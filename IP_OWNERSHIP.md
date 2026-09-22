@@ -1,11 +1,15 @@
-# ZazuEMP Intellectual Property & Ownership Record
+# Zazu EMP Intellectual Property & Ownership Record
 
 **Status:** Foundational project record  
 **Established:** 2026-09-22
 
-## Designated project owner
+## Product owner
 
-The project owner / rights-holder designated for ZazuEMP is:
+Zazu EMP is a software product of:
+
+**Rosscore Labs Pty Ltd**
+
+The designated founder, company owner, creator and lead developer for Zazu EMP is:
 
 **Isaac Junior Lehlogonolo Maluleka**
 
@@ -13,7 +17,7 @@ The GitHub repository currently associated with the project is:
 
 `Leano-Jordan/ZazuEMP`
 
-The GitHub account has administrative ownership/permission over the repository at the time this record was established.
+The GitHub account currently has administrative ownership/permission over the repository.
 
 ## Ownership boundary
 
@@ -22,7 +26,6 @@ This document records the project's intended ownership position. It is not, by i
 Original project material should be created, stored and attributed in a way that preserves an auditable chain of ownership.
 
 The project should maintain provenance for:
-
 - source code
 - architecture
 - database schemas and migrations
@@ -43,11 +46,11 @@ No external contributor should be treated as transferring ownership of their con
 
 Before accepting material that creates meaningful ownership, licensing or confidentiality risk, use an appropriate written contributor, contractor or assignment agreement.
 
-The repository's [CONTRIBUTING.md](CONTRIBUTING.md) sets the operational contribution rules.
+The repository's [CONTRIBUTING.md](CONTRIBUTING.md) sets operational contribution rules.
 
 ## Third-party material
 
-Third-party code, fonts, images, libraries, datasets, documentation and other assets must not be treated as ZazuEMP-owned IP merely because they are included in or used by the project.
+Third-party code, fonts, images, libraries, datasets, documentation and other assets must not be treated as Zazu EMP-owned IP merely because they are included in or used by the project.
 
 Record third-party material and its licence in [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md).
 
@@ -55,13 +58,15 @@ Record third-party material and its licence in [THIRD_PARTY_NOTICES.md](THIRD_PA
 
 The name, logo, product identity and other brand elements should be treated separately from copyright.
 
+The Zazu EMP mascot should be an original bird design and must not reproduce protected artwork or a distinctive third-party character design.
+
 Before commercial launch or public brand expansion, conduct appropriate trade-mark clearance and registration analysis in the relevant jurisdictions.
 
 ## Public repository warning
 
-ZazuEMP is currently hosted in a public GitHub repository.
+Zazu EMP is currently hosted in a public GitHub repository.
 
-Do **not** place confidential source material, credentials, personal records, customer data, private contracts or trade secrets in the public repository.
+Do not place confidential source material, credentials, personal records, private contracts or trade secrets in the public repository.
 
 ## Legal review
 
