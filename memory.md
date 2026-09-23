@@ -1,612 +1,307 @@
 # Zazu EMP — Living Project Context
 
-**Product:** Zazu – Event Management Platform  
-**Short name:** Zazu EMP  
-**Company / product owner:** Rosscore Labs Pty Ltd  
-**Founder / company owner / creator / lead developer:** Isaac Junior Lehlogonolo Maluleka  
-**Repository:** `Leano-Jordan/ZazuEMP`  
-**Default branch:** `main`  
-**Project state:** Definition / foundation build  
-**Context last updated:** 2026-09-23
+**Product:** Zazu – Event Management Platform (Zazu EMP)
+**Owner:** Rosscore Labs Pty Ltd
+**Founder / creator / lead developer:** Isaac Junior Lehlogonolo Maluleka
+**Repository:** Leano-Jordan/ZazuEMP
+**Default branch:** main
+**Context updated:** 2026-09-23 16:08 SAST
 
-> **BOOTSTRAP RULE FOR EVERY NEW PROJECT CHAT:** Read this file first. Treat it as the current project context and living memory. It records current decisions, validated discovery evidence, unresolved questions, architecture direction, and build state. It may change when the owner gives new direction or when new evidence changes what we know.
+> NEW-CHAT BOOTSTRAP: Read this file first. It is the canonical project memory. Then read docs/ZAZU_CHAT_CONTEXT.md. Inspect the current repository state before acting. Repository state outranks stale conversation memory.
 
----
+## 1. Product identity
 
-## 1. What Zazu EMP is
+Zazu EMP is a reusable commercial event-management platform owned by Rosscore Labs Pty Ltd.
 
-Zazu EMP is a Rosscore Labs Pty Ltd software product for small businesses that provide event-related services.
+It is NOT a bespoke Sindi system and NOT SwiftOrder.
 
-The product is **not Sindi's personal system** and is **not limited to catering**.
-
-Target businesses can include:
+Target businesses include:
 - catering
-- tents and chairs / event equipment hire
-- sound / DJ
-- baking / cookies
+- tents/chairs and event equipment hire
+- sound/DJ
+- baking/cookies
 - decor
-- other event services
-- businesses combining several of these services
+- rentals
+- combinations of event services
+- other small event-related businesses
 
-A business may use only one service or several on the same event.
+Core model:
 
-The central model is:
+Business -> Customer -> Event/Job -> Services -> Quote -> Confirmation/Deposit -> Buying/Hiring -> Preparation -> Event -> Payments/Completion
 
-**Business → Customer → Event / Job → Services → Quote → Confirmation / Deposit → Buying / Hiring → Preparation → Event → Payments / Completion**
+The Event/Job is the central operational record.
 
-The event/job is the centre of the product, not the industry category.
+## 2. Owner authority
 
----
+Isaac is the product owner and final decision-maker.
 
-## 2. Owner and decision authority
+For consequential product, UX, architecture, infrastructure, spending, licensing, branding or scope decisions:
+- inspect evidence
+- present viable options and trade-offs
+- identify risks/costs/dependencies
+- let the owner decide unless already explicitly decided
 
-Zazu EMP is owned and controlled by **Rosscore Labs Pty Ltd**.
-
-**Isaac Junior Lehlogonolo Maluleka** is the owner of the company, creator and lead developer of Zazu EMP.
-
-The engineering/discovery assistants work for the owner.
-
-### Decision rule
-Do not silently turn an assistant preference into a project decision.
-
-For major product, UX, architecture, infrastructure, spending, licensing or scope decisions:
-1. inspect the current project/evidence
-2. present viable options and meaningful trade-offs
-3. identify risks/dependencies/cost implications
-4. let the owner decide unless the owner has already decided
-
-The project memory is adaptable. It is not a rigid specification.
-
----
+Do not silently convert an AI preference into a project decision.
 
 ## 3. Operating engines
 
-Three project engines must stay aligned on meaningful Zazu EMP work:
+Keep these three guidance systems aligned:
+- Project Genesis & Scale Engine
+- Human-First Discovery Mode
+- RossCore Engineering Command Engine
 
-### Project Genesis & Scale Engine
-Purpose: understand reality, reduce uncertainty, define the product, sequence work, and scale from evidence.
+Operating principles:
+- evidence before assumptions
+- small useful solutions
+- no unnecessary abstractions
+- inspect current implementation before changing it
+- implement, test and verify
+- record meaningful project state
+- keep discovery questions short and high-value
+- UI/UX is an engineering concern, not a final coat of paint
 
-Core loop:
-**EXTRACT → UNDERSTAND → QUESTION → VALIDATE → DEFINE → SCOPE → PLAN → BUILD / JOIN / INTERVENE → VERIFY → LEARN → ADAPT → SCALE / PRODUCTIZE / PIVOT / STOP**
+## 4. Commercial constraints
 
-### Human-First Discovery Mode
-Purpose: learn from real operators without wasting their time.
+Current budget: R0.
 
-Rules:
-- ask short, high-value questions
-- ask one useful question at a time when interviewing
-- follow the pain rather than completing a template
-- distinguish known facts from assumptions
-- stop questioning when another question will not materially change the next decision
+Prefer free/open-source technologies with commercial-use-friendly licensing. Paid services are possible later but require an explicit cost/value decision.
 
-### RossCore Engineering Command Engine
-Purpose: produce software that is correct, maintainable, secure, usable and verifiable.
+Zazu must support multiple independent businesses. Business data isolation is foundational.
 
-Core engineering discipline:
-**INSPECT → PLAN → AUTHORIZE → IMPLEMENT → TEST → VERIFY**
+## 5. Discovery evidence: Sindi
 
-UI/UX is a first-class engineering concern.
+Sindi Sithole is a real discovery/pilot operator. Her workflow is evidence about her business, not a universal market specification.
 
----
+Validated signals:
+- quotation work is a major pain point
+- she currently uses Excel for quotations/invoices
+- she manually researches prices from shops, online or physically
+- menu is agreed before quotation
+- ingredients, time and effort are considered
+- client confirmation can fail after quote effort
+- distance is checked with Google Maps
+- she described kilometre-based travel costing and mentioned R14/km as an example from her current practice
+- round-trip travel is charged
+- calculating cost per kilometre is the slowest quotation task for her
+- after deposit, controlling spending against agreed scope matters
+- she uses owned resources and hires what she lacks for a job
+- separate events use different invoices/references
+- event folders may be named using the address
+- reminders/keeping track are a problem
+- she would like a dedicated system
+- map, WhatsApp and Excel connections sounded useful to her
 
-## 4. Commercial position
-
-### Current budget
-**R0.**
-
-Explore free and open-source technologies that permit commercial use before introducing paid services.
-
-Paid infrastructure or services are not forbidden forever, but they must be presented as an option with cost/value implications and require owner approval.
-
-### Productisation
-Zazu EMP should be designed from the beginning as a reusable commercial product for multiple independent businesses.
-
-Sindi is a real discovery/pilot user. She is not the sole customer and not the product owner.
-
-Other operators, including the owner's neighbour and additional catering/event businesses, are valid discovery and pilot users.
-
----
-
-## 5. Real-world discovery: Sindi
-
-Sindi Sithole is an actual small event-business operator whose workflow is being used for product discovery.
-
-She is not being treated as a proxy for every business. Her answers are evidence about **her workflow** and signals about problems worth investigating with other operators.
-
-### Confirmed quotation findings
-- Quotation is a major pain point.
-- Before quoting, she may need to source prices from different shops.
-- She personally goes online or physically to look for ingredients/items.
-- This is an owner-operated, ad-hoc sourcing process, not a large-company supplier-chain workflow.
-- Menu is already agreed before the quote.
-- Ingredients are accounted for.
-- Time and effort are included.
-- Prices are already set when preparing the quote.
-- She currently uses Excel for quotations and invoices.
-- Some clients do not confirm after substantial quotation work has already been done.
-- Deposit/payment is the commitment point.
-
-### Confirmed distance/travel findings
-- Distance charge is calculated by kilometre.
-- She checks Google Maps.
-- She referred to government pricing available online as a reference.
-- Example mentioned: R14/km.
-- She charges the trip in and out.
-- She confirmed that calculating the cost per kilometre is the part of quotation work that takes the most time.
-
-### Confirmed changes/additions
-- Additions can be added to the existing work or handled as a separate quote.
-- Invoice number and amount may be changed when the work changes.
-- Keeping related work together is preferable.
-
-### Confirmed buying/hiring model
-- She uses what she already owns.
-- She hires what she does not have for a particular job.
-- Sourcing can therefore vary from job to job.
-- The product should not assume every operator owns all equipment or has a fixed supplier catalogue.
-
-### Confirmed cost-control issue
-- After deposit, she wants to avoid buying things outside the agreed scope.
-- Time and distance can be missed in costing.
-- Finance is currently manual using Excel and calculators.
-
-### Confirmed event organisation
-- Separate events can be separated with different invoices and references.
-- She creates a folder for a wedding, funeral or other event and names the folder using the address.
-- Reminders / keeping track are a problem and built-in reminders sounded useful.
-- Before an event she checks that everything agreed with the client is prepared and ready.
-- That preparation check is ordinary operational common sense and is not itself being treated as a major validated pain point.
-
-### Confirmed technology preferences/signals
-- She currently has no dedicated system.
-- She said many businesses also do not have one.
-- She would like a dedicated system.
-- She mentioned a map, WhatsApp connection and possible Excel connection as useful.
-
-### Current strongest discovery signals
-1. Faster, easier quotation work.
-2. Automatic or assisted distance-cost calculation.
-3. Clear approved scope so spending stays within the job.
-4. Simple event/job organisation.
-5. Practical reminders and follow-up.
-6. Less manual Excel/calculator work.
-7. The ability to work with owned, hired and bought resources in one job.
-
----
+Do not treat R14/km as a universal Zazu rule.
 
 ## 6. Product hypothesis
 
-The product should reduce the manual coordination around an event without forcing a small operator into enterprise software.
+The product should reduce manual coordination around an event without forcing a small operator into enterprise software.
 
-A useful event record should bring related data together:
-
+Useful event context may include:
 - customer
-- event date/time
+- date/time
 - venue/address
 - services
 - quote
 - travel
 - deposit/payment status
 - expenses
-- hired items
+- hired/bought items
 - documents
 - reminders
 - activity/history
 - contact actions
 
-The goal is not “more features”.
+The goal is faster, clearer, less error-prone real work, not feature volume.
 
-The goal is to make the operator's real work faster, clearer and less error-prone.
+## 7. UX direction
 
----
+Core principle: WORKSPACE OVER SCREEN.
 
-## 7. UX / information architecture
+Prefer a small number of rich contextual workspaces using tabs, panels, drawers, contextual modals, split views and inline editing where useful.
 
-### Core UX principle
-**Workspace over screen.**
+Desktop/laptop is important because operators already use Excel, folders and calculators. Phone use also matters. Zazu is desktop + mobile, not mobile-only.
 
-Do not create one narrow CRUD screen for every data type simply because the database has separate tables.
+The Event Workspace is expected to be the most important operator surface and should eventually bring relevant customer, quote, travel, spending, payment, preparation, documents and history context together.
 
-Current design direction is a small number of primary workspaces containing rich, contextual records using:
-- tabs
-- cards
-- side panels
-- drawers
-- contextual modals
-- split views
-- inline editing where useful
+Design quality bar:
+professional, fast, clear, calm, information-dense without clutter, accessible, responsive, maintainable and commercially credible.
 
-Related information should remain together when the user is performing one job.
+Avoid card soup, button soup, unnecessary animation, decorative UI and excessive whitespace.
 
-Example:
+## 8. Security / business isolation
 
-When editing an event quote, the user should not need to bounce through separate screens to see the customer, venue, distance, travel cost and payment context.
+Conceptual access model:
 
-### Candidate primary operator navigation
-This is a working proposal, not a final locked decision:
+User -> Business membership -> Role -> Permission -> Allowed action
 
-1. **Home** — today's work, upcoming events, reminders, outstanding quotes/payments and attention items.
-2. **Events** — combined list/calendar with search and filtering.
-3. **Event Workspace** — central operational record for one event.
-4. **Customers** — customer records and event history.
-5. **Quotes / Work** — quotation pipeline and active work.
-6. **Finance** — payments, expenses and business summaries.
-7. **Settings** — business profile, services, rates, users and integrations.
+Do not rely on a global role alone.
 
-The exact navigation and screen count remain subject to design and owner approval.
+Every business-owned record needs a clear business boundary.
 
-### Event Workspace
-This is expected to be the most important screen/workspace.
+Likely roles are business owner, manager, staff/operator plus Rosscore platform control, but exact permissions remain an implementation decision.
 
-It should be able to show, in one contextual view:
-- customer
-- date/time
-- event type
-- address
-- status
-- quote value
-- deposit/balance
-- services
-- travel calculation
-- spending
-- hired/bought items
-- reminders
-- documents
-- activity/history
-- WhatsApp actions
-- map/route
+Server-side authorization is mandatory.
 
----
+## 9. Integrations
 
-## 8. Two connected product experiences
+Maps:
+- address -> route/distance -> configurable km rate -> travel charge
+- provider choice remains open
+- use a replaceable integration boundary
 
-Zazu EMP has two faces over the same product core.
+WhatsApp:
+- first useful capability can be click-to-chat and pre-filled messages
+- deep API automation is a later decision
 
-### Business Operator App
-For each customer business:
-- strong desktop/laptop experience because operators already use Excel, MS tools, folders and calculators
-- strong phone experience for work away from the desk and at events
-- responsive web application
-- eventual PWA capabilities
+Excel:
+- import/export is useful for migration and existing workflows
+- live two-way sync is not yet validated
 
-This is **desktop + mobile**, not mobile-only.
+## 10. Technical foundation
 
-### Rosscore Control
-For Isaac / Rosscore Labs:
-- cross-business operational visibility
-- product usage and support visibility
-- event/activity overview
-- alerts and exceptions
-- account/business administration
-- system health
+Verified on 2026-09-23:
+- Windows + VS Code
+- PHP 8.4.26 CLI
+- Laravel 13.33.0
+- Composer dependencies installed
+- Node/npm installed
+- npm.cmd is used because PowerShell blocks the npm.ps1 shim
+- .env exists
+- application key generated
+- migrations execute
+- npm.cmd install completed
+- npm.cmd run build succeeds
 
-Access to customer business data must be deliberate, permissioned and auditable.
+A clean Laravel skeleton was temporarily created at:
+C:\Projects\ZazuEMP-LaravelTemp
 
----
+The Laravel foundation was then merged into the real project:
+C:\Projects\ZazuEMP
 
-## 9. Role-based access and business boundaries
+The temporary folder is not the product and should not become the working project.
 
-Security and authorization are foundational.
+Known non-blocking warnings:
+- PHP reports missing pdo_firebird. Leave it alone unless it causes a real Zazu failure.
+- Vite reports optional fontaine optimization. Leave it alone unless the owner chooses to address it.
 
-Use a business-aware access model:
+Do not restart PHP setup because of either warning.
 
-**User → Business membership → Role → Permission → Allowed action**
-
-Do not use a simple global user role as the whole authorization model.
-
-Every business-owned record should have a clear business boundary so independent businesses cannot see each other's data.
-
-Initial conceptual roles may include:
-- platform owner / Rosscore control
-- business owner
-- manager
-- staff / operator
-- other restricted roles as evidence requires
-
-The exact role catalogue and permissions are subject to implementation design and owner approval.
-
-Core requirements:
-- authentication
-- registration
-- session security
-- authorization
-- business isolation
-- password recovery
-- email verification where appropriate
-- auditability for important actions
-- server-side authorization, not just hidden UI
-
----
-
-## 10. Quotation model
-
-Quotation is a key entry point.
-
-A quote may combine:
-- services
-- products/items
-- quantities
-- prices
-- labour/time
-- travel
-- hired items
-- other charges
-- discount/adjustment where applicable
-- total
-- deposit
-- payment status
-
-### Travel calculation
-Validated pain point.
-
-Conceptual flow:
-**origin + destination → route distance → one-way/round-trip → km rate → calculated travel charge**
-
-The rate is configurable. Sindi's R14/km is an example from her current practice, not a universal Genesis rule.
-
-A manual override may be allowed with a reason/history record.
-
-The route provider should sit behind a replaceable map/distance service boundary.
-
----
-
-## 11. Scope, changes and money
-
-An accepted/approved quote should create a clear historical boundary for the job.
-
-Changes/additions should be represented as versions or change records rather than silently destroying the prior agreed state.
-
-The event should be able to distinguish:
-- quoted amount
-- deposit received
-- additional charges
-- actual expenses
-- hire costs
-- balance outstanding
-
-This is particularly relevant to Sindi's concern about avoiding spending outside agreed scope.
-
-The first financial model is operational visibility, not a replacement for every accounting package.
-
----
-
-## 12. Buying, hiring and sourcing
-
-Genesis must support real small-operator behaviour.
-
-For a particular event, an item/service may be:
-- already owned
-- bought for the event
-- hired for the event
-- sourced ad-hoc from a shop/supplier
-
-A fixed supplier network is **not** a prerequisite.
-
-Potential future structures:
-- simple supplier/source records
-- reusable known prices
-- event-specific purchase/hire records
-- actual-vs-quoted cost comparison
-
-These remain to be validated.
-
----
-
-## 13. Maps, WhatsApp and Excel
-
-### Maps
-Current user evidence supports map-assisted distance calculation.
-
-Candidate approach:
-- address fields
-- route/distance lookup
-- configurable km rate
-- round-trip calculation
-- generated travel line item
-
-Map provider choice remains open.
-
-### WhatsApp
-First useful capability:
-- stored customer phone number
-- click-to-chat
-- pre-filled quote/reminder/payment messages
-
-Deep API automation is a later decision based on demand, cost and feasibility.
-
-### Excel
-First useful capability:
-- import existing business data where practical
-- export quotes, invoices and operational/financial information
-- ease migration from current Excel workflows
-
-Live two-way Excel synchronisation is not yet a validated requirement.
-
----
-
-## 14. Technical direction
-
-### Current preferred foundation
-This is the current technical proposal, not an irreversible commitment:
-
-- **PHP 8.4** as the practical local development target because that version is already available on the owner's machine
-- **Laravel 13**
-- **MySQL 8.x**
-- **Livewire 4**
-- **Tailwind CSS 4**
-- **Vite**
-- minimal JavaScript for browser capabilities where useful
-- automated tests appropriate to critical business/security workflows
-
-The reason for using PHP 8.4 rather than forcing another installation is practicality. The owner's current CLI is still resolving AMPPS PHP 7.4 and must be switched to the existing PHP 8.4 installation before Laravel 13 creation.
-
-### Architecture
-Current direction:
-- modular monolith
-- recognisable Laravel conventions
+Architecture direction:
+- Laravel modular monolith
+- normal Laravel conventions
 - reusable business logic
 - replaceable integration boundaries
-- multi-business data boundaries from the start
-- simple infrastructure appropriate to R0
-- avoid architecture that assumes one business only
+- multi-business boundaries from the start
+- infrastructure appropriate to R0
+- avoid abstractions for their own sake
 
-Do not inherit SwiftOrder's architecture automatically. Genesis has different product requirements.
+## 11. Current Event/Job implementation
 
----
+The first database object is Event/Job because other operational information hangs from it.
 
-## 15. Current development environment / build state
+Migration:
+database/migrations/2026_09_23_000000_create_events_table.php
 
-Owner is developing in **VS Code on Windows**.
+Fields:
+- id
+- reference, unique
+- name
+- event_type, nullable
+- customer_name
+- customer_phone, nullable
+- customer_email, nullable
+- event_date, nullable
+- event_address, nullable
+- notes, nullable
+- status, default draft
+- timestamps
 
-Working project folder:
-**Zazu EMP** under the owner's projects directory.
+Verified:
+php artisan migrate created events successfully.
 
-GitHub repository exists:
-**Leano-Jordan/ZazuEMP**
+Controller scaffold:
+app/Http/Controllers/EventController.php
 
-Repository is currently a public GitHub repository and includes project-control documentation.
+Verified:
+php artisan make:controller EventController succeeded.
 
-Current machine state:
-- PHP CLI: **7.4.33**, supplied by AMPPS
-- Composer: **2.10.2**
-- Node: **26.9.0**
-- npm: **11.19.1**
-- PHP 8.4 is already available separately on the owner's machine
-- current task is to make the development shell resolve PHP 8.4 instead of AMPPS PHP 7.4
+The Event model, routes and UI still need to be implemented unless current repository inspection shows otherwise.
 
-Do not delete or break AMPPS PHP 7.4 while switching the Zazu development environment.
+## 12. First vertical slice
 
-### Immediate build sequence
-1. Correct the PHP CLI resolution.
-2. Create the Laravel application in the Zazu EMP project.
-3. Establish authentication and polished first impression.
-4. Establish business creation/ownership and role-based access.
-5. Build the shared application shell and workspace navigation.
-6. Build Event/Job + Customer foundation.
-7. Build Quote + travel-cost workflow.
-8. Build deposits/payments/scope/change tracking.
-9. Add reminders, documents, WhatsApp actions and Excel support.
-10. Build Rosscore Control.
-11. Test with multiple real businesses and adapt from evidence.
+Do not jump directly into quotations, suppliers, WhatsApp, Maps, finance, dashboards or dozens of tables.
 
----
+Current target:
 
-## 16. UI/UX quality bar
+CREATE EVENT
+-> SAVE EVENT
+-> SEE EVENT
+-> EDIT EVENT
+-> SEE EVENT IN ZAZU UI
 
-A beautiful UI is not a finishing coat.
+Expected next implementation files:
+1. app/Models/Event.php
+2. app/Http/Controllers/EventController.php
+3. routes/web.php
+4. resources/views/events/index.blade.php
+5. resources/views/events/create.blade.php
+6. resources/views/events/edit.blade.php
+7. resources/views/events/show.blade.php
 
-Zazu should feel:
-- modern
-- clear
-- calm
-- fast
-- professional
-- approachable
-- information-dense without being cluttered
-- usable on laptop/desktop
-- excellent on phone when needed
+Use normal Laravel conventions. Keep the first slice small and verifiable.
 
-The product should feel like a **purpose-built modern operations workspace**, not an Excel spreadsheet wearing a web skin.
+## 13. Current verification scoreboard
 
----
+DONE:
+- PHP/Laravel foundation
+- .env and app key
+- database migration infrastructure
+- events table migration
+- controller scaffold
+- frontend dependency installation
+- frontend production build
 
-## 17. Brand
+IN PROGRESS:
+- Event/Job vertical slice
 
-Product name:
-**Zazu – Event Management Platform**
+NOT YET VERIFIED:
+- Event model behavior
+- validation
+- controller behavior
+- routes
+- create/edit/show/index UI
+- automated tests for Event slice
+- polished Zazu application shell
+- authentication/registration
+- business membership/isolation implementation
 
-Short form:
-**Zazu EMP**
+## 14. New-chat operating rules
 
-Zazu is a personal name connection used by Sindi for Isaac, and the product brand can use an original bird mascot.
+1. Read memory.md and docs/ZAZU_CHAT_CONTEXT.md before acting.
+2. Inspect current Git branch, HEAD and changed files.
+3. Treat GitHub/current repository as source of truth.
+4. Do not repeat completed setup work.
+5. Do not ask the owner to re-investigate problems already verified.
+6. Give exact file paths and exact code when implementation is requested.
+7. Keep responses focused and actionable.
+8. For major decisions, show options and let Isaac decide.
+9. Keep discovery evidence separate from hypotheses.
+10. Update project memory after meaningful implementation state changes.
+11. Preserve working behavior and avoid unnecessary rewrites.
+12. Every meaningful implementation batch should have a clear verification step and meaningful commit.
+13. The temporary Laravel folder is not the working project.
+14. Never treat Sindi's workflow as the universal market specification.
+15. Do not invent business rules, pricing, legal claims, branding claims or integrations without evidence/owner approval.
 
-Mascot direction:
-- create an original bird character
-- may draw on broad African bird/hornbill inspiration
-- must not copy the appearance, costume, artwork or distinctive character design of Disney's Zazu
-- treat brand/trademark questions separately from copyright
-- complete appropriate clearance before commercial brand expansion
+## 15. Immediate next action
 
----
+Complete and verify the Event/Job vertical slice.
 
-## 18. Current discovery questions
+Start with:
+app/Models/Event.php
 
-Discovery should continue only where another answer can change what we build.
+Then wire:
+controller -> routes -> validation -> Blade UI -> create/save -> show -> edit/update -> tests.
 
-Useful future questions should focus on concrete mechanics such as:
-- how quote revisions are actually handled
-- how event spending is recorded
-- what information an owner needs at a glance
-- how different businesses organise services/items
-- how customers communicate changes
-- what multiple events look like in practice
-- what operators would pay or what commercial model is realistic
-
-Ask real operators short questions. Do not waste their time.
-
----
-
-## 19. Known facts vs hypotheses
-
-### VERIFIED / REPOSITORY
-- Zazu EMP repository exists.
-- Rosscore Labs owns the product.
-- Isaac is the owner/creator/lead developer.
-- This is a multi-business product direction.
-- Project uses three operating engines.
-- R0 is the current budget.
-- Desktop/laptop is an important primary workspace.
-- Workspace-over-screen is a current UX principle.
-- Role/business isolation is foundational.
-
-### REPORTED BY SINIDI
-- quotation work is time-consuming
-- per-kilometre calculation is the slowest part for her
-- sourcing is done personally online/physically
-- Excel + calculator is current workflow
-- deposit is commitment point
-- time/distance can cause costing losses
-- scope control matters after deposit
-- events are separated by invoice/reference
-- folders by event/address are used
-- reminders/keeping track are problematic
-- map, WhatsApp and Excel connections sound useful
-- she would use a dedicated system
-
-### INFERRED
-- quote + travel costing is a plausible initial product wedge
-- approved scope linked to expenses may reduce out-of-scope spending
-- event workspace can replace multiple disconnected manual records
-
-### ASSUMED / NEEDS MORE VALIDATION
-- exact common workflow across the broader market
-- universal role structure
-- universal accounting requirements
-- universal need for inventory management
-- preferred map provider
-- depth of WhatsApp integration
-- commercial pricing model
-- exact minimum screen/workspace count
-
----
-
-## 20. Major rules for future project chats
-
-1. Read this file before acting.
-2. Check current repository/runtime evidence before assuming state.
-3. Treat owner instructions as authoritative unless they conflict with safety/legal constraints.
-4. Do not treat stale AI output as a decision.
-5. Do not make a major architecture/spending/product decision without presenting options unless the owner has already decided.
-6. Keep the three engines together.
-7. Keep discovery evidence separate from assumptions.
-8. Prefer useful action over long speeches.
-9. Do not build features merely because they are possible.
-10. Update this file when project reality, owner decisions or validated evidence changes.
-11. Keep documentation aligned with repository reality.
-12. Zazu EMP is a Rosscore Labs product for multiple businesses, not a bespoke Sindi application.
-
----
-
-## 21. Current next action
-
-**Get the development environment onto PHP 8.4, then create the real Laravel application and begin the authentication/registration foundation with a polished Zazu EMP UI.**
+After the slice works, move to the next highest-value dependency based on evidence rather than building the entire platform at once.
