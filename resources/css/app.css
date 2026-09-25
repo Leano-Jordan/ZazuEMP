@@ -7,3 +7,19 @@
     --font-sans: 'Instrument Sans', ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji',
         'Segoe UI Symbol', 'Noto Color Emoji';
 }
+
+
+/* Low-glare light palette. This is intentionally not a full dark theme. */
+:root {
+    color-scheme: light;
+}
+
+body {
+    background-color: #e9edf1;
+}
+
+input,
+select,
+textarea {
+    background-color: #f7f8fa;
+}
