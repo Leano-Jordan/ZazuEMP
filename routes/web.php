@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\CustomerController;
+use App\Http\Controllers\EventRequirementController;
 use App\Http\Controllers\WorkController;
 use Illuminate\Support\Facades\Route;
 
@@ -16,3 +17,5 @@ Route::put('/work/{event}', [WorkController::class, 'update'])->name('work.updat
 Route::get('/customers', [CustomerController::class, 'index'])->name('customers.index');
 Route::get('/customers/create', [CustomerController::class, 'create'])->name('customers.create');
 Route::post('/customers', [CustomerController::class, 'store'])->name('customers.store');
+
+Route::post('/work/{event}/requirements', [EventRequirementController::class, 'store'])->name('work.requirements.store');

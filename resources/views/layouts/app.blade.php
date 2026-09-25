@@ -33,6 +33,7 @@
                 <div class="pt-5">
                     <p class="px-3 pb-2 text-[11px] font-semibold uppercase tracking-[0.16em] text-slate-400">Coming next</p>
                     <div class="space-y-1 text-sm text-slate-400">
+                        <div class="rounded-xl bg-slate-200/70 px-3 py-2 font-medium text-slate-500">Requirements <span class="font-normal text-slate-400">· active</span></div>
                         <div class="px-3 py-2">Quotes</div>
                         <div class="px-3 py-2">Calendar</div>
                         <div class="px-3 py-2">Suppliers</div>

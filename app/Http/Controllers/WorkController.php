@@ -112,7 +112,7 @@ class WorkController extends Controller
 
     public function show(Event $event): View
     {
-        $event->load(['customer.contacts', 'eventDayContact']);
+        $event->load(['customer.contacts', 'eventDayContact', 'requirements']);
 
         return view('work.show', compact('event'));
     }

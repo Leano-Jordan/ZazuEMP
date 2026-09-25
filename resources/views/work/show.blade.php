@@ -37,12 +37,46 @@
             </section>
 
             <section class="rounded-2xl border border-slate-200 bg-white p-5">
-                <h2 class="font-semibold text-slate-950">Requirements & services</h2>
-                <p class="mt-1 text-sm text-slate-500">This is where the work will become specific to catering, hire, sound, funeral services, or another business capability.</p>
-                <div class="mt-5 rounded-xl border border-dashed border-slate-300 px-4 py-8 text-center">
-                    <p class="font-medium text-slate-700">Requirements layer comes next</p>
-                    <p class="mt-1 text-sm text-slate-400">No quote is created until the work is understood.</p>
+                <div class="flex items-center justify-between gap-4">
+                    <div>
+                        <h2 class="font-semibold text-slate-950">Requirements</h2>
+                        <p class="mt-1 text-sm text-slate-500">Capture what this work needs before pricing or buying.</p>
+                    </div>
+                    <span class="text-xs font-medium text-slate-400">{{ $event->requirements->count() }} items</span>
                 </div>
+
+                @if ($event->requirements->isNotEmpty())
+                    <div class="mt-5 space-y-2">
+                        @foreach ($event->requirements as $requirement)
+                            <div class="rounded-xl border border-slate-200 bg-slate-50 px-4 py-3">
+                                <div class="flex flex-col gap-1 sm:flex-row sm:items-center sm:justify-between">
+                                    <p class="font-medium text-slate-800">{{ $requirement->description }}</p>
+                                    @if ($requirement->quantity)
+                                        <p class="text-sm text-slate-500">{{ rtrim(rtrim(number_format((float) $requirement->quantity, 2), '0'), '.') }} {{ $requirement->unit }}</p>
+                                    @endif
+                                </div>
+                                @if ($requirement->category || $requirement->notes)
+                                    <p class="mt-1 text-xs text-slate-400">
+                                        {{ $requirement->category ?: 'General' }}
+                                        @if ($requirement->notes) · {{ $requirement->notes }} @endif
+                                    </p>
+                                @endif
+                            </div>
+                        @endforeach
+                    </div>
+                @endif
+
+                <form method="POST" action="{{ route('work.requirements.store', $event) }}" class="mt-5 grid gap-3 sm:grid-cols-2">
+                    @csrf
+                    <input name="description" required class="w-full rounded-xl border border-slate-300 px-3.5 py-3 text-sm outline-none focus:border-sky-500 focus:ring-2 focus:ring-sky-100" placeholder="e.g. 100 chairs">
+                    <input name="category" class="w-full rounded-xl border border-slate-300 px-3.5 py-3 text-sm outline-none focus:border-sky-500 focus:ring-2 focus:ring-sky-100" placeholder="Category (optional)">
+                    <input type="number" step="0.01" min="0" name="quantity" class="w-full rounded-xl border border-slate-300 px-3.5 py-3 text-sm outline-none focus:border-sky-500 focus:ring-2 focus:ring-sky-100" placeholder="Quantity">
+                    <input name="unit" class="w-full rounded-xl border border-slate-300 px-3.5 py-3 text-sm outline-none focus:border-sky-500 focus:ring-2 focus:ring-sky-100" placeholder="Unit (chairs, people, hours...)">
+                    <input name="notes" class="sm:col-span-2 w-full rounded-xl border border-slate-300 px-3.5 py-3 text-sm outline-none focus:border-sky-500 focus:ring-2 focus:ring-sky-100" placeholder="Notes (optional)">
+                    <div class="sm:col-span-2 flex justify-end">
+                        <button class="rounded-xl bg-slate-900 px-4 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-slate-800">Add requirement</button>
+                    </div>
+                </form>
             </section>
 
             <section class="rounded-2xl border border-slate-200 bg-white p-5">
