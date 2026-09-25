@@ -8,23 +8,138 @@
         'Segoe UI Symbol', 'Noto Color Emoji';
 }
 
-
-/* Low-glare light palette. This is intentionally not a full dark theme. */
+/*
+ * Zazu soft coastal light theme.
+ * The hierarchy intentionally avoids pure white so cards, groups and page
+ * surfaces remain visually distinct without becoming a dark theme.
+ */
 :root {
     color-scheme: light;
 }
 
 body {
-    background-color: #e9edf1;
+    background-color: #dcecf2;
 }
 
 input,
 select,
 textarea {
-    background-color: #f7f8fa;
+    background-color: #eef7fa;
+    border-color: #b9d3dc;
 }
 
+input:focus,
+select:focus,
+textarea:focus {
+    border-color: #70aebe;
+}
 
 .bg-white {
-    background-color: #f7f8fa !important;
+    background-color: #edf7fa !important;
+}
+
+.bg-slate-50 {
+    background-color: #e3f1f5 !important;
+}
+
+.bg-slate-100 {
+    background-color: #d8ebf1 !important;
+}
+
+.border-slate-100 {
+    border-color: #d2e5eb !important;
+}
+
+.border-slate-200 {
+    border-color: #bdd6df !important;
+}
+
+.border-slate-300 {
+    border-color: #aac9d3 !important;
+}
+
+.hover\:bg-slate-50:hover {
+    background-color: #e5f3f7 !important;
+}
+
+.hover\:bg-slate-100:hover {
+    background-color: #d7eaf0 !important;
+}
+
+.text-slate-950 {
+    color: #18343e !important;
+}
+
+.text-slate-900 {
+    color: #203f49 !important;
+}
+
+.text-slate-700 {
+    color: #3b5d68 !important;
+}
+
+.text-slate-600 {
+    color: #55717b !important;
+}
+
+.text-slate-500 {
+    color: #67828b !important;
+}
+
+.text-slate-400 {
+    color: #78939c !important;
+}
+
+.bg-slate-900 {
+    background-color: #285461 !important;
+}
+
+.hover\:bg-slate-800:hover {
+    background-color: #214a56 !important;
+}
+
+.bg-emerald-50 {
+    background-color: #e2f3ed !important;
+}
+
+.bg-rose-50 {
+    background-color: #f8e9ec !important;
+}
+
+.bg-amber-50 {
+    background-color: #f6efd9 !important;
+}
+
+.text-sky-600,
+.text-sky-700 {
+    color: #2f7183 !important;
+}
+
+.text-emerald-700 {
+    color: #2d6b58 !important;
+}
+
+.text-rose-600,
+.text-rose-800 {
+    color: #9a5260 !important;
+}
+
+.text-amber-700 {
+    color: #876d32 !important;
+}
+
+.border-emerald-200 {
+    border-color: #b8d9ce !important;
+}
+
+.border-rose-200 {
+    border-color: #e2c2ca !important;
+}
+
+.border-slate-300 {
+    border-color: #aac9d3 !important;
+}
+
+.shadow-sm {
+    box-shadow: 0 1px 3px rgba(45, 84, 97, 0.08) !important;
 }
