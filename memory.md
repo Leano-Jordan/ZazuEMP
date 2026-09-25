@@ -6,7 +6,7 @@
 **Repository:** Leano-Jordan/ZazuEMP
 **Default branch:** main
 **Active development branch:** laravel-foundation
-**Context updated:** 2026-09-25
+**Context updated:** 2026-09-26
 
 Repository state outranks stale conversation memory. Inspect the current repository before acting.
 
@@ -51,12 +51,20 @@ The Work Workspace is the operational centre.
 Quality target:
 professional, clear, calm, fast, dense without clutter, accessible, responsive and maintainable.
 
-## Security direction
+## Security / privacy direction
 
 Conceptual access model:
 User -> Business membership -> Role -> Permission -> Allowed action
 
 Server-side authorization and business isolation are mandatory before production use.
+
+Never commit secrets, production data or customer records.
+
+Compliance baseline is recorded in:
+docs/COMPLIANCE_BASELINE.md
+
+Ownership/provenance is recorded in:
+IP_OWNERSHIP.md
 
 ## Technical foundation
 
@@ -102,19 +110,34 @@ Current foreign keys for business/customer/event context are nullable because au
 
 ## Batch 02 — Customer + Work workflow
 
-NEXT:
+IMPLEMENTED:
 - Customer CRUD
-- primary and alternative contacts
+- primary contact creation
 - create Work/Event from selected customer
 - event-day contact selection
-- validation
+- validation and contact ownership validation
 - Work index/show/edit
 - workspace shell
-- feature tests for create/update/read paths
+- core workflow test coverage
+
+## Batch 03 — Application shell + stability pass
+
+IMPLEMENTED on laravel-foundation:
+- responsive mobile navigation in the shared application shell
+- clearer Work overview metrics
+- defensive rendering for optional/legacy event values
+- dynamic Work status badge instead of always showing Draft
+- visible validation error list in the shared shell
+- customer + primary-contact creation wrapped in a database transaction
+- edit workflow now clears an old event-day contact when the customer changes
+- owner-oriented file map: docs/ZAZU_FILE_MAP.md
+- compliance/privacy engineering baseline: docs/COMPLIANCE_BASELINE.md
+- core customer/work workflow tests: tests/Feature/WorkWorkflowTest.php
+- additional model property documentation was started to reduce IDE undefined-property noise
+
+The current batch is still locally UNVERIFIED until the owner pulls/refreshes the branch and runs the verification commands below.
 
 ## Later batches
-
-Batch 03: application shell and responsive workspace UI.
 
 Batch 04: requirements versus business capabilities.
 
@@ -132,7 +155,7 @@ The order can change when verified dependencies or evidence justify it.
 
 ## Verification scoreboard
 
-DONE:
+IMPLEMENTED:
 - Laravel foundation
 - environment/application key
 - database infrastructure
@@ -142,23 +165,58 @@ DONE:
 - Batch 01 schema foundation
 - Batch 01 Eloquent relationships
 - Batch 01 relationship test added
+- Batch 02 customer/work workflow
+- Batch 03 application shell/stability pass
 
-NOT YET VERIFIED locally after Batch 01:
-- fresh migration run
-- feature test execution
-- compatibility with any existing local event data
-- Customer/Event CRUD
-- workspace UI
-- authentication/business authorization
+LOCAL VERIFICATION REQUIRED:
+- pull/refresh current branch
+- git status review
+- migration status
+- full feature test run
+- npm production build
+- browser walkthrough of Work, Customers, Create Work and Edit Work
+- confirm the local database connection in .env matches the intended development database
 
-## Immediate next action
+PRODUCTION BLOCKERS STILL OUTSTANDING:
+- authentication
+- active business context
+- roles/permissions
+- server-side business isolation
+- production backup/restore evidence
+- complete security review
+- legal/compliance review for the actual deployment and processing model
 
-Refresh laravel-foundation in VS Code.
+## Owner orientation
 
-Verify Batch 01 with:
+When a batch changes files, explain:
+1. which working files changed,
+2. what each file does,
+3. whether the database schema changed,
+4. whether live data changes are expected,
+5. what the owner should inspect in VS Code,
+6. what browser behaviour should visibly improve.
+
+Do not treat the owner as a passenger.
+
+## Immediate verification commands
+
+After refreshing the local branch:
+
 git status
-git log -1 --oneline
-php artisan migrate
+git log -5 --oneline
+php artisan migrate:status
 php artisan test
+npm.cmd run build
 
-Then proceed directly to Batch 02.
+Then refresh:
+http://localhost:8000
+
+Verify:
+- Work page loads without undefined errors
+- mobile/desktop navigation is usable
+- New customer saves
+- customer primary contact is saved
+- New work saves
+- event-day contact follows the selected customer
+- Edit Work changes customer/contact safely
+- Work status displays correctly
