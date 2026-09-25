@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Customer;
+use App\Models\CustomerContact;
 use App\Models\Event;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -18,7 +19,23 @@ class WorkController extends Controller
             ->latest()
             ->paginate(15);
 
-        return view('work.index', compact('events'));
+        $activeWorkCount = Event::query()
+            ->whereNotIn('status', ['completed', 'cancelled'])
+            ->count();
+
+        $upcomingWorkCount = Event::query()
+            ->whereDate('event_date', '>=', now()->toDateString())
+            ->whereNotIn('status', ['completed', 'cancelled'])
+            ->count();
+
+        $customerCount = Customer::query()->count();
+
+        return view('work.index', compact(
+            'events',
+            'activeWorkCount',
+            'upcomingWorkCount',
+            'customerCount',
+        ));
     }
 
     public function create(): View
@@ -119,7 +136,7 @@ class WorkController extends Controller
             return;
         }
 
-        $valid = $customerId === (int) \App\Models\CustomerContact::query()
+        $valid = $customerId === (int) CustomerContact::query()
             ->whereKey($contactId)
             ->value('customer_id');
 
