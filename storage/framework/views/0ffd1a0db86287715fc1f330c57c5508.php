@@ -8,13 +8,13 @@
 <?php $attributes = $attributes->except(\Illuminate\View\AnonymousComponent::ignoredParameterNames()); ?>
 <?php endif; ?>
 <?php $component->withAttributes([]); ?>
-    <?php $__env->slot('title', null, []); ?> Customers <?php $__env->endSlot(); ?>
-    <?php $__env->slot('heading', null, []); ?> Customers <?php $__env->endSlot(); ?>
-    <?php $__env->slot('headerAction', null, []); ?>
+     <?php $__env->slot('title', null, []); ?> Customers <?php $__env->endSlot(); ?>
+     <?php $__env->slot('heading', null, []); ?> Customers <?php $__env->endSlot(); ?>
+     <?php $__env->slot('headerAction', null, []); ?> 
         <a href="<?php echo e(route('customers.create')); ?>" class="inline-flex items-center rounded-xl bg-slate-900 px-4 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-slate-800">
             New customer
         </a>
-    <?php $__env->endSlot(); ?>
+     <?php $__env->endSlot(); ?>
 
     <div class="mb-5 flex flex-col gap-3 rounded-2xl border border-slate-200 bg-white p-4 sm:flex-row sm:items-center sm:justify-between">
         <div>
@@ -52,7 +52,7 @@
             <div class="border-t border-slate-200 px-5 py-4"><?php echo e($customers->links()); ?></div>
         <?php endif; ?>
     </div>
-    <?php echo $__env->renderComponent(); ?>
+ <?php echo $__env->renderComponent(); ?>
 <?php endif; ?>
 <?php if (isset($__attributesOriginal4619374cef299e94fd7263111d0abc69)): ?>
 <?php $attributes = $__attributesOriginal4619374cef299e94fd7263111d0abc69; ?>
