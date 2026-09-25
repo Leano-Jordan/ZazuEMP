@@ -23,3 +23,8 @@ select,
 textarea {
     background-color: #f7f8fa;
 }
+
+
+.bg-white {
+    background-color: #f7f8fa !important;
+}
