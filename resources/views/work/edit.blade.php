@@ -1,5 +1,5 @@
 <x-app-layout>
-    <x-slot:title>Edit {{ $event->name }}</x-slot:title>
+    <x-slot:title>Edit {{ $event->name ?? 'Work' }}</x-slot:title>
     <x-slot:heading>Edit work</x-slot:heading>
     <x-slot:headerAction>
         <a href="{{ route('work.show', $event) }}" class="text-sm font-medium text-slate-500 hover:text-slate-900">← Back to workspace</a>
@@ -29,6 +29,7 @@
                 <label class="block sm:col-span-2">
                     <span class="text-sm font-medium text-slate-700">Work / event name</span>
                     <input name="name" value="{{ old('name', $event->name) }}" required class="mt-2 w-full rounded-xl border border-slate-300 px-3.5 py-3 text-sm outline-none focus:border-sky-500 focus:ring-2 focus:ring-sky-100">
+                    @error('name')<span class="mt-1 block text-xs text-rose-600">{{ $message }}</span>@enderror
                 </label>
 
                 <label class="block">
@@ -46,6 +47,7 @@
                     <select id="event_day_contact_id" name="event_day_contact_id" class="mt-2 w-full rounded-xl border border-slate-300 bg-white px-3.5 py-3 text-sm outline-none focus:border-sky-500 focus:ring-2 focus:ring-sky-100">
                         <option value="">No event-day contact</option>
                     </select>
+                    @error('event_day_contact_id')<span class="mt-1 block text-xs text-rose-600">{{ $message }}</span>@enderror
                 </label>
 
                 <label class="block">
@@ -86,7 +88,7 @@
             ])->values(),
         ])->values());
 
-        const selectedContact = @json(old('event_day_contact_id', $event->event_day_contact_id));
+        let selectedContact = @json(old('event_day_contact_id', $event->event_day_contact_id));
         const customerSelect = document.getElementById('customer_id');
         const contactSelect = document.getElementById('event_day_contact_id');
 
@@ -94,7 +96,9 @@
             const customer = customers.find(item => String(item.id) === customerSelect.value);
             contactSelect.innerHTML = '<option value="">No event-day contact</option>';
 
-            if (!customer) return;
+            if (!customer) {
+                return;
+            }
 
             customer.contacts.forEach(contact => {
                 const option = document.createElement('option');
@@ -106,7 +110,7 @@
         }
 
         customerSelect.addEventListener('change', () => {
-            contactSelect.value = '';
+            selectedContact = null;
             refreshContacts();
         });
 
