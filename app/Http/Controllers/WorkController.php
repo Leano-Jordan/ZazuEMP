@@ -7,6 +7,7 @@ use App\Models\Event;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
+use Illuminate\Support\Facades\DB;
 use Illuminate\View\View;
 
 class WorkController extends Controller
@@ -44,22 +45,24 @@ class WorkController extends Controller
 
         $this->validateContactBelongsToCustomer($validated['event_day_contact_id'] ?? null, $customer->id);
 
-        $event = Event::create([
-            'customer_id' => $customer->id,
-            'event_day_contact_id' => $validated['event_day_contact_id'] ?? null,
-            'reference' => 'ZAZU-' . Str::upper(Str::random(8)),
-            'name' => $validated['name'],
-            'event_type' => $validated['event_type'] ?? null,
-            'customer_name' => $customer->name,
-            'customer_phone' => $customer->primaryContact?->phone,
-            'customer_email' => $customer->primaryContact?->email,
-            'event_date' => $validated['event_date'] ?? null,
-            'event_address' => $validated['event_address'] ?? null,
-            'notes' => $validated['notes'] ?? null,
-            'status' => 'draft',
-        ]);
+        $event = DB::transaction(function () use ($validated, $customer) {
+            return Event::create([
+                'customer_id' => $customer->id,
+                'event_day_contact_id' => $validated['event_day_contact_id'] ?? null,
+                'reference' => 'ZAZU-' . Str::upper(Str::random(8)),
+                'name' => $validated['name'],
+                'event_type' => $validated['event_type'] ?? null,
+                'customer_name' => $customer->name,
+                'customer_phone' => $customer->primaryContact?->phone,
+                'customer_email' => $customer->primaryContact?->email,
+                'event_date' => $validated['event_date'] ?? null,
+                'event_address' => $validated['event_address'] ?? null,
+                'notes' => $validated['notes'] ?? null,
+                'status' => 'draft',
+            ]);
+        });
 
-        return redirect()->route('work.show', $event);
+        return redirect()->route('work.show', $event)->with('success', 'Work created successfully.');
     }
 
     public function edit(Event $event): View
