@@ -27,7 +27,7 @@ class CustomerController extends Controller
     public function store(Request $request): RedirectResponse
     {
         $validated = $request->validate([
-            'name' => ['required', 'string', 'max:255'],
+            'name' => ['required', 'string', 'max:255', 'unique:customers,name'],
             'notes' => ['nullable', 'string'],
             'primary_contact_name' => ['required', 'string', 'max:255'],
             'primary_contact_phone' => ['nullable', 'string', 'max:50'],

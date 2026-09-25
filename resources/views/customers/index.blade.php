@@ -17,7 +17,7 @@
 
     <div class="overflow-hidden rounded-2xl border border-slate-200 bg-white">
         @forelse ($customers as $customer)
-            <div class="flex flex-col gap-3 border-b border-slate-100 px-5 py-4 last:border-b-0 sm:flex-row sm:items-center sm:justify-between">
+            <a href="{{ route('work.create', ['customer_id' => $customer->id]) }}" class="flex flex-col gap-3 border-b border-slate-100 px-5 py-4 last:border-b-0 transition hover:bg-slate-100 sm:flex-row sm:items-center sm:justify-between">
                 <div>
                     <p class="font-semibold text-slate-950">{{ $customer->name }}</p>
                     <p class="mt-1 text-sm text-slate-500">
@@ -29,6 +29,7 @@
                     {{ $customer->events_count }} {{ $customer->events_count === 1 ? 'work item' : 'work items' }}
                 </div>
             </div>
+            </a>
         @empty
             <div class="px-5 py-16 text-center">
                 <p class="text-lg font-semibold text-slate-950">No customers yet</p>

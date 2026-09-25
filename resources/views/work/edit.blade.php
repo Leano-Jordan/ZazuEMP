@@ -37,12 +37,12 @@
                 </label>
 
                 <label class="block">
-                    <span class="text-sm font-medium text-slate-700">Date</span>
-                    <input type="date" name="event_date" value="{{ old('event_date', $event->event_date?->format('Y-m-d')) }}" class="mt-2 w-full rounded-xl border border-slate-300 px-3.5 py-3 text-sm outline-none focus:border-sky-500 focus:ring-2 focus:ring-sky-100">
+                    <span class="text-sm font-medium text-slate-700">Date <span class="text-rose-500">*</span></span>
+                    <input type="date" name="event_date" value="{{ old('event_date', $event->event_date?->format('Y-m-d')) }}" required class="mt-2 w-full rounded-xl border border-slate-300 px-3.5 py-3 text-sm outline-none focus:border-sky-500 focus:ring-2 focus:ring-sky-100">
                 </label>
 
                 <label class="block sm:col-span-2">
-                    <span class="text-sm font-medium text-slate-700">Event-day contact</span>
+                    <span class="text-sm font-medium text-slate-700">Event-day contact <span class="font-normal text-slate-400">(optional)</span></span>
                     <select id="event_day_contact_id" name="event_day_contact_id" class="mt-2 w-full rounded-xl border border-slate-300 bg-white px-3.5 py-3 text-sm outline-none focus:border-sky-500 focus:ring-2 focus:ring-sky-100">
                         <option value="">No event-day contact</option>
                     </select>

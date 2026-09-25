@@ -6,10 +6,10 @@
     <title>{{ $title ?? 'Zazu' }} · Zazu EMP</title>
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
-<body class="min-h-screen bg-slate-50 text-slate-900 antialiased">
+<body class="min-h-screen bg-[#e9edf1] text-slate-900 antialiased">
     <div class="min-h-screen lg:flex">
-        <aside class="hidden w-64 shrink-0 border-r border-slate-200 bg-white lg:flex lg:flex-col">
-            <div class="flex h-20 items-center border-b border-slate-200 px-6">
+        <aside class="hidden w-64 shrink-0 border-r border-slate-200 bg-[#f4f6f8] lg:flex lg:flex-col">
+            <div class="flex h-20 items-center border-b border-slate-200 bg-[#f4f6f8] px-6">
                 <a href="{{ route('work.index') }}" class="text-2xl font-semibold tracking-tight text-slate-950">zazu<span class="text-sky-600">.</span></a>
             </div>
 
@@ -43,7 +43,7 @@
             </nav>
 
             <div class="border-t border-slate-200 p-4">
-                <div class="rounded-xl bg-slate-50 px-3 py-3">
+                <div class="rounded-xl bg-[#e9edf1] px-3 py-3">
                     <p class="text-xs font-semibold text-slate-500">Zazu EMP</p>
                     <p class="mt-1 text-xs text-slate-400">Operational workspace</p>
                 </div>
@@ -51,7 +51,7 @@
         </aside>
 
         <main class="min-w-0 flex-1">
-            <header class="border-b border-slate-200 bg-white">
+            <header class="border-b border-slate-200 bg-[#f4f6f8]">
                 <div class="mx-auto flex max-w-7xl items-center justify-between px-5 py-4 sm:px-8">
                     <div>
                         <p class="text-xs font-medium uppercase tracking-[0.14em] text-slate-400">Zazu EMP</p>
