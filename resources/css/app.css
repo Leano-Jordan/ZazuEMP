@@ -8,138 +8,175 @@
         'Segoe UI Symbol', 'Noto Color Emoji';
 }
 
-/*
- * Zazu soft coastal light theme.
- * The hierarchy intentionally avoids pure white so cards, groups and page
- * surfaces remain visually distinct without becoming a dark theme.
- */
+/* Zazu: soft coastal daylight theme. No pure-white surfaces. */
 :root {
     color-scheme: light;
+    --zazu-page: #d7eaf1;
+    --zazu-nav: #c9e1e9;
+    --zazu-surface: #e8f4f7;
+    --zazu-surface-raised: #eef8fa;
+    --zazu-surface-soft: #dceff4;
+    --zazu-border: #a9cbd5;
+    --zazu-border-soft: #c2dfe7;
+    --zazu-ink: #183943;
+    --zazu-muted: #58737d;
+    --zazu-primary: #2b6575;
+    --zazu-primary-hover: #245765;
 }
 
 body {
-    background-color: #dcecf2;
+    background-color: var(--zazu-page);
+    color: var(--zazu-ink);
 }
 
+/* Main surfaces */
+.bg-white {
+    background-color: var(--zazu-surface) !important;
+}
+
+.bg-slate-50 {
+    background-color: var(--zazu-surface-soft) !important;
+}
+
+.bg-slate-100 {
+    background-color: #d2e8ef !important;
+}
+
+.bg-\[\#f4f6f8\] {
+    background-color: var(--zazu-nav) !important;
+}
+
+.bg-\[\#e9edf1\] {
+    background-color: var(--zazu-page) !important;
+}
+
+/* Borders are intentionally visible against the blue surfaces. */
+.border-slate-100 {
+    border-color: var(--zazu-border-soft) !important;
+}
+
+.border-slate-200 {
+    border-color: var(--zazu-border) !important;
+}
+
+.border-slate-300 {
+    border-color: #91bac6 !important;
+}
+
+/* Typography */
+.text-slate-950 {
+    color: var(--zazu-ink) !important;
+}
+
+.text-slate-900 {
+    color: #214752 !important;
+}
+
+.text-slate-700 {
+    color: #365963 !important;
+}
+
+.text-slate-600 {
+    color: #4e6d77 !important;
+}
+
+.text-slate-500 {
+    color: var(--zazu-muted) !important;
+}
+
+.text-slate-400 {
+    color: #718d96 !important;
+}
+
+/* Primary actions */
+.bg-slate-900 {
+    background-color: var(--zazu-primary) !important;
+}
+
+.hover\:bg-slate-800:hover {
+    background-color: var(--zazu-primary-hover) !important;
+}
+
+.text-sky-600,
+.text-sky-700 {
+    color: #286b7d !important;
+}
+
+.hover\:text-slate-900:hover {
+    color: var(--zazu-ink) !important;
+}
+
+/* Inputs remain lighter than cards, but never pure white. */
 input,
 select,
 textarea {
-    background-color: #eef7fa;
-    border-color: #b9d3dc;
+    background-color: var(--zazu-surface-raised);
+    border-color: #91bac6;
+    color: var(--zazu-ink);
+}
+
+input::placeholder,
+textarea::placeholder {
+    color: #78939c;
 }
 
 input:focus,
 select:focus,
 textarea:focus {
-    border-color: #70aebe;
+    border-color: #5795a6;
+    outline: none;
 }
 
-.bg-white {
-    background-color: #edf7fa !important;
-}
-
-.bg-slate-50 {
-    background-color: #e3f1f5 !important;
-}
-
-.bg-slate-100 {
-    background-color: #d8ebf1 !important;
-}
-
-.border-slate-100 {
-    border-color: #d2e5eb !important;
-}
-
-.border-slate-200 {
-    border-color: #bdd6df !important;
-}
-
-.border-slate-300 {
-    border-color: #aac9d3 !important;
-}
-
+/* Hover states stay inside the coastal hierarchy. */
 .hover\:bg-slate-50:hover {
-    background-color: #e5f3f7 !important;
+    background-color: #d9edf2 !important;
 }
 
 .hover\:bg-slate-100:hover {
-    background-color: #d7eaf0 !important;
+    background-color: #cfe5ec !important;
 }
 
-.text-slate-950 {
-    color: #18343e !important;
-}
-
-.text-slate-900 {
-    color: #203f49 !important;
-}
-
-.text-slate-700 {
-    color: #3b5d68 !important;
-}
-
-.text-slate-600 {
-    color: #55717b !important;
-}
-
-.text-slate-500 {
-    color: #67828b !important;
-}
-
-.text-slate-400 {
-    color: #78939c !important;
-}
-
-.bg-slate-900 {
-    background-color: #285461 !important;
-}
-
-.hover\:bg-slate-800:hover {
-    background-color: #214a56 !important;
-}
-
+/* Semantic states */
 .bg-emerald-50 {
-    background-color: #e2f3ed !important;
+    background-color: #dff1ea !important;
 }
 
 .bg-rose-50 {
-    background-color: #f8e9ec !important;
+    background-color: #f5e5e9 !important;
 }
 
 .bg-amber-50 {
-    background-color: #f6efd9 !important;
-}
-
-.text-sky-600,
-.text-sky-700 {
-    color: #2f7183 !important;
+    background-color: #f3ecd5 !important;
 }
 
 .text-emerald-700 {
-    color: #2d6b58 !important;
+    color: #2b6655 !important;
 }
 
 .text-rose-600,
 .text-rose-800 {
-    color: #9a5260 !important;
+    color: #96515e !important;
 }
 
 .text-amber-700 {
-    color: #876d32 !important;
+    color: #80672f !important;
 }
 
 .border-emerald-200 {
-    border-color: #b8d9ce !important;
+    border-color: #acd3c5 !important;
 }
 
 .border-rose-200 {
-    border-color: #e2c2ca !important;
+    border-color: #dfbcc5 !important;
 }
 
-.border-slate-300 {
-    border-color: #aac9d3 !important;
-}
-
+/* Soft elevation, not floating white cards. */
 .shadow-sm {
-    box-shadow: 0 1px 3px rgba(45, 84, 97, 0.08) !important;
+    box-shadow: 0 1px 3px rgba(35, 82, 96, 0.10), 0 4px 12px rgba(35, 82, 96, 0.04) !important;
+}
+
+/* Native controls should inherit the calmer palette. */
+button,
+a {
+    -webkit-tap-highlight-color: transparent;
 }
