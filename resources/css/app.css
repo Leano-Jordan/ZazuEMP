@@ -9,35 +9,34 @@
 }
 
 /*
- * ZAZU COASTAL NIGHT
- * Soft dark mode: blue-black workspace, blue-grey navigation,
- * clearly lifted cards, restrained cyan accents.
+ * ZAZU COASTAL DAY
+ * Light coastal corporate theme with clear hierarchy and gentle blue depth.
  */
 :root {
-    color-scheme: dark;
-    --zazu-page: #142b34;
-    --zazu-page-deep: #10242c;
-    --zazu-nav: #183740;
-    --zazu-surface: #1c414d;
-    --zazu-surface-raised: #234d59;
-    --zazu-surface-soft: #285763;
-    --zazu-border: #3e6d78;
-    --zazu-border-soft: #315c68;
-    --zazu-ink: #e7f4f6;
-    --zazu-muted: #a5c1c8;
-    --zazu-primary: #3b8da0;
-    --zazu-primary-hover: #4ca5b8;
-    --zazu-accent: #78c9d8;
+    color-scheme: light;
+    --zazu-page: #dceff4;
+    --zazu-page-deep: #cfe6ed;
+    --zazu-nav: #c9e2e9;
+    --zazu-surface: #f0f8fa;
+    --zazu-surface-raised: #f7fbfc;
+    --zazu-surface-soft: #e4f2f5;
+    --zazu-border: #a9cbd4;
+    --zazu-border-soft: #c0dce3;
+    --zazu-ink: #18343d;
+    --zazu-muted: #5f7d86;
+    --zazu-primary: #3d8294;
+    --zazu-primary-hover: #316f80;
+    --zazu-accent: #4b9daf;
 }
 
 body {
     background:
-        radial-gradient(circle at 78% -10%, rgba(75, 151, 168, 0.16), transparent 34rem),
-        var(--zazu-page);
+        radial-gradient(circle at 78% -10%, rgba(92, 171, 190, 0.18), transparent 34rem),
+        linear-gradient(135deg, var(--zazu-page) 0%, #e7f5f8 58%, #d5ebf0 100%);
     color: var(--zazu-ink);
 }
 
-/* Kill the white-paper effect throughout the existing Blade UI. */
+/* Replace legacy white/grey surfaces with the coastal palette. */
 .bg-white {
     background-color: var(--zazu-surface) !important;
 }
@@ -47,7 +46,7 @@ body {
 }
 
 .bg-slate-100 {
-    background-color: #315f6b !important;
+    background-color: #d5eaf0 !important;
 }
 
 .bg-\[\#f4f6f8\] {
@@ -55,10 +54,10 @@ body {
 }
 
 .bg-\[\#e9edf1\] {
-    background-color: var(--zazu-page) !important;
+    background-color: var(--zazu-page-deep) !important;
 }
 
-/* Borders are deliberately visible. */
+/* Borders create the separation the lighter palette needs. */
 .border-slate-100 {
     border-color: var(--zazu-border-soft) !important;
 }
@@ -68,24 +67,24 @@ body {
 }
 
 .border-slate-300 {
-    border-color: #507c87 !important;
+    border-color: #8fb9c4 !important;
 }
 
 /* Typography */
 .text-slate-950 {
-    color: #f0f8fa !important;
+    color: #12303a !important;
 }
 
 .text-slate-900 {
-    color: #e2f1f4 !important;
+    color: #183943 !important;
 }
 
 .text-slate-700 {
-    color: #c4dce1 !important;
+    color: #365a64 !important;
 }
 
 .text-slate-600 {
-    color: #b2cdd3 !important;
+    color: #4f7079 !important;
 }
 
 .text-slate-500 {
@@ -93,7 +92,7 @@ body {
 }
 
 .text-slate-400 {
-    color: #88aab3 !important;
+    color: #75949c !important;
 }
 
 /* Primary actions */
@@ -107,25 +106,25 @@ body {
 
 .text-sky-600,
 .text-sky-700 {
-    color: var(--zazu-accent) !important;
+    color: var(--zazu-primary) !important;
 }
 
 .hover\:text-slate-900:hover {
-    color: #f0fbfc !important;
+    color: #163944 !important;
 }
 
-/* Inputs are lifted another level from cards. */
+/* Inputs sit slightly above cards without becoming stark white. */
 input,
 select,
 textarea {
     background-color: var(--zazu-surface-raised);
-    border-color: #56838e;
+    border-color: #9fc4ce;
     color: var(--zazu-ink);
 }
 
 input::placeholder,
 textarea::placeholder {
-    color: #88aab3;
+    color: #78959d;
 }
 
 input:focus,
@@ -133,67 +132,67 @@ select:focus,
 textarea:focus {
     border-color: var(--zazu-accent);
     outline: none;
-    box-shadow: 0 0 0 3px rgba(120, 201, 216, 0.12);
+    box-shadow: 0 0 0 3px rgba(75, 157, 175, 0.16);
 }
 
 /* Hover states */
 .hover\:bg-slate-50:hover {
-    background-color: #315f6b !important;
+    background-color: #d9edf2 !important;
 }
 
 .hover\:bg-slate-100:hover {
-    background-color: #376b77 !important;
+    background-color: #cde6ed !important;
 }
 
-/* Semantic states, softened for dark surfaces. */
+/* Semantic states remain soft and readable. */
 .bg-emerald-50 {
-    background-color: #244b45 !important;
+    background-color: #dff2ec !important;
 }
 
 .bg-rose-50 {
-    background-color: #513842 !important;
+    background-color: #f6e3e7 !important;
 }
 
 .bg-amber-50 {
-    background-color: #51472f !important;
+    background-color: #f7eed7 !important;
 }
 
 .text-emerald-700 {
-    color: #8bd1bc !important;
+    color: #28735f !important;
 }
 
 .text-rose-600,
 .text-rose-800 {
-    color: #f0a7b4 !important;
+    color: #b34f62 !important;
 }
 
 .text-amber-700 {
-    color: #e7c77d !important;
+    color: #8b681f !important;
 }
 
 .border-emerald-200 {
-    border-color: #397064 !important;
+    border-color: #a9d7ca !important;
 }
 
 .border-rose-200 {
-    border-color: #7c4e5b !important;
+    border-color: #dfb5bf !important;
 }
 
-/* Dashed placeholders need to remain visible. */
+/* Dashed placeholders stay visible on the lighter canvas. */
 .border-dashed {
-    border-color: #4f7d88 !important;
+    border-color: #91bbc5 !important;
 }
 
-/* Depth without heavy black shadows. */
+/* Gentle depth, not heavy shadows. */
 .shadow-sm {
-    box-shadow: 0 1px 2px rgba(4, 15, 20, 0.22), 0 8px 24px rgba(4, 15, 20, 0.12) !important;
+    box-shadow: 0 1px 2px rgba(31, 78, 91, 0.08), 0 6px 20px rgba(31, 78, 91, 0.07) !important;
 }
 
-/* Selected/active navigation should be distinct, not black. */
+/* Selected navigation gets a clear coastal-blue anchor. */
 .bg-slate-900.text-white {
-    background-color: #3a7887 !important;
-    color: #f2fbfc !important;
-    box-shadow: inset 3px 0 0 #8bd6e2;
+    background-color: #5a9aaa !important;
+    color: #ffffff !important;
+    box-shadow: inset 3px 0 0 #8bc9d5;
 }
 
 /* Links and interactive elements */
@@ -208,14 +207,14 @@ a {
 }
 
 ::-webkit-scrollbar-track {
-    background: #132a32;
+    background: #c9e2e9;
 }
 
 ::-webkit-scrollbar-thumb {
-    background: #386673;
+    background: #8db9c3;
     border-radius: 999px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-    background: #4b8190;
+    background: #6fa3b0;
 }
