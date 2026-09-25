@@ -2,6 +2,7 @@
     <x-slot:title>{{ $event->name }}</x-slot:title>
     <x-slot:heading>{{ $event->name }}</x-slot:heading>
     <x-slot:headerAction>
+        <a href="{{ route('work.edit', $event) }}" class="mr-4 inline-flex rounded-xl bg-slate-900 px-4 py-2.5 text-sm font-semibold text-white">Edit work</a>
         <a href="{{ route('work.index') }}" class="text-sm font-medium text-slate-500 hover:text-slate-900">← All work</a>
     </x-slot:headerAction>
 
