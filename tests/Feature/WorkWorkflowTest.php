@@ -61,6 +61,7 @@ class WorkWorkflowTest extends TestCase
             'customer_id' => $customer->id,
             'event_day_contact_id' => $contact->id,
             'name' => 'Invalid Work',
+            'event_date' => '2026-10-20',
         ]);
 
         $response->assertStatus(422);
