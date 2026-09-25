@@ -3,12 +3,15 @@
 Read this file after memory.md at the start of every Zazu EMP chat.
 
 ## OWNER
+
 Rosscore Labs Pty Ltd owns Zazu EMP.
+
 Isaac Junior Lehlogonolo Maluleka is the founder, creator, lead developer and final decision-maker.
 
 AI is the engineering/research partner. Do not make consequential product or architecture decisions silently.
 
 ## PRODUCT
+
 Zazu EMP = reusable Event Management Platform.
 
 It is NOT:
@@ -22,9 +25,10 @@ Core:
 Business -> Customer -> Event/Job -> Services -> Quote -> Confirmation/Deposit -> Buying/Hiring -> Preparation -> Event -> Payment/Completion
 
 ## CURRENT DEVELOPMENT STATE
+
 Windows + VS Code.
 
-Verified 2026-09-23:
+Verified:
 - PHP 8.4.26
 - Laravel 13.33.0
 - Composer dependencies installed
@@ -37,7 +41,7 @@ Non-blocking warnings:
 - missing pdo_firebird PHP extension
 - optional Vite fontaine optimization
 
-Do not derail development to fix those warnings.
+Do not derail development to fix those warnings unless they cause a real Zazu failure.
 
 Temporary Laravel skeleton:
 C:\Projects\ZazuEMP-LaravelTemp
@@ -48,6 +52,7 @@ C:\Projects\ZazuEMP
 Git history must remain protected.
 
 ## CURRENT GIT STATE
+
 The owner created a local branch named:
 laravel-foundation
 
@@ -57,10 +62,82 @@ Before any new implementation:
 - inspect changed files
 - never assume old chat state is current
 
+## PRODUCT / UX DIRECTION
+
+Build the smallest useful solution.
+
+Core UX principle:
+WORKSPACE OVER SCREEN.
+
+Zazu should provide rich contextual workspaces rather than turning every table into a separate CRUD screen.
+
+Desktop/laptop is important.
+Phone use is also important.
+Target is desktop + mobile responsive web, with PWA capabilities later if justified.
+
+UI quality:
+professional, clear, calm, fast, dense without clutter, accessible, responsive, maintainable and commercially credible.
+
+Avoid:
+card soup, button soup, decorative UI, excessive animation, random spacing, excessive whitespace.
+
+## SECURITY / PRIVACY / IP
+
+Use:
+User -> Business membership -> Role -> Permission -> Allowed action
+
+Business isolation is foundational.
+Server-side authorization is mandatory before production use.
+
+Never commit secrets, production exports or customer personal information.
+
+Relevant project controls:
+- SECURITY.md
+- IP_OWNERSHIP.md
+- THIRD_PARTY_NOTICES.md
+- docs/COMPLIANCE_BASELINE.md
+- docs/ZAZU_FILE_MAP.md
+
+The compliance baseline is an engineering control document, not a declaration of legal compliance.
+
+## CURRENT WORKING FILE MAP
+
+Start with docs/ZAZU_FILE_MAP.md for the plain-English explanation of the Laravel files.
+
+Core workflow:
+- routes/web.php = URL -> controller map
+- app/Http/Controllers/WorkController.php = Work workflow
+- app/Http/Controllers/CustomerController.php = Customer workflow
+- app/Models/Event.php = Event database model
+- app/Models/Customer.php = Customer database model
+- app/Models/CustomerContact.php = contact database model
+- resources/views/components/app-layout.blade.php = shared browser shell
+- resources/views/work/*.blade.php = Work browser screens
+- resources/views/customers/*.blade.php = Customer browser screens
+- database/migrations/*.php = versioned schema changes
+- config/database.php + local .env = database connection configuration
+
+## DATABASE REALITY
+
+The migration files are not the live database.
+
+Migration files describe schema changes.
+The migration repository table records which migrations ran.
+The actual local records live in the database selected by the local .env.
+
+For this foundation, the important flow is:
+
+Browser -> route -> controller -> model -> database -> controller redirect -> Blade view
+
+Customer creation now saves the customer and primary contact inside one database transaction.
+
+Work creation writes the Event record after validating the selected customer/contact relationship.
+
 ## DISCOVERY SIGNALS
+
 Sindi is a real discovery/pilot operator, not the product definition.
 
-Her validated pain signals:
+Validated pain signals:
 - quotation is time-consuming
 - Excel is used for quotes/invoices
 - prices are researched manually
@@ -80,94 +157,52 @@ VERIFIED = directly established
 INFERRED = plausible but needs validation
 UNKNOWN = not established
 
-## PRODUCT / UX DIRECTION
-Build the smallest useful solution.
+## BATCH 01 — DATA FOUNDATION
 
-Core UX principle:
-WORKSPACE OVER SCREEN.
+DONE.
 
-Zazu should provide rich contextual workspaces rather than turning every table into a separate CRUD screen.
+## BATCH 02 — CUSTOMER + WORK WORKFLOW
 
-Desktop/laptop is important.
-Phone use is also important.
-Target is desktop + mobile responsive web, with PWA capabilities later if justified.
+DONE.
 
-UI quality:
-professional, clear, calm, fast, dense without clutter, accessible, responsive, maintainable and commercially credible.
+Implemented:
+- Customer CRUD
+- primary contact creation
+- create Work/Event from selected customer
+- event-day contact selection
+- validation
+- contact ownership validation
+- Work index/show/edit
+- workspace shell
+- workflow tests
 
-Avoid:
-card soup, button soup, decorative UI, excessive animation, random spacing, excessive whitespace.
+## BATCH 03 — APPLICATION SHELL + STABILITY
 
-## SECURITY DIRECTION
-Use:
-User -> Business membership -> Role -> Permission -> Allowed action
+IMPLEMENTED on laravel-foundation:
+- responsive mobile navigation in the shared application shell
+- clearer Work overview metrics
+- defensive rendering for optional/legacy Event values
+- dynamic Work status badge
+- visible validation error list
+- atomic Customer + primary contact creation
+- safe event-day contact reset when changing Customer during edit
+- owner file map
+- compliance/privacy baseline
+- core customer/work workflow tests
 
-Business isolation is foundational.
+LOCAL VERIFICATION IS STILL REQUIRED.
 
-Server-side authorization is mandatory.
+## NEXT
 
-Exact role catalogue remains to be designed and validated.
+Batch 04:
+Requirements versus business capabilities.
 
-## FIRST BUILD SLICE
-Do not build the whole platform at once.
+Do not jump into quotes, Maps, WhatsApp, suppliers, finance, dashboards, roles or dozens of tables without the workflow dependency being established.
 
-Current target:
-
-CREATE EVENT
--> SAVE EVENT
--> SEE EVENT
--> EDIT EVENT
--> SEE EVENT IN ZAZU UI
-
-The Event/Job record is the first central database object.
-
-Migration:
-database/migrations/2026_09_23_000000_create_events_table.php
-
-Current events fields:
-id
-reference unique
-name
-event_type nullable
-customer_name
-customer_phone nullable
-customer_email nullable
-event_date nullable
-event_address nullable
-notes nullable
-status default draft
-timestamps
-
-Migration has been executed successfully.
-
-Controller scaffold exists:
-app/Http/Controllers/EventController.php
-
-## NEXT FILES
-Start with:
-app/Models/Event.php
-
-Then:
-app/Http/Controllers/EventController.php
-routes/web.php
-resources/views/events/index.blade.php
-resources/views/events/create.blade.php
-resources/views/events/edit.blade.php
-resources/views/events/show.blade.php
-
-Add validation and tests as part of the slice.
-
-Do not add quotations, Maps, WhatsApp, suppliers, finance, dashboards, roles or dozens of tables until this slice is working and verified.
-
-## IMPLEMENTATION STYLE
-Use standard Laravel conventions.
-Do not manufacture framework internals.
-Do not create abstractions without demonstrated repetition.
-Do not replace working code just because another structure looks cleaner.
-Give the owner exact paths and exact code when asking them to implement.
-Explain only what is necessary to keep the owner oriented.
+Authentication/business isolation remains a production-critical stage.
 
 ## DELIVERY LOOP
+
 DISCOVER -> DEFINE -> SCOPE -> INSPECT -> DESIGN -> IMPLEMENT -> TEST -> VERIFY -> RECORD -> NEXT
 
 After a meaningful batch:
@@ -177,18 +212,27 @@ After a meaningful batch:
 
 Repository state wins over old plans.
 
-## CURRENT SCOREBOARD
-Foundation: DONE
-Laravel: DONE
-Events migration: DONE
-Event controller scaffold: DONE
-Event model: NEXT
-Event routes: NEXT
-Event CRUD UI: NEXT
-Event tests: NEXT
-Application shell: NOT STARTED
-Authentication/business isolation: NOT STARTED
-Quotation/travel costing: NOT STARTED
+## VERIFICATION
 
-## IMMEDIATE COMMAND
-Continue from the Event model. Do not restart setup.
+After refreshing the local branch:
+
+git status
+git log -5 --oneline
+php artisan migrate:status
+php artisan test
+npm.cmd run build
+
+Then refresh:
+http://localhost:8000
+
+Walk through:
+1. Work
+2. Customers
+3. New customer
+4. New work
+5. Work workspace
+6. Edit work
+7. Change customer and confirm the contact resets
+8. Try an invalid submission and confirm validation errors are visible
+
+Do not declare the batch verified until the local browser and tests confirm it.
