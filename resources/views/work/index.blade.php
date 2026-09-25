@@ -3,7 +3,7 @@
     <x-slot:heading>Work</x-slot:heading>
     <x-slot:headerAction>
         <a href="{{ route('work.create') }}" class="inline-flex items-center rounded-xl bg-slate-900 px-4 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-slate-800">
-            New work
+            Create work
         </a>
     </x-slot:headerAction>
 

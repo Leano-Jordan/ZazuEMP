@@ -5,8 +5,8 @@
 **Founder / creator / lead developer:** Isaac Junior Lehlogonolo Maluleka
 **Repository:** Leano-Jordan/ZazuEMP
 **Default branch:** main
-**Active development branch:** laravel-foundation
-**Context updated:** 2026-09-25
+**Active development branch:** main
+**Context updated:** 2026-09-26
 
 Repository state outranks stale conversation memory. Inspect the current repository before acting.
 
@@ -102,15 +102,20 @@ Current foreign keys for business/customer/event context are nullable because au
 
 ## Batch 02 — Customer + Work workflow
 
-NEXT:
-- Customer CRUD
-- primary and alternative contacts
-- create Work/Event from selected customer
-- event-day contact selection
-- validation
-- Work index/show/edit
-- workspace shell
-- feature tests for create/update/read paths
+IMPLEMENTED:
+- Customer creation workflow
+- primary customer contact creation
+- Work index/show/edit/create workflow
+- customer selection when creating Work
+- event-day contact selection and ownership validation
+- Work creation transaction
+- Work creation feature coverage
+- Work action renamed from `New work` to `Create work`
+
+REMAINS TO VERIFY LOCALLY:
+- fresh Work creation after clearing compiled Blade views
+- full feature test suite
+- fresh migration run against the current local database
 
 ## Later batches
 
@@ -147,18 +152,18 @@ NOT YET VERIFIED locally after Batch 01:
 - fresh migration run
 - feature test execution
 - compatibility with any existing local event data
-- Customer/Event CRUD
+- Customer/Event CRUD: owner has manually verified customer creation and current Work UI
+- Work creation: source-level fix implemented; local runtime verification pending
 - workspace UI
 - authentication/business authorization
 
 ## Immediate next action
 
-Refresh laravel-foundation in VS Code.
+On the owner's Windows ZazuEMP checkout:
 
-Verify Batch 01 with:
-git status
-git log -1 --oneline
-php artisan migrate
+php artisan view:clear
 php artisan test
 
-Then proceed directly to Batch 02.
+Then manually create one Work record from the existing customer and confirm the redirect to the Work record.
+
+If that passes, proceed to the next Work Workspace slice rather than jumping to quotes or travel costing.

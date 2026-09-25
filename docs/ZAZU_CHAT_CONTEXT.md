@@ -48,8 +48,9 @@ C:\Projects\ZazuEMP
 Git history must remain protected.
 
 ## CURRENT GIT STATE
-The owner created a local branch named:
-laravel-foundation
+
+Current repository focus: Customer + Work workflow.
+`main` is the GitHub source-of-truth branch. Historical branch notes may be stale.
 
 Before any new implementation:
 - inspect git status
@@ -181,14 +182,19 @@ Repository state wins over old plans.
 Foundation: DONE
 Laravel: DONE
 Events migration: DONE
-Event controller scaffold: DONE
-Event model: NEXT
-Event routes: NEXT
-Event CRUD UI: NEXT
-Event tests: NEXT
-Application shell: NOT STARTED
+Customer workflow: IMPLEMENTED
+Work index/show/edit/create workflow: IMPLEMENTED
+Work creation hardening + feature tests: IMPLEMENTED
+Application shell: PARTIAL
 Authentication/business isolation: NOT STARTED
 Quotation/travel costing: NOT STARTED
 
-## IMMEDIATE COMMAND
-Continue from the Event model. Do not restart setup.
+## CURRENT WORKFLOW STATUS
+Customer creation has been exercised successfully by the owner.
+Work dashboard is present and the Work index is functional.
+The Work create source had a historical compiled Blade parse error: `Unclosed '[' on line 94 does not match ')'`. The source view has since been corrected and generated `storage/framework/views` artifacts were removed from Git. A local `php artisan view:clear` is required to discard any stale compiled view on the owner's machine.
+
+The current Work creation implementation includes customer selection, event-day contact validation, event creation, redirect to the created work record, and a transactional write.
+
+## IMMEDIATE NEXT
+Verify the Work creation path locally after clearing compiled views, then continue with the next smallest operational workspace slice.
