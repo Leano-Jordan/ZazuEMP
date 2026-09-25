@@ -8,6 +8,18 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 
+/**
+ * @property int $id
+ * @property int|null $business_id
+ * @property string $name
+ * @property string|null $notes
+ * @property \Illuminate\Support\Carbon|null $created_at
+ * @property \Illuminate\Support\Carbon|null $updated_at
+ * @property-read Business|null $business
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, CustomerContact> $contacts
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, Event> $events
+ * @property-read CustomerContact|null $primaryContact
+ */
 class Customer extends Model
 {
     use HasFactory;
