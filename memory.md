@@ -117,6 +117,39 @@ REMAINS TO VERIFY LOCALLY:
 - full feature test suite
 - fresh migration run against the current local database
 
+## Batch 04 — Business capabilities foundation
+
+IMPLEMENTED:
+- business_capabilities migration
+- BusinessCapability model
+- Business -> capabilities relationship
+- BusinessCapabilityController
+- capability index/create/edit screens
+- capability routes and navigation
+- Work workspace link into the capability catalogue
+- BusinessCapability feature coverage for create/update
+
+Foundation fields:
+- business_id nullable
+- name
+- category
+- capability_type
+- pricing_basis
+- default_unit
+- description
+- is_active
+
+The capability catalogue is intentionally foundational. Work-specific quantities/pricing and quote history are not coupled to it yet. Tightening/scoping belongs to later architecture hardening.
+
+## Work creation hardening
+
+IMPLEMENTED:
+- moved nested customer/contact data preparation out of the Create Work Blade template
+- Create Work now uses prepared JSON data, removing the fragile nested Blade/PHP expression that caused the recurring compiled-view parse failure
+- contact selector clearly handles customers with no contacts
+- validation errors are shown beside the relevant Create Work fields
+- ownership test payload now includes the required event date
+
 ## Later batches
 
 Batch 03: application shell and responsive workspace UI.
