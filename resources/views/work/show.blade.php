@@ -17,7 +17,7 @@
     <div class="grid gap-5 xl:grid-cols-[1.5fr_1fr]">
         <div class="space-y-5">
             <section class="rounded-2xl border border-slate-200 bg-white p-5">
-                <div class="flex items-center justify-between">
+                <div class="flex items-center justify-between gap-4">
                     <div>
                         <h2 class="font-semibold text-slate-950">Customer</h2>
                         <p class="mt-1 text-sm text-slate-500">The relationship behind this work.</p>
@@ -37,11 +37,16 @@
             </section>
 
             <section class="rounded-2xl border border-slate-200 bg-white p-5">
-                <h2 class="font-semibold text-slate-950">Requirements & services</h2>
-                <p class="mt-1 text-sm text-slate-500">This is where the work will become specific to catering, hire, sound, funeral services, or another business capability.</p>
+                <div class="flex items-start justify-between gap-4">
+                    <div>
+                        <h2 class="font-semibold text-slate-950">Requirements & services</h2>
+                        <p class="mt-1 text-sm text-slate-500">The work will eventually select capabilities from the reusable business catalogue.</p>
+                    </div>
+                    <a href="{{ route('capabilities.index') }}" class="shrink-0 text-sm font-medium text-sky-700 hover:text-sky-900">View capabilities →</a>
+                </div>
                 <div class="mt-5 rounded-xl border border-dashed border-slate-300 px-4 py-8 text-center">
-                    <p class="font-medium text-slate-700">Requirements layer comes next</p>
-                    <p class="mt-1 text-sm text-slate-400">No quote is created until the work is understood.</p>
+                    <p class="font-medium text-slate-700">Capability selection comes next</p>
+                    <p class="mt-1 text-sm text-slate-400">The catalogue is now ready without coupling work records to pricing too early.</p>
                 </div>
             </section>
 
@@ -67,7 +72,7 @@
             <section class="rounded-2xl border border-slate-200 bg-white p-5">
                 <h2 class="font-semibold text-slate-950">Next operational layers</h2>
                 <div class="mt-4 space-y-2 text-sm">
-                    <div class="rounded-xl bg-slate-50 px-3 py-3">Requirements</div>
+                    <a href="{{ route('capabilities.index') }}" class="block rounded-xl bg-slate-50 px-3 py-3 font-medium text-slate-700 hover:bg-slate-100">Business capabilities →</a>
                     <div class="rounded-xl bg-slate-50 px-3 py-3">Quote & versions</div>
                     <div class="rounded-xl bg-slate-50 px-3 py-3">Buying & preparation</div>
                     <div class="rounded-xl bg-slate-50 px-3 py-3">Execution & accountability</div>
