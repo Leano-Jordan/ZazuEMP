@@ -33,4 +33,9 @@ class Business extends Model
     {
         return $this->hasMany(Event::class);
     }
+
+    public function capabilities(): HasMany
+    {
+        return $this->hasMany(BusinessCapability::class);
+    }
 }
