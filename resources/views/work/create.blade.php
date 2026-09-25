@@ -36,16 +36,19 @@
                     <label class="block sm:col-span-2">
                         <span class="text-sm font-medium text-slate-700">Work / event name</span>
                         <input name="name" value="{{ old('name') }}" required class="mt-2 w-full rounded-xl border border-slate-300 px-3.5 py-3 text-sm outline-none focus:border-sky-500 focus:ring-2 focus:ring-sky-100" placeholder="e.g. Mokoena Wedding">
+                        @error('name')<span class="mt-1 block text-xs text-rose-600">{{ $message }}</span>@enderror
                     </label>
 
                     <label class="block">
                         <span class="text-sm font-medium text-slate-700">Type</span>
                         <input name="event_type" value="{{ old('event_type') }}" class="mt-2 w-full rounded-xl border border-slate-300 px-3.5 py-3 text-sm outline-none focus:border-sky-500 focus:ring-2 focus:ring-sky-100" placeholder="Wedding, funeral, hire, catering...">
+                        @error('event_type')<span class="mt-1 block text-xs text-rose-600">{{ $message }}</span>@enderror
                     </label>
 
                     <label class="block">
                         <span class="text-sm font-medium text-slate-700">Date <span class="text-rose-500">*</span></span>
                         <input type="date" name="event_date" value="{{ old('event_date') }}" required class="mt-2 w-full rounded-xl border border-slate-300 px-3.5 py-3 text-sm outline-none focus:border-sky-500 focus:ring-2 focus:ring-sky-100">
+                        @error('event_date')<span class="mt-1 block text-xs text-rose-600">{{ $message }}</span>@enderror
                     </label>
 
                     <label class="block sm:col-span-2">
@@ -53,16 +56,19 @@
                         <select id="event_day_contact_id" name="event_day_contact_id" class="mt-2 w-full rounded-xl border border-slate-300 bg-white px-3.5 py-3 text-sm outline-none focus:border-sky-500 focus:ring-2 focus:ring-sky-100">
                             <option value="">Select a customer first</option>
                         </select>
+                        @error('event_day_contact_id')<span class="mt-1 block text-xs text-rose-600">{{ $message }}</span>@enderror
                     </label>
 
                     <label class="block sm:col-span-2">
                         <span class="text-sm font-medium text-slate-700">Event location</span>
                         <input name="event_address" value="{{ old('event_address') }}" class="mt-2 w-full rounded-xl border border-slate-300 px-3.5 py-3 text-sm outline-none focus:border-sky-500 focus:ring-2 focus:ring-sky-100" placeholder="Address or venue">
+                        @error('event_address')<span class="mt-1 block text-xs text-rose-600">{{ $message }}</span>@enderror
                     </label>
 
                     <label class="block sm:col-span-2">
                         <span class="text-sm font-medium text-slate-700">Notes</span>
                         <textarea name="notes" rows="4" class="mt-2 w-full rounded-xl border border-slate-300 px-3.5 py-3 text-sm outline-none focus:border-sky-500 focus:ring-2 focus:ring-sky-100">{{ old('notes') }}</textarea>
+                        @error('notes')<span class="mt-1 block text-xs text-rose-600">{{ $message }}</span>@enderror
                     </label>
                 </div>
             </section>
@@ -74,34 +80,35 @@
         </form>
 
         <script>
-            const customers = {{ Illuminate\Support\Js::from($customers->map(fn ($customer) => [
-                'id' => $customer->id,
-                'contacts' => $customer->contacts->map(fn ($contact) => [
-                    'id' => $contact->id,
-                    'name' => $contact->name,
-                    'phone' => $contact->phone,
-                    'label' => $contact->label,
-                ])->values(),
-            })->values()) }};
+            const customers = @json($customerOptions);
+            const oldContactId = @json(old('event_day_contact_id'));
 
             const customerSelect = document.getElementById('customer_id');
             const contactSelect = document.getElementById('event_day_contact_id');
 
-            function refreshContacts() {
+            function refreshContacts(selectedContactId = oldContactId) {
                 const customer = customers.find(item => String(item.id) === customerSelect.value);
-                contactSelect.innerHTML = '<option value="">Select event-day contact</option>';
+                contactSelect.innerHTML = '<option value="">No event-day contact</option>';
 
-                if (!customer) return;
+                if (!customer) {
+                    return;
+                }
+
+                if (customer.contacts.length === 0) {
+                    contactSelect.innerHTML = '<option value="">No contacts available</option>';
+                    return;
+                }
 
                 customer.contacts.forEach(contact => {
                     const option = document.createElement('option');
                     option.value = contact.id;
                     option.textContent = contact.name + (contact.label ? ' · ' + contact.label : '') + (contact.phone ? ' · ' + contact.phone : '');
+                    option.selected = String(contact.id) === String(selectedContactId);
                     contactSelect.appendChild(option);
                 });
             }
 
-            customerSelect.addEventListener('change', refreshContacts);
+            customerSelect.addEventListener('change', () => refreshContacts(''));
             refreshContacts();
         </script>
     @endif
