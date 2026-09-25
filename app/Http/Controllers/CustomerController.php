@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Customer;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\View\View;
 
 class CustomerController extends Controller
@@ -34,18 +35,20 @@ class CustomerController extends Controller
             'primary_contact_email' => ['nullable', 'email', 'max:255'],
         ]);
 
-        $customer = Customer::create([
-            'name' => $validated['name'],
-            'notes' => $validated['notes'] ?? null,
-        ]);
+        DB::transaction(function () use ($validated): void {
+            $customer = Customer::create([
+                'name' => $validated['name'],
+                'notes' => $validated['notes'] ?? null,
+            ]);
 
-        $customer->contacts()->create([
-            'name' => $validated['primary_contact_name'],
-            'phone' => $validated['primary_contact_phone'] ?? null,
-            'email' => $validated['primary_contact_email'] ?? null,
-            'label' => 'Primary',
-            'is_primary' => true,
-        ]);
+            $customer->contacts()->create([
+                'name' => $validated['primary_contact_name'],
+                'phone' => $validated['primary_contact_phone'] ?? null,
+                'email' => $validated['primary_contact_email'] ?? null,
+                'label' => 'Primary',
+                'is_primary' => true,
+            ]);
+        });
 
         return redirect()
             ->route('customers.index')
