@@ -18,6 +18,7 @@
                     $items = [
                         ['label' => 'Work', 'route' => 'work.index'],
                         ['label' => 'Customers', 'route' => 'customers.index'],
+                        ['label' => 'Capabilities', 'route' => 'capabilities.index'],
                     ];
                 @endphp
 
