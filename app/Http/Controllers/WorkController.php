@@ -27,7 +27,17 @@ class WorkController extends Controller
         $customers = Customer::with('contacts')->orderBy('name')->get();
         $selectedCustomerId = $request->integer('customer_id');
 
-        return view('work.create', compact('customers', 'selectedCustomerId'));
+        $customerOptions = $customers->map(fn ($customer) => [
+            'id' => $customer->id,
+            'contacts' => $customer->contacts->map(fn ($contact) => [
+                'id' => $contact->id,
+                'name' => $contact->name,
+                'phone' => $contact->phone,
+                'label' => $contact->label,
+            ])->values()->all(),
+        ])->values()->all();
+
+        return view('work.create', compact('customers', 'selectedCustomerId', 'customerOptions'));
     }
 
     public function store(Request $request): RedirectResponse
