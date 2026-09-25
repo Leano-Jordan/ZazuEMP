@@ -1,6 +1,6 @@
 <x-app-layout>
-    <x-slot:title>New work</x-slot:title>
-    <x-slot:heading>New work</x-slot:heading>
+    <x-slot:title>Create work</x-slot:title>
+    <x-slot:heading>Create work</x-slot:heading>
     <x-slot:headerAction>
         <a href="{{ route('work.index') }}" class="text-sm font-medium text-slate-500 hover:text-slate-900">← Work</a>
     </x-slot:headerAction>
@@ -74,7 +74,7 @@
         </form>
 
         <script>
-            const customers = @json($customers->map(fn ($customer) => [
+            const customers = \Illuminate\Support\Js::from($customers->map(fn ($customer) => [
                 'id' => $customer->id,
                 'contacts' => $customer->contacts->map(fn ($contact) => [
                     'id' => $contact->id,
@@ -82,7 +82,7 @@
                     'phone' => $contact->phone,
                     'label' => $contact->label,
                 ])->values(),
-            ])->values());
+            })->values());
 
             const customerSelect = document.getElementById('customer_id');
             const contactSelect = document.getElementById('event_day_contact_id');
