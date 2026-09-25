@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\BusinessCapabilityController;
 use App\Http\Controllers\CustomerController;
 use App\Http\Controllers\WorkController;
 use Illuminate\Support\Facades\Route;
@@ -16,3 +17,9 @@ Route::put('/work/{event}', [WorkController::class, 'update'])->name('work.updat
 Route::get('/customers', [CustomerController::class, 'index'])->name('customers.index');
 Route::get('/customers/create', [CustomerController::class, 'create'])->name('customers.create');
 Route::post('/customers', [CustomerController::class, 'store'])->name('customers.store');
+
+Route::get('/capabilities', [BusinessCapabilityController::class, 'index'])->name('capabilities.index');
+Route::get('/capabilities/create', [BusinessCapabilityController::class, 'create'])->name('capabilities.create');
+Route::post('/capabilities', [BusinessCapabilityController::class, 'store'])->name('capabilities.store');
+Route::get('/capabilities/{capability}/edit', [BusinessCapabilityController::class, 'edit'])->name('capabilities.edit');
+Route::put('/capabilities/{capability}', [BusinessCapabilityController::class, 'update'])->name('capabilities.update');
