@@ -22,11 +22,12 @@ class WorkController extends Controller
         return view('work.index', compact('events'));
     }
 
-    public function create(): View
+    public function create(Request $request): View
     {
         $customers = Customer::with('contacts')->orderBy('name')->get();
+        $selectedCustomerId = $request->integer('customer_id');
 
-        return view('work.create', compact('customers'));
+        return view('work.create', compact('customers', 'selectedCustomerId'));
     }
 
     public function store(Request $request): RedirectResponse
@@ -36,7 +37,7 @@ class WorkController extends Controller
             'event_day_contact_id' => ['nullable', 'exists:customer_contacts,id'],
             'name' => ['required', 'string', 'max:255'],
             'event_type' => ['nullable', 'string', 'max:255'],
-            'event_date' => ['nullable', 'date'],
+            'event_date' => ['required', 'date'],
             'event_address' => ['nullable', 'string', 'max:255'],
             'notes' => ['nullable', 'string'],
         ]);
@@ -80,7 +81,7 @@ class WorkController extends Controller
             'event_day_contact_id' => ['nullable', 'exists:customer_contacts,id'],
             'name' => ['required', 'string', 'max:255'],
             'event_type' => ['nullable', 'string', 'max:255'],
-            'event_date' => ['nullable', 'date'],
+            'event_date' => ['required', 'date'],
             'event_address' => ['nullable', 'string', 'max:255'],
             'notes' => ['nullable', 'string'],
             'status' => ['required', 'in:draft,confirmed,in_progress,completed,cancelled'],
