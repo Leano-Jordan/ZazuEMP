@@ -26,7 +26,7 @@
                     </p>
                 </div>
                 <div class="text-sm text-slate-500">
-                    {{ $customer->events_count }} {{ Str::plural('work item', $customer->events_count) }}
+                    {{ $customer->events_count }} {{ $customer->events_count === 1 ? 'work item' : 'work items' }}
                 </div>
             </div>
         @empty
