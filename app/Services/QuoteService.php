@@ -53,7 +53,7 @@ class QuoteService
                 ->orderByDesc('version')
                 ->firstOrFail();
 
-            if ($latest->status === 'draft') {
+            if ($latest->status === 'draft' && $latest->matchesRequirements($requirements)) {
                 return $latest;
             }
 
@@ -84,8 +84,29 @@ class QuoteService
                 $prices[$requirement->id] = $savedPrice ?? '0.00';
             }
 
-            $this->replaceItems($version, $requirements, $prices, $lockedQuote->currency);
-            $this->recalculate($version);
+            $previousRequirementIds = $previousItems->keys()
+                ->mapWithKeys(fn ($id) => [(int) $id => true])
+                ->all();
+
+            foreach ($requirements as $requirement) {
+                if (!array_key_exists((int) $requirement->id, $previousRequirementIds)) {
+                    continue;
+                }
+
+                $previousItem = $previousItems->get($requirement->id);
+
+                $version->items()->create([
+                    'event_requirement_id' => $requirement->id,
+                    'capability_id' => $requirement->capability_id,
+                    'description' => $requirement->description,
+                    'quantity' => $previousItem->quantity,
+                    'unit' => $requirement->unit,
+                    'unit_price' => $previousItem->unit_price,
+                    'line_total' => $previousItem->line_total,
+                    'pricing_basis' => $requirement->capability?->pricing_basis,
+                    'source_snapshot' => $previousItem->source_snapshot,
+                ]);
+            }
 
             return $version->fresh('items');
         });
