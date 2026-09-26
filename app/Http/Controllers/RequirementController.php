@@ -7,6 +7,7 @@ use App\Models\Event;
 use App\Models\EventRequirement;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Validation\Rule;
 use Illuminate\View\View;
 
 class RequirementController extends Controller
@@ -34,7 +35,10 @@ class RequirementController extends Controller
     public function store(Request $request, Event $event): RedirectResponse
     {
         $validated = $request->validate([
-            'capability_id' => ['nullable', 'exists:business_capabilities,id'],
+            'capability_id' => [
+                'nullable',
+                Rule::exists('business_capabilities', 'id')->where(fn ($query) => $query->where('is_active', true)),
+            ],
             'description' => ['required', 'string', 'max:255'],
             'category' => ['nullable', 'string', 'max:100'],
             'quantity' => ['required', 'numeric', 'min:0.01'],
