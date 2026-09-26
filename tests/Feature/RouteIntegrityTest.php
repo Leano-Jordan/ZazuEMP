@@ -63,6 +63,22 @@ class RouteIntegrityTest extends TestCase
         $this->assertSame([], $missing);
     }
 
+    public function test_controller_routes_resolve_to_loadable_controller_classes(): void
+    {
+        $invalid = collect(Route::getRoutes()->getRoutes())
+            ->map(fn ($route) => $route->getActionName())
+            ->filter(fn ($action) => is_string($action) && str_contains($action, '@'))
+            ->filter(function ($action) {
+                [$class] = str_contains($action, '@') ? explode('@', $action, 2) : [$action];
+
+                return !class_exists($class);
+            })
+            ->values()
+            ->all();
+
+        $this->assertSame([], $invalid);
+    }
+
     public function test_blade_named_route_calls_point_to_registered_routes(): void
     {
         $registered = collect(Route::getRoutes()->getRoutes())
