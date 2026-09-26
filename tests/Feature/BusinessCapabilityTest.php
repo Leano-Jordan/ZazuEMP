@@ -35,6 +35,7 @@ class BusinessCapabilityTest extends TestCase
             'category' => 'Catering',
             'capability_type' => 'service',
             'pricing_basis' => 'per_person',
+            'currency' => 'ZAR',
             'is_active' => 1,
         ]);
     }
@@ -56,6 +57,7 @@ class BusinessCapabilityTest extends TestCase
             'pricing_basis' => 'per_unit',
             'default_unit' => 'chair',
             'description' => 'Premium event chairs.',
+            'currency' => 'USD',
             'is_active' => '1',
         ]);
 
@@ -65,6 +67,7 @@ class BusinessCapabilityTest extends TestCase
             'id' => $capability->id,
             'name' => 'Premium Chair Hire',
             'category' => 'Furniture & equipment',
+            'currency' => 'USD',
         ]);
     }
 }
