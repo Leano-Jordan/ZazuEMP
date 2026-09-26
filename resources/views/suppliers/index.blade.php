@@ -6,7 +6,7 @@
     <section class="zazu-card zazu-list">
         <div class="zazu-card-header">
             <div class="zazu-card-title">Supplier directory</div>
-            <div class="zazu-card-description">Skeleton rows showing the future shape without pretending live supplier data exists.</div>
+            <div class="zazu-card-description">Planned supplier register for profiles, contacts, terms and buying activity.</div>
         </div>
         @foreach (['Catering supplier','Equipment hire supplier','Decor supplier','Transport supplier'] as $supplier)
             <div class="zazu-list-item">
@@ -14,7 +14,7 @@
                     <div class="zazu-list-title">{{ $supplier }}</div>
                     <div class="zazu-list-meta">Supplier profile, contacts, terms and linked buying activity</div>
                 </div>
-                <span class="zazu-chip zazu-chip-neutral">Coming next</span>
+                <span class="zazu-chip zazu-chip-neutral">Planned</span>
             </div>
         @endforeach
     </section>
