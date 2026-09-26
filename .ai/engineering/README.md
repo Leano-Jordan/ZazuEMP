@@ -78,3 +78,14 @@ UNVERIFIED = the change may exist but required evidence is missing.
 BLOCKED = work cannot safely continue because a required dependency, decision, environment or authorization is missing.
 
 A task is complete only when its required verification level is satisfied.
+
+
+## Git branch discipline
+
+Zazu EMP is a single-branch repository by explicit operator decision.
+
+- The only development branch is `main`.
+- Do not create or maintain feature, fix, hardening, release or temporary branches.
+- Do not use pull-request/merge workflows for normal Zazu development.
+- Commit directly to `main` after verification.
+- Preserve the existing architecture; use small, reversible hardening changes and regression coverage.
