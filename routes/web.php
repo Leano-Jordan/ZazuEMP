@@ -9,9 +9,11 @@ use App\Http\Controllers\CustomerController;
 use App\Http\Controllers\CustomerContactController;
 use App\Http\Controllers\EventCostController;
 use App\Http\Controllers\EventPreparationController;
+use App\Http\Controllers\EventAttachmentController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\FinanceController;
 use App\Http\Controllers\InventoryController;
+use App\Http\Controllers\OnboardingController;
 use App\Http\Controllers\PasswordResetController;
 use App\Http\Controllers\PurchaseOrderController;
 use App\Http\Controllers\QuoteController;
@@ -41,6 +43,14 @@ Route::middleware(['auth', 'owner'])->group(function () {
 
 Route::middleware(['auth', 'business.context'])->group(function () {
     Route::get('/dashboard', DashboardController::class)->name('dashboard');
+
+    Route::get('/setup/catalogue', [OnboardingController::class, 'catalogue'])->name('onboarding.catalogue');
+    Route::post('/setup/catalogue', [OnboardingController::class, 'storeCatalogue'])->name('onboarding.catalogue.store');
+    Route::post('/setup/catalogue/finish', [OnboardingController::class, 'finishCatalogue'])->name('onboarding.catalogue.finish');
+    Route::post('/setup/catalogue/skip', [OnboardingController::class, 'skipCatalogue'])->name('onboarding.catalogue.skip');
+    Route::get('/setup/business', [OnboardingController::class, 'business'])->name('onboarding.business');
+    Route::post('/setup/business', [OnboardingController::class, 'storeBusiness'])->name('onboarding.business.store');
+    Route::post('/setup/business/skip', [OnboardingController::class, 'skipBusiness'])->name('onboarding.business.skip');
     Route::get('/media/profile/{type}/{id}', [\App\Http\Controllers\ProfileMediaController::class, 'show'])->whereIn('type', ['customer', 'user'])->name('profile.media');
     Route::get('/media/business/{type}', [\App\Http\Controllers\BusinessMediaController::class, 'show'])->whereIn('type', ['logo', 'dashboard', 'wallpaper'])->name('business.media');
     Route::get('/calendar', CalendarController::class)->name('calendar.index');

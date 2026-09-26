@@ -4456,3 +4456,114 @@ body.zazu-has-wallpaper .zazu-content > * {
         gap: 9px;
     }
 }
+.zazu-toast {
+    position: fixed;
+    right: 24px;
+    bottom: 24px;
+    z-index: 100;
+    width: min(440px, calc(100vw - 32px));
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    padding: 14px;
+    border: 1px solid var(--zazu-border);
+    border-radius: 14px;
+    background: var(--zazu-surface);
+    color: var(--zazu-ink);
+    box-shadow: var(--zazu-shadow-strong);
+    animation: zazu-toast-in 180ms ease-out;
+}
+
+.zazu-toast-success { border-color: color-mix(in srgb, var(--zazu-success) 34%, var(--zazu-border)); }
+.zazu-toast-error { border-color: color-mix(in srgb, var(--zazu-danger) 38%, var(--zazu-border)); }
+.zazu-toast-info { border-color: color-mix(in srgb, var(--zazu-info) 34%, var(--zazu-border)); }
+
+.zazu-toast-icon {
+    width: 28px;
+    height: 28px;
+    flex: 0 0 28px;
+    display: grid;
+    place-items: center;
+    border-radius: 9px;
+    background: var(--zazu-primary-soft);
+    color: var(--zazu-primary);
+    font-size: 13px;
+    font-weight: 800;
+}
+
+.zazu-toast-error .zazu-toast-icon { background: var(--zazu-danger-soft); color: var(--zazu-danger-ink); }
+.zazu-toast-success .zazu-toast-icon { background: var(--zazu-success-soft); color: var(--zazu-success-ink); }
+.zazu-toast-info .zazu-toast-icon { background: var(--zazu-info-soft); color: var(--zazu-info-ink); }
+
+.zazu-toast-content { min-width: 0; flex: 1; }
+.zazu-toast-title { color: var(--zazu-ink); font-size: 12px; font-weight: 750; }
+.zazu-toast-message { margin-top: 3px; color: var(--zazu-muted); font-size: 11px; line-height: 1.5; }
+.zazu-toast-action {
+    flex: 0 0 auto;
+    align-self: center;
+    color: var(--zazu-link);
+    font-size: 11px;
+    font-weight: 750;
+    text-decoration: none;
+}
+.zazu-toast-action:hover { text-decoration: underline; text-underline-offset: 3px; }
+.zazu-toast-close {
+    width: 28px;
+    height: 28px;
+    flex: 0 0 28px;
+    display: grid;
+    place-items: center;
+    border: 0;
+    border-radius: 8px;
+    background: transparent;
+    color: var(--zazu-muted);
+    font-size: 19px;
+    line-height: 1;
+    cursor: pointer;
+}
+.zazu-toast-close:hover { background: var(--zazu-surface-2); color: var(--zazu-ink); }
+
+@keyframes zazu-toast-in {
+    from { opacity: 0; transform: translateY(8px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.zazu-onboarding-shell {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 300px;
+    gap: 20px;
+    align-items: start;
+}
+.zazu-onboarding-main { min-width: 0; }
+.zazu-onboarding-aside { position: sticky; top: 96px; }
+.zazu-onboarding-progress {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 18px;
+}
+.zazu-onboarding-progress span {
+    width: 28px; height: 28px; display: grid; place-items: center;
+    border: 1px solid var(--zazu-border-strong); border-radius: 50%;
+    background: var(--zazu-surface); color: var(--zazu-muted); font-size: 10px; font-weight: 800;
+}
+.zazu-onboarding-progress span.active { border-color: var(--zazu-primary); background: var(--zazu-primary); color: var(--zazu-primary-ink); }
+.zazu-onboarding-progress i { width: 42px; height: 1px; background: var(--zazu-border-strong); }
+.zazu-onboarding-title { margin-top: 4px; color: var(--zazu-ink); font-size: clamp(1.5rem, 3vw, 2rem); font-weight: 680; letter-spacing: -0.045em; }
+.zazu-onboarding-copy { max-width: 700px; margin-top: 8px; margin-bottom: 20px; color: var(--zazu-muted); font-size: 13px; line-height: 1.65; }
+
+@media (max-width: 900px) {
+    .zazu-onboarding-shell { grid-template-columns: 1fr; }
+    .zazu-onboarding-aside { position: static; }
+}
+@media (max-width: 640px) {
+    .zazu-toast { right: 16px; bottom: 16px; }
+}
+.zazu-dropzone {
+    padding: 18px;
+    border: 1px dashed var(--zazu-border-strong);
+    border-radius: 14px;
+    background: var(--zazu-surface-2);
+}
+.zazu-dropzone-title { margin-top: 10px; color: var(--zazu-ink-2); font-size: 12px; font-weight: 750; }
+.zazu-dropzone-copy { margin-top: 4px; color: var(--zazu-muted); font-size: 11px; line-height: 1.5; }

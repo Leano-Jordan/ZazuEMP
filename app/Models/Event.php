@@ -96,6 +96,11 @@ class Event extends Model
         return $this->hasMany(EventCost::class);
     }
 
+    public function attachments(): HasMany
+    {
+        return $this->hasMany(EventAttachment::class)->latest();
+    }
+
     public function preparationItems(): HasMany
     {
         return $this->hasMany(EventPreparationItem::class);

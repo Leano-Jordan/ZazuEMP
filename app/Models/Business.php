@@ -11,6 +11,14 @@ class Business extends Model
 {
     use HasFactory;
 
+    protected function casts(): array
+    {
+        return [
+            'catalogue_setup_completed_at' => 'datetime',
+            'business_setup_completed_at' => 'datetime',
+        ];
+    }
+
     protected $fillable = [
         'name',
         'slug',
@@ -19,6 +27,13 @@ class Business extends Model
         'logo_path',
         'dashboard_image_path',
         'wallpaper_path',
+        'email',
+        'phone',
+        'address',
+        'website',
+        'tax_number',
+        'catalogue_setup_completed_at',
+        'business_setup_completed_at',
     ];
 
     public function users(): BelongsToMany

@@ -253,7 +253,7 @@ class WorkController extends Controller
         $business = $this->business($request);
         $this->ensureBusiness($event, $business);
 
-        $event->load(['customer.contacts', 'eventDayContact', 'eventNightContact', 'requirements.capability', 'quotes.latestVersion.items']);
+        $event->load(['customer.contacts', 'eventDayContact', 'eventNightContact', 'requirements.capability', 'quotes.latestVersion.items', 'attachments']);
 
         return view('work.show', compact('event'));
     }
