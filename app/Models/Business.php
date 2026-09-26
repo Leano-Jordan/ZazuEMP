@@ -15,6 +15,7 @@ class Business extends Model
         'name',
         'slug',
         'status',
+        'currency',
         'logo_path',
         'dashboard_image_path',
         'wallpaper_path',
