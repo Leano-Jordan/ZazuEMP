@@ -88,6 +88,39 @@ class WorkWorkflowTest extends TestCase
         $this->assertSame($newNight->id, $fresh->event_night_contact_id);
     }
 
+    public function test_work_customer_cannot_change_after_a_quote_exists(): void
+    {
+        $customer = Customer::create(['name' => 'Quoted Customer']);
+        $otherCustomer = Customer::create(['name' => 'Other Customer']);
+
+        $event = Event::create([
+            'customer_id' => $customer->id,
+            'reference' => 'ZAZU-LOCK-001',
+            'name' => 'Quoted Work',
+            'event_date' => '2026-10-22',
+            'status' => 'draft',
+        ]);
+
+        // Use the relationship existence check that the controller uses.
+        $event->quotes()->create([
+            'reference' => 'QUO-LOCK-001',
+            'status' => 'draft',
+            'currency' => 'ZAR',
+        ]);
+
+        $response = $this->put(route('work.update', $event), [
+            'customer_id' => $otherCustomer->id,
+            'name' => 'Quoted Work',
+            'event_date' => '2026-10-22',
+            'status' => 'confirmed',
+        ]);
+
+        $response->assertRedirect(route('work.edit', $event));
+        $response->assertSessionHas('error');
+
+        $this->assertSame($customer->id, $event->fresh()->customer_id);
+    }
+
     public function test_work_can_be_removed_without_destroying_the_record(): void
     {
         $customer = Customer::create(['name' => 'Remove Customer']);
