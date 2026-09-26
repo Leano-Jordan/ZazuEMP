@@ -534,3 +534,32 @@ Verification boundary:
 - This removes the remaining fragile JSON directive surface from Work Edit and follows the Laravel 13 Blade guidance for rendering existing variables as JavaScript data.
 - Work Edit rendering regression test now verifies the rendered JavaScript uses JSON.parse output and contains no legacy @json( marker.
 - Local generated storage/framework/views cache remains runtime-owned; after source changes the owner's Windows checkout should run php artisan view:clear before browser/test verification.
+
+
+## Core re-audit + regression consolidation — 2026-09-26
+
+Verified on current main:
+- Full Laravel CI suite passed on commit `d7e2ad63489c00d5374e5cd3500873c00d5374e5cd3500873c00a586b29` with the current application test set.
+- Frontend dependency install/build passed in the same CI sequence.
+- Earlier failure wall was traced to malformed compiled Blade PHP, not fifteen unrelated application failures.
+
+Implemented in this sweep:
+- Restored onboarding route ownership enforcement and registration -> catalogue -> business setup flow.
+- Added missing Work attachment routes and ownership checks.
+- Added onboarding regression coverage.
+- Corrected onboarding controller method collision.
+- Hardened purchase-order capability ownership and line-array shape validation.
+- Added transaction locking around inventory issue/adjustment mutations.
+- Added transaction locking around asset allocation/release mutations.
+- Added attachment file cleanup on failed persistence.
+- Replaced fragile Blade `@php(...)` assignment sites with explicit `@php ... @endphp` blocks in the affected views.
+- Fixed CI/runtime diagnosis so compiled Blade PHP syntax can be detected separately from template caching.
+
+Current architectural risks:
+- Business isolation remains controller/context-centric because `BelongsToBusiness` is not yet consistently applied across every business-owned model.
+- Psalm security workflow currently fails, but the repository has no `psalm.xml` and no direct Psalm dev dependency; root cause is not yet verified as an application vulnerability.
+- Composer lock/platform metadata and CI action runtime warnings require release-hygiene review.
+- Browser traversal, local Windows database state, backup/restore, licensing evidence and real deployment runtime remain outside this CI verification boundary.
+
+Regression rule:
+- Do not treat a green feature suite as proof that every Blade view compiles. Keep a dedicated all-view Blade syntax check in the audit process before release.
