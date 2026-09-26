@@ -4559,3 +4559,11 @@ body.zazu-has-wallpaper .zazu-content > * {
 @media (max-width: 640px) {
     .zazu-toast { right: 16px; bottom: 16px; }
 }
+.zazu-dropzone {
+    padding: 18px;
+    border: 1px dashed var(--zazu-border-strong);
+    border-radius: 14px;
+    background: var(--zazu-surface-2);
+}
+.zazu-dropzone-title { margin-top: 10px; color: var(--zazu-ink-2); font-size: 12px; font-weight: 750; }
+.zazu-dropzone-copy { margin-top: 4px; color: var(--zazu-muted); font-size: 11px; line-height: 1.5; }
