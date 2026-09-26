@@ -29,7 +29,11 @@ class RequirementController extends Controller
             ->orderBy('name')
             ->get();
 
-        return view('requirements.create', compact('event', 'capabilities'));
+        return view('requirements.create', [
+            'event' => $event,
+            'capabilities' => $capabilities,
+            'serviceCategories' => config('zazu.service_categories'),
+        ]);
     }
 
     public function store(Request $request, Event $event): RedirectResponse
@@ -40,7 +44,7 @@ class RequirementController extends Controller
                 Rule::exists('business_capabilities', 'id')->where(fn ($query) => $query->where('is_active', true)),
             ],
             'description' => ['required', 'string', 'max:255'],
-            'category' => ['nullable', 'string', 'max:100'],
+            'category' => ['required', 'string', 'max:100', \Illuminate\Validation\Rule::in(array_keys(config('zazu.service_categories')))],
             'quantity' => ['required', 'numeric', 'min:0.01'],
             'unit' => ['nullable', 'string', 'max:50'],
             'notes' => ['nullable', 'string'],
