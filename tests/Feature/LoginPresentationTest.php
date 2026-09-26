@@ -16,6 +16,8 @@ class LoginPresentationTest extends TestCase
             ->assertSee('zazu-login-frame', false)
             ->assertSee('zazu-login-visual', false)
             ->assertSee('data-password-toggle', false)
+            ->assertSee('name="identifier"', false)
+            ->assertSee('Username or email', false)
             ->assertSee('zazu-auth-subtitle', false)
             ->assertSee('catering', false);
     }
