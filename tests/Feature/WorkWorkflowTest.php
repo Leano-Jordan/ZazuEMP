@@ -36,7 +36,7 @@ class WorkWorkflowTest extends TestCase
             'event_day_contact_id' => $day->id,
             'event_night_contact_id' => $night->id,
             'name' => 'Zazu Test Work',
-            'event_type' => 'Catering',
+            'event_type' => 'Catering order',
             'event_date' => '2026-10-15',
             'event_address' => 'Pretoria',
             'notes' => 'Workflow test',
@@ -75,7 +75,7 @@ class WorkWorkflowTest extends TestCase
             'event_day_contact_id' => $newDay->id,
             'event_night_contact_id' => $newNight->id,
             'name' => 'Updated Work',
-            'event_type' => 'Hire',
+            'event_type' => 'Equipment hire',
             'event_date' => '2026-10-21',
             'status' => 'confirmed',
         ]);
