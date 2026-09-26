@@ -48,10 +48,11 @@
                     </label>
                 </div>
                 <div class="zazu-actionbar">
-                    <a href="{{ route('dashboard') }}" class="zazu-btn zazu-btn-ghost">Skip for now</a>
+                    <button type="submit" form="skip-business-form" class="zazu-btn zazu-btn-ghost">Skip for now</button>
                     <button class="zazu-btn zazu-btn-primary">Finish setup</button>
                 </div>
             </form>
+            <form id="skip-business-form" method="POST" action="{{ route('onboarding.business.skip') }}">@csrf</form>
         </div>
         <aside class="zazu-onboarding-aside">
             <div class="zazu-context-card">
