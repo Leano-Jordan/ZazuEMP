@@ -51,4 +51,14 @@ class CustomerController extends Controller
             ->route('customers.index')
             ->with('success', 'Customer created successfully.');
     }
+
+    public function show(Customer $customer): View
+    {
+        $customer->load([
+            'contacts',
+            'events' => fn ($query) => $query->latest('event_date')->latest(),
+        ]);
+
+        return view('customers.show', compact('customer'));
+    }
 }
