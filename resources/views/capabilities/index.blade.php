@@ -2,7 +2,9 @@
     <x-slot:title>Service catalogue</x-slot:title>
     <x-slot:heading>Service catalogue</x-slot:heading>
     <x-slot:headerAction>
-        <a href="{{ route('capabilities.create') }}" class="zazu-btn zazu-btn-primary">Add service</a>
+        @if($isOwner)
+            <a href="{{ route('capabilities.create') }}" class="zazu-btn zazu-btn-primary">Add service</a>
+        @endif
     </x-slot:headerAction>
 
     <section class="zazu-command-band">
@@ -41,7 +43,11 @@
 
     <section class="zazu-catalogue-grid">
         @forelse ($capabilities as $capability)
-            <a href="{{ route('capabilities.edit', $capability) }}" class="zazu-catalogue-card">
+            @if($isOwner)
+                <a href="{{ route('capabilities.edit', $capability) }}" class="zazu-catalogue-card">
+            @else
+                <article class="zazu-catalogue-card">
+            @endif
                 <div class="zazu-catalogue-image">
                     @if ($capability->image_path)
                         <img src="{{ Storage::disk('public')->url($capability->image_path) }}" alt="{{ $capability->name }}">
@@ -69,7 +75,11 @@
                         @endif
                     </div>
                 </div>
-            </a>
+            @if($isOwner)
+                </a>
+            @else
+                </article>
+            @endif
         @empty
             <section class="zazu-empty zazu-card">
                 <div class="zazu-empty-title">Your catalogue is empty</div>
