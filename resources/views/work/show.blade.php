@@ -20,7 +20,7 @@
             ? !$latestQuote->latestVersion->matchesRequirements($event->requirements)
             : false;
         $nextAction = $latestQuoteNeedsRevision
-            ? ['label' => 'Revise quote', 'route' => route('quotes.versions.store', $latestQuote), 'copy' => 'The job services changed after the latest quote. Review the current lines before using the quote.']
+            ? ['label' => 'Review quote', 'route' => route('quotes.show', $latestQuote), 'copy' => 'The job services changed after the latest quote. Review the current lines before using the quote.']
             : ($latestQuote
                 ? ['label' => 'Open quote', 'route' => route('quotes.show', $latestQuote), 'copy' => 'Review the current quote for this job.']
                 : ['label' => 'Add services', 'route' => route('work.requirements.create', $event), 'copy' => 'Choose what you are providing for this job.']);
