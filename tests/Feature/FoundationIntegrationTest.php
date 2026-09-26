@@ -179,6 +179,43 @@ class FoundationIntegrationTest extends TestCase
         $this->assertModelExists($otherEvent);
     }
 
+    public function test_active_business_context_can_be_switched_only_to_an_active_membership(): void
+    {
+        $first = Business::create([
+            'name' => 'First Business',
+            'slug' => 'first-business',
+            'status' => 'active',
+            'currency' => 'ZAR',
+        ]);
+        $second = Business::create([
+            'name' => 'Second Business',
+            'slug' => 'second-business',
+            'status' => 'active',
+            'currency' => 'ZAR',
+        ]);
+        $user = $this->signInAsOwner($first);
+        $second->users()->attach($user->id, ['role' => 'staff']);
+
+        $this->assertSame($first->id, app(\App\Support\CurrentBusiness::class)->id($user));
+
+        $this->post(route('business.switch'), ['business_id' => $second->id])
+            ->assertRedirect();
+
+        $this->assertSame($second->id, app(\App\Support\CurrentBusiness::class)->id($user));
+
+        $third = Business::create([
+            'name' => 'Unrelated Business',
+            'slug' => 'unrelated-business',
+            'status' => 'active',
+            'currency' => 'ZAR',
+        ]);
+
+        $this->post(route('business.switch'), ['business_id' => $third->id])
+            ->assertForbidden();
+
+        $this->assertSame($second->id, app(\App\Support\CurrentBusiness::class)->id($user));
+    }
+
     public function test_staff_ui_does_not_advertise_owner_only_settings_or_catalogue_editing(): void
     {
         $business = Business::create([
