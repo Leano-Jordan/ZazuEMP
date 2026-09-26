@@ -4,6 +4,25 @@
     <x-slot:headerAction>
         @if ($version?->status === 'draft')
             <a href="{{ route('quotes.versions.edit', [$quote, $version]) }}" class="zazu-btn zazu-btn-primary">Edit draft</a>
+            <form method="POST" action="{{ route('quotes.status', $quote) }}">
+                @csrf
+                @method('PATCH')
+                <input type="hidden" name="status" value="sent">
+                <button class="zazu-btn zazu-btn-secondary">Mark as sent</button>
+            </form>
+        @elseif ($quote->status === 'sent')
+            <form method="POST" action="{{ route('quotes.status', $quote) }}">
+                @csrf
+                @method('PATCH')
+                <input type="hidden" name="status" value="accepted">
+                <button class="zazu-btn zazu-btn-primary">Mark accepted</button>
+            </form>
+            <form method="POST" action="{{ route('quotes.status', $quote) }}">
+                @csrf
+                @method('PATCH')
+                <input type="hidden" name="status" value="declined">
+                <button class="zazu-btn zazu-btn-ghost">Decline</button>
+            </form>
         @else
             <form method="POST" action="{{ route('quotes.versions.store', $quote) }}">
                 @csrf
@@ -15,10 +34,11 @@
     </x-slot:headerAction>
 
     @php
-        $statusClass = match ($version?->status) {
-            'superseded' => 'zazu-chip-neutral',
+        $displayStatus = $quote->status ?: ($version?->status ?? 'draft');
+        $statusClass = match ($displayStatus) {
             'accepted' => 'zazu-chip-success',
-            'rejected' => 'zazu-chip-danger',
+            'declined', 'expired' => 'zazu-chip-danger',
+            'superseded' => 'zazu-chip-neutral',
             default => 'zazu-chip-info',
         };
     @endphp
@@ -30,7 +50,7 @@
             <div class="zazu-work-summary">{{ $quote->event->name }} · {{ $quote->event->customer?->name ?? 'Customer' }} · {{ $quote->currency }}</div>
         </div>
         <div class="zazu-work-actions">
-            <span class="zazu-chip {{ $statusClass }}">{{ ucfirst($version?->status ?? $quote->status) }}</span>
+            <span class="zazu-chip {{ $statusClass }}">{{ ucfirst($displayStatus) }}</span>
         </div>
     </section>
 
@@ -94,7 +114,7 @@
                 <div class="zazu-panel-title mt-1">Totals</div>
                 <div class="zazu-detail-rows">
                     <div class="zazu-detail-row"><div class="zazu-detail-label">Subtotal</div><div class="zazu-detail-value">{{ $quote->currency }} {{ number_format((float) ($version?->subtotal ?? 0), 2) }}</div></div>
-                    <div class="zazu-detail-row"><div class="zazu-detail-label">Tax</div><div class="zazu-detail-value">{{ $quote->currency }} {{ number_format((float) ($version?->tax_total ?? 0), 2) }}</div></div>
+                    <div class="zazu-detail-row"><div class="zazu-detail-label">Tax · {{ $version?->tax_label ?: 'No tax' }} ({{ $version?->tax_rate ?? '0.00' }}%)</div><div class="zazu-detail-value">{{ $quote->currency }} {{ number_format((float) ($version?->tax_total ?? 0), 2) }}</div></div>
                     <div class="zazu-detail-row"><div class="zazu-detail-label">Total</div><div class="zazu-detail-value">{{ $quote->currency }} {{ number_format((float) ($version?->total ?? 0), 2) }}</div></div>
                 </div>
             </section>
