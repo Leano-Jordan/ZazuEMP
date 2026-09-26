@@ -87,7 +87,6 @@ class BusinessCapabilityController extends Controller
 
         return $request->validate([
             'name' => ['required', 'string', 'max:255'],
-            'category' => ['required', 'string', 'max:100'],
             'capability_type' => ['required', 'in:service,rental,product,package,other'],
             'pricing_basis' => ['required', 'in:custom,fixed,per_unit,per_person,per_hour,per_day'],
             'default_price' => ['nullable', 'numeric', 'min:0'],
