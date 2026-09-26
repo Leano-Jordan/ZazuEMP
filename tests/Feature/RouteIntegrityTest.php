@@ -17,6 +17,7 @@ class RouteIntegrityTest extends TestCase
             'register.store',
             'owner.dashboard',
             'logout',
+            'business.switch',
             'dashboard',
             'calendar.index',
             'suppliers.index',
