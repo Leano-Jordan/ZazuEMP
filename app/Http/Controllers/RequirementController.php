@@ -49,6 +49,7 @@ class RequirementController extends Controller
     public function store(Request $request, Event $event): RedirectResponse
     {
         $this->ensureBusiness($event, $request);
+        abort_if($event->isClosed(), 422, 'Closed work cannot receive new requirements.');
 
         $validated = $request->validate([
             'capability_id' => [
