@@ -25,11 +25,14 @@ class WorkController extends Controller
         $baseQuery = Event::query()
             ->where('business_id', $business->id);
 
+        $activeQuery = (clone $baseQuery)
+            ->whereNotIn('status', Event::TERMINAL_STATUSES);
+
         $workload = [
-            'today' => (clone $baseQuery)->whereDate('event_date', $today)->count(),
-            'next_7_days' => (clone $baseQuery)->whereBetween('event_date', [$today, $today->copy()->addDays(6)])->count(),
-            'in_progress' => (clone $baseQuery)->where('status', 'in_progress')->count(),
-            'draft' => (clone $baseQuery)->where('status', 'draft')->count(),
+            'today' => (clone $activeQuery)->whereDate('event_date', $today)->count(),
+            'next_7_days' => (clone $activeQuery)->whereBetween('event_date', [$today, $today->copy()->addDays(6)])->count(),
+            'in_progress' => (clone $activeQuery)->where('status', 'in_progress')->count(),
+            'draft' => (clone $activeQuery)->where('status', 'draft')->count(),
             'overdue' => EventPreparationItem::query()
                 ->where('business_id', $business->id)
                 ->whereIn('status', ['open', 'blocked'])
@@ -52,7 +55,9 @@ class WorkController extends Controller
             ->when($filter === 'next_7_days', fn ($query) => $query->whereBetween('event_date', [$today, $today->copy()->addDays(6)]))
             ->when($filter === 'in_progress', fn ($query) => $query->where('status', 'in_progress'))
             ->when($filter === 'draft', fn ($query) => $query->where('status', 'draft'))
-            ->when($filter === 'overdue', fn ($query) => $query->whereHas('preparationItems', fn ($prep) => $prep
+            ->when($filter === 'overdue', fn ($query) => $query
+                ->whereNotIn('status', Event::TERMINAL_STATUSES)
+                ->whereHas('preparationItems', fn ($prep) => $prep
                 ->whereIn('status', ['open', 'blocked'])
                 ->whereNotNull('due_date')
                 ->whereDate('due_date', '<', $today)
