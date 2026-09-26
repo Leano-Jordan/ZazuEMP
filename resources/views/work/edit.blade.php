@@ -7,9 +7,9 @@
 
     <section class="zazu-command-band">
         <div>
-            <div class="zazu-eyebrow">Workspace settings</div>
+            <div class="zazu-eyebrow">Work details</div>
             <h2 class="zazu-command-title">{{ $event->name }}</h2>
-            <p class="zazu-command-copy">Update the work record without leaving the operational context.</p>
+            <p class="zazu-command-copy">Update the work details without leaving this record.</p>
         </div>
         <div class="zazu-command-meta">
             <div class="zazu-command-meta-label">Reference</div>
@@ -26,7 +26,7 @@
                 <section class="zazu-form-section">
                     <div class="zazu-form-section-head">
                         <div class="zazu-form-section-title">Core work details</div>
-                        <div class="zazu-form-section-copy">Change the information that defines this workspace.</div>
+                        <div class="zazu-form-section-copy">Change the information that defines this work.</div>
                     </div>
 
                     <div class="zazu-form-grid">
@@ -94,8 +94,8 @@
 
                 <section class="zazu-form-section">
                     <div class="zazu-form-section-head">
-                        <div class="zazu-form-section-title">Operational context</div>
-                        <div class="zazu-form-section-copy">Location and notes remain close to the work record.</div>
+                        <div class="zazu-form-section-title">Location and notes</div>
+                        <div class="zazu-form-section-copy">Keep the address and notes with the work record.</div>
                     </div>
 
                     <div class="zazu-form-grid">
