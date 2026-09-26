@@ -4118,9 +4118,7 @@ body.zazu-has-wallpaper .zazu-content > * {
     position: relative;
     overflow: hidden;
     isolation: isolate;
-    background:
-        radial-gradient(circle at 72% 25%, rgba(255,255,255,.26), transparent 8rem),
-        linear-gradient(145deg, #c6d5cf 0%, #8fa69e 42%, #465c59 100%);
+    background: linear-gradient(145deg, #9be5ec 0%, #4db9ca 48%, #155f79 100%);
 }
 
 .zazu-login-visual::before {
@@ -4136,11 +4134,13 @@ body.zazu-has-wallpaper .zazu-content > * {
     height: 420px;
     left: -150px;
     bottom: -190px;
-    background: rgba(21,51,56,.22);
+    background: rgba(7,48,65,.22);
 }
 
 .zazu-login-visual {
-    background-image: url('../../images/catering.webp');
+    background-image:
+        linear-gradient(180deg, rgba(17, 104, 125, .08), rgba(5, 45, 61, .72)),
+        url('../../images/catering.webp');
     background-size: cover;
     background-position: center center;
 }
