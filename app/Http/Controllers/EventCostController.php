@@ -43,6 +43,7 @@ class EventCostController extends Controller
     public function store(Request $request, Event $event): RedirectResponse
     {
         $this->ensureBusiness($event, $request);
+        abort_if($event->isClosed(), 422, 'Closed work cannot receive new cost records.');
 
         $validated = $request->validate([
             'category' => ['required', Rule::in(array_keys(config('zazu.service_categories')))],
