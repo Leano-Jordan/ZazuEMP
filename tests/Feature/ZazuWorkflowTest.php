@@ -27,13 +27,13 @@ class ZazuWorkflowTest extends TestCase
 
         $response = $this->post(route('work.requirements.store', $event), [
             'description' => '100 chairs',
-            'category' => 'Furniture',
+            'category' => 'Furniture & equipment',
             'quantity' => 100,
             'unit' => 'chairs',
             'notes' => 'White folding chairs',
         ]);
 
-        $response->assertRedirect(route('work.requirements.index', $event));
+        $response->assertRedirect(route('work.show', $event));
 
         $this->assertDatabaseHas('event_requirements', [
             'event_id' => $event->id,
