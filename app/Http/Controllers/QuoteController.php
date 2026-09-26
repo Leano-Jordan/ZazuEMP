@@ -5,12 +5,11 @@ namespace App\Http\Controllers;
 use App\Models\Event;
 use App\Models\Quote;
 use App\Models\QuoteVersion;
+use App\Services\QuoteService;
 use App\Support\CurrentBusiness;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Str;
 use Illuminate\Validation\Rule;
 use Illuminate\View\View;
 
@@ -62,19 +61,19 @@ class QuoteController extends Controller
         ]);
     }
 
-    public function store(Request $request, Event $event): RedirectResponse
+    public function store(Request $request, Event $event, QuoteService $quoteService): RedirectResponse
     {
-        $businessId = app(CurrentBusiness::class)->id($request->user());
-        $request->merge(['currency' => strtoupper((string) $request->input('currency'))]);
         $this->ensureBusiness($event, $request);
         abort_if($event->isClosed(), 422, 'Closed work cannot receive new quotes.');
         $event->load(['customer', 'requirements.capability']);
+
+        $request->merge(['currency' => strtoupper((string) $request->input('currency'))]);
 
         $validated = $request->validate([
             'currency' => ['required', Rule::in(array_keys(config('zazu.currencies')))],
             'notes' => ['nullable', 'string'],
             'unit_price' => ['required', 'array', 'min:1'],
-            'unit_price.*' => ['required', 'numeric', 'min:0'],
+            'unit_price.*' => ['required', 'numeric', 'decimal:0,2', 'min:0'],
         ]);
 
         $requirementsById = $event->requirements->keyBy('id');
@@ -90,68 +89,16 @@ class QuoteController extends Controller
                 ->withInput();
         }
 
-        $result = DB::transaction(function () use ($validated, $requirementsById, $event, $businessId): Quote {
-            $quote = Quote::create([
-                'event_id' => $event->id,
-                'reference' => 'QUO-' . Str::upper(Str::random(8)),
-                'status' => 'draft',
-                'currency' => Str::upper($validated['currency']),
-            ]);
-
-            $version = $quote->versions()->create([
-                'version' => 1,
-                'status' => 'draft',
-                'notes' => $validated['notes'] ?? null,
-            ]);
-
-            $subtotalCents = 0;
-
-            foreach ($requirementsById as $requirement) {
-                $unitPriceCents = (int) round(((float) $validated['unit_price'][$requirement->id]) * 100);
-                $quantityHundredths = (int) round(((float) $requirement->quantity) * 100);
-                $lineTotalCents = intdiv(($quantityHundredths * $unitPriceCents) + 50, 100);
-                $subtotalCents += $lineTotalCents;
-
-                $quantity = number_format($quantityHundredths / 100, 2, '.', '');
-                $unitPrice = number_format($unitPriceCents / 100, 2, '.', '');
-                $lineTotal = number_format($lineTotalCents / 100, 2, '.', '');
-
-                $version->items()->create([
-                    'event_requirement_id' => $requirement->id,
-                    'capability_id' => $requirement->capability_id,
-                    'description' => $requirement->description,
-                    'quantity' => $quantity,
-                    'unit' => $requirement->unit,
-                    'unit_price' => $unitPrice,
-                    'line_total' => $lineTotal,
-                    'pricing_basis' => $requirement->capability?->pricing_basis,
-                    'source_snapshot' => [
-                        'requirement_id' => $requirement->id,
-                        'description' => $requirement->description,
-                        'category' => $requirement->category,
-                        'quantity' => $quantity,
-                        'unit' => $requirement->unit,
-                        'notes' => $requirement->notes,
-                        'capability_id' => $requirement->capability_id,
-                        'capability_name' => $requirement->capability?->name,
-                        'pricing_basis' => $requirement->capability?->pricing_basis,
-                    ],
-                ]);
-            }
-
-            $subtotal = number_format($subtotalCents / 100, 2, '.', '');
-
-            $version->update([
-                'subtotal' => $subtotal,
-                'tax_total' => '0.00',
-                'total' => $subtotal,
-            ]);
-
-            return $quote;
-        });
+        $quote = $quoteService->createFromRequirements(
+            $event,
+            $event->requirements,
+            $validated['unit_price'],
+            strtoupper($validated['currency']),
+            $validated['notes'] ?? null
+        );
 
         return redirect()
-            ->route('quotes.show', $result)
+            ->route('quotes.show', $quote)
             ->with('success', 'Draft quote created.');
     }
 
@@ -159,18 +106,25 @@ class QuoteController extends Controller
     {
         $businessId = app(CurrentBusiness::class)->id($request->user());
 
-        $quote->load(['event.customer', 'versions.items']);
+        $quote->load([
+            'event.customer',
+            'event.requirements.capability',
+            'versions.items',
+        ]);
         abort_unless($quote->event && (int) $quote->event->business_id === $businessId, 404);
 
         $version = $quote->versions->sortByDesc('version')->first();
+        $quoteNeedsRevision = $version
+            ? !$version->matchesRequirements($quote->event->requirements)
+            : true;
 
-        return view('quotes.show', compact('quote', 'version'));
+        return view('quotes.show', compact('quote', 'version', 'quoteNeedsRevision'));
     }
 
-    public function createVersion(Request $request, Quote $quote): RedirectResponse
+    public function createVersion(Request $request, Quote $quote, QuoteService $quoteService): RedirectResponse
     {
         $businessId = app(CurrentBusiness::class)->id($request->user());
-        $quote->loadMissing('event');
+        $quote->loadMissing(['event', 'event.requirements.capability']);
 
         abort_unless(
             $quote->event && (int) $quote->event->business_id === $businessId,
@@ -178,51 +132,74 @@ class QuoteController extends Controller
         );
         abort_if($quote->event->isClosed(), 422, 'Closed work cannot receive new quote revisions.');
 
-        $newVersion = DB::transaction(function () use ($quote, $businessId): QuoteVersion {
-            $lockedQuote = Quote::query()
-                ->whereKey($quote->id)
-                ->whereHas('event', fn (Builder $query) => $query->where('business_id', $businessId))
-                ->lockForUpdate()
-                ->firstOrFail();
+        $version = $quoteService->createRevision($quote, $quote->event->requirements);
 
-            $latest = $lockedQuote->versions()
-                ->with('items')
-                ->orderByDesc('version')
-                ->first();
+        return redirect()
+            ->route('quotes.versions.edit', [$quote, $version])
+            ->with('success', 'Quote revision v' . $version->version . ' is ready to review.');
+    }
 
-            abort_unless($latest, 404);
+    public function editVersion(Request $request, Quote $quote, QuoteVersion $version): View
+    {
+        $businessId = app(CurrentBusiness::class)->id($request->user());
 
-            $latest->update(['status' => 'superseded']);
+        $quote->loadMissing(['event.customer', 'event.requirements.capability']);
+        abort_unless(
+            $quote->event && (int) $quote->event->business_id === $businessId,
+            404
+        );
+        abort_unless((int) $version->quote_id === (int) $quote->id, 404);
+        abort_if($quote->event->isClosed(), 422, 'Closed work cannot receive quote revisions.');
+        abort_unless($version->status === 'draft', 422, 'Only draft quote revisions can be edited.');
 
-            $newVersion = $lockedQuote->versions()->create([
-                'version' => $latest->version + 1,
-                'status' => 'draft',
-                'subtotal' => $latest->subtotal,
-                'tax_total' => $latest->tax_total,
-                'total' => $latest->total,
-                'notes' => $latest->notes,
-            ]);
+        $version->load('items');
 
-            foreach ($latest->items as $item) {
-                $newVersion->items()->create([
-                    'event_requirement_id' => $item->event_requirement_id,
-                    'capability_id' => $item->capability_id,
-                    'description' => $item->description,
-                    'quantity' => $item->quantity,
-                    'unit' => $item->unit,
-                    'unit_price' => $item->unit_price,
-                    'line_total' => $item->line_total,
-                    'pricing_basis' => $item->pricing_basis,
-                    'source_snapshot' => $item->source_snapshot,
-                ]);
-            }
+        return view('quotes.edit', compact('quote', 'version'));
+    }
 
-            return $newVersion;
-        });
+    public function updateVersion(Request $request, Quote $quote, QuoteVersion $version, QuoteService $quoteService): RedirectResponse
+    {
+        $businessId = app(CurrentBusiness::class)->id($request->user());
+
+        $quote->loadMissing(['event', 'event.requirements.capability']);
+        abort_unless(
+            $quote->event && (int) $quote->event->business_id === $businessId,
+            404
+        );
+        abort_unless((int) $version->quote_id === (int) $quote->id, 404);
+        abort_if($quote->event->isClosed(), 422, 'Closed work cannot receive quote revisions.');
+        abort_unless($version->status === 'draft', 422, 'Only draft quote revisions can be edited.');
+
+        $validated = $request->validate([
+            'notes' => ['nullable', 'string'],
+            'unit_price' => ['required', 'array', 'min:1'],
+            'unit_price.*' => ['required', 'numeric', 'decimal:0,2', 'min:0'],
+        ]);
+
+        $requirementsById = $quote->event->requirements->keyBy('id');
+        $submittedRequirementIds = array_map('intval', array_keys($validated['unit_price']));
+        $currentRequirementIds = $requirementsById->keys()->map(fn ($id) => (int) $id)->all();
+
+        sort($submittedRequirementIds);
+        sort($currentRequirementIds);
+
+        if ($submittedRequirementIds !== $currentRequirementIds) {
+            return back()
+                ->withErrors(['unit_price' => 'The quote lines changed. Refresh the page and try again.'])
+                ->withInput();
+        }
+
+        $quoteService->updateDraft(
+            $quote,
+            $version,
+            $quote->event->requirements,
+            $validated['unit_price'],
+            $validated['notes'] ?? null
+        );
 
         return redirect()
             ->route('quotes.show', $quote)
-            ->with('success', 'New quote revision created: v' . $newVersion->version . '.');
+            ->with('success', 'Quote v' . $version->version . ' saved.');
     }
 
     private function ensureBusiness(Event $event, Request $request): void
