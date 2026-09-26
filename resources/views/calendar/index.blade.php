@@ -1,10 +1,10 @@
 <x-app-layout>
     <x-slot:title>Calendar</x-slot:title>
     <x-slot:heading>Calendar</x-slot:heading>
-    <x-slot:headerAction><a href="{{ route('work.create') }}" class="zazu-btn zazu-btn-primary">Create work</a></x-slot:headerAction>
+    <x-slot:headerAction><a href="{{ route('work.create') }}" class="zazu-btn zazu-btn-primary">Create job</a></x-slot:headerAction>
 
     <section class="zazu-command-band">
-        <div><div class="zazu-eyebrow">Operations / Calendar</div><h2 class="zazu-command-title">{{ $monthLabel }}</h2><p class="zazu-command-copy">Work is shown by event date. Removed work is not included in active planning.</p></div>
+        <div><div class="zazu-eyebrow">Operations / Job calendar</div><h2 class="zazu-command-title">{{ $monthLabel }}</h2><p class="zazu-command-copy">Work is shown by event date. Removed work is not included in active planning.</p></div>
         <div class="flex flex-wrap gap-2">
             <a href="{{ route('calendar.index', ['month' => $previousMonth]) }}" class="zazu-btn zazu-btn-ghost">Previous month</a>
             <a href="{{ route('calendar.index') }}" class="zazu-btn zazu-btn-secondary">Current</a>
