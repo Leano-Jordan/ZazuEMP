@@ -35,7 +35,8 @@ class EventCostController extends Controller
         return view('costs.create', [
             'event' => $event,
             'currencies' => config('zazu.currencies'),
-            'costCategories' => array_keys(config('zazu.service_categories')),
+            'costCategories' => config('zazu.cost_categories'),
+            'defaultCurrency' => app(CurrentBusiness::class)->model($request->user())->currency ?? 'ZAR',
         ]);
     }
 
