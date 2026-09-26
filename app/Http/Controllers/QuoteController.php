@@ -13,7 +13,6 @@ use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\Rule;
-use Illuminate\Validation\ValidationException;
 use Illuminate\View\View;
 
 class QuoteController extends Controller
@@ -246,7 +245,7 @@ class QuoteController extends Controller
         abort_unless($version->status === 'draft', 422, 'Only draft quote revisions can be edited.');
 
         $validated = $request->validate([
-            'tax_rate_id' => ['nullable', 'integer'],
+            'tax_rate_id' => ['nullable', 'string'],
             'notes' => ['nullable', 'string'],
             'unit_price' => ['required', 'array', 'min:1'],
             'unit_price.*' => ['required', 'numeric', 'decimal:0,2', 'min:0'],
@@ -265,9 +264,11 @@ class QuoteController extends Controller
                 ->withInput();
         }
 
-        $taxRate = array_key_exists('tax_rate_id', $validated) && $validated['tax_rate_id'] !== null && $validated['tax_rate_id'] !== ''
-            ? $this->resolveTaxRate($businessId, $validated['tax_rate_id'])
-            : null;
+        $taxSelection = $validated['tax_rate_id'] ?? null;
+        $replaceTax = $taxSelection !== null && $taxSelection !== '';
+        $taxRate = $taxSelection === 'none'
+            ? null
+            : ($replaceTax ? $this->resolveTaxRate($businessId, $taxSelection) : null);
 
         $quoteService->updateDraft(
             $quote,
@@ -275,6 +276,7 @@ class QuoteController extends Controller
             $quote->event->requirements,
             $validated['unit_price'],
             $taxRate,
+            $replaceTax,
             $validated['notes'] ?? null
         );
 
