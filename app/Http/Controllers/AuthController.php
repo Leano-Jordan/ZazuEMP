@@ -8,9 +8,11 @@ use App\Support\CurrentBusiness;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Str;
 use Illuminate\Validation\ValidationException;
 use Illuminate\View\View;
+use Throwable;
 
 class AuthController extends Controller
 {
@@ -117,7 +119,23 @@ class AuthController extends Controller
             'password' => ['required', 'string', 'min:8', 'confirmed'],
         ]);
 
-        $user = $registration->register($validated);
+        if (!Schema::hasColumn('users', 'username')
+            || !Schema::hasColumn('businesses', 'currency')
+            || !Schema::hasTable('business_user')) {
+            throw ValidationException::withMessages([
+                'business_name' => 'Zazu cannot create the workspace because the local database is not up to date. Run the latest migrations, then try again.',
+            ]);
+        }
+
+        try {
+            $user = $registration->register($validated);
+        } catch (Throwable $exception) {
+            report($exception);
+
+            throw ValidationException::withMessages([
+                'business_name' => 'We could not create this workspace. No account was activated. Check that the database migrations are current and try again.',
+            ]);
+        }
 
         Auth::login($user);
         $request->session()->regenerate();
