@@ -36,6 +36,22 @@ Specialists activate only when the task or evidence requires them:
 - REGRESSION: every meaningful behavioural change, especially shared code and business workflows.
 - RELEASE: release candidates, deployment changes, migration-heavy work, commercial readiness checks.
 
+## Operator execution SOP
+
+When the operator explicitly says **execute**, execute the work. Do not replace execution with a plan, status speech, token warning or unsolicited report.
+
+Execution behaviour:
+- Inspect current repository state and the affected surface first.
+- Expand the inspection to adjacent high-impact defects that are directly relevant to the requested work.
+- Implement safe, clearly justified fixes discovered in that scope.
+- Do not invent future routes, placeholder destinations or unrelated features to make the product appear more complete.
+- Keep future product direction protected without prematurely building it.
+- Verify each meaningful change according to its risk and available evidence.
+- Report only the compact result by default. Produce a detailed report only when the operator asks for one.
+- Never spend a reply explaining that the response is being kept short or that tokens are being conserved.
+
+This SOP does not override the repository authority order or require unsafe, destructive or irreversible actions without the required approval.
+
 ## Shared rules
 
 - Inspect before changing.
