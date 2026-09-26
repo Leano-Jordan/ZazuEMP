@@ -83,7 +83,55 @@ class PurchaseOrderController extends Controller
     {
         $this->ensure($request,$purchaseOrder);
         $data=$request->validate(['status'=>['required','in:draft,sent,ordered,received,cancelled']]);
-        $purchaseOrder->update($data);
+        DB::transaction(function () use ($purchaseOrder, $data, $businessId): void {
+            $purchaseOrder->update($data);
+
+            if ($data['status'] !== 'received') {
+                return;
+            }
+
+            $purchaseOrder->load('items');
+
+            foreach ($purchaseOrder->items as $item) {
+                $inventoryItem = \App\Models\InventoryItem::query()
+                    ->where('business_id', $businessId)
+                    ->when($item->capability_id, fn ($query) => $query->where('capability_id', $item->capability_id))
+                    ->where(function ($query) use ($item) {
+                        $query->where('name', $item->description)
+                            ->orWhere('sku', $item->description);
+                    })
+                    ->first();
+
+                if (!$inventoryItem) {
+                    $inventoryItem = \App\Models\InventoryItem::create([
+                        'business_id' => $businessId,
+                        'capability_id' => $item->capability_id,
+                        'name' => $item->description,
+                        'unit' => $item->unit ?: 'unit',
+                        'reorder_level' => 0,
+                    ]);
+                }
+
+                $alreadyReceived = \App\Models\InventoryMovement::query()
+                    ->where('business_id', $businessId)
+                    ->where('purchase_order_id', $purchaseOrder->id)
+                    ->where('inventory_item_id', $inventoryItem->id)
+                    ->exists();
+
+                if (!$alreadyReceived) {
+                    $inventoryItem->movements()->create([
+                        'business_id' => $businessId,
+                        'purchase_order_id' => $purchaseOrder->id,
+                        'type' => 'receipt',
+                        'quantity' => $item->quantity,
+                        'unit_cost' => $item->unit_price,
+                        'movement_date' => now()->toDateString(),
+                        'reference' => $purchaseOrder->reference,
+                        'notes' => 'Received from purchase order.',
+                    ]);
+                }
+            }
+        });
         return back()->with('success','Purchase order status updated.');
     }
 
