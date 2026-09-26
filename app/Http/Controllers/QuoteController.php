@@ -65,6 +65,7 @@ class QuoteController extends Controller
     public function store(Request $request, Event $event): RedirectResponse
     {
         $businessId = app(CurrentBusiness::class)->id($request->user());
+        $request->merge(['currency' => strtoupper((string) $request->input('currency'))]);
         $this->ensureBusiness($event, $request);
         abort_if($event->isClosed(), 422, 'Closed work cannot receive new quotes.');
         $event->load(['customer', 'requirements.capability']);
