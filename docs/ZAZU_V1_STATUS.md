@@ -194,3 +194,15 @@ The next V1 work should therefore concentrate on completing the missing transact
 Recommended architectural progression:
 
 Quote customer delivery → Acceptance/deposit → Payments/invoices → Supplier/purchasing → Inventory movement → Asset accountability → Audit/notifications → Private media → Export/recovery → Release candidate verification
+
+## 8. Post-hardening control state — 2026-09-26
+
+- Current repository head: `dc95a140c82919a9f2579de7f38590e7034a3df1`.
+- Live branch state verified: `main` only.
+- The temporary branch-cleanup workflow was removed after successful cleanup.
+- Business ownership writes now enforce the authenticated active-business boundary at the shared model concern, with regression coverage for foreign creation and cross-business reassignment.
+- Quote revision source snapshots are rebuilt from current Work requirements and covered by regression assertions for changed description and quantity.
+- Repository source was re-read after each syntax-sensitive PHP change; a missing `EventRequirement` import was caught and repaired before completion.
+- The existing Laravel CI workflow is configured to run on pushes to `main`.
+- The connected status endpoint returned no check-status records for the latest head, so the latest explicit passing CI evidence remains the previously recorded **51 tests / 266 assertions** on `0826b6fa435afa3f3a8eafb9c4d276057ff1443e`.
+- Current post-hardening code is therefore **IMPLEMENTED / source-verified, CI result for the latest head UNVERIFIED**.
