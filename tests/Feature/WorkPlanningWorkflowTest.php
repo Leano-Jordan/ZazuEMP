@@ -23,7 +23,7 @@ class WorkPlanningWorkflowTest extends TestCase
 
         return Event::create([
             'business_id' => $business->id,
-            'reference' => 'ZAZ-PLAN-001',
+            'reference' => 'ZAZ-PLAN-'.Str::upper(Str::random(8)),
             'name' => 'Wedding Preparation Test',
             'event_date' => '2026-11-15',
             'status' => 'draft',
