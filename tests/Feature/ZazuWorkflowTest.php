@@ -9,6 +9,12 @@ use Tests\TestCase;
 
 class ZazuWorkflowTest extends TestCase
 {
+    protected function setUp(): void
+    {
+        parent::setUp();
+        $this->signInAsOwner();
+    }
+
     use RefreshDatabase;
 
     public function test_work_requirements_can_be_added_to_a_work_record(): void
