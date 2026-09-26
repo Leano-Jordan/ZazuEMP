@@ -62,7 +62,7 @@ class TravelCostWorkflowTest extends TestCase
             'status' => 'draft',
         ]);
 
-        $this->post(route('work.travel.store', $event), [
+        $response = $this->post(route('work.travel.store', $event), [
             'route_label' => 'Route B',
             'currency' => 'ZAR',
             'provider' => 'manual',
