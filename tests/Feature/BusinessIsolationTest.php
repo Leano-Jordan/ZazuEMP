@@ -89,6 +89,42 @@ class BusinessIsolationTest extends TestCase
         $response->assertDontSee('Hidden Customer');
     }
 
+    public function test_authenticated_domain_write_rejects_an_explicit_foreign_business_id(): void
+    {
+        $first = $this->business('First Business');
+        $second = $this->business('Second Business');
+        $user = $this->userFor($first);
+
+        $this->actingAs($user);
+
+        $this->expectException(AuthorizationException::class);
+
+        Customer::create([
+            'business_id' => $second->id,
+            'name' => 'Blocked Direct Customer',
+        ]);
+    }
+
+    public function test_authenticated_domain_update_cannot_move_a_record_between_businesses(): void
+    {
+        $first = $this->business('First Business');
+        $second = $this->business('Second Business');
+        $user = $this->userFor($first);
+
+        $customer = Customer::create([
+            'business_id' => $first->id,
+            'name' => 'Protected Customer',
+        ]);
+
+        $this->actingAs($user);
+
+        $this->expectException(AuthorizationException::class);
+
+        $customer->update([
+            'business_id' => $second->id,
+        ]);
+    }
+
     public function test_work_cannot_be_created_for_a_customer_from_another_business(): void
     {
         $first = $this->business('First Business');
