@@ -35,7 +35,7 @@ class AuthenticationTest extends TestCase
             'password_confirmation' => 'password123',
         ]);
 
-        $response->assertRedirect(route('dashboard'));
+        $response->assertRedirect(route('onboarding.catalogue'));
 
         $user = User::where('email', 'owner@example.com')->firstOrFail();
         $business = Business::where('name', 'Owner Catering')->firstOrFail();

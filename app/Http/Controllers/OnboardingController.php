@@ -32,20 +32,22 @@ class OnboardingController extends Controller
     {
         $business = $this->business($request);
 
+        $categories = array_keys(config('zazu.service_categories'));
+
         $validated = $request->validate([
             'name' => ['required', 'string', 'max:255'],
             'capability_type' => ['required', 'in:service,rental,product,package,other'],
             'pricing_basis' => ['required', 'in:custom,fixed,per_unit,per_person,per_hour,per_day'],
             'default_price' => ['nullable', 'numeric', 'decimal:0,2', 'min:0'],
-            'currency' => ['required', 'in:' . implode(',', array_keys(config('zazu.currencies')))],
             'default_unit' => ['nullable', 'string', 'max:50'],
-            'category' => ['required', 'string', 'max:100'],
+            'category' => ['required', 'string', 'max:100', 'in:' . implode(',', $categories)],
             'description' => ['nullable', 'string'],
         ]);
 
         BusinessCapability::create([
             ...$validated,
             'business_id' => $business->id,
+            'currency' => $business->currency ?? 'ZAR',
             'is_active' => true,
         ]);
 

@@ -44,13 +44,15 @@ Route::middleware(['auth', 'owner'])->group(function () {
 Route::middleware(['auth', 'business.context'])->group(function () {
     Route::get('/dashboard', DashboardController::class)->name('dashboard');
 
-    Route::get('/setup/catalogue', [OnboardingController::class, 'catalogue'])->name('onboarding.catalogue');
-    Route::post('/setup/catalogue', [OnboardingController::class, 'storeCatalogue'])->name('onboarding.catalogue.store');
-    Route::post('/setup/catalogue/finish', [OnboardingController::class, 'finishCatalogue'])->name('onboarding.catalogue.finish');
-    Route::post('/setup/catalogue/skip', [OnboardingController::class, 'skipCatalogue'])->name('onboarding.catalogue.skip');
-    Route::get('/setup/business', [OnboardingController::class, 'business'])->name('onboarding.business');
-    Route::post('/setup/business', [OnboardingController::class, 'storeBusiness'])->name('onboarding.business.store');
-    Route::post('/setup/business/skip', [OnboardingController::class, 'skipBusiness'])->name('onboarding.business.skip');
+    Route::middleware('owner')->group(function () {
+        Route::get('/setup/catalogue', [OnboardingController::class, 'catalogue'])->name('onboarding.catalogue');
+        Route::post('/setup/catalogue', [OnboardingController::class, 'storeCatalogue'])->name('onboarding.catalogue.store');
+        Route::post('/setup/catalogue/finish', [OnboardingController::class, 'finishCatalogue'])->name('onboarding.catalogue.finish');
+        Route::post('/setup/catalogue/skip', [OnboardingController::class, 'skipCatalogue'])->name('onboarding.catalogue.skip');
+        Route::get('/setup/business', [OnboardingController::class, 'business'])->name('onboarding.business');
+        Route::post('/setup/business', [OnboardingController::class, 'storeBusiness'])->name('onboarding.business.store');
+        Route::post('/setup/business/skip', [OnboardingController::class, 'skipBusiness'])->name('onboarding.business.skip');
+    });
     Route::get('/media/profile/{type}/{id}', [\App\Http\Controllers\ProfileMediaController::class, 'show'])->whereIn('type', ['customer', 'user'])->name('profile.media');
     Route::get('/media/business/{type}', [\App\Http\Controllers\BusinessMediaController::class, 'show'])->whereIn('type', ['logo', 'dashboard', 'wallpaper'])->name('business.media');
     Route::get('/calendar', CalendarController::class)->name('calendar.index');
@@ -103,6 +105,9 @@ Route::middleware(['auth', 'business.context'])->group(function () {
     Route::get('/work/{event}/edit', [WorkController::class, 'edit'])->name('work.edit');
     Route::put('/work/{event}', [WorkController::class, 'update'])->name('work.update');
     Route::delete('/work/{event}', [WorkController::class, 'destroy'])->name('work.destroy');
+    Route::post('/work/{event}/attachments', [EventAttachmentController::class, 'store'])->name('work.attachments.store');
+    Route::get('/work/attachments/{attachment}', [EventAttachmentController::class, 'download'])->name('work.attachments.download');
+    Route::delete('/work/attachments/{attachment}', [EventAttachmentController::class, 'destroy'])->name('work.attachments.destroy');
 
     Route::get('/work/{event}/travel', [TravelCostController::class, 'index'])->name('work.travel.index');
     Route::get('/work/{event}/travel/create', [TravelCostController::class, 'create'])->name('work.travel.create');

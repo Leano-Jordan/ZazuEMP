@@ -71,6 +71,7 @@
                     <button class="zazu-btn zazu-btn-primary">Continue</button>
                 </div>
             </form>
+            <form id="skip-catalogue-form" method="POST" action="{{ route('onboarding.catalogue.skip') }}">@csrf</form>
 
             <section class="zazu-panel">
                 <div class="zazu-panel-head">
