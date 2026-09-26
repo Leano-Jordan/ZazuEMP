@@ -451,3 +451,29 @@ Verification:
 - Subsequent runs are validating the final owner/security refinements.
 - Frontend dependency installation and build have passed in the CI workflow on the verified runs.
 - Local Windows browser traversal, rendered responsive/light-dark inspection and direct local runtime checks still require the owner's checkout.
+
+
+## Authentication recovery + usability hardening — 2026-09-26
+
+Implemented:
+- Username is a first-class user identity and login identifier.
+- Login accepts username or email, with case-normalized lookup and Laravel's native Auth::attempt path.
+- Dedicated owner login route remains protected by server-side owner membership checks.
+- Registration requires a unique username and prevents username/email cross-field identifier collisions.
+- Existing users receive deterministic backfilled usernames through migration 000018.
+- Password recovery accepts username or email and sends the reset link to the account email.
+- Password reset uses Laravel's password broker, consumes reset tokens, updates the password, signs the user in and restores an owned active workspace context.
+- Password recovery requests and reset attempts are rate-limited.
+- Generic recovery messaging avoids revealing whether an identifier matched an account.
+- Login exposes an obvious Forgot password path.
+- Settings shortcut is available beside the light/dark control for owners and is not shown to staff.
+- Registration and reset forms include password visibility controls and browser-friendly autocomplete hints.
+- Account identity now uses @username in the signed-in account control.
+
+Verification:
+- Laravel CI run 370 on commit 5231cf passed the full suite with 61 tests and 310 assertions after the rendered-URL test corrections.
+- Password recovery, username login, owner login, logout, token reuse and identifier-collision tests passed in that verified run.
+- CodeQL actions analysis on the preceding auth context completed successfully; the current post-hardening CodeQL run is still in progress.
+- Current Laravel CI run for commit 04bd790 is still in progress after the cross-field identifier hardening.
+- Browser traversal, real email delivery and the owner's local Windows database remain runtime-only verification boundaries.
+- The example environment uses the log mailer, so local reset messages are logged rather than delivered externally unless deployment configuration supplies a real mail transport.
