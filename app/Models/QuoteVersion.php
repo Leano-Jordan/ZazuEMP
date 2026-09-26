@@ -20,6 +20,12 @@ class QuoteVersion extends Model
         'tax_total',
         'total',
         'notes',
+        'tax_rate_id',
+        'tax_code',
+        'tax_label',
+        'tax_treatment',
+        'tax_rate',
+        'tax_snapshot_at',
     ];
 
     protected function casts(): array
@@ -28,12 +34,19 @@ class QuoteVersion extends Model
             'subtotal' => 'decimal:2',
             'tax_total' => 'decimal:2',
             'total' => 'decimal:2',
+            'tax_rate' => 'decimal:2',
+            'tax_snapshot_at' => 'datetime',
         ];
     }
 
     public function quote(): BelongsTo
     {
         return $this->belongsTo(Quote::class);
+    }
+
+    public function taxRateRecord(): BelongsTo
+    {
+        return $this->belongsTo(TaxRate::class, 'tax_rate_id');
     }
 
     public function items(): HasMany
