@@ -3471,3 +3471,28 @@ body.zazu-has-wallpaper .zazu-content > * {
     font-size: 12px;
     font-weight: 650;
 }
+
+.zazu-auth-shell {
+    min-height: 100vh;
+    display: grid;
+    place-items: center;
+    padding: 24px;
+    background: var(--zazu-page, #f5f6f8);
+    color: var(--zazu-ink, #18202a);
+}
+.zazu-auth-card {
+    width: min(440px, 100%);
+    padding: 32px;
+    border: 1px solid var(--zazu-border, #dfe3e8);
+    border-radius: 18px;
+    background: var(--zazu-surface, #fff);
+    box-shadow: 0 18px 50px rgba(20, 28, 38, .08);
+}
+.zazu-auth-brand { display:flex; align-items:center; gap:12px; margin-bottom:34px; }
+.zazu-auth-mark { width:42px; height:42px; display:grid; place-items:center; border-radius:12px; background:var(--zazu-ink,#18202a); color:#fff; font-weight:800; }
+.zazu-auth-name { font-weight:800; letter-spacing:-.02em; }
+.zazu-auth-subtitle { font-size:11px; color:var(--zazu-muted,#6f7885); margin-top:2px; }
+.zazu-auth-card h1 { margin:5px 0 7px; }
+.zazu-auth-copy { margin:0 0 24px; color:var(--zazu-muted,#6f7885); font-size:13px; }
+.zazu-field-error { margin-top:5px; color:#b42318; font-size:12px; }
+.zazu-auth-card .zazu-button { width:100%; justify-content:center; margin-top:6px; }
