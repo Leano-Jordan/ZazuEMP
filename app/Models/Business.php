@@ -38,4 +38,14 @@ class Business extends Model
     {
         return $this->hasMany(BusinessCapability::class);
     }
+
+    public function costs(): HasMany
+    {
+        return $this->hasMany(EventCost::class);
+    }
+
+    public function preparationItems(): HasMany
+    {
+        return $this->hasMany(EventPreparationItem::class);
+    }
 }
