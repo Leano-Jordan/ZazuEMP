@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Customer;
 use App\Models\CustomerContact;
 use App\Models\Event;
+use App\Models\EventRequirement;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -27,7 +28,6 @@ class WorkController extends Controller
     {
         $customers = Customer::with('contacts')->orderBy('name')->get();
         $selectedCustomerId = $request->integer('customer_id');
-
         $customerOptions = $customers->map(fn ($customer) => [
             'id' => $customer->id,
             'contacts' => $customer->contacts->map(fn ($contact) => [
@@ -38,7 +38,13 @@ class WorkController extends Controller
             ])->values()->all(),
         ])->values()->all();
 
-        return view('work.create', compact('customers', 'selectedCustomerId', 'customerOptions'));
+        return view('work.create', [
+            'customers' => $customers,
+            'selectedCustomerId' => $selectedCustomerId,
+            'customerOptions' => $customerOptions,
+            'jobTypes' => config('zazu.job_types'),
+            'serviceCategories' => config('zazu.service_categories'),
+        ]);
     }
 
     public function store(Request $request): RedirectResponse
@@ -50,14 +56,19 @@ class WorkController extends Controller
         $this->validateContactBelongsToCustomer($validated['event_day_contact_id'] ?? null, $customer->id);
         $this->validateContactBelongsToCustomer($validated['event_night_contact_id'] ?? null, $customer->id);
 
-        $event = DB::transaction(function () use ($validated, $customer) {
-            return Event::create([
+        $services = array_values(array_unique($validated['services'] ?? []));
+        if (!empty($validated['other_service'])) {
+            $services[] = Str::limit(trim($validated['other_service']), 100, '');
+        }
+
+        $event = DB::transaction(function () use ($validated, $customer, $services) {
+            $event = Event::create([
                 'customer_id' => $customer->id,
                 'event_day_contact_id' => $validated['event_day_contact_id'] ?? null,
                 'event_night_contact_id' => $validated['event_night_contact_id'] ?? null,
                 'reference' => 'ZAZU-' . Str::upper(Str::random(8)),
                 'name' => $validated['name'],
-                'event_type' => $validated['event_type'] ?? null,
+                'event_type' => $validated['event_type'],
                 'customer_name' => $customer->name,
                 'customer_phone' => $customer->primaryContact?->phone,
                 'customer_email' => $customer->primaryContact?->email,
@@ -66,16 +77,30 @@ class WorkController extends Controller
                 'notes' => $validated['notes'] ?? null,
                 'status' => 'draft',
             ]);
+
+            foreach ($services as $service) {
+                EventRequirement::create([
+                    'event_id' => $event->id,
+                    'description' => $service,
+                    'category' => $service,
+                    'quantity' => 1,
+                    'unit' => 'service',
+                    'status' => 'open',
+                ]);
+            }
+
+            return $event;
         });
 
-        return redirect()->route('work.show', $event)->with('success', 'Work created successfully.');
+        return redirect()
+            ->route('work.show', $event)
+            ->with('success', 'Job created. Start by checking the services below.');
     }
 
     public function edit(Event $event): View
     {
         $event->load(['customer', 'eventDayContact', 'eventNightContact']);
         $customers = Customer::with('contacts')->orderBy('name')->get();
-
         $hasQuotes = $event->quotes()->exists();
 
         return view('work.edit', compact('event', 'customers', 'hasQuotes'));
@@ -92,7 +117,7 @@ class WorkController extends Controller
         if ((int) $event->customer_id !== (int) $customer->id && $event->quotes()->exists()) {
             return redirect()
                 ->route('work.edit', $event)
-                ->with('error', 'The customer cannot be changed after a quote exists for this Work record. Create new Work for a different customer so commercial history remains attributable.');
+                ->with('error', 'The customer cannot be changed after a quote exists for this job. Create a new job for a different customer so the quote history stays correct.');
         }
 
         $this->validateContactBelongsToCustomer($validated['event_day_contact_id'] ?? null, $customer->id);
@@ -103,7 +128,7 @@ class WorkController extends Controller
             'event_day_contact_id' => $validated['event_day_contact_id'] ?? null,
             'event_night_contact_id' => $validated['event_night_contact_id'] ?? null,
             'name' => $validated['name'],
-            'event_type' => $validated['event_type'] ?? null,
+            'event_type' => $validated['event_type'],
             'customer_name' => $customer->name,
             'customer_phone' => $customer->primaryContact?->phone,
             'customer_email' => $customer->primaryContact?->email,
@@ -115,7 +140,7 @@ class WorkController extends Controller
 
         return redirect()
             ->route('work.show', $event)
-            ->with('success', 'Work updated successfully.');
+            ->with('success', 'Job details updated.');
     }
 
     public function destroy(Event $event): RedirectResponse
@@ -124,12 +149,12 @@ class WorkController extends Controller
 
         return redirect()
             ->route('work.index')
-            ->with('success', 'Work removed from active work. Historical records remain retained.');
+            ->with('success', 'Job removed from active work. Historical records remain retained.');
     }
 
     public function show(Event $event): View
     {
-        $event->load(['customer.contacts', 'eventDayContact', 'eventNightContact']);
+        $event->load(['customer.contacts', 'eventDayContact', 'eventNightContact', 'requirements.capability', 'quotes.latestVersion']);
 
         return view('work.show', compact('event'));
     }
@@ -141,10 +166,13 @@ class WorkController extends Controller
             'event_day_contact_id' => ['nullable', 'exists:customer_contacts,id'],
             'event_night_contact_id' => ['nullable', 'exists:customer_contacts,id'],
             'name' => ['required', 'string', 'max:255'],
-            'event_type' => ['nullable', 'string', 'max:255'],
+            'event_type' => ['required', 'string', 'max:255'],
             'event_date' => ['required', 'date'],
             'event_address' => ['nullable', 'string', 'max:255'],
             'notes' => ['nullable', 'string'],
+            'services' => ['nullable', 'array'],
+            'services.*' => ['string', 'max:100'],
+            'other_service' => ['nullable', 'string', 'max:100'],
         ];
     }
 
