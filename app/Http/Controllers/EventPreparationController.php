@@ -40,6 +40,7 @@ class EventPreparationController extends Controller
     public function store(Request $request, Event $event): RedirectResponse
     {
         $this->ensureBusiness($event, $request);
+        abort_if($event->isClosed(), 422, 'Closed work cannot receive new preparation records.');
 
         $validated = $request->validate([
             'title' => ['required', 'string', 'max:255'],
