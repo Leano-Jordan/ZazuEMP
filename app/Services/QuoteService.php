@@ -3,6 +3,7 @@
 namespace App\Services;
 
 use App\Models\Event;
+use App\Models\EventRequirement;
 use App\Models\Quote;
 use App\Models\QuoteVersion;
 use App\Support\Money;
