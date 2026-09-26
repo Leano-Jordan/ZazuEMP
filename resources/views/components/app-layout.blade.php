@@ -4,7 +4,7 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
     <meta name="theme-color" content="#0d4f43">
-    @php($business = auth()->user()?->businesses()->first())
+    @php($business = auth()->user()?->businesses()->first() ?? \App\Models\Business::first())
     <title>{{ $title ?? 'Zazu' }} · {{ $business?->name ?? 'Zazu EMP' }}</title>
     <script>
         (() => {
