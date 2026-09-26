@@ -13,6 +13,7 @@ class TravelCost extends Model
     protected $fillable = [
         'event_id',
         'route_label',
+        'currency',
         'provider',
         'origin',
         'destination',
