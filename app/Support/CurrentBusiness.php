@@ -12,10 +12,31 @@ class CurrentBusiness
         $user ??= request()->user();
 
         if ($user) {
-            return $user->businesses()
+            $business = $user->businesses()
                 ->where('businesses.status', 'active')
                 ->orderBy('businesses.id')
                 ->first();
+
+            if ($business) {
+                return $business;
+            }
+
+            // First-run bootstrap: a newly authenticated user must receive
+            // an owner business before normal business-scoped pages can load.
+            if (!$user->businesses()->exists()) {
+                $business = Business::create([
+                    'name' => trim((string) $user->name) . "'s Business",
+                    'slug' => IlluminateSupportStr::slug((string) $user->name) . '-' . IlluminateSupportStr::lower(IlluminateSupportStr::random(6)),
+                    'status' => 'active',
+                    'currency' => 'ZAR',
+                ]);
+
+                $business->users()->attach($user->id, ['role' => 'owner']);
+
+                return $business;
+            }
+
+            return null;
         }
 
         if (app()->environment('testing')) {
