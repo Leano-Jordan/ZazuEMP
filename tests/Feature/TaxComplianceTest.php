@@ -3,7 +3,6 @@
 namespace Tests\Feature;
 
 use App\Models\Business;
-use App\Models\BusinessTaxProfile;
 use App\Models\ComplianceDocument;
 use App\Models\Customer;
 use App\Models\Event;
@@ -151,7 +150,14 @@ class TaxComplianceTest extends TestCase
             'is_active' => true,
         ]);
 
-        $customer = Customer::create(['business_id' => $business->id, 'name' => 'Invoice Customer']);
+        $customer = Customer::create([
+            'business_id' => $business->id,
+            'name' => 'Invoice Customer',
+            'legal_name' => 'Invoice Customer (Pty) Ltd',
+            'tax_number' => '9999999999',
+            'vat_number' => '4987654321',
+            'billing_address' => '10 Test Street, Pretoria, 0001',
+        ]);
         $event = Event::create([
             'business_id' => $business->id,
             'customer_id' => $customer->id,
@@ -192,7 +198,64 @@ class TaxComplianceTest extends TestCase
         $this->assertSame('1150.00', (string) $invoice->total);
         $this->assertSame('VAT_STANDARD', $invoice->tax_code);
         $this->assertSame('15.00', (string) $invoice->tax_rate);
+        $this->assertSame('Invoice Customer (Pty) Ltd', $invoice->customer_name);
+        $this->assertSame('10 Test Street, Pretoria, 0001', $invoice->customer_address);
+        $this->assertSame('4987654321', $invoice->customer_vat_number);
+        $this->assertSame('9999999999', $invoice->customer_tax_number);
+        $this->assertCount(1, $invoice->items);
+        $this->assertSame('10 tables', $invoice->items->first()->description);
+        $this->assertSame('100.00', (string) $invoice->items->first()->unit_price);
+        $this->assertSame('1000.00', (string) $invoice->items->first()->line_total);
 
+    }
+
+    public function test_direct_invoice_calculates_from_itemized_lines(): void
+    {
+        $business = Business::create([
+            'name' => 'Direct Invoice Business',
+            'slug' => 'direct-invoice-business',
+            'status' => 'active',
+            'currency' => 'ZAR',
+        ]);
+
+        $this->signInAsOwner($business);
+
+        $customer = Customer::create([
+            'business_id' => $business->id,
+            'name' => 'Direct Invoice Customer',
+        ]);
+
+        $event = Event::create([
+            'business_id' => $business->id,
+            'customer_id' => $customer->id,
+            'reference' => 'ZAZ-DIRECT-INV',
+            'name' => 'Direct Invoice Event',
+            'event_date' => '2026-10-22',
+            'status' => 'draft',
+        ]);
+
+        $response = $this->post(route('finance.invoices.store'), [
+            'event_id' => $event->id,
+            'lines' => [
+                [
+                    'description' => 'Catering service',
+                    'quantity' => '2.00',
+                    'unit' => 'service',
+                    'unit_price' => '750.00',
+                ],
+            ],
+        ]);
+
+        $response->assertRedirect(route('finance.invoices.show', Invoice::latest('id')->firstOrFail()));
+
+        $invoice = Invoice::with('items')->latest('id')->firstOrFail();
+
+        $this->assertSame('1500.00', (string) $invoice->subtotal);
+        $this->assertSame('0.00', (string) $invoice->tax_total);
+        $this->assertSame('1500.00', (string) $invoice->total);
+        $this->assertCount(1, $invoice->items);
+        $this->assertSame('Catering service', $invoice->items->first()->description);
+        $this->assertSame('2.00', (string) $invoice->items->first()->quantity);
     }
 
     public function test_compliance_documents_are_business_scoped_and_stored_privately(): void
