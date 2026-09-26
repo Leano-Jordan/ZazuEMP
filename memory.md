@@ -190,13 +190,38 @@ NOT YET VERIFIED locally after Batch 01:
 - workspace UI
 - authentication/business authorization
 
+## Navigation + workflow connectivity pass — 2026-09-26
+
+IMPLEMENTED:
+- Customer directory rows now open a real customer relationship workspace.
+- Customer workspace exposes contacts, work history and Start Work.
+- Work workspace links directly to Customer and Requirements.
+- Requirements register is now a real workflow page under a Work record.
+- Requirement creation supports optional reusable BusinessCapability selection plus work-specific quantity/unit/category/notes.
+- Requirement routes/controller/model/migration added.
+- Requirements page links back to Work and into Add Requirement.
+- Work progression now makes Requirements the first connected downstream stage.
+- Feature coverage updated for the Requirements redirect and Customer relationship workspace.
+
+Navigation rule:
+- Every implemented page must have a valid path forward and a valid path back to its parent workflow.
+- Do not render a clickable UI element for a workflow stage until its destination route exists, unless it is explicitly styled as a non-interactive future stage.
+- Contextual workflow pages should link back to their parent workspace rather than becoming isolated global navigation items.
+
 ## Immediate next action
 
 On the owner's Windows ZazuEMP checkout:
 
+php artisan migrate
 php artisan view:clear
 php artisan test
 
-Then manually create one Work record from the existing customer and confirm the redirect to the Work record.
+Then manually verify:
+1. Customers -> open a customer -> Start Work -> Work.
+2. Work -> Customer -> back to Work.
+3. Work -> Requirements -> Add Requirement -> save -> Requirements -> Work.
+4. Work -> Capability catalogue -> capability edit -> back to catalogue.
+5. Work edit -> Workspace.
+6. Theme toggle remains functional across all connected pages.
 
-If that passes, proceed to the next Work Workspace slice rather than jumping to quotes or travel costing.
+If those pass, proceed to the next roster slice after Requirements, which is the versioned Quote foundation, while keeping all existing navigation connected.
