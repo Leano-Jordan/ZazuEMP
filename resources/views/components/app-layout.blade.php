@@ -2,7 +2,8 @@
 <html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
 <head>
     <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+    <meta name="theme-color" content="#0d4f43">
     <title>{{ $title ?? 'Zazu' }} · Zazu EMP</title>
     <script>
         (() => {
@@ -181,43 +182,67 @@
 
 <script>
     document.addEventListener('DOMContentLoaded', () => {
+        const serverErrors = @json($errors->toArray());
+
         document.querySelectorAll('.zazu-field').forEach((field) => {
             const control = field.querySelector('input, select, textarea');
             if (!control) return;
 
+            const name = (control.getAttribute('name') || '').toLowerCase();
+            const baseName = name.replace(/\[.*?\]/g, '');
+            const messages = serverErrors[name] || serverErrors[baseName] || [];
+
             if (control.required) control.setAttribute('aria-required', 'true');
+
+            if (messages.length && !field.querySelector('.zazu-field-error')) {
+                const error = document.createElement('span');
+                error.className = 'zazu-field-error';
+                error.textContent = messages[0];
+                field.appendChild(error);
+            }
 
             const error = field.querySelector('.zazu-field-error');
             if (error) {
-                const errorId = control.id ? control.id + '-error' : 'zazu-error-' + Math.random().toString(36).slice(2, 10);
+                const errorId = control.id ? control.id + '-error' : 'zazu-error-' + baseName.replace(/[^a-z0-9_-]/g, '-');
                 error.id = errorId;
                 control.setAttribute('aria-invalid', 'true');
                 control.setAttribute('aria-describedby', errorId);
             }
 
-            const name = (control.getAttribute('name') || '').toLowerCase();
             if (name.includes('phone')) {
                 control.setAttribute('inputmode', 'tel');
                 control.setAttribute('autocomplete', 'tel');
             } else if (control.type === 'email' || name.includes('email')) {
                 control.setAttribute('inputmode', 'email');
                 control.setAttribute('autocomplete', 'email');
+            } else if (control.type === 'number') {
+                control.setAttribute('inputmode', 'decimal');
             }
         });
 
         const summary = document.querySelector('[data-error-summary]');
         const list = document.querySelector('[data-error-summary-list]');
+
         if (summary && list) {
             document.querySelectorAll('.zazu-field-error').forEach((error) => {
                 const field = error.closest('.zazu-field');
                 const control = field?.querySelector('input, select, textarea');
                 if (!control || !error.textContent.trim()) return;
 
-                if (!control.id) control.id = 'zazu-field-' + Math.random().toString(36).slice(2, 10);
+                if (!control.id) {
+                    const name = control.getAttribute('name') || 'field';
+                    control.id = 'zazu-field-' + name.replace(/[^a-z0-9_-]/gi, '-');
+                }
+
+                if ([...list.children].some((item) => item.dataset.forField === control.id)) return;
+
                 const item = document.createElement('li');
+                item.dataset.forField = control.id;
+
                 const link = document.createElement('a');
                 link.href = '#' + control.id;
                 link.textContent = error.textContent.trim();
+
                 item.appendChild(link);
                 list.appendChild(item);
             });
