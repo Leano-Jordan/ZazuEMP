@@ -89,7 +89,7 @@
 
                         <label class="zazu-field zazu-field-wide">
                             <span class="zazu-label">Replace preview picture</span>
-                            <input type="file" name="image" accept=".jpg,.jpeg,.png,.webp,image/jpeg,image/png,image/webp" class="zazu-input" data-image-preview>
+                            <input type="file" name="image" accept=".jpg,.jpeg,.png,.webp,image/jpeg,image/png,image/webp" class="zazu-file-input" data-image-preview>
                             @error('image')<span class="zazu-field-error">{{ $message }}</span>@enderror
                             <img data-image-preview-output alt="" class="zazu-image-preview" hidden>
                         </label>
