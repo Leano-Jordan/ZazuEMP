@@ -45,7 +45,7 @@ class BusinessCapabilityTest extends TestCase
 
         $response = $this->put(route('capabilities.update', $capability), [
             'name' => 'Premium Chair Hire',
-            'category' => 'Equipment Hire',
+            'category' => 'Furniture & equipment',
             'capability_type' => 'rental',
             'pricing_basis' => 'per_unit',
             'default_unit' => 'chair',
