@@ -40,7 +40,7 @@ class CustomerController extends Controller
     {
         $business = $this->business($request);
         $validated = $this->validated($request, null, true, $business->id);
-        $photoPath = $request->file('profile_photo')?->store('profile-photos/customers', 'public');
+        $photoPath = $request->file('profile_photo')?->store('profile-photos/customers', 'local');
 
         try {
             DB::transaction(function () use ($validated, $photoPath, $business): void {
@@ -64,7 +64,7 @@ class CustomerController extends Controller
             });
         } catch (Throwable $e) {
             if ($photoPath) {
-                Storage::disk('public')->delete($photoPath);
+                Storage::disk('local')->delete($photoPath);
             }
 
             throw $e;
@@ -145,14 +145,14 @@ class CustomerController extends Controller
             });
         } catch (Throwable $e) {
             if ($newPhotoPath) {
-                Storage::disk('public')->delete($newPhotoPath);
+                Storage::disk('local')->delete($newPhotoPath);
             }
 
             throw $e;
         }
 
         if ($newPhotoPath && $oldPhotoPath) {
-            Storage::disk('public')->delete($oldPhotoPath);
+            Storage::disk('local')->delete($oldPhotoPath);
         }
 
         if (!$newPhotoPath && $request->boolean('remove_profile_photo') && $oldPhotoPath) {

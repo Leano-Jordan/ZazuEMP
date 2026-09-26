@@ -14,6 +14,7 @@ return Application::configure(basePath: dirname(__DIR__))
     ->withMiddleware(function (Middleware $middleware): void {
         $middleware->alias([
             'owner' => \App\Http\Middleware\EnsureBusinessOwner::class,
+            'business.context' => \App\Http\Middleware\EnsureActiveBusinessContext::class,
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {

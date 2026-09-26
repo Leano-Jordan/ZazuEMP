@@ -3943,3 +3943,421 @@ body.zazu-has-wallpaper .zazu-content > * {
     font-size: 11px;
     font-weight: 650;
 }
+
+
+/* Commercial auth refresh: isolated from the existing workspace surface styles. */
+.zazu-login-page {
+    padding: clamp(16px, 3vw, 36px);
+    background:
+        radial-gradient(circle at 10% 0%, color-mix(in srgb, var(--zazu-accent) 15%, transparent), transparent 24rem),
+        linear-gradient(135deg, var(--zazu-page) 0%, var(--zazu-page-deep) 100%);
+}
+
+.zazu-login-frame {
+    width: min(1120px, 100%);
+    grid-template-columns: minmax(420px, .9fr) minmax(0, 1.1fr);
+    gap: 0;
+    overflow: hidden;
+    border: 1px solid var(--zazu-border);
+    border-radius: 28px;
+    background: var(--zazu-surface);
+    box-shadow: 0 28px 70px color-mix(in srgb, var(--zazu-ink) 14%, transparent);
+}
+
+.zazu-login-panel {
+    min-height: 680px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    border: 0;
+    border-radius: 0;
+    box-shadow: none;
+    padding: clamp(32px, 5vw, 64px);
+    background: var(--zazu-surface);
+}
+
+.zazu-login-brand {
+    margin-bottom: 42px;
+}
+
+.zazu-login-mark {
+    width: 46px;
+    height: 46px;
+    flex-basis: 46px;
+    border-radius: 14px;
+    box-shadow: 0 8px 20px color-mix(in srgb, var(--zazu-ink) 16%, transparent);
+}
+
+.zazu-login-kicker {
+    color: var(--zazu-accent-ink);
+    font-size: 10px;
+    font-weight: 800;
+    letter-spacing: .16em;
+    text-transform: uppercase;
+}
+
+.zazu-login-panel h1 {
+    margin-top: 8px;
+    font-size: clamp(2rem, 4vw, 3rem);
+    line-height: .98;
+    letter-spacing: -.055em;
+}
+
+.zazu-login-copy {
+    max-width: 410px;
+    margin-top: 12px;
+    margin-bottom: 30px;
+    font-size: 13px;
+}
+
+.zazu-login-notice {
+    margin-bottom: 20px;
+}
+
+.zazu-login-form {
+    max-width: 430px;
+}
+
+.zazu-login-form .zazu-field {
+    gap: 7px;
+}
+
+.zazu-login-form .zazu-field + .zazu-field {
+    margin-top: 18px;
+}
+
+.zazu-login-password {
+    position: relative;
+}
+
+.zazu-login-password input {
+    padding-right: 68px;
+}
+
+.zazu-login-password-toggle {
+    position: absolute;
+    top: 50%;
+    right: 6px;
+    min-height: 32px;
+    padding: 0 9px;
+    transform: translateY(-50%);
+    border: 0;
+    border-radius: 7px;
+    background: transparent;
+    color: var(--zazu-muted);
+    font: inherit;
+    font-size: 11px;
+    font-weight: 750;
+    cursor: pointer;
+}
+
+.zazu-login-password-toggle:hover {
+    background: var(--zazu-surface-2);
+    color: var(--zazu-ink);
+}
+
+.zazu-login-password-toggle:focus-visible {
+    outline: 2px solid var(--zazu-focus);
+    outline-offset: 1px;
+}
+
+.zazu-login-options {
+    margin-top: 16px;
+}
+
+.zazu-login-submit {
+    min-height: 50px;
+    margin-top: 22px;
+    border-radius: 11px;
+    font-size: 13px;
+    box-shadow: 0 12px 24px color-mix(in srgb, var(--zazu-primary) 21%, transparent);
+}
+
+.zazu-login-submit svg {
+    width: 17px;
+    height: 17px;
+}
+
+.zazu-login-switch {
+    max-width: 430px;
+    margin-top: 19px;
+}
+
+.zazu-login-visual {
+    min-height: 680px;
+    border: 0;
+    border-radius: 0;
+    box-shadow: none;
+    position: relative;
+    overflow: hidden;
+    isolation: isolate;
+    background:
+        radial-gradient(circle at 72% 25%, rgba(255,255,255,.26), transparent 8rem),
+        linear-gradient(145deg, #c6d5cf 0%, #8fa69e 42%, #465c59 100%);
+}
+
+.zazu-login-visual::before {
+    width: 560px;
+    height: 560px;
+    right: -180px;
+    top: -160px;
+    background: rgba(255,255,255,.08);
+}
+
+.zazu-login-visual::after {
+    width: 420px;
+    height: 420px;
+    left: -150px;
+    bottom: -190px;
+    background: rgba(21,51,56,.22);
+}
+
+.zazu-login-visual-scene {
+    position: absolute;
+    inset: 0;
+    overflow: hidden;
+    opacity: .98;
+}
+
+.zazu-login-window {
+    position: absolute;
+    inset: 9% 12% auto auto;
+    width: 48%;
+    height: 34%;
+    border: 18px solid rgba(236,242,238,.33);
+    background:
+        linear-gradient(90deg, transparent 48%, rgba(236,242,238,.28) 48% 52%, transparent 52%),
+        linear-gradient(180deg, transparent 48%, rgba(236,242,238,.28) 48% 52%, transparent 52%),
+        linear-gradient(150deg, rgba(240,246,242,.16), rgba(82,108,101,.18));
+    box-shadow: 0 22px 50px rgba(20,39,42,.12);
+    transform: rotate(-5deg);
+}
+
+.zazu-login-table {
+    position: absolute;
+    left: -8%;
+    right: -4%;
+    bottom: -4%;
+    height: 43%;
+    background:
+        linear-gradient(160deg, rgba(121,88,58,.88), rgba(73,55,42,.88)),
+        repeating-linear-gradient(90deg, rgba(255,255,255,.06) 0 2px, transparent 2px 64px);
+    transform: perspective(500px) rotateX(14deg);
+    transform-origin: bottom center;
+}
+
+.zazu-login-plate {
+    position: absolute;
+    left: 28%;
+    top: 46%;
+    width: 34%;
+    aspect-ratio: 1;
+    border-radius: 50%;
+    background: radial-gradient(circle, #e7ebe5 0 35%, #b6c5bf 36% 42%, rgba(230,235,229,.95) 43% 100%);
+    box-shadow: 0 28px 32px rgba(35,43,43,.22);
+    transform: rotate(-7deg);
+}
+
+.zazu-login-plate::after {
+    content: "";
+    position: absolute;
+    inset: 30% 28%;
+    border-radius: 50%;
+    background: radial-gradient(circle, #b9784d 0 48%, transparent 49%),
+        radial-gradient(circle at 30% 30%, #768f76 0 11%, transparent 12%),
+        radial-gradient(circle at 70% 66%, #8d6a44 0 9%, transparent 10%);
+    opacity: .92;
+}
+
+.zazu-login-glass {
+    position: absolute;
+    right: 13%;
+    bottom: 19%;
+    width: 14%;
+    height: 26%;
+    border: 3px solid rgba(233,242,237,.58);
+    border-radius: 48% 48% 32% 32% / 18% 18% 72% 72%;
+    background: linear-gradient(90deg, rgba(242,248,244,.16), rgba(242,248,244,.02));
+    box-shadow: inset 10px 0 18px rgba(255,255,255,.08), 0 22px 30px rgba(20,35,36,.14);
+    transform: rotate(6deg);
+}
+
+.zazu-login-glass::after {
+    content: "";
+    position: absolute;
+    left: 48%;
+    bottom: -29%;
+    width: 6px;
+    height: 28%;
+    border-radius: 999px;
+    background: rgba(232,241,236,.54);
+    box-shadow: 0 18px 0 7px rgba(232,241,236,.18);
+}
+
+.zazu-login-sprig {
+    position: absolute;
+    left: 17%;
+    bottom: 22%;
+    width: 26%;
+    height: 2px;
+    border-radius: 999px;
+    background: rgba(231,239,233,.62);
+    transform: rotate(-35deg);
+}
+
+.zazu-login-sprig::before,
+.zazu-login-sprig::after {
+    content: "";
+    position: absolute;
+    width: 18px;
+    height: 8px;
+    border-radius: 100% 0 100% 0;
+    background: rgba(221,234,224,.76);
+}
+
+.zazu-login-sprig::before {
+    left: 30%;
+    top: -8px;
+    transform: rotate(-24deg);
+}
+
+.zazu-login-sprig::after {
+    right: 17%;
+    top: 4px;
+    transform: rotate(25deg);
+}
+
+.zazu-login-visual-inner {
+    min-height: 680px;
+    justify-content: flex-end;
+    padding: clamp(28px, 5vw, 58px);
+}
+
+.zazu-login-visual-title {
+    max-width: 520px;
+    margin-top: 10px;
+    color: #f6f8f5;
+    font-size: clamp(1.9rem, 4vw, 3.4rem);
+    font-weight: 760;
+    line-height: .98;
+    letter-spacing: -.055em;
+    text-wrap: balance;
+}
+
+.zazu-login-visual .zazu-auth-visual-label,
+.zazu-login-visual .zazu-auth-visual-copy {
+    color: rgba(247,250,247,.86);
+}
+
+.zazu-login-visual .zazu-auth-visual-copy {
+    max-width: 470px;
+    margin-top: 14px;
+    font-size: 13px;
+}
+
+.zazu-login-points {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 7px;
+    margin-top: 22px;
+}
+
+.zazu-login-points span {
+    padding: 7px 10px;
+    border: 1px solid rgba(247,250,247,.26);
+    border-radius: 999px;
+    background: rgba(9,28,30,.12);
+    color: #f7faf8;
+    font-size: 10px;
+    font-weight: 760;
+    letter-spacing: .04em;
+    text-transform: uppercase;
+    backdrop-filter: blur(8px);
+}
+
+@media (max-width: 900px) {
+    .zazu-login-frame {
+        grid-template-columns: minmax(360px, .92fr) minmax(0, 1.08fr);
+    }
+
+    .zazu-login-panel,
+    .zazu-login-visual,
+    .zazu-login-visual-inner {
+        min-height: 620px;
+    }
+
+    .zazu-login-panel {
+        padding: 38px;
+    }
+}
+
+@media (max-width: 820px) {
+    .zazu-login-frame {
+        grid-template-columns: 1fr;
+        max-width: 620px;
+    }
+
+    .zazu-login-panel {
+        min-height: 0;
+    }
+
+    .zazu-login-visual,
+    .zazu-login-visual-inner {
+        min-height: 320px;
+    }
+
+    .zazu-login-visual-inner {
+        padding: 30px;
+    }
+
+    .zazu-login-visual-title {
+        max-width: 430px;
+    }
+}
+
+@media (max-width: 520px) {
+    .zazu-login-page {
+        padding: 10px;
+    }
+
+    .zazu-login-frame {
+        border-radius: 20px;
+    }
+
+    .zazu-login-panel {
+        padding: 28px 20px;
+    }
+
+    .zazu-login-brand {
+        margin-bottom: 31px;
+    }
+
+    .zazu-login-panel h1 {
+        font-size: 2.1rem;
+    }
+
+    .zazu-login-visual,
+    .zazu-login-visual-inner {
+        min-height: 280px;
+    }
+
+    .zazu-login-visual-scene {
+        transform: scale(.9);
+        transform-origin: center;
+    }
+
+    .zazu-login-visual-title {
+        font-size: 2rem;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .zazu-login-page *,
+    .zazu-login-page *::before,
+    .zazu-login-page *::after {
+        scroll-behavior: auto !important;
+        transition-duration: 0.01ms !important;
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+    }
+}
