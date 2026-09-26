@@ -111,7 +111,7 @@ class QuoteWorkflowTest extends TestCase
         $newest = $quote->versions->sortByDesc('version')->first();
 
         $createResponse->assertRedirect(route('quotes.versions.edit', [$quote, $newest]));
-        $this->assertSame('draft', $original->fresh()->status);
+        $this->assertSame('superseded', $original->fresh()->status);
         $this->assertSame(2, $newest->version);
         $this->assertSame('50 chairs', $original->items->first()->description);
         $this->assertSame('80 chairs', $newest->items->first()->description);
@@ -119,6 +119,54 @@ class QuoteWorkflowTest extends TestCase
         $this->assertSame('40.00', (string) $newest->items->first()->unit_price);
         $this->assertSame('80 chairs', $newest->items->first()->source_snapshot['description']);
         $this->assertSame('80.00', $newest->items->first()->source_snapshot['quantity']);
+    }
+
+    public function test_quote_revision_includes_new_requirements_and_recalculates_totals(): void
+    {
+        $customer = Customer::create(['name' => 'New Requirement Customer']);
+
+        $event = Event::create([
+            'customer_id' => $customer->id,
+            'reference' => 'ZAZ-QUOTE-007',
+            'name' => 'New Requirement Event',
+            'event_date' => '2026-10-16',
+            'status' => 'draft',
+        ]);
+
+        $first = EventRequirement::create([
+            'event_id' => $event->id,
+            'description' => '10 tables',
+            'quantity' => 10,
+            'unit' => 'tables',
+            'status' => 'open',
+        ]);
+
+        $this->post(route('work.quotes.store', $event), [
+            'currency' => 'ZAR',
+            'unit_price' => [$first->id => '100.00'],
+        ]);
+
+        $quote = Quote::query()->firstOrFail();
+
+        $second = EventRequirement::create([
+            'event_id' => $event->id,
+            'description' => '20 chairs',
+            'quantity' => 20,
+            'unit' => 'chairs',
+            'status' => 'open',
+        ]);
+
+        $this->post(route('quotes.versions.store', $quote))
+            ->assertRedirect();
+
+        $version = $quote->refresh()->versions()->where('version', 2)->firstOrFail();
+        $version->load('items');
+
+        $this->assertCount(2, $version->items);
+        $this->assertSame('1000.00', (string) $version->subtotal);
+        $this->assertSame('1000.00', (string) $version->total);
+        $this->assertSame('10.00', (string) $version->items->firstWhere('event_requirement_id', $first->id)->line_total);
+        $this->assertSame('0.00', (string) $version->items->firstWhere('event_requirement_id', $second->id)->line_total);
     }
 
     public function test_quote_draft_revision_can_be_saved_with_updated_prices(): void
