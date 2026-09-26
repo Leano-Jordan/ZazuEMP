@@ -493,3 +493,12 @@ Verification:
 - Quote revision creation now rebuilds each revision line's source snapshot from the current Work requirement instead of carrying a stale prior snapshot.
 - Snapshot construction is centralized in `QuoteService` so initial quote creation and revision creation use the same evidence shape.
 - Regression coverage now checks that a revised requirement's description and quantity are reflected in the new revision snapshot.
+
+
+## Business-boundary hardening — 2026-09-26
+
+- `BelongsToBusiness` now enforces the active business boundary for authenticated model saves.
+- Missing business IDs are still derived from the active workspace.
+- Explicit foreign business IDs are rejected instead of being silently accepted.
+- Authenticated attempts to move an existing business-owned record to another business are rejected.
+- Regression tests cover both direct creation and cross-business reassignment.
