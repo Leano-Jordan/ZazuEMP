@@ -68,9 +68,13 @@
                         </label>
 
                         <label class="zazu-field">
-                            <span class="zazu-label">Unit</span>
-                            <input name="default_unit" value="{{ old('default_unit') }}" class="zazu-input">
-                            <span class="zazu-field-help">Example: guests, chairs, hours, days.</span>
+                            <span class="zazu-label">Default unit</span>
+                            <select name="default_unit" class="zazu-select">
+                                <option value="">Not specified</option>
+                                @foreach (config('zazu.units') as $value => $label)
+                                    <option value="{{ $value }}" @selected(old('default_unit') === $value)>{{ $label }}</option>
+                                @endforeach
+                            </select>
                         </label>
 
                         <label class="zazu-field zazu-field-wide">
