@@ -21,7 +21,7 @@
                 <section class="zazu-form-section">
                     <div class="zazu-form-section-head">
                         <div class="zazu-form-section-title">Commercial inputs</div>
-                        <div class="zazu-form-section-copy">Tax stays at zero in this foundation slice until the finance/tax configuration is implemented.</div>
+                        <div class="zazu-form-section-copy">Choose the tax treatment that applies to this quote. Zazu stores the rate and treatment used so later tax changes do not rewrite old commercial documents.</div>
                     </div>
 
                     <div class="zazu-form-grid">
@@ -35,6 +35,19 @@
                             @error('currency')<span class="zazu-field-error">{{ $message }}</span>@enderror
                         </label>
 
+                        <label class="zazu-field">
+                            <span class="zazu-label">Tax treatment</span>
+                            <select name="tax_rate_id" class="zazu-select">
+                                <option value="">No tax / 0%</option>
+                                @foreach ($taxRates as $taxRate)
+                                    <option value="{{ $taxRate->id }}" @selected((string) old('tax_rate_id', $defaultTaxRateId) === (string) $taxRate->id)>
+                                        {{ $taxRate->name }} · {{ $taxRate->rate }}%
+                                    </option>
+                                @endforeach
+                            </select>
+                            <span class="zazu-field-help">The selected tax rule is copied into this quote revision as a historical snapshot.</span>
+                            @error('tax_rate_id')<span class="zazu-field-error">{{ $message }}</span>@enderror
+                        </label>
                         <label class="zazu-field zazu-field-wide">
                             <span class="zazu-label">Quote notes</span>
                             <textarea name="notes" rows="3" class="zazu-textarea">{{ old('notes') }}</textarea>
