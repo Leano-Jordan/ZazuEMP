@@ -33,6 +33,8 @@ class RouteIntegrityTest extends TestCase
             'quotes.index',
             'quotes.show',
             'quotes.versions.store',
+            'quotes.versions.edit',
+            'quotes.versions.update',
             'work.index',
             'work.create',
             'work.store',

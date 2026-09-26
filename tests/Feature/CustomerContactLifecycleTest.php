@@ -49,6 +49,41 @@ class CustomerContactLifecycleTest extends TestCase
         Storage::disk('local')->assertExists($customer->profile_photo_path);
     }
 
+    public function test_customer_profile_photo_replacement_stays_on_private_storage(): void
+    {
+        Storage::fake('local');
+        Storage::fake('public');
+
+        $oldPath = 'profile-photos/customers/old.jpg';
+        Storage::disk('local')->put($oldPath, 'old-image');
+
+        $customer = Customer::create([
+            'name' => 'Private Photo Customer',
+            'profile_photo_path' => $oldPath,
+        ]);
+        CustomerContact::create([
+            'customer_id' => $customer->id,
+            'name' => 'Primary',
+            'is_primary' => true,
+        ]);
+
+        $newPhoto = UploadedFile::fake()->image('replacement.jpg');
+
+        $response = $this->put(route('customers.update', $customer), [
+            'name' => 'Private Photo Customer',
+            'profile_photo' => $newPhoto,
+            'primary_contact_name' => 'Primary',
+        ]);
+
+        $response->assertRedirect(route('customers.show', $customer));
+
+        $newPath = $customer->fresh()->profile_photo_path;
+        $this->assertNotSame($oldPath, $newPath);
+        Storage::disk('local')->assertExists($newPath);
+        Storage::disk('local')->assertMissing($oldPath);
+        Storage::disk('public')->assertMissing($newPath);
+    }
+
     public function test_secondary_contact_can_be_edited_and_removed_without_destroying_history(): void
     {
         $customer = Customer::create(['name' => 'Contact Lifecycle Customer']);

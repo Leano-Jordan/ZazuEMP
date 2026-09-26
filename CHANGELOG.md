@@ -57,4 +57,11 @@ All notable Zazu EMP project changes will be recorded here.
 - Added lifecycle rules preventing invalid Work status movement and mutation of closed Work records.
 - Prevented downstream requirements, quotes, costs, travel and preparation changes after Work closes.
 - Hardened quote monetary arithmetic around integer cents and historical snapshots.
+- Moved quote construction and revision logic into a transaction-aware QuoteService so Work requirements, quote versions and historical snapshots stay aligned.
+- Added stale-quote detection and an explicit draft-revision review/edit workflow when Work services change.
+- Attached currency to reusable catalogue prices and prevented catalogue defaults from silently crossing quote currencies.
+- Added exact two-decimal validation for requirement quantities and commercial prices.
+- Fixed catalogue service selection so choosing a saved service does not clear its capability binding.
+- Kept customer profile-photo replacements on private local storage, with cleanup of legacy public paths.
+- Added regression coverage for quote revision integrity, currency-aware pricing, exact Money arithmetic, private media replacement and route integrity.
 - Added BusinessIsolationTest coverage for cross-business access, workload isolation and lifecycle controls.

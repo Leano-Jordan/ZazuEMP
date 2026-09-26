@@ -68,7 +68,7 @@ class QuoteWorkflowTest extends TestCase
         $this->assertSame('100 white chairs', $item->source_snapshot['description']);
     }
 
-    public function test_new_quote_revision_supersedes_the_previous_revision_without_changing_its_snapshot(): void
+    public function test_quote_revision_rebuilds_from_current_requirements_and_preserves_previous_snapshot_until_saved(): void
     {
         $customer = Customer::create([
             'name' => 'Revision Customer',
@@ -105,18 +105,134 @@ class QuoteWorkflowTest extends TestCase
             'quantity' => 80,
         ]);
 
-        $response = $this->post(route('quotes.versions.store', $quote));
+        $createResponse = $this->post(route('quotes.versions.store', $quote));
 
         $quote->refresh()->load('versions.items');
-
         $newest = $quote->versions->sortByDesc('version')->first();
 
-        $response->assertRedirect(route('quotes.show', $quote));
-        $this->assertSame('superseded', $original->fresh()->status);
+        $createResponse->assertRedirect(route('quotes.versions.edit', [$quote, $newest]));
+        $this->assertSame('draft', $original->fresh()->status);
         $this->assertSame(2, $newest->version);
         $this->assertSame('50 chairs', $original->items->first()->description);
-        $this->assertSame('50 chairs', $newest->items->first()->description);
-        $this->assertSame('50.00', (string) $newest->items->first()->quantity);
+        $this->assertSame('80 chairs', $newest->items->first()->description);
+        $this->assertSame('80.00', (string) $newest->items->first()->quantity);
+        $this->assertSame('40.00', (string) $newest->items->first()->unit_price);
+    }
+
+    public function test_quote_draft_revision_can_be_saved_with_updated_prices(): void
+    {
+        $customer = Customer::create(['name' => 'Revision Save Customer']);
+
+        $event = Event::create([
+            'customer_id' => $customer->id,
+            'reference' => 'ZAZ-QUOTE-006',
+            'name' => 'Revision Save Event',
+            'event_date' => '2026-10-15',
+            'status' => 'draft',
+        ]);
+
+        $requirement = EventRequirement::create([
+            'event_id' => $event->id,
+            'description' => '80 chairs',
+            'quantity' => 80,
+            'unit' => 'chairs',
+            'status' => 'open',
+        ]);
+
+        $this->post(route('work.quotes.store', $event), [
+            'currency' => 'ZAR',
+            'unit_price' => [$requirement->id => 40],
+        ]);
+
+        $quote = Quote::query()->firstOrFail();
+        $original = $quote->versions()->firstOrFail();
+
+        $requirement->update(['quantity' => 100]);
+        $this->post(route('quotes.versions.store', $quote));
+
+        $version = $quote->refresh()->versions()->where('version', 2)->firstOrFail();
+
+        $response = $this->put(route('quotes.versions.update', [$quote, $version]), [
+            'notes' => 'Updated revision',
+            'unit_price' => [$requirement->id => 50],
+        ]);
+
+        $version->refresh()->load('items');
+        $original->refresh();
+
+        $response->assertRedirect(route('quotes.show', $quote));
+        $this->assertSame('superseded', $original->status);
+        $this->assertSame('draft', $version->status);
+        $this->assertSame('100.00', (string) $version->items->first()->quantity);
+        $this->assertSame('50.00', (string) $version->items->first()->unit_price);
+        $this->assertSame('5000.00', (string) $version->items->first()->line_total);
+        $this->assertSame('Updated revision', $version->notes);
+    }
+
+    public function test_quote_creation_rejects_prices_with_more_than_two_decimal_places(): void
+    {
+        $customer = Customer::create(['name' => 'Precision Customer']);
+
+        $event = Event::create([
+            'customer_id' => $customer->id,
+            'reference' => 'ZAZ-QUOTE-004',
+            'name' => 'Precision Event',
+            'event_date' => '2026-10-13',
+            'status' => 'draft',
+        ]);
+
+        $requirement = EventRequirement::create([
+            'event_id' => $event->id,
+            'description' => '10 plates',
+            'quantity' => 10,
+            'unit' => 'plates',
+            'status' => 'open',
+        ]);
+
+        $response = $this->from(route('work.quotes.create', $event))
+            ->post(route('work.quotes.store', $event), [
+                'currency' => 'ZAR',
+                'unit_price' => [$requirement->id => '12.345'],
+            ]);
+
+        $response->assertRedirect(route('work.quotes.create', $event));
+        $response->assertSessionHasErrors('unit_price.' . $requirement->id);
+        $this->assertDatabaseCount('quotes', 0);
+    }
+
+    public function test_work_workspace_detects_when_a_quote_is_stale_against_changed_requirements(): void
+    {
+        $customer = Customer::create(['name' => 'Stale Quote Customer']);
+
+        $event = Event::create([
+            'customer_id' => $customer->id,
+            'reference' => 'ZAZ-QUOTE-005',
+            'name' => 'Stale Quote Event',
+            'event_date' => '2026-10-14',
+            'status' => 'draft',
+        ]);
+
+        $requirement = EventRequirement::create([
+            'event_id' => $event->id,
+            'description' => '25 chairs',
+            'quantity' => 25,
+            'unit' => 'chairs',
+            'status' => 'open',
+        ]);
+
+        $this->post(route('work.quotes.store', $event), [
+            'currency' => 'ZAR',
+            'unit_price' => [$requirement->id => 40],
+        ]);
+
+        $requirement->update(['quantity' => 30]);
+
+        $response = $this->get(route('work.show', $event));
+
+        $response->assertOk();
+        $response->assertSee('Quote needs review');
+        $response->assertSee('Revise quote');
+        $response->assertSee(route('quotes.versions.store', $event->quotes()->first()), false);
     }
 
     public function test_quote_creation_requires_a_price_for_each_current_requirement(): void

@@ -7,6 +7,7 @@ use App\Models\BusinessCapability;
 use App\Support\CurrentBusiness;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Validation\Rule;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\View\View;
 
@@ -39,16 +40,21 @@ class BusinessCapabilityController extends Controller
         return view('capabilities.index', compact('capabilities', 'categories', 'isOwner'));
     }
 
-    public function create(): View
+    public function create(Request $request): View
     {
+        $business = $this->business($request);
+
         return view('capabilities.create', [
             'serviceCategories' => array_keys(config('zazu.service_categories')),
+            'currencies' => config('zazu.currencies'),
+            'defaultCurrency' => $business->currency ?? 'ZAR',
         ]);
     }
 
     public function store(Request $request): RedirectResponse
     {
         $business = $this->business($request);
+        $request->merge(['currency' => strtoupper((string) $request->input('currency', $business->currency ?? 'ZAR'))]);
         $validated = $this->validated($request);
 
         $photoPath = $request->file('image')?->store('catalogue', 'public');
@@ -80,6 +86,8 @@ class BusinessCapabilityController extends Controller
         return view('capabilities.edit', [
             'capability' => $capability,
             'serviceCategories' => array_keys(config('zazu.service_categories')),
+            'currencies' => config('zazu.currencies'),
+            'defaultCurrency' => $business->currency ?? 'ZAR',
         ]);
     }
 
@@ -88,6 +96,7 @@ class BusinessCapabilityController extends Controller
         $business = $this->business($request);
         $this->ensureBusiness($capability, $business);
 
+        $request->merge(['currency' => strtoupper((string) $request->input('currency', $capability->currency ?? $business->currency ?? 'ZAR'))]);
         $validated = $this->validated($request, $capability->category);
         $oldImagePath = $capability->image_path;
         $newImagePath = $request->file('image')?->store('catalogue', 'public');
@@ -132,7 +141,8 @@ class BusinessCapabilityController extends Controller
             'name' => ['required', 'string', 'max:255'],
             'capability_type' => ['required', 'in:service,rental,product,package,other'],
             'pricing_basis' => ['required', 'in:custom,fixed,per_unit,per_person,per_hour,per_day'],
-            'default_price' => ['nullable', 'numeric', 'min:0'],
+            'default_price' => ['nullable', 'numeric', 'decimal:0,2', 'min:0'],
+            'currency' => ['required', Rule::in(array_keys(config('zazu.currencies')))],
             'default_unit' => ['nullable', 'string', 'max:50'],
             'description' => ['nullable', 'string'],
             'image' => ['nullable', 'image', 'mimes:jpg,jpeg,png,webp', 'max:4096'],

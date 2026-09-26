@@ -16,9 +16,14 @@
         };
         $latestQuote = $event->quotes->sortByDesc('created_at')->first();
         $hasRequirements = $event->requirements->isNotEmpty();
-        $nextAction = $latestQuote
-            ? ['label' => 'Open quote', 'route' => route('quotes.show', $latestQuote), 'copy' => 'Review the current quote for this job.']
-            : ['label' => 'Add services', 'route' => route('work.requirements.create', $event), 'copy' => 'Choose what you are providing for this job.'];
+        $latestQuoteNeedsRevision = $latestQuote?->latestVersion
+            ? !$latestQuote->latestVersion->matchesRequirements($event->requirements)
+            : false;
+        $nextAction = $latestQuoteNeedsRevision
+            ? ['label' => 'Review quote', 'route' => route('quotes.show', $latestQuote), 'copy' => 'The job services changed after the latest quote. Review the current lines before using the quote.']
+            : ($latestQuote
+                ? ['label' => 'Open quote', 'route' => route('quotes.show', $latestQuote), 'copy' => 'Review the current quote for this job.']
+                : ['label' => 'Add services', 'route' => route('work.requirements.create', $event), 'copy' => 'Choose what you are providing for this job.']);
     @endphp
 
     <section class="zazu-work-hero">
@@ -44,6 +49,20 @@
         </div>
         <a href="{{ $nextAction['route'] }}" class="zazu-btn zazu-btn-primary">{{ $nextAction['label'] }} →</a>
     </section>
+
+    @if ($latestQuoteNeedsRevision)
+        <section class="zazu-next-action">
+            <div>
+                <div class="zazu-eyebrow">Quote needs review</div>
+                <h2 class="zazu-next-action-title">The job changed after the latest quote</h2>
+                <p class="zazu-next-action-copy">Create a revision from the current services before treating the quote as current.</p>
+            </div>
+            <form method="POST" action="{{ route('quotes.versions.store', $latestQuote) }}">
+                @csrf
+                <button class="zazu-btn zazu-btn-primary">Revise quote →</button>
+            </form>
+        </section>
+    @endif
 
     <section class="zazu-work-progress">
         <a href="{{ route('work.show', $event) }}" class="zazu-work-progress-step current">

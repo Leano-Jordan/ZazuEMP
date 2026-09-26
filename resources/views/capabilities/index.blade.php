@@ -68,7 +68,7 @@
                     @endif
                     <div class="zazu-catalogue-price">
                         @if ($capability->default_price !== null)
-                            {{ 'ZAR '.number_format((float) $capability->default_price, 2) }}
+                            {{ ($capability->currency ?? 'ZAR').' '.number_format((float) $capability->default_price, 2) }}
                             <span>{{ str_replace('_', ' ', $capability->pricing_basis) }}</span>
                         @else
                             <span>Price set when quoting</span>

@@ -63,6 +63,8 @@ Route::middleware(['auth', 'business.context'])->group(function () {
     Route::get('/quotes', [QuoteController::class, 'index'])->name('quotes.index');
     Route::get('/quotes/{quote}', [QuoteController::class, 'show'])->name('quotes.show');
     Route::post('/quotes/{quote}/versions', [QuoteController::class, 'createVersion'])->name('quotes.versions.store');
+    Route::get('/quotes/{quote}/versions/{version}/edit', [QuoteController::class, 'editVersion'])->name('quotes.versions.edit');
+    Route::put('/quotes/{quote}/versions/{version}', [QuoteController::class, 'updateVersion'])->name('quotes.versions.update');
 
     Route::get('/work', [WorkController::class, 'index'])->name('work.index');
     Route::get('/work/create', [WorkController::class, 'create'])->name('work.create');

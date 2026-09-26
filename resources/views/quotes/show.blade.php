@@ -2,10 +2,14 @@
     <x-slot:title>{{ $quote->reference }}</x-slot:title>
     <x-slot:heading>{{ $quote->reference }}</x-slot:heading>
     <x-slot:headerAction>
-        <form method="POST" action="{{ route('quotes.versions.store', $quote) }}">
-            @csrf
-            <button class="zazu-btn zazu-btn-primary">Create new revision</button>
-        </form>
+        @if ($version?->status === 'draft')
+            <a href="{{ route('quotes.versions.edit', [$quote, $version]) }}" class="zazu-btn zazu-btn-primary">Edit draft</a>
+        @else
+            <form method="POST" action="{{ route('quotes.versions.store', $quote) }}">
+                @csrf
+                <button class="zazu-btn zazu-btn-primary">Create new revision</button>
+            </form>
+        @endif
         <a href="{{ route('work.show', $quote->event) }}" class="zazu-btn zazu-btn-secondary">Job workspace</a>
         <a href="{{ route('work.quotes.index', $quote->event) }}" class="zazu-btn zazu-btn-ghost">All quotes</a>
     </x-slot:headerAction>
@@ -29,6 +33,20 @@
             <span class="zazu-chip {{ $statusClass }}">{{ ucfirst($version?->status ?? $quote->status) }}</span>
         </div>
     </section>
+
+    @if ($quoteNeedsRevision)
+        <section class="zazu-next-action">
+            <div>
+                <div class="zazu-eyebrow">Quote needs review</div>
+                <h2 class="zazu-next-action-title">Services have changed since this quote</h2>
+                <p class="zazu-next-action-copy">Create a new revision from the current Work services. Existing prices are carried forward where possible.</p>
+            </div>
+            <form method="POST" action="{{ route('quotes.versions.store', $quote) }}">
+                @csrf
+                <button class="zazu-btn zazu-btn-primary">Revise quote →</button>
+            </form>
+        </section>
+    @endif
 
     <div class="zazu-detail-grid">
         <div class="zazu-detail-stack">
