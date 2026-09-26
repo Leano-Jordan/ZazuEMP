@@ -9,6 +9,7 @@ use App\Models\Payment;
 use App\Models\Quote;
 use App\Models\Supplier;
 use App\Support\CurrentBusiness;
+use App\Support\Money;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
@@ -73,11 +74,18 @@ class FinanceController extends Controller
             'reference'=>['nullable','string','max:255'],'paid_at'=>['required','date'],'notes'=>['nullable','string'],
         ]);
         $invoice=Invoice::where('business_id',$businessId)->with('payments')->findOrFail($data['invoice_id']);
-        $balance=max(0,(float)$invoice->total-$invoice->payments->sum(fn($p)=>(float)$p->amount));
-        abort_if((float)$data['amount']>$balance+0.0001,422,'Payment cannot exceed the outstanding invoice balance.');
+        $totalCents = Money::toCents((string) $invoice->total);
+        $paidCents = $invoice->payments->sum(fn ($payment) => Money::toCents((string) $payment->amount));
+        $paymentCents = Money::toCents((string) $data['amount']);
+
+        abort_if($paymentCents > ($totalCents - $paidCents), 422, 'Payment cannot exceed the outstanding invoice balance.');
+
         Payment::create([...$data,'business_id'=>$businessId,'event_id'=>$invoice->event_id,'currency'=>$invoice->currency]);
-        $paid=$invoice->payments()->sum('amount')+(float)$data['amount'];
-        $invoice->update(['status'=>$paid+0.0001 >= (float)$invoice->total ? 'paid' : 'issued']);
+
+        $newPaidCents = $paidCents + $paymentCents;
+        $invoice->update([
+            'status' => $newPaidCents >= $totalCents ? 'paid' : 'issued',
+        ]);
         return redirect()->route('finance.index')->with('success','Payment recorded.');
     }
 
