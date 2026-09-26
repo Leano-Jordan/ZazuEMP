@@ -27,7 +27,11 @@
                     <div class="zazu-form-grid">
                         <label class="zazu-field">
                             <span class="zazu-label">Currency</span>
-                            <input name="currency" value="{{ old('currency', 'ZAR') }}" maxlength="3" class="zazu-input" required>
+                            <select name="currency" class="zazu-select" required>
+                                @foreach ($currencies as $code => $label)
+                                    <option value="{{ $code }}" @selected(old('currency', $defaultCurrency) === $code)>{{ $label }}</option>
+                                @endforeach
+                            </select>
                             @error('currency')<span class="zazu-field-error">{{ $message }}</span>@enderror
                         </label>
 
