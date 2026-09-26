@@ -2,11 +2,14 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\User;
 use App\Services\RegisterBusiness;
 use App\Support\CurrentBusiness;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Str;
 use Illuminate\Validation\ValidationException;
 use Illuminate\View\View;
 
@@ -27,17 +30,28 @@ class AuthController extends Controller
     public function store(Request $request): RedirectResponse
     {
         $credentials = $request->validate([
-            'email' => ['required', 'email'],
+            'identifier' => ['required', 'string', 'max:255'],
             'password' => ['required', 'string'],
         ]);
 
-        if (!Auth::attempt($credentials, $request->boolean('remember'))) {
+        $identifier = Str::lower(trim($credentials['identifier']));
+
+        $user = User::query()
+            ->where(function ($query) use ($identifier) {
+                $query->where('username', $identifier)
+                    ->orWhere('email', $identifier);
+            })
+            ->first();
+
+        if (!$user || !Hash::check($credentials['password'], $user->password)) {
             throw ValidationException::withMessages([
-                'email' => 'Those sign-in details could not be verified.',
+                'identifier' => 'We could not sign you in with those details.',
             ]);
         }
 
+        Auth::login($user, $request->boolean('remember'));
         $request->session()->regenerate();
+
         app(CurrentBusiness::class)->resolve($request->user());
 
         if ($request->boolean('owner_access')) {
@@ -53,7 +67,7 @@ class AuthController extends Controller
                 $request->session()->regenerateToken();
 
                 throw ValidationException::withMessages([
-                    'email' => 'This account does not have owner access to an active workspace.',
+                    'identifier' => 'This account does not have owner access to an active workspace.',
                 ]);
             }
 
@@ -67,8 +81,21 @@ class AuthController extends Controller
 
     public function storeRegistration(Request $request, RegisterBusiness $registration): RedirectResponse
     {
+        $request->merge([
+            'username' => Str::lower(trim($request->string('username')->toString())),
+            'email' => Str::lower(trim($request->string('email')->toString())),
+        ]);
+
         $validated = $request->validate([
             'name' => ['required', 'string', 'max:255'],
+            'username' => [
+                'required',
+                'string',
+                'min:3',
+                'max:32',
+                'regex:/^[a-z0-9][a-z0-9._-]{2,31}$/',
+                'unique:users,username',
+            ],
             'business_name' => ['required', 'string', 'max:255'],
             'email' => ['required', 'email', 'max:255', 'unique:users,email'],
             'password' => ['required', 'string', 'min:8', 'confirmed'],
