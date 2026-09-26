@@ -2,7 +2,10 @@
 
 use App\Http\Controllers\BusinessCapabilityController;
 use App\Http\Controllers\CustomerContactController;
+use App\Http\Controllers\CalendarController;
 use App\Http\Controllers\CustomerController;
+use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\CustomerContactController;
 use App\Http\Controllers\RequirementController;
 use App\Http\Controllers\QuoteController;
 use App\Http\Controllers\TravelCostController;
@@ -12,9 +15,9 @@ use Illuminate\Support\Facades\Route;
 Route::get('/', fn () => redirect()->route('dashboard'));
 
 
-Route::view('/dashboard', 'dashboard')->name('dashboard');
+Route::get('/dashboard', DashboardController::class)->name('dashboard');
 
-Route::view('/calendar', 'calendar.index')->name('calendar.index');
+Route::get('/calendar', CalendarController::class)->name('calendar.index');
 Route::view('/suppliers', 'suppliers.index')->name('suppliers.index');
 Route::view('/inventory', 'inventory.index')->name('inventory.index');
 Route::view('/assets', 'assets.index')->name('assets.index');
