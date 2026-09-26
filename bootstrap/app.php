@@ -22,4 +22,14 @@ return Application::configure(basePath: dirname(__DIR__))
         $exceptions->shouldRenderJsonWhen(
             fn (Request $request) => $request->is('api/*') || $request->expectsJson(),
         );
+
+        $exceptions->respond(function ($response) {
+            $requestId = request()->attributes->get('zazu_request_id');
+
+            if ($requestId) {
+                $response->headers->set('X-Zazu-Request-Id', $requestId);
+            }
+
+            return $response;
+        });
     })->create();
