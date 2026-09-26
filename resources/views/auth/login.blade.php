@@ -13,7 +13,7 @@
                 <div class="zazu-auth-mark">Z</div>
                 <div>
                     <div class="zazu-auth-name">Zazu</div>
-                    <div class="zazu-auth-subtitle">Event & Catering Management</div>
+                    <div class="zazu-auth-subtitle">Event Management Platform</div>
                 </div>
             </div>
 
@@ -74,11 +74,8 @@
             @endif
         </section>
 
-        <aside class="zazu-auth-visual" aria-label="Zazu image area">
-            <div class="zazu-auth-visual-inner">
-                <span class="zazu-auth-visual-label">Image area</span>
-                <span class="zazu-auth-visual-copy">Reserved for Zazu artwork, product photography or business imagery.</span>
-            </div>
+        <aside class="zazu-auth-visual" aria-hidden="true">
+            <div class="zazu-auth-visual-inner"></div>
         </aside>
     </main>
 </body>
