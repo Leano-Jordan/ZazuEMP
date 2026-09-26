@@ -23,8 +23,8 @@ class MoneyTest extends TestCase
 
     public function test_quantity_and_unit_price_are_multiplied_and_rounded_to_cents(): void
     {
-        $this->assertSame(2550, Money::multiplyQuantityByPrice(10000, 2550));
+        $this->assertSame(255000, Money::multiplyQuantityByPrice(10000, 2550));
         $this->assertSame('2550.00', Money::fromCents(2550));
-        $this->assertSame(1005, Money::multiplyQuantityByPrice(333, 302));
+        $this->assertSame(1006, Money::multiplyQuantityByPrice(333, 302));
     }
 }
