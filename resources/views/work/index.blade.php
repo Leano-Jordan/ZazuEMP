@@ -4,13 +4,13 @@
     <x-slot:headerAction><a href="{{ route('work.create') }}" class="zazu-btn zazu-btn-primary">Create work</a></x-slot:headerAction>
 
     <section class="zazu-command-band">
-        <div><div class="zazu-eyebrow">Operations</div><h2 class="zazu-command-title">Workspaces</h2><p class="zazu-command-copy">Every event or job gets its own operational record.</p></div>
+        <div><div class="zazu-eyebrow">Operations</div><h2 class="zazu-command-title">Workspaces</h2><p class="zazu-command-copy">Each event or job has its own work record.</p></div>
         <div class="zazu-command-meta"><div class="zazu-command-meta-label">Active work</div><div class="zazu-command-meta-value">{{ $events->total() }}</div></div>
     </section>
 
     <section class="zazu-card zazu-list">
         <div class="zazu-card-header flex items-center justify-between gap-4">
-            <div><div class="zazu-card-title">Active work</div><div class="zazu-card-description">Open, edit or remove an active work record.</div></div>
+            <div><div class="zazu-card-title">Active work</div><div class="zazu-card-description">Open, edit or remove active work.</div></div>
             <a href="{{ route('customers.index') }}" class="zazu-btn zazu-btn-ghost">Customers →</a>
         </div>
 
