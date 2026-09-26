@@ -20,7 +20,7 @@ class CustomerContactController extends Controller
     {
         $validated = $this->validated($request);
 
-        DB::transaction(function () use ($customer, $validated): void {
+        DB::transaction(function () use ($customer, $validated, $request): void {
             $makePrimary = $request->boolean('is_primary');
 
             if ($makePrimary) {
@@ -58,7 +58,7 @@ class CustomerContactController extends Controller
 
             if ($makePrimary) {
                 $customer->contacts()
-                    ->whereKeyNot($contact->id)
+                    ->where('id', '!=', $contact->id)
                     ->update(['is_primary' => false]);
             }
 
