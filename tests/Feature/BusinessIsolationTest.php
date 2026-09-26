@@ -143,6 +143,7 @@ class BusinessIsolationTest extends TestCase
         $event = $this->eventFor($business);
 
         $invalid = $this->actingAs($user)->put(route('work.update', $event), [
+            'customer_id' => $event->customer_id,
             'name' => $event->name,
             'event_type' => 'Wedding',
             'event_date' => $event->event_date->toDateString(),
