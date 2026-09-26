@@ -17,6 +17,17 @@ class Invoice extends Model
         'event_id',
         'quote_id',
         'number',
+        'business_legal_name',
+        'business_trading_name',
+        'business_address',
+        'business_email',
+        'business_phone',
+        'business_tax_number',
+        'business_vat_number',
+        'customer_name',
+        'customer_address',
+        'customer_email',
+        'customer_phone',
         'status',
         'currency',
         'subtotal',
@@ -62,6 +73,11 @@ class Invoice extends Model
     public function payments(): HasMany
     {
         return $this->hasMany(Payment::class);
+    }
+
+    public function items(): HasMany
+    {
+        return $this->hasMany(InvoiceItem::class);
     }
 
     public function getPaidAmountAttribute(): float
