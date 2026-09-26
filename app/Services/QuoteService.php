@@ -140,9 +140,10 @@ class QuoteService
         Collection $requirements,
         array $unitPrices,
         ?TaxRate $taxRate,
+        bool $replaceTax,
         ?string $notes
     ): QuoteVersion {
-        return DB::transaction(function () use ($quote, $version, $requirements, $unitPrices, $taxRate, $notes): QuoteVersion {
+        return DB::transaction(function () use ($quote, $version, $requirements, $unitPrices, $taxRate, $replaceTax, $notes): QuoteVersion {
             $lockedQuote = Quote::query()
                 ->whereKey($quote->id)
                 ->lockForUpdate()
@@ -161,7 +162,7 @@ class QuoteService
 
             $this->replaceItems($lockedVersion, $requirements, $unitPrices, $lockedQuote->currency);
 
-            $taxSnapshot = $taxRate
+            $taxSnapshot = $replaceTax
                 ? $this->taxSnapshot($taxRate)
                 : [
                     'tax_rate_id' => $lockedVersion->tax_rate_id,
