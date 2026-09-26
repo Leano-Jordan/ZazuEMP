@@ -49,22 +49,27 @@
         <section class="zazu-panel">
             <div class="zazu-panel-title">Quick access</div>
             <div class="zazu-panel-copy">Open a business area quickly.</div>
-            <div class="mt-4 grid gap-2">
-                @foreach ([
+            @php
+                $quickAccess = [
                     ['label' => 'Jobs', 'route' => 'work.index'],
                     ['label' => 'Customers', 'route' => 'customers.index'],
                     ['label' => 'Quotes', 'route' => 'quotes.index'],
                     ['label' => 'Services & prices', 'route' => 'capabilities.index'],
-                    ['label' => 'Settings', 'route' => 'settings.index'],
-                ] as $item)
+                ];
+                if ($isOwner) {
+                    $quickAccess[] = ['label' => 'Settings', 'route' => 'settings.index'];
+                }
+            @endphp
+            <div class="mt-4 grid gap-2">
+                @foreach ($quickAccess as $item)
                     <a href="{{ route($item['route']) }}" class="zazu-quick-link flex items-center justify-between rounded-lg border border-[var(--zazu-border)] bg-[var(--zazu-surface-2)] px-3 py-2 text-xs font-semibold text-[var(--zazu-ink-2)] no-underline hover:border-[var(--zazu-border-strong)] hover:text-[var(--zazu-link)]"><span>{{ $item['label'] }}</span><span aria-hidden="true">→</span></a>
                 @endforeach
             </div>
         </section>
     </div>
 
-    <section class="zazu-module-grid mt-5">
-        @foreach ([
+    @php
+        $modules = [
             ['label' => 'Jobs', 'copy' => 'Jobs, services, quotes and preparation.', 'route' => 'work.index', 'group' => 'Operations'],
             ['label' => 'Customers', 'copy' => 'Customer details, contacts and work history.', 'route' => 'customers.index', 'group' => 'Relationships'],
             ['label' => 'Quotes', 'copy' => 'Quotes and pricing history.', 'route' => 'quotes.index', 'group' => 'Commercial'],
@@ -73,9 +78,14 @@
             ['label' => 'Inventory', 'copy' => 'Stock and movement.', 'route' => 'inventory.index', 'group' => 'Resources'],
             ['label' => 'Assets', 'copy' => 'Reusable equipment and accountability.', 'route' => 'assets.index', 'group' => 'Resources'],
             ['label' => 'Reports', 'copy' => 'Business information from your records.', 'route' => 'reports.index', 'group' => 'Insights'],
-            ['label' => 'Settings', 'copy' => 'Business and system controls.', 'route' => 'settings.index', 'group' => 'System'],
             ['label' => 'Services & prices', 'copy' => 'Your reusable services, rentals and usual prices.', 'route' => 'capabilities.index', 'group' => 'Catalogue'],
-        ] as $module)
+        ];
+        if ($isOwner) {
+            $modules[] = ['label' => 'Settings', 'copy' => 'Business and system controls.', 'route' => 'settings.index', 'group' => 'System'];
+        }
+    @endphp
+    <section class="zazu-module-grid mt-5">
+        @foreach ($modules as $module)
             <a href="{{ route($module['route']) }}" class="zazu-module">
                 <div class="zazu-module-top"><span class="zazu-module-group">{{ $module['group'] }}</span><span class="zazu-module-arrow" aria-hidden="true">→</span></div>
                 <div class="zazu-module-title">{{ $module['label'] }}</div>
