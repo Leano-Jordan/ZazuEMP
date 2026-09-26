@@ -240,7 +240,8 @@ class FoundationIntegrationTest extends TestCase
 
         $this->get(route('dashboard'))
             ->assertOk()
-            ->assertDontSee(route('settings.index'), false);
+            ->assertDontSee(route('settings.index'), false)
+            ->assertDontSee('aria-label="Open settings"', false);
 
         $this->get(route('capabilities.index'))
             ->assertOk()
