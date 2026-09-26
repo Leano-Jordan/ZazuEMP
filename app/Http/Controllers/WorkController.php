@@ -47,6 +47,12 @@ class WorkController extends Controller
 
         $customer = Customer::with('primaryContact')->findOrFail($validated['customer_id']);
 
+        if ((int) $event->customer_id !== (int) $customer->id && $event->quotes()->exists()) {
+            return redirect()
+                ->route('work.edit', $event)
+                ->with('error', 'The customer cannot be changed after a quote exists for this Work record. Create new Work for a different customer so commercial history remains attributable.');
+        }
+
         $this->validateContactBelongsToCustomer($validated['event_day_contact_id'] ?? null, $customer->id);
         $this->validateContactBelongsToCustomer($validated['event_night_contact_id'] ?? null, $customer->id);
 
@@ -76,7 +82,9 @@ class WorkController extends Controller
         $event->load(['customer', 'eventDayContact', 'eventNightContact']);
         $customers = Customer::with('contacts')->orderBy('name')->get();
 
-        return view('work.edit', compact('event', 'customers'));
+        $hasQuotes = $event->quotes()->exists();
+
+        return view('work.edit', compact('event', 'customers', 'hasQuotes'));
     }
 
     public function update(Request $request, Event $event): RedirectResponse
