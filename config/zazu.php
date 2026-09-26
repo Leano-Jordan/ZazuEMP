@@ -10,9 +10,40 @@ return [
     ],
 
     'units' => [
-        'unit' => 'Unit', 'item' => 'Item', 'person' => 'Person', 'guest' => 'Guest',
-        'chair' => 'Chair', 'table' => 'Table', 'plate' => 'Plate', 'hour' => 'Hour',
-        'day' => 'Day', 'kilometre' => 'Kilometre', 'litre' => 'Litre',
+        'service' => 'Service',
+        'unit' => 'Unit',
+        'item' => 'Item',
+        'person' => 'Person',
+        'guest' => 'Guest',
+        'chair' => 'Chair',
+        'table' => 'Table',
+        'plate' => 'Plate',
+        'hour' => 'Hour',
+        'day' => 'Day',
+        'kilometre' => 'Kilometre',
+        'litre' => 'Litre',
+    ],
+
+    'cost_categories' => [
+        'Food' => 'Food',
+        'Transport' => 'Transport',
+        'Venue' => 'Venue',
+        'Staff' => 'Staff',
+        'Equipment' => 'Equipment',
+        'Supplies' => 'Supplies',
+        'Accommodation' => 'Accommodation',
+        'Fees' => 'Fees',
+        'Other' => 'Other',
+    ],
+
+    'readiness_categories' => [
+        'Food' => 'Food',
+        'Equipment' => 'Equipment',
+        'Staff' => 'Staff',
+        'Venue' => 'Venue',
+        'Transport' => 'Transport',
+        'Documents' => 'Documents',
+        'Other' => 'Other',
     ],
 
     'service_categories' => [
