@@ -105,7 +105,7 @@ class ResourceOverviewController extends Controller
                 ->whereNotIn('status', ['completed', 'cancelled']))
             ->with([
                 'event.customer',
-                'capability' => fn (Builder $query) => $query->where('business_id', $business->id),
+                'capability' => fn ($query) => $query->where('business_id', $business->id),
             ])
             ->orderBy('created_at');
     }
