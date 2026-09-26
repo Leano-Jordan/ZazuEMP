@@ -161,6 +161,7 @@ class WorkController extends Controller
     {
         $business = $this->business($request);
         $this->ensureBusiness($event, $business);
+        abort_if($event->isClosed(), 422, 'Closed work cannot be edited.');
 
         $event->load(['customer', 'eventDayContact', 'eventNightContact']);
         $customers = Customer::query()
