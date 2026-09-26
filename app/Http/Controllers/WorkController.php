@@ -166,7 +166,7 @@ class WorkController extends Controller
             'event_day_contact_id' => ['nullable', 'exists:customer_contacts,id'],
             'event_night_contact_id' => ['nullable', 'exists:customer_contacts,id'],
             'name' => ['required', 'string', 'max:255'],
-            'event_type' => ['required', 'string', 'max:255'],
+            'event_type' => ['nullable', 'string', 'max:255'],
             'event_date' => ['required', 'date'],
             'event_address' => ['nullable', 'string', 'max:255'],
             'notes' => ['nullable', 'string'],
