@@ -64,6 +64,10 @@
 
                 <div class="zazu-nav-group">
                     <div class="zazu-nav-label">Commercial</div>
+                    <a href="{{ route('finance.index') }}" class="zazu-nav-link {{ request()->routeIs('finance.*') ? 'active' : '' }}" @if (request()->routeIs('finance.*')) aria-current="page" @endif>
+                        <svg class="zazu-nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true"><path d="M6 4h12v16H6z"></path><path d="M9 8h6M9 12h6M9 16h4"></path></svg>
+                        <span>Finance</span>
+                    </a>
                     <a href="{{ route('quotes.index') }}" class="zazu-nav-link {{ request()->routeIs('quotes.*') ? 'active' : '' }}" @if (request()->routeIs('quotes.*')) aria-current="page" @endif>
                         <svg class="zazu-nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true"><path d="M6 4h12v16H6z"></path><path d="M9 8h6M9 12h6M9 16h4"></path></svg>
                         <span>Quotes</span>
@@ -72,6 +76,10 @@
 
                 <div class="zazu-nav-group">
                     <div class="zazu-nav-label">Resources</div>
+                    <a href="{{ route('purchasing.index') }}" class="zazu-nav-link {{ request()->routeIs('purchasing.*') ? 'active' : '' }}" @if (request()->routeIs('purchasing.*')) aria-current="page" @endif>
+                        <svg class="zazu-nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true"><path d="M5 9h14v10H5z"></path><path d="M8 9V6h8v3M9 13h6"></path></svg>
+                        <span>Purchasing</span>
+                    </a>
                     <a href="{{ route('suppliers.index') }}" class="zazu-nav-link {{ request()->routeIs('suppliers.*') ? 'active' : '' }}" @if (request()->routeIs('suppliers.*')) aria-current="page" @endif>
                         <svg class="zazu-nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true"><path d="M5 9h14v10H5z"></path><path d="M8 9V6h8v3M9 13h6"></path></svg>
                         <span>Suppliers</span>
@@ -211,6 +219,8 @@
                 <a href="{{ route('customers.index') }}" class="zazu-mobile-link {{ request()->routeIs('customers.*') ? 'active' : '' }}" @if (request()->routeIs('customers.*')) aria-current="page" @endif>Customers</a>
                 <a href="{{ route('quotes.index') }}" class="zazu-mobile-link {{ request()->routeIs('quotes.*') ? 'active' : '' }}" @if (request()->routeIs('quotes.*')) aria-current="page" @endif>Quotes</a>
                 <a href="{{ route('calendar.index') }}" class="zazu-mobile-link {{ request()->routeIs('calendar.*') ? 'active' : '' }}" @if (request()->routeIs('calendar.*')) aria-current="page" @endif>Calendar</a>
+                <a href="{{ route('finance.index') }}" class="zazu-mobile-link {{ request()->routeIs('finance.*') ? 'active' : '' }}" @if (request()->routeIs('finance.*')) aria-current="page" @endif>Finance</a>
+                <a href="{{ route('purchasing.index') }}" class="zazu-mobile-link {{ request()->routeIs('purchasing.*') ? 'active' : '' }}" @if (request()->routeIs('purchasing.*')) aria-current="page" @endif>Purchasing</a>
                 <a href="{{ route('suppliers.index') }}" class="zazu-mobile-link {{ request()->routeIs('suppliers.*') ? 'active' : '' }}" @if (request()->routeIs('suppliers.*')) aria-current="page" @endif>Suppliers</a>
                 <a href="{{ route('inventory.index') }}" class="zazu-mobile-link {{ request()->routeIs('inventory.*') ? 'active' : '' }}" @if (request()->routeIs('inventory.*')) aria-current="page" @endif>Inventory</a>
                 <a href="{{ route('assets.index') }}" class="zazu-mobile-link {{ request()->routeIs('assets.*') ? 'active' : '' }}" @if (request()->routeIs('assets.*')) aria-current="page" @endif>Assets</a>
