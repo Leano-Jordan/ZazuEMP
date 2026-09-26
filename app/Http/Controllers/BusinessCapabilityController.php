@@ -53,11 +53,19 @@ class BusinessCapabilityController extends Controller
 
         $photoPath = $request->file('image')?->store('catalogue', 'public');
 
-        BusinessCapability::create($validated + [
-            'business_id' => $business->id,
-            'image_path' => $photoPath,
-            'is_active' => $request->boolean('is_active', true),
-        ]);
+        try {
+            BusinessCapability::create($validated + [
+                'business_id' => $business->id,
+                'image_path' => $photoPath,
+                'is_active' => $request->boolean('is_active', true),
+            ]);
+        } catch (\Throwable $e) {
+            if ($photoPath) {
+                Storage::disk('public')->delete($photoPath);
+            }
+
+            throw $e;
+        }
 
         return redirect()
             ->route('capabilities.index')
@@ -84,10 +92,18 @@ class BusinessCapabilityController extends Controller
         $oldImagePath = $capability->image_path;
         $newImagePath = $request->file('image')?->store('catalogue', 'public');
 
-        $capability->update($validated + [
-            'image_path' => $newImagePath ?: $capability->image_path,
-            'is_active' => $request->boolean('is_active'),
-        ]);
+        try {
+            $capability->update($validated + [
+                'image_path' => $newImagePath ?: $capability->image_path,
+                'is_active' => $request->boolean('is_active'),
+            ]);
+        } catch (\Throwable $e) {
+            if ($newImagePath) {
+                Storage::disk('public')->delete($newImagePath);
+            }
+
+            throw $e;
+        }
 
         if ($newImagePath && $oldImagePath) {
             Storage::disk('public')->delete($oldImagePath);
