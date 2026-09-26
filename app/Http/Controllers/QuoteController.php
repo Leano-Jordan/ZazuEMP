@@ -169,10 +169,14 @@ class QuoteController extends Controller
 
     public function createVersion(Request $request, Quote $quote): RedirectResponse
     {
-        $quote->loadMissing('event');
-        abort_if($quote->event?->isClosed(), 422, 'Closed work cannot receive new quote revisions.');
-
         $businessId = app(CurrentBusiness::class)->id($request->user());
+        $quote->loadMissing('event');
+
+        abort_unless(
+            $quote->event && (int) $quote->event->business_id === $businessId,
+            404
+        );
+        abort_if($quote->event->isClosed(), 422, 'Closed work cannot receive new quote revisions.');
 
         $newVersion = DB::transaction(function () use ($quote, $businessId): QuoteVersion {
             $lockedQuote = Quote::query()
