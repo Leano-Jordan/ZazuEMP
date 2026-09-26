@@ -4,6 +4,7 @@ namespace Tests\Feature;
 
 use App\Models\Business;
 use App\Models\User;
+use App\Support\CurrentBusiness;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
@@ -226,7 +227,7 @@ class AuthenticationTest extends TestCase
             'owner_access' => 1,
         ])->assertRedirect(route('owner.dashboard'));
 
-        $this->assertSame($owned->id, app(AppSupportCurrentBusiness::class)->id($user));
+        $this->assertSame($owned->id, app(CurrentBusiness::class)->id($user));
     }
 
 }
