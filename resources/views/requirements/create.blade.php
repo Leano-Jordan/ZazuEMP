@@ -8,8 +8,8 @@
     <section class="zazu-command-band">
         <div>
             <div class="zazu-eyebrow">{{ $event->reference }} · Requirements</div>
-            <h2 class="zazu-command-title">Add a delivery requirement</h2>
-            <p class="zazu-command-copy">Capture what this specific work item needs. Select a reusable capability when the requirement maps cleanly to the business catalogue.</p>
+            <h2 class="zazu-command-title">Add a requirement</h2>
+            <p class="zazu-command-copy">Record what this work needs. Select a reusable capability when one matches.</p>
         </div>
     </section>
 
@@ -20,8 +20,8 @@
             <div class="zazu-form-main">
                 <section class="zazu-form-section">
                     <div class="zazu-form-section-head">
-                        <div class="zazu-form-section-title">Requirement detail</div>
-                        <div class="zazu-form-section-copy">The requirement belongs to this workspace, not to the reusable catalogue.</div>
+                        <div class="zazu-form-section-title">Requirement</div>
+                        <div class="zazu-form-section-copy">This requirement belongs to this work. The catalogue remains reusable.</div>
                     </div>
 
                     <div class="zazu-form-grid">
