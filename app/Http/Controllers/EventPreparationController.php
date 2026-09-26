@@ -69,6 +69,7 @@ class EventPreparationController extends Controller
     public function updateStatus(Request $request, Event $event, EventPreparationItem $item): RedirectResponse
     {
         $this->ensureBusiness($event, $request);
+        abort_if($event->isClosed(), 422, 'Closed work cannot have its preparation status changed.');
         abort_unless($item->event_id === $event->id && $item->business_id === $event->business_id, 404);
 
         $validated = $request->validate([
