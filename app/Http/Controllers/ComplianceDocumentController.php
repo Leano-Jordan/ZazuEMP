@@ -47,6 +47,22 @@ class ComplianceDocumentController extends Controller
         return view('settings.compliance', compact('business', 'documents', 'checklist'));
     }
 
+    public function pack(Request $request): View
+    {
+        $business = app(CurrentBusiness::class)->model($request->user());
+        $business->loadMissing('taxProfile');
+
+        $documents = ComplianceDocument::where('business_id', $business->id)
+            ->latest()
+            ->get();
+
+        return view('settings.compliance-pack', [
+            'business' => $business,
+            'documents' => $documents,
+            'generatedAt' => now(),
+        ]);
+    }
+
     public function store(Request $request): RedirectResponse
     {
         $business = app(CurrentBusiness::class)->model($request->user());
