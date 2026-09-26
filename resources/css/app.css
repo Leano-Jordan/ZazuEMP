@@ -590,8 +590,9 @@ body {
     white-space: nowrap;
 }
 
-.zazu-field-compact {
-    max-width: 360px;
+.zazu-field-compact,
+.zazu-field-medium {
+    max-width: 460px;
 }
 
 .zazu-field-narrow {
