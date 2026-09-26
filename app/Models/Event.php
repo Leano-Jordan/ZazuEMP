@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Event extends Model
 {
@@ -43,5 +44,10 @@ class Event extends Model
     public function eventDayContact(): BelongsTo
     {
         return $this->belongsTo(CustomerContact::class, 'event_day_contact_id');
+    }
+
+    public function requirements(): HasMany
+    {
+        return $this->hasMany(EventRequirement::class);
     }
 }
