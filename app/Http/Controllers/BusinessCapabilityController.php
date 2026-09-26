@@ -34,7 +34,9 @@ class BusinessCapabilityController extends Controller
             ->orderBy('category')
             ->pluck('category');
 
-        return view('capabilities.index', compact('capabilities', 'categories'));
+        $isOwner = app(CurrentBusiness::class)->hasRole('owner', $request->user(), $business);
+
+        return view('capabilities.index', compact('capabilities', 'categories', 'isOwner'));
     }
 
     public function create(): View
