@@ -14,6 +14,7 @@
     </section>
 
     <form method="POST" action="{{ route('work.requirements.store', $event) }}" id="service-form">
+        <input type="hidden" name="capability_id" id="capability_id" value="{{ old('capability_id') }}">
         @csrf
         <div class="zazu-editor">
             <div class="zazu-form-main">
@@ -22,6 +23,29 @@
                         <div class="zazu-form-section-title">Choose a service</div>
                         <div class="zazu-form-section-copy">Pick the closest match. You can add more services from the job workspace afterwards.</div>
                     </div>
+
+                    @if ($capabilities->isNotEmpty())
+                        <div class="mb-6">
+                            <div class="zazu-label mb-2">Your saved services</div>
+                            <div class="zazu-catalogue-mini-grid">
+                                @foreach ($capabilities as $capability)
+                                    <button type="button" class="zazu-catalogue-mini" data-capability-id="{{ $capability->id }}" data-service-name="{{ $capability->name }}" data-category="{{ $capability->category }}" data-unit="{{ $capability->default_unit }}" data-price="{{ $capability->default_price }}">
+                                        <span class="zazu-catalogue-mini-image">
+                                            @if ($capability->image_path)
+                                                <img src="{{ Storage::disk('public')->url($capability->image_path) }}" alt="">
+                                            @else
+                                                {{ strtoupper(substr($capability->name, 0, 1)) }}
+                                            @endif
+                                        </span>
+                                        <span class="zazu-catalogue-mini-name">{{ $capability->name }}</span>
+                                        @if ($capability->default_price !== null)
+                                            <span class="zazu-catalogue-mini-price">ZAR {{ number_format((float) $capability->default_price, 2) }}</span>
+                                        @endif
+                                    </button>
+                                @endforeach
+                            </div>
+                        </div>
+                    @endif
 
                     <div class="zazu-service-groups">
                         @foreach ($serviceCategories as $group => $services)
@@ -100,7 +124,25 @@
 
     <script>
         const description = document.getElementById('description');
+        const capabilityId = document.getElementById('capability_id');
+        const unitSelect = document.getElementById('unit-select');
         const help = document.getElementById('description-help');
+
+        document.querySelectorAll('[data-capability-id]').forEach((button) => {
+            button.addEventListener('click', () => {
+                document.querySelectorAll('.zazu-catalogue-mini').forEach(item => item.classList.remove('selected'));
+                button.classList.add('selected');
+                capabilityId.value = button.dataset.capabilityId;
+                description.value = button.dataset.serviceName;
+                description.readOnly = true;
+                const unit = button.dataset.unit;
+                if (unit) {
+                    const option = [...unitSelect.options].find(item => item.value === unit);
+                    if (option) unitSelect.value = unit;
+                }
+                help.textContent = 'Saved service selected. You can edit the description if this job needs more detail.';
+            });
+        });
 
         document.querySelectorAll('[data-service-name]').forEach((input) => {
             input.addEventListener('change', () => {
