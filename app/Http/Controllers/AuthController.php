@@ -96,9 +96,24 @@ class AuthController extends Controller
                 'max:32',
                 'regex:/^[a-z0-9][a-z0-9._-]{2,31}$/',
                 'unique:users,username',
+                function ($attribute, $value, $fail): void {
+                    if (User::query()->whereRaw('LOWER(email) = ?', [$value])->exists()) {
+                        $fail('Choose a username that is different from every account email address.');
+                    }
+                },
             ],
             'business_name' => ['required', 'string', 'max:255'],
-            'email' => ['required', 'email', 'max:255', 'unique:users,email'],
+            'email' => [
+                'required',
+                'email',
+                'max:255',
+                'unique:users,email',
+                function ($attribute, $value, $fail): void {
+                    if (User::query()->where('username', Str::lower(trim($value)))->exists()) {
+                        $fail('Use an email address that is different from every username.');
+                    }
+                },
+            ],
             'password' => ['required', 'string', 'min:8', 'confirmed'],
         ]);
 
