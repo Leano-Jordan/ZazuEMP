@@ -2,10 +2,19 @@
 
 namespace Tests\Feature;
 
+use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
 class UiAccessibilityTest extends TestCase
 {
+    use RefreshDatabase;
+
+    protected function setUp(): void
+    {
+        parent::setUp();
+        $this->signInAsOwner();
+    }
+
     public function test_shared_layout_exposes_accessible_navigation_and_theme_controls(): void
     {
         $response = $this->get(route('dashboard'));

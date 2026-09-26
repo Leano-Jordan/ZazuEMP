@@ -37,10 +37,17 @@ class BusinessIsolationTest extends TestCase
 
     private function eventFor(Business $business, array $overrides = []): Event
     {
+        $customer = Customer::create([
+            'business_id' => $business->id,
+            'name' => 'Isolation Test Customer',
+        ]);
+
         return Event::create(array_merge([
             'business_id' => $business->id,
+            'customer_id' => $customer->id,
             'reference' => 'ZAZ-ISO-' . Str::upper(Str::random(8)),
             'name' => 'Isolation Test Work',
+            'event_type' => 'Catering order',
             'event_date' => now()->addDays(3)->toDateString(),
             'status' => 'draft',
         ], $overrides));
@@ -143,6 +150,7 @@ class BusinessIsolationTest extends TestCase
         $event = $this->eventFor($business);
 
         $invalid = $this->actingAs($user)->put(route('work.update', $event), [
+            'customer_id' => $event->customer_id,
             'name' => $event->name,
             'event_type' => 'Wedding',
             'event_date' => $event->event_date->toDateString(),
@@ -153,6 +161,7 @@ class BusinessIsolationTest extends TestCase
         $this->assertSame('draft', $event->fresh()->status);
 
         $confirmed = $this->actingAs($user)->put(route('work.update', $event), [
+            'customer_id' => $event->customer_id,
             'name' => $event->name,
             'event_type' => 'Wedding',
             'event_date' => $event->event_date->toDateString(),
@@ -164,6 +173,7 @@ class BusinessIsolationTest extends TestCase
         $event->refresh();
 
         $invalidReverse = $this->actingAs($user)->put(route('work.update', $event), [
+            'customer_id' => $event->customer_id,
             'name' => $event->name,
             'event_type' => 'Wedding',
             'event_date' => $event->event_date->toDateString(),

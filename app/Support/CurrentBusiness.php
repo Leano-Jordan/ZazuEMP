@@ -3,59 +3,19 @@
 namespace App\Support;
 
 use App\Models\Business;
-use Illuminate\Support\Str;
 use Illuminate\Contracts\Auth\Authenticatable;
 
 class CurrentBusiness
 {
     public function resolve(?Authenticatable $user = null): ?Business
     {
-        $user ??= request()->user();
+        $user ??= auth()->user();
 
         if ($user) {
-            $business = $user->businesses()
+            return $user->businesses()
                 ->where('businesses.status', 'active')
                 ->orderBy('businesses.id')
                 ->first();
-
-            if ($business) {
-                return $business;
-            }
-
-            // First-run bootstrap: a newly authenticated user must receive
-            // an owner business before normal business-scoped pages can load.
-            if (!$user->businesses()->exists()) {
-                // Existing single-business installations may predate the
-                // business_user membership layer. Attach the authenticated
-                // user only when there is exactly one active business, so
-                // we never guess across multiple businesses.
-                $soleBusiness = Business::query()
-                    ->where('status', 'active')
-                    ->limit(2)
-                    ->get();
-
-                if ($soleBusiness->count() === 1) {
-                    $business = $soleBusiness->first();
-                    $business->users()->syncWithoutDetaching([
-                        $user->id => ['role' => 'owner'],
-                    ]);
-
-                    return $business;
-                }
-
-                $business = Business::create([
-                    'name' => trim((string) $user->name) . "'s Business",
-                    'slug' => Str::slug((string) $user->name) . '-' . Str::lower(Str::random(6)),
-                    'status' => 'active',
-                    'currency' => 'ZAR',
-                ]);
-
-                $business->users()->attach($user->id, ['role' => 'owner']);
-
-                return $business;
-            }
-
-            return null;
         }
 
         if (app()->environment('testing')) {
@@ -73,24 +33,6 @@ class CurrentBusiness
                 ['slug' => 'zazu-test-business'],
                 ['name' => 'Zazu Test Business', 'status' => 'active', 'currency' => 'ZAR']
             );
-        }
-
-        // Zazu is currently being developed before the authentication
-        // surface is enabled. Keep the application previewable in local/debug
-        // environments so UX work is actually visible, while never enabling
-        // this fallback for a production configuration.
-        if (app()->environment('local') || (bool) config('app.debug')) {
-            $business = Business::query()
-                ->where('status', 'active')
-                ->orderBy('id')
-                ->first();
-
-            return $business ?: Business::create([
-                'name' => 'Zazu Demo Business',
-                'slug' => 'zazu-demo-business',
-                'status' => 'active',
-                'currency' => 'ZAR',
-            ]);
         }
 
         return null;
