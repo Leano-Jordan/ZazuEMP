@@ -9,8 +9,8 @@
     <section class="zazu-command-band">
         <div>
             <div class="zazu-eyebrow">{{ $event->reference }} · {{ $event->customer?->name ?? 'Customer' }}</div>
-            <h2 class="zazu-command-title">What must be delivered</h2>
-            <p class="zazu-command-copy">Turn the work brief into explicit quantities and delivery requirements. Reusable capabilities can be attached without locking the requirement to a quote.</p>
+            <h2 class="zazu-command-title">Delivery requirements</h2>
+            <p class="zazu-command-copy">Record the items, services and quantities needed for this work. You can link a reusable capability when it matches.</p>
         </div>
         <div class="zazu-command-meta">
             <div class="zazu-command-meta-label">Requirements</div>
@@ -21,7 +21,7 @@
     <section class="zazu-card zazu-list">
         <div class="zazu-card-header">
             <div class="zazu-card-title">Requirement register</div>
-            <div class="zazu-card-description">These are work-specific needs. Commercial pricing comes later.</div>
+            <div class="zazu-card-description">These are the items needed for this work. Pricing is added when you create a quote.</div>
         </div>
 
         @forelse ($requirements as $requirement)
