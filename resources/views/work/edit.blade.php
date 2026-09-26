@@ -146,10 +146,10 @@
     </form>
 
     <script>
-        const customers = @json($customerOptions);
+        const customers = {{ Illuminate\Support\Js::from($customerOptions) }};
 
-        const selectedDayContact = @json(old('event_day_contact_id', $event->event_day_contact_id));
-        const selectedNightContact = @json(old('event_night_contact_id', $event->event_night_contact_id));
+        const selectedDayContact = {{ Illuminate\Support\Js::from(old('event_day_contact_id', $event->event_day_contact_id)) }};
+        const selectedNightContact = {{ Illuminate\Support\Js::from(old('event_night_contact_id', $event->event_night_contact_id)) }};
         const customerSelect = document.getElementById('customer_id');
         const dayContactSelect = document.getElementById('event_day_contact_id');
         const nightContactSelect = document.getElementById('event_night_contact_id');
