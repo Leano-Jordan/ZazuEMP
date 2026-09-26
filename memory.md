@@ -364,3 +364,19 @@ Legal/security design:
 - Personal information minimisation, purpose limitation, security safeguards and retention/deletion principles are reflected in the feature design.
 - Soft delete is used for operational history preservation but is not treated as a permanent retention policy.
 - Profile-photo uploads use an allowlist and size limit, while production should serve identifiable images through an authenticated/authorised boundary.
+
+
+## Regression prevention — PHP write integrity — 2026-09-26
+
+Incident:
+- A repository write to `app/Http/Controllers/DashboardController.php` produced malformed PHP namespace/import declarations: `AppHttpControllers` and `AppModelsBusiness` instead of namespaced forms.
+- The controller file physically existed, but Laravel could not resolve the class, making the dashboard/UI appear unavailable.
+- Root cause was a write-integrity failure in the automation path, not a missing Laravel controller scaffold.
+
+Permanent rules:
+- Treat PHP namespace/import backslashes as critical syntax, never cosmetic text.
+- After every automated PHP file write, re-fetch the exact file from the repository and inspect its namespace, imports and class declaration before considering the batch complete.
+- Never report a PHP implementation as verified from the write operation alone.
+- Controller-backed routes must have a loadable controller class. The route-integrity test now checks that controller route targets resolve to existing classes.
+- A page is not considered executed merely because its Blade file exists or its route name is registered. The full chain is: route -> controller/class -> data/model -> view -> rendered response.
+- Regression prevention outranks feature velocity. If a write corrupts a foundational file, repair it first, add a guard, record the failure mode, then resume the planned execution cycle.
