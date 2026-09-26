@@ -22,8 +22,8 @@ This is the living execution map for Zazu EMP. Work it in order unless repositor
 - [x] Customer workspace
 - [x] Requirements workspace
 - [x] Capability catalogue
-- [ ] Calendar connected to real Work records
-- [ ] Dashboard connected to real operational signals
+- [x] Calendar connected to real Work records
+- [x] Dashboard connected to real operational signals
 - [x] Quote centre connected to real quote records
 - [ ] Contextual activity/timeline
 - [ ] Documents attached to Work
@@ -40,10 +40,10 @@ This is the living execution map for Zazu EMP. Work it in order unless repositor
 - [x] Historical reproducibility coverage
 
 ## 04 Planning & Resources
-- [ ] Travel costing
-- [ ] Replaceable route provider
-- [ ] Distance/time evidence
-- [ ] Configurable fuel and vehicle assumptions
+- [x] Travel costing
+- [x] Replaceable route provider
+- [x] Distance/time evidence
+- [x] Configurable fuel and vehicle assumptions
 - [ ] Projected versus actual costs
 - [ ] Staff costing
 - [ ] Suppliers and purchasing
@@ -129,6 +129,18 @@ Travel costing foundation implemented in this cycle:
 - historical calculation snapshot
 - contextual Work → Travel navigation
 - automated calculation coverage
+
+## Work recovery and capability update - 2026-09-26
+
+- [x] Event schema recovery migration added for existing development databases missing `events.deleted_at` and/or `event_night_contact_id`.
+- [x] Work creation pre-save variable defect fixed.
+- [x] Work Edit night-contact selector restored and covered by existing Work workflow tests.
+- [x] Photography and Photographer capability direction recorded.
+- [x] Camera hire capability direction recorded.
+- [x] Current owner documentation aligned to Isaac Junior Lehlogonolo Maluleka as solo developer/owner.
+- [x] Rosscore Labs documented as future business identity, not present legal owner.
+
+**Runtime gate:** the owner must run `php artisan migrate`, `php artisan view:clear`, and `php artisan test` on the Windows checkout. GitHub source inspection cannot prove the state of the local database or browser runtime.
 
 ## Operating rule
 Execute the smallest complete outcome that advances the current stage. Protect future scale without building speculative infrastructure. Every meaningful change ends with verification, regression checking and updated project memory.
