@@ -3,15 +3,19 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Event extends Model
 {
+    use SoftDeletes;
+
     protected $fillable = [
         'business_id',
         'customer_id',
         'event_day_contact_id',
+        'event_night_contact_id',
         'reference',
         'name',
         'event_type',
@@ -43,7 +47,12 @@ class Event extends Model
 
     public function eventDayContact(): BelongsTo
     {
-        return $this->belongsTo(CustomerContact::class, 'event_day_contact_id');
+        return $this->belongsTo(CustomerContact::class, 'event_day_contact_id')->withTrashed();
+    }
+
+    public function eventNightContact(): BelongsTo
+    {
+        return $this->belongsTo(CustomerContact::class, 'event_night_contact_id')->withTrashed();
     }
 
     public function requirements(): HasMany
