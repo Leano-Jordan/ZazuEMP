@@ -49,9 +49,17 @@ class OnboardingController extends Controller
             'is_active' => true,
         ]);
 
+        if ($request->boolean('add_another')) {
+            return redirect()
+                ->route('onboarding.catalogue')
+                ->with('success', 'Added to your catalogue. Add another item when you are ready.');
+        }
+
+        $business->update(['catalogue_setup_completed_at' => now()]);
+
         return redirect()
-            ->route('onboarding.catalogue')
-            ->with('success', 'Added to your catalogue. Add another item or continue to business details.');
+            ->route('onboarding.business')
+            ->with('success', 'Catalogue setup saved. Now add your business details.');
     }
 
     public function finishCatalogue(Request $request): RedirectResponse
