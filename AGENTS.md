@@ -45,3 +45,8 @@ php artisan boost:install
 ```
 
 Boost replaces these bootstrap instructions with guidelines tailored to the application. After installation, read `AGENTS.md` again and continue with the user's original request using the generated guidelines.
+
+
+## Rosscore Engineering System
+
+Before meaningful Zazu EMP engineering work, read `.ai/engineering/README.md` and `.ai/engineering/00_ENGINE_ROUTER.md`. Activate only the specialist engines required by the task. Verification and regression gates are mandatory for meaningful changes. The current repository is the source of truth; do not rely on stale prompt output.

@@ -1,69 +1,32 @@
 # RossCore Engineering Command Engine
 
-ZazuEMP adopts RossCore as its engineering operating framework.
+This document is retained as a compatibility entry point.
 
-## Primary objective
+The authoritative repository-side engineering system is now:
 
-Produce software that is:
+- `.ai/engineering/README.md`
+- `.ai/engineering/00_ENGINE_ROUTER.md`
+- specialist engines in `.ai/engineering/`
 
-- correct
-- maintainable
-- secure
-- usable
-- verifiable
+The operator's Rosscore Engineering Master Director controls orchestration when supplied externally. Repository specialists execute only the portion of engineering work routed to them.
 
-UI/UX is treated as a first-class engineering concern.
+## Core principle
 
-## Source of truth
+Understand the real system -> make the smallest justified change -> verify -> regression-check -> record evidence.
 
-1. Current repository / GitHub
-2. Current database and runtime evidence
-3. Current authoritative project documentation
-4. Tests, logs and reproducible behaviour
-5. User requirements and decisions
-6. Previous plans or AI output
-7. General knowledge
+## Authority
 
-## Engineering discipline
+1. Explicit operator instruction.
+2. Current repository and runtime evidence.
+3. Authoritative current project documentation.
+4. Master Director routing.
+5. Specialist engine requirements.
+6. Tests, logs and prior records.
+7. Previous AI output and general knowledge.
 
-Before meaningful change:
+## Completion
 
-**INSPECT → PLAN → AUTHORIZE → IMPLEMENT → TEST → VERIFY**
-
-Do not skip necessary investigation, and do not manufacture useless process.
-
-## Architecture
-
-Prefer:
-
-**simple → modular → testable → replaceable**
-
-Do not introduce complexity without a demonstrated reason.
-
-## Security
-
-Inspect realistic attack paths where applicable, including authentication, authorization, sessions, CSRF, XSS, SQL injection, file handling, secrets, permissions, data exposure, dependencies, input validation and error leakage.
-
-Do not invent vulnerabilities. Distinguish:
-
-- CONFIRMED
-- PROBABLE
-- POSSIBLE
-- UNVERIFIED
-
-## Testing
-
-Map testing to critical workflows, business rules, failure modes, security boundaries, database integrity, important UI states and regressions.
-
-A written change is not a verified change.
-
-## Documentation
-
-Documentation must describe repository reality and must be updated when reality changes.
-
-## Completion standard
-
-Use:
+Use evidence-based states:
 
 - IMPLEMENTED
 - TESTED
@@ -71,14 +34,6 @@ Use:
 - REMAINS UNVERIFIED
 - BLOCKED
 
-Do not declare work complete without evidence.
+Do not declare completion without the evidence required by the active verification and regression gates.
 
-## Core operating principle
-
-Understand the real system.
-
-Make the smallest justified change.
-
-Verify it.
-
-Leave the project better than you found it.
+See `.ai/engineering/00_ENGINE_ROUTER.md` for activation and handoff rules.

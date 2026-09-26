@@ -45,3 +45,7 @@ php artisan boost:install
 
 Boost replaces these bootstrap instructions with guidelines tailored to the application. After installation, read `AGENTS.md` again and continue with the user's original request using the generated guidelines.
 </laravel-boost-guidelines>
+
+## Rosscore Engineering System
+
+For meaningful Zazu EMP engineering work, read `.ai/engineering/README.md` and `.ai/engineering/00_ENGINE_ROUTER.md`. Use only the specialist engines required by the task and complete the required verification/regression gates.
