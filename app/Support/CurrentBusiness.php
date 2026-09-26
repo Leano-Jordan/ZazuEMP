@@ -18,7 +18,14 @@ class CurrentBusiness
                 ->first();
         }
 
-        if (app()->environment(['local', 'testing'])) {
+        if (app()->environment('testing')) {
+            return Business::firstOrCreate(
+                ['slug' => 'zazu-test-business'],
+                ['name' => 'Zazu Test Business', 'status' => 'active', 'currency' => 'ZAR']
+            );
+        }
+
+        if (app()->environment('local')) {
             return Business::query()
                 ->where('status', 'active')
                 ->orderBy('id')
