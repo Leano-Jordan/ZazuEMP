@@ -34,7 +34,9 @@ class BusinessMediaController extends Controller
         abort_unless($disk->exists($path), 404);
 
         return response()->file($disk->path($path), [
-            'Cache-Control' => 'private, max-age=300',
+            'Cache-Control' => 'private, no-store, max-age=0, must-revalidate',
+            'Pragma' => 'no-cache',
+            'Expires' => '0',
             'X-Content-Type-Options' => 'nosniff',
         ]);
     }
