@@ -88,6 +88,8 @@ document.querySelectorAll('[data-zazu-toast]').forEach((toast) => {
 });
 
 
+const brandingPreviewUrls = new WeakMap();
+
 function setupBrandingUploads() {
     document.querySelectorAll('[data-branding-upload]').forEach((input) => {
         input.addEventListener('change', () => {
@@ -121,7 +123,12 @@ function setupBrandingUploads() {
             preview.hidden = true;
             if (placeholder) placeholder.hidden = true;
 
+            const previousUrl = brandingPreviewUrls.get(input);
+            if (previousUrl) URL.revokeObjectURL(previousUrl);
+
             const objectUrl = URL.createObjectURL(file);
+            brandingPreviewUrls.set(input, objectUrl);
+
             const image = new Image();
 
             image.onload = () => {
@@ -129,7 +136,6 @@ function setupBrandingUploads() {
                 preview.hidden = false;
                 loading.hidden = true;
                 container.setAttribute('aria-busy', 'false');
-                window.setTimeout(() => URL.revokeObjectURL(objectUrl), 250);
             };
 
             image.onerror = () => {
@@ -138,6 +144,7 @@ function setupBrandingUploads() {
                 container.setAttribute('aria-busy', 'false');
                 if (filename) filename.textContent = 'That image could not be previewed.';
                 URL.revokeObjectURL(objectUrl);
+                brandingPreviewUrls.delete(input);
             };
 
             image.src = objectUrl;
