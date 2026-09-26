@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\BusinessCapabilityController;
+use App\Http\Controllers\BusinessSettingsController;
 use App\Http\Controllers\CalendarController;
 use App\Http\Controllers\CustomerController;
 use App\Http\Controllers\CustomerContactController;
@@ -23,7 +24,8 @@ Route::view('/suppliers', 'suppliers.index')->name('suppliers.index');
 Route::view('/inventory', 'inventory.index')->name('inventory.index');
 Route::view('/assets', 'assets.index')->name('assets.index');
 Route::view('/reports', 'reports.index')->name('reports.index');
-Route::view('/settings', 'settings.index')->name('settings.index');
+Route::get('/settings', [BusinessSettingsController::class, 'edit'])->name('settings.index');
+Route::put('/settings', [BusinessSettingsController::class, 'update'])->name('settings.update');
 Route::get('/quotes', [QuoteController::class, 'index'])->name('quotes.index');
 Route::get('/quotes/{quote}', [QuoteController::class, 'show'])->name('quotes.show');
 Route::post('/quotes/{quote}/versions', [QuoteController::class, 'createVersion'])->name('quotes.versions.store');
