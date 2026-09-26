@@ -9,6 +9,7 @@ use App\Http\Controllers\EventCostController;
 use App\Http\Controllers\EventPreparationController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\RequirementController;
+use App\Http\Controllers\ResourceOverviewController;
 use App\Http\Controllers\QuoteController;
 use App\Http\Controllers\TravelCostController;
 use App\Http\Controllers\WorkController;
@@ -39,10 +40,10 @@ Route::middleware('auth')->group(function () {
 Route::get('/dashboard', DashboardController::class)->name('dashboard');
 
 Route::get('/calendar', CalendarController::class)->name('calendar.index');
-Route::view('/suppliers', 'suppliers.index')->name('suppliers.index');
-Route::view('/inventory', 'inventory.index')->name('inventory.index');
-Route::view('/assets', 'assets.index')->name('assets.index');
-Route::view('/reports', 'reports.index')->name('reports.index');
+Route::get('/suppliers', [ResourceOverviewController::class, 'suppliers'])->name('suppliers.index');
+Route::get('/inventory', [ResourceOverviewController::class, 'inventory'])->name('inventory.index');
+Route::get('/assets', [ResourceOverviewController::class, 'assets'])->name('assets.index');
+Route::get('/reports', \App\Http\Controllers\ReportController::class)->name('reports.index');
 Route::middleware('owner')->group(function () {
     Route::get('/settings', [BusinessSettingsController::class, 'edit'])->name('settings.index');
     Route::put('/settings', [BusinessSettingsController::class, 'update'])->name('settings.update');
