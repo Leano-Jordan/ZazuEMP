@@ -21,7 +21,7 @@
                 <section class="zazu-form-section">
                     <div class="zazu-form-section-head">
                         <div class="zazu-form-section-title">Route</div>
-                        <div class="zazu-form-section-copy">Manual routing is the current source. Zazu records the route evidence now and keeps the integration boundary replaceable later.</div>
+                        <div class="zazu-form-section-copy">Enter the route details used for this calculation. The saved result stays attached to this job.</div>
                     </div>
 
                     <div class="zazu-form-grid">
@@ -40,7 +40,7 @@
                             @error('route_label')<span class="zazu-field-error">{{ $message }}</span>@enderror
                         </label>
                         <div class="zazu-field">
-                            <span class="zazu-label">Routing source</span>
+                            <span class="zazu-label">Calculation method</span>
                             <div class="zazu-static-field">Manual calculation</div>
                             <span class="zazu-field-help">Zazu records the source used for this calculation. A route provider can be connected later without changing stored evidence.</span>
                         </div>
