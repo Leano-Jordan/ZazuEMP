@@ -132,9 +132,16 @@
         <main id="main-content" class="zazu-main" tabindex="-1">
             <header class="zazu-topbar">
                 <div class="zazu-topbar-inner">
-                    <div>
-                        <div class="zazu-eyebrow">{{ $business?->name ?? 'Zazu EMP' }}</div>
-                        <h1 class="zazu-page-title">{{ $heading ?? $title ?? 'Workspace' }}</h1>
+                    <div class="zazu-header-context">
+                        <div class="zazu-header-title-row">
+                            <div>
+                                <div class="zazu-eyebrow">Workspace · {{ $business?->name ?? 'Zazu EMP' }}</div>
+                                <h1 class="zazu-page-title">{{ $heading ?? $title ?? 'Workspace' }}</h1>
+                            </div>
+                            @if($business)
+                                <span class="zazu-workspace-status"><i aria-hidden="true"></i> Active</span>
+                            @endif
+                        </div>
                     </div>
 
                     <div class="zazu-topbar-actions">
