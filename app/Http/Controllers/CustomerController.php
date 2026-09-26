@@ -109,7 +109,7 @@ class CustomerController extends Controller
 
         $validated = $this->validated($request, $customer, false, $business->id);
         $oldPhotoPath = $customer->profile_photo_path;
-        $newPhotoPath = $request->file('profile_photo')?->store('profile-photos/customers', 'public');
+        $newPhotoPath = $request->file('profile_photo')?->store('profile-photos/customers', 'local');
 
         if ($newPhotoPath) {
             $validated['profile_photo_path'] = $newPhotoPath;
@@ -153,9 +153,11 @@ class CustomerController extends Controller
 
         if ($newPhotoPath && $oldPhotoPath) {
             Storage::disk('local')->delete($oldPhotoPath);
+            Storage::disk('public')->delete($oldPhotoPath);
         }
 
         if (!$newPhotoPath && $request->boolean('remove_profile_photo') && $oldPhotoPath) {
+            Storage::disk('local')->delete($oldPhotoPath);
             Storage::disk('public')->delete($oldPhotoPath);
         }
 
