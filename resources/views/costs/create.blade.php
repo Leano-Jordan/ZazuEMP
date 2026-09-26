@@ -2,7 +2,7 @@
     <x-slot:title>Add cost · {{ $event->name }}</x-slot:title>
     <x-slot:heading>Add cost</x-slot:heading>
     <x-slot:headerAction>
-        <a href="{{ route('work.costs.index', $event) }}" class="zazu-btn zazu-btn-ghost">← Costs</a>
+        <a href="{{ route('work.show', $event) }}" class="zazu-btn zazu-btn-ghost">Job workspace</a>
     </x-slot:headerAction>
 
     <section class="zazu-command-band">
