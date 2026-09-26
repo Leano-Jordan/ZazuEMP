@@ -37,6 +37,7 @@ class TravelCostController extends Controller
     public function store(Request $request, Event $event): RedirectResponse
     {
         $this->ensureBusiness($event, $request);
+        abort_if($event->isClosed(), 422, 'Closed work cannot receive new travel records.');
 
         $validated = $request->validate([
             'route_label' => ['required', 'string', 'max:100'],
