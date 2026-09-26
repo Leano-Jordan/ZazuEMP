@@ -2,7 +2,9 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Business;
 use App\Models\BusinessCapability;
+use App\Support\CurrentBusiness;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
@@ -12,7 +14,10 @@ class BusinessCapabilityController extends Controller
 {
     public function index(Request $request): View
     {
+        $business = $this->business($request);
+
         $capabilities = BusinessCapability::query()
+            ->where('business_id', $business->id)
             ->when($request->filled('category'), fn ($query) => $query->where('category', $request->string('category')))
             ->when($request->filled('search'), fn ($query) => $query->where('name', 'like', '%' . $request->string('search') . '%'))
             ->orderByDesc('is_active')
@@ -22,6 +27,7 @@ class BusinessCapabilityController extends Controller
             ->withQueryString();
 
         $categories = BusinessCapability::query()
+            ->where('business_id', $business->id)
             ->whereNotNull('category')
             ->where('category', '<>', '')
             ->distinct()
@@ -40,10 +46,13 @@ class BusinessCapabilityController extends Controller
 
     public function store(Request $request): RedirectResponse
     {
+        $business = $this->business($request);
         $validated = $this->validated($request);
+
         $photoPath = $request->file('image')?->store('catalogue', 'public');
 
         BusinessCapability::create($validated + [
+            'business_id' => $business->id,
             'image_path' => $photoPath,
             'is_active' => $request->boolean('is_active', true),
         ]);
@@ -53,8 +62,11 @@ class BusinessCapabilityController extends Controller
             ->with('success', 'Catalogue item added.');
     }
 
-    public function edit(BusinessCapability $capability): View
+    public function edit(Request $request, BusinessCapability $capability): View
     {
+        $business = $this->business($request);
+        $this->ensureBusiness($capability, $business);
+
         return view('capabilities.edit', [
             'capability' => $capability,
             'serviceCategories' => array_keys(config('zazu.service_categories')),
@@ -63,6 +75,9 @@ class BusinessCapabilityController extends Controller
 
     public function update(Request $request, BusinessCapability $capability): RedirectResponse
     {
+        $business = $this->business($request);
+        $this->ensureBusiness($capability, $business);
+
         $validated = $this->validated($request, $capability->category);
         $oldImagePath = $capability->image_path;
         $newImagePath = $request->file('image')?->store('catalogue', 'public');
@@ -81,6 +96,16 @@ class BusinessCapabilityController extends Controller
             ->with('success', 'Catalogue item updated.');
     }
 
+    private function business(Request $request): Business
+    {
+        return app(CurrentBusiness::class)->model($request->user());
+    }
+
+    private function ensureBusiness(BusinessCapability $capability, Business $business): void
+    {
+        abort_unless((int) $capability->business_id === (int) $business->id, 404);
+    }
+
     private function validated(Request $request, ?string $currentCategory = null): array
     {
         $categories = array_values(array_unique(array_filter([...array_keys(config('zazu.service_categories')), $currentCategory])));
@@ -93,7 +118,7 @@ class BusinessCapabilityController extends Controller
             'default_unit' => ['nullable', 'string', 'max:50'],
             'description' => ['nullable', 'string'],
             'image' => ['nullable', 'image', 'mimes:jpg,jpeg,png,webp', 'max:4096'],
-            'category' => ['nullable', 'string', 'max:100'],
+            'category' => ['required', 'string', 'max:100', 'in:' . implode(',', $categories)],
         ]);
     }
 }
