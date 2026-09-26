@@ -28,7 +28,9 @@ class UiAccessibilityTest extends TestCase
         $response->assertSee('data-theme-icon-moon', false);
         $response->assertSee('aria-pressed="false"', false);
         $response->assertSee('data-user-menu', false);
-        $response->assertSee('action="/logout"', false);
+        $response->assertSee('data-user-trigger', false);
+        $response->assertSee('data-user-popover', false);
+        $response->assertSee('Sign out', false);
         $response->assertSee('name="viewport"', false);
         $response->assertSee('viewport-fit=cover', false);
     }
