@@ -3,7 +3,7 @@
     <x-slot:heading>Settings</x-slot:heading>
 
     <section class="zazu-command-band">
-        <div><div class="zazu-eyebrow">System</div><h2 class="zazu-command-title">Business controls</h2><p class="zazu-command-copy">Configuration, access and privacy controls belong here as the platform becomes production-ready.</p></div>
+        <div><div class="zazu-eyebrow">System</div><h2 class="zazu-command-title">Business settings</h2><p class="zazu-command-copy">Manage business settings, user access and privacy here.</p></div>
     </section>
 
     <section class="zazu-settings-grid">
@@ -28,7 +28,7 @@
         <div class="zazu-card zazu-setting-card">
             <div class="zazu-card-title">Security & access</div>
             <div class="zazu-card-description">Authentication, active business context, server-side business isolation, role permissions and protected media are required before real customer or staff data is handled in production.</div>
-            <span class="zazu-chip zazu-chip-warning mt-4">Production gate</span>
+            <span class="zazu-chip zazu-chip-warning mt-4">Important for live use</span>
         </div>
     </section>
 
