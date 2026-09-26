@@ -209,6 +209,60 @@ class TaxComplianceTest extends TestCase
 
     }
 
+    public function test_accepted_quote_revision_returns_quote_to_draft(): void
+    {
+        $business = Business::create([
+            'name' => 'Revision Lifecycle Business',
+            'slug' => 'revision-lifecycle-business',
+            'status' => 'active',
+            'currency' => 'ZAR',
+        ]);
+
+        $this->signInAsOwner($business);
+
+        $customer = Customer::create([
+            'business_id' => $business->id,
+            'name' => 'Revision Lifecycle Customer',
+        ]);
+
+        $event = Event::create([
+            'business_id' => $business->id,
+            'customer_id' => $customer->id,
+            'reference' => 'ZAZ-REV-001',
+            'name' => 'Revision Lifecycle Event',
+            'event_date' => '2026-10-23',
+            'status' => 'draft',
+        ]);
+
+        $requirement = EventRequirement::create([
+            'event_id' => $event->id,
+            'description' => '10 tables',
+            'quantity' => 10,
+            'unit' => 'tables',
+            'status' => 'open',
+        ]);
+
+        $this->post(route('work.quotes.store', $event), [
+            'currency' => 'ZAR',
+            'unit_price' => [$requirement->id => '100.00'],
+        ]);
+
+        $quote = $event->quotes()->firstOrFail();
+
+        $this->patch(route('quotes.status', $quote), ['status' => 'sent']);
+        $this->patch(route('quotes.status', $quote), ['status' => 'accepted']);
+
+        $this->assertSame('accepted', $quote->refresh()->status);
+
+        $this->post(route('quotes.versions.store', $quote))
+            ->assertRedirect();
+
+        $quote->refresh();
+
+        $this->assertSame('draft', $quote->status);
+        $this->assertSame('draft', $quote->latestVersion->status);
+    }
+
     public function test_direct_invoice_calculates_from_itemized_lines(): void
     {
         $business = Business::create([
