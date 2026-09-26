@@ -477,3 +477,12 @@ Verification:
 - Current Laravel CI run for commit 04bd790 is still in progress after the cross-field identifier hardening.
 - Browser traversal, real email delivery and the owner's local Windows database remain runtime-only verification boundaries.
 - The example environment uses the log mailer, so local reset messages are logged rather than delivered externally unless deployment configuration supplies a real mail transport.
+
+
+## Git control policy — owner directive — 2026-09-26
+
+- Zazu EMP uses exactly one Git branch: main.
+- Do not create, maintain, merge, or recommend feature/fix/release branches unless the owner explicitly overrides this rule.
+- All implementation, hardening, verification fixes and documentation updates are committed directly to main.
+- No branch-merging workflow is used.
+- Repository branch state verified after cleanup: main only.
