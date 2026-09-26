@@ -142,10 +142,10 @@
                         <span class="zazu-stage-marker"></span>
                         <div><div class="zazu-stage-title">Travel & costing</div><div class="zazu-stage-copy">Route, fuel and customer charge</div></div>
                     </a>
-                    <div class="zazu-stage">
+                    <a href="{{ route('work.preparation.index', $event) }}" class="zazu-stage">
                         <span class="zazu-stage-marker"></span>
-                        <div><div class="zazu-stage-title">Preparation</div><div class="zazu-stage-copy">Buying and readiness</div></div>
-                    </div>
+                        <div><div class="zazu-stage-title">Preparation</div><div class="zazu-stage-copy">Readiness and practical checks</div></div>
+                    </a>
                     <div class="zazu-stage">
                         <span class="zazu-stage-marker"></span>
                         <div><div class="zazu-stage-title">Execution</div><div class="zazu-stage-copy">Delivery and accountability</div></div>
