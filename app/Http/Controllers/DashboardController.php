@@ -5,7 +5,6 @@ namespace App\Http\Controllers;
 use App\Models\Customer;
 use App\Models\Event;
 use App\Models\Quote;
-use App\Models\Business;
 use Illuminate\View\View;
 
 class DashboardController extends Controller
