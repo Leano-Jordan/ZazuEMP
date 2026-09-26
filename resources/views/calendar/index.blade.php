@@ -1,32 +1,38 @@
-<x-skeleton-page
-    eyebrow="Operations"
-    title="Calendar"
-    description="A work-first calendar for dates, preparation windows, event days and follow-up timing."
->
-    <section class="zazu-calendar-shell">
-        <div class="zazu-card-header">
-            <div class="zazu-card-title">October 2026</div>
-            <div class="zazu-card-description">Skeleton calendar surface. Real work records will populate the grid later.</div>
-        </div>
-        <div class="zazu-calendar-grid">
-            @foreach (['Mon','Tue','Wed','Thu','Fri','Sat','Sun'] as $day)
-                <div class="zazu-calendar-label">{{ $day }}</div>
-            @endforeach
-            @for ($i = 1; $i <= 35; $i++)
-                <div class="zazu-calendar-cell">
-                    @if ($i <= 31)
-                        <span class="zazu-calendar-date">{{ $i }}</span>
-                        @if (in_array($i, [3, 8, 14, 21, 27]))
-                            <span class="zazu-calendar-event">Work</span>
-                        @endif
-                    @endif
-                </div>
-            @endfor
+<x-app-layout>
+    <x-slot:title>Calendar</x-slot:title>
+    <x-slot:heading>Calendar</x-slot:heading>
+    <x-slot:headerAction><a href="{{ route('work.create') }}" class="zazu-btn zazu-btn-primary">Create work</a></x-slot:headerAction>
+
+    <section class="zazu-command-band">
+        <div><div class="zazu-eyebrow">Operations / Calendar</div><h2 class="zazu-command-title">{{ $monthLabel }}</h2><p class="zazu-command-copy">Live Work records grouped by event date. Removed work stays out of active planning.</p></div>
+        <div class="flex flex-wrap gap-2">
+            <a href="{{ route('calendar.index', ['month' => $previousMonth]) }}" class="zazu-btn zazu-btn-ghost">← Previous</a>
+            <a href="{{ route('calendar.index') }}" class="zazu-btn zazu-btn-secondary">Current</a>
+            <a href="{{ route('calendar.index', ['month' => $nextMonth]) }}" class="zazu-btn zazu-btn-ghost">Next →</a>
         </div>
     </section>
 
-    <div class="zazu-skeleton-actions">
-        <a href="{{ route('work.index') }}" class="zazu-btn zazu-btn-secondary">Open work</a>
-        <a href="{{ route('quotes.index') }}" class="zazu-btn zazu-btn-ghost">Quotes →</a>
-    </div>
-</x-skeleton-page>
+    <section class="zazu-calendar-shell">
+        <div class="zazu-calendar-grid">
+            @foreach (['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'] as $label)
+                <div class="zazu-calendar-label">{{ $label }}</div>
+            @endforeach
+            @foreach ($days as $day)
+                @php
+                    $key = $day->format('Y-m-d');
+                    $isCurrentMonth = $day->month === $month->month;
+                    $dayEvents = $eventsByDate->get($key, collect());
+                @endphp
+                <div class="zazu-calendar-cell {{ $isCurrentMonth ? '' : 'opacity-45' }}">
+                    <div class="zazu-calendar-date">{{ $day->format('j') }}</div>
+                    @foreach ($dayEvents as $event)
+                        <a href="{{ route('work.show', $event) }}" class="zazu-calendar-event block no-underline">{{ $event->name }}</a>
+                    @endforeach
+                    @if ($dayEvents->isEmpty() && $isCurrentMonth)
+                        <span class="text-[9px] text-[var(--zazu-faint)]">No work</span>
+                    @endif
+                </div>
+            @endforeach
+        </div>
+    </section>
+</x-app-layout>

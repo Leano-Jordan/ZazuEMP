@@ -132,3 +132,34 @@ Travel costing foundation implemented in this cycle:
 
 ## Operating rule
 Execute the smallest complete outcome that advances the current stage. Protect future scale without building speculative infrastructure. Every meaningful change ends with verification, regression checking and updated project memory.
+
+
+## Foundation sweep - 2026-09-26
+
+Completed:
+- [x] Customer edit workflow
+- [x] Customer profile photo capture/update/remove
+- [x] Optional Day and Night customer contacts during creation
+- [x] Additional customer contact create/edit/remove workflow
+- [x] Primary-contact protection during removal
+- [x] Work edit and active-record removal controls
+- [x] Work Day and Night contact assignment
+- [x] Work soft deletion with historical data retained
+- [x] Historical Event lookup preserved for Quotes after Work removal
+- [x] Dashboard connected to live Work/Customer/Quote signals
+- [x] Calendar connected to live Work dates
+- [x] Shared customer/profile avatar component
+- [x] User/staff profile photo field prepared in the data model
+- [x] Expected-route registration test
+- [x] Blade named-route integrity test
+- [x] Customer/contact/profile-photo workflow tests
+- [x] Work edit/removal/day-night tests
+- [x] Privacy engineering baseline documented
+
+Commercial/security boundaries recorded:
+- Profile photos are validated to approved image formats and a size limit.
+- Development photo delivery currently uses Laravel's public disk so the feature can be exercised.
+- Production must use authenticated/business-authorized media access for identifiable customer and staff images.
+- Authentication, active business context, business isolation, roles/permissions, auditability and retention/deletion workflows remain production gates.
+- Soft deletion preserves history; it is not a substitute for a lawful retention schedule.
+- Local PHPUnit/migrations/browser rendering remain unverified in this environment.

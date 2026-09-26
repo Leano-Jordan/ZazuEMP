@@ -3,39 +3,70 @@
     <x-slot:heading>Dashboard</x-slot:heading>
 
     <section class="zazu-command-band">
-        <div>
-            <div class="zazu-eyebrow">Overview</div>
-            <h2 class="zazu-command-title">Your operating desk</h2>
-            <p class="zazu-command-copy">A single starting point for the work, relationships, commercial activity and resources that keep the business moving.</p>
-        </div>
-        <div class="zazu-command-meta">
-            <div class="zazu-command-meta-label">Workspace</div>
-            <div class="zazu-command-meta-value">Zazu</div>
-        </div>
+        <div><div class="zazu-eyebrow">Overview</div><h2 class="zazu-command-title">Your operating desk</h2><p class="zazu-command-copy">A live starting point for work, relationships and commercial activity.</p></div>
+        <div class="zazu-command-meta"><div class="zazu-command-meta-label">Today</div><div class="zazu-command-meta-value">{{ now()->format('d M') }}</div></div>
     </section>
 
-    <section class="zazu-module-grid">
-        @php
-            $modules = [
-                ['label' => 'Work', 'copy' => 'Events, jobs and operational workspaces.', 'route' => 'work.index', 'group' => 'Operations'],
-                ['label' => 'Customers', 'copy' => 'Relationships, contacts and work history.', 'route' => 'customers.index', 'group' => 'Relationships'],
-                ['label' => 'Quotes', 'copy' => 'Commercial offers and quote versions.', 'route' => 'quotes.index', 'group' => 'Commercial'],
-                ['label' => 'Calendar', 'copy' => 'Upcoming work, dates and operational timing.', 'route' => 'calendar.index', 'group' => 'Operations'],
-                ['label' => 'Suppliers', 'copy' => 'Buying relationships and supplier records.', 'route' => 'suppliers.index', 'group' => 'Resources'],
-                ['label' => 'Inventory', 'copy' => 'Stock, availability and movement.', 'route' => 'inventory.index', 'group' => 'Resources'],
-                ['label' => 'Assets', 'copy' => 'Reusable equipment and accountability.', 'route' => 'assets.index', 'group' => 'Resources'],
-                ['label' => 'Reports', 'copy' => 'Operational and commercial visibility.', 'route' => 'reports.index', 'group' => 'Insights'],
-                ['label' => 'Settings', 'copy' => 'Business configuration and system controls.', 'route' => 'settings.index', 'group' => 'System'],
-                ['label' => 'Capabilities', 'copy' => 'Reusable services, rentals and products.', 'route' => 'capabilities.index', 'group' => 'Catalogue'],
-            ];
-        @endphp
+    <section class="zazu-metric-grid">
+        <div class="zazu-metric-card"><div class="zazu-metric-label">Active work</div><div class="zazu-metric-value">{{ $metrics['active_work'] }}</div><div class="zazu-metric-copy">Current event and job workspaces.</div></div>
+        <div class="zazu-metric-card"><div class="zazu-metric-label">Next 14 days</div><div class="zazu-metric-value">{{ $metrics['upcoming_work'] }}</div><div class="zazu-metric-copy">Work with scheduled dates.</div></div>
+        <div class="zazu-metric-card"><div class="zazu-metric-label">Customers</div><div class="zazu-metric-value">{{ $metrics['customers'] }}</div><div class="zazu-metric-copy">Relationship records available.</div></div>
+        <div class="zazu-metric-card"><div class="zazu-metric-label">Draft quotes</div><div class="zazu-metric-value">{{ $metrics['draft_quotes'] }}</div><div class="zazu-metric-copy">Offers still in draft state.</div></div>
+    </section>
 
-        @foreach ($modules as $module)
+    <div class="zazu-detail-grid">
+        <section class="zazu-panel">
+            <div class="zazu-panel-head">
+                <div><div class="zazu-panel-title">Upcoming work</div><div class="zazu-panel-copy">Operational records with future event dates.</div></div>
+                <a href="{{ route('calendar.index') }}" class="zazu-btn zazu-btn-secondary">Calendar</a>
+            </div>
+            <div class="zazu-list mt-3">
+                @forelse ($upcoming as $event)
+                    <div class="zazu-list-item">
+                        <a href="{{ route('work.show', $event) }}" class="zazu-list-main min-w-0 flex-1">
+                            <div class="zazu-list-title">{{ $event->name }}</div>
+                            <div class="zazu-list-meta">{{ $event->customer?->name ?? 'No customer' }} · {{ $event->reference }}</div>
+                        </a>
+                        <div class="zazu-list-side"><div class="zazu-side-primary">{{ $event->event_date?->format('d M Y') }}</div><div class="zazu-side-secondary">{{ $event->event_type ?: 'Work' }}</div></div>
+                    </div>
+                @empty
+                    <div class="zazu-empty"><div class="zazu-empty-title">Nothing scheduled yet</div><p class="zazu-empty-copy">Create Work with an event date and it will appear here and on the calendar.</p><a href="{{ route('work.create') }}" class="zazu-btn zazu-btn-primary mt-5">Create work</a></div>
+                @endforelse
+            </div>
+        </section>
+
+        <section class="zazu-panel">
+            <div class="zazu-panel-title">Jump into work</div>
+            <div class="zazu-panel-copy">Go straight to the operational surface you need.</div>
+            <div class="mt-4 grid gap-2">
+                @foreach ([
+                    ['label' => 'Work', 'route' => 'work.index'],
+                    ['label' => 'Customers', 'route' => 'customers.index'],
+                    ['label' => 'Quotes', 'route' => 'quotes.index'],
+                    ['label' => 'Capabilities', 'route' => 'capabilities.index'],
+                    ['label' => 'Settings', 'route' => 'settings.index'],
+                ] as $item)
+                    <a href="{{ route($item['route']) }}" class="flex items-center justify-between rounded-lg border border-[var(--zazu-border)] bg-[var(--zazu-surface-2)] px-3 py-2 text-xs font-semibold text-[var(--zazu-ink-2)] no-underline hover:border-[var(--zazu-border-strong)] hover:text-[var(--zazu-link)]"><span>{{ $item['label'] }}</span><span aria-hidden="true">→</span></a>
+                @endforeach
+            </div>
+        </section>
+    </div>
+
+    <section class="zazu-module-grid mt-5">
+        @foreach ([
+            ['label' => 'Work', 'copy' => 'Events, jobs and operational workspaces.', 'route' => 'work.index', 'group' => 'Operations'],
+            ['label' => 'Customers', 'copy' => 'Relationships, contacts and work history.', 'route' => 'customers.index', 'group' => 'Relationships'],
+            ['label' => 'Quotes', 'copy' => 'Commercial offers and quote versions.', 'route' => 'quotes.index', 'group' => 'Commercial'],
+            ['label' => 'Calendar', 'copy' => 'Dates and operational timing.', 'route' => 'calendar.index', 'group' => 'Operations'],
+            ['label' => 'Suppliers', 'copy' => 'Buying relationships.', 'route' => 'suppliers.index', 'group' => 'Resources'],
+            ['label' => 'Inventory', 'copy' => 'Stock and movement.', 'route' => 'inventory.index', 'group' => 'Resources'],
+            ['label' => 'Assets', 'copy' => 'Reusable equipment and accountability.', 'route' => 'assets.index', 'group' => 'Resources'],
+            ['label' => 'Reports', 'copy' => 'Operational and commercial visibility.', 'route' => 'reports.index', 'group' => 'Insights'],
+            ['label' => 'Settings', 'copy' => 'Business and system controls.', 'route' => 'settings.index', 'group' => 'System'],
+            ['label' => 'Capabilities', 'copy' => 'Reusable services, rentals and products.', 'route' => 'capabilities.index', 'group' => 'Catalogue'],
+        ] as $module)
             <a href="{{ route($module['route']) }}" class="zazu-module">
-                <div class="zazu-module-top">
-                    <span class="zazu-module-group">{{ $module['group'] }}</span>
-                    <span class="zazu-module-arrow">→</span>
-                </div>
+                <div class="zazu-module-top"><span class="zazu-module-group">{{ $module['group'] }}</span><span class="zazu-module-arrow" aria-hidden="true">→</span></div>
                 <div class="zazu-module-title">{{ $module['label'] }}</div>
                 <div class="zazu-module-copy">{{ $module['copy'] }}</div>
             </a>

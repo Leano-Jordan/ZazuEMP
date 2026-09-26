@@ -26,7 +26,7 @@
         @forelse ($customers as $customer)
             <div class="zazu-list-item">
                 <a href="{{ route('customers.show', $customer) }}" class="zazu-row-with-avatar min-w-0 flex-1">
-                    <div class="zazu-avatar">{{ \Illuminate\Support\Str::upper(\Illuminate\Support\Str::substr($customer->name, 0, 1)) }}</div>
+                    <x-profile-avatar :name="$customer->name" :path="$customer->profile_photo_path" size="sm" />
                     <div class="zazu-list-main">
                         <div class="zazu-list-title">{{ $customer->name }}</div>
                         <div class="zazu-list-meta">
@@ -35,9 +35,12 @@
                         </div>
                     </div>
                 </a>
-                <div class="zazu-list-side">
-                    <div class="zazu-side-primary">{{ $customer->events_count }} {{ $customer->events_count === 1 ? 'work item' : 'work items' }}</div>
-                    <a href="{{ route('work.create', ['customer_id' => $customer->id]) }}" class="zazu-side-secondary">Start work →</a>
+                <div class="flex flex-wrap items-center justify-end gap-2">
+                    <div class="zazu-list-side">
+                        <div class="zazu-side-primary">{{ $customer->events_count }} {{ $customer->events_count === 1 ? 'work item' : 'work items' }}</div>
+                        <a href="{{ route('work.create', ['customer_id' => $customer->id]) }}" class="zazu-side-secondary">Start work →</a>
+                    </div>
+                    <a href="{{ route('customers.edit', $customer) }}" class="zazu-btn zazu-btn-ghost">Edit</a>
                 </div>
             </div>
         @empty

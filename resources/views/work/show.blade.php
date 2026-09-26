@@ -4,6 +4,10 @@
     <x-slot:headerAction>
         <a href="{{ route('work.requirements.create', $event) }}" class="zazu-btn zazu-btn-primary">Add requirement</a>
         <a href="{{ route('work.edit', $event) }}" class="zazu-btn zazu-btn-secondary">Edit work</a>
+        <form method="POST" action="{{ route('work.destroy', $event) }}" onsubmit="return confirm('Remove this work from active operations? Historical records will be retained.')">
+            @csrf @method('DELETE')
+            <button type="submit" class="zazu-btn zazu-btn-ghost text-[var(--zazu-danger-ink)]">Remove</button>
+        </form>
         <a href="{{ route('work.index') }}" class="zazu-btn zazu-btn-ghost">← All work</a>
     </x-slot:headerAction>
 
@@ -51,11 +55,20 @@
                         <div class="zazu-detail-value">{{ $event->customer?->name ?? $event->customer_name }}</div>
                     </div>
                     <div class="zazu-detail-row">
-                        <div class="zazu-detail-label">Event-day</div>
+                        <div class="zazu-detail-label">Day contact</div>
                         <div class="zazu-detail-value">
                             {{ $event->eventDayContact?->name ?? 'Not selected' }}
                             @if ($event->eventDayContact?->phone)
                                 <div class="mt-1 text-[11px] font-normal text-[var(--zazu-muted)]">{{ $event->eventDayContact->phone }}</div>
+                            @endif
+                        </div>
+                    </div>
+                    <div class="zazu-detail-row">
+                        <div class="zazu-detail-label">Night contact</div>
+                        <div class="zazu-detail-value">
+                            {{ $event->eventNightContact?->name ?? 'Not selected' }}
+                            @if ($event->eventNightContact?->phone)
+                                <div class="mt-1 text-[11px] font-normal text-[var(--zazu-muted)]">{{ $event->eventNightContact->phone }}</div>
                             @endif
                         </div>
                     </div>

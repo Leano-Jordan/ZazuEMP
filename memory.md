@@ -314,3 +314,35 @@ UNVERIFIED:
 - light/dark rendered inspection
 - local PHPUnit execution after the latest changes
 - local build after the latest changes
+
+
+## Foundation sweep completed - 2026-09-26
+
+Execution batch expanded the existing Zazu foundation across relationship, Work, navigation, accessibility/privacy and file-profile foundations.
+
+Implemented:
+- Customer edit/update surface and visible lifecycle controls.
+- Customer creation now accepts optional profile photo plus optional Day and Night contacts.
+- Customer contact create/edit/remove surface; primary contact removal is protected.
+- Work edit/update/remove controls exposed from active Work surfaces.
+- Work creation and editing support optional Day and Night contacts, with server-side customer ownership validation.
+- Event and contact soft deletes preserve historical references.
+- Quote -> Event relationship resolves soft-removed Work records.
+- Dashboard and Calendar are live data-backed surfaces rather than static skeletons.
+- Shared profile avatar component renders initials or stored profile photos.
+- Customer and User models have profile photo paths; staff photo editing remains behind the future authenticated profile/access layer.
+- Dead Laravel welcome view removed because it referenced unregistered login/register routes.
+- Route integrity tests cover expected registered routes and scan Blade literal route calls.
+- Customer/contact and Work lifecycle tests added/updated.
+- POPIA/OWASP/WCAG engineering baseline documented in docs/ZAZU_PRIVACY_BASELINE.md.
+
+Verification boundary:
+- GitHub main branch was re-inspected after the sweep.
+- Route references were statically reviewed and a repository test was added for automated verification.
+- PHPUnit, fresh migrations and browser/light-dark/responsive runtime traversal have not been executed in this environment.
+- Zazu still lacks authentication, active business context, server-side business isolation, roles/permissions and private/authenticated media delivery. These remain production security/privacy gates, not cosmetic follow-ups.
+
+Legal/security design:
+- Personal information minimisation, purpose limitation, security safeguards and retention/deletion principles are reflected in the feature design.
+- Soft delete is used for operational history preservation but is not treated as a permanent retention policy.
+- Profile-photo uploads use an allowlist and size limit, while production should serve identifiable images through an authenticated/authorised boundary.
