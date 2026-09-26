@@ -122,6 +122,13 @@
                             {{ $headerAction }}
                         @endisset
 
+                        @auth
+                            <div class="flex items-center gap-2 rounded-lg border border-[var(--zazu-border)] bg-[var(--zazu-surface-2)] px-2 py-1">
+                                <x-profile-avatar :name="auth()->user()->name" :path="auth()->user()->profile_photo_path" size="sm" />
+                                <span class="hidden text-[11px] font-semibold text-[var(--zazu-ink-2)] sm:inline">{{ auth()->user()->name }}</span>
+                            </div>
+                        @endauth
+
                         <button type="button" class="zazu-theme-toggle" data-theme-toggle aria-pressed="false">
                             <span data-theme-icon aria-hidden="true">◐</span>
                             <span data-theme-label>Dark</span>
