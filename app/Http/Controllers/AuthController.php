@@ -41,22 +41,23 @@ class AuthController extends Controller
         app(CurrentBusiness::class)->resolve($request->user());
 
         if ($request->boolean('owner_access')) {
-            $business = app(CurrentBusiness::class)->resolve($request->user());
-            $isOwner = $business
-                && $request->user()->businesses()
-                    ->whereKey($business->id)
-                    ->wherePivot('role', 'owner')
-                    ->exists();
+            $business = $request->user()->businesses()
+                ->where('businesses.status', 'active')
+                ->wherePivot('role', 'owner')
+                ->orderBy('businesses.id')
+                ->first();
 
-            if (!$isOwner) {
+            if (!$business) {
                 Auth::logout();
                 $request->session()->invalidate();
                 $request->session()->regenerateToken();
 
                 throw ValidationException::withMessages([
-                    'email' => 'This account does not have owner access to the active workspace.',
+                    'email' => 'This account does not have owner access to an active workspace.',
                 ]);
             }
+
+            $request->session()->put(CurrentBusiness::SESSION_KEY, $business->id);
 
             return redirect()->route('owner.dashboard');
         }
