@@ -29,7 +29,11 @@ class EventPreparationController extends Controller
     {
         $this->ensureBusiness($event, $request);
 
-        return view('preparation.create', compact('event'));
+        return view('preparation.create', [
+            'event' => $event,
+            'categories' => config('zazu.readiness_categories'),
+            'units' => config('zazu.units'),
+        ]);
     }
 
     public function store(Request $request, Event $event): RedirectResponse
