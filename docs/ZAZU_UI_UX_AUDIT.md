@@ -83,3 +83,19 @@ Colour contrast was checked for the principal foreground/background relationship
 The repository workflow was aligned to PHP 8.4 because the current dependency lock contains Symfony 8.1 packages requiring PHP 8.4.1 or newer while the project itself permits PHP 8.3 and above.
 
 A pre-hardening CI failure was confirmed at Composer installation because the workflow was running PHP 8.3 against the current lock set. The workflow was corrected to PHP 8.4. Subsequent commits continue to verify the resulting application state through GitHub Actions.
+
+
+## 2026-09-26 implementation cycle: typography, branding and remaining pages
+
+- [x] Local-first typography stack: no external font dependency; uses installed system fonts with accessible fallbacks.
+- [x] Business logo upload and application-shell branding.
+- [x] Configurable dashboard artwork.
+- [x] Configurable workspace wallpaper with readability overlay in light/dark mode.
+- [x] Dashboard metrics are actionable links to the information they describe.
+- [x] Resource and reporting foundation pages now distinguish live navigation from planned functionality and avoid fake data.
+- [x] Settings page now provides a real business appearance workflow.
+- [x] Business context is created for an authenticated account that has no assigned business, establishing an explicit owner relationship.
+- [x] Image uploads are constrained to raster formats and size limits.
+- [x] CI verification passed on current HEAD after the cycle.
+
+Design rule retained: branding is business-owned, not user-owned. Operational records should remain separate from presentation artwork.
