@@ -34,19 +34,25 @@
         <div class="zazu-detail-stack">
             <section class="zazu-card zazu-list">
                 <div class="zazu-card-header">
-                    <div class="zazu-card-title">Services and prices</div>
-                    <div class="zazu-card-description">The services and prices saved in this quote version.</div>
+                    <div class="zazu-eyebrow">Quote lines</div>
+                    <div class="zazu-card-title mt-1">Services and prices</div>
+                    <div class="zazu-card-description">Each row is one saved commercial line.</div>
                 </div>
+                @if (($version?->items?->count() ?? 0) > 0)
+                    <div class="zazu-record-header" style="--zazu-record-cols: 2">
+                        <div class="zazu-record-header-note">Service</div>
+                        <div class="zazu-record-header-cell">Unit price</div>
+                        <div class="zazu-record-header-cell">Line total</div>
+                    </div>
+                @endif
                 @forelse ($version?->items ?? [] as $item)
                     <div class="zazu-list-item">
                         <div class="zazu-list-main">
                             <div class="zazu-list-title">{{ $item->description }}</div>
                             <div class="zazu-list-meta">{{ number_format((float) $item->quantity, 2) }} {{ $item->unit ?: 'units' }} · {{ $item->pricing_basis ?: 'Custom pricing' }}</div>
                         </div>
-                        <div class="zazu-list-side">
-                            <div class="zazu-side-primary">{{ number_format((float) $item->unit_price, 2) }}</div>
-                            <div class="zazu-side-secondary">{{ number_format((float) $item->line_total, 2) }}</div>
-                        </div>
+                        <div class="zazu-list-side"><div class="zazu-side-primary">{{ $quote->currency }} {{ number_format((float) $item->unit_price, 2) }}</div></div>
+                        <div class="zazu-list-side"><div class="zazu-side-primary">{{ $quote->currency }} {{ number_format((float) $item->line_total, 2) }}</div></div>
                     </div>
                 @empty
                     <div class="zazu-empty">No quote lines.</div>
@@ -54,8 +60,9 @@
             </section>
 
             <section class="zazu-panel">
-                <div class="zazu-panel-title">Historical snapshot</div>
-                <div class="zazu-panel-copy">The quote stores the source requirement values used when this revision was created.</div>
+                <div class="zazu-eyebrow">Integrity</div>
+                <div class="zazu-panel-title mt-1">Historical snapshot</div>
+                <div class="zazu-panel-copy">This revision stores the source requirement values used when it was created.</div>
                 <div class="zazu-placeholder">
                     <div class="zazu-placeholder-title">Source snapshots preserved</div>
                     <div class="zazu-placeholder-copy">Changing the current Work requirements does not rewrite the saved quote line descriptions, quantities or source metadata.</div>
@@ -65,7 +72,8 @@
 
         <aside class="zazu-detail-stack">
             <section class="zazu-panel">
-                <div class="zazu-panel-title">Totals</div>
+                <div class="zazu-eyebrow">Commercial summary</div>
+                <div class="zazu-panel-title mt-1">Totals</div>
                 <div class="zazu-detail-rows">
                     <div class="zazu-detail-row"><div class="zazu-detail-label">Subtotal</div><div class="zazu-detail-value">{{ $quote->currency }} {{ number_format((float) ($version?->subtotal ?? 0), 2) }}</div></div>
                     <div class="zazu-detail-row"><div class="zazu-detail-label">Tax</div><div class="zazu-detail-value">{{ $quote->currency }} {{ number_format((float) ($version?->tax_total ?? 0), 2) }}</div></div>
@@ -74,7 +82,8 @@
             </section>
 
             <section class="zazu-panel">
-                <div class="zazu-panel-title">Version history</div>
+                <div class="zazu-eyebrow">Revision history</div>
+                <div class="zazu-panel-title mt-1">Versions</div>
                 <div class="zazu-panel-copy">Each revision remains a separate commercial snapshot.</div>
                 <div class="zazu-stage-list">
                     @foreach ($quote->versions->sortByDesc('version') as $quoteVersion)
@@ -91,7 +100,8 @@
 
             @if ($version?->notes)
                 <section class="zazu-panel">
-                    <div class="zazu-panel-title">Notes</div>
+                    <div class="zazu-eyebrow">Notes</div>
+                    <div class="zazu-panel-title mt-1">Quote notes</div>
                     <div class="mt-3 text-xs leading-6 text-[var(--zazu-ink-2)]">{{ $version->notes }}</div>
                 </section>
             @endif
