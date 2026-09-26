@@ -45,6 +45,134 @@
 
             <section class="zazu-form-section">
                 <div class="zazu-form-section-head">
+                    <div class="zazu-form-section-title">Tax & compliance profile</div>
+                    <div class="zazu-form-section-copy">Store the business identity, tax registrations and activity flags that Zazu can reuse when preparing commercial and compliance documents.</div>
+                </div>
+
+                <div class="zazu-form-grid">
+                    <label class="zazu-field zazu-field-medium">
+                        <span class="zazu-label">Legal business name</span>
+                        <input name="legal_name" value="{{ old('legal_name', $business->taxProfile?->legal_name ?? $business->name) }}" class="zazu-input">
+                    </label>
+                    <label class="zazu-field">
+                        <span class="zazu-label">Trading name</span>
+                        <input name="trading_name" value="{{ old('trading_name', $business->taxProfile?->trading_name) }}" class="zazu-input">
+                    </label>
+                    <label class="zazu-field">
+                        <span class="zazu-label">Registration type</span>
+                        <select name="registration_type" class="zazu-select">
+                            @foreach(['company'=>'Company','sole_proprietor'=>'Sole proprietor','close_corporation'=>'Close corporation','trust'=>'Trust','cooperative'=>'Co-operative','other'=>'Other / specialist'] as $code => $label)
+                                <option value="{{ $code }}" @selected(old('registration_type', $business->taxProfile?->registration_type) === $code)>{{ $label }}</option>
+                            @endforeach
+                        </select>
+                    </label>
+                    <label class="zazu-field">
+                        <span class="zazu-label">Registration number</span>
+                        <input name="registration_number" value="{{ old('registration_number', $business->taxProfile?->registration_number) }}" class="zazu-input">
+                    </label>
+                    <label class="zazu-field">
+                        <span class="zazu-label">Income tax number</span>
+                        <input name="income_tax_number" value="{{ old('income_tax_number', $business->taxProfile?->income_tax_number ?? $business->tax_number) }}" class="zazu-input">
+                    </label>
+                    <label class="zazu-field">
+                        <span class="zazu-label">Tax regime</span>
+                        <select name="tax_regime" class="zazu-select">
+                            @foreach($taxRegimes as $code => $label)
+                                <option value="{{ $code }}" @selected(old('tax_regime', $business->taxProfile?->tax_regime ?? 'standard_income_tax') === $code)>{{ $label }}</option>
+                            @endforeach
+                        </select>
+                    </label>
+                    <label class="zazu-field">
+                        <span class="zazu-label">VAT status</span>
+                        <select name="vat_status" id="vat-status" class="zazu-select" required>
+                            @foreach($vatStatuses as $code => $label)
+                                <option value="{{ $code }}" @selected(old('vat_status', $business->taxProfile?->vat_status ?? 'not_registered') === $code)>{{ $label }}</option>
+                            @endforeach
+                        </select>
+                    </label>
+                    <label class="zazu-field">
+                        <span class="zazu-label">VAT registration number</span>
+                        <input name="vat_number" value="{{ old('vat_number', $business->taxProfile?->vat_number) }}" class="zazu-input">
+                        @error('vat_number')<span class="zazu-field-error">{{ $message }}</span>@enderror
+                    </label>
+                    <label class="zazu-field">
+                        <span class="zazu-label">Default VAT rate (%)</span>
+                        <input name="default_vat_rate" value="{{ old('default_vat_rate', $taxRates->firstWhere('code', 'VAT_STANDARD')?->rate ?? config('zazu.tax.default_standard_rate')) }}" class="zazu-input" inputmode="decimal" type="number" min="0" max="100" step="0.01" required>
+                        <span class="zazu-field-help">Current SARS standard VAT rate is 15%; only apply a different rate when the applicable rule supports it.</span>
+                        @error('default_vat_rate')<span class="zazu-field-error">{{ $message }}</span>@enderror
+                    </label>
+                    <label class="zazu-field">
+                        <span class="zazu-label">Tax rate effective from</span>
+                        <input name="tax_effective_from" value="{{ old('tax_effective_from', now()->toDateString()) }}" class="zazu-input" type="date" required>
+                        <span class="zazu-field-help">Zazu creates an effective-dated rate instead of changing old quote history.</span>
+                    </label>
+                    <label class="zazu-field">
+                        <span class="zazu-label">PAYE number</span>
+                        <input name="paye_number" value="{{ old('paye_number', $business->taxProfile?->paye_number) }}" class="zazu-input">
+                    </label>
+                    <label class="zazu-field">
+                        <span class="zazu-label">UIF number</span>
+                        <input name="uif_number" value="{{ old('uif_number', $business->taxProfile?->uif_number) }}" class="zazu-input">
+                    </label>
+                    <label class="zazu-field">
+                        <span class="zazu-label">SDL number</span>
+                        <input name="sdl_number" value="{{ old('sdl_number', $business->taxProfile?->sdl_number) }}" class="zazu-input">
+                    </label>
+                    <label class="zazu-field">
+                        <span class="zazu-label">Financial year end</span>
+                        <input name="financial_year_end" value="{{ old('financial_year_end', optional($business->taxProfile?->financial_year_end)->format('Y-m-d')) }}" class="zazu-input" type="date">
+                    </label>
+                    <label class="zazu-field">
+                        <span class="zazu-label">Representative taxpayer</span>
+                        <input name="representative_name" value="{{ old('representative_name', $business->taxProfile?->representative_name) }}" class="zazu-input">
+                    </label>
+                    <label class="zazu-field">
+                        <span class="zazu-label">Representative email</span>
+                        <input name="representative_email" value="{{ old('representative_email', $business->taxProfile?->representative_email) }}" class="zazu-input" type="email">
+                    </label>
+                    <label class="zazu-field">
+                        <span class="zazu-label">TCS reference</span>
+                        <input name="tcs_reference" value="{{ old('tcs_reference', $business->taxProfile?->tcs_reference) }}" class="zazu-input">
+                        <span class="zazu-field-help">SARS uses the Good Standing TCS application for tender-related compliance status.</span>
+                    </label>
+                    <label class="zazu-field">
+                        <span class="zazu-label">TCS PIN expiry</span>
+                        <input name="tcs_pin_expires_at" value="{{ old('tcs_pin_expires_at', optional($business->taxProfile?->tcs_pin_expires_at)->format('Y-m-d')) }}" class="zazu-input" type="date">
+                    </label>
+                    <label class="zazu-field zazu-field-wide">
+                        <span class="zazu-label">TCS PIN</span>
+                        <input name="tcs_pin" value="" class="zazu-input" autocomplete="off" placeholder="{{ $business->taxProfile?->tcs_pin ? 'PIN stored securely — leave blank to keep it' : 'Enter only when needed' }}">
+                        <span class="zazu-field-help">Stored encrypted. Zazu should never display or expose the PIN unnecessarily.</span>
+                    </label>
+                    <div class="zazu-field zazu-field-wide">
+                        <span class="zazu-label">Business activity flags</span>
+                        <div class="flex flex-wrap gap-4 mt-2">
+                            @foreach(['food_handling'=>'Handles food','employees'=>'Employs staff','government_supply'=>'Supplies government','tendering'=>'Prepares tenders','regulated_activity'=>'Other regulated activity'] as $flag => $label)
+                                <label class="zazu-check-row"><input type="checkbox" name="{{ $flag }}" value="1" @checked(old($flag, $business->taxProfile?->activity_flags[$flag] ?? false))><span>{{ $label }}</span></label>
+                            @endforeach
+                        </div>
+                    </div>
+                    <label class="zazu-field zazu-field-wide">
+                        <span class="zazu-label">Compliance notes</span>
+                        <textarea name="compliance_notes" rows="3" class="zazu-textarea">{{ old('compliance_notes', $business->taxProfile?->compliance_notes) }}</textarea>
+                    </label>
+                </div>
+            </section>
+
+            <section class="zazu-form-section">
+                <div class="zazu-form-section-head">
+                    <div class="zazu-form-section-title">Tender & evidence readiness</div>
+                    <div class="zazu-form-section-copy">Keep the source documents behind the business boundary so Zazu can build evidence packs without making a legal or procurement decision for the business.</div>
+                </div>
+                <div class="zazu-panel">
+                    <div class="zazu-panel-title">Compliance Centre</div>
+                    <div class="zazu-panel-copy mt-1">Track CIPC, SARS, CSD, B-BBEE, UIF/SDL/COID, food-premises and tender-specific evidence where applicable.</div>
+                    <a href="{{ route('settings.compliance') }}" class="zazu-btn zazu-btn-secondary mt-4">Open Compliance Centre</a>
+                </div>
+            </section>
+
+            <section class="zazu-form-section">
+                <div class="zazu-form-section-head">
                     <div class="zazu-form-section-title">Branding images</div>
                     <div class="zazu-form-section-copy">Use clear images. Zazu keeps the original upload and displays it responsively.</div>
                 </div>
