@@ -14,7 +14,9 @@ class CurrentBusiness
         $user ??= auth()->user();
 
         if ($user) {
-            $selectedId = request()->session()->get(self::SESSION_KEY);
+            $request = request();
+            $hasSession = $request->hasSession();
+            $selectedId = $hasSession ? $request->session()->get(self::SESSION_KEY) : null;
 
             $query = $user->businesses()
                 ->where('businesses.status', 'active');
@@ -26,13 +28,13 @@ class CurrentBusiness
                     return $selected;
                 }
 
-                request()->session()->forget(self::SESSION_KEY);
+                $request->session()->forget(self::SESSION_KEY);
             }
 
             $business = $query->orderBy('businesses.id')->first();
 
-            if ($business) {
-                request()->session()->put(self::SESSION_KEY, $business->id);
+            if ($business && $hasSession) {
+                $request->session()->put(self::SESSION_KEY, $business->id);
             }
 
             return $business;
@@ -75,6 +77,17 @@ class CurrentBusiness
         request()->session()->put(self::SESSION_KEY, $business->id);
 
         return $business;
+    }
+
+    public function hasRole(string $role, ?Authenticatable $user = null, ?Business $business = null): bool
+    {
+        $user ??= auth()->user();
+        $business ??= $this->resolve($user);
+
+        return (bool) ($user && $business && $user->businesses()
+            ->whereKey($business->id)
+            ->wherePivot('role', $role)
+            ->exists());
     }
 
     public function id(?Authenticatable $user = null): int
