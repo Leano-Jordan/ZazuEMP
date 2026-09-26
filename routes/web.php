@@ -34,11 +34,14 @@ Route::middleware(['auth', 'owner'])->group(function () {
 });
 
 
-Route::middleware('auth')->group(function () {
+Route::middleware(['auth', 'business.context'])->group(function () {
 
 
 
 Route::get('/dashboard', DashboardController::class)->name('dashboard');
+Route::get('/media/profile/{type}/{id}', [\App\Http\Controllers\ProfileMediaController::class, 'show'])
+    ->whereIn('type', ['customer', 'user'])
+    ->name('profile.media');
 
 Route::get('/calendar', CalendarController::class)->name('calendar.index');
 Route::get('/suppliers', [ResourceOverviewController::class, 'suppliers'])->name('suppliers.index');
@@ -103,7 +106,9 @@ Route::middleware('owner')->group(function () {
 });
 
 
-    Route::post('/business/switch', [BusinessContextController::class, 'change'])->name('business.switch');
+});
 
+Route::middleware('auth')->group(function () {
+    Route::post('/business/switch', [BusinessContextController::class, 'change'])->name('business.switch');
     Route::post('/logout', [\App\Http\Controllers\AuthController::class, 'destroy'])->name('logout');
 });

@@ -144,7 +144,7 @@
                                     aria-controls="zazu-user-menu"
                                     aria-label="Open account menu"
                                 >
-                                    <x-profile-avatar :name="auth()->user()->name" :path="auth()->user()->profile_photo_path" size="sm" />
+                                    <x-profile-avatar :name="auth()->user()->name" :path="auth()->user()->profile_photo_path" media-type="user" :media-id="auth()->id()" size="sm" />
                                     <span class="zazu-user-identity">
                                         <strong>{{ auth()->user()->name }}</strong>
                                         <span>Account</span>
@@ -154,7 +154,7 @@
 
                                 <div class="zazu-user-popover" id="zazu-user-menu" data-user-popover hidden>
                                     <div class="zazu-user-popover-head">
-                                        <x-profile-avatar :name="auth()->user()->name" :path="auth()->user()->profile_photo_path" size="md" />
+                                        <x-profile-avatar :name="auth()->user()->name" :path="auth()->user()->profile_photo_path" media-type="user" :media-id="auth()->id()" size="md" />
                                         <div class="min-w-0">
                                             <strong class="zazu-user-popover-name">{{ auth()->user()->name }}</strong>
                                             <span class="zazu-user-popover-email">{{ auth()->user()->email }}</span>
