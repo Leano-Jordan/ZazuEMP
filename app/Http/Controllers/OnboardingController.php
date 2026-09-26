@@ -11,6 +11,33 @@ use Illuminate\View\View;
 
 class OnboardingController extends Controller
 {
+    public function index(Request $request): View
+    {
+        $business = $this->currentBusiness($request);
+        $business->loadMissing('taxProfile');
+
+        $catalogueStatus = $this->setupStatus(
+            $business->catalogue_setup_completed_at,
+            $business->catalogue_setup_skipped_at,
+            $business->capabilities()->exists()
+        );
+
+        $businessStatus = $this->setupStatus(
+            $business->business_setup_completed_at,
+            $business->business_setup_skipped_at,
+            filled($business->email) || filled($business->phone) || filled($business->address)
+        );
+
+        $taxStatus = $business->taxProfile ? 'in_progress' : 'not_started';
+
+        return view('onboarding.index', compact(
+            'business',
+            'catalogueStatus',
+            'businessStatus',
+            'taxStatus'
+        ));
+    }
+
     public function catalogue(Request $request): View|RedirectResponse
     {
         $business = $this->currentBusiness($request);
@@ -52,36 +79,47 @@ class OnboardingController extends Controller
         ]);
 
         if ($request->boolean('add_another')) {
+            $business->update(['catalogue_setup_skipped_at' => null]);
+
             return redirect()
                 ->route('onboarding.catalogue')
-                ->with('success', 'Added to your catalogue. Add another item when you are ready.');
+                ->with('success', 'Added to your catalogue. Add another service, product or rental.');
         }
 
-        $business->update(['catalogue_setup_completed_at' => now()]);
+        $business->update([
+            'catalogue_setup_completed_at' => now(),
+            'catalogue_setup_skipped_at' => null,
+        ]);
 
         return redirect()
             ->route('onboarding.business')
-            ->with('success', 'Catalogue setup saved. Now add your business details.');
+            ->with('success', 'Services saved. Now complete your business identity.');
     }
 
     public function finishCatalogue(Request $request): RedirectResponse
     {
         $business = $this->currentBusiness($request);
-        $business->update(['catalogue_setup_completed_at' => now()]);
+        $business->update([
+            'catalogue_setup_completed_at' => now(),
+            'catalogue_setup_skipped_at' => null,
+        ]);
 
         return redirect()
             ->route('onboarding.business')
-            ->with('success', 'Catalogue setup saved. Now add your business details.');
+            ->with('success', 'Services setup saved. Continue with your business identity.');
     }
 
     public function skipCatalogue(Request $request): RedirectResponse
     {
         $business = $this->currentBusiness($request);
-        $business->update(['catalogue_setup_completed_at' => now()]);
+        $business->update([
+            'catalogue_setup_completed_at' => null,
+            'catalogue_setup_skipped_at' => now(),
+        ]);
 
         return redirect()
             ->route('onboarding.business')
-            ->with('info', 'You can add products and services later from Services & prices.');
+            ->with('info', 'Services setup was deferred. You can resume it from Setup Centre or Services & prices.');
     }
 
     public function business(Request $request): View|RedirectResponse
@@ -112,7 +150,10 @@ class OnboardingController extends Controller
             'currency' => ['required', 'in:' . implode(',', array_keys(config('zazu.currencies')))],
         ]);
 
-        $business->update($validated + ['business_setup_completed_at' => now()]);
+        $business->update($validated + [
+            'business_setup_completed_at' => now(),
+            'business_setup_skipped_at' => null,
+        ]);
 
         return redirect()
             ->route('dashboard')
@@ -122,11 +163,27 @@ class OnboardingController extends Controller
     public function skipBusiness(Request $request): RedirectResponse
     {
         $business = $this->currentBusiness($request);
-        $business->update(['business_setup_completed_at' => now()]);
+        $business->update([
+            'business_setup_completed_at' => null,
+            'business_setup_skipped_at' => now(),
+        ]);
 
         return redirect()
             ->route('dashboard')
-            ->with('info', 'Business details can be completed later from Settings.');
+            ->with('info', 'Business details were deferred. You can resume setup from Setup Centre or Settings.');
+    }
+
+    private function setupStatus($completedAt, $skippedAt, bool $hasData): string
+    {
+        if ($completedAt) {
+            return 'completed';
+        }
+
+        if ($skippedAt) {
+            return 'deferred';
+        }
+
+        return $hasData ? 'in_progress' : 'not_started';
     }
 
     private function currentBusiness(Request $request): Business
