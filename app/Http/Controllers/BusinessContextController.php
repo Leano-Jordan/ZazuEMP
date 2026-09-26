@@ -8,7 +8,7 @@ use Illuminate\Http\Request;
 
 class BusinessContextController extends Controller
 {
-    public function switch(Request $request): RedirectResponse
+    public function change(Request $request): RedirectResponse
     {
         $validated = $request->validate([
             'business_id' => ['required', 'integer'],
