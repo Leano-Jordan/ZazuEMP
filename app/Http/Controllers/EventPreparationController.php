@@ -8,6 +8,7 @@ use App\Support\CurrentBusiness;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Validation\Rule;
 use Illuminate\View\View;
 
 class EventPreparationController extends Controller
@@ -44,7 +45,7 @@ class EventPreparationController extends Controller
             'title' => ['required', 'string', 'max:255'],
             'category' => ['nullable', Rule::in(array_keys(config('zazu.readiness_categories')))],
             'quantity' => ['nullable', 'numeric', 'min:0'],
-            'unit' => ['nullable', Rule::in(array_keys(config('zazu.units')))],
+            'unit' => ['nullable', 'string', 'max:50'],
             'status' => ['required', 'in:open,blocked,ready'],
             'due_date' => ['nullable', 'date'],
             'notes' => ['nullable', 'string'],
