@@ -12,16 +12,25 @@
             <p class="zazu-command-copy">Keep the people and organisations behind your work in one place, ready to become operational records.</p>
         </div>
         <div class="zazu-command-meta">
-            <div class="zazu-command-meta-label">Customers</div>
+            <div class="zazu-command-meta-label">Records</div>
             <div class="zazu-command-meta-value">{{ $customers->total() }}</div>
         </div>
     </section>
 
     <section class="zazu-card zazu-list">
         <div class="zazu-card-header">
-            <div class="zazu-card-title">Your customers</div>
-            <div class="zazu-card-description">Open a customer to see the relationship and work history, or start work directly.</div>
+            <div class="zazu-eyebrow">Records</div>
+            <div class="zazu-card-title mt-1">Customer list</div>
+            <div class="zazu-card-description">Each row is one customer record. Select a name to open its relationship workspace.</div>
         </div>
+
+        @if ($customers->count())
+            <div class="zazu-record-header" style="--zazu-record-cols: 2">
+                <div class="zazu-record-header-note">Customer</div>
+                <div class="zazu-record-header-cell">Work</div>
+                <div class="zazu-record-header-cell">Actions</div>
+            </div>
+        @endif
 
         @forelse ($customers as $customer)
             <div class="zazu-list-item">
@@ -35,11 +44,11 @@
                         </div>
                     </div>
                 </a>
-                <div class="flex flex-wrap items-center justify-end gap-2">
-                    <div class="zazu-list-side">
-                        <div class="zazu-side-primary">{{ $customer->events_count }} {{ $customer->events_count === 1 ? 'work item' : 'work items' }}</div>
-                        <a href="{{ route('work.create', ['customer_id' => $customer->id]) }}" class="zazu-side-secondary">Start work →</a>
-                    </div>
+                <div class="zazu-list-side">
+                    <div class="zazu-side-primary">{{ $customer->events_count }} {{ $customer->events_count === 1 ? 'work item' : 'work items' }}</div>
+                </div>
+                <div class="zazu-action-group">
+                    <a href="{{ route('work.create', ['customer_id' => $customer->id]) }}" class="zazu-btn zazu-btn-secondary">Start work</a>
                     <a href="{{ route('customers.edit', $customer) }}" class="zazu-btn zazu-btn-ghost">Edit</a>
                 </div>
             </div>
