@@ -90,7 +90,7 @@ This is the living execution map for Zazu EMP. Work it in order unless repositor
 
 ## Current execution position — 2026-09-26
 
-Active slice: **Commercial → Quote foundation**
+Completed slices: **Commercial → Quote foundation** and **Planning & Resources → Travel costing foundation**
 
 Implemented in this cycle:
 - Quote identity and version tables
@@ -112,7 +112,9 @@ Not yet proven locally:
 - rendered responsive/light/dark verification
 - customer-facing quote document generation
 
-Next execution slice: **Planning & Resources → Travel costing**, unless repository evidence changes that sequence.
+Current execution slice: **Planning & Resources → Travel costing foundation** is implemented.
+
+Next execution slice: **Planning & Resources → Projected vs actual costs / preparation workspace**, unless repository evidence changes that sequence.
 
 
 Travel costing foundation implemented in this cycle:
