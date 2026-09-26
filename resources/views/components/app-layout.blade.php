@@ -3,7 +3,7 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-    <meta name="theme-color" content="#0d4f43">
+    <meta name="theme-color" content="#38b8c7">
     @php($business = app(\App\Support\CurrentBusiness::class)->resolve(auth()->user()))
     @php($businesses = auth()->user()->businesses()->where('businesses.status', 'active')->orderBy('businesses.name')->get())
     @php($isOwner = app(\App\Support\CurrentBusiness::class)->hasRole('owner', auth()->user(), $business))
@@ -20,14 +20,14 @@
     </script>
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
-<body class="{{ $business?->wallpaper_path ? 'zazu-has-wallpaper' : '' }}" data-business-currency="{{ $business?->currency ?? 'ZAR' }}" @if($business?->wallpaper_path) style="--zazu-wallpaper: url('{{ e(Storage::disk('public')->url($business->wallpaper_path)) }}')" @endif>
+<body class="{{ $business?->wallpaper_path ? 'zazu-has-wallpaper' : '' }}" data-business-currency="{{ $business?->currency ?? 'ZAR' }}" @if($business?->wallpaper_path) style="--zazu-wallpaper: url('{{ e(route('business.media', ['type' => 'wallpaper'])) }}')" @endif>
     <a class="zazu-skip-link" href="#main-content">Skip to main content</a>
     <div class="zazu-shell">
         <aside class="zazu-sidebar">
             <div class="zazu-brand">
                 <a href="{{ route('dashboard') }}" class="zazu-brand-link">
                     @if ($business?->logo_path)
-                        <img src="{{ Storage::disk('public')->url($business->logo_path) }}" alt="{{ $business->name }} logo" class="zazu-brand-logo">
+                        <img src="{{ route('business.media', ['type' => 'logo']) }}" alt="{{ $business->name }} logo" class="zazu-brand-logo">
                     @endif
                     <span class="zazu-brand-word">{{ $business?->name ?? 'zazu' }}</span>
                 </a>
