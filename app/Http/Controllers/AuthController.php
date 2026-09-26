@@ -18,7 +18,7 @@ class AuthController extends Controller
     public function create(Request $request): View
     {
         return view('auth.login', [
-            'ownerAccess' => $request->boolean('owner'),
+            'ownerAccess' => $request->boolean('owner') || $request->routeIs('owner.login'),
         ]);
     }
 
@@ -43,13 +43,15 @@ class AuthController extends Controller
             })
             ->first();
 
-        if (!$user || !Hash::check($credentials['password'], $user->password)) {
+        if (!$user || !Auth::attempt([
+            'id' => $user->id,
+            'password' => $credentials['password'],
+        ], $request->boolean('remember'))) {
             throw ValidationException::withMessages([
                 'identifier' => 'We could not sign you in with those details.',
             ]);
         }
 
-        Auth::login($user, $request->boolean('remember'));
         $request->session()->regenerate();
 
         app(CurrentBusiness::class)->resolve($request->user());
