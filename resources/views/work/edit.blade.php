@@ -37,6 +37,9 @@
                                     Customer is locked because this Work record already has a quote. This protects historical commercial attribution.
                                 </div>
                             @endif
+                            @if ($hasQuotes)
+                                <input type="hidden" name="customer_id" value="{{ $event->customer_id }}">
+                            @endif
                             <select id="customer_id" name="customer_id" required class="zazu-select" @disabled($hasQuotes)>
                                 @foreach ($customers as $customer)
                                     <option value="{{ $customer->id }}" @selected(old('customer_id', $event->customer_id) == $customer->id)>{{ $customer->name }}</option>
