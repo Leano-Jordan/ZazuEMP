@@ -63,7 +63,7 @@ class BusinessCapabilityController extends Controller
 
     public function update(Request $request, BusinessCapability $capability): RedirectResponse
     {
-        $validated = $this->validated($request);
+        $validated = $this->validated($request, $capability->category);
         $oldImagePath = $capability->image_path;
         $newImagePath = $request->file('image')?->store('catalogue', 'public');
 
@@ -81,9 +81,9 @@ class BusinessCapabilityController extends Controller
             ->with('success', 'Catalogue item updated.');
     }
 
-    private function validated(Request $request): array
+    private function validated(Request $request, ?string $currentCategory = null): array
     {
-        $categories = array_keys(config('zazu.service_categories'));
+        $categories = array_values(array_unique(array_filter([...array_keys(config('zazu.service_categories')), $currentCategory])));
 
         return $request->validate([
             'name' => ['required', 'string', 'max:255'],
