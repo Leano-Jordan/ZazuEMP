@@ -6,7 +6,7 @@
         <div>
             <div class="zazu-eyebrow">Business identity</div>
             <h2 class="zazu-command-title">Make Zazu look like your business</h2>
-            <p class="zazu-command-copy">Use your logo and artwork throughout the workspace. Images stay with this business and are used only where configured.</p>
+            <p class="zazu-command-copy">Use your logo, default currency and artwork throughout the workspace. Images stay with this business and are used only where configured.</p>
         </div>
     </section>
 
@@ -21,10 +21,20 @@
                     <div class="zazu-form-section-copy">This name appears in the application shell and business records.</div>
                 </div>
                 <div class="zazu-form-grid">
-                    <label class="zazu-field zazu-field-wide">
+                    <label class="zazu-field">
                         <span class="zazu-label">Business name <span class="zazu-required">*</span></span>
                         <input name="name" value="{{ old('name', $business->name) }}" class="zazu-input" required>
                         @error('name')<span class="zazu-field-error">{{ $message }}</span>@enderror
+                    </label>
+                    <label class="zazu-field">
+                        <span class="zazu-label">Default currency <span class="zazu-required">*</span></span>
+                        <select name="currency" class="zazu-select" required>
+                            @foreach ($currencies as $code => $label)
+                                <option value="{{ $code }}" @selected(old('currency', $business->currency ?? 'ZAR') === $code)>{{ $label }}</option>
+                            @endforeach
+                        </select>
+                        <span class="zazu-field-help">New quotes, costs and travel records use this as their starting currency.</span>
+                        @error('currency')<span class="zazu-field-error">{{ $message }}</span>@enderror
                     </label>
                 </div>
             </section>
