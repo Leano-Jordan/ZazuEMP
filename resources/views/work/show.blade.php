@@ -2,7 +2,8 @@
     <x-slot:title>{{ $event->name }}</x-slot:title>
     <x-slot:heading>{{ $event->name }}</x-slot:heading>
     <x-slot:headerAction>
-        <a href="{{ route('work.edit', $event) }}" class="zazu-btn zazu-btn-primary">Edit work</a>
+        <a href="{{ route('work.requirements.create', $event) }}" class="zazu-btn zazu-btn-primary">Add requirement</a>
+        <a href="{{ route('work.edit', $event) }}" class="zazu-btn zazu-btn-secondary">Edit work</a>
         <a href="{{ route('work.index') }}" class="zazu-btn zazu-btn-ghost">← All work</a>
     </x-slot:headerAction>
 
@@ -39,6 +40,9 @@
                         <div class="zazu-panel-title">Customer relationship</div>
                         <div class="zazu-panel-copy">The customer and event-day contact behind this work.</div>
                     </div>
+                    @if ($event->customer)
+                        <a href="{{ route('customers.show', $event->customer) }}" class="zazu-btn zazu-btn-ghost">Open customer</a>
+                    @endif
                 </div>
 
                 <div class="zazu-detail-rows">
@@ -62,14 +66,18 @@
                 <div class="zazu-panel-head">
                     <div>
                         <div class="zazu-panel-title">Requirements & services</div>
-                        <div class="zazu-panel-copy">Reusable capabilities will be selected here before commercial quoting.</div>
+                        <div class="zazu-panel-copy">Work-specific quantities and deliverables before commercial quoting.</div>
                     </div>
-                    <a href="{{ route('capabilities.index') }}" class="zazu-btn zazu-btn-secondary">Capability catalogue</a>
+                    <div class="flex flex-wrap gap-2">
+                        <a href="{{ route('work.requirements.index', $event) }}" class="zazu-btn zazu-btn-secondary">Requirements</a>
+                        <a href="{{ route('capabilities.index') }}" class="zazu-btn zazu-btn-ghost">Capability catalogue</a>
+                    </div>
                 </div>
 
                 <div class="zazu-placeholder">
-                    <div class="zazu-placeholder-title">Requirement selection is the next workflow layer</div>
-                    <div class="zazu-placeholder-copy">The capability catalogue is ready. The next connection is to select those reusable definitions against this specific work item.</div>
+                    <div class="zazu-placeholder-title">Build the requirement register</div>
+                    <div class="zazu-placeholder-copy">Select reusable capabilities where useful, then record the quantity and specification this particular work item needs.</div>
+                    <a href="{{ route('work.requirements.create', $event) }}" class="zazu-btn zazu-btn-primary mt-4">Add requirement</a>
                 </div>
             </section>
 
@@ -103,21 +111,26 @@
                 <div class="zazu-panel-copy">The workspace grows from this record into the operational layers below.</div>
 
                 <div class="zazu-stage-list">
-                    @foreach ([
-                        ['title' => 'Work', 'copy' => 'Core event or job record', 'current' => true],
-                        ['title' => 'Requirements', 'copy' => 'Capabilities and quantities', 'current' => false],
-                        ['title' => 'Quote', 'copy' => 'Commercial offer and versions', 'current' => false],
-                        ['title' => 'Preparation', 'copy' => 'Buying and readiness', 'current' => false],
-                        ['title' => 'Execution', 'copy' => 'Delivery and accountability', 'current' => false],
-                    ] as $stage)
-                        <div class="zazu-stage {{ $stage['current'] ? 'current' : '' }}">
-                            <span class="zazu-stage-marker"></span>
-                            <div>
-                                <div class="zazu-stage-title">{{ $stage['title'] }}</div>
-                                <div class="zazu-stage-copy">{{ $stage['copy'] }}</div>
-                            </div>
-                        </div>
-                    @endforeach
+                    <a href="{{ route('work.show', $event) }}" class="zazu-stage current">
+                        <span class="zazu-stage-marker"></span>
+                        <div><div class="zazu-stage-title">Work</div><div class="zazu-stage-copy">Core event or job record</div></div>
+                    </a>
+                    <a href="{{ route('work.requirements.index', $event) }}" class="zazu-stage">
+                        <span class="zazu-stage-marker"></span>
+                        <div><div class="zazu-stage-title">Requirements</div><div class="zazu-stage-copy">Capabilities and quantities</div></div>
+                    </a>
+                    <div class="zazu-stage">
+                        <span class="zazu-stage-marker"></span>
+                        <div><div class="zazu-stage-title">Quote</div><div class="zazu-stage-copy">Commercial offer and versions</div></div>
+                    </div>
+                    <div class="zazu-stage">
+                        <span class="zazu-stage-marker"></span>
+                        <div><div class="zazu-stage-title">Preparation</div><div class="zazu-stage-copy">Buying and readiness</div></div>
+                    </div>
+                    <div class="zazu-stage">
+                        <span class="zazu-stage-marker"></span>
+                        <div><div class="zazu-stage-title">Execution</div><div class="zazu-stage-copy">Delivery and accountability</div></div>
+                    </div>
                 </div>
             </section>
 
