@@ -152,6 +152,13 @@
                     </div>
                 @endif
 
+                @if (session('error'))
+                    <div class="zazu-alert zazu-alert-error" role="alert">
+                        <strong>Action needed.</strong>
+                        <span>{{ session('error') }}</span>
+                    </div>
+                @endif
+
                 @if ($errors->any())
                     <div class="zazu-alert zazu-alert-error" role="alert">
                         <strong>Check this record.</strong>
