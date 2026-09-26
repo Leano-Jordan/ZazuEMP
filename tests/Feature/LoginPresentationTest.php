@@ -24,5 +24,11 @@ class LoginPresentationTest extends TestCase
             ->assertDontSee('zazu-login-visual', false)
             ->assertDontSee('catering.webp', false)
             ->assertDontSee('<img', false);
+
+        $css = file_get_contents(resource_path('css/app.css'));
+
+        $this->assertIsString($css);
+        $this->assertStringNotContainsString('catering.webp', $css);
+        $this->assertStringNotContainsString('.zazu-login-visual', $css);
     }
 }
