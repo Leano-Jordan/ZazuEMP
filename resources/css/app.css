@@ -1166,12 +1166,20 @@ textarea:focus-visible {
     }
 
     .zazu-mobile-nav {
+        position: fixed;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        z-index: 40;
         display: flex;
         gap: 5px;
         overflow-x: auto;
-        padding: 9px 18px;
-        border-bottom: 1px solid var(--zazu-border);
-        background: var(--zazu-sidebar);
+        padding: 8px 18px calc(8px + env(safe-area-inset-bottom));
+        border-top: 1px solid var(--zazu-border);
+        background: color-mix(in srgb, var(--zazu-sidebar) 97%, var(--zazu-page));
+        box-shadow: 0 -8px 24px color-mix(in srgb, var(--zazu-ink) 8%, transparent);
+        -webkit-overflow-scrolling: touch;
+        scrollbar-width: none;
     }
 
     .zazu-mobile-nav::-webkit-scrollbar {
@@ -1198,6 +1206,10 @@ textarea:focus-visible {
     .zazu-content {
         padding-left: 18px;
         padding-right: 18px;
+    }
+
+    .zazu-content {
+        padding-bottom: 92px;
     }
 
     .zazu-form-aside {
