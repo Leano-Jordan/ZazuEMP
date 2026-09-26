@@ -19,7 +19,11 @@ class WorkPlanningWorkflowTest extends TestCase
         $business = Business::create([
             'name' => 'Planning Test Business',
             'slug' => 'planning-test-'.Str::lower(Str::random(8)),
+            'status' => 'active',
+            'currency' => 'ZAR',
         ]);
+
+        $this->signInAsOwner($business);
 
         return Event::create([
             'business_id' => $business->id,
