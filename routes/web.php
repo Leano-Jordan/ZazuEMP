@@ -20,6 +20,9 @@ Route::get('/', fn () => redirect()->route('dashboard'));
 
 Route::middleware('guest')->group(function () {
     Route::get('/login', [\App\Http\Controllers\AuthController::class, 'create'])->name('login');
+    Route::get('/owner/login', [\App\Http\Controllers\AuthController::class, 'create'])
+        ->defaults('owner', true)
+        ->name('owner.login');
     Route::post('/login', [\App\Http\Controllers\AuthController::class, 'store'])
         ->middleware('throttle:login')
         ->name('login.store');
