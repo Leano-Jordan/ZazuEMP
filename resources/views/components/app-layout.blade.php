@@ -17,6 +17,7 @@
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
 <body>
+    <a class="zazu-skip-link" href="#main-content">Skip to main content</a>
     <div class="zazu-shell">
         <aside class="zazu-sidebar">
             <div class="zazu-brand">
@@ -109,7 +110,7 @@
             </div>
         </aside>
 
-        <main class="zazu-main">
+        <main id="main-content" class="zazu-main" tabindex="-1">
             <header class="zazu-topbar">
                 <div class="zazu-topbar-inner">
                     <div>
@@ -152,6 +153,13 @@
             </nav>
 
             <div class="zazu-content">
+                @if ($errors->any())
+                    <div class="zazu-error-summary" role="alert" tabindex="-1" data-error-summary>
+                        <div class="zazu-error-summary-title">Please check the highlighted fields.</div>
+                        <ul class="zazu-error-summary-list" data-error-summary-list></ul>
+                    </div>
+                @endif
+
                 @if (session('success'))
                     <div class="zazu-alert zazu-alert-success" role="status">
                         <strong>Saved.</strong>
@@ -166,16 +174,60 @@
                     </div>
                 @endif
 
-                @if ($errors->any())
-                    <div class="zazu-alert zazu-alert-error" role="alert">
-                        <strong>Check this record.</strong>
-                        <span>Please correct the highlighted information and try again.</span>
-                    </div>
-                @endif
-
                 {{ $slot }}
             </div>
         </main>
     </div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        document.querySelectorAll('.zazu-field').forEach((field) => {
+            const control = field.querySelector('input, select, textarea');
+            if (!control) return;
+
+            if (control.required) control.setAttribute('aria-required', 'true');
+
+            const error = field.querySelector('.zazu-field-error');
+            if (error) {
+                const errorId = control.id ? control.id + '-error' : 'zazu-error-' + Math.random().toString(36).slice(2, 10);
+                error.id = errorId;
+                control.setAttribute('aria-invalid', 'true');
+                control.setAttribute('aria-describedby', errorId);
+            }
+
+            const name = (control.getAttribute('name') || '').toLowerCase();
+            if (name.includes('phone')) {
+                control.setAttribute('inputmode', 'tel');
+                control.setAttribute('autocomplete', 'tel');
+            } else if (control.type === 'email' || name.includes('email')) {
+                control.setAttribute('inputmode', 'email');
+                control.setAttribute('autocomplete', 'email');
+            }
+        });
+
+        const summary = document.querySelector('[data-error-summary]');
+        const list = document.querySelector('[data-error-summary-list]');
+        if (summary && list) {
+            document.querySelectorAll('.zazu-field-error').forEach((error) => {
+                const field = error.closest('.zazu-field');
+                const control = field?.querySelector('input, select, textarea');
+                if (!control || !error.textContent.trim()) return;
+
+                if (!control.id) control.id = 'zazu-field-' + Math.random().toString(36).slice(2, 10);
+                const item = document.createElement('li');
+                const link = document.createElement('a');
+                link.href = '#' + control.id;
+                link.textContent = error.textContent.trim();
+                item.appendChild(link);
+                list.appendChild(item);
+            });
+
+            if (list.children.length) {
+                summary.hidden = false;
+                summary.focus();
+            }
+        }
+    });
+</script>
 </body>
 </html>
