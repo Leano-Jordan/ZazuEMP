@@ -130,3 +130,29 @@ Verification:
 Security boundary:
 - Business isolation is now enforced in the touched domain/query/write paths.
 - Full authentication, explicit active-business selection, role/permission authorization and authenticated media delivery remain production gates.
+
+
+## 2026-09-26 commercial hardening cycle
+
+Implemented:
+- [x] Header theme control reduced to an icon-only 42px control with accessible labelling and persistent theme state.
+- [x] Signed-in identity changed from a passive status chip to a compact account control with name, account context, email and secure POST sign-out action.
+- [x] Account menu closes on outside interaction and Escape.
+- [x] Removed internal/developer-facing wording from recently added customer, Work, travel and quote surfaces where users were being told about implementation/source mechanics.
+- [x] Service selection no longer forces a system-selected description into a read-only field; selected service details remain editable by the operator.
+- [x] Removed placeholder authentication artwork text.
+- [x] Image upload controls use constrained file-input sizing rather than inheriting full-width field treatment.
+- [x] Business identity controls use constrained widths appropriate to their data.
+- [x] Added UI regression assertions for icon-only theme and account controls.
+
+Commercial interaction discipline:
+- Icon-only controls retain accessible names.
+- Actions are visually differentiated by hierarchy rather than oversized controls.
+- Field width is constrained according to content type where a full-width treatment adds no value.
+- Static explanatory copy does not expose implementation terminology.
+- Existing workflow routes and server-side business-scope checks were left intact.
+
+Verification boundary:
+- Current GitHub source was re-read after the changes.
+- Source-level checks confirmed the removed theme label, read-only service description behaviour and placeholder authentication copy are absent from the changed files.
+- Runtime browser traversal, Blade compilation, local PHPUnit and fresh migration execution remain unverified in this environment.
