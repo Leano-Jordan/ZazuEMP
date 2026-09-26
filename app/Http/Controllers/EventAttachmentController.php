@@ -50,6 +50,16 @@ class EventAttachmentController extends Controller
             ->with('success', 'Files added to the job.');
     }
 
+    public function download(Request $request, EventAttachment $attachment)
+    {
+        $business = $this->business($request);
+        abort_unless((int) $attachment->business_id === (int) $business->id, 404);
+
+        abort_unless(Storage::disk($attachment->disk)->exists($attachment->path), 404);
+
+        return Storage::disk($attachment->disk)->download($attachment->path, $attachment->original_name);
+    }
+
     public function destroy(Request $request, EventAttachment $attachment): RedirectResponse
     {
         $business = $this->business($request);
