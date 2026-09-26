@@ -39,6 +39,7 @@ class TravelCostWorkflowTest extends TestCase
             'notes' => 'Manual route evidence',
         ]);
 
+        $response->assertSessionDoesntHaveErrors();
         $travel = TravelCost::query()->firstOrFail();
 
         $response->assertRedirect(route('work.travel.index', $event));
@@ -73,6 +74,7 @@ class TravelCostWorkflowTest extends TestCase
             'customer_rate_per_km' => 10,
         ]);
 
+        $response->assertSessionDoesntHaveErrors();
         $travel = TravelCost::query()->firstOrFail();
 
         $this->assertFalse($travel->round_trip);
