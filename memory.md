@@ -527,3 +527,10 @@ Verification boundary:
 - GitHub Actions was triggered on main after the fixes.
 - The latest Laravel workflow was still in progress at the end of this execution window.
 - Local Windows PHPUnit and php artisan view:clear remain unavailable from this execution environment.
+
+## Work Edit / compiled Blade hardening — 2026-09-26
+
+- Replaced Work Edit JavaScript serialization with Laravel's Illuminate\\Support\\Js::from(...) for customer/contact payloads and selected contact IDs.
+- This removes the remaining fragile JSON directive surface from Work Edit and follows the Laravel 13 Blade guidance for rendering existing variables as JavaScript data.
+- Work Edit rendering regression test now verifies the rendered JavaScript uses JSON.parse output and contains no legacy @json( marker.
+- Local generated storage/framework/views cache remains runtime-owned; after source changes the owner's Windows checkout should run php artisan view:clear before browser/test verification.
