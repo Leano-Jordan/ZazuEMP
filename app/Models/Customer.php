@@ -15,6 +15,7 @@ class Customer extends Model
     protected $fillable = [
         'business_id',
         'name',
+        'profile_photo_path',
         'notes',
     ];
 
