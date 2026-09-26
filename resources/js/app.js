@@ -86,3 +86,89 @@ document.querySelectorAll('[data-zazu-toast]').forEach((toast) => {
         if (document.body.contains(toast)) close();
     }, duration);
 });
+
+
+const brandingPreviewUrls = new WeakMap();
+
+function setupBrandingUploads() {
+    document.querySelectorAll('[data-branding-upload]').forEach((input) => {
+        input.addEventListener('change', () => {
+            const type = input.dataset.brandingUpload;
+            const file = input.files?.[0];
+
+            if (!type || !file) return;
+
+            const container = document.querySelector(`[data-branding-preview-container="${type}"]`);
+            const preview = document.querySelector(`[data-branding-preview="${type}"]`);
+            const placeholder = document.querySelector(`[data-branding-placeholder="${type}"]`);
+            const loading = document.querySelector(`[data-branding-loading="${type}"]`);
+            const filename = document.querySelector(`[data-branding-file="${type}"]`);
+
+            if (!container || !preview || !loading) return;
+
+            const extension = file.name.split('.').pop()?.toLowerCase() ?? '';
+            const allowed = file.type.startsWith('image/')
+                || ['jpg', 'jpeg', 'png', 'webp'].includes(extension);
+
+            if (!allowed) {
+                input.value = '';
+                if (filename) filename.textContent = 'Choose a JPG, PNG or WebP image.';
+                return;
+            }
+
+            if (filename) filename.textContent = file.name;
+
+            container.setAttribute('aria-busy', 'true');
+            loading.hidden = false;
+            preview.hidden = true;
+            if (placeholder) placeholder.hidden = true;
+
+            const previousUrl = brandingPreviewUrls.get(input);
+            if (previousUrl) URL.revokeObjectURL(previousUrl);
+
+            const objectUrl = URL.createObjectURL(file);
+            brandingPreviewUrls.set(input, objectUrl);
+
+            const image = new Image();
+
+            image.onload = () => {
+                preview.src = objectUrl;
+                preview.hidden = false;
+                loading.hidden = true;
+                container.setAttribute('aria-busy', 'false');
+            };
+
+            image.onerror = () => {
+                loading.hidden = true;
+                if (placeholder) placeholder.hidden = false;
+                container.setAttribute('aria-busy', 'false');
+                if (filename) filename.textContent = 'That image could not be previewed.';
+                URL.revokeObjectURL(objectUrl);
+                brandingPreviewUrls.delete(input);
+            };
+
+            image.src = objectUrl;
+        });
+    });
+
+    document.querySelectorAll('[data-branding-form]').forEach((form) => {
+        form.addEventListener('submit', () => {
+            const button = form.querySelector('[data-branding-save]');
+            const label = form.querySelector('[data-branding-save-label]');
+            const spinner = form.querySelector('[data-branding-save-spinner]');
+
+            if (!button) return;
+
+            button.disabled = true;
+            button.setAttribute('aria-busy', 'true');
+            if (label) label.textContent = 'Saving…';
+            if (spinner) spinner.hidden = false;
+        });
+    });
+}
+
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', setupBrandingUploads);
+} else {
+    setupBrandingUploads();
+}

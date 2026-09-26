@@ -16,7 +16,7 @@
 
     @if (!empty($business?->dashboard_image_path))
         <section class="zazu-dashboard-visual">
-            <img src="{{ Storage::disk('public')->url($business->dashboard_image_path) }}" alt="" loading="lazy">
+            <img src="{{ route('business.media', ['type' => 'dashboard']) }}?v={{ $business->updated_at?->timestamp ?? 0 }}" alt="" loading="lazy">
             <div class="zazu-dashboard-visual-overlay">
                 <div class="zazu-eyebrow">Your business</div>
                 <div class="zazu-dashboard-visual-title">{{ $business->name }}</div>

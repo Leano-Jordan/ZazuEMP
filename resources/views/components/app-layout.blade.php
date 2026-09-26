@@ -8,6 +8,7 @@
         $business = app(\App\Support\CurrentBusiness::class)->resolve(auth()->user());
         $businesses = auth()->user()->businesses()->where('businesses.status', 'active')->orderBy('businesses.name')->get();
         $isOwner = app(\App\Support\CurrentBusiness::class)->hasRole('owner', auth()->user(), $business);
+        $brandingVersion = $business?->updated_at?->timestamp ?? 0;
     @endphp
     <title>{{ $title ?? 'Zazu' }} · {{ $business?->name ?? 'Zazu EMP' }}</title>
     <script>
@@ -22,14 +23,14 @@
     </script>
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
-<body class="{{ $business?->wallpaper_path ? 'zazu-has-wallpaper' : '' }}" data-business-currency="{{ $business?->currency ?? 'ZAR' }}" @if($business?->wallpaper_path) style="--zazu-wallpaper: url('{{ e(route('business.media', ['type' => 'wallpaper'])) }}')" @endif>
+<body class="{{ $business?->wallpaper_path ? 'zazu-has-wallpaper' : '' }}" data-business-currency="{{ $business?->currency ?? 'ZAR' }}" @if($business?->wallpaper_path) style="--zazu-wallpaper: url('{{ e(route('business.media', ['type' => 'wallpaper']).'?v='.$brandingVersion) }}')" @endif>
     <a class="zazu-skip-link" href="#main-content">Skip to main content</a>
     <div class="zazu-shell">
         <aside class="zazu-sidebar">
             <div class="zazu-brand">
                 <a href="{{ route('dashboard') }}" class="zazu-brand-link">
                     @if ($business?->logo_path)
-                        <img src="{{ route('business.media', ['type' => 'logo']) }}" alt="{{ $business->name }} logo" class="zazu-brand-logo">
+                        <img src="{{ route('business.media', ['type' => 'logo']) }}?v={{ $brandingVersion }}" alt="{{ $business->name }} logo" class="zazu-brand-logo">
                     @endif
                     <span class="zazu-brand-word">{{ $business?->name ?? 'zazu' }}</span>
                 </a>

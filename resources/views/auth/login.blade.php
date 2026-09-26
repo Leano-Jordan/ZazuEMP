@@ -8,7 +8,7 @@
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
 <body class="zazu-auth-shell zazu-login-page">
-    <main class="zazu-auth-frame zazu-login-frame">
+    <main class="zazu-auth-frame zazu-login-frame zazu-login-frame-single">
         <section class="zazu-auth-card zazu-login-panel" aria-labelledby="login-heading">
             <div class="zazu-auth-brand zazu-login-brand">
                 <div class="zazu-auth-mark zazu-login-mark" aria-hidden="true">Z</div>
@@ -110,29 +110,6 @@
             @endif
         </section>
 
-        <aside class="zazu-auth-visual zazu-login-visual" aria-label="Zazu workspace overview">
-            <div class="zazu-login-visual-scene" aria-hidden="true">
-                <div class="zazu-login-window"></div>
-                <div class="zazu-login-table"></div>
-                <div class="zazu-login-plate"></div>
-                <div class="zazu-login-glass"></div>
-                <div class="zazu-login-sprig"></div>
-            </div>
-
-            <div class="zazu-auth-visual-inner zazu-login-visual-inner">
-                <div class="zazu-auth-visual-label">{{ $ownerAccess ? 'Owner control' : 'Business control' }}</div>
-                <div class="zazu-login-visual-title">The work behind the event, in one calm workspace.</div>
-                <div class="zazu-auth-visual-copy">
-                    Plan the job, keep the customer record close, track the commercial detail, and move the work forward.
-                </div>
-
-                <div class="zazu-login-points">
-                    <span>Plan</span>
-                    <span>Coordinate</span>
-                    <span>Deliver</span>
-                </div>
-            </div>
-        </aside>
     </main>
 
     <script>
