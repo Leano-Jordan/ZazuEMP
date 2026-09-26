@@ -5,27 +5,36 @@ namespace App\Http\Controllers;
 use App\Models\Event;
 use App\Models\Quote;
 use App\Models\QuoteVersion;
+use App\Support\CurrentBusiness;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
+use Illuminate\Validation\Rule;
 use Illuminate\View\View;
 
 class QuoteController extends Controller
 {
-    public function index(): View
+    public function index(Request $request): View
     {
+        $businessId = app(CurrentBusiness::class)->id($request->user());
+
         $quotes = Quote::query()
+            ->whereHas('event', fn (Builder $query) => $query->where('business_id', $businessId))
             ->with(['event.customer', 'latestVersion'])
             ->latest()
-            ->paginate(20);
+            ->paginate(20)
+            ->withQueryString();
 
         return view('quotes.index', compact('quotes'));
     }
 
-    public function eventIndex(Event $event): View
+    public function eventIndex(Request $request, Event $event): View
     {
+        $this->ensureBusiness($event, $request);
         $event->load('customer');
+
         $quotes = $event->quotes()
             ->with('latestVersion')
             ->latest()
@@ -34,8 +43,9 @@ class QuoteController extends Controller
         return view('quotes.event-index', compact('event', 'quotes'));
     }
 
-    public function create(Event $event): View
+    public function create(Request $request, Event $event): View|RedirectResponse
     {
+        $this->ensureBusiness($event, $request);
         $event->load(['customer', 'requirements.capability']);
 
         if ($event->requirements->isEmpty()) {
@@ -44,22 +54,27 @@ class QuoteController extends Controller
                 ->with('error', 'Add at least one requirement before creating a quote.');
         }
 
-        return view('quotes.create', compact('event'));
+        return view('quotes.create', [
+            'event' => $event,
+            'currencies' => config('zazu.currencies'),
+            'defaultCurrency' => app(CurrentBusiness::class)->model($request->user())->currency ?? 'ZAR',
+        ]);
     }
 
     public function store(Request $request, Event $event): RedirectResponse
     {
+        $businessId = app(CurrentBusiness::class)->id($request->user());
+        $this->ensureBusiness($event, $request);
         $event->load(['customer', 'requirements.capability']);
 
         $validated = $request->validate([
-            'currency' => ['required', 'string', 'size:3', 'regex:/^[A-Za-z]{3}$/'],
+            'currency' => ['required', Rule::in(array_keys(config('zazu.currencies')))],
             'notes' => ['nullable', 'string'],
             'unit_price' => ['required', 'array', 'min:1'],
             'unit_price.*' => ['required', 'numeric', 'min:0'],
         ]);
 
         $requirementsById = $event->requirements->keyBy('id');
-
         $submittedRequirementIds = array_map('intval', array_keys($validated['unit_price']));
         $currentRequirementIds = $requirementsById->keys()->map(fn ($id) => (int) $id)->all();
 
@@ -72,7 +87,7 @@ class QuoteController extends Controller
                 ->withInput();
         }
 
-        $result = DB::transaction(function () use ($validated, $requirementsById, $event): Quote {
+        $result = DB::transaction(function () use ($validated, $requirementsById, $event, $businessId): Quote {
             $quote = Quote::create([
                 'event_id' => $event->id,
                 'reference' => 'QUO-' . Str::upper(Str::random(8)),
@@ -86,13 +101,16 @@ class QuoteController extends Controller
                 'notes' => $validated['notes'] ?? null,
             ]);
 
-            $subtotal = 0;
+            $subtotalCents = 0;
 
             foreach ($requirementsById as $requirement) {
-                $unitPrice = (float) $validated['unit_price'][$requirement->id];
+                $unitPriceCents = (int) round(((float) $validated['unit_price'][$requirement->id]) * 100);
                 $quantity = (float) $requirement->quantity;
-                $lineTotal = round($quantity * $unitPrice, 2);
-                $subtotal += $lineTotal;
+                $lineTotalCents = (int) round($quantity * $unitPriceCents);
+                $subtotalCents += $lineTotalCents;
+
+                $unitPrice = number_format($unitPriceCents / 100, 2, '.', '');
+                $lineTotal = number_format($lineTotalCents / 100, 2, '.', '');
 
                 $version->items()->create([
                     'event_requirement_id' => $requirement->id,
@@ -117,9 +135,11 @@ class QuoteController extends Controller
                 ]);
             }
 
+            $subtotal = number_format($subtotalCents / 100, 2, '.', '');
+
             $version->update([
                 'subtotal' => $subtotal,
-                'tax_total' => 0,
+                'tax_total' => '0.00',
                 'total' => $subtotal,
             ]);
 
@@ -131,24 +151,28 @@ class QuoteController extends Controller
             ->with('success', 'Draft quote created.');
     }
 
-    public function show(Quote $quote): View
+    public function show(Request $request, Quote $quote): View
     {
-        $quote->load([
-            'event.customer',
-            'versions.items',
-        ]);
+        $businessId = app(CurrentBusiness::class)->id($request->user());
+
+        $quote->load(['event.customer', 'versions.items']);
+        abort_unless($quote->event && (int) $quote->event->business_id === $businessId, 404);
 
         $version = $quote->versions->sortByDesc('version')->first();
 
         return view('quotes.show', compact('quote', 'version'));
     }
 
-    public function createVersion(Quote $quote): RedirectResponse
+    public function createVersion(Request $request, Quote $quote): RedirectResponse
     {
-        $newVersion = DB::transaction(function () use ($quote): QuoteVersion {
+        $businessId = app(CurrentBusiness::class)->id($request->user());
+
+        $newVersion = DB::transaction(function () use ($quote, $businessId): QuoteVersion {
             $lockedQuote = Quote::query()
+                ->whereKey($quote->id)
+                ->whereHas('event', fn (Builder $query) => $query->where('business_id', $businessId))
                 ->lockForUpdate()
-                ->findOrFail($quote->id);
+                ->firstOrFail();
 
             $latest = $lockedQuote->versions()
                 ->with('items')
@@ -188,5 +212,10 @@ class QuoteController extends Controller
         return redirect()
             ->route('quotes.show', $quote)
             ->with('success', 'New quote revision created: v' . $newVersion->version . '.');
+    }
+
+    private function ensureBusiness(Event $event, Request $request): void
+    {
+        abort_unless((int) $event->business_id === app(CurrentBusiness::class)->id($request->user()), 404);
     }
 }
