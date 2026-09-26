@@ -68,9 +68,18 @@
                             </select>
                         </label>
 
+                        @php($currentUnit = old('default_unit', $capability->default_unit))
                         <label class="zazu-field">
-                            <span class="zazu-label">Unit</span>
-                            <input name="default_unit" value="{{ old('default_unit', $capability->default_unit) }}" class="zazu-input">
+                            <span class="zazu-label">Default unit</span>
+                            <select name="default_unit" class="zazu-select">
+                                <option value="">Not specified</option>
+                                @foreach (config('zazu.units') as $value => $label)
+                                    <option value="{{ $value }}" @selected($currentUnit === $value)>{{ $label }}</option>
+                                @endforeach
+                                @if ($currentUnit && !array_key_exists($currentUnit, config('zazu.units')))
+                                    <option value="{{ $currentUnit }}" selected>{{ $currentUnit }} (current)</option>
+                                @endif
+                            </select>
                         </label>
 
                         <label class="zazu-field zazu-field-wide">
