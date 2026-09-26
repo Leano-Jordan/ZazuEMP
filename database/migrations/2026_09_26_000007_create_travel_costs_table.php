@@ -12,6 +12,7 @@ return new class extends Migration
             $table->id();
             $table->foreignId('event_id')->constrained()->cascadeOnDelete();
             $table->string('route_label')->default('Route A');
+            $table->char('currency', 3)->default('ZAR');
             $table->string('provider')->default('manual');
             $table->string('origin');
             $table->string('destination');
