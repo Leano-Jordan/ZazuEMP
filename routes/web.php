@@ -4,6 +4,8 @@ use App\Http\Controllers\BusinessCapabilityController;
 use App\Http\Controllers\CalendarController;
 use App\Http\Controllers\CustomerController;
 use App\Http\Controllers\CustomerContactController;
+use App\Http\Controllers\EventCostController;
+use App\Http\Controllers\EventPreparationController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\RequirementController;
 use App\Http\Controllers\QuoteController;
@@ -37,6 +39,15 @@ Route::delete('/work/{event}', [WorkController::class, 'destroy'])->name('work.d
 Route::get('/work/{event}/travel', [TravelCostController::class, 'index'])->name('work.travel.index');
 Route::get('/work/{event}/travel/create', [TravelCostController::class, 'create'])->name('work.travel.create');
 Route::post('/work/{event}/travel', [TravelCostController::class, 'store'])->name('work.travel.store');
+
+Route::get('/work/{event}/costs', [EventCostController::class, 'index'])->name('work.costs.index');
+Route::get('/work/{event}/costs/create', [EventCostController::class, 'create'])->name('work.costs.create');
+Route::post('/work/{event}/costs', [EventCostController::class, 'store'])->name('work.costs.store');
+
+Route::get('/work/{event}/preparation', [EventPreparationController::class, 'index'])->name('work.preparation.index');
+Route::get('/work/{event}/preparation/create', [EventPreparationController::class, 'create'])->name('work.preparation.create');
+Route::post('/work/{event}/preparation', [EventPreparationController::class, 'store'])->name('work.preparation.store');
+Route::patch('/work/{event}/preparation/{item}/status', [EventPreparationController::class, 'updateStatus'])->name('work.preparation.status');
 
 Route::get('/work/{event}/quotes', [QuoteController::class, 'eventIndex'])->name('work.quotes.index');
 Route::get('/work/{event}/quotes/create', [QuoteController::class, 'create'])->name('work.quotes.create');
