@@ -3,19 +3,30 @@
 namespace App\Http\Controllers;
 
 use App\Models\Business;
+use App\Support\CurrentBusiness;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 use Illuminate\View\View;
+use Illuminate\Validation\Rule;
 
 class BusinessSettingsController extends Controller
 {
     public function edit(Request $request): View
     {
-        $business = $request->user()?->businesses()->first() ?? Business::first() ?? new Business(['name' => 'Zazu']);
+        $business = app(CurrentBusiness::class)->resolve($request->user());
 
-        return view('settings.index', compact('business'));
+        if (!$business && $request->user()) {
+            $business = $this->business($request);
+        }
+
+        $business ??= new Business(['name' => 'Zazu', 'currency' => 'ZAR']);
+
+        return view('settings.index', [
+            'business' => $business,
+            'currencies' => config('zazu.currencies'),
+        ]);
     }
 
     public function update(Request $request): RedirectResponse
@@ -24,6 +35,7 @@ class BusinessSettingsController extends Controller
 
         $validated = $request->validate([
             'name' => ['required', 'string', 'max:255'],
+            'currency' => ['required', Rule::in(array_keys(config('zazu.currencies')))],
             'logo' => ['nullable', 'image', 'mimes:jpg,jpeg,png,webp', 'max:4096'],
             'dashboard_image' => ['nullable', 'image', 'mimes:jpg,jpeg,png,webp', 'max:5120'],
             'wallpaper' => ['nullable', 'image', 'mimes:jpg,jpeg,png,webp', 'max:5120'],
@@ -50,7 +62,8 @@ class BusinessSettingsController extends Controller
         }
 
         $business->update([
-            'name' => $validated['name'],
+            'name' => trim($validated['name']),
+            'currency' => strtoupper($validated['currency']),
             ...$newPaths,
         ]);
 
@@ -60,26 +73,30 @@ class BusinessSettingsController extends Controller
             }
         }
 
-        return redirect()->route('settings.index')->with('success', 'Business appearance updated.');
+        return redirect()->route('settings.index')->with('success', 'Business settings saved.');
     }
 
     private function business(Request $request): Business
     {
         $user = $request->user();
-        abort_unless($user, 401);
 
-        $business = $user->businesses()->first();
+        if ($user) {
+            $business = $user->businesses()->where('businesses.status', 'active')->first();
 
-        if (!$business) {
-            $business = Business::create([
-                'name' => trim($user->name) . "'s Business",
-                'slug' => Str::slug($user->name) . '-' . Str::lower(Str::random(6)),
-                'status' => 'active',
-            ]);
+            if (!$business) {
+                $business = Business::create([
+                    'name' => trim($user->name) . "'s Business",
+                    'slug' => Str::slug($user->name) . '-' . Str::lower(Str::random(6)),
+                    'status' => 'active',
+                    'currency' => 'ZAR',
+                ]);
 
-            $business->users()->attach($user->id, ['role' => 'owner']);
+                $business->users()->attach($user->id, ['role' => 'owner']);
+            }
+
+            return $business;
         }
 
-        return $business;
+        return app(CurrentBusiness::class)->model();
     }
 }
