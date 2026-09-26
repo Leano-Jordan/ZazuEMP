@@ -45,7 +45,7 @@ class OnboardingTest extends TestCase
         $this->assertNotNull($business->fresh()->catalogue_setup_completed_at);
     }
 
-    public function test_catalogue_skip_marks_setup_complete_and_moves_to_business_setup(): void
+    public function test_catalogue_skip_is_deferred_and_can_be_resumed(): void
     {
         $business = Business::create([
             'name' => 'Skip Business',
@@ -60,7 +60,55 @@ class OnboardingTest extends TestCase
             ->assertRedirect(route('onboarding.business'))
             ->assertSessionHas('info');
 
+        $business->refresh();
+
+        $this->assertNull($business->catalogue_setup_completed_at);
+        $this->assertNotNull($business->catalogue_setup_skipped_at);
+
+        $this->get(route('onboarding.catalogue'))->assertOk();
+        $this->get(route('onboarding.index'))->assertOk();
+
+        $this->post(route('onboarding.catalogue.finish'))
+            ->assertRedirect(route('onboarding.business'));
+
         $this->assertNotNull($business->fresh()->catalogue_setup_completed_at);
+        $this->assertNull($business->fresh()->catalogue_setup_skipped_at);
+    }
+
+    public function test_business_skip_is_deferred_and_can_be_resumed(): void
+    {
+        $business = Business::create([
+            'name' => 'Business Setup Skip',
+            'slug' => 'business-setup-skip',
+            'status' => 'active',
+            'currency' => 'ZAR',
+        ]);
+
+        $this->signInAsOwner($business);
+
+        $this->post(route('onboarding.business.skip'))
+            ->assertRedirect(route('dashboard'))
+            ->assertSessionHas('info');
+
+        $business->refresh();
+
+        $this->assertNull($business->business_setup_completed_at);
+        $this->assertNotNull($business->business_setup_skipped_at);
+
+        $this->get(route('onboarding.business'))->assertOk();
+
+        $this->post(route('onboarding.business'), [
+            'name' => 'Completed Business Setup',
+            'email' => 'owner@example.com',
+            'phone' => '0123456789',
+            'address' => 'Pretoria',
+            'website' => 'https://example.com',
+            'tax_number' => '1234567890',
+            'currency' => 'ZAR',
+        ])->assertRedirect(route('dashboard'));
+
+        $this->assertNotNull($business->fresh()->business_setup_completed_at);
+        $this->assertNull($business->fresh()->business_setup_skipped_at);
     }
 
     public function test_staff_cannot_enter_or_mutate_onboarding(): void
