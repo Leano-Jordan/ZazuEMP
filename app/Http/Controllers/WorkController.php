@@ -95,7 +95,14 @@ class WorkController extends Controller
             $services[] = Str::limit(trim($validated['other_service']), 100, '');
         }
 
-        $event = DB::transaction(function () use ($validated, $customer, $services, $business) {
+        $categoryByService = [];
+        foreach (config('zazu.service_categories') as $category => $availableServices) {
+            foreach ($availableServices as $service) {
+                $categoryByService[$service] = $category;
+            }
+        }
+
+        $event = DB::transaction(function () use ($validated, $customer, $services, $business, $categoryByService) {
             $event = Event::create([
                 'business_id' => $business->id,
                 'customer_id' => $customer->id,
@@ -117,7 +124,7 @@ class WorkController extends Controller
                 EventRequirement::create([
                     'event_id' => $event->id,
                     'description' => $service,
-                    'category' => 'Other',
+                    'category' => $categoryByService[$service] ?? 'Other',
                     'quantity' => 1,
                     'unit' => 'service',
                     'status' => 'open',
