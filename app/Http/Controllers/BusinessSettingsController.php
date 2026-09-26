@@ -13,7 +13,7 @@ class BusinessSettingsController extends Controller
 {
     public function edit(Request $request): View
     {
-        $business = $this->business($request);
+        $business = $request->user()?->businesses()->first() ?? Business::first() ?? new Business(['name' => 'Zazu']);
 
         return view('settings.index', compact('business'));
     }
