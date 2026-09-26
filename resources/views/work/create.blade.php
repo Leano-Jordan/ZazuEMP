@@ -61,12 +61,19 @@
                                 @error('event_date')<span class="zazu-field-error">{{ $message }}</span>@enderror
                             </label>
 
-                            <label class="zazu-field zazu-field-wide">
-                                <span class="zazu-label">Event-day contact <span class="font-normal text-[var(--zazu-faint)]">(optional)</span></span>
+                            <label class="zazu-field">
+                                <span class="zazu-label">Day contact</span>
                                 <select id="event_day_contact_id" name="event_day_contact_id" class="zazu-select">
                                     <option value="">Select a customer first</option>
                                 </select>
                                 @error('event_day_contact_id')<span class="zazu-field-error">{{ $message }}</span>@enderror
+                            </label>
+                            <label class="zazu-field">
+                                <span class="zazu-label">Night contact</span>
+                                <select id="event_night_contact_id" name="event_night_contact_id" class="zazu-select">
+                                    <option value="">Select a customer first</option>
+                                </select>
+                                @error('event_night_contact_id')<span class="zazu-field-error">{{ $message }}</span>@enderror
                             </label>
                         </div>
                     </section>
@@ -117,32 +124,36 @@
 
         <script>
             const customers = @json($customerOptions);
-            const oldContactId = @json(old('event_day_contact_id'));
+            const oldDayContactId = @json(old('event_day_contact_id'));
+            const oldNightContactId = @json(old('event_night_contact_id'));
 
             const customerSelect = document.getElementById('customer_id');
-            const contactSelect = document.getElementById('event_day_contact_id');
+            const dayContactSelect = document.getElementById('event_day_contact_id');
+            const nightContactSelect = document.getElementById('event_night_contact_id');
 
-            function refreshContacts(selectedContactId = oldContactId) {
+            function refreshContacts(selectedDay = oldDayContactId, selectedNight = oldNightContactId) {
                 const customer = customers.find(item => String(item.id) === customerSelect.value);
-                contactSelect.innerHTML = '<option value="">No event-day contact</option>';
+                for (const select of [dayContactSelect, nightContactSelect]) {
+                    select.innerHTML = '<option value="">No contact selected</option>';
+                }
 
                 if (!customer) return;
 
-                if (customer.contacts.length === 0) {
-                    contactSelect.innerHTML = '<option value="">No contacts available</option>';
-                    return;
-                }
+                for (const contact of customer.contacts) {
+                    const suffix = [contact.label, contact.phone].filter(Boolean).join(' · ');
+                    const dayOption = document.createElement('option');
+                    dayOption.value = contact.id;
+                    dayOption.textContent = contact.name + (suffix ? ' · ' + suffix : '');
+                    dayOption.selected = String(contact.id) === String(selectedDay);
+                    dayContactSelect.appendChild(dayOption);
 
-                customer.contacts.forEach(contact => {
-                    const option = document.createElement('option');
-                    option.value = contact.id;
-                    option.textContent = contact.name + (contact.label ? ' · ' + contact.label : '') + (contact.phone ? ' · ' + contact.phone : '');
-                    option.selected = String(contact.id) === String(selectedContactId);
-                    contactSelect.appendChild(option);
-                });
+                    const nightOption = dayOption.cloneNode(true);
+                    nightOption.selected = String(contact.id) === String(selectedNight);
+                    nightContactSelect.appendChild(nightOption);
+                }
             }
 
-            customerSelect.addEventListener('change', () => refreshContacts(''));
+            customerSelect.addEventListener('change', () => refreshContacts('', ''));
             refreshContacts();
         </script>
     @endif
