@@ -79,13 +79,25 @@
                 <div class="zazu-list mt-3">
                     @forelse ($customer->events as $event)
                         <div class="zazu-list-item">
-                            <a href="{{ route('work.show', $event) }}" class="zazu-list-main min-w-0 flex-1">
-                                <div class="zazu-list-title">{{ $event->name }}</div>
-                                <div class="zazu-list-meta">{{ $event->reference }} · {{ $event->event_type ?: 'Work' }}</div>
-                            </a>
-                            <div class="flex flex-wrap items-center justify-end gap-2">
-                                <div class="zazu-list-side"><div class="zazu-side-primary">{{ $event->event_date?->format('d M Y') ?? 'Date not set' }}</div></div>
-                                <a href="{{ route('work.edit', $event) }}" class="zazu-btn zazu-btn-ghost">Edit</a>
+                            @if ($event->trashed())
+                                <div class="zazu-list-main min-w-0 flex-1">
+                                    <div class="flex flex-wrap items-center gap-2">
+                                        <span class="zazu-list-title">{{ $event->name }}</span>
+                                        <span class="zazu-chip zazu-chip-danger">Removed from active work</span>
+                                    </div>
+                                    <div class="zazu-list-meta">{{ $event->reference }} · {{ $event->event_type ?: 'Work' }}</div>
+                                </div>
+                            @else
+                                <a href="{{ route('work.show', $event) }}" class="zazu-list-main min-w-0 flex-1">
+                                    <div class="zazu-list-title">{{ $event->name }}</div>
+                                    <div class="zazu-list-meta">{{ $event->reference }} · {{ $event->event_type ?: 'Work' }}</div>
+                                </a>
+                            @endif
+                            <div class="zazu-list-side">
+                                <div class="zazu-side-primary">{{ $event->event_date?->format('d M Y') ?? 'Date not set' }}</div>
+                                @unless ($event->trashed())
+                                    <a href="{{ route('work.edit', $event) }}" class="zazu-btn zazu-btn-ghost">Edit</a>
+                                @endunless
                             </div>
                         </div>
                     @empty
