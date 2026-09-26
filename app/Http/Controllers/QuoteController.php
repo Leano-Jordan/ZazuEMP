@@ -5,16 +5,27 @@ namespace App\Http\Controllers;
 use App\Models\Event;
 use App\Models\Quote;
 use App\Models\QuoteVersion;
+use App\Models\TaxRate;
 use App\Services\QuoteService;
 use App\Support\CurrentBusiness;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\Rule;
+use Illuminate\Validation\ValidationException;
 use Illuminate\View\View;
 
 class QuoteController extends Controller
 {
+    private const STATUS_TRANSITIONS = [
+        'draft' => ['sent'],
+        'sent' => ['accepted', 'declined', 'expired'],
+        'declined' => ['draft'],
+        'expired' => ['draft'],
+        'accepted' => [],
+    ];
+
     public function index(Request $request): View
     {
         $businessId = app(CurrentBusiness::class)->id($request->user());
@@ -54,10 +65,16 @@ class QuoteController extends Controller
                 ->with('error', 'Add at least one requirement before creating a quote.');
         }
 
+        $businessId = app(CurrentBusiness::class)->id($request->user());
+        $taxRates = $this->activeTaxRates($businessId);
+        $defaultTaxRate = $taxRates->firstWhere('is_default', true);
+
         return view('quotes.create', [
             'event' => $event,
             'currencies' => config('zazu.currencies'),
             'defaultCurrency' => app(CurrentBusiness::class)->model($request->user())->currency ?? 'ZAR',
+            'taxRates' => $taxRates,
+            'defaultTaxRateId' => $defaultTaxRate?->id,
         ]);
     }
 
@@ -67,14 +84,18 @@ class QuoteController extends Controller
         abort_if($event->isClosed(), 422, 'Closed work cannot receive new quotes.');
         $event->load(['customer', 'requirements.capability']);
 
+        $businessId = app(CurrentBusiness::class)->id($request->user());
         $request->merge(['currency' => strtoupper((string) $request->input('currency'))]);
 
         $validated = $request->validate([
             'currency' => ['required', Rule::in(array_keys(config('zazu.currencies')))],
+            'tax_rate_id' => ['nullable', 'integer'],
             'notes' => ['nullable', 'string'],
             'unit_price' => ['required', 'array', 'min:1'],
             'unit_price.*' => ['required', 'numeric', 'decimal:0,2', 'min:0'],
         ]);
+
+        $taxRate = $this->resolveTaxRate($businessId, $validated['tax_rate_id'] ?? null);
 
         $requirementsById = $event->requirements->keyBy('id');
         $submittedRequirementIds = array_map('intval', array_keys($validated['unit_price']));
@@ -94,6 +115,7 @@ class QuoteController extends Controller
             $event->requirements,
             $validated['unit_price'],
             strtoupper($validated['currency']),
+            $taxRate,
             $validated['notes'] ?? null
         );
 
@@ -110,6 +132,7 @@ class QuoteController extends Controller
             'event.customer',
             'event.requirements.capability',
             'versions.items',
+            'versions.taxRateRecord',
         ]);
         abort_unless($quote->event && (int) $quote->event->business_id === $businessId, 404);
 
@@ -119,6 +142,54 @@ class QuoteController extends Controller
             : true;
 
         return view('quotes.show', compact('quote', 'version', 'quoteNeedsRevision'));
+    }
+
+    public function updateStatus(Request $request, Quote $quote): RedirectResponse
+    {
+        $businessId = app(CurrentBusiness::class)->id($request->user());
+
+        $quote->loadMissing(['event', 'latestVersion']);
+        abort_unless($quote->event && (int) $quote->event->business_id === $businessId, 404);
+        abort_if($quote->event->isClosed(), 422, 'Closed work cannot change quote status.');
+
+        $validated = $request->validate([
+            'status' => ['required', Rule::in(['sent', 'accepted', 'declined', 'expired'])],
+        ]);
+
+        $newStatus = $validated['status'];
+        $currentStatus = $quote->status ?: 'draft';
+
+        abort_unless(
+            in_array($newStatus, self::STATUS_TRANSITIONS[$currentStatus] ?? [], true),
+            422,
+            'That quote status change is not allowed.'
+        );
+
+        abort_unless($quote->latestVersion, 422, 'A quote must have a version before its status can change.');
+
+        DB::transaction(function () use ($quote, $newStatus): void {
+            $lockedQuote = Quote::query()
+                ->whereKey($quote->id)
+                ->lockForUpdate()
+                ->firstOrFail();
+
+            $version = $lockedQuote->versions()
+                ->orderByDesc('version')
+                ->lockForUpdate()
+                ->firstOrFail();
+
+            $version->update([
+                'status' => $newStatus,
+            ]);
+
+            $lockedQuote->update([
+                'status' => $newStatus,
+            ]);
+        });
+
+        return redirect()
+            ->route('quotes.show', $quote)
+            ->with('success', 'Quote marked as '.str_replace('_', ' ', $newStatus).'.');
     }
 
     public function createVersion(Request $request, Quote $quote, QuoteService $quoteService): RedirectResponse
@@ -154,7 +225,11 @@ class QuoteController extends Controller
 
         $version->load('items');
 
-        return view('quotes.edit', compact('quote', 'version'));
+        return view('quotes.edit', [
+            'quote' => $quote,
+            'version' => $version,
+            'taxRates' => $this->activeTaxRates($businessId),
+        ]);
     }
 
     public function updateVersion(Request $request, Quote $quote, QuoteVersion $version, QuoteService $quoteService): RedirectResponse
@@ -171,6 +246,7 @@ class QuoteController extends Controller
         abort_unless($version->status === 'draft', 422, 'Only draft quote revisions can be edited.');
 
         $validated = $request->validate([
+            'tax_rate_id' => ['nullable', 'integer'],
             'notes' => ['nullable', 'string'],
             'unit_price' => ['required', 'array', 'min:1'],
             'unit_price.*' => ['required', 'numeric', 'decimal:0,2', 'min:0'],
@@ -189,17 +265,57 @@ class QuoteController extends Controller
                 ->withInput();
         }
 
+        $taxRate = array_key_exists('tax_rate_id', $validated) && $validated['tax_rate_id'] !== null && $validated['tax_rate_id'] !== ''
+            ? $this->resolveTaxRate($businessId, $validated['tax_rate_id'])
+            : null;
+
         $quoteService->updateDraft(
             $quote,
             $version,
             $quote->event->requirements,
             $validated['unit_price'],
+            $taxRate,
             $validated['notes'] ?? null
         );
 
         return redirect()
             ->route('quotes.show', $quote)
             ->with('success', 'Quote v' . $version->version . ' saved.');
+    }
+
+    private function activeTaxRates(int $businessId)
+    {
+        $today = now()->toDateString();
+
+        return TaxRate::query()
+            ->where('business_id', $businessId)
+            ->where('is_active', true)
+            ->whereDate('effective_from', '<=', $today)
+            ->where(fn (Builder $query) => $query
+                ->whereNull('effective_to')
+                ->orWhereDate('effective_to', '>=', $today))
+            ->orderByDesc('is_default')
+            ->orderBy('name')
+            ->get();
+    }
+
+    private function resolveTaxRate(int $businessId, $taxRateId): ?TaxRate
+    {
+        if ($taxRateId === null || $taxRateId === '') {
+            return null;
+        }
+
+        $today = now()->toDateString();
+
+        return TaxRate::query()
+            ->where('business_id', $businessId)
+            ->where('is_active', true)
+            ->whereDate('effective_from', '<=', $today)
+            ->where(fn (Builder $query) => $query
+                ->whereNull('effective_to')
+                ->orWhereDate('effective_to', '>=', $today))
+            ->whereKey($taxRateId)
+            ->firstOrFail();
     }
 
     private function ensureBusiness(Event $event, Request $request): void
