@@ -16,7 +16,8 @@ class AssetController extends Controller
     {
         $businessId=app(CurrentBusiness::class)->id($request->user());
         $assets=Asset::where('business_id',$businessId)->with(['capability','allocations'=>fn($q)=>$q->where('status','allocated')->with('event')])->orderBy('name')->get();
-        return view('assets.index',compact('assets'));
+        $events=Event::where('business_id',$businessId)->whereNotIn('status',['completed','cancelled'])->orderByDesc('event_date')->get();
+        return view('assets.index',compact('assets','events'));
     }
 
     public function create(Request $request): View
