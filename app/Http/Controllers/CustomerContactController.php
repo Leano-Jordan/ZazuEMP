@@ -2,8 +2,10 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Business;
 use App\Models\Customer;
 use App\Models\CustomerContact;
+use App\Support\CurrentBusiness;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -11,13 +13,18 @@ use Illuminate\View\View;
 
 class CustomerContactController extends Controller
 {
-    public function create(Customer $customer): View
+    public function create(Request $request, Customer $customer): View
     {
+        $business = $this->business($request);
+        $this->ensureCustomer($customer, $business);
+
         return view('customers.contacts.create', compact('customer'));
     }
 
     public function store(Request $request, Customer $customer): RedirectResponse
     {
+        $business = $this->business($request);
+        $this->ensureCustomer($customer, $business);
         $validated = $this->validated($request);
 
         DB::transaction(function () use ($customer, $validated, $request): void {
@@ -28,7 +35,7 @@ class CustomerContactController extends Controller
             }
 
             $customer->contacts()->create([
-                'name' => $validated['name'],
+                'name' => trim($validated['name']),
                 'phone' => $validated['phone'] ?? null,
                 'email' => $validated['email'] ?? null,
                 'label' => $validated['label'] ?? null,
@@ -41,8 +48,10 @@ class CustomerContactController extends Controller
             ->with('success', 'Contact added successfully.');
     }
 
-    public function edit(Customer $customer, CustomerContact $contact): View
+    public function edit(Request $request, Customer $customer, CustomerContact $contact): View
     {
+        $business = $this->business($request);
+        $this->ensureCustomer($customer, $business);
         $this->ensureBelongsToCustomer($customer, $contact);
 
         return view('customers.contacts.edit', compact('customer', 'contact'));
@@ -50,6 +59,8 @@ class CustomerContactController extends Controller
 
     public function update(Request $request, Customer $customer, CustomerContact $contact): RedirectResponse
     {
+        $business = $this->business($request);
+        $this->ensureCustomer($customer, $business);
         $this->ensureBelongsToCustomer($customer, $contact);
         $validated = $this->validated($request);
 
@@ -58,12 +69,12 @@ class CustomerContactController extends Controller
 
             if ($makePrimary) {
                 $customer->contacts()
-                    ->where('id', '!=', $contact->id)
+                    ->whereKeyNot($contact->id)
                     ->update(['is_primary' => false]);
             }
 
             $contact->update([
-                'name' => $validated['name'],
+                'name' => trim($validated['name']),
                 'phone' => $validated['phone'] ?? null,
                 'email' => $validated['email'] ?? null,
                 'label' => $validated['label'] ?? null,
@@ -76,8 +87,10 @@ class CustomerContactController extends Controller
             ->with('success', 'Contact updated successfully.');
     }
 
-    public function destroy(Customer $customer, CustomerContact $contact): RedirectResponse
+    public function destroy(Request $request, Customer $customer, CustomerContact $contact): RedirectResponse
     {
+        $business = $this->business($request);
+        $this->ensureCustomer($customer, $business);
         $this->ensureBelongsToCustomer($customer, $contact);
 
         if ($contact->is_primary) {
@@ -102,6 +115,16 @@ class CustomerContactController extends Controller
             'label' => ['nullable', 'string', 'max:50'],
             'is_primary' => ['nullable', 'boolean'],
         ]);
+    }
+
+    private function business(Request $request): Business
+    {
+        return app(CurrentBusiness::class)->model($request->user());
+    }
+
+    private function ensureCustomer(Customer $customer, Business $business): void
+    {
+        abort_unless((int) $customer->business_id === (int) $business->id, 404);
     }
 
     private function ensureBelongsToCustomer(Customer $customer, CustomerContact $contact): void
