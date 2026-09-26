@@ -3,21 +3,21 @@
     <x-slot:heading>Dashboard</x-slot:heading>
 
     <section class="zazu-command-band">
-        <div><div class="zazu-eyebrow">Overview</div><h2 class="zazu-command-title">Your operating desk</h2><p class="zazu-command-copy">A live starting point for work, relationships and commercial activity.</p></div>
+        <div><div class="zazu-eyebrow">Overview</div><h2 class="zazu-command-title">Business overview</h2><p class="zazu-command-copy">See current work, customers and quotes in one place.</p></div>
         <div class="zazu-command-meta"><div class="zazu-command-meta-label">Today</div><div class="zazu-command-meta-value">{{ now()->format('d M') }}</div></div>
     </section>
 
     <section class="zazu-metric-grid">
-        <div class="zazu-metric-card"><div class="zazu-metric-label">Active work</div><div class="zazu-metric-value">{{ $metrics['active_work'] }}</div><div class="zazu-metric-copy">Current event and job workspaces.</div></div>
-        <div class="zazu-metric-card"><div class="zazu-metric-label">Next 14 days</div><div class="zazu-metric-value">{{ $metrics['upcoming_work'] }}</div><div class="zazu-metric-copy">Work with scheduled dates.</div></div>
-        <div class="zazu-metric-card"><div class="zazu-metric-label">Customers</div><div class="zazu-metric-value">{{ $metrics['customers'] }}</div><div class="zazu-metric-copy">Relationship records available.</div></div>
-        <div class="zazu-metric-card"><div class="zazu-metric-label">Draft quotes</div><div class="zazu-metric-value">{{ $metrics['draft_quotes'] }}</div><div class="zazu-metric-copy">Offers still in draft state.</div></div>
+        <div class="zazu-metric-card"><h2 class="zazu-metric-label">Active work</h2><div class="zazu-metric-value">{{ $metrics['active_work'] }}</div><div class="zazu-metric-copy">Current event and job workspaces.</div></div>
+        <div class="zazu-metric-card"><h2 class="zazu-metric-label">Next 14 days</h2><div class="zazu-metric-value">{{ $metrics['upcoming_work'] }}</div><div class="zazu-metric-copy">Work with scheduled dates.</div></div>
+        <div class="zazu-metric-card"><h2 class="zazu-metric-label">Customers</h2><div class="zazu-metric-value">{{ $metrics['customers'] }}</div><div class="zazu-metric-copy">Relationship records available.</div></div>
+        <div class="zazu-metric-card"><h2 class="zazu-metric-label">Draft quotes</h2><div class="zazu-metric-value">{{ $metrics['draft_quotes'] }}</div><div class="zazu-metric-copy">Offers still in draft state.</div></div>
     </section>
 
     <div class="zazu-detail-grid">
         <section class="zazu-panel">
             <div class="zazu-panel-head">
-                <div><div class="zazu-panel-title">Upcoming work</div><div class="zazu-panel-copy">Operational records with future event dates.</div></div>
+                <div><div class="zazu-panel-title">Upcoming work</div><div class="zazu-panel-copy">Work scheduled for future dates.</div></div>
                 <a href="{{ route('calendar.index') }}" class="zazu-btn zazu-btn-secondary">Calendar</a>
             </div>
             <div class="zazu-list mt-3">
@@ -36,8 +36,8 @@
         </section>
 
         <section class="zazu-panel">
-            <div class="zazu-panel-title">Jump into work</div>
-            <div class="zazu-panel-copy">Go straight to the operational surface you need.</div>
+            <div class="zazu-panel-title">Quick access</div>
+            <div class="zazu-panel-copy">Open a business area quickly.</div>
             <div class="mt-4 grid gap-2">
                 @foreach ([
                     ['label' => 'Work', 'route' => 'work.index'],
@@ -46,7 +46,7 @@
                     ['label' => 'Capabilities', 'route' => 'capabilities.index'],
                     ['label' => 'Settings', 'route' => 'settings.index'],
                 ] as $item)
-                    <a href="{{ route($item['route']) }}" class="flex items-center justify-between rounded-lg border border-[var(--zazu-border)] bg-[var(--zazu-surface-2)] px-3 py-2 text-xs font-semibold text-[var(--zazu-ink-2)] no-underline hover:border-[var(--zazu-border-strong)] hover:text-[var(--zazu-link)]"><span>{{ $item['label'] }}</span><span aria-hidden="true">→</span></a>
+                    <a href="{{ route($item['route']) }}" class="zazu-quick-link flex items-center justify-between rounded-lg border border-[var(--zazu-border)] bg-[var(--zazu-surface-2)] px-3 py-2 text-xs font-semibold text-[var(--zazu-ink-2)] no-underline hover:border-[var(--zazu-border-strong)] hover:text-[var(--zazu-link)]"><span>{{ $item['label'] }}</span><span aria-hidden="true">→</span></a>
                 @endforeach
             </div>
         </section>
@@ -54,14 +54,14 @@
 
     <section class="zazu-module-grid mt-5">
         @foreach ([
-            ['label' => 'Work', 'copy' => 'Events, jobs and operational workspaces.', 'route' => 'work.index', 'group' => 'Operations'],
-            ['label' => 'Customers', 'copy' => 'Relationships, contacts and work history.', 'route' => 'customers.index', 'group' => 'Relationships'],
-            ['label' => 'Quotes', 'copy' => 'Commercial offers and quote versions.', 'route' => 'quotes.index', 'group' => 'Commercial'],
+            ['label' => 'Work', 'copy' => 'Events, jobs and delivery records.', 'route' => 'work.index', 'group' => 'Operations'],
+            ['label' => 'Customers', 'copy' => 'Customer details, contacts and work history.', 'route' => 'customers.index', 'group' => 'Relationships'],
+            ['label' => 'Quotes', 'copy' => 'Quotes and pricing history.', 'route' => 'quotes.index', 'group' => 'Commercial'],
             ['label' => 'Calendar', 'copy' => 'Dates and operational timing.', 'route' => 'calendar.index', 'group' => 'Operations'],
             ['label' => 'Suppliers', 'copy' => 'Buying relationships.', 'route' => 'suppliers.index', 'group' => 'Resources'],
             ['label' => 'Inventory', 'copy' => 'Stock and movement.', 'route' => 'inventory.index', 'group' => 'Resources'],
             ['label' => 'Assets', 'copy' => 'Reusable equipment and accountability.', 'route' => 'assets.index', 'group' => 'Resources'],
-            ['label' => 'Reports', 'copy' => 'Operational and commercial visibility.', 'route' => 'reports.index', 'group' => 'Insights'],
+            ['label' => 'Reports', 'copy' => 'Business information from your records.', 'route' => 'reports.index', 'group' => 'Insights'],
             ['label' => 'Settings', 'copy' => 'Business and system controls.', 'route' => 'settings.index', 'group' => 'System'],
             ['label' => 'Capabilities', 'copy' => 'Reusable services, rentals and products.', 'route' => 'capabilities.index', 'group' => 'Catalogue'],
         ] as $module)
