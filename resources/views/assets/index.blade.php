@@ -6,7 +6,7 @@
     <section class="zazu-card zazu-list">
         <div class="zazu-card-header">
             <div class="zazu-card-title">Asset register</div>
-            <div class="zazu-card-description">Skeleton surface for owned resources, availability and accountability.</div>
+            <div class="zazu-card-description">Planned asset register for equipment, availability and accountability.</div>
         </div>
         @foreach (['Owned equipment','Reusable catering equipment','Transport assets','Other accountable assets'] as $asset)
             <div class="zazu-list-item">
@@ -14,7 +14,7 @@
                     <div class="zazu-list-title">{{ $asset }}</div>
                     <div class="zazu-list-meta">Availability · allocation · condition · accountability</div>
                 </div>
-                <span class="zazu-chip zazu-chip-neutral">Coming next</span>
+                <span class="zazu-chip zazu-chip-neutral">Planned</span>
             </div>
         @endforeach
     </section>
