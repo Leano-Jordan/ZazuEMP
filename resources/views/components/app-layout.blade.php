@@ -116,6 +116,11 @@
                     </div>
 
                     <div class="zazu-topbar-actions">
+                        @if($isOwner)
+                            <a href="{{ route('settings.index') }}" class="zazu-theme-toggle" aria-label="Open settings" title="Settings">
+                                <span aria-hidden="true">⚙</span>
+                            </a>
+                        @endif
                         @isset($headerAction)
                             {{ $headerAction }}
                         @endisset
