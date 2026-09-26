@@ -43,6 +43,9 @@ class InventoryController extends Controller
             'unit'=>['required','string','max:50'],'reorder_level'=>['required','numeric','min:0'],
             'capability_id'=>['nullable','integer'],
         ]);
+        if (!empty($data['capability_id'])) {
+            abort_unless(BusinessCapability::where('business_id',$businessId)->where('capability_type','product')->whereKey($data['capability_id'])->exists(), 404);
+        }
         InventoryItem::create([...$data,'business_id'=>$businessId]);
         return redirect()->route('inventory.index')->with('success','Inventory item created.');
     }
@@ -57,6 +60,10 @@ class InventoryController extends Controller
             'movement_date'=>['required','date'],'reference'=>['nullable','string','max:255'],'notes'=>['nullable','string'],
             'event_id'=>['nullable','integer'],
         ]);
+        if (!empty($data['event_id'])) {
+            abort_unless(Event::where('business_id',$businessId)->whereKey($data['event_id'])->exists(), 404);
+        }
+
         if (in_array($data['type'], ['issue','adjustment_out'], true)) {
             $inventoryItem->load('movements');
             $onHand = $inventoryItem->on_hand;
