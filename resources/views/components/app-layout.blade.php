@@ -86,10 +86,12 @@
                         <svg class="zazu-nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true"><path d="M5 19V9M12 19V5M19 19V12"></path></svg>
                         <span>Reports</span>
                     </a>
+        @if($isOwner)
         <a href="{{ route('settings.index') }}" class="zazu-nav-link {{ request()->routeIs('settings.*') ? 'active' : '' }}" @if (request()->routeIs('settings.*')) aria-current="page" @endif>
                             <svg class="zazu-nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true"><circle cx="12" cy="12" r="3"></circle><path d="M19 12a7 7 0 0 0-.3-2l2-1.3-2-3.4-2.3 1a7 7 0 0 0-3.4-2L12.7 2h-1.4L11 4.3a7 7 0 0 0-3.4 2l-2.3-1-2 3.4 2 1.3a7 7 0 0 0 0 4L3.3 15.3l2 3.4 2.3-1a7 7 0 0 0 3.4 2l.3 2.3h1.4l.3-2.3a7 7 0 0 0 3.4-2l2.3 1 2-3.4-2-1.3a7 7 0 0 0 .3-2z"></path></svg>
                             <span>Settings</span>
                         </a>
+        @endif
     </div>
 </nav>
 
@@ -191,8 +193,9 @@
             </header>
 
             <nav class="zazu-mobile-nav" aria-label="Mobile primary">
-                <a href="{{ route('dashboard') }}" class="zazu-mobile-link {{ request()->routeIs('dashboard') ? 'active' : '' }}" @if (request()->routeIs('dashboard')) aria-current="page" @endif>Dashboard</a>
-                <a href="{{ route('work.index') }}" class="zazu-mobile-link {{ request()->routeIs('work.*') ? 'active' : '' }}" @if (request()->routeIs('work.*')) aria-current="page" @endif>Work</a>
+                <a href="{{ route('dashboard') }}" class="zazu-mobile-link {{ request()->routeIs('dashboard') ? 'active' : '' }}" @if (request()->routeIs('dashboard')) aria-current="page" @endif>Home</a>
+                <a href="{{ route('capabilities.index') }}" class="zazu-mobile-link zazu-mobile-priority {{ request()->routeIs('capabilities.*') ? 'active' : '' }}" @if (request()->routeIs('capabilities.*')) aria-current="page" @endif>Services</a>
+                <a href="{{ route('work.index') }}" class="zazu-mobile-link {{ request()->routeIs('work.*') ? 'active' : '' }}" @if (request()->routeIs('work.*')) aria-current="page" @endif>Jobs</a>
                 <a href="{{ route('customers.index') }}" class="zazu-mobile-link {{ request()->routeIs('customers.*') ? 'active' : '' }}" @if (request()->routeIs('customers.*')) aria-current="page" @endif>Customers</a>
                 <a href="{{ route('quotes.index') }}" class="zazu-mobile-link {{ request()->routeIs('quotes.*') ? 'active' : '' }}" @if (request()->routeIs('quotes.*')) aria-current="page" @endif>Quotes</a>
                 <a href="{{ route('calendar.index') }}" class="zazu-mobile-link {{ request()->routeIs('calendar.*') ? 'active' : '' }}" @if (request()->routeIs('calendar.*')) aria-current="page" @endif>Calendar</a>
@@ -202,7 +205,6 @@
                 <a href="{{ route('inventory.index') }}" class="zazu-mobile-link {{ request()->routeIs('inventory.*') ? 'active' : '' }}" @if (request()->routeIs('inventory.*')) aria-current="page" @endif>Inventory</a>
                 <a href="{{ route('assets.index') }}" class="zazu-mobile-link {{ request()->routeIs('assets.*') ? 'active' : '' }}" @if (request()->routeIs('assets.*')) aria-current="page" @endif>Assets</a>
                 <a href="{{ route('reports.index') }}" class="zazu-mobile-link {{ request()->routeIs('reports.*') ? 'active' : '' }}" @if (request()->routeIs('reports.*')) aria-current="page" @endif>Reports</a>
-                <a href="{{ route('capabilities.index') }}" class="zazu-mobile-link {{ request()->routeIs('capabilities.*') ? 'active' : '' }}" @if (request()->routeIs('capabilities.*')) aria-current="page" @endif>Capabilities</a>
                 @if($isOwner)
                     <a href="{{ route('settings.index') }}" class="zazu-mobile-link {{ request()->routeIs('settings.*') ? 'active' : '' }}" @if (request()->routeIs('settings.*')) aria-current="page" @endif>Settings</a>
                 @endif
