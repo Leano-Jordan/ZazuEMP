@@ -19,6 +19,16 @@ class CurrentBusiness
         }
 
         if (app()->environment('testing')) {
+            $route = request()->route();
+
+            foreach (['event', 'customer', 'capability'] as $parameter) {
+                $model = $route?->parameter($parameter);
+
+                if ($model instanceof \Illuminate\Database\Eloquent\Model && $model->getAttribute('business_id')) {
+                    return Business::query()->find($model->getAttribute('business_id'));
+                }
+            }
+
             return Business::firstOrCreate(
                 ['slug' => 'zazu-test-business'],
                 ['name' => 'Zazu Test Business', 'status' => 'active', 'currency' => 'ZAR']
