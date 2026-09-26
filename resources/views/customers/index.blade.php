@@ -26,7 +26,7 @@
         @forelse ($customers as $customer)
             <div class="zazu-list-item">
                 <a href="{{ route('customers.show', $customer) }}" class="zazu-row-with-avatar min-w-0 flex-1">
-                    <div class="zazu-avatar">{{ IlluminateSupportStr::upper(IlluminateSupportStr::substr($customer->name, 0, 1)) }}</div>
+                    <div class="zazu-avatar">{{ \Illuminate\Support\Str::upper(\Illuminate\Support\Str::substr($customer->name, 0, 1)) }}</div>
                     <div class="zazu-list-main">
                         <div class="zazu-list-title">{{ $customer->name }}</div>
                         <div class="zazu-list-meta">
