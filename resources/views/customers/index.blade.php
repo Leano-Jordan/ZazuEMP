@@ -35,9 +35,12 @@
                         </div>
                     </div>
                 </a>
-                <div class="zazu-list-side">
-                    <div class="zazu-side-primary">{{ $customer->events_count }} {{ $customer->events_count === 1 ? 'work item' : 'work items' }}</div>
-                    <a href="{{ route('work.create', ['customer_id' => $customer->id]) }}" class="zazu-side-secondary">Start work →</a>
+                <div class="flex flex-wrap items-center justify-end gap-2">
+                    <div class="zazu-list-side">
+                        <div class="zazu-side-primary">{{ $customer->events_count }} {{ $customer->events_count === 1 ? 'work item' : 'work items' }}</div>
+                        <a href="{{ route('work.create', ['customer_id' => $customer->id]) }}" class="zazu-side-secondary">Start work →</a>
+                    </div>
+                    <a href="{{ route('customers.edit', $customer) }}" class="zazu-btn zazu-btn-ghost">Edit</a>
                 </div>
             </div>
         @empty
