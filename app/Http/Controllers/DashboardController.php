@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Customer;
 use App\Models\Event;
 use App\Models\Quote;
+use App\Models\Business;
 use Illuminate\View\View;
 
 class DashboardController extends Controller
@@ -12,6 +13,7 @@ class DashboardController extends Controller
     public function __invoke(): View
     {
         $today = now()->startOfDay();
+        $business = request()->user()?->businesses()->first();
 
         $metrics = [
             'active_work' => Event::query()->count(),
@@ -30,6 +32,6 @@ class DashboardController extends Controller
             ->limit(8)
             ->get();
 
-        return view('dashboard', compact('metrics', 'upcoming'));
+        return view('dashboard', compact('metrics', 'upcoming', 'business'));
     }
 }
