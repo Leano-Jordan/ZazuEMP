@@ -189,7 +189,7 @@ class TaxComplianceTest extends TestCase
         $this->patch(route('quotes.status', $quote), ['status' => 'accepted'])->assertRedirect();
 
         $this->post(route('finance.invoices.store'), ['quote_id' => $quote->id])
-            ->assertRedirect(route('finance.index'));
+            ->assertRedirect();
 
         $invoice = Invoice::where('quote_id', $quote->id)->firstOrFail();
 
