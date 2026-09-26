@@ -129,6 +129,8 @@ class WorkWorkflowTest extends TestCase
         $response->assertSee('Night Contact');
         $response->assertSee('event_day_contact_id', false);
         $response->assertSee('event_night_contact_id', false);
+        $response->assertSee('JSON.parse', false);
+        $response->assertDontSee('@json(', false);
     }
 
     public function test_work_customer_cannot_change_after_a_quote_exists(): void
