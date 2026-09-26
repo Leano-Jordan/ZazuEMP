@@ -7,6 +7,17 @@
         <div class="zazu-command-meta"><div class="zazu-command-meta-label">Today</div><div class="zazu-command-meta-value">{{ now()->format('d M') }}</div></div>
     </section>
 
+    @if ($isOwner && (! $business?->catalogue_setup_completed_at || ! $business?->business_setup_completed_at))
+        <section class="zazu-next-action">
+            <div>
+                <div class="zazu-eyebrow">Setup centre</div>
+                <h2 class="zazu-next-action-title">Keep building your business workspace.</h2>
+                <p class="zazu-next-action-copy">Services, business identity and optional tax/compliance setup can be completed later without losing your progress.</p>
+            </div>
+            <a href="{{ route('onboarding.index') }}" class="zazu-btn zazu-btn-primary">Continue setup →</a>
+        </section>
+    @endif
+
     <section class="zazu-metric-grid">
         <a href="{{ route('work.index') }}" class="zazu-metric-card zazu-metric-link"><h2 class="zazu-metric-label">Active jobs</h2><div class="zazu-metric-value">{{ $metrics['active_work'] }}</div><div class="zazu-metric-copy">Open the job list →</div></a>
         <a href="{{ route('calendar.index') }}" class="zazu-metric-card zazu-metric-link"><h2 class="zazu-metric-label">Next 14 days</h2><div class="zazu-metric-value">{{ $metrics['upcoming_work'] }}</div><div class="zazu-metric-copy">Open the calendar →</div></a>
@@ -51,10 +62,10 @@
             <div class="zazu-panel-copy">Open a business area quickly.</div>
             @php
                 $quickAccess = [
+                    ['label' => 'Services & prices', 'route' => 'capabilities.index'],
                     ['label' => 'Jobs', 'route' => 'work.index'],
                     ['label' => 'Customers', 'route' => 'customers.index'],
                     ['label' => 'Quotes', 'route' => 'quotes.index'],
-                    ['label' => 'Services & prices', 'route' => 'capabilities.index'],
                 ];
                 if ($isOwner) {
                     $quickAccess[] = ['label' => 'Settings', 'route' => 'settings.index'];
