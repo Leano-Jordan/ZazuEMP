@@ -3,6 +3,7 @@
 namespace App\Support;
 
 use App\Models\Business;
+use Illuminate\Support\Str;
 use Illuminate\Contracts\Auth\Authenticatable;
 
 class CurrentBusiness
@@ -26,7 +27,7 @@ class CurrentBusiness
             if (!$user->businesses()->exists()) {
                 $business = Business::create([
                     'name' => trim((string) $user->name) . "'s Business",
-                    'slug' => IlluminateSupportStr::slug((string) $user->name) . '-' . IlluminateSupportStr::lower(IlluminateSupportStr::random(6)),
+                    'slug' => Str::slug((string) $user->name) . '-' . Str::lower(Str::random(6)),
                     'status' => 'active',
                     'currency' => 'ZAR',
                 ]);
