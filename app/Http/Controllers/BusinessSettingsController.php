@@ -48,7 +48,7 @@ class BusinessSettingsController extends Controller
 
             'legal_name' => ['nullable', 'string', 'max:255'],
             'trading_name' => ['nullable', 'string', 'max:255'],
-            'registration_type' => ['nullable', 'string', 'max:50'],
+            'registration_type' => ['nullable', 'string', 'in:company,sole_proprietor,close_corporation,trust,cooperative,other'],
             'registration_number' => ['nullable', 'string', 'max:100'],
             'tax_regime' => ['required', Rule::in(array_keys(config('zazu.tax.regimes')))],
             'income_tax_number' => ['nullable', 'string', 'max:100'],
@@ -170,13 +170,25 @@ class BusinessSettingsController extends Controller
 
         TaxRate::query()
             ->where('business_id', $business->id)
-            ->where('is_default', true)
-            ->update(['is_default' => false]);
+            ->where('tax_type', 'vat')
+            ->update(['is_default' => false, 'is_active' => false]);
 
         $defaultCode = match ($profile->vat_status) {
             'registered' => 'VAT_STANDARD',
             'exempt' => 'VAT_EXEMPT',
             default => 'NO_VAT',
+        };
+
+        $defaultRate = $profile->vat_status === 'registered' ? $rate : '0.00';
+        $defaultName = match ($profile->vat_status) {
+            'registered' => 'Standard VAT',
+            'exempt' => 'VAT exempt',
+            default => 'No VAT',
+        };
+        $defaultTreatment = match ($profile->vat_status) {
+            'registered' => 'standard',
+            'exempt' => 'exempt',
+            default => 'out_of_scope',
         };
 
         $existing = TaxRate::query()
@@ -186,54 +198,80 @@ class BusinessSettingsController extends Controller
             ->latest('effective_from')
             ->first();
 
-        $defaultRate = $profile->vat_status === 'registered'
-            ? $rate
-            : '0.00';
-
         if ($existing && (string) $existing->rate === $defaultRate && $existing->effective_from <= $effectiveFrom) {
             $existing->update([
-                'name' => $profile->vat_status === 'registered' ? 'Standard VAT' : ($profile->vat_status === 'exempt' ? 'VAT exempt' : 'No VAT'),
-                'treatment' => $profile->vat_status === 'registered' ? 'standard' : ($profile->vat_status === 'exempt' ? 'exempt' : 'out_of_scope'),
+                'name' => $defaultName,
+                'treatment' => $defaultTreatment,
                 'is_default' => true,
                 'is_active' => true,
-                'source_reference' => $profile->vat_status === 'registered' ? 'SARS VAT guidance; reviewed by Zazu configuration' : 'Business tax profile',
+                'source_reference' => $profile->vat_status === 'registered'
+                    ? 'SARS VAT guidance; reviewed by Zazu configuration'
+                    : 'Business tax profile',
             ]);
         } else {
             if ($existing && $existing->effective_from < $effectiveFrom) {
-                $existing->update(['effective_to' => $effectiveFrom->copy()->subDay()->toDateString()]);
+                $existing->update([
+                    'effective_to' => $effectiveFrom->copy()->subDay()->toDateString(),
+                    'is_default' => false,
+                    'is_active' => false,
+                ]);
             }
 
             TaxRate::create([
                 'business_id' => $business->id,
-                'name' => $profile->vat_status === 'registered' ? 'Standard VAT' : ($profile->vat_status === 'exempt' ? 'VAT exempt' : 'No VAT'),
+                'name' => $defaultName,
                 'code' => $defaultCode,
                 'tax_type' => 'vat',
-                'treatment' => $profile->vat_status === 'registered' ? 'standard' : ($profile->vat_status === 'exempt' ? 'exempt' : 'out_of_scope'),
+                'treatment' => $defaultTreatment,
                 'rate' => $defaultRate,
                 'effective_from' => $effectiveFrom->toDateString(),
                 'is_default' => true,
                 'is_active' => true,
-                'source_reference' => $profile->vat_status === 'registered' ? 'SARS VAT guidance; reviewed by Zazu configuration' : 'Business tax profile',
+                'source_reference' => $profile->vat_status === 'registered'
+                    ? 'SARS VAT guidance; reviewed by Zazu configuration'
+                    : 'Business tax profile',
             ]);
         }
 
-        foreach ([
+        $supportRates = [
             ['code' => 'VAT_ZERO', 'name' => 'Zero-rated', 'treatment' => 'zero_rated'],
             ['code' => 'VAT_EXEMPT', 'name' => 'Exempt', 'treatment' => 'exempt'],
-        ] as $supportRate) {
-            TaxRate::query()->firstOrCreate(
-                ['business_id' => $business->id, 'code' => $supportRate['code']],
-                [
+        ];
+
+        foreach ($supportRates as $supportRate) {
+            $rateRecord = TaxRate::query()
+                ->where('business_id', $business->id)
+                ->where('code', $supportRate['code'])
+                ->first();
+
+            if (!$rateRecord) {
+                TaxRate::create([
+                    'business_id' => $business->id,
                     'name' => $supportRate['name'],
+                    'code' => $supportRate['code'],
                     'tax_type' => 'vat',
                     'treatment' => $supportRate['treatment'],
                     'rate' => '0.00',
                     'effective_from' => $effectiveFrom->toDateString(),
                     'is_default' => false,
-                    'is_active' => true,
+                    'is_active' => $profile->vat_status !== 'not_registered',
                     'source_reference' => 'SARS VAT guidance; use only where the supply qualifies for the treatment',
-                ]
-            );
+                ]);
+            } else {
+                $rateRecord->update([
+                    'is_active' => $profile->vat_status !== 'not_registered',
+                    'is_default' => false,
+                    'effective_from' => min($rateRecord->effective_from->toDateString(), $effectiveFrom->toDateString()),
+                ]);
+            }
+        }
+
+        if ($profile->vat_status !== 'registered') {
+            TaxRate::query()
+                ->where('business_id', $business->id)
+                ->where('code', 'VAT_STANDARD')
+                ->whereKeyNot($defaultCode === 'VAT_STANDARD' ? 0 : null)
+                ->update(['is_default' => false, 'is_active' => false]);
         }
     }
 
