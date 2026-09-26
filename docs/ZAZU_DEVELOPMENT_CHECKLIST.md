@@ -44,12 +44,12 @@ This is the living execution map for Zazu EMP. Work it in order unless repositor
 - [x] Replaceable route provider
 - [x] Distance/time evidence
 - [x] Configurable fuel and vehicle assumptions
-- [ ] Projected versus actual costs
+- [x] Projected versus actual costs
 - [ ] Staff costing
 - [ ] Suppliers and purchasing
 - [ ] Inventory
 - [ ] Asset accountability
-- [ ] Preparation/readiness workspace
+- [x] Preparation/readiness workspace
 
 ## 05 Finance & Completion
 - [ ] Payments
@@ -112,9 +112,9 @@ Not yet proven locally:
 - rendered responsive/light/dark verification
 - customer-facing quote document generation
 
-Current execution slice: **Planning & Resources → Travel costing foundation** is implemented.
+Current execution slice: **Planning & Resources → Projected vs actual costs / preparation workspace** is implemented.
 
-Next execution slice: **Planning & Resources → Projected vs actual costs / preparation workspace**, unless repository evidence changes that sequence.
+Next execution slice: **Control & Security → Authentication, active business context and server-side business isolation**, unless repository evidence changes that sequence.
 
 
 Travel costing foundation implemented in this cycle:
@@ -175,3 +175,24 @@ Commercial/security boundaries recorded:
 - Authentication, active business context, business isolation, roles/permissions, auditability and retention/deletion workflows remain production gates.
 - Soft deletion preserves history; it is not a substitute for a lawful retention schedule.
 - Local PHPUnit/migrations/browser rendering remain unverified in this environment.
+
+
+## Planning & resources cycle - 2026-09-26
+
+Completed:
+- [x] Work-specific projected vs actual cost records
+- [x] Currency-safe cost summaries without mixing currencies
+- [x] Cost status lifecycle: planned, incurred, cancelled
+- [x] Preparation/readiness item records
+- [x] Preparation status transitions: open, blocked, ready
+- [x] Preparation due dates, quantities and notes
+- [x] Work workspace navigation to costs and preparation
+- [x] Business ownership fields on planning records
+- [x] Server-side protection against updating a preparation item through the wrong Work route
+- [x] Automated workflow coverage for cost persistence and preparation status transitions
+
+Architecture boundary:
+- Cost records are operational planning records, not payment/accounting records.
+- Preparation records are Work-scoped readiness records and do not yet pretend to be staff, supplier or inventory allocation.
+- Business IDs are derived from the Work record rather than accepted from user input.
+- Authentication and server-side business membership authorization remain the next foundation gate.
