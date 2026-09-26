@@ -12,14 +12,12 @@ Route::get('/', fn () => redirect()->route('dashboard'));
 
 Route::view('/dashboard', 'dashboard')->name('dashboard');
 
-Route::view('/quotes', 'quotes.index')->name('quotes.index');
 Route::view('/calendar', 'calendar.index')->name('calendar.index');
 Route::view('/suppliers', 'suppliers.index')->name('suppliers.index');
 Route::view('/inventory', 'inventory.index')->name('inventory.index');
 Route::view('/assets', 'assets.index')->name('assets.index');
 Route::view('/reports', 'reports.index')->name('reports.index');
 Route::view('/settings', 'settings.index')->name('settings.index');
-
 Route::get('/quotes', [QuoteController::class, 'index'])->name('quotes.index');
 Route::get('/quotes/{quote}', [QuoteController::class, 'show'])->name('quotes.show');
 Route::post('/quotes/{quote}/versions', [QuoteController::class, 'createVersion'])->name('quotes.versions.store');
