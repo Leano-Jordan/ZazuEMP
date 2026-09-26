@@ -44,6 +44,9 @@ class AssetController extends Controller
             'acquired_at'=>['nullable','date'],'purchase_cost'=>['required','numeric','min:0'],
             'capability_id'=>['nullable','integer'],'notes'=>['nullable','string'],
         ]);
+        if (!empty($data['capability_id'])) {
+            abort_unless(BusinessCapability::where('business_id',$businessId)->where('capability_type','rental')->whereKey($data['capability_id'])->exists(), 404);
+        }
         Asset::create([...$data,'business_id'=>$businessId,'currency'=>$currency,'status'=>'available']);
         return redirect()->route('assets.index')->with('success','Asset added to the register.');
     }
@@ -57,6 +60,13 @@ class AssetController extends Controller
         ]);
         $event=Event::where('business_id',$businessId)->findOrFail($data['event_id']);
         abort_if($asset->status!=='available',422,'Only available assets can be allocated.');
+        abort_if($data['allocated_until'] && $data['allocated_from'] > $data['allocated_until'], 422, 'Allocation dates are invalid.');
+        $overlap=$asset->allocations()->where('status','allocated')
+            ->whereDate('allocated_from','<=',$data['allocated_until'] ?: $data['allocated_from'])
+            ->where(function($query) use ($data) {
+                $query->whereNull('allocated_until')->orWhereDate('allocated_until','>=',$data['allocated_from']);
+            })->exists();
+        abort_if($overlap, 422, 'This asset is already allocated for the selected period.');
         $asset->allocations()->create([...$data,'business_id'=>$businessId,'status'=>'allocated']);
         $asset->update(['status'=>'allocated']);
         return back()->with('success',$asset->name.' allocated to '.$event->name.'.');
