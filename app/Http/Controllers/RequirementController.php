@@ -43,6 +43,7 @@ class RequirementController extends Controller
             'event' => $event,
             'capabilities' => $capabilities,
             'serviceCategories' => config('zazu.service_categories'),
+            'businessCurrency' => app(CurrentBusiness::class)->model($request->user())->currency ?? 'ZAR',
         ]);
     }
 
@@ -61,7 +62,7 @@ class RequirementController extends Controller
             ],
             'description' => ['required', 'string', 'max:255'],
             'category' => ['required', 'string', 'max:100', Rule::in(array_keys(config('zazu.service_categories')))],
-            'quantity' => ['required', 'numeric', 'min:0.01'],
+            'quantity' => ['required', 'numeric', 'decimal:0,2', 'min:0.01'],
             'unit' => ['nullable', 'string', 'max:50'],
             'notes' => ['nullable', 'string'],
         ]);
