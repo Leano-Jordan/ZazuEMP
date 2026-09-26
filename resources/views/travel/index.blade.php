@@ -54,6 +54,6 @@
 
     <div class="zazu-skeleton-actions">
         <a href="{{ route('work.quotes.index', $event) }}" class="zazu-btn zazu-btn-secondary">Quotes</a>
-        <a href="{{ route('work.requirements.index', $event) }}" class="zazu-btn zazu-btn-ghost">Requirements →</a>
+        <a href="{{ route('work.show', $event) }}" class="zazu-btn zazu-btn-ghost">Job workspace</a>
     </div>
 </x-app-layout>
