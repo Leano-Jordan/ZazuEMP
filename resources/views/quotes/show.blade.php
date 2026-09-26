@@ -62,10 +62,10 @@
             <section class="zazu-panel">
                 <div class="zazu-eyebrow">Integrity</div>
                 <div class="zazu-panel-title mt-1">Historical snapshot</div>
-                <div class="zazu-panel-copy">This revision stores the source requirement values used when it was created.</div>
+                <div class="zazu-panel-copy">This revision keeps the original requirement details used when it was created.</div>
                 <div class="zazu-placeholder">
-                    <div class="zazu-placeholder-title">Source snapshots preserved</div>
-                    <div class="zazu-placeholder-copy">Changing the current Work requirements does not rewrite the saved quote line descriptions, quantities or source metadata.</div>
+                    <div class="zazu-placeholder-title">Quote details stay fixed</div>
+                    <div class="zazu-placeholder-copy">Changing the current Work requirements does not rewrite the saved quote line descriptions and quantities.</div>
                 </div>
             </section>
         </div>
