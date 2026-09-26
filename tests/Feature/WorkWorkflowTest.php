@@ -10,6 +10,12 @@ use Tests\TestCase;
 
 class WorkWorkflowTest extends TestCase
 {
+    protected function setUp(): void
+    {
+        parent::setUp();
+        $this->signInAsOwner();
+    }
+
     use RefreshDatabase;
 
     public function test_work_can_be_created_from_a_customer_with_day_and_night_contacts(): void
