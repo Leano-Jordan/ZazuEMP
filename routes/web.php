@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\BusinessCapabilityController;
+use App\Http\Controllers\BusinessContextController;
 use App\Http\Controllers\BusinessSettingsController;
 use App\Http\Controllers\CalendarController;
 use App\Http\Controllers\CustomerController;
@@ -102,15 +103,7 @@ Route::middleware('owner')->group(function () {
 });
 
 
-    Route::post('/business/switch', function (\Illuminate\Http\Request $request): \Illuminate\Http\RedirectResponse {
-        $validated = $request->validate([
-            'business_id' => ['required', 'integer'],
-        ]);
-
-        app(\App\Support\CurrentBusiness::class)->switchTo((int) $validated['business_id'], $request->user());
-
-        return back()->with('success', 'Workspace changed.');
-    })->name('business.switch');
+    Route::post('/business/switch', [BusinessContextController::class, 'switch'])->name('business.switch');
 
     Route::post('/logout', [\App\Http\Controllers\AuthController::class, 'destroy'])->name('logout');
 });
