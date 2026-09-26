@@ -4,7 +4,7 @@
     "src": "images/catering.webp"
   },
   "resources/css/app.css": {
-    "file": "assets/app-CzHlmAQI.css",
+    "file": "assets/app-CoSmm5Ci.css",
     "name": "app",
     "names": [
       "app.css"
@@ -16,7 +16,7 @@
     ]
   },
   "resources/js/app.js": {
-    "file": "assets/app-ClQNl2gm.js",
+    "file": "assets/app-BBFIpWfN.js",
     "name": "app",
     "src": "resources/js/app.js",
     "isEntry": true
