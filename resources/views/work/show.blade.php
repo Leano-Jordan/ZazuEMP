@@ -42,7 +42,7 @@
                 <div class="zazu-panel-head">
                     <div>
                         <div class="zazu-panel-title">Customer relationship</div>
-                        <div class="zazu-panel-copy">The customer and event-day contact behind this work.</div>
+                        <div class="zazu-panel-copy">The customer and contacts for this work.</div>
                     </div>
                     @if ($event->customer)
                         <a href="{{ route('customers.show', $event->customer) }}" class="zazu-btn zazu-btn-ghost">Open customer</a>
@@ -79,7 +79,7 @@
                 <div class="zazu-panel-head">
                     <div>
                         <div class="zazu-panel-title">Requirements & services</div>
-                        <div class="zazu-panel-copy">Work-specific quantities and deliverables before commercial quoting.</div>
+                        <div class="zazu-panel-copy">What must be delivered before a quote is prepared.</div>
                     </div>
                     <div class="flex flex-wrap gap-2">
                         <a href="{{ route('work.requirements.index', $event) }}" class="zazu-btn zazu-btn-secondary">Requirements</a>
@@ -99,7 +99,7 @@
                 <div class="zazu-panel-head">
                     <div>
                         <div class="zazu-panel-title">Location & travel</div>
-                        <div class="zazu-panel-copy">Keep the operating location visible while route and travel costing are added later.</div>
+                        <div class="zazu-panel-copy">Keep the event location visible with travel details.</div>
                     </div>
                 </div>
 
@@ -113,7 +113,7 @@
 
         <aside class="zazu-detail-stack">
             <section class="zazu-panel">
-                <div class="zazu-panel-title">Work at a glance</div>
+                <div class="zazu-panel-title">Work details</div>
                 <div class="zazu-detail-rows">
                     <div class="zazu-detail-row"><div class="zazu-detail-label">Date</div><div class="zazu-detail-value">{{ $event->event_date?->format('d M Y') ?? 'Not set' }}</div></div>
                     <div class="zazu-detail-row"><div class="zazu-detail-label">Location</div><div class="zazu-detail-value">{{ $event->event_address ?: 'Not set' }}</div></div>
@@ -122,8 +122,8 @@
             </section>
 
             <section class="zazu-panel">
-                <div class="zazu-panel-title">Operational progression</div>
-                <div class="zazu-panel-copy">The workspace grows from this record into the operational layers below.</div>
+                <div class="zazu-panel-title">Work progress</div>
+                <div class="zazu-panel-copy">The work record moves through the stages below.</div>
 
                 <div class="zazu-stage-list">
                     <a href="{{ route('work.show', $event) }}" class="zazu-stage current">
