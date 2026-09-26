@@ -62,6 +62,7 @@ Route::middleware(['auth', 'business.context'])->group(function () {
 
     Route::get('/finance', [FinanceController::class, 'index'])->name('finance.index');
     Route::get('/finance/invoices/create', [FinanceController::class, 'createInvoice'])->name('finance.invoices.create');
+    Route::get('/finance/invoices/{invoice}', [FinanceController::class, 'showInvoice'])->name('finance.invoices.show');
     Route::post('/finance/invoices', [FinanceController::class, 'storeInvoice'])->name('finance.invoices.store');
     Route::get('/finance/payments/create', [FinanceController::class, 'createPayment'])->name('finance.payments.create');
     Route::post('/finance/payments', [FinanceController::class, 'storePayment'])->name('finance.payments.store');
