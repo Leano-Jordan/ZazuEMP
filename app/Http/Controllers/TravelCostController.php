@@ -63,7 +63,8 @@ class TravelCostController extends Controller
             $fuelCost,
             $customerCharge
         ): TravelCost {
-            return $event->travelCosts()->create([
+            return TravelCost::query()->create([
+                'event_id' => $event->id,
                 'route_label' => $validated['route_label'],
                 'currency' => strtoupper($validated['currency']),
                 'provider' => $validated['provider'],
