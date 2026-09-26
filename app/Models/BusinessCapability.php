@@ -18,6 +18,7 @@ class BusinessCapability extends Model
         'capability_type',
         'pricing_basis',
         'default_price',
+        'currency',
         'default_unit',
         'description',
         'image_path',
