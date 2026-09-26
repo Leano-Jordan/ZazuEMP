@@ -16,7 +16,7 @@
             <div>
                 <div class="zazu-eyebrow">Operations / New workspace</div>
                 <h2 class="zazu-command-title">Create work</h2>
-                <p class="zazu-command-copy">Capture the core event or job facts now. Requirements, quotes, travel and costs can attach to this workspace later.</p>
+                <p class="zazu-command-copy">Enter the main event or job details first. You can add requirements, quotes and travel details later.</p>
             </div>
         </section>
 
@@ -28,7 +28,7 @@
                     <section class="zazu-form-section">
                         <div class="zazu-form-section-head">
                             <div class="zazu-form-section-title">Core work details</div>
-                            <div class="zazu-form-section-copy">Start with the relationship, name and timing of the work.</div>
+                            <div class="zazu-form-section-copy">Start with the customer, name and date.</div>
                         </div>
 
                         <div class="zazu-form-grid">
@@ -80,7 +80,7 @@
 
                     <section class="zazu-form-section">
                         <div class="zazu-form-section-head">
-                            <div class="zazu-form-section-title">Operational context</div>
+                            <div class="zazu-form-section-title">Location and notes</div>
                             <div class="zazu-form-section-copy">Useful information the team may need before the requirements layer is built.</div>
                         </div>
 
