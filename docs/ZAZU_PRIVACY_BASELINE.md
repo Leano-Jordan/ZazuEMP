@@ -45,3 +45,8 @@ Before real customer or staff personal information is processed in production, Z
 - WCAG 3.3.1 Error Identification: https://www.w3.org/WAI/WCAG22/Understanding/error-identification
 
 The 2026 POPIA regulations should also be checked against the specific processing activity before production release.
+
+
+## Other South African legal lenses considered
+
+POPIA is the primary privacy/security lens for the personal information handled by these features. PAIA is relevant to record-access processes for private bodies, while the Electronic Communications and Transactions Act is relevant to electronic communications and transactions. The Cybercrimes Act is relevant to the broader security environment around unlawful access, interference and related cyber offences. Applicability depends on the actual business, data, transaction and deployment context.
