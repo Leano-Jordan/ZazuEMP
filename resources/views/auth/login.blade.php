@@ -22,13 +22,13 @@
             <h1 id="login-heading">{{ $ownerAccess ? 'Welcome back, owner.' : 'Welcome back.' }}</h1>
             <p class="zazu-auth-copy zazu-login-copy">
                 {{ $ownerAccess
-                    ? 'Use an owner account to enter protected administration.'
-                    : 'Sign in to continue managing the work behind every event.' }}
+                    ? 'Use your owner account to enter protected administration.'
+                    : 'Use the username you chose for Zazu, or your email address.' }}
             </p>
 
             @if($ownerAccess)
                 <div class="zazu-auth-notice zazu-login-notice" role="note">
-                    Owner authority is verified on the server. Staff credentials cannot elevate themselves.
+                    Owner authority is checked on the server. Staff credentials cannot elevate themselves.
                 </div>
             @endif
 
@@ -39,22 +39,22 @@
                 @endif
 
                 <div class="zazu-field">
-                    <label for="email">Email address</label>
+                    <label for="identifier">Username or email</label>
                     <input
-                        id="email"
-                        name="email"
-                        type="email"
-                        value="{{ old('email') }}"
-                        autocomplete="email"
+                        id="identifier"
+                        name="identifier"
+                        type="text"
+                        value="{{ old('identifier') }}"
+                        autocomplete="username"
                         inputmode="email"
                         spellcheck="false"
                         autocapitalize="none"
                         required
                         autofocus
-                        aria-describedby="@error('email')email-error @enderror"
+                        aria-describedby="@error('identifier')identifier-error @enderror"
                     >
-                    @error('email')
-                        <div id="email-error" class="zazu-field-error">{{ $message }}</div>
+                    @error('identifier')
+                        <div id="identifier-error" class="zazu-field-error">{{ $message }}</div>
                     @enderror
                 </div>
 
@@ -100,14 +100,12 @@
             </div>
 
             @if(!$ownerAccess)
-                <details class="zazu-owner-door">
-                    <summary>Owner / Administrator access</summary>
-                    <div class="zazu-owner-door-body">
-                        <strong>Protected owner entry</strong>
-                        <p>Use this for owner-level administration. Authority is verified server-side.</p>
-                        <a href="{{ route('login', ['owner' => 1]) }}" class="zazu-owner-door-link">Open owner sign-in</a>
-                    </div>
-                </details>
+                <a href="{{ route('owner.login') }}" class="zazu-owner-door-link">Owner / Administrator sign in</a>
+            @else
+                <div class="zazu-auth-switch">
+                    Regular workspace access?
+                    <a href="{{ route('login') }}">Sign in normally</a>
+                </div>
             @endif
         </section>
 
