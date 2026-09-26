@@ -15,13 +15,15 @@ class AuthenticationTest extends TestCase
     public function test_guest_can_open_login_and_registration(): void
     {
         $this->get(route('login'))->assertOk();
-        $this->get(route('register'))->assertOk();
+        $this->get(route('register'))->assertOk()->assertSee('Username');
+        $this->get(route('owner.login'))->assertOk()->assertSee('Owner sign in');
     }
 
     public function test_registration_creates_user_business_owner_membership_and_session(): void
     {
         $response = $this->post(route('register.store'), [
             'name' => 'Owner Person',
+            'username' => 'ownerperson',
             'business_name' => 'Owner Catering',
             'email' => 'owner@example.com',
             'password' => 'password123',
@@ -34,6 +36,7 @@ class AuthenticationTest extends TestCase
         $business = Business::where('name', 'Owner Catering')->firstOrFail();
 
         $this->assertAuthenticatedAs($user);
+        $this->assertSame('ownerperson', $user->username);
         $this->assertDatabaseHas('business_user', [
             'business_id' => $business->id,
             'user_id' => $user->id,
@@ -41,24 +44,43 @@ class AuthenticationTest extends TestCase
         ]);
     }
 
-    public function test_registration_rejects_duplicate_email(): void
+    public function test_registration_rejects_duplicate_email_and_username(): void
     {
-        User::factory()->create(['email' => 'owner@example.com']);
-
-        $response = $this->from(route('register'))->post(route('register.store'), [
-            'name' => 'Another Owner',
-            'business_name' => 'Another Catering',
+        User::factory()->create([
+            'username' => 'existingowner',
             'email' => 'owner@example.com',
-            'password' => 'password123',
-            'password_confirmation' => 'password123',
         ]);
 
-        $response->assertSessionHasErrors('email');
+        $this->from(route('register'))
+            ->post(route('register.store'), [
+                'name' => 'Another Owner',
+                'username' => 'existingowner',
+                'business_name' => 'Another Catering',
+                'email' => 'owner@example.com',
+                'password' => 'password123',
+                'password_confirmation' => 'password123',
+            ])
+            ->assertSessionHasErrors(['email', 'username']);
     }
 
-    public function test_normal_login_succeeds_and_logout_ends_the_authenticated_session(): void
+    public function test_registration_rejects_invalid_username(): void
+    {
+        $this->from(route('register'))
+            ->post(route('register.store'), [
+                'name' => 'Another Owner',
+                'username' => 'Not Allowed!',
+                'business_name' => 'Another Catering',
+                'email' => 'another@example.com',
+                'password' => 'password123',
+                'password_confirmation' => 'password123',
+            ])
+            ->assertSessionHasErrors('username');
+    }
+
+    public function test_username_login_succeeds_and_logout_ends_the_authenticated_session(): void
     {
         $user = User::factory()->create([
+            'username' => 'loginowner',
             'email' => 'login@example.com',
             'password' => 'password123',
         ]);
@@ -73,7 +95,7 @@ class AuthenticationTest extends TestCase
         $business->users()->attach($user->id, ['role' => 'owner']);
 
         $this->post(route('login.store'), [
-            'email' => 'login@example.com',
+            'identifier' => 'LOGINOWNER',
             'password' => 'password123',
         ])->assertRedirect(route('dashboard'));
 
@@ -81,6 +103,48 @@ class AuthenticationTest extends TestCase
 
         $this->post(route('logout'))
             ->assertRedirect(route('login'));
+
+        $this->assertGuest();
+    }
+
+    public function test_email_remains_a_valid_login_identifier(): void
+    {
+        $user = User::factory()->create([
+            'username' => 'emailfallback',
+            'email' => 'login@example.com',
+            'password' => 'password123',
+        ]);
+
+        $business = Business::create([
+            'name' => 'Email Login Business',
+            'slug' => 'email-login-business',
+            'status' => 'active',
+            'currency' => 'ZAR',
+        ]);
+
+        $business->users()->attach($user->id, ['role' => 'owner']);
+
+        $this->post(route('login.store'), [
+            'identifier' => 'LOGIN@EXAMPLE.COM',
+            'password' => 'password123',
+        ])->assertRedirect(route('dashboard'));
+
+        $this->assertAuthenticatedAs($user);
+    }
+
+    public function test_invalid_login_does_not_authenticate_and_preserves_the_identifier_error(): void
+    {
+        $user = User::factory()->create([
+            'username' => 'wrongpassword',
+            'password' => 'password123',
+        ]);
+
+        $this->from(route('login'))
+            ->post(route('login.store'), [
+                'identifier' => $user->username,
+                'password' => 'wrong-password',
+            ])
+            ->assertSessionHasErrors('identifier');
 
         $this->assertGuest();
     }
@@ -118,31 +182,69 @@ class AuthenticationTest extends TestCase
             'currency' => 'ZAR',
         ]);
 
-        $owner = User::factory()->create(['password' => 'password123']);
-        $staff = User::factory()->create(['password' => 'password123']);
+        $owner = User::factory()->create([
+            'username' => 'theowner',
+            'password' => 'password123',
+        ]);
+        $staff = User::factory()->create([
+            'username' => 'thestaff',
+            'password' => 'password123',
+        ]);
 
         $business->users()->attach($owner->id, ['role' => 'owner']);
         $business->users()->attach($staff->id, ['role' => 'staff']);
 
-        $this->get(route('login', ['owner' => 1]))
+        $this->get(route('owner.login'))
             ->assertOk()
             ->assertSee('Owner sign in');
 
         $this->post(route('login.store'), [
-            'email' => $staff->email,
+            'identifier' => $staff->username,
             'password' => 'password123',
             'owner_access' => 1,
-        ])->assertSessionHasErrors('email');
+        ])->assertSessionHasErrors('identifier');
 
         $this->assertGuest();
 
         $this->post(route('login.store'), [
-            'email' => $owner->email,
+            'identifier' => 'THEOWNER',
             'password' => 'password123',
             'owner_access' => 1,
         ])->assertRedirect(route('owner.dashboard'));
 
         $this->assertAuthenticatedAs($owner);
+        $this->assertSame($business->id, app(CurrentBusiness::class)->id($owner));
+    }
+
+    public function test_owner_login_selects_an_owned_workspace_when_an_account_is_staff_elsewhere(): void
+    {
+        $owned = Business::create([
+            'name' => 'Owned Workspace',
+            'slug' => 'owned-workspace',
+            'status' => 'active',
+            'currency' => 'ZAR',
+        ]);
+        $staffWorkspace = Business::create([
+            'name' => 'Staff Workspace',
+            'slug' => 'staff-workspace',
+            'status' => 'active',
+            'currency' => 'ZAR',
+        ]);
+
+        $user = User::factory()->create([
+            'username' => 'multiworkowner',
+            'password' => 'password123',
+        ]);
+        $owned->users()->attach($user->id, ['role' => 'owner']);
+        $staffWorkspace->users()->attach($user->id, ['role' => 'staff']);
+
+        $this->post(route('login.store'), [
+            'identifier' => $user->username,
+            'password' => 'password123',
+            'owner_access' => 1,
+        ])->assertRedirect(route('owner.dashboard'));
+
+        $this->assertSame($owned->id, app(CurrentBusiness::class)->id($user));
     }
 
     public function test_business_context_does_not_auto_adopt_an_unassociated_user(): void
@@ -158,7 +260,7 @@ class AuthenticationTest extends TestCase
 
         $this->actingAs($user);
 
-        $this->assertNull(app(\App\Support\CurrentBusiness::class)->resolve($user));
+        $this->assertNull(app(CurrentBusiness::class)->resolve($user));
         $this->assertDatabaseMissing('business_user', [
             'business_id' => $business->id,
             'user_id' => $user->id,
@@ -201,33 +303,4 @@ class AuthenticationTest extends TestCase
 
         $this->actingAs($owner)->get(route('settings.index'))->assertOk();
     }
-
-    public function test_owner_login_selects_an_owned_workspace_when_an_account_is_staff_elsewhere(): void
-    {
-        $owned = Business::create([
-            'name' => 'Owned Workspace',
-            'slug' => 'owned-workspace',
-            'status' => 'active',
-            'currency' => 'ZAR',
-        ]);
-        $staffWorkspace = Business::create([
-            'name' => 'Staff Workspace',
-            'slug' => 'staff-workspace',
-            'status' => 'active',
-            'currency' => 'ZAR',
-        ]);
-
-        $user = User::factory()->create(['password' => 'password123']);
-        $owned->users()->attach($user->id, ['role' => 'owner']);
-        $staffWorkspace->users()->attach($user->id, ['role' => 'staff']);
-
-        $this->post(route('login.store'), [
-            'email' => $user->email,
-            'password' => 'password123',
-            'owner_access' => 1,
-        ])->assertRedirect(route('owner.dashboard'));
-
-        $this->assertSame($owned->id, app(CurrentBusiness::class)->id($user));
-    }
-
 }
