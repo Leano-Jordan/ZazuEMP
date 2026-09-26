@@ -15,12 +15,12 @@
                     <div class="zazu-form-section-head"><div class="zazu-form-section-title">Customer profile</div><div class="zazu-form-section-copy">Profile photos are optional and should have a clear business purpose.</div></div>
                     <div class="flex flex-wrap items-center gap-4">
                         <x-profile-avatar :name="$customer->name" :path="$customer->profile_photo_path" media-type="customer" :media-id="$customer->id" size="lg" />
-                        <label class="zazu-field min-w-[240px] flex-1"><span class="zazu-label">Customer name <span class="zazu-required">*</span></span><input name="name" value="{{ old('name', $customer->name) }}" required class="zazu-input">@error('name')<span class="zazu-field-error">{{ $message }}</span>@enderror</label>
+                        <label class="zazu-field min-w-60 flex-1"><span class="zazu-label">Customer name <span class="zazu-required">*</span></span><input name="name" value="{{ old('name', $customer->name) }}" required class="zazu-input">@error('name')<span class="zazu-field-error">{{ $message }}</span>@enderror</label>
                     </div>
                     <div class="mt-5 grid gap-4">
                         <label class="zazu-field"><span class="zazu-label">Replace profile photo</span><input type="file" name="profile_photo" accept=".jpg,.jpeg,.png,.webp,image/jpeg,image/png,image/webp" class="zazu-file-input" data-file-input>@error('profile_photo')<span class="zazu-field-error">{{ $message }}</span>@enderror</label>
                         @if ($customer->profile_photo_path)
-                            <label class="zazu-check-row"><input type="checkbox" name="remove_profile_photo" value="1" @checked(old('remove_profile_photo'))><span><span class="block text-xs font-semibold text-[var(--zazu-ink-2)]">Remove current photo</span><span class="mt-1 block text-[10px] text-[var(--zazu-faint)]">The active record will return to initials.</span></span></label>
+                            <label class="zazu-check-row"><input type="checkbox" name="remove_profile_photo" value="1" @checked(old('remove_profile_photo'))><span><span class="block text-xs font-semibold text-(--zazu-ink-2)">Remove current photo</span><span class="mt-1 block text-[10px] text-(--zazu-faint)">The active record will return to initials.</span></span></label>
                         @endif
                         <label class="zazu-field"><span class="zazu-label">Notes</span><textarea name="notes" rows="5" class="zazu-textarea">{{ old('notes', $customer->notes) }}</textarea></label>
                     </div>
