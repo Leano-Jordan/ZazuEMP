@@ -24,19 +24,20 @@ This is the living execution map for Zazu EMP. Work it in order unless repositor
 - [x] Capability catalogue
 - [ ] Calendar connected to real Work records
 - [ ] Dashboard connected to real operational signals
+- [x] Quote centre connected to real quote records
 - [ ] Contextual activity/timeline
 - [ ] Documents attached to Work
 
 ## 03 Commercial
-- [ ] Quote identity and lifecycle
-- [ ] Quote versions with immutable commercial snapshots
-- [ ] Quote line items
-- [ ] Requirement/capability snapshot inputs
-- [ ] Pricing calculations
-- [ ] Quote totals
+- [x] Quote identity and lifecycle foundation
+- [x] Quote versions with immutable commercial snapshots
+- [x] Quote line items
+- [x] Requirement/capability snapshot inputs
+- [x] Draft pricing calculations
+- [x] Quote totals
 - [ ] Customer-facing quote presentation
 - [ ] Quote acceptance/deposit workflow
-- [ ] Historical reproducibility tests
+- [x] Historical reproducibility coverage
 
 ## 04 Planning & Resources
 - [ ] Travel costing
@@ -86,6 +87,32 @@ This is the living execution map for Zazu EMP. Work it in order unless repositor
 - [ ] Dependency/configuration review
 - [ ] Backup/restore evidence
 - [ ] Release candidate review
+
+## Current execution position — 2026-09-26
+
+Active slice: **Commercial → Quote foundation**
+
+Implemented in this cycle:
+- Quote identity and version tables
+- Quote line snapshots
+- Draft quote creation from Work requirements
+- Server-side line validation
+- Server-side subtotal/total calculation
+- Quote revision cloning with preserved historical snapshot
+- Revision concurrency protection
+- Quote centre and Work-specific quote views
+- Work → Quote navigation
+- Quote workflow tests
+- Laravel 13 compatibility checked against current official documentation for Eloquent revision lookup and pessimistic locking
+
+Not yet proven locally:
+- PHPUnit execution
+- fresh migration execution
+- browser traversal
+- rendered responsive/light/dark verification
+- customer-facing quote document generation
+
+Next execution slice: **Planning & Resources → Travel costing**, unless repository evidence changes that sequence.
 
 ## Operating rule
 Execute the smallest complete outcome that advances the current stage. Protect future scale without building speculative infrastructure. Every meaningful change ends with verification, regression checking and updated project memory.
