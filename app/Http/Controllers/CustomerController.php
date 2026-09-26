@@ -47,6 +47,11 @@ class CustomerController extends Controller
                 $customer = Customer::create([
                     'business_id' => $business->id,
                     'name' => trim($validated['name']),
+                    'legal_name' => $validated['legal_name'] ?? null,
+                    'registration_number' => $validated['registration_number'] ?? null,
+                    'tax_number' => $validated['tax_number'] ?? null,
+                    'vat_number' => $validated['vat_number'] ?? null,
+                    'billing_address' => $validated['billing_address'] ?? null,
                     'profile_photo_path' => $photoPath,
                     'notes' => $validated['notes'] ?? null,
                 ]);
@@ -121,6 +126,11 @@ class CustomerController extends Controller
             DB::transaction(function () use ($customer, $validated): void {
                 $customer->update([
                     'name' => trim($validated['name']),
+                    'legal_name' => $validated['legal_name'] ?? null,
+                    'registration_number' => $validated['registration_number'] ?? null,
+                    'tax_number' => $validated['tax_number'] ?? null,
+                    'vat_number' => $validated['vat_number'] ?? null,
+                    'billing_address' => $validated['billing_address'] ?? null,
                     'profile_photo_path' => $validated['profile_photo_path'] ?? $customer->profile_photo_path,
                     'notes' => $validated['notes'] ?? null,
                 ]);
@@ -188,6 +198,11 @@ class CustomerController extends Controller
                     ->ignore($customer?->id),
             ],
             'notes' => ['nullable', 'string'],
+            'legal_name' => ['nullable', 'string', 'max:255'],
+            'registration_number' => ['nullable', 'string', 'max:100'],
+            'tax_number' => ['nullable', 'string', 'max:100'],
+            'vat_number' => ['nullable', 'string', 'max:100'],
+            'billing_address' => ['nullable', 'string', 'max:1000'],
             'primary_contact_name' => ['required', 'string', 'max:255'],
             'primary_contact_phone' => ['nullable', 'string', 'max:50'],
             'primary_contact_email' => ['nullable', 'email', 'max:255'],
