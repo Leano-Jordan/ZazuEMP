@@ -19,8 +19,8 @@
             <div class="zazu-card-description">Future surface for stock items, availability, movements and work allocation.</div>
         </div>
         <div class="zazu-placeholder">
-            <div class="zazu-placeholder-title">Inventory engine not connected yet</div>
-            <div class="zazu-placeholder-copy">The page exists and is navigable. The data model will be added after the first complete workflow slice is proven.</div>
+            <div class="zazu-placeholder-title">Inventory is being prepared</div>
+            <div class="zazu-placeholder-copy">No live inventory data is shown here yet. Stock items, availability, movements and work allocation will be added as the inventory workflow is completed.</div>
         </div>
     </section>
 
