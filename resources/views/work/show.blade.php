@@ -70,6 +70,7 @@
                     </div>
                     <div class="flex flex-wrap gap-2">
                         <a href="{{ route('work.requirements.index', $event) }}" class="zazu-btn zazu-btn-secondary">Requirements</a>
+                        <a href="{{ route('work.quotes.index', $event) }}" class="zazu-btn zazu-btn-secondary">Quotes</a>
                         <a href="{{ route('capabilities.index') }}" class="zazu-btn zazu-btn-ghost">Capability catalogue</a>
                     </div>
                 </div>
@@ -119,10 +120,10 @@
                         <span class="zazu-stage-marker"></span>
                         <div><div class="zazu-stage-title">Requirements</div><div class="zazu-stage-copy">Capabilities and quantities</div></div>
                     </a>
-                    <div class="zazu-stage">
+                    <a href="{{ route('work.quotes.index', $event) }}" class="zazu-stage">
                         <span class="zazu-stage-marker"></span>
                         <div><div class="zazu-stage-title">Quote</div><div class="zazu-stage-copy">Commercial offer and versions</div></div>
-                    </div>
+                    </a>
                     <div class="zazu-stage">
                         <span class="zazu-stage-marker"></span>
                         <div><div class="zazu-stage-title">Preparation</div><div class="zazu-stage-copy">Buying and readiness</div></div>
