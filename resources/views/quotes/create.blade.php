@@ -2,14 +2,14 @@
     <x-slot:title>Create quote · {{ $event->name }}</x-slot:title>
     <x-slot:heading>Create quote</x-slot:heading>
     <x-slot:headerAction>
-        <a href="{{ route('work.quotes.index', $event) }}" class="zazu-btn zazu-btn-ghost">← Quotes</a>
+        <a href="{{ route('work.show', $event) }}" class="zazu-btn zazu-btn-ghost">Job workspace</a>
     </x-slot:headerAction>
 
     <section class="zazu-command-band">
         <div>
             <div class="zazu-eyebrow">{{ $event->reference }} · Commercial</div>
             <h2 class="zazu-command-title">Build draft quote v1</h2>
-            <p class="zazu-command-copy">The requirement register becomes the first quote snapshot. Enter the unit price for each line. The saved quote keeps these source details even if the Work record changes later.</p>
+            <p class="zazu-command-copy">Your job services are already listed. Zazu fills in saved usual prices where you have them. Check the amounts, change anything needed, then save the quote.</p>
         </div>
     </section>
 
@@ -57,8 +57,8 @@
                                     </div>
                                 </div>
                                 <label class="w-32 shrink-0">
-                                    <span class="zazu-label">Unit price</span>
-                                    <input type="number" min="0" step="0.01" name="unit_price[{{ $requirement->id }}]" value="{{ old('unit_price.'.$requirement->id, 0) }}" class="zazu-input" required>
+                                    <span class="zazu-label">Price</span>
+                                    <input type="number" min="0" step="0.01" name="unit_price[{{ $requirement->id }}]" value="{{ old('unit_price.'.$requirement->id, $requirement->capability?->default_price ?? 0) }}" class="zazu-input" required>
                                 </label>
                             </div>
                         @endforeach
