@@ -1,0 +1,35 @@
+<?php
+
+namespace App\Http\Controllers;
+
+use App\Models\Supplier;
+use App\Support\CurrentBusiness;
+use Illuminate\Http\RedirectResponse;
+use Illuminate\Http\Request;
+use Illuminate\View\View;
+
+class SupplierController extends Controller
+{
+    public function index(Request $request): View
+    {
+        $businessId = app(CurrentBusiness::class)->id($request->user());
+        $suppliers = Supplier::where('business_id',$businessId)->withCount('purchaseOrders')->orderBy('name')->get();
+        return view('suppliers.index', compact('suppliers'));
+    }
+
+    public function create(): View { return view('suppliers.create'); }
+
+    public function store(Request $request): RedirectResponse
+    {
+        $businessId = app(CurrentBusiness::class)->id($request->user());
+        $data = $request->validate([
+            'name'=>['required','string','max:255'],
+            'contact_name'=>['nullable','string','max:255'],
+            'email'=>['nullable','email','max:255'],
+            'phone'=>['nullable','string','max:50'],
+            'notes'=>['nullable','string'],
+        ]);
+        Supplier::create([...$data,'business_id'=>$businessId]);
+        return redirect()->route('suppliers.index')->with('success','Supplier added.');
+    }
+}
