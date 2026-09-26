@@ -33,10 +33,23 @@
                         <div class="zazu-form-section-copy">The quote currency remains {{ $quote->currency }} for this revision.</div>
                     </div>
                     <div class="zazu-form-grid">
-                        <div class="zazu-field zazu-field-wide">
+                        <div class="zazu-field">
                             <span class="zazu-label">Currency</span>
                             <div class="zazu-input flex items-center font-bold">{{ $quote->currency }}</div>
                         </div>
+                        <label class="zazu-field">
+                            <span class="zazu-label">Tax treatment</span>
+                            <select name="tax_rate_id" class="zazu-select">
+                                <option value="">Keep current tax treatment</option>
+                                @foreach ($taxRates as $taxRate)
+                                    <option value="{{ $taxRate->id }}" @selected((string) old('tax_rate_id') === (string) $taxRate->id)>
+                                        {{ $taxRate->name }} · {{ $taxRate->rate }}%
+                                    </option>
+                                @endforeach
+                            </select>
+                            <span class="zazu-field-help">Current snapshot: {{ $version->tax_label ?: 'No tax' }} · {{ $version->tax_rate }}%</span>
+                            @error('tax_rate_id')<span class="zazu-field-error">{{ $message }}</span>@enderror
+                        </label>
                         <label class="zazu-field zazu-field-wide">
                             <span class="zazu-label">Quote notes</span>
                             <textarea name="notes" rows="3" class="zazu-textarea">{{ old('notes', $version->notes) }}</textarea>
