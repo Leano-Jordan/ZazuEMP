@@ -131,18 +131,50 @@
                         @endisset
 
                         @auth
-                            <div class="zazu-user-chip" aria-label="Signed in as {{ auth()->user()->name }}">
-                                <x-profile-avatar :name="auth()->user()->name" :path="auth()->user()->profile_photo_path" size="sm" />
-                                <div class="zazu-user-identity">
-                                    <span class="zazu-user-label">Signed in as</span>
-                                    <strong>{{ auth()->user()->name }}</strong>
+                            <div class="zazu-user-menu" data-user-menu>
+                                <button
+                                    type="button"
+                                    class="zazu-user-trigger"
+                                    data-user-trigger
+                                    aria-expanded="false"
+                                    aria-controls="zazu-user-menu"
+                                    aria-label="Open account menu"
+                                >
+                                    <x-profile-avatar :name="auth()->user()->name" :path="auth()->user()->profile_photo_path" size="sm" />
+                                    <span class="zazu-user-identity">
+                                        <strong>{{ auth()->user()->name }}</strong>
+                                        <span>Account</span>
+                                    </span>
+                                    <svg class="zazu-user-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="m7 9 5 5 5-5"></path></svg>
+                                </button>
+
+                                <div class="zazu-user-popover" id="zazu-user-menu" data-user-popover hidden>
+                                    <div class="zazu-user-popover-head">
+                                        <x-profile-avatar :name="auth()->user()->name" :path="auth()->user()->profile_photo_path" size="md" />
+                                        <div class="min-w-0">
+                                            <strong class="zazu-user-popover-name">{{ auth()->user()->name }}</strong>
+                                            <span class="zazu-user-popover-email">{{ auth()->user()->email }}</span>
+                                        </div>
+                                    </div>
+                                    <div class="zazu-user-popover-divider"></div>
+                                    <form method="POST" action="{{ route('logout') }}">
+                                        @csrf
+                                        <button type="submit" class="zazu-user-signout">
+                                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M10 6V4h9v16h-9v-2"></path><path d="M4 12h11m-4-4 4 4-4 4"></path></svg>
+                                            <span>Sign out</span>
+                                        </button>
+                                    </form>
                                 </div>
                             </div>
                         @endauth
 
                         <button type="button" class="zazu-theme-toggle" data-theme-toggle aria-pressed="false">
-                            <span data-theme-icon aria-hidden="true">◐</span>
-                            <span data-theme-label>Dark</span>
+                            <svg data-theme-icon-sun viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true">
+                                <circle cx="12" cy="12" r="4"></circle><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"></path>
+                            </svg>
+                            <svg data-theme-icon-moon viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true" hidden>
+                                <path d="M20 15.5A8 8 0 0 1 8.5 4 8.5 8.5 0 1 0 20 15.5Z"></path>
+                            </svg>
                         </button>
                     </div>
                 </div>
