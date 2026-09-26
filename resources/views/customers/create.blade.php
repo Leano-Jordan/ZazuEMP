@@ -63,7 +63,7 @@
 
                         <label class="zazu-field">
                             <span class="zazu-label">Phone</span>
-                            <input name="primary_contact_phone" value="{{ old('primary_contact_phone') }}" class="zazu-input" placeholder="e.g. 071 234 5678">
+                            <input type="tel" name="primary_contact_phone" value="{{ old('primary_contact_phone') }}" class="zazu-input" placeholder="e.g. 071 234 5678" autocomplete="tel">
                         </label>
 
                         <label class="zazu-field zazu-field-wide">
@@ -83,7 +83,7 @@
                             <summary class="cursor-pointer text-xs font-semibold text-[var(--zazu-ink-2)]">Day contact</summary>
                             <div class="mt-4 grid gap-4 sm:grid-cols-2">
                                 <label class="zazu-field"><span class="zazu-label">Name</span><input name="day_contact_name" value="{{ old('day_contact_name') }}" class="zazu-input">@error('day_contact_name')<span class="zazu-field-error">{{ $message }}</span>@enderror</label>
-                                <label class="zazu-field"><span class="zazu-label">Phone</span><input name="day_contact_phone" value="{{ old('day_contact_phone') }}" class="zazu-input"></label>
+                                <label class="zazu-field"><span class="zazu-label">Phone</span><input type="tel" name="day_contact_phone" value="{{ old('day_contact_phone') }}" class="zazu-input" autocomplete="tel"></label>
                                 <label class="zazu-field sm:col-span-2"><span class="zazu-label">Email</span><input type="email" name="day_contact_email" value="{{ old('day_contact_email') }}" class="zazu-input"></label>
                             </div>
                         </details>
@@ -91,7 +91,7 @@
                             <summary class="cursor-pointer text-xs font-semibold text-[var(--zazu-ink-2)]">Night contact</summary>
                             <div class="mt-4 grid gap-4 sm:grid-cols-2">
                                 <label class="zazu-field"><span class="zazu-label">Name</span><input name="night_contact_name" value="{{ old('night_contact_name') }}" class="zazu-input">@error('night_contact_name')<span class="zazu-field-error">{{ $message }}</span>@enderror</label>
-                                <label class="zazu-field"><span class="zazu-label">Phone</span><input name="night_contact_phone" value="{{ old('night_contact_phone') }}" class="zazu-input"></label>
+                                <label class="zazu-field"><span class="zazu-label">Phone</span><input type="tel" name="night_contact_phone" value="{{ old('night_contact_phone') }}" class="zazu-input" autocomplete="tel"></label>
                                 <label class="zazu-field sm:col-span-2"><span class="zazu-label">Email</span><input type="email" name="night_contact_email" value="{{ old('night_contact_email') }}" class="zazu-input"></label>
                             </div>
                         </details>
