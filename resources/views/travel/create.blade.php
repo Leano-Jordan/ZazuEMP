@@ -21,7 +21,7 @@
                 <section class="zazu-form-section">
                     <div class="zazu-form-section-head">
                         <div class="zazu-form-section-title">Route</div>
-                        <div class="zazu-form-section-copy">Manual routing is the current source. The provider field keeps this boundary replaceable later.</div>
+                        <div class="zazu-form-section-copy">Manual routing is the current source. Zazu records the route evidence now and keeps the integration boundary replaceable later.</div>
                     </div>
 
                     <div class="zazu-form-grid">
