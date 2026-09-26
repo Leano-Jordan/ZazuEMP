@@ -4,9 +4,11 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
     <meta name="theme-color" content="#38b8c7">
-    @php($business = app(\App\Support\CurrentBusiness::class)->resolve(auth()->user()))
-    @php($businesses = auth()->user()->businesses()->where('businesses.status', 'active')->orderBy('businesses.name')->get())
-    @php($isOwner = app(\App\Support\CurrentBusiness::class)->hasRole('owner', auth()->user(), $business))
+    @php
+        $business = app(\App\Support\CurrentBusiness::class)->resolve(auth()->user());
+        $businesses = auth()->user()->businesses()->where('businesses.status', 'active')->orderBy('businesses.name')->get();
+        $isOwner = app(\App\Support\CurrentBusiness::class)->hasRole('owner', auth()->user(), $business);
+    @endphp
     <title>{{ $title ?? 'Zazu' }} · {{ $business?->name ?? 'Zazu EMP' }}</title>
     <script>
         (() => {
