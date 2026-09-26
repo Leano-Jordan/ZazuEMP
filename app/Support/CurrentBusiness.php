@@ -68,7 +68,9 @@ class CurrentBusiness
         $business = $user->businesses()
             ->where('businesses.status', 'active')
             ->whereKey($businessId)
-            ->firstOrFail();
+            ->first();
+
+        abort_unless($business, 403);
 
         request()->session()->put(self::SESSION_KEY, $business->id);
 
