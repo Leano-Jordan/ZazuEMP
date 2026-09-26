@@ -2,44 +2,54 @@
     <x-slot:title>Customers</x-slot:title>
     <x-slot:heading>Customers</x-slot:heading>
     <x-slot:headerAction>
-        <a href="{{ route('customers.create') }}" class="inline-flex items-center rounded-xl bg-slate-900 px-4 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-slate-800">
-            New customer
-        </a>
+        <a href="{{ route('customers.create') }}" class="zazu-btn zazu-btn-primary">New customer</a>
     </x-slot:headerAction>
 
-    <div class="mb-5 flex flex-col gap-3 rounded-2xl border border-slate-200 bg-white p-4 sm:flex-row sm:items-center sm:justify-between">
+    <section class="zazu-command-band">
         <div>
-            <p class="font-semibold text-slate-950">Customer directory</p>
-            <p class="mt-1 text-sm text-slate-500">Customers are the starting point for operational work.</p>
+            <div class="zazu-eyebrow">Relationships</div>
+            <h2 class="zazu-command-title">Customer directory</h2>
+            <p class="zazu-command-copy">Keep the people and organisations behind your work in one place, ready to become operational records.</p>
         </div>
-        <p class="text-sm text-slate-400">{{ $customers->total() }} total</p>
-    </div>
+        <div class="zazu-command-meta">
+            <div class="zazu-command-meta-label">Customers</div>
+            <div class="zazu-command-meta-value">{{ $customers->total() }}</div>
+        </div>
+    </section>
 
-    <div class="overflow-hidden rounded-2xl border border-slate-200 bg-white">
+    <section class="zazu-card zazu-list">
+        <div class="zazu-card-header">
+            <div class="zazu-card-title">Your customers</div>
+            <div class="zazu-card-description">Select a customer to start a new piece of work.</div>
+        </div>
+
         @forelse ($customers as $customer)
-            <a href="{{ route('work.create', ['customer_id' => $customer->id]) }}" class="flex flex-col gap-3 border-b border-slate-100 px-5 py-4 last:border-b-0 transition hover:bg-slate-100 sm:flex-row sm:items-center sm:justify-between">
-                <div>
-                    <p class="font-semibold text-slate-950">{{ $customer->name }}</p>
-                    <p class="mt-1 text-sm text-slate-500">
-                        {{ $customer->primaryContact?->phone ?? 'No phone' }}
-                        @if ($customer->primaryContact?->email) · {{ $customer->primaryContact->email }} @endif
-                    </p>
+            <a href="{{ route('work.create', ['customer_id' => $customer->id]) }}" class="zazu-list-item">
+                <div class="zazu-row-with-avatar">
+                    <div class="zazu-avatar">{{ IlluminateSupportStr::upper(IlluminateSupportStr::substr($customer->name, 0, 1)) }}</div>
+                    <div class="zazu-list-main">
+                        <div class="zazu-list-title">{{ $customer->name }}</div>
+                        <div class="zazu-list-meta">
+                            {{ $customer->primaryContact?->phone ?? 'No phone' }}
+                            @if ($customer->primaryContact?->email) · {{ $customer->primaryContact->email }} @endif
+                        </div>
+                    </div>
                 </div>
-                <div class="text-sm text-slate-500">
-                    {{ $customer->events_count }} {{ $customer->events_count === 1 ? 'work item' : 'work items' }}
+                <div class="zazu-list-side">
+                    <div class="zazu-side-primary">{{ $customer->events_count }} {{ $customer->events_count === 1 ? 'work item' : 'work items' }}</div>
+                    <div class="zazu-side-secondary">Start work →</div>
                 </div>
-            </div>
             </a>
         @empty
-            <div class="px-5 py-16 text-center">
-                <p class="text-lg font-semibold text-slate-950">No customers yet</p>
-                <p class="mx-auto mt-2 max-w-md text-sm text-slate-500">Add your first customer. Their primary contact will be stored with them.</p>
-                <a href="{{ route('customers.create') }}" class="mt-5 inline-flex rounded-xl bg-slate-900 px-4 py-2.5 text-sm font-semibold text-white">Add customer</a>
+            <div class="zazu-empty">
+                <div class="zazu-empty-title">No customers yet</div>
+                <p class="zazu-empty-copy">Create the first customer record, then use it as the starting point for a work workspace.</p>
+                <a href="{{ route('customers.create') }}" class="zazu-btn zazu-btn-primary mt-5">Add customer</a>
             </div>
         @endforelse
 
         @if ($customers->hasPages())
-            <div class="border-t border-slate-200 px-5 py-4">{{ $customers->links() }}</div>
+            <div class="border-t border-[var(--zazu-border)] px-5 py-4">{{ $customers->links() }}</div>
         @endif
-    </div>
+    </section>
 </x-app-layout>

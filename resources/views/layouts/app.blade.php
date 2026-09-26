@@ -4,76 +4,113 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>{{ $title ?? 'Zazu' }} · Zazu EMP</title>
+    <script>
+        (() => {
+            const saved = localStorage.getItem('zazu-theme');
+            const theme = saved === 'light' || saved === 'dark'
+                ? saved
+                : (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+
+            document.documentElement.dataset.theme = theme;
+        })();
+    </script>
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
-<body class="min-h-screen bg-[#dcecf2] text-slate-900 antialiased">
-    <div class="min-h-screen lg:flex">
-        <aside class="hidden w-64 shrink-0 border-r border-[#b9d3dc] bg-[#d3e8ef] lg:flex lg:flex-col">
-            <div class="flex h-20 items-center border-b border-[#b9d3dc] bg-[#d9edf3] px-6">
-                <a href="{{ route('work.index') }}" class="text-2xl font-semibold tracking-tight text-slate-950">zazu<span class="text-sky-600">.</span></a>
+<body>
+    <div class="zazu-shell">
+        <aside class="zazu-sidebar">
+            <div class="zazu-brand">
+                <a href="{{ route('work.index') }}" class="zazu-brand-word">zazu<span class="zazu-brand-dot">.</span></a>
             </div>
 
-            <nav class="flex-1 space-y-1 p-4">
-                @php
-                    $items = [
-                        ['label' => 'Work', 'route' => 'work.index'],
-                        ['label' => 'Customers', 'route' => 'customers.index'],
-                        ['label' => 'Capabilities', 'route' => 'capabilities.index'],
-                    ];
-                @endphp
-
-                @foreach ($items as $item)
-                    <a
-                        href="{{ route($item['route']) }}"
-                        class="flex items-center rounded-xl px-3 py-2.5 text-sm font-medium {{ request()->routeIs($item['route']) ? 'bg-slate-900 text-white shadow-sm' : 'text-slate-600 hover:bg-slate-100 hover:text-slate-950' }}"
-                    >
-                        {{ $item['label'] }}
+            <nav class="zazu-nav" aria-label="Primary">
+                <div class="zazu-nav-group">
+                    <div class="zazu-nav-label">Operations</div>
+                    <a href="{{ route('work.index') }}" class="zazu-nav-link {{ request()->routeIs('work.*') ? 'active' : '' }}">
+                        <svg class="zazu-nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true">
+                            <rect x="4" y="4" width="6" height="6" rx="1"></rect>
+                            <rect x="14" y="4" width="6" height="6" rx="1"></rect>
+                            <rect x="4" y="14" width="6" height="6" rx="1"></rect>
+                            <rect x="14" y="14" width="6" height="6" rx="1"></rect>
+                        </svg>
+                        <span>Work</span>
                     </a>
-                @endforeach
+                </div>
 
-                <div class="pt-5">
-                    <p class="px-3 pb-2 text-[11px] font-semibold uppercase tracking-[0.16em] text-slate-400">Coming next</p>
-                    <div class="space-y-1 text-sm text-slate-500">
-                        <div class="rounded-lg px-3 py-2">Quotes</div>
-                        <div class="rounded-lg px-3 py-2">Calendar</div>
-                        <div class="rounded-lg px-3 py-2">Suppliers</div>
-                        <div class="rounded-lg px-3 py-2">Inventory</div>
-                        <div class="rounded-lg px-3 py-2">Reports</div>
-                    </div>
+                <div class="zazu-nav-group">
+                    <div class="zazu-nav-label">Relationships</div>
+                    <a href="{{ route('customers.index') }}" class="zazu-nav-link {{ request()->routeIs('customers.*') ? 'active' : '' }}">
+                        <svg class="zazu-nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true">
+                            <circle cx="9" cy="8" r="3"></circle>
+                            <path d="M4 19c.7-3 2.3-4.5 5-4.5s4.3 1.5 5 4.5"></path>
+                            <path d="M16 11.5c2.2.2 3.5 1.6 4 4"></path>
+                            <path d="M15.5 5.4a3 3 0 0 1 0 5.1"></path>
+                        </svg>
+                        <span>Customers</span>
+                    </a>
+                </div>
+
+                <div class="zazu-nav-group">
+                    <div class="zazu-nav-label">Catalogue</div>
+                    <a href="{{ route('capabilities.index') }}" class="zazu-nav-link {{ request()->routeIs('capabilities.*') ? 'active' : '' }}">
+                        <svg class="zazu-nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true">
+                            <path d="M6 5.5A2.5 2.5 0 0 1 8.5 3H20v15.5A2.5 2.5 0 0 1 17.5 21H8.5A2.5 2.5 0 0 1 6 18.5z"></path>
+                            <path d="M6 6h10.5A2.5 2.5 0 0 1 19 8.5V21"></path>
+                            <path d="M10 8.5h5"></path>
+                            <path d="M10 12h5"></path>
+                        </svg>
+                        <span>Capabilities</span>
+                    </a>
                 </div>
             </nav>
 
-            <div class="border-t border-[#b9d3dc] p-4">
-                <div class="rounded-xl border border-[#bdd6df] bg-[#c9e1e9] px-3 py-3">
-                    <p class="text-xs font-semibold text-slate-600">Zazu EMP</p>
-                    <p class="mt-1 text-xs text-slate-500">Operational workspace</p>
+            <div class="zazu-sidebar-footer">
+                <div class="zazu-footer-card">
+                    <div class="zazu-footer-title">Zazu EMP</div>
+                    <div class="zazu-footer-copy">Event operations workspace</div>
                 </div>
             </div>
         </aside>
 
-        <main class="min-w-0 flex-1">
-            <header class="border-b border-[#bdd6df] bg-[#e1f0f5]">
-                <div class="mx-auto flex max-w-7xl items-center justify-between px-5 py-4 sm:px-8">
+        <main class="zazu-main">
+            <header class="zazu-topbar">
+                <div class="zazu-topbar-inner">
                     <div>
-                        <p class="text-xs font-medium uppercase tracking-[0.14em] text-slate-400">Zazu EMP</p>
-                        <h1 class="mt-1 text-xl font-semibold tracking-tight text-slate-950">{{ $heading ?? $title ?? 'Workspace' }}</h1>
+                        <div class="zazu-eyebrow">Zazu EMP</div>
+                        <h1 class="zazu-page-title">{{ $heading ?? $title ?? 'Workspace' }}</h1>
                     </div>
-                    @isset($headerAction)
-                        {{ $headerAction }}
-                    @endisset
+
+                    <div class="zazu-topbar-actions">
+                        @isset($headerAction)
+                            {{ $headerAction }}
+                        @endisset
+
+                        <button type="button" class="zazu-theme-toggle" data-theme-toggle aria-pressed="false">
+                            <span data-theme-icon aria-hidden="true">◐</span>
+                            <span data-theme-label>Dark</span>
+                        </button>
+                    </div>
                 </div>
             </header>
 
-            <div class="mx-auto max-w-7xl px-5 py-6 sm:px-8">
+            <nav class="zazu-mobile-nav" aria-label="Mobile primary">
+                <a href="{{ route('work.index') }}" class="zazu-mobile-link {{ request()->routeIs('work.*') ? 'active' : '' }}">Work</a>
+                <a href="{{ route('customers.index') }}" class="zazu-mobile-link {{ request()->routeIs('customers.*') ? 'active' : '' }}">Customers</a>
+                <a href="{{ route('capabilities.index') }}" class="zazu-mobile-link {{ request()->routeIs('capabilities.*') ? 'active' : '' }}">Capabilities</a>
+            </nav>
+
+            <div class="zazu-content">
                 @if (session('success'))
-                    <div class="mb-5 rounded-xl border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm text-emerald-800 shadow-sm">
-                        {{ session('success') }}
+                    <div class="zazu-alert zazu-alert-success" role="status">
+                        <strong>Saved.</strong>
+                        <span>{{ session('success') }}</span>
                     </div>
                 @endif
 
                 @if ($errors->any())
-                    <div class="mb-5 rounded-xl border border-rose-200 bg-rose-50 px-4 py-3 text-sm text-rose-800 shadow-sm">
-                        <p class="font-semibold">Please check the highlighted information.</p>
+                    <div class="zazu-alert zazu-alert-error" role="alert">
+                        <strong>Check this record.</strong>
+                        <span>Please correct the highlighted information and try again.</span>
                     </div>
                 @endif
 
