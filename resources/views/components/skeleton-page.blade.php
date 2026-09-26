@@ -18,8 +18,8 @@
             <p class="zazu-command-copy">{{ $description }}</p>
         </div>
         <div class="zazu-command-meta">
-            <div class="zazu-command-meta-label">Stage</div>
-            <div class="zazu-command-meta-value">Skeleton</div>
+            <div class="zazu-command-meta-label">Availability</div>
+            <div class="zazu-command-meta-value">Planned</div>
         </div>
     </section>
 
