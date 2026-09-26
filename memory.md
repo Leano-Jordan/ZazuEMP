@@ -421,3 +421,33 @@ Verification:
 - GitHub source re-inspected after each change.
 - Static checks confirmed changed files contain the intended new controls and no read-only/system-filled service description UI.
 - Local runtime execution remains required for PHPUnit, migrations, Blade rendering and browser responsive/light-dark verification.
+
+
+## Full foundation integration sweep — 2026-09-26
+
+Implemented:
+- Connected Suppliers, Inventory and Assets foundation pages to live Work requirements and the reusable capability catalogue.
+- Connected Reports to current-business operational, quote and cost records without mixing currencies or businesses.
+- Replaced static foundation routes with controller-backed, business-scoped views.
+- Added explicit session-backed active business context with membership-bound workspace switching.
+- Centralized owner-role evaluation.
+- Removed owner-only Settings/catalogue actions from staff-visible navigation and dashboard surfaces.
+- Added live Owner Administration overview.
+- Hardened quote revision authorization ordering to avoid cross-business lifecycle disclosure.
+- Hardened branding/catalogue/customer image write cleanup against orphaned uploads.
+- Corrected EventCost category validation to use the cost-category vocabulary.
+- Aligned the declared PHP runtime to the PHP 8.4 CI/locked dependency baseline.
+- Added integration and role/context regression coverage.
+
+Important verification incidents caught and resolved:
+- Foundation integration test data was initially not isolated with RefreshDatabase, contaminating later tests. Fixed.
+- Resource eager-load callback initially used an Eloquent Builder type against a BelongsTo relation. Fixed.
+- Controller route integrity initially did not recognise invokable controller actions. Fixed.
+- Multi-workspace owner access initially depended on whichever workspace happened to be active. Fixed.
+- Quote revision lifecycle checking initially occurred before business authorization. Fixed.
+
+Verification:
+- GitHub Actions run 309 passed 50 tests and 263 assertions after the major foundation corrections.
+- Subsequent runs are validating the final owner/security refinements.
+- Frontend dependency installation and build have passed in the CI workflow on the verified runs.
+- Local Windows browser traversal, rendered responsive/light-dark inspection and direct local runtime checks still require the owner's checkout.
