@@ -13,6 +13,7 @@ class RouteIntegrityTest extends TestCase
         $expected = [
             'login',
             'login.store',
+            'owner.login',
             'register',
             'register.store',
             'owner.dashboard',
