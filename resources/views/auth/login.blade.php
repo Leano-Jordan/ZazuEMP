@@ -46,7 +46,7 @@
                         type="text"
                         value="{{ old('identifier') }}"
                         autocomplete="username"
-                        inputmode="email"
+                        inputmode="text"
                         spellcheck="false"
                         autocapitalize="none"
                         required
@@ -83,6 +83,7 @@
                         <input type="checkbox" name="remember" value="1">
                         <span>Keep me signed in</span>
                     </label>
+                    <a href="{{ route('password.request') }}" class="zazu-login-recovery">Forgot password?</a>
                 </div>
 
                 <button type="submit" class="zazu-btn zazu-btn-primary zazu-auth-submit zazu-login-submit">
