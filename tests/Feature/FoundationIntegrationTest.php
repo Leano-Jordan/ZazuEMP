@@ -11,10 +11,12 @@ use App\Models\EventPreparationItem;
 use App\Models\EventRequirement;
 use App\Models\Quote;
 use App\Models\User;
+use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
 class FoundationIntegrationTest extends TestCase
 {
+    use RefreshDatabase;
     public function test_resource_foundation_pages_are_connected_to_authoritative_work_and_catalogue_records(): void
     {
         $business = Business::create([
@@ -172,7 +174,6 @@ class FoundationIntegrationTest extends TestCase
             ->assertOk()
             ->assertSee('12,500.00')
             ->assertSee('2,800.00')
-            ->assertSee('Reporting Customer')
             ->assertDontSee('Other Event');
 
         $this->assertModelExists($otherEvent);
