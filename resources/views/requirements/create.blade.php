@@ -87,13 +87,10 @@
                         <label class="zazu-field">
                             <span class="zazu-label">Unit</span>
                             <select name="unit" class="zazu-select" id="unit-select">
-                                <option value="">Choose a unit</option>
-                                <option value="service" @selected(old('unit') === 'service')>Service</option>
-                                <option value="person" @selected(old('unit') === 'person')>People</option>
-                                <option value="item" @selected(old('unit') === 'item')>Items</option>
-                                <option value="hour" @selected(old('unit') === 'hour')>Hours</option>
-                                <option value="day" @selected(old('unit') === 'day')>Days</option>
-                                <option value="other" @selected(old('unit') === 'other')>Other</option>
+                                <option value="">Not specified</option>
+                                @foreach (config('zazu.units') as $value => $label)
+                                    <option value="{{ $value }}" @selected(old('unit') === $value)>{{ $label }}</option>
+                                @endforeach
                             </select>
                             <span class="zazu-field-help">Use Other only if the unit is not listed.</span>
                             @error('unit')<span class="zazu-field-error">{{ $message }}</span>@enderror
