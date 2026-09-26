@@ -27,7 +27,11 @@
                     <div class="zazu-form-grid">
                         <label class="zazu-field">
                             <span class="zazu-label">Currency</span>
-                            <input name="currency" value="{{ old('currency', 'ZAR') }}" maxlength="3" class="zazu-input" required>
+                            <select name="currency" class="zazu-select" required>
+                                @foreach ($currencies as $code => $label)
+                                    <option value="{{ $code }}" @selected(old('currency', $defaultCurrency) === $code)>{{ $label }}</option>
+                                @endforeach
+                            </select>
                             @error('currency')<span class="zazu-field-error">{{ $message }}</span>@enderror
                         </label>
                         <label class="zazu-field">
@@ -35,11 +39,11 @@
                             <input name="route_label" value="{{ old('route_label', 'Route A') }}" class="zazu-input" required>
                             @error('route_label')<span class="zazu-field-error">{{ $message }}</span>@enderror
                         </label>
-                        <label class="zazu-field">
-                            <span class="zazu-label">Provider</span>
-                            <input name="provider" value="{{ old('provider', 'manual') }}" class="zazu-input" required>
-                            @error('provider')<span class="zazu-field-error">{{ $message }}</span>@enderror
-                        </label>
+                        <div class="zazu-field">
+                            <span class="zazu-label">Routing source</span>
+                            <div class="zazu-static-field">Manual calculation</div>
+                            <span class="zazu-field-help">Zazu records the source used for this calculation. A route provider can be connected later without changing stored evidence.</span>
+                        </div>
                         <label class="zazu-field">
                             <span class="zazu-label">Origin</span>
                             <input name="origin" value="{{ old('origin') }}" class="zazu-input" required>
