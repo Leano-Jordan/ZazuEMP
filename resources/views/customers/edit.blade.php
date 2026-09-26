@@ -18,6 +18,13 @@
                         <label class="zazu-field min-w-60 flex-1"><span class="zazu-label">Customer name <span class="zazu-required">*</span></span><input name="name" value="{{ old('name', $customer->name) }}" required class="zazu-input">@error('name')<span class="zazu-field-error">{{ $message }}</span>@enderror</label>
                     </div>
                     <div class="mt-5 grid gap-4">
+                        <div class="zazu-form-grid">
+                            <label class="zazu-field"><span class="zazu-label">Legal / billing name</span><input name="legal_name" value="{{ old('legal_name', $customer->legal_name) }}" class="zazu-input"></label>
+                            <label class="zazu-field"><span class="zazu-label">Registration number</span><input name="registration_number" value="{{ old('registration_number', $customer->registration_number) }}" class="zazu-input"></label>
+                            <label class="zazu-field"><span class="zazu-label">Tax reference</span><input name="tax_number" value="{{ old('tax_number', $customer->tax_number) }}" class="zazu-input"></label>
+                            <label class="zazu-field"><span class="zazu-label">VAT number</span><input name="vat_number" value="{{ old('vat_number', $customer->vat_number) }}" class="zazu-input"></label>
+                            <label class="zazu-field zazu-field-wide"><span class="zazu-label">Billing address</span><textarea name="billing_address" rows="3" class="zazu-textarea" placeholder="Use when invoices require a recipient address">{{ old('billing_address', $customer->billing_address) }}</textarea></label>
+                        </div>
                         <label class="zazu-field"><span class="zazu-label">Replace profile photo</span><input type="file" name="profile_photo" accept=".jpg,.jpeg,.png,.webp,image/jpeg,image/png,image/webp" class="zazu-file-input" data-file-input>@error('profile_photo')<span class="zazu-field-error">{{ $message }}</span>@enderror</label>
                         @if ($customer->profile_photo_path)
                             <label class="zazu-check-row"><input type="checkbox" name="remove_profile_photo" value="1" @checked(old('remove_profile_photo'))><span><span class="block text-xs font-semibold text-(--zazu-ink-2)">Remove current photo</span><span class="mt-1 block text-[10px] text-(--zazu-faint)">The active record will return to initials.</span></span></label>
@@ -31,7 +38,7 @@
                     <div class="zazu-form-grid">
                         <label class="zazu-field"><span class="zazu-label">Contact name <span class="zazu-required">*</span></span><input name="primary_contact_name" value="{{ old('primary_contact_name', $customer->primaryContact?->name) }}" required class="zazu-input">@error('primary_contact_name')<span class="zazu-field-error">{{ $message }}</span>@enderror</label>
                         <label class="zazu-field"><span class="zazu-label">Phone</span><input type="tel" name="primary_contact_phone" value="{{ old('primary_contact_phone', $customer->primaryContact?->phone) }}" class="zazu-input" autocomplete="tel"></label>
-                        <label class="zazu-field zazu-field-wide"><span class="zazu-label">Email</span><input type="email" name="primary_contact_email" value="{{ old('primary_contact_email', $customer- autocomplete="email">primaryContact?->email) }}" class="zazu-input">@error('primary_contact_email')<span class="zazu-field-error">{{ $message }}</span>@enderror</label>
+                        <label class="zazu-field zazu-field-wide"><span class="zazu-label">Email</span><input type="email" name="primary_contact_email" value="{{ old('primary_contact_email', $customer->primaryContact?->email) }}" autocomplete="email" class="zazu-input">@error('primary_contact_email')<span class="zazu-field-error">{{ $message }}</span>@enderror</label>
                     </div>
                 </section>
 
