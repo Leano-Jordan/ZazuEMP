@@ -196,3 +196,34 @@ Architecture boundary:
 - Preparation records are Work-scoped readiness records and do not yet pretend to be staff, supplier or inventory allocation.
 - Business IDs are derived from the Work record rather than accepted from user input.
 - Authentication and server-side business membership authorization remain the next foundation gate.
+
+
+## UX navigation and job-creation hardening - 2026-09-26
+
+Completed:
+- [x] Guided job creation instead of category/event-type free typing
+- [x] South Africa-oriented service choices for Catering, Decor, Sound & Entertainment, Furniture & Equipment, Photography & Video, Baking, Transport, Staff and Venue
+- [x] "Other" path for services not listed
+- [x] Job creation creates selected services and redirects directly to the new Job workspace
+- [x] Job workspace now presents a visible next action
+- [x] Job progress is visible from Job → Services → Quote → Prepare → Complete
+- [x] Work-scoped pages keep a direct Job workspace action available
+- [x] Adding a service returns to the Job workspace instead of leaving the user on a dead-end form
+- [x] Service catalogue redesigned around visual cards
+- [x] Catalogue preview images
+- [x] Reusable usual prices and charging methods
+- [x] Saved catalogue services appear visually when adding services to a Job
+- [x] Quote price fields prefill from saved service prices
+- [x] Signed-in user is explicitly shown with avatar and name
+- [x] User-facing wording changed toward literal "Jobs", "Services", "Prices", "Prepare" and "Job workspace"
+- [x] Form choices favour recognition over recall and reduce unnecessary typing
+
+UX verification basis:
+- Jobber's current workflow keeps clients, quotes, jobs and invoices connected and provides creation from multiple contextual locations. citeturn0search1turn0search3turn0search8
+- HoneyBook's current product flow centralises service selection, project management and payment-related stages and uses reusable services rather than repeatedly defining the same offering. citeturn0search9turn0search15turn2search6
+- WCAG guidance requires clear labels/instructions and supports reducing repeated entry; Nielsen Norman Group guidance supports recognition over recall and reducing cognitive load in forms. citeturn1search2turn1search6turn1search7turn1search16
+
+Next architectural gate remains:
+- [ ] Authentication and active business context
+- [ ] Server-side business isolation
+- [ ] Roles and permissions
