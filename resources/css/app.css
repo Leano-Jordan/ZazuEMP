@@ -4112,11 +4112,29 @@ body.zazu-has-wallpaper .zazu-content > * {
     background: rgba(21,51,56,.22);
 }
 
-.zazu-login-visual-scene {
+.zazu-login-hero-image {
     position: absolute;
     inset: 0;
-    overflow: hidden;
-    opacity: .98;
+    width: 100%;
+    height: 100%;
+    display: block;
+    object-fit: cover;
+    object-position: center center;
+    filter: saturate(.92) contrast(.98);
+    transform: scale(1.015);
+}
+
+.zazu-login-visual-scene {
+    display: none;
+}
+
+.zazu-login-visual::after {
+    width: 100%;
+    height: 100%;
+    left: 0;
+    bottom: 0;
+    border-radius: 0;
+    background: linear-gradient(180deg, rgba(18,38,39,.04) 0%, rgba(18,38,39,.08) 38%, rgba(18,38,39,.78) 100%);
 }
 
 .zazu-login-window {
