@@ -192,7 +192,18 @@
             const baseName = name.replace(/\[.*?\]/g, '');
             const messages = serverErrors[name] || serverErrors[baseName] || [];
 
-            if (control.required) control.setAttribute('aria-required', 'true');
+            if (control.required) {
+                control.setAttribute('aria-required', 'true');
+
+                const label = field.querySelector('.zazu-label');
+                if (label && !label.querySelector('.zazu-required')) {
+                    const marker = document.createElement('span');
+                    marker.className = 'zazu-required';
+                    marker.setAttribute('aria-hidden', 'true');
+                    marker.textContent = ' *';
+                    label.appendChild(marker);
+                }
+            }
 
             if (messages.length && !field.querySelector('.zazu-field-error')) {
                 const error = document.createElement('span');
