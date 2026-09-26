@@ -26,7 +26,7 @@
             <nav class="zazu-nav" aria-label="Primary">
                 <div class="zazu-nav-group">
                     <div class="zazu-nav-label">Operations</div>
-                    <a href="{{ route('work.index') }}" class="zazu-nav-link {{ request()->routeIs('work.*') ? 'active' : '' }}">
+                    <a href="{{ route('work.index') }}" class="zazu-nav-link {{ request()->routeIs('work.*') ? 'active' : '' }}" @if (request()->routeIs('work.*')) aria-current="page" @endif>
                         <svg class="zazu-nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true">
                             <rect x="4" y="4" width="6" height="6" rx="1"></rect>
                             <rect x="14" y="4" width="6" height="6" rx="1"></rect>
@@ -39,7 +39,7 @@
 
                 <div class="zazu-nav-group">
                     <div class="zazu-nav-label">Relationships</div>
-                    <a href="{{ route('customers.index') }}" class="zazu-nav-link {{ request()->routeIs('customers.*') ? 'active' : '' }}">
+                    <a href="{{ route('customers.index') }}" class="zazu-nav-link {{ request()->routeIs('customers.*') ? 'active' : '' }}" @if (request()->routeIs('customers.*')) aria-current="page" @endif>
                         <svg class="zazu-nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true">
                             <circle cx="9" cy="8" r="3"></circle>
                             <path d="M4 19c.7-3 2.3-4.5 5-4.5s4.3 1.5 5 4.5"></path>
@@ -52,7 +52,7 @@
 
                 <div class="zazu-nav-group">
                     <div class="zazu-nav-label">Catalogue</div>
-                    <a href="{{ route('capabilities.index') }}" class="zazu-nav-link {{ request()->routeIs('capabilities.*') ? 'active' : '' }}">
+                    <a href="{{ route('capabilities.index') }}" class="zazu-nav-link {{ request()->routeIs('capabilities.*') ? 'active' : '' }}" @if (request()->routeIs('capabilities.*')) aria-current="page" @endif>
                         <svg class="zazu-nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true">
                             <path d="M6 5.5A2.5 2.5 0 0 1 8.5 3H20v15.5A2.5 2.5 0 0 1 17.5 21H8.5A2.5 2.5 0 0 1 6 18.5z"></path>
                             <path d="M6 6h10.5A2.5 2.5 0 0 1 19 8.5V21"></path>
@@ -94,9 +94,9 @@
             </header>
 
             <nav class="zazu-mobile-nav" aria-label="Mobile primary">
-                <a href="{{ route('work.index') }}" class="zazu-mobile-link {{ request()->routeIs('work.*') ? 'active' : '' }}">Work</a>
-                <a href="{{ route('customers.index') }}" class="zazu-mobile-link {{ request()->routeIs('customers.*') ? 'active' : '' }}">Customers</a>
-                <a href="{{ route('capabilities.index') }}" class="zazu-mobile-link {{ request()->routeIs('capabilities.*') ? 'active' : '' }}">Capabilities</a>
+                <a href="{{ route('work.index') }}" class="zazu-mobile-link {{ request()->routeIs('work.*') ? 'active' : '' }}" @if (request()->routeIs('work.*')) aria-current="page" @endif>Work</a>
+                <a href="{{ route('customers.index') }}" class="zazu-mobile-link {{ request()->routeIs('customers.*') ? 'active' : '' }}" @if (request()->routeIs('customers.*')) aria-current="page" @endif>Customers</a>
+                <a href="{{ route('capabilities.index') }}" class="zazu-mobile-link {{ request()->routeIs('capabilities.*') ? 'active' : '' }}" @if (request()->routeIs('capabilities.*')) aria-current="page" @endif>Capabilities</a>
             </nav>
 
             <div class="zazu-content">
