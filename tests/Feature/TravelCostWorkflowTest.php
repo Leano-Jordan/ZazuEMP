@@ -40,10 +40,9 @@ class TravelCostWorkflowTest extends TestCase
         ]);
 
         $response->assertSessionDoesntHaveErrors();
-        $travel = TravelCost::query()->firstOrFail();
-
         $response->assertRedirect(route('work.travel.index', $event));
         $response->assertSessionHas('success', 'Travel calculation saved.');
+        $travel = TravelCost::query()->firstOrFail();
 
         $this->assertSame('ZAR', $travel->currency);
         $this->assertSame('100.00', (string) $travel->total_distance_km);
@@ -75,6 +74,8 @@ class TravelCostWorkflowTest extends TestCase
         ]);
 
         $response->assertSessionDoesntHaveErrors();
+        $response->assertRedirect(route('work.travel.index', $event));
+        $response->assertSessionHas('success', 'Travel calculation saved.');
         $travel = TravelCost::query()->firstOrFail();
 
         $this->assertFalse($travel->round_trip);
