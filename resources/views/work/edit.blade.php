@@ -32,7 +32,12 @@
                     <div class="zazu-form-grid">
                         <label class="zazu-field zazu-field-wide">
                             <span class="zazu-label">Customer</span>
-                            <select id="customer_id" name="customer_id" required class="zazu-select">
+                            @if ($hasQuotes)
+                                <div class="mb-2 rounded-lg border border-[var(--zazu-border)] bg-[var(--zazu-warning-soft)] px-3 py-2 text-[11px] leading-5 text-[var(--zazu-warning-ink)]">
+                                    Customer is locked because this Work record already has a quote. This protects historical commercial attribution.
+                                </div>
+                            @endif
+                            <select id="customer_id" name="customer_id" required class="zazu-select" @disabled($hasQuotes)>
                                 @foreach ($customers as $customer)
                                     <option value="{{ $customer->id }}" @selected(old('customer_id', $event->customer_id) == $customer->id)>{{ $customer->name }}</option>
                                 @endforeach
