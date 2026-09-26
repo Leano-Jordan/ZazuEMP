@@ -40,6 +40,8 @@
                 <div class="zazu-document-party-name">{{ $invoice->customer_name ?: 'Customer not recorded' }}</div>
                 <div class="zazu-document-muted">
                     @if($invoice->customer_address){{ $invoice->customer_address }}<br>@endif
+                    @if($invoice->customer_vat_number)VAT No. {{ $invoice->customer_vat_number }}<br>@endif
+                    @if($invoice->customer_tax_number)Tax reference {{ $invoice->customer_tax_number }}<br>@endif
                     @if($invoice->customer_email){{ $invoice->customer_email }}<br>@endif
                     @if($invoice->customer_phone){{ $invoice->customer_phone }}@endif
                 </div>
