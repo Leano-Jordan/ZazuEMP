@@ -26,6 +26,11 @@
 
                     <div class="zazu-form-grid">
                         <label class="zazu-field">
+                            <span class="zazu-label">Currency</span>
+                            <input name="currency" value="{{ old('currency', 'ZAR') }}" maxlength="3" class="zazu-input" required>
+                            @error('currency')<span class="zazu-field-error">{{ $message }}</span>@enderror
+                        </label>
+                        <label class="zazu-field">
                             <span class="zazu-label">Route label</span>
                             <input name="route_label" value="{{ old('route_label', 'Route A') }}" class="zazu-input" required>
                             @error('route_label')<span class="zazu-field-error">{{ $message }}</span>@enderror
