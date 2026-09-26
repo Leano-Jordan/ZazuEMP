@@ -50,9 +50,9 @@ class BusinessSettingsController extends Controller
             'trading_name' => ['nullable', 'string', 'max:255'],
             'registration_type' => ['nullable', 'string', 'in:company,sole_proprietor,close_corporation,trust,cooperative,other'],
             'registration_number' => ['nullable', 'string', 'max:100'],
-            'tax_regime' => ['required', Rule::in(array_keys(config('zazu.tax.regimes')))],
+            'tax_regime' => ['nullable', Rule::in(array_keys(config('zazu.tax.regimes')))],
             'income_tax_number' => ['nullable', 'string', 'max:100'],
-            'vat_status' => ['required', Rule::in(array_keys(config('zazu.tax.vat_statuses')))],
+            'vat_status' => ['nullable', Rule::in(array_keys(config('zazu.tax.vat_statuses')))],
             'vat_number' => ['nullable', 'required_if:vat_status,registered', 'string', 'max:100'],
             'paye_number' => ['nullable', 'string', 'max:100'],
             'uif_number' => ['nullable', 'string', 'max:100'],
@@ -64,8 +64,8 @@ class BusinessSettingsController extends Controller
             'tcs_reference' => ['nullable', 'string', 'max:100'],
             'tcs_pin' => ['nullable', 'string', 'max:100'],
             'tcs_pin_expires_at' => ['nullable', 'date'],
-            'default_vat_rate' => ['required', 'numeric', 'decimal:0,2', 'min:0', 'max:100'],
-            'tax_effective_from' => ['required', 'date', 'after_or_equal:today'],
+            'default_vat_rate' => ['nullable', 'numeric', 'decimal:0,2', 'min:0', 'max:100'],
+            'tax_effective_from' => ['nullable', 'date', 'after_or_equal:today'],
             'food_handling' => ['nullable', 'boolean'],
             'employees' => ['nullable', 'boolean'],
             'government_supply' => ['nullable', 'boolean'],
@@ -109,9 +109,9 @@ class BusinessSettingsController extends Controller
                     'trading_name' => $validated['trading_name'] ?? null,
                     'registration_type' => $validated['registration_type'] ?? null,
                     'registration_number' => $validated['registration_number'] ?? null,
-                    'tax_regime' => $validated['tax_regime'],
+                    'tax_regime' => $validated['tax_regime'] ?? ($business->taxProfile?->tax_regime ?? 'standard_income_tax'),
                     'income_tax_number' => $validated['income_tax_number'] ?? null,
-                    'vat_status' => $validated['vat_status'],
+                    'vat_status' => $validated['vat_status'] ?? ($business->taxProfile?->vat_status ?? 'not_registered'),
                     'vat_number' => $validated['vat_number'] ?? null,
                     'paye_number' => $validated['paye_number'] ?? null,
                     'uif_number' => $validated['uif_number'] ?? null,
@@ -141,8 +141,11 @@ class BusinessSettingsController extends Controller
                 $this->syncTaxDefaults(
                     $business,
                     $profile,
-                    (string) $validated['default_vat_rate'],
-                    Carbon::parse($validated['tax_effective_from'])
+                    (string) ($validated['default_vat_rate'] ?? $business->taxRates()
+                        ->where('code', 'VAT_STANDARD')
+                        ->where('is_default', true)
+                        ->value('rate') ?? config('zazu.tax.default_standard_rate')),
+                    Carbon::parse($validated['tax_effective_from'] ?? now()->toDateString())
                 );
             });
         } catch (\Throwable $e) {
@@ -161,7 +164,7 @@ class BusinessSettingsController extends Controller
             }
         }
 
-        return redirect()->route('settings.index')->with('success', 'Business, tax and compliance settings saved.');
+        return redirect()->route('settings.index')->with('success', 'Business settings saved.');
     }
 
     private function syncTaxDefaults(Business $business, BusinessTaxProfile $profile, string $requestedRate, Carbon $effectiveFrom): void
