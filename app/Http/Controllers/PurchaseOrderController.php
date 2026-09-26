@@ -6,6 +6,7 @@ use App\Models\BusinessCapability;
 use App\Models\PurchaseOrder;
 use App\Models\Supplier;
 use App\Support\CurrentBusiness;
+use App\Support\Money;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
@@ -58,16 +59,20 @@ class PurchaseOrderController extends Controller
                 'currency'=>strtoupper($data['currency']),'expected_at'=>$data['expected_at']??null,'notes'=>$data['notes']??null,
                 'total_amount'=>'0.00',
             ]);
-            $total=0;
+            $totalCents=0;
             foreach($data['description'] as $i=>$description){
-                $qty=(float)$data['quantity'][$i]; $price=(float)$data['unit_price'][$i]; $line=round($qty*$price,2); $total+= $line;
+                $qtyHundredths=Money::toHundredths((string)$data['quantity'][$i]);
+                $priceCents=Money::toCents((string)$data['unit_price'][$i]);
+                $lineCents=Money::multiplyQuantityByPrice($qtyHundredths,$priceCents);
+                $totalCents += $lineCents;
+                $qty=(float)$data['quantity'][$i]; $price=(float)$data['unit_price'][$i]; $line=Money::fromCents($lineCents);
                 $order->items()->create([
                     'business_id'=>$businessId,'capability_id'=>$data['capability_id'][$i]??null,
                     'description'=>$description,'quantity'=>$qty,'unit'=>$data['unit'][$i]??null,
                     'unit_price'=>$price,'line_total'=>$line,
                 ]);
             }
-            $order->update(['total_amount'=>number_format($total,2,'.','')]);
+            $order->update(['total_amount'=>Money::fromCents($totalCents)]);
             return $order;
         });
         return redirect()->route('purchasing.show',$order)->with('success','Purchase order created.');
