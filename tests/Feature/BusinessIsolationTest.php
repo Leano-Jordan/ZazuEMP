@@ -161,6 +161,7 @@ class BusinessIsolationTest extends TestCase
         $this->assertSame('draft', $event->fresh()->status);
 
         $confirmed = $this->actingAs($user)->put(route('work.update', $event), [
+            'customer_id' => $event->customer_id,
             'name' => $event->name,
             'event_type' => 'Wedding',
             'event_date' => $event->event_date->toDateString(),
@@ -172,6 +173,7 @@ class BusinessIsolationTest extends TestCase
         $event->refresh();
 
         $invalidReverse = $this->actingAs($user)->put(route('work.update', $event), [
+            'customer_id' => $event->customer_id,
             'name' => $event->name,
             'event_type' => 'Wedding',
             'event_date' => $event->event_date->toDateString(),
