@@ -105,10 +105,11 @@ class QuoteController extends Controller
 
             foreach ($requirementsById as $requirement) {
                 $unitPriceCents = (int) round(((float) $validated['unit_price'][$requirement->id]) * 100);
-                $quantity = (float) $requirement->quantity;
-                $lineTotalCents = (int) round($quantity * $unitPriceCents);
+                $quantityHundredths = (int) round(((float) $requirement->quantity) * 100);
+                $lineTotalCents = intdiv(($quantityHundredths * $unitPriceCents) + 50, 100);
                 $subtotalCents += $lineTotalCents;
 
+                $quantity = number_format($quantityHundredths / 100, 2, '.', '');
                 $unitPrice = number_format($unitPriceCents / 100, 2, '.', '');
                 $lineTotal = number_format($lineTotalCents / 100, 2, '.', '');
 
