@@ -84,7 +84,7 @@ return [
             'sars_income_tax' => 'SARS income tax registration / reference',
             'sars_tcs_good_standing' => 'SARS Tax Compliance Status (Good Standing)',
             'vat_certificate' => 'VAT registration certificate',
-            'bbbEE' => 'B-BBEE certificate / affidavit where applicable',
+            'bbbee' => 'B-BBEE certificate / affidavit where applicable',
             'csd_registration' => 'Central Supplier Database (CSD) registration/report',
             'uif_registration' => 'UIF registration',
             'sdl_registration' => 'SDL registration where applicable',
