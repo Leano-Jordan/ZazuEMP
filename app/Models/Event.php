@@ -12,6 +12,26 @@ class Event extends Model
 {
     use BelongsToBusiness, SoftDeletes;
 
+    public const TERMINAL_STATUSES = ['completed', 'cancelled'];
+
+    public const STATUS_TRANSITIONS = [
+        'draft' => ['draft', 'confirmed', 'cancelled'],
+        'confirmed' => ['confirmed', 'in_progress', 'cancelled'],
+        'in_progress' => ['in_progress', 'completed', 'cancelled'],
+        'completed' => ['completed'],
+        'cancelled' => ['cancelled'],
+    ];
+
+    public function isClosed(): bool
+    {
+        return in_array($this->status, self::TERMINAL_STATUSES, true);
+    }
+
+    public function canTransitionTo(string $status): bool
+    {
+        return in_array($status, self::STATUS_TRANSITIONS[$this->status] ?? [], true);
+    }
+
     protected $fillable = [
         'business_id',
         'customer_id',
