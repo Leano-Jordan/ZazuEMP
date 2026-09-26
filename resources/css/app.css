@@ -3912,3 +3912,34 @@ body.zazu-has-wallpaper .zazu-content > * {
         display: none;
     }
 }
+
+.zazu-user-popover-section {
+    padding: 4px 5px 10px;
+}
+
+.zazu-user-popover-label {
+    display: block;
+    margin-bottom: 5px;
+    color: var(--zazu-faint);
+    font-size: 9px;
+    font-weight: 750;
+    letter-spacing: .08em;
+    text-transform: uppercase;
+}
+
+.zazu-user-switch-form,
+.zazu-user-switch-select {
+    width: 100%;
+}
+
+.zazu-user-switch-select {
+    min-height: 38px;
+    padding: 0 9px;
+    border: 1px solid var(--zazu-border);
+    border-radius: 9px;
+    background: var(--zazu-field);
+    color: var(--zazu-ink-2);
+    font: inherit;
+    font-size: 11px;
+    font-weight: 650;
+}
