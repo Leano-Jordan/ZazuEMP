@@ -4,7 +4,7 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
     <meta name="theme-color" content="#0d4f43">
-    @php($business = auth()->user()?->businesses()->first() ?? \App\Models\Business::first())
+    @php($business = app(\App\Support\CurrentBusiness::class)->resolve(auth()->user()))
     <title>{{ $title ?? 'Zazu' }} · {{ $business?->name ?? 'Zazu EMP' }}</title>
     <script>
         (() => {
@@ -18,7 +18,7 @@
     </script>
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
-<body class="{{ $business?->wallpaper_path ? 'zazu-has-wallpaper' : '' }}" @if($business?->wallpaper_path) style="--zazu-wallpaper: url('{{ e(Storage::disk('public')->url($business->wallpaper_path)) }}')" @endif>
+<body class="{{ $business?->wallpaper_path ? 'zazu-has-wallpaper' : '' }}" data-business-currency="{{ $business?->currency ?? 'ZAR' }}" @if($business?->wallpaper_path) style="--zazu-wallpaper: url('{{ e(Storage::disk('public')->url($business->wallpaper_path)) }}')" @endif>
     <a class="zazu-skip-link" href="#main-content">Skip to main content</a>
     <div class="zazu-shell">
         <aside class="zazu-sidebar">
