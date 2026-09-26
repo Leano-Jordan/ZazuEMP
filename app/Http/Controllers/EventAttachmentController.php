@@ -8,7 +8,9 @@ use App\Models\EventAttachment;
 use App\Support\CurrentBusiness;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
+use Throwable;
 
 class EventAttachmentController extends Controller
 {
@@ -28,21 +30,34 @@ class EventAttachmentController extends Controller
             'description' => ['nullable', 'string', 'max:255'],
         ]);
 
-        foreach ($request->file('files', []) as $file) {
-            $path = $file->store('jobs/' . $event->id . '/attachments', 'private');
+        $storedPaths = [];
 
-            EventAttachment::create([
-                'event_id' => $event->id,
-                'business_id' => $business->id,
-                'uploaded_by' => $request->user()->id,
-                'original_name' => $file->getClientOriginalName(),
-                'disk' => 'private',
-                'path' => $path,
-                'mime_type' => $file->getMimeType(),
-                'size' => $file->getSize(),
-                'source' => 'upload',
-                'description' => $validated['description'] ?? null,
-            ]);
+        try {
+            DB::transaction(function () use ($request, $event, $business, $validated, &$storedPaths): void {
+                foreach ($request->file('files', []) as $file) {
+                    $path = $file->store('jobs/' . $event->id . '/attachments', 'private');
+                    $storedPaths[] = $path;
+
+                    EventAttachment::create([
+                        'event_id' => $event->id,
+                        'business_id' => $business->id,
+                        'uploaded_by' => $request->user()->id,
+                        'original_name' => $file->getClientOriginalName(),
+                        'disk' => 'private',
+                        'path' => $path,
+                        'mime_type' => $file->getMimeType(),
+                        'size' => $file->getSize(),
+                        'source' => 'upload',
+                        'description' => $validated['description'] ?? null,
+                    ]);
+                }
+            });
+        } catch (Throwable $exception) {
+            foreach ($storedPaths as $path) {
+                Storage::disk('private')->delete($path);
+            }
+
+            throw $exception;
         }
 
         return redirect()
@@ -53,7 +68,11 @@ class EventAttachmentController extends Controller
     public function download(Request $request, EventAttachment $attachment)
     {
         $business = $this->business($request);
-        abort_unless((int) $attachment->business_id === (int) $business->id, 404);
+        abort_unless(
+            (int) $attachment->business_id === (int) $business->id
+                && (int) $attachment->event?->business_id === (int) $business->id,
+            404
+        );
 
         abort_unless(Storage::disk($attachment->disk)->exists($attachment->path), 404);
 
@@ -63,7 +82,11 @@ class EventAttachmentController extends Controller
     public function destroy(Request $request, EventAttachment $attachment): RedirectResponse
     {
         $business = $this->business($request);
-        abort_unless((int) $attachment->business_id === (int) $business->id, 404);
+        abort_unless(
+            (int) $attachment->business_id === (int) $business->id
+                && (int) $attachment->event?->business_id === (int) $business->id,
+            404
+        );
 
         Storage::disk($attachment->disk)->delete($attachment->path);
         $event = $attachment->event;

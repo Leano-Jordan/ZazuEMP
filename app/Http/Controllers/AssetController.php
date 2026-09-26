@@ -9,6 +9,7 @@ use App\Models\EventRequirement;
 use App\Support\CurrentBusiness;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\View\View;
 
 class AssetController extends Controller
@@ -59,26 +60,47 @@ class AssetController extends Controller
             'event_id'=>['required','integer'],'allocated_from'=>['required','date'],'allocated_until'=>['nullable','date','after_or_equal:allocated_from'],'notes'=>['nullable','string'],
         ]);
         $event=Event::where('business_id',$businessId)->findOrFail($data['event_id']);
-        abort_if($asset->status!=='available',422,'Only available assets can be allocated.');
-        abort_if($data['allocated_until'] && $data['allocated_from'] > $data['allocated_until'], 422, 'Allocation dates are invalid.');
-        $overlap=$asset->allocations()->where('status','allocated')
-            ->whereDate('allocated_from','<=',$data['allocated_until'] ?: $data['allocated_from'])
-            ->where(function($query) use ($data) {
-                $query->whereNull('allocated_until')->orWhereDate('allocated_until','>=',$data['allocated_from']);
-            })->exists();
-        abort_if($overlap, 422, 'This asset is already allocated for the selected period.');
-        $asset->allocations()->create([...$data,'business_id'=>$businessId,'status'=>'allocated']);
-        $asset->update(['status'=>'allocated']);
-        return back()->with('success',$asset->name.' allocated to '.$event->name.'.');
+
+        return DB::transaction(function () use ($asset, $businessId, $data, $event): RedirectResponse {
+            $lockedAsset = Asset::query()
+                ->where('business_id', $businessId)
+                ->lockForUpdate()
+                ->findOrFail($asset->id);
+
+            abort_if($lockedAsset->status!=='available',422,'Only available assets can be allocated.');
+            abort_if($data['allocated_until'] && $data['allocated_from'] > $data['allocated_until'], 422, 'Allocation dates are invalid.');
+
+            $overlap=$lockedAsset->allocations()->where('status','allocated')
+                ->whereDate('allocated_from','<=',$data['allocated_until'] ?: $data['allocated_from'])
+                ->where(function($query) use ($data) {
+                    $query->whereNull('allocated_until')->orWhereDate('allocated_until','>=',$data['allocated_from']);
+                })->exists();
+
+            abort_if($overlap, 422, 'This asset is already allocated for the selected period.');
+
+            $lockedAsset->allocations()->create([...$data,'business_id'=>$businessId,'status'=>'allocated']);
+            $lockedAsset->update(['status'=>'allocated']);
+
+            return back()->with('success',$lockedAsset->name.' allocated to '.$event->name.'.');
+        });
     }
 
     public function release(Request $request, Asset $asset): RedirectResponse
     {
         $businessId=app(CurrentBusiness::class)->id($request->user());
         abort_unless((int)$asset->business_id===$businessId,404);
-        $allocation=$asset->allocations()->where('status','allocated')->latest()->first();
-        if($allocation){ $allocation->update(['status'=>'returned','allocated_until'=>$allocation->allocated_until ?? now()->toDateString()]); }
-        $asset->update(['status'=>'available']);
-        return back()->with('success','Asset returned to available status.');
+
+        return DB::transaction(function () use ($asset, $businessId): RedirectResponse {
+            $lockedAsset = Asset::query()
+                ->where('business_id', $businessId)
+                ->lockForUpdate()
+                ->findOrFail($asset->id);
+
+            $allocation=$lockedAsset->allocations()->where('status','allocated')->latest()->lockForUpdate()->first();
+            if($allocation){ $allocation->update(['status'=>'returned','allocated_until'=>$allocation->allocated_until ?? now()->toDateString()]); }
+            $lockedAsset->update(['status'=>'available']);
+
+            return back()->with('success','Asset returned to available status.');
+        });
     }
 }

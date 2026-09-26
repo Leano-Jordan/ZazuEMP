@@ -66,6 +66,44 @@ class FinancePurchasingInventoryTest extends TestCase
         ]);
     }
 
+    public function test_purchase_order_rejects_a_foreign_business_capability(): void
+    {
+        [$business, $user] = $this->businessUser();
+        $otherBusiness = Business::create([
+            'name' => 'Capability Owner',
+            'slug' => 'capability-owner',
+            'status' => 'active',
+            'currency' => 'ZAR',
+        ]);
+
+        $foreignCapability = \App\Models\BusinessCapability::create([
+            'business_id' => $otherBusiness->id,
+            'name' => 'Foreign Ingredient',
+            'category' => 'Catering',
+            'capability_type' => 'product',
+            'pricing_basis' => 'per_unit',
+            'default_unit' => 'kg',
+            'is_active' => true,
+        ]);
+
+        $this->actingAs($user);
+
+        $this->post(route('purchasing.store'), [
+            'supplier_id' => \App\Models\Supplier::create([
+                'business_id' => $business->id,
+                'name' => 'Local Supplier',
+            ])->id,
+            'currency' => 'ZAR',
+            'description' => ['Foreign Ingredient'],
+            'quantity' => ['10'],
+            'unit' => ['kg'],
+            'unit_price' => ['20.00'],
+            'capability_id' => [(string) $foreignCapability->id],
+        ])->assertNotFound();
+
+        $this->assertDatabaseCount('purchase_orders', 0);
+    }
+
     public function test_inventory_cannot_be_issued_below_zero(): void
     {
         [$business, $user] = $this->businessUser();

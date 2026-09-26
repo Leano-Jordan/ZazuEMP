@@ -52,6 +52,30 @@ class PurchaseOrderController extends Controller
             'capability_id.*'=>['nullable','integer'],
         ]);
         $supplier=Supplier::where('business_id',$businessId)->findOrFail($data['supplier_id']);
+
+        abort_unless(
+            count($data['description']) === count($data['quantity'])
+                && count($data['description']) === count($data['unit_price']),
+            422,
+            'Purchase order lines are incomplete.'
+        );
+
+        $capabilityIds = collect($data['capability_id'] ?? [])
+            ->filter(fn ($id) => $id !== null && $id !== '')
+            ->map(fn ($id) => (int) $id)
+            ->unique()
+            ->values();
+
+        abort_unless(
+            $capabilityIds->count() === BusinessCapability::query()
+                ->where('business_id', $businessId)
+                ->whereIn('capability_type', ['product', 'rental'])
+                ->whereIn('id', $capabilityIds->all())
+                ->count(),
+            404,
+            'One or more catalogue items do not belong to this business.'
+        );
+
         $order=\DB::transaction(function() use($data,$businessId,$supplier){
             $order=PurchaseOrder::create([
                 'business_id'=>$businessId,'supplier_id'=>$supplier->id,
