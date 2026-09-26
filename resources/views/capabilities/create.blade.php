@@ -85,7 +85,7 @@
 
                         <label class="zazu-field zazu-field-wide">
                             <span class="zazu-label">Preview picture</span>
-                            <input type="file" name="image" accept=".jpg,.jpeg,.png,.webp,image/jpeg,image/png,image/webp" class="zazu-input" data-image-preview>
+                            <input type="file" name="image" accept=".jpg,.jpeg,.png,.webp,image/jpeg,image/png,image/webp" class="zazu-file-input" data-image-preview>
                             <span class="zazu-field-help">Use a clear picture of the service, product, setup or equipment.</span>
                             @error('image')<span class="zazu-field-error">{{ $message }}</span>@enderror
                             <img data-image-preview-output alt="" class="zazu-image-preview" hidden>
