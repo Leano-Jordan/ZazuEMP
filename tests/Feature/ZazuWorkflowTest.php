@@ -33,7 +33,7 @@ class ZazuWorkflowTest extends TestCase
             'notes' => 'White folding chairs',
         ]);
 
-        $response->assertRedirect(route('work.show', $event));
+        $response->assertRedirect(route('work.requirements.index', $event));
 
         $this->assertDatabaseHas('event_requirements', [
             'event_id' => $event->id,
@@ -41,6 +41,19 @@ class ZazuWorkflowTest extends TestCase
             'category' => 'Furniture',
             'status' => 'open',
         ]);
+    }
+
+    public function test_customer_directory_opens_customer_relationship_workspace(): void
+    {
+        $customer = Customer::create([
+            'name' => 'Customer Workspace Test',
+        ]);
+
+        $response = $this->get(route('customers.show', $customer));
+
+        $response->assertOk();
+        $response->assertSee('Customer Workspace Test');
+        $response->assertSee(route('work.create', ['customer_id' => $customer->id]));
     }
 
     public function test_duplicate_customer_names_are_rejected(): void
