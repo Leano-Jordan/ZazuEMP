@@ -46,6 +46,7 @@ class QuoteController extends Controller
     public function create(Request $request, Event $event): View|RedirectResponse
     {
         $this->ensureBusiness($event, $request);
+        abort_if($event->isClosed(), 422, 'Closed work cannot receive new quotes.');
         $event->load(['customer', 'requirements.capability']);
 
         if ($event->requirements->isEmpty()) {
@@ -65,6 +66,7 @@ class QuoteController extends Controller
     {
         $businessId = app(CurrentBusiness::class)->id($request->user());
         $this->ensureBusiness($event, $request);
+        abort_if($event->isClosed(), 422, 'Closed work cannot receive new quotes.');
         $event->load(['customer', 'requirements.capability']);
 
         $validated = $request->validate([
@@ -166,6 +168,9 @@ class QuoteController extends Controller
 
     public function createVersion(Request $request, Quote $quote): RedirectResponse
     {
+        $quote->loadMissing('event');
+        abort_if($quote->event?->isClosed(), 422, 'Closed work cannot receive new quote revisions.');
+
         $businessId = app(CurrentBusiness::class)->id($request->user());
 
         $newVersion = DB::transaction(function () use ($quote, $businessId): QuoteVersion {
