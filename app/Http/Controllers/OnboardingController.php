@@ -13,7 +13,7 @@ class OnboardingController extends Controller
 {
     public function catalogue(Request $request): View|RedirectResponse
     {
-        $business = $this->business($request);
+        $business = $this->currentBusiness($request);
 
         if ($business->catalogue_setup_completed_at) {
             return redirect()->route('onboarding.business');
@@ -30,7 +30,7 @@ class OnboardingController extends Controller
 
     public function storeCatalogue(Request $request): RedirectResponse
     {
-        $business = $this->business($request);
+        $business = $this->currentBusiness($request);
 
         $categories = array_keys(config('zazu.service_categories'));
 
@@ -66,7 +66,7 @@ class OnboardingController extends Controller
 
     public function finishCatalogue(Request $request): RedirectResponse
     {
-        $business = $this->business($request);
+        $business = $this->currentBusiness($request);
         $business->update(['catalogue_setup_completed_at' => now()]);
 
         return redirect()
@@ -76,7 +76,7 @@ class OnboardingController extends Controller
 
     public function skipCatalogue(Request $request): RedirectResponse
     {
-        $business = $this->business($request);
+        $business = $this->currentBusiness($request);
         $business->update(['catalogue_setup_completed_at' => now()]);
 
         return redirect()
@@ -86,7 +86,7 @@ class OnboardingController extends Controller
 
     public function business(Request $request): View|RedirectResponse
     {
-        $business = $this->business($request);
+        $business = $this->currentBusiness($request);
 
         if ($business->business_setup_completed_at) {
             return redirect()->route('dashboard');
@@ -100,7 +100,7 @@ class OnboardingController extends Controller
 
     public function storeBusiness(Request $request): RedirectResponse
     {
-        $business = $this->business($request);
+        $business = $this->currentBusiness($request);
 
         $validated = $request->validate([
             'name' => ['required', 'string', 'max:255'],
@@ -121,7 +121,7 @@ class OnboardingController extends Controller
 
     public function skipBusiness(Request $request): RedirectResponse
     {
-        $business = $this->business($request);
+        $business = $this->currentBusiness($request);
         $business->update(['business_setup_completed_at' => now()]);
 
         return redirect()
@@ -129,7 +129,7 @@ class OnboardingController extends Controller
             ->with('info', 'Business details can be completed later from Settings.');
     }
 
-    private function business(Request $request): Business
+    private function currentBusiness(Request $request): Business
     {
         return app(CurrentBusiness::class)->model($request->user());
     }
