@@ -246,17 +246,24 @@
                     </div>
                 @endif
 
-                @if (session('success'))
-                    <div class="zazu-alert zazu-alert-success" role="status">
-                        <strong>Saved.</strong>
-                        <span>{{ session('success') }}</span>
-                    </div>
-                @endif
-
-                @if (session('error'))
-                    <div class="zazu-alert zazu-alert-error" role="alert">
-                        <strong>Action needed.</strong>
-                        <span>{{ session('error') }}</span>
+                @if (session('success') || session('error') || session('info'))
+                    @php
+                        $toastType = session('error') ? 'error' : (session('info') ? 'info' : 'success');
+                        $toastTitle = $toastType === 'error' ? 'Action needed' : ($toastType === 'info' ? 'Zazu' : 'Saved');
+                        $toastMessage = session('error') ?? session('info') ?? session('success');
+                    @endphp
+                    <div class="zazu-toast zazu-toast-{{ $toastType }}" role="{{ $toastType === 'error' ? 'alert' : 'status' }}" data-zazu-toast>
+                        <div class="zazu-toast-icon" aria-hidden="true">
+                            @if ($toastType === 'success') ✓ @elseif ($toastType === 'error') ! @else i @endif
+                        </div>
+                        <div class="zazu-toast-content">
+                            <div class="zazu-toast-title">{{ $toastTitle }}</div>
+                            <div class="zazu-toast-message">{{ $toastMessage }}</div>
+                        </div>
+                        @if (session('toast_action_url') && session('toast_action_label'))
+                            <a href="{{ session('toast_action_url') }}" class="zazu-toast-action">{{ session('toast_action_label') }}</a>
+                        @endif
+                        <button type="button" class="zazu-toast-close" data-zazu-toast-close aria-label="Dismiss notification">×</button>
                     </div>
                 @endif
 
