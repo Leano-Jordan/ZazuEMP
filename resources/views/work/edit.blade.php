@@ -1,15 +1,15 @@
 <x-app-layout>
-    <x-slot:title>Edit {{ $event->name }}</x-slot:title>
-    <x-slot:heading>Edit work</x-slot:heading>
+    <x-slot:title>Edit job</x-slot:title>
+    <x-slot:heading>Edit job</x-slot:heading>
     <x-slot:headerAction>
-        <a href="{{ route('work.show', $event) }}" class="zazu-btn zazu-btn-ghost">← Workspace</a>
+        <a href="{{ route('work.show', $event) }}" class="zazu-btn zazu-btn-ghost">Job workspace</a>
     </x-slot:headerAction>
 
     <section class="zazu-command-band">
         <div>
-            <div class="zazu-eyebrow">Work details</div>
+            <div class="zazu-eyebrow">Job details</div>
             <h2 class="zazu-command-title">{{ $event->name }}</h2>
-            <p class="zazu-command-copy">Update the work details without leaving this record.</p>
+            <p class="zazu-command-copy">Update the job details without leaving this record.</p>
         </div>
         <div class="zazu-command-meta">
             <div class="zazu-command-meta-label">Reference</div>
@@ -25,7 +25,7 @@
             <div class="zazu-form-main">
                 <section class="zazu-form-section">
                     <div class="zazu-form-section-head">
-                        <div class="zazu-form-section-title">Core work details</div>
+                        <div class="zazu-form-section-title">Job details</div>
                         <div class="zazu-form-section-copy">Change the information that defines this work.</div>
                     </div>
 
@@ -52,22 +52,29 @@
                             @error('name')<span class="zazu-field-error">{{ $message }}</span>@enderror
                         </label>
 
-                        <label class="zazu-field">
-                            <span class="zazu-label">Type</span>
-                            <input name="event_type" value="{{ old('event_type', $event->event_type) }}" class="zazu-input">
+                        <fieldset class="zazu-field zazu-field-wide">
+                            <legend class="zazu-label">What kind of job is it? <span class="zazu-required">*</span></legend>
+                            <div class="zazu-choice-grid">
+                                @foreach (config('zazu.job_types') as $jobType)
+                                    <label class="zazu-choice-card">
+                                        <input type="radio" name="event_type" value="{{ $jobType }}" @checked(old('event_type', $event->event_type) === $jobType) required>
+                                        <span>{{ $jobType }}</span>
+                                    </label>
+                                @endforeach
+                            </div>
                             @error('event_type')<span class="zazu-field-error">{{ $message }}</span>@enderror
-                        </label>
+                        </fieldset>
 
                         <label class="zazu-field">
-                            <span class="zazu-label">Event date <span class="zazu-required">*</span></span>
+                            <span class="zazu-label">Job date <span class="zazu-required">*</span></span>
                             <input type="date" name="event_date" value="{{ old('event_date', $event->event_date?->format('Y-m-d')) }}" required class="zazu-input">
                             @error('event_date')<span class="zazu-field-error">{{ $message }}</span>@enderror
                         </label>
 
                         <label class="zazu-field">
-                            <span class="zazu-label">Event-day contact <span class="font-normal text-[var(--zazu-faint)]">(optional)</span></span>
+                            <span class="zazu-label">Day contact <span class="font-normal text-[var(--zazu-faint)]">(optional)</span></span>
                             <select id="event_day_contact_id" name="event_day_contact_id" class="zazu-select">
-                                <option value="">No event-day contact</option>
+                                <option value="">No day contact</option>
                             </select>
                             @error('event_day_contact_id')<span class="zazu-field-error">{{ $message }}</span>@enderror
                         </label>
@@ -100,7 +107,7 @@
 
                     <div class="zazu-form-grid">
                         <label class="zazu-field zazu-field-wide">
-                            <span class="zazu-label">Event location</span>
+                            <span class="zazu-label">Job location</span>
                             <input name="event_address" value="{{ old('event_address', $event->event_address) }}" class="zazu-input">
                             @error('event_address')<span class="zazu-field-error">{{ $message }}</span>@enderror
                         </label>
