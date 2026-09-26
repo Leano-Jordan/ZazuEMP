@@ -4,34 +4,42 @@ namespace App\Http\Controllers;
 
 use App\Models\Event;
 use App\Models\TravelCost;
+use App\Support\CurrentBusiness;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Validation\Rule;
 use Illuminate\View\View;
 
 class TravelCostController extends Controller
 {
-    public function index(Event $event): View
+    public function index(Request $request, Event $event): View
     {
+        $this->ensureBusiness($event, $request);
         $event->load('customer');
         $travelCosts = $event->travelCosts()->latest()->get();
 
         return view('travel.index', compact('event', 'travelCosts'));
     }
 
-    public function create(Event $event): View
+    public function create(Request $request, Event $event): View
     {
+        $this->ensureBusiness($event, $request);
         $event->load('customer');
 
-        return view('travel.create', compact('event'));
+        return view('travel.create', [
+            'event' => $event,
+            'currencies' => config('zazu.currencies'),
+        ]);
     }
 
     public function store(Request $request, Event $event): RedirectResponse
     {
+        $this->ensureBusiness($event, $request);
+
         $validated = $request->validate([
             'route_label' => ['required', 'string', 'max:100'],
-            'currency' => ['required', 'string', 'size:3', 'regex:/^[A-Za-z]{3}$/'],
-            'provider' => ['required', 'string', 'max:100'],
+            'currency' => ['required', Rule::in(array_keys(config('zazu.currencies')))],
             'origin' => ['required', 'string', 'max:255'],
             'destination' => ['required', 'string', 'max:255'],
             'distance_km' => ['required', 'numeric', 'gt:0'],
@@ -66,11 +74,11 @@ class TravelCostController extends Controller
         ): TravelCost {
             return TravelCost::query()->create([
                 'event_id' => $event->id,
-                'route_label' => $validated['route_label'],
+                'route_label' => trim($validated['route_label']),
                 'currency' => strtoupper($validated['currency']),
-                'provider' => $validated['provider'],
-                'origin' => $validated['origin'],
-                'destination' => $validated['destination'],
+                'provider' => 'manual',
+                'origin' => trim($validated['origin']),
+                'destination' => trim($validated['destination']),
                 'distance_km' => $validated['distance_km'],
                 'travel_time_minutes' => $validated['travel_time_minutes'] ?? null,
                 'fuel_price_per_litre' => $validated['fuel_price_per_litre'],
@@ -83,11 +91,11 @@ class TravelCostController extends Controller
                 'customer_charge' => $customerCharge,
                 'notes' => $validated['notes'] ?? null,
                 'calculation_snapshot' => [
-                    'route_label' => $validated['route_label'],
+                    'route_label' => trim($validated['route_label']),
                     'currency' => strtoupper($validated['currency']),
-                    'provider' => $validated['provider'],
-                    'origin' => $validated['origin'],
-                    'destination' => $validated['destination'],
+                    'provider' => 'manual',
+                    'origin' => trim($validated['origin']),
+                    'destination' => trim($validated['destination']),
                     'distance_km' => $distance,
                     'travel_time_minutes' => $validated['travel_time_minutes'] ?? null,
                     'fuel_price_per_litre' => (float) $validated['fuel_price_per_litre'],
@@ -105,5 +113,10 @@ class TravelCostController extends Controller
         return redirect()
             ->route('work.travel.index', $event)
             ->with('success', 'Travel calculation saved.');
+    }
+
+    private function ensureBusiness(Event $event, Request $request): void
+    {
+        abort_unless((int) $event->business_id === app(CurrentBusiness::class)->id($request->user()), 404);
     }
 }
