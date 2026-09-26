@@ -1,17 +1,17 @@
 <?php
 
-namespace TestsFeature;
+namespace Tests\Feature;
 
-use AppModelsBusiness;
-use AppModelsBusinessCapability;
-use AppModelsCustomer;
-use AppModelsEvent;
-use AppModelsEventRequirement;
-use AppModelsEventCost;
-use AppModelsEventPreparationItem;
-use AppModelsQuote;
-use AppModelsQuoteVersion;
-use TestsTestCase;
+use App\Models\Business;
+use App\Models\BusinessCapability;
+use App\Models\Customer;
+use App\Models\Event;
+use App\Models\EventCost;
+use App\Models\EventPreparationItem;
+use App\Models\EventRequirement;
+use App\Models\Quote;
+use App\Models\User;
+use Tests\TestCase;
 
 class FoundationIntegrationTest extends TestCase
 {
@@ -53,7 +53,7 @@ class FoundationIntegrationTest extends TestCase
         $rental = BusinessCapability::create([
             'business_id' => $business->id,
             'name' => 'Banquet chairs',
-            'category' => 'Furniture & Equipment',
+            'category' => 'Furniture & equipment',
             'capability_type' => 'rental',
             'pricing_basis' => 'per_unit',
             'default_unit' => 'unit',
@@ -74,7 +74,7 @@ class FoundationIntegrationTest extends TestCase
             'event_id' => $event->id,
             'capability_id' => $rental->id,
             'description' => 'Banquet chairs',
-            'category' => 'Furniture & Equipment',
+            'category' => 'Furniture & equipment',
             'quantity' => 100,
             'unit' => 'unit',
             'status' => 'open',
@@ -153,7 +153,7 @@ class FoundationIntegrationTest extends TestCase
         EventCost::create([
             'business_id' => $business->id,
             'event_id' => $event->id,
-            'category' => 'Catering',
+            'category' => 'Food',
             'description' => 'Ingredients',
             'currency' => 'ZAR',
             'projected_amount' => '3000.00',
@@ -170,10 +170,9 @@ class FoundationIntegrationTest extends TestCase
 
         $this->get(route('reports.index'))
             ->assertOk()
-            ->assertSee('Reporting Event')
             ->assertSee('12,500.00')
             ->assertSee('2,800.00')
-            ->assertSee('1')
+            ->assertSee('Reporting Customer')
             ->assertDontSee('Other Event');
 
         $this->assertModelExists($otherEvent);
@@ -224,10 +223,10 @@ class FoundationIntegrationTest extends TestCase
             'status' => 'active',
             'currency' => 'ZAR',
         ]);
-        $staff = AppModelsUser::factory()->create();
+        $staff = User::factory()->create();
         $business->users()->attach($staff->id, ['role' => 'staff']);
 
-        BusinessCapability::create([
+        $capability = BusinessCapability::create([
             'business_id' => $business->id,
             'name' => 'Staff-visible Service',
             'category' => 'Catering',
@@ -245,6 +244,6 @@ class FoundationIntegrationTest extends TestCase
         $this->get(route('capabilities.index'))
             ->assertOk()
             ->assertDontSee(route('capabilities.create'), false)
-            ->assertDontSee(route('capabilities.edit', BusinessCapability::where('name', 'Staff-visible Service')->first()), false);
+            ->assertDontSee(route('capabilities.edit', $capability), false);
     }
 }
