@@ -30,7 +30,12 @@
                         </label>
                         <label class="zazu-field">
                             <span class="zazu-label">Category</span>
-                            <input name="category" value="{{ old('category') }}" class="zazu-input" placeholder="Equipment, food, staff...">
+                            <select name="category" class="zazu-select">
+                                <option value="">Not specified</option>
+                                @foreach ($categories as $value => $label)
+                                    <option value="{{ $value }}" @selected(old('category') === $value)>{{ $label }}</option>
+                                @endforeach
+                            </select>
                             @error('category')<span class="zazu-field-error">{{ $message }}</span>@enderror
                         </label>
                         <label class="zazu-field">
@@ -40,7 +45,12 @@
                         </label>
                         <label class="zazu-field">
                             <span class="zazu-label">Unit</span>
-                            <input name="unit" value="{{ old('unit') }}" class="zazu-input" placeholder="chairs, trays, boxes...">
+                            <select name="unit" class="zazu-select">
+                                <option value="">Not specified</option>
+                                @foreach ($units as $value => $label)
+                                    <option value="{{ $value }}" @selected(old('unit') === $value)>{{ $label }}</option>
+                                @endforeach
+                            </select>
                             @error('unit')<span class="zazu-field-error">{{ $message }}</span>@enderror
                         </label>
                         <label class="zazu-field">
