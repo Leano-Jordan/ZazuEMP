@@ -61,51 +61,110 @@ class FinanceController extends Controller
 
     public function storeInvoice(Request $request): RedirectResponse
     {
-        $businessId = app(CurrentBusiness::class)->id($request->user());
+        $business = app(CurrentBusiness::class)->model($request->user());
+        $business->loadMissing('taxProfile');
+
         $data = $request->validate([
             'quote_id' => ['nullable', 'integer'],
             'event_id' => ['nullable', 'integer'],
             'tax_rate_id' => ['nullable', 'integer'],
-            'subtotal' => ['nullable', 'numeric', 'decimal:0,2', 'min:0', 'required_without:quote_id'],
+            'lines' => ['nullable', 'array', 'min:1', 'required_without:quote_id'],
+            'lines.*.description' => ['required', 'string', 'max:500'],
+            'lines.*.quantity' => ['required', 'numeric', 'decimal:0,2', 'gt:0'],
+            'lines.*.unit' => ['nullable', 'string', 'max:100'],
+            'lines.*.unit_price' => ['required', 'numeric', 'decimal:0,2', 'min:0'],
             'issued_at' => ['nullable', 'date'],
-            'due_at' => ['nullable', 'date'],
+            'due_at' => ['nullable', 'date', 'after_or_equal:issued_at'],
             'notes' => ['nullable', 'string'],
         ]);
 
-        $quote = $data['quote_id']
-            ? Quote::whereHas('event', fn ($q) => $q->where('business_id', $businessId))
-                ->with('latestVersion')
+        $businessId = $business->id;
+
+        $quote = !empty($data['quote_id'])
+            ? Quote::query()
+                ->whereHas('event', fn ($q) => $q->where('business_id', $businessId))
+                ->with(['latestVersion.items', 'event.customer.primaryContact'])
                 ->findOrFail($data['quote_id'])
             : null;
 
         $event = !empty($data['event_id'])
-            ? Event::where('business_id', $businessId)->findOrFail($data['event_id'])
+            ? Event::query()
+                ->where('business_id', $businessId)
+                ->with('customer.primaryContact')
+                ->findOrFail($data['event_id'])
             : $quote?->event;
 
-        abort_if($quote && $event && (int) $quote->event_id !== (int) $event->id, 422, 'The selected quote and job do not match.');
+        abort_if(
+            $quote && $event && (int) $quote->event_id !== (int) $event->id,
+            422,
+            'The selected quote and job do not match.'
+        );
         abort_unless($quote || $event, 422, 'Select a quote or job for the invoice.');
 
+        $invoiceLines = [];
+        $taxRateId = null;
+        $taxCode = null;
+        $taxLabel = 'No tax';
+        $taxTreatment = 'out_of_scope';
+        $taxRate = '0.00';
+
         if ($quote) {
-            abort_unless($quote->status === 'accepted' && $quote->latestVersion?->status === 'accepted', 422, 'Only an accepted quote can be converted into an invoice.');
+            abort_unless(
+                $quote->status === 'accepted' && $quote->latestVersion?->status === 'accepted',
+                422,
+                'Only an accepted quote can be converted into an invoice.'
+            );
             abort_unless($quote->latestVersion, 422, 'The selected quote has no version to invoice.');
 
             $version = $quote->latestVersion;
+
+            foreach ($version->items as $item) {
+                $invoiceLines[] = [
+                    'description' => $item->description,
+                    'quantity' => (string) $item->quantity,
+                    'unit' => $item->unit,
+                    'unit_price' => (string) $item->unit_price,
+                    'line_total' => (string) $item->line_total,
+                    'quote_item_id' => $item->id,
+                ];
+            }
+
             $subtotal = (string) $version->subtotal;
             $tax = (string) $version->tax_total;
             $total = (string) $version->total;
             $currency = $quote->currency;
             $taxRateId = $version->tax_rate_id;
             $taxCode = $version->tax_code;
-            $taxLabel = $version->tax_label;
-            $taxTreatment = $version->tax_treatment;
+            $taxLabel = $version->tax_label ?: 'No tax';
+            $taxTreatment = $version->tax_treatment ?: 'out_of_scope';
             $taxRate = (string) ($version->tax_rate ?? '0.00');
         } else {
             $taxRateRecord = $this->resolveTaxRate($businessId, $data['tax_rate_id'] ?? null);
-            $subtotal = Money::fromCents(Money::toCents((string) $data['subtotal']));
-            $taxCents = $this->calculateTaxCents(Money::toCents($subtotal), (string) ($taxRateRecord?->rate ?? '0.00'));
+
+            $subtotalCents = 0;
+
+            foreach ($data['lines'] as $line) {
+                $quantityHundredths = Money::toHundredths((string) $line['quantity']);
+                $unitPriceCents = Money::toCents((string) $line['unit_price']);
+                $lineTotalCents = Money::multiplyQuantityByPrice($quantityHundredths, $unitPriceCents);
+
+                $invoiceLines[] = [
+                    'description' => trim($line['description']),
+                    'quantity' => number_format($quantityHundredths / 100, 2, '.', ''),
+                    'unit' => $line['unit'] ?? null,
+                    'unit_price' => Money::fromCents($unitPriceCents),
+                    'line_total' => Money::fromCents($lineTotalCents),
+                    'quote_item_id' => null,
+                ];
+
+                $subtotalCents += $lineTotalCents;
+            }
+
+            $subtotal = Money::fromCents($subtotalCents);
+            $taxCents = $this->calculateTaxCents($subtotalCents, (string) ($taxRateRecord?->rate ?? '0.00'));
             $tax = Money::fromCents($taxCents);
-            $total = Money::fromCents(Money::toCents($subtotal) + $taxCents);
-            $currency = app(CurrentBusiness::class)->model($request->user())->currency ?? 'ZAR';
+            $total = Money::fromCents($subtotalCents + $taxCents);
+            $currency = $business->currency ?? 'ZAR';
             $taxRateId = $taxRateRecord?->id;
             $taxCode = $taxRateRecord?->code;
             $taxLabel = $taxRateRecord?->name ?: 'No tax';
@@ -113,27 +172,66 @@ class FinanceController extends Controller
             $taxRate = (string) ($taxRateRecord?->rate ?? '0.00');
         }
 
-        $invoice = Invoice::create([
-            'business_id' => $businessId,
-            'event_id' => $event?->id,
-            'quote_id' => $quote?->id,
-            'number' => 'INV-'.now()->format('Ym').'-'.Str::upper(Str::random(6)),
-            'status' => 'issued',
-            'currency' => $currency,
-            'subtotal' => $subtotal,
-            'tax_total' => $tax,
-            'total' => $total,
-            'issued_at' => $data['issued_at'] ?? now()->toDateString(),
-            'due_at' => $data['due_at'] ?? now()->addDays(7)->toDateString(),
-            'notes' => $data['notes'] ?? null,
-            'tax_rate_id' => $taxRateId,
-            'tax_code' => $taxCode,
-            'tax_label' => $taxLabel,
-            'tax_treatment' => $taxTreatment,
-            'tax_rate' => $taxRate,
-        ]);
+        abort_unless(count($invoiceLines) > 0, 422, 'The invoice must contain at least one line.');
 
-        return redirect()->route('finance.index')->with('success', 'Invoice '.$invoice->number.' created.');
+        $customer = $event?->customer;
+
+        $invoice = DB::transaction(function () use (
+            $business,
+            $businessId,
+            $data,
+            $event,
+            $customer,
+            $currency,
+            $subtotal,
+            $tax,
+            $total,
+            $taxRateId,
+            $taxCode,
+            $taxLabel,
+            $taxTreatment,
+            $taxRate,
+            $invoiceLines
+        ): Invoice {
+            $invoice = Invoice::create([
+                'business_id' => $businessId,
+                'event_id' => $event?->id,
+                'quote_id' => $data['quote_id'] ?? null,
+                'number' => 'INV-'.now()->format('Ym').'-'.Str::upper(Str::random(6)),
+                'business_legal_name' => $business->taxProfile?->legal_name ?: $business->name,
+                'business_trading_name' => $business->taxProfile?->trading_name ?: $business->name,
+                'business_address' => $business->address,
+                'business_email' => $business->email,
+                'business_phone' => $business->phone,
+                'business_tax_number' => $business->taxProfile?->income_tax_number ?: $business->tax_number,
+                'business_vat_number' => $business->taxProfile?->vat_number,
+                'customer_name' => $customer?->legal_name ?: $customer?->name,
+                'customer_address' => $customer?->billing_address ?: ($event?->event_address),
+                'customer_email' => $customer?->primaryContact?->email,
+                'customer_phone' => $customer?->primaryContact?->phone,
+                'status' => 'issued',
+                'currency' => $currency,
+                'subtotal' => $subtotal,
+                'tax_total' => $tax,
+                'total' => $total,
+                'issued_at' => $data['issued_at'] ?? now()->toDateString(),
+                'due_at' => $data['due_at'] ?? now()->addDays(7)->toDateString(),
+                'notes' => $data['notes'] ?? null,
+                'tax_rate_id' => $taxRateId,
+                'tax_code' => $taxCode,
+                'tax_label' => $taxLabel,
+                'tax_treatment' => $taxTreatment,
+                'tax_rate' => $taxRate,
+            ]);
+
+            $invoice->items()->createMany($invoiceLines);
+
+            return $invoice;
+        });
+
+        return redirect()
+            ->route('finance.invoices.show', $invoice)
+            ->with('success', 'Invoice '.$invoice->number.' created.');
     }
 
     public function createPayment(Request $request): View
