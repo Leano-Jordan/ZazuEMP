@@ -216,3 +216,20 @@ The current Work creation implementation includes customer selection, event-day 
 
 ## IMMEDIATE NEXT
 Verify the Work creation path locally after clearing compiled views, then continue with the next smallest operational workspace slice.
+
+
+## Critical regression lesson — 2026-09-26
+
+A generated write corrupted PHP namespace/import backslashes in `DashboardController.php`, producing `AppHttpControllers` / `AppModels...` and causing the controller-backed dashboard to fail even though the file existed.
+
+Root cause:
+- write-integrity failure during automated repository editing.
+
+Required execution guard:
+1. After every automated PHP write, immediately re-fetch the exact repository file.
+2. Verify namespace, imports, class declaration and obvious syntax-sensitive constructs.
+3. Verify the route -> controller -> view chain for touched pages.
+4. Run or leave an explicit runtime/test verification state before calling the batch complete.
+5. Treat regression prevention as higher priority than the next feature.
+
+A new route-integrity test now checks that controller-backed route actions resolve to loadable PHP classes.
