@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Business;
 use App\Models\Customer;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -14,12 +15,17 @@ use Throwable;
 
 class CustomerController extends Controller
 {
-    public function index(): View
+    public function index(Request $request): View
     {
-        $customers = Customer::with('primaryContact')
+        $business = $this->business($request);
+
+        $customers = Customer::query()
+            ->where('business_id', $business->id)
+            ->with('primaryContact')
             ->withCount('events')
             ->latest()
-            ->paginate(15);
+            ->paginate(15)
+            ->withQueryString();
 
         return view('customers.index', compact('customers'));
     }
@@ -31,19 +37,21 @@ class CustomerController extends Controller
 
     public function store(Request $request): RedirectResponse
     {
-        $validated = $this->validated($request, null, true);
+        $business = $this->business($request);
+        $validated = $this->validated($request, null, true, $business->id);
         $photoPath = $request->file('profile_photo')?->store('profile-photos/customers', 'public');
 
         try {
-            DB::transaction(function () use ($validated, $photoPath): void {
+            DB::transaction(function () use ($validated, $photoPath, $business): void {
                 $customer = Customer::create([
-                    'name' => $validated['name'],
+                    'business_id' => $business->id,
+                    'name' => trim($validated['name']),
                     'profile_photo_path' => $photoPath,
                     'notes' => $validated['notes'] ?? null,
                 ]);
 
                 $customer->contacts()->create([
-                    'name' => $validated['primary_contact_name'],
+                    'name' => trim($validated['primary_contact_name']),
                     'phone' => $validated['primary_contact_phone'] ?? null,
                     'email' => $validated['primary_contact_email'] ?? null,
                     'label' => 'Primary',
@@ -66,18 +74,28 @@ class CustomerController extends Controller
             ->with('success', 'Customer created successfully.');
     }
 
-    public function show(Customer $customer): View
+    public function show(Request $request, Customer $customer): View
     {
+        $business = $this->business($request);
+        $this->ensureBusiness($customer, $business);
+
         $customer->load([
             'contacts',
-            'events' => fn ($query) => $query->withTrashed()->latest('event_date')->latest(),
+            'events' => fn ($query) => $query
+                ->withTrashed()
+                ->where('business_id', $business->id)
+                ->latest('event_date')
+                ->latest(),
         ]);
 
         return view('customers.show', compact('customer'));
     }
 
-    public function edit(Customer $customer): View
+    public function edit(Request $request, Customer $customer): View
     {
+        $business = $this->business($request);
+        $this->ensureBusiness($customer, $business);
+
         $customer->load('primaryContact');
 
         return view('customers.edit', compact('customer'));
@@ -85,7 +103,10 @@ class CustomerController extends Controller
 
     public function update(Request $request, Customer $customer): RedirectResponse
     {
-        $validated = $this->validated($request, $customer, false);
+        $business = $this->business($request);
+        $this->ensureBusiness($customer, $business);
+
+        $validated = $this->validated($request, $customer, false, $business->id);
         $oldPhotoPath = $customer->profile_photo_path;
         $newPhotoPath = $request->file('profile_photo')?->store('profile-photos/customers', 'public');
 
@@ -98,7 +119,7 @@ class CustomerController extends Controller
         try {
             DB::transaction(function () use ($customer, $validated): void {
                 $customer->update([
-                    'name' => $validated['name'],
+                    'name' => trim($validated['name']),
                     'profile_photo_path' => $validated['profile_photo_path'] ?? $customer->profile_photo_path,
                     'notes' => $validated['notes'] ?? null,
                 ]);
@@ -107,13 +128,13 @@ class CustomerController extends Controller
 
                 if ($primary) {
                     $primary->update([
-                        'name' => $validated['primary_contact_name'],
+                        'name' => trim($validated['primary_contact_name']),
                         'phone' => $validated['primary_contact_phone'] ?? null,
                         'email' => $validated['primary_contact_email'] ?? null,
                     ]);
                 } else {
                     $customer->contacts()->create([
-                        'name' => $validated['primary_contact_name'],
+                        'name' => trim($validated['primary_contact_name']),
                         'phone' => $validated['primary_contact_phone'] ?? null,
                         'email' => $validated['primary_contact_email'] ?? null,
                         'label' => 'Primary',
@@ -142,20 +163,33 @@ class CustomerController extends Controller
             ->with('success', 'Customer updated successfully.');
     }
 
-    private function validated(Request $request, ?Customer $customer, bool $creating): array
+    private function business(Request $request): Business
+    {
+        return app(CurrentBusiness::class)->model($request->user());
+    }
+
+    private function ensureBusiness(Customer $customer, Business $business): void
+    {
+        abort_unless((int) $customer->business_id === (int) $business->id, 404);
+    }
+
+    private function validated(Request $request, ?Customer $customer, bool $creating, int $businessId): array
     {
         $rules = [
             'name' => [
                 'required',
                 'string',
                 'max:255',
-                Rule::unique('customers', 'name')->ignore($customer?->id),
+                Rule::unique('customers', 'name')
+                    ->where(fn ($query) => $query->where('business_id', $businessId))
+                    ->ignore($customer?->id),
             ],
             'notes' => ['nullable', 'string'],
             'primary_contact_name' => ['required', 'string', 'max:255'],
             'primary_contact_phone' => ['nullable', 'string', 'max:50'],
             'primary_contact_email' => ['nullable', 'email', 'max:255'],
             'profile_photo' => ['nullable', 'image', 'mimes:jpg,jpeg,png,webp', 'max:2048'],
+            'remove_profile_photo' => ['nullable', 'boolean'],
         ];
 
         if ($creating) {
@@ -170,9 +204,6 @@ class CustomerController extends Controller
 
             $rules['day_contact_name'][] = 'required_with:day_contact_phone,day_contact_email';
             $rules['night_contact_name'][] = 'required_with:night_contact_phone,night_contact_email';
-            $rules['remove_profile_photo'] = ['nullable', 'boolean'];
-        } else {
-            $rules['remove_profile_photo'] = ['nullable', 'boolean'];
         }
 
         return $request->validate($rules);
@@ -189,7 +220,7 @@ class CustomerController extends Controller
         }
 
         $customer->contacts()->create([
-            'name' => $name,
+            'name' => trim($name),
             'phone' => $phone,
             'email' => $email,
             'label' => Str::ucfirst($period),
