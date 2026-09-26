@@ -10,6 +10,7 @@ MASTER DIRECTOR (external operator/system prompt)
 TASK ROUTER
         |
         +--> RECON ENGINE (context required)
+        +--> FRESH EYES ENGINE (product/workflow/user/system coherence?)
         |
         +--> ARCHITECTURE ENGINE (structural decision?)
         +--> DATA ENGINE (data/schema/persistence?)
@@ -43,6 +44,23 @@ VERIFICATION after every meaningful change.
 REGRESSION after every meaningful behavioural, shared-code, database, authorization, navigation, refactor or defect change.
 
 ### Conditional specialists
+
+FRESH EYES:
+- explicit "fresh eyes" or "devil's advocate" request
+- product or workflow sanity checking
+- onboarding or first-use flow
+- navigation and information architecture
+- forms and multi-step journeys
+- business-process sequencing
+- cross-module user journeys
+- terminology/comprehension concerns
+- dashboards and operational visibility
+- feature design before implementation
+- challenging an existing design decision
+- detecting friction, unnecessary steps, missing states or confusing handoffs
+- identifying when a user-facing problem may actually be architectural or data-model related
+
+FRESH EYES may be active during development rather than only as a final review. When active, it can raise a FRESH EYES ALERT as soon as evidence reveals a meaningful product, workflow, usability or system-flow problem.
 
 ARCHITECTURE:
 - shared abstractions
@@ -101,6 +119,9 @@ Examples:
 - A UI bug reveals an authorization defect -> SECURITY.
 - A controller bug reveals a transaction problem -> DATA.
 - A feature request reveals a shared-boundary problem -> ARCHITECTURE.
+- A workflow exposes a domain ownership problem -> ARCHITECTURE.
+- A workflow requires missing or contradictory data -> DATA.
+- A user-comprehension problem reveals a broken system transition -> FRESH EYES + relevant engineering specialist.
 - A database fix changes workflows -> REGRESSION.
 - A regression reveals an incorrect original assumption -> RECON, then return to the affected specialist.
 
