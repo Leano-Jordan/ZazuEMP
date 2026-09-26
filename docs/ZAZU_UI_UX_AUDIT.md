@@ -82,7 +82,7 @@ Colour contrast was checked for the principal foreground/background relationship
 
 The repository workflow was aligned to PHP 8.4 because the current dependency lock contains Symfony 8.1 packages requiring PHP 8.4.1 or newer while the project itself permits PHP 8.3 and above.
 
-A pre-hardening CI failure was confirmed at Composer installation because the workflow was running PHP 8.3 against the current lock set. The workflow was corrected to PHP 8.4. Subsequent commits continue to verify the resulting application state through GitHub Actions.
+A pre-hardening CI failure was confirmed at Composer installation because the workflow was running PHP 8.3 against the current lock set. The workflow was corrected to PHP 8.4. That CI result is historical evidence from the earlier hardening cycle; the latest execution cycle remains locally unverified.
 
 
 ## 2026-09-26 implementation cycle: typography, branding and remaining pages
