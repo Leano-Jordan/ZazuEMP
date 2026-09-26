@@ -79,7 +79,9 @@
                             </select>
                         </label>
 
-                        @php($currentUnit = old('default_unit', $capability->default_unit))
+                        @php
+                            $currentUnit = old('default_unit', $capability->default_unit);
+                        @endphp
                         <label class="zazu-field">
                             <span class="zazu-label">Default unit</span>
                             <select name="default_unit" class="zazu-select">
