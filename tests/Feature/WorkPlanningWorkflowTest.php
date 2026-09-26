@@ -99,7 +99,6 @@ class WorkPlanningWorkflowTest extends TestCase
     public function test_preparation_item_from_another_work_cannot_be_relabelled_through_work_route(): void
     {
         $first = $this->event();
-        $second = $this->event();
 
         $item = EventPreparationItem::create([
             'business_id' => $first->business_id,
@@ -107,6 +106,8 @@ class WorkPlanningWorkflowTest extends TestCase
             'title' => 'Private preparation item',
             'status' => 'open',
         ]);
+
+        $second = $this->event();
 
         $response = $this->patch(route('work.preparation.status', [$second, $item]), [
             'status' => 'ready',
