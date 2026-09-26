@@ -53,6 +53,22 @@ class BusinessIsolationTest extends TestCase
         ], $overrides));
     }
 
+    public function test_direct_business_models_reject_an_explicit_foreign_business_id_in_an_active_context(): void
+    {
+        $first = $this->business('Protected First Business');
+        $second = $this->business('Protected Second Business');
+        $user = $this->userFor($first);
+
+        $this->actingAs($user);
+
+        $this->expectException(\Illuminate\Auth\Access\AuthorizationException::class);
+
+        Customer::create([
+            'business_id' => $second->id,
+            'name' => 'Blocked Direct Customer',
+        ]);
+    }
+
     public function test_direct_business_models_receive_the_active_business_context_when_not_supplied(): void
     {
         $business = $this->business('Context Business');
