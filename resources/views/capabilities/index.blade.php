@@ -84,7 +84,9 @@
             <section class="zazu-empty zazu-card">
                 <div class="zazu-empty-title">Your catalogue is empty</div>
                 <p class="zazu-empty-copy">Start with the services you sell most often, such as Catering, Decor, Sound & Entertainment, Furniture & Equipment, Photography & Video, Baking or Transport.</p>
-                <a href="{{ route('capabilities.create') }}" class="zazu-btn zazu-btn-primary mt-5">Add your first service</a>
+                @if($isOwner)
+                    <a href="{{ route('capabilities.create') }}" class="zazu-btn zazu-btn-primary mt-5">Add your first service</a>
+                @endif
             </section>
         @endforelse
     </section>
