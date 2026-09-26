@@ -1,13 +1,14 @@
 # Zazu – Event Management Platform (Zazu EMP)
 
-Zazu EMP is a Rosscore Labs Pty Ltd software product for small businesses operating in catering and event-related services, including businesses that provide catering, tents/chairs, sound/DJ, baking/cookies, decor, rentals or combinations of these services.
+Zazu EMP is a proprietary event-management platform for small businesses operating across catering and event-related services, including catering, tents/chairs, sound/DJ, baking/cookies, decor, rentals, photography, camera hire and combinations of these services.
 
 ## Project authority
 
 - **Product:** Zazu – Event Management Platform
 - **Short name:** Zazu EMP
-- **Product/company owner:** Rosscore Labs Pty Ltd
-- **Founder / company owner / creator / lead developer:** Isaac Junior Lehlogonolo Maluleka
+- **Current owner:** Isaac Junior Lehlogonolo Maluleka
+- **Development model:** Solo developer
+- **Future business identity:** Rosscore Labs (not yet registered)
 - **Repository:** `Leano-Jordan/ZazuEMP`
 - **Repository default branch:** `main`
 - **Project state:** Definition / foundation build
@@ -36,6 +37,8 @@ These frameworks guide discovery, decision-making and engineering. They do not r
 Zazu EMP is designed as a reusable multi-business product rather than a bespoke system for one operator.
 
 The event/job is the central business record. Related information such as customer, quote, services, travel, deposits, expenses, hired items, reminders, documents and activity should remain together in a contextual workspace where practical.
+
+Supported capability examples include catering, rentals, sound/DJ, decor, baking, photography and camera hire. Businesses define their own reusable capability catalogue rather than receiving a fixed industry list.
 
 The product is intended to work well for desktop/laptop workflows as well as phones used away from the desk or at events.
 

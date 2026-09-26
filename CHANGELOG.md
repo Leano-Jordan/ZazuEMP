@@ -2,6 +2,19 @@
 
 All notable Zazu EMP project changes will be recorded here.
 
+## 2026-09-26
+
+### Fixed / Updated
+
+- Added a conditional Work event-schema repair migration for existing databases missing `events.deleted_at` and/or the Work night-contact column.
+- Fixed Work creation code that referenced `$event` before the event record existed.
+- Restored the Work Edit night-contact selector so the matching JavaScript and submitted field are present together.
+- Added photography/Photographer and camera-hire capability direction for event and wedding workflows.
+- Corrected project ownership records so Isaac Junior Lehlogonolo Maluleka is the current solo developer and owner.
+- Recorded Rosscore Labs as a future business identity only, pending registration and any later written IP transfer.
+- Added the commercial/legal protection register and event-media privacy controls.
+- Populated the third-party licence register with top-level dependency information and a release-level transitive-audit gate.
+
 ## 2026-09-23
 
 ### Updated

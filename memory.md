@@ -1,8 +1,9 @@
 # Zazu EMP — Living Project Context
 
 **Product:** Zazu – Event Management Platform (Zazu EMP)
-**Owner:** Rosscore Labs Pty Ltd
-**Founder / creator / lead developer:** Isaac Junior Lehlogonolo Maluleka
+**Current owner:** Isaac Junior Lehlogonolo Maluleka
+**Development model:** Solo developer
+**Future business identity:** Rosscore Labs, not yet registered
 **Repository:** Leano-Jordan/ZazuEMP
 **Default branch:** main
 **Active development branch:** main
@@ -32,7 +33,7 @@ The owner's time and response budget are part of the operating constraints. Do n
 
 Zazu EMP is a reusable commercial event-management platform.
 
-It is not catering-only software and not funeral-specific software. Target businesses include catering, event equipment hire, sound/DJ, baking, decor, rentals, combinations of event services, and funeral parlours whose work can use the same operational core.
+It is not catering-only software and not funeral-specific software. Target businesses include catering, event equipment hire, sound/DJ, baking, decor, rentals, photography, camera hire, combinations of event services, and funeral parlours whose work can use the same operational core.
 
 Core model:
 Business -> Customer -> Event/Job/Case -> Requirements/Capabilities -> Quote -> Confirmation/Deposit -> Buying/Hiring -> Preparation -> Execution -> Payments/Completion
@@ -315,6 +316,23 @@ UNVERIFIED:
 - local PHPUnit execution after the latest changes
 - local build after the latest changes
 
+
+## Ownership correction and Work recovery - 2026-09-26
+
+Implemented:
+- Current project ownership record corrected to Isaac Junior Lehlogonolo Maluleka as the present solo developer/owner.
+- Rosscore Labs is recorded as a planned future business identity only; it is not currently treated as an incorporated owner.
+- Proprietary LICENSE and IP ownership documentation aligned with that reality.
+- Added a commercial/legal protection register covering copyright provenance, future company transfer, trade marks, third-party material, POPIA/PAIA/ECTA/CPA considerations and production release gates.
+
+Work recovery findings:
+- Existing repository migration `2026_09_26_000008_add_event_night_contact_and_soft_deletes_to_events_table.php` defines `events.deleted_at`, but an existing development database can still be out of sync with repository migration state.
+- Added a resilient repair migration `2026_09_26_000011_repair_event_workflow_schema.php` so missing Work columns are restored without requiring a destructive schema replacement.
+- Fixed a Work creation defect where `$event` was referenced before the record was created.
+- Fixed Work Edit so the night-contact selector actually exists and is populated.
+- Photography and camera hire are now explicitly part of the supported capability direction.
+
+**Current incident:** owner-reported UI failure due to `events.deleted_at` missing from the actual database. Source is fixed, but the owner's local database must still have the repair migration applied before runtime recovery is complete.
 
 ## Foundation sweep completed - 2026-09-26
 
