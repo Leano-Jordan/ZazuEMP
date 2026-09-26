@@ -250,14 +250,14 @@ body {
     z-index: 20;
     border-bottom: 1px solid var(--zazu-border);
     background: color-mix(in srgb, var(--zazu-page) 91%, transparent);
-    backdrop-filter: blur(16px);
+    backdrop-filter: blur(18px) saturate(125%);
 }
 
 .zazu-topbar-inner {
-    min-height: 76px;
+    min-height: 72px;
     max-width: 1440px;
     margin: 0 auto;
-    padding: 14px 30px;
+    padding: 12px 30px;
     display: flex;
     align-items: center;
     justify-content: space-between;
@@ -281,6 +281,35 @@ body {
     letter-spacing: -0.035em;
 }
 
+.zazu-header-context {
+    min-width: 0;
+}
+.zazu-header-title-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+.zazu-workspace-status {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    min-height: 25px;
+    padding: 0 9px;
+    border: 1px solid color-mix(in srgb, var(--zazu-primary) 24%, var(--zazu-border));
+    border-radius: 999px;
+    background: color-mix(in srgb, var(--zazu-primary-soft) 78%, transparent);
+    color: var(--zazu-primary);
+    font-size: 10px;
+    font-weight: 750;
+    white-space: nowrap;
+}
+.zazu-workspace-status i {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: var(--zazu-primary);
+    box-shadow: 0 0 0 3px color-mix(in srgb, var(--zazu-primary) 14%, transparent);
+}
 .zazu-topbar-actions {
     display: flex;
     align-items: center;
