@@ -45,7 +45,7 @@ class WorkWorkflowTest extends TestCase
         $event = Event::query()->where('name', 'Zazu Test Work')->first();
 
         $response->assertRedirect(route('work.show', $event));
-        $response->assertSessionHas('success', 'Work created successfully.');
+        $response->assertSessionHas('success', 'Job created. Start by checking the services below.');
 
         $this->assertNotNull($event);
         $this->assertSame($customer->id, $event->customer_id);
