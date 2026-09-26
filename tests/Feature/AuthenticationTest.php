@@ -55,6 +55,35 @@ class AuthenticationTest extends TestCase
         $response->assertSessionHasErrors('email');
     }
 
+    public function test_normal_login_succeeds_and_logout_ends_the_authenticated_session(): void
+    {
+        $user = User::factory()->create([
+            'email' => 'login@example.com',
+            'password' => 'password123',
+        ]);
+
+        $business = Business::create([
+            'name' => 'Login Business',
+            'slug' => 'login-business',
+            'status' => 'active',
+            'currency' => 'ZAR',
+        ]);
+
+        $business->users()->attach($user->id, ['role' => 'owner']);
+
+        $this->post(route('login.store'), [
+            'email' => 'login@example.com',
+            'password' => 'password123',
+        ])->assertRedirect(route('dashboard'));
+
+        $this->assertAuthenticatedAs($user);
+
+        $this->post(route('logout'))
+            ->assertRedirect(route('login'));
+
+        $this->assertGuest();
+    }
+
     public function test_owner_area_rejects_staff_and_allows_owner(): void
     {
         $business = Business::create([
@@ -151,6 +180,24 @@ class AuthenticationTest extends TestCase
         $business->users()->attach($owner->id, ['role' => 'owner']);
 
         $this->actingAs($staff)->get(route('settings.index'))->assertForbidden();
+
+        $this->actingAs($staff)
+            ->put(route('settings.update'), [
+                'name' => 'Should Not Save',
+                'currency' => 'ZAR',
+            ])
+            ->assertForbidden();
+
+        $this->actingAs($staff)
+            ->post(route('capabilities.store'), [
+                'name' => 'Should Not Exist',
+                'category' => 'Catering',
+                'capability_type' => 'service',
+                'pricing_basis' => 'custom',
+                'is_active' => '1',
+            ])
+            ->assertForbidden();
+
         $this->actingAs($owner)->get(route('settings.index'))->assertOk();
     }
 }
