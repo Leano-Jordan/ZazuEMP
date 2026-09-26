@@ -3,206 +3,155 @@
 Assessment date: 2026-09-26
 Repository: Leano-Jordan/ZazuEMP
 Branch: main
-Verified application head: 0826b6fa435afa3f3a8eafb9c4d276057ff1443e
-Latest CI result: PASS
-CI tests: 51 passed, 266 assertions
-CI frontend: npm ci + npm run build passed
-CI database: fresh SQLite database created and application test suite passed
+Current application head: 112dd4e4680fd887b23ab89dbed4bebb86bbce58
+Latest CI for current head: queued at time of this update
 
-## 1. Current product position
+## 1. Current position
 
-Zazu EMP has moved beyond a disconnected foundation prototype.
+Zazu EMP has a connected operational foundation and now has live transaction layers for finance, purchasing, inventory and physical assets.
 
-The current application has a connected operational chain:
+Core chain:
 
-Authentication → Business membership → Active workspace → Dashboard/Calendar → Customer → Job → Services/Requirements → Quote → Travel / Costs / Preparation → Resource planning → Reporting
+Authentication → Business → Customer → Work → Requirements → Quote → Finance → Purchasing → Inventory / Assets → Preparation → Execution
 
-The Job/Work workspace remains the central operational record. Related customer, requirement, commercial and planning data are connected to that record rather than being implemented as isolated screens.
+The system is still not a V1 release candidate because customer-facing quote acceptance/deposits, control/audit features, recovery/export and final runtime verification remain.
 
-The foundation phase is now sufficiently integrated to support the next V1 implementation tranche.
+## 2. Implemented
 
-It is not yet a V1 release candidate because several transactional, security, recovery and customer-facing layers remain unfinished or require runtime evidence.
-
-## 2. Implemented and connected
-
-### Identity and workspace foundation
+### Identity and workspace
 - Authentication and registration
-- Owner/staff membership model
+- Owner/staff membership
 - Server-side owner boundary
-- Explicit session-backed active business context
-- Secure workspace switching limited to active memberships
-- Owner access selects an owned workspace correctly when the account has multiple memberships
-- Staff-visible navigation respects owner-only controls
+- Session-backed active business context
+- Business-scoped navigation and writes
+- Registration now detects an outdated local schema and returns a usable validation error instead of an uncaught database exception
 
 ### Core operations
-- Customer directory and relationship workspace
-- Customer contacts and primary-contact protection
-- Customer profile images
-- Job creation, editing and removal
-- Job lifecycle transitions
-- Day/night contact assignment
-- Soft deletion and historical Work references
-- Calendar connected to live Work dates
-- Dashboard connected to live operational signals
-
-### Services and commercial flow
-- Business service/capability catalogue
-- Service/product/rental definitions
-- Work-specific requirements
-- Reusable capability selection
-- Quote creation from requirements
-- Integer-cent quote arithmetic
-- Versioned quote history
-- Immutable historical line snapshots
-- Quote revision cloning and concurrency protection
-- Work → quote navigation
-
-### Planning
-- Travel costing
-- Route evidence and calculation snapshots
-- Projected vs actual operational costs
-- Preparation/readiness tracking
-- Overdue preparation workload
-- Resource planning foundations
-- Inventory demand view
-- Rental/asset demand view
-- Supplier planning context
-
-### Reporting
-- Live operational metrics
-- Job status reporting
-- Quote totals grouped by currency
-- Operational cost summaries grouped by currency
-- Business isolation in reporting
-
-### UX and commercial presentation
-- Shared visual system
-- Responsive shell
-- Light/dark theme
-- Icon-only theme control
-- Compact account menu
-- Consistent action hierarchy
-- Constrained form control sizing
-- Improved image inputs
-- Guided selections where finite vocabularies exist
-- Reduced implementation language on user-facing surfaces
-- Owner Administration overview
-- Foundation resource pages brought to the same structural level as the core Work/Customer pages
-
-## 3. Architecture and security improvements completed in this sweep
-
-- Foundation resource pages changed from static views to business-scoped controller-backed views.
-- Active business context is now explicit and membership-bound.
-- Owner role checks are centralized through CurrentBusiness.
-- Quote revision authorization occurs before closed-work lifecycle checks, reducing cross-business information disclosure.
-- Resource joins are explicitly business-scoped.
-- New branding/customer/catalogue image files are cleaned up when database writes fail, reducing orphaned storage.
-- EventCost category validation now uses the actual cost-category vocabulary.
-- PHP runtime declaration is aligned with the PHP 8.4 CI/dependency baseline.
-- Controller route integrity checks now handle invokable controllers.
-- Foundation integration tests use RefreshDatabase so test data cannot contaminate later suites.
-- Duplicate migration timestamp prefix was identified and retained as historical migration structure rather than destructively rewriting applied migration history.
-
-## 4. Remaining V1 implementation gates
-
-### Customer-facing commercial layer
-- Customer-facing quote presentation/document
-- Quote delivery/share workflow
-- Quote acceptance
-- Deposit workflow
-- Commercial status model beyond internal draft/revision handling
+- Customers and contacts
+- Work/job lifecycle
+- Calendar and dashboard
+- Requirements and capability catalogue
+- Quotes, revisions and historical snapshots
+- Travel, operational costs and preparation
 
 ### Finance
-- Payments
-- Deposits and balances
-- Invoice generation
-- Expenses as finance records rather than operational cost records
-- Reconciliation
-- Financial history and reporting
+- Business-scoped invoices
+- Invoice totals linked to quote versions
+- Customer payments
+- Payment methods and references
+- Outstanding balance calculation
+- Overpayment rejection
+- Automatic invoice paid/issued status
+- Finance expenses
+- Finance overview for invoiced, received and expense totals
 
-### Resource transactions
-- Supplier records
-- Supplier terms/contact data
-- Purchasing
+### Purchasing
+- Supplier register
+- Supplier contact details
 - Purchase orders
-- Receiving/GRN
-- Inventory movement history
-- Stock availability
-- Physical asset register
-- Asset assignment/availability
-- Return/condition/damage/loss records
+- Purchase order line items
+- Supplier/business isolation
+- Purchase order status
+- Receiving through purchase-order status
 
-### Control and security
-- Granular roles and permissions
-- Authorization policy coverage for every protected action
-- Authenticated/private media delivery for identifiable customer/staff images
+### Inventory
+- Inventory item register
+- SKU/unit/reorder level
+- Auditable movement history
+- Receipts, issues, returns and adjustments
+- Negative-stock protection
+- Purchase-order receipt automatically creates inventory stock movements
+- Stock-on-hand derived from movement history rather than job demand
+
+### Physical assets
+- Individual asset register
+- Asset tags
+- Condition, location and acquisition data
+- Availability status
+- Job allocation
+- Return/release workflow
+- Business-scoped allocation protection
+
+### UX
+- Shared Zazu visual system
+- Responsive shell
+- Light/dark theme
+- Existing navigation retained and extended with Finance and Purchasing
+- Login visual now uses the supplied repository catering image with controlled cover cropping and a readable overlay
+
+## 3. Remaining V1 gates
+
+### Customer-facing commercial layer
+- Quote delivery/share
+- Customer acceptance
+- Deposit workflow
+- Commercial status lifecycle
+
+### Finance completion
+- Reconciliation workflow
+- Finance-grade reporting/history
+- Invoice document rendering/download
+- Deposit-specific lifecycle if required by final commercial rules
+
+### Purchasing/inventory/assets completion
+- Multi-line purchase-order editor rather than the initial one-line form
+- Receiving/GRN detail and partial receipt handling
+- Inventory allocation/reservation against Work
+- Asset damage/loss evidence and condition history
+- Supplier terms and richer purchasing history
+- Stronger inventory costing rules if required for accounting-grade reporting
+
+### Control layer
+- Granular permissions
+- Complete authorization policy coverage
 - Audit/activity trail
 - Notifications/reminders
-- Data export
+- Export
 - Backup/restore evidence
-- Retention/deletion lifecycle controls
+- Retention/deletion controls
+- Authenticated/private production media delivery
 
-### Release verification
-- Browser end-to-end workflow traversal
-- Responsive desktop/tablet/mobile verification
-- Light/dark rendered verification
+### Release proof
+- Browser end-to-end traversal
+- Desktop/tablet/mobile runtime verification
+- Light/dark runtime verification
 - Accessibility runtime verification
 - Fresh migration verification on the owner's Windows checkout
-- Upgrade/migration test using the populated development database
-- Release-candidate review
+- Upgrade test against populated development database
+- Dependency/license review
+- Final release-candidate audit
 
-## 5. Known architectural debt to manage
+## 4. Known architectural debt
 
-1. Several controllers repeat small business-context helper methods. The current behaviour is safe, but the next architecture pass can reduce duplication through shared authorization/context infrastructure.
-2. BelongsToBusiness automatically stamps missing business IDs but does not by itself reject an explicitly supplied incorrect business ID. Current controller boundaries protect the implemented workflows; stronger domain-level invariants should be considered before broadening write paths.
-3. The migration history contains two migrations with the same 2026_09_26_000015 timestamp prefix. They are structurally distinct and should not be rewritten casually once development databases may have applied them.
-4. Public-disk media remains a production security boundary. The current development path is usable, but identifiable production media should move behind an authenticated/business-authorized delivery path.
+1. Several controllers still repeat small business-context checks.
+2. Some child models rely on controller-level business authorization rather than enforcing every parent/child invariant independently.
+3. Two migrations share the 2026_09_26_000015 timestamp prefix. They should not be rewritten casually after development databases have applied them.
+4. Some reporting/UI summaries still use PHP float conversion for decimal monetary values. Finance transaction validation now uses integer cents; broader reporting should follow the same rule.
+5. Public-disk identifiable media remains a production security boundary.
 
-## 6. Verification evidence
+## 5. Verification
 
-The repository's Laravel CI workflow currently performs:
+The Laravel CI workflow runs on pushes to main and performs PHP 8.4 setup, Composer installation, Node/npm build, fresh SQLite creation and the full Laravel test suite.
 
-- PHP 8.4 environment setup
-- Composer dependency installation
-- Node setup
-- npm dependency installation
-- frontend production build
-- application key generation
-- fresh SQLite database creation
-- full Laravel test execution
+Current head CI run: 36265411148
+Status at documentation update: queued.
 
-The latest exact application head passed:
+The implementation must not be treated as verified until this run completes successfully. The repository has previously demonstrated a green CI baseline of 75 tests / 367 assertions before this transaction-layer tranche.
 
-51 tests / 266 assertions
+## 6. V1 position
 
-This proves the current automated application suite and fresh CI database path.
+Foundation: complete.
 
-It does not prove visual browser rendering, local populated-database compatibility, or production media/security configuration. Those require runtime evidence from the owner's environment.
+Finance: implemented foundation.
 
-## 7. V1 position
+Purchasing: implemented foundation.
 
-Foundation: integrated and ready for the next implementation tranche.
+Inventory: implemented transaction foundation.
 
-Automated application verification: green.
+Assets: implemented accountability foundation.
 
-Core operational workflow: connected.
+Commercial completion: still required.
 
-Commercial release: not yet ready.
+Control/recovery/release proof: still required.
 
-The next V1 work should therefore concentrate on completing the missing transaction layers rather than adding more cosmetic foundation pages.
-
-Recommended architectural progression:
-
-Quote customer delivery → Acceptance/deposit → Payments/invoices → Supplier/purchasing → Inventory movement → Asset accountability → Audit/notifications → Private media → Export/recovery → Release candidate verification
-
-## 8. Post-hardening control state — 2026-09-26
-
-- Current repository head: `dc95a140c82919a9f2579de7f38590e7034a3df1`.
-- Live branch state verified: `main` only.
-- The temporary branch-cleanup workflow was removed after successful cleanup.
-- Business ownership writes now enforce the authenticated active-business boundary at the shared model concern, with regression coverage for foreign creation and cross-business reassignment.
-- Quote revision source snapshots are rebuilt from current Work requirements and covered by regression assertions for changed description and quantity.
-- Repository source was re-read after each syntax-sensitive PHP change; a missing `EventRequirement` import was caught and repaired before completion.
-- The existing Laravel CI workflow is configured to run on pushes to `main`.
-- The connected status endpoint returned no check-status records for the latest head, so the latest explicit passing CI evidence remains the previously recorded **51 tests / 266 assertions** on `0826b6fa435afa3f3a8eafb9c4d276057ff1443e`.
-- Current post-hardening code is therefore **IMPLEMENTED / source-verified, CI result for the latest head UNVERIFIED**.
+The next work should deepen transaction correctness and customer-facing commercial completion, not create more placeholder resource screens.
