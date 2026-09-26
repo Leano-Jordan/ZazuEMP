@@ -6,6 +6,7 @@ use App\Models\Business;
 use App\Models\Customer;
 use App\Models\CustomerContact;
 use App\Models\Event;
+use App\Models\EventPreparationItem;
 use App\Models\EventRequirement;
 use App\Support\CurrentBusiness;
 use Illuminate\Http\RedirectResponse;
@@ -29,10 +30,17 @@ class WorkController extends Controller
             'next_7_days' => (clone $baseQuery)->whereBetween('event_date', [$today, $today->copy()->addDays(6)])->count(),
             'in_progress' => (clone $baseQuery)->where('status', 'in_progress')->count(),
             'draft' => (clone $baseQuery)->where('status', 'draft')->count(),
+            'overdue' => EventPreparationItem::query()
+                ->where('business_id', $business->id)
+                ->whereIn('status', ['open', 'blocked'])
+                ->whereNotNull('due_date')
+                ->whereDate('due_date', '<', $today)
+                ->whereHas('event', fn ($query) => $query->where('business_id', $business->id)->whereNotIn('status', Event::TERMINAL_STATUSES))
+                ->count(),
         ];
 
         $filter = $request->string('filter')->toString();
-        $allowedFilters = ['', 'today', 'next_7_days', 'in_progress', 'draft'];
+        $allowedFilters = ['', 'today', 'next_7_days', 'in_progress', 'draft', 'overdue'];
 
         if (!in_array($filter, $allowedFilters, true)) {
             $filter = '';
@@ -44,6 +52,11 @@ class WorkController extends Controller
             ->when($filter === 'next_7_days', fn ($query) => $query->whereBetween('event_date', [$today, $today->copy()->addDays(6)]))
             ->when($filter === 'in_progress', fn ($query) => $query->where('status', 'in_progress'))
             ->when($filter === 'draft', fn ($query) => $query->where('status', 'draft'))
+            ->when($filter === 'overdue', fn ($query) => $query->whereHas('preparationItems', fn ($prep) => $prep
+                ->whereIn('status', ['open', 'blocked'])
+                ->whereNotNull('due_date')
+                ->whereDate('due_date', '<', $today)
+            ))
             ->latest('event_date')
             ->latest()
             ->paginate(15)
@@ -253,16 +266,10 @@ class WorkController extends Controller
 
     private function validateStatusTransition(string $current, string $next): void
     {
-        $allowed = [
-            'draft' => ['draft', 'confirmed', 'cancelled'],
-            'confirmed' => ['confirmed', 'in_progress', 'cancelled'],
-            'in_progress' => ['in_progress', 'completed', 'cancelled'],
-            'completed' => ['completed'],
-            'cancelled' => ['cancelled'],
-        ];
+        $event = new Event(['status' => $current]);
 
         abort_unless(
-            in_array($next, $allowed[$current] ?? [], true),
+            $event->canTransitionTo($next),
             422,
             'That status change is not allowed for this work record.'
         );
