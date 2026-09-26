@@ -15,10 +15,14 @@ class EventCostController extends Controller
     {
         $costs = $event->costs()->latest()->get();
 
-        $projectedTotal = (float) $costs->sum(fn (EventCost $cost) => (float) $cost->projected_amount);
-        $actualTotal = (float) $costs->sum(fn (EventCost $cost) => (float) ($cost->actual_amount ?? 0));
+        $totalsByCurrency = $costs->groupBy('currency')->map(function ($currencyCosts) {
+            return [
+                'projected' => (float) $currencyCosts->sum(fn (EventCost $cost) => (float) $cost->projected_amount),
+                'actual' => (float) $currencyCosts->sum(fn (EventCost $cost) => (float) ($cost->actual_amount ?? 0)),
+            ];
+        });
 
-        return view('costs.index', compact('event', 'costs', 'projectedTotal', 'actualTotal'));
+        return view('costs.index', compact('event', 'costs', 'totalsByCurrency'));
     }
 
     public function create(Event $event): View
