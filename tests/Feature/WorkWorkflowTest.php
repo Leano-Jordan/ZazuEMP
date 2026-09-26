@@ -94,6 +94,43 @@ class WorkWorkflowTest extends TestCase
         $this->assertSame($newNight->id, $fresh->event_night_contact_id);
     }
 
+    public function test_work_edit_renders_contact_data_without_nested_blade_php_expression(): void
+    {
+        $customer = Customer::create(['name' => 'Render Customer']);
+        $day = CustomerContact::create([
+            'customer_id' => $customer->id,
+            'name' => 'Day Contact',
+            'phone' => '0123456789',
+            'label' => 'Day',
+        ]);
+        $night = CustomerContact::create([
+            'customer_id' => $customer->id,
+            'name' => 'Night Contact',
+            'phone' => '0987654321',
+            'label' => 'Night',
+        ]);
+
+        $event = Event::create([
+            'customer_id' => $customer->id,
+            'event_day_contact_id' => $day->id,
+            'event_night_contact_id' => $night->id,
+            'reference' => 'ZAZU-RENDER-001',
+            'name' => 'Rendered Edit Work',
+            'event_type' => 'Catering order',
+            'event_date' => '2026-10-25',
+            'status' => 'draft',
+        ]);
+
+        $response = $this->get(route('work.edit', $event));
+
+        $response->assertOk();
+        $response->assertSee('Rendered Edit Work');
+        $response->assertSee('Day Contact');
+        $response->assertSee('Night Contact');
+        $response->assertSee('event_day_contact_id', false);
+        $response->assertSee('event_night_contact_id', false);
+    }
+
     public function test_work_customer_cannot_change_after_a_quote_exists(): void
     {
         $customer = Customer::create(['name' => 'Quoted Customer']);
