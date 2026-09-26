@@ -400,3 +400,24 @@ Verification boundary:
 - Automated PHP source write integrity was rechecked on critical files.
 - Local runtime execution remains unverified because this environment cannot reach GitHub, so PHPUnit, migrations, Blade compilation and browser traversal were not run here.
 - Full authentication, explicit business selection, roles/permissions and private media authorization remain production gates.
+
+
+## Commercial UI hardening cycle — 2026-09-26
+
+Implemented:
+- icon-only light/dark theme control
+- compact signed-in account menu with sign-out
+- removal of implementation/source language from user-facing recently added surfaces
+- removal of placeholder authentication artwork copy
+- constrained image-input and business-identity control sizing
+- service description remains operator-editable after guided service selection
+- UI accessibility regression assertions updated
+
+Architecture boundary:
+- Existing business-scope guards and CurrentBusiness logic were preserved.
+- No working workflow routes or business-domain behaviour were deliberately rewritten in this UI hardening cycle.
+
+Verification:
+- GitHub source re-inspected after each change.
+- Static checks confirmed changed files contain the intended new controls and no read-only/system-filled service description UI.
+- Local runtime execution remains required for PHPUnit, migrations, Blade rendering and browser responsive/light-dark verification.
