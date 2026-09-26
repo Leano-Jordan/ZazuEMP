@@ -74,7 +74,6 @@
                         <label class="zazu-field zazu-field-wide">
                             <span class="zazu-label">Service description <span class="zazu-required">*</span></span>
                             <input id="description" name="description" value="{{ old('description') }}" required class="zazu-input">
-                            <span id="description-help" class="zazu-field-help">Zazu fills this in when you choose a service. Change it only when you need a more specific description.</span>
                             @error('description')<span class="zazu-field-error">{{ $message }}</span>@enderror
                         </label>
 
@@ -123,22 +122,18 @@
         const description = document.getElementById('description');
         const capabilityId = document.getElementById('capability_id');
         const unitSelect = document.getElementById('unit-select');
-        const help = document.getElementById('description-help');
-
-        document.querySelectorAll('[data-capability-id]').forEach((button) => {
+         document.querySelectorAll('[data-capability-id]').forEach((button) => {
             button.addEventListener('click', () => {
                 document.querySelectorAll('.zazu-catalogue-mini').forEach(item => item.classList.remove('selected'));
                 button.classList.add('selected');
                 capabilityId.value = button.dataset.capabilityId;
                 description.value = button.dataset.serviceName;
-                description.readOnly = true;
                 const unit = button.dataset.unit;
                 if (unit) {
                     const option = [...unitSelect.options].find(item => item.value === unit);
                     if (option) unitSelect.value = unit;
                 }
-                help.textContent = 'Saved service selected. You can edit the description if this job needs more detail.';
-            });
+             });
         });
 
         document.querySelectorAll('[data-service-name]').forEach((input) => {
@@ -146,18 +141,14 @@
                 if (!input.checked) return;
                 capabilityId.value = '';
                 description.value = input.dataset.serviceName;
-                description.readOnly = true;
-                help.textContent = 'This service name came from your service list. You can edit it if this job needs a more specific description.';
-            });
+             });
         });
 
         document.querySelector('[data-other-service]')?.addEventListener('change', (event) => {
             if (!event.target.checked) return;
             capabilityId.value = '';
             description.value = '';
-            description.readOnly = false;
             description.focus();
-            help.textContent = 'Type the service only because it is not in the list.';
         });
     </script>
 </x-app-layout>
