@@ -30,7 +30,7 @@
                     <div class="zazu-form-section-head"><div class="zazu-form-section-title">Primary contact</div><div class="zazu-form-section-copy">Update the default customer contact used when new Work records inherit relationship details.</div></div>
                     <div class="zazu-form-grid">
                         <label class="zazu-field"><span class="zazu-label">Contact name <span class="zazu-required">*</span></span><input name="primary_contact_name" value="{{ old('primary_contact_name', $customer->primaryContact?->name) }}" required class="zazu-input">@error('primary_contact_name')<span class="zazu-field-error">{{ $message }}</span>@enderror</label>
-                        <label class="zazu-field"><span class="zazu-label">Phone</span><input name="primary_contact_phone" value="{{ old('primary_contact_phone', $customer->primaryContact?->phone) }}" class="zazu-input"></label>
+                        <label class="zazu-field"><span class="zazu-label">Phone</span><input type="tel" name="primary_contact_phone" value="{{ old('primary_contact_phone', $customer- autocomplete="tel">primaryContact?->phone) }}" class="zazu-input"></label>
                         <label class="zazu-field zazu-field-wide"><span class="zazu-label">Email</span><input type="email" name="primary_contact_email" value="{{ old('primary_contact_email', $customer->primaryContact?->email) }}" class="zazu-input">@error('primary_contact_email')<span class="zazu-field-error">{{ $message }}</span>@enderror</label>
                     </div>
                 </section>
