@@ -6,7 +6,18 @@ use App\Http\Controllers\RequirementController;
 use App\Http\Controllers\WorkController;
 use Illuminate\Support\Facades\Route;
 
-Route::get('/', fn () => redirect()->route('work.index'));
+Route::get('/', fn () => redirect()->route('dashboard'));
+
+
+Route::view('/dashboard', 'dashboard')->name('dashboard');
+
+Route::view('/quotes', 'quotes.index')->name('quotes.index');
+Route::view('/calendar', 'calendar.index')->name('calendar.index');
+Route::view('/suppliers', 'suppliers.index')->name('suppliers.index');
+Route::view('/inventory', 'inventory.index')->name('inventory.index');
+Route::view('/assets', 'assets.index')->name('assets.index');
+Route::view('/reports', 'reports.index')->name('reports.index');
+Route::view('/settings', 'settings.index')->name('settings.index');
 
 Route::get('/work', [WorkController::class, 'index'])->name('work.index');
 Route::get('/work/create', [WorkController::class, 'create'])->name('work.create');
