@@ -83,7 +83,21 @@ class AuthController extends Controller
 
     public function owner(): View
     {
-        return view('owner.index');
+        $business = app(CurrentBusiness::class)->model(request()->user());
+        $ownerCount = $business->users()->wherePivot('role', 'owner')->count();
+        $staffCount = $business->users()->wherePivot('role', 'staff')->count();
+        $customerCount = $business->customers()->count();
+        $jobCount = $business->events()->whereNotIn('status', ['completed', 'cancelled'])->count();
+        $capabilityCount = $business->capabilities()->where('is_active', true)->count();
+
+        return view('owner.index', compact(
+            'business',
+            'ownerCount',
+            'staffCount',
+            'customerCount',
+            'jobCount',
+            'capabilityCount'
+        ));
     }
 
     public function destroy(Request $request): RedirectResponse
