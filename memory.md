@@ -502,3 +502,28 @@ Verification:
 - Explicit foreign business IDs are rejected instead of being silently accepted.
 - Authenticated attempts to move an existing business-owned record to another business are rejected.
 - Regression tests cover both direct creation and cross-business reassignment.
+
+
+## Bug-fix sweep — 2026-09-26
+
+Implemented:
+- Work Edit no longer performs nested collection/arrow-function transformation inside the Blade @json directive.
+- WorkController now prepares the Work Edit customer/contact JSON payload before rendering, matching the safer Create Work pattern.
+- Added a Work Edit rendering regression test covering the day/night contact data and rendered form controls.
+- Fixed CI business-isolation test fixture to import Laravel's AuthorizationException.
+- Fixed cross-business media test setup so its foreign fixture is created before authentication/business-boundary enforcement.
+- Fixed cross-work preparation test setup so its foreign fixture is created before switching the active business context.
+- Fixed Reports quote-total formatting to render thousands separators expected by the reporting contract.
+
+CI failure root causes addressed:
+- test namespace/import defect
+- test fixtures violating the newly hardened business-boundary write guard
+- test fixture created after switching business context
+- reporting presentation assertion mismatch
+- fragile Work Edit Blade compilation surface
+
+Verification boundary:
+- Every changed repository file was re-fetched after writing and matched the intended content.
+- GitHub Actions was triggered on main after the fixes.
+- The latest Laravel workflow was still in progress at the end of this execution window.
+- Local Windows PHPUnit and php artisan view:clear remain unavailable from this execution environment.
