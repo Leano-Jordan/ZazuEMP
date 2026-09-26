@@ -9,6 +9,7 @@ use App\Support\CurrentBusiness;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
+use Illuminate\Support\Facades\DB;
 use Illuminate\View\View;
 
 class PurchaseOrderController extends Controller
@@ -83,6 +84,8 @@ class PurchaseOrderController extends Controller
     {
         $this->ensure($request,$purchaseOrder);
         $data=$request->validate(['status'=>['required','in:draft,sent,ordered,received,cancelled']]);
+        $businessId = app(CurrentBusiness::class)->id($request->user());
+
         DB::transaction(function () use ($purchaseOrder, $data, $businessId): void {
             $purchaseOrder->update($data);
 
