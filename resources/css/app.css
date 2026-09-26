@@ -30,9 +30,14 @@
     --zazu-primary: #2f6f70;
     --zazu-primary-hover: #275d5e;
     --zazu-primary-soft: #d1e4e0;
+    --zazu-primary-ink: #f7fbf9;
+    --zazu-link: #2f6f70;
+    --zazu-link-hover: #275d5e;
+    --zazu-nav-active: #2f6f70;
 
     --zazu-accent: #9a7956;
     --zazu-accent-soft: #eadfd2;
+    --zazu-focus: #9a7956;
 
     --zazu-success: #2f765f;
     --zazu-success-soft: #dbece4;
@@ -74,9 +79,14 @@
     --zazu-primary: #6ca7a2;
     --zazu-primary-hover: #81b8b2;
     --zazu-primary-soft: #274648;
+    --zazu-primary-ink: #122125;
+    --zazu-link: #9ccbc6;
+    --zazu-link-hover: #b6ddd8;
+    --zazu-nav-active: #6ca7a2;
 
     --zazu-accent: #c5a47d;
     --zazu-accent-soft: #393126;
+    --zazu-focus: #c5a47d;
 
     --zazu-success: #72b39b;
     --zazu-success-soft: #243f36;
@@ -185,7 +195,7 @@ body {
 .zazu-nav-link.active {
     color: var(--zazu-ink);
     background: var(--zazu-surface);
-    box-shadow: inset 3px 0 0 var(--zazu-primary), 0 2px 8px rgba(24, 61, 65, 0.05);
+    box-shadow: inset 3px 0 0 var(--zazu-nav-active), 0 2px 8px rgba(24, 61, 65, 0.05);
 }
 
 .zazu-nav-icon {
@@ -440,6 +450,18 @@ body {
     font-size: 11px;
 }
 
+.zazu-side-secondary[href] {
+    color: var(--zazu-link);
+    text-decoration: none;
+    font-weight: 650;
+}
+
+.zazu-side-secondary[href]:hover {
+    color: var(--zazu-link-hover);
+    text-decoration: underline;
+    text-underline-offset: 3px;
+}
+
 .zazu-avatar {
     width: 36px;
     height: 36px;
@@ -545,7 +567,7 @@ body {
 
 .zazu-btn-primary {
     background: var(--zazu-primary);
-    color: #f7fbf9;
+    color: var(--zazu-primary-ink);
     box-shadow: 0 5px 14px color-mix(in srgb, var(--zazu-primary) 18%, transparent);
 }
 
@@ -990,7 +1012,7 @@ button:focus-visible,
 input:focus-visible,
 select:focus-visible,
 textarea:focus-visible {
-    outline: 3px solid color-mix(in srgb, var(--zazu-accent) 58%, transparent);
+    outline: 3px solid color-mix(in srgb, var(--zazu-focus) 58%, transparent);
     outline-offset: 2px;
 }
 
@@ -1048,6 +1070,7 @@ textarea:focus-visible {
     .zazu-mobile-link.active {
         background: var(--zazu-surface);
         color: var(--zazu-ink);
+        box-shadow: inset 0 -2px 0 var(--zazu-nav-active);
     }
 
     .zazu-topbar-inner,
