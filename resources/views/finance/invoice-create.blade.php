@@ -5,7 +5,7 @@
         <div>
             <div class="zazu-eyebrow">Finance · Controlled issue</div>
             <h2 class="zazu-command-title">Create an invoice from a commercial record.</h2>
-            <p class="zazu-command-copy">Accepted quotes carry their historical tax treatment forward. Direct job invoices require a subtotal and the applicable tax treatment.</p>
+            <p class="zazu-command-copy">Accepted quotes carry their historical tax treatment forward. Direct job invoices are built from itemised lines and the applicable tax treatment.</p>
         </div>
     </section>
 
@@ -42,14 +42,39 @@
                 @error('event_id')<span class="zazu-field-error">{{ $message }}</span>@enderror
             </label>
 
-            <div class="zazu-form-grid mt-4">
-                <label class="zazu-field">
-                    <span class="zazu-label">Subtotal (direct invoice)</span>
-                    <input type="number" name="subtotal" value="{{ old('subtotal') }}" min="0" step="0.01" inputmode="decimal" class="zazu-input">
-                    <span class="zazu-field-help">Not used when an accepted quote is selected.</span>
-                    @error('subtotal')<span class="zazu-field-error">{{ $message }}</span>@enderror
-                </label>
+            <section class="zazu-form-section mt-5" data-invoice-lines>
+                <div class="zazu-form-section-head">
+                    <div>
+                        <div class="zazu-form-section-title">Direct invoice lines</div>
+                        <div class="zazu-form-section-copy">Use these only when no accepted quote is selected. Zazu calculates the subtotal from the lines so the invoice has its own evidence.</div>
+                    </div>
+                    <button type="button" class="zazu-btn zazu-btn-ghost" data-add-invoice-line>+ Add line</button>
+                </div>
 
+                <div class="grid gap-3" data-invoice-line-list>
+                    <div class="zazu-invoice-line" data-invoice-line>
+                        <label class="zazu-field">
+                            <span class="zazu-label">Description</span>
+                            <input name="lines[0][description]" value="{{ old('lines.0.description') }}" class="zazu-input" placeholder="Service or item">
+                        </label>
+                        <label class="zazu-field">
+                            <span class="zazu-label">Quantity</span>
+                            <input type="number" name="lines[0][quantity]" value="{{ old('lines.0.quantity', '1.00') }}" min="0.01" step="0.01" class="zazu-input">
+                        </label>
+                        <label class="zazu-field">
+                            <span class="zazu-label">Unit</span>
+                            <input name="lines[0][unit]" value="{{ old('lines.0.unit') }}" class="zazu-input" placeholder="service, item, hour">
+                        </label>
+                        <label class="zazu-field">
+                            <span class="zazu-label">Unit price</span>
+                            <input type="number" name="lines[0][unit_price]" value="{{ old('lines.0.unit_price') }}" min="0" step="0.01" class="zazu-input">
+                        </label>
+                        <button type="button" class="zazu-btn zazu-btn-ghost" data-remove-invoice-line aria-label="Remove invoice line">Remove</button>
+                    </div>
+                </div>
+            </section>
+
+            <div class="zazu-form-grid mt-5">
                 <label class="zazu-field">
                     <span class="zazu-label">Tax treatment</span>
                     <select name="tax_rate_id" class="zazu-select">
@@ -60,7 +85,7 @@
                             </option>
                         @endforeach
                     </select>
-                    <span class="zazu-field-help">For direct invoices, this tax treatment is snapshotted onto the invoice.</span>
+                    <span class="zazu-field-help">For direct invoices, this tax treatment is stored on the invoice. Accepted quotes already carry their historical tax treatment.</span>
                     @error('tax_rate_id')<span class="zazu-field-error">{{ $message }}</span>@enderror
                 </label>
 
@@ -89,4 +114,36 @@
             </div>
         </form>
     </section>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const root = document.querySelector('[data-invoice-lines]');
+            const list = root?.querySelector('[data-invoice-line-list]');
+            const add = root?.querySelector('[data-add-invoice-line]');
+            if (!root || !list || !add) return;
+
+            let index = 1;
+            add.addEventListener('click', () => {
+                const row = document.createElement('div');
+                row.className = 'zazu-invoice-line';
+                row.dataset.invoiceLine = '';
+                row.innerHTML = `
+                    <label class="zazu-field"><span class="zazu-label">Description</span><input name="lines[${index}][description]" class="zazu-input" required placeholder="Service or item"></label>
+                    <label class="zazu-field"><span class="zazu-label">Quantity</span><input type="number" name="lines[${index}][quantity]" value="1.00" min="0.01" step="0.01" class="zazu-input" required></label>
+                    <label class="zazu-field"><span class="zazu-label">Unit</span><input name="lines[${index}][unit]" class="zazu-input" placeholder="service, item, hour"></label>
+                    <label class="zazu-field"><span class="zazu-label">Unit price</span><input type="number" name="lines[${index}][unit_price]" min="0" step="0.01" class="zazu-input" required></label>
+                    <button type="button" class="zazu-btn zazu-btn-ghost" data-remove-invoice-line aria-label="Remove invoice line">Remove</button>`;
+                list.appendChild(row);
+                index += 1;
+            });
+
+            list.addEventListener('click', (event) => {
+                const button = event.target.closest('[data-remove-invoice-line]');
+                if (!button) return;
+                const rows = list.querySelectorAll('[data-invoice-line]');
+                if (rows.length <= 1) return;
+                button.closest('[data-invoice-line]')?.remove();
+            });
+        });
+    </script>
 </x-app-layout>
