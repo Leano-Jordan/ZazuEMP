@@ -112,3 +112,4 @@ class BusinessMediaSecurityTest extends TestCase
             ->assertSee('data-branding-loading="wallpaper"', false)
             ->assertSee('data-branding-save', false);
     }
+}
