@@ -10,6 +10,7 @@ use App\Models\EventPreparationItem;
 use App\Models\EventRequirement;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Support\Str;
 use Tests\TestCase;
 
