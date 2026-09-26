@@ -1,22 +1,15 @@
 {
-  "images/catering.webp": {
-    "file": "assets/catering-bsglG5ib.webp",
-    "src": "images/catering.webp"
-  },
   "resources/css/app.css": {
-    "file": "assets/app-CH20cZgS.css",
+    "file": "assets/app--1V8jnXb.css",
     "name": "app",
     "names": [
       "app.css"
     ],
     "src": "resources/css/app.css",
-    "isEntry": true,
-    "assets": [
-      "assets/catering-bsglG5ib.webp"
-    ]
+    "isEntry": true
   },
   "resources/js/app.js": {
-    "file": "assets/app-BBFIpWfN.js",
+    "file": "assets/app-ftoHYJMA.js",
     "name": "app",
     "src": "resources/js/app.js",
     "isEntry": true
