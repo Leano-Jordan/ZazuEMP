@@ -38,7 +38,7 @@
                     <div class="zazu-nav-label">Operations</div>
                     <a href="{{ route('work.index') }}" class="zazu-nav-link {{ request()->routeIs('work.*') ? 'active' : '' }}" @if (request()->routeIs('work.*')) aria-current="page" @endif>
                         <svg class="zazu-nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true"><rect x="4" y="4" width="6" height="6" rx="1"></rect><rect x="14" y="4" width="6" height="6" rx="1"></rect><rect x="4" y="14" width="6" height="6" rx="1"></rect><rect x="14" y="14" width="6" height="6" rx="1"></rect></svg>
-                        <span>Work</span>
+                        <span>Jobs</span>
                     </a>
                     <a href="{{ route('calendar.index') }}" class="zazu-nav-link {{ request()->routeIs('calendar.*') ? 'active' : '' }}" @if (request()->routeIs('calendar.*')) aria-current="page" @endif>
                         <svg class="zazu-nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true"><rect x="4" y="5" width="16" height="15" rx="2"></rect><path d="M8 3v4M16 3v4M4 10h16"></path></svg>
@@ -87,10 +87,10 @@
                 </div>
 
                 <div class="zazu-nav-group">
-                    <div class="zazu-nav-label">Catalogue</div>
+                    <div class="zazu-nav-label">Services</div>
                     <a href="{{ route('capabilities.index') }}" class="zazu-nav-link {{ request()->routeIs('capabilities.*') ? 'active' : '' }}" @if (request()->routeIs('capabilities.*')) aria-current="page" @endif>
                         <svg class="zazu-nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true"><path d="M6 5.5A2.5 2.5 0 0 1 8.5 3H20v15.5A2.5 2.5 0 0 1 17.5 21H8.5A2.5 2.5 0 0 1 6 18.5z"></path><path d="M6 6h10.5A2.5 2.5 0 0 1 19 8.5V21"></path><path d="M10 8.5h5M10 12h5"></path></svg>
-                        <span>Capabilities</span>
+                        <span>Services & prices</span>
                     </a>
                 </div>
 
@@ -125,9 +125,12 @@
                         @endisset
 
                         @auth
-                            <div class="flex items-center gap-2 rounded-lg border border-[var(--zazu-border)] bg-[var(--zazu-surface-2)] px-2 py-1">
+                            <div class="zazu-user-chip" aria-label="Signed in as {{ auth()->user()->name }}">
                                 <x-profile-avatar :name="auth()->user()->name" :path="auth()->user()->profile_photo_path" size="sm" />
-                                <span class="hidden text-[11px] font-semibold text-[var(--zazu-ink-2)] sm:inline">{{ auth()->user()->name }}</span>
+                                <div class="zazu-user-identity">
+                                    <span class="zazu-user-label">Signed in as</span>
+                                    <strong>{{ auth()->user()->name }}</strong>
+                                </div>
                             </div>
                         @endauth
 
