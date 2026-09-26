@@ -50,4 +50,14 @@ class Event extends Model
     {
         return $this->hasMany(EventRequirement::class);
     }
+
+    public function quotes(): HasMany
+    {
+        return $this->hasMany(Quote::class);
+    }
+
+    public function travelCosts(): HasMany
+    {
+        return $this->hasMany(TravelCost::class);
+    }
 }
