@@ -30,6 +30,7 @@ class TravelCostController extends Controller
         return view('travel.create', [
             'event' => $event,
             'currencies' => config('zazu.currencies'),
+            'defaultCurrency' => app(CurrentBusiness::class)->model($request->user())->currency ?? 'ZAR',
         ]);
     }
 
