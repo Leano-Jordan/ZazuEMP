@@ -66,7 +66,7 @@
                     </label>
                 </div>
                 <div class="zazu-actionbar">
-                    <a href="{{ route('onboarding.business') }}" class="zazu-btn zazu-btn-ghost">Skip for now</a>
+                    <button type="submit" form="skip-catalogue-form" class="zazu-btn zazu-btn-ghost">Skip for now</button>
                     <button class="zazu-btn zazu-btn-secondary" name="add_another" value="1">Save & add another</button>
                     <button class="zazu-btn zazu-btn-primary">Continue</button>
                 </div>
