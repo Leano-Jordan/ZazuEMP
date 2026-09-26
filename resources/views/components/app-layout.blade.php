@@ -6,7 +6,7 @@
     <meta name="theme-color" content="#0d4f43">
     @php($business = app(\App\Support\CurrentBusiness::class)->resolve(auth()->user()))
     @php($businesses = auth()->user()->businesses()->where('businesses.status', 'active')->orderBy('businesses.name')->get())
-    @php($isOwner = $business && $businesses->firstWhere('id', $business->id)?->pivot?->role === 'owner')
+    @php($isOwner = app(\App\Support\CurrentBusiness::class)->hasRole('owner', auth()->user(), $business))
     <title>{{ $title ?? 'Zazu' }} · {{ $business?->name ?? 'Zazu EMP' }}</title>
     <script>
         (() => {
