@@ -234,6 +234,19 @@ class FinanceController extends Controller
             ->with('success', 'Invoice '.$invoice->number.' created.');
     }
 
+    public function showInvoice(Request $request, Invoice $invoice): View
+    {
+        $businessId = app(CurrentBusiness::class)->id($request->user());
+
+        $invoice->load(['items', 'event.customer.primaryContact']);
+
+        abort_unless((int) $invoice->business_id === $businessId, 404);
+
+        return view('finance.invoice-show', [
+            'invoice' => $invoice,
+        ]);
+    }
+
     public function createPayment(Request $request): View
     {
         $businessId = app(CurrentBusiness::class)->id($request->user());
