@@ -30,6 +30,7 @@ class TravelCostController extends Controller
     {
         $validated = $request->validate([
             'route_label' => ['required', 'string', 'max:100'],
+            'currency' => ['required', 'string', 'size:3', 'regex:/^[A-Za-z]{3}$/'],
             'provider' => ['required', 'string', 'max:100'],
             'origin' => ['required', 'string', 'max:255'],
             'destination' => ['required', 'string', 'max:255'],
@@ -64,6 +65,7 @@ class TravelCostController extends Controller
         ): TravelCost {
             return $event->travelCosts()->create([
                 'route_label' => $validated['route_label'],
+                'currency' => strtoupper($validated['currency']),
                 'provider' => $validated['provider'],
                 'origin' => $validated['origin'],
                 'destination' => $validated['destination'],
@@ -80,6 +82,7 @@ class TravelCostController extends Controller
                 'notes' => $validated['notes'] ?? null,
                 'calculation_snapshot' => [
                     'route_label' => $validated['route_label'],
+                    'currency' => strtoupper($validated['currency']),
                     'provider' => $validated['provider'],
                     'origin' => $validated['origin'],
                     'destination' => $validated['destination'],
