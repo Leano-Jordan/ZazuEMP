@@ -21,8 +21,9 @@
 
     --zazu-ink: #173338;
     --zazu-ink-2: #27464b;
-    --zazu-muted: #647b7e;
-    --zazu-faint: #809396;
+    --zazu-muted: #526d70;
+    --zazu-faint: #5b7174;
+    --zazu-nav-label: #4b6264;
 
     --zazu-border: #bfd0cd;
     --zazu-border-strong: #9fbab5;
@@ -36,6 +37,7 @@
     --zazu-nav-active: #2f6f70;
 
     --zazu-accent: #9a7956;
+    --zazu-accent-ink: #6d5035;
     --zazu-accent-soft: #eadfd2;
     --zazu-focus: #9a7956;
 
@@ -75,7 +77,8 @@
     --zazu-ink: #e7efed;
     --zazu-ink-2: #d1dfdc;
     --zazu-muted: #9db2af;
-    --zazu-faint: #819896;
+    --zazu-faint: #92a8a5;
+    --zazu-nav-label: #92a8a5;
 
     --zazu-border: #39555a;
     --zazu-border-strong: #4a696d;
@@ -89,6 +92,7 @@
     --zazu-nav-active: #6ca7a2;
 
     --zazu-accent: #c5a47d;
+    --zazu-accent-ink: #c5a47d;
     --zazu-accent-soft: #393126;
     --zazu-focus: #c5a47d;
 
@@ -173,7 +177,7 @@ body {
 
 .zazu-nav-label {
     padding: 0 10px 7px;
-    color: var(--zazu-faint);
+    color: var(--zazu-nav-label);
     font-size: 10px;
     font-weight: 700;
     letter-spacing: 0.16em;
@@ -511,7 +515,7 @@ body {
 
 .zazu-chip-accent {
     background: var(--zazu-accent-soft);
-    color: var(--zazu-accent);
+    color: var(--zazu-accent-ink);
 }
 
 .zazu-chip-success {
