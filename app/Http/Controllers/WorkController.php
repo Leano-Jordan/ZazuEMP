@@ -174,9 +174,20 @@ class WorkController extends Controller
             ->with('contacts')
             ->orderBy('name')
             ->get();
+
+        $customerOptions = $customers->map(fn ($customer) => [
+            'id' => $customer->id,
+            'contacts' => $customer->contacts->map(fn ($contact) => [
+                'id' => $contact->id,
+                'name' => $contact->name,
+                'phone' => $contact->phone,
+                'label' => $contact->label,
+            ])->values()->all(),
+        ])->values()->all();
+
         $hasQuotes = $event->quotes()->exists();
 
-        return view('work.edit', compact('event', 'customers', 'hasQuotes'));
+        return view('work.edit', compact('event', 'customers', 'customerOptions', 'hasQuotes'));
     }
 
     public function update(Request $request, Event $event): RedirectResponse
