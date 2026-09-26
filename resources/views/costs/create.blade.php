@@ -25,7 +25,12 @@
                     <div class="zazu-form-grid">
                         <label class="zazu-field">
                             <span class="zazu-label">Category</span>
-                            <input name="category" value="{{ old('category') }}" class="zazu-input" placeholder="Food, transport, venue..." required>
+                            <select name="category" class="zazu-select" required>
+                                <option value="">Choose a cost category</option>
+                                @foreach ($costCategories as $value => $label)
+                                    <option value="{{ $value }}" @selected(old('category') === $value)>{{ $label }}</option>
+                                @endforeach
+                            </select>
                             @error('category')<span class="zazu-field-error">{{ $message }}</span>@enderror
                         </label>
                         <label class="zazu-field zazu-field-wide">
@@ -35,7 +40,11 @@
                         </label>
                         <label class="zazu-field">
                             <span class="zazu-label">Currency</span>
-                            <input name="currency" value="{{ old('currency', 'ZAR') }}" maxlength="3" class="zazu-input" required>
+                            <select name="currency" class="zazu-select" required>
+                                @foreach ($currencies as $code => $label)
+                                    <option value="{{ $code }}" @selected(old('currency', $defaultCurrency) === $code)>{{ $label }}</option>
+                                @endforeach
+                            </select>
                             @error('currency')<span class="zazu-field-error">{{ $message }}</span>@enderror
                         </label>
                         <label class="zazu-field">
