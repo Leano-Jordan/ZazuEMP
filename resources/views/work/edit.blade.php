@@ -36,8 +36,6 @@
                                 <div class="mb-2 rounded-lg border border-[var(--zazu-border)] bg-[var(--zazu-warning-soft)] px-3 py-2 text-[11px] leading-5 text-[var(--zazu-warning-ink)]">
                                     Customer is locked because this Work record already has a quote. This protects historical commercial attribution.
                                 </div>
-                            @endif
-                            @if ($hasQuotes)
                                 <input type="hidden" name="customer_id" value="{{ $event->customer_id }}">
                             @endif
                             <select id="customer_id" name="customer_id" required class="zazu-select" @disabled($hasQuotes)>
@@ -51,16 +49,19 @@
                         <label class="zazu-field zazu-field-wide">
                             <span class="zazu-label">Work / event name</span>
                             <input name="name" value="{{ old('name', $event->name) }}" required class="zazu-input">
+                            @error('name')<span class="zazu-field-error">{{ $message }}</span>@enderror
                         </label>
 
                         <label class="zazu-field">
                             <span class="zazu-label">Type</span>
                             <input name="event_type" value="{{ old('event_type', $event->event_type) }}" class="zazu-input">
+                            @error('event_type')<span class="zazu-field-error">{{ $message }}</span>@enderror
                         </label>
 
                         <label class="zazu-field">
                             <span class="zazu-label">Event date <span class="zazu-required">*</span></span>
                             <input type="date" name="event_date" value="{{ old('event_date', $event->event_date?->format('Y-m-d')) }}" required class="zazu-input">
+                            @error('event_date')<span class="zazu-field-error">{{ $message }}</span>@enderror
                         </label>
 
                         <label class="zazu-field">
@@ -68,6 +69,15 @@
                             <select id="event_day_contact_id" name="event_day_contact_id" class="zazu-select">
                                 <option value="">No event-day contact</option>
                             </select>
+                            @error('event_day_contact_id')<span class="zazu-field-error">{{ $message }}</span>@enderror
+                        </label>
+
+                        <label class="zazu-field">
+                            <span class="zazu-label">Night contact <span class="font-normal text-[var(--zazu-faint)]">(optional)</span></span>
+                            <select id="event_night_contact_id" name="event_night_contact_id" class="zazu-select">
+                                <option value="">No night contact</option>
+                            </select>
+                            @error('event_night_contact_id')<span class="zazu-field-error">{{ $message }}</span>@enderror
                         </label>
 
                         <label class="zazu-field">
@@ -77,6 +87,7 @@
                                     <option value="{{ $value }}" @selected(old('status', $event->status) === $value)>{{ $label }}</option>
                                 @endforeach
                             </select>
+                            @error('status')<span class="zazu-field-error">{{ $message }}</span>@enderror
                         </label>
                     </div>
                 </section>
@@ -91,11 +102,13 @@
                         <label class="zazu-field zazu-field-wide">
                             <span class="zazu-label">Event location</span>
                             <input name="event_address" value="{{ old('event_address', $event->event_address) }}" class="zazu-input">
+                            @error('event_address')<span class="zazu-field-error">{{ $message }}</span>@enderror
                         </label>
 
                         <label class="zazu-field zazu-field-wide">
                             <span class="zazu-label">Notes</span>
                             <textarea name="notes" rows="6" class="zazu-textarea">{{ old('notes', $event->notes) }}</textarea>
+                            @error('notes')<span class="zazu-field-error">{{ $message }}</span>@enderror
                         </label>
                     </div>
                 </section>
@@ -153,6 +166,7 @@
 
             for (const contact of customer.contacts) {
                 const suffix = [contact.label, contact.phone].filter(Boolean).join(' · ');
+
                 const dayOption = document.createElement('option');
                 dayOption.value = contact.id;
                 dayOption.textContent = contact.name + (suffix ? ' · ' + suffix : '');
