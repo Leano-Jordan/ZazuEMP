@@ -1,6 +1,6 @@
 # Zazu EMP - Privacy and personal-information engineering baseline
 
-**Scope:** customer/contact records, customer profile photos and staff/user profile photos.
+**Scope:** customer/contact records, customer profile photos, staff/user profile photos and the future handling of event photography/media.
 
 This is an engineering baseline, not legal advice. A production release still requires the responsible party/operator to confirm its actual purposes, lawful processing grounds, notices, retention schedules, contracts and security measures.
 
@@ -22,6 +22,14 @@ Zazu therefore treats customer names, telephone numbers, email addresses and ide
 - **Storage boundary:** the current development implementation uses Laravel's public disk so the feature can be exercised. For production, identifiable customer/staff photos should be delivered through an authenticated application boundary or equivalent controlled storage rather than unrestricted public URLs.
 - **Retention:** soft deletion is not a retention policy. A later retention/deletion process must remove, destroy or de-identify information when the business is no longer authorised or required to retain it.
 - **Data-subject participation:** future authenticated workflows must provide appropriate access, correction and deletion/retention handling.
+- **Event media:** photographs, videos and identifiable event media can constitute personal information. Where Zazu stores or delivers such media, the purpose, access control, retention/deletion, contractual/consent basis where applicable, and rights between the customer, photographer and business must be addressed explicitly.
+- **Photography provider boundary:** Zazu managing a photography service does not by itself give Zazu ownership of photographs created by a photographer, customer, employee or contractor. Software IP and media copyright/usage rights must remain separate.
+
+## Work-schema incident note - 2026-09-26
+
+The owner reported a runtime database error indicating `events.deleted_at` was missing. The repository uses Laravel soft deletes on Event, so the local schema must contain that column. A conditional repair migration was added to reconcile an existing development database without replacing the populated schema.
+
+This is an engineering consistency issue, not evidence of a privacy breach.
 
 ## Security and commercial engineering implications
 
