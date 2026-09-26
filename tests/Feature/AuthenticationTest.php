@@ -5,6 +5,10 @@ namespace Tests\Feature;
 use App\Models\Business;
 use App\Models\User;
 use App\Support\CurrentBusiness;
+use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Notification;
+use Illuminate\Support\Facades\Password;
+use Illuminate\Auth\Notifications\ResetPassword as ResetPasswordNotification;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
@@ -145,6 +149,83 @@ class AuthenticationTest extends TestCase
                 'password' => 'wrong-password',
             ])
             ->assertSessionHasErrors('identifier');
+
+        $this->assertGuest();
+    }
+
+    public function test_password_recovery_accepts_username_and_sends_reset_notification(): void
+    {
+        Notification::fake();
+
+        $user = User::factory()->create([
+            'username' => 'recoverowner',
+            'email' => 'recover@example.com',
+        ]);
+
+        $this->post(route('password.email'), [
+            'identifier' => 'RECOVEROWNER',
+        ])->assertSessionHas('status');
+
+        Notification::assertSentTo($user, ResetPasswordNotification::class);
+    }
+
+    public function test_password_recovery_returns_the_same_success_message_for_unknown_accounts(): void
+    {
+        Notification::fake();
+
+        $this->post(route('password.email'), [
+            'identifier' => 'does-not-exist',
+        ])->assertSessionHas('status');
+
+        Notification::assertNothingSent();
+    }
+
+    public function test_password_reset_updates_password_logs_the_user_in_and_consumes_the_token(): void
+    {
+        $user = User::factory()->create([
+            'username' => 'resetowner',
+            'email' => 'reset@example.com',
+            'password' => 'old-password',
+        ]);
+
+        $token = Password::createToken($user);
+
+        $this->post(route('password.update'), [
+            'token' => $token,
+            'email' => 'RESET@EXAMPLE.COM',
+            'password' => 'new-password',
+            'password_confirmation' => 'new-password',
+        ])->assertRedirect(route('dashboard'));
+
+        $this->assertAuthenticatedAs($user);
+        $this->assertTrue(Hash::check('new-password', $user->fresh()->password));
+        $this->assertFalse(Hash::check('old-password', $user->fresh()->password));
+    }
+
+    public function test_password_reset_token_cannot_be_reused(): void
+    {
+        $user = User::factory()->create([
+            'username' => 'singleuse',
+            'email' => 'singleuse@example.com',
+        ]);
+
+        $token = Password::createToken($user);
+
+        $this->post(route('password.update'), [
+            'token' => $token,
+            'email' => $user->email,
+            'password' => 'new-password',
+            'password_confirmation' => 'new-password',
+        ])->assertRedirect(route('dashboard'));
+
+        Auth::logout();
+
+        $this->post(route('password.update'), [
+            'token' => $token,
+            'email' => $user->email,
+            'password' => 'another-password',
+            'password_confirmation' => 'another-password',
+        ])->assertSessionHasErrors('email');
 
         $this->assertGuest();
     }
