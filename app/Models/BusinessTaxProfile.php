@@ -10,6 +10,8 @@ class BusinessTaxProfile extends Model
 {
     use HasFactory;
 
+    protected $hidden = ['tcs_pin'];
+
     protected $fillable = [
         'business_id',
         'legal_name',
