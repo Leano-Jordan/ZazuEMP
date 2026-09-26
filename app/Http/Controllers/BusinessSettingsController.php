@@ -7,7 +7,6 @@ use App\Support\CurrentBusiness;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
-use Illuminate\Support\Str;
 use Illuminate\View\View;
 use Illuminate\Validation\Rule;
 
@@ -56,11 +55,21 @@ class BusinessSettingsController extends Controller
             }
         }
 
-        $business->update([
-            'name' => trim($validated['name']),
-            'currency' => strtoupper($validated['currency']),
-            ...$newPaths,
-        ]);
+        try {
+            $business->update([
+                'name' => trim($validated['name']),
+                'currency' => strtoupper($validated['currency']),
+                ...$newPaths,
+            ]);
+        } catch (\Throwable $e) {
+            foreach ($newPaths as $path) {
+                if ($path) {
+                    Storage::disk('public')->delete($path);
+                }
+            }
+
+            throw $e;
+        }
 
         foreach ($oldPaths as $path) {
             if ($path) {
