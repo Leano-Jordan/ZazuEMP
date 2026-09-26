@@ -27,6 +27,7 @@ ROUTE -> RECON -> IMPACT -> IMPLEMENT -> VERIFY -> REGRESSION -> RECORD
 Specialists activate only when the task or evidence requires them:
 
 - RECON: unfamiliar area, cross-cutting task, unclear ownership, stale context.
+- FRESH EYES: product/workflow/user-perspective challenge, usability friction, business-process coherence, cross-module flow, or explicit devil's-advocate review.
 - ARCHITECTURE: structural decisions, shared abstractions, service boundaries, major refactors.
 - DATA: migrations, models, queries, persistence, integrity, historical records, concurrency-sensitive writes.
 - SECURITY: auth, authorization, business isolation, sessions, uploads, secrets, sensitive data, trust boundaries.
@@ -35,6 +36,8 @@ Specialists activate only when the task or evidence requires them:
 - VERIFICATION: every meaningful change.
 - REGRESSION: every meaningful behavioural change, especially shared code and business workflows.
 - RELEASE: release candidates, deployment changes, migration-heavy work, commercial readiness checks.
+
+FRESH EYES is deliberately independent of implementation and architecture. It may challenge decisions already present in the repository and may intervene during development when its evidence shows a meaningful product, workflow, usability or system-flow problem.
 
 ## Operator execution SOP
 
