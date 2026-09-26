@@ -21,10 +21,7 @@ class EnsureBusinessOwner
         );
 
         abort_unless(
-            $user->businesses()
-                ->whereKey($business->id)
-                ->wherePivot('role', 'owner')
-                ->exists(),
+            app(CurrentBusiness::class)->hasRole('owner', $user, $business),
             403,
             'Owner access is required.'
         );
