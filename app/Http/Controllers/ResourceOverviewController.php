@@ -17,7 +17,9 @@ class ResourceOverviewController extends Controller
         $business = $this->business($request);
 
         $resourceRequirements = $this->resourceRequirements($business)
-            ->whereHas('capability', fn (Builder $query) => $query->whereIn('capability_type', ['product', 'rental']))
+            ->whereHas('capability', fn (Builder $query) => $query
+                ->where('business_id', $business->id)
+                ->whereIn('capability_type', ['product', 'rental']))
             ->get()
             ->sortBy(fn (EventRequirement $requirement) => $requirement->event?->event_date?->timestamp ?? PHP_INT_MAX)
             ->values();
@@ -101,7 +103,10 @@ class ResourceOverviewController extends Controller
             ->whereHas('event', fn (Builder $query) => $query
                 ->where('business_id', $business->id)
                 ->whereNotIn('status', ['completed', 'cancelled']))
-            ->with(['event.customer', 'capability'])
+            ->with([
+                'event.customer',
+                'capability' => fn (Builder $query) => $query->where('business_id', $business->id),
+            ])
             ->orderBy('created_at');
     }
 }
