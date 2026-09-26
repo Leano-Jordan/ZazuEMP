@@ -227,3 +227,28 @@ Next architectural gate remains:
 - [ ] Authentication and active business context
 - [ ] Server-side business isolation
 - [ ] Roles and permissions
+
+## Execution cycle - 2026-09-26: UX + business-control hardening
+
+- [x] Guided currency selection
+- [x] Guided category selection where a finite vocabulary exists
+- [x] Guided unit selection with flexible legacy/custom storage support
+- [x] Explicit record/column hierarchy across major lists
+- [x] Clickable workload quick views
+- [x] Overdue preparation workload view
+- [x] Central active business resolver
+- [x] Model-level business ownership guard for direct business records
+- [x] Business-scoped reads/writes across touched modules
+- [x] Closed-work mutation protection
+- [x] Central Work lifecycle transitions
+- [x] Cross-business regression coverage
+
+Still required before production security acceptance:
+- [ ] Authentication
+- [ ] Explicit active-business selection
+- [ ] Roles and permissions
+- [ ] Authorization policy coverage for every protected action
+- [ ] Authenticated/private media delivery
+- [ ] Full PHPUnit execution
+- [ ] Fresh migration verification
+- [ ] Browser/light-dark/responsive traversal
