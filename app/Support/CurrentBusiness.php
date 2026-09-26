@@ -75,11 +75,22 @@ class CurrentBusiness
             );
         }
 
-        if (app()->environment('local')) {
-            return Business::query()
+        // Zazu is currently being developed before the authentication
+        // surface is enabled. Keep the application previewable in local/debug
+        // environments so UX work is actually visible, while never enabling
+        // this fallback for a production configuration.
+        if (app()->environment('local') || (bool) config('app.debug')) {
+            $business = Business::query()
                 ->where('status', 'active')
                 ->orderBy('id')
                 ->first();
+
+            return $business ?: Business::create([
+                'name' => 'Zazu Demo Business',
+                'slug' => 'zazu-demo-business',
+                'status' => 'active',
+                'currency' => 'ZAR',
+            ]);
         }
 
         return null;
