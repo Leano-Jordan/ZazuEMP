@@ -66,7 +66,7 @@
                 @forelse ($quoteTotalsByCurrency as $currency => $totals)
                     <div class="zazu-context-card">
                         <div class="zazu-detail-label">{{ $currency }} quotes</div>
-                        <div class="zazu-command-meta-value mt-1">{{ $currency }} {{ number_format($totals['total'], 2) }}</div>
+                        <div class="zazu-command-meta-value mt-1">{{ $currency }} {{ number_format($totals['total'], 2, '.', ',') }}</div>
                         <div class="zazu-field-help">{{ $totals['count'] }} quote{{ $totals['count'] === 1 ? '' : 's' }} with a saved latest version</div>
                     </div>
                 @empty
