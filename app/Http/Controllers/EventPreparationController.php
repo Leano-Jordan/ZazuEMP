@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Event;
 use App\Models\EventPreparationItem;
+use App\Support\CurrentBusiness;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -11,8 +12,10 @@ use Illuminate\View\View;
 
 class EventPreparationController extends Controller
 {
-    public function index(Event $event): View
+    public function index(Request $request, Event $event): View
     {
+        $this->ensureBusiness($event, $request);
+
         $items = $event->preparationItems()
             ->orderByRaw("CASE status WHEN 'open' THEN 1 WHEN 'blocked' THEN 2 WHEN 'ready' THEN 3 ELSE 4 END")
             ->orderBy('due_date')
@@ -22,13 +25,17 @@ class EventPreparationController extends Controller
         return view('preparation.index', compact('event', 'items'));
     }
 
-    public function create(Event $event): View
+    public function create(Request $request, Event $event): View
     {
+        $this->ensureBusiness($event, $request);
+
         return view('preparation.create', compact('event'));
     }
 
     public function store(Request $request, Event $event): RedirectResponse
     {
+        $this->ensureBusiness($event, $request);
+
         $validated = $request->validate([
             'title' => ['required', 'string', 'max:255'],
             'category' => ['nullable', 'string', 'max:100'],
@@ -55,7 +62,8 @@ class EventPreparationController extends Controller
 
     public function updateStatus(Request $request, Event $event, EventPreparationItem $item): RedirectResponse
     {
-        abort_unless($item->event_id === $event->id, 404);
+        $this->ensureBusiness($event, $request);
+        abort_unless($item->event_id === $event->id && $item->business_id === $event->business_id, 404);
 
         $validated = $request->validate([
             'status' => ['required', 'in:open,blocked,ready'],
@@ -69,5 +77,10 @@ class EventPreparationController extends Controller
         return redirect()
             ->route('work.preparation.index', $event)
             ->with('success', 'Preparation status updated.');
+    }
+
+    private function ensureBusiness(Event $event, Request $request): void
+    {
+        abort_unless((int) $event->business_id === app(CurrentBusiness::class)->id($request->user()), 404);
     }
 }
