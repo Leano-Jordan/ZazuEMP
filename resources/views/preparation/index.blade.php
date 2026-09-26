@@ -10,19 +10,24 @@
         <div>
             <div class="zazu-eyebrow">{{ $event->reference }} · Readiness</div>
             <h2 class="zazu-command-title">Preparation and readiness</h2>
-            <p class="zazu-command-copy">Turn the work brief into a practical readiness list. Mark items open, blocked or ready as preparation progresses.</p>
+            <p class="zazu-command-copy">Track the work that must be ready before the job. Use the action buttons on each row to change its readiness state.</p>
         </div>
-        <div class="zazu-command-meta">
-            <div class="zazu-command-meta-label">Ready</div>
-            <div class="zazu-command-meta-value">{{ $items->where('status', 'ready')->count() }}/{{ $items->count() }}</div>
-        </div>
+        <div class="zazu-command-meta"><div class="zazu-command-meta-label">Ready</div><div class="zazu-command-meta-value">{{ $items->where('status', 'ready')->count() }}/{{ $items->count() }}</div></div>
     </section>
 
     <section class="zazu-card zazu-list">
         <div class="zazu-card-header">
-            <div class="zazu-card-title">Readiness items</div>
-            <div class="zazu-card-description">Keep practical preparation visible before the event or job date.</div>
+            <div class="zazu-eyebrow">Readiness records</div>
+            <div class="zazu-card-title mt-1">Preparation list</div>
+            <div class="zazu-card-description">Status controls belong to the row they update.</div>
         </div>
+        @if ($items->count())
+            <div class="zazu-record-header" style="--zazu-record-cols: 2">
+                <div class="zazu-record-header-note">Task</div>
+                <div class="zazu-record-header-cell">Due</div>
+                <div class="zazu-record-header-cell">Status</div>
+            </div>
+        @endif
         @forelse ($items as $item)
             <div class="zazu-list-item">
                 <div class="zazu-list-main">
@@ -37,13 +42,14 @@
                     </div>
                     @if ($item->notes)<div class="zazu-list-meta">{{ $item->notes }}</div>@endif
                 </div>
-                <div class="zazu-list-side">
-                    <form method="POST" action="{{ route('work.preparation.status', [$event, $item]) }}" class="flex flex-wrap gap-2 justify-end">
-                        @csrf @method('PATCH')
-                        @foreach (['open' => 'Open', 'blocked' => 'Blocked', 'ready' => 'Ready'] as $status => $label)
+                <div class="zazu-list-side"><div class="zazu-side-primary">{{ $item->due_date?->format('d M Y') ?? 'No due date' }}</div></div>
+                <div class="zazu-action-group">
+                    @foreach (['open' => 'Open', 'blocked' => 'Blocked', 'ready' => 'Ready'] as $status => $label)
+                        <form method="POST" action="{{ route('work.preparation.status', [$event, $item]) }}">
+                            @csrf @method('PATCH')
                             <button name="status" value="{{ $status }}" class="zazu-btn {{ $item->status === $status ? 'zazu-btn-secondary' : 'zazu-btn-ghost' }}">{{ $label }}</button>
-                        @endforeach
-                    </form>
+                        </form>
+                    @endforeach
                 </div>
             </div>
         @empty
