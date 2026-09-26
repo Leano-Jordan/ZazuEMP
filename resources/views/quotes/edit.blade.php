@@ -6,7 +6,9 @@
         <a href="{{ route('work.show', $quote->event) }}" class="zazu-btn zazu-btn-secondary">Job workspace</a>
     </x-slot:headerAction>
 
-    @php($itemsByRequirement = $version->items->keyBy('event_requirement_id'))
+    @php
+        $itemsByRequirement = $version->items->keyBy('event_requirement_id');
+    @endphp
 
     <section class="zazu-command-band">
         <div>
