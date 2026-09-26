@@ -146,15 +146,7 @@
     </form>
 
     <script>
-        const customers = @json($customers->map(fn ($customer) => [
-            'id' => $customer->id,
-            'contacts' => $customer->contacts->map(fn ($contact) => [
-                'id' => $contact->id,
-                'name' => $contact->name,
-                'phone' => $contact->phone,
-                'label' => $contact->label,
-            ])->values(),
-        ])->values());
+        const customers = @json($customerOptions);
 
         const selectedDayContact = @json(old('event_day_contact_id', $event->event_day_contact_id));
         const selectedNightContact = @json(old('event_night_contact_id', $event->event_night_contact_id));
