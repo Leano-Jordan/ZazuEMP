@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\BusinessCapability;
 use App\Models\Event;
 use App\Models\InventoryItem;
+use App\Models\EventRequirement;
 use App\Support\CurrentBusiness;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -18,7 +19,13 @@ class InventoryController extends Controller
         $items=InventoryItem::where('business_id',$businessId)->with(['capability','movements'])->orderBy('name')->get();
         $totalOnHand=$items->sum(fn($item)=>$item->on_hand);
         $lowStock=$items->filter(fn($item)=>$item->on_hand <= (float)$item->reorder_level)->count();
-        return view('inventory.index',compact('items','totalOnHand','lowStock'));
+        $demand = EventRequirement::query()
+            ->whereHas('event', fn ($query) => $query->where('business_id', $businessId)->whereNotIn('status', ['completed', 'cancelled']))
+            ->whereHas('capability', fn ($query) => $query->where('business_id', $businessId)->where('capability_type', 'product'))
+            ->with('event.customer', 'capability')
+            ->orderBy('created_at')
+            ->get();
+        return view('inventory.index',compact('items','totalOnHand','lowStock','demand'));
     }
 
     public function create(Request $request): View
