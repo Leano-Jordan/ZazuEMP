@@ -38,6 +38,7 @@ class AuthController extends Controller
         }
 
         $request->session()->regenerate();
+        app(CurrentBusiness::class)->resolve($request->user());
 
         if ($request->boolean('owner_access')) {
             $business = app(CurrentBusiness::class)->resolve($request->user());
