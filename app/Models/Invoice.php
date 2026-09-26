@@ -28,6 +28,8 @@ class Invoice extends Model
         'customer_address',
         'customer_email',
         'customer_phone',
+        'customer_tax_number',
+        'customer_vat_number',
         'status',
         'currency',
         'subtotal',
