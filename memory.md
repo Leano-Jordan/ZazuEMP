@@ -486,3 +486,10 @@ Verification:
 - All implementation, hardening, verification fixes and documentation updates are committed directly to main.
 - No branch-merging workflow is used.
 - Repository branch state verified after cleanup: main only.
+
+
+## Hardening correction — quote revision snapshot integrity — 2026-09-26
+
+- Quote revision creation now rebuilds each revision line's source snapshot from the current Work requirement instead of carrying a stale prior snapshot.
+- Snapshot construction is centralized in `QuoteService` so initial quote creation and revision creation use the same evidence shape.
+- Regression coverage now checks that a revised requirement's description and quantity are reflected in the new revision snapshot.
