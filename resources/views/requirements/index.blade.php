@@ -10,20 +10,24 @@
         <div>
             <div class="zazu-eyebrow">{{ $event->reference }} · {{ $event->customer?->name ?? 'Customer' }}</div>
             <h2 class="zazu-command-title">Services for this job</h2>
-            <p class="zazu-command-copy">Choose what you are providing for this job. Zazu uses these services to build the quote.</p>
+            <p class="zazu-command-copy">Build the concrete services, rentals and deliverables that the quote will use.</p>
         </div>
-        <div class="zazu-command-meta">
-            <div class="zazu-command-meta-label">Requirements</div>
-            <div class="zazu-command-meta-value">{{ $requirements->count() }}</div>
-        </div>
+        <div class="zazu-command-meta"><div class="zazu-command-meta-label">Records</div><div class="zazu-command-meta-value">{{ $requirements->count() }}</div></div>
     </section>
 
     <section class="zazu-card zazu-list">
         <div class="zazu-card-header">
-            <div class="zazu-card-title">Requirement register</div>
-            <div class="zazu-card-description">Add or review the services before creating the quote.</div>
+            <div class="zazu-eyebrow">Operational records</div>
+            <div class="zazu-card-title mt-1">Requirement list</div>
+            <div class="zazu-card-description">Each row is one requirement. The quantity shown at right belongs to that row.</div>
         </div>
-
+        @if ($requirements->count())
+            <div class="zazu-record-header" style="--zazu-record-cols: 2">
+                <div class="zazu-record-header-note">Service</div>
+                <div class="zazu-record-header-cell">Quantity</div>
+                <div class="zazu-record-header-cell">Status</div>
+            </div>
+        @endif
         @forelse ($requirements as $requirement)
             <div class="zazu-list-item">
                 <div class="zazu-list-main">
@@ -37,10 +41,8 @@
                         @if ($requirement->notes) · {{ $requirement->notes }} @endif
                     </div>
                 </div>
-                <div class="zazu-list-side">
-                    <div class="zazu-side-primary">{{ number_format((float) $requirement->quantity, 2) }} {{ $requirement->unit ?: 'units' }}</div>
-                    <div class="zazu-side-secondary">Work requirement</div>
-                </div>
+                <div class="zazu-list-side"><div class="zazu-side-primary">{{ number_format((float) $requirement->quantity, 2) }} {{ $requirement->unit ?: 'units' }}</div></div>
+                <div class="zazu-list-side"><div class="zazu-side-primary">{{ ucfirst($requirement->status) }}</div></div>
             </div>
         @empty
             <div class="zazu-empty">
