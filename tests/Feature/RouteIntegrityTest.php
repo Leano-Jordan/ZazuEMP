@@ -70,16 +70,20 @@ class RouteIntegrityTest extends TestCase
         $this->assertSame([], $missing);
     }
 
-    public function test_controller_routes_resolve_to_loadable_controller_classes(): void
+    public function test_controller_routes_resolve_to_existing_controller_methods(): void
     {
         $invalid = collect(Route::getRoutes()->getRoutes())
-            ->map(fn ($route) => $route->getActionName())
-            ->filter(fn ($action) => is_string($action) && str_contains($action, '@'))
-            ->filter(function ($action) {
-                [$class] = str_contains($action, '@') ? explode('@', $action, 2) : [$action];
+            ->filter(fn ($route) => $route->getControllerClass() !== null)
+            ->filter(function ($route) {
+                $class = $route->getControllerClass();
+                $method = $route->getActionMethod();
 
-                return !class_exists($class);
+                return !class_exists($class) || !method_exists($class, $method);
             })
+            ->map(fn ($route) => [
+                'name' => $route->getName(),
+                'action' => $route->getActionName(),
+            ])
             ->values()
             ->all();
 
