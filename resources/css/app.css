@@ -4361,3 +4361,55 @@ body.zazu-has-wallpaper .zazu-content > * {
         animation-iteration-count: 1 !important;
     }
 }
+
+
+/* Authentication recovery + account utility refinements. */
+.zazu-auth-frame-single {
+    width: min(560px, 100%);
+    grid-template-columns: 1fr;
+}
+
+.zazu-auth-status {
+    margin: 0 0 18px;
+    padding: 11px 13px;
+    border: 1px solid var(--zazu-border);
+    border-radius: var(--zazu-radius-md);
+    background: var(--zazu-success-soft);
+    color: var(--zazu-success-ink);
+    font-size: 12px;
+    line-height: 1.5;
+}
+
+.zazu-auth-notice-error {
+    background: var(--zazu-danger-soft);
+    color: var(--zazu-danger-ink);
+}
+
+.zazu-login-options {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 14px;
+}
+
+.zazu-login-recovery {
+    color: var(--zazu-link);
+    font-size: 11px;
+    font-weight: 750;
+    text-decoration: none;
+    white-space: nowrap;
+}
+
+.zazu-login-recovery:hover {
+    color: var(--zazu-link-hover);
+    text-decoration: underline;
+    text-underline-offset: 3px;
+}
+
+@media (max-width: 520px) {
+    .zazu-login-options {
+        align-items: flex-start;
+        flex-direction: column;
+        gap: 9px;
+    }
+}
