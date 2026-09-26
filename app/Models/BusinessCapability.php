@@ -16,8 +16,10 @@ class BusinessCapability extends Model
         'category',
         'capability_type',
         'pricing_basis',
+        'default_price',
         'default_unit',
         'description',
+        'image_path',
         'is_active',
     ];
 
@@ -25,6 +27,7 @@ class BusinessCapability extends Model
     {
         return [
             'is_active' => 'boolean',
+            'default_price' => 'decimal:2',
         ];
     }
 
