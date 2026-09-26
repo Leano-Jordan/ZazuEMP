@@ -53,7 +53,7 @@ class RequirementController extends Controller
         $event->requirements()->create($validated + ['status' => 'open']);
 
         return redirect()
-            ->route('work.requirements.index', $event)
+            ->route('work.show', $event)
             ->with('success', 'Requirement added to the workspace.');
     }
 }
