@@ -5,7 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
     <meta name="theme-color" content="#0d4f43">
     @php($business = app(\App\Support\CurrentBusiness::class)->resolve(auth()->user()))
-    @php($isOwner = $business && auth()->user()->businesses()->whereKey($business->id)->wherePivot('role', 'owner')->exists())
+    @php($businesses = auth()->user()->businesses()->where('businesses.status', 'active')->orderBy('businesses.name')->get())
+    @php($isOwner = $business && $businesses->firstWhere('id', $business->id)?->pivot?->role === 'owner')
     <title>{{ $title ?? 'Zazu' }} · {{ $business?->name ?? 'Zazu EMP' }}</title>
     <script>
         (() => {
@@ -159,6 +160,20 @@
                                             <span class="zazu-user-popover-email">{{ auth()->user()->email }}</span>
                                         </div>
                                     </div>
+                                    @if($businesses->count() > 1)
+                                        <div class="zazu-user-popover-section">
+                                            <span class="zazu-user-popover-label">Workspace</span>
+                                            <form method="POST" action="{{ route('business.switch') }}" class="zazu-user-switch-form">
+                                                @csrf
+                                                <label class="sr-only" for="zazu-business-switch">Current workspace</label>
+                                                <select id="zazu-business-switch" name="business_id" class="zazu-user-switch-select" onchange="this.form.submit()">
+                                                    @foreach($businesses as $availableBusiness)
+                                                        <option value="{{ $availableBusiness->id }}" @selected((int) $availableBusiness->id === (int) $business->id)>{{ $availableBusiness->name }}</option>
+                                                    @endforeach
+                                                </select>
+                                            </form>
+                                        </div>
+                                    @endif
                                     <div class="zazu-user-popover-divider"></div>
                                     <form method="POST" action="{{ route('logout') }}">
                                         @csrf
