@@ -5,6 +5,7 @@
 .env.production
 .piscator.json
 .hupnet.result.cache
+.phpunit.result.cache
 /.codex
 /.cursor/
 /.idea
