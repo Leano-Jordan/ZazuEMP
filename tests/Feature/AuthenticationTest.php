@@ -68,6 +68,44 @@ class AuthenticationTest extends TestCase
             ->assertSessionHasErrors(['email', 'username']);
     }
 
+    public function test_registration_rejects_username_equal_to_an_existing_email(): void
+    {
+        User::factory()->create([
+            'username' => 'existinguser',
+            'email' => 'owner@example.com',
+        ]);
+
+        $this->from(route('register'))
+            ->post(route('register.store'), [
+                'name' => 'Another Owner',
+                'username' => 'owner@example.com',
+                'business_name' => 'Another Catering',
+                'email' => 'another@example.com',
+                'password' => 'password123',
+                'password_confirmation' => 'password123',
+            ])
+            ->assertSessionHasErrors('username');
+    }
+
+    public function test_registration_rejects_email_equal_to_an_existing_username(): void
+    {
+        User::factory()->create([
+            'username' => 'existinguser',
+            'email' => 'owner@example.com',
+        ]);
+
+        $this->from(route('register'))
+            ->post(route('register.store'), [
+                'name' => 'Another Owner',
+                'username' => 'anotherowner',
+                'business_name' => 'Another Catering',
+                'email' => 'existinguser',
+                'password' => 'password123',
+                'password_confirmation' => 'password123',
+            ])
+            ->assertSessionHasErrors('email');
+    }
+
     public function test_registration_rejects_invalid_username(): void
     {
         $this->from(route('register'))
