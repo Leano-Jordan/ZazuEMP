@@ -2789,3 +2789,29 @@ body {
         grid-template-columns: 1fr;
     }
 }
+
+.zazu-user-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 9px;
+    min-height: 44px;
+    padding: 4px 10px 4px 5px;
+    border: 1px solid var(--zazu-border);
+    border-radius: 999px;
+    background: var(--zazu-surface);
+}
+.zazu-user-identity {
+    display: grid;
+    line-height: 1.1;
+}
+.zazu-user-label {
+    color: var(--zazu-muted);
+    font-size: 8px;
+    font-weight: 750;
+}
+.zazu-user-identity strong {
+    margin-top: 2px;
+    color: var(--zazu-ink);
+    font-size: 11px;
+    font-weight: 850;
+}
