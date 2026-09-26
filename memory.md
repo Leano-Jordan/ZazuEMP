@@ -10,6 +10,24 @@
 
 Repository state outranks stale conversation memory. Inspect the current repository before acting.
 
+## Owner execution directive — 2026-09-26
+
+Morpheus is the Master ENGINE identity. The owner refers to the engine as Jarvis.
+
+When the owner explicitly says **execute**, execution is the default response. Do not substitute a plan, progress speech, token warning, or unsolicited report for the requested work.
+
+During execution:
+- Inspect the current Zazu repository before changing it.
+- Work the repository, not only the defects the owner happened to name.
+- Inspect adjacent high-impact correctness, accessibility, reliability, maintainability and workflow defects in the touched surface.
+- Fix directly related defects when the safe scope is clear.
+- Do not invent future routes or placeholder navigation merely to make the interface look complete.
+- Do not silently turn future product ideas into implementation scope.
+- Verify what can be verified from available evidence and mark runtime-only checks as unverified.
+- Return a compact completion result unless the owner explicitly asks for a report.
+
+The owner's time and response budget are part of the operating constraints. Do not waste replies explaining that the response is being kept short or that tokens are limited.
+
 ## Product direction
 
 Zazu EMP is a reusable commercial event-management platform.
@@ -235,18 +253,14 @@ If those pass, proceed to the next roster slice after Requirements, which is the
 
 ### Current verified findings
 
-1. **[HIGH] Dark-mode primary button contrast is wrong**
-   - `--zazu-primary: #6ca7a2` is used as the dark-theme primary button background.
-   - `.zazu-btn-primary` forces text to `#f7fbf9`.
-   - Calculated contrast is approximately **2.62:1**, below WCAG AA for normal button text.
-   - Dark-theme hover `#81b8b2` with the same light text is also unsuitable.
-   - Fix belongs in the shared color/button system, not individual pages.
+1. **[HIGH] Dark-mode primary button contrast was wrong and is now fixed**
+   - Dark mode now uses a semantic `--zazu-primary-ink` token for primary button text.
+   - The dark primary background `#6ca7a2` now uses dark ink `#122125` for readable button text.
+   - The shared button rule was fixed rather than patching individual pages.
 
-2. **[MEDIUM] Two application-layout sources exist**
-   - `resources/views/components/app-layout.blade.php` is the active component used by current pages.
-   - `resources/views/layouts/app.blade.php` contains effectively the same shell.
-   - This creates a maintenance trap: a future UI/link fix can be applied to one shell while the other remains stale.
-   - Confirm intended ownership, then remove/archive the duplicate or make the relationship explicit.
+2. **[MEDIUM] Duplicate application layout was removed**
+   - `resources/views/components/app-layout.blade.php` is the active application shell.
+   - The unused duplicate `resources/views/layouts/app.blade.php` was deleted after repository-wide usage inspection found no `layouts.app` consumers.
 
 3. **[MEDIUM] Navigation is structurally incomplete versus the recorded product navigation target**
    - Project memory records: Dashboard / Work / Customers / Quotes / Calendar / Suppliers / Inventory / Assets / Reports / Settings.
@@ -254,17 +268,16 @@ If those pass, proceed to the next roster slice after Requirements, which is the
    - This is not a broken-link finding by itself. Missing destinations should remain non-clickable until their routes exist, per the navigation rule.
    - The issue is therefore recorded as **navigation hierarchy/information architecture incomplete**, not as permission to invent placeholder links.
 
-4. **[MEDIUM] Color hierarchy needs a formal semantic contract**
-   - The current system has primary teal, neutral secondary/ghost, brown accent, and separate success/warning/danger/info colors.
-   - The visual hierarchy is currently encoded through many component rules rather than a clearly documented semantic priority.
-   - The accent is also used for the brand dot and focus outline, while teal is the primary action/state color.
-   - Before further UI expansion, define which color means: primary action, navigation state, focus, informational state, success, warning, danger and decorative brand accent.
-   - This will prevent color meaning from drifting as new modules are added.
+4. **[MEDIUM] Color hierarchy was formalized in the shared token layer**
+   - Added semantic tokens for primary action text, links, navigation active state and focus.
+   - Dark-mode links now use a dedicated readable link token instead of inheriting the primary action color on every surface.
+   - Active navigation state and keyboard focus now reference semantic tokens rather than component-specific colour meaning.
 
-5. **[LOW] Static route/link audit did not find an obvious missing named route in the currently inspected navigation/workflow links**
-   - Existing inspected links use named Laravel routes such as `work.*`, `customers.*`, `capabilities.*` and `work.requirements.*`.
-   - The route definitions inspected contain those destinations.
-   - Therefore, the reported link problems should be treated as requiring **runtime/browser verification** rather than assuming every issue is a missing route.
+5. **[LOW] Link and template correctness issues found during the deeper pass**
+   - The customer directory contained an invalid `IlluminateSupportStr` class reference; this was corrected to Laravel's real `Illuminate\Support\Str` class.
+   - Customer creation is now atomic so the customer record and primary contact cannot be split by a partial write.
+   - Requirement creation now rejects inactive capabilities even when a crafted request bypasses the rendered selector.
+   - Existing named route targets remain structurally valid in the inspected workflow code; rendered/browser verification is still required for runtime link behaviour.
 
 ### Next UI/link verification pass
 
@@ -280,3 +293,24 @@ Verify the actual rendered application, not source alone:
 - button/link contrast
 
 **Rule:** do not fix individual symptoms before checking the shared component/layout/token that controls them.
+
+
+## Execution fix pass — 2026-09-26
+
+IMPLEMENTED in Zazu EMP:
+- shared dark-theme primary button contrast fix
+- semantic colour-token layer for action/link/navigation/focus meaning
+- stronger actionable "Start work" link treatment
+- semantic `aria-current="page"` on active desktop/mobile primary navigation
+- invalid customer-list avatar `Str` reference corrected
+- customer + primary-contact creation made transactional
+- inactive capability selection rejected at requirement write time
+- committed PHPUnit result cache removed and added to `.gitignore`
+- duplicate unused application layout removed
+
+UNVERIFIED:
+- actual browser/runtime link traversal
+- mobile visual inspection
+- light/dark rendered inspection
+- local PHPUnit execution after the latest changes
+- local build after the latest changes
