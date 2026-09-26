@@ -47,7 +47,7 @@ class EventCostController extends Controller
         abort_if($event->isClosed(), 422, 'Closed work cannot receive new cost records.');
 
         $validated = $request->validate([
-            'category' => ['required', Rule::in(array_keys(config('zazu.service_categories')))],
+            'category' => ['required', Rule::in(array_keys(config('zazu.cost_categories')))],
             'description' => ['required', 'string', 'max:255'],
             'currency' => ['required', Rule::in(array_keys(config('zazu.currencies')))],
             'projected_amount' => ['required', 'numeric', 'min:0'],
