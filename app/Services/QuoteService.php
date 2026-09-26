@@ -92,7 +92,7 @@ class QuoteService
                         )
                     ),
                     'pricing_basis' => $requirement->capability?->pricing_basis,
-                    'source_snapshot' => $previousItem->source_snapshot,
+                    'source_snapshot' => $this->snapshotForRequirement($requirement, $lockedQuote->currency),
                 ]);
             }
 
@@ -160,22 +160,29 @@ class QuoteService
                 'unit_price' => Money::fromCents($unitPriceCents),
                 'line_total' => Money::fromCents($lineTotalCents),
                 'pricing_basis' => $requirement->capability?->pricing_basis,
-                'source_snapshot' => [
-                    'requirement_id' => $requirement->id,
-                    'description' => $requirement->description,
-                    'category' => $requirement->category,
-                    'quantity' => number_format($quantityHundredths / 100, 2, '.', ''),
-                    'unit' => $requirement->unit,
-                    'notes' => $requirement->notes,
-                    'capability_id' => $requirement->capability_id,
-                    'capability_name' => $requirement->capability?->name,
-                    'pricing_basis' => $requirement->capability?->pricing_basis,
-                    'capability_currency' => $requirement->capability?->currency,
-                    'capability_default_price' => $requirement->capability?->default_price,
-                    'quote_currency' => $currency,
-                ],
+                'source_snapshot' => $this->snapshotForRequirement($requirement, $currency),
             ]);
         }
+    }
+
+    private function snapshotForRequirement(EventRequirement $requirement, string $currency): array
+    {
+        $quantityHundredths = Money::toHundredths((string) $requirement->quantity);
+
+        return [
+            'requirement_id' => $requirement->id,
+            'description' => $requirement->description,
+            'category' => $requirement->category,
+            'quantity' => number_format($quantityHundredths / 100, 2, '.', ''),
+            'unit' => $requirement->unit,
+            'notes' => $requirement->notes,
+            'capability_id' => $requirement->capability_id,
+            'capability_name' => $requirement->capability?->name,
+            'pricing_basis' => $requirement->capability?->pricing_basis,
+            'capability_currency' => $requirement->capability?->currency,
+            'capability_default_price' => $requirement->capability?->default_price,
+            'quote_currency' => strtoupper($currency),
+        ];
     }
 
     private function recalculate(QuoteVersion $version): void
