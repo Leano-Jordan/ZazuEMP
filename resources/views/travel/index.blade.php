@@ -9,8 +9,8 @@
     <section class="zazu-command-band">
         <div>
             <div class="zazu-eyebrow">{{ $event->reference }} · {{ $event->customer?->name ?? 'Customer' }}</div>
-            <h2 class="zazu-command-title">Travel and route evidence</h2>
-            <p class="zazu-command-copy">Keep route inputs, fuel assumptions and the resulting customer charge together. Each saved calculation remains a historical record.</p>
+            <h2 class="zazu-command-title">Travel and route details</h2>
+            <p class="zazu-command-copy">Keep the route, fuel details and customer charge together. Each saved calculation is kept as a record.</p>
         </div>
         <div class="zazu-command-meta">
             <div class="zazu-command-meta-label">Calculations</div>
@@ -21,7 +21,7 @@
     <section class="zazu-card zazu-list">
         <div class="zazu-card-header">
             <div class="zazu-card-title">Saved travel calculations</div>
-            <div class="zazu-card-description">Manual routing is the current provider. Replaceable routing integration comes later.</div>
+            <div class="zazu-card-description">Routes are entered manually for now.</div>
         </div>
 
         @forelse ($travelCosts as $travel)
