@@ -12,6 +12,7 @@ use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\RequirementController;
 use App\Http\Controllers\ResourceOverviewController;
 use App\Http\Controllers\QuoteController;
+use App\Http\Controllers\PasswordResetController;
 use App\Http\Controllers\TravelCostController;
 use App\Http\Controllers\WorkController;
 use Illuminate\Support\Facades\Route;
@@ -19,7 +20,18 @@ use Illuminate\Support\Facades\Route;
 Route::get('/', fn () => redirect()->route('dashboard'));
 
 Route::middleware('guest')->group(function () {
-    Route::get('/login', [\App\Http\Controllers\AuthController::class, 'create'])->name('login');
+        Route::get('/login', [\App\Http\Controllers\AuthController::class, 'create'])->name('login');
+    Route::get('/owner/login', [\App\Http\Controllers\AuthController::class, 'create'])
+        ->defaults('owner', true)
+        ->name('owner.login');
+    Route::get('/forgot-password', [PasswordResetController::class, 'request'])->name('password.request');
+    Route::post('/forgot-password', [PasswordResetController::class, 'send'])
+        ->middleware('throttle:password.email')
+        ->name('password.email');
+    Route::get('/reset-password/{token}', [PasswordResetController::class, 'edit'])->name('password.reset');
+    Route::post('/reset-password', [PasswordResetController::class, 'update'])
+        ->middleware('throttle:password.reset')
+        ->name('password.update');
     Route::get('/owner/login', [\App\Http\Controllers\AuthController::class, 'create'])
         ->defaults('owner', true)
         ->name('owner.login');
