@@ -25,7 +25,7 @@ class UiAccessibilityTest extends TestCase
         $response->assertSee('aria-label="Primary"', false);
         $response->assertSee('data-theme-toggle', false);
         $response->assertSee('aria-label="Open settings"', false);
-        $response->assertSee("route('settings.index')", false);
+        $response->assertSee(route('settings.index'), false);
         $response->assertSee('data-theme-icon-sun', false);
         $response->assertSee('data-theme-icon-moon', false);
         $response->assertSee('aria-pressed="false"', false);
