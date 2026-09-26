@@ -20,12 +20,12 @@
     <section class="zazu-card zazu-list">
         <div class="zazu-card-header">
             <div class="zazu-card-title">Your customers</div>
-            <div class="zazu-card-description">Select a customer to start a new piece of work.</div>
+            <div class="zazu-card-description">Open a customer to see the relationship and work history, or start work directly.</div>
         </div>
 
         @forelse ($customers as $customer)
-            <a href="{{ route('work.create', ['customer_id' => $customer->id]) }}" class="zazu-list-item">
-                <div class="zazu-row-with-avatar">
+            <div class="zazu-list-item">
+                <a href="{{ route('customers.show', $customer) }}" class="zazu-row-with-avatar min-w-0 flex-1">
                     <div class="zazu-avatar">{{ IlluminateSupportStr::upper(IlluminateSupportStr::substr($customer->name, 0, 1)) }}</div>
                     <div class="zazu-list-main">
                         <div class="zazu-list-title">{{ $customer->name }}</div>
@@ -34,12 +34,12 @@
                             @if ($customer->primaryContact?->email) · {{ $customer->primaryContact->email }} @endif
                         </div>
                     </div>
-                </div>
+                </a>
                 <div class="zazu-list-side">
                     <div class="zazu-side-primary">{{ $customer->events_count }} {{ $customer->events_count === 1 ? 'work item' : 'work items' }}</div>
-                    <div class="zazu-side-secondary">Start work →</div>
+                    <a href="{{ route('work.create', ['customer_id' => $customer->id]) }}" class="zazu-side-secondary">Start work →</a>
                 </div>
-            </a>
+            </div>
         @empty
             <div class="zazu-empty">
                 <div class="zazu-empty-title">No customers yet</div>
