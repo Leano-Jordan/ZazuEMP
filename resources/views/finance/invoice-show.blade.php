@@ -9,7 +9,7 @@
     <section class="zazu-document">
         <header class="zazu-document-header">
             <div>
-                <div class="zazu-eyebrow">Tax invoice</div>
+                <div class="zazu-eyebrow">{{ $invoice->business_vat_number ? 'Tax Invoice' : 'Invoice' }}</div>
                 <h2 class="zazu-document-title">{{ $invoice->business_trading_name ?: $invoice->business_legal_name }}</h2>
                 @if($invoice->business_legal_name && $invoice->business_legal_name !== $invoice->business_trading_name)
                     <div class="zazu-document-muted">{{ $invoice->business_legal_name }}</div>
