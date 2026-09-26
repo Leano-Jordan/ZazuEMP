@@ -65,7 +65,7 @@ class BusinessSettingsController extends Controller
             'tcs_pin' => ['nullable', 'string', 'max:100'],
             'tcs_pin_expires_at' => ['nullable', 'date'],
             'default_vat_rate' => ['required', 'numeric', 'decimal:0,2', 'min:0', 'max:100'],
-            'tax_effective_from' => ['required', 'date'],
+            'tax_effective_from' => ['required', 'date', 'after_or_equal:today'],
             'food_handling' => ['nullable', 'boolean'],
             'employees' => ['nullable', 'boolean'],
             'government_supply' => ['nullable', 'boolean'],
@@ -198,7 +198,18 @@ class BusinessSettingsController extends Controller
             ->latest('effective_from')
             ->first();
 
-        if ($existing && (string) $existing->rate === $defaultRate && $existing->effective_from <= $effectiveFrom) {
+        if ($existing && $existing->effective_from->equalTo($effectiveFrom)) {
+            $existing->update([
+                'name' => $defaultName,
+                'treatment' => $defaultTreatment,
+                'rate' => $defaultRate,
+                'is_default' => true,
+                'is_active' => true,
+                'source_reference' => $profile->vat_status === 'registered'
+                    ? 'SARS VAT guidance; reviewed by Zazu configuration'
+                    : 'Business tax profile',
+            ]);
+        } elseif ($existing && (string) $existing->rate === $defaultRate && $existing->effective_from < $effectiveFrom) {
             $existing->update([
                 'name' => $defaultName,
                 'treatment' => $defaultTreatment,
@@ -266,13 +277,6 @@ class BusinessSettingsController extends Controller
             }
         }
 
-        if ($profile->vat_status !== 'registered') {
-            TaxRate::query()
-                ->where('business_id', $business->id)
-                ->where('code', 'VAT_STANDARD')
-                ->whereKeyNot($defaultCode === 'VAT_STANDARD' ? 0 : null)
-                ->update(['is_default' => false, 'is_active' => false]);
-        }
     }
 
     private function normalizeDecimal(string $value): string
