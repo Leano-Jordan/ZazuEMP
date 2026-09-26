@@ -82,6 +82,10 @@
         </div>
     </section>
 
+    <section class="mb-5">
+        @include('work.attachments')
+    </section>
+
     <div class="zazu-detail-grid">
         <div class="zazu-detail-stack">
             <section class="zazu-panel">
