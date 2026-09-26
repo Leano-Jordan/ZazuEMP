@@ -142,12 +142,12 @@
                                     data-user-trigger
                                     aria-expanded="false"
                                     aria-controls="zazu-user-menu"
-                                    aria-label="Open account menu"
+                                    aria-label="Open account menu for {{ '@'.auth()->user()->username }}"
                                 >
                                     <x-profile-avatar :name="auth()->user()->name" :path="auth()->user()->profile_photo_path" media-type="user" :media-id="auth()->id()" size="sm" />
                                     <span class="zazu-user-identity">
-                                        <strong>{{ auth()->user()->name }}</strong>
-                                        <span>Account</span>
+                                        <strong>{{ '@'.auth()->user()->username }}</strong>
+                                        <span>{{ auth()->user()->name }}</span>
                                     </span>
                                     <svg class="zazu-user-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="m7 9 5 5 5-5"></path></svg>
                                 </button>
@@ -156,7 +156,8 @@
                                     <div class="zazu-user-popover-head">
                                         <x-profile-avatar :name="auth()->user()->name" :path="auth()->user()->profile_photo_path" media-type="user" :media-id="auth()->id()" size="md" />
                                         <div class="min-w-0">
-                                            <strong class="zazu-user-popover-name">{{ auth()->user()->name }}</strong>
+                                            <strong class="zazu-user-popover-name">{{ '@'.auth()->user()->username }}</strong>
+                                            <span class="zazu-user-popover-email">{{ auth()->user()->name }}</span>
                                             <span class="zazu-user-popover-email">{{ auth()->user()->email }}</span>
                                         </div>
                                     </div>
