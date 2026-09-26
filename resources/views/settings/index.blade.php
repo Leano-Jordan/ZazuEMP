@@ -68,7 +68,7 @@
                     <div class="zazu-branding-preview">
                         <div class="zazu-branding-preview-media zazu-branding-dashboard">
                             @if ($business->dashboard_image_path)
-                                <img src="{{ Storage::disk('public')->url($business->dashboard_image_path) }}" alt="">
+                                <img src="{{ route('business.media', ['type' => 'dashboard']) }}" alt="">
                             @else
                                 <span>Dashboard image</span>
                             @endif
