@@ -19,7 +19,7 @@ class LoginPresentationTest extends TestCase
             ->assertSee('name="identifier"', false)
             ->assertSee('Username or email', false)
             ->assertSee('Forgot password?', false)
-            ->assertSee("route('password.request')", false)
+            ->assertSee(route('password.request'), false)
             ->assertSee('zazu-auth-subtitle', false)
             ->assertSee('catering', false);
     }
