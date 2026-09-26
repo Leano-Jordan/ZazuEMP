@@ -14,6 +14,7 @@ class RegisterBusiness
         return DB::transaction(function () use ($data) {
             $user = User::create([
                 'name' => trim($data['name']),
+                'username' => strtolower(trim($data['username'])),
                 'email' => strtolower(trim($data['email'])),
                 'password' => $data['password'],
             ]);
