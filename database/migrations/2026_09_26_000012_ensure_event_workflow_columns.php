@@ -31,21 +31,7 @@ return new class extends Migration
 
     public function down(): void
     {
-        if (!Schema::hasTable('events')) {
-            return;
-        }
-
-        if (Schema::hasColumn('events', 'event_night_contact_id')) {
-            Schema::table('events', function (Blueprint $table) {
-                $table->dropForeign(['event_night_contact_id']);
-                $table->dropColumn('event_night_contact_id');
-            });
-        }
-
-        if (Schema::hasColumn('events', 'deleted_at')) {
-            Schema::table('events', function (Blueprint $table) {
-                $table->dropSoftDeletes();
-            });
-        }
+        // This repair/ensure migration may have found columns that were created by
+        // another migration. It is intentionally non-destructive on rollback.
     }
 };
