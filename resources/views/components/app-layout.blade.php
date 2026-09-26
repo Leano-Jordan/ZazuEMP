@@ -4,7 +4,8 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
     <meta name="theme-color" content="#0d4f43">
-    <title>{{ $title ?? 'Zazu' }} · Zazu EMP</title>
+    @php($business = auth()->user()?->businesses()->first())
+    <title>{{ $title ?? 'Zazu' }} · {{ $business?->name ?? 'Zazu EMP' }}</title>
     <script>
         (() => {
             const saved = localStorage.getItem('zazu-theme');
@@ -17,12 +18,17 @@
     </script>
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
-<body>
+<body class="{{ $business?->wallpaper_path ? 'zazu-has-wallpaper' : '' }}" @if($business?->wallpaper_path) style="--zazu-wallpaper: url('{{ e(Storage::disk('public')->url($business->wallpaper_path)) }}')" @endif>
     <a class="zazu-skip-link" href="#main-content">Skip to main content</a>
     <div class="zazu-shell">
         <aside class="zazu-sidebar">
             <div class="zazu-brand">
-                <a href="{{ route('work.index') }}" class="zazu-brand-word">zazu<span class="zazu-brand-dot">.</span></a>
+                <a href="{{ route('dashboard') }}" class="zazu-brand-link">
+                    @if ($business?->logo_path)
+                        <img src="{{ Storage::disk('public')->url($business->logo_path) }}" alt="{{ $business->name }} logo" class="zazu-brand-logo">
+                    @endif
+                    <span class="zazu-brand-word">{{ $business?->name ?? 'zazu' }}</span>
+                </a>
             </div>
 
             <nav class="zazu-nav" aria-label="Primary">
@@ -105,7 +111,7 @@
 
             <div class="zazu-sidebar-footer">
                 <div class="zazu-footer-card">
-                    <div class="zazu-footer-title">Zazu EMP</div>
+                    <div class="zazu-footer-title">{{ $business?->name ?? 'Zazu EMP' }}</div>
                     <div class="zazu-footer-copy">Event operations workspace</div>
                 </div>
             </div>
@@ -115,7 +121,7 @@
             <header class="zazu-topbar">
                 <div class="zazu-topbar-inner">
                     <div>
-                        <div class="zazu-eyebrow">Zazu EMP</div>
+                        <div class="zazu-eyebrow">{{ $business?->name ?? 'Zazu EMP' }}</div>
                         <h1 class="zazu-page-title">{{ $heading ?? $title ?? 'Workspace' }}</h1>
                     </div>
 
