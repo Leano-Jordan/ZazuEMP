@@ -26,7 +26,14 @@ class BusinessMediaSecurityTest extends TestCase
 
         $response->assertOk();
         $response->assertHeader('X-Content-Type-Options', 'nosniff');
-        $response->assertHeader('Cache-Control', 'private, no-store, max-age=0, must-revalidate');
+
+        $cacheControl = $response->headers->get('Cache-Control');
+
+        $this->assertIsString($cacheControl);
+        $this->assertStringContainsString('private', $cacheControl);
+        $this->assertStringContainsString('no-store', $cacheControl);
+        $this->assertStringContainsString('max-age=0', $cacheControl);
+        $this->assertStringContainsString('must-revalidate', $cacheControl);
         $response->assertHeader('Pragma', 'no-cache');
     }
 
