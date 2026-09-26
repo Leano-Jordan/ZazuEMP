@@ -58,7 +58,7 @@ class BusinessCapabilityTest extends TestCase
         $this->assertDatabaseHas('business_capabilities', [
             'id' => $capability->id,
             'name' => 'Premium Chair Hire',
-            'category' => 'Equipment Hire',
+            'category' => 'Furniture & equipment',
         ]);
     }
 }
