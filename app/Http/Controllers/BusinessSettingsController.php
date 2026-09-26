@@ -6,6 +6,7 @@ use App\Models\Business;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Str;
 use Illuminate\View\View;
 
 class BusinessSettingsController extends Controller
@@ -64,9 +65,20 @@ class BusinessSettingsController extends Controller
 
     private function business(Request $request): Business
     {
-        $business = $request->user()?->businesses()->first();
+        $user = $request->user();
+        abort_unless($user, 401);
 
-        abort_unless($business, 403, 'No business is assigned to this account.');
+        $business = $user->businesses()->first();
+
+        if (!$business) {
+            $business = Business::create([
+                'name' => trim($user->name) . "'s Business",
+                'slug' => Str::slug($user->name) . '-' . Str::lower(Str::random(6)),
+                'status' => 'active',
+            ]);
+
+            $business->users()->attach($user->id, ['role' => 'owner']);
+        }
 
         return $business;
     }
