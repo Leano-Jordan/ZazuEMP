@@ -587,3 +587,17 @@ Regression rule:
 - Current high-priority risks not yet cleared remain: purchasing state machine/GRN, receiving and payment idempotency, inventory movement idempotency, parent/child business invariants, audit trail, backup/restore/export, granular permissions, notification/reminder workflows, migration-upgrade evidence and browser/E2E verification.
 - Current expansion code is committed directly to main; final CI/runtime verification is still required before declaring this expansion green.
 
+
+
+### Invoice/document evidence standard — extended 2026-09-27
+
+- A SARS-facing invoice must be self-contained at issue time. Do not rely on a live customer, quote or business record to reconstruct an old invoice later.
+- Invoices now snapshot supplier identity, supplier tax/VAT identity, recipient identity, recipient billing address and recipient tax/VAT identity, plus immutable invoice line items.
+- Invoice lines must preserve description, quantity, unit, unit price and line total. Direct invoices calculate the subtotal from lines rather than accepting a free-standing subtotal as the source of truth.
+- A VAT-registered business may use “Tax Invoice” presentation; a non-VAT-registered business must not be presented as issuing a VAT tax invoice merely because an invoice exists.
+- Customer records now support optional legal/billing name, registration number, tax number, VAT number and billing address so recipient information can be reused correctly.
+- Event/service location must never silently be treated as the customer's billing address.
+- Printable invoice output must show the supplier identity, recipient identity where recorded, issue/due dates, serial/number, line details, subtotal, applicable tax treatment/rate, tax and total, while clearly remaining a business-prepared document.
+- Historical quote and invoice snapshots are evidence records. Later edits to business/customer/tax settings must not rewrite their commercial or tax history.
+- Compliance evidence files remain private and business-scoped; generated packs are preparation aids, not official authority forms or legal certificates.
+- Error surfaces must remain asset-independent enough to render when the frontend build is unavailable; unexpected 5xx errors should still expose a traceable Zazu request reference without leaking technical internals.
