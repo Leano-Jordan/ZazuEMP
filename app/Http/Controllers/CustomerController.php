@@ -70,7 +70,7 @@ class CustomerController extends Controller
     {
         $customer->load([
             'contacts',
-            'events' => fn ($query) => $query->latest('event_date')->latest(),
+            'events' => fn ($query) => $query->withTrashed()->latest('event_date')->latest(),
         ]);
 
         return view('customers.show', compact('customer'));
