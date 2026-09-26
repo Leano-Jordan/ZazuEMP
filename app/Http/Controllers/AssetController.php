@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Asset;
 use App\Models\BusinessCapability;
 use App\Models\Event;
+use App\Models\EventRequirement;
 use App\Support\CurrentBusiness;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -17,7 +18,13 @@ class AssetController extends Controller
         $businessId=app(CurrentBusiness::class)->id($request->user());
         $assets=Asset::where('business_id',$businessId)->with(['capability','allocations'=>fn($q)=>$q->where('status','allocated')->with('event')])->orderBy('name')->get();
         $events=Event::where('business_id',$businessId)->whereNotIn('status',['completed','cancelled'])->orderByDesc('event_date')->get();
-        return view('assets.index',compact('assets','events'));
+        $demand = EventRequirement::query()
+            ->whereHas('event', fn ($query) => $query->where('business_id', $businessId)->whereNotIn('status', ['completed', 'cancelled']))
+            ->whereHas('capability', fn ($query) => $query->where('business_id', $businessId)->where('capability_type', 'rental'))
+            ->with('event.customer', 'capability')
+            ->orderBy('created_at')
+            ->get();
+        return view('assets.index',compact('assets','events','demand'));
     }
 
     public function create(Request $request): View
