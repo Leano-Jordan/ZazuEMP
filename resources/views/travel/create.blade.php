@@ -2,7 +2,7 @@
     <x-slot:title>Add travel calculation · {{ $event->name }}</x-slot:title>
     <x-slot:heading>Travel & Costing</x-slot:heading>
     <x-slot:headerAction>
-        <a href="{{ route('work.travel.index', $event) }}" class="zazu-btn zazu-btn-ghost">← Travel</a>
+        <a href="{{ route('work.travel.index', $event) }}" class="zazu-btn zazu-btn-ghost">Job workspace</a>
     </x-slot:headerAction>
 
     <section class="zazu-command-band">
