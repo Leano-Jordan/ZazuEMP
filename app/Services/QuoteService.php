@@ -67,23 +67,6 @@ class QuoteService
                 'notes' => $latest->notes,
             ]);
 
-            $prices = [];
-
-            foreach ($requirements as $requirement) {
-                $previousItem = $previousItems->get($requirement->id);
-                $savedPrice = $previousItem?->unit_price;
-
-                if (
-                    $savedPrice === null &&
-                    $requirement->capability?->default_price !== null &&
-                    $requirement->capability->currency === $lockedQuote->currency
-                ) {
-                    $savedPrice = $requirement->capability->default_price;
-                }
-
-                $prices[$requirement->id] = $savedPrice ?? '0.00';
-            }
-
             $previousRequirementIds = $previousItems->keys()
                 ->mapWithKeys(fn ($id) => [(int) $id => true])
                 ->all();
@@ -99,10 +82,15 @@ class QuoteService
                     'event_requirement_id' => $requirement->id,
                     'capability_id' => $requirement->capability_id,
                     'description' => $requirement->description,
-                    'quantity' => $previousItem->quantity,
+                    'quantity' => $requirement->quantity,
                     'unit' => $requirement->unit,
                     'unit_price' => $previousItem->unit_price,
-                    'line_total' => $previousItem->line_total,
+                    'line_total' => Money::fromCents(
+                        Money::multiplyQuantityByPrice(
+                            Money::toHundredths((string) $requirement->quantity),
+                            Money::toCents((string) $previousItem->unit_price)
+                        )
+                    ),
                     'pricing_basis' => $requirement->capability?->pricing_basis,
                     'source_snapshot' => $previousItem->source_snapshot,
                 ]);
