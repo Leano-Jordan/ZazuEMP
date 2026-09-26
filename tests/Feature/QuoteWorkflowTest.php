@@ -165,7 +165,7 @@ class QuoteWorkflowTest extends TestCase
         $this->assertCount(2, $version->items);
         $this->assertSame('1000.00', (string) $version->subtotal);
         $this->assertSame('1000.00', (string) $version->total);
-        $this->assertSame('10.00', (string) $version->items->firstWhere('event_requirement_id', $first->id)->line_total);
+        $this->assertSame('1000.00', (string) $version->items->firstWhere('event_requirement_id', $first->id)->line_total);
         $this->assertSame('0.00', (string) $version->items->firstWhere('event_requirement_id', $second->id)->line_total);
     }
 
