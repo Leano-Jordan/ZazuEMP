@@ -36,7 +36,7 @@
                     <div class="mt-5 grid gap-4">
                         <label class="zazu-field">
                             <span class="zazu-label">Profile photo <span class="font-normal text-[var(--zazu-faint)]">(optional)</span></span>
-                            <input type="file" name="profile_photo" accept=".jpg,.jpeg,.png,.webp,image/jpeg,image/png,image/webp" class="zazu-input">
+                            <input type="file" name="profile_photo" accept=".jpg,.jpeg,.png,.webp,image/jpeg,image/png,image/webp" class="zazu-file-input" data-file-input>
                             <span class="mt-1 block text-[10px] leading-5 text-[var(--zazu-faint)]">JPEG, PNG or WebP, up to 2 MB.</span>
                             @error('profile_photo')<span class="zazu-field-error">{{ $message }}</span>@enderror
                         </label>
