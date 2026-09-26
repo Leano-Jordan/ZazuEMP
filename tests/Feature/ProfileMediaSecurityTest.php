@@ -41,8 +41,6 @@ class ProfileMediaSecurityTest extends TestCase
 
     public function test_customer_profile_media_cannot_cross_business_boundary(): void
     {
-        $this->signInAsOwner();
-
         Storage::fake('local');
 
         $otherBusiness = Business::create([
@@ -57,6 +55,8 @@ class ProfileMediaSecurityTest extends TestCase
             'name' => 'Other Customer',
             'profile_photo_path' => 'profile-photos/customers/other.jpg',
         ]);
+
+        $this->signInAsOwner();
 
         Storage::disk('local')->put($customer->profile_photo_path, 'other-image');
 
