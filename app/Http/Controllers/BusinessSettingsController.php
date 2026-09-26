@@ -171,11 +171,6 @@ class BusinessSettingsController extends Controller
     {
         $rate = $this->normalizeDecimal($requestedRate);
 
-        TaxRate::query()
-            ->where('business_id', $business->id)
-            ->where('tax_type', 'vat')
-            ->update(['is_default' => false, 'is_active' => false]);
-
         $defaultCode = match ($profile->vat_status) {
             'registered' => 'VAT_STANDARD',
             'exempt' => 'VAT_EXEMPT',
@@ -194,28 +189,33 @@ class BusinessSettingsController extends Controller
             default => 'out_of_scope',
         };
 
-        $existing = TaxRate::query()
+        $currentDefaults = TaxRate::query()
+            ->where('business_id', $business->id)
+            ->where('tax_type', 'vat')
+            ->where('is_default', true)
+            ->where('effective_from', '<', $effectiveFrom)
+            ->get();
+
+        foreach ($currentDefaults as $currentDefault) {
+            $currentDefault->update([
+                'effective_to' => $effectiveFrom->copy()->subDay()->toDateString(),
+                'is_default' => false,
+                'is_active' => false,
+            ]);
+        }
+
+        $sameDay = TaxRate::query()
             ->where('business_id', $business->id)
             ->where('code', $defaultCode)
-            ->whereNull('effective_to')
-            ->latest('effective_from')
+            ->whereDate('effective_from', $effectiveFrom->toDateString())
             ->first();
 
-        if ($existing && $existing->effective_from->equalTo($effectiveFrom)) {
-            $existing->update([
+        if ($sameDay) {
+            $sameDay->update([
                 'name' => $defaultName,
                 'treatment' => $defaultTreatment,
                 'rate' => $defaultRate,
-                'is_default' => true,
-                'is_active' => true,
-                'source_reference' => $profile->vat_status === 'registered'
-                    ? 'SARS VAT guidance; reviewed by Zazu configuration'
-                    : 'Business tax profile',
-            ]);
-        } elseif ($existing && (string) $existing->rate === $defaultRate && $existing->effective_from < $effectiveFrom) {
-            $existing->update([
-                'name' => $defaultName,
-                'treatment' => $defaultTreatment,
+                'effective_to' => null,
                 'is_default' => true,
                 'is_active' => true,
                 'source_reference' => $profile->vat_status === 'registered'
@@ -223,14 +223,6 @@ class BusinessSettingsController extends Controller
                     : 'Business tax profile',
             ]);
         } else {
-            if ($existing && $existing->effective_from < $effectiveFrom) {
-                $existing->update([
-                    'effective_to' => $effectiveFrom->copy()->subDay()->toDateString(),
-                    'is_default' => false,
-                    'is_active' => false,
-                ]);
-            }
-
             TaxRate::create([
                 'business_id' => $business->id,
                 'name' => $defaultName,
@@ -256,6 +248,7 @@ class BusinessSettingsController extends Controller
             $rateRecord = TaxRate::query()
                 ->where('business_id', $business->id)
                 ->where('code', $supportRate['code'])
+                ->whereDate('effective_from', $effectiveFrom->toDateString())
                 ->first();
 
             if (!$rateRecord) {
@@ -275,11 +268,9 @@ class BusinessSettingsController extends Controller
                 $rateRecord->update([
                     'is_active' => $profile->vat_status !== 'not_registered',
                     'is_default' => false,
-                    'effective_from' => min($rateRecord->effective_from->toDateString(), $effectiveFrom->toDateString()),
                 ]);
             }
         }
-
     }
 
     private function normalizeDecimal(string $value): string
