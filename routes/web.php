@@ -95,6 +95,7 @@ Route::middleware(['auth', 'business.context'])->group(function () {
         Route::get('/settings', [BusinessSettingsController::class, 'edit'])->name('settings.index');
         Route::put('/settings', [BusinessSettingsController::class, 'update'])->name('settings.update');
         Route::get('/settings/compliance', [ComplianceDocumentController::class, 'index'])->name('settings.compliance');
+        Route::get('/settings/compliance/pack', [ComplianceDocumentController::class, 'pack'])->name('settings.compliance.pack');
         Route::post('/settings/compliance', [ComplianceDocumentController::class, 'store'])->name('settings.compliance.store');
         Route::get('/settings/compliance/{document}/download', [ComplianceDocumentController::class, 'download'])->name('settings.compliance.download');
         Route::delete('/settings/compliance/{document}', [ComplianceDocumentController::class, 'destroy'])->name('settings.compliance.destroy');
