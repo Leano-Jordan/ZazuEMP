@@ -21,12 +21,12 @@
                     <div class="zazu-form-section-copy">This name appears in the application shell and business records.</div>
                 </div>
                 <div class="zazu-form-grid">
-                    <label class="zazu-field">
+                    <label class="zazu-field zazu-field-medium">
                         <span class="zazu-label">Business name <span class="zazu-required">*</span></span>
                         <input name="name" value="{{ old('name', $business->name) }}" class="zazu-input" required>
                         @error('name')<span class="zazu-field-error">{{ $message }}</span>@enderror
                     </label>
-                    <label class="zazu-field">
+                    <label class="zazu-field zazu-field-narrow">
                         <span class="zazu-label">Default currency <span class="zazu-required">*</span></span>
                         <select name="currency" class="zazu-select" required>
                             @foreach ($currencies as $code => $label)
