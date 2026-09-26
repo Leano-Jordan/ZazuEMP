@@ -254,13 +254,7 @@
                     @endphp
                     <div class="zazu-toast zazu-toast-{{ $toastType }}" role="{{ $toastType === 'error' ? 'alert' : 'status' }}" data-zazu-toast>
                         <div class="zazu-toast-icon" aria-hidden="true">
-                            @if ($toastType === 'success')
-                                ✓
-                            @elseif ($toastType === 'error')
-                                !
-                            @else
-                                i
-                            @endif
+                            @if ($toastType === 'success') ✓ @elseif ($toastType === 'error') ! @else i @endif
                         </div>
                         <div class="zazu-toast-content">
                             <div class="zazu-toast-title">{{ $toastTitle }}</div>
