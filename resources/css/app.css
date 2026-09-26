@@ -3457,3 +3457,17 @@ body.zazu-has-wallpaper .zazu-content > * {
         grid-template-columns: 1fr;
     }
 }
+
+
+.zazu-static-field {
+    min-height: 44px;
+    display: flex;
+    align-items: center;
+    padding: 0 13px;
+    border: 1px solid var(--zazu-border);
+    border-radius: 10px;
+    background: var(--zazu-field);
+    color: var(--zazu-ink-2);
+    font-size: 12px;
+    font-weight: 650;
+}
