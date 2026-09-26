@@ -148,7 +148,7 @@
                         <span class="zazu-label">Business activity flags</span>
                         <div class="flex flex-wrap gap-4 mt-2">
                             @foreach(['food_handling'=>'Handles food','employees'=>'Employs staff','government_supply'=>'Supplies government','tendering'=>'Prepares tenders','regulated_activity'=>'Other regulated activity'] as $flag => $label)
-                                <label class="zazu-check-row"><input type="checkbox" name="{{ $flag }}" value="1" @checked(old($flag, $business->taxProfile?->activity_flags[$flag] ?? false))><span>{{ $label }}</span></label>
+                                <label class="zazu-check-row"><input type="checkbox" name="{{ $flag }}" value="1" @checked(old($flag, ($business->taxProfile?->activity_flags ?? [])[$flag] ?? false))><span>{{ $label }}</span></label>
                             @endforeach
                         </div>
                     </div>
