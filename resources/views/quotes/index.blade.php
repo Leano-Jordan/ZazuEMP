@@ -5,8 +5,8 @@
     <section class="zazu-command-band">
         <div>
             <div class="zazu-eyebrow">Commercial</div>
-            <h2 class="zazu-command-title">Quote centre</h2>
-            <p class="zazu-command-copy">Every quote belongs to a Work record and carries its own version history. Pricing inputs are captured as historical snapshots.</p>
+            <h2 class="zazu-command-title">Quotes</h2>
+            <p class="zazu-command-copy">Quotes are linked to Work and keep their revision history.</p>
         </div>
         <div class="zazu-command-meta">
             <div class="zazu-command-meta-label">Quotes</div>
@@ -18,7 +18,7 @@
         <div class="zazu-card-header grid grid-cols-[minmax(0,1fr)_auto_auto_auto] gap-4">
             <div>
                 <div class="zazu-card-title">Recent quotes</div>
-                <div class="zazu-card-description">Open a quote to inspect its current revision and history.</div>
+                <div class="zazu-card-description">Open a quote to view its latest revision and history.</div>
             </div>
             <span class="zazu-eyebrow self-center">Version</span>
             <span class="zazu-eyebrow self-center">Status</span>
