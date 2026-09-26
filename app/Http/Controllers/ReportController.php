@@ -2,7 +2,6 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Business;
 use App\Models\Event;
 use App\Models\EventCost;
 use App\Models\EventPreparationItem;
