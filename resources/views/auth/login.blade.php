@@ -111,6 +111,7 @@
         </section>
 
         <aside class="zazu-auth-visual zazu-login-visual" aria-label="Zazu workspace overview">
+            <img src="https://raw.githubusercontent.com/Leano-Jordan/ZazuEMP/main/images/catering.webp" alt="" class="zazu-login-hero-image" aria-hidden="true">
             <div class="zazu-login-visual-scene" aria-hidden="true">
                 <div class="zazu-login-window"></div>
                 <div class="zazu-login-table"></div>
