@@ -2,80 +2,116 @@
     <x-slot:title>Create work</x-slot:title>
     <x-slot:heading>Create work</x-slot:heading>
     <x-slot:headerAction>
-        <a href="{{ route('work.index') }}" class="text-sm font-medium text-slate-500 hover:text-slate-900">← Work</a>
+        <a href="{{ route('work.index') }}" class="zazu-btn zazu-btn-ghost">← Work</a>
     </x-slot:headerAction>
 
     @if ($customers->isEmpty())
-        <div class="rounded-2xl border border-amber-200 bg-amber-50 p-6">
-            <h2 class="font-semibold text-amber-950">Add a customer first</h2>
-            <p class="mt-1 text-sm text-amber-800">A work record starts from a customer. Once you have one, it can become an event/job workspace.</p>
-            <a href="{{ route('customers.create') }}" class="mt-4 inline-flex rounded-xl bg-slate-900 px-4 py-2.5 text-sm font-semibold text-white">Add customer</a>
-        </div>
+        <section class="zazu-panel">
+            <div class="zazu-panel-title">A customer is needed first</div>
+            <div class="zazu-panel-copy">A work record starts from a customer. Create one, then return here to build the event or job workspace.</div>
+            <a href="{{ route('customers.create') }}" class="zazu-btn zazu-btn-primary mt-4">Add customer</a>
+        </section>
     @else
-        <form method="POST" action="{{ route('work.store') }}" class="space-y-6">
+        <section class="zazu-command-band">
+            <div>
+                <div class="zazu-eyebrow">Operations / New workspace</div>
+                <h2 class="zazu-command-title">Create work</h2>
+                <p class="zazu-command-copy">Capture the core event or job facts now. Requirements, quotes, travel and costs can attach to this workspace later.</p>
+            </div>
+        </section>
+
+        <form method="POST" action="{{ route('work.store') }}">
             @csrf
 
-            <section class="rounded-2xl border border-slate-200 bg-white p-5 sm:p-6">
-                <div class="mb-5">
-                    <h2 class="font-semibold text-slate-950">Work details</h2>
-                    <p class="mt-1 text-sm text-slate-500">Start the operational record. Requirements, quotes, travel and costs attach later.</p>
+            <div class="zazu-editor">
+                <div class="zazu-form-main">
+                    <section class="zazu-form-section">
+                        <div class="zazu-form-section-head">
+                            <div class="zazu-form-section-title">Core work details</div>
+                            <div class="zazu-form-section-copy">Start with the relationship, name and timing of the work.</div>
+                        </div>
+
+                        <div class="zazu-form-grid">
+                            <label class="zazu-field zazu-field-wide">
+                                <span class="zazu-label">Customer</span>
+                                <select id="customer_id" name="customer_id" required class="zazu-select">
+                                    <option value="">Select customer</option>
+                                    @foreach ($customers as $customer)
+                                        <option value="{{ $customer->id }}" @selected(old('customer_id', $selectedCustomerId) == $customer->id)>{{ $customer->name }}</option>
+                                    @endforeach
+                                </select>
+                                @error('customer_id')<span class="zazu-field-error">{{ $message }}</span>@enderror
+                            </label>
+
+                            <label class="zazu-field zazu-field-wide">
+                                <span class="zazu-label">Work / event name</span>
+                                <input name="name" value="{{ old('name') }}" required class="zazu-input" placeholder="e.g. Mokoena Wedding">
+                                @error('name')<span class="zazu-field-error">{{ $message }}</span>@enderror
+                            </label>
+
+                            <label class="zazu-field">
+                                <span class="zazu-label">Type</span>
+                                <input name="event_type" value="{{ old('event_type') }}" class="zazu-input" placeholder="Wedding, funeral, hire...">
+                                @error('event_type')<span class="zazu-field-error">{{ $message }}</span>@enderror
+                            </label>
+
+                            <label class="zazu-field">
+                                <span class="zazu-label">Event date <span class="zazu-required">*</span></span>
+                                <input type="date" name="event_date" value="{{ old('event_date') }}" required class="zazu-input">
+                                @error('event_date')<span class="zazu-field-error">{{ $message }}</span>@enderror
+                            </label>
+
+                            <label class="zazu-field zazu-field-wide">
+                                <span class="zazu-label">Event-day contact <span class="zazu-required">*</span><span class="font-normal text-[var(--zazu-faint)]"> optional</span></span>
+                                <select id="event_day_contact_id" name="event_day_contact_id" class="zazu-select">
+                                    <option value="">Select a customer first</option>
+                                </select>
+                                @error('event_day_contact_id')<span class="zazu-field-error">{{ $message }}</span>@enderror
+                            </label>
+                        </div>
+                    </section>
+
+                    <section class="zazu-form-section">
+                        <div class="zazu-form-section-head">
+                            <div class="zazu-form-section-title">Operational context</div>
+                            <div class="zazu-form-section-copy">Useful information the team may need before the requirements layer is built.</div>
+                        </div>
+
+                        <div class="zazu-form-grid">
+                            <label class="zazu-field zazu-field-wide">
+                                <span class="zazu-label">Event location</span>
+                                <input name="event_address" value="{{ old('event_address') }}" class="zazu-input" placeholder="Address or venue">
+                                @error('event_address')<span class="zazu-field-error">{{ $message }}</span>@enderror
+                            </label>
+
+                            <label class="zazu-field zazu-field-wide">
+                                <span class="zazu-label">Notes</span>
+                                <textarea name="notes" rows="5" class="zazu-textarea" placeholder="Important context, instructions or customer notes">{{ old('notes') }}</textarea>
+                                @error('notes')<span class="zazu-field-error">{{ $message }}</span>@enderror
+                            </label>
+                        </div>
+                    </section>
+
+                    <div class="zazu-actionbar">
+                        <a href="{{ route('work.index') }}" class="zazu-btn zazu-btn-ghost">Cancel</a>
+                        <button class="zazu-btn zazu-btn-primary">Create workspace</button>
+                    </div>
                 </div>
 
-                <div class="grid gap-4 sm:grid-cols-2">
-                    <label class="block sm:col-span-2">
-                        <span class="text-sm font-medium text-slate-700">Customer</span>
-                        <select id="customer_id" name="customer_id" required class="mt-2 w-full rounded-xl border border-slate-300 bg-white px-3.5 py-3 text-sm outline-none focus:border-sky-500 focus:ring-2 focus:ring-sky-100">
-                            <option value="">Select customer</option>
-                            @foreach ($customers as $customer)
-                                <option value="{{ $customer->id }}" @selected(old('customer_id', $selectedCustomerId) == $customer->id)>{{ $customer->name }}</option>
-                            @endforeach
-                        </select>
-                        @error('customer_id')<span class="mt-1 block text-xs text-rose-600">{{ $message }}</span>@enderror
-                    </label>
+                <aside class="zazu-form-aside">
+                    <div class="zazu-context-card">
+                        <div class="zazu-context-title">Workspace flow</div>
+                        <div class="zazu-context-copy">This record is deliberately small at creation time. Each later layer should add operational value instead of turning this into one giant form.</div>
 
-                    <label class="block sm:col-span-2">
-                        <span class="text-sm font-medium text-slate-700">Work / event name</span>
-                        <input name="name" value="{{ old('name') }}" required class="mt-2 w-full rounded-xl border border-slate-300 px-3.5 py-3 text-sm outline-none focus:border-sky-500 focus:ring-2 focus:ring-sky-100" placeholder="e.g. Mokoena Wedding">
-                        @error('name')<span class="mt-1 block text-xs text-rose-600">{{ $message }}</span>@enderror
-                    </label>
-
-                    <label class="block">
-                        <span class="text-sm font-medium text-slate-700">Type</span>
-                        <input name="event_type" value="{{ old('event_type') }}" class="mt-2 w-full rounded-xl border border-slate-300 px-3.5 py-3 text-sm outline-none focus:border-sky-500 focus:ring-2 focus:ring-sky-100" placeholder="Wedding, funeral, hire, catering...">
-                        @error('event_type')<span class="mt-1 block text-xs text-rose-600">{{ $message }}</span>@enderror
-                    </label>
-
-                    <label class="block">
-                        <span class="text-sm font-medium text-slate-700">Date <span class="text-rose-500">*</span></span>
-                        <input type="date" name="event_date" value="{{ old('event_date') }}" required class="mt-2 w-full rounded-xl border border-slate-300 px-3.5 py-3 text-sm outline-none focus:border-sky-500 focus:ring-2 focus:ring-sky-100">
-                        @error('event_date')<span class="mt-1 block text-xs text-rose-600">{{ $message }}</span>@enderror
-                    </label>
-
-                    <label class="block sm:col-span-2">
-                        <span class="text-sm font-medium text-slate-700">Event-day contact <span class="font-normal text-slate-400">(optional)</span></span>
-                        <select id="event_day_contact_id" name="event_day_contact_id" class="mt-2 w-full rounded-xl border border-slate-300 bg-white px-3.5 py-3 text-sm outline-none focus:border-sky-500 focus:ring-2 focus:ring-sky-100">
-                            <option value="">Select a customer first</option>
-                        </select>
-                        @error('event_day_contact_id')<span class="mt-1 block text-xs text-rose-600">{{ $message }}</span>@enderror
-                    </label>
-
-                    <label class="block sm:col-span-2">
-                        <span class="text-sm font-medium text-slate-700">Event location</span>
-                        <input name="event_address" value="{{ old('event_address') }}" class="mt-2 w-full rounded-xl border border-slate-300 px-3.5 py-3 text-sm outline-none focus:border-sky-500 focus:ring-2 focus:ring-sky-100" placeholder="Address or venue">
-                        @error('event_address')<span class="mt-1 block text-xs text-rose-600">{{ $message }}</span>@enderror
-                    </label>
-
-                    <label class="block sm:col-span-2">
-                        <span class="text-sm font-medium text-slate-700">Notes</span>
-                        <textarea name="notes" rows="4" class="mt-2 w-full rounded-xl border border-slate-300 px-3.5 py-3 text-sm outline-none focus:border-sky-500 focus:ring-2 focus:ring-sky-100">{{ old('notes') }}</textarea>
-                        @error('notes')<span class="mt-1 block text-xs text-rose-600">{{ $message }}</span>@enderror
-                    </label>
-                </div>
-            </section>
-
-            <div class="flex justify-end gap-3">
-                <a href="{{ route('work.index') }}" class="rounded-xl px-4 py-2.5 text-sm font-semibold text-slate-600 hover:bg-slate-100">Cancel</a>
-                <button class="rounded-xl bg-slate-900 px-5 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-slate-800">Create work</button>
+                        <div class="zazu-step-list">
+                            <div class="zazu-step"><span class="zazu-step-dot"></span><div><div class="zazu-step-title">Work</div><div class="zazu-step-copy">Core event or job record</div></div></div>
+                            <div class="zazu-step"><span class="zazu-step-dot"></span><div><div class="zazu-step-title">Requirements</div><div class="zazu-step-copy">Capabilities and quantities</div></div></div>
+                            <div class="zazu-step"><span class="zazu-step-dot"></span><div><div class="zazu-step-title">Quote</div><div class="zazu-step-copy">Versioned commercial offer</div></div></div>
+                            <div class="zazu-step"><span class="zazu-step-dot"></span><div><div class="zazu-step-title">Preparation</div><div class="zazu-step-copy">Buying and readiness</div></div></div>
+                            <div class="zazu-step"><span class="zazu-step-dot"></span><div><div class="zazu-step-title">Execution</div><div class="zazu-step-copy">Delivery and accountability</div></div></div>
+                        </div>
+                    </div>
+                </aside>
             </div>
         </form>
 
@@ -90,9 +126,7 @@
                 const customer = customers.find(item => String(item.id) === customerSelect.value);
                 contactSelect.innerHTML = '<option value="">No event-day contact</option>';
 
-                if (!customer) {
-                    return;
-                }
+                if (!customer) return;
 
                 if (customer.contacts.length === 0) {
                     contactSelect.innerHTML = '<option value="">No contacts available</option>';

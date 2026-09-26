@@ -1,57 +1,60 @@
 <x-app-layout>
     <x-slot:title>Business capabilities</x-slot:title>
-    <x-slot:heading>Business capabilities</x-slot:heading>
+    <x-slot:heading>Capabilities</x-slot:heading>
     <x-slot:headerAction>
-        <a href="{{ route('capabilities.create') }}" class="inline-flex items-center rounded-xl bg-slate-900 px-4 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-slate-800">
-            Add capability
-        </a>
+        <a href="{{ route('capabilities.create') }}" class="zazu-btn zazu-btn-primary">Add capability</a>
     </x-slot:headerAction>
 
-    <div class="mb-5 rounded-2xl border border-slate-200 bg-white p-5">
-        <p class="text-xs font-semibold uppercase tracking-[0.14em] text-slate-400">Foundation</p>
-        <h2 class="mt-1 text-lg font-semibold text-slate-950">What this business can deliver</h2>
-        <p class="mt-1 max-w-2xl text-sm text-slate-500">
-            Build the reusable capability catalogue first. These entries can later be selected inside Work, requirements and quotes without duplicating the same service definition.
-        </p>
-    </div>
+    <section class="zazu-command-band">
+        <div>
+            <div class="zazu-eyebrow">Catalogue</div>
+            <h2 class="zazu-command-title">What this business can deliver</h2>
+            <p class="zazu-command-copy">Reusable services, rentals, products and packages belong here first. Workspaces can then select them without redefining the same capability.</p>
+        </div>
+        <div class="zazu-command-meta">
+            <div class="zazu-command-meta-label">Capabilities</div>
+            <div class="zazu-command-meta-value">{{ $capabilities->total() }}</div>
+        </div>
+    </section>
 
-    <div class="overflow-hidden rounded-2xl border border-slate-200 bg-white">
-        <div class="grid grid-cols-[1fr_auto_auto] gap-4 border-b border-slate-200 px-5 py-3 text-xs font-semibold uppercase tracking-wide text-slate-400">
-            <span>Capability</span>
-            <span>Pricing</span>
-            <span>Status</span>
+    <section class="zazu-card zazu-list">
+        <div class="zazu-card-header grid grid-cols-[minmax(0,1fr)_auto_auto] gap-4">
+            <div>
+                <div class="zazu-card-title">Capability catalogue</div>
+                <div class="zazu-card-description">Open an item to edit its reusable business definition.</div>
+            </div>
+            <span class="zazu-eyebrow self-center">Pricing</span>
+            <span class="zazu-eyebrow self-center">State</span>
         </div>
 
         @forelse ($capabilities as $capability)
-            <a href="{{ route('capabilities.edit', $capability) }}" class="grid grid-cols-[1fr_auto_auto] items-center gap-4 border-b border-slate-100 px-5 py-4 last:border-b-0 hover:bg-slate-50">
-                <div class="min-w-0">
+            <a href="{{ route('capabilities.edit', $capability) }}" class="zazu-list-item grid grid-cols-[minmax(0,1fr)_auto_auto]">
+                <div class="zazu-list-main">
                     <div class="flex flex-wrap items-center gap-2">
-                        <span class="font-semibold text-slate-950">{{ $capability->name }}</span>
-                        <span class="rounded-full bg-slate-100 px-2 py-0.5 text-xs font-medium text-slate-600">{{ ucfirst($capability->capability_type) }}</span>
+                        <span class="zazu-list-title">{{ $capability->name }}</span>
+                        <span class="zazu-chip zazu-chip-neutral">{{ ucfirst($capability->capability_type) }}</span>
                     </div>
-                    <p class="mt-1 text-sm text-slate-500">
+                    <div class="zazu-list-meta">
                         {{ $capability->category ?: 'Uncategorised' }}
                         @if ($capability->default_unit) · {{ $capability->default_unit }} @endif
-                    </p>
-                    @if ($capability->description)
-                        <p class="mt-1 truncate text-xs text-slate-400">{{ $capability->description }}</p>
-                    @endif
+                        @if ($capability->description) · {{ $capability->description }} @endif
+                    </div>
                 </div>
-                <span class="text-sm text-slate-600">{{ str_replace('_', ' ', ucfirst($capability->pricing_basis)) }}</span>
-                <span class="rounded-full px-2.5 py-1 text-xs font-semibold {{ $capability->is_active ? 'bg-emerald-50 text-emerald-700' : 'bg-slate-100 text-slate-500' }}">
-                    {{ $capability->is_active ? 'Active' : 'Inactive' }}
-                </span>
+                <div class="zazu-side-primary">{{ str_replace('_', ' ', ucfirst($capability->pricing_basis)) }}</div>
+                <div>
+                    <span class="zazu-chip {{ $capability->is_active ? 'zazu-chip-success' : 'zazu-chip-neutral' }}">{{ $capability->is_active ? 'Active' : 'Inactive' }}</span>
+                </div>
             </a>
         @empty
-            <div class="px-5 py-16 text-center">
-                <p class="text-lg font-semibold text-slate-950">No capabilities yet</p>
-                <p class="mx-auto mt-2 max-w-md text-sm text-slate-500">Add the services, rentals, products or packages this business can deliver.</p>
-                <a href="{{ route('capabilities.create') }}" class="mt-5 inline-flex rounded-xl bg-slate-900 px-4 py-2.5 text-sm font-semibold text-white">Add first capability</a>
+            <div class="zazu-empty">
+                <div class="zazu-empty-title">No capabilities yet</div>
+                <p class="zazu-empty-copy">Define the services, rentals, products or packages this business can deliver.</p>
+                <a href="{{ route('capabilities.create') }}" class="zazu-btn zazu-btn-primary mt-5">Add capability</a>
             </div>
         @endforelse
 
         @if ($capabilities->hasPages())
-            <div class="border-t border-slate-200 px-5 py-4">{{ $capabilities->links() }}</div>
+            <div class="border-t border-[var(--zazu-border)] px-5 py-4">{{ $capabilities->links() }}</div>
         @endif
-    </div>
+    </section>
 </x-app-layout>
