@@ -144,6 +144,7 @@
         document.querySelectorAll('[data-service-name]').forEach((input) => {
             input.addEventListener('change', () => {
                 if (!input.checked) return;
+                capabilityId.value = '';
                 description.value = input.dataset.serviceName;
                 description.readOnly = true;
                 help.textContent = 'This service name came from your service list. You can edit it if this job needs a more specific description.';
@@ -152,6 +153,7 @@
 
         document.querySelector('[data-other-service]')?.addEventListener('change', (event) => {
             if (!event.target.checked) return;
+            capabilityId.value = '';
             description.value = '';
             description.readOnly = false;
             description.focus();
