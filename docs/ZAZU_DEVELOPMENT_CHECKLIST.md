@@ -114,5 +114,19 @@ Not yet proven locally:
 
 Next execution slice: **Planning & Resources → Travel costing**, unless repository evidence changes that sequence.
 
+
+Travel costing foundation implemented in this cycle:
+- Work-specific travel calculation workspace
+- route label + provider boundary
+- origin/destination
+- distance and travel time inputs
+- configurable fuel price and vehicle consumption
+- one-way / round-trip handling
+- customer rate per kilometre
+- authoritative calculated distance, fuel litres, fuel cost and customer charge
+- historical calculation snapshot
+- contextual Work → Travel navigation
+- automated calculation coverage
+
 ## Operating rule
 Execute the smallest complete outcome that advances the current stage. Protect future scale without building speculative infrastructure. Every meaningful change ends with verification, regression checking and updated project memory.
