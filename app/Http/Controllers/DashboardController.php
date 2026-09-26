@@ -42,6 +42,8 @@ class DashboardController extends Controller
             ->limit(8)
             ->get();
 
-        return view('dashboard', compact('metrics', 'upcoming', 'business'));
+        $isOwner = app(CurrentBusiness::class)->hasRole('owner', $request->user(), $business);
+
+        return view('dashboard', compact('metrics', 'upcoming', 'business', 'isOwner'));
     }
 }
