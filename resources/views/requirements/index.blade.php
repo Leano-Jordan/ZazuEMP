@@ -2,15 +2,15 @@
     <x-slot:title>Requirements · {{ $event->name }}</x-slot:title>
     <x-slot:heading>Requirements</x-slot:heading>
     <x-slot:headerAction>
-        <a href="{{ route('work.requirements.create', $event) }}" class="zazu-btn zazu-btn-primary">Add requirement</a>
-        <a href="{{ route('work.show', $event) }}" class="zazu-btn zazu-btn-ghost">← Workspace</a>
+        <a href="{{ route('work.requirements.create', $event) }}" class="zazu-btn zazu-btn-primary">Add service</a>
+        <a href="{{ route('work.show', $event) }}" class="zazu-btn zazu-btn-ghost">Job workspace</a>
     </x-slot:headerAction>
 
     <section class="zazu-command-band">
         <div>
             <div class="zazu-eyebrow">{{ $event->reference }} · {{ $event->customer?->name ?? 'Customer' }}</div>
-            <h2 class="zazu-command-title">Delivery requirements</h2>
-            <p class="zazu-command-copy">Record the items, services and quantities needed for this work. You can link a reusable capability when it matches.</p>
+            <h2 class="zazu-command-title">Services for this job</h2>
+            <p class="zazu-command-copy">Choose what you are providing for this job. Zazu uses these services to build the quote.</p>
         </div>
         <div class="zazu-command-meta">
             <div class="zazu-command-meta-label">Requirements</div>
@@ -21,7 +21,7 @@
     <section class="zazu-card zazu-list">
         <div class="zazu-card-header">
             <div class="zazu-card-title">Requirement register</div>
-            <div class="zazu-card-description">These are the items needed for this work. Pricing is added when you create a quote.</div>
+            <div class="zazu-card-description">Add or review the services before creating the quote.</div>
         </div>
 
         @forelse ($requirements as $requirement)
@@ -46,7 +46,7 @@
             <div class="zazu-empty">
                 <div class="zazu-empty-title">No requirements yet</div>
                 <p class="zazu-empty-copy">Start translating the customer brief into concrete quantities, services, rentals or other deliverables.</p>
-                <a href="{{ route('work.requirements.create', $event) }}" class="zazu-btn zazu-btn-primary mt-5">Add first requirement</a>
+                <a href="{{ route('work.requirements.create', $event) }}" class="zazu-btn zazu-btn-primary mt-5">Choose first service</a>
             </div>
         @endforelse
     </section>
