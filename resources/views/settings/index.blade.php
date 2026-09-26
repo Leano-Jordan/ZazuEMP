@@ -1,39 +1,115 @@
 <x-app-layout>
     <x-slot:title>Settings</x-slot:title>
-    <x-slot:heading>Settings</x-slot:heading>
+    <x-slot:heading>Business settings</x-slot:heading>
 
     <section class="zazu-command-band">
-        <div><div class="zazu-eyebrow">System</div><h2 class="zazu-command-title">Business settings</h2><p class="zazu-command-copy">Manage business settings, user access and privacy here.</p></div>
-    </section>
-
-    <section class="zazu-settings-grid">
-        <div class="zazu-card zazu-setting-card">
-            <div class="zazu-card-title">Business profile</div>
-            <div class="zazu-card-description">Business identity and operational defaults.</div>
-            <span class="zazu-chip zazu-chip-neutral mt-4">Foundation</span>
-        </div>
-
-        <div class="zazu-card zazu-setting-card">
-            <div class="zazu-card-title">Staff profiles</div>
-            <div class="zazu-card-description">Staff/user records now support an optional profile photo. The authenticated profile editor and staff directory remain part of the access-control layer.</div>
-            <span class="zazu-chip zazu-chip-info mt-4">Access layer next</span>
-        </div>
-
-        <div class="zazu-card zazu-setting-card">
-            <div class="zazu-card-title">Privacy & data</div>
-            <div class="zazu-card-description">Customer names, contact details and identifiable photos are treated as personal information. Capture only what has a business purpose and apply lifecycle and access controls.</div>
-            <a href="{{ route('dashboard') }}" class="zazu-btn zazu-btn-secondary mt-4">Return to dashboard</a>
-        </div>
-
-        <div class="zazu-card zazu-setting-card">
-            <div class="zazu-card-title">Security & access</div>
-            <div class="zazu-card-description">Authentication, active business context, server-side business isolation, role permissions and protected media are required before real customer or staff data is handled in production.</div>
-            <span class="zazu-chip zazu-chip-warning mt-4">Important for live use</span>
+        <div>
+            <div class="zazu-eyebrow">Business identity</div>
+            <h2 class="zazu-command-title">Make Zazu look like your business</h2>
+            <p class="zazu-command-copy">Use your logo and artwork throughout the workspace. Images stay with this business and are used only where configured.</p>
         </div>
     </section>
 
-    <section class="mt-5 rounded-xl border border-[var(--zazu-border)] bg-[var(--zazu-surface-2)] p-5">
-        <div class="zazu-detail-label">Privacy engineering baseline</div>
-        <div class="mt-2 max-w-3xl text-[11px] leading-5 text-[var(--zazu-muted)]">POPIA-oriented controls in the current foundation include minimal collection, optional photo fields, server-side validation and lifecycle preservation. Full compliance depends on the deployed business's actual processing purposes, lawful grounds, notices, retention rules, operators and security measures.</div>
-    </section>
+    <form method="POST" action="{{ route('settings.update') }}" enctype="multipart/form-data" class="zazu-editor">
+        @csrf
+        @method('PUT')
+
+        <div class="zazu-form-main">
+            <section class="zazu-form-section">
+                <div class="zazu-form-section-head">
+                    <div class="zazu-form-section-title">Business identity</div>
+                    <div class="zazu-form-section-copy">This name appears in the application shell and business records.</div>
+                </div>
+                <div class="zazu-form-grid">
+                    <label class="zazu-field zazu-field-wide">
+                        <span class="zazu-label">Business name <span class="zazu-required">*</span></span>
+                        <input name="name" value="{{ old('name', $business->name) }}" class="zazu-input" required>
+                        @error('name')<span class="zazu-field-error">{{ $message }}</span>@enderror
+                    </label>
+                </div>
+            </section>
+
+            <section class="zazu-form-section">
+                <div class="zazu-form-section-head">
+                    <div class="zazu-form-section-title">Branding images</div>
+                    <div class="zazu-form-section-copy">Use clear images. Zazu keeps the original upload and displays it responsively.</div>
+                </div>
+
+                <div class="zazu-branding-preview-grid">
+                    <div class="zazu-branding-preview">
+                        <div class="zazu-branding-preview-media zazu-branding-logo">
+                            @if ($business->logo_path)
+                                <img src="{{ Storage::disk('public')->url($business->logo_path) }}" alt="{{ $business->name }} logo">
+                            @else
+                                <span>{{ strtoupper(substr($business->name, 0, 1)) }}</span>
+                            @endif
+                        </div>
+                        <strong>Business logo</strong>
+                        <span>Used in the application identity.</span>
+                        <label class="zazu-btn zazu-btn-secondary mt-3 cursor-pointer">
+                            Choose logo
+                            <input type="file" name="logo" accept="image/jpeg,image/png,image/webp" class="hidden">
+                        </label>
+                        @if ($business->logo_path)
+                            <label class="zazu-check-row mt-3"><input type="checkbox" name="remove_logo" value="1"><span>Remove current logo</span></label>
+                        @endif
+                    </div>
+
+                    <div class="zazu-branding-preview">
+                        <div class="zazu-branding-preview-media zazu-branding-dashboard">
+                            @if ($business->dashboard_image_path)
+                                <img src="{{ Storage::disk('public')->url($business->dashboard_image_path) }}" alt="">
+                            @else
+                                <span>Dashboard image</span>
+                            @endif
+                        </div>
+                        <strong>Dashboard picture</strong>
+                        <span>A visual focal image for the dashboard.</span>
+                        <label class="zazu-btn zazu-btn-secondary mt-3 cursor-pointer">
+                            Choose dashboard picture
+                            <input type="file" name="dashboard_image" accept="image/jpeg,image/png,image/webp" class="hidden">
+                        </label>
+                        @if ($business->dashboard_image_path)
+                            <label class="zazu-check-row mt-3"><input type="checkbox" name="remove_dashboard_image" value="1"><span>Remove current picture</span></label>
+                        @endif
+                    </div>
+
+                    <div class="zazu-branding-preview">
+                        <div class="zazu-branding-preview-media zazu-branding-wallpaper">
+                            @if ($business->wallpaper_path)
+                                <img src="{{ Storage::disk('public')->url($business->wallpaper_path) }}" alt="">
+                            @else
+                                <span>Workspace wallpaper</span>
+                            @endif
+                        </div>
+                        <strong>Workspace wallpaper</strong>
+                        <span>Optional art used subtly behind the workspace.</span>
+                        <label class="zazu-btn zazu-btn-secondary mt-3 cursor-pointer">
+                            Choose wallpaper
+                            <input type="file" name="wallpaper" accept="image/jpeg,image/png,image/webp" class="hidden">
+                        </label>
+                        @if ($business->wallpaper_path)
+                            <label class="zazu-check-row mt-3"><input type="checkbox" name="remove_wallpaper" value="1"><span>Remove current wallpaper</span></label>
+                        @endif
+                    </div>
+                </div>
+            </section>
+
+            <div class="zazu-actionbar">
+                <a href="{{ route('dashboard') }}" class="zazu-btn zazu-btn-ghost">Cancel</a>
+                <button type="submit" class="zazu-btn zazu-btn-primary">Save business appearance</button>
+            </div>
+        </div>
+
+        <aside class="zazu-form-aside">
+            <div class="zazu-context-card">
+                <div class="zazu-context-title">Keep it readable</div>
+                <div class="zazu-context-copy">Choose artwork with enough empty space and contrast. Zazu places a translucent surface over wallpaper so operational information stays readable in light and dark mode.</div>
+            </div>
+            <div class="zazu-context-card mt-4">
+                <div class="zazu-context-title">Privacy note</div>
+                <div class="zazu-context-copy">Only upload artwork you have the right to use. Do not put customer documents or private personal information into business branding images.</div>
+            </div>
+        </aside>
+    </form>
 </x-app-layout>
