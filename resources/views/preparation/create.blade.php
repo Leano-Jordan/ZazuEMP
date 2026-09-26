@@ -2,7 +2,7 @@
     <x-slot:title>Add preparation item · {{ $event->name }}</x-slot:title>
     <x-slot:heading>Add preparation item</x-slot:heading>
     <x-slot:headerAction>
-        <a href="{{ route('work.preparation.index', $event) }}" class="zazu-btn zazu-btn-ghost">← Preparation</a>
+        <a href="{{ route('work.show', $event) }}" class="zazu-btn zazu-btn-ghost">Job workspace</a>
     </x-slot:headerAction>
 
     <section class="zazu-command-band">
