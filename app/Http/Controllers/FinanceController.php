@@ -78,7 +78,7 @@ class FinanceController extends Controller
                 ->findOrFail($data['quote_id'])
             : null;
 
-        $event = $data['event_id']
+        $event = !empty($data['event_id'])
             ? Event::where('business_id', $businessId)->findOrFail($data['event_id'])
             : $quote?->event;
 
