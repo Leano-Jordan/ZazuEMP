@@ -4,6 +4,7 @@ use App\Http\Controllers\BusinessCapabilityController;
 use App\Http\Controllers\CustomerController;
 use App\Http\Controllers\RequirementController;
 use App\Http\Controllers\QuoteController;
+use App\Http\Controllers\TravelCostController;
 use App\Http\Controllers\WorkController;
 use Illuminate\Support\Facades\Route;
 
@@ -28,6 +29,10 @@ Route::post('/work', [WorkController::class, 'store'])->name('work.store');
 Route::get('/work/{event}', [WorkController::class, 'show'])->name('work.show');
 Route::get('/work/{event}/edit', [WorkController::class, 'edit'])->name('work.edit');
 Route::put('/work/{event}', [WorkController::class, 'update'])->name('work.update');
+
+Route::get('/work/{event}/travel', [TravelCostController::class, 'index'])->name('work.travel.index');
+Route::get('/work/{event}/travel/create', [TravelCostController::class, 'create'])->name('work.travel.create');
+Route::post('/work/{event}/travel', [TravelCostController::class, 'store'])->name('work.travel.store');
 
 Route::get('/work/{event}/quotes', [QuoteController::class, 'eventIndex'])->name('work.quotes.index');
 Route::get('/work/{event}/quotes/create', [QuoteController::class, 'create'])->name('work.quotes.create');
