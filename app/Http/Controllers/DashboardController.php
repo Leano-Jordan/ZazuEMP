@@ -1,11 +1,11 @@
 <?php
 
-namespace AppHttpControllers;
+namespace App\Http\Controllers;
 
-use AppModelsBusiness;
-use AppModelsCustomer;
-use AppModelsEvent;
-use AppModelsQuote;
+use App\Models\Business;
+use App\Models\Customer;
+use App\Models\Event;
+use App\Models\Quote;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\View\View;
 
@@ -20,9 +20,6 @@ class DashboardController extends Controller
         $customerQuery = Customer::query();
         $quoteQuery = Quote::query();
 
-        // When a business context exists, every dashboard signal must come from it.
-        // The fallback keeps the foundation usable before authentication/business context
-        // is fully enforced across the application.
         if ($business) {
             $eventQuery->where('business_id', $business->id);
             $customerQuery->where('business_id', $business->id);
