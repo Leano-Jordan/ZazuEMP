@@ -32,6 +32,11 @@ class WorkController extends Controller
         ];
 
         $filter = $request->string('filter')->toString();
+        $allowedFilters = ['', 'today', 'next_7_days', 'in_progress', 'draft'];
+
+        if (!in_array($filter, $allowedFilters, true)) {
+            $filter = '';
+        }
 
         $events = (clone $baseQuery)
             ->with(['customer', 'eventDayContact', 'eventNightContact'])
@@ -248,11 +253,19 @@ class WorkController extends Controller
 
     private function validateStatusTransition(string $current, string $next): void
     {
-        $terminal = ['completed', 'cancelled'];
+        $allowed = [
+            'draft' => ['draft', 'confirmed', 'cancelled'],
+            'confirmed' => ['confirmed', 'in_progress', 'cancelled'],
+            'in_progress' => ['in_progress', 'completed', 'cancelled'],
+            'completed' => ['completed'],
+            'cancelled' => ['cancelled'],
+        ];
 
-        if (in_array($current, $terminal, true) && $current !== $next) {
-            abort(422, 'Completed and cancelled jobs are closed and cannot be moved back into active work.');
-        }
+        abort_unless(
+            in_array($next, $allowed[$current] ?? [], true),
+            422,
+            'That status change is not allowed for this work record.'
+        );
     }
 
     private function rules(): array
