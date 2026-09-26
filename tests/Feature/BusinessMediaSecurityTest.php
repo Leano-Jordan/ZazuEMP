@@ -46,8 +46,6 @@ class BusinessMediaSecurityTest extends TestCase
 
         $this->get(route('business.media', ['type' => 'logo']))->assertNotFound();
     }
-}
-
 
     public function test_owner_can_replace_all_branding_assets_and_old_files_are_removed(): void
     {
