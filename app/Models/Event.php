@@ -55,4 +55,9 @@ class Event extends Model
     {
         return $this->hasMany(Quote::class);
     }
+
+    public function travelCosts(): HasMany
+    {
+        return $this->hasMany(TravelCost::class);
+    }
 }
