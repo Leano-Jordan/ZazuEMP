@@ -83,7 +83,7 @@ class TravelCostController extends Controller
                     'provider' => $validated['provider'],
                     'origin' => $validated['origin'],
                     'destination' => $validated['destination'],
-                    'distance_km' => $distance = (float) $validated['distance_km'],
+                    'distance_km' => $distance,
                     'travel_time_minutes' => $validated['travel_time_minutes'] ?? null,
                     'fuel_price_per_litre' => (float) $validated['fuel_price_per_litre'],
                     'vehicle_consumption_l_per_100km' => (float) $validated['vehicle_consumption_l_per_100km'],
