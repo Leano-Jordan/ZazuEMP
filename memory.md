@@ -563,3 +563,27 @@ Current architectural risks:
 
 Regression rule:
 - Do not treat a green feature suite as proof that every Blade view compiles. Keep a dedicated all-view Blade syntax check in the audit process before release.
+
+
+## South Africa compliance + commercial workflow standard — 2026-09-27
+
+- Zazu EMP is South Africa-first for compliance workflows. Tax and regulatory rules must be configurable, source-linked and effective-dated, because requirements can change.
+- Zazu must prepare and organize business information, not certify legal compliance. Official authorities, tender issuers and municipalities remain the source of truth.
+- Current SARS facts verified on 2026-09-27: standard VAT rate is 15%; the VAT compulsory-registration threshold is R2.3 million and the voluntary threshold is R120,000, effective 1 April 2026, subject to applicable rules/exceptions.
+- VAT invoices need prescribed supplier/recipient, serial/date, description, quantity/volume, taxable value, tax amount and total information; full tax-invoice treatment applies above R5,000 under SARS guidance and invoices are generally issued within 21 days of supply.
+- SARS Tax Compliance Status now uses Good Standing for tender-related compliance. TCS status is time-sensitive and must not be represented as permanently valid.
+- Government supplier information is maintained through CSD. Tender packs vary, so Zazu must support opportunity-specific requirements rather than hard-code one universal checklist.
+- CIPC annual-return and beneficial-ownership evidence should be handled as conditional, current evidence requirements for the applicable legal entity.
+- UIF, SDL and Compensation Fund/COID evidence should be surfaced when the business/employer profile makes those obligations relevant.
+- Food-related businesses may have Certificate of Acceptability and local licensing requirements. Municipal requirements must be treated as conditional and location-specific.
+- Zazu now has structured BusinessTaxProfile, effective-dated TaxRate records, historical tax snapshots on quote revisions/invoices, a private ComplianceDocument register and a printable Compliance Pack.
+- Quote lifecycle is explicit: draft -> sent -> accepted/declined/expired. Invoices created from quotes require an accepted quote/version.
+- Quote revisions must recalculate totals and include newly added Work requirements. Historical tax and commercial snapshots must never be rewritten by later configuration changes.
+- Future quote enhancement: per-line tax treatment for mixed standard-rated, zero-rated, exempt and out-of-scope supplies.
+- Onboarding is a persistent workspace. Skipped setup is deferred, not completed, and can be resumed later through Setup Centre. Services & prices is an early setup step.
+- Navigation standard: one compact persistent hierarchy, no repeated section labels, Services near the front, sticky/scrollable desktop navigation and persistent mobile navigation.
+- Error standard: expected validation/domain failures are branded and actionable; unexpected exceptions are logged and traced without exposing technical internals; important financial/stock/compliance mutations need audit history and idempotent retry protection.
+- Commercial benchmark principles studied from QuickBooks, Xero, Shopify, Salesforce and HubSpot: persistent setup/checklists, progressive disclosure, clear dependencies, contextual actions, workspace-oriented navigation, search/shortcuts, non-destructive configuration and safe return to incomplete setup.
+- Current high-priority risks not yet cleared remain: purchasing state machine/GRN, receiving and payment idempotency, inventory movement idempotency, parent/child business invariants, audit trail, backup/restore/export, granular permissions, notification/reminder workflows, migration-upgrade evidence and browser/E2E verification.
+- Current expansion code is committed directly to main; final CI/runtime verification is still required before declaring this expansion green.
+
