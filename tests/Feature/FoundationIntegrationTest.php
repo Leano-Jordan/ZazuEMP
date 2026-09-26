@@ -116,8 +116,6 @@ class FoundationIntegrationTest extends TestCase
             'currency' => 'ZAR',
         ]);
 
-        $this->signInAsOwner($business);
-
         $customer = Customer::create(['business_id' => $business->id, 'name' => 'Reporting Customer']);
         $event = Event::create([
             'business_id' => $business->id,
@@ -137,6 +135,8 @@ class FoundationIntegrationTest extends TestCase
             'event_date' => now()->addDays(3)->toDateString(),
             'status' => 'confirmed',
         ]);
+
+        $this->signInAsOwner($business);
 
         $quote = Quote::create([
             'event_id' => $event->id,
