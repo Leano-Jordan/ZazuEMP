@@ -102,5 +102,15 @@ Route::middleware('owner')->group(function () {
 });
 
 
+    Route::post('/business/switch', function (\Illuminate\Http\Request $request): \Illuminate\Http\RedirectResponse {
+        $validated = $request->validate([
+            'business_id' => ['required', 'integer'],
+        ]);
+
+        app(\App\Support\CurrentBusiness::class)->switchTo((int) $validated['business_id'], $request->user());
+
+        return back()->with('success', 'Workspace changed.');
+    })->name('business.switch');
+
     Route::post('/logout', [\App\Http\Controllers\AuthController::class, 'destroy'])->name('logout');
 });
