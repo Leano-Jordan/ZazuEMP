@@ -6,7 +6,8 @@
             @csrf
             <button class="zazu-btn zazu-btn-primary">Create new revision</button>
         </form>
-        <a href="{{ route('work.quotes.index', $quote->event) }}" class="zazu-btn zazu-btn-ghost">← Work quotes</a>
+        <a href="{{ route('work.show', $quote->event) }}" class="zazu-btn zazu-btn-secondary">Job workspace</a>
+        <a href="{{ route('work.quotes.index', $quote->event) }}" class="zazu-btn zazu-btn-ghost">All quotes</a>
     </x-slot:headerAction>
 
     @php
@@ -33,8 +34,8 @@
         <div class="zazu-detail-stack">
             <section class="zazu-card zazu-list">
                 <div class="zazu-card-header">
-                    <div class="zazu-card-title">Quote lines</div>
-                    <div class="zazu-card-description">Snapshot for this quote revision.</div>
+                    <div class="zazu-card-title">Services and prices</div>
+                    <div class="zazu-card-description">The services and prices saved in this quote version.</div>
                 </div>
                 @forelse ($version?->items ?? [] as $item)
                     <div class="zazu-list-item">
