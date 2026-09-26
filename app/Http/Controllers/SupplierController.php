@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Supplier;
+use App\Models\EventRequirement;
 use App\Support\CurrentBusiness;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -14,7 +15,12 @@ class SupplierController extends Controller
     {
         $businessId = app(CurrentBusiness::class)->id($request->user());
         $suppliers = Supplier::where('business_id',$businessId)->withCount('purchaseOrders')->orderBy('name')->get();
-        return view('suppliers.index', compact('suppliers'));
+        $resourceRequirements = EventRequirement::query()
+            ->whereHas('event', fn ($query) => $query->where('business_id', $businessId)->whereNotIn('status', ['completed', 'cancelled']))
+            ->with(['event.customer', 'capability'])
+            ->orderBy('created_at')
+            ->get();
+        return view('suppliers.index', compact('suppliers', 'resourceRequirements'));
     }
 
     public function create(): View { return view('suppliers.create'); }
