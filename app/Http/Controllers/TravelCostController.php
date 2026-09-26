@@ -57,6 +57,7 @@ class TravelCostController extends Controller
         $travelCost = DB::transaction(function () use (
             $validated,
             $event,
+            $distance,
             $roundTrip,
             $totalDistance,
             $fuelLitres,
