@@ -134,7 +134,6 @@
 
                 if (matchingCategory) {
                     matchingCategory.checked = true;
-                    matchingCategory.dispatchEvent(new Event('change', { bubbles: true }));
                 }
 
                 const unit = button.dataset.unit;
