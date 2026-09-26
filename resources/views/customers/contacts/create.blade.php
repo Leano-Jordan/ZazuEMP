@@ -14,7 +14,7 @@
                     <div class="zazu-form-grid">
                         <label class="zazu-field zazu-field-wide"><span class="zazu-label">Name <span class="zazu-required">*</span></span><input name="name" value="{{ old('name') }}" required class="zazu-input">@error('name')<span class="zazu-field-error">{{ $message }}</span>@enderror</label>
                         <label class="zazu-field"><span class="zazu-label">Label</span><input name="label" value="{{ old('label') }}" class="zazu-input" placeholder="Day, Night, Billing..."></label>
-                        <label class="zazu-field"><span class="zazu-label">Phone</span><input name="phone" value="{{ old('phone') }}" class="zazu-input"></label>
+                        <label class="zazu-field"><span class="zazu-label">Phone</span><input type="tel" name="phone" value="{{ old('phone') }}" class="zazu-input" autocomplete="tel"></label>
                         <label class="zazu-field zazu-field-wide"><span class="zazu-label">Email</span><input type="email" name="email" value="{{ old('email') }}" class="zazu-input"></label>
                         <label class="zazu-check-row"><input type="checkbox" name="is_primary" value="1" @checked(old('is_primary'))><span><span class="block text-xs font-semibold text-[var(--zazu-ink-2)]">Make this the primary contact</span><span class="mt-1 block text-[10px] text-[var(--zazu-faint)]">The current primary will be demoted in the same transaction.</span></span></label>
                     </div>
