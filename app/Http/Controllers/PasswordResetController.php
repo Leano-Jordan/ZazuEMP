@@ -34,11 +34,9 @@ class PasswordResetController extends Controller
             })
             ->first();
 
-        if ($user) {
-            Password::sendResetLink([
-                'email' => $user->email,
-            ]);
-        }
+        Password::sendResetLink([
+            'email' => $user?->email ?? ('unknown+'.Str::uuid().'@invalid.local'),
+        ]);
 
         return back()->with(
             'status',
@@ -56,6 +54,10 @@ class PasswordResetController extends Controller
 
     public function update(Request $request): RedirectResponse
     {
+        $request->merge([
+            'email' => Str::lower(trim($request->string('email')->toString())),
+        ]);
+
         $validated = $request->validate([
             'token' => ['required', 'string'],
             'email' => ['required', 'email'],
