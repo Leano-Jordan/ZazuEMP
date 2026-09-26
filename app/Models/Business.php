@@ -82,4 +82,9 @@ class Business extends Model
     {
         return $this->hasMany(TaxRate::class);
     }
+
+    public function complianceDocuments(): HasMany
+    {
+        return $this->hasMany(ComplianceDocument::class);
+    }
 }
