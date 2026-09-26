@@ -92,7 +92,8 @@
 
                 <div class="mt-4 rounded-xl border border-[var(--zazu-border)] bg-[var(--zazu-surface-2)] px-4 py-3">
                     <div class="text-xs font-semibold text-[var(--zazu-ink-2)]">{{ $event->event_address ?: 'No event location yet' }}</div>
-                    <div class="mt-1 text-[11px] text-[var(--zazu-faint)]">Distance, travel time and fuel costing can attach here later.</div>
+                    <div class="mt-1 text-[11px] text-[var(--zazu-faint)]">Distance, travel time and fuel costing can attach here.</div>
+                    <a href="{{ route('work.travel.index', $event) }}" class="zazu-btn zazu-btn-secondary mt-3">Open travel costing</a>
                 </div>
             </section>
         </div>
@@ -123,6 +124,10 @@
                     <a href="{{ route('work.quotes.index', $event) }}" class="zazu-stage">
                         <span class="zazu-stage-marker"></span>
                         <div><div class="zazu-stage-title">Quote</div><div class="zazu-stage-copy">Commercial offer and versions</div></div>
+                    </a>
+                    <a href="{{ route('work.travel.index', $event) }}" class="zazu-stage">
+                        <span class="zazu-stage-marker"></span>
+                        <div><div class="zazu-stage-title">Travel & costing</div><div class="zazu-stage-copy">Route, fuel and customer charge</div></div>
                     </a>
                     <div class="zazu-stage">
                         <span class="zazu-stage-marker"></span>
