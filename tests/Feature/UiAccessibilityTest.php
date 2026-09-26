@@ -24,7 +24,11 @@ class UiAccessibilityTest extends TestCase
         $response->assertSee('<main id="main-content" class="zazu-main" tabindex="-1">', false);
         $response->assertSee('aria-label="Primary"', false);
         $response->assertSee('data-theme-toggle', false);
+        $response->assertSee('data-theme-icon-sun', false);
+        $response->assertSee('data-theme-icon-moon', false);
         $response->assertSee('aria-pressed="false"', false);
+        $response->assertSee('data-user-menu', false);
+        $response->assertSee('action="/logout"', false);
         $response->assertSee('name="viewport"', false);
         $response->assertSee('viewport-fit=cover', false);
     }
