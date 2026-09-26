@@ -295,7 +295,7 @@ Verify the actual rendered application, not source alone:
 **Rule:** do not fix individual symptoms before checking the shared component/layout/token that controls them.
 
 
-## Execution fix pass — 2026-09-26
+NaN## Execution fix pass — 2026-09-26
 
 IMPLEMENTED in Zazu EMP:
 - shared dark-theme primary button contrast fix
