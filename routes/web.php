@@ -42,6 +42,7 @@ Route::middleware(['auth', 'owner'])->group(function () {
 Route::middleware(['auth', 'business.context'])->group(function () {
     Route::get('/dashboard', DashboardController::class)->name('dashboard');
     Route::get('/media/profile/{type}/{id}', [\App\Http\Controllers\ProfileMediaController::class, 'show'])->whereIn('type', ['customer', 'user'])->name('profile.media');
+    Route::get('/media/business/{type}', [\App\Http\Controllers\BusinessMediaController::class, 'show'])->whereIn('type', ['logo', 'dashboard', 'wallpaper'])->name('business.media');
     Route::get('/calendar', CalendarController::class)->name('calendar.index');
 
     Route::get('/finance', [FinanceController::class, 'index'])->name('finance.index');
