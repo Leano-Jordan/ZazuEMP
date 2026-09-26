@@ -128,30 +128,36 @@
             ])->values(),
         ])->values());
 
-        const selectedContact = @json(old('event_day_contact_id', $event->event_day_contact_id));
+        const selectedDayContact = @json(old('event_day_contact_id', $event->event_day_contact_id));
+        const selectedNightContact = @json(old('event_night_contact_id', $event->event_night_contact_id));
         const customerSelect = document.getElementById('customer_id');
-        const contactSelect = document.getElementById('event_day_contact_id');
+        const dayContactSelect = document.getElementById('event_day_contact_id');
+        const nightContactSelect = document.getElementById('event_night_contact_id');
 
-        function refreshContacts() {
+        function refreshContacts(daySelected = selectedDayContact, nightSelected = selectedNightContact) {
             const customer = customers.find(item => String(item.id) === customerSelect.value);
-            contactSelect.innerHTML = '<option value="">No event-day contact</option>';
+
+            for (const select of [dayContactSelect, nightContactSelect]) {
+                select.innerHTML = '<option value="">No contact selected</option>';
+            }
 
             if (!customer) return;
 
-            customer.contacts.forEach(contact => {
-                const option = document.createElement('option');
-                option.value = contact.id;
-                option.textContent = contact.name + (contact.label ? ' · ' + contact.label : '') + (contact.phone ? ' · ' + contact.phone : '');
-                option.selected = String(contact.id) === String(selectedContact);
-                contactSelect.appendChild(option);
-            });
+            for (const contact of customer.contacts) {
+                const suffix = [contact.label, contact.phone].filter(Boolean).join(' · ');
+                const dayOption = document.createElement('option');
+                dayOption.value = contact.id;
+                dayOption.textContent = contact.name + (suffix ? ' · ' + suffix : '');
+                dayOption.selected = String(contact.id) === String(daySelected);
+                dayContactSelect.appendChild(dayOption);
+
+                const nightOption = dayOption.cloneNode(true);
+                nightOption.selected = String(contact.id) === String(nightSelected);
+                nightContactSelect.appendChild(nightOption);
+            }
         }
 
-        customerSelect.addEventListener('change', () => {
-            contactSelect.value = '';
-            refreshContacts();
-        });
-
+        customerSelect.addEventListener('change', () => refreshContacts('', ''));
         refreshContacts();
     </script>
 </x-app-layout>
