@@ -41,6 +41,7 @@
                             <span class="zazu-label">Tax treatment</span>
                             <select name="tax_rate_id" class="zazu-select">
                                 <option value="">Keep current tax treatment</option>
+                                <option value="none" @selected(old('tax_rate_id') === 'none')>No tax / 0%</option>
                                 @foreach ($taxRates as $taxRate)
                                     <option value="{{ $taxRate->id }}" @selected((string) old('tax_rate_id') === (string) $taxRate->id)>
                                         {{ $taxRate->name }} · {{ $taxRate->rate }}%
