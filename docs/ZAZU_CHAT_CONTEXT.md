@@ -19,8 +19,8 @@ While executing:
 - Default to a compact result. Give a detailed report only when explicitly requested.
 
 ## OWNER
-Rosscore Labs Pty Ltd owns Zazu EMP.
-Isaac Junior Lehlogonolo Maluleka is the founder, creator, lead developer and final decision-maker.
+Isaac Junior Lehlogonolo Maluleka is the current owner, founder, creator, solo developer and final decision-maker for Zazu EMP.
+Rosscore Labs is a planned future business identity and is not yet a registered company or the present legal owner.
 
 AI is the engineering/research partner. Do not make consequential product or architecture decisions silently.
 
@@ -32,12 +32,14 @@ It is NOT:
 - SwiftOrder
 - catering-only software
 
-Target businesses include catering, equipment hire, tents/chairs, sound/DJ, baking, decor, rentals and combinations of event services.
+Target businesses include catering, equipment hire, tents/chairs, sound/DJ, baking, decor, rentals, photography, camera hire and combinations of event services.
 
 Core:
 Business -> Customer -> Event/Job -> Services -> Quote -> Confirmation/Deposit -> Buying/Hiring -> Preparation -> Event -> Payment/Completion
 
 ## CURRENT DEVELOPMENT STATE
+
+Recovery note 2026-09-26: repository source uses Event soft deletes, but an owner development database reported a missing `events.deleted_at` column. A repair migration has been added to reconcile schema drift. Work creation also had a source-level pre-save `$event` reference, and Work Edit now includes the previously missing night-contact field.
 Windows + VS Code.
 
 Verified 2026-09-23:
