@@ -34,6 +34,29 @@
                     </div>
 
                     <div class="mt-5 grid gap-4">
+                        <div class="zazu-form-grid">
+                            <label class="zazu-field">
+                                <span class="zazu-label">Legal / billing name</span>
+                                <input name="legal_name" value="{{ old('legal_name') }}" class="zazu-input" placeholder="Organisation or legal name">
+                            </label>
+                            <label class="zazu-field">
+                                <span class="zazu-label">Registration number</span>
+                                <input name="registration_number" value="{{ old('registration_number') }}" class="zazu-input">
+                            </label>
+                            <label class="zazu-field">
+                                <span class="zazu-label">Tax reference</span>
+                                <input name="tax_number" value="{{ old('tax_number') }}" class="zazu-input">
+                            </label>
+                            <label class="zazu-field">
+                                <span class="zazu-label">VAT number</span>
+                                <input name="vat_number" value="{{ old('vat_number') }}" class="zazu-input">
+                            </label>
+                            <label class="zazu-field zazu-field-wide">
+                                <span class="zazu-label">Billing address</span>
+                                <textarea name="billing_address" rows="3" class="zazu-textarea" placeholder="Use when invoices require a recipient address">{{ old('billing_address') }}</textarea>
+                            </label>
+                        </div>
+
                         <label class="zazu-field">
                             <span class="zazu-label">Profile photo <span class="font-normal text-[var(--zazu-faint)]">(optional)</span></span>
                             <input type="file" name="profile_photo" accept=".jpg,.jpeg,.png,.webp,image/jpeg,image/png,image/webp" class="zazu-file-input" data-file-input>
