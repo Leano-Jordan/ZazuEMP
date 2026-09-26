@@ -21,7 +21,7 @@ class CustomerContactLifecycleTest extends TestCase
 
     public function test_customer_creation_accepts_optional_day_and_night_contacts_and_profile_photo(): void
     {
-        Storage::fake('public');
+        Storage::fake('local');
 
         $photo = UploadedFile::fake()->image('customer.jpg');
 
@@ -46,7 +46,7 @@ class CustomerContactLifecycleTest extends TestCase
         $this->assertSame(1, $customer->contacts()->where('label', 'Night')->count());
         $this->assertSame(1, $customer->contacts()->where('is_primary', true)->count());
 
-        Storage::disk('public')->assertExists($customer->profile_photo_path);
+        Storage::disk('local')->assertExists($customer->profile_photo_path);
     }
 
     public function test_secondary_contact_can_be_edited_and_removed_without_destroying_history(): void

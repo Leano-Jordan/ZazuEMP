@@ -35,7 +35,7 @@
         @forelse ($customers as $customer)
             <div class="zazu-list-item">
                 <a href="{{ route('customers.show', $customer) }}" class="zazu-row-with-avatar min-w-0 flex-1">
-                    <x-profile-avatar :name="$customer->name" :path="$customer->profile_photo_path" size="sm" />
+                    <x-profile-avatar :name="$customer->name" :path="$customer->profile_photo_path" media-type="customer" :media-id="$customer->id" size="sm" />
                     <div class="zazu-list-main">
                         <div class="zazu-list-title">{{ $customer->name }}</div>
                         <div class="zazu-list-meta">

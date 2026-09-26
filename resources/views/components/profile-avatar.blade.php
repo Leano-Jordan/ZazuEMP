@@ -2,6 +2,8 @@
     'name' => '',
     'path' => null,
     'size' => 'md',
+    'mediaType' => null,
+    'mediaId' => null,
 ])
 
 @php
@@ -20,11 +22,13 @@
 @endphp
 
 <div class="grid {{ $sizeClasses }} shrink-0 place-items-center overflow-hidden rounded-full border border-[var(--zazu-border-strong)] bg-[var(--zazu-primary-soft)] font-extrabold text-[var(--zazu-primary)]">
-    @if ($path)
+    @if ($path && $mediaType && $mediaId)
         <img
-            src="{{ \Illuminate\Support\Facades\Storage::disk('public')->url($path) }}"
+            src="{{ route('profile.media', ['type' => $mediaType, 'id' => $mediaId]) }}"
             alt="{{ $name }}"
             class="h-full w-full object-cover"
+            loading="lazy"
+            decoding="async"
         >
     @else
         <span aria-hidden="true">{{ $initials ?: '?' }}</span>

@@ -10,7 +10,7 @@
 
     <section class="zazu-command-band">
         <div class="flex min-w-0 items-center gap-4">
-            <x-profile-avatar :name="$customer->name" :path="$customer->profile_photo_path" size="lg" />
+            <x-profile-avatar :name="$customer->name" :path="$customer->profile_photo_path" media-type="customer" :media-id="$customer->id" size="lg" />
             <div class="min-w-0">
                 <div class="zazu-eyebrow">Customer relationship</div>
                 <h2 class="zazu-command-title">{{ $customer->name }}</h2>

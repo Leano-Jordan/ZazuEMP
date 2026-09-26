@@ -14,7 +14,7 @@
                 <section class="zazu-form-section">
                     <div class="zazu-form-section-head"><div class="zazu-form-section-title">Customer profile</div><div class="zazu-form-section-copy">Profile photos are optional and should have a clear business purpose.</div></div>
                     <div class="flex flex-wrap items-center gap-4">
-                        <x-profile-avatar :name="$customer->name" :path="$customer->profile_photo_path" size="lg" />
+                        <x-profile-avatar :name="$customer->name" :path="$customer->profile_photo_path" media-type="customer" :media-id="$customer->id" size="lg" />
                         <label class="zazu-field min-w-[240px] flex-1"><span class="zazu-label">Customer name <span class="zazu-required">*</span></span><input name="name" value="{{ old('name', $customer->name) }}" required class="zazu-input">@error('name')<span class="zazu-field-error">{{ $message }}</span>@enderror</label>
                     </div>
                     <div class="mt-5 grid gap-4">
