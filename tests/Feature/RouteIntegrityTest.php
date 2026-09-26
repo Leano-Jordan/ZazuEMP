@@ -78,6 +78,10 @@ class RouteIntegrityTest extends TestCase
                 $class = $route->getControllerClass();
                 $method = $route->getActionMethod();
 
+                if ($method === $class) {
+                    $method = '__invoke';
+                }
+
                 return !class_exists($class) || !method_exists($class, $method);
             })
             ->map(fn ($route) => [
