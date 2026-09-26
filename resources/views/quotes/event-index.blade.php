@@ -3,6 +3,7 @@
     <x-slot:heading>Quotes</x-slot:heading>
     <x-slot:headerAction>
         <a href="{{ route('work.quotes.create', $event) }}" class="zazu-btn zazu-btn-primary">Create quote</a>
+        <a href="{{ route('work.show', $event) }}" class="zazu-btn zazu-btn-ghost">Job workspace</a>
         <a href="{{ route('work.show', $event) }}" class="zazu-btn zazu-btn-ghost">← Workspace</a>
     </x-slot:headerAction>
 
