@@ -50,6 +50,12 @@ class InventoryController extends Controller
             'movement_date'=>['required','date'],'reference'=>['nullable','string','max:255'],'notes'=>['nullable','string'],
             'event_id'=>['nullable','integer'],
         ]);
+        if (in_array($data['type'], ['issue','adjustment_out'], true)) {
+            $inventoryItem->load('movements');
+            $onHand = $inventoryItem->on_hand;
+            abort_if((float) $data['quantity'] > $onHand + 0.0001, 422, 'This movement would make stock on hand negative.');
+        }
+
         $inventoryItem->movements()->create([...$data,'business_id'=>$businessId]);
         return back()->with('success','Inventory movement recorded.');
     }
