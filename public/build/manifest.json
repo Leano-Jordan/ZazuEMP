@@ -1,12 +1,19 @@
 {
+  "images/catering.webp": {
+    "file": "assets/catering-bsglG5ib.webp",
+    "src": "images/catering.webp"
+  },
   "resources/css/app.css": {
-    "file": "assets/app-CZ_kyjUl.css",
+    "file": "assets/app-CecCkpCm.css",
     "name": "app",
     "names": [
       "app.css"
     ],
     "src": "resources/css/app.css",
-    "isEntry": true
+    "isEntry": true,
+    "assets": [
+      "assets/catering-bsglG5ib.webp"
+    ]
   },
   "resources/js/app.js": {
     "file": "assets/app-ClQNl2gm.js",
