@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 
 class Business extends Model
 {
@@ -15,7 +16,9 @@ class Business extends Model
     {
         return [
             'catalogue_setup_completed_at' => 'datetime',
+            'catalogue_setup_skipped_at' => 'datetime',
             'business_setup_completed_at' => 'datetime',
+            'business_setup_skipped_at' => 'datetime',
         ];
     }
 
@@ -33,7 +36,9 @@ class Business extends Model
         'website',
         'tax_number',
         'catalogue_setup_completed_at',
+        'catalogue_setup_skipped_at',
         'business_setup_completed_at',
+        'business_setup_skipped_at',
     ];
 
     public function users(): BelongsToMany
@@ -66,5 +71,15 @@ class Business extends Model
     public function preparationItems(): HasMany
     {
         return $this->hasMany(EventPreparationItem::class);
+    }
+
+    public function taxProfile(): HasOne
+    {
+        return $this->hasOne(BusinessTaxProfile::class);
+    }
+
+    public function taxRates(): HasMany
+    {
+        return $this->hasMany(TaxRate::class);
     }
 }
