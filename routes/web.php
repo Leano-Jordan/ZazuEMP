@@ -103,7 +103,7 @@ Route::middleware('owner')->group(function () {
 });
 
 
-    Route::post('/business/switch', [BusinessContextController::class, 'switch'])->name('business.switch');
+    Route::post('/business/switch', [BusinessContextController::class, 'change'])->name('business.switch');
 
     Route::post('/logout', [\App\Http\Controllers\AuthController::class, 'destroy'])->name('logout');
 });
