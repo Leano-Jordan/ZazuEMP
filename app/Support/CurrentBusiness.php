@@ -25,6 +25,24 @@ class CurrentBusiness
             // First-run bootstrap: a newly authenticated user must receive
             // an owner business before normal business-scoped pages can load.
             if (!$user->businesses()->exists()) {
+                // Existing single-business installations may predate the
+                // business_user membership layer. Attach the authenticated
+                // user only when there is exactly one active business, so
+                // we never guess across multiple businesses.
+                $soleBusiness = Business::query()
+                    ->where('status', 'active')
+                    ->limit(2)
+                    ->get();
+
+                if ($soleBusiness->count() === 1) {
+                    $business = $soleBusiness->first();
+                    $business->users()->syncWithoutDetaching([
+                        $user->id => ['role' => 'owner'],
+                    ]);
+
+                    return $business;
+                }
+
                 $business = Business::create([
                     'name' => trim((string) $user->name) . "'s Business",
                     'slug' => Str::slug((string) $user->name) . '-' . Str::lower(Str::random(6)),
