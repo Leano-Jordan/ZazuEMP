@@ -200,4 +200,33 @@ class AuthenticationTest extends TestCase
 
         $this->actingAs($owner)->get(route('settings.index'))->assertOk();
     }
+
+    public function test_owner_login_selects_an_owned_workspace_when_an_account_is_staff_elsewhere(): void
+    {
+        $owned = Business::create([
+            'name' => 'Owned Workspace',
+            'slug' => 'owned-workspace',
+            'status' => 'active',
+            'currency' => 'ZAR',
+        ]);
+        $staffWorkspace = Business::create([
+            'name' => 'Staff Workspace',
+            'slug' => 'staff-workspace',
+            'status' => 'active',
+            'currency' => 'ZAR',
+        ]);
+
+        $user = User::factory()->create(['password' => 'password123']);
+        $owned->users()->attach($user->id, ['role' => 'owner']);
+        $staffWorkspace->users()->attach($user->id, ['role' => 'staff']);
+
+        $this->post(route('login.store'), [
+            'email' => $user->email,
+            'password' => 'password123',
+            'owner_access' => 1,
+        ])->assertRedirect(route('owner.dashboard'));
+
+        $this->assertSame($owned->id, app(AppSupportCurrentBusiness::class)->id($user));
+    }
+
 }
