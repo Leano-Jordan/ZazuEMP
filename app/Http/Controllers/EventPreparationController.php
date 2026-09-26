@@ -42,9 +42,9 @@ class EventPreparationController extends Controller
 
         $validated = $request->validate([
             'title' => ['required', 'string', 'max:255'],
-            'category' => ['nullable', 'string', 'max:100'],
+            'category' => ['nullable', Rule::in(array_keys(config('zazu.readiness_categories')))],
             'quantity' => ['nullable', 'numeric', 'min:0'],
-            'unit' => ['nullable', 'string', 'max:50'],
+            'unit' => ['nullable', Rule::in(array_keys(config('zazu.units')))],
             'status' => ['required', 'in:open,blocked,ready'],
             'due_date' => ['nullable', 'date'],
             'notes' => ['nullable', 'string'],
