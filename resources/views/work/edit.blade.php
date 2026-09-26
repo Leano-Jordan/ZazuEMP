@@ -129,7 +129,7 @@
             <aside class="zazu-form-aside">
                 <div class="zazu-context-card">
                     <div class="zazu-context-title">Current workspace</div>
-                    <div class="zazu-context-copy">Changes here update the source record used by the rest of the workspace.</div>
+                    <div class="zazu-context-copy">Changes here update this job across the workspace.</div>
                     <div class="mt-4 grid gap-3">
                         <div>
                             <div class="zazu-detail-label">Reference</div>
