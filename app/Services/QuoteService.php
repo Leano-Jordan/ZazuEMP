@@ -96,6 +96,8 @@ class QuoteService
                 ...$taxSnapshot,
             ]);
 
+            $lockedQuote->update(['status' => 'draft']);
+
             foreach ($requirements as $requirement) {
                 $previousItem = $previousItems->get($requirement->id);
                 $capabilityPrice = $requirement->capability?->default_price;
