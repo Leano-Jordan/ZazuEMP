@@ -43,3 +43,18 @@ All notable Zazu EMP project changes will be recorded here.
 - Project Genesis framework.
 - Human-First Discovery framework.
 - RossCore Engineering Command Engine framework.
+
+## 2026-09-26
+
+### UX / Architecture hardening cycle
+
+- Reworked operational list hierarchy so page titles, section labels, column headers, records and row actions are visually distinct.
+- Replaced avoidable typed currency/category/unit fields with guided choices and centralized configuration.
+- Added a business default currency setting and reused it in quote, cost and travel workflows.
+- Added Work quick-view workload navigation and overdue preparation visibility.
+- Centralized active business resolution and added model-level business ownership protection.
+- Scoped affected operational queries and writes to the active business context.
+- Added lifecycle rules preventing invalid Work status movement and mutation of closed Work records.
+- Prevented downstream requirements, quotes, costs, travel and preparation changes after Work closes.
+- Hardened quote monetary arithmetic around integer cents and historical snapshots.
+- Added BusinessIsolationTest coverage for cross-business access, workload isolation and lifecycle controls.
