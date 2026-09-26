@@ -14,7 +14,8 @@ class DashboardController extends Controller
 {
     public function __invoke(Request $request): View
     {
-        $businessId = app(CurrentBusiness::class)->id($request->user());
+        $business = app(CurrentBusiness::class)->model($request->user());
+        $businessId = $business->id;
         $today = now()->startOfDay();
 
         $eventQuery = Event::query()->where('business_id', $businessId);
@@ -41,6 +42,6 @@ class DashboardController extends Controller
             ->limit(8)
             ->get();
 
-        return view('dashboard', compact('metrics', 'upcoming'));
+        return view('dashboard', compact('metrics', 'upcoming', 'business'));
     }
 }
