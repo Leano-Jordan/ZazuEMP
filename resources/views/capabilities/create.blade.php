@@ -59,6 +59,17 @@
                         </label>
 
                         <label class="zazu-field">
+                            <span class="zazu-label">Price currency <span class="zazu-required">*</span></span>
+                            <select name="currency" class="zazu-select" required>
+                                @foreach ($currencies as $code => $label)
+                                    <option value="{{ $code }}" @selected(old('currency', $defaultCurrency) === $code)>{{ $label }}</option>
+                                @endforeach
+                            </select>
+                            <span class="zazu-field-help">This is the currency attached to the saved catalogue price.</span>
+                            @error('currency')<span class="zazu-field-error">{{ $message }}</span>@enderror
+                        </label>
+
+                        <label class="zazu-field">
                             <span class="zazu-label">How do you charge?</span>
                             <select name="pricing_basis" class="zazu-select" required>
                                 @foreach (['custom' => 'Set a price each time', 'fixed' => 'One fixed price', 'per_unit' => 'Per item / unit', 'per_person' => 'Per person', 'per_hour' => 'Per hour', 'per_day' => 'Per day'] as $value => $label)
