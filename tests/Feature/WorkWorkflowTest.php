@@ -117,6 +117,7 @@ class WorkWorkflowTest extends TestCase
         $response = $this->put(route('work.update', $event), [
             'customer_id' => $otherCustomer->id,
             'name' => 'Quoted Work',
+            'event_type' => 'Catering order',
             'event_date' => '2026-10-22',
             'status' => 'confirmed',
         ]);
@@ -160,6 +161,7 @@ class WorkWorkflowTest extends TestCase
             'event_day_contact_id' => $contact->id,
             'event_night_contact_id' => $contact->id,
             'name' => 'Invalid Work',
+            'event_type' => 'Catering order',
             'event_date' => '2026-10-20',
         ]);
 
