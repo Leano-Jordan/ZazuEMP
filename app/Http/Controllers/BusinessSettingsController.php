@@ -32,6 +32,7 @@ class BusinessSettingsController extends Controller
     public function update(Request $request): RedirectResponse
     {
         $business = $this->business($request);
+        $request->merge(['currency' => strtoupper((string) $request->input('currency'))]);
 
         $validated = $request->validate([
             'name' => ['required', 'string', 'max:255'],
