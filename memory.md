@@ -380,3 +380,23 @@ Permanent rules:
 - Controller-backed routes must have a loadable controller class. The route-integrity test now checks that controller route targets resolve to existing classes.
 - A page is not considered executed merely because its Blade file exists or its route name is registered. The full chain is: route -> controller/class -> data/model -> view -> rendered response.
 - Regression prevention outranks feature velocity. If a write corrupts a foundational file, repair it first, add a guard, record the failure mode, then resume the planned execution cycle.
+
+## Execution cycle — 2026-09-26: guided interaction + commercial hardening
+
+Implemented:
+- Local-only system typography end-to-end; removed the remaining external Bunny font declaration from Vite.
+- Guided currency/category/unit controls and business-default currency.
+- Explicit visual distinction between section headers, column headers, records, metadata and row actions.
+- Workload quick views for all work, today, next 7 days, in progress, drafts and overdue preparation.
+- Central active business resolver and model-level direct-record business stamping.
+- Business scoping across the touched Work, Customer, Capability, Requirement, Contact, Quote, Cost, Travel, Preparation, Calendar and Dashboard paths.
+- Closed Work is treated as immutable for downstream operational/commercial changes.
+- Work status transitions are centrally represented by Event domain rules.
+- Quote totals use integer-cent calculations with quantity hundredths.
+- Added cross-business and workload regression coverage.
+
+Verification boundary:
+- Repository source was re-inspected after changes.
+- Automated PHP source write integrity was rechecked on critical files.
+- Local runtime execution remains unverified because this environment cannot reach GitHub, so PHPUnit, migrations, Blade compilation and browser traversal were not run here.
+- Full authentication, explicit business selection, roles/permissions and private media authorization remain production gates.
