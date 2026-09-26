@@ -1,6 +1,20 @@
 <?php
 
 return [
+    'currencies' => [
+        'ZAR' => 'South African rand (ZAR)',
+        'BWP' => 'Botswana pula (BWP)',
+        'EUR' => 'Euro (EUR)',
+        'GBP' => 'Pound sterling (GBP)',
+        'USD' => 'US dollar (USD)',
+    ],
+
+    'units' => [
+        'unit' => 'Unit', 'item' => 'Item', 'person' => 'Person', 'guest' => 'Guest',
+        'chair' => 'Chair', 'table' => 'Table', 'plate' => 'Plate', 'hour' => 'Hour',
+        'day' => 'Day', 'kilometre' => 'Kilometre', 'litre' => 'Litre',
+    ],
+
     'service_categories' => [
         'Catering' => [
             'Catering',
