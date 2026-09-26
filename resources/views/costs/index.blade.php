@@ -13,22 +13,19 @@
             <p class="zazu-command-copy">Track expected cost against what was actually incurred for this work. These records support operational costing and are not payment or accounting records.</p>
         </div>
         <div class="zazu-command-meta">
-            <div class="zazu-command-meta-label">Variance</div>
-            <div class="zazu-command-meta-value">{{ number_format($actualTotal - $projectedTotal, 2) }}</div>
+            <div class="zazu-command-meta-label">Currencies</div>
+            <div class="zazu-command-meta-value">{{ $totalsByCurrency->count() }}</div>
         </div>
     </section>
 
     <div class="zazu-metric-grid">
-        <section class="zazu-metric-card">
-            <h2 class="zazu-metric-label">Projected</h2>
-            <div class="zazu-metric-value">ZAR {{ number_format($projectedTotal, 2) }}</div>
-            <div class="zazu-metric-note">Expected operating cost</div>
-        </section>
-        <section class="zazu-metric-card">
-            <h2 class="zazu-metric-label">Actual</h2>
-            <div class="zazu-metric-value">ZAR {{ number_format($actualTotal, 2) }}</div>
-            <div class="zazu-metric-note">Recorded incurred cost</div>
-        </section>
+        @foreach ($totalsByCurrency as $currency => $totals)
+            <section class="zazu-metric-card">
+                <h2 class="zazu-metric-label">{{ $currency }} projected</h2>
+                <div class="zazu-metric-value">{{ $currency }} {{ number_format($totals['projected'], 2) }}</div>
+                <div class="zazu-metric-note">Actual: {{ $currency }} {{ number_format($totals['actual'], 2) }}</div>
+            </section>
+        @endforeach
         <section class="zazu-metric-card">
             <h2 class="zazu-metric-label">Records</h2>
             <div class="zazu-metric-value">{{ $costs->count() }}</div>
