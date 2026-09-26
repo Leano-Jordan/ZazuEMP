@@ -62,7 +62,7 @@
                             </label>
 
                             <label class="zazu-field zazu-field-wide">
-                                <span class="zazu-label">Event-day contact <span class="zazu-required">*</span><span class="font-normal text-[var(--zazu-faint)]"> optional</span></span>
+                                <span class="zazu-label">Event-day contact <span class="font-normal text-[var(--zazu-faint)]">(optional)</span></span>
                                 <select id="event_day_contact_id" name="event_day_contact_id" class="zazu-select">
                                     <option value="">Select a customer first</option>
                                 </select>
