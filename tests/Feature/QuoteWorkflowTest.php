@@ -117,6 +117,8 @@ class QuoteWorkflowTest extends TestCase
         $this->assertSame('80 chairs', $newest->items->first()->description);
         $this->assertSame('80.00', (string) $newest->items->first()->quantity);
         $this->assertSame('40.00', (string) $newest->items->first()->unit_price);
+        $this->assertSame('80 chairs', $newest->items->first()->source_snapshot['description']);
+        $this->assertSame('80.00', $newest->items->first()->source_snapshot['quantity']);
     }
 
     public function test_quote_draft_revision_can_be_saved_with_updated_prices(): void
