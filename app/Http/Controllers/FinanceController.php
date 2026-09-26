@@ -81,17 +81,23 @@ class FinanceController extends Controller
             'invoice_id'=>['required','integer'],'amount'=>['required','numeric','gt:0'],'method'=>['required','in:cash,bank_transfer,card,other'],
             'reference'=>['nullable','string','max:255'],'paid_at'=>['required','date'],'notes'=>['nullable','string'],
         ]);
-        $invoice=Invoice::where('business_id',$businessId)->with('payments')->lockForUpdate()->findOrFail($data['invoice_id']);
-        $totalCents = Money::toCents((string) $invoice->total);
-        $paidCents = $invoice->payments->sum(fn ($payment) => Money::toCents((string) $payment->amount));
-        $paymentCents = Money::toCents((string) $data['amount']);
 
-        abort_if($paymentCents > ($totalCents - $paidCents), 422, 'Payment cannot exceed the outstanding invoice balance.');
+        DB::transaction(function () use ($data, $businessId): void {
+            $invoice=Invoice::where('business_id',$businessId)->whereKey($data['invoice_id'])->with('payments')->lockForUpdate()->firstOrFail();
+            abort_if(in_array($invoice->status, ['paid','void'], true), 422, 'This invoice cannot accept another payment.');
 
-        DB::transaction(function () use ($data, $businessId, $invoice, $paymentCents, $paidCents, $totalCents): void {
+            $totalCents = Money::toCents((string) $invoice->total);
+            $paidCents = $invoice->payments->sum(fn ($payment) => Money::toCents((string) $payment->amount));
+            $paymentCents = Money::toCents((string) $data['amount']);
+
+            abort_if($paymentCents > ($totalCents - $paidCents), 422, 'Payment cannot exceed the outstanding invoice balance.');
+
             Payment::create([...$data,'business_id'=>$businessId,'event_id'=>$invoice->event_id,'currency'=>$invoice->currency]);
+
             $newPaidCents = $paidCents + $paymentCents;
-            $invoice->update(['status' => $newPaidCents >= $totalCents ? 'paid' : 'issued']);
+            $invoice->update([
+                'status' => $newPaidCents >= $totalCents ? 'paid' : 'issued',
+            ]);
         });
 
         return redirect()->route('finance.index')->with('success','Payment recorded.');
