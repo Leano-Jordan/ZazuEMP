@@ -39,7 +39,7 @@
                                         </span>
                                         <span class="zazu-catalogue-mini-name">{{ $capability->name }}</span>
                                         @if ($capability->default_price !== null)
-                                            <span class="zazu-catalogue-mini-price">ZAR {{ number_format((float) $capability->default_price, 2) }}</span>
+                                            <span class="zazu-catalogue-mini-price">{{ $capability->currency ?? $businessCurrency }} {{ number_format((float) $capability->default_price, 2) }}</span>
                                         @endif
                                     </button>
                                 @endforeach
@@ -128,6 +128,15 @@
                 button.classList.add('selected');
                 capabilityId.value = button.dataset.capabilityId;
                 description.value = button.dataset.serviceName;
+
+                const matchingCategory = [...document.querySelectorAll('input[name="category"]')]
+                    .find((input) => input.value === button.dataset.category);
+
+                if (matchingCategory) {
+                    matchingCategory.checked = true;
+                    matchingCategory.dispatchEvent(new Event('change', { bubbles: true }));
+                }
+
                 const unit = button.dataset.unit;
                 if (unit) {
                     const option = [...unitSelect.options].find(item => item.value === unit);
