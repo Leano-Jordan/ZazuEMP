@@ -33,6 +33,10 @@
             <div><div class="zazu-filter-label">Drafts</div><div class="zazu-filter-value">{{ $workload['draft'] }}</div><div class="zazu-filter-copy">Work not yet confirmed.</div></div>
             <span class="zazu-module-arrow">→</span>
         </a>
+        <a href="{{ route('work.index', ['filter' => 'overdue']) }}" class="zazu-filter-card {{ $filter === 'overdue' ? 'active' : '' }}">
+            <div><div class="zazu-filter-label">Overdue</div><div class="zazu-filter-value">{{ $workload['overdue'] }}</div><div class="zazu-filter-copy">Work with unfinished preparation past its due date.</div></div>
+            <span class="zazu-module-arrow">→</span>
+        </a>
     </div>
 
     <section class="zazu-card zazu-list">
