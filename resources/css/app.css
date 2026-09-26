@@ -40,12 +40,16 @@
     --zazu-focus: #9a7956;
 
     --zazu-success: #2f765f;
+    --zazu-success-ink: #245f4d;
     --zazu-success-soft: #dbece4;
     --zazu-warning: #956d2c;
+    --zazu-warning-ink: #75531d;
     --zazu-warning-soft: #f0e6d2;
     --zazu-danger: #ac5362;
+    --zazu-danger-ink: #8e3f4c;
     --zazu-danger-soft: #f0dce0;
     --zazu-info: #4f7480;
+    --zazu-info-ink: #385d68;
     --zazu-info-soft: #dce8eb;
 
     --zazu-shadow: 0 10px 30px rgba(31, 65, 69, 0.07);
@@ -89,12 +93,16 @@
     --zazu-focus: #c5a47d;
 
     --zazu-success: #72b39b;
+    --zazu-success-ink: #72b39b;
     --zazu-success-soft: #243f36;
     --zazu-warning: #d0ac6f;
+    --zazu-warning-ink: #d0ac6f;
     --zazu-warning-soft: #403624;
     --zazu-danger: #e39aa8;
+    --zazu-danger-ink: #e39aa8;
     --zazu-danger-soft: #402b31;
     --zazu-info: #8ebbc4;
+    --zazu-info-ink: #8ebbc4;
     --zazu-info-soft: #263c42;
 
     --zazu-shadow: 0 12px 32px rgba(4, 14, 17, 0.20);
@@ -508,22 +516,22 @@ body {
 
 .zazu-chip-success {
     background: var(--zazu-success-soft);
-    color: var(--zazu-success);
+    color: var(--zazu-success-ink);
 }
 
 .zazu-chip-warning {
     background: var(--zazu-warning-soft);
-    color: var(--zazu-warning);
+    color: var(--zazu-warning-ink);
 }
 
 .zazu-chip-danger {
     background: var(--zazu-danger-soft);
-    color: var(--zazu-danger);
+    color: var(--zazu-danger-ink);
 }
 
 .zazu-chip-info {
     background: var(--zazu-info-soft);
-    color: var(--zazu-info);
+    color: var(--zazu-info-ink);
 }
 
 .zazu-empty {
@@ -611,13 +619,13 @@ body {
 .zazu-alert-success {
     border-color: color-mix(in srgb, var(--zazu-success) 34%, var(--zazu-border));
     background: var(--zazu-success-soft);
-    color: var(--zazu-success);
+    color: var(--zazu-success-ink);
 }
 
 .zazu-alert-error {
     border-color: color-mix(in srgb, var(--zazu-danger) 34%, var(--zazu-border));
     background: var(--zazu-danger-soft);
-    color: var(--zazu-danger);
+    color: var(--zazu-danger-ink);
 }
 
 .zazu-form-main {
@@ -678,7 +686,7 @@ body {
 }
 
 .zazu-required {
-    color: var(--zazu-danger);
+    color: var(--zazu-danger-ink);
 }
 
 .zazu-input,
@@ -729,7 +737,7 @@ body {
 .zazu-field-error {
     display: block;
     margin-top: 5px;
-    color: var(--zazu-danger);
+    color: var(--zazu-danger-ink);
     font-size: 10px;
     line-height: 1.45;
 }
