@@ -8,6 +8,12 @@ use Tests\TestCase;
 
 class BusinessCapabilityTest extends TestCase
 {
+    protected function setUp(): void
+    {
+        parent::setUp();
+        $this->signInAsOwner();
+    }
+
     use RefreshDatabase;
 
     public function test_business_capability_can_be_created(): void

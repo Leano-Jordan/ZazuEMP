@@ -2,10 +2,19 @@
 
 namespace Tests\Feature;
 
+use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
 class SkeletonPagesTest extends TestCase
 {
+    use RefreshDatabase;
+
+    protected function setUp(): void
+    {
+        parent::setUp();
+        $this->signInAsOwner();
+    }
+
     public function test_all_top_level_zazu_skeleton_pages_are_reachable(): void
     {
         $routes = [

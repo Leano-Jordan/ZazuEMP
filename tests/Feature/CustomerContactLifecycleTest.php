@@ -11,6 +11,12 @@ use Tests\TestCase;
 
 class CustomerContactLifecycleTest extends TestCase
 {
+    protected function setUp(): void
+    {
+        parent::setUp();
+        $this->signInAsOwner();
+    }
+
     use RefreshDatabase;
 
     public function test_customer_creation_accepts_optional_day_and_night_contacts_and_profile_photo(): void

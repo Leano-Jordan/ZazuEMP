@@ -15,13 +15,7 @@ class BusinessSettingsController extends Controller
 {
     public function edit(Request $request): View
     {
-        $business = app(CurrentBusiness::class)->resolve($request->user());
-
-        if (!$business && $request->user()) {
-            $business = $this->business($request);
-        }
-
-        $business ??= new Business(['name' => 'Zazu', 'currency' => 'ZAR']);
+        $business = app(CurrentBusiness::class)->model($request->user());
 
         return view('settings.index', [
             'business' => $business,
@@ -31,7 +25,7 @@ class BusinessSettingsController extends Controller
 
     public function update(Request $request): RedirectResponse
     {
-        $business = $this->business($request);
+        $business = app(CurrentBusiness::class)->model($request->user());
         $request->merge(['currency' => strtoupper((string) $request->input('currency'))]);
 
         $validated = $request->validate([
@@ -77,27 +71,4 @@ class BusinessSettingsController extends Controller
         return redirect()->route('settings.index')->with('success', 'Business settings saved.');
     }
 
-    private function business(Request $request): Business
-    {
-        $user = $request->user();
-
-        if ($user) {
-            $business = $user->businesses()->where('businesses.status', 'active')->first();
-
-            if (!$business) {
-                $business = Business::create([
-                    'name' => trim($user->name) . "'s Business",
-                    'slug' => Str::slug($user->name) . '-' . Str::lower(Str::random(6)),
-                    'status' => 'active',
-                    'currency' => 'ZAR',
-                ]);
-
-                $business->users()->attach($user->id, ['role' => 'owner']);
-            }
-
-            return $business;
-        }
-
-        return app(CurrentBusiness::class)->model();
-    }
 }

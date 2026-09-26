@@ -18,8 +18,19 @@ Route::get('/', fn () => redirect()->route('dashboard'));
 
 Route::middleware('guest')->group(function () {
     Route::get('/login', [\App\Http\Controllers\AuthController::class, 'create'])->name('login');
-    Route::post('/login', [\App\Http\Controllers\AuthController::class, 'store'])->name('login.store');
+    Route::post('/login', [\App\Http\Controllers\AuthController::class, 'store'])
+        ->middleware('throttle:login')
+        ->name('login.store');
+    Route::get('/register', [\App\Http\Controllers\AuthController::class, 'register'])->name('register');
+    Route::post('/register', [\App\Http\Controllers\AuthController::class, 'storeRegistration'])
+        ->middleware('throttle:register')
+        ->name('register.store');
 });
+
+Route::middleware(['auth', 'owner'])->group(function () {
+    Route::get('/owner', [\App\Http\Controllers\AuthController::class, 'owner'])->name('owner.dashboard');
+});
+
 
 Route::middleware('auth')->group(function () {
 
@@ -32,8 +43,10 @@ Route::view('/suppliers', 'suppliers.index')->name('suppliers.index');
 Route::view('/inventory', 'inventory.index')->name('inventory.index');
 Route::view('/assets', 'assets.index')->name('assets.index');
 Route::view('/reports', 'reports.index')->name('reports.index');
-Route::get('/settings', [BusinessSettingsController::class, 'edit'])->name('settings.index');
-Route::put('/settings', [BusinessSettingsController::class, 'update'])->name('settings.update');
+Route::middleware('owner')->group(function () {
+    Route::get('/settings', [BusinessSettingsController::class, 'edit'])->name('settings.index');
+    Route::put('/settings', [BusinessSettingsController::class, 'update'])->name('settings.update');
+});
 Route::get('/quotes', [QuoteController::class, 'index'])->name('quotes.index');
 Route::get('/quotes/{quote}', [QuoteController::class, 'show'])->name('quotes.show');
 Route::post('/quotes/{quote}/versions', [QuoteController::class, 'createVersion'])->name('quotes.versions.store');
@@ -80,10 +93,12 @@ Route::put('/customers/{customer}/contacts/{contact}', [CustomerContactControlle
 Route::delete('/customers/{customer}/contacts/{contact}', [CustomerContactController::class, 'destroy'])->name('customers.contacts.destroy');
 
 Route::get('/capabilities', [BusinessCapabilityController::class, 'index'])->name('capabilities.index');
-Route::get('/capabilities/create', [BusinessCapabilityController::class, 'create'])->name('capabilities.create');
-Route::post('/capabilities', [BusinessCapabilityController::class, 'store'])->name('capabilities.store');
-Route::get('/capabilities/{capability}/edit', [BusinessCapabilityController::class, 'edit'])->name('capabilities.edit');
-Route::put('/capabilities/{capability}', [BusinessCapabilityController::class, 'update'])->name('capabilities.update');
+Route::middleware('owner')->group(function () {
+    Route::get('/capabilities/create', [BusinessCapabilityController::class, 'create'])->name('capabilities.create');
+    Route::post('/capabilities', [BusinessCapabilityController::class, 'store'])->name('capabilities.store');
+    Route::get('/capabilities/{capability}/edit', [BusinessCapabilityController::class, 'edit'])->name('capabilities.edit');
+    Route::put('/capabilities/{capability}', [BusinessCapabilityController::class, 'update'])->name('capabilities.update');
+});
 
 
     Route::post('/logout', [\App\Http\Controllers\AuthController::class, 'destroy'])->name('logout');

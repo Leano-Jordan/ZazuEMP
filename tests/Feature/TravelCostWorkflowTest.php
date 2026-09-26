@@ -10,6 +10,12 @@ use Tests\TestCase;
 
 class TravelCostWorkflowTest extends TestCase
 {
+    protected function setUp(): void
+    {
+        parent::setUp();
+        $this->signInAsOwner();
+    }
+
     use RefreshDatabase;
 
     public function test_travel_cost_is_calculated_and_saved_as_historical_evidence(): void
