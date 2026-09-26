@@ -52,7 +52,7 @@ class QuoteController extends Controller
         $event->load(['customer', 'requirements.capability']);
 
         $validated = $request->validate([
-            'currency' => ['required', 'string', 'size:3'],
+            'currency' => ['required', 'string', 'size:3', 'regex:/^[A-Za-z]{3}$/'],
             'notes' => ['nullable', 'string'],
             'unit_price' => ['required', 'array', 'min:1'],
             'unit_price.*' => ['required', 'numeric', 'min:0'],
@@ -60,7 +60,13 @@ class QuoteController extends Controller
 
         $requirementsById = $event->requirements->keyBy('id');
 
-        if ($requirementsById->count() !== count($validated['unit_price'])) {
+        $submittedRequirementIds = array_map('intval', array_keys($validated['unit_price']));
+        $currentRequirementIds = $requirementsById->keys()->map(fn ($id) => (int) $id)->all();
+
+        sort($submittedRequirementIds);
+        sort($currentRequirementIds);
+
+        if ($submittedRequirementIds !== $currentRequirementIds) {
             return back()
                 ->withErrors(['unit_price' => 'The quote lines changed. Refresh the page and try again.'])
                 ->withInput();
@@ -139,16 +145,21 @@ class QuoteController extends Controller
 
     public function createVersion(Quote $quote): RedirectResponse
     {
-        $quote->load('versions.items');
+        $newVersion = DB::transaction(function () use ($quote): QuoteVersion {
+            $lockedQuote = Quote::query()
+                ->lockForUpdate()
+                ->findOrFail($quote->id);
 
-        $latest = $quote->versions->sortByDesc('version')->first();
+            $latest = $lockedQuote->versions()
+                ->with('items')
+                ->orderByDesc('version')
+                ->first();
 
-        abort_unless($latest, 404);
+            abort_unless($latest, 404);
 
-        $newVersion = DB::transaction(function () use ($quote, $latest): QuoteVersion {
             $latest->update(['status' => 'superseded']);
 
-            $newVersion = $quote->versions()->create([
+            $newVersion = $lockedQuote->versions()->create([
                 'version' => $latest->version + 1,
                 'status' => 'draft',
                 'subtotal' => $latest->subtotal,
