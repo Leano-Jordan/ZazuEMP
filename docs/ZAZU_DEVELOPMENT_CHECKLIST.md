@@ -252,3 +252,61 @@ Still required before production security acceptance:
 - [ ] Full PHPUnit execution
 - [ ] Fresh migration verification
 - [ ] Browser/light-dark/responsive traversal
+
+## Full foundation integration sweep — 2026-09-26
+
+### Foundation controls
+- [x] Authentication and registration
+- [x] Active business context
+- [x] Membership-bound business switching
+- [x] Owner/staff role boundary
+- [x] Core business-scoped reads and writes
+- [x] Cross-business regression coverage
+
+### Connected workspaces
+- [x] Work
+- [x] Customers
+- [x] Services & prices
+- [x] Requirements
+- [x] Quotes
+- [x] Calendar
+- [x] Travel costing
+- [x] Operational costs
+- [x] Preparation/readiness
+- [x] Supplier planning foundation
+- [x] Inventory planning foundation
+- [x] Asset planning foundation
+- [x] Operational/commercial reporting foundation
+- [x] Owner Administration
+
+### Verification
+- [x] Full automated feature/unit suite passes in CI
+- [x] Fresh SQLite database exercised by CI
+- [x] Composer dependency installation passes
+- [x] Frontend dependency installation passes
+- [x] Frontend production build passes
+- [x] Route/controller integrity verification
+- [x] UI/account/theme regression coverage
+
+### Remaining V1 gates
+- [ ] Customer-facing quote presentation/delivery
+- [ ] Quote acceptance and deposits
+- [ ] Payments, balances and reconciliation
+- [ ] Invoice/document generation
+- [ ] Supplier transaction/purchasing model
+- [ ] Inventory movement/receiving/availability model
+- [ ] Physical asset register and accountability
+- [ ] Granular roles/permissions
+- [ ] Full authorization-policy coverage
+- [ ] Authenticated/private media delivery
+- [ ] Audit/activity trail
+- [ ] Notifications/reminders
+- [ ] Export/recovery and backup/restore evidence
+- [ ] Browser end-to-end verification
+- [ ] Responsive/light/dark runtime verification
+- [ ] Populated-development-database upgrade verification
+- [ ] Release candidate review
+
+Current verified CI evidence: 51 tests passed, 266 assertions on application head 0826b6fa435afa3f3a8eafb9c4d276057ff1443e.
+
+The resource pages are now connected planning surfaces rather than isolated placeholders. They must remain explicitly labelled as planning foundations until their underlying supplier, inventory and physical-asset transaction models exist.
