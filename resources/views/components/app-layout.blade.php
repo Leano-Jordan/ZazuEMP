@@ -258,8 +258,9 @@
             if (!control) return;
 
             const name = (control.getAttribute('name') || '').toLowerCase();
+            const dottedName = name.replace(/\[([^\]]+)\]/g, '.$1');
             const baseName = name.replace(/\[.*?\]/g, '');
-            const messages = serverErrors[name] || serverErrors[baseName] || [];
+            const messages = serverErrors[name] || serverErrors[dottedName] || serverErrors[baseName] || [];
 
             if (control.required) {
                 control.setAttribute('aria-required', 'true');
