@@ -16,11 +16,11 @@
     <section class="zazu-card">
         <div class="zazu-card-header">
             <div class="zazu-card-title">Reporting workspace</div>
-            <div class="zazu-card-description">Skeleton only. Reports will be driven by verified underlying records, not decorative numbers.</div>
+            <div class="zazu-card-description">No live report data is shown yet. Reports will use verified business records rather than sample numbers.</div>
         </div>
         <div class="zazu-placeholder">
-            <div class="zazu-placeholder-title">Reporting engine not connected yet</div>
-            <div class="zazu-placeholder-copy">The page is intentionally present now so the information architecture can be reviewed before the underlying reporting logic is built.</div>
+            <div class="zazu-placeholder-title">Reporting is being prepared</div>
+            <div class="zazu-placeholder-copy">This area is ready for the reporting workflow. Live reports will appear once the required business records are available.</div>
         </div>
     </section>
 
