@@ -7,6 +7,7 @@ use App\Models\Event;
 use App\Models\EventCost;
 use App\Models\EventPreparationItem;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Str;
 use Tests\TestCase;
 
 class WorkPlanningWorkflowTest extends TestCase
@@ -17,7 +18,7 @@ class WorkPlanningWorkflowTest extends TestCase
     {
         $business = Business::create([
             'name' => 'Planning Test Business',
-            'slug' => 'planning-test-business',
+            'slug' => 'planning-test-'.Str::lower(Str::random(8)),
         ]);
 
         return Event::create([
