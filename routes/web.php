@@ -5,6 +5,7 @@ use App\Http\Controllers\BusinessCapabilityController;
 use App\Http\Controllers\BusinessContextController;
 use App\Http\Controllers\BusinessSettingsController;
 use App\Http\Controllers\CalendarController;
+use App\Http\Controllers\ComplianceDocumentController;
 use App\Http\Controllers\CustomerController;
 use App\Http\Controllers\CustomerContactController;
 use App\Http\Controllers\EventCostController;
@@ -45,6 +46,7 @@ Route::middleware(['auth', 'business.context'])->group(function () {
     Route::get('/dashboard', DashboardController::class)->name('dashboard');
 
     Route::middleware('owner')->group(function () {
+        Route::get('/setup', [OnboardingController::class, 'index'])->name('onboarding.index');
         Route::get('/setup/catalogue', [OnboardingController::class, 'catalogue'])->name('onboarding.catalogue');
         Route::post('/setup/catalogue', [OnboardingController::class, 'storeCatalogue'])->name('onboarding.catalogue.store');
         Route::post('/setup/catalogue/finish', [OnboardingController::class, 'finishCatalogue'])->name('onboarding.catalogue.finish');
@@ -53,6 +55,7 @@ Route::middleware(['auth', 'business.context'])->group(function () {
         Route::post('/setup/business', [OnboardingController::class, 'storeBusiness'])->name('onboarding.business.store');
         Route::post('/setup/business/skip', [OnboardingController::class, 'skipBusiness'])->name('onboarding.business.skip');
     });
+
     Route::get('/media/profile/{type}/{id}', [\App\Http\Controllers\ProfileMediaController::class, 'show'])->whereIn('type', ['customer', 'user'])->name('profile.media');
     Route::get('/media/business/{type}', [\App\Http\Controllers\BusinessMediaController::class, 'show'])->whereIn('type', ['logo', 'dashboard', 'wallpaper'])->name('business.media');
     Route::get('/calendar', CalendarController::class)->name('calendar.index');
@@ -87,14 +90,20 @@ Route::middleware(['auth', 'business.context'])->group(function () {
     Route::post('/assets/{asset}/release', [AssetController::class, 'release'])->name('assets.release');
 
     Route::get('/reports', \App\Http\Controllers\ReportController::class)->name('reports.index');
+
     Route::middleware('owner')->group(function () {
         Route::get('/settings', [BusinessSettingsController::class, 'edit'])->name('settings.index');
         Route::put('/settings', [BusinessSettingsController::class, 'update'])->name('settings.update');
+        Route::get('/settings/compliance', [ComplianceDocumentController::class, 'index'])->name('settings.compliance');
+        Route::post('/settings/compliance', [ComplianceDocumentController::class, 'store'])->name('settings.compliance.store');
+        Route::get('/settings/compliance/{document}/download', [ComplianceDocumentController::class, 'download'])->name('settings.compliance.download');
+        Route::delete('/settings/compliance/{document}', [ComplianceDocumentController::class, 'destroy'])->name('settings.compliance.destroy');
     });
 
     Route::get('/quotes', [QuoteController::class, 'index'])->name('quotes.index');
     Route::get('/quotes/{quote}', [QuoteController::class, 'show'])->name('quotes.show');
     Route::post('/quotes/{quote}/versions', [QuoteController::class, 'createVersion'])->name('quotes.versions.store');
+    Route::patch('/quotes/{quote}/status', [QuoteController::class, 'updateStatus'])->name('quotes.status');
     Route::get('/quotes/{quote}/versions/{version}/edit', [QuoteController::class, 'editVersion'])->name('quotes.versions.edit');
     Route::put('/quotes/{quote}/versions/{version}', [QuoteController::class, 'updateVersion'])->name('quotes.versions.update');
 
