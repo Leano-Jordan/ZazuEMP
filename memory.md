@@ -539,7 +539,7 @@ Verification boundary:
 ## Core re-audit + regression consolidation — 2026-09-26
 
 Verified on current main:
-- Full Laravel CI suite passed on commit `d7e2ad63489c00d5374e5cd3500873c00d5374e5cd3500873c00a586b29` with the current application test set.
+- Full Laravel CI suite passed on commit `d7e2ad63489c00d5374e5cd3500873c00a586b29` with the current application test set.
 - Frontend dependency install/build passed in the same CI sequence.
 - Earlier failure wall was traced to malformed compiled Blade PHP, not fifteen unrelated application failures.
 
