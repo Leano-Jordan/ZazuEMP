@@ -31,6 +31,6 @@ class Quote extends Model
 
     public function latestVersion(): HasOne
     {
-        return $this->hasOne(QuoteVersion::class)->latestOfMany('version');
+        return $this->versions()->one()->latestOfMany('version');
     }
 }
