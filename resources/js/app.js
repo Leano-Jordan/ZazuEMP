@@ -69,3 +69,20 @@ document.querySelectorAll('[data-user-menu]').forEach((menu) => {
         if (event.key === 'Escape') close();
     });
 });
+
+
+document.querySelectorAll('[data-zazu-toast]').forEach((toast) => {
+    const close = () => {
+        toast.style.opacity = '0';
+        toast.style.transform = 'translateY(8px)';
+        toast.style.transition = 'opacity 140ms ease, transform 140ms ease';
+        window.setTimeout(() => toast.remove(), 150);
+    };
+
+    toast.querySelector('[data-zazu-toast-close]')?.addEventListener('click', close);
+
+    const duration = toast.classList.contains('zazu-toast-error') ? 9000 : 6000;
+    window.setTimeout(() => {
+        if (document.body.contains(toast)) close();
+    }, duration);
+});
