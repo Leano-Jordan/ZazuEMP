@@ -38,7 +38,7 @@ class ZazuWorkflowTest extends TestCase
         $this->assertDatabaseHas('event_requirements', [
             'event_id' => $event->id,
             'description' => '100 chairs',
-            'category' => 'Furniture',
+            'category' => 'Furniture & equipment',
             'status' => 'open',
         ]);
     }
