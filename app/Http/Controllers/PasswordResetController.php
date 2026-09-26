@@ -87,7 +87,18 @@ class PasswordResetController extends Controller
 
         Auth::login($user);
         $request->session()->regenerate();
-        app(CurrentBusiness::class)->resolve($user);
+
+        $ownedBusiness = $user->businesses()
+            ->where('businesses.status', 'active')
+            ->wherePivot('role', 'owner')
+            ->orderBy('businesses.id')
+            ->first();
+
+        if ($ownedBusiness) {
+            $request->session()->put(CurrentBusiness::SESSION_KEY, $ownedBusiness->id);
+        } else {
+            app(CurrentBusiness::class)->resolve($user);
+        }
 
         return redirect()
             ->route('dashboard')
