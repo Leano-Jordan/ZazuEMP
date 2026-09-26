@@ -4,7 +4,7 @@
 @source '../../storage/framework/views/*.php';
 
 @theme {
-    --font-sans: 'Instrument Sans', ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji',
+    --font-sans: 'Segoe UI Variable Text', 'Segoe UI', 'Noto Sans', 'Helvetica Neue', Arial, ui-sans-serif, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji',
         'Segoe UI Symbol', 'Noto Color Emoji';
 }
 
@@ -2814,4 +2814,110 @@ body {
     color: var(--zazu-ink);
     font-size: 11px;
     font-weight: 850;
+}
+
+
+body.zazu-has-wallpaper {
+    background-image:
+        linear-gradient(135deg, color-mix(in srgb, var(--zazu-page) 91%, transparent), color-mix(in srgb, var(--zazu-page-deep) 94%, transparent)),
+        var(--zazu-wallpaper),
+        linear-gradient(145deg, var(--zazu-page) 0%, var(--zazu-page-deep) 100%);
+    background-size: cover, cover, cover;
+    background-position: center, center, center;
+    background-attachment: fixed;
+}
+.zazu-has-wallpaper .zazu-content > *,
+.zazu-has-wallpaper .zazu-topbar-inner {
+    position: relative;
+}
+.zazu-brand-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 9px;
+    min-width: 0;
+    color: inherit;
+    text-decoration: none;
+}
+.zazu-brand-logo {
+    width: 32px;
+    height: 32px;
+    flex: 0 0 32px;
+    object-fit: contain;
+    border-radius: 8px;
+    background: var(--zazu-surface);
+    border: 1px solid var(--zazu-border);
+}
+.zazu-brand-word {
+    max-width: 175px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+.zazu-brand-word::after {
+    content: ".";
+    color: var(--zazu-accent);
+}
+.zazu-brand-link:hover .zazu-brand-word {
+    color: var(--zazu-primary);
+}
+.zazu-brand-link:hover .zazu-brand-word::after {
+    color: var(--zazu-primary);
+}
+.zazu-branding-preview-grid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 14px;
+}
+.zazu-branding-preview {
+    min-width: 0;
+    padding: 14px;
+    border: 1px solid var(--zazu-border);
+    border-radius: 14px;
+    background: var(--zazu-surface-2);
+}
+.zazu-branding-preview > strong,
+.zazu-branding-preview > span {
+    display: block;
+}
+.zazu-branding-preview > strong {
+    margin-top: 12px;
+    color: var(--zazu-ink);
+    font-size: 12px;
+    font-weight: 800;
+}
+.zazu-branding-preview > span {
+    margin-top: 4px;
+    color: var(--zazu-muted);
+    font-size: 10px;
+    line-height: 1.5;
+}
+.zazu-branding-preview-media {
+    width: 100%;
+    height: 130px;
+    display: grid;
+    place-items: center;
+    overflow: hidden;
+    border-radius: 11px;
+    background: var(--zazu-surface);
+    color: var(--zazu-muted);
+    font-size: 11px;
+    font-weight: 700;
+}
+.zazu-branding-preview-media img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+.zazu-branding-logo {
+    height: 130px;
+    background: var(--zazu-primary-soft);
+}
+.zazu-branding-logo img {
+    object-fit: contain;
+    padding: 18px;
+}
+@media (max-width: 900px) {
+    .zazu-branding-preview-grid {
+        grid-template-columns: 1fr;
+    }
 }
