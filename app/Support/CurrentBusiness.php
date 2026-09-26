@@ -9,7 +9,7 @@ class CurrentBusiness
 {
     public function resolve(?Authenticatable $user = null): ?Business
     {
-        $user ??= request()->user();
+        $user ??= auth()->user();
 
         if ($user) {
             return $user->businesses()
