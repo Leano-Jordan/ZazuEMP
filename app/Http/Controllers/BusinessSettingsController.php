@@ -28,6 +28,10 @@ class BusinessSettingsController extends Controller
             'taxRegimes' => config('zazu.tax.regimes'),
             'vatStatuses' => config('zazu.tax.vat_statuses'),
             'taxRates' => $business->taxRates,
+            // Do not decrypt the stored TCS PIN merely to decide whether one exists.
+            // This keeps the settings page render-safe even if an old installation
+            // contains a legacy/plaintext value that predates encrypted storage.
+            'hasTcsPin' => filled($business->taxProfile?->getRawOriginal('tcs_pin')),
         ]);
     }
 
@@ -93,14 +97,18 @@ class BusinessSettingsController extends Controller
 
         try {
             DB::transaction(function () use ($business, $validated, $request, $newPaths): void {
-                $business->update([
+                // Serialize settings/tax updates so two browser tabs cannot version
+                // the same business tax configuration against stale state.
+                $lockedBusiness = Business::query()->lockForUpdate()->findOrFail($business->id);
+
+                $lockedBusiness->update([
                     'name' => trim($validated['name']),
                     'currency' => strtoupper($validated['currency']),
-                    'tax_number' => $validated['income_tax_number'] ?? $business->tax_number,
+                    'tax_number' => $validated['income_tax_number'] ?? $lockedBusiness->tax_number,
                     ...$newPaths,
                 ]);
 
-                $profile = $business->taxProfile()->firstOrNew([
+                $profile = $lockedBusiness->taxProfile()->firstOrNew([
                     'business_id' => $business->id,
                 ]);
 
@@ -139,9 +147,9 @@ class BusinessSettingsController extends Controller
                 $profile->save();
 
                 $this->syncTaxDefaults(
-                    $business,
+                    $lockedBusiness,
                     $profile,
-                    (string) ($validated['default_vat_rate'] ?? $business->taxRates()
+                    (string) ($validated['default_vat_rate'] ?? $lockedBusiness->taxRates()
                         ->where('code', 'VAT_STANDARD')
                         ->where('is_default', true)
                         ->value('rate') ?? config('zazu.tax.default_standard_rate')),
