@@ -2,9 +2,16 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Asset;
 use App\Models\Customer;
 use App\Models\Event;
+use App\Models\FinanceExpense;
+use App\Models\InventoryItem;
+use App\Models\Invoice;
+use App\Models\Payment;
+use App\Models\PurchaseOrder;
 use App\Models\Quote;
+use App\Models\Supplier;
 use App\Support\CurrentBusiness;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\Request;
@@ -42,8 +49,26 @@ class DashboardController extends Controller
             ->limit(8)
             ->get();
 
+        $workspaceTools = [
+            'finance' => Invoice::query()->where('business_id', $businessId)->exists()
+                || Payment::query()->where('business_id', $businessId)->exists()
+                || FinanceExpense::query()->where('business_id', $businessId)->exists(),
+            'purchasing' => Supplier::query()->where('business_id', $businessId)->exists()
+                || PurchaseOrder::query()->where('business_id', $businessId)->exists(),
+            'inventory' => InventoryItem::query()->where('business_id', $businessId)->exists(),
+            'assets' => Asset::query()->where('business_id', $businessId)->exists(),
+            'reports' => (clone $eventQuery)->whereIn('status', ['completed', 'cancelled'])->exists()
+                || Invoice::query()->where('business_id', $businessId)->exists(),
+        ];
+
         $isOwner = app(CurrentBusiness::class)->hasRole('owner', $request->user(), $business);
 
-        return view('dashboard', compact('metrics', 'upcoming', 'business', 'isOwner'));
+        return view('dashboard', compact(
+            'metrics',
+            'upcoming',
+            'business',
+            'isOwner',
+            'workspaceTools'
+        ));
     }
 }
