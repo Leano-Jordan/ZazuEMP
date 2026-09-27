@@ -16,6 +16,7 @@ class Invoice extends Model
         'business_id',
         'event_id',
         'quote_id',
+        'quote_version_id',
         'number',
         'business_legal_name',
         'business_trading_name',
@@ -70,6 +71,11 @@ class Invoice extends Model
     public function taxRateRecord(): BelongsTo
     {
         return $this->belongsTo(TaxRate::class, 'tax_rate_id');
+    }
+
+    public function quoteVersion(): BelongsTo
+    {
+        return $this->belongsTo(QuoteVersion::class, 'quote_version_id');
     }
 
     public function payments(): HasMany

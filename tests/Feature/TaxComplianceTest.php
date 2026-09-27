@@ -206,6 +206,12 @@ class TaxComplianceTest extends TestCase
         $this->assertSame('10 tables', $invoice->items->first()->description);
         $this->assertSame('100.00', (string) $invoice->items->first()->unit_price);
         $this->assertSame('1000.00', (string) $invoice->items->first()->line_total);
+        $this->assertSame($quote->latestVersion->id, $invoice->quote_version_id);
+
+        $this->post(route('finance.invoices.store'), ['quote_id' => $quote->id])
+            ->assertStatus(422);
+
+        $this->assertDatabaseCount('invoices', 1);
 
     }
 

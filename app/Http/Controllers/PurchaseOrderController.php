@@ -11,10 +11,19 @@ use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Validation\Rule;
 use Illuminate\View\View;
 
 class PurchaseOrderController extends Controller
 {
+    private const STATUS_TRANSITIONS = [
+        'draft' => ['sent', 'cancelled'],
+        'sent' => ['ordered', 'cancelled'],
+        'ordered' => ['received', 'cancelled'],
+        'received' => [],
+        'cancelled' => [],
+    ];
+
     public function index(Request $request): View
     {
         $businessId=app(CurrentBusiness::class)->id($request->user());
@@ -37,7 +46,7 @@ class PurchaseOrderController extends Controller
         $businessId=app(CurrentBusiness::class)->id($request->user());
         $data=$request->validate([
             'supplier_id'=>['required','integer'],
-            'currency'=>['required','string','size:3'],
+            'currency'=>['required','string','size:3', Rule::in(array_keys(config('zazu.currencies')))],
             'expected_at'=>['nullable','date'],
             'notes'=>['nullable','string'],
             'description'=>['required','array','min:1'],
@@ -52,10 +61,26 @@ class PurchaseOrderController extends Controller
             'capability_id.*'=>['nullable','integer'],
         ]);
         $supplier=Supplier::where('business_id',$businessId)->findOrFail($data['supplier_id']);
+        $businessCurrency = app(CurrentBusiness::class)->model($request->user())->currency ?? 'ZAR';
 
         abort_unless(
-            count($data['description']) === count($data['quantity'])
-                && count($data['description']) === count($data['unit_price']),
+            strtoupper($data['currency']) === strtoupper($businessCurrency),
+            422,
+            'Purchase orders must use the active business currency.'
+        );
+
+        $lineCount = count($data['description']);
+
+        abort_unless(
+            count($data['quantity']) === $lineCount
+                && (empty($data['unit']) || count($data['unit']) === $lineCount)
+                && (empty($data['capability_id']) || count($data['capability_id']) === $lineCount),
+            422,
+            'Purchase order lines are incomplete.'
+        );
+
+        abort_unless(
+            count($data['description']) === count($data['unit_price']),
             422,
             'Purchase order lines are incomplete.'
         );
@@ -114,9 +139,24 @@ class PurchaseOrderController extends Controller
         $this->ensure($request,$purchaseOrder);
         $data=$request->validate(['status'=>['required','in:draft,sent,ordered,received,cancelled']]);
         $businessId = app(CurrentBusiness::class)->id($request->user());
+        $currentStatus = $purchaseOrder->status;
+
+        if ($currentStatus !== $data['status']) {
+            abort_unless(
+                in_array($data['status'], self::STATUS_TRANSITIONS[$currentStatus] ?? [], true),
+                422,
+                'That purchase order status change is not allowed.'
+            );
+        }
 
         DB::transaction(function () use ($purchaseOrder, $data, $businessId): void {
-            $purchaseOrder->update($data);
+            $updates = ['status' => $data['status']];
+
+            if ($data['status'] === 'ordered' && !$purchaseOrder->ordered_at) {
+                $updates['ordered_at'] = now()->toDateString();
+            }
+
+            $purchaseOrder->update($updates);
 
             if ($data['status'] !== 'received') {
                 return;
