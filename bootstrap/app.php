@@ -36,11 +36,9 @@ return Application::configure(basePath: dirname(__DIR__))
 
         $exceptions->respond(function (Response $response) {
             $request = request();
-            $requestId = $request->attributes->get('zazu_request_id');
+            $requestId = $request->attributes->get('zazu_request_id') ?: (string) Str::uuid();
 
-            if ($requestId) {
-                $response->headers->set('X-Zazu-Request-Id', $requestId);
-            }
+            $response->headers->set('X-Zazu-Request-Id', $requestId);
 
             if (
                 $response->getStatusCode() < 500
@@ -51,9 +49,9 @@ return Application::configure(basePath: dirname(__DIR__))
             }
 
             return response()->view('errors.500', [
-                'requestId' => $requestId ?: (string) Str::uuid(),
+                'requestId' => $requestId,
                 'code' => $response->getStatusCode(),
             ], $response->getStatusCode())
-                ->header('X-Zazu-Request-Id', $requestId ?: (string) Str::uuid());
+                ->header('X-Zazu-Request-Id', $requestId);
         });
     })->create();
