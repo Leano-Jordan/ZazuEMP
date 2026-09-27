@@ -250,7 +250,7 @@ If those pass, proceed to the next roster slice after Requirements, which is the
 
 **Master ENGINE name:** Morpheus  
 **Owner-facing nickname:** Jarvis  
-**Project boundary:** This audit is for **Zazu EMP / Leano-Jordan/ZazuEMP only**. Do not mix findings, files, architecture or memory from SwiftOrder / store-ordering into Zazu EMP.
+**Project boundary:** This audit is for **Zazu EMP / Leano-Jordan/ZazuEMP only**. Do not mix findings, files, architecture or memory from any other project into Zazu EMP.
 
 ### Current verified findings
 
