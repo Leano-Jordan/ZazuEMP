@@ -165,7 +165,8 @@ class QuoteController extends Controller
         );
 
         abort_unless($quote->latestVersion, 422, 'A quote must have a version before its status can change.');
-\n        DB::transaction(function () use ($quote, $newStatus): void {
+
+        DB::transaction(function () use ($quote, $newStatus): void {
             $lockedQuote = Quote::query()
                 ->whereKey($quote->id)
                 ->lockForUpdate()
