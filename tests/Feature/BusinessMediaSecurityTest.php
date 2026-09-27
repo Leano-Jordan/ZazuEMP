@@ -119,5 +119,23 @@ class BusinessMediaSecurityTest extends TestCase
             ->assertSee('data-branding-loading="wallpaper"', false)
             ->assertSee('data-branding-save', false);
     }
+    public function test_settings_page_does_not_decrypt_legacy_tcs_pin_just_to_render(): void
+    {
+        $this->signInAsOwner();
+        $business = auth()->user()->businesses()->firstOrFail();
+
+        $profile = $business->taxProfile()->create([
+            'vat_status' => 'not_registered',
+            'tcs_pin' => 'legacy-plain-text-value',
+        ]);
+
+        $this->get(route('settings.index'))
+            ->assertOk()
+            ->assertSee('PIN stored securely — leave blank to keep it', false);
+
+        $this->assertSame('legacy-plain-text-value', $profile->getRawOriginal('tcs_pin'));
+    }
+
+
 }
 
