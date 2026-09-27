@@ -11,7 +11,7 @@ class InventoryMovement extends Model
 {
     use BelongsToBusiness, HasFactory;
 
-    protected $fillable = ['business_id','inventory_item_id','event_id','purchase_order_id','type','quantity','unit_cost','movement_date','reference','notes'];
+    protected $fillable = ['business_id','inventory_item_id','event_id','purchase_order_id','purchase_order_item_id','type','quantity','unit_cost','movement_date','reference','notes'];
 
     protected function casts(): array
     {
@@ -21,4 +21,5 @@ class InventoryMovement extends Model
     public function item(): BelongsTo { return $this->belongsTo(InventoryItem::class, 'inventory_item_id'); }
     public function event(): BelongsTo { return $this->belongsTo(Event::class); }
     public function purchaseOrder(): BelongsTo { return $this->belongsTo(PurchaseOrder::class); }
+    public function purchaseOrderItem(): BelongsTo { return $this->belongsTo(PurchaseOrderItem::class); }
 }
