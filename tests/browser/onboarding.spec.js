@@ -31,6 +31,23 @@ test('registration flows into catalogue, business setup and dashboard', async ({
     await expect(page.getByRole('heading', { name: 'Business overview' })).toBeVisible();
     await expect(page.getByTitle('Active business workspace')).toHaveText(businessName);
 
+    const helperPanel = page.locator('[data-zazu-helper-panel]');
+    const helperToggle = page.locator('[data-zazu-helper-toggle]');
+
+    await expect(helperPanel).toBeVisible();
+    await expect(helperToggle).toHaveAttribute('aria-pressed', 'true');
+
+    await page.getByRole('button', { name: 'Turn guide off' }).click();
+    await expect(helperPanel).toBeHidden();
+    await expect(helperToggle).toHaveAttribute('aria-pressed', 'false');
+
+    await helperToggle.click();
+    await expect(helperPanel).toBeVisible();
+    await expect(helperToggle).toHaveAttribute('aria-pressed', 'true');
+
+    await page.getByRole('button', { name: 'Close' }).click();
+    await expect(helperPanel).toBeHidden();
+
     const moduleLinks = await page.locator('nav[aria-label="Primary"] a').evaluateAll((links) =>
         links.map((link) => ({ href: link.href, name: link.textContent?.trim() }))
             .filter((link) => link.href && link.name)
