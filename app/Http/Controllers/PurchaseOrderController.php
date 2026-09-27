@@ -17,13 +17,7 @@ use Illuminate\View\View;
 
 class PurchaseOrderController extends Controller
 {
-    private const STATUS_TRANSITIONS = [
-        'draft' => ['sent', 'cancelled'],
-        'sent' => ['ordered', 'cancelled'],
-        'ordered' => ['received', 'cancelled'],
-        'received' => [],
-        'cancelled' => [],
-    ];
+
 
     public function index(Request $request): View
     {
