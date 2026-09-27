@@ -22,7 +22,7 @@
         </div>
 
         @if ($quotes->count())
-            <div class="zazu-record-header" style="--zazu-record-cols: 3">
+            <div class="zazu-record-header" data-record-cols="3">
                 <div class="zazu-record-header-note">Quote</div>
                 <div class="zazu-record-header-cell">Version</div>
                 <div class="zazu-record-header-cell">Status</div>
