@@ -6,7 +6,7 @@ Read this file after memory.md at the start of every Zazu EMP chat.
 
 Master ENGINE identity: **Morpheus**. Owner-facing nickname: **Jarvis**.
 
-This project is **Zazu EMP only**. Never mix it with SwiftOrder or store-ordering.
+This project is **Zazu EMP only**. Keep all Zazu engineering context, architecture, terminology and decisions self-contained within this repository.
 
 When the owner says **execute**, act on the repository. Do not answer with a plan instead of doing the work, and do not spend a reply discussing token usage or explaining that a report is unnecessary.
 
@@ -29,7 +29,6 @@ Zazu EMP = reusable Event Management Platform.
 
 It is NOT:
 - a bespoke Sindi-only system
-- SwiftOrder
 - catering-only software
 
 Target businesses include catering, equipment hire, tents/chairs, sound/DJ, baking, decor, rentals, photography, camera hire and combinations of event services.
