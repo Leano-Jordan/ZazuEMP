@@ -158,7 +158,7 @@
             const customer = customers.find(item => String(item.id) === customerSelect.value);
 
             for (const select of [dayContactSelect, nightContactSelect]) {
-                select.innerHTML = '<option value="">No contact selected</option>';
+                select.replaceChildren(new Option('No contact selected', ''));
             }
 
             if (!customer) return;
