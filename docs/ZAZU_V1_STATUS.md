@@ -127,7 +127,7 @@ The system is still not a V1 release candidate because customer-facing quote acc
 2. Some child models rely on controller-level business authorization rather than enforcing every parent/child invariant independently.
 3. Two migrations share the 2026_09_26_000015 timestamp prefix. They should not be rewritten casually after development databases have applied them.
 4. Some reporting/UI summaries still use PHP float conversion for decimal monetary values. Finance transaction validation now uses integer cents; broader reporting should follow the same rule.
-5. Public-disk identifiable media remains a production security boundary.
+5. Identifiable customer, staff and business-branding media are now kept on private storage; migration of existing business-branding files is included in the application upgrade path.
 
 ## 5. Verification
 
