@@ -6,6 +6,7 @@ use Illuminate\Foundation\Configuration\Middleware;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
+use Throwable;
 
 return Application::configure(basePath: dirname(__DIR__))
     ->withRouting(
@@ -31,6 +32,18 @@ return Application::configure(basePath: dirname(__DIR__))
             return response()->view('errors.404', [
                 'requestId' => $requestId,
             ], 404)->header('X-Zazu-Request-Id', $requestId);
+        });
+
+        $exceptions->render(function (Throwable $exception, Request $request) {
+            if ($request->expectsJson() || $request->is('api/*')) {
+                return null;
+            }
+
+            $requestId = $request->attributes->get('zazu_request_id') ?: (string) Str::uuid();
+
+            return response()->view('errors.500', [
+                'requestId' => $requestId,
+            ], 500)->header('X-Zazu-Request-Id', $requestId);
         });
 
         $exceptions->respond(function ($response) {
