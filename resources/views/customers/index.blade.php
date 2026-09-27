@@ -25,7 +25,7 @@
         </div>
 
         @if ($customers->count())
-            <div class="zazu-record-header" style="--zazu-record-cols: 2">
+            <div class="zazu-record-header" data-record-cols="2">
                 <div class="zazu-record-header-note">Customer</div>
                 <div class="zazu-record-header-cell">Work</div>
                 <div class="zazu-record-header-cell">Actions</div>
