@@ -1,14 +1,16 @@
 import { test, expect } from '@playwright/test';
 
 test('registration flows into catalogue, business setup and dashboard', async ({ page }) => {
-    const username = 'browserowner' + Date.now().toString().slice(-6);
+    const unique = Date.now().toString().slice(-6);
+    const username = 'browserowner' + unique;
+    const businessName = 'Browser Catering ' + unique;
 
     await page.goto('http://127.0.0.1:8000/register');
     await expect(page.getByRole('heading', { name: 'Set up your Zazu workspace' })).toBeVisible();
 
     await page.getByLabel('Your name').fill('Browser Owner');
     await page.getByLabel('Username').fill(username);
-    await page.getByLabel('Business name').fill('Browser Catering');
+    await page.getByLabel('Business name').fill(businessName);
     await page.getByLabel('Email address').fill(username + '@example.com');
     await page.getByLabel('Password').fill('password123');
     await page.getByLabel('Confirm password').fill('password123');
@@ -27,5 +29,5 @@ test('registration flows into catalogue, business setup and dashboard', async ({
 
     await expect(page).toHaveURL(/\/dashboard$/);
     await expect(page.getByRole('heading', { name: 'Business overview' })).toBeVisible();
-    await expect(page.getByText('Wedding catering')).toBeVisible();
+    await expect(page.getByText(businessName)).toBeVisible();
 });
