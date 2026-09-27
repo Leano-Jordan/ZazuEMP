@@ -24,47 +24,49 @@
             <form method="POST" action="{{ route('register.store') }}" class="zazu-form">
                 @csrf
 
-                <div class="zazu-field">
-                    <label for="name">Your name</label>
-                    <input id="name" name="name" type="text" value="{{ old('name') }}" autocomplete="name" required autofocus>
-                    @error('name') <div class="zazu-field-error">{{ $message }}</div> @enderror
-                </div>
-
-                <div class="zazu-field">
-                    <label for="username">Username</label>
-                    <input id="username" name="username" type="text" value="{{ old('username') }}" autocomplete="username" autocapitalize="none" spellcheck="false" maxlength="32" pattern="[A-Za-z0-9][A-Za-z0-9._-]{2,31}" required>
-                    <div class="zazu-field-help">3–32 characters. Letters, numbers, dots, underscores and hyphens.</div>
-                    @error('username') <div class="zazu-field-error">{{ $message }}</div> @enderror
-                </div>
-
-                <div class="zazu-field">
-                    <label for="business_name">Business name</label>
-                    <input id="business_name" name="business_name" type="text" value="{{ old('business_name') }}" autocomplete="organization" required>
-                    @error('business_name') <div class="zazu-field-error">{{ $message }}</div> @enderror
-                </div>
-
-                <div class="zazu-field">
-                    <label for="email">Email address</label>
-                    <input id="email" name="email" type="email" value="{{ old('email') }}" autocomplete="email" required>
-                    @error('email') <div class="zazu-field-error">{{ $message }}</div> @enderror
-                </div>
-
-                <div class="zazu-field">
-                    <label for="password">Password</label>
-                    <div class="zazu-login-password">
-                        <input id="password" name="password" type="password" autocomplete="new-password" minlength="8" required>
-                        <button type="button" class="zazu-login-password-toggle" data-password-toggle aria-controls="password" aria-label="Show password">Show</button>
+                <div class="zazu-auth-form-grid">
+                    <div class="zazu-field">
+                        <label for="name">Your name</label>
+                        <input id="name" name="name" type="text" value="{{ old('name') }}" autocomplete="name" required autofocus>
+                        @error('name') <div class="zazu-field-error">{{ $message }}</div> @enderror
                     </div>
-                    @error('password') <div class="zazu-field-error">{{ $message }}</div> @enderror
-                </div>
 
-                <div class="zazu-field">
-                    <label for="password_confirmation">Confirm password</label>
-                    <div class="zazu-login-password">
-                        <input id="password_confirmation" name="password_confirmation" type="password" autocomplete="new-password" minlength="8" required>
-                        <button type="button" class="zazu-login-password-toggle" data-password-toggle="password_confirmation" aria-controls="password_confirmation" aria-label="Show password">Show</button>
+                    <div class="zazu-field">
+                        <label for="username">Username</label>
+                        <input id="username" name="username" type="text" value="{{ old('username') }}" autocomplete="username" autocapitalize="none" spellcheck="false" maxlength="32" pattern="[A-Za-z0-9][A-Za-z0-9._-]{2,31}" required>
+                        <div class="zazu-field-help">3–32 characters. Letters, numbers, dots, underscores and hyphens.</div>
+                        @error('username') <div class="zazu-field-error">{{ $message }}</div> @enderror
                     </div>
-                    @error('password_confirmation') <div class="zazu-field-error">{{ $message }}</div> @enderror
+
+                    <div class="zazu-field">
+                        <label for="business_name">Business name</label>
+                        <input id="business_name" name="business_name" type="text" value="{{ old('business_name') }}" autocomplete="organization" required>
+                        @error('business_name') <div class="zazu-field-error">{{ $message }}</div> @enderror
+                    </div>
+
+                    <div class="zazu-field">
+                        <label for="email">Email address</label>
+                        <input id="email" name="email" type="email" value="{{ old('email') }}" autocomplete="email" required>
+                        @error('email') <div class="zazu-field-error">{{ $message }}</div> @enderror
+                    </div>
+
+                    <div class="zazu-field">
+                        <label for="password">Password</label>
+                        <div class="zazu-login-password">
+                            <input id="password" name="password" type="password" autocomplete="new-password" minlength="8" required>
+                            <button type="button" class="zazu-login-password-toggle" data-password-toggle aria-controls="password" aria-label="Show password">Show</button>
+                        </div>
+                        @error('password') <div class="zazu-field-error">{{ $message }}</div> @enderror
+                    </div>
+
+                    <div class="zazu-field">
+                        <label for="password_confirmation">Confirm password</label>
+                        <div class="zazu-login-password">
+                            <input id="password_confirmation" name="password_confirmation" type="password" autocomplete="new-password" minlength="8" required>
+                            <button type="button" class="zazu-login-password-toggle" data-password-toggle="password_confirmation" aria-controls="password_confirmation" aria-label="Show password">Show</button>
+                        </div>
+                        @error('password_confirmation') <div class="zazu-field-error">{{ $message }}</div> @enderror
+                    </div>
                 </div>
 
                 <button type="submit" class="zazu-btn zazu-btn-primary zazu-auth-submit">Create workspace</button>
