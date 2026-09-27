@@ -45,7 +45,7 @@
                                 <div class="flex flex-wrap gap-2">
                                     <a href="{{ route('customers.contacts.edit', [$customer, $contact]) }}" class="zazu-btn zazu-btn-ghost">Edit</a>
                                     @unless ($contact->is_primary)
-                                        <form method="POST" action="{{ route('customers.contacts.destroy', [$customer, $contact]) }}" onsubmit="return confirm('Remove this contact from the active customer record? Historical Work references will be retained.')">
+                                        <form method="POST" action="{{ route('customers.contacts.destroy', [$customer, $contact]) }}" data-zazu-confirm="Remove this contact from the active customer record? Historical Work references will be retained." data-zazu-confirm-title="Remove contact?">
                                             @csrf @method('DELETE')
                                             <button type="submit" class="zazu-btn zazu-btn-ghost text-[var(--zazu-danger-ink)]">Remove</button>
                                         </form>
