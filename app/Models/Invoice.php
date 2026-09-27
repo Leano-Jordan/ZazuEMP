@@ -19,6 +19,7 @@ class Invoice extends Model
         'quote_id',
         'quote_version_id',
         'number',
+        'idempotency_key',
         'business_legal_name',
         'business_trading_name',
         'business_address',
