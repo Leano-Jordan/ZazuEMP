@@ -10,6 +10,19 @@ use Illuminate\Database\Eloquent\Relations\HasOne;
 
 class Quote extends Model
 {
+    public const STATUS_TRANSITIONS = [
+        'draft' => ['sent'],
+        'sent' => ['accepted', 'declined', 'expired'],
+        'declined' => ['draft'],
+        'expired' => ['draft'],
+        'accepted' => [],
+    ];
+
+    public function canTransitionTo(string $status): bool
+    {
+        return in_array($status, self::STATUS_TRANSITIONS[$this->status] ?? [], true);
+    }
+
     use HasFactory;
 
     protected $fillable = [
