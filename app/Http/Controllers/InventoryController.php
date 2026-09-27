@@ -6,6 +6,7 @@ use App\Models\BusinessCapability;
 use App\Models\Event;
 use App\Models\InventoryItem;
 use App\Models\EventRequirement;
+use App\Support\Audit;
 use App\Support\CurrentBusiness;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -47,7 +48,8 @@ class InventoryController extends Controller
         if (!empty($data['capability_id'])) {
             abort_unless(BusinessCapability::where('business_id',$businessId)->where('capability_type','product')->whereKey($data['capability_id'])->exists(), 404);
         }
-        InventoryItem::create([...$data,'business_id'=>$businessId]);
+        $item = InventoryItem::create([...$data,'business_id'=>$businessId]);
+        Audit::record('inventory.item.created', $item, ['name' => $item->name], $businessId);
         return redirect()->route('inventory.index')->with('success','Inventory item created.');
     }
 
@@ -56,6 +58,7 @@ class InventoryController extends Controller
         $businessId=app(CurrentBusiness::class)->id($request->user());
         abort_unless((int)$inventoryItem->business_id===$businessId,404);
         $data=$request->validate([
+            'idempotency_key'=>['required','uuid'],
             'type'=>['required','in:receipt,issue,return,adjustment_in,adjustment_out'],
             'quantity'=>['required','numeric','gt:0'],'unit_cost'=>['required','numeric','min:0'],
             'movement_date'=>['required','date'],'reference'=>['nullable','string','max:255'],'notes'=>['nullable','string'],
@@ -63,6 +66,15 @@ class InventoryController extends Controller
         ]);
         if (!empty($data['event_id'])) {
             abort_unless(Event::where('business_id',$businessId)->whereKey($data['event_id'])->exists(), 404);
+        }
+
+        $existingMovement = \App\Models\InventoryMovement::query()
+            ->where('business_id', $businessId)
+            ->where('idempotency_key', $data['idempotency_key'])
+            ->first();
+
+        if ($existingMovement) {
+            return back()->with('info', 'That stock submission was already processed.');
         }
 
         DB::transaction(function () use ($inventoryItem, $businessId, $data): void {
@@ -77,7 +89,12 @@ class InventoryController extends Controller
                 abort_if((float) $data['quantity'] > $onHand + 0.0001, 422, 'This movement would make stock on hand negative.');
             }
 
-            $lockedItem->movements()->create([...$data,'business_id'=>$businessId]);
+            $movement = $lockedItem->movements()->create([...$data,'business_id'=>$businessId]);
+            Audit::record('inventory.movement.recorded', $movement, [
+                'type' => $movement->type,
+                'quantity' => $movement->quantity,
+                'item_id' => $lockedItem->id,
+            ], $businessId);
         });
 
         return back()->with('success','Inventory movement recorded.');
