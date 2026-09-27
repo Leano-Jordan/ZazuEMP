@@ -568,6 +568,44 @@ class FinancePurchasingInventoryTest extends TestCase
         ]);
     }
 
+    public function test_payment_rejects_mixed_currency_invoice_history(): void
+    {
+        [$business, $user] = $this->businessUser();
+        $this->actingAs($user);
+
+        $invoice = Invoice::create([
+            'business_id' => $business->id,
+            'number' => 'INV-CURRENCY-001',
+            'status' => 'issued',
+            'currency' => 'ZAR',
+            'subtotal' => '100.00',
+            'tax_total' => '0.00',
+            'total' => '100.00',
+            'issued_at' => now()->toDateString(),
+        ]);
+
+        AppModelsPayment::create([
+            'business_id' => $business->id,
+            'invoice_id' => $invoice->id,
+            'amount' => '10.00',
+            'currency' => 'USD',
+            'method' => 'bank_transfer',
+            'paid_at' => now()->toDateString(),
+        ]);
+
+        $this->from(route('finance.payments.create'))
+            ->post(route('finance.payments.store'), [
+                'invoice_id' => $invoice->id,
+                'amount' => '20.00',
+                'method' => 'bank_transfer',
+                'paid_at' => now()->toDateString(),
+                'idempotency_key' => (string) IlluminateSupportStr::uuid(),
+            ])
+            ->assertStatus(409);
+
+        $this->assertDatabaseCount('payments', 1);
+    }
+
     public function test_invoice_balance_is_calculated_without_float_rounding(): void
     {
         [$business, $user] = $this->businessUser();
