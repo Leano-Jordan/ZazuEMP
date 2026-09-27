@@ -8,26 +8,14 @@ return new class extends Migration
 {
     public function up(): void
     {
+        // Idempotency indexes for invoices, payments, expenses and inventory movements
+        // are created by the earlier hardening migration. Do not create them twice.
         Schema::table('invoices', function (Blueprint $table): void {
-            $table->unique(['business_id', 'idempotency_key'], 'invoices_business_idempotency_unique');
             $table->unique(['business_id', 'number'], 'invoices_business_number_unique');
         });
 
-        Schema::table('payments', function (Blueprint $table): void {
-            $table->unique(['business_id', 'idempotency_key'], 'payments_business_idempotency_unique');
-        });
-
-        Schema::table('finance_expenses', function (Blueprint $table): void {
-            $table->unique(['business_id', 'idempotency_key'], 'finance_expenses_business_idempotency_unique');
-        });
-
-        Schema::table('purchase_orders', function (Blueprint $table): void {
-            $table->unique(['business_id', 'idempotency_key'], 'purchase_orders_business_idempotency_unique');
-            $table->unique(['business_id', 'reference'], 'purchase_orders_business_reference_unique');
-        });
-
+        // Purchase-order idempotency is added by 000016, after this migration.
         Schema::table('inventory_movements', function (Blueprint $table): void {
-            $table->unique(['business_id', 'idempotency_key'], 'inventory_movements_business_idempotency_unique');
             $table->unique(
                 ['business_id', 'purchase_order_id', 'purchase_order_item_id', 'type'],
                 'inventory_po_receipt_unique'
@@ -39,25 +27,10 @@ return new class extends Migration
     {
         Schema::table('inventory_movements', function (Blueprint $table): void {
             $table->dropUnique('inventory_po_receipt_unique');
-            $table->dropUnique('inventory_movements_business_idempotency_unique');
-        });
-
-        Schema::table('purchase_orders', function (Blueprint $table): void {
-            $table->dropUnique('purchase_orders_business_reference_unique');
-            $table->dropUnique('purchase_orders_business_idempotency_unique');
-        });
-
-        Schema::table('finance_expenses', function (Blueprint $table): void {
-            $table->dropUnique('finance_expenses_business_idempotency_unique');
-        });
-
-        Schema::table('payments', function (Blueprint $table): void {
-            $table->dropUnique('payments_business_idempotency_unique');
         });
 
         Schema::table('invoices', function (Blueprint $table): void {
             $table->dropUnique('invoices_business_number_unique');
-            $table->dropUnique('invoices_business_idempotency_unique');
         });
     }
 };
