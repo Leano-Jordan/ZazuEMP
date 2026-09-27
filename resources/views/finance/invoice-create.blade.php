@@ -16,6 +16,7 @@
 
         <form method="POST" action="{{ route('finance.invoices.store') }}" class="zazu-form p-5">
             @csrf
+            <input type="hidden" name="idempotency_key" value="{{ $idempotencyKey }}">
 
             <label class="zazu-field">
                 <span class="zazu-label">Accepted quote</span>
