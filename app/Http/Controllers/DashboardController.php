@@ -2,16 +2,9 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Asset;
-use App\Models\Customer;
+Asset import placeholderuse App\Models\Customer;
 use App\Models\Event;
-use App\Models\FinanceExpense;
-use App\Models\InventoryItem;
-use App\Models\Invoice;
-use App\Models\Payment;
-use App\Models\PurchaseOrder;
 use App\Models\Quote;
-use App\Models\Supplier;
 use App\Support\CurrentBusiness;
 use App\Support\PermissionService;
 use Illuminate\Database\Eloquent\Builder;
@@ -52,26 +45,11 @@ class DashboardController extends Controller
 
         $permissionService = app(PermissionService::class);
         $workspaceTools = [
-            'finance' => $permissionService->allows('finance.view', $request->user(), $business)
-                && (
-                    Invoice::query()->where('business_id', $businessId)->exists()
-                    || Payment::query()->where('business_id', $businessId)->exists()
-                    || FinanceExpense::query()->where('business_id', $businessId)->exists()
-                ),
-            'purchasing' => $permissionService->allows('purchasing.view', $request->user(), $business)
-                && (
-                    Supplier::query()->where('business_id', $businessId)->exists()
-                    || PurchaseOrder::query()->where('business_id', $businessId)->exists()
-                ),
-            'inventory' => $permissionService->allows('inventory.view', $request->user(), $business)
-                && InventoryItem::query()->where('business_id', $businessId)->exists(),
-            'assets' => $permissionService->allows('assets.view', $request->user(), $business)
-                && Asset::query()->where('business_id', $businessId)->exists(),
-            'reports' => $permissionService->allows('reports.view', $request->user(), $business)
-                && (
-                    (clone $eventQuery)->whereIn('status', ['completed', 'cancelled'])->exists()
-                    || Invoice::query()->where('business_id', $businessId)->exists()
-                ),
+            'finance' => $permissionService->allows('finance.view', $request->user(), $business),
+            'purchasing' => $permissionService->allows('purchasing.view', $request->user(), $business),
+            'inventory' => $permissionService->allows('inventory.view', $request->user(), $business),
+            'assets' => $permissionService->allows('assets.view', $request->user(), $business),
+            'reports' => $permissionService->allows('reports.view', $request->user(), $business),
         ];
 
         $isOwner = app(CurrentBusiness::class)->hasRole('owner', $request->user(), $business);
