@@ -7,6 +7,7 @@ use App\Models\EventCost;
 use App\Models\EventPreparationItem;
 use App\Models\Quote;
 use App\Support\CurrentBusiness;
+use App\Support\Money;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
@@ -50,7 +51,9 @@ class ReportController extends Controller
             ->groupBy('currency')
             ->map(fn ($quotes) => [
                 'count' => $quotes->count(),
-                'total' => (float) $quotes->sum(fn (Quote $quote) => (float) $quote->latestVersion->total),
+                'total_cents' => $quotes->sum(
+                    fn (Quote $quote) => Money::toCents((string) $quote->latestVersion->total)
+                ),
             ]);
 
         $costTotalsByCurrency = EventCost::query()
@@ -59,8 +62,12 @@ class ReportController extends Controller
             ->get()
             ->groupBy('currency')
             ->map(fn ($costs) => [
-                'projected' => (float) $costs->sum(fn (EventCost $cost) => (float) $cost->projected_amount),
-                'actual' => (float) $costs->sum(fn (EventCost $cost) => (float) ($cost->actual_amount ?? 0)),
+                'projected_cents' => $costs->sum(
+                    fn (EventCost $cost) => Money::toCents((string) $cost->projected_amount)
+                ),
+                'actual_cents' => $costs->sum(
+                    fn (EventCost $cost) => Money::toCents((string) ($cost->actual_amount ?? '0.00'))
+                ),
             ]);
 
         return view('reports.index', compact(
