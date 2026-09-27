@@ -584,7 +584,7 @@ class FinancePurchasingInventoryTest extends TestCase
             'issued_at' => now()->toDateString(),
         ]);
 
-        AppModelsPayment::create([
+        \App\Models\Payment::create([
             'business_id' => $business->id,
             'invoice_id' => $invoice->id,
             'amount' => '0.01',
