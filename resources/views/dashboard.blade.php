@@ -38,20 +38,28 @@
             <section class="zazu-dashboard-work zazu-panel">
                 <div class="zazu-panel-head">
                     <div><div class="zazu-panel-title">Upcoming work</div><div class="zazu-panel-copy">Scheduled jobs that are coming up next.</div></div>
-                    <a href="{{ route('calendar.index') }}" class="zazu-btn zazu-btn-secondary">Calendar <span aria-hidden="true">→</span></a>
+                    @if ($workspaceTools['calendar'])<a href="{{ route('calendar.index') }}" class="zazu-btn zazu-btn-secondary">Calendar <span aria-hidden="true">→</span></a>@endif
                 </div>
                 <div class="zazu-list mt-3">
                     @if ($workspaceTools['work'] || $workspaceTools['calendar'])
                     @forelse ($upcoming as $event)
                         <div class="zazu-list-item">
-                            <a href="{{ route('work.show', $event) }}" class="zazu-list-main min-w-0 flex-1">
+                            @if ($workspaceTools['work'])
+                                <a href="{{ route('work.show', $event) }}" class="zazu-list-main min-w-0 flex-1">
+                            @else
+                                <div class="zazu-list-main min-w-0 flex-1">
+                            @endif
                                 <div class="zazu-list-title">{{ $event->name }}</div>
                                 <div class="zazu-list-meta">{{ $event->customer?->name ?? 'No customer' }} · {{ $event->reference }}</div>
-                            </a>
+                            @if ($workspaceTools['work'])
+                                </a>
+                            @else
+                                </div>
+                            @endif
                             <div class="zazu-list-side"><div class="zazu-side-primary" data-numeric="true">{{ $event->event_date?->format('d M Y') }}</div><div class="zazu-side-secondary">{{ $event->event_type ?: 'Work' }}</div></div>
                         </div>
                     @empty
-                        <div class="zazu-empty"><div class="zazu-empty-title">Nothing scheduled yet</div><p class="zazu-empty-copy">Create a job with a scheduled date and it will appear here and on the calendar.</p><a href="{{ route('work.create') }}" class="zazu-btn zazu-btn-primary mt-4">Create job</a></div>
+                        <div class="zazu-empty"><div class="zazu-empty-title">Nothing scheduled yet</div><p class="zazu-empty-copy">Create a job with a scheduled date and it will appear here and on the calendar.</p>@if ($workspaceTools['work'])<a href="{{ route('work.create') }}" class="zazu-btn zazu-btn-primary mt-4">Create job</a>@endif</div>
                     @endforelse
                     @else
                         <div class="zazu-empty"><div class="zazu-empty-title">Upcoming work is not available</div><p class="zazu-empty-copy">Your current access level does not include jobs or calendar planning.</p></div>
