@@ -48,6 +48,13 @@ Challenge the proposed or existing design independently:
 
 Fresh Eyes must adapt to the existing Zazu architecture. It does not demand theoretical redesign merely because another pattern exists.
 
+## UI/UX relationship
+For every UI/UX-affecting task, automatically activate the dedicated UI/UX IMPROVEMENT ENGINE as a cross-cutting capability.
+
+Discovery & Design remains responsible for deciding what the product/workflow should do. UI/UX IMPROVEMENT is responsible for continuously challenging how that experience is presented, understood, operated, and visually expressed.
+
+The two must work together rather than creating competing design authorities.
+
 ## Output
 Produce a compact decision:
 - intended outcome
