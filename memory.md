@@ -636,3 +636,12 @@ Regression rule:
 - Added regression coverage for invoice/expense idempotency, settings markup integrity and unsafe restore archives.
 - Corrected one malformed PHP namespace discovered during the self-recheck.
 - Latest hardening source state is commit `9c06e3dd1c1e4bc4c7514c2625945411c634a325`; CI/runtime execution still needs to run in the repository environment before declaring the pass green.
+
+
+## Director UI/UX improvement pass — 2026-09-28
+- Activated the dedicated Zazu UI/UX Improvement Engine against current `main`.
+- Reconciled the interface with the established Operational Premium doctrine: controlled density, workflow-first hierarchy, micro-radii, borders before shadows, tabular numerics, restrained motion and accessible states.
+- Corrected the shared visual token layer toward neutral workbench/deep-green light/dark themes.
+- Streamlined the Dashboard into attention, compact metrics, upcoming work and contextual quick access; removed redundant module cards and decorative dashboard artwork from the operational surface.
+- Final fresh-eyes source review found and corrected remaining oversized rectangular radii.
+- Changes committed directly to `main`; browser-rendered QA remains a runtime verification boundary.
