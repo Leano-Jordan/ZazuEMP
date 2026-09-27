@@ -601,3 +601,12 @@ Regression rule:
 - Historical quote and invoice snapshots are evidence records. Later edits to business/customer/tax settings must not rewrite their commercial or tax history.
 - Compliance evidence files remain private and business-scoped; generated packs are preparation aids, not official authority forms or legal certificates.
 - Error surfaces must remain asset-independent enough to render when the frontend build is unavailable; unexpected 5xx errors should still expose a traceable Zazu request reference without leaking technical internals.
+
+## Repository-wide sweep hardening — 2026-09-27
+
+- Quote status transitions now revalidate the locked quote state and locked latest-version state before mutation.
+- Customer primary-contact creation/promotion now locks the parent customer to serialize primary-state changes.
+- Successful password reset now revokes prior database-backed sessions and authenticated application routes use Laravel session integrity middleware.
+- Business branding files are private-storage assets; an upgrade migration moves existing business-branding files off the public disk.
+- Sweep record: `docs/ZAZU_SWEEP_AUDIT_2026-09-27.md`.
+
