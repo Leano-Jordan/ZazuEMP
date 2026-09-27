@@ -216,7 +216,8 @@ class PurchaseOrderController extends Controller
                         'name' => $item->description,
                         'unit' => $item->unit ?: 'unit',
                         'reorder_level' => 0,
-                    ]);
+                        ]);
+                    }
                 }
 
                 $alreadyReceived = \App\Models\InventoryMovement::query()
