@@ -156,3 +156,24 @@ Verification boundary:
 - Current GitHub source was re-read after the changes.
 - Source-level checks confirmed the removed theme label, read-only service description behaviour and placeholder authentication copy are absent from the changed files.
 - Runtime browser traversal, Blade compilation, local PHPUnit and fresh migration execution remain unverified in this environment.
+
+
+## 2026-09-28 operational premium UI pass
+
+Implemented on `main`:
+
+- Reworked the shared visual token layer toward the accepted neutral workbench / deep-green Zazu direction in both light and dark themes.
+- Reduced operational surface radii to the 2–6px default range and removed decorative elevation from routine cards, navigation and data surfaces.
+- Tightened shell, navigation, headings, panels, lists, forms and controls to improve scan density without reducing core touch-target sizing.
+- Applied tabular numerics to dashboard metrics and other numeric operational values.
+- Preserved reduced-motion handling and existing focus-visible/accessibility rules.
+- Simplified the Dashboard into an operational command centre: attention prompt → compact metrics → upcoming work → contextual quick access.
+- Removed redundant dashboard module-directory cards and configurable dashboard artwork from the operational dashboard surface so the screen prioritises work over decoration.
+- Replaced repeated quick-access cards with a dense contextual list that preserves navigation while reducing visual repetition.
+- Preserved existing routes, metrics, permissions and business logic.
+
+Fresh-eyes review:
+
+- Remaining generic SaaS signals were identified in shared styling, especially oversized radii, decorative shadows and blue-first visual hierarchy, and corrected in the final normalization pass.
+- No asymmetric Bento structure was forced into transaction-heavy areas. Dashboard asymmetry remains limited to the overview composition where it improves hierarchy.
+- Runtime browser rendering, responsive visual inspection and local Blade compilation remain environment verification boundaries and must be performed in the owner's checkout/CI before treating the visual pass as fully rendered-verified.
