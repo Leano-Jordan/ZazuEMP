@@ -137,8 +137,8 @@ class FinancePurchasingInventoryTest extends TestCase
 
         $this->get(route('finance.index'))
             ->assertOk()
-            ->assertViewHas('paid', '1100.11')
-            ->assertViewHas('expensesTotal', '550.22');
+            ->assertViewHas('paidByCurrency', fn ($totals) => $totals->get('ZAR') === '1100.11')
+            ->assertViewHas('expensesByCurrency', fn ($totals) => $totals->get('ZAR') === '550.22');
     }
 
     public function test_purchase_order_receipt_tracks_each_purchase_order_line_separately(): void
@@ -568,5 +568,35 @@ class FinancePurchasingInventoryTest extends TestCase
         ]);
     }
 
+    public function test_invoice_balance_is_calculated_without_float_rounding(): void
+    {
+        [$business, $user] = $this->businessUser();
+        $this->actingAs($user);
+
+        $invoice = Invoice::create([
+            'business_id' => $business->id,
+            'number' => 'INV-DECIMAL-001',
+            'status' => 'issued',
+            'currency' => 'ZAR',
+            'subtotal' => '1000000000.03',
+            'tax_total' => '0.00',
+            'total' => '1000000000.03',
+            'issued_at' => now()->toDateString(),
+        ]);
+
+        AppModelsPayment::create([
+            'business_id' => $business->id,
+            'invoice_id' => $invoice->id,
+            'amount' => '0.01',
+            'currency' => 'ZAR',
+            'method' => 'bank_transfer',
+            'paid_at' => now()->toDateString(),
+        ]);
+
+        $invoice->refresh();
+
+        $this->assertSame('0.01', $invoice->paid_amount);
+        $this->assertSame('1000000000.02', $invoice->balance);
+    }
 
 }
