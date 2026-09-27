@@ -15,6 +15,11 @@ class ZazuRestoreCommand extends Command
 
     public function handle(): int
     {
+        if (!class_exists(ZipArchive::class)) {
+            $this->error('The PHP Zip extension is required for Zazu restores.');
+            return self::FAILURE;
+        }
+
         $archive = $this->argument('archive');
 
         if (!is_file($archive)) {
