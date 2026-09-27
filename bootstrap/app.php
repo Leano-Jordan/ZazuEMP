@@ -20,6 +20,7 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware->alias([
             'owner' => \App\Http\Middleware\EnsureBusinessOwner::class,
             'business.context' => \App\Http\Middleware\EnsureActiveBusinessContext::class,
+            'permission' => \App\Http\Middleware\EnsureBusinessPermission::class,
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {
