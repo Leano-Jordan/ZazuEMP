@@ -488,6 +488,14 @@ Verification:
 - Repository branch state verified after cleanup: main only.
 
 
+## Branch-control correction — owner directive — 2026-09-27
+
+- `main` is the sole Zazu EMP source of truth.
+- The assistant must not create extra branches for fixes, audits, hardening, regression work or normal feature development.
+- Existing extra branches must be treated as cleanup targets: inspect their unique commits, consolidate any genuinely missing value into `main`, then delete the stale branch.
+- Do not recommend retaining stale branches merely as historical backups when their work is already merged or superseded. Git history on `main` is the historical record.
+- Before manual/runtime testing, reconcile the local VS Code checkout to `main` so a stale branch cannot resurrect an already-fixed regression.
+
 ## Hardening correction — quote revision snapshot integrity — 2026-09-26
 
 - Quote revision creation now rebuilds each revision line's source snapshot from the current Work requirement instead of carrying a stale prior snapshot.
