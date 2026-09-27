@@ -66,4 +66,15 @@ class UiAccessibilityTest extends TestCase
         $response->assertSee('data-error-summary', false);
         $response->assertSee('aria-label="Mobile primary"', false);
     }
+    public function test_settings_page_renders_without_malformed_closing_markup(): void
+    {
+        $response = $this->get(route('settings.index'));
+
+        $response->assertOk();
+        $response->assertDontSee('</div>>', false);
+        $response->assertSee('Save business appearance', false);
+        $response->assertSee('Open activity audit', false);
+    }
+
+
 }
