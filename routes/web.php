@@ -42,7 +42,7 @@ Route::middleware(['auth', 'owner'])->group(function () {
     Route::get('/owner', [\App\Http\Controllers\AuthController::class, 'owner'])->name('owner.dashboard');
 });
 
-Route::middleware(['auth', 'business.context'])->group(function () {
+Route::middleware(['auth', 'auth.session', 'business.context'])->group(function () {
     Route::get('/dashboard', DashboardController::class)->name('dashboard');
 
     Route::middleware('owner')->group(function () {
