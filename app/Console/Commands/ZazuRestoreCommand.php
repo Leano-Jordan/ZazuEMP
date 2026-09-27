@@ -41,7 +41,35 @@ class ZazuRestoreCommand extends Command
                 return self::FAILURE;
             }
 
-            $zip->extractTo($work);
+            // Validate every archive member before extraction to prevent path traversal.
+            for ($index = 0; $index < $zip->numFiles; $index++) {
+                $name = $zip->getNameIndex($index);
+
+                if ($name === false || str_contains($name, '\\0')) {
+                    $zip->close();
+                    $this->error('The backup archive contains an invalid entry.');
+                    return self::FAILURE;
+                }
+
+                $normalized = str_replace('\\', '/', $name);
+
+                if (
+                    str_starts_with($normalized, '/')
+                    || preg_match('/^[A-Za-z]:\\//', $normalized)
+                    || in_array('..', explode('/', trim($normalized, '/')), true)
+                ) {
+                    $zip->close();
+                    $this->error('The backup archive contains an unsafe path.');
+                    return self::FAILURE;
+                }
+            }
+
+            if (!$zip->extractTo($work)) {
+                $zip->close();
+                $this->error('Could not extract the backup archive.');
+                return self::FAILURE;
+            }
+
             $zip->close();
 
             $manifestPath = $work.'/manifest.json';
