@@ -240,7 +240,7 @@ body {
 .zazu-nav-link.active {
     color: var(--zazu-ink);
     background: var(--zazu-surface);
-    box-shadow: inset 3px 0 0 var(--zazu-nav-active), 0 2px 8px rgba(24, 61, 65, 0.05);
+    box-shadow: inset 3px 0 0 var(--zazu-nav-active), 0 2px 8px rgba(24, 71, 113, 0.05);
 }
 
 .zazu-nav-icon {
@@ -2112,13 +2112,17 @@ body {
 
 .zazu-mobile-nav {
     border-bottom-color: var(--zazu-border);
-    background: var(--zazu-surface);
+    background: color-mix(in srgb, var(--zazu-surface) 96%, var(--zazu-primary) 4%);
     box-shadow: 0 3px 12px rgba(13, 48, 78, 0.06);
+    scrollbar-width: thin;
 }
 
 .zazu-mobile-link {
+    min-height: 46px;
     color: var(--zazu-muted);
-    transition: background-color var(--zazu-motion-fast) ease, color var(--zazu-motion-fast) ease, box-shadow var(--zazu-motion-fast) ease;
+    font-size: 11px;
+    font-weight: 700;
+    transition: background-color var(--zazu-motion-fast) ease, color var(--zazu-motion-fast) ease, box-shadow var(--zazu-motion-fast) ease, transform var(--zazu-motion-fast) var(--zazu-ease);
 }
 
 .zazu-mobile-link:hover {
