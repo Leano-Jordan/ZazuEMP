@@ -37,9 +37,9 @@
         a { color: inherit; }
         .zazu-error-body { min-height: 100vh; display: grid; place-items: center; padding: 24px; background: var(--page); color: var(--ink); }
         .zazu-error-shell { width: min(100%, 720px); }
-        .zazu-error-card { padding: 34px; border: 1px solid var(--border); border-radius: 12px; background: var(--surface); box-shadow: 0 8px 24px rgba(16,24,20,.06); }
+        .zazu-error-card { padding: 34px; border: 1px solid var(--border); border-radius: 6px; background: var(--surface); box-shadow: 0 8px 24px rgba(16,24,20,.06); }
         .zazu-error-brand { display: inline-flex; align-items: center; gap: 10px; margin-bottom: 26px; font-weight: 800; font-size: 20px; letter-spacing: -.02em; }
-        .zazu-brand-mark { display: grid; width: 34px; height: 34px; place-items: center; border-radius: 8px; background: var(--primary); color: var(--primary-ink); }
+        .zazu-brand-mark { display: grid; width: 34px; height: 34px; place-items: center; border-radius: 4px; background: var(--primary); color: var(--primary-ink); }
         .zazu-eyebrow { color: var(--primary); font-size: 10px; font-weight: 800; letter-spacing: .16em; text-transform: uppercase; }
         .zazu-error-code { margin-top: 14px; color: var(--muted); font-size: 11px; font-weight: 800; letter-spacing: .18em; }
         .zazu-error-title { margin: 7px 0 0; font-size: clamp(28px, 5vw, 44px); line-height: 1.05; letter-spacing: -.03em; }
