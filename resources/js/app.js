@@ -14,7 +14,7 @@ function applyTheme(theme) {
     document.documentElement.dataset.theme = theme;
 
     const themeColor = document.querySelector('meta[name="theme-color"]');
-    if (themeColor) themeColor.setAttribute('content', theme === 'dark' ? '#0d1512' : '#f4f6f4');
+    if (themeColor) themeColor.setAttribute('content', theme === 'dark' ? '#0b1827' : '#edf4fb');
 
     document.querySelectorAll('[data-theme-toggle]').forEach((button) => {
         const isDark = theme === 'dark';
@@ -36,7 +36,13 @@ document.querySelectorAll('[data-theme-toggle]').forEach((button) => {
         const next = document.documentElement.dataset.theme === 'dark' ? 'light' : 'dark';
 
         localStorage.setItem(storageKey, next);
+        document.documentElement.classList.add('zazu-theme-transition');
         applyTheme(next);
+
+        window.clearTimeout(window.__zazuThemeTransitionTimer);
+        window.__zazuThemeTransitionTimer = window.setTimeout(() => {
+            document.documentElement.classList.remove('zazu-theme-transition');
+        }, 200);
     });
 });
 
