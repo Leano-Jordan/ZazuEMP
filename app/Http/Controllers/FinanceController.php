@@ -9,6 +9,7 @@ use App\Models\Payment;
 use App\Models\Quote;
 use App\Models\Supplier;
 use App\Models\TaxRate;
+use App\Support\Audit;
 use App\Support\CurrentBusiness;
 use App\Support\Money;
 use Illuminate\Database\Eloquent\Builder;
@@ -67,6 +68,7 @@ class FinanceController extends Controller
         $business->loadMissing('taxProfile');
 
         $data = $request->validate([
+            'idempotency_key' => ['required', 'uuid'],
             'quote_id' => ['nullable', 'integer'],
             'event_id' => ['nullable', 'integer'],
             'tax_rate_id' => ['nullable', 'integer'],
@@ -205,6 +207,7 @@ class FinanceController extends Controller
         ): Invoice {
             $invoice = Invoice::create([
                 'business_id' => $businessId,
+                'idempotency_key' => $data['idempotency_key'],
                 'event_id' => $event?->id,
                 'quote_id' => $data['quote_id'] ?? null,
                 'quote_version_id' => $quoteVersionId,
@@ -238,6 +241,11 @@ class FinanceController extends Controller
             ]);
 
             $invoice->items()->createMany($invoiceLines);
+            Audit::record('finance.invoice.created', $invoice, [
+                'number' => $invoice->number,
+                'total' => $invoice->total,
+                'currency' => $invoice->currency,
+            ], $businessId);
 
             return $invoice;
         });
@@ -265,6 +273,7 @@ class FinanceController extends Controller
         $businessId = app(CurrentBusiness::class)->id($request->user());
 
         return view('finance.payment-create', [
+            'idempotencyKey' => (string) Str::uuid(),
             'invoices' => Invoice::where('business_id', $businessId)
                 ->whereNotIn('status', ['paid', 'void'])
                 ->with('event.customer')
@@ -277,6 +286,7 @@ class FinanceController extends Controller
     {
         $businessId = app(CurrentBusiness::class)->id($request->user());
         $data = $request->validate([
+            'idempotency_key' => ['required', 'uuid'],
             'invoice_id' => ['required', 'integer'],
             'amount' => ['required', 'numeric', 'decimal:0,2', 'gt:0'],
             'method' => ['required', 'in:cash,bank_transfer,card,other'],
@@ -284,6 +294,15 @@ class FinanceController extends Controller
             'paid_at' => ['required', 'date'],
             'notes' => ['nullable', 'string'],
         ]);
+
+        $existingPayment = Payment::query()
+            ->where('business_id', $businessId)
+            ->where('idempotency_key', $data['idempotency_key'])
+            ->first();
+
+        if ($existingPayment) {
+            return redirect()->route('finance.index')->with('info', 'That payment submission was already processed.');
+        }
 
         DB::transaction(function () use ($data, $businessId): void {
             $invoice = Invoice::where('business_id', $businessId)
@@ -312,6 +331,13 @@ class FinanceController extends Controller
             $invoice->update([
                 'status' => $newPaidCents >= $totalCents ? 'paid' : 'issued',
             ]);
+
+            Audit::record('finance.payment.recorded', $invoice->payments()->latest('id')->first(), [
+                'invoice_id' => $invoice->id,
+                'amount' => $data['amount'],
+                'currency' => $invoice->currency,
+                'method' => $data['method'],
+            ], $businessId);
         });
 
         return redirect()->route('finance.index')->with('success', 'Payment recorded.');
@@ -322,6 +348,7 @@ class FinanceController extends Controller
         $businessId = app(CurrentBusiness::class)->id($request->user());
 
         return view('finance.expense-create', [
+            'idempotencyKey' => (string) Str::uuid(),
             'suppliers' => Supplier::where('business_id', $businessId)->orderBy('name')->get(),
             'events' => Event::where('business_id', $businessId)->whereNotIn('status', ['cancelled'])->orderByDesc('event_date')->get(),
         ]);
@@ -332,6 +359,7 @@ class FinanceController extends Controller
         $businessId = app(CurrentBusiness::class)->id($request->user());
         $currency = app(CurrentBusiness::class)->model($request->user())->currency ?? 'ZAR';
         $data = $request->validate([
+            'idempotency_key' => ['required', 'uuid'],
             'description' => ['required', 'string', 'max:255'],
             'amount' => ['required', 'numeric', 'decimal:0,2', 'gt:0'],
             'expense_date' => ['required', 'date'],
@@ -350,7 +378,21 @@ class FinanceController extends Controller
             abort_unless(Event::where('business_id', $businessId)->whereKey($data['event_id'])->exists(), 404);
         }
 
-        FinanceExpense::create([...$data, 'business_id' => $businessId, 'currency' => $currency]);
+        $existingExpense = FinanceExpense::query()
+            ->where('business_id', $businessId)
+            ->where('idempotency_key', $data['idempotency_key'])
+            ->first();
+
+        if ($existingExpense) {
+            return redirect()->route('finance.index')->with('info', 'That expense submission was already processed.');
+        }
+
+        $expense = FinanceExpense::create([...$data, 'business_id' => $businessId, 'currency' => $currency]);
+        Audit::record('finance.expense.recorded', $expense, [
+            'amount' => $expense->amount,
+            'currency' => $expense->currency,
+            'status' => $expense->status,
+        ], $businessId);
 
         return redirect()->route('finance.index')->with('success', 'Finance expense recorded.');
     }
