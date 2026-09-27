@@ -169,7 +169,7 @@ class PurchaseOrderController extends Controller
 
             if ($currentStatus !== $data['status']) {
                 abort_unless(
-                    in_array($data['status'], self::STATUS_TRANSITIONS[$currentStatus] ?? [], true),
+                    in_array($data['status'], PurchaseOrder::STATUS_TRANSITIONS[$currentStatus] ?? [], true),
                     422,
                     'That purchase order status change is not allowed.'
                 );
