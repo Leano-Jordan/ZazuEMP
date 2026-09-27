@@ -1051,7 +1051,7 @@ body {
     background: var(--zazu-field);
     color: var(--zazu-ink);
     font: inherit;
-    font-size: 12px;
+    font-size: 13px;
     transition: border-color 140ms ease, box-shadow 140ms ease, background-color 140ms ease;
 }
 
@@ -1091,7 +1091,7 @@ body {
     display: block;
     margin-top: 5px;
     color: var(--zazu-danger-ink);
-    font-size: 10px;
+    font-size: 11px;
     line-height: 1.45;
 }
 
@@ -1759,7 +1759,7 @@ textarea:focus-visible {
     border-radius: 6px;
     background: var(--zazu-primary-soft);
     color: var(--zazu-primary);
-    font-size: 9px;
+    font-size: 10px;
     font-weight: 750;
 }
 
@@ -1910,7 +1910,7 @@ body {
 .zazu-nav-label {
     padding: 0 11px 8px;
     color: var(--zazu-sidebar-label);
-    font-size: 9px;
+    font-size: 10px;
     letter-spacing: 0.19em;
 }
 
@@ -1976,7 +1976,7 @@ body {
 
 .zazu-eyebrow {
     color: var(--zazu-primary);
-    font-size: 9px;
+    font-size: 10px;
     font-weight: 800;
     letter-spacing: 0.18em;
 }
@@ -2275,7 +2275,7 @@ body {
 
 .zazu-module-group {
     color: var(--zazu-faint);
-    font-size: 9px;
+    font-size: 10px;
     font-weight: 800;
     letter-spacing: 0.15em;
 }
@@ -2340,7 +2340,7 @@ body {
 
 .zazu-metric-label {
     color: var(--zazu-faint);
-    font-size: 9px;
+    font-size: 10px;
     font-weight: 800;
     letter-spacing: 0.13em;
 }
@@ -2863,7 +2863,7 @@ body {
 }
 .zazu-catalogue-category {
     color: var(--zazu-primary);
-    font-size: 9px;
+    font-size: 10px;
     font-weight: 850;
     letter-spacing: .12em;
     text-transform: uppercase;
@@ -2946,7 +2946,7 @@ body {
 }
 .zazu-catalogue-mini-price {
     color: var(--zazu-muted);
-    font-size: 9px;
+    font-size: 10px;
 }
 .zazu-next-action {
     display: flex;
@@ -3007,7 +3007,7 @@ body {
 }
 .zazu-work-progress-step small {
     color: var(--zazu-muted);
-    font-size: 9px;
+    font-size: 10px;
 }
 .zazu-work-progress-step.current,
 .zazu-work-progress-step.complete {
@@ -3080,7 +3080,7 @@ body {
 .zazu-user-identity span {
     margin-top: 3px;
     color: var(--zazu-muted);
-    font-size: 9px;
+    font-size: 10px;
     font-weight: 650;
 }
 
@@ -3407,7 +3407,7 @@ body.zazu-has-wallpaper .zazu-content > * {
 
 .zazu-module-group {
     color: var(--zazu-faint);
-    font-size: 9px;
+    font-size: 10px;
     font-weight: 800;
     letter-spacing: .13em;
     text-transform: uppercase;
@@ -3474,7 +3474,7 @@ body.zazu-has-wallpaper .zazu-content > * {
 
 .zazu-metric-label {
     color: var(--zazu-faint);
-    font-size: 9px;
+    font-size: 10px;
     font-weight: 800;
     letter-spacing: .13em;
     text-transform: uppercase;
@@ -3491,7 +3491,7 @@ body.zazu-has-wallpaper .zazu-content > * {
 .zazu-metric-copy {
     margin-top: 5px;
     color: var(--zazu-muted);
-    font-size: 11px;
+    font-size: 12px;
     line-height: 1.45;
 }
 
@@ -3676,7 +3676,7 @@ body.zazu-has-wallpaper .zazu-content > * {
     border-bottom: 1px solid var(--zazu-border);
     background: var(--zazu-field);
     color: var(--zazu-faint);
-    font-size: 9px;
+    font-size: 10px;
     font-weight: 850;
     letter-spacing: .13em;
     line-height: 1.2;
@@ -3763,7 +3763,7 @@ body.zazu-has-wallpaper .zazu-content > * {
 
 .zazu-filter-label {
     color: var(--zazu-faint);
-    font-size: 9px;
+    font-size: 10px;
     font-weight: 850;
     letter-spacing: .12em;
     text-transform: uppercase;
@@ -4112,7 +4112,7 @@ body.zazu-has-wallpaper .zazu-content > * {
     display: block;
     margin-bottom: 5px;
     color: var(--zazu-faint);
-    font-size: 9px;
+    font-size: 10px;
     font-weight: 750;
     letter-spacing: .08em;
     text-transform: uppercase;
@@ -4412,7 +4412,7 @@ body.zazu-has-wallpaper .zazu-content > * {
 
 .zazu-toast-content { min-width: 0; flex: 1; }
 .zazu-toast-title { color: var(--zazu-ink); font-size: 12px; font-weight: 750; }
-.zazu-toast-message { margin-top: 3px; color: var(--zazu-muted); font-size: 11px; line-height: 1.5; }
+.zazu-toast-message { margin-top: 3px; color: var(--zazu-muted); font-size: 12px; line-height: 1.5; }
 .zazu-toast-action {
     flex: 0 0 auto;
     align-self: center;
