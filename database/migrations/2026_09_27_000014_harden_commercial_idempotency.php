@@ -26,7 +26,6 @@ return new class extends Migration
         Schema::table('inventory_movements', function (Blueprint $table): void {
             $table->uuid('idempotency_key')->nullable()->after('inventory_item_id');
             $table->unique(['business_id', 'idempotency_key']);
-            $table->unique(['business_id', 'purchase_order_item_id', 'type']);
         });
     }
 
@@ -34,7 +33,6 @@ return new class extends Migration
     {
         Schema::table('inventory_movements', function (Blueprint $table): void {
             $table->dropUnique('inventory_movements_business_id_idempotency_key_unique');
-            $table->dropUnique('inventory_movements_business_id_purchase_order_item_id_type_unique');
             $table->dropColumn('idempotency_key');
         });
 
