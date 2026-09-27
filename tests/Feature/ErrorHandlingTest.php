@@ -20,7 +20,7 @@ class ErrorHandlingTest extends TestCase
 
     public function test_unexpected_database_failure_uses_branded_500_surface_without_leaking_details(): void
     {
-        Route::get('/__zazu-test-missing-table', fn () => DB::table('__zazu_missing_table__')->count());
+        Route::get('/__zazu-test-missing-table', fn () => DB::table('__zazu_missing_table__')->count())->middleware('web');
 
         $response = $this->get('/__zazu-test-missing-table');
 
