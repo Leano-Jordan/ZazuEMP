@@ -12,6 +12,7 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\URL;
 use Illuminate\Validation\Rule;
 use Illuminate\View\View;
 
@@ -140,7 +141,74 @@ class QuoteController extends Controller
             ? !$version->matchesRequirements($quote->event->requirements)
             : true;
 
-        return view('quotes.show', compact('quote', 'version', 'quoteNeedsRevision'));
+        $customerUrl = in_array($quote->status, ['sent', 'accepted'], true)
+            ? URL::temporarySignedRoute('quotes.public', now()->addDays(30), ['quote' => $quote])
+            : null;
+
+        return view('quotes.show', compact('quote', 'version', 'quoteNeedsRevision', 'customerUrl'));
+    }
+
+    public function publicShow(Request $request, Quote $quote): View
+    {
+        abort_unless(in_array($quote->status, ['sent', 'accepted'], true), 404);
+
+        $quote->load([
+            'event.customer',
+            'versions.items',
+        ]);
+
+        $version = $quote->versions->sortByDesc('version')->first();
+
+        abort_unless(
+            $version && $version->status === $quote->status,
+            404
+        );
+
+        $acceptUrl = $quote->status === 'sent'
+            ? URL::temporarySignedRoute('quotes.public.accept', now()->addDays(30), ['quote' => $quote])
+            : null;
+
+        return view('quotes.public', compact('quote', 'version', 'acceptUrl'));
+    }
+
+    public function publicAccept(Request $request, Quote $quote): RedirectResponse
+    {
+        $validated = $request->validate([
+            'customer_name' => ['required', 'string', 'max:255'],
+            'acceptance' => ['accepted'],
+        ]);
+
+        DB::transaction(function () use ($quote, $validated): void {
+            $lockedQuote = Quote::query()
+                ->whereKey($quote->id)
+                ->lockForUpdate()
+                ->firstOrFail();
+
+            abort_unless($lockedQuote->status === 'sent', 422, 'This quote is no longer awaiting customer acceptance.');
+
+            $version = $lockedQuote->versions()
+                ->orderByDesc('version')
+                ->lockForUpdate()
+                ->firstOrFail();
+
+            abort_unless($version->status === 'sent', 422, 'This quote version is no longer awaiting customer acceptance.');
+
+            $version->update(['status' => 'accepted']);
+            $lockedQuote->update(['status' => 'accepted']);
+
+            $businessId = (int) $lockedQuote->event?->business_id;
+
+            abort_unless($businessId > 0, 404);
+
+            AppSupportAudit::record('quote.customer.accepted', $lockedQuote, [
+                'customer_name' => trim($validated['customer_name']),
+                'quote_version' => $version->version,
+            ], $businessId);
+        });
+
+        return redirect()->to(
+            URL::temporarySignedRoute('quotes.public', now()->addDays(30), ['quote' => $quote])
+        );
     }
 
     public function updateStatus(Request $request, Quote $quote): RedirectResponse
