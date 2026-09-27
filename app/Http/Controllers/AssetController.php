@@ -6,6 +6,7 @@ use App\Models\Asset;
 use App\Models\BusinessCapability;
 use App\Models\Event;
 use App\Models\EventRequirement;
+use App\Support\Audit;
 use App\Support\CurrentBusiness;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -81,6 +82,13 @@ class AssetController extends Controller
             $lockedAsset->allocations()->create([...$data,'business_id'=>$businessId,'status'=>'allocated']);
             $lockedAsset->update(['status'=>'allocated']);
 
+            Audit::record('assets.allocated', $lockedAsset, [
+                'event_id' => $event->id,
+                'allocation_id' => $lockedAsset->allocations()->latest('id')->value('id'),
+                'allocated_from' => $data['allocated_from'],
+                'allocated_until' => $data['allocated_until'],
+            ], $businessId);
+
             return back()->with('success',$lockedAsset->name.' allocated to '.$event->name.'.');
         });
     }
@@ -97,7 +105,18 @@ class AssetController extends Controller
                 ->findOrFail($asset->id);
 
             $allocation=$lockedAsset->allocations()->where('status','allocated')->latest()->lockForUpdate()->first();
-            if($allocation){ $allocation->update(['status'=>'returned','allocated_until'=>$allocation->allocated_until ?? now()->toDateString()]); }
+            if($allocation){
+                $allocation->update([
+                    'status' => 'returned',
+                    'allocated_until' => $allocation->allocated_until ?? now()->toDateString(),
+                ]);
+
+                Audit::record('assets.released', $lockedAsset, [
+                    'event_id' => $allocation->event_id,
+                    'allocation_id' => $allocation->id,
+                ], $businessId);
+            }
+
             $lockedAsset->update(['status'=>'available']);
 
             return back()->with('success','Asset returned to available status.');
