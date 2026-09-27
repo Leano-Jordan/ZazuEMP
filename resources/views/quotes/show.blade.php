@@ -92,8 +92,8 @@
                             <div class="zazu-list-title">{{ $item->description }}</div>
                             <div class="zazu-list-meta">{{ number_format((float) $item->quantity, 2) }} {{ $item->unit ?: 'units' }} · {{ $item->pricing_basis ?: 'Custom pricing' }}</div>
                         </div>
-                        <div class="zazu-list-side"><div class="zazu-side-primary">{{ $quote->currency }} {{ number_format((float) $item->unit_price, 2) }}</div></div>
-                        <div class="zazu-list-side"><div class="zazu-side-primary">{{ $quote->currency }} {{ number_format((float) $item->line_total, 2) }}</div></div>
+                        <div class="zazu-list-side"><div class="zazu-side-primary">{{ $quote->currency }} {{ $item->unit_price }}</div></div>
+                        <div class="zazu-list-side"><div class="zazu-side-primary">{{ $quote->currency }} {{ $item->line_total }}</div></div>
                     </div>
                 @empty
                     <div class="zazu-empty">No quote lines.</div>
@@ -116,9 +116,9 @@
                 <div class="zazu-eyebrow">Commercial summary</div>
                 <div class="zazu-panel-title mt-1">Totals</div>
                 <div class="zazu-detail-rows">
-                    <div class="zazu-detail-row"><div class="zazu-detail-label">Subtotal</div><div class="zazu-detail-value">{{ $quote->currency }} {{ number_format((float) ($version?->subtotal ?? 0), 2) }}</div></div>
-                    <div class="zazu-detail-row"><div class="zazu-detail-label">Tax · {{ $version?->tax_label ?: 'No tax' }} ({{ $version?->tax_rate ?? '0.00' }}%)</div><div class="zazu-detail-value">{{ $quote->currency }} {{ number_format((float) ($version?->tax_total ?? 0), 2) }}</div></div>
-                    <div class="zazu-detail-row"><div class="zazu-detail-label">Total</div><div class="zazu-detail-value">{{ $quote->currency }} {{ number_format((float) ($version?->total ?? 0), 2) }}</div></div>
+                    <div class="zazu-detail-row"><div class="zazu-detail-label">Subtotal</div><div class="zazu-detail-value">{{ $quote->currency }} {{ $version?->subtotal ?? '0.00' }}</div></div>
+                    <div class="zazu-detail-row"><div class="zazu-detail-label">Tax · {{ $version?->tax_label ?: 'No tax' }} ({{ $version?->tax_rate ?? '0.00' }}%)</div><div class="zazu-detail-value">{{ $quote->currency }} {{ $version?->tax_total ?? '0.00' }}</div></div>
+                    <div class="zazu-detail-row"><div class="zazu-detail-label">Total</div><div class="zazu-detail-value">{{ $quote->currency }} {{ $version?->total ?? '0.00' }}</div></div>
                 </div>
             </section>
 
@@ -132,7 +132,7 @@
                             <span class="zazu-stage-marker"></span>
                             <div>
                                 <div class="zazu-stage-title">v{{ $quoteVersion->version }} · {{ ucfirst($quoteVersion->status) }}</div>
-                                <div class="zazu-stage-copy">{{ $quote->currency }} {{ number_format((float) $quoteVersion->total, 2) }} · {{ $quoteVersion->created_at->format('d M Y, H:i') }}</div>
+                                <div class="zazu-stage-copy">{{ $quote->currency }} {{ $quoteVersion->total }} · {{ $quoteVersion->created_at->format('d M Y, H:i') }}</div>
                             </div>
                         </div>
                     @endforeach
