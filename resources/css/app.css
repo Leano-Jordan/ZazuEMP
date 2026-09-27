@@ -2378,7 +2378,7 @@ body {
 }
 
 .zazu-mobile-link {
-    color: #c8dbd3;
+    color: var(--zazu-sidebar-muted);
 }
 
 .zazu-mobile-link.active {
@@ -2408,14 +2408,6 @@ body {
 /* --------------------------------------------------------------------------
    Zazu Accessibility + Commercial UX Hardening
    -------------------------------------------------------------------------- */
-
-:root {
-    --zazu-border-strong: #56796d;
-}
-
-:root[data-theme="dark"] {
-    --zazu-border-strong: #6a9a89;
-}
 
 .zazu-skip-link {
     position: fixed;
