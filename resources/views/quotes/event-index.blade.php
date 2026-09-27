@@ -25,7 +25,7 @@
             <div class="zazu-card-description">Each row is one quote. Revisions are viewed inside the quote.</div>
         </div>
         @if ($quotes->count())
-            <div class="zazu-record-header" style="--zazu-record-cols: 2">
+            <div class="zazu-record-header" data-record-cols="2">
                 <div class="zazu-record-header-note">Quote</div>
                 <div class="zazu-record-header-cell">Created</div>
                 <div class="zazu-record-header-cell">Current total</div>
