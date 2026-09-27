@@ -50,11 +50,9 @@
                 <a href="{{ route('dashboard') }}" class="zazu-btn zazu-btn-primary">Go to workspace</a>
             </div>
 
-            @if($requestId ?? false)
-                <div class="zazu-error-reference">
-                    Reference {{ $requestId }}
-                </div>
-            @endif
+            <div class="zazu-error-reference">
+                Reference {{ $requestId ?? 'available in the request header' }}
+            </div>
         </div>
     </main>
 </body>
