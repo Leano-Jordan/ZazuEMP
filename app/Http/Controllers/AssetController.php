@@ -10,6 +10,7 @@ use App\Support\Audit;
 use App\Support\CurrentBusiness;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Validation\Rule;
 use Illuminate\Support\Facades\DB;
 use Illuminate\View\View;
 
@@ -34,6 +35,67 @@ class AssetController extends Controller
         $businessId=app(CurrentBusiness::class)->id($request->user());
         $capabilities=BusinessCapability::where('business_id',$businessId)->where('is_active',true)->where('capability_type','rental')->orderBy('name')->get();
         return view('assets.create',compact('capabilities'));
+    }
+
+    public function edit(Request $request, Asset $asset): View
+    {
+        $businessId = app(CurrentBusiness::class)->id($request->user());
+        abort_unless((int) $asset->business_id === $businessId, 404);
+
+        $capabilities = BusinessCapability::query()
+            ->where('business_id', $businessId)
+            ->where('is_active', true)
+            ->where('capability_type', 'rental')
+            ->orderBy('name')
+            ->get();
+
+        return view('assets.create', compact('asset', 'capabilities'));
+    }
+
+    public function update(Request $request, Asset $asset): RedirectResponse
+    {
+        $businessId = app(CurrentBusiness::class)->id($request->user());
+        abort_unless((int) $asset->business_id === $businessId, 404);
+
+        $data = $request->validate([
+            'asset_tag' => ['required', 'string', 'max:100', Rule::unique('assets', 'asset_tag')
+                ->where(fn ($query) => $query->where('business_id', $businessId))
+                ->ignore($asset->id)],
+            'name' => ['required', 'string', 'max:255'],
+            'condition' => ['required', 'in:good,fair,poor,damaged'],
+            'location' => ['nullable', 'string', 'max:255'],
+            'acquired_at' => ['nullable', 'date'],
+            'purchase_cost' => ['required', 'numeric', 'decimal:0,2', 'min:0'],
+            'capability_id' => ['nullable', 'integer'],
+            'notes' => ['nullable', 'string'],
+        ]);
+
+        if (!empty($data['capability_id'])) {
+            abort_unless(
+                BusinessCapability::where('business_id', $businessId)
+                    ->where('capability_type', 'rental')
+                    ->whereKey($data['capability_id'])
+                    ->exists(),
+                404
+            );
+        }
+
+        DB::transaction(function () use ($asset, $businessId, $data): void {
+            $lockedAsset = Asset::query()
+                ->where('business_id', $businessId)
+                ->lockForUpdate()
+                ->findOrFail($asset->id);
+
+            $lockedAsset->update($data);
+
+            Audit::record('assets.updated', $lockedAsset, [
+                'condition' => $lockedAsset->condition,
+                'location' => $lockedAsset->location,
+                'capability_id' => $lockedAsset->capability_id,
+            ], $businessId);
+        });
+
+        return redirect()->route('assets.index')->with('success', 'Asset details updated.');
     }
 
     public function store(Request $request): RedirectResponse
