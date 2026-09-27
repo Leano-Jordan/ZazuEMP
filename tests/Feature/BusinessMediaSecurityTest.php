@@ -136,7 +136,10 @@ class BusinessMediaSecurityTest extends TestCase
             ->assertOk()
             ->assertDontSee('legacy-plain-text-value', false);
 
-        $this->assertSame('legacy-plain-text-value', $profile->getRawOriginal('tcs_pin'));
+        $this->assertDatabaseHas('business_tax_profiles', [
+            'id' => $profile->id,
+            'tcs_pin' => 'legacy-plain-text-value',
+        ]);
     }
 
 
