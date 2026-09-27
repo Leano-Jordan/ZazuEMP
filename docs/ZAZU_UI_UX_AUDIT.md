@@ -177,3 +177,27 @@ Fresh-eyes review:
 - Remaining generic SaaS signals were identified in shared styling, especially oversized radii, decorative shadows and blue-first visual hierarchy, and corrected in the final normalization pass.
 - No asymmetric Bento structure was forced into transaction-heavy areas. Dashboard asymmetry remains limited to the overview composition where it improves hierarchy.
 - Runtime browser rendering, responsive visual inspection and local Blade compilation remain environment verification boundaries and must be performed in the owner's checkout/CI before treating the visual pass as fully rendered-verified.
+
+
+## 2026-09-28 blue reference + fresh-eyes UI pass
+
+Implemented on `main` after auditing the current shared shell and Dashboard:
+
+- Rebased the shared light/dark visual tokens on the repository reference asset `images/blue pallette.jpg`.
+- Canonical brand anchors are Primary `#5592FC`, Secondary `#F2F7FF`, Shadow `#C2DCFF`, Pale `#9EC8FF`, Light `#6FA4FF`, and Deep `#416AD7`.
+- Preserved distinct semantic success, warning and danger colours so operational status does not collapse into the brand colour.
+- Consolidated the palette in the shared token layer rather than introducing screen-specific colours.
+- Completed another micro-radius sweep; rectangular operational surfaces now stay within the 2–6px default range. Semantic circular avatars and true pill/status controls remain exceptions.
+- Expanded component-level responsiveness with CSS Container Queries for reusable Zazu surfaces and retained viewport media queries only where shell/device behaviour requires them.
+- Removed a redundant Dashboard overview band. The Dashboard now establishes hierarchy directly through setup state, operational attention, compact metrics, upcoming work and contextual access.
+- Preserved existing routes, metrics, permissions and business logic.
+
+Fresh-eyes review:
+- Removed duplicate hierarchy that made the Dashboard feel like two competing overview headers.
+- Kept asymmetry limited to the command-centre composition instead of forcing Bento into transactional surfaces.
+- Kept routine elevation restrained and used borders/surface contrast as the primary separation mechanism.
+- Confirmed CSS brace balance, removal of superseded green/teal token values from the current shared stylesheet, and presence of Container Query primitives.
+
+Verification boundary:
+- Source-level re-read and structural checks were performed after the changes.
+- Browser-rendered desktop/tablet/mobile inspection, Blade compilation and full application tests were not run in this environment and are not claimed as verified.
