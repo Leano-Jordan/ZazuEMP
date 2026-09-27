@@ -4,7 +4,12 @@
 <form method="POST" action="{{ route('purchasing.store') }}" class="zazu-form p-5">@csrf
 <input type="hidden" name="idempotency_key" value="{{ $idempotencyKey }}">
 <div class="zazu-form-grid"><label class="zazu-field"><span>Supplier</span><select name="supplier_id" required><option value="">Choose supplier</option>@foreach($suppliers as $supplier)<option value="{{ $supplier->id }}" @selected(old('supplier_id')==$supplier->id)>{{ $supplier->name }}</option>@endforeach</select></label>
-<label class="zazu-field"><span>Currency</span><input name="currency" value="{{ old('currency',$currency) }}" maxlength="3" required></label>
+<label class="zazu-field">
+    <span>Currency</span>
+    <input value="{{ $currency }}" class="zazu-input" readonly aria-describedby="purchase-currency-help">
+    <input type="hidden" name="currency" value="{{ $currency }}">
+    <span id="purchase-currency-help" class="zazu-field-help">Purchase orders use the active business currency.</span>
+</label>
 <label class="zazu-field"><span>Expected date</span><input type="date" name="expected_at" value="{{ old('expected_at') }}"></label></div>
 <div class="zazu-form-section mt-5"><div class="zazu-form-section-title">Order line</div><div class="zazu-form-grid mt-3">
 <label class="zazu-field"><span>Description</span><input name="description[]" required></label>
