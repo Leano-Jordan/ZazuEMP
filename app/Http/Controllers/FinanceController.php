@@ -342,7 +342,7 @@ class FinanceController extends Controller
 
         DB::transaction(function () use ($data, $businessId, &$alreadyProcessed): void {
             // Serialize business-level idempotency checks so concurrent retries cannot both pass the lookup.
-            AppModelsBusiness::query()->whereKey($businessId)->lockForUpdate()->firstOrFail();
+            \App\Models\Business::query()->whereKey($businessId)->lockForUpdate()->firstOrFail();
 
             if (Payment::query()
                 ->where('business_id', $businessId)
@@ -435,7 +435,7 @@ class FinanceController extends Controller
 
         $expense = DB::transaction(function () use ($data, $businessId, $currency, &$alreadyProcessed): ?FinanceExpense {
             // Serialize business-level idempotency checks so concurrent retries cannot both pass the lookup.
-            AppModelsBusiness::query()->whereKey($businessId)->lockForUpdate()->firstOrFail();
+            \App\Models\Business::query()->whereKey($businessId)->lockForUpdate()->firstOrFail();
 
             $existingExpense = FinanceExpense::query()
                 ->where('business_id', $businessId)
