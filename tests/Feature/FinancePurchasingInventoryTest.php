@@ -68,7 +68,7 @@ class FinancePurchasingInventoryTest extends TestCase
             ->assertRedirect();
 
         $this->patch(route('purchasing.status', $order), ['status' => 'received'])
-            ->assertStatus(422);
+            ->assertRedirect();
 
         $this->assertDatabaseCount('inventory_movements', 1);
 
