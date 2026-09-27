@@ -29,7 +29,7 @@ class ZazuBackupRestoreTest extends TestCase
         $outside = base_path('outside.txt');
         File::delete($outside);
 
-        $this->artisan('zazu:restore', [$archive, '--force'])
+        $this->artisan('zazu:restore', ['archive' => $archive, '--force' => true])
             ->assertExitCode(1);
 
         $this->assertFileDoesNotExist($outside);
