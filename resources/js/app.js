@@ -209,6 +209,7 @@ function setupZazuHelper() {
 
         let index = 0;
         let enabled = localStorage.getItem(storageKey) !== 'off';
+        let autoOpenTimer = null;
 
         const render = () => {
             const step = data[index];
@@ -253,6 +254,10 @@ function setupZazuHelper() {
         const turnOff = () => {
             enabled = false;
             localStorage.setItem(storageKey, 'off');
+            if (autoOpenTimer !== null) {
+                window.clearTimeout(autoOpenTimer);
+                autoOpenTimer = null;
+            }
             syncEnabledState();
             close();
         };
@@ -292,7 +297,13 @@ function setupZazuHelper() {
         render();
 
         if (enabled && localStorage.getItem(seenKey) !== '1') {
-            window.setTimeout(open, 450);
+            autoOpenTimer = window.setTimeout(() => {
+                autoOpenTimer = null;
+
+                if (enabled && localStorage.getItem(seenKey) !== '1') {
+                    open();
+                }
+            }, 450);
         }
     });
 }
