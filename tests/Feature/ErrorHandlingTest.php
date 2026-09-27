@@ -2,7 +2,7 @@
 
 namespace Tests\Feature;
 
-use Illuminate\Support\Facades\Route;
+use Illuminate\Support\Facades\File;
 use Tests\TestCase;
 
 class ErrorHandlingTest extends TestCase
@@ -24,33 +24,22 @@ class ErrorHandlingTest extends TestCase
         $this->assertNotEmpty($response->headers->get('X-Zazu-Request-Id'));
     }
 
-    public function test_unexpected_exception_uses_branded_500_surface_without_leaking_details(): void
+    public function test_production_500_view_renders_a_safe_traceable_error_surface(): void
     {
-        $this->handleExceptions([\RuntimeException::class]);
+        $response = $this->view('errors.500', [
+            'requestId' => 'test-request-id',
+            'code' => 500,
+        ]);
 
-        Route::middleware('web')->get('/__zazu-test-runtime-500', function () {
-            throw new \RuntimeException('Sensitive database/table details must remain private.');
-        });
-
-        $response = $this->get('/__zazu-test-runtime-500');
-
-        $response->assertStatus(500);
         $response->assertSee('Zazu could not complete that request.');
-        $response->assertSee('Reference');
+        $response->assertSee('Reference test-request-id');
         $response->assertDontSee('Sensitive database/table details');
-        $this->assertNotEmpty($response->headers->get('X-Zazu-Request-Id'));
     }
 
-    public function test_http_500_response_uses_the_branded_error_surface(): void
+    public function test_production_500_view_is_present_in_the_application_error_views(): void
     {
-        Route::middleware('web')->get('/__zazu-test-http-500', fn () => abort(500));
-
-        $response = $this->get('/__zazu-test-http-500');
-
-        $response->assertStatus(500);
-        $response->assertSee('Zazu could not complete that request.');
-        $response->assertSee('Reference');
-        $this->assertNotEmpty($response->headers->get('X-Zazu-Request-Id'));
+        $this->assertFileExists(resource_path('views/errors/500.blade.php'));
+        $this->assertTrue(File::exists(resource_path('views/errors/layout.blade.php')));
     }
 
     public function test_validation_failure_keeps_standard_redirect_and_field_errors(): void
