@@ -90,6 +90,13 @@ function setupZazuToasts() {
 
         toast.dataset.zazuToastBound = '1';
         const close = () => {
+            const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+            if (reducedMotion) {
+                toast.remove();
+                return;
+            }
+
             toast.style.opacity = '0';
             toast.style.transform = 'translateY(8px)';
             toast.style.transition = 'opacity 140ms ease, transform 140ms ease';
