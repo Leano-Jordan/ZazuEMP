@@ -80,7 +80,7 @@
                     <div class="zazu-card-description">Each row is one saved commercial line.</div>
                 </div>
                 @if (($version?->items?->count() ?? 0) > 0)
-                    <div class="zazu-record-header" style="--zazu-record-cols: 2">
+                    <div class="zazu-record-header" data-record-cols="2">
                         <div class="zazu-record-header-note">Service</div>
                         <div class="zazu-record-header-cell">Unit price</div>
                         <div class="zazu-record-header-cell">Line total</div>
