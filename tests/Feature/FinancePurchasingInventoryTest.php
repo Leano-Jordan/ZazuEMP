@@ -53,6 +53,18 @@ class FinancePurchasingInventoryTest extends TestCase
         $response->assertRedirect(route('purchasing.show', $order));
 
         $this->patch(route('purchasing.status', $order), ['status' => 'received'])
+            ->assertStatus(422);
+
+        $this->patch(route('purchasing.status', $order), ['status' => 'sent'])
+            ->assertRedirect();
+
+        $this->patch(route('purchasing.status', $order), ['status' => 'received'])
+            ->assertStatus(422);
+
+        $this->patch(route('purchasing.status', $order), ['status' => 'ordered'])
+            ->assertRedirect();
+
+        $this->patch(route('purchasing.status', $order), ['status' => 'received'])
             ->assertRedirect();
 
         $item = \App\Models\InventoryItem::where('business_id', $business->id)->where('name', 'Chicken')->firstOrFail();
@@ -64,6 +76,29 @@ class FinancePurchasingInventoryTest extends TestCase
             'purchase_order_id' => $order->id,
             'type' => 'receipt',
         ]);
+    }
+
+    public function test_purchase_order_requires_business_currency(): void
+    {
+        [$business, $user] = $this->businessUser();
+        $this->actingAs($user);
+
+        $supplier = \App\Models\Supplier::create([
+            'business_id' => $business->id,
+            'name' => 'Currency Supplier',
+        ]);
+
+        $this->post(route('purchasing.store'), [
+            'supplier_id' => $supplier->id,
+            'currency' => 'USD',
+            'description' => ['Chicken'],
+            'quantity' => ['10'],
+            'unit' => ['kg'],
+            'unit_price' => ['85.00'],
+            'capability_id' => [''],
+        ])->assertStatus(422);
+
+        $this->assertDatabaseCount('purchase_orders', 0);
     }
 
     public function test_purchase_order_rejects_a_foreign_business_capability(): void
