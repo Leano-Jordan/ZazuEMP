@@ -2,7 +2,6 @@
 
 namespace Tests\Feature;
 
-use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\DB;
 use Tests\TestCase;
@@ -10,7 +9,6 @@ use ZipArchive;
 
 class ZazuBackupRestoreTest extends TestCase
 {
-    use RefreshDatabase;
 
     public function test_backup_and_restore_round_trip_preserves_a_sqlite_record(): void
     {
@@ -33,46 +31,50 @@ class ZazuBackupRestoreTest extends TestCase
             'database.connections.sqlite.database' => $database,
         ]);
 
-        DB::purge('sqlite');
-        DB::connection('sqlite')->getSchemaBuilder()->create('backup_probe', function ($table) {
-            $table->id();
-            $table->string('value');
-        });
-        DB::table('backup_probe')->insert(['value' => 'before backup']);
+        try {
+            DB::purge('sqlite');
+            DB::connection('sqlite')->getSchemaBuilder()->create('backup_probe', function ($table) {
+                $table->id();
+                $table->string('value');
+            });
+            DB::table('backup_probe')->insert(['value' => 'before backup']);
 
-        $this->artisan('zazu:backup', ['--output' => $output])
-            ->assertExitCode(0);
+            $this->artisan('zazu:backup', ['--output' => $output])
+                ->assertExitCode(0);
 
-        $archives = File::glob($output.DIRECTORY_SEPARATOR.'zazu-backup-*.zip');
-        $this->assertCount(1, $archives);
+            $archives = File::glob($output.DIRECTORY_SEPARATOR.'zazu-backup-*.zip');
+            $this->assertCount(1, $archives);
 
-        $archive = $archives[0];
-        $zip = new ZipArchive();
-        $this->assertSame(true, $zip->open($archive));
-        $this->assertNotFalse($zip->locateName('manifest.json'));
-        $this->assertNotFalse($zip->locateName('database.sqlite'));
-        $zip->close();
+            $archive = $archives[0];
+            $zip = new ZipArchive();
+            $this->assertSame(true, $zip->open($archive));
+            $this->assertNotFalse($zip->locateName('manifest.json'));
+            $this->assertNotFalse($zip->locateName('database.sqlite'));
+            $zip->close();
 
-        DB::table('backup_probe')->update(['value' => 'changed after backup']);
+            DB::table('backup_probe')->update(['value' => 'changed after backup']);
 
-        $this->artisan('zazu:restore', [
-            'archive' => $archive,
-            '--force' => true,
-        ])->assertExitCode(0);
+            $this->artisan('zazu:restore', [
+                'archive' => $archive,
+                '--force' => true,
+            ])->assertExitCode(0);
 
-        DB::purge('sqlite');
+            DB::purge('sqlite');
 
-        $this->assertSame(
-            'before backup',
-            DB::connection('sqlite')->table('backup_probe')->value('value')
-        );
-
-        File::delete($database);
-        File::deleteDirectory($output);
-        config([
-            'database.default' => $originalDefault,
-            'database.connections.sqlite.database' => $originalDatabase,
-        ]);
+            $this->assertSame(
+                'before backup',
+                DB::connection('sqlite')->table('backup_probe')->value('value')
+            );
+        } finally {
+            DB::purge('sqlite');
+            File::delete($database);
+            File::deleteDirectory($output);
+            config([
+                'database.default' => $originalDefault,
+                'database.connections.sqlite.database' => $originalDatabase,
+            ]);
+            DB::purge('sqlite');
+        }
     }
 
     public function test_restore_rejects_unsafe_archive_paths_before_writing_files(): void
