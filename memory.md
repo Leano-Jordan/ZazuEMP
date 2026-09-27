@@ -645,3 +645,13 @@ Regression rule:
 - Streamlined the Dashboard into attention, compact metrics, upcoming work and contextual quick access; removed redundant module cards and decorative dashboard artwork from the operational surface.
 - Final fresh-eyes source review found and corrected remaining oversized rectangular radii.
 - Changes committed directly to `main`; browser-rendered QA remains a runtime verification boundary.
+
+
+## Director UI/UX blue reference pass — 2026-09-28
+
+- Repository asset confirmed at `images/blue pallette.jpg`.
+- Shared Zazu UI tokens were rebased to the blue reference family: `#5592FC`, `#F2F7FF`, `#C2DCFF`, `#9EC8FF`, `#6FA4FF`, `#416AD7`.
+- Fresh-eyes Dashboard review removed the redundant Business overview command band.
+- Shared operational surfaces now use consolidated 2–6px micro-radii and Container Query primitives.
+- Error surfaces were aligned with the same blue visual system.
+- Source-level verification passed; rendered browser QA and full runtime test execution remain unverified.
