@@ -50,9 +50,9 @@
                 <a href="{{ route('dashboard') }}" class="zazu-btn zazu-btn-primary">Go to workspace</a>
             </div>
 
-            @if(request()->attributes->get('zazu_request_id'))
+            @if(app()->bound('zazu_request_id'))
                 <div class="zazu-error-reference">
-                    Reference {{ request()->attributes->get('zazu_request_id') }}
+                    Reference {{ app('zazu_request_id') }}
                 </div>
             @endif
         </div>
