@@ -69,3 +69,17 @@ GitHub status/workflow results for the latest hardening commits are not currentl
 - Run the new browser smoke workflow successfully.
 - Perform a real installation backup and restore using `zazu:backup` and `zazu:restore`, then verify representative customers, jobs, invoices, payments, stock and private media.
 - Review migration behaviour against any populated production-like database before release.
+
+## Second verification loop: settings + regression hardening
+
+The settings path was traced after reported test failures. The repository connector did not expose the user's four failing test stack traces, so the failures were not guessed as a single named test. Source-level tracing identified two concrete fragilities:
+
+- Settings rendering previously touched the encrypted tcs_pin attribute just to decide whether a PIN existed. A legacy/plaintext or otherwise non-decryptable stored value could therefore break the entire settings page before any data could be displayed. The view now receives a raw-presence boolean without decrypting the secret.
+- Settings/tax writes were not serialized against concurrent browser saves. The update transaction now locks the business row and uses the locked business state for the tax-profile update and default-rate lookup.
+- A focused settings save regression test now verifies a minimal business-name/currency save and the resulting default NO_VAT configuration.
+- A legacy TCS rendering regression test was added.
+- Business settings changes now create an operational audit entry without recording the secret PIN value itself.
+
+The touched source was re-fetched after the fixes. PHP delimiter balance is clean, no malformed namespace tokens were found, and the previous extra settings closing-tag defect remains absent.
+
+CI/runtime status is still not declared green because no workflow result is exposed for the current head.
