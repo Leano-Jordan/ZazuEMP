@@ -443,4 +443,62 @@ class FinancePurchasingInventoryTest extends TestCase
 
         $this->assertDatabaseCount('asset_allocations', 0);
     }
+    public function test_invoice_idempotency_prevents_duplicate_invoice_creation(): void
+    {
+        [$business, $user] = $this->businessUser();
+        $this->actingAs($user);
+
+        $event = Event::create([
+            'business_id' => $business->id,
+            'reference' => 'EVT-IDEMP-001',
+            'name' => 'Invoice Idempotency Event',
+            'customer_name' => 'Invoice Customer',
+            'status' => 'draft',
+        ]);
+
+        $payload = [
+            'idempotency_key' => (string) \Illuminate\Support\Str::uuid(),
+            'event_id' => $event->id,
+            'lines' => [[
+                'description' => 'Catering service',
+                'quantity' => '1',
+                'unit' => 'service',
+                'unit_price' => '1000.00',
+            ]],
+        ];
+
+        $this->post(route('finance.invoices.store'), $payload)->assertRedirect();
+        $this->post(route('finance.invoices.store'), $payload)->assertRedirect();
+
+        $this->assertDatabaseCount('invoices', 1);
+        $this->assertDatabaseHas('audit_logs', [
+            'action' => 'finance.invoice.created',
+            'business_id' => $business->id,
+        ]);
+    }
+
+    public function test_expense_idempotency_prevents_duplicate_expense_creation(): void
+    {
+        [$business, $user] = $this->businessUser();
+        $this->actingAs($user);
+
+        $payload = [
+            'idempotency_key' => (string) \Illuminate\Support\Str::uuid(),
+            'description' => 'Fuel',
+            'amount' => '250.00',
+            'expense_date' => now()->toDateString(),
+            'status' => 'paid',
+        ];
+
+        $this->post(route('finance.expenses.store'), $payload)->assertRedirect();
+        $this->post(route('finance.expenses.store'), $payload)->assertRedirect();
+
+        $this->assertDatabaseCount('finance_expenses', 1);
+        $this->assertDatabaseHas('audit_logs', [
+            'action' => 'finance.expense.recorded',
+            'business_id' => $business->id,
+        ]);
+    }
+
+
 }
