@@ -47,7 +47,7 @@ class PurchaseOrderController extends Controller
     {
         $businessId=app(CurrentBusiness::class)->id($request->user());
         $data=$request->validate([
-            'idempotency_key'=>['required','uuid'],
+            'idempotency_key'=>['nullable','uuid'],
             'supplier_id'=>['required','integer'],
             'currency'=>['required','string','size:3', Rule::in(array_keys(config('zazu.currencies')))],
             'expected_at'=>['nullable','date'],
@@ -103,6 +103,8 @@ class PurchaseOrderController extends Controller
             404,
             'One or more catalogue items do not belong to this business.'
         );
+
+        $data['idempotency_key'] ??= (string) Str::uuid();
 
         $existingOrder = PurchaseOrder::query()->where('business_id',$businessId)->where('idempotency_key',$data['idempotency_key'])->first();
         if ($existingOrder) {
