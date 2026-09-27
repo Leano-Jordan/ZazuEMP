@@ -33,4 +33,9 @@ final class Money
     {
         return number_format($cents / 100, 2, '.', '');
     }
+
+    public static function formatCents(int $cents): string
+    {
+        return number_format($cents / 100, 2, '.', ',');
+    }
 }
