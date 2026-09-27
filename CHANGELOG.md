@@ -2,6 +2,18 @@
 
 All notable Zazu EMP project changes will be recorded here.
 
+## 2026-09-27
+
+### Security / Correctness Sweep
+
+- Revalidated quote status transitions after row locking to close a concurrent state-change race.
+- Serialized primary customer-contact promotion per customer to prevent multiple primary contacts under concurrent writes.
+- Revoked prior database-backed sessions after password reset and enabled Laravel session-integrity middleware for authenticated application routes.
+- Moved business branding uploads and delivery to private storage.
+- Added an upgrade migration to move existing business-branding files out of the public disk.
+- Updated privacy, development-checklist and V1 status records to reflect the private branding boundary.
+- Recorded the repository-wide sweep in `docs/ZAZU_SWEEP_AUDIT_2026-09-27.md`.
+
 ## 2026-09-26
 
 ### Fixed / Updated
