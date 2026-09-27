@@ -22,7 +22,7 @@
             <div class="zazu-card-description">Each row is one requirement. The quantity shown at right belongs to that row.</div>
         </div>
         @if ($requirements->count())
-            <div class="zazu-record-header" style="--zazu-record-cols: 2">
+            <div class="zazu-record-header" data-record-cols="2">
                 <div class="zazu-record-header-note">Service</div>
                 <div class="zazu-record-header-cell">Quantity</div>
                 <div class="zazu-record-header-cell">Status</div>
