@@ -201,3 +201,36 @@ Fresh-eyes review:
 Verification boundary:
 - Source-level re-read and structural checks were performed after the changes.
 - Browser-rendered desktop/tablet/mobile inspection, Blade compilation and full application tests were not run in this environment and are not claimed as verified.
+
+
+## 2026-09-28 iterative commercial hardening loop
+
+Implemented during the continued Director loop:
+
+- Permission-aware Dashboard discovery, metrics, CTAs and record links.
+- Shared navigation now reuses the loaded current workspace membership role rather than re-querying permission state for each navigation item.
+- Branded confirmation dialogs replaced remaining browser confirmation handlers; focus returns to the initiating control on Escape or cancel.
+- Workspace switching moved out of inline JavaScript into the shared UI initializer.
+- Workflow helper semantics corrected from dialog to non-modal region.
+- Finance summaries are grouped by currency and monetary display no longer round-trips through floating point.
+- Invoice paid and balance calculations use integer cents.
+- Purchase Order and Quote status transitions are centralized in their domain models and reused by locked controller checks and status UI.
+- Purchasing currency entry now follows the active business currency instead of allowing an invalid server-rejected value.
+- Money multiplication and decimal parsing now reject negative or overflowing inputs with regression coverage.
+- Mixed-currency payment history is rejected rather than silently contaminating invoice balances.
+- Remaining monetary float formatting was removed from Purchase Orders, Travel, Quotes, Catalogue and capability surfaces.
+- Legacy theme overrides were consolidated so the blue reference palette has a single canonical root token system.
+- Browser smoke identity generation was made parallel-safe and its Dashboard expectation updated to the current operational hierarchy.
+- Branding preview validation now matches the server upload allowlist.
+- Reduced-motion handling now applies to toast dismissal as well as persistent UI transitions.
+- Shared UI DOM initialization is centralized through one DOM-ready lifecycle.
+
+Automated evidence:
+- Laravel: green on commit 613f0f0.
+- Psalm Security Scan: green on commit 613f0f0.
+- PHPMD: green on commit 613f0f0.
+- Browser smoke: still running on commit 613f0f0 at the time of this record.
+
+Verification boundary:
+- Browser smoke successfully built the frontend, installed Chromium and started the application; its regression suite had not completed at record time.
+- Local manual browser inspection is unavailable in this environment.
