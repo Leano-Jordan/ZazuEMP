@@ -45,7 +45,7 @@ class ZazuRestoreCommand extends Command
             for ($index = 0; $index < $zip->numFiles; $index++) {
                 $name = $zip->getNameIndex($index);
 
-                if ($name === false || str_contains($name, '\\0')) {
+                if ($name === false || str_contains($name, "\0")) {
                     $zip->close();
                     $this->error('The backup archive contains an invalid entry.');
                     return self::FAILURE;
