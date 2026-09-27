@@ -13,7 +13,7 @@
     gap: 7px;
     padding: 0 13px;
     border: 1px solid var(--zazu-border);
-    border-radius: 999px;
+    border-radius: 4px;
     background: var(--zazu-surface);
     color: var(--zazu-ink);
     box-shadow: var(--zazu-shadow-strong, 0 10px 30px rgba(0,0,0,.12));
@@ -28,7 +28,7 @@
     margin-bottom: 9px;
     padding: 16px;
     border: 1px solid var(--zazu-border);
-    border-radius: 14px;
+    border-radius: 6px;
     background: var(--zazu-surface);
     color: var(--zazu-ink);
     box-shadow: var(--zazu-shadow-strong, 0 16px 42px rgba(0,0,0,.15));
@@ -57,7 +57,7 @@
     margin-top: 12px;
     padding: 10px;
     border: 1px solid var(--zazu-border);
-    border-radius: 10px;
+    border-radius: 4px;
     background: var(--zazu-surface-2);
 }
 .zazu-helper-step-label {
@@ -87,7 +87,7 @@
     min-height: 34px;
     padding: 0 10px;
     border: 1px solid var(--zazu-border);
-    border-radius: 8px;
+    border-radius: 2px;
     background: var(--zazu-surface);
     color: var(--zazu-ink);
     font-size: 11px;
