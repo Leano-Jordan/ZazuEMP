@@ -104,6 +104,64 @@ class RouteIntegrityTest extends TestCase
         $this->assertSame([], $invalid);
     }
 
+    public function test_sensitive_routes_retain_required_authorization_middleware(): void
+    {
+        $expectedMiddleware = [
+            'dashboard' => ['permission:dashboard.view'],
+            'calendar.index' => ['permission:calendar.view'],
+            'finance.index' => ['permission:finance.view'],
+            'finance.invoices.create' => ['permission:finance.invoice.create'],
+            'finance.invoices.store' => ['permission:finance.invoice.create'],
+            'finance.payments.store' => ['permission:finance.payment.create'],
+            'finance.expenses.store' => ['permission:finance.expense.create'],
+            'purchasing.index' => ['permission:purchasing.view'],
+            'purchasing.store' => ['permission:purchasing.create'],
+            'purchasing.status' => ['permission:purchasing.status'],
+            'inventory.index' => ['permission:inventory.view'],
+            'inventory.movement' => ['permission:inventory.movement'],
+            'assets.allocate' => ['permission:assets.allocate'],
+            'quotes.index' => ['permission:quotes.view'],
+            'quotes.status' => ['permission:quotes.status'],
+            'work.index' => ['permission:work.view'],
+            'work.store' => ['permission:work.create'],
+            'work.update' => ['permission:work.update'],
+            'work.destroy' => ['permission:work.delete'],
+            'work.quotes.index' => ['permission:quotes.view'],
+            'work.quotes.create' => ['permission:quotes.create'],
+            'work.quotes.store' => ['permission:quotes.create'],
+            'work.requirements.index' => ['permission:work.view'],
+            'work.requirements.create' => ['permission:work.update'],
+            'work.requirements.store' => ['permission:work.update'],
+            'customers.index' => ['permission:customers.view'],
+            'customers.store' => ['permission:customers.create'],
+            'customers.update' => ['permission:customers.update'],
+            'capabilities.index' => ['permission:capabilities.view'],
+            'settings.index' => ['owner'],
+            'settings.update' => ['owner'],
+            'settings.compliance' => ['owner'],
+            'capabilities.create' => ['owner'],
+            'capabilities.store' => ['owner'],
+            'capabilities.edit' => ['owner'],
+            'capabilities.update' => ['owner'],
+        ];
+
+        foreach ($expectedMiddleware as $routeName => $required) {
+            $route = Route::getRoutes()->getByName($routeName);
+
+            $this->assertNotNull($route, "Expected route [{$routeName}] to be registered.");
+
+            $middleware = $route->gatherMiddleware();
+
+            foreach ($required as $entry) {
+                $this->assertContains(
+                    $entry,
+                    $middleware,
+                    "Route [{$routeName}] must retain middleware [{$entry}]."
+                );
+            }
+        }
+    }
+
     public function test_blade_named_route_calls_point_to_registered_routes(): void
     {
         $registered = collect(Route::getRoutes()->getRoutes())
