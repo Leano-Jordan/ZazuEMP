@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers;
 
-Asset import placeholderuse App\Models\Customer;
+use App\Models\Customer;
 use App\Models\Event;
 use App\Models\Quote;
 use App\Support\CurrentBusiness;
