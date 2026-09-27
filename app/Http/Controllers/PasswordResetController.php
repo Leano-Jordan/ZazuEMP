@@ -86,6 +86,10 @@ class PasswordResetController extends Controller
         $user = User::query()->where('email', $validated['email'])->firstOrFail();
 
         Auth::login($user);
+
+        // A successful password reset should evict previously authenticated devices.
+        Auth::logoutOtherDevices($validated['password']);
+
         $request->session()->regenerate();
 
         $ownedBusiness = $user->businesses()
