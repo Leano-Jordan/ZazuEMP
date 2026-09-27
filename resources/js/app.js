@@ -178,3 +178,127 @@ if (document.readyState === 'loading') {
 } else {
     setupBrandingUploads();
 }
+
+
+function setupZazuHelper() {
+    document.querySelectorAll('[data-zazu-helper]').forEach((helper) => {
+        const route = helper.dataset.zazuGuideRoute || 'workspace';
+        const storageKey = 'zazu-helper-enabled';
+        const seenKey = 'zazu-helper-seen:' + route;
+        const panel = helper.querySelector('[data-zazu-helper-panel]');
+        const toggle = helper.querySelector('[data-zazu-helper-toggle]');
+        const toggleLabel = helper.querySelector('[data-zazu-helper-toggle-label]');
+        const closeButton = helper.querySelector('[data-zazu-helper-close]');
+        const offButton = helper.querySelector('[data-zazu-helper-off]');
+        const backButton = helper.querySelector('[data-zazu-helper-back]');
+        const nextButton = helper.querySelector('[data-zazu-helper-next]');
+        const title = helper.querySelector('[data-zazu-helper-title]');
+        const copy = helper.querySelector('[data-zazu-helper-copy]');
+        const stepLabel = helper.querySelector('[data-zazu-helper-step-label]');
+        const count = helper.querySelector('[data-zazu-helper-count]');
+        const guideLink = helper.querySelector('[data-zazu-helper-link]');
+        const data = [...helper.querySelectorAll('[data-zazu-helper-step-data]')].map((item) => ({
+            label: item.dataset.label || '',
+            title: item.dataset.title || '',
+            copy: item.dataset.copy || '',
+            href: item.dataset.href || '',
+            link: item.dataset.link || '',
+        }));
+
+        if (!panel || !toggle || !toggleLabel || !data.length) return;
+
+        let index = 0;
+        let enabled = localStorage.getItem(storageKey) !== 'off';
+
+        const render = () => {
+            const step = data[index];
+
+            if (title) title.textContent = step.title;
+            if (copy) copy.textContent = step.copy;
+            if (stepLabel) stepLabel.textContent = step.label;
+            if (count) count.textContent = (index + 1) + ' of ' + data.length;
+
+            if (guideLink) {
+                guideLink.hidden = !step.href;
+                guideLink.href = step.href || '#';
+                guideLink.textContent = step.link || '';
+            }
+
+            if (backButton) backButton.disabled = index === 0;
+            if (nextButton) nextButton.textContent = index === data.length - 1 ? 'Done' : 'Next';
+        };
+
+        const syncEnabledState = () => {
+            helper.dataset.zazuGuideEnabled = enabled ? 'on' : 'off';
+            toggle.setAttribute('aria-pressed', enabled ? 'true' : 'false');
+            toggleLabel.textContent = enabled ? 'Guide' : 'Guide off';
+        };
+
+        const close = () => {
+            panel.hidden = true;
+            toggle.setAttribute('aria-expanded', 'false');
+        };
+
+        const open = () => {
+            if (!enabled) enabled = true;
+            index = 0;
+            localStorage.setItem(storageKey, 'on');
+            localStorage.setItem(seenKey, '1');
+            syncEnabledState();
+            render();
+            panel.hidden = false;
+            toggle.setAttribute('aria-expanded', 'true');
+        };
+
+        const turnOff = () => {
+            enabled = false;
+            localStorage.setItem(storageKey, 'off');
+            syncEnabledState();
+            close();
+        };
+
+        toggle.addEventListener('click', () => {
+            if (panel.hidden) {
+                open();
+            } else {
+                close();
+            }
+        });
+
+        offButton?.addEventListener('click', turnOff);
+        closeButton?.addEventListener('click', close);
+
+        backButton?.addEventListener('click', () => {
+            if (index === 0) return;
+            index -= 1;
+            render();
+        });
+
+        nextButton?.addEventListener('click', () => {
+            if (index >= data.length - 1) {
+                close();
+                return;
+            }
+
+            index += 1;
+            render();
+        });
+
+        document.addEventListener('keydown', (event) => {
+            if (event.key === 'Escape' && !panel.hidden) close();
+        });
+
+        syncEnabledState();
+        render();
+
+        if (enabled && localStorage.getItem(seenKey) !== '1') {
+            window.setTimeout(open, 450);
+        }
+    });
+}
+
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', setupZazuHelper);
+} else {
+    setupZazuHelper();
+}
