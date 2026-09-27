@@ -117,6 +117,34 @@ class CustomerContactLifecycleTest extends TestCase
         $this->assertCount(1, $customer->fresh()->contacts);
     }
 
+    public function test_promoting_a_secondary_contact_leaves_exactly_one_primary_contact(): void
+    {
+        $customer = Customer::create(['name' => 'Primary Promotion Customer']);
+
+        $primary = CustomerContact::create([
+            'customer_id' => $customer->id,
+            'name' => 'Original Primary',
+            'is_primary' => true,
+        ]);
+
+        $secondary = CustomerContact::create([
+            'customer_id' => $customer->id,
+            'name' => 'New Primary',
+            'is_primary' => false,
+        ]);
+
+        $response = $this->put(route('customers.contacts.update', [$customer, $secondary]), [
+            'name' => 'New Primary',
+            'is_primary' => true,
+        ]);
+
+        $response->assertRedirect(route('customers.show', $customer));
+        $this->assertSame(1, $customer->contacts()->where('is_primary', true)->count());
+        $this->assertFalse((bool) $primary->fresh()->is_primary);
+        $this->assertTrue((bool) $secondary->fresh()->is_primary);
+    }
+
+
     public function test_primary_contact_cannot_be_removed_without_replacement(): void
     {
         $customer = Customer::create(['name' => 'Primary Protection Customer']);
