@@ -68,7 +68,7 @@ class FinanceController extends Controller
         $business->loadMissing('taxProfile');
 
         $data = $request->validate([
-            'idempotency_key' => ['required', 'uuid'],
+            'idempotency_key' => ['nullable', 'uuid'],
             'quote_id' => ['nullable', 'integer'],
             'event_id' => ['nullable', 'integer'],
             'tax_rate_id' => ['nullable', 'integer'],
@@ -286,7 +286,7 @@ class FinanceController extends Controller
     {
         $businessId = app(CurrentBusiness::class)->id($request->user());
         $data = $request->validate([
-            'idempotency_key' => ['required', 'uuid'],
+            'idempotency_key' => ['nullable', 'uuid'],
             'invoice_id' => ['required', 'integer'],
             'amount' => ['required', 'numeric', 'decimal:0,2', 'gt:0'],
             'method' => ['required', 'in:cash,bank_transfer,card,other'],
@@ -303,6 +303,8 @@ class FinanceController extends Controller
         if ($existingPayment) {
             return redirect()->route('finance.index')->with('info', 'That payment submission was already processed.');
         }
+
+        $data['idempotency_key'] ??= (string) Str::uuid();
 
         DB::transaction(function () use ($data, $businessId): void {
             $invoice = Invoice::where('business_id', $businessId)
@@ -377,6 +379,8 @@ class FinanceController extends Controller
         if (!empty($data['event_id'])) {
             abort_unless(Event::where('business_id', $businessId)->whereKey($data['event_id'])->exists(), 404);
         }
+
+        $data['idempotency_key'] ??= (string) Str::uuid();
 
         $existingExpense = FinanceExpense::query()
             ->where('business_id', $businessId)
