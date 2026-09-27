@@ -186,8 +186,8 @@
 
             function refreshContacts(selectedDay = oldDayContactId, selectedNight = oldNightContactId) {
                 const customer = customers.find(item => String(item.id) === customerSelect.value);
-                dayContactSelect.innerHTML = '<option value="">No day contact</option>';
-                nightContactSelect.innerHTML = '<option value="">No night contact</option>';
+                dayContactSelect.replaceChildren(new Option('No day contact', ''));
+                nightContactSelect.replaceChildren(new Option('No night contact', ''));
                 if (!customer) return;
 
                 for (const contact of customer.contacts) {
