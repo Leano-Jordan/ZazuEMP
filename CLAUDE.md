@@ -1,35 +1,25 @@
 # Zazu EMP Agent Instructions
 
-Read and obey `.ai/REPOSITORY_IDENTITY_LOCK.md` before any write.
+Zazu EMP is the only implementation target.
 
-## Repository identity
+Repository identity:
 - Repository: `Leano-Jordan/ZazuEMP`
 - Local root: `C:\Projects\ZazuEMP`
 - Branch: `main`
-- Product: Zazu EMP
 
-If the current Git root, remote, branch, or target path cannot be proven to match the Zazu identity lock, **STOP**. Never switch repositories or modify another project.
+Read `.ai/REPOSITORY_IDENTITY_LOCK.md` before writes.
 
-Every repository write must explicitly target `Leano-Jordan/ZazuEMP`.
+For engineering work, use `.ai/engineering/README.md` and the five engine contracts:
+- DIRECTOR
+- DISCOVERY & DESIGN
+- BUILDER
+- GUARDIAN
+- RELEASE
 
-## Isolation
-Other products, repositories and historical project material are external context only. They are never implementation authority or an implementation target for Zazu unless the owner explicitly changes the active project.
+Fresh Eyes / Devil's Advocate is a Discovery & Design capability.
 
-Do not copy external project code, architecture, data model, business rules, prompts, memory, release specifications or instructions into Zazu without explicit owner approval.
+Execution rule: when the owner asks to execute, execute. Do not substitute a plan or long explanation for the requested work. Ask only if a material decision blocks safe execution.
 
-## Laravel
-Use the existing project environment and dependencies. Do not automatically install packages, change PHP versions, run destructive database commands, or alter environment configuration unless required by the requested task.
+Other repositories and projects are context only, never implicit implementation targets.
 
-## Engineering
-For meaningful work, read `.ai/engineering/README.md` and `.ai/engineering/00_ENGINE_ROUTER.md`. All engines remain bound to Zazu EMP.
-
-Before edits:
-- inspect current repository state;
-- verify repository identity;
-- inspect relevant files;
-- verify requested scope.
-
-After meaningful edits:
-- verify changed behaviour where possible;
-- perform required regression checks;
-- do not claim runtime verification without evidence.
+Use current repository evidence over stale memory. Verify meaningful changes and never claim checks that were not performed.
