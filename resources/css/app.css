@@ -4996,3 +4996,119 @@ body {
     outline: 3px solid var(--zazu-focus);
     outline-offset: 3px;
 }
+
+
+/* Commercial form layout and overflow hardening */
+.zazu-form,
+.zazu-auth-card,
+.zazu-form-main,
+.zazu-form-section,
+.zazu-card,
+.zazu-panel,
+.zazu-list-item,
+.zazu-command-band,
+.zazu-editor {
+    min-width: 0;
+}
+
+.zazu-form input,
+.zazu-form select,
+.zazu-form textarea,
+.zazu-auth-card input,
+.zazu-auth-card select,
+.zazu-auth-card textarea {
+    box-sizing: border-box;
+    max-width: 100%;
+}
+
+.zazu-auth-form-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 18px 16px;
+    width: 100%;
+}
+
+.zazu-auth-form-grid .zazu-field {
+    min-width: 0;
+}
+
+.zazu-auth-form-grid .zazu-field-help,
+.zazu-auth-form-grid .zazu-field-error {
+    overflow-wrap: anywhere;
+}
+
+.zazu-login-form {
+    width: 100%;
+    min-width: 0;
+}
+
+.zazu-login-form .zazu-field,
+.zazu-form > .zazu-field {
+    min-width: 0;
+}
+
+.zazu-action-group,
+.zazu-list-main,
+.zazu-list-side {
+    min-width: 0;
+    max-width: 100%;
+}
+
+.zazu-action-group form {
+    min-width: 0;
+    max-width: 100%;
+}
+
+.zazu-action-group input,
+.zazu-action-group select,
+.zazu-action-group textarea {
+    min-width: 0;
+    max-width: 100%;
+    flex: 1 1 140px;
+}
+
+.zazu-list-title,
+.zazu-list-meta,
+.zazu-detail-value,
+.zazu-command-copy,
+.zazu-form-section-copy,
+.zazu-context-copy {
+    overflow-wrap: anywhere;
+}
+
+@media (max-width: 700px) {
+    .zazu-auth-form-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .zazu-form-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .zazu-field-wide {
+        grid-column: auto;
+    }
+
+    .zazu-action-group {
+        width: 100%;
+    }
+
+    .zazu-action-group form {
+        width: 100%;
+    }
+}
+
+@media (max-width: 560px) {
+    .zazu-auth-card {
+        padding: 22px 18px;
+    }
+
+    .zazu-form-grid {
+        gap: 14px;
+    }
+
+    .zazu-btn {
+        max-width: 100%;
+    }
+}
+
