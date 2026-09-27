@@ -225,7 +225,6 @@
                                     class="zazu-user-trigger"
                                     data-user-trigger
                                     aria-expanded="false"
-                                    aria-haspopup="dialog"
                                     aria-controls="zazu-user-menu"
                                     aria-label="Open account menu for {{ '@'.auth()->user()->username }}"
                                 >
@@ -252,7 +251,7 @@
                                             <form method="POST" action="{{ route('business.switch') }}" class="zazu-user-switch-form">
                                                 @csrf
                                                 <label class="sr-only" for="zazu-business-switch">Current workspace</label>
-                                                <select id="zazu-business-switch" name="business_id" class="zazu-user-switch-select" onchange="this.form.submit()">
+                                                <select id="zazu-business-switch" name="business_id" class="zazu-user-switch-select" data-business-switch>
                                                     @foreach($businesses as $availableBusiness)
                                                         <option value="{{ $availableBusiness->id }}" @selected((int) $availableBusiness->id === (int) $business->id)>{{ $availableBusiness->name }}</option>
                                                     @endforeach
