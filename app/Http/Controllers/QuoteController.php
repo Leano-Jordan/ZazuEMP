@@ -19,13 +19,7 @@ use Illuminate\View\View;
 
 class QuoteController extends Controller
 {
-    private const STATUS_TRANSITIONS = [
-        'draft' => ['sent'],
-        'sent' => ['accepted', 'declined', 'expired'],
-        'declined' => ['draft'],
-        'expired' => ['draft'],
-        'accepted' => [],
-    ];
+
 
     public function index(Request $request): View
     {
@@ -230,7 +224,7 @@ class QuoteController extends Controller
         $currentStatus = $quote->status ?: 'draft';
 
         abort_unless(
-            in_array($newStatus, self::STATUS_TRANSITIONS[$currentStatus] ?? [], true),
+            in_array($newStatus, Quote::STATUS_TRANSITIONS[$currentStatus] ?? [], true),
             422,
             'That quote status change is not allowed.'
         );
