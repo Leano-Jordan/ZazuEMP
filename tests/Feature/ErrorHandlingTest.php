@@ -4,7 +4,6 @@ namespace Tests\Feature;
 
 use Illuminate\Contracts\Debug\ExceptionHandler;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Route;
 use Tests\TestCase;
 
@@ -30,8 +29,8 @@ class ErrorHandlingTest extends TestCase
             new \RuntimeException('Sensitive database/table details must remain private.')
         );
 
-        $response->assertStatus(500);
-        $this->assertStringContainsString('Zazu could not complete that request.', $response->getContent());
+        $this->assertSame(500, $response->getStatusCode());
+        $this->assertStringContainsString('Zazu could not complete that request.', (string) $response->getContent());
         $this->assertStringContainsString('Reference test-request-id', $response->getContent());
         $this->assertStringNotContainsString('Sensitive database/table details', $response->getContent());
         $this->assertSame('test-request-id', $response->headers->get('X-Zazu-Request-Id'));
