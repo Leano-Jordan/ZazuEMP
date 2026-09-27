@@ -123,16 +123,70 @@
             if (!root || !list || !add) return;
 
             let index = 1;
+            const createField = (labelText, attributes = {}) => {
+                const label = document.createElement('label');
+                label.className = 'zazu-field';
+
+                const labelTextNode = document.createElement('span');
+                labelTextNode.className = 'zazu-label';
+                labelTextNode.textContent = labelText;
+
+                const input = document.createElement('input');
+                input.className = 'zazu-input';
+
+                Object.entries(attributes).forEach(([name, value]) => {
+                    if (name === 'required') {
+                        input.required = Boolean(value);
+                    } else {
+                        input.setAttribute(name, String(value));
+                    }
+                });
+
+                label.append(labelTextNode, input);
+
+                return label;
+            };
+
             add.addEventListener('click', () => {
                 const row = document.createElement('div');
                 row.className = 'zazu-invoice-line';
                 row.dataset.invoiceLine = '';
-                row.innerHTML = `
-                    <label class="zazu-field"><span class="zazu-label">Description</span><input name="lines[${index}][description]" class="zazu-input" required placeholder="Service or item"></label>
-                    <label class="zazu-field"><span class="zazu-label">Quantity</span><input type="number" name="lines[${index}][quantity]" value="1.00" min="0.01" step="0.01" class="zazu-input" required></label>
-                    <label class="zazu-field"><span class="zazu-label">Unit</span><input name="lines[${index}][unit]" class="zazu-input" placeholder="service, item, hour"></label>
-                    <label class="zazu-field"><span class="zazu-label">Unit price</span><input type="number" name="lines[${index}][unit_price]" min="0" step="0.01" class="zazu-input" required></label>
-                    <button type="button" class="zazu-btn zazu-btn-ghost" data-remove-invoice-line aria-label="Remove invoice line">Remove</button>`;
+
+                row.append(
+                    createField('Description', {
+                        name: `lines[${index}][description]`,
+                        required: true,
+                        placeholder: 'Service or item',
+                    }),
+                    createField('Quantity', {
+                        type: 'number',
+                        name: `lines[${index}][quantity]`,
+                        value: '1.00',
+                        min: '0.01',
+                        step: '0.01',
+                        required: true,
+                    }),
+                    createField('Unit', {
+                        name: `lines[${index}][unit]`,
+                        placeholder: 'service, item, hour',
+                    }),
+                    createField('Unit price', {
+                        type: 'number',
+                        name: `lines[${index}][unit_price]`,
+                        min: '0',
+                        step: '0.01',
+                        required: true,
+                    }),
+                );
+
+                const remove = document.createElement('button');
+                remove.type = 'button';
+                remove.className = 'zazu-btn zazu-btn-ghost';
+                remove.dataset.removeInvoiceLine = '';
+                remove.setAttribute('aria-label', 'Remove invoice line');
+                remove.textContent = 'Remove';
+                row.appendChild(remove);
+
                 list.appendChild(row);
                 index += 1;
             });
