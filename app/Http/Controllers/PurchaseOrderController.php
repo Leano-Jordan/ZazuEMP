@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\BusinessCapability;
 use App\Models\PurchaseOrder;
 use App\Models\Supplier;
+use App\Support\Audit;
 use App\Support\CurrentBusiness;
 use App\Support\Money;
 use Illuminate\Http\RedirectResponse;
@@ -35,6 +36,7 @@ class PurchaseOrderController extends Controller
     {
         $businessId=app(CurrentBusiness::class)->id($request->user());
         return view('purchasing.create',[
+            'idempotencyKey'=>(string) Str::uuid(),
             'suppliers'=>Supplier::where('business_id',$businessId)->orderBy('name')->get(),
             'catalogue'=>BusinessCapability::where('business_id',$businessId)->where('is_active',true)->whereIn('capability_type',['product','rental'])->orderBy('name')->get(),
             'currency'=>app(CurrentBusiness::class)->model($request->user())->currency ?? 'ZAR',
@@ -45,6 +47,7 @@ class PurchaseOrderController extends Controller
     {
         $businessId=app(CurrentBusiness::class)->id($request->user());
         $data=$request->validate([
+            'idempotency_key'=>['required','uuid'],
             'supplier_id'=>['required','integer'],
             'currency'=>['required','string','size:3', Rule::in(array_keys(config('zazu.currencies')))],
             'expected_at'=>['nullable','date'],
@@ -101,9 +104,14 @@ class PurchaseOrderController extends Controller
             'One or more catalogue items do not belong to this business.'
         );
 
+        $existingOrder = PurchaseOrder::query()->where('business_id',$businessId)->where('idempotency_key',$data['idempotency_key'])->first();
+        if ($existingOrder) {
+            return redirect()->route('purchasing.show',$existingOrder)->with('info','That purchase order submission was already processed.');
+        }
+
         $order=\DB::transaction(function() use($data,$businessId,$supplier){
             $order=PurchaseOrder::create([
-                'business_id'=>$businessId,'supplier_id'=>$supplier->id,
+                'business_id'=>$businessId,'supplier_id'=>$supplier->id,'idempotency_key'=>$data['idempotency_key'],
                 'reference'=>'PO-'.Str::upper(Str::random(8)),'status'=>'draft',
                 'currency'=>strtoupper($data['currency']),'expected_at'=>$data['expected_at']??null,'notes'=>$data['notes']??null,
                 'total_amount'=>'0.00',
@@ -122,6 +130,11 @@ class PurchaseOrderController extends Controller
                 ]);
             }
             $order->update(['total_amount'=>Money::fromCents($totalCents)]);
+            Audit::record('purchasing.order.created', $order, [
+                'reference' => $order->reference,
+                'total' => $order->total_amount,
+                'currency' => $order->currency,
+            ], $businessId);
             return $order;
         });
         return redirect()->route('purchasing.show',$order)->with('success','Purchase order created.');
@@ -164,6 +177,7 @@ class PurchaseOrderController extends Controller
                 $lockedOrder->ordered_at = now()->toDateString();
             }
 
+            $previousStatus = $lockedOrder->status;
             $lockedOrder->status = $data['status'];
             $lockedOrder->save();
 
@@ -174,6 +188,7 @@ class PurchaseOrderController extends Controller
             $lockedOrder->load('items');
 
             foreach ($lockedOrder->items as $item) {
+                abort_unless((int) $item->business_id === $businessId && (int) $item->purchase_order_id === (int) $lockedOrder->id, 409, 'Purchase order line integrity could not be verified.');
                 $inventoryItem = \App\Models\InventoryItem::query()
                     ->where('business_id', $businessId)
                     ->when($item->capability_id, fn ($query) => $query->where('capability_id', $item->capability_id))
@@ -184,6 +199,19 @@ class PurchaseOrderController extends Controller
                     ->first();
 
                 if (!$inventoryItem) {
+                    // Serialize auto-creation across concurrent receipts from different orders.
+                    \App\Models\Business::query()->whereKey($businessId)->lockForUpdate()->firstOrFail();
+                    $inventoryItem = \App\Models\InventoryItem::query()
+                        ->where('business_id', $businessId)
+                        ->when($item->capability_id, fn ($query) => $query->where('capability_id', $item->capability_id))
+                        ->where(function ($query) use ($item) {
+                            $query->where('name', $item->description)
+                                ->orWhere('sku', $item->description);
+                        })
+                        ->first();
+                    if ($inventoryItem) {
+                        continue;
+                    }
                     $inventoryItem = \App\Models\InventoryItem::create([
                         'business_id' => $businessId,
                         'capability_id' => $item->capability_id,
@@ -214,6 +242,13 @@ class PurchaseOrderController extends Controller
                         'notes' => 'Received from purchase order.',
                     ]);
                 }
+            }
+
+            if ($previousStatus !== $lockedOrder->status) {
+                Audit::record('purchasing.order.status_changed', $lockedOrder, [
+                    'from' => $previousStatus,
+                    'to' => $lockedOrder->status,
+                ], $businessId);
             }
         });
 
