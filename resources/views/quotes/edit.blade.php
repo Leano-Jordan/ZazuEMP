@@ -71,7 +71,7 @@
                                 $defaultPrice = $item?->unit_price;
 
                                 if (!$item && $requirement->capability?->default_price !== null && ($requirement->capability->currency ?? $quote->currency) === $quote->currency) {
-                                    $defaultPrice = number_format((float) $requirement->capability->default_price, 2, '.', '');
+                                    $defaultPrice = $requirement->capability->default_price;
                                 }
                             @endphp
                             <div class="zazu-list-item">
