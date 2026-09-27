@@ -67,6 +67,11 @@ class FinancePurchasingInventoryTest extends TestCase
         $this->patch(route('purchasing.status', $order), ['status' => 'received'])
             ->assertRedirect();
 
+        $this->patch(route('purchasing.status', $order), ['status' => 'received'])
+            ->assertStatus(422);
+
+        $this->assertDatabaseCount('inventory_movements', 1);
+
         $item = \App\Models\InventoryItem::where('business_id', $business->id)->where('name', 'Chicken')->firstOrFail();
 
         $this->assertSame(20.0, $item->on_hand);

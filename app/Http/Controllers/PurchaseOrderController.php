@@ -136,35 +136,44 @@ class PurchaseOrderController extends Controller
 
     public function updateStatus(Request $request, PurchaseOrder $purchaseOrder): RedirectResponse
     {
-        $this->ensure($request,$purchaseOrder);
-        $data=$request->validate(['status'=>['required','in:draft,sent,ordered,received,cancelled']]);
-        $businessId = app(CurrentBusiness::class)->id($request->user());
-        $currentStatus = $purchaseOrder->status;
+        $this->ensure($request, $purchaseOrder);
 
-        if ($currentStatus !== $data['status']) {
-            abort_unless(
-                in_array($data['status'], self::STATUS_TRANSITIONS[$currentStatus] ?? [], true),
-                422,
-                'That purchase order status change is not allowed.'
-            );
-        }
+        $data = $request->validate([
+            'status' => ['required', 'in:draft,sent,ordered,received,cancelled'],
+        ]);
+
+        $businessId = app(CurrentBusiness::class)->id($request->user());
 
         DB::transaction(function () use ($purchaseOrder, $data, $businessId): void {
-            $updates = ['status' => $data['status']];
+            $lockedOrder = PurchaseOrder::query()
+                ->where('business_id', $businessId)
+                ->lockForUpdate()
+                ->findOrFail($purchaseOrder->id);
 
-            if ($data['status'] === 'ordered' && !$purchaseOrder->ordered_at) {
-                $updates['ordered_at'] = now()->toDateString();
+            $currentStatus = $lockedOrder->status;
+
+            if ($currentStatus !== $data['status']) {
+                abort_unless(
+                    in_array($data['status'], self::STATUS_TRANSITIONS[$currentStatus] ?? [], true),
+                    422,
+                    'That purchase order status change is not allowed.'
+                );
             }
 
-            $purchaseOrder->update($updates);
+            if ($data['status'] === 'ordered' && !$lockedOrder->ordered_at) {
+                $lockedOrder->ordered_at = now()->toDateString();
+            }
+
+            $lockedOrder->status = $data['status'];
+            $lockedOrder->save();
 
             if ($data['status'] !== 'received') {
                 return;
             }
 
-            $purchaseOrder->load('items');
+            $lockedOrder->load('items');
 
-            foreach ($purchaseOrder->items as $item) {
+            foreach ($lockedOrder->items as $item) {
                 $inventoryItem = \App\Models\InventoryItem::query()
                     ->where('business_id', $businessId)
                     ->when($item->capability_id, fn ($query) => $query->where('capability_id', $item->capability_id))
@@ -186,25 +195,26 @@ class PurchaseOrderController extends Controller
 
                 $alreadyReceived = \App\Models\InventoryMovement::query()
                     ->where('business_id', $businessId)
-                    ->where('purchase_order_id', $purchaseOrder->id)
+                    ->where('purchase_order_id', $lockedOrder->id)
                     ->where('inventory_item_id', $inventoryItem->id)
                     ->exists();
 
                 if (!$alreadyReceived) {
                     $inventoryItem->movements()->create([
                         'business_id' => $businessId,
-                        'purchase_order_id' => $purchaseOrder->id,
+                        'purchase_order_id' => $lockedOrder->id,
                         'type' => 'receipt',
                         'quantity' => $item->quantity,
                         'unit_cost' => $item->unit_price,
                         'movement_date' => now()->toDateString(),
-                        'reference' => $purchaseOrder->reference,
+                        'reference' => $lockedOrder->reference,
                         'notes' => 'Received from purchase order.',
                     ]);
                 }
             }
         });
-        return back()->with('success','Purchase order status updated.');
+
+        return back()->with('success', 'Purchase order status updated.');
     }
 
     private function ensure(Request $request, PurchaseOrder $order): void
