@@ -4,6 +4,7 @@ namespace Tests\Feature;
 
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\File;
+use Illuminate\Support\Facades\DB;
 use Tests\TestCase;
 use ZipArchive;
 
@@ -22,6 +23,7 @@ class ZazuBackupRestoreTest extends TestCase
         $originalDefault = config('database.default');
         $originalDatabase = config('database.connections.sqlite.database');
 
+        File::ensureDirectoryExists(dirname($database));
         File::delete($database);
         File::deleteDirectory($output);
 
@@ -30,12 +32,12 @@ class ZazuBackupRestoreTest extends TestCase
             'database.connections.sqlite.database' => $database,
         ]);
 
-        \Illuminate\Support\Facades\DB::purge('sqlite');
-        \Illuminate\Support\Facades\DB::connection('sqlite')->getSchemaBuilder()->create('backup_probe', function ($table) {
+        DB::purge('sqlite');
+        DB::connection('sqlite')->getSchemaBuilder()->create('backup_probe', function ($table) {
             $table->id();
             $table->string('value');
         });
-        \Illuminate\Support\Facades\DB::table('backup_probe')->insert(['value' => 'before backup']);
+        DB::table('backup_probe')->insert(['value' => 'before backup']);
 
         $this->artisan('zazu:backup', ['--output' => $output])
             ->assertExitCode(0);
@@ -50,18 +52,18 @@ class ZazuBackupRestoreTest extends TestCase
         $this->assertNotFalse($zip->locateName('database.sqlite'));
         $zip->close();
 
-        \Illuminate\Support\Facades\DB::table('backup_probe')->update(['value' => 'changed after backup']);
+        DB::table('backup_probe')->update(['value' => 'changed after backup']);
 
         $this->artisan('zazu:restore', [
             'archive' => $archive,
             '--force' => true,
         ])->assertExitCode(0);
 
-        \Illuminate\Support\Facades\DB::purge('sqlite');
+        DB::purge('sqlite');
 
         $this->assertSame(
             'before backup',
-            \Illuminate\Support\Facades\DB::connection('sqlite')->table('backup_probe')->value('value')
+            DB::connection('sqlite')->table('backup_probe')->value('value')
         );
 
         File::delete($database);
