@@ -15,11 +15,11 @@ class BusinessMediaSecurityTest extends TestCase
     public function test_business_branding_media_is_served_through_authenticated_route(): void
     {
         $this->signInAsOwner();
-        Storage::fake('public');
+        Storage::fake('local');
 
         $business = app(\App\Support\CurrentBusiness::class)->model(auth()->user());
         $path = 'business-branding/test-logo.webp';
-        Storage::disk('public')->put($path, 'image-bytes');
+        Storage::disk('local')->put($path, 'image-bytes');
         $business->update(['logo_path' => $path]);
 
         $response = $this->get(route('business.media', ['type' => 'logo']));
@@ -40,7 +40,7 @@ class BusinessMediaSecurityTest extends TestCase
     public function test_business_branding_media_cannot_be_read_from_another_business(): void
     {
         $this->signInAsOwner();
-        Storage::fake('public');
+        Storage::fake('local');
 
         $other = Business::create([
             'name' => 'Other Business',
@@ -49,7 +49,7 @@ class BusinessMediaSecurityTest extends TestCase
             'currency' => 'ZAR',
             'logo_path' => 'business-branding/other.webp',
         ]);
-        Storage::disk('public')->put($other->logo_path, 'other-image');
+        Storage::disk('local')->put($other->logo_path, 'other-image');
 
         $this->get(route('business.media', ['type' => 'logo']))->assertNotFound();
     }
@@ -57,7 +57,7 @@ class BusinessMediaSecurityTest extends TestCase
     public function test_owner_can_replace_all_branding_assets_and_old_files_are_removed(): void
     {
         $this->signInAsOwner();
-        Storage::fake('public');
+        Storage::fake('local');
 
         $business = auth()->user()->businesses()->firstOrFail();
         $oldPaths = [
@@ -67,7 +67,7 @@ class BusinessMediaSecurityTest extends TestCase
         ];
 
         foreach ($oldPaths as $path) {
-            Storage::disk('public')->put($path, 'old');
+            Storage::disk('local')->put($path, 'old');
         }
 
         $business->update($oldPaths);
@@ -87,15 +87,15 @@ class BusinessMediaSecurityTest extends TestCase
         foreach (array_keys($oldPaths) as $column) {
             $this->assertIsString($business->{$column});
             $this->assertNotSame($oldPaths[$column], $business->{$column});
-            Storage::disk('public')->assertExists($business->{$column});
-            Storage::disk('public')->assertMissing($oldPaths[$column]);
+            Storage::disk('local')->assertExists($business->{$column});
+            Storage::disk('local')->assertMissing($oldPaths[$column]);
         }
     }
 
     public function test_settings_page_exposes_versioned_authenticated_branding_preview_contract(): void
     {
         $this->signInAsOwner();
-        Storage::fake('public');
+        Storage::fake('local');
 
         $business = auth()->user()->businesses()->firstOrFail();
         $business->update([
@@ -120,3 +120,4 @@ class BusinessMediaSecurityTest extends TestCase
             ->assertSee('data-branding-save', false);
     }
 }
+
