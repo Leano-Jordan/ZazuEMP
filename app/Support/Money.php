@@ -31,11 +31,23 @@ final class Money
 
     public static function fromCents(int $cents): string
     {
-        return number_format($cents / 100, 2, '.', '');
+        $negative = $cents < 0;
+        $absolute = abs($cents);
+        $whole = intdiv($absolute, 100);
+        $fraction = str_pad((string) ($absolute % 100), 2, '0', STR_PAD_LEFT);
+
+        return ($negative ? '-' : '') . $whole . '.' . $fraction;
     }
 
     public static function formatCents(int $cents): string
     {
-        return number_format($cents / 100, 2, '.', ',');
+        $value = self::fromCents($cents);
+        [$whole, $fraction] = explode('.', $value, 2);
+        $negative = str_starts_with($whole, '-');
+        $whole = ltrim($whole, '-');
+
+        $formattedWhole = number_format((int) $whole, 0, '.', ',');
+
+        return ($negative ? '-' : '') . $formattedWhole . '.' . $fraction;
     }
 }
