@@ -83,7 +83,7 @@ class BusinessSettingsController extends Controller
             'wallpaper' => 'wallpaper_path',
         ] as $upload => $column) {
             if ($request->hasFile($upload)) {
-                $newPaths[$column] = $request->file($upload)->store('business-branding', 'public');
+                $newPaths[$column] = $request->file($upload)->store('business-branding', 'local');
                 $oldPaths[$column] = $business->{$column};
             } elseif ($request->boolean('remove_' . $upload)) {
                 $newPaths[$column] = null;
