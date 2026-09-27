@@ -389,22 +389,35 @@ class FinanceController extends Controller
         }
 
         $data['idempotency_key'] ??= (string) Str::uuid();
+        $alreadyProcessed = false;
 
-        $existingExpense = FinanceExpense::query()
-            ->where('business_id', $businessId)
-            ->where('idempotency_key', $data['idempotency_key'])
-            ->first();
+        $expense = DB::transaction(function () use ($data, $businessId, $currency, &$alreadyProcessed): ?FinanceExpense {
+            // Serialize business-level idempotency checks so concurrent retries cannot both pass the lookup.
+            AppModelsBusiness::query()->whereKey($businessId)->lockForUpdate()->firstOrFail();
 
-        if ($existingExpense) {
+            $existingExpense = FinanceExpense::query()
+                ->where('business_id', $businessId)
+                ->where('idempotency_key', $data['idempotency_key'])
+                ->first();
+
+            if ($existingExpense) {
+                $alreadyProcessed = true;
+                return $existingExpense;
+            }
+
+            $expense = FinanceExpense::create([...$data, 'business_id' => $businessId, 'currency' => $currency]);
+            Audit::record('finance.expense.recorded', $expense, [
+                'amount' => $expense->amount,
+                'currency' => $expense->currency,
+                'status' => $expense->status,
+            ], $businessId);
+
+            return $expense;
+        });
+
+        if ($alreadyProcessed) {
             return redirect()->route('finance.index')->with('info', 'That expense submission was already processed.');
         }
-
-        $expense = FinanceExpense::create([...$data, 'business_id' => $businessId, 'currency' => $currency]);
-        Audit::record('finance.expense.recorded', $expense, [
-            'amount' => $expense->amount,
-            'currency' => $expense->currency,
-            'status' => $expense->status,
-        ], $businessId);
 
         return redirect()->route('finance.index')->with('success', 'Finance expense recorded.');
     }
