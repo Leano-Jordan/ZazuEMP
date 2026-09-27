@@ -29,6 +29,9 @@
                 <button class="zazu-btn zazu-btn-primary">Create new revision</button>
             </form>
         @endif
+        @if ($customerUrl)
+            <a href="{{ $customerUrl }}" target="_blank" rel="noopener" class="zazu-btn zazu-btn-primary">Customer view</a>
+        @endif
         <a href="{{ route('work.show', $quote->event) }}" class="zazu-btn zazu-btn-secondary">Job workspace</a>
         <a href="{{ route('work.quotes.index', $quote->event) }}" class="zazu-btn zazu-btn-ghost">All quotes</a>
     </x-slot:headerAction>
