@@ -83,6 +83,7 @@ class FinanceController extends Controller
         ]);
 
         $businessId = $business->id;
+        $data['idempotency_key'] ??= (string) Str::uuid();
 
         $quote = !empty($data['quote_id'])
             ? Quote::query()
@@ -187,6 +188,8 @@ class FinanceController extends Controller
         $customer = $event?->customer;
         $quoteVersionId = $quote?->latestVersion?->id;
 
+        $alreadyProcessed = false;
+
         $invoice = DB::transaction(function () use (
             $business,
             $businessId,
@@ -203,8 +206,41 @@ class FinanceController extends Controller
             $taxLabel,
             $taxTreatment,
             $taxRate,
-            $invoiceLines
+            $invoiceLines,
+            &$alreadyProcessed
         ): Invoice {
+            // Serialize the business-level idempotency check and quote-version conversion.
+            \App\Models\Business::query()->whereKey($businessId)->lockForUpdate()->firstOrFail();
+
+            $existingInvoice = Invoice::query()
+                ->where('business_id', $businessId)
+                ->where('idempotency_key', $data['idempotency_key'])
+                ->first();
+
+            if ($existingInvoice) {
+                $alreadyProcessed = true;
+                return $existingInvoice;
+            }
+
+            if ($quoteVersionId) {
+                $lockedVersion = \App\Models\QuoteVersion::query()
+                    ->whereKey($quoteVersionId)
+                    ->lockForUpdate()
+                    ->firstOrFail();
+
+                abort_unless(
+                    $lockedVersion->status === 'accepted',
+                    409,
+                    'The quote version changed while the invoice was being prepared. Please review it and try again.'
+                );
+
+                abort_if(
+                    Invoice::query()->where('quote_version_id', $lockedVersion->id)->exists(),
+                    422,
+                    'This accepted quote version has already been invoiced.'
+                );
+            }
+
             $invoice = Invoice::create([
                 'business_id' => $businessId,
                 'idempotency_key' => $data['idempotency_key'],
@@ -249,6 +285,12 @@ class FinanceController extends Controller
 
             return $invoice;
         });
+
+        if ($alreadyProcessed) {
+            return redirect()
+                ->route('finance.invoices.show', $invoice)
+                ->with('info', 'That invoice submission was already processed.');
+        }
 
         return redirect()
             ->route('finance.invoices.show', $invoice)
