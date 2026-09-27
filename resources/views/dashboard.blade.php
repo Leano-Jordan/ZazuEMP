@@ -2,11 +2,6 @@
     <x-slot:title>Dashboard</x-slot:title>
     <x-slot:heading>Dashboard</x-slot:heading>
 
-    <section class="zazu-command-band">
-        <div><div class="zazu-eyebrow">Overview</div><h2 class="zazu-command-title">Business overview</h2><p class="zazu-command-copy">See current work, customers and quotes in one place.</p></div>
-        <div class="zazu-command-meta"><div class="zazu-command-meta-label">Today</div><div class="zazu-command-meta-value">{{ now()->format('d M') }}</div></div>
-    </section>
-
     @if ($isOwner && (! $business?->catalogue_setup_completed_at || ! $business?->business_setup_completed_at))
         <section class="zazu-next-action">
             <div>
