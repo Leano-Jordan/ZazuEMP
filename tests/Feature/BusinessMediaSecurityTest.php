@@ -126,8 +126,11 @@ class BusinessMediaSecurityTest extends TestCase
 
         $profile = $business->taxProfile()->create([
             'vat_status' => 'not_registered',
-            'tcs_pin' => 'legacy-plain-text-value',
         ]);
+
+        \Illuminate\Support\Facades\DB::table('business_tax_profiles')
+            ->whereKey($profile->id)
+            ->update(['tcs_pin' => 'legacy-plain-text-value']);
 
         $this->get(route('settings.index'))
             ->assertOk()
