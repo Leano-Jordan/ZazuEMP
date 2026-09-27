@@ -298,6 +298,87 @@ class FinancePurchasingInventoryTest extends TestCase
             ->assertStatus(422);
     }
 
+    public function test_payment_idempotency_prevents_duplicate_financial_posting(): void
+    {
+        [$business, $user] = $this->businessUser();
+        $this->actingAs($user);
+
+        $invoice = Invoice::create([
+            'business_id' => $business->id,
+            'number' => 'INV-IDEMP-001',
+            'status' => 'issued',
+            'currency' => 'ZAR',
+            'subtotal' => '500.00',
+            'tax_total' => '0.00',
+            'total' => '500.00',
+            'issued_at' => now()->toDateString(),
+            'due_at' => now()->addDays(7)->toDateString(),
+        ]);
+
+        $payload = [
+            'idempotency_key' => (string) \Illuminate\Support\Str::uuid(),
+            'invoice_id' => $invoice->id,
+            'amount' => '250.00',
+            'method' => 'bank_transfer',
+            'paid_at' => now()->toDateString(),
+        ];
+
+        $this->post(route('finance.payments.store'), $payload)->assertRedirect(route('finance.index'));
+        $this->post(route('finance.payments.store'), $payload)->assertRedirect(route('finance.index'));
+
+        $this->assertDatabaseCount('payments', 1);
+        $this->assertSame('issued', $invoice->fresh()->status);
+        $this->assertDatabaseHas('audit_logs', ['action' => 'finance.payment.recorded', 'business_id' => $business->id]);
+    }
+
+    public function test_inventory_idempotency_prevents_duplicate_stock_change(): void
+    {
+        [$business, $user] = $this->businessUser();
+        $this->actingAs($user);
+
+        $item = \App\Models\InventoryItem::create([
+            'business_id' => $business->id,
+            'name' => 'Flour',
+            'unit' => 'kg',
+            'reorder_level' => 5,
+        ]);
+
+        $payload = [
+            'idempotency_key' => (string) \Illuminate\Support\Str::uuid(),
+            'type' => 'receipt',
+            'quantity' => '10',
+            'unit_cost' => '20.00',
+            'movement_date' => now()->toDateString(),
+        ];
+
+        $this->post(route('inventory.movement', $item), $payload)->assertRedirect();
+        $this->post(route('inventory.movement', $item), $payload)->assertRedirect();
+
+        $this->assertDatabaseCount('inventory_movements', 1);
+        $this->assertSame(10.0, $item->fresh()->on_hand);
+        $this->assertDatabaseHas('audit_logs', ['action' => 'inventory.movement.recorded', 'business_id' => $business->id]);
+    }
+
+    public function test_staff_permission_boundary_allows_operational_finance_but_denies_owner_settings(): void
+    {
+        $business = Business::create([
+            'name' => 'Staff Boundary Business',
+            'slug' => 'staff-boundary-business',
+            'status' => 'active',
+            'currency' => 'ZAR',
+        ]);
+        $staff = User::factory()->create(['username' => 'boundarystaff']);
+        $business->users()->attach($staff->id, ['role' => 'staff']);
+
+        $this->actingAs($staff)
+            ->get(route('finance.index'))
+            ->assertOk();
+
+        $this->actingAs($staff)
+            ->get(route('settings.index'))
+            ->assertForbidden();
+    }
+
     public function test_asset_allocation_is_business_scoped(): void
     {
         [$business, $user] = $this->businessUser();
