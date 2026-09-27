@@ -200,6 +200,21 @@ return [
         'Other' => [],
     ],
 
+    'permissions' => [
+        'roles' => [
+            'staff' => [
+                'dashboard.view', 'work.view', 'work.create', 'work.update',
+                'customers.view', 'customers.create', 'customers.update',
+                'quotes.view', 'quotes.create', 'quotes.update',
+                'finance.view', 'finance.invoice.create', 'finance.payment.create', 'finance.expense.create',
+                'purchasing.view', 'purchasing.create', 'purchasing.status',
+                'inventory.view', 'inventory.create', 'inventory.movement',
+                'assets.view', 'assets.create', 'assets.allocate', 'assets.release',
+                'reports.view', 'capabilities.view',
+            ],
+        ],
+    ],
+
     'job_types' => [
         'Wedding',
         'Funeral',
