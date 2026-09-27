@@ -20,12 +20,17 @@ class InventoryItem extends Model
     public function capability(): BelongsTo { return $this->belongsTo(BusinessCapability::class); }
     public function movements(): HasMany { return $this->hasMany(InventoryMovement::class); }
 
+    public function getOnHandHundredthsAttribute(): int
+    {
+        return $this->movements->sum(fn (InventoryMovement $movement) =>
+            in_array($movement->type, ['receipt', 'return', 'adjustment_in'], true)
+                ? \App\Support\Money::toHundredths((string) $movement->quantity)
+                : -\App\Support\Money::toHundredths((string) $movement->quantity)
+        );
+    }
+
     public function getOnHandAttribute(): float
     {
-        return (float) $this->movements->sum(fn (InventoryMovement $movement) =>
-            in_array($movement->type, ['receipt','return','adjustment_in'], true)
-                ? (float) $movement->quantity
-                : -1 * (float) $movement->quantity
-        );
+        return $this->on_hand_hundredths / 100;
     }
 }
