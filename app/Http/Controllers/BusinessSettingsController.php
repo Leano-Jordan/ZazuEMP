@@ -151,7 +151,7 @@ class BusinessSettingsController extends Controller
         } catch (\Throwable $e) {
             foreach ($newPaths as $path) {
                 if ($path) {
-                    Storage::disk('public')->delete($path);
+                    Storage::disk('local')->delete($path);
                 }
             }
 
@@ -160,7 +160,7 @@ class BusinessSettingsController extends Controller
 
         foreach ($oldPaths as $path) {
             if ($path) {
-                Storage::disk('public')->delete($path);
+                Storage::disk('local')->delete($path);
             }
         }
 
