@@ -209,10 +209,8 @@ class PurchaseOrderController extends Controller
                                 ->orWhere('sku', $item->description);
                         })
                         ->first();
-                    if ($inventoryItem) {
-                        continue;
-                    }
-                    $inventoryItem = \App\Models\InventoryItem::create([
+                    if (!$inventoryItem) {
+                        $inventoryItem = \App\Models\InventoryItem::create([
                         'business_id' => $businessId,
                         'capability_id' => $item->capability_id,
                         'name' => $item->description,
