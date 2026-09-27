@@ -1,5 +1,14 @@
 # Changelog
 
+## 2026-09-27 — Development hardening
+- Added business-scoped idempotency protection for invoices, payments, expenses, purchase orders and stock movements.
+- Added operational audit logging and owner Activity Audit view.
+- Added centralized staff permissions with server-side route enforcement for finance, purchasing and inventory.
+- Hardened purchase-order receipt concurrency and parent/child integrity checks.
+- Added SQLite/MySQL backup and restore commands covering private storage.
+- Added Playwright registration-to-dashboard browser smoke coverage and CI workflow.
+
+
 All notable Zazu EMP project changes will be recorded here.
 
 ## 2026-09-27
