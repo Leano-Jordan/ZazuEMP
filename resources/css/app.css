@@ -916,7 +916,7 @@ body {
     min-height: 30px;
     padding: 0 10px;
     border: 1px solid var(--zazu-border-strong);
-    border-radius: 7px;
+    border-radius: var(--zazu-radius-md);
     background: var(--zazu-surface-2);
     color: var(--zazu-ink-2);
     font: inherit;
@@ -2418,7 +2418,7 @@ body {
     .zazu-form-section,
     .zazu-panel,
     .zazu-card {
-        border-radius: 17px;
+        border-radius: var(--zazu-radius-lg);
     }
 
     .zazu-list-item {
@@ -2510,7 +2510,7 @@ body {
     min-height: 52px;
     padding: 12px 14px;
     border: 1px solid var(--zazu-border);
-    border-radius: 13px;
+    border-radius: var(--zazu-radius-lg);
     background: var(--zazu-surface-2);
     color: var(--zazu-ink-2);
     cursor: pointer;
@@ -2656,7 +2656,7 @@ body {
     width: 100%;
     padding: 9px;
     border: 1px solid var(--zazu-border);
-    border-radius: 13px;
+    border-radius: var(--zazu-radius-lg);
     background: var(--zazu-surface-2);
     color: var(--zazu-ink-2);
     text-align: left;
@@ -3899,7 +3899,7 @@ body.zazu-has-wallpaper .zazu-content > * {
     gap: 0;
     overflow: hidden;
     border: 1px solid var(--zazu-border);
-    border-radius: 28px;
+    border-radius: var(--zazu-radius-lg);
     background: var(--zazu-surface);
     box-shadow: 0 28px 70px color-mix(in srgb, var(--zazu-ink) 14%, transparent);
 }
@@ -3982,7 +3982,7 @@ body.zazu-has-wallpaper .zazu-content > * {
     padding: 0 9px;
     transform: translateY(-50%);
     border: 0;
-    border-radius: 7px;
+    border-radius: var(--zazu-radius-md);
     background: transparent;
     color: var(--zazu-muted);
     font: inherit;
@@ -4796,7 +4796,7 @@ body {
 .zazu-select,
 .zazu-textarea {
     border-color: var(--zazu-border-strong);
-    border-radius: 7px;
+    border-radius: var(--zazu-radius-md);
     background: var(--zazu-field);
     color: var(--zazu-ink);
     transition:
@@ -4819,7 +4819,7 @@ body {
 }
 
 .zazu-btn {
-    border-radius: 7px;
+    border-radius: var(--zazu-radius-md);
     font-size: 13px;
     font-weight: 700;
     transition:
@@ -4998,7 +4998,7 @@ body {
     height: 24px;
     flex: 0 0 24px;
     padding: 4px;
-    border-radius: 7px;
+    border-radius: var(--zazu-radius-md);
 }
 .zazu-header-settings:focus-visible,
 .zazu-theme-toggle:focus-visible {
