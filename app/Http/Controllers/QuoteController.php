@@ -196,7 +196,9 @@ class QuoteController extends Controller
             $version->update(['status' => 'accepted']);
             $lockedQuote->update(['status' => 'accepted']);
 
-            $businessId = (int) $lockedQuote->event?->business_id;
+            $businessId = (int) Event::query()
+                ->whereKey($lockedQuote->event_id)
+                ->value('business_id');
 
             abort_unless($businessId > 0, 404);
 
