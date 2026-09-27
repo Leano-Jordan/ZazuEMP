@@ -2,13 +2,14 @@
 
 namespace App\Models;
 
+use App\Models\Concerns\BelongsToBusiness;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class FinanceExpense extends Model
 {
-    use HasFactory;
+    use BelongsToBusiness, HasFactory;
 
     protected $table = 'finance_expenses';
     protected $fillable = ['business_id','event_id','supplier_id','purchase_order_id','description','amount','currency','expense_date','status','reference','notes'];

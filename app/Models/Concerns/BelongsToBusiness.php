@@ -18,7 +18,9 @@ trait BelongsToBusiness
             $business = app(CurrentBusiness::class)->resolve(auth()->user());
 
             if (!$business) {
-                return;
+                throw new AuthorizationException(
+                    'An active business workspace is required for business-owned records.'
+                );
             }
 
             $businessId = (int) $business->id;

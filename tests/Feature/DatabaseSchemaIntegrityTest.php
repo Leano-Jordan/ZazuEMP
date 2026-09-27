@@ -2,6 +2,7 @@
 
 namespace Tests\Feature;
 
+use App\Models\Concerns\BelongsToBusiness;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\File;
@@ -35,6 +36,60 @@ class DatabaseSchemaIntegrityTest extends TestCase
             $expectedTables,
             static fn (string $table): bool => !Schema::hasTable($table)
         ));
+
+        $this->assertSame([], $missing);
+    }
+
+    public function test_every_business_owned_model_uses_business_isolation_guard(): void
+    {
+        $missing = [];
+
+        foreach (File::allFiles(app_path('Models')) as $file) {
+            if ($file->getFilename() === 'BelongsToBusiness.php' || $file->getExtension() !== 'php') {
+                continue;
+            }
+
+            $source = $file->getContents();
+            $namespace = preg_match('/namespace\s+([^;]+);/', $source, $namespaceMatch)
+                ? $namespaceMatch[1]
+                : null;
+            $class = preg_match('/\bclass\s+(\w+)/', $source, $classMatch)
+                ? $classMatch[1]
+                : null;
+
+            if (!$namespace || !$class) {
+                continue;
+            }
+
+            $className = $namespace.'\'.$class;
+
+            if (!class_exists($className) || !is_subclass_of($className, Model::class)) {
+                continue;
+            }
+
+            $reflection = new \ReflectionClass($className);
+
+            if ($reflection->isAbstract()) {
+                continue;
+            }
+
+            /** @var Model $model */
+            $model = $reflection->newInstance();
+
+            if (!Schema::hasColumn($model->getTable(), 'business_id')) {
+                continue;
+            }
+
+            $usesGuard = in_array(
+                BelongsToBusiness::class,
+                class_uses_recursive($className),
+                true
+            );
+
+            if (!$usesGuard) {
+                $missing[] = $file->getRelativePathname();
+            }
+        }
 
         $this->assertSame([], $missing);
     }
