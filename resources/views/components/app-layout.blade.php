@@ -129,7 +129,7 @@
                         <div class="zazu-nav-label">System</div>
                         <div class="zazu-nav-stack">
                             <a href="{{ route('settings.index') }}" class="zazu-nav-link {{ request()->routeIs('settings.*') ? 'active' : '' }}" @if (request()->routeIs('settings.*')) aria-current="page" @endif>
-                                <svg class="zazu-nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true"><circle cx="12" cy="12" r="3"></circle><path d="M19 12a7 7 0 0 0-.3-2l2-3.4-2.3 1a7 7 0 0 0-3.4-2L12.7 2h-1.4L11 4.3a7 7 0 0 0-3.4 2l-2.3-1-2 3.4 2.3 1a7 7 0 0 0 .3 4L19 12z"></path></svg>
+                                <svg class="zazu-nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true"><circle cx="12" cy="12" r="3"></circle><path d="M19 12a7 7 0 0 0-.3-2l-2-3.4-2.3 1a7 7 0 0 0-3.4-2L12.7 2h-1.4L11 4.3a7 7 0 0 0-3.4 2l-2.3-1-2 3.4 2.3 1a7 7 0 0 0 0 4l2.3 1a7 7 0 0 0 3.4-2l.3 2.3h1.4l.3-2.3a7 7 0 0 0 3.4-2l2.3 1a7 7 0 0 0 .3-2z"></path></svg>
                                 <span>Settings</span>
                             </a>
                         </div>
