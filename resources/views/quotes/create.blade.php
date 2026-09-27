@@ -69,7 +69,7 @@
                                 $initialPrice = $capability
                                     && $capability->default_price !== null
                                     && ($capability->currency ?? $defaultCurrency) === old('currency', $defaultCurrency)
-                                    ? number_format((float) $capability->default_price, 2, '.', '')
+                                    ? $capability->default_price
                                     : null;
                             @endphp
                             <div class="zazu-list-item">
