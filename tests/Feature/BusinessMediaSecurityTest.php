@@ -128,18 +128,19 @@ class BusinessMediaSecurityTest extends TestCase
             'vat_status' => 'not_registered',
         ]);
 
-        \Illuminate\Support\Facades\DB::table('business_tax_profiles')
-            ->whereKey($profile->id)
-            ->update(['tcs_pin' => 'legacy-plain-text-value']);
+        \Illuminate\Support\Facades\DB::statement(
+            'UPDATE business_tax_profiles SET tcs_pin = ? WHERE id = ?',
+            ['legacy-plain-text-value', $profile->id]
+        );
 
         $this->get(route('settings.index'))
             ->assertOk()
             ->assertDontSee('legacy-plain-text-value', false);
 
-        $this->assertDatabaseHas('business_tax_profiles', [
-            'id' => $profile->id,
-            'tcs_pin' => 'legacy-plain-text-value',
-        ]);
+        $this->assertSame(
+            'legacy-plain-text-value',
+            \Illuminate\Support\Facades\DB::table('business_tax_profiles')->where('id', $profile->id)->value('tcs_pin')
+        );
     }
 
 
