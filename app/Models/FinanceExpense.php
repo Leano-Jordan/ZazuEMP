@@ -12,7 +12,7 @@ class FinanceExpense extends Model
     use BelongsToBusiness, HasFactory;
 
     protected $table = 'finance_expenses';
-    protected $fillable = ['business_id','event_id','supplier_id','purchase_order_id','description','amount','currency','expense_date','status','reference','notes'];
+    protected $fillable = ['business_id','idempotency_key','event_id','supplier_id','purchase_order_id','description','amount','currency','expense_date','status','reference','notes'];
 
     protected function casts(): array { return ['amount'=>'decimal:2','expense_date'=>'date']; }
 
