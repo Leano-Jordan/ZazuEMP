@@ -37,7 +37,7 @@
             </div>
         </div>
         <div class="zazu-work-actions">
-            <span class="zazu-chip {{ $statusClass }}">{{ str_replace('_', ' ', ucfirst($event->status)) }}</span>
+            <span class="zazu-chip {{ $statusClass }} data-status">{{ str_replace('_', ' ', ucfirst($event->status)) }}</span>
         </div>
     </section>
 
@@ -153,7 +153,7 @@
                     </div>
                     <a href="{{ route('work.travel.index', $event) }}" class="zazu-btn zazu-btn-secondary">Travel & distance</a>
                 </div>
-                <div class="mt-4 rounded-xl border border-[var(--zazu-border)] bg-[var(--zazu-surface-2)] px-4 py-4 text-sm font-semibold text-[var(--zazu-ink-2)]">
+                <div class="mt-4 rounded border border-[var(--zazu-border)] bg-[var(--zazu-surface-2)] px-4 py-4 text-sm font-semibold text-[var(--zazu-ink-2)]">
                     {{ $event->event_address ?: 'No location added yet.' }}
                 </div>
             </section>
