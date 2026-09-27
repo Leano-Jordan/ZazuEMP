@@ -170,8 +170,8 @@ Completed:
 
 Commercial/security boundaries recorded:
 - Profile photos are validated to approved image formats and a size limit.
-- Development photo delivery currently uses Laravel's public disk so the feature can be exercised.
-- Production must use authenticated/business-authorized media access for identifiable customer and staff images.
+- Customer, staff and business-branding media use private storage and authenticated/business-authorized media access.
+- New identifiable media must not be exposed through unrestricted public URLs.
 - Authentication, active business context, business isolation, roles/permissions, auditability and retention/deletion workflows remain production gates.
 - Soft deletion preserves history; it is not a substitute for a lawful retention schedule.
 - Local PHPUnit/migrations/browser rendering remain unverified in this environment.
