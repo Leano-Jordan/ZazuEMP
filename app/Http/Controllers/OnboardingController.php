@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Business;
 use App\Models\BusinessCapability;
+use App\Support\Audit;
 use App\Support\CurrentBusiness;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -71,7 +72,7 @@ class OnboardingController extends Controller
             'description' => ['nullable', 'string'],
         ]);
 
-        BusinessCapability::create([
+        $capability = BusinessCapability::create([
             'business_id' => $business->id,
             'name' => $validated['name'],
             'capability_type' => $validated['capability_type'] ?? 'service',
@@ -83,6 +84,8 @@ class OnboardingController extends Controller
             'currency' => $business->currency ?? 'ZAR',
             'is_active' => true,
         ]);
+
+        Audit::record('onboarding.catalogue.item_added', $capability, ['name' => $capability->name, 'type' => $capability->capability_type], $business->id);
 
         if ($request->boolean('add_another')) {
             $business->update(['catalogue_setup_skipped_at' => null]);
@@ -109,6 +112,8 @@ class OnboardingController extends Controller
             'catalogue_setup_completed_at' => now(),
             'catalogue_setup_skipped_at' => null,
         ]);
+
+        Audit::record('onboarding.catalogue.completed', $business, ['capability_count' => $business->capabilities()->count()], $business->id);
 
         return redirect()
             ->route('onboarding.business')
@@ -164,6 +169,8 @@ class OnboardingController extends Controller
             'business_setup_completed_at' => now(),
             'business_setup_skipped_at' => null,
         ]);
+
+        Audit::record('onboarding.business.completed', $business, ['business_name' => $business->name], $business->id);
 
         return redirect()
             ->route('dashboard')
