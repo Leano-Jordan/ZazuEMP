@@ -140,12 +140,24 @@ Route::middleware(['auth', 'auth.session', 'business.context'])->group(function 
     Route::get('/work/{event}/preparation/create', [EventPreparationController::class, 'create'])->middleware('permission:work.update')->name('work.preparation.create');
     Route::post('/work/{event}/preparation', [EventPreparationController::class, 'store'])->middleware('permission:work.update')->name('work.preparation.store');
     Route::patch('/work/{event}/preparation/{item}/status', [EventPreparationController::class, 'updateStatus'])->middleware('permission:work.update')->name('work.preparation.status');
-    Route::get('/work/{event}/quotes', [QuoteController::class, 'eventIndex'])->name('work.quotes.index');
-    Route::get('/work/{event}/quotes/create', [QuoteController::class, 'create'])->name('work.quotes.create');
-    Route::post('/work/{event}/quotes', [QuoteController::class, 'store'])->name('work.quotes.store');
-    Route::get('/work/{event}/requirements', [RequirementController::class, 'index'])->name('work.requirements.index');
-    Route::get('/work/{event}/requirements/create', [RequirementController::class, 'create'])->name('work.requirements.create');
-    Route::post('/work/{event}/requirements', [RequirementController::class, 'store'])->name('work.requirements.store');
+    Route::get('/work/{event}/quotes', [QuoteController::class, 'eventIndex'])
+        ->middleware('permission:quotes.view')
+        ->name('work.quotes.index');
+    Route::get('/work/{event}/quotes/create', [QuoteController::class, 'create'])
+        ->middleware('permission:quotes.create')
+        ->name('work.quotes.create');
+    Route::post('/work/{event}/quotes', [QuoteController::class, 'store'])
+        ->middleware('permission:quotes.create')
+        ->name('work.quotes.store');
+    Route::get('/work/{event}/requirements', [RequirementController::class, 'index'])
+        ->middleware('permission:work.view')
+        ->name('work.requirements.index');
+    Route::get('/work/{event}/requirements/create', [RequirementController::class, 'create'])
+        ->middleware('permission:work.update')
+        ->name('work.requirements.create');
+    Route::post('/work/{event}/requirements', [RequirementController::class, 'store'])
+        ->middleware('permission:work.update')
+        ->name('work.requirements.store');
 
     Route::get('/customers', [CustomerController::class, 'index'])->middleware('permission:customers.view')->name('customers.index');
     Route::get('/customers/create', [CustomerController::class, 'create'])->middleware('permission:customers.create')->name('customers.create');
