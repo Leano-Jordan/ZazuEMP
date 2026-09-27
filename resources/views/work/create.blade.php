@@ -17,9 +17,9 @@
     @else
         <section class="zazu-command-band">
             <div>
-                <div class="zazu-eyebrow">New job · 1 of 1</div>
-                <h2 class="zazu-command-title">Tell Zazu what you are doing</h2>
-                <p class="zazu-command-copy">Choose the customer, type of job and services you need. Zazu will create the job and take you straight to its workspace.</p>
+                <div class="zazu-eyebrow">New job</div>
+                <h2 class="zazu-command-title">Start with the job essentials</h2>
+                <p class="zazu-command-copy">Capture only what you need to get this job onto the schedule. Add operational detail after the job exists.</p>
             </div>
         </section>
 
@@ -124,12 +124,10 @@
                         </div>
                     </section>
 
-                    <section class="zazu-form-section">
-                        <div class="zazu-form-section-head">
-                            <div class="zazu-form-section-title">Who should we contact?</div>
-                            <div class="zazu-form-section-copy">Optional. These contacts come from the selected customer.</div>
-                        </div>
-                        <div class="zazu-form-grid">
+                    <details class="zazu-progressive-details zazu-form-section">
+                        <summary>Optional contacts</summary>
+                        <div class="zazu-form-section-copy px-4 pt-3">Use these only when the job needs different day or night contacts.</div>
+                        <div class="zazu-form-grid p-4">
                             <label class="zazu-field">
                                 <span class="zazu-label">Day contact</span>
                                 <select id="event_day_contact_id" name="event_day_contact_id" class="zazu-select">
@@ -143,15 +141,18 @@
                                 </select>
                             </label>
                         </div>
-                    </section>
+                    </details>
 
-                    <section class="zazu-form-section">
-                        <label class="zazu-field">
-                            <span class="zazu-label">Extra notes</span>
-                            <textarea name="notes" rows="4" class="zazu-textarea"></textarea>
-                            <span class="zazu-field-help">Add anything the team must know now. You can add more detail later.</span>
-                        </label>
-                    </section>
+                    <details class="zazu-progressive-details zazu-form-section">
+                        <summary>Extra notes</summary>
+                        <div class="p-4">
+                            <label class="zazu-field">
+                                <span class="zazu-label">Notes</span>
+                                <textarea name="notes" rows="4" class="zazu-textarea"></textarea>
+                                <span class="zazu-field-help">Add anything the team must know now. You can add more detail later.</span>
+                            </label>
+                        </div>
+                    </details>
 
                     <div class="zazu-actionbar">
                         <a href="{{ route('work.index') }}" class="zazu-btn zazu-btn-ghost">Cancel</a>
