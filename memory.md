@@ -655,3 +655,11 @@ Regression rule:
 - Shared operational surfaces now use consolidated 2–6px micro-radii and Container Query primitives.
 - Error surfaces were aligned with the same blue visual system.
 - Source-level verification passed; rendered browser QA and full runtime test execution remain unverified.
+
+
+## Director iterative commercial hardening loop — 2026-09-28
+
+- Continued UI/UX and product-integrity iteration beyond the initial blue palette pass.
+- Fixed permission-aware Dashboard/navigation discovery, branded confirmations, workspace-switch initialization, mixed-currency finance handling, integer-cent invoice balance arithmetic, Purchase Order and Quote transition centralization, money overflow and negative-input handling, remaining monetary float presentation, and duplicate CSS theme-token systems.
+- Browser smoke registration was made safe under parallel desktop/mobile execution and updated to the current Dashboard hierarchy.
+- Latest completed automated gates at the time of this record: Laravel, Psalm and PHPMD green on commit 613f0f0; browser smoke was still executing on that head.
