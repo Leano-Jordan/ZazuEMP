@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Event;
 use App\Models\EventCost;
 use App\Support\CurrentBusiness;
+use App\Support\Money;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -19,9 +20,16 @@ class EventCostController extends Controller
         $costs = $event->costs()->latest()->get();
 
         $totalsByCurrency = $costs->groupBy('currency')->map(function ($currencyCosts) {
+            $projectedCents = $currencyCosts->sum(
+                fn (EventCost $cost) => Money::toCents((string) $cost->projected_amount)
+            );
+            $actualCents = $currencyCosts->sum(
+                fn (EventCost $cost) => Money::toCents((string) ($cost->actual_amount ?? '0.00'))
+            );
+
             return [
-                'projected' => (float) $currencyCosts->sum(fn (EventCost $cost) => (float) $cost->projected_amount),
-                'actual' => (float) $currencyCosts->sum(fn (EventCost $cost) => (float) ($cost->actual_amount ?? 0)),
+                'projected' => Money::fromCents($projectedCents),
+                'actual' => Money::fromCents($actualCents),
             ];
         });
 
