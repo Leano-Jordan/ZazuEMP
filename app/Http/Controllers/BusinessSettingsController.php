@@ -6,6 +6,7 @@ use App\Models\Business;
 use App\Models\BusinessTaxProfile;
 use App\Models\TaxRate;
 use App\Support\CurrentBusiness;
+use App\Support\Audit;
 use Carbon\Carbon;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -145,6 +146,15 @@ class BusinessSettingsController extends Controller
                 }
 
                 $profile->save();
+
+                Audit::record('business.settings.updated', $lockedBusiness, [
+                    'changed_sections' => [
+                        'identity',
+                        'tax_compliance',
+                        'branding',
+                    ],
+                    'tcs_pin_changed' => filled($validated['tcs_pin'] ?? null),
+                ], $lockedBusiness->id);
 
                 $this->syncTaxDefaults(
                     $lockedBusiness,
