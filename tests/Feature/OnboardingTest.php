@@ -211,6 +211,7 @@ class OnboardingTest extends TestCase
 
         $this->get(route('dashboard'))
             ->assertOk()
-            ->assertSee('Suppliers and purchase orders.');
+            ->assertSee('Quick access')
+            ->assertSee('Purchasing');
     }
 }
