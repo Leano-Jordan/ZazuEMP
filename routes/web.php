@@ -91,6 +91,9 @@ Route::middleware(['auth', 'auth.session', 'business.context'])->group(function 
     Route::post('/inventory/{inventoryItem}/movement', [InventoryController::class, 'movement'])->middleware('permission:inventory.movement')->name('inventory.movement');
 
     Route::get('/assets', [AssetController::class, 'index'])->middleware('permission:assets.view')->name('assets.index');
+    Route::get('/assets/{asset}/edit', [AssetController::class, 'edit'])->middleware('permission:assets.update')->name('assets.edit');
+    Route::put('/assets/{asset}', [AssetController::class, 'update'])->middleware('permission:assets.update')->name('assets.update');
+
     Route::get('/assets/create', [AssetController::class, 'create'])->middleware('permission:assets.create')->name('assets.create');
     Route::post('/assets', [AssetController::class, 'store'])->middleware('permission:assets.create')->name('assets.store');
     Route::post('/assets/{asset}/allocate', [AssetController::class, 'allocate'])->middleware('permission:assets.allocate')->name('assets.allocate');
