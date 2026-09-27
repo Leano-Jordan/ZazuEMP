@@ -11,7 +11,7 @@ class InventoryMovement extends Model
 {
     use BelongsToBusiness, HasFactory;
 
-    protected $fillable = ['business_id','inventory_item_id','event_id','purchase_order_id','purchase_order_item_id','type','quantity','unit_cost','movement_date','reference','notes'];
+    protected $fillable = ['business_id','inventory_item_id','idempotency_key','event_id','purchase_order_id','purchase_order_item_id','type','quantity','unit_cost','movement_date','reference','notes'];
 
     protected function casts(): array
     {
