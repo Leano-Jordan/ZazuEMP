@@ -32,6 +32,8 @@ What operational/business result should the change produce?
 - Data:
 - Security:
 - Regression:
+- UI/UX:
+- Responsive/accessibility:
 
 ## Acceptance criteria
 - [ ]
@@ -40,6 +42,8 @@ What operational/business result should the change produce?
 - Automated:
 - Runtime/manual:
 - Regression:
+- UI/UX:
+- Responsive/accessibility:
 
 ## Evidence
 - Current repository files:
