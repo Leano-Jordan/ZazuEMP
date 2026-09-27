@@ -28,13 +28,18 @@ class CustomerContactController extends Controller
         $validated = $this->validated($request);
 
         DB::transaction(function () use ($customer, $validated, $request): void {
+            $lockedCustomer = Customer::query()
+                ->whereKey($customer->id)
+                ->lockForUpdate()
+                ->firstOrFail();
+
             $makePrimary = $request->boolean('is_primary');
 
             if ($makePrimary) {
-                $customer->contacts()->update(['is_primary' => false]);
+                $lockedCustomer->contacts()->update(['is_primary' => false]);
             }
 
-            $customer->contacts()->create([
+            $lockedCustomer->contacts()->create([
                 'name' => trim($validated['name']),
                 'phone' => $validated['phone'] ?? null,
                 'email' => $validated['email'] ?? null,
@@ -65,20 +70,29 @@ class CustomerContactController extends Controller
         $validated = $this->validated($request);
 
         DB::transaction(function () use ($customer, $contact, $validated, $request): void {
+            $lockedCustomer = Customer::query()
+                ->whereKey($customer->id)
+                ->lockForUpdate()
+                ->firstOrFail();
+
+            $lockedContact = $lockedCustomer->contacts()
+                ->whereKey($contact->id)
+                ->firstOrFail();
+
             $makePrimary = $request->boolean('is_primary');
 
             if ($makePrimary) {
-                $customer->contacts()
-                    ->whereKeyNot($contact->id)
+                $lockedCustomer->contacts()
+                    ->whereKeyNot($lockedContact->id)
                     ->update(['is_primary' => false]);
             }
 
-            $contact->update([
+            $lockedContact->update([
                 'name' => trim($validated['name']),
                 'phone' => $validated['phone'] ?? null,
                 'email' => $validated['email'] ?? null,
                 'label' => $validated['label'] ?? null,
-                'is_primary' => $makePrimary || $contact->is_primary,
+                'is_primary' => $makePrimary || $lockedContact->is_primary,
             ]);
         });
 
