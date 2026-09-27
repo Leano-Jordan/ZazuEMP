@@ -141,8 +141,8 @@
                     </label>
                     <label class="zazu-field zazu-field-wide">
                         <span class="zazu-label">TCS PIN</span>
-                        <input name="tcs_pin" value="" class="zazu-input" autocomplete="off" placeholder="{{ $business->taxProfile?->tcs_pin ? 'PIN stored securely — leave blank to keep it' : 'Enter only when needed' }}">
-                        <span class="zazu-field-help">Stored encrypted. Zazu should never display or expose the PIN unnecessarily.</span>
+                        <input name="tcs_pin" value="" class="zazu-input" autocomplete="off" placeholder="{{ $hasTcsPin ? 'PIN stored securely — leave blank to keep it' : 'Enter only when needed' }}">
+                        <span class="zazu-field-help">{{ $hasTcsPin ? 'PIN stored securely — leave blank to keep it.' : 'Stored encrypted. Zazu should never display or expose the PIN unnecessarily.' }}</span>
                     </label>
                     <div class="zazu-field zazu-field-wide">
                         <span class="zazu-label">Business activity flags</span>
