@@ -109,7 +109,7 @@ class BusinessSettingsController extends Controller
                 ]);
 
                 $profile = $lockedBusiness->taxProfile()->firstOrNew([
-                    'business_id' => $business->id,
+                    'business_id' => $lockedBusiness->id,
                 ]);
 
                 $profile->fill([
@@ -117,9 +117,9 @@ class BusinessSettingsController extends Controller
                     'trading_name' => $validated['trading_name'] ?? null,
                     'registration_type' => $validated['registration_type'] ?? null,
                     'registration_number' => $validated['registration_number'] ?? null,
-                    'tax_regime' => $validated['tax_regime'] ?? ($business->taxProfile?->tax_regime ?? 'standard_income_tax'),
+                    'tax_regime' => $validated['tax_regime'] ?? ($lockedBusiness->taxProfile?->tax_regime ?? 'standard_income_tax'),
                     'income_tax_number' => $validated['income_tax_number'] ?? null,
-                    'vat_status' => $validated['vat_status'] ?? ($business->taxProfile?->vat_status ?? 'not_registered'),
+                    'vat_status' => $validated['vat_status'] ?? ($lockedBusiness->taxProfile?->vat_status ?? 'not_registered'),
                     'vat_number' => $validated['vat_number'] ?? null,
                     'paye_number' => $validated['paye_number'] ?? null,
                     'uif_number' => $validated['uif_number'] ?? null,
