@@ -31,8 +31,9 @@ class FinanceController extends Controller
         $invoicedCents = $invoices->sum(fn ($invoice) => Money::toCents((string) $invoice->total));
         $paidTotal = Payment::where('business_id', $businessId)->sum('amount');
         $expensesTotal = FinanceExpense::where('business_id', $businessId)->sum('amount');
-        $paidCents = Money::toCents(number_format((float) $paidTotal, 2, '.', ''));
-        $expensesCents = Money::toCents(number_format((float) $expensesTotal, 2, '.', ''));
+        // DECIMAL values must remain decimal strings. Converting aggregate totals through float can silently lose cents on larger ledgers.
+        $paidCents = Money::toCents((string) $paidTotal);
+        $expensesCents = Money::toCents((string) $expensesTotal);
 
         return view('finance.index', [
             'invoices' => $invoices,
