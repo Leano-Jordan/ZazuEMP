@@ -96,7 +96,7 @@
                                 <div class="zazu-list-title">{{ $capability->name }}</div>
                                 <div class="zazu-list-meta">{{ ucfirst($capability->capability_type) }}{{ $capability->category ? ' · '.$capability->category : '' }}</div>
                             </div>
-                            <div class="zazu-list-side">{{ $capability->default_price !== null ? number_format($capability->default_price, 2).' '.$capability->currency : 'Custom pricing' }}</div>
+                            <div class="zazu-list-side">{{ $capability->default_price !== null ? $capability->default_price.' '.$capability->currency : 'Custom pricing' }}</div>
                         </div>
                     @empty
                         <div class="zazu-empty"><div class="zazu-empty-title">Nothing added yet</div><p class="zazu-empty-copy">You can skip this and build the catalogue later.</p></div>
