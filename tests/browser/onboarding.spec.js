@@ -21,9 +21,9 @@ test('registration flows into catalogue, business setup and dashboard', async ({
     await page.getByRole('button', { name: 'Continue' }).click();
 
     await expect(page).toHaveURL(/\/setup\/business$/);
-    await expect(page.getByRole('heading', { name: /Business details|Set up your business/i })).toBeVisible();
+    await expect(page.getByRole('heading', { name: 'Tell Zazu about your business' })).toBeVisible();
 
-    await page.getByRole('button', { name: /Save|Continue/i }).last().click();
+    await page.getByRole('button', { name: 'Finish setup' }).click();
 
     await expect(page).toHaveURL(/\/dashboard$/);
     await expect(page.getByRole('heading', { name: 'Business overview' })).toBeVisible();
