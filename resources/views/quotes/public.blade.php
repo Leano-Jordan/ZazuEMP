@@ -39,7 +39,7 @@
                             <strong>{{ $item->description }}</strong>
                             <span>{{ number_format((float) $item->quantity, 2) }} {{ $item->unit ?: 'units' }}</span>
                         </div>
-                        <strong>{{ $quote->currency }} {{ number_format((float) $item->line_total, 2) }}</strong>
+                        <strong>{{ $quote->currency }} {{ $item->line_total }}</strong>
                     </div>
                 @endforeach
             </section>
