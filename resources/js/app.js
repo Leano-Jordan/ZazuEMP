@@ -47,73 +47,7 @@ document.querySelectorAll('[data-theme-toggle]').forEach((button) => {
 });
 
 
-document.querySelectorAll('[data-user-menu]').forEach((menu) => {
-    const trigger = menu.querySelector('[data-user-trigger]');
-    const popover = menu.querySelector('[data-user-popover]');
-
-    if (!trigger || !popover) return;
-
-    const close = () => {
-        popover.hidden = true;
-        trigger.setAttribute('aria-expanded', 'false');
-    };
-
-    trigger.addEventListener('click', (event) => {
-        event.stopPropagation();
-        const open = !popover.hidden;
-        document.querySelectorAll('[data-user-popover]').forEach((item) => { item.hidden = true; });
-        document.querySelectorAll('[data-user-trigger]').forEach((item) => { item.setAttribute('aria-expanded', 'false'); });
-
-        popover.hidden = open;
-        trigger.setAttribute('aria-expanded', open ? 'false' : 'true');
-    });
-
-    popover.addEventListener('click', (event) => event.stopPropagation());
-
-    document.addEventListener('click', close);
-    document.addEventListener('keydown', (event) => {
-        if (event.key === 'Escape') close();
-    });
-});
-
-
-document.querySelectorAll('[data-zazu-toast]').forEach((toast) => {
-    const close = () => {
-        toast.style.opacity = '0';
-        toast.style.transform = 'translateY(8px)';
-        toast.style.transition = 'opacity 140ms ease, transform 140ms ease';
-        window.setTimeout(() => toast.remove(), 150);
-    };
-
-    toast.querySelector('[data-zazu-toast-close]')?.addEventListener('click', close);
-
-    const duration = toast.classList.contains('zazu-toast-error') ? 9000 : 6000;
-    window.setTimeout(() => {
-        if (document.body.contains(toast)) close();
-    }, duration);
-});
-
-
-const brandingPreviewUrls = new WeakMap();
-
-function setupBrandingUploads() {
-    document.querySelectorAll('[data-branding-upload]').forEach((input) => {
-        input.addEventListener('change', () => {
-            const type = input.dataset.brandingUpload;
-            const file = input.files?.[0];
-
-            if (!type || !file) return;
-
-            const container = document.querySelector(`[data-branding-preview-container="${type}"]`);
-            const preview = document.querySelector(`[data-branding-preview="${type}"]`);
-            const placeholder = document.querySelector(`[data-branding-placeholder="${type}"]`);
-            const loading = document.querySelector(`[data-branding-loading="${type}"]`);
-            const filename = document.querySelector(`[data-branding-file="${type}"]`);
-
-            if (!container || !preview || !loading) return;
-
-            const extension = file.name.split('.').pop()?.toLowerCase() ?? '';
-      function setupZazuPrintButtons() {
+function setupZazuPrintButtons() {
 document.querySelectorAll('[data-zazu-print]').forEach((button) => {
     button.addEventListener('click', () => window.print());
 });
@@ -196,6 +130,73 @@ dialog.addEventListener('close', () => {
 }
 
 
+      
+document.querySelectorAll('[data-user-menu]').forEach((menu) => {
+    const trigger = menu.querySelector('[data-user-trigger]');
+    const popover = menu.querySelector('[data-user-popover]');
+
+    if (!trigger || !popover) return;
+
+    const close = () => {
+        popover.hidden = true;
+        trigger.setAttribute('aria-expanded', 'false');
+    };
+
+    trigger.addEventListener('click', (event) => {
+        event.stopPropagation();
+        const open = !popover.hidden;
+        document.querySelectorAll('[data-user-popover]').forEach((item) => { item.hidden = true; });
+        document.querySelectorAll('[data-user-trigger]').forEach((item) => { item.setAttribute('aria-expanded', 'false'); });
+
+        popover.hidden = open;
+        trigger.setAttribute('aria-expanded', open ? 'false' : 'true');
+    });
+
+    popover.addEventListener('click', (event) => event.stopPropagation());
+
+    document.addEventListener('click', close);
+    document.addEventListener('keydown', (event) => {
+        if (event.key === 'Escape') close();
+    });
+});
+
+
+document.querySelectorAll('[data-zazu-toast]').forEach((toast) => {
+    const close = () => {
+        toast.style.opacity = '0';
+        toast.style.transform = 'translateY(8px)';
+        toast.style.transition = 'opacity 140ms ease, transform 140ms ease';
+        window.setTimeout(() => toast.remove(), 150);
+    };
+
+    toast.querySelector('[data-zazu-toast-close]')?.addEventListener('click', close);
+
+    const duration = toast.classList.contains('zazu-toast-error') ? 9000 : 6000;
+    window.setTimeout(() => {
+        if (document.body.contains(toast)) close();
+    }, duration);
+});
+
+
+const brandingPreviewUrls = new WeakMap();
+
+function setupBrandingUploads() {
+    document.querySelectorAll('[data-branding-upload]').forEach((input) => {
+        input.addEventListener('change', () => {
+            const type = input.dataset.brandingUpload;
+            const file = input.files?.[0];
+
+            if (!type || !file) return;
+
+            const container = document.querySelector(`[data-branding-preview-container="${type}"]`);
+            const preview = document.querySelector(`[data-branding-preview="${type}"]`);
+            const placeholder = document.querySelector(`[data-branding-placeholder="${type}"]`);
+            const loading = document.querySelector(`[data-branding-loading="${type}"]`);
+            const filename = document.querySelector(`[data-branding-file="${type}"]`);
+
+            if (!container || !preview || !loading) return;
+
+            const extension = file.name.split('.').pop()?.toLowerCase() ?? '';
       const allowed = file.type.startsWith('image/')
                 || ['jpg', 'jpeg', 'png', 'webp'].includes(extension);
 
