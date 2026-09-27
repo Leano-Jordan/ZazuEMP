@@ -10,6 +10,14 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class PurchaseOrder extends Model
 {
+    public const STATUS_TRANSITIONS = [
+        'draft' => ['sent', 'cancelled'],
+        'sent' => ['ordered', 'cancelled'],
+        'ordered' => ['received', 'cancelled'],
+        'received' => [],
+        'cancelled' => [],
+    ];
+
     use BelongsToBusiness, HasFactory;
 
     protected $fillable = ['business_id','supplier_id','idempotency_key','reference','status','currency','total_amount','ordered_at','expected_at','notes'];
