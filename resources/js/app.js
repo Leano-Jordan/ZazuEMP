@@ -16,88 +16,6 @@ function applyTheme(theme) {
     const themeColor = document.querySelector('meta[name="theme-color"]');
     if (themeColor) themeColor.setAttribute('content', theme === 'dark' ? '#0D1F3A' : '#F2F7FF');
 
-    function setupZazuPrintButtons() {
-    document.querySelectorAll('[data-zazu-print]').forEach((button) => {
-        button.addEventListener('click', () => window.print());
-    });
-}
-
-function setupZazuConfirmations() {
-    const forms = document.querySelectorAll('form[data-zazu-confirm]');
-    if (!forms.length) return;
-
-    let activeForm = null;
-    let returnFocus = null;
-
-    const dialog = document.createElement('dialog');
-    dialog.className = 'zazu-confirm-dialog';
-    dialog.setAttribute('aria-labelledby', 'zazu-confirm-title');
-    dialog.setAttribute('aria-describedby', 'zazu-confirm-message');
-    dialog.innerHTML = `
-        <form method="dialog" class="zazu-confirm-panel">
-            <div class="zazu-eyebrow">Confirmation</div>
-            <h2 id="zazu-confirm-title" class="zazu-confirm-title"></h2>
-            <p id="zazu-confirm-message" class="zazu-confirm-message"></p>
-            <div class="zazu-confirm-actions">
-                <button type="button" class="zazu-btn zazu-btn-secondary" data-zazu-confirm-cancel>Cancel</button>
-                <button type="button" class="zazu-btn zazu-btn-danger" data-zazu-confirm-submit>Continue</button>
-            </div>
-        </form>
-    `;
-    document.body.appendChild(dialog);
-
-    const title = dialog.querySelector('#zazu-confirm-title');
-    const message = dialog.querySelector('#zazu-confirm-message');
-    const cancel = dialog.querySelector('[data-zazu-confirm-cancel]');
-    const submit = dialog.querySelector('[data-zazu-confirm-submit]');
-
-    const restoreFocus = () => {
-        if (returnFocus && typeof returnFocus.focus === 'function') returnFocus.focus();
-        returnFocus = null;
-        activeForm = null;
-    };
-
-    forms.forEach((form) => {
-        form.addEventListener('submit', (event) => {
-            if (form.dataset.zazuConfirmed === '1') {
-                delete form.dataset.zazuConfirmed;
-                return;
-            }
-
-            event.preventDefault();
-            activeForm = form;
-            returnFocus = document.activeElement instanceof HTMLElement ? document.activeElement : null;
-            title.textContent = form.dataset.zazuConfirmTitle || 'Confirm action';
-            message.textContent = form.dataset.zazuConfirm || 'Are you sure you want to continue?';
-            submit.textContent = form.dataset.zazuConfirmAction || 'Continue';
-            if (typeof dialog.showModal === 'function') {
-                dialog.showModal();
-            } else {
-                const confirmed = window.confirm(message.textContent);
-                if (confirmed) {
-                    form.dataset.zazuConfirmed = '1';
-                    form.requestSubmit();
-                } else {
-                    restoreFocus();
-                }
-            }
-        });
-    });
-
-    cancel?.addEventListener('click', () => dialog.close('cancel'));
-    submit?.addEventListener('click', () => {
-        if (!activeForm) return;
-        activeForm.dataset.zazuConfirmed = '1';
-        const form = activeForm;
-        dialog.close('confirm');
-        form.requestSubmit();
-    });
-
-    dialog.addEventListener('close', () => {
-        if (dialog.returnValue !== 'confirm') restoreFocus();
-    });
-}
-
 document.querySelectorAll('[data-theme-toggle]').forEach((button) => {
         const isDark = theme === 'dark';
         const sun = button.querySelector('[data-theme-icon-sun]');
@@ -195,7 +113,90 @@ function setupBrandingUploads() {
             if (!container || !preview || !loading) return;
 
             const extension = file.name.split('.').pop()?.toLowerCase() ?? '';
-            const allowed = file.type.startsWith('image/')
+      function setupZazuPrintButtons() {
+document.querySelectorAll('[data-zazu-print]').forEach((button) => {
+    button.addEventListener('click', () => window.print());
+});
+}
+
+function setupZazuConfirmations() {
+const forms = document.querySelectorAll('form[data-zazu-confirm]');
+if (!forms.length) return;
+
+let activeForm = null;
+let returnFocus = null;
+
+const dialog = document.createElement('dialog');
+dialog.className = 'zazu-confirm-dialog';
+dialog.setAttribute('aria-labelledby', 'zazu-confirm-title');
+dialog.setAttribute('aria-describedby', 'zazu-confirm-message');
+dialog.innerHTML = `
+    <form method="dialog" class="zazu-confirm-panel">
+        <div class="zazu-eyebrow">Confirmation</div>
+        <h2 id="zazu-confirm-title" class="zazu-confirm-title"></h2>
+        <p id="zazu-confirm-message" class="zazu-confirm-message"></p>
+        <div class="zazu-confirm-actions">
+            <button type="button" class="zazu-btn zazu-btn-secondary" data-zazu-confirm-cancel>Cancel</button>
+            <button type="button" class="zazu-btn zazu-btn-danger" data-zazu-confirm-submit>Continue</button>
+        </div>
+    </form>
+`;
+document.body.appendChild(dialog);
+
+const title = dialog.querySelector('#zazu-confirm-title');
+const message = dialog.querySelector('#zazu-confirm-message');
+const cancel = dialog.querySelector('[data-zazu-confirm-cancel]');
+const submit = dialog.querySelector('[data-zazu-confirm-submit]');
+
+const restoreFocus = () => {
+    if (returnFocus && typeof returnFocus.focus === 'function') returnFocus.focus();
+    returnFocus = null;
+    activeForm = null;
+};
+
+forms.forEach((form) => {
+    form.addEventListener('submit', (event) => {
+        if (form.dataset.zazuConfirmed === '1') {
+            delete form.dataset.zazuConfirmed;
+            return;
+        }
+
+        event.preventDefault();
+        activeForm = form;
+        returnFocus = document.activeElement instanceof HTMLElement ? document.activeElement : null;
+        title.textContent = form.dataset.zazuConfirmTitle || 'Confirm action';
+        message.textContent = form.dataset.zazuConfirm || 'Are you sure you want to continue?';
+        submit.textContent = form.dataset.zazuConfirmAction || 'Continue';
+        if (typeof dialog.showModal === 'function') {
+            dialog.showModal();
+        } else {
+            const confirmed = window.confirm(message.textContent);
+            if (confirmed) {
+                form.dataset.zazuConfirmed = '1';
+                form.requestSubmit();
+            } else {
+                restoreFocus();
+            }
+        }
+    });
+});
+
+cancel?.addEventListener('click', () => dialog.close('cancel'));
+submit?.addEventListener('click', () => {
+    if (!activeForm) return;
+    activeForm.dataset.zazuConfirmed = '1';
+    const form = activeForm;
+    dialog.close('confirm');
+    form.requestSubmit();
+});
+
+dialog.addEventListener('close', () => {
+    if (dialog.returnValue !== 'confirm') restoreFocus();
+});
+}
+
+
+      const allowed = file.type.startsWith('image/')
                 || ['jpg', 'jpeg', 'png', 'webp'].includes(extension);
 
             if (!allowed) {
