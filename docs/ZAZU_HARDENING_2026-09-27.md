@@ -83,3 +83,23 @@ The settings path was traced after reported test failures. The repository connec
 The touched source was re-fetched after the fixes. PHP delimiter balance is clean, no malformed namespace tokens were found, and the previous extra settings closing-tag defect remains absent.
 
 CI/runtime status is still not declared green because no workflow result is exposed for the current head.
+
+
+## Finance + inventory/procurement hardening sprint
+
+This sprint added a second integrity layer without changing the intended business workflows:
+
+- Finance dashboard invoice totals now use a database decimal aggregate instead of loading every invoice into PHP for summation.
+- Finance payment and expense aggregate totals no longer pass DECIMAL values through floating-point conversion before cent normalization.
+- Inventory movement quantities and unit costs are restricted to two decimal places, matching the stored precision.
+- Inventory on-hand arithmetic now calculates through integer hundredths rather than repeated floating-point additions/subtractions.
+- Purchase-order quantities are restricted to two decimal places and persisted as normalized decimal strings.
+- Purchase-order unit prices are persisted through the existing cent-based Money helper rather than PHP floats.
+- Added database-level uniqueness for business-scoped finance, purchase-order and inventory idempotency keys.
+- Added database-level uniqueness for invoice numbers and purchase-order references within a business.
+- Added a database guard preventing duplicate receipt movements for the same purchase-order line/type.
+- Added regression coverage for exact finance decimal aggregation and fractional inventory arithmetic.
+
+The source-level target after this sprint is **8.5/10 for Finance & Invoicing** and **8.5/10 for Inventory & Procurement**. These are engineering assessment targets based on the implemented hardening, not runtime-certified scores.
+
+Runtime/CI verification remains outstanding. The new migration must also be exercised against a representative populated database before release because existing duplicate non-null keys would correctly cause migration failure rather than being silently merged.
