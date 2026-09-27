@@ -38,6 +38,38 @@ class SkeletonPagesTest extends TestCase
         }
     }
 
+    public function test_key_top_level_and_create_pages_are_reachable(): void
+    {
+        foreach ([
+            'onboarding.index',
+            'onboarding.catalogue',
+            'onboarding.business',
+            'finance.index',
+            'finance.invoices.create',
+            'finance.payments.create',
+            'finance.expenses.create',
+            'suppliers.index',
+            'suppliers.create',
+            'purchasing.index',
+            'purchasing.create',
+            'inventory.index',
+            'inventory.create',
+            'assets.index',
+            'assets.create',
+            'reports.index',
+            'settings.index',
+            'settings.compliance',
+            'capabilities.index',
+            'capabilities.create',
+            'work.index',
+            'work.create',
+            'customers.index',
+            'customers.create',
+        ] as $route) {
+            $this->get(route($route))->assertOk();
+        }
+    }
+
     public function test_dashboard_links_to_every_top_level_module(): void
     {
         $response = $this->get(route('dashboard'));
