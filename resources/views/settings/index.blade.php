@@ -142,7 +142,11 @@
                     <label class="zazu-field zazu-field-wide">
                         <span class="zazu-label">TCS PIN</span>
                         <input name="tcs_pin" value="" class="zazu-input" autocomplete="off" placeholder="{{ $hasTcsPin ? 'PIN stored securely — leave blank to keep it' : 'Enter only when needed' }}">
-                        <span class="zazu-field-help">{{ $hasTcsPin ? 'PIN stored securely — leave blank to keep it.' : 'Stored encrypted. Zazu should never display or expose the PIN unnecessarily.' }}</span>
+                        @if ($hasTcsPin)
+                            <span class="zazu-field-help">PIN stored securely — leave blank to keep it.</span>
+                        @else
+                            <span class="zazu-field-help">Stored encrypted. Zazu should never display or expose the PIN unnecessarily.</span>
+                        @endif
                     </label>
                     <div class="zazu-field zazu-field-wide">
                         <span class="zazu-label">Business activity flags</span>
