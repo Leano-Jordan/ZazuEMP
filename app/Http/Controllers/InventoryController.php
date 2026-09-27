@@ -8,6 +8,7 @@ use App\Models\InventoryItem;
 use App\Models\EventRequirement;
 use App\Support\Audit;
 use App\Support\CurrentBusiness;
+use App\Support\Money;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -42,7 +43,7 @@ class InventoryController extends Controller
         $businessId=app(CurrentBusiness::class)->id($request->user());
         $data=$request->validate([
             'name'=>['required','string','max:255'],'sku'=>['nullable','string','max:100'],
-            'unit'=>['required','string','max:50'],'reorder_level'=>['required','numeric','min:0'],
+            'unit'=>['required','string','max:50'],'reorder_level'=>['required','numeric','decimal:0,2','min:0'],
             'capability_id'=>['nullable','integer'],
         ]);
         if (!empty($data['capability_id'])) {
@@ -60,7 +61,7 @@ class InventoryController extends Controller
         $data=$request->validate([
             'idempotency_key'=>['nullable','uuid'],
             'type'=>['required','in:receipt,issue,return,adjustment_in,adjustment_out'],
-            'quantity'=>['required','numeric','gt:0'],'unit_cost'=>['required','numeric','min:0'],
+            'quantity'=>['required','numeric','decimal:0,2','gt:0'],'unit_cost'=>['required','numeric','decimal:0,2','min:0'],
             'movement_date'=>['required','date'],'reference'=>['nullable','string','max:255'],'notes'=>['nullable','string'],
             'event_id'=>['nullable','integer'],
         ]);
@@ -91,8 +92,9 @@ class InventoryController extends Controller
 
             if (in_array($data['type'], ['issue','adjustment_out'], true)) {
                 $lockedItem->load('movements');
-                $onHand = $lockedItem->on_hand;
-                abort_if((float) $data['quantity'] > $onHand + 0.0001, 422, 'This movement would make stock on hand negative.');
+                $onHandHundredths = $lockedItem->on_hand_hundredths;
+                $movementHundredths = Money::toHundredths((string) $data['quantity']);
+                abort_if($movementHundredths > $onHandHundredths, 422, 'This movement would make stock on hand negative.');
             }
 
             $movement = $lockedItem->movements()->create([...$data,'business_id'=>$businessId]);
