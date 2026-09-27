@@ -45,6 +45,11 @@ class DashboardController extends Controller
 
         $permissionService = app(PermissionService::class);
         $workspaceTools = [
+            'services' => $permissionService->allows('capabilities.view', $request->user(), $business),
+            'work' => $permissionService->allows('work.view', $request->user(), $business),
+            'calendar' => $permissionService->allows('calendar.view', $request->user(), $business),
+            'customers' => $permissionService->allows('customers.view', $request->user(), $business),
+            'quotes' => $permissionService->allows('quotes.view', $request->user(), $business),
             'finance' => $permissionService->allows('finance.view', $request->user(), $business),
             'purchasing' => $permissionService->allows('purchasing.view', $request->user(), $business),
             'inventory' => $permissionService->allows('inventory.view', $request->user(), $business),
