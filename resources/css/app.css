@@ -3416,6 +3416,10 @@ body.zazu-has-wallpaper .zazu-content > * {
     letter-spacing: -.02em;
 }
 
+.zazu-record-header[data-record-cols="1"] { --zazu-record-cols: 1; }
+.zazu-record-header[data-record-cols="2"] { --zazu-record-cols: 2; }
+.zazu-record-header[data-record-cols="3"] { --zazu-record-cols: 3; }
+
 .zazu-record-header {
     display: grid;
     grid-template-columns: minmax(0, 1fr) repeat(var(--zazu-record-cols, 1), auto);
