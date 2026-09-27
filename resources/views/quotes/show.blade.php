@@ -30,7 +30,7 @@
             </form>
         @endif
         @if ($customerUrl)
-            <a href="{{ $customerUrl }}" target="_blank" rel="noopener" class="zazu-btn zazu-btn-primary">Customer view</a>
+            <a href="{{ $customerUrl }}" target="_blank" rel="noopener" class="zazu-btn zazu-btn-secondary">Customer view</a>
         @endif
         <a href="{{ route('work.show', $quote->event) }}" class="zazu-btn zazu-btn-secondary">Job workspace</a>
         <a href="{{ route('work.quotes.index', $quote->event) }}" class="zazu-btn zazu-btn-ghost">All quotes</a>
@@ -43,109 +43,3 @@
             'declined', 'expired' => 'zazu-chip-danger',
             'superseded' => 'zazu-chip-neutral',
             default => 'zazu-chip-info',
-        };
-    @endphp
-
-    <section class="zazu-work-hero">
-        <div>
-            <div class="zazu-work-ref">{{ $quote->reference }}</div>
-            <div class="zazu-work-name">Quote v{{ $version?->version ?? '—' }}</div>
-            <div class="zazu-work-summary">{{ $quote->event->name }} · {{ $quote->event->customer?->name ?? 'Customer' }} · {{ $quote->currency }}</div>
-        </div>
-        <div class="zazu-work-actions">
-            <span class="zazu-chip {{ $statusClass }}">{{ ucfirst($displayStatus) }}</span>
-        </div>
-    </section>
-
-    @if ($quoteNeedsRevision)
-        <section class="zazu-next-action">
-            <div>
-                <div class="zazu-eyebrow">Quote needs review</div>
-                <h2 class="zazu-next-action-title">Services have changed since this quote</h2>
-                <p class="zazu-next-action-copy">Create a new revision from the current Work services. Existing prices are carried forward where possible.</p>
-            </div>
-            <form method="POST" action="{{ route('quotes.versions.store', $quote) }}">
-                @csrf
-                <button class="zazu-btn zazu-btn-primary">Revise quote →</button>
-            </form>
-        </section>
-    @endif
-
-    <div class="zazu-detail-grid">
-        <div class="zazu-detail-stack">
-            <section class="zazu-card zazu-list">
-                <div class="zazu-card-header">
-                    <div class="zazu-eyebrow">Quote lines</div>
-                    <div class="zazu-card-title mt-1">Services and prices</div>
-                    <div class="zazu-card-description">Each row is one saved commercial line.</div>
-                </div>
-                @if (($version?->items?->count() ?? 0) > 0)
-                    <div class="zazu-record-header" data-record-cols="2">
-                        <div class="zazu-record-header-note">Service</div>
-                        <div class="zazu-record-header-cell">Unit price</div>
-                        <div class="zazu-record-header-cell">Line total</div>
-                    </div>
-                @endif
-                @forelse ($version?->items ?? [] as $item)
-                    <div class="zazu-list-item">
-                        <div class="zazu-list-main">
-                            <div class="zazu-list-title">{{ $item->description }}</div>
-                            <div class="zazu-list-meta">{{ number_format((float) $item->quantity, 2) }} {{ $item->unit ?: 'units' }} · {{ $item->pricing_basis ?: 'Custom pricing' }}</div>
-                        </div>
-                        <div class="zazu-list-side"><div class="zazu-side-primary">{{ $quote->currency }} {{ $item->unit_price }}</div></div>
-                        <div class="zazu-list-side"><div class="zazu-side-primary">{{ $quote->currency }} {{ $item->line_total }}</div></div>
-                    </div>
-                @empty
-                    <div class="zazu-empty">No quote lines.</div>
-                @endforelse
-            </section>
-
-            <section class="zazu-panel">
-                <div class="zazu-eyebrow">Integrity</div>
-                <div class="zazu-panel-title mt-1">Historical snapshot</div>
-                <div class="zazu-panel-copy">This revision keeps the original requirement details used when it was created.</div>
-                <div class="zazu-placeholder">
-                    <div class="zazu-placeholder-title">Quote details stay fixed</div>
-                    <div class="zazu-placeholder-copy">Changing the current Work requirements does not rewrite the saved quote line descriptions and quantities.</div>
-                </div>
-            </section>
-        </div>
-
-        <aside class="zazu-detail-stack">
-            <section class="zazu-panel">
-                <div class="zazu-eyebrow">Commercial summary</div>
-                <div class="zazu-panel-title mt-1">Totals</div>
-                <div class="zazu-detail-rows">
-                    <div class="zazu-detail-row"><div class="zazu-detail-label">Subtotal</div><div class="zazu-detail-value">{{ $quote->currency }} {{ $version?->subtotal ?? '0.00' }}</div></div>
-                    <div class="zazu-detail-row"><div class="zazu-detail-label">Tax · {{ $version?->tax_label ?: 'No tax' }} ({{ $version?->tax_rate ?? '0.00' }}%)</div><div class="zazu-detail-value">{{ $quote->currency }} {{ $version?->tax_total ?? '0.00' }}</div></div>
-                    <div class="zazu-detail-row"><div class="zazu-detail-label">Total</div><div class="zazu-detail-value">{{ $quote->currency }} {{ $version?->total ?? '0.00' }}</div></div>
-                </div>
-            </section>
-
-            <section class="zazu-panel">
-                <div class="zazu-eyebrow">Revision history</div>
-                <div class="zazu-panel-title mt-1">Versions</div>
-                <div class="zazu-panel-copy">Each revision remains a separate commercial snapshot.</div>
-                <div class="zazu-stage-list">
-                    @foreach ($quote->versions->sortByDesc('version') as $quoteVersion)
-                        <div class="zazu-stage {{ $quoteVersion->id === $version?->id ? 'current' : '' }}">
-                            <span class="zazu-stage-marker"></span>
-                            <div>
-                                <div class="zazu-stage-title">v{{ $quoteVersion->version }} · {{ ucfirst($quoteVersion->status) }}</div>
-                                <div class="zazu-stage-copy">{{ $quote->currency }} {{ $quoteVersion->total }} · {{ $quoteVersion->created_at->format('d M Y, H:i') }}</div>
-                            </div>
-                        </div>
-                    @endforeach
-                </div>
-            </section>
-
-            @if ($version?->notes)
-                <section class="zazu-panel">
-                    <div class="zazu-eyebrow">Notes</div>
-                    <div class="zazu-panel-title mt-1">Quote notes</div>
-                    <div class="mt-3 text-xs leading-6 text-[var(--zazu-ink-2)]">{{ $version->notes }}</div>
-                </section>
-            @endif
-        </aside>
-    </div>
-</x-app-layout>
