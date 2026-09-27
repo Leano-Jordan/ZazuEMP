@@ -196,13 +196,16 @@ class PurchaseOrderController extends Controller
                 $alreadyReceived = \App\Models\InventoryMovement::query()
                     ->where('business_id', $businessId)
                     ->where('purchase_order_id', $lockedOrder->id)
+                    ->where('purchase_order_item_id', $item->id)
                     ->where('inventory_item_id', $inventoryItem->id)
+                    ->where('type', 'receipt')
                     ->exists();
 
                 if (!$alreadyReceived) {
                     $inventoryItem->movements()->create([
                         'business_id' => $businessId,
                         'purchase_order_id' => $lockedOrder->id,
+                        'purchase_order_item_id' => $item->id,
                         'type' => 'receipt',
                         'quantity' => $item->quantity,
                         'unit_cost' => $item->unit_price,
