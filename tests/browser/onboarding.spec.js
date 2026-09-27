@@ -29,5 +29,23 @@ test('registration flows into catalogue, business setup and dashboard', async ({
 
     await expect(page).toHaveURL(/\/dashboard$/);
     await expect(page.getByRole('heading', { name: 'Business overview' })).toBeVisible();
-    await expect(page.getByText(businessName)).toBeVisible();
+    await expect(page.getByTitle('Active business workspace')).toHaveText(businessName);
+
+    const moduleLinks = await page.locator('nav[aria-label="Primary"] a').evaluateAll((links) =>
+        links.map((link) => ({ href: link.href, name: link.textContent?.trim() }))
+            .filter((link) => link.href && link.name)
+    );
+
+    for (const link of moduleLinks) {
+        const response = await page.goto(link.href, { waitUntil: 'domcontentloaded' });
+        expect(response?.status(), link.name).toBe(200);
+        await expect(page.locator('body')).not.toContainText('Whoops');
+        await expect(page.locator('body')).not.toContainText('Server Error');
+    }
+
+    await page.goto('http://127.0.0.1:8000/dashboard');
+    await page.locator('[data-theme-toggle]').click();
+    await expect(page.locator('html')).toHaveAttribute('data-theme', 'dark');
+    await page.locator('[data-theme-toggle]').click();
+    await expect(page.locator('html')).toHaveAttribute('data-theme', 'light');
 });
