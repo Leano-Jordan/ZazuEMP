@@ -119,7 +119,7 @@ class FinancePurchasingInventoryTest extends TestCase
         foreach (range(1, 11) as $index) {
             \App\Models\Payment::create([
                 'business_id' => $business->id,
-                'amount' => '100.00',
+                'amount' => '100.01',
                 'currency' => 'ZAR',
                 'method' => 'bank_transfer',
                 'paid_at' => now()->toDateString(),
@@ -128,7 +128,7 @@ class FinancePurchasingInventoryTest extends TestCase
             \App\Models\FinanceExpense::create([
                 'business_id' => $business->id,
                 'description' => 'Expense '.$index,
-                'amount' => '50.00',
+                'amount' => '50.02',
                 'currency' => 'ZAR',
                 'expense_date' => now()->toDateString(),
                 'status' => 'paid',
@@ -137,8 +137,8 @@ class FinancePurchasingInventoryTest extends TestCase
 
         $this->get(route('finance.index'))
             ->assertOk()
-            ->assertViewHas('paid', '1100.00')
-            ->assertViewHas('expensesTotal', '550.00');
+            ->assertViewHas('paid', '1100.11')
+            ->assertViewHas('expensesTotal', '550.22');
     }
 
     public function test_purchase_order_receipt_tracks_each_purchase_order_line_separately(): void
@@ -386,6 +386,37 @@ class FinancePurchasingInventoryTest extends TestCase
         $this->assertSame(10.0, $item->fresh()->on_hand);
         $this->assertDatabaseHas('audit_logs', ['action' => 'inventory.movement.recorded', 'business_id' => $business->id]);
     }
+
+    public function test_inventory_fractional_quantities_use_deterministic_hundredths(): void
+    {
+        [$business, $user] = $this->businessUser();
+        $this->actingAs($user);
+
+        $item = \App\Models\InventoryItem::create([
+            'business_id' => $business->id,
+            'name' => 'Liquid Ingredient',
+            'unit' => 'litre',
+            'reorder_level' => '0.10',
+        ]);
+
+        foreach ([
+            ['type' => 'receipt', 'quantity' => '0.10'],
+            ['type' => 'receipt', 'quantity' => '0.20'],
+            ['type' => 'issue', 'quantity' => '0.10'],
+        ] as $movement) {
+            $this->post(route('inventory.movement', $item), [
+                ...$movement,
+                'unit_cost' => '10.00',
+                'movement_date' => now()->toDateString(),
+            ])->assertRedirect();
+        }
+
+        $item = $item->fresh();
+
+        $this->assertSame(20, $item->on_hand_hundredths);
+        $this->assertSame(0.2, $item->on_hand);
+    }
+
 
     public function test_staff_permission_boundary_allows_operational_finance_but_denies_owner_settings(): void
     {
