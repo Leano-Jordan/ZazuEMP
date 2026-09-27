@@ -143,7 +143,7 @@
                         <span class="zazu-label">TCS PIN</span>
                         <input name="tcs_pin" value="" class="zazu-input" autocomplete="off" placeholder="{{ $hasTcsPin ? 'PIN stored securely — leave blank to keep it' : 'Enter only when needed' }}">
                         @if ($hasTcsPin)
-                            <span class="zazu-field-help">PIN stored securely — leave blank to keep it.</span>
+                            <span class="zazu-field-help">PIN stored securely — leave blank to keep it</span>
                         @else
                             <span class="zazu-field-help">Stored encrypted. Zazu should never display or expose the PIN unnecessarily.</span>
                         @endif
