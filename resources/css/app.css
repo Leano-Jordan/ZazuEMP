@@ -4936,3 +4936,63 @@ body {
         will-change: auto;
     }
 }
+
+
+/* --------------------------------------------------------------------------
+   Zazu Compact Header + Navigation Controls
+   -------------------------------------------------------------------------- */
+.zazu-header-settings {
+    width: 36px;
+    height: 36px;
+    min-height: 36px;
+    flex: 0 0 36px;
+    display: inline-grid;
+    place-items: center;
+    margin-left: auto;
+    padding: 0;
+    border: 1px solid var(--zazu-border);
+    border-radius: 8px;
+    background: var(--zazu-surface-2);
+    color: var(--zazu-ink-2);
+    text-decoration: none;
+    box-shadow: none;
+    transition:
+        background-color var(--zazu-motion-fast) ease,
+        border-color var(--zazu-motion-fast) ease,
+        color var(--zazu-motion-fast) ease,
+        transform var(--zazu-motion-fast) var(--zazu-ease);
+}
+.zazu-header-settings:hover {
+    border-color: var(--zazu-primary);
+    background: var(--zazu-primary-soft);
+    color: var(--zazu-primary);
+    transform: translateY(-1px);
+}
+.zazu-header-settings svg {
+    width: 16px;
+    height: 16px;
+}
+.zazu-theme-toggle {
+    width: 36px;
+    height: 36px;
+    min-height: 36px;
+    flex: 0 0 36px;
+    padding: 0;
+    border-radius: 8px;
+}
+.zazu-theme-toggle svg {
+    width: 16px;
+    height: 16px;
+}
+.zazu-nav-icon {
+    width: 24px;
+    height: 24px;
+    flex: 0 0 24px;
+    padding: 4px;
+    border-radius: 7px;
+}
+.zazu-header-settings:focus-visible,
+.zazu-theme-toggle:focus-visible {
+    outline: 3px solid var(--zazu-focus);
+    outline-offset: 3px;
+}
