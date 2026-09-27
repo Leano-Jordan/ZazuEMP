@@ -14,6 +14,11 @@ class ZazuBackupCommand extends Command
 
     public function handle(): int
     {
+        if (!class_exists(ZipArchive::class)) {
+            $this->error('The PHP Zip extension is required for Zazu backups.');
+            return self::FAILURE;
+        }
+
         $directory = $this->option('output') ?: storage_path('app/private/backups');
         File::ensureDirectoryExists($directory);
 
