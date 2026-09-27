@@ -22,7 +22,7 @@
             <div class="zazu-card-description">Status controls belong to the row they update.</div>
         </div>
         @if ($items->count())
-            <div class="zazu-record-header" style="--zazu-record-cols: 2">
+            <div class="zazu-record-header" data-record-cols="2">
                 <div class="zazu-record-header-note">Task</div>
                 <div class="zazu-record-header-cell">Due</div>
                 <div class="zazu-record-header-cell">Status</div>
