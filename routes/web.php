@@ -44,7 +44,7 @@ Route::middleware('guest')->group(function () {
     Route::post('/register', [\App\Http\Controllers\AuthController::class, 'storeRegistration'])->middleware('throttle:register')->name('register.store');
 });
 
-Route::middleware(['auth', 'owner'])->group(function () {
+Route::middleware(['auth', 'auth.session', 'owner'])->group(function () {
     Route::get('/owner', [\App\Http\Controllers\AuthController::class, 'owner'])->name('owner.dashboard');
 });
 
