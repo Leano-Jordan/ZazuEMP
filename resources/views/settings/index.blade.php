@@ -266,6 +266,11 @@
 
         <aside class="zazu-form-aside">
             <div class="zazu-context-card">
+                <div class="zazu-context-title">Operational controls</div>
+                <div class="zazu-context-copy">Review important business activity recorded by Zazu.</div>
+                <a href="{{ route('settings.audit') }}" class="zazu-btn zazu-btn-secondary mt-4">Open activity audit</a>
+            </div>
+            <div class="zazu-context-card mt-4">
                 <div class="zazu-context-title">Keep it readable</div>
                 <div class="zazu-context-copy">Choose artwork with enough empty space and contrast. Zazu places a translucent surface over wallpaper so operational information stays readable in light and dark mode.</div>
             </div>
