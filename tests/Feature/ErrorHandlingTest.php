@@ -2,6 +2,8 @@
 
 namespace Tests\Feature;
 
+use Illuminate\Contracts\Debug\ExceptionHandler;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Route;
 use Tests\TestCase;
@@ -18,16 +20,32 @@ class ErrorHandlingTest extends TestCase
         $this->assertNotEmpty($response->headers->get('X-Zazu-Request-Id'));
     }
 
-    public function test_unexpected_database_failure_uses_branded_500_surface_without_leaking_details(): void
+    public function test_unexpected_exception_renders_branded_500_surface_without_leaking_details(): void
     {
-        Route::get('/__zazu-test-missing-table', fn () => DB::table('__zazu_missing_table__')->count())->middleware('web');
+        $request = Request::create('/__zazu-test-500', 'GET');
+        $request->attributes->set('zazu_request_id', 'test-request-id');
 
-        $response = $this->get('/__zazu-test-missing-table');
+        $response = app(ExceptionHandler::class)->render(
+            $request,
+            new \RuntimeException('Sensitive database/table details must remain private.')
+        );
+
+        $response->assertStatus(500);
+        $this->assertStringContainsString('Zazu could not complete that request.', $response->getContent());
+        $this->assertStringContainsString('Reference test-request-id', $response->getContent());
+        $this->assertStringNotContainsString('Sensitive database/table details', $response->getContent());
+        $this->assertSame('test-request-id', $response->headers->get('X-Zazu-Request-Id'));
+    }
+
+    public function test_http_500_response_uses_the_branded_error_surface(): void
+    {
+        Route::middleware('web')->get('/__zazu-test-http-500', fn () => abort(500));
+
+        $response = $this->get('/__zazu-test-http-500');
 
         $response->assertStatus(500);
         $response->assertSee('Zazu could not complete that request.');
         $response->assertSee('Reference');
-        $response->assertDontSee('__zazu_missing_table__');
         $this->assertNotEmpty($response->headers->get('X-Zazu-Request-Id'));
     }
 
@@ -41,6 +59,5 @@ class ErrorHandlingTest extends TestCase
 
         $response->assertRedirect('/dashboard');
         $response->assertSessionHasErrors('name');
-        $response->assertNotSame(500, $response->status());
     }
 }
