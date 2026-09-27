@@ -68,6 +68,108 @@ class QuoteWorkflowTest extends TestCase
         $this->assertSame('100 white chairs', $item->source_snapshot['description']);
     }
 
+    public function test_customer_can_view_and_accept_a_sent_quote_through_a_signed_link(): void
+    {
+        $customer = Customer::create(['name' => 'Public Quote Customer']);
+
+        $event = Event::create([
+            'business_id' => app(\App\Support\CurrentBusiness::class)->id(auth()->user()),
+            'customer_id' => $customer->id,
+            'reference' => 'ZAZ-PUBLIC-001',
+            'name' => 'Public Acceptance Event',
+            'event_date' => now()->addDays(10)->toDateString(),
+            'status' => 'confirmed',
+        ]);
+
+        $quote = Quote::create([
+            'event_id' => $event->id,
+            'reference' => 'QUO-PUBLIC-001',
+            'status' => 'sent',
+            'currency' => 'ZAR',
+        ]);
+
+        $version = $quote->versions()->create([
+            'version' => 1,
+            'status' => 'sent',
+            'subtotal' => '1000.00',
+            'tax_total' => '150.00',
+            'total' => '1150.00',
+        ]);
+
+        $version->items()->create([
+            'description' => 'Public catering package',
+            'quantity' => '1.00',
+            'unit' => 'event',
+            'unit_price' => '1000.00',
+            'line_total' => '1000.00',
+            'source_snapshot' => ['description' => 'Public catering package'],
+        ]);
+
+        $url = \Illuminate\Support\Facades\URL::temporarySignedRoute(
+            'quotes.public',
+            now()->addHour(),
+            ['quote' => $quote]
+        );
+
+        $this->get($url)
+            ->assertOk()
+            ->assertSee('QUO-PUBLIC-001')
+            ->assertSee('Public Quote Customer')
+            ->assertSee('Accept quote');
+
+        $acceptUrl = \Illuminate\Support\Facades\URL::temporarySignedRoute(
+            'quotes.public.accept',
+            now()->addHour(),
+            ['quote' => $quote]
+        );
+
+        $this->post($acceptUrl, [
+            'customer_name' => 'Public Quote Customer',
+            'acceptance' => '1',
+        ])->assertRedirect();
+
+        $this->assertSame('accepted', $quote->fresh()->status);
+        $this->assertSame('accepted', $version->fresh()->status);
+        $this->assertDatabaseHas('audit_logs', [
+            'business_id' => $event->business_id,
+            'action' => 'quote.customer.accepted',
+            'subject_id' => $quote->id,
+        ]);
+
+        $this->get(
+            \Illuminate\Support\Facades\URL::temporarySignedRoute(
+                'quotes.public',
+                now()->addHour(),
+                ['quote' => $quote]
+            )
+        )
+            ->assertOk()
+            ->assertSee('Quote accepted');
+    }
+
+    public function test_customer_quote_link_rejects_an_invalid_signature(): void
+    {
+        $customer = Customer::create(['name' => 'Invalid Link Customer']);
+        $event = Event::create([
+            'business_id' => app(\App\Support\CurrentBusiness::class)->id(auth()->user()),
+            'customer_id' => $customer->id,
+            'reference' => 'ZAZ-PUBLIC-002',
+            'name' => 'Invalid Link Event',
+            'event_date' => now()->addDays(10)->toDateString(),
+            'status' => 'confirmed',
+        ]);
+
+        $quote = Quote::create([
+            'event_id' => $event->id,
+            'reference' => 'QUO-PUBLIC-002',
+            'status' => 'sent',
+            'currency' => 'ZAR',
+        ]);
+
+        $this->get(route('quotes.public', $quote))
+            ->assertForbidden();
+    }
+
     public function test_quote_revision_rebuilds_from_current_requirements_and_preserves_previous_snapshot_until_saved(): void
     {
         $customer = Customer::create([
