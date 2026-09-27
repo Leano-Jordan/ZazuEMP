@@ -4,6 +4,7 @@ use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
 use Illuminate\Http\Request;
+use Illuminate\Support\Str;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 return Application::configure(basePath: dirname(__DIR__))
@@ -25,9 +26,11 @@ return Application::configure(basePath: dirname(__DIR__))
         );
 
         $exceptions->render(function (NotFoundHttpException $exception, Request $request) {
+            $requestId = $request->attributes->get('zazu_request_id') ?: (string) Str::uuid();
+
             return response()->view('errors.404', [
-                'requestId' => $request->attributes->get('zazu_request_id'),
-            ], 404);
+                'requestId' => $requestId,
+            ], 404)->header('X-Zazu-Request-Id', $requestId);
         });
 
         $exceptions->respond(function ($response) {
