@@ -2,8 +2,6 @@
 
 namespace Tests\Feature;
 
-use Illuminate\Contracts\Debug\ExceptionHandler;
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use Tests\TestCase;
 
@@ -19,21 +17,21 @@ class ErrorHandlingTest extends TestCase
         $this->assertNotEmpty($response->headers->get('X-Zazu-Request-Id'));
     }
 
-    public function test_unexpected_exception_renders_branded_500_surface_without_leaking_details(): void
+    public function test_unexpected_exception_uses_branded_500_surface_without_leaking_details(): void
     {
-        $request = Request::create('/__zazu-test-500', 'GET');
-        $request->attributes->set('zazu_request_id', 'test-request-id');
+        $this->handleExceptions([\RuntimeException::class]);
 
-        $response = app(ExceptionHandler::class)->render(
-            $request,
-            new \RuntimeException('Sensitive database/table details must remain private.')
-        );
+        Route::middleware('web')->get('/__zazu-test-runtime-500', function () {
+            throw new \RuntimeException('Sensitive database/table details must remain private.');
+        });
 
-        $this->assertSame(500, $response->getStatusCode());
-        $this->assertStringContainsString('Zazu could not complete that request.', (string) $response->getContent());
-        $this->assertStringContainsString('Reference test-request-id', $response->getContent());
-        $this->assertStringNotContainsString('Sensitive database/table details', $response->getContent());
-        $this->assertSame('test-request-id', $response->headers->get('X-Zazu-Request-Id'));
+        $response = $this->get('/__zazu-test-runtime-500');
+
+        $response->assertStatus(500);
+        $response->assertSee('Zazu could not complete that request.');
+        $response->assertSee('Reference');
+        $response->assertDontSee('Sensitive database/table details');
+        $this->assertNotEmpty($response->headers->get('X-Zazu-Request-Id'));
     }
 
     public function test_http_500_response_uses_the_branded_error_surface(): void
