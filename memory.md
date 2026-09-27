@@ -610,3 +610,12 @@ Regression rule:
 - Business branding files are private-storage assets; an upgrade migration moves existing business-branding files off the public disk.
 - Sweep record: `docs/ZAZU_SWEEP_AUDIT_2026-09-27.md`.
 
+
+
+## Director hardening pass — 2026-09-27
+- Added idempotency protection for finance, purchasing and inventory commercial mutations.
+- Added operational audit log storage/view and audit records for important commercial and onboarding actions.
+- Added centralized staff permission mapping and server-side permission middleware for finance, purchasing and inventory.
+- Added backup/restore CLI tooling for SQLite/MySQL plus private storage.
+- Added Playwright onboarding browser smoke coverage and CI workflow.
+- Final CI/runtime verification remains required; do not declare this hardening pass green until repository checks and a real backup/restore drill succeed.
