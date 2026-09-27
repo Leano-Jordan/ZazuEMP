@@ -138,6 +138,20 @@ Do not eliminate modals categorically.
 
 ## Visual System
 
+### Current Zazu blue reference palette
+
+The repository reference asset is `images/blue pallette.jpg`. The current product token layer uses its blue family as the visual source of truth:
+
+- Primary: `#5592FC`
+- Secondary/light surface: `#F2F7FF`
+- Shadow/border tint: `#C2DCFF`
+- Pale blue: `#9EC8FF`
+- Light blue: `#6FA4FF`
+- Deep blue: `#416AD7`
+
+Use these as brand-system anchors. Semantic success, warning and danger colours remain distinct from the brand blue so status cannot be confused with navigation or primary actions.
+
+
 ### Radius
 
 Use a restrained radius scale.
