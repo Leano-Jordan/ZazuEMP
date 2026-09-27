@@ -49,9 +49,19 @@ Director hardening pass across the previously identified release gaps, with an e
 
 ## Recheck
 
-The modified controllers, routes, support classes, commands and browser test were re-fetched after modification. Basic structural checks found balanced PHP/JavaScript braces across the touched files.
+The modified controllers, routes, support classes, commands, views and tests were re-fetched after modification. The Director rechecked the changed source for write-integrity errors and corrected one malformed PHP namespace introduced during the hardening write. A settings view markup defect (`</div>>`) was also corrected and covered by a regression test.
 
-GitHub status/workflow results for the final hardening commit were not yet available through the repository connector at the time this record was written. Therefore this pass is **implemented and rechecked at source level, but not declared CI-green** until the repository's own runtime checks complete.
+Idempotency was rechecked at the database boundary: generated keys are now established before lookup, and commercial mutations perform their duplicate check inside the transaction rather than relying on a pre-transaction read. Invoice conversion additionally locks the quote version before creating the invoice.
+
+Backup/restore was rechecked for storage isolation and archive-entry safety. Backup archives now live outside `storage/app/private`, and restore rejects unsafe absolute, drive-qualified and `..` archive paths before extraction.
+
+GitHub status/workflow results for the latest hardening commits are not currently exposed by the repository connector. A local clone/runtime verification was also unavailable because the execution environment could not resolve GitHub. Therefore this pass is **source-rechecked but not declared CI-green** until the repository's own Laravel, PHPMD, Psalm and browser checks run successfully.
+
+## Regression findings addressed during the loop
+
+- Settings page: corrected malformed closing markup and added a focused render regression test.
+- Idempotency tests: added explicit invoice and expense duplicate-submission coverage after rechecking the transaction paths.
+- Repository write integrity: corrected a malformed PHP namespace produced during an automated edit before final review.
 
 ## Remaining evidence
 
