@@ -30,7 +30,7 @@ class BusinessMediaController extends Controller
             404
         );
 
-        $disk = Storage::disk('public');
+        $disk = Storage::disk('local');
         abort_unless($disk->exists($path), 404);
 
         $response = response()->file($disk->path($path));
