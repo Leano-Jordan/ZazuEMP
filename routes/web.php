@@ -49,7 +49,7 @@ Route::middleware(['auth', 'owner'])->group(function () {
 });
 
 Route::middleware(['auth', 'auth.session', 'business.context'])->group(function () {
-    Route::get('/dashboard', DashboardController::class)->name('dashboard');
+    Route::get('/dashboard', DashboardController::class)->middleware('permission:dashboard.view')->name('dashboard');
 
     Route::middleware('owner')->group(function () {
         Route::get('/setup', [OnboardingController::class, 'index'])->name('onboarding.index');
@@ -64,7 +64,7 @@ Route::middleware(['auth', 'auth.session', 'business.context'])->group(function 
 
     Route::get('/media/profile/{type}/{id}', [\App\Http\Controllers\ProfileMediaController::class, 'show'])->whereIn('type', ['customer', 'user'])->name('profile.media');
     Route::get('/media/business/{type}', [\App\Http\Controllers\BusinessMediaController::class, 'show'])->whereIn('type', ['logo', 'dashboard', 'wallpaper'])->name('business.media');
-    Route::get('/calendar', CalendarController::class)->name('calendar.index');
+    Route::get('/calendar', CalendarController::class)->middleware('permission:calendar.view')->name('calendar.index');
 
     Route::get('/finance', [FinanceController::class, 'index'])->middleware('permission:finance.view')->name('finance.index');
     Route::get('/finance/invoices/create', [FinanceController::class, 'createInvoice'])->middleware('permission:finance.invoice.create')->name('finance.invoices.create');
@@ -96,7 +96,7 @@ Route::middleware(['auth', 'auth.session', 'business.context'])->group(function 
     Route::post('/assets/{asset}/allocate', [AssetController::class, 'allocate'])->middleware('permission:assets.allocate')->name('assets.allocate');
     Route::post('/assets/{asset}/release', [AssetController::class, 'release'])->middleware('permission:assets.release')->name('assets.release');
 
-    Route::get('/reports', \App\Http\Controllers\ReportController::class)->name('reports.index');
+    Route::get('/reports', \App\Http\Controllers\ReportController::class)->middleware('permission:reports.view')->name('reports.index');
 
     Route::middleware('owner')->group(function () {
         Route::get('/settings', [BusinessSettingsController::class, 'edit'])->name('settings.index');
@@ -116,27 +116,27 @@ Route::middleware(['auth', 'auth.session', 'business.context'])->group(function 
     Route::get('/quotes/{quote}/versions/{version}/edit', [QuoteController::class, 'editVersion'])->middleware('permission:quotes.update')->name('quotes.versions.edit');
     Route::put('/quotes/{quote}/versions/{version}', [QuoteController::class, 'updateVersion'])->middleware('permission:quotes.update')->name('quotes.versions.update');
 
-    Route::get('/work', [WorkController::class, 'index'])->name('work.index');
-    Route::get('/work/create', [WorkController::class, 'create'])->name('work.create');
-    Route::post('/work', [WorkController::class, 'store'])->name('work.store');
-    Route::get('/work/{event}', [WorkController::class, 'show'])->name('work.show');
-    Route::get('/work/{event}/edit', [WorkController::class, 'edit'])->name('work.edit');
-    Route::put('/work/{event}', [WorkController::class, 'update'])->name('work.update');
-    Route::delete('/work/{event}', [WorkController::class, 'destroy'])->name('work.destroy');
-    Route::post('/work/{event}/attachments', [EventAttachmentController::class, 'store'])->name('work.attachments.store');
-    Route::get('/work/attachments/{attachment}', [EventAttachmentController::class, 'download'])->name('work.attachments.download');
-    Route::delete('/work/attachments/{attachment}', [EventAttachmentController::class, 'destroy'])->name('work.attachments.destroy');
+    Route::get('/work', [WorkController::class, 'index'])->middleware('permission:work.view')->name('work.index');
+    Route::get('/work/create', [WorkController::class, 'create'])->middleware('permission:work.create')->name('work.create');
+    Route::post('/work', [WorkController::class, 'store'])->middleware('permission:work.create')->name('work.store');
+    Route::get('/work/{event}', [WorkController::class, 'show'])->middleware('permission:work.view')->name('work.show');
+    Route::get('/work/{event}/edit', [WorkController::class, 'edit'])->middleware('permission:work.update')->name('work.edit');
+    Route::put('/work/{event}', [WorkController::class, 'update'])->middleware('permission:work.update')->name('work.update');
+    Route::delete('/work/{event}', [WorkController::class, 'destroy'])->middleware('permission:work.delete')->name('work.destroy');
+    Route::post('/work/{event}/attachments', [EventAttachmentController::class, 'store'])->middleware('permission:work.update')->name('work.attachments.store');
+    Route::get('/work/attachments/{attachment}', [EventAttachmentController::class, 'download'])->middleware('permission:work.view')->name('work.attachments.download');
+    Route::delete('/work/attachments/{attachment}', [EventAttachmentController::class, 'destroy'])->middleware('permission:work.update')->name('work.attachments.destroy');
 
-    Route::get('/work/{event}/travel', [TravelCostController::class, 'index'])->name('work.travel.index');
-    Route::get('/work/{event}/travel/create', [TravelCostController::class, 'create'])->name('work.travel.create');
-    Route::post('/work/{event}/travel', [TravelCostController::class, 'store'])->name('work.travel.store');
-    Route::get('/work/{event}/costs', [EventCostController::class, 'index'])->name('work.costs.index');
-    Route::get('/work/{event}/costs/create', [EventCostController::class, 'create'])->name('work.costs.create');
-    Route::post('/work/{event}/costs', [EventCostController::class, 'store'])->name('work.costs.store');
-    Route::get('/work/{event}/preparation', [EventPreparationController::class, 'index'])->name('work.preparation.index');
-    Route::get('/work/{event}/preparation/create', [EventPreparationController::class, 'create'])->name('work.preparation.create');
-    Route::post('/work/{event}/preparation', [EventPreparationController::class, 'store'])->name('work.preparation.store');
-    Route::patch('/work/{event}/preparation/{item}/status', [EventPreparationController::class, 'updateStatus'])->name('work.preparation.status');
+    Route::get('/work/{event}/travel', [TravelCostController::class, 'index'])->middleware('permission:work.view')->name('work.travel.index');
+    Route::get('/work/{event}/travel/create', [TravelCostController::class, 'create'])->middleware('permission:work.update')->name('work.travel.create');
+    Route::post('/work/{event}/travel', [TravelCostController::class, 'store'])->middleware('permission:work.update')->name('work.travel.store');
+    Route::get('/work/{event}/costs', [EventCostController::class, 'index'])->middleware('permission:work.view')->name('work.costs.index');
+    Route::get('/work/{event}/costs/create', [EventCostController::class, 'create'])->middleware('permission:work.update')->name('work.costs.create');
+    Route::post('/work/{event}/costs', [EventCostController::class, 'store'])->middleware('permission:work.update')->name('work.costs.store');
+    Route::get('/work/{event}/preparation', [EventPreparationController::class, 'index'])->middleware('permission:work.view')->name('work.preparation.index');
+    Route::get('/work/{event}/preparation/create', [EventPreparationController::class, 'create'])->middleware('permission:work.update')->name('work.preparation.create');
+    Route::post('/work/{event}/preparation', [EventPreparationController::class, 'store'])->middleware('permission:work.update')->name('work.preparation.store');
+    Route::patch('/work/{event}/preparation/{item}/status', [EventPreparationController::class, 'updateStatus'])->middleware('permission:work.update')->name('work.preparation.status');
     Route::get('/work/{event}/quotes', [QuoteController::class, 'eventIndex'])->name('work.quotes.index');
     Route::get('/work/{event}/quotes/create', [QuoteController::class, 'create'])->name('work.quotes.create');
     Route::post('/work/{event}/quotes', [QuoteController::class, 'store'])->name('work.quotes.store');
@@ -156,7 +156,7 @@ Route::middleware(['auth', 'auth.session', 'business.context'])->group(function 
     Route::put('/customers/{customer}/contacts/{contact}', [CustomerContactController::class, 'update'])->middleware('permission:customers.contacts.manage')->name('customers.contacts.update');
     Route::delete('/customers/{customer}/contacts/{contact}', [CustomerContactController::class, 'destroy'])->middleware('permission:customers.contacts.manage')->name('customers.contacts.destroy');
 
-    Route::get('/capabilities', [BusinessCapabilityController::class, 'index'])->name('capabilities.index');
+    Route::get('/capabilities', [BusinessCapabilityController::class, 'index'])->middleware('permission:capabilities.view')->name('capabilities.index');
     Route::middleware('owner')->group(function () {
         Route::get('/capabilities/create', [BusinessCapabilityController::class, 'create'])->name('capabilities.create');
         Route::post('/capabilities', [BusinessCapabilityController::class, 'store'])->name('capabilities.store');
