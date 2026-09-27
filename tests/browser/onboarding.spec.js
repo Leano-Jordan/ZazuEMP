@@ -12,8 +12,8 @@ test('registration flows into catalogue, business setup and dashboard', async ({
     await page.getByLabel('Username').fill(username);
     await page.getByLabel('Business name').fill(businessName);
     await page.getByLabel('Email address').fill(username + '@example.com');
-    await page.getByLabel('Password').fill('password123');
-    await page.getByLabel('Confirm password').fill('password123');
+    await page.locator('#password').fill('password123');
+    await page.locator('#password_confirmation').fill('password123');
     await page.getByRole('button', { name: 'Create workspace' }).click();
 
     await expect(page).toHaveURL(/\/setup\/catalogue$/);
