@@ -6,6 +6,7 @@ use App\Models\Business;
 use App\Models\User;
 use App\Support\CurrentBusiness;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Notification;
 use Illuminate\Support\Facades\Password;
@@ -240,6 +241,37 @@ class AuthenticationTest extends TestCase
         $this->assertTrue(Hash::check('new-password', $user->fresh()->password));
         $this->assertFalse(Hash::check('old-password', $user->fresh()->password));
     }
+
+    public function test_password_reset_revokes_previously_authenticated_sessions(): void
+    {
+        $user = User::factory()->create([
+            'username' => 'sessionreset',
+            'email' => 'sessionreset@example.com',
+            'password' => 'old-password',
+        ]);
+
+        DB::table('sessions')->insert([
+            'id' => 'old-device-session',
+            'user_id' => $user->id,
+            'ip_address' => '127.0.0.1',
+            'user_agent' => 'old-device',
+            'payload' => '{}',
+            'last_activity' => now()->timestamp,
+        ]);
+
+        $token = Password::createToken($user);
+
+        $this->post(route('password.update'), [
+            'token' => $token,
+            'email' => $user->email,
+            'password' => 'new-password',
+            'password_confirmation' => 'new-password',
+        ])->assertRedirect(route('dashboard'));
+
+        $this->assertAuthenticatedAs($user);
+        $this->assertDatabaseMissing('sessions', ['id' => 'old-device-session']);
+    }
+
 
     public function test_password_reset_token_cannot_be_reused(): void
     {
