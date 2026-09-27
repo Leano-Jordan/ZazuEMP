@@ -7,29 +7,29 @@
     <style>
         :root {
             color-scheme: light;
-            --page: #f4f6f4;
-            --surface: #ffffff;
-            --ink: #17221e;
-            --muted: #596963;
-            --border: #cbd6d0;
-            --border-strong: #7f8d86;
-            --primary: #17785f;
-            --primary-hover: #0f604c;
+            --page: #e9f1f6;
+            --surface: #f9fbfd;
+            --ink: #253746;
+            --muted: #536d7d;
+            --border: #c7d5df;
+            --border-strong: #8fa5b4;
+            --primary: #4d7898;
+            --primary-hover: #416a88;
             --primary-ink: #ffffff;
         }
 
         @media (prefers-color-scheme: dark) {
             :root {
                 color-scheme: dark;
-                --page: #111715;
-                --surface: #171f1b;
-                --ink: #edf5f1;
-                --muted: #9aaca4;
-                --border: #2d3c34;
-                --border-strong: #43564b;
-                --primary: #45c39b;
-                --primary-hover: #62d3ac;
-                --primary-ink: #062016;
+                --page: #101821;
+                --surface: #172532;
+                --ink: #edf5fa;
+                --muted: #a4b8c7;
+                --border: #2b4051;
+                --border-strong: #50687b;
+                --primary: #86b6d2;
+                --primary-hover: #9fc9df;
+                --primary-ink: #102230;
             }
         }
         * { box-sizing: border-box; }
