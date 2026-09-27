@@ -198,11 +198,17 @@ function setupBrandingUploads() {
             if (!container || !preview || !loading) return;
 
             const extension = file.name.split('.').pop()?.toLowerCase() ?? '';
-      const allowed = file.type.startsWith('image/')
-                || ['jpg', 'jpeg', 'png', 'webp'].includes(extension);
+            const allowedExtensions = ['jpg', 'jpeg', 'png', 'webp'];
+            const allowedMimeTypes = ['image/jpeg', 'image/png', 'image/webp'];
+            const allowed = allowedExtensions.includes(extension)
+                && (!file.type || allowedMimeTypes.includes(file.type));
 
             if (!allowed) {
                 input.value = '';
+                preview.hidden = true;
+                loading.hidden = true;
+                if (placeholder) placeholder.hidden = false;
+                container.setAttribute('aria-busy', 'false');
                 if (filename) filename.textContent = 'Choose a JPG, PNG or WebP image.';
                 return;
             }
