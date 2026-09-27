@@ -206,7 +206,7 @@
                                     <div class="zazu-user-popover-divider"></div>
                                     @if($isOwner)
                                     <a href="{{ route('onboarding.index') }}" class="zazu-user-signout" style="text-decoration:none;">
-                                        <span aria-hidden="true">⚙</span>
+                                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><circle cx="12" cy="12" r="3"></circle><path d="M19 12a7 7 0 0 0-.3-2l-2-1.3-2-3.4-2.3 1a7 7 0 0 0-3.4-2L12.7 2h-1.4L11 4.3a7 7 0 0 0-3.4 2l-2.3-1-2 3.4 2 1.3a7 7 0 0 0 0 4l-2 1.3 2 3.4 2.3-1a7 7 0 0 0 3.4 2l.3 2.3h1.4l.3-2.3a7 7 0 0 0 3.4-2l2.3 1 2-3.4-2-1.3A7 7 0 0 0 19 12z"></path></svg>
                                         <span>Setup centre</span>
                                     </a>
 
