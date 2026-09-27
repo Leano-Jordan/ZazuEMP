@@ -28,8 +28,12 @@ class FinanceController extends Controller
         $payments = Payment::where('business_id', $businessId)->latest('paid_at')->limit(10)->get();
         $expenses = FinanceExpense::where('business_id', $businessId)->latest('expense_date')->limit(10)->get();
         $invoicedCents = $invoices->sum(fn ($invoice) => Money::toCents((string) $invoice->total));
-        $paidCents = $payments->sum(fn ($payment) => Money::toCents((string) $payment->amount));
-        $expensesCents = $expenses->sum(fn ($expense) => Money::toCents((string) $expense->amount));
+        $paidCents = Payment::where('business_id', $businessId)
+            ->pluck('amount')
+            ->sum(fn ($amount) => Money::toCents((string) $amount));
+        $expensesCents = FinanceExpense::where('business_id', $businessId)
+            ->pluck('amount')
+            ->sum(fn ($amount) => Money::toCents((string) $amount));
 
         return view('finance.index', [
             'invoices' => $invoices,
