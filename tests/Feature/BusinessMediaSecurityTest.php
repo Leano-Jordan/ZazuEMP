@@ -140,5 +140,31 @@ class BusinessMediaSecurityTest extends TestCase
     }
 
 
+    public function test_owner_can_save_business_settings_without_tax_profile_values(): void
+    {
+        $this->signInAsOwner();
+
+        $business = auth()->user()->businesses()->firstOrFail();
+
+        $this->put(route('settings.update'), [
+            'name' => 'Saved Zazu Business',
+            'currency' => 'ZAR',
+        ])
+            ->assertRedirect(route('settings.index'))
+            ->assertSessionHas('success', 'Business settings saved.');
+
+        $business->refresh();
+
+        $this->assertSame('Saved Zazu Business', $business->name);
+        $this->assertSame('ZAR', $business->currency);
+        $this->assertNotNull($business->taxProfile);
+        $this->assertDatabaseHas('tax_rates', [
+            'business_id' => $business->id,
+            'code' => 'NO_VAT',
+            'is_default' => true,
+        ]);
+    }
+
+
 }
 
