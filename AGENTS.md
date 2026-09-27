@@ -3,35 +3,37 @@
 ## HARD PROJECT BOUNDARY
 This repository is **Zazu EMP only**.
 
-Before any state-changing operation, obey `.ai/REPOSITORY_IDENTITY_LOCK.md`.
+Before any state-changing operation, obey .ai/REPOSITORY_IDENTITY_LOCK.md.
 
 Canonical identity:
-- Repository: `Leano-Jordan/ZazuEMP`
-- Local root: `C:\Projects\ZazuEMP`
-- Branch: `main`
+- Repository: Leano-Jordan/ZazuEMP
+- Local root: C:\Projects\ZazuEMP
+- Branch: main
 
 Before every write-capable operation, prove the repository root, remote, branch, target path, and explicit GitHub target. If any proof fails, STOP. Never switch, repair, checkout, pull, clone, or modify another repository.
 
 ## EXECUTION-FIRST
-For meaningful work, read `.ai/engineering/README.md` and the relevant engine files.
+For meaningful work, read .ai/engineering/README.md and the relevant engine files.
 
 When the owner asks to **execute**, execute. Do not replace execution with a plan, tutorial, motivational speech, token discussion, or long status report.
 
 - Inspect the current Zazu repository first.
-- Use the five-engine system and activate only needed capability modes.
+- Use the five core engines and activate only needed capability modes.
+- Automatically activate the dedicated UI/UX IMPROVEMENT ENGINE on all UI/UX-affecting work.
 - Ask only when a missing decision materially blocks safe execution.
 - Fix directly relevant defects discovered in the requested scope when safe and justified.
 - Verify meaningful changes.
 - Report compactly by default.
 
-## FIVE-ENGINE SYSTEM
+## ENGINE SYSTEM
 1. DIRECTOR
 2. DISCOVERY & DESIGN
 3. BUILDER
 4. GUARDIAN
 5. RELEASE
+6. UI/UX IMPROVEMENT CAPABILITY
 
-Fresh Eyes / Devil's Advocate is a capability inside Discovery & Design, not a separate always-on agent.
+UI/UX IMPROVEMENT is dedicated to UI/UX audits, improvements, fixes, interaction design, responsive behaviour, visual consistency, accessibility, and continuous premium-product refinement. It is automatically active whenever a task touches those areas. It is not a separate competing execution hierarchy.
 
 ## PROJECT ISOLATION
 Other products, repositories, prompts, memories, schemas, release specifications, or project instructions are external context only. They never become Zazu implementation authority unless the owner explicitly requests a reviewed adaptation.

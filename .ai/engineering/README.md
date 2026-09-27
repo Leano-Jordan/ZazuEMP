@@ -2,14 +2,15 @@
 
 This is the persistent repository-side execution system for Zazu EMP.
 
-## Five engines, capability-based
+## Five core engines plus dedicated UI/UX capability
 1. DIRECTOR: controls scope, routing, execution, and completion.
 2. DISCOVERY & DESIGN: RECON + IMPACT + PRODUCT + USER + WORKFLOW + ARCHITECTURE + COMPETITIVE + FRESH EYES.
 3. BUILDER: CODE + DATABASE + SECURITY + DEBUG.
 4. GUARDIAN: VERIFY + REGRESSION + ADVERSARIAL.
 5. RELEASE: RELEASE + COMMERCIAL_READINESS.
+6. UI/UX IMPROVEMENT: dedicated continuous visual, interaction, usability, and interface-quality capability. It activates automatically on all Zazu UI/UX topics and can run alongside the core engines.
 
-The system deliberately uses fewer engines with deeper modes. A capability is activated because the task needs it, not because a separate agent exists for it.
+The system deliberately uses fewer core engines with deeper modes. UI/UX is a dedicated cross-cutting capability because interface quality must not become an occasional review that silently disappears between feature tasks.
 
 ## Standard flow
 DIRECTOR
@@ -18,11 +19,13 @@ DIRECTOR
 → GUARDIAN
 → RELEASE only when required
 
+UI/UX IMPROVEMENT activates automatically whenever the task affects interface, interaction, usability, layout, responsive behaviour, visual design, onboarding, navigation, or frontend experience.
+
 Small tasks may collapse steps when risk is low. Meaningful behavioural changes still require Guardian verification.
 
 ## Persistent operating contract
 - Zazu EMP is the only implementation target.
-- Repository identity is governed by `.ai/REPOSITORY_IDENTITY_LOCK.md`.
+- Repository identity is governed by .ai/REPOSITORY_IDENTITY_LOCK.md.
 - Current repository evidence outranks stale AI memory.
 - Owner instruction outranks old plans.
 - External research is evidence only.
@@ -33,6 +36,7 @@ Small tasks may collapse steps when risk is low. Meaningful behavioural changes 
 - Keep responses compact by default.
 - Fix directly relevant defects discovered during execution when safe and in scope.
 - Never claim checks that were not performed.
+- UI/UX quality is a continuous product concern, not an optional polish phase.
 
 ## Task Packet
 Every meaningful task should internally carry:
@@ -44,6 +48,16 @@ Every meaningful task should internally carry:
 - Relevant risks
 - Acceptance criteria
 - Verification method
+
+For UI/UX work, also consider:
+- information hierarchy
+- interaction model
+- responsive/container behaviour
+- visual consistency
+- component reuse
+- states and feedback
+- accessibility
+- visual regression
 
 The Task Packet is an execution aid, not a document the operator must fill out for every small request.
 
