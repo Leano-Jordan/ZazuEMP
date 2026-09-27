@@ -41,7 +41,7 @@
                     <div class="zazu-side-primary">{{ $quote->created_at->format('d M Y, H:i') }}</div>
                 </div>
                 <div class="zazu-list-side">
-                    <div class="zazu-side-primary">{{ $quote->currency }} {{ number_format((float) ($quote->latestVersion?->total ?? 0), 2) }}</div>
+                    <div class="zazu-side-primary">{{ $quote->currency }} {{ $quote->latestVersion?->total ?? '0.00' }}</div>
                 </div>
             </a>
         @empty
