@@ -7,29 +7,29 @@
     <style>
         :root {
             color-scheme: light;
-            --page: #e9f1f6;
-            --surface: #f9fbfd;
-            --ink: #253746;
-            --muted: #536d7d;
-            --border: #c7d5df;
-            --border-strong: #8fa5b4;
-            --primary: #4d7898;
-            --primary-hover: #416a88;
-            --primary-ink: #ffffff;
+            --page: #F2F7FF;
+            --surface: #FFFFFF;
+            --ink: #17315A;
+            --muted: #405C7E;
+            --border: #C2DCFF;
+            --border-strong: #9EC8FF;
+            --primary: #5592FC;
+            --primary-hover: #416AD7;
+            --primary-ink: #FFFFFF;
         }
 
         @media (prefers-color-scheme: dark) {
             :root {
                 color-scheme: dark;
-                --page: #101821;
-                --surface: #172532;
-                --ink: #edf5fa;
-                --muted: #a4b8c7;
-                --border: #2b4051;
-                --border-strong: #50687b;
-                --primary: #86b6d2;
-                --primary-hover: #9fc9df;
-                --primary-ink: #102230;
+                --page: #0D1F3A;
+                --surface: #102743;
+                --ink: #F2F7FF;
+                --muted: #C2DCFF;
+                --border: #31588C;
+                --border-strong: #6FA4FF;
+                --primary: #6FA4FF;
+                --primary-hover: #9EC8FF;
+                --primary-ink: #0D1F3A;
             }
         }
         * { box-sizing: border-box; }
