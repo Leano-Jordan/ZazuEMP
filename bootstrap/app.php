@@ -69,6 +69,9 @@ return Application::configure(basePath: dirname(__DIR__))
                 return $response;
             }
 
+            // Mark this as having been processed to avoid infinite loops
+            $response->headers->set('X-Zazu-Error-Code', 'APP-001');
+
             $definition = ZazuErrorCatalog::forStatus($response->getStatusCode());
 
             return response()->view('errors.layout', [
