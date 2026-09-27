@@ -2564,7 +2564,7 @@ body {
 .zazu-catalogue-card {
     overflow: hidden;
     border: 1px solid var(--zazu-border);
-    border-radius: 18px;
+    border-radius: 6px;
     background: var(--zazu-surface);
     box-shadow: var(--zazu-shadow);
     color: inherit;
@@ -4032,7 +4032,7 @@ body.zazu-has-wallpaper .zazu-content > * {
     }
 
     .zazu-login-frame {
-        border-radius: 20px;
+        border-radius: 6px;
     }
 
     .zazu-login-panel {
@@ -4111,7 +4111,7 @@ body.zazu-has-wallpaper .zazu-content > * {
         gap: 9px;
     }
 }
-.zazu-toast {
+ .zazu-toast {
     position: fixed;
     right: 24px;
     bottom: 24px;
@@ -4122,7 +4122,7 @@ body.zazu-has-wallpaper .zazu-content > * {
     gap: 12px;
     padding: 14px;
     border: 1px solid var(--zazu-border);
-    border-radius: 14px;
+    border-radius: 6px;
     background: var(--zazu-surface);
     color: var(--zazu-ink);
     box-shadow: var(--zazu-shadow-strong);
@@ -4133,13 +4133,13 @@ body.zazu-has-wallpaper .zazu-content > * {
 .zazu-toast-error { border-color: color-mix(in srgb, var(--zazu-danger) 38%, var(--zazu-border)); }
 .zazu-toast-info { border-color: color-mix(in srgb, var(--zazu-info) 34%, var(--zazu-border)); }
 
-.zazu-toast-icon {
+ .zazu-toast-icon {
     width: 28px;
     height: 28px;
     flex: 0 0 28px;
     display: grid;
     place-items: center;
-    border-radius: 9px;
+    border-radius: 4px;
     background: var(--zazu-primary-soft);
     color: var(--zazu-primary);
     font-size: 13px;
@@ -4169,7 +4169,7 @@ body.zazu-has-wallpaper .zazu-content > * {
     display: grid;
     place-items: center;
     border: 0;
-    border-radius: 8px;
+    border-radius: 4px;
     background: transparent;
     color: var(--zazu-muted);
     font-size: 19px;
@@ -4217,7 +4217,7 @@ body.zazu-has-wallpaper .zazu-content > * {
 .zazu-dropzone {
     padding: 18px;
     border: 1px dashed var(--zazu-border-strong);
-    border-radius: 14px;
+    border-radius: 6px;
     background: var(--zazu-surface-2);
 }
 .zazu-dropzone-title { margin-top: 10px; color: var(--zazu-ink-2); font-size: 12px; font-weight: 750; }
@@ -4225,7 +4225,7 @@ body.zazu-has-wallpaper .zazu-content > * {
 
 
 /* Zazu branding upload states: immediate local preview and explicit persistence feedback. */
-.zazu-branding-preview-media {
+ .zazu-branding-preview-media {
     position: relative;
     isolation: isolate;
 }
@@ -5561,3 +5561,8 @@ html[data-theme="dark"] .zazu-public-party,html[data-theme="dark"] .zazu-public-
 @media (max-width:900px) { .zazu-dashboard-metrics { grid-template-columns:repeat(2,minmax(0,1fr)); } .zazu-dashboard-lower { grid-template-columns:1fr; } }
 @media (max-width:640px) { .zazu-dashboard-attention { align-items:flex-start; flex-direction:column; } .zazu-dashboard-metrics { grid-template-columns:1fr 1fr; } }
 @media (max-width:420px) { .zazu-dashboard-metrics { grid-template-columns:1fr; } }
+
+
+/* Final radius normalization for operational rectangular surfaces */
+.zazu-login-frame,.zazu-auth-frame,.zazu-auth-card,.zazu-auth-visual,.zazu-login-panel,.zazu-branding-preview,.zazu-branding-preview-media,.zazu-file-input::file-selector-button,.zazu-user-popover,.zazu-user-switch-select,.zazu-login-password-toggle { border-radius: 6px; }
+.zazu-login-submit { border-radius: 4px; }
