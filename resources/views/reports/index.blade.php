@@ -66,7 +66,7 @@
                 @forelse ($quoteTotalsByCurrency as $currency => $totals)
                     <div class="zazu-context-card">
                         <div class="zazu-detail-label">{{ $currency }} quotes</div>
-                        <div class="zazu-command-meta-value mt-1">{{ $currency }} {{ number_format($totals['total'], 2, '.', ',') }}</div>
+                        <div class="zazu-command-meta-value mt-1">{{ $currency }} {{ \App\Support\Money::formatCents($totals['total_cents']) }}</div>
                         <div class="zazu-field-help">{{ $totals['count'] }} quote{{ $totals['count'] === 1 ? '' : 's' }} with a saved latest version</div>
                     </div>
                 @empty
@@ -89,7 +89,7 @@
                 <div class="zazu-route-card">
                     <div>
                         <div class="zazu-route-card-title">{{ $currency }}</div>
-                        <div class="zazu-route-card-copy">Projected {{ $currency }} {{ number_format($totals['projected'], 2) }} · Actual {{ $currency }} {{ number_format($totals['actual'], 2) }}</div>
+                        <div class="zazu-route-card-copy">Projected {{ $currency }} {{ \App\Support\Money::formatCents($totals['projected_cents']) }} · Actual {{ $currency }} {{ \App\Support\Money::formatCents($totals['actual_cents']) }}</div>
                     </div>
                 </div>
             @empty
