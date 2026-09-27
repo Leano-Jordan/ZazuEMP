@@ -83,6 +83,61 @@ class FinancePurchasingInventoryTest extends TestCase
         ]);
     }
 
+    public function test_purchase_order_receipt_tracks_each_purchase_order_line_separately(): void
+    {
+        [$business, $user] = $this->businessUser();
+        $this->actingAs($user);
+
+        $supplier = \App\Models\Supplier::create([
+            'business_id' => $business->id,
+            'name' => 'Duplicate Item Supplier',
+        ]);
+
+        $this->post(route('purchasing.store'), [
+            'supplier_id' => $supplier->id,
+            'currency' => 'ZAR',
+            'description' => ['Chicken', 'Chicken'],
+            'quantity' => ['10', '20'],
+            'unit' => ['kg', 'kg'],
+            'unit_price' => ['85.00', '85.00'],
+            'capability_id' => ['', ''],
+        ])->assertRedirect();
+
+        $order = \App\Models\PurchaseOrder::firstOrFail();
+
+        $this->patch(route('purchasing.status', $order), ['status' => 'sent'])->assertRedirect();
+        $this->patch(route('purchasing.status', $order), ['status' => 'ordered'])->assertRedirect();
+        $this->patch(route('purchasing.status', $order), ['status' => 'received'])->assertRedirect();
+        $this->patch(route('purchasing.status', $order), ['status' => 'received'])->assertRedirect();
+
+        $this->assertDatabaseCount('inventory_movements', 2);
+        $this->assertDatabaseCount('purchase_order_items', 2);
+
+        $item = \App\Models\InventoryItem::where('business_id', $business->id)
+            ->where('name', 'Chicken')
+            ->firstOrFail();
+
+        $this->assertSame(30.0, $item->on_hand);
+
+        $lines = \App\Models\PurchaseOrderItem::where('purchase_order_id', $order->id)
+            ->orderBy('id')
+            ->get();
+
+        $this->assertDatabaseHas('inventory_movements', [
+            'purchase_order_id' => $order->id,
+            'purchase_order_item_id' => $lines[0]->id,
+            'quantity' => '10.00',
+            'type' => 'receipt',
+        ]);
+
+        $this->assertDatabaseHas('inventory_movements', [
+            'purchase_order_id' => $order->id,
+            'purchase_order_item_id' => $lines[1]->id,
+            'quantity' => '20.00',
+            'type' => 'receipt',
+        ]);
+    }
+
     public function test_purchase_order_requires_business_currency(): void
     {
         [$business, $user] = $this->businessUser();
