@@ -87,6 +87,13 @@
     --zazu-motion-base: 160ms;
     --zazu-motion-slow: 220ms;
     --zazu-ease: cubic-bezier(0.2, 0, 0.38, 0.9);
+
+    --zazu-border-subtle: color-mix(in srgb, var(--zazu-border) 72%, transparent);
+    --zazu-surface-raised: color-mix(in srgb, var(--zazu-surface) 88%, var(--zazu-surface-2));
+    --zazu-shadow-none: none;
+    --zazu-shadow-soft: 0 1px 2px color-mix(in srgb, var(--zazu-ink) 7%, transparent);
+    --zazu-shadow-float: 0 8px 24px color-mix(in srgb, var(--zazu-ink) 10%, transparent);
+    --zazu-radius-pill: 999px;
 }
 
 :root[data-theme="dark"] {
@@ -149,6 +156,8 @@
 
     --zazu-shadow: 0 1px 2px rgba(0,0,0,.24), 0 8px 24px rgba(0,0,0,.18);
     --zazu-shadow-strong: 0 4px 14px rgba(0,0,0,.24);
+    --zazu-shadow-soft: 0 1px 2px rgba(0, 0, 0, 0.22);
+    --zazu-shadow-float: 0 10px 28px rgba(0, 0, 0, 0.24);
 }
 * {
     border-color: var(--zazu-border);
@@ -5198,26 +5207,7 @@ html[data-theme="dark"] .zazu-public-party,html[data-theme="dark"] .zazu-public-
 
 
 /* -------------------------------------------------------------------------- */
-/* Zazu Operational Premium system                                            */
-/* Canonical interaction, state, density and responsive layer.                */
-/* -------------------------------------------------------------------------- */
 
-:root {
-    --zazu-radius-sm: 2px;
-    --zazu-radius-md: 4px;
-    --zazu-radius-lg: 6px;
-    --zazu-radius-xl: 6px;
-    --zazu-border-subtle: color-mix(in srgb, var(--zazu-border) 72%, transparent);
-    --zazu-surface-raised: color-mix(in srgb, var(--zazu-surface) 88%, var(--zazu-surface-2));
-    --zazu-shadow-none: none;
-    --zazu-shadow-soft: 0 1px 2px color-mix(in srgb, var(--zazu-ink) 7%, transparent);
-    --zazu-shadow-float: 0 8px 24px color-mix(in srgb, var(--zazu-ink) 10%, transparent);
-}
-
-:root[data-theme="dark"] {
-    --zazu-shadow-soft: 0 1px 2px rgba(0, 0, 0, 0.22);
-    --zazu-shadow-float: 0 10px 28px rgba(0, 0, 0, 0.24);
-}
 
 .zazu-command-band,
 .zazu-card,
@@ -5499,148 +5489,7 @@ html[data-theme="dark"] .zazu-public-party,html[data-theme="dark"] .zazu-public-
     }
 }
 
-/* Zazu Operational Premium UI pass — 2026-09-28 */
-:root {
-    color-scheme: light;
 
-    /* Soft blue product system */
-    --zazu-page: #F2F7FF;
-    --zazu-page-deep: #C2DCFF;
-
-    /* Navigation rail */
-    --zazu-sidebar: #F2F7FF;
-    --zazu-sidebar-ink: #17315A;
-    --zazu-sidebar-muted: #405C7E;
-    --zazu-sidebar-label: #5A7598;
-    --zazu-sidebar-hover: #DDEBFF;
-    --zazu-sidebar-active: #FFFFFF;
-    --zazu-sidebar-surface: #FFFFFF;
-
-    /* Surfaces */
-    --zazu-surface: #FFFFFF;
-    --zazu-surface-2: #F2F7FF;
-    --zazu-surface-3: #F7FAFF;
-    --zazu-field: #FFFFFF;
-
-    /* Typography */
-    --zazu-ink: #17315A;
-    --zazu-ink-2: #29496B;
-    --zazu-muted: #405C7E;
-    --zazu-faint: #5A7598;
-    --zazu-nav-label: #5A7598;
-
-    /* Structure */
-    --zazu-border: #C2DCFF;
-    --zazu-border-strong: #9EC8FF;
-
-    /* Brand / actions */
-    --zazu-primary: #5592FC;
-    --zazu-primary-light: #6FA4FF;
-    --zazu-primary-pale: #9EC8FF;
-    --zazu-primary-shadow: #C2DCFF;
-    --zazu-primary-deep: #416AD7;
-    --zazu-primary-hover: #416AD7;
-    --zazu-primary-soft: #F2F7FF;
-    --zazu-primary-ink: #FFFFFF;
-    --zazu-link: #416AD7;
-    --zazu-link-hover: #3158B8;
-    --zazu-nav-active: #5592FC;
-
-    /* Semantic */
-    --zazu-accent: #416AD7;
-    --zazu-accent-ink: #3158B8;
-    --zazu-accent-soft: #E7EFFF;
-    --zazu-focus: #5592FC;
-
-    --zazu-success: #247A63;
-    --zazu-success-ink: #1C624F;
-    --zazu-success-soft: #E3F4EE;
-    --zazu-warning: #8A641E;
-    --zazu-warning-ink: #694A14;
-    --zazu-warning-soft: #FFF3D9;
-    --zazu-danger: #B44D5B;
-    --zazu-danger-ink: #8E3847;
-    --zazu-danger-soft: #FBE8EB;
-    --zazu-info: #416AD7;
-    --zazu-info-ink: #3158B8;
-    --zazu-info-soft: #E7EFFF;
-
-    /* Elevation / shape / motion */
-    --zazu-shadow: 0 1px 2px rgba(23, 49, 90, 0.035);
-    --zazu-shadow-strong: 0 4px 14px rgba(23, 49, 90, 0.07);
-
-    --zazu-radius-sm: 2px;
-    --zazu-radius-md: 4px;
-    --zazu-radius-lg: 6px;
-    --zazu-radius-xl: 6px;
-    --zazu-radius-pill: 999px;
-
-    --zazu-motion-fast: 120ms;
-    --zazu-motion-base: 160ms;
-    --zazu-motion-slow: 220ms;
-    --zazu-ease: cubic-bezier(0.2, 0, 0.38, 0.9);
-}
-:root[data-theme="dark"] {
-    color-scheme: dark;
-
-    --zazu-page: #0D1F3A;
-    --zazu-page-deep: #09172B;
-
-    --zazu-sidebar: #10294B;
-    --zazu-sidebar-ink: #F2F7FF;
-    --zazu-sidebar-muted: #C2DCFF;
-    --zazu-sidebar-label: #9EC8FF;
-    --zazu-sidebar-hover: #173A67;
-    --zazu-sidebar-active: #1D4380;
-    --zazu-sidebar-surface: #14335D;
-
-    --zazu-surface: #102743;
-    --zazu-surface-2: #153252;
-    --zazu-surface-3: #1B3E68;
-    --zazu-field: #0C1D35;
-
-    --zazu-ink: #F2F7FF;
-    --zazu-ink-2: #DCEAFF;
-    --zazu-muted: #C2DCFF;
-    --zazu-faint: #9EC8FF;
-    --zazu-nav-label: #9EC8FF;
-
-    --zazu-border: #31588C;
-    --zazu-border-strong: #6FA4FF;
-
-    --zazu-primary: #6FA4FF;
-    --zazu-primary-light: #9EC8FF;
-    --zazu-primary-pale: #9EC8FF;
-    --zazu-primary-shadow: #31588C;
-    --zazu-primary-deep: #9EC8FF;
-    --zazu-primary-hover: #9EC8FF;
-    --zazu-primary-soft: #1A3D68;
-    --zazu-primary-ink: #0D1F3A;
-    --zazu-link: #9EC8FF;
-    --zazu-link-hover: #C2DCFF;
-    --zazu-nav-active: #6FA4FF;
-
-    --zazu-accent: #9EC8FF;
-    --zazu-accent-ink: #C2DCFF;
-    --zazu-accent-soft: #1A3D68;
-    --zazu-focus: #9EC8FF;
-
-    --zazu-success: #59B69A;
-    --zazu-success-ink: #76CAAE;
-    --zazu-success-soft: #193A31;
-    --zazu-warning: #D7AD67;
-    --zazu-warning-ink: #E6C184;
-    --zazu-warning-soft: #3A3121;
-    --zazu-danger: #DE9292;
-    --zazu-danger-ink: #EFAAAA;
-    --zazu-danger-soft: #42292A;
-    --zazu-info: #6FA4FF;
-    --zazu-info-ink: #C2DCFF;
-    --zazu-info-soft: #1A3D68;
-
-    --zazu-shadow: 0 1px 2px rgba(0,0,0,.24), 0 8px 24px rgba(0,0,0,.18);
-    --zazu-shadow-strong: 0 4px 14px rgba(0,0,0,.24);
-}
 .zazu-sidebar { width:232px; flex-basis:232px; box-shadow:none; }
 .zazu-brand { height:64px; min-height:64px; padding-inline:16px; }
 .zazu-brand-word { font-size:1.35rem; }
