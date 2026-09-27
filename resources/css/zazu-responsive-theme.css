@@ -1,0 +1,298 @@
+/* Zazu responsive + colour calibration pass
+   Research basis: neutral surfaces, restrained brand colour, WCAG contrast.
+   Loaded after app.css so the existing component architecture stays intact.
+*/
+
+:root {
+    color-scheme: light;
+
+    --zazu-page: #e8f0f5;
+    --zazu-page-deep: #dfe9f0;
+
+    --zazu-sidebar: #dbe8f1;
+    --zazu-sidebar-ink: #1e3444;
+    --zazu-sidebar-muted: #466174;
+    --zazu-sidebar-label: #5d7586;
+    --zazu-sidebar-hover: #cfe0eb;
+    --zazu-sidebar-active: #f0f5f8;
+    --zazu-sidebar-surface: #e7eff4;
+
+    --zazu-surface: #f2f6f9;
+    --zazu-surface-2: #e7eff4;
+    --zazu-surface-3: #edf3f6;
+    --zazu-field: #eef3f6;
+
+    --zazu-ink: #203344;
+    --zazu-ink-2: #385266;
+    --zazu-muted: #4e687a;
+    --zazu-faint: #617b8c;
+    --zazu-nav-label: #5d7586;
+
+    --zazu-border: #c1d1dc;
+    --zazu-border-strong: #8099aa;
+
+    --zazu-primary: #2472b5;
+    --zazu-primary-hover: #1d639e;
+    --zazu-primary-soft: #dcebf7;
+    --zazu-primary-ink: #ffffff;
+    --zazu-link: #216da9;
+    --zazu-link-hover: #185987;
+    --zazu-nav-active: #2472b5;
+
+    --zazu-accent: #a36d36;
+    --zazu-accent-ink: #754719;
+    --zazu-accent-soft: #f3e7d9;
+    --zazu-focus: #2472b5;
+
+    --zazu-shadow: 0 1px 2px rgba(35, 58, 75, 0.05), 0 8px 22px rgba(35, 58, 75, 0.06);
+    --zazu-shadow-strong: 0 5px 14px rgba(35, 58, 75, 0.08), 0 16px 34px rgba(35, 58, 75, 0.09);
+}
+
+:root[data-theme="dark"] {
+    color-scheme: dark;
+
+    --zazu-page: #1a2732;
+    --zazu-page-deep: #16232d;
+
+    --zazu-sidebar: #203744;
+    --zazu-sidebar-ink: #eef5f8;
+    --zazu-sidebar-muted: #bfd0da;
+    --zazu-sidebar-label: #9eb5c3;
+    --zazu-sidebar-hover: #294653;
+    --zazu-sidebar-active: #2b4d60;
+    --zazu-sidebar-surface: #263f4d;
+
+    --zazu-surface: #223542;
+    --zazu-surface-2: #2a3f4d;
+    --zazu-surface-3: #304958;
+    --zazu-field: #1f313d;
+
+    --zazu-ink: #eef5f8;
+    --zazu-ink-2: #d5e3ea;
+    --zazu-muted: #b8cbd6;
+    --zazu-faint: #9fb6c4;
+    --zazu-nav-label: #9eb5c3;
+
+    --zazu-border: #3a5261;
+    --zazu-border-strong: #668091;
+
+    --zazu-primary: #6bb5e8;
+    --zazu-primary-hover: #82c3ed;
+    --zazu-primary-soft: #284b63;
+    --zazu-primary-ink: #132631;
+    --zazu-link: #7fc1eb;
+    --zazu-link-hover: #9dd2f2;
+    --zazu-nav-active: #6bb5e8;
+
+    --zazu-accent: #d5aa72;
+    --zazu-accent-ink: #ebc48f;
+    --zazu-accent-soft: #443726;
+    --zazu-focus: #82c3ed;
+
+    --zazu-shadow: 0 1px 2px rgba(0, 0, 0, 0.18), 0 10px 26px rgba(0, 0, 0, 0.16);
+    --zazu-shadow-strong: 0 5px 14px rgba(0, 0, 0, 0.22), 0 18px 36px rgba(0, 0, 0, 0.18);
+}
+
+html,
+body,
+.zazu-shell,
+.zazu-main {
+    background: var(--zazu-page);
+}
+
+.zazu-topbar {
+    background: color-mix(in srgb, var(--zazu-page) 94%, var(--zazu-surface));
+}
+
+.zazu-topbar-inner {
+    min-height: 64px;
+}
+
+.zazu-command-band,
+.zazu-card,
+.zazu-panel,
+.zazu-form-section,
+.zazu-module,
+.zazu-metric-card,
+.zazu-toast {
+    background: var(--zazu-surface);
+}
+
+.zazu-input,
+.zazu-select,
+.zazu-textarea {
+    background: var(--zazu-field);
+}
+
+.zazu-btn-primary {
+    background: var(--zazu-primary);
+    border-color: var(--zazu-primary);
+}
+
+.zazu-btn-primary:hover {
+    background: var(--zazu-primary-hover);
+    border-color: var(--zazu-primary-hover);
+}
+
+.zazu-primary,
+.zazu-sea-accent,
+.zazu-link {
+    color: var(--zazu-primary);
+}
+
+/* Compact mobile navigation. The full navigation remains unchanged on desktop. */
+.zazu-mobile-nav {
+    position: relative;
+}
+
+.zazu-mobile-toggle {
+    display: none;
+}
+
+@media (max-width: 820px) {
+    .zazu-topbar {
+        position: sticky;
+        top: 0;
+        z-index: 60;
+        backdrop-filter: blur(14px);
+    }
+
+    .zazu-topbar-inner {
+        min-height: 54px;
+        padding: 7px 12px;
+    }
+
+    .zazu-page-title {
+        font-size: 1.08rem;
+    }
+
+    .zazu-workspace-name {
+        display: none;
+    }
+
+    .zazu-header-title-row {
+        min-width: 0;
+    }
+
+    .zazu-topbar-actions {
+        gap: 6px;
+    }
+
+    .zazu-user-identity,
+    .zazu-user-chevron,
+    .zazu-header-settings {
+        display: none;
+    }
+
+    .zazu-user-trigger {
+        width: 36px;
+        min-height: 36px;
+        padding: 2px;
+        border-radius: 9px;
+    }
+
+    .zazu-theme-toggle {
+        width: 36px;
+        height: 36px;
+    }
+
+    .zazu-mobile-nav {
+        display: block;
+        min-height: 0;
+        padding: 6px 10px;
+        border-bottom: 1px solid var(--zazu-border);
+        background: color-mix(in srgb, var(--zazu-surface) 96%, var(--zazu-primary-soft));
+    }
+
+    .zazu-mobile-toggle {
+        width: 100%;
+        min-height: 36px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 10px;
+        padding: 0 10px;
+        border: 1px solid var(--zazu-border);
+        border-radius: 9px;
+        background: var(--zazu-surface-2);
+        color: var(--zazu-ink);
+        font: inherit;
+        font-size: 12px;
+        font-weight: 750;
+        cursor: pointer;
+    }
+
+    .zazu-mobile-toggle:hover {
+        border-color: var(--zazu-primary);
+        background: var(--zazu-primary-soft);
+    }
+
+    .zazu-mobile-toggle-icon {
+        width: 18px;
+        height: 18px;
+        flex: 0 0 18px;
+        display: grid;
+        place-items: center;
+        color: var(--zazu-primary);
+        transition: transform 160ms ease;
+    }
+
+    .zazu-mobile-nav.is-open .zazu-mobile-toggle-icon {
+        transform: rotate(180deg);
+    }
+
+    .zazu-mobile-links {
+        display: none;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 5px;
+        margin-top: 6px;
+        padding-bottom: 2px;
+    }
+
+    .zazu-mobile-nav.is-open .zazu-mobile-links {
+        display: grid;
+    }
+
+    .zazu-mobile-link {
+        min-height: 38px;
+        justify-content: flex-start;
+        padding: 0 10px;
+        border: 1px solid transparent;
+        border-radius: 8px;
+        background: transparent;
+        color: var(--zazu-muted);
+        font-size: 11px;
+        font-weight: 700;
+    }
+
+    .zazu-mobile-link.active {
+        background: var(--zazu-primary-soft);
+        border-color: color-mix(in srgb, var(--zazu-primary) 28%, var(--zazu-border));
+        color: var(--zazu-primary);
+        box-shadow: none;
+    }
+
+    .zazu-content {
+        padding: 16px 14px 34px;
+    }
+}
+
+@media (max-width: 420px) {
+    .zazu-topbar-inner {
+        padding-inline: 9px;
+    }
+
+    .zazu-content {
+        padding-inline: 11px;
+    }
+
+    .zazu-mobile-nav {
+        padding-inline: 8px;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .zazu-mobile-toggle-icon {
+        transition: none;
+    }
+}
