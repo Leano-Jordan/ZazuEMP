@@ -47,7 +47,7 @@
         </div>
 
         @if ($events->count())
-            <div class="zazu-record-header" style="--zazu-record-cols: 2">
+            <div class="zazu-record-header" data-record-cols="2">
                 <div class="zazu-record-header-note">Work item</div>
                 <div class="zazu-record-header-cell">Schedule</div>
                 <div class="zazu-record-header-cell">Actions</div>
