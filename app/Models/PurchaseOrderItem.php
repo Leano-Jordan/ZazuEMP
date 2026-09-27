@@ -19,5 +19,6 @@ class PurchaseOrderItem extends Model
     }
 
     public function purchaseOrder(): BelongsTo { return $this->belongsTo(PurchaseOrder::class); }
+    public function inventoryMovements(): HasMany { return $this->hasMany(InventoryMovement::class); }
     public function capability(): BelongsTo { return $this->belongsTo(BusinessCapability::class); }
 }
