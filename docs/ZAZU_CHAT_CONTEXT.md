@@ -57,11 +57,10 @@ Non-blocking warnings:
 
 Do not derail development to fix those warnings.
 
-Temporary Laravel skeleton:
-C:\Projects\ZazuEMP-LaravelTemp
-
-Real working project:
+Canonical working project:
 C:\Projects\ZazuEMP
+
+Do not use or modify similarly named temporary, backup, copied, parent, or sibling folders as the Zazu implementation workspace.
 
 Git history must remain protected.
 
