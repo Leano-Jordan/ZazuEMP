@@ -5775,3 +5775,79 @@ html[data-theme="dark"] .zazu-public-party,html[data-theme="dark"] .zazu-public-
         transition: none !important;
     }
 }
+
+
+/* Shared confirmation surface and compact multi-currency metrics */
+.zazu-confirm-dialog {
+    width: min(460px, calc(100vw - 28px));
+    max-width: 460px;
+    padding: 0;
+    border: 1px solid var(--zazu-border);
+    border-radius: var(--zazu-radius-lg);
+    background: var(--zazu-surface);
+    color: var(--zazu-ink);
+    box-shadow: var(--zazu-shadow-strong);
+}
+
+.zazu-confirm-dialog::backdrop {
+    background: color-mix(in srgb, #0D1F3A 38%, transparent);
+}
+
+.zazu-confirm-panel {
+    margin: 0;
+    padding: 20px;
+}
+
+.zazu-confirm-title {
+    margin-top: 5px;
+    color: var(--zazu-ink);
+    font-size: 16px;
+    font-weight: 750;
+    letter-spacing: -.015em;
+}
+
+.zazu-confirm-message {
+    margin-top: 7px;
+    color: var(--zazu-muted);
+    font-size: 12px;
+    line-height: 1.6;
+}
+
+.zazu-confirm-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 8px;
+    margin-top: 18px;
+}
+
+.zazu-btn-danger {
+    border-color: var(--zazu-danger);
+    background: var(--zazu-danger);
+    color: #FFFFFF;
+}
+
+.zazu-btn-danger:hover {
+    background: var(--zazu-danger-ink);
+    border-color: var(--zazu-danger-ink);
+}
+
+.zazu-metric-currency-stack {
+    display: grid;
+    gap: 4px;
+    margin-top: 7px;
+}
+
+.zazu-metric-currency-stack .zazu-metric-value {
+    margin-top: 0;
+    font-size: 1.2rem;
+}
+
+@container zazu-surface (max-width: 360px) {
+    .zazu-confirm-actions {
+        justify-content: stretch;
+    }
+
+    .zazu-confirm-actions .zazu-btn {
+        flex: 1 1 0;
+    }
+}
