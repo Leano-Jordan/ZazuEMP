@@ -24,7 +24,7 @@
                     <option value="">No quote</option>
                     @foreach($quotes as $quote)
                         <option value="{{ $quote->id }}" @selected(old('quote_id') == $quote->id)>
-                            {{ $quote->reference }} · {{ $quote->status }} · {{ $quote->event?->customer?->name }} · {{ $quote->currency }} {{ number_format((float)($quote->latestVersion?->total ?? 0),2) }}
+                            {{ $quote->reference }} · {{ $quote->status }} · {{ $quote->event?->customer?->name }} · {{ $quote->currency }} {{ $quote->latestVersion?->total ?? '0.00' }}
                         </option>
                     @endforeach
                 </select>
