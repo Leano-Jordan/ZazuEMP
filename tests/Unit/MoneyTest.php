@@ -21,6 +21,12 @@ class MoneyTest extends TestCase
         Money::toCents('25.501');
     }
 
+    public function test_display_formatting_preserves_exact_cents_and_adds_separators(): void
+    {
+        $this->assertSame('12,500.00', Money::formatCents(1250000));
+        $this->assertSame('1,000.01', Money::formatCents(100001));
+    }
+
     public function test_quantity_and_unit_price_are_multiplied_and_rounded_to_cents(): void
     {
         $this->assertSame(255000, Money::multiplyQuantityByPrice(10000, 2550));
