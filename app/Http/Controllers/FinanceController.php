@@ -181,6 +181,7 @@ class FinanceController extends Controller
         abort_unless(count($invoiceLines) > 0, 422, 'The invoice must contain at least one line.');
 
         $customer = $event?->customer;
+        $quoteVersionId = $quote?->latestVersion?->id;
 
         $invoice = DB::transaction(function () use (
             $business,
@@ -188,6 +189,7 @@ class FinanceController extends Controller
             $data,
             $event,
             $customer,
+            $quoteVersionId,
             $currency,
             $subtotal,
             $tax,
@@ -203,7 +205,7 @@ class FinanceController extends Controller
                 'business_id' => $businessId,
                 'event_id' => $event?->id,
                 'quote_id' => $data['quote_id'] ?? null,
-                'quote_version_id' => $quote?->latestVersion?->id,
+                'quote_version_id' => $quoteVersionId,
                 'number' => 'INV-'.now()->format('Ym').'-'.Str::upper(Str::random(6)),
                 'business_legal_name' => $business->taxProfile?->legal_name ?: $business->name,
                 'business_trading_name' => $business->taxProfile?->trading_name ?: $business->name,

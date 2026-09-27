@@ -87,9 +87,9 @@ class ErrorHandlingTest extends TestCase
         $this->assertSame('DB-001', $response->headers->get('X-Zazu-Error-Code'));
     }
 
-    public function test_response_only_500_gets_an_application_error_code(): void
+    public function test_http_500_exception_gets_an_application_error_code(): void
     {
-        Route::get('/__zazu-test-response-500', fn () => response('failure', 500))->middleware('web');
+        Route::get('/__zazu-test-response-500', fn () => abort(500))->middleware('web');
 
         $response = $this->get('/__zazu-test-response-500');
 

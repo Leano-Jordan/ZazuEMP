@@ -218,8 +218,6 @@ class FinancePurchasingInventoryTest extends TestCase
             'currency' => 'ZAR',
         ]);
 
-        $this->actingAs($user);
-
         $asset = \App\Models\Asset::create([
             'business_id' => $otherBusiness->id,
             'asset_tag' => 'OTHER-001',
@@ -238,7 +236,8 @@ class FinancePurchasingInventoryTest extends TestCase
             'status' => 'draft',
         ]);
 
-        $this->post(route('assets.allocate', $asset), [
+        $this->actingAs($user)
+            ->post(route('assets.allocate', $asset), [
             'event_id' => $event->id,
             'allocated_from' => now()->toDateString(),
         ])->assertNotFound();
