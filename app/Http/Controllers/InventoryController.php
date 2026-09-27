@@ -58,7 +58,7 @@ class InventoryController extends Controller
         $businessId=app(CurrentBusiness::class)->id($request->user());
         abort_unless((int)$inventoryItem->business_id===$businessId,404);
         $data=$request->validate([
-            'idempotency_key'=>['required','uuid'],
+            'idempotency_key'=>['nullable','uuid'],
             'type'=>['required','in:receipt,issue,return,adjustment_in,adjustment_out'],
             'quantity'=>['required','numeric','gt:0'],'unit_cost'=>['required','numeric','min:0'],
             'movement_date'=>['required','date'],'reference'=>['nullable','string','max:255'],'notes'=>['nullable','string'],
@@ -67,6 +67,8 @@ class InventoryController extends Controller
         if (!empty($data['event_id'])) {
             abort_unless(Event::where('business_id',$businessId)->whereKey($data['event_id'])->exists(), 404);
         }
+
+        $data['idempotency_key'] ??= (string) \Illuminate\Support\Str::uuid();
 
         $existingMovement = \App\Models\InventoryMovement::query()
             ->where('business_id', $businessId)
