@@ -380,6 +380,12 @@ class FinanceController extends Controller
 
             abort_if(in_array($invoice->status, ['paid', 'void'], true), 422, 'This invoice cannot accept another payment.');
 
+            abort_if(
+                $invoice->payments->contains(fn ($payment) => $payment->currency !== $invoice->currency),
+                409,
+                'This invoice contains a payment recorded in a different currency. Review the payment history before continuing.'
+            );
+
             $totalCents = Money::toCents((string) $invoice->total);
             $paidCents = $invoice->payments->sum(fn ($payment) => Money::toCents((string) $payment->amount));
             $paymentCents = Money::toCents((string) $data['amount']);
