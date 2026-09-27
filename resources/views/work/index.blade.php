@@ -75,7 +75,7 @@
                 </div>
                 <div class="zazu-action-group">
                     <a href="{{ route('work.edit', $event) }}" class="zazu-btn zazu-btn-ghost">Edit</a>
-                    <form method="POST" action="{{ route('work.destroy', $event) }}" onsubmit="return confirm('Remove this work from active operations? Historical records will be retained.')">
+                    <form method="POST" action="{{ route('work.destroy', $event) }}" data-zazu-confirm="Remove this work from active operations? Historical records will be retained." data-zazu-confirm-title="Remove work?">
                         @csrf @method('DELETE')
                         <button type="submit" class="zazu-btn zazu-btn-ghost text-[var(--zazu-danger-ink)]">Remove</button>
                     </form>
