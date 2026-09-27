@@ -18,7 +18,7 @@ class ZazuBackupCommand extends Command
         File::ensureDirectoryExists($directory);
 
         $stamp = now()->format('Ymd_His');
-        $work = storage_path('app/private/.zazu-backup-'.$stamp);
+        $work = storage_path('app/.zazu-backup-'.$stamp);
         File::ensureDirectoryExists($work);
 
         try {
