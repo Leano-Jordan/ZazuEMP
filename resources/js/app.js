@@ -137,9 +137,10 @@ document.querySelectorAll('[data-user-menu]').forEach((menu) => {
 
     if (!trigger || !popover) return;
 
-    const close = () => {
+    const close = (restoreFocus = false) => {
         popover.hidden = true;
         trigger.setAttribute('aria-expanded', 'false');
+        if (restoreFocus) trigger.focus();
     };
 
     trigger.addEventListener('click', (event) => {
@@ -156,7 +157,7 @@ document.querySelectorAll('[data-user-menu]').forEach((menu) => {
 
     document.addEventListener('click', close);
     document.addEventListener('keydown', (event) => {
-        if (event.key === 'Escape') close();
+        if (event.key === 'Escape') close(true);
     });
 });
 
@@ -392,10 +393,18 @@ function setupZazuHelper() {
     });
 }
 
+function setupZazuBusinessSwitcher() {
+    document.querySelectorAll('[data-business-switch]').forEach((select) => {
+        select.addEventListener('change', () => select.form?.requestSubmit());
+    });
+}
+
 if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', setupZazuHelper);
+        setupZazuBusinessSwitcher();
 } else {
     setupZazuHelper();
+    setupZazuBusinessSwitcher();
 }
 
 
