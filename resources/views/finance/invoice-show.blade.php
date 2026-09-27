@@ -3,7 +3,7 @@
     <x-slot:heading>Invoice {{ $invoice->number }}</x-slot:heading>
     <x-slot:headerAction>
         <a href="{{ route('finance.index') }}" class="zazu-btn zazu-btn-ghost print-hide">← Finance</a>
-        <button type="button" class="zazu-btn zazu-btn-primary print-hide" onclick="window.print()">Print / Save as PDF</button>
+        <button type="button" class="zazu-btn zazu-btn-primary print-hide" data-zazu-print>Print / Save as PDF</button>
     </x-slot:headerAction>
 
     <section class="zazu-document">
