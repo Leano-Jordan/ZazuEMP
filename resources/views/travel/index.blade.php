@@ -42,8 +42,8 @@
                     </div>
                 </div>
                 <div class="zazu-list-side">
-                    <div class="zazu-side-primary">{{ $travel->currency }} {{ number_format((float) $travel->customer_charge, 2) }}</div>
-                    <div class="zazu-side-secondary">Fuel {{ number_format((float) $travel->fuel_cost, 2) }}</div>
+                    <div class="zazu-side-primary">{{ $travel->currency }} {{ $travel->customer_charge }}</div>
+                    <div class="zazu-side-secondary">Fuel {{ $travel->fuel_cost }}</div>
                 </div>
             </div>
         @empty
