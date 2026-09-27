@@ -295,18 +295,22 @@ class FinanceController extends Controller
             'notes' => ['nullable', 'string'],
         ]);
 
-        $existingPayment = Payment::query()
-            ->where('business_id', $businessId)
-            ->where('idempotency_key', $data['idempotency_key'])
-            ->first();
-
-        if ($existingPayment) {
-            return redirect()->route('finance.index')->with('info', 'That payment submission was already processed.');
-        }
-
         $data['idempotency_key'] ??= (string) Str::uuid();
+        $alreadyProcessed = false;
 
-        DB::transaction(function () use ($data, $businessId): void {
+        DB::transaction(function () use ($data, $businessId, &$alreadyProcessed): void {
+            // Serialize business-level idempotency checks so concurrent retries cannot both pass the lookup.
+            AppModelsBusiness::query()->whereKey($businessId)->lockForUpdate()->firstOrFail();
+
+            if (Payment::query()
+                ->where('business_id', $businessId)
+                ->where('idempotency_key', $data['idempotency_key'])
+                ->exists()
+            ) {
+                $alreadyProcessed = true;
+                return;
+            }
+
             $invoice = Invoice::where('business_id', $businessId)
                 ->whereKey($data['invoice_id'])
                 ->with('payments')
