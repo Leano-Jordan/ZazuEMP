@@ -210,7 +210,7 @@ return [
                 'finance.view', 'finance.invoice.create', 'finance.payment.create', 'finance.expense.create',
                 'purchasing.view', 'purchasing.create', 'purchasing.status',
                 'inventory.view', 'inventory.create', 'inventory.movement',
-                'assets.view', 'assets.create', 'assets.allocate', 'assets.release',
+                'assets.view', 'assets.create', 'assets.update', 'assets.allocate', 'assets.release',
                 'suppliers.view', 'suppliers.create',
                 'reports.view', 'capabilities.view',
             ],
