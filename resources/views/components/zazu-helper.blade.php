@@ -191,10 +191,10 @@
 
 @if(!empty($steps))
     <div class="zazu-helper" data-zazu-helper data-zazu-guide-route="{{ $routeName }}" data-zazu-guide-enabled="on">
-        <section id="zazu-helper-panel" class="zazu-helper-panel" data-zazu-helper-panel role="dialog" aria-modal="false" aria-label="Zazu workflow guide" hidden>
+        <section id="zazu-helper-panel" class="zazu-helper-panel" data-zazu-helper-panel role="region" aria-label="Zazu workflow guide" hidden>
             <div class="zazu-helper-kicker">Zazu guide</div>
-            <div class="zazu-helper-title" data-zazu-helper-title>{{ $steps[0]['title'] }}</div>
-            <p class="zazu-helper-copy" data-zazu-helper-copy>{{ $steps[0]['copy'] }}</p>
+            <div class="zazu-helper-title" data-zazu-helper-title aria-live="polite">{{ $steps[0]['title'] }}</div>
+            <p class="zazu-helper-copy" data-zazu-helper-copy aria-live="polite">{{ $steps[0]['copy'] }}</p>
             <div class="zazu-helper-step">
                 <div class="zazu-helper-step-label" data-zazu-helper-step-label>{{ $steps[0]['label'] }}</div>
                 <div data-zazu-helper-count>1 of {{ count($steps) }}</div>
