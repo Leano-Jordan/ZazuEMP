@@ -1,7 +1,9 @@
 import { test, expect } from '@playwright/test';
 
 test('registration flows into catalogue, business setup and dashboard', async ({ page }) => {
-    const unique = Date.now().toString().slice(-6);
+    const unique = (globalThis.crypto?.randomUUID?.() ?? String(Date.now()) + String(Math.random()))
+        .replace(/[^a-zA-Z0-9]/g, '')
+        .slice(-10);
     const username = 'browserowner' + unique;
     const businessName = 'Browser Catering ' + unique;
 
@@ -28,7 +30,7 @@ test('registration flows into catalogue, business setup and dashboard', async ({
     await page.getByRole('button', { name: 'Finish setup' }).click();
 
     await expect(page).toHaveURL(/\/dashboard$/);
-    await expect(page.getByRole('heading', { name: 'Business overview' })).toBeVisible();
+    await expect(page.getByRole('heading', { name: 'What needs attention next?' })).toBeVisible();
     await expect(page.getByTitle('Active business workspace')).toHaveText(businessName);
 
     const helperPanel = page.locator('[data-zazu-helper-panel]');
