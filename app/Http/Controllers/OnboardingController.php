@@ -63,17 +63,23 @@ class OnboardingController extends Controller
 
         $validated = $request->validate([
             'name' => ['required', 'string', 'max:255'],
-            'capability_type' => ['required', 'in:service,rental,product,package,other'],
-            'pricing_basis' => ['required', 'in:custom,fixed,per_unit,per_person,per_hour,per_day'],
+            'capability_type' => ['nullable', 'in:service,rental,product,package,other'],
+            'pricing_basis' => ['nullable', 'in:custom,fixed,per_unit,per_person,per_hour,per_day'],
             'default_price' => ['nullable', 'numeric', 'decimal:0,2', 'min:0'],
             'default_unit' => ['nullable', 'string', 'max:50'],
-            'category' => ['required', 'string', 'max:100', 'in:' . implode(',', $categories)],
+            'category' => ['nullable', 'string', 'max:100', 'in:' . implode(',', $categories)],
             'description' => ['nullable', 'string'],
         ]);
 
         BusinessCapability::create([
-            ...$validated,
             'business_id' => $business->id,
+            'name' => $validated['name'],
+            'capability_type' => $validated['capability_type'] ?? 'service',
+            'pricing_basis' => $validated['pricing_basis'] ?? 'custom',
+            'default_price' => $validated['default_price'] ?? null,
+            'default_unit' => $validated['default_unit'] ?? null,
+            'category' => $validated['category'] ?? null,
+            'description' => $validated['description'] ?? null,
             'currency' => $business->currency ?? 'ZAR',
             'is_active' => true,
         ]);
@@ -147,7 +153,7 @@ class OnboardingController extends Controller
             'address' => ['nullable', 'string', 'max:500'],
             'website' => ['nullable', 'url', 'max:255'],
             'tax_number' => ['nullable', 'string', 'max:100'],
-            'currency' => ['required', 'in:' . implode(',', array_keys(config('zazu.currencies')))],
+            'currency' => ['nullable', 'in:' . implode(',', array_keys(config('zazu.currencies')))],
         ]);
 
         $business->update($validated + [
