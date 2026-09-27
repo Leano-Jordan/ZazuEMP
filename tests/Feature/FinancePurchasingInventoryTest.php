@@ -83,6 +83,34 @@ class FinancePurchasingInventoryTest extends TestCase
         ]);
     }
 
+    public function test_purchase_order_idempotency_prevents_duplicate_supplier_commitment(): void
+    {
+        [$business, $user] = $this->businessUser();
+        $this->actingAs($user);
+
+        $supplier = \App\Models\Supplier::create([
+            'business_id' => $business->id,
+            'name' => 'Idempotent Supplier',
+        ]);
+
+        $payload = [
+            'idempotency_key' => (string) \Illuminate\Support\Str::uuid(),
+            'supplier_id' => $supplier->id,
+            'currency' => 'ZAR',
+            'description' => ['Chicken'],
+            'quantity' => ['10'],
+            'unit' => ['kg'],
+            'unit_price' => ['85.00'],
+            'capability_id' => [''],
+        ];
+
+        $this->post(route('purchasing.store'), $payload)->assertRedirect();
+        $this->post(route('purchasing.store'), $payload)->assertRedirect();
+
+        $this->assertDatabaseCount('purchase_orders', 1);
+        $this->assertDatabaseHas('audit_logs', ['action' => 'purchasing.order.created', 'business_id' => $business->id]);
+    }
+
     public function test_finance_dashboard_totals_include_records_beyond_display_limit(): void
     {
         [$business, $user] = $this->businessUser();
