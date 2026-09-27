@@ -20,8 +20,21 @@ final class Money
         }
 
         [$whole, $fraction] = array_pad(explode('.', $value, 2), 2, '');
+        $wholeInteger = (int) $whole;
+        $fractionInteger = (int) str_pad($fraction, 2, '0');
 
-        return ((int) $whole * 100) + (int) str_pad($fraction, 2, '0');
+        if (
+            (string) $wholeInteger !== ltrim($whole, '0')
+            && trim($whole, '0') !== ''
+        ) {
+            throw new InvalidArgumentException('Amount exceeds the supported calculation range.');
+        }
+
+        if ($wholeInteger > intdiv(PHP_INT_MAX - $fractionInteger, 100)) {
+            throw new InvalidArgumentException('Amount exceeds the supported calculation range.');
+        }
+
+        return ($wholeInteger * 100) + $fractionInteger;
     }
 
     public static function multiplyQuantityByPrice(int $quantityHundredths, int $unitPriceCents): int
