@@ -4,6 +4,7 @@ namespace Tests\Feature;
 
 use App\Models\Business;
 use App\Models\BusinessCapability;
+use App\Models\Supplier;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
@@ -12,7 +13,35 @@ class OnboardingTest extends TestCase
 {
     use RefreshDatabase;
 
-    public function test_owner_can_save_catalogue_setup_without_a_currency_field(): void
+    public function test_owner_can_save_catalogue_setup_with_minimum_information(): void
+    {
+        $business = Business::create([
+            'name' => 'Small Catering Business',
+            'slug' => 'small-catering-business',
+            'status' => 'active',
+            'currency' => 'ZAR',
+        ]);
+
+        $this->signInAsOwner($business);
+
+        $response = $this->post(route('onboarding.catalogue.store'), [
+            'name' => 'Wedding catering',
+        ]);
+
+        $response->assertRedirect(route('onboarding.business'));
+
+        $this->assertDatabaseHas('business_capabilities', [
+            'business_id' => $business->id,
+            'name' => 'Wedding catering',
+            'capability_type' => 'service',
+            'pricing_basis' => 'custom',
+            'currency' => 'ZAR',
+        ]);
+
+        $this->assertNotNull($business->fresh()->catalogue_setup_completed_at);
+    }
+
+    public function test_owner_can_save_catalogue_setup_with_optional_details(): void
     {
         $business = Business::create([
             'name' => 'Onboarding Business',
@@ -75,6 +104,27 @@ class OnboardingTest extends TestCase
         $this->assertNull($business->fresh()->catalogue_setup_skipped_at);
     }
 
+    public function test_business_setup_can_finish_with_only_the_existing_business_name(): void
+    {
+        $business = Business::create([
+            'name' => 'Lean Business',
+            'slug' => 'lean-business',
+            'status' => 'active',
+            'currency' => 'ZAR',
+        ]);
+
+        $this->signInAsOwner($business);
+
+        $this->post(route('onboarding.business'), [
+            'name' => 'Lean Business',
+        ])->assertRedirect(route('dashboard'));
+
+        $business->refresh();
+
+        $this->assertNotNull($business->business_setup_completed_at);
+        $this->assertSame('ZAR', $business->currency);
+    }
+
     public function test_business_skip_is_deferred_and_can_be_resumed(): void
     {
         $business = Business::create([
@@ -132,5 +182,36 @@ class OnboardingTest extends TestCase
             ->assertForbidden();
 
         $this->assertDatabaseCount('business_capabilities', 0);
+    }
+
+    public function test_dashboard_stays_lean_until_resource_data_exists(): void
+    {
+        $business = Business::create([
+            'name' => 'Lean Dashboard Business',
+            'slug' => 'lean-dashboard-business',
+            'status' => 'active',
+            'currency' => 'ZAR',
+        ]);
+
+        $this->signInAsOwner($business);
+
+        $this->get(route('dashboard'))
+            ->assertOk()
+            ->assertSee('Services & prices')
+            ->assertSee('Jobs')
+            ->assertSee('Customers')
+            ->assertSee('Quotes')
+            ->assertDontSee('Purchase orders')
+            ->assertDontSee('Inventory')
+            ->assertDontSee('Assets');
+
+        Supplier::create([
+            'business_id' => $business->id,
+            'name' => 'Fresh Supplier',
+        ]);
+
+        $this->get(route('dashboard'))
+            ->assertOk()
+            ->assertSee('Purchasing');
     }
 }
