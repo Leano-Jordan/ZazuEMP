@@ -156,6 +156,10 @@ class OnboardingController extends Controller
             'currency' => ['nullable', 'in:' . implode(',', array_keys(config('zazu.currencies')))],
         ]);
 
+        if (($validated['currency'] ?? null) === null) {
+            unset($validated['currency']);
+        }
+
         $business->update($validated + [
             'business_setup_completed_at' => now(),
             'business_setup_skipped_at' => null,
