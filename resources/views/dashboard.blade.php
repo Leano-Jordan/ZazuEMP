@@ -59,7 +59,7 @@
 
         <section class="zazu-panel">
             <div class="zazu-panel-title">Quick access</div>
-            <div class="zazu-panel-copy">Open a business area quickly.</div>
+            <div class="zazu-panel-copy">Open the areas you use most.</div>
             @php
                 $quickAccess = [
                     ['label' => 'Services & prices', 'route' => 'capabilities.index'],
@@ -67,6 +67,18 @@
                     ['label' => 'Customers', 'route' => 'customers.index'],
                     ['label' => 'Quotes', 'route' => 'quotes.index'],
                 ];
+                if ($workspaceTools['finance']) {
+                    $quickAccess[] = ['label' => 'Finance', 'route' => 'finance.index'];
+                }
+                if ($workspaceTools['purchasing']) {
+                    $quickAccess[] = ['label' => 'Purchasing', 'route' => 'purchasing.index'];
+                }
+                if ($workspaceTools['inventory']) {
+                    $quickAccess[] = ['label' => 'Inventory', 'route' => 'inventory.index'];
+                }
+                if ($workspaceTools['assets']) {
+                    $quickAccess[] = ['label' => 'Assets', 'route' => 'assets.index'];
+                }
                 if ($isOwner) {
                     $quickAccess[] = ['label' => 'Settings', 'route' => 'settings.index'];
                 }
@@ -85,12 +97,23 @@
             ['label' => 'Customers', 'copy' => 'Customer details, contacts and work history.', 'route' => 'customers.index', 'group' => 'Relationships'],
             ['label' => 'Quotes', 'copy' => 'Quotes and pricing history.', 'route' => 'quotes.index', 'group' => 'Commercial'],
             ['label' => 'Calendar', 'copy' => 'Dates and operational timing.', 'route' => 'calendar.index', 'group' => 'Operations'],
-            ['label' => 'Suppliers', 'copy' => 'Buying relationships.', 'route' => 'suppliers.index', 'group' => 'Resources'],
-            ['label' => 'Inventory', 'copy' => 'Stock and movement.', 'route' => 'inventory.index', 'group' => 'Resources'],
-            ['label' => 'Assets', 'copy' => 'Reusable equipment and accountability.', 'route' => 'assets.index', 'group' => 'Resources'],
-            ['label' => 'Reports', 'copy' => 'Business information from your records.', 'route' => 'reports.index', 'group' => 'Insights'],
             ['label' => 'Services & prices', 'copy' => 'Your reusable services, rentals and usual prices.', 'route' => 'capabilities.index', 'group' => 'Catalogue'],
         ];
+        if ($workspaceTools['finance']) {
+            $modules[] = ['label' => 'Finance', 'copy' => 'Invoices, payments and business expenses.', 'route' => 'finance.index', 'group' => 'Commercial'];
+        }
+        if ($workspaceTools['purchasing']) {
+            $modules[] = ['label' => 'Purchasing', 'copy' => 'Suppliers and purchase orders.', 'route' => 'purchasing.index', 'group' => 'Resources'];
+        }
+        if ($workspaceTools['inventory']) {
+            $modules[] = ['label' => 'Inventory', 'copy' => 'Stock and movement history.', 'route' => 'inventory.index', 'group' => 'Resources'];
+        }
+        if ($workspaceTools['assets']) {
+            $modules[] = ['label' => 'Assets', 'copy' => 'Reusable equipment and accountability.', 'route' => 'assets.index', 'group' => 'Resources'];
+        }
+        if ($workspaceTools['reports']) {
+            $modules[] = ['label' => 'Reports', 'copy' => 'Business information from your recorded activity.', 'route' => 'reports.index', 'group' => 'Insights'];
+        }
         if ($isOwner) {
             $modules[] = ['label' => 'Settings', 'copy' => 'Business and system controls.', 'route' => 'settings.index', 'group' => 'System'];
         }
