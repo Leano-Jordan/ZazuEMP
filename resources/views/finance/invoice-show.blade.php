@@ -65,8 +65,8 @@
                             <td>{{ $item->description }}</td>
                             <td>{{ $item->quantity }}</td>
                             <td>{{ $item->unit ?: '—' }}</td>
-                            <td class="text-right">{{ $invoice->currency }} {{ number_format((float)$item->unit_price, 2) }}</td>
-                            <td class="text-right">{{ $invoice->currency }} {{ number_format((float)$item->line_total, 2) }}</td>
+                            <td class="text-right">{{ $invoice->currency }} {{ $item->unit_price }}</td>
+                            <td class="text-right">{{ $invoice->currency }} {{ $item->line_total }}</td>
                         </tr>
                     @endforeach
                 </tbody>
@@ -74,9 +74,9 @@
         </div>
 
         <section class="zazu-document-total">
-            <div class="zazu-document-total-row"><span>Subtotal</span><strong>{{ $invoice->currency }} {{ number_format((float)$invoice->subtotal, 2) }}</strong></div>
-            <div class="zazu-document-total-row"><span>{{ $invoice->tax_label ?: 'Tax' }} @if((float)$invoice->tax_rate > 0) ({{ $invoice->tax_rate }}%) @endif</span><strong>{{ $invoice->currency }} {{ number_format((float)$invoice->tax_total, 2) }}</strong></div>
-            <div class="zazu-document-total-row zazu-document-total-grand"><span>Total</span><strong>{{ $invoice->currency }} {{ number_format((float)$invoice->total, 2) }}</strong></div>
+            <div class="zazu-document-total-row"><span>Subtotal</span><strong>{{ $invoice->currency }} {{ $invoice->subtotal }}</strong></div>
+            <div class="zazu-document-total-row"><span>{{ $invoice->tax_label ?: 'Tax' }} @if((float)$invoice->tax_rate > 0) ({{ $invoice->tax_rate }}%) @endif</span><strong>{{ $invoice->currency }} {{ $invoice->tax_total }}</strong></div>
+            <div class="zazu-document-total-row zazu-document-total-grand"><span>Total</span><strong>{{ $invoice->currency }} {{ $invoice->total }}</strong></div>
         </section>
 
         @if($invoice->quote_id)
