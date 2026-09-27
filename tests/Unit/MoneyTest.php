@@ -33,6 +33,13 @@ class MoneyTest extends TestCase
         $this->assertSame('25.50', Money::fromCents(2550));
         $this->assertSame(1006, Money::multiplyQuantityByPrice(333, 302));
     }
+    public function test_oversized_money_string_is_rejected(): void
+    {
+        $this->expectException(InvalidArgumentException::class);
+
+        Money::toCents('999999999999999999999999999.99');
+    }
+
     public function test_monetary_multiplication_rejects_overflow(): void
     {
         $this->expectException(InvalidArgumentException::class);
