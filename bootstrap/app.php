@@ -1,12 +1,14 @@
 <?php
 
+use App\Support\ZazuErrorCatalog;
+use App\Support\ZazuIncidentRecorder;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
+use Throwable;
 
 return Application::configure(basePath: dirname(__DIR__))
     ->withRouting(
@@ -26,12 +28,31 @@ return Application::configure(basePath: dirname(__DIR__))
             fn (Request $request) => $request->is('api/*') || $request->expectsJson(),
         );
 
-        $exceptions->render(function (NotFoundHttpException $exception, Request $request) {
+        $exceptions->reportable(function (Throwable $exception): void {
+            ZazuIncidentRecorder::record($exception);
+        });
+
+        $exceptions->render(function (Throwable $exception, Request $request) {
+            if ($request->expectsJson() || $request->is('api/*')) {
+                return null;
+            }
+
+            $definition = ZazuErrorCatalog::for($exception);
+
+            if (in_array($definition['status'], [401, 422], true)) {
+                return null;
+            }
+
             $requestId = $request->attributes->get('zazu_request_id') ?: (string) Str::uuid();
 
-            return response()->view('errors.404', [
+            return response()->view('errors.layout', [
                 'requestId' => $requestId,
-            ], 404)->header('X-Zazu-Request-Id', $requestId);
+                'code' => $definition['code'],
+                'headline' => $definition['headline'],
+                'messageText' => $definition['message'],
+            ], $definition['status'])
+                ->header('X-Zazu-Request-Id', $requestId)
+                ->header('X-Zazu-Error-Code', $definition['code']);
         });
 
         $exceptions->respond(function (Response $response) {
@@ -44,14 +65,20 @@ return Application::configure(basePath: dirname(__DIR__))
                 $response->getStatusCode() < 500
                 || $request->expectsJson()
                 || $request->is('api/*')
+                || $response->headers->has('X-Zazu-Error-Code')
             ) {
                 return $response;
             }
 
-            return response()->view('errors.500', [
+            $definition = ZazuErrorCatalog::forStatus($response->getStatusCode());
+
+            return response()->view('errors.layout', [
                 'requestId' => $requestId,
-                'code' => $response->getStatusCode(),
+                'code' => $definition['code'],
+                'headline' => $definition['headline'],
+                'messageText' => $definition['message'],
             ], $response->getStatusCode())
-                ->header('X-Zazu-Request-Id', $requestId);
+                ->header('X-Zazu-Request-Id', $requestId)
+                ->header('X-Zazu-Error-Code', $definition['code']);
         });
     })->create();

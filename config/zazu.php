@@ -1,6 +1,23 @@
 <?php
 
 return [
+    'errors' => [
+        'AUTH-001' => ['category' => 'Authentication', 'severity' => 'medium', 'status' => 401, 'headline' => 'Sign-in required.', 'message' => 'Please sign in to continue.'],
+        'AUTH-002' => ['category' => 'Authentication', 'severity' => 'medium', 'status' => 419, 'headline' => 'Your session has expired.', 'message' => 'Please refresh the page or sign in again to continue.'],
+        'AUTHZ-001' => ['category' => 'Authorization', 'severity' => 'high', 'status' => 403, 'headline' => 'You do not have permission for that.', 'message' => 'Your current access level does not allow this action.'],
+        'VAL-001' => ['category' => 'Validation', 'severity' => 'low', 'status' => 422, 'headline' => 'Some information needs attention.', 'message' => 'Check the highlighted information and try again.'],
+        'ROUTE-001' => ['category' => 'Routing', 'severity' => 'low', 'status' => 404, 'headline' => 'We could not find that page.', 'message' => 'The page may have moved, the record may no longer exist, or it may belong to another business workspace.'],
+        'ROUTE-002' => ['category' => 'Routing', 'severity' => 'low', 'status' => 405, 'headline' => 'That action is not available here.', 'message' => 'This action is not available for this request.'],
+        'DB-001' => ['category' => 'Database', 'severity' => 'critical', 'status' => 500, 'headline' => 'We could not load or save the requested data.', 'message' => 'Zazu could not complete a database operation. Please try again and use the reference below if the problem continues.'],
+        'BUS-001' => ['category' => 'Business rule', 'severity' => 'medium', 'status' => 409, 'headline' => 'That action conflicts with the current work state.', 'message' => 'Review the record and try again.'],
+        'FILE-001' => ['category' => 'File / storage', 'severity' => 'high', 'status' => 500, 'headline' => 'We could not access that file.', 'message' => 'Zazu could not access the requested file or storage. Please try again.'],
+        'API-001' => ['category' => 'Integration / API', 'severity' => 'high', 'status' => 502, 'headline' => 'A connected service did not respond as expected.', 'message' => 'Please try again. The connected service may be temporarily unavailable.'],
+        'CFG-001' => ['category' => 'Configuration', 'severity' => 'critical', 'status' => 500, 'headline' => 'Zazu could not use a required setting.', 'message' => 'The workspace could not complete this request. Please contact an administrator if it continues.'],
+        'APP-001' => ['category' => 'Application', 'severity' => 'high', 'status' => 500, 'headline' => 'Zazu could not complete that request.', 'message' => 'We could not complete your request. Please try again, and use the reference below if the problem continues.'],
+        'SYS-001' => ['category' => 'Server / infrastructure', 'severity' => 'critical', 'status' => 503, 'headline' => 'Zazu is temporarily unavailable.', 'message' => 'Please try again shortly. No technical details are exposed on this screen.'],
+        'SYS-002' => ['category' => 'Server / infrastructure', 'severity' => 'medium', 'status' => 429, 'headline' => 'Please slow down for a moment.', 'message' => 'Too many requests were received. Please wait a moment and try again.'],
+    ],
+
     'currencies' => [
         'ZAR' => 'South African rand (ZAR)',
         'BWP' => 'Botswana pula (BWP)',
@@ -22,6 +39,27 @@ return [
         'day' => 'Day',
         'kilometre' => 'Kilometre',
         'litre' => 'Litre',
+        'bottle' => 'Bottle',
+        'can' => 'Can',
+        'crate' => 'Crate',
+        'jug' => 'Jug',
+        'case' => 'Case',
+        'serving' => 'Serving',
+    ],
+
+    'beverage_sizes' => [
+        '250ml',
+        '300ml',
+        '330ml',
+        '440ml',
+        '500ml',
+        '750ml',
+        '1L',
+        '1.25L',
+        '1.5L',
+        '2L',
+        '5L',
+        '20L',
     ],
 
     'cost_categories' => [
@@ -107,6 +145,12 @@ return [
             'Plated meals',
             'Snacks & platters',
             'Drinks & refreshments',
+            'Cooldrinks',
+            'Bottled water',
+            'Juices',
+            'Homemade juices',
+            'Ginger ale',
+            'Homemade beer (Mqombothi)',
         ],
         'Decor' => [
             'Decor',
