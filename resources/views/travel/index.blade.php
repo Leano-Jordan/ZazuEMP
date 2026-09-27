@@ -22,7 +22,7 @@
             <div class="zazu-card-description">The route is the record. The amount on the right is its customer charge.</div>
         </div>
         @if ($travelCosts->count())
-            <div class="zazu-record-header" style="--zazu-record-cols: 1">
+            <div class="zazu-record-header" data-record-cols="1">
                 <div class="zazu-record-header-note">Route</div>
                 <div class="zazu-record-header-cell">Customer charge</div>
             </div>
