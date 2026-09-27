@@ -201,6 +201,7 @@
                 <a href="#" class="zazu-helper-link" data-zazu-helper-link hidden></a>
             </div>
             <div class="zazu-helper-actions">
+                <button type="button" class="zazu-helper-btn" data-zazu-helper-close>Close</button>
                 <button type="button" class="zazu-helper-btn" data-zazu-helper-off>Turn guide off</button>
                 <div class="zazu-helper-nav">
                     <button type="button" class="zazu-helper-btn" data-zazu-helper-back disabled>Back</button>
