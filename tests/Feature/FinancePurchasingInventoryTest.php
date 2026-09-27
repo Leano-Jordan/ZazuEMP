@@ -5,9 +5,11 @@ namespace Tests\Feature;
 use App\Models\Business;
 use App\Models\Event;
 use App\Models\Invoice;
+use App\Models\Payment;
 use App\Models\User;
 use App\Support\CurrentBusiness;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Str;
 use Tests\TestCase;
 
 class FinancePurchasingInventoryTest extends TestCase
@@ -94,7 +96,7 @@ class FinancePurchasingInventoryTest extends TestCase
         ]);
 
         $payload = [
-            'idempotency_key' => (string) \Illuminate\Support\Str::uuid(),
+            'idempotency_key' => (string) Str::uuid(),
             'supplier_id' => $supplier->id,
             'currency' => 'ZAR',
             'description' => ['Chicken'],
@@ -344,7 +346,7 @@ class FinancePurchasingInventoryTest extends TestCase
         ]);
 
         $payload = [
-            'idempotency_key' => (string) \Illuminate\Support\Str::uuid(),
+            'idempotency_key' => (string) Str::uuid(),
             'invoice_id' => $invoice->id,
             'amount' => '250.00',
             'method' => 'bank_transfer',
@@ -372,7 +374,7 @@ class FinancePurchasingInventoryTest extends TestCase
         ]);
 
         $payload = [
-            'idempotency_key' => (string) \Illuminate\Support\Str::uuid(),
+            'idempotency_key' => (string) Str::uuid(),
             'type' => 'receipt',
             'quantity' => '10',
             'unit_cost' => '20.00',
@@ -511,6 +513,7 @@ class FinancePurchasingInventoryTest extends TestCase
 
         $this->assertDatabaseCount('asset_allocations', 0);
     }
+
     public function test_invoice_idempotency_prevents_duplicate_invoice_creation(): void
     {
         [$business, $user] = $this->businessUser();
@@ -525,7 +528,7 @@ class FinancePurchasingInventoryTest extends TestCase
         ]);
 
         $payload = [
-            'idempotency_key' => (string) \Illuminate\Support\Str::uuid(),
+            'idempotency_key' => (string) Str::uuid(),
             'event_id' => $event->id,
             'lines' => [[
                 'description' => 'Catering service',
@@ -551,7 +554,7 @@ class FinancePurchasingInventoryTest extends TestCase
         $this->actingAs($user);
 
         $payload = [
-            'idempotency_key' => (string) \Illuminate\Support\Str::uuid(),
+            'idempotency_key' => (string) Str::uuid(),
             'description' => 'Fuel',
             'amount' => '250.00',
             'expense_date' => now()->toDateString(),
@@ -584,7 +587,7 @@ class FinancePurchasingInventoryTest extends TestCase
             'issued_at' => now()->toDateString(),
         ]);
 
-        AppModelsPayment::create([
+        Payment::create([
             'business_id' => $business->id,
             'invoice_id' => $invoice->id,
             'amount' => '10.00',
@@ -599,7 +602,7 @@ class FinancePurchasingInventoryTest extends TestCase
                 'amount' => '20.00',
                 'method' => 'bank_transfer',
                 'paid_at' => now()->toDateString(),
-                'idempotency_key' => (string) IlluminateSupportStr::uuid(),
+                'idempotency_key' => (string) Str::uuid(),
             ])
             ->assertStatus(409);
 
