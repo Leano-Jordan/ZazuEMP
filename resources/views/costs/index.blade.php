@@ -29,7 +29,7 @@
             <div class="zazu-card-description">Projected and actual amounts sit under clearly labelled columns.</div>
         </div>
         @if ($costs->count())
-            <div class="zazu-record-header" style="--zazu-record-cols: 2">
+            <div class="zazu-record-header" data-record-cols="2">
                 <div class="zazu-record-header-note">Cost</div>
                 <div class="zazu-record-header-cell">Projected</div>
                 <div class="zazu-record-header-cell">Actual</div>
