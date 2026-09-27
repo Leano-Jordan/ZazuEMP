@@ -26,6 +26,17 @@ final class Money
 
     public static function multiplyQuantityByPrice(int $quantityHundredths, int $unitPriceCents): int
     {
+        if ($quantityHundredths < 0 || $unitPriceCents < 0) {
+            throw new InvalidArgumentException('Quantity and unit price cannot be negative.');
+        }
+
+        if (
+            $quantityHundredths > 0
+            && $unitPriceCents > intdiv(PHP_INT_MAX - 50, $quantityHundredths)
+        ) {
+            throw new InvalidArgumentException('Amount exceeds the supported calculation range.');
+        }
+
         return intdiv(($quantityHundredths * $unitPriceCents) + 50, 100);
     }
 
