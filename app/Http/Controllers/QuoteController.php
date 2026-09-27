@@ -8,6 +8,7 @@ use App\Models\QuoteVersion;
 use App\Models\TaxRate;
 use App\Services\QuoteService;
 use App\Support\CurrentBusiness;
+use App\Support\Audit;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -202,7 +203,7 @@ class QuoteController extends Controller
 
             abort_unless($businessId > 0, 404);
 
-            AppSupportAudit::record('quote.customer.accepted', $lockedQuote, [
+            Audit::record('quote.customer.accepted', $lockedQuote, [
                 'customer_name' => trim($validated['customer_name']),
                 'quote_version' => $version->version,
             ], $businessId);
