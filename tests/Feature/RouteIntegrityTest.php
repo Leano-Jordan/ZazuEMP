@@ -107,6 +107,7 @@ class RouteIntegrityTest extends TestCase
     public function test_sensitive_routes_retain_required_authorization_middleware(): void
     {
         $expectedMiddleware = [
+            'owner.dashboard' => ['auth', 'auth.session', 'owner'],
             'dashboard' => ['permission:dashboard.view'],
             'calendar.index' => ['permission:calendar.view'],
             'finance.index' => ['permission:finance.view'],
