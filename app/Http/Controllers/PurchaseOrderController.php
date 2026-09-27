@@ -106,12 +106,18 @@ class PurchaseOrderController extends Controller
 
         $data['idempotency_key'] ??= (string) Str::uuid();
 
-        $existingOrder = PurchaseOrder::query()->where('business_id',$businessId)->where('idempotency_key',$data['idempotency_key'])->first();
-        if ($existingOrder) {
-            return redirect()->route('purchasing.show',$existingOrder)->with('info','That purchase order submission was already processed.');
-        }
-
         $order=\DB::transaction(function() use($data,$businessId,$supplier){
+            // Serialize business-level idempotency checks so concurrent retries cannot both create an order.
+            \App\Models\Business::query()->whereKey($businessId)->lockForUpdate()->firstOrFail();
+
+            $existingOrder = PurchaseOrder::query()
+                ->where('business_id',$businessId)
+                ->where('idempotency_key',$data['idempotency_key'])
+                ->first();
+
+            if ($existingOrder) {
+                return $existingOrder;
+            }
             $order=PurchaseOrder::create([
                 'business_id'=>$businessId,'supplier_id'=>$supplier->id,'idempotency_key'=>$data['idempotency_key'],
                 'reference'=>'PO-'.Str::upper(Str::random(8)),'status'=>'draft',
