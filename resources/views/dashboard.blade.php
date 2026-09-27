@@ -21,110 +21,66 @@
     <section class="zazu-dashboard-bento mt-3" aria-label="Business command centre">
         <section class="zazu-dashboard-attention" aria-labelledby="zazu-dashboard-attention-title">
             <div>
-                <div class="zazu-eyebrow">Operational command centre</div>
+                <div class="zazu-eyebrow">Operational overview</div>
                 <h2 id="zazu-dashboard-attention-title" class="zazu-command-title">What needs attention next?</h2>
-                <p class="zazu-command-copy">Start with active work, upcoming dates and commercial activity. Open the relevant record to continue without leaving your operating context.</p>
+                <p class="zazu-command-copy">Start with active jobs, upcoming dates and commercial activity. Open a record to continue without leaving your workspace.</p>
             </div>
-            <a href="{{ route('work.index') }}" class="zazu-btn zazu-btn-primary">Open active jobs →</a>
+            <a href="{{ route('work.index') }}" class="zazu-btn zazu-btn-primary">Open active jobs <span aria-hidden="true">→</span></a>
         </section>
 
         <section class="zazu-dashboard-metrics" aria-label="Key business metrics">
-            <a href="{{ route('work.index') }}" class="zazu-metric-card zazu-metric-link"><h2 class="zazu-metric-label">Active jobs</h2><div class="zazu-metric-value">{{ $metrics['active_work'] }}</div><div class="zazu-metric-copy">Open job list →</div></a>
-            <a href="{{ route('calendar.index') }}" class="zazu-metric-card zazu-metric-link"><h2 class="zazu-metric-label">Next 14 days</h2><div class="zazu-metric-value">{{ $metrics['upcoming_work'] }}</div><div class="zazu-metric-copy">Open calendar →</div></a>
-            <a href="{{ route('customers.index') }}" class="zazu-metric-card zazu-metric-link"><h2 class="zazu-metric-label">Customers</h2><div class="zazu-metric-value">{{ $metrics['customers'] }}</div><div class="zazu-metric-copy">Open customer records →</div></a>
-            <a href="{{ route('quotes.index') }}" class="zazu-metric-card zazu-metric-link"><h2 class="zazu-metric-label">Draft quotes</h2><div class="zazu-metric-value">{{ $metrics['draft_quotes'] }}</div><div class="zazu-metric-copy">Review draft quotes →</div></a>
+            <a href="{{ route('work.index') }}" class="zazu-metric-card zazu-metric-link"><h2 class="zazu-metric-label">Active jobs</h2><div class="zazu-metric-value" data-numeric="true">{{ $metrics['active_work'] }}</div><div class="zazu-metric-copy">Open job list</div></a>
+            <a href="{{ route('calendar.index') }}" class="zazu-metric-card zazu-metric-link"><h2 class="zazu-metric-label">Next 14 days</h2><div class="zazu-metric-value" data-numeric="true">{{ $metrics['upcoming_work'] }}</div><div class="zazu-metric-copy">Open calendar</div></a>
+            <a href="{{ route('customers.index') }}" class="zazu-metric-card zazu-metric-link"><h2 class="zazu-metric-label">Customers</h2><div class="zazu-metric-value" data-numeric="true">{{ $metrics['customers'] }}</div><div class="zazu-metric-copy">Open customer records</div></a>
+            <a href="{{ route('quotes.index') }}" class="zazu-metric-card zazu-metric-link"><h2 class="zazu-metric-label">Draft quotes</h2><div class="zazu-metric-value" data-numeric="true">{{ $metrics['draft_quotes'] }}</div><div class="zazu-metric-copy">Review draft quotes</div></a>
         </section>
 
-        <section class="zazu-dashboard-work zazu-panel">
-            <div class="zazu-panel-head">
-                <div><div class="zazu-panel-title">Upcoming work</div><div class="zazu-panel-copy">Work scheduled for future dates.</div></div>
-                <a href="{{ route('calendar.index') }}" class="zazu-btn zazu-btn-secondary">Calendar</a>
-            </div>
-            <div class="zazu-list mt-3">
-                @forelse ($upcoming as $event)
-                    <div class="zazu-list-item">
-                        <a href="{{ route('work.show', $event) }}" class="zazu-list-main min-w-0 flex-1">
-                            <div class="zazu-list-title">{{ $event->name }}</div>
-                            <div class="zazu-list-meta">{{ $event->customer?->name ?? 'No customer' }} · {{ $event->reference }}</div>
-                        </a>
-                        <div class="zazu-list-side"><div class="zazu-side-primary" data-numeric="true">{{ $event->event_date?->format('d M Y') }}</div><div class="zazu-side-secondary">{{ $event->event_type ?: 'Work' }}</div></div>
-                    </div>
-                @empty
-                    <div class="zazu-empty"><div class="zazu-empty-title">Nothing scheduled yet</div><p class="zazu-empty-copy">Create a job with a scheduled date and it will appear here and on the calendar.</p><a href="{{ route('work.create') }}" class="zazu-btn zazu-btn-primary mt-5">Create job</a></div>
-                @endforelse
-            </div>
-        </section>
+        <div class="zazu-dashboard-lower">
+            <section class="zazu-dashboard-work zazu-panel">
+                <div class="zazu-panel-head">
+                    <div><div class="zazu-panel-title">Upcoming work</div><div class="zazu-panel-copy">Scheduled jobs that are coming up next.</div></div>
+                    <a href="{{ route('calendar.index') }}" class="zazu-btn zazu-btn-secondary">Calendar <span aria-hidden="true">→</span></a>
+                </div>
+                <div class="zazu-list mt-3">
+                    @forelse ($upcoming as $event)
+                        <div class="zazu-list-item">
+                            <a href="{{ route('work.show', $event) }}" class="zazu-list-main min-w-0 flex-1">
+                                <div class="zazu-list-title">{{ $event->name }}</div>
+                                <div class="zazu-list-meta">{{ $event->customer?->name ?? 'No customer' }} · {{ $event->reference }}</div>
+                            </a>
+                            <div class="zazu-list-side"><div class="zazu-side-primary" data-numeric="true">{{ $event->event_date?->format('d M Y') }}</div><div class="zazu-side-secondary">{{ $event->event_type ?: 'Work' }}</div></div>
+                        </div>
+                    @empty
+                        <div class="zazu-empty"><div class="zazu-empty-title">Nothing scheduled yet</div><p class="zazu-empty-copy">Create a job with a scheduled date and it will appear here and on the calendar.</p><a href="{{ route('work.create') }}" class="zazu-btn zazu-btn-primary mt-4">Create job</a></div>
+                    @endforelse
+                </div>
+            </section>
 
-        <section class="zazu-dashboard-quick zazu-panel">
-            <div class="zazu-panel-title">Quick access</div>
-            <div class="zazu-panel-copy">Open the areas you use most.</div>
-            @php
-                $quickAccess = [
-                    ['label' => 'Services & prices', 'route' => 'capabilities.index'],
-                    ['label' => 'Jobs', 'route' => 'work.index'],
-                    ['label' => 'Customers', 'route' => 'customers.index'],
-                    ['label' => 'Quotes', 'route' => 'quotes.index'],
-                ];
-                if ($workspaceTools['finance']) $quickAccess[] = ['label' => 'Finance', 'route' => 'finance.index'];
-                if ($workspaceTools['purchasing']) $quickAccess[] = ['label' => 'Purchasing', 'route' => 'purchasing.index'];
-                if ($workspaceTools['inventory']) $quickAccess[] = ['label' => 'Inventory', 'route' => 'inventory.index'];
-                if ($workspaceTools['assets']) $quickAccess[] = ['label' => 'Assets', 'route' => 'assets.index'];
-                if ($isOwner) $quickAccess[] = ['label' => 'Settings', 'route' => 'settings.index'];
-            @endphp
-            <div class="zazu-quick-links mt-4">
-                @foreach ($quickAccess as $item)
-                    <a href="{{ route($item['route']) }}" class="zazu-quick-link flex items-center justify-between border border-[var(--zazu-border)] bg-[var(--zazu-surface-2)] px-3 py-2 text-xs font-semibold text-[var(--zazu-ink-2)] no-underline hover:border-[var(--zazu-border-strong)] hover:text-[var(--zazu-link)]"><span>{{ $item['label'] }}</span><span aria-hidden="true">→</span></a>
-                @endforeach
-            </div>
-        </section>
+            <aside class="zazu-dashboard-quick zazu-panel" aria-labelledby="zazu-quick-access-title">
+                <div id="zazu-quick-access-title" class="zazu-panel-title">Quick access</div>
+                <div class="zazu-panel-copy">Common operating areas.</div>
+                @php
+                    $quickAccess = [
+                        ['label' => 'Services & prices', 'route' => 'capabilities.index'],
+                        ['label' => 'Jobs', 'route' => 'work.index'],
+                        ['label' => 'Customers', 'route' => 'customers.index'],
+                        ['label' => 'Quotes', 'route' => 'quotes.index'],
+                    ];
+                    if ($workspaceTools['finance']) $quickAccess[] = ['label' => 'Finance', 'route' => 'finance.index'];
+                    if ($workspaceTools['purchasing']) $quickAccess[] = ['label' => 'Purchasing', 'route' => 'purchasing.index'];
+                    if ($workspaceTools['inventory']) $quickAccess[] = ['label' => 'Inventory', 'route' => 'inventory.index'];
+                    if ($workspaceTools['assets']) $quickAccess[] = ['label' => 'Assets', 'route' => 'assets.index'];
+                    if ($isOwner) $quickAccess[] = ['label' => 'Settings', 'route' => 'settings.index'];
+                @endphp
+                <nav class="zazu-quick-links" aria-label="Quick access">
+                    @foreach ($quickAccess as $item)
+                        <a href="{{ route($item['route']) }}" class="zazu-quick-link"><span>{{ $item['label'] }}</span><span aria-hidden="true">→</span></a>
+                    @endforeach
+                </nav>
+            </aside>
+        </div>
     </section>
 
-    @if (!empty($business?->dashboard_image_path))
-        <section class="zazu-dashboard-visual">
-            <img src="{{ route('business.media', ['type' => 'dashboard']) }}?v={{ $business->updated_at?->timestamp ?? 0 }}" alt="" loading="lazy">
-            <div class="zazu-dashboard-visual-overlay">
-                <div class="zazu-eyebrow">Your business</div>
-                <div class="zazu-dashboard-visual-title">{{ $business->name }}</div>
-                <div class="zazu-dashboard-visual-copy">Your workspace, your services, your jobs.</div>
-            </div>
-        </section>
-    @endif
 
 
-    @php
-        $modules = [
-            ['label' => 'Jobs', 'copy' => 'Jobs, services, quotes and preparation.', 'route' => 'work.index', 'group' => 'Operations'],
-            ['label' => 'Customers', 'copy' => 'Customer details, contacts and work history.', 'route' => 'customers.index', 'group' => 'Relationships'],
-            ['label' => 'Quotes', 'copy' => 'Quotes and pricing history.', 'route' => 'quotes.index', 'group' => 'Commercial'],
-            ['label' => 'Calendar', 'copy' => 'Dates and operational timing.', 'route' => 'calendar.index', 'group' => 'Operations'],
-            ['label' => 'Services & prices', 'copy' => 'Your reusable services, rentals and usual prices.', 'route' => 'capabilities.index', 'group' => 'Catalogue'],
-        ];
-        if ($workspaceTools['finance']) {
-            $modules[] = ['label' => 'Finance', 'copy' => 'Invoices, payments and business expenses.', 'route' => 'finance.index', 'group' => 'Commercial'];
-        }
-        if ($workspaceTools['purchasing']) {
-            $modules[] = ['label' => 'Purchasing', 'copy' => 'Suppliers and purchase orders.', 'route' => 'purchasing.index', 'group' => 'Resources'];
-        }
-        if ($workspaceTools['inventory']) {
-            $modules[] = ['label' => 'Inventory', 'copy' => 'Stock and movement history.', 'route' => 'inventory.index', 'group' => 'Resources'];
-        }
-        if ($workspaceTools['assets']) {
-            $modules[] = ['label' => 'Assets', 'copy' => 'Reusable equipment and accountability.', 'route' => 'assets.index', 'group' => 'Resources'];
-        }
-        if ($workspaceTools['reports']) {
-            $modules[] = ['label' => 'Reports', 'copy' => 'Business information from your recorded activity.', 'route' => 'reports.index', 'group' => 'Insights'];
-        }
-        if ($isOwner) {
-            $modules[] = ['label' => 'Settings', 'copy' => 'Business and system controls.', 'route' => 'settings.index', 'group' => 'System'];
-        }
-    @endphp
-    <section class="zazu-module-grid mt-5">
-        @foreach ($modules as $module)
-            <a href="{{ route($module['route']) }}" class="zazu-module">
-                <div class="zazu-module-top"><span class="zazu-module-group">{{ $module['group'] }}</span><span class="zazu-module-arrow" aria-hidden="true">→</span></div>
-                <div class="zazu-module-title">{{ $module['label'] }}</div>
-                <div class="zazu-module-copy">{{ $module['copy'] }}</div>
-            </a>
-        @endforeach
-    </section>
 </x-app-layout>
