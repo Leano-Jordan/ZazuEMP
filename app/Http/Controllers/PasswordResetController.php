@@ -8,6 +8,7 @@ use Illuminate\Auth\Events\PasswordReset;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Password;
 use Illuminate\Support\Str;
 use Illuminate\View\View;
@@ -86,11 +87,18 @@ class PasswordResetController extends Controller
         $user = User::query()->where('email', $validated['email'])->firstOrFail();
 
         Auth::login($user);
-
-        // A successful password reset should evict previously authenticated devices.
-        Auth::logoutOtherDevices($validated['password']);
-
         $request->session()->regenerate();
+
+        // Revoke existing database-backed sessions immediately. For other
+        // drivers, AuthenticateSession + logoutOtherDevices provide the guard.
+        if (config('session.driver') === 'database') {
+            DB::table(config('session.table', 'sessions'))
+                ->where('user_id', $user->id)
+                ->where('id', '!=', $request->session()->getId())
+                ->delete();
+        }
+
+        Auth::logoutOtherDevices($validated['password']);
 
         $ownedBusiness = $user->businesses()
             ->where('businesses.status', 'active')
