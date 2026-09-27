@@ -70,9 +70,9 @@ Route::middleware(['auth', 'auth.session', 'business.context'])->group(function 
     Route::get('/finance/expenses/create', [FinanceController::class, 'createExpense'])->middleware('permission:finance.expense.create')->name('finance.expenses.create');
     Route::post('/finance/expenses', [FinanceController::class, 'storeExpense'])->middleware('permission:finance.expense.create')->name('finance.expenses.store');
 
-    Route::get('/suppliers', [SupplierController::class, 'index'])->name('suppliers.index');
-    Route::get('/suppliers/create', [SupplierController::class, 'create'])->name('suppliers.create');
-    Route::post('/suppliers', [SupplierController::class, 'store'])->name('suppliers.store');
+    Route::get('/suppliers', [SupplierController::class, 'index'])->middleware('permission:suppliers.view')->name('suppliers.index');
+    Route::get('/suppliers/create', [SupplierController::class, 'create'])->middleware('permission:suppliers.create')->name('suppliers.create');
+    Route::post('/suppliers', [SupplierController::class, 'store'])->middleware('permission:suppliers.create')->name('suppliers.store');
 
     Route::get('/purchasing', [PurchaseOrderController::class, 'index'])->middleware('permission:purchasing.view')->name('purchasing.index');
     Route::get('/purchasing/create', [PurchaseOrderController::class, 'create'])->middleware('permission:purchasing.create')->name('purchasing.create');
@@ -85,11 +85,11 @@ Route::middleware(['auth', 'auth.session', 'business.context'])->group(function 
     Route::post('/inventory', [InventoryController::class, 'store'])->middleware('permission:inventory.create')->name('inventory.store');
     Route::post('/inventory/{inventoryItem}/movement', [InventoryController::class, 'movement'])->middleware('permission:inventory.movement')->name('inventory.movement');
 
-    Route::get('/assets', [AssetController::class, 'index'])->name('assets.index');
-    Route::get('/assets/create', [AssetController::class, 'create'])->name('assets.create');
-    Route::post('/assets', [AssetController::class, 'store'])->name('assets.store');
-    Route::post('/assets/{asset}/allocate', [AssetController::class, 'allocate'])->name('assets.allocate');
-    Route::post('/assets/{asset}/release', [AssetController::class, 'release'])->name('assets.release');
+    Route::get('/assets', [AssetController::class, 'index'])->middleware('permission:assets.view')->name('assets.index');
+    Route::get('/assets/create', [AssetController::class, 'create'])->middleware('permission:assets.create')->name('assets.create');
+    Route::post('/assets', [AssetController::class, 'store'])->middleware('permission:assets.create')->name('assets.store');
+    Route::post('/assets/{asset}/allocate', [AssetController::class, 'allocate'])->middleware('permission:assets.allocate')->name('assets.allocate');
+    Route::post('/assets/{asset}/release', [AssetController::class, 'release'])->middleware('permission:assets.release')->name('assets.release');
 
     Route::get('/reports', \App\Http\Controllers\ReportController::class)->name('reports.index');
 
@@ -104,12 +104,12 @@ Route::middleware(['auth', 'auth.session', 'business.context'])->group(function 
         Route::delete('/settings/compliance/{document}', [ComplianceDocumentController::class, 'destroy'])->name('settings.compliance.destroy');
     });
 
-    Route::get('/quotes', [QuoteController::class, 'index'])->name('quotes.index');
-    Route::get('/quotes/{quote}', [QuoteController::class, 'show'])->name('quotes.show');
-    Route::post('/quotes/{quote}/versions', [QuoteController::class, 'createVersion'])->name('quotes.versions.store');
-    Route::patch('/quotes/{quote}/status', [QuoteController::class, 'updateStatus'])->name('quotes.status');
-    Route::get('/quotes/{quote}/versions/{version}/edit', [QuoteController::class, 'editVersion'])->name('quotes.versions.edit');
-    Route::put('/quotes/{quote}/versions/{version}', [QuoteController::class, 'updateVersion'])->name('quotes.versions.update');
+    Route::get('/quotes', [QuoteController::class, 'index'])->middleware('permission:quotes.view')->name('quotes.index');
+    Route::get('/quotes/{quote}', [QuoteController::class, 'show'])->middleware('permission:quotes.view')->name('quotes.show');
+    Route::post('/quotes/{quote}/versions', [QuoteController::class, 'createVersion'])->middleware('permission:quotes.create')->name('quotes.versions.store');
+    Route::patch('/quotes/{quote}/status', [QuoteController::class, 'updateStatus'])->middleware('permission:quotes.status')->name('quotes.status');
+    Route::get('/quotes/{quote}/versions/{version}/edit', [QuoteController::class, 'editVersion'])->middleware('permission:quotes.update')->name('quotes.versions.edit');
+    Route::put('/quotes/{quote}/versions/{version}', [QuoteController::class, 'updateVersion'])->middleware('permission:quotes.update')->name('quotes.versions.update');
 
     Route::get('/work', [WorkController::class, 'index'])->name('work.index');
     Route::get('/work/create', [WorkController::class, 'create'])->name('work.create');
@@ -139,17 +139,17 @@ Route::middleware(['auth', 'auth.session', 'business.context'])->group(function 
     Route::get('/work/{event}/requirements/create', [RequirementController::class, 'create'])->name('work.requirements.create');
     Route::post('/work/{event}/requirements', [RequirementController::class, 'store'])->name('work.requirements.store');
 
-    Route::get('/customers', [CustomerController::class, 'index'])->name('customers.index');
-    Route::get('/customers/create', [CustomerController::class, 'create'])->name('customers.create');
-    Route::post('/customers', [CustomerController::class, 'store'])->name('customers.store');
-    Route::get('/customers/{customer}', [CustomerController::class, 'show'])->name('customers.show');
-    Route::get('/customers/{customer}/edit', [CustomerController::class, 'edit'])->name('customers.edit');
-    Route::put('/customers/{customer}', [CustomerController::class, 'update'])->name('customers.update');
-    Route::get('/customers/{customer}/contacts/create', [CustomerContactController::class, 'create'])->name('customers.contacts.create');
-    Route::post('/customers/{customer}/contacts', [CustomerContactController::class, 'store'])->name('customers.contacts.store');
-    Route::get('/customers/{customer}/contacts/{contact}/edit', [CustomerContactController::class, 'edit'])->name('customers.contacts.edit');
-    Route::put('/customers/{customer}/contacts/{contact}', [CustomerContactController::class, 'update'])->name('customers.contacts.update');
-    Route::delete('/customers/{customer}/contacts/{contact}', [CustomerContactController::class, 'destroy'])->name('customers.contacts.destroy');
+    Route::get('/customers', [CustomerController::class, 'index'])->middleware('permission:customers.view')->name('customers.index');
+    Route::get('/customers/create', [CustomerController::class, 'create'])->middleware('permission:customers.create')->name('customers.create');
+    Route::post('/customers', [CustomerController::class, 'store'])->middleware('permission:customers.create')->name('customers.store');
+    Route::get('/customers/{customer}', [CustomerController::class, 'show'])->middleware('permission:customers.view')->name('customers.show');
+    Route::get('/customers/{customer}/edit', [CustomerController::class, 'edit'])->middleware('permission:customers.update')->name('customers.edit');
+    Route::put('/customers/{customer}', [CustomerController::class, 'update'])->middleware('permission:customers.update')->name('customers.update');
+    Route::get('/customers/{customer}/contacts/create', [CustomerContactController::class, 'create'])->middleware('permission:customers.contacts.manage')->name('customers.contacts.create');
+    Route::post('/customers/{customer}/contacts', [CustomerContactController::class, 'store'])->middleware('permission:customers.contacts.manage')->name('customers.contacts.store');
+    Route::get('/customers/{customer}/contacts/{contact}/edit', [CustomerContactController::class, 'edit'])->middleware('permission:customers.contacts.manage')->name('customers.contacts.edit');
+    Route::put('/customers/{customer}/contacts/{contact}', [CustomerContactController::class, 'update'])->middleware('permission:customers.contacts.manage')->name('customers.contacts.update');
+    Route::delete('/customers/{customer}/contacts/{contact}', [CustomerContactController::class, 'destroy'])->middleware('permission:customers.contacts.manage')->name('customers.contacts.destroy');
 
     Route::get('/capabilities', [BusinessCapabilityController::class, 'index'])->name('capabilities.index');
     Route::middleware('owner')->group(function () {
