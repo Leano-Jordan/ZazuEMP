@@ -361,7 +361,7 @@ class FinanceController extends Controller
         $businessId = app(CurrentBusiness::class)->id($request->user());
         $currency = app(CurrentBusiness::class)->model($request->user())->currency ?? 'ZAR';
         $data = $request->validate([
-            'idempotency_key' => ['required', 'uuid'],
+            'idempotency_key' => ['nullable', 'uuid'],
             'description' => ['required', 'string', 'max:255'],
             'amount' => ['required', 'numeric', 'decimal:0,2', 'gt:0'],
             'expense_date' => ['required', 'date'],
