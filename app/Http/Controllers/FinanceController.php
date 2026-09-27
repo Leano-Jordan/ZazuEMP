@@ -28,7 +28,8 @@ class FinanceController extends Controller
         $invoices = Invoice::where('business_id', $businessId)->with('payments')->latest()->get();
         $payments = Payment::where('business_id', $businessId)->latest('paid_at')->limit(10)->get();
         $expenses = FinanceExpense::where('business_id', $businessId)->latest('expense_date')->limit(10)->get();
-        $invoicedCents = $invoices->sum(fn ($invoice) => Money::toCents((string) $invoice->total));
+        $invoicedTotal = Invoice::where('business_id', $businessId)->sum('total');
+        $invoicedCents = Money::toCents((string) $invoicedTotal);
         $paidTotal = Payment::where('business_id', $businessId)->sum('amount');
         $expensesTotal = FinanceExpense::where('business_id', $businessId)->sum('amount');
         // DECIMAL values must remain decimal strings. Converting aggregate totals through float can silently lose cents on larger ledgers.
