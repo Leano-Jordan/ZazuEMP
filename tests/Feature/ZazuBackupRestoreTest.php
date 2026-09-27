@@ -19,6 +19,9 @@ class ZazuBackupRestoreTest extends TestCase
 
         $database = storage_path('app/zazu-roundtrip.sqlite');
         $output = storage_path('app/zazu-roundtrip-backups');
+        $originalDefault = config('database.default');
+        $originalDatabase = config('database.connections.sqlite.database');
+
         File::delete($database);
         File::deleteDirectory($output);
 
@@ -63,6 +66,10 @@ class ZazuBackupRestoreTest extends TestCase
 
         File::delete($database);
         File::deleteDirectory($output);
+        config([
+            'database.default' => $originalDefault,
+            'database.connections.sqlite.database' => $originalDatabase,
+        ]);
     }
 
     public function test_restore_rejects_unsafe_archive_paths_before_writing_files(): void
