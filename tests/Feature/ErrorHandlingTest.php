@@ -35,7 +35,7 @@ class ErrorHandlingTest extends TestCase
     {
         Route::post('/__zazu-test-validation', fn () => request()->validate([
             'name' => ['required', 'string'],
-        ]));
+        ]))->middleware('web');
 
         $response = $this->from('/dashboard')->post('/__zazu-test-validation', []);
 
