@@ -3,7 +3,6 @@
 namespace Tests\Feature;
 
 use App\Models\Business;
-use App\Models\BusinessCapability;
 use App\Models\Supplier;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -201,9 +200,9 @@ class OnboardingTest extends TestCase
             ->assertSee('Jobs')
             ->assertSee('Customers')
             ->assertSee('Quotes')
-            ->assertDontSee('Purchase orders')
-            ->assertDontSee('Inventory')
-            ->assertDontSee('Assets');
+            ->assertDontSee('Suppliers and purchase orders.')
+            ->assertDontSee('Stock and movement history.')
+            ->assertDontSee('Reusable equipment and accountability.');
 
         Supplier::create([
             'business_id' => $business->id,
@@ -212,6 +211,6 @@ class OnboardingTest extends TestCase
 
         $this->get(route('dashboard'))
             ->assertOk()
-            ->assertSee('Purchasing');
+            ->assertSee('Suppliers and purchase orders.');
     }
 }
