@@ -19,7 +19,7 @@ class ZazuBackupCommand extends Command
             return self::FAILURE;
         }
 
-        $directory = $this->option('output') ?: storage_path('app/private/backups');
+        $directory = $this->option('output') ?: storage_path('app/zazu-backups');
         File::ensureDirectoryExists($directory);
 
         $stamp = now()->format('Ymd_His');
@@ -72,6 +72,7 @@ class ZazuBackupCommand extends Command
             }
 
             $privateRoot = storage_path('app/private');
+            // Backup archives live outside the private storage tree so the backup cannot copy itself recursively.
             if (is_dir($privateRoot)) {
                 File::copyDirectory($privateRoot, $work.'/storage/private');
             }
