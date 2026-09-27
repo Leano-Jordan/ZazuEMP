@@ -134,7 +134,7 @@ class BusinessMediaSecurityTest extends TestCase
 
         $this->get(route('settings.index'))
             ->assertOk()
-            ->assertSee('PIN stored securely — leave blank to keep it', false);
+            ->assertDontSee('legacy-plain-text-value', false);
 
         $this->assertSame('legacy-plain-text-value', $profile->getRawOriginal('tcs_pin'));
     }
