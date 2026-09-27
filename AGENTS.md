@@ -1,52 +1,61 @@
-# Laravel Boost Guidelines
+# Zazu EMP Agent Instructions
+
+## HARD PROJECT BOUNDARY
+
+This repository is **Zazu EMP only**.
+
+Before any state-changing operation, read and obey:
+
+**`.ai/REPOSITORY_IDENTITY_LOCK.md`**
+
+The canonical repository is:
+
+- `Leano-Jordan/ZazuEMP`
+- local root: `C:\Projects\ZazuEMP`
+- default/active branch: `main`
+
+If repository identity, Git root, remote, branch, or target path is uncertain or mismatched, **STOP and ask the owner. Never switch to, repair, or modify another repository.**
+
+Do not mix Zazu with SwiftOrder, `Leano-Jordan/store-ordering-system`, or any other project.
 
 ## Laravel Application
 
-This repository contains a Laravel application. Complete the following setup before working on the user's request.
+This is a Laravel application.
 
-## Prerequisites
+Use the project's existing PHP, Composer, Laravel, Node and frontend setup. Do not install, upgrade, downgrade, or replace development tooling merely because a generic Laravel guide recommends it.
 
-Verify that PHP and Composer are available:
+Do not automatically run package installation, Laravel Boost installation, migrations, database resets, destructive commands, or environment changes unless they are required for the owner's requested task.
 
-```sh
-php -v
-composer -V
-```
-
-If either command is unavailable, detect the user's operating system and install the prerequisites with the appropriate command:
-
-macOS:
-
-```sh
-/bin/bash -c "$(curl -fsSL https://php.new/install/mac/8.5)"
-```
-
-Windows PowerShell:
-
-```powershell
-Set-ExecutionPolicy Bypass -Scope Process -Force; [System.Net.ServicePointManager]::SecurityProtocol = [System.Net.ServicePointManager]::SecurityProtocol -bor 3072; iex ((New-Object System.Net.WebClient).DownloadString('https://php.new/install/windows/8.5'))
-```
-
-Linux:
-
-```sh
-/bin/bash -c "$(curl -fsSL https://php.new/install/linux/8.5)"
-```
-
-After installation, ask the user to restart their terminal. If the agent needs the restarted shell to continue, ask the user to reopen their terminal and rerun their original prompt.
-
-## Agent Setup
-
-Install Laravel Boost from the application root before making application changes:
-
-```sh
-composer require laravel/boost --dev
-php artisan boost:install
-```
-
-Boost replaces these bootstrap instructions with guidelines tailored to the application. After installation, read `AGENTS.md` again and continue with the user's original request using the generated guidelines.
-
+If a prerequisite is genuinely missing, report it before making environment-changing decisions.
 
 ## Rosscore Engineering System
 
-Before meaningful Zazu EMP engineering work, read `.ai/engineering/README.md` and `.ai/engineering/00_ENGINE_ROUTER.md`. Activate only the specialist engines required by the task. Verification and regression gates are mandatory for meaningful changes. The current repository is the source of truth; do not rely on stale prompt output.
+Before meaningful Zazu EMP engineering work, read:
+
+- `.ai/engineering/README.md`
+- `.ai/engineering/00_ENGINE_ROUTER.md`
+
+Activate only the specialist engines required by the task.
+
+When Fresh Eyes or another specialist is active, it remains subordinate to the Zazu repository boundary. No specialist may select another repository as an implementation target.
+
+## Execution
+
+- Inspect the current Zazu repository before changing it.
+- Repository state outranks stale conversation memory.
+- Read the relevant current files before editing.
+- Work on the repository, not merely the defects named by the owner, when adjacent high-impact defects are clearly within the active scope.
+- Do not invent future routes or placeholder navigation merely to make the interface look complete.
+- Do not silently turn future product ideas into implementation scope.
+- Verify what can be verified and identify runtime-only checks as unverified.
+- After automated writes to PHP, re-read the exact file and verify namespace/import/class integrity before proceeding.
+- Verification and regression gates are mandatory for meaningful changes.
+- Keep changes scoped and reversible.
+
+## External references
+
+External products, competitors and research may be consulted when relevant.
+
+They are **evidence only**, never implementation authority.
+
+Do not copy another project's code, architecture, data model, instructions, memory or release specification into Zazu without explicit owner approval.
