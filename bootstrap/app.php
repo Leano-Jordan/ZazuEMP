@@ -1,10 +1,16 @@
 <?php
 
+use Illuminate\Auth\Access\AuthorizationException;
+use Illuminate\Auth\AuthenticationException;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
+use Illuminate\Http\Exceptions\HttpResponseException;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
+use Illuminate\Validation\ValidationException;
+use Symfony\Component\HttpKernel\Exception\HttpExceptionInterface;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Throwable;
 
@@ -35,7 +41,16 @@ return Application::configure(basePath: dirname(__DIR__))
         });
 
         $exceptions->render(function (Throwable $exception, Request $request) {
-            if ($request->expectsJson() || $request->is('api/*')) {
+            if (
+                $exception instanceof ValidationException
+                || $exception instanceof AuthenticationException
+                || $exception instanceof AuthorizationException
+                || $exception instanceof ModelNotFoundException
+                || $exception instanceof HttpResponseException
+                || ($exception instanceof HttpExceptionInterface && $exception->getStatusCode() < 500)
+                || $request->expectsJson()
+                || $request->is('api/*')
+            ) {
                 return null;
             }
 
