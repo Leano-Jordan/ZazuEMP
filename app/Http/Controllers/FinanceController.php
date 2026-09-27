@@ -28,21 +28,37 @@ class FinanceController extends Controller
         $invoices = Invoice::where('business_id', $businessId)->with('payments')->latest()->get();
         $payments = Payment::where('business_id', $businessId)->latest('paid_at')->limit(10)->get();
         $expenses = FinanceExpense::where('business_id', $businessId)->latest('expense_date')->limit(10)->get();
-        $invoicedTotal = Invoice::where('business_id', $businessId)->sum('total');
-        $invoicedCents = Money::toCents((string) $invoicedTotal);
-        $paidTotal = Payment::where('business_id', $businessId)->sum('amount');
-        $expensesTotal = FinanceExpense::where('business_id', $businessId)->sum('amount');
-        // DECIMAL values must remain decimal strings. Converting aggregate totals through float can silently lose cents on larger ledgers.
-        $paidCents = Money::toCents((string) $paidTotal);
-        $expensesCents = Money::toCents((string) $expensesTotal);
+        $invoicedByCurrency = Invoice::where('business_id', $businessId)
+            ->select('currency')
+            ->selectRaw('SUM(total) as total')
+            ->groupBy('currency')
+            ->orderBy('currency')
+            ->get()
+            ->mapWithKeys(fn ($row) => [$row->currency => Money::fromCents(Money::toCents((string) $row->total))]);
+
+        $paidByCurrency = Payment::where('business_id', $businessId)
+            ->select('currency')
+            ->selectRaw('SUM(amount) as total')
+            ->groupBy('currency')
+            ->orderBy('currency')
+            ->get()
+            ->mapWithKeys(fn ($row) => [$row->currency => Money::fromCents(Money::toCents((string) $row->total))]);
+
+        $expensesByCurrency = FinanceExpense::where('business_id', $businessId)
+            ->select('currency')
+            ->selectRaw('SUM(amount) as total')
+            ->groupBy('currency')
+            ->orderBy('currency')
+            ->get()
+            ->mapWithKeys(fn ($row) => [$row->currency => Money::fromCents(Money::toCents((string) $row->total))]);
 
         return view('finance.index', [
             'invoices' => $invoices,
             'payments' => $payments,
             'expenses' => $expenses,
-            'invoiced' => Money::fromCents($invoicedCents),
-            'paid' => Money::fromCents($paidCents),
-            'expensesTotal' => Money::fromCents($expensesCents),
+            'invoicedByCurrency' => $invoicedByCurrency,
+            'paidByCurrency' => $paidByCurrency,
+            'expensesByCurrency' => $expensesByCurrency,
         ]);
     }
 
