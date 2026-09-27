@@ -7,9 +7,11 @@
     @php
         $business = app(\App\Support\CurrentBusiness::class)->resolve(auth()->user());
         $businesses = auth()->user()->businesses()->where('businesses.status', 'active')->orderBy('businesses.name')->get();
-        $permissionService = app(\App\Support\PermissionService::class);
-        $can = fn (string $permission): bool => $permissionService->allows($permission, auth()->user(), $business);
-        $isOwner = app(\App\Support\CurrentBusiness::class)->hasRole('owner', auth()->user(), $business);
+        $currentMembership = $businesses->firstWhere('id', $business?->id);
+        $currentRole = $currentMembership?->pivot?->role;
+        $can = fn (string $permission): bool => $currentRole === 'owner'
+            || in_array($permission, config('zazu.permissions.roles.'.$currentRole, []), true);
+        $isOwner = $currentRole === 'owner';
         $brandingVersion = $business?->updated_at?->timestamp ?? 0;
     @endphp
     <title>{{ $title ?? 'Zazu' }} · {{ $business?->name ?? 'Zazu EMP' }}</title>
