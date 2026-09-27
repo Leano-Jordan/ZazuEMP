@@ -2,6 +2,7 @@
 <x-slot:title>New purchase order</x-slot:title><x-slot:heading>New purchase order</x-slot:heading>
 <section class="zazu-card"><div class="zazu-card-header"><div class="zazu-eyebrow">Buying</div><div class="zazu-card-title mt-1">Order details</div></div>
 <form method="POST" action="{{ route('purchasing.store') }}" class="zazu-form p-5">@csrf
+<input type="hidden" name="idempotency_key" value="{{ $idempotencyKey }}">
 <div class="zazu-form-grid"><label class="zazu-field"><span>Supplier</span><select name="supplier_id" required><option value="">Choose supplier</option>@foreach($suppliers as $supplier)<option value="{{ $supplier->id }}" @selected(old('supplier_id')==$supplier->id)>{{ $supplier->name }}</option>@endforeach</select></label>
 <label class="zazu-field"><span>Currency</span><input name="currency" value="{{ old('currency',$currency) }}" maxlength="3" required></label>
 <label class="zazu-field"><span>Expected date</span><input type="date" name="expected_at" value="{{ old('expected_at') }}"></label></div>
