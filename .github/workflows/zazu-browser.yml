@@ -1,0 +1,44 @@
+name: Zazu browser smoke
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  browser:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+
+      - name: Set up PHP
+        uses: shivammathur/setup-php@f3e473d116dcccaddc5834248c87452386958240 # v2.37.2
+        with:
+          php-version: '8.4'
+          extensions: mbstring, sqlite3, pdo_sqlite
+
+      - name: Copy environment
+        run: php -r "file_exists('.env') || copy('.env.example', '.env');"
+
+      - name: Install PHP dependencies
+        run: composer install --no-interaction --prefer-dist --no-progress
+
+      - name: Prepare application
+        run: |
+          php artisan key:generate
+          php artisan migrate --force
+
+      - name: Install frontend dependencies
+        run: npm install --ignore-scripts
+
+      - name: Build frontend
+        run: npm run build
+
+      - name: Install Chromium
+        run: npx playwright install --with-deps chromium
+
+      - name: Start application
+        run: php artisan serve --host=127.0.0.1 --port=8000 > storage/logs/browser-server.log 2>&1 &
+
+      - name: Run onboarding browser smoke
+        run: npx playwright test tests/browser/onboarding.spec.js --workers=1
