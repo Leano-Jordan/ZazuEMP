@@ -11,7 +11,7 @@ class Payment extends Model
 {
     use BelongsToBusiness, HasFactory;
 
-    protected $fillable = ['business_id','invoice_id','event_id','amount','currency','method','reference','paid_at','notes'];
+    protected $fillable = ['business_id','invoice_id','idempotency_key','event_id','amount','currency','method','reference','paid_at','notes'];
 
     protected function casts(): array { return ['amount'=>'decimal:2','paid_at'=>'date']; }
 
