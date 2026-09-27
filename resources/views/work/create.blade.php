@@ -175,9 +175,9 @@
         </form>
 
         <script>
-            const customers = @json($customerOptions);
-            const oldDayContactId = @json(old('event_day_contact_id'));
-            const oldNightContactId = @json(old('event_night_contact_id'));
+            const customers = {{ Illuminate\Support\Js::from($customerOptions) }};
+            const oldDayContactId = {{ Illuminate\Support\Js::from(old('event_day_contact_id')) }};
+            const oldNightContactId = {{ Illuminate\Support\Js::from(old('event_night_contact_id')) }};
             const customerSelect = document.getElementById('customer_id');
             const dayContactSelect = document.getElementById('event_day_contact_id');
             const nightContactSelect = document.getElementById('event_night_contact_id');
