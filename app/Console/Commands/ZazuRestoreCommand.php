@@ -26,7 +26,7 @@ class ZazuRestoreCommand extends Command
             return self::SUCCESS;
         }
 
-        $work = storage_path('app/private/.zazu-restore-'.now()->format('Ymd_His'));
+        $work = storage_path('app/.zazu-restore-'.now()->format('Ymd_His'));
         File::ensureDirectoryExists($work);
 
         try {
