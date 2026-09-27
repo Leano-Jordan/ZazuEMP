@@ -39,6 +39,12 @@ test('registration flows into catalogue, business setup and dashboard', async ({
 
     await page.getByRole('button', { name: 'Turn guide off' }).click();
     await expect(helperPanel).toBeHidden();
+    await page.waitForTimeout(600);
+    await expect(helperPanel).toBeHidden();
+    await expect(helperToggle).toHaveAttribute('aria-pressed', 'false');
+
+    await page.reload();
+    await expect(helperPanel).toBeHidden();
     await expect(helperToggle).toHaveAttribute('aria-pressed', 'false');
 
     await helperToggle.click();
