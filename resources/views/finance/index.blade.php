@@ -21,7 +21,7 @@
         <div class="zazu-metric-label">Payments recorded</div>
         <div class="zazu-metric-currency-stack">
             @forelse($paidByCurrency as $currency => $total)
-                <div class="zazu-metric-value" data-numeric="true">{{ $currency }} {{ number_format((float) $total, 2) }}</div>
+                <div class="zazu-metric-value" data-numeric="true">{{ $currency }} {{ $total }}</div>
             @empty
                 <div class="zazu-metric-value" data-numeric="true">0.00</div>
             @endforelse
@@ -31,7 +31,7 @@
         <div class="zazu-metric-label">Expenses</div>
         <div class="zazu-metric-currency-stack">
             @forelse($expensesByCurrency as $currency => $total)
-                <div class="zazu-metric-value" data-numeric="true">{{ $currency }} {{ number_format((float) $total, 2) }}</div>
+                <div class="zazu-metric-value" data-numeric="true">{{ $currency }} {{ $total }}</div>
             @empty
                 <div class="zazu-metric-value" data-numeric="true">0.00</div>
             @endforelse
