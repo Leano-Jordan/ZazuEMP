@@ -2,11 +2,14 @@
 
 namespace Tests\Feature;
 
+use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Schema;
 use Tests\TestCase;
 
 class EventSchemaContractTest extends TestCase
 {
+    use RefreshDatabase;
+
     public function test_events_table_matches_the_event_model_schema_contract(): void
     {
         $this->assertTrue(Schema::hasTable('events'));
