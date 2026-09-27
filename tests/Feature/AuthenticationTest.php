@@ -244,6 +244,8 @@ class AuthenticationTest extends TestCase
 
     public function test_password_reset_revokes_previously_authenticated_sessions(): void
     {
+        config(['session.driver' => 'database']);
+
         $user = User::factory()->create([
             'username' => 'sessionreset',
             'email' => 'sessionreset@example.com',
