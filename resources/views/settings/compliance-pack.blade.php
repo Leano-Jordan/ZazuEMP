@@ -3,7 +3,7 @@
     <x-slot:heading>Business compliance pack</x-slot:heading>
     <x-slot:headerAction>
         <a href="{{ route('settings.compliance') }}" class="zazu-btn zazu-btn-secondary print-hide">Compliance centre</a>
-        <button type="button" class="zazu-btn zazu-btn-primary print-hide" onclick="window.print()">Print / Save as PDF</button>
+        <button type="button" class="zazu-btn zazu-btn-primary print-hide" data-zazu-print>Print / Save as PDF</button>
     </x-slot:headerAction>
 
     <section class="zazu-command-band">
