@@ -240,7 +240,7 @@ class QuoteController extends Controller
             $lockedCurrentStatus = $lockedQuote->status ?: 'draft';
 
             abort_unless(
-                in_array($newStatus, self::STATUS_TRANSITIONS[$lockedCurrentStatus] ?? [], true),
+                $lockedQuote->canTransitionTo($newStatus),
                 422,
                 'That quote status change is no longer allowed.'
             );
