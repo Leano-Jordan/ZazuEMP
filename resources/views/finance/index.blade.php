@@ -11,7 +11,7 @@
         <div class="zazu-metric-label">Invoiced</div>
         <div class="zazu-metric-currency-stack">
             @forelse($invoicedByCurrency as $currency => $total)
-                <div class="zazu-metric-value" data-numeric="true">{{ $currency }} {{ number_format((float) $total, 2) }}</div>
+                <div class="zazu-metric-value" data-numeric="true">{{ $currency }} {{ $total }}</div>
             @empty
                 <div class="zazu-metric-value" data-numeric="true">0.00</div>
             @endforelse
@@ -48,8 +48,8 @@
                 <div class="zazu-list-meta">{{ $invoice->event?->name ?: 'No job linked' }} · due {{ $invoice->due_at?->format('d M Y') ?: 'Not set' }}</div>
             </div>
             <div class="zazu-list-side">
-                <div class="zazu-side-primary" data-numeric="true">{{ $invoice->currency }} {{ number_format((float)$invoice->total,2) }}</div>
-                <div class="zazu-list-meta" data-numeric="true">balance {{ $invoice->currency }} {{ number_format((float)$invoice->balance,2) }}</div>
+                <div class="zazu-side-primary" data-numeric="true">{{ $invoice->currency }} {{ $invoice->total }}</div>
+                <div class="zazu-list-meta" data-numeric="true">balance {{ $invoice->currency }} {{ $invoice->balance }}</div>
             </div>
             <span class="zazu-chip zazu-chip-info">{{ ucfirst($invoice->status) }}</span>
             <a href="{{ route('finance.invoices.show', $invoice) }}" class="zazu-btn zazu-btn-ghost">Open</a>
@@ -65,7 +65,7 @@
         @forelse($payments as $payment)
             <div class="zazu-list-item">
                 <div class="zazu-list-main"><div class="zazu-list-title">{{ $payment->method }}</div><div class="zazu-list-meta">{{ $payment->reference ?: 'No reference' }} · {{ $payment->paid_at->format('d M Y') }}</div></div>
-                <div class="zazu-list-side"><div class="zazu-side-primary" data-numeric="true">{{ $payment->currency }} {{ number_format((float)$payment->amount,2) }}</div></div>
+                <div class="zazu-list-side"><div class="zazu-side-primary" data-numeric="true">{{ $payment->currency }} {{ $payment->amount }}</div></div>
             </div>
         @empty
             <div class="zazu-empty">No payments recorded.</div>
@@ -76,7 +76,7 @@
         @forelse($expenses as $expense)
             <div class="zazu-list-item">
                 <div class="zazu-list-main"><div class="zazu-list-title">{{ $expense->description }}</div><div class="zazu-list-meta">{{ $expense->status }} · {{ $expense->expense_date->format('d M Y') }}</div></div>
-                <div class="zazu-list-side"><div class="zazu-side-primary" data-numeric="true">{{ $expense->currency }} {{ number_format((float)$expense->amount,2) }}</div></div>
+                <div class="zazu-list-side"><div class="zazu-side-primary" data-numeric="true">{{ $expense->currency }} {{ $expense->amount }}</div></div>
             </div>
         @empty
             <div class="zazu-empty">No expenses recorded.</div>
