@@ -83,6 +83,36 @@ class FinancePurchasingInventoryTest extends TestCase
         ]);
     }
 
+    public function test_finance_dashboard_totals_include_records_beyond_display_limit(): void
+    {
+        [$business, $user] = $this->businessUser();
+        $this->actingAs($user);
+
+        foreach (range(1, 11) as $index) {
+            \App\Models\Payment::create([
+                'business_id' => $business->id,
+                'amount' => '100.00',
+                'currency' => 'ZAR',
+                'method' => 'bank_transfer',
+                'paid_at' => now()->toDateString(),
+            ]);
+
+            \App\Models\FinanceExpense::create([
+                'business_id' => $business->id,
+                'description' => 'Expense '.$index,
+                'amount' => '50.00',
+                'currency' => 'ZAR',
+                'expense_date' => now()->toDateString(),
+                'status' => 'paid',
+            ]);
+        }
+
+        $this->get(route('finance.index'))
+            ->assertOk()
+            ->assertViewHas('paid', '1100.00')
+            ->assertViewHas('expensesTotal', '550.00');
+    }
+
     public function test_purchase_order_receipt_tracks_each_purchase_order_line_separately(): void
     {
         [$business, $user] = $this->businessUser();
