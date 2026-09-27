@@ -1,16 +1,11 @@
 <?php
 
-use Illuminate\Auth\Access\AuthorizationException;
-use Illuminate\Auth\AuthenticationException;
-use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
-use Illuminate\Http\Exceptions\HttpResponseException;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
-use Illuminate\Validation\ValidationException;
-use Symfony\Component\HttpKernel\Exception\HttpExceptionInterface;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 return Application::configure(basePath: dirname(__DIR__))
@@ -39,34 +34,26 @@ return Application::configure(basePath: dirname(__DIR__))
             ], 404)->header('X-Zazu-Request-Id', $requestId);
         });
 
-        $exceptions->render(function (Throwable $exception, Request $request) {
-            if (
-                $exception instanceof ValidationException
-                || $exception instanceof AuthenticationException
-                || $exception instanceof AuthorizationException
-                || $exception instanceof ModelNotFoundException
-                || $exception instanceof HttpResponseException
-                || ($exception instanceof HttpExceptionInterface && $exception->getStatusCode() < 500)
-                || $request->expectsJson()
-                || $request->is('api/*')
-            ) {
-                return null;
-            }
-
-            $requestId = $request->attributes->get('zazu_request_id') ?: (string) Str::uuid();
-
-            return response()->view('errors.500', [
-                'requestId' => $requestId,
-            ], 500)->header('X-Zazu-Request-Id', $requestId);
-        });
-
-        $exceptions->respond(function ($response) {
-            $requestId = request()->attributes->get('zazu_request_id');
+        $exceptions->respond(function (Response $response) {
+            $request = request();
+            $requestId = $request->attributes->get('zazu_request_id');
 
             if ($requestId) {
                 $response->headers->set('X-Zazu-Request-Id', $requestId);
             }
 
-            return $response;
+            if (
+                $response->getStatusCode() < 500
+                || $request->expectsJson()
+                || $request->is('api/*')
+            ) {
+                return $response;
+            }
+
+            return response()->view('errors.500', [
+                'requestId' => $requestId ?: (string) Str::uuid(),
+                'code' => $response->getStatusCode(),
+            ], $response->getStatusCode())
+                ->header('X-Zazu-Request-Id', $requestId ?: (string) Str::uuid());
         });
     })->create();
