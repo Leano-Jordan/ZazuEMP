@@ -18,6 +18,8 @@ Zazu EMP is a proprietary event-management platform for small businesses operati
 
 **Read [memory.md](memory.md) first.**
 
+**Repository safety:** Read [.ai/REPOSITORY_IDENTITY_LOCK.md](.ai/REPOSITORY_IDENTITY_LOCK.md) before any state-changing work. Zazu EMP must never be mixed with another repository or project.
+
 It is the living project context for Zazu EMP and records the current product definition, real-world discovery evidence, owner decisions, architecture direction, UX principles, current development state, unresolved questions and immediate next action.
 
 The memory is adaptable. New owner decisions and validated evidence can change it.
