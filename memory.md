@@ -619,3 +619,12 @@ Regression rule:
 - Added backup/restore CLI tooling for SQLite/MySQL plus private storage.
 - Added Playwright onboarding browser smoke coverage and CI workflow.
 - Final CI/runtime verification remains required; do not declare this hardening pass green until repository checks and a real backup/restore drill succeed.
+
+## Director hardening loop — 2026-09-27
+- Hardened finance idempotency for invoices, payments and expenses, including transaction-scoped duplicate checks and quote-version locking during invoice conversion.
+- Hardened purchase-order and inventory idempotency checks and retained serialized stock/receipt processing.
+- Matured server-side staff permissions across finance, purchasing, inventory, assets, suppliers, customers and quotes/work access while preserving owner-only settings/catalogue boundaries.
+- Hardened backup/restore: backup archives are outside private storage and restore rejects unsafe archive paths before extraction.
+- Added regression coverage for invoice/expense idempotency, settings markup integrity and unsafe restore archives.
+- Corrected one malformed PHP namespace discovered during the self-recheck.
+- Latest hardening source state is commit `9c06e3dd1c1e4bc4c7514c2625945411c634a325`; CI/runtime execution still needs to run in the repository environment before declaring the pass green.
