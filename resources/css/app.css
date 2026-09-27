@@ -73,10 +73,10 @@
     --zazu-shadow: 0 1px 2px rgba(35, 58, 75, 0.04), 0 8px 22px rgba(35, 58, 75, 0.05);
     --zazu-shadow-strong: 0 4px 12px rgba(35, 58, 75, 0.07), 0 16px 34px rgba(35, 58, 75, 0.08);
 
-    --zazu-radius-sm: 6px;
-    --zazu-radius-md: 8px;
-    --zazu-radius-lg: 12px;
-    --zazu-radius-xl: 16px;
+    --zazu-radius-sm: 2px;
+    --zazu-radius-md: 4px;
+    --zazu-radius-lg: 6px;
+    --zazu-radius-xl: 6px;
 
     --zazu-motion-fast: 120ms;
     --zazu-motion-base: 160ms;
@@ -5181,3 +5181,307 @@ body {
 html[data-theme="dark"] .zazu-public-shell{background:#10161d;color:#edf3f8}
 html[data-theme="dark"] .zazu-public-card{background:#18212b;border-color:#2a3846;box-shadow:0 18px 60px rgba(0,0,0,.22)}
 html[data-theme="dark"] .zazu-public-party,html[data-theme="dark"] .zazu-public-accept,html[data-theme="dark"] .zazu-public-accepted{background:#141c25}
+
+
+
+/* -------------------------------------------------------------------------- */
+/* Zazu Operational Premium system                                            */
+/* Canonical interaction, state, density and responsive layer.                */
+/* -------------------------------------------------------------------------- */
+
+:root {
+    --zazu-radius-sm: 2px;
+    --zazu-radius-md: 4px;
+    --zazu-radius-lg: 6px;
+    --zazu-radius-xl: 6px;
+    --zazu-border-subtle: color-mix(in srgb, var(--zazu-border) 72%, transparent);
+    --zazu-surface-raised: color-mix(in srgb, var(--zazu-surface) 88%, var(--zazu-surface-2));
+    --zazu-shadow-none: none;
+    --zazu-shadow-soft: 0 1px 2px color-mix(in srgb, var(--zazu-ink) 7%, transparent);
+    --zazu-shadow-float: 0 8px 24px color-mix(in srgb, var(--zazu-ink) 10%, transparent);
+}
+
+:root[data-theme="dark"] {
+    --zazu-shadow-soft: 0 1px 2px rgba(0, 0, 0, 0.22);
+    --zazu-shadow-float: 0 10px 28px rgba(0, 0, 0, 0.24);
+}
+
+.zazu-command-band,
+.zazu-card,
+.zazu-panel,
+.zazu-form-section,
+.zazu-metric-card,
+.zazu-module,
+.zazu-document,
+.zazu-error-card {
+    border-radius: var(--zazu-radius-lg);
+    box-shadow: var(--zazu-shadow-soft);
+}
+
+.zazu-command-band {
+    box-shadow: var(--zazu-shadow-soft);
+}
+
+.zazu-card-header,
+.zazu-panel-head,
+.zazu-form-section-head {
+    border-bottom-color: var(--zazu-border-subtle);
+}
+
+.zazu-btn,
+.zazu-input,
+.zazu-select,
+.zazu-textarea,
+.zazu-theme-toggle,
+.zazu-header-settings,
+.zazu-mobile-toggle,
+.zazu-mobile-link,
+.zazu-user-trigger {
+    border-radius: var(--zazu-radius-sm);
+}
+
+.zazu-chip,
+.zazu-badge,
+.zazu-pill {
+    border-radius: var(--zazu-radius-sm);
+}
+
+.zazu-chip {
+    min-height: 21px;
+    padding-inline: 7px;
+}
+
+.zazu-btn:focus-visible,
+.zazu-input:focus-visible,
+.zazu-select:focus-visible,
+.zazu-textarea:focus-visible,
+.zazu-theme-toggle:focus-visible,
+.zazu-header-settings:focus-visible,
+.zazu-mobile-toggle:focus-visible,
+.zazu-mobile-link:focus-visible,
+.zazu-user-trigger:focus-visible,
+.zazu-nav-link:focus-visible,
+.zazu-list-item:focus-visible,
+.zazu-quick-link:focus-visible,
+.zazu-toast-close:focus-visible {
+    outline: 2px solid var(--zazu-focus);
+    outline-offset: 2px;
+}
+
+.zazu-btn:disabled,
+.zazu-input:disabled,
+.zazu-select:disabled,
+.zazu-textarea:disabled {
+    cursor: not-allowed;
+    opacity: 0.58;
+}
+
+.zazu-btn[aria-busy="true"],
+.zazu-action-loading {
+    pointer-events: none;
+    cursor: progress;
+}
+
+.zazu-state {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    padding: 14px 16px;
+    border: 1px solid var(--zazu-border);
+    border-left-width: 3px;
+    border-radius: var(--zazu-radius-md);
+    background: var(--zazu-surface-2);
+    color: var(--zazu-ink);
+}
+
+.zazu-state-title {
+    font-size: 12px;
+    font-weight: 750;
+}
+
+.zazu-state-copy {
+    margin-top: 3px;
+    color: var(--zazu-muted);
+    font-size: 12px;
+    line-height: 1.5;
+}
+
+.zazu-state-success { border-left-color: var(--zazu-success); background: var(--zazu-success-soft); }
+.zazu-state-warning { border-left-color: var(--zazu-warning); background: var(--zazu-warning-soft); }
+.zazu-state-error { border-left-color: var(--zazu-danger); background: var(--zazu-danger-soft); }
+.zazu-state-info { border-left-color: var(--zazu-info); background: var(--zazu-info-soft); }
+
+.zazu-state-retry,
+.zazu-state-recovery,
+.zazu-state-permission,
+.zazu-state-stale,
+.zazu-state-loading {
+    background: var(--zazu-surface-2);
+}
+
+.zazu-state-action {
+    flex: 0 0 auto;
+    margin-left: auto;
+}
+
+.zazu-skeleton {
+    min-height: 12px;
+    border-radius: var(--zazu-radius-sm);
+    background: linear-gradient(90deg, var(--zazu-surface-2), var(--zazu-surface-3), var(--zazu-surface-2));
+    background-size: 200% 100%;
+    animation: zazu-skeleton 1.2s ease-in-out infinite;
+}
+
+@keyframes zazu-skeleton {
+    0% { background-position: 100% 0; }
+    100% { background-position: -100% 0; }
+}
+
+/* Quantitative surfaces use stable digit widths for fast scanning. */
+.zazu-metric-value,
+.zazu-command-meta-value,
+.zazu-side-primary,
+.zazu-detail-value,
+.zazu-document-number,
+.zazu-document-total,
+[data-numeric="true"] {
+    font-variant-numeric: tabular-nums lining-nums;
+}
+
+/* Component-level responsiveness. Viewport media queries remain responsible for shell/device/print. */
+.zazu-metric-grid,
+.zazu-detail-grid,
+.zazu-module-grid,
+.zazu-form-grid,
+.zazu-action-group,
+.zazu-card,
+.zazu-panel {
+    container-type: inline-size;
+}
+
+@container (max-width: 720px) {
+    .zazu-action-group {
+        flex-wrap: wrap;
+    }
+
+    .zazu-action-group form {
+        flex: 1 1 100%;
+        min-width: min(100%, 280px);
+    }
+}
+
+@container (max-width: 560px) {
+    .zazu-metric-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .zazu-detail-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .zazu-module-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .zazu-action-group,
+    .zazu-action-group form {
+        align-items: stretch;
+    }
+}
+
+/* Dashboard composition: Bento belongs to overview, not dense operational registers. */
+.zazu-dashboard-bento {
+    display: grid;
+    grid-template-columns: minmax(0, 1.55fr) minmax(240px, 0.9fr);
+    grid-template-areas:
+        "attention metrics"
+        "work metrics"
+        "quick quick";
+    gap: 12px;
+    container-type: inline-size;
+}
+
+.zazu-dashboard-bento > .zazu-dashboard-attention { grid-area: attention; }
+.zazu-dashboard-bento > .zazu-dashboard-metrics { grid-area: metrics; }
+.zazu-dashboard-bento > .zazu-dashboard-work { grid-area: work; }
+.zazu-dashboard-bento > .zazu-dashboard-quick { grid-area: quick; }
+
+.zazu-dashboard-bento > section {
+    min-width: 0;
+}
+
+.zazu-dashboard-attention {
+    min-height: 150px;
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 18px;
+    padding: 18px 20px;
+    border: 1px solid color-mix(in srgb, var(--zazu-primary) 28%, var(--zazu-border));
+    border-left: 3px solid var(--zazu-primary);
+    border-radius: var(--zazu-radius-lg);
+    background: linear-gradient(135deg, var(--zazu-primary-soft), var(--zazu-surface));
+}
+
+.zazu-dashboard-metrics {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 8px;
+}
+
+.zazu-dashboard-metrics .zazu-metric-card {
+    min-height: 108px;
+}
+
+.zazu-dashboard-quick .zazu-quick-links {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 8px;
+}
+
+@container (max-width: 760px) {
+    .zazu-dashboard-bento {
+        grid-template-columns: 1fr;
+        grid-template-areas:
+            "attention"
+            "metrics"
+            "work"
+            "quick";
+    }
+
+    .zazu-dashboard-quick .zazu-quick-links {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+}
+
+@container (max-width: 480px) {
+    .zazu-dashboard-metrics {
+        grid-template-columns: 1fr;
+    }
+
+    .zazu-dashboard-quick .zazu-quick-links {
+        grid-template-columns: 1fr;
+    }
+
+    .zazu-dashboard-attention {
+        align-items: flex-start;
+        flex-direction: column;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .zazu-skeleton {
+        animation: none;
+    }
+
+    .zazu-btn,
+    .zazu-card,
+    .zazu-panel,
+    .zazu-metric-card,
+    .zazu-module,
+    .zazu-nav-link,
+    .zazu-list-item,
+    .zazu-quick-link {
+        transition: none !important;
+    }
+}
