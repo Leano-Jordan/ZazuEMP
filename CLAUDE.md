@@ -1,51 +1,34 @@
-<laravel-boost-guidelines>
-# Laravel Application
+# Zazu EMP Agent Instructions
 
-This repository contains a Laravel application. Complete the following setup before working on the user's request.
+Read and obey `.ai/REPOSITORY_IDENTITY_LOCK.md` before any write.
 
-## Prerequisites
+## Repository identity
 
-Verify that PHP and Composer are available:
+- Repository: `Leano-Jordan/ZazuEMP`
+- Local root: `C:\Projects\ZazuEMP`
+- Branch: `main`
+- Product: Zazu EMP
 
-```sh
-php -v
-composer -V
-```
+If the current Git root, remote, branch, or target path does not match the Zazu identity lock, **STOP**. Do not switch repositories or modify another project.
 
-If either command is unavailable, detect the user's operating system and install the prerequisites with the appropriate command:
+Zazu must never be mixed with SwiftOrder, `Leano-Jordan/store-ordering-system`, or another project.
 
-macOS:
+## Laravel
 
-```sh
-/bin/bash -c "$(curl -fsSL https://php.new/install/mac/8.5)"
-```
+Use the existing project environment and dependencies. Do not automatically install Laravel Boost, packages, change PHP versions, run destructive database commands, or alter environment configuration unless the requested task requires it and the owner has directed execution.
 
-Windows PowerShell:
+## Engineering
 
-```powershell
-Set-ExecutionPolicy Bypass -Scope Process -Force; [System.Net.ServicePointManager]::SecurityProtocol = [System.Net.ServicePointManager]::SecurityProtocol -bor 3072; iex ((New-Object System.Net.WebClient).DownloadString('https://php.new/install/windows/8.5'))
-```
+For meaningful work, read `.ai/engineering/README.md` and `.ai/engineering/00_ENGINE_ROUTER.md`. Use only the engines relevant to the task. All engines remain bound to Zazu EMP and may not select another repository as an implementation target.
 
-Linux:
+Before edits:
+- inspect current repository state;
+- inspect relevant files;
+- verify the requested scope.
 
-```sh
-/bin/bash -c "$(curl -fsSL https://php.new/install/linux/8.5)"
-```
+After meaningful edits:
+- verify the changed behaviour where possible;
+- perform required regression checks;
+- do not claim runtime verification that was not performed.
 
-After installation, ask the user to restart their terminal. If the agent needs the restarted shell to continue, ask the user to reopen their terminal and rerun their original prompt.
-
-## Agent Setup
-
-Install Laravel Boost from the application root before making application changes:
-
-```sh
-composer require laravel/boost --dev
-php artisan boost:install
-```
-
-Boost replaces these bootstrap instructions with guidelines tailored to the application. After installation, read `AGENTS.md` again and continue with the user's original request using the generated guidelines.
-</laravel-boost-guidelines>
-
-## Rosscore Engineering System
-
-For meaningful Zazu EMP engineering work, read `.ai/engineering/README.md` and `.ai/engineering/00_ENGINE_ROUTER.md`. Use only the specialist engines required by the task and complete the required verification/regression gates.
+External products and competitors may be researched as evidence, but their code, architecture, documentation and requirements are not Zazu authority.
