@@ -37,7 +37,7 @@
             </div>
         </div>
         <div class="zazu-work-actions">
-            <span class="zazu-chip {{ $statusClass }} data-status">{{ str_replace('_', ' ', ucfirst($event->status)) }}</span>
+            <span class="zazu-chip {{ $statusClass }}">{{ str_replace('_', ' ', ucfirst($event->status)) }}</span>
         </div>
     </section>
 
