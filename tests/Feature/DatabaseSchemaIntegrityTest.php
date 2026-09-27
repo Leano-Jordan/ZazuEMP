@@ -61,7 +61,7 @@ class DatabaseSchemaIntegrityTest extends TestCase
                 continue;
             }
 
-            $className = $namespace.'\\\\'.$class;
+            $className = $namespace.'\\'.$class;
 
             if (!class_exists($className) || !is_subclass_of($className, Model::class)) {
                 continue;
