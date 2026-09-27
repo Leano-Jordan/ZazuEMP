@@ -252,7 +252,7 @@
                             <label class="zazu-check-row mt-3"><input type="checkbox" name="remove_wallpaper" value="1"><span>Remove current wallpaper</span></label>
                         @endif
                     </div>
-                </div>>
+                </div>
             </section>
 
             <div class="zazu-actionbar">
