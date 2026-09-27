@@ -51,6 +51,7 @@ class FinanceController extends Controller
         $businessId = app(CurrentBusiness::class)->id($request->user());
 
         return view('finance.invoice-create', [
+            'idempotencyKey' => (string) Str::uuid(),
             'quotes' => Quote::whereHas('event', fn ($q) => $q->where('business_id', $businessId))
                 ->with(['event.customer', 'latestVersion'])
                 ->latest()
