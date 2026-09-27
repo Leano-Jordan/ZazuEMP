@@ -15,6 +15,7 @@ class AttachRequestId
         $requestId = (string) Str::uuid();
 
         $request->attributes->set('zazu_request_id', $requestId);
+        $request->headers->set('X-Zazu-Request-Id', $requestId);
 
         Log::withContext([
             'zazu_request_id' => $requestId,
