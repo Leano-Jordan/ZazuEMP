@@ -55,7 +55,7 @@ class PurchaseOrderController extends Controller
             'description'=>['required','array','min:1'],
             'description.*'=>['required','string','max:255'],
             'quantity'=>['required','array'],
-            'quantity.*'=>['required','numeric','gt:0'],
+            'quantity.*'=>['required','numeric','decimal:0,2','gt:0'],
             'unit'=>['nullable','array'],
             'unit.*'=>['nullable','string','max:50'],
             'unit_price'=>['required','array'],
@@ -130,7 +130,7 @@ class PurchaseOrderController extends Controller
                 $priceCents=Money::toCents((string)$data['unit_price'][$i]);
                 $lineCents=Money::multiplyQuantityByPrice($qtyHundredths,$priceCents);
                 $totalCents += $lineCents;
-                $qty=(float)$data['quantity'][$i]; $price=(float)$data['unit_price'][$i]; $line=Money::fromCents($lineCents);
+                $qty=number_format($qtyHundredths / 100, 2, '.', ''); $price=Money::fromCents($priceCents); $line=Money::fromCents($lineCents);
                 $order->items()->create([
                     'business_id'=>$businessId,'capability_id'=>$data['capability_id'][$i]??null,
                     'description'=>$description,'quantity'=>$qty,'unit'=>$data['unit'][$i]??null,
