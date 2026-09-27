@@ -2,7 +2,10 @@
 
 namespace Tests\Feature;
 
+use Illuminate\Contracts\Debug\ExceptionHandler;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\File;
+use Illuminate\Support\Facades\Route;
 use Tests\TestCase;
 
 class ErrorHandlingTest extends TestCase
@@ -24,16 +27,22 @@ class ErrorHandlingTest extends TestCase
         $this->assertNotEmpty($response->headers->get('X-Zazu-Request-Id'));
     }
 
-    public function test_production_500_view_renders_a_safe_traceable_error_surface(): void
+    public function test_exception_handler_renders_the_branded_500_surface_without_leaking_details(): void
     {
-        $response = $this->view('errors.500', [
-            'requestId' => 'test-request-id',
-            'code' => 500,
-        ]);
+        $request = Request::create('/__zazu-test-handler-500', 'GET');
+        $request->attributes->set('zazu_request_id', 'test-request-id');
+        $this->app->instance('request', $request);
 
-        $response->assertSee('Zazu could not complete that request.');
-        $response->assertSee('Reference test-request-id');
-        $response->assertDontSee('Sensitive database/table details');
+        $response = app(ExceptionHandler::class)->render(
+            $request,
+            new \RuntimeException('Sensitive database/table details must remain private.')
+        );
+
+        $this->assertSame(500, $response->getStatusCode());
+        $this->assertStringContainsString('Zazu could not complete that request.', (string) $response->getContent());
+        $this->assertStringContainsString('Reference test-request-id', (string) $response->getContent());
+        $this->assertStringNotContainsString('Sensitive database/table details', (string) $response->getContent());
+        $this->assertSame('test-request-id', $response->headers->get('X-Zazu-Request-Id'));
     }
 
     public function test_production_500_view_is_present_in_the_application_error_views(): void
