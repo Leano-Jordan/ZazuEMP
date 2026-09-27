@@ -30,4 +30,17 @@ class ErrorHandlingTest extends TestCase
         $response->assertDontSee('__zazu_missing_table__');
         $this->assertNotEmpty($response->headers->get('X-Zazu-Request-Id'));
     }
+
+    public function test_validation_failure_keeps_standard_redirect_and_field_errors(): void
+    {
+        Route::post('/__zazu-test-validation', fn () => request()->validate([
+            'name' => ['required', 'string'],
+        ]));
+
+        $response = $this->from('/dashboard')->post('/__zazu-test-validation', []);
+
+        $response->assertRedirect('/dashboard');
+        $response->assertSessionHasErrors('name');
+        $response->assertNotSame(500, $response->status());
+    }
 }
