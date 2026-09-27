@@ -29,7 +29,7 @@ jobs:
           php artisan migrate --force
 
       - name: Install frontend dependencies
-        run: npm install --ignore-scripts
+        run: npm ci
 
       - name: Build frontend
         run: npm run build
@@ -40,5 +40,5 @@ jobs:
       - name: Start application
         run: php artisan serve --host=127.0.0.1 --port=8000 > storage/logs/browser-server.log 2>&1 &
 
-      - name: Run onboarding browser smoke
-        run: npx playwright test tests/browser/onboarding.spec.js --workers=1
+      - name: Run browser regression suite
+        run: npm run test:e2e -- --workers=1
