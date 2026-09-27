@@ -69,17 +69,21 @@ class InventoryController extends Controller
         }
 
         $data['idempotency_key'] ??= (string) \Illuminate\Support\Str::uuid();
+        $alreadyProcessed = false;
 
-        $existingMovement = \App\Models\InventoryMovement::query()
-            ->where('business_id', $businessId)
-            ->where('idempotency_key', $data['idempotency_key'])
-            ->first();
+        DB::transaction(function () use ($inventoryItem, $businessId, $data, &$alreadyProcessed): void {
+            // Serialize business-level idempotency checks before locking the stock row.
+            \App\Models\Business::query()->whereKey($businessId)->lockForUpdate()->firstOrFail();
 
-        if ($existingMovement) {
-            return back()->with('info', 'That stock submission was already processed.');
-        }
+            if (\App\Models\InventoryMovement::query()
+                ->where('business_id', $businessId)
+                ->where('idempotency_key', $data['idempotency_key'])
+                ->exists()
+            ) {
+                $alreadyProcessed = true;
+                return;
+            }
 
-        DB::transaction(function () use ($inventoryItem, $businessId, $data): void {
             $lockedItem = InventoryItem::query()
                 ->where('business_id', $businessId)
                 ->lockForUpdate()
@@ -98,6 +102,10 @@ class InventoryController extends Controller
                 'item_id' => $lockedItem->id,
             ], $businessId);
         });
+
+        if ($alreadyProcessed) {
+            return back()->with('info', 'That stock submission was already processed.');
+        }
 
         return back()->with('success','Inventory movement recorded.');
     }
