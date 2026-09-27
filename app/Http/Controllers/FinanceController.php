@@ -346,6 +346,10 @@ class FinanceController extends Controller
             ], $businessId);
         });
 
+        if ($alreadyProcessed) {
+            return redirect()->route('finance.index')->with('info', 'That payment submission was already processed.');
+        }
+
         return redirect()->route('finance.index')->with('success', 'Payment recorded.');
     }
 
