@@ -60,29 +60,29 @@ Route::middleware(['auth', 'auth.session', 'business.context'])->group(function 
     Route::get('/media/business/{type}', [\App\Http\Controllers\BusinessMediaController::class, 'show'])->whereIn('type', ['logo', 'dashboard', 'wallpaper'])->name('business.media');
     Route::get('/calendar', CalendarController::class)->name('calendar.index');
 
-    Route::get('/finance', [FinanceController::class, 'index'])->name('finance.index');
-    Route::get('/finance/invoices/create', [FinanceController::class, 'createInvoice'])->name('finance.invoices.create');
-    Route::get('/finance/invoices/{invoice}', [FinanceController::class, 'showInvoice'])->name('finance.invoices.show');
-    Route::post('/finance/invoices', [FinanceController::class, 'storeInvoice'])->name('finance.invoices.store');
-    Route::get('/finance/payments/create', [FinanceController::class, 'createPayment'])->name('finance.payments.create');
-    Route::post('/finance/payments', [FinanceController::class, 'storePayment'])->name('finance.payments.store');
-    Route::get('/finance/expenses/create', [FinanceController::class, 'createExpense'])->name('finance.expenses.create');
-    Route::post('/finance/expenses', [FinanceController::class, 'storeExpense'])->name('finance.expenses.store');
+    Route::get('/finance', [FinanceController::class, 'index'])->middleware('permission:finance.view')->name('finance.index');
+    Route::get('/finance/invoices/create', [FinanceController::class, 'createInvoice'])->middleware('permission:finance.invoice.create')->name('finance.invoices.create');
+    Route::get('/finance/invoices/{invoice}', [FinanceController::class, 'showInvoice'])->middleware('permission:finance.view')->name('finance.invoices.show');
+    Route::post('/finance/invoices', [FinanceController::class, 'storeInvoice'])->middleware('permission:finance.invoice.create')->name('finance.invoices.store');
+    Route::get('/finance/payments/create', [FinanceController::class, 'createPayment'])->middleware('permission:finance.payment.create')->name('finance.payments.create');
+    Route::post('/finance/payments', [FinanceController::class, 'storePayment'])->middleware('permission:finance.payment.create')->name('finance.payments.store');
+    Route::get('/finance/expenses/create', [FinanceController::class, 'createExpense'])->middleware('permission:finance.expense.create')->name('finance.expenses.create');
+    Route::post('/finance/expenses', [FinanceController::class, 'storeExpense'])->middleware('permission:finance.expense.create')->name('finance.expenses.store');
 
     Route::get('/suppliers', [SupplierController::class, 'index'])->name('suppliers.index');
     Route::get('/suppliers/create', [SupplierController::class, 'create'])->name('suppliers.create');
     Route::post('/suppliers', [SupplierController::class, 'store'])->name('suppliers.store');
 
-    Route::get('/purchasing', [PurchaseOrderController::class, 'index'])->name('purchasing.index');
-    Route::get('/purchasing/create', [PurchaseOrderController::class, 'create'])->name('purchasing.create');
-    Route::post('/purchasing', [PurchaseOrderController::class, 'store'])->name('purchasing.store');
-    Route::get('/purchasing/{purchaseOrder}', [PurchaseOrderController::class, 'show'])->name('purchasing.show');
-    Route::patch('/purchasing/{purchaseOrder}/status', [PurchaseOrderController::class, 'updateStatus'])->name('purchasing.status');
+    Route::get('/purchasing', [PurchaseOrderController::class, 'index'])->middleware('permission:purchasing.view')->name('purchasing.index');
+    Route::get('/purchasing/create', [PurchaseOrderController::class, 'create'])->middleware('permission:purchasing.create')->name('purchasing.create');
+    Route::post('/purchasing', [PurchaseOrderController::class, 'store'])->middleware('permission:purchasing.create')->name('purchasing.store');
+    Route::get('/purchasing/{purchaseOrder}', [PurchaseOrderController::class, 'show'])->middleware('permission:purchasing.view')->name('purchasing.show');
+    Route::patch('/purchasing/{purchaseOrder}/status', [PurchaseOrderController::class, 'updateStatus'])->middleware('permission:purchasing.status')->name('purchasing.status');
 
-    Route::get('/inventory', [InventoryController::class, 'index'])->name('inventory.index');
-    Route::get('/inventory/create', [InventoryController::class, 'create'])->name('inventory.create');
-    Route::post('/inventory', [InventoryController::class, 'store'])->name('inventory.store');
-    Route::post('/inventory/{inventoryItem}/movement', [InventoryController::class, 'movement'])->name('inventory.movement');
+    Route::get('/inventory', [InventoryController::class, 'index'])->middleware('permission:inventory.view')->name('inventory.index');
+    Route::get('/inventory/create', [InventoryController::class, 'create'])->middleware('permission:inventory.create')->name('inventory.create');
+    Route::post('/inventory', [InventoryController::class, 'store'])->middleware('permission:inventory.create')->name('inventory.store');
+    Route::post('/inventory/{inventoryItem}/movement', [InventoryController::class, 'movement'])->middleware('permission:inventory.movement')->name('inventory.movement');
 
     Route::get('/assets', [AssetController::class, 'index'])->name('assets.index');
     Route::get('/assets/create', [AssetController::class, 'create'])->name('assets.create');
