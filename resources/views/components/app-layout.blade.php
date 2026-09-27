@@ -293,6 +293,8 @@
                     </div>
                 @endif
 
+                <x-zazu-helper />
+
                 {{ $slot }}
             </div>
         </main>
