@@ -25,6 +25,7 @@ class ZazuBackupRestoreTest extends TestCase
 
         File::ensureDirectoryExists(dirname($database));
         File::delete($database);
+        File::put($database, '');
         File::deleteDirectory($output);
 
         config([
