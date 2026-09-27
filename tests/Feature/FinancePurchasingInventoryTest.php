@@ -438,6 +438,43 @@ class FinancePurchasingInventoryTest extends TestCase
             ->assertForbidden();
     }
 
+    public function test_asset_details_can_be_updated_and_audit_is_recorded(): void
+    {
+        [$business, $user] = $this->businessUser();
+        $this->actingAs($user);
+
+        $asset = \App\Models\Asset::create([
+            'business_id' => $business->id,
+            'asset_tag' => 'ASSET-UPDATE-001',
+            'name' => 'Tent',
+            'status' => 'available',
+            'condition' => 'good',
+            'location' => 'Depot',
+            'purchase_cost' => '3000.00',
+            'currency' => 'ZAR',
+        ]);
+
+        $this->get(route('assets.edit', $asset))->assertOk();
+
+        $this->put(route('assets.update', $asset), [
+            'asset_tag' => 'ASSET-UPDATE-001',
+            'name' => 'Tent',
+            'condition' => 'damaged',
+            'location' => 'Repair area',
+            'purchase_cost' => '3000.00',
+        ])->assertRedirect(route('assets.index'));
+
+        $asset->refresh();
+
+        $this->assertSame('damaged', $asset->condition);
+        $this->assertSame('Repair area', $asset->location);
+        $this->assertDatabaseHas('audit_logs', [
+            'business_id' => $business->id,
+            'action' => 'assets.updated',
+            'subject_id' => $asset->id,
+        ]);
+    }
+
     public function test_asset_allocation_is_business_scoped(): void
     {
         [$business, $user] = $this->businessUser();
