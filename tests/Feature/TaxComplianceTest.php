@@ -193,7 +193,7 @@ class TaxComplianceTest extends TestCase
 
         $invoice = Invoice::where('quote_id', $quote->id)->firstOrFail();
 
-        $this->assertSame('1150.00', (string) $invoice->subtotal);
+        $this->assertSame('1000.00', (string) $invoice->subtotal);
         $this->assertSame('150.00', (string) $invoice->tax_total);
         $this->assertSame('1150.00', (string) $invoice->total);
         $this->assertSame('VAT_STANDARD', $invoice->tax_code);
