@@ -9,6 +9,7 @@ use App\Models\InventoryItem;
 use App\Models\Invoice;
 use App\Models\Quote;
 use App\Models\QuoteVersion;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Str;
 use Tests\TestCase;
@@ -45,20 +46,30 @@ class ParentChildIntegrityTest extends TestCase
         ]);
     }
 
+    private function foreignEventFor(Business $business, string $reference): Event
+    {
+        return Model::withoutEvents(fn () => $this->eventFor($business, $reference));
+    }
+
+    private function foreignQuote(Event $event, string $reference, string $status = 'draft'): Quote
+    {
+        return Model::withoutEvents(fn () => Quote::create([
+            'event_id' => $event->id,
+            'reference' => $reference,
+            'status' => $status,
+            'currency' => 'ZAR',
+        ]));
+    }
+
     public function test_quote_from_another_business_cannot_be_opened_in_the_current_workspace(): void
     {
         $own = $this->business('Own Business');
         $foreign = $this->business('Foreign Business');
         $user = $this->signInAsOwner($own);
 
-        $event = $this->eventFor($foreign, 'ZAZ-FOREIGN-QUOTE');
+        $event = $this->foreignEventFor($foreign, 'ZAZ-FOREIGN-QUOTE');
 
-        $quote = Quote::create([
-            'event_id' => $event->id,
-            'reference' => 'QUO-FOREIGN-001',
-            'status' => 'draft',
-            'currency' => 'ZAR',
-        ]);
+        $quote = $this->foreignQuote($event, 'QUO-FOREIGN-001');
 
         $this->actingAs($user)
             ->get(route('quotes.show', $quote))
@@ -72,7 +83,7 @@ class ParentChildIntegrityTest extends TestCase
         $user = $this->signInAsOwner($own);
 
         $ownEvent = $this->eventFor($own, 'ZAZ-OWN-VERSION');
-        $foreignEvent = $this->eventFor($foreign, 'ZAZ-FOREIGN-VERSION');
+        $foreignEvent = $this->foreignEventFor($foreign, 'ZAZ-FOREIGN-VERSION');
 
         $ownQuote = Quote::create([
             'event_id' => $ownEvent->id,
@@ -81,12 +92,7 @@ class ParentChildIntegrityTest extends TestCase
             'currency' => 'ZAR',
         ]);
 
-        $foreignQuote = Quote::create([
-            'event_id' => $foreignEvent->id,
-            'reference' => 'QUO-FOREIGN-002',
-            'status' => 'draft',
-            'currency' => 'ZAR',
-        ]);
+        $foreignQuote = $this->foreignQuote($foreignEvent, 'QUO-FOREIGN-002');
 
         $foreignVersion = $foreignQuote->versions()->create([
             'version' => 1,
@@ -108,14 +114,9 @@ class ParentChildIntegrityTest extends TestCase
         $user = $this->signInAsOwner($own);
 
         $ownEvent = $this->eventFor($own, 'ZAZ-OWN-INVOICE');
-        $foreignEvent = $this->eventFor($foreign, 'ZAZ-FOREIGN-INVOICE');
+        $foreignEvent = $this->foreignEventFor($foreign, 'ZAZ-FOREIGN-INVOICE');
 
-        $foreignQuote = Quote::create([
-            'event_id' => $foreignEvent->id,
-            'reference' => 'QUO-FOREIGN-003',
-            'status' => 'accepted',
-            'currency' => 'ZAR',
-        ]);
+        $foreignQuote = $this->foreignQuote($foreignEvent, 'QUO-FOREIGN-003', 'accepted');
 
         $foreignVersion = $foreignQuote->versions()->create([
             'version' => 1,
@@ -150,7 +151,7 @@ class ParentChildIntegrityTest extends TestCase
         $foreign = $this->business('Foreign Business');
         $user = $this->signInAsOwner($own);
 
-        $foreignInvoice = Invoice::create([
+        $foreignInvoice = Model::withoutEvents(fn () => Invoice::create([
             'business_id' => $foreign->id,
             'number' => 'INV-FOREIGN-001',
             'status' => 'issued',
@@ -160,7 +161,7 @@ class ParentChildIntegrityTest extends TestCase
             'total' => '500.00',
             'issued_at' => now()->toDateString(),
             'due_at' => now()->addDays(7)->toDateString(),
-        ]);
+        ]));
 
         $this->actingAs($user)
             ->post(route('finance.payments.store'), [
@@ -187,7 +188,7 @@ class ParentChildIntegrityTest extends TestCase
             'reorder_level' => 0,
         ]);
 
-        $foreignEvent = $this->eventFor($foreign, 'ZAZ-FOREIGN-STOCK');
+        $foreignEvent = $this->foreignEventFor($foreign, 'ZAZ-FOREIGN-STOCK');
 
         $this->actingAs($user)
             ->post(route('inventory.movement', $item), [
