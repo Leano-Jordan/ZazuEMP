@@ -90,17 +90,20 @@ class Invoice extends Model
         return $this->hasMany(InvoiceItem::class);
     }
 
-    public function getPaidAmountAttribute(): float
+    public function getPaidAmountAttribute(): string
     {
         $this->loadMissing('payments');
 
-        return (float) Money::fromCents(
+        return Money::fromCents(
             $this->payments->sum(fn (Payment $payment) => Money::toCents((string) $payment->amount))
         );
     }
 
-    public function getBalanceAttribute(): float
+    public function getBalanceAttribute(): string
     {
-        return max(0, (float) $this->total - $this->paid_amount);
+        $totalCents = Money::toCents((string) $this->total);
+        $paidCents = Money::toCents((string) $this->paid_amount);
+
+        return Money::fromCents(max(0, $totalCents - $paidCents));
     }
 }
