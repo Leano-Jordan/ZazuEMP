@@ -17,7 +17,7 @@
 
     <div class="zazu-metric-grid">
         @foreach ($totalsByCurrency as $currency => $totals)
-            <section class="zazu-metric-card"><h2 class="zazu-metric-label">{{ $currency }} projected</h2><div class="zazu-metric-value">{{ $currency }} {{ number_format($totals['projected'], 2) }}</div><div class="zazu-metric-note">Actual: {{ $currency }} {{ number_format($totals['actual'], 2) }}</div></section>
+            <section class="zazu-metric-card"><h2 class="zazu-metric-label">{{ $currency }} projected</h2><div class="zazu-metric-value">{{ $currency }} {{ $totals['projected'] }}</div><div class="zazu-metric-note">Actual: {{ $currency }} {{ $totals['actual'] }}</div></section>
         @endforeach
         <section class="zazu-metric-card"><h2 class="zazu-metric-label">Records</h2><div class="zazu-metric-value">{{ $costs->count() }}</div><div class="zazu-metric-note">Cost entries for this work</div></section>
     </div>
@@ -45,8 +45,8 @@
                     </div>
                     @if ($cost->notes)<div class="zazu-list-meta">{{ $cost->notes }}</div>@endif
                 </div>
-                <div class="zazu-list-side"><div class="zazu-side-primary">{{ $cost->currency }} {{ number_format((float) $cost->projected_amount, 2) }}</div></div>
-                <div class="zazu-list-side"><div class="zazu-side-primary">{{ $cost->actual_amount !== null ? $cost->currency.' '.number_format((float) $cost->actual_amount, 2) : 'Not recorded' }}</div></div>
+                <div class="zazu-list-side"><div class="zazu-side-primary">{{ $cost->currency }} {{ $cost->projected_amount }}</div></div>
+                <div class="zazu-list-side"><div class="zazu-side-primary">{{ $cost->actual_amount !== null ? $cost->currency.' '.$cost->actual_amount : 'Not recorded' }}</div></div>
             </div>
         @empty
             <div class="zazu-empty">
