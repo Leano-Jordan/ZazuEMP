@@ -16,9 +16,11 @@ class PermissionService
             return false;
         }
 
-        $role = $user->businesses()
+        $membership = $user->businesses()
             ->whereKey($business->id)
-            ->value('business_user.role');
+            ->first();
+
+        $role = $membership?->pivot?->role;
 
         if ($role === 'owner') {
             return true;
