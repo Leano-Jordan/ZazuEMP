@@ -163,6 +163,10 @@ class BusinessMediaSecurityTest extends TestCase
             'code' => 'NO_VAT',
             'is_default' => true,
         ]);
+        $this->assertDatabaseHas('audit_logs', [
+            'business_id' => $business->id,
+            'action' => 'business.settings.updated',
+        ]);
     }
 
 
