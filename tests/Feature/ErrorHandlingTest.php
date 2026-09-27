@@ -7,6 +7,13 @@ use Tests\TestCase;
 
 class ErrorHandlingTest extends TestCase
 {
+    protected function setUp(): void
+    {
+        parent::setUp();
+
+        // Test the same non-debug HTML error contract used in production.
+        config()->set('app.debug', false);
+    }
     public function test_missing_route_uses_branded_error_surface_and_request_reference(): void
     {
         $response = $this->get('/this-page-does-not-exist');
