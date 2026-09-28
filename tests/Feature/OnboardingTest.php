@@ -185,7 +185,7 @@ class OnboardingTest extends TestCase
         $this->assertDatabaseCount('business_capabilities', 0);
     }
 
-    public function test_dashboard_stays_lean_until_resource_data_exists(): void
+    public function test_dashboard_exposes_the_current_operational_command_surface(): void
     {
         $business = Business::create([
             'name' => 'Lean Dashboard Business',
