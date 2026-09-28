@@ -739,3 +739,17 @@ Regression rule:
 - Deliberately did not add a real Planned event state. Current lifecycle remains Draft → Confirmed → In Progress → Completed with cancellation handling until a business requirement proves a separate Planned state is necessary.
 - Deliberately contained compliance, inventory, assets, travel, BI and AI autonomy rather than expanding them into separate V1 systems.
 - Runtime Laravel/browser execution remains outstanding because this environment could not clone the public repository due unavailable outbound DNS/network access. Source-level review of the executed changes was performed; release certification still requires repository-environment runtime checks, browser QA, backup/restore and populated-database migration verification.
+
+
+## Director visual visibility and landing correction — 2026-09-28
+
+- Corrected the base visual rule that forced the Zazu navigation rail into a dark treatment even in light mode.
+- Light mode now uses a bright blue/white shell with vibrant blue actions and clearly readable navy/blue navigation.
+- Applied the Reports page's visible structural-boundary pattern across shared Zazu cards, panels, forms, metrics, route cards, context surfaces and dashboard-specific surfaces.
+- Dashboard now has stronger visual anchors so primary work, metrics, commercial action, resources and quick access read as distinct areas.
+- Preserved the existing dark-mode system by scoping the new navigation/header treatment to non-dark mode.
+- Landing page remains the public root and now exposes explicit Register and Log in actions for guests.
+- Logout now returns to the public landing page instead of directly to login.
+- Added replaceable Unsplash-licensed event/catering image placeholders to the landing page.
+- Added LandingPageTest coverage for public root and logout destination.
+- Runtime rendered QA remains pending; source changes are committed on main and require browser verification in the repository environment.
