@@ -79,6 +79,12 @@
                         @if($can('reports.view'))
                             <a href="{{ route('reports.index') }}" class="zazu-nav-link {{ request()->routeIs('reports.*') ? 'active' : '' }}"><span class="zazu-nav-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 19V9M12 19V5M19 19v-7"></path></svg></span><span class="zazu-nav-label">Reports</span><span class="zazu-nav-arrow" aria-hidden="true">↗</span></a>
                         @endif
+
+                    </div>
+                </div>
+                <div class="zazu-nav-group zazu-nav-account">
+                    <div class="zazu-nav-group-label">Account</div>
+                    <div class="zazu-nav-stack">
                         @if($isOwner)
                             <a href="{{ route('settings.index') }}" class="zazu-nav-link {{ request()->routeIs('settings.*') ? 'active' : '' }}"><span class="zazu-nav-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="3"></circle><path d="M19 12a7 7 0 0 0-.3-2l-2-1.3-2-3.4-2.3 1a7 7 0 0 0-3.4-2L11 4.3 12 2l1 2.3a7 7 0 0 0 3.4 2l2.3-1 2 3.4-2 1.3a7 7 0 0 0 0 4l2 1.3-2 3.4-2.3-1a7 7 0 0 0-3.4 2L13 22l-2-2.3a7 7 0 0 0-3.4-2l-2.3 1-2-3.4 2-1.3a7 7 0 0 0 0-4L3.3 8.7l2-3.4 2.3 1a7 7 0 0 0 3.4-2L11 2"></path></svg></span><span class="zazu-nav-label">Settings</span><span class="zazu-nav-arrow" aria-hidden="true">↗</span></a>
                         @endif
