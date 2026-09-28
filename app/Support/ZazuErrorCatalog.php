@@ -104,6 +104,10 @@ final class ZazuErrorCatalog
         }
 
         if ($exception instanceof HttpExceptionInterface) {
+            if ($exception->getStatusCode() === 403 && $exception->getMessage() === 'An active business workspace is required.') {
+                return 'AUTHZ-002';
+            }
+
             return match ($exception->getStatusCode()) {
                 401 => 'AUTH-001',
                 403 => 'AUTHZ-001',
