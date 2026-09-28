@@ -746,8 +746,8 @@ textarea:focus {
 
 [data-zazu-route="assets.index"] .zazu-list-item,
 [data-zazu-route="suppliers.index"] .zazu-list-item,
-[data-zazu-route="travel.index"] .zazu-list-item,
-[data-zazu-route="preparation.index"] .zazu-list-item {
+[data-zazu-route="work.travel.index"] .zazu-list-item,
+[data-zazu-route="work.preparation.index"] .zazu-list-item {
     min-height: 72px;
 }
 
@@ -811,10 +811,10 @@ textarea:focus {
     box-shadow: 0 8px 20px color-mix(in srgb, var(--zazu-accent) 12%, transparent);
 }
 
-[data-zazu-route="costs.index"] .zazu-metric-card {
+[data-zazu-route="work.costs.index"] .zazu-metric-card {
     border-top-color: #0B8F8F;
 }
-[data-zazu-route="costs.create"] .zazu-form-section {
+[data-zazu-route="work.costs.create"] .zazu-form-section {
     border-left: 3px solid var(--zazu-accent);
 }
 
@@ -844,7 +844,7 @@ textarea:focus {
 }
 
 [data-zazu-route="preparation.index"] .zazu-command-band,
-[data-zazu-route="preparation.create"] .zazu-command-band {
+[data-zazu-route="work.preparation.create"] .zazu-command-band {
     border-left-color: #D17B17;
 }
 [data-zazu-route="preparation.index"] .zazu-list-item:hover {
@@ -854,7 +854,7 @@ textarea:focus {
 
 [data-zazu-route="travel.index"] .zazu-command-band,
 [data-zazu-route="work.travel.index"] .zazu-command-band,
-[data-zazu-route="travel.create"] .zazu-command-band,
+[data-zazu-route="work.travel.create"] .zazu-command-band,
 [data-zazu-route="work.travel.create"] .zazu-command-band {
     border-left-color: #0B8F8F;
 }
@@ -947,15 +947,15 @@ textarea:focus {
 }
 
 [data-zazu-route="quotes.index"] .zazu-command-band,
-[data-zazu-route="quotes.event-index"] .zazu-command-band,
-[data-zazu-route="quotes.create"] .zazu-command-band,
+[data-zazu-route="work.quotes.index"] .zazu-command-band,
+[data-zazu-route="work.quotes.create"] .zazu-command-band,
 [data-zazu-route="quotes.versions.edit"] .zazu-command-band,
 [data-zazu-route="quotes.show"] .zazu-quote-hero {
     border-left-color: var(--zazu-primary);
 }
 
-[data-zazu-route="requirements.index"] .zazu-command-band,
-[data-zazu-route="requirements.create"] .zazu-command-band {
+[data-zazu-route="work.requirements.index"] .zazu-command-band,
+[data-zazu-route="work.requirements.create"] .zazu-command-band {
     border-left-color: #0B8F8F;
 }
 [data-zazu-route="requirements.index"] .zazu-requirement-status {
