@@ -2,6 +2,7 @@
 
 namespace Tests\Feature;
 
+use App\Models\User;
 use Illuminate\Contracts\Debug\ExceptionHandler;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\File;
@@ -27,7 +28,20 @@ class ErrorHandlingTest extends TestCase
         $this->assertNotEmpty($response->headers->get('X-Zazu-Request-Id'));
     }
 
-    public function test_exception_handler_renders_the_branded_500_surface_without_leaking_details(): void
+    public function test_missing_workspace_403_explains_signed_in_account_state(): void
+    {
+        $this->actingAs(User::factory()->create());
+
+        $response = $this->get('/dashboard');
+
+        $response->assertForbidden();
+        $response->assertSee("You're signed in, but no workspace is active.");
+        $response->assertSee('Public site');
+        $response->assertSee('Sign out');
+        $this->assertSame('AUTHZ-002', $response->headers->get('X-Zazu-Error-Code'));
+    }
+
+        public function test_exception_handler_renders_the_branded_500_surface_without_leaking_details(): void
     {
         $request = Request::create('/__zazu-test-handler-500', 'GET');
         $request->attributes->set('zazu_request_id', 'test-request-id');
