@@ -429,6 +429,7 @@ class FinanceController extends Controller
             Audit::record('finance.payment.recorded', $invoice->payments()->latest('id')->first(), [
                 'invoice_id' => $invoice->id,
                 'amount' => $data['amount'],
+                'type' => $data['type'],
                 'currency' => $invoice->currency,
                 'method' => $data['method'],
             ], $businessId);
