@@ -86,6 +86,67 @@ class FinancePurchasingInventoryTest extends TestCase
         ]);
     }
 
+    public function test_purchase_order_supports_partial_receipts_without_over_receiving_or_duplicate_stock(): void
+    {
+        [$business, $user] = $this->businessUser();
+        $this->actingAs($user);
+
+        $supplier = \App\Models\Supplier::create([
+            'business_id' => $business->id,
+            'name' => 'Partial Receipt Supplier',
+        ]);
+
+        $this->post(route('purchasing.store'), [
+            'supplier_id' => $supplier->id,
+            'currency' => 'ZAR',
+            'description' => ['Chairs'],
+            'quantity' => ['20'],
+            'unit' => ['units'],
+            'unit_price' => ['50.00'],
+            'capability_id' => [''],
+        ])->assertRedirect();
+
+        $order = \App\Models\PurchaseOrder::firstOrFail();
+
+        $this->patch(route('purchasing.status', $order), ['status' => 'sent'])->assertRedirect();
+        $this->patch(route('purchasing.status', $order), ['status' => 'ordered'])->assertRedirect();
+
+        $key = (string) Str::uuid();
+
+        $this->post(route('purchasing.receive', $order), [
+            'idempotency_key' => $key,
+            'received_quantity' => [$order->items()->first()->id => '8'],
+        ])->assertRedirect();
+
+        $order->refresh();
+        $line = $order->items()->first();
+
+        $this->assertSame('ordered', $order->status);
+        $this->assertSame('8.00', $line->received_quantity);
+        $this->assertDatabaseHas('inventory_movements', [
+            'purchase_order_id' => $order->id,
+            'purchase_order_item_id' => $line->id,
+            'quantity' => '8.00',
+            'type' => 'receipt',
+        ]);
+
+        $this->post(route('purchasing.receive', $order), [
+            'idempotency_key' => $key,
+            'received_quantity' => [$line->id => '8'],
+        ])->assertRedirect();
+
+        $this->assertDatabaseCount('inventory_movements', 1);
+
+        $this->post(route('purchasing.receive', $order), [
+            'idempotency_key' => (string) Str::uuid(),
+            'received_quantity' => [$line->id => '12'],
+        ])->assertRedirect();
+
+        $this->assertSame('received', $order->fresh()->status);
+        $this->assertSame('20.00', $line->fresh()->received_quantity);
+        $this->assertDatabaseCount('inventory_movements', 2);
+    }
+
     public function test_purchase_order_idempotency_prevents_duplicate_supplier_commitment(): void
     {
         [$business, $user] = $this->businessUser();
