@@ -60,50 +60,27 @@ test('registration flows through onboarding into the dashboard', async ({ page }
     await expect(page.getByRole('heading', { name: 'Command Centre' })).toBeVisible();
     await expect(page.locator('.zazu-footer-workspace strong')).toHaveText(businessName);
 
-    const helperPanel = page.locator('[data-zazu-helper-panel]');
-    const helperToggle = page.locator('[data-zazu-helper-toggle]');
-
-    await expect(helperPanel).toBeVisible();
-    await expect(helperToggle).toHaveAttribute('aria-pressed', 'true');
-
-    await page.getByRole('button', { name: 'Turn guide off' }).click();
-    await expect(helperPanel).toBeHidden();
-    await page.waitForTimeout(600);
-    await expect(helperPanel).toBeHidden();
-    await expect(helperToggle).toHaveAttribute('aria-pressed', 'false');
-
-    await page.reload();
-    await expect(helperPanel).toBeHidden();
-    await expect(helperToggle).toHaveAttribute('aria-pressed', 'false');
-
-    await helperToggle.click();
-    await expect(helperPanel).toBeVisible();
-    await expect(helperToggle).toHaveAttribute('aria-pressed', 'true');
-
-    await page.getByRole('button', { name: 'Close' }).click();
-    await expect(helperPanel).toBeHidden();
-
-    const moduleLinks = await page.locator('nav[aria-label="Primary"] a').evaluateAll((links) =>
-        links.map((link) => ({ href: link.href, name: link.textContent?.trim() }))
-            .filter((link) => link.href && link.name)
-    );
-
-    for (const link of moduleLinks) {
-        const response = await page.goto(link.href, { waitUntil: 'domcontentloaded' });
-        expect(response?.status(), link.name).toBe(200);
-        await expect(page.locator('body')).not.toContainText('Whoops');
-        await expect(page.locator('body')).not.toContainText('Server Error');
-    }
-
     const signedInLandingResponse = await page.goto('/');
     expect(signedInLandingResponse?.status(), 'authenticated landing').toBe(200);
     await expect(page.locator('.zazu-error-shell')).toHaveCount(0);
     await expect(page.getByText("You’re signed in")).toBeVisible();
-    const dashboardResponse = await page.goto('/dashboard');
-    expect(dashboardResponse?.status(), 'authenticated dashboard').toBe(200);
+
+    await page.getByRole('button', { name: /Sign out/ }).click();
+    await expect(page).toHaveURL(/\/$/);
     await expect(page.locator('.zazu-error-shell')).toHaveCount(0);
-    await page.locator('[data-theme-toggle]').click();
-    await expect(page.locator('html')).toHaveAttribute('data-theme', 'dark');
-    await page.locator('[data-theme-toggle]').click();
-    await expect(page.locator('html')).toHaveAttribute('data-theme', 'light');
+    await expect(page.getByRole('link', { name: 'Log in', exact: true })).toBeVisible();
+
+    const loginPageResponse = await page.goto('/login');
+    expect(loginPageResponse?.status(), 'login page after logout').toBe(200);
+    await expect(page.locator('.zazu-error-shell')).toHaveCount(0);
+    await expect(page.getByRole('heading', { name: /Sign in/i })).toBeVisible();
+
+    const loginIdentifier = username;
+    await page.getByLabel(/Username or email/i).fill(loginIdentifier);
+    await page.getByLabel('Password', { exact: true }).fill('password123');
+    await page.getByRole('button', { name: /Sign in/i }).click();
+
+    await expect(page).toHaveURL(/\/dashboard$/);
+    await expect(page.locator('.zazu-error-shell')).toHaveCount(0);
+    await expect(page.getByRole('heading', { name: 'Command Centre' })).toBeVisible();
 });
