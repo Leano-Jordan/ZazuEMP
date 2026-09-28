@@ -1,4 +1,8 @@
 {
+  "images/Background-ZAZU.jpg": {
+    "file": "assets/Background-ZAZU-BKmA5Uiu.jpg",
+    "src": "images/Background-ZAZU.jpg"
+  },
   "resources/css/app.css": {
     "file": "assets/app-DXoIBlEF.css",
     "name": "app",
@@ -9,13 +13,16 @@
     "isEntry": true
   },
   "resources/css/zazu-final-visual-sweep.css": {
-    "file": "assets/zazu-final-visual-sweep-6RLkGoak.css",
+    "file": "assets/zazu-final-visual-sweep-CObIuYHn.css",
     "name": "zazu-final-visual-sweep",
     "names": [
       "zazu-final-visual-sweep.css"
     ],
     "src": "resources/css/zazu-final-visual-sweep.css",
-    "isEntry": true
+    "isEntry": true,
+    "assets": [
+      "assets/Background-ZAZU-BKmA5Uiu.jpg"
+    ]
   },
   "resources/css/zazu-responsive-theme.css": {
     "file": "assets/zazu-responsive-theme-Bs6ezN0C.css",
