@@ -224,3 +224,21 @@ The correct sequence after that is targeted defect fixing, then desktop/mobile a
 `7ce740ed32e21431d5dbb0a57594aeaa19c5db4e`
 
 This report is a dated evidence record. Current repository control files remain authoritative for active engineering direction.
+
+
+## Colour theory and contrast audit — 2026-09-28
+
+A second visual audit found that earlier passes had accumulated several competing blue systems across `app.css` and `zazu-final-visual-sweep.css`. The latest correction establishes a single cobalt-iris primary identity with sea-glass as a secondary accent.
+
+The audit specifically checked for:
+- pale foregrounds on light surfaces;
+- low-contrast muted text;
+- status states incorrectly relying on the primary blue;
+- inconsistent action-blue meanings;
+- header/title vertical alignment;
+- navigation active-state positioning;
+- mobile table/register containment.
+
+Static source inspection found no remaining literal non-dark light-on-light foreground/background rule in the canonical visual layer.
+
+Rendered desktop/mobile/tablet verification remains a release gate because source inspection cannot prove actual browser rendering, font metrics or device-specific layout.
