@@ -82,23 +82,5 @@
             <div class="zazu-auth-visual-inner"><span class="zazu-auth-visual-label">Already have a workspace?</span><strong class="zazu-auth-switch-title">Return to your Zazu workspace.</strong><p class="zazu-auth-visual-copy">Sign in with your existing account and continue where you left off.</p><a href="{{ route('login') }}" data-auth-switch class="zazu-btn zazu-btn-secondary zazu-auth-switch-button">Sign in</a></div>
         </aside>
     </main>
-
-    <script>
-        document.addEventListener('DOMContentLoaded', () => {
-            document.querySelectorAll('[data-password-toggle]').forEach((toggle) => {
-                const id = toggle.dataset.passwordToggle || toggle.getAttribute('aria-controls');
-                const password = document.getElementById(id);
-
-                if (!password) return;
-
-                toggle.addEventListener('click', () => {
-                    const showing = password.type === 'text';
-                    password.type = showing ? 'password' : 'text';
-                    toggle.textContent = showing ? 'Show' : 'Hide';
-                    toggle.setAttribute('aria-label', showing ? 'Show password' : 'Hide password');
-                });
-            });
-        });
-    </script>
 </body>
 </html>
