@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Models\Concerns\BelongsToBusiness;
+use App\Support\Money;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -20,15 +21,62 @@ class PurchaseOrder extends Model
 
     use BelongsToBusiness, HasFactory;
 
-    protected $fillable = ['business_id','supplier_id','idempotency_key','last_receipt_idempotency_key','reference','status','currency','total_amount','ordered_at','expected_at','notes'];
+    protected $fillable = [
+        'business_id',
+        'supplier_id',
+        'idempotency_key',
+        'last_receipt_idempotency_key',
+        'reference',
+        'status',
+        'currency',
+        'total_amount',
+        'ordered_at',
+        'expected_at',
+        'notes',
+    ];
 
     protected function casts(): array
     {
-        return ['total_amount' => 'decimal:2', 'ordered_at' => 'date', 'expected_at' => 'date'];
+        return [
+            'total_amount' => 'decimal:2',
+            'ordered_at' => 'date',
+            'expected_at' => 'date',
+        ];
     }
 
-    public function business(): BelongsTo { return $this->belongsTo(Business::class); }
-    public function supplier(): BelongsTo { return $this->belongsTo(Supplier::class); }
-    public function items(): HasMany { return $this->hasMany(PurchaseOrderItem::class); }
-    public function receipts(): HasMany { return $this->hasMany(PurchaseOrderReceipt::class); }
+    public function canTransitionTo(string $status): bool
+    {
+        return in_array($status, self::STATUS_TRANSITIONS[$this->status] ?? [], true);
+    }
+
+    public function isFullyReceived(): bool
+    {
+        $this->loadMissing('items');
+
+        return $this->items->isNotEmpty()
+            && $this->items->every(
+                fn (PurchaseOrderItem $item): bool => Money::toHundredths((string) $item->received_quantity)
+                    >= Money::toHundredths((string) $item->quantity)
+            );
+    }
+
+    public function business(): BelongsTo
+    {
+        return $this->belongsTo(Business::class);
+    }
+
+    public function supplier(): BelongsTo
+    {
+        return $this->belongsTo(Supplier::class);
+    }
+
+    public function items(): HasMany
+    {
+        return $this->hasMany(PurchaseOrderItem::class);
+    }
+
+    public function receipts(): HasMany
+    {
+        return $this->hasMany(PurchaseOrderReceipt::class);
+    }
 }
