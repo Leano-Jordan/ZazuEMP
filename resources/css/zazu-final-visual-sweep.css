@@ -3326,3 +3326,20 @@ body[data-zazu-route^="quotes."] .zazu-topbar-actions .zazu-command-trigger:focu
     color: var(--zazu-ink);
     font-variant-numeric: tabular-nums;
 }
+
+
+/* CUSTOMERS — CYCLE 3: focus visibility + touch targets */
+.zazu-customer-directory .zazu-row-with-avatar:focus-visible,
+.zazu-customer-directory .zazu-action-group .zazu-btn:focus-visible {
+    outline: 3px solid color-mix(in srgb, var(--zazu-focus) 72%, transparent);
+    outline-offset: 2px;
+}
+.zazu-customer-directory .zazu-action-group .zazu-btn {
+    min-height: 40px;
+}
+@media (max-width: 700px) {
+    .zazu-customer-directory .zazu-row-with-avatar {
+        min-height: 42px;
+        align-items: center;
+    }
+}
