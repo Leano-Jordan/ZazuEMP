@@ -269,3 +269,12 @@ Re-audit:
 - No source-level regression observed in the modified access, error, landing and browser-control areas.
 - Release-readiness score remains unchanged until current-head runtime/browser evidence completes.
 - Cycle status remains IN PROGRESS.
+
+## ZR-02 Vite manifest regression — 2026-09-28
+
+- **Finding:** app-layout.blade.php loaded resources/css/zazu-mobile-refinement.css, but vite.config.js did not declare that stylesheet as an input.
+- **Observed evidence:** 42 feature tests failed while rendering protected Blade pages with "Unable to locate file in Vite manifest: resources/css/zazu-mobile-refinement.css".
+- **Root cause:** Blade/Vite input mismatch, not 42 independent application defects.
+- **Fix:** Added resources/css/zazu-mobile-refinement.css to the Laravel Vite input list.
+- **Status:** 🟡 IN PROGRESS until the current-head Laravel suite completes.
+- **Required verification:** Vite build, Blade compilation, full Laravel feature suite and browser smoke.
