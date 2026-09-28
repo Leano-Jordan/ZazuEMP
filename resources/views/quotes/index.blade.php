@@ -2,7 +2,7 @@
     <x-slot:title>Quotes</x-slot:title>
     <x-slot:heading>Quotes</x-slot:heading>
 
-    <section class="zazu-command-band">
+    <section class="zazu-command-band zazu-quote-register-command">
         <div>
             <div class="zazu-eyebrow">Commercial</div>
             <h2 class="zazu-command-title">Quote register</h2>
@@ -35,7 +35,7 @@
         @endif
 
         @forelse ($quotes as $quote)
-            <a href="{{ route('quotes.show', $quote) }}" class="zazu-list-item grid grid-cols-[minmax(0,1fr)_auto_auto_auto]">
+            <a href="{{ route('quotes.show', $quote) }}" class="zazu-list-item zazu-quote-register-row grid grid-cols-[minmax(0,1fr)_auto_auto_auto]">
                 <div class="zazu-list-main">
                     <div class="flex flex-wrap items-center gap-2">
                         <span class="zazu-list-title">{{ $quote->reference }}</span>

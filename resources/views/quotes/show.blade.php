@@ -46,19 +46,19 @@
         };
     @endphp
 
-    <section class="zazu-work-hero">
+    <section class="zazu-work-hero zazu-quote-hero">
         <div>
             <div class="zazu-work-ref">{{ $quote->reference }}</div>
             <div class="zazu-work-name">Quote v{{ $version?->version ?? '—' }}</div>
             <div class="zazu-work-summary">{{ $quote->event->name }} · {{ $quote->event->customer?->name ?? 'Customer' }} · {{ $quote->currency }}</div>
         </div>
-        <div class="zazu-work-actions">
+        <div class="zazu-work-actions zazu-quote-status-stack">
             <span class="zazu-chip {{ $statusClass }}">{{ ucfirst($displayStatus) }}</span>
         </div>
     </section>
 
     @if ($quoteNeedsRevision)
-        <section class="zazu-next-action">
+        <section class="zazu-next-action zazu-quote-review-action">
             <div>
                 <div class="zazu-eyebrow">Quote needs review</div>
                 <h2 class="zazu-next-action-title">Services have changed since this quote</h2>
@@ -73,7 +73,7 @@
 
     <div class="zazu-detail-grid">
         <div class="zazu-detail-stack">
-            <section class="zazu-card zazu-list">
+            <section class="zazu-card zazu-list zazu-quote-lines">
                 <div class="zazu-card-header">
                     <div class="zazu-eyebrow">Quote lines</div>
                     <div class="zazu-card-title mt-1">Services and prices</div>
@@ -112,13 +112,13 @@
         </div>
 
         <aside class="zazu-detail-stack">
-            <section class="zazu-panel">
+            <section class="zazu-panel zazu-quote-total-panel">
                 <div class="zazu-eyebrow">Commercial summary</div>
                 <div class="zazu-panel-title mt-1">Totals</div>
                 <div class="zazu-detail-rows">
                     <div class="zazu-detail-row"><div class="zazu-detail-label">Subtotal</div><div class="zazu-detail-value">{{ $quote->currency }} {{ $version?->subtotal ?? '0.00' }}</div></div>
                     <div class="zazu-detail-row"><div class="zazu-detail-label">Tax · {{ $version?->tax_label ?: 'No tax' }} ({{ $version?->tax_rate ?? '0.00' }}%)</div><div class="zazu-detail-value">{{ $quote->currency }} {{ $version?->tax_total ?? '0.00' }}</div></div>
-                    <div class="zazu-detail-row"><div class="zazu-detail-label">Total</div><div class="zazu-detail-value">{{ $quote->currency }} {{ $version?->total ?? '0.00' }}</div></div>
+                    <div class="zazu-detail-row zazu-total-row"><div class="zazu-detail-label">Total</div><div class="zazu-detail-value">{{ $quote->currency }} {{ $version?->total ?? '0.00' }}</div></div>
                 </div>
             </section>
 

@@ -3,7 +3,7 @@
     <x-slot:heading>Edit customer</x-slot:heading>
     <x-slot:headerAction><a href="{{ route('customers.show', $customer) }}" class="zazu-btn zazu-btn-ghost">← Customer</a></x-slot:headerAction>
 
-    <section class="zazu-command-band">
+    <section class="zazu-command-band zazu-customer-editor-command">
         <div><div class="zazu-eyebrow">Relationship record</div><h2 class="zazu-command-title">{{ $customer->name }}</h2><p class="zazu-command-copy">Update the customer identity, primary contact and profile image without rewriting linked operational history.</p></div>
     </section>
 
@@ -42,7 +42,7 @@
                     </div>
                 </section>
 
-                <div class="zazu-actionbar"><a href="{{ route('customers.show', $customer) }}" class="zazu-btn zazu-btn-ghost">Cancel</a><button class="zazu-btn zazu-btn-primary">Save changes</button></div>
+                <div class="zazu-actionbar zazu-actionbar-sticky"><a href="{{ route('customers.show', $customer) }}" class="zazu-btn zazu-btn-ghost">Cancel</a><button class="zazu-btn zazu-btn-primary">Save changes</button></div>
             </div>
             <aside class="zazu-form-aside"><div class="zazu-context-card"><div class="zazu-context-title">History stays intact</div><div class="zazu-context-copy">Changing the customer profile does not rewrite historical quote snapshots or the contacts recorded against past Work.</div></div></aside>
         </div>

@@ -5,7 +5,7 @@
         <a href="{{ route('work.show', $event) }}" class="zazu-btn zazu-btn-ghost">Job workspace</a>
     </x-slot:headerAction>
 
-    <section class="zazu-command-band">
+    <section class="zazu-command-band zazu-requirement-editor-command">
         <div>
             <div class="zazu-eyebrow">{{ $event->reference }} · {{ $event->name }}</div>
             <h2 class="zazu-command-title">What does this job need?</h2>
@@ -103,7 +103,7 @@
                     </div>
                 </section>
 
-                <div class="zazu-actionbar">
+                <div class="zazu-actionbar zazu-actionbar-sticky">
                     <a href="{{ route('work.show', $event) }}" class="zazu-btn zazu-btn-ghost">Cancel</a>
                     <button class="zazu-btn zazu-btn-primary">Add service to job</button>
                 </div>

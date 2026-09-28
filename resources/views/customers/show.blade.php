@@ -8,7 +8,7 @@
         <a href="{{ route('customers.index') }}" class="zazu-btn zazu-btn-ghost">← Customers</a>
     </x-slot:headerAction>
 
-    <section class="zazu-command-band">
+    <section class="zazu-command-band zazu-customer-hero">
         <div class="flex min-w-0 items-center gap-4">
             <x-profile-avatar :name="$customer->name" :path="$customer->profile_photo_path" media-type="customer" :media-id="$customer->id" size="lg" />
             <div class="min-w-0">
@@ -17,7 +17,7 @@
                 <p class="zazu-command-copy">Relationship details, contacts and work history connected to this customer.</p>
             </div>
         </div>
-        <div class="zazu-command-meta">
+        <div class="zazu-command-meta zazu-command-meta-strong">
             <div class="zazu-command-meta-label">Work items</div>
             <div class="zazu-command-meta-value">{{ $customer->events->count() }}</div>
         </div>
@@ -25,9 +25,10 @@
 
     <div class="zazu-detail-grid">
         <div class="zazu-detail-stack">
-            <section class="zazu-panel">
+            <section class="zazu-panel zazu-customer-contacts">
                 <div class="zazu-panel-head">
                     <div>
+                        <div class="zazu-panel-kicker">Relationship people</div>
                         <div class="zazu-panel-title">Contacts</div>
                         <div class="zazu-panel-copy">Active people connected to this relationship. Historical Work records can retain a removed contact reference.</div>
                     </div>
@@ -67,9 +68,10 @@
                 </div>
             </section>
 
-            <section class="zazu-panel">
+            <section class="zazu-panel zazu-customer-work-history">
                 <div class="zazu-panel-head">
                     <div>
+                        <div class="zazu-panel-kicker">Operational history</div>
                         <div class="zazu-panel-title">Work history</div>
                         <div class="zazu-panel-copy">Open a workspace or continue editing an active job.</div>
                     </div>

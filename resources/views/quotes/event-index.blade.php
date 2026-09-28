@@ -6,7 +6,7 @@
         <a href="{{ route('work.show', $event) }}" class="zazu-btn zazu-btn-ghost">Job workspace</a>
     </x-slot:headerAction>
 
-    <section class="zazu-command-band">
+    <section class="zazu-command-band zazu-quote-history-command">
         <div>
             <div class="zazu-eyebrow">{{ $event->reference }} · {{ $event->customer?->name ?? 'Customer' }}</div>
             <h2 class="zazu-command-title">Quote history</h2>
@@ -18,7 +18,7 @@
         </div>
     </section>
 
-    <section class="zazu-card zazu-list">
+    <section class="zazu-card zazu-list zazu-quote-history-register">
         <div class="zazu-card-header">
             <div class="zazu-eyebrow">Commercial records</div>
             <div class="zazu-card-title mt-1">Quote list</div>
