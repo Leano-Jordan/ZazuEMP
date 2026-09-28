@@ -34,6 +34,17 @@
 
                     <div class="zazu-list-item">
                         <div class="zazu-list-main">
+                            <div class="zazu-list-title">Workspace experience</div>
+                            <div class="zazu-list-meta">Choose how much of Zazu is surfaced at once. This affects presentation and guidance, not permissions.</div>
+                        </div>
+                        <div class="zazu-list-side flex items-center gap-2">
+                            <span class="zazu-chip {{ $experienceStatus === 'completed' ? 'zazu-chip-success' : 'zazu-chip-info' }}">{{ $experienceLevel ? ucfirst($experienceLevel) : 'Not selected' }}</span>
+                            <a href="{{ route('preferences.experience') }}" class="zazu-btn zazu-btn-ghost">{{ $experienceStatus === 'completed' ? 'Change' : 'Choose' }}</a>
+                        </div>
+                    </div>
+
+                    <div class="zazu-list-item">
+                        <div class="zazu-list-main">
                             <div class="zazu-list-title">Business identity</div>
                             <div class="zazu-list-meta">Business name, contact details, address, website, registration and tax reference information.</div>
                         </div>
@@ -65,6 +76,7 @@
                 <div class="zazu-context-copy">Setup is a workspace, not a gate. You can start trading before every optional detail is complete, then return later without losing your progress.</div>
                 <div class="zazu-step-list mt-4">
                     <div class="zazu-step"><span class="zazu-step-dot"></span><div><div class="zazu-step-title">Build what you sell</div><div class="zazu-step-copy">Services & prices come first.</div></div></div>
+                    <div class="zazu-step"><span class="zazu-step-dot"></span><div><div class="zazu-step-title">Choose your workspace level</div><div class="zazu-step-copy">Control how much detail Zazu surfaces.</div></div></div>
                     <div class="zazu-step"><span class="zazu-step-dot"></span><div><div class="zazu-step-title">Identify the business</div><div class="zazu-step-copy">Reusable details feed documents.</div></div></div>
                     <div class="zazu-step"><span class="zazu-step-dot"></span><div><div class="zazu-step-title">Make it tender-ready</div><div class="zazu-step-copy">Add compliance evidence when needed.</div></div></div>
                 </div>
