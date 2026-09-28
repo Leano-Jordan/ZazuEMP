@@ -242,3 +242,20 @@ The audit specifically checked for:
 Static source inspection found no remaining literal non-dark light-on-light foreground/background rule in the canonical visual layer.
 
 Rendered desktop/mobile/tablet verification remains a release gate because source inspection cannot prove actual browser rendering, font metrics or device-specific layout.
+
+
+## Visual refinement cycle 2 — 2026-09-28
+
+The previous visual pass was re-audited rather than treated as final. A theme-scope regression was identified: several new light-mode rules were global and could leak light surfaces/colours into dark mode.
+
+Corrective work:
+- scoped light-mode assertions explicitly;
+- added dark-mode restoration for dashboard, section navigation, form controls, buttons and statuses;
+- separated sea-glass accent semantics from indigo information semantics;
+- tightened header search/action positioning;
+- performed a second static contrast scan.
+
+Result:
+- no unscoped literal white/pale-background + pale-foreground pairing remains in the final visual layer;
+- current visual authority is cobalt-iris + sea-glass + semantic status colours;
+- rendered device verification remains outstanding.
