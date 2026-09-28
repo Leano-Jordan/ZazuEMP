@@ -3343,3 +3343,89 @@ body[data-zazu-route^="quotes."] .zazu-topbar-actions .zazu-command-trigger:focu
         align-items: center;
     }
 }
+
+
+/* RESOURCE PAGES — CYCLE 1: mobile transaction composition */
+.zazu-finance-directory,
+.zazu-assets-directory,
+.zazu-inventory-directory {
+    min-width: 0;
+}
+.zazu-assets-directory .zazu-list-item,
+.zazu-inventory-directory .zazu-list-item,
+.zazu-finance-directory ~ .zazu-card .zazu-list-item {
+    min-width: 0;
+}
+.zazu-assets-directory .zazu-action-group,
+.zazu-inventory-directory .zazu-action-group {
+    min-width: 0;
+}
+.zazu-assets-directory .zazu-action-group form,
+.zazu-inventory-directory .zazu-action-group form {
+    min-width: 0;
+}
+.zazu-assets-directory input,
+.zazu-assets-directory select,
+.zazu-inventory-directory input,
+.zazu-inventory-directory select {
+    min-width: 0;
+}
+@media (max-width: 760px) {
+    .zazu-assets-directory .zazu-list-item,
+    .zazu-inventory-directory .zazu-list-item {
+        display: grid;
+        grid-template-columns: minmax(0,1fr) auto;
+        gap: 10px;
+    }
+    .zazu-assets-directory .zazu-list-main,
+    .zazu-inventory-directory .zazu-list-main {
+        min-width: 0;
+    }
+    .zazu-assets-directory .zazu-action-group,
+    .zazu-inventory-directory .zazu-action-group {
+        grid-column: 1 / -1;
+        display: grid;
+        gap: 8px;
+        width: 100%;
+    }
+    .zazu-assets-directory .zazu-action-group form,
+    .zazu-inventory-directory .zazu-action-group form {
+        display: grid;
+        grid-template-columns: minmax(0,1fr) minmax(0,1fr) auto;
+        width: 100%;
+        gap: 8px;
+    }
+    .zazu-assets-directory .zazu-action-group form:first-of-type {
+        grid-template-columns: minmax(0,1fr) minmax(0,1fr) auto;
+    }
+    .zazu-assets-directory .zazu-action-group .zazu-btn,
+    .zazu-inventory-directory .zazu-action-group .zazu-btn {
+        width: 100%;
+    }
+}
+@media (max-width: 520px) {
+    .zazu-assets-directory .zazu-action-group form,
+    .zazu-inventory-directory .zazu-action-group form {
+        grid-template-columns: 1fr 1fr;
+    }
+    .zazu-assets-directory .zazu-action-group form .zazu-btn,
+    .zazu-inventory-directory .zazu-action-group form .zazu-btn {
+        grid-column: 1 / -1;
+    }
+}
+@media (max-width: 700px) {
+    .zazu-calendar-page .zazu-calendar-grid {
+        display: none;
+    }
+    .zazu-calendar-page .zazu-calendar-agenda {
+        display: grid;
+    }
+    .zazu-calendar-page .zazu-calendar-toolbar-main {
+        width: 100%;
+        display: grid;
+        grid-template-columns: 48px minmax(0,1fr) 48px;
+    }
+    .zazu-calendar-page .zazu-calendar-toolbar-main .zazu-btn {
+        width: 100%;
+    }
+}
