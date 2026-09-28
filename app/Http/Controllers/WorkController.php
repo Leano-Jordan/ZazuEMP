@@ -9,6 +9,7 @@ use App\Models\Event;
 use App\Models\EventPreparationItem;
 use App\Models\EventRequirement;
 use App\Support\Audit;
+use App\Services\EventLifecycleService;
 use App\Support\CurrentBusiness;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -192,7 +193,7 @@ class WorkController extends Controller
         return view('work.edit', compact('event', 'customers', 'customerOptions', 'hasQuotes'));
     }
 
-    public function update(Request $request, Event $event): RedirectResponse
+    public function update(Request $request, Event $event, EventLifecycleService $lifecycle): RedirectResponse
     {
         $business = $this->business($request);
         $validated = $request->validate($this->rules() + [
@@ -207,11 +208,8 @@ class WorkController extends Controller
         $this->validateContactBelongsToCustomer($validated['event_day_contact_id'] ?? null, $customer->id);
         $this->validateContactBelongsToCustomer($validated['event_night_contact_id'] ?? null, $customer->id);
 
-        DB::transaction(function () use ($event, $validated, $customer, $business): void {
-            $lockedEvent = Event::query()
-                ->where('business_id', $business->id)
-                ->lockForUpdate()
-                ->findOrFail($event->id);
+        DB::transaction(function () use ($event, $validated, $customer, $business, $lifecycle): void {
+            $lockedEvent = $lifecycle->lock($business->id, $event->id);
 
             abort_if($lockedEvent->isClosed(), 422, 'Closed work cannot be edited.');
 
@@ -224,11 +222,7 @@ class WorkController extends Controller
                 ]);
             }
 
-            abort_unless(
-                $lockedEvent->canTransitionTo($validated['status']),
-                422,
-                'That status change is not allowed for this work record.'
-            );
+            $lifecycle->assertTransitionAllowed($lockedEvent, $validated['status']);
 
             $previousStatus = $lockedEvent->status;
 
@@ -260,15 +254,12 @@ class WorkController extends Controller
             ->with('success', 'Job details updated.');
     }
 
-    public function destroy(Request $request, Event $event): RedirectResponse
+    public function destroy(Request $request, Event $event, EventLifecycleService $lifecycle): RedirectResponse
     {
         $business = $this->business($request);
 
-        DB::transaction(function () use ($event, $business): void {
-            $lockedEvent = Event::query()
-                ->where('business_id', $business->id)
-                ->lockForUpdate()
-                ->findOrFail($event->id);
+        DB::transaction(function () use ($event, $business, $lifecycle): void {
+            $lockedEvent = $lifecycle->lock($business->id, $event->id);
 
             abort_if($lockedEvent->isClosed(), 422, 'Closed work cannot be deleted.');
 

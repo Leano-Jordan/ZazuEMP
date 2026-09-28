@@ -6,6 +6,7 @@ use App\Models\Asset;
 use App\Models\BusinessCapability;
 use App\Models\Event;
 use App\Models\EventRequirement;
+use App\Services\EventLifecycleService;
 use App\Support\Audit;
 use App\Support\CurrentBusiness;
 use Illuminate\Http\RedirectResponse;
@@ -115,16 +116,16 @@ class AssetController extends Controller
         return redirect()->route('assets.index')->with('success','Asset added to the register.');
     }
 
-    public function allocate(Request $request, Asset $asset): RedirectResponse
+    public function allocate(Request $request, Asset $asset, EventLifecycleService $lifecycle): RedirectResponse
     {
         $businessId=app(CurrentBusiness::class)->id($request->user());
         abort_unless((int)$asset->business_id===$businessId,404);
         $data=$request->validate([
             'event_id'=>['required','integer'],'allocated_from'=>['required','date'],'allocated_until'=>['nullable','date','after_or_equal:allocated_from'],'notes'=>['nullable','string'],
         ]);
-        $event=Event::where('business_id',$businessId)->findOrFail($data['event_id']);
-
-        return DB::transaction(function () use ($asset, $businessId, $data, $event): RedirectResponse {
+        return DB::transaction(function () use ($asset, $businessId, $data, $lifecycle): RedirectResponse {
+            $event = $lifecycle->lock($businessId, (int) $data['event_id']);
+            $lifecycle->assertOperational($event);
             $lockedAsset = Asset::query()
                 ->where('business_id', $businessId)
                 ->lockForUpdate()

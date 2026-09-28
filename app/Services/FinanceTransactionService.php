@@ -3,25 +3,28 @@
 namespace App\Services;
 
 use App\Models\Business;
-use App\Models\Event;
 use App\Models\FinanceExpense;
 use App\Models\Invoice;
 use App\Models\Payment;
+use App\Models\PurchaseOrder;
 use App\Models\Supplier;
 use App\Support\Audit;
 use App\Support\Money;
 use Illuminate\Support\Facades\DB;
 
-class FinanceTransactionService
+final class FinanceTransactionService
 {
     /**
      * Record a customer payment atomically with invoice reconciliation.
      *
      * @param array<string, mixed> $data
      */
-    public function recordPayment(int $businessId, array $data): bool
-    {
-        return DB::transaction(function () use ($businessId, $data): bool {
+    public function recordPayment(
+        int $businessId,
+        array $data,
+        EventLifecycleService $lifecycle
+    ): bool {
+        return DB::transaction(function () use ($businessId, $data, $lifecycle): bool {
             $this->lockBusiness($businessId);
 
             if (Payment::query()
@@ -29,6 +32,19 @@ class FinanceTransactionService
                 ->where('idempotency_key', $data['idempotency_key'])
                 ->exists()) {
                 return true;
+            }
+
+            $invoiceEventId = Invoice::query()
+                ->where('business_id', $businessId)
+                ->whereKey($data['invoice_id'])
+                ->value('event_id');
+
+            $lockedEvent = $invoiceEventId
+                ? $lifecycle->lock($businessId, (int) $invoiceEventId)
+                : null;
+
+            if ($lockedEvent) {
+                $lifecycle->assertFinanciallyActive($lockedEvent);
             }
 
             $invoice = Invoice::query()
@@ -42,6 +58,13 @@ class FinanceTransactionService
                 !in_array($invoice->status, ['issued'], true),
                 422,
                 'Only issued invoices can accept payments.'
+            );
+
+            abort_if(
+                $lockedEvent
+                    && (int) $invoice->event_id !== (int) $lockedEvent->id,
+                409,
+                'The invoice job changed while the payment was being prepared. Please retry.'
             );
 
             abort_if(
@@ -93,6 +116,7 @@ class FinanceTransactionService
 
             Audit::record('finance.payment.recorded', $payment, [
                 'invoice_id' => $invoice->id,
+                'event_id' => $invoice->event_id,
                 'amount' => $data['amount'],
                 'type' => $data['type'],
                 'currency' => $invoice->currency,
@@ -108,9 +132,13 @@ class FinanceTransactionService
      *
      * @param array<string, mixed> $data
      */
-    public function recordExpense(int $businessId, string $currency, array $data): bool
-    {
-        return DB::transaction(function () use ($businessId, $currency, $data): bool {
+    public function recordExpense(
+        int $businessId,
+        string $currency,
+        array $data,
+        EventLifecycleService $lifecycle
+    ): bool {
+        return DB::transaction(function () use ($businessId, $currency, $data, $lifecycle): bool {
             $this->lockBusiness($businessId);
 
             $existingExpense = FinanceExpense::query()
@@ -122,23 +150,90 @@ class FinanceTransactionService
                 return true;
             }
 
-            if (!empty($data['supplier_id'])) {
+            $eventId = !empty($data['event_id']) ? (int) $data['event_id'] : null;
+            $purchaseOrderId = !empty($data['purchase_order_id']) ? (int) $data['purchase_order_id'] : null;
+
+            $purchaseOrder = null;
+
+            if ($purchaseOrderId !== null) {
+                $purchaseOrder = PurchaseOrder::query()
+                    ->where('business_id', $businessId)
+                    ->whereKey($purchaseOrderId)
+                    ->firstOrFail();
+
+                abort_unless(
+                    in_array($purchaseOrder->status, ['ordered', 'received', 'cancelled'], true),
+                    422,
+                    'An expense can only be linked to an ordered, received or cancelled purchase order.'
+                );
+
+                if ($eventId === null && $purchaseOrder->event_id !== null) {
+                    $eventId = (int) $purchaseOrder->event_id;
+                    $data['event_id'] = $eventId;
+                }
+
+                abort_if(
+                    $eventId !== null
+                        && $purchaseOrder->event_id !== null
+                        && $eventId !== (int) $purchaseOrder->event_id,
+                    422,
+                    'The selected purchase order and job do not match.'
+                );
+            }
+
+            $lockedEvent = $eventId !== null
+                ? $lifecycle->lock($businessId, $eventId)
+                : null;
+
+            $lockedPurchaseOrder = $purchaseOrderId !== null
+                ? PurchaseOrder::query()
+                    ->where('business_id', $businessId)
+                    ->lockForUpdate()
+                    ->findOrFail($purchaseOrderId)
+                : null;
+
+            if ($lockedPurchaseOrder) {
+                abort_unless(
+                    in_array($lockedPurchaseOrder->status, ['ordered', 'received', 'cancelled'], true),
+                    422,
+                    'An expense can only be linked to an ordered, received or cancelled purchase order.'
+                );
+
+                abort_if(
+                    $lockedPurchaseOrder->event_id !== null
+                        && $eventId !== null
+                        && (int) $lockedPurchaseOrder->event_id !== $eventId,
+                    409,
+                    'The selected purchase order and job do not match.'
+                );
+            }
+
+            $supplierId = !empty($data['supplier_id']) ? (int) $data['supplier_id'] : null;
+
+            if ($supplierId !== null) {
                 Supplier::query()
                     ->where('business_id', $businessId)
-                    ->whereKey($data['supplier_id'])
+                    ->whereKey($supplierId)
                     ->firstOrFail();
             }
 
-            if (!empty($data['event_id'])) {
-                Event::query()
-                    ->where('business_id', $businessId)
-                    ->whereKey($data['event_id'])
-                    ->firstOrFail();
+            if (
+                $lockedPurchaseOrder
+                && $supplierId !== null
+                && (int) $lockedPurchaseOrder->supplier_id !== $supplierId
+            ) {
+                abort(422, 'The selected supplier does not match the purchase order supplier.');
+            }
+
+            if ($lockedPurchaseOrder && $supplierId === null) {
+                $data['supplier_id'] = $lockedPurchaseOrder->supplier_id;
             }
 
             $expense = FinanceExpense::create([
                 ...$data,
                 'business_id' => $businessId,
+                'event_id' => $eventId,
+                'purchase_order_id' => $purchaseOrderId,
                 'currency' => strtoupper($currency),
             ]);
 
@@ -146,6 +241,8 @@ class FinanceTransactionService
                 'amount' => $expense->amount,
                 'currency' => $expense->currency,
                 'status' => $expense->status,
+                'event_id' => $expense->event_id,
+                'purchase_order_id' => $expense->purchase_order_id,
             ], $businessId);
 
             return false;

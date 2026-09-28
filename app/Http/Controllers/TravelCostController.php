@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Event;
 use App\Models\TravelCost;
+use App\Services\EventLifecycleService;
 use App\Support\CurrentBusiness;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -34,11 +35,10 @@ class TravelCostController extends Controller
         ]);
     }
 
-    public function store(Request $request, Event $event): RedirectResponse
+    public function store(Request $request, Event $event, EventLifecycleService $lifecycle): RedirectResponse
     {
         $this->ensureBusiness($event, $request);
         $request->merge(['currency' => strtoupper((string) $request->input('currency'))]);
-        abort_if($event->isClosed(), 422, 'Closed work cannot receive new travel records.');
 
         $validated = $request->validate([
             'route_label' => ['required', 'string', 'max:100'],
@@ -63,13 +63,10 @@ class TravelCostController extends Controller
             (string) $validated['customer_rate_per_km'],
         );
 
-        $travelCost = DB::transaction(function () use ($validated, $event, $roundTrip, $calculation): TravelCost {
-            $lockedEvent = Event::query()
-                ->whereKey($event->id)
-                ->lockForUpdate()
-                ->firstOrFail();
-
-            abort_if($lockedEvent->isClosed(), 422, 'Closed work cannot receive new travel records.');
+        $travelCost = DB::transaction(function () use ($validated, $event, $roundTrip, $calculation, $request, $lifecycle): TravelCost {
+            $businessId = app(CurrentBusiness::class)->id($request->user());
+            $lockedEvent = $lifecycle->lock($businessId, $event->id);
+            $lifecycle->assertOperational($lockedEvent);
 
             return TravelCost::query()->create([
                 'event_id' => $lockedEvent->id,
