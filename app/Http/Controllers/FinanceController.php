@@ -408,7 +408,7 @@ class FinanceController extends Controller
         ]);
     }
 
-    public function storeExpense(Request $request, FinanceTransactionService $finance): RedirectResponse
+    public function storeExpense(Request $request, FinanceTransactionService $finance, EventLifecycleService $lifecycle): RedirectResponse
     {
         $businessId = app(CurrentBusiness::class)->id($request->user());
         $currency = app(CurrentBusiness::class)->model($request->user())->currency ?? 'ZAR';
