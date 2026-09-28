@@ -12,6 +12,7 @@ use App\Models\TaxRate;
 use App\Support\Audit;
 use App\Support\CurrentBusiness;
 use App\Support\Money;
+use App\Services\FinanceTransactionService;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -349,7 +350,7 @@ class FinanceController extends Controller
         ]);
     }
 
-    public function storePayment(Request $request): RedirectResponse
+    public function storePayment(Request $request, FinanceTransactionService $finance): RedirectResponse
     {
         $businessId = app(CurrentBusiness::class)->id($request->user());
         $data = $request->validate([
@@ -367,74 +368,10 @@ class FinanceController extends Controller
         $data['type'] ??= 'payment';
         $alreadyProcessed = false;
 
-        DB::transaction(function () use ($data, $businessId, &$alreadyProcessed): void {
-            // Serialize business-level idempotency checks so concurrent retries cannot both pass the lookup.
-            \App\Models\Business::query()->whereKey($businessId)->lockForUpdate()->firstOrFail();
-
-            if (Payment::query()
-                ->where('business_id', $businessId)
-                ->where('idempotency_key', $data['idempotency_key'])
-                ->exists()
-            ) {
-                $alreadyProcessed = true;
-                return;
-            }
-
-            $invoice = Invoice::where('business_id', $businessId)
-                ->whereKey($data['invoice_id'])
-                ->with('payments')
-                ->lockForUpdate()
-                ->firstOrFail();
-
-            abort_if(in_array($invoice->status, ['paid', 'void'], true), 422, 'This invoice cannot accept another payment.');
-
-            abort_if(
-                $invoice->payments->contains(fn ($payment) => $payment->currency !== $invoice->currency),
-                409,
-                'This invoice contains a payment recorded in a different currency. Review the payment history before continuing.'
-            );
-
-            $totalCents = Money::toCents((string) $invoice->total);
-            $paidCents = $invoice->payments->sum(fn ($payment) => Money::toCents((string) $payment->amount));
-            $paymentCents = Money::toCents((string) $data['amount']);
-
-            abort_if($paymentCents > ($totalCents - $paidCents), 422, 'Payment cannot exceed the outstanding invoice balance.');
-
-            if ($data['type'] === 'deposit') {
-                $depositRequiredCents = Money::toCents((string) ($invoice->quoteVersion?->deposit_amount ?? '0.00'));
-                $depositPaidCents = $invoice->payments
-                    ->where('type', 'deposit')
-                    ->sum(fn ($payment) => Money::toCents((string) $payment->amount));
-
-                abort_if($depositRequiredCents <= 0, 422, 'This invoice has no deposit requirement.');
-                abort_if(
-                    $depositPaidCents + $paymentCents > $depositRequiredCents,
-                    422,
-                    'This deposit would exceed the required deposit amount.'
-                );
-            }
-
-            Payment::create([
-                ...$data,
-                'business_id' => $businessId,
-                'event_id' => $invoice->event_id,
-                'currency' => $invoice->currency,
-            ]);
-
-            $newPaidCents = $paidCents + $paymentCents;
-
-            $invoice->update([
-                'status' => $newPaidCents >= $totalCents ? 'paid' : 'issued',
-            ]);
-
-            Audit::record('finance.payment.recorded', $invoice->payments()->latest('id')->first(), [
-                'invoice_id' => $invoice->id,
-                'amount' => $data['amount'],
-                'type' => $data['type'],
-                'currency' => $invoice->currency,
-                'method' => $data['method'],
-            ], $businessId);
-        });
+        $alreadyProcessed = $finance->recordPayment(
+            businessId: $businessId,
+            data: $data,
+        );
 
         if ($alreadyProcessed) {
             return redirect()->route('finance.index')->with('info', 'That payment submission was already processed.');
@@ -454,7 +391,7 @@ class FinanceController extends Controller
         ]);
     }
 
-    public function storeExpense(Request $request): RedirectResponse
+    public function storeExpense(Request $request, FinanceTransactionService $finance): RedirectResponse
     {
         $businessId = app(CurrentBusiness::class)->id($request->user());
         $currency = app(CurrentBusiness::class)->model($request->user())->currency ?? 'ZAR';
@@ -481,29 +418,11 @@ class FinanceController extends Controller
         $data['idempotency_key'] ??= (string) Str::uuid();
         $alreadyProcessed = false;
 
-        $expense = DB::transaction(function () use ($data, $businessId, $currency, &$alreadyProcessed): ?FinanceExpense {
-            // Serialize business-level idempotency checks so concurrent retries cannot both pass the lookup.
-            \App\Models\Business::query()->whereKey($businessId)->lockForUpdate()->firstOrFail();
-
-            $existingExpense = FinanceExpense::query()
-                ->where('business_id', $businessId)
-                ->where('idempotency_key', $data['idempotency_key'])
-                ->first();
-
-            if ($existingExpense) {
-                $alreadyProcessed = true;
-                return $existingExpense;
-            }
-
-            $expense = FinanceExpense::create([...$data, 'business_id' => $businessId, 'currency' => $currency]);
-            Audit::record('finance.expense.recorded', $expense, [
-                'amount' => $expense->amount,
-                'currency' => $expense->currency,
-                'status' => $expense->status,
-            ], $businessId);
-
-            return $expense;
-        });
+        $expense = $finance->recordExpense(
+            businessId: $businessId,
+            currency: $currency,
+            data: $data,
+        );
 
         if ($alreadyProcessed) {
             return redirect()->route('finance.index')->with('info', 'That expense submission was already processed.');
