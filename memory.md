@@ -663,3 +663,15 @@ Regression rule:
 - Fixed permission-aware Dashboard/navigation discovery, branded confirmations, workspace-switch initialization, mixed-currency finance handling, integer-cent invoice balance arithmetic, Purchase Order and Quote transition centralization, money overflow and negative-input handling, remaining monetary float presentation, and duplicate CSS theme-token systems.
 - Browser smoke registration was made safe under parallel desktop/mobile execution and updated to the current Dashboard hierarchy.
 - Latest completed automated gates at the time of this record: Laravel, Psalm and PHPMD green on commit 613f0f0; browser smoke was still executing on that head.
+
+
+## Director deep-dive UI/UX batch — 2026-09-28
+
+- Unified normal registration and sign-in into one dual auth visual with fluid in-place switching and history restoration.
+- Centralized auth password visibility handling and added a real mobile navigation toggle initializer.
+- Reduced primary navigation to compact workspace destinations and moved lower-level routes into contextual section tabs within page titles.
+- Added permission gates to contextual Finance action tabs.
+- Standardized form field rhythm globally so labels, controls, helper text and validation stay aligned across the operational form family.
+- Upgraded Calendar with stronger month hierarchy, current-day emphasis, event overflow handling and a mobile agenda view.
+- Hardened mobile form layouts, action groups, document padding and shell behaviour.
+- Latest batch source checks were clean; rendered browser QA remains unverified.
