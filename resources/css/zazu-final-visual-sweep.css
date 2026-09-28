@@ -5616,3 +5616,245 @@ body {
         transform: none !important;
     }
 }
+
+
+/* ============================================================
+   DIRECTOR CONTRAST CORRECTION / CYCLE 2 / 2026-09
+   Regression fix: all light-theme visual assertions are scoped.
+   Dark mode receives its own explicit surface/foreground pairing.
+   ============================================================ */
+
+:root:not([data-theme="dark"]) {
+    --zazu-blue-brand: #3949E8;
+    --zazu-blue-vivid: #5B5CFF;
+    --zazu-blue-glow: #7C7FFF;
+    --zazu-blue-deep: #2834B8;
+    --zazu-blue-soft: #EEF0FF;
+    --zazu-accent: #008E88;
+    --zazu-accent-ink: #006D68;
+    --zazu-accent-soft: #E7F8F6;
+
+    --zazu-text-ink: #191D31;
+    --zazu-text-body: #343B52;
+    --zazu-text-muted: #566078;
+    --zazu-text-faint: #68728A;
+    --zazu-border: #C9CEDC;
+    --zazu-border-strong: #9EA7BC;
+}
+
+/* Light mode: make component text hierarchy explicit. */
+:root:not([data-theme="dark"]) .zazu-dash-status.status-in-progress {
+    background: #F0EEFF;
+    color: #3B348F;
+}
+
+:root:not([data-theme="dark"]) .zazu-dash-focus-item.is-info .zazu-dash-focus-marker {
+    background: #5B5CFF;
+}
+
+:root:not([data-theme="dark"]) .zazu-dash-resource-grid .zazu-resource-dot {
+    background: #177245;
+    box-shadow: 0 0 0 3px rgba(23,114,69,.10);
+}
+
+/* Dark mode restoration: never inherit light-only text/surfaces. */
+:root[data-theme="dark"] .zazu-section-tabs {
+    border-bottom-color: var(--zazu-border);
+}
+
+:root[data-theme="dark"] .zazu-section-tabs a,
+:root[data-theme="dark"] .zazu-section-tabs .zazu-section-name {
+    color: var(--zazu-muted);
+}
+
+:root[data-theme="dark"] .zazu-section-tabs a:hover {
+    background: transparent;
+    color: var(--zazu-primary-deep);
+}
+
+:root[data-theme="dark"] .zazu-section-tabs a.active {
+    color: var(--zazu-primary-light);
+    border-bottom-color: var(--zazu-primary);
+    background: transparent;
+}
+
+:root[data-theme="dark"] .zazu-dash-hero,
+:root[data-theme="dark"] .zazu-dash-surface,
+:root[data-theme="dark"] .zazu-dash-commandbar,
+:root[data-theme="dark"] .zazu-dash-setup {
+    border-color: var(--zazu-border);
+    background: var(--zazu-surface);
+    box-shadow: var(--zazu-shadow);
+}
+
+:root[data-theme="dark"] .zazu-dash-hero-side {
+    background: var(--zazu-surface-2);
+    border-left-color: var(--zazu-border);
+}
+
+:root[data-theme="dark"] .zazu-dash-hero h2,
+:root[data-theme="dark"] .zazu-dash-event-time strong,
+:root[data-theme="dark"] .zazu-dash-event-copy strong,
+:root[data-theme="dark"] .zazu-dash-metric > strong,
+:root[data-theme="dark"] .zazu-dash-surface-head h3 {
+    color: var(--zazu-ink);
+}
+
+:root[data-theme="dark"] .zazu-dash-hero p,
+:root[data-theme="dark"] .zazu-dash-side-label,
+:root[data-theme="dark"] .zazu-dash-side-line,
+:root[data-theme="dark"] .zazu-dash-hero-side > span:not(.zazu-dash-side-label),
+:root[data-theme="dark"] .zazu-dash-surface-head p,
+:root[data-theme="dark"] .zazu-dash-event-time span,
+:root[data-theme="dark"] .zazu-dash-event-copy span,
+:root[data-theme="dark"] .zazu-dash-event-copy small,
+:root[data-theme="dark"] .zazu-dash-metric > span,
+:root[data-theme="dark"] .zazu-dash-metric > small {
+    color: var(--zazu-muted);
+}
+
+:root[data-theme="dark"] .zazu-dash-surface-head {
+    background: var(--zazu-surface-2);
+    border-bottom-color: var(--zazu-border);
+}
+
+:root[data-theme="dark"] .zazu-dash-event {
+    border-bottom-color: var(--zazu-border);
+    color: var(--zazu-ink);
+}
+
+:root[data-theme="dark"] .zazu-dash-event:hover,
+:root[data-theme="dark"] .zazu-dash-metric:hover,
+:root[data-theme="dark"] .zazu-dash-focus-item:hover {
+    background: var(--zazu-primary-soft);
+    border-color: var(--zazu-border-strong);
+}
+
+:root[data-theme="dark"] .zazu-dash-note {
+    background: var(--zazu-page-deep);
+    border-color: var(--zazu-border);
+    color: var(--zazu-muted);
+}
+
+:root[data-theme="dark"] .zazu-dash-focus-item {
+    border-right-color: var(--zazu-border);
+    background: var(--zazu-surface);
+    color: var(--zazu-ink);
+}
+
+:root[data-theme="dark"] .zazu-dash-focus-item.is-warning {
+    background: var(--zazu-warning-soft);
+}
+
+:root[data-theme="dark"] .zazu-dash-focus-item.is-info {
+    background: var(--zazu-info-soft);
+}
+
+:root[data-theme="dark"] .zazu-dash-focus-item.is-clear {
+    background: var(--zazu-success-soft);
+}
+
+:root[data-theme="dark"] .zazu-dash-focus-item strong {
+    color: var(--zazu-ink);
+}
+
+:root[data-theme="dark"] .zazu-dash-focus-item small {
+    color: var(--zazu-muted);
+}
+
+:root[data-theme="dark"] .zazu-dash-metric > b,
+:root[data-theme="dark"] .zazu-dash-focus-item > b,
+:root[data-theme="dark"] .zazu-text-action {
+    color: var(--zazu-primary-light);
+}
+
+:root[data-theme="dark"] .zazu-dash-status {
+    border-color: var(--zazu-border);
+    background: var(--zazu-surface-2);
+    color: var(--zazu-muted);
+}
+
+:root[data-theme="dark"] .zazu-dash-status.status-draft {
+    border-color: #6F5A2B;
+    background: var(--zazu-warning-soft);
+    color: var(--zazu-warning-ink);
+}
+
+:root[data-theme="dark"] .zazu-dash-status.status-confirmed,
+:root[data-theme="dark"] .zazu-dash-status.status-completed {
+    border-color: #35664C;
+    background: var(--zazu-success-soft);
+    color: var(--zazu-success-ink);
+}
+
+:root[data-theme="dark"] .zazu-dash-status.status-in-progress {
+    border-color: #5C5796;
+    background: var(--zazu-info-soft);
+    color: var(--zazu-info-ink);
+}
+
+:root[data-theme="dark"] .zazu-dash-status.status-cancelled {
+    border-color: #76464B;
+    background: var(--zazu-danger-soft);
+    color: var(--zazu-danger-ink);
+}
+
+:root[data-theme="dark"] .zazu-dash-queue-state.is-warning {
+    border-color: #6F5A2B;
+    background: var(--zazu-warning-soft);
+    color: var(--zazu-warning-ink);
+}
+
+:root[data-theme="dark"] .zazu-dash-queue-state.is-clear {
+    border-color: #35664C;
+    background: var(--zazu-success-soft);
+    color: var(--zazu-success-ink);
+}
+
+/* Positioning refinement: keep dense headers readable without crowding. */
+.zazu-topbar-actions {
+    gap: 10px;
+}
+
+.zazu-command-search {
+    min-width: 240px;
+}
+
+.zazu-header-create {
+    min-width: 118px;
+}
+
+@media (max-width: 1100px) {
+    .zazu-command-search {
+        min-width: 210px;
+    }
+}
+
+@media (max-width: 820px) {
+    .zazu-command-search {
+        min-width: 42px;
+    }
+
+    .zazu-header-create {
+        min-width: 0;
+    }
+}
+
+/* Accent separation: action links are cobalt; supporting context can use sea-glass. */
+:root:not([data-theme="dark"]) .zazu-live-mark,
+:root:not([data-theme="dark"]) .zazu-workload-pill.is-active {
+    color: #006D68;
+}
+
+:root:not([data-theme="dark"]) .zazu-live-mark i {
+    background: #008E88;
+}
+
+:root:not([data-theme="dark"]) .zazu-workload-pill.is-active {
+    background: #008E88;
+    border-color: #008E88;
+}
+
+:root:not([data-theme="dark"]) .zazu-workload-pill.is-active strong {
+    color: #FFFFFF;
+}
