@@ -11,38 +11,66 @@ Zazu EMP is a proprietary event-management platform for small businesses operati
 - **Future business identity:** Rosscore Labs (not yet registered)
 - **Repository:** `Leano-Jordan/ZazuEMP`
 - **Repository default branch:** `main`
-- **Project state:** Definition / foundation build
+- **Project state:** Active foundation → commercial-readiness hardening
 - **Established:** 2026-09-22
 
 ## Start here
 
 **Read [memory.md](memory.md) first.**
 
-**Repository safety:** Read [.ai/REPOSITORY_IDENTITY_LOCK.md](.ai/REPOSITORY_IDENTITY_LOCK.md) before any state-changing work. Zazu EMP must never be mixed with another repository or project.
+For AI/coding work, also read:
+1. [.ai/REPOSITORY_IDENTITY_LOCK.md](.ai/REPOSITORY_IDENTITY_LOCK.md)
+2. [.ai/engineering/README.md](.ai/engineering/README.md)
+3. [.ai/engineering/00_ENGINE_ROUTER.md](.ai/engineering/00_ENGINE_ROUTER.md)
+4. [.ai/engineering/STATE.md](.ai/engineering/STATE.md)
 
-It is the living project context for Zazu EMP and records the current product definition, real-world discovery evidence, owner decisions, architecture direction, UX principles, current development state, unresolved questions and immediate next action.
+The repository-side engineering system is the authoritative control layer for Zazu execution.
 
-The memory is adaptable. New owner decisions and validated evidence can change it.
+## Engineering system
 
-## Operating engines
+Zazu uses one master control identity and bounded specialist engines:
 
-Zazu EMP uses three aligned operating frameworks:
+- **Morpheus / Jarvis** — control plane, routing, state, acceptance and progress control.
+- **Discovery & Design** — reconnaissance, workflow truth, architecture and decision boundaries.
+- **Builder** — implementation, database, security implementation and debugging.
+- **Guardian** — independent verification, regression breaking, forensics, security challenge and data-integrity review.
+- **Release** — commercial readiness, recovery, deployment and release evidence.
+- **UI/UX Improvement** — permanent cross-cutting interface and product-quality capability.
 
-- [Project Genesis & Scale Engine](docs/PROJECT_GENESIS.md)
-- [Human-First Discovery Mode](docs/HUMAN_FIRST_DISCOVERY.md)
-- [RossCore Engineering Command Engine](docs/ROSSCORE_ENGINEERING_COMMAND_ENGINE.md)
+The system is **state-driven, not conversation-driven**. Meaningful cycles follow:
 
-These frameworks guide discovery, decision-making and engineering. They do not replace the current project context in `memory.md`.
+`BASELINE → TARGET → INSPECT → DESIGN → CHANGE → VERIFY → BREAK → ACCEPT → RECORD → NEXT`
+
+See [.ai/engineering/README.md](.ai/engineering/README.md) and [.ai/engineering/STATE.md](.ai/engineering/STATE.md).
 
 ## Product direction
 
-Zazu EMP is designed as a reusable multi-business product rather than a bespoke system for one operator.
+Zazu EMP is designed as a reusable commercial event-management platform.
 
-The event/job is the central business record. Related information such as customer, quote, services, travel, deposits, expenses, hired items, reminders, documents and activity should remain together in a contextual workspace where practical.
+The event/job is the central operational record. Related information such as customer, requirements, quote, services, purchasing, preparation, costs, payments, documents and activity should remain connected to that job where practical.
 
-Supported capability examples include catering, rentals, sound/DJ, decor, baking, photography and camera hire. Businesses define their own reusable capability catalogue rather than receiving a fixed industry list.
+Supported capability examples include catering, rentals, sound/DJ, decor, baking, photography, camera hire and combinations of event services. Businesses define their own reusable capability catalogue rather than receiving a fixed industry list.
 
-The product is intended to work well for desktop/laptop workflows as well as phones used away from the desk or at events.
+The product is intended to work across desktop/laptop workflows and responsive phone use.
+
+## Current commercial-readiness principle
+
+The goal is not to maximize feature count or test count.
+
+Engineering priority is:
+1. correctness
+2. architecture
+3. data integrity
+4. security
+5. workflow integrity
+6. UX/accessibility
+7. reliability/recovery
+8. operability
+9. deployment/upgrade safety
+10. documentation/ownership/compliance
+11. release evidence
+
+See [.ai/engineering/READINESS_REGISTER.md](.ai/engineering/READINESS_REGISTER.md).
 
 ## Ownership and use
 
@@ -50,16 +78,18 @@ Unless a repository file explicitly states otherwise, Zazu EMP source code, orig
 
 Third-party components remain subject to their own licences. See [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md).
 
-## Development
+## Documentation rule
 
-Documentation must describe repository reality and must be updated when reality changes.
+Current state belongs in current-state files.
 
-The project is currently at the foundation stage. See [memory.md](memory.md) for the current build state.
+Dated audit/hardening records are historical evidence and must not be treated as current instructions unless explicitly promoted into the current control files.
+
+Documentation must be updated when repository reality changes.
 
 ## Security and privacy
 
 Do not commit passwords, API keys, private keys, tokens, customer personal information, production exports or other secrets.
 
-Do not publish private residential/contact information in project documentation unless there is a specific legal or operational reason to do so.
+Do not publish private residential/contact information in project documentation unless there is a specific legal or operational reason.
 
 See [SECURITY.md](SECURITY.md) and [IP_OWNERSHIP.md](IP_OWNERSHIP.md).
