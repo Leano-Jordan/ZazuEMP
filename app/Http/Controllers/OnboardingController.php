@@ -159,7 +159,6 @@ class OnboardingController extends Controller
             'experience_level' => ['required', 'in:basic,intermediate,advanced'],
         ]);
 
-        $levels->selected($request->user(), $business);
         $request->user()->businesses()->updateExistingPivot($business->id, [
             'experience_level' => $validated['experience_level'],
         ]);
