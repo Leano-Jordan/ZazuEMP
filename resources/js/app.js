@@ -14,7 +14,7 @@ function applyTheme(theme) {
     document.documentElement.dataset.theme = theme;
 
     const themeColor = document.querySelector('meta[name="theme-color"]');
-    if (themeColor) themeColor.setAttribute('content', theme === 'dark' ? '#0D1F3A' : '#F2F7FF');
+    if (themeColor) themeColor.setAttribute('content', theme === 'dark' ? '#081A2A' : '#E3EBF3');
 
 document.querySelectorAll('[data-theme-toggle]').forEach((button) => {
         const isDark = theme === 'dark';
@@ -458,7 +458,31 @@ function setupZazuMobileNavigation() {
     sidebar.querySelectorAll('a').forEach((link) => link.addEventListener('click', () => close(false)));
 
     document.addEventListener('keydown', (event) => {
-        if (event.key === 'Escape' && document.body.classList.contains('zazu-mobile-menu-open')) close(true);
+        if (!document.body.classList.contains('zazu-mobile-menu-open')) return;
+
+        if (event.key === 'Escape') {
+            close(true);
+            return;
+        }
+
+        if (event.key !== 'Tab') return;
+
+        const items = focusable();
+        if (!items.length) return;
+
+        const first = items[0];
+        const last = items[items.length - 1];
+
+        if (event.shiftKey && document.activeElement === first) {
+            event.preventDefault();
+            last.focus();
+            return;
+        }
+
+        if (!event.shiftKey && document.activeElement === last) {
+            event.preventDefault();
+            first.focus();
+        }
     });
 
     media.addEventListener?.('change', () => {
