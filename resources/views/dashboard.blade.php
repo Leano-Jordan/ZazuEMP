@@ -80,6 +80,7 @@
                         'calendar' => ['label' => 'Calendar', 'route' => 'calendar.index'],
                         'finance' => ['label' => 'Finance', 'route' => 'finance.index'],
                         'purchasing' => ['label' => 'Purchasing', 'route' => 'purchasing.index'],
+                        'suppliers' => ['label' => 'Suppliers', 'route' => 'suppliers.index'],
                         'inventory' => ['label' => 'Inventory', 'route' => 'inventory.index'],
                         'assets' => ['label' => 'Assets', 'route' => 'assets.index'],
                         'reports' => ['label' => 'Reports', 'route' => 'reports.index'],
