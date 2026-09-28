@@ -342,7 +342,7 @@ class FinanceController extends Controller
             'idempotencyKey' => (string) Str::uuid(),
             'invoices' => Invoice::where('business_id', $businessId)
                 ->whereNotIn('status', ['paid', 'void'])
-                ->with('event.customer')
+                ->with(['event.customer', 'quoteVersion'])
                 ->orderByDesc('issued_at')
                 ->get(),
         ]);
@@ -354,6 +354,7 @@ class FinanceController extends Controller
         $data = $request->validate([
             'idempotency_key' => ['nullable', 'uuid'],
             'invoice_id' => ['required', 'integer'],
+            'type' => ['required', 'in:payment,deposit'],
             'amount' => ['required', 'numeric', 'decimal:0,2', 'gt:0'],
             'method' => ['required', 'in:cash,bank_transfer,card,other'],
             'reference' => ['nullable', 'string', 'max:255'],
@@ -396,6 +397,20 @@ class FinanceController extends Controller
             $paymentCents = Money::toCents((string) $data['amount']);
 
             abort_if($paymentCents > ($totalCents - $paidCents), 422, 'Payment cannot exceed the outstanding invoice balance.');
+
+            if ($data['type'] === 'deposit') {
+                $depositRequiredCents = Money::toCents((string) ($invoice->quoteVersion?->deposit_amount ?? '0.00'));
+                $depositPaidCents = $invoice->payments
+                    ->where('type', 'deposit')
+                    ->sum(fn ($payment) => Money::toCents((string) $payment->amount));
+
+                abort_if($depositRequiredCents <= 0, 422, 'This invoice has no deposit requirement.');
+                abort_if(
+                    $depositPaidCents + $paymentCents > $depositRequiredCents,
+                    422,
+                    'This deposit would exceed the required deposit amount.'
+                );
+            }
 
             Payment::create([
                 ...$data,
