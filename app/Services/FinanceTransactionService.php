@@ -185,6 +185,12 @@ final class FinanceTransactionService
                 ? $lifecycle->lock($businessId, $eventId)
                 : null;
 
+            if ($lockedEvent) {
+                // Expenses are financial records. They may still be reconciled after
+                // operational completion, but never against cancelled work.
+                $lifecycle->assertFinanciallyActive($lockedEvent);
+            }
+
             $lockedPurchaseOrder = $purchaseOrderId !== null
                 ? PurchaseOrder::query()
                     ->where('business_id', $businessId)
