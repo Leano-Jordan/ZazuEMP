@@ -222,7 +222,7 @@ class WorkspaceSearchService
             ->with(['supplier', 'event']);
 
         if ($term !== '') {
-            $query->where(function (Builder $builder) use ($term) {
+            $query->where(function (Builder $builder) use ($term, $business) {
                 $builder
                     ->where('reference', 'like', '%'.$term.'%')
                     ->orWhere('status', 'like', '%'.$term.'%')
@@ -299,7 +299,7 @@ class WorkspaceSearchService
             ->with('event');
 
         if ($term !== '') {
-            $query->where(function (Builder $builder) use ($term) {
+            $query->where(function (Builder $builder) use ($term, $business) {
                 $builder
                     ->where('description', 'like', '%'.$term.'%')
                     ->orWhere('category', 'like', '%'.$term.'%')
