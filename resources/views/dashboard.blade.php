@@ -1,165 +1,91 @@
 <x-app-layout>
     <x-slot:title>Dashboard</x-slot:title>
-    <x-slot:heading>Dashboard</x-slot:heading>
+    <x-slot:heading>Command Centre</x-slot:heading>
 
     @if ($isOwner && (! $business?->catalogue_setup_completed_at || ! $business?->business_setup_completed_at))
-        <section class="zazu-dashboard-setup" aria-label="Workspace setup">
-            <div>
-                <div class="zazu-eyebrow">Setup centre</div>
-                <h2>Finish the workspace foundation when you are ready.</h2>
-                <p>Services, business identity and optional compliance settings can be completed without losing existing work.</p>
-            </div>
-            <a href="{{ route('onboarding.index') }}" class="zazu-btn zazu-btn-primary">Continue setup <span aria-hidden="true">→</span></a>
+        <section class="zazu-dash-setup">
+            <div><span class="zazu-dash-kicker">Workspace setup</span><h2>Finish the foundation when you are ready.</h2><p>Complete business identity and catalogue setup without losing existing work.</p></div>
+            <a href="{{ route('onboarding.index') }}" class="zazu-btn zazu-btn-primary">Continue setup <span>→</span></a>
         </section>
     @endif
 
-    <section class="zazu-dashboard-command" aria-labelledby="zazu-dashboard-title">
-        <div>
-            <div class="zazu-dashboard-kicker"><span class="zazu-dashboard-live-dot" aria-hidden="true"></span>Live workspace telemetry</div>
-            <h2 id="zazu-dashboard-title">Run the business from one operational surface.</h2>
-            <p>Jobs, commercial activity and planning stay connected to the workspace records that already exist.</p>
+    <section class="zazu-dash-hero">
+        <div class="zazu-dash-hero-main">
+            <div class="zazu-dash-kicker"><span class="zazu-dash-live"></span> ZAZU EMP / OPERATIONAL COMMAND</div>
+            <h2>Everything important, closer to the work.</h2>
+            <p>Use the event record as the centre of operations. Move from schedule to preparation, resources, commercial activity and control without losing context.</p>
+            <div class="zazu-dash-actions">
+                @if($workspaceTools['work'] && app(\App\Support\PermissionService::class)->allows('work.create', auth()->user(), $business))
+                    <a href="{{ route('work.create') }}" class="zazu-btn zazu-btn-primary">Create work <span>+</span></a>
+                @endif
+                @if($workspaceTools['calendar'])<a href="{{ route('calendar.index') }}" class="zazu-btn zazu-btn-secondary">Open calendar <span>→</span></a>@endif
+            </div>
         </div>
-        @if($workspaceTools['work'] && app(\App\Support\PermissionService::class)->allows('work.create', auth()->user(), $business))
-            <a href="{{ route('work.create') }}" class="zazu-btn zazu-btn-primary">Create work <span aria-hidden="true">+</span></a>
-        @elseif($workspaceTools['services'])
-            <a href="{{ route('capabilities.index') }}" class="zazu-btn zazu-btn-primary">Open catalogue <span aria-hidden="true">→</span></a>
-        @endif
+        <div class="zazu-dash-hero-side">
+            <span class="zazu-dash-side-label">Workspace state</span>
+            <strong>Operational</strong>
+            <span>Live workspace records</span>
+            <div class="zazu-dash-side-line"><i></i><span>Event operations</span><b>ONLINE</b></div>
+        </div>
     </section>
 
-    <section class="zazu-dashboard-bento" aria-label="Operational workbench">
-        <section class="zazu-dashboard-workbench">
-            <div class="zazu-dashboard-panel-head">
-                <div>
-                    <div class="zazu-eyebrow">Run-sheet</div>
-                    <h3>Upcoming dispatch &amp; work</h3>
-                    <p>Real workspace events, ordered by execution date.</p>
-                </div>
-                @if($workspaceTools['calendar'])
-                    <a href="{{ route('calendar.index') }}" class="zazu-btn zazu-btn-secondary">Calendar <span aria-hidden="true">→</span></a>
-                @endif
-            </div>
-
-            <div class="zazu-run-sheet">
+    <section class="zazu-dash-grid" aria-label="Dashboard operational overview">
+        <section class="zazu-dash-run zazu-dash-surface">
+            <header class="zazu-dash-surface-head">
+                <div><span class="zazu-dash-kicker">Run-sheet</span><h3>Upcoming work</h3><p>Real events from the workspace, ordered by execution date.</p></div>
+                @if($workspaceTools['work'])<a href="{{ route('work.index') }}" class="zazu-text-action">All work →</a>@endif
+            </header>
+            <div class="zazu-dash-timeline">
                 @forelse($upcoming as $event)
-                    <a href="{{ $workspaceTools['work'] ? route('work.show', $event) : route('calendar.index') }}" class="zazu-run-item">
-                        <div class="zazu-run-time">
-                            <strong>{{ $event->event_date?->format('H:i') ?: '—' }}</strong>
-                            <span>{{ $event->event_date?->format('d M Y') ?: 'Unscheduled' }}</span>
-                        </div>
-                        <div class="zazu-run-marker" aria-hidden="true"></div>
-                        <div class="zazu-run-main">
-                            <strong>{{ $event->name }}</strong>
-                            <span>{{ $event->customer?->name ?? 'No customer' }} · {{ $event->reference }}</span>
-                        </div>
-                        <div class="zazu-run-status">{{ strtoupper(str_replace('_', ' ', $event->status ?? 'OPEN')) }}</div>
+                    <a href="{{ $workspaceTools['work'] ? route('work.show', $event) : route('calendar.index') }}" class="zazu-dash-event">
+                        <div class="zazu-dash-event-time"><strong>{{ $event->event_date?->format('H:i') ?: '—' }}</strong><span>{{ $event->event_date?->format('d M Y') ?: 'Unscheduled' }}</span></div>
+                        <div class="zazu-dash-event-line"><i></i></div>
+                        <div class="zazu-dash-event-copy"><strong>{{ $event->name }}</strong><span>{{ $event->customer?->name ?? 'No customer' }}</span><small class="mono">{{ $event->reference }}</small></div>
+                        <span class="zazu-dash-status">{{ strtoupper(str_replace('_',' ',$event->status ?? 'OPEN')) }}</span>
                     </a>
                 @empty
-                    <div class="zazu-dashboard-empty">
-                        <strong>No scheduled work yet.</strong>
-                        <span>Create a job with an event date and it will appear here.</span>
-                        @if($workspaceTools['work'])
-                            <a href="{{ route('work.create') }}" class="zazu-btn zazu-btn-primary">Create job</a>
-                        @endif
-                    </div>
+                    <div class="zazu-dash-empty"><strong>No scheduled work yet.</strong><span>Create a job with an event date and it will appear here.</span>@if($workspaceTools['work'])<a href="{{ route('work.create') }}" class="zazu-btn zazu-btn-primary">Create job</a>@endif</div>
                 @endforelse
             </div>
-
-            <div class="zazu-run-sheet-footer">
-                <span>Operational source: workspace event register</span>
-                @if($workspaceTools['work'])
-                    <a href="{{ route('work.index') }}">Open all work →</a>
-                @endif
-            </div>
         </section>
 
-        <div class="zazu-dashboard-side-stack">
-    <section class="zazu-dashboard-telemetry" aria-label="Operational telemetry">
-        @if($workspaceTools['work'])
-            <a href="{{ route('work.index') }}" class="zazu-dashboard-kpi">
-                <span class="zazu-dashboard-kpi-label">Active events</span>
-                <strong>{{ number_format($metrics['active_work']) }}</strong>
-                <span class="zazu-dashboard-kpi-meta">Open operational records</span>
-            </a>
-        @endif
-        @if($workspaceTools['calendar'])
-            <a href="{{ route('calendar.index') }}" class="zazu-dashboard-kpi">
-                <span class="zazu-dashboard-kpi-label">Next 14 days</span>
-                <strong>{{ number_format($metrics['upcoming_work']) }}</strong>
-                <span class="zazu-dashboard-kpi-meta">Scheduled work ahead</span>
-            </a>
-        @endif
-        @if($workspaceTools['quotes'])
-            <a href="{{ route('quotes.index') }}" class="zazu-dashboard-kpi">
-                <span class="zazu-dashboard-kpi-label">Draft quotes</span>
-                <strong>{{ number_format($metrics['draft_quotes']) }}</strong>
-                <span class="zazu-dashboard-kpi-meta">Commercial records awaiting action</span>
-            </a>
-        @endif
-        @if($workspaceTools['customers'])
-            <a href="{{ route('customers.index') }}" class="zazu-dashboard-kpi">
-                <span class="zazu-dashboard-kpi-label">Customers</span>
-                <strong>{{ number_format($metrics['customers']) }}</strong>
-                <span class="zazu-dashboard-kpi-meta">People and organisations</span>
-            </a>
-        @endif
-    </section>
-
-        <aside class="zazu-dashboard-commercial">
-            <div class="zazu-dashboard-panel-head">
-                <div>
-                    <div class="zazu-eyebrow">Commercial queue</div>
-                    <h3>Quotes awaiting action</h3>
-                    <p>Keep draft commercial records visible without inventing financial state.</p>
-                </div>
-            </div>
-
-            <div class="zazu-commercial-stat">
-                <span>Draft quotes</span>
-                <strong>{{ number_format($metrics['draft_quotes']) }}</strong>
-                <small>Current workspace count</small>
-            </div>
-
-            <div class="zazu-commercial-actions">
-                @if($workspaceTools['quotes'])
-                    <a href="{{ route('quotes.index') }}" class="zazu-btn zazu-btn-primary">Inspect quote queue</a>
-                @endif
-                @if($workspaceTools['finance'])
-                    <a href="{{ route('finance.index') }}" class="zazu-btn zazu-btn-secondary">Open finance</a>
-                @endif
-            </div>
-
-            <div class="zazu-dashboard-note">
-                <span class="zazu-dashboard-note-mark" aria-hidden="true">i</span>
-                <p>Revenue, deposits and payment balances are intentionally not fabricated here. They should be surfaced from the finance ledger once the dashboard has an authoritative aggregate.</p>
-            </div>
+        <aside class="zazu-dash-metrics">
+            @if($workspaceTools['work'])
+            <a href="{{ route('work.index') }}" class="zazu-dash-metric zazu-dash-surface"><span>Active events</span><strong>{{ number_format($metrics['active_work']) }}</strong><small>Open operational records</small><b>→</b></a>
+            @endif
+            @if($workspaceTools['calendar'])
+            <a href="{{ route('calendar.index') }}" class="zazu-dash-metric zazu-dash-surface"><span>Next 14 days</span><strong>{{ number_format($metrics['upcoming_work']) }}</strong><small>Scheduled work ahead</small><b>→</b></a>
+            @endif
+            @if($workspaceTools['quotes'])
+            <a href="{{ route('quotes.index') }}" class="zazu-dash-metric zazu-dash-surface"><span>Draft quotes</span><strong>{{ number_format($metrics['draft_quotes']) }}</strong><small>Commercial records awaiting action</small><b>→</b></a>
+            @endif
+            @if($workspaceTools['customers'])
+            <a href="{{ route('customers.index') }}" class="zazu-dash-metric zazu-dash-surface"><span>Customers</span><strong>{{ number_format($metrics['customers']) }}</strong><small>People and organisations</small><b>→</b></a>
+            @endif
         </aside>
-        </div>
 
-        <section class="zazu-dashboard-assets">
-            <div class="zazu-dashboard-panel-head">
-                <div>
-                    <div class="zazu-eyebrow">Asset readiness</div>
-                    <h3>Equipment &amp; stock manifest</h3>
-                    <p>The asset register remains the authoritative source for availability, allocation and release state.</p>
-                </div>
-                @if($workspaceTools['assets'])
-                    <a href="{{ route('assets.index') }}" class="zazu-btn zazu-btn-secondary">Open asset register <span aria-hidden="true">→</span></a>
-                @endif
+        <section class="zazu-dash-commercial zazu-dash-surface">
+            <header class="zazu-dash-surface-head"><div><span class="zazu-dash-kicker">Commercial queue</span><h3>Quote action</h3><p>Keep commercial work visible without inventing financial state.</p></div></header>
+            <div class="zazu-dash-commercial-main"><div><span>Draft quotes</span><strong>{{ number_format($metrics['draft_quotes']) }}</strong></div><span class="zazu-dash-queue-state">AWAITING ACTION</span></div>
+            <div class="zazu-dash-actions">
+                @if($workspaceTools['quotes'])<a href="{{ route('quotes.index') }}" class="zazu-btn zazu-btn-primary">Inspect quote queue</a>@endif
+                @if($workspaceTools['finance'])<a href="{{ route('finance.index') }}" class="zazu-btn zazu-btn-secondary">Open finance</a>@endif
             </div>
+            <div class="zazu-dash-note"><b>i</b><span>Revenue, deposits and balances are not shown here because this dashboard does not own an authoritative finance aggregate.</span></div>
+        </section>
 
-            <div class="zazu-asset-manifest">
-                <div><span class="zazu-asset-signal"></span><strong>Live allocation state</strong><small>Tracked in Assets</small></div>
-                <div><span class="zazu-asset-signal"></span><strong>Hire availability</strong><small>Tracked per asset</small></div>
-                <div><span class="zazu-asset-signal"></span><strong>Warehouse readiness</strong><small>Tracked in asset status</small></div>
+        <section class="zazu-dash-resources zazu-dash-surface">
+            <header class="zazu-dash-surface-head"><div><span class="zazu-dash-kicker">Resource readiness</span><h3>Equipment &amp; stock</h3><p>Operational resource state remains authoritative in the asset register.</p></div>@if($workspaceTools['assets'])<a href="{{ route('assets.index') }}" class="zazu-text-action">Asset register →</a>@endif</header>
+            <div class="zazu-dash-resource-grid">
+                <div><span class="zazu-resource-dot"></span><strong>Allocation</strong><small>Tracked per asset</small></div>
+                <div><span class="zazu-resource-dot"></span><strong>Hire availability</strong><small>Tracked per asset</small></div>
+                <div><span class="zazu-resource-dot"></span><strong>Warehouse readiness</strong><small>Tracked in asset status</small></div>
             </div>
         </section>
     </section>
 
-    <section class="zazu-dashboard-quickbar" aria-label="Workspace shortcuts">
-        <div>
-            <div class="zazu-eyebrow">Workspace surfaces</div>
-            <strong>Move directly into the record you need.</strong>
-        </div>
+    <section class="zazu-dash-commandbar">
+        <div><span class="zazu-dash-kicker">Workspace surfaces</span><strong>Move directly into the record you need.</strong></div>
         <nav>
             @if($workspaceTools['services'])<a href="{{ route('capabilities.index') }}">Services &amp; prices</a>@endif
             @if($workspaceTools['work'])<a href="{{ route('work.index') }}">Jobs</a>@endif
@@ -170,5 +96,4 @@
             @if($workspaceTools['reports'])<a href="{{ route('reports.index') }}">Reports</a>@endif
         </nav>
     </section>
-
 </x-app-layout>
