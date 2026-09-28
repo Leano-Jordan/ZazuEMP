@@ -64,7 +64,11 @@ class UiAccessibilityTest extends TestCase
         $response->assertOk();
         $response->assertSee('required', false);
         $response->assertSee('data-error-summary', false);
-        $response->assertSee('aria-label="Mobile primary"', false);
+        $response->assertSee('data-mobile-sidebar', false);
+        $response->assertSee('data-mobile-sidebar-toggle', false);
+        $response->assertSee('aria-controls="zazu-mobile-sidebar"', false);
+        $response->assertSee('data-mobile-sidebar-close', false);
+        $response->assertDontSee('data-mobile-nav', false);
     }
     public function test_settings_page_renders_without_malformed_closing_markup(): void
     {
