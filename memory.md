@@ -675,3 +675,13 @@ Regression rule:
 - Upgraded Calendar with stronger month hierarchy, current-day emphasis, event overflow handling and a mobile agenda view.
 - Hardened mobile form layouts, action groups, document padding and shell behaviour.
 - Latest batch source checks were clean; rendered browser QA remains unverified.
+
+
+## Director comparative product-pattern cycle — 2026-09-28
+
+- Benchmarked current event-management patterns from HoneyBook, Tripleseat and Event Temple.
+- Adapted the shared event-record, next-action, connected-workflow and mobile-access lessons rather than copying product-specific features.
+- Removed the final non-actionable Complete lifecycle step from Job workspace by routing it into the existing status editor.
+- Added compact Job “At a glance” context and removed duplicate Dashboard quick-access entries.
+- Normalized customer contact surface styling and hardened mobile action-heavy headers.
+- Rendered QA remains unverified.
