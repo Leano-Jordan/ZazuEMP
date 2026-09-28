@@ -107,7 +107,9 @@ class CustomerContactController extends Controller
         $this->ensureCustomer($customer, $business);
         $this->ensureBelongsToCustomer($customer, $contact);
 
-        DB::transaction(function () use ($customer, $contact): void {
+        $cannotDelete = false;
+
+        DB::transaction(function () use ($customer, $contact, &$cannotDelete): void {
             $lockedCustomer = Customer::query()
                 ->whereKey($customer->id)
                 ->lockForUpdate()
@@ -118,14 +120,19 @@ class CustomerContactController extends Controller
                 ->lockForUpdate()
                 ->firstOrFail();
 
-            abort_if(
-                $lockedContact->is_primary,
-                422,
-                'The primary contact cannot be removed. Make another contact primary first.'
-            );
+            if ($lockedContact->is_primary) {
+                $cannotDelete = true;
+                return;
+            }
 
             $lockedContact->delete();
         });
+
+        if ($cannotDelete) {
+            return redirect()
+                ->route('customers.show', $customer)
+                ->with('error', 'The primary contact cannot be removed. Make another contact primary first.');
+        }
 
         return redirect()
             ->route('customers.show', $customer)
