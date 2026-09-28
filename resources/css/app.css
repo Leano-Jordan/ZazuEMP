@@ -4,13 +4,13 @@
 @source '../../storage/framework/views/*.php';
 
 @theme {
-    --color-zazu-blue-primary: #1E40AF;
-    --color-zazu-blue-accent: #3B82F6;
-    --color-zazu-blue-hover: #1D4ED8;
-    --color-zazu-blue-light: #60A5FA;
-    --color-zazu-blue-soft: #EFF6FF;
-    --color-zazu-blue-subtle: #DBEAFE;
-    --color-zazu-blue-canvas: #F8FAFC;
+    --color-zazu-blue-primary: #3949E8;
+    --color-zazu-blue-accent: #5B5CFF;
+    --color-zazu-blue-hover: #2834B8;
+    --color-zazu-blue-light: #7C7FFF;
+    --color-zazu-blue-soft: #EEF0FF;
+    --color-zazu-blue-subtle: #E0E3FF;
+    --color-zazu-blue-canvas: #F6F7FB;
     --color-zazu-surface-card: #FFFFFF;
     --color-zazu-surface-border: #E2E8F0;
     --color-zazu-text-main: #0F172A;
@@ -23,53 +23,53 @@
     color-scheme: light;
 
     /* Soft blue product system */
-    --zazu-page: #F2F7FF;
-    --zazu-page-deep: #C2DCFF;
+    --zazu-page: #F6F7FB;
+    --zazu-page-deep: #E7E9F1;
 
     /* Navigation rail */
-    --zazu-sidebar: #F2F7FF;
-    --zazu-sidebar-ink: #17315A;
-    --zazu-sidebar-muted: #405C7E;
-    --zazu-sidebar-label: #5A7598;
-    --zazu-sidebar-hover: #DDEBFF;
+    --zazu-sidebar: #EEF1FA;
+    --zazu-sidebar-ink: #191D31;
+    --zazu-sidebar-muted: #343B52;
+    --zazu-sidebar-label: #5B647C;
+    --zazu-sidebar-hover: #E5E7F0;
     --zazu-sidebar-active: #FFFFFF;
     --zazu-sidebar-surface: #FFFFFF;
 
     /* Surfaces */
     --zazu-surface: #FFFFFF;
-    --zazu-surface-2: #F2F7FF;
-    --zazu-surface-3: #F7FAFF;
+    --zazu-surface-2: #F0F1F6;
+    --zazu-surface-3: #E7E9F1;
     --zazu-field: #FFFFFF;
 
     /* Typography */
-    --zazu-ink: #17315A;
-    --zazu-ink-2: #29496B;
-    --zazu-muted: #405C7E;
-    --zazu-faint: #5A7598;
-    --zazu-nav-label: #5A7598;
+    --zazu-ink: #191D31;
+    --zazu-ink-2: #343B52;
+    --zazu-muted: #566078;
+    --zazu-faint: #68728A;
+    --zazu-nav-label: #58627B;
 
     /* Structure */
-    --zazu-border: #C2DCFF;
-    --zazu-border-strong: #9EC8FF;
+    --zazu-border: #C9CEDC;
+    --zazu-border-strong: #9EA7BC;
 
     /* Brand / actions */
-    --zazu-primary: #5592FC;
-    --zazu-primary-light: #6FA4FF;
-    --zazu-primary-pale: #9EC8FF;
-    --zazu-primary-shadow: #C2DCFF;
-    --zazu-primary-deep: #416AD7;
-    --zazu-primary-hover: #416AD7;
-    --zazu-primary-soft: #F2F7FF;
+    --zazu-primary: #3949E8;
+    --zazu-primary-light: #7C7FFF;
+    --zazu-primary-pale: #D9DBFF;
+    --zazu-primary-shadow: #AEB3EA;
+    --zazu-primary-deep: #2834B8;
+    --zazu-primary-hover: #2834B8;
+    --zazu-primary-soft: #EEF0FF;
     --zazu-primary-ink: #FFFFFF;
-    --zazu-link: #416AD7;
-    --zazu-link-hover: #3158B8;
-    --zazu-nav-active: #5592FC;
+    --zazu-link: #2F39C7;
+    --zazu-link-hover: #20298F;
+    --zazu-nav-active: #3949E8;
 
     /* Semantic */
-    --zazu-accent: #416AD7;
-    --zazu-accent-ink: #3158B8;
-    --zazu-accent-soft: #E7EFFF;
-    --zazu-focus: #5592FC;
+    --zazu-accent: #008E88;
+    --zazu-accent-ink: #006D68;
+    --zazu-accent-soft: #E7F8F6;
+    --zazu-focus: #5B5CFF;
 
     --zazu-success: #247A63;
     --zazu-success-ink: #1C624F;
@@ -80,9 +80,9 @@
     --zazu-danger: #B44D5B;
     --zazu-danger-ink: #8E3847;
     --zazu-danger-soft: #FBE8EB;
-    --zazu-info: #416AD7;
-    --zazu-info-ink: #3158B8;
-    --zazu-info-soft: #E7EFFF;
+    --zazu-info: #4F46C5;
+    --zazu-info-ink: #3B348F;
+    --zazu-info-soft: #F0EEFF;
 
     /* Elevation / shape / motion */
     --zazu-shadow: 0 1px 2px rgba(23, 49, 90, 0.035);
@@ -137,7 +137,7 @@
 
     --zazu-primary: #6FA4FF;
     --zazu-primary-light: #9EC8FF;
-    --zazu-primary-pale: #9EC8FF;
+    --zazu-primary-pale: #D9DBFF;
     --zazu-primary-shadow: #31588C;
     --zazu-primary-deep: #9EC8FF;
     --zazu-primary-hover: #9EC8FF;
@@ -5851,7 +5851,7 @@ html[data-theme="dark"] .zazu-public-party,html[data-theme="dark"] .zazu-public-
 :root {
     --zazu-page: #F7FAFF;
     --zazu-surface: #FFFFFF;
-    --zazu-surface-2: #F2F7FF;
+    --zazu-surface-2: #F0F1F6;
     --zazu-surface-3: #EAF2FF;
     --zazu-border: color-mix(in srgb, var(--zazu-ink) 7%, transparent);
     --zazu-border-strong: color-mix(in srgb, var(--zazu-primary) 30%, transparent);
@@ -8288,3 +8288,7 @@ body.zazu-inspector-open { overflow:hidden; }
 @media (prefers-reduced-motion: reduce) {
     .zazu-workload-pill, .zazu-inspector, .zazu-inspector-backdrop { transition:none; }
 }
+
+
+/* DIRECTOR COLOUR THEORY ALIGNMENT / 2026-09 */
+/* app.css utility/theme tokens intentionally mirror the canonical final visual layer. */
