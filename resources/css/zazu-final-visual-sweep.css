@@ -4154,3 +4154,241 @@ main {
         display: none;
     }
 }
+
+
+/* DIRECTOR LIGHT THEME CORRECTION
+ * Reports is the structural reference: sections should read as deliberate,
+ * bounded working surfaces without changing the dark theme.
+ */
+:root:not([data-theme="dark"]) {
+    --zazu-page: #F4F8FF;
+    --zazu-page-deep: #D8E7FF;
+    --zazu-sidebar: #EAF3FF;
+    --zazu-sidebar-ink: #102B52;
+    --zazu-sidebar-muted: #31577F;
+    --zazu-sidebar-label: #5C7B9E;
+    --zazu-sidebar-hover: #D8E8FF;
+    --zazu-sidebar-active: #FFFFFF;
+    --zazu-sidebar-surface: #FFFFFF;
+
+    --zazu-surface: #FFFFFF;
+    --zazu-surface-2: #F5F9FF;
+    --zazu-surface-3: #EAF2FF;
+    --zazu-field: #FFFFFF;
+
+    --zazu-ink: #102B52;
+    --zazu-ink-2: #274B73;
+    --zazu-muted: #4D6B8B;
+    --zazu-faint: #6B86A4;
+    --zazu-nav-label: #31577F;
+
+    --zazu-border: #BCD2EE;
+    --zazu-border-strong: #8FB6E6;
+
+    --zazu-primary: #2563EB;
+    --zazu-primary-light: #4F8CFF;
+    --zazu-primary-pale: #BFD7FF;
+    --zazu-primary-shadow: #9FC1F1;
+    --zazu-primary-deep: #1749B8;
+    --zazu-primary-hover: #1749B8;
+    --zazu-primary-soft: #E8F1FF;
+    --zazu-primary-ink: #FFFFFF;
+    --zazu-link: #1D58C7;
+    --zazu-link-hover: #12429E;
+    --zazu-nav-active: #2563EB;
+
+    --zazu-accent: #087F95;
+    --zazu-accent-ink: #086476;
+    --zazu-accent-soft: #DFF6FA;
+    --zazu-focus: #2563EB;
+}
+
+/* Light-mode shell: intentionally light, blue and legible. */
+:root:not([data-theme="dark"]) .zazu-sidebar {
+    background:
+        linear-gradient(180deg, #EEF6FF 0%, #E5F0FF 58%, #DCEBFF 100%);
+    border-right: 1px solid #B7D0F1;
+    box-shadow: 8px 0 26px rgba(37, 99, 235, .06);
+}
+
+:root:not([data-theme="dark"]) .zazu-brand {
+    background: rgba(255,255,255,.72);
+    border-bottom: 1px solid #BCD2EE;
+}
+
+:root:not([data-theme="dark"]) .zazu-brand-word {
+    color: #102B52;
+}
+
+:root:not([data-theme="dark"]) .zazu-brand-dot {
+    color: #2563EB;
+}
+
+:root:not([data-theme="dark"]) .zazu-sidebar-workspace {
+    border-color: #B9D2F2;
+    background: linear-gradient(135deg, #FFFFFF 0%, #EAF3FF 100%);
+    box-shadow: 0 2px 10px rgba(37,99,235,.05);
+}
+
+:root:not([data-theme="dark"]) .zazu-sidebar-workspace-label {
+    color: #5D7D9F;
+}
+
+:root:not([data-theme="dark"]) .zazu-sidebar-workspace-name {
+    color: #102B52;
+}
+
+:root:not([data-theme="dark"]) .zazu-sidebar-workspace-meta {
+    color: #45698E;
+}
+
+:root:not([data-theme="dark"]) .zazu-nav-link {
+    color: #31577F;
+    border-color: transparent;
+}
+
+:root:not([data-theme="dark"]) .zazu-nav-link:hover {
+    background: #DDEBFF;
+    border-color: #B7D0F1;
+    color: #102B52;
+}
+
+:root:not([data-theme="dark"]) .zazu-nav-link.active {
+    background: #FFFFFF;
+    border-color: #A6C9F4;
+    color: #1749B8;
+    box-shadow: inset 3px 0 #2563EB, 0 2px 8px rgba(37,99,235,.07);
+}
+
+:root:not([data-theme="dark"]) .zazu-nav-link.active .zazu-nav-icon {
+    color: #2563EB;
+}
+
+:root:not([data-theme="dark"]) .zazu-topbar {
+    background: rgba(255,255,255,.97);
+    border-bottom: 1px solid #BCD2EE;
+    box-shadow: 0 4px 16px rgba(37,99,235,.06);
+    backdrop-filter: blur(14px);
+}
+
+:root:not([data-theme="dark"]) .zazu-page-title {
+    color: #102B52;
+}
+
+:root:not([data-theme="dark"]) .zazu-page-context,
+:root:not([data-theme="dark"]) .zazu-workspace-status {
+    color: #4D6B8B;
+}
+
+:root:not([data-theme="dark"]) .zazu-theme-toggle,
+:root:not([data-theme="dark"]) .zazu-user-trigger,
+:root:not([data-theme="dark"]) .zazu-header-settings,
+:root:not([data-theme="dark"]) .zazu-mobile-toggle {
+    background: #FFFFFF;
+    border-color: #B8D0EF;
+    color: #21496F;
+}
+
+:root:not([data-theme="dark"]) .zazu-theme-toggle:hover,
+:root:not([data-theme="dark"]) .zazu-user-trigger:hover,
+:root:not([data-theme="dark"]) .zazu-header-settings:hover,
+:root:not([data-theme="dark"]) .zazu-mobile-toggle:hover {
+    background: #EAF3FF;
+    border-color: #72A6E8;
+    color: #1749B8;
+}
+
+/* Structural visibility standard: use the Reports page as the reference. */
+:root:not([data-theme="dark"]) .zazu-card,
+:root:not([data-theme="dark"]) .zazu-panel,
+:root:not([data-theme="dark"]) .zazu-form-section,
+:root:not([data-theme="dark"]) .zazu-command-band,
+:root:not([data-theme="dark"]) .zazu-document,
+:root:not([data-theme="dark"]) .zazu-catalogue-card,
+:root:not([data-theme="dark"]) .zazu-filter-card,
+:root:not([data-theme="dark"]) .zazu-metric-card,
+:root:not([data-theme="dark"]) .zazu-route-card,
+:root:not([data-theme="dark"]) .zazu-context-card,
+:root:not([data-theme="dark"]) .zazu-next-action,
+:root:not([data-theme="dark"]) .zazu-dash-hero,
+:root:not([data-theme="dark"]) .zazu-dash-surface,
+:root:not([data-theme="dark"]) .zazu-dash-commandbar,
+:root:not([data-theme="dark"]) .zazu-calendar-shell,
+:root:not([data-theme="dark"]) .zazu-ops-register,
+:root:not([data-theme="dark"]) .zazu-ops-hero {
+    border-color: #BFD3EC;
+    background-color: #FFFFFF;
+    box-shadow: 0 2px 8px rgba(31, 76, 132, .06);
+}
+
+:root:not([data-theme="dark"]) .zazu-card-header,
+:root:not([data-theme="dark"]) .zazu-panel-head,
+:root:not([data-theme="dark"]) .zazu-form-section-head,
+:root:not([data-theme="dark"]) .zazu-dash-surface-head {
+    background: #F7FAFF;
+    border-bottom-color: #C9D9EE;
+}
+
+:root:not([data-theme="dark"]) .zazu-list-item,
+:root:not([data-theme="dark"]) .zazu-detail-row,
+:root:not([data-theme="dark"]) .zazu-dash-event,
+:root:not([data-theme="dark"]) .zazu-dash-metric,
+:root:not([data-theme="dark"]) .zazu-dash-note,
+:root:not([data-theme="dark"]) .zazu-dash-resource-grid > div,
+:root:not([data-theme="dark"]) .zazu-dash-commercial-main {
+    border-color: #D0DDF0;
+}
+
+:root:not([data-theme="dark"]) .zazu-dash-metric {
+    background: #FFFFFF;
+    box-shadow: 0 1px 4px rgba(31, 76, 132, .04);
+}
+
+:root:not([data-theme="dark"]) .zazu-dash-metric:hover,
+:root:not([data-theme="dark"]) .zazu-dash-event:hover,
+:root:not([data-theme="dark"]) .zazu-route-card:hover {
+    border-color: #83B1EA;
+    background: #EEF5FF;
+}
+
+:root:not([data-theme="dark"]) .zazu-dash-hero {
+    background: linear-gradient(120deg, #FFFFFF 0%, #FFFFFF 55%, #EAF3FF 100%);
+}
+
+:root:not([data-theme="dark"]) .zazu-dash-hero-side {
+    background: #F3F8FF;
+    border-left-color: #C9D9EE;
+}
+
+:root:not([data-theme="dark"]) .zazu-dash-side-line {
+    border-top-color: #C9D9EE;
+}
+
+:root:not([data-theme="dark"]) .zazu-dash-commandbar {
+    background: #FFFFFF;
+}
+
+:root:not([data-theme="dark"]) .zazu-command-band {
+    background: linear-gradient(135deg, #FFFFFF 0%, #F2F7FF 100%);
+    border-left-color: #2563EB;
+}
+
+:root:not([data-theme="dark"]) .zazu-command-meta {
+    border-left-color: #C9D9EE;
+}
+
+:root:not([data-theme="dark"]) .zazu-record-header {
+    background: #EEF5FF;
+    border-bottom-color: #C5D8EF;
+}
+
+:root:not([data-theme="dark"]) .zazu-dash-status {
+    border-color: #C1D4EB;
+    background: #F5F9FF;
+}
+
+@media (max-width: 820px) {
+    :root:not([data-theme="dark"]) .zazu-sidebar {
+        box-shadow: 0 8px 24px rgba(37,99,235,.08);
+    }
+}
