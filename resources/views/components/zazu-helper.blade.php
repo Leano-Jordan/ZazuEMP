@@ -1,10 +1,21 @@
 @php
     $routeName = request()->route()?->getName();
+    $business = app(\App\Support\CurrentBusiness::class)->resolve(auth()->user());
+    $experience = app(\App\Support\ExperienceLevel::class);
+    $level = $business ? $experience->for(auth()->user(), $business) : 'intermediate';
+    $attention = $business
+        ? app(\App\Support\ZazuHelperService::class)->attention(auth()->user(), $business, (string) $routeName)
+        : [];
+    $attention = array_slice($attention, 0, $level === 'basic' ? 2 : ($level === 'intermediate' ? 3 : 4));
     $guides = [
         'dashboard' => [
             ['label' => 'Start', 'title' => 'Define what your business offers', 'copy' => 'Services and products become reusable building blocks for jobs, requirements and quotes.', 'href' => route('capabilities.index'), 'link' => 'Open Services'],
             ['label' => 'Next', 'title' => 'Create the job', 'copy' => 'The Job is the operational home for the customer, requirements, quotes, preparation and costs.', 'href' => route('work.index'), 'link' => 'Open Jobs'],
             ['label' => 'Then', 'title' => 'Follow the job through execution', 'copy' => 'Move from accepted quote to requirements, purchasing, inventory, preparation and finance without losing the thread.'],
+        ],
+        'onboarding.experience' => [
+            ['label' => 'Choose', 'title' => 'Set the amount of detail you want surfaced', 'copy' => 'Basic keeps the workspace focused. Intermediate adds operational depth. Advanced exposes the broader control picture.'],
+            ['label' => 'Remember', 'title' => 'This does not change your permissions', 'copy' => 'Your role still controls access and actions. Experience level only changes presentation and guidance.'],
         ],
         'capabilities.index' => [
             ['label' => 'Services', 'title' => 'Define what you sell or provide', 'copy' => 'Keep your common offerings reusable instead of rebuilding them for every job.'],
@@ -65,9 +76,23 @@
 @if(!empty($steps))
     <div class="zazu-helper" data-zazu-helper data-zazu-guide-route="{{ $routeName }}" data-zazu-guide-enabled="on">
         <section id="zazu-helper-panel" class="zazu-helper-panel" data-zazu-helper-panel role="region" aria-label="Zazu workflow guide" hidden>
-            <div class="zazu-helper-kicker">Zazu guide</div>
+            <div class="zazu-helper-kicker">Zazu guide · {{ ucfirst($level) }}</div>
             <div class="zazu-helper-title" data-zazu-helper-title aria-live="polite">{{ $steps[0]['title'] }}</div>
             <p class="zazu-helper-copy" data-zazu-helper-copy aria-live="polite">{{ $steps[0]['copy'] }}</p>
+            @if(!empty($attention))
+                <div class="zazu-helper-step">
+                    <div class="zazu-helper-step-label">Needs attention</div>
+                    @foreach($attention as $item)
+                        <div class="mt-2">
+                            <strong class="block">{{ $item['title'] }}</strong>
+                            <span class="block">{{ $item['copy'] }}</span>
+                            @if(!empty($item['href']))
+                                <a href="{{ $item['href'] }}" class="zazu-helper-link">{{ $item['link'] }}</a>
+                            @endif
+                        </div>
+                    @endforeach
+                </div>
+            @endif
             <div class="zazu-helper-step">
                 <div class="zazu-helper-step-label" data-zazu-helper-step-label>{{ $steps[0]['label'] }}</div>
                 <div data-zazu-helper-count>1 of {{ count($steps) }}</div>
