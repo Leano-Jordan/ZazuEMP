@@ -326,7 +326,7 @@ class FinanceController extends Controller
     {
         $businessId = app(CurrentBusiness::class)->id($request->user());
 
-        $invoice->load(['items', 'event.customer.primaryContact']);
+        $invoice->load(['items', 'event.customer.primaryContact', 'quoteVersion']);
 
         abort_unless((int) $invoice->business_id === $businessId, 404);
 
