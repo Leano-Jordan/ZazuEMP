@@ -5,9 +5,11 @@ namespace App\Http\Controllers;
 use App\Models\BusinessCapability;
 use App\Models\Event;
 use App\Models\EventRequirement;
+use App\Services\EventLifecycleService;
 use App\Support\CurrentBusiness;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\Rule;
 use Illuminate\View\View;
 
@@ -47,11 +49,9 @@ class RequirementController extends Controller
         ]);
     }
 
-    public function store(Request $request, Event $event): RedirectResponse
+    public function store(Request $request, Event $event, EventLifecycleService $lifecycle): RedirectResponse
     {
         $this->ensureBusiness($event, $request);
-        abort_if($event->isClosed(), 422, 'Closed work cannot receive new requirements.');
-
         $validated = $request->validate([
             'capability_id' => [
                 'nullable',
@@ -67,7 +67,13 @@ class RequirementController extends Controller
             'notes' => ['nullable', 'string'],
         ]);
 
-        $event->requirements()->create($validated + ['status' => 'open']);
+        DB::transaction(function () use ($request, $event, $validated, $lifecycle): void {
+            $businessId = app(CurrentBusiness::class)->id($request->user());
+            $lockedEvent = $lifecycle->lock($businessId, $event->id);
+            $lifecycle->assertOperational($lockedEvent);
+
+            $lockedEvent->requirements()->create($validated + ['status' => 'open']);
+        });
 
         return redirect()
             ->route('work.show', $event)
