@@ -18,7 +18,7 @@
                 </div>
             </div>
 
-            <div class="zazu-login-kicker">{{ $ownerAccess ? 'Owner access' : 'Workspace access' }}</div>
+            <div class="zazu-auth-entry-state"><span class="zazu-status-dot" aria-hidden="true"></span><span>{{ $ownerAccess ? 'Owner access' : 'Workspace access' }}</span></div>
             <h1 id="login-heading">{{ $ownerAccess ? 'Welcome back, owner.' : 'Welcome back.' }}</h1>
             <p class="zazu-auth-copy zazu-login-copy">
                 {{ $ownerAccess
@@ -86,7 +86,7 @@
                     <a href="{{ route('password.request') }}" class="zazu-login-recovery">Forgot password?</a>
                 </div>
 
-                <button type="submit" class="zazu-btn zazu-btn-primary zazu-auth-submit zazu-login-submit">
+                <button type="submit" class="zazu-btn zazu-btn-primary zazu-auth-submit zazu-login-submit"><span class="zazu-submit-pulse" aria-hidden="true"></span>
                     <span>{{ $ownerAccess ? 'Open owner area' : 'Sign in' }}</span>
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" aria-hidden="true">
                         <path d="M5 12h12"></path>
