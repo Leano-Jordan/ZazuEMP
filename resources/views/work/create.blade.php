@@ -66,6 +66,7 @@
                         <div class="zazu-form-section-head">
                             <div class="zazu-form-section-title">What are you providing?</div>
                             <div class="zazu-form-section-copy">Select everything that applies. You do not need to type service names.</div>
+                            <div class="zazu-selection-summary" id="service-selection-summary" aria-live="polite">No services selected yet</div>
                         </div>
 
                         <div class="zazu-service-groups">
@@ -74,7 +75,7 @@
                                     <legend>{{ $group }}</legend>
                                     <div class="zazu-choice-grid">
                                         @foreach ($services as $service)
-                                            <label class="zazu-choice-card zazu-service-choice">
+                                            <label class="zazu-choice-card zazu-service-choice" data-service-choice>
                                                 <input type="checkbox" name="services[]" value="{{ $service }}" @checked(in_array($service, old('services', []), true))>
                                                 <span>{{ $service }}</span>
                                             </label>
@@ -183,6 +184,7 @@
             const nightContactSelect = document.getElementById('event_night_contact_id');
             const otherToggle = document.getElementById('other-service-toggle');
             const otherWrap = document.getElementById('other-service-wrap');
+            const serviceSummary = document.getElementById('service-selection-summary');
 
             function refreshContacts(selectedDay = oldDayContactId, selectedNight = oldNightContactId) {
                 const customer = customers.find(item => String(item.id) === customerSelect.value);
@@ -199,6 +201,13 @@
                 }
             }
 
+            function refreshServiceSummary() {
+                if (!serviceSummary) return;
+                const selected = [...document.querySelectorAll('input[name="services[]"]:checked')];
+                serviceSummary.textContent = selected.length ? `${selected.length} service${selected.length === 1 ? '' : 's'} selected` : 'No services selected yet';
+                serviceSummary.classList.toggle('is-ready', selected.length > 0);
+            }
+
             function refreshOtherService() {
                 otherWrap.hidden = !otherToggle?.checked;
                 if (!otherToggle?.checked) {
@@ -208,8 +217,10 @@
 
             customerSelect.addEventListener('change', () => refreshContacts('', ''));
             otherToggle?.addEventListener('change', refreshOtherService);
+            document.querySelectorAll('input[name="services[]"]').forEach(input => input.addEventListener('change', refreshServiceSummary));
             refreshContacts();
             refreshOtherService();
+            refreshServiceSummary();
         </script>
     @endif
 </x-app-layout>
