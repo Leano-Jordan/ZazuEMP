@@ -19,6 +19,8 @@ class QuoteVersion extends Model
         'subtotal',
         'tax_total',
         'total',
+        'deposit_percent',
+        'deposit_amount',
         'notes',
         'tax_rate_id',
         'tax_code',
@@ -34,6 +36,8 @@ class QuoteVersion extends Model
             'subtotal' => 'decimal:2',
             'tax_total' => 'decimal:2',
             'total' => 'decimal:2',
+            'deposit_percent' => 'decimal:2',
+            'deposit_amount' => 'decimal:2',
             'tax_rate' => 'decimal:2',
             'tax_snapshot_at' => 'datetime',
         ];
