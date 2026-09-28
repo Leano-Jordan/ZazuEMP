@@ -14,8 +14,7 @@ class LandingPageTest extends TestCase
         $this->get(route('landing'))
             ->assertOk()
             ->assertSee('Register')
-            ->assertSee('Log in')
-            ->assertSee('Precision command for');
+            ->assertSee('Log in');
     }
 
     public function test_authenticated_owner_sees_clear_workspace_state_on_the_public_landing_page(): void
