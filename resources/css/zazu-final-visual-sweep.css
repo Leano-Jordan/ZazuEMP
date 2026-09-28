@@ -2636,3 +2636,8 @@ html[data-theme="dark"] body {
 @media (prefers-reduced-motion: reduce) {
     .zazu-nav-link, .zazu-nav-arrow { transition: none; }
 }
+
+
+.zazu-record-header[data-record-cols="2"] {
+    grid-template-columns: minmax(0,1fr) repeat(2,minmax(90px,auto));
+}
