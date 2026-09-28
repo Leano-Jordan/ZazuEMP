@@ -17,11 +17,15 @@
         </div>
     </section>
 
-    <section class="zazu-card zazu-list">
-        <div class="zazu-card-header">
-            <div class="zazu-eyebrow">Records</div>
-            <div class="zazu-card-title mt-1">Customer list</div>
-            <div class="zazu-card-description">Each row is one customer record. Select a name to open its relationship workspace.</div>
+    <section class="zazu-card zazu-list">        <div class="zazu-card-header">
+            <div class="zazu-section-heading">
+                <div>
+                    <div class="zazu-eyebrow">Records</div>
+                    <div class="zazu-card-title mt-1">Customer list</div>
+                    <div class="zazu-card-description">Each row is one customer record. Select a name to open its relationship workspace.</div>
+                </div>
+                <span class="zazu-section-count">{{ $customers->total() }}</span>
+            </div>
         </div>
 
         @if ($customers->count())
