@@ -64,15 +64,10 @@ class QuoteService
         });
     }
 
-    /** @SuppressWarnings(PHPMD.CyclomaticComplexity) */
     public function createRevision(Quote $quote, Collection $requirements): QuoteVersion
     {
         return DB::transaction(function () use ($quote, $requirements): QuoteVersion {
-            $eventId = Quote::query()->whereKey($quote->id)->value('event_id');
-            abort_unless($eventId, 404);
-
-            $businessId = (int) Event::query()->whereKey($eventId)->value('business_id');
-            abort_unless($businessId > 0, 404);
+            [$businessId, $eventId] = $this->resolveQuoteRevisionContext($quote);
 
             Business::query()
                 ->whereKey($businessId)
@@ -91,7 +86,9 @@ class QuoteService
                 ->firstOrFail();
 
             if ($lockedEvent->isClosed()) {
-                throw ValidationException::withMessages(['quote' => 'Closed work cannot receive new quote revisions.']);
+                throw ValidationException::withMessages([
+                    'quote' => 'Closed work cannot receive new quote revisions.',
+                ]);
             }
 
             $latest = $lockedQuote->versions()
@@ -103,79 +100,129 @@ class QuoteService
                 return $latest;
             }
 
-            $previousItems = $latest->items
-                ->filter(fn (\App\Models\QuoteItem $item) => $item->event_requirement_id !== null)
-                ->keyBy('event_requirement_id');
-
-            $taxRate = $latest->tax_rate_id
-                ? TaxRate::query()->whereKey($latest->tax_rate_id)->where('business_id', $lockedQuote->event->business_id)->first()
-                : null;
-
-            if ($taxRate) {
-                $taxSnapshot = $this->taxSnapshot($taxRate);
-            } else {
-                $taxSnapshot = [
-                    'tax_rate_id' => null,
-                    'tax_code' => $latest->tax_code,
-                    'tax_label' => $latest->tax_label ?: 'No tax',
-                    'tax_treatment' => $latest->tax_treatment ?: 'out_of_scope',
-                    'tax_rate' => $latest->tax_rate ?: '0.00',
-                    'tax_snapshot_at' => $latest->tax_snapshot_at ?: now(),
-                ];
-            }
-
-            $latest->update(['status' => 'superseded']);
-
-            $version = $lockedQuote->versions()->create([
-                'version' => $latest->version + 1,
-                'status' => 'draft',
-                'subtotal' => '0.00',
-                'tax_total' => '0.00',
-                'total' => '0.00',
-                'notes' => $latest->notes,
-                'deposit_percent' => $latest->deposit_percent ?? '0.00',
-                'deposit_amount' => $latest->deposit_amount ?? '0.00',
-                ...$taxSnapshot,
-            ]);
-
-            $lockedQuote->update(['status' => 'draft']);
-
-            foreach ($requirements as $requirement) {
-                $previousItem = $previousItems->get($requirement->id);
-                $capabilityPrice = $requirement->capability?->default_price;
-                $capabilityCurrency = strtoupper((string) ($requirement->capability?->currency ?? $lockedQuote->currency));
-
-                $unitPrice = $previousItem?->unit_price;
-
-                if ($unitPrice === null && $capabilityPrice !== null && $capabilityCurrency === strtoupper($lockedQuote->currency)) {
-                    $unitPrice = $capabilityPrice;
-                }
-
-                $unitPrice = $unitPrice ?? '0.00';
-                $quantityHundredths = Money::toHundredths((string) $requirement->quantity);
-
-                $version->items()->create([
-                    'event_requirement_id' => $requirement->id,
-                    'capability_id' => $requirement->capability_id,
-                    'description' => $requirement->description,
-                    'quantity' => number_format($quantityHundredths / 100, 2, '.', ''),
-                    'unit' => $requirement->unit,
-                    'unit_price' => $unitPrice,
-                    'line_total' => Money::fromCents(
-                        Money::multiplyQuantityByPrice(
-                            $quantityHundredths,
-                            Money::toCents((string) $unitPrice)
-                        )
-                    ),
-                    'pricing_basis' => $requirement->capability?->pricing_basis,
-                    'source_snapshot' => $this->snapshotForRequirement($requirement, $lockedQuote->currency),
-                ]);
-            }
-
+            $version = $this->createRevisionVersion($lockedQuote, $latest, $requirements);
             $this->recalculate($version);
 
             return $version->fresh('items');
         });
+    }
+
+    /**
+     * @return array{0:int,1:int}
+     */
+    private function resolveQuoteRevisionContext(Quote $quote): array
+    {
+        $eventId = (int) Quote::query()->whereKey($quote->id)->value('event_id');
+        abort_unless($eventId > 0, 404);
+
+        $businessId = (int) Event::query()->whereKey($eventId)->value('business_id');
+        abort_unless($businessId > 0, 404);
+
+        return [$businessId, $eventId];
+    }
+
+    private function createRevisionVersion(
+        Quote $lockedQuote,
+        QuoteVersion $latest,
+        Collection $requirements
+    ): QuoteVersion {
+        $previousItems = $latest->items
+            ->filter(fn (\App\Models\QuoteItem $item) => $item->event_requirement_id !== null)
+            ->keyBy('event_requirement_id');
+
+        $taxSnapshot = $this->revisionTaxSnapshot($latest, $lockedQuote->event->business_id);
+
+        $latest->update(['status' => 'superseded']);
+
+        $version = $lockedQuote->versions()->create([
+            'version' => $latest->version + 1,
+            'status' => 'draft',
+            'subtotal' => '0.00',
+            'tax_total' => '0.00',
+            'total' => '0.00',
+            'notes' => $latest->notes,
+            'deposit_percent' => $latest->deposit_percent ?? '0.00',
+            'deposit_amount' => $latest->deposit_amount ?? '0.00',
+            ...$taxSnapshot,
+        ]);
+
+        $lockedQuote->update(['status' => 'draft']);
+
+        $this->copyRevisionItems(
+            $version,
+            $requirements,
+            $previousItems,
+            $lockedQuote->currency
+        );
+
+        return $version;
+    }
+
+    /**
+     * @return array<string,mixed>
+     */
+    private function revisionTaxSnapshot(QuoteVersion $latest, int $businessId): array
+    {
+        if ($latest->tax_rate_id) {
+            $taxRate = TaxRate::query()
+                ->whereKey($latest->tax_rate_id)
+                ->where('business_id', $businessId)
+                ->first();
+
+            if ($taxRate) {
+                return $this->taxSnapshot($taxRate);
+            }
+        }
+
+        return [
+            'tax_rate_id' => null,
+            'tax_code' => $latest->tax_code,
+            'tax_label' => $latest->tax_label ?: 'No tax',
+            'tax_treatment' => $latest->tax_treatment ?: 'out_of_scope',
+            'tax_rate' => $latest->tax_rate ?: '0.00',
+            'tax_snapshot_at' => $latest->tax_snapshot_at ?: now(),
+        ];
+    }
+
+    /**
+     * @param \Illuminate\Support\Collection<int, \App\Models\QuoteItem> $previousItems
+     */
+    private function copyRevisionItems(
+        QuoteVersion $version,
+        Collection $requirements,
+        Collection $previousItems,
+        string $currency
+    ): void {
+        foreach ($requirements as $requirement) {
+            $previousItem = $previousItems->get($requirement->id);
+            $capabilityPrice = $requirement->capability?->default_price;
+            $capabilityCurrency = strtoupper((string) ($requirement->capability?->currency ?? $currency));
+            $unitPrice = $previousItem?->unit_price;
+
+            if ($unitPrice === null && $capabilityPrice !== null && $capabilityCurrency === strtoupper($currency)) {
+                $unitPrice = $capabilityPrice;
+            }
+
+            $unitPrice = $unitPrice ?? '0.00';
+            $quantityHundredths = Money::toHundredths((string) $requirement->quantity);
+
+            $version->items()->create([
+                'event_requirement_id' => $requirement->id,
+                'capability_id' => $requirement->capability_id,
+                'description' => $requirement->description,
+                'quantity' => number_format($quantityHundredths / 100, 2, '.', ''),
+                'unit' => $requirement->unit,
+                'unit_price' => $unitPrice,
+                'line_total' => Money::fromCents(
+                    Money::multiplyQuantityByPrice(
+                        $quantityHundredths,
+                        Money::toCents((string) $unitPrice)
+                    )
+                ),
+                'pricing_basis' => $requirement->capability?->pricing_basis,
+                'source_snapshot' => $this->snapshotForRequirement($requirement, $currency),
+            ]);
+        }
     }
 
     public function updateDraft(
