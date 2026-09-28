@@ -27,7 +27,7 @@ class OnboardingTest extends TestCase
             'name' => 'Wedding catering',
         ]);
 
-        $response->assertRedirect(route('onboarding.business'));
+        $response->assertRedirect(route('onboarding.experience'));
 
         $this->assertDatabaseHas('business_capabilities', [
             'business_id' => $business->id,
@@ -85,7 +85,7 @@ class OnboardingTest extends TestCase
         $this->signInAsOwner($business);
 
         $this->post(route('onboarding.catalogue.skip'))
-            ->assertRedirect(route('onboarding.business'))
+            ->assertRedirect(route('onboarding.experience'))
             ->assertSessionHas('info');
 
         $business->refresh();
@@ -97,7 +97,7 @@ class OnboardingTest extends TestCase
         $this->get(route('onboarding.index'))->assertOk();
 
         $this->post(route('onboarding.catalogue.finish'))
-            ->assertRedirect(route('onboarding.business'));
+            ->assertRedirect(route('onboarding.experience'));
 
         $this->assertNotNull($business->fresh()->catalogue_setup_completed_at);
         $this->assertNull($business->fresh()->catalogue_setup_skipped_at);
@@ -112,7 +112,8 @@ class OnboardingTest extends TestCase
             'currency' => 'ZAR',
         ]);
 
-        $this->signInAsOwner($business);
+        $user = $this->signInAsOwner($business);
+        $user->businesses()->updateExistingPivot($business->id, ['experience_level' => 'intermediate']);
 
         $this->post(route('onboarding.business'), [
             'name' => 'Lean Business',
