@@ -63,33 +63,31 @@ class TravelCostController extends Controller
             (string) $validated['customer_rate_per_km'],
         );
 
-        $travelCost = DB::transaction(function () use (
-            $validated,
-            $event,
-            $distance,
-            $roundTrip,
-            $totalDistance,
-            $fuelLitres,
-            $fuelCost,
-            $customerCharge
-        ): TravelCost {
+        $travelCost = DB::transaction(function () use ($validated, $event, $roundTrip, $calculation): TravelCost {
+            $lockedEvent = Event::query()
+                ->whereKey($event->id)
+                ->lockForUpdate()
+                ->firstOrFail();
+
+            abort_if($lockedEvent->isClosed(), 422, 'Closed work cannot receive new travel records.');
+
             return TravelCost::query()->create([
-                'event_id' => $event->id,
+                'event_id' => $lockedEvent->id,
                 'route_label' => trim($validated['route_label']),
                 'currency' => strtoupper($validated['currency']),
                 'provider' => 'manual',
                 'origin' => trim($validated['origin']),
                 'destination' => trim($validated['destination']),
-                'distance_km' => $validated['distance_km'],
+                'distance_km' => $calculation['distance_km'],
                 'travel_time_minutes' => $validated['travel_time_minutes'] ?? null,
                 'fuel_price_per_litre' => $validated['fuel_price_per_litre'],
                 'vehicle_consumption_l_per_100km' => $validated['vehicle_consumption_l_per_100km'],
                 'round_trip' => $roundTrip,
                 'customer_rate_per_km' => $validated['customer_rate_per_km'],
-                'total_distance_km' => $totalDistance,
-                'fuel_litres' => $fuelLitres,
-                'fuel_cost' => $fuelCost,
-                'customer_charge' => $customerCharge,
+                'total_distance_km' => $calculation['total_distance_km'],
+                'fuel_litres' => $calculation['fuel_litres'],
+                'fuel_cost' => $calculation['fuel_cost'],
+                'customer_charge' => $calculation['customer_charge'],
                 'notes' => $validated['notes'] ?? null,
                 'calculation_snapshot' => [
                     'route_label' => trim($validated['route_label']),
@@ -97,16 +95,16 @@ class TravelCostController extends Controller
                     'provider' => 'manual',
                     'origin' => trim($validated['origin']),
                     'destination' => trim($validated['destination']),
-                    'distance_km' => $distance,
+                    'distance_km' => $calculation['distance_km'],
                     'travel_time_minutes' => $validated['travel_time_minutes'] ?? null,
-                    'fuel_price_per_litre' => (float) $validated['fuel_price_per_litre'],
-                    'vehicle_consumption_l_per_100km' => (float) $validated['vehicle_consumption_l_per_100km'],
+                    'fuel_price_per_litre' => (string) $validated['fuel_price_per_litre'],
+                    'vehicle_consumption_l_per_100km' => (string) $validated['vehicle_consumption_l_per_100km'],
                     'round_trip' => $roundTrip,
-                    'customer_rate_per_km' => (float) $validated['customer_rate_per_km'],
-                    'total_distance_km' => $totalDistance,
-                    'fuel_litres' => $fuelLitres,
-                    'fuel_cost' => $fuelCost,
-                    'customer_charge' => $customerCharge,
+                    'customer_rate_per_km' => (string) $validated['customer_rate_per_km'],
+                    'total_distance_km' => $calculation['total_distance_km'],
+                    'fuel_litres' => $calculation['fuel_litres'],
+                    'fuel_cost' => $calculation['fuel_cost'],
+                    'customer_charge' => $calculation['customer_charge'],
                 ],
             ]);
         });
