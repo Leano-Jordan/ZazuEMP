@@ -12,7 +12,9 @@ class SkeletonPagesTest extends TestCase
     protected function setUp(): void
     {
         parent::setUp();
-        $this->signInAsOwner();
+        $user = $this->signInAsOwner();
+        $business = $user->businesses()->first();
+        $user->businesses()->updateExistingPivot($business->id, ['experience_level' => 'intermediate']);
     }
 
     public function test_all_top_level_zazu_skeleton_pages_are_reachable(): void
@@ -43,6 +45,7 @@ class SkeletonPagesTest extends TestCase
         foreach ([
             'onboarding.index',
             'onboarding.catalogue',
+            'onboarding.experience',
             'onboarding.business',
             'finance.index',
             'finance.invoices.create',
