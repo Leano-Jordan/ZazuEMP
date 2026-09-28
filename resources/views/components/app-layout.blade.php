@@ -44,21 +44,15 @@
             </div>
 
             <nav class="zazu-nav" aria-label="Primary">
-                <div class="zazu-sidebar-workspace">
-                    <div class="zazu-sidebar-workspace-label">Active workspace</div>
-                    <div class="zazu-sidebar-workspace-name">{{ $business?->name ?? 'Zazu EMP' }}</div>
-                    <div class="zazu-sidebar-workspace-meta"><span class="zazu-sidebar-workspace-dot" aria-hidden="true"></span><span>Online · Event operations</span></div>
-                </div>
-
                 <div class="zazu-nav-group">
                     <div class="zazu-nav-group-label">Workspace</div>
                     <div class="zazu-nav-stack zazu-nav-primary">
-                        <a href="{{ route('dashboard') }}" title="Dashboard" class="zazu-nav-link {{ request()->routeIs('dashboard') ? 'active' : '' }}" @if(request()->routeIs('dashboard')) aria-current="page" @endif><span class="zazu-nav-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><rect x="4" y="4" width="6" height="6" rx="1"></rect><rect x="14" y="4" width="6" height="6" rx="1"></rect><rect x="4" y="14" width="6" height="6" rx="1"></rect><rect x="14" y="14" width="6" height="6" rx="1"></rect></svg></span><span class="zazu-nav-label">Dashboard</span><span class="zazu-nav-arrow" aria-hidden="true">↗</span></a>
+                        <a href="{{ route('dashboard') }}" class="zazu-nav-link {{ request()->routeIs('dashboard') ? 'active' : '' }}" @if(request()->routeIs('dashboard')) aria-current="page" @endif><span class="zazu-nav-label">Dashboard</span></a>
                         @if($can('work.view') || $can('capabilities.view') || $can('quotes.view') || $can('calendar.view'))
-                            <a href="{{ $can('work.view') ? route('work.index') : ($can('capabilities.view') ? route('capabilities.index') : ($can('quotes.view') ? route('quotes.index') : route('calendar.index'))) }}" class="zazu-nav-link {{ request()->routeIs('work.*','capabilities.*','quotes.*','calendar.*') ? 'active' : '' }}"><span class="zazu-nav-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 19V9m7 10V5m7 14v-7"></path><path d="M3 19h18"></path></svg></span><span class="zazu-nav-label">Operations</span><span class="zazu-nav-arrow" aria-hidden="true">↗</span></a>
+                            <a href="{{ $can('work.view') ? route('work.index') : ($can('capabilities.view') ? route('capabilities.index') : ($can('quotes.view') ? route('quotes.index') : route('calendar.index'))) }}" class="zazu-nav-link {{ request()->routeIs('work.*','capabilities.*','quotes.*','calendar.*') ? 'active' : '' }}"><span class="zazu-nav-label">Operations</span></a>
                         @endif
                         @if($can('customers.view'))
-                            <a href="{{ route('customers.index') }}" class="zazu-nav-link {{ request()->routeIs('customers.*') ? 'active' : '' }}"><span class="zazu-nav-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="9" cy="8" r="3"></circle><path d="M3.5 19a5.5 5.5 0 0 1 11 0"></path><path d="M16 11a3 3 0 0 1 4 2.8M16 16.5a5 5 0 0 1 4.5 2.5"></path></svg></span><span class="zazu-nav-label">Customers</span><span class="zazu-nav-arrow" aria-hidden="true">↗</span></a>
+                            <a href="{{ route('customers.index') }}" class="zazu-nav-link {{ request()->routeIs('customers.*') ? 'active' : '' }}"><span class="zazu-nav-label">Customers</span></a>
                         @endif
                     </div>
                 </div>
@@ -67,10 +61,10 @@
                     <div class="zazu-nav-group-label">Commercial & supply</div>
                     <div class="zazu-nav-stack">
                         @if($can('finance.view'))
-                            <a href="{{ route('finance.index') }}" class="zazu-nav-link {{ request()->routeIs('finance.*') ? 'active' : '' }}"><span class="zazu-nav-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h16v12H4z"></path><path d="M8 7V5h8v2M4 11h16"></path><path d="M9 15h6"></path></svg></span><span class="zazu-nav-label">Finance</span><span class="zazu-nav-arrow" aria-hidden="true">↗</span></a>
+                            <a href="{{ route('finance.index') }}" class="zazu-nav-link {{ request()->routeIs('finance.*') ? 'active' : '' }}"><span class="zazu-nav-label">Finance</span></a>
                         @endif
                         @if($can('purchasing.view') || $can('suppliers.view') || $can('inventory.view') || $can('assets.view'))
-                            <a href="{{ $can('purchasing.view') ? route('purchasing.index') : ($can('suppliers.view') ? route('suppliers.index') : ($can('inventory.view') ? route('inventory.index') : route('assets.index'))) }}" class="zazu-nav-link {{ request()->routeIs('purchasing.*','suppliers.*','inventory.*','assets.*') ? 'active' : '' }}"><span class="zazu-nav-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m4 8 8-4 8 4-8 4-8-4Z"></path><path d="m4 12 8 4 8-4M4 16l8 4 8-4"></path></svg></span><span class="zazu-nav-label">Resources</span><span class="zazu-nav-arrow" aria-hidden="true">↗</span></a>
+                            <a href="{{ $can('purchasing.view') ? route('purchasing.index') : ($can('suppliers.view') ? route('suppliers.index') : ($can('inventory.view') ? route('inventory.index') : route('assets.index'))) }}" class="zazu-nav-link {{ request()->routeIs('purchasing.*','suppliers.*','inventory.*','assets.*') ? 'active' : '' }}"><span class="zazu-nav-label">Resources</span></a>
                         @endif
                     </div>
                 </div>
@@ -79,92 +73,103 @@
                     <div class="zazu-nav-group-label">Control</div>
                     <div class="zazu-nav-stack">
                         @if($can('reports.view'))
-                            <a href="{{ route('reports.index') }}" class="zazu-nav-link {{ request()->routeIs('reports.*') ? 'active' : '' }}"><span class="zazu-nav-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 19V9M12 19V5M19 19v-7"></path></svg></span><span class="zazu-nav-label">Reports</span><span class="zazu-nav-arrow" aria-hidden="true">↗</span></a>
+                            <a href="{{ route('reports.index') }}" class="zazu-nav-link {{ request()->routeIs('reports.*') ? 'active' : '' }}"><span class="zazu-nav-label">Reports</span></a>
                         @endif
+                    </div>
+                </div>
 
+                @if($isOwner)
+                    <div class="zazu-nav-group">
+                        <div class="zazu-nav-group-label">System</div>
+                        <div class="zazu-nav-stack">
+                            <a href="{{ route('settings.index') }}" class="zazu-nav-link {{ request()->routeIs('settings.*') ? 'active' : '' }}"><span class="zazu-nav-label">Settings</span></a>
+                        </div>
                     </div>
-                </div>
-                <div class="zazu-nav-group zazu-nav-account">
-                    <div class="zazu-nav-group-label">Account</div>
-                    <div class="zazu-nav-stack">
-                        @if($isOwner)
-                            <a href="{{ route('settings.index') }}" class="zazu-nav-link {{ request()->routeIs('settings.*') ? 'active' : '' }}"><span class="zazu-nav-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="3"></circle><path d="M19 12a7 7 0 0 0-.3-2l-2-1.3-2-3.4-2.3 1a7 7 0 0 0-3.4-2L11 4.3 12 2l1 2.3a7 7 0 0 0 3.4 2l2.3-1 2 3.4-2 1.3a7 7 0 0 0 0 4l2 1.3-2 3.4-2.3-1a7 7 0 0 0-3.4 2L13 22l-2-2.3a7 7 0 0 0-3.4-2l-2.3 1-2-3.4 2-1.3a7 7 0 0 0 0-4L3.3 8.7l2-3.4 2.3 1a7 7 0 0 0 3.4-2L11 2"></path></svg></span><span class="zazu-nav-label">Settings</span><span class="zazu-nav-arrow" aria-hidden="true">↗</span></a>
-                        @endif
-                    </div>
-                </div>
+                @endif
             </nav>
 
             <div class="zazu-sidebar-footer">
-                @auth
-                    @auth
-                                            <div class="zazu-user-menu" data-user-menu>
-                                                <button
-                                                    type="button"
-                                                    class="zazu-user-trigger"
-                                                    data-user-trigger
-                                                    aria-expanded="false"
-                                                    aria-controls="zazu-user-menu"
-                                                    aria-label="Open account menu for {{ '@'.auth()->user()->username }}"
-                                                >
-                                                    <x-profile-avatar :name="auth()->user()->name" :path="auth()->user()->profile_photo_path" media-type="user" :media-id="auth()->id()" size="sm" />
-                                                    <span class="zazu-user-identity">
-                                                        <strong>{{ '@'.auth()->user()->username }}</strong>
-                                                        <span>{{ auth()->user()->name }}</span>
-                                                    </span>
-                                                    <svg class="zazu-user-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="m7 9 5 5 5-5"></path></svg>
-                                                </button>
-                
-                                                <div class="zazu-user-popover" id="zazu-user-menu" data-user-popover hidden>
-                                                    <div class="zazu-user-popover-head">
-                                                        <x-profile-avatar :name="auth()->user()->name" :path="auth()->user()->profile_photo_path" media-type="user" :media-id="auth()->id()" size="md" />
-                                                        <div class="min-w-0">
-                                                            <strong class="zazu-user-popover-name">{{ '@'.auth()->user()->username }}</strong>
-                                                            <span class="zazu-user-popover-email">{{ auth()->user()->name }}</span>
-                                                            <span class="zazu-user-popover-email">{{ auth()->user()->email }}</span>
-                                                            <span class="zazu-user-popover-email">Workspace level · {{ $experienceLabel }}</span>
-                                                        </div>
-                                                    </div>
-                                                    @if($businesses->count() > 1)
-                                                        <div class="zazu-user-popover-section">
-                                                            <span class="zazu-user-popover-label">Workspace</span>
-                                                            <form method="POST" action="{{ route('business.switch') }}" class="zazu-user-switch-form">
-                                                                @csrf
-                                                                <label class="sr-only" for="zazu-business-switch">Current workspace</label>
-                                                                <select id="zazu-business-switch" name="business_id" class="zazu-user-switch-select" data-business-switch>
-                                                                    @foreach($businesses as $availableBusiness)
-                                                                        <option value="{{ $availableBusiness->id }}" @selected((int) $availableBusiness->id === (int) $business->id)>{{ $availableBusiness->name }}</option>
-                                                                    @endforeach
-                                                                </select>
-                                                            </form>
-                                                        </div>
-                                                    @endif
-                                                    <div class="zazu-user-popover-divider"></div>
-                                                    <a href="{{ route('preferences.experience') }}" class="zazu-user-signout zazu-user-link">
-                                                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><circle cx="12" cy="12" r="3"></circle><path d="M5 12h14M12 5v14"></path></svg>
-                                                        <span>Experience level · {{ $experienceLabel }}</span>
-                                                    </a>
-                                                    @if($isOwner)
-                                                    <a href="{{ route('onboarding.index') }}" class="zazu-user-signout zazu-user-link">
-                                                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><circle cx="12" cy="12" r="3"></circle><path d="M19 12a7 7 0 0 0-.3-2l-2-1.3-2-3.4-2.3 1a7 7 0 0 0-3.4-2L12.7 2h-1.4L11 4.3a7 7 0 0 0-3.4 2l-2.3-1-2 3.4 2 1.3a7 7 0 0 0 0 4l-2 1.3 2 3.4 2.3-1a7 7 0 0 0 3.4 2l.3 2.3h1.4l.3-2.3a7 7 0 0 0 3.4-2l2.3 1 2-3.4-2-1.3A7 7 0 0 0 19 12z"></path></svg>
-                                                        <span>Setup centre</span>
-                                                    </a>
-                
-                                                    @endif
-                                                    <form method="POST" action="{{ route('logout') }}">
-                                                        @csrf
-                                                        <button type="submit" class="zazu-user-signout">
-                                                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M10 6V4h9v16h-9v-2"></path><path d="M4 12h11m-4-4 4 4-4 4"></path></svg>
-                                                            <span>Sign out</span>
-                                                        </button>
-                                                    </form>
-                                                </div>
-                                            </div>
-                                        @endauth
-                @endauth
-                <div class="zazu-footer-card">
-                    <div class="zazu-footer-title">{{ $business?->name ?? 'Zazu EMP' }}</div>
-                    <div class="zazu-footer-copy">Event operations workspace</div>
+                <div class="zazu-footer-workspace">
+                    <span class="zazu-footer-workspace-label">Workspace</span>
+                    <strong>{{ $business?->name ?? 'Zazu EMP' }}</strong>
+                    <span>Event operations</span>
                 </div>
+                @auth
+                    <div class="zazu-user-menu" data-user-menu>
+                        <button
+                            type="button"
+                            class="zazu-user-trigger"
+                            data-user-trigger
+                            aria-expanded="false"
+                            aria-controls="zazu-user-menu"
+                            aria-label="Open account menu for {{ '@'.auth()->user()->username }}"
+                        >
+                            <x-profile-avatar :name="auth()->user()->name" :path="auth()->user()->profile_photo_path" media-type="user" :media-id="auth()->id()" size="sm" />
+                            <span class="zazu-user-identity">
+                                <span class="zazu-user-kicker">Signed in</span>
+                                <strong>{{ auth()->user()->name }}</strong>
+                                <span>{{ '@'.auth()->user()->username }} · {{ ucfirst(str_replace('_', ' ', $currentRole ?? 'member')) }}</span>
+                            </span>
+                            <svg class="zazu-user-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="m7 9 5 5 5-5"></path></svg>
+                        </button>
+
+                        <div class="zazu-user-popover" id="zazu-user-menu" data-user-popover hidden>
+                            <div class="zazu-user-popover-head">
+                                <x-profile-avatar :name="auth()->user()->name" :path="auth()->user()->profile_photo_path" media-type="user" :media-id="auth()->id()" size="md" />
+                                <div class="min-w-0">
+                                    <span class="zazu-user-popover-label">Account</span>
+                                    <strong class="zazu-user-popover-name">{{ auth()->user()->name }}</strong>
+                                    <span class="zazu-user-popover-email">{{ '@'.auth()->user()->username }}</span>
+                                    <span class="zazu-user-popover-email">{{ auth()->user()->email }}</span>
+                                    <span class="zazu-user-role">{{ ucfirst(str_replace('_', ' ', $currentRole ?? 'member')) }} · {{ $experienceLabel }}</span>
+                                </div>
+                            </div>
+
+                            <div class="zazu-user-popover-section">
+                                <span class="zazu-user-popover-label">Workspace</span>
+                                @if($businesses->count() > 1)
+                                    <form method="POST" action="{{ route('business.switch') }}" class="zazu-user-switch-form">
+                                        @csrf
+                                        <label class="sr-only" for="zazu-business-switch">Current workspace</label>
+                                        <select id="zazu-business-switch" name="business_id" class="zazu-user-switch-select" data-business-switch>
+                                            @foreach($businesses as $availableBusiness)
+                                                <option value="{{ $availableBusiness->id }}" @selected((int) $availableBusiness->id === (int) $business->id)>{{ $availableBusiness->name }}</option>
+                                            @endforeach
+                                        </select>
+                                    </form>
+                                @else
+                                    <strong class="zazu-user-workspace-name">{{ $business?->name ?? 'Zazu EMP' }}</strong>
+                                @endif
+                            </div>
+
+                            <div class="zazu-user-popover-divider"></div>
+
+                            <a href="{{ route('preferences.experience') }}" class="zazu-user-menu-link">
+                                <span>Experience preference</span>
+                                <small>{{ $experienceLabel }}</small>
+                            </a>
+                            @if($isOwner)
+                                <a href="{{ route('onboarding.index') }}" class="zazu-user-menu-link">
+                                    <span>Setup centre</span>
+                                    <small>Business and catalogue foundation</small>
+                                </a>
+                                <a href="{{ route('settings.index') }}" class="zazu-user-menu-link">
+                                    <span>Business settings</span>
+                                    <small>Workspace configuration</small>
+                                </a>
+                            @endif
+
+                            <div class="zazu-user-popover-divider"></div>
+
+                            <form method="POST" action="{{ route('logout') }}">
+                                @csrf
+                                <button type="submit" class="zazu-user-signout">
+                                    <span>Sign out</span>
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+                @endauth
             </div>
         </aside>
 
