@@ -5858,3 +5858,155 @@ body {
 :root:not([data-theme="dark"]) .zazu-workload-pill.is-active strong {
     color: #FFFFFF;
 }
+
+
+/* ============================================================
+   DIRECTOR VISUAL CONSISTENCY SEAL / CYCLE 2 / 2026-09
+   Legacy global component rules remain for compatibility, but
+   theme-specific surfaces are now explicitly sealed below them.
+   ============================================================ */
+
+/* Accent is sea-glass; information remains indigo. */
+:root:not([data-theme="dark"]) .zazu-chip-accent {
+    border-color: #A9D8D3;
+    background: #E7F8F6;
+    color: #006D68;
+}
+
+:root:not([data-theme="dark"]) .zazu-chip-info {
+    border-color: #C7C2FF;
+    background: #F0EEFF;
+    color: #3B348F;
+}
+
+/* Light theme: older component selectors cannot pull pale defaults back in. */
+:root:not([data-theme="dark"]) .zazu-input,
+:root:not([data-theme="dark"]) .zazu-select,
+:root:not([data-theme="dark"]) .zazu-textarea,
+:root:not([data-theme="dark"]) .zazu-form-control,
+:root:not([data-theme="dark"]) input:not([type="checkbox"]):not([type="radio"]),
+:root:not([data-theme="dark"]) select,
+:root:not([data-theme="dark"]) textarea {
+    background: #FFFFFF;
+    color: #191D31;
+    border-color: #9EA7BC;
+}
+
+:root:not([data-theme="dark"]) .zazu-btn-secondary {
+    background: #FFFFFF;
+    color: #22283B;
+    border-color: #98A2B8;
+}
+
+:root:not([data-theme="dark"]) .zazu-card-header,
+:root:not([data-theme="dark"]) .zazu-panel-head,
+:root:not([data-theme="dark"]) .zazu-form-section-head {
+    background: #F0F1F5;
+    color: #191D31;
+    border-bottom-color: #C5CAD8;
+}
+
+/* Explicit readable treatment for shared status text. */
+:root:not([data-theme="dark"]) .zazu-status-active {
+    color: #166534;
+    font-weight: 800;
+}
+
+:root:not([data-theme="dark"]) .zazu-status-muted {
+    color: #566078;
+}
+
+/* Dark theme: seal every legacy light-surface component against leakage. */
+:root[data-theme="dark"] .zazu-chip-neutral {
+    border-color: var(--zazu-border);
+    background: var(--zazu-surface-2);
+    color: var(--zazu-muted);
+}
+
+:root[data-theme="dark"] .zazu-chip-info {
+    border-color: #5C5796;
+    background: var(--zazu-info-soft);
+    color: var(--zazu-info-ink);
+}
+
+:root[data-theme="dark"] .zazu-chip-accent {
+    border-color: #285C56;
+    background: var(--zazu-accent-soft);
+    color: var(--zazu-accent-ink);
+}
+
+:root[data-theme="dark"] .zazu-dietary-halaal {
+    background: #17362A;
+    color: #9BE0BB;
+}
+
+:root[data-theme="dark"] .zazu-dietary-vegan,
+:root[data-theme="dark"] .zazu-dietary-vegetarian {
+    background: #1C3A2A;
+    color: #9BE0BB;
+}
+
+:root[data-theme="dark"] .zazu-dietary-glutenfree {
+    background: var(--zazu-warning-soft);
+    color: var(--zazu-warning-ink);
+}
+
+:root[data-theme="dark"] .zazu-dash-queue-state {
+    background: var(--zazu-surface-2);
+    border-color: var(--zazu-border);
+    color: var(--zazu-muted);
+}
+
+:root[data-theme="dark"] .zazu-input,
+:root[data-theme="dark"] .zazu-select,
+:root[data-theme="dark"] .zazu-textarea,
+:root[data-theme="dark"] .zazu-form-control,
+:root[data-theme="dark"] input:not([type="checkbox"]):not([type="radio"]),
+:root[data-theme="dark"] select,
+:root[data-theme="dark"] textarea {
+    background: var(--zazu-field);
+    color: var(--zazu-ink);
+    border-color: var(--zazu-border);
+}
+
+:root[data-theme="dark"] .zazu-btn-secondary {
+    background: var(--zazu-surface);
+    color: var(--zazu-ink);
+    border-color: var(--zazu-border-strong);
+}
+
+:root[data-theme="dark"] .zazu-btn-ghost {
+    background: transparent;
+    color: var(--zazu-muted);
+}
+
+:root[data-theme="dark"] .zazu-card-header,
+:root[data-theme="dark"] .zazu-panel-head,
+:root[data-theme="dark"] .zazu-form-section-head {
+    background: var(--zazu-surface-2);
+    color: var(--zazu-ink);
+    border-bottom-color: var(--zazu-border);
+}
+
+:root[data-theme="dark"] .zazu-status-active {
+    color: var(--zazu-success-ink);
+}
+
+:root[data-theme="dark"] .zazu-status-muted {
+    color: var(--zazu-muted);
+}
+
+/* Keep status meaning visible where the component has no background chip. */
+:root:not([data-theme="dark"]) .zazu-status-active {
+    padding: 2px 6px;
+    border: 1px solid #B9DEC8;
+    border-radius: 999px;
+    background: #E8F6EE;
+}
+
+:root:not([data-theme="dark"]) .zazu-status-muted {
+    padding: 2px 6px;
+    border: 1px solid #BCC3D1;
+    border-radius: 999px;
+    background: #F0F1F5;
+}
