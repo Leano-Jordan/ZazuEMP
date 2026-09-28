@@ -2909,3 +2909,127 @@ html[data-theme="dark"] body {
         padding-top: 14px;
     }
 }
+
+
+/* CATALOGUE — CYCLE 1: responsive composition */
+.zazu-catalogue-shell {
+    min-width: 0;
+}
+.zazu-catalogue-command {
+    background:
+        linear-gradient(135deg, color-mix(in srgb, var(--zazu-primary) 8%, var(--zazu-surface)) 0%, var(--zazu-surface) 60%, var(--zazu-surface-2) 100%);
+}
+.zazu-catalogue-toolbar {
+    gap: 12px;
+}
+.zazu-catalogue-filters {
+    min-width: 0;
+}
+.zazu-catalogue-search {
+    min-width: 180px;
+}
+.zazu-catalogue-row {
+    min-width: 0;
+}
+.zazu-catalogue-row > div {
+    min-width: 0;
+}
+.zazu-catalogue-row-title,
+.zazu-catering-card h4 {
+    overflow-wrap: anywhere;
+}
+.zazu-catering-grid {
+    align-items: stretch;
+}
+.zazu-catering-card {
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+}
+.zazu-catering-actions {
+    margin-top: auto;
+    padding-top: 14px;
+}
+.zazu-catalogue-tab:focus-visible,
+.zazu-catalogue-row .zazu-btn:focus-visible,
+.zazu-catalogue-filters .zazu-btn:focus-visible,
+.zazu-catalogue-drawer-panel:focus-visible {
+    outline: 3px solid color-mix(in srgb, var(--zazu-focus) 72%, transparent);
+    outline-offset: 2px;
+}
+@media (max-width: 900px) {
+    .zazu-catalogue-toolbar {
+        align-items: stretch;
+        flex-direction: column;
+    }
+    .zazu-catalogue-tabs {
+        width: 100%;
+    }
+    .zazu-catalogue-filters {
+        display: grid;
+        grid-template-columns: minmax(0,1fr) auto auto;
+    }
+}
+@media (max-width: 680px) {
+    .zazu-catalogue-command {
+        min-height: auto;
+    }
+    .zazu-catalogue-filters {
+        grid-template-columns: 1fr 1fr;
+    }
+    .zazu-catalogue-search {
+        grid-column: 1 / -1;
+    }
+    .zazu-catalogue-filters .zazu-btn {
+        width: 100%;
+    }
+    .zazu-catalogue-register {
+        overflow-x: visible;
+    }
+    .zazu-catalogue-row {
+        display: grid;
+        grid-template-columns: 1fr auto;
+        gap: 10px 12px;
+        padding: 15px 14px;
+    }
+    .zazu-catalogue-row > div:nth-child(1) {
+        grid-column: 1 / -1;
+    }
+    .zazu-catalogue-row > div:nth-child(3),
+    .zazu-catalogue-row > div:nth-child(4) {
+        align-self: end;
+    }
+    .zazu-catalogue-actions {
+        grid-column: 1 / -1;
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 8px;
+    }
+    .zazu-catalogue-actions .zazu-btn {
+        width: 100%;
+    }
+    .zazu-catering-card {
+        padding: 15px;
+    }
+    .zazu-catering-card-head {
+        align-items: flex-start;
+        gap: 10px;
+    }
+}
+@media (max-width: 430px) {
+    .zazu-catalogue-tabs {
+        overflow-x: auto;
+    }
+    .zazu-catalogue-tab {
+        min-width: 190px;
+    }
+    .zazu-catalogue-filters {
+        grid-template-columns: 1fr;
+    }
+    .zazu-catalogue-search {
+        grid-column: auto;
+    }
+    .zazu-catalogue-actions {
+        grid-template-columns: 1fr;
+    }
+}
