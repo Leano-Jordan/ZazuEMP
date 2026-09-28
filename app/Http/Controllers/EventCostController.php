@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Event;
 use App\Models\EventCost;
+use App\Services\EventLifecycleService;
 use App\Support\CurrentBusiness;
 use App\Support\Money;
 use Illuminate\Http\RedirectResponse;
@@ -48,11 +49,10 @@ class EventCostController extends Controller
         ]);
     }
 
-    public function store(Request $request, Event $event): RedirectResponse
+    public function store(Request $request, Event $event, EventLifecycleService $lifecycle): RedirectResponse
     {
         $this->ensureBusiness($event, $request);
         $request->merge(['currency' => strtoupper((string) $request->input('currency'))]);
-        abort_if($event->isClosed(), 422, 'Closed work cannot receive new cost records.');
 
         $validated = $request->validate([
             'category' => ['required', Rule::in(array_keys(config('zazu.cost_categories')))],
@@ -76,13 +76,10 @@ class EventCostController extends Controller
             'A cancelled cost cannot have an actual amount.'
         );
 
-        DB::transaction(function () use ($validated, $event): void {
-            $lockedEvent = Event::query()
-                ->whereKey($event->id)
-                ->lockForUpdate()
-                ->firstOrFail();
-
-            abort_if($lockedEvent->isClosed(), 422, 'Closed work cannot receive new cost records.');
+        DB::transaction(function () use ($validated, $event, $request, $lifecycle): void {
+            $businessId = app(CurrentBusiness::class)->id($request->user());
+            $lockedEvent = $lifecycle->lock($businessId, $event->id);
+            $lifecycle->assertOperational($lockedEvent);
 
             EventCost::query()->create([
                 ...$validated,
