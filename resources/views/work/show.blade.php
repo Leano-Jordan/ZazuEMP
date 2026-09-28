@@ -77,9 +77,9 @@
         <a href="{{ route('work.preparation.index', $event) }}" class="zazu-work-progress-step">
             <span>4</span><strong>Prepare</strong><small>Get ready</small>
         </a>
-        <div class="zazu-work-progress-step">
-            <span>5</span><strong>Complete</strong><small>Finish the job</small>
-        </div>
+        <a href="{{ route('work.edit', $event) }}" class="zazu-work-progress-step {{ $event->status === 'completed' ? 'complete current' : '' }}">
+            <span>5</span><strong>Complete</strong><small>{{ $event->status === 'completed' ? 'Completed' : 'Update status' }}</small>
+        </a>
     </section>
 
     <section class="mb-5">
@@ -153,7 +153,7 @@
                     </div>
                     <a href="{{ route('work.travel.index', $event) }}" class="zazu-btn zazu-btn-secondary">Travel & distance</a>
                 </div>
-                <div class="mt-4 rounded border border-[var(--zazu-border)] bg-[var(--zazu-surface-2)] px-4 py-4 text-sm font-semibold text-[var(--zazu-ink-2)]">
+                <div class="zazu-detail-value-box">
                     {{ $event->event_address ?: 'No location added yet.' }}
                 </div>
             </section>
