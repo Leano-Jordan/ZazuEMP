@@ -77,7 +77,7 @@ test.describe('Zazu UI theme and navigation', () => {
         await expect(page).toHaveURL(/\/work/);
         await expect(page.locator('[data-zazu-inspector-open]').first()).toBeVisible();
         await page.locator('[data-zazu-inspector-open]').first().click();
-        await expect(page.locator('[data-zazu-inspector]').first()).toBeVisible();
+        await expect(page.locator('[data-zazu-inspector-panel]').first()).toBeVisible();
 
         expect(responses).toEqual([]);
     });
