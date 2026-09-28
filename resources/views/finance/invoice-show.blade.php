@@ -79,6 +79,17 @@
             <div class="zazu-document-total-row zazu-document-total-grand"><span>Total</span><strong>{{ $invoice->currency }} {{ $invoice->total }}</strong></div>
         </section>
 
+        @if($invoice->quoteVersion?->deposit_amount > 0)
+            <section class="zazu-panel mt-5 print-hide">
+                <div class="zazu-eyebrow">Deposit reconciliation</div>
+                <div class="zazu-detail-rows mt-2">
+                    <div class="zazu-detail-row"><div class="zazu-detail-label">Required</div><div class="zazu-detail-value">{{ $invoice->currency }} {{ $invoice->quoteVersion->deposit_amount }}</div></div>
+                    <div class="zazu-detail-row"><div class="zazu-detail-label">Received</div><div class="zazu-detail-value">{{ $invoice->currency }} {{ $invoice->deposit_paid_amount }}</div></div>
+                    <div class="zazu-detail-row"><div class="zazu-detail-label">Deposit balance</div><div class="zazu-detail-value">{{ $invoice->currency }} {{ $invoice->deposit_balance }}</div></div>
+                </div>
+            </section>
+        @endif
+
         @if($invoice->quote_id)
             <div class="zazu-document-muted mt-4">Source: accepted quote linked to this job. Invoice values preserve the commercial and tax snapshot used when the invoice was issued.</div>
         @endif
