@@ -25,7 +25,7 @@ use App\Http\Controllers\TravelCostController;
 use App\Http\Controllers\WorkController;
 use Illuminate\Support\Facades\Route;
 
-Route::get('/', fn () => redirect()->route('dashboard'));
+Route::view('/', 'landing')->name('landing');
 
 Route::middleware('signed')->group(function () {
     Route::get('/quotes/{quote}/view', [QuoteController::class, 'publicShow'])->name('quotes.public');
