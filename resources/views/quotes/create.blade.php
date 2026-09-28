@@ -26,6 +26,15 @@
 
                     <div class="zazu-form-grid">
                         <label class="zazu-field">
+    <span class="zazu-label">Deposit required</span>
+    <div class="flex items-center gap-2">
+        <input type="number" name="deposit_percent" min="0" max="100" step="0.01" required class="zazu-input" value="{{ old('deposit_percent', $version->deposit_percent ?? 0) }}">
+        <span class="text-sm text-[var(--zazu-ink-2)]">%</span>
+    </div>
+    <span class="zazu-field-help">Optional upfront deposit percentage. Zazu calculates the exact deposit from the final quote total.</span>
+    @error('deposit_percent')<span class="zazu-field-error">{{ $message }}</span>@enderror
+</label>
+<label class="zazu-field">
                             <span class="zazu-label">Currency</span>
                             <select name="currency" id="quote-currency" class="zazu-select" required>
                                 @foreach ($currencies as $code => $label)
