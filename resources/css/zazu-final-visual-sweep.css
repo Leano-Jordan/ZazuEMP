@@ -3195,3 +3195,43 @@ html[data-theme="dark"] body {
         grid-template-columns: 1fr;
     }
 }
+
+
+/* QUOTES — CYCLE 2: visual balance + commercial emphasis */
+.zazu-quote-register-row,
+.zazu-quote-lines .zazu-list-item {
+    background: var(--zazu-surface);
+}
+.zazu-quote-register-row:nth-of-type(even),
+.zazu-quote-lines .zazu-list-item:nth-of-type(even) {
+    background: color-mix(in srgb, var(--zazu-surface-2) 38%, var(--zazu-surface));
+}
+.zazu-quote-register-row:hover,
+.zazu-quote-lines .zazu-list-item:hover {
+    background: color-mix(in srgb, var(--zazu-primary-soft) 72%, var(--zazu-surface));
+}
+.zazu-quote-lines .zazu-card-header,
+.zazu-quote-register-command {
+    background: linear-gradient(135deg, color-mix(in srgb, var(--zazu-primary) 7%, var(--zazu-surface)), var(--zazu-surface-2));
+}
+.zazu-quote-total-panel {
+    background:
+        linear-gradient(180deg, color-mix(in srgb, var(--zazu-primary-soft) 42%, var(--zazu-surface)), var(--zazu-surface));
+}
+.zazu-total-row {
+    border-top-color: var(--zazu-border-strong);
+}
+.zazu-quote-review-action {
+    background: var(--zazu-warning-soft);
+}
+.zazu-quote-review-action .zazu-eyebrow,
+.zazu-quote-review-action .zazu-next-action-title {
+    color: var(--zazu-warning-ink);
+}
+.zazu-stage.current {
+    background: var(--zazu-primary-soft);
+    border-color: color-mix(in srgb, var(--zazu-primary) 34%, var(--zazu-border));
+}
+.zazu-stage.current .zazu-stage-title {
+    color: var(--zazu-primary-deep);
+}
