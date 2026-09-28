@@ -4,6 +4,18 @@
 @source '../../storage/framework/views/*.php';
 
 @theme {
+    --color-zazu-blue-primary: #416AD7;
+    --color-zazu-blue-accent: #5592FC;
+    --color-zazu-blue-hover: #3255B8;
+    --color-zazu-blue-light: #6FA4FF;
+    --color-zazu-blue-soft: #9EC8FF;
+    --color-zazu-blue-subtle: #C2DCFF;
+    --color-zazu-blue-canvas: #F2F7FF;
+    --color-zazu-surface-card: #FFFFFF;
+    --color-zazu-surface-border: #E2E8F0;
+    --color-zazu-text-main: #0F172A;
+    --color-zazu-text-muted: #64748B;
+
     --font-sans: 'Segoe UI Variable Text', 'Segoe UI', 'Noto Sans', 'Helvetica Neue', Arial, ui-sans-serif, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji',
         'Segoe UI Symbol', 'Noto Color Emoji';
 }
