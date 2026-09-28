@@ -87,6 +87,7 @@ class QuoteController extends Controller
             'currency' => ['required', Rule::in(array_keys(config('zazu.currencies')))],
             'tax_rate_id' => ['nullable', 'integer'],
             'notes' => ['nullable', 'string'],
+            'deposit_percent' => ['required', 'numeric', 'decimal:0,2', 'min:0', 'max:100'],
             'unit_price' => ['required', 'array', 'min:1'],
             'unit_price.*' => ['required', 'numeric', 'decimal:0,2', 'min:0'],
         ]);
@@ -112,7 +113,8 @@ class QuoteController extends Controller
             $validated['unit_price'],
             strtoupper($validated['currency']),
             $taxRate,
-            $validated['notes'] ?? null
+            $validated['notes'] ?? null,
+            (string) $validated['deposit_percent']
         );
 
         return redirect()
@@ -327,6 +329,7 @@ class QuoteController extends Controller
         $validated = $request->validate([
             'tax_rate_id' => ['nullable', 'string'],
             'notes' => ['nullable', 'string'],
+            'deposit_percent' => ['required', 'numeric', 'decimal:0,2', 'min:0', 'max:100'],
             'unit_price' => ['required', 'array', 'min:1'],
             'unit_price.*' => ['required', 'numeric', 'decimal:0,2', 'min:0'],
         ]);
@@ -357,7 +360,8 @@ class QuoteController extends Controller
             $validated['unit_price'],
             $taxRate,
             $replaceTax,
-            $validated['notes'] ?? null
+            $validated['notes'] ?? null,
+            (string) $validated['deposit_percent']
         );
 
         return redirect()
