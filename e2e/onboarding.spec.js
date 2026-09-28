@@ -94,5 +94,5 @@ test('public entry and login surfaces render without Zazu error pages', async ({
     const loginResponse = await page.goto('/login');
     expect(loginResponse?.status(), 'login page').toBe(200);
     await expect(page.locator('.zazu-error-shell')).toHaveCount(0);
-    await expect(page.getByRole('heading', { name: /Sign in/i })).toBeVisible();
+    await expect(page.getByLabel('Username or email')).toBeVisible();
 });
