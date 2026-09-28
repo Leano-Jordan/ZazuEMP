@@ -49,6 +49,15 @@
                 <strong>{{ $quote->currency }} {{ number_format((float) $version->total, 2) }}</strong>
             </section>
 
+            <section class="zazu-public-accepted">
+                <div class="zazu-public-section-title">Deposit</div>
+                <p class="zazu-public-copy">
+                    This quote requires a {{ number_format((float) ($version->deposit_percent ?? 0), 2) }}% deposit:
+                    <strong>{{ $quote->currency }} {{ $version->deposit_amount }}</strong>.
+                    The business can confirm the deposit payment against the resulting invoice.
+                </p>
+            </section>
+
             @if ($quote->status === 'sent' && $acceptUrl)
                 <section class="zazu-public-accept">
                     <div>
