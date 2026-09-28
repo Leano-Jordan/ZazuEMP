@@ -44,153 +44,29 @@
                 <div class="zazu-sidebar-workspace">
                     <div class="zazu-sidebar-workspace-label">Active workspace</div>
                     <div class="zazu-sidebar-workspace-name">{{ $business?->name ?? 'Zazu EMP' }}</div>
-                    <div class="zazu-sidebar-workspace-meta">
-                        <span class="zazu-sidebar-workspace-dot" aria-hidden="true"></span>
-                        <span>Event operations</span>
-                    </div>
+                    <div class="zazu-sidebar-workspace-meta"><span class="zazu-sidebar-workspace-dot" aria-hidden="true"></span><span>Event operations</span></div>
                 </div>
-
-                <div class="zazu-nav-group">
-                    <div class="zazu-nav-label">Overview</div>
-                    <div class="zazu-nav-stack">
-                        <a href="{{ route('dashboard') }}" class="zazu-nav-link {{ request()->routeIs('dashboard') ? 'active' : '' }}" @if (request()->routeIs('dashboard')) aria-current="page" @endif>
-                            <svg class="zazu-nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true"><rect x="4" y="4" width="7" height="7" rx="1"></rect><rect x="13" y="4" width="7" height="4" rx="1"></rect><rect x="13" y="10" width="7" height="10" rx="1"></rect><rect x="4" y="13" width="7" height="7" rx="1"></rect></svg>
-                            <span>Dashboard</span>
-                        </a>
-                    </div>
+                <div class="zazu-nav-stack zazu-nav-primary">
+                    <a href="{{ route('dashboard') }}" class="zazu-nav-link {{ request()->routeIs('dashboard') ? 'active' : '' }}" @if(request()->routeIs('dashboard')) aria-current="page" @endif><span>Dashboard</span></a>
+                    @if($can('work.view') || $can('capabilities.view') || $can('quotes.view') || $can('calendar.view'))
+                        <a href="{{ $can('work.view') ? route('work.index') : ($can('capabilities.view') ? route('capabilities.index') : ($can('quotes.view') ? route('quotes.index') : route('calendar.index'))) }}" class="zazu-nav-link {{ request()->routeIs('work.*','capabilities.*','quotes.*','calendar.*') ? 'active' : '' }}">Operations</a>
+                    @endif
+                    @if($can('customers.view'))
+                        <a href="{{ route('customers.index') }}" class="zazu-nav-link {{ request()->routeIs('customers.*') ? 'active' : '' }}">Customers</a>
+                    @endif
+                    @if($can('finance.view'))
+                        <a href="{{ route('finance.index') }}" class="zazu-nav-link {{ request()->routeIs('finance.*') ? 'active' : '' }}">Finance</a>
+                    @endif
+                    @if($can('purchasing.view') || $can('suppliers.view') || $can('inventory.view') || $can('assets.view'))
+                        <a href="{{ $can('purchasing.view') ? route('purchasing.index') : ($can('suppliers.view') ? route('suppliers.index') : ($can('inventory.view') ? route('inventory.index') : route('assets.index'))) }}" class="zazu-nav-link {{ request()->routeIs('purchasing.*','suppliers.*','inventory.*','assets.*') ? 'active' : '' }}">Resources</a>
+                    @endif
+                    @if($can('reports.view'))
+                        <a href="{{ route('reports.index') }}" class="zazu-nav-link {{ request()->routeIs('reports.*') ? 'active' : '' }}">Reports</a>
+                    @endif
+                    @if($isOwner)
+                        <a href="{{ route('settings.index') }}" class="zazu-nav-link {{ request()->routeIs('settings.*') ? 'active' : '' }}">Settings</a>
+                    @endif
                 </div>
-
-                @if($can('capabilities.view') || $can('work.view') || $can('quotes.view') || $can('calendar.view'))
-                    <div class="zazu-nav-group">
-                        <div class="zazu-nav-label">Plan & deliver</div>
-                    <div class="zazu-nav-stack">
-                        @if($can('capabilities.view'))
-
-                            <a href="{{ route('capabilities.index') }}" class="zazu-nav-link zazu-nav-priority {{ request()->routeIs('capabilities.*') ? 'active' : '' }}" @if (request()->routeIs('capabilities.*')) aria-current="page" @endif>
-                            <svg class="zazu-nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true"><path d="M6 5.5A2.5 2.5 0 0 1 8.5 3H20v15.5A2.5 2.5 0 0 1 17.5 21H8.5A2.5 2.5 0 0 1 6 18.5z"></path><path d="M6 6h10.5A2.5 2.5 0 0 1 19 8.5V21"></path><path d="M10 8.5h5M10 12h5"></path></svg>
-                            <span>Services & prices</span>
-                        </a>
-
-                        @endif
-                        @if($can('work.view'))
-
-                            <a href="{{ route('work.index') }}" class="zazu-nav-link {{ request()->routeIs('work.*') ? 'active' : '' }}" @if (request()->routeIs('work.*')) aria-current="page" @endif>
-                            <svg class="zazu-nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true"><rect x="4" y="4" width="6" height="6" rx="1"></rect><rect x="14" y="4" width="6" height="6" rx="1"></rect><rect x="4" y="14" width="6" height="6" rx="1"></rect><rect x="14" y="14" width="6" height="6" rx="1"></rect></svg>
-                            <span>Jobs</span>
-                        </a>
-
-                        @endif
-                        @if($can('quotes.view'))
-
-                            <a href="{{ route('quotes.index') }}" class="zazu-nav-link {{ request()->routeIs('quotes.*') ? 'active' : '' }}" @if (request()->routeIs('quotes.*')) aria-current="page" @endif>
-                            <svg class="zazu-nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true"><path d="M6 4h12v16H6z"></path><path d="M9 8h6M9 12h6M9 16h4"></path></svg>
-                            <span>Quotes</span>
-                        </a>
-
-                        @endif
-                        @if($can('calendar.view'))
-
-                            <a href="{{ route('calendar.index') }}" class="zazu-nav-link {{ request()->routeIs('calendar.*') ? 'active' : '' }}" @if (request()->routeIs('calendar.*')) aria-current="page" @endif>
-                            <svg class="zazu-nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true"><rect x="4" y="5" width="16" height="15" rx="2"></rect><path d="M8 3v4M16 3v4M4 10h16"></path></svg>
-                            <span>Calendar</span>
-                        </a>
-
-                        @endif
-                    </div>
-                    </div>
-                @endif
-
-                @if($can('customers.view') || $can('finance.view'))
-                    <div class="zazu-nav-group">
-                        <div class="zazu-nav-label">Customers & money</div>
-                    <div class="zazu-nav-stack">
-                        @if($can('customers.view'))
-
-                            <a href="{{ route('customers.index') }}" class="zazu-nav-link {{ request()->routeIs('customers.*') ? 'active' : '' }}" @if (request()->routeIs('customers.*')) aria-current="page" @endif>
-                            <svg class="zazu-nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true"><circle cx="9" cy="8" r="3"></circle><path d="M4 19c.7-3 2.3-4.5 5-4.5s4.3 1.5 5 4.5"></path><path d="M16 11.5c2.2.2 3.5 1.6 4 4"></path><path d="M15.5 5.4a3 3 0 0 1 0 5.1"></path></svg>
-                            <span>Customers</span>
-                        </a>
-
-                        @endif
-                        @if($can('finance.view'))
-
-                            <a href="{{ route('finance.index') }}" class="zazu-nav-link {{ request()->routeIs('finance.*') ? 'active' : '' }}" @if (request()->routeIs('finance.*')) aria-current="page" @endif>
-                            <svg class="zazu-nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true"><path d="M6 4h12v16H6z"></path><path d="M9 8h6M9 12h6M9 16h4"></path></svg>
-                            <span>Finance</span>
-                        </a>
-
-                        @endif
-                    </div>
-                    </div>
-                @endif
-
-                @if($can('purchasing.view') || $can('suppliers.view') || $can('inventory.view') || $can('assets.view'))
-                    <div class="zazu-nav-group">
-                        <div class="zazu-nav-label">Resources</div>
-                    <div class="zazu-nav-stack">
-                        @if($can('purchasing.view'))
-
-                            <a href="{{ route('purchasing.index') }}" class="zazu-nav-link {{ request()->routeIs('purchasing.*') ? 'active' : '' }}" @if (request()->routeIs('purchasing.*')) aria-current="page" @endif>
-                            <svg class="zazu-nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true"><path d="M5 9h14v10H5z"></path><path d="M8 9V6h8v3M9 13h6"></path></svg>
-                            <span>Purchasing</span>
-                        </a>
-
-                        @endif
-                        @if($can('suppliers.view'))
-
-                            <a href="{{ route('suppliers.index') }}" class="zazu-nav-link {{ request()->routeIs('suppliers.*') ? 'active' : '' }}" @if (request()->routeIs('suppliers.*')) aria-current="page" @endif>
-                            <svg class="zazu-nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true"><path d="M5 9h14v10H5z"></path><path d="M8 9V6h8v3M9 13h6"></path></svg>
-                            <span>Suppliers</span>
-                        </a>
-
-                        @endif
-                        @if($can('inventory.view'))
-
-                            <a href="{{ route('inventory.index') }}" class="zazu-nav-link {{ request()->routeIs('inventory.*') ? 'active' : '' }}" @if (request()->routeIs('inventory.*')) aria-current="page" @endif>
-                            <svg class="zazu-nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true"><path d="M4 7h16M6 4h12v16H6z"></path><path d="M9 11h6M9 15h6"></path></svg>
-                            <span>Inventory</span>
-                        </a>
-
-                        @endif
-                        @if($can('assets.view'))
-
-                            <a href="{{ route('assets.index') }}" class="zazu-nav-link {{ request()->routeIs('assets.*') ? 'active' : '' }}" @if (request()->routeIs('assets.*')) aria-current="page" @endif>
-                            <svg class="zazu-nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true"><circle cx="12" cy="12" r="7"></circle><path d="M12 8v8M8 12h8"></path></svg>
-                            <span>Assets</span>
-                        </a>
-
-                        @endif
-                    </div>
-                    </div>
-                @endif
-
-                @if($can('reports.view'))
-                    <div class="zazu-nav-group">
-                        <div class="zazu-nav-label">Insights</div>
-                    <div class="zazu-nav-stack">
-                        @if($can('reports.view'))
-
-                            <a href="{{ route('reports.index') }}" class="zazu-nav-link {{ request()->routeIs('reports.*') ? 'active' : '' }}" @if (request()->routeIs('reports.*')) aria-current="page" @endif>
-                            <svg class="zazu-nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true"><path d="M5 19V9M12 19V5M19 19V12"></path></svg>
-                            <span>Reports</span>
-                        </a>
-
-                        @endif
-                    </div>
-                    </div>
-                @endif
-
-                @if($isOwner)
-                    <div class="zazu-nav-group">
-                        <div class="zazu-nav-label">System</div>
-                        <div class="zazu-nav-stack">
-                            <a href="{{ route('settings.index') }}" class="zazu-nav-link {{ request()->routeIs('settings.*') ? 'active' : '' }}" @if (request()->routeIs('settings.*')) aria-current="page" @endif>
-                                <svg class="zazu-nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true"><circle cx="12" cy="12" r="3"></circle><path d="M19 12a7 7 0 0 0-.3-2l-2-3.4-2.3 1a7 7 0 0 0-3.4-2L12.7 2h-1.4L11 4.3a7 7 0 0 0-3.4 2l-2.3-1-2 3.4 2.3 1a7 7 0 0 0 0 4l2.3 1a7 7 0 0 0 3.4-2l.3 2.3h1.4l.3-2.3a7 7 0 0 0 3.4-2l2.3 1a7 7 0 0 0 .3-2z"></path></svg>
-                                <span>Settings</span>
-                            </a>
-                        </div>
-                    </div>
-                @endif
             </nav>
 
             <div class="zazu-sidebar-footer">
@@ -207,10 +83,33 @@
                     <div class="zazu-header-context">
                         <div class="zazu-header-title-row">
                             <h1 class="zazu-page-title">{{ $heading ?? $title ?? 'Workspace' }}</h1>
-                            @if($business)
-                                <span class="zazu-workspace-name" title="Active business workspace">{{ $business->name }}</span>
-                            @endif
+                            @if($business)<span class="zazu-workspace-name" title="Active business workspace">{{ $business->name }}</span>@endif
                         </div>
+                        <nav class="zazu-section-tabs" aria-label="Section navigation">
+                            @if(request()->routeIs('work.*','capabilities.*','quotes.*','calendar.*'))
+                                <span class="zazu-section-name">Operations</span>
+                                @if($can('work.view'))<a href="{{ route('work.index') }}" class="{{ request()->routeIs('work.*') ? 'active' : '' }}">Jobs</a>@endif
+                                @if($can('capabilities.view'))<a href="{{ route('capabilities.index') }}" class="{{ request()->routeIs('capabilities.*') ? 'active' : '' }}">Services & prices</a>@endif
+                                @if($can('quotes.view'))<a href="{{ route('quotes.index') }}" class="{{ request()->routeIs('quotes.*') ? 'active' : '' }}">Quotes</a>@endif
+                                @if($can('calendar.view'))<a href="{{ route('calendar.index') }}" class="{{ request()->routeIs('calendar.*') ? 'active' : '' }}">Calendar</a>@endif
+                            @elseif(request()->routeIs('customers.*'))
+                                <span class="zazu-section-name">Customers</span><a href="{{ route('customers.index') }}" class="active">Customers</a>
+                            @elseif(request()->routeIs('finance.*'))
+                                <span class="zazu-section-name">Finance</span><a href="{{ route('finance.index') }}" class="active">Overview</a>
+                                <a href="{{ route('finance.invoices.create') }}">New invoice</a><a href="{{ route('finance.payments.create') }}">Payment</a><a href="{{ route('finance.expenses.create') }}">Expense</a>
+                            @elseif(request()->routeIs('purchasing.*','suppliers.*','inventory.*','assets.*'))
+                                <span class="zazu-section-name">Resources</span>
+                                @if($can('purchasing.view'))<a href="{{ route('purchasing.index') }}" class="{{ request()->routeIs('purchasing.*') ? 'active' : '' }}">Purchasing</a>@endif
+                                @if($can('suppliers.view'))<a href="{{ route('suppliers.index') }}" class="{{ request()->routeIs('suppliers.*') ? 'active' : '' }}">Suppliers</a>@endif
+                                @if($can('inventory.view'))<a href="{{ route('inventory.index') }}" class="{{ request()->routeIs('inventory.*') ? 'active' : '' }}">Inventory</a>@endif
+                                @if($can('assets.view'))<a href="{{ route('assets.index') }}" class="{{ request()->routeIs('assets.*') ? 'active' : '' }}">Assets</a>@endif
+                            @elseif(request()->routeIs('reports.*'))
+                                <span class="zazu-section-name">Insights</span><a href="{{ route('reports.index') }}" class="active">Reports</a>
+                            @elseif(request()->routeIs('settings.*'))
+                                <span class="zazu-section-name">System</span><a href="{{ route('settings.index') }}" class="{{ request()->routeIs('settings.index') ? 'active' : '' }}">Business</a>
+                                @if($isOwner)<a href="{{ route('settings.compliance') }}" class="{{ request()->routeIs('settings.compliance*') ? 'active' : '' }}">Compliance</a><a href="{{ route('settings.audit') }}" class="{{ request()->routeIs('settings.audit') ? 'active' : '' }}">Audit</a>@endif
+                            @endif
+                        </nav>
                     </div>
 
                     <div class="zazu-topbar-actions">
@@ -296,77 +195,39 @@
                 </div>
             </header>
 
-            <nav class="zazu-mobile-nav" aria-label="Mobile primary" data-mobile-nav>
+            <nav class="zazu-mobile-nav" aria-label="Mobile section navigation" data-mobile-nav>
                 <button type="button" class="zazu-mobile-toggle" data-mobile-nav-toggle aria-expanded="false" aria-controls="zazu-mobile-links">
-                    <span>Navigation</span>
+                    <span>Open section navigation</span>
                     <svg class="zazu-mobile-toggle-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" aria-hidden="true"><path d="m6 9 6 6 6-6"></path></svg>
                 </button>
                 <div class="zazu-mobile-links" id="zazu-mobile-links">
-                    <div class="zazu-mobile-group">Work</div>
-                    <a href="{{ route('dashboard') }}" class="zazu-mobile-link {{ request()->routeIs('dashboard') ? 'active' : '' }}" @if (request()->routeIs('dashboard')) aria-current="page" @endif>Dashboard</a>
-                    @if($can('capabilities.view'))
-
-                        <a href="{{ route('capabilities.index') }}" class="zazu-mobile-link {{ request()->routeIs('capabilities.*') ? 'active' : '' }}" @if (request()->routeIs('capabilities.*')) aria-current="page" @endif>Services & prices</a>
-
-                    @endif
-                    @if($can('work.view'))
-
-                        <a href="{{ route('work.index') }}" class="zazu-mobile-link {{ request()->routeIs('work.*') ? 'active' : '' }}" @if (request()->routeIs('work.*')) aria-current="page" @endif>Jobs</a>
-
-                    @endif
-                    @if($can('calendar.view'))
-
-                        <a href="{{ route('calendar.index') }}" class="zazu-mobile-link {{ request()->routeIs('calendar.*') ? 'active' : '' }}" @if (request()->routeIs('calendar.*')) aria-current="page" @endif>Calendar</a>
-
-                    @endif
-                    @if($can('customers.view'))
-
-                        <a href="{{ route('customers.index') }}" class="zazu-mobile-link {{ request()->routeIs('customers.*') ? 'active' : '' }}" @if (request()->routeIs('customers.*')) aria-current="page" @endif>Customers</a>
-
-                    @endif
-                    @if($can('quotes.view'))
-
-                        <a href="{{ route('quotes.index') }}" class="zazu-mobile-link {{ request()->routeIs('quotes.*') ? 'active' : '' }}" @if (request()->routeIs('quotes.*')) aria-current="page" @endif>Quotes</a>
-
-                    @endif
-
-                    <div class="zazu-mobile-group">Resources</div>
-                    @if($can('purchasing.view'))
-
-                        <a href="{{ route('purchasing.index') }}" class="zazu-mobile-link {{ request()->routeIs('purchasing.*') ? 'active' : '' }}" @if (request()->routeIs('purchasing.*')) aria-current="page" @endif>Purchasing</a>
-
-                    @endif
-                    @if($can('suppliers.view'))
-
-                        <a href="{{ route('suppliers.index') }}" class="zazu-mobile-link {{ request()->routeIs('suppliers.*') ? 'active' : '' }}" @if (request()->routeIs('suppliers.*')) aria-current="page" @endif>Suppliers</a>
-
-                    @endif
-                    @if($can('inventory.view'))
-
-                        <a href="{{ route('inventory.index') }}" class="zazu-mobile-link {{ request()->routeIs('inventory.*') ? 'active' : '' }}" @if (request()->routeIs('inventory.*')) aria-current="page" @endif>Inventory</a>
-
-                    @endif
-                    @if($can('assets.view'))
-
-                        <a href="{{ route('assets.index') }}" class="zazu-mobile-link {{ request()->routeIs('assets.*') ? 'active' : '' }}" @if (request()->routeIs('assets.*')) aria-current="page" @endif>Assets</a>
-
-                    @endif
-
-                    <div class="zazu-mobile-group">Money & insight</div>
-                    @if($can('finance.view'))
-
-                        <a href="{{ route('finance.index') }}" class="zazu-mobile-link {{ request()->routeIs('finance.*') ? 'active' : '' }}" @if (request()->routeIs('finance.*')) aria-current="page" @endif>Finance</a>
-
-                    @endif
-                    @if($can('reports.view'))
-
-                        <a href="{{ route('reports.index') }}" class="zazu-mobile-link {{ request()->routeIs('reports.*') ? 'active' : '' }}" @if (request()->routeIs('reports.*')) aria-current="page" @endif>Reports</a>
-
-                    @endif
-
-                    @if($isOwner)
-                        <div class="zazu-mobile-group">System</div>
-                        <a href="{{ route('settings.index') }}" class="zazu-mobile-link {{ request()->routeIs('settings.*') ? 'active' : '' }}" @if (request()->routeIs('settings.*')) aria-current="page" @endif>Settings</a>
+                    @if(request()->routeIs('work.*','capabilities.*','quotes.*','calendar.*'))
+                        <div class="zazu-mobile-group">Operations</div>
+                        @if($can('work.view'))<a href="{{ route('work.index') }}" class="zazu-mobile-link {{ request()->routeIs('work.*') ? 'active' : '' }}">Jobs</a>@endif
+                        @if($can('capabilities.view'))<a href="{{ route('capabilities.index') }}" class="zazu-mobile-link {{ request()->routeIs('capabilities.*') ? 'active' : '' }}">Services & prices</a>@endif
+                        @if($can('quotes.view'))<a href="{{ route('quotes.index') }}" class="zazu-mobile-link {{ request()->routeIs('quotes.*') ? 'active' : '' }}">Quotes</a>@endif
+                        @if($can('calendar.view'))<a href="{{ route('calendar.index') }}" class="zazu-mobile-link {{ request()->routeIs('calendar.*') ? 'active' : '' }}">Calendar</a>@endif
+                    @elseif(request()->routeIs('customers.*'))
+                        <div class="zazu-mobile-group">Customers</div><a href="{{ route('customers.index') }}" class="zazu-mobile-link active">Customers</a>
+                    @elseif(request()->routeIs('finance.*'))
+                        <div class="zazu-mobile-group">Finance</div><a href="{{ route('finance.index') }}" class="zazu-mobile-link active">Finance</a>
+                    @elseif(request()->routeIs('purchasing.*','suppliers.*','inventory.*','assets.*'))
+                        <div class="zazu-mobile-group">Resources</div>
+                        @if($can('purchasing.view'))<a href="{{ route('purchasing.index') }}" class="zazu-mobile-link {{ request()->routeIs('purchasing.*') ? 'active' : '' }}">Purchasing</a>@endif
+                        @if($can('suppliers.view'))<a href="{{ route('suppliers.index') }}" class="zazu-mobile-link {{ request()->routeIs('suppliers.*') ? 'active' : '' }}">Suppliers</a>@endif
+                        @if($can('inventory.view'))<a href="{{ route('inventory.index') }}" class="zazu-mobile-link {{ request()->routeIs('inventory.*') ? 'active' : '' }}">Inventory</a>@endif
+                        @if($can('assets.view'))<a href="{{ route('assets.index') }}" class="zazu-mobile-link {{ request()->routeIs('assets.*') ? 'active' : '' }}">Assets</a>@endif
+                    @elseif(request()->routeIs('reports.*'))
+                        <div class="zazu-mobile-group">Insights</div><a href="{{ route('reports.index') }}" class="zazu-mobile-link active">Reports</a>
+                    @elseif(request()->routeIs('settings.*'))
+                        <div class="zazu-mobile-group">System</div><a href="{{ route('settings.index') }}" class="zazu-mobile-link {{ request()->routeIs('settings.index') ? 'active' : '' }}">Business settings</a>
+                        @if($isOwner)<a href="{{ route('settings.compliance') }}" class="zazu-mobile-link {{ request()->routeIs('settings.compliance*') ? 'active' : '' }}">Compliance</a><a href="{{ route('settings.audit') }}" class="zazu-mobile-link {{ request()->routeIs('settings.audit') ? 'active' : '' }}">Audit</a>@endif
+                    @else
+                        <div class="zazu-mobile-group">Workspace</div>
+                        <a href="{{ route('dashboard') }}" class="zazu-mobile-link {{ request()->routeIs('dashboard') ? 'active' : '' }}">Dashboard</a>
+                        @if($can('customers.view'))<a href="{{ route('customers.index') }}" class="zazu-mobile-link">Customers</a>@endif
+                        @if($can('finance.view'))<a href="{{ route('finance.index') }}" class="zazu-mobile-link">Finance</a>@endif
+                        @if($can('reports.view'))<a href="{{ route('reports.index') }}" class="zazu-mobile-link">Reports</a>@endif
                     @endif
                 </div>
             </nav>
