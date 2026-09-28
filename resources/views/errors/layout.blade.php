@@ -3,6 +3,7 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="color-scheme" content="light dark">
     <title>{{ $title ?? 'Zazu · Something went wrong' }}</title>
     <style>
         :root {
@@ -49,6 +50,14 @@
         .zazu-btn-primary { background: var(--primary); border-color: var(--primary); color: var(--primary-ink); box-shadow: 0 5px 14px rgba(27,99,201,.22); }
         .zazu-btn-secondary { background: var(--surface); color: var(--ink); border-color: var(--border-strong); }
         .zazu-error-reference { margin-top: 24px; padding-top: 16px; border-top: 1px solid var(--border); color: var(--muted); font: 600 11px/1.5 ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace; overflow-wrap: anywhere; }
+
+        @media (prefers-color-scheme: dark) {
+            .zazu-error-body {
+                background:
+                    radial-gradient(circle at 85% 0%, rgba(78,145,234,.18), transparent 28rem),
+                    linear-gradient(180deg, #091827, #07121E);
+            }
+        }
     </style>
 </head>
 <body class="zazu-error-body">
