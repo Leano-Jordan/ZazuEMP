@@ -18,7 +18,7 @@
         a{text-decoration:none;color:inherit}button{font:inherit}.mono{font-family:"DM Mono",ui-monospace,monospace}.site{width:min(1380px,calc(100% - 40px));margin:auto}
         .top{height:76px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid rgba(226,232,240,.82);backdrop-filter:blur(16px)}
         .brand{display:flex;align-items:center;gap:11px}.mark{width:36px;height:36px;display:grid;place-items:center;border-radius:9px;background:var(--blue);color:#fff;font-weight:800;box-shadow:0 8px 20px rgba(30,64,175,.2)}.brand strong{display:block;letter-spacing:-.04em}.brand span:last-child{display:block;color:var(--muted);font:500 9px "DM Mono";letter-spacing:.08em;text-transform:uppercase;margin-top:2px}
-        .topnav{display:flex;align-items:center;gap:6px}.topnav a{padding:9px 11px;border-radius:7px;color:var(--muted);font-size:11px;font-weight:700}.topnav a:hover{background:#fff;color:var(--ink)}.topnav .launch{padding:11px 15px;background:var(--blue);color:#fff;box-shadow:0 7px 16px rgba(30,64,175,.16)}
+        .topnav{display:flex;align-items:center;gap:6px}.topnav a,.topnav button{padding:9px 11px;border-radius:7px;color:var(--muted);font-size:11px;font-weight:700}.topnav button{border:0;background:transparent;cursor:pointer}.topnav a:hover,.topnav button:hover{background:#fff;color:var(--ink)}.topnav .launch{padding:11px 15px;background:var(--blue);color:#fff;box-shadow:0 7px 16px rgba(30,64,175,.16)}
         .hero{display:grid;grid-template-columns:minmax(0,1.08fr) minmax(460px,.92fr);gap:clamp(40px,7vw,100px);align-items:center;min-height:calc(100vh - 76px);padding:72px 0 88px}
         .eyebrow{display:flex;align-items:center;gap:8px;color:var(--blue);font:500 10px "DM Mono";letter-spacing:.13em;text-transform:uppercase}.eyebrow:before{content:"";width:24px;height:1px;background:currentColor}
         h1{max-width:780px;margin:18px 0;font-size:clamp(48px,6.4vw,88px);line-height:.93;letter-spacing:-.065em}h1 em{font-style:normal;color:var(--blue)}.hero-copy{max-width:650px;color:var(--body);font-size:17px;line-height:1.7}.actions{display:flex;flex-wrap:wrap;gap:9px;margin-top:28px}.btn{display:inline-flex;align-items:center;justify-content:center;gap:9px;min-height:44px;padding:0 16px;border:1px solid var(--line);border-radius:7px;background:#fff;color:var(--ink);font-size:11px;font-weight:800}.btn.primary{border-color:var(--blue);background:var(--blue);color:#fff;box-shadow:0 9px 20px rgba(30,64,175,.17)}.btn:hover{transform:translateY(-1px)}.hero-note{margin-top:18px;color:var(--muted);font:500 9px "DM Mono";letter-spacing:.05em}
@@ -201,14 +201,14 @@
 
 </main>
 
-<dialog class="auth-modal" data-auth-modal aria-labelledby="auth-modal-title" aria-describedby="auth-modal-copy">
+<dialog class="auth-modal" data-auth-modal aria-modal="true" aria-labelledby="auth-login-title" aria-describedby="auth-login-copy">
     <div class="auth-modal-panel">
         <button type="button" class="auth-modal-close" data-auth-modal-close aria-label="Close authentication window">×</button>
 
         <section data-auth-panel="login">
             <div class="auth-modal-kicker">Workspace access</div>
-            <h2 id="auth-modal-title">Welcome back.</h2>
-            <p class="auth-modal-copy" id="auth-modal-copy">Use your username or email address to continue to Zazu.</p>
+            <h2 id="auth-login-title">Welcome back.</h2>
+            <p class="auth-modal-copy" id="auth-login-copy">Use your username or email address to continue to Zazu.</p>
             <form method="POST" action="{{ route('login.store') }}" class="auth-modal-form" data-auth-form="login">
                 @csrf
                 <div class="auth-modal-field">
@@ -232,8 +232,8 @@
 
         <section data-auth-panel="register" hidden>
             <div class="auth-modal-kicker">Create workspace</div>
-            <h2>Set up your Zazu workspace.</h2>
-            <p class="auth-modal-copy">Create your owner account and choose the username you will use to sign in.</p>
+            <h2 id="auth-register-title">Set up your Zazu workspace.</h2>
+            <p class="auth-modal-copy" id="auth-register-copy">Create your owner account and choose the username you will use to sign in.</p>
             <form method="POST" action="{{ route('register.store') }}" class="auth-modal-form" data-auth-form="register">
                 @csrf
                 <div class="auth-modal-grid">
@@ -297,6 +297,8 @@
 
     const showPanel = (name) => {
         panels.forEach((panel) => { panel.hidden = panel.dataset.authPanel !== name; });
+        modal.setAttribute('aria-labelledby', name === 'register' ? 'auth-register-title' : 'auth-login-title');
+        modal.setAttribute('aria-describedby', name === 'register' ? 'auth-register-copy' : 'auth-login-copy');
         const first = modal.querySelector('[data-auth-panel="' + name + '"] input');
         window.setTimeout(() => first?.focus(), 0);
     };
