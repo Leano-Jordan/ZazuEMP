@@ -72,6 +72,20 @@ Every meaningful cycle has:
 - verification evidence;
 - regression disposition.
 
+## Continuous execution
+
+A broad owner directive such as **harden Zazu**, **audit and fix**, **improve architecture**, or **make commercially ready** is a **mission**, not a single task turn.
+
+After a cycle reaches ACCEPTED, Morpheus must evaluate NEXT and continue into the next bounded target automatically.
+
+Pause only when:
+- a material owner decision is required;
+- destructive/irreversible authorization is required;
+- a necessary environment or evidence dependency is unavailable;
+- the mission is complete.
+
+The owner must not need to repeat the same broad directive after every successful cycle.
+
 ## Anti-loop controls
 
 - Do not reopen a resolved finding without new evidence.
