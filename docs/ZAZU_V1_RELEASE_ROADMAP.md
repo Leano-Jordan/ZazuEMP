@@ -1,10 +1,10 @@
 # Zazu EMP — V1 Commercial Release Roadmap
 
 **Status:** LIVE  
-**Last Director cycle:** 2026-09-28  
+**Last Director cycle:** 2026-09-29  
 **Repository:** `Leano-Jordan/ZazuEMP`  
 **Branch:** `main`  
-**HEAD:** `c1752f9de0a294cfad71dc552a806ff749e72217`  
+**HEAD:** `bf0942617de3572484baa0a4ef97888e87defae9`  
 **Evidence rule:** Implemented ≠ Verified ≠ Proven.
 
 ## Director operating rule
@@ -369,3 +369,35 @@ The full Laravel suite still has **9 unrelated existing failures** (151 passed) 
 The original landing-page access blocker is no longer reproducing in the current HEAD verification environment. The current browser evidence reaches the real landing page and completes registration/onboarding/dashboard without a Zazu error page.
 
 This does **not** certify the user's separate deployed/local environment as live-green; no deployment URL was available for direct external browser verification.
+
+
+## ZR-05 Release regression contract alignment — 2026-09-29
+
+### Scope
+Test-contract and release-evidence hygiene only. No application business logic, routes, controllers, views, database schema or authentication behavior was changed in this cycle.
+
+### Executed hardening
+- Updated public landing assertions from the retired **Create workspace** wording to the current **Register** action.
+- Updated logout coverage to the current public-landing destination.
+- Updated the work customer-lock regression to assert Laravel validation errors rather than a generic session key.
+- Updated search regression coverage to inspect the returned result set instead of treating the echoed search input as a result.
+- Updated dashboard regression coverage to the current command-surface contract.
+- Allowed onboarding pages that intentionally redirect after setup to remain valid in the skeleton reachability regression.
+- Added a regression test proving work cannot be cancelled while a linked cost remains in **planned** state.
+
+### Evidence
+- Current HEAD: `bf0942617de3572484baa0a4ef97888e87defae9`.
+- Compare from verified browser baseline `5764b7112840a359c1b4d7299ca082b53813c6af` to current HEAD shows changes only in:
+  - `docs/ZAZU_V1_RELEASE_ROADMAP.md`
+  - `resources/css/zazu-mobile-refinement.css`
+  - feature-test files.
+- No application runtime logic changed after the verified browser baseline.
+- Fresh CI result for the current HEAD is not yet available through the repository evidence interface.
+
+### Release interpretation
+- This cycle removes obsolete regression noise and adds direct coverage for the latest lifecycle hardening.
+- It does **not** upgrade RC-01 to green because current-head Laravel execution evidence is still pending.
+- The previously verified browser registration/login/dashboard path remains applicable to runtime code because this cycle changed only CSS, tests and release documentation after that baseline.
+
+### Next Director target
+Obtain fresh current-head CI evidence. Fix only verified runtime failures. After a green runtime baseline, move to populated-data reconciliation, authorization challenge testing, backup/restore proof and upgrade safety before adding non-critical product features.
