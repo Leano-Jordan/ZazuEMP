@@ -4402,3 +4402,492 @@ main {
         box-shadow: 0 8px 24px rgba(37,99,235,.08);
     }
 }
+
+
+/* ============================================================
+   DIRECTOR UI REFINEMENT / 2026-09
+   Flat navigation, stronger electric-blue identity, richer account
+   surface, useful dashboard attention cues, restrained motion.
+   ============================================================ */
+
+/* Light mode is the primary product surface: bright, flat, saturated blue. */
+:root:not([data-theme="dark"]) {
+    --zazu-blue-brand: #0B63FF;
+    --zazu-blue-vivid: #145BFF;
+    --zazu-blue-glow: #3F8CFF;
+    --zazu-blue-soft: #EAF2FF;
+    --zazu-primary: #0B63FF;
+    --zazu-primary-light: #3F8CFF;
+    --zazu-primary-hover: #084DD1;
+    --zazu-primary-soft: #EAF2FF;
+    --zazu-link: #084DD1;
+    --zazu-link-hover: #063CA5;
+    --zazu-nav-active: #0B63FF;
+    --zazu-card-border: #C6D7EE;
+    --zazu-border: #C6D7EE;
+    --zazu-border-strong: #A8C1E1;
+    --zazu-canvas-bg: #F3F7FD;
+}
+
+:root:not([data-theme="dark"]) .zazu-sidebar {
+    background: #EDF4FF;
+    border-right: 1px solid #C4D7F0;
+    box-shadow: 5px 0 18px rgba(11,99,255,.055);
+}
+
+:root:not([data-theme="dark"]) .zazu-brand {
+    background: #FFFFFF;
+    border-bottom: 1px solid #C4D7F0;
+}
+
+:root:not([data-theme="dark"]) .zazu-sidebar-workspace {
+    display: none;
+}
+
+:root:not([data-theme="dark"]) .zazu-nav {
+    padding-top: 14px;
+}
+
+:root:not([data-theme="dark"]) .zazu-nav-group {
+    margin-bottom: 18px;
+}
+
+:root:not([data-theme="dark"]) .zazu-nav-group-label {
+    padding: 0 12px;
+    color: #5B78A0;
+}
+
+:root:not([data-theme="dark"]) .zazu-nav-stack {
+    gap: 2px;
+}
+
+:root:not([data-theme="dark"]) .zazu-nav-link {
+    min-height: 38px;
+    padding: 0 12px;
+    border: 0;
+    border-left: 3px solid transparent;
+    border-radius: 0;
+    background: transparent;
+    color: #31557F;
+    box-shadow: none;
+    font-weight: 700;
+}
+
+:root:not([data-theme="dark"]) .zazu-nav-link:hover {
+    border-left-color: #8EB8FF;
+    background: #E4EEFF;
+    color: #103E91;
+    box-shadow: none;
+}
+
+:root:not([data-theme="dark"]) .zazu-nav-link.active {
+    border-left-color: #0B63FF;
+    background: #DCE9FF;
+    color: #0648C7;
+    box-shadow: none;
+    font-weight: 800;
+}
+
+:root:not([data-theme="dark"]) .zazu-nav-link.active .zazu-nav-icon {
+    color: #0B63FF;
+}
+
+/* Account section: one substantial, useful control instead of a loose footer. */
+:root:not([data-theme="dark"]) .zazu-sidebar-footer {
+    padding: 12px;
+    border-top: 1px solid #C4D7F0;
+    background: rgba(255,255,255,.42);
+}
+
+:root:not([data-theme="dark"]) .zazu-footer-workspace {
+    display: grid;
+    gap: 3px;
+    margin-bottom: 10px;
+    padding: 0 2px 10px;
+    border-bottom: 1px solid #C8D8EC;
+}
+
+:root:not([data-theme="dark"]) .zazu-footer-workspace-label {
+    color: #6A86A9;
+    font-size: 8px;
+    font-weight: 850;
+    letter-spacing: .14em;
+    text-transform: uppercase;
+}
+
+:root:not([data-theme="dark"]) .zazu-footer-workspace strong {
+    min-width: 0;
+    overflow: hidden;
+    color: #12345F;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    font-size: 11px;
+    font-weight: 800;
+}
+
+:root:not([data-theme="dark"]) .zazu-footer-workspace > span:last-child {
+    color: #6B83A0;
+    font-size: 9px;
+}
+
+:root:not([data-theme="dark"]) .zazu-user-trigger {
+    width: 100%;
+    min-height: 58px;
+    display: flex;
+    padding: 6px 8px 6px 6px;
+    border: 1px solid #B8D0EE;
+    border-radius: 7px;
+    background: #FFFFFF;
+    box-shadow: 0 2px 7px rgba(11,99,255,.06);
+}
+
+:root:not([data-theme="dark"]) .zazu-user-trigger:hover,
+:root:not([data-theme="dark"]) .zazu-user-trigger[aria-expanded="true"] {
+    border-color: #72A5EF;
+    background: #F8FBFF;
+    box-shadow: 0 5px 14px rgba(11,99,255,.10);
+}
+
+.zazu-sidebar .zazu-user-identity {
+    display: grid;
+    flex: 1;
+    min-width: 0;
+}
+
+.zazu-user-kicker {
+    color: #7089A7;
+    font-size: 8px;
+    font-weight: 800;
+    letter-spacing: .08em;
+    text-transform: uppercase;
+}
+
+:root:not([data-theme="dark"]) .zazu-user-identity strong {
+    max-width: 100%;
+    color: #102E55;
+    font-size: 11px;
+}
+
+:root:not([data-theme="dark"]) .zazu-user-identity > span:last-child {
+    overflow: hidden;
+    color: #607B9D;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    font-size: 9px;
+    font-weight: 700;
+}
+
+:root:not([data-theme="dark"]) .zazu-user-chevron {
+    color: #4D78B1;
+}
+
+.zazu-sidebar .zazu-user-popover {
+    top: auto;
+    right: 0;
+    bottom: calc(100% + 9px);
+    width: min(340px, calc(100vw - 24px));
+}
+
+:root:not([data-theme="dark"]) .zazu-user-popover {
+    border-color: #B5CCE9;
+    border-radius: 8px;
+    background: #FFFFFF;
+    box-shadow: 0 16px 36px rgba(32,68,112,.16);
+}
+
+:root:not([data-theme="dark"]) .zazu-user-popover-head {
+    padding: 8px 7px 12px;
+}
+
+:root:not([data-theme="dark"]) .zazu-user-popover-name {
+    color: #102E55;
+    font-size: 13px;
+    font-weight: 820;
+}
+
+:root:not([data-theme="dark"]) .zazu-user-popover-email {
+    color: #617B9C;
+    font-size: 10px;
+}
+
+:root:not([data-theme="dark"]) .zazu-user-role {
+    display: block;
+    margin-top: 5px;
+    color: #0B63FF;
+    font-size: 9px;
+    font-weight: 800;
+}
+
+:root:not([data-theme="dark"]) .zazu-user-popover-section {
+    padding: 7px 7px 9px;
+}
+
+:root:not([data-theme="dark"]) .zazu-user-popover-label {
+    color: #6C87A8;
+    font-size: 8px;
+    font-weight: 850;
+    letter-spacing: .09em;
+    text-transform: uppercase;
+}
+
+:root:not([data-theme="dark"]) .zazu-user-workspace-name {
+    display: block;
+    margin-top: 5px;
+    color: #12345F;
+    font-size: 11px;
+    font-weight: 800;
+}
+
+:root:not([data-theme="dark"]) .zazu-user-menu-link {
+    min-height: 46px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 7px 9px;
+    border-left: 3px solid transparent;
+    border-radius: 0;
+    color: #264C76;
+    text-decoration: none;
+}
+
+:root:not([data-theme="dark"]) .zazu-user-menu-link:hover {
+    border-left-color: #0B63FF;
+    background: #EAF2FF;
+    color: #084DD1;
+}
+
+:root:not([data-theme="dark"]) .zazu-user-menu-link span {
+    font-size: 10px;
+    font-weight: 780;
+}
+
+:root:not([data-theme="dark"]) .zazu-user-menu-link small {
+    color: #738AA6;
+    font-size: 8px;
+    text-align: right;
+}
+
+:root:not([data-theme="dark"]) .zazu-user-signout {
+    border-radius: 0;
+    color: #A63A4D;
+}
+
+:root:not([data-theme="dark"]) .zazu-user-signout:hover {
+    background: #FDECEF;
+}
+
+/* Header remains bright and visually anchored to the page. */
+:root:not([data-theme="dark"]) .zazu-topbar {
+    background: #FFFFFF;
+    border-bottom: 2px solid #C9D9ED;
+    box-shadow: 0 3px 14px rgba(30,76,129,.055);
+}
+
+:root:not([data-theme="dark"]) .zazu-theme-toggle,
+:root:not([data-theme="dark"]) .zazu-user-trigger,
+:root:not([data-theme="dark"]) .zazu-mobile-toggle {
+    border-color: #B8CCE6;
+    background: #FFFFFF;
+    color: #174B91;
+}
+
+:root:not([data-theme="dark"]) .zazu-theme-toggle:hover,
+:root:not([data-theme="dark"]) .zazu-mobile-toggle:hover {
+    border-color: #0B63FF;
+    background: #EAF2FF;
+    color: #084DD1;
+}
+
+/* Dashboard: clear action hierarchy rather than more decorative cards. */
+.zazu-dash-focus {
+    grid-column: 1 / -1;
+    overflow: hidden;
+}
+
+.zazu-dash-focus-grid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.zazu-dash-focus-item {
+    min-width: 0;
+    min-height: 74px;
+    display: grid;
+    grid-template-columns: auto minmax(0,1fr) auto;
+    align-items: center;
+    gap: 10px;
+    padding: 13px 15px;
+    border-right: 1px solid var(--zazu-card-border);
+    color: var(--zazu-text-ink);
+    text-decoration: none;
+}
+
+.zazu-dash-focus-item:last-child {
+    border-right: 0;
+}
+
+.zazu-dash-focus-item > span:nth-child(2) {
+    min-width: 0;
+}
+
+.zazu-dash-focus-item strong {
+    display: block;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    color: var(--zazu-text-ink);
+    font-size: 10px;
+    font-weight: 820;
+}
+
+.zazu-dash-focus-item small {
+    display: block;
+    margin-top: 3px;
+    overflow: hidden;
+    color: var(--zazu-text-muted);
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    font-size: 8px;
+    line-height: 1.45;
+}
+
+.zazu-dash-focus-marker {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    box-shadow: 0 0 0 4px rgba(11,99,255,.08);
+}
+
+.zazu-dash-focus-item.is-warning {
+    background: #FFFBF1;
+}
+
+.zazu-dash-focus-item.is-warning .zazu-dash-focus-marker {
+    background: #D18A00;
+    box-shadow: 0 0 0 4px rgba(209,138,0,.10);
+}
+
+.zazu-dash-focus-item.is-info .zazu-dash-focus-marker {
+    background: #0B63FF;
+}
+
+.zazu-dash-focus-item.is-clear .zazu-dash-focus-marker {
+    background: #16A34A;
+    box-shadow: 0 0 0 4px rgba(22,163,74,.09);
+}
+
+.zazu-dash-focus-item > b {
+    color: var(--zazu-blue-brand);
+    font-size: 12px;
+    opacity: .8;
+}
+
+/* Empty-state and action transitions across the product. */
+@keyframes zazu-refine-enter {
+    from { opacity: 0; transform: translateY(4px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+    .zazu-nav-link,
+    .zazu-user-trigger,
+    .zazu-user-menu-link,
+    .zazu-btn,
+    .zazu-dash-event,
+    .zazu-dash-metric,
+    .zazu-dash-focus-item,
+    .zazu-dash-commandbar a {
+        transition:
+            transform var(--zazu-motion-fast) var(--zazu-ease),
+            background-color var(--zazu-motion-fast) ease,
+            border-color var(--zazu-motion-fast) ease,
+            color var(--zazu-motion-fast) ease,
+            box-shadow var(--zazu-motion-fast) ease;
+    }
+
+    .zazu-nav-link:hover { transform: translateX(2px); }
+    .zazu-user-trigger:hover { transform: translateY(-1px); }
+    .zazu-btn:hover { transform: translateY(-1px); }
+    .zazu-dash-event:hover,
+    .zazu-dash-metric:hover,
+    .zazu-dash-focus-item:hover {
+        transform: translateY(-1px);
+    }
+
+    .zazu-dash-focus-grid > * {
+        animation: zazu-refine-enter var(--zazu-motion-slow) var(--zazu-ease) both;
+    }
+
+    .zazu-dash-focus-grid > *:nth-child(2) { animation-delay: 35ms; }
+    .zazu-dash-focus-grid > *:nth-child(3) { animation-delay: 70ms; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .zazu-nav-link,
+    .zazu-user-trigger,
+    .zazu-user-menu-link,
+    .zazu-btn,
+    .zazu-dash-event,
+    .zazu-dash-metric,
+    .zazu-dash-focus-item,
+    .zazu-dash-commandbar a {
+        transition: none !important;
+        transform: none !important;
+    }
+}
+
+@media (max-width: 980px) {
+    .zazu-dash-focus-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .zazu-dash-focus-item {
+        border-right: 0;
+        border-bottom: 1px solid var(--zazu-card-border);
+    }
+
+    .zazu-dash-focus-item:last-child {
+        border-bottom: 0;
+    }
+}
+
+@media (max-width: 820px) {
+    :root:not([data-theme="dark"]) .zazu-nav-link {
+        min-height: 40px;
+    }
+
+    :root:not([data-theme="dark"]) .zazu-mobile-toggle {
+        border-radius: 5px;
+        box-shadow: none;
+    }
+
+    :root:not([data-theme="dark"]) .zazu-mobile-links {
+        border: 1px solid #BFD3EC;
+        border-top: 0;
+        background: #FFFFFF;
+    }
+
+    :root:not([data-theme="dark"]) .zazu-mobile-link {
+        min-height: 40px;
+        border-left: 3px solid transparent;
+        border-radius: 0;
+    }
+
+    :root:not([data-theme="dark"]) .zazu-mobile-link.active {
+        border-left-color: #0B63FF;
+        background: #EAF2FF;
+        color: #084DD1;
+    }
+}
+
+@media (max-width: 620px) {
+    .zazu-dash-focus-item {
+        padding: 12px 14px;
+    }
+
+    .zazu-dash-focus-item strong,
+    .zazu-dash-focus-item small {
+        white-space: normal;
+    }
+}
