@@ -265,59 +265,46 @@ function setupBrandingUploads() {
             const previousUrl = brandingPreviewUrls.get(input);
             if (previousUrl) URL.revokeObjectURL(previousUrl);
 
-            const image = new Image();
+            if (typeof createImageBitmap !== 'function') {
+                loading.hidden = true;
+                if (placeholder) placeholder.hidden = false;
+                container.setAttribute('aria-busy', 'false');
+                if (filename) filename.textContent = 'Image preview is not supported in this browser.';
+                return;
+            }
 
-            image.onload = () => {
-                const canvas = document.createElement('canvas');
-                canvas.width = image.naturalWidth;
-                canvas.height = image.naturalHeight;
+            createImageBitmap(file)
+                .then((bitmap) => {
+                    const canvas = document.createElement('canvas');
+                    canvas.width = bitmap.width;
+                    canvas.height = bitmap.height;
 
-                const context = canvas.getContext('2d');
-                if (!context) {
+                    const context = canvas.getContext('2d');
+                    if (!context) {
+                        bitmap.close();
+                        throw new Error('Canvas preview context unavailable');
+                    }
+
+                    context.drawImage(bitmap, 0, 0);
+                    bitmap.close();
+
+                    canvas.toBlob((blob) => {
+                        if (!blob) throw new Error('Image preview conversion failed');
+
+                        const objectUrl = URL.createObjectURL(blob);
+                        brandingPreviewUrls.set(input, objectUrl);
+                        preview.src = objectUrl;
+                        preview.hidden = false;
+                        loading.hidden = true;
+                        container.setAttribute('aria-busy', 'false');
+                    }, 'image/png');
+                })
+                .catch(() => {
                     loading.hidden = true;
                     if (placeholder) placeholder.hidden = false;
                     container.setAttribute('aria-busy', 'false');
                     if (filename) filename.textContent = 'That image could not be previewed.';
-                    return;
-                }
-
-                context.drawImage(image, 0, 0);
-                canvas.toBlob((blob) => {
-                    if (!blob) {
-                        loading.hidden = true;
-                        if (placeholder) placeholder.hidden = false;
-                        container.setAttribute('aria-busy', 'false');
-                        if (filename) filename.textContent = 'That image could not be previewed.';
-                        return;
-                    }
-
-                    const objectUrl = URL.createObjectURL(blob);
-                    brandingPreviewUrls.set(input, objectUrl);
-                    preview.src = objectUrl;
-                    preview.hidden = false;
-                    loading.hidden = true;
-                    container.setAttribute('aria-busy', 'false');
-                }, 'image/png');
-            };
-
-            image.onerror = () => {
-                loading.hidden = true;
-                if (placeholder) placeholder.hidden = false;
-                container.setAttribute('aria-busy', 'false');
-                if (filename) filename.textContent = 'That image could not be previewed.';
-            };
-
-            const fileReader = new FileReader();
-            fileReader.onload = () => {
-                image.src = fileReader.result;
-            };
-            fileReader.onerror = () => {
-                loading.hidden = true;
-                if (placeholder) placeholder.hidden = false;
-                container.setAttribute('aria-busy', 'false');
-                if (filename) filename.textContent = 'That image could not be previewed.';
-            };
-            fileReader.readAsDataURL(file);
+                });
         });
     });
 
