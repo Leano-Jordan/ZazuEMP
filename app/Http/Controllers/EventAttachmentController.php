@@ -94,13 +94,14 @@ class EventAttachmentController extends Controller
         $event = $attachment->event;
 
         DB::transaction(function () use ($attachment, $business, $lifecycle): void {
+            $lockedEvent = $lifecycle->lock($business->id, $attachment->event_id);
+            $lifecycle->assertOperational($lockedEvent);
+
             $lockedAttachment = EventAttachment::query()
                 ->where('business_id', $business->id)
+                ->where('event_id', $lockedEvent->id)
                 ->lockForUpdate()
                 ->findOrFail($attachment->id);
-
-            $lockedEvent = $lifecycle->lock($business->id, $lockedAttachment->event_id);
-            $lifecycle->assertOperational($lockedEvent);
 
             Storage::disk($lockedAttachment->disk)->delete($lockedAttachment->path);
             $lockedAttachment->delete();
