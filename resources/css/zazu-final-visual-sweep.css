@@ -1447,7 +1447,7 @@ textarea.zazu-textarea,
 }
 
 .zazu-dashboard-attention {
-    box-shadow: 0 6px 18px color-mix(in srgb, var(--zazu-primary) 10%, transparent);
+    box-shadow: none;
 }
 
 /* Operations workspace */
