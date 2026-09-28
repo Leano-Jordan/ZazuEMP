@@ -2306,7 +2306,7 @@ html{background:var(--zazu-canvas-bg);scroll-behavior:smooth}body{background:lin
  * Kept deliberately faint so operational content remains the visual priority.
  */
 :root {
-    --zazu-master-bg: url('/images/blue%20pallette.jpg');
+    --zazu-master-bg: url('../../images/blue pallette.jpg');
     --zazu-content-max: 1480px;
     --zazu-shell-gap: clamp(14px, 1.8vw, 26px);
 }
