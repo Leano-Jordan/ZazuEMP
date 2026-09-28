@@ -68,6 +68,8 @@ class AuthController extends Controller
 
     public function store(Request $request): RedirectResponse
     {
+        $request->session()->flash('auth_modal', 'login');
+
         $credentials = $request->validate([
             'identifier' => ['required', 'string', 'max:255'],
             'password' => ['required', 'string'],
@@ -126,6 +128,8 @@ class AuthController extends Controller
 
     public function storeRegistration(Request $request, RegisterBusiness $registration): RedirectResponse
     {
+        $request->session()->flash('auth_modal', 'register');
+
         $request->merge([
             'username' => Str::lower(trim($request->string('username')->toString())),
             'email' => Str::lower(trim($request->string('email')->toString())),
