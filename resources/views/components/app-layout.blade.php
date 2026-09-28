@@ -96,7 +96,9 @@
                                 <span class="zazu-section-name">Customers</span><a href="{{ route('customers.index') }}" class="active">Customers</a>
                             @elseif(request()->routeIs('finance.*'))
                                 <span class="zazu-section-name">Finance</span><a href="{{ route('finance.index') }}" class="active">Overview</a>
-                                <a href="{{ route('finance.invoices.create') }}">New invoice</a><a href="{{ route('finance.payments.create') }}">Payment</a><a href="{{ route('finance.expenses.create') }}">Expense</a>
+                                @if($can('finance.invoice.create'))<a href="{{ route('finance.invoices.create') }}">New invoice</a>@endif
+                                @if($can('finance.payment.create'))<a href="{{ route('finance.payments.create') }}">Payment</a>@endif
+                                @if($can('finance.expense.create'))<a href="{{ route('finance.expenses.create') }}">Expense</a>@endif
                             @elseif(request()->routeIs('purchasing.*','suppliers.*','inventory.*','assets.*'))
                                 <span class="zazu-section-name">Resources</span>
                                 @if($can('purchasing.view'))<a href="{{ route('purchasing.index') }}" class="{{ request()->routeIs('purchasing.*') ? 'active' : '' }}">Purchasing</a>@endif
