@@ -12,6 +12,8 @@
         $can = fn (string $permission): bool => $currentRole === 'owner'
             || in_array($permission, config('zazu.permissions.roles.'.$currentRole, []), true);
         $isOwner = $currentRole === 'owner';
+        $experienceLevel = app(\App\Support\ExperienceLevel::class)->for(auth()->user(), $business);
+        $experienceLabel = app(\App\Support\ExperienceLevel::class)->label($experienceLevel);
         $brandingVersion = $business?->updated_at?->timestamp ?? 0;
     @endphp
     <title>{{ $title ?? 'Zazu' }} · {{ $business?->name ?? 'Zazu EMP' }}</title>
@@ -119,6 +121,7 @@
                                                             <strong class="zazu-user-popover-name">{{ '@'.auth()->user()->username }}</strong>
                                                             <span class="zazu-user-popover-email">{{ auth()->user()->name }}</span>
                                                             <span class="zazu-user-popover-email">{{ auth()->user()->email }}</span>
+                                                            <span class="zazu-user-popover-email">Workspace level · {{ $experienceLabel }}</span>
                                                         </div>
                                                     </div>
                                                     @if($businesses->count() > 1)
@@ -136,6 +139,10 @@
                                                         </div>
                                                     @endif
                                                     <div class="zazu-user-popover-divider"></div>
+                                                    <a href="{{ route('preferences.experience') }}" class="zazu-user-signout zazu-user-link">
+                                                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><circle cx="12" cy="12" r="3"></circle><path d="M5 12h14M12 5v14"></path></svg>
+                                                        <span>Experience level · {{ $experienceLabel }}</span>
+                                                    </a>
                                                     @if($isOwner)
                                                     <a href="{{ route('onboarding.index') }}" class="zazu-user-signout zazu-user-link">
                                                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><circle cx="12" cy="12" r="3"></circle><path d="M19 12a7 7 0 0 0-.3-2l-2-1.3-2-3.4-2.3 1a7 7 0 0 0-3.4-2L12.7 2h-1.4L11 4.3a7 7 0 0 0-3.4 2l-2.3-1-2 3.4 2 1.3a7 7 0 0 0 0 4l-2 1.3 2 3.4 2.3-1a7 7 0 0 0 3.4 2l.3 2.3h1.4l.3-2.3a7 7 0 0 0 3.4-2l2.3 1 2-3.4-2-1.3A7 7 0 0 0 19 12z"></path></svg>
@@ -206,6 +213,7 @@
                                     id="zazu-command-input"
                                     type="search"
                                     data-zazu-command-input
+                                    data-search-url="{{ route('search.index') }}"
                                     placeholder="Search the workspace…"
                                     autocomplete="off"
                                     spellcheck="false"
@@ -222,6 +230,7 @@
                     <small data-zazu-command-count>All available surfaces</small>
                 </div>
                 <div class="zazu-command-results" data-zazu-command-results role="listbox" aria-label="Workspace search results">
+                    <a href="{{ route('search.index') }}" data-command-item data-search-terms="search records workspace customers jobs suppliers quotes invoices purchasing finance find" role="option"><span>Search records</span><small>Search business records across your workspace</small></a>
                     @if($can('work.view'))<a href="{{ route('work.index') }}" data-command-item data-search-terms="jobs work events operations event management schedule run sheet" role="option"><span>Jobs</span><small>Event operations · work register</small></a>@endif
                     @if($can('capabilities.view'))<a href="{{ route('capabilities.index') }}" data-command-item data-search-terms="services prices catalogue capabilities catering food packages equipment hire rates" role="option"><span>Services & prices</span><small>Capability catalogue · rates and packages</small></a>@endif
                     @if($can('quotes.view'))<a href="{{ route('quotes.index') }}" data-command-item data-search-terms="quotes quotation quotations commercial documents proposals" role="option"><span>Quotes</span><small>Commercial documents · quote queue</small></a>@endif
@@ -238,7 +247,9 @@
                     <a href="{{ route('settings.audit') }}" data-command-item data-search-terms="audit log activity history accountability changes security" role="option"><span>Audit</span><small>Audit trail · system activity</small></a>
                     <a href="{{ route('onboarding.index') }}" data-command-item data-search-terms="setup onboarding business setup catalogue setup foundation" role="option"><span>Setup centre</span><small>Workspace foundation · business and catalogue setup</small></a>@endif
                 </div>
-                <div class="zazu-command-empty" data-zazu-command-empty hidden>No matching workspace surfaces.</div>
+                <div class="zazu-command-empty" data-zazu-command-empty hidden>
+                    No matching surfaces. Press Enter to search business records.
+                </div>
             </div>
                         </div>
 
@@ -417,7 +428,17 @@
         }));
 
         commandInput?.addEventListener('keydown', (event) => {
-            if (event.key === 'ArrowDown') {
+            if (event.key === 'Enter') {
+                const query = commandInput.value.trim();
+                const searchUrl = commandInput.dataset.searchUrl;
+
+                if (searchUrl) {
+                    event.preventDefault();
+                    const target = new URL(searchUrl, window.location.origin);
+                    if (query) target.searchParams.set('q', query);
+                    window.location.assign(target.toString());
+                }
+            } else if (event.key === 'ArrowDown') {
                 const first = commandItems.find((item) => !item.hidden);
                 if (first) {
                     event.preventDefault();
