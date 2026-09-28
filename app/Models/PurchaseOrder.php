@@ -20,7 +20,7 @@ class PurchaseOrder extends Model
 
     use BelongsToBusiness, HasFactory;
 
-    protected $fillable = ['business_id','supplier_id','idempotency_key','reference','status','currency','total_amount','ordered_at','expected_at','notes'];
+    protected $fillable = ['business_id','supplier_id','idempotency_key','last_receipt_idempotency_key','reference','status','currency','total_amount','ordered_at','expected_at','notes'];
 
     protected function casts(): array
     {
