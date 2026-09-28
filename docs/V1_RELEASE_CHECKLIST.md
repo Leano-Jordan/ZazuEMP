@@ -156,3 +156,18 @@ Checked means implemented and source-reviewed. Runtime-only items remain uncheck
 - Unlimited UI configurability
 
 Rule: finish the product before expanding the product.
+
+
+### Gate 7A — Visual visibility correction
+- [x] Light mode has a genuinely light navigation rail
+- [x] Light mode has a genuinely light header
+- [x] Vibrant blue accent is visible in light mode
+- [x] Structural borders are visible across major Zazu surfaces
+- [x] Dashboard surfaces have explicit boundaries
+- [x] Reports remains the internal visibility reference
+- [x] Dark-mode styles are not overwritten by the light-mode correction
+- [x] Landing page contains explicit Register and Log in actions
+- [x] Logout returns to landing
+- [x] Replaceable landing image placeholders added
+- [ ] Rendered visual QA on desktop
+- [ ] Rendered visual QA on mobile
