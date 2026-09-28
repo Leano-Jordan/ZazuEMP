@@ -18,6 +18,21 @@ return [
         'SYS-002' => ['category' => 'Server / infrastructure', 'severity' => 'medium', 'status' => 429, 'headline' => 'Please slow down for a moment.', 'message' => 'Too many requests were received. Please wait a moment and try again.'],
     ],
 
+    'experience_levels' => [
+        'basic' => [
+            'label' => 'Basic',
+            'description' => 'Keep Zazu focused on customers, jobs, essential commercial work and the next action.',
+        ],
+        'intermediate' => [
+            'label' => 'Intermediate',
+            'description' => 'Surface the operational flow across jobs, resources, purchasing, costs and finance.',
+        ],
+        'advanced' => [
+            'label' => 'Advanced',
+            'description' => 'Expose the full operational picture, controls, deeper search and more detailed guidance.',
+        ],
+    ],
+
     'currencies' => [
         'ZAR' => 'South African rand (ZAR)',
         'BWP' => 'Botswana pula (BWP)',
