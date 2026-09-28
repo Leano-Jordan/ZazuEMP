@@ -257,3 +257,20 @@ Verification boundary:
 - Source-level structural checks after this batch were clean for CSS and JS brace balance; auth pages no longer contain page-local script blocks.
 - Connected GitHub status surface did not expose CI status for the latest UI commits at audit time.
 - Browser-rendered desktop/tablet/mobile QA and local Blade compilation were not executed in this environment, so rendered verification is not claimed.
+
+
+## 2026-09-28 comparative product-pattern cycle
+
+Benchmark sources reviewed: HoneyBook event-planner/venue workflows, Tripleseat event and catering workflows, and Event Temple hotel/event workflows. These products consistently emphasize one connected event/project record, a visible next step, fast access to documents/payments, client-facing document/payment experiences, and mobile access. citeturn0search2turn0search4turn0search7
+
+Adapted into Zazu without importing unrelated enterprise complexity:
+- Preserved and strengthened the Job workspace as the single operational thread linking customer, services, quote, preparation, travel and costs.
+- Converted the final non-actionable “Complete” lifecycle step into a real path to the job status editor, removing a dead-end control.
+- Added a compact “At a glance” operational block to the Job workspace so the core event context stays visible while working through secondary panels.
+- Removed duplicate Dashboard quick-access entries found during the fresh-eyes pass.
+- Normalized customer contact cards away from one-off utility styling into the shared surface language.
+- Hardened action-heavy page headers for narrow screens so multiple controls wrap deliberately instead of competing for one line.
+
+The benchmark lesson was treated as workflow design rather than feature copying: Zazu already has several of the strongest structural ideas, particularly the event workspace, next-action treatment, quote customer view and preparation workflow. HoneyBook emphasizes centralized project information and client portals, while Tripleseat and Event Temple emphasize the event record as the operational source of truth and connected documents/payments. citeturn0search12turn0search0turn0search1
+
+Verification boundary: source-level checks only for this batch; browser-rendered QA and Blade/runtime execution remain unverified.
