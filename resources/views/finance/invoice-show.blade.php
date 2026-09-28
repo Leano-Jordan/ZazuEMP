@@ -105,17 +105,4 @@
             Zazu prepared this document from the business and customer records stored at issue time. It is the business owner's responsibility to verify the document against applicable SARS and contractual requirements before issuing it.
         </footer>
     </section>
-
-    <style>
-        @media print {
-            .print-hide,
-            .zazu-sidebar,
-            .zazu-topbar-actions,
-            .zazu-mobile-nav { display: none !important; }
-            .zazu-topbar { position: static !important; }
-            .zazu-content { padding: 0 !important; max-width: none !important; }
-            body { background: white !important; }
-            .zazu-document { border: 0 !important; box-shadow: none !important; }
-        }
-    </style>
 </x-app-layout>
