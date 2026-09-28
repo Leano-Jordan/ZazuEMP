@@ -3,7 +3,7 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-    <meta name="theme-color" content="#F2F7FF">
+    <meta name="theme-color" content="#E7EEF5">
     @php
         $business = app(\App\Support\CurrentBusiness::class)->resolve(auth()->user());
         $businesses = auth()->user()->businesses()->where('businesses.status', 'active')->orderBy('businesses.name')->get();
@@ -25,9 +25,9 @@
             document.documentElement.dataset.theme = theme;
         })();
     </script>
-    @vite(['resources/css/app.css', 'resources/css/zazu-responsive-theme.css', 'resources/js/app.js'])
+    @vite(['resources/css/app.css', 'resources/css/zazu-responsive-theme.css', 'resources/css/zazu-final-visual-sweep.css', 'resources/js/app.js'])
 </head>
-<body class="{{ $business?->wallpaper_path ? 'zazu-has-wallpaper' : '' }}" data-business-currency="{{ $business?->currency ?? 'ZAR' }}" @if($business?->wallpaper_path) style="--zazu-wallpaper: url('{{ e(route('business.media', ['type' => 'wallpaper']).'?v='.$brandingVersion) }}')" @endif>
+<body data-zazu-route="{{ request()->route()?->getName() ?? '' }}" class="{{ $business?->wallpaper_path ? 'zazu-has-wallpaper' : '' }}" data-business-currency="{{ $business?->currency ?? 'ZAR' }}" @if($business?->wallpaper_path) style="--zazu-wallpaper: url('{{ e(route('business.media', ['type' => 'wallpaper']).'?v='.$brandingVersion) }}')" @endif>
     <a class="zazu-skip-link" href="#main-content">Skip to main content</a>
     <div class="zazu-shell">
         <aside class="zazu-sidebar">
