@@ -70,16 +70,11 @@ class QuoteWorkflowTest extends TestCase
 
     public function test_quote_deposit_percent_calculates_from_final_total(): void
     {
-        [$business, $user] = $this->businessUser();
-        $this->actingAs($user);
-
         $customer = \App\Models\Customer::create([
-            'business_id' => $business->id,
             'name' => 'Deposit Quote Customer',
         ]);
 
         $event = Event::create([
-            'business_id' => $business->id,
             'customer_id' => $customer->id,
             'reference' => 'DEP-Q-001',
             'name' => 'Deposit Quote Event',
@@ -87,20 +82,7 @@ class QuoteWorkflowTest extends TestCase
             'status' => 'confirmed',
         ]);
 
-        $capability = \App\Models\BusinessCapability::create([
-            'business_id' => $business->id,
-            'name' => 'Catering',
-            'category' => 'Catering',
-            'capability_type' => 'service',
-            'pricing_basis' => 'per_event',
-            'default_unit' => 'event',
-            'default_price' => '1150.00',
-            'currency' => 'ZAR',
-            'is_active' => true,
-        ]);
-
         $requirement = $event->requirements()->create([
-            'capability_id' => $capability->id,
             'description' => 'Catering',
             'category' => 'service',
             'quantity' => '1.00',
