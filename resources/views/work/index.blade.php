@@ -115,7 +115,7 @@
                 <h2 id="zazu-inspector-title">Job inspection</h2>
                 <div class="zazu-inspector-reference" data-zazu-inspector-reference>—</div>
             </div>
-            <button type="button" class="zazu-inspector-close" data-zazu-inspector-close aria-label="Close inspector">×</button>
+            <button type="button" class="zazu-inspector-close" data-zazu-inspector-close aria-label="Close job inspection">×</button>
         </header>
 
         <div class="zazu-inspector-summary">
@@ -126,13 +126,13 @@
         </div>
 
         <div class="zazu-inspector-tabs" role="tablist" aria-label="Function sheet sections">
-            <button type="button" class="is-active" data-zazu-tab="catering" role="tab" aria-selected="true">Catering &amp; Menu Prep</button>
-            <button type="button" data-zazu-tab="equipment" role="tab" aria-selected="false">Equipment Hire Manifest</button>
-            <button type="button" data-zazu-tab="finance" role="tab" aria-selected="false">Financial Ledger</button>
+            <button type="button" class="is-active" data-zazu-tab="catering" role="tab" aria-selected="true" aria-controls="zazu-inspector-panel-catering">Catering &amp; Menu Prep</button>
+            <button type="button" data-zazu-tab="equipment" role="tab" aria-selected="false" aria-controls="zazu-inspector-panel-equipment">Equipment Hire Manifest</button>
+            <button type="button" data-zazu-tab="finance" role="tab" aria-selected="false" aria-controls="zazu-inspector-panel-finance">Financial Ledger</button>
         </div>
 
         <div class="zazu-inspector-body">
-            <section data-zazu-tab-panel="catering">
+            <section id="zazu-inspector-panel-catering" role="tabpanel" tabindex="0" data-zazu-tab-panel="catering">
                 <div class="zazu-inspector-section-title">Catering &amp; Menu Prep</div>
                 <div class="zazu-inspector-grid">
                     <div class="zazu-inspector-field"><span>Packages</span><strong>Review function sheet</strong></div>
@@ -141,7 +141,7 @@
                 </div>
             </section>
 
-            <section class="hidden" data-zazu-tab-panel="equipment">
+            <section id="zazu-inspector-panel-equipment" role="tabpanel" tabindex="0" class="hidden" data-zazu-tab-panel="equipment">
                 <div class="zazu-inspector-section-title">Equipment Hire Manifest</div>
                 <div class="zazu-manifest-list">
                     @foreach(['Marquees','Sound rigs','Tables','Cutlery'] as $item)
@@ -151,7 +151,7 @@
                 <p class="zazu-inspector-note">Quantities are shown once equipment requirements are recorded against this job.</p>
             </section>
 
-            <section class="hidden" data-zazu-tab-panel="finance">
+            <section id="zazu-inspector-panel-finance" role="tabpanel" tabindex="0" class="hidden" data-zazu-tab-panel="finance">
                 <div class="zazu-inspector-section-title">Financial Ledger</div>
                 <div class="zazu-inspector-finance">
                     <div><span>SARS VAT</span><strong>15%</strong></div>
