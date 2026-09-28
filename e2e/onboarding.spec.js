@@ -63,9 +63,9 @@ test('registration flows through onboarding into the dashboard', async ({ page }
     const signedInLandingResponse = await page.goto('/');
     expect(signedInLandingResponse?.status(), 'authenticated landing').toBe(200);
     await expect(page.locator('.zazu-error-shell')).toHaveCount(0);
-    await expect(page.getByText("You’re signed in")).toBeVisible();
+    await expect(page.locator('nav[aria-label="Public navigation"]').getByText("You’re signed in", { exact: true })).toBeVisible();
 
-    await page.getByRole('button', { name: /Sign out/ }).click();
+    await page.locator('nav[aria-label="Public navigation"]').getByRole('button', { name: 'Sign out', exact: true }).click();
     await expect(page).toHaveURL(/\/$/);
     await expect(page.locator('.zazu-error-shell')).toHaveCount(0);
     await expect(page.getByRole('link', { name: 'Log in', exact: true })).toBeVisible();
