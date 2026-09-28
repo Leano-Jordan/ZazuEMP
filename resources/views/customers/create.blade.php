@@ -5,7 +5,7 @@
         <a href="{{ route('customers.index') }}" class="zazu-btn zazu-btn-ghost">← Customers</a>
     </x-slot:headerAction>
 
-    <section class="zazu-command-band">
+    <section class="zazu-command-band zazu-customer-editor-command">
         <div>
             <div class="zazu-eyebrow">Relationship record</div>
             <h2 class="zazu-command-title">Create a customer</h2>
@@ -121,7 +121,7 @@
                     </div>
                 </section>
 
-                <div class="zazu-actionbar">
+                <div class="zazu-actionbar zazu-actionbar-sticky">
                     <a href="{{ route('customers.index') }}" class="zazu-btn zazu-btn-ghost">Cancel</a>
                     <button class="zazu-btn zazu-btn-primary">Save customer</button>
                 </div>
