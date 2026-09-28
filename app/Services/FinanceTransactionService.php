@@ -110,7 +110,7 @@ class FinanceTransactionService
      */
     public function recordExpense(int $businessId, string $currency, array $data): bool
     {
-        return DB::transaction(function () use ($businessId, $currency, $data): FinanceExpense {
+        return DB::transaction(function () use ($businessId, $currency, $data): bool {
             $this->lockBusiness($businessId);
 
             $existingExpense = FinanceExpense::query()
