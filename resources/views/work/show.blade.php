@@ -26,7 +26,7 @@
                 : ['label' => 'Add services', 'route' => route('work.requirements.create', $event), 'copy' => 'Choose what you are providing for this job.']);
     @endphp
 
-    <section class="zazu-work-hero">
+    <section class="zazu-work-hero zazu-work-hero-refined">
         <div>
             <div class="zazu-work-ref">{{ $event->reference }}</div>
             <div class="zazu-work-name">{{ $event->name }}</div>
@@ -36,12 +36,15 @@
                 @if ($event->event_date) · {{ $event->event_date->format('l, d F Y') }} @endif
             </div>
         </div>
-        <div class="zazu-work-actions">
-            <span class="zazu-chip {{ $statusClass }}">{{ str_replace('_', ' ', ucfirst($event->status)) }}</span>
+        <div class="zazu-work-actions zazu-work-actions-refined">
+            <div class="zazu-work-meta-stack">
+                <span class="zazu-chip {{ $statusClass }}">{{ str_replace('_', ' ', ucfirst($event->status)) }}</span>
+                <span class="zazu-work-meta-line">{{ $event->event_type ?: 'Job' }} @if ($event->event_date) · {{ $event->event_date->format('d M Y') }} @endif</span>
+            </div>
         </div>
     </section>
 
-    <section class="zazu-next-action">
+    <section class="zazu-next-action zazu-next-action-primary">
         <div>
             <div class="zazu-eyebrow">Next action</div>
             <h2 class="zazu-next-action-title">{{ $nextAction['label'] }}</h2>
@@ -51,7 +54,7 @@
     </section>
 
     @if ($latestQuoteNeedsRevision)
-        <section class="zazu-next-action">
+        <section class="zazu-next-action zazu-next-action-warning">
             <div>
                 <div class="zazu-eyebrow">Quote needs review</div>
                 <h2 class="zazu-next-action-title">The job changed after the latest quote</h2>
@@ -64,7 +67,7 @@
         </section>
     @endif
 
-    <section class="zazu-work-progress">
+    <section class="zazu-work-progress zazu-work-progress-refined" aria-label="Job progress">
         <a href="{{ route('work.show', $event) }}" class="zazu-work-progress-step current">
             <span>1</span><strong>Job</strong><small>Details</small>
         </a>
