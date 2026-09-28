@@ -3302,3 +3302,27 @@ body[data-zazu-route^="quotes."] .zazu-topbar-actions .zazu-command-trigger:focu
 @media (max-width: 420px) {
     .zazu-customer-directory .zazu-action-group { grid-template-columns: 1fr; }
 }
+
+
+/* CUSTOMERS — CYCLE 2: calm surface contrast + relationship scanning */
+.zazu-customer-directory {
+    background: var(--zazu-page);
+}
+.zazu-customer-directory .zazu-card-header,
+.zazu-customer-directory .zazu-record-header {
+    background: var(--zazu-surface-2);
+}
+.zazu-customer-directory .zazu-list-item {
+    background: var(--zazu-surface);
+}
+.zazu-customer-directory .zazu-list-item:nth-of-type(even) {
+    background: color-mix(in srgb, var(--zazu-surface-2) 38%, var(--zazu-surface));
+}
+.zazu-customer-directory .zazu-list-item:hover {
+    background: color-mix(in srgb, var(--zazu-primary-soft) 68%, var(--zazu-surface));
+    box-shadow: inset 3px 0 0 var(--zazu-primary);
+}
+.zazu-customer-directory .zazu-side-primary {
+    color: var(--zazu-ink);
+    font-variant-numeric: tabular-nums;
+}
