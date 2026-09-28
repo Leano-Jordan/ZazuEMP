@@ -17,7 +17,7 @@
                 </div>
             </div>
 
-            <div class="zazu-page-kicker">Create workspace</div>
+            <div class="zazu-auth-entry-state"><span class="zazu-status-dot" aria-hidden="true"></span><span>Step 1 · Create workspace</span></div>
             <h1 id="register-heading">Set up your Zazu workspace</h1>
             <p class="zazu-auth-copy">Create your owner account and choose the username you will use to sign in.</p>
 
@@ -69,7 +69,7 @@
                     </div>
                 </div>
 
-                <button type="submit" class="zazu-btn zazu-btn-primary zazu-auth-submit">Create workspace</button>
+                <button type="submit" class="zazu-btn zazu-btn-primary zazu-auth-submit"><span>Create workspace</span><span aria-hidden="true">→</span></button>
             </form>
 
             <div class="zazu-auth-switch">
