@@ -1,7 +1,7 @@
 import { test, expect } from '@playwright/test';
 
 test('registration flows into catalogue, business setup and dashboard', async ({ page }) => {
-    const unique = (globalThis.crypto?.randomUUID?.() ?? String(Date.now()) + String(Math.random()))
+    const unique = globalThis.crypto.randomUUID()
         .replace(/[^a-zA-Z0-9]/g, '')
         .slice(-10);
     const username = 'browserowner' + unique;
