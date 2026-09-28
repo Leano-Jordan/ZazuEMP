@@ -274,3 +274,23 @@ Adapted into Zazu without importing unrelated enterprise complexity:
 The benchmark lesson was treated as workflow design rather than feature copying: Zazu already has several of the strongest structural ideas, particularly the event workspace, next-action treatment, quote customer view and preparation workflow. HoneyBook emphasizes centralized project information and client portals, while Tripleseat and Event Temple emphasize the event record as the operational source of truth and connected documents/payments. citeturn0search12turn0search0turn0search1
 
 Verification boundary: source-level checks only for this batch; browser-rendered QA and Blade/runtime execution remain unverified.
+
+
+## 2026-09-28 visual-attraction refinement cycle
+
+The comparative 2026 SaaS review identified a specific Zazu visual issue: too much visible component chrome. Current references repeatedly favor calm composition, whitespace, typography-led hierarchy, restrained color, minimal chrome, progressive disclosure and polished interaction states. Linear is cited for calm whitespace-heavy interfaces; Vercel for restraint and semantic color; Stripe for focused data presentation; Attio for designed insight surfaces. citeturn0search2turn0search4turn0search8
+
+Applied to Zazu:
+- Reduced border-first visual grammar across cards, panels, command bands, navigation shell, metrics, chips and document surfaces.
+- Replaced many separators with spacing, tonal surface changes and hover states.
+- Increased visual attraction through a restrained blue atmospheric page treatment rather than decorative card colors.
+- Made dashboard metric surfaces quieter and interactive on hover instead of boxed.
+- Made forms use softer field chrome with focused blue rings.
+- Preserved borders where they communicate actual structure, especially fields, calendar cells and document tables.
+- Added subtle elevation only where it helps distinguish a surface from the page.
+- Kept Zazu's blue reference palette as the brand accent instead of introducing a rainbow UI.
+- Added interaction microstates rather than more decoration.
+
+This is deliberately not a generic "make everything glassmorphic" treatment. 2026 references emphasize restraint, typography, interaction quality and specific product character over visual effects. citeturn0search8turn0search13turn0search15
+
+Verification boundary: source-level CSS/Blade inspection only. Browser-rendered visual QA remains required before final sign-off.
