@@ -8,7 +8,7 @@
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
 <body class="zazu-auth-shell zazu-login-page">
-    <main class="zazu-auth-frame zazu-auth-dual zazu-auth-state-login" data-auth-frame>
+    <main class="zazu-auth-frame zazu-login-frame-single zazu-auth-state-login" data-auth-frame>
         <section class="zazu-auth-card zazu-auth-form-panel" aria-labelledby="login-heading">
             <div class="zazu-auth-brand zazu-login-brand">
                 <div class="zazu-auth-mark zazu-login-mark" aria-hidden="true">Z</div>
@@ -105,21 +105,7 @@
             @endif
         </section>
 
-        <aside class="zazu-auth-visual zazu-auth-switch-panel" aria-label="Workspace account options">
-            <div class="zazu-auth-visual-inner">
-                @if($ownerAccess)
-                    <span class="zazu-auth-visual-label">Workspace access</span>
-                    <strong class="zazu-auth-switch-title">Need the regular workspace sign-in?</strong>
-                    <p class="zazu-auth-visual-copy">Return to the standard workspace entry point. Owner administration remains protected separately.</p>
-                    <a href="{{ route('login') }}" class="zazu-btn zazu-btn-secondary zazu-auth-switch-button">Workspace sign in</a>
-                @else
-                    <span class="zazu-auth-visual-label">New to Zazu?</span>
-                    <strong class="zazu-auth-switch-title">Create a workspace built around your events.</strong>
-                    <p class="zazu-auth-visual-copy">Set up your business, services and daily operations in one place.</p>
-                    <a href="{{ route('register') }}" data-auth-switch class="zazu-btn zazu-btn-secondary zazu-auth-switch-button">Create workspace</a>
-                @endif
-            </div>
-        </aside>
+</aside>
     </main>
 </body>
 </html>
