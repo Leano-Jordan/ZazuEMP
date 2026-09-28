@@ -64,4 +64,33 @@ class ExperienceLevelTest extends TestCase
         $this->assertSame('staff', $membership->role);
         $this->assertSame('basic', $membership->experience_level);
     }
+
+    public function test_onboarding_requires_an_experience_level_before_business_setup(): void
+    {
+        $business = Business::create([
+            'name' => 'Onboarding Experience Business',
+            'slug' => 'onboarding-experience-'.Str::lower(Str::random(8)),
+            'status' => 'active',
+            'currency' => 'ZAR',
+        ]);
+
+        $user = User::factory()->create();
+        $business->users()->attach($user->id, ['role' => 'owner']);
+
+        $this->actingAs($user);
+
+        $this->get(route('onboarding.experience'))
+            ->assertOk()
+            ->assertSee('Choose how much of Zazu you want surfaced.');
+
+        $this->post(route('onboarding.experience.store'), [
+            'experience_level' => 'advanced',
+        ])->assertRedirect(route('onboarding.business'));
+
+        $this->assertSame(
+            'advanced',
+            $user->businesses()->whereKey($business->id)->first()->pivot->experience_level
+        );
+    }
+
 }
