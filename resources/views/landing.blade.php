@@ -34,29 +34,7 @@
         @media(max-width:920px){.hero{grid-template-columns:1fr;min-height:auto;padding-top:60px}.bento{grid-template-columns:1fr}.feature.large{grid-row:auto}.section-head{display:block}.intro{margin-top:15px}.closing-box{display:block}.closing-box .btn{margin-top:20px}}
         @media(max-width:640px){.site{width:min(100% - 24px,1380px)}.top{height:auto;padding:14px 0}.topnav a:not(.launch){display:none}.topnav .account-state{display:none}.hero{padding:48px 0 65px}h1{font-size:48px}.telemetry{grid-template-columns:repeat(2,1fr)}.telemetry div:nth-child(2n){border-right:0}.record{grid-template-columns:1fr}.compare{grid-template-columns:1fr}.compare>article+article{border-left:0;border-top:1px solid #334155}footer{display:block}.footer-right{margin-top:8px}}
 
-        /* Public authentication: one reusable dialog, no standalone public auth page UI. */
-        .topnav .register,.topnav .login{font:inherit;cursor:pointer}.topnav button{border:0}.topnav .register{padding:10px 13px;background:#E8F1FF;color:var(--blue);border:1px solid #B7D0F1}.topnav .login{padding:10px 13px;background:#fff;color:var(--ink);border:1px solid var(--line)}
-        .zazu-public-auth{width:min(94vw,620px);max-width:620px;max-height:calc(100vh - 28px);padding:0;border:1px solid #CBD5E1;border-radius:16px;background:#fff;color:var(--ink);box-shadow:0 28px 90px rgba(15,23,42,.24);overflow:hidden}
-        .zazu-public-auth::backdrop{background:rgba(15,23,42,.48);backdrop-filter:blur(3px)}
-        .zazu-public-auth-panel{display:flex;flex-direction:column;max-height:calc(100vh - 28px)}
-        .zazu-public-auth-head{display:flex;align-items:flex-start;justify-content:space-between;gap:18px;padding:24px 24px 18px;border-bottom:1px solid var(--line)}
-        .zazu-public-auth-kicker{display:block;color:var(--blue);font:500 9px "DM Mono";letter-spacing:.12em;text-transform:uppercase}
-        .zazu-public-auth-head h2{margin:8px 0 5px;font-size:25px;letter-spacing:-.04em}.zazu-public-auth-head p{margin:0;color:var(--muted);font-size:11px;line-height:1.6}
-        .zazu-public-auth-close{width:34px;height:34px;flex:0 0 34px;border:1px solid var(--line);border-radius:8px;background:#fff;color:var(--muted);font-size:22px;line-height:1;cursor:pointer}.zazu-public-auth-close:hover{color:var(--ink);border-color:#94A3B8;background:#F8FAFC}
-        .zazu-public-auth-tabs{display:grid;grid-template-columns:1fr 1fr;gap:6px;padding:10px 24px;border-bottom:1px solid var(--line);background:#F8FAFC}
-        .zazu-public-auth-tab{min-height:40px;border:1px solid transparent;border-radius:7px;background:transparent;color:var(--muted);font-size:11px;font-weight:800;cursor:pointer}.zazu-public-auth-tab[aria-selected="true"]{border-color:#B7D0F1;background:#fff;color:var(--blue);box-shadow:0 2px 8px rgba(15,23,42,.06)}
-        .zazu-public-auth-body{overflow:auto;padding:24px}
-        .zazu-public-auth-body section[hidden]{display:none}
-        .zazu-public-auth-state{display:flex;align-items:center;gap:7px;color:var(--blue);font:500 9px "DM Mono";letter-spacing:.06em;text-transform:uppercase}.zazu-public-auth-state span{width:6px;height:6px;border-radius:50%;background:#16A34A;box-shadow:0 0 0 4px rgba(22,163,74,.10)}
-        .zazu-public-auth-body h3{margin:10px 0 7px;font-size:27px;letter-spacing:-.045em}.zazu-public-auth-copy{margin:0 0 18px;color:var(--muted);font-size:11px;line-height:1.6}
-        .zazu-public-auth-form{display:grid;gap:14px}.zazu-public-auth-field{display:grid;gap:6px}.zazu-public-auth-field label{font-size:10px;font-weight:800;color:var(--ink)}.zazu-public-auth-field input{width:100%;min-height:42px;padding:0 12px;border:1px solid #9EA7BC;border-radius:7px;background:#fff;color:var(--ink);font:inherit;font-size:12px}.zazu-public-auth-field input:focus{outline:2px solid rgba(37,99,235,.24);outline-offset:1px;border-color:#2563EB}.zazu-public-auth-field small{color:var(--muted);font-size:9px;line-height:1.45}
-        .zazu-public-auth-password{display:grid;grid-template-columns:1fr auto}.zazu-public-auth-password input{border-radius:7px 0 0 7px}.zazu-public-auth-password button{min-width:58px;border:1px solid #9EA7BC;border-left:0;border-radius:0 7px 7px 0;background:#F8FAFC;color:var(--blue);font-size:10px;font-weight:800;cursor:pointer}
-        .zazu-public-auth-options{display:flex;justify-content:space-between;align-items:center;gap:12px;color:var(--muted);font-size:9px}.zazu-public-auth-options label{display:flex;align-items:center;gap:6px}.zazu-public-auth-options a,.zazu-public-auth-switch button{border:0;padding:0;background:none;color:var(--blue);font:inherit;font-weight:800;cursor:pointer;text-decoration:none}.zazu-public-auth-options a:hover,.zazu-public-auth-switch button:hover{text-decoration:underline}
-        .zazu-public-auth-submit{min-height:44px;width:100%;display:flex;align-items:center;justify-content:center;gap:10px;border:1px solid var(--blue);border-radius:7px;background:var(--blue);color:#fff;font-size:11px;font-weight:800;cursor:pointer;box-shadow:0 9px 20px rgba(30,64,175,.17)}.zazu-public-auth-submit:hover{background:#1747A5}.zazu-public-auth-submit span{font-size:14px}
-        .zazu-public-auth-grid{display:grid;grid-template-columns:1fr 1fr;gap:13px}.zazu-public-auth-alert{margin:0 0 14px;padding:10px 11px;border:1px solid #E7A2A9;border-radius:7px;background:#FDEBEC;color:#8E3847;font-size:10px;line-height:1.5}.zazu-public-auth-error{color:#A12B37;font-size:9px;line-height:1.35}.zazu-public-auth-switch{margin:16px 0 0;color:var(--muted);text-align:center;font-size:10px}
-        @media(max-width:640px){.zazu-public-auth{width:calc(100vw - 16px);max-height:calc(100vh - 16px);border-radius:14px}.zazu-public-auth-panel{max-height:calc(100vh - 16px)}.zazu-public-auth-head{padding:19px 17px 15px}.zazu-public-auth-head h2{font-size:22px}.zazu-public-auth-tabs{padding:8px 17px}.zazu-public-auth-body{padding:18px 17px}.zazu-public-auth-grid{grid-template-columns:1fr}.zazu-public-auth-body h3{font-size:24px}.zazu-public-auth-options{align-items:flex-start;flex-direction:column}}
-
-    
+        /* Public authentication modal. */
         .auth-modal{width:min(520px,calc(100% - 24px));max-width:none;padding:0;border:0;border-radius:16px;background:transparent;box-shadow:0 30px 90px rgba(15,23,42,.28);color:var(--ink)}.auth-modal::backdrop{background:rgba(15,23,42,.58);backdrop-filter:blur(5px)}.auth-modal-panel{position:relative;padding:30px;background:#fff;border:1px solid rgba(226,232,240,.95);border-radius:16px}.auth-modal-close{position:absolute;top:14px;right:14px;width:36px;height:36px;border:1px solid var(--line);border-radius:9px;background:#fff;color:var(--muted);cursor:pointer;font-size:18px;line-height:1}.auth-modal-close:hover{color:var(--ink);background:var(--canvas)}.auth-modal-kicker{color:var(--blue);font:500 9px "DM Mono";letter-spacing:.12em;text-transform:uppercase}.auth-modal h2{margin:7px 45px 6px 0;font-size:28px;letter-spacing:-.045em}.auth-modal-copy{margin:0 40px 22px 0;color:var(--muted);font-size:12px;line-height:1.6}.auth-modal-form{display:grid;gap:14px}.auth-modal-field{display:grid;gap:6px}.auth-modal-field label{font-size:11px;font-weight:800}.auth-modal-field input{width:100%;min-height:44px;padding:0 12px;border:1px solid var(--line);border-radius:8px;background:#fff;color:var(--ink);font:500 13px Manrope,ui-sans-serif,system-ui,sans-serif}.auth-modal-field input:focus{outline:3px solid rgba(59,130,246,.18);border-color:var(--sapphire)}.auth-modal-password{position:relative}.auth-modal-password input{padding-right:68px}.auth-modal-password button{position:absolute;right:6px;top:6px;height:32px;padding:0 9px;border:0;border-radius:6px;background:var(--soft);color:var(--blue);font:700 10px Manrope;cursor:pointer}.auth-modal-error{margin:0;color:#B91C1C;font-size:10px;line-height:1.45}.auth-modal-help{margin-top:-5px;color:var(--muted);font-size:10px;line-height:1.45}.auth-modal-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}.auth-modal-submit{width:100%;border:0;cursor:pointer}.auth-modal-switch{margin-top:18px;padding-top:16px;border-top:1px solid var(--line);text-align:center;color:var(--muted);font-size:11px}.auth-modal-switch button,.auth-modal-forgot{border:0;background:none;padding:0;color:var(--blue);font:800 11px Manrope;cursor:pointer}.auth-modal-forgot{display:block;margin-top:9px;text-align:right}.auth-modal[open]{animation:authModalIn 140ms ease-out}@keyframes authModalIn{from{opacity:0;transform:translateY(8px) scale(.99)}to{opacity:1;transform:none}}@media(max-width:640px){.auth-modal{width:calc(100% - 16px);margin:auto}.auth-modal-panel{padding:24px 18px 20px;border-radius:14px}.auth-modal-grid{grid-template-columns:1fr}.auth-modal h2{font-size:25px}.auth-modal-copy{margin-right:30px}.auth-modal-close{top:10px;right:10px}.auth-modal::backdrop{backdrop-filter:none}}@media(prefers-reduced-motion:reduce){.auth-modal[open]{animation:none}}
     </style>
 </head>
@@ -64,12 +42,12 @@
 <div class="site">
 <header class="top">
     <a href="{{ url('/') }}" class="brand"><span class="mark">Z</span><span><strong>ZAZU</strong><span>Event Management Platform</span></span></a>
-    <nav class="topnav" aria-label="Public navigation"><a href="#capabilities">How it works</a><a href="#difference">Why Zazu</a>@if(!$isAuthenticated)<button type="button" class="register" data-auth-open="register">Register</button><button type="button" class="login" data-auth-open="login">Log in</button>@elseif($hasActiveWorkspace)<span class="account-state">You’re signed in</span><a class="launch" href="{{ route('dashboard') }}">Open workspace <span>↗</span></a><form method="POST" action="{{ route('logout') }}" class="topnav-form">@csrf<button type="submit" class="login">Sign out</button></form>@else<span class="account-state">You’re signed in</span><a class="launch" href="{{ route('workspace.recovery') }}">Set up workspace <span>↗</span></a><form method="POST" action="{{ route('logout') }}" class="topnav-form">@csrf<button type="submit" class="login">Sign out</button></form>@endif
+    <nav class="topnav" aria-label="Public navigation"><a href="#capabilities">How it works</a><a href="#difference">Why Zazu</a>@if(!$isAuthenticated)<button type="button" class="register" data-auth-modal-open="register">Register</button><button type="button" class="login" data-auth-modal-open="login">Log in</button>@elseif($hasActiveWorkspace)<span class="account-state">You’re signed in</span><a class="launch" href="{{ route('dashboard') }}">Open workspace <span>↗</span></a><form method="POST" action="{{ route('logout') }}" class="topnav-form">@csrf<button type="submit" class="login">Sign out</button></form>@else<span class="account-state">You’re signed in</span><a class="launch" href="{{ route('workspace.recovery') }}">Set up workspace <span>↗</span></a><form method="POST" action="{{ route('logout') }}" class="topnav-form">@csrf<button type="submit" class="login">Sign out</button></form>@endif
 </nav>
 </header>
 <main>
 <section class="hero">
-<div><div class="eyebrow">Built for South African event businesses</div><h1>Run the work. <em>Know the numbers.</em></h1><p class="hero-copy">From a one-person catering business to a growing events company, keep customers, bookings, quotes, suppliers, equipment, preparation, costs and payments connected to the job—without stitching the business together across WhatsApp, notebooks and spreadsheets.</p><div class="actions">@if(!$isAuthenticated)<button type="button" class="btn primary" data-auth-open="register">Create your workspace <span>→</span></button><button type="button" class="btn" data-auth-open="login">Log in</button>@elseif($hasActiveWorkspace)<span class="account-state">You’re signed in · {{ $business->name }}</span><a class="btn primary" href="{{ route('dashboard') }}">Open workspace <span>→</span></a><form method="POST" action="{{ route('logout') }}" class="topnav-form">@csrf<button type="submit" class="btn">Sign out</button></form>@else<span class="account-state">You’re signed in</span><a class="btn primary" href="{{ route('workspace.recovery') }}">Set up workspace <span>→</span></a><form method="POST" action="{{ route('logout') }}" class="topnav-form">@csrf<button type="submit" class="btn">Sign out</button></form>@endif
+<div><div class="eyebrow">Built for South African event businesses</div><h1>Run the work. <em>Know the numbers.</em></h1><p class="hero-copy">From a one-person catering business to a growing events company, keep customers, bookings, quotes, suppliers, equipment, preparation, costs and payments connected to the job—without stitching the business together across WhatsApp, notebooks and spreadsheets.</p><div class="actions">@if(!$isAuthenticated)<button type="button" class="btn primary" data-auth-modal-open="register">Create your workspace <span>→</span></button><button type="button" class="btn" data-auth-modal-open="login">Log in</button>@elseif($hasActiveWorkspace)<span class="account-state">You’re signed in · {{ $business->name }}</span><a class="btn primary" href="{{ route('dashboard') }}">Open workspace <span>→</span></a><form method="POST" action="{{ route('logout') }}" class="topnav-form">@csrf<button type="submit" class="btn">Sign out</button></form>@else<span class="account-state">You’re signed in</span><a class="btn primary" href="{{ route('workspace.recovery') }}">Set up workspace <span>→</span></a><form method="POST" action="{{ route('logout') }}" class="topnav-form">@csrf<button type="submit" class="btn">Sign out</button></form>@endif
 <a class="btn" href="#capabilities">See how it works</a></div><div class="hero-note">SOUTH AFRICAN BUSINESS · EVENTS · CATERING · HIRE · COMMERCIAL · CONTROL</div></div>
 <div class="control-card" aria-label="Live workspace preview">
 <div class="hero-photo" role="img" aria-label="Catering event table placeholder image" style="background-image:url('https://images.unsplash.com/photo-1576842546422-60562b9242ae?auto=format&fit=crop&w=1600&q=85');"><span>Replace with your event photography</span></div>
@@ -84,122 +62,8 @@
 <section class="section" id="capabilities"><div class="section-head"><div><div class="eyebrow">Made for the work</div><h2>One job. A clear view from booking to payment.</h2></div><p class="intro">Start with the basics, then bring more of the operation together as the business grows—from customer and quote through preparation, purchasing, costs and finance.</p></div>
 <div class="bento"><article class="feature large"><div class="feature-image" style="background-image:url('https://images.unsplash.com/photo-1773409258502-a9e77a8d80fe?auto=format&fit=crop&w=1200&q=85');"><span>Placeholder</span></div><span class="num">01 / OPERATIONS</span><h3>Keep the booking together.</h3><p>Customer details, event dates, requirements, quotes, preparation and costs stay connected to the work they belong to.</p></article><article class="feature mini"><div class="feature-image compact" style="background-image:url('https://images.unsplash.com/photo-1768508948334-541161d1cb5c?auto=format&fit=crop&w=900&q=85');"><span>Placeholder</span></div><span class="num">02 / RESOURCES</span><h3>Know what you need before the event.</h3><p>Track services, equipment, stock, suppliers and purchasing in the same operational context.</p></article><article class="feature mini"><span class="num">03 / CONTROL</span><h3>Keep money tied to the work.</h3><p>See invoices, payments, expenses and costs with a clearer line back to the work that created them.</p></article></div></section>
 <section class="section" id="difference"><div class="section-head"><div><div class="eyebrow">A better working record</div><h2>Replace scattered admin with one working record.</h2></div></div><div class="compare"><article><h3>Without a central record</h3><ul><li>WhatsApp messages, notebooks and spreadsheets each hold part of the job.</li><li>Quotes and preparation details can drift away from execution.</li><li>Equipment and supplier decisions are easy to lose in the admin.</li><li>Costs can reach finance long after the operational decision.</li></ul></article><article><h3>With Zazu</h3><ul><li>One job record becomes the reference point for the work.</li><li>Operational and commercial context stays connected.</li><li>Purchasing and costs can be traced back to the work.</li><li>Finance has a clearer line back to what happened on the job.</li></ul></article></div></section>
-<section class="closing"><div class="closing-box"><div><div class="eyebrow closing-eyebrow">Ready for the next booking?</div><h2>{{ $hasActiveWorkspace ? 'Open your workspace.' : 'Restore your workspace access.' }}</h2><p>{{ $hasActiveWorkspace ? 'You are signed in. Open your workspace when you are ready.' : 'Your account is signed in. Finish workspace setup to continue.' }}</p></div><div class="actions">@if(!$isAuthenticated)<button type="button" class="btn" data-auth-open="register">Register →</button><button type="button" class="btn" data-auth-open="login">Log in →</button>@else
+<section class="closing"><div class="closing-box"><div><div class="eyebrow closing-eyebrow">Ready for the next booking?</div><h2>{{ $hasActiveWorkspace ? 'Open your workspace.' : 'Restore your workspace access.' }}</h2><p>{{ $hasActiveWorkspace ? 'You are signed in. Open your workspace when you are ready.' : 'Your account is signed in. Finish workspace setup to continue.' }}</p></div><div class="actions">@if(!$isAuthenticated)<button type="button" class="btn" data-auth-modal-open="register">Register →</button><button type="button" class="btn" data-auth-modal-open="login">Log in →</button>@else
 @if($hasActiveWorkspace)<a class="btn" href="{{ route('dashboard') }}">Open workspace →</a>@else<a class="btn" href="{{ route('workspace.recovery') }}">Set up workspace →</a>@endif<form method="POST" action="{{ route('logout') }}" class="topnav-form">@csrf<button type="submit" class="btn">Sign out</button></form>@endif</div></div></section>
-
-<dialog class="zazu-public-auth" data-public-auth data-auth-initial="{{ request('auth') ?: session('auth_modal') }}" aria-labelledby="zazu-auth-dialog-title">
-    <div class="zazu-public-auth-panel">
-        <header class="zazu-public-auth-head">
-            <div>
-                <span class="zazu-public-auth-kicker">ZAZU ACCESS</span>
-                <h2 id="zazu-auth-dialog-title">Keep the business moving.</h2>
-                <p>Sign in to your workspace or create a new one without leaving the Zazu site.</p>
-            </div>
-            <button type="button" class="zazu-public-auth-close" data-auth-close aria-label="Close sign in or registration window">×</button>
-        </header>
-
-        <div class="zazu-public-auth-tabs" role="tablist" aria-label="Zazu account access">
-            <button type="button" class="zazu-public-auth-tab" data-auth-tab="login" role="tab" aria-selected="true" aria-controls="zazu-auth-login">Log in</button>
-            <button type="button" class="zazu-public-auth-tab" data-auth-tab="register" role="tab" aria-selected="false" aria-controls="zazu-auth-register">Create workspace</button>
-        </div>
-
-        <div class="zazu-public-auth-body">
-            <section id="zazu-auth-login" data-auth-panel="login" role="tabpanel" aria-labelledby="zazu-auth-login-tab">
-                <div class="zazu-public-auth-state"><span></span> Workspace access</div>
-                <h3>Welcome back.</h3>
-                <p class="zazu-public-auth-copy">Use your Zazu username or email address to continue.</p>
-
-                @if(session('auth_modal') === 'login' && $errors->any())
-                    <div class="zazu-public-auth-alert" role="alert">{{ $errors->first() }}</div>
-                @endif
-
-                <form method="POST" action="{{ route('login.store') }}" class="zazu-public-auth-form">
-                    @csrf
-                    <div class="zazu-public-auth-field">
-                        <label for="public-identifier">Username or email</label>
-                        <input id="public-identifier" name="identifier" type="text" value="{{ old('identifier') }}" autocomplete="username" inputmode="text" spellcheck="false" autocapitalize="none" required>
-                    </div>
-
-                    <div class="zazu-public-auth-field">
-                        <label for="public-login-password">Password</label>
-                        <div class="zazu-public-auth-password">
-                            <input id="public-login-password" name="password" type="password" autocomplete="current-password" required>
-                            <button type="button" data-auth-password-toggle="public-login-password" aria-label="Show password">Show</button>
-                        </div>
-                    </div>
-
-                    <div class="zazu-public-auth-options">
-                        <label><input type="checkbox" name="remember" value="1"> <span>Keep me signed in</span></label>
-                        <a href="{{ route('password.request') }}">Forgot password?</a>
-                    </div>
-
-                    <button type="submit" class="zazu-public-auth-submit">Sign in <span aria-hidden="true">→</span></button>
-                </form>
-
-                <p class="zazu-public-auth-switch">New to Zazu? <button type="button" data-auth-tab="register">Create your workspace</button></p>
-            </section>
-
-            <section id="zazu-auth-register" data-auth-panel="register" role="tabpanel" aria-labelledby="zazu-auth-register-tab" hidden>
-                <div class="zazu-public-auth-state"><span></span> Step 1 · Create workspace</div>
-                <h3>Set up your Zazu workspace.</h3>
-                <p class="zazu-public-auth-copy">Create your owner account and choose the username you will use to sign in.</p>
-
-                @if(session('auth_modal') === 'register' && $errors->any())
-                    <div class="zazu-public-auth-alert" role="alert">{{ $errors->first() }}</div>
-                @endif
-
-                <form method="POST" action="{{ route('register.store') }}" class="zazu-public-auth-form">
-                    @csrf
-                    <div class="zazu-public-auth-grid">
-                        <div class="zazu-public-auth-field">
-                            <label for="public-name">Your name</label>
-                            <input id="public-name" name="name" type="text" value="{{ old('name') }}" autocomplete="name" required>
-                            @error('name') <div class="zazu-public-auth-error">{{ $message }}</div> @enderror
-                        </div>
-                        <div class="zazu-public-auth-field">
-                            <label for="public-username">Username</label>
-                            <input id="public-username" name="username" type="text" value="{{ old('username') }}" autocomplete="username" autocapitalize="none" spellcheck="false" maxlength="32" pattern="[A-Za-z0-9][A-Za-z0-9._-]{2,31}" required>
-                            <small>3–32 characters. Letters, numbers, dots, underscores and hyphens.</small>
-                            @error('username') <div class="zazu-public-auth-error">{{ $message }}</div> @enderror
-                        </div>
-                        <div class="zazu-public-auth-field">
-                            <label for="public-business-name">Business name</label>
-                            <input id="public-business-name" name="business_name" type="text" value="{{ old('business_name') }}" autocomplete="organization" required>
-                            @error('business_name') <div class="zazu-public-auth-error">{{ $message }}</div> @enderror
-                        </div>
-                        <div class="zazu-public-auth-field">
-                            <label for="public-email">Email address</label>
-                            <input id="public-email" name="email" type="email" value="{{ old('email') }}" autocomplete="email" required>
-                            @error('email') <div class="zazu-public-auth-error">{{ $message }}</div> @enderror
-                        </div>
-                        <div class="zazu-public-auth-field">
-                            <label for="public-register-password">Password</label>
-                            <div class="zazu-public-auth-password">
-                                <input id="public-register-password" name="password" type="password" autocomplete="new-password" minlength="8" required>
-                                <button type="button" data-auth-password-toggle="public-register-password" aria-label="Show password">Show</button>
-                            </div>
-                            @error('password') <div class="zazu-public-auth-error">{{ $message }}</div> @enderror
-                        </div>
-                        <div class="zazu-public-auth-field">
-                            <label for="public-password-confirmation">Confirm password</label>
-                            <div class="zazu-public-auth-password">
-                                <input id="public-password-confirmation" name="password_confirmation" type="password" autocomplete="new-password" minlength="8" required>
-                                <button type="button" data-auth-password-toggle="public-password-confirmation" aria-label="Show password">Show</button>
-                            </div>
-                            @error('password_confirmation') <div class="zazu-public-auth-error">{{ $message }}</div> @enderror
-                        </div>
-                    </div>
-
-                    <button type="submit" class="zazu-public-auth-submit">Create workspace <span aria-hidden="true">→</span></button>
-                </form>
-
-                <p class="zazu-public-auth-switch">Already have an account? <button type="button" data-auth-tab="login">Sign in</button></p>
-            </section>
-        </div>
-    </div>
-</dialog>
-
-</main>
 
 <dialog class="auth-modal" data-auth-modal aria-modal="true" aria-labelledby="auth-login-title" aria-describedby="auth-login-copy">
     <div class="auth-modal-panel">
