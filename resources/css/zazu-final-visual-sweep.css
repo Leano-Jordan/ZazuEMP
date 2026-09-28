@@ -3529,3 +3529,30 @@ body[data-zazu-route^="quotes."] .zazu-topbar-actions .zazu-command-trigger:focu
     .zazu-reports-page .zazu-metric-link { min-height:100px; }
     .zazu-settings-page .zazu-form-main { width:100%; }
 }
+
+
+/* COMMERCIAL CONTROL PAGES — CYCLE 2: balanced surfaces */
+.zazu-reports-page .zazu-metric-link,
+.zazu-purchasing-page .zazu-list-item,
+.zazu-suppliers-page .zazu-list-item {
+    background: var(--zazu-surface);
+}
+.zazu-reports-page .zazu-metric-link:nth-child(even),
+.zazu-purchasing-page .zazu-list-item:nth-of-type(even),
+.zazu-suppliers-page .zazu-list-item:nth-of-type(even) {
+    background: color-mix(in srgb, var(--zazu-surface-2) 40%, var(--zazu-surface));
+}
+.zazu-reports-page .zazu-metric-link:hover,
+.zazu-purchasing-page .zazu-list-item:hover,
+.zazu-suppliers-page .zazu-list-item:hover {
+    background: color-mix(in srgb, var(--zazu-primary-soft) 70%, var(--zazu-surface));
+}
+.zazu-settings-page .zazu-form-section {
+    background: color-mix(in srgb, var(--zazu-surface) 88%, var(--zazu-surface-2));
+}
+.zazu-settings-page .zazu-form-section-head {
+    background: var(--zazu-surface-2);
+}
+.zazu-settings-page .zazu-form-section + .zazu-form-section {
+    border-top-color: var(--zazu-border-strong);
+}
