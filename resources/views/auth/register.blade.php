@@ -4,7 +4,7 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Create workspace · Zazu</title>
-    @vite(['resources/css/app.css', 'resources/js/app.js'])
+    @vite(['resources/css/app.css', 'resources/css/zazu-final-visual-sweep.css', 'resources/js/app.js'])
 </head>
 <body class="zazu-auth-shell">
     <main class="zazu-auth-frame zazu-auth-dual zazu-auth-state-register" data-auth-frame>
