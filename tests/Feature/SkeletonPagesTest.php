@@ -253,6 +253,19 @@ class SkeletonPagesTest extends TestCase
         $this->assertTrue($asset->exists);
     }
 
+    public function test_app_shell_uses_flat_navigation_and_richer_account_surface(): void
+    {
+        $response = $this->get(route('dashboard'));
+
+        $response->assertOk()
+            ->assertDontSee('Active workspace')
+            ->assertDontSee('zazu-nav-icon')
+            ->assertDontSee('zazu-nav-arrow')
+            ->assertSee('Signed in')
+            ->assertSee('Experience preference')
+            ->assertSee('Business settings');
+    }
+
     public function test_dashboard_links_to_every_top_level_module(): void
     {
         $response = $this->get(route('dashboard'));
