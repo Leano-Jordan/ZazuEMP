@@ -9,7 +9,7 @@
             <h2 class="zazu-command-title">Workspaces</h2>
             <p class="zazu-command-copy">Each event or job has one operational record. Use the quick views below instead of typing filter values.</p>
         </div>
-        <div class="zazu-command-meta"><div class="zazu-command-meta-label">Records</div><div class="zazu-command-meta-value">{{ $events->total() }}</div></div>
+        <div class="zazu-command-meta zazu-command-meta-live"><span class="zazu-status-dot" aria-hidden="true"></span><div><div class="zazu-command-meta-label">Operational records</div><div class="zazu-command-meta-value">{{ $events->total() }}</div></div></div>
     </section>
 
     <div class="zazu-workload-grid">
@@ -43,7 +43,8 @@
         <div class="zazu-card-header">
             <div class="zazu-eyebrow">Records</div>
             <div class="zazu-card-title mt-1">Work list</div>
-            <div class="zazu-card-description">The row contains one job. The right-hand area is scheduling and actions, not another record.</div>
+            <div class="zazu-card-description">One row equals one job. Scan status first, schedule second, then take action.</div>
+            <div class="zazu-list-legend"><span><i class="zazu-legend-dot zazu-legend-primary"></i>Record</span><span><i class="zazu-legend-dot zazu-legend-muted"></i>Schedule</span><span><i class="zazu-legend-dot zazu-legend-action"></i>Actions</span></div>
         </div>
 
         @if ($events->count())
