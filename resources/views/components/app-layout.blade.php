@@ -49,22 +49,22 @@
                 <div class="zazu-nav-stack zazu-nav-primary">
                     <a href="{{ route('dashboard') }}" class="zazu-nav-link {{ request()->routeIs('dashboard') ? 'active' : '' }}" @if(request()->routeIs('dashboard')) aria-current="page" @endif><span>Dashboard</span></a>
                     @if($can('work.view') || $can('capabilities.view') || $can('quotes.view') || $can('calendar.view'))
-                        <a href="{{ $can('work.view') ? route('work.index') : ($can('capabilities.view') ? route('capabilities.index') : ($can('quotes.view') ? route('quotes.index') : route('calendar.index'))) }}" class="zazu-nav-link {{ request()->routeIs('work.*','capabilities.*','quotes.*','calendar.*') ? 'active' : '' }}">Operations</a>
+                        <a href="{{ $can('work.view') ? route('work.index') : ($can('capabilities.view') ? route('capabilities.index') : ($can('quotes.view') ? route('quotes.index') : route('calendar.index'))) }}" class="zazu-nav-link {{ request()->routeIs('work.*','capabilities.*','quotes.*','calendar.*') ? 'active' : '' }}"><span class="zazu-nav-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 19V9m7 10V5m7 14v-7"></path><path d="M3 19h18"></path></svg></span><span class="zazu-nav-label">Operations</span></a>
                     @endif
                     @if($can('customers.view'))
-                        <a href="{{ route('customers.index') }}" class="zazu-nav-link {{ request()->routeIs('customers.*') ? 'active' : '' }}">Customers</a>
+                        <a href="{{ route('customers.index') }}" class="zazu-nav-link {{ request()->routeIs('customers.*') ? 'active' : '' }}"><span class="zazu-nav-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="9" cy="8" r="3"></circle><path d="M3.5 19a5.5 5.5 0 0 1 11 0"></path><path d="M16 11a3 3 0 0 1 4 2.8M16 16.5a5 5 0 0 1 4.5 2.5"></path></svg></span><span class="zazu-nav-label">Customers</span></a>
                     @endif
                     @if($can('finance.view'))
-                        <a href="{{ route('finance.index') }}" class="zazu-nav-link {{ request()->routeIs('finance.*') ? 'active' : '' }}">Finance</a>
+                        <a href="{{ route('finance.index') }}" class="zazu-nav-link {{ request()->routeIs('finance.*') ? 'active' : '' }}"><span class="zazu-nav-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h16v12H4z"></path><path d="M8 7V5h8v2M4 11h16"></path><path d="M9 15h6"></path></svg></span><span class="zazu-nav-label">Finance</span></a>
                     @endif
                     @if($can('purchasing.view') || $can('suppliers.view') || $can('inventory.view') || $can('assets.view'))
-                        <a href="{{ $can('purchasing.view') ? route('purchasing.index') : ($can('suppliers.view') ? route('suppliers.index') : ($can('inventory.view') ? route('inventory.index') : route('assets.index'))) }}" class="zazu-nav-link {{ request()->routeIs('purchasing.*','suppliers.*','inventory.*','assets.*') ? 'active' : '' }}">Resources</a>
+                        <a href="{{ $can('purchasing.view') ? route('purchasing.index') : ($can('suppliers.view') ? route('suppliers.index') : ($can('inventory.view') ? route('inventory.index') : route('assets.index'))) }}" class="zazu-nav-link {{ request()->routeIs('purchasing.*','suppliers.*','inventory.*','assets.*') ? 'active' : '' }}"><span class="zazu-nav-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m4 8 8-4 8 4-8 4-8-4Z"></path><path d="m4 12 8 4 8-4M4 16l8 4 8-4"></path></svg></span><span class="zazu-nav-label">Resources</span></a>
                     @endif
                     @if($can('reports.view'))
-                        <a href="{{ route('reports.index') }}" class="zazu-nav-link {{ request()->routeIs('reports.*') ? 'active' : '' }}">Reports</a>
+                        <a href="{{ route('reports.index') }}" class="zazu-nav-link {{ request()->routeIs('reports.*') ? 'active' : '' }}"><span class="zazu-nav-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 19V9M12 19V5M19 19v-7"></path></svg></span><span class="zazu-nav-label">Reports</span></a>
                     @endif
                     @if($isOwner)
-                        <a href="{{ route('settings.index') }}" class="zazu-nav-link {{ request()->routeIs('settings.*') ? 'active' : '' }}">Settings</a>
+                        <a href="{{ route('settings.index') }}" class="zazu-nav-link {{ request()->routeIs('settings.*') ? 'active' : '' }}"><span class="zazu-nav-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="3"></circle><path d="M19 12a7 7 0 0 0-.3-2l-2-1.3-2-3.4-2.3 1a7 7 0 0 0-3.4-2L11 4.3 12 2l1 2.3a7 7 0 0 0 3.4 2l2.3-1 2 3.4-2 1.3a7 7 0 0 0 0 4l2 1.3-2 3.4-2.3-1a7 7 0 0 0-3.4 2L13 22l-2-2.3a7 7 0 0 0-3.4-2l-2.3 1-2-3.4 2-1.3a7 7 0 0 0 0-4L3.3 8.7l2-3.4 2.3 1a7 7 0 0 0 3.4-2L11 2"></path></svg></span><span class="zazu-nav-label">Settings</span></a>
                     @endif
                 </div>
             </nav>
