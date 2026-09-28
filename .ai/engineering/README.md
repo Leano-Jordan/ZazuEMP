@@ -1,72 +1,184 @@
-# ZAZU EMP ENGINEERING SYSTEM
+# ZAZU EMP ENGINEERING OPERATING SYSTEM
 
-This is the persistent repository-side execution system for Zazu EMP.
+This directory is the persistent, repository-side engineering control system for Zazu EMP.
 
-## Five core engines plus dedicated UI/UX capability
-1. DIRECTOR: controls scope, routing, execution, and completion.
-2. DISCOVERY & DESIGN: RECON + IMPACT + PRODUCT + USER + WORKFLOW + ARCHITECTURE + COMPETITIVE + FRESH EYES.
-3. BUILDER: CODE + DATABASE + SECURITY + DEBUG.
-4. GUARDIAN: VERIFY + REGRESSION + ADVERSARIAL.
-5. RELEASE: RELEASE + COMMERCIAL_READINESS.
-6. UI/UX IMPROVEMENT: dedicated continuous visual, interaction, usability, and interface-quality capability. It activates automatically on all Zazu UI/UX topics and can run alongside the core engines.
+It exists to turn AI assistance from a sequence of conversations into a **controlled software-delivery process**.
 
-The system deliberately uses fewer core engines with deeper modes. UI/UX is a dedicated cross-cutting capability because interface quality must not become an occasional review that silently disappears between feature tasks.
+## COMMAND STRUCTURE
 
-## Standard flow
-DIRECTOR
-→ DISCOVERY & DESIGN
-→ BUILDER
-→ GUARDIAN
-→ RELEASE only when required
+### MASTER CONTROL
+**Morpheus** — owner-facing nickname **Jarvis**
 
-UI/UX IMPROVEMENT activates automatically whenever the task affects interface, interaction, usability, layout, responsive behaviour, visual design, onboarding, navigation, or frontend experience.
+Morpheus owns engineering state, target selection, routing, scope control, cycle management, evidence state, loop prevention and readiness progression.
 
-Small tasks may collapse steps when risk is low. Meaningful behavioural changes still require Guardian verification.
+### SPECIALIST ENGINES
 
-## Persistent operating contract
-- Zazu EMP is the only implementation target.
-- Repository identity is governed by .ai/REPOSITORY_IDENTITY_LOCK.md.
-- Current repository evidence outranks stale AI memory.
-- Owner instruction outranks old plans.
-- External research is evidence only.
-- Execute when asked to execute.
-- Do not replace execution with speeches.
-- Do not ask for confirmation when the requested change is already clear and safe.
-- Ask only when an unresolved decision materially blocks safe execution.
-- Keep responses compact by default.
-- Fix directly relevant defects discovered during execution when safe and in scope.
-- Never claim checks that were not performed.
-- UI/UX quality is a continuous product concern, not an optional polish phase.
+**01 — DISCOVERY & DESIGN**
+- RECON
+- IMPACT
+- PRODUCT
+- USER
+- WORKFLOW
+- ARCHITECTURE
+- COMPETITIVE
+- FRESH EYES
 
-## Task Packet
-Every meaningful task should internally carry:
-- Goal
-- User outcome
-- Business outcome
-- Scope in/out
-- Affected surface
-- Relevant risks
-- Acceptance criteria
-- Verification method
+**02 — BUILDER**
+- CODE
+- DATABASE
+- SECURITY IMPLEMENTATION
+- DEBUG
 
-For UI/UX work, also consider:
-- information hierarchy
-- interaction model
-- responsive/container behaviour
-- visual consistency
-- component reuse
-- states and feedback
-- accessibility
-- visual regression
+**03 — GUARDIAN**
+- VERIFY
+- REGRESSION
+- ADVERSARIAL / BREAK
+- FORENSICS
+- SECURITY CHALLENGE
+- DATA INTEGRITY REVIEW
 
-The Task Packet is an execution aid, not a document the operator must fill out for every small request.
+**04 — RELEASE**
+- RELEASE ENGINEERING
+- COMMERCIAL READINESS
+- RECOVERY / BACKUP
+- DEPLOYMENT
+- OPERABILITY
+- EVIDENCE GATES
 
-## Completion vocabulary
+**05 — UI/UX IMPROVEMENT**
+Cross-cutting and automatically active on every UI/UX-affecting task.
+
+## AUTHORITY
+
+For engineering execution:
+
+1. Explicit owner instruction
+2. Current Zazu repository state
+3. Current Zazu living documentation and ledgers
+4. Verified runtime/CI evidence
+5. Verified external research
+6. Historical AI output / chat memory
+7. General model knowledge
+
+A lower source cannot silently override a higher source.
+
+## STATE-DRIVEN DELIVERY
+
+The system operates through:
+
+`BASELINE → TARGET → INSPECT → DESIGN → CHANGE → VERIFY → BREAK → ACCEPT → RECORD → NEXT`
+
+### BASELINE
+Capture the current repository ref, relevant changed files, current evidence and open findings.
+
+### TARGET
+Select one primary engineering objective with measurable expected delta, scope, risk, acceptance criteria and stop condition.
+
+### INSPECT
+Trace the actual implementation before deciding what to change.
+
+### DESIGN
+Choose the smallest safe architecture/implementation path.
+
+### CHANGE
+Implement only the approved target and directly related defects.
+
+### VERIFY
+Use the strongest available evidence. Tests are evidence, not the objective.
+
+### BREAK
+Actively search for regressions, invariant violations, missing failure paths and collateral damage.
+
+### ACCEPT
+Accept only when the target's evidence threshold is met.
+
+### RECORD
+Update persistent state and relevant ledgers.
+
+### NEXT
+Select the next unresolved, high-value target automatically.
+
+## ANTI-LOOP CONTROL
+
+Every meaningful finding receives a stable ID.
+
+A finding may be reopened only when new evidence proves it remains unresolved or a related regression has appeared.
+
+Escalate to FORENSICS when:
+- the same root cause survives two correction attempts;
+- multiple symptoms share a mechanism;
+- the system appears fixed but a related failure remains;
+- causality cannot be established from available evidence.
+
+After three cycles without meaningful progress on the same target, stop the loop and record a blocker or re-scope.
+
+A cycle that only produces another report is not progress.
+
+## CHANGE CONTROL
+
+Every meaningful cycle must have:
+- baseline;
+- target ID;
+- bounded scope;
+- expected invariants;
+- acceptance criteria;
+- verification evidence;
+- regression disposition.
+
+Shared changes require expanded blast-radius review.
+
+Unrelated file edits are a scope failure unless explicitly justified.
+
+## WRITE INTEGRITY
+
+Automated writes are untrusted until re-read.
+
+For PHP, re-check namespace, imports, class/interface/trait declarations, route/controller compatibility and obvious syntax-sensitive structures.
+
+For migrations, consider ordering, foreign keys, existing-data compatibility and upgrade safety.
+
+For frontend, inspect shared token/component impact, responsive behaviour and interaction states.
+
+## RELEASE PROGRESSION
+
+Commercial readiness is tracked continuously through `READINESS_REGISTER.md`.
+
+The system prioritizes:
+- correctness;
+- architecture;
+- data integrity;
+- security;
+- workflow integrity;
+- UX/accessibility;
+- reliability/recovery;
+- operability;
+- deployment/upgrade safety;
+- documentation/ownership/compliance;
+- release evidence.
+
+## TEST PHILOSOPHY
+
+Tests are a verification instrument, not the progress metric.
+
+Prioritize architecture, hardening, correctness, integrity, recovery and real workflow proof.
+
+A higher test count with unchanged engineering risk does not constitute meaningful progress.
+
+## PERSISTENT CONTROL FILES
+
+- `00_ENGINE_ROUTER.md` — routing and cycle control
+- `STATE.md` — current state
+- `DECISION_LOG.md` — durable decisions
+- `REGRESSION_LEDGER.md` — known failure patterns
+- `READINESS_REGISTER.md` — commercial-readiness gates
+- `TASK_PACKET.md` — cycle contract
+- specialist engine contracts
+
+## COMPLETION VOCABULARY
+
 IMPLEMENTED = repository change exists.
-TESTED = relevant automated checks ran and passed.
-VERIFIED = intended behaviour and relevant regression surface have evidence.
-UNVERIFIED = evidence is missing.
-BLOCKED = safe progress requires missing information, environment, authorization, or owner decision.
-
-## External prompt rule
-This repository-side system is the durable engineering source for Zazu EMP. An external uploaded prompt, chat attachment, or temporary conversation instruction is not required for ordinary Zazu execution once the repository instructions are loaded.
+TESTED = relevant automated check actually ran and passed.
+VERIFIED = intended behaviour has sufficient evidence.
+PROVEN = repeated realistic/production/recovery evidence exists.
+UNVERIFIED = required evidence is unavailable.
+BLOCKED = safe progress is materially prevented.
