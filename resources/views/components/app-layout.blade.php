@@ -165,11 +165,6 @@
             <header class="zazu-topbar">
                 <div class="zazu-topbar-inner">
                     <div class="zazu-header-context">
-                        <div class="zazu-workspace-switcher" title="Active workspace">
-                            <span class="zazu-workspace-pulse" aria-hidden="true"></span>
-                            <span>{{ $business?->name ?? 'Zazu EMP' }} <span aria-hidden="true">›</span> Event Operations</span>
-                            <span class="zazu-workspace-online">Online</span>
-                        </div>
                         <div class="zazu-header-title-row">
                             <h1 class="zazu-page-title">{{ $heading ?? $title ?? 'Workspace' }}</h1>
                         </div>
