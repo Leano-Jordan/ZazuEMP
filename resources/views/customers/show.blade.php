@@ -36,7 +36,7 @@
 
                 <div class="mt-4 grid gap-3">
                     @forelse ($customer->contacts as $contact)
-                        <div class="rounded border border-[var(--zazu-border)] bg-[var(--zazu-surface-2)] p-4">
+                        <div class="zazu-contact-card">
                             <div class="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
                                 <div class="min-w-0">
                                     <div class="zazu-detail-value">{{ $contact->name }}</div>
