@@ -31,7 +31,7 @@ A requirement is **🟢 VERIFIED COMPLETE** only when it is implemented, verifie
 | ID | Area | Requirement | Status | Evidence | Risk | Next Action |
 |---|---|---|---|---|---|---|
 | CTRL-01 | Release control | Maintain this roadmap as the single V1 execution checklist | 🟢 VERIFIED COMPLETE | This document created on current `main` HEAD | Low | Update every Director cycle |
-| CTRL-02 | Repository truth | Inspect branch and HEAD before every execution | 🟢 VERIFIED COMPLETE | Current branch `main`; HEAD `aa01ad1` inspected | Low | Repeat each cycle |
+| CTRL-02 | Repository truth | Inspect branch and HEAD before every execution | 🟢 VERIFIED COMPLETE | Current branch `main`; HEAD `5cdceff` verified after roadmap commit; application baseline was `aa01ad1` | Low | Repeat each cycle |
 | CTRL-03 | Evidence discipline | Separate implemented/tested/verified/proven claims | 🟢 VERIFIED COMPLETE | Existing readiness register + release documentation | Low | Preserve distinction |
 | CTRL-04 | Regression control | Stop improvement work when a regression is found | 🟢 VERIFIED COMPLETE | Director operating rule | Medium | Apply every batch |
 | CTRL-05 | Release evidence | Current-head CI/browser/runtime evidence | 🟡 IN PROGRESS | Existing register rates Release Evidence 1/5; current audit records source inspection but not current runtime/browser execution | High | Execute runtime/browser verification on current HEAD |
