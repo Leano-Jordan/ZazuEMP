@@ -162,7 +162,7 @@ class WorkWorkflowTest extends TestCase
         ]);
 
         $response->assertRedirect(route('work.edit', $event));
-        $response->assertSessionHas('error');
+        $response->assertSessionHasErrors('customer_id');
 
         $this->assertSame($customer->id, $event->fresh()->customer_id);
     }
