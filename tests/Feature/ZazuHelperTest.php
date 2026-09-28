@@ -20,10 +20,11 @@ class ZazuHelperTest extends TestCase
             ->assertSee('data-zazu-guide-enabled="on"', false);
     }
 
-    public function test_authentication_pages_do_not_render_the_workspace_helper(): void
+    public function test_public_landing_authentication_modal_does_not_render_the_workspace_helper(): void
     {
-        $this->get(route('login'))
+        $this->get(route('landing'))
             ->assertOk()
+            ->assertSee('data-auth-modal', false)
             ->assertDontSee('data-zazu-helper', false);
     }
 }
