@@ -431,3 +431,56 @@ Zazu should make running an event and catering business feel:
 Zazu's job is not to show users how much software it contains.
 
 **Its job is to help them run the business.**
+
+
+## 25. Director implementation baseline — 2026-09-28
+
+The V1 specification has been checked against the current implementation and the main missing capabilities have been moved materially toward baseline.
+
+### Experience levels
+
+Zazu now defines Basic, Intermediate and Advanced as presentation levels stored per business membership. They change the amount and order of surfaced information and guidance. They do not change roles, permissions or business-data access.
+
+### Onboarding
+
+The operational onboarding sequence is now:
+
+**Registration → Services & prices → Experience level → Business identity → Dashboard**
+
+Catalogue and business setup deferral remain supported.
+
+### Search
+
+A real cross-domain record search foundation now exists within the Laravel/database architecture. The header command palette can hand a query into record search. Results remain business-scoped and permission-aware.
+
+### Zazu Helper
+
+The Helper now combines route-specific guide content with a small live attention layer for setup, overdue preparation, open purchasing and draft jobs. The amount of attention shown adapts to experience level.
+
+### Operational chain
+
+The Job workspace now makes the intended operational path more visible:
+
+**Services → Preparation → Purchasing → Costs → Finance**
+
+This is a visibility layer over existing domain relationships and lifecycle controls, not a new source of truth.
+
+### Event lifecycle note
+
+The implementation remains:
+
+**Draft → Confirmed → In Progress → Completed**
+
+with cancellation handling.
+
+The specification does not require a new Planned state merely because the word appears in a descriptive lifecycle. Adding a state will require an explicit business rule and impact assessment first.
+
+### V1 scope control
+
+No major existing domain has been removed. Compliance, inventory, assets, travel, reporting and AI remain deliberately bounded so V1 can finish as a coherent product rather than expanding indefinitely.
+
+### Release implication
+
+The work is now moving from broad capability construction toward:
+
+**runtime verification → populated-database verification → desktop/mobile QA → targeted defect correction → release candidate**
