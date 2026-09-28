@@ -16,12 +16,10 @@ test('registration flows through onboarding into the dashboard', async ({ page }
     await expect(page.getByRole('heading', { name: 'Run the work. Know the numbers.' })).toBeVisible();
     await expect(page.locator('nav[aria-label="Public navigation"]').getByRole('link', { name: 'Register', exact: true })).toBeVisible();
     await expect(page.locator('nav[aria-label="Public navigation"]').getByRole('link', { name: 'Log in', exact: true })).toBeVisible();
-    const loginResponse = await page.goto('/login');
-    expect(loginResponse?.status(), 'login page').toBe(200);
-    await expect(page.locator('.zazu-error-shell')).toHaveCount(0);
-    await page.goto('/');
-    await page.locator('nav[aria-label="Public navigation"]').getByRole('link', { name: 'Register', exact: true }).click();
-    await expect(page.getByRole('heading', { name: 'Set up your Zazu workspace' })).toBeVisible();
+    await expect(page.locator('[data-auth-modal]')).toHaveCount(1);
+    await page.locator('nav[aria-label="Public navigation"]').getByRole('button', { name: 'Register', exact: true }).click();
+    await expect(page.locator('[data-auth-modal]')).toBeVisible();
+    await expect(page.getByRole('heading', { name: 'Set up your Zazu workspace.' })).toBeVisible();
 
     await page.getByLabel('Your name').fill('Browser Owner');
     await page.getByLabel('Username').fill(username);
@@ -70,9 +68,8 @@ test('registration flows through onboarding into the dashboard', async ({ page }
     await expect(page).toHaveURL(/\/$/);
     await expect(page.locator('.zazu-error-shell')).toHaveCount(0);
 
-    const loginPageResponse = await page.goto('/login');
-    expect(loginPageResponse?.status(), 'login page after logout').toBe(200);
-    await expect(page.locator('.zazu-error-shell')).toHaveCount(0);
+    await page.locator('nav[aria-label="Public navigation"]').getByRole('button', { name: 'Log in', exact: true }).click();
+    await expect(page.locator('[data-auth-modal]')).toBeVisible();
     await expect(page.getByRole('heading', { name: 'Welcome back.' })).toBeVisible();
 
     const loginIdentifier = username;
@@ -92,7 +89,29 @@ test('public entry and login surfaces render without Zazu error pages', async ({
     await expect(page.locator('nav[aria-label="Public navigation"]')).toBeVisible();
 
     const loginResponse = await page.goto('/login');
-    expect(loginResponse?.status(), 'login page').toBe(200);
+    expect(loginResponse?.status(), 'legacy login entry').toBe(200);
+    await expect(page).toHaveURL(/\/$/);
     await expect(page.locator('.zazu-error-shell')).toHaveCount(0);
+    await expect(page.getByRole('button', { name: 'Log in', exact: true }).first()).toBeVisible();
+    await page.getByRole('button', { name: 'Log in', exact: true }).first().click();
     await expect(page.getByLabel('Username or email')).toBeVisible();
+});
+
+
+test('landing authentication modal is keyboard-safe and switches between login and registration', async ({ page }) => {
+    await page.goto('/');
+    const loginTrigger = page.getByRole('button', { name: 'Log in', exact: true }).first();
+    await loginTrigger.click();
+    const modal = page.locator('[data-auth-modal]');
+    await expect(modal).toBeVisible();
+    await expect(page.getByRole('heading', { name: 'Welcome back.' })).toBeVisible();
+    await expect(page.getByLabel('Username or email')).toBeFocused();
+
+    await page.getByRole('button', { name: 'Create your workspace' }).last().click();
+    await expect(page.getByRole('heading', { name: 'Set up your Zazu workspace.' })).toBeVisible();
+    await expect(page.getByLabel('Your name')).toBeFocused();
+
+    await page.keyboard.press('Escape');
+    await expect(modal).toBeHidden();
+    await expect(loginTrigger).toBeFocused();
 });
