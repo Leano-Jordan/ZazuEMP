@@ -4011,6 +4011,8 @@ main {
 
 
 /* INLINE WORKSPACE SEARCH — results stay anchored under the real search field */
+.zazu-command-palette[hidden] { display: none !important; }
+
 .zazu-command-search {
     position: relative;
     width: min(430px, 38vw);
