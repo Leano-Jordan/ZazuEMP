@@ -695,3 +695,13 @@ Regression rule:
 - Removed unnecessary card/panel/list chrome while preserving structural borders where they communicate actual data/form boundaries.
 - Kept the interface operational and dense without making it look like a generic card-grid SaaS template.
 - Browser-rendered visual QA remains unverified.
+
+
+## Director modern SaaS attraction cycle — 2026-09-28
+
+- Benchmarked current 2026 UI patterns from Linear/Notion-style calm interfaces, Attio record-page redesign, Vercel navigation redesign and modern SaaS trend research.
+- Executed a product-wide reduction of hard borders/grid lines across cards, panels, list rows, record headers, quick links, calendar cells and major navigation surfaces.
+- Shifted visual hierarchy toward tonal surfaces, typography, spacing, restrained blue atmospheric gradients, soft layered shadows and purposeful hover states.
+- Calendar cells now read as separated day surfaces rather than a continuous spreadsheet grid.
+- Remaining inline content borders were removed from pagination, customer disclosures and work warnings, with semantic accent treatment retained where useful.
+- Inputs retain clear control boundaries and focus states for usability/accessibility.
