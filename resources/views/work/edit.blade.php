@@ -33,7 +33,7 @@
                         <label class="zazu-field zazu-field-wide">
                             <span class="zazu-label">Customer</span>
                             @if ($hasQuotes)
-                                <div class="mb-2 rounded border border-[var(--zazu-border)] bg-[var(--zazu-warning-soft)] px-3 py-2 text-[11px] leading-5 text-[var(--zazu-warning-ink)]">
+                                <div class="zazu-warning-note mb-2">
                                     Customer is locked because this Work record already has a quote. This protects historical commercial attribution.
                                 </div>
                                 <input type="hidden" name="customer_id" value="{{ $event->customer_id }}">
