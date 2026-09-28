@@ -7,6 +7,7 @@ use App\Models\Event;
 use App\Models\Quote;
 use App\Support\CurrentBusiness;
 use App\Support\PermissionService;
+use App\Support\ExperienceLevel;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
@@ -43,6 +44,8 @@ class DashboardController extends Controller
             ->limit(8)
             ->get();
 
+        $experienceLevel = app(ExperienceLevel::class)->for($request->user(), $business);
+
         $permissionService = app(PermissionService::class);
         $workspaceTools = [
             'services' => $permissionService->allows('capabilities.view', $request->user(), $business),
@@ -65,7 +68,8 @@ class DashboardController extends Controller
             'upcoming',
             'business',
             'isOwner',
-            'workspaceTools'
+            'workspaceTools',
+            'experienceLevel'
         ));
     }
 }
