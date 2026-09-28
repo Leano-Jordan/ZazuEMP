@@ -721,3 +721,21 @@ Regression rule:
 - Calendar cells now read as separated day surfaces rather than a continuous spreadsheet grid.
 - Remaining inline content borders were removed from pagination, customer disclosures and work warnings, with semantic accent treatment retained where useful.
 - Inputs retain clear control boundaries and focus states for usability/accessibility.
+
+
+## Director V1 capability deep-dive and execution — 2026-09-28
+
+- Audited current main against docs/product-specification.md and docs/v1-capability-map.md, with current Laravel 13, OWASP authorization, HoneyBook and Tripleseat research used as external reference.
+- Confirmed major business domains already exist; the primary remaining V1 gaps were experience-level state, real record search, Helper operational awareness and experience-adaptive presentation.
+- Added business-membership experience levels: basic, intermediate, advanced, with existing memberships backfilled to intermediate.
+- Added onboarding experience selection and a self-service experience preference screen. Experience level changes presentation/guidance only and never replaces role/permission checks.
+- Added WorkspaceSearchService and SearchController with business-scoped, permission-aware search across customers, jobs, services, suppliers, purchase orders, quotes, invoices, costs, assets, inventory and expenses, plus type/status/date filtering.
+- Extended the header command search so users can enter a real query into the record-search surface instead of only filtering static navigation.
+- Extended Zazu Helper with live attention items for unfinished setup, overdue preparation, open purchasing and draft jobs, with the amount of surfaced attention adapted to experience level.
+- Adapted Dashboard detail to experience level without removing underlying permission/access.
+- Added an explicit Job Operational chain surface showing Services → Preparation → Purchasing → Costs → Finance using existing relationships rather than creating a second source of truth.
+- Added regression tests for experience-level onboarding/preference paths and search business isolation/status-filter handling.
+- Added docs/DIRECTOR_DEEPDIVE_AUDIT_2026-09-28.md and docs/V1_RELEASE_CHECKLIST.md and updated docs/product-specification.md plus docs/v1-capability-map.md with current implementation state.
+- Deliberately did not add a real Planned event state. Current lifecycle remains Draft → Confirmed → In Progress → Completed with cancellation handling until a business requirement proves a separate Planned state is necessary.
+- Deliberately contained compliance, inventory, assets, travel, BI and AI autonomy rather than expanding them into separate V1 systems.
+- Runtime Laravel/browser execution remains outstanding because this environment could not clone the public repository due unavailable outbound DNS/network access. Source-level review of the executed changes was performed; release certification still requires repository-environment runtime checks, browser QA, backup/restore and populated-database migration verification.
