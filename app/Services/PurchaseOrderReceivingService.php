@@ -4,13 +4,13 @@ namespace App\Services;
 
 use App\Models\Business;
 use App\Models\InventoryItem;
-use App\Models\InventoryMovement;
 use App\Models\PurchaseOrder;
 use App\Models\PurchaseOrderItem;
 use App\Models\PurchaseOrderReceipt;
 use App\Support\Audit;
 use App\Support\Money;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Str;
 
 final class PurchaseOrderReceivingService
 {
@@ -67,7 +67,7 @@ final class PurchaseOrderReceivingService
             PurchaseOrderReceipt::create([
                 'business_id' => $businessId,
                 'purchase_order_id' => $lockedOrder->id,
-                'idempotency_key' => $idempotencyKey,
+                'idempotency_key' => (string) Str::uuid(),
             ]);
 
             $lockedOrder->load('items');
