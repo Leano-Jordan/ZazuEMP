@@ -28,6 +28,12 @@ use App\Http\Controllers\WorkController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function (\Illuminate\Http\Request $request) {
+    $isAuthenticated = (bool) $request->user();
+    $business = $isAuthenticated
+        ? app(\App\Support\CurrentBusiness::class)->resolve($request->user())
+        : null;
+    $hasActiveWorkspace = $business !== null;
+
     $telemetry = [
         'all_work' => 1,
         'today' => 0,
@@ -43,8 +49,7 @@ Route::get('/', function (\Illuminate\Http\Request $request) {
         'reference_meta' => 'Sign in for live workspace data',
     ];
 
-    if ($request->user()) {
-        $business = app(\App\Support\CurrentBusiness::class)->model($request->user());
+    if ($hasActiveWorkspace) {
         $today = now()->startOfDay();
         $active = \App\Models\Event::query()
             ->where('business_id', $business->id)
@@ -68,7 +73,7 @@ Route::get('/', function (\Illuminate\Http\Request $request) {
         ];
     }
 
-    return view('landing', compact('telemetry'));
+    return view('landing', compact('telemetry', 'isAuthenticated', 'hasActiveWorkspace', 'business'));
 })->name('landing');
 
 Route::middleware('signed')->group(function () {
