@@ -18,6 +18,7 @@ class EventAttachmentController extends Controller
     {
         $business = $this->business($request);
         abort_unless((int) $event->business_id === (int) $business->id, 404);
+        abort_if($event->isClosed(), 422, 'Closed work cannot receive new attachments.');
 
         $validated = $request->validate([
             'files' => ['required', 'array', 'min:1', 'max:10'],
@@ -34,6 +35,13 @@ class EventAttachmentController extends Controller
 
         try {
             DB::transaction(function () use ($request, $event, $business, $validated, &$storedPaths): void {
+                $lockedEvent = Event::query()
+                    ->where('business_id', $business->id)
+                    ->lockForUpdate()
+                    ->findOrFail($event->id);
+
+                abort_if($lockedEvent->isClosed(), 422, 'Closed work cannot receive new attachments.');
+
                 foreach ($request->file('files', []) as $file) {
                     $path = $file->store('jobs/' . $event->id . '/attachments', 'private');
                     $storedPaths[] = $path;
@@ -88,9 +96,18 @@ class EventAttachmentController extends Controller
             404
         );
 
-        Storage::disk($attachment->disk)->delete($attachment->path);
         $event = $attachment->event;
-        $attachment->delete();
+        abort_if($event?->isClosed(), 422, 'Attachments on closed work cannot be deleted.');
+
+        DB::transaction(function () use ($attachment): void {
+            $lockedAttachment = EventAttachment::query()
+                ->whereKey($attachment->id)
+                ->lockForUpdate()
+                ->firstOrFail();
+
+            Storage::disk($lockedAttachment->disk)->delete($lockedAttachment->path);
+            $lockedAttachment->delete();
+        });
 
         return redirect()
             ->route('work.show', $event)
