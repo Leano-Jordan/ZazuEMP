@@ -212,7 +212,8 @@ class PurchaseOrderController extends Controller
     public function receive(
         Request $request,
         PurchaseOrder $purchaseOrder,
-        PurchaseOrderReceivingService $receivingService
+        PurchaseOrderReceivingService $receivingService,
+        EventLifecycleService $lifecycle
     ): RedirectResponse {
         $this->ensure($request, $purchaseOrder);
 
@@ -236,7 +237,8 @@ class PurchaseOrderController extends Controller
             $purchaseOrder,
             $businessId,
             $data['received_quantity'],
-            $data['idempotency_key']
+            $data['idempotency_key'],
+            $lifecycle
         );
 
         if ($alreadyProcessed) {
