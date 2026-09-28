@@ -1,7 +1,9 @@
+> **CURRENT-DOC NOTE:** Engineering control state is maintained separately under `.ai/engineering/`. This declaration remains an IP evidence record and is not the software release authority.
+
 # Zazu EMP - Founder Intellectual Property Declaration
 
 **Draft evidence record**  
-**Date:** 2026-09-26
+**Date:** 2026-09-28
 
 ## Declarant
 
