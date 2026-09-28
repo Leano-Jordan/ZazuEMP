@@ -2236,3 +2236,11 @@ body{background:var(--zazu-canvas-bg);color:var(--zazu-text-body)}
 @media(max-width:1000px){.zazu-dashboard-bento{grid-template-columns:1fr}.zazu-dashboard-workbench,.zazu-dashboard-assets{grid-column:auto;grid-row:auto}}
 @media(max-width:700px){.zazu-dashboard-workbench,.zazu-dashboard-commercial,.zazu-dashboard-assets{padding:17px}.zazu-dashboard-quickbar{border-radius:16px}}
 @media(prefers-reduced-motion:reduce){.zazu-dashboard-kpi,.zazu-run-item,.zazu-ops-row{transition:none}}
+
+.zazu-dashboard-side-stack{grid-column:2;display:grid;gap:12px;align-self:start}
+.zazu-dashboard-side-stack .zazu-dashboard-telemetry{display:grid;grid-template-columns:1fr;gap:10px;margin:0}
+.zazu-dashboard-side-stack .zazu-dashboard-kpi{min-height:86px;padding:14px;border-radius:14px}
+.zazu-dashboard-side-stack .zazu-dashboard-kpi strong{margin-top:8px;font-size:21px}
+.zazu-dashboard-side-stack .zazu-dashboard-commercial{padding:20px}
+.zazu-dashboard-assets{grid-column:1/-1}
+@media(max-width:1000px){.zazu-dashboard-side-stack{grid-column:auto}.zazu-dashboard-assets{grid-column:auto}}
