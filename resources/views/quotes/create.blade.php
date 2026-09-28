@@ -5,7 +5,7 @@
         <a href="{{ route('work.show', $event) }}" class="zazu-btn zazu-btn-ghost">Job workspace</a>
     </x-slot:headerAction>
 
-    <section class="zazu-command-band">
+    <section class="zazu-command-band zazu-quote-editor-command">
         <div>
             <div class="zazu-eyebrow">{{ $event->reference }} · Commercial</div>
             <h2 class="zazu-command-title">Build draft quote v1</h2>
@@ -71,7 +71,7 @@
                         <div class="zazu-form-section-copy">These values are copied into the quote snapshot when saved.</div>
                     </div>
 
-                    <div class="zazu-card zazu-list">
+                    <div class="zazu-card zazu-list zazu-quote-line-editor">
                         @foreach ($event->requirements as $requirement)
                             @php
                                 $capability = $requirement->capability;
@@ -116,7 +116,7 @@
                     @error('unit_price')<span class="zazu-field-error mt-3">{{ $message }}</span>@enderror
                 </section>
 
-                <div class="zazu-actionbar">
+                <div class="zazu-actionbar zazu-actionbar-sticky zazu-quote-savebar">
                     <a href="{{ route('work.quotes.index', $event) }}" class="zazu-btn zazu-btn-ghost">Cancel</a>
                     <button class="zazu-btn zazu-btn-primary">Save quote v1</button>
                 </div>
