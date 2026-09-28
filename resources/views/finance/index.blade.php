@@ -2,13 +2,14 @@
 <x-slot:title>Finance</x-slot:title><x-slot:heading>Finance</x-slot:heading>
 <x-slot:headerAction><a href="{{ route('finance.invoices.create') }}" class="zazu-btn zazu-btn-primary">New invoice</a><a href="{{ route('finance.payments.create') }}" class="zazu-btn zazu-btn-secondary">Record payment</a><a href="{{ route('finance.expenses.create') }}" class="zazu-btn zazu-btn-ghost">Record expense</a></x-slot:headerAction>
 
-<section class="zazu-command-band">
+<section class="zazu-command-band zazu-finance-command">
     <div><div class="zazu-eyebrow">Commercial control</div><h2 class="zazu-command-title">Money in, money out</h2><p class="zazu-command-copy">Invoices, customer payments and finance expenses now live as separate transaction records.</p></div>
+    <div class="zazu-command-badge"><span class="zazu-status-dot" aria-hidden="true"></span><span>Finance workspace</span></div>
 </section>
 
 <section class="zazu-metric-grid" aria-label="Finance totals">
     <div class="zazu-metric-card">
-        <div class="zazu-metric-label">Invoiced</div>
+        <div class="zazu-metric-top"><div class="zazu-metric-label">Invoiced</div><span class="zazu-finance-symbol" aria-hidden="true">INV</span></div>
         <div class="zazu-metric-currency-stack">
             @forelse($invoicedByCurrency as $currency => $total)
                 <div class="zazu-metric-value" data-numeric="true">{{ $currency }} {{ $total }}</div>
@@ -18,7 +19,7 @@
         </div>
     </div>
     <div class="zazu-metric-card">
-        <div class="zazu-metric-label">Payments recorded</div>
+        <div class="zazu-metric-top"><div class="zazu-metric-label">Payments recorded</div><span class="zazu-finance-symbol" aria-hidden="true">IN</span></div>
         <div class="zazu-metric-currency-stack">
             @forelse($paidByCurrency as $currency => $total)
                 <div class="zazu-metric-value" data-numeric="true">{{ $currency }} {{ $total }}</div>
@@ -28,7 +29,7 @@
         </div>
     </div>
     <div class="zazu-metric-card">
-        <div class="zazu-metric-label">Expenses</div>
+        <div class="zazu-metric-top"><div class="zazu-metric-label">Expenses</div><span class="zazu-finance-symbol" aria-hidden="true">OUT</span></div>
         <div class="zazu-metric-currency-stack">
             @forelse($expensesByCurrency as $currency => $total)
                 <div class="zazu-metric-value" data-numeric="true">{{ $currency }} {{ $total }}</div>
@@ -40,7 +41,7 @@
 </section>
 
 <section class="zazu-card zazu-list mt-5">
-    <div class="zazu-card-header"><div class="zazu-card-title">Invoices</div></div>
+    <div class="zazu-card-header"><div><div class="zazu-eyebrow">Receivables</div><div class="zazu-card-title mt-1">Invoices</div></div><span class="zazu-section-count">{{ $invoices->count() }}</span></div>
     @forelse($invoices as $invoice)
         <div class="zazu-list-item">
             <div class="zazu-list-main">
