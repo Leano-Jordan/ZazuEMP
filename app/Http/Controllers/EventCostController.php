@@ -77,10 +77,17 @@ class EventCostController extends Controller
         );
 
         DB::transaction(function () use ($validated, $event): void {
+            $lockedEvent = Event::query()
+                ->whereKey($event->id)
+                ->lockForUpdate()
+                ->firstOrFail();
+
+            abort_if($lockedEvent->isClosed(), 422, 'Closed work cannot receive new cost records.');
+
             EventCost::query()->create([
                 ...$validated,
-                'business_id' => $event->business_id,
-                'event_id' => $event->id,
+                'business_id' => $lockedEvent->business_id,
+                'event_id' => $lockedEvent->id,
                 'currency' => strtoupper($validated['currency']),
             ]);
         });
