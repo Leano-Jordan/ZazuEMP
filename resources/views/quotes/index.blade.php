@@ -52,7 +52,7 @@
         @endforelse
 
         @if ($quotes->hasPages())
-            <div class="border-t border-[var(--zazu-border)] px-5 py-4">{{ $quotes->links() }}</div>
+            <div class="px-5 py-4 pt-4">{{ $quotes->links() }}</div>
         @endif
     </section>
 </x-app-layout>
