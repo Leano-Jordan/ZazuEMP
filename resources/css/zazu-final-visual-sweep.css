@@ -3556,3 +3556,28 @@ body[data-zazu-route^="quotes."] .zazu-topbar-actions .zazu-command-trigger:focu
 .zazu-settings-page .zazu-form-section + .zazu-form-section {
     border-top-color: var(--zazu-border-strong);
 }
+
+
+/* COMMERCIAL CONTROL PAGES — CYCLE 3: accessibility + touch targets */
+.zazu-reports-page .zazu-metric-link:focus-visible,
+.zazu-purchasing-page .zazu-list-item:focus-visible,
+.zazu-suppliers-page .zazu-list-item:focus-visible,
+.zazu-settings-page .zazu-btn:focus-visible,
+.zazu-settings-page input:focus-visible,
+.zazu-settings-page select:focus-visible,
+.zazu-settings-page textarea:focus-visible {
+    outline: 3px solid color-mix(in srgb, var(--zazu-focus) 72%, transparent);
+    outline-offset: 2px;
+}
+.zazu-reports-page .zazu-metric-link {
+    min-height: 116px;
+}
+.zazu-purchasing-page .zazu-list-item,
+.zazu-suppliers-page .zazu-list-item {
+    min-height: 64px;
+}
+@media (max-width: 560px) {
+    .zazu-reports-page .zazu-metric-link { min-height:104px; }
+    .zazu-purchasing-page .zazu-list-item,
+    .zazu-suppliers-page .zazu-list-item { min-height:72px; }
+}
