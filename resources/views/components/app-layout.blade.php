@@ -197,7 +197,7 @@
                 </div>
             </header>
 
-            <nav class="zazu-mobile-nav" aria-label="Mobile section navigation" data-mobile-nav>
+            <nav class="zazu-mobile-nav" aria-label="Mobile primary" data-mobile-nav>
                 <button type="button" class="zazu-mobile-toggle" data-mobile-nav-toggle aria-expanded="false" aria-controls="zazu-mobile-links">
                     <span>Open section navigation</span>
                     <svg class="zazu-mobile-toggle-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" aria-hidden="true"><path d="m6 9 6 6 6-6"></path></svg>
