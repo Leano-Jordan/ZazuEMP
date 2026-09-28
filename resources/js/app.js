@@ -129,17 +129,40 @@ const dialog = document.createElement('dialog');
 dialog.className = 'zazu-confirm-dialog';
 dialog.setAttribute('aria-labelledby', 'zazu-confirm-title');
 dialog.setAttribute('aria-describedby', 'zazu-confirm-message');
-dialog.innerHTML = `
-    <form method="dialog" class="zazu-confirm-panel">
-        <div class="zazu-eyebrow">Confirmation</div>
-        <h2 id="zazu-confirm-title" class="zazu-confirm-title"></h2>
-        <p id="zazu-confirm-message" class="zazu-confirm-message"></p>
-        <div class="zazu-confirm-actions">
-            <button type="button" class="zazu-btn zazu-btn-secondary" data-zazu-confirm-cancel>Cancel</button>
-            <button type="button" class="zazu-btn zazu-btn-danger" data-zazu-confirm-submit>Continue</button>
-        </div>
-    </form>
-`;
+const panel = document.createElement('form');
+panel.method = 'dialog';
+panel.className = 'zazu-confirm-panel';
+
+const eyebrow = document.createElement('div');
+eyebrow.className = 'zazu-eyebrow';
+eyebrow.textContent = 'Confirmation';
+
+const titleElement = document.createElement('h2');
+titleElement.id = 'zazu-confirm-title';
+titleElement.className = 'zazu-confirm-title';
+
+const messageElement = document.createElement('p');
+messageElement.id = 'zazu-confirm-message';
+messageElement.className = 'zazu-confirm-message';
+
+const actions = document.createElement('div');
+actions.className = 'zazu-confirm-actions';
+
+const cancelButton = document.createElement('button');
+cancelButton.type = 'button';
+cancelButton.className = 'zazu-btn zazu-btn-secondary';
+cancelButton.dataset.zazuConfirmCancel = '';
+cancelButton.textContent = 'Cancel';
+
+const submitButton = document.createElement('button');
+submitButton.type = 'button';
+submitButton.className = 'zazu-btn zazu-btn-danger';
+submitButton.dataset.zazuConfirmSubmit = '';
+submitButton.textContent = 'Continue';
+
+actions.append(cancelButton, submitButton);
+panel.append(eyebrow, titleElement, messageElement, actions);
+dialog.appendChild(panel);
 document.body.appendChild(dialog);
 
 const title = dialog.querySelector('#zazu-confirm-title');
