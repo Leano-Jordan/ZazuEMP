@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\Models\Business;
 use App\Models\Event;
 use App\Models\EventRequirement;
 use App\Models\Quote;
@@ -25,7 +26,18 @@ class QuoteService
         string $depositPercent = '0.00'
     ): Quote {
         return DB::transaction(function () use ($event, $requirements, $unitPrices, $currency, $taxRate, $notes, $depositPercent): Quote {
-            $lockedEvent = Event::query()->whereKey($event->id)->lockForUpdate()->firstOrFail();
+            $businessId = (int) Event::query()->whereKey($event->id)->value('business_id');
+            abort_unless($businessId > 0, 404);
+
+            Business::query()
+                ->whereKey($businessId)
+                ->lockForUpdate()
+                ->firstOrFail();
+
+            $lockedEvent = Event::query()
+                ->where('business_id', $businessId)
+                ->lockForUpdate()
+                ->findOrFail($event->id);
             if ($lockedEvent->isClosed()) {
                 throw ValidationException::withMessages(['event' => 'Closed work cannot receive new quotes.']);
             }
@@ -56,13 +68,25 @@ class QuoteService
     public function createRevision(Quote $quote, Collection $requirements): QuoteVersion
     {
         return DB::transaction(function () use ($quote, $requirements): QuoteVersion {
-            $lockedQuote = Quote::query()
-                ->whereKey($quote->id)
+            $eventId = Quote::query()->whereKey($quote->id)->value('event_id');
+            abort_unless($eventId, 404);
+
+            $businessId = (int) Event::query()->whereKey($eventId)->value('business_id');
+            abort_unless($businessId > 0, 404);
+
+            Business::query()
+                ->whereKey($businessId)
                 ->lockForUpdate()
                 ->firstOrFail();
 
             $lockedEvent = Event::query()
-                ->whereKey($lockedQuote->event_id)
+                ->where('business_id', $businessId)
+                ->lockForUpdate()
+                ->findOrFail($eventId);
+
+            $lockedQuote = Quote::query()
+                ->whereKey($quote->id)
+                ->where('event_id', $lockedEvent->id)
                 ->lockForUpdate()
                 ->firstOrFail();
 
