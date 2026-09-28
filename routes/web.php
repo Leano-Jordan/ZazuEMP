@@ -84,6 +84,7 @@ Route::middleware(['auth', 'auth.session', 'business.context'])->group(function 
     Route::post('/purchasing', [PurchaseOrderController::class, 'store'])->middleware('permission:purchasing.create')->name('purchasing.store');
     Route::get('/purchasing/{purchaseOrder}', [PurchaseOrderController::class, 'show'])->middleware('permission:purchasing.view')->name('purchasing.show');
     Route::patch('/purchasing/{purchaseOrder}/status', [PurchaseOrderController::class, 'updateStatus'])->middleware('permission:purchasing.status')->name('purchasing.status');
+    Route::post('/purchasing/{purchaseOrder}/receive', [PurchaseOrderController::class, 'receive'])->middleware('permission:purchasing.status')->name('purchasing.receive');
 
     Route::get('/inventory', [InventoryController::class, 'index'])->middleware('permission:inventory.view')->name('inventory.index');
     Route::get('/inventory/create', [InventoryController::class, 'create'])->middleware('permission:inventory.create')->name('inventory.create');
