@@ -17,7 +17,7 @@
         </div>
     </section>
 
-    <section class="zazu-card zazu-list">        <div class="zazu-card-header">
+    <section class="zazu-card zazu-list zazu-customer-directory">        <div class="zazu-card-header">
             <div class="zazu-section-heading">
                 <div>
                     <div class="zazu-eyebrow">Records</div>
