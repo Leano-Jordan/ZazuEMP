@@ -3,6 +3,7 @@
 namespace App\Services;
 
 use App\Models\Business;
+use App\Services\EventLifecycleService;
 use App\Models\InventoryItem;
 use App\Models\PurchaseOrder;
 use App\Models\PurchaseOrderItem;
@@ -23,7 +24,8 @@ final class PurchaseOrderReceivingService
         PurchaseOrder $purchaseOrder,
         int $businessId,
         array $receivedQuantities,
-        string $idempotencyKey
+        string $idempotencyKey,
+        EventLifecycleService $lifecycle
     ): bool {
         $alreadyProcessed = false;
 
@@ -32,6 +34,7 @@ final class PurchaseOrderReceivingService
             $businessId,
             $receivedQuantities,
             $idempotencyKey,
+            $lifecycle,
             &$alreadyProcessed
         ): void {
             // Keep business -> purchase order lock ordering consistent with the
@@ -41,10 +44,23 @@ final class PurchaseOrderReceivingService
                 ->lockForUpdate()
                 ->firstOrFail();
 
+            $eventId = PurchaseOrder::query()
+                ->where('business_id', $businessId)
+                ->whereKey($purchaseOrder->id)
+                ->value('event_id');
+
+            $lockedEvent = $eventId
+                ? $lifecycle->lock($businessId, (int) $eventId)
+                : null;
+
             $lockedOrder = PurchaseOrder::query()
                 ->where('business_id', $businessId)
                 ->lockForUpdate()
                 ->findOrFail($purchaseOrder->id);
+
+            if ($lockedEvent) {
+                $lifecycle->assertOperational($lockedEvent);
+            }
 
             abort_unless(
                 in_array($lockedOrder->status, ['ordered', 'received'], true),
@@ -116,6 +132,7 @@ final class PurchaseOrderReceivingService
                     'idempotency_key' => (string) Str::uuid(),
                     'purchase_order_id' => $lockedOrder->id,
                     'purchase_order_item_id' => $item->id,
+                    'event_id' => $lockedEvent?->id,
                     'type' => 'receipt',
                     'quantity' => $received,
                     'unit_cost' => $item->unit_price,
