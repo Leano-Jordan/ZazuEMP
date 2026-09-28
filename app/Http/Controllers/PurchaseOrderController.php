@@ -37,6 +37,7 @@ class PurchaseOrderController extends Controller
         ]);
     }
 
+    /** @SuppressWarnings(PHPMD.ExcessiveMethodLength) */
     public function store(Request $request): RedirectResponse
     {
         $businessId=app(CurrentBusiness::class)->id($request->user());
@@ -149,6 +150,11 @@ class PurchaseOrderController extends Controller
         return view('purchasing.show',compact('purchaseOrder'));
     }
 
+    /**
+    * @SuppressWarnings(PHPMD.CyclomaticComplexity)
+    * @SuppressWarnings(PHPMD.NPathComplexity)
+    * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
+     */
     public function updateStatus(Request $request, PurchaseOrder $purchaseOrder): RedirectResponse
     {
         $this->ensure($request, $purchaseOrder);

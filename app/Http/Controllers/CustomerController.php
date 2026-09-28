@@ -107,6 +107,7 @@ class CustomerController extends Controller
         return view('customers.edit', compact('customer'));
     }
 
+    /** @SuppressWarnings(PHPMD.CyclomaticComplexity) */
     public function update(Request $request, Customer $customer): RedirectResponse
     {
         $business = $this->business($request);

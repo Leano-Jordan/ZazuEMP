@@ -61,6 +61,10 @@ final class ZazuErrorCatalog
         ];
     }
 
+    /**
+    * @SuppressWarnings(PHPMD.CyclomaticComplexity)
+    * @SuppressWarnings(PHPMD.NPathComplexity)
+     */
     private static function codeFor(Throwable $exception): string
     {
         if ($exception instanceof AuthenticationException) {

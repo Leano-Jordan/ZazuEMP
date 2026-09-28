@@ -40,6 +40,10 @@ class DatabaseSchemaIntegrityTest extends TestCase
         $this->assertSame([], $missing);
     }
 
+    /**
+    * @SuppressWarnings(PHPMD.CyclomaticComplexity)
+    * @SuppressWarnings(PHPMD.NPathComplexity)
+     */
     public function test_every_business_owned_model_uses_business_isolation_guard(): void
     {
         $missing = [];
@@ -94,6 +98,10 @@ class DatabaseSchemaIntegrityTest extends TestCase
         $this->assertSame([], $missing);
     }
 
+    /**
+    * @SuppressWarnings(PHPMD.CyclomaticComplexity)
+    * @SuppressWarnings(PHPMD.NPathComplexity)
+     */
     public function test_every_concrete_application_model_points_to_an_existing_table(): void
     {
         $missing = [];

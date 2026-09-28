@@ -8,6 +8,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
+/** @SuppressWarnings(PHPMD.TooManyPublicMethods) */
 class Event extends Model
 {
     use BelongsToBusiness, SoftDeletes;

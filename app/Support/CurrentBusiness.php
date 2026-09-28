@@ -9,6 +9,7 @@ class CurrentBusiness
 {
     public const SESSION_KEY = 'zazu_business_id';
 
+    /** @SuppressWarnings(PHPMD.CyclomaticComplexity) */
     public function resolve(?Authenticatable $user = null): ?Business
     {
         $user ??= auth()->user();

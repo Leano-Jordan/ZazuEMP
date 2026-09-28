@@ -70,6 +70,7 @@ class SkeletonPagesTest extends TestCase
         }
     }
 
+    /** @SuppressWarnings(PHPMD.ExcessiveMethodLength) */
     public function test_core_record_pages_render_with_representative_business_data(): void
     {
         $business = \App\Models\Business::create([

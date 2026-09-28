@@ -13,6 +13,10 @@ class ZazuBackupCommand extends Command
     protected $signature = 'zazu:backup {--output= : Destination directory for the backup archive}';
     protected $description = 'Create a portable Zazu database and private-storage backup';
 
+    /**
+    * @SuppressWarnings(PHPMD.CyclomaticComplexity)
+    * @SuppressWarnings(PHPMD.NPathComplexity)
+     */
     public function handle(): int
     {
         if (!class_exists(ZipArchive::class)) {

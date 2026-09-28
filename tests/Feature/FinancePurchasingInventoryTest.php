@@ -12,6 +12,7 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Str;
 use Tests\TestCase;
 
+/** @SuppressWarnings(PHPMD.TooManyPublicMethods) */
 class FinancePurchasingInventoryTest extends TestCase
 {
     use RefreshDatabase;

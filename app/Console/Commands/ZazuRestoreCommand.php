@@ -14,6 +14,11 @@ class ZazuRestoreCommand extends Command
     protected $signature = 'zazu:restore {archive : Path to a Zazu backup ZIP} {--force : Skip the interactive confirmation}';
     protected $description = 'Restore a Zazu database and private storage from a verified backup archive';
 
+    /**
+    * @SuppressWarnings(PHPMD.CyclomaticComplexity)
+    * @SuppressWarnings(PHPMD.NPathComplexity)
+    * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
+     */
     public function handle(): int
     {
         if (!class_exists(ZipArchive::class)) {

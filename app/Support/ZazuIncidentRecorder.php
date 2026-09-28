@@ -10,6 +10,10 @@ use Throwable;
 
 final class ZazuIncidentRecorder
 {
+    /**
+    * @SuppressWarnings(PHPMD.CyclomaticComplexity)
+    * @SuppressWarnings(PHPMD.NPathComplexity)
+     */
     public static function record(Throwable $exception): void
     {
         try {

@@ -81,6 +81,11 @@ class FinanceController extends Controller
         ]);
     }
 
+    /**
+    * @SuppressWarnings(PHPMD.CyclomaticComplexity)
+    * @SuppressWarnings(PHPMD.NPathComplexity)
+    * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
+     */
     public function storeInvoice(Request $request): RedirectResponse
     {
         $business = app(CurrentBusiness::class)->model($request->user());

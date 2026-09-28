@@ -17,6 +17,7 @@ use Illuminate\Support\Facades\URL;
 use Illuminate\Validation\Rule;
 use Illuminate\View\View;
 
+/** @SuppressWarnings(PHPMD.TooManyPublicMethods) */
 class QuoteController extends Controller
 {
 

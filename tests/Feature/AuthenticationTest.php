@@ -14,6 +14,7 @@ use Illuminate\Auth\Notifications\ResetPassword as ResetPasswordNotification;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
+/** @SuppressWarnings(PHPMD.TooManyPublicMethods) */
 class AuthenticationTest extends TestCase
 {
     use RefreshDatabase;

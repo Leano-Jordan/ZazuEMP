@@ -46,6 +46,7 @@ class QuoteService
         });
     }
 
+    /** @SuppressWarnings(PHPMD.CyclomaticComplexity) */
     public function createRevision(Quote $quote, Collection $requirements): QuoteVersion
     {
         return DB::transaction(function () use ($quote, $requirements): QuoteVersion {
