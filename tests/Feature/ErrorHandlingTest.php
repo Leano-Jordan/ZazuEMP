@@ -3,6 +3,7 @@
 namespace Tests\Feature;
 
 use App\Models\User;
+use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Contracts\Debug\ExceptionHandler;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\File;
@@ -11,6 +12,8 @@ use Tests\TestCase;
 
 class ErrorHandlingTest extends TestCase
 {
+    use RefreshDatabase;
+
     protected function setUp(): void
     {
         parent::setUp();
