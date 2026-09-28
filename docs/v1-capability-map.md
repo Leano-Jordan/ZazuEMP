@@ -244,3 +244,81 @@ over:
 - Feature accumulation
 
 **V1 is a complete product foundation, not the final form of Zazu.**
+
+
+## 19. Director implementation audit — 2026-09-28
+
+The capability map has now been checked against the current main source.
+
+### Implemented or materially present
+
+- Registration and authentication
+- Business setup and resumable onboarding
+- Customers and contacts
+- Events/jobs and controlled lifecycle transitions
+- Products/services/capabilities
+- Work/preparation
+- Resource foundations through assets and inventory
+- Suppliers
+- Purchasing and receiving
+- Costs
+- Core finance
+- Documents/attachments
+- Reporting
+- Business-scoped permissions and isolation
+- Auditability
+- Financial/idempotency protections
+- Responsive desktop/mobile shell
+- Contextual Zazu Helper guide
+- Header command-palette navigation
+
+### Implemented in the 2026-09-28 baseline pass
+
+- Basic / Intermediate / Advanced experience level stored per business membership
+- Onboarding experience-level selection
+- Self-service experience preference screen
+- Experience-aware Dashboard detail
+- Permission-aware cross-domain record search
+- Search filters for type, status and date
+- Search across customers, jobs, services, suppliers, purchase orders, quotes, invoices, costs, assets, inventory and expenses
+- Contextual Helper operational attention
+- Job Operational chain visibility
+- Regression tests for experience selection and search/business isolation
+
+### Still incomplete before release candidate
+
+- Runtime execution of the Laravel test suite on the current head
+- Runtime/browser verification of fresh registration and onboarding on desktop
+- Runtime/browser verification of fresh registration and onboarding on mobile
+- Rendered desktop/mobile QA for the new search experience
+- Rendered desktop/mobile QA for the experience-adaptive Dashboard
+- Populated production-like migration verification
+- Real backup/restore drill
+- Final accessibility smoke
+- Final security/release review
+- Final decision on whether Planned should become a real event status
+
+### Deliberately contained
+
+The following remain valid foundations but are not being expanded into separate V1 products:
+
+- compliance management
+- warehouse-scale inventory
+- enterprise asset management
+- travel/logistics optimisation
+- advanced BI
+- predictive finance
+- autonomous AI
+- large integration frameworks
+
+### Boundary interpretation
+
+The current codebase is now in an integration-and-verification phase. Further V1 work should strengthen the primary chain:
+
+**Registration → Onboarding → Client → Event → Work → Resources → Purchasing → Costs → Finance → Completion**
+
+or the supporting capabilities:
+
+**Experience Level + Navigation + Search + Zazu Helper + Responsive UX**
+
+A difference between the specification and current code is not automatically a defect. The clearest example is the Planned event state: it remains a product decision until a business requirement demonstrates the need for a separate state.
