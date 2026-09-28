@@ -206,14 +206,10 @@ class OnboardingTest extends TestCase
             ->assertDontSee('Stock and movement history.')
             ->assertDontSee('Reusable equipment and accountability.');
 
-        Supplier::create([
-            'business_id' => $business->id,
-            'name' => 'Fresh Supplier',
-        ]);
-
         $this->get(route('dashboard'))
             ->assertOk()
-            ->assertSee('Quick access')
-            ->assertSee('Purchasing');
+            ->assertSee('Workspace surfaces')
+            ->assertSee('Finance')
+            ->assertDontSee('Quick access');
     }
 }
