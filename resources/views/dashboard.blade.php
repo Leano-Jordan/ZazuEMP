@@ -65,13 +65,56 @@
         </aside>
 
         <section class="zazu-dash-commercial zazu-dash-surface">
-            <header class="zazu-dash-surface-head"><div><span class="zazu-dash-kicker">Commercial queue</span><h3>Quote action</h3><p>Keep commercial work visible without inventing financial state.</p></div></header>
-            <div class="zazu-dash-commercial-main"><div><span>Draft quotes</span><strong>{{ number_format($metrics['draft_quotes']) }}</strong></div><span class="zazu-dash-queue-state">AWAITING ACTION</span></div>
+            <header class="zazu-dash-surface-head"><div><span class="zazu-dash-kicker">Commercial queue</span><h3>Quote action</h3><p>Turn outstanding commercial work into the next deliberate action.</p></div></header>
+            <div class="zazu-dash-commercial-main"><div><span>Draft quotes</span><strong>{{ number_format($metrics['draft_quotes']) }}</strong></div><span class="zazu-dash-queue-state {{ $metrics['draft_quotes'] > 0 ? 'is-warning' : 'is-clear' }}">{{ $metrics['draft_quotes'] > 0 ? 'ACTION REQUIRED' : 'QUEUE CLEAR' }}</span></div>
             <div class="zazu-dash-actions">
-                @if($workspaceTools['quotes'])<a href="{{ route('quotes.index') }}" class="zazu-btn zazu-btn-primary">Inspect quote queue</a>@endif
+                @if($workspaceTools['quotes'])<a href="{{ route('quotes.index') }}" class="zazu-btn zazu-btn-primary">{{ $metrics['draft_quotes'] > 0 ? 'Review draft quotes' : 'Open quote queue' }}</a>@endif
                 @if($workspaceTools['finance'])<a href="{{ route('finance.index') }}" class="zazu-btn zazu-btn-secondary">Open finance</a>@endif
             </div>
-            <div class="zazu-dash-note"><b>i</b><span>Revenue, deposits and balances are not shown here because this dashboard does not own an authoritative finance aggregate.</span></div>
+            <div class="zazu-dash-note"><b>i</b><span>Finance remains authoritative in its own workspace. This surface only tells you whether commercial records need attention.</span></div>
+        </section>
+
+        <section class="zazu-dash-focus zazu-dash-surface" aria-label="Priority actions">
+            <header class="zazu-dash-surface-head">
+                <div>
+                    <span class="zazu-dash-kicker">Priority now</span>
+                    <h3>What needs your attention</h3>
+                    <p>A short action queue based on the records already visible in this workspace.</p>
+                </div>
+            </header>
+            <div class="zazu-dash-focus-grid">
+                @if($isOwner && (! $business?->catalogue_setup_completed_at || ! $business?->business_setup_completed_at))
+                    <a href="{{ route('onboarding.index') }}" class="zazu-dash-focus-item is-warning">
+                        <span class="zazu-dash-focus-marker"></span>
+                        <span><strong>Finish workspace setup</strong><small>Business identity and catalogue setup are still incomplete.</small></span>
+                        <b>→</b>
+                    </a>
+                @endif
+
+                @if($upcoming->isNotEmpty())
+                    @php($nextEvent = $upcoming->first())
+                    <a href="{{ $workspaceTools['work'] ? route('work.show', $nextEvent) : route('calendar.index') }}" class="zazu-dash-focus-item is-info">
+                        <span class="zazu-dash-focus-marker"></span>
+                        <span><strong>Next scheduled work: {{ $nextEvent->name }}</strong><small>{{ $nextEvent->event_date?->format('d M Y · H:i') ?: 'Date to be confirmed' }} · {{ $nextEvent->customer?->name ?? 'No customer' }}</small></span>
+                        <b>→</b>
+                    </a>
+                @endif
+
+                @if($workspaceTools['quotes'] && $metrics['draft_quotes'] > 0)
+                    <a href="{{ route('quotes.index') }}" class="zazu-dash-focus-item is-warning">
+                        <span class="zazu-dash-focus-marker"></span>
+                        <span><strong>{{ number_format($metrics['draft_quotes']) }} draft quote{{ $metrics['draft_quotes'] === 1 ? '' : 's' }} need review</strong><small>Commercial records are waiting for a decision or next step.</small></span>
+                        <b>→</b>
+                    </a>
+                @endif
+
+                @if((!$isOwner || ($business?->catalogue_setup_completed_at && $business?->business_setup_completed_at)) && $upcoming->isEmpty() && (!$workspaceTools['quotes'] || $metrics['draft_quotes'] === 0))
+                    <div class="zazu-dash-focus-item is-clear">
+                        <span class="zazu-dash-focus-marker"></span>
+                        <span><strong>No immediate priority flagged</strong><small>The workspace has no setup, schedule or quote action to surface right now.</small></span>
+                    </div>
+                @endif
+            </div>
         </section>
 
         @if($experienceLevel !== 'basic')
