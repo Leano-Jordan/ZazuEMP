@@ -283,10 +283,60 @@ function setupBrandingUploads() {
     });
 }
 
+const function setupZazuCatalogue() {
+    document.querySelectorAll('[data-zazu-catalogue]').forEach((catalogue) => {
+        if (catalogue.dataset.zazuCatalogueBound === '1') return;
+        catalogue.dataset.zazuCatalogueBound = '1';
+
+        const tabs = catalogue.querySelectorAll('[data-catalogue-tab]');
+        const panels = catalogue.querySelectorAll('[data-catalogue-panel]');
+        const drawer = catalogue.querySelector('[data-catalogue-drawer]');
+        const drawerOpeners = catalogue.querySelectorAll('[data-catalogue-drawer-open]');
+        const drawerClosers = catalogue.querySelectorAll('[data-catalogue-drawer-close]');
+
+        const selectTab = (name) => {
+            tabs.forEach((tab) => {
+                const active = tab.dataset.catalogueTab === name;
+                tab.classList.toggle('is-active', active);
+                tab.setAttribute('aria-selected', active ? 'true' : 'false');
+            });
+            panels.forEach((panel) => {
+                const active = panel.dataset.cataloguePanel === name;
+                panel.hidden = !active;
+                panel.classList.toggle('is-active', active);
+            });
+        };
+
+        tabs.forEach((tab) => tab.addEventListener('click', () => selectTab(tab.dataset.catalogueTab)));
+
+        const closeDrawer = () => {
+            if (!drawer) return;
+            drawer.hidden = true;
+            drawer.setAttribute('aria-hidden', 'true');
+            document.body.classList.remove('zazu-drawer-open');
+        };
+
+        const openDrawer = () => {
+            if (!drawer) return;
+            drawer.hidden = false;
+            drawer.setAttribute('aria-hidden', 'false');
+            document.body.classList.add('zazu-drawer-open');
+            drawer.querySelector('a,button,input,select,textarea')?.focus();
+        };
+
+        drawerOpeners.forEach((button) => button.addEventListener('click', openDrawer));
+        drawerClosers.forEach((button) => button.addEventListener('click', closeDrawer));
+        document.addEventListener('keydown', (event) => {
+            if (event.key === 'Escape' && drawer && !drawer.hidden) closeDrawer();
+        });
+    });
+}
+
 const initializeZazuUi = () => {
     setupZazuAuthExperience();
     setupZazuMobileNavigation();
     setupZazuThemeToggle();
+    setupZazuCatalogue();
     setupZazuUserMenus();
     setupZazuToasts();
     setupBrandingUploads();
