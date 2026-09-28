@@ -103,6 +103,8 @@ class AuthenticationTest extends TestCase
             ->assertSee('data-auth-modal-open="login"', false)
             ->assertSee('data-auth-modal-open="register"', false)
             ->assertSee('data-auth-modal', false)
+            ->assertSee('Owner / Administrator', false)
+            ->assertSee('name="owner_access"', false)
             ->assertSee('action="'.route('login.store').'"', false)
             ->assertSee('action="'.route('register.store').'"', false);
     }
@@ -439,8 +441,7 @@ class AuthenticationTest extends TestCase
         $business->users()->attach($staff->id, ['role' => 'staff']);
 
         $this->get(route('owner.login'))
-            ->assertOk()
-            ->assertSee('Owner sign in');
+            ->assertRedirect(route('landing', ['auth' => 'owner']));
 
         $this->post(route('login.store'), [
             'identifier' => $staff->username,

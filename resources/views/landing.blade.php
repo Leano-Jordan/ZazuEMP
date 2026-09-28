@@ -69,12 +69,18 @@
     <div class="auth-modal-panel">
         <button type="button" class="auth-modal-close" data-auth-modal-close aria-label="Close authentication window">×</button>
 
+        <div class="auth-modal-access" role="tablist" aria-label="Zazu access type">
+            <button type="button" role="tab" aria-selected="true" data-auth-access-switch="login">Workspace access</button>
+            <button type="button" role="tab" aria-selected="false" data-auth-access-switch="owner">Owner / Administrator</button>
+        </div>
+
         <section data-auth-panel="login">
-            <div class="auth-modal-kicker">Workspace access</div>
-            <h2 id="auth-login-title">Welcome back.</h2>
-            <p class="auth-modal-copy" id="auth-login-copy">Use your username or email address to continue to Zazu.</p>
+            <div class="auth-modal-kicker" data-auth-kicker>Workspace access</div>
+            <h2 id="auth-login-title" data-auth-title>Welcome back.</h2>
+            <p class="auth-modal-copy" id="auth-login-copy" data-auth-copy>Use your username or email address to continue to Zazu.</p>
             <form method="POST" action="{{ route('login.store') }}" class="auth-modal-form" data-auth-form="login">
                 @csrf
+                <input type="hidden" name="owner_access" value="0" data-auth-owner-access>
                 <div class="auth-modal-field">
                     <label for="auth_identifier">Username or email</label>
                     <input id="auth_identifier" name="identifier" type="text" value="{{ old('identifier') }}" autocomplete="username" inputmode="text" spellcheck="false" autocapitalize="none" required>
@@ -88,16 +94,16 @@
                     </div>
                     @error('password')<p class="auth-modal-error">{{ $message }}</p>@enderror
                 </div>
-                <button type="submit" class="btn primary auth-modal-submit">Log in <span>→</span></button>
+                <button type="submit" class="btn primary auth-modal-submit" data-auth-submit>Log in <span>→</span></button>
                 <a class="auth-modal-forgot" href="{{ route('password.request') }}">Forgot your password?</a>
             </form>
-            <div class="auth-modal-switch">New to Zazu? <button type="button" data-auth-modal-switch="register">Create your workspace</button></div>
+            <div class="auth-modal-switch" data-auth-login-switch>New to Zazu? <button type="button" data-auth-modal-switch="register">Create your workspace</button></div>
         </section>
 
         <section data-auth-panel="register" hidden>
-            <div class="auth-modal-kicker">Create workspace</div>
+            <div class="auth-modal-kicker">Create owner workspace</div>
             <h2 id="auth-register-title">Set up your Zazu workspace.</h2>
-            <p class="auth-modal-copy" id="auth-register-copy">Create your owner account and choose the username you will use to sign in.</p>
+            <p class="auth-modal-copy" id="auth-register-copy">Create the owner account for your Zazu workspace and choose the username you will use to sign in.</p>
             <form method="POST" action="{{ route('register.store') }}" class="auth-modal-form" data-auth-form="register">
                 @csrf
                 <div class="auth-modal-grid">
@@ -157,13 +163,34 @@
     const closeButton = modal.querySelector('[data-auth-modal-close]');
     const panels = modal.querySelectorAll('[data-auth-panel]');
     const lastFocus = { element: null };
-    const initialPanel = @json(session('auth_modal', old('identifier') || $errors->any() ? 'login' : null));
+    const requestedPanel = @json(request()->query('auth'));
+    const initialPanel = @json(session('auth_modal', old('identifier') || $errors->any() ? 'login' : null)) || (['login', 'register', 'owner'].includes(requestedPanel) ? requestedPanel : null);
+    const accessTabs = modal.querySelectorAll('[data-auth-access-switch]');
+    const ownerAccess = modal.querySelector('[data-auth-owner-access]');
+    const loginTitle = modal.querySelector('[data-auth-title]');
+    const loginCopy = modal.querySelector('[data-auth-copy]');
+    const loginKicker = modal.querySelector('[data-auth-kicker]');
+    const loginSubmit = modal.querySelector('[data-auth-submit]');
+    const loginSwitch = modal.querySelector('[data-auth-login-switch]');
+
+    const setAccessMode = (mode) => {
+        const isOwner = mode === 'owner';
+        accessTabs.forEach((tab) => tab.setAttribute('aria-selected', tab.dataset.authAccessSwitch === mode ? 'true' : 'false'));
+        if (ownerAccess) ownerAccess.value = isOwner ? '1' : '0';
+        if (loginKicker) loginKicker.textContent = isOwner ? 'Owner access' : 'Workspace access';
+        if (loginTitle) loginTitle.textContent = isOwner ? 'Welcome back, owner.' : 'Welcome back.';
+        if (loginCopy) loginCopy.textContent = isOwner ? 'Use your owner account to enter protected administration.' : 'Use your username or email address to continue to Zazu.';
+        if (loginSubmit) loginSubmit.innerHTML = isOwner ? 'Open owner area <span>→</span>' : 'Log in <span>→</span>';
+        if (loginSwitch) loginSwitch.hidden = isOwner;
+    };
 
     const showPanel = (name) => {
-        panels.forEach((panel) => { panel.hidden = panel.dataset.authPanel !== name; });
-        modal.setAttribute('aria-labelledby', name === 'register' ? 'auth-register-title' : 'auth-login-title');
-        modal.setAttribute('aria-describedby', name === 'register' ? 'auth-register-copy' : 'auth-login-copy');
-        const first = modal.querySelector('[data-auth-panel="' + name + '"] input');
+        const panel = name === 'owner' ? 'login' : name;
+        panels.forEach((item) => { item.hidden = item.dataset.authPanel !== panel; });
+        modal.setAttribute('aria-labelledby', panel === 'register' ? 'auth-register-title' : 'auth-login-title');
+        modal.setAttribute('aria-describedby', panel === 'register' ? 'auth-register-copy' : 'auth-login-copy');
+        if (panel === 'login') setAccessMode(name === 'owner' ? 'owner' : 'login');
+        const first = modal.querySelector('[data-auth-panel="' + panel + '"] input:not([type="hidden"])');
         window.setTimeout(() => first?.focus(), 0);
     };
 
@@ -182,6 +209,7 @@
     };
 
     openers.forEach((button) => button.addEventListener('click', () => open(button.dataset.authModalOpen, button)));
+    accessTabs.forEach((button) => button.addEventListener('click', () => showPanel(button.dataset.authAccessSwitch)));
     modal.querySelectorAll('[data-auth-modal-switch]').forEach((button) => button.addEventListener('click', () => showPanel(button.dataset.authModalSwitch)));
     closeButton?.addEventListener('click', close);
     modal.addEventListener('cancel', (event) => { event.preventDefault(); close(); });

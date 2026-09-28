@@ -68,7 +68,7 @@ class AuthController extends Controller
 
     public function store(Request $request): RedirectResponse
     {
-        $request->session()->flash('auth_modal', 'login');
+        $request->session()->flash('auth_modal', $request->boolean('owner_access') ? 'owner' : 'login');
 
         $credentials = $request->validate([
             'identifier' => ['required', 'string', 'max:255'],
