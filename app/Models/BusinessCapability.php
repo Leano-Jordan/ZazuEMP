@@ -6,6 +6,7 @@ use App\Models\Concerns\BelongsToBusiness;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class BusinessCapability extends Model
 {
@@ -36,5 +37,10 @@ class BusinessCapability extends Model
     public function business(): BelongsTo
     {
         return $this->belongsTo(Business::class);
+    }
+
+    public function assets(): HasMany
+    {
+        return $this->hasMany(Asset::class, 'capability_id');
     }
 }
