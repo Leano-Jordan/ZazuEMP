@@ -169,16 +169,39 @@ class QuoteController extends Controller
         return view('quotes.public', compact('quote', 'version', 'acceptUrl'));
     }
 
-    public function publicAccept(Request $request, Quote $quote): RedirectResponse
+    public function publicAccept(
+        Request $request,
+        Quote $quote,
+        EventLifecycleService $lifecycle
+    ): RedirectResponse
     {
         $validated = $request->validate([
             'customer_name' => ['required', 'string', 'max:255'],
             'acceptance' => ['accepted'],
         ]);
 
-        DB::transaction(function () use ($quote, $validated): void {
+        DB::transaction(function () use ($quote, $validated, $lifecycle): void {
+            $eventId = Quote::query()
+                ->whereKey($quote->id)
+                ->value('event_id');
+
+            abort_unless($eventId, 404);
+
+            $businessId = (int) Event::query()
+                ->whereKey($eventId)
+                ->value('business_id');
+
+            abort_unless($businessId > 0, 404);
+
+            // Use the same business -> event -> child lock ordering as the
+            // authenticated commercial mutation paths. This prevents a public
+            // quote acceptance racing an event cancellation or closure.
+            $lockedEvent = $lifecycle->lock($businessId, (int) $eventId);
+            $lifecycle->assertOperational($lockedEvent);
+
             $lockedQuote = Quote::query()
                 ->whereKey($quote->id)
+                ->where('event_id', $lockedEvent->id)
                 ->lockForUpdate()
                 ->firstOrFail();
 
@@ -194,12 +217,6 @@ class QuoteController extends Controller
             $version->update(['status' => 'accepted']);
             $lockedQuote->update(['status' => 'accepted']);
 
-            $businessId = (int) Event::query()
-                ->whereKey($lockedQuote->event_id)
-                ->value('business_id');
-
-            abort_unless($businessId > 0, 404);
-
             Audit::record('quote.customer.accepted', $lockedQuote, [
                 'customer_name' => trim($validated['customer_name']),
                 'quote_version' => $version->version,
@@ -211,7 +228,11 @@ class QuoteController extends Controller
         );
     }
 
-    public function updateStatus(Request $request, Quote $quote): RedirectResponse
+    public function updateStatus(
+        Request $request,
+        Quote $quote,
+        EventLifecycleService $lifecycle
+    ): RedirectResponse
     {
         $businessId = app(CurrentBusiness::class)->id($request->user());
 
@@ -234,9 +255,19 @@ class QuoteController extends Controller
 
         abort_unless($quote->latestVersion, 422, 'A quote must have a version before its status can change.');
 
-        DB::transaction(function () use ($quote, $newStatus): void {
+        DB::transaction(function () use ($quote, $newStatus, $businessId, $lifecycle): void {
+            $eventId = Quote::query()
+                ->whereKey($quote->id)
+                ->value('event_id');
+
+            abort_unless($eventId, 404);
+
+            $lockedEvent = $lifecycle->lock($businessId, (int) $eventId);
+            $lifecycle->assertOperational($lockedEvent);
+
             $lockedQuote = Quote::query()
                 ->whereKey($quote->id)
+                ->where('event_id', $lockedEvent->id)
                 ->lockForUpdate()
                 ->firstOrFail();
 
