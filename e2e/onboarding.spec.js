@@ -7,12 +7,19 @@ test('registration flows through onboarding into the dashboard', async ({ page }
     const username = 'browserowner' + unique;
     const businessName = 'Browser Catering ' + unique;
 
-    await page.goto('/');
+    const landingResponse = await page.goto('/');
+    expect(landingResponse?.status(), 'public landing').toBe(200);
     await expect(page.locator('html')).toHaveAttribute('lang', /.+/);
     await expect(page.locator('nav[aria-label="Public navigation"]')).toBeVisible();
-    await expect(page.getByRole('link', { name: 'Register' })).toBeVisible();
-    await expect(page.getByRole('link', { name: 'Log in' })).toBeVisible();
-    await page.getByRole('link', { name: 'Register' }).click();
+    await expect(page.locator('.zazu-error-shell')).toHaveCount(0);
+    await expect(page.getByRole('heading', { name: 'Run the work. Know the numbers.' })).toBeVisible();
+    await expect(page.locator('nav[aria-label="Public navigation"]').getByRole('link', { name: 'Register', exact: true })).toBeVisible();
+    await expect(page.locator('nav[aria-label="Public navigation"]').getByRole('link', { name: 'Log in', exact: true })).toBeVisible();
+    const loginResponse = await page.goto('/login');
+    expect(loginResponse?.status(), 'login page').toBe(200);
+    await expect(page.locator('.zazu-error-shell')).toHaveCount(0);
+    await page.goto('/');
+    await page.locator('nav[aria-label="Public navigation"]').getByRole('link', { name: 'Register', exact: true }).click();
     await expect(page.getByRole('heading', { name: 'Set up your Zazu workspace' })).toBeVisible();
 
     await page.getByLabel('Your name').fill('Browser Owner');
@@ -24,23 +31,27 @@ test('registration flows through onboarding into the dashboard', async ({ page }
     await page.getByRole('button', { name: 'Create workspace' }).click();
 
     await expect(page).toHaveURL(/\/setup\/catalogue$/);
+    await expect(page.locator('.zazu-error-shell')).toHaveCount(0);
     await expect(page.getByRole('heading', { name: 'Set up what you offer' })).toBeVisible();
 
     await page.getByLabel('What do you offer?').fill('Wedding catering');
     await page.getByRole('button', { name: 'Continue' }).click();
 
     await expect(page).toHaveURL(/\/setup\/experience$/);
+    await expect(page.locator('.zazu-error-shell')).toHaveCount(0);
     await expect(page.getByRole('heading', { name: 'Choose how much of Zazu you want surfaced.' })).toBeVisible();
 
     await page.getByLabel('Intermediate').check();
     await page.getByRole('button', { name: 'Continue setup' }).click();
 
     await expect(page).toHaveURL(/\/setup\/business$/);
+    await expect(page.locator('.zazu-error-shell')).toHaveCount(0);
     await expect(page.getByRole('heading', { name: 'Tell Zazu about your business' })).toBeVisible();
 
     await page.getByRole('button', { name: 'Finish setup' }).click();
 
     await expect(page).toHaveURL(/\/dashboard$/);
+    await expect(page.locator('.zazu-error-shell')).toHaveCount(0);
     await expect(page.locator('main#main-content')).toBeVisible();
     await expect(page.locator('a.zazu-skip-link')).toHaveCount(1);
     await expect(page.getByRole('button', { name: 'Open navigation' })).toBeVisible();
@@ -82,9 +93,13 @@ test('registration flows through onboarding into the dashboard', async ({ page }
         await expect(page.locator('body')).not.toContainText('Server Error');
     }
 
-    await page.goto('/');
+    const signedInLandingResponse = await page.goto('/');
+    expect(signedInLandingResponse?.status(), 'authenticated landing').toBe(200);
+    await expect(page.locator('.zazu-error-shell')).toHaveCount(0);
     await expect(page.getByText("You’re signed in")).toBeVisible();
-    await page.goto('/dashboard');
+    const dashboardResponse = await page.goto('/dashboard');
+    expect(dashboardResponse?.status(), 'authenticated dashboard').toBe(200);
+    await expect(page.locator('.zazu-error-shell')).toHaveCount(0);
     await page.locator('[data-theme-toggle]').click();
     await expect(page.locator('html')).toHaveAttribute('data-theme', 'dark');
     await page.locator('[data-theme-toggle]').click();
