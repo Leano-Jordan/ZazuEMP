@@ -5,7 +5,7 @@
         <a href="{{ route('work.show', $event) }}" class="zazu-btn zazu-btn-ghost">Job workspace</a>
     </x-slot:headerAction>
 
-    <section class="zazu-command-band">
+    <section class="zazu-command-band zazu-edit-command">
         <div>
             <div class="zazu-eyebrow">Job details</div>
             <h2 class="zazu-command-title">{{ $event->name }}</h2>
@@ -120,7 +120,7 @@
                     </div>
                 </section>
 
-                <div class="zazu-actionbar">
+                <div class="zazu-actionbar zazu-actionbar-sticky">
                     <a href="{{ route('work.show', $event) }}" class="zazu-btn zazu-btn-ghost">Cancel</a>
                     <button class="zazu-btn zazu-btn-primary">Save changes</button>
                 </div>
@@ -129,6 +129,7 @@
             <aside class="zazu-form-aside">
                 <div class="zazu-context-card">
                     <div class="zazu-context-title">Current workspace</div>
+                    <div class="zazu-context-status"><span class="zazu-status-dot"></span> Changes apply across this job</div>
                     <div class="zazu-context-copy">Changes here update this job across the workspace.</div>
                     <div class="mt-4 grid gap-3">
                         <div>
