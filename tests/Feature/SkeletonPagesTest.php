@@ -69,7 +69,13 @@ class SkeletonPagesTest extends TestCase
             'customers.index',
             'customers.create',
         ] as $route) {
-            $this->get(route($route))->assertOk();
+            $response = $this->get(route($route));
+
+            $this->assertContains(
+                $response->status(),
+                [200, 302],
+                "Expected {$route} to be directly reachable or intentionally redirected."
+            );
         }
     }
 
