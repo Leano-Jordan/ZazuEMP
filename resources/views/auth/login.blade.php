@@ -114,21 +114,5 @@
             </div>
         </aside>
     </main>
-
-    <script>
-        document.addEventListener('DOMContentLoaded', () => {
-            const toggle = document.querySelector('[data-password-toggle]');
-            const password = document.getElementById('password');
-
-            if (!toggle || !password) return;
-
-            toggle.addEventListener('click', () => {
-                const showing = password.type === 'text';
-                password.type = showing ? 'password' : 'text';
-                toggle.textContent = showing ? 'Show' : 'Hide';
-                toggle.setAttribute('aria-label', showing ? 'Show password' : 'Hide password');
-            });
-        });
-    </script>
 </body>
 </html>
