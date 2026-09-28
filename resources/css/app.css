@@ -6608,3 +6608,68 @@ body:not(.zazu-has-wallpaper) {
 @media (max-width: 520px) {
     .zazu-soft-disclosure { padding: 13px; }
 }
+
+/* Final composition pass: let page headers breathe instead of boxing every section. */
+.zazu-command-band {
+    margin-bottom: 22px;
+    padding: 8px 2px 18px;
+    overflow: visible;
+    background: transparent;
+    box-shadow: none;
+}
+
+.zazu-command-band::after {
+    right: -20px;
+    top: -58px;
+    width: 150px;
+    height: 150px;
+    opacity: .7;
+}
+
+.zazu-command-band .zazu-command-meta {
+    padding-left: 20px;
+    border-left: 0;
+}
+
+.zazu-command-band .zazu-command-meta-value {
+    font-size: 1.7rem;
+}
+
+.zazu-panel {
+    box-shadow:
+        0 1px 2px color-mix(in srgb, var(--zazu-ink) 3%, transparent),
+        0 10px 26px color-mix(in srgb, var(--zazu-ink) 4%, transparent);
+}
+
+.zazu-panel:hover {
+    box-shadow:
+        0 1px 2px color-mix(in srgb, var(--zazu-ink) 3%, transparent),
+        0 14px 32px color-mix(in srgb, var(--zazu-primary) 5%, transparent);
+}
+
+.zazu-card:not(.zazu-list) {
+    box-shadow:
+        0 1px 2px color-mix(in srgb, var(--zazu-ink) 3%, transparent),
+        0 10px 26px color-mix(in srgb, var(--zazu-ink) 4%, transparent);
+}
+
+@media (max-width: 820px) {
+    .zazu-command-band {
+        padding: 4px 0 14px;
+        margin-bottom: 16px;
+    }
+
+    .zazu-command-band .zazu-command-meta {
+        padding-left: 0;
+        margin-top: 8px;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .zazu-panel:hover,
+    .zazu-card:not(.zazu-list):hover {
+        box-shadow:
+            0 1px 2px color-mix(in srgb, var(--zazu-ink) 3%, transparent),
+            0 10px 26px color-mix(in srgb, var(--zazu-ink) 4%, transparent);
+    }
+}
