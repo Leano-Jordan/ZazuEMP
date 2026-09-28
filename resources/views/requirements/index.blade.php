@@ -6,7 +6,7 @@
         <a href="{{ route('work.show', $event) }}" class="zazu-btn zazu-btn-ghost">Job workspace</a>
     </x-slot:headerAction>
 
-    <section class="zazu-command-band">
+    <section class="zazu-command-band zazu-requirements-command">
         <div>
             <div class="zazu-eyebrow">{{ $event->reference }} · {{ $event->customer?->name ?? 'Customer' }}</div>
             <h2 class="zazu-command-title">Services for this job</h2>
@@ -15,7 +15,7 @@
         <div class="zazu-command-meta"><div class="zazu-command-meta-label">Records</div><div class="zazu-command-meta-value">{{ $requirements->count() }}</div></div>
     </section>
 
-    <section class="zazu-card zazu-list">
+    <section class="zazu-card zazu-list zazu-requirements-register">
         <div class="zazu-card-header">
             <div class="zazu-eyebrow">Operational records</div>
             <div class="zazu-card-title mt-1">Requirement list</div>
@@ -33,7 +33,7 @@
                 <div class="zazu-list-main">
                     <div class="flex flex-wrap items-center gap-2">
                         <span class="zazu-list-title">{{ $requirement->description }}</span>
-                        <span class="zazu-chip zazu-chip-info">{{ ucfirst($requirement->status) }}</span>
+                        <span class="zazu-chip zazu-chip-info zazu-requirement-status">{{ ucfirst($requirement->status) }}</span>
                     </div>
                     <div class="zazu-list-meta">
                         {{ $requirement->category ?: 'General' }}
