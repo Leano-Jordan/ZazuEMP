@@ -102,7 +102,7 @@
                         <div class="zazu-form-section-copy">Use these when daytime and nighttime coordination need different people.</div>
                     </div>
                     <div class="grid gap-4">
-                        <details class="rounded border border-[var(--zazu-border)] bg-[var(--zazu-surface-2)] p-4" open>
+                        <details class="zazu-soft-disclosure" open>
                             <summary class="cursor-pointer text-xs font-semibold text-[var(--zazu-ink-2)]">Day contact</summary>
                             <div class="mt-4 grid gap-4 sm:grid-cols-2">
                                 <label class="zazu-field"><span class="zazu-label">Name</span><input name="day_contact_name" value="{{ old('day_contact_name') }}" class="zazu-input">@error('day_contact_name')<span class="zazu-field-error">{{ $message }}</span>@enderror</label>
@@ -110,7 +110,7 @@
                                 <label class="zazu-field sm:col-span-2"><span class="zazu-label">Email</span><input type="email" name="day_contact_email" value="{{ old('day_contact_email') }}" class="zazu-input" autocomplete="email"></label>
                             </div>
                         </details>
-                        <details class="rounded border border-[var(--zazu-border)] bg-[var(--zazu-surface-2)] p-4">
+                        <details class="zazu-soft-disclosure">
                             <summary class="cursor-pointer text-xs font-semibold text-[var(--zazu-ink-2)]">Night contact</summary>
                             <div class="mt-4 grid gap-4 sm:grid-cols-2">
                                 <label class="zazu-field"><span class="zazu-label">Name</span><input name="night_contact_name" value="{{ old('night_contact_name') }}" class="zazu-input">@error('night_contact_name')<span class="zazu-field-error">{{ $message }}</span>@enderror</label>
