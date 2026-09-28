@@ -3033,3 +3033,75 @@ html[data-theme="dark"] body {
         grid-template-columns: 1fr;
     }
 }
+
+
+/* CATALOGUE — CYCLE 2: color balance + scanning contrast */
+.zazu-catalogue-toolbar {
+    background: var(--zazu-surface-2);
+    border-color: var(--zazu-border);
+}
+.zazu-catalogue-tabs {
+    background: var(--zazu-page);
+}
+.zazu-catalogue-tab {
+    color: var(--zazu-muted);
+}
+.zazu-catalogue-tab:hover {
+    background: var(--zazu-primary-soft);
+    color: var(--zazu-ink);
+}
+.zazu-catalogue-tab.is-active {
+    background: var(--zazu-primary);
+    color: var(--zazu-primary-ink);
+    box-shadow: 0 3px 10px color-mix(in srgb, var(--zazu-primary) 18%, transparent);
+}
+.zazu-tab-count {
+    color: inherit;
+    opacity: .78;
+}
+.zazu-catalogue-register,
+.zazu-catering-card {
+    background: var(--zazu-page);
+    border-color: var(--zazu-border);
+}
+.zazu-register-head {
+    background: var(--zazu-surface-2);
+    color: var(--zazu-muted);
+}
+.zazu-catalogue-row {
+    background: var(--zazu-surface);
+}
+.zazu-catalogue-row:nth-child(even) {
+    background: color-mix(in srgb, var(--zazu-surface-2) 40%, var(--zazu-surface));
+}
+.zazu-catalogue-row:hover {
+    background: color-mix(in srgb, var(--zazu-primary-soft) 72%, var(--zazu-surface));
+}
+.zazu-catalogue-row-meta,
+.zazu-catering-description,
+.zazu-catering-meta,
+.zazu-catalogue-unit {
+    color: var(--zazu-muted);
+}
+.zazu-rate-badge,
+.zazu-dietary-tag {
+    border-color: color-mix(in srgb, var(--zazu-primary) 30%, var(--zazu-border));
+    background: var(--zazu-primary-soft);
+    color: var(--zazu-primary-deep);
+}
+.zazu-status-active {
+    color: var(--zazu-success-ink);
+}
+.zazu-status-muted {
+    color: var(--zazu-muted);
+}
+.zazu-catalogue-drawer-panel {
+    background: var(--zazu-page);
+}
+.zazu-catalogue-drawer-head {
+    background: var(--zazu-surface);
+}
+.zazu-drawer-specs > div {
+    background: var(--zazu-surface);
+    border-color: var(--zazu-border);
+}
