@@ -3467,3 +3467,39 @@ body[data-zazu-route^="quotes."] .zazu-topbar-actions .zazu-command-trigger:focu
 .zazu-calendar-page .zazu-calendar-agenda-event:hover {
     background: var(--zazu-primary-soft);
 }
+
+
+/* RESOURCE PAGES — CYCLE 3: accessibility + touch-safe controls */
+.zazu-assets-directory .zazu-btn:focus-visible,
+.zazu-assets-directory input:focus-visible,
+.zazu-assets-directory select:focus-visible,
+.zazu-inventory-directory .zazu-btn:focus-visible,
+.zazu-inventory-directory input:focus-visible,
+.zazu-inventory-directory select:focus-visible,
+.zazu-calendar-page .zazu-btn:focus-visible,
+.zazu-calendar-page .zazu-calendar-event:focus-visible {
+    outline: 3px solid color-mix(in srgb, var(--zazu-focus) 72%, transparent);
+    outline-offset: 2px;
+}
+.zazu-assets-directory .zazu-action-group .zazu-btn,
+.zazu-inventory-directory .zazu-action-group .zazu-btn {
+    min-height: 40px;
+}
+.zazu-metric-alert {
+    border-color: color-mix(in srgb, var(--zazu-warning) 42%, var(--zazu-border));
+    background: var(--zazu-warning-soft);
+}
+.zazu-metric-alert .zazu-metric-value,
+.zazu-metric-alert .zazu-finance-symbol {
+    color: var(--zazu-warning-ink);
+}
+.zazu-metric-alert .zazu-finance-symbol {
+    border-color: color-mix(in srgb, var(--zazu-warning) 38%, var(--zazu-border));
+    background: var(--zazu-warning-soft);
+}
+@media (max-width: 700px) {
+    .zazu-calendar-page .zazu-calendar-agenda-event {
+        min-height: 44px;
+        align-items: center;
+    }
+}
