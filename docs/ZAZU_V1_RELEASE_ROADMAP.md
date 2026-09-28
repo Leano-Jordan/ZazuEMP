@@ -318,3 +318,54 @@ A second structural gap was confirmed: an authenticated account with no active `
 ### Next action
 Run the current HEAD Laravel and browser workflows. If a failure remains, fix only the verified blocker before further feature/refinement work.
 
+
+
+## ZR-04 Current-HEAD access verification — 2026-09-28
+
+### Verification scope
+Access path only. No feature/refinement work was performed during this verification pass.
+
+### Browser evidence
+Current HEAD browser smoke run: `36490728441`  
+Result: **SUCCESS** — **4 passed, 8 skipped**.
+
+Verified path:
+`public landing → register → catalogue setup → experience setup → business setup → dashboard → authenticated landing → logout → login → dashboard`
+
+The browser smoke explicitly checked `.zazu-error-shell` was absent after:
+- public landing
+- login
+- catalogue setup
+- experience setup
+- business setup
+- dashboard
+- authenticated landing
+- post-logout landing
+- login surface
+
+Responsive entry smoke also ran for Chromium desktop, Pixel 7 mobile and Chromium tablet emulation and passed.
+
+### Authentication evidence
+Current-head Laravel run `36490448966`:
+- `AuthenticationTest`: **PASS**
+- Registration creates user + business + owner membership: **PASS**
+- Orphaned account workspace recovery: **PASS**
+- Username login/logout: **PASS**
+- Blade compilation: **PASS**
+- Vite asset manifest verification: **PASS**
+- Psalm security scan: **PASS**
+
+The full Laravel suite still has **9 unrelated existing failures** (151 passed) and therefore remains open as a broader regression gate. Those failures are not the access-path failure that originally prevented the landing page from rendering.
+
+### Release status
+- **CORE-02 Authentication:** 🟢 VERIFIED COMPLETE for the tested registration/login/access path.
+- **CORE-03 Onboarding:** 🟢 VERIFIED COMPLETE for the tested registration → setup → dashboard path.
+- **RC-01 Runtime:** 🟡 IN PROGRESS — full suite still has 9 unrelated failures.
+- **RC-02 Browser desktop:** 🟢 VERIFIED COMPLETE for the targeted critical access traversal.
+- **RC-03 Browser mobile:** 🟢 VERIFIED COMPLETE for responsive landing/login no-error smoke; full registration traversal intentionally runs once on Chromium to avoid shared-IP registration throttling.
+- **Access blocker:** **CLEARED in CI verification.**
+
+### Director conclusion
+The original landing-page access blocker is no longer reproducing in the current HEAD verification environment. The current browser evidence reaches the real landing page and completes registration/onboarding/dashboard without a Zazu error page.
+
+This does **not** certify the user's separate deployed/local environment as live-green; no deployment URL was available for direct external browser verification.
