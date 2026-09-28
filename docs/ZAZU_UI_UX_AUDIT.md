@@ -234,3 +234,26 @@ Automated evidence:
 Verification boundary:
 - Browser smoke successfully built the frontend, installed Chromium and started the application; its regression suite had not completed at record time.
 - Local manual browser inspection is unavailable in this environment.
+
+
+## 2026-09-28 deep-dive UI/UX cycle
+
+Scope: every form surface, unified authentication, Calendar, navigation simplification, dead-end reduction and mobile hardening.
+
+Implemented:
+- Registration and normal sign-in now share the same dual auth composition with route-preserving in-place switching and animation.
+- Owner sign-in remains semantically separate from workspace registration.
+- Shared password visibility handling is centralized in the application UI initializer.
+- Form rhythm is standardized through the shared `.zazu-form` system so labels, controls, helper text and validation align as one vertical unit, with mobile single-column fallback.
+- Calendar now has stronger month hierarchy, current-day emphasis, event limits, overflow indication and a mobile agenda representation.
+- Primary navigation was reduced to compact workspace destinations; lower-level destinations now appear as contextual section tabs inside the page-title area.
+- Mobile navigation exposes only the current section's relevant destinations and no longer depends on an internally scrolling navigation rail.
+- Finance contextual actions are permission-gated individually.
+- Mobile form grids collapse to one column, controls receive mobile-safe minimum heights, action groups can fill available width, and document/form surfaces reduce padding safely.
+
+Findings addressed: duplicate auth compositions; missing mobile navigation toggle initialization; excessive sidebar density; lower-level routes competing with primary navigation; weak Calendar hierarchy; inconsistent form rhythm; and finance action links that could be shown without their specific permission.
+
+Verification boundary:
+- Source-level structural checks after this batch were clean for CSS and JS brace balance; auth pages no longer contain page-local script blocks.
+- Connected GitHub status surface did not expose CI status for the latest UI commits at audit time.
+- Browser-rendered desktop/tablet/mobile QA and local Blade compilation were not executed in this environment, so rendered verification is not claimed.
