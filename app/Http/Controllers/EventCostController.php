@@ -76,6 +76,12 @@ class EventCostController extends Controller
             'A cancelled cost cannot have an actual amount.'
         );
 
+        abort_if(
+            $validated['status'] === 'incurred' && ($validated['actual_amount'] ?? null) === null,
+            422,
+            'An incurred cost must have an actual amount.'
+        );
+
         DB::transaction(function () use ($validated, $event, $request, $lifecycle): void {
             $businessId = app(CurrentBusiness::class)->id($request->user());
             $lockedEvent = $lifecycle->lock($businessId, $event->id);
