@@ -155,6 +155,113 @@ class PurchaseOrderController extends Controller
     * @SuppressWarnings(PHPMD.NPathComplexity)
     * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
      */
+    public function receive(Request $request, PurchaseOrder $purchaseOrder): RedirectResponse
+    {
+        $this->ensure($request, $purchaseOrder);
+
+        $data = $request->validate([
+            'idempotency_key' => ['required', 'uuid'],
+            'received_quantity' => ['required', 'array', 'min:1'],
+            'received_quantity.*' => ['nullable', 'numeric', 'decimal:0,2', 'min:0'],
+        ]);
+
+        $businessId = app(CurrentBusiness::class)->id($request->user());
+
+        DB::transaction(function () use ($data, $purchaseOrder, $businessId): void {
+            $lockedOrder = PurchaseOrder::query()
+                ->where('business_id', $businessId)
+                ->lockForUpdate()
+                ->findOrFail($purchaseOrder->id);
+
+            abort_unless(
+                in_array($lockedOrder->status, ['ordered', 'received'], true),
+                422,
+                'Only ordered purchase orders can receive goods.'
+            );
+
+            if ($lockedOrder->last_receipt_idempotency_key === $data['idempotency_key']) {
+                return;
+            }
+
+            $lockedOrder->load('items');
+
+            foreach ($data['received_quantity'] as $itemId => $received) {
+                $receivedCents = Money::toCents((string) ($received ?: '0'));
+                if ($receivedCents <= 0) {
+                    continue;
+                }
+
+                $item = $lockedOrder->items->firstWhere('id', (int) $itemId);
+                abort_unless($item, 404);
+
+                $orderedHundredths = Money::toHundredths((string) $item->quantity);
+                $alreadyHundredths = Money::toHundredths((string) $item->received_quantity);
+                $receivedHundredths = Money::toHundredths((string) $received);
+
+                abort_if(
+                    $alreadyHundredths + $receivedHundredths > $orderedHundredths,
+                    422,
+                    'Received quantity cannot exceed the ordered quantity.'
+                );
+
+                $inventoryItem = AppModelsInventoryItem::query()
+                    ->where('business_id', $businessId)
+                    ->when($item->capability_id, fn ($query) => $query->where('capability_id', $item->capability_id))
+                    ->where(function ($query) use ($item) {
+                        $query->where('name', $item->description)
+                            ->orWhere('sku', $item->description);
+                    })
+                    ->first();
+
+                if (!$inventoryItem) {
+                    $inventoryItem = AppModelsInventoryItem::create([
+                        'business_id' => $businessId,
+                        'capability_id' => $item->capability_id,
+                        'name' => $item->description,
+                        'unit' => $item->unit ?: 'unit',
+                        'reorder_level' => 0,
+                    ]);
+                }
+
+                $inventoryItem->movements()->create([
+                    'business_id' => $businessId,
+                    'idempotency_key' => $data['idempotency_key'],
+                    'purchase_order_id' => $lockedOrder->id,
+                    'purchase_order_item_id' => $item->id,
+                    'type' => 'receipt',
+                    'quantity' => $received,
+                    'unit_cost' => $item->unit_price,
+                    'movement_date' => now()->toDateString(),
+                    'reference' => $lockedOrder->reference,
+                    'notes' => 'Partial receipt from purchase order.',
+                ]);
+
+                $item->update([
+                    'received_quantity' => Money::fromCents(
+                        $alreadyHundredths + $receivedHundredths
+                    ),
+                ]);
+            }
+
+            $fullyReceived = $lockedOrder->items->every(
+                fn ($item) => Money::toHundredths((string) $item->received_quantity)
+                    >= Money::toHundredths((string) $item->quantity)
+            );
+
+            $lockedOrder->update([
+                'status' => $fullyReceived ? 'received' : 'ordered',
+                'last_receipt_idempotency_key' => $data['idempotency_key'],
+            ]);
+
+            Audit::record('purchasing.order.received', $lockedOrder, [
+                'fully_received' => $fullyReceived,
+                'receipt_idempotency_key' => $data['idempotency_key'],
+            ], $businessId);
+        });
+
+        return back()->with('success', 'Purchase receipt recorded.');
+    }
+
     public function updateStatus(Request $request, PurchaseOrder $purchaseOrder): RedirectResponse
     {
         $this->ensure($request, $purchaseOrder);
