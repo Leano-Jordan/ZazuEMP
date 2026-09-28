@@ -24,6 +24,15 @@
       "assets/Background-ZAZU-BKmA5Uiu.jpg"
     ]
   },
+  "resources/css/zazu-mobile-refinement.css": {
+    "file": "assets/zazu-mobile-refinement-BnOURLog.css",
+    "name": "zazu-mobile-refinement",
+    "names": [
+      "zazu-mobile-refinement.css"
+    ],
+    "src": "resources/css/zazu-mobile-refinement.css",
+    "isEntry": true
+  },
   "resources/css/zazu-responsive-theme.css": {
     "file": "assets/zazu-responsive-theme-hZplWMSa.css",
     "name": "zazu-responsive-theme",
