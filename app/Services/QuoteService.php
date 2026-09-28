@@ -24,7 +24,7 @@ class QuoteService
         ?string $notes,
         string $depositPercent = '0.00'
     ): Quote {
-        return DB::transaction(function () use ($event, $requirements, $unitPrices, $currency, $taxRate, $notes): Quote {
+        return DB::transaction(function () use ($event, $requirements, $unitPrices, $currency, $taxRate, $notes, $depositPercent): Quote {
             $currency = strtoupper($currency);
 
             $quote = $event->quotes()->create([
@@ -151,7 +151,7 @@ class QuoteService
         ?string $notes,
         string $depositPercent = '0.00'
     ): QuoteVersion {
-        return DB::transaction(function () use ($quote, $version, $requirements, $unitPrices, $taxRate, $replaceTax, $notes): QuoteVersion {
+        return DB::transaction(function () use ($quote, $version, $requirements, $unitPrices, $taxRate, $replaceTax, $notes, $depositPercent): QuoteVersion {
             $lockedQuote = Quote::query()
                 ->whereKey($quote->id)
                 ->lockForUpdate()
