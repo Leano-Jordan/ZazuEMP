@@ -24,9 +24,10 @@
     }
 
     .zazu-topbar-inner {
-        min-height: 58px;
-        padding: 8px 12px;
+        min-height: 56px;
+        padding: max(8px, env(safe-area-inset-top)) 12px 8px;
         gap: 8px;
+        align-items: center;
     }
 
     .zazu-mobile-menu-button {
@@ -100,9 +101,10 @@
 
     .zazu-topbar-actions {
         min-width: 0;
+        max-width: 100%;
         width: auto !important;
-        flex: 0 0 auto;
-        flex-wrap: nowrap !important;
+        flex: 0 1 auto;
+        flex-wrap: wrap !important;
         gap: 5px;
         padding: 0 !important;
         justify-content: flex-end;
@@ -145,6 +147,32 @@
         display: none !important;
     }
 
+    .zazu-command-search:focus-within .zazu-command-trigger {
+        border-color: var(--zazu-primary);
+        background: var(--zazu-primary-soft);
+        color: var(--zazu-primary);
+    }
+
+    .zazu-header-slot-actions {
+        display: flex;
+        flex: 0 1 auto;
+        min-width: 0;
+        max-width: 100%;
+        align-items: center;
+        justify-content: flex-end;
+        gap: 5px;
+        flex-wrap: wrap;
+    }
+
+    .zazu-header-slot-actions > .zazu-btn {
+        min-height: 40px;
+        flex: 0 1 auto;
+        max-width: 180px;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
     .zazu-header-create {
         width: 40px !important;
         min-width: 40px;
@@ -168,6 +196,7 @@
 
     .zazu-mobile-nav-backdrop {
         display: block;
+        visibility: hidden;
         position: fixed;
         inset: 0;
         z-index: 90;
@@ -200,6 +229,7 @@
     }
 
     body.zazu-mobile-menu-open .zazu-mobile-nav-backdrop {
+        visibility: visible;
         opacity: 1;
         pointer-events: auto;
         cursor: default;
@@ -257,7 +287,19 @@
     }
 
     .zazu-sidebar-footer {
-        padding: 12px;
+        padding: 12px 12px max(12px, env(safe-area-inset-bottom));
+    }
+
+    .zazu-action-group {
+        width: 100%;
+        flex-wrap: wrap;
+        justify-content: flex-start;
+        gap: 6px;
+    }
+
+    .zazu-action-group > .zazu-btn {
+        min-height: 40px;
+        flex: 0 1 auto;
     }
 
     body.zazu-mobile-menu-open {
@@ -284,7 +326,7 @@
 @media (max-width: 520px) {
     .zazu-topbar-inner {
         min-height: 56px;
-        padding: 7px 9px;
+        padding: max(7px, env(safe-area-inset-top)) 9px 7px;
         gap: 6px;
     }
 
@@ -292,20 +334,20 @@
     .zazu-command-trigger,
     .zazu-header-create,
     .zazu-theme-toggle {
-        width: 38px;
-        height: 38px;
-        min-height: 38px !important;
+        width: 40px;
+        height: 40px;
+        min-height: 40px !important;
     }
 
     .zazu-mobile-menu-button,
     .zazu-header-create,
     .zazu-theme-toggle {
-        flex-basis: 38px;
+        flex-basis: 40px;
     }
 
     .zazu-command-search {
-        width: 38px;
-        flex-basis: 38px;
+        width: 40px;
+        flex-basis: 40px;
     }
 
     .zazu-page-title {
