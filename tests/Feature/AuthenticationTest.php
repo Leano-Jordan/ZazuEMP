@@ -49,6 +49,45 @@ class AuthenticationTest extends TestCase
             'user_id' => $user->id,
             'role' => 'owner',
         ]);
+
+        $this->get(route('dashboard'))->assertOk();
+        $this->post(route('logout'))->assertRedirect(route('landing'));
+        $this->post(route('login.store'), [
+            'identifier' => 'ownerperson',
+            'password' => 'password123',
+        ])->assertRedirect(route('dashboard'));
+        $this->get(route('dashboard'))->assertOk();
+    }
+
+    public function test_orphaned_account_can_restore_workspace_access(): void
+    {
+        $user = User::factory()->create([
+            'username' => 'orphanowner',
+            'email' => 'orphan@example.com',
+            'password' => 'password123',
+        ]);
+
+        $this->post(route('login.store'), [
+            'identifier' => 'orphanowner',
+            'password' => 'password123',
+        ])->assertRedirect(route('workspace.recovery'));
+
+        $this->assertAuthenticatedAs($user);
+
+        $this->post(route('workspace.recovery.store'), [
+            'business_name' => 'Recovered Catering',
+        ])->assertRedirect(route('onboarding.catalogue'));
+
+        $business = Business::where('name', 'Recovered Catering')->firstOrFail();
+
+        $this->assertDatabaseHas('business_user', [
+            'business_id' => $business->id,
+            'user_id' => $user->id,
+            'role' => 'owner',
+        ]);
+
+        $this->get(route('dashboard'))->assertOk();
+        $this->assertSame($business->id, app(CurrentBusiness::class)->id($user));
     }
 
     public function test_registration_rejects_duplicate_email_and_username(): void
@@ -147,7 +186,7 @@ class AuthenticationTest extends TestCase
         $this->assertAuthenticatedAs($user);
 
         $this->post(route('logout'))
-            ->assertRedirect(route('login'));
+            ->assertRedirect(route('landing'));
 
         $this->assertGuest();
     }
