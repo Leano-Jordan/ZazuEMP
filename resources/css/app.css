@@ -8118,3 +8118,41 @@ textarea:focus {
     .zazu-calendar-event,
     .zazu-check-row { transition: none; }
 }
+
+/* ============================================================
+   WORKSPACE REFINEMENT / 2026-09
+   ============================================================ */
+.zazu-work-hero-refined { align-items: flex-start; }
+.zazu-work-actions-refined { align-items: flex-start; }
+.zazu-work-meta-stack { display: grid; justify-items: end; gap: 8px; }
+.zazu-work-meta-line { color: var(--zazu-faint); font-size: 10px; font-weight: 700; letter-spacing: .04em; }
+.zazu-next-action-primary { border-left: 4px solid var(--zazu-primary); }
+.zazu-next-action-warning { border-left: 4px solid #c88718; background: #fffaf0; }
+.zazu-next-action-warning .zazu-eyebrow,
+.zazu-next-action-warning .zazu-next-action-title { color: #8b5b0c; }
+.zazu-work-progress-refined { border-color: var(--zazu-border-strong); box-shadow: 0 4px 14px rgba(20,37,58,.05); }
+.zazu-selection-summary {
+    display: inline-flex; align-items: center; min-height: 25px; margin-top: 9px;
+    padding: 4px 8px; border: 1px solid var(--zazu-border); background: var(--zazu-surface);
+    color: var(--zazu-faint); border-radius: 3px; font-size: 9px; font-weight: 800;
+    letter-spacing: .05em; text-transform: uppercase;
+}
+.zazu-selection-summary.is-ready {
+    border-color: color-mix(in srgb, var(--zazu-primary) 35%, var(--zazu-border));
+    background: var(--zazu-primary-soft); color: var(--zazu-primary-deep);
+}
+.zazu-edit-command { border-left: 4px solid var(--zazu-primary); }
+.zazu-context-status {
+    display: flex; align-items: center; gap: 7px; margin-top: 12px; padding-top: 10px;
+    border-top: 1px solid var(--zazu-border); color: var(--zazu-faint); font-size: 10px; line-height: 1.4;
+}
+.zazu-actionbar-sticky {
+    position: sticky; bottom: 12px; z-index: 20; margin-top: 18px; padding: 10px;
+    border: 1px solid var(--zazu-border-strong);
+    background: color-mix(in srgb, var(--zazu-surface) 94%, transparent);
+    box-shadow: 0 10px 24px rgba(20,37,58,.10); backdrop-filter: blur(8px);
+}
+@media (max-width: 820px) {
+    .zazu-work-meta-stack { justify-items: start; }
+    .zazu-actionbar-sticky { bottom: 8px; }
+}
