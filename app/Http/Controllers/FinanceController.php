@@ -6,11 +6,13 @@ use App\Models\Event;
 use App\Models\FinanceExpense;
 use App\Models\Invoice;
 use App\Models\Payment;
+use App\Models\PurchaseOrder;
 use App\Models\Quote;
 use App\Models\Supplier;
 use App\Models\TaxRate;
 use App\Support\Audit;
 use App\Support\CurrentBusiness;
+use App\Services\EventLifecycleService;
 use App\Support\Money;
 use App\Services\FinanceTransactionService;
 use Illuminate\Database\Eloquent\Builder;
@@ -87,7 +89,7 @@ class FinanceController extends Controller
     * @SuppressWarnings(PHPMD.NPathComplexity)
     * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
      */
-    public function storeInvoice(Request $request): RedirectResponse
+    public function storeInvoice(Request $request, EventLifecycleService $lifecycle): RedirectResponse
     {
         $business = app(CurrentBusiness::class)->model($request->user());
         $business->loadMissing('taxProfile');
@@ -233,10 +235,19 @@ class FinanceController extends Controller
             $taxTreatment,
             $taxRate,
             $invoiceLines,
+            $lifecycle,
             &$alreadyProcessed
         ): Invoice {
             // Serialize the business-level idempotency check and quote-version conversion.
             \App\Models\Business::query()->whereKey($businessId)->lockForUpdate()->firstOrFail();
+
+            $lockedEvent = $event
+                ? $lifecycle->lock($businessId, $event->id)
+                : null;
+
+            if ($lockedEvent) {
+                $lifecycle->assertFinanciallyActive($lockedEvent);
+            }
 
             $existingInvoice = Invoice::query()
                 ->where('business_id', $businessId)
@@ -270,7 +281,7 @@ class FinanceController extends Controller
             $invoice = Invoice::create([
                 'business_id' => $businessId,
                 'idempotency_key' => $data['idempotency_key'],
-                'event_id' => $event?->id,
+                'event_id' => $lockedEvent?->id ?? $event?->id,
                 'quote_id' => $data['quote_id'] ?? null,
                 'quote_version_id' => $quoteVersionId,
                 'number' => 'INV-'.now()->format('Ym').'-'.Str::upper(Str::random(6)),
@@ -350,7 +361,7 @@ class FinanceController extends Controller
         ]);
     }
 
-    public function storePayment(Request $request, FinanceTransactionService $finance): RedirectResponse
+    public function storePayment(Request $request, FinanceTransactionService $finance, EventLifecycleService $lifecycle): RedirectResponse
     {
         $businessId = app(CurrentBusiness::class)->id($request->user());
         $data = $request->validate([
@@ -371,6 +382,7 @@ class FinanceController extends Controller
         $alreadyProcessed = $finance->recordPayment(
             businessId: $businessId,
             data: $data,
+            lifecycle: $lifecycle,
         );
 
         if ($alreadyProcessed) {
@@ -387,7 +399,12 @@ class FinanceController extends Controller
         return view('finance.expense-create', [
             'idempotencyKey' => (string) Str::uuid(),
             'suppliers' => Supplier::where('business_id', $businessId)->orderBy('name')->get(),
-            'events' => Event::where('business_id', $businessId)->whereNotIn('status', ['cancelled'])->orderByDesc('event_date')->get(),
+            'events' => Event::where('business_id', $businessId)->orderByDesc('event_date')->get(),
+            'purchaseOrders' => PurchaseOrder::where('business_id', $businessId)
+                ->whereIn('status', ['ordered', 'received', 'cancelled'])
+                ->with('event')
+                ->latest()
+                ->get(),
         ]);
     }
 
@@ -402,18 +419,11 @@ class FinanceController extends Controller
             'expense_date' => ['required', 'date'],
             'supplier_id' => ['nullable', 'integer'],
             'event_id' => ['nullable', 'integer'],
+            'purchase_order_id' => ['nullable', 'integer'],
             'status' => ['required', 'in:unpaid,paid'],
             'reference' => ['nullable', 'string', 'max:255'],
             'notes' => ['nullable', 'string'],
         ]);
-
-        if (!empty($data['supplier_id'])) {
-            abort_unless(Supplier::where('business_id', $businessId)->whereKey($data['supplier_id'])->exists(), 404);
-        }
-
-        if (!empty($data['event_id'])) {
-            abort_unless(Event::where('business_id', $businessId)->whereKey($data['event_id'])->exists(), 404);
-        }
 
         $data['idempotency_key'] ??= (string) Str::uuid();
         $alreadyProcessed = false;
@@ -422,6 +432,7 @@ class FinanceController extends Controller
             businessId: $businessId,
             currency: $currency,
             data: $data,
+            lifecycle: $lifecycle,
         );
 
         if ($alreadyProcessed) {
