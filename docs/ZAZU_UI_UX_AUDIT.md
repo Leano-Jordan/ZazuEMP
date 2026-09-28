@@ -294,3 +294,20 @@ Applied to Zazu:
 This is deliberately not a generic "make everything glassmorphic" treatment. 2026 references emphasize restraint, typography, interaction quality and specific product character over visual effects. citeturn0search8turn0search13turn0search15
 
 Verification boundary: source-level CSS/Blade inspection only. Browser-rendered visual QA remains required before final sign-off.
+
+
+## 2026-09-28 modern SaaS attraction cycle
+
+Research applied from 2026 product UI patterns: calm design reduces visible chrome; Attio's redesigned record pages emphasize headline/key info/primary actions and compact lists; Vercel's 2026 navigation redesign prioritizes common workflows and mobile ergonomics; Notion's 2026 releases emphasize tidy tabs and glanceable dashboard views. citeturn670982search0turn293887search2turn293887search1turn293887search10
+
+Implementation direction for Zazu:
+- Remove decorative grid lines and repeated card borders from operational surfaces.
+- Use tonal separation, whitespace, typography and restrained depth instead of boxes to establish hierarchy.
+- Reserve borders for fields, focus states, semantic warnings, tables and deliberate accent edges.
+- Turn lists into quiet records with hover elevation rather than divider-heavy grids.
+- Give major page headers a soft blue atmospheric treatment to create brand character without decorative artwork.
+- Reduce visual competition between metrics so the numbers and labels carry hierarchy.
+- Make the calendar a set of separated visual day surfaces rather than a continuous bordered spreadsheet.
+- Keep mobile surfaces stacked and touch-friendly, with less chrome and fewer competing boundaries.
+
+This is a product-wide visual language change, not a new component kit: the existing Zazu blue palette and 2–6px geometry are retained, while attraction is created through light, depth, typography, whitespace and motion restraint.
