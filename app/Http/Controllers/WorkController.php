@@ -208,46 +208,53 @@ class WorkController extends Controller
         $this->validateContactBelongsToCustomer($validated['event_day_contact_id'] ?? null, $customer->id);
         $this->validateContactBelongsToCustomer($validated['event_night_contact_id'] ?? null, $customer->id);
 
-        DB::transaction(function () use ($event, $validated, $customer, $business, $lifecycle): void {
-            $lockedEvent = $lifecycle->lock($business->id, $event->id);
+        try {
+            DB::transaction(function () use ($event, $validated, $customer, $business, $lifecycle): void {
+                $lockedEvent = $lifecycle->lock($business->id, $event->id);
 
-            abort_if($lockedEvent->isClosed(), 422, 'Closed work cannot be edited.');
+                abort_if($lockedEvent->isClosed(), 422, 'Closed work cannot be edited.');
 
-            if (
-                (int) $lockedEvent->customer_id !== (int) $customer->id
-                && $lockedEvent->quotes()->exists()
-            ) {
-                throw ValidationException::withMessages([
-                    'customer_id' => 'The customer cannot be changed after a quote exists for this job. Create a new job for a different customer so the quote history stays correct.',
+                if (
+                    (int) $lockedEvent->customer_id !== (int) $customer->id
+                    && $lockedEvent->quotes()->exists()
+                ) {
+                    throw ValidationException::withMessages([
+                        'customer_id' => 'The customer cannot be changed after a quote exists for this job. Create a new job for a different customer so the quote history stays correct.',
+                    ]);
+                }
+
+                $lifecycle->assertTransitionAllowed($lockedEvent, $validated['status']);
+
+                $previousStatus = $lockedEvent->status;
+
+                $lockedEvent->update([
+                    'customer_id' => $customer->id,
+                    'event_day_contact_id' => $validated['event_day_contact_id'] ?? null,
+                    'event_night_contact_id' => $validated['event_night_contact_id'] ?? null,
+                    'name' => trim($validated['name']),
+                    'event_type' => $validated['event_type'],
+                    'customer_name' => $customer->name,
+                    'customer_phone' => $customer->primaryContact?->phone,
+                    'customer_email' => $customer->primaryContact?->email,
+                    'event_date' => $validated['event_date'],
+                    'event_address' => $validated['event_address'] ?? null,
+                    'notes' => $validated['notes'] ?? null,
+                    'status' => $validated['status'],
                 ]);
-            }
 
-            $lifecycle->assertTransitionAllowed($lockedEvent, $validated['status']);
-
-            $previousStatus = $lockedEvent->status;
-
-            $lockedEvent->update([
-                'customer_id' => $customer->id,
-                'event_day_contact_id' => $validated['event_day_contact_id'] ?? null,
-                'event_night_contact_id' => $validated['event_night_contact_id'] ?? null,
-                'name' => trim($validated['name']),
-                'event_type' => $validated['event_type'],
-                'customer_name' => $customer->name,
-                'customer_phone' => $customer->primaryContact?->phone,
-                'customer_email' => $customer->primaryContact?->email,
-                'event_date' => $validated['event_date'],
-                'event_address' => $validated['event_address'] ?? null,
-                'notes' => $validated['notes'] ?? null,
-                'status' => $validated['status'],
-            ]);
-
-            if ($previousStatus !== $lockedEvent->status) {
-                Audit::record('work.status_changed', $lockedEvent, [
-                    'from' => $previousStatus,
-                    'to' => $lockedEvent->status,
-                ], $business->id);
-            }
-        });
+                if ($previousStatus !== $lockedEvent->status) {
+                    Audit::record('work.status_changed', $lockedEvent, [
+                        'from' => $previousStatus,
+                        'to' => $lockedEvent->status,
+                    ], $business->id);
+                }
+            });
+        } catch (ValidationException $exception) {
+            return redirect()
+                ->route('work.edit', $event)
+                ->withInput()
+                ->withErrors($exception->errors());
+        }
 
         return redirect()
             ->route('work.show', $event)
