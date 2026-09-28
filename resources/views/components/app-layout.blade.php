@@ -105,7 +105,6 @@
                         </div>
                         <div class="zazu-header-title-row">
                             <h1 class="zazu-page-title">{{ $heading ?? $title ?? 'Workspace' }}</h1>
-                            @if($business)<span class="zazu-workspace-name" title="Active business workspace">{{ $business->name }}</span>@endif
                         </div>
                         <nav class="zazu-section-tabs" aria-label="Section navigation">
                             @if(request()->routeIs('work.*','capabilities.*','quotes.*','calendar.*'))
