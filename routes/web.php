@@ -12,6 +12,8 @@ use App\Http\Controllers\CustomerContactController;
 use App\Http\Controllers\EventCostController;
 use App\Http\Controllers\EventPreparationController;
 use App\Http\Controllers\EventAttachmentController;
+use App\Http\Controllers\ExperiencePreferenceController;
+use App\Http\Controllers\SearchController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\FinanceController;
 use App\Http\Controllers\InventoryController;
@@ -99,6 +101,8 @@ Route::middleware(['auth', 'auth.session', 'business.context'])->group(function 
         Route::post('/setup/catalogue', [OnboardingController::class, 'storeCatalogue'])->name('onboarding.catalogue.store');
         Route::post('/setup/catalogue/finish', [OnboardingController::class, 'finishCatalogue'])->name('onboarding.catalogue.finish');
         Route::post('/setup/catalogue/skip', [OnboardingController::class, 'skipCatalogue'])->name('onboarding.catalogue.skip');
+        Route::get('/setup/experience', [OnboardingController::class, 'experience'])->name('onboarding.experience');
+        Route::post('/setup/experience', [OnboardingController::class, 'storeExperience'])->name('onboarding.experience.store');
         Route::get('/setup/business', [OnboardingController::class, 'business'])->name('onboarding.business');
         Route::post('/setup/business', [OnboardingController::class, 'storeBusiness'])->name('onboarding.business.store');
         Route::post('/setup/business/skip', [OnboardingController::class, 'skipBusiness'])->name('onboarding.business.skip');
@@ -107,6 +111,9 @@ Route::middleware(['auth', 'auth.session', 'business.context'])->group(function 
     Route::get('/media/profile/{type}/{id}', [\App\Http\Controllers\ProfileMediaController::class, 'show'])->whereIn('type', ['customer', 'user'])->name('profile.media');
     Route::get('/media/business/{type}', [\App\Http\Controllers\BusinessMediaController::class, 'show'])->whereIn('type', ['logo', 'dashboard', 'wallpaper'])->name('business.media');
     Route::get('/calendar', CalendarController::class)->middleware('permission:calendar.view')->name('calendar.index');
+    Route::get('/search', SearchController::class)->name('search.index');
+    Route::get('/preferences/experience', [ExperiencePreferenceController::class, 'edit'])->name('preferences.experience');
+    Route::put('/preferences/experience', [ExperiencePreferenceController::class, 'update'])->name('preferences.experience.update');
 
     Route::get('/finance', [FinanceController::class, 'index'])->middleware('permission:finance.view')->name('finance.index');
     Route::get('/finance/invoices/create', [FinanceController::class, 'createInvoice'])->middleware('permission:finance.invoice.create')->name('finance.invoices.create');
