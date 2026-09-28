@@ -3581,3 +3581,144 @@ body[data-zazu-route^="quotes."] .zazu-topbar-actions .zazu-command-trigger:focu
     .zazu-purchasing-page .zazu-list-item,
     .zazu-suppliers-page .zazu-list-item { min-height:72px; }
 }
+
+
+/* ZAZU VISIBILITY RESET — strong surfaces, borders and controlled white */
+:root {
+    --zazu-page: #F1F5F9;
+    --zazu-surface: #FFFFFF;
+    --zazu-surface-2: #E8EEF5;
+    --zazu-border: #CBD5E1;
+    --zazu-border-strong: #94A3B8;
+    --zazu-muted: #475569;
+    --zazu-ink: #0F172A;
+    --zazu-primary-soft: #DBEAFE;
+}
+body {
+    background: var(--zazu-page);
+    color: var(--zazu-ink);
+}
+.zazu-card,
+.zazu-panel,
+.zazu-context-card,
+.zazu-route-card,
+.zazu-metric-card,
+.zazu-form-section,
+.zazu-list,
+.zazu-command-band,
+.zazu-detail-stack > *,
+.zazu-editor,
+.zazu-table-wrap,
+.zazu-calendar-shell,
+.zazu-catalogue-register,
+.zazu-catalogue-drawer-panel,
+.zazu-inspector,
+.zazu-quote-total-panel {
+    border: 1px solid var(--zazu-border-strong);
+    box-shadow: 0 2px 8px rgba(15,23,42,.07);
+}
+.zazu-card-header,
+.zazu-panel-head,
+.zazu-form-section-head,
+.zazu-register-head,
+.zazu-table-head,
+.zazu-command-band,
+.zazu-section-heading {
+    border-color: var(--zazu-border);
+}
+.zazu-card + .zazu-card,
+.zazu-panel + .zazu-panel,
+.zazu-detail-grid > .zazu-panel,
+.zazu-detail-grid > .zazu-detail-stack > * {
+    border-color: var(--zazu-border-strong);
+}
+.zazu-list-item,
+.zazu-table-row,
+.zazu-detail-row,
+.zazu-manifest-row,
+.zazu-inspector-field,
+.zazu-drawer-specs > div {
+    border-bottom: 1px solid var(--zazu-border);
+}
+.zazu-list-item:last-child,
+.zazu-table-row:last-child,
+.zazu-detail-row:last-child {
+    border-bottom: 0;
+}
+.zazu-input,
+.zazu-select,
+.zazu-textarea,
+.zazu-form-control,
+input:not([type="checkbox"]):not([type="radio"]),
+select,
+textarea {
+    background: #FFFFFF;
+    border: 1px solid var(--zazu-border-strong);
+    color: var(--zazu-ink);
+    box-shadow: inset 0 1px 2px rgba(15,23,42,.04);
+}
+.zazu-input:focus,
+.zazu-select:focus,
+.zazu-textarea:focus,
+input:not([type="checkbox"]):not([type="radio"]):focus,
+select:focus,
+textarea:focus {
+    border-color: var(--zazu-primary);
+    box-shadow: 0 0 0 3px rgba(37,99,235,.16);
+}
+.zazu-btn {
+    border-width: 1px;
+    border-color: var(--zazu-border-strong);
+}
+.zazu-btn-secondary,
+.zazu-btn-ghost {
+    background: #FFFFFF;
+    border-color: var(--zazu-border-strong);
+    color: var(--zazu-ink);
+}
+.zazu-btn-secondary:hover,
+.zazu-btn-ghost:hover {
+    background: var(--zazu-surface-2);
+    border-color: var(--zazu-primary);
+}
+.zazu-eyebrow,
+.zazu-label,
+.zazu-metric-label,
+.zazu-detail-label,
+.zazu-field-help,
+.zazu-command-copy,
+.zazu-card-description,
+.zazu-panel-copy {
+    color: var(--zazu-muted);
+}
+.zazu-card-title,
+.zazu-panel-title,
+.zazu-command-title,
+.zazu-form-section-title,
+.zazu-list-title {
+    color: var(--zazu-ink);
+}
+.zazu-table-head,
+.zazu-register-head {
+    background: var(--zazu-surface-2);
+}
+.zazu-empty,
+.zazu-placeholder {
+    background: var(--zazu-surface-2);
+    border: 1px dashed var(--zazu-border-strong);
+}
+@media (max-width: 700px) {
+    .zazu-card,
+    .zazu-panel,
+    .zazu-context-card,
+    .zazu-route-card,
+    .zazu-metric-card,
+    .zazu-form-section,
+    .zazu-list,
+    .zazu-command-band,
+    .zazu-editor,
+    .zazu-table-wrap,
+    .zazu-calendar-shell {
+        box-shadow: 0 2px 6px rgba(15,23,42,.06);
+    }
+}
