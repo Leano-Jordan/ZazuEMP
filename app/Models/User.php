@@ -23,7 +23,7 @@ class User extends Authenticatable implements CanResetPasswordContract
     public function businesses(): BelongsToMany
     {
         return $this->belongsToMany(Business::class)
-            ->withPivot('role')
+            ->withPivot(['role', 'experience_level'])
             ->withTimestamps();
     }
 
