@@ -86,9 +86,6 @@
                     ] as $tool => $item) {
                         if ($workspaceTools[$tool]) $quickAccess[] = $item;
                     }
-                    if ($workspaceTools['purchasing']) $quickAccess[] = ['label' => 'Purchasing', 'route' => 'purchasing.index'];
-                    if ($workspaceTools['inventory']) $quickAccess[] = ['label' => 'Inventory', 'route' => 'inventory.index'];
-                    if ($workspaceTools['assets']) $quickAccess[] = ['label' => 'Assets', 'route' => 'assets.index'];
                     if ($isOwner) $quickAccess[] = ['label' => 'Settings', 'route' => 'settings.index'];
                 @endphp
                 <nav class="zazu-quick-links" aria-label="Quick access">
