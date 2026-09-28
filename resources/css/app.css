@@ -6230,3 +6230,360 @@ body {
         box-shadow: 0 1px 2px color-mix(in srgb, var(--zazu-ink) 4%, transparent);
     }
 }
+
+/* ============================================================
+   ZAZU 2026 VISUAL ATTRACTION LAYER
+   Calm density, soft depth, typographic hierarchy, minimal chrome.
+   Surfaces define relationships. Borders are reserved for controls,
+   focus states, semantic tables and intentional component edges.
+   ============================================================ */
+
+body:not(.zazu-has-wallpaper) {
+    background:
+        radial-gradient(circle at 82% -8%, color-mix(in srgb, var(--zazu-primary) 10%, transparent), transparent 30%),
+        radial-gradient(circle at 12% 100%, color-mix(in srgb, var(--zazu-primary-soft) 48%, transparent), transparent 28%),
+        var(--zazu-page);
+}
+
+.zazu-sidebar {
+    border-right: 0;
+    background: color-mix(in srgb, var(--zazu-sidebar) 97%, var(--zazu-page));
+    box-shadow: 14px 0 36px color-mix(in srgb, var(--zazu-ink) 4%, transparent);
+}
+
+.zazu-brand {
+    border-bottom: 0;
+}
+
+.zazu-sidebar-footer {
+    border-top: 0;
+}
+
+.zazu-footer-card {
+    border: 0;
+    background: color-mix(in srgb, var(--zazu-primary-soft) 42%, transparent);
+}
+
+.zazu-nav-link.active {
+    box-shadow: inset 3px 0 0 var(--zazu-nav-active);
+    background: color-mix(in srgb, var(--zazu-primary-soft) 58%, transparent);
+}
+
+.zazu-topbar {
+    border-bottom: 0;
+    background: color-mix(in srgb, var(--zazu-page) 82%, transparent);
+    box-shadow: 0 1px 0 color-mix(in srgb, var(--zazu-ink) 3%, transparent);
+}
+
+.zazu-content {
+    padding-top: 30px;
+}
+
+.zazu-command-band {
+    position: relative;
+    overflow: hidden;
+    border: 0;
+    background:
+        radial-gradient(circle at 92% 20%, color-mix(in srgb, var(--zazu-primary) 15%, transparent), transparent 30%),
+        linear-gradient(135deg, color-mix(in srgb, var(--zazu-primary-soft) 74%, var(--zazu-surface)), var(--zazu-surface));
+    box-shadow:
+        0 1px 2px color-mix(in srgb, var(--zazu-ink) 4%, transparent),
+        0 16px 42px color-mix(in srgb, var(--zazu-primary) 7%, transparent);
+}
+
+.zazu-command-band::after {
+    content: "";
+    position: absolute;
+    right: -52px;
+    top: -72px;
+    width: 180px;
+    height: 180px;
+    border-radius: 50%;
+    background: color-mix(in srgb, var(--zazu-primary) 9%, transparent);
+    filter: blur(26px);
+    pointer-events: none;
+}
+
+.zazu-command-title,
+.zazu-page-title,
+.zazu-card-title,
+.zazu-panel-title,
+.zazu-list-title {
+    text-wrap: balance;
+}
+
+.zazu-card,
+.zazu-panel {
+    border: 0;
+    box-shadow:
+        0 1px 2px color-mix(in srgb, var(--zazu-ink) 4%, transparent),
+        0 14px 34px color-mix(in srgb, var(--zazu-ink) 5%, transparent);
+}
+
+.zazu-card-header {
+    border-bottom: 0;
+    padding-bottom: 10px;
+}
+
+.zazu-card.zazu-list {
+    background: transparent;
+    box-shadow: none;
+}
+
+.zazu-card.zazu-list .zazu-card-header {
+    padding-left: 2px;
+    padding-right: 2px;
+}
+
+.zazu-record-header {
+    border-bottom: 0;
+    background: transparent;
+    padding: 5px 18px 7px;
+}
+
+.zazu-list-item {
+    position: relative;
+    margin: 2px 0;
+    border-bottom: 0;
+    border-radius: var(--zazu-radius-md);
+    background: color-mix(in srgb, var(--zazu-surface) 86%, transparent);
+    box-shadow: 0 1px 2px color-mix(in srgb, var(--zazu-ink) 2%, transparent);
+    transition: transform 140ms ease, background-color 140ms ease, box-shadow 140ms ease;
+}
+
+.zazu-list-item:hover {
+    background: color-mix(in srgb, var(--zazu-primary-soft) 70%, var(--zazu-surface));
+    box-shadow: 0 7px 20px color-mix(in srgb, var(--zazu-primary) 7%, transparent);
+    transform: translateX(1px);
+}
+
+.zazu-list-side,
+.zazu-action-group {
+    border-left: 0;
+}
+
+.zazu-list-side {
+    padding-left: 10px;
+}
+
+.zazu-action-group {
+    padding-left: 10px;
+}
+
+.zazu-detail-grid {
+    gap: 20px;
+}
+
+.zazu-detail-stack {
+    gap: 20px;
+}
+
+.zazu-detail-row {
+    gap: 18px;
+    padding: 8px 0;
+}
+
+.zazu-form-section {
+    border: 0;
+    box-shadow:
+        0 1px 2px color-mix(in srgb, var(--zazu-ink) 4%, transparent),
+        0 12px 30px color-mix(in srgb, var(--zazu-ink) 4%, transparent);
+}
+
+.zazu-form-section-head {
+    border-bottom: 0;
+    padding-bottom: 9px;
+}
+
+.zazu-input,
+.zazu-select,
+.zazu-textarea {
+    border-color: color-mix(in srgb, var(--zazu-ink) 14%, transparent);
+    background: color-mix(in srgb, var(--zazu-field) 82%, var(--zazu-page));
+}
+
+.zazu-input:hover,
+.zazu-select:hover,
+.zazu-textarea:hover {
+    border-color: color-mix(in srgb, var(--zazu-primary) 48%, var(--zazu-ink) 10%);
+    background: var(--zazu-surface);
+}
+
+.zazu-filter-card {
+    border: 0;
+    box-shadow:
+        0 1px 2px color-mix(in srgb, var(--zazu-ink) 4%, transparent),
+        0 12px 28px color-mix(in srgb, var(--zazu-ink) 4%, transparent);
+}
+
+.zazu-filter-card:hover,
+.zazu-filter-card.active {
+    border-color: transparent;
+    box-shadow:
+        0 8px 24px color-mix(in srgb, var(--zazu-primary) 9%, transparent);
+}
+
+.zazu-quick-links {
+    border: 0;
+    background: transparent;
+    gap: 4px;
+}
+
+.zazu-quick-link {
+    border-radius: var(--zazu-radius-md);
+    background: color-mix(in srgb, var(--zazu-surface) 76%, transparent);
+}
+
+.zazu-quick-link:hover {
+    background: var(--zazu-primary-soft);
+}
+
+.zazu-dashboard-attention {
+    border: 0;
+    box-shadow:
+        0 1px 2px color-mix(in srgb, var(--zazu-ink) 4%, transparent),
+        0 18px 44px color-mix(in srgb, var(--zazu-primary) 8%, transparent);
+}
+
+.zazu-dashboard-metrics {
+    gap: 16px;
+}
+
+.zazu-metric-card {
+    border: 0;
+    background: transparent;
+    box-shadow: none;
+}
+
+.zazu-metric-card:hover {
+    background: color-mix(in srgb, var(--zazu-primary-soft) 32%, transparent);
+    box-shadow: none;
+    transform: none;
+}
+
+.zazu-metric-value {
+    letter-spacing: -0.055em;
+}
+
+.zazu-next-action {
+    border: 0;
+    box-shadow:
+        0 1px 2px color-mix(in srgb, var(--zazu-ink) 4%, transparent),
+        0 16px 38px color-mix(in srgb, var(--zazu-primary) 8%, transparent);
+}
+
+.zazu-calendar-toolbar {
+    border-bottom: 0;
+}
+
+.zazu-calendar-grid {
+    gap: 5px;
+    background: transparent;
+}
+
+.zazu-calendar-cell {
+    border: 0;
+    border-radius: var(--zazu-radius-md);
+    background: color-mix(in srgb, var(--zazu-surface) 88%, var(--zazu-page));
+    box-shadow: 0 1px 2px color-mix(in srgb, var(--zazu-ink) 3%, transparent);
+}
+
+.zazu-calendar-cell:hover {
+    box-shadow: 0 8px 18px color-mix(in srgb, var(--zazu-primary) 8%, transparent);
+}
+
+.zazu-calendar-cell.is-today {
+    box-shadow:
+        inset 0 2px 0 var(--zazu-primary),
+        0 8px 20px color-mix(in srgb, var(--zazu-primary) 10%, transparent);
+}
+
+.zazu-calendar-event {
+    border: 0;
+    background: color-mix(in srgb, var(--zazu-primary-soft) 78%, var(--zazu-surface));
+    box-shadow: inset 3px 0 0 var(--zazu-primary);
+}
+
+.zazu-calendar-event:hover {
+    border: 0;
+}
+
+.zazu-auth-dual {
+    border: 0;
+    box-shadow:
+        0 2px 4px color-mix(in srgb, var(--zazu-ink) 5%, transparent),
+        0 24px 72px color-mix(in srgb, var(--zazu-primary) 13%, transparent);
+    background:
+        radial-gradient(circle at 95% 5%, color-mix(in srgb, var(--zazu-primary) 12%, transparent), transparent 26%),
+        var(--zazu-surface);
+}
+
+.zazu-auth-dual .zazu-auth-visual {
+    border-left: 0;
+    background:
+        radial-gradient(circle at 18% 22%, color-mix(in srgb, var(--zazu-primary) 17%, transparent), transparent 32%),
+        linear-gradient(145deg, color-mix(in srgb, var(--zazu-primary-soft) 88%, var(--zazu-surface)), var(--zazu-surface-2));
+    box-shadow: inset 24px 0 50px -46px color-mix(in srgb, var(--zazu-primary) 42%, transparent);
+}
+
+.zazu-auth-state-register .zazu-auth-switch-panel {
+    border-right: 0;
+}
+
+.zazu-section-tabs {
+    border: 0;
+    box-shadow: none;
+}
+
+.zazu-section-tabs a.active {
+    box-shadow: inset 0 -2px 0 var(--zazu-primary);
+}
+
+@media (max-width: 820px) {
+    .zazu-content {
+        padding-top: 20px;
+    }
+
+    .zazu-card,
+    .zazu-panel {
+        box-shadow:
+            0 1px 2px color-mix(in srgb, var(--zazu-ink) 4%, transparent),
+            0 10px 24px color-mix(in srgb, var(--zazu-ink) 4%, transparent);
+    }
+
+    .zazu-calendar-cell {
+        box-shadow: 0 1px 2px color-mix(in srgb, var(--zazu-ink) 3%, transparent);
+    }
+
+    .zazu-list-item {
+        padding: 14px;
+    }
+}
+
+@media (max-width: 700px) {
+    .zazu-calendar-agenda-day {
+        border-bottom: 0;
+        border-radius: var(--zazu-radius-md);
+        margin-bottom: 4px;
+        box-shadow: 0 1px 2px color-mix(in srgb, var(--zazu-ink) 3%, transparent);
+    }
+
+    .zazu-calendar-agenda-event {
+        border: 0;
+        border-left: 3px solid var(--zazu-primary);
+        border-radius: var(--zazu-radius-md);
+        background: var(--zazu-primary-soft);
+    }
+
+    .zazu-metric-card {
+        padding: 14px 0;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .zazu-list-item,
+    .zazu-filter-card,
+    .zazu-metric-card {
+        transition: none !important;
+    }
+}
