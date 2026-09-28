@@ -265,16 +265,39 @@ function setupBrandingUploads() {
             const previousUrl = brandingPreviewUrls.get(input);
             if (previousUrl) URL.revokeObjectURL(previousUrl);
 
-            const objectUrl = URL.createObjectURL(file);
-            brandingPreviewUrls.set(input, objectUrl);
-
             const image = new Image();
 
             image.onload = () => {
-                preview.src = objectUrl;
-                preview.hidden = false;
-                loading.hidden = true;
-                container.setAttribute('aria-busy', 'false');
+                const canvas = document.createElement('canvas');
+                canvas.width = image.naturalWidth;
+                canvas.height = image.naturalHeight;
+
+                const context = canvas.getContext('2d');
+                if (!context) {
+                    loading.hidden = true;
+                    if (placeholder) placeholder.hidden = false;
+                    container.setAttribute('aria-busy', 'false');
+                    if (filename) filename.textContent = 'That image could not be previewed.';
+                    return;
+                }
+
+                context.drawImage(image, 0, 0);
+                canvas.toBlob((blob) => {
+                    if (!blob) {
+                        loading.hidden = true;
+                        if (placeholder) placeholder.hidden = false;
+                        container.setAttribute('aria-busy', 'false');
+                        if (filename) filename.textContent = 'That image could not be previewed.';
+                        return;
+                    }
+
+                    const objectUrl = URL.createObjectURL(blob);
+                    brandingPreviewUrls.set(input, objectUrl);
+                    preview.src = objectUrl;
+                    preview.hidden = false;
+                    loading.hidden = true;
+                    container.setAttribute('aria-busy', 'false');
+                }, 'image/png');
             };
 
             image.onerror = () => {
@@ -282,11 +305,19 @@ function setupBrandingUploads() {
                 if (placeholder) placeholder.hidden = false;
                 container.setAttribute('aria-busy', 'false');
                 if (filename) filename.textContent = 'That image could not be previewed.';
-                URL.revokeObjectURL(objectUrl);
-                brandingPreviewUrls.delete(input);
             };
 
-            image.src = objectUrl;
+            const fileReader = new FileReader();
+            fileReader.onload = () => {
+                image.src = fileReader.result;
+            };
+            fileReader.onerror = () => {
+                loading.hidden = true;
+                if (placeholder) placeholder.hidden = false;
+                container.setAttribute('aria-busy', 'false');
+                if (filename) filename.textContent = 'That image could not be previewed.';
+            };
+            fileReader.readAsDataURL(file);
         });
     });
 
