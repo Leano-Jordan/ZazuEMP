@@ -89,9 +89,9 @@ class WorkspaceSearchService
             };
     }
 
-    private function applyStatusAndDate(Builder $query, string $status, ?string $from, ?string $to, string $dateColumn): void
+    private function applyStatusAndDate(Builder $query, string $status, ?string $from, ?string $to, string $dateColumn, bool $hasStatus = true): void
     {
-        if ($status !== '') {
+        if ($hasStatus && $status !== '') {
             $query->where('status', $status);
         }
 
@@ -121,7 +121,7 @@ class WorkspaceSearchService
     {
         $query = Customer::query()->where('business_id', $business->id);
         $this->text($query, $term, ['name', 'legal_name', 'registration_number', 'tax_number', 'vat_number', 'billing_address']);
-        $this->applyStatusAndDate($query, $status, $from, $to, 'created_at');
+        $this->applyStatusAndDate($query, '', $from, $to, 'created_at', false);
 
         return $query->latest()->limit(10)->get()->map(fn (Customer $customer) => [
             'type' => 'customer',
@@ -157,7 +157,15 @@ class WorkspaceSearchService
     {
         $query = BusinessCapability::query()->where('business_id', $business->id);
         $this->text($query, $term, ['name', 'category', 'capability_type', 'description']);
-        $this->applyStatusAndDate($query, $status, $from, $to, 'created_at');
+        if ($status === 'active') {
+            $query->where('is_active', true);
+        } elseif ($status === 'inactive') {
+            $query->where('is_active', false);
+        } elseif ($status !== '') {
+            return [];
+        }
+
+        $this->applyStatusAndDate($query, '', $from, $to, 'created_at', false);
 
         return $query->latest()->limit(10)->get()->map(fn (BusinessCapability $service) => [
             'type' => 'service',
@@ -175,7 +183,7 @@ class WorkspaceSearchService
     {
         $query = Supplier::query()->where('business_id', $business->id);
         $this->text($query, $term, ['name', 'contact_name', 'email', 'phone', 'notes']);
-        $this->applyStatusAndDate($query, $status, $from, $to, 'created_at');
+        $this->applyStatusAndDate($query, '', $from, $to, 'created_at', false);
 
         return $query->latest()->limit(10)->get()->map(fn (Supplier $supplier) => [
             'type' => 'supplier',
@@ -202,7 +210,7 @@ class WorkspaceSearchService
                     ->orWhere('status', 'like', '%'.$term.'%')
                     ->orWhereHas('supplier', fn (Builder $supplier) => $supplier->where('name', 'like', '%'.$term.'%'))
                     ->orWhereHas('event', fn (Builder $event) => $event
-                        ->where('business_id', request()->user() ? app(CurrentBusiness::class)->id(request()->user()) : 0)
+                        ->where('business_id', $business->id)
                         ->where(function (Builder $nested) use ($term) {
                             $nested
                                 ->where('reference', 'like', '%'.$term.'%')
