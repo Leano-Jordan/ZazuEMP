@@ -10,7 +10,7 @@
         $itemsByRequirement = $version->items->keyBy('event_requirement_id');
     @endphp
 
-    <section class="zazu-command-band">
+    <section class="zazu-command-band zazu-quote-editor-command">
         <div>
             <div class="zazu-eyebrow">{{ $quote->reference }} · Revision v{{ $version->version }}</div>
             <h2 class="zazu-command-title">Review the current services and prices</h2>
@@ -73,7 +73,7 @@
                         <div class="zazu-form-section-title">Current Work services</div>
                         <div class="zazu-form-section-copy">This draft records the current Work services and prices when you save it. Earlier quote revisions remain unchanged.</div>
                     </div>
-                    <div class="zazu-card zazu-list">
+                    <div class="zazu-card zazu-list zazu-quote-line-editor">
                         @foreach ($quote->event->requirements as $requirement)
                             @php
                                 $item = $itemsByRequirement->get($requirement->id);
@@ -115,7 +115,7 @@
                     @error('unit_price')<span class="zazu-field-error mt-3">{{ $message }}</span>@enderror
                 </section>
 
-                <div class="zazu-actionbar">
+                <div class="zazu-actionbar zazu-actionbar-sticky zazu-quote-savebar">
                     <a href="{{ route('quotes.show', $quote) }}" class="zazu-btn zazu-btn-ghost">Cancel</a>
                     <button class="zazu-btn zazu-btn-primary">Save quote v{{ $version->version }}</button>
                 </div>
