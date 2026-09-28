@@ -55,15 +55,13 @@ class TravelCostController extends Controller
         ]);
 
         $roundTrip = $request->boolean('round_trip');
-        $distance = (float) $validated['distance_km'];
-        $fuelPrice = (float) $validated['fuel_price_per_litre'];
-        $consumption = (float) $validated['vehicle_consumption_l_per_100km'];
-        $customerRate = (float) $validated['customer_rate_per_km'];
-
-        $totalDistance = round($distance * ($roundTrip ? 2 : 1), 2);
-        $fuelLitres = round(($totalDistance * $consumption) / 100, 3);
-        $fuelCost = round($fuelLitres * $fuelPrice, 2);
-        $customerCharge = round($totalDistance * $customerRate, 2);
+        $calculation = TravelCost::calculate(
+            (string) $validated['distance_km'],
+            (string) $validated['fuel_price_per_litre'],
+            (string) $validated['vehicle_consumption_l_per_100km'],
+            $roundTrip,
+            (string) $validated['customer_rate_per_km'],
+        );
 
         $travelCost = DB::transaction(function () use (
             $validated,
