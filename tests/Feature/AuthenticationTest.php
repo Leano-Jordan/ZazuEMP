@@ -90,6 +90,56 @@ class AuthenticationTest extends TestCase
         $this->assertSame($business->id, app(CurrentBusiness::class)->id($user));
     }
 
+    public function test_public_login_and_register_pages_redirect_to_landing(): void
+    {
+        $this->get(route('login'))->assertRedirect(route('landing'));
+        $this->get(route('register'))->assertRedirect(route('landing'));
+    }
+
+    public function test_landing_exposes_login_and_register_modal(): void
+    {
+        $this->get(route('landing'))
+            ->assertOk()
+            ->assertSee('data-auth-modal-open="login"', false)
+            ->assertSee('data-auth-modal-open="register"', false)
+            ->assertSee('data-auth-modal', false)
+            ->assertSee('action="'.route('login.store').'"', false)
+            ->assertSee('action="'.route('register.store').'"', false);
+    }
+
+    public function test_failed_login_returns_to_landing_and_reopens_login_modal(): void
+    {
+        $user = User::factory()->create([
+            'username' => 'modalowner',
+            'password' => 'password123',
+        ]);
+
+        $this->from(route('landing'))
+            ->post(route('login.store'), [
+                'identifier' => $user->username,
+                'password' => 'wrong-password',
+            ])
+            ->assertRedirect(route('landing'))
+            ->assertSessionHas('auth_modal', 'login')
+            ->assertSessionHasErrors('identifier');
+    }
+
+    public function test_failed_registration_returns_to_landing_and_reopens_register_modal(): void
+    {
+        $this->from(route('landing'))
+            ->post(route('register.store'), [
+                'name' => 'Modal Owner',
+                'username' => 'bad username',
+                'business_name' => 'Modal Catering',
+                'email' => 'modal@example.com',
+                'password' => 'password123',
+                'password_confirmation' => 'password123',
+            ])
+            ->assertRedirect(route('landing'))
+            ->assertSessionHas('auth_modal', 'register')
+            ->assertSessionHasErrors('username');
+    }
+
     public function test_registration_rejects_duplicate_email_and_username(): void
     {
         User::factory()->create([
