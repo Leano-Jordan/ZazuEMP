@@ -3,11 +3,9 @@
 namespace App\Http\Controllers;
 
 use App\Models\BusinessCapability;
-use App\Models\Business;
-use App\Models\InventoryItem;
 use App\Models\PurchaseOrder;
-use App\Models\PurchaseOrderReceipt;
 use App\Models\Supplier;
+use App\Services\PurchaseOrderReceivingService;
 use App\Support\Audit;
 use App\Support\CurrentBusiness;
 use App\Support\Money;
@@ -158,8 +156,11 @@ class PurchaseOrderController extends Controller
     * @SuppressWarnings(PHPMD.NPathComplexity)
     * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
      */
-    public function receive(Request $request, PurchaseOrder $purchaseOrder): RedirectResponse
-    {
+    public function receive(
+        Request $request,
+        PurchaseOrder $purchaseOrder,
+        PurchaseOrderReceivingService $receivingService
+    ): RedirectResponse {
         $this->ensure($request, $purchaseOrder);
 
         $data = $request->validate([
@@ -178,111 +179,16 @@ class PurchaseOrderController extends Controller
             'Receive at least one positive quantity.'
         );
 
-        DB::transaction(function () use ($data, $purchaseOrder, $businessId): void {
-            $lockedOrder = PurchaseOrder::query()
-                ->where('business_id', $businessId)
-                ->lockForUpdate()
-                ->findOrFail($purchaseOrder->id);
+        $alreadyProcessed = $receivingService->receive(
+            $purchaseOrder,
+            $businessId,
+            $data['received_quantity'],
+            $data['idempotency_key']
+        );
 
-            // Serialize auto-created inventory records across all receipts in this business.
-            Business::query()->whereKey($businessId)->lockForUpdate()->firstOrFail();
-
-            abort_unless(
-                in_array($lockedOrder->status, ['ordered', 'received'], true),
-                422,
-                'Only ordered purchase orders can receive goods.'
-            );
-
-            if (PurchaseOrderReceipt::query()
-                ->where('business_id', $businessId)
-                ->where('purchase_order_id', $lockedOrder->id)
-                ->where('idempotency_key', $data['idempotency_key'])
-                ->exists()
-            ) {
-                return;
-            }
-
-            PurchaseOrderReceipt::create([
-                'business_id' => $businessId,
-                'purchase_order_id' => $lockedOrder->id,
-                'idempotency_key' => $data['idempotency_key'],
-            ]);
-
-            $lockedOrder->load('items');
-
-            foreach ($data['received_quantity'] as $itemId => $received) {
-                $receivedCents = Money::toCents((string) ($received ?: '0'));
-                if ($receivedCents <= 0) {
-                    continue;
-                }
-
-                $item = $lockedOrder->items->firstWhere('id', (int) $itemId);
-                abort_unless($item, 404);
-
-                $orderedHundredths = Money::toHundredths((string) $item->quantity);
-                $alreadyHundredths = Money::toHundredths((string) $item->received_quantity);
-                $receivedHundredths = Money::toHundredths((string) $received);
-
-                abort_if(
-                    $alreadyHundredths + $receivedHundredths > $orderedHundredths,
-                    422,
-                    'Received quantity cannot exceed the ordered quantity.'
-                );
-
-                $inventoryItem = InventoryItem::query()
-                    ->where('business_id', $businessId)
-                    ->when($item->capability_id, fn ($query) => $query->where('capability_id', $item->capability_id))
-                    ->where(function ($query) use ($item) {
-                        $query->where('name', $item->description)
-                            ->orWhere('sku', $item->description);
-                    })
-                    ->first();
-
-                if (!$inventoryItem) {
-                    $inventoryItem = InventoryItem::create([
-                        'business_id' => $businessId,
-                        'capability_id' => $item->capability_id,
-                        'name' => $item->description,
-                        'unit' => $item->unit ?: 'unit',
-                        'reorder_level' => 0,
-                    ]);
-                }
-
-                $inventoryItem->movements()->create([
-                    'business_id' => $businessId,
-                    'idempotency_key' => (string) Str::uuid(),
-                    'purchase_order_id' => $lockedOrder->id,
-                    'purchase_order_item_id' => $item->id,
-                    'type' => 'receipt',
-                    'quantity' => $received,
-                    'unit_cost' => $item->unit_price,
-                    'movement_date' => now()->toDateString(),
-                    'reference' => $lockedOrder->reference,
-                    'notes' => 'Partial receipt from purchase order.',
-                ]);
-
-                $item->update([
-                    'received_quantity' => Money::fromCents(
-                        $alreadyHundredths + $receivedHundredths
-                    ),
-                ]);
-            }
-
-            $fullyReceived = $lockedOrder->items->every(
-                fn ($item) => Money::toHundredths((string) $item->received_quantity)
-                    >= Money::toHundredths((string) $item->quantity)
-            );
-
-            $lockedOrder->update([
-                'status' => $fullyReceived ? 'received' : 'ordered',
-                'last_receipt_idempotency_key' => $data['idempotency_key'],
-            ]);
-
-            Audit::record('purchasing.order.received', $lockedOrder, [
-                'fully_received' => $fullyReceived,
-                'receipt_idempotency_key' => $data['idempotency_key'],
-            ], $businessId);
-        });
+        if ($alreadyProcessed) {
+            return back()->with('info', 'That purchase receipt was already processed.');
+        }
 
         return back()->with('success', 'Purchase receipt recorded.');
     }
@@ -298,100 +204,48 @@ class PurchaseOrderController extends Controller
         $businessId = app(CurrentBusiness::class)->id($request->user());
 
         DB::transaction(function () use ($purchaseOrder, $data, $businessId): void {
+            Business::query()
+                ->whereKey($businessId)
+                ->lockForUpdate()
+                ->firstOrFail();
+
             $lockedOrder = PurchaseOrder::query()
                 ->where('business_id', $businessId)
                 ->lockForUpdate()
                 ->findOrFail($purchaseOrder->id);
 
             $currentStatus = $lockedOrder->status;
+            $newStatus = $data['status'];
 
-            if ($currentStatus !== $data['status']) {
-                abort_unless(
-                    in_array($data['status'], PurchaseOrder::STATUS_TRANSITIONS[$currentStatus] ?? [], true),
-                    422,
-                    'That purchase order status change is not allowed.'
-                );
-            }
-
-            if ($data['status'] === 'ordered' && !$lockedOrder->ordered_at) {
-                $lockedOrder->ordered_at = now()->toDateString();
-            }
-
-            $previousStatus = $lockedOrder->status;
-            $lockedOrder->status = $data['status'];
-            $lockedOrder->save();
-
-            if ($data['status'] !== 'received') {
+            if ($currentStatus === $newStatus) {
                 return;
             }
 
-            $lockedOrder->load('items');
+            abort_unless(
+                $lockedOrder->canTransitionTo($newStatus),
+                422,
+                'That purchase order status change is not allowed.'
+            );
 
-            foreach ($lockedOrder->items as $item) {
-                abort_unless((int) $item->business_id === $businessId && (int) $item->purchase_order_id === (int) $lockedOrder->id, 409, 'Purchase order line integrity could not be verified.');
-                $inventoryItem = \App\Models\InventoryItem::query()
-                    ->where('business_id', $businessId)
-                    ->when($item->capability_id, fn ($query) => $query->where('capability_id', $item->capability_id))
-                    ->where(function ($query) use ($item) {
-                        $query->where('name', $item->description)
-                            ->orWhere('sku', $item->description);
-                    })
-                    ->first();
-
-                if (!$inventoryItem) {
-                    // Serialize auto-creation across concurrent receipts from different orders.
-                    \App\Models\Business::query()->whereKey($businessId)->lockForUpdate()->firstOrFail();
-                    $inventoryItem = \App\Models\InventoryItem::query()
-                        ->where('business_id', $businessId)
-                        ->when($item->capability_id, fn ($query) => $query->where('capability_id', $item->capability_id))
-                        ->where(function ($query) use ($item) {
-                            $query->where('name', $item->description)
-                                ->orWhere('sku', $item->description);
-                        })
-                        ->first();
-                    if (!$inventoryItem) {
-                        $inventoryItem = \App\Models\InventoryItem::create([
-                        'business_id' => $businessId,
-                        'capability_id' => $item->capability_id,
-                        'name' => $item->description,
-                        'unit' => $item->unit ?: 'unit',
-                        'reorder_level' => 0,
-                        ]);
-                    }
-                }
-
-                $alreadyReceived = \App\Models\InventoryMovement::query()
-                    ->where('business_id', $businessId)
-                    ->where('purchase_order_id', $lockedOrder->id)
-                    ->where('purchase_order_item_id', $item->id)
-                    ->where('inventory_item_id', $inventoryItem->id)
-                    ->where('type', 'receipt')
-                    ->exists();
-
-                if (!$alreadyReceived) {
-                    $inventoryItem->movements()->create([
-                        'business_id' => $businessId,
-                        'idempotency_key' => (string) Str::uuid(),
-                        'purchase_order_id' => $lockedOrder->id,
-                        'purchase_order_item_id' => $item->id,
-                        'type' => 'receipt',
-                        'quantity' => $item->quantity,
-                        'unit_cost' => $item->unit_price,
-                        'movement_date' => now()->toDateString(),
-                        'reference' => $lockedOrder->reference,
-                        'notes' => 'Received from purchase order.',
-                    ]);
-                }
-
-                $item->update(['received_quantity' => $item->quantity]);
+            if ($newStatus === 'ordered' && !$lockedOrder->ordered_at) {
+                $lockedOrder->ordered_at = now()->toDateString();
             }
 
-            if ($previousStatus !== $lockedOrder->status) {
-                Audit::record('purchasing.order.status_changed', $lockedOrder, [
-                    'from' => $previousStatus,
-                    'to' => $lockedOrder->status,
-                ], $businessId);
+            if ($newStatus === 'received') {
+                abort_unless(
+                    $lockedOrder->isFullyReceived(),
+                    422,
+                    'A purchase order can only be marked received after all ordered quantities have been received.'
+                );
             }
+
+            $lockedOrder->status = $newStatus;
+            $lockedOrder->save();
+
+            Audit::record('purchasing.order.status_changed', $lockedOrder, [
+                'from' => $currentStatus,
+                'to' => $newStatus,
+            ], $businessId);
         });
 
         return back()->with('success', 'Purchase order status updated.');
@@ -399,7 +253,9 @@ class PurchaseOrderController extends Controller
 
     private function ensure(Request $request, PurchaseOrder $order): void
     {
-        abort_unless((int)$order->business_id===app(CurrentBusiness::class)->id($request->user()),404);
-        abort_unless((int)$order->supplier->business_id===app(CurrentBusiness::class)->id($request->user()),404);
+        $businessId = app(CurrentBusiness::class)->id($request->user());
+
+        abort_unless((int) $order->business_id === $businessId, 404);
+        abort_unless((int) $order->supplier->business_id === $businessId, 404);
     }
 }
