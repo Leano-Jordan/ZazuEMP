@@ -54,10 +54,37 @@ class PurchaseOrderController extends Controller
         ]);
     }
 
-    /** @SuppressWarnings(PHPMD.ExcessiveMethodLength) */
     public function store(Request $request, EventLifecycleService $lifecycle): RedirectResponse
     {
         $businessId = app(CurrentBusiness::class)->id($request->user());
+        $data = $this->validateStoreData($request, $businessId);
+
+        $supplier = Supplier::where('business_id', $businessId)->findOrFail($data['supplier_id']);
+        $businessCurrency = app(CurrentBusiness::class)->model($request->user())->currency ?? 'ZAR';
+
+        abort_unless(
+            strtoupper($data['currency']) === strtoupper($businessCurrency),
+            422,
+            'Purchase orders must use the active business currency.'
+        );
+
+        $data['idempotency_key'] ??= (string) Str::uuid();
+
+        $order = $this->createPurchaseOrder(
+            $data,
+            $businessId,
+            $supplier,
+            !empty($data['event_id']) ? (int) $data['event_id'] : null,
+            $lifecycle
+        );
+
+        return redirect()
+            ->route('purchasing.show', $order)
+            ->with('success', 'Purchase order created.');
+    }
+
+    private function validateStoreData(Request $request, int $businessId): array
+    {
         $data = $request->validate([
             'idempotency_key' => ['nullable', 'uuid'],
             'event_id' => ['nullable', 'integer'],
@@ -77,27 +104,13 @@ class PurchaseOrderController extends Controller
             'capability_id.*' => ['nullable', 'integer'],
         ]);
 
-        $supplier = Supplier::where('business_id', $businessId)->findOrFail($data['supplier_id']);
-        $businessCurrency = app(CurrentBusiness::class)->model($request->user())->currency ?? 'ZAR';
-
-        abort_unless(
-            strtoupper($data['currency']) === strtoupper($businessCurrency),
-            422,
-            'Purchase orders must use the active business currency.'
-        );
-
         $lineCount = count($data['description']);
 
         abort_unless(
             count($data['quantity']) === $lineCount
                 && (empty($data['unit']) || count($data['unit']) === $lineCount)
-                && (empty($data['capability_id']) || count($data['capability_id']) === $lineCount),
-            422,
-            'Purchase order lines are incomplete.'
-        );
-
-        abort_unless(
-            count($data['description']) === count($data['unit_price']),
+                && (empty($data['capability_id']) || count($data['capability_id']) === $lineCount)
+                && count($data['unit_price']) === $lineCount,
             422,
             'Purchase order lines are incomplete.'
         );
@@ -118,16 +131,17 @@ class PurchaseOrderController extends Controller
             'One or more catalogue items do not belong to this business.'
         );
 
-        $data['idempotency_key'] ??= (string) Str::uuid();
-        $eventId = !empty($data['event_id']) ? (int) $data['event_id'] : null;
+        return $data;
+    }
 
-        $order = DB::transaction(function () use (
-            $data,
-            $businessId,
-            $supplier,
-            $eventId,
-            $lifecycle
-        ): PurchaseOrder {
+    private function createPurchaseOrder(
+        array $data,
+        int $businessId,
+        Supplier $supplier,
+        ?int $eventId,
+        EventLifecycleService $lifecycle
+    ): PurchaseOrder {
+        return DB::transaction(function () use ($data, $businessId, $supplier, $eventId, $lifecycle): PurchaseOrder {
             Business::query()
                 ->whereKey($businessId)
                 ->lockForUpdate()
@@ -190,10 +204,6 @@ class PurchaseOrderController extends Controller
 
             return $order;
         });
-
-        return redirect()
-            ->route('purchasing.show', $order)
-            ->with('success', 'Purchase order created.');
     }
 
     public function show(Request $request, PurchaseOrder $purchaseOrder): View
