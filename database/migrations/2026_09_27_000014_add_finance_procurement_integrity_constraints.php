@@ -10,10 +10,8 @@ return new class extends Migration
     {
         // Idempotency indexes for invoices, payments, expenses and inventory movements
         // are created by the earlier hardening migration. Do not create them twice.
-        Schema::table('invoices', function (Blueprint $table): void {
-            $table->unique(['business_id', 'number'], 'invoices_business_number_unique');
-        });
-
+        // Invoice number uniqueness is created with the invoices table itself.
+        // Re-adding the same index here breaks fresh-install migration runs.
         // Purchase-order idempotency is added by 000016, after this migration.
         Schema::table('inventory_movements', function (Blueprint $table): void {
             $table->unique(
@@ -29,8 +27,5 @@ return new class extends Migration
             $table->dropUnique('inventory_po_receipt_unique');
         });
 
-        Schema::table('invoices', function (Blueprint $table): void {
-            $table->dropUnique('invoices_business_number_unique');
-        });
     }
 };
