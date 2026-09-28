@@ -32,7 +32,7 @@
         .closing{padding:90px 0}.closing-box{display:flex;align-items:center;justify-content:space-between;gap:30px;padding:38px;border-radius:14px;background:var(--blue);color:#fff;box-shadow:0 20px 50px rgba(30,64,175,.2)}.closing-box h2{margin:8px 0;font-size:34px;letter-spacing:-.045em}.closing-box p{margin:0;color:#DBEAFE;font-size:12px}.closing-box .btn{border-color:#fff;background:#fff;color:var(--blue)}
         footer{display:flex;justify-content:space-between;padding:22px 0;border-top:1px solid var(--line);color:var(--muted);font:500 8px "DM Mono";letter-spacing:.06em}
         @media(max-width:920px){.hero{grid-template-columns:1fr;min-height:auto;padding-top:60px}.bento{grid-template-columns:1fr}.feature.large{grid-row:auto}.section-head{display:block}.intro{margin-top:15px}.closing-box{display:block}.closing-box .btn{margin-top:20px}}
-        @media(max-width:640px){.site{width:min(100% - 24px,1380px)}.top{height:auto;padding:14px 0}.topnav a:not(.register):not(.login):not(.launch){display:none}.topnav .account-state{display:none}.hero{padding:48px 0 65px}h1{font-size:48px}.telemetry{grid-template-columns:repeat(2,1fr)}.telemetry div:nth-child(2n){border-right:0}.record{grid-template-columns:1fr}.compare{grid-template-columns:1fr}.compare>article+article{border-left:0;border-top:1px solid #334155}footer{display:block}.footer-right{margin-top:8px}}
+        @media(max-width:640px){.site{width:min(100% - 24px,1380px)}.top{height:auto;padding:14px 0}.topnav a:not(.launch){display:none}.topnav .account-state{display:none}.hero{padding:48px 0 65px}h1{font-size:48px}.telemetry{grid-template-columns:repeat(2,1fr)}.telemetry div:nth-child(2n){border-right:0}.record{grid-template-columns:1fr}.compare{grid-template-columns:1fr}.compare>article+article{border-left:0;border-top:1px solid #334155}footer{display:block}.footer-right{margin-top:8px}}
 
         /* Public authentication: one reusable dialog, no standalone public auth page UI. */
         .topnav .register,.topnav .login{font:inherit;cursor:pointer}.topnav button{border:0}.topnav .register{padding:10px 13px;background:#E8F1FF;color:var(--blue);border:1px solid #B7D0F1}.topnav .login{padding:10px 13px;background:#fff;color:var(--ink);border:1px solid var(--line)}
@@ -56,6 +56,8 @@
         .zazu-public-auth-grid{display:grid;grid-template-columns:1fr 1fr;gap:13px}.zazu-public-auth-alert{margin:0 0 14px;padding:10px 11px;border:1px solid #E7A2A9;border-radius:7px;background:#FDEBEC;color:#8E3847;font-size:10px;line-height:1.5}.zazu-public-auth-error{color:#A12B37;font-size:9px;line-height:1.35}.zazu-public-auth-switch{margin:16px 0 0;color:var(--muted);text-align:center;font-size:10px}
         @media(max-width:640px){.zazu-public-auth{width:calc(100vw - 16px);max-height:calc(100vh - 16px);border-radius:14px}.zazu-public-auth-panel{max-height:calc(100vh - 16px)}.zazu-public-auth-head{padding:19px 17px 15px}.zazu-public-auth-head h2{font-size:22px}.zazu-public-auth-tabs{padding:8px 17px}.zazu-public-auth-body{padding:18px 17px}.zazu-public-auth-grid{grid-template-columns:1fr}.zazu-public-auth-body h3{font-size:24px}.zazu-public-auth-options{align-items:flex-start;flex-direction:column}}
 
+    
+        .auth-modal{width:min(520px,calc(100% - 24px));max-width:none;padding:0;border:0;border-radius:16px;background:transparent;box-shadow:0 30px 90px rgba(15,23,42,.28);color:var(--ink)}.auth-modal::backdrop{background:rgba(15,23,42,.58);backdrop-filter:blur(5px)}.auth-modal-panel{position:relative;padding:30px;background:#fff;border:1px solid rgba(226,232,240,.95);border-radius:16px}.auth-modal-close{position:absolute;top:14px;right:14px;width:36px;height:36px;border:1px solid var(--line);border-radius:9px;background:#fff;color:var(--muted);cursor:pointer;font-size:18px;line-height:1}.auth-modal-close:hover{color:var(--ink);background:var(--canvas)}.auth-modal-kicker{color:var(--blue);font:500 9px "DM Mono";letter-spacing:.12em;text-transform:uppercase}.auth-modal h2{margin:7px 45px 6px 0;font-size:28px;letter-spacing:-.045em}.auth-modal-copy{margin:0 40px 22px 0;color:var(--muted);font-size:12px;line-height:1.6}.auth-modal-form{display:grid;gap:14px}.auth-modal-field{display:grid;gap:6px}.auth-modal-field label{font-size:11px;font-weight:800}.auth-modal-field input{width:100%;min-height:44px;padding:0 12px;border:1px solid var(--line);border-radius:8px;background:#fff;color:var(--ink);font:500 13px Manrope,ui-sans-serif,system-ui,sans-serif}.auth-modal-field input:focus{outline:3px solid rgba(59,130,246,.18);border-color:var(--sapphire)}.auth-modal-password{position:relative}.auth-modal-password input{padding-right:68px}.auth-modal-password button{position:absolute;right:6px;top:6px;height:32px;padding:0 9px;border:0;border-radius:6px;background:var(--soft);color:var(--blue);font:700 10px Manrope;cursor:pointer}.auth-modal-error{margin:0;color:#B91C1C;font-size:10px;line-height:1.45}.auth-modal-help{margin-top:-5px;color:var(--muted);font-size:10px;line-height:1.45}.auth-modal-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}.auth-modal-submit{width:100%;border:0;cursor:pointer}.auth-modal-switch{margin-top:18px;padding-top:16px;border-top:1px solid var(--line);text-align:center;color:var(--muted);font-size:11px}.auth-modal-switch button,.auth-modal-forgot{border:0;background:none;padding:0;color:var(--blue);font:800 11px Manrope;cursor:pointer}.auth-modal-forgot{display:block;margin-top:9px;text-align:right}.auth-modal[open]{animation:authModalIn 140ms ease-out}@keyframes authModalIn{from{opacity:0;transform:translateY(8px) scale(.99)}to{opacity:1;transform:none}}@media(max-width:640px){.auth-modal{width:calc(100% - 16px);margin:auto}.auth-modal-panel{padding:24px 18px 20px;border-radius:14px}.auth-modal-grid{grid-template-columns:1fr}.auth-modal h2{font-size:25px}.auth-modal-copy{margin-right:30px}.auth-modal-close{top:10px;right:10px}.auth-modal::backdrop{backdrop-filter:none}}@media(prefers-reduced-motion:reduce){.auth-modal[open]{animation:none}}
     </style>
 </head>
 <body>
@@ -198,7 +200,137 @@
 </dialog>
 
 </main>
+
+<dialog class="auth-modal" data-auth-modal aria-labelledby="auth-modal-title" aria-describedby="auth-modal-copy">
+    <div class="auth-modal-panel">
+        <button type="button" class="auth-modal-close" data-auth-modal-close aria-label="Close authentication window">×</button>
+
+        <section data-auth-panel="login">
+            <div class="auth-modal-kicker">Workspace access</div>
+            <h2 id="auth-modal-title">Welcome back.</h2>
+            <p class="auth-modal-copy" id="auth-modal-copy">Use your username or email address to continue to Zazu.</p>
+            <form method="POST" action="{{ route('login.store') }}" class="auth-modal-form" data-auth-form="login">
+                @csrf
+                <div class="auth-modal-field">
+                    <label for="auth_identifier">Username or email</label>
+                    <input id="auth_identifier" name="identifier" type="text" value="{{ old('identifier') }}" autocomplete="username" inputmode="text" spellcheck="false" autocapitalize="none" required>
+                    @error('identifier')<p class="auth-modal-error">{{ $message }}</p>@enderror
+                </div>
+                <div class="auth-modal-field">
+                    <label for="auth_password">Password</label>
+                    <div class="auth-modal-password">
+                        <input id="auth_password" name="password" type="password" autocomplete="current-password" required>
+                        <button type="button" data-auth-password-toggle data-target="auth_password" aria-label="Show password">Show</button>
+                    </div>
+                    @error('password')<p class="auth-modal-error">{{ $message }}</p>@enderror
+                </div>
+                <button type="submit" class="btn primary auth-modal-submit">Log in <span>→</span></button>
+                <a class="auth-modal-forgot" href="{{ route('password.request') }}">Forgot your password?</a>
+            </form>
+            <div class="auth-modal-switch">New to Zazu? <button type="button" data-auth-modal-switch="register">Create your workspace</button></div>
+        </section>
+
+        <section data-auth-panel="register" hidden>
+            <div class="auth-modal-kicker">Create workspace</div>
+            <h2>Set up your Zazu workspace.</h2>
+            <p class="auth-modal-copy">Create your owner account and choose the username you will use to sign in.</p>
+            <form method="POST" action="{{ route('register.store') }}" class="auth-modal-form" data-auth-form="register">
+                @csrf
+                <div class="auth-modal-grid">
+                    <div class="auth-modal-field">
+                        <label for="auth_name">Your name</label>
+                        <input id="auth_name" name="name" type="text" value="{{ old('name') }}" autocomplete="name" required>
+                        @error('name')<p class="auth-modal-error">{{ $message }}</p>@enderror
+                    </div>
+                    <div class="auth-modal-field">
+                        <label for="auth_username">Username</label>
+                        <input id="auth_username" name="username" type="text" value="{{ old('username') }}" autocomplete="username" autocapitalize="none" spellcheck="false" maxlength="32" pattern="[A-Za-z0-9][A-Za-z0-9._-]{2,31}" required>
+                        <div class="auth-modal-help">3–32 characters. Letters, numbers, dots, underscores and hyphens.</div>
+                        @error('username')<p class="auth-modal-error">{{ $message }}</p>@enderror
+                    </div>
+                    <div class="auth-modal-field">
+                        <label for="auth_business_name">Business name</label>
+                        <input id="auth_business_name" name="business_name" type="text" value="{{ old('business_name') }}" autocomplete="organization" required>
+                        @error('business_name')<p class="auth-modal-error">{{ $message }}</p>@enderror
+                    </div>
+                    <div class="auth-modal-field">
+                        <label for="auth_email">Email address</label>
+                        <input id="auth_email" name="email" type="email" value="{{ old('email') }}" autocomplete="email" required>
+                        @error('email')<p class="auth-modal-error">{{ $message }}</p>@enderror
+                    </div>
+                    <div class="auth-modal-field">
+                        <label for="auth_register_password">Password</label>
+                        <div class="auth-modal-password">
+                            <input id="auth_register_password" name="password" type="password" autocomplete="new-password" minlength="8" required>
+                            <button type="button" data-auth-password-toggle data-target="auth_register_password" aria-label="Show password">Show</button>
+                        </div>
+                        @error('password')<p class="auth-modal-error">{{ $message }}</p>@enderror
+                    </div>
+                    <div class="auth-modal-field">
+                        <label for="auth_password_confirmation">Confirm password</label>
+                        <div class="auth-modal-password">
+                            <input id="auth_password_confirmation" name="password_confirmation" type="password" autocomplete="new-password" minlength="8" required>
+                            <button type="button" data-auth-password-toggle data-target="auth_password_confirmation" aria-label="Show password">Show</button>
+                        </div>
+                        @error('password_confirmation')<p class="auth-modal-error">{{ $message }}</p>@enderror
+                    </div>
+                </div>
+                <button type="submit" class="btn primary auth-modal-submit">Create workspace <span>→</span></button>
+            </form>
+            <div class="auth-modal-switch">Already have an account? <button type="button" data-auth-modal-switch="login">Log in</button></div>
+        </section>
+    </div>
+</dialog>
+
 <footer><span>ZAZU EMP · EVENT OPERATIONS PLATFORM</span><span class="footer-right">SOUTH AFRICAN BUSINESS · EVENTS / CATERING / HIRE</span></footer>
 </div>
+
+<script>
+(() => {
+    const modal = document.querySelector('[data-auth-modal]');
+    if (!modal) return;
+    const openers = document.querySelectorAll('[data-auth-modal-open]');
+    const closeButton = modal.querySelector('[data-auth-modal-close]');
+    const panels = modal.querySelectorAll('[data-auth-panel]');
+    const lastFocus = { element: null };
+    const initialPanel = @json(session('auth_modal', old('identifier') || $errors->any() ? 'login' : null));
+
+    const showPanel = (name) => {
+        panels.forEach((panel) => { panel.hidden = panel.dataset.authPanel !== name; });
+        const first = modal.querySelector('[data-auth-panel="' + name + '"] input');
+        window.setTimeout(() => first?.focus(), 0);
+    };
+
+    const open = (name, opener = null) => {
+        lastFocus.element = opener || document.activeElement;
+        showPanel(name);
+        if (typeof modal.showModal === 'function') modal.showModal();
+        else modal.setAttribute('open', '');
+    };
+
+    const close = () => {
+        if (typeof modal.close === 'function' && modal.open) modal.close();
+        else modal.removeAttribute('open');
+        lastFocus.element?.focus?.();
+        lastFocus.element = null;
+    };
+
+    openers.forEach((button) => button.addEventListener('click', () => open(button.dataset.authModalOpen, button)));
+    modal.querySelectorAll('[data-auth-modal-switch]').forEach((button) => button.addEventListener('click', () => showPanel(button.dataset.authModalSwitch)));
+    closeButton?.addEventListener('click', close);
+    modal.addEventListener('cancel', (event) => { event.preventDefault(); close(); });
+    modal.addEventListener('click', (event) => { if (event.target === modal) close(); });
+    modal.querySelectorAll('[data-auth-password-toggle]').forEach((button) => button.addEventListener('click', () => {
+        const input = document.getElementById(button.dataset.target);
+        if (!input) return;
+        const visible = input.type === 'text';
+        input.type = visible ? 'password' : 'text';
+        button.textContent = visible ? 'Show' : 'Hide';
+        button.setAttribute('aria-label', visible ? 'Show password' : 'Hide password');
+    }));
+
+    if (initialPanel) open(initialPanel);
+})();
+</script>
 </body>
 </html>
