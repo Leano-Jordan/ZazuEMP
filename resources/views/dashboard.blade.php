@@ -41,7 +41,7 @@
                         <div class="zazu-dash-event-time"><strong>{{ $event->event_date?->format('H:i') ?: '—' }}</strong><span>{{ $event->event_date?->format('d M Y') ?: 'Unscheduled' }}</span></div>
                         <div class="zazu-dash-event-line"><i></i></div>
                         <div class="zazu-dash-event-copy"><strong>{{ $event->name }}</strong><span>{{ $event->customer?->name ?? 'No customer' }}</span><small class="mono">{{ $event->reference }}</small></div>
-                        <span class="zazu-dash-status">{{ strtoupper(str_replace('_',' ',$event->status ?? 'OPEN')) }}</span>
+                        <span class="zazu-dash-status status-{{ str_replace('_', '-', strtolower($event->status ?? 'open')) }}">{{ strtoupper(str_replace('_',' ',$event->status ?? 'OPEN')) }}</span>
                     </a>
                 @empty
                     <div class="zazu-dash-empty"><strong>No scheduled work yet.</strong><span>Create a job with an event date and it will appear here.</span>@if($workspaceTools['work'])<a href="{{ route('work.create') }}" class="zazu-btn zazu-btn-primary">Create job</a>@endif</div>
