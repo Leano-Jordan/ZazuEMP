@@ -4,15 +4,15 @@
  * professional density, and clear interaction states.
  */
 :root {
-    --zazu-page: #E7EEF5;
-    --zazu-page-deep: #CFDDEA;
+    --zazu-page: #F8FAFC;
+    --zazu-page-deep: #E2E8F0;
 
-    --zazu-sidebar: #0F2942;
+    --zazu-sidebar: #0F172A;
     --zazu-sidebar-ink: #F7FBFF;
     --zazu-sidebar-muted: #B9CBDA;
     --zazu-sidebar-label: #8FA9BE;
     --zazu-sidebar-hover: #183D5F;
-    --zazu-sidebar-active: #1B63C9;
+    --zazu-sidebar-active: #1E40AF;
     --zazu-sidebar-surface: #163A5B;
 
     --zazu-surface: #FFFFFF;
@@ -29,13 +29,13 @@
     --zazu-border: #AEBECB;
     --zazu-border-strong: #73899D;
 
-    --zazu-primary: #1B63C9;
+    --zazu-primary: #1E40AF;
     --zazu-primary-light: #347DDF;
-    --zazu-primary-pale: #B8D3F5;
+    --zazu-primary-pale: #BFDBFE;
     --zazu-primary-shadow: #91B5DF;
     --zazu-primary-deep: #174F9F;
     --zazu-primary-hover: #164A95;
-    --zazu-primary-soft: #E5EFFC;
+    --zazu-primary-soft: #EFF6FF;
     --zazu-primary-ink: #FFFFFF;
     --zazu-link: #1757A9;
     --zazu-link-hover: #123E79;
@@ -44,7 +44,7 @@
     --zazu-accent: #0B8F8F;
     --zazu-accent-ink: #0A6D6D;
     --zazu-accent-soft: #E1F4F4;
-    --zazu-focus: #1B63C9;
+    --zazu-focus: #1E40AF;
 
     --zazu-success: #1E765E;
     --zazu-success-ink: #165744;
@@ -57,7 +57,7 @@
     --zazu-danger-soft: #FBE7EB;
     --zazu-info: #2469D1;
     --zazu-info-ink: #184F9E;
-    --zazu-info-soft: #E5EFFC;
+    --zazu-info-soft: #EFF6FF;
 
     --zazu-shadow: 0 2px 8px rgba(20, 43, 64, .07);
     --zazu-shadow-strong: 0 8px 22px rgba(20, 43, 64, .12);
@@ -706,7 +706,7 @@ textarea:focus {
     background:
         radial-gradient(circle at 15% 10%, rgba(39,117,211,.18), transparent 26rem),
         radial-gradient(circle at 88% 90%, rgba(11,143,143,.12), transparent 22rem),
-        #E7EEF5;
+        #F8FAFC;
 }
 
 .zazu-auth-card {
