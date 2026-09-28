@@ -42,4 +42,31 @@ class SearchTest extends TestCase
             ->assertSee('Visible Search Customer')
             ->assertDontSee('Hidden Search Customer');
     }
+
+    public function test_search_does_not_apply_nonexistent_status_columns_to_customers(): void
+    {
+        $business = Business::create([
+            'name' => 'Status Filter Business',
+            'slug' => 'status-filter-'.Str::lower(Str::random(8)),
+            'status' => 'active',
+            'currency' => 'ZAR',
+        ]);
+
+        $user = User::factory()->create();
+        $business->users()->attach($user->id, ['role' => 'owner']);
+
+        Customer::create(['business_id' => $business->id, 'name' => 'Status Safe Customer']);
+
+        $this->actingAs($user);
+
+        $this->get(route('search.index', [
+            'q' => 'Status Safe Customer',
+            'type' => 'customer',
+            'status' => 'paid',
+        ]))
+            ->assertOk()
+            ->assertSee('0 records')
+            ->assertDontSee('Status Safe Customer');
+    }
+
 }
