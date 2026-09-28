@@ -107,13 +107,25 @@ class CustomerContactController extends Controller
         $this->ensureCustomer($customer, $business);
         $this->ensureBelongsToCustomer($customer, $contact);
 
-        if ($contact->is_primary) {
-            return redirect()
-                ->route('customers.show', $customer)
-                ->with('error', 'The primary contact cannot be removed. Make another contact primary first.');
-        }
+        DB::transaction(function () use ($customer, $contact): void {
+            $lockedCustomer = Customer::query()
+                ->whereKey($customer->id)
+                ->lockForUpdate()
+                ->firstOrFail();
 
-        $contact->delete();
+            $lockedContact = $lockedCustomer->contacts()
+                ->whereKey($contact->id)
+                ->lockForUpdate()
+                ->firstOrFail();
+
+            abort_if(
+                $lockedContact->is_primary,
+                422,
+                'The primary contact cannot be removed. Make another contact primary first.'
+            );
+
+            $lockedContact->delete();
+        });
 
         return redirect()
             ->route('customers.show', $customer)
