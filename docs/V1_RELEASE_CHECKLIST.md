@@ -171,3 +171,17 @@ Rule: finish the product before expanding the product.
 - [x] Replaceable landing image placeholders added
 - [ ] Rendered visual QA on desktop
 - [ ] Rendered visual QA on mobile
+
+
+### Gate 7B — Navigation, account and motion refinement
+- [x] Primary navigation no longer uses per-link icons
+- [x] Primary navigation no longer uses trailing arrow glyphs
+- [x] Repeated "Active workspace" navigation card removed
+- [x] Navigation hierarchy remains permission-aware
+- [x] Account/avatar surface exposes identity, role and experience context
+- [x] Workspace context remains available without repeating it throughout navigation
+- [x] Dashboard exposes a priority/attention surface
+- [x] Restrained cross-product motion added with reduced-motion handling
+- [x] Legacy root redirect assertion corrected to public landing behaviour
+- [ ] Rendered desktop verification
+- [ ] Rendered mobile verification
