@@ -4891,3 +4891,728 @@ main {
         white-space: normal;
     }
 }
+
+
+/* ============================================================
+   DIRECTOR COLOUR THEORY + SPATIAL AUDIT / 2026-09
+   Canonical visual authority. Purpose: eliminate legacy colour
+   collisions, improve contrast, and give Zazu a distinct identity.
+   ============================================================ */
+
+:root:not([data-theme="dark"]) {
+    /* Distinctive identity: cobalt-iris + sea-glass, not generic web blue. */
+    --zazu-blue-brand: #3949E8;
+    --zazu-blue-vivid: #5B5CFF;
+    --zazu-blue-glow: #7C7FFF;
+    --zazu-blue-soft: #EEF0FF;
+    --zazu-blue-deep: #2834B8;
+
+    --zazu-canvas-bg: #F6F7FB;
+    --zazu-card-bg: #FFFFFF;
+    --zazu-card-border: #C9CEDC;
+    --zazu-card-shadow: 0 1px 2px rgba(30, 36, 68, .05);
+
+    --zazu-text-ink: #191D31;
+    --zazu-text-body: #343B52;
+    --zazu-text-muted: #566078;
+    --zazu-text-faint: #68728A;
+
+    --zazu-status-draft: #FFF4D6;
+    --zazu-status-draft-text: #8A5600;
+    --zazu-status-active: #E8F6EE;
+    --zazu-status-active-text: #166534;
+    --zazu-status-overdue: #FDEBEC;
+    --zazu-status-overdue-text: #A12B37;
+
+    --zazu-page: var(--zazu-canvas-bg);
+    --zazu-page-deep: #E7E9F1;
+    --zazu-surface: var(--zazu-card-bg);
+    --zazu-surface-2: #F0F1F6;
+    --zazu-surface-3: #E7E9F1;
+    --zazu-field: var(--zazu-card-bg);
+
+    --zazu-ink: var(--zazu-text-ink);
+    --zazu-ink-2: var(--zazu-text-body);
+    --zazu-muted: var(--zazu-text-muted);
+    --zazu-faint: var(--zazu-text-faint);
+    --zazu-nav-label: #58627B;
+
+    --zazu-border: var(--zazu-card-border);
+    --zazu-border-strong: #9EA7BC;
+
+    --zazu-primary: var(--zazu-blue-brand);
+    --zazu-primary-light: var(--zazu-blue-glow);
+    --zazu-primary-pale: #D9DBFF;
+    --zazu-primary-shadow: #AEB3EA;
+    --zazu-primary-deep: var(--zazu-blue-deep);
+    --zazu-primary-hover: #2F39C7;
+    --zazu-primary-soft: var(--zazu-blue-soft);
+    --zazu-primary-ink: #FFFFFF;
+
+    --zazu-link: #2F39C7;
+    --zazu-link-hover: #20298F;
+    --zazu-nav-active: var(--zazu-blue-brand);
+
+    /* Secondary brand accent: separates status/context from action blue. */
+    --zazu-accent: #008E88;
+    --zazu-accent-ink: #006D68;
+    --zazu-accent-soft: #E7F8F6;
+    --zazu-focus: #5B5CFF;
+
+    --zazu-success: #177245;
+    --zazu-success-ink: #166534;
+    --zazu-success-soft: #E8F6EE;
+    --zazu-warning: #B06A00;
+    --zazu-warning-ink: #8A5600;
+    --zazu-warning-soft: #FFF4D6;
+    --zazu-danger: #B42318;
+    --zazu-danger-ink: #A12B37;
+    --zazu-danger-soft: #FDEBEC;
+    --zazu-info: #4F46C5;
+    --zazu-info-ink: #3B348F;
+    --zazu-info-soft: #F0EEFF;
+}
+
+:root[data-theme="dark"] {
+    /* Deep ink + luminous cobalt + sea-glass. */
+    --zazu-page: #0D1020;
+    --zazu-page-deep: #090C18;
+    --zazu-sidebar: #11162A;
+    --zazu-sidebar-ink: #F4F5FA;
+    --zazu-sidebar-muted: #C5C9D8;
+    --zazu-sidebar-label: #959DB3;
+    --zazu-sidebar-hover: #1A213A;
+    --zazu-sidebar-active: #232B4D;
+    --zazu-sidebar-surface: #171D33;
+
+    --zazu-surface: #151B2F;
+    --zazu-surface-2: #1B2239;
+    --zazu-surface-3: #222A43;
+    --zazu-field: #11172A;
+
+    --zazu-ink: #F4F5FA;
+    --zazu-ink-2: #DADDE8;
+    --zazu-muted: #B1B7C9;
+    --zazu-faint: #929AAF;
+    --zazu-nav-label: #A4ABBD;
+
+    --zazu-border: #394158;
+    --zazu-border-strong: #5E6882;
+
+    --zazu-blue-brand: #7A78FF;
+    --zazu-blue-vivid: #9492FF;
+    --zazu-blue-glow: #B0AEFF;
+    --zazu-blue-soft: #282B52;
+    --zazu-blue-deep: #5B59E0;
+
+    --zazu-primary: #7A78FF;
+    --zazu-primary-light: #9492FF;
+    --zazu-primary-pale: #B0AEFF;
+    --zazu-primary-shadow: #4C4C8D;
+    --zazu-primary-deep: #A7A5FF;
+    --zazu-primary-hover: #8C8AFF;
+    --zazu-primary-soft: #282B52;
+    --zazu-primary-ink: #0D1020;
+
+    --zazu-link: #A7A5FF;
+    --zazu-link-hover: #C1BFFF;
+    --zazu-nav-active: #7A78FF;
+
+    --zazu-accent: #48C6B8;
+    --zazu-accent-ink: #9AE2DA;
+    --zazu-accent-soft: #123A37;
+    --zazu-focus: #9492FF;
+
+    --zazu-success: #67C59A;
+    --zazu-success-ink: #9BE0BB;
+    --zazu-success-soft: #17362A;
+    --zazu-warning: #E0B86B;
+    --zazu-warning-ink: #F0CF8E;
+    --zazu-warning-soft: #3C321E;
+    --zazu-danger: #F08E8E;
+    --zazu-danger-ink: #FFB2B2;
+    --zazu-danger-soft: #45272C;
+    --zazu-info: #9C99FF;
+    --zazu-info-ink: #C6C4FF;
+    --zazu-info-soft: #272646;
+}
+
+/* Surfaces stay flat. Hierarchy comes from borders, spacing and restrained elevation. */
+body {
+    background: var(--zazu-page);
+    color: var(--zazu-ink);
+}
+
+:root:not([data-theme="dark"]) .zazu-sidebar {
+    background: #EEF1FA;
+    border-right: 1px solid #C7CCDB;
+    box-shadow: 4px 0 16px rgba(36,42,74,.04);
+}
+
+:root:not([data-theme="dark"]) .zazu-brand {
+    background: #FFFFFF;
+    border-bottom-color: #C7CCDB;
+}
+
+:root:not([data-theme="dark"]) .zazu-topbar {
+    background: #FFFFFF;
+    border-bottom: 2px solid #C7CCDB;
+    box-shadow: 0 2px 10px rgba(36,42,74,.045);
+}
+
+:root:not([data-theme="dark"]) .zazu-content {
+    position: relative;
+}
+
+:root:not([data-theme="dark"]) .zazu-nav-group-label {
+    color: #5B647C;
+}
+
+:root:not([data-theme="dark"]) .zazu-nav-link {
+    color: #30384F;
+}
+
+:root:not([data-theme="dark"]) .zazu-nav-link:hover {
+    background: #E5E7F0;
+    border-left-color: #8D91FF;
+    color: #1E2438;
+}
+
+:root:not([data-theme="dark"]) .zazu-nav-link.active {
+    background: #E0E3FF;
+    border-left-color: #3949E8;
+    color: #232C9C;
+}
+
+:root:not([data-theme="dark"]) .zazu-nav-group {
+    margin-bottom: 20px;
+}
+
+:root:not([data-theme="dark"]) .zazu-nav {
+    padding: 16px 0;
+}
+
+:root:not([data-theme="dark"]) .zazu-nav-stack {
+    gap: 1px;
+}
+
+:root:not([data-theme="dark"]) .zazu-sidebar-footer {
+    background: #F1F3F8;
+    border-top-color: #C7CCDB;
+}
+
+:root:not([data-theme="dark"]) .zazu-footer-workspace {
+    border-bottom-color: #CCD1DE;
+}
+
+:root:not([data-theme="dark"]) .zazu-footer-workspace-label,
+:root:not([data-theme="dark"]) .zazu-user-kicker,
+:root:not([data-theme="dark"]) .zazu-user-popover-label {
+    color: #5E687F;
+}
+
+:root:not([data-theme="dark"]) .zazu-footer-workspace strong,
+:root:not([data-theme="dark"]) .zazu-user-identity strong,
+:root:not([data-theme="dark"]) .zazu-user-popover-name,
+:root:not([data-theme="dark"]) .zazu-user-workspace-name {
+    color: #191D31;
+}
+
+:root:not([data-theme="dark"]) .zazu-footer-workspace > span:last-child,
+:root:not([data-theme="dark"]) .zazu-user-identity > span:last-child,
+:root:not([data-theme="dark"]) .zazu-user-popover-email,
+:root:not([data-theme="dark"]) .zazu-user-menu-link small {
+    color: #566078;
+}
+
+:root:not([data-theme="dark"]) .zazu-user-trigger {
+    border-color: #BCC3D4;
+    background: #FFFFFF;
+    color: #232943;
+    box-shadow: 0 2px 7px rgba(40,45,72,.06);
+}
+
+:root:not([data-theme="dark"]) .zazu-user-trigger:hover,
+:root:not([data-theme="dark"]) .zazu-user-trigger[aria-expanded="true"] {
+    border-color: #8D91FF;
+    background: #F9FAFF;
+    color: #222A83;
+}
+
+:root:not([data-theme="dark"]) .zazu-user-role {
+    color: #3949E8;
+}
+
+:root:not([data-theme="dark"]) .zazu-user-menu-link {
+    color: #2D3650;
+}
+
+:root:not([data-theme="dark"]) .zazu-user-menu-link:hover {
+    background: #EEF0FF;
+    border-left-color: #3949E8;
+    color: #252E9E;
+}
+
+:root:not([data-theme="dark"]) .zazu-theme-toggle,
+:root:not([data-theme="dark"]) .zazu-mobile-toggle {
+    background: #FFFFFF;
+    border-color: #BCC3D4;
+    color: #30384F;
+}
+
+:root:not([data-theme="dark"]) .zazu-theme-toggle:hover,
+:root:not([data-theme="dark"]) .zazu-mobile-toggle:hover {
+    background: #EEF0FF;
+    border-color: #5B5CFF;
+    color: #2F39C7;
+}
+
+:root:not([data-theme="dark"]) .zazu-command-trigger {
+    border-color: #B8C0D1;
+    background: #FFFFFF;
+    color: #293148;
+}
+
+:root:not([data-theme="dark"]) .zazu-command-trigger:hover,
+:root:not([data-theme="dark"]) .zazu-command-trigger:focus-within {
+    border-color: #7A7EFF;
+    background: #F8F8FF;
+    color: #232A86;
+}
+
+/* Header positioning: align the title and actions on one optical baseline. */
+.zazu-topbar-inner {
+    align-items: center;
+}
+
+.zazu-header-context {
+    flex: 1 1 auto;
+    min-width: 0;
+}
+
+.zazu-topbar-actions {
+    flex: 0 0 auto;
+    align-items: center;
+}
+
+@media (max-width: 1100px) {
+    .zazu-topbar-inner {
+        align-items: center;
+    }
+}
+
+/* Section tabs use an open underline model instead of extra pills. */
+.zazu-section-tabs {
+    border-bottom: 1px solid #D0D4DF;
+    padding-bottom: 2px;
+}
+
+.zazu-section-tabs a,
+.zazu-section-tabs .zazu-section-name {
+    color: #566078;
+}
+
+.zazu-section-tabs a {
+    border-radius: 0;
+    border-bottom: 2px solid transparent;
+    padding: 4px 7px 5px;
+}
+
+.zazu-section-tabs a:hover {
+    background: transparent;
+    color: #232A86;
+}
+
+.zazu-section-tabs a.active {
+    color: #2F39C7;
+    border-bottom-color: #5B5CFF;
+    background: transparent;
+}
+
+/* Kill accidental low-contrast text on light surfaces. */
+:root:not([data-theme="dark"]) .zazu-eyebrow,
+:root:not([data-theme="dark"]) .zazu-command-meta-label,
+:root:not([data-theme="dark"]) .zazu-metric-copy,
+:root:not([data-theme="dark"]) .zazu-metric-note,
+:root:not([data-theme="dark"]) .zazu-field-help,
+:root:not([data-theme="dark"]) .zazu-side-secondary,
+:root:not([data-theme="dark"]) .zazu-document-footer,
+:root:not([data-theme="dark"]) .zazu-dashboard-helper-copy,
+:root:not([data-theme="dark"]) .zazu-page-context {
+    color: #566078;
+}
+
+:root:not([data-theme="dark"]) .zazu-card-title,
+:root:not([data-theme="dark"]) .zazu-panel-title,
+:root:not([data-theme="dark"]) .zazu-command-title,
+:root:not([data-theme="dark"]) .zazu-list-title,
+:root:not([data-theme="dark"]) .zazu-detail-value,
+:root:not([data-theme="dark"]) .zazu-route-card-title,
+:root:not([data-theme="dark"]) .zazu-document-title,
+:root:not([data-theme="dark"]) .zazu-document-number {
+    color: #191D31;
+}
+
+:root:not([data-theme="dark"]) .zazu-card-description,
+:root:not([data-theme="dark"]) .zazu-panel-copy,
+:root:not([data-theme="dark"]) .zazu-form-section-copy,
+:root:not([data-theme="dark"]) .zazu-list-meta,
+:root:not([data-theme="dark"]) .zazu-route-card-copy,
+:root:not([data-theme="dark"]) .zazu-document-muted {
+    color: #566078;
+}
+
+:root:not([data-theme="dark"]) .zazu-record-header {
+    background: #EEF0F5;
+    border-bottom-color: #B4BBCB;
+    color: #404860;
+}
+
+:root:not([data-theme="dark"]) .zazu-input,
+:root:not([data-theme="dark"]) .zazu-select,
+:root:not([data-theme="dark"]) .zazu-textarea,
+:root:not([data-theme="dark"]) input,
+:root:not([data-theme="dark"]) select,
+:root:not([data-theme="dark"]) textarea {
+    border-color: #9EA7BC;
+    background: #FFFFFF;
+    color: #191D31;
+}
+
+:root:not([data-theme="dark"]) .zazu-input::placeholder,
+:root:not([data-theme="dark"]) .zazu-textarea::placeholder {
+    color: #707A92;
+}
+
+:root:not([data-theme="dark"]) .zazu-btn-secondary {
+    border-color: #98A2B8;
+    background: #FFFFFF;
+    color: #22283B;
+}
+
+:root:not([data-theme="dark"]) .zazu-btn-ghost {
+    color: #566078;
+}
+
+:root:not([data-theme="dark"]) .zazu-btn-ghost:hover {
+    background: #EEF0FF;
+    border-color: #9A9FF0;
+    color: #2F39C7;
+}
+
+/* Status system: meaning is carried by hue + text contrast, not blue everywhere. */
+:root:not([data-theme="dark"]) .zazu-chip-info,
+:root:not([data-theme="dark"]) .zazu-chip-accent {
+    border-color: #C7C2FF;
+    background: #F0EEFF;
+    color: #3B348F;
+}
+
+:root:not([data-theme="dark"]) .zazu-chip-success {
+    border-color: #B9DEC8;
+    background: #E8F6EE;
+    color: #166534;
+}
+
+:root:not([data-theme="dark"]) .zazu-chip-warning {
+    border-color: #E4C77B;
+    background: #FFF4D6;
+    color: #8A5600;
+}
+
+:root:not([data-theme="dark"]) .zazu-chip-danger {
+    border-color: #E7A2A9;
+    background: #FDEBEC;
+    color: #A12B37;
+}
+
+:root:not([data-theme="dark"]) .zazu-chip-neutral {
+    border-color: #BCC3D1;
+    background: #F0F1F5;
+    color: #4C566D;
+}
+
+:root:not([data-theme="dark"]) .zazu-btn-primary {
+    background: #3949E8;
+    border-color: #3949E8;
+    color: #FFFFFF;
+}
+
+:root:not([data-theme="dark"]) .zazu-btn-primary:hover {
+    background: #2834B8;
+    border-color: #2834B8;
+    color: #FFFFFF;
+}
+
+:root:not([data-theme="dark"]) .zazu-avatar {
+    border-color: #B8C1D3;
+    background: #EEF0FF;
+    color: #2F39C7;
+}
+
+/* Dashboard status colours are explicit; red/amber/green carry different meanings. */
+.zazu-dash-status {
+    border: 1px solid #B8C1D3;
+    background: #F0F1F5;
+    color: #4C566D;
+    font-weight: 800;
+}
+
+.zazu-dash-status.status-draft {
+    border-color: #E4C77B;
+    background: #FFF4D6;
+    color: #8A5600;
+}
+
+.zazu-dash-status.status-confirmed {
+    border-color: #B9DEC8;
+    background: #E8F6EE;
+    color: #166534;
+}
+
+.zazu-dash-status.status-in-progress {
+    border-color: #C7C2FF;
+    background: #F0EEFF;
+    color: #3B348F;
+}
+
+.zazu-dash-status.status-completed {
+    border-color: #9AC9B0;
+    background: #DDF2E6;
+    color: #165B39;
+}
+
+.zazu-dash-status.status-cancelled {
+    border-color: #E7A2A9;
+    background: #FDEBEC;
+    color: #A12B37;
+}
+
+.zazu-dash-queue-state {
+    border: 1px solid #E4C77B;
+}
+
+.zazu-dash-queue-state.is-warning {
+    background: #FFF4D6;
+    color: #8A5600;
+}
+
+.zazu-dash-queue-state.is-clear {
+    background: #E8F6EE;
+    color: #166534;
+    border-color: #B9DEC8;
+}
+
+/* Dashboard hierarchy: stronger anchors, quieter secondary copy, clean positioning. */
+.zazu-dash-hero,
+.zazu-dash-surface,
+.zazu-dash-commandbar,
+.zazu-dash-setup {
+    border-color: #C5CAD8;
+    background: #FFFFFF;
+    box-shadow: 0 2px 8px rgba(30,36,68,.045);
+}
+
+.zazu-dash-hero-main,
+.zazu-dash-hero-side {
+    padding-top: 20px;
+    padding-bottom: 20px;
+}
+
+.zazu-dash-hero-side {
+    background: #F0F1F5;
+    border-left-color: #C5CAD8;
+}
+
+.zazu-dash-hero h2 {
+    color: #191D31;
+}
+
+.zazu-dash-hero p {
+    color: #343B52;
+}
+
+.zazu-dash-kicker {
+    color: #2F39C7;
+}
+
+.zazu-dash-side-label,
+.zazu-dash-side-line,
+.zazu-dash-hero-side > span:not(.zazu-dash-side-label) {
+    color: #566078;
+}
+
+.zazu-dash-side-line b {
+    color: #166534;
+}
+
+.zazu-dash-surface-head {
+    background: #F0F1F5;
+    border-bottom-color: #C5CAD8;
+}
+
+.zazu-dash-surface-head h3 {
+    color: #191D31;
+}
+
+.zazu-dash-surface-head p {
+    color: #566078;
+}
+
+.zazu-dash-event,
+.zazu-dash-metric,
+.zazu-dash-focus-item {
+    color: #191D31;
+}
+
+.zazu-dash-event {
+    border-bottom-color: #D0D4DF;
+}
+
+.zazu-dash-event:hover,
+.zazu-dash-metric:hover,
+.zazu-dash-focus-item:hover {
+    background: #F5F5FF;
+    border-color: #B8BDEB;
+}
+
+.zazu-dash-event-time strong,
+.zazu-dash-event-copy strong,
+.zazu-dash-metric > strong {
+    color: #191D31;
+}
+
+.zazu-dash-event-time span,
+.zazu-dash-event-copy span,
+.zazu-dash-event-copy small,
+.zazu-dash-metric > span,
+.zazu-dash-metric > small,
+.zazu-dash-note {
+    color: #566078;
+}
+
+.zazu-dash-metric > b,
+.zazu-dash-focus-item > b,
+.zazu-text-action {
+    color: #3949E8;
+}
+
+.zazu-dash-note {
+    background: #F6F7FA;
+    border-color: #C9CEDC;
+}
+
+.zazu-dash-focus-item {
+    border-right-color: #D0D4DF;
+}
+
+.zazu-dash-focus-item.is-warning {
+    background: #FFF9EE;
+}
+
+.zazu-dash-focus-item.is-info {
+    background: #F2F2FF;
+}
+
+.zazu-dash-focus-item.is-clear {
+    background: #F2FAF5;
+}
+
+/* Keep mobile tables/registers inside the viewport by composing, not horizontal scrolling. */
+@media (max-width: 760px) {
+    .zazu-ops-row,
+    .zazu-ops-row-main {
+        width: 100%;
+        min-width: 0;
+        max-width: 100%;
+        box-sizing: border-box;
+    }
+
+    .zazu-ops-row-main strong,
+    .zazu-ops-row-main small {
+        white-space: normal;
+    }
+
+    .zazu-document-table-wrap,
+    .zazu-table-wrap {
+        overflow-x: hidden;
+        width: 100%;
+    }
+
+    .zazu-document-table {
+        table-layout: fixed;
+        width: 100%;
+    }
+
+    .zazu-document-table th,
+    .zazu-document-table td {
+        overflow-wrap: anywhere;
+        word-break: break-word;
+    }
+}
+
+/* Final contrast guard: no pale foreground is allowed on light-mode surfaces. */
+:root:not([data-theme="dark"]) :where(
+    .zazu-card,
+    .zazu-panel,
+    .zazu-form-section,
+    .zazu-document,
+    .zazu-route-card,
+    .zazu-filter-card,
+    .zazu-metric-card,
+    .zazu-command-band,
+    .zazu-dash-surface,
+    .zazu-dash-commandbar,
+    .zazu-onboarding-main,
+    .zazu-calendar-shell,
+    .zazu-ops-register,
+    .zazu-ops-hero,
+    .zazu-user-popover
+) {
+    color: #191D31;
+}
+
+/* Accessibility: preserve motion only where users permit it. */
+@media (prefers-reduced-motion: no-preference) {
+    .zazu-nav-link,
+    .zazu-section-tabs a,
+    .zazu-command-trigger,
+    .zazu-theme-toggle,
+    .zazu-user-trigger,
+    .zazu-btn,
+    .zazu-dash-event,
+    .zazu-dash-metric,
+    .zazu-dash-focus-item,
+    .zazu-route-card {
+        transition:
+            background-color 140ms var(--zazu-ease),
+            border-color 140ms ease,
+            color 140ms ease,
+            box-shadow 140ms var(--zazu-ease),
+            transform 140ms var(--zazu-ease);
+    }
+
+    .zazu-nav-link:hover { transform: translateX(2px); }
+    .zazu-route-card:hover,
+    .zazu-dash-metric:hover,
+    .zazu-dash-focus-item:hover,
+    .zazu-dash-event:hover {
+        transform: translateY(-1px);
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .zazu-nav-link,
+    .zazu-section-tabs a,
+    .zazu-command-trigger,
+    .zazu-theme-toggle,
+    .zazu-user-trigger,
+    .zazu-btn,
+    .zazu-dash-event,
+    .zazu-dash-metric,
+    .zazu-dash-focus-item,
+    .zazu-route-card {
+        transition: none !important;
+        transform: none !important;
+    }
+}
