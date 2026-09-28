@@ -2846,3 +2846,66 @@ html[data-theme="dark"] body {
         min-width: 48%;
     }
 }
+
+
+/* OPERATIONS HUB — CYCLE 2: color balance + accessibility */
+.zazu-ops-register {
+    background: var(--zazu-page);
+}
+.zazu-ops-register-head,
+.zazu-ops-table-head {
+    background: var(--zazu-surface-2);
+}
+.zazu-ops-row:nth-of-type(even) {
+    background: color-mix(in srgb, var(--zazu-surface-2) 42%, var(--zazu-surface));
+}
+.zazu-ops-row:nth-of-type(even):hover,
+.zazu-ops-row:hover {
+    background: color-mix(in srgb, var(--zazu-primary-soft) 68%, var(--zazu-surface));
+}
+.zazu-register-key i.is-status {
+    background: var(--zazu-danger);
+}
+.zazu-live-mark i {
+    background: var(--zazu-success);
+    box-shadow: 0 0 0 3px color-mix(in srgb, var(--zazu-success) 16%, transparent);
+}
+.zazu-ops-ref strong {
+    color: var(--zazu-primary-deep);
+}
+.zazu-inspector-summary {
+    background: var(--zazu-surface-2);
+}
+.zazu-inspector-tabs {
+    background: var(--zazu-surface-2);
+}
+.zazu-inspector-tabs button {
+    background: var(--zazu-surface-2);
+}
+.zazu-inspector-tabs button:hover {
+    background: var(--zazu-primary-soft);
+}
+.zazu-inspector-field,
+.zazu-manifest-row,
+.zazu-inspector-finance > div {
+    background: color-mix(in srgb, var(--zazu-surface) 82%, var(--zazu-surface-2));
+}
+.zazu-workload-pill:focus-visible,
+.zazu-inspector-tabs button:focus-visible,
+.zazu-inspector-close:focus-visible,
+.zazu-ops-actions .zazu-btn:focus-visible,
+.zazu-ops-row-main:focus-visible {
+    outline: 3px solid color-mix(in srgb, var(--zazu-focus) 72%, transparent);
+    outline-offset: 2px;
+}
+.zazu-workload-pill.is-active {
+    box-shadow: 0 0 0 1px var(--zazu-primary), 0 3px 10px color-mix(in srgb, var(--zazu-primary) 18%, transparent);
+}
+@media (max-width: 560px) {
+    .zazu-ops-register-head {
+        padding: 15px 14px;
+    }
+    .zazu-ops-row-main {
+        padding-top: 14px;
+    }
+}
