@@ -8,6 +8,8 @@ test('registration flows through onboarding into the dashboard', async ({ page }
     const businessName = 'Browser Catering ' + unique;
 
     await page.goto('/');
+    await expect(page.locator('html')).toHaveAttribute('lang', /.+/);
+    await expect(page.locator('nav[aria-label="Public navigation"]')).toBeVisible();
     await expect(page.getByRole('link', { name: 'Register' })).toBeVisible();
     await expect(page.getByRole('link', { name: 'Log in' })).toBeVisible();
     await page.getByRole('link', { name: 'Register' }).click();
@@ -39,6 +41,9 @@ test('registration flows through onboarding into the dashboard', async ({ page }
     await page.getByRole('button', { name: 'Finish setup' }).click();
 
     await expect(page).toHaveURL(/\/dashboard$/);
+    await expect(page.locator('main#main-content')).toBeVisible();
+    await expect(page.locator('a.zazu-skip-link')).toHaveCount(1);
+    await expect(page.getByRole('button', { name: 'Open navigation' })).toBeVisible();
     await expect(page.getByRole('heading', { name: 'Command Centre' })).toBeVisible();
     await expect(page.getByTitle('Active business workspace')).toHaveText(businessName);
 
