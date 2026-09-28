@@ -285,6 +285,7 @@ function setupBrandingUploads() {
 
 const initializeZazuUi = () => {
     setupZazuAuthExperience();
+    setupZazuMobileNavigation();
     setupZazuThemeToggle();
     setupZazuUserMenus();
     setupZazuToasts();
@@ -299,6 +300,29 @@ if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', initializeZazuUi, { once: true });
 } else {
     initializeZazuUi();
+}
+
+
+function setupZazuMobileNavigation() {
+    document.querySelectorAll('[data-mobile-nav]').forEach((nav) => {
+        if (nav.dataset.zazuMobileBound === '1') return;
+        const toggle = nav.querySelector('[data-mobile-nav-toggle]');
+        const links = nav.querySelector('[data-mobile-links]') || nav.querySelector('.zazu-mobile-links');
+        if (!toggle || !links) return;
+        nav.dataset.zazuMobileBound = '1';
+        const close = () => {
+            nav.classList.remove('is-open');
+            toggle.setAttribute('aria-expanded', 'false');
+        };
+        toggle.addEventListener('click', () => {
+            const open = nav.classList.toggle('is-open');
+            toggle.setAttribute('aria-expanded', open ? 'true' : 'false');
+        });
+        links.querySelectorAll('a').forEach((link) => link.addEventListener('click', close));
+        document.addEventListener('keydown', (event) => {
+            if (event.key === 'Escape') close();
+        });
+    });
 }
 
 function setupZazuAuthExperience() {
