@@ -3,7 +3,7 @@
     <x-slot:heading>Services &amp; Prices</x-slot:heading>
     <x-slot:headerAction>
         @if($isOwner)
-            <a href="{{ route('capabilities.create') }}" class="zazu-btn zazu-btn-primary">+ Add catalogue item</a>
+            <button type="button" class="zazu-btn zazu-btn-primary" data-catalogue-drawer-open>+ Add catalogue item</button>
         @endif
     </x-slot:headerAction>
 
