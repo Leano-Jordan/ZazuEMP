@@ -4,7 +4,7 @@
 **Last Director cycle:** 2026-09-28  
 **Repository:** `Leano-Jordan/ZazuEMP`  
 **Branch:** `main`  
-**HEAD:** `aa01ad1fb0209f13114455bb3b0eb3a8bfbeba1d`  
+**HEAD:** `f714253a8b1cebfae70b394bcd87281a4e240828`  
 **Evidence rule:** Implemented ≠ Verified ≠ Proven.
 
 ## Director operating rule
@@ -233,3 +233,39 @@ Any existing workflow failure stops new improvement work.
 Update this roadmap, readiness register and release position only from observed evidence.
 
 **Next Director target after ZR-01:** fix the highest-severity verified defect, then re-run the same evidence slice before touching the next domain.
+
+---
+
+# Director cycle record — 2026-09-28
+
+## ZR-01 access + verification consolidation
+
+Application changes:
+- Public landing remains available to authenticated accounts even when no active workspace can be resolved.
+- Guests see Register / Log in; authenticated users see You’re signed in and, where available, Open workspace / Sign out.
+- Missing workspace context is now distinguished from ordinary permission denial, with a public-site/sign-out recovery path.
+- Landing copy now speaks directly to South African event businesses, including small operators and growing businesses.
+- Mobile landing keeps Register and Log in visible.
+
+Verification infrastructure:
+- Laravel CI now compiles Blade views with php artisan view:cache.
+- Laravel CI now checks every emitted public/build/manifest.json asset exists.
+- Browser CI now creates the SQLite database file before migration.
+- The real registration/onboarding browser test now lives under e2e/ and is executed by the Zazu browser workflow.
+- Stale generic Playwright coverage was removed.
+- Browser projects now cover desktop Chrome, Pixel 7 mobile and iPad tablet.
+- Browser onboarding includes accessibility-oriented assertions.
+
+Current evidence:
+- Final application commit: f714253a8b1cebfae70b394bcd87281a4e240828.
+- Laravel workflow run 36483769899: QUEUED.
+- Zazu browser smoke run 36483769888: QUEUED.
+- Psalm run 36483769887: QUEUED.
+- PHPMD run 36483769876: QUEUED.
+- CodeQL run 36483769482: QUEUED.
+- SonarCloud run 36483769880: SKIPPED.
+
+Re-audit:
+- No source-level regression observed in the modified access, error, landing and browser-control areas.
+- Release-readiness score remains unchanged until current-head runtime/browser evidence completes.
+- Cycle status remains IN PROGRESS.
