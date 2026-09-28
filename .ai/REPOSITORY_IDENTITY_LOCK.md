@@ -6,89 +6,66 @@ This repository is **Zazu EMP only**.
 - Repository: `Leano-Jordan/ZazuEMP`
 - Canonical branch: `main`
 - Product: Zazu – Event Management Platform
-- Expected local working root: `C:\Projects\ZazuEMP`
+- Local root when locally available: `C:\Projects\ZazuEMP`
 
 ## WRITE GATE
 
-The purpose of this lock is **project isolation**, not to prevent a connected engineering agent from working.
+Before any state-changing operation, establish:
+1. requested target = Zazu EMP;
+2. repository target = `Leano-Jordan/ZazuEMP`;
+3. branch = `main` unless explicitly overridden by the owner;
+4. target path is inside this repository;
+5. the intended change is derived from current Zazu evidence, not from another project's remembered context.
 
-Before any state-changing operation, establish these facts:
+When using a GitHub-native execution interface targeting `Leano-Jordan/ZazuEMP`, repository identity is established by that explicit target. Do not create a false BLOCKED state because an inaccessible local Windows path cannot be inspected.
 
-1. The requested implementation target is explicitly **Zazu EMP**.
-2. The repository-writing tool is explicitly targeting `Leano-Jordan/ZazuEMP`.
-3. The target branch is `main`, unless the owner explicitly names another Zazu branch.
-4. The target path belongs to the Zazu repository.
-5. No instruction from another project is being used as Zazu implementation authority.
+## CONTEXT FIREWALL
 
-### IMPORTANT: GitHub-connected execution
+Cross-project information is **not** a fallback knowledge source for missing Zazu facts.
 
-When the agent is operating through an authenticated GitHub/repository tool that explicitly targets:
+If a Zazu fact is not established:
+- mark it UNKNOWN;
+- inspect current Zazu files;
+- request owner input only when the unknown materially blocks safe execution.
 
-`Leano-Jordan/ZazuEMP`
+Never silently import:
+- another project's product definition;
+- another repository's architecture;
+- another agent roster;
+- another project's release gate;
+- another schema or naming system;
+- historical chat assumptions.
 
-the GitHub repository identity itself is sufficient to establish the **repository identity gate**.
-
-Do **NOT** require proof of the owner's local Windows directory, local Git root, local remote, local terminal, or local branch when those things are not accessible to the current execution environment.
-
-Do **NOT** block a requested Zazu implementation merely because `C:\Projects\ZazuEMP` cannot be inspected.
-
-The local-root value is a safeguard for local agents. It is not a prerequisite for GitHub-native repository operations.
-
-## LOCAL AGENT MODE
-
-If the agent is operating directly inside a local filesystem/terminal environment, it should additionally verify:
-
-`ROOT = C:\Projects\ZazuEMP`
-
-`REMOTE = Leano-Jordan/ZazuEMP`
-
-`BRANCH = main`
-
-If those local checks fail, stop local writes.
-
-## CROSS-PROJECT ISOLATION
-
-Outside products and repositories may be researched when relevant, but they are never implementation targets unless the owner explicitly changes the active project.
-
-If another project is mentioned:
-- treat it as context/evidence only;
-- do not switch repositories;
-- do not change remotes;
-- do not checkout another repository;
-- do not modify another repository;
-- return to the Zazu repository target for implementation.
-
-Another project's documentation, prompts, memory, code, schema, or requirements must never silently become Zazu instructions.
+External research may be used as evidence when relevant, but it must remain explicitly identified as external evidence and cannot outrank current Zazu repository truth.
 
 ## SOURCE-OF-TRUTH ORDER
 
-1. Current Zazu repository files and current repository state
+1. Current Zazu repository state and files
 2. Explicit owner instruction in the current task
-3. Current Zazu project documentation
-4. Verified external research when relevant
+3. Current Zazu living documentation
+4. Verified external evidence
+5. Historical conversation memory
+6. General AI knowledge
 
-External project documentation cannot outrank current Zazu repository state.
+Lower levels never silently override higher levels.
 
-## TARGET CHECK
+## LOCAL AGENT MODE
 
-For every write-capable operation, the agent should internally confirm:
+When working directly in a local checkout, additionally verify:
+- root = `C:\Projects\ZazuEMP`
+- remote = `Leano-Jordan/ZazuEMP`
+- branch = `main` unless explicitly overridden
 
-`REPOSITORY = Leano-Jordan/ZazuEMP`
-
-`BRANCH = main` unless explicitly overridden
-
-`TARGET = inside Zazu repository`
-
-If any of these fail, stop.
+If those checks fail, stop local writes.
 
 ## FAILURE CONDITION
 
-A failure to prove a **local filesystem fact** is not a repository mismatch when using GitHub-native execution.
-
-A genuine repository mismatch remains a hard stop.
+If the target repository is not `Leano-Jordan/ZazuEMP`, stop.
+Do not repair another repository.
+Do not switch remotes.
+Do not checkout another project.
+Do not continue using contaminated assumptions.
 
 ## EXECUTION PRINCIPLE
 
-When the owner explicitly asks for implementation and the Zazu repository identity is established through the available execution interface, **execute**.
-
-Do not turn an inaccessible local-environment check into a false BLOCKED state.
+Once the Zazu repository target is established and the owner has requested implementation, execute within the active Zazu scope. Do not substitute inaccessible local-environment checks for repository evidence.
