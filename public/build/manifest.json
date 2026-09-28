@@ -1,6 +1,6 @@
 {
   "resources/css/app.css": {
-    "file": "assets/app-DnorRYPq.css",
+    "file": "assets/app-gxAqZxfy.css",
     "name": "app",
     "names": [
       "app.css"
@@ -9,7 +9,7 @@
     "isEntry": true
   },
   "resources/css/zazu-responsive-theme.css": {
-    "file": "assets/zazu-responsive-theme-DIsxLrx9.css",
+    "file": "assets/zazu-responsive-theme-DO9fKzpG.css",
     "name": "zazu-responsive-theme",
     "names": [
       "zazu-responsive-theme.css"
@@ -18,7 +18,7 @@
     "isEntry": true
   },
   "resources/js/app.js": {
-    "file": "assets/app-BkLrISMN.js",
+    "file": "assets/app-CCMjDrkG.js",
     "name": "app",
     "src": "resources/js/app.js",
     "isEntry": true
