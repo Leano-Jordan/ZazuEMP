@@ -80,3 +80,27 @@ Current Director assessment:
 The major V1 capability surface is present. Remaining release risk is concentrated in proof, recovery, device QA and defects exposed by those checks.
 
 Current UI cycle does not create a new V1 feature expansion requirement.
+
+
+## Latest visual-system audit — 2026-09-28
+
+Target: colour theory, contrast, positioning and shared visual authority.
+
+Completed:
+- consolidated light-mode identity around cobalt-iris rather than generic utility blue;
+- introduced sea-glass as a distinct secondary accent;
+- separated semantic status colours into warning / success / danger / information roles;
+- aligned base app utility colour tokens with the canonical visual layer;
+- removed the repeated active-workspace navigation treatment;
+- preserved the flat navigation structure;
+- corrected header optical alignment;
+- strengthened active/hover navigation states without light text on light surfaces;
+- applied explicit dark foregrounds to light-mode cards, panels, forms, lists and dashboard surfaces;
+- applied explicit semantic colours to dashboard lifecycle statuses;
+- retained reduced-motion support;
+- confirmed no literal non-dark light-on-light colour/background rule in the final visual layer by static source inspection.
+
+Evidence boundary:
+- static source inspection completed;
+- rendered visual/device verification is still required before release acceptance.
+
