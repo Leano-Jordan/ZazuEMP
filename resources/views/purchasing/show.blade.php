@@ -1,7 +1,7 @@
 <x-app-layout>
 <x-slot:title>{{ $purchaseOrder->reference }}</x-slot:title><x-slot:heading>{{ $purchaseOrder->reference }}</x-slot:heading>
 <x-slot:headerAction><a href="{{ route('purchasing.index') }}" class="zazu-btn zazu-btn-secondary">All orders</a></x-slot:headerAction>
-<section class="zazu-detail-grid"><div class="zazu-card"><div class="zazu-card-header"><div class="zazu-eyebrow">Purchase order</div><div class="zazu-card-title mt-1">{{ $purchaseOrder->supplier->name }}</div></div><div class="p-5 grid gap-3"><div><strong>Status:</strong> {{ ucfirst($purchaseOrder->status) }}</div><div><strong>Expected:</strong> {{ $purchaseOrder->expected_at?->format('d M Y') ?: 'Not set' }}</div><div><strong>Total:</strong> {{ $purchaseOrder->currency }} {{ $purchaseOrder->total_amount }}</div></div></div>
+<section class="zazu-detail-grid"><div class="zazu-card"><div class="zazu-card-header"><div class="zazu-eyebrow">Purchase order</div><div class="zazu-card-title mt-1">{{ $purchaseOrder->supplier->name }}</div></div><div class="p-5 grid gap-3"><div><strong>Status:</strong> {{ ucfirst($purchaseOrder->status) }}</div><div><strong>Job:</strong> {{ $purchaseOrder->event?->name ?: 'General purchase' }}</div><div><strong>Expected:</strong> {{ $purchaseOrder->expected_at?->format('d M Y') ?: 'Not set' }}</div><div><strong>Total:</strong> {{ $purchaseOrder->currency }} {{ $purchaseOrder->total_amount }}</div></div></div>
 <section class="zazu-panel">
     <div class="zazu-eyebrow">Receiving</div>
     <div class="zazu-panel-title mt-1">Receive goods</div>
