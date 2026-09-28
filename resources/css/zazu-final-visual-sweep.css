@@ -1022,9 +1022,9 @@ textarea:focus {
     --zazu-accent-ink: #08766F;
     --zazu-accent-soft: #D8F4F1;
 
-    --zazu-violet: #7657E8;
-    --zazu-violet-ink: #5A3FC3;
-    --zazu-violet-soft: #EEE9FF;
+    --zazu-violet: var(--zazu-primary);
+    --zazu-violet-ink: var(--zazu-primary-deep);
+    --zazu-violet-soft: var(--zazu-primary-soft);
 
     --zazu-amber: #C9790B;
     --zazu-amber-ink: #855207;
@@ -1081,9 +1081,9 @@ textarea:focus {
     --zazu-accent-ink: #7AE0D9;
     --zazu-accent-soft: #103D3B;
 
-    --zazu-violet: #9B87F5;
-    --zazu-violet-ink: #C5B9FF;
-    --zazu-violet-soft: #2C2550;
+    --zazu-violet: var(--zazu-primary);
+    --zazu-violet-ink: var(--zazu-primary-deep);
+    --zazu-violet-soft: var(--zazu-primary-soft);
 
     --zazu-amber: #E0A85A;
     --zazu-amber-ink: #F4C985;
@@ -1439,7 +1439,7 @@ textarea.zazu-textarea,
 }
 [data-zazu-route="dashboard"] .zazu-metric-card:nth-child(3)::before,
 [data-zazu-route="owner.dashboard"] .zazu-metric-card:nth-child(3)::before {
-    background: var(--zazu-violet);
+    background: var(--zazu-primary);
 }
 [data-zazu-route="dashboard"] .zazu-metric-card:nth-child(4)::before,
 [data-zazu-route="owner.dashboard"] .zazu-metric-card:nth-child(4)::before {
@@ -1477,18 +1477,18 @@ textarea.zazu-textarea,
 /* Relationship workspace */
 [data-zazu-route^="customers."] .zazu-command-band,
 [data-zazu-route="customers.show"] .zazu-customer-hero {
-    border-left-color: var(--zazu-violet);
+    border-left-color: var(--zazu-primary);
 }
 [data-zazu-route^="customers."] .zazu-command-band {
-    background: linear-gradient(135deg, color-mix(in srgb, var(--zazu-violet) 12%, var(--zazu-surface)), var(--zazu-surface) 72%);
+    background: linear-gradient(135deg, color-mix(in srgb, var(--zazu-primary) 12%, var(--zazu-surface)), var(--zazu-surface) 72%);
 }
 [data-zazu-route^="customers."] .zazu-contact-card,
 [data-zazu-route="customers.show"] .zazu-panel {
-    border-color: color-mix(in srgb, var(--zazu-violet) 27%, var(--zazu-border));
+    border-color: color-mix(in srgb, var(--zazu-primary) 27%, var(--zazu-border));
 }
 [data-zazu-route^="customers."] .zazu-contact-card:hover {
-    border-color: var(--zazu-violet);
-    background: var(--zazu-violet-soft);
+    border-color: var(--zazu-primary);
+    background: var(--zazu-primary-soft);
 }
 
 /* Service catalogue */
@@ -1550,7 +1550,7 @@ textarea.zazu-textarea,
     background: var(--zazu-accent);
 }
 [data-zazu-route="finance.index"] .zazu-metric-card:nth-child(3)::before {
-    background: var(--zazu-violet);
+    background: var(--zazu-primary);
 }
 [data-zazu-route="finance.invoices.show"] .zazu-document-table {
     border: 1px solid var(--zazu-border-strong);
@@ -1600,12 +1600,12 @@ textarea.zazu-textarea,
     background: var(--zazu-warning);
 }
 [data-zazu-route^="assets."] .zazu-command-band {
-    border-left-color: var(--zazu-violet);
+    border-left-color: var(--zazu-primary);
 }
 [data-zazu-route="assets.index"] .zazu-list-item:hover {
-    background: var(--zazu-violet-soft);
-    border-color: color-mix(in srgb, var(--zazu-violet) 42%, var(--zazu-border));
-    box-shadow: inset 4px 0 0 var(--zazu-violet);
+    background: var(--zazu-primary-soft);
+    border-color: color-mix(in srgb, var(--zazu-primary) 42%, var(--zazu-border));
+    box-shadow: inset 4px 0 0 var(--zazu-primary);
 }
 
 /* Job-side tools: same system, purpose-specific cue. */
@@ -1630,15 +1630,15 @@ textarea.zazu-textarea,
 
 /* Insights + system pages */
 [data-zazu-route="reports.index"] .zazu-command-band {
-    border-left-color: var(--zazu-violet);
-    background: linear-gradient(135deg, color-mix(in srgb, var(--zazu-violet) 12%, var(--zazu-surface)), var(--zazu-surface) 72%);
+    border-left-color: var(--zazu-primary);
+    background: linear-gradient(135deg, color-mix(in srgb, var(--zazu-primary) 12%, var(--zazu-surface)), var(--zazu-surface) 72%);
 }
 [data-zazu-route="reports.index"] .zazu-metric-card::before {
-    background: var(--zazu-violet);
+    background: var(--zazu-primary);
 }
 [data-zazu-route="reports.index"] .zazu-route-card:hover {
-    border-color: var(--zazu-violet);
-    background: var(--zazu-violet-soft);
+    border-color: var(--zazu-primary);
+    background: var(--zazu-primary-soft);
 }
 [data-zazu-route="settings.index"] .zazu-command-band,
 [data-zazu-route="settings.compliance"] .zazu-command-band {
