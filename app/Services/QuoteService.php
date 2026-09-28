@@ -170,6 +170,15 @@ class QuoteService
                 ->lockForUpdate()
                 ->firstOrFail();
 
+            $lockedEvent = Event::query()
+                ->whereKey($lockedQuote->event_id)
+                ->lockForUpdate()
+                ->firstOrFail();
+
+            if ($lockedEvent->isClosed()) {
+                throw ValidationException::withMessages(['quote' => 'Closed work cannot receive quote revisions.']);
+            }
+
             $lockedVersion = $lockedQuote->versions()
                 ->whereKey($version->id)
                 ->lockForUpdate()
