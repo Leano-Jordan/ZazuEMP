@@ -37,6 +37,8 @@ class SearchController extends Controller
             'statuses' => [
                 'draft', 'confirmed', 'in_progress', 'completed', 'cancelled',
                 'sent', 'accepted', 'declined', 'expired', 'ordered', 'received',
+                'planned', 'incurred', 'void', 'open', 'blocked', 'ready',
+                'active', 'inactive', 'unpaid', 'paid',
             ],
         ]);
     }
