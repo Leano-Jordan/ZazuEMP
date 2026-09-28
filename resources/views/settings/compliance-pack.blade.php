@@ -83,17 +83,4 @@
             </section>
         </aside>
     </section>
-
-    <style>
-        @media print {
-            .print-hide,
-            .zazu-sidebar,
-            .zazu-topbar-actions,
-            .zazu-mobile-nav { display: none !important; }
-            .zazu-topbar { position: static !important; }
-            body { background: white !important; }
-            .zazu-content { padding: 0 !important; }
-            .zazu-card, .zazu-panel, .zazu-context-card { break-inside: avoid; }
-        }
-    </style>
 </x-app-layout>
