@@ -5938,3 +5938,9 @@ html[data-theme="dark"] .zazu-public-party,html[data-theme="dark"] .zazu-public-
   .zazu-form { gap:14px; }
   .zazu-form .zazu-field { gap:6px; }
 }
+
+/* Auth transition states used by the route-preserving switcher. */
+.zazu-auth-dual.zazu-auth-switching { opacity:.86; transform:translateY(4px); transition:opacity 120ms ease, transform 120ms ease; }
+.zazu-auth-dual.zazu-auth-switched { animation:zazu-auth-switched 220ms var(--zazu-ease) both; }
+@keyframes zazu-auth-switched { from { opacity:.72; transform:translateY(5px); } to { opacity:1; transform:none; } }
+@media(prefers-reduced-motion:reduce){ .zazu-auth-dual.zazu-auth-switching,.zazu-auth-dual.zazu-auth-switched { animation:none; transition:none; transform:none; opacity:1; } }
