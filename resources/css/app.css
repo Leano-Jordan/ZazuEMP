@@ -8179,3 +8179,21 @@ textarea:focus {
         border-top: 1px solid var(--zazu-border); padding-top: 10px;
     }
 }
+
+/* REQUIREMENTS WORKFLOW REFINEMENT / 2026-09 */
+.zazu-requirements-command { border-left: 4px solid var(--zazu-primary); }
+.zazu-requirements-register .zazu-record-header {
+    background: var(--zazu-surface-3);
+    border-top: 1px solid var(--zazu-border);
+    border-bottom: 1px solid var(--zazu-border-strong);
+}
+.zazu-requirements-register .zazu-list-item {
+    min-height: 72px;
+}
+.zazu-requirement-status {
+    letter-spacing: .04em;
+}
+.zazu-requirements-register .zazu-list-side {
+    padding-left: 12px;
+}
+.zazu-requirement-editor-command { border-left: 4px solid var(--zazu-primary); }
