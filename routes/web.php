@@ -93,6 +93,11 @@ Route::middleware('guest')->group(function () {
     Route::post('/register', [\App\Http\Controllers\AuthController::class, 'storeRegistration'])->middleware('throttle:register')->name('register.store');
 });
 
+Route::middleware(['auth', 'auth.session'])->group(function () {
+    Route::get('/workspace/recover', [\App\Http\Controllers\AuthController::class, 'workspaceRecovery'])->name('workspace.recovery');
+    Route::post('/workspace/recover', [\App\Http\Controllers\AuthController::class, 'storeWorkspaceRecovery'])->name('workspace.recovery.store');
+});
+
 Route::middleware(['auth', 'auth.session', 'owner'])->group(function () {
     Route::get('/owner', [\App\Http\Controllers\AuthController::class, 'owner'])->name('owner.dashboard');
 });
