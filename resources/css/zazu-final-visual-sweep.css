@@ -3272,3 +3272,33 @@ body[data-zazu-route^="quotes."] .zazu-topbar-actions .zazu-command-trigger:focu
         width: 100%;
     }
 }
+
+
+/* CUSTOMERS — CYCLE 1: relationship directory mobile composition */
+.zazu-customer-directory .zazu-list-item { min-width: 0; }
+.zazu-customer-directory .zazu-list-main { min-width: 0; }
+.zazu-customer-directory .zazu-list-title,
+.zazu-customer-directory .zazu-list-meta { overflow-wrap: anywhere; }
+@media (max-width: 700px) {
+    .zazu-customer-directory .zazu-list-item {
+        display: grid;
+        grid-template-columns: minmax(0,1fr) auto;
+        gap: 10px;
+    }
+    .zazu-customer-directory .zazu-row-with-avatar {
+        grid-column: 1 / -1;
+        min-width: 0;
+    }
+    .zazu-customer-directory .zazu-list-side { text-align: left; }
+    .zazu-customer-directory .zazu-action-group {
+        grid-column: 1 / -1;
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        width: 100%;
+        gap: 8px;
+    }
+    .zazu-customer-directory .zazu-action-group .zazu-btn { width: 100%; }
+}
+@media (max-width: 420px) {
+    .zazu-customer-directory .zazu-action-group { grid-template-columns: 1fr; }
+}
