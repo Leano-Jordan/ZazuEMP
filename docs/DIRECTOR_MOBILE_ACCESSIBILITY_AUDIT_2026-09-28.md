@@ -1,51 +1,58 @@
-# Director Mobile Accessibility & UX Audit — 2026-09-28
+# Director Mobile + Desktop Accessibility & UX Audit — 2026-09-28
 
-## Scope
+## Iteration
 
-Mobile-only audit and correction of the shared application shell. Existing desktop visual hierarchy, colours, navigation destinations, permissions, business logic and workflows were intentionally preserved.
+Controlled refinement of the shared application shell after the previous mobile repair. The desktop visual benchmark, business logic, routes, permissions and operational workflows were protected.
 
-## Findings
+## Findings carried into this cycle
 
 | Finding | Severity | Fix effort | Release impact |
 |---|---|---:|---|
-| Mobile navigation had two click handlers and could toggle twice | Critical | Low | Functional mobile navigation defect |
-| Mobile navigation exposed only the current section | High | Low | Created navigation dead ends |
-| Mobile section tabs and wrapped header actions consumed excessive vertical space | High | Low | Poor mobile usability / content visibility |
-| Mobile users lost access to the full sidebar account/workspace controls | High | Low | Incomplete mobile control surface |
-| Header controls were oversized and competing for width | Medium | Low | Touch/scan friction |
-| Mobile drawer lacked explicit focus-return and inert-state handling | High | Low | Keyboard/accessibility weakness |
+| Mobile navigation previously had duplicate toggle handling | Critical | Low | Functional mobile defect |
+| Mobile navigation previously exposed only the current section | High | Low | Navigation dead ends |
+| Mobile header/section navigation consumed excessive vertical space | High | Low | Poor content visibility |
+| Mobile drawer backdrop could remain keyboard-focusable while visually hidden | High | Low | Accessibility defect |
+| Mobile drawer had no keyboard focus trap | High | Low | Accessibility defect |
+| Header action slots relied on implicit inline flow | Medium | Low | Inconsistent desktop/mobile header behaviour |
+| Accessibility test expected a removed “Open settings” control | Medium | Low | Stale failing test |
+| Legacy mobile-nav rules remained in shared responsive CSS | Medium | Low | CSS ownership/consolidation problem |
+| Duplicate route selectors remained in the final visual layer | Low | Low | CSS maintenance error |
 
-## Correction
+## Refinement executed
 
-The desktop sidebar is now the source of truth for mobile navigation. On viewports up to 820px it becomes an off-canvas drawer opened by a compact hamburger control.
+The desktop sidebar remains the source of truth for mobile navigation. On phone widths it becomes a compact off-canvas drawer controlled by a hamburger/close button.
 
-The mobile shell now provides:
+The shared shell now also:
 
-- full permission-aware navigation instead of current-section-only navigation;
-- account, workspace and sign-out access through the existing sidebar;
-- a visible close control and tap-to-dismiss backdrop;
-- Escape-to-close behaviour;
-- focus moved into the drawer when opened and restored when closed;
-- inert applied to the closed mobile drawer;
-- a single JavaScript controller with no duplicate inline mobile-nav handler;
-- section tabs hidden on mobile so they no longer consume header height;
-- compact 38–40px header controls;
-- a single-row mobile header with an ellipsized page title;
-- mobile-safe content and form spacing.
+- groups page-level header actions explicitly;
+- keeps mobile header controls at a consistent 40px target;
+- hides contextual section tabs on mobile to preserve vertical space;
+- uses safe-area-aware top and bottom spacing;
+- makes the mobile backdrop visibility-hidden when closed;
+- traps Tab/Shift+Tab inside the open drawer;
+- returns focus to the hamburger control after drawer dismissal;
+- uses inert on the closed mobile drawer;
+- updates browser theme chrome to the current visual palette;
+- removes obsolete mobile navigation CSS from the responsive architecture file;
+- removes duplicate route selectors from the final visual layer;
+- aligns accessibility tests with the actual current header.
 
 ## Verification
 
-Static repository verification confirmed:
+Static verification after execution confirms:
 
-- legacy data-mobile-nav markup is removed from the shared layout;
-- legacy mobile navigation controller is removed from resources/js/app.js;
-- the new mobile drawer contract is present in the accessibility feature test;
-- the new mobile CSS is isolated in resources/css/zazu-mobile-refinement.css;
-- the existing desktop visual CSS files were not modified for this correction;
-- no GitHub Actions workflow run was available for the final commit, so rendered-device/runtime QA remains outstanding.
+- JavaScript parses successfully;
+- all three relevant CSS files have balanced braces;
+- no legacy data-mobile-nav markup remains;
+- no legacy mobile-nav controller remains in JavaScript;
+- the responsive architecture file no longer owns obsolete mobile navigation selectors;
+- mobile drawer focus, Escape, inert and hidden-backdrop safeguards are present;
+- the accessibility test covers the current mobile drawer contract;
+- the desktop visual files remain unchanged except for duplicate-selector cleanup;
+- the new header-action wrapper has an explicit responsive layout owner.
 
-## Release judgement
+## Remaining proof
 
-The mobile shell has moved from a structurally broken state to a coherent, reusable navigation pattern without changing the desktop benchmark.
+GitHub Actions did not report a workflow run for the final commit. Therefore rendered phone/tablet/desktop browser QA remains the final evidence gate.
 
-**Remaining proof:** actual rendered QA on phone widths (and tablet crossover) before declaring the mobile gate complete.
+**Release posture:** the shell architecture is substantially cleaner and more consistent across desktop and mobile, but rendered-device verification is still required before marking the UI accessibility gate complete.
