@@ -67,7 +67,7 @@ final class PurchaseOrderReceivingService
             PurchaseOrderReceipt::create([
                 'business_id' => $businessId,
                 'purchase_order_id' => $lockedOrder->id,
-                'idempotency_key' => (string) Str::uuid(),
+                'idempotency_key' => $idempotencyKey,
             ]);
 
             $lockedOrder->load('items');
@@ -113,7 +113,7 @@ final class PurchaseOrderReceivingService
 
                 $inventoryItem->movements()->create([
                     'business_id' => $businessId,
-                    'idempotency_key' => $idempotencyKey,
+                    'idempotency_key' => (string) Str::uuid(),
                     'purchase_order_id' => $lockedOrder->id,
                     'purchase_order_item_id' => $item->id,
                     'type' => 'receipt',
