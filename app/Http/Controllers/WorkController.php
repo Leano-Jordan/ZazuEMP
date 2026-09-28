@@ -213,7 +213,7 @@ class WorkController extends Controller
                 ->lockForUpdate()
                 ->findOrFail($event->id);
 
-            abort_if($lockedEvent->isClosed() && $validated['status'] !== $lockedEvent->status, 422, 'Closed work cannot change status.');
+            abort_if($lockedEvent->isClosed(), 422, 'Closed work cannot be edited.');
 
             if (
                 (int) $lockedEvent->customer_id !== (int) $customer->id
