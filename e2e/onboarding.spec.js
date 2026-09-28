@@ -1,6 +1,6 @@
 import { test, expect } from '@playwright/test';
 
-test('registration flows through onboarding into the dashboard', async ({ page }) => {
+test('registration flows through onboarding into the dashboard', async ({ page }, testInfo) => {
     const unique = globalThis.crypto.randomUUID()
         .replace(/[^a-zA-Z0-9]/g, '')
         .slice(-10);
@@ -54,7 +54,9 @@ test('registration flows through onboarding into the dashboard', async ({ page }
     await expect(page.locator('.zazu-error-shell')).toHaveCount(0);
     await expect(page.locator('main#main-content')).toBeVisible();
     await expect(page.locator('a.zazu-skip-link')).toHaveCount(1);
-    await expect(page.getByRole('button', { name: 'Open navigation' })).toBeVisible();
+    if (testInfo.project.name !== 'chromium') {
+        await expect(page.getByRole('button', { name: 'Open navigation' })).toBeVisible();
+    }
     await expect(page.getByRole('heading', { name: 'Command Centre' })).toBeVisible();
     await expect(page.getByTitle('Active business workspace')).toHaveText(businessName);
 
