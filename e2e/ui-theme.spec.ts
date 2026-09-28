@@ -55,9 +55,10 @@ test.describe('Zazu UI theme and navigation', () => {
         });
 
         await page.goto('/');
-        await expect(page.locator('a', { hasText: 'Launch Rosco ICT Workspace' }).first()).toBeVisible();
+        await expect(page.getByRole('link', { name: 'Register' })).toBeVisible();
+        await expect(page.getByRole('link', { name: 'Log in' })).toBeVisible();
 
-        await page.locator('a', { hasText: 'Launch Rosco ICT Workspace' }).first().click();
+        await page.getByRole('link', { name: 'Log in' }).click();
         await expect(page).toHaveURL(/\/login$/);
 
         const username = process.env.ZAZU_E2E_USERNAME;
