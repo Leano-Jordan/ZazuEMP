@@ -105,7 +105,6 @@
             @endif
         </section>
 
-</aside>
     </main>
 </body>
 </html>
