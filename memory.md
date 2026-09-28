@@ -685,3 +685,13 @@ Regression rule:
 - Added compact Job “At a glance” context and removed duplicate Dashboard quick-access entries.
 - Normalized customer contact surface styling and hardened mobile action-heavy headers.
 - Rendered QA remains unverified.
+
+
+## Director visual-attraction refinement cycle — 2026-09-28
+
+- Researched current 2026 SaaS UI patterns across Linear, Vercel, Stripe, Attio and event-management references.
+- Identified Zazu's excessive visible borders/grid separators as the main visual attraction problem.
+- Applied a calm-interface refinement: tonal surfaces, whitespace, typography hierarchy, restrained blue accent, subtle depth and stronger interaction states.
+- Removed unnecessary card/panel/list chrome while preserving structural borders where they communicate actual data/form boundaries.
+- Kept the interface operational and dense without making it look like a generic card-grid SaaS template.
+- Browser-rendered visual QA remains unverified.
