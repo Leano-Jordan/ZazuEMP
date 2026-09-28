@@ -83,6 +83,32 @@
         <a href="{{ route('work.edit', $event) }}" class="zazu-work-progress-step {{ $event->status === 'completed' ? 'complete current' : '' }}">
             <span>5</span><strong>Complete</strong><small>{{ $event->status === 'completed' ? 'Completed' : 'Update status' }}</small>
         </a>
+    <section class="zazu-panel mb-5" aria-label="Operational chain">
+        <div class="zazu-panel-head">
+            <div>
+                <div class="zazu-panel-title">Operational chain</div>
+                <div class="zazu-panel-copy">This job remains the source context while work moves from requirements through preparation, purchasing, costs and finance.</div>
+            </div>
+        </div>
+        <div class="grid gap-2 md:grid-cols-5">
+            <a href="{{ route('work.requirements.index', $event) }}" class="zazu-quick-link">
+                <span><strong>Services</strong><small class="block opacity-70">{{ $event->requirements->count() }} linked</small></span><span>→</span>
+            </a>
+            <a href="{{ route('work.preparation.index', $event) }}" class="zazu-quick-link">
+                <span><strong>Preparation</strong><small class="block opacity-70">{{ $event->preparationItems->whereIn('status', ['open', 'blocked'])->count() }} outstanding</small></span><span>→</span>
+            </a>
+            <a href="{{ route('purchasing.index') }}" class="zazu-quick-link">
+                <span><strong>Purchasing</strong><small class="block opacity-70">{{ $event->purchaseOrders->count() }} linked</small></span><span>→</span>
+            </a>
+            <a href="{{ route('work.costs.index', $event) }}" class="zazu-quick-link">
+                <span><strong>Costs</strong><small class="block opacity-70">{{ $event->costs->count() }} recorded</small></span><span>→</span>
+            </a>
+            <a href="{{ $event->invoices->count() ? route('finance.invoices.show', $event->invoices->sortByDesc('created_at')->first()) : route('finance.index') }}" class="zazu-quick-link">
+                <span><strong>Finance</strong><small class="block opacity-70">{{ $event->invoices->count() }} invoice{{ $event->invoices->count() === 1 ? '' : 's' }}</small></span><span>→</span>
+            </a>
+        </div>
+    </section>
+
     </section>
 
     <section class="mb-5">
