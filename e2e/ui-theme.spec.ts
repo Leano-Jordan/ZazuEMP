@@ -60,8 +60,25 @@ test.describe('Zazu UI theme and navigation', () => {
         await page.locator('a', { hasText: 'Launch Rosco ICT Workspace' }).first().click();
         await expect(page).toHaveURL(/\/login$/);
 
+        const username = process.env.ZAZU_E2E_USERNAME;
+        const password = process.env.ZAZU_E2E_PASSWORD;
+
+        if (!username || !password) {
+            expect(responses).toEqual([]);
+            return;
+        }
+
+        await page.locator('#identifier').fill(username);
+        await page.locator('#password').fill(password);
+        await page.getByRole('button', { name: /sign in/i }).click();
+
+        await expect(page).toHaveURL(/\/dashboard$/);
         await page.goto('/work');
-        await expect(page).toHaveURL(/\/login$/);
+        await expect(page).toHaveURL(/\/work/);
+        await expect(page.locator('[data-zazu-inspector-open]').first()).toBeVisible();
+        await page.locator('[data-zazu-inspector-open]').first().click();
+        await expect(page.locator('[data-zazu-inspector]').first()).toBeVisible();
+
         expect(responses).toEqual([]);
     });
 });
