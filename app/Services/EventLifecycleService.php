@@ -4,6 +4,7 @@ namespace App\Services;
 
 use App\Models\Business;
 use App\Models\Event;
+use App\Models\EventCost;
 use App\Models\EventPreparationItem;
 use App\Models\Invoice;
 use App\Models\Payment;
@@ -67,6 +68,16 @@ final class EventLifecycleService
                     ->exists(),
                 422,
                 'Work cannot be completed while preparation items are still open or blocked.'
+            );
+
+            abort_if(
+                EventCost::query()
+                    ->where('business_id', $event->business_id)
+                    ->where('event_id', $event->id)
+                    ->where('status', 'planned')
+                    ->exists(),
+                422,
+                'Work cannot be completed while a linked cost is still planned. Mark it incurred or cancelled first.'
             );
 
             abort_if(
