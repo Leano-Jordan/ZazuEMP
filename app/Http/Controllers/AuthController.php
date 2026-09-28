@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Business;
 use App\Models\User;
 use App\Services\RegisterBusiness;
 use App\Support\CurrentBusiness;
@@ -26,6 +27,43 @@ class AuthController extends Controller
     public function register(): View
     {
         return view('auth.register');
+    }
+
+    public function workspaceRecovery(): View
+    {
+        return view('auth.workspace-recovery');
+    }
+
+    public function storeWorkspaceRecovery(Request $request): RedirectResponse
+    {
+        $user = $request->user();
+
+        abort_unless($user, 403);
+
+        if (app(CurrentBusiness::class)->resolve($user)) {
+            return redirect()->route('dashboard');
+        }
+
+        $validated = $request->validate([
+            'business_name' => ['required', 'string', 'max:255'],
+        ]);
+
+        $business = \Illuminate\Support\Facades\DB::transaction(function () use ($user, $validated): Business {
+            $business = Business::create([
+                'name' => trim($validated['business_name']),
+                'slug' => Str::slug($validated['business_name']).'-'.Str::lower(Str::random(8)),
+                'status' => 'active',
+                'currency' => 'ZAR',
+            ]);
+
+            $business->users()->attach($user->id, ['role' => 'owner']);
+
+            return $business;
+        });
+
+        $request->session()->put(CurrentBusiness::SESSION_KEY, $business->id);
+
+        return redirect()->route('onboarding.catalogue');
     }
 
     public function store(Request $request): RedirectResponse
