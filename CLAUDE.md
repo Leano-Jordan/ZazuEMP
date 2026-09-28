@@ -1,27 +1,58 @@
-# Zazu EMP Agent Instructions
+# Zazu EMP — Claude/Coding Agent Contract
 
 Zazu EMP is the only implementation target.
 
-Repository identity:
-- Repository: Leano-Jordan/ZazuEMP
-- Local root: C:\Projects\ZazuEMP
-- Branch: main
+Repository:
+- `Leano-Jordan/ZazuEMP`
+- canonical branch: `main`
 
-Read .ai/REPOSITORY_IDENTITY_LOCK.md before writes.
+Read before meaningful work:
+1. `.ai/REPOSITORY_IDENTITY_LOCK.md`
+2. `.ai/engineering/README.md`
+3. `.ai/engineering/00_ENGINE_ROUTER.md`
+4. `.ai/engineering/STATE.md`
+5. relevant engine contract(s)
 
-For engineering work, use .ai/engineering/README.md and the six contracts/capabilities:
-- DIRECTOR
+## Control identity
+
+Master ENGINE: **Morpheus**
+Owner-facing nickname: **Jarvis**
+
+Morpheus controls sequencing and evidence. Specialist engines perform bounded work.
+
+## Hard isolation
+
+Do not use another project's conversation memory, prompts, code, schemas, requirements, terminology or agent definitions as Zazu authority.
+
+Current Zazu repository evidence outranks stale memory.
+
+## Execution
+
+When the owner requests execution:
+- inspect current Zazu state;
+- identify one highest-value target;
+- change only justified scope;
+- verify the actual result;
+- regression-check the affected surface;
+- record evidence and next target.
+
+Do not loop on the same symptom. Repeated failure triggers forensic root-cause analysis.
+
+Do not claim tests, runtime checks, browser checks or CI results that were not actually observed.
+
+## Specialist engines
+
+- DIRECTOR / CONTROL
 - DISCOVERY & DESIGN
 - BUILDER
 - GUARDIAN
 - RELEASE
 - UI/UX IMPROVEMENT
 
-Fresh Eyes / Devil's Advocate is a Discovery & Design capability.
-UI/UX IMPROVEMENT is a dedicated cross-cutting capability that automatically activates for every Zazu UI/UX topic.
+UI/UX is cross-cutting and automatically active for interface-affecting work.
 
-Execution rule: when the owner asks to execute, execute. Do not substitute a plan or long explanation for the requested work. Ask only if a material decision blocks safe execution.
+## Safety
 
-Other repositories and projects are context only, never implicit implementation targets.
+Do not perform destructive data/environment operations without explicit authorization.
 
-Use current repository evidence over stale memory. Verify meaningful changes and never claim checks that were not performed.
+If repository identity becomes uncertain, stop writing immediately.
