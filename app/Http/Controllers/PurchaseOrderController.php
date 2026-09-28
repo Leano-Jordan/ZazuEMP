@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\BusinessCapability;
+use App\Models\InventoryItem;
 use App\Models\PurchaseOrder;
 use App\Models\Supplier;
 use App\Support\Audit;
@@ -204,7 +205,7 @@ class PurchaseOrderController extends Controller
                     'Received quantity cannot exceed the ordered quantity.'
                 );
 
-                $inventoryItem = AppModelsInventoryItem::query()
+                $inventoryItem = InventoryItem::query()
                     ->where('business_id', $businessId)
                     ->when($item->capability_id, fn ($query) => $query->where('capability_id', $item->capability_id))
                     ->where(function ($query) use ($item) {
@@ -214,7 +215,7 @@ class PurchaseOrderController extends Controller
                     ->first();
 
                 if (!$inventoryItem) {
-                    $inventoryItem = AppModelsInventoryItem::create([
+                    $inventoryItem = InventoryItem::create([
                         'business_id' => $businessId,
                         'capability_id' => $item->capability_id,
                         'name' => $item->description,

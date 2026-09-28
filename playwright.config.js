@@ -9,6 +9,7 @@ export default defineConfig({
     reporter: process.env.CI ? 'github' : 'list',
     use: {
         baseURL: process.env.ZAZU_BASE_URL || 'http://127.0.0.1:8000',
+        executablePath: process.env.ZAZU_BROWSER_PATH || undefined,
         trace: 'retain-on-failure',
         screenshot: 'only-on-failure',
         video: 'retain-on-failure',

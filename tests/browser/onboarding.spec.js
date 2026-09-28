@@ -7,7 +7,7 @@ test('registration flows into catalogue, business setup and dashboard', async ({
     const username = 'browserowner' + unique;
     const businessName = 'Browser Catering ' + unique;
 
-    await page.goto('http://127.0.0.1:8000/register');
+    await page.goto('/register');
     await expect(page.getByRole('heading', { name: 'Set up your Zazu workspace' })).toBeVisible();
 
     await page.getByLabel('Your name').fill('Browser Owner');
@@ -68,7 +68,7 @@ test('registration flows into catalogue, business setup and dashboard', async ({
         await expect(page.locator('body')).not.toContainText('Server Error');
     }
 
-    await page.goto('http://127.0.0.1:8000/dashboard');
+    await page.goto('/dashboard');
     await page.locator('[data-theme-toggle]').click();
     await expect(page.locator('html')).toHaveAttribute('data-theme', 'dark');
     await page.locator('[data-theme-toggle]').click();
