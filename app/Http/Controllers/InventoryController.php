@@ -3,7 +3,6 @@
 namespace App\Http\Controllers;
 
 use App\Models\BusinessCapability;
-use App\Models\Event;
 use App\Models\InventoryItem;
 use App\Models\EventRequirement;
 use App\Services\EventLifecycleService;
