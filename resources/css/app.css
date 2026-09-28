@@ -6587,3 +6587,24 @@ body:not(.zazu-has-wallpaper) {
         transition: none !important;
     }
 }
+
+.zazu-soft-disclosure {
+    display: block;
+    padding: 14px 15px;
+    border: 0;
+    border-radius: var(--zazu-radius-md);
+    background: color-mix(in srgb, var(--zazu-surface-2) 76%, transparent);
+}
+.zazu-soft-disclosure + .zazu-soft-disclosure { margin-top: 8px; }
+.zazu-warning-note {
+    padding: 10px 12px;
+    border-left: 3px solid var(--zazu-warning);
+    border-radius: 0 var(--zazu-radius-md) var(--zazu-radius-md) 0;
+    background: var(--zazu-warning-soft);
+    color: var(--zazu-warning-ink);
+    font-size: 11px;
+    line-height: 1.55;
+}
+@media (max-width: 520px) {
+    .zazu-soft-disclosure { padding: 13px; }
+}
