@@ -82,14 +82,14 @@ Route::middleware('signed')->group(function () {
 });
 
 Route::middleware('guest')->group(function () {
-    Route::get('/login', [\App\Http\Controllers\AuthController::class, 'create'])->name('login');
+    Route::get('/login', fn () => redirect()->route('landing', ['auth' => 'login']))->name('login');
     Route::get('/owner/login', [\App\Http\Controllers\AuthController::class, 'create'])->defaults('owner', true)->name('owner.login');
     Route::get('/forgot-password', [PasswordResetController::class, 'request'])->name('password.request');
     Route::post('/forgot-password', [PasswordResetController::class, 'send'])->middleware('throttle:password.email')->name('password.email');
     Route::get('/reset-password/{token}', [PasswordResetController::class, 'edit'])->name('password.reset');
     Route::post('/reset-password', [PasswordResetController::class, 'update'])->middleware('throttle:password.reset')->name('password.update');
     Route::post('/login', [\App\Http\Controllers\AuthController::class, 'store'])->middleware('throttle:login')->name('login.store');
-    Route::get('/register', [\App\Http\Controllers\AuthController::class, 'register'])->name('register');
+    Route::get('/register', fn () => redirect()->route('landing', ['auth' => 'register']))->name('register');
     Route::post('/register', [\App\Http\Controllers\AuthController::class, 'storeRegistration'])->middleware('throttle:register')->name('register.store');
 });
 
