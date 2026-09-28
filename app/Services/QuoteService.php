@@ -21,7 +21,8 @@ class QuoteService
         array $unitPrices,
         string $currency,
         ?TaxRate $taxRate,
-        ?string $notes
+        ?string $notes,
+        string $depositPercent = '0.00'
     ): Quote {
         return DB::transaction(function () use ($event, $requirements, $unitPrices, $currency, $taxRate, $notes): Quote {
             $currency = strtoupper($currency);
@@ -36,6 +37,7 @@ class QuoteService
                 'version' => 1,
                 'status' => 'draft',
                 'notes' => $notes,
+                'deposit_percent' => $depositPercent,
                 ...$this->taxSnapshot($taxRate),
             ]);
 
@@ -94,6 +96,8 @@ class QuoteService
                 'tax_total' => '0.00',
                 'total' => '0.00',
                 'notes' => $latest->notes,
+                'deposit_percent' => $latest->deposit_percent ?? '0.00',
+                'deposit_amount' => $latest->deposit_amount ?? '0.00',
                 ...$taxSnapshot,
             ]);
 
@@ -144,7 +148,8 @@ class QuoteService
         array $unitPrices,
         ?TaxRate $taxRate,
         bool $replaceTax,
-        ?string $notes
+        ?string $notes,
+        string $depositPercent = '0.00'
     ): QuoteVersion {
         return DB::transaction(function () use ($quote, $version, $requirements, $unitPrices, $taxRate, $replaceTax, $notes): QuoteVersion {
             $lockedQuote = Quote::query()
@@ -178,6 +183,7 @@ class QuoteService
 
             $lockedVersion->update([
                 'notes' => $notes,
+                'deposit_percent' => $depositPercent,
                 ...$taxSnapshot,
             ]);
 
@@ -273,10 +279,15 @@ class QuoteService
 
         $taxCents = $this->calculateTaxCents($subtotalCents, (string) ($version->tax_rate ?? '0.00'));
 
+        $totalCents = $subtotalCents + $taxCents;
+        $depositPercent = Money::toCents((string) ($version->deposit_percent ?? '0.00'));
+        $depositCents = intdiv(($totalCents * $depositPercent) + 5000, 10000);
+
         $version->update([
             'subtotal' => Money::fromCents($subtotalCents),
             'tax_total' => Money::fromCents($taxCents),
-            'total' => Money::fromCents($subtotalCents + $taxCents),
+            'total' => Money::fromCents($totalCents),
+            'deposit_amount' => Money::fromCents($depositCents),
         ]);
     }
 
