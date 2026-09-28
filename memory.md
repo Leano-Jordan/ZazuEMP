@@ -7,9 +7,17 @@
 **Repository:** Leano-Jordan/ZazuEMP
 **Default branch:** main
 **Active development branch:** main
-**Context updated:** 2026-09-26
+**Context updated:** 2026-09-28
 
 Repository state outranks stale conversation memory. Inspect the current repository before acting.
+
+**CURRENT CONTROL STATE:** `.ai/engineering/STATE.md`
+
+**CURRENT ENGINE ROUTER:** `.ai/engineering/00_ENGINE_ROUTER.md`
+
+**CURRENT READINESS REGISTER:** `.ai/engineering/READINESS_REGISTER.md`
+
+Dated entries below are historical engineering evidence unless a current control file explicitly supersedes them. Do not treat old heads, task order, feature counts or delivery loops inside historical entries as current instructions.
 
 ## Owner execution directive — 2026-09-26
 
@@ -48,15 +56,23 @@ Use evidence before assumptions. Do not silently turn an AI preference into a pr
 
 ## Engineering rules
 
-Operating engines:
-- Project Genesis & Scale Engine
-- Human-First Discovery Mode
-- RossCore Engineering Command Engine
+The current repository-side engineering system is the Zazu Engineering Operating System in `.ai/engineering/`.
 
-Delivery loop:
-DISCOVER -> DEFINE -> SCOPE -> INSPECT -> IMPLEMENT -> TEST -> VERIFY -> RECORD -> COMMIT -> NEXT
+Master control: Morpheus (owner-facing nickname: Jarvis).
 
-Repository/GitHub is the primary source of truth.
+Specialist engines:
+- Discovery & Design
+- Builder
+- Guardian
+- Release
+- UI/UX Improvement (cross-cutting)
+
+Current delivery state machine:
+BASELINE -> TARGET -> INSPECT -> DESIGN -> CHANGE -> VERIFY -> BREAK -> ACCEPT -> RECORD -> NEXT
+
+Use `.ai/engineering/STATE.md` for current state, `.ai/engineering/00_ENGINE_ROUTER.md` for routing, and `.ai/engineering/READINESS_REGISTER.md` for release direction.
+
+Tests are evidence, not the engineering objective. Repository/GitHub is the primary source of truth.
 
 ## UX direction
 
