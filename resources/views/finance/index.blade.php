@@ -7,7 +7,7 @@
     <div class="zazu-command-badge"><span class="zazu-status-dot" aria-hidden="true"></span><span>Finance workspace</span></div>
 </section>
 
-<section class="zazu-metric-grid" aria-label="Finance totals">
+<section class="zazu-metric-grid zazu-finance-directory" aria-label="Finance totals">
     <div class="zazu-metric-card">
         <div class="zazu-metric-top"><div class="zazu-metric-label">Invoiced</div><span class="zazu-finance-symbol" aria-hidden="true">INV</span></div>
         <div class="zazu-metric-currency-stack">
