@@ -15,7 +15,7 @@
         <div class="zazu-command-meta"><div class="zazu-command-meta-label">Live metrics</div><div class="zazu-command-meta-value">4</div></div>
     </section>
 
-    <section class="zazu-metric-grid">
+    <section class="zazu-metric-grid zazu-reports-page">
         <a href="{{ route('work.index') }}" class="zazu-metric-card zazu-metric-link">
             <div class="zazu-metric-label">Active jobs</div>
             <div class="zazu-metric-value">{{ $metrics['active_jobs'] }}</div>
