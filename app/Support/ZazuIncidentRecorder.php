@@ -38,7 +38,6 @@ final class ZazuIncidentRecorder
                 'route_name' => $routeName,
                 'http_method' => $request instanceof Request ? $request->method() : null,
                 'http_path' => $request instanceof Request ? $request->path() : null,
-                'url' => $request instanceof Request ? $request->fullUrl() : null,
                 'request_id' => $requestId,
                 'timestamp' => now()->toIso8601String(),
                 'file' => $exception->getFile(),
