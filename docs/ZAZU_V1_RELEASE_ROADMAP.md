@@ -4,7 +4,7 @@
 **Last Director cycle:** 2026-09-28  
 **Repository:** `Leano-Jordan/ZazuEMP`  
 **Branch:** `main`  
-**HEAD:** `ee52c37fda4d29562d96089f557d76fa04a76379`  
+**HEAD:** `c1752f9de0a294cfad71dc552a806ff749e72217`  
 **Evidence rule:** Implemented ≠ Verified ≠ Proven.
 
 ## Director operating rule
@@ -50,7 +50,7 @@ A requirement is **🟢 VERIFIED COMPLETE** only when it is implemented, verifie
 | CORE-08 | Purchasing | Purchase orders and receiving remain event/work/cost aware | 🟡 IN PROGRESS | Existing purchasing/receiving foundation; complete workflow verification outstanding | High | Verify create → status → receive → cost relationship |
 | CORE-09 | Costs | Costs remain traceable to work and purchasing without duplicate authority | 🟡 IN PROGRESS | Existing event-cost foundation and operational chain visibility | High | Reconcile populated records |
 | CORE-10 | Finance | Financial records remain consistent with commercial/operational state | 🟡 IN PROGRESS | Invoice/payment/expense safeguards documented; runtime reconciliation drill outstanding | Critical | Verify financial mutation and reconciliation paths |
-| CORE-11 | Completion | Completion/cancellation cannot leave contradictory operational/procurement/financial states | 🟡 IN PROGRESS | Existing guards documented; populated-data walkthrough outstanding | Critical | Adversarial transition verification |
+| CORE-11 | Completion | Completion/cancellation cannot leave contradictory operational/procurement/financial states | 🟡 IN PROGRESS | Central lifecycle guard now blocks completion/cancellation with unresolved preparation, planned-cost, active-purchasing or active-finance states; populated-data walkthrough outstanding | Critical | Verify populated-data transition matrix |
 
 # Phase 2 — Financial correctness and data integrity
 
@@ -178,8 +178,8 @@ Scoring is deliberately conservative and evidence-based. These figures are not t
 
 | Measure | Current position |
 |---|---:|
-| Engineering Quality | **76%** |
-| V1 Release Readiness | **58%** |
+| Engineering Quality | **78%** |
+| V1 Release Readiness | **59%** |
 | Critical Open | **9** |
 | High Open | **19** |
 | Medium Open | **8** |
@@ -194,6 +194,14 @@ Scoring is deliberately conservative and evidence-based. These figures are not t
 **V1 Release Readiness 58%** is intentionally lower because several release gates are implemented but not yet proven at runtime/recovery level. The product is materially advanced but is **not a release candidate**.
 
 ---
+
+# Immediate Director hardening result — 2026-09-28
+
+- Central event lifecycle boundary retained as the authority for downstream mutation paths.
+- Cancellation now rejects unresolved planned costs, preventing a cancelled work record from leaving a live planned-cost obligation behind.
+- Existing completion guards remain unchanged: open/blocked preparation, planned costs and active purchase orders still block completion.
+- Existing finance guards remain unchanged: cancelled work cannot receive new financial records.
+- No test-contract changes were made to manufacture green tests; the purchasing `received` 422 remains an intentional business-rule check until the product workflow is reviewed.
 
 # Immediate next batch
 
