@@ -2747,3 +2747,102 @@ html[data-theme="dark"] body {
     --zazu-shadow: 0 2px 10px rgba(0,0,0,.24);
     --zazu-shadow-strong: 0 12px 30px rgba(0,0,0,.32);
 }
+
+
+/* OPERATIONS HUB — CYCLE 1: structural hierarchy + mobile-first density */
+.zazu-ops-hero {
+    background:
+        linear-gradient(135deg, color-mix(in srgb, var(--zazu-primary) 8%, var(--zazu-surface)) 0%, var(--zazu-surface) 58%, var(--zazu-surface-2) 100%);
+}
+.zazu-ops-register-head {
+    padding: 18px 20px;
+}
+.zazu-ops-row {
+    background: var(--zazu-surface);
+    transition: background-color 140ms ease, box-shadow 140ms ease;
+}
+.zazu-ops-row:hover {
+    background: var(--zazu-surface-2);
+    box-shadow: inset 3px 0 0 var(--zazu-primary);
+}
+.zazu-ops-actions {
+    padding-right: 2px;
+}
+.zazu-ops-actions .zazu-btn {
+    min-height: 36px;
+}
+.zazu-inspector {
+    background: var(--zazu-page);
+}
+.zazu-inspector-head {
+    background: var(--zazu-surface);
+}
+.zazu-inspector-body {
+    background: var(--zazu-page);
+}
+.zazu-inspector-field,
+.zazu-manifest-row,
+.zazu-inspector-finance > div {
+    background: var(--zazu-surface);
+}
+@media (max-width: 1100px) {
+    .zazu-ops-row {
+        padding: 0 14px;
+    }
+    .zazu-ops-row-main {
+        grid-template-columns: minmax(0,1fr) minmax(0,1fr);
+        gap: 12px;
+    }
+    .zazu-ops-actions {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 8px;
+        padding: 0 0 14px;
+    }
+    .zazu-ops-actions .zazu-btn,
+    .zazu-ops-actions form,
+    .zazu-ops-actions form .zazu-btn {
+        width: 100%;
+    }
+}
+@media (max-width: 560px) {
+    .zazu-ops-hero {
+        padding: 16px;
+        gap: 14px;
+    }
+    .zazu-command-title {
+        font-size: 1.08rem;
+    }
+    .zazu-workload-pills {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0,1fr));
+    }
+    .zazu-workload-pill {
+        justify-content: space-between;
+        min-width: 0;
+        padding-inline: 11px;
+    }
+    .zazu-ops-row {
+        padding-inline: 12px;
+    }
+    .zazu-ops-row-main {
+        grid-template-columns: 1fr;
+        grid-template-areas: "ref" "client" "function" "date" "status";
+        gap: 10px;
+    }
+    .zazu-ops-actions {
+        grid-template-columns: 1fr;
+    }
+    .zazu-inspector-head,
+    .zazu-inspector-body {
+        padding-inline: 16px;
+    }
+    .zazu-inspector-summary {
+        grid-template-columns: 1fr;
+        padding-inline: 16px;
+    }
+    .zazu-inspector-tabs button {
+        flex: 0 0 auto;
+        min-width: 48%;
+    }
+}
