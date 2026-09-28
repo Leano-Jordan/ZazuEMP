@@ -4,7 +4,7 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>{{ $quote->reference }} · Zazu</title>
-    @vite(['resources/css/app.css', 'resources/css/zazu-responsive-theme.css'])
+    @vite(['resources/css/app.css', 'resources/css/zazu-responsive-theme.css', 'resources/css/zazu-final-visual-sweep.css'])
 </head>
 <body>
     <main class="zazu-public-shell">
