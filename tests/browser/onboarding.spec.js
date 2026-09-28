@@ -24,6 +24,12 @@ test('registration flows into catalogue, business setup and dashboard', async ({
     await page.getByLabel('What do you offer?').fill('Wedding catering');
     await page.getByRole('button', { name: 'Continue' }).click();
 
+    await expect(page).toHaveURL(/\/setup\/experience$/);
+    await expect(page.getByRole('heading', { name: 'Choose how much of Zazu you want surfaced.' })).toBeVisible();
+
+    await page.getByLabel('Intermediate').check();
+    await page.getByRole('button', { name: 'Continue setup' }).click();
+
     await expect(page).toHaveURL(/\/setup\/business$/);
     await expect(page.getByRole('heading', { name: 'Tell Zazu about your business' })).toBeVisible();
 
