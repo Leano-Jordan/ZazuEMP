@@ -701,5 +701,79 @@ class FinancePurchasingInventoryTest extends TestCase
         $this->assertSame('0.01', $invoice->paid_amount);
         $this->assertSame('1000000000.02', $invoice->balance);
     }
+    public function test_deposit_payment_is_reconciled_and_cannot_exceed_quote_requirement(): void
+    {
+        [$business, $user] = $this->businessUser();
+        $this->actingAs($user);
+
+        $customer = \App\Models\Customer::create([
+            'business_id' => $business->id,
+            'name' => 'Deposit Customer',
+        ]);
+
+        $event = Event::create([
+            'business_id' => $business->id,
+            'customer_id' => $customer->id,
+            'reference' => 'DEP-001',
+            'name' => 'Deposit Event',
+            'event_date' => now()->addDays(10)->toDateString(),
+            'status' => 'confirmed',
+        ]);
+
+        $quote = \App\Models\Quote::create([
+            'event_id' => $event->id,
+            'reference' => 'QUO-DEP-001',
+            'status' => 'accepted',
+            'currency' => 'ZAR',
+        ]);
+
+        $version = $quote->versions()->create([
+            'version' => 1,
+            'status' => 'accepted',
+            'subtotal' => '1000.00',
+            'tax_total' => '150.00',
+            'total' => '1150.00',
+            'deposit_percent' => '20.00',
+            'deposit_amount' => '230.00',
+        ]);
+
+        $invoice = Invoice::create([
+            'business_id' => $business->id,
+            'event_id' => $event->id,
+            'quote_id' => $quote->id,
+            'quote_version_id' => $version->id,
+            'number' => 'INV-DEP-001',
+            'status' => 'issued',
+            'currency' => 'ZAR',
+            'subtotal' => '1000.00',
+            'tax_total' => '150.00',
+            'total' => '1150.00',
+            'issued_at' => now()->toDateString(),
+        ]);
+
+        $this->post(route('finance.payments.store'), [
+            'invoice_id' => $invoice->id,
+            'type' => 'deposit',
+            'amount' => '200.00',
+            'method' => 'bank_transfer',
+            'paid_at' => now()->toDateString(),
+            'idempotency_key' => (string) Str::uuid(),
+        ])->assertRedirect();
+
+        $this->assertSame('200.00', $invoice->fresh()->deposit_paid_amount);
+        $this->assertSame('30.00', $invoice->fresh()->deposit_balance);
+
+        $this->post(route('finance.payments.store'), [
+            'invoice_id' => $invoice->id,
+            'type' => 'deposit',
+            'amount' => '31.00',
+            'method' => 'bank_transfer',
+            'paid_at' => now()->toDateString(),
+            'idempotency_key' => (string) Str::uuid(),
+        ])->assertStatus(422);
+
+        $this->assertDatabaseCount('payments', 1);
+    }
+
 
 }
