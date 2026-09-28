@@ -88,7 +88,7 @@
                 </div>
 
                 <template data-zazu-inspector>
-                    <div data-event-name="{{ e($event->name) }}" data-event-reference="{{ e($event->reference) }}" data-event-type="{{ e($event->event_type ?: 'Event') }}" data-event-date="{{ $event->event_date?->format('d M Y') ?? 'Date not set' }}" data-event-status="{{ e($statusLabel) }}" data-customer="{{ e($event->customer?->name ?? $event->customer_name ?? 'No customer') }}" data-contact="{{ e($contact ?? $event->customer_phone ?? $event->customer_email ?? 'Contact not recorded') }}">
+                    <div data-event-name="{{ e($event->name) }}" data-event-reference="{{ e($event->reference) }}" data-event-type="{{ e($event->event_type ?: 'Event') }}" data-event-date="{{ $event->event_date?->format('d M Y') ?? 'Date not set' }}" data-event-status="{{ e($statusLabel) }}" data-show-route="{{ route('work.show', $event) }}" data-customer="{{ e($event->customer?->name ?? $event->customer_name ?? 'No customer') }}" data-contact="{{ e($contact ?? $event->customer_phone ?? $event->customer_email ?? 'Contact not recorded') }}">
                         <div class="zazu-inspector-empty">Live operational details can be reviewed from the function sheet. This preview does not invent catering, equipment or financial values that are not recorded on the job.</div>
                     </div>
                 </template>
@@ -182,11 +182,7 @@
                 panel.querySelector('[data-zazu-inspector-status]').textContent = data.eventStatus || '—';
 
                 const financeLink = panel.querySelector('[data-zazu-finance-link]');
-                if (financeLink && row) {
-                    const editLink = row.querySelector('a[href*="/edit"]');
-                    const href = editLink?.href?.replace(/\/edit\/?$/, '') || '#';
-                    financeLink.href = href;
-                }
+                if (financeLink) financeLink.href = data.showRoute || '#';
 
                 panel.querySelectorAll('[data-zazu-tab]').forEach(tab => {
                     tab.classList.toggle('is-active', tab.dataset.zazuTab === 'catering');
