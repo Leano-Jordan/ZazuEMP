@@ -5944,3 +5944,289 @@ html[data-theme="dark"] .zazu-public-party,html[data-theme="dark"] .zazu-public-
 .zazu-auth-dual.zazu-auth-switched { animation:zazu-auth-switched 220ms var(--zazu-ease) both; }
 @keyframes zazu-auth-switched { from { opacity:.72; transform:translateY(5px); } to { opacity:1; transform:none; } }
 @media(prefers-reduced-motion:reduce){ .zazu-auth-dual.zazu-auth-switching,.zazu-auth-dual.zazu-auth-switched { animation:none; transition:none; transform:none; opacity:1; } }
+
+/* 2026 visual refinement: calm surfaces, hierarchy and interaction over visible grid lines.
+   Inspired by current Linear/Vercel/Stripe/Attio patterns: reduce chrome, let typography,
+   spacing, tonal surfaces and microstates carry hierarchy. */
+
+:root {
+    --zazu-page: #F7FAFF;
+    --zazu-surface: #FFFFFF;
+    --zazu-surface-2: #F2F7FF;
+    --zazu-surface-3: #EAF2FF;
+    --zazu-border: color-mix(in srgb, var(--zazu-ink) 7%, transparent);
+    --zazu-border-strong: color-mix(in srgb, var(--zazu-primary) 30%, transparent);
+    --zazu-shadow: 0 1px 2px color-mix(in srgb, var(--zazu-ink) 5%, transparent);
+    --zazu-shadow-soft: 0 1px 2px color-mix(in srgb, var(--zazu-ink) 5%, transparent);
+    --zazu-shadow-float: 0 14px 38px color-mix(in srgb, var(--zazu-ink) 10%, transparent);
+}
+
+:root[data-theme="dark"] {
+    --zazu-page: #0A1628;
+    --zazu-surface: #0F2038;
+    --zazu-surface-2: #132943;
+    --zazu-surface-3: #183451;
+    --zazu-border: color-mix(in srgb, var(--zazu-ink) 13%, transparent);
+    --zazu-border-strong: color-mix(in srgb, var(--zazu-primary) 38%, transparent);
+}
+
+body {
+    background:
+        radial-gradient(circle at 78% -10%, color-mix(in srgb, var(--zazu-primary) 9%, transparent), transparent 32rem),
+        var(--zazu-page);
+}
+
+.zazu-sidebar {
+    border-right: 0;
+    background: color-mix(in srgb, var(--zazu-page) 94%, var(--zazu-surface));
+}
+
+.zazu-brand {
+    border-bottom: 0;
+}
+
+.zazu-sidebar-footer {
+    border-top: 0;
+}
+
+.zazu-footer-card {
+    border: 0;
+    background: color-mix(in srgb, var(--zazu-primary-soft) 68%, var(--zazu-surface));
+}
+
+.zazu-nav-priority {
+    border: 0;
+}
+
+.zazu-nav-link.active {
+    box-shadow: inset 3px 0 0 var(--zazu-nav-active);
+    background: color-mix(in srgb, var(--zazu-primary-soft) 74%, var(--zazu-surface));
+}
+
+.zazu-topbar {
+    border-bottom: 0;
+    background: color-mix(in srgb, var(--zazu-page) 82%, transparent);
+}
+
+.zazu-workspace-name,
+.zazu-workspace-status,
+.zazu-theme-toggle {
+    border-color: transparent;
+}
+
+.zazu-theme-toggle {
+    background: color-mix(in srgb, var(--zazu-surface-2) 82%, transparent);
+}
+
+.zazu-command-band {
+    border: 0;
+    border-radius: 10px;
+    padding: 25px 26px;
+    background:
+        linear-gradient(120deg,
+            color-mix(in srgb, var(--zazu-primary) 10%, var(--zazu-surface)) 0%,
+            var(--zazu-surface) 58%,
+            color-mix(in srgb, var(--zazu-primary-soft) 65%, var(--zazu-surface)) 100%);
+    box-shadow: none;
+}
+
+.zazu-command-meta {
+    border-left: 0;
+    padding-left: 0;
+    padding-right: 4px;
+}
+
+.zazu-card,
+.zazu-panel {
+    border: 0;
+    border-radius: 10px;
+    background: var(--zazu-surface);
+    box-shadow: 0 1px 2px color-mix(in srgb, var(--zazu-ink) 4%, transparent),
+                0 8px 28px color-mix(in srgb, var(--zazu-ink) 4%, transparent);
+}
+
+.zazu-card-header {
+    border-bottom: 0;
+    padding: 19px 20px 13px;
+}
+
+.zazu-list-item {
+    border-bottom: 0;
+    margin: 1px 8px;
+    padding: 13px 12px;
+    border-radius: 7px;
+}
+
+.zazu-list-item:hover {
+    background: var(--zazu-surface-2);
+}
+
+.zazu-list-item:last-child {
+    margin-bottom: 8px;
+}
+
+.zazu-metric-card {
+    border: 0;
+    border-radius: 10px;
+    background: color-mix(in srgb, var(--zazu-surface) 92%, var(--zazu-primary-soft));
+    box-shadow: none;
+    transition: transform 160ms ease, background-color 160ms ease, box-shadow 160ms ease;
+}
+
+.zazu-metric-card:hover {
+    transform: translateY(-1px);
+    background: var(--zazu-surface);
+    box-shadow: 0 8px 24px color-mix(in srgb, var(--zazu-ink) 6%, transparent);
+}
+
+.zazu-next-action {
+    border: 0;
+    border-left: 3px solid var(--zazu-primary);
+    border-radius: 0 10px 10px 0;
+    background: linear-gradient(100deg, color-mix(in srgb, var(--zazu-primary) 9%, var(--zazu-surface)), var(--zazu-surface));
+    box-shadow: none;
+}
+
+.zazu-section-tabs {
+    border: 0;
+    background: transparent;
+}
+
+.zazu-section-tabs a {
+    border: 0;
+    background: transparent;
+}
+
+.zazu-section-tabs a.active {
+    background: color-mix(in srgb, var(--zazu-primary) 10%, transparent);
+    box-shadow: inset 0 -2px 0 var(--zazu-primary);
+}
+
+.zazu-btn {
+    transition: transform 140ms ease, background-color 140ms ease, border-color 140ms ease, box-shadow 140ms ease;
+}
+
+.zazu-btn:active {
+    transform: translateY(1px);
+}
+
+.zazu-btn-secondary,
+.zazu-btn-ghost {
+    border-color: transparent;
+}
+
+.zazu-btn-secondary {
+    background: var(--zazu-surface-2);
+}
+
+.zazu-btn-secondary:hover,
+.zazu-btn-ghost:hover {
+    border-color: transparent;
+    background: var(--zazu-primary-soft);
+}
+
+.zazu-form .zazu-field input,
+.zazu-form .zazu-field select,
+.zazu-form .zazu-field textarea,
+.zazu-form input,
+.zazu-form select,
+.zazu-form textarea {
+    border-color: color-mix(in srgb, var(--zazu-ink) 12%, transparent);
+    background: color-mix(in srgb, var(--zazu-field) 94%, var(--zazu-page));
+    box-shadow: none;
+    transition: border-color 140ms ease, box-shadow 140ms ease, background-color 140ms ease;
+}
+
+.zazu-form .zazu-field input:focus,
+.zazu-form .zazu-field select:focus,
+.zazu-form .zazu-field textarea:focus,
+.zazu-form input:focus,
+.zazu-form select:focus,
+.zazu-form textarea:focus {
+    border-color: var(--zazu-primary);
+    box-shadow: 0 0 0 3px color-mix(in srgb, var(--zazu-primary) 13%, transparent);
+    background: var(--zazu-surface);
+}
+
+.zazu-avatar {
+    border: 0;
+    background: var(--zazu-primary-soft);
+}
+
+.zazu-chip {
+    border: 0;
+}
+
+.zazu-document {
+    border: 0;
+    box-shadow: 0 14px 40px color-mix(in srgb, var(--zazu-ink) 6%, transparent);
+}
+
+.zazu-document-header,
+.zazu-document-total-grand,
+.zazu-document-footer {
+    border-color: color-mix(in srgb, var(--zazu-ink) 8%, transparent);
+}
+
+.zazu-document-table th,
+.zazu-document-table td {
+    border-bottom-color: color-mix(in srgb, var(--zazu-ink) 7%, transparent);
+}
+
+.zazu-calendar-cell {
+    border-color: color-mix(in srgb, var(--zazu-ink) 7%, transparent);
+    background: color-mix(in srgb, var(--zazu-surface) 82%, var(--zazu-page));
+}
+
+.zazu-calendar-cell:hover {
+    background: var(--zazu-surface);
+    box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--zazu-primary) 18%, transparent);
+}
+
+.zazu-calendar-cell.is-today {
+    box-shadow: inset 0 0 0 2px color-mix(in srgb, var(--zazu-primary) 45%, transparent);
+}
+
+.zazu-mobile-nav {
+    border-bottom: 0;
+    background: transparent;
+}
+
+.zazu-mobile-toggle {
+    border-color: transparent;
+    border-radius: 8px;
+    background: var(--zazu-surface);
+    box-shadow: 0 1px 3px color-mix(in srgb, var(--zazu-ink) 5%, transparent);
+}
+
+.zazu-detail-value-box,
+.zazu-job-context-grid > div,
+.zazu-contact-card {
+    border: 0;
+    background: var(--zazu-surface-2);
+}
+
+.zazu-job-context-grid > div {
+    border-radius: 7px;
+}
+
+.zazu-auth-card,
+.zazu-auth-panel {
+    border-color: transparent;
+    box-shadow: 0 18px 50px color-mix(in srgb, var(--zazu-ink) 8%, transparent);
+}
+
+@media (max-width: 820px) {
+    body {
+        background: var(--zazu-page);
+    }
+
+    .zazu-command-band {
+        padding: 20px;
+    }
+
+    .zazu-card,
+    .zazu-panel {
+        box-shadow: 0 1px 2px color-mix(in srgb, var(--zazu-ink) 4%, transparent);
+    }
+}
