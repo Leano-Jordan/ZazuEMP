@@ -22,10 +22,10 @@
 
         <section class="zazu-catalogue-toolbar">
             <div class="zazu-catalogue-tabs" role="tablist" aria-label="Catalogue streams">
-                <button type="button" class="zazu-catalogue-tab is-active" role="tab" aria-selected="true" data-catalogue-tab="equipment">
+                <button type="button" class="zazu-catalogue-tab is-active" role="tab" aria-selected="true" aria-controls="catalogue-panel-equipment" data-catalogue-tab="equipment">
                     <span>Equipment Hire Catalog</span><span class="zazu-tab-count font-mono">{{ $equipment->count() }}</span>
                 </button>
-                <button type="button" class="zazu-catalogue-tab" role="tab" aria-selected="false" data-catalogue-tab="catering">
+                <button type="button" class="zazu-catalogue-tab" role="tab" aria-selected="false" aria-controls="catalogue-panel-catering" data-catalogue-tab="catering">
                     <span>Catering &amp; Food Packages</span><span class="zazu-tab-count font-mono">{{ $catering->count() }}</span>
                 </button>
             </div>
@@ -33,7 +33,7 @@
             <form method="GET" class="zazu-catalogue-filters">
                 <label class="zazu-field zazu-catalogue-search">
                     <span class="sr-only">Search catalogue</span>
-                    <input name="search" value="{{ request('search') }}" class="zazu-input" placeholder="Search gear, SKUs, or menu packages... (Cmd+K)" aria-label="Search catalogue">
+                    <input name="search" value="{{ request('search') }}" class="zazu-input" placeholder="Search catalogue..." aria-label="Search catalogue">
                 </label>
                 <label class="zazu-field zazu-catalogue-filter">
                     <span class="sr-only">Filter category</span>
@@ -51,7 +51,7 @@
             </form>
         </section>
 
-        <section data-catalogue-panel="equipment" class="zazu-catalogue-panel is-active">
+        <section id="catalogue-panel-equipment" role="tabpanel" tabindex="0" data-catalogue-panel="equipment" class="zazu-catalogue-panel is-active">
             <div class="zazu-section-heading">
                 <div>
                     <div class="zazu-eyebrow">Physical revenue stream</div>
@@ -102,7 +102,7 @@
             @endif
         </section>
 
-        <section data-catalogue-panel="catering" class="zazu-catalogue-panel" hidden>
+        <section id="catalogue-panel-catering" role="tabpanel" tabindex="0" data-catalogue-panel="catering" class="zazu-catalogue-panel" hidden>
             <div class="zazu-section-heading">
                 <div>
                     <div class="zazu-eyebrow">Hospitality revenue stream</div>
