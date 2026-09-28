@@ -346,6 +346,7 @@ class PurchaseOrderController extends Controller
                 if (!$alreadyReceived) {
                     $inventoryItem->movements()->create([
                         'business_id' => $businessId,
+                        'idempotency_key' => (string) Str::uuid(),
                         'purchase_order_id' => $lockedOrder->id,
                         'purchase_order_item_id' => $item->id,
                         'type' => 'receipt',
@@ -356,6 +357,8 @@ class PurchaseOrderController extends Controller
                         'notes' => 'Received from purchase order.',
                     ]);
                 }
+
+                $item->update(['received_quantity' => $item->quantity]);
             }
 
             if ($previousStatus !== $lockedOrder->status) {
