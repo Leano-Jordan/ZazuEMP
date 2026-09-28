@@ -3781,3 +3781,9 @@ main {
             url('../../images/Background-ZAZU.jpg') center top / auto 520px no-repeat;
     }
 }
+
+
+/* AUDIT FIX — landing closing label moved out of inline presentation */
+.closing-eyebrow {
+    color: #BFDBFE;
+}
