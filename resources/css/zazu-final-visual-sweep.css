@@ -853,8 +853,6 @@ textarea:focus {
 }
 
 [data-zazu-route="work.travel.index"] .zazu-command-band,
-[data-zazu-route="work.travel.index"] .zazu-command-band,
-[data-zazu-route="work.travel.create"] .zazu-command-band,
 [data-zazu-route="work.travel.create"] .zazu-command-band {
     border-left-color: #0B8F8F;
 }
@@ -909,7 +907,6 @@ textarea:focus {
 }
 
 [data-zazu-route="finance.index"] .zazu-command-band,
-[data-zazu-route="finance.invoices.create"] .zazu-command-band,
 [data-zazu-route="finance.invoices.create"] .zazu-command-band,
 [data-zazu-route="finance.invoices.show"] .zazu-document,
 [data-zazu-route="finance.payments.create"] .zazu-card,
