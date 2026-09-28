@@ -67,8 +67,10 @@ class FinancePurchasingInventoryTest extends TestCase
         $this->patch(route('purchasing.status', $order), ['status' => 'ordered'])
             ->assertRedirect();
 
-        $this->patch(route('purchasing.status', $order), ['status' => 'received'])
-            ->assertRedirect();
+        $this->post(route('purchasing.receive', $order), [
+            'idempotency_key' => (string) Str::uuid(),
+            'received_quantity' => [$order->items()->first()->id => '20'],
+        ])->assertRedirect();
 
         $this->patch(route('purchasing.status', $order), ['status' => 'received'])
             ->assertRedirect();
@@ -229,7 +231,16 @@ class FinancePurchasingInventoryTest extends TestCase
 
         $this->patch(route('purchasing.status', $order), ['status' => 'sent'])->assertRedirect();
         $this->patch(route('purchasing.status', $order), ['status' => 'ordered'])->assertRedirect();
-        $this->patch(route('purchasing.status', $order), ['status' => 'received'])->assertRedirect();
+
+        $lines = $order->items()->orderBy('id')->get();
+        $this->post(route('purchasing.receive', $order), [
+            'idempotency_key' => (string) Str::uuid(),
+            'received_quantity' => [
+                $lines[0]->id => '10',
+                $lines[1]->id => '20',
+            ],
+        ])->assertRedirect();
+
         $this->patch(route('purchasing.status', $order), ['status' => 'received'])->assertRedirect();
 
         $this->assertDatabaseCount('inventory_movements', 2);
