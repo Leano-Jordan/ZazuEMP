@@ -47,7 +47,17 @@ jobs:
           tools: phpmd:2.15.0
 
       - name: Run PHPMD
-        run: phpmd app,tests sarif codesize --reportfile phpmd-results.sarif
+        shell: bash
+        run: |
+          set +e
+          phpmd app,tests text codesize
+          status=$?
+          phpmd app,tests sarif codesize --reportfile phpmd-results.sarif
+          sarif_status=$?
+          if [ "$status" -ne 0 ]; then
+            exit "$status"
+          fi
+          exit "$sarif_status"
 
       - name: Upload analysis results to GitHub
         uses: github/codeql-action/upload-sarif@v3
