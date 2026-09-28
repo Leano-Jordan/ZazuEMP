@@ -3503,3 +3503,29 @@ body[data-zazu-route^="quotes."] .zazu-topbar-actions .zazu-command-trigger:focu
         align-items: center;
     }
 }
+
+
+/* COMMERCIAL CONTROL PAGES — CYCLE 1: mobile composition */
+.zazu-reports-page,
+.zazu-settings-page,
+.zazu-purchasing-page,
+.zazu-suppliers-page { min-width:0; }
+.zazu-reports-page .zazu-metric-link { min-width:0; }
+.zazu-settings-page .zazu-form-main { min-width:0; }
+@media (max-width: 760px) {
+    .zazu-reports-page .zazu-metric-link { min-height:112px; }
+    .zazu-purchasing-page .zazu-list-item,
+    .zazu-suppliers-page .zazu-list-item {
+        display:grid;
+        grid-template-columns:minmax(0,1fr) auto;
+        gap:10px;
+    }
+    .zazu-purchasing-page .zazu-list-side,
+    .zazu-suppliers-page .zazu-list-side { text-align:left; }
+    .zazu-settings-page .zazu-actionbar,
+    .zazu-settings-page .zazu-actionbar-sticky { margin-inline:0; }
+}
+@media (max-width: 560px) {
+    .zazu-reports-page .zazu-metric-link { min-height:100px; }
+    .zazu-settings-page .zazu-form-main { width:100%; }
+}
