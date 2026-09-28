@@ -843,16 +843,16 @@ textarea:focus {
     border-left-color: var(--zazu-accent);
 }
 
-[data-zazu-route="preparation.index"] .zazu-command-band,
+[data-zazu-route="work.preparation.index"] .zazu-command-band,
 [data-zazu-route="work.preparation.create"] .zazu-command-band {
     border-left-color: #D17B17;
 }
-[data-zazu-route="preparation.index"] .zazu-list-item:hover {
+[data-zazu-route="work.preparation.index"] .zazu-list-item:hover {
     background: var(--zazu-warning-soft);
     box-shadow: inset 3px 0 0 var(--zazu-warning);
 }
 
-[data-zazu-route="travel.index"] .zazu-command-band,
+[data-zazu-route="work.travel.index"] .zazu-command-band,
 [data-zazu-route="work.travel.index"] .zazu-command-band,
 [data-zazu-route="work.travel.create"] .zazu-command-band,
 [data-zazu-route="work.travel.create"] .zazu-command-band {
@@ -909,7 +909,7 @@ textarea:focus {
 }
 
 [data-zazu-route="finance.index"] .zazu-command-band,
-[data-zazu-route="finance.invoice-create"] .zazu-command-band,
+[data-zazu-route="finance.invoices.create"] .zazu-command-band,
 [data-zazu-route="finance.invoices.create"] .zazu-command-band,
 [data-zazu-route="finance.invoices.show"] .zazu-document,
 [data-zazu-route="finance.payments.create"] .zazu-card,
@@ -958,14 +958,14 @@ textarea:focus {
 [data-zazu-route="work.requirements.create"] .zazu-command-band {
     border-left-color: #0B8F8F;
 }
-[data-zazu-route="requirements.index"] .zazu-requirement-status {
+[data-zazu-route="work.requirements.index"] .zazu-requirement-status {
     border-color: color-mix(in srgb, var(--zazu-accent) 35%, var(--zazu-border));
 }
 
 [data-zazu-route="assets.index"] .zazu-command-meta-value,
 [data-zazu-route="suppliers.index"] .zazu-command-meta-value,
 [data-zazu-route="purchasing.index"] .zazu-section-count,
-[data-zazu-route="requirements.index"] .zazu-section-count {
+[data-zazu-route="work.requirements.index"] .zazu-section-count {
     font-variant-numeric: tabular-nums;
 }
 
