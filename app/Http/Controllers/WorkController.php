@@ -14,6 +14,7 @@ use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
+use Illuminate\Validation\ValidationException;
 use Illuminate\View\View;
 
 class WorkController extends Controller
@@ -218,9 +219,9 @@ class WorkController extends Controller
                 (int) $lockedEvent->customer_id !== (int) $customer->id
                 && $lockedEvent->quotes()->exists()
             ) {
-                throw new \RuntimeException(
-                    'The customer cannot be changed after a quote exists for this job.'
-                );
+                throw ValidationException::withMessages([
+                    'customer_id' => 'The customer cannot be changed after a quote exists for this job. Create a new job for a different customer so the quote history stays correct.',
+                ]);
             }
 
             abort_unless(
