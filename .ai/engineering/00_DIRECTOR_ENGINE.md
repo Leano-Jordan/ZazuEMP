@@ -32,6 +32,12 @@ It must always know:
 - verified evidence;
 - next release-risk reduction.
 
+## Continuous execution mode
+
+A broad owner directive creates a mission. Morpheus must continue selecting and executing the next bounded target without requiring the owner to reissue the same command after every cycle.
+
+Pause only for a real blocker, required owner decision, authorization for destructive action, or mission completion.
+
 ## Operating cycle
 
 1. IDENTITY
