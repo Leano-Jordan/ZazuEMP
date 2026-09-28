@@ -1,6 +1,6 @@
 # Zazu EMP - Commercial and Legal Protection Register
 
-**Record date:** 2026-09-26  
+**Record date:** 2026-09-28  
 **Current owner:** Isaac Junior Lehlogonolo Maluleka  
 **Current development model:** Solo developer  
 **Future business identity:** Rosscore Labs, not yet registered
@@ -114,13 +114,15 @@ The fact that Zazu manages a photography service does not give Zazu ownership of
 
 ## 9. Current release protection state
 
+Current engineering control authority: `.ai/engineering/READINESS_REGISTER.md`. Engineering implementation state must be taken from current repository evidence rather than this dated legal register.
+
 **Ownership record:** documented  
 **Proprietary repository notice:** documented  
 **Third-party licence register:** present but requires release-by-release completion  
 **Trade-mark clearance:** not yet completed  
 **Company incorporation:** not yet completed  
 **Founder-to-company IP transfer:** not yet applicable  
-**Authentication/business isolation:** not yet production-ready  
+**Authentication/business isolation:** implemented in the current application foundation; final production acceptance still requires full authorization, runtime and release evidence  
 **POPIA operational documentation:** not yet complete  
 **Customer terms / SaaS agreement:** not yet complete  
 **Privacy notice:** not yet complete  
