@@ -8197,3 +8197,81 @@ textarea:focus {
     padding-left: 12px;
 }
 .zazu-requirement-editor-command { border-left: 4px solid var(--zazu-primary); }
+
+/* QUOTE WORKFLOW REFINEMENT / 2026-09 */
+.zazu-quote-register-command,
+.zazu-quote-history-command,
+.zazu-quote-editor-command { border-left: 4px solid var(--zazu-primary); }
+
+.zazu-quote-register-row { transition: background-color 120ms ease, border-color 120ms ease, box-shadow 120ms ease; }
+.zazu-quote-register-row:hover {
+    background: var(--zazu-surface-2);
+    border-color: var(--zazu-border-strong);
+    box-shadow: inset 3px 0 0 var(--zazu-primary);
+}
+.zazu-quote-register-row .zazu-side-primary,
+.zazu-quote-history-register .zazu-side-primary {
+    font-variant-numeric: tabular-nums;
+}
+
+.zazu-quote-history-register .zazu-list-item:hover {
+    background: var(--zazu-surface-2);
+    border-color: var(--zazu-border-strong);
+}
+
+.zazu-quote-hero { border-left: 4px solid var(--zazu-primary); }
+.zazu-quote-status-stack { min-width: 108px; }
+.zazu-quote-review-action {
+    border-left: 4px solid #c88718;
+    background: #fffaf0;
+}
+.zazu-quote-review-action .zazu-eyebrow,
+.zazu-quote-review-action .zazu-next-action-title { color: #8b5b0c; }
+
+.zazu-quote-lines .zazu-record-header {
+    background: var(--zazu-surface-3);
+    border-bottom-color: var(--zazu-border-strong);
+}
+.zazu-quote-lines .zazu-list-item {
+    min-height: 76px;
+}
+.zazu-quote-lines .zazu-side-primary {
+    font-variant-numeric: tabular-nums;
+}
+
+.zazu-quote-total-panel {
+    border-top: 3px solid var(--zazu-primary);
+}
+.zazu-total-row {
+    margin-top: 4px;
+    padding-top: 13px;
+    border-top: 2px solid var(--zazu-border-strong);
+}
+.zazu-total-row .zazu-detail-label,
+.zazu-total-row .zazu-detail-value {
+    color: var(--zazu-ink);
+    font-weight: 820;
+}
+.zazu-total-row .zazu-detail-value {
+    font-size: 18px;
+    letter-spacing: -.02em;
+    font-variant-numeric: tabular-nums;
+}
+
+.zazu-quote-line-editor .zazu-list-item {
+    align-items: flex-end;
+}
+.zazu-quote-line-editor .zazu-label {
+    margin-bottom: 5px;
+}
+.zazu-quote-line-editor .zazu-input {
+    text-align: right;
+    font-variant-numeric: tabular-nums;
+}
+.zazu-quote-savebar {
+    border-color: var(--zazu-border-strong);
+}
+@media (max-width: 820px) {
+    .zazu-quote-status-stack { min-width: 0; }
+    .zazu-quote-line-editor .zazu-list-item { align-items: stretch; }
+}
