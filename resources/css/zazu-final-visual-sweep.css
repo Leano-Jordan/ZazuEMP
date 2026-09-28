@@ -4142,10 +4142,10 @@ main {
         min-height: 42px;
     }
     .zazu-command-palette {
-        position: fixed;
-        top: calc(var(--zazu-topbar-height, 64px) + 6px);
-        left: 12px;
-        right: 12px;
+        position: absolute;
+        top: calc(100% + 7px);
+        left: 0;
+        right: 0;
         width: auto;
     }
 }
