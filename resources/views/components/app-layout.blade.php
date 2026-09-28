@@ -26,28 +26,61 @@
         })();
     </script>
     @vite(['resources/css/app.css', 'resources/css/zazu-responsive-theme.css', 'resources/css/zazu-final-visual-sweep.css', 'resources/js/app.js'])
+    <style>
+        .zazu-brand-link{display:flex;align-items:center;gap:10px;text-decoration:none}
+        .zazu-brand-mark{display:grid;place-items:center;width:30px;height:30px;border-radius:5px;background:var(--zazu-blue-primary);color:#fff;font:800 15px/1 'JetBrains Mono',ui-monospace,monospace;box-shadow:0 1px 2px rgba(15,23,42,.08)}
+        .zazu-brand-lockup{display:flex;align-items:baseline;gap:5px;color:var(--zazu-text-main);letter-spacing:-.02em}
+        .zazu-brand-lockup strong{font:800 15px/1 'Cabinet Grotesk','Segoe UI',sans-serif}
+        .zazu-brand-lockup span{font:700 9px/1 'JetBrains Mono',ui-monospace,monospace;color:var(--zazu-text-muted);letter-spacing:.12em}
+        .zazu-workspace-switcher{display:inline-flex;align-items:center;gap:8px;margin-bottom:6px;padding:5px 9px;border:1px solid var(--zazu-surface-border);border-radius:4px;background:color-mix(in srgb,var(--zazu-surface-card) 78%,transparent);backdrop-filter:blur(12px);color:var(--zazu-text-muted);font:700 10px/1.2 'Plus Jakarta Sans','Inter',sans-serif}
+        .zazu-workspace-pulse{width:6px;height:6px;border-radius:50%;background:#2FA36B;box-shadow:0 0 0 3px color-mix(in srgb,#2FA36B 14%,transparent)}
+        .zazu-workspace-online{color:#247A63;font:700 9px/1 'JetBrains Mono',ui-monospace,monospace}
+        .zazu-command-trigger{height:38px;width:min(360px,28vw);min-width:220px;display:flex;align-items:center;gap:8px;padding:0 9px;border:1px solid var(--zazu-surface-border);border-radius:4px;background:color-mix(in srgb,var(--zazu-surface-card) 82%,transparent);backdrop-filter:blur(12px);color:var(--zazu-text-muted);cursor:pointer;text-align:left}
+        .zazu-command-trigger:hover{border-color:var(--zazu-blue-soft);color:var(--zazu-text-main)}
+        .zazu-command-search-icon{font-size:18px;line-height:1}
+        .zazu-command-placeholder{flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:11px}
+        .zazu-command-trigger kbd{padding:3px 5px;border:1px solid var(--zazu-surface-border);border-radius:3px;background:var(--zazu-surface-2);font:700 9px/1 'JetBrains Mono',ui-monospace,monospace}
+        .zazu-header-create{white-space:nowrap}
+        .zazu-command-palette{position:fixed;inset:0;z-index:100}
+        .zazu-command-backdrop{position:absolute;inset:0;background:rgba(15,23,42,.32);backdrop-filter:blur(3px)}
+        .zazu-command-dialog{position:relative;width:min(620px,calc(100% - 28px));margin:12vh auto 0;overflow:hidden;border:1px solid var(--zazu-surface-border);border-radius:6px;background:var(--zazu-surface-card);box-shadow:0 20px 60px rgba(15,23,42,.18)}
+        .zazu-command-head{display:flex;align-items:flex-start;justify-content:space-between;gap:16px;padding:18px 18px 12px;border-bottom:1px solid var(--zazu-surface-border)}
+        .zazu-command-head h2{margin-top:4px;color:var(--zazu-text-main);font:800 18px/1.15 'Cabinet Grotesk','Segoe UI',sans-serif;letter-spacing:-.02em}
+        .zazu-command-close{width:34px;height:34px;border:1px solid var(--zazu-surface-border);border-radius:4px;background:var(--zazu-surface-2);color:var(--zazu-text-muted);font-size:18px;cursor:pointer}
+        .zazu-command-input-wrap{display:flex;align-items:center;gap:8px;margin:12px;padding:0 12px;border:1px solid var(--zazu-surface-border);border-radius:4px;background:var(--zazu-surface-2);color:var(--zazu-text-muted)}
+        .zazu-command-input-wrap input{width:100%;height:42px;border:0;outline:0;background:transparent;color:var(--zazu-text-main);font-size:12px}
+        .zazu-command-results{padding:0 8px 8px}
+        .zazu-command-results a{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:11px 10px;border-radius:4px;color:var(--zazu-text-main);text-decoration:none}
+        .zazu-command-results a:hover{background:var(--zazu-blue-canvas)}
+        .zazu-command-results a span{font-size:12px;font-weight:750}
+        .zazu-command-results a small{color:var(--zazu-text-muted);font-size:10px}
+        body.zazu-command-open{overflow:hidden}
+        @media(max-width:900px){.zazu-command-trigger{min-width:42px;width:42px;padding:0;justify-content:center}.zazu-command-placeholder,.zazu-command-trigger kbd{display:none}}
+        @media(max-width:700px){.zazu-workspace-switcher{display:none}.zazu-header-create{font-size:10px}.zazu-topbar-actions{gap:6px}}
+    </style>
 </head>
 <body data-zazu-route="{{ request()->route()?->getName() ?? '' }}" class="{{ $business?->wallpaper_path ? 'zazu-has-wallpaper' : '' }}" data-business-currency="{{ $business?->currency ?? 'ZAR' }}" @if($business?->wallpaper_path) style="--zazu-wallpaper: url('{{ e(route('business.media', ['type' => 'wallpaper']).'?v='.$brandingVersion) }}')" @endif>
     <a class="zazu-skip-link" href="#main-content">Skip to main content</a>
     <div class="zazu-shell">
         <aside class="zazu-sidebar">
             <div class="zazu-brand">
-                <a href="{{ route('dashboard') }}" class="zazu-brand-link">
-                    @if ($business?->logo_path)
-                        <img src="{{ route('business.media', ['type' => 'logo']) }}?v={{ $brandingVersion }}" alt="{{ $business->name }} logo" class="zazu-brand-logo">
-                    @endif
-                    <span class="zazu-brand-word">{{ $business?->name ?? 'zazu' }}</span>
+                <a href="{{ route('dashboard') }}" class="zazu-brand-link" aria-label="Zazu EMP dashboard">
+                    <span class="zazu-brand-mark" aria-hidden="true">Z</span>
+                    <span class="zazu-brand-lockup">
+                        <strong>ZAZU</strong>
+                        <span>EMP</span>
+                    </span>
                 </a>
             </div>
 
             <nav class="zazu-nav" aria-label="Primary">
                 <div class="zazu-sidebar-workspace">
-                    <div class="zazu-sidebar-workspace-label">Active workspace</div>
+                    <div class="zazu-sidebar-workspace-label">Workspace</div>
                     <div class="zazu-sidebar-workspace-name">{{ $business?->name ?? 'Zazu EMP' }}</div>
-                    <div class="zazu-sidebar-workspace-meta"><span class="zazu-sidebar-workspace-dot" aria-hidden="true"></span><span>Event operations</span></div>
+                    <div class="zazu-sidebar-workspace-meta"><span class="zazu-sidebar-workspace-dot" aria-hidden="true"></span><span>Online · Event Operations</span></div>
                 </div>
                 <div class="zazu-nav-stack zazu-nav-primary">
-                    <a href="{{ route('dashboard') }}" class="zazu-nav-link {{ request()->routeIs('dashboard') ? 'active' : '' }}" @if(request()->routeIs('dashboard')) aria-current="page" @endif><span>Dashboard</span></a>
+                    <a href="{{ route('dashboard') }}" title="Dashboard" class="zazu-nav-link {{ request()->routeIs('dashboard') ? 'active' : '' }}" @if(request()->routeIs('dashboard')) aria-current="page" @endif><span class="zazu-nav-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><rect x="4" y="4" width="6" height="6" rx="1"></rect><rect x="14" y="4" width="6" height="6" rx="1"></rect><rect x="4" y="14" width="6" height="6" rx="1"></rect><rect x="14" y="14" width="6" height="6" rx="1"></rect></svg></span><span class="zazu-nav-label">Dashboard</span></a>
                     @if($can('work.view') || $can('capabilities.view') || $can('quotes.view') || $can('calendar.view'))
                         <a href="{{ $can('work.view') ? route('work.index') : ($can('capabilities.view') ? route('capabilities.index') : ($can('quotes.view') ? route('quotes.index') : route('calendar.index'))) }}" class="zazu-nav-link {{ request()->routeIs('work.*','capabilities.*','quotes.*','calendar.*') ? 'active' : '' }}"><span class="zazu-nav-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 19V9m7 10V5m7 14v-7"></path><path d="M3 19h18"></path></svg></span><span class="zazu-nav-label">Operations</span></a>
                     @endif
@@ -81,6 +114,11 @@
             <header class="zazu-topbar">
                 <div class="zazu-topbar-inner">
                     <div class="zazu-header-context">
+                        <div class="zazu-workspace-switcher" title="Active workspace">
+                            <span class="zazu-workspace-pulse" aria-hidden="true"></span>
+                            <span>{{ $business?->name ?? 'Zazu EMP' }} <span aria-hidden="true">›</span> Event Operations</span>
+                            <span class="zazu-workspace-online">Online</span>
+                        </div>
                         <div class="zazu-header-title-row">
                             <h1 class="zazu-page-title">{{ $heading ?? $title ?? 'Workspace' }}</h1>
                             @if($business)<span class="zazu-workspace-name" title="Active business workspace">{{ $business->name }}</span>@endif
@@ -115,6 +153,16 @@
                     </div>
 
                     <div class="zazu-topbar-actions">
+                        <button type="button" class="zazu-command-trigger" data-zazu-command-open aria-haspopup="dialog" aria-controls="zazu-command-palette">
+                            <span class="zazu-command-search-icon" aria-hidden="true">⌕</span>
+                            <span class="zazu-command-placeholder">Search jobs, gear, or quotes…</span>
+                            <kbd>⌘K</kbd>
+                        </button>
+
+                        @if($can('work.create'))
+                            <a href="{{ route('work.create') }}" class="zazu-btn zazu-btn-primary zazu-header-create"><span aria-hidden="true">+</span> Create work</a>
+                        @endif
+
                         @isset($headerAction)
                             {{ $headerAction }}
                         @endisset
@@ -234,6 +282,32 @@
                 </div>
             </nav>
 
+            <div class="zazu-command-palette" id="zazu-command-palette" data-zazu-command hidden>
+                <div class="zazu-command-backdrop" data-zazu-command-close></div>
+                <div class="zazu-command-dialog" role="dialog" aria-modal="true" aria-labelledby="zazu-command-title">
+                    <div class="zazu-command-head">
+                        <div>
+                            <div class="zazu-eyebrow">Workspace command</div>
+                            <h2 id="zazu-command-title">Jump to a workspace surface</h2>
+                        </div>
+                        <button type="button" class="zazu-command-close" data-zazu-command-close aria-label="Close command search">×</button>
+                    </div>
+                    <label class="zazu-command-input-wrap">
+                        <span aria-hidden="true">⌕</span>
+                        <input type="search" data-zazu-command-input placeholder="Search jobs, services, quotes, customers…" autocomplete="off">
+                    </label>
+                    <div class="zazu-command-results" data-zazu-command-results>
+                        @if($can('work.view'))<a href="{{ route('work.index') }}" data-command-item><span>Jobs</span><small>Event operations</small></a>@endif
+                        @if($can('capabilities.view'))<a href="{{ route('capabilities.index') }}" data-command-item><span>Services & prices</span><small>Capability catalogue</small></a>@endif
+                        @if($can('quotes.view'))<a href="{{ route('quotes.index') }}" data-command-item><span>Quotes</span><small>Commercial documents</small></a>@endif
+                        @if($can('customers.view'))<a href="{{ route('customers.index') }}" data-command-item><span>Customers</span><small>Client records</small></a>@endif
+                        @if($can('calendar.view'))<a href="{{ route('calendar.index') }}" data-command-item><span>Calendar</span><small>Planning</small></a>@endif
+                        @if($can('finance.view'))<a href="{{ route('finance.index') }}" data-command-item><span>Finance</span><small>Ledger and payments</small></a>@endif
+                        @if($can('assets.view'))<a href="{{ route('assets.index') }}" data-command-item><span>Assets</span><small>Equipment register</small></a>@endif
+                        @if($can('reports.view'))<a href="{{ route('reports.index') }}" data-command-item><span>Reports</span><small>Business intelligence</small></a>@endif
+                    </div>
+                </div>
+            </div>
             <div class="zazu-content">
                 @if ($errors->any())
                     <div class="zazu-error-summary" role="alert" tabindex="-1" data-error-summary>
@@ -288,6 +362,45 @@
                 });
             });
         }
+
+        const command = document.querySelector('[data-zazu-command]');
+        const commandInput = command?.querySelector('[data-zazu-command-input]');
+        const commandItems = [...(command?.querySelectorAll('[data-command-item]') || [])];
+        const commandOpeners = document.querySelectorAll('[data-zazu-command-open]');
+        const commandClosers = command?.querySelectorAll('[data-zazu-command-close]') || [];
+        let commandReturnFocus = null;
+
+        const closeCommand = () => {
+            if (!command) return;
+            command.hidden = true;
+            document.body.classList.remove('zazu-command-open');
+            commandReturnFocus?.focus();
+        };
+
+        const openCommand = () => {
+            if (!command) return;
+            commandReturnFocus = document.activeElement;
+            command.hidden = false;
+            document.body.classList.add('zazu-command-open');
+            window.setTimeout(() => commandInput?.focus(), 0);
+        };
+
+        commandOpeners.forEach((button) => button.addEventListener('click', openCommand));
+        commandClosers.forEach((button) => button.addEventListener('click', closeCommand));
+        commandInput?.addEventListener('input', () => {
+            const query = commandInput.value.trim().toLowerCase();
+            commandItems.forEach((item) => {
+                item.hidden = query !== '' && !item.textContent.toLowerCase().includes(query);
+            });
+        });
+
+        document.addEventListener('keydown', (event) => {
+            if ((event.metaKey || event.ctrlKey) && event.key.toLowerCase() === 'k') {
+                event.preventDefault();
+                openCommand();
+            }
+            if (event.key === 'Escape' && command && !command.hidden) closeCommand();
+        });
 
         const serverErrors = @json($errors->toArray());
 
