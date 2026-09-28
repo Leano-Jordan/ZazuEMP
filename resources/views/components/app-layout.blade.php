@@ -3,7 +3,7 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-    <meta name="theme-color" content="#F2F7FF">
+    <meta name="theme-color" content="#F8FAFC">
     @php
         $business = app(\App\Support\CurrentBusiness::class)->resolve(auth()->user());
         $businesses = auth()->user()->businesses()->where('businesses.status', 'active')->orderBy('businesses.name')->get();
@@ -26,38 +26,6 @@
         })();
     </script>
     @vite(['resources/css/app.css', 'resources/css/zazu-responsive-theme.css', 'resources/css/zazu-final-visual-sweep.css', 'resources/js/app.js'])
-    <style>
-        .zazu-brand-link{display:flex;align-items:center;gap:10px;text-decoration:none}
-        .zazu-brand-mark{display:grid;place-items:center;width:30px;height:30px;border-radius:5px;background:var(--zazu-blue-primary);color:#fff;font:800 15px/1 'JetBrains Mono',ui-monospace,monospace;box-shadow:0 1px 2px rgba(15,23,42,.08)}
-        .zazu-brand-lockup{display:flex;align-items:baseline;gap:5px;color:var(--zazu-text-main);letter-spacing:-.02em}
-        .zazu-brand-lockup strong{font:800 15px/1 'Cabinet Grotesk','Segoe UI',sans-serif}
-        .zazu-brand-lockup span{font:700 9px/1 'JetBrains Mono',ui-monospace,monospace;color:var(--zazu-text-muted);letter-spacing:.12em}
-        .zazu-workspace-switcher{display:inline-flex;align-items:center;gap:8px;margin-bottom:6px;padding:5px 9px;border:1px solid var(--zazu-surface-border);border-radius:4px;background:color-mix(in srgb,var(--zazu-surface-card) 78%,transparent);backdrop-filter:blur(12px);color:var(--zazu-text-muted);font:700 10px/1.2 'Plus Jakarta Sans','Inter',sans-serif}
-        .zazu-workspace-pulse{width:6px;height:6px;border-radius:50%;background:#2FA36B;box-shadow:0 0 0 3px color-mix(in srgb,#2FA36B 14%,transparent)}
-        .zazu-workspace-online{color:#247A63;font:700 9px/1 'JetBrains Mono',ui-monospace,monospace}
-        .zazu-command-trigger{height:38px;width:min(360px,28vw);min-width:220px;display:flex;align-items:center;gap:8px;padding:0 9px;border:1px solid var(--zazu-surface-border);border-radius:4px;background:color-mix(in srgb,var(--zazu-surface-card) 82%,transparent);backdrop-filter:blur(12px);color:var(--zazu-text-muted);cursor:pointer;text-align:left}
-        .zazu-command-trigger:hover{border-color:var(--zazu-blue-soft);color:var(--zazu-text-main)}
-        .zazu-command-search-icon{font-size:18px;line-height:1}
-        .zazu-command-placeholder{flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:11px}
-        .zazu-command-trigger kbd{padding:3px 5px;border:1px solid var(--zazu-surface-border);border-radius:3px;background:var(--zazu-surface-2);font:700 9px/1 'JetBrains Mono',ui-monospace,monospace}
-        .zazu-header-create{white-space:nowrap}
-        .zazu-command-palette{position:fixed;inset:0;z-index:100}
-        .zazu-command-backdrop{position:absolute;inset:0;background:rgba(15,23,42,.32);backdrop-filter:blur(3px)}
-        .zazu-command-dialog{position:relative;width:min(620px,calc(100% - 28px));margin:12vh auto 0;overflow:hidden;border:1px solid var(--zazu-surface-border);border-radius:6px;background:var(--zazu-surface-card);box-shadow:0 20px 60px rgba(15,23,42,.18)}
-        .zazu-command-head{display:flex;align-items:flex-start;justify-content:space-between;gap:16px;padding:18px 18px 12px;border-bottom:1px solid var(--zazu-surface-border)}
-        .zazu-command-head h2{margin-top:4px;color:var(--zazu-text-main);font:800 18px/1.15 'Cabinet Grotesk','Segoe UI',sans-serif;letter-spacing:-.02em}
-        .zazu-command-close{width:34px;height:34px;border:1px solid var(--zazu-surface-border);border-radius:4px;background:var(--zazu-surface-2);color:var(--zazu-text-muted);font-size:18px;cursor:pointer}
-        .zazu-command-input-wrap{display:flex;align-items:center;gap:8px;margin:12px;padding:0 12px;border:1px solid var(--zazu-surface-border);border-radius:4px;background:var(--zazu-surface-2);color:var(--zazu-text-muted)}
-        .zazu-command-input-wrap input{width:100%;height:42px;border:0;outline:0;background:transparent;color:var(--zazu-text-main);font-size:12px}
-        .zazu-command-results{padding:0 8px 8px}
-        .zazu-command-results a{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:11px 10px;border-radius:4px;color:var(--zazu-text-main);text-decoration:none}
-        .zazu-command-results a:hover{background:var(--zazu-blue-canvas)}
-        .zazu-command-results a span{font-size:12px;font-weight:750}
-        .zazu-command-results a small{color:var(--zazu-text-muted);font-size:10px}
-        body.zazu-command-open{overflow:hidden}
-        @media(max-width:900px){.zazu-command-trigger{min-width:42px;width:42px;padding:0;justify-content:center}.zazu-command-placeholder,.zazu-command-trigger kbd{display:none}}
-        @media(max-width:700px){.zazu-workspace-switcher{display:none}.zazu-header-create{font-size:10px}.zazu-topbar-actions{gap:6px}}
-    </style>
 </head>
 <body data-zazu-route="{{ request()->route()?->getName() ?? '' }}" class="{{ $business?->wallpaper_path ? 'zazu-has-wallpaper' : '' }}" data-business-currency="{{ $business?->currency ?? 'ZAR' }}" @if($business?->wallpaper_path) style="--zazu-wallpaper: url('{{ e(route('business.media', ['type' => 'wallpaper']).'?v='.$brandingVersion) }}')" @endif>
     <a class="zazu-skip-link" href="#main-content">Skip to main content</a>
