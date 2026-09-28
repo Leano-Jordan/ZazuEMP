@@ -11,8 +11,7 @@
             <a href="{{ route('calendar.index', ['month' => $nextMonth]) }}" class="zazu-btn zazu-btn-ghost" aria-label="Next month">→</a>
         </div>
     </section>
-
-    <section class="zazu-calendar-shell" aria-label="Monthly job calendar">
+    <section class="zazu-calendar-shell zazu-calendar-command-shell" aria-label="Monthly job calendar">
         <div class="zazu-calendar-grid">
             @foreach ([['short' => 'Mon', 'full' => 'Monday'], ['short' => 'Tue', 'full' => 'Tuesday'], ['short' => 'Wed', 'full' => 'Wednesday'], ['short' => 'Thu', 'full' => 'Thursday'], ['short' => 'Fri', 'full' => 'Friday'], ['short' => 'Sat', 'full' => 'Saturday'], ['short' => 'Sun', 'full' => 'Sunday']] as $label)
                 <div class="zazu-calendar-label" aria-label="{{ $label['full'] }}" title="{{ $label['full'] }}">{{ $label['short'] }}</div>
