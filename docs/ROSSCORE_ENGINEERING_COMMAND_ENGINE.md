@@ -1,39 +1,45 @@
 # RossCore Engineering Command Engine
 
-This document is retained as a compatibility entry point.
+## Status
 
-The authoritative repository-side engineering system is now:
+This document is retained as a compatibility and integration entry point.
 
+For Zazu EMP execution, the authoritative repository-side system is:
+
+- `.ai/REPOSITORY_IDENTITY_LOCK.md`
 - `.ai/engineering/README.md`
 - `.ai/engineering/00_ENGINE_ROUTER.md`
-- specialist engines in `.ai/engineering/`
+- `.ai/engineering/STATE.md`
+- specialist engine contracts in `.ai/engineering/`
 
-The operator's Rosscore Engineering Master Director controls orchestration when supplied externally. Repository specialists execute only the portion of engineering work routed to them.
+## Zazu operating principle
 
-## Core principle
+Understand the real system → make the smallest justified change → verify → actively break-check → record evidence → advance to the next release-risk target.
 
-Understand the real system -> make the smallest justified change -> verify -> regression-check -> record evidence.
+The objective is **engineering progress**, not conversation volume or test-count growth.
 
 ## Authority
 
-1. Explicit operator instruction.
-2. Current repository and runtime evidence.
-3. Authoritative current project documentation.
-4. Master Director routing.
-5. Specialist engine requirements.
-6. Tests, logs and prior records.
-7. Previous AI output and general knowledge.
+1. Explicit owner instruction
+2. Current Zazu repository state
+3. Current Zazu living documentation and engineering ledgers
+4. Verified runtime/CI evidence
+5. Verified external research
+6. Historical AI output
+7. General AI knowledge
 
 ## Completion
 
-Use evidence-based states:
-
+Use:
 - IMPLEMENTED
 - TESTED
 - VERIFIED
-- REMAINS UNVERIFIED
+- PROVEN
+- UNVERIFIED
 - BLOCKED
 
-Do not declare completion without the evidence required by the active verification and regression gates.
+Do not declare a release gate closed without the evidence required by that gate.
 
-See `.ai/engineering/00_ENGINE_ROUTER.md` for activation and handoff rules.
+## Integration rule
+
+Any external Rosscore engineering framework is subordinate to the current Zazu repository control system when operating on Zazu.
