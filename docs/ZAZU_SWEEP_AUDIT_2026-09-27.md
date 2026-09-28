@@ -1,3 +1,5 @@
+> **HISTORICAL RECORD:** This document records work/evidence from its dated period. It is not the current engineering control state. For current instructions/status, use `.ai/engineering/STATE.md`, `.ai/engineering/READINESS_REGISTER.md`, and `.ai/engineering/00_ENGINE_ROUTER.md`.
+
 # Zazu EMP Sweep Audit — 2026-09-27
 
 ## Scope
