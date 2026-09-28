@@ -143,12 +143,7 @@
 
             <section id="zazu-inspector-panel-equipment" role="tabpanel" tabindex="0" class="hidden" data-zazu-tab-panel="equipment">
                 <div class="zazu-inspector-section-title">Equipment Hire Manifest</div>
-                <div class="zazu-manifest-list">
-                    @foreach(['Marquees','Sound rigs','Tables','Cutlery'] as $item)
-                        <div class="zazu-manifest-row"><span>{{ $item }}</span><strong>—</strong></div>
-                    @endforeach
-                </div>
-                <p class="zazu-inspector-note">Quantities are shown once equipment requirements are recorded against this job.</p>
+                <div class="zazu-inspector-empty">No equipment requirements are recorded on this job yet.</div>
             </section>
 
             <section id="zazu-inspector-panel-finance" role="tabpanel" tabindex="0" class="hidden" data-zazu-tab-panel="finance">
@@ -212,15 +207,28 @@
             document.querySelectorAll('[data-zazu-inspector-close]').forEach(button => button.addEventListener('click', close));
             document.addEventListener('keydown', event => { if (event.key === 'Escape') close(); });
 
-            panel.querySelectorAll('[data-zazu-tab]').forEach(tab => {
-                tab.addEventListener('click', () => {
-                    const target = tab.dataset.zazuTab;
-                    panel.querySelectorAll('[data-zazu-tab]').forEach(item => {
-                        const active = item === tab;
-                        item.classList.toggle('is-active', active);
-                        item.setAttribute('aria-selected', active ? 'true' : 'false');
-                    });
-                    panel.querySelectorAll('[data-zazu-tab-panel]').forEach(section => section.classList.toggle('hidden', section.dataset.zazuTab !== target));
+            const tabs = [...panel.querySelectorAll('[data-zazu-tab]')];
+            const activateTab = (tab, moveFocus = false) => {
+                const target = tab.dataset.zazuTab;
+                tabs.forEach(item => {
+                    const active = item === tab;
+                    item.classList.toggle('is-active', active);
+                    item.setAttribute('aria-selected', active ? 'true' : 'false');
+                    item.tabIndex = active ? 0 : -1;
+                });
+                panel.querySelectorAll('[data-zazu-tab-panel]').forEach(section => {
+                    section.classList.toggle('hidden', section.dataset.zazuTab !== target);
+                });
+                if (moveFocus) tab.focus();
+            };
+            tabs.forEach((tab, index) => {
+                tab.addEventListener('click', () => activateTab(tab));
+                tab.addEventListener('keydown', event => {
+                    if (!['ArrowRight', 'ArrowLeft', 'Home', 'End'].includes(event.key)) return;
+                    event.preventDefault();
+                    const nextIndex = event.key === 'Home' ? 0 : event.key === 'End' ? tabs.length - 1 :
+                        (index + (event.key === 'ArrowRight' ? 1 : -1) + tabs.length) % tabs.length;
+                    activateTab(tabs[nextIndex], true);
                 });
             });
         })();
