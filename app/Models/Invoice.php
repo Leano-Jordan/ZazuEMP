@@ -99,6 +99,27 @@ class Invoice extends Model
         );
     }
 
+    public function getDepositPaidAmountAttribute(): string
+    {
+        $this->loadMissing(['payments', 'quoteVersion']);
+
+        return Money::fromCents(
+            $this->payments
+                ->where('type', 'deposit')
+                ->sum(fn (Payment $payment) => Money::toCents((string) $payment->amount))
+        );
+    }
+
+    public function getDepositBalanceAttribute(): string
+    {
+        $this->loadMissing('quoteVersion');
+
+        $requiredCents = Money::toCents((string) ($this->quoteVersion?->deposit_amount ?? '0.00'));
+        $paidCents = Money::toCents((string) $this->deposit_paid_amount);
+
+        return Money::fromCents(max(0, $requiredCents - $paidCents));
+    }
+
     public function getBalanceAttribute(): string
     {
         $totalCents = Money::toCents((string) $this->total);
