@@ -68,6 +68,61 @@ class QuoteWorkflowTest extends TestCase
         $this->assertSame('100 white chairs', $item->source_snapshot['description']);
     }
 
+    public function test_quote_deposit_percent_calculates_from_final_total(): void
+    {
+        [$business, $user] = $this->businessUser();
+        $this->actingAs($user);
+
+        $customer = \App\Models\Customer::create([
+            'business_id' => $business->id,
+            'name' => 'Deposit Quote Customer',
+        ]);
+
+        $event = Event::create([
+            'business_id' => $business->id,
+            'customer_id' => $customer->id,
+            'reference' => 'DEP-Q-001',
+            'name' => 'Deposit Quote Event',
+            'event_date' => now()->addDays(10)->toDateString(),
+            'status' => 'confirmed',
+        ]);
+
+        $capability = \App\Models\BusinessCapability::create([
+            'business_id' => $business->id,
+            'name' => 'Catering',
+            'category' => 'Catering',
+            'capability_type' => 'service',
+            'pricing_basis' => 'per_event',
+            'default_unit' => 'event',
+            'default_price' => '1150.00',
+            'currency' => 'ZAR',
+            'is_active' => true,
+        ]);
+
+        $requirement = $event->requirements()->create([
+            'capability_id' => $capability->id,
+            'description' => 'Catering',
+            'category' => 'service',
+            'quantity' => '1.00',
+            'unit' => 'event',
+        ]);
+
+        $quote = app(\App\Services\QuoteService::class)->createFromRequirements(
+            $event,
+            collect([$requirement->load('capability')]),
+            [$requirement->id => '1000.00'],
+            'ZAR',
+            null,
+            null,
+            '20.00'
+        );
+
+        $version = $quote->latestVersion;
+
+        $this->assertSame('20.00', $version->deposit_percent);
+        $this->assertSame('200.00', $version->deposit_amount);
+    }
+
     public function test_customer_can_view_and_accept_a_sent_quote_through_a_signed_link(): void
     {
         $customer = Customer::create(['name' => 'Public Quote Customer']);
