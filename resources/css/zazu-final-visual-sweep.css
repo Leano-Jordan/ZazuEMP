@@ -2299,3 +2299,340 @@ html{background:var(--zazu-canvas-bg);scroll-behavior:smooth}body{background:lin
 .zazu-calendar-toolbar-main{display:flex;align-items:center;gap:5px}.zazu-calendar-grid{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));background:var(--zazu-card-border);gap:1px}.zazu-calendar-label{min-height:32px;display:grid;place-items:center;background:var(--zazu-canvas-bg);color:var(--zazu-text-muted);font-size:9px;font-weight:800;letter-spacing:.08em;text-transform:uppercase}.zazu-calendar-cell{min-height:116px;padding:9px;background:var(--zazu-card-bg);transition:background-color 130ms}.zazu-calendar-cell.is-today{background:linear-gradient(180deg,var(--zazu-blue-soft),var(--zazu-card-bg) 55%)}.zazu-calendar-date-row{display:flex;align-items:center;justify-content:space-between;gap:5px}.zazu-calendar-date{display:grid;min-width:23px;height:23px;place-items:center;border-radius:7px;color:var(--zazu-text-ink);font:800 10px "JetBrains Mono",ui-monospace,monospace}.zazu-calendar-cell.is-today .zazu-calendar-date{background:var(--zazu-blue-brand);color:#fff}.zazu-calendar-today{color:var(--zazu-blue-brand);font-size:8px;font-weight:800;text-transform:uppercase}.zazu-calendar-events{display:grid;gap:4px;margin-top:8px}.zazu-calendar-event{display:block;overflow:hidden;padding:5px 6px;border:1px solid color-mix(in srgb,var(--zazu-blue-vivid) 18%,var(--zazu-card-border));border-radius:6px;background:var(--zazu-blue-soft);color:var(--zazu-blue-brand);font-size:9px;font-weight:700;text-overflow:ellipsis;white-space:nowrap}.zazu-calendar-event:hover{border-color:var(--zazu-blue-vivid);background:color-mix(in srgb,var(--zazu-blue-vivid) 12%,var(--zazu-card-bg))}.zazu-calendar-more{padding:1px 5px;color:var(--zazu-text-muted);font-size:8px;font-weight:750}.zazu-calendar-command-shell{margin-top:14px}
 .zazu-finance-command{align-items:center}.zazu-command-badge{display:inline-flex;align-items:center;gap:8px;min-height:34px;padding:0 11px;border:1px solid var(--zazu-card-border);border-radius:999px;background:var(--zazu-canvas-bg);color:var(--zazu-text-muted);font-size:9px;font-weight:800}.zazu-status-dot{width:7px;height:7px;border-radius:50%;background:#16A34A;box-shadow:0 0 0 3px rgba(22,163,74,.12)}.zazu-metric-currency-stack{display:grid;gap:6px;margin-top:8px}.zazu-metric-currency-stack .zazu-metric-value{margin-top:0;font-size:18px}.zazu-finance-list .zazu-list-item{min-height:74px}
 @media(max-width:700px){.zazu-auth-frame{padding:16px 12px}.zazu-auth-form-panel{padding:20px}.zazu-auth-form-grid{grid-template-columns:1fr}.zazu-command-band.zazu-finance-command{align-items:flex-start}.zazu-calendar-grid{min-width:700px}.zazu-calendar-command-shell{overflow-x:auto}.zazu-calendar-cell{min-height:96px}}
+
+
+/* ZAZU EMP — MASTER BACKGROUND + FLUID SHELL REFINEMENT
+ * Existing repository asset: images/blue pallette.jpg
+ * Kept deliberately faint so operational content remains the visual priority.
+ */
+:root {
+    --zazu-master-bg: url('/images/blue%20pallette.jpg');
+    --zazu-content-max: 1480px;
+    --zazu-shell-gap: clamp(14px, 1.8vw, 26px);
+}
+
+/* The image is a visual field, not a decorative card background. */
+body {
+    background-color: var(--zazu-canvas-bg);
+    background-image:
+        linear-gradient(180deg, rgba(248,250,252,.94) 0%, rgba(248,250,252,.97) 52%, rgba(248,250,252,.99) 100%),
+        var(--zazu-master-bg);
+    background-position: center top;
+    background-repeat: no-repeat;
+    background-size: cover;
+    background-attachment: fixed;
+}
+html[data-theme="dark"] body {
+    background-image:
+        linear-gradient(180deg, rgba(9,13,22,.93) 0%, rgba(9,13,22,.965) 58%, rgba(9,13,22,.985) 100%),
+        var(--zazu-master-bg);
+}
+
+/* Give the shell a continuous product surface while allowing the master image to breathe at the edges. */
+.zazu-main {
+    min-width: 0;
+    background: transparent;
+}
+.zazu-content {
+    width: min(100%, var(--zazu-content-max));
+    margin-inline: auto;
+    padding: 22px var(--zazu-shell-gap) 34px;
+}
+
+/* Header: one hierarchy, no repeated workspace labels, no accidental title collisions. */
+.zazu-topbar {
+    position: sticky;
+    top: 0;
+    z-index: 60;
+    background: color-mix(in srgb, var(--zazu-card-bg) 90%, transparent);
+    border-bottom: 1px solid color-mix(in srgb, var(--zazu-card-border) 72%, transparent);
+    box-shadow: 0 8px 26px rgba(15,23,42,.055);
+    backdrop-filter: blur(18px) saturate(125%);
+}
+.zazu-topbar-inner {
+    width: min(100%, var(--zazu-content-max));
+    min-height: 68px;
+    margin-inline: auto;
+    padding: 8px var(--zazu-shell-gap);
+    gap: 18px;
+}
+.zazu-header-context {
+    min-width: 0;
+}
+.zazu-workspace-switcher {
+    width: fit-content;
+    max-width: min(100%, 680px);
+    min-height: 22px;
+    padding: 0;
+    border: 0;
+    background: transparent;
+    box-shadow: none;
+    color: var(--zazu-text-muted);
+    font-size: 9px;
+    font-weight: 750;
+    letter-spacing: .02em;
+}
+.zazu-workspace-switcher > span:last-child {
+    color: var(--zazu-text-ink);
+}
+.zazu-workspace-online {
+    display: inline-flex;
+    margin-left: 7px;
+    padding: 2px 6px;
+    border: 1px solid color-mix(in srgb,#16A34A 22%,var(--zazu-card-border));
+    border-radius: 999px;
+    background: color-mix(in srgb,#DCFCE7 70%,var(--zazu-card-bg));
+    color: #166534;
+    font-size: 8px;
+    letter-spacing: .04em;
+    text-transform: uppercase;
+}
+.zazu-header-title-row {
+    display: flex;
+    align-items: center;
+    min-width: 0;
+    margin-top: 1px;
+}
+.zazu-page-title {
+    min-width: 0;
+    max-width: min(46vw, 620px);
+    overflow: hidden;
+    margin: 0;
+    color: var(--zazu-text-ink);
+    font-size: clamp(18px, 2vw, 25px);
+    line-height: 1.08;
+    letter-spacing: -.035em;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+.zazu-section-tabs {
+    display: flex;
+    align-items: center;
+    gap: 3px;
+    min-width: 0;
+    max-width: 100%;
+    margin-top: 6px;
+    overflow-x: auto;
+    scrollbar-width: none;
+}
+.zazu-section-tabs::-webkit-scrollbar { display: none; }
+.zazu-section-tabs .zazu-section-name {
+    flex: 0 0 auto;
+    margin-right: 3px;
+    padding-right: 8px;
+    border-right: 1px solid var(--zazu-card-border);
+    color: var(--zazu-text-muted);
+    font-size: 8px;
+    font-weight: 850;
+    letter-spacing: .11em;
+    text-transform: uppercase;
+}
+.zazu-section-tabs a {
+    flex: 0 0 auto;
+    min-height: 24px;
+    padding: 4px 8px;
+    border: 1px solid transparent;
+    border-radius: 6px;
+    color: var(--zazu-text-muted);
+    font-size: 9px;
+    font-weight: 750;
+    text-decoration: none;
+    white-space: nowrap;
+}
+.zazu-section-tabs a:hover {
+    border-color: var(--zazu-card-border);
+    background: var(--zazu-canvas-bg);
+    color: var(--zazu-text-ink);
+}
+.zazu-section-tabs a.active {
+    border-color: color-mix(in srgb,var(--zazu-blue-vivid) 22%,var(--zazu-card-border));
+    background: var(--zazu-blue-soft);
+    color: var(--zazu-blue-brand);
+    box-shadow: inset 0 -2px 0 var(--zazu-blue-vivid);
+}
+.zazu-topbar-actions {
+    flex: 0 1 auto;
+    align-items: center;
+    gap: 6px;
+}
+.zazu-command-trigger {
+    width: clamp(180px, 20vw, 300px);
+    min-height: 36px;
+    border-radius: 7px;
+}
+.zazu-command-placeholder {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+.zazu-header-create {
+    white-space: nowrap;
+}
+.zazu-user-trigger {
+    min-height: 36px;
+    padding-inline: 6px 8px;
+}
+.zazu-user-identity span {
+    max-width: 112px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+/* Navigation becomes a visual command rail instead of a flat list. */
+.zazu-sidebar {
+    width: 244px;
+    background:
+        linear-gradient(180deg, rgba(11,18,32,.985), rgba(8,14,26,.99)),
+        var(--zazu-master-bg);
+    background-position: center;
+    background-size: cover;
+    border-right: 1px solid #1E293B;
+}
+.zazu-nav {
+    padding: 4px 10px 18px;
+}
+.zazu-sidebar-workspace {
+    margin: 0 4px 15px;
+    padding: 12px 12px 11px;
+    border: 1px solid rgba(148,163,184,.14);
+    border-radius: 8px;
+    background: rgba(255,255,255,.035);
+}
+.zazu-sidebar-workspace-label,
+.zazu-nav-group-label {
+    color: var(--zazu-sidebar-label);
+    font-size: 8px;
+    font-weight: 850;
+    letter-spacing: .12em;
+    text-transform: uppercase;
+}
+.zazu-sidebar-workspace-name {
+    margin-top: 5px;
+    overflow: hidden;
+    color: var(--zazu-sidebar-ink);
+    font-size: 12px;
+    font-weight: 800;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+.zazu-sidebar-workspace-meta {
+    margin-top: 5px;
+    color: var(--zazu-sidebar-muted);
+    font-size: 8px;
+}
+.zazu-nav-group {
+    margin-top: 14px;
+}
+.zazu-nav-group-label {
+    margin: 0 9px 5px;
+}
+.zazu-nav-stack {
+    display: grid;
+    gap: 2px;
+}
+.zazu-nav-link {
+    position: relative;
+    min-height: 38px;
+    padding: 0 9px 0 10px;
+    border: 1px solid transparent;
+    border-radius: 7px;
+    transition: background-color 130ms ease, border-color 130ms ease, transform 130ms ease;
+}
+.zazu-nav-link:hover {
+    border-color: rgba(148,163,184,.13);
+    background: rgba(255,255,255,.045);
+    transform: translateX(1px);
+}
+.zazu-nav-link.active {
+    border-color: rgba(96,165,250,.20);
+    background: linear-gradient(90deg, rgba(37,99,235,.22), rgba(37,99,235,.07));
+    box-shadow: inset 3px 0 0 var(--zazu-blue-vivid);
+}
+.zazu-nav-link.active .zazu-nav-icon {
+    color: #93C5FD;
+}
+.zazu-nav-arrow {
+    margin-left: auto;
+    color: var(--zazu-sidebar-label);
+    font-size: 10px;
+    opacity: 0;
+    transform: translateX(-3px);
+    transition: opacity 130ms ease, transform 130ms ease;
+}
+.zazu-nav-link:hover .zazu-nav-arrow,
+.zazu-nav-link.active .zazu-nav-arrow {
+    opacity: .9;
+    transform: translateX(0);
+}
+.zazu-sidebar-footer {
+    padding: 10px 14px 14px;
+}
+.zazu-footer-card {
+    border-color: rgba(148,163,184,.14);
+    background: rgba(255,255,255,.028);
+}
+
+/* Prevent the common "title + toolbar + fields" compression pattern. */
+:where(.zazu-page-header,.zazu-command-band,.zazu-command-shell,.zazu-dashboard-command) {
+    min-width: 0;
+}
+:where(.zazu-page-header,.zazu-command-band) {
+    gap: 14px;
+}
+:where(.zazu-page-header h1,.zazu-command-title,.zazu-panel-title,.zazu-card-title) {
+    overflow-wrap: anywhere;
+}
+:where(.zazu-page-header-actions,.zazu-command-actions,.zazu-card-actions) {
+    flex: 0 0 auto;
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+    gap: 6px;
+}
+:where(.zazu-form-grid,.zazu-editor-grid,.zazu-detail-grid) {
+    container-type: inline-size;
+}
+:where(.zazu-form-grid,.zazu-editor-grid) > * {
+    min-width: 0;
+}
+@container (max-width: 680px) {
+    :where(.zazu-form-grid,.zazu-editor-grid) {
+        grid-template-columns: minmax(0,1fr);
+    }
+}
+@media (max-width: 1100px) {
+    .zazu-topbar-inner { align-items: flex-start; }
+    .zazu-command-trigger { width: 210px; }
+    .zazu-user-identity { display: none; }
+}
+@media (max-width: 820px) {
+    .zazu-sidebar { width: 0; }
+    .zazu-content { padding: 16px 12px 28px; }
+    .zazu-topbar-inner { min-height: 62px; padding: 7px 12px; gap: 9px; }
+    .zazu-page-title { max-width: 52vw; font-size: 17px; }
+    .zazu-workspace-switcher { max-width: 55vw; }
+    .zazu-section-tabs { margin-top: 4px; }
+    .zazu-command-trigger { width: 42px; padding-inline: 0; justify-content: center; }
+    .zazu-command-placeholder, .zazu-command-trigger kbd { display: none; }
+    .zazu-header-create { width: 38px; padding-inline: 0; font-size: 0; }
+    .zazu-header-create span { font-size: 17px; }
+}
+@media (max-width: 560px) {
+    .zazu-topbar-actions { gap: 4px; }
+    .zazu-workspace-online { display: none; }
+    .zazu-page-title { max-width: 44vw; }
+    .zazu-section-tabs .zazu-section-name { display: none; }
+    :where(.zazu-page-header,.zazu-command-band) {
+        align-items: flex-start;
+        flex-direction: column;
+    }
+    :where(.zazu-page-header-actions,.zazu-command-actions,.zazu-card-actions) {
+        width: 100%;
+        justify-content: flex-start;
+    }
+}
+@media (prefers-reduced-motion: reduce) {
+    .zazu-nav-link, .zazu-nav-arrow { transition: none; }
+}
