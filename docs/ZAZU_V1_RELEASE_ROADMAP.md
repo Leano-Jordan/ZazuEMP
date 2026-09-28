@@ -4,7 +4,7 @@
 **Last Director cycle:** 2026-09-28  
 **Repository:** `Leano-Jordan/ZazuEMP`  
 **Branch:** `main`  
-**HEAD:** `f714253a8b1cebfae70b394bcd87281a4e240828`  
+**HEAD:** `ee52c37fda4d29562d96089f557d76fa04a76379`  
 **Evidence rule:** Implemented ≠ Verified ≠ Proven.
 
 ## Director operating rule
