@@ -39,7 +39,10 @@ class Event extends Model
             || $this->travelCosts()->exists()
             || $this->costs()->exists()
             || $this->attachments()->exists()
-            || $this->preparationItems()->exists();
+            || $this->preparationItems()->exists()
+            || $this->purchaseOrders()->exists()
+            || $this->invoices()->exists()
+            || $this->payments()->exists();
     }
 
     protected $fillable = [
@@ -114,5 +117,20 @@ class Event extends Model
     public function preparationItems(): HasMany
     {
         return $this->hasMany(EventPreparationItem::class);
+    }
+
+    public function purchaseOrders(): HasMany
+    {
+        return $this->hasMany(PurchaseOrder::class);
+    }
+
+    public function invoices(): HasMany
+    {
+        return $this->hasMany(Invoice::class);
+    }
+
+    public function payments(): HasMany
+    {
+        return $this->hasMany(Payment::class);
     }
 }

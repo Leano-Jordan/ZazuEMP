@@ -23,6 +23,7 @@ class PurchaseOrder extends Model
 
     protected $fillable = [
         'business_id',
+        'event_id',
         'supplier_id',
         'idempotency_key',
         'last_receipt_idempotency_key',
@@ -63,6 +64,11 @@ class PurchaseOrder extends Model
     public function business(): BelongsTo
     {
         return $this->belongsTo(Business::class);
+    }
+
+    public function event(): BelongsTo
+    {
+        return $this->belongsTo(Event::class);
     }
 
     public function supplier(): BelongsTo

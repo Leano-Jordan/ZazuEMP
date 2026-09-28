@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Event;
 use App\Models\EventPreparationItem;
+use App\Services\EventLifecycleService;
 use App\Support\CurrentBusiness;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -37,11 +38,9 @@ class EventPreparationController extends Controller
         ]);
     }
 
-    public function store(Request $request, Event $event): RedirectResponse
+    public function store(Request $request, Event $event, EventLifecycleService $lifecycle): RedirectResponse
     {
         $this->ensureBusiness($event, $request);
-        abort_if($event->isClosed(), 422, 'Closed work cannot receive new preparation records.');
-
         $validated = $request->validate([
             'title' => ['required', 'string', 'max:255'],
             'category' => ['nullable', Rule::in(array_keys(config('zazu.readiness_categories')))],
@@ -52,11 +51,15 @@ class EventPreparationController extends Controller
             'notes' => ['nullable', 'string'],
         ]);
 
-        DB::transaction(function () use ($validated, $event): void {
+        DB::transaction(function () use ($validated, $event, $request, $lifecycle): void {
+            $businessId = app(CurrentBusiness::class)->id($request->user());
+            $lockedEvent = $lifecycle->lock($businessId, $event->id);
+            $lifecycle->assertOperational($lockedEvent);
+
             EventPreparationItem::query()->create([
                 ...$validated,
-                'business_id' => $event->business_id,
-                'event_id' => $event->id,
+                'business_id' => $lockedEvent->business_id,
+                'event_id' => $lockedEvent->id,
                 'completed_at' => ($validated['status'] ?? 'open') === 'ready' ? now() : null,
             ]);
         });
@@ -66,20 +69,30 @@ class EventPreparationController extends Controller
             ->with('success', 'Preparation item added.');
     }
 
-    public function updateStatus(Request $request, Event $event, EventPreparationItem $item): RedirectResponse
+    public function updateStatus(Request $request, Event $event, EventPreparationItem $item, EventLifecycleService $lifecycle): RedirectResponse
     {
         $this->ensureBusiness($event, $request);
-        abort_if($event->isClosed(), 422, 'Closed work cannot have its preparation status changed.');
-        abort_unless($item->event_id === $event->id && $item->business_id === $event->business_id, 404);
 
         $validated = $request->validate([
             'status' => ['required', 'in:open,blocked,ready'],
         ]);
 
-        $item->update([
-            'status' => $validated['status'],
-            'completed_at' => $validated['status'] === 'ready' ? now() : null,
-        ]);
+        DB::transaction(function () use ($request, $event, $item, $validated, $lifecycle): void {
+            $businessId = app(CurrentBusiness::class)->id($request->user());
+            $lockedEvent = $lifecycle->lock($businessId, $event->id);
+            $lifecycle->assertOperational($lockedEvent);
+
+            $lockedItem = EventPreparationItem::query()
+                ->where('business_id', $businessId)
+                ->where('event_id', $lockedEvent->id)
+                ->lockForUpdate()
+                ->findOrFail($item->id);
+
+            $lockedItem->update([
+                'status' => $validated['status'],
+                'completed_at' => $validated['status'] === 'ready' ? now() : null,
+            ]);
+        });
 
         return redirect()
             ->route('work.preparation.index', $event)
