@@ -58,7 +58,7 @@ test('registration flows through onboarding into the dashboard', async ({ page }
         await expect(page.getByRole('button', { name: 'Open navigation' })).toBeVisible();
     }
     await expect(page.getByRole('heading', { name: 'Command Centre' })).toBeVisible();
-    await expect(page.getByTitle('Active business workspace')).toHaveText(businessName);
+    await expect(page.locator('.zazu-footer-workspace strong')).toHaveText(businessName);
 
     const helperPanel = page.locator('[data-zazu-helper-panel]');
     const helperToggle = page.locator('[data-zazu-helper-toggle]');
