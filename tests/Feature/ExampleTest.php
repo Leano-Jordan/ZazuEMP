@@ -12,7 +12,7 @@ class ExampleTest extends TestCase
 
         $response->assertOk()
             ->assertViewIs('landing')
-            ->assertSee('Create workspace')
+            ->assertSee('Register')
             ->assertSee('Log in');
     }
 }
