@@ -59,14 +59,15 @@ class SearchTest extends TestCase
 
         $this->actingAs($user);
 
-        $this->get(route('search.index', [
+        $response = $this->get(route('search.index', [
             'q' => 'Status Safe Customer',
             'type' => 'customer',
             'status' => 'paid',
-        ]))
-            ->assertOk()
+        ]));
+
+        $response->assertOk()
             ->assertSee('0 records')
-            ->assertDontSee('Status Safe Customer');
+            ->assertViewHas('results', static fn (array $results): bool => $results === []);
     }
 
 }
