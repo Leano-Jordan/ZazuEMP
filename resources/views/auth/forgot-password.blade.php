@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="color-scheme" content="light">
     <title>Reset password · Zazu</title>
-    @vite(['resources/css/app.css', 'resources/js/app.js'])
+    @vite(['resources/css/app.css', 'resources/css/zazu-final-visual-sweep.css', 'resources/js/app.js'])
 </head>
 <body class="zazu-auth-shell">
     <main class="zazu-auth-frame zazu-auth-frame-single">
