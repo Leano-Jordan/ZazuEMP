@@ -19,10 +19,10 @@ class AuthenticationTest extends TestCase
 {
     use RefreshDatabase;
 
-    public function test_guest_can_open_login_and_registration(): void
+    public function test_guest_authentication_entry_points_use_the_landing_modal(): void
     {
-        $this->get(route('login'))->assertOk();
-        $this->get(route('register'))->assertOk()->assertSee('Username');
+        $this->get(route('login'))->assertRedirect(route('landing', ['auth' => 'login']));
+        $this->get(route('register'))->assertRedirect(route('landing', ['auth' => 'register']));
         $this->get(route('owner.login'))->assertOk()->assertSee('Owner sign in');
     }
 
@@ -92,8 +92,8 @@ class AuthenticationTest extends TestCase
 
     public function test_public_login_and_register_pages_redirect_to_landing(): void
     {
-        $this->get(route('login'))->assertRedirect(route('landing'));
-        $this->get(route('register'))->assertRedirect(route('landing'));
+        $this->get(route('login'))->assertRedirect(route('landing', ['auth' => 'login']));
+        $this->get(route('register'))->assertRedirect(route('landing', ['auth' => 'register']));
     }
 
     public function test_landing_exposes_login_and_register_modal(): void
