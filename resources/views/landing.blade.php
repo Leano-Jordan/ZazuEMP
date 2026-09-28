@@ -8,9 +8,9 @@
     <title>Zazu EMP · Event Operations Management</title>
     <style>
         :root {
-            --canvas:#0B0E14; --surface:#11161E; --surface-2:#171D27; --ink:#F2F2ED;
-            --muted:#9BA5B4; --line:#2A323E; --orange:#FF4500; --green:#00E676;
-            --amber:#FFB300; --red:#FF1744; --blue:#69A7FF;
+            --canvas:#F2F7FF; --surface:#FFFFFF; --surface-2:#F7FAFF; --ink:#0F172A;
+            --muted:#64748B; --line:#E2E8F0; --blue:#416AD7; --green:#137333;
+            --amber:#92400E; --red:#991B1B; --blue:#5592FC;
         }
         * { box-sizing:border-box; }
         html { scroll-behavior:smooth; }
@@ -26,50 +26,50 @@
         .shell { width:min(1180px,calc(100% - 40px)); margin:auto; }
         .topbar { height:76px; display:flex; align-items:center; justify-content:space-between; border-bottom:1px solid var(--line); }
         .brand { display:flex; align-items:center; gap:12px; font-weight:900; letter-spacing:-.04em; }
-        .mark { width:34px;height:34px;display:grid;place-items:center;background:var(--orange);color:#fff;font-weight:950; }
+        .mark { width:34px;height:34px;display:grid;place-items:center;background:var(--blue);color:#fff;font-weight:950; }
         .brand small { display:block;color:var(--muted);font:600 10px/1 "JetBrains Mono",monospace;letter-spacing:.12em;text-transform:uppercase;margin-top:4px; }
         .top-actions { display:flex;gap:10px;align-items:center; }
         .btn { min-height:42px;padding:0 17px;border:1px solid var(--line);display:inline-flex;align-items:center;justify-content:center;gap:9px;font-weight:800; }
-        .btn-primary { background:var(--orange);border-color:var(--orange);color:#fff; }
-        .btn-primary:hover { background:#e83e00; }
+        .btn-primary { background:var(--blue);border-color:var(--blue);color:#fff; }
+        .btn-primary:hover { background: #3255B8; }
         .btn-ghost:hover { border-color:#5A6677;background:var(--surface); }
         .hero { padding:82px 0 70px; display:grid;grid-template-columns:minmax(0,1fr) minmax(430px,.95fr);gap:60px;align-items:center; }
-        .eyebrow { color:var(--orange);font:800 11px/1 "JetBrains Mono",monospace;letter-spacing:.16em;text-transform:uppercase;display:flex;align-items:center;gap:9px; }
-        .eyebrow:before { content:"";width:28px;height:2px;background:var(--orange); }
+        .eyebrow { color:var(--blue);font:800 11px/1 "JetBrains Mono",monospace;letter-spacing:.16em;text-transform:uppercase;display:flex;align-items:center;gap:9px; }
+        .eyebrow:before { content:"";width:28px;height:2px;background:var(--blue); }
         h1 { margin:18px 0 20px;font-size:clamp(44px,6vw,76px);line-height:.94;letter-spacing:-.065em;max-width:720px; }
-        .hero-copy { color:#B8C0CC;font-size:18px;line-height:1.65;max-width:650px; }
+        .hero-copy { color:#475569;font-size:18px;line-height:1.65;max-width:650px; }
         .hero-actions { display:flex;flex-wrap:wrap;gap:10px;margin-top:30px; }
-        .hero-note { margin-top:18px;color:#778292;font:500 11px/1.5 "JetBrains Mono",monospace; }
-        .telemetry { border:1px solid #36404E;background:rgba(17,22,30,.92);box-shadow:0 24px 70px rgba(0,0,0,.35); }
+        .hero-note { margin-top:18px;color:#64748B;font:500 11px/1.5 "JetBrains Mono",monospace; }
+        .telemetry { border:1px solid #36404E;background:rgba(255,255,255,.96);box-shadow:0 12px 30px rgba(15,23,42,.08); }
         .telemetry-head { padding:12px 14px;border-bottom:1px solid var(--line);display:flex;justify-content:space-between;gap:15px;font:700 10px/1.2 "JetBrains Mono",monospace;letter-spacing:.08em; }
         .online { color:var(--green);display:flex;gap:7px;align-items:center; }
         .online i { width:7px;height:7px;border-radius:50%;background:var(--green);box-shadow:0 0 12px var(--green); }
         .metrics { display:grid;grid-template-columns:repeat(5,1fr); }
         .metric { padding:16px 12px;border-right:1px solid var(--line); }
         .metric:last-child { border-right:0; }
-        .metric-label { color:#758092;font:700 8px/1.2 "JetBrains Mono",monospace;text-transform:uppercase; }
+        .metric-label { color:#64748B;font:700 8px/1.2 "JetBrains Mono",monospace;text-transform:uppercase; }
         .metric-value { font:800 26px/1 "JetBrains Mono",monospace;margin-top:8px; }
         .record { border-top:1px solid var(--line);padding:18px;display:grid;grid-template-columns:1.5fr 1fr .8fr;gap:15px; }
-        .record-label { color:#6F7A89;font:700 8px/1.2 "JetBrains Mono",monospace;text-transform:uppercase; }
+        .record-label { color:#64748B;font:700 8px/1.2 "JetBrains Mono",monospace;text-transform:uppercase; }
         .record-main { font-weight:850;margin-top:7px; }
-        .record-meta { color:#9BA5B4;font-size:12px;margin-top:4px; }
+        .record-meta { color:#64748B;font-size:12px;margin-top:4px; }
         .badge { display:inline-flex;align-items:center;border:1px solid var(--amber);color:var(--amber);padding:4px 7px;font:800 9px/1 "JetBrains Mono",monospace;margin-top:7px; }
-        .matrix-foot { border-top:1px solid var(--line);padding:10px 14px;color:#6F7A89;font:600 9px/1.4 "JetBrains Mono",monospace; }
+        .matrix-foot { border-top:1px solid var(--line);padding:10px 14px;color:#64748B;font:600 9px/1.4 "JetBrains Mono",monospace; }
         .section { padding:70px 0;border-top:1px solid var(--line); }
         .section-head { display:flex;justify-content:space-between;gap:30px;align-items:end;margin-bottom:28px; }
         .section h2 { margin:8px 0 0;font-size:36px;letter-spacing:-.045em; }
         .section-intro { max-width:600px;color:var(--muted);line-height:1.6; }
         .pillars { display:grid;grid-template-columns:repeat(3,1fr);border-top:1px solid var(--line);border-left:1px solid var(--line); }
         .pillar { min-height:220px;padding:24px;border-right:1px solid var(--line);border-bottom:1px solid var(--line);background:rgba(17,22,30,.65); }
-        .pillar-num { color:var(--orange);font:800 11px "JetBrains Mono",monospace; }
+        .pillar-num { color:var(--blue);font:800 11px "JetBrains Mono",monospace; }
         .pillar h3 { margin:48px 0 9px;font-size:21px; }
         .pillar p { margin:0;color:var(--muted);line-height:1.6;font-size:14px; }
         .compare { display:grid;grid-template-columns:1fr 1fr;border:1px solid var(--line); }
         .compare > div { padding:28px;min-height:260px; }
-        .compare > div + div { border-left:1px solid var(--line);background:#0F141B; }
+        .compare > div + div { border-left:1px solid var(--line);background:#F7FAFF; }
         .compare h3 { margin:0 0 18px;font-size:13px;text-transform:uppercase;letter-spacing:.1em;font-family:"JetBrains Mono",monospace; }
-        .compare ul { margin:0;padding:0;list-style:none;display:grid;gap:12px;color:#B6BFCC;font-size:14px;line-height:1.5; }
-        .compare li:before { content:"/";color:var(--orange);font-family:monospace;font-weight:900;margin-right:9px; }
+        .compare ul { margin:0;padding:0;list-style:none;display:grid;gap:12px;color:#475569;font-size:14px;line-height:1.5; }
+        .compare li:before { content:"/";color:var(--blue);font-family:monospace;font-weight:900;margin-right:9px; }
         .inspector { display:grid;grid-template-columns:1.1fr .9fr;border:1px solid var(--line); }
         .inspector-main,.inspector-side { padding:26px; }
         .inspector-side { border-left:1px solid var(--line);background:var(--surface); }
@@ -78,7 +78,7 @@
         .status { font:800 10px "JetBrains Mono",monospace; }
         .status.ok { color:var(--green); }.status.warn { color:var(--amber); }.status.alert { color:var(--red); }
         .cta { padding:70px 0 90px; }
-        .cta-box { border:1px solid var(--line);padding:36px;background:linear-gradient(110deg,#151A22,#0E1218);display:flex;justify-content:space-between;gap:30px;align-items:center; }
+        .cta-box { border:1px solid var(--line);padding:36px;background:linear-gradient(110deg,#FFFFFF,#F2F7FF);display:flex;justify-content:space-between;gap:30px;align-items:center; }
         .cta-box h2 { margin:0 0 8px;font-size:32px;letter-spacing:-.04em; }
         .cta-box p { margin:0;color:var(--muted); }
         footer { border-top:1px solid var(--line);padding:22px 0;color:#667181;font:600 10px "JetBrains Mono",monospace;display:flex;justify-content:space-between;gap:20px; }
@@ -104,8 +104,8 @@
         <main>
             <section class="hero">
                 <div>
-                    <div class="eyebrow">Operational command system</div>
-                    <h1>Zero-Friction Staging.<br>From Draft Quote to Teardown.</h1>
+                    <div class="eyebrow">Event, catering &amp; equipment operations</div>
+                    <h1>Precision Command for Events, Catering &amp; Equipment Hire.</h1>
                     <p class="hero-copy">The operational workspace for event managers, caterers and equipment-hire teams. Keep jobs, customers, quotes, resources, preparation and financial activity connected in one system.</p>
                     <div class="hero-actions">
                         <a class="btn btn-primary" href="{{ route('login') }}">Enter Rosco ICT Workspace →</a>
