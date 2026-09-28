@@ -14,7 +14,7 @@
     $brandingVersion = $business->updated_at?->timestamp ?? 0;
 @endphp
 
-<form method="POST" action="{{ route('settings.update') }}" enctype="multipart/form-data" class="zazu-editor" data-branding-form>
+<form method="POST" action="{{ route('settings.update') }}" enctype="multipart/form-data" class="zazu-editor zazu-settings-page" data-branding-form>
         @csrf
         @method('PUT')
 
