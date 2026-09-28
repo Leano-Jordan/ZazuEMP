@@ -16,7 +16,7 @@
                         <label class="zazu-field"><span class="zazu-label">Label</span><input name="label" value="{{ old('label', $contact->label) }}" class="zazu-input"></label>
                         <label class="zazu-field"><span class="zazu-label">Phone</span><input type="tel" name="phone" value="{{ old('phone', $contact->phone) }}" class="zazu-input" autocomplete="tel"></label>
                         <label class="zazu-field zazu-field-wide"><span class="zazu-label">Email</span><input type="email" name="email" value="{{ old('email', $contact->email) }}" class="zazu-input" autocomplete="email"></label>
-                        <label class="zazu-check-row"><input type="checkbox" name="is_primary" value="1" @checked(old('is_primary', $contact->is_primary))><span><span class="block text-xs font-semibold text-[var(--zazu-ink-2)]">Primary contact</span><span class="mt-1 block text-[10px] text-[var(--zazu-faint)]">Selecting this demotes the current primary contact.</span></span></label>
+                        <label class="zazu-check-row"><input type="checkbox" name="is_primary" value="1" @checked(old('is_primary', $contact->is_primary))><span><span class="block text-xs font-semibold text-(--zazu-ink-2)">Primary contact</span><span class="mt-1 block text-[10px] text-(--zazu-faint)">Selecting this demotes the current primary contact.</span></span></label>
                     </div>
                 </section>
                 <div class="zazu-actionbar"><a href="{{ route('customers.show', $customer) }}" class="zazu-btn zazu-btn-ghost">Cancel</a><button class="zazu-btn zazu-btn-primary">Save changes</button></div>
