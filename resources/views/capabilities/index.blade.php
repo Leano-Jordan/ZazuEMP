@@ -69,7 +69,7 @@
                     @foreach($equipment as $capability)
                         @php
                             $assetTotal = (int) $capability->assets_count;
-                            $activeAssets = $capability->assets()->whereNotIn('status', ['maintenance', 'retired'])->count();
+                            $activeAssets = (int) $capability->available_assets_count;
                             $rate = $capability->default_price !== null ? number_format((float) $capability->default_price, 2) : '—';
                             $code = 'EQ-' . strtoupper(substr(preg_replace('/[^A-Za-z0-9]/', '', $capability->name), 0, 8));
                         @endphp
