@@ -87,6 +87,67 @@
             </nav>
 
             <div class="zazu-sidebar-footer">
+                @auth
+                    @auth
+                                            <div class="zazu-user-menu" data-user-menu>
+                                                <button
+                                                    type="button"
+                                                    class="zazu-user-trigger"
+                                                    data-user-trigger
+                                                    aria-expanded="false"
+                                                    aria-controls="zazu-user-menu"
+                                                    aria-label="Open account menu for {{ '@'.auth()->user()->username }}"
+                                                >
+                                                    <x-profile-avatar :name="auth()->user()->name" :path="auth()->user()->profile_photo_path" media-type="user" :media-id="auth()->id()" size="sm" />
+                                                    <span class="zazu-user-identity">
+                                                        <strong>{{ '@'.auth()->user()->username }}</strong>
+                                                        <span>{{ auth()->user()->name }}</span>
+                                                    </span>
+                                                    <svg class="zazu-user-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="m7 9 5 5 5-5"></path></svg>
+                                                </button>
+                
+                                                <div class="zazu-user-popover" id="zazu-user-menu" data-user-popover hidden>
+                                                    <div class="zazu-user-popover-head">
+                                                        <x-profile-avatar :name="auth()->user()->name" :path="auth()->user()->profile_photo_path" media-type="user" :media-id="auth()->id()" size="md" />
+                                                        <div class="min-w-0">
+                                                            <strong class="zazu-user-popover-name">{{ '@'.auth()->user()->username }}</strong>
+                                                            <span class="zazu-user-popover-email">{{ auth()->user()->name }}</span>
+                                                            <span class="zazu-user-popover-email">{{ auth()->user()->email }}</span>
+                                                        </div>
+                                                    </div>
+                                                    @if($businesses->count() > 1)
+                                                        <div class="zazu-user-popover-section">
+                                                            <span class="zazu-user-popover-label">Workspace</span>
+                                                            <form method="POST" action="{{ route('business.switch') }}" class="zazu-user-switch-form">
+                                                                @csrf
+                                                                <label class="sr-only" for="zazu-business-switch">Current workspace</label>
+                                                                <select id="zazu-business-switch" name="business_id" class="zazu-user-switch-select" data-business-switch>
+                                                                    @foreach($businesses as $availableBusiness)
+                                                                        <option value="{{ $availableBusiness->id }}" @selected((int) $availableBusiness->id === (int) $business->id)>{{ $availableBusiness->name }}</option>
+                                                                    @endforeach
+                                                                </select>
+                                                            </form>
+                                                        </div>
+                                                    @endif
+                                                    <div class="zazu-user-popover-divider"></div>
+                                                    @if($isOwner)
+                                                    <a href="{{ route('onboarding.index') }}" class="zazu-user-signout zazu-user-link">
+                                                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><circle cx="12" cy="12" r="3"></circle><path d="M19 12a7 7 0 0 0-.3-2l-2-1.3-2-3.4-2.3 1a7 7 0 0 0-3.4-2L12.7 2h-1.4L11 4.3a7 7 0 0 0-3.4 2l-2.3-1-2 3.4 2 1.3a7 7 0 0 0 0 4l-2 1.3 2 3.4 2.3-1a7 7 0 0 0 3.4 2l.3 2.3h1.4l.3-2.3a7 7 0 0 0 3.4-2l2.3 1 2-3.4-2-1.3A7 7 0 0 0 19 12z"></path></svg>
+                                                        <span>Setup centre</span>
+                                                    </a>
+                
+                                                    @endif
+                                                    <form method="POST" action="{{ route('logout') }}">
+                                                        @csrf
+                                                        <button type="submit" class="zazu-user-signout">
+                                                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M10 6V4h9v16h-9v-2"></path><path d="M4 12h11m-4-4 4 4-4 4"></path></svg>
+                                                            <span>Sign out</span>
+                                                        </button>
+                                                    </form>
+                                                </div>
+                                            </div>
+                                        @endauth
+                @endauth
                 <div class="zazu-footer-card">
                     <div class="zazu-footer-title">{{ $business?->name ?? 'Zazu EMP' }}</div>
                     <div class="zazu-footer-copy">Event operations workspace</div>
@@ -150,65 +211,7 @@
                             {{ $headerAction }}
                         @endisset
 
-                        @auth
-                            <div class="zazu-user-menu" data-user-menu>
-                                <button
-                                    type="button"
-                                    class="zazu-user-trigger"
-                                    data-user-trigger
-                                    aria-expanded="false"
-                                    aria-controls="zazu-user-menu"
-                                    aria-label="Open account menu for {{ '@'.auth()->user()->username }}"
-                                >
-                                    <x-profile-avatar :name="auth()->user()->name" :path="auth()->user()->profile_photo_path" media-type="user" :media-id="auth()->id()" size="sm" />
-                                    <span class="zazu-user-identity">
-                                        <strong>{{ '@'.auth()->user()->username }}</strong>
-                                        <span>{{ auth()->user()->name }}</span>
-                                    </span>
-                                    <svg class="zazu-user-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="m7 9 5 5 5-5"></path></svg>
-                                </button>
 
-                                <div class="zazu-user-popover" id="zazu-user-menu" data-user-popover hidden>
-                                    <div class="zazu-user-popover-head">
-                                        <x-profile-avatar :name="auth()->user()->name" :path="auth()->user()->profile_photo_path" media-type="user" :media-id="auth()->id()" size="md" />
-                                        <div class="min-w-0">
-                                            <strong class="zazu-user-popover-name">{{ '@'.auth()->user()->username }}</strong>
-                                            <span class="zazu-user-popover-email">{{ auth()->user()->name }}</span>
-                                            <span class="zazu-user-popover-email">{{ auth()->user()->email }}</span>
-                                        </div>
-                                    </div>
-                                    @if($businesses->count() > 1)
-                                        <div class="zazu-user-popover-section">
-                                            <span class="zazu-user-popover-label">Workspace</span>
-                                            <form method="POST" action="{{ route('business.switch') }}" class="zazu-user-switch-form">
-                                                @csrf
-                                                <label class="sr-only" for="zazu-business-switch">Current workspace</label>
-                                                <select id="zazu-business-switch" name="business_id" class="zazu-user-switch-select" data-business-switch>
-                                                    @foreach($businesses as $availableBusiness)
-                                                        <option value="{{ $availableBusiness->id }}" @selected((int) $availableBusiness->id === (int) $business->id)>{{ $availableBusiness->name }}</option>
-                                                    @endforeach
-                                                </select>
-                                            </form>
-                                        </div>
-                                    @endif
-                                    <div class="zazu-user-popover-divider"></div>
-                                    @if($isOwner)
-                                    <a href="{{ route('onboarding.index') }}" class="zazu-user-signout zazu-user-link">
-                                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><circle cx="12" cy="12" r="3"></circle><path d="M19 12a7 7 0 0 0-.3-2l-2-1.3-2-3.4-2.3 1a7 7 0 0 0-3.4-2L12.7 2h-1.4L11 4.3a7 7 0 0 0-3.4 2l-2.3-1-2 3.4 2 1.3a7 7 0 0 0 0 4l-2 1.3 2 3.4 2.3-1a7 7 0 0 0 3.4 2l.3 2.3h1.4l.3-2.3a7 7 0 0 0 3.4-2l2.3 1 2-3.4-2-1.3A7 7 0 0 0 19 12z"></path></svg>
-                                        <span>Setup centre</span>
-                                    </a>
-
-                                    @endif
-                                    <form method="POST" action="{{ route('logout') }}">
-                                        @csrf
-                                        <button type="submit" class="zazu-user-signout">
-                                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M10 6V4h9v16h-9v-2"></path><path d="M4 12h11m-4-4 4 4-4 4"></path></svg>
-                                            <span>Sign out</span>
-                                        </button>
-                                    </form>
-                                </div>
-                            </div>
-                        @endauth
 
                         <button type="button" class="zazu-theme-toggle" data-theme-toggle aria-pressed="false">
                             <svg data-theme-icon-sun viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true">
