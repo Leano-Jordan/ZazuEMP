@@ -418,7 +418,7 @@ class FinanceController extends Controller
         $data['idempotency_key'] ??= (string) Str::uuid();
         $alreadyProcessed = false;
 
-        $expense = $finance->recordExpense(
+        $alreadyProcessed = $finance->recordExpense(
             businessId: $businessId,
             currency: $currency,
             data: $data,
