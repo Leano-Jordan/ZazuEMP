@@ -3,8 +3,10 @@
 namespace App\Http\Controllers;
 
 use App\Models\BusinessCapability;
+use App\Models\Business;
 use App\Models\InventoryItem;
 use App\Models\PurchaseOrder;
+use App\Models\PurchaseOrderReceipt;
 use App\Models\Supplier;
 use App\Support\Audit;
 use App\Support\CurrentBusiness;
@@ -168,11 +170,22 @@ class PurchaseOrderController extends Controller
 
         $businessId = app(CurrentBusiness::class)->id($request->user());
 
+        abort_unless(
+            collect($data['received_quantity'])->contains(
+                fn ($received) => Money::toHundredths((string) ($received ?: '0')) > 0
+            ),
+            422,
+            'Receive at least one positive quantity.'
+        );
+
         DB::transaction(function () use ($data, $purchaseOrder, $businessId): void {
             $lockedOrder = PurchaseOrder::query()
                 ->where('business_id', $businessId)
                 ->lockForUpdate()
                 ->findOrFail($purchaseOrder->id);
+
+            // Serialize auto-created inventory records across all receipts in this business.
+            Business::query()->whereKey($businessId)->lockForUpdate()->firstOrFail();
 
             abort_unless(
                 in_array($lockedOrder->status, ['ordered', 'received'], true),
@@ -180,9 +193,20 @@ class PurchaseOrderController extends Controller
                 'Only ordered purchase orders can receive goods.'
             );
 
-            if ($lockedOrder->last_receipt_idempotency_key === $data['idempotency_key']) {
+            if (PurchaseOrderReceipt::query()
+                ->where('business_id', $businessId)
+                ->where('purchase_order_id', $lockedOrder->id)
+                ->where('idempotency_key', $data['idempotency_key'])
+                ->exists()
+            ) {
                 return;
             }
+
+            PurchaseOrderReceipt::create([
+                'business_id' => $businessId,
+                'purchase_order_id' => $lockedOrder->id,
+                'idempotency_key' => $data['idempotency_key'],
+            ]);
 
             $lockedOrder->load('items');
 

@@ -30,4 +30,5 @@ class PurchaseOrder extends Model
     public function business(): BelongsTo { return $this->belongsTo(Business::class); }
     public function supplier(): BelongsTo { return $this->belongsTo(Supplier::class); }
     public function items(): HasMany { return $this->hasMany(PurchaseOrderItem::class); }
+    public function receipts(): HasMany { return $this->hasMany(PurchaseOrderReceipt::class); }
 }
