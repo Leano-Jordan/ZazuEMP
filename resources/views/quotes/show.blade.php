@@ -123,6 +123,12 @@
             </section>
 
             <section class="zazu-panel">
+                <div class="zazu-eyebrow">Deposit</div>
+                <div class="zazu-panel-title mt-1">{{ number_format((float) ($version?->deposit_percent ?? 0), 2) }}% upfront</div>
+                <div class="zazu-panel-copy">Required deposit: {{ $quote->currency }} {{ $version?->deposit_amount ?? '0.00' }}</div>
+            </section>
+
+            <section class="zazu-panel">
                 <div class="zazu-eyebrow">Revision history</div>
                 <div class="zazu-panel-title mt-1">Versions</div>
                 <div class="zazu-panel-copy">Each revision remains a separate commercial snapshot.</div>
