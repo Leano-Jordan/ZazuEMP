@@ -3105,3 +3105,93 @@ html[data-theme="dark"] body {
     background: var(--zazu-surface);
     border-color: var(--zazu-border);
 }
+
+
+/* QUOTES — CYCLE 1: commercial workflow + mobile composition */
+.zazu-quote-register-row {
+    min-width: 0;
+}
+.zazu-quote-register-row > * {
+    min-width: 0;
+}
+.zazu-quote-register-row .zazu-list-title,
+.zazu-quote-register-row .zazu-chip {
+    overflow-wrap: anywhere;
+}
+.zazu-quote-line-editor .zazu-list-item {
+    gap: 18px;
+}
+.zazu-quote-line-editor .zazu-list-main {
+    min-width: 0;
+}
+.zazu-quote-line-editor .zazu-list-main + label {
+    flex: 0 0 170px;
+}
+.zazu-quote-status-stack {
+    align-items: flex-end;
+}
+.zazu-detail-stack {
+    min-width: 0;
+}
+@media (max-width: 900px) {
+    .zazu-quote-line-editor .zazu-list-item {
+        display: grid;
+        grid-template-columns: minmax(0,1fr) minmax(130px,170px);
+        align-items: end;
+    }
+    .zazu-quote-line-editor .zazu-list-main {
+        grid-column: 1 / 2;
+    }
+    .zazu-quote-line-editor .zazu-list-main + label {
+        grid-column: 2 / 3;
+        width: 100%;
+    }
+    .zazu-quote-savebar {
+        position: sticky;
+        bottom: 8px;
+    }
+}
+@media (max-width: 680px) {
+    .zazu-quote-register-row {
+        display: grid;
+        grid-template-columns: 1fr auto;
+        gap: 10px;
+        padding: 14px;
+    }
+    .zazu-quote-register-row .zazu-list-main {
+        grid-column: 1 / -1;
+    }
+    .zazu-quote-register-row > div:nth-child(2),
+    .zazu-quote-register-row > div:nth-child(3),
+    .zazu-quote-register-row > div:nth-child(4) {
+        align-self: center;
+    }
+    .zazu-quote-status-stack {
+        align-items: flex-start;
+    }
+    .zazu-quote-line-editor .zazu-list-item {
+        grid-template-columns: 1fr;
+        gap: 12px;
+    }
+    .zazu-quote-line-editor .zazu-list-main,
+    .zazu-quote-line-editor .zazu-list-main + label {
+        grid-column: 1;
+    }
+    .zazu-quote-line-editor .zazu-list-main + label {
+        width: 100%;
+        flex-basis: auto;
+    }
+    .zazu-quote-savebar {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 8px;
+    }
+    .zazu-quote-savebar .zazu-btn {
+        width: 100%;
+    }
+}
+@media (max-width: 460px) {
+    .zazu-quote-savebar {
+        grid-template-columns: 1fr;
+    }
+}
