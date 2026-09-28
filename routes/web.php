@@ -25,7 +25,49 @@ use App\Http\Controllers\TravelCostController;
 use App\Http\Controllers\WorkController;
 use Illuminate\Support\Facades\Route;
 
-Route::view('/', 'landing')->name('landing');
+Route::get('/', function (\Illuminate\Http\Request $request) {
+    $telemetry = [
+        'all_work' => 1,
+        'today' => 0,
+        'next_7_days' => 1,
+        'in_progress' => 0,
+        'drafts' => 1,
+        'record_name' => 'Workspace preview',
+        'record_meta' => 'Live operational preview',
+        'status' => 'PREVIEW',
+        'date' => '30 Sep 2026',
+        'event_type' => 'Event operations',
+        'reference' => 'ZAZU-PREVIEW',
+        'reference_meta' => 'Sign in for live workspace data',
+    ];
+
+    if ($request->user()) {
+        $business = app(\App\Support\CurrentBusiness::class)->model($request->user());
+        $today = now()->startOfDay();
+        $active = \App\Models\Event::query()
+            ->where('business_id', $business->id)
+            ->whereNotIn('status', \App\Models\Event::TERMINAL_STATUSES);
+
+        $latest = (clone $active)->latest('event_date')->latest()->first();
+
+        $telemetry = [
+            'all_work' => (clone $active)->count(),
+            'today' => (clone $active)->whereDate('event_date', $today)->count(),
+            'next_7_days' => (clone $active)->whereBetween('event_date', [$today, $today->copy()->addDays(6)])->count(),
+            'in_progress' => (clone $active)->where('status', 'in_progress')->count(),
+            'drafts' => (clone $active)->where('status', 'draft')->count(),
+            'record_name' => $latest?->customer_name ?: $business->name,
+            'record_meta' => $latest?->name ?: 'No active work selected',
+            'status' => strtoupper($latest?->status ?: 'READY'),
+            'date' => $latest?->event_date?->format('d M Y') ?: '—',
+            'event_type' => $latest?->event_type ?: 'Workspace',
+            'reference' => $latest?->reference ?: 'NO ACTIVE JOB',
+            'reference_meta' => $latest ? 'Current workspace record' : 'No active work',
+        ];
+    }
+
+    return view('landing', compact('telemetry'));
+})->name('landing');
 
 Route::middleware('signed')->group(function () {
     Route::get('/quotes/{quote}/view', [QuoteController::class, 'publicShow'])->name('quotes.public');
