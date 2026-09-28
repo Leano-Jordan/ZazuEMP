@@ -52,6 +52,7 @@ class DashboardController extends Controller
             'quotes' => $permissionService->allows('quotes.view', $request->user(), $business),
             'finance' => $permissionService->allows('finance.view', $request->user(), $business),
             'purchasing' => $permissionService->allows('purchasing.view', $request->user(), $business),
+            'suppliers' => $permissionService->allows('suppliers.view', $request->user(), $business),
             'inventory' => $permissionService->allows('inventory.view', $request->user(), $business),
             'assets' => $permissionService->allows('assets.view', $request->user(), $business),
             'reports' => $permissionService->allows('reports.view', $request->user(), $business),
