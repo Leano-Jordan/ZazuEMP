@@ -5,6 +5,7 @@ namespace App\Console\Commands;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\File;
+use Illuminate\Support\Str;
 use Symfony\Component\Process\Process;
 use ZipArchive;
 
@@ -31,7 +32,7 @@ class ZazuRestoreCommand extends Command
             return self::SUCCESS;
         }
 
-        $work = storage_path('app/.zazu-restore-'.now()->format('Ymd_His'));
+        $work = storage_path('app/.zazu-restore-'.now()->format('Ymd_His').'_'.Str::lower((string) Str::ulid()));
         File::ensureDirectoryExists($work);
 
         try {
@@ -81,6 +82,10 @@ class ZazuRestoreCommand extends Command
             }
 
             $driver = config('database.default');
+            if (($manifest['database_driver'] ?? null) !== $driver) {
+                $this->error('The backup database driver does not match the current Zazu database configuration.');
+                return self::FAILURE;
+            }
 
             if ($driver === 'sqlite') {
                 $source = $work.'/database.sqlite';
