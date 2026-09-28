@@ -17,15 +17,38 @@ class BusinessCapabilityController extends Controller
     {
         $business = $this->business($request);
 
-        $capabilities = BusinessCapability::query()
+        $base = BusinessCapability::query()
             ->where('business_id', $business->id)
             ->when($request->filled('category'), fn ($query) => $query->where('category', $request->string('category')))
-            ->when($request->filled('search'), fn ($query) => $query->where('name', 'like', '%' . $request->string('search') . '%'))
+            ->when($request->filled('search'), fn ($query) => $query->where('name', 'like', '%' . $request->string('search') . '%'));
+
+        $capabilities = (clone $base)
             ->orderByDesc('is_active')
             ->orderBy('category')
             ->orderBy('name')
             ->paginate(20)
             ->withQueryString();
+
+        $equipment = (clone $base)
+            ->where('capability_type', 'rental')
+            ->withCount('assets')
+            ->orderByDesc('is_active')
+            ->orderBy('category')
+            ->orderBy('name')
+            ->get();
+
+        $catering = (clone $base)
+            ->whereIn('capability_type', ['package', 'service'])
+            ->where(function ($query) {
+                $query->where('category', 'like', '%Cater%')
+                    ->orWhere('category', 'like', '%Food%')
+                    ->orWhere('category', 'like', '%Hospitality%')
+                    ->orWhere('pricing_basis', 'per_person');
+            })
+            ->orderByDesc('is_active')
+            ->orderBy('category')
+            ->orderBy('name')
+            ->get();
 
         $categories = BusinessCapability::query()
             ->where('business_id', $business->id)
@@ -37,7 +60,7 @@ class BusinessCapabilityController extends Controller
 
         $isOwner = app(CurrentBusiness::class)->hasRole('owner', $request->user(), $business);
 
-        return view('capabilities.index', compact('capabilities', 'categories', 'isOwner'));
+        return view('capabilities.index', compact('capabilities', 'categories', 'isOwner', 'equipment', 'catering'));
     }
 
     public function create(Request $request): View
