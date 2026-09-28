@@ -108,9 +108,17 @@ Do not assume a successful write means a valid implementation.
 - If the evidence cannot establish a safe fix, mark **BLOCKED** rather than guessing.
 - Do not create work merely to keep the engine busy.
 
-## 8. EXECUTION-FIRST
+## 8. EXECUTION-FIRST / CONTINUOUS MODE
 
 When the owner says **execute**, execute when the requested action is safely actionable.
+
+When the owner gives a broad engineering directive such as hardening, audit-and-fix, commercial-readiness work or architectural improvement, treat it as a **mission**, not a single conversational turn. Continue through bounded cycles automatically until:
+- the mission is materially advanced;
+- the next safe target is blocked;
+- a required owner decision is reached; or
+- the defined release/readiness scope is closed.
+
+Do not stop after one small patch merely to ask the owner to repeat the same instruction.
 
 Do not replace execution with:
 - a plan instead of the work;
