@@ -6,13 +6,14 @@ use App\Models\Business;
 use App\Models\BusinessCapability;
 use App\Support\Audit;
 use App\Support\CurrentBusiness;
+use App\Support\ExperienceLevel;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
 
 class OnboardingController extends Controller
 {
-    public function index(Request $request): View
+    public function index(Request $request, ExperienceLevel $levels): View
     {
         $business = $this->currentBusiness($request);
         $business->loadMissing('taxProfile');
@@ -30,12 +31,16 @@ class OnboardingController extends Controller
         );
 
         $taxStatus = $business->taxProfile ? 'in_progress' : 'not_started';
+        $experienceLevel = $levels->selected($request->user(), $business);
+        $experienceStatus = $experienceLevel ? 'completed' : 'not_started';
 
         return view('onboarding.index', compact(
             'business',
             'catalogueStatus',
             'businessStatus',
-            'taxStatus'
+            'taxStatus',
+            'experienceLevel',
+            'experienceStatus'
         ));
     }
 
@@ -44,7 +49,7 @@ class OnboardingController extends Controller
         $business = $this->currentBusiness($request);
 
         if ($business->catalogue_setup_completed_at) {
-            return redirect()->route('onboarding.business');
+            return redirect()->route('onboarding.experience');
         }
 
         return view('onboarding.catalogue', [
@@ -101,8 +106,8 @@ class OnboardingController extends Controller
         ]);
 
         return redirect()
-            ->route('onboarding.business')
-            ->with('success', 'Services saved. Now complete your business identity.');
+            ->route('onboarding.experience')
+            ->with('success', 'Services saved. Choose how much of Zazu you want surfaced, then continue setup.');
     }
 
     public function finishCatalogue(Request $request): RedirectResponse
@@ -116,8 +121,8 @@ class OnboardingController extends Controller
         Audit::record('onboarding.catalogue.completed', $business, ['capability_count' => $business->capabilities()->count()], $business->id);
 
         return redirect()
-            ->route('onboarding.business')
-            ->with('success', 'Services setup saved. Continue with your business identity.');
+            ->route('onboarding.experience')
+            ->with('success', 'Services setup saved. Choose your workspace experience level.');
     }
 
     public function skipCatalogue(Request $request): RedirectResponse
@@ -129,13 +134,52 @@ class OnboardingController extends Controller
         ]);
 
         return redirect()
-            ->route('onboarding.business')
+            ->route('onboarding.experience')
             ->with('info', 'Services setup was deferred. You can resume it from Setup Centre or Services & prices.');
     }
 
-    public function business(Request $request): View|RedirectResponse
+    public function experience(Request $request, ExperienceLevel $levels): View|RedirectResponse
     {
         $business = $this->currentBusiness($request);
+
+        if ($levels->selected($request->user(), $business)) {
+            return redirect()->route('onboarding.business');
+        }
+
+        return view('onboarding.experience', [
+            'business' => $business,
+            'options' => $levels->options(),
+        ]);
+    }
+
+    public function storeExperience(Request $request, ExperienceLevel $levels): RedirectResponse
+    {
+        $business = $this->currentBusiness($request);
+        $validated = $request->validate([
+            'experience_level' => ['required', 'in:basic,intermediate,advanced'],
+        ]);
+
+        $levels->selected($request->user(), $business);
+        $request->user()->businesses()->updateExistingPivot($business->id, [
+            'experience_level' => $validated['experience_level'],
+        ]);
+
+        Audit::record('onboarding.experience_level_selected', $business, [
+            'experience_level' => $validated['experience_level'],
+        ], $business->id);
+
+        return redirect()
+            ->route('onboarding.business')
+            ->with('success', 'Experience level saved. Now add your business details.');
+    }
+
+    public function business(Request $request, ExperienceLevel $levels): View|RedirectResponse
+    {
+        $business = $this->currentBusiness($request);
+
+        if (!$levels->selected($request->user(), $business)) {
+            return redirect()->route('onboarding.experience');
+        }
 
         if ($business->business_setup_completed_at) {
             return redirect()->route('dashboard');
