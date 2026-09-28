@@ -417,25 +417,56 @@ if (document.readyState === 'loading') {
 
 
 function setupZazuMobileNavigation() {
-    document.querySelectorAll('[data-mobile-nav]').forEach((nav) => {
-        if (nav.dataset.zazuMobileBound === '1') return;
-        const toggle = nav.querySelector('[data-mobile-nav-toggle]');
-        const links = nav.querySelector('[data-mobile-links]') || nav.querySelector('.zazu-mobile-links');
-        if (!toggle || !links) return;
-        nav.dataset.zazuMobileBound = '1';
-        const close = () => {
-            nav.classList.remove('is-open');
-            toggle.setAttribute('aria-expanded', 'false');
-        };
-        toggle.addEventListener('click', () => {
-            const open = nav.classList.toggle('is-open');
-            toggle.setAttribute('aria-expanded', open ? 'true' : 'false');
-        });
-        links.querySelectorAll('a').forEach((link) => link.addEventListener('click', close));
-        document.addEventListener('keydown', (event) => {
-            if (event.key === 'Escape') close();
-        });
+    const sidebar = document.querySelector('[data-mobile-sidebar]');
+    const toggle = document.querySelector('[data-mobile-sidebar-toggle]');
+    const closers = document.querySelectorAll('[data-mobile-sidebar-close]');
+    if (!sidebar || !toggle) return;
+
+    const media = window.matchMedia('(max-width: 820px)');
+    const focusable = () => [...sidebar.querySelectorAll('a,button,input,select,textarea,[tabindex]:not([tabindex="-1"])')]
+        .filter((element) => !element.hidden && !element.disabled && element.offsetParent !== null);
+
+    let returnFocus = null;
+
+    const sync = (open, moveFocus = false) => {
+        const active = open && media.matches;
+        document.body.classList.toggle('zazu-mobile-menu-open', active);
+        toggle.setAttribute('aria-expanded', active ? 'true' : 'false');
+        toggle.setAttribute('aria-label', active ? 'Close navigation' : 'Open navigation');
+        sidebar.toggleAttribute('inert', !active && media.matches);
+
+        if (moveFocus && active) {
+            (sidebar.querySelector('[data-mobile-sidebar-close]') || focusable()[0])?.focus();
+        }
+    };
+
+    const close = (restoreFocus = false) => {
+        sync(false);
+        if (restoreFocus) {
+            (returnFocus || toggle)?.focus();
+        }
+        returnFocus = null;
+    };
+
+    toggle.addEventListener('click', () => {
+        const opening = !document.body.classList.contains('zazu-mobile-menu-open');
+        if (opening) returnFocus = document.activeElement instanceof HTMLElement ? document.activeElement : toggle;
+        sync(opening, opening);
     });
+
+    closers.forEach((button) => button.addEventListener('click', () => close(true)));
+    sidebar.querySelectorAll('a').forEach((link) => link.addEventListener('click', () => close(false)));
+
+    document.addEventListener('keydown', (event) => {
+        if (event.key === 'Escape' && document.body.classList.contains('zazu-mobile-menu-open')) close(true);
+    });
+
+    media.addEventListener?.('change', () => {
+        if (!media.matches) close(false);
+        else sync(false);
+    });
+
+    sync(false);
 }
 
 function setupZazuAuthExperience() {
