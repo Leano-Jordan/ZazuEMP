@@ -108,6 +108,7 @@ class FinanceController extends Controller
 
         $businessId = $business->id;
         $data['idempotency_key'] ??= (string) Str::uuid();
+        $data['type'] ??= 'payment';
 
         $quote = !empty($data['quote_id'])
             ? Quote::query()
@@ -354,7 +355,7 @@ class FinanceController extends Controller
         $data = $request->validate([
             'idempotency_key' => ['nullable', 'uuid'],
             'invoice_id' => ['required', 'integer'],
-            'type' => ['required', 'in:payment,deposit'],
+            'type' => ['nullable', 'in:payment,deposit'],
             'amount' => ['required', 'numeric', 'decimal:0,2', 'gt:0'],
             'method' => ['required', 'in:cash,bank_transfer,card,other'],
             'reference' => ['nullable', 'string', 'max:255'],
