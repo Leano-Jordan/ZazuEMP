@@ -7,6 +7,7 @@ use App\Models\Quote;
 use App\Models\QuoteVersion;
 use App\Models\TaxRate;
 use App\Services\QuoteService;
+use App\Services\EventLifecycleService;
 use App\Support\CurrentBusiness;
 use App\Support\Audit;
 use Illuminate\Database\Eloquent\Builder;
