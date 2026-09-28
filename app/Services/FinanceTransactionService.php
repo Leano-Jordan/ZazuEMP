@@ -108,7 +108,7 @@ class FinanceTransactionService
      *
      * @param array<string, mixed> $data
      */
-    public function recordExpense(int $businessId, string $currency, array $data): FinanceExpense
+    public function recordExpense(int $businessId, string $currency, array $data): bool
     {
         return DB::transaction(function () use ($businessId, $currency, $data): FinanceExpense {
             $this->lockBusiness($businessId);
@@ -119,7 +119,7 @@ class FinanceTransactionService
                 ->first();
 
             if ($existingExpense) {
-                return $existingExpense;
+                return true;
             }
 
             if (!empty($data['supplier_id'])) {
@@ -148,7 +148,7 @@ class FinanceTransactionService
                 'status' => $expense->status,
             ], $businessId);
 
-            return $expense;
+            return false;
         });
     }
 
