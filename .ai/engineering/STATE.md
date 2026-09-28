@@ -92,3 +92,27 @@ After every meaningful cycle:
 - create a dated historical record only when the event is significant.
 
 Last updated: 2026-09-28
+
+
+## Latest completed cycle — 2026-09-28
+
+Target: shared shell/UI refinement + dashboard usefulness + release-position check.
+
+Completed:
+- flattened primary navigation and removed nav icons/arrows;
+- removed repeated "Active workspace" navigation block;
+- strengthened vibrant light-mode blue treatment;
+- expanded sidebar account/avatar surface;
+- extended restrained cross-product motion with reduced-motion handling;
+- added dashboard Priority Now attention surface;
+- corrected the root landing-page regression test;
+- added shared shell regression coverage;
+- recorded current V1 release scorecard in `docs/DIRECTOR_RELEASE_STATUS_2026-09-28.md`.
+
+Verification boundary:
+- repository structure and source were inspected;
+- current-HEAD CI status returned no observed status entries/runs at inspection time;
+- local runtime/browser execution remains an environment-dependent verification boundary.
+
+Next target:
+**RELEASE VERIFICATION — runtime + populated data + recovery**
