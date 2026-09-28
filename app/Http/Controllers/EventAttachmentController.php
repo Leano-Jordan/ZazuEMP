@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Business;
 use App\Models\Event;
 use App\Models\EventAttachment;
+use App\Services\EventLifecycleService;
 use App\Support\CurrentBusiness;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -14,12 +15,10 @@ use Throwable;
 
 class EventAttachmentController extends Controller
 {
-    public function store(Request $request, Event $event): RedirectResponse
+    public function store(Request $request, Event $event, EventLifecycleService $lifecycle): RedirectResponse
     {
         $business = $this->business($request);
         abort_unless((int) $event->business_id === (int) $business->id, 404);
-        abort_if($event->isClosed(), 422, 'Closed work cannot receive new attachments.');
-
         $validated = $request->validate([
             'files' => ['required', 'array', 'min:1', 'max:10'],
             'files.*' => [
@@ -34,21 +33,17 @@ class EventAttachmentController extends Controller
         $storedPaths = [];
 
         try {
-            DB::transaction(function () use ($request, $event, $business, $validated, &$storedPaths): void {
-                $lockedEvent = Event::query()
-                    ->where('business_id', $business->id)
-                    ->lockForUpdate()
-                    ->findOrFail($event->id);
-
-                abort_if($lockedEvent->isClosed(), 422, 'Closed work cannot receive new attachments.');
+            DB::transaction(function () use ($request, $event, $business, $validated, $lifecycle, &$storedPaths): void {
+                $lockedEvent = $lifecycle->lock($business->id, $event->id);
+                $lifecycle->assertOperational($lockedEvent);
 
                 foreach ($request->file('files', []) as $file) {
                     $path = $file->store('jobs/' . $event->id . '/attachments', 'private');
                     $storedPaths[] = $path;
 
                     EventAttachment::create([
-                        'event_id' => $event->id,
-                        'business_id' => $business->id,
+                        'event_id' => $lockedEvent->id,
+                        'business_id' => $lockedEvent->business_id,
                         'uploaded_by' => $request->user()->id,
                         'original_name' => $file->getClientOriginalName(),
                         'disk' => 'private',
@@ -87,7 +82,7 @@ class EventAttachmentController extends Controller
         return Storage::disk($attachment->disk)->download($attachment->path, $attachment->original_name);
     }
 
-    public function destroy(Request $request, EventAttachment $attachment): RedirectResponse
+    public function destroy(Request $request, EventAttachment $attachment, EventLifecycleService $lifecycle): RedirectResponse
     {
         $business = $this->business($request);
         abort_unless(
@@ -97,13 +92,15 @@ class EventAttachmentController extends Controller
         );
 
         $event = $attachment->event;
-        abort_if($event?->isClosed(), 422, 'Attachments on closed work cannot be deleted.');
 
-        DB::transaction(function () use ($attachment): void {
+        DB::transaction(function () use ($attachment, $business, $lifecycle): void {
             $lockedAttachment = EventAttachment::query()
-                ->whereKey($attachment->id)
+                ->where('business_id', $business->id)
                 ->lockForUpdate()
-                ->firstOrFail();
+                ->findOrFail($attachment->id);
+
+            $lockedEvent = $lifecycle->lock($business->id, $lockedAttachment->event_id);
+            $lifecycle->assertOperational($lockedEvent);
 
             Storage::disk($lockedAttachment->disk)->delete($lockedAttachment->path);
             $lockedAttachment->delete();
