@@ -283,7 +283,7 @@ function setupBrandingUploads() {
     });
 }
 
-const function setupZazuCatalogue() {
+function setupZazuCatalogue() {
     document.querySelectorAll('[data-zazu-catalogue]').forEach((catalogue) => {
         if (catalogue.dataset.zazuCatalogueBound === '1') return;
         catalogue.dataset.zazuCatalogueBound = '1';
