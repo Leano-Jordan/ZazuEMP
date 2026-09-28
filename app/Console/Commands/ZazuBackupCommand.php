@@ -4,6 +4,7 @@ namespace App\Console\Commands;
 
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\File;
+use Illuminate\Support\Str;
 use Symfony\Component\Process\Process;
 use ZipArchive;
 
@@ -22,7 +23,7 @@ class ZazuBackupCommand extends Command
         $directory = $this->option('output') ?: storage_path('app/zazu-backups');
         File::ensureDirectoryExists($directory);
 
-        $stamp = now()->format('Ymd_His');
+        $stamp = now()->format('Ymd_His').'_'.Str::lower((string) Str::ulid());
         $work = storage_path('app/.zazu-backup-'.$stamp);
         File::ensureDirectoryExists($work);
 
