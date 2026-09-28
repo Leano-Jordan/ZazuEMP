@@ -122,3 +122,17 @@
   .zazu-header-title-row + .zazu-section-tabs { max-width:100%; }
   .zazu-job-context-grid { grid-template-columns:1fr; }
 }
+
+/* 2026 calm-interface mobile refinement */
+@media (max-width: 820px) {
+    .zazu-section-tabs {
+        border: 0;
+        box-shadow: none;
+    }
+    .zazu-mobile-links {
+        border: 0;
+        background: var(--zazu-surface);
+        border-radius: 8px;
+        box-shadow: 0 8px 24px color-mix(in srgb, var(--zazu-ink) 7%, transparent);
+    }
+}
