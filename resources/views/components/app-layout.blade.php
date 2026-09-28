@@ -3,7 +3,7 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-    <meta name="theme-color" content="#F8FAFC">
+    <meta name="theme-color" content="#E3EBF3">
     @php
         $business = app(\App\Support\CurrentBusiness::class)->resolve(auth()->user());
         $businesses = auth()->user()->businesses()->where('businesses.status', 'active')->orderBy('businesses.name')->get();
@@ -270,7 +270,9 @@
                         @endif
 
                         @isset($headerAction)
-                            {{ $headerAction }}
+                            <div class="zazu-header-slot-actions">
+                                {{ $headerAction }}
+                            </div>
                         @endisset
 
 
