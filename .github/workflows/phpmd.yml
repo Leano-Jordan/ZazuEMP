@@ -44,12 +44,10 @@ jobs:
         with:
           php-version: '8.4'
           coverage: none
-
-      - name: Install project dependencies
-        run: composer install --no-interaction --no-progress --prefer-dist
+          tools: phpmd:2.15.0
 
       - name: Run PHPMD
-        run: vendor/bin/phpmd app,tests sarif codesize --reportfile phpmd-results.sarif
+        run: phpmd app,tests sarif codesize --reportfile phpmd-results.sarif
 
       - name: Upload analysis results to GitHub
         uses: github/codeql-action/upload-sarif@v3
