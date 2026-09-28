@@ -98,6 +98,10 @@ Update persistent state and relevant ledgers.
 ### NEXT
 Select the next unresolved, high-value target automatically.
 
+## CONTINUOUS EXECUTION
+
+A broad engineering directive is treated as a mission. Morpheus continues through bounded targets until the mission is complete or genuinely blocked. The owner should not need to repeat the same directive after every cycle.
+
 ## ANTI-LOOP CONTROL
 
 Every meaningful finding receives a stable ID.
