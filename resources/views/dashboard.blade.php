@@ -12,8 +12,8 @@
     <section class="zazu-dash-hero">
         <div class="zazu-dash-hero-main">
             <div class="zazu-dash-kicker"><span class="zazu-dash-live"></span> ZAZU EMP / OPERATIONAL COMMAND</div>
-            <h2>Everything important, closer to the work.</h2>
-            <p>Use the event record as the centre of operations. Move from schedule to preparation, resources, commercial activity and control without losing context.</p>
+            <h2>{{ $experienceLevel === 'basic' ? 'Keep the next operational action clear.' : 'Everything important, closer to the work.' }}</h2>
+            <p>{{ $experienceLevel === 'basic' ? 'Start with customers, jobs and the commercial work that needs attention. More operational detail can be surfaced later.' : 'Use the event record as the centre of operations. Move from schedule to preparation, resources, commercial activity and control without losing context.' }}</p>
             <div class="zazu-dash-actions">
                 @if($workspaceTools['work'] && app(\App\Support\PermissionService::class)->allows('work.create', auth()->user(), $business))
                     <a href="{{ route('work.create') }}" class="zazu-btn zazu-btn-primary">Create work <span>+</span></a>
@@ -74,6 +74,7 @@
             <div class="zazu-dash-note"><b>i</b><span>Revenue, deposits and balances are not shown here because this dashboard does not own an authoritative finance aggregate.</span></div>
         </section>
 
+        @if($experienceLevel !== 'basic')
         <section class="zazu-dash-resources zazu-dash-surface">
             <header class="zazu-dash-surface-head"><div><span class="zazu-dash-kicker">Resource readiness</span><h3>Equipment &amp; stock</h3><p>Operational resource state remains authoritative in the asset register.</p></div>@if($workspaceTools['assets'])<a href="{{ route('assets.index') }}" class="zazu-text-action">Asset register →</a>@endif</header>
             <div class="zazu-dash-resource-grid">
@@ -82,6 +83,7 @@
                 <div><span class="zazu-resource-dot"></span><strong>Warehouse readiness</strong><small>Tracked in asset status</small></div>
             </div>
         </section>
+        @endif
     </section>
 
     <section class="zazu-dash-commandbar">
