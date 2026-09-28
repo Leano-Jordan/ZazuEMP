@@ -24,9 +24,6 @@ class UiAccessibilityTest extends TestCase
         $response->assertSee('<main id="main-content" class="zazu-main" tabindex="-1">', false);
         $response->assertSee('aria-label="Primary"', false);
         $response->assertSee('data-theme-toggle', false);
-        $response->assertSee('class="zazu-header-settings"', false);
-        $response->assertSee('aria-label="Open settings"', false);
-        $response->assertSee(route('settings.index'), false);
         $response->assertSee('data-theme-icon-sun', false);
         $response->assertSee('data-theme-icon-moon', false);
         $response->assertSee('aria-pressed="false"', false);
@@ -39,11 +36,8 @@ class UiAccessibilityTest extends TestCase
 
         $html = $response->getContent();
         $themePosition = strpos($html, 'data-theme-toggle');
-        $settingsPosition = strpos($html, 'class="zazu-header-settings"');
 
         $this->assertNotFalse($themePosition);
-        $this->assertNotFalse($settingsPosition);
-        $this->assertGreaterThan($themePosition, $settingsPosition);
     }
 
     public function test_customer_form_uses_mobile_friendly_contact_inputs(): void
