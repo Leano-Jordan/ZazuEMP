@@ -4161,6 +4161,16 @@ main {
  * bounded working surfaces without changing the dark theme.
  */
 :root:not([data-theme="dark"]) {
+    --zazu-blue-brand: #2563EB;
+    --zazu-blue-vivid: #3B82F6;
+    --zazu-blue-glow: #60A5FA;
+    --zazu-blue-soft: #E8F1FF;
+    --zazu-canvas-bg: #F4F8FF;
+    --zazu-card-bg: #FFFFFF;
+    --zazu-card-border: #BFD3EC;
+    --zazu-text-ink: #102B52;
+    --zazu-text-body: #274B73;
+    --zazu-text-muted: #4D6B8B;
     --zazu-page: #F4F8FF;
     --zazu-page-deep: #D8E7FF;
     --zazu-sidebar: #EAF3FF;
