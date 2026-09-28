@@ -7,8 +7,8 @@
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
 <body class="zazu-auth-shell">
-    <main class="zazu-auth-frame">
-        <section class="zazu-auth-card" aria-labelledby="register-heading">
+    <main class="zazu-auth-frame zazu-auth-dual zazu-auth-state-register" data-auth-frame>
+        <section class="zazu-auth-card zazu-auth-form-panel" aria-labelledby="register-heading">
             <div class="zazu-auth-brand">
                 <div class="zazu-auth-mark">Z</div>
                 <div>
@@ -74,14 +74,12 @@
 
             <div class="zazu-auth-switch">
                 Already have an account?
-                <a href="{{ route('login') }}">Sign in</a>
+                <a href="{{ route('login') }}" data-auth-switch>Sign in</a>
             </div>
-
-            <a href="{{ route('owner.login') }}" class="zazu-owner-door-link">Owner / Administrator sign in</a>
         </section>
 
-        <aside class="zazu-auth-visual" aria-hidden="true">
-            <div class="zazu-auth-visual-inner"></div>
+        <aside class="zazu-auth-visual zazu-auth-switch-panel" aria-label="Workspace account options">
+            <div class="zazu-auth-visual-inner"><span class="zazu-auth-visual-label">Already have a workspace?</span><strong class="zazu-auth-switch-title">Return to your Zazu workspace.</strong><p class="zazu-auth-visual-copy">Sign in with your existing account and continue where you left off.</p><a href="{{ route('login') }}" data-auth-switch class="zazu-btn zazu-btn-secondary zazu-auth-switch-button">Sign in</a></div>
         </aside>
     </main>
 
