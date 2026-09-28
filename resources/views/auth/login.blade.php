@@ -8,8 +8,8 @@
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
 <body class="zazu-auth-shell zazu-login-page">
-    <main class="zazu-auth-frame zazu-login-frame zazu-login-frame-single">
-        <section class="zazu-auth-card zazu-login-panel" aria-labelledby="login-heading">
+    <main class="zazu-auth-frame zazu-auth-dual zazu-auth-state-login" data-auth-frame>
+        <section class="zazu-auth-card zazu-auth-form-panel" aria-labelledby="login-heading">
             <div class="zazu-auth-brand zazu-login-brand">
                 <div class="zazu-auth-mark zazu-login-mark" aria-hidden="true">Z</div>
                 <div>
@@ -95,11 +95,6 @@
                 </button>
             </form>
 
-            <div class="zazu-auth-switch zazu-login-switch">
-                Need a workspace?
-                <a href="{{ route('register') }}">Create one</a>
-            </div>
-
             @if(!$ownerAccess)
                 <a href="{{ route('owner.login') }}" class="zazu-owner-door-link">Owner / Administrator sign in</a>
             @else
@@ -110,6 +105,14 @@
             @endif
         </section>
 
+        <aside class="zazu-auth-visual zazu-auth-switch-panel" aria-label="Workspace account options">
+            <div class="zazu-auth-visual-inner">
+                <span class="zazu-auth-visual-label">New to Zazu?</span>
+                <strong class="zazu-auth-switch-title">Create a workspace built around your events.</strong>
+                <p class="zazu-auth-visual-copy">Set up your business, services and daily operations in one place.</p>
+                <a href="{{ route('register') }}" data-auth-switch class="zazu-btn zazu-btn-secondary zazu-auth-switch-button">Create workspace</a>
+            </div>
+        </aside>
     </main>
 
     <script>
