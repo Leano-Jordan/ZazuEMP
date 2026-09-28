@@ -263,9 +263,23 @@ class WorkController extends Controller
     public function destroy(Request $request, Event $event): RedirectResponse
     {
         $business = $this->business($request);
-        $this->ensureBusiness($event, $business);
 
-        $event->delete();
+        DB::transaction(function () use ($event, $business): void {
+            $lockedEvent = Event::query()
+                ->where('business_id', $business->id)
+                ->lockForUpdate()
+                ->findOrFail($event->id);
+
+            abort_if($lockedEvent->isClosed(), 422, 'Closed work cannot be deleted.');
+
+            abort_if(
+                $lockedEvent->hasHistoricalRecords(),
+                422,
+                'This job cannot be deleted because it already has historical records. Keep it for audit and operational history.'
+            );
+
+            $lockedEvent->delete();
+        });
 
         return redirect()
             ->route('work.index')
@@ -303,17 +317,6 @@ class WorkController extends Controller
             ->value('customer_id');
 
         abort_unless($valid, 422, 'The selected contact does not belong to the selected customer.');
-    }
-
-    private function validateStatusTransition(string $current, string $next): void
-    {
-        $event = new Event(['status' => $current]);
-
-        abort_unless(
-            $event->canTransitionTo($next),
-            422,
-            'That status change is not allowed for this work record.'
-        );
     }
 
     private function rules(): array
