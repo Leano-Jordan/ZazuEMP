@@ -284,6 +284,7 @@ function setupBrandingUploads() {
 }
 
 const initializeZazuUi = () => {
+    setupZazuAuthExperience();
     setupZazuThemeToggle();
     setupZazuUserMenus();
     setupZazuToasts();
@@ -298,4 +299,49 @@ if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', initializeZazuUi, { once: true });
 } else {
     initializeZazuUi();
+}
+
+function setupZazuAuthExperience() {
+    document.querySelectorAll('[data-password-toggle]').forEach((toggle) => {
+        if (toggle.dataset.zazuPasswordBound === '1') return;
+        const id = toggle.dataset.passwordToggle || toggle.getAttribute('aria-controls');
+        const password = id ? document.getElementById(id) : null;
+        if (!password) return;
+        toggle.dataset.zazuPasswordBound = '1';
+        toggle.addEventListener('click', () => {
+            const showing = password.type === 'text';
+            password.type = showing ? 'password' : 'text';
+            toggle.textContent = showing ? 'Show' : 'Hide';
+            toggle.setAttribute('aria-label', showing ? 'Show password' : 'Hide password');
+        });
+    });
+    document.querySelectorAll('[data-auth-switch]').forEach((link) => {
+        if (link.dataset.zazuAuthBound === '1') return;
+        link.dataset.zazuAuthBound = '1';
+        link.addEventListener('click', async (event) => {
+            if (event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return;
+            event.preventDefault();
+            const frame = document.querySelector('[data-auth-frame]');
+            if (!frame) { window.location.href = link.href; return; }
+            try {
+                const response = await fetch(link.href, { headers: { 'X-Requested-With': 'XMLHttpRequest', 'Accept': 'text/html' } });
+                if (!response.ok) throw new Error('Auth navigation failed');
+                const html = await response.text();
+                const doc = new DOMParser().parseFromString(html, 'text/html');
+                const next = doc.querySelector('[data-auth-frame]');
+                if (!next) throw new Error('Auth surface missing');
+                frame.classList.add('zazu-auth-switching');
+                window.setTimeout(() => {
+                    frame.replaceWith(next);
+                    history.pushState({}, '', link.href);
+                    document.title = doc.title;
+                    next.classList.add('zazu-auth-switched');
+                    setupZazuAuthExperience();
+                    window.setTimeout(() => next.classList.remove('zazu-auth-switched'), 240);
+                }, 120);
+            } catch {
+                window.location.href = link.href;
+            }
+        });
+    });
 }
