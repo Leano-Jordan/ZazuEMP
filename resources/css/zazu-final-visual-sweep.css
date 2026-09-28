@@ -3235,3 +3235,40 @@ html[data-theme="dark"] body {
 .zazu-stage.current .zazu-stage-title {
     color: var(--zazu-primary-deep);
 }
+
+
+/* QUOTES — CYCLE 3: action accessibility + responsive command shell */
+body[data-zazu-route^="quotes."] .zazu-topbar-actions {
+    flex-wrap: wrap;
+}
+body[data-zazu-route^="quotes."] .zazu-topbar-actions > form {
+    display: inline-flex;
+}
+body[data-zazu-route^="quotes."] .zazu-topbar-actions > form > .zazu-btn {
+    white-space: nowrap;
+}
+body[data-zazu-route^="quotes."] .zazu-topbar-actions .zazu-btn:focus-visible,
+body[data-zazu-route^="quotes."] .zazu-topbar-actions .zazu-command-trigger:focus-visible {
+    outline: 3px solid color-mix(in srgb, var(--zazu-focus) 72%, transparent);
+    outline-offset: 2px;
+}
+@media (max-width: 700px) {
+    body[data-zazu-route^="quotes."] .zazu-topbar-actions {
+        width: 100%;
+        justify-content: flex-end;
+    }
+    body[data-zazu-route^="quotes."] .zazu-topbar-actions .zazu-command-trigger {
+        flex: 1 1 100%;
+        min-width: 0;
+    }
+}
+@media (max-width: 460px) {
+    body[data-zazu-route^="quotes."] .zazu-topbar-actions > form,
+    body[data-zazu-route^="quotes."] .zazu-topbar-actions > a:not(.zazu-command-trigger) {
+        flex: 1 1 calc(50% - 4px);
+    }
+    body[data-zazu-route^="quotes."] .zazu-topbar-actions > form .zazu-btn,
+    body[data-zazu-route^="quotes."] .zazu-topbar-actions > a .zazu-btn {
+        width: 100%;
+    }
+}
