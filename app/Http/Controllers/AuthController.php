@@ -93,7 +93,7 @@ class AuthController extends Controller
 
         $request->session()->regenerate();
 
-        app(CurrentBusiness::class)->resolve($request->user());
+        $business = app(CurrentBusiness::class)->resolve($request->user());
 
         if ($request->boolean('owner_access')) {
             $business = $request->user()->businesses()
@@ -115,6 +115,10 @@ class AuthController extends Controller
             $request->session()->put(CurrentBusiness::SESSION_KEY, $business->id);
 
             return redirect()->route('owner.dashboard');
+        }
+
+        if (!$business) {
+            return redirect()->route('workspace.recovery');
         }
 
         return redirect()->intended(route('dashboard'));
