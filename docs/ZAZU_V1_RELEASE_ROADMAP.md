@@ -278,3 +278,35 @@ Re-audit:
 - **Fix:** Added resources/css/zazu-mobile-refinement.css to the Laravel Vite input list.
 - **Status:** 🟡 IN PROGRESS until the current-head Laravel suite completes.
 - **Required verification:** Vite build, Blade compilation, full Laravel feature suite and browser smoke.
+
+## ZR-03 Workspace access restoration — 2026-09-28
+
+### Finding
+The current access path had a release-blocking Blade compilation failure in `resources/views/landing.blade.php`. CI showed the landing page failed before the registration flow could begin, so browser verification could not reach the application.
+
+A second structural gap was confirmed: an authenticated account with no active `business_user` membership had no legitimate route from the public landing back into workspace setup.
+
+### Fix
+- Replaced nested `@guest/@else/@if` landing conditionals with explicit authenticated-state conditionals so the public entry page compiles deterministically.
+- Added an authenticated workspace-recovery route for accounts with no active workspace.
+- Workspace recovery creates one active business, attaches the signed-in account as owner, stores the selected business in session and resumes the existing catalogue onboarding flow.
+- Login now routes an authenticated account with no active workspace to recovery instead of sending it into the protected dashboard dead-end.
+- Authenticated landing state now exposes **Set up workspace** when no active workspace exists.
+- Added feature coverage for orphan-account recovery and registration → dashboard → logout → login → dashboard round-trip.
+- Corrected the browser tablet project to use Chromium emulation rather than the iPad WebKit device profile.
+
+### Evidence
+- Pre-fix Laravel run `36485085109` failed on the landing Blade syntax error plus unrelated existing feature failures.
+- Pre-fix browser run `36485085175` failed immediately at the public landing assertion; tablet also attempted to launch missing WebKit.
+- Application fixes are now on `main` through HEAD `8fc24ff9c5497928266d8a3cff32418674b68cab`.
+- Current-head CI verification is pending; no green runtime claim is made yet.
+
+### Release status
+- **CORE-02 Authentication:** 🟡 IN PROGRESS — access path fixed in source; current-head runtime verification pending.
+- **CORE-03 Onboarding:** 🟡 IN PROGRESS — fresh registration path retained; orphan-account recovery added; current-head browser verification pending.
+- **RC-01 Runtime:** 🟡 IN PROGRESS — prior run exposed a landing compilation blocker; rerun required after fix.
+- **RC-02/03 Browser:** 🟡 IN PROGRESS — desktop/mobile path was blocked at landing; tablet browser definition corrected; rerun required.
+
+### Next action
+Run the current HEAD Laravel and browser workflows. If a failure remains, fix only the verified blocker before further feature/refinement work.
+
