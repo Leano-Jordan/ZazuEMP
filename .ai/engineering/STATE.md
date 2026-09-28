@@ -116,3 +116,20 @@ Verification boundary:
 
 Next target:
 **RELEASE VERIFICATION — runtime + populated data + recovery**
+
+
+## Latest visual review cycle — 2026-09-28
+
+Target: review the previous visual cycle for regressions and refine again.
+
+Findings/corrections:
+- detected that some previous light-theme assertions were global instead of theme-scoped;
+- sealed dark mode with explicit dashboard, section-tab, form, button and status foreground/background pairings;
+- separated sea-glass accent from indigo information status;
+- tightened header search/action spacing and mobile positioning;
+- retained flat navigation and stronger cobalt-iris identity;
+- statically re-checked the final visual layer: no unscoped literal white/pale background + pale foreground pairing remains.
+
+Verification boundary:
+- source-level audit completed;
+- rendered browser/device verification remains required before visual acceptance.
