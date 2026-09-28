@@ -13,7 +13,7 @@ class SearchController extends Controller
     {
         $validated = $request->validate([
             'q' => ['nullable', 'string', 'max:100'],
-            'type' => ['nullable', 'in:customer,event,service,supplier,purchase_order,quote,invoice'],
+            'type' => ['nullable', 'in:customer,event,service,supplier,purchase_order,quote,invoice,cost,asset,inventory,expense'],
             'status' => ['nullable', 'string', 'max:50'],
             'from' => ['nullable', 'date_format:Y-m-d'],
             'to' => ['nullable', 'date_format:Y-m-d', 'after_or_equal:from'],
