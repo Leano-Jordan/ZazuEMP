@@ -5,6 +5,7 @@ namespace Tests\Feature;
 use App\Models\Customer;
 use App\Models\CustomerContact;
 use App\Models\Event;
+use App\Models\EventCost;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
@@ -165,6 +166,39 @@ class WorkWorkflowTest extends TestCase
         $response->assertSessionHasErrors('customer_id');
 
         $this->assertSame($customer->id, $event->fresh()->customer_id);
+    }
+
+    public function test_work_cannot_be_cancelled_while_a_planned_cost_remains(): void
+    {
+        $customer = Customer::create(['name' => 'Planned Cost Customer']);
+        $event = Event::create([
+            'customer_id' => $customer->id,
+            'reference' => 'ZAZU-CANCEL-COST-001',
+            'name' => 'Planned Cost Work',
+            'event_date' => '2026-10-23',
+            'status' => 'draft',
+        ]);
+
+        EventCost::create([
+            'business_id' => $event->business_id,
+            'event_id' => $event->id,
+            'category' => 'Supplier',
+            'description' => 'Planned supplier cost',
+            'currency' => 'ZAR',
+            'projected_amount' => '500.00',
+            'status' => 'planned',
+        ]);
+
+        $response = $this->put(route('work.update', $event), [
+            'customer_id' => $customer->id,
+            'name' => $event->name,
+            'event_type' => 'Catering order',
+            'event_date' => $event->event_date?->toDateString(),
+            'status' => 'cancelled',
+        ]);
+
+        $response->assertStatus(422);
+        $this->assertSame('draft', $event->fresh()->status);
     }
 
     public function test_work_can_be_removed_without_destroying_the_record(): void
