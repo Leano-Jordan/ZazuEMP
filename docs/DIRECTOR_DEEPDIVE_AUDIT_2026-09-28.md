@@ -395,3 +395,54 @@ No speculative enterprise workflow engine was added.
 No Planned event state was invented without a business reason.
 
 The remaining work is predominantly verification, targeted correction and release assurance.
+
+## Director visual hierarchy correction — 2026-09-28
+
+### Light mode
+
+The previous visual sweep contained a base zazu-sidebar rule that forced a dark navigation rail even when the application theme was light. The shell has now been corrected so light mode explicitly uses a bright blue/white navigation and header treatment.
+
+Light mode now has:
+- bright near-white page surface
+- blue-tinted navigation rail
+- white active navigation states
+- vibrant blue primary actions
+- readable navy/blue typography
+- stronger but restrained structural borders
+
+Dark mode is scoped separately and remains unchanged by the light-mode correction.
+
+### Structural visibility
+
+The Reports page was reviewed as the internal visibility reference because its sections have clear light borders, explicit panel boundaries and readable internal separation.
+
+That visibility standard is now applied across shared Zazu structural surfaces, including cards, panels, forms, command bands, documents, metrics, route cards, context cards, next-action blocks, dashboard surfaces, calendar/register surfaces and operational rows.
+
+Dashboard-specific surfaces also receive stronger light-mode boundaries so the user can immediately distinguish primary work, metrics, commercial action, resource information and quick access.
+
+This is a structural visibility improvement, not a return to noisy grid-heavy UI.
+
+### Public entry
+
+The public root remains the landing page.
+
+The landing page now provides explicit guest actions for:
+- Register
+- Log in
+
+Logout now returns to the public landing page rather than directly to the login screen.
+
+A feature test locks this behavior.
+
+### Landing imagery
+
+The landing page now uses replaceable image placeholders from free Unsplash-licensed event/catering photography for:
+- the hero workspace preview
+- operations
+- resources
+
+These are deliberately temporary visual assets and can be replaced by the product owner later.
+
+### Research note
+
+The light-theme decision aligns with current interface guidance that treats light and dark themes as separate surface systems rather than simple color inversion. Current SaaS references also emphasize clear navigation, structural hierarchy and restrained use of accents. The Reports-page reference is retained as the Zazu-specific visual authority for operational visibility.
