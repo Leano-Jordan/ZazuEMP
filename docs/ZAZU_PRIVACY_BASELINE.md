@@ -1,3 +1,5 @@
+> **CURRENT-DOC NOTE (2026-09-28):** This document is a privacy engineering baseline. Current implementation status belongs in the engineering state/readiness records.
+
 # Zazu EMP - Privacy and personal-information engineering baseline
 
 **Scope:** customer/contact records, customer profile photos, staff/user profile photos and the future handling of event photography/media.
@@ -33,7 +35,7 @@ This is an engineering consistency issue, not evidence of a privacy breach.
 
 ## Security and commercial engineering implications
 
-Before real customer or staff personal information is processed in production, Zazu still needs:
+Before real customer or staff personal information is processed in production, Zazu still needs production acceptance evidence for:
 
 1. Authentication and session security.
 2. Active business context and server-side business isolation.
