@@ -87,7 +87,7 @@ class QuoteController extends Controller
             'currency' => ['required', Rule::in(array_keys(config('zazu.currencies')))],
             'tax_rate_id' => ['nullable', 'integer'],
             'notes' => ['nullable', 'string'],
-            'deposit_percent' => ['required', 'numeric', 'decimal:0,2', 'min:0', 'max:100'],
+            'deposit_percent' => ['nullable', 'numeric', 'decimal:0,2', 'min:0', 'max:100'],
             'unit_price' => ['required', 'array', 'min:1'],
             'unit_price.*' => ['required', 'numeric', 'decimal:0,2', 'min:0'],
         ]);
@@ -114,7 +114,7 @@ class QuoteController extends Controller
             strtoupper($validated['currency']),
             $taxRate,
             $validated['notes'] ?? null,
-            (string) $validated['deposit_percent']
+            (string) ($validated['deposit_percent'] ?? '0.00')
         );
 
         return redirect()
