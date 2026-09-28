@@ -3429,3 +3429,41 @@ body[data-zazu-route^="quotes."] .zazu-topbar-actions .zazu-command-trigger:focu
         width: 100%;
     }
 }
+
+
+/* RESOURCE PAGES — CYCLE 2: surface contrast + semantic color balance */
+.zazu-finance-directory .zazu-metric-card,
+.zazu-assets-directory,
+.zazu-inventory-directory,
+.zazu-calendar-page {
+    background: var(--zazu-page);
+}
+.zazu-finance-directory .zazu-metric-card,
+.zazu-assets-directory .zazu-list-item,
+.zazu-inventory-directory .zazu-list-item,
+.zazu-calendar-page .zazu-calendar-agenda-day {
+    background: var(--zazu-surface);
+}
+.zazu-assets-directory .zazu-list-item:nth-of-type(even),
+.zazu-inventory-directory .zazu-list-item:nth-of-type(even) {
+    background: color-mix(in srgb, var(--zazu-surface-2) 40%, var(--zazu-surface));
+}
+.zazu-assets-directory .zazu-list-item:hover,
+.zazu-inventory-directory .zazu-list-item:hover,
+.zazu-finance-directory ~ .zazu-card .zazu-list-item:hover {
+    background: color-mix(in srgb, var(--zazu-primary-soft) 70%, var(--zazu-surface));
+}
+.zazu-finance-directory .zazu-finance-symbol {
+    background: var(--zazu-primary-soft);
+    border-color: color-mix(in srgb, var(--zazu-primary) 30%, var(--zazu-border));
+    color: var(--zazu-primary-deep);
+}
+.zazu-calendar-page .zazu-calendar-agenda-day {
+    border-color: var(--zazu-border);
+}
+.zazu-calendar-page .zazu-calendar-agenda-event {
+    background: var(--zazu-surface-2);
+}
+.zazu-calendar-page .zazu-calendar-agenda-event:hover {
+    background: var(--zazu-primary-soft);
+}
