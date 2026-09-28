@@ -3722,3 +3722,62 @@ textarea:focus {
         box-shadow: 0 2px 6px rgba(15,23,42,.06);
     }
 }
+
+
+/* VISUAL DEPTH PASS — stop the workspace reading as one white canvas */
+body {
+    background:
+        linear-gradient(rgba(241,245,249,.93), rgba(241,245,249,.93)),
+        url('../../images/Background-ZAZU.jpg') center top / cover fixed no-repeat;
+}
+.zazu-main,
+main {
+    background: transparent;
+}
+.zazu-card,
+.zazu-panel,
+.zazu-list,
+.zazu-editor,
+.zazu-calendar-shell,
+.zazu-catalogue-register {
+    background: var(--zazu-surface);
+}
+.zazu-command-band {
+    background:
+        linear-gradient(135deg, #E2E8F0 0%, #F8FAFC 52%, #E0ECFF 100%);
+}
+.zazu-card-header,
+.zazu-panel-head,
+.zazu-form-section-head {
+    background: #F1F5F9;
+}
+.zazu-metric-card {
+    background: linear-gradient(180deg, #FFFFFF 0%, #F8FAFC 100%);
+}
+.zazu-list-item:hover,
+.zazu-route-card:hover,
+.zazu-context-card:hover {
+    border-color: #64748B;
+}
+.zazu-btn-primary {
+    border-color: #1E3A8A;
+    box-shadow: 0 2px 5px rgba(30,64,175,.18);
+}
+.zazu-chip,
+.zazu-status,
+.zazu-rate-badge,
+.zazu-dietary-tag {
+    border-width: 1px;
+}
+@media (prefers-reduced-transparency: reduce) {
+    body {
+        background: var(--zazu-page);
+    }
+}
+@media (max-width: 700px) {
+    body {
+        background:
+            linear-gradient(rgba(241,245,249,.96), rgba(241,245,249,.96)),
+            url('../../images/Background-ZAZU.jpg') center top / auto 520px no-repeat;
+    }
+}
