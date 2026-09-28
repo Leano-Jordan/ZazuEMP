@@ -8,6 +8,7 @@ use App\Models\CustomerContact;
 use App\Models\Event;
 use App\Models\EventPreparationItem;
 use App\Models\EventRequirement;
+use App\Support\Audit;
 use App\Support\CurrentBusiness;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -193,8 +194,6 @@ class WorkController extends Controller
     public function update(Request $request, Event $event): RedirectResponse
     {
         $business = $this->business($request);
-        $this->ensureBusiness($event, $business);
-
         $validated = $request->validate($this->rules() + [
             'status' => ['required', 'in:draft,confirmed,in_progress,completed,cancelled'],
         ]);
@@ -204,18 +203,35 @@ class WorkController extends Controller
             ->with('primaryContact')
             ->findOrFail($validated['customer_id']);
 
-        if ((int) $event->customer_id !== (int) $customer->id && $event->quotes()->exists()) {
-            return redirect()
-                ->route('work.edit', $event)
-                ->with('error', 'The customer cannot be changed after a quote exists for this job. Create a new job for a different customer so the quote history stays correct.');
-        }
-
-        $this->validateStatusTransition($event->status, $validated['status']);
         $this->validateContactBelongsToCustomer($validated['event_day_contact_id'] ?? null, $customer->id);
         $this->validateContactBelongsToCustomer($validated['event_night_contact_id'] ?? null, $customer->id);
 
-        DB::transaction(function () use ($event, $validated, $customer): void {
-            $event->update([
+        DB::transaction(function () use ($event, $validated, $customer, $business): void {
+            $lockedEvent = Event::query()
+                ->where('business_id', $business->id)
+                ->lockForUpdate()
+                ->findOrFail($event->id);
+
+            abort_if($lockedEvent->isClosed() && $validated['status'] !== $lockedEvent->status, 422, 'Closed work cannot change status.');
+
+            if (
+                (int) $lockedEvent->customer_id !== (int) $customer->id
+                && $lockedEvent->quotes()->exists()
+            ) {
+                throw new \RuntimeException(
+                    'The customer cannot be changed after a quote exists for this job.'
+                );
+            }
+
+            abort_unless(
+                $lockedEvent->canTransitionTo($validated['status']),
+                422,
+                'That status change is not allowed for this work record.'
+            );
+
+            $previousStatus = $lockedEvent->status;
+
+            $lockedEvent->update([
                 'customer_id' => $customer->id,
                 'event_day_contact_id' => $validated['event_day_contact_id'] ?? null,
                 'event_night_contact_id' => $validated['event_night_contact_id'] ?? null,
@@ -229,6 +245,13 @@ class WorkController extends Controller
                 'notes' => $validated['notes'] ?? null,
                 'status' => $validated['status'],
             ]);
+
+            if ($previousStatus !== $lockedEvent->status) {
+                Audit::record('work.status_changed', $lockedEvent, [
+                    'from' => $previousStatus,
+                    'to' => $lockedEvent->status,
+                ], $business->id);
+            }
         });
 
         return redirect()
