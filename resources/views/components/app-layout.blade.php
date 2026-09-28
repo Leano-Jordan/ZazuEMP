@@ -27,12 +27,13 @@
             document.documentElement.dataset.theme = theme;
         })();
     </script>
-    @vite(['resources/css/app.css', 'resources/css/zazu-responsive-theme.css', 'resources/css/zazu-final-visual-sweep.css', 'resources/js/app.js'])
+    @vite(['resources/css/app.css', 'resources/css/zazu-responsive-theme.css', 'resources/css/zazu-final-visual-sweep.css', 'resources/css/zazu-mobile-refinement.css', 'resources/js/app.js'])
 </head>
 <body data-zazu-route="{{ request()->route()?->getName() ?? '' }}" class="{{ $business?->wallpaper_path ? 'zazu-has-wallpaper' : '' }}" data-business-currency="{{ $business?->currency ?? 'ZAR' }}" @if($business?->wallpaper_path) style="--zazu-wallpaper: url('{{ e(route('business.media', ['type' => 'wallpaper']).'?v='.$brandingVersion) }}')" @endif>
     <a class="zazu-skip-link" href="#main-content">Skip to main content</a>
     <div class="zazu-shell">
-        <aside class="zazu-sidebar">
+        <button type="button" class="zazu-mobile-nav-backdrop" data-mobile-sidebar-close aria-label="Close navigation"></button>
+        <aside class="zazu-sidebar" id="zazu-mobile-sidebar" data-mobile-sidebar>
             <div class="zazu-brand">
                 <a href="{{ route('dashboard') }}" class="zazu-brand-link" aria-label="Zazu EMP dashboard">
                     <span class="zazu-brand-mark" aria-hidden="true">Z</span>
@@ -41,6 +42,9 @@
                         <span>EMP</span>
                     </span>
                 </a>
+                <button type="button" class="zazu-mobile-sidebar-close" data-mobile-sidebar-close aria-label="Close navigation">
+                    <span aria-hidden="true">×</span>
+                </button>
             </div>
 
             <nav class="zazu-nav" aria-label="Primary">
@@ -176,6 +180,9 @@
         <main id="main-content" class="zazu-main" tabindex="-1">
             <header class="zazu-topbar">
                 <div class="zazu-topbar-inner">
+                    <button type="button" class="zazu-mobile-menu-button" data-mobile-sidebar-toggle aria-expanded="false" aria-controls="zazu-mobile-sidebar" aria-label="Open navigation">
+                        <span class="zazu-mobile-menu-icon" aria-hidden="true"><i></i><i></i><i></i></span>
+                    </button>
                     <div class="zazu-header-context">
                         <div class="zazu-header-title-row">
                             <h1 class="zazu-page-title">{{ $heading ?? $title ?? 'Workspace' }}</h1>
@@ -281,44 +288,7 @@
                 </div>
             </header>
 
-            <nav class="zazu-mobile-nav" aria-label="Mobile primary" data-mobile-nav>
-                <button type="button" class="zazu-mobile-toggle" data-mobile-nav-toggle aria-expanded="false" aria-controls="zazu-mobile-links">
-                    <span>Open section navigation</span>
-                    <svg class="zazu-mobile-toggle-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" aria-hidden="true"><path d="m6 9 6 6 6-6"></path></svg>
-                </button>
-                <div class="zazu-mobile-links" id="zazu-mobile-links">
-                    @if(request()->routeIs('work.*','capabilities.*','quotes.*','calendar.*'))
-                        <div class="zazu-mobile-group">Operations</div>
-                        @if($can('work.view'))<a href="{{ route('work.index') }}" class="zazu-mobile-link {{ request()->routeIs('work.*') ? 'active' : '' }}">Jobs</a>@endif
-                        @if($can('capabilities.view'))<a href="{{ route('capabilities.index') }}" class="zazu-mobile-link {{ request()->routeIs('capabilities.*') ? 'active' : '' }}">Services & prices</a>@endif
-                        @if($can('quotes.view'))<a href="{{ route('quotes.index') }}" class="zazu-mobile-link {{ request()->routeIs('quotes.*') ? 'active' : '' }}">Quotes</a>@endif
-                        @if($can('calendar.view'))<a href="{{ route('calendar.index') }}" class="zazu-mobile-link {{ request()->routeIs('calendar.*') ? 'active' : '' }}">Calendar</a>@endif
-                    @elseif(request()->routeIs('customers.*'))
-                        <div class="zazu-mobile-group">Customers</div><a href="{{ route('customers.index') }}" class="zazu-mobile-link active">Customers</a>
-                    @elseif(request()->routeIs('finance.*'))
-                        <div class="zazu-mobile-group">Finance</div><a href="{{ route('finance.index') }}" class="zazu-mobile-link active">Finance</a>
-                    @elseif(request()->routeIs('purchasing.*','suppliers.*','inventory.*','assets.*'))
-                        <div class="zazu-mobile-group">Resources</div>
-                        @if($can('purchasing.view'))<a href="{{ route('purchasing.index') }}" class="zazu-mobile-link {{ request()->routeIs('purchasing.*') ? 'active' : '' }}">Purchasing</a>@endif
-                        @if($can('suppliers.view'))<a href="{{ route('suppliers.index') }}" class="zazu-mobile-link {{ request()->routeIs('suppliers.*') ? 'active' : '' }}">Suppliers</a>@endif
-                        @if($can('inventory.view'))<a href="{{ route('inventory.index') }}" class="zazu-mobile-link {{ request()->routeIs('inventory.*') ? 'active' : '' }}">Inventory</a>@endif
-                        @if($can('assets.view'))<a href="{{ route('assets.index') }}" class="zazu-mobile-link {{ request()->routeIs('assets.*') ? 'active' : '' }}">Assets</a>@endif
-                    @elseif(request()->routeIs('reports.*'))
-                        <div class="zazu-mobile-group">Insights</div><a href="{{ route('reports.index') }}" class="zazu-mobile-link active">Reports</a>
-                    @elseif(request()->routeIs('settings.*'))
-                        <div class="zazu-mobile-group">System</div><a href="{{ route('settings.index') }}" class="zazu-mobile-link {{ request()->routeIs('settings.index') ? 'active' : '' }}">Business settings</a>
-                        @if($isOwner)<a href="{{ route('settings.compliance') }}" class="zazu-mobile-link {{ request()->routeIs('settings.compliance*') ? 'active' : '' }}">Compliance</a><a href="{{ route('settings.audit') }}" class="zazu-mobile-link {{ request()->routeIs('settings.audit') ? 'active' : '' }}">Audit</a>@endif
-                    @else
-                        <div class="zazu-mobile-group">Workspace</div>
-                        <a href="{{ route('dashboard') }}" class="zazu-mobile-link {{ request()->routeIs('dashboard') ? 'active' : '' }}">Dashboard</a>
-                        @if($can('customers.view'))<a href="{{ route('customers.index') }}" class="zazu-mobile-link">Customers</a>@endif
-                        @if($can('finance.view'))<a href="{{ route('finance.index') }}" class="zazu-mobile-link">Finance</a>@endif
-                        @if($can('reports.view'))<a href="{{ route('reports.index') }}" class="zazu-mobile-link">Reports</a>@endif
-                    @endif
-                </div>
-            </nav>
-
-            <div class="zazu-content">
+<div class="zazu-content">
                 @if ($errors->any())
                     <div class="zazu-error-summary" role="alert" tabindex="-1" data-error-summary>
                         <div class="zazu-error-summary-title">Please check the highlighted fields.</div>
@@ -356,23 +326,6 @@
 
 <script>
     document.addEventListener('DOMContentLoaded', () => {
-        const mobileNav = document.querySelector('[data-mobile-nav]');
-        const mobileNavToggle = document.querySelector('[data-mobile-nav-toggle]');
-
-        if (mobileNav && mobileNavToggle) {
-            mobileNavToggle.addEventListener('click', () => {
-                const open = mobileNav.classList.toggle('is-open');
-                mobileNavToggle.setAttribute('aria-expanded', open ? 'true' : 'false');
-            });
-
-            mobileNav.querySelectorAll('.zazu-mobile-link').forEach((link) => {
-                link.addEventListener('click', () => {
-                    mobileNav.classList.remove('is-open');
-                    mobileNavToggle.setAttribute('aria-expanded', 'false');
-                });
-            });
-        }
-
         const command = document.querySelector('[data-zazu-command]');
         const commandInput = document.querySelector('[data-zazu-command-input]');
         const commandItems = [...(command?.querySelectorAll('[data-command-item]') || [])];
