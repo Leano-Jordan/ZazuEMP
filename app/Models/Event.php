@@ -8,7 +8,6 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
-/** @SuppressWarnings(PHPMD.TooManyPublicMethods) */
 class Event extends Model
 {
     use BelongsToBusiness, SoftDeletes;
@@ -31,6 +30,16 @@ class Event extends Model
     public function canTransitionTo(string $status): bool
     {
         return in_array($status, self::STATUS_TRANSITIONS[$this->status] ?? [], true);
+    }
+
+    public function hasHistoricalRecords(): bool
+    {
+        return $this->requirements()->exists()
+            || $this->quotes()->exists()
+            || $this->travelCosts()->exists()
+            || $this->costs()->exists()
+            || $this->attachments()->exists()
+            || $this->preparationItems()->exists();
     }
 
     protected $fillable = [
