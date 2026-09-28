@@ -102,6 +102,16 @@ final class EventLifecycleService
             );
 
             abort_if(
+                EventCost::query()
+                    ->where('business_id', $event->business_id)
+                    ->where('event_id', $event->id)
+                    ->where('status', 'planned')
+                    ->exists(),
+                422,
+                'Work cannot be cancelled while a linked cost is still planned. Mark it incurred or cancelled first.'
+            );
+
+            abort_if(
                 PurchaseOrder::query()
                     ->where('business_id', $event->business_id)
                     ->where('event_id', $event->id)
