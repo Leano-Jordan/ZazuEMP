@@ -25,6 +25,10 @@ class QuoteService
         string $depositPercent = '0.00'
     ): Quote {
         return DB::transaction(function () use ($event, $requirements, $unitPrices, $currency, $taxRate, $notes, $depositPercent): Quote {
+            $lockedEvent = Event::query()->whereKey($event->id)->lockForUpdate()->firstOrFail();
+            if ($lockedEvent->isClosed()) {
+                throw ValidationException::withMessages(['event' => 'Closed work cannot receive new quotes.']);
+            }
             $currency = strtoupper($currency);
 
             $quote = $event->quotes()->create([
