@@ -61,7 +61,7 @@ class OnboardingTest extends TestCase
             'description' => 'Wedding and event catering.',
         ]);
 
-        $response->assertRedirect(route('onboarding.business'));
+        $response->assertRedirect(route('onboarding.experience'));
 
         $this->assertDatabaseHas('business_capabilities', [
             'business_id' => $business->id,
@@ -134,7 +134,8 @@ class OnboardingTest extends TestCase
             'currency' => 'ZAR',
         ]);
 
-        $this->signInAsOwner($business);
+        $user = $this->signInAsOwner($business);
+        $user->businesses()->updateExistingPivot($business->id, ['experience_level' => 'intermediate']);
 
         $this->post(route('onboarding.business.skip'))
             ->assertRedirect(route('dashboard'))
