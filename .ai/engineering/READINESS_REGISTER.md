@@ -57,3 +57,26 @@ Future architecture should remain compatible with these possibilities without al
 **Close existing correctness, architecture, integrity, security, reliability and release-evidence gaps before speculative feature expansion.**
 
 Last updated: 2026-09-28
+
+
+## Evidence snapshot — 2026-09-28
+
+Current Director assessment:
+
+| Domain | Evidence maturity | Release condition |
+|---|---:|---|
+| Correctness | 3/5 | Runtime suite still required |
+| Architecture | 4/5 | No major V1 blocker identified |
+| Data Integrity | 3/5 | Populated-data/reconciliation proof required |
+| Security | 4/5 | Final release security review required |
+| Workflow Integrity | 4/5 | Populated end-to-end walkthrough required |
+| UX / Accessibility | 3/5 | Desktop/mobile/tablet/accessibility verification required |
+| Reliability / Recovery | 2/5 | Backup/restore proof required |
+| Operability | 3/5 | Final operational evidence required |
+| Deployment / Upgrade Safety | 2/5 | Existing populated database migration proof required |
+| Documentation / Ownership / Compliance | 4/5 | Release/runbook sign-off remains |
+| Release Evidence | 1/5 | Current-HEAD CI/browser/security evidence required |
+
+The major V1 capability surface is present. Remaining release risk is concentrated in proof, recovery, device QA and defects exposed by those checks.
+
+Current UI cycle does not create a new V1 feature expansion requirement.
