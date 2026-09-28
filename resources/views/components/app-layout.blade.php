@@ -198,11 +198,24 @@
                     </div>
 
                     <div class="zazu-topbar-actions">
-                        <button type="button" class="zazu-command-trigger" data-zazu-command-open aria-haspopup="dialog" aria-controls="zazu-command-palette">
-                            <span class="zazu-command-search-icon" aria-hidden="true">⌕</span>
-                            <span class="zazu-command-placeholder">Search the workspace…</span>
-                            <kbd>⌘K</kbd>
-                        </button>
+                        <div class="zazu-command-search" data-zazu-command-search>
+                            <label class="zazu-command-trigger" for="zazu-command-input">
+                                <span class="zazu-command-search-icon" aria-hidden="true">⌕</span>
+                                <span class="sr-only">Search the workspace</span>
+                                <input
+                                    id="zazu-command-input"
+                                    type="search"
+                                    data-zazu-command-input
+                                    placeholder="Search the workspace…"
+                                    autocomplete="off"
+                                    spellcheck="false"
+                                    role="combobox"
+                                    aria-autocomplete="list"
+                                    aria-controls="zazu-command-palette"
+                                    aria-expanded="false"
+                                >
+                                <kbd>⌘K</kbd>
+                            </label>
 
                         @if($can('work.create'))
                             <a href="{{ route('work.create') }}" class="zazu-btn zazu-btn-primary zazu-header-create"><span aria-hidden="true">+</span> Create work</a>
@@ -265,30 +278,28 @@
             </nav>
 
             <div class="zazu-command-palette" id="zazu-command-palette" data-zazu-command hidden>
-                <div class="zazu-command-backdrop" data-zazu-command-close></div>
-                <div class="zazu-command-dialog" role="dialog" aria-modal="true" aria-labelledby="zazu-command-title">
-                    <div class="zazu-command-head">
-                        <div>
-                            <div class="zazu-eyebrow">Workspace command</div>
-                            <h2 id="zazu-command-title">Jump to a workspace surface</h2>
-                        </div>
-                        <button type="button" class="zazu-command-close" data-zazu-command-close aria-label="Close command search">×</button>
-                    </div>
-                    <label class="zazu-command-input-wrap">
-                        <span aria-hidden="true">⌕</span>
-                        <input type="search" data-zazu-command-input placeholder="Search jobs, services, quotes, customers…" autocomplete="off">
-                    </label>
-                    <div class="zazu-command-results" data-zazu-command-results>
-                        @if($can('work.view'))<a href="{{ route('work.index') }}" data-command-item><span>Jobs</span><small>Event operations</small></a>@endif
-                        @if($can('capabilities.view'))<a href="{{ route('capabilities.index') }}" data-command-item><span>Services & prices</span><small>Capability catalogue</small></a>@endif
-                        @if($can('quotes.view'))<a href="{{ route('quotes.index') }}" data-command-item><span>Quotes</span><small>Commercial documents</small></a>@endif
-                        @if($can('customers.view'))<a href="{{ route('customers.index') }}" data-command-item><span>Customers</span><small>Client records</small></a>@endif
-                        @if($can('calendar.view'))<a href="{{ route('calendar.index') }}" data-command-item><span>Calendar</span><small>Planning</small></a>@endif
-                        @if($can('finance.view'))<a href="{{ route('finance.index') }}" data-command-item><span>Finance</span><small>Ledger and payments</small></a>@endif
-                        @if($can('assets.view'))<a href="{{ route('assets.index') }}" data-command-item><span>Assets</span><small>Equipment register</small></a>@endif
-                        @if($can('reports.view'))<a href="{{ route('reports.index') }}" data-command-item><span>Reports</span><small>Business intelligence</small></a>@endif
-                    </div>
+                <div class="zazu-command-results-head">
+                    <span>Workspace search</span>
+                    <small data-zazu-command-count>All available surfaces</small>
                 </div>
+                <div class="zazu-command-results" data-zazu-command-results role="listbox" aria-label="Workspace search results">
+                    @if($can('work.view'))<a href="{{ route('work.index') }}" data-command-item data-search-terms="jobs work events operations event management schedule run sheet" role="option"><span>Jobs</span><small>Event operations · work register</small></a>@endif
+                    @if($can('capabilities.view'))<a href="{{ route('capabilities.index') }}" data-command-item data-search-terms="services prices catalogue capabilities catering food packages equipment hire rates" role="option"><span>Services & prices</span><small>Capability catalogue · rates and packages</small></a>@endif
+                    @if($can('quotes.view'))<a href="{{ route('quotes.index') }}" data-command-item data-search-terms="quotes quotation quotations commercial documents proposals" role="option"><span>Quotes</span><small>Commercial documents · quote queue</small></a>@endif
+                    @if($can('customers.view'))<a href="{{ route('customers.index') }}" data-command-item data-search-terms="customers clients contacts people organisations companies" role="option"><span>Customers</span><small>Client records · people and organisations</small></a>@endif
+                    @if($can('calendar.view'))<a href="{{ route('calendar.index') }}" data-command-item data-search-terms="calendar schedule planning dates events" role="option"><span>Calendar</span><small>Planning · scheduled work</small></a>@endif
+                    @if($can('finance.view'))<a href="{{ route('finance.index') }}" data-command-item data-search-terms="finance invoices payments expenses ledger money accounting" role="option"><span>Finance</span><small>Ledger · invoices, payments and expenses</small></a>@endif
+                    @if($can('purchasing.view'))<a href="{{ route('purchasing.index') }}" data-command-item data-search-terms="purchasing purchase orders procurement buying suppliers supply" role="option"><span>Purchasing</span><small>Purchase orders · procurement</small></a>@endif
+                    @if($can('suppliers.view'))<a href="{{ route('suppliers.index') }}" data-command-item data-search-terms="suppliers vendors procurement contacts supply" role="option"><span>Suppliers</span><small>Supplier register · procurement contacts</small></a>@endif
+                    @if($can('inventory.view'))<a href="{{ route('inventory.index') }}" data-command-item data-search-terms="inventory stock warehouse quantities items goods" role="option"><span>Inventory</span><small>Stock control · warehouse records</small></a>@endif
+                    @if($can('assets.view'))<a href="{{ route('assets.index') }}" data-command-item data-search-terms="assets equipment hire resources allocation availability register" role="option"><span>Assets</span><small>Equipment register · resource readiness</small></a>@endif
+                    @if($can('reports.view'))<a href="{{ route('reports.index') }}" data-command-item data-search-terms="reports reporting analytics insights business intelligence performance" role="option"><span>Reports</span><small>Insights · business reporting</small></a>@endif
+                    @if($isOwner)<a href="{{ route('settings.index') }}" data-command-item data-search-terms="settings business configuration company profile tax branding system" role="option"><span>Business settings</span><small>Workspace configuration · business identity</small></a>
+                    <a href="{{ route('settings.compliance') }}" data-command-item data-search-terms="compliance tax vat legal documents statutory finance" role="option"><span>Compliance</span><small>Compliance pack · controls and records</small></a>
+                    <a href="{{ route('settings.audit') }}" data-command-item data-search-terms="audit log activity history accountability changes security" role="option"><span>Audit</span><small>Audit trail · system activity</small></a>
+                    <a href="{{ route('onboarding.index') }}" data-command-item data-search-terms="setup onboarding business setup catalogue setup foundation" role="option"><span>Setup centre</span><small>Workspace foundation · business and catalogue setup</small></a>@endif
+                </div>
+                <div class="zazu-command-empty" data-zazu-command-empty hidden>No matching workspace surfaces.</div>
             </div>
             <div class="zazu-content">
                 @if ($errors->any())
@@ -346,43 +357,93 @@
         }
 
         const command = document.querySelector('[data-zazu-command]');
-        const commandInput = command?.querySelector('[data-zazu-command-input]');
+        const commandInput = document.querySelector('[data-zazu-command-input]');
         const commandItems = [...(command?.querySelectorAll('[data-command-item]') || [])];
-        const commandOpeners = document.querySelectorAll('[data-zazu-command-open]');
-        const commandClosers = command?.querySelectorAll('[data-zazu-command-close]') || [];
-        let commandReturnFocus = null;
+        const commandCount = command?.querySelector('[data-zazu-command-count]');
+        const commandEmpty = command?.querySelector('[data-zazu-command-empty]');
+        const commandSearch = document.querySelector('[data-zazu-command-search]');
+        let commandOpen = false;
 
-        const closeCommand = () => {
-            if (!command) return;
-            command.hidden = true;
-            document.body.classList.remove('zazu-command-open');
-            commandReturnFocus?.focus();
+        const setCommandOpen = (open) => {
+            if (!command || !commandInput) return;
+            commandOpen = open;
+            command.hidden = !open;
+            commandInput.setAttribute('aria-expanded', open ? 'true' : 'false');
+            commandSearch?.classList.toggle('is-open', open);
+        };
+
+        const filterCommandItems = () => {
+            if (!command || !commandInput) return;
+            const query = commandInput.value.trim().toLowerCase();
+            let visible = 0;
+
+            commandItems.forEach((item) => {
+                const haystack = (item.dataset.searchTerms || item.textContent || '').toLowerCase();
+                const match = !query || haystack.includes(query);
+                item.hidden = !match;
+                if (match) visible += 1;
+            });
+
+            if (commandCount) {
+                commandCount.textContent = query ? visible + ' matching surface' + (visible === 1 ? '' : 's') : 'All available surfaces';
+            }
+            if (commandEmpty) commandEmpty.hidden = visible !== 0;
         };
 
         const openCommand = () => {
-            if (!command) return;
-            commandReturnFocus = document.activeElement;
-            command.hidden = false;
-            document.body.classList.add('zazu-command-open');
-            window.setTimeout(() => commandInput?.focus(), 0);
+            if (!commandInput) return;
+            setCommandOpen(true);
+            filterCommandItems();
         };
 
-        commandOpeners.forEach((button) => button.addEventListener('click', openCommand));
-        commandClosers.forEach((button) => button.addEventListener('click', closeCommand));
+        const closeCommand = (clear = false) => {
+            if (!commandInput) return;
+            setCommandOpen(false);
+            if (clear) {
+                commandInput.value = '';
+                filterCommandItems();
+            }
+        };
+
+        commandInput?.addEventListener('focus', openCommand);
         commandInput?.addEventListener('input', () => {
-            const query = commandInput.value.trim().toLowerCase();
-            commandItems.forEach((item) => {
-                item.hidden = query !== '' && !item.textContent.toLowerCase().includes(query);
-            });
+            openCommand();
+            filterCommandItems();
+        });
+
+        commandItems.forEach((item) => item.addEventListener('click', () => {
+            window.setTimeout(() => closeCommand(true), 0);
+        }));
+
+        commandInput?.addEventListener('keydown', (event) => {
+            if (event.key === 'ArrowDown') {
+                const first = commandItems.find((item) => !item.hidden);
+                if (first) {
+                    event.preventDefault();
+                    first.focus();
+                }
+            } else if (event.key === 'Escape') {
+                event.preventDefault();
+                closeCommand();
+                commandInput.blur();
+            }
+        });
+
+        document.addEventListener('click', (event) => {
+            if (commandOpen && commandSearch && !commandSearch.contains(event.target) && !command?.contains(event.target)) {
+                closeCommand();
+            }
         });
 
         document.addEventListener('keydown', (event) => {
             if ((event.metaKey || event.ctrlKey) && event.key.toLowerCase() === 'k') {
                 event.preventDefault();
+                commandInput?.focus();
                 openCommand();
             }
-            if (event.key === 'Escape' && command && !command.hidden) closeCommand();
         });
+
+        filterCommandItems();
 
         const serverErrors = @json($errors->toArray());
 
