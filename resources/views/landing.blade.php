@@ -8,13 +8,14 @@
     <title>Zazu EMP · Event Operations Management</title>
     <style>
         :root {
-            --canvas:#F2F7FF; --surface:#FFFFFF; --surface-2:#F7FAFF; --ink:#0F172A;
-            --muted:#64748B; --line:#E2E8F0; --blue:#416AD7; --green:#137333;
-            --amber:#92400E; --red:#991B1B; --blue:#5592FC;
+            --zazu-blue-primary:#416AD7; --zazu-blue-accent:#5592FC; --zazu-blue-hover:#3255B8;
+            --zazu-blue-canvas:#F2F7FF; --zazu-surface-card:#FFFFFF; --zazu-surface-border:#E2E8F0;
+            --zazu-text-main:#0F172A; --zazu-text-muted:#64748B; --zazu-surface-soft:#F7FAFF;
+            --zazu-status-active:#137333; --zazu-status-draft:#92400E; --zazu-status-overdue:#991B1B;
         }
         * { box-sizing:border-box; }
         html { scroll-behavior:smooth; }
-        body { margin:0; background:var(--canvas); color:var(--ink); font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif; }
+        body { margin:0; background:var(--zazu-blue-canvas); color:var(--zazu-text-main); font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif; }
         a { color:inherit; text-decoration:none; }
         button { font:inherit; }
         .mono { font-family:"JetBrains Mono",ui-monospace,SFMono-Regular,Menlo,monospace; }
@@ -24,67 +25,67 @@
             background-size:48px 48px;
         }
         .shell { width:min(1180px,calc(100% - 40px)); margin:auto; }
-        .topbar { height:76px; display:flex; align-items:center; justify-content:space-between; border-bottom:1px solid var(--line); }
+        .topbar { height:76px; display:flex; align-items:center; justify-content:space-between; border-bottom:1px solid var(--zazu-surface-border); }
         .brand { display:flex; align-items:center; gap:12px; font-weight:900; letter-spacing:-.04em; }
-        .mark { width:34px;height:34px;display:grid;place-items:center;background:var(--blue);color:#fff;font-weight:950; }
-        .brand small { display:block;color:var(--muted);font:600 10px/1 "JetBrains Mono",monospace;letter-spacing:.12em;text-transform:uppercase;margin-top:4px; }
+        .mark { width:34px;height:34px;display:grid;place-items:center;background:var(--zazu-blue-primary);color:#fff;font-weight:950; }
+        .brand small { display:block;color:var(--zazu-text-muted);font:600 10px/1 "JetBrains Mono",monospace;letter-spacing:.12em;text-transform:uppercase;margin-top:4px; }
         .top-actions { display:flex;gap:10px;align-items:center; }
-        .btn { min-height:42px;padding:0 17px;border:1px solid var(--line);display:inline-flex;align-items:center;justify-content:center;gap:9px;font-weight:800; }
-        .btn-primary { background:var(--blue);border-color:var(--blue);color:#fff; }
-        .btn-primary:hover { background: #3255B8; }
-        .btn-ghost:hover { border-color:#5A6677;background:var(--surface); }
+        .btn { min-height:42px;padding:0 17px;border:1px solid var(--zazu-surface-border);display:inline-flex;align-items:center;justify-content:center;gap:9px;font-weight:800; }
+        .btn-primary { background:var(--zazu-blue-primary);border-color:var(--zazu-blue-primary);color:#fff; }
+        .btn-primary:hover { background:var(--zazu-blue-hover); }
+        .btn-ghost:hover { border-color:#5A6677;background:var(--zazu-surface-card); }
         .hero { padding:82px 0 70px; display:grid;grid-template-columns:minmax(0,1fr) minmax(430px,.95fr);gap:60px;align-items:center; }
-        .eyebrow { color:var(--blue);font:800 11px/1 "JetBrains Mono",monospace;letter-spacing:.16em;text-transform:uppercase;display:flex;align-items:center;gap:9px; }
-        .eyebrow:before { content:"";width:28px;height:2px;background:var(--blue); }
+        .eyebrow { color:var(--zazu-blue-primary);font:800 11px/1 "JetBrains Mono",monospace;letter-spacing:.16em;text-transform:uppercase;display:flex;align-items:center;gap:9px; }
+        .eyebrow:before { content:"";width:28px;height:2px;background:var(--zazu-blue-primary); }
         h1 { margin:18px 0 20px;font-size:clamp(44px,6vw,76px);line-height:.94;letter-spacing:-.065em;max-width:720px; }
         .hero-copy { color:#475569;font-size:18px;line-height:1.65;max-width:650px; }
         .hero-actions { display:flex;flex-wrap:wrap;gap:10px;margin-top:30px; }
         .hero-note { margin-top:18px;color:#64748B;font:500 11px/1.5 "JetBrains Mono",monospace; }
         .telemetry { border:1px solid #36404E;background:rgba(255,255,255,.96);box-shadow:0 12px 30px rgba(15,23,42,.08); }
-        .telemetry-head { padding:12px 14px;border-bottom:1px solid var(--line);display:flex;justify-content:space-between;gap:15px;font:700 10px/1.2 "JetBrains Mono",monospace;letter-spacing:.08em; }
-        .online { color:var(--green);display:flex;gap:7px;align-items:center; }
-        .online i { width:7px;height:7px;border-radius:50%;background:var(--green);box-shadow:0 0 12px var(--green); }
+        .telemetry-head { padding:12px 14px;border-bottom:1px solid var(--zazu-surface-border);display:flex;justify-content:space-between;gap:15px;font:700 10px/1.2 "JetBrains Mono",monospace;letter-spacing:.08em; }
+        .online { color:var(--zazu-status-active);display:flex;gap:7px;align-items:center; }
+        .online i { width:7px;height:7px;border-radius:50%;background:var(--zazu-status-active);box-shadow:0 0 12px var(--zazu-status-active); }
         .metrics { display:grid;grid-template-columns:repeat(5,1fr); }
-        .metric { padding:16px 12px;border-right:1px solid var(--line); }
+        .metric { padding:16px 12px;border-right:1px solid var(--zazu-surface-border); }
         .metric:last-child { border-right:0; }
         .metric-label { color:#64748B;font:700 8px/1.2 "JetBrains Mono",monospace;text-transform:uppercase; }
         .metric-value { font:800 26px/1 "JetBrains Mono",monospace;margin-top:8px; }
-        .record { border-top:1px solid var(--line);padding:18px;display:grid;grid-template-columns:1.5fr 1fr .8fr;gap:15px; }
+        .record { border-top:1px solid var(--zazu-surface-border);padding:18px;display:grid;grid-template-columns:1.5fr 1fr .8fr;gap:15px; }
         .record-label { color:#64748B;font:700 8px/1.2 "JetBrains Mono",monospace;text-transform:uppercase; }
         .record-main { font-weight:850;margin-top:7px; }
         .record-meta { color:#64748B;font-size:12px;margin-top:4px; }
-        .badge { display:inline-flex;align-items:center;border:1px solid var(--amber);color:var(--amber);padding:4px 7px;font:800 9px/1 "JetBrains Mono",monospace;margin-top:7px; }
-        .matrix-foot { border-top:1px solid var(--line);padding:10px 14px;color:#64748B;font:600 9px/1.4 "JetBrains Mono",monospace; }
-        .section { padding:70px 0;border-top:1px solid var(--line); }
+        .badge { display:inline-flex;align-items:center;border:1px solid var(--zazu-status-draft);color:var(--zazu-status-draft);padding:4px 7px;font:800 9px/1 "JetBrains Mono",monospace;margin-top:7px; }
+        .matrix-foot { border-top:1px solid var(--zazu-surface-border);padding:10px 14px;color:#64748B;font:600 9px/1.4 "JetBrains Mono",monospace; }
+        .section { padding:70px 0;border-top:1px solid var(--zazu-surface-border); }
         .section-head { display:flex;justify-content:space-between;gap:30px;align-items:end;margin-bottom:28px; }
         .section h2 { margin:8px 0 0;font-size:36px;letter-spacing:-.045em; }
-        .section-intro { max-width:600px;color:var(--muted);line-height:1.6; }
-        .pillars { display:grid;grid-template-columns:repeat(3,1fr);border-top:1px solid var(--line);border-left:1px solid var(--line); }
-        .pillar { min-height:220px;padding:24px;border-right:1px solid var(--line);border-bottom:1px solid var(--line);background:rgba(17,22,30,.65); }
-        .pillar-num { color:var(--blue);font:800 11px "JetBrains Mono",monospace; }
+        .section-intro { max-width:600px;color:var(--zazu-text-muted);line-height:1.6; }
+        .pillars { display:grid;grid-template-columns:repeat(3,1fr);border-top:1px solid var(--zazu-surface-border);border-left:1px solid var(--zazu-surface-border); }
+        .pillar { min-height:220px;padding:24px;border-right:1px solid var(--zazu-surface-border);border-bottom:1px solid var(--zazu-surface-border);background:rgba(17,22,30,.65); }
+        .pillar-num { color:var(--zazu-blue-primary);font:800 11px "JetBrains Mono",monospace; }
         .pillar h3 { margin:48px 0 9px;font-size:21px; }
-        .pillar p { margin:0;color:var(--muted);line-height:1.6;font-size:14px; }
-        .compare { display:grid;grid-template-columns:1fr 1fr;border:1px solid var(--line); }
+        .pillar p { margin:0;color:var(--zazu-text-muted);line-height:1.6;font-size:14px; }
+        .compare { display:grid;grid-template-columns:1fr 1fr;border:1px solid var(--zazu-surface-border); }
         .compare > div { padding:28px;min-height:260px; }
-        .compare > div + div { border-left:1px solid var(--line);background:#F7FAFF; }
+        .compare > div + div { border-left:1px solid var(--zazu-surface-border);background:#F7FAFF; }
         .compare h3 { margin:0 0 18px;font-size:13px;text-transform:uppercase;letter-spacing:.1em;font-family:"JetBrains Mono",monospace; }
         .compare ul { margin:0;padding:0;list-style:none;display:grid;gap:12px;color:#475569;font-size:14px;line-height:1.5; }
-        .compare li:before { content:"/";color:var(--blue);font-family:monospace;font-weight:900;margin-right:9px; }
-        .inspector { display:grid;grid-template-columns:1.1fr .9fr;border:1px solid var(--line); }
+        .compare li:before { content:"/";color:var(--zazu-blue-primary);font-family:monospace;font-weight:900;margin-right:9px; }
+        .inspector { display:grid;grid-template-columns:1.1fr .9fr;border:1px solid var(--zazu-surface-border); }
         .inspector-main,.inspector-side { padding:26px; }
-        .inspector-side { border-left:1px solid var(--line);background:var(--surface); }
-        .ledger-row { display:flex;justify-content:space-between;gap:20px;padding:13px 0;border-bottom:1px solid var(--line);font-size:13px; }
+        .inspector-side { border-left:1px solid var(--zazu-surface-border);background:var(--zazu-surface-card); }
+        .ledger-row { display:flex;justify-content:space-between;gap:20px;padding:13px 0;border-bottom:1px solid var(--zazu-surface-border);font-size:13px; }
         .ledger-row:last-child { border-bottom:0; }
         .status { font:800 10px "JetBrains Mono",monospace; }
-        .status.ok { color:var(--green); }.status.warn { color:var(--amber); }.status.alert { color:var(--red); }
+        .status.ok { color:var(--zazu-status-active); }.status.warn { color:var(--zazu-status-draft); }.status.alert { color:var(--zazu-status-overdue); }
         .cta { padding:70px 0 90px; }
-        .cta-box { border:1px solid var(--line);padding:36px;background:linear-gradient(110deg,#FFFFFF,#F2F7FF);display:flex;justify-content:space-between;gap:30px;align-items:center; }
+        .cta-box { border:1px solid var(--zazu-surface-border);padding:36px;background:linear-gradient(110deg,#FFFFFF,#F2F7FF);display:flex;justify-content:space-between;gap:30px;align-items:center; }
         .cta-box h2 { margin:0 0 8px;font-size:32px;letter-spacing:-.04em; }
-        .cta-box p { margin:0;color:var(--muted); }
-        footer { border-top:1px solid var(--line);padding:22px 0;color:#667181;font:600 10px "JetBrains Mono",monospace;display:flex;justify-content:space-between;gap:20px; }
-        @media (max-width:900px) { .hero{grid-template-columns:1fr;padding-top:55px}.pillars{grid-template-columns:1fr}.inspector{grid-template-columns:1fr}.inspector-side{border-left:0;border-top:1px solid var(--line)} }
-        @media (max-width:650px) { .shell{width:min(100% - 24px,1180px)}.topbar{height:auto;padding:16px 0;gap:15px}.top-actions .btn-ghost{display:none}.hero{padding:45px 0}.metrics{grid-template-columns:repeat(2,1fr)}.metric{border-bottom:1px solid var(--line)}.record{grid-template-columns:1fr}.compare{grid-template-columns:1fr}.compare>div+div{border-left:0;border-top:1px solid var(--line)}.section{padding:52px 0}.cta-box{display:block}.cta-box .btn{margin-top:20px}footer{display:block}.footer-right{margin-top:8px} }
-        @media (prefers-reduced-motion:no-preference) { .telemetry{animation:rise .7s ease both}.online i{animation:pulse 1.8s infinite}@keyframes rise{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:none}}@keyframes pulse{50%{opacity:.45;box-shadow:0 0 4px var(--green)}} }
+        .cta-box p { margin:0;color:var(--zazu-text-muted); }
+        footer { border-top:1px solid var(--zazu-surface-border);padding:22px 0;color:#667181;font:600 10px "JetBrains Mono",monospace;display:flex;justify-content:space-between;gap:20px; }
+        @media (max-width:900px) { .hero{grid-template-columns:1fr;padding-top:55px}.pillars{grid-template-columns:1fr}.inspector{grid-template-columns:1fr}.inspector-side{border-left:0;border-top:1px solid var(--zazu-surface-border)} }
+        @media (max-width:650px) { .shell{width:min(100% - 24px,1180px)}.topbar{height:auto;padding:16px 0;gap:15px}.top-actions .btn-ghost{display:none}.hero{padding:45px 0}.metrics{grid-template-columns:repeat(2,1fr)}.metric{border-bottom:1px solid var(--zazu-surface-border)}.record{grid-template-columns:1fr}.compare{grid-template-columns:1fr}.compare>div+div{border-left:0;border-top:1px solid var(--zazu-surface-border)}.section{padding:52px 0}.cta-box{display:block}.cta-box .btn{margin-top:20px}footer{display:block}.footer-right{margin-top:8px} }
+        @media (prefers-reduced-motion:no-preference) { .telemetry{animation:rise .7s ease both}.online i{animation:pulse 1.8s infinite}@keyframes rise{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:none}}@keyframes pulse{50%{opacity:.45;box-shadow:0 0 4px var(--zazu-status-active)}} }
     </style>
 </head>
 <body>
@@ -97,7 +98,7 @@
             </a>
             <div class="top-actions">
                 <a class="btn btn-ghost" href="#capabilities">Capabilities</a>
-                <a class="btn btn-primary" href="{{ route('login') }}">Launch Workspace →</a>
+                <a class="btn btn-primary" href="{{ auth()->check() ? route('dashboard') : route('login') }}">Launch Rosco ICT Workspace →</a>
             </div>
         </header>
 
@@ -108,7 +109,7 @@
                     <h1>Precision Command for Events, Catering &amp; Equipment Hire.</h1>
                     <p class="hero-copy">The operational workspace for event managers, caterers and equipment-hire teams. Keep jobs, customers, quotes, resources, preparation and financial activity connected in one system.</p>
                     <div class="hero-actions">
-                        <a class="btn btn-primary" href="{{ route('login') }}">Enter Rosco ICT Workspace →</a>
+                        <a class="btn btn-primary" href="{{ auth()->check() ? route('dashboard') : route('login') }}">Launch Rosco ICT Workspace →</a>
                         <a class="btn btn-ghost" href="#live-preview">Simulate Dispatch Load</a>
                     </div>
                     <div class="hero-note mono">LOCAL WORKSPACE :: OPERATIONS / RESOURCES / FINANCE / REPORTING</div>
@@ -120,16 +121,16 @@
                         <span class="online"><i></i> STATUS: ONLINE</span>
                     </div>
                     <div class="metrics">
-                        <div class="metric"><div class="metric-label">All work</div><div class="metric-value">01</div></div>
-                        <div class="metric"><div class="metric-label">Today</div><div class="metric-value">00</div></div>
-                        <div class="metric"><div class="metric-label">Next 7d</div><div class="metric-value">01</div></div>
-                        <div class="metric"><div class="metric-label">In progress</div><div class="metric-value">00</div></div>
-                        <div class="metric"><div class="metric-label">Drafts</div><div class="metric-value">01</div></div>
+                        <div class="metric"><div class="metric-label">All work</div><div class="metric-value">{{ str_pad((string) $telemetry['all_work'], 2, '0', STR_PAD_LEFT) }}</div></div>
+                        <div class="metric"><div class="metric-label">Today</div><div class="metric-value">{{ str_pad((string) $telemetry['today'], 2, '0', STR_PAD_LEFT) }}</div></div>
+                        <div class="metric"><div class="metric-label">Next 7d</div><div class="metric-value">{{ str_pad((string) $telemetry['next_7_days'], 2, '0', STR_PAD_LEFT) }}</div></div>
+                        <div class="metric"><div class="metric-label">In progress</div><div class="metric-value">{{ str_pad((string) $telemetry['in_progress'], 2, '0', STR_PAD_LEFT) }}</div></div>
+                        <div class="metric"><div class="metric-label">Drafts</div><div class="metric-value">{{ str_pad((string) $telemetry['drafts'], 2, '0', STR_PAD_LEFT) }}</div></div>
                     </div>
                     <div class="record">
-                        <div><div class="record-label">Record</div><div class="record-main">Rosscore Labs (Pty) Ltd</div><div class="record-meta">Isaac Junior Lehlogonolo Maluleka</div><span class="badge">DRAFT</span></div>
-                        <div><div class="record-label">Schedule</div><div class="record-main">30 Sep 2026</div><div class="record-meta">Birthday event</div></div>
-                        <div><div class="record-label">Reference</div><div class="record-main mono">ZAZU-PIEXWGKF</div><div class="record-meta">Deposit pending</div></div>
+                        <div><div class="record-label">Record</div><div class="record-main">{{ $telemetry['record_name'] }}</div><div class="record-meta">{{ $telemetry['record_meta'] }}</div><span class="badge">{{ $telemetry['status'] }}</span></div>
+                        <div><div class="record-label">Schedule</div><div class="record-main">{{ $telemetry['date'] }}</div><div class="record-meta">{{ $telemetry['event_type'] }}</div></div>
+                        <div><div class="record-label">Reference</div><div class="record-main mono">{{ $telemetry['reference'] }}</div><div class="record-meta">{{ $telemetry['reference_meta'] }}</div></div>
                     </div>
                     <div class="matrix-foot">WORKLOAD PREVIEW // QUOTES → PREPARATION → RESOURCES → EXECUTION → FINANCE</div>
                 </div>
@@ -175,7 +176,7 @@
             <section class="cta">
                 <div class="cta-box">
                     <div><div class="eyebrow">Ready room</div><h2>Open the workspace when the work starts.</h2><p>Sign in to continue into the Zazu EMP operational workspace.</p></div>
-                    <a class="btn btn-primary" href="{{ route('login') }}">Launch Workspace →</a>
+                    <a class="btn btn-primary" href="{{ auth()->check() ? route('dashboard') : route('login') }}">Launch Rosco ICT Workspace →</a>
                 </div>
             </section>
         </main>
