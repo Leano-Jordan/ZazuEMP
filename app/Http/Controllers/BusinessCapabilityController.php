@@ -31,7 +31,10 @@ class BusinessCapabilityController extends Controller
 
         $equipment = (clone $base)
             ->where('capability_type', 'rental')
-            ->withCount('assets')
+            ->withCount([
+                'assets',
+                'assets as available_assets_count' => fn ($query) => $query->whereNotIn('status', ['maintenance', 'retired']),
+            ])
             ->orderByDesc('is_active')
             ->orderBy('category')
             ->orderBy('name')
