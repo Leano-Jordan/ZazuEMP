@@ -13,7 +13,7 @@ class LandingPageTest extends TestCase
     {
         $this->get(route('landing'))
             ->assertOk()
-            ->assertSee('Create workspace')
+            ->assertSee('Register')
             ->assertSee('Log in')
             ->assertSee('Precision command for');
     }
