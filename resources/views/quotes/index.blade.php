@@ -14,11 +14,15 @@
         </div>
     </section>
 
-    <section class="zazu-card zazu-list">
-        <div class="zazu-card-header">
-            <div class="zazu-eyebrow">Records</div>
-            <div class="zazu-card-title mt-1">Quote list</div>
-            <div class="zazu-card-description">Headers above describe columns. They are not additional quote records.</div>
+    <section class="zazu-card zazu-list">        <div class="zazu-card-header">
+            <div class="zazu-section-heading">
+                <div>
+                    <div class="zazu-eyebrow">Records</div>
+                    <div class="zazu-card-title mt-1">Quote list</div>
+                    <div class="zazu-card-description">Scan reference and status first, then version and total before opening the commercial record.</div>
+                </div>
+                <span class="zazu-section-count">{{ $quotes->total() }}</span>
+            </div>
         </div>
 
         @if ($quotes->count())
