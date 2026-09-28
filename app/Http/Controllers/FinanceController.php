@@ -364,6 +364,7 @@ class FinanceController extends Controller
         ]);
 
         $data['idempotency_key'] ??= (string) Str::uuid();
+        $data['type'] ??= 'payment';
         $alreadyProcessed = false;
 
         DB::transaction(function () use ($data, $businessId, &$alreadyProcessed): void {
