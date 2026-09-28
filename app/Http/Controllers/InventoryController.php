@@ -6,6 +6,7 @@ use App\Models\BusinessCapability;
 use App\Models\Event;
 use App\Models\InventoryItem;
 use App\Models\EventRequirement;
+use App\Services\EventLifecycleService;
 use App\Support\Audit;
 use App\Support\CurrentBusiness;
 use App\Support\Money;
@@ -54,7 +55,7 @@ class InventoryController extends Controller
         return redirect()->route('inventory.index')->with('success','Inventory item created.');
     }
 
-    public function movement(Request $request, InventoryItem $inventoryItem): RedirectResponse
+    public function movement(Request $request, InventoryItem $inventoryItem, EventLifecycleService $lifecycle): RedirectResponse
     {
         $businessId=app(CurrentBusiness::class)->id($request->user());
         abort_unless((int)$inventoryItem->business_id===$businessId,404);
@@ -65,14 +66,10 @@ class InventoryController extends Controller
             'movement_date'=>['required','date'],'reference'=>['nullable','string','max:255'],'notes'=>['nullable','string'],
             'event_id'=>['nullable','integer'],
         ]);
-        if (!empty($data['event_id'])) {
-            abort_unless(Event::where('business_id',$businessId)->whereKey($data['event_id'])->exists(), 404);
-        }
-
         $data['idempotency_key'] ??= (string) \Illuminate\Support\Str::uuid();
         $alreadyProcessed = false;
 
-        DB::transaction(function () use ($inventoryItem, $businessId, $data, &$alreadyProcessed): void {
+        DB::transaction(function () use ($inventoryItem, $businessId, $data, $lifecycle, &$alreadyProcessed): void {
             // Serialize business-level idempotency checks before locking the stock row.
             \App\Models\Business::query()->whereKey($businessId)->lockForUpdate()->firstOrFail();
 
@@ -83,6 +80,14 @@ class InventoryController extends Controller
             ) {
                 $alreadyProcessed = true;
                 return;
+            }
+
+            $lockedEvent = !empty($data['event_id'])
+                ? $lifecycle->lock($businessId, (int) $data['event_id'])
+                : null;
+
+            if ($lockedEvent) {
+                $lifecycle->assertOperational($lockedEvent);
             }
 
             $lockedItem = InventoryItem::query()
@@ -97,7 +102,11 @@ class InventoryController extends Controller
                 abort_if($movementHundredths > $onHandHundredths, 422, 'This movement would make stock on hand negative.');
             }
 
-            $movement = $lockedItem->movements()->create([...$data,'business_id'=>$businessId]);
+            $movement = $lockedItem->movements()->create([
+                ...$data,
+                'business_id' => $businessId,
+                'event_id' => $lockedEvent?->id,
+            ]);
             Audit::record('inventory.movement.recorded', $movement, [
                 'type' => $movement->type,
                 'quantity' => $movement->quantity,
