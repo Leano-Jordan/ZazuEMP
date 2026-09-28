@@ -83,6 +83,19 @@ textarea {
     min-width: 0;
 }
 
+.zazu-header-slot-actions {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 6px;
+    flex-wrap: wrap;
+    min-width: 0;
+}
+
+.zazu-header-slot-actions > .zazu-btn {
+    white-space: nowrap;
+}
+
 .zazu-detail-value-box {
     margin-top: 16px;
     padding: 14px 16px;
