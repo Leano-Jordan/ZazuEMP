@@ -289,7 +289,13 @@ function setupBrandingUploads() {
                     bitmap.close();
 
                     canvas.toBlob((blob) => {
-                        if (!blob) throw new Error('Image preview conversion failed');
+                        if (!blob) {
+                            loading.hidden = true;
+                            if (placeholder) placeholder.hidden = false;
+                            container.setAttribute('aria-busy', 'false');
+                            if (filename) filename.textContent = 'That image could not be previewed.';
+                            return;
+                        }
 
                         const objectUrl = URL.createObjectURL(blob);
                         brandingPreviewUrls.set(input, objectUrl);
