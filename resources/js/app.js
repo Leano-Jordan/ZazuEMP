@@ -294,30 +294,46 @@ function setupZazuCatalogue() {
         const drawerOpeners = catalogue.querySelectorAll('[data-catalogue-drawer-open]');
         const drawerClosers = catalogue.querySelectorAll('[data-catalogue-drawer-close]');
 
-        const selectTab = (name) => {
+        const selectTab = (name, moveFocus = false) => {
             tabs.forEach((tab) => {
                 const active = tab.dataset.catalogueTab === name;
                 tab.classList.toggle('is-active', active);
                 tab.setAttribute('aria-selected', active ? 'true' : 'false');
+                tab.tabIndex = active ? 0 : -1;
             });
             panels.forEach((panel) => {
                 const active = panel.dataset.cataloguePanel === name;
                 panel.hidden = !active;
                 panel.classList.toggle('is-active', active);
             });
+            if (moveFocus) catalogue.querySelector('[data-catalogue-tab="' + name + '"]')?.focus();
         };
 
-        tabs.forEach((tab) => tab.addEventListener('click', () => selectTab(tab.dataset.catalogueTab)));
+        tabs.forEach((tab, index) => {
+            tab.addEventListener('click', () => selectTab(tab.dataset.catalogueTab));
+            tab.addEventListener('keydown', (event) => {
+                if (!['ArrowRight', 'ArrowLeft', 'Home', 'End'].includes(event.key)) return;
+                event.preventDefault();
+                const nextIndex = event.key === 'Home' ? 0 : event.key === 'End' ? tabs.length - 1 :
+                    (index + (event.key === 'ArrowRight' ? 1 : -1) + tabs.length) % tabs.length;
+                selectTab(tabs[nextIndex].dataset.catalogueTab, true);
+            });
+        });
+        selectTab(tabs[0]?.dataset.catalogueTab || 'equipment');
 
+        let drawerReturnFocus = null;
         const closeDrawer = () => {
             if (!drawer) return;
             drawer.hidden = true;
             drawer.setAttribute('aria-hidden', 'true');
             document.body.classList.remove('zazu-drawer-open');
+            drawerReturnFocus?.focus();
+            drawerReturnFocus = null;
         };
 
-        const openDrawer = () => {
+        const openDrawer = (event) => {
             if (!drawer) return;
+            drawerReturnFocus = event?.currentTarget || document.activeElement;
             drawer.hidden = false;
             drawer.setAttribute('aria-hidden', 'false');
             document.body.classList.add('zazu-drawer-open');
