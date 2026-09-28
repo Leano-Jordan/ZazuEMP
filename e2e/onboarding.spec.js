@@ -73,7 +73,7 @@ test('registration flows through onboarding into the dashboard', async ({ page }
     const loginPageResponse = await page.goto('/login');
     expect(loginPageResponse?.status(), 'login page after logout').toBe(200);
     await expect(page.locator('.zazu-error-shell')).toHaveCount(0);
-    await expect(page.getByRole('heading', { name: /Sign in/i })).toBeVisible();
+    await expect(page.getByRole('heading', { name: 'Welcome back.' })).toBeVisible();
 
     const loginIdentifier = username;
     await page.getByLabel(/Username or email/i).fill(loginIdentifier);
