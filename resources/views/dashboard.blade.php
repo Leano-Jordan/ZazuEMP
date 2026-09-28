@@ -16,9 +16,9 @@
     <section class="zazu-dashboard-bento mt-3" aria-label="Business command centre">
         <section class="zazu-dashboard-attention" aria-labelledby="zazu-dashboard-attention-title">
             <div>
-                <div class="zazu-eyebrow">Operational overview</div>
-                <h2 id="zazu-dashboard-attention-title" class="zazu-command-title">What needs attention next?</h2>
-                <p class="zazu-command-copy">Start with the areas available to your current access level and continue inside the workspace.</p>
+                <div class="zazu-dashboard-attention-kicker"><span class="zazu-status-dot" aria-hidden="true"></span><span>Live workspace</span></div>
+                <h2 id="zazu-dashboard-attention-title" class="zazu-command-title">Your operation at a glance.</h2>
+                <p class="zazu-command-copy">Jump straight into the work that moves the business forward. Zazu keeps operational records, commercial activity and planning connected.</p>
             </div>
             @if ($workspaceTools['work'])
                 <a href="{{ route('work.index') }}" class="zazu-btn zazu-btn-primary">Open active jobs <span aria-hidden="true">→</span></a>
@@ -28,10 +28,10 @@
         </section>
 
         <section class="zazu-dashboard-metrics" aria-label="Key business metrics">
-            @if ($workspaceTools['work']) <a href="{{ route('work.index') }}" class="zazu-metric-card zazu-metric-link"><h2 class="zazu-metric-label">Active jobs</h2><div class="zazu-metric-value" data-numeric="true">{{ $metrics['active_work'] }}</div><div class="zazu-metric-copy">Open job list</div></a> @endif
-            @if ($workspaceTools['calendar']) <a href="{{ route('calendar.index') }}" class="zazu-metric-card zazu-metric-link"><h2 class="zazu-metric-label">Next 14 days</h2><div class="zazu-metric-value" data-numeric="true">{{ $metrics['upcoming_work'] }}</div><div class="zazu-metric-copy">Open calendar</div></a> @endif
-            @if ($workspaceTools['customers']) <a href="{{ route('customers.index') }}" class="zazu-metric-card zazu-metric-link"><h2 class="zazu-metric-label">Customers</h2><div class="zazu-metric-value" data-numeric="true">{{ $metrics['customers'] }}</div><div class="zazu-metric-copy">Open customer records</div></a> @endif
-            @if ($workspaceTools['quotes']) <a href="{{ route('quotes.index') }}" class="zazu-metric-card zazu-metric-link"><h2 class="zazu-metric-label">Draft quotes</h2><div class="zazu-metric-value" data-numeric="true">{{ $metrics['draft_quotes'] }}</div><div class="zazu-metric-copy">Review draft quotes</div></a> @endif
+            @if ($workspaceTools['work']) <a href="{{ route('work.index') }}" class="zazu-metric-card zazu-metric-link"><div class="zazu-metric-top"><h2 class="zazu-metric-label">Active jobs</h2><span class="zazu-metric-arrow" aria-hidden="true">↗</span></div><div class="zazu-metric-value" data-numeric="true">{{ $metrics['active_work'] }}</div><div class="zazu-metric-copy">Open operational records</div></a> @endif
+            @if ($workspaceTools['calendar']) <a href="{{ route('calendar.index') }}" class="zazu-metric-card zazu-metric-link"><div class="zazu-metric-top"><h2 class="zazu-metric-label">Next 14 days</h2><span class="zazu-metric-arrow" aria-hidden="true">↗</span></div><div class="zazu-metric-value" data-numeric="true">{{ $metrics['upcoming_work'] }}</div><div class="zazu-metric-copy">Scheduled work ahead</div></a> @endif
+            @if ($workspaceTools['customers']) <a href="{{ route('customers.index') }}" class="zazu-metric-card zazu-metric-link"><div class="zazu-metric-top"><h2 class="zazu-metric-label">Customers</h2><span class="zazu-metric-arrow" aria-hidden="true">↗</span></div><div class="zazu-metric-value" data-numeric="true">{{ $metrics['customers'] }}</div><div class="zazu-metric-copy">People and organisations</div></a> @endif
+            @if ($workspaceTools['quotes']) <a href="{{ route('quotes.index') }}" class="zazu-metric-card zazu-metric-link"><div class="zazu-metric-top"><h2 class="zazu-metric-label">Draft quotes</h2><span class="zazu-metric-arrow" aria-hidden="true">↗</span></div><div class="zazu-metric-value" data-numeric="true">{{ $metrics['draft_quotes'] }}</div><div class="zazu-metric-copy">Commercial work awaiting review</div></a> @endif
         </section>
 
         <div class="zazu-dashboard-lower">
@@ -68,8 +68,9 @@
             </section>
 
             <aside class="zazu-dashboard-quick zazu-panel" aria-labelledby="zazu-quick-access-title">
+                <div class="zazu-panel-kicker">Workspace</div>
                 <div id="zazu-quick-access-title" class="zazu-panel-title">Quick access</div>
-                <div class="zazu-panel-copy">Common operating areas.</div>
+                <div class="zazu-panel-copy">The places you use most to run the business.</div>
                 @php
                     $quickAccess = [];
                     foreach ([
@@ -91,7 +92,7 @@
                 @endphp
                 <nav class="zazu-quick-links" aria-label="Quick access">
                     @foreach ($quickAccess as $item)
-                        <a href="{{ route($item['route']) }}" class="zazu-quick-link"><span>{{ $item['label'] }}</span><span aria-hidden="true">→</span></a>
+                        <a href="{{ route($item['route']) }}" class="zazu-quick-link"><span class="zazu-quick-link-label">{{ $item['label'] }}</span><span class="zazu-quick-link-arrow" aria-hidden="true">↗</span></a>
                     @endforeach
                 </nav>
             </aside>
