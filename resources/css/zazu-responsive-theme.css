@@ -101,3 +101,24 @@
  .zazu-action-group .zazu-btn { flex:1 1 auto; }
 }
 @media(prefers-reduced-motion:reduce){ .zazu-section-tabs a,.zazu-mobile-link { transition:none !important; } }
+
+/* Comparative product lesson: action-heavy headers must become a deliberate mobile action row. */
+.zazu-header-actions { min-width:0; }
+.zazu-detail-value-box { margin-top:16px; padding:14px 16px; border:1px solid var(--zazu-border); background:var(--zazu-surface-2); color:var(--zazu-ink-2); font-size:13px; font-weight:650; line-height:1.55; }
+.zazu-job-context-grid { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:10px; margin-top:12px; }
+.zazu-job-context-grid > div { min-width:0; padding:10px; border:1px solid var(--zazu-border); background:var(--zazu-surface-2); }
+.zazu-job-context-grid span { display:block; color:var(--zazu-faint); font-size:9px; font-weight:800; letter-spacing:.08em; text-transform:uppercase; }
+.zazu-job-context-grid strong { display:block; margin-top:4px; overflow:hidden; color:var(--zazu-ink); font-size:12px; text-overflow:ellipsis; white-space:nowrap; }
+.zazu-contact-card { padding:16px; border:1px solid var(--zazu-border); background:var(--zazu-surface-2); }
+@media(max-width:820px){
+  .zazu-topbar-actions { min-width:0; flex-wrap:wrap; justify-content:flex-end; }
+  .zazu-topbar-actions > .zazu-btn { min-height:34px; }
+  .zazu-header-action { max-width:100%; }
+  .zazu-header-action > * { max-width:100%; }
+  .zazu-job-context-grid { grid-template-columns:1fr 1fr; }
+}
+@media(max-width:520px){
+  .zazu-topbar-actions { width:100%; justify-content:flex-start; padding-top:4px; }
+  .zazu-header-title-row + .zazu-section-tabs { max-width:100%; }
+  .zazu-job-context-grid { grid-template-columns:1fr; }
+}
