@@ -315,6 +315,7 @@ function setupZazuAuthExperience() {
             toggle.setAttribute('aria-label', showing ? 'Show password' : 'Hide password');
         });
     });
+
     document.querySelectorAll('[data-auth-switch]').forEach((link) => {
         if (link.dataset.zazuAuthBound === '1') return;
         link.dataset.zazuAuthBound = '1';
@@ -323,13 +324,17 @@ function setupZazuAuthExperience() {
             event.preventDefault();
             const frame = document.querySelector('[data-auth-frame]');
             if (!frame) { window.location.href = link.href; return; }
+
             try {
-                const response = await fetch(link.href, { headers: { 'X-Requested-With': 'XMLHttpRequest', 'Accept': 'text/html' } });
+                const response = await fetch(link.href, {
+                    headers: { 'X-Requested-With': 'XMLHttpRequest', 'Accept': 'text/html' }
+                });
                 if (!response.ok) throw new Error('Auth navigation failed');
                 const html = await response.text();
                 const doc = new DOMParser().parseFromString(html, 'text/html');
                 const next = doc.querySelector('[data-auth-frame]');
                 if (!next) throw new Error('Auth surface missing');
+
                 frame.classList.add('zazu-auth-switching');
                 window.setTimeout(() => {
                     frame.replaceWith(next);
@@ -345,3 +350,22 @@ function setupZazuAuthExperience() {
         });
     });
 }
+
+async function restoreZazuAuthRoute() {
+    if (!document.querySelector('[data-auth-frame]')) return;
+    const frame = document.querySelector('[data-auth-frame]');
+    try {
+        const response = await fetch(window.location.href, { headers: { 'X-Requested-With': 'XMLHttpRequest', 'Accept': 'text/html' } });
+        if (!response.ok) throw new Error('Auth history navigation failed');
+        const doc = new DOMParser().parseFromString(await response.text(), 'text/html');
+        const next = doc.querySelector('[data-auth-frame]');
+        if (!next) throw new Error('Auth surface missing');
+        frame.replaceWith(next);
+        document.title = doc.title;
+        setupZazuAuthExperience();
+    } catch {
+        window.location.reload();
+    }
+}
+
+window.addEventListener('popstate', restoreZazuAuthRoute);
