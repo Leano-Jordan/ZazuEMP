@@ -4,11 +4,20 @@
    Mobile shell navigation is owned by zazu-mobile-refinement.css.
 */
 
+/* Sidebar shell must not clip footer-owned account popovers. Keep only the navigation region scrollable. */
 .zazu-sidebar {
-    overflow: hidden;
+    overflow: visible;
 }
 
 .zazu-nav {
+    min-height: 0;
+    overflow-y: auto;
+    overflow-x: hidden;
+}
+
+.zazu-sidebar-footer {
+    position: relative;
+    flex: 0 0 auto;
     overflow: visible;
 }
 
