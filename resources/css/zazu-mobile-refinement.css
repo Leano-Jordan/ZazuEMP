@@ -24,13 +24,19 @@
     }
 
     .zazu-topbar-inner {
-        min-height: 56px;
-        padding: max(8px, env(safe-area-inset-top)) 12px 8px;
-        gap: 8px;
+        min-height: 0;
+        padding: max(8px, env(safe-area-inset-top)) 12px 10px;
+        display: grid;
+        grid-template-columns: 40px minmax(0, 1fr);
+        grid-template-areas:
+            "menu context"
+            "actions actions";
         align-items: center;
+        gap: 8px 10px;
     }
 
     .zazu-mobile-menu-button {
+        grid-area: menu;
         width: 40px;
         height: 40px;
         flex: 0 0 40px;
@@ -83,8 +89,10 @@
     }
 
     .zazu-header-context {
+        grid-area: context;
         min-width: 0;
-        flex: 1 1 auto;
+        width: 100%;
+        text-align: center;
     }
 
     .zazu-page-title {
@@ -100,14 +108,17 @@
     }
 
     .zazu-topbar-actions {
+        grid-area: actions;
         min-width: 0;
         max-width: 100%;
-        width: auto !important;
-        flex: 0 1 auto;
-        flex-wrap: wrap !important;
-        gap: 5px;
+        width: 100% !important;
+        display: flex;
+        flex: none;
+        flex-wrap: nowrap !important;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
         padding: 0 !important;
-        justify-content: flex-end;
     }
 
     .zazu-command-search {
@@ -326,9 +337,9 @@
 
 @media (max-width: 520px) {
     .zazu-topbar-inner {
-        min-height: 56px;
-        padding: max(7px, env(safe-area-inset-top)) 9px 7px;
-        gap: 6px;
+        padding: max(7px, env(safe-area-inset-top)) 9px 9px;
+        grid-template-columns: 40px minmax(0, 1fr);
+        gap: 7px 8px;
     }
 
     .zazu-mobile-menu-button,
