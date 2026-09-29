@@ -13,7 +13,7 @@
     <section class="zazu-card zazu-list">
         <div class="zazu-card-header">
             <div class="zazu-eyebrow">Costing records</div>
-            <div class="zazu-card-title mt-1">Travel list</div>
+            <div class="zazu-section-heading"><div class="zazu-card-title mt-1">Travel list</div><a href="{{ route('work.travel.create', $event) }}" class="zazu-btn zazu-btn-primary">Add calculation</a></div>
             <div class="zazu-card-description">The route is the record. The amount on the right is its customer charge.</div>
         </div>
         @if ($travelCosts->count())
