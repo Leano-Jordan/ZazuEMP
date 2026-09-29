@@ -3,12 +3,9 @@
     <x-slot:heading>{{ $customer->name }}</x-slot:heading>
     <x-slot:headerAction>
         <a href="{{ route('customers.edit', $customer) }}" class="zazu-btn zazu-btn-secondary">Edit customer</a>
-        <a href="{{ route('customers.contacts.create', $customer) }}" class="zazu-btn zazu-btn-primary">Add contact</a>
-        <a href="{{ route('work.create', ['customer_id' => $customer->id]) }}" class="zazu-btn zazu-btn-ghost">Start work</a>
         <a href="{{ route('customers.index') }}" class="zazu-btn zazu-btn-ghost">← Customers</a>
     </x-slot:headerAction>
-
-    <section class="zazu-command-band zazu-customer-hero">
+<section class="zazu-command-band zazu-customer-hero">
         <div class="flex min-w-0 items-center gap-4">
             <x-profile-avatar :name="$customer->name" :path="$customer->profile_photo_path" media-type="customer" :media-id="$customer->id" size="lg" />
             <div class="min-w-0">
