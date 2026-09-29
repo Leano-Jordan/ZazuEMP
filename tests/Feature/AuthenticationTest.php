@@ -23,7 +23,8 @@ class AuthenticationTest extends TestCase
     {
         $this->get(route('login'))->assertRedirect(route('landing', ['auth' => 'login']));
         $this->get(route('register'))->assertRedirect(route('landing', ['auth' => 'register']));
-        $this->get(route('owner.login'))->assertOk()->assertSee('Owner sign in');
+        $this->get(route('owner.login'))
+            ->assertRedirect(route('landing', ['auth' => 'owner']));
     }
 
     public function test_registration_creates_user_business_owner_membership_and_session(): void
