@@ -276,12 +276,7 @@
                 </div>
             </div>
                         </div>
-
-                        @if($can('work.create'))
-                            <a href="{{ route('work.create') }}" class="zazu-btn zazu-btn-primary zazu-header-create"><span aria-hidden="true">+</span> Create work</a>
-                        @endif
-
-                        @isset($headerAction)
+@isset($headerAction)
                             <div class="zazu-header-slot-actions">
                                 {{ $headerAction }}
                             </div>
