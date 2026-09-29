@@ -12,6 +12,7 @@
         $can = fn (string $permission): bool => $currentRole === 'owner'
             || in_array($permission, config('zazu.permissions.roles.'.$currentRole, []), true);
         $isOwner = $currentRole === 'owner';
+        $isPlatformAdmin = in_array(strtolower((string) auth()->user()->email), array_map('strtolower', config('zazu.platform_admin_emails', [])), true);
         $experienceLevel = app(\App\Support\ExperienceLevel::class)->for(auth()->user(), $business);
         $experienceLabel = app(\App\Support\ExperienceLevel::class)->label($experienceLevel);
         $brandingVersion = $business?->updated_at?->timestamp ?? 0;
@@ -95,6 +96,9 @@
                         <div class="zazu-nav-group-label">System</div>
                         <div class="zazu-nav-stack">
                             <a href="{{ route('settings.index') }}" class="zazu-nav-link {{ request()->routeIs('settings.*') ? 'active' : '' }}"><span class="zazu-nav-label">Settings</span></a>
+                            @if($isPlatformAdmin)
+                                <a href="{{ route('admin.landing.settings') }}" class="zazu-nav-link {{ request()->routeIs('admin.landing.*') ? 'active' : '' }}"><span class="zazu-nav-label">Platform admin</span></a>
+                            @endif
                         </div>
                     </div>
                 @endif
