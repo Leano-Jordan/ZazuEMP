@@ -4,7 +4,6 @@ namespace App\Services\Search;
 
 use App\Models\Business;
 use App\Models\Event;
-use Illuminate\Database\Eloquent\Builder;
 
 class EventSearchHandler extends AbstractWorkspaceSearchHandler
 {
