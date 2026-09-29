@@ -46,12 +46,18 @@ class PlatformAdminTest extends TestCase
             'control_image_path' => config('zazu.landing_image_library.catering_service.url'),
         ]);
 
-        $this->get(route('landing'))
-            ->assertOk()
-            ->assertSee(config('zazu.landing_image_library.sound_stage.url'), false)
-            ->assertSee(config('zazu.landing_image_library.event_catering.url'), false)
-            ->assertSee(config('zazu.landing_image_library.wedding_catering.url'), false)
-            ->assertSee(config('zazu.landing_image_library.catering_service.url'), false);
+        $response = $this->get(route('landing'));
+
+        $response->assertOk();
+
+        foreach ([
+            config('zazu.landing_image_library.sound_stage.url'),
+            config('zazu.landing_image_library.event_catering.url'),
+            config('zazu.landing_image_library.wedding_catering.url'),
+            config('zazu.landing_image_library.catering_service.url'),
+        ] as $imageUrl) {
+            $response->assertSee(e($imageUrl), false);
+        }
     }
 
     public function test_non_platform_admin_cannot_manage_landing_media(): void
