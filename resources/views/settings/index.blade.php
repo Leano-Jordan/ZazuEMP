@@ -19,11 +19,14 @@
         @method('PUT')
 
         <div class="zazu-form-main">
-            <section class="zazu-form-section">
-                <div class="zazu-form-section-head">
-                    <div class="zazu-form-section-title">Business identity</div>
-                    <div class="zazu-form-section-copy">This name appears in the application shell and business records.</div>
-                </div>
+            <details class="zazu-form-section zazu-settings-collapsible" open>
+                <summary class="zazu-form-section-head zazu-settings-section-toggle">
+                    <span>
+                        <span class="zazu-form-section-title">Business identity</span>
+                        <span class="zazu-form-section-copy">This name appears in the application shell and business records.</span>
+                    </span>
+                    <span class="zazu-settings-toggle-icon" aria-hidden="true">+</span>
+                </summary>
                 <div class="zazu-form-grid">
                     <label class="zazu-field zazu-field-medium">
                         <span class="zazu-label">Business name <span class="zazu-required">*</span></span>
@@ -41,13 +44,16 @@
                         @error('currency')<span class="zazu-field-error">{{ $message }}</span>@enderror
                     </label>
                 </div>
-            </section>
+            </details>
 
-            <section class="zazu-form-section">
-                <div class="zazu-form-section-head">
-                    <div class="zazu-form-section-title">Tax & compliance profile</div>
-                    <div class="zazu-form-section-copy">Store the business identity, tax registrations and activity flags that Zazu can reuse when preparing commercial and compliance documents.</div>
-                </div>
+            <details class="zazu-form-section zazu-settings-collapsible" @if($errors->hasAny(['legal_name','trading_name','registration_type','registration_number','income_tax_number','tax_regime','vat_status','vat_number','paye_number','uif_number','sdl_number','financial_year_end','representative_name','representative_email','representative_phone','tcs_reference','tcs_pin','tcs_pin_expires_at','default_vat_rate','tax_effective_from','food_handling','employees','government_supply','tendering','regulated_activity','compliance_notes'])) open @endif>
+                <summary class="zazu-form-section-head zazu-settings-section-toggle">
+                    <span>
+                        <span class="zazu-form-section-title">Tax & compliance profile</span>
+                        <span class="zazu-form-section-copy">Store the business identity, tax registrations and activity flags that Zazu can reuse when preparing commercial and compliance documents.</span>
+                    </span>
+                    <span class="zazu-settings-toggle-icon" aria-hidden="true">+</span>
+                </summary>
 
                 <div class="zazu-form-grid">
                     <label class="zazu-field zazu-field-medium">
@@ -161,25 +167,31 @@
                         <textarea name="compliance_notes" rows="3" class="zazu-textarea">{{ old('compliance_notes', $business->taxProfile?->compliance_notes) }}</textarea>
                     </label>
                 </div>
-            </section>
+            </details>
 
-            <section class="zazu-form-section">
-                <div class="zazu-form-section-head">
-                    <div class="zazu-form-section-title">Tender & evidence readiness</div>
-                    <div class="zazu-form-section-copy">Keep the source documents behind the business boundary so Zazu can build evidence packs without making a legal or procurement decision for the business.</div>
-                </div>
+            <details class="zazu-form-section zazu-settings-collapsible">
+                <summary class="zazu-form-section-head zazu-settings-section-toggle">
+                    <span>
+                        <span class="zazu-form-section-title">Tender & evidence readiness</span>
+                        <span class="zazu-form-section-copy">Keep the source documents behind the business boundary so Zazu can build evidence packs without making a legal or procurement decision for the business.</span>
+                    </span>
+                    <span class="zazu-settings-toggle-icon" aria-hidden="true">+</span>
+                </summary>
                 <div class="zazu-panel">
                     <div class="zazu-panel-title">Compliance Centre</div>
                     <div class="zazu-panel-copy mt-1">Track CIPC, SARS, CSD, B-BBEE, UIF/SDL/COID, food-premises and tender-specific evidence where applicable.</div>
                     <a href="{{ route('settings.compliance') }}" class="zazu-btn zazu-btn-secondary mt-4">Open Compliance Centre</a>
                 </div>
-            </section>
+            </details>
 
-            <section class="zazu-form-section">
-                <div class="zazu-form-section-head">
-                    <div class="zazu-form-section-title">Branding images</div>
-                    <div class="zazu-form-section-copy">Use clear images. Zazu keeps the original upload and displays it responsively.</div>
-                </div>
+            <details class="zazu-form-section zazu-settings-collapsible" open>
+                <summary class="zazu-form-section-head zazu-settings-section-toggle">
+                    <span>
+                        <span class="zazu-form-section-title">Branding images</span>
+                        <span class="zazu-form-section-copy">Use clear images. Zazu keeps the original upload and displays it responsively.</span>
+                    </span>
+                    <span class="zazu-settings-toggle-icon" aria-hidden="true">+</span>
+                </summary>
 
                 <div class="zazu-branding-preview-grid">
                     <div class="zazu-branding-preview">
@@ -257,7 +269,7 @@
                         @endif
                     </div>
                 </div>
-            </section>
+            </details>
 
             <div class="zazu-actionbar">
                 <a href="{{ route('dashboard') }}" class="zazu-btn zazu-btn-ghost">Cancel</a>
