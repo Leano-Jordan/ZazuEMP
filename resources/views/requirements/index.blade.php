@@ -1,11 +1,6 @@
 <x-app-layout>
     <x-slot:title>Requirements · {{ $event->name }}</x-slot:title>
     <x-slot:heading>Requirements</x-slot:heading>
-    <x-slot:headerAction>
-        <a href="{{ route('work.requirements.create', $event) }}" class="zazu-btn zazu-btn-primary">Add service</a>
-        <a href="{{ route('work.show', $event) }}" class="zazu-btn zazu-btn-ghost">Job workspace</a>
-    </x-slot:headerAction>
-
     <section class="zazu-command-band zazu-requirements-command">
         <div>
             <div class="zazu-eyebrow">{{ $event->reference }} · {{ $event->customer?->name ?? 'Customer' }}</div>
@@ -18,7 +13,7 @@
     <section class="zazu-card zazu-list zazu-requirements-register">
         <div class="zazu-card-header">
             <div class="zazu-eyebrow">Operational records</div>
-            <div class="zazu-card-title mt-1">Requirement list</div>
+            <div class="zazu-section-heading"><div><div class="zazu-card-title mt-1">Requirement list</div></div><a href="{{ route('work.requirements.create', $event) }}" class="zazu-btn zazu-btn-primary">Add service</a></div>
             <div class="zazu-card-description">Each row is one requirement. The quantity shown at right belongs to that row.</div>
         </div>
         @if ($requirements->count())
