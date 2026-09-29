@@ -119,6 +119,37 @@ class BusinessMediaSecurityTest extends TestCase
             ->assertSee('data-branding-loading="wallpaper"', false)
             ->assertSee('data-branding-save', false);
     }
+    public function test_saved_branding_assets_are_rendered_in_shell_and_dashboard(): void
+    {
+        $this->signInAsOwner();
+        Storage::fake('local');
+
+        $business = auth()->user()->businesses()->firstOrFail();
+        $paths = [
+            'logo_path' => 'business-branding/logo.webp',
+            'dashboard_image_path' => 'business-branding/dashboard.webp',
+            'wallpaper_path' => 'business-branding/wallpaper.webp',
+        ];
+
+        foreach ($paths as $path) {
+            Storage::disk('local')->put($path, 'image-bytes');
+        }
+
+        $business->update($paths);
+        $version = $business->fresh()->updated_at?->timestamp ?? 0;
+
+        $response = $this->get(route('dashboard'));
+
+        $response->assertOk();
+        $response->assertSee('class="zazu-brand-logo"', false);
+        $response->assertSee(route('business.media', ['type' => 'logo']).'?v='.$version, false);
+        $response->assertSee('class="zazu-dash-hero-image"', false);
+        $response->assertSee(route('business.media', ['type' => 'dashboard']).'?v='.$version, false);
+        $response->assertSee('class="zazu-has-wallpaper"', false);
+        $response->assertSee('--zazu-wallpaper:', false);
+        $response->assertSee(route('business.media', ['type' => 'wallpaper']).'?v='.$version, false);
+    }
+
     public function test_settings_page_does_not_decrypt_legacy_tcs_pin_just_to_render(): void
     {
         $this->signInAsOwner();
