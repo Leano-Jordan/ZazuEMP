@@ -21,11 +21,25 @@
                 @if($workspaceTools['calendar'])<a href="{{ route('calendar.index') }}" class="zazu-btn zazu-btn-secondary">Open calendar <span>→</span></a>@endif
             </div>
         </div>
-        <div class="zazu-dash-hero-side">
-            <span class="zazu-dash-side-label">Workspace state</span>
-            <strong>Operational</strong>
-            <span>Live workspace records</span>
-            <div class="zazu-dash-side-line"><i></i><span>Event operations</span><b>ONLINE</b></div>
+        <div class="zazu-dash-hero-side zazu-dash-hero-visual">
+            @if($business?->dashboard_image_path)
+                <img
+                    src="{{ route('business.media', ['type' => 'dashboard']) }}?v={{ $business->updated_at?->timestamp ?? 0 }}"
+                    alt="{{ $business->name }} dashboard image"
+                    class="zazu-dash-hero-image"
+                >
+                <div class="zazu-dash-hero-overlay">
+                    <span class="zazu-dash-side-label">Workspace state</span>
+                    <strong>Operational</strong>
+                    <span>Live workspace records</span>
+                    <div class="zazu-dash-side-line"><i></i><span>Event operations</span><b>ONLINE</b></div>
+                </div>
+            @else
+                <span class="zazu-dash-side-label">Workspace state</span>
+                <strong>Operational</strong>
+                <span>Live workspace records</span>
+                <div class="zazu-dash-side-line"><i></i><span>Event operations</span><b>ONLINE</b></div>
+            @endif
         </div>
     </section>
 
