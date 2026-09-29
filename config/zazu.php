@@ -1,6 +1,7 @@
 <?php
 
 return [
+    'platform_admin_emails' => array_values(array_filter(array_map('trim', explode(',', (string) env('ZAZU_PLATFORM_ADMIN_EMAILS', ''))))),
     'errors' => [
         'AUTH-001' => ['category' => 'Authentication', 'severity' => 'medium', 'status' => 401, 'headline' => 'Sign-in required.', 'message' => 'Please sign in to continue.'],
         'AUTH-002' => ['category' => 'Authentication', 'severity' => 'medium', 'status' => 419, 'headline' => 'Your session has expired.', 'message' => 'Please refresh the page or sign in again to continue.'],
