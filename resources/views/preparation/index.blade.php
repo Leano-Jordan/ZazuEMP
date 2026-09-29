@@ -1,11 +1,6 @@
 <x-app-layout>
     <x-slot:title>Preparation · {{ $event->name }}</x-slot:title>
     <x-slot:heading>Preparation</x-slot:heading>
-    <x-slot:headerAction>
-        <a href="{{ route('work.preparation.create', $event) }}" class="zazu-btn zazu-btn-primary">Add preparation item</a>
-        <a href="{{ route('work.show', $event) }}" class="zazu-btn zazu-btn-ghost">Job workspace</a>
-    </x-slot:headerAction>
-
     <section class="zazu-command-band">
         <div>
             <div class="zazu-eyebrow">{{ $event->reference }} · Readiness</div>
@@ -18,7 +13,7 @@
     <section class="zazu-card zazu-list">
         <div class="zazu-card-header">
             <div class="zazu-eyebrow">Readiness records</div>
-            <div class="zazu-card-title mt-1">Preparation list</div>
+            <div class="zazu-section-heading"><div><div class="zazu-card-title mt-1">Preparation list</div></div><a href="{{ route('work.preparation.create', $event) }}" class="zazu-btn zazu-btn-primary">Add preparation item</a></div>
             <div class="zazu-card-description">Status controls belong to the row they update.</div>
         </div>
         @if ($items->count())
