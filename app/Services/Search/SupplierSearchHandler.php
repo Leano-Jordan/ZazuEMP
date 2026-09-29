@@ -4,7 +4,6 @@ namespace App\Services\Search;
 
 use App\Models\Business;
 use App\Models\Supplier;
-use Illuminate\Database\Eloquent\Builder;
 
 class SupplierSearchHandler extends AbstractWorkspaceSearchHandler
 {
