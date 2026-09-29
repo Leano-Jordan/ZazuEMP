@@ -501,3 +501,16 @@ textarea:focus-visible {
         transition: none;
     }
 }
+
+
+.zazu-admin-image-preview {
+    width: 100%;
+    min-height: 150px;
+    margin-top: 10px;
+    border: 1px solid var(--zazu-ui-divider);
+    border-radius: var(--zazu-ui-radius-sm);
+    background-color: var(--zazu-surface-2);
+    background-position: center;
+    background-size: cover;
+    background-repeat: no-repeat;
+}
