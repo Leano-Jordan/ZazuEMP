@@ -330,6 +330,48 @@
 
                 {{ $slot }}
             </div>
+
+            <footer class="zazu-app-footer">
+                <div class="zazu-app-footer-inner">
+                    <div class="zazu-app-footer-brand">
+                        <div class="zazu-app-footer-lockup">
+                            <span class="zazu-app-footer-mark" aria-hidden="true">Z</span>
+                            <div>
+                                <strong>ZAZU EMP</strong>
+                                <span>Event &amp; catering management</span>
+                            </div>
+                        </div>
+                        <p>Keep work, resources, purchasing and finance connected in one operational workspace.</p>
+                    </div>
+
+                    <nav class="zazu-app-footer-nav" aria-label="Footer navigation">
+                        <span class="zazu-app-footer-heading">Workspace</span>
+                        <a href="{{ route('dashboard') }}">Dashboard</a>
+                        @if($can('work.view'))<a href="{{ route('work.index') }}">Jobs</a>@endif
+                        @if($can('reports.view'))<a href="{{ route('reports.index') }}">Reports</a>@endif
+                        <a href="{{ route('search.index') }}">Search</a>
+                    </nav>
+
+                    @if($isOwner)
+                        <nav class="zazu-app-footer-nav" aria-label="System navigation">
+                            <span class="zazu-app-footer-heading">System</span>
+                            <a href="{{ route('settings.index') }}">Business settings</a>
+                            <a href="{{ route('settings.audit') }}">Activity audit</a>
+                            <a href="{{ route('onboarding.index') }}">Setup centre</a>
+                        </nav>
+                    @endif
+
+                    <div class="zazu-app-footer-meta">
+                        <span class="zazu-app-footer-heading">Workspace</span>
+                        <strong>{{ $business?->name ?? 'Zazu EMP' }}</strong>
+                        <span>Signed in as {{ auth()->user()->name }}</span>
+                    </div>
+                </div>
+                <div class="zazu-app-footer-bottom">
+                    <span>&copy; {{ now()->year }} Zazu EMP. All rights reserved.</span>
+                    <span>Built for practical event operations.</span>
+                </div>
+            </footer>
         </main>
     </div>
 
