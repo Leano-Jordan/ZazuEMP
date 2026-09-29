@@ -1,11 +1,6 @@
 <x-app-layout>
     <x-slot:title>Travel & Costing · {{ $event->name }}</x-slot:title>
     <x-slot:heading>Travel & Costing</x-slot:heading>
-    <x-slot:headerAction>
-        <a href="{{ route('work.travel.create', $event) }}" class="zazu-btn zazu-btn-primary">Add calculation</a>
-        <a href="{{ route('work.show', $event) }}" class="zazu-btn zazu-btn-ghost">Job workspace</a>
-    </x-slot:headerAction>
-
     <section class="zazu-command-band">
         <div>
             <div class="zazu-eyebrow">{{ $event->reference }} · {{ $event->customer?->name ?? 'Customer' }}</div>
