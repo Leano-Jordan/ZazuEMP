@@ -3,6 +3,7 @@
 namespace App\Services;
 
 use App\Models\PlatformLandingSetting;
+use Illuminate\Support\Facades\Schema;
 
 class LandingMediaService
 {
