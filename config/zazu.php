@@ -2,6 +2,32 @@
 
 return [
     'platform_admin_emails' => array_values(array_filter(array_map('trim', explode(',', (string) env('ZAZU_PLATFORM_ADMIN_EMAILS', ''))))),
+    'landing_image_library' => [
+        'catering_service' => [
+            'label' => 'Outdoor catered event',
+            'url' => 'https://www.spholaskitchen.co.za/assets/catering-setup-DkqWhPGH.jpg',
+        ],
+        'event_catering' => [
+            'label' => 'Event catering service',
+            'url' => 'https://media.licdn.com/dms/image/v2/C5612AQHjV15kmibk8g/article-cover_image-shrink_720_1280/article-cover_image-shrink_720_1280/0/1528725310398?e=2147483647&t=SYwaSIhNMUJQXQcEoIOZO5HYREYXnDDTN71NwSA-tMs&v=beta',
+        ],
+        'sound_stage' => [
+            'label' => 'Sound and stage setup',
+            'url' => 'https://4realpro.co.za/assets/images/471193228-9201696576549015-5830043338781498257-n.jpg',
+        ],
+        'wedding_catering' => [
+            'label' => 'Wedding catering',
+            'url' => 'https://florence.co.za/wp-content/uploads/2023/11/florence-05.jpg',
+        ],
+        'luxury_banquet' => [
+            'label' => 'Luxury outdoor banquet',
+            'url' => 'https://www.spholaskitchen.co.za/assets/catering-setup-DkqWhPGH.jpg',
+        ],
+        'stage_av' => [
+            'label' => 'Event stage and AV',
+            'url' => 'https://media.licdn.com/dms/image/v2/C561BAQGEiMk5LWJNBA/company-background_10000/company-background_10000/0/1585451060895/city_life_centre_cover?e=2147483647&t=ejo4m7p-pgJ0GzgCMIPe_ha8SCLfxlsKWW2G6Obwvfo&v=beta',
+        ],
+    ],
     'errors' => [
         'AUTH-001' => ['category' => 'Authentication', 'severity' => 'medium', 'status' => 401, 'headline' => 'Sign-in required.', 'message' => 'Please sign in to continue.'],
         'AUTH-002' => ['category' => 'Authentication', 'severity' => 'medium', 'status' => 419, 'headline' => 'Your session has expired.', 'message' => 'Please refresh the page or sign in again to continue.'],
