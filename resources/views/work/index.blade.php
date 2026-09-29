@@ -1,9 +1,7 @@
 <x-app-layout>
     <x-slot:title>Work</x-slot:title>
     <x-slot:heading>Event Operations</x-slot:heading>
-    <x-slot:headerAction><a href="{{ route('work.create') }}" class="zazu-btn zazu-btn-primary">+ Create work</a></x-slot:headerAction>
-
-    <section class="zazu-ops-hero">
+<section class="zazu-ops-hero">
         <div>
             <div class="zazu-eyebrow">Rosco ICT · Event Operations</div>
             <h2 class="zazu-command-title">Keep every event moving.</h2>
