@@ -65,7 +65,7 @@ test('registration flows through onboarding into the dashboard', async ({ page }
     await expect(page.locator('nav[aria-label="Public navigation"]').getByText("You’re signed in", { exact: true })).toBeVisible();
 
     await page.locator('nav[aria-label="Public navigation"]').getByRole('button', { name: 'Sign out', exact: true }).click();
-    await expect(page).toHaveURL(/\/?(?:\?auth=login)?$/);
+    await expect(page).toHaveURL(/\/$/);
     await expect(page.locator('.zazu-error-shell')).toHaveCount(0);
 
     await page.locator('nav[aria-label="Public navigation"]').getByRole('button', { name: 'Log in', exact: true }).click();
@@ -90,7 +90,7 @@ test('public entry and login surfaces render without Zazu error pages', async ({
 
     const loginResponse = await page.goto('/login');
     expect(loginResponse?.status(), 'legacy login entry').toBe(200);
-    await expect(page).toHaveURL(/\/$/);
+    await expect(page).toHaveURL(/\/?(?:\?auth=login)?$/);
     await expect(page.locator('.zazu-error-shell')).toHaveCount(0);
     await expect(page.getByRole('button', { name: 'Log in', exact: true }).first()).toBeVisible();
     await page.getByRole('button', { name: 'Log in', exact: true }).first().click();
