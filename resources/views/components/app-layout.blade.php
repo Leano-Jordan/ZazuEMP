@@ -412,7 +412,8 @@
 
         const filterCommandItems = () => {
             if (!command || !commandInput) return;
-            const query = commandInput.value.trim().toLowerCase();
+            const rawQuery = commandInput.value.trim();
+            const query = rawQuery.toLowerCase();
             let visible = 0;
 
             commandItems.forEach((item) => {
@@ -428,8 +429,8 @@
                     : 'Workspace destinations';
             }
             if (commandSearchLabel) {
-                commandSearchLabel.textContent = query
-                    ? 'Search workspace for “' + query + '”'
+                commandSearchLabel.textContent = rawQuery
+                    ? 'Search workspace for “' + rawQuery + '”'
                     : 'Search workspace';
             }
             if (commandSearchMeta) {
