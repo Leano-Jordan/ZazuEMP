@@ -85,6 +85,7 @@
                 <div class="zazu-nav-group">
                     <div class="zazu-nav-group-label">Control</div>
                     <div class="zazu-nav-stack">
+                        <a href="{{ route('search.index') }}" class="zazu-nav-link {{ request()->routeIs('search.*') ? 'active' : '' }}" @if(request()->routeIs('search.*')) aria-current="page" @endif><span class="zazu-nav-label">Search</span></a>
                         @if($can('reports.view'))
                             <a href="{{ route('reports.index') }}" class="zazu-nav-link {{ request()->routeIs('reports.*') ? 'active' : '' }}"><span class="zazu-nav-label">Reports</span></a>
                         @endif
@@ -250,11 +251,11 @@
                             </label>
             <div class="zazu-command-palette" id="zazu-command-palette" data-zazu-command hidden>
                 <div class="zazu-command-results-head">
-                    <span>Workspace search</span>
-                    <small data-zazu-command-count>All available surfaces</small>
+                    <span>Quick access</span>
+                    <small data-zazu-command-count>Workspace destinations</small>
                 </div>
-                <div class="zazu-command-results" data-zazu-command-results role="listbox" aria-label="Workspace search results">
-                    <a href="{{ route('search.index') }}" data-command-item data-search-terms="search records workspace customers jobs suppliers quotes invoices purchasing finance find" role="option"><span>Search records</span><small>Search business records across your workspace</small></a>
+                <div class="zazu-command-results" data-zazu-command-results role="listbox" aria-label="Quick access and workspace search">
+                    <a href="{{ route('search.index') }}" data-command-item data-search-terms="search find records workspace customers jobs suppliers quotes invoices purchasing finance advanced filters" role="option"><span>Search workspace</span><small>Find business records · filters and date range</small></a>
                     @if($can('work.view'))<a href="{{ route('work.index') }}" data-command-item data-search-terms="jobs work events operations event management schedule run sheet" role="option"><span>Jobs</span><small>Event operations · work register</small></a>@endif
                     @if($can('capabilities.view'))<a href="{{ route('capabilities.index') }}" data-command-item data-search-terms="services prices catalogue capabilities catering food packages equipment hire rates" role="option"><span>Services & prices</span><small>Capability catalogue · rates and packages</small></a>@endif
                     @if($can('quotes.view'))<a href="{{ route('quotes.index') }}" data-command-item data-search-terms="quotes quotation quotations commercial documents proposals" role="option"><span>Quotes</span><small>Commercial documents · quote queue</small></a>@endif
@@ -272,7 +273,7 @@
                     <a href="{{ route('onboarding.index') }}" data-command-item data-search-terms="setup onboarding business setup catalogue setup foundation" role="option"><span>Setup centre</span><small>Workspace foundation · business and catalogue setup</small></a>@endif
                 </div>
                 <div class="zazu-command-empty" data-zazu-command-empty hidden>
-                    No matching surfaces. Press Enter to search business records.
+                    No matching destinations. Press Enter to search workspace records.
                 </div>
             </div>
                         </div>
@@ -419,7 +420,9 @@
             });
 
             if (commandCount) {
-                commandCount.textContent = query ? visible + ' matching surface' + (visible === 1 ? '' : 's') : 'All available surfaces';
+                commandCount.textContent = query
+                    ? visible + ' matching destination' + (visible === 1 ? '' : 's')
+                    : 'Workspace destinations';
             }
             if (commandEmpty) commandEmpty.hidden = visible !== 0;
         };
