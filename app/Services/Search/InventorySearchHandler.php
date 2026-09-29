@@ -4,7 +4,6 @@ namespace App\Services\Search;
 
 use App\Models\Business;
 use App\Models\InventoryItem;
-use Illuminate\Database\Eloquent\Builder;
 
 class InventorySearchHandler extends AbstractWorkspaceSearchHandler
 {
