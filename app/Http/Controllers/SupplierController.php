@@ -25,32 +25,6 @@ class SupplierController extends Controller
 
     public function create(): View { return view('suppliers.create'); }
 
-    public function edit(Request $request, Supplier $supplier): View
-    {
-        $businessId = app(CurrentBusiness::class)->id($request->user());
-        abort_unless((int) $supplier->business_id === $businessId, 404);
-
-        return view('suppliers.create', compact('supplier'));
-    }
-
-    public function update(Request $request, Supplier $supplier): RedirectResponse
-    {
-        $businessId = app(CurrentBusiness::class)->id($request->user());
-        abort_unless((int) $supplier->business_id === $businessId, 404);
-
-        $data = $request->validate([
-            'name'=>['required','string','max:255'],
-            'contact_name'=>['nullable','string','max:255'],
-            'email'=>['nullable','email','max:255'],
-            'phone'=>['nullable','string','max:50'],
-            'notes'=>['nullable','string'],
-        ]);
-
-        $supplier->update($data);
-
-        return redirect()->route('suppliers.index')->with('success','Supplier updated.');
-    }
-
     public function store(Request $request): RedirectResponse
     {
         $businessId = app(CurrentBusiness::class)->id($request->user());
