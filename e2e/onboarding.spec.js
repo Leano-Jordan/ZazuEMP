@@ -13,7 +13,7 @@ test('registration flows through onboarding into the dashboard', async ({ page }
     await expect(page.locator('html')).toHaveAttribute('lang', /.+/);
     await expect(page.locator('nav[aria-label="Public navigation"]')).toBeVisible();
     await expect(page.locator('.zazu-error-shell')).toHaveCount(0);
-    await expect(page.getByRole('heading', { name: 'Run the work. Know the numbers.' })).toBeVisible();
+    await expect(page.getByRole('heading', { name: 'Run every event. Stay ahead of the business.' })).toBeVisible();
     await expect(page.locator('nav[aria-label="Public navigation"]').getByRole('button', { name: 'Register', exact: true })).toBeVisible();
     await expect(page.locator('nav[aria-label="Public navigation"]').getByRole('button', { name: 'Log in', exact: true })).toBeVisible();
     await expect(page.locator('[data-auth-modal]')).toHaveCount(1);
