@@ -254,7 +254,7 @@ return [
                 'purchasing.view', 'purchasing.create', 'purchasing.status',
                 'inventory.view', 'inventory.create', 'inventory.movement',
                 'assets.view', 'assets.create', 'assets.update', 'assets.allocate', 'assets.release',
-                'suppliers.view', 'suppliers.create',
+                'suppliers.view', 'suppliers.create', 'suppliers.update',
                 'reports.view', 'capabilities.view',
             ],
         ],
