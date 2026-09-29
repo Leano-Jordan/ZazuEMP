@@ -401,3 +401,50 @@ Test-contract and release-evidence hygiene only. No application business logic, 
 
 ### Next Director target
 Obtain fresh current-head CI evidence. Fix only verified runtime failures. After a green runtime baseline, move to populated-data reconciliation, authorization challenge testing, backup/restore proof and upgrade safety before adding non-critical product features.
+
+
+## ZR-06 Architectural debt hardening — 2026-09-29
+
+### Director scope
+Four-pass hardening loop focused on architectural debt and static engineering quality. No new product feature scope was introduced.
+
+### Cycle 1 — Complexity isolation
+- Split the monolithic `WorkspaceSearchService` into a thin orchestrator plus focused search handlers for customer, event, service, supplier, purchasing, quote, invoice, cost, asset, inventory and expense domains.
+- Extracted shared search filtering/text helpers into `AbstractWorkspaceSearchHandler`.
+- Decomposed `ZazuHelperService::attention()` into focused attention rules.
+- Purpose: reduce class/method complexity, isolate change impact and make search rules independently maintainable.
+
+### Cycle 2 — Persistence boundary audit
+- Replaced direct `DB::table('platform_landing_settings')` access in the public route and platform-admin controller.
+- Added `PlatformLandingSetting` model with a single canonical `current()` accessor.
+- Added `LandingMediaService` as the landing-media application boundary.
+- Caught one integration contract mismatch during the cycle: the admin view expected the settings model, not the resolved image array. Corrected before final pass.
+- Result: public routing, controller and persistence responsibilities are now separated.
+
+### Cycle 3 — Integration and hygiene audit
+- Re-read the orchestrator, search handlers, landing-media service, controller and route wiring after refactor.
+- Removed unused handler imports.
+- Confirmed business scoping remains inside each search query and existing permission filtering remains in the orchestrator.
+- Confirmed platform-admin routes remain behind `auth`, `auth.session` and `platform.admin`.
+- Confirmed no TODO/FIXME debt was introduced by this cycle.
+
+### Cycle 4 — Final destructive-change gate
+- Re-audited the changed architecture for duplicate authorities, hidden cross-domain coupling, dead code and unnecessary scope.
+- No additional safe high-value refactor was identified that could be made without materially widening the change surface or risking unrelated runtime behavior.
+- **Decision:** stop architectural mutation here. Further broad refactoring at this point would be diminishing-return / potentially destructive rather than controlled hardening.
+
+### Current verification state
+- Current HEAD after the four-cycle execution is pending CI completion.
+- GitHub has queued fresh Laravel, browser, Psalm and PHPMD runs for the latest push.
+- SonarCloud remains skipped by repository workflow conditions.
+- Static architecture position is materially improved, but no test/runtime gate is marked green until fresh workflow evidence completes.
+
+### Gate target
+Non-test engineering gates targeted by this cycle:
+- Architecture / separation of concerns: **90+ target**
+- Complexity / maintainability: **90+ target**
+- Security boundary: **90+ target**
+- Configuration / persistence boundaries: **90+ target**
+- Release hygiene / change containment: **90+ target**
+
+These are engineering assessments, not automated test scores. Runtime, browser, recovery, populated-data and upgrade gates remain evidence-dependent.
