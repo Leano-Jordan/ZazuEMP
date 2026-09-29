@@ -69,7 +69,7 @@
     <div class="auth-modal-panel">
         <button type="button" class="auth-modal-close" data-auth-modal-close aria-label="Close authentication window">×</button>
 
-        <div class="auth-modal-access" role="tablist" aria-label="Zazu access type" data-auth-access-selector>
+        <div class="auth-modal-access" role="tablist" aria-label="Zazu access type">
             <button type="button" role="tab" aria-selected="true" data-auth-access-switch="login">Workspace access</button>
             <button type="button" role="tab" aria-selected="false" data-auth-access-switch="owner">Owner / Administrator</button>
         </div>
@@ -101,9 +101,9 @@
         </section>
 
         <section data-auth-panel="register" hidden>
-            <div class="auth-modal-kicker">Create your workspace</div>
+            <div class="auth-modal-kicker">Create owner workspace</div>
             <h2 id="auth-register-title">Set up your Zazu workspace.</h2>
-            <p class="auth-modal-copy" id="auth-register-copy">Set up your business workspace and create the account you will use to sign in.</p>
+            <p class="auth-modal-copy" id="auth-register-copy">Create the owner account for your Zazu workspace and choose the username you will use to sign in.</p>
             <form method="POST" action="{{ route('register.store') }}" class="auth-modal-form" data-auth-form="register">
                 @csrf
                 <div class="auth-modal-grid">
@@ -174,7 +174,6 @@
     const loginKicker = modal.querySelector('[data-auth-kicker]');
     const loginSubmit = modal.querySelector('[data-auth-submit]');
     const loginSwitch = modal.querySelector('[data-auth-login-switch]');
-    const accessSelector = modal.querySelector('[data-auth-access-selector]');
 
     const setAccessMode = (mode) => {
         const isOwner = mode === 'owner';
@@ -185,7 +184,6 @@
         if (loginCopy) loginCopy.textContent = isOwner ? 'Use your owner account to enter protected administration.' : 'Use your username or email address to continue to Zazu.';
         if (loginSubmit) loginSubmit.innerHTML = isOwner ? 'Open owner area <span>→</span>' : 'Log in <span>→</span>';
         if (loginSwitch) loginSwitch.hidden = isOwner;
-        if (accessSelector) accessSelector.hidden = true;
     };
 
     const showPanel = (name) => {
@@ -196,7 +194,6 @@
 
         if (active === next) {
             if (panel === 'login') setAccessMode(name === 'owner' ? 'owner' : 'login');
-        if (accessSelector) accessSelector.hidden = panel !== 'login';
             const currentFirst = next.querySelector('input:not([type="hidden"])');
             window.setTimeout(() => currentFirst?.focus(), 0);
             return;
