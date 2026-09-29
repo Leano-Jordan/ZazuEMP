@@ -35,6 +35,14 @@ Route::get('/', function (\Illuminate\Http\Request $request) {
         : null;
     $hasActiveWorkspace = $business !== null;
 
+    $landingSettings = \Illuminate\Support\Facades\DB::table('platform_landing_settings')->first();
+    $landingImages = [
+        'hero' => $landingSettings?->hero_image_path ?: 'https://www.spholaskitchen.co.za/assets/catering-setup-DkqWhPGH.jpg',
+        'operations' => $landingSettings?->operations_image_path ?: 'https://media.licdn.com/dms/image/v2/C5612AQHjV15kmibk8g/article-cover_image-shrink_720_1280/article-cover_image-shrink_720_1280/0/1528725310398?e=2147483647&t=SYwaSIhNMUJQXQcEoIOZO5HYREYXnDDTN71NwSA-tMs&v=beta',
+        'resources' => $landingSettings?->resources_image_path ?: 'https://4realpro.co.za/assets/images/471193228-9201696576549015-5830043338781498257-n.jpg',
+        'control' => $landingSettings?->control_image_path ?: 'https://florence.co.za/wp-content/uploads/2023/11/florence-05.jpg',
+    ];
+
     $telemetry = [
         'all_work' => 1,
         'today' => 0,
