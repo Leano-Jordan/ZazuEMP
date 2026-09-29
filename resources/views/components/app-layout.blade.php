@@ -331,7 +331,7 @@
                 {{ $slot }}
             </div>
 
-            <footer class="zazu-app-footer">
+            <footer class="zazu-app-footer {{ $isOwner ? 'has-system-links' : 'without-system-links' }}">
                 <div class="zazu-app-footer-inner">
                     <div class="zazu-app-footer-brand">
                         <div class="zazu-app-footer-lockup">
@@ -345,7 +345,7 @@
                     </div>
 
                     <nav class="zazu-app-footer-nav" aria-label="Footer navigation">
-                        <span class="zazu-app-footer-heading">Workspace</span>
+                        <h2 class="zazu-app-footer-heading">Workspace</h2>
                         <a href="{{ route('dashboard') }}">Dashboard</a>
                         @if($can('work.view'))<a href="{{ route('work.index') }}">Jobs</a>@endif
                         @if($can('reports.view'))<a href="{{ route('reports.index') }}">Reports</a>@endif
@@ -354,7 +354,7 @@
 
                     @if($isOwner)
                         <nav class="zazu-app-footer-nav" aria-label="System navigation">
-                            <span class="zazu-app-footer-heading">System</span>
+                            <h2 class="zazu-app-footer-heading">System</h2>
                             <a href="{{ route('settings.index') }}">Business settings</a>
                             <a href="{{ route('settings.audit') }}">Activity audit</a>
                             <a href="{{ route('onboarding.index') }}">Setup centre</a>
@@ -362,7 +362,7 @@
                     @endif
 
                     <div class="zazu-app-footer-meta">
-                        <span class="zazu-app-footer-heading">Workspace</span>
+                        <h2 class="zazu-app-footer-heading">Workspace</h2>
                         <strong>{{ $business?->name ?? 'Zazu EMP' }}</strong>
                         <span>Signed in as {{ auth()->user()->name }}</span>
                     </div>

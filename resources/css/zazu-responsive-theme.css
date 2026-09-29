@@ -28,6 +28,11 @@
     color: var(--zazu-muted);
 }
 
+/* Non-owner workspaces do not render the System column; collapse the unused desktop track. */
+.zazu-app-footer.without-system-links .zazu-app-footer-inner {
+    grid-template-columns: minmax(260px, 1.8fr) minmax(120px, .75fr) minmax(190px, 1fr);
+}
+
 .zazu-app-footer-inner {
     width: min(100%, 1440px);
     margin: 0 auto;
@@ -89,7 +94,7 @@
 
 .zazu-app-footer-heading {
     display: block;
-    margin-bottom: 8px;
+    margin: 0 0 8px;
     color: var(--zazu-faint);
     font-size: 9px;
     font-weight: 800;
@@ -169,6 +174,10 @@
 }
 
 @media (max-width: 1100px) {
+    .zazu-app-footer.without-system-links .zazu-app-footer-inner {
+        grid-template-columns: minmax(220px, 1.6fr) minmax(110px, 1fr);
+    }
+
     .zazu-app-footer-inner {
         grid-template-columns: minmax(220px, 1.6fr) repeat(2, minmax(110px, 1fr));
     }
@@ -181,7 +190,12 @@
 }
 
 @media (max-width: 820px) {
+    .zazu-app-footer.without-system-links .zazu-app-footer-inner {
+        grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    }
+
     .zazu-app-footer {
+
         margin-top: 24px;
     }
 
