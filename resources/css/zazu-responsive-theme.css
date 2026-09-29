@@ -94,7 +94,7 @@
 
 .zazu-app-footer-heading {
     display: block;
-    margin-bottom: 8px;
+    margin: 0 0 8px;
     color: var(--zazu-faint);
     font-size: 9px;
     font-weight: 800;
