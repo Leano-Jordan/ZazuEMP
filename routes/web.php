@@ -20,6 +20,7 @@ use App\Http\Controllers\InventoryController;
 use App\Http\Controllers\OnboardingController;
 use App\Http\Controllers\PasswordResetController;
 use App\Http\Controllers\PurchaseOrderController;
+use App\Http\Controllers\PlatformLandingSettingsController;
 use App\Http\Controllers\QuoteController;
 use App\Http\Controllers\RequirementController;
 use App\Http\Controllers\SupplierController;
@@ -100,6 +101,11 @@ Route::middleware(['auth', 'auth.session'])->group(function () {
 
 Route::middleware(['auth', 'auth.session', 'owner'])->group(function () {
     Route::get('/owner', [\App\Http\Controllers\AuthController::class, 'owner'])->name('owner.dashboard');
+});
+
+Route::middleware(['auth', 'auth.session', 'platform.admin'])->prefix('admin')->group(function () {
+    Route::get('/landing-settings', [PlatformLandingSettingsController::class, 'edit'])->name('admin.landing.settings');
+    Route::put('/landing-settings', [PlatformLandingSettingsController::class, 'update'])->name('admin.landing.settings.update');
 });
 
 Route::middleware(['auth', 'auth.session', 'business.context'])->group(function () {
