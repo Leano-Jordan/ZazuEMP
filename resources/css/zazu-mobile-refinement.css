@@ -29,8 +29,8 @@
         display: grid;
         grid-template-columns: 40px minmax(0, 1fr);
         grid-template-areas:
-            "menu context"
-            "actions actions";
+            "menu actions"
+            "context context";
         align-items: center;
         gap: 8px 10px;
     }
@@ -93,6 +93,7 @@
         min-width: 0;
         width: 100%;
         text-align: center;
+        padding-top: 1px;
     }
 
     .zazu-page-title {
@@ -111,14 +112,15 @@
         grid-area: actions;
         min-width: 0;
         max-width: 100%;
-        width: 100% !important;
+        width: auto !important;
         display: flex;
         flex: none;
         flex-wrap: nowrap !important;
         align-items: center;
-        justify-content: center;
+        justify-content: flex-end;
         gap: 8px;
         padding: 0 !important;
+        justify-self: end;
     }
 
     .zazu-command-search {
@@ -339,6 +341,9 @@
     .zazu-topbar-inner {
         padding: max(7px, env(safe-area-inset-top)) 9px 9px;
         grid-template-columns: 40px minmax(0, 1fr);
+        grid-template-areas:
+            "menu actions"
+            "context context";
         gap: 7px 8px;
     }
 
