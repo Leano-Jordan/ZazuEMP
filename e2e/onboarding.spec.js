@@ -107,7 +107,7 @@ test('landing authentication modal is keyboard-safe and switches between login a
     await expect(page.getByRole('heading', { name: 'Welcome back.' })).toBeVisible();
     await expect(page.getByLabel('Username or email')).toBeFocused();
 
-    await page.getByRole('button', { name: 'Create your workspace' }).click();
+    await page.getByRole('button', { name: 'Create your workspace', exact: true }).click();
     await expect(page.getByRole('heading', { name: 'Set up your Zazu workspace.' })).toBeVisible();
     await expect(page.getByLabel('Your name')).toBeFocused();
 
