@@ -172,6 +172,48 @@ These are not to be pulled into V1 unless a concrete release requirement proves 
 
 ---
 
+
+# Phase 10 — Deferred product capabilities and integrations
+
+These are **post-core hardening / later-release priorities**. They are recorded now so they are not lost or accidentally pulled into the current release-critical path.
+
+| ID | Area | Requirement | Status | Priority | Release impact | Next Action |
+|---|---|---|---|---|---|---|
+| LATER-01 | Zazu Helper | Decide whether the in-app Zazu Helper is a maintained product capability or should be retired/hidden | 🟡 DEFERRED REVIEW | P2 | Medium | Audit actual usage, value and maintenance cost before expanding it |
+| LATER-02 | Platform Admin | Decide whether the platform-admin surface is a supported product capability or an internal maintenance surface | 🟡 DEFERRED REVIEW | P2 | Low–Medium | Audit current purpose, routes, authorization and actual operational need |
+| LATER-03 | Media | Complete wallpaper support where logo/workspace image already work | 🟡 PARTIAL | P2 | Medium | Trace wallpaper storage → settings → rendering → responsive/background CSS and fix the missing path |
+| LATER-04 | Spreadsheet import | Import existing business Excel workbooks into Zazu for supported domains | ⬜ NOT STARTED | P2 | High | Define supported workbook templates/columns and safe preview → validate → import flow |
+| LATER-05 | Spreadsheet export | Export relevant Zazu business data back to Excel | ⬜ NOT STARTED | P2 | Medium | Define domain exports for customers, assets/equipment, products/services, suppliers, purchasing and finance where appropriate |
+| LATER-06 | Spreadsheet migration safety | Prevent bad spreadsheets from corrupting live business data | ⬜ NOT STARTED | P1 | High | Add staging/preview, row-level validation, duplicate matching, business scoping, transaction/rollback and import audit trail |
+| LATER-07 | Document ingestion | Ingest business documents/photos/scans and extract useful structured data into Zazu | ⬜ NOT STARTED | P2 | High | Define document types, extraction pipeline, human review and source-document retention |
+| LATER-08 | Email connection | Connect a business mailbox to Zazu for controlled inbound/outbound operational workflows | ⬜ NOT STARTED | P2 | Medium–High | Define provider/auth model, mailbox permissions, message linking, attachments and audit rules |
+| LATER-09 | WhatsApp connection | Connect WhatsApp business conversations/messages to relevant Zazu records | ⬜ NOT STARTED | P2 | High | Define provider/API route, consent/privacy boundaries, message/media linking and record ownership |
+| LATER-10 | Unified ingestion | Establish a common ingestion architecture for Excel, documents, email and WhatsApp | ⬜ NOT STARTED | P2 | High | Design a staged ingestion boundary so external data never writes directly into core domain tables |
+| LATER-11 | Import/export auditability | Make all imports, exports and external-ingestion actions attributable and reversible where appropriate | ⬜ NOT STARTED | P1 | High | Define import batch IDs, actor/source metadata, change summaries and rollback/reversal strategy |
+
+## Deferred data-ingestion design rule
+
+Do **not** let Excel/document/email/WhatsApp integrations write directly into production domain tables without a validation boundary.
+
+Target flow:
+
+**Source → Ingestion/Staging → Parse/Map → Validate → Preview/Review → Commit → Audit**
+
+For Excel specifically, initial supported migration candidates should be practical business sheets such as:
+
+- Customers
+- Products/services
+- Suppliers
+- Assets/equipment
+- Inventory items
+- Event/job records where a safe mapping exists
+
+The importer should not assume every customer's spreadsheet layout is identical. Template detection, column mapping and a review screen should be treated as part of the feature.
+
+## Deferred integration principle
+
+Email and WhatsApp should connect to existing Zazu records rather than become separate communication silos. Messages, attachments and documents should be linkable to customers, jobs/events, quotes, invoices or other supported records without bypassing existing permissions and audit rules.
+
 # Current Director scoreboard
 
 Scoring is deliberately conservative and evidence-based. These figures are not test-count scores.
