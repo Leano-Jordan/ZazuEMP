@@ -210,6 +210,6 @@ class OnboardingTest extends TestCase
             ->assertOk()
             ->assertSee('Workspace surfaces')
             ->assertSee('Finance')
-            ->assertDontSee('Quick access');
+            ->assertSee('Quick access');
     }
 }
