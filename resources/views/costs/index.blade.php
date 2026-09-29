@@ -1,11 +1,6 @@
 <x-app-layout>
     <x-slot:title>Costs · {{ $event->name }}</x-slot:title>
     <x-slot:heading>Costs</x-slot:heading>
-    <x-slot:headerAction>
-        <a href="{{ route('work.costs.create', $event) }}" class="zazu-btn zazu-btn-primary">Add cost</a>
-        <a href="{{ route('work.show', $event) }}" class="zazu-btn zazu-btn-ghost">Job workspace</a>
-    </x-slot:headerAction>
-
     <section class="zazu-command-band">
         <div>
             <div class="zazu-eyebrow">{{ $event->reference }} · {{ $event->customer?->name ?? 'Customer' }}</div>
@@ -25,7 +20,7 @@
     <section class="zazu-card zazu-list">
         <div class="zazu-card-header">
             <div class="zazu-eyebrow">Operational records</div>
-            <div class="zazu-card-title mt-1">Cost list</div>
+            <div class="zazu-section-heading"><div><div class="zazu-card-title mt-1">Cost list</div></div><a href="{{ route('work.costs.create', $event) }}" class="zazu-btn zazu-btn-primary">Add cost</a></div>
             <div class="zazu-card-description">Projected and actual amounts sit under clearly labelled columns.</div>
         </div>
         @if ($costs->count())
