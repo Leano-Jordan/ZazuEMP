@@ -75,6 +75,68 @@ This document is the current execution map. Dated implementation records remain 
 - [ ] Operational runbooks
 - [ ] Final release-candidate audit
 
+
+## 07 Deferred product capabilities & integrations
+
+These items are deliberately **later priorities**, not current release blockers unless a future release scope promotes them.
+
+### Product surfaces to review
+- [ ] Zazu Helper — audit usefulness, actual usage and maintenance cost; decide maintain / simplify / retire
+- [ ] Platform Admin — audit actual operational purpose, authorization and maintenance value; decide supported surface vs internal tooling
+- [ ] Wallpaper — complete the missing wallpaper path while preserving working logo and workspace-image behavior
+
+### Excel / spreadsheet interoperability
+- [ ] Excel import foundation
+- [ ] Excel export foundation
+- [ ] Customers workbook import
+- [ ] Products/services workbook import
+- [ ] Suppliers workbook import
+- [ ] Assets/equipment workbook import
+- [ ] Inventory workbook import
+- [ ] Safe event/job workbook import where a reliable mapping exists
+- [ ] Import template/column mapping
+- [ ] Import preview before commit
+- [ ] Row-level validation and useful error reporting
+- [ ] Duplicate matching / conflict handling
+- [ ] Staging area before production writes
+- [ ] Transactional commit and rollback
+- [ ] Import audit trail
+- [ ] Export permissions and business scoping
+
+### Document ingestion
+- [ ] Document ingestion boundary
+- [ ] PDF/document extraction
+- [ ] Scan/photo/OCR extraction
+- [ ] Source-document retention and linkage
+- [ ] Human review before committing extracted data
+- [ ] Structured extraction into supported Zazu records
+- [ ] Ingestion audit trail
+
+### Email integration
+- [ ] Business mailbox connection model
+- [ ] Provider authentication and permissions
+- [ ] Inbound message ingestion
+- [ ] Outbound operational email integration
+- [ ] Attachment handling
+- [ ] Link messages to customers/jobs/quotes/invoices where supported
+- [ ] Email audit and privacy controls
+
+### WhatsApp integration
+- [ ] WhatsApp Business provider/API integration model
+- [ ] Inbound message ingestion
+- [ ] Outbound operational messaging where appropriate
+- [ ] Photo/document/media handling
+- [ ] Link conversations/messages to supported Zazu records
+- [ ] Consent/privacy/retention controls
+- [ ] WhatsApp audit trail
+
+### Unified ingestion architecture
+- [ ] Common Source → Staging → Parse/Map → Validate → Preview/Review → Commit → Audit pipeline
+- [ ] External sources cannot bypass core business permissions
+- [ ] External data cannot write directly to production domain tables without validation
+- [ ] Import/ingestion batch identity and source metadata
+- [ ] Reversal/rollback strategy for imported changes
+
 ## Execution rule
 
 Do not work down this list mechanically.
