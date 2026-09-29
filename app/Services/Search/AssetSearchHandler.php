@@ -4,7 +4,6 @@ namespace App\Services\Search;
 
 use App\Models\Business;
 use App\Models\Asset;
-use Illuminate\Database\Eloquent\Builder;
 
 class AssetSearchHandler extends AbstractWorkspaceSearchHandler
 {
