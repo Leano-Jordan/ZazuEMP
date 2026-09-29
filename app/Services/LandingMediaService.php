@@ -14,8 +14,20 @@ class LandingMediaService
 
     public function images(): array
     {
-        $settings = $this->current();
         $library = config('zazu.landing_image_library', []);
+
+        // The public landing page must remain available during a deployment
+        // where the new platform-media migration has not run yet.
+        if (!Schema::hasTable('platform_landing_settings')) {
+            return [
+                'hero' => $library['catering_service']['url'],
+                'operations' => $library['event_catering']['url'],
+                'resources' => $library['sound_stage']['url'],
+                'control' => $library['wedding_catering']['url'],
+            ];
+        }
+
+        $settings = $this->current();
 
         return [
             'hero' => $settings->hero_image_path ?: $library['catering_service']['url'],
