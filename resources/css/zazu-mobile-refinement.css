@@ -360,6 +360,32 @@
         padding-inline: 10px;
     }
 
+    /* Mobile form actions: compact, content-sized controls instead of oversized full-width buttons. */
+    .zazu-actionbar {
+        width: 100%;
+        display: flex;
+        align-items: center;
+        justify-content: flex-end;
+        gap: 8px;
+        flex-wrap: nowrap;
+    }
+
+    .zazu-actionbar > .zazu-btn,
+    .zazu-actionbar-sticky > .zazu-btn {
+        min-height: 36px;
+        height: 36px;
+        flex: 0 1 auto;
+        width: auto;
+        min-width: 0;
+        padding: 0 12px;
+        font-size: 11px;
+        line-height: 1;
+    }
+
+    .zazu-actionbar-sticky {
+        padding: 8px;
+    }
+
     .zazu-mobile-nav-backdrop {
         background: color-mix(in srgb, #000 40%, transparent);
     }
