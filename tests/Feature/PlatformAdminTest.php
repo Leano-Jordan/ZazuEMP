@@ -37,6 +37,23 @@ class PlatformAdminTest extends TestCase
         $this->assertSame(config('zazu.landing_image_library.wedding_catering.url'), $row->control_image_path);
     }
 
+    public function test_public_landing_uses_platform_media_configuration(): void
+    {
+        DB::table('platform_landing_settings')->update([
+            'hero_image_path' => config('zazu.landing_image_library.sound_stage.url'),
+            'operations_image_path' => config('zazu.landing_image_library.event_catering.url'),
+            'resources_image_path' => config('zazu.landing_image_library.wedding_catering.url'),
+            'control_image_path' => config('zazu.landing_image_library.catering_service.url'),
+        ]);
+
+        $this->get(route('landing'))
+            ->assertOk()
+            ->assertSee(config('zazu.landing_image_library.sound_stage.url'), false)
+            ->assertSee(config('zazu.landing_image_library.event_catering.url'), false)
+            ->assertSee(config('zazu.landing_image_library.wedding_catering.url'), false)
+            ->assertSee(config('zazu.landing_image_library.catering_service.url'), false);
+    }
+
     public function test_non_platform_admin_cannot_manage_landing_media(): void
     {
         $user = \App\Models\User::factory()->create(['email' => 'owner@zazu.test']);
