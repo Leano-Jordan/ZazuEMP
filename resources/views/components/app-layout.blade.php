@@ -341,34 +341,47 @@
                                 <span>Event &amp; catering management</span>
                             </div>
                         </div>
-                        <p>Keep work, resources, purchasing and finance connected in one operational workspace.</p>
+                        <p>One operational workspace for jobs, resources, purchasing and finance.</p>
                     </div>
 
-                    <nav class="zazu-app-footer-nav" aria-label="Footer navigation">
-                        <h2 class="zazu-app-footer-heading">Workspace</h2>
-                        <a href="{{ route('dashboard') }}">Dashboard</a>
-                        @if($can('work.view'))<a href="{{ route('work.index') }}">Jobs</a>@endif
-                        @if($can('reports.view'))<a href="{{ route('reports.index') }}">Reports</a>@endif
-                        <a href="{{ route('search.index') }}">Search</a>
+                    <nav class="zazu-app-footer-nav" aria-label="Operations navigation">
+                        <h2 class="zazu-app-footer-heading">Operate</h2>
+                        <a href="{{ route('dashboard') }}" @if(request()->routeIs('dashboard')) aria-current="page" @endif>Dashboard</a>
+                        @if($can('work.view'))<a href="{{ route('work.index') }}" @if(request()->routeIs('work.*')) aria-current="page" @endif>Jobs</a>@endif
+                        @if($can('quotes.view'))<a href="{{ route('quotes.index') }}" @if(request()->routeIs('quotes.*')) aria-current="page" @endif>Quotes</a>@endif
+                        @if($can('customers.view'))<a href="{{ route('customers.index') }}" @if(request()->routeIs('customers.*')) aria-current="page" @endif>Customers</a>@endif
+                        @if($can('calendar.view'))<a href="{{ route('calendar.index') }}" @if(request()->routeIs('calendar.*')) aria-current="page" @endif>Calendar</a>@endif
                     </nav>
 
-                    @if($isOwner)
-                        <nav class="zazu-app-footer-nav" aria-label="System navigation">
-                            <h2 class="zazu-app-footer-heading">System</h2>
-                            <a href="{{ route('settings.index') }}">Business settings</a>
-                            <a href="{{ route('settings.audit') }}">Activity audit</a>
-                            <a href="{{ route('onboarding.index') }}">Setup centre</a>
-                        </nav>
-                    @endif
+                    <nav class="zazu-app-footer-nav" aria-label="Resources navigation">
+                        <h2 class="zazu-app-footer-heading">Resources</h2>
+                        @if($can('finance.view'))<a href="{{ route('finance.index') }}" @if(request()->routeIs('finance.*')) aria-current="page" @endif>Finance</a>@endif
+                        @if($can('purchasing.view'))<a href="{{ route('purchasing.index') }}" @if(request()->routeIs('purchasing.*')) aria-current="page" @endif>Purchasing</a>@endif
+                        @if($can('suppliers.view'))<a href="{{ route('suppliers.index') }}" @if(request()->routeIs('suppliers.*')) aria-current="page" @endif>Suppliers</a>@endif
+                        @if($can('inventory.view'))<a href="{{ route('inventory.index') }}" @if(request()->routeIs('inventory.*')) aria-current="page" @endif>Inventory</a>@endif
+                        @if($can('assets.view'))<a href="{{ route('assets.index') }}" @if(request()->routeIs('assets.*')) aria-current="page" @endif>Assets</a>@endif
+                    </nav>
+
+                    <nav class="zazu-app-footer-nav zazu-app-footer-control" aria-label="Control navigation">
+                        <h2 class="zazu-app-footer-heading">Control</h2>
+                        @if($can('reports.view'))<a href="{{ route('reports.index') }}" @if(request()->routeIs('reports.*')) aria-current="page" @endif>Reports</a>@endif
+                        <a href="{{ route('search.index') }}" @if(request()->routeIs('search.index')) aria-current="page" @endif>Search</a>
+                        @if($isOwner)
+                            <a href="{{ route('settings.index') }}" @if(request()->routeIs('settings.index')) aria-current="page" @endif>Business settings</a>
+                            <a href="{{ route('settings.audit') }}" @if(request()->routeIs('settings.audit')) aria-current="page" @endif>Activity audit</a>
+                            <a href="{{ route('onboarding.index') }}" @if(request()->routeIs('onboarding.*')) aria-current="page" @endif>Setup centre</a>
+                        @endif
+                    </nav>
 
                     <div class="zazu-app-footer-meta">
-                        <h2 class="zazu-app-footer-heading">Workspace</h2>
+                        <span class="zazu-app-footer-heading">Workspace</span>
                         <strong>{{ $business?->name ?? 'Zazu EMP' }}</strong>
-                        <span>Signed in as {{ auth()->user()->name }}</span>
+                        <span>{{ ucfirst(str_replace('_', ' ', $currentRole ?? 'member')) }} · {{ auth()->user()->name }}</span>
                     </div>
                 </div>
                 <div class="zazu-app-footer-bottom">
                     <span>&copy; {{ now()->year }} Zazu EMP. All rights reserved.</span>
+                    <span>Search: <kbd>Ctrl</kbd>/<kbd>⌘</kbd> K</span>
                     <span>Built for practical event operations.</span>
                 </div>
             </footer>
