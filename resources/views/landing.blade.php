@@ -18,7 +18,7 @@
         a{text-decoration:none;color:inherit}button{font:inherit}.mono{font-family:"DM Mono",ui-monospace,monospace}.site{width:min(1380px,calc(100% - 40px));margin:auto}
         .top{height:76px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid rgba(226,232,240,.82);backdrop-filter:blur(16px)}
         .brand{display:flex;align-items:center;gap:11px}.mark{width:36px;height:36px;display:grid;place-items:center;border-radius:9px;background:var(--blue);color:#fff;font-weight:800;box-shadow:0 8px 20px rgba(30,64,175,.2)}.brand strong{display:block;letter-spacing:-.04em}.brand span:last-child{display:block;color:var(--muted);font:500 9px "DM Mono";letter-spacing:.08em;text-transform:uppercase;margin-top:2px}
-        .topnav{display:flex;align-items:center;gap:5px}.topnav a,.topnav button{padding:9px 11px;border-radius:7px;color:var(--muted);font-size:11px;font-weight:700}.topnav button{border:0;background:transparent;cursor:pointer}.topnav a:hover,.topnav button:hover{background:#fff;color:var(--ink)}.topnav .launch{padding:11px 15px;background:var(--blue);color:#fff;box-shadow:0 7px 16px rgba(30,64,175,.16)}.topnav-form{display:flex;margin:0}.mobile-nav-toggle{display:none}
+        .topnav{display:flex;align-items:center;gap:5px}.topnav a,.topnav button{padding:9px 11px;border-radius:7px;color:var(--muted);font-size:11px;font-weight:700}.topnav button{border:0;background:transparent;cursor:pointer}.topnav a:hover,.topnav button:hover{background:#fff;color:var(--ink)}.topnav .launch{padding:11px 15px;background:var(--blue);color:#fff;box-shadow:0 7px 16px rgba(30,64,175,.16)}.topnav-form{display:flex;margin:0}.mobile-nav-toggle{display:none}.mobile-menu{display:flex;align-items:center;gap:5px}
         .hero{display:grid;grid-template-columns:minmax(0,1.08fr) minmax(460px,.92fr);gap:clamp(40px,7vw,100px);align-items:center;min-height:calc(100vh - 76px);padding:72px 0 88px}
         .eyebrow{display:flex;align-items:center;gap:8px;color:var(--blue);font:500 10px "DM Mono";letter-spacing:.13em;text-transform:uppercase}.eyebrow:before{content:"";width:24px;height:1px;background:currentColor}
         h1{max-width:780px;margin:18px 0;font-family:"Space Grotesk",Manrope,ui-sans-serif,sans-serif;font-size:clamp(48px,6.4vw,88px);font-weight:700;line-height:.92;letter-spacing:-.055em}h1 em{font-style:normal;color:var(--blue)}.hero-copy{max-width:650px;color:var(--body);font-size:17px;line-height:1.7}.actions{display:flex;flex-wrap:wrap;gap:9px;margin-top:28px}.btn{display:inline-flex;align-items:center;justify-content:center;gap:9px;min-height:44px;padding:0 16px;border:1px solid var(--line);border-radius:7px;background:#fff;color:var(--ink);font-size:11px;font-weight:800}.btn.primary{border-color:var(--blue);background:var(--blue);color:#fff;box-shadow:0 9px 20px rgba(30,64,175,.17)}.btn:hover{transform:translateY(-1px)}.hero-note{margin-top:18px;color:var(--muted);font:500 9px "DM Mono";letter-spacing:.05em}
@@ -42,7 +42,7 @@
 <div class="site">
 <header class="top">
     <a href="{{ url('/') }}" class="brand"><span class="mark">Z</span><span><strong>ZAZU</strong><span>Event Management Platform</span></span></a>
-    <nav class="topnav" aria-label="Public navigation"><div class="mobile-menu"><a href="#capabilities">How it works</a><a href="#difference">Why Zazu</a>@if(!$isAuthenticated)<button type="button" class="register" data-auth-modal-open="register">Register</button><button type="button" class="login" data-auth-modal-open="login">Log in</button>@elseif($hasActiveWorkspace)<span class="account-state">You’re signed in</span><a class="launch" href="{{ route('dashboard') }}">Open workspace <span>↗</span></a><form method="POST" action="{{ route('logout') }}" class="topnav-form">@csrf<button type="submit" class="login">Sign out</button></form>@else<span class="account-state">You’re signed in</span><a class="launch" href="{{ route('workspace.recovery') }}">Set up workspace <span>↗</span></a><form method="POST" action="{{ route('logout') }}" class="topnav-form">@csrf<button type="submit" class="login">Sign out</button></form>@endif</div><button type="button" class="mobile-nav-toggle" aria-label="Open navigation" aria-expanded="false"><span></span></button>
+    <nav class="topnav" aria-label="Public navigation"><div id="mobile-public-menu" class="mobile-menu" data-mobile-menu><a href="#capabilities">How it works</a><a href="#difference">Why Zazu</a>@if(!$isAuthenticated)<button type="button" class="register" data-auth-modal-open="register">Register</button><button type="button" class="login" data-auth-modal-open="login">Log in</button>@elseif($hasActiveWorkspace)<span class="account-state">You’re signed in</span><a class="launch" href="{{ route('dashboard') }}">Open workspace <span>↗</span></a><form method="POST" action="{{ route('logout') }}" class="topnav-form">@csrf<button type="submit" class="login">Sign out</button></form>@else<span class="account-state">You’re signed in</span><a class="launch" href="{{ route('workspace.recovery') }}">Set up workspace <span>↗</span></a><form method="POST" action="{{ route('logout') }}" class="topnav-form">@csrf<button type="submit" class="login">Sign out</button></form>@endif</div><button type="button" class="mobile-nav-toggle" aria-label="Open navigation" aria-expanded="false" aria-controls="mobile-public-menu"><span></span></button>
 </nav>
 </header>
 <main>
@@ -155,6 +155,28 @@
 <footer><span>ZAZU EMP · EVENT OPERATIONS PLATFORM</span><span class="footer-right">SOUTH AFRICAN BUSINESS · EVENTS / CATERING / HIRE</span></footer>
 </div>
 
+<script>
+(() => {
+    const nav = document.querySelector('.topnav');
+    const toggle = document.querySelector('.mobile-nav-toggle');
+    const menu = document.querySelector('[data-mobile-menu]');
+    if (nav && toggle && menu) {
+        const setOpen = (open) => {
+            nav.classList.toggle('mobile-open', open);
+            toggle.setAttribute('aria-expanded', open ? 'true' : 'false');
+            toggle.setAttribute('aria-label', open ? 'Close navigation' : 'Open navigation');
+        };
+        toggle.addEventListener('click', () => setOpen(!nav.classList.contains('mobile-open')));
+        menu.querySelectorAll('a,button').forEach((item) => item.addEventListener('click', () => setOpen(false)));
+        document.addEventListener('click', (event) => {
+            if (!nav.contains(event.target)) setOpen(false);
+        });
+        document.addEventListener('keydown', (event) => {
+            if (event.key === 'Escape') setOpen(false);
+        });
+    }
+})();
+</script>
 <script>
 (() => {
     const modal = document.querySelector('[data-auth-modal]');
