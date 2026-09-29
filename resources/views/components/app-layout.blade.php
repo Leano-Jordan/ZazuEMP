@@ -36,7 +36,15 @@
         <aside class="zazu-sidebar" id="zazu-mobile-sidebar" data-mobile-sidebar>
             <div class="zazu-brand">
                 <a href="{{ route('dashboard') }}" class="zazu-brand-link" aria-label="Zazu EMP dashboard">
-                    <span class="zazu-brand-mark" aria-hidden="true">Z</span>
+                    @if($business?->logo_path)
+                        <img
+                            class="zazu-brand-logo"
+                            src="{{ route('business.media', ['type' => 'logo']) }}?v={{ $brandingVersion }}"
+                            alt="{{ $business->name }} logo"
+                        >
+                    @else
+                        <span class="zazu-brand-mark" aria-hidden="true">Z</span>
+                    @endif
                     <span class="zazu-brand-lockup">
                         <strong>ZAZU</strong>
                         <span>EMP</span>
