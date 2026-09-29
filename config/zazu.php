@@ -20,8 +20,8 @@ return [
             'url' => 'https://florence.co.za/wp-content/uploads/2023/11/florence-05.jpg',
         ],
         'luxury_banquet' => [
-            'label' => 'Luxury outdoor banquet',
-            'url' => 'https://www.spholaskitchen.co.za/assets/catering-setup-DkqWhPGH.jpg',
+            'label' => 'Event venue and service',
+            'url' => 'https://www.asanteestate.co.za/assets/img/instagram/05.jpg',
         ],
         'stage_av' => [
             'label' => 'Event stage and AV',
