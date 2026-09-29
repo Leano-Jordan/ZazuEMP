@@ -4,7 +4,6 @@ namespace App\Services\Search;
 
 use App\Models\Business;
 use App\Models\FinanceExpense;
-use Illuminate\Database\Eloquent\Builder;
 
 class ExpenseSearchHandler extends AbstractWorkspaceSearchHandler
 {
