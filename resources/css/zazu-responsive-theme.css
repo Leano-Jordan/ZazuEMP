@@ -6,6 +6,8 @@
 
 /* Sidebar shell must not clip footer-owned account popovers. Keep only the navigation region scrollable. */
 .zazu-sidebar {
+    position: sticky;
+    z-index: 40;
     overflow: visible;
 }
 
