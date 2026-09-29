@@ -19,6 +19,7 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware->appendToGroup('web', \App\Http\Middleware\AttachRequestId::class);
         $middleware->alias([
             'owner' => \App\Http\Middleware\EnsureBusinessOwner::class,
+            'platform.admin' => \App\Http\Middleware\EnsurePlatformAdmin::class,
             'business.context' => \App\Http\Middleware\EnsureActiveBusinessContext::class,
             'permission' => \App\Http\Middleware\EnsureBusinessPermission::class,
         ]);
