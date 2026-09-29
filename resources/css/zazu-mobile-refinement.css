@@ -161,10 +161,44 @@
         display: none !important;
     }
 
-    .zazu-command-search:focus-within .zazu-command-trigger {
+    .zazu-command-search:focus-within .zazu-command-trigger,
+    .zazu-command-search.is-open .zazu-command-trigger {
         border-color: var(--zazu-primary);
-        background: var(--zazu-primary-soft);
-        color: var(--zazu-primary);
+        background: var(--zazu-surface);
+        color: var(--zazu-ink);
+    }
+
+    /* Mobile search must become a real input when opened; the previous 40px transparent input made it effectively unusable. */
+    .zazu-command-search:focus-within,
+    .zazu-command-search.is-open {
+        width: min(220px, calc(100vw - 74px));
+        flex: 0 1 min(220px, calc(100vw - 74px));
+    }
+
+    .zazu-command-search:focus-within .zazu-command-trigger,
+    .zazu-command-search.is-open .zazu-command-trigger {
+        width: 100%;
+        min-width: 0;
+        justify-content: flex-start;
+        padding: 0 10px 0 34px;
+    }
+
+    .zazu-command-search:focus-within .zazu-command-trigger input,
+    .zazu-command-search.is-open .zazu-command-trigger input {
+        width: 100%;
+        opacity: 1;
+        padding: 0 8px 0 0;
+        color: var(--zazu-ink);
+        background: transparent;
+        cursor: text;
+        caret-color: var(--zazu-ink);
+        z-index: 2;
+    }
+
+    .zazu-command-search:focus-within .zazu-command-search-icon,
+    .zazu-command-search.is-open .zazu-command-search-icon {
+        position: absolute;
+        left: 11px;
     }
 
     .zazu-header-slot-actions {
