@@ -82,7 +82,7 @@ Route::get('/', function (\Illuminate\Http\Request $request) {
         ];
     }
 
-    return view('landing', compact('telemetry', 'isAuthenticated', 'hasActiveWorkspace', 'business'));
+    return view('landing', compact('telemetry', 'isAuthenticated', 'hasActiveWorkspace', 'business', 'landingImages'));
 })->name('landing');
 
 Route::middleware('signed')->group(function () {
