@@ -6,9 +6,14 @@ use App\Models\PlatformLandingSetting;
 
 class LandingMediaService
 {
+    public function current(): PlatformLandingSetting
+    {
+        return PlatformLandingSetting::current();
+    }
+
     public function images(): array
     {
-        $settings = PlatformLandingSetting::current();
+        $settings = $this->current();
         $library = config('zazu.landing_image_library', []);
 
         return [
