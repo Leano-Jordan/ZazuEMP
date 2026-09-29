@@ -1,9 +1,7 @@
 <x-app-layout>
     <x-slot:title>Calendar</x-slot:title>
     <x-slot:heading>Calendar</x-slot:heading>
-    <x-slot:headerAction><a href="{{ route('work.create') }}" class="zazu-btn zazu-btn-primary">Create job</a></x-slot:headerAction>
-
-    <section class="zazu-command-band zazu-calendar-command">
+<section class="zazu-command-band zazu-calendar-command">
         <div><div class="zazu-eyebrow">Operations / Job calendar</div><h2 class="zazu-command-title">{{ $monthLabel }}</h2><p class="zazu-command-copy">Plan active jobs by event date. Select a job to open its operational record.</p></div>
         <div class="zazu-calendar-toolbar-main" aria-label="Calendar controls">
             <a href="{{ route('calendar.index', ['month' => $previousMonth]) }}" class="zazu-btn zazu-btn-ghost" aria-label="Previous month">←</a>
