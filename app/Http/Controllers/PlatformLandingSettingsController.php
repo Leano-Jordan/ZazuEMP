@@ -12,7 +12,7 @@ class PlatformLandingSettingsController extends Controller
     public function edit(): View
     {
         return view('admin.landing-settings', [
-            'settings' => app(LandingMediaService::class)->images(),
+            'settings' => app(LandingMediaService::class)->current(),
             'library' => config('zazu.landing_image_library', []),
         ]);
     }
