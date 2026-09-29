@@ -4,7 +4,6 @@ namespace App\Services\Search;
 
 use App\Models\Business;
 use App\Models\Customer;
-use Illuminate\Database\Eloquent\Builder;
 
 class CustomerSearchHandler extends AbstractWorkspaceSearchHandler
 {
