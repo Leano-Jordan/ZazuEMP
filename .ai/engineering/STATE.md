@@ -133,3 +133,30 @@ Findings/corrections:
 Verification boundary:
 - source-level audit completed;
 - rendered browser/device verification remains required before visual acceptance.
+
+
+## Customer import cycle — 2026-09-30
+
+Target: complete the bounded customer spreadsheet import path without weakening existing customer architecture.
+
+Completed:
+- preserved read-only spreadsheet reader and matcher boundaries;
+- connected matching states to preview;
+- added transactional customer import service;
+- restricted writes to explicitly approved new rows;
+- existing matches can only be skipped, never overwritten by import;
+- duplicate and needs-review rows are blocked;
+- serialized imports per business with a parent-business row lock;
+- recorded per-customer import audit entries;
+- added upload → preview → approval → import controller/view workflow;
+- bound pending import data to the active business workspace;
+- exposed import from the customer directory.
+
+Verification boundary:
+- repository source and diff inspected;
+- current GitHub status returned no observed CI status entries;
+- local Laravel/browser/database execution has not been observed in this cycle and remains required.
+
+Remaining risk:
+- duplicate/needs-review resolution UI is intentionally not implemented yet; those states remain hard blockers rather than silent guesses;
+- runtime upload, preview, transaction, rollback and populated-data isolation still require execution evidence.
