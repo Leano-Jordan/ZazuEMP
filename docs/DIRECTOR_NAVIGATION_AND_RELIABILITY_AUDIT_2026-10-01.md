@@ -109,24 +109,21 @@ Additional hardening:
 This cycle deliberately does not add new modules, new navigation categories or feature breadth.
 
 
-## Navigation acceleration — 2026-10-01
-The previous explicit-destination navigation corrected hidden modules but still left a usability defect: the sidebar remained a long list, and the owner had to scroll to reach less-prominent destinations such as Suppliers.
+## Navigation hierarchy correction — 2026-10-01
 
-### Director decision
-Treat navigation as a reliability surface. The user must be able to reach common destinations without scrolling or remembering Zazu's internal grouping.
+The previous Quick Access acceleration was superseded after owner testing showed that duplicating destinations created clutter without solving the core problem: Settings and lower navigation areas still required scrolling.
 
-### Executed
-- Added a persistent Quick access rail for Jobs, Customers, Quotes, Purchasing, Suppliers and Calendar.
-- Added a visible Find control beside All areas.
-- Wired the existing workspace command surface to actually function: focus/open, filtering, keyboard navigation, Enter activation, Escape close and Ctrl/Cmd+K.
-- Kept the full permission-aware destination list intact so no module is hidden or removed.
-- Added regression coverage for quick-access and command-navigation hooks.
+### Current model
+- Five persistent top-level areas remain visible: Workspace, Sales & operations, Purchasing & resources, Money & control, System.
+- Desktop: hover/focus reveals a compact flyout of child destinations.
+- Mobile: tap/focus expands the same children inline.
+- Child destinations remain directly clickable.
+- Active child and parent area remain visible.
+- Permission-aware children remain unchanged.
+- Settings is exposed through the always-visible System area.
 
-### Design basis
-Current SaaS navigation patterns increasingly combine a concise personalized/sidebar surface with command navigation and favorites/recent access. Atlassian documents customization, starred items, recent items, collapsible sidebars and command navigation; Linear documents favorites, recent access and command/search shortcuts. These patterns support Zazu's direction without copying either product's information architecture.
+### Rejected intermediary
+Quick Access is not part of the target architecture and must not be reintroduced as a duplicate destination list.
 
-### Boundary
-Quick access is intentionally a bounded first acceleration layer. Personal favorites/reordering and richer recent-record navigation can be added later if actual usage evidence shows they are needed.
-
-### Financial conversion re-audit
-Invoice creation already requires an accepted quote and accepted latest version for quote-based conversion. The quote-version foreign key is unique at database level. Payments are business-scoped, idempotent, invoice-locked, lifecycle-checked, prevented from exceeding balance, and deposit payments are capped to the quoted deposit requirement. No new financial mutation was justified in this sweep; end-to-end acceptance evidence remains the next proof target.
+### Reliability rule
+Navigation must minimise hunting, scrolling and prior knowledge while preserving direct access to real destinations. Search/command navigation remains a secondary accelerator, not the primary information architecture.
