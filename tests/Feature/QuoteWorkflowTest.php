@@ -167,6 +167,7 @@ class QuoteWorkflowTest extends TestCase
 
         $this->assertSame('accepted', $quote->fresh()->status);
         $this->assertSame('accepted', $version->fresh()->status);
+        $this->assertSame('confirmed', $event->fresh()->status);
         $this->assertDatabaseHas('audit_logs', [
             'business_id' => $event->business_id,
             'action' => 'quote.customer.accepted',
@@ -182,6 +183,39 @@ class QuoteWorkflowTest extends TestCase
         )
             ->assertOk()
             ->assertSee('Quote accepted');
+    }
+
+    public function test_staff_accepting_a_quote_confirms_a_draft_job(): void
+    {
+        $customer = Customer::create(['name' => 'Staff Acceptance Customer']);
+        $event = Event::create([
+            'business_id' => app(\\App\\Support\\CurrentBusiness::class)->id(auth()->user()),
+            'customer_id' => $customer->id,
+            'reference' => 'ZAZ-STAFF-ACCEPT-001',
+            'name' => 'Staff Acceptance Event',
+            'event_date' => now()->addDays(10)->toDateString(),
+            'status' => 'draft',
+        ]);
+
+        $quote = Quote::create([
+            'event_id' => $event->id,
+            'reference' => 'QUO-STAFF-001',
+            'status' => 'sent',
+            'currency' => 'ZAR',
+        ]);
+        $quote->versions()->create([
+            'version' => 1,
+            'status' => 'sent',
+            'subtotal' => '1000.00',
+            'tax_total' => '0.00',
+            'total' => '1000.00',
+        ]);
+
+        $this->patch(route('quotes.status', $quote), ['status' => 'accepted'])
+            ->assertRedirect(route('quotes.show', $quote));
+
+        $this->assertSame('accepted', $quote->fresh()->status);
+        $this->assertSame('confirmed', $event->fresh()->status);
     }
 
     public function test_customer_quote_link_rejects_an_invalid_signature(): void
