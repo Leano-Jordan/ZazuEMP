@@ -44,6 +44,8 @@ Zazu should adapt to the business rather than forcing the business to adapt to Z
 
 26. **Situation-aware work intake:** Zazu should recognize what an incoming interaction represents based on the situation and available information. It should not force every business or every customer interaction into one universal label such as Enquiry, Request or Booking. Zazu may begin with the appropriate lightweight state and guide the user as the interaction becomes clearer (for example, enquiry → request → booking/confirmed work). The underlying records should remain connected rather than requiring the owner to understand the data model.
 
+27. **Next-useful-question behaviour:** after recognizing the situation, Zazu should ask the next useful question needed to move the work forward instead of presenting a large form. Questions should be adaptive and based on what is already known; do not ask for information that is unnecessary at that stage.
+
 ## Product guardrails
 
 - Do **not** rewrite Zazu just to satisfy this definition.
