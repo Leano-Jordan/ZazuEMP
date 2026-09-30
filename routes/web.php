@@ -8,6 +8,7 @@ use App\Http\Controllers\BusinessSettingsController;
 use App\Http\Controllers\CalendarController;
 use App\Http\Controllers\ComplianceDocumentController;
 use App\Http\Controllers\CustomerController;
+use App\Http\Controllers\CustomerImportController;
 use App\Http\Controllers\CustomerContactController;
 use App\Http\Controllers\EventCostController;
 use App\Http\Controllers\EventPreparationController;
@@ -228,6 +229,9 @@ Route::middleware(['auth', 'auth.session', 'business.context'])->group(function 
         ->name('work.requirements.store');
 
     Route::get('/customers', [CustomerController::class, 'index'])->middleware('permission:customers.view')->name('customers.index');
+    Route::get('/customers/import', [CustomerImportController::class, 'create'])->middleware('permission:customers.create')->name('customers.import.create');
+    Route::post('/customers/import/preview', [CustomerImportController::class, 'preview'])->middleware('permission:customers.create')->name('customers.import.preview');
+    Route::post('/customers/import', [CustomerImportController::class, 'import'])->middleware('permission:customers.create')->name('customers.import.store');
     Route::get('/customers/create', [CustomerController::class, 'create'])->middleware('permission:customers.create')->name('customers.create');
     Route::post('/customers', [CustomerController::class, 'store'])->middleware('permission:customers.create')->name('customers.store');
     Route::get('/customers/{customer}', [CustomerController::class, 'show'])->middleware('permission:customers.view')->name('customers.show');
