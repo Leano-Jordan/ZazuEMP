@@ -217,6 +217,7 @@ class QuoteController extends Controller
 
             $version->update(['status' => 'accepted']);
             $lockedQuote->update(['status' => 'accepted']);
+            $lifecycle->confirmAfterQuoteAcceptance($lockedEvent);
 
             Audit::record('quote.customer.accepted', $lockedQuote, [
                 'customer_name' => trim($validated['customer_name']),
@@ -298,6 +299,10 @@ class QuoteController extends Controller
             $lockedQuote->update([
                 'status' => $newStatus,
             ]);
+
+            if ($newStatus === 'accepted') {
+                $lifecycle->confirmAfterQuoteAcceptance($lockedEvent);
+            }
         });
 
         return redirect()
