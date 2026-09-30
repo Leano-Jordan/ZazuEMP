@@ -50,6 +50,8 @@ Zazu should adapt to the business rather than forcing the business to adapt to Z
 
 29. **Review-before-approval:** anything Zazu prepares for a business-changing action (such as a quote, shopping list, invoice or reminder) must be reviewable and editable by the owner/authorised user before approval. Preparation is not execution; the user remains in control of the final content and action.
 
+30. **Owner preferences from review:** when an owner repeatedly changes Zazu's prepared suggestions in a meaningful, repeatable way, Zazu may retain that as a business preference to improve future suggestions. Preferences must never silently change or execute business actions, and they must remain reviewable/changeable by the authorised business user.
+
 ## Product guardrails
 
 - Do **not** rewrite Zazu just to satisfy this definition.
