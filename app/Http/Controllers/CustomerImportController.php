@@ -48,7 +48,10 @@ class CustomerImportController extends Controller
             throw new RuntimeException('The spreadsheet is too large for an interactive import. Use 5,000 rows or fewer.');
         }
 
-        $request->session()->put('customer_import.rows', $rows);
+        $request->session()->put('customer_import', [
+            'business_id' => $business->id,
+            'rows' => $rows,
+        ]);
 
         $preview = $mapper->preview($rows, $business);
 
@@ -60,12 +63,21 @@ class CustomerImportController extends Controller
         CustomerImportService $importer,
     ): RedirectResponse {
         $business = app(CurrentBusiness::class)->model($request->user());
-        $rows = $request->session()->get('customer_import.rows');
+        $import = $request->session()->get('customer_import');
+        $rows = is_array($import) ? ($import['rows'] ?? null) : null;
 
         if (!is_array($rows) || $rows === []) {
             return redirect()
                 ->route('customers.import.create')
                 ->withErrors(['spreadsheet' => 'The import preview has expired. Upload the spreadsheet again.']);
+        }
+
+        if ((int) ($import['business_id'] ?? 0) !== (int) $business->id) {
+            $request->session()->forget('customer_import');
+
+            return redirect()
+                ->route('customers.import.create')
+                ->withErrors(['spreadsheet' => 'The import belongs to a different business workspace. Upload it again.']);
         }
 
         $actions = $request->input('actions', []);
@@ -76,7 +88,7 @@ class CustomerImportController extends Controller
 
         $result = $importer->import($business, $rows, $actions);
 
-        $request->session()->forget('customer_import.rows');
+        $request->session()->forget('customer_import');
 
         return redirect()
             ->route('customers.index')
