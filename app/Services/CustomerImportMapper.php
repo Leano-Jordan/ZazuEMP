@@ -2,8 +2,15 @@
 
 namespace App\Services;
 
+use App\Models\Business;
+
 class CustomerImportMapper
 {
+    public function __construct(
+        private readonly CustomerImportMatcher $matcher,
+    ) {
+    }
+
     /**
      * Map spreadsheet rows to the existing Customer + primary contact shape.
      *
@@ -24,17 +31,41 @@ class CustomerImportMapper
     /**
      * Build an import preview without writing to the database.
      *
+     * Matching is performed only when a business is supplied. Both mapping
+     * and matching are read-only; this method never creates or updates records.
+     *
      * @param array<int, array<string, string>> $rows
-     * @return array{headers: array<int, string>, summary: array{total: int, ready: int, needs_attention: int}, rows: array<int, array{row_number: int, status: string, source: array<string, string>, customer: array<string, ?string>, primary_contact: array<string, ?string>, issues: array<int, array{field: string, severity: string, message: string}>}>}
+     * @return array{headers: array<int, string>, summary: array{total: int, ready: int, needs_attention: int, new: int, existing: int, duplicate: int, needs_review: int}, rows: array<int, array{row_number: int, status: string, source: array<string, string>, customer: array<string, ?string>, primary_contact: array<string, ?string>, issues: array<int, array{field: string, severity: string, message: string}>, match: array{status: string, customer_id: int|null, matched_by: array<int, string>, source_duplicate_of_row: int|null, message: string}}>}
      */
-    public function preview(array $rows): array
+    public function preview(array $rows, ?Business $business = null): array
     {
+        $mappedRows = $this->map($rows)['rows'];
+        $matches = $business ? $this->matcher->match($business, $mappedRows) : [];
+
         $previewRows = [];
         $ready = 0;
+        $counts = [
+            'new' => 0,
+            'existing' => 0,
+            'duplicate' => 0,
+            'needs_review' => 0,
+        ];
 
-        foreach ($rows as $index => $row) {
-            $mapped = $this->mapRow($row);
+        foreach ($mappedRows as $index => $mapped) {
             $issues = $this->structuredIssues($mapped['issues']);
+            $match = $matches[$index]['match'] ?? [
+                'status' => 'not_checked',
+                'customer_id' => null,
+                'matched_by' => [],
+                'source_duplicate_of_row' => null,
+                'message' => 'Existing-customer matching was not requested.',
+            ];
+
+            $matchStatus = $this->previewMatchStatus($match['status']);
+
+            if (isset($counts[$matchStatus])) {
+                $counts[$matchStatus]++;
+            }
 
             $status = $issues === [] ? 'ready' : 'needs_attention';
 
@@ -49,6 +80,10 @@ class CustomerImportMapper
                 'customer' => $mapped['customer'],
                 'primary_contact' => $mapped['primary_contact'],
                 'issues' => $issues,
+                'match' => [
+                    ...$match,
+                    'status' => $matchStatus,
+                ],
             ];
         }
 
@@ -58,6 +93,7 @@ class CustomerImportMapper
                 'total' => count($previewRows),
                 'ready' => $ready,
                 'needs_attention' => count($previewRows) - $ready,
+                ...$counts,
             ],
             'rows' => $previewRows,
         ];
@@ -79,71 +115,19 @@ class CustomerImportMapper
         }
 
         $customer = [
-            'name' => $this->value($columns, [
-                'customer name',
-                'customer',
-                'client name',
-                'client',
-                'company name',
-                'company',
-                'business name',
-            ]),
+            'name' => $this->value($columns, ['customer name', 'customer', 'client name', 'client', 'company name', 'company', 'business name']),
             'legal_name' => $this->value($columns, ['legal name', 'registered name']),
-            'registration_number' => $this->value($columns, [
-                'registration number',
-                'registration no',
-                'company registration number',
-                'company reg number',
-                'reg number',
-                'reg no',
-            ]),
-            'tax_number' => $this->value($columns, [
-                'tax number',
-                'tax no',
-                'tax reference',
-            ]),
-            'vat_number' => $this->value($columns, [
-                'vat number',
-                'vat no',
-                'vat registration number',
-                'vat registration',
-            ]),
-            'billing_address' => $this->value($columns, [
-                'billing address',
-                'billing address 1',
-                'address',
-                'physical address',
-                'postal address',
-            ]),
+            'registration_number' => $this->value($columns, ['registration number', 'registration no', 'company registration number', 'company reg number', 'reg number', 'reg no']),
+            'tax_number' => $this->value($columns, ['tax number', 'tax no', 'tax reference']),
+            'vat_number' => $this->value($columns, ['vat number', 'vat no', 'vat registration number', 'vat registration']),
+            'billing_address' => $this->value($columns, ['billing address', 'billing address 1', 'address', 'physical address', 'postal address']),
             'notes' => $this->value($columns, ['notes', 'note', 'comments', 'comment']),
         ];
 
         $primaryContact = [
-            'name' => $this->value($columns, [
-                'primary contact name',
-                'contact name',
-                'contact person',
-                'contact',
-            ]),
-            'phone' => $this->value($columns, [
-                'primary contact phone',
-                'contact phone',
-                'phone',
-                'phone number',
-                'mobile',
-                'mobile number',
-                'cell',
-                'cell no',
-                'cell number',
-                'telephone',
-                'tel',
-            ]),
-            'email' => $this->value($columns, [
-                'primary contact email',
-                'contact email',
-                'email',
-                'email address',
-            ]),
+            'name' => $this->value($columns, ['primary contact name', 'contact name', 'contact person', 'contact']),
+            'phone' => $this->value($columns, ['primary contact phone', 'contact phone', 'phone', 'phone number', 'mobile', 'mobile number', 'cell', 'cell no', 'cell number', 'telephone', 'tel']),
+            'email' => $this->value($columns, ['primary contact email', 'contact email', 'email', 'email address']),
         ];
 
         $issues = [];
@@ -168,10 +152,16 @@ class CustomerImportMapper
         ];
     }
 
-    /**
-     * @param array<int, array<string, string>> $rows
-     * @return array<int, string>
-     */
+    private function previewMatchStatus(string $status): string
+    {
+        return match ($status) {
+            'matched' => 'existing',
+            'ambiguous' => 'needs_review',
+            'duplicate' => 'duplicate',
+            default => $status,
+        };
+    }
+
     /**
      * @param array<int, string> $issues
      * @return array<int, array{field: string, severity: string, message: string}>
