@@ -116,15 +116,21 @@ class CustomerImportServiceTest extends TestCase
             'name' => 'Race Customer',
         ]);
 
-        $this->expectException(RuntimeException::class);
+        try {
+            app(CustomerImportService::class)->import(
+                $business,
+                [
+                    ['Customer Name' => 'Race Customer', 'Contact' => 'John Smith'],
+                ],
+                [2 => 'create'],
+            );
 
-        app(CustomerImportService::class)->import(
-            $business,
-            [
-                ['Customer Name' => 'Race Customer', 'Contact' => 'John Smith'],
-            ],
-            [2 => 'create'],
-        );
+            $this->fail('Expected an existing customer match to block creation.');
+        } catch (RuntimeException $e) {
+            $this->assertStringContainsString('is not a new customer', $e->getMessage());
+        }
+
+        $this->assertSame(1, Customer::where('business_id', $business->id)->count());
     }
 
     private function business(string $name): Business
