@@ -132,6 +132,7 @@ class QuoteController extends Controller
             'event.requirements.capability',
             'versions.items',
             'versions.taxRateRecord',
+            'invoices',
         ]);
         abort_unless($quote->event && (int) $quote->event->business_id === $businessId, 404);
 
