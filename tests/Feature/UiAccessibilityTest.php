@@ -65,6 +65,20 @@ class UiAccessibilityTest extends TestCase
         $response->assertSee('href="'.route('quotes.index').'"', false);
     }
 
+    public function test_quick_navigation_and_command_menu_expose_fast_paths(): void
+    {
+        $response = $this->get(route('dashboard'));
+
+        $response->assertOk();
+        $response->assertSee('aria-label="Quick access"', false);
+        $response->assertSee('data-zazu-nav-jump', false);
+        $response->assertSee('data-zazu-command-input', false);
+        $response->assertSee('data-zazu-command', false);
+        $response->assertSee('data-command-item', false);
+        $response->assertSee('href="'.route('suppliers.index').'"', false);
+        $response->assertSee('href="'.route('quotes.index').'"', false);
+    }
+
     public function test_customer_form_uses_mobile_friendly_contact_inputs(): void
     {
         $response = $this->get(route('customers.create'));
