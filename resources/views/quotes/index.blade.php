@@ -44,7 +44,12 @@
                     <div class="zazu-list-meta">{{ $quote->event->customer?->name ?? 'Customer' }} · {{ $quote->currency }}</div>
                 </div>
                 <div class="zazu-side-primary">v{{ $quote->latestVersion?->version ?? '—' }}</div>
-                <div><span class="zazu-chip {{ $quote->latestVersion?->status === 'draft' ? 'zazu-chip-neutral' : 'zazu-chip-success' }}">{{ ucfirst($quote->latestVersion?->status ?? $quote->status) }}</span></div>
+                <div><span class="zazu-chip {{ match ($quote->latestVersion?->status ?? $quote->status) {
+                    'accepted' => 'zazu-chip-success',
+                    'declined', 'expired' => 'zazu-chip-danger',
+                    'sent' => 'zazu-chip-info',
+                    default => 'zazu-chip-neutral',
+                } }}">{{ ucfirst($quote->latestVersion?->status ?? $quote->status) }}</span></div>
                 <div class="zazu-side-primary">{{ $quote->latestVersion ? $quote->latestVersion->total : '—' }}</div>
             </a>
         @empty
