@@ -91,7 +91,6 @@ class SpreadsheetReader
             }
 
             $sheets = [];
-            $workbookNamespace = 'http://schemas.openxmlformats.org/spreadsheetml/2006/main';
 
             foreach ($workbook->sheets->sheet as $sheet) {
                 $name = trim((string) $sheet['name']) ?: 'Sheet ' . (count($sheets) + 1);
@@ -232,6 +231,9 @@ class SpreadsheetReader
 
         foreach ($rows as $row) {
             $maxColumns = max($maxColumns, count($row));
+            if ($row !== []) {
+                $maxColumns = max($maxColumns, max(array_keys($row)) + 1);
+            }
         }
 
         $maxColumns = max($maxColumns, count($headerRow));
