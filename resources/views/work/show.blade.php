@@ -83,11 +83,13 @@
         <a href="{{ route('work.edit', $event) }}" class="zazu-work-progress-step {{ $event->status === 'completed' ? 'complete current' : '' }}">
             <span>5</span><strong>Complete</strong><small>{{ $event->status === 'completed' ? 'Completed' : 'Update status' }}</small>
         </a>
+    </section>
+
     <section class="zazu-panel mb-5" aria-label="Operational chain">
         <div class="zazu-panel-head">
             <div>
                 <div class="zazu-panel-title">Operational chain</div>
-                <div class="zazu-panel-copy">This job remains the source context while work moves from requirements through preparation, purchasing, costs and finance.</div>
+                <div class="zazu-panel-copy">Everything connected to this job stays together as the work moves from services to preparation, purchasing, costs and finance.</div>
             </div>
         </div>
         <div class="grid gap-2 md:grid-cols-5">
@@ -200,7 +202,7 @@
 
             <section class="zazu-panel">
                 <div class="zazu-panel-title">Job tools</div>
-                <div class="zazu-panel-copy">Everything below stays connected to this job.</div>
+                <div class="zazu-panel-copy">Open the work connected to this job.</div>
                 <div class="mt-4 grid gap-2">
                     <a href="{{ route('work.quotes.index', $event) }}" class="zazu-quick-link">Quotes <span>→</span></a>
                     <a href="{{ route('work.costs.index', $event) }}" class="zazu-quick-link">Costs <span>→</span></a>
