@@ -336,8 +336,8 @@ Next Director target:
 Target: audit Customer → Job → Services → Quote → acceptance as one commercial workflow.
 
 Homework:
-- Current Dubsado guidance keeps proposals inside project context and can connect proposal, contract and invoice into one client flow; this supports Zazu's decision to keep quotes attached to the Work record rather than make them isolated documents. citeturn0search2turn0search0
-- Tripleseat describes proposals and operational documents as deriving from the same event record, reinforcing the single-event-context direction. citeturn0search12
+- Current Dubsado guidance keeps proposals inside project context and can connect proposal, contract and invoice into one client flow; this supports Zazu's decision to keep quotes attached to the Work record rather than make them isolated documents.
+- Tripleseat describes proposals and operational documents as deriving from the same event record, reinforcing the single-event-context direction.
 
 Findings:
 - Zazu's quote domain already has strong snapshot/version integrity, business scoping, status transition rules and stale-requirement detection.
