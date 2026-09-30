@@ -91,6 +91,7 @@ class CustomerImportMapper
                 'mobile',
                 'mobile number',
                 'cell',
+                'cell no',
                 'cell number',
                 'telephone',
                 'tel',
