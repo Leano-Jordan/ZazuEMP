@@ -204,3 +204,35 @@ Verification boundary:
 - actual phone/browser/local-network execution still requires owner-side runtime observation.
 
 Next runtime target remains the populated end-to-end business workflow, with mobile field testing now available as a practical verification path.
+
+
+## Director module-skeleton cycle — 2026-10-01
+
+Target: stop polishing already-fit modules and identify the thin structural modules sitting inside the broader Zazu foundation.
+
+Durable product rule added:
+- Mobile is a first-class V1 usage surface. A business owner/staff member may have only a phone available; desktop is not a prerequisite for usable Zazu.
+- Desktop remains important for dense setup, bulk operations, reporting and administration.
+- True phone-only offline operation is a future architecture and is not claimed by the current PWA/static-cache work.
+- Offline capability should be built incrementally: small foundation bricks with explicit evidence before each next layer.
+
+Source-level module audit recorded in docs/DIRECTOR_MODULE_SKELETON_AUDIT_2026-10-01.md.
+
+Primary skeleton target selected:
+SUPPLIERS — coherent maintenance surface.
+
+Reason: supplier records are a core dependency of purchasing, but the current module only exposes list/create/store and leaves normal supplier correction incomplete. This is a bounded structural completion, not feature expansion.
+
+Other module decisions:
+- Calendar: keep intentionally lean.
+- Reports: keep as a reporting foundation until finance/commercial data closes.
+- Compliance: already substantial; stop breadth expansion.
+- Assets: existing foundation is sufficient for now; later address only the explicit condition/damage/loss requirement.
+- Inventory: existing foundation is substantial; later reconcile with purchasing/receiving rather than expanding warehouse scope.
+- Capabilities/catalogue: fit; deepen connections rather than add catalogue complexity.
+- Work/Event: central authority; protect it from duplicate domain logic.
+- Quotes/Finance: architecture is substantial, but commercial closure remains higher priority than internal feature accumulation.
+
+Next execution target:
+Complete the supplier maintenance skeleton, then re-audit its purchasing blast radius.
+
