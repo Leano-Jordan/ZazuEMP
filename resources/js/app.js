@@ -561,3 +561,15 @@ async function restoreZazuAuthRoute() {
 }
 
 window.addEventListener('popstate', restoreZazuAuthRoute);
+
+function registerZazuServiceWorker() {
+    if (!('serviceWorker' in navigator)) return;
+
+    window.addEventListener('load', () => {
+        navigator.serviceWorker.register('/sw.js', { scope: '/' }).catch(() => {
+            // Offline asset support is an enhancement; application behaviour must not depend on it.
+        });
+    });
+}
+
+registerZazuServiceWorker();
