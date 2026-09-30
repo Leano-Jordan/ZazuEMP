@@ -8,7 +8,7 @@ test('registration flows through onboarding into the dashboard', async ({ page }
     const username = 'browserowner' + unique;
     const businessName = 'Browser Catering ' + unique;
 
-    const landingResponse = await page.goto('/');
+    const landingResponse = await page.goto('/', { waitUntil: 'domcontentloaded' });
     expect(landingResponse?.status(), 'public landing').toBe(200);
     await expect(page.locator('html')).toHaveAttribute('lang', /.+/);
     await expect(page.locator('nav[aria-label="Public navigation"]')).toBeVisible();
@@ -88,7 +88,7 @@ test('public entry and login surfaces render without Zazu error pages', async ({
     await expect(page.locator('.zazu-error-shell')).toHaveCount(0);
     await expect(page.locator('nav[aria-label="Public navigation"]')).toBeVisible();
 
-    const loginResponse = await page.goto('/login');
+    const loginResponse = await page.goto('/login', { waitUntil: 'domcontentloaded' });
     expect(loginResponse?.status(), 'legacy login entry').toBe(200);
     await expect(page).toHaveURL(/\/?(?:\?auth=login)?$/);
     await expect(page.locator('.zazu-error-shell')).toHaveCount(0);
