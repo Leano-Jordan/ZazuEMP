@@ -52,6 +52,8 @@ Zazu should adapt to the business rather than forcing the business to adapt to Z
 
 30. **Owner preferences from review:** when an owner repeatedly changes Zazu's prepared suggestions in a meaningful, repeatable way, Zazu may retain that as a business preference to improve future suggestions. Preferences must never silently change or execute business actions, and they must remain reviewable/changeable by the authorised business user.
 
+31. **Deferred suggestions:** when the owner says “Not now” to a non-urgent Zazu suggestion, Zazu should offer the owner control over when to be reminded. The owner can choose a suitable reminder time rather than Zazu repeatedly resurfacing the suggestion on its own schedule.
+
 ## Product guardrails
 
 - Do **not** rewrite Zazu just to satisfy this definition.
