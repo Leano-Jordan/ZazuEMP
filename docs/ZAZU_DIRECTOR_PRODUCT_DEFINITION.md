@@ -54,6 +54,8 @@ Zazu should adapt to the business rather than forcing the business to adapt to Z
 
 31. **Deferred suggestions:** when the owner says “Not now” to a non-urgent Zazu suggestion, Zazu should offer the owner control over when to be reminded. The owner can choose a suitable reminder time rather than Zazu repeatedly resurfacing the suggestion on its own schedule.
 
+32. **WhatsApp conversation capture with privacy boundaries:** Zazu should treat relevant WhatsApp Business conversations as part of the customer's business record when the owner intentionally imports/captures them, but it must not silently scrape, monitor, or copy a person's WhatsApp conversations. The first implementation should favor explicit owner-initiated capture/import and selective attachment of relevant messages/media to the appropriate customer/work record, rather than assuming Zazu may ingest an entire chat. Zazu must clearly identify what is being imported, why it is being stored, and where it will be attached, with the owner able to review before saving. Zazu must not turn imported conversation data into unrelated marketing or other secondary uses. Any future direct WhatsApp integration must be designed against Meta's current WhatsApp Business policies/technical terms and applicable South African privacy law, including POPIA, with consent/other lawful basis, purpose limitation, data minimisation, access controls, retention/deletion, security, and data-subject rights considered. This is a product requirement, not a claim of legal compliance; implementation should receive a dedicated privacy/legal review before release.
+
 ## Product guardrails
 
 - Do **not** rewrite Zazu just to satisfy this definition.
