@@ -160,3 +160,29 @@ Verification boundary:
 Remaining risk:
 - duplicate/needs-review resolution UI is intentionally not implemented yet; those states remain hard blockers rather than silent guesses;
 - runtime upload, preview, transaction, rollback and populated-data isolation still require execution evidence.
+
+
+
+## Director revelation cycle — 2026-10-01
+
+Target: persist the latest external design findings and establish the next UI/capability governance layer without changing application behaviour yet.
+
+### New durable direction
+- Progressive disclosure is now a formal Zazu UX rule: primary → expandable → advanced → specialist.
+- Basic/Intermediate/Advanced remains an experience presentation level, not a requirement to show a literal mode switch on every screen.
+- Accordions are preferred for grouped settings/forms; expandable rows for records; expandable cards/summaries for overview surfaces; sticky summaries for consequential workflows such as quotes.
+- Event/job context should be the user's mental container for connected operational information.
+- The public landing page is a brand/identity surface distinct from the operational dashboard.
+- Development visual assets are allowed for design exploration. Release asset/IP/license clearance is a separate gate.
+- Open-source libraries and APIs are enhancements unless explicitly promoted to core.
+
+### New control documents
+- docs/ZAZU_EXTERNAL_CAPABILITY_REGISTER.md
+- docs/ZAZU_UI_DISCLOSURE_STANDARD.md
+
+### Next Director target
+**UI/UX RECONNAISSANCE — current landing + key operational screens against the new disclosure standard, followed by bounded implementation targets.**
+
+No application code was changed by this documentation cycle.
+
+Last updated: 2026-10-01
