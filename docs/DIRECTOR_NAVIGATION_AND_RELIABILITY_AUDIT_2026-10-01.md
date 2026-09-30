@@ -56,6 +56,7 @@ Those patterns were compact but made the destination model invisible.
 8. Avoid duplicate routes or parallel navigation authorities.
 9. Navigation should be permission-aware without changing the meaning of the remaining destinations.
 10. A module that exists but cannot be found during ordinary use is treated as a navigation defect.
+11. A long navigation set must remain fully reachable on small screens; the mobile drawer may scroll its destination region without changing the information architecture.
 
 ## Reliability hardening direction
 
@@ -93,3 +94,16 @@ Do not add navigation items merely because a route exists.
 
 Every visible destination must represent a user-understandable business area or an essential control surface.
 
+
+
+## 2026-10-01 execution — navigation hardening
+
+The explicit-destination navigation change is now treated as the current control state rather than an experimental compact-navigation pattern.
+
+Additional hardening:
+- the mobile destination region now owns vertical scrolling when the navigation set exceeds the available viewport;
+- the drawer shell remains fixed and the brand/close control and account area are not lost behind an overflowing destination list;
+- feature destinations remain named directly: Suppliers is not hidden under Resources, and the same rule applies to Purchasing, Inventory, Assets, Quotes and other daily-use areas;
+- regression coverage now protects the visible destination set from accidental removal.
+
+This cycle deliberately does not add new modules, new navigation categories or feature breadth.
