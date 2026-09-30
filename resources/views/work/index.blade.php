@@ -3,9 +3,9 @@
     <x-slot:heading>Event Operations</x-slot:heading>
 <section class="zazu-ops-hero">
         <div>
-            <div class="zazu-eyebrow">Rosco ICT · Event Operations</div>
-            <h2 class="zazu-command-title">Keep every event moving.</h2>
-            <p class="zazu-command-copy">One operational record from planning through execution. Scan workload, open a job, and inspect the details without leaving the workspace.</p>
+            <div class="zazu-eyebrow">Operations</div>
+            <h2 class="zazu-command-title">Your event workload</h2>
+            <p class="zazu-command-copy">See what needs attention, open a job, and inspect its details without leaving the workspace.</p>
         </div>
         <div class="zazu-ops-hero-meta">
             <span class="zazu-live-mark"><i></i> Workspace live</span>
