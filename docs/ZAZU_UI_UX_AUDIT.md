@@ -313,3 +313,35 @@ Implementation direction for Zazu:
 - Keep mobile surfaces stacked and touch-friendly, with less chrome and fewer competing boundaries.
 
 This is a product-wide visual language change, not a new component kit: the existing Zazu blue palette and 2–6px geometry are retained, while attraction is created through light, depth, typography, whitespace and motion restraint.
+
+
+
+## 2026-10-01 Director revelation cycle — progressive disclosure + landing identity
+
+### New UX doctrine
+The latest external design review clarified how Zazu should present its existing domains as the product grows:
+- Do not solve visual complexity by deleting useful capability.
+- Classify information as **Primary / Expandable / Advanced / Specialist**.
+- Use accordions for grouped forms/settings.
+- Use expandable rows for record detail.
+- Use expandable cards/summaries for dashboard and event/job context.
+- Use sticky financial summaries for quotes and other consequential workflows.
+- Surface connected event/job information around the user's business mental model instead of exposing database-shaped complexity.
+
+### Landing-page correction
+The public landing page is intentionally different from the operational dashboard. The dashboard should stay calm and task-focused; the landing page is allowed to carry stronger visual identity, imagery, illustration, mascot exploration, motion and art direction during development.
+
+Temporary/reference assets are not automatically release assets. Before release, run an explicit ownership/license/IP audit and replace anything not cleared. Do not remove design exploration simply because it is not yet release-cleared.
+
+### Visual design consequence
+The existing blue visual system, typography work, structural boundaries and responsive rules remain constraints. The new direction adds **character without operational clutter**: expressive landing visuals; restrained operational screens; progressive disclosure where detail would otherwise create density.
+
+### Implementation gate
+Before changing the current landing implementation, perform a current rendered/source audit and identify:
+1. what visual material was intentionally removed;
+2. what existing landing infrastructure can be restored/reused;
+3. what temporary assets are development-only;
+4. what final custom artwork is still expected;
+5. which changes affect tests or landing media configuration.
+
+Do not redesign the landing page from memory.
