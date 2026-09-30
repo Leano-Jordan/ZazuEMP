@@ -189,7 +189,7 @@ class QuoteWorkflowTest extends TestCase
     {
         $customer = Customer::create(['name' => 'Staff Acceptance Customer']);
         $event = Event::create([
-            'business_id' => app(\\App\\Support\\CurrentBusiness::class)->id(auth()->user()),
+            'business_id' => app(\App\Support\CurrentBusiness::class)->id(auth()->user()),
             'customer_id' => $customer->id,
             'reference' => 'ZAZ-STAFF-ACCEPT-001',
             'name' => 'Staff Acceptance Event',
