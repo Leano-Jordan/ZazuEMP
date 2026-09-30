@@ -42,6 +42,8 @@ Zazu should adapt to the business rather than forcing the business to adapt to Z
 24. **Industry wording:** terminology must be researched by industry before being selected. Zazu should use the natural term for the user's business rather than forcing one universal label such as “Job” or “Event.”
 25. **Offline accessibility:** important daily business work should remain usable without internet. Internet-dependent actions can wait until connectivity returns. Do not promise full offline parity until the current architecture has been audited.
 
+26. **Situation-aware work intake:** Zazu should recognize what an incoming interaction represents based on the situation and available information. It should not force every business or every customer interaction into one universal label such as Enquiry, Request or Booking. Zazu may begin with the appropriate lightweight state and guide the user as the interaction becomes clearer (for example, enquiry → request → booking/confirmed work). The underlying records should remain connected rather than requiring the owner to understand the data model.
+
 ## Product guardrails
 
 - Do **not** rewrite Zazu just to satisfy this definition.
