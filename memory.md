@@ -753,3 +753,15 @@ Regression rule:
 - Added replaceable Unsplash-licensed event/catering image placeholders to the landing page.
 - Added LandingPageTest coverage for public root and logout destination.
 - Runtime rendered QA remains pending; source changes are committed on main and require browser verification in the repository environment.
+
+
+
+## Director revelation — 2026-10-01
+
+- Progressive disclosure is now a formal Zazu UX principle: primary → expandable → advanced → specialist.
+- Use accordions for grouped forms/settings, expandable rows for records, expandable cards/summaries for overview/event context, and sticky summaries for consequential workflows such as quotes.
+- Basic/Intermediate/Advanced remains an experience/presentation level, not a literal per-page mode switch and never a permission boundary.
+- The event/job should remain the user's mental container for connected operational context.
+- The landing page is a brand/identity surface and may remain visually expressive during development. Temporary/reference imagery, mascot exploration and custom-art concepts should not be removed merely because release licensing has not yet been cleared. Release requires a separate asset/IP/license audit.
+- Open-source libraries/APIs are optional enhancements unless explicitly promoted to core. Core offline-capable workflows must not depend on online services.
+- New persistent control docs: docs/ZAZU_EXTERNAL_CAPABILITY_REGISTER.md and docs/ZAZU_UI_DISCLOSURE_STANDARD.md.
