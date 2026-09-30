@@ -2,7 +2,10 @@
     <x-slot:title>Customers</x-slot:title>
     <x-slot:heading>Customers</x-slot:heading>
     <x-slot:headerAction>
-        <a href="{{ route('customers.create') }}" class="zazu-btn zazu-btn-primary">New customer</a>
+        <div class="flex gap-2">
+            <a href="{{ route('customers.import.create') }}" class="zazu-btn zazu-btn-secondary">Import</a>
+            <a href="{{ route('customers.create') }}" class="zazu-btn zazu-btn-primary">New customer</a>
+        </div>
     </x-slot:headerAction>
 
     <section class="zazu-command-band">
