@@ -74,7 +74,7 @@ test('registration flows through onboarding into the dashboard', async ({ page }
 
     const loginIdentifier = username;
     await page.getByLabel(/Username or email/i).fill(loginIdentifier);
-    await page.getByLabel('Password', { exact: true }).fill('password123');
+    await page.locator('#auth_password').fill('password123');
     await page.getByRole('button', { name: /Log in/i }).click();
 
     await expect(page).toHaveURL(/\/dashboard$/);
@@ -83,7 +83,7 @@ test('registration flows through onboarding into the dashboard', async ({ page }
 });
 
 test('public entry and login surfaces render without Zazu error pages', async ({ page }) => {
-    const landingResponse = await page.goto('/');
+    const landingResponse = await page.goto('/', { waitUntil: 'domcontentloaded' });
     expect(landingResponse?.status(), 'public landing').toBe(200);
     await expect(page.locator('.zazu-error-shell')).toHaveCount(0);
     await expect(page.locator('nav[aria-label="Public navigation"]')).toBeVisible();
@@ -99,7 +99,7 @@ test('public entry and login surfaces render without Zazu error pages', async ({
 
 
 test('landing authentication modal is keyboard-safe and switches between login and registration', async ({ page }) => {
-    await page.goto('/');
+    await page.goto('/', { waitUntil: 'domcontentloaded' });
     const loginTrigger = page.getByRole('button', { name: 'Log in', exact: true }).first();
     await loginTrigger.click();
     const modal = page.locator('[data-auth-modal]');
@@ -115,12 +115,13 @@ test('landing authentication modal is keyboard-safe and switches between login a
     await expect(loginSwitch).toBeVisible();
     await loginSwitch.click();
     await expect(page.getByRole('heading', { name: 'Welcome back.' })).toBeVisible();
-    await expect(page.getByRole('button', { name: 'Owner / Administrator', exact: true })).toHaveAttribute('aria-selected', 'false');
-    await page.getByRole('button', { name: 'Owner / Administrator', exact: true }).click();
+    const ownerAccessSwitch = page.locator('[data-auth-access-switch="owner"]');
+    await expect(ownerAccessSwitch).toHaveAttribute('aria-selected', 'false');
+    await ownerAccessSwitch.click();
     await expect(page.getByRole('heading', { name: 'Welcome back, owner.' })).toBeVisible();
     await expect(page.getByRole('button', { name: 'Open owner area', exact: false })).toBeVisible();
     await expect(page.locator('input[name="owner_access"]')).toHaveValue('1');
-    await page.getByRole('button', { name: 'Workspace access', exact: true }).click();
+    await page.locator('[data-auth-access-switch="login"]').click();
     await expect(page.getByRole('heading', { name: 'Welcome back.' })).toBeVisible();
     await expect(page.locator('input[name="owner_access"]')).toHaveValue('0');
 
