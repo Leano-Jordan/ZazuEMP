@@ -77,6 +77,62 @@ class CustomerImportMapperTest extends TestCase
         ], $result['rows'][0]['issues']);
     }
 
+    public function test_preview_provides_row_numbers_status_summary_and_structured_issues(): void
+    {
+        $result = app(CustomerImportMapper::class)->preview([
+            [
+                'Customer Name' => 'ABC Catering',
+                'Contact' => 'John Smith',
+                'Email' => 'john@example.com',
+            ],
+            [
+                'Customer Name' => '',
+                'Contact' => 'Jane Smith',
+                'Email' => 'bad-email',
+            ],
+        ]);
+
+        $this->assertSame([
+            'total' => 2,
+            'ready' => 1,
+            'needs_attention' => 1,
+        ], $result['summary']);
+
+        $this->assertSame(2, $result['rows'][0]['row_number']);
+        $this->assertSame('ready', $result['rows'][0]['status']);
+        $this->assertSame([], $result['rows'][0]['issues']);
+
+        $this->assertSame(3, $result['rows'][1]['row_number']);
+        $this->assertSame('needs_attention', $result['rows'][1]['status']);
+        $this->assertSame([
+            [
+                'field' => 'customer.name',
+                'severity' => 'error',
+                'message' => 'Customer name is required.',
+            ],
+            [
+                'field' => 'primary_contact.email',
+                'severity' => 'error',
+                'message' => 'Primary contact email is not valid.',
+            ],
+        ], $result['rows'][1]['issues']);
+    }
+
+    public function test_preview_is_read_only_and_preserves_source_values(): void
+    {
+        $result = app(CustomerImportMapper::class)->preview([
+            [
+                'Client' => 'ABC Catering',
+                'Contact' => 'John Smith',
+                'Mobile' => '0821234567',
+            ],
+        ]);
+
+        $this->assertSame('ABC Catering', $result['rows'][0]['source']['Client']);
+        $this->assertSame('John Smith', $result['rows'][0]['primary_contact']['name']);
+        $this->assertSame('0821234567', $result['rows'][0]['primary_contact']['phone']);
+    }
+
     public function test_mapper_does_not_write_to_the_database(): void
     {
         $result = app(CustomerImportMapper::class)->map([
