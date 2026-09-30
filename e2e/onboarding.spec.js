@@ -22,7 +22,7 @@ test('registration flows through onboarding into the dashboard', async ({ page }
     await expect(page.getByRole('heading', { name: 'Set up your Zazu workspace.' })).toBeVisible();
 
     await page.getByLabel('Your name').fill('Browser Owner');
-    await page.getByLabel('Username').fill(username);
+    await page.locator('#auth_username').fill(username);
     await page.getByLabel('Business name').fill(businessName);
     await page.getByLabel('Email address').fill(username + '@example.com');
     await page.locator('#auth_register_password').fill('password123');
@@ -59,7 +59,7 @@ test('registration flows through onboarding into the dashboard', async ({ page }
     await expect(page.getByRole('heading', { name: 'Command Centre' })).toBeVisible();
     await expect(page.locator('.zazu-footer-workspace strong')).toHaveText(businessName);
 
-    const signedInLandingResponse = await page.goto('/');
+    const signedInLandingResponse = await page.goto('/', { waitUntil: 'domcontentloaded' });
     expect(signedInLandingResponse?.status(), 'authenticated landing').toBe(200);
     await expect(page.locator('.zazu-error-shell')).toHaveCount(0);
     await expect(page.locator('nav[aria-label="Public navigation"]').getByText("You’re signed in", { exact: true })).toBeVisible();
