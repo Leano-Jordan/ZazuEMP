@@ -297,6 +297,9 @@
     }
 
     .zazu-nav {
+        min-height: 0;
+        overflow-y: auto;
+        overscroll-behavior: contain;
         padding: 14px 12px;
     }
 
