@@ -186,3 +186,24 @@ VERIFIED = intended behaviour has sufficient evidence.
 PROVEN = repeated realistic/production/recovery evidence exists.
 UNVERIFIED = required evidence is unavailable.
 BLOCKED = safe progress is materially prevented.
+
+
+
+## NEW CONTROL DOCTRINE — 2026-10-01
+
+### Progressive disclosure
+The UI/UX Improvement Engine must apply progressive disclosure rather than equating simplicity with removal of capability.
+
+Preferred patterns:
+- accordion for grouped forms/settings;
+- expandable rows for records;
+- expandable cards/summaries for overview surfaces;
+- sticky summaries for consequential workflows such as quotes.
+
+The engine must classify visible information as primary, expandable, advanced or specialist before increasing screen density.
+
+### Landing-page freedom vs release clearance
+The landing page is a brand/aesthetic development surface and may contain temporary visual references, custom-art experiments, photography, mascot concepts and other visual exploration. Asset/IP/license clearance is a release gate, not a reason to sterilize development visuals prematurely.
+
+### Capability integration
+New open-source libraries and external APIs are managed through docs/ZAZU_EXTERNAL_CAPABILITY_REGISTER.md. The register records integration intent, license verification, privacy/data-egress assessment and release priority. Core business workflows must not become dependent on optional online services.
