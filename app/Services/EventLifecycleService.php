@@ -47,6 +47,18 @@ final class EventLifecycleService
         );
     }
 
+    public function confirmAfterQuoteAcceptance(Event $event): Event
+    {
+        if ($event->status !== 'draft') {
+            return $event;
+        }
+
+        $this->assertTransitionAllowed($event, 'confirmed');
+        $event->update(['status' => 'confirmed']);
+
+        return $event;
+    }
+
     public function assertTransitionAllowed(Event $event, string $newStatus): void
     {
         abort_unless(
