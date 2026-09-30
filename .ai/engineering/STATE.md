@@ -186,3 +186,21 @@ Target: persist the latest external design findings and establish the next UI/ca
 No application code was changed by this documentation cycle.
 
 Last updated: 2026-10-01
+
+
+## Load-shedding mobile test cycle — 2026-10-01
+
+Target: make Zazu practical to test from a phone when internet/GitHub/Wi-Fi are unavailable during load shedding.
+
+Executed:
+- added a web-app manifest for Zazu;
+- added a conservative service worker that caches static assets only;
+- deliberately excluded authenticated HTML and business data from offline caching;
+- added a field-testing runbook for phone → hotspot → laptop → Laravel local-network testing;
+- established that full offline business operation is a separate architecture decision and is not claimed by this change.
+
+Verification boundary:
+- repository source was inspected and the implementation was committed;
+- actual phone/browser/local-network execution still requires owner-side runtime observation.
+
+Next runtime target remains the populated end-to-end business workflow, with mobile field testing now available as a practical verification path.
