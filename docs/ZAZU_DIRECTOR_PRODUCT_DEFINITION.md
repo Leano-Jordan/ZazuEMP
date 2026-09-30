@@ -48,6 +48,8 @@ Zazu should adapt to the business rather than forcing the business to adapt to Z
 
 28. **Proactive next-step preparation:** when Zazu has enough information to identify an obvious useful next step, it should prepare that step and ask the owner for approval before carrying it out. Example: once a catering booking has enough information, Zazu can prepare a quote rather than making the owner navigate to a separate quote workflow.
 
+29. **Review-before-approval:** anything Zazu prepares for a business-changing action (such as a quote, shopping list, invoice or reminder) must be reviewable and editable by the owner/authorised user before approval. Preparation is not execution; the user remains in control of the final content and action.
+
 ## Product guardrails
 
 - Do **not** rewrite Zazu just to satisfy this definition.
