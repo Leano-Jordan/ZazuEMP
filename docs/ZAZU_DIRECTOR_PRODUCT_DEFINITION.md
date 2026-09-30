@@ -46,6 +46,8 @@ Zazu should adapt to the business rather than forcing the business to adapt to Z
 
 27. **Next-useful-question behaviour:** after recognizing the situation, Zazu should ask the next useful question needed to move the work forward instead of presenting a large form. Questions should be adaptive and based on what is already known; do not ask for information that is unnecessary at that stage.
 
+28. **Proactive next-step preparation:** when Zazu has enough information to identify an obvious useful next step, it should prepare that step and ask the owner for approval before carrying it out. Example: once a catering booking has enough information, Zazu can prepare a quote rather than making the owner navigate to a separate quote workflow.
+
 ## Product guardrails
 
 - Do **not** rewrite Zazu just to satisfy this definition.
