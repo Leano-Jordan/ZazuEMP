@@ -236,3 +236,32 @@ Other module decisions:
 Next execution target:
 Complete the supplier maintenance skeleton, then re-audit its purchasing blast radius.
 
+
+
+## Supplier skeleton execution — 2026-10-01
+
+Executed the selected bounded skeleton correction.
+
+Changed:
+- added supplier edit/update routes using existing suppliers.update permission;
+- added business-scoped supplier edit/update controller path;
+- wrapped supplier updates in a transaction with row locking;
+- added supplier create/update audit entries;
+- reused the existing supplier form for create and edit;
+- exposed Edit from the supplier register;
+- removed the pre-existing duplicate Add supplier action in the supplier header;
+- kept supplier history intact; no delete operation was introduced.
+
+Source-level re-audit:
+- purchasing already resolves suppliers by active business, so the maintenance surface remains within the existing supplier authority;
+- supplier business ownership is checked before edit/update;
+- no new supplier abstraction or parallel domain was introduced;
+- no purchasing, inventory or finance logic was changed.
+
+Verification boundary:
+- current repository source was re-read after the changes;
+- local Laravel/browser/database execution was not observed and is not claimed.
+
+Next Director target:
+**Re-audit the remaining lean resource modules, with purchasing ↔ inventory reconciliation as the next structural target unless a higher-risk commercial gap is verified first.**
+
