@@ -169,3 +169,23 @@ Destructive or irreversible actions require explicit owner authorization unless 
 The owner is the final product and architecture decision-maker.
 
 AI may propose and execute within clear authority, but must not silently convert assumptions into product truth.
+
+
+## 13. Director UX / capability governance — 2026-10-01
+
+All future UI/UX work must consult:
+- docs/ZAZU_UI_DISCLOSURE_STANDARD.md
+- docs/ZAZU_UI_UX_AUDIT.md
+- docs/ZAZU_TYPOGRAPHY_STANDARD.md
+
+All new open-source libraries and external APIs must consult:
+- docs/ZAZU_EXTERNAL_CAPABILITY_REGISTER.md
+
+Progressive disclosure is the default complexity-management mechanism:
+**Primary → Expandable → Advanced → Specialist**.
+
+The public landing page is an expressive brand surface during development. Do not remove development visual exploration merely because an asset is not yet release-cleared. Release preparation must perform a separate IP/license/ownership audit.
+
+Core local-first workflows must not silently depend on optional online services.
+
+When another AI session starts work, repository-side documentation is the current instruction state. Do not rely on prior chat context when the repository contains newer decisions.
