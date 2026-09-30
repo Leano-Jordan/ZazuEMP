@@ -5,27 +5,27 @@ return [
     'landing_image_library' => [
         'catering_service' => [
             'label' => 'Outdoor catered event',
-            'url' => 'https://www.spholaskitchen.co.za/assets/catering-setup-DkqWhPGH.jpg',
+            'url' => '/images/landing/hero.svg',
         ],
         'event_catering' => [
             'label' => 'Event catering service',
-            'url' => 'https://media.licdn.com/dms/image/v2/C5612AQHjV15kmibk8g/article-cover_image-shrink_720_1280/article-cover_image-shrink_720_1280/0/1528725310398?e=2147483647&t=SYwaSIhNMUJQXQcEoIOZO5HYREYXnDDTN71NwSA-tMs&v=beta',
+            'url' => '/images/landing/operations.svg',
         ],
         'sound_stage' => [
             'label' => 'Sound and stage setup',
-            'url' => 'https://4realpro.co.za/assets/images/471193228-9201696576549015-5830043338781498257-n.jpg',
+            'url' => '/images/landing/resources.svg',
         ],
         'wedding_catering' => [
             'label' => 'Wedding catering',
-            'url' => 'https://florence.co.za/wp-content/uploads/2023/11/florence-05.jpg',
+            'url' => '/images/landing/control.svg',
         ],
         'luxury_banquet' => [
             'label' => 'Event venue and service',
-            'url' => 'https://www.asanteestate.co.za/assets/img/instagram/05.jpg',
+            'url' => '/images/landing/hero.svg',
         ],
         'stage_av' => [
             'label' => 'Event stage and AV',
-            'url' => 'https://media.licdn.com/dms/image/v2/C561BAQGEiMk5LWJNBA/company-background_10000/company-background_10000/0/1585451060895/city_life_centre_cover?e=2147483647&t=ejo4m7p-pgJ0GzgCMIPe_ha8SCLfxlsKWW2G6Obwvfo&v=beta',
+            'url' => '/images/landing/resources.svg',
         ],
     ],
     'errors' => [
