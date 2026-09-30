@@ -395,9 +395,139 @@ function setupZazuCatalogue() {
     });
 }
 
+
+function setupZazuCommandNavigation() {
+    const shell = document.querySelector('[data-zazu-command-search]');
+    const input = document.querySelector('[data-zazu-command-input]');
+    const palette = document.querySelector('[data-zazu-command]');
+    const results = document.querySelector('[data-zazu-command-results]');
+    const empty = document.querySelector('[data-zazu-command-empty]');
+    const count = document.querySelector('[data-zazu-command-count]');
+    const jump = document.querySelector('[data-zazu-nav-jump]');
+
+    if (!shell || !input || !palette || !results) return;
+
+    const items = [...results.querySelectorAll('[data-command-item]')];
+    let selected = 0;
+
+    const visibleItems = () => items.filter((item) => !item.hidden);
+
+    const select = (index) => {
+        const visible = visibleItems();
+        if (!visible.length) return;
+        selected = (index + visible.length) % visible.length;
+        visible.forEach((item, i) => {
+            const active = i === selected;
+            item.classList.toggle('is-command-active', active);
+            item.setAttribute('aria-selected', active ? 'true' : 'false');
+            if (active) item.scrollIntoView({ block: 'nearest' });
+        });
+    };
+
+    const close = (restoreFocus = false) => {
+        palette.hidden = true;
+        input.setAttribute('aria-expanded', 'false');
+        if (restoreFocus) input.focus();
+    };
+
+    const open = () => {
+        palette.hidden = false;
+        input.setAttribute('aria-expanded', 'true');
+        input.focus();
+        select(0);
+    };
+
+    const filter = () => {
+        const query = input.value.trim().toLowerCase();
+        const visible = [];
+
+        items.forEach((item) => {
+            const haystack = [
+                item.textContent || '',
+                item.dataset.searchTerms || '',
+            ].join(' ').toLowerCase();
+            const match = !query || haystack.includes(query);
+            item.hidden = !match;
+            if (match) visible.push(item);
+        });
+
+        if (empty) empty.hidden = visible.length > 0;
+        if (count) count.textContent = query
+            ? `${visible.length} destination${visible.length === 1 ? '' : 's'}`
+            : 'Workspace destinations';
+
+        selected = 0;
+        select(0);
+    };
+
+    input.addEventListener('focus', open);
+    input.addEventListener('input', () => {
+        open();
+        filter();
+    });
+
+    input.addEventListener('keydown', (event) => {
+        if (event.key === 'Escape') {
+            event.preventDefault();
+            close(true);
+            return;
+        }
+
+        if (event.key === 'ArrowDown') {
+            event.preventDefault();
+            select(selected + 1);
+            return;
+        }
+
+        if (event.key === 'ArrowUp') {
+            event.preventDefault();
+            select(selected - 1);
+            return;
+        }
+
+        if (event.key === 'Enter') {
+            const item = visibleItems()[selected];
+            if (item) {
+                event.preventDefault();
+                item.click();
+            }
+        }
+    });
+
+    results.addEventListener('click', (event) => {
+        const item = event.target.closest('[data-command-item]');
+        if (!item) return;
+        localStorage.setItem('zazu-last-destination', item.href);
+        close(false);
+    });
+
+    jump?.addEventListener('click', () => open());
+
+    document.addEventListener('keydown', (event) => {
+        const target = event.target;
+        const typing = target instanceof HTMLInputElement
+            || target instanceof HTMLTextAreaElement
+            || target instanceof HTMLSelectElement
+            || target?.isContentEditable;
+
+        if ((event.ctrlKey || event.metaKey) && event.key.toLowerCase() === 'k' && !typing) {
+            event.preventDefault();
+            if (palette.hidden) open();
+            else close(true);
+        }
+    });
+
+    document.addEventListener('click', (event) => {
+        if (!shell.contains(event.target)) close(false);
+    });
+
+    filter();
+}
+
 const initializeZazuUi = () => {
     setupZazuAuthExperience();
     setupZazuMobileNavigation();
+    setupZazuCommandNavigation();
     setupZazuThemeToggle();
     setupZazuCatalogue();
     setupZazuUserMenus();
