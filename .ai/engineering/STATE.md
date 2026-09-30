@@ -284,3 +284,31 @@ Verification boundary:
 
 Next Director target:
 **CORE WORKFLOW INTEGRITY — audit Customer → Job/Event → Quote → acceptance/status → payment/deposit → preparation → purchasing/costs → invoice/completion, starting with the highest-risk broken or incomplete relationship found in source evidence.**
+
+
+## Core workflow hardening cycle — 2026-10-01
+
+Target: keep the Customer → Job/Event → Quote → acceptance/status chain internally coherent.
+
+Finding:
+- Quote acceptance changed the quote and quote version to accepted but did not advance a draft Job/Event into its confirmed operational state. That left the commercial acceptance and operational lifecycle disagreeing.
+
+Executed:
+- centralised the bounded rule in EventLifecycleService;
+- public customer acceptance now confirms a draft job atomically with quote acceptance;
+- authenticated staff acceptance follows the same rule;
+- added regression coverage for both public and staff acceptance paths;
+- existing confirmed/in-progress jobs are not rewritten by acceptance.
+
+Re-audit:
+- business/event/quote lock ordering remains intact;
+- accepted quote and accepted version remain updated together;
+- event confirmation occurs inside the same transaction;
+- no new domain or parallel lifecycle logic introduced.
+
+Verification boundary:
+- repository source was re-read after the change;
+- local PHPUnit/runtime execution is not observed in this cycle and is not claimed.
+
+Next target:
+**FINANCIAL CONVERSION INTEGRITY — re-audit accepted quote → invoice → payment/deposit relationships and identify the next concrete integrity gap before adding breadth.**
