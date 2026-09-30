@@ -107,3 +107,26 @@ Additional hardening:
 - regression coverage now protects the visible destination set from accidental removal.
 
 This cycle deliberately does not add new modules, new navigation categories or feature breadth.
+
+
+## Navigation acceleration — 2026-10-01
+The previous explicit-destination navigation corrected hidden modules but still left a usability defect: the sidebar remained a long list, and the owner had to scroll to reach less-prominent destinations such as Suppliers.
+
+### Director decision
+Treat navigation as a reliability surface. The user must be able to reach common destinations without scrolling or remembering Zazu's internal grouping.
+
+### Executed
+- Added a persistent Quick access rail for Jobs, Customers, Quotes, Purchasing, Suppliers and Calendar.
+- Added a visible Find control beside All areas.
+- Wired the existing workspace command surface to actually function: focus/open, filtering, keyboard navigation, Enter activation, Escape close and Ctrl/Cmd+K.
+- Kept the full permission-aware destination list intact so no module is hidden or removed.
+- Added regression coverage for quick-access and command-navigation hooks.
+
+### Design basis
+Current SaaS navigation patterns increasingly combine a concise personalized/sidebar surface with command navigation and favorites/recent access. Atlassian documents customization, starred items, recent items, collapsible sidebars and command navigation; Linear documents favorites, recent access and command/search shortcuts. These patterns support Zazu's direction without copying either product's information architecture.
+
+### Boundary
+Quick access is intentionally a bounded first acceleration layer. Personal favorites/reordering and richer recent-record navigation can be added later if actual usage evidence shows they are needed.
+
+### Financial conversion re-audit
+Invoice creation already requires an accepted quote and accepted latest version for quote-based conversion. The quote-version foreign key is unique at database level. Payments are business-scoped, idempotent, invoice-locked, lifecycle-checked, prevented from exceeding balance, and deposit payments are capped to the quoted deposit requirement. No new financial mutation was justified in this sweep; end-to-end acceptance evidence remains the next proof target.
