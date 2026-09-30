@@ -80,6 +80,14 @@ class CustomerImportService
         }
 
         return DB::transaction(function () use ($business, $rows, $approvedActions): array {
+            // Serialize customer imports for this business. The lock is on the
+            // parent business row, so concurrent imports cannot both conclude
+            // that the same customer is new and then create it.
+            Business::query()
+                ->whereKey($business->id)
+                ->lockForUpdate()
+                ->firstOrFail();
+
             $freshPreview = $this->mapper->preview($rows, $business);
             $created = 0;
             $skipped = 0;
