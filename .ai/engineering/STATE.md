@@ -91,7 +91,7 @@ After every meaningful cycle:
 - update READINESS_REGISTER when a gate changes;
 - create a dated historical record only when the event is significant.
 
-Last updated: 2026-09-28
+Last updated: 2026-10-01
 
 
 ## Latest completed cycle — 2026-09-28
@@ -265,3 +265,22 @@ Verification boundary:
 Next Director target:
 **Re-audit the remaining lean resource modules, with purchasing ↔ inventory reconciliation as the next structural target unless a higher-risk commercial gap is verified first.**
 
+
+
+## Navigation hardening cycle — 2026-10-01
+
+Target: make navigation reliable enough that normal users can test and operate Zazu without hunting for modules.
+
+Executed:
+- kept primary navigation explicit: real business destinations are exposed by name rather than hidden behind category landing links;
+- added regression coverage for the primary destination set, including Suppliers, Purchasing, Inventory, Assets, Quotes and core workspace destinations;
+- hardened the mobile navigation region so a long destination list can scroll inside the drawer without clipping the drawer shell or pushing essential controls off-screen;
+- preserved the same information architecture on desktop and mobile;
+- retained contextual section tabs as secondary navigation rather than the sole route to a module.
+
+Verification boundary:
+- current GitHub source was re-read after the hardening changes;
+- runtime/browser/mobile execution was not observed in this cycle and is not claimed.
+
+Next Director target:
+**CORE WORKFLOW INTEGRITY — audit Customer → Job/Event → Quote → acceptance/status → payment/deposit → preparation → purchasing/costs → invoice/completion, starting with the highest-risk broken or incomplete relationship found in source evidence.**
