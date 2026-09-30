@@ -9,9 +9,9 @@
         <div class="flex min-w-0 items-center gap-4">
             <x-profile-avatar :name="$customer->name" :path="$customer->profile_photo_path" media-type="customer" :media-id="$customer->id" size="lg" />
             <div class="min-w-0">
-                <div class="zazu-eyebrow">Customer relationship</div>
+                <div class="zazu-eyebrow">Customer</div>
                 <h2 class="zazu-command-title">{{ $customer->name }}</h2>
-                <p class="zazu-command-copy">Relationship details, contacts and work history connected to this customer.</p>
+                <p class="zazu-command-copy">Contact details and work history for this customer.</p>
             </div>
         </div>
         <div class="zazu-command-meta zazu-command-meta-strong">
@@ -25,9 +25,9 @@
             <section class="zazu-panel zazu-customer-contacts">
                 <div class="zazu-panel-head">
                     <div>
-                        <div class="zazu-panel-kicker">Relationship people</div>
+                        <div class="zazu-panel-kicker">Contacts</div>
                         <div class="zazu-panel-title">Contacts</div>
-                        <div class="zazu-panel-copy">Active people connected to this relationship. Historical Work records can retain a removed contact reference.</div>
+                        <div class="zazu-panel-copy">People connected to this customer.</div>
                     </div>
                     <a href="{{ route('customers.contacts.create', $customer) }}" class="zazu-btn zazu-btn-secondary">Add contact</a>
                 </div>
@@ -68,9 +68,9 @@
             <section class="zazu-panel zazu-customer-work-history">
                 <div class="zazu-panel-head">
                     <div>
-                        <div class="zazu-panel-kicker">Operational history</div>
+                        <div class="zazu-panel-kicker">Work history</div>
                         <div class="zazu-panel-title">Work history</div>
-                        <div class="zazu-panel-copy">Open a workspace or continue editing an active job.</div>
+                        <div class="zazu-panel-copy">Jobs and events linked to this customer.</div>
                     </div>
                     <a href="{{ route('work.create', ['customer_id' => $customer->id]) }}" class="zazu-btn zazu-btn-secondary">Create work</a>
                 </div>
@@ -108,7 +108,7 @@
 
         <aside class="zazu-detail-stack">
             <section class="zazu-panel">
-                <div class="zazu-panel-title">Relationship at a glance</div>
+                <div class="zazu-panel-title">Customer details</div>
                 <div class="zazu-detail-rows">
                     <div class="zazu-detail-row"><div class="zazu-detail-label">Customer</div><div class="zazu-detail-value">{{ $customer->name }}</div></div>
                     <div class="zazu-detail-row"><div class="zazu-detail-label">Primary</div><div class="zazu-detail-value">{{ $customer->primaryContact?->name ?: 'Not set' }}</div></div>
@@ -120,10 +120,6 @@
             @if ($customer->notes)
                 <section class="zazu-panel"><div class="zazu-panel-title">Notes</div><div class="mt-3 text-xs leading-6 text-[var(--zazu-ink-2)]">{{ $customer->notes }}</div></section>
             @endif
-            <section class="zazu-panel">
-                <div class="zazu-panel-title">Privacy-aware handling</div>
-                <div class="mt-3 text-[11px] leading-5 text-[var(--zazu-muted)]">Names, contact details and identifiable profile photos are personal information. Keep access limited to people who need it for the relationship, retain information only for a lawful business purpose, and use lifecycle controls when a contact is no longer active.</div>
-            </section>
-        </aside>
+                    </aside>
     </div>
 </x-app-layout>
