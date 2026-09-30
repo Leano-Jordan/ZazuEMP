@@ -82,6 +82,8 @@ class UiAccessibilityTest extends TestCase
             ->assertSee('Quotes');
     }
 
+    
+
     public function test_quick_navigation_and_command_menu_expose_fast_paths(): void
     {
         $response = $this->get(route('dashboard'));
