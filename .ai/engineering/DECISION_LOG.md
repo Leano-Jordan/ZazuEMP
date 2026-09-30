@@ -37,3 +37,29 @@ Durable decisions governing the Zazu engineering system.
 **Decision:** Release risk is tracked during normal engineering, not only at the end.  
 **Reason:** Keep work pointed at real release blockers.  
 **Status:** ACTIVE
+
+
+
+## DEC-007 — Progressive disclosure over capability removal
+**Date:** 2026-10-01
+**Decision:** Zazu will manage interface complexity primarily through progressive disclosure. Capability should remain available underneath the interface rather than being removed to make screens look simple.
+**Reason:** Preserve broad business capability while keeping the default experience approachable.
+**Status:** ACTIVE
+
+## DEC-008 — Landing development visuals are not release assets by default
+**Date:** 2026-10-01
+**Decision:** Development-stage landing imagery, visual references, custom-art experiments and mascot concepts may be used to establish Zazu identity. Release requires a separate IP/license/ownership audit.
+**Reason:** Design exploration and commercial release clearance are different gates.
+**Status:** ACTIVE
+
+## DEC-009 — Optional capabilities must not compromise local-first core
+**Date:** 2026-10-01
+**Decision:** OCR, voice, maps, external messaging, translation, cloud services and similar capabilities are optional enhancements unless explicitly promoted to core. Core workflows must remain functional without them where local-first architecture permits.
+**Reason:** Preserve reliability, offline operation, privacy and continuity.
+**Status:** ACTIVE
+
+## DEC-010 — External dependency register
+**Date:** 2026-10-01
+**Decision:** Every new open-source library or external API considered for Zazu must be recorded with license, data-egress, offline, security, product-surface and release-priority information before adoption.
+**Reason:** Prevent dependency sprawl, licensing surprises and accidental online coupling.
+**Status:** ACTIVE
