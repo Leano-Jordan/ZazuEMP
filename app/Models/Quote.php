@@ -46,4 +46,9 @@ class Quote extends Model
     {
         return $this->versions()->one()->latestOfMany('version');
     }
+
+    public function invoices(): HasMany
+    {
+        return $this->hasMany(Invoice::class);
+    }
 }
