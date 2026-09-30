@@ -75,7 +75,7 @@ test('registration flows through onboarding into the dashboard', async ({ page }
     const loginIdentifier = username;
     await page.getByLabel(/Username or email/i).fill(loginIdentifier);
     await page.locator('#auth_password').fill('password123');
-    await page.getByRole('button', { name: /Log in/i }).click();
+    await page.locator('[data-auth-submit]').click();
 
     await expect(page).toHaveURL(/\/dashboard$/);
     await expect(page.locator('.zazu-error-shell')).toHaveCount(0);
@@ -92,11 +92,10 @@ test('public entry and login surfaces render without Zazu error pages', async ({
     expect(loginResponse?.status(), 'legacy login entry').toBe(200);
     await expect(page).toHaveURL(/\/?(?:\?auth=login)?$/);
     await expect(page.locator('.zazu-error-shell')).toHaveCount(0);
-    await expect(page.getByRole('button', { name: 'Log in', exact: true }).first()).toBeVisible();
-    await page.getByRole('button', { name: 'Log in', exact: true }).first().click();
+    await expect(page.locator('[data-auth-modal]')).toBeVisible();
+    await expect(page.getByRole('heading', { name: 'Welcome back.' })).toBeVisible();
     await expect(page.getByLabel('Username or email')).toBeVisible();
 });
-
 
 test('landing authentication modal is keyboard-safe and switches between login and registration', async ({ page }) => {
     await page.goto('/', { waitUntil: 'domcontentloaded' });
