@@ -312,3 +312,13 @@ Verification boundary:
 
 Next target:
 **FINANCIAL CONVERSION INTEGRITY — re-audit accepted quote → invoice → payment/deposit relationships and identify the next concrete integrity gap before adding breadth.**
+
+
+### Navigation acceleration + financial conversion re-audit — 2026-10-01
+- User testing exposed navigation itself as a reliability blocker: if a destination requires sidebar scrolling or prior knowledge of Zazu's grouping, effective system testing slows down.
+- Navigation hardening now treats quick access as a primary UX/reliability layer, not cosmetic UI.
+- Six high-frequency destinations are surfaced in a persistent Quick access rail: Jobs, Customers, Quotes, Purchasing, Suppliers, Calendar.
+- The existing full destination list remains available for complete coverage; command navigation is also wired to provide keyboard/type-ahead access.
+- Desktop command navigation supports Ctrl/Cmd+K, arrow-key selection, Enter activation and Escape close. Mobile keeps a compact search entrypoint.
+- Financial conversion re-audit reviewed invoice creation, quote-version binding, payment locking/idempotency, balance calculations and deposit constraints. Existing safeguards include accepted-quote gating, business-scoped quote-version uniqueness, business/invoice locking, idempotency, overpayment prevention and deposit cap enforcement.
+- No new financial mutation was justified in this sweep; next proof target is end-to-end feature coverage for accepted quote → invoice → deposit/payment → final balance/status, including rejected paths and populated-data evidence.
