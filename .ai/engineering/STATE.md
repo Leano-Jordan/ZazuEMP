@@ -329,3 +329,28 @@ Executed:
 
 Next Director target:
 **Continue UI/UX reconnaissance and attack the highest-risk page/workflow defect found in source and owner testing, without deferring UI behind backend work.**
+
+
+## Quote workflow UI/reliability cycle — 2026-10-01
+
+Target: audit Customer → Job → Services → Quote → acceptance as one commercial workflow.
+
+Homework:
+- Current Dubsado guidance keeps proposals inside project context and can connect proposal, contract and invoice into one client flow; this supports Zazu's decision to keep quotes attached to the Work record rather than make them isolated documents. citeturn0search2turn0search0
+- Tripleseat describes proposals and operational documents as deriving from the same event record, reinforcing the single-event-context direction. citeturn0search12
+
+Findings:
+- Zazu's quote domain already has strong snapshot/version integrity, business scoping, status transition rules and stale-requirement detection.
+- The quote register had a real UI correctness defect: every non-draft status was rendered as success, so declined/expired quotes could visually appear successful.
+- A stale UI regression test still expected the previously rejected Quick Access navigation, conflicting with the current hierarchical navigation design.
+
+Executed:
+- corrected quote-register status semantics: accepted = success, declined/expired = danger, sent = info, draft/superseded = neutral;
+- replaced the obsolete Quick Access regression test with current quote UI semantic coverage.
+
+Verification boundary:
+- repository source was re-read and both changed files were updated successfully;
+- local Laravel/browser execution remains unobserved and is not claimed.
+
+Next target:
+**QUOTE → ACCEPTANCE → FINANCE CONVERSION** — verify the hand-off from an accepted commercial version into invoice/deposit/payment and identify the next concrete release-risk gap before adding quote breadth.
