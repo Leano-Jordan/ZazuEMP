@@ -33,11 +33,36 @@ class UiAccessibilityTest extends TestCase
         $response->assertSee('Sign out', false);
         $response->assertSee('name="viewport"', false);
         $response->assertSee('viewport-fit=cover', false);
+        $response->assertSee('>Jobs</span>', false);
+        $response->assertSee('>Customers</span>', false);
+        $response->assertSee('>Services &amp; prices</span>', false);
+        $response->assertSee('>Quotes</span>', false);
+        $response->assertSee('>Calendar</span>', false);
+        $response->assertSee('>Purchasing</span>', false);
+        $response->assertSee('>Suppliers</span>', false);
+        $response->assertSee('>Inventory</span>', false);
+        $response->assertSee('>Assets</span>', false);
+        $response->assertSee('>Finance</span>', false);
+        $response->assertSee('>Search</span>', false);
+        $response->assertSee('>Reports</span>', false);
 
         $html = $response->getContent();
         $themePosition = strpos($html, 'data-theme-toggle');
 
         $this->assertNotFalse($themePosition);
+    }
+
+    public function test_primary_navigation_exposes_real_destinations(): void
+    {
+        $response = $this->get(route('dashboard'));
+
+        $response->assertOk();
+        $response->assertSee('aria-label="Primary"', false);
+        $response->assertSee('href="'.route('suppliers.index').'"', false);
+        $response->assertSee('href="'.route('purchasing.index').'"', false);
+        $response->assertSee('href="'.route('inventory.index').'"', false);
+        $response->assertSee('href="'.route('assets.index').'"', false);
+        $response->assertSee('href="'.route('quotes.index').'"', false);
     }
 
     public function test_customer_form_uses_mobile_friendly_contact_inputs(): void
