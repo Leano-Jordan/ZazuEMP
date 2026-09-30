@@ -1,0 +1,11 @@
+{
+  "name": "Zazu EMP",
+  "short_name": "Zazu",
+  "description": "Zazu EMP — event and catering management.",
+  "start_url": "/dashboard",
+  "scope": "/",
+  "display": "standalone",
+  "background_color": "#F8FAFC",
+  "theme_color": "#E3EBF3",
+  "orientation": "any"
+}
