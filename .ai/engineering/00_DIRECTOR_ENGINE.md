@@ -133,3 +133,40 @@ Default result:
 - regression disposition;
 - readiness impact;
 - next target.
+
+
+
+## Director revelation — progressive disclosure + capability architecture — 2026-10-01
+
+The latest external design review produced a durable UX principle: **complexity should exist underneath the interface, not in front of the user.**
+
+### Progressive disclosure standard
+Zazu must not remove capability merely to appear simple. Information is surfaced in layers:
+1. Primary — task-relevant information/action is immediately visible.
+2. Expandable — useful detail appears through an accordion, expandable row, card or disclosure control.
+3. Advanced — deeper operational/financial/configuration detail remains available without dominating the default view.
+4. Specialist — rare compliance, tender, administrative and power-user controls stay contextual.
+
+Do not force a literal Basic/Pro switch onto every page. Basic/Intermediate/Advanced remains an experience preference; progressive disclosure is the UI mechanism.
+
+### Disclosure pattern selection
+- Accordion: grouped forms/settings.
+- Row expansion: records such as customers, inventory, assets and quotes.
+- Expandable summary/card: dashboards and job/event summaries.
+- Sticky summary: consequential workflows, especially quotes, where financial totals should remain visible.
+
+### Context-first rule
+Surface information around the user's actual business object or task. A job/event should expose customer, services, preparation, purchasing, resources, costs and finance context without requiring database/domain literacy.
+
+### Landing-page visual rule
+The public landing page is a brand/identity surface, not the operational dashboard. Development-stage visual experimentation, custom artwork, photography, mascot concepts and other aesthetic material may remain while the product is being shaped. Release requires a separate asset/IP/license audit; do not remove useful design exploration merely because it is not yet release-cleared.
+
+### External capability rule
+Open-source libraries/APIs are enhancements, not dependencies for core offline business operations. Core workflows must remain usable without optional online services where local-first architecture supports that.
+
+Every proposed dependency must record capability, library/API, exact license, data egress, offline behaviour, product surface, security/privacy impact, release priority and replacement/removal path.
+
+Never describe a library as an API, or an API as a library, without checking the actual integration model and current license.
+
+### Director execution consequence
+Future UI work must first classify information as primary / expandable / advanced / specialist before adding another visible panel, card, table or navigation destination. Shared UI changes require responsive, accessibility and blast-radius review.
