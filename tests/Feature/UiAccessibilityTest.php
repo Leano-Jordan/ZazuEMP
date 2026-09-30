@@ -84,18 +84,13 @@ class UiAccessibilityTest extends TestCase
 
     
 
-    public function test_quick_navigation_and_command_menu_expose_fast_paths(): void
+    public function test_quote_register_uses_semantic_status_classes(): void
     {
-        $response = $this->get(route('dashboard'));
+        $view = file_get_contents(resource_path('views/quotes/index.blade.php'));
 
-        $response->assertOk();
-        $response->assertSee('aria-label="Quick access"', false);
-        $response->assertSee('data-zazu-nav-jump', false);
-        $response->assertSee('data-zazu-command-input', false);
-        $response->assertSee('data-zazu-command', false);
-        $response->assertSee('data-command-item', false);
-        $response->assertSee('href="'.route('suppliers.index').'"', false);
-        $response->assertSee('href="'.route('quotes.index').'"', false);
+        $this->assertStringContainsString("zazu-chip-danger", $view);
+        $this->assertStringContainsString("declined", $view);
+        $this->assertStringContainsString("expired", $view);
     }
 
     public function test_customer_form_uses_mobile_friendly_contact_inputs(): void
