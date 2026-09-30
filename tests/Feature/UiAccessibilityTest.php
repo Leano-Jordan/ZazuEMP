@@ -65,6 +65,23 @@ class UiAccessibilityTest extends TestCase
         $response->assertSee('href="'.route('quotes.index').'"', false);
     }
 
+    public function test_hierarchical_navigation_exposes_primary_areas_and_children(): void
+    {
+        $response = $this->actingAs($this->user)->get(route('dashboard'));
+
+        $response->assertOk()
+            ->assertSee('Workspace')
+            ->assertSee('Sales &amp; operations')
+            ->assertSee('Purchasing &amp; resources')
+            ->assertSee('Money &amp; control')
+            ->assertSee('System')
+            ->assertSee('data-zazu-nav-trigger', false)
+            ->assertSee('data-zazu-nav-panel', false)
+            ->assertSee('Settings')
+            ->assertSee('Suppliers')
+            ->assertSee('Quotes');
+    }
+
     public function test_quick_navigation_and_command_menu_expose_fast_paths(): void
     {
         $response = $this->get(route('dashboard'));
