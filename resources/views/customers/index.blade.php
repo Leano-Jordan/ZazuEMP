@@ -10,12 +10,12 @@
 
     <section class="zazu-command-band">
         <div>
-            <div class="zazu-eyebrow">Relationships</div>
-            <h2 class="zazu-command-title">Customer directory</h2>
-            <p class="zazu-command-copy">Keep the people and organisations behind your work in one place, ready to become operational records.</p>
+            <div class="zazu-eyebrow">Customers</div>
+            <h2 class="zazu-command-title">Your customer directory</h2>
+            <p class="zazu-command-copy">People and organisations connected to your events and work.</p>
         </div>
         <div class="zazu-command-meta">
-            <div class="zazu-command-meta-label">Records</div>
+            <div class="zazu-command-meta-label">Customers</div>
             <div class="zazu-command-meta-value">{{ $customers->total() }}</div>
         </div>
     </section>
@@ -23,11 +23,10 @@
     <section class="zazu-card zazu-list zazu-customer-directory">        <div class="zazu-card-header">
             <div class="zazu-section-heading">
                 <div>
-                    <div class="zazu-eyebrow">Records</div>
-                    <div class="zazu-card-title mt-1">Customer list</div>
-                    <div class="zazu-card-description">Each row is one customer record. Select a name to open its relationship workspace.</div>
+                    <div class="zazu-eyebrow">Directory</div>
+                    <div class="zazu-card-title mt-1">Customers</div>
+                    <div class="zazu-card-description">Open a customer to see their relationship and connected work.</div>
                 </div>
-                <span class="zazu-section-count">{{ $customers->total() }}</span>
             </div>
         </div>
 
@@ -56,7 +55,7 @@
                 </div>
                 <div class="zazu-action-group">
                     <a href="{{ route('work.create', ['customer_id' => $customer->id]) }}" class="zazu-btn zazu-btn-secondary">Start work</a>
-                    <a href="{{ route('customers.edit', $customer) }}" class="zazu-btn zazu-btn-ghost">Edit</a>
+                    <a href="{{ route('customers.show', $customer) }}" class="zazu-btn zazu-btn-ghost">Open</a>
                 </div>
             </div>
         @empty
