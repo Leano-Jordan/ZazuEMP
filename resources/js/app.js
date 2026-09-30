@@ -524,9 +524,44 @@ function setupZazuCommandNavigation() {
     filter();
 }
 
+const setupZazuHierarchicalNavigation = () => {
+    const areas = [...document.querySelectorAll('[data-zazu-nav-area]')];
+    if (!areas.length) return;
+
+    const closeOthers = (except) => {
+        areas.forEach((area) => {
+            if (area === except) return;
+            area.classList.remove('is-open');
+            area.querySelector('[data-zazu-nav-trigger]')?.setAttribute('aria-expanded', 'false');
+        });
+    };
+
+    areas.forEach((area) => {
+        const trigger = area.querySelector('[data-zazu-nav-trigger]');
+        if (!trigger) return;
+
+        trigger.addEventListener('click', () => {
+            const open = area.classList.toggle('is-open');
+            closeOthers(area);
+            trigger.setAttribute('aria-expanded', open ? 'true' : 'false');
+        });
+    });
+
+    document.addEventListener('click', (event) => {
+        if (!areas.some((area) => area.contains(event.target))) closeOthers(null);
+    });
+
+    document.addEventListener('keydown', (event) => {
+        if (event.key !== 'Escape') return;
+        closeOthers(null);
+        document.querySelector('[data-zazu-nav-trigger][aria-expanded="true"]')?.focus();
+    });
+};
+
 const initializeZazuUi = () => {
     setupZazuAuthExperience();
     setupZazuMobileNavigation();
+    setupZazuHierarchicalNavigation();
     setupZazuCommandNavigation();
     setupZazuThemeToggle();
     setupZazuCatalogue();
