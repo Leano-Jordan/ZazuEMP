@@ -22,6 +22,48 @@ class CustomerImportMapper
     }
 
     /**
+     * Build an import preview without writing to the database.
+     *
+     * @param array<int, array<string, string>> $rows
+     * @return array{headers: array<int, string>, summary: array{total: int, ready: int, needs_attention: int}, rows: array<int, array{row_number: int, status: string, source: array<string, string>, customer: array<string, ?string>, primary_contact: array<string, ?string>, issues: array<int, array{field: string, severity: string, message: string}>}>}
+     */
+    public function preview(array $rows): array
+    {
+        $previewRows = [];
+        $ready = 0;
+
+        foreach ($rows as $index => $row) {
+            $mapped = $this->mapRow($row);
+            $issues = $this->structuredIssues($mapped['issues']);
+
+            $status = $issues === [] ? 'ready' : 'needs_attention';
+
+            if ($status === 'ready') {
+                $ready++;
+            }
+
+            $previewRows[] = [
+                'row_number' => $index + 2,
+                'status' => $status,
+                'source' => $mapped['source'],
+                'customer' => $mapped['customer'],
+                'primary_contact' => $mapped['primary_contact'],
+                'issues' => $issues,
+            ];
+        }
+
+        return [
+            'headers' => $this->headers($rows),
+            'summary' => [
+                'total' => count($previewRows),
+                'ready' => $ready,
+                'needs_attention' => count($previewRows) - $ready,
+            ],
+            'rows' => $previewRows,
+        ];
+    }
+
+    /**
      * @param array<string, string> $row
      * @return array{source: array<string, string>, customer: array<string, ?string>, primary_contact: array<string, ?string>, issues: array<int, string>}
      */
@@ -124,6 +166,33 @@ class CustomerImportMapper
             'primary_contact' => $primaryContact,
             'issues' => $issues,
         ];
+    }
+
+    /**
+     * @param array<int, array<string, string>> $rows
+     * @return array<int, string>
+     */
+    /**
+     * @param array<int, string> $issues
+     * @return array<int, array{field: string, severity: string, message: string}>
+     */
+    private function structuredIssues(array $issues): array
+    {
+        return array_map(function (string $issue): array {
+            $field = str_starts_with($issue, 'Customer name')
+                ? 'customer.name'
+                : (str_starts_with($issue, 'Primary contact name')
+                    ? 'primary_contact.name'
+                    : (str_starts_with($issue, 'Primary contact email')
+                        ? 'primary_contact.email'
+                        : 'row'));
+
+            return [
+                'field' => $field,
+                'severity' => 'error',
+                'message' => $issue,
+            ];
+        }, $issues);
     }
 
     /**
