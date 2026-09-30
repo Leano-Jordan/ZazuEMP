@@ -484,3 +484,40 @@ No major existing domain has been removed. Compliance, inventory, assets, travel
 The work is now moving from broad capability construction toward:
 
 **runtime verification → populated-database verification → desktop/mobile QA → targeted defect correction → release candidate**
+
+
+
+## 26. Director UX revelation — progressive disclosure
+
+Zazu must be capable without being visually overwhelming. Simplicity is achieved through **progressive disclosure**, not capability removal.
+
+### Information layers
+1. Primary: what the user needs for the current task.
+2. Expandable: useful detail available on demand.
+3. Advanced: deeper operational, financial or configuration information.
+4. Specialist: rare compliance, tender, administration and power-user controls.
+
+### Preferred interaction patterns
+- Accordion for grouped forms and settings.
+- Expandable row for record detail.
+- Expandable card/summary for dashboard or event/job context.
+- Sticky summary for quotes and other workflows where a consequential total should remain visible.
+
+Basic/Intermediate/Advanced remains a presentation/guidance preference, not a literal per-page mode switch and never a permission boundary.
+
+### Context rule
+Where possible, users should work from the business object they understand — especially the event/job — rather than navigating through implementation-shaped domain boundaries.
+
+## 27. Director landing-page visual direction
+
+The landing page is a brand/identity surface and may be visually expressive during product development. Custom artwork, photography, mascot concepts, illustration, texture and visual experimentation are legitimate design inputs.
+
+Release preparation must separately verify ownership, licensing, trademark/brand permissions and replacement requirements for every externally sourced asset. Development visuals must not be removed merely because release clearance has not yet occurred.
+
+## 28. Local-first capability integration
+
+Zazu may use open-source libraries and external APIs to enhance the product, including OCR, document viewing, scanning, signatures, search, charts, mapping and voice input. These are not automatically V1 core requirements.
+
+Integration rule: **core business operations first; optional intelligence/enrichment second.**
+
+An external service must not become a hidden dependency for essential offline-capable workflows. Each dependency is governed through docs/ZAZU_EXTERNAL_CAPABILITY_REGISTER.md.
