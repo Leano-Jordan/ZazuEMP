@@ -86,16 +86,20 @@ class CustomerImportServiceTest extends TestCase
             'name' => 'Ambiguous Customer',
         ]);
 
-        $this->expectException(RuntimeException::class);
+        try {
+            app(CustomerImportService::class)->import(
+                $business,
+                [
+                    ['Customer Name' => 'Safe New Customer', 'Contact' => 'John Smith'],
+                    ['Customer Name' => 'Ambiguous Customer', 'Contact' => 'Jane Smith'],
+                ],
+                [2 => 'create'],
+            );
 
-        app(CustomerImportService::class)->import(
-            $business,
-            [
-                ['Customer Name' => 'Safe New Customer', 'Contact' => 'John Smith'],
-                ['Customer Name' => 'Ambiguous Customer', 'Contact' => 'Jane Smith'],
-            ],
-            [2 => 'create'],
-        );
+            $this->fail('Expected the ambiguous row to block the import.');
+        } catch (RuntimeException $e) {
+            $this->assertStringContainsString('requires resolution', $e->getMessage());
+        }
 
         $this->assertDatabaseMissing('customers', [
             'business_id' => $business->id,
@@ -103,7 +107,7 @@ class CustomerImportServiceTest extends TestCase
         ]);
     }
 
-    public function test_stale_preview_cannot_create_a_customer_that_becomes_existing(): void
+    public function test_existing_match_cannot_be_created_even_when_create_is_requested(): void
     {
         $business = $this->business('Race Business');
 
