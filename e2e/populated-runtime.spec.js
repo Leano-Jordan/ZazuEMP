@@ -117,6 +117,67 @@ test.describe('Zazu populated runtime challenge', () => {
         await expectNoServerFailures(page, responses, errors);
     });
 
+    test('owner financial reconciliation rejects invalid replay and overpayment states', async ({ page }) => {
+        test.setTimeout(60_000);
+
+        const responses = [];
+        const errors = [];
+        page.on('response', response => {
+            if (response.status() >= 500) {
+                responses.push({ status: response.status(), url: response.url() });
+            }
+        });
+        page.on('pageerror', error => errors.push(error.message));
+
+        await login(page, DEMO_EMAIL, DEMO_PASSWORD);
+
+        const finance = await page.goto('/finance', { waitUntil: 'domcontentloaded' });
+        expect(finance?.status()).toBe(200);
+
+        const invoiceLink = page.getByRole('link', { name: /INV-ZAZU-DEMO-001/ }).first();
+        await expect(invoiceLink).toBeVisible();
+        const invoiceHref = await invoiceLink.getAttribute('href');
+        expect(invoiceHref).toMatch(/\/finance\/invoices\/\d+$/);
+        const invoiceId = invoiceHref.match(/\/(\d+)$/)?.[1];
+        expect(invoiceId).toBeTruthy();
+
+        await page.goto('/finance/payments/create', { waitUntil: 'domcontentloaded' });
+        const csrf = await page.locator('input[name="_token"]').first().inputValue();
+
+        const replay = await page.request.post('/finance/payments', {
+            form: {
+                _token: csrf,
+                idempotency_key: 'demo-payment-balance-001',
+                type: 'payment',
+                invoice_id: invoiceId,
+                amount: '8050.00',
+                method: 'bank_transfer',
+                paid_at: new Date().toISOString().slice(0, 10),
+                reference: 'DIRECTOR-REPLAY-001',
+            },
+            maxRedirects: 0,
+        });
+        expect(replay.status(), 'same payment idempotency key must replay safely').toBe(302);
+        expect(replay.headers()['location']).toMatch(/\/finance$/);
+
+        const overpayment = await page.request.post('/finance/payments', {
+            form: {
+                _token: csrf,
+                idempotency_key: '00000000-0000-4000-8000-000000000001',
+                type: 'payment',
+                invoice_id: invoiceId,
+                amount: '0.01',
+                method: 'bank_transfer',
+                paid_at: new Date().toISOString().slice(0, 10),
+                reference: 'DIRECTOR-OVERPAYMENT-001',
+            },
+            maxRedirects: 0,
+        });
+        expect(overpayment.status(), 'paid invoice must reject a new payment').toBe(422);
+
+        await expectNoServerFailures(page, responses, errors);
+    });
+
     test('manager has operational access but cannot enter owner-only finance mutation or settings', async ({ page }) => {
         test.setTimeout(60_000);
 
