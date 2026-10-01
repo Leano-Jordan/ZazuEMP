@@ -74,80 +74,139 @@ class SpreadsheetReader
         }
 
         try {
-            $workbookXml = $zip->getFromName('xl/workbook.xml');
-            $relationshipsXml = $zip->getFromName('xl/_rels/workbook.xml.rels');
-
-            if ($workbookXml === false || $relationshipsXml === false) {
-                throw new RuntimeException('The XLSX workbook structure is invalid.');
-            }
-
-            $workbook = $this->xml($workbookXml);
-            $relationships = $this->xml($relationshipsXml);
-            $sharedStrings = $this->readSharedStrings($zip);
-
-            $relationshipMap = [];
-            foreach ($relationships->Relationship as $relationship) {
-                $relationshipMap[(string) $relationship['Id']] = (string) $relationship['Target'];
-            }
-
-            $sheets = [];
-
-            foreach ($workbook->sheets->sheet as $sheet) {
-                $name = trim((string) $sheet['name']) ?: 'Sheet ' . (count($sheets) + 1);
-                $relationshipId = (string) $sheet->attributes('http://schemas.openxmlformats.org/officeDocument/2006/relationships')->id;
-                $target = $relationshipMap[$relationshipId] ?? null;
-
-                if (!$target) {
-                    continue;
-                }
-
-                $target = ltrim(str_replace('\\', '/', $target), '/');
-                $sheetPath = Str::startsWith($target, 'xl/') ? $target : 'xl/' . $target;
-                $sheetXml = $zip->getFromName($sheetPath);
-
-                if ($sheetXml === false) {
-                    continue;
-                }
-
-                $sheetData = $this->xml($sheetXml);
-                $rawRows = [];
-
-                foreach ($sheetData->sheetData->row as $row) {
-                    $values = [];
-
-                    foreach ($row->c as $cell) {
-                        $reference = (string) $cell['r'];
-                        $column = $this->columnIndex($reference);
-                        $type = (string) $cell['t'];
-                        $value = (string) ($cell->v ?? '');
-
-                        if ($type === 's') {
-                            $value = $sharedStrings[(int) $value] ?? '';
-                        } elseif ($type === 'inlineStr') {
-                            $value = $this->inlineString($cell);
-                        } elseif ($type === 'b') {
-                            $value = $value === '1' ? 'TRUE' : 'FALSE';
-                        }
-
-                        $values[$column] = trim($value);
-                    }
-
-                    if ($values !== []) {
-                        $rawRows[] = $values;
-                    }
-                }
-
-                $sheets[$name] = $this->normaliseRows($rawRows);
-            }
-
-            if ($sheets === []) {
-                throw new RuntimeException('The XLSX workbook contains no readable sheets.');
-            }
-
-            return $sheets;
+            return $this->readXlsxWorkbook($zip);
         } finally {
             $zip->close();
         }
+    }
+
+    /**
+     * @return array<string, array{headers: array<int, string>, rows: array<int, array<string, string>>}>
+     */
+    private function readXlsxWorkbook(ZipArchive $zip): array
+    {
+        $workbookXml = $zip->getFromName('xl/workbook.xml');
+        $relationshipsXml = $zip->getFromName('xl/_rels/workbook.xml.rels');
+
+        if ($workbookXml === false || $relationshipsXml === false) {
+            throw new RuntimeException('The XLSX workbook structure is invalid.');
+        }
+
+        $workbook = $this->xml($workbookXml);
+        $relationships = $this->xml($relationshipsXml);
+        $sharedStrings = $this->readSharedStrings($zip);
+        $relationshipMap = $this->relationshipMap($relationships);
+        $sheets = [];
+
+        foreach ($workbook->sheets->sheet as $sheet) {
+            $result = $this->readXlsxSheet($zip, $sheet, $relationshipMap, $sharedStrings, count($sheets) + 1);
+
+            if ($result !== null) {
+                $sheets[$result['name']] = $result['data'];
+            }
+        }
+
+        if ($sheets === []) {
+            throw new RuntimeException('The XLSX workbook contains no readable sheets.');
+        }
+
+        return $sheets;
+    }
+
+    /**
+     * @return array<string, string>
+     */
+    private function relationshipMap(SimpleXMLElement $relationships): array
+    {
+        $map = [];
+
+        foreach ($relationships->Relationship as $relationship) {
+            $map[(string) $relationship['Id']] = (string) $relationship['Target'];
+        }
+
+        return $map;
+    }
+
+    /**
+     * @param array<string, string> $relationshipMap
+     * @param array<int, string> $sharedStrings
+     * @return array{name: string, data: array{headers: array<int, string>, rows: array<int, array<string, string>>}}|null
+     */
+    private function readXlsxSheet(
+        ZipArchive $zip,
+        SimpleXMLElement $sheet,
+        array $relationshipMap,
+        array $sharedStrings,
+        int $sheetNumber,
+    ): ?array {
+        $name = trim((string) $sheet['name']) ?: 'Sheet ' . $sheetNumber;
+        $relationshipId = (string) $sheet
+            ->attributes('http://schemas.openxmlformats.org/officeDocument/2006/relationships')
+            ->id;
+        $target = $relationshipMap[$relationshipId] ?? null;
+
+        if (!$target) {
+            return null;
+        }
+
+        $target = ltrim(str_replace('\\', '/', $target), '/');
+        $sheetPath = Str::startsWith($target, 'xl/') ? $target : 'xl/' . $target;
+        $sheetXml = $zip->getFromName($sheetPath);
+
+        if ($sheetXml === false) {
+            return null;
+        }
+
+        $sheetData = $this->xml($sheetXml);
+        $rawRows = [];
+
+        foreach ($sheetData->sheetData->row as $row) {
+            $values = $this->readXlsxRow($row, $sharedStrings);
+
+            if ($values !== []) {
+                $rawRows[] = $values;
+            }
+        }
+
+        return ['name' => $name, 'data' => $this->normaliseRows($rawRows)];
+    }
+
+    /**
+     * @param array<int, string> $sharedStrings
+     * @return array<int, string>
+     */
+    private function readXlsxRow(SimpleXMLElement $row, array $sharedStrings): array
+    {
+        $values = [];
+
+        foreach ($row->c as $cell) {
+            $values[$this->columnIndex((string) $cell['r'])] = $this->readXlsxCell($cell, $sharedStrings);
+        }
+
+        return $values;
+    }
+
+    /**
+     * @param array<int, string> $sharedStrings
+     */
+    private function readXlsxCell(SimpleXMLElement $cell, array $sharedStrings): string
+    {
+        $type = (string) $cell['t'];
+        $value = (string) ($cell->v ?? '');
+
+        if ($type === 's') {
+            return trim($sharedStrings[(int) $value] ?? '');
+        }
+
+        if ($type === 'inlineStr') {
+            return $this->inlineString($cell);
+        }
+
+        if ($type === 'b') {
+            return $value === '1' ? 'TRUE' : 'FALSE';
+        }
+
+        return trim($value);
     }
 
     /**
@@ -227,25 +286,30 @@ class SpreadsheetReader
         }
 
         $headerRow = array_shift($rows);
-        $maxColumns = 0;
+        $headers = $this->normaliseHeaders($headerRow, $rows);
 
-        foreach ($rows as $row) {
-            $maxColumns = max($maxColumns, count($row));
-            if ($row !== []) {
-                $maxColumns = max($maxColumns, max(array_keys($row)) + 1);
-            }
-        }
+        return [
+            'headers' => array_values($headers),
+            'rows' => $this->normaliseDataRows($rows, $headers),
+        ];
+    }
 
-        $maxColumns = max($maxColumns, count($headerRow));
+    /**
+     * @param array<int|string, string> $headerRow
+     * @param array<int, array<int|string, string>> $rows
+     * @return array<int, string>
+     */
+    private function normaliseHeaders(array $headerRow, array $rows): array
+    {
+        $maxColumns = max(count($headerRow), $this->maxRowColumnCount($rows));
         $headers = [];
         $seen = [];
 
         for ($index = 0; $index < $maxColumns; $index++) {
-            $header = trim((string) ($headerRow[$index] ?? ''));
-            $header = $header !== '' ? $header : 'Column ' . ($index + 1);
-
-            $base = $header;
+            $base = trim((string) ($headerRow[$index] ?? '')) ?: 'Column ' . ($index + 1);
+            $header = $base;
             $suffix = 2;
+
             while (isset($seen[strtolower($header)])) {
                 $header = $base . ' ' . $suffix++;
             }
@@ -254,6 +318,34 @@ class SpreadsheetReader
             $headers[$index] = $header;
         }
 
+        return $headers;
+    }
+
+    /**
+     * @param array<int, array<int|string, string>> $rows
+     */
+    private function maxRowColumnCount(array $rows): int
+    {
+        $maxColumns = 0;
+
+        foreach ($rows as $row) {
+            $maxColumns = max($maxColumns, count($row));
+
+            if ($row !== []) {
+                $maxColumns = max($maxColumns, max(array_keys($row)) + 1);
+            }
+        }
+
+        return $maxColumns;
+    }
+
+    /**
+     * @param array<int, array<int|string, string>> $rows
+     * @param array<int, string> $headers
+     * @return array<int, array<string, string>>
+     */
+    private function normaliseDataRows(array $rows, array $headers): array
+    {
         $normalisedRows = [];
 
         foreach ($rows as $row) {
@@ -271,7 +363,7 @@ class SpreadsheetReader
             }
         }
 
-        return ['headers' => array_values($headers), 'rows' => $normalisedRows];
+        return $normalisedRows;
     }
 
     private function isCsvMime(?string $mimeType): bool
