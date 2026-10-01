@@ -1,12 +1,18 @@
 <?php
 
-namespace AppServices;
+namespace App\Services;
 
-use IlluminateSupportStr;
+use Illuminate\Support\Str;
 use RuntimeException;
 use SimpleXMLElement;
 use ZipArchive;
 
+/**
+ * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
+ *
+ * This class deliberately keeps CSV/XLSX format dispatch and ZIP/XML
+ * coordination together as the bounded spreadsheet-reader boundary.
+ */
 class SpreadsheetReader
 {
     /**
