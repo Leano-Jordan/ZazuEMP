@@ -3,6 +3,8 @@
 namespace Tests\Feature;
 
 use App\Models\Invoice;
+use App\Models\PurchaseOrder;
+use App\Models\User;
 use Database\Seeders\DemoScenarioSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
@@ -39,6 +41,7 @@ class DemoScenarioSeederTest extends TestCase
         $this->assertDatabaseHas('purchase_orders', [
             'reference' => 'PO-ZAZU-DEMO-002',
             'status' => 'ordered',
+            'event_id' => null,
         ]);
         $this->assertDatabaseHas('inventory_items', ['sku' => 'INV-CHAFER-001']);
         $this->assertDatabaseHas('assets', ['asset_tag' => 'AST-TENT-001']);
@@ -47,6 +50,46 @@ class DemoScenarioSeederTest extends TestCase
             now()->subDay()->toDateString(),
             $invoice->event->event_date->toDateString()
         );
+    }
+
+    public function test_populated_demo_surfaces_are_operator_readable(): void
+    {
+        $this->seed(DemoScenarioSeeder::class);
+
+        $owner = User::query()->where('email', env('ZAZU_DEMO_EMAIL', 'demo@zazu.local'))->firstOrFail();
+        $this->actingAs($owner);
+
+        $this->get(route('dashboard'))
+            ->assertOk()
+            ->assertSee('Open purchase orders')
+            ->assertSee('Unpaid invoices');
+
+        $this->get(route('work.index'))
+            ->assertOk()
+            ->assertSee('Buffet catering')
+            ->assertSee('Services &amp; preparation', false)
+            ->assertSee('11,500.00');
+
+        $po = PurchaseOrder::query()->where('reference', 'PO-ZAZU-DEMO-001')->firstOrFail();
+        $this->get(route('purchasing.show', $po))
+            ->assertOk()
+            ->assertSee('Job workspace')
+            ->assertDontSee('Receive goods');
+
+        $this->get(route('finance.invoices.show', Invoice::query()->where('number', 'INV-ZAZU-DEMO-001')->firstOrFail()))
+            ->assertOk()
+            ->assertSee('Payment history')
+            ->assertSee('DEP-ZAZU-DEMO-001')
+            ->assertSee('BAL-ZAZU-DEMO-001');
+
+        $this->get(route('reports.index'))
+            ->assertOk()
+            ->assertSee('Financial snapshot')
+            ->assertSee('Invoiced')
+            ->assertSee('Outstanding')
+            ->assertSee('ZAR');
+
+        $this->assertStringNotContainsString('</section>\n\n    </section>', $this->get(route('work.show', $po->event))->getContent());
     }
 
     public function test_demo_scenario_is_idempotent_when_seeded_again(): void
