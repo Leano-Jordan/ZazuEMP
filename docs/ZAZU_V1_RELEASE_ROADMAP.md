@@ -4,7 +4,8 @@
 **Last Director cycle:** 2026-10-01  
 **Repository:** `Leano-Jordan/ZazuEMP`  
 **Branch:** `main`  
-**HEAD:** 0c7adefcf08bdb955b83ff5f31f3612c30fc2ce5 (documentation-only release-control update)  
+**Application HEAD assessed:** `c83474e1e32ca8c29950eac3723b854c163e5786`  
+**Release-control docs commits:** documentation-only commits may follow and do not change the application assessment baseline.  
 **Evidence rule:** Implemented ≠ Verified ≠ Proven.
 
 ## Director operating rule
