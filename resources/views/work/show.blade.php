@@ -99,7 +99,7 @@
             <a href="{{ route('work.preparation.index', $event) }}" class="zazu-quick-link">
                 <span><strong>Preparation</strong><small class="block opacity-70">{{ $event->preparationItems->whereIn('status', ['open', 'blocked'])->count() }} outstanding</small></span><span>→</span>
             </a>
-            <a href="{{ route('purchasing.index') }}" class="zazu-quick-link">
+            <a href="{{ route('purchasing.index', ['event_id' => $event->id]) }}" class="zazu-quick-link">
                 <span><strong>Purchasing</strong><small class="block opacity-70">{{ $event->purchaseOrders->count() }} linked</small></span><span>→</span>
             </a>
             <a href="{{ route('work.costs.index', $event) }}" class="zazu-quick-link">
