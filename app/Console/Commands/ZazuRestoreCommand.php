@@ -267,6 +267,11 @@ class ZazuRestoreCommand extends Command
                 // database can be safely replaced on Windows.
                 if ($target !== ':memory:' && is_file($target)) {
                     try {
+                        // Never let a restore sit on SQLite's default busy timeout.
+                        // A restore must fail fast if another connection still owns the
+                        // database; silently waiting here is what turns a test failure
+                        // into a 60-second suite hang on Windows.
+                        DB::connection('sqlite')->statement('PRAGMA busy_timeout=0');
                         $checkpoint = DB::connection('sqlite')->selectOne('PRAGMA wal_checkpoint(TRUNCATE)');
                         if ((int) ($checkpoint->busy ?? $checkpoint['busy'] ?? 0) !== 0) {
                             throw new \RuntimeException('The SQLite database is still busy and cannot be safely restored.');
