@@ -262,7 +262,9 @@ class ZazuRestoreCommand extends Command
                 $source = $work.'/database.sqlite';
                 $target = config('database.connections.sqlite.database');
 
-                DB::disconnect();
+                // Purge the resolved SQLite connection before replacing the database file.
+                // On Windows, disconnect alone can leave the PDO object holding a file handle.
+                DB::purge('sqlite');
 
                 $databaseStage = storage_path('app/.zazu-database-restore-'.Str::ulid().'.sqlite');
                 if (!copy($source, $databaseStage)) {
@@ -319,7 +321,7 @@ class ZazuRestoreCommand extends Command
         } catch (\Throwable $exception) {
             if ($databaseRollback !== null && is_file($databaseRollback)) {
                 $target = config('database.connections.sqlite.database');
-                DB::disconnect();
+                DB::purge('sqlite');
                 File::delete($target);
                 rename($databaseRollback, $target);
             }
