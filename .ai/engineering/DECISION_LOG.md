@@ -106,3 +106,21 @@ Durable decisions governing the Zazu engineering system.
 **Authority:** Director/Morpheus remains the single entry point. The detailed contract is docs/ZAZU_SAAS_READINESS_ARCHITECTURE.md.
 
 **Status:** ACTIVE
+
+
+## DEC-016 — One product, tiered operational sophistication
+**Date:** 2026-10-02
+
+**Decision:** Zazu commercial packaging will use one product with increasing operational sophistication rather than four separate products or arbitrary record-count restrictions.
+
+Working commercial hypotheses:
+- R299 Basic — keep the business organised;
+- R499 Professional — run jobs and money;
+- R799 Business — run people and operations;
+- R1,299 Business Plus — control larger/more complex operations.
+
+**Reason:** Give each higher tier a meaningful business outcome while protecting V1 from feature sprawl. The immediate commercial bridge is Event → Quote → Deposit → Invoice → Payment → Purchasing → Receiving → Costs → Profit → Export.
+
+**Authority:** Detailed requirements live in docs/ZAZU_COMMERCIAL_REQUIREMENTS.md and the Product Specification.
+
+**Status:** ACTIVE
