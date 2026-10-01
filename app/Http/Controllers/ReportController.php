@@ -5,6 +5,8 @@ namespace App\Http\Controllers;
 use App\Models\Event;
 use App\Models\EventCost;
 use App\Models\EventPreparationItem;
+use App\Models\FinanceExpense;
+use App\Models\Invoice;
 use App\Models\Quote;
 use App\Support\CurrentBusiness;
 use App\Support\Money;
@@ -70,11 +72,41 @@ class ReportController extends Controller
                 ),
             ]);
 
+        $invoices = Invoice::query()
+            ->where('business_id', $businessId)
+            ->with('payments')
+            ->get();
+
+        $financeTotalsByCurrency = $invoices
+            ->groupBy('currency')
+            ->map(fn ($currencyInvoices) => [
+                'invoiced_cents' => $currencyInvoices->sum(
+                    fn (Invoice $invoice) => Money::toCents((string) $invoice->total)
+                ),
+                'paid_cents' => $currencyInvoices->sum(
+                    fn (Invoice $invoice) => Money::toCents((string) $invoice->paid_amount)
+                ),
+                'outstanding_cents' => $currencyInvoices->sum(
+                    fn (Invoice $invoice) => Money::toCents((string) $invoice->balance)
+                ),
+            ]);
+
+        $expenseTotalsByCurrency = FinanceExpense::query()
+            ->where('business_id', $businessId)
+            ->whereNotIn('status', ['cancelled'])
+            ->get()
+            ->groupBy('currency')
+            ->map(fn ($expenses) => $expenses->sum(
+                fn (FinanceExpense $expense) => Money::toCents((string) $expense->amount)
+            ));
+
         return view('reports.index', compact(
             'metrics',
             'jobsByStatus',
             'quoteTotalsByCurrency',
-            'costTotalsByCurrency'
+            'costTotalsByCurrency',
+            'financeTotalsByCurrency',
+            'expenseTotalsByCurrency'
         ));
     }
 }
