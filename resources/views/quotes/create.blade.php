@@ -49,7 +49,7 @@
                             <select name="tax_rate_id" class="zazu-select">
                                 <option value="">No tax / 0%</option>
                                 @foreach ($taxRates as $taxRate)
-                                    <option value="{{ $taxRate->id }}" @selected((string) old('tax_rate_id', $defaultTaxRateId) === (string) $taxRate->id)>
+                                    <option value="{{ $taxRate->id }}" data-tax-rate="{{ $taxRate->rate }}" @selected((string) old('tax_rate_id', $defaultTaxRateId) === (string) $taxRate->id)>
                                         {{ $taxRate->name }} · {{ $taxRate->rate }}%
                                     </option>
                                 @endforeach
@@ -140,6 +140,34 @@
 
     <script>
         const currencySelect = document.getElementById('quote-currency');
+        const depositInput = document.querySelector('input[name="deposit_percent"]');
+        const taxSelect = document.querySelector('select[name="tax_rate_id"]');
+        const summary = document.querySelector('[data-quote-summary]');
+        const money = new Intl.NumberFormat(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+
+        function refreshQuoteSummary() {
+            if (!summary) return;
+
+            let subtotal = 0;
+            priceInputs.forEach((input) => {
+                const quantity = Number.parseFloat(input.dataset.quoteQuantity || '1');
+                const price = Number.parseFloat(input.value || '');
+                if (Number.isFinite(quantity) && Number.isFinite(price)) subtotal += quantity * price;
+            });
+
+            const selectedTax = taxSelect?.selectedOptions[0];
+            const taxRate = Number.parseFloat(selectedTax?.dataset.taxRate || '0');
+            const tax = subtotal * (Number.isFinite(taxRate) ? taxRate : 0) / 100;
+            const total = subtotal + tax;
+            const depositPercent = Number.parseFloat(depositInput?.value || '0');
+            const deposit = total * (Number.isFinite(depositPercent) ? depositPercent : 0) / 100;
+            const format = (value) => currencySelect?.value + ' ' + money.format(value);
+
+            summary.querySelector('[data-quote-subtotal]').textContent = format(subtotal);
+            summary.querySelector('[data-quote-tax]').textContent = format(tax);
+            summary.querySelector('[data-quote-total]').textContent = format(total);
+            summary.querySelector('[data-quote-deposit]').textContent = format(deposit);
+        }
         const priceInputs = [...document.querySelectorAll('[data-quote-price]')];
 
         const priceId = (input) => input.name.replace('unit_price[', '').replace(']', '');
@@ -168,6 +196,14 @@
             if (help) help.textContent = 'Price entered manually.';
         }));
 
-        currencySelect?.addEventListener('change', () => priceInputs.forEach(refreshQuotePriceInput));
+        depositInput?.addEventListener('input', refreshQuoteSummary);
+        taxSelect?.addEventListener('change', refreshQuoteSummary);
+        currencySelect?.addEventListener('change', () => {
+            priceInputs.forEach(refreshQuotePriceInput);
+            refreshQuoteSummary();
+        });
+
+        priceInputs.forEach((input) => input.addEventListener('input', refreshQuoteSummary));
+        refreshQuoteSummary();
     </script>
 </x-app-layout>
