@@ -4,7 +4,7 @@
 **Last Director cycle:** 2026-10-01  
 **Repository:** `Leano-Jordan/ZazuEMP`  
 **Branch:** `main`  
-**Application HEAD assessed:** `c83474e1e32ca8c29950eac3723b854c163e5786`  
+**Application HEAD assessed:** `52d9b26bc17ddee8d1427032ecaf2fb8fc0b6350`  
 **Release-control docs commits:** documentation-only commits may follow and do not change the application assessment baseline.  
 **Evidence rule:** Implemented ≠ Verified ≠ Proven.
 
@@ -35,15 +35,15 @@ A requirement is **🟢 VERIFIED COMPLETE** only when it is implemented, verifie
 | CTRL-02 | Repository truth | Inspect branch and HEAD before every execution | 🟢 VERIFIED COMPLETE | Current branch main; current HEAD recorded in both roadmap and canonical checklist | Low | Repeat each cycle |
 | CTRL-03 | Evidence discipline | Separate implemented/tested/verified/proven claims | 🟢 VERIFIED COMPLETE | Existing readiness register + release documentation | Low | Preserve distinction |
 | CTRL-04 | Regression control | Stop improvement work when a regression is found | 🟢 VERIFIED COMPLETE | Director operating rule | Medium | Apply every batch |
-| CTRL-05 | Release evidence | Current-head CI/browser/runtime evidence | 🟡 IN PROGRESS | Existing register rates Release Evidence 1/5; current audit records source inspection but not current runtime/browser execution | High | Execute runtime/browser verification on current HEAD |
+| CTRL-05 | Release evidence | Current-head CI/browser/runtime evidence | 🟢 VERIFIED COMPLETE | Laravel 202/1,174; browser 7 passed/8 skipped; Quality passed; PHPMD passed; Psalm passed with documented Laravel compatibility shim | High | Move to populated workflow, recovery and upgrade proof |
 
 # Phase 1 — Core operational workflow
 
 | ID | Area | Requirement | Status | Evidence | Risk | Next Action |
 |---|---|---|---|---|---|---|
 | CORE-01 | Core workflow | Registration → Onboarding → Client → Event → Work → Resources → Purchasing → Costs → Finance → Completion is connected | 🟡 IN PROGRESS | Product spec/capability map and deep-dive show major domains implemented; populated end-to-end walkthrough remains outstanding | High | Run populated-data end-to-end traversal |
-| CORE-02 | Authentication | Registration and authentication foundation | 🟡 IN PROGRESS | Existing implementation documented as present; fresh desktop/mobile runtime walkthrough outstanding | High | Runtime verify fresh account |
-| CORE-03 | Onboarding | Registration enters services/catalogue setup, experience selection, business setup and dashboard | 🟡 IN PROGRESS | Deep-dive documents implemented sequence; fresh-account traversal unverified | Medium | Browser verify desktop/mobile |
+| CORE-02 | Authentication | Registration and authentication foundation | 🟢 VERIFIED COMPLETE | Current-head Laravel + browser registration/login/dashboard evidence | High | Include in broader populated journey |
+| CORE-03 | Onboarding | Registration enters services/catalogue setup, experience selection, business setup and dashboard | 🟢 VERIFIED COMPLETE | Current-head browser completes registration → catalogue → experience → business → dashboard; responsive entry smoke also passes | Medium | Verify broader mobile journey later in release sweep |
 | CORE-04 | Clients | Customer records and event relationship | 🟡 IN PROGRESS | Existing domain present; runtime chain proof outstanding | Medium | Include in end-to-end traversal |
 | CORE-05 | Event lifecycle | Valid lifecycle transitions and completion/cancellation guards | 🟡 IN PROGRESS | Centralized transition service documented; Planned remains intentionally unresolved product decision | High | Verify transitions and dependent-state guards |
 | CORE-06 | Work/process | Work, preparation, requirements and event linkage remain coherent | 🟡 IN PROGRESS | Operational chain implemented and visible; populated-data proof outstanding | High | Verify work → preparation → completion |
@@ -140,9 +140,9 @@ A requirement is **🟢 VERIFIED COMPLETE** only when it is implemented, verifie
 
 | ID | Area | Requirement | Status | Evidence | Risk | Next Action |
 |---|---|---|---|---|---|---|
-| RC-01 | Runtime | Current HEAD Laravel test/runtime suite executed | ⬜ NOT STARTED | No current execution evidence available in this Director inspection | Critical | Execute locally/CI |
-| RC-02 | Browser | Critical desktop workflows traversed | ⬜ NOT STARTED | Existing audit says browser proof remains required | Critical | Execute browser traversal |
-| RC-03 | Browser | Critical mobile workflows traversed | ⬜ NOT STARTED | Existing audit says mobile proof remains required | Critical | Execute browser traversal |
+| RC-01 | Runtime | Current HEAD Laravel test/runtime suite executed | 🟢 VERIFIED COMPLETE | Run 36873263833: 202 passed / 1,174 assertions | Critical | Proceed to populated-data proof |
+| RC-02 | Browser | Critical desktop workflows traversed | 🟢 VERIFIED COMPLETE | Run 36873263870: desktop registration/onboarding/login path passed | Critical | Continue populated critical workflows |
+| RC-03 | Browser | Critical mobile workflows traversed | 🟡 IN PROGRESS | Current browser suite passes responsive/mobile entry coverage; complete mobile critical workflow traversal remains | Critical | Expand mobile critical-path evidence without shared-IP throttling |
 | RC-04 | Accessibility | Critical accessibility smoke passes | ⬜ NOT STARTED | Static work exists; runtime evidence absent | High | Execute accessibility smoke |
 | RC-05 | Security | Final authorization/security challenge passes | ⬜ NOT STARTED | Security foundation strong but final review open | Critical | Execute adversarial review |
 | RC-06 | Data | Populated-data workflow/reconciliation proof passes | ⬜ NOT STARTED | Explicit release gap | Critical | Execute representative scenario |
