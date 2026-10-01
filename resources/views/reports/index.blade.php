@@ -110,8 +110,8 @@
             @forelse($financeTotalsByCurrency as $currency => $totals)
                 <div class="zazu-context-card">
                     <div class="zazu-detail-label">{{ $currency }} receivables</div>
-                    <div class="zazu-command-meta-value mt-1">Invoiced {{ $currency }} {{ \\App\\Support\\Money::formatCents($totals['invoiced_cents']) }}</div>
-                    <div class="zazu-field-help">Paid {{ $currency }} {{ \\App\\Support\\Money::formatCents($totals['paid_cents']) }} · Outstanding {{ $currency }} {{ \\App\\Support\\Money::formatCents($totals['outstanding_cents']) }}</div>
+                    <div class="zazu-command-meta-value mt-1">Invoiced {{ $currency }} {{ \App\Support\Money::formatCents($totals['invoiced_cents']) }}</div>
+                    <div class="zazu-field-help">Paid {{ $currency }} {{ \App\Support\Money::formatCents($totals['paid_cents']) }} · Outstanding {{ $currency }} {{ \App\Support\Money::formatCents($totals['outstanding_cents']) }}</div>
                 </div>
             @empty
                 <div class="zazu-placeholder"><div class="zazu-placeholder-title">No invoices yet</div><div class="zazu-placeholder-copy">Finance reporting will appear here once an invoice exists.</div></div>
@@ -120,7 +120,7 @@
         <div class="mt-3 grid gap-3 sm:grid-cols-2">
             @forelse($expenseTotalsByCurrency as $currency => $totalCents)
                 <div class="zazu-route-card">
-                    <div><div class="zazu-route-card-title">{{ $currency }} expenses</div><div class="zazu-route-card-copy">{{ $currency }} {{ \\App\\Support\\Money::formatCents($totalCents) }} recorded excluding cancelled expenses.</div></div>
+                    <div><div class="zazu-route-card-title">{{ $currency }} expenses</div><div class="zazu-route-card-copy">{{ $currency }} {{ \App\Support\Money::formatCents($totalCents) }} recorded excluding cancelled expenses.</div></div>
                 </div>
             @empty
                 <div class="zazu-placeholder"><div class="zazu-placeholder-title">No finance expenses yet</div></div>
