@@ -541,3 +541,22 @@ Current execution commits:
 
 Next Director target:
 **CONSUME POPULATED BROWSER EXECUTION → classify failures → correct verified defects only → rerun → then repeat responsive runtime and recovery/upgrade evidence.**
+
+
+## Director V2 loop-breaking control — 2026-10-01
+
+Implemented repository-side failure-loop controls:
+
+- .ai/engineering/07_FAILURE_CASE_ENGINE.md — persistent failure-case operating contract;
+- .ai/engineering/FAILURE_CASES.md — active/history registry and case template;
+- Director and router now require failure identity, fingerprint review, hypothesis history and escalation before repeated correction;
+- Verification engine now enforces the failure-case attempt budget;
+- AGENTS.md and TASK_PACKET.md carry the V2 rules into future sessions;
+- DEC-014 and REG-011 record the durable decision/control.
+
+Hard limits:
+- 2 correction attempts per hypothesis;
+- 3 no-progress cycles per failure case;
+- then STOP PATCHING → FORENSICS / ESCALATION.
+
+This control-plane implementation is DOCUMENTATION/PROCESS infrastructure. It does not claim that application tests or runtime workflows are now passing.
