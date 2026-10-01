@@ -169,11 +169,15 @@ class UiAccessibilityTest extends TestCase
     public function test_shared_ui_hardens_browser_storage_and_duplicate_submissions(): void
     {
         $script = file_get_contents(resource_path('js/app.js'));
+        $layout = file_get_contents(resource_path('views/components/app-layout.blade.php'));
 
         $this->assertStringContainsString('function safeStorageGet', $script);
         $this->assertStringContainsString('function safeStorageSet', $script);
         $this->assertStringContainsString('function setupZazuFormSubmissionGuards', $script);
         $this->assertStringContainsString('event.defaultPrevented', $script);
+        $this->assertStringContainsString('window.localStorage.getItem', $layout);
+        $this->assertStringContainsString('try {', $layout);
+        $this->assertStringContainsString('Browser privacy/storage restrictions must not prevent the page from rendering.', $layout);
     }
 
 }
