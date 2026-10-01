@@ -35,5 +35,26 @@ class DemoScenarioSeederTest extends TestCase
             'reference' => 'PO-ZAZU-DEMO-001',
             'status' => 'received',
         ]);
+        $this->assertDatabaseHas('events', [
+            'reference' => 'ZAZU-DEMO-001',
+            'event_date' => now()->subDay()->toDateString(),
+        ]);
+    }
+
+    public function test_demo_scenario_is_idempotent_when_seeded_again(): void
+    {
+        $this->seed(DemoScenarioSeeder::class);
+        $this->seed(DemoScenarioSeeder::class);
+
+        $this->assertDatabaseCount('businesses', 1);
+        $this->assertDatabaseCount('users', 1);
+        $this->assertDatabaseCount('events', 1);
+        $this->assertDatabaseCount('quotes', 1);
+        $this->assertDatabaseCount('quote_versions', 1);
+        $this->assertDatabaseCount('invoices', 1);
+        $this->assertDatabaseCount('payments', 2);
+        $this->assertDatabaseCount('purchase_orders', 1);
+        $this->assertDatabaseCount('event_costs', 3);
+        $this->assertDatabaseCount('event_preparation_items', 3);
     }
 }
