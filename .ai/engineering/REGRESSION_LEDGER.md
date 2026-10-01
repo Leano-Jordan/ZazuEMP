@@ -45,3 +45,25 @@ Shared tokens/layout/components can affect many screens at once.
 **Control:** shared UI changes require blast-radius review, theme/responsive review and Guardian regression checks.
 
 **Status:** CONTROL ACTIVE
+
+
+## REG-007 — Verification-layer conflation
+A failing test, static scanner, CI workflow, fixture, environment or application defect can present as the same red execution result.
+
+**Control:** classify every failure F1–F8 before changing application code using 06_VERIFICATION_AND_QUALITY_ENGINE.md.
+
+**Status:** CONTROL ACTIVE
+
+## REG-008 — Append-only visual token drift
+Zazu accumulated repeated visual sweep/root-token layers. Later declarations silently overrode earlier visual decisions, producing inconsistent colour relationships and theme behaviour.
+
+**Control:** one shared light root + one shared dark root for design tokens; visual changes modify the shared authority rather than appending another sweep. Rendered desktop/mobile theme verification remains required.
+
+**Status:** CONTROL ACTIVE
+
+## REG-009 — Temporary branch residue
+Ordinary Director execution created multiple non-main branches around isolated work, increasing repository/sync clutter and fragmenting the working state.
+
+**Control:** main-only Director execution unless the owner explicitly authorizes another ref. Do not create temporary branches for routine verification.
+
+**Status:** CONTROL ACTIVE
