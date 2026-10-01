@@ -198,7 +198,7 @@
         <header class="zazu-inspector-head">
             <div>
                 <div class="zazu-eyebrow">Function sheet</div>
-                <h2 id="zazu-inspector-title">Job inspection</h2>
+                <h2 id="zazu-inspector-title" data-zazu-inspector-name>Job inspection</h2>
                 <div class="zazu-inspector-reference" data-zazu-inspector-reference>—</div>
             </div>
             <button type="button" class="zazu-inspector-close" data-zazu-inspector-close aria-label="Close job inspection">×</button>
@@ -245,6 +245,7 @@
                 const data = source?.content?.firstElementChild?.dataset;
                 if (!data) return;
 
+                panel.querySelector('[data-zazu-inspector-name]').textContent = data.eventName || 'Job inspection';
                 panel.querySelector('[data-zazu-inspector-reference]').textContent = data.eventReference || '—';
                 panel.querySelector('[data-zazu-inspector-client]').textContent = data.customer || '—';
                 panel.querySelector('[data-zazu-inspector-type]').textContent = data.eventType || '—';
