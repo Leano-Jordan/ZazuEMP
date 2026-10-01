@@ -417,3 +417,29 @@ Verification boundary:
 
 Next target:
 **RUNTIME POPULATED WALKTHROUGH / RELEASE EVIDENCE.** Do not continue broad feature or cosmetic expansion until current-head execution exposes the next verified defect.
+
+
+## Finance dashboard regression cycle — 2026-10-01
+
+Target: close finance/workflow rendering and populated financial-display failures from the current test run.
+
+Finding FIN-001:
+- Finance dashboard rendering failed because the view checks action permissions against `$business`, but `FinanceController::index()` supplied only the active business ID.
+- The work inspector exposed raw financial amounts without thousands grouping despite the existing `Money::formatCents()` display helper.
+- The quote-editor UI test created an event without requirements; the quote route correctly redirected because quotes require at least one requirement.
+
+Completed:
+- passed the active business model to the finance view while retaining business-scoped queries;
+- formatted inspector quote, deposit, paid and balance values with the shared money formatter;
+- supplied an event requirement in the quote-editor UI test fixture.
+
+Verification:
+- targeted finance, skeleton-page and UI/accessibility suites: 37 passed;
+- full automated suite: 202 passed, 1,174 assertions;
+- `git diff --check`: passed.
+- PHP emits a startup warning for the unavailable optional `pdo_firebird` extension; it did not prevent the test suite from completing.
+
+Readiness impact: the observed source/test regressions are closed. Automated evidence is current; runtime/browser, populated-device, recovery and upgrade evidence remain unverified.
+
+Next target:
+**RUNTIME POPULATED WALKTHROUGH / RELEASE EVIDENCE.**

@@ -27,7 +27,8 @@ class FinanceController extends Controller
 {
     public function index(Request $request): View
     {
-        $businessId = app(CurrentBusiness::class)->id($request->user());
+        $business = app(CurrentBusiness::class)->model($request->user());
+        $businessId = (int) $business->id;
         $invoices = Invoice::where('business_id', $businessId)
             ->with('payments')
             ->latest()
@@ -60,6 +61,7 @@ class FinanceController extends Controller
             ->mapWithKeys(fn ($row) => [$row->currency => Money::fromCents(Money::toCents((string) $row->total))]);
 
         return view('finance.index', [
+            'business' => $business,
             'invoices' => $invoices,
             'payments' => $payments,
             'expenses' => $expenses,

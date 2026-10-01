@@ -56,6 +56,7 @@
                 $statusLabel = str_replace('_', ' ', ucfirst($event->status));
                 $contact = $event->eventDayContact?->name ?? $event->eventNightContact?->name ?? null;
                 $guestRequirement = $event->requirements->first(fn ($requirement) => in_array(strtolower((string) $requirement->unit), ['guest', 'guests'], true));
+                $formatMoney = static fn (string $amount): string => \App\Support\Money::formatCents(\App\Support\Money::toCents($amount));
             @endphp
             <article class="zazu-ops-row" data-zazu-job-row>
                 <button type="button" class="zazu-ops-row-main" data-zazu-inspector-open aria-label="Inspect {{ $event->name }}">
@@ -168,11 +169,11 @@
                             <div class="zazu-inspector-section-title">Financial position</div>
                             <div class="zazu-inspector-finance">
                                 <div><span>Quote</span><strong>{{ $latestQuoteVersion ? ucfirst($latestQuoteVersion->status).' · '.$latestQuote?->currency : 'Not quoted' }}</strong></div>
-                                <div><span>Quote total</span><strong>{{ $latestQuoteVersion ? $latestQuote?->currency.' '.$latestQuoteVersion->total : 'Not quoted' }}</strong></div>
-                                <div><span>Deposit</span><strong>{{ $latestQuoteVersion ? $latestQuoteVersion->deposit_percent.'% · '.$latestQuote?->currency.' '.$latestQuoteVersion->deposit_amount : 'Not set' }}</strong></div>
+                                <div><span>Quote total</span><strong>{{ $latestQuoteVersion ? $latestQuote?->currency.' '.$formatMoney((string) $latestQuoteVersion->total) : 'Not quoted' }}</strong></div>
+                                <div><span>Deposit</span><strong>{{ $latestQuoteVersion ? $latestQuoteVersion->deposit_percent.'% · '.$latestQuote?->currency.' '.$formatMoney((string) $latestQuoteVersion->deposit_amount) : 'Not set' }}</strong></div>
                                 <div><span>Invoice</span><strong>{{ $latestInvoice ? $latestInvoice->number.' · '.ucfirst($latestInvoice->status) : 'Not invoiced' }}</strong></div>
-                                <div><span>Paid</span><strong>{{ $latestInvoice ? $latestInvoice->currency.' '.$latestInvoice->paid_amount : '0.00' }}</strong></div>
-                                <div><span>Balance</span><strong>{{ $latestInvoice ? $latestInvoice->currency.' '.$latestInvoice->balance : '0.00' }}</strong></div>
+                                <div><span>Paid</span><strong>{{ $latestInvoice ? $latestInvoice->currency.' '.$formatMoney((string) $latestInvoice->paid_amount) : '0.00' }}</strong></div>
+                                <div><span>Balance</span><strong>{{ $latestInvoice ? $latestInvoice->currency.' '.$formatMoney((string) $latestInvoice->balance) : '0.00' }}</strong></div>
                             </div>
                         </section>
                     </div>

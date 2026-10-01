@@ -5,6 +5,7 @@ namespace Tests\Feature;
 use App\Models\Business;
 use App\Models\Customer;
 use App\Models\Event;
+use App\Models\EventRequirement;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
@@ -158,6 +159,14 @@ class UiAccessibilityTest extends TestCase
             'event_type' => 'Catering',
             'event_date' => now()->addDays(10)->toDateString(),
             'status' => 'draft',
+        ]);
+        EventRequirement::create([
+            'event_id' => $event->id,
+            'description' => 'Catering service',
+            'category' => 'service',
+            'quantity' => 1,
+            'unit' => 'service',
+            'status' => 'open',
         ]);
 
         $response = $this->get(route('work.quotes.create', $event));
