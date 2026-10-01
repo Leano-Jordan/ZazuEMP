@@ -296,4 +296,30 @@
             </div>
         </aside>
     </form>
+
+    <section class="zazu-context-card mt-4" data-zazu-backup-controls>
+        <div class="zazu-context-title">Backup &amp; recovery</div>
+        <div class="zazu-context-copy">Create a portable Zazu backup containing the database and private business files. Restore is owner-only and replaces the current business database and private files.</div>
+        <div class="flex flex-wrap gap-3 mt-4">
+            <a href="{{ route('settings.backup') }}" class="zazu-btn zazu-btn-secondary" data-zazu-backup-download>Download backup</a>
+        </div>
+        <div class="mt-5 pt-5 border-t border-slate-200/70 dark:border-slate-700/70">
+            <div class="zazu-context-title">Restore a backup</div>
+            <p class="zazu-context-copy mt-1">Use a Zazu backup ZIP created by this installation. Existing data will be replaced by the backup contents.</p>
+            <form method="POST" action="{{ route('settings.restore') }}" enctype="multipart/form-data" class="mt-4" data-zazu-restore-form>
+                @csrf
+                <label class="zazu-field">
+                    <span class="zazu-label">Backup ZIP</span>
+                    <input type="file" name="backup" accept=".zip,application/zip" class="zazu-input" required data-zazu-restore-file>
+                    @error('backup')<span class="zazu-field-error">{{ $message }}</span>@enderror
+                </label>
+                <label class="zazu-check-row mt-3">
+                    <input type="checkbox" required data-zazu-restore-confirm>
+                    <span>I understand that restoring replaces the current Zazu database and private files.</span>
+                </label>
+                <button type="submit" class="zazu-btn zazu-btn-primary mt-4" data-zazu-restore-submit disabled>Restore backup</button>
+            </form>
+        </div>
+    </section>
+
 </x-app-layout>
