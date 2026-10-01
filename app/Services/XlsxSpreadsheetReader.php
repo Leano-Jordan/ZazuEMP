@@ -229,13 +229,23 @@ class XlsxSpreadsheetReader
 
     private function columnIndex(string $reference): int
     {
-        if (!preg_match('~^([A-Z]+)[0-9]+$~i', $reference, $matches)) {
+        $reference = trim($reference);
+        $upper = strtoupper($reference);
+        $columnLength = strspn($upper, 'ABCDEFGHIJKLMNOPQRSTUVWXYZ');
+        $numberLength = strspn($upper, '0123456789', $columnLength);
+
+        if (
+            $columnLength === 0
+            || $numberLength === 0
+            || ($columnLength + $numberLength) !== strlen($upper)
+        ) {
             throw new RuntimeException('The XLSX workbook contains an invalid cell reference.');
         }
 
+        $columnLetters = substr($upper, 0, $columnLength);
         $index = 0;
 
-        foreach (str_split(strtoupper($matches[1])) as $letter) {
+        foreach (str_split($columnLetters) as $letter) {
             $index = ($index * 26) + (ord($letter) - 64);
         }
 
