@@ -33,6 +33,22 @@ jobs:
       - name: Install project dependencies
         run: composer install --no-interaction --no-progress --prefer-dist
 
+      - name: Apply Laravel Psalm compatibility shim
+        run: |
+          php -r '$lock = json_decode(file_get_contents("composer.lock"), true, 512, JSON_THROW_ON_ERROR); foreach ($lock["packages"] as $package) { if ($package["name"] === "laravel/framework") { if (($package["version"] ?? null) !== "v13.34.0" || ($package["dist"]["reference"] ?? null) !== "c829b4982d29344cbcf1d7ad78eb5d2bb8ae66c4") { fwrite(STDERR, "Unsupported Laravel framework version for the Psalm compatibility shim.".PHP_EOL); exit(1); } break; } }'
+          python3 - <<'PY'
+          from pathlib import Path
+          path = Path("vendor/laravel/framework/src/Illuminate/Collections/Collection.php")
+          text = path.read_text()
+          marker = r"     * @phpstan-this-out ($key is null ? static<TKey|int, TValue> : $this)
+"
+          found = text.count(marker)
+          if found != 1:
+              raise SystemExit(f"Expected exactly one unsupported Laravel annotation, found {found}")
+          path.write_text(text.replace(marker, ""))
+          print("Applied one verified Laravel/Psalm compatibility shim.")
+          PY
+
       - name: Run Psalm security analysis
         run: psalm --taint-analysis --no-progress --report=results.sarif
 
