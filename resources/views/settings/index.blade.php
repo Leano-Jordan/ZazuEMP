@@ -322,4 +322,34 @@
         </div>
     </section>
 
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        const restoreForm = document.querySelector('[data-zazu-restore-form]');
+        const restoreFile = document.querySelector('[data-zazu-restore-file]');
+        const restoreConfirm = document.querySelector('[data-zazu-restore-confirm]');
+        const restoreSubmit = document.querySelector('[data-zazu-restore-submit]');
+
+        const syncRestoreState = () => {
+            if (!restoreSubmit) return;
+            restoreSubmit.disabled = !(restoreFile?.files?.length && restoreConfirm?.checked);
+        };
+
+        restoreFile?.addEventListener('change', syncRestoreState);
+        restoreConfirm?.addEventListener('change', syncRestoreState);
+
+        restoreForm?.addEventListener('submit', (event) => {
+            if (!restoreFile?.files?.length || !restoreConfirm?.checked) {
+                event.preventDefault();
+                return;
+            }
+
+            if (!window.confirm('Restore this Zazu backup? The current database and private files will be replaced.')) {
+                event.preventDefault();
+            }
+        });
+
+        syncRestoreState();
+    });
+</script>
+
 </x-app-layout>
