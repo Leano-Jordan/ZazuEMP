@@ -4,7 +4,7 @@
 <section class="zazu-card zazu-compact-editor-card"><div class="zazu-card-header"><div class="zazu-eyebrow">Buying</div><div class="zazu-card-title mt-1">Order details</div></div>
 <form method="POST" action="{{ route('purchasing.store') }}" class="zazu-form p-5">@csrf
 <input type="hidden" name="idempotency_key" value="{{ $idempotencyKey }}">
-<div class="zazu-form-grid"><label class="zazu-field"><span>Job (optional)</span><select name="event_id"><option value="">General purchase</option>@foreach($events as $event)<option value="{{ $event->id }}" @selected(old('event_id') == $event->id)>{{ $event->reference }} · {{ $event->name }} · {{ ucfirst($event->status) }}</option>@endforeach</select></label>
+<div class="zazu-form-grid"><label class="zazu-field"><span>Job (optional)</span><select name="event_id"><option value="">General purchase</option>@foreach($events as $event)<option value="{{ $event->id }}" @selected(old('event_id', $selectedEventId) == $event->id)>{{ $event->reference }} · {{ $event->name }} · {{ ucfirst($event->status) }}</option>@endforeach</select></label>
 <label class="zazu-field"><span>Supplier</span><select name="supplier_id" required><option value="">Choose supplier</option>@foreach($suppliers as $supplier)<option value="{{ $supplier->id }}" @selected(old('supplier_id')==$supplier->id)>{{ $supplier->name }}</option>@endforeach</select></label>
 <label class="zazu-field">
     <span>Currency</span>
