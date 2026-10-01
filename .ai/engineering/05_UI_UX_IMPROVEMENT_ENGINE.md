@@ -36,7 +36,24 @@ Every page should make clear:
 Optimize recognition over recall, contextual actions, minimal unnecessary navigation, clear feedback and recoverable errors.
 
 ### VISUAL SYSTEM
-Preserve the current Zazu shared blue reference system.
+Zazu must have one authoritative design-token system. Do not append another visual sweep that redefines the same root tokens.
+
+The shared visual authority owns:
+- page/canvas surfaces;
+- card/panel surfaces;
+- text hierarchy;
+- border hierarchy;
+- primary/secondary/semantic colours;
+- focus states;
+- typography roles;
+- spacing and control dimensions;
+- light/dark theme mappings.
+
+A visual change must first modify the shared authority, then inherit through components. Hardcoded component colours are allowed only for genuinely content-specific imagery or semantic exceptions with documented contrast intent.
+
+Typography must be judged as a hierarchy, not as isolated font sizes: page title → section title → body → supporting text → labels/metadata. Small or low-contrast text that carries operational meaning is a defect.
+
+Preserve the current Zazu shared blue reference system only through that single authority.
 
 Prefer disciplined spacing, semantic colour, strong typography hierarchy, structural separation where needed, restrained depth and meaningful interaction states.
 
@@ -47,6 +64,20 @@ Use container queries for reusable component behaviour where appropriate. Use vi
 
 ### ACCESSIBILITY
 Review keyboard use, focus visibility, labels/instructions, contrast, state feedback, touch targets and reduced motion.
+
+## VISUAL REGRESSION RULE
+
+For meaningful visual work, verify both themes and at least desktop + mobile layouts. Check:
+- foreground/background contrast;
+- typography weight and size hierarchy;
+- border consistency and spacing rhythm;
+- navigation/header alignment;
+- focus/hover/active states;
+- overflow/clipping;
+- responsive stacking;
+- semantic colour meaning.
+
+Static source checks do not close the visual gate by themselves; rendered browser evidence is required.
 
 ## SHARED-PATTERN RULE
 
