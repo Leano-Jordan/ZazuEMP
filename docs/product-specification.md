@@ -521,3 +521,118 @@ Zazu may use open-source libraries and external APIs to enhance the product, inc
 Integration rule: **core business operations first; optional intelligence/enrichment second.**
 
 An external service must not become a hidden dependency for essential offline-capable workflows. Each dependency is governed through docs/ZAZU_EXTERNAL_CAPABILITY_REGISTER.md.
+
+
+## 29. Commercial packaging requirements — Director consolidation 2026-10-02
+
+Zazu is one product with increasing levels of operational sophistication. Commercial tiers must not become four separate codebases or artificially cripple basic users.
+
+The working commercial packaging hypothesis is:
+
+| Tier | Working price | Product promise |
+|---|---:|---|
+| Basic | R299/month | Keep my business organised |
+| Professional | R499/month | Run my jobs and money |
+| Business | R799/month | Run my people and operations |
+| Business Plus | R1,299/month | Control a larger, more complex business |
+
+These prices are **commercial hypotheses, not fixed entitlements**. Final pricing requires customer validation, operating-cost analysis and a release-ready entitlement/licensing model.
+
+### R299 — Basic
+
+The minimum credible paid product should replace the operator's core spreadsheet/admin workflow.
+
+Required capability:
+- business/workspace and authentication;
+- customers and contacts;
+- products/services;
+- events/jobs and requirements;
+- calendar;
+- quotes and quote versions;
+- quote acceptance;
+- deposits;
+- invoices;
+- payments;
+- basic expenses;
+- dashboard and essential reports;
+- search;
+- printable business documents;
+- essential audit/security controls;
+- reliable data protection and recovery.
+
+The customer outcome is: **"I no longer need my main workbook to run the business."**
+
+### R499 — Professional
+
+This tier must add a clear operational and financial control loop rather than merely more screens.
+
+Required commercial spine:
+**Event → Quote → Deposit → Invoice → Payment → Purchasing → Receiving → Costs → Profit → Export**
+
+Required capability:
+- supplier workflow;
+- purchase orders;
+- receiving/goods received;
+- cost capture tied to operational records;
+- usable inventory foundations;
+- product/service costing;
+- event profitability;
+- customer/event history;
+- spreadsheet import with preview and matching;
+- spreadsheet export;
+- stronger operational reporting.
+
+The customer outcome is: **"Zazu is running the operational side of the business, not just recording it."**
+
+### R799 — Business
+
+This tier is for businesses with staff and meaningful operational coordination.
+
+Required capability:
+- staff roles and permissions;
+- manager access with explicit permission boundaries;
+- event/work assignment;
+- workload visibility;
+- operational attention dashboard;
+- staff activity;
+- approval/control workflows where consequential;
+- stock and purchasing alerts;
+- operational notifications/reminders;
+- management-level financial and operational visibility;
+- stronger resource/equipment control.
+
+The customer outcome is: **"My team can use Zazu and I can manage the operation."**
+
+### R1,299 — Business Plus
+
+This tier is for materially more complex businesses. It should not be built simply to justify a price.
+
+Required capability when validated by real customer need:
+- advanced profitability by event/service/customer;
+- resource capacity and allocation;
+- advanced purchasing/stock controls;
+- advanced management reporting;
+- multi-location or equivalent multi-operational-unit controls;
+- advanced import/migration;
+- higher-order automation and cross-team coordination.
+
+The customer outcome is: **"I can control a larger, more complex operation from one system."**
+
+### Commercial entitlement rule
+
+Do not create arbitrary record-count limits as the primary upgrade mechanism.
+
+Upgrade boundaries should be based on meaningful operational sophistication, such as team management, approvals, advanced reporting, resource control and multi-unit operation.
+
+### Commercial readiness order
+
+The engineering sequence is:
+
+1. Close release blockers and prove the current core.
+2. Complete the R299 foundation.
+3. Complete the R299 → R499 operational/financial bridge.
+4. Validate the commercial workflow with real businesses.
+5. Build R799 capabilities from demonstrated team-management needs.
+6. Build R1,299 capabilities only where complexity and willingness-to-pay are evidenced.
+
+This protects V1 from feature sprawl while giving pricing a concrete product architecture.
