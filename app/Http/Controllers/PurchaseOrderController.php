@@ -24,14 +24,24 @@ class PurchaseOrderController extends Controller
     public function index(Request $request): View
     {
         $businessId = app(CurrentBusiness::class)->id($request->user());
+        $eventId = $request->integer('event_id') ?: null;
+
+        if ($eventId !== null) {
+            abort_unless(
+                Event::query()->where('business_id', $businessId)->whereKey($eventId)->exists(),
+                404
+            );
+        }
 
         $purchaseOrders = PurchaseOrder::query()
             ->where('business_id', $businessId)
+            ->when($eventId !== null, fn ($query) => $query->where('event_id', $eventId))
             ->with(['supplier', 'event'])
             ->latest()
-            ->paginate(20);
+            ->paginate(20)
+            ->withQueryString();
 
-        return view('purchasing.index', compact('purchaseOrders'));
+        return view('purchasing.index', compact('purchaseOrders', 'eventId'));
     }
 
     public function create(Request $request): View
