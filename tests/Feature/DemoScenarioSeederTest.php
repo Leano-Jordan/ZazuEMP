@@ -172,4 +172,21 @@ class DemoScenarioSeederTest extends TestCase
         $this->assertDatabaseCount('compliance_documents', 4);
         $this->assertDatabaseCount('purchase_order_receipts', 1);
     }
+
+    public function test_non_owner_cannot_trigger_backup_or_restore(): void
+    {
+        $this->seed(DemoScenarioSeeder::class);
+
+        $manager = User::query()->where('email', 'operations@zazu.local')->firstOrFail();
+        $this->actingAs($manager);
+
+        $this->get(route('settings.backup'))
+            ->assertForbidden();
+
+        $upload = UploadedFile::fake()->create('not-a-backup.zip', 1, 'application/zip');
+
+        $this->post(route('settings.restore'), ['backup' => $upload])
+            ->assertForbidden();
+    }
+
 }
