@@ -122,10 +122,43 @@
                     </a>
                 @endif
 
-                @if((!$isOwner || ($business?->catalogue_setup_completed_at && $business?->business_setup_completed_at)) && $upcoming->isEmpty() && (!$workspaceTools['quotes'] || $metrics['draft_quotes'] === 0))
+                @if($workspaceTools['purchasing'] && $experienceLevel !== 'basic' && $metrics['open_purchase_orders'] > 0)
+                    <a href="{{ route('purchasing.index') }}" class="zazu-dash-focus-item is-warning">
+                        <span class="zazu-dash-focus-marker"></span>
+                        <span><strong>{{ number_format($metrics['open_purchase_orders']) }} purchase order{{ $metrics['open_purchase_orders'] === 1 ? '' : 's' }} remain open</strong><small>Supplier commitments still need receiving or closure.</small></span>
+                        <b>→</b>
+                    </a>
+                @endif
+
+                @if($workspaceTools['inventory'] && $experienceLevel !== 'basic' && $metrics['low_stock'] > 0)
+                    <a href="{{ route('inventory.index') }}" class="zazu-dash-focus-item is-warning">
+                        <span class="zazu-dash-focus-marker"></span>
+                        <span><strong>{{ number_format($metrics['low_stock']) }} stock item{{ $metrics['low_stock'] === 1 ? '' : 's' }} need replenishment</strong><small>Items are at or below their reorder level.</small></span>
+                        <b>→</b>
+                    </a>
+                @endif
+
+                @if($workspaceTools['finance'] && $experienceLevel !== 'basic' && $metrics['unpaid_invoices'] > 0)
+                    <a href="{{ route('finance.index') }}" class="zazu-dash-focus-item is-warning">
+                        <span class="zazu-dash-focus-marker"></span>
+                        <span><strong>{{ number_format($metrics['unpaid_invoices']) }} invoice{{ $metrics['unpaid_invoices'] === 1 ? '' : 's' }} need collection</strong><small>Issued invoices still have an outstanding balance.</small></span>
+                        <b>→</b>
+                    </a>
+                @endif
+
+                @if(
+                    (!$isOwner || ($business?->catalogue_setup_completed_at && $business?->business_setup_completed_at))
+                    && $upcoming->isEmpty()
+                    && (!$workspaceTools['quotes'] || $metrics['draft_quotes'] === 0)
+                    && ($experienceLevel === 'basic' || (
+                        $metrics['open_purchase_orders'] === 0
+                        && $metrics['low_stock'] === 0
+                        && $metrics['unpaid_invoices'] === 0
+                    ))
+                )
                     <div class="zazu-dash-focus-item is-clear">
                         <span class="zazu-dash-focus-marker"></span>
-                        <span><strong>No immediate priority flagged</strong><small>The workspace has no setup, schedule or quote action to surface right now.</small></span>
+                        <span><strong>No immediate priority flagged</strong><small>The workspace has no setup, schedule, quote or resource action to surface right now.</small></span>
                     </div>
                 @endif
             </div>
