@@ -93,3 +93,16 @@ Durable decisions governing the Zazu engineering system.
 **Reason:** Prevent the engineering system from looping through variations of the same diagnosis or patch without materially new evidence.
 
 **Status:** ACTIVE
+
+
+## DEC-015 — SaaS-ready boundary without premature distributed infrastructure
+
+**Date:** 2026-10-02
+
+**Decision:** Zazu shall be architecturally prepared for hosted multi-business SaaS while remaining a coherent modular monolith until measured evidence requires scaling or service extraction. Business ownership, parent/child invariants, state transitions, idempotency, persistence boundaries and infrastructure seams are strengthened now; distributed infrastructure is not added speculatively.
+
+**Reason:** Preserve the current product's simplicity and local-first reliability while preventing future SaaS migration from requiring a rewrite of business rules or historical data.
+
+**Authority:** Director/Morpheus remains the single entry point. The detailed contract is docs/ZAZU_SAAS_READINESS_ARCHITECTURE.md.
+
+**Status:** ACTIVE
