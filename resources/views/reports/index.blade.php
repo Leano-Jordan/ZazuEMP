@@ -98,14 +98,44 @@
         </div>
     </section>
 
+    <section class="zazu-panel mt-5">
+        <div class="zazu-panel-head">
+            <div>
+                <div class="zazu-panel-title">Financial snapshot</div>
+                <div class="zazu-panel-copy">Invoice collections and finance expenses are grouped by currency so totals are never mixed.</div>
+            </div>
+            <a href="{{ route('finance.index') }}" class="zazu-btn zazu-btn-secondary">Open finance</a>
+        </div>
+        <div class="mt-4 grid gap-3">
+            @forelse($financeTotalsByCurrency as $currency => $totals)
+                <div class="zazu-context-card">
+                    <div class="zazu-detail-label">{{ $currency }} receivables</div>
+                    <div class="zazu-command-meta-value mt-1">Invoiced {{ $currency }} {{ AppSupportMoney::formatCents($totals['invoiced_cents']) }}</div>
+                    <div class="zazu-field-help">Paid {{ $currency }} {{ AppSupportMoney::formatCents($totals['paid_cents']) }} · Outstanding {{ $currency }} {{ AppSupportMoney::formatCents($totals['outstanding_cents']) }}</div>
+                </div>
+            @empty
+                <div class="zazu-placeholder"><div class="zazu-placeholder-title">No invoices yet</div><div class="zazu-placeholder-copy">Finance reporting will appear here once an invoice exists.</div></div>
+            @endforelse
+        </div>
+        <div class="mt-3 grid gap-3 sm:grid-cols-2">
+            @forelse($expenseTotalsByCurrency as $currency => $totalCents)
+                <div class="zazu-route-card">
+                    <div><div class="zazu-route-card-title">{{ $currency }} expenses</div><div class="zazu-route-card-copy">{{ $currency }} {{ AppSupportMoney::formatCents($totalCents) }} recorded excluding cancelled expenses.</div></div>
+                </div>
+            @empty
+                <div class="zazu-placeholder"><div class="zazu-placeholder-title">No finance expenses yet</div></div>
+            @endforelse
+        </div>
+    </section>
+
     <section class="zazu-detail-grid mt-5">
         <div class="zazu-panel">
             <div class="zazu-panel-title">Reporting boundary</div>
-            <div class="zazu-panel-copy mt-1">Finance, profitability, payments and invoice reporting remain gated until their underlying transaction models exist.</div>
+            <div class="zazu-panel-copy mt-1">These figures are calculated from the same invoice, payment, expense, job and quote records used by the operational workspaces.</div>
         </div>
         <div class="zazu-detail-stack">
             <a href="{{ route('quotes.index') }}" class="zazu-route-card"><div><div class="zazu-route-card-title">Quote history</div><div class="zazu-route-card-copy">Inspect the commercial records behind these totals.</div></div><span class="zazu-route-card-arrow">→</span></a>
-            <a href="{{ route('customers.index') }}" class="zazu-route-card"><div><div class="zazu-route-card-title">Customers</div><div class="zazu-route-card-copy">Open relationship records behind operational reporting.</div></div><span class="zazu-route-card-arrow">→</span></a>
+            <a href="{{ route('finance.index') }}" class="zazu-route-card"><div><div class="zazu-route-card-title">Finance</div><div class="zazu-route-card-copy">Open invoice, payment and expense records.</div></div><span class="zazu-route-card-arrow">→</span></a>
             <a href="{{ route('dashboard') }}" class="zazu-route-card"><div><div class="zazu-route-card-title">Dashboard</div><div class="zazu-route-card-copy">Return to the operational overview.</div></div><span class="zazu-route-card-arrow">→</span></a>
         </div>
     </section>
