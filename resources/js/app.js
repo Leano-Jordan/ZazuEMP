@@ -1,7 +1,23 @@
 const storageKey = 'zazu-theme';
 
+function safeStorageGet(key) {
+    try {
+        return window.localStorage.getItem(key);
+    } catch {
+        return null;
+    }
+}
+
+function safeStorageSet(key, value) {
+    try {
+        window.localStorage.setItem(key, value);
+    } catch {
+        // Browser privacy/quota restrictions must not break Zazu UI behaviour.
+    }
+}
+
 function preferredTheme() {
-    const saved = localStorage.getItem(storageKey);
+    const saved = safeStorageGet(storageKey);
 
     if (saved === 'light' || saved === 'dark') {
         return saved;
@@ -39,7 +55,7 @@ function setupZazuThemeToggle() {
         button.addEventListener('click', () => {
             const next = document.documentElement.dataset.theme === 'dark' ? 'light' : 'dark';
 
-            localStorage.setItem(storageKey, next);
+            safeStorageSet(storageKey, next);
             document.documentElement.classList.add('zazu-theme-transition');
             applyTheme(next);
 
@@ -116,6 +132,29 @@ function setupZazuPrintButtons() {
 document.querySelectorAll('[data-zazu-print]').forEach((button) => {
     button.addEventListener('click', () => window.print());
 });
+}
+
+function setupZazuFormSubmissionGuards() {
+    document.querySelectorAll('form').forEach((form) => {
+        if (form.dataset.zazuSubmitGuardBound === '1' || form.dataset.zazuNoSubmitGuard === '1') return;
+
+        form.dataset.zazuSubmitGuardBound = '1';
+
+        form.addEventListener('submit', (event) => {
+            if (event.defaultPrevented || form.dataset.zazuSubmitting === '1') return;
+
+            const submitter = event.submitter instanceof HTMLElement
+                ? event.submitter
+                : form.querySelector('button[type="submit"], input[type="submit"]');
+
+            if (!submitter) return;
+
+            form.dataset.zazuSubmitting = '1';
+            submitter.dataset.zazuSubmitLabel = submitter.innerText || submitter.value || '';
+            submitter.disabled = true;
+            submitter.setAttribute('aria-busy', 'true');
+        });
+    });
 }
 
 function setupZazuConfirmations() {
@@ -497,7 +536,7 @@ function setupZazuCommandNavigation() {
     results.addEventListener('click', (event) => {
         const item = event.target.closest('[data-command-item]');
         if (!item) return;
-        localStorage.setItem('zazu-last-destination', item.href);
+        safeStorageSet('zazu-last-destination', item.href);
         close(false);
     });
 
@@ -572,6 +611,7 @@ const initializeZazuUi = () => {
     setupZazuBusinessSwitcher();
     setupZazuPrintButtons();
     setupZazuConfirmations();
+    setupZazuFormSubmissionGuards();
 };
 
 if (document.readyState === 'loading') {
