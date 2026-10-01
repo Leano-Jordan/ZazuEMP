@@ -174,6 +174,8 @@ Route::middleware(['auth', 'auth.session', 'business.context'])->group(function 
 
     Route::middleware('owner')->group(function () {
         Route::get('/settings', [BusinessSettingsController::class, 'edit'])->name('settings.index');
+        Route::get('/settings/backup', [BusinessSettingsController::class, 'backup'])->name('settings.backup');
+        Route::post('/settings/restore', [BusinessSettingsController::class, 'restore'])->name('settings.restore');
         Route::get('/settings/audit', [AuditLogController::class, 'index'])->name('settings.audit');
         Route::put('/settings', [BusinessSettingsController::class, 'update'])->name('settings.update');
         Route::get('/settings/compliance', [ComplianceDocumentController::class, 'index'])->name('settings.compliance');
