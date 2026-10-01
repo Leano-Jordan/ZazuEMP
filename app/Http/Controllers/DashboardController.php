@@ -5,6 +5,10 @@ namespace App\Http\Controllers;
 use App\Models\Customer;
 use App\Models\Event;
 use App\Models\Quote;
+use App\Models\Asset;
+use App\Models\InventoryItem;
+use App\Models\Invoice;
+use App\Models\PurchaseOrder;
 use App\Support\CurrentBusiness;
 use App\Support\PermissionService;
 use App\Support\ExperienceLevel;
@@ -33,7 +37,37 @@ class DashboardController extends Controller
                 ->count(),
             'customers' => (clone $customerQuery)->count(),
             'draft_quotes' => (clone $quoteQuery)->where('status', 'draft')->count(),
+            'open_purchase_orders' => PurchaseOrder::query()
+                ->where('business_id', $businessId)
+                ->whereIn('status', ['draft', 'sent', 'ordered'])
+                ->count(),
+            'available_assets' => Asset::query()
+                ->where('business_id', $businessId)
+                ->where('status', 'available')
+                ->count(),
         ];
+
+        if ($experienceLevel = app(ExperienceLevel::class)->for($request->user(), $business)) {
+            $inventory = InventoryItem::query()
+                ->where('business_id', $businessId)
+                ->with('movements')
+                ->get();
+
+            $metrics['low_stock'] = $inventory
+                ->filter(fn ($item) => $item->on_hand <= (float) $item->reorder_level)
+                ->count();
+
+            $metrics['unpaid_invoices'] = Invoice::query()
+                ->where('business_id', $businessId)
+                ->where('status', 'issued')
+                ->with('payments')
+                ->get()
+                ->filter(fn ($invoice) => (float) $invoice->balance > 0)
+                ->count();
+        } else {
+            $metrics['low_stock'] = 0;
+            $metrics['unpaid_invoices'] = 0;
+        }
 
         $upcoming = (clone $eventQuery)
             ->with('customer')
@@ -43,8 +77,6 @@ class DashboardController extends Controller
             ->orderBy('name')
             ->limit(8)
             ->get();
-
-        $experienceLevel = app(ExperienceLevel::class)->for($request->user(), $business);
 
         $permissionService = app(PermissionService::class);
         $workspaceTools = [
