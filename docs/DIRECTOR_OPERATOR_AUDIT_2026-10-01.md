@@ -102,3 +102,36 @@ Execute the seeded business through the actual browser and verify:
 6. reports rendering;
 7. no visual overflow/clipping introduced by the populated content;
 8. seeded scenario still passes idempotency and lifecycle invariants.
+
+
+## Error-return investigation — consolidation pass
+
+The first populated-operator pass returned errors. Re-inspection of the current repository identified four concrete issues in the audit output itself:
+
+1. **Regression-test write corruption — fixed**
+   - `tests/Feature/FinancePurchasingInventoryTest.php` contained flattened PHP model namespaces (`AppModelsSupplier`, `AppModelsPurchaseOrder`, `AppModelsInventoryItem`).
+   - This was a repository-write integrity defect, not an application design defect.
+   - All three references were restored to valid `\\App\\Models\\...` namespaces.
+   - A repository-wide check of the touched files now finds no flattened `AppModels` / `AppSupport` / `AppHttp` / `AppServices` tokens.
+
+2. **Received PO still exposed the receiving panel — fixed**
+   - The original UI hid only the button while still rendering the “Receive goods” panel/form for a `received` PO.
+   - The lifecycle test expected the closed PO not to expose that workflow.
+   - The entire receiving panel is now state-aware: ordered → receive form; received → closed/read-only message; other states → awaiting order message.
+   - The server-side receiving guard remains authoritative.
+
+3. **Finance workspace ignored create permissions — fixed**
+   - Finance index header actions initially rendered New Invoice / Record Payment / New Expense for every user who could view Finance.
+   - Routes correctly enforce separate create permissions, so this created a UI-to-authorization mismatch.
+   - Actions now render only when the corresponding permission is granted.
+   - Staff regression coverage now verifies the create actions are absent while Finance itself remains accessible.
+
+4. **Vite manifest issue rechecked — confirmed fixed**
+   - `resources/css/zazu-mobile-refinement.css` is present in both `vite.config.js` input and `public/build/manifest.json`.
+   - This is not an outstanding error in the current head.
+
+### Current verification boundary
+
+The current repository source has been re-read after these corrections. Runtime PHPUnit/browser execution is still not claimed because this environment does not have a usable local Laravel runtime and the GitHub connector currently reports no workflow runs/statuses for the current main commits.
+
+The populated operator audit is therefore **source-corrected and consolidated, but runtime certification remains outstanding**.
