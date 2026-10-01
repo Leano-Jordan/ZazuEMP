@@ -33,18 +33,18 @@ class UiAccessibilityTest extends TestCase
         $response->assertSee('Sign out', false);
         $response->assertSee('name="viewport"', false);
         $response->assertSee('viewport-fit=cover', false);
-        $response->assertSee('>Jobs</span>', false);
-        $response->assertSee('>Customers</span>', false);
-        $response->assertSee('>Services &amp; prices</span>', false);
-        $response->assertSee('>Quotes</span>', false);
-        $response->assertSee('>Calendar</span>', false);
-        $response->assertSee('>Purchasing</span>', false);
-        $response->assertSee('>Suppliers</span>', false);
-        $response->assertSee('>Inventory</span>', false);
-        $response->assertSee('>Assets</span>', false);
-        $response->assertSee('>Finance</span>', false);
-        $response->assertSee('>Search</span>', false);
-        $response->assertSee('>Reports</span>', false);
+        $response->assertSee('>Jobs</a>', false);
+        $response->assertSee('>Customers</a>', false);
+        $response->assertSee('>Services &amp; prices</a>', false);
+        $response->assertSee('>Quotes</a>', false);
+        $response->assertSee('>Calendar</a>', false);
+        $response->assertSee('>Purchasing</a>', false);
+        $response->assertSee('>Suppliers</a>', false);
+        $response->assertSee('>Inventory</a>', false);
+        $response->assertSee('>Assets</a>', false);
+        $response->assertSee('>Finance</a>', false);
+        $response->assertSee('>Search</a>', false);
+        $response->assertSee('>Reports</a>', false);
 
         $html = $response->getContent();
         $themePosition = strpos($html, 'data-theme-toggle');
@@ -67,7 +67,7 @@ class UiAccessibilityTest extends TestCase
 
     public function test_hierarchical_navigation_exposes_primary_areas_and_children(): void
     {
-        $response = $this->actingAs($this->user)->get(route('dashboard'));
+        $response = $this->get(route('dashboard'));
 
         $response->assertOk()
             ->assertSee('Workspace')
