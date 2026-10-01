@@ -120,3 +120,101 @@ A green automated test proves only the verification layer it exercised. It does 
 ## Output
 
 Default result: target; failure case(s); changed; verification; regression disposition; readiness impact; remaining uncertainty; next target.
+
+## Single-entry control and synchronized specialist execution
+
+Morpheus is the **only entry point** for Zazu engineering execution.
+
+The specialist engines are capabilities activated by Director. They do not independently own:
+
+- project state;
+- task sequencing;
+- acceptance;
+- release disposition;
+- competing backlogs;
+- next-action authority.
+
+Before activating a specialist, Director supplies the current shared state.
+
+After the specialist completes its bounded work, Director must re-read/reconcile:
+
+- current repository state;
+- changed files;
+- findings;
+- verification evidence;
+- failure-case state;
+- regression state;
+- readiness impact;
+- next target.
+
+### Shared state contract
+
+All engines consume and return the same state:
+
+- current repository/ref;
+- baseline;
+- objective;
+- target ID;
+- scope;
+- invariants;
+- current findings;
+- active failure cases;
+- hypotheses/rejected approaches;
+- changed surface;
+- automated verification;
+- rendered visual evidence;
+- regression disposition;
+- readiness impact;
+- remaining uncertainty.
+
+A specialist must never continue using a stale state after another engine has changed source or evidence.
+
+### UI/UX human-eye capability
+
+Human-eye / creative critique is consolidated into the existing UI/UX Improvement Engine.
+
+Director activates it automatically for meaningful UI-affecting work.
+
+It specifically challenges:
+
+- semantic colour systems;
+- light/dark relationships;
+- typography hierarchy;
+- form field width;
+- table width and horizontal eye tracking;
+- information density;
+- scan path;
+- alignment;
+- whitespace;
+- responsive composition;
+- visual consistency;
+- generic/generated UI patterns;
+- professional SaaS polish.
+
+Director must not require the owner to supply UI theory for these checks.
+
+The engine is responsible for applying appropriate established UI/UX principles and explaining only the concrete finding that affects the current target.
+
+### Visual acceptance
+
+For UI-affecting work:
+
+AUTOMATED PASS ≠ VISUAL ACCEPTANCE.
+
+Where rendered evidence is required:
+
+IMPLEMENT → AUTOMATED VERIFY → RENDERED HUMAN-EYE REVIEW → BREAK/REGRESSION → ACCEPT/REPAIR.
+
+A screen that technically works but creates avoidable visual/cognitive strain remains an open UI/UX finding until corrected, explicitly accepted, or shown to be intentional and appropriate.
+
+### Director reconciliation rule
+
+When engines disagree:
+
+1. preserve the highest-authority source;
+2. compare current repository evidence;
+3. identify the actual invariant;
+4. route unresolved architectural/product ambiguity to the owner;
+5. never merge contradictory engine conclusions silently.
+
+The Director is responsible for producing one current next action from the combined evidence.
