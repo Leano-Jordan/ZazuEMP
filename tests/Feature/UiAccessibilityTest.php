@@ -141,7 +141,23 @@ class UiAccessibilityTest extends TestCase
 
     public function test_quote_editor_exposes_live_financial_checkpoint(): void
     {
-        $response = $this->get(route('work.quotes.create', $this->event));
+        $business = AppModelsBusiness::query()->firstOrFail();
+        $customer = AppModelsCustomer::create([
+            'business_id' => $business->id,
+            'name' => 'Quote UI Customer',
+        ]);
+        $event = Event::create([
+            'business_id' => $business->id,
+            'customer_id' => $customer->id,
+            'reference' => 'EVT-QUOTE-UI-001',
+            'name' => 'Quote UI Test',
+            'customer_name' => $customer->name,
+            'event_type' => 'Catering',
+            'event_date' => now()->addDays(10)->toDateString(),
+            'status' => 'draft',
+        ]);
+
+        $response = $this->get(route('work.quotes.create', $event));
 
         $response->assertOk()
             ->assertSee('data-quote-summary', false)
