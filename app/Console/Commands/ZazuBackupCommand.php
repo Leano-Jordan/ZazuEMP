@@ -66,27 +66,26 @@ class ZazuBackupCommand extends Command
                 $source = config('database.connections.sqlite.database');
                 $target = $work.'/database.sqlite';
 
-                if ($source && $source !== ':memory:' && is_file($source)) {
-                    if (!copy($source, $target)) {
-                        $this->error('Could not copy the SQLite database.');
-                        return self::FAILURE;
-                    }
-                } else {
-                    // PHPUnit uses an in-memory SQLite database. VACUUM INTO gives the
-                    // same populated database a real backup file without requiring a
-                    // test-only filesystem database.
-                    $quotedTarget = str_replace("'", "''", $target);
-                    try {
-                        DB::connection('sqlite')->statement("VACUUM INTO '".$quotedTarget."'");
-                    } catch (\Throwable $exception) {
-                        $this->error('Could not snapshot the SQLite database: '.$exception->getMessage());
-                        return self::FAILURE;
-                    }
+                // VACUUM INTO creates a transactionally consistent SQLite snapshot.
+                // A raw file copy is unsafe when WAL is active because committed data can
+                // still live in the -wal sidecar. Keep one backup path for both real and
+                // in-memory SQLite databases.
+                if (!$source || !is_file($source) && $source !== ':memory:') {
+                    $this->error('The SQLite database is unavailable.');
+                    return self::FAILURE;
+                }
 
-                    if (!is_file($target) || filesize($target) === 0) {
-                        $this->error('The SQLite database snapshot was not created.');
-                        return self::FAILURE;
-                    }
+                $quotedTarget = str_replace("'", "''", $target);
+                try {
+                    DB::connection('sqlite')->statement("VACUUM INTO '".$quotedTarget."'");
+                } catch (\Throwable $exception) {
+                    $this->error('Could not snapshot the SQLite database: '.$exception->getMessage());
+                    return self::FAILURE;
+                }
+
+                if (!is_file($target) || filesize($target) === 0) {
+                    $this->error('The SQLite database snapshot was not created.');
+                    return self::FAILURE;
                 }
             } elseif ($driver === 'mysql') {
                 $connection = config('database.connections.mysql');
