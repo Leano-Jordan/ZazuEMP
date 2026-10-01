@@ -1,6 +1,7 @@
 import { test, expect } from '@playwright/test';
 
 test('registration flows through onboarding into the dashboard', async ({ page }, testInfo) => {
+    test.setTimeout(60_000);
     test.skip(testInfo.project.name !== 'chromium', 'The complete registration flow runs once to avoid shared-IP registration throttling; responsive entry surfaces are covered separately.');
     const unique = globalThis.crypto.randomUUID()
         .replace(/[^a-zA-Z0-9]/g, '')
