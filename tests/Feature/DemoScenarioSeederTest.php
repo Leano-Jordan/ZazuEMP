@@ -43,10 +43,10 @@ class DemoScenarioSeederTest extends TestCase
         $this->assertDatabaseHas('inventory_items', ['sku' => 'INV-CHAFER-001']);
         $this->assertDatabaseHas('assets', ['asset_tag' => 'AST-TENT-001']);
         $this->assertDatabaseHas('compliance_documents', ['title' => 'Public liability insurance']);
-        $this->assertDatabaseHas('events', [
-            'reference' => 'ZAZU-DEMO-001',
-            'event_date' => now()->subDay()->toDateString(),
-        ]);
+        $this->assertSame(
+            now()->subDay()->toDateString(),
+            $invoice->event->event_date->toDateString()
+        );
     }
 
     public function test_demo_scenario_is_idempotent_when_seeded_again(): void
