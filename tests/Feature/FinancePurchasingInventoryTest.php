@@ -516,6 +516,57 @@ class FinancePurchasingInventoryTest extends TestCase
             ->assertForbidden();
     }
 
+    public function test_manager_permission_boundary_allows_operations_and_finance_view_but_denies_finance_mutation_and_owner_admin(): void
+    {
+        $business = Business::create([
+            'name' => 'Manager Boundary Business',
+            'slug' => 'manager-boundary-business',
+            'status' => 'active',
+            'currency' => 'ZAR',
+        ]);
+
+        $manager = User::factory()->create(['username' => 'boundarymanager']);
+        $business->users()->attach($manager->id, ['role' => 'manager']);
+
+        $this->actingAs($manager)
+            ->get(route('customers.index'))
+            ->assertOk();
+
+        $this->actingAs($manager)
+            ->get(route('finance.index'))
+            ->assertOk()
+            ->assertDontSee('New invoice')
+            ->assertDontSee('Record payment')
+            ->assertDontSee('New expense');
+
+        $this->actingAs($manager)
+            ->get(route('finance.invoices.create'))
+            ->assertForbidden();
+
+        $this->actingAs($manager)
+            ->get(route('finance.payments.create'))
+            ->assertForbidden();
+
+        $this->actingAs($manager)
+            ->get(route('finance.expenses.create'))
+            ->assertForbidden();
+
+        $this->actingAs($manager)
+            ->get(route('settings.index'))
+            ->assertForbidden();
+
+        $this->assertTrue(app(\App\Support\PermissionService::class)->allows('work.view', $manager, $business));
+        $this->assertTrue(app(\App\Support\PermissionService::class)->allows('work.update', $manager, $business));
+        $this->assertFalse(app(\App\Support\PermissionService::class)->allows('work.delete', $manager, $business));
+        $this->assertTrue(app(\App\Support\PermissionService::class)->allows('purchasing.status', $manager, $business));
+        $this->assertTrue(app(\App\Support\PermissionService::class)->allows('inventory.movement', $manager, $business));
+        $this->assertTrue(app(\App\Support\PermissionService::class)->allows('assets.allocate', $manager, $business));
+        $this->assertTrue(app(\App\Support\PermissionService::class)->allows('finance.view', $manager, $business));
+        $this->assertFalse(app(\App\Support\PermissionService::class)->allows('finance.invoice.create', $manager, $business));
+        $this->assertFalse(app(\App\Support\PermissionService::class)->allows('finance.payment.create', $manager, $business));
+        $this->assertFalse(app(\App\Support\PermissionService::class)->allows('finance.expense.create', $manager, $business));
+    }
+
     public function test_asset_details_can_be_updated_and_audit_is_recorded(): void
     {
         [$business, $user] = $this->businessUser();
