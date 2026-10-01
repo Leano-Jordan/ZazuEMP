@@ -141,3 +141,38 @@ Manager policy:
 Regression coverage has been added for representative allowed and denied manager routes plus direct permission resolution.
 
 **Release status:** role-policy gap closed. Final authorization certification remains pending runtime/adversarial execution, not source implementation.
+
+
+## SaaS-readiness architecture gate — 2026-10-02
+
+A hosted multi-business SaaS path is now an explicit architectural readiness concern, while public SaaS release remains a separate certification gate.
+
+### Architecture position
+- Current deployment remains a coherent modular monolith.
+- Business ownership and parent/child invariants are the required isolation seam.
+- Local-first core workflows remain protected from accidental online dependencies.
+- Scaling is evidence-driven: optimise first, then targeted caching/queues, then infrastructure scaling, then service extraction only if required.
+- Distributed infrastructure is not a current release requirement.
+
+### SaaS certification gates added
+Before hosted multi-business release can be accepted, Director must have evidence for:
+1. cross-business read isolation;
+2. cross-business mutation isolation;
+3. nested parent/child ownership consistency;
+4. search/filter/export isolation;
+5. attachment/download isolation;
+6. background-job ownership where jobs exist;
+7. populated multi-business authorization challenge;
+8. migration of existing business data into explicit ownership boundaries;
+9. backup/restore with multiple businesses;
+10. deployment and upgrade safety;
+11. operational logging/diagnostics without cross-business leakage.
+
+### Status
+**Architecture foundation:** established.
+
+**Hosted SaaS certification:** not yet claimed.
+
+The next Director target is isolation proof against actual repository implementation and populated multi-business fixtures. This does not expand V1 feature scope by itself.
+
+Last updated: 2026-10-02
