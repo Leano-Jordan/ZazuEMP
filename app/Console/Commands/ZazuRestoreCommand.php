@@ -202,25 +202,44 @@ class ZazuRestoreCommand extends Command
                 return self::FAILURE;
             }
 
-            // Stage private storage before changing the database. If anything fails after
-            // this point, the original files can be put back without leaving a mixed state.
             $storedPrivate = $work.'/storage/private';
             $privateTarget = storage_path('app/private');
 
+            // Preflight all target-specific requirements before mutating the installation.
+            if ($driver === 'sqlite') {
+                $source = $work.'/database.sqlite';
+                $target = config('database.connections.sqlite.database');
+
+                if (!$target || $target === ':memory:' || !is_file($source)) {
+                    $this->error('SQLite restore target or backup database is unavailable.');
+                    return self::FAILURE;
+                }
+            } elseif ($driver === 'mysql') {
+                $sql = $work.'/database.sql';
+
+                if (!is_file($sql)) {
+                    $this->error('MySQL dump is missing from the backup.');
+                    return self::FAILURE;
+                }
+            } else {
+                $this->error('Restore currently supports SQLite and MySQL installations.');
+                return self::FAILURE;
+            }
+
+            // Stage private storage before changing the database. Every mutation after this
+            // point either completes or throws so the catch block can restore the originals.
             if ($hasPrivateStorage && is_dir($storedPrivate)) {
                 $privateRollback = storage_path('app/.zazu-private-rollback-'.Str::ulid());
 
                 if (is_dir($privateTarget) && !rename($privateTarget, $privateRollback)) {
-                    $this->error('Could not stage the current private storage for safe replacement.');
-                    return self::FAILURE;
+                    throw new \RuntimeException('Could not stage the current private storage for safe replacement.');
                 }
 
                 if (!rename($storedPrivate, $privateTarget)) {
                     if (is_dir($privateRollback)) {
                         rename($privateRollback, $privateTarget);
                     }
-                    $this->error('Could not activate the restored private storage.');
-                    return self::FAILURE;
+                    throw new \RuntimeException('Could not activate the restored private storage.');
                 }
 
                 $privateActivated = true;
@@ -230,25 +249,18 @@ class ZazuRestoreCommand extends Command
                 $source = $work.'/database.sqlite';
                 $target = config('database.connections.sqlite.database');
 
-                if (!$target || $target === ':memory:' || !is_file($source)) {
-                    $this->error('SQLite restore target or backup database is unavailable.');
-                    return self::FAILURE;
-                }
-
                 DB::disconnect();
 
                 $databaseStage = storage_path('app/.zazu-database-restore-'.Str::ulid().'.sqlite');
                 if (!copy($source, $databaseStage)) {
-                    $this->error('Could not stage the SQLite database for restore.');
-                    return self::FAILURE;
+                    throw new \RuntimeException('Could not stage the SQLite database for restore.');
                 }
 
                 $databaseRollback = storage_path('app/.zazu-database-rollback-'.Str::ulid().'.sqlite');
 
                 if (is_file($target) && !rename($target, $databaseRollback)) {
                     File::delete($databaseStage);
-                    $this->error('Could not stage the current SQLite database for safe replacement.');
-                    return self::FAILURE;
+                    throw new \RuntimeException('Could not stage the current SQLite database for safe replacement.');
                 }
 
                 if (!rename($databaseStage, $target)) {
@@ -256,17 +268,11 @@ class ZazuRestoreCommand extends Command
                     if (is_file($databaseRollback)) {
                         rename($databaseRollback, $target);
                     }
-                    $this->error('Could not activate the restored SQLite database.');
-                    return self::FAILURE;
+                    throw new \RuntimeException('Could not activate the restored SQLite database.');
                 }
             } elseif ($driver === 'mysql') {
                 $connection = config('database.connections.mysql');
                 $sql = $work.'/database.sql';
-
-                if (!is_file($sql)) {
-                    $this->error('MySQL dump is missing from the backup.');
-                    return self::FAILURE;
-                }
 
                 $process = new Process([
                     'mysql',
@@ -281,12 +287,8 @@ class ZazuRestoreCommand extends Command
                 $process->run();
 
                 if (!$process->isSuccessful()) {
-                    $this->error('Database restore failed: '.$process->getErrorOutput());
-                    return self::FAILURE;
+                    throw new \RuntimeException('Database restore failed: '.$process->getErrorOutput());
                 }
-            } else {
-                $this->error('Restore currently supports SQLite and MySQL installations.');
-                return self::FAILURE;
             }
 
             if ($databaseRollback !== null) {
