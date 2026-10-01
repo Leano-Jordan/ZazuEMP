@@ -50,7 +50,7 @@
 </section>
 
 <section class="zazu-card zazu-list mt-5">
-    <div class="zazu-card-header"><div><div class="zazu-eyebrow">Receivables</div><div class="zazu-card-title mt-1">Invoices</div></div><span class="zazu-section-count">{{ $invoices->count() }}</span></div>
+    <div class="zazu-card-header"><div><div class="zazu-eyebrow">Receivables</div><div class="zazu-card-title mt-1">Invoices</div></div><span class="zazu-section-count">{{ $invoices->total() }}</span></div>
     @forelse($invoices as $invoice)
         <div class="zazu-list-item">
             <div class="zazu-list-main">
@@ -68,6 +68,12 @@
         <div class="zazu-empty"><div class="zazu-empty-title">No invoices</div><p class="zazu-empty-copy">Create an invoice from a quote or job.</p></div>
     @endforelse
 </section>
+
+@if ($invoices->hasPages())
+    <div class="zazu-pagination-wrap mt-4">
+        {{ $invoices->links() }}
+    </div>
+@endif
 
 <section class="zazu-detail-grid mt-5">
     <div class="zazu-card zazu-list">
