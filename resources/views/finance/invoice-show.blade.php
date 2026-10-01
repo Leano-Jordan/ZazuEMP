@@ -3,6 +3,12 @@
     <x-slot:heading>Invoice {{ $invoice->number }}</x-slot:heading>
     <x-slot:headerAction>
         <a href="{{ route('finance.index') }}" class="zazu-btn zazu-btn-ghost print-hide">← Finance</a>
+        @if($invoice->event)
+            <a href="{{ route('work.show', $invoice->event) }}" class="zazu-btn zazu-btn-secondary print-hide">Job workspace</a>
+        @endif
+        @if($invoice->status === 'issued')
+            <a href="{{ route('finance.payments.create', ['invoice_id' => $invoice->id]) }}" class="zazu-btn zazu-btn-primary print-hide">Record payment</a>
+        @endif
         <button type="button" class="zazu-btn zazu-btn-primary print-hide" data-zazu-print>Print / Save as PDF</button>
     </x-slot:headerAction>
 
@@ -89,6 +95,26 @@
                 </div>
             </section>
         @endif
+
+        <section class="zazu-panel mt-5 print-hide">
+            <div class="zazu-panel-head">
+                <div>
+                    <div class="zazu-eyebrow">Payment history</div>
+                    <div class="zazu-panel-title mt-1">{{ $invoice->currency }} {{ $invoice->paid_amount }} received · {{ $invoice->currency }} {{ $invoice->balance }} outstanding</div>
+                </div>
+            </div>
+            @forelse($invoice->payments as $payment)
+                <div class="zazu-list-item">
+                    <div class="zazu-list-main">
+                        <div class="zazu-list-title">{{ ucfirst($payment->type) }} · {{ ucfirst(str_replace('_', ' ', $payment->method)) }}</div>
+                        <div class="zazu-list-meta">{{ $payment->paid_at?->format('d M Y') ?: 'Date not set' }} · {{ $payment->reference ?: 'No reference' }}</div>
+                    </div>
+                    <div class="zazu-list-side"><div class="zazu-side-primary">{{ $invoice->currency }} {{ $payment->amount }}</div></div>
+                </div>
+            @empty
+                <div class="zazu-empty">No payments recorded yet.</div>
+            @endforelse
+        </section>
 
         @if($invoice->quote_id)
             <div class="zazu-document-muted mt-4">Source: accepted quote linked to this job. Invoice values preserve the commercial and tax snapshot used when the invoice was issued.</div>
