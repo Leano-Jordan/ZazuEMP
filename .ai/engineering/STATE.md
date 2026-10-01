@@ -388,3 +388,32 @@ Re-audit:
 
 Next target:
 RUNTIME POPULATED WALKTHROUGH — execute the seeded business in the actual browser on desktop and mobile, focusing on rendered inspector, contextual purchasing, inventory attribution, invoice/payment hand-off, reports rendering and populated-content overflow.
+
+
+## Long-sprint page-by-page hardening cycle — 2026-10-01
+
+Target: audit the complete operator surface for solo → growing business usability while tightening reliability foundations without expanding architecture unnecessarily.
+
+Executed:
+- audited public landing/authentication, onboarding, dashboard, Work, requirements, customers/contacts, quotes, purchasing, inventory, assets, preparation, travel, costs, finance, reports, settings/compliance, search, calendar and shared shell;
+- kept surfaces that already met the usability quota instead of adding duplicate cards, modules or navigation;
+- exposed the existing multi-line purchase-order capability in the UI with add/remove lines and live totals;
+- added live quote subtotal/tax/total/deposit checkpoints to quote create and revision surfaces, matching the documented financial-workflow UI rule;
+- added shared duplicate-submit protection for ordinary forms and made browser storage optional/failure-tolerant;
+- preserved job-scoped purchasing context and invoice-scoped payment return paths;
+- extended regression contracts for the new foundations and corrected a test-source write defect found during re-audit;
+- re-read changed files after writes and stopped further source-only mutation once no higher-value safe improvement remained without runtime evidence.
+
+Re-audit:
+- quote financial summary was verified as rendered in both create and revision views after the initial source gap was caught;
+- application/test source contains no flattened AppModels/AppSupport/AppHttp/AppServices tokens;
+- existing business isolation, composite parent/child constraints, lifecycle transactions, idempotency and error containment remain intact;
+- no new navigation authority, permission model, or parallel domain source was introduced.
+
+Verification boundary:
+- repository source is current through the latest main commit;
+- GitHub connector still exposes no usable current workflow-run/status result for the latest main commits;
+- runtime, browser/mobile, migration/upgrade and backup/restore execution remain unobserved because the development PC is off.
+
+Next target:
+**RUNTIME POPULATED WALKTHROUGH / RELEASE EVIDENCE.** Do not continue broad feature or cosmetic expansion until current-head execution exposes the next verified defect.
