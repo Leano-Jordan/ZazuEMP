@@ -68,6 +68,12 @@ The control system now uses:
 
 See `READINESS_REGISTER.md` for live gate direction.
 
+## Current release-candidate head
+
+`52d9b26bc17ddee8d1427032ecaf2fb8fc0b6350`
+
+Current-head evidence: Laravel **202 passed / 1,174 assertions**; browser **7 passed / 8 skipped**; Zazu Quality **passed**; PHPMD **passed**; Psalm **passed** with a narrow Laravel 13.34.0 compatibility shim. Remaining release proof is concentrated in populated workflows, authorization challenge, recovery, upgrade and rollback.
+
 ## Current next-target rule
 
 Select the highest-risk unresolved item that is:
