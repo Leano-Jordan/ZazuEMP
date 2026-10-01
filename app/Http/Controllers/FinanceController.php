@@ -342,7 +342,7 @@ class FinanceController extends Controller
     {
         $businessId = app(CurrentBusiness::class)->id($request->user());
 
-        $invoice->load(['items', 'event.customer.primaryContact', 'quoteVersion']);
+        $invoice->load(['items', 'event.customer.primaryContact', 'quoteVersion', 'payments']);
 
         abort_unless((int) $invoice->business_id === $businessId, 404);
 
@@ -357,6 +357,7 @@ class FinanceController extends Controller
 
         return view('finance.payment-create', [
             'idempotencyKey' => (string) Str::uuid(),
+            'selectedInvoiceId' => $request->integer('invoice_id') ?: null,
             'invoices' => Invoice::where('business_id', $businessId)
                 ->whereNotIn('status', ['paid', 'void'])
                 ->with(['event.customer', 'quoteVersion'])
