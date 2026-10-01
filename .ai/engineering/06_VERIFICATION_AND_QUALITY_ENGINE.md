@@ -293,3 +293,71 @@ A green automated suite with missing required rendered evidence is:
 **AUTOMATED PASS / VISUAL UNVERIFIED**
 
 not a complete UI acceptance.
+
+
+## RENDERED HUMAN-VISUAL EVIDENCE
+
+Human visual quality is a verification layer for UI-affecting work.
+
+UI/UX owns the human-eye critique. Verification owns evidence discipline.
+
+For meaningful rendered changes, verify where applicable:
+- desktop and mobile composition;
+- relevant intermediate responsive states;
+- light/dark themes;
+- empty/populated/error states;
+- overflow and clipping;
+- field sizing;
+- table width and horizontal scanning burden;
+- colour relationships and semantic state visibility;
+- typography hierarchy;
+- alignment and spacing;
+- navigation and primary-action prominence.
+
+A passing browser journey proves exercised behaviour. It does not by itself prove clear, balanced or commercially polished composition.
+
+### Visual finding classes
+
+- V1 — visual defect
+- V2 — UX friction
+- V3 — visual inconsistency
+- V4 — visual quality weakness
+- V5 — creative opportunity
+- V6 — intentional/acceptable
+
+V5 is not automatically a release blocker.
+
+### Width and eye-tracking verification
+
+Do not use "fits on desktop" as the acceptance criterion.
+
+Challenge whether:
+- important table columns remain visible;
+- routine actions stay near the data they affect;
+- long fields are bounded appropriately;
+- secondary detail can move to an inspector/detail surface;
+- mobile avoids becoming a compressed desktop;
+- horizontal overflow is necessary rather than accidental.
+
+### Colour verification
+
+For meaningful theme/colour changes verify:
+- semantic role consistency;
+- foreground/background contrast;
+- focus visibility;
+- status distinction;
+- selected/active states;
+- disabled states;
+- light/dark mapping;
+- absence of competing token authorities.
+
+### Synchronization
+
+Verification returns evidence to Director. It does not maintain a competing decision state.
+
+For UI work, the acceptance state must distinguish:
+**AUTOMATED PASS / VISUAL UNVERIFIED**
+from
+**VISUALLY VERIFIED**.
+
+A green automated suite with missing required rendered evidence does not close the UI target.
