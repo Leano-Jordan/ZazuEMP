@@ -50,6 +50,10 @@ Cross-cutting and automatically active on every UI/UX-affecting task.
 
 Includes the **Human-Eye / Creative Critique** capability. It is not a separate engine.
 
+It covers semantic colour systems, theme relationships, information hierarchy, scan path, field sizing, table width, avoidable horizontal eye tracking, spacing, responsive composition, visual consistency and commercial polish.
+
+Includes the **Human-Eye / Creative Critique** capability. It is not a separate engine.
+
 It owns the expert visual critique layer covering:
 - semantic colour systems and theme relationships;
 - information hierarchy and scan path;
@@ -305,3 +309,37 @@ Rendered evidence is required when the target materially changes the visual inte
 ### Design-system rule
 
 Colour, typography, spacing and component geometry remain under one shared visual authority. Do not create competing page-level palettes or append-only token sweeps.
+
+
+## SINGLE-ENTRY / SYNCHRONIZED ENGINE MODEL
+
+**Director/Morpheus is the sole entry point.**
+
+Specialist engines are synchronized capabilities under Director. They do not maintain competing state, acceptance authority or next-action queues.
+
+Execution:
+DIRECTOR → ROUTE → SPECIALIST → DIRECTOR → CHANGE → VERIFY → DIRECTOR → GUARDIAN → DIRECTOR → ACCEPT/REPAIR → RECORD
+
+For UI work, the owner is not expected to provide UI theory. The UI/UX capability is responsible for applying established principles and surfacing concrete findings.
+
+### Human-eye UI quality
+
+The UI/UX engine must actively challenge:
+- poor semantic colour usage;
+- weak light/dark relationships;
+- unnecessary wide form fields;
+- unnecessarily wide tables;
+- avoidable horizontal scanning;
+- weak grouping and scan paths;
+- poor typography hierarchy;
+- excessive visual noise;
+- generic/generated UI patterns;
+- responsive layouts that technically fit but feel poor.
+
+The objective is lower cognitive load, clearer hierarchy, predictable scanning and efficient work — not decoration.
+
+**AUTOMATED PASS ≠ VISUAL ACCEPTANCE.**
+
+Rendered evidence is required when the visual target materially changes the interface.
+
+One shared visual token authority remains mandatory.
