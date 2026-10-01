@@ -119,7 +119,7 @@ class DemoScenarioSeeder extends Seeder
                 'customer_name' => $customer->name,
                 'customer_phone' => $contact->phone,
                 'customer_email' => $contact->email,
-                'event_date' => now()->addDays(14)->toDateString(),
+                'event_date' => now()->subDay()->toDateString(),
                 'event_address' => 'Pretoria, Gauteng',
                 'notes' => 'Complete seeded scenario covering sales, preparation, purchasing, costs and finance.',
                 'status' => 'completed',
@@ -199,7 +199,7 @@ class DemoScenarioSeeder extends Seeder
         ] as $item) {
             EventPreparationItem::updateOrCreate(
                 ['business_id' => $business->id, 'event_id' => $event->id, 'title' => $item['title']],
-                $item + ['status' => 'completed', 'due_date' => now()->addDays(10)->toDateString(), 'completed_at' => now()]
+                $item + ['status' => 'completed', 'due_date' => now()->subDays(3)->toDateString(), 'completed_at' => now()]
             );
         }
 
