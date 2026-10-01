@@ -434,7 +434,7 @@ class DemoScenarioSeeder extends Seeder
         $purchaseOrder2 = PurchaseOrder::updateOrCreate(
             ['business_id' => $business->id, 'reference' => 'PO-ZAZU-DEMO-002'],
             [
-                'event_id' => $event->id,
+                'event_id' => null,
                 'supplier_id' => $supplier2->id,
                 'idempotency_key' => 'demo-po-zazu-002',
                 'reference' => 'PO-ZAZU-DEMO-002',
@@ -443,7 +443,7 @@ class DemoScenarioSeeder extends Seeder
                 'total_amount' => '1850.00',
                 'ordered_at' => now()->subDay()->toDateString(),
                 'expected_at' => now()->addDays(2)->toDateString(),
-                'notes' => 'Open supplier order for upcoming replenishment.',
+                'notes' => 'Open supplier order for general stock replenishment.',
             ]
         );
         $po2Item = PurchaseOrderItem::updateOrCreate(
