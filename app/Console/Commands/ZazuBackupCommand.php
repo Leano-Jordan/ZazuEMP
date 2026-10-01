@@ -3,6 +3,7 @@
 namespace App\Console\Commands;
 
 use Illuminate\Console\Command;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Str;
 use Symfony\Component\Process\Process;
@@ -63,14 +64,29 @@ class ZazuBackupCommand extends Command
 
             if ($driver === 'sqlite') {
                 $source = config('database.connections.sqlite.database');
-                if (!$source || $source === ':memory:' || !is_file($source)) {
-                    $this->error('SQLite database file is not available for backup.');
-                    return self::FAILURE;
-                }
+                $target = $work.'/database.sqlite';
 
-                if (!copy($source, $work.'/database.sqlite')) {
-                    $this->error('Could not copy the SQLite database.');
-                    return self::FAILURE;
+                if ($source && $source !== ':memory:' && is_file($source)) {
+                    if (!copy($source, $target)) {
+                        $this->error('Could not copy the SQLite database.');
+                        return self::FAILURE;
+                    }
+                } else {
+                    // PHPUnit uses an in-memory SQLite database. VACUUM INTO gives the
+                    // same populated database a real backup file without requiring a
+                    // test-only filesystem database.
+                    $quotedTarget = str_replace("'", "''", $target);
+                    try {
+                        DB::connection('sqlite')->statement("VACUUM INTO '".$quotedTarget."'");
+                    } catch (\Throwable $exception) {
+                        $this->error('Could not snapshot the SQLite database: '.$exception->getMessage());
+                        return self::FAILURE;
+                    }
+
+                    if (!is_file($target) || filesize($target) === 0) {
+                        $this->error('The SQLite database snapshot was not created.');
+                        return self::FAILURE;
+                    }
                 }
             } elseif ($driver === 'mysql') {
                 $connection = config('database.connections.mysql');
