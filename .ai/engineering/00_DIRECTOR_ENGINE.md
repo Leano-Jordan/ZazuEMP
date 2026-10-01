@@ -9,18 +9,11 @@ This is the Zazu engineering control plane.
 
 ## Mission
 
-Turn the owner's objective into **measurable, verified engineering progress** while preventing:
-- project-context contamination;
-- regressions;
-- scope drift;
-- repeated no-op work;
-- contradictory instructions;
-- endless analysis;
-- blind patching.
+Turn the owner's objective into measurable, verified engineering progress while preventing project-context contamination, regressions, scope drift, repeated no-op work, contradictory instructions, endless analysis, blind patching and failure-loop recurrence.
 
 ## Primary responsibility
 
-Morpheus owns **state**, not every implementation detail.
+Morpheus owns state, not every implementation detail.
 
 It must always know:
 - active repository;
@@ -28,145 +21,102 @@ It must always know:
 - current target;
 - changed surface;
 - open findings;
+- active failure cases;
 - failed attempts;
+- rejected hypotheses;
 - verified evidence;
 - next release-risk reduction.
 
-## Continuous execution mode
+## Director V2 — evidence over activity
 
-A broad owner directive creates a mission. Morpheus must continue selecting and executing the next bounded target without requiring the owner to reissue the same command after every cycle.
+A failure is not a new task every time it reappears.
 
-Pause only for a real blocker, required owner decision, authorization for destructive action, or mission completion.
+Before authorizing another correction, Morpheus must:
+1. identify or create the failure case;
+2. fingerprint the observable failure;
+3. classify the verification layer F1–F8;
+4. read previous hypotheses, experiments and rejected approaches;
+5. determine whether materially new evidence exists;
+6. select the next diagnostic layer;
+7. authorize a correction only when evidence supports it.
+
+**No repeated investigation without materially new evidence.**
+
+Persistent case registry: .ai/engineering/FAILURE_CASES.md
 
 ## Operating cycle
 
-1. IDENTITY
-2. BASELINE
-3. TARGET
-4. ROUTE
-5. INSPECT
-6. DESIGN
-7. CHANGE
-8. VERIFY
-9. BREAK
-10. ACCEPT / REPAIR
-11. RECORD
-12. NEXT
+IDENTITY → BASELINE → TARGET → ROUTE → INSPECT → DESIGN → CHANGE → VERIFY → BREAK → ACCEPT/REPAIR → RECORD → NEXT
 
-## Target selection
+For a failing verification cycle:
+OBSERVE → FINGERPRINT → CLASSIFY → LOAD CASE → HYPOTHESIZE → EXPERIMENT → CONFIRM/REJECT → CORRECT → REGRESS → CLOSE/BLOCK
 
-Prioritize:
+## Failure-loop control
 
-**critical business/data/security defect**
-→ **high-risk architectural weakness**
-→ **workflow integrity**
-→ **reliability/recovery**
-→ **commercial completion**
-→ **major UX/operability weakness**
-→ **maintainability/cleanup**
+A failure case receives a stable ID and remains persistent across cycles.
 
-Do not use cosmetic work to hide unresolved correctness or integrity defects.
+### Attempt budget
+- maximum 2 correction attempts per hypothesis;
+- maximum 3 no-progress cycles per case.
+
+After either limit: **STOP PATCHING → FORENSICS / ESCALATION**.
+
+### Escalation order
+1. reproduction;
+2. assertion/test contract;
+3. application path;
+4. fixture/data state;
+5. session/auth/cache/filesystem/runtime;
+6. browser/real workflow;
+7. instrumentation;
+8. architecture/design boundary;
+9. BLOCKED / owner decision.
+
+The Director may skip a layer only when evidence rules it out.
 
 ## No-op / stagnation control
 
-A cycle is invalid when it:
-- repeats a prior finding without new evidence;
-- makes cosmetic changes while the root defect remains;
-- produces another analysis report without implementation/proof;
-- changes files without advancing a target;
-- revisits the same module without a measurable delta.
+A cycle is invalid when it repeats a prior finding without new evidence, repeats a rejected hypothesis, applies a previously failed correction strategy, produces analysis without proof, changes files without advancing a target, or revisits a module without measurable delta.
 
 When this happens:
-- compare with the prior cycle;
+- load the failure case;
+- compare fingerprint and prior evidence;
 - invoke FORENSICS if causality is unclear;
-- otherwise move to the next gate.
+- otherwise escalate to the next diagnostic layer;
+- never manufacture another patch to keep the cycle moving.
+
+## State contamination gate
+
+Before blaming application code, check database/fixture state, session/authentication state, cache, compiled views/assets, browser storage, filesystem/uploads, queue/job state, prior test mutation and environment/runtime configuration.
+
+If plausible, isolate and reproduce first.
+
+## Known-good checkpoint
+
+Meaningful experiments should start from a known-good checkpoint where practical: HEAD, relevant data/fixture state, authentication state, configuration, passing narrow check and runtime state where relevant.
+
+Do not stack speculative fixes on contaminated state.
 
 ## Handoffs
 
-### Discovery → Builder
-Provide:
-- observed behaviour;
-- desired behaviour;
-- affected surfaces;
-- invariants;
-- architecture boundary;
-- acceptance criteria;
-- risks.
-
 ### Builder → Guardian
-Provide:
-- baseline;
-- changed files;
-- behavioural delta;
-- verification performed;
-- uncertainty;
-- blast radius.
+
+Provide baseline, changed files, behavioural delta, verification performed, uncertainty, blast radius and failure case ID when applicable.
 
 ### Guardian → Builder
-Provide:
-- concrete failure/evidence;
-- root-cause hypothesis;
-- affected surface;
-- regression mechanism;
-- correction required.
 
-### Guardian → Release
-Escalate release-significant risk or evidence gaps.
+Provide concrete failure/evidence, failure case ID, root-cause hypothesis, affected surface, regression mechanism, correction required and rejected approaches that must not be repeated.
 
 ## Stop conditions
 
-Stop and mark BLOCKED when:
-- repository identity is uncertain;
-- required product policy is genuinely undefined;
-- destructive action lacks authorization;
-- evidence contradicts the intended change;
-- repeated attempts cannot establish a safe correction.
+Stop and mark BLOCKED when repository identity is uncertain, required product policy is undefined, destructive action lacks authorization, evidence contradicts the intended change, the failure case exceeds its budget, repeated attempts cannot establish a safe correction, or required runtime/CI evidence is unavailable for a release claim.
 
 Do not generate activity merely to appear productive.
 
+## Green-test rule
+
+A green automated test proves only the verification layer it exercised. It does not automatically prove browser behaviour, populated runtime behaviour, recovery, CI execution, cross-role authorization or commercial acceptance.
+
 ## Output
 
-Default result:
-- target;
-- changed;
-- verification;
-- regression disposition;
-- readiness impact;
-- next target.
-
-
-
-## Director revelation — progressive disclosure + capability architecture — 2026-10-01
-
-The latest external design review produced a durable UX principle: **complexity should exist underneath the interface, not in front of the user.**
-
-### Progressive disclosure standard
-Zazu must not remove capability merely to appear simple. Information is surfaced in layers:
-1. Primary — task-relevant information/action is immediately visible.
-2. Expandable — useful detail appears through an accordion, expandable row, card or disclosure control.
-3. Advanced — deeper operational/financial/configuration detail remains available without dominating the default view.
-4. Specialist — rare compliance, tender, administrative and power-user controls stay contextual.
-
-Do not force a literal Basic/Pro switch onto every page. Basic/Intermediate/Advanced remains an experience preference; progressive disclosure is the UI mechanism.
-
-### Disclosure pattern selection
-- Accordion: grouped forms/settings.
-- Row expansion: records such as customers, inventory, assets and quotes.
-- Expandable summary/card: dashboards and job/event summaries.
-- Sticky summary: consequential workflows, especially quotes, where financial totals should remain visible.
-
-### Context-first rule
-Surface information around the user's actual business object or task. A job/event should expose customer, services, preparation, purchasing, resources, costs and finance context without requiring database/domain literacy.
-
-### Landing-page visual rule
-The public landing page is a brand/identity surface, not the operational dashboard. Development-stage visual experimentation, custom artwork, photography, mascot concepts and other aesthetic material may remain while the product is being shaped. Release requires a separate asset/IP/license audit; do not remove useful design exploration merely because it is not yet release-cleared.
-
-### External capability rule
-Open-source libraries/APIs are enhancements, not dependencies for core offline business operations. Core workflows must remain usable without optional online services where local-first architecture supports that.
-
-Every proposed dependency must record capability, library/API, exact license, data egress, offline behaviour, product surface, security/privacy impact, release priority and replacement/removal path.
-
-Never describe a library as an API, or an API as a library, without checking the actual integration model and current license.
-
-### Director execution consequence
-Future UI work must first classify information as primary / expandable / advanced / specialist before adding another visible panel, card, table or navigation destination. Shared UI changes require responsive, accessibility and blast-radius review.
+Default result: target; failure case(s); changed; verification; regression disposition; readiness impact; remaining uncertainty; next target.
