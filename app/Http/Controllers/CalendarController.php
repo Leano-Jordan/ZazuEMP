@@ -33,7 +33,12 @@ class CalendarController extends Controller
 
         $monthEvents = $events->flatten(1);
         $statusCounts = $monthEvents->groupBy('status')->map->count();
-        $attentionCount = ($statusCounts->get('draft', 0) + $statusCounts->get('cancelled', 0));
+        $attentionCount = $statusCounts->get('draft', 0);
+        $isCurrentMonth = $month->isSameMonth(now());
+        $agendaStart = $isCurrentMonth ? now()->startOfDay() : $month->copy()->startOfMonth();
+        $upcomingCount = $monthEvents
+            ->filter(fn ($event) => $event->event_date->gte($agendaStart))
+            ->count();
 
         return view('calendar.index', [
             'month' => $month,
@@ -43,8 +48,10 @@ class CalendarController extends Controller
             'days' => $days,
             'eventsByDate' => $events,
             'monthEventCount' => $monthEvents->count(),
+            'upcomingCount' => $upcomingCount,
             'confirmedCount' => $statusCounts->get('confirmed', 0),
             'attentionCount' => $attentionCount,
+            'isCurrentMonth' => $isCurrentMonth,
         ]);
     }
 
