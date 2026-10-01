@@ -322,3 +322,29 @@ or the supporting capabilities:
 **Experience Level + Navigation + Search + Zazu Helper + Responsive UX**
 
 A difference between the specification and current code is not automatically a defect. The clearest example is the Planned event state: it remains a product decision until a business requirement demonstrates the need for a separate state.
+
+
+## 20. Commercial packaging alignment — Director 2026-10-02
+
+The capability map now has a commercial overlay. Commercial tiers are not separate products; they are increasing levels of operational depth.
+
+### Basic — R299 working hypothesis
+Core organisation and essential commercial workflow. Current source baseline is materially present; release proof remains required.
+
+### Professional — R499 working hypothesis
+The first major commercial expansion. The required bridge is:
+**Event → Quote → Deposit → Invoice → Payment → Purchasing → Receiving → Costs → Profit → Export**
+
+Current foundations are present across these domains, but the end-to-end populated proof, profitability clarity, spreadsheet export and remaining import coverage must be closed before this tier is considered fully defensible.
+
+### Business — R799 working hypothesis
+Team and operational management. Roles/permissions foundations exist; assignment, management attention, notifications/reminders and stronger management controls remain material gaps.
+
+### Business Plus — R1,299 working hypothesis
+Advanced complexity management. Advanced profitability, resource capacity, management intelligence, multi-location/equivalent multi-unit control and advanced migration remain post-core work.
+
+### Commercial boundary rule
+A feature should enter a higher tier because it creates meaningful additional business value, not because an arbitrary record limit was introduced.
+
+### Current commercial priority
+**Do not build the R799/R1,299 surface ahead of the R299 → R499 bridge.**
