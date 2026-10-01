@@ -4,7 +4,7 @@
 **Last Director update:** 2026-10-01  
 **Repository:** `Leano-Jordan/ZazuEMP`  
 **Branch:** `main`  
-**Current HEAD:** `c83474e1e32ca8c29950eac3723b854c163e5786`
+**Current HEAD:** `52d9b26bc17ddee8d1427032ecaf2fb8fc0b6350`
 
 ## Authority rule
 
@@ -39,20 +39,20 @@ This file is the **single authoritative V1 release-gate ledger**.
 | Roles / permissions | ✅ Implemented | 🟡 Full protected-action audit |
 | Auditability | ✅ Implemented | 🟡 End-to-end mutation trace |
 | Experience level | ✅ Implemented | 🟡 Fresh-account traversal |
-| Runtime regression suite | ✅ Test infrastructure exists | 🔴 Current-head full-suite proof outstanding |
+| Runtime regression suite | ✅ Implemented | 🟢 Current-head Laravel suite: 202 passed / 1,174 assertions |
 
 # Gate 2 — Onboarding
 
 | Area | Current state | Release proof |
 |---|---|---|
-| Registration → catalogue/setup | ✅ Implemented | 🟡 Fresh browser run |
-| Basic / Intermediate / Advanced | ✅ Implemented | 🟡 Current-head runtime |
-| Business identity/setup | ✅ Implemented | 🟡 Current-head runtime |
+| Registration → catalogue/setup | ✅ Implemented | 🟢 Current-head browser journey passed |
+| Basic / Intermediate / Advanced | ✅ Implemented | 🟢 Intermediate onboarding exercised in current-head browser run |
+| Business identity/setup | ✅ Implemented | 🟢 Current-head browser journey passed |
 | Deferral/resume behaviour | ✅ Implemented | 🟡 Current-head runtime |
 | Experience-level changes | ✅ Implemented | 🟡 Current-head runtime |
-| Orphan-account workspace recovery | ✅ Implemented | 🟢 Previously CI-verified; revalidate on release candidate |
-| Desktop onboarding | ✅ Implemented | 🟡 Current-head browser proof |
-| Mobile onboarding | ✅ Implemented | 🟡 Current-head browser proof |
+| Orphan-account workspace recovery | ✅ Implemented | 🟢 Current-head Laravel suite passes recovery coverage |
+| Desktop onboarding | ✅ Implemented | 🟢 Current-head browser journey passed |
+| Mobile onboarding | ✅ Implemented | 🟡 Responsive entry smoke passed; full registration journey remains Chromium-only |
 
 # Gate 3 — Core operations
 
@@ -225,20 +225,19 @@ These remain outside V1 unless a verified release requirement proves they are ne
 
 The repository contains earlier CI/browser evidence for the access/onboarding path, including a successful targeted browser traversal. That evidence is retained as historical proof but does **not** automatically certify the current HEAD.
 
-The current Director inspection found that the GitHub connector does not provide usable current-main workflow completion evidence, and the development PC was not available. Therefore current-head runtime, populated-data, migration/upgrade and backup/restore claims remain open.
+Current-head evidence is now available on the release candidate: Laravel **202 passed / 1,174 assertions**, browser **7 passed / 8 skipped**, Zazu Quality **passed**, PHPMD **passed**, and Psalm **passed** using the narrow Laravel 13.34.0 compatibility shim. Fresh migration/build/Blade/asset-manifest checks also passed. Populated-data workflow proof, full authorization challenge, backup/restore, representative upgrade and rollback remain open.
 
 ## Immediate execution priority
 
-**Release Gate Sprint:**
+**Release Gate Sprint — remaining:**
 
-1. Current-head CI/build/static evidence
-2. Populated end-to-end workflow
-3. Commercial reconciliation
-4. Authorization/security challenge
-5. Desktop/mobile/tablet QA + accessibility
-6. Backup/restore
-7. Populated upgrade
-8. Rollback exercise
-9. Final Director re-audit
+1. Populated end-to-end business workflow
+2. Commercial reconciliation: quote → acceptance → invoice → deposit/payment
+3. Authorization/security challenge
+4. Desktop/mobile/tablet critical workflow + accessibility verification
+5. Real backup/restore + private-media recovery
+6. Representative populated-database upgrade
+7. Rollback exercise
+8. Final Director re-audit
 
 No broad feature expansion should displace these gates while any Critical item remains open.
