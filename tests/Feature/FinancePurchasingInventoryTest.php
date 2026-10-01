@@ -787,4 +787,71 @@ class FinancePurchasingInventoryTest extends TestCase
     }
 
 
+
+    public function test_received_purchase_order_rejects_further_receipts(): void
+    {
+        [$business, $user] = $this->businessUser();
+        $this->actingAs($user);
+
+        $supplier = AppModelsSupplier::create([
+            'business_id' => $business->id,
+            'name' => 'Received Order Supplier',
+        ]);
+
+        $this->post(route('purchasing.store'), [
+            'supplier_id' => $supplier->id,
+            'currency' => 'ZAR',
+            'description' => ['Plates'],
+            'quantity' => ['10'],
+            'unit' => ['units'],
+            'unit_price' => ['25.00'],
+            'capability_id' => [''],
+        ])->assertRedirect();
+
+        $order = AppModelsPurchaseOrder::firstOrFail();
+
+        $this->patch(route('purchasing.status', $order), ['status' => 'sent'])->assertRedirect();
+        $this->patch(route('purchasing.status', $order), ['status' => 'ordered'])->assertRedirect();
+
+        $this->post(route('purchasing.receive', $order), [
+            'idempotency_key' => (string) Str::uuid(),
+            'received_quantity' => [$order->items()->first()->id => '10'],
+        ])->assertRedirect();
+
+        $this->assertSame('received', $order->fresh()->status);
+
+        $this->post(route('purchasing.receive', $order), [
+            'idempotency_key' => (string) Str::uuid(),
+            'received_quantity' => [$order->items()->first()->id => '1'],
+        ])->assertStatus(422);
+
+        $this->assertDatabaseCount('inventory_movements', 1);
+    }
+
+    public function test_inventory_issue_form_exposes_active_jobs_for_attribution(): void
+    {
+        [$business, $user] = $this->businessUser();
+        $this->actingAs($user);
+
+        $event = Event::create([
+            'business_id' => $business->id,
+            'reference' => 'EVT-STOCK-001',
+            'name' => 'Stock Allocation Job',
+            'event_date' => now()->addDays(3)->toDateString(),
+            'status' => 'confirmed',
+        ]);
+
+        AppModelsInventoryItem::create([
+            'business_id' => $business->id,
+            'name' => 'Serving Trays',
+            'unit' => 'unit',
+            'reorder_level' => 2,
+        ]);
+
+        $this->get(route('inventory.index'))
+            ->assertOk()
+            ->assertSee('General stock issue')
+            ->assertSee('EVT-STOCK-001 · Stock Allocation Job');
+    }
+
 }
