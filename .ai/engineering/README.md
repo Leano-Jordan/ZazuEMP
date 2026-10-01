@@ -48,6 +48,9 @@ Morpheus owns engineering state, target selection, routing, scope control, cycle
 **05 — UI/UX IMPROVEMENT**
 Cross-cutting and automatically active on every UI/UX-affecting task.
 
+**06 — VERIFICATION & QUALITY**
+Independent verification orchestration across PHPUnit, Playwright, UI/accessibility checks, static analysis, CI/YAML, dependencies and runtime evidence. It classifies failures before application correction.
+
 ## AUTHORITY
 
 For engineering execution:
@@ -160,6 +163,14 @@ The system prioritizes:
 - documentation/ownership/compliance;
 - release evidence.
 
+## VERIFICATION PHILOSOPHY
+
+Tests remain evidence, but verification is broader than tests. Every failed check must be classified before the Builder changes application code.
+
+Owner-added code-review tests are first-class regression evidence.
+
+GitHub workflow YAML is part of the engineering surface and must be inspected when CI/release evidence is relevant.
+
 ## TEST PHILOSOPHY
 
 Tests are a verification instrument, not the progress metric.
@@ -177,6 +188,8 @@ A higher test count with unchanged engineering risk does not constitute meaningf
 - `READINESS_REGISTER.md` — commercial-readiness gates
 - `TASK_PACKET.md` — cycle contract
 - specialist engine contracts
+- `06_VERIFICATION_AND_QUALITY_ENGINE.md` — verification and failure classification
+- `../docs/ZAZU_TEST_AND_QUALITY_MATRIX.md` — current evidence map
 
 ## COMPLETION VOCABULARY
 
