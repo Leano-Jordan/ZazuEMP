@@ -552,6 +552,18 @@ class FinancePurchasingInventoryTest extends TestCase
             ->assertForbidden();
 
         $this->actingAs($manager)
+            ->post(route('finance.invoices.store'), [])
+            ->assertForbidden();
+
+        $this->actingAs($manager)
+            ->post(route('finance.payments.store'), [])
+            ->assertForbidden();
+
+        $this->actingAs($manager)
+            ->post(route('finance.expenses.store'), [])
+            ->assertForbidden();
+
+        $this->actingAs($manager)
             ->get(route('settings.index'))
             ->assertForbidden();
 
