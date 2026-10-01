@@ -40,8 +40,7 @@ jobs:
           from pathlib import Path
           path = Path("vendor/laravel/framework/src/Illuminate/Collections/Collection.php")
           text = path.read_text()
-          marker = r"     * @phpstan-this-out ($key is null ? static<TKey|int, TValue> : $this)
-"
+          marker = "     * @phpstan-this-out ($key is null ? static<TKey|int, TValue> : $this)\\n"
           found = text.count(marker)
           if found != 1:
               raise SystemExit(f"Expected exactly one unsupported Laravel annotation, found {found}")
