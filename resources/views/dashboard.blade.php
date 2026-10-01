@@ -133,11 +133,26 @@
 
         @if($experienceLevel !== 'basic')
         <section class="zazu-dash-resources zazu-dash-surface">
-            <header class="zazu-dash-surface-head"><div><span class="zazu-dash-kicker">Resource readiness</span><h3>Equipment &amp; stock</h3><p>Operational resource state remains authoritative in the asset register.</p></div>@if($workspaceTools['assets'])<a href="{{ route('assets.index') }}" class="zazu-text-action">Asset register →</a>@endif</header>
+            <header class="zazu-dash-surface-head">
+                <div><span class="zazu-dash-kicker">Resource readiness</span><h3>Equipment, stock &amp; money</h3><p>Live counts from the workspace show where an established business needs attention.</p></div>
+                <div class="flex flex-wrap gap-2">
+                    @if($workspaceTools['assets'])<a href="{{ route('assets.index') }}" class="zazu-text-action">Asset register →</a>@endif
+                    @if($workspaceTools['inventory'])<a href="{{ route('inventory.index') }}" class="zazu-text-action">Stock control →</a>@endif
+                </div>
+            </header>
             <div class="zazu-dash-resource-grid">
-                <div><span class="zazu-resource-dot"></span><strong>Allocation</strong><small>Tracked per asset</small></div>
-                <div><span class="zazu-resource-dot"></span><strong>Hire availability</strong><small>Tracked per asset</small></div>
-                <div><span class="zazu-resource-dot"></span><strong>Warehouse readiness</strong><small>Tracked in asset status</small></div>
+                @if($workspaceTools['purchasing'])
+                    <a href="{{ route('purchasing.index') }}" class="zazu-quick-link"><span><strong>Open purchase orders</strong><small class="block opacity-70">Supplier commitments still in motion</small></span><strong>{{ number_format($metrics['open_purchase_orders']) }}</strong></a>
+                @endif
+                @if($workspaceTools['inventory'])
+                    <a href="{{ route('inventory.index') }}" class="zazu-quick-link"><span><strong>Low-stock items</strong><small class="block opacity-70">At or below reorder level</small></span><strong>{{ number_format($metrics['low_stock']) }}</strong></a>
+                @endif
+                @if($workspaceTools['assets'])
+                    <a href="{{ route('assets.index') }}" class="zazu-quick-link"><span><strong>Available assets</strong><small class="block opacity-70">Ready for allocation</small></span><strong>{{ number_format($metrics['available_assets']) }}</strong></a>
+                @endif
+                @if($workspaceTools['finance'])
+                    <a href="{{ route('finance.index') }}" class="zazu-quick-link"><span><strong>Unpaid invoices</strong><small class="block opacity-70">Issued invoices with a balance</small></span><strong>{{ number_format($metrics['unpaid_invoices']) }}</strong></a>
+                @endif
             </div>
         </section>
         @endif
