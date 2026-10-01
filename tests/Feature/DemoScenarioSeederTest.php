@@ -82,6 +82,12 @@ class DemoScenarioSeederTest extends TestCase
             ->assertSee('DEP-ZAZU-DEMO-001')
             ->assertSee('BAL-ZAZU-DEMO-001');
 
+        $this->get(route('finance.index'))
+            ->assertOk()
+            ->assertSee('New invoice')
+            ->assertSee('Record payment')
+            ->assertSee('New expense');
+
         $this->get(route('reports.index'))
             ->assertOk()
             ->assertSee('Financial snapshot')
@@ -89,7 +95,7 @@ class DemoScenarioSeederTest extends TestCase
             ->assertSee('Outstanding')
             ->assertSee('ZAR');
 
-        $this->assertStringNotContainsString('</section>\n\n    </section>', $this->get(route('work.show', $po->event))->getContent());
+        $this->assertStringNotContainsString("</section>\n\n    </section>", $this->get(route('work.show', $po->event))->getContent());
     }
 
     public function test_demo_scenario_is_idempotent_when_seeded_again(): void
