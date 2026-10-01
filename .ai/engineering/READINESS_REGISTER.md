@@ -126,3 +126,18 @@ AUTH-ROLE-001 — Seeded manager role has no permission mapping
 The populated business financial chain is source-consistent at ZAR 11,500.00 total with ZAR 3,450.00 deposit plus ZAR 8,050.00 final payment. This remains source evidence only until executed against a current runtime.
 
 Current Security maturity remains 4/5: automated isolation/authorization foundations exist, but the final adversarial challenge and role-policy closure remain outstanding.
+
+## Manager role policy closure — 2026-10-01
+
+**AUTH-ROLE-001 RESOLVED AT SOURCE:** the previously seeded `manager` role now has an explicit permission matrix.
+
+Manager policy:
+- operational dashboard/calendar/work/customer/quote/purchasing/inventory/assets/supplier/report capabilities;
+- Finance view only;
+- no invoice creation, payment recording or expense creation;
+- no work deletion;
+- owner-only settings/catalogue/administration boundaries remain enforced.
+
+Regression coverage has been added for representative allowed and denied manager routes plus direct permission resolution.
+
+**Release status:** role-policy gap closed. Final authorization certification remains pending runtime/adversarial execution, not source implementation.
