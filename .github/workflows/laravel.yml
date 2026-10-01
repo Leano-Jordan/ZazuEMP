@@ -39,10 +39,15 @@ jobs:
     - name: Verify built asset manifest
       run: |
         php -r '$manifest = json_decode(file_get_contents("public/build/manifest.json"), true, 512, JSON_THROW_ON_ERROR); foreach ($manifest as $entry) { if (isset($entry["file"]) && !is_file("public/build/".$entry["file"])) { fwrite(STDERR, "Missing built asset: ".$entry["file"].PHP_EOL); exit(1); } } echo "Asset manifest verified.".PHP_EOL;'
+    - name: Validate application configuration
+      run: |
+        php artisan config:cache
+        php artisan config:clear
     - name: Create Database
       run: |
         mkdir -p database
         touch database/database.sqlite
+        php artisan migrate --force
     - name: Execute tests (Unit and Feature tests) via PHPUnit/Pest
       env:
         DB_CONNECTION: sqlite
