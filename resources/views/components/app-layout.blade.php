@@ -21,7 +21,13 @@
     <title>{{ $title ?? 'Zazu' }} · {{ $business?->name ?? 'Zazu EMP' }}</title>
     <script>
         (() => {
-            const saved = localStorage.getItem('zazu-theme');
+            let saved = null;
+            try {
+                saved = window.localStorage.getItem('zazu-theme');
+            } catch {
+                // Browser privacy/storage restrictions must not prevent the page from rendering.
+            }
+
             const theme = saved === 'light' || saved === 'dark'
                 ? saved
                 : (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
