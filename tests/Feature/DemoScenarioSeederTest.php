@@ -22,6 +22,7 @@ class DemoScenarioSeederTest extends TestCase
 
         $this->assertSame('accepted', $invoice->quote->status);
         $this->assertSame('accepted', $invoice->quoteVersion->status);
+        $this->assertTrue($invoice->quoteVersion->matchesRequirements($invoice->event->requirements));
         $this->assertSame('11500.00', (string) $invoice->total);
         $this->assertSame('11500.00', (string) $invoice->paid_amount);
         $this->assertSame('0.00', (string) $invoice->balance);
@@ -35,6 +36,13 @@ class DemoScenarioSeederTest extends TestCase
             'reference' => 'PO-ZAZU-DEMO-001',
             'status' => 'received',
         ]);
+        $this->assertDatabaseHas('purchase_orders', [
+            'reference' => 'PO-ZAZU-DEMO-002',
+            'status' => 'ordered',
+        ]);
+        $this->assertDatabaseHas('inventory_items', ['sku' => 'INV-CHAFER-001']);
+        $this->assertDatabaseHas('assets', ['asset_tag' => 'AST-TENT-001']);
+        $this->assertDatabaseHas('compliance_documents', ['title' => 'Public liability insurance']);
         $this->assertDatabaseHas('events', [
             'reference' => 'ZAZU-DEMO-001',
             'event_date' => now()->subDay()->toDateString(),
