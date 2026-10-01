@@ -55,6 +55,7 @@
                 };
                 $statusLabel = str_replace('_', ' ', ucfirst($event->status));
                 $contact = $event->eventDayContact?->name ?? $event->eventNightContact?->name ?? null;
+                $guestRequirement = $event->requirements->first(fn ($requirement) => in_array(strtolower((string) $requirement->unit), ['guest', 'guests'], true));
             @endphp
             <article class="zazu-ops-row" data-zazu-job-row>
                 <button type="button" class="zazu-ops-row-main" data-zazu-inspector-open aria-label="Inspect {{ $event->name }}">
@@ -68,7 +69,7 @@
                     </span>
                     <span class="zazu-ops-function">
                         <strong>{{ $event->event_type ?: 'Event' }}</strong>
-                        <small>Guest headcount not recorded</small>
+                        <small>{{ $guestRequirement ? number_format((float) $guestRequirement->quantity, 0).' guests' : 'Guest headcount not recorded' }}</small>
                     </span>
                     <span class="zazu-ops-date">
                         <strong>{{ $event->event_date?->format('d M Y') ?? 'Date not set' }}</strong>
@@ -166,7 +167,7 @@
                         <section data-inspector-tab="finance">
                             <div class="zazu-inspector-section-title">Financial position</div>
                             <div class="zazu-inspector-finance">
-                                <div><span>Quote</span><strong>{{ $latestQuoteVersion ? $latestQuoteVersion->status.' · '.$event->quotes->first()?->currency : 'Not quoted' }}</strong></div>
+                                <div><span>Quote</span><strong>{{ $latestQuoteVersion ? ucfirst($latestQuoteVersion->status).' · '.$latestQuote?->currency : 'Not quoted' }}</strong></div>
                                 <div><span>Quote total</span><strong>{{ $latestQuoteVersion ? $latestQuote?->currency.' '.$latestQuoteVersion->total : 'Not quoted' }}</strong></div>
                                 <div><span>Deposit</span><strong>{{ $latestQuoteVersion ? $latestQuoteVersion->deposit_percent.'% · '.$latestQuote?->currency.' '.$latestQuoteVersion->deposit_amount : 'Not set' }}</strong></div>
                                 <div><span>Invoice</span><strong>{{ $latestInvoice ? $latestInvoice->number.' · '.ucfirst($latestInvoice->status) : 'Not invoiced' }}</strong></div>
