@@ -87,3 +87,13 @@ For future product-direction decisions:
 **Research → inspect current Zazu implementation → propose small evidence-based direction → get owner decision → consolidate here → only then plan implementation.**
 
 This log is a product-direction source of truth, not permission to execute a rewrite.
+
+
+## Approved role authority baseline — 2026-10-01
+
+The Zazu authority model is explicitly separate from experience level:
+- **Owner:** full business authority, including owner-only administration and financial mutations.
+- **Manager:** day-to-day operational authority across customers, work, quotes, purchasing, inventory, assets, suppliers and operational reports; finance is view-only; work deletion and owner administration remain restricted.
+- **Staff:** operational execution according to the existing staff permission matrix; finance remains view-only and owner-only administration remains restricted.
+
+Basic / Intermediate / Advanced remains an experience-level setting, never a permission level.
