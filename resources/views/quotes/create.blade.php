@@ -123,9 +123,20 @@
             </div>
 
             <aside class="zazu-form-aside">
+                <div class="zazu-context-card zazu-financial-summary" data-quote-summary>
+                    <div class="zazu-context-title">Live quote summary</div>
+                    <div class="zazu-context-copy">Use this as a quick check before saving. Zazu recalculates the final figures from the saved quote data.</div>
+                    <dl class="zazu-financial-summary-list">
+                        <div><dt>Subtotal</dt><dd data-quote-subtotal>{{ $defaultCurrency }} 0.00</dd></div>
+                        <div><dt>Tax</dt><dd data-quote-tax>{{ $defaultCurrency }} 0.00</dd></div>
+                        <div class="is-total"><dt>Total</dt><dd data-quote-total>{{ $defaultCurrency }} 0.00</dd></div>
+                        <div><dt>Deposit</dt><dd data-quote-deposit>{{ $defaultCurrency }} 0.00</dd></div>
+                    </dl>
+                </div>
+
                 <div class="zazu-context-card">
                     <div class="zazu-context-title">Commercial position</div>
-                    <div class="zazu-context-copy">This foundation establishes the quote identity, version and historical line snapshot before tax, travel and richer costing are attached.</div>
+                    <div class="zazu-context-copy">This quote records the current job requirements as a historical commercial snapshot before later revisions or downstream finance actions.</div>
 
                     <div class="zazu-step-list">
                         <div class="zazu-step"><span class="zazu-step-dot"></span><div><div class="zazu-step-title">Requirements</div><div class="zazu-step-copy">Source record</div></div></div>
