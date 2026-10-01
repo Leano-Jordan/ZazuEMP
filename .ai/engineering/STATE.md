@@ -449,3 +449,37 @@ Readiness impact: the observed source/test regressions are closed. Automated evi
 
 Next target:
 **RUNTIME POPULATED WALKTHROUGH / RELEASE EVIDENCE.**
+
+
+## Director control correction cycle — 2026-10-01
+
+Target: eliminate repeated execution failures caused by weak verification orchestration, branch residue and competing UI token authorities.
+
+Completed:
+- added 06_VERIFICATION_AND_QUALITY_ENGINE.md;
+- added docs/ZAZU_TEST_AND_QUALITY_MATRIX.md;
+- formalized F1–F8 failure classification before application correction;
+- made owner-added code-review tests first-class regression evidence;
+- made GitHub workflow/YAML inspection part of relevant verification work;
+- established main-only Director execution by default;
+- consolidated the repeated root-token blocks in resources/css/zazu-final-visual-sweep.css into one light root and one dark root, preserving the latest declared value for each token;
+- strengthened the UI/UX engine so visual changes must use one shared token authority and require rendered theme/responsive verification.
+
+Observed repository branch state during audit:
+- main;
+- director/calendar-ux-refinement;
+- director/ci-test-hardening;
+- director/diagnostic-release-gates;
+- director/psalm-ci-hardening;
+- revert-12-hardening/process-cross-domain-2026-09-28.
+
+The Director will not create additional temporary branches. Existing branch cleanup remains a repository-ref cleanup task because the connected GitHub action surface available to this execution does not expose branch deletion.
+
+Verification boundary:
+- repository source changes were written to main and re-read through GitHub operations;
+- current workflow-run evidence remains unavailable through the connected workflow-run inspection path;
+- local browser rendering remains required for visual acceptance;
+- the consolidated CSS token layer is source-verified but not rendered-verified.
+
+Next target:
+**CURRENT-HEAD VERIFICATION RECONNAISSANCE** — inspect the exact current main workflows/tests and consume actual run evidence before further application mutation.
