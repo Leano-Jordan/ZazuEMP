@@ -483,3 +483,31 @@ Verification boundary:
 
 Next target:
 **CURRENT-HEAD VERIFICATION RECONNAISSANCE** — inspect the exact current main workflows/tests and consume actual run evidence before further application mutation.
+
+## Director populated workflow + authorization challenge — 2026-10-01
+
+Target: execute the populated business walkthrough and challenge the role, permission and business-isolation boundaries using the current main source of truth.
+
+Current main head observed: ebdebe9365181c1632dcbb804c51fd0905785a76.
+
+Populated walkthrough result:
+- The seeded Zazu Demo Catering fixture contains a connected Customer → Job/Event → Requirements → Quote → accepted version → Preparation → Purchasing → Inventory/Assets → Invoice → Deposit/Payment → Reports chain.
+- The financial chain reconciles at source level: invoice total ZAR 11,500.00, deposit ZAR 3,450.00, balance payment ZAR 8,050.00, paid total ZAR 11,500.00 and balance ZAR 0.00.
+- The received event PO is closed to further receiving; the second PO is deliberately general stock replenishment rather than attached to completed work.
+- Demo seeding is idempotent and existing populated-surface regression coverage exercises dashboard, Work, purchasing, invoice/payment and reports relationships.
+
+Authorization challenge result:
+- Owner authorization path is explicitly supported by the current permission architecture.
+- Staff owner-only boundaries are covered by existing tests for owner dashboard, settings, catalogue and finance mutation access.
+- Active-business isolation and foreign-business route/model boundaries are structurally enforced.
+- AUTH-ROLE-001 found: the populated demo seeds an Operations Manager membership with role manager, but config/zazu.php currently defines a permission set only for staff; PermissionService therefore resolves the manager to an empty permission set.
+- This is an authorization-completeness / role-model consistency blocker for multi-role release certification. It does not by itself demonstrate privilege escalation.
+- Safe release disposition: do not certify the manager role until the role is explicitly mapped to permissions or the seeded/demo role is changed to a supported role.
+
+Verification boundary:
+- GitHub source evidence was observed on the current main head.
+- No live deployment URL and no local Laravel/browser runtime are available through this execution, so the literal rendered populated walkthrough and adversarial HTTP/browser responses are UNVERIFIED, not green.
+- Historical/current-head test claims in repository documentation are not substituted for direct execution against this latest commit.
+
+Next target:
+ROLE POLICY CLOSURE → RUNTIME POPULATED WALKTHROUGH → FULL AUTHORIZATION/ISOLATION CHALLENGE.
