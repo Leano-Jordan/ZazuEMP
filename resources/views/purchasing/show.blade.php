@@ -9,24 +9,28 @@
 <section class="zazu-detail-grid"><div class="zazu-card"><div class="zazu-card-header"><div class="zazu-eyebrow">Purchase order</div><div class="zazu-card-title mt-1">{{ $purchaseOrder->supplier->name }}</div></div><div class="p-5 grid gap-3"><div><strong>Status:</strong> {{ ucfirst($purchaseOrder->status) }}</div><div><strong>Job:</strong> {{ $purchaseOrder->event?->name ?: 'General purchase' }}</div><div><strong>Expected:</strong> {{ $purchaseOrder->expected_at?->format('d M Y') ?: 'Not set' }}</div><div><strong>Total:</strong> {{ $purchaseOrder->currency }} {{ $purchaseOrder->total_amount }}</div></div></div>
 <section class="zazu-panel">
     <div class="zazu-eyebrow">Receiving</div>
-    <div class="zazu-panel-title mt-1">Receive goods</div>
-    <div class="zazu-panel-copy">Record what actually arrived. Zazu prevents receiving more than ordered and keeps partial receipts in inventory history.</div>
-    <form method="POST" action="{{ route('purchasing.receive', $purchaseOrder) }}" class="zazu-form mt-4">
-        @csrf
-        <input type="hidden" name="idempotency_key" value="{{ (string) \Illuminate\Support\Str::uuid() }}">
-        @foreach($purchaseOrder->items as $item)
-            <label class="zazu-field">
-                <span class="zazu-label">{{ $item->description }}</span>
-                <span class="zazu-field-help">Ordered {{ number_format((float)$item->quantity, 2) }} {{ $item->unit ?: 'units' }} · Received {{ number_format((float)$item->received_quantity, 2) }}</span>
-                <input type="number" name="received_quantity[{{ $item->id }}]" min="0" max="{{ $item->quantity - $item->received_quantity }}" step="0.01" class="zazu-input" value="0">
-            </label>
-        @endforeach
-        @if($purchaseOrder->status === 'ordered')
+    @if($purchaseOrder->status === 'ordered')
+        <div class="zazu-panel-title mt-1">Receive goods</div>
+        <div class="zazu-panel-copy">Record what actually arrived. Zazu prevents receiving more than ordered and keeps partial receipts in inventory history.</div>
+        <form method="POST" action="{{ route('purchasing.receive', $purchaseOrder) }}" class="zazu-form mt-4">
+            @csrf
+            <input type="hidden" name="idempotency_key" value="{{ (string) IlluminateSupportStr::uuid() }}">
+            @foreach($purchaseOrder->items as $item)
+                <label class="zazu-field">
+                    <span class="zazu-label">{{ $item->description }}</span>
+                    <span class="zazu-field-help">Ordered {{ number_format((float)$item->quantity, 2) }} {{ $item->unit ?: 'units' }} · Received {{ number_format((float)$item->received_quantity, 2) }}</span>
+                    <input type="number" name="received_quantity[{{ $item->id }}]" min="0" max="{{ $item->quantity - $item->received_quantity }}" step="0.01" class="zazu-input" value="0">
+                </label>
+            @endforeach
             <button class="zazu-btn zazu-btn-primary">Record receipt</button>
-        @elseif($purchaseOrder->status === 'received')
-            <div class="zazu-panel-copy mt-3">All ordered quantities have been received. No further receipt can be recorded.</div>
-        @endif
-    </form>
+        </form>
+    @elseif($purchaseOrder->status === 'received')
+        <div class="zazu-panel-title mt-1">Goods received</div>
+        <div class="zazu-panel-copy mt-2">All ordered quantities have been received. This purchase order is closed to further receipts.</div>
+    @else
+        <div class="zazu-panel-title mt-1">Awaiting order</div>
+        <div class="zazu-panel-copy mt-2">Receiving becomes available after the purchase order reaches Ordered status.</div>
+    @endif
 </section>
 
 @php($nextStatuses = \App\Models\PurchaseOrder::STATUS_TRANSITIONS[$purchaseOrder->status] ?? [])
