@@ -50,6 +50,7 @@ class PurchaseOrderController extends Controller
 
         return view('purchasing.create', [
             'idempotencyKey' => (string) Str::uuid(),
+            'selectedEventId' => $request->integer('event_id') ?: null,
             'suppliers' => Supplier::where('business_id', $businessId)->orderBy('name')->get(),
             'events' => Event::where('business_id', $businessId)
                 ->whereIn('status', ['draft', 'confirmed', 'in_progress'])
