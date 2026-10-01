@@ -103,7 +103,7 @@ class DemoScenarioSeederTest extends TestCase
 
     public function test_owner_backup_and_restore_round_trip_preserves_populated_business_and_private_file(): void
     {
-        if (!class_exists(\\ZipArchive::class)) {
+        if (!class_exists(\ZipArchive::class)) {
             $this->markTestSkipped('PHP Zip extension is required for backup/restore tests.');
         }
 
