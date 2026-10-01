@@ -85,9 +85,95 @@
                     </form>
                 </div>
 
+                @php
+                    $rentalRequirements = $event->requirements->filter(fn ($requirement) => $requirement->capability?->capability_type === 'rental');
+                    $latestQuote = $event->quotes->sortByDesc('created_at')->first();
+                    $latestQuoteVersion = $latestQuote?->latestVersion;
+                    $latestInvoice = $event->invoices->sortByDesc('created_at')->first();
+                @endphp
                 <template data-zazu-inspector>
-                    <div data-event-name="{{ e($event->name) }}" data-event-reference="{{ e($event->reference) }}" data-event-type="{{ e($event->event_type ?: 'Event') }}" data-event-date="{{ $event->event_date?->format('d M Y') ?? 'Date not set' }}" data-event-status="{{ e($statusLabel) }}" data-show-route="{{ route('work.show', $event) }}" data-customer="{{ e($event->customer?->name ?? $event->customer_name ?? 'No customer') }}" data-contact="{{ e($contact ?? $event->customer_phone ?? $event->customer_email ?? 'Contact not recorded') }}">
-                        <div class="zazu-inspector-empty">Live operational details can be reviewed from the function sheet. This preview does not invent catering, equipment or financial values that are not recorded on the job.</div>
+                    <div
+                        data-event-name="{{ e($event->name) }}"
+                        data-event-reference="{{ e($event->reference) }}"
+                        data-event-type="{{ e($event->event_type ?: 'Event') }}"
+                        data-event-date="{{ $event->event_date?->format('d M Y') ?? 'Date not set' }}"
+                        data-event-status="{{ e($statusLabel) }}"
+                        data-show-route="{{ route('work.show', $event) }}"
+                        data-customer="{{ e($event->customer?->name ?? $event->customer_name ?? 'No customer') }}"
+                        data-contact="{{ e($contact ?? $event->customer_phone ?? $event->customer_email ?? 'Contact not recorded') }}"
+                    >
+                        <section data-inspector-tab="catering">
+                            <div class="zazu-inspector-section-title">Services &amp; preparation</div>
+                            @if($event->requirements->isNotEmpty())
+                                <div class="zazu-inspector-record-list">
+                                    @foreach($event->requirements as $requirement)
+                                        <div class="zazu-inspector-record">
+                                            <strong>{{ $requirement->description }}</strong>
+                                            <span>{{ number_format((float)$requirement->quantity, 2) }} {{ $requirement->unit ?: 'units' }} · {{ $requirement->category ?: 'General' }}</span>
+                                            <small>{{ $requirement->status === 'completed' ? 'Completed' : ucfirst($requirement->status) }}@if($requirement->notes) · {{ $requirement->notes }}@endif</small>
+                                        </div>
+                                    @endforeach
+                                </div>
+                            @else
+                                <div class="zazu-inspector-empty">No services have been recorded for this job.</div>
+                            @endif
+                            <div class="zazu-inspector-section-title mt-5">Preparation readiness</div>
+                            @if($event->preparationItems->isNotEmpty())
+                                <div class="zazu-inspector-record-list">
+                                    @foreach($event->preparationItems->sortBy('due_date') as $item)
+                                        <div class="zazu-inspector-record">
+                                            <strong>{{ $item->title }}</strong>
+                                            <span>{{ ucfirst($item->status) }}@if($item->due_date) · due {{ $item->due_date->format('d M Y') }}@endif</span>
+                                        </div>
+                                    @endforeach
+                                </div>
+                            @else
+                                <div class="zazu-inspector-empty">No preparation items have been recorded.</div>
+                            @endif
+                        </section>
+
+                        <section data-inspector-tab="equipment">
+                            <div class="zazu-inspector-section-title">Equipment &amp; hire demand</div>
+                            @if($rentalRequirements->isNotEmpty())
+                                <div class="zazu-inspector-record-list">
+                                    @foreach($rentalRequirements as $requirement)
+                                        <div class="zazu-inspector-record">
+                                            <strong>{{ $requirement->description }}</strong>
+                                            <span>{{ number_format((float)$requirement->quantity, 2) }} {{ $requirement->unit ?: 'units' }}</span>
+                                            <small>{{ $requirement->capability?->name ?? 'Rental requirement' }}</small>
+                                        </div>
+                                    @endforeach
+                                </div>
+                            @else
+                                <div class="zazu-inspector-empty">No rental requirements are recorded on this job.</div>
+                            @endif
+                            <div class="zazu-inspector-section-title mt-5">Asset allocation history</div>
+                            @if($event->assetAllocations->isNotEmpty())
+                                <div class="zazu-inspector-record-list">
+                                    @foreach($event->assetAllocations->sortByDesc('allocated_from') as $allocation)
+                                        <div class="zazu-inspector-record">
+                                            <strong>{{ $allocation->asset?->name ?? 'Asset' }}</strong>
+                                            <span>{{ ucfirst($allocation->status) }} · {{ $allocation->asset?->asset_tag ?? 'No tag' }}</span>
+                                            <small>{{ $allocation->allocated_from?->format('d M Y') ?: 'Date not set' }}@if($allocation->allocated_until) → {{ $allocation->allocated_until->format('d M Y') }}@endif</small>
+                                        </div>
+                                    @endforeach
+                                </div>
+                            @else
+                                <div class="zazu-inspector-empty">No asset allocations have been recorded for this job.</div>
+                            @endif
+                        </section>
+
+                        <section data-inspector-tab="finance">
+                            <div class="zazu-inspector-section-title">Financial position</div>
+                            <div class="zazu-inspector-finance">
+                                <div><span>Quote</span><strong>{{ $latestQuoteVersion ? $latestQuoteVersion->status.' · '.$event->quotes->first()?->currency : 'Not quoted' }}</strong></div>
+                                <div><span>Quote total</span><strong>{{ $latestQuoteVersion ? $latestQuote?->currency.' '.$latestQuoteVersion->total : 'Not quoted' }}</strong></div>
+                                <div><span>Deposit</span><strong>{{ $latestQuoteVersion ? $latestQuoteVersion->deposit_percent.'% · '.$latestQuote?->currency.' '.$latestQuoteVersion->deposit_amount : 'Not set' }}</strong></div>
+                                <div><span>Invoice</span><strong>{{ $latestInvoice ? $latestInvoice->number.' · '.ucfirst($latestInvoice->status) : 'Not invoiced' }}</strong></div>
+                                <div><span>Paid</span><strong>{{ $latestInvoice ? $latestInvoice->currency.' '.$latestInvoice->paid_amount : '0.00' }}</strong></div>
+                                <div><span>Balance</span><strong>{{ $latestInvoice ? $latestInvoice->currency.' '.$latestInvoice->balance : '0.00' }}</strong></div>
+                            </div>
+                        </section>
                     </div>
                 </template>
             </article>
@@ -131,27 +217,16 @@
 
         <div class="zazu-inspector-body">
             <section id="zazu-inspector-panel-catering" role="tabpanel" tabindex="0" data-zazu-tab-panel="catering">
-                <div class="zazu-inspector-section-title">Catering &amp; Menu Prep</div>
-                <div class="zazu-inspector-grid">
-                    <div class="zazu-inspector-field"><span>Packages</span><strong>Review function sheet</strong></div>
-                    <div class="zazu-inspector-field"><span>Headcount</span><strong>Not recorded</strong></div>
-                    <div class="zazu-inspector-field zazu-inspector-field-wide"><span>Dietary notes</span><strong>None recorded</strong></div>
-                </div>
+                <div data-zazu-inspector-content></div>
             </section>
 
             <section id="zazu-inspector-panel-equipment" role="tabpanel" tabindex="0" class="hidden" data-zazu-tab-panel="equipment">
-                <div class="zazu-inspector-section-title">Equipment Hire Manifest</div>
-                <div class="zazu-inspector-empty">No equipment requirements are recorded on this job yet.</div>
+                <div data-zazu-inspector-content></div>
             </section>
 
             <section id="zazu-inspector-panel-finance" role="tabpanel" tabindex="0" class="hidden" data-zazu-tab-panel="finance">
-                <div class="zazu-inspector-section-title">Financial Ledger</div>
-                <div class="zazu-inspector-finance">
-                    <div><span>SARS VAT</span><strong>15%</strong></div>
-                    <div><span>Total quote</span><strong>Not quoted</strong></div>
-                    <div><span>Deposit status</span><strong>Not recorded</strong></div>
-                </div>
-                <a href="{{ route('work.show', $events->first() ?? 1) }}" class="zazu-btn zazu-btn-primary w-full mt-4" data-zazu-finance-link>Open financial record</a>
+                <div data-zazu-inspector-content></div>
+                <a href="#" class="zazu-btn zazu-btn-primary w-full mt-4" data-zazu-finance-link>Open job record</a>
             </section>
         </div>
     </aside>
@@ -165,7 +240,7 @@
             const open = (button) => {
                 const row = button.closest('[data-zazu-job-row]');
                 const source = row?.querySelector('[data-zazu-inspector]');
-                const data = source?.firstElementChild?.dataset;
+                const data = source?.content?.firstElementChild?.dataset;
                 if (!data) return;
 
                 panel.querySelector('[data-zazu-inspector-reference]').textContent = data.eventReference || '—';
@@ -180,8 +255,17 @@
                 panel.querySelectorAll('[data-zazu-tab]').forEach(tab => {
                     tab.classList.toggle('is-active', tab.dataset.zazuTab === 'catering');
                     tab.setAttribute('aria-selected', tab.dataset.zazuTab === 'catering' ? 'true' : 'false');
+                    tab.tabIndex = tab.dataset.zazuTab === 'catering' ? 0 : -1;
                 });
-                panel.querySelectorAll('[data-zazu-tab-panel]').forEach(section => section.classList.toggle('hidden', section.dataset.zazuTab !== 'catering'));
+
+                const sourceTabs = source.content.querySelectorAll('[data-inspector-tab]');
+                panel.querySelectorAll('[data-zazu-tab-panel]').forEach(panelSection => {
+                    const target = panelSection.dataset.zazuTabPanel;
+                    const sourceTab = [...sourceTabs].find(item => item.dataset.inspectorTab === target);
+                    const content = panelSection.querySelector('[data-zazu-inspector-content]');
+                    if (content) content.innerHTML = sourceTab?.innerHTML || '<div class="zazu-inspector-empty">No data recorded.</div>';
+                    panelSection.classList.toggle('hidden', target !== 'catering');
+                });
 
                 panel.classList.add('is-open');
                 backdrop.classList.add('is-visible');
