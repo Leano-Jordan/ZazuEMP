@@ -411,7 +411,7 @@ Re-audit:
 - no new navigation authority, permission model, or parallel domain source was introduced.
 
 Verification boundary:
-- repository source is current through main commit e756bf22a64ee8915464aa510de6463a7fd44ce7;
+- repository source is current through main commit ea06afa44a9c2134fee5857f16a882f7674cd61;
 - GitHub connector still exposes no usable current workflow-run/status result for the latest main commits;
 - runtime, browser/mobile, migration/upgrade and backup/restore execution remain unobserved because the development PC is off.
 
