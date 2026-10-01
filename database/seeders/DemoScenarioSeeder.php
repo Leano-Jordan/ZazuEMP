@@ -137,8 +137,11 @@ class DemoScenarioSeeder extends Seeder
         $customer = Customer::updateOrCreate(
             ['business_id' => $business->id, 'name' => 'Mokoena Family Events'],
             [
-                'legal_name' => 'Mokoena Family Events',
-                'billing_address' => 'Pretoria, Gauteng',
+                'legal_name' => 'Mokoena Family Events (Pty) Ltd',
+                'registration_number' => '2025/456789/07',
+                'tax_number' => '9876543210',
+                'vat_number' => '4987654321',
+                'billing_address' => '42 Jacaranda Street, Pretoria, Gauteng, 0001',
                 'notes' => 'Demo customer for end-to-end Zazu hardening.',
             ]
         );
@@ -407,7 +410,7 @@ class DemoScenarioSeeder extends Seeder
         }
 
         foreach ([
-            ['asset_tag' => 'AST-TENT-001', 'name' => '6m x 12m stretch tent', 'status' => 'allocated', 'condition' => 'good', 'location' => 'Main storage', 'acquired_at' => now()->subYear()->toDateString(), 'purchase_cost' => '42000.00', 'capability' => 'Event Furniture'],
+            ['asset_tag' => 'AST-TENT-001', 'name' => '6m x 12m stretch tent', 'status' => 'available', 'condition' => 'good', 'location' => 'Main storage', 'acquired_at' => now()->subYear()->toDateString(), 'purchase_cost' => '42000.00', 'capability' => 'Event Furniture'],
             ['asset_tag' => 'AST-SOUND-001', 'name' => 'Portable PA sound system', 'status' => 'available', 'condition' => 'good', 'location' => 'Main storage', 'acquired_at' => now()->subMonths(8)->toDateString(), 'purchase_cost' => '18500.00', 'capability' => 'Event Furniture'],
             ['asset_tag' => 'AST-OVEN-001', 'name' => 'Commercial convection oven', 'status' => 'in_use', 'condition' => 'good', 'location' => 'Kitchen', 'acquired_at' => now()->subMonths(18)->toDateString(), 'purchase_cost' => '32000.00', 'capability' => 'Buffet Catering'],
         ] as $row) {
@@ -418,7 +421,7 @@ class DemoScenarioSeeder extends Seeder
             if ($row['asset_tag'] === 'AST-TENT-001') {
                 AssetAllocation::updateOrCreate(
                     ['business_id' => $business->id, 'asset_id' => $asset->id, 'event_id' => $event->id],
-                    ['allocated_from' => now()->subDays(2)->toDateString(), 'allocated_until' => now()->addDay()->toDateString(), 'status' => 'allocated', 'notes' => 'Allocated for event setup and teardown.']
+                    ['allocated_from' => now()->subDays(5)->toDateString(), 'allocated_until' => now()->subDays(1)->toDateString(), 'status' => 'released', 'notes' => 'Allocated for event setup and teardown.']
                 );
             }
         }
