@@ -21,8 +21,10 @@
                 <input type="number" name="received_quantity[{{ $item->id }}]" min="0" max="{{ $item->quantity - $item->received_quantity }}" step="0.01" class="zazu-input" value="0">
             </label>
         @endforeach
-        @if(in_array($purchaseOrder->status, ['ordered','received'], true))
+        @if($purchaseOrder->status === 'ordered')
             <button class="zazu-btn zazu-btn-primary">Record receipt</button>
+        @elseif($purchaseOrder->status === 'received')
+            <div class="zazu-panel-copy mt-3">All ordered quantities have been received. No further receipt can be recorded.</div>
         @endif
     </form>
 </section>
