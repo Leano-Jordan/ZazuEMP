@@ -354,3 +354,37 @@ Verification boundary:
 
 Next target:
 **QUOTE → ACCEPTANCE → FINANCE CONVERSION** — verify the hand-off from an accepted commercial version into invoice/deposit/payment and identify the next concrete release-risk gap before adding quote breadth.
+
+
+## Populated operator audit cycle — 2026-10-01
+
+Target: use the advanced populated demo business as the end-to-end operator test fixture.
+
+Journey:
+Dashboard → Job → Requirements → Quote → Purchasing → Inventory / Assets → Preparation → Invoice → Payment → Reports
+
+Executed:
+- replaced the job-register function-sheet placeholders with live requirement, preparation, rental, asset-allocation, quote and invoice data;
+- fixed the HTML template data-read bug by using template content;
+- made guest headcount visible from recorded job requirements;
+- preserved job context when moving from Work into Purchasing;
+- added job preselection to new purchase orders;
+- removed the invalid receipt path from received purchase orders and aligned the receiving service;
+- added active-job attribution to inventory issue forms;
+- added invoice payment history and direct invoice → payment hand-off;
+- added direct Finance workspace entry actions;
+- replaced stale Reports finance gating with live currency-safe invoice/payment/expense summaries;
+- surfaced populated purchasing, stock, assets and receivables attention on the dashboard;
+- corrected a populated demo PO/lifecycle contradiction by making the open replenishment PO general rather than event-linked;
+- corrected demo invoice chronology;
+- added populated operator regression coverage and receiving/inventory UI coverage;
+- recorded the full audit in docs/DIRECTOR_OPERATOR_AUDIT_2026-10-01.md.
+
+Re-audit:
+- current repository head was re-read after the cycle;
+- malformed report formatter reference was caught and corrected before completion;
+- current combined GitHub status returned no status entries and the available workflow-run wrapper returned no runs for the latest main-branch commit;
+- local runtime/browser execution remains unobserved and is not claimed.
+
+Next target:
+RUNTIME POPULATED WALKTHROUGH — execute the seeded business in the actual browser on desktop and mobile, focusing on rendered inspector, contextual purchasing, inventory attribution, invoice/payment hand-off, reports rendering and populated-content overflow.
