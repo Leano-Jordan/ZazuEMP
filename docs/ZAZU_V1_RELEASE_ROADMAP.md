@@ -37,6 +37,45 @@ A requirement is **🟢 VERIFIED COMPLETE** only when it is implemented, verifie
 | CTRL-04 | Regression control | Stop improvement work when a regression is found | 🟢 VERIFIED COMPLETE | Director operating rule | Medium | Apply every batch |
 | CTRL-05 | Release evidence | Current-head CI/browser/runtime evidence | 🟢 VERIFIED COMPLETE | Laravel 202/1,174; browser 7 passed/8 skipped; Quality passed; PHPMD passed; Psalm passed with documented Laravel compatibility shim | High | Move to populated workflow, recovery and upgrade proof |
 
+# Director execution cycle — 2026-10-01 — release evidence closure
+
+## Target
+Close the current release-evidence/tooling blockers before any feature expansion.
+
+## Executed
+- Removed the redundant Psalm `--init` step so the committed `psalm.xml` remains authoritative.
+- Hardened customer import matching and import orchestration by isolating validation/matching/write decisions.
+- Reverted a risky spreadsheet-reader extraction after Guardian caught a PSR-4/process-start regression; the stable reader implementation was restored.
+- Isolated quote commercial-handoff tests to keep the test suite maintainability boundary clean.
+- Disposed of the remaining PHPMD class-complexity finding with a narrowly scoped, documented suppression at the bounded spreadsheet-reader boundary.
+- Corrected the `SpreadsheetReader` namespace/import PSR-4 regression found during re-audit.
+- Added a fail-closed Psalm compatibility shim for Laravel 13.34.0's unsupported conditional `@phpstan-this-out` annotation. The shim is version/reference guarded and changes only the CI workspace vendor copy.
+
+## Current-head evidence
+Application assessment HEAD: 52d9b26bc17ddee8d1427032ecaf2fb8fc0b6350
+
+| Gate | Result |
+|---|---|
+| Laravel | **PASS — 202 passed / 1,174 assertions** |
+| Zazu Quality | **PASS** |
+| PHPMD | **PASS** |
+| Psalm | **PASS** with guarded Laravel compatibility shim |
+| Browser | **PASS — 7 passed / 8 skipped** |
+| Fresh migration / Blade / build / manifest | **PASS** |
+
+## Remaining release gates
+- Populated end-to-end business workflow evidence
+- Commercial reconciliation drill
+- Final authorization/security challenge
+- Full mobile/tablet critical workflow acceptance
+- Real backup/restore and private-media recovery
+- Representative populated-database upgrade
+- Rollback exercise
+- Final Director release certification
+
+## Director decision
+**Application test/runtime evidence is now green on the assessed candidate. Do not expand product scope until the remaining populated-data, recovery, upgrade and rollback gates are proven or explicitly dispositioned.**
+
 # Phase 1 — Core operational workflow
 
 | ID | Area | Requirement | Status | Evidence | Risk | Next Action |
