@@ -78,7 +78,7 @@ class CustomerImportMapperTest extends TestCase
         $this->assertSame('new', $result['rows'][0]['match']['status']);
         $this->assertSame('existing', $result['rows'][1]['match']['status']);
         $this->assertSame('duplicate', $result['rows'][2]['match']['status']);
-        $this->assertSame(4, $result['rows'][2]['match']['source_duplicate_of_row']);
+        $this->assertSame(5, $result['rows'][2]['match']['source_duplicate_of_row']);
         $this->assertSame('needs_review', $result['rows'][4]['match']['status']);
         $this->assertNull($result['rows'][4]['match']['customer_id']);
     }
