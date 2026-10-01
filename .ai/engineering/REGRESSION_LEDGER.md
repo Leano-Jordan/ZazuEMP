@@ -67,3 +67,12 @@ Ordinary Director execution created multiple non-main branches around isolated w
 **Control:** main-only Director execution unless the owner explicitly authorizes another ref. Do not create temporary branches for routine verification.
 
 **Status:** CONTROL ACTIVE
+
+## REG-010 — Role-to-permission drift
+A business role can be seeded or assigned in data without a corresponding permission definition, causing silent authorization denial across the application.
+
+Observed 2026-10-01: the populated demo creates role manager, while config/zazu.php has no manager permission map. PermissionService therefore returns an empty permission set for that membership.
+
+Control: every non-owner role referenced by seeders, membership fixtures or production-facing role administration must have an explicit permission matrix and adversarial route coverage. Missing role mapping is a release evidence blocker, not an implicit deny-by-default success.
+
+Status: CONTROL ACTIVE
