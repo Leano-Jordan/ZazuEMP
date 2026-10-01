@@ -57,6 +57,29 @@
         </div>
     </section>
 
+    @if ($quote->status === 'accepted')
+        <section class="zazu-next-action zazu-quote-finance-action">
+            <div>
+                <div class="zazu-eyebrow">Finance hand-off</div>
+                <h2 class="zazu-next-action-title">Accepted quote → invoice</h2>
+                @if ($quote->invoices->isNotEmpty())
+                    <p class="zazu-next-action-copy">This accepted quote already has an invoice. Keep the payment and balance trail on that invoice.</p>
+                @else
+                    <p class="zazu-next-action-copy">The commercial decision is complete. Move the accepted quote into Finance to issue the invoice and continue with deposit and payment tracking.</p>
+                @endif
+            </div>
+            <div class="zazu-work-actions">
+                @if ($quote->invoices->isNotEmpty())
+                    @foreach ($quote->invoices as $invoice)
+                        <a href="{{ route('finance.invoices.show', $invoice) }}" class="zazu-btn zazu-btn-primary">Open invoice {{ $invoice->number }}</a>
+                    @endforeach
+                @else
+                    <a href="{{ route('finance.invoices.create', ['quote_id' => $quote->id]) }}" class="zazu-btn zazu-btn-primary">Create invoice →</a>
+                @endif
+            </div>
+        </section>
+    @endif
+
     @if ($quoteNeedsRevision)
         <section class="zazu-next-action zazu-quote-review-action">
             <div>
