@@ -257,6 +257,18 @@ return [
                 'suppliers.view', 'suppliers.create', 'suppliers.update',
                 'reports.view', 'capabilities.view',
             ],
+            'manager' => [
+                'dashboard.view', 'calendar.view',
+                'work.view', 'work.create', 'work.update',
+                'customers.view', 'customers.create', 'customers.update', 'customers.contacts.manage',
+                'quotes.view', 'quotes.create', 'quotes.update', 'quotes.status',
+                'finance.view',
+                'purchasing.view', 'purchasing.create', 'purchasing.status',
+                'inventory.view', 'inventory.create', 'inventory.movement',
+                'assets.view', 'assets.create', 'assets.update', 'assets.allocate', 'assets.release',
+                'suppliers.view', 'suppliers.create', 'suppliers.update',
+                'reports.view', 'capabilities.view',
+            ],
         ],
     ],
 
