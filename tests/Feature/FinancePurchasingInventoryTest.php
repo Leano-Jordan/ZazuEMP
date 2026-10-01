@@ -793,7 +793,7 @@ class FinancePurchasingInventoryTest extends TestCase
         [$business, $user] = $this->businessUser();
         $this->actingAs($user);
 
-        $supplier = AppModelsSupplier::create([
+        $supplier = \App\Models\Supplier::create([
             'business_id' => $business->id,
             'name' => 'Received Order Supplier',
         ]);
@@ -808,7 +808,7 @@ class FinancePurchasingInventoryTest extends TestCase
             'capability_id' => [''],
         ])->assertRedirect();
 
-        $order = AppModelsPurchaseOrder::firstOrFail();
+        $order = \App\Models\PurchaseOrder::firstOrFail();
 
         $this->patch(route('purchasing.status', $order), ['status' => 'sent'])->assertRedirect();
         $this->patch(route('purchasing.status', $order), ['status' => 'ordered'])->assertRedirect();
@@ -841,7 +841,7 @@ class FinancePurchasingInventoryTest extends TestCase
             'status' => 'confirmed',
         ]);
 
-        AppModelsInventoryItem::create([
+        \App\Models\InventoryItem::create([
             'business_id' => $business->id,
             'name' => 'Serving Trays',
             'unit' => 'unit',
