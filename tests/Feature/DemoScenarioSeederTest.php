@@ -47,14 +47,24 @@ class DemoScenarioSeederTest extends TestCase
         $this->seed(DemoScenarioSeeder::class);
 
         $this->assertDatabaseCount('businesses', 1);
-        $this->assertDatabaseCount('users', 1);
+        $this->assertDatabaseCount('users', 3);
         $this->assertDatabaseCount('events', 1);
         $this->assertDatabaseCount('quotes', 1);
         $this->assertDatabaseCount('quote_versions', 1);
         $this->assertDatabaseCount('invoices', 1);
         $this->assertDatabaseCount('payments', 2);
-        $this->assertDatabaseCount('purchase_orders', 1);
+        $this->assertDatabaseCount('purchase_orders', 2);
         $this->assertDatabaseCount('event_costs', 3);
         $this->assertDatabaseCount('event_preparation_items', 3);
+        $this->assertDatabaseCount('business_capabilities', 5);
+        $this->assertDatabaseCount('inventory_items', 4);
+        $this->assertDatabaseCount('inventory_movements', 8);
+        $this->assertDatabaseCount('assets', 3);
+        $this->assertDatabaseCount('asset_allocations', 1);
+        $this->assertDatabaseCount('suppliers', 2);
+        $this->assertDatabaseCount('finance_expenses', 3);
+        $this->assertDatabaseCount('travel_costs', 1);
+        $this->assertDatabaseCount('compliance_documents', 4);
+        $this->assertDatabaseCount('purchase_order_receipts', 1);
     }
 }
