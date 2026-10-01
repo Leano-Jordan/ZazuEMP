@@ -6071,3 +6071,15 @@ body {
     .zazu-calendar-open { display:none; }
     .zazu-calendar-agenda-status { font-size:7px; }
 }
+
+.zazu-calendar-summary { grid-template-columns:repeat(4,minmax(100px,1fr)); }
+.zazu-calendar-dot.is-cancelled { background:#94A3B8; }
+.zazu-calendar-event.status-cancelled .zazu-calendar-event-accent,
+.zazu-calendar-agenda-event.status-cancelled .zazu-calendar-event-accent { background:#94A3B8; }
+.zazu-calendar-event.status-cancelled { opacity:.72; }
+@media(max-width:900px){
+    .zazu-calendar-summary { grid-template-columns:repeat(4,minmax(0,1fr)); }
+}
+@media(max-width:700px){
+    .zazu-calendar-summary { grid-template-columns:repeat(2,1fr); }
+}
