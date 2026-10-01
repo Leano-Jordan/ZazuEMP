@@ -119,6 +119,7 @@ class DemoScenarioSeederTest extends TestCase
         File::put($privateProbe, 'restore me');
 
         $output = storage_path('app/director-backup-test');
+        $originalDatabase = config('database.connections.sqlite.database');
         File::deleteDirectory($output);
 
         try {
@@ -141,6 +142,12 @@ class DemoScenarioSeederTest extends TestCase
             $this->assertDatabaseHas('invoices', ['number' => 'INV-ZAZU-DEMO-001']);
             $this->assertDatabaseHas('payments', ['idempotency_key' => 'demo-payment-balance-001']);
         } finally {
+            DB::purge();
+            config(['database.connections.sqlite.database' => $originalDatabase]);
+            DB::purge();
+            foreach (File::glob(storage_path('app/.zazu-test-restore-*.sqlite')) as $restoreFile) {
+                File::delete($restoreFile);
+            }
             File::delete($privateProbe);
             File::deleteDirectory($output);
         }
