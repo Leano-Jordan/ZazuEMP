@@ -188,3 +188,108 @@ Before another application correction:
 A green rerun without materially new evidence does not close a repeated or flaky case.
 
 Persistent case history is stored in .ai/engineering/FAILURE_CASES.md.
+
+
+## RENDERED HUMAN-VISUAL EVIDENCE
+
+Human visual quality is a verification layer for UI-affecting work.
+
+The UI/UX engine owns the human-eye critique. Verification owns the evidence discipline.
+
+For meaningful rendered UI changes, verify:
+
+- desktop composition;
+- mobile composition;
+- relevant intermediate responsive states;
+- light theme;
+- dark theme where supported;
+- empty/populated/error states where affected;
+- overflow/clipping;
+- field sizing;
+- table width and horizontal scanning burden;
+- colour relationships and semantic state visibility;
+- typography hierarchy;
+- alignment and spacing;
+- navigation and primary-action prominence.
+
+A passing browser test proves behaviour in the exercised journey. It does not by itself prove that the resulting composition is clear, balanced or commercially polished.
+
+### Visual finding classification
+
+Use the UI/UX engine's finding classes:
+
+- V1 — visual defect;
+- V2 — UX friction;
+- V3 — visual inconsistency;
+- V4 — visual quality weakness;
+- V5 — creative opportunity;
+- V6 — intentional/acceptable.
+
+V1–V4 require consideration as defects/risks. V5 is an improvement opportunity and is not automatically a release blocker. V6 is recorded only when useful and does not create work.
+
+### Visual evidence vs test failure
+
+A human-eye observation is not automatically F1–F8.
+
+Classify the underlying engineering failure only when a verification check actually fails.
+
+Examples:
+
+- screenshot shows clipping caused by application CSS → F1;
+- screenshot expectation is stale while application contract is correct → F2;
+- abnormal fixture/data creates an unintended visual state → F3;
+- browser environment cannot render the target → F4;
+- CI visual/browser workflow is misconfigured → F5;
+- visual scanner/tool configuration is defective → F6;
+- current design authority changed → F7;
+- inconsistent visual result without meaningful source/environment change → investigate F8.
+
+### Width and eye-tracking verification
+
+For tables and forms, verification should explicitly challenge avoidable horizontal scanning.
+
+Do not use "fits on desktop" as the acceptance criterion.
+
+Check whether:
+
+- important columns remain visible;
+- routine actions are close to the data they affect;
+- long fields are bounded appropriately;
+- secondary information can move to detail/inspector views;
+- mobile does not simply become a compressed desktop;
+- horizontal overflow is necessary rather than accidental.
+
+### Colour verification
+
+For meaningful theme or colour changes verify:
+
+- semantic role consistency;
+- foreground/background contrast;
+- focus visibility;
+- status distinction;
+- selected/active states;
+- disabled states;
+- light/dark mapping;
+- no accidental token drift.
+
+The source token system must remain singular. Repeated root-token blocks or page-specific competing palettes are a verification concern.
+
+### Synchronization requirement
+
+Verification returns evidence to Director rather than maintaining a separate decision state.
+
+A UI cycle is complete only when the Director has:
+
+1. current source state;
+2. implementation result;
+3. automated verification result;
+4. rendered visual evidence where required;
+5. Guardian/regression disposition;
+6. remaining uncertainty;
+7. next target.
+
+A green automated suite with missing required rendered evidence is:
+
+**AUTOMATED PASS / VISUAL UNVERIFIED**
+
+not a complete UI acceptance.
