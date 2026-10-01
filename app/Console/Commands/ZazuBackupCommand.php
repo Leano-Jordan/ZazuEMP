@@ -10,12 +10,15 @@ use ZipArchive;
 
 class ZazuBackupCommand extends Command
 {
+    private const FORMAT_VERSION = 1;
+    private const MAX_PRIVATE_FILES = 50000;
+
     protected $signature = 'zazu:backup {--output= : Destination directory for the backup archive}';
     protected $description = 'Create a portable Zazu database and private-storage backup';
 
     /**
-    * @SuppressWarnings(PHPMD.CyclomaticComplexity)
-    * @SuppressWarnings(PHPMD.NPathComplexity)
+     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
+     * @SuppressWarnings(PHPMD.NPathComplexity)
      */
     public function handle(): int
     {
@@ -27,16 +30,35 @@ class ZazuBackupCommand extends Command
         $directory = $this->option('output') ?: storage_path('app/zazu-backups');
         File::ensureDirectoryExists($directory);
 
-        $stamp = now()->format('Ymd_His').'_'.Str::lower((string) Str::ulid());
+        $directory = realpath($directory);
+        $privateRoot = realpath(storage_path('app/private')) ?: storage_path('app/private');
+
+        if ($directory === false) {
+            $this->error('The backup destination is unavailable.');
+            return self::FAILURE;
+        }
+
+        if (is_dir($privateRoot) && ($directory === $privateRoot || str_starts_with($directory, $privateRoot.DIRECTORY_SEPARATOR))) {
+            $this->error('The backup destination cannot be inside private storage.');
+            return self::FAILURE;
+        }
+
+        $stamp = now()->format('Ymd_His').'_' . Str::lower((string) Str::ulid());
         $work = storage_path('app/.zazu-backup-'.$stamp);
+        $archive = $directory.DIRECTORY_SEPARATOR.'zazu-backup-'.$stamp.'.zip';
+        $temporaryArchive = $archive.'.tmp';
+
         File::ensureDirectoryExists($work);
 
         try {
             $driver = config('database.default');
             $manifest = [
                 'application' => 'Zazu EMP',
+                'format_version' => self::FORMAT_VERSION,
+                'backup_id' => $stamp,
                 'created_at' => now()->toIso8601String(),
                 'database_driver' => $driver,
+                'contents' => ['database', 'private_storage'],
             ];
 
             if ($driver === 'sqlite') {
@@ -62,6 +84,7 @@ class ZazuBackupCommand extends Command
                     '--user='.$connection['username'],
                     $connection['database'],
                 ], null, array_filter(['MYSQL_PWD' => $connection['password'] ?? null]));
+
                 $process->setTimeout(300);
                 $result = $process->run();
 
@@ -76,30 +99,54 @@ class ZazuBackupCommand extends Command
                 return self::FAILURE;
             }
 
-            $privateRoot = storage_path('app/private');
-            // Backup archives live outside the private storage tree so the backup cannot copy itself recursively.
             if (is_dir($privateRoot)) {
+                $files = File::allFiles($privateRoot);
+                if (count($files) > self::MAX_PRIVATE_FILES) {
+                    $this->error('Private storage contains too many files for one backup.');
+                    return self::FAILURE;
+                }
+
+                foreach ($files as $file) {
+                    if ($file->isLink()) {
+                        $this->error('Private storage contains a symbolic link; backup aborted for safety.');
+                        return self::FAILURE;
+                    }
+                }
+
                 File::copyDirectory($privateRoot, $work.'/storage/private');
             }
 
             File::put($work.'/manifest.json', json_encode($manifest, JSON_PRETTY_PRINT | JSON_THROW_ON_ERROR));
 
-            $archive = rtrim($directory, DIRECTORY_SEPARATOR).DIRECTORY_SEPARATOR.'zazu-backup-'.$stamp.'.zip';
             $zip = new ZipArchive();
-            if ($zip->open($archive, ZipArchive::CREATE | ZipArchive::OVERWRITE) !== true) {
+            if ($zip->open($temporaryArchive, ZipArchive::CREATE | ZipArchive::OVERWRITE) !== true) {
                 $this->error('Could not create backup archive.');
                 return self::FAILURE;
             }
 
             foreach (File::allFiles($work) as $file) {
-                $zip->addFile($file->getPathname(), $file->getRelativePathname());
+                if (!$zip->addFile($file->getPathname(), $file->getRelativePathname())) {
+                    $zip->close();
+                    $this->error('Could not add a file to the backup archive.');
+                    return self::FAILURE;
+                }
             }
 
-            $zip->close();
+            if (!$zip->close() || !is_file($temporaryArchive) || filesize($temporaryArchive) === 0) {
+                $this->error('Could not finalize the backup archive.');
+                return self::FAILURE;
+            }
+
+            if (!rename($temporaryArchive, $archive)) {
+                $this->error('Could not publish the completed backup archive.');
+                return self::FAILURE;
+            }
+
             $this->info('Backup created: '.$archive);
 
             return self::SUCCESS;
         } finally {
+            File::delete($temporaryArchive);
             File::deleteDirectory($work);
         }
     }
