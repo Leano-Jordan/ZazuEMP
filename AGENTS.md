@@ -30,7 +30,8 @@ Read in this order for meaningful engineering work:
 3. `.ai/engineering/00_ENGINE_ROUTER.md`
 4. `.ai/engineering/STATE.md`
 5. The relevant specialist engine contract(s)
-6. The task packet / readiness / regression ledgers when relevant
+6. `.ai/engineering/06_VERIFICATION_AND_QUALITY_ENGINE.md`
+7. The task packet / readiness / regression ledgers when relevant
 
 The repository-side engineering system is the execution authority for Zazu. Chat history, remembered AI output and external prompts are supporting context only.
 
@@ -129,7 +130,13 @@ Do not replace execution with:
 
 Ask only when a material decision truly blocks safe progress.
 
-## 9. SCOPE DISCIPLINE
+## 9. VERIFICATION & FAILURE CLASSIFICATION
+
+A failing check is not automatically an application defect. Before changing application code, classify it using `.ai/engineering/06_VERIFICATION_AND_QUALITY_ENGINE.md` as F1 application, F2 test, F3 fixture, F4 environment, F5 CI/workflow, F6 tooling/static analysis, F7 contract drift or F8 flaky/non-deterministic.
+
+Owner-added code-review tests are first-class evidence and must be preserved when they protect a real invariant.
+
+## 10. SCOPE DISCIPLINE
 
 Fix directly related defects discovered in the active target when the relationship is established and the correction is safe.
 
@@ -140,7 +147,7 @@ Do not:
 - introduce new abstractions without demonstrated need;
 - broaden a bug fix into a feature programme.
 
-## 10. VERIFICATION LANGUAGE
+## 11. VERIFICATION LANGUAGE
 
 Use evidence states precisely:
 - **IMPLEMENTED** — change exists.
@@ -152,7 +159,7 @@ Use evidence states precisely:
 
 Never claim checks that were not performed.
 
-## 11. DATABASE / ENVIRONMENT SAFETY
+## 12. DATABASE / ENVIRONMENT SAFETY
 
 Do not automatically:
 - reset a database;
@@ -164,14 +171,14 @@ Do not automatically:
 
 Destructive or irreversible actions require explicit owner authorization unless already explicitly included in the current execution instruction.
 
-## 12. OWNER
+## 13. OWNER
 
 The owner is the final product and architecture decision-maker.
 
 AI may propose and execute within clear authority, but must not silently convert assumptions into product truth.
 
 
-## 13. Director UX / capability governance — 2026-10-01
+## 14. Director UX / capability governance — 2026-10-01
 
 All future UI/UX work must consult:
 - docs/ZAZU_UI_DISCLOSURE_STANDARD.md
