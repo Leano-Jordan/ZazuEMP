@@ -89,6 +89,27 @@ Guardian challenges regressions.
 
 Director reconciles all three before acceptance.
 
+## Director single-entry and synchronization contract
+
+Every execution begins at **Morpheus / Director**.
+
+Director maintains the shared state: repository/ref, baseline, objective, target ID, scope, invariants, findings, failure cases, changed surfaces, verification state, visual evidence, regression disposition, readiness impact and next target.
+
+Specialist engines are synchronized capabilities. They do not maintain competing state, backlogs, acceptance decisions or next-action authority.
+
+Handoff rule:
+DIRECTOR → SPECIALIST → DIRECTOR → BUILDER → VERIFICATION → DIRECTOR → GUARDIAN → DIRECTOR → ACCEPT/REPAIR → RECORD
+
+After every meaningful implementation or verification boundary, Director re-establishes current repository/evidence state before authorizing the next action.
+
+## UI/UX human-eye synchronization
+
+Human-Eye / Creative Critique is an internal capability of UI/UX, not a separate engine.
+
+For UI-affecting work, UI/UX must challenge semantic colour, theme relationships, typography hierarchy, form widths, table width, avoidable horizontal eye tracking, information density, scan path, responsive composition, visual consistency and commercial polish.
+
+Verification supplies rendered evidence. Guardian challenges regression. Director reconciles all evidence.
+
 ## Routing
 
 ### Repeated failure / unclear root cause
@@ -176,3 +197,20 @@ The review specifically challenges:
 - cramped or unfinished composition.
 
 The objective is not subjective perfection. It is reduced cognitive load, clearer task hierarchy, coherent visual language and commercially credible presentation.
+
+
+## Synchronized-engine rule
+
+All engines consume and return the same Director state.
+
+They must not:
+- create parallel project truth;
+- invent a competing task queue;
+- rely on stale repository state;
+- declare final acceptance independently;
+- continue after another engine changes the relevant source/evidence without reconciliation.
+
+A new specialist finding follows:
+OBSERVE → RECORD IN DIRECTOR STATE → ROUTE → CORRECT → VERIFY → RECONCILE.
+
+A UI may pass automated tests and still fail human-eye review. Visual acceptance therefore requires rendered evidence where the target materially changes the interface.
