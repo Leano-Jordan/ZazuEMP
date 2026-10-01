@@ -327,7 +327,7 @@ class DemoScenarioSeeder extends Seeder
                 'tax_total' => '1500.00',
                 'total' => '11500.00',
                 'issued_at' => now()->subDays(8)->toDateString(),
-                'due_at' => now()->addDays(7)->toDateString(),
+                'due_at' => now()->subDay()->toDateString(),
                 'tax_rate_id' => $taxRate->id,
                 'tax_code' => 'VAT15',
                 'tax_label' => 'VAT',
