@@ -62,6 +62,12 @@ Its responsibility is to:
 
 UI/UX automatically activates on UI/UX-affecting work. It is not a competing command hierarchy.
 
+Human-Eye / Creative Critique is an internal capability of UI/UX. It is not a separate engine.
+
+Director/Morpheus is the sole entry point and the only engine authorized to coordinate specialist state and final acceptance.
+
+All specialist work must synchronize through the shared Director state before the next action is selected.
+
 ## 5. DELIVERY MODEL
 
 The system is state-driven, not conversation-driven:
@@ -217,3 +223,32 @@ Hard limits:
 After a limit is reached: STOP PATCHING → FORENSICS / ESCALATION.
 
 A green rerun without materially new evidence is not closure. If the evidence cannot establish a safe correction, mark BLOCKED rather than inventing another patch.
+
+
+## 16. UI HUMAN-EYE QUALITY GOVERNANCE
+
+The UI/UX engine is expected to apply established UI/UX principles without requiring the owner to provide design theory.
+
+For meaningful UI work it must challenge:
+
+- semantic colour and theme relationships;
+- contrast and status communication;
+- typography hierarchy;
+- field width and form density;
+- table width and avoidable horizontal eye tracking;
+- scan path and grouping;
+- whitespace and visual rhythm;
+- responsive composition;
+- visual consistency;
+- commercial polish;
+- technically-correct but visually weak/generated UI.
+
+Do not optimize for decoration or novelty.
+
+Prefer lower cognitive load, clearer hierarchy, predictable scanning and efficient task completion.
+
+A wide field is not automatically wrong, and a wide table is not automatically wrong. The engine must establish whether the width serves the user's task or creates avoidable visual search and interaction strain.
+
+For UI changes, automated pass is not equivalent to visual acceptance. Rendered evidence is required where the visual target warrants it.
+
+All findings return to Director state. No separate UI backlog or competing next-action authority is permitted.
