@@ -47,7 +47,9 @@ class DashboardController extends Controller
                 ->count(),
         ];
 
-        if ($experienceLevel = app(ExperienceLevel::class)->for($request->user(), $business)) {
+        $experienceLevel = app(ExperienceLevel::class)->for($request->user(), $business);
+
+        if ($experienceLevel !== 'basic') {
             $inventory = InventoryItem::query()
                 ->where('business_id', $businessId)
                 ->with('movements')
