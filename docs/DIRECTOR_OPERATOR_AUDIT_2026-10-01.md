@@ -135,3 +135,25 @@ The first populated-operator pass returned errors. Re-inspection of the current 
 The current repository source has been re-read after these corrections. Runtime PHPUnit/browser execution is still not claimed because this environment does not have a usable local Laravel runtime and the GitHub connector currently reports no workflow runs/statuses for the current main commits.
 
 The populated operator audit is therefore **source-corrected and consolidated, but runtime certification remains outstanding**.
+
+
+## Hardening pass — crash resistance and loose-screw consolidation
+
+With the development PC unavailable, Director continued with repository-level hardening that can be verified from source without pretending runtime success.
+
+### Executed
+
+- Financial permission boundary tightened: staff no longer receive invoice creation, payment recording or expense creation permissions. Finance remains viewable; financial mutation is now owner-level by default. This aligns the role configuration with the existing UI regression expectation and route-level permission gates.
+- CI strengthened: the Laravel workflow now caches and clears configuration before tests, runs the full migration set against a fresh SQLite database, then runs the existing PHPUnit suite. This moves migration and configuration failures earlier in CI instead of allowing them to surface only after deployment.
+- Environment example corrected: .env.example had literal escaped newline text in the demo credential section; it is now valid line-separated environment configuration.
+- Existing crash containment retained: Zazu already has request IDs, incident logging, categorized error handling and a user-facing error page. The recorder has its own failure guard so an error while recording an error does not replace the original failure with a second exception.
+- Commercial mutation protection retained: invoice, payment, expense, inventory and purchasing flows use idempotency keys and database uniqueness constraints, while lifecycle-sensitive mutations use transactions and row/business locking.
+- Tenant isolation retained: active-business middleware structurally rejects foreign business-bound route models, while mutation paths additionally bind queried records to the active business.
+
+### Verification boundary
+
+Source verification was performed against the post-hardening commits. GitHub currently exposes no usable workflow-run/status result for the latest main commits, so these changes are not called runtime-green yet. The next PC-on pass must consume the CI result and execute the browser/mobile populated journey.
+
+### Release-risk focus after this pass
+
+The main remaining unknown is no longer whether obvious error handling exists; it is whether the complete populated workflow survives real runtime execution under the current build, migrations, database state and responsive layouts. That is the next hard gate before treating Zazu as payment-user ready.
