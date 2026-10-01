@@ -560,3 +560,26 @@ Hard limits:
 - then STOP PATCHING → FORENSICS / ESCALATION.
 
 This control-plane implementation is DOCUMENTATION/PROCESS infrastructure. It does not claim that application tests or runtime workflows are now passing.
+
+
+## Director synchronization + human-eye UI doctrine — 2026-10-01
+
+Decision:
+- Director/Morpheus is the sole engineering entry point.
+- Specialist engines are synchronized capabilities, not independent command hierarchies.
+- Human-Eye / Creative Critique is consolidated into the existing UI/UX Improvement Engine.
+- Verification owns rendered visual evidence; UI/UX owns visual critique; Guardian challenges regression; Director reconciles the combined state.
+
+UI quality requirements:
+- semantic colour systems with one shared token authority;
+- light/dark theme relationship review;
+- content-appropriate form widths;
+- table width and horizontal eye-tracking burden review;
+- predictable scan paths and grouping;
+- typography hierarchy;
+- responsive composition;
+- technical correctness does not equal visual acceptance.
+
+The owner is not expected to supply UI theory. UI/UX is responsible for applying established principles and surfacing concrete findings relevant to the current target.
+
+No standalone Engine 08 is created.
