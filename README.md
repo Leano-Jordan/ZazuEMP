@@ -36,12 +36,15 @@ Zazu uses one master control identity and bounded specialist engines:
 - **Guardian** — independent verification, regression breaking, forensics, security challenge and data-integrity review.
 - **Release** — commercial readiness, recovery, deployment and release evidence.
 - **UI/UX Improvement** — permanent cross-cutting interface and product-quality capability.
+- **Verification & Quality** — test, browser, static-analysis, CI/YAML and runtime evidence classification.
 
 The system is **state-driven, not conversation-driven**. Meaningful cycles follow:
 
 `BASELINE → TARGET → INSPECT → DESIGN → CHANGE → VERIFY → BREAK → ACCEPT → RECORD → NEXT`
 
-See [.ai/engineering/README.md](.ai/engineering/README.md) and [.ai/engineering/STATE.md](.ai/engineering/STATE.md).
+See [.ai/engineering/README.md](.ai/engineering/README.md), [.ai/engineering/06_VERIFICATION_AND_QUALITY_ENGINE.md](.ai/engineering/06_VERIFICATION_AND_QUALITY_ENGINE.md) and [.ai/engineering/STATE.md](.ai/engineering/STATE.md).
+
+Routine Director execution targets `main`; temporary branches are not part of the normal Zazu operating model.
 
 ## Product direction
 
