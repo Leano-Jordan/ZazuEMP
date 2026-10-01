@@ -7,6 +7,9 @@ use App\Models\PurchaseOrder;
 use App\Models\User;
 use Database\Seeders\DemoScenarioSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Http\UploadedFile;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\File;
 use Tests\TestCase;
 
 class DemoScenarioSeederTest extends TestCase
@@ -96,6 +99,51 @@ class DemoScenarioSeederTest extends TestCase
             ->assertSee('ZAR');
 
         $this->assertStringNotContainsString("</section>\n\n    </section>", $this->get(route('work.show', $po->event))->getContent());
+    }
+
+    public function test_owner_backup_and_restore_round_trip_preserves_populated_business_and_private_file(): void
+    {
+        $this->seed(DemoScenarioSeeder::class);
+
+        $owner = User::query()->where('email', env('ZAZU_DEMO_EMAIL', 'demo@zazu.local'))->firstOrFail();
+        $this->actingAs($owner);
+
+        $this->get(route('settings.index'))
+            ->assertOk()
+            ->assertSee('Backup &amp; recovery', false)
+            ->assertSee('Download backup')
+            ->assertSee('Restore a backup');
+
+        $privateProbe = storage_path('app/private/director-backup-probe.txt');
+        File::ensureDirectoryExists(dirname($privateProbe));
+        File::put($privateProbe, 'restore me');
+
+        $output = storage_path('app/director-backup-test');
+        File::deleteDirectory($output);
+
+        try {
+            $this->artisan('zazu:backup', ['--output' => $output])->assertExitCode(0);
+            $archives = File::glob($output.DIRECTORY_SEPARATOR.'zazu-backup-*.zip');
+            $this->assertCount(1, $archives);
+
+            $businessId = DB::table('businesses')->where('slug', 'zazu-demo-catering')->value('id');
+            DB::table('businesses')->where('id', $businessId)->update(['name' => 'Corrupted Business State']);
+            File::put($privateProbe, 'changed after backup');
+
+            $upload = UploadedFile::fake()->createWithContent('zazu-demo-backup.zip', File::get($archives[0]));
+            $this->post(route('settings.restore'), ['backup' => $upload])
+                ->assertRedirect(route('settings.index'))
+                ->assertSessionHas('success');
+
+            DB::purge();
+            $this->assertSame('Zazu Demo Catering', DB::table('businesses')->where('slug', 'zazu-demo-catering')->value('name'));
+            $this->assertSame('restore me', File::get($privateProbe));
+            $this->assertDatabaseHas('invoices', ['number' => 'INV-ZAZU-DEMO-001']);
+            $this->assertDatabaseHas('payments', ['idempotency_key' => 'demo-payment-balance-001']);
+        } finally {
+            File::delete($privateProbe);
+            File::deleteDirectory($output);
+        }
     }
 
     public function test_demo_scenario_is_idempotent_when_seeded_again(): void
