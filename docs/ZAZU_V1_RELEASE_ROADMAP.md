@@ -1,10 +1,10 @@
 # Zazu EMP — V1 Commercial Release Roadmap
 
 **Status:** LIVE  
-**Last Director cycle:** 2026-09-29  
+**Last Director cycle:** 2026-10-01  
 **Repository:** `Leano-Jordan/ZazuEMP`  
 **Branch:** `main`  
-**HEAD:** `57530369d9d5a589df7ef8671e84cab44f14eeea`  
+**HEAD:** c75ce78e20cbfad9d31f16f61aece8f7a878dc84  
 **Evidence rule:** Implemented ≠ Verified ≠ Proven.
 
 ## Director operating rule
@@ -490,3 +490,54 @@ Non-test engineering gates targeted by this cycle:
 - Release hygiene / change containment: **90+ target**
 
 These are engineering assessments, not automated test scores. Runtime, browser, recovery, populated-data and upgrade gates remain evidence-dependent.
+
+
+# Director cycle record — 2026-10-01 — long-sprint usability + foundation hardening
+
+## Scope
+
+Page-by-page audit of the operator experience from solo/non-technical use through larger teams, with reliability and productivity treated as one system. Existing architecture was reused; no new domain was introduced merely to improve presentation.
+
+## Executed
+
+- Shared UI storage access was hardened so denied/unavailable browser storage does not break theme or last-destination persistence.
+- Ordinary form submissions now disable the active submit control after the browser has accepted the submit event, reducing accidental duplicate requests while preserving confirmation-dialog behaviour.
+- Purchase-order creation now exposes the backend's existing multi-line capability with line management and live estimated totals instead of forcing users through a one-line-at-a-time workaround.
+- Quote creation and revision now expose a live subtotal/tax/total/deposit checkpoint beside the consequential form, matching the existing UI disclosure decision for financial workflows.
+- Job-scoped purchasing cancellation and invoice-scoped payment cancellation preserve the user's originating context.
+- Regression contracts were added for these foundations.
+- A test-source namespace corruption introduced during the cycle was caught in re-audit and corrected before the cycle was closed.
+
+## Page-to-page decision
+
+The following surfaces were reviewed and intentionally kept within their current information architecture because source evidence did not justify more complexity:
+
+Landing/authentication → Onboarding → Dashboard → Work → Requirements → Customers/Contacts → Inventory → Assets → Preparation → Travel/Costs → Finance → Reports → Settings/Compliance → Search/Calendar.
+
+The governing rule remains:
+
+When the page already gives the user the next useful action with enough context, stop. Do not add another card, menu, wizard or abstraction just because the feature exists elsewhere in the system.
+
+## Re-audit
+
+- Quote summary rendering was corrected after the first source check found the JavaScript without corresponding sidebar markup.
+- AppModels, AppSupport, AppHttp and AppServices flattened namespace tokens were re-scanned and found only in documentation/history, not application or test source.
+- Existing tenant isolation, composite parent/child database constraints, idempotency, lifecycle locking and error containment remain intact.
+- No new permission authority or parallel navigation authority was created.
+- No further source-only improvement met the threshold for safe high-value change without runtime evidence.
+
+## Verification boundary
+
+Current GitHub branch is main. The repository source was re-read after the final correction. The connector still provides no usable workflow result for the current main commits, and the development PC is off; therefore current-head Laravel, browser/mobile, migration/upgrade and backup/restore execution remain unproven.
+
+## Next release gate
+
+Runtime populated walkthrough is now the next priority. The next pass should consume actual CI/runtime evidence before any wider feature expansion:
+
+1. fresh CI/build/migration;
+2. populated desktop journey;
+3. populated mobile/tablet journey;
+4. intentional validation/error/recovery checks;
+5. backup/restore drill;
+6. representative populated-database upgrade;
+7. final Director re-audit.
