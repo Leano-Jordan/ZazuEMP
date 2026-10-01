@@ -127,7 +127,7 @@ class CustomerImportMapper
         $primaryContact = [
             'name' => $this->value($columns, ['primary contact name', 'contact name', 'contact person', 'contact']),
             'phone' => $this->value($columns, ['primary contact phone', 'contact phone', 'phone', 'phone number', 'mobile', 'mobile number', 'cell', 'cell no', 'cell number', 'telephone', 'tel']),
-            'email' => $this->value($columns, ['primary contact email', 'contact email', 'email', 'email address']),
+            'email' => $this->value($columns, ['primary contact email', 'contact email', 'email', 'email address', 'e-mail']),
         ];
 
         $issues = [];
