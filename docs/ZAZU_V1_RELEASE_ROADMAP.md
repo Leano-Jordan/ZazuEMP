@@ -4,7 +4,7 @@
 **Last Director cycle:** 2026-10-01  
 **Repository:** `Leano-Jordan/ZazuEMP`  
 **Branch:** `main`  
-**HEAD:** ddba8ce1d557eafc3d25bdadeaf2d5e7ed8414bf  
+**HEAD:** 0c7adefcf08bdb955b83ff5f31f3612c30fc2ce5 (documentation-only release-control update)  
 **Evidence rule:** Implemented ≠ Verified ≠ Proven.
 
 ## Director operating rule
@@ -30,8 +30,8 @@ A requirement is **🟢 VERIFIED COMPLETE** only when it is implemented, verifie
 
 | ID | Area | Requirement | Status | Evidence | Risk | Next Action |
 |---|---|---|---|---|---|---|
-| CTRL-01 | Release control | Maintain this roadmap as the single V1 execution checklist | 🟢 VERIFIED COMPLETE | This document created on current `main` HEAD | Low | Update every Director cycle |
-| CTRL-02 | Repository truth | Inspect branch and HEAD before every execution | 🟢 VERIFIED COMPLETE | Current branch `main`; HEAD `5cdceff` verified after roadmap commit; application baseline was `aa01ad1` | Low | Repeat each cycle |
+| CTRL-01 | Release control | Treat docs/V1_RELEASE_CHECKLIST.md as the single authoritative V1 release-gate ledger | 🟢 VERIFIED COMPLETE | Checklist rewritten on current main HEAD and explicitly designated canonical | Low | Update checklist every Director cycle; keep roadmap as supporting strategy/history |
+| CTRL-02 | Repository truth | Inspect branch and HEAD before every execution | 🟢 VERIFIED COMPLETE | Current branch main; current HEAD recorded in both roadmap and canonical checklist | Low | Repeat each cycle |
 | CTRL-03 | Evidence discipline | Separate implemented/tested/verified/proven claims | 🟢 VERIFIED COMPLETE | Existing readiness register + release documentation | Low | Preserve distinction |
 | CTRL-04 | Regression control | Stop improvement work when a regression is found | 🟢 VERIFIED COMPLETE | Director operating rule | Medium | Apply every batch |
 | CTRL-05 | Release evidence | Current-head CI/browser/runtime evidence | 🟡 IN PROGRESS | Existing register rates Release Evidence 1/5; current audit records source inspection but not current runtime/browser execution | High | Execute runtime/browser verification on current HEAD |
@@ -79,11 +79,11 @@ A requirement is **🟢 VERIFIED COMPLETE** only when it is implemented, verifie
 
 | ID | Area | Requirement | Status | Evidence | Risk | Next Action |
 |---|---|---|---|---|---|---|
-| COMM-01 | Quotes | Customer-facing quote presentation/delivery | ⬜ NOT STARTED | V1 status identifies this as release-critical remaining work | Critical | Inspect current quote presentation and implement smallest V1 closure |
-| COMM-02 | Quotes | Quote acceptance lifecycle | ⬜ NOT STARTED | Explicit release gap | Critical | Define and verify acceptance transition |
-| COMM-03 | Deposits | Deposit lifecycle is tied to commercial state | ⬜ NOT STARTED | Explicit release gap | High | Inspect existing payment model before adding state |
-| COMM-04 | Invoices | Complete invoice/document workflow | 🟡 IN PROGRESS | Invoice creation/show/store routes exist; complete document workflow evidence incomplete | Critical | Trace invoice creation → delivery/document → payment |
-| COMM-05 | Payments | Payment/reconciliation completion | 🟡 IN PROGRESS | Payment controls and idempotency documented; runtime reconciliation missing | Critical | Execute populated reconciliation drill |
+| COMM-01 | Quotes | Customer-facing quote presentation/delivery | 🟡 IMPLEMENTED / VERIFICATION PENDING | routes/web.php signed quotes.public route and resources/views/quotes/public.blade.php exist at current HEAD | Critical | Browser-verify signed customer-facing quote journey |
+| COMM-02 | Quotes | Quote acceptance lifecycle | 🟡 IMPLEMENTED / VERIFICATION PENDING | Signed quotes.public.accept route, QuoteController::publicAccept() and QuoteWorkflowTest exist at current HEAD | Critical | Verify acceptance transition, idempotency and resulting commercial state |
+| COMM-03 | Deposits | Deposit lifecycle is tied to commercial state | 🟡 IMPLEMENTED / VERIFICATION PENDING | quote_versions stores deposit percent/amount; finance accepts deposit payment type; invoice/finance services reconcile required vs received deposit | High | Run populated quote → invoice → deposit reconciliation drill |
+| COMM-04 | Invoices | Complete invoice/document workflow | 🟡 IMPLEMENTED / VERIFICATION PENDING | Invoice creation/show/store path and quote snapshot linkage exist at current HEAD | Critical | Verify invoice creation → document presentation → payment |
+| COMM-05 | Payments | Payment/reconciliation completion | 🟡 IMPLEMENTED / VERIFICATION PENDING | Payment flow supports invoice payment/deposit and idempotency controls; runtime reconciliation remains open | Critical | Execute populated reconciliation drill |
 | COMM-06 | Purchasing | Complete purchasing/receiving workflow | 🟡 IN PROGRESS | Create/status/receive routes exist; full verification outstanding | High | Verify against event/cost/finance state |
 | COMM-07 | Inventory | Reservation/allocation where required by V1 | 🟡 IN PROGRESS | Inventory movement foundation exists; requirement boundary still needs populated-data verification | High | Verify actual V1 operational need before expansion |
 | COMM-08 | Assets | Condition/damage/loss evidence | 🟡 IN PROGRESS | Asset allocation/release foundation exists; evidence workflow remains incomplete | Medium | Verify whether current V1 requirement is satisfied without expansion |
@@ -541,3 +541,15 @@ Runtime populated walkthrough is now the next priority. The next pass should con
 5. backup/restore drill;
 6. representative populated-database upgrade;
 7. final Director re-audit.
+
+
+## Authority update — 2026-10-01
+
+The release-control relationship is now explicit:
+
+**docs/V1_RELEASE_CHECKLIST.md = canonical V1 gate authority.**  
+**docs/ZAZU_V1_RELEASE_ROADMAP.md = strategy, historical evidence, rationale and deferred-work roadmap.**
+
+The checklist was rewritten after the Director found that the roadmap/checklist had fallen behind implementation. In particular, customer-facing quote presentation, signed quote acceptance and deposit handling were incorrectly represented as "not started" despite current source and regression coverage. They remain release-critical until runtime evidence proves the complete journey, but they are no longer build-from-zero work.
+
+The roadmap must not reintroduce stale status. When implementation changes, update the canonical checklist first; then record the reasoning/evidence in this roadmap.
