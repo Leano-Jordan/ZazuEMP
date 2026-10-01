@@ -76,3 +76,11 @@ Observed 2026-10-01: the populated demo creates role manager, while config/zazu.
 Control: every non-owner role referenced by seeders, membership fixtures or production-facing role administration must have an explicit permission matrix and adversarial route coverage. Missing role mapping is a release evidence blocker, not an implicit deny-by-default success.
 
 Status: CONTROL ACTIVE
+
+## REG-011 — AI failure-loop recurrence
+
+A verification failure can recur across cycles while the Director repeatedly reinterprets it as a new task. This causes symptom patching, contaminated experiments and wasted verification cycles.
+
+**Control:** persistent failure case ID + fingerprint + hypothesis ledger + 2-attempt hypothesis budget + 3-cycle case budget + mandatory escalation. Rejected approaches remain recorded.
+
+**Status:** CONTROL ACTIVE
