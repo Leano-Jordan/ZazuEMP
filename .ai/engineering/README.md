@@ -220,3 +220,26 @@ The landing page is a brand/aesthetic development surface and may contain tempor
 
 ### Capability integration
 New open-source libraries and external APIs are managed through docs/ZAZU_EXTERNAL_CAPABILITY_REGISTER.md. The register records integration intent, license verification, privacy/data-egress assessment and release priority. Core business workflows must not become dependent on optional online services.
+
+
+## DIRECTOR V2 — LOOP-BREAKING CONTROL
+
+Failure handling is now stateful rather than retry-driven.
+
+The Failure Case Engine maintains:
+- stable failure IDs;
+- failure fingerprints;
+- F1–F8 classification;
+- hypothesis ledgers;
+- experiment history;
+- rejected approaches;
+- attempt budgets;
+- diagnostic escalation;
+- known-good checkpoints;
+- closure evidence.
+
+Persistent case history: .ai/engineering/FAILURE_CASES.md.
+
+The Director must load the existing case before attempting another correction against a repeated failure. Two correction attempts against one hypothesis or three no-progress cycles against one case trigger FORENSICS / ESCALATION.
+
+A green test only closes the verification layer it actually exercised.
