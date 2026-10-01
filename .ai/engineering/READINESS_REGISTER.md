@@ -110,3 +110,19 @@ Evidence boundary:
 - static source inspection completed;
 - rendered visual/device verification is still required before release acceptance.
 
+
+## Director authorization challenge snapshot — 2026-10-01
+
+The populated source walkthrough is coherent, but final authorization certification is currently blocked by a concrete role-policy gap.
+
+AUTH-ROLE-001 — Seeded manager role has no permission mapping
+- Demo fixture creates an Operations Manager membership with role manager.
+- PermissionService grants all permissions to owners and otherwise reads the role entry from config/zazu.php.
+- config/zazu.php defines staff permissions but no manager entry.
+- Result: the seeded manager resolves to an empty permission set and cannot reach permission-protected workspaces such as Dashboard, Work, Customers, Quotes, Purchasing or Finance.
+- Classification: authorization completeness / role-model consistency, not proven privilege escalation.
+- Release impact: blocks final multi-role authorization certification until the role policy is made explicit.
+
+The populated business financial chain is source-consistent at ZAR 11,500.00 total with ZAR 3,450.00 deposit plus ZAR 8,050.00 final payment. This remains source evidence only until executed against a current runtime.
+
+Current Security maturity remains 4/5: automated isolation/authorization foundations exist, but the final adversarial challenge and role-policy closure remain outstanding.
