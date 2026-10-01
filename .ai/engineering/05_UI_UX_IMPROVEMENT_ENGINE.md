@@ -98,3 +98,249 @@ Guardian should consider layout, interaction, navigation, feedback, mobile, them
 When a systemic weakness appears, improve the shared source instead of repeatedly patching individual screens.
 
 Do not force redesign when the existing structure already works.
+
+
+## HUMAN-EYE / CREATIVE CRITIQUE
+
+This capability is part of the UI/UX engine. It is NOT a separate engine or command hierarchy.
+
+Its purpose is to detect interface problems that can survive functional tests and still be visibly or cognitively poor to a human.
+
+The engine must actively challenge rendered UI rather than merely confirm that it works.
+
+### Human-eye review
+
+For meaningful UI work inspect the rendered interface and evaluate:
+
+- first visual impression;
+- information hierarchy;
+- scan path;
+- grouping and proximity;
+- alignment;
+- spacing rhythm;
+- density;
+- whitespace;
+- typography hierarchy;
+- control prominence;
+- navigation clarity;
+- state communication;
+- responsive composition;
+- empty/populated/error states;
+- theme consistency;
+- commercial polish.
+
+Use evidence-based language. Do not report "I don't like it"; identify the observable reason and user consequence.
+
+### Visual attack questions
+
+Ask:
+
+- What does the eye see first, and is that the correct priority?
+- Can the primary action be identified quickly?
+- Are secondary actions competing with the primary action?
+- Is the user forced to scan too far horizontally or vertically?
+- Are related elements visually grouped?
+- Is unrelated information visually competing?
+- Does anything look cramped, orphaned, stranded or unfinished?
+- Does the interface technically fit while still feeling poor?
+- Does this look like deliberate Zazu UI or generic/generated CRUD UI?
+- What would a first-time business user misunderstand?
+- What would a professional SaaS reviewer notice immediately?
+- Can the same information be communicated with less cognitive effort?
+
+Do not redesign merely because another treatment is fashionable.
+
+### COLOR SYSTEM GOVERNANCE
+
+Colour is semantic infrastructure, not decoration.
+
+Use one shared token authority for:
+
+- canvas/background;
+- surface/panel;
+- elevated surface;
+- primary text;
+- secondary text;
+- muted text;
+- border;
+- focus;
+- primary action;
+- secondary action;
+- success;
+- warning;
+- danger;
+- informational states;
+- interactive hover/active states.
+
+Rules:
+
+1. Prefer semantic roles over page-specific colour choices.
+2. Maintain a coherent palette relationship across light and dark themes.
+3. Do not introduce a new colour when an existing semantic token represents the same meaning.
+4. Do not use colour as the only carrier of status or meaning.
+5. Check text and control contrast against their actual rendered backgrounds.
+6. Keep accent colour subordinate to operational content unless the accent is the intentional primary action.
+7. Avoid colour competition between navigation, status, actions and decorative surfaces.
+8. New visual tokens require a shared-system reason, not a one-screen preference.
+9. Review colour in context: adjacent surfaces, borders, text, icons, disabled states, focus and selected states must form a coherent relationship.
+10. Light and dark themes are separate render targets and both require review.
+
+Do not blindly apply a "60/30/10" or similar aesthetic formula. Zazu is an operational workbench; semantic hierarchy, contrast, task clarity and consistency take precedence over decorative ratios.
+
+### FORM WIDTH / COGNITIVE LOAD
+
+Do not stretch every field to fill the available viewport.
+
+Field width should reflect the information being entered.
+
+Prefer:
+
+- compact controls for short values;
+- moderate widths for names, codes and identifiers;
+- bounded wider fields for addresses and descriptive content;
+- full-width only when the content or workflow genuinely benefits from it.
+
+Avoid:
+
+- enormous single-line inputs with large unused interiors;
+- long form rows containing unrelated fields;
+- wide controls that force unnecessary eye travel;
+- inconsistent field widths that destroy grouping.
+
+Use grouping and progressive disclosure before adding more horizontal space.
+
+### TABLE / DATA-DENSITY GOVERNANCE
+
+Tables must be designed for the user's task, not for exposing every available database column.
+
+Before widening a table, ask:
+
+1. What decision is the user making?
+2. Which columns are essential to that decision?
+3. Which information can be moved into row expansion, an inspector, detail view or contextual action?
+4. Which columns are redundant?
+5. Can labels or values be shortened without losing meaning?
+6. Does the table require horizontal scrolling at the target viewport?
+7. Is the user forced into excessive left-right eye tracking?
+
+Default rules:
+
+- keep high-value columns visible;
+- keep related values adjacent;
+- align numeric values consistently;
+- use tabular numerics where comparison matters;
+- avoid repeating the same information in multiple columns;
+- use compact but readable row density;
+- allow secondary detail to move to an inspector/detail surface;
+- prefer responsive column prioritisation over squeezing every column into a narrow viewport;
+- use horizontal scrolling only when the dataset is inherently wide and no better representation exists;
+- if horizontal scrolling is necessary, preserve contextual identification where practical;
+- do not make users repeatedly scan from the far left to far right for routine decisions.
+
+A wide table is not automatically a defect. A table is a defect when its width creates avoidable cognitive or operational strain.
+
+### EYE-TRACKING / SCAN-PATH RULE
+
+The interface should support predictable scanning.
+
+Prefer:
+
+- strong left alignment for text;
+- consistent columns;
+- meaningful proximity;
+- clear section boundaries;
+- predictable action placement;
+- visual grouping;
+- progressive disclosure;
+- concise labels;
+- stable row structures.
+
+Avoid:
+
+- unrelated items sharing the same visual weight;
+- repeated full-width containers;
+- scattered actions;
+- unnecessary centre alignment of operational text;
+- excessive horizontal movement;
+- long decorative headings that push useful information downward;
+- multiple competing "primary" actions.
+
+The goal is not to literally measure eye movement. The goal is to reduce avoidable visual search and cognitive load.
+
+### COMMERCIAL POLISH CHECK
+
+For important screens ask:
+
+> Does this look intentionally designed for a real business, or merely technically assembled?
+
+Look for:
+
+- unfinished spacing;
+- generic cards;
+- inconsistent control geometry;
+- weak hierarchy;
+- arbitrary colours;
+- excessive shadows/radii;
+- awkward empty states;
+- crowded toolbars;
+- unexplained icons;
+- redundant navigation;
+- unnecessary visual noise.
+
+Creative improvements must have a user or workflow benefit.
+
+### CREATIVE ALTERNATIVES
+
+When a meaningful weakness is found, propose no more than three materially different alternatives.
+
+For each alternative record:
+
+- problem addressed;
+- user benefit;
+- implementation complexity;
+- regression risk;
+- fit with existing Zazu patterns.
+
+Prefer one strong improvement over cosmetic idea generation.
+
+### HUMAN-EYE ACCEPTANCE
+
+A visual target is not accepted merely because:
+
+- PHPUnit passes;
+- Playwright passes;
+- CSS compiles;
+- accessibility assertions pass.
+
+For meaningful UI changes, rendered evidence must show that:
+
+- hierarchy remains clear;
+- important content is not unnecessarily wide;
+- fields are appropriately bounded;
+- tables do not create avoidable eye-tracking strain;
+- colour relationships remain coherent;
+- responsive layouts preserve the intended task;
+- no clipping, overlap or visual regression is present.
+
+When the rendered result is technically valid but materially weak, record a UI/UX finding and route it back through Director.
+
+### SHARED ENGINE SYNCHRONIZATION
+
+UI/UX findings are Director findings.
+
+The UI/UX engine does not create an independent backlog or competing "next action".
+
+It must return:
+
+- finding ID;
+- evidence;
+- affected surface;
+- root/shared-pattern hypothesis;
+- severity;
+- recommended correction;
+- regression risk;
+- verification required.
+
+Director reconciles the finding with Builder, Verification, Guardian, Failure Case and Release state.
+
+The next engine action is always derived from the shared Director state.
