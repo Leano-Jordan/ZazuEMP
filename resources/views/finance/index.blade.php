@@ -1,5 +1,10 @@
 <x-app-layout>
 <x-slot:title>Finance</x-slot:title><x-slot:heading>Finance</x-slot:heading>
+<x-slot:headerAction>
+    <a href="{{ route('finance.invoices.create') }}" class="zazu-btn zazu-btn-secondary">New invoice</a>
+    <a href="{{ route('finance.payments.create') }}" class="zazu-btn zazu-btn-primary">Record payment</a>
+    <a href="{{ route('finance.expenses.create') }}" class="zazu-btn zazu-btn-ghost">New expense</a>
+</x-slot:headerAction>
 <section class="zazu-command-band zazu-finance-command">
     <div><div class="zazu-eyebrow">Commercial control</div><h2 class="zazu-command-title">Money in, money out</h2><p class="zazu-command-copy">Invoices, customer payments and finance expenses now live as separate transaction records.</p></div>
     <div class="zazu-command-badge"><span class="zazu-status-dot" aria-hidden="true"></span><span>Finance workspace</span></div>
