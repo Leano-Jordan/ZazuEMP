@@ -111,8 +111,6 @@
         </div>
     </section>
 
-    </section>
-
     <section class="mb-5">
         @include('work.attachments')
     </section>
