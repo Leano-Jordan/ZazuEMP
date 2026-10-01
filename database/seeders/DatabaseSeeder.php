@@ -15,12 +15,16 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
-        // User::factory(10)->create();
-
+        // Keep the normal database seed safe and lightweight. Opt into the
+        // full local demo scenario explicitly with ZAZU_SEED_DEMO=true.
         User::factory()->create([
             'name' => 'Test User',
             'username' => 'testuser',
             'email' => 'test@example.com',
         ]);
+
+        if (app()->environment('local') && filter_var(env('ZAZU_SEED_DEMO', false), FILTER_VALIDATE_BOOL)) {
+            $this->call(DemoScenarioSeeder::class);
+        }
     }
 }
