@@ -28,7 +28,11 @@ class FinanceController extends Controller
     public function index(Request $request): View
     {
         $businessId = app(CurrentBusiness::class)->id($request->user());
-        $invoices = Invoice::where('business_id', $businessId)->with('payments')->latest()->get();
+        $invoices = Invoice::where('business_id', $businessId)
+            ->with('payments')
+            ->latest()
+            ->paginate(25)
+            ->withQueryString();
         $payments = Payment::where('business_id', $businessId)->latest('paid_at')->limit(10)->get();
         $expenses = FinanceExpense::where('business_id', $businessId)->latest('expense_date')->limit(10)->get();
         $invoicedByCurrency = Invoice::where('business_id', $businessId)
