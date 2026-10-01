@@ -111,7 +111,7 @@ final class PurchaseOrderReceivingService
     private function assertReceivable(PurchaseOrder $purchaseOrder): void
     {
         abort_unless(
-            in_array($purchaseOrder->status, ['ordered', 'received'], true),
+            $purchaseOrder->status === 'ordered',
             422,
             'Only ordered purchase orders can receive goods.'
         );
