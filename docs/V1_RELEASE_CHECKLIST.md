@@ -4,7 +4,8 @@
 **Last Director update:** 2026-10-01  
 **Repository:** `Leano-Jordan/ZazuEMP`  
 **Branch:** `main`  
-**Current HEAD:** `52d9b26bc17ddee8d1427032ecaf2fb8fc0b6350`
+**Application assessment HEAD:** `52d9b26bc17ddee8d1427032ecaf2fb8fc0b6350`  
+**Note:** subsequent documentation-only commits do not change the application assessment baseline.
 
 ## Authority rule
 
@@ -185,10 +186,10 @@ The previous checklist incorrectly treated some commercial capabilities as not s
 
 All of the following are required before V1 is treated as release-ready:
 
-- [ ] Current-head Laravel suite has an accepted release disposition with no unexplained release-blocking failures.
-- [ ] Current-head browser smoke passes.
-- [ ] Current-head static analysis passes or every deviation is explicitly dispositioned.
-- [ ] Fresh migration succeeds.
+- [x] Current-head Laravel suite has an accepted release disposition with no unexplained release-blocking failures.
+- [x] Current-head browser smoke passes.
+- [x] Current-head static analysis passes or every deviation is explicitly dispositioned.
+- [x] Fresh migration succeeds.
 - [ ] Populated database upgrade succeeds without integrity loss.
 - [ ] Populated end-to-end business workflow succeeds.
 - [ ] Search succeeds on populated data with authorization boundaries intact.
