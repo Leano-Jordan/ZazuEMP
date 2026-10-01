@@ -4,9 +4,9 @@
  * professional density, and clear interaction states.
  */
 :root {
-    --zazu-page: #F8FAFC;
+    color-scheme: light;
+    --zazu-page: #F1F5F9;
     --zazu-page-deep: #E2E8F0;
-
     --zazu-sidebar: #0F172A;
     --zazu-sidebar-ink: #F7FBFF;
     --zazu-sidebar-muted: #B9CBDA;
@@ -14,114 +14,186 @@
     --zazu-sidebar-hover: #183D5F;
     --zazu-sidebar-active: #1E40AF;
     --zazu-sidebar-surface: #163A5B;
-
     --zazu-surface: #FFFFFF;
-    --zazu-surface-2: #F1F5F8;
-    --zazu-surface-3: #E6EDF3;
-    --zazu-field: #FFFFFF;
-
-    --zazu-ink: #142B40;
-    --zazu-ink-2: #29465E;
-    --zazu-muted: #456077;
-    --zazu-faint: #667F96;
+    --zazu-surface-2: #E8EEF5;
+    --zazu-surface-3: #F1F5F9;
+    --zazu-field: var(--zazu-card-bg);
+    --zazu-ink: #0F172A;
+    --zazu-ink-2: var(--zazu-text-body);
+    --zazu-muted: #475569;
+    --zazu-faint: #94A3B8;
     --zazu-nav-label: #C7D7E5;
-
-    --zazu-border: #AEBECB;
-    --zazu-border-strong: #73899D;
-
-    --zazu-primary: #1E40AF;
-    --zazu-primary-light: #347DDF;
+    --zazu-border: #CBD5E1;
+    --zazu-border-strong: #94A3B8;
+    --zazu-primary: var(--zazu-blue-brand);
+    --zazu-primary-light: var(--zazu-blue-glow);
     --zazu-primary-pale: #BFDBFE;
-    --zazu-primary-shadow: #91B5DF;
-    --zazu-primary-deep: #174F9F;
-    --zazu-primary-hover: #164A95;
-    --zazu-primary-soft: #EFF6FF;
+    --zazu-primary-shadow: #93C5FD;
+    --zazu-primary-deep: #1E3A8A;
+    --zazu-primary-hover: #2563EB;
+    --zazu-primary-soft: #DBEAFE;
     --zazu-primary-ink: #FFFFFF;
-    --zazu-link: #1757A9;
-    --zazu-link-hover: #123E79;
-    --zazu-nav-active: #2D82EA;
-
-    --zazu-accent: #0B8F8F;
-    --zazu-accent-ink: #0A6D6D;
-    --zazu-accent-soft: #E1F4F4;
-    --zazu-focus: #1E40AF;
-
-    --zazu-success: #1E765E;
-    --zazu-success-ink: #165744;
-    --zazu-success-soft: #E2F3EC;
-    --zazu-warning: #8A5F13;
-    --zazu-warning-ink: #66440D;
-    --zazu-warning-soft: #FFF2D4;
-    --zazu-danger: #B33D4F;
-    --zazu-danger-ink: #8C2F3D;
-    --zazu-danger-soft: #FBE7EB;
-    --zazu-info: #2469D1;
-    --zazu-info-ink: #184F9E;
-    --zazu-info-soft: #EFF6FF;
-
-    --zazu-shadow: 0 2px 8px rgba(20, 43, 64, .07);
-    --zazu-shadow-strong: 0 8px 22px rgba(20, 43, 64, .12);
+    --zazu-link: var(--zazu-blue-brand);
+    --zazu-link-hover: #1D4ED8;
+    --zazu-nav-active: var(--zazu-blue-vivid);
+    --zazu-accent: #5592FC;
+    --zazu-accent-ink: #3255B8;
+    --zazu-accent-soft: #F2F7FF;
+    --zazu-focus: var(--zazu-blue-vivid);
+    --zazu-success: #137333;
+    --zazu-success-ink: #137333;
+    --zazu-success-soft: #E6F4EA;
+    --zazu-warning: #92400E;
+    --zazu-warning-ink: #92400E;
+    --zazu-warning-soft: #FEF3C7;
+    --zazu-danger: #991B1B;
+    --zazu-danger-ink: #991B1B;
+    --zazu-danger-soft: #FEE2E2;
+    --zazu-info: var(--zazu-blue-vivid);
+    --zazu-info-ink: #1D4ED8;
+    --zazu-info-soft: var(--zazu-blue-soft);
+    --zazu-shadow: var(--zazu-card-shadow);
+    --zazu-shadow-strong: 0 12px 30px rgba(15,23,42,.10);
+    --zazu-border-subtle: #B8C7D3;
+    --zazu-violet: var(--zazu-primary);
+    --zazu-violet-ink: var(--zazu-primary-deep);
+    --zazu-violet-soft: var(--zazu-primary-soft);
+    --zazu-amber: #C9790B;
+    --zazu-amber-ink: #855207;
+    --zazu-amber-soft: #FFF0D2;
+    --zazu-surface-canvas: #F2F7FF;
+    --zazu-surface-card: var(--zazu-card-bg);
+    --zazu-surface-border: var(--zazu-card-border);
+    --zazu-text-main: #0F172A;
+    --zazu-text-muted: #64748B;
+    --zazu-blue-primary: var(--zazu-blue-brand);
+    --zazu-blue-accent: var(--zazu-blue-glow);
+    --zazu-blue-hover: #1D4ED8;
+    --zazu-blue-light: #6FA4FF;
+    --zazu-blue-soft: #EFF6FF;
+    --zazu-blue-subtle: #C2DCFF;
+    --zazu-blue-canvas: var(--zazu-blue-soft);
+    --zazu-status-draft: #FEF3C7;
+    --zazu-status-draft-text: #92400E;
+    --zazu-status-active: #DCFCE7;
+    --zazu-status-active-text: #166534;
+    --zazu-status-overdue: #FEE2E2;
+    --zazu-status-overdue-text: #991B1B;
+    --zazu-ui-radius: 14px;
+    --zazu-ui-radius-sm: 9px;
+    --zazu-ui-control-height: 40px;
+    --zazu-ui-border: var(--zazu-surface-border);
+    --zazu-ui-shadow: var(--zazu-card-shadow);
+    --zazu-ui-shadow-hover: 0 6px 18px rgba(15,23,42,.08);
+    --zazu-blue-brand: #1E40AF;
+    --zazu-blue-vivid: #2563EB;
+    --zazu-blue-glow: #3B82F6;
+    --zazu-canvas-bg: #F8FAFC;
+    --zazu-card-bg: #FFFFFF;
+    --zazu-card-border: #E2E8F0;
+    --zazu-card-shadow: 0 1px 3px 0 rgba(15,23,42,.05), 0 1px 2px -1px rgba(15,23,42,.05);
+    --zazu-text-ink: #0F172A;
+    --zazu-text-body: #334155;
+    --zazu-card-shadow-hover: 0 10px 26px rgba(15,23,42,.07);
+    --zazu-ui-focus: 0 0 0 3px rgba(37,99,235,.14);
+    --zazu-master-bg: url('../../images/Background-ZAZU.jpg');
+    --zazu-content-max: 1480px;
+    --zazu-shell-gap: clamp(14px, 1.8vw, 26px);
 }
 
 :root[data-theme="dark"] {
-    --zazu-page: #091827;
-    --zazu-page-deep: #07121E;
-
-    --zazu-sidebar: #071624;
-    --zazu-sidebar-ink: #F4F8FC;
-    --zazu-sidebar-muted: #B4C7D7;
-    --zazu-sidebar-label: #86A3BA;
-    --zazu-sidebar-hover: #102E47;
-    --zazu-sidebar-active: #1F6ED0;
-    --zazu-sidebar-surface: #0E2940;
-
-    --zazu-surface: #0F2235;
-    --zazu-surface-2: #142C43;
-    --zazu-surface-3: #193750;
-    --zazu-field: #0B1B2B;
-
-    --zazu-ink: #F2F7FB;
-    --zazu-ink-2: #D8E5F0;
-    --zazu-muted: #B7C9D8;
-    --zazu-faint: #91A9BC;
-    --zazu-nav-label: #B5C9D9;
-
-    --zazu-border: #3A5870;
-    --zazu-border-strong: #5D7A93;
-
-    --zazu-primary: #4E91EA;
-    --zazu-primary-light: #6AA9F2;
-    --zazu-primary-pale: #86B8F4;
-    --zazu-primary-shadow: #315E8F;
-    --zazu-primary-deep: #83B7F2;
-    --zazu-primary-hover: #74ADF0;
-    --zazu-primary-soft: #163A5A;
-    --zazu-primary-ink: #061A2B;
-    --zazu-link: #8DC0F4;
-    --zazu-link-hover: #B2D4FA;
-    --zazu-nav-active: #5BA2F0;
-
-    --zazu-accent: #31C0B4;
-    --zazu-accent-ink: #73DDD6;
-    --zazu-accent-soft: #103B3A;
-    --zazu-focus: #63A9F2;
-
-    --zazu-success: #55B896;
-    --zazu-success-ink: #83D3B2;
-    --zazu-success-soft: #173A31;
-    --zazu-warning: #D8B46E;
-    --zazu-warning-ink: #F0CB8B;
-    --zazu-warning-soft: #3A311F;
-    --zazu-danger: #E18B9B;
-    --zazu-danger-ink: #F3ABB7;
-    --zazu-danger-soft: #44262D;
-    --zazu-info: #6AA9F2;
-    --zazu-info-ink: #B6D7FA;
-    --zazu-info-soft: #163A5A;
-
-    --zazu-shadow: 0 2px 10px rgba(0, 0, 0, .24);
-    --zazu-shadow-strong: 0 10px 28px rgba(0, 0, 0, .30);
+    color-scheme: dark;
+    --zazu-page: #0D1020;
+    --zazu-page-deep: #090C18;
+    --zazu-sidebar: #11162A;
+    --zazu-sidebar-ink: #F4F5FA;
+    --zazu-sidebar-muted: #C5C9D8;
+    --zazu-sidebar-label: #959DB3;
+    --zazu-sidebar-hover: #1A213A;
+    --zazu-sidebar-active: #232B4D;
+    --zazu-sidebar-surface: #171D33;
+    --zazu-surface: #151B2F;
+    --zazu-surface-2: #1B2239;
+    --zazu-surface-3: #222A43;
+    --zazu-field: #11172A;
+    --zazu-ink: #F4F5FA;
+    --zazu-ink-2: #DADDE8;
+    --zazu-muted: #B1B7C9;
+    --zazu-faint: #929AAF;
+    --zazu-nav-label: #A4ABBD;
+    --zazu-border: #394158;
+    --zazu-border-strong: #5E6882;
+    --zazu-primary: #7A78FF;
+    --zazu-primary-light: #9492FF;
+    --zazu-primary-pale: #B0AEFF;
+    --zazu-primary-shadow: #4C4C8D;
+    --zazu-primary-deep: #A7A5FF;
+    --zazu-primary-hover: #8C8AFF;
+    --zazu-primary-soft: #282B52;
+    --zazu-primary-ink: #0D1020;
+    --zazu-link: #A7A5FF;
+    --zazu-link-hover: #C1BFFF;
+    --zazu-nav-active: #7A78FF;
+    --zazu-accent: #48C6B8;
+    --zazu-accent-ink: #9AE2DA;
+    --zazu-accent-soft: #123A37;
+    --zazu-focus: #9492FF;
+    --zazu-success: #67C59A;
+    --zazu-success-ink: #9BE0BB;
+    --zazu-success-soft: #17362A;
+    --zazu-warning: #E0B86B;
+    --zazu-warning-ink: #F0CF8E;
+    --zazu-warning-soft: #3C321E;
+    --zazu-danger: #F08E8E;
+    --zazu-danger-ink: #FFB2B2;
+    --zazu-danger-soft: #45272C;
+    --zazu-info: #9C99FF;
+    --zazu-info-ink: #C6C4FF;
+    --zazu-info-soft: #272646;
+    --zazu-shadow: 0 2px 10px rgba(0,0,0,.24);
+    --zazu-shadow-strong: 0 12px 30px rgba(0,0,0,.32);
+    --zazu-border-subtle: #526E83;
+    --zazu-violet: var(--zazu-primary);
+    --zazu-violet-ink: var(--zazu-primary-deep);
+    --zazu-violet-soft: var(--zazu-primary-soft);
+    --zazu-amber: #E0A85A;
+    --zazu-amber-ink: #F4C985;
+    --zazu-amber-soft: #3B301F;
+    --zazu-surface-canvas: #0B0E14;
+    --zazu-surface-card: var(--zazu-card-bg);
+    --zazu-surface-border: var(--zazu-card-border);
+    --zazu-text-main: #F8FAFC;
+    --zazu-text-muted: #94A3B8;
+    --zazu-blue-canvas: var(--zazu-blue-soft);
+    --zazu-blue-primary: var(--zazu-blue-brand);
+    --zazu-blue-accent: var(--zazu-blue-glow);
+    --zazu-blue-hover: var(--zazu-blue-vivid);
+    --zazu-blue-light: #6FA4FF;
+    --zazu-blue-soft: #282B52;
+    --zazu-blue-subtle: #31506F;
+    --zazu-blue-brand: #7A78FF;
+    --zazu-blue-vivid: #9492FF;
+    --zazu-blue-glow: #B0AEFF;
+    --zazu-canvas-bg: #090D16;
+    --zazu-card-bg: #111827;
+    --zazu-card-border: #1E293B;
+    --zazu-card-shadow: 0 1px 3px rgba(0,0,0,.24),0 10px 28px rgba(0,0,0,.1);
+    --zazu-text-ink: #F8FAFC;
+    --zazu-text-body: #E2E8F0;
+    --zazu-status-draft: #422006;
+    --zazu-status-draft-text: #FDE68A;
+    --zazu-status-active: #052E16;
+    --zazu-status-active-text: #86EFAC;
+    --zazu-status-overdue: #450A0A;
+    --zazu-status-overdue-text: #FCA5A5;
+    --zazu-card-shadow-hover: 0 12px 30px rgba(0,0,0,.22);
+    --zazu-ui-focus: 0 0 0 3px rgba(96,165,250,.2);
+    --zazu-blue-deep: #5B59E0;
 }
+
+
+
+
 
 /* Perceptual foundation: the page is visibly a different plane from its cards. */
 body {
@@ -995,123 +1067,9 @@ textarea:focus {
    explicit control affordances, compact scanning density, and visible grouping.
    ========================================================================== */
 
-:root {
-    --zazu-page: #E3EBF3;
-    --zazu-page-deep: #C9D9E7;
 
-    --zazu-surface: #FFFFFF;
-    --zazu-surface-2: #EAF1F7;
-    --zazu-surface-3: #DCE6EF;
-    --zazu-field: #FBFDFF;
 
-    --zazu-ink: #11283E;
-    --zazu-ink-2: #274560;
-    --zazu-muted: #45627A;
-    --zazu-faint: #607A91;
 
-    --zazu-border: #91A7BA;
-    --zazu-border-strong: #687F94;
-    --zazu-border-subtle: #B8C7D3;
-
-    --zazu-primary: #246BEB;
-    --zazu-primary-light: #3F84F0;
-    --zazu-primary-pale: #AFCDF9;
-    --zazu-primary-shadow: #7FAEF1;
-    --zazu-primary-deep: #154FAF;
-    --zazu-primary-hover: #174FAE;
-    --zazu-primary-soft: #D9E9FF;
-    --zazu-primary-ink: #FFFFFF;
-    --zazu-link: #1459BF;
-    --zazu-link-hover: #0E438E;
-    --zazu-nav-active: #3F84F0;
-
-    --zazu-accent: #0AA79D;
-    --zazu-accent-ink: #08766F;
-    --zazu-accent-soft: #D8F4F1;
-
-    --zazu-violet: var(--zazu-primary);
-    --zazu-violet-ink: var(--zazu-primary-deep);
-    --zazu-violet-soft: var(--zazu-primary-soft);
-
-    --zazu-amber: #C9790B;
-    --zazu-amber-ink: #855207;
-    --zazu-amber-soft: #FFF0D2;
-
-    --zazu-success: #19785D;
-    --zazu-success-ink: #135841;
-    --zazu-success-soft: #E0F4EB;
-    --zazu-warning: #9A6410;
-    --zazu-warning-ink: #704605;
-    --zazu-warning-soft: #FFF0D2;
-    --zazu-danger: #B7374D;
-    --zazu-danger-ink: #8C2739;
-    --zazu-danger-soft: #FBE5E9;
-    --zazu-info: #246BEB;
-    --zazu-info-ink: #154FAF;
-    --zazu-info-soft: #D9E9FF;
-
-    --zazu-shadow: 0 2px 8px rgba(17, 40, 62, .08), 0 10px 24px rgba(17, 40, 62, .045);
-    --zazu-shadow-strong: 0 8px 26px rgba(17, 40, 62, .13);
-}
-
-:root[data-theme="dark"] {
-    --zazu-page: #081A2A;
-    --zazu-page-deep: #061321;
-
-    --zazu-surface: #0D2438;
-    --zazu-surface-2: #13304A;
-    --zazu-surface-3: #193B59;
-    --zazu-field: #0A1F31;
-
-    --zazu-ink: #F3F8FC;
-    --zazu-ink-2: #D4E2ED;
-    --zazu-muted: #B4C8D8;
-    --zazu-faint: #8FA9BC;
-
-    --zazu-border: #3E5C74;
-    --zazu-border-strong: #6A89A3;
-    --zazu-border-subtle: #526E83;
-
-    --zazu-primary: #5B9AF2;
-    --zazu-primary-light: #77AEF5;
-    --zazu-primary-pale: #9EC6F8;
-    --zazu-primary-shadow: #315F8F;
-    --zazu-primary-deep: #9BC5FF;
-    --zazu-primary-hover: #82B5F7;
-    --zazu-primary-soft: #173B60;
-    --zazu-primary-ink: #061725;
-    --zazu-link: #A6CCFC;
-    --zazu-link-hover: #C2DEFF;
-    --zazu-nav-active: #65A7F4;
-
-    --zazu-accent: #35C9BF;
-    --zazu-accent-ink: #7AE0D9;
-    --zazu-accent-soft: #103D3B;
-
-    --zazu-violet: var(--zazu-primary);
-    --zazu-violet-ink: var(--zazu-primary-deep);
-    --zazu-violet-soft: var(--zazu-primary-soft);
-
-    --zazu-amber: #E0A85A;
-    --zazu-amber-ink: #F4C985;
-    --zazu-amber-soft: #3B301F;
-
-    --zazu-success: #59C29B;
-    --zazu-success-ink: #85D9B7;
-    --zazu-success-soft: #153B31;
-    --zazu-warning: #E0B56E;
-    --zazu-warning-ink: #F4CB8D;
-    --zazu-warning-soft: #3B301F;
-    --zazu-danger: #E18C9E;
-    --zazu-danger-ink: #F2AFBD;
-    --zazu-danger-soft: #43272E;
-    --zazu-info: #5B9AF2;
-    --zazu-info-ink: #B4D7FC;
-    --zazu-info-soft: #173B60;
-
-    --zazu-shadow: 0 2px 10px rgba(0,0,0,.28), 0 12px 30px rgba(0,0,0,.18);
-    --zazu-shadow-strong: 0 10px 28px rgba(0,0,0,.34);
-}
 
 /* Human-eye separation: the page plane, work surfaces, and controls must read as
    three different layers before any content is read. */
@@ -1833,8 +1791,8 @@ textarea.zazu-textarea,
 }
 
 /* ZAZU BLUE SYSTEM / CANONICAL TOKENS */
-:root { --zazu-surface-canvas:#F2F7FF; --zazu-surface-card:#FFFFFF; --zazu-surface-border:#E2E8F0; --zazu-text-main:#0F172A; --zazu-text-muted:#64748B; --zazu-blue-primary:#416AD7; --zazu-blue-accent:#5592FC; --zazu-blue-hover:#3255B8; --zazu-blue-light:#6FA4FF; --zazu-blue-soft:#9EC8FF; --zazu-blue-subtle:#C2DCFF; --zazu-blue-canvas:#F2F7FF; --zazu-status-draft:#FEF3C7; --zazu-status-draft-text:#92400E; --zazu-status-active:#E6F4EA; --zazu-status-active-text:#137333; --zazu-status-overdue:#FEE2E2; --zazu-status-overdue-text:#991B1B; --zazu-page:#F2F7FF; --zazu-page-deep:#C2DCFF; --zazu-surface:#FFFFFF; --zazu-surface-2:#F2F7FF; --zazu-surface-3:#F7FAFF; --zazu-field:#FFFFFF; --zazu-ink:#0F172A; --zazu-ink-2:#334155; --zazu-muted:#64748B; --zazu-faint:#64748B; --zazu-border:#E2E8F0; --zazu-border-strong:#C2DCFF; --zazu-primary:#416AD7; --zazu-primary-light:#6FA4FF; --zazu-primary-pale:#9EC8FF; --zazu-primary-shadow:#C2DCFF; --zazu-primary-deep:#3255B8; --zazu-primary-hover:#3255B8; --zazu-primary-soft:#F2F7FF; --zazu-primary-ink:#FFFFFF; --zazu-link:#416AD7; --zazu-link-hover:#3255B8; --zazu-nav-active:#416AD7; --zazu-accent:#5592FC; --zazu-accent-ink:#3255B8; --zazu-accent-soft:#F2F7FF; --zazu-focus:#5592FC; --zazu-success:#137333; --zazu-success-ink:#137333; --zazu-success-soft:#E6F4EA; --zazu-warning:#92400E; --zazu-warning-ink:#92400E; --zazu-warning-soft:#FEF3C7; --zazu-danger:#991B1B; --zazu-danger-ink:#991B1B; --zazu-danger-soft:#FEE2E2; }
-:root[data-theme="dark"] { --zazu-surface-canvas:#0B0E14; --zazu-surface-card:#151B26; --zazu-surface-border:#232D3F; --zazu-text-main:#F8FAFC; --zazu-text-muted:#94A3B8; --zazu-blue-canvas:#0F172A; --zazu-blue-primary:#5592FC; --zazu-blue-accent:#6FA4FF; --zazu-blue-hover:#416AD7; --zazu-blue-light:#6FA4FF; --zazu-blue-soft:#9EC8FF; --zazu-blue-subtle:#31506F; --zazu-page:#0B0E14; --zazu-page-deep:#0F172A; --zazu-surface:#151B26; --zazu-surface-2:#0F172A; --zazu-surface-3:#1B2432; --zazu-field:#101722; --zazu-ink:#F8FAFC; --zazu-ink-2:#CBD5E1; --zazu-muted:#94A3B8; --zazu-faint:#94A3B8; --zazu-border:#232D3F; --zazu-border-strong:#31506F; --zazu-primary:#5592FC; --zazu-primary-light:#6FA4FF; --zazu-primary-pale:#9EC8FF; --zazu-primary-deep:#6FA4FF; --zazu-primary-hover:#6FA4FF; --zazu-primary-soft:#17263B; --zazu-primary-ink:#0B0E14; --zazu-link:#9EC8FF; --zazu-link-hover:#FFFFFF; --zazu-nav-active:#5592FC; --zazu-accent:#6FA4FF; --zazu-accent-ink:#9EC8FF; --zazu-accent-soft:#17263B; --zazu-focus:#6FA4FF; --zazu-success:#7BCB9A; --zazu-success-ink:#A5E4BA; --zazu-success-soft:#173022; --zazu-warning:#F0C96B; --zazu-warning-ink:#F8D98D; --zazu-warning-soft:#3A301B; --zazu-danger:#F28B8B; --zazu-danger-ink:#FFB0B0; --zazu-danger-soft:#3B2020; }
+
+
 body { background:var(--zazu-page); color:var(--zazu-ink); }
 .zazu-card,.zazu-panel,.zazu-command-band,.zazu-next-action,.zazu-metric-card,.zazu-catalogue-card,.zazu-calendar-shell,.zazu-list,.zazu-form-section { border-color:var(--zazu-border); background:var(--zazu-surface); }
 .zazu-btn-primary { background:var(--zazu-blue-primary); border-color:var(--zazu-blue-primary); color:#fff; } .zazu-btn-primary:hover { background:var(--zazu-blue-hover); border-color:var(--zazu-blue-hover); }
@@ -1845,14 +1803,7 @@ body { background:var(--zazu-page); color:var(--zazu-ink); }
 .zazu-metric-value,.zazu-side-primary,.zazu-work-ref,.zazu-ops-ref strong,[data-numeric="true"] { font-variant-numeric:tabular-nums; } .zazu-work-ref,.zazu-ops-ref strong { font-family:"JetBrains Mono",ui-monospace,SFMono-Regular,Menlo,monospace; }
 
 /* ZAZU DIRECTOR SWEEP — UI CONSISTENCY PASS */
-:root {
-    --zazu-ui-radius: 6px;
-    --zazu-ui-radius-sm: 4px;
-    --zazu-ui-control-height: 38px;
-    --zazu-ui-border: var(--zazu-surface-border);
-    --zazu-ui-shadow: 0 1px 2px rgba(15, 23, 42, 0.04);
-    --zazu-ui-shadow-hover: 0 4px 12px rgba(15, 23, 42, 0.07);
-}
+
 
 /* 1. One surface language: quiet canvas, crisp cards, restrained elevation. */
 .zazu-card,
@@ -2168,36 +2119,8 @@ body.zazu-drawer-open { overflow:hidden; }
 [data-theme="dark"] .zazu-register-head { background:var(--zazu-blue-canvas); }
 
 /* ZAZU EMP — COMMERCIAL HIGH-CONTRAST CONSOLIDATION */
-:root {
-    --zazu-blue-brand:#1E40AF; --zazu-blue-vivid:#2563EB; --zazu-blue-glow:#3B82F6; --zazu-blue-soft:#EFF6FF;
-    --zazu-canvas-bg:#F8FAFC; --zazu-card-bg:#FFFFFF; --zazu-card-border:#E2E8F0;
-    --zazu-card-shadow:0 1px 3px 0 rgba(15,23,42,.05),0 1px 2px -1px rgba(15,23,42,.05);
-    --zazu-text-ink:#0F172A; --zazu-text-body:#334155; --zazu-text-muted:#64748B;
-    --zazu-status-draft:#FEF3C7; --zazu-status-draft-text:#92400E;
-    --zazu-status-active:#DCFCE7; --zazu-status-active-text:#166534;
-    --zazu-status-overdue:#FEE2E2; --zazu-status-overdue-text:#991B1B;
-    --zazu-page:var(--zazu-canvas-bg); --zazu-surface:var(--zazu-card-bg); --zazu-surface-card:var(--zazu-card-bg);
-    --zazu-surface-border:var(--zazu-card-border); --zazu-border:var(--zazu-card-border);
-    --zazu-ink:var(--zazu-text-ink); --zazu-ink-2:var(--zazu-text-body); --zazu-muted:var(--zazu-text-muted);
-    --zazu-primary:var(--zazu-blue-brand); --zazu-primary-light:var(--zazu-blue-glow); --zazu-primary-hover:#1D4ED8;
-    --zazu-primary-soft:var(--zazu-blue-soft); --zazu-primary-ink:#FFFFFF;
-    --zazu-blue-primary:var(--zazu-blue-brand); --zazu-blue-accent:var(--zazu-blue-glow); --zazu-blue-hover:#1D4ED8;
-    --zazu-blue-canvas:var(--zazu-blue-soft); --zazu-ui-radius:16px; --zazu-ui-radius-sm:10px;
-    --zazu-ui-shadow:var(--zazu-card-shadow); --zazu-ui-shadow-hover:0 6px 18px rgba(15,23,42,.08);
-}
-:root[data-theme="dark"] {
-    --zazu-blue-brand:#3B82F6; --zazu-blue-vivid:#60A5FA; --zazu-blue-glow:#93C5FD; --zazu-blue-soft:#172554;
-    --zazu-canvas-bg:#090D16; --zazu-card-bg:#111827; --zazu-card-border:#1E293B; --zazu-card-shadow:0 1px 3px rgba(0,0,0,.22);
-    --zazu-text-ink:#F8FAFC; --zazu-text-body:#E2E8F0; --zazu-text-muted:#94A3B8;
-    --zazu-status-draft:#422006; --zazu-status-draft-text:#FDE68A; --zazu-status-active:#052E16; --zazu-status-active-text:#86EFAC;
-    --zazu-status-overdue:#450A0A; --zazu-status-overdue-text:#FCA5A5;
-    --zazu-page:var(--zazu-canvas-bg); --zazu-surface:var(--zazu-card-bg); --zazu-surface-card:var(--zazu-card-bg);
-    --zazu-surface-border:var(--zazu-card-border); --zazu-border:var(--zazu-card-border); --zazu-ink:var(--zazu-text-ink);
-    --zazu-ink-2:var(--zazu-text-body); --zazu-muted:var(--zazu-text-muted); --zazu-primary:var(--zazu-blue-brand);
-    --zazu-primary-light:var(--zazu-blue-glow); --zazu-primary-hover:#60A5FA; --zazu-primary-soft:var(--zazu-blue-soft);
-    --zazu-primary-ink:#07111F; --zazu-blue-primary:var(--zazu-blue-brand); --zazu-blue-accent:var(--zazu-blue-glow);
-    --zazu-blue-hover:var(--zazu-blue-vivid); --zazu-blue-canvas:var(--zazu-blue-soft);
-}
+
+
 body{background:var(--zazu-canvas-bg);color:var(--zazu-text-body)}
 .zazu-sidebar{background:#0B1220;border-right:1px solid #1E293B}
 .zazu-topbar{background:color-mix(in srgb,var(--zazu-card-bg) 88%,transparent);border-bottom:0;box-shadow:0 6px 24px rgba(15,23,42,.05);backdrop-filter:blur(16px)}
@@ -2253,8 +2176,8 @@ body{background:var(--zazu-canvas-bg);color:var(--zazu-text-body)}
 @media(max-width:1000px){.zazu-dashboard-side-stack{grid-column:auto}.zazu-dashboard-assets{grid-column:auto}}
 
 /* ZAZU EMP 2026 — PRODUCT-WIDE UI/UX REFINEMENT */
-:root{--zazu-canvas-bg:#F8FAFC;--zazu-card-bg:#FFF;--zazu-card-border:#E2E8F0;--zazu-card-shadow:0 1px 3px rgba(15,23,42,.05),0 8px 24px rgba(15,23,42,.025);--zazu-card-shadow-hover:0 10px 26px rgba(15,23,42,.07);--zazu-text-ink:#0F172A;--zazu-text-body:#334155;--zazu-text-muted:#64748B;--zazu-blue-brand:#1E40AF;--zazu-blue-vivid:#2563EB;--zazu-blue-glow:#3B82F6;--zazu-blue-soft:#EFF6FF;--zazu-ui-radius:14px;--zazu-ui-radius-sm:9px;--zazu-ui-control-height:40px;--zazu-ui-focus:0 0 0 3px rgba(37,99,235,.14)}
-:root[data-theme="dark"]{--zazu-canvas-bg:#090D16;--zazu-card-bg:#111827;--zazu-card-border:#1E293B;--zazu-card-shadow:0 1px 3px rgba(0,0,0,.24),0 10px 28px rgba(0,0,0,.1);--zazu-card-shadow-hover:0 12px 30px rgba(0,0,0,.22);--zazu-text-ink:#F8FAFC;--zazu-text-body:#E2E8F0;--zazu-text-muted:#94A3B8;--zazu-blue-brand:#3B82F6;--zazu-blue-vivid:#60A5FA;--zazu-blue-glow:#93C5FD;--zazu-blue-soft:#172554;--zazu-ui-focus:0 0 0 3px rgba(96,165,250,.2)}
+
+
 html{background:var(--zazu-canvas-bg);scroll-behavior:smooth}body{background:linear-gradient(180deg,color-mix(in srgb,var(--zazu-canvas-bg) 88%,var(--zazu-blue-soft)),var(--zazu-canvas-bg) 18rem);color:var(--zazu-text-body);font-family:Inter,"Plus Jakarta Sans","Segoe UI Variable Text","Segoe UI",system-ui,sans-serif;-webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility}::selection{background:color-mix(in srgb,var(--zazu-blue-vivid) 18%,transparent);color:var(--zazu-text-ink)}:where(a,button,input,select,textarea):focus-visible{outline:0;box-shadow:var(--zazu-ui-focus)}
 .zazu-sidebar{background:linear-gradient(180deg,#0A1220,#0B1220 52%,#0A101B);border-right:1px solid rgba(148,163,184,.14)}.zazu-sidebar a,.zazu-sidebar button{border-radius:10px;transition:background-color 140ms,color 140ms,transform 140ms,border-color 140ms}.zazu-sidebar a:hover,.zazu-sidebar button:hover{background:rgba(59,130,246,.1)}.zazu-sidebar a[aria-current="page"],.zazu-sidebar a.is-active{background:rgba(59,130,246,.16);color:#fff;box-shadow:inset 3px 0 var(--zazu-blue-glow)}
 .zazu-topbar{background:color-mix(in srgb,var(--zazu-card-bg) 92%,transparent);border-bottom:1px solid color-mix(in srgb,var(--zazu-card-border) 80%,transparent);box-shadow:0 4px 18px rgba(15,23,42,.035);backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px)}.zazu-topbar-inner{min-height:68px}.zazu-command-trigger{min-height:38px;border:1px solid var(--zazu-card-border);border-radius:10px;background:var(--zazu-card-bg);color:var(--zazu-text-body);box-shadow:0 1px 2px rgba(15,23,42,.03)}.zazu-command-trigger:hover{border-color:color-mix(in srgb,var(--zazu-blue-vivid) 30%,var(--zazu-card-border));background:var(--zazu-blue-soft)}
@@ -2312,11 +2235,7 @@ html{background:var(--zazu-canvas-bg);scroll-behavior:smooth}body{background:lin
  * Existing repository asset: images/blue pallette.jpg
  * Kept deliberately faint so operational content remains the visual priority.
  */
-:root {
-    --zazu-master-bg: url('../../images/Background-ZAZU.jpg');
-    --zazu-content-max: 1480px;
-    --zazu-shell-gap: clamp(14px, 1.8vw, 26px);
-}
+
 
 /* The image is a visual field, not a decorative card background. */
 body {
@@ -2670,90 +2589,8 @@ html[data-theme="dark"] body {
  * Final authority: Deep Slate Ink + Midnight Cobalt + Sapphire.
  * Kept here at the end of the visual layer so legacy aliases cannot win.
  */
-:root {
-    --zazu-blue-brand: #1E40AF;
-    --zazu-blue-vivid: #2563EB;
-    --zazu-blue-glow: #3B82F6;
-    --zazu-blue-soft: #EFF6FF;
-    --zazu-canvas-bg: #F8FAFC;
-    --zazu-card-bg: #FFFFFF;
-    --zazu-card-border: #E2E8F0;
-    --zazu-card-shadow: 0 1px 3px 0 rgba(15,23,42,.05), 0 1px 2px -1px rgba(15,23,42,.05);
-    --zazu-text-ink: #0F172A;
-    --zazu-text-body: #334155;
-    --zazu-text-muted: #64748B;
-    --zazu-status-draft: #FEF3C7;
-    --zazu-status-draft-text: #92400E;
-    --zazu-status-active: #DCFCE7;
-    --zazu-status-active-text: #166534;
-    --zazu-status-overdue: #FEE2E2;
-    --zazu-status-overdue-text: #991B1B;
 
-    --zazu-page: var(--zazu-canvas-bg);
-    --zazu-page-deep: #E2E8F0;
-    --zazu-surface: var(--zazu-card-bg);
-    --zazu-surface-2: #F1F5F9;
-    --zazu-surface-3: #F1F5F9;
-    --zazu-field: var(--zazu-card-bg);
-    --zazu-ink: var(--zazu-text-ink);
-    --zazu-ink-2: var(--zazu-text-body);
-    --zazu-muted: var(--zazu-text-muted);
-    --zazu-faint: #94A3B8;
-    --zazu-border: var(--zazu-card-border);
-    --zazu-border-strong: #CBD5E1;
-    --zazu-primary: var(--zazu-blue-brand);
-    --zazu-primary-light: var(--zazu-blue-glow);
-    --zazu-primary-pale: #BFDBFE;
-    --zazu-primary-shadow: #93C5FD;
-    --zazu-primary-deep: #1E3A8A;
-    --zazu-primary-hover: #2563EB;
-    --zazu-primary-soft: var(--zazu-blue-soft);
-    --zazu-link: var(--zazu-blue-brand);
-    --zazu-link-hover: #1D4ED8;
-    --zazu-nav-active: var(--zazu-blue-vivid);
-    --zazu-focus: var(--zazu-blue-vivid);
-    --zazu-info: var(--zazu-blue-vivid);
-    --zazu-info-ink: #1D4ED8;
-    --zazu-info-soft: var(--zazu-blue-soft);
-    --zazu-shadow: var(--zazu-card-shadow);
-    --zazu-shadow-strong: 0 12px 30px rgba(15,23,42,.10);
-}
-:root[data-theme="dark"] {
-    --zazu-canvas-bg: #090D16;
-    --zazu-card-bg: #111827;
-    --zazu-card-border: #1E293B;
-    --zazu-text-ink: #F8FAFC;
-    --zazu-text-body: #E2E8F0;
-    --zazu-text-muted: #94A3B8;
-    --zazu-page: var(--zazu-canvas-bg);
-    --zazu-page-deep: #020617;
-    --zazu-surface: var(--zazu-card-bg);
-    --zazu-surface-2: #172033;
-    --zazu-surface-3: #172033;
-    --zazu-field: #0F172A;
-    --zazu-ink: var(--zazu-text-ink);
-    --zazu-ink-2: var(--zazu-text-body);
-    --zazu-muted: var(--zazu-text-muted);
-    --zazu-faint: #64748B;
-    --zazu-border: var(--zazu-card-border);
-    --zazu-border-strong: #334155;
-    --zazu-primary: #2563EB;
-    --zazu-primary-light: #3B82F6;
-    --zazu-primary-pale: #60A5FA;
-    --zazu-primary-shadow: #1D4ED8;
-    --zazu-primary-deep: #93C5FD;
-    --zazu-primary-hover: #3B82F6;
-    --zazu-primary-soft: #172554;
-    --zazu-link: #60A5FA;
-    --zazu-link-hover: #93C5FD;
-    --zazu-nav-active: #3B82F6;
-    --zazu-focus: #60A5FA;
-    --zazu-info: #60A5FA;
-    --zazu-info-ink: #93C5FD;
-    --zazu-info-soft: #172554;
-    --zazu-shadow: 0 2px 10px rgba(0,0,0,.24);
-    --zazu-shadow-strong: 0 12px 30px rgba(0,0,0,.32);
-}
+
 
 
 /* OPERATIONS HUB — CYCLE 1: structural hierarchy + mobile-first density */
@@ -3591,16 +3428,7 @@ body[data-zazu-route^="quotes."] .zazu-topbar-actions .zazu-command-trigger:focu
 
 
 /* ZAZU VISIBILITY RESET — strong surfaces, borders and controlled white */
-:root {
-    --zazu-page: #F1F5F9;
-    --zazu-surface: #FFFFFF;
-    --zazu-surface-2: #E8EEF5;
-    --zazu-border: #CBD5E1;
-    --zazu-border-strong: #94A3B8;
-    --zazu-muted: #475569;
-    --zazu-ink: #0F172A;
-    --zazu-primary-soft: #DBEAFE;
-}
+
 body {
     background: var(--zazu-page);
     color: var(--zazu-ink);
@@ -4980,69 +4808,7 @@ main {
     --zazu-info-soft: #F0EEFF;
 }
 
-:root[data-theme="dark"] {
-    /* Deep ink + luminous cobalt + sea-glass. */
-    --zazu-page: #0D1020;
-    --zazu-page-deep: #090C18;
-    --zazu-sidebar: #11162A;
-    --zazu-sidebar-ink: #F4F5FA;
-    --zazu-sidebar-muted: #C5C9D8;
-    --zazu-sidebar-label: #959DB3;
-    --zazu-sidebar-hover: #1A213A;
-    --zazu-sidebar-active: #232B4D;
-    --zazu-sidebar-surface: #171D33;
 
-    --zazu-surface: #151B2F;
-    --zazu-surface-2: #1B2239;
-    --zazu-surface-3: #222A43;
-    --zazu-field: #11172A;
-
-    --zazu-ink: #F4F5FA;
-    --zazu-ink-2: #DADDE8;
-    --zazu-muted: #B1B7C9;
-    --zazu-faint: #929AAF;
-    --zazu-nav-label: #A4ABBD;
-
-    --zazu-border: #394158;
-    --zazu-border-strong: #5E6882;
-
-    --zazu-blue-brand: #7A78FF;
-    --zazu-blue-vivid: #9492FF;
-    --zazu-blue-glow: #B0AEFF;
-    --zazu-blue-soft: #282B52;
-    --zazu-blue-deep: #5B59E0;
-
-    --zazu-primary: #7A78FF;
-    --zazu-primary-light: #9492FF;
-    --zazu-primary-pale: #B0AEFF;
-    --zazu-primary-shadow: #4C4C8D;
-    --zazu-primary-deep: #A7A5FF;
-    --zazu-primary-hover: #8C8AFF;
-    --zazu-primary-soft: #282B52;
-    --zazu-primary-ink: #0D1020;
-
-    --zazu-link: #A7A5FF;
-    --zazu-link-hover: #C1BFFF;
-    --zazu-nav-active: #7A78FF;
-
-    --zazu-accent: #48C6B8;
-    --zazu-accent-ink: #9AE2DA;
-    --zazu-accent-soft: #123A37;
-    --zazu-focus: #9492FF;
-
-    --zazu-success: #67C59A;
-    --zazu-success-ink: #9BE0BB;
-    --zazu-success-soft: #17362A;
-    --zazu-warning: #E0B86B;
-    --zazu-warning-ink: #F0CF8E;
-    --zazu-warning-soft: #3C321E;
-    --zazu-danger: #F08E8E;
-    --zazu-danger-ink: #FFB2B2;
-    --zazu-danger-soft: #45272C;
-    --zazu-info: #9C99FF;
-    --zazu-info-ink: #C6C4FF;
-    --zazu-info-soft: #272646;
-}
 
 /* Surfaces stay flat. Hierarchy comes from borders, spacing and restrained elevation. */
 body {
