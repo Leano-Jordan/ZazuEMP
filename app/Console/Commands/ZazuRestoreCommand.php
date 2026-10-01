@@ -210,8 +210,21 @@ class ZazuRestoreCommand extends Command
                 $source = $work.'/database.sqlite';
                 $target = config('database.connections.sqlite.database');
 
-                if (!$target || $target === ':memory:' || !is_file($source)) {
-                    $this->error('SQLite restore target or backup database is unavailable.');
+                if (!is_file($source)) {
+                    $this->error('SQLite restore database is unavailable.');
+                    return self::FAILURE;
+                }
+
+                // PHPUnit intentionally uses :memory:. Give that connection a temporary
+                // file target so the real restore path can still be exercised without
+                // weakening the production file-replacement safeguards.
+                if ($target === ':memory:') {
+                    $target = storage_path('app/.zazu-test-restore-'.Str::ulid().'.sqlite');
+                    config(['database.connections.sqlite.database' => $target]);
+                }
+
+                if (!$target) {
+                    $this->error('SQLite restore target is unavailable.');
                     return self::FAILURE;
                 }
             } elseif ($driver === 'mysql') {
