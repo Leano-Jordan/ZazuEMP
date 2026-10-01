@@ -101,4 +101,67 @@ class ZazuBackupRestoreTest extends TestCase
         $this->assertFileDoesNotExist($outside);
         File::delete($archive);
     }
+
+    public function test_restore_rejects_unsupported_entries_before_touching_the_installation(): void
+    {
+        if (!class_exists(ZipArchive::class)) {
+            $this->markTestSkipped('PHP Zip extension is required for backup/restore tests.');
+        }
+
+        $archive = storage_path('app/zazu-unsupported-test.zip');
+        $probe = storage_path('app/private/restore-safety-probe.txt');
+        File::ensureDirectoryExists(dirname($archive));
+        File::ensureDirectoryExists(dirname($probe));
+        File::put($probe, 'must survive');
+
+        $zip = new ZipArchive();
+        $this->assertSame(true, $zip->open($archive, ZipArchive::CREATE | ZipArchive::OVERWRITE));
+        $zip->addFromString('manifest.json', json_encode([
+            'application' => 'Zazu EMP',
+            'format_version' => 1,
+            'database_driver' => 'sqlite',
+        ]));
+        $zip->addFromString('database.sqlite', 'not a real database');
+        $zip->addFromString('unexpected.txt', 'must be rejected');
+        $zip->close();
+
+        try {
+            $this->artisan('zazu:restore', ['archive' => $archive, '--force' => true])
+                ->assertExitCode(1);
+
+            $this->assertSame('must survive', File::get($probe));
+        } finally {
+            File::delete($archive);
+            File::delete($probe);
+        }
+    }
+
+    public function test_restore_rejects_duplicate_archive_entries(): void
+    {
+        if (!class_exists(ZipArchive::class)) {
+            $this->markTestSkipped('PHP Zip extension is required for backup/restore tests.');
+        }
+
+        $archive = storage_path('app/zazu-duplicate-test.zip');
+        File::ensureDirectoryExists(dirname($archive));
+
+        $zip = new ZipArchive();
+        $this->assertSame(true, $zip->open($archive, ZipArchive::CREATE | ZipArchive::OVERWRITE));
+        $zip->addFromString('manifest.json', json_encode([
+            'application' => 'Zazu EMP',
+            'format_version' => 1,
+            'database_driver' => 'sqlite',
+        ]));
+        $zip->addFromString('database.sqlite', 'first');
+        $zip->addFromString('database.sqlite', 'second');
+        $zip->close();
+
+        try {
+            $this->artisan('zazu:restore', ['archive' => $archive, '--force' => true])
+                ->assertExitCode(1);
+        } finally {
+            File::delete($archive);
+        }
+    }
+
 }
