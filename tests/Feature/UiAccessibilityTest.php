@@ -141,8 +141,8 @@ class UiAccessibilityTest extends TestCase
 
     public function test_quote_editor_exposes_live_financial_checkpoint(): void
     {
-        $business = AppModelsBusiness::query()->firstOrFail();
-        $customer = AppModelsCustomer::create([
+        $business = Business::query()->firstOrFail();
+        $customer = Customer::create([
             'business_id' => $business->id,
             'name' => 'Quote UI Customer',
         ]);
