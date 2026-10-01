@@ -12,6 +12,12 @@ permissions:
 jobs:
   browser:
     runs-on: ubuntu-latest
+    env:
+      ZAZU_DEMO_EMAIL: demo@zazu.local
+      ZAZU_DEMO_PASSWORD: password
+      ZAZU_MANAGER_EMAIL: operations@zazu.local
+      ZAZU_STAFF_EMAIL: finance@zazu.local
+      ZAZU_ROLE_PASSWORD: password
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
 
@@ -33,6 +39,7 @@ jobs:
           touch database/database.sqlite
           php artisan key:generate
           php artisan migrate --force
+          php artisan db:seed --class=Database\\Seeders\\DemoScenarioSeeder --force
 
       - name: Install frontend dependencies
         run: npm ci
