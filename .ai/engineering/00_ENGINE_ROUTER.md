@@ -214,3 +214,33 @@ A new specialist finding follows:
 OBSERVE → RECORD IN DIRECTOR STATE → ROUTE → CORRECT → VERIFY → RECONCILE.
 
 A UI may pass automated tests and still fail human-eye review. Visual acceptance therefore requires rendered evidence where the target materially changes the interface.
+
+
+## SaaS-readiness architecture gate — 2026-10-02
+
+Director now treats hosted SaaS readiness as an architectural readiness concern, not permission to introduce distributed infrastructure prematurely.
+
+For material architecture changes, Director routes through:
+
+`DIRECTOR → DISCOVERY/ARCHITECTURE → BUILDER → VERIFICATION → GUARDIAN → DIRECTOR → ACCEPT/RECORD`
+
+The architecture review must establish:
+- evidence for the problem being solved;
+- authoritative source of state;
+- business ownership and parent/child invariants;
+- transaction/idempotency/concurrency behaviour;
+- offline/local-first impact;
+- hosted-SaaS migration impact;
+- failure and recovery behaviour;
+- operational complexity introduced;
+- replacement/exit path.
+
+Preferred evolution:
+
+`MODULAR MONOLITH → MEASURE → OPTIMISE → TARGETED CACHE/QUEUE → SCALE → EXTRACT ONLY WHEN EVIDENCE REQUIRES`
+
+Do not introduce microservices, Kubernetes, sharding, distributed caching or cloud-only dependencies solely because they are common SaaS patterns.
+
+The living contract is `docs/ZAZU_SAAS_READINESS_ARCHITECTURE.md`.
+
+**Important:** SaaS-ready architecture is not equivalent to public multi-tenant SaaS release certification. Runtime business-isolation, populated-data, recovery, deployment and adversarial authorization evidence remain release gates.
