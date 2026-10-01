@@ -118,7 +118,7 @@ class ZazuRestoreCommand extends Command
                     return self::FAILURE;
                 }
 
-                if (str_contains($name, '\')) {
+                if (str_contains($name, '\\')) {
                     $zip->close();
                     $this->error('The backup archive contains an ambiguous path.');
                     return self::FAILURE;
