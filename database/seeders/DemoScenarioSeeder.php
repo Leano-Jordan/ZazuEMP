@@ -381,14 +381,14 @@ class DemoScenarioSeeder extends Seeder
         }
 
         $movementRows = [
-            [$inventoryItems['INV-CHAFER-001'], 'receipt', '20.00', '350.00', 'INV-REC-001', 'Opening equipment stock'],
-            [$inventoryItems['INV-CHAFER-001'], 'usage', '4.00', '350.00', 'INV-USE-001', 'Allocated to demo event'],
-            [$inventoryItems['INV-TABLE-001'], 'receipt', '18.00', '850.00', 'INV-REC-002', 'Opening rental stock'],
-            [$inventoryItems['INV-TABLE-001'], 'usage', '10.00', '850.00', 'INV-USE-002', 'Allocated to demo event'],
-            [$inventoryItems['INV-NAPKIN-001'], 'receipt', '300.00', '12.00', 'INV-REC-003', 'Opening consumable stock'],
-            [$inventoryItems['INV-NAPKIN-001'], 'usage', '80.00', '12.00', 'INV-USE-003', 'Consumed for demo event'],
-            [$inventoryItems['INV-PLATE-001'], 'receipt', '240.00', '18.00', 'INV-REC-004', 'Opening consumable stock'],
-            [$inventoryItems['INV-PLATE-001'], 'usage', '80.00', '18.00', 'INV-USE-004', 'Consumed for demo event'],
+            [$inventoryItems['INV-CHAFER-001'], 'receipt', '20.00', '350.00', 'INV-REC-001', 'Opening equipment stock', 'Opening equipment stock received into storage.'],
+            [$inventoryItems['INV-CHAFER-001'], 'usage', '4.00', '350.00', 'INV-USE-001', 'Allocated to demo event', 'Equipment issued for event service.'],
+            [$inventoryItems['INV-TABLE-001'], 'receipt', '18.00', '850.00', 'INV-REC-002', 'Opening rental stock', 'Rental stock received into storage.'],
+            [$inventoryItems['INV-TABLE-001'], 'usage', '10.00', '850.00', 'INV-USE-002', 'Allocated to demo event', 'Tables issued for event setup.'],
+            [$inventoryItems['INV-NAPKIN-001'], 'receipt', '300.00', '12.00', 'INV-REC-003', 'Opening consumable stock', 'Consumables received into storage.'],
+            [$inventoryItems['INV-NAPKIN-001'], 'usage', '80.00', '12.00', 'INV-USE-003', 'Consumed for demo event', 'Consumables issued for guest service.'],
+            [$inventoryItems['INV-PLATE-001'], 'receipt', '240.00', '18.00', 'INV-REC-004', 'Opening consumable stock', 'Dinnerware received into storage.'],
+            [$inventoryItems['INV-PLATE-001'], 'usage', '80.00', '18.00', 'INV-USE-004', 'Consumed for demo event', 'Dinnerware issued for guest service.'],
         ];
         foreach ($movementRows as [$item, $type, $quantity, $unitCost, $key, $reference, $notes]) {
             InventoryMovement::updateOrCreate(
@@ -407,7 +407,7 @@ class DemoScenarioSeeder extends Seeder
         }
 
         foreach ([
-            ['asset_tag' => 'AST-TENT-001', 'name' => '6m x 12m stretch tent', 'status' => 'available', 'condition' => 'good', 'location' => 'Main storage', 'acquired_at' => now()->subYear()->toDateString(), 'purchase_cost' => '42000.00', 'capability' => 'Event Furniture'],
+            ['asset_tag' => 'AST-TENT-001', 'name' => '6m x 12m stretch tent', 'status' => 'allocated', 'condition' => 'good', 'location' => 'Main storage', 'acquired_at' => now()->subYear()->toDateString(), 'purchase_cost' => '42000.00', 'capability' => 'Event Furniture'],
             ['asset_tag' => 'AST-SOUND-001', 'name' => 'Portable PA sound system', 'status' => 'available', 'condition' => 'good', 'location' => 'Main storage', 'acquired_at' => now()->subMonths(8)->toDateString(), 'purchase_cost' => '18500.00', 'capability' => 'Event Furniture'],
             ['asset_tag' => 'AST-OVEN-001', 'name' => 'Commercial convection oven', 'status' => 'in_use', 'condition' => 'good', 'location' => 'Kitchen', 'acquired_at' => now()->subMonths(18)->toDateString(), 'purchase_cost' => '32000.00', 'capability' => 'Buffet Catering'],
         ] as $row) {
