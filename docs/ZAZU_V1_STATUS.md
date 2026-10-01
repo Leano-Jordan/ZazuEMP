@@ -1,8 +1,8 @@
 # Zazu EMP — V1 Software / Commercial Status
 
-**Assessment date:** 2026-09-28  
+**Assessment date:** 2026-10-01  
 **Repository:** `Leano-Jordan/ZazuEMP`  
-**Current main code baseline observed before the engineering-system refactor:** `ff28e74723e6de8c75805db325f8491fd78180c9`
+**Application assessment HEAD:** `52d9b26bc17ddee8d1427032ecaf2fb8fc0b6350`
 
 ## Current position
 
@@ -20,7 +20,7 @@ Zazu EMP has a substantial connected operational foundation across:
 - reporting;
 - responsive/shared UI.
 
-The product is **not yet a release candidate**.
+The product is **not yet release-certified**. The current application assessment has green automated CI/browser/static-quality evidence, but several commercial-operational proof gates remain open.
 
 ## Release-critical work remaining
 
@@ -42,6 +42,15 @@ The product is **not yet a release candidate**.
 - Rollback procedure
 - Operational diagnostics/observability
 - Final deployment/configuration review
+
+### Current release evidence
+
+- Laravel: **202 passed / 1,174 assertions**
+- Browser: **7 passed / 8 skipped**; the complete registration journey runs once on Chromium to avoid shared-IP registration throttling, while responsive entry coverage is separate
+- Zazu Quality: **passed**
+- PHPMD: **passed**
+- Psalm: **passed** after removing the redundant init step and applying a narrowly scoped Laravel 13.34.0 compatibility shim for one unsupported `@phpstan-this-out` annotation
+- Fresh SQLite migration, Blade compilation, asset build/manifest verification and application configuration validation: **passed**
 
 ### Runtime proof
 - Browser critical-path traversal
@@ -73,4 +82,4 @@ Historical CI/test figures in older records remain historical and are not restat
 
 ## Direction
 
-The next Zazu engineering effort should close the highest-risk release gate in the readiness register rather than adding speculative modules.
+The next Zazu engineering effort should close the highest-risk remaining release gate: populated commercial workflow → real recovery → representative upgrade → rollback → final Director certification.
