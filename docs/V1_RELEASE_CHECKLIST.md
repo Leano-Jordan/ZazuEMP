@@ -1,187 +1,244 @@
-# Zazu EMP — V1 Release Checklist
-## Director baseline — 2026-09-28
+# Zazu EMP — V1 Commercial Release Checklist
 
-Checked means implemented and source-reviewed. Runtime-only items remain unchecked until executed in the repository environment.
+**Authority:** ACTIVE / CANONICAL V1 RELEASE GATE  
+**Last Director update:** 2026-10-01  
+**Repository:** `Leano-Jordan/ZazuEMP`  
+**Branch:** `main`  
+**Current HEAD:** `c83474e1e32ca8c29950eac3723b854c163e5786`
 
-### Gate 1 — Platform
-- [x] Registration/authentication
-- [x] Active business context
-- [x] Workspace switching
-- [x] Business isolation
-- [x] Role/permission enforcement
-- [x] Auditability
-- [x] Experience level
-- [ ] Final runtime regression suite
+## Authority rule
 
-### Gate 2 — Onboarding
-- [x] Registration redirects into setup
-- [x] Services/products setup follows registration
-- [x] Catalogue deferral
-- [x] Basic / Intermediate / Advanced selection
-- [x] Business identity setup
-- [x] Business setup deferral
-- [x] Resumable setup
-- [x] Change experience level later
-- [ ] Fresh desktop registration walkthrough
-- [ ] Fresh mobile registration walkthrough
+This file is the **single authoritative V1 release-gate ledger**.
 
-### Gate 3 — Operations
-- [x] Customers
-- [x] Contacts
-- [x] Events/jobs
-- [x] Lifecycle control
-- [x] Work/preparation
-- [x] Requirements/services
-- [x] Suppliers
-- [x] Purchasing
-- [x] Receiving
-- [x] Assets
-- [x] Inventory
-- [x] Event costs
-- [x] Finance
-- [x] Documents
-- [x] Reports
+- `docs/ZAZU_V1_RELEASE_ROADMAP.md` records strategy, historical Director cycles, evidence context and deferred roadmap work.
+- This checklist records the **current state of V1 release gates**.
+- No item is considered release-complete merely because source code exists.
+- **Implemented** means source-reviewed and present.
+- **Verified** means exercised by tests/runtime against the relevant current release candidate.
+- **Proven** means the verification has recorded evidence sufficient for release sign-off.
+- Never downgrade a proven result based on stale documentation; update the documentation instead.
 
-### Gate 4 — Connected business truth
-- [x] Event → Work
-- [x] Work → Resources
-- [x] Work → Purchasing
-- [x] Work → Costs
-- [x] Work → Finance
-- [x] Completion protection
-- [x] Cancellation protection
-- [x] Operational chain visibility
-- [ ] Populated-data end-to-end walkthrough
+### Status key
 
-### Gate 5 — Search
-- [x] Header search
-- [x] Customer search
-- [x] Job/event search
-- [x] Service search
-- [x] Supplier search
-- [x] Purchase-order search
-- [x] Quote search
-- [x] Invoice search
-- [x] Cost search
-- [x] Asset search
-- [x] Inventory search
-- [x] Expense search
-- [x] Type filter
-- [x] Status filter
-- [x] Date filter
-- [x] Business isolation
-- [x] Permission-aware result selection
-- [ ] Runtime search suite
-- [ ] Desktop search QA
-- [ ] Mobile search QA
+- ✅ **IMPLEMENTED** — source-reviewed and present.
+- 🟡 **IMPLEMENTED / VERIFICATION PENDING** — implementation exists, but required current-head proof is outstanding.
+- 🟢 **VERIFIED / PROVEN** — current release evidence supports the claim.
+- 🔴 **BLOCKED** — a verified defect prevents the gate.
+- ⚪ **DEFERRED / NOT V1** — deliberately outside the current release.
 
-### Gate 6 — Zazu Helper
-- [x] Contextual guides
-- [x] Workflow explanations
-- [x] Experience awareness
-- [x] Setup attention
-- [x] Overdue preparation attention
-- [x] Open purchasing attention
-- [x] Draft-job attention
-- [x] Next-action links
-- [ ] Broader natural-language business queries
-- [x] No autonomous V1 decisions
+---
 
-### Gate 7 — UX
-- [x] Coherent Zazu visual system
-- [x] Desktop shell
-- [x] Mobile shell
-- [x] Mobile navigation
-- [x] Professional forms
-- [x] Professional lists/tables
-- [x] Empty/loading/error states
-- [x] Meaningful toast feedback
-- [x] Consequential-action confirmation
-- [ ] Rendered desktop QA
-- [ ] Rendered mobile QA
-- [ ] Tablet QA
-- [ ] Accessibility smoke
+# Gate 1 — Platform foundation
 
-### Gate 8 — Security
-- [x] Authentication boundary
-- [x] Server-side authorization
-- [x] Business isolation
-- [x] Permission-aware search
-- [x] Secure attachment foundation
-- [x] Validation
-- [x] Auditability
-- [ ] Final release security review
+| Area | Current state | Release proof |
+|---|---|---|
+| Registration / authentication | ✅ Implemented | 🟡 Fresh current-head runtime |
+| Active business context | ✅ Implemented | 🟡 Current-head runtime |
+| Workspace switching | ✅ Implemented | 🟡 Current-head runtime |
+| Business isolation | ✅ Implemented | 🟡 Adversarial verification |
+| Roles / permissions | ✅ Implemented | 🟡 Full protected-action audit |
+| Auditability | ✅ Implemented | 🟡 End-to-end mutation trace |
+| Experience level | ✅ Implemented | 🟡 Fresh-account traversal |
+| Runtime regression suite | ✅ Test infrastructure exists | 🔴 Current-head full-suite proof outstanding |
 
-### Gate 9 — Database and recovery
-- [x] Experience-level migration
-- [x] Existing memberships backfilled to Intermediate
-- [ ] Populated production-like migration run
-- [ ] Backup creation
-- [ ] Restore
-- [ ] Representative record verification after restore
-- [ ] Private media verification after restore
+# Gate 2 — Onboarding
 
-### Gate 10 — Scope control
-- [x] No enterprise workflow engine
-- [x] No autonomous AI employee
-- [x] No predictive finance
-- [x] No mature BI expansion
-- [x] No warehouse-management expansion
-- [x] No enterprise asset-management expansion
-- [x] No speculative external search infrastructure
-- [x] No automatic Planned event state
+| Area | Current state | Release proof |
+|---|---|---|
+| Registration → catalogue/setup | ✅ Implemented | 🟡 Fresh browser run |
+| Basic / Intermediate / Advanced | ✅ Implemented | 🟡 Current-head runtime |
+| Business identity/setup | ✅ Implemented | 🟡 Current-head runtime |
+| Deferral/resume behaviour | ✅ Implemented | 🟡 Current-head runtime |
+| Experience-level changes | ✅ Implemented | 🟡 Current-head runtime |
+| Orphan-account workspace recovery | ✅ Implemented | 🟢 Previously CI-verified; revalidate on release candidate |
+| Desktop onboarding | ✅ Implemented | 🟡 Current-head browser proof |
+| Mobile onboarding | ✅ Implemented | 🟡 Current-head browser proof |
 
-### Release-candidate finish line
-- [ ] Laravel tests green
-- [ ] Browser smoke green
-- [ ] Static analysis green
-- [ ] Populated migration verified
-- [ ] Backup/restore proven
-- [ ] Desktop critical workflows verified
-- [ ] Mobile critical workflows verified
-- [ ] Operational chain verified end-to-end
-- [ ] Search verified
-- [ ] Helper verified
-- [ ] No release-blocking authorization or data-integrity defects remain
+# Gate 3 — Core operations
 
-### Post-V1 hold
-- Autonomous AI actions
-- Predictive analytics
-- Advanced BI
-- Enterprise workflow design
-- Heavy integration expansion
+| Domain | Current state | Release proof |
+|---|---|---|
+| Customers / contacts | ✅ Implemented | 🟡 Populated-data traversal |
+| Jobs / events | ✅ Implemented | 🟡 Populated-data traversal |
+| Lifecycle control | ✅ Implemented | 🟡 Transition matrix |
+| Work / preparation | ✅ Implemented | 🟡 Populated-data traversal |
+| Requirements / services | ✅ Implemented | 🟡 Populated-data traversal |
+| Suppliers | ✅ Implemented | 🟡 Populated-data traversal |
+| Purchasing / receiving | ✅ Implemented | 🟡 Populated-data traversal |
+| Assets / inventory | ✅ Implemented | 🟡 Populated-data traversal |
+| Event costs / travel | ✅ Implemented | 🟡 Populated-data traversal |
+| Finance / invoices / payments | ✅ Implemented | 🟡 Reconciliation drill |
+| Documents | ✅ Implemented | 🟡 Critical document workflow |
+| Reports | ✅ Implemented | 🟡 Populated-data verification |
+
+# Gate 4 — Commercial truth
+
+The previous checklist incorrectly treated some commercial capabilities as not started. Current source at HEAD contains the following implementations:
+
+| Area | Current state | Release proof |
+|---|---|---|
+| Customer-facing quote presentation | ✅ Implemented — signed public quote route/view exists | 🟡 Browser verification |
+| Quote acceptance lifecycle | ✅ Implemented — signed public acceptance route and controller path exist | 🟡 Browser + business-state verification |
+| Deposit definition | ✅ Implemented — quote version stores deposit percentage/amount | 🟡 Financial reconciliation |
+| Deposit recording | ✅ Implemented — finance payment flow supports `deposit` type | 🟡 Reconciliation drill |
+| Invoice linkage | ✅ Implemented — invoices retain quote relationship/snapshot | 🟡 End-to-end verification |
+| Payment/idempotency controls | ✅ Implemented | 🟡 Runtime reconciliation |
+| Quote revision/history | ✅ Implemented | 🟡 Historical snapshot verification |
+| Purchasing / receiving | ✅ Implemented | 🟡 End-to-end verification |
+| Inventory/resource continuity | ✅ Implemented | 🟡 Populated-data verification |
+| Activity/audit continuity | ✅ Implemented | 🟡 Mutation trace |
+
+**Commercial interpretation:** these are no longer “build from zero” release items. They are **prove-the-workflow** items.
+
+# Gate 5 — Connected business truth
+
+| Chain | Current state | Release proof |
+|---|---|---|
+| Customer → Job/Event | ✅ Implemented | 🟡 Populated traversal |
+| Job → Requirements/Work | ✅ Implemented | 🟡 Populated traversal |
+| Work → Resources | ✅ Implemented | 🟡 Populated traversal |
+| Work → Purchasing | ✅ Implemented | 🟡 Populated traversal |
+| Work → Costs | ✅ Implemented | 🟡 Reconciliation |
+| Job/Quote → Invoice | ✅ Implemented | 🟡 End-to-end verification |
+| Invoice → Deposit/payment | ✅ Implemented | 🟡 Reconciliation |
+| Completion/cancellation guards | ✅ Implemented | 🟡 Transition matrix |
+| Full operational chain | ✅ Implemented | 🔴 Must be proven on populated data |
+
+# Gate 6 — Search and commandability
+
+| Area | Current state | Release proof |
+|---|---|---|
+| Unified header search | ✅ Implemented | 🟡 Runtime search suite |
+| Domain search coverage | ✅ Implemented | 🟡 Current-head runtime |
+| Type/status/date filters | ✅ Implemented | 🟡 Current-head runtime |
+| Permission-aware results | ✅ Implemented | 🟡 Adversarial verification |
+| Business isolation in search | ✅ Implemented | 🟡 Cross-business challenge |
+| Desktop search UX | ✅ Implemented | 🟡 Rendered QA |
+| Mobile search UX | ✅ Implemented | 🟡 Rendered QA |
+
+# Gate 7 — Zazu Helper
+
+| Area | Current state | Release proof |
+|---|---|---|
+| Contextual guidance | ✅ Implemented | 🟡 Current-head runtime |
+| Workflow explanations | ✅ Implemented | 🟡 Current-head runtime |
+| Experience awareness | ✅ Implemented | 🟡 Current-head runtime |
+| Attention signals / next actions | ✅ Implemented | 🟡 Current-head runtime |
+| Autonomous V1 decisions | ⚪ Deliberately excluded | 🟢 Scope locked |
+| Broader natural-language commands | ⚪ Post-V1 | 🟢 Scope locked |
+
+# Gate 8 — UX / responsive / accessibility
+
+| Area | Current state | Release proof |
+|---|---|---|
+| Zazu visual system | ✅ Implemented | 🟡 Rendered release QA |
+| Desktop shell | ✅ Implemented | 🟡 Rendered QA |
+| Mobile shell/navigation | ✅ Implemented | 🟡 Rendered QA |
+| Forms / lists / tables | ✅ Implemented | 🟡 Critical-page QA |
+| Empty/loading/error states | ✅ Implemented | 🟡 Failure-state sweep |
+| Toasts / consequential-action confirmation | ✅ Implemented | 🟡 Runtime smoke |
+| Dashboard attention surface | ✅ Implemented | 🟡 Rendered QA |
+| Calendar/workflow visibility | ✅ Implemented | 🟡 Rendered QA |
+| Desktop visual QA | ✅ Test coverage available | 🟡 Current-head execution |
+| Mobile visual QA | ✅ Test coverage available | 🟡 Current-head execution |
+| Tablet QA | ✅ Test configuration exists | 🟡 Current-head execution |
+| Accessibility smoke | ✅ Assertions/foundation exist | 🟡 Current-head execution |
+
+# Gate 9 — Security / privacy
+
+| Area | Current state | Release proof |
+|---|---|---|
+| Authentication boundary | ✅ Implemented | 🟡 Release-candidate runtime |
+| Server-side authorization | ✅ Implemented | 🟡 Full challenge |
+| Business isolation | ✅ Implemented | 🟡 Cross-business adversarial test |
+| Permission-aware search | ✅ Implemented | 🟡 Adversarial test |
+| Secure attachments/private media | ✅ Implemented | 🟡 Direct-access challenge |
+| Input validation | ✅ Implemented | 🟡 Failure-path sweep |
+| Audit trail | ✅ Implemented | 🟡 Representative mutation trace |
+| Privacy baseline | ✅ Documented | 🟡 Final operational review |
+| Final security review | ✅ Scope/foundation exists | 🟡 Release sign-off |
+
+# Gate 10 — Database / recovery
+
+| Area | Current state | Release proof |
+|---|---|---|
+| Experience-level migration | ✅ Implemented | 🟡 Current-head migration |
+| Existing-membership backfill | ✅ Implemented | 🟡 Current-head verification |
+| Populated production-like migration | ✅ Tooling/schema exists | 🔴 Evidence outstanding |
+| Backup creation | ✅ Capability exists | 🔴 Real backup drill outstanding |
+| Restore | ✅ Capability exists | 🔴 Real restore drill outstanding |
+| Record verification after restore | ✅ Test target defined | 🔴 Evidence outstanding |
+| Private media after restore | ✅ Test target defined | 🔴 Evidence outstanding |
+
+# Gate 11 — Deployment / upgrade
+
+| Area | Current state | Release proof |
+|---|---|---|
+| Fresh install | ✅ Foundation exists | 🟡 Clean-install run |
+| Existing database upgrade | ✅ Migration path exists | 🔴 Populated upgrade drill outstanding |
+| Production configuration | ✅ Configuration exists | 🟡 Final audit |
+| Dependency/licence review | ✅ Registers exist | 🟡 Final audit |
+| Vite/build manifest | ✅ Build pipeline exists | 🟡 Current-head build proof |
+| Rollback procedure | ✅ Release requirement defined | 🔴 Exercise required |
+
+# Gate 12 — Release candidate finish line
+
+All of the following are required before V1 is treated as release-ready:
+
+- [ ] Current-head Laravel suite has an accepted release disposition with no unexplained release-blocking failures.
+- [ ] Current-head browser smoke passes.
+- [ ] Current-head static analysis passes or every deviation is explicitly dispositioned.
+- [ ] Fresh migration succeeds.
+- [ ] Populated database upgrade succeeds without integrity loss.
+- [ ] Populated end-to-end business workflow succeeds.
+- [ ] Search succeeds on populated data with authorization boundaries intact.
+- [ ] Quote → acceptance → invoice → deposit/payment reconciliation succeeds.
+- [ ] Desktop critical workflows pass.
+- [ ] Mobile critical workflows pass.
+- [ ] Tablet critical workflows pass.
+- [ ] Accessibility smoke passes.
+- [ ] Backup succeeds.
+- [ ] Restore succeeds.
+- [ ] Restored records and private media are verified.
+- [ ] Rollback procedure is exercised.
+- [ ] Final authorization/security challenge passes.
+- [ ] Final Director re-audit records no release-critical defects.
+
+# V1 scope lock
+
+These remain outside V1 unless a verified release requirement proves they are necessary:
+
+- Autonomous AI actions or decisions
+- Predictive finance
+- Advanced BI/predictive analytics
+- Enterprise workflow designer
 - Warehouse-scale inventory
 - Enterprise asset management
+- Heavy integration expansion
 - Broad collaboration suite
+- Enterprise SSO
 - Unlimited UI configurability
 
-Rule: finish the product before expanding the product.
+**Rule:** finish and prove the product before expanding the product.
 
+## Evidence baseline
 
-### Gate 7A — Visual visibility correction
-- [x] Light mode has a genuinely light navigation rail
-- [x] Light mode has a genuinely light header
-- [x] Vibrant blue accent is visible in light mode
-- [x] Structural borders are visible across major Zazu surfaces
-- [x] Dashboard surfaces have explicit boundaries
-- [x] Reports remains the internal visibility reference
-- [x] Dark-mode styles are not overwritten by the light-mode correction
-- [x] Landing page contains explicit Register and Log in actions
-- [x] Logout returns to landing
-- [x] Replaceable landing image placeholders added
-- [ ] Rendered visual QA on desktop
-- [ ] Rendered visual QA on mobile
+The repository contains earlier CI/browser evidence for the access/onboarding path, including a successful targeted browser traversal. That evidence is retained as historical proof but does **not** automatically certify the current HEAD.
 
+The current Director inspection found that the GitHub connector does not provide usable current-main workflow completion evidence, and the development PC was not available. Therefore current-head runtime, populated-data, migration/upgrade and backup/restore claims remain open.
 
-### Gate 7B — Navigation, account and motion refinement
-- [x] Primary navigation no longer uses per-link icons
-- [x] Primary navigation no longer uses trailing arrow glyphs
-- [x] Repeated "Active workspace" navigation card removed
-- [x] Navigation hierarchy remains permission-aware
-- [x] Account/avatar surface exposes identity, role and experience context
-- [x] Workspace context remains available without repeating it throughout navigation
-- [x] Dashboard exposes a priority/attention surface
-- [x] Restrained cross-product motion added with reduced-motion handling
-- [x] Legacy root redirect assertion corrected to public landing behaviour
-- [ ] Rendered desktop verification
-- [ ] Rendered mobile verification
+## Immediate execution priority
+
+**Release Gate Sprint:**
+
+1. Current-head CI/build/static evidence
+2. Populated end-to-end workflow
+3. Commercial reconciliation
+4. Authorization/security challenge
+5. Desktop/mobile/tablet QA + accessibility
+6. Backup/restore
+7. Populated upgrade
+8. Rollback exercise
+9. Final Director re-audit
+
+No broad feature expansion should displace these gates while any Critical item remains open.
