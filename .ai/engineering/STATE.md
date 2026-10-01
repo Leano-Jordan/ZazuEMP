@@ -511,3 +511,33 @@ Verification boundary:
 
 Next target:
 ROLE POLICY CLOSURE → RUNTIME POPULATED WALKTHROUGH → FULL AUTHORIZATION/ISOLATION CHALLENGE.
+
+## Director populated runtime challenge — 2026-10-01
+
+Target: move the populated business workflow from source/PHPUnit evidence into real browser/runtime evidence and deliberately challenge the workflow rather than only its assertions.
+
+Executed:
+- inspected current main head before mutation;
+- attempted direct local runtime/browser observation;
+- confirmed no deployed runtime URL is recorded in the repository and the available live-browser connector could not execute because of insufficient browser credits;
+- identified that .github/workflows/zazu-browser.yml migrated a clean database but did not seed the populated demo;
+- added e2e/populated-runtime.spec.js covering the seeded owner chain: Dashboard → Work → Job inspector → Requirements → Preparation → Purchasing → Inventory → Assets → Finance → Invoice/Payment history → Reports;
+- added adversarial role checks for manager and finance staff boundaries;
+- changed zazu-browser.yml to seed DemoScenarioSeeder before Playwright execution;
+- created docs/DIRECTOR_POPULATED_RUNTIME_CHALLENGE_2026-10-01.md with the evidence boundary and release disposition.
+
+Important current-source correction:
+- config/zazu.php now contains an explicit manager permission matrix. The earlier AUTH-ROLE-001 record describing a missing manager mapping is historical/stale; it is not a current source defect.
+
+Verification boundary:
+- GitHub source changes were committed and re-read;
+- immediate commit-status/workflow inspection returned no usable status entries or workflow runs through the available connector;
+- therefore populated browser execution is still UNOBSERVED, not green.
+
+Current execution commits:
+- 715a38a411606846c715fe38e3388276c613161 — populated runtime browser challenge;
+- 6b7c306349efd9852b60c5c14ccbf7f0aacbba34 — seed populated demo in browser workflow;
+- 0dcfd2e4db5f62f69972411a02c9bd71a2e89a25 — runtime challenge evidence record.
+
+Next Director target:
+**CONSUME POPULATED BROWSER EXECUTION → classify failures → correct verified defects only → rerun → then repeat responsive runtime and recovery/upgrade evidence.**
