@@ -53,7 +53,17 @@ class WorkController extends Controller
         }
 
         $events = (clone $baseQuery)
-            ->with(['customer', 'eventDayContact', 'eventNightContact'])
+            ->with([
+                'customer',
+                'eventDayContact',
+                'eventNightContact',
+                'requirements.capability',
+                'quotes.latestVersion',
+                'preparationItems',
+                'purchaseOrders',
+                'invoices.payments',
+                'assetAllocations.asset',
+            ])
             ->when($filter === 'today', fn ($query) => $query->whereDate('event_date', $today))
             ->when($filter === 'next_7_days', fn ($query) => $query->whereBetween('event_date', [$today, $today->copy()->addDays(6)]))
             ->when($filter === 'in_progress', fn ($query) => $query->where('status', 'in_progress'))
