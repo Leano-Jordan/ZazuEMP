@@ -12,6 +12,8 @@ use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\Artisan;
+use Illuminate\Support\Str;
 use Illuminate\Validation\Rule;
 use Illuminate\View\View;
 
@@ -34,6 +36,60 @@ class BusinessSettingsController extends Controller
             // contains a legacy/plaintext value that predates encrypted storage.
             'hasTcsPin' => filled($business->taxProfile?->getRawOriginal('tcs_pin')),
         ]);
+    }
+
+    public function backup(Request $request)
+    {
+        $directory = storage_path('app/zazu-backups');
+        if (!is_dir($directory)) {
+            mkdir($directory, 0755, true);
+        }
+
+        Artisan::call('zazu:backup', ['--output' => $directory]);
+        $output = trim(Artisan::output());
+        preg_match('/Backup created: (.+)$/m', $output, $matches);
+
+        if (empty($matches[1]) || !is_file($matches[1])) {
+            return redirect()->route('settings.index')->with('error', $output ?: 'Zazu could not create the backup.');
+        }
+
+        Audit::record('system.backup.created', $business = app(CurrentBusiness::class)->model($request->user()), [
+            'filename' => basename($matches[1]),
+        ], $business->id);
+
+        return response()->download($matches[1], basename($matches[1]))->deleteFileAfterSend(true);
+    }
+
+    public function restore(Request $request): RedirectResponse
+    {
+        $validated = $request->validate([
+            'backup' => ['required', 'file', 'mimes:zip', 'max:102400'],
+        ]);
+
+        $path = $validated['backup']->storeAs('zazu-restore-staging', 'restore-'.Str::ulid().'.zip', 'local');
+        $absolutePath = Storage::disk('local')->path($path);
+
+        try {
+            $exitCode = Artisan::call('zazu:restore', [
+                'archive' => $absolutePath,
+                '--force' => true,
+            ]);
+            $output = trim(Artisan::output());
+        } finally {
+            Storage::disk('local')->delete($path);
+        }
+
+        $business = app(CurrentBusiness::class)->model($request->user());
+
+        if ($exitCode !== 0) {
+            return redirect()->route('settings.index')->with('error', $output ?: 'The backup could not be restored.');
+        }
+
+        Audit::record('system.backup.restored', $business, [
+            'filename' => $validated['backup']->getClientOriginalName(),
+        ], $business->id);
+
+        return redirect()->route('settings.index')->with('success', 'Backup restored successfully. Refresh Zazu if another browser tab was open during recovery.');
     }
 
     /**
