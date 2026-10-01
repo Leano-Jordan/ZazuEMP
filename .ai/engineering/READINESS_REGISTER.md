@@ -56,7 +56,7 @@ Future architecture should remain compatible with these possibilities without al
 
 **Close existing correctness, architecture, integrity, security, reliability and release-evidence gaps before speculative feature expansion.**
 
-Last updated: 2026-09-28
+Last updated: 2026-10-01
 
 
 ## Evidence snapshot — 2026-09-28
@@ -79,7 +79,13 @@ Current Director assessment:
 
 The major V1 capability surface is present. Remaining release risk is concentrated in proof, recovery, device QA and defects exposed by those checks.
 
+
 Current UI cycle does not create a new V1 feature expansion requirement.
+
+## Source-hardening snapshot — 2026-10-01
+
+The long-sprint page audit tightened shared form submission safety, browser-storage failure tolerance, quote financial visibility, multi-line purchasing usability and context-preserving return paths. These changes improve the implemented foundations but do not increase runtime evidence maturity. Current release-critical evidence remains blocked on fresh execution of CI/runtime, populated browser journeys, recovery drills and upgrade verification.
+
 
 
 ## Latest visual-system audit — 2026-09-28
