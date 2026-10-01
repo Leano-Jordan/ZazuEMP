@@ -196,3 +196,24 @@ The public landing page is an expressive brand surface during development. Do no
 Core local-first workflows must not silently depend on optional online services.
 
 When another AI session starts work, repository-side documentation is the current instruction state. Do not rely on prior chat context when the repository contains newer decisions.
+
+
+## 15. Director V2 failure-loop enforcement
+
+Repeated failures are handled through .ai/engineering/07_FAILURE_CASE_ENGINE.md and .ai/engineering/FAILURE_CASES.md.
+
+Before another correction against a repeated failure, the agent MUST:
+1. identify/load the persistent failure case;
+2. compare the failure fingerprint;
+3. review prior hypotheses, experiments and rejected approaches;
+4. establish materially new evidence;
+5. classify the failure F1–F8;
+6. move to the next diagnostic layer when the current hypothesis has failed.
+
+Hard limits:
+- maximum 2 correction attempts per hypothesis;
+- maximum 3 no-progress cycles per case.
+
+After a limit is reached: STOP PATCHING → FORENSICS / ESCALATION.
+
+A green rerun without materially new evidence is not closure. If the evidence cannot establish a safe correction, mark BLOCKED rather than inventing another patch.
