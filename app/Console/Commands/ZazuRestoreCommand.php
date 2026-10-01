@@ -44,6 +44,10 @@ class ZazuRestoreCommand extends Command
         $work = storage_path('app/.zazu-restore-'.now()->format('Ymd_His').'_' . Str::lower((string) Str::ulid()));
         File::ensureDirectoryExists($work);
 
+        $privateRollback = null;
+        $privateActivated = false;
+        $databaseRollback = null;
+
         try {
             $zip = new ZipArchive();
             if ($zip->open($archive, ZipArchive::RDONLY | ZipArchive::CHECKCONS) !== true) {
@@ -129,7 +133,7 @@ class ZazuRestoreCommand extends Command
                     || str_starts_with($name, '/')
                     || preg_match('/^[A-Za-z]:[\\\/]/', $name)
                     || in_array('..', $parts, true)
-                    || in_array('', $parts, true) && !str_ends_with($name, '/')
+                    || (in_array('', $parts, true) && !str_ends_with($name, '/'))
                 ) {
                     $zip->close();
                     $this->error('The backup archive contains an unsafe path.');
@@ -198,6 +202,30 @@ class ZazuRestoreCommand extends Command
                 return self::FAILURE;
             }
 
+            // Stage private storage before changing the database. If anything fails after
+            // this point, the original files can be put back without leaving a mixed state.
+            $storedPrivate = $work.'/storage/private';
+            $privateTarget = storage_path('app/private');
+
+            if ($hasPrivateStorage && is_dir($storedPrivate)) {
+                $privateRollback = storage_path('app/.zazu-private-rollback-'.Str::ulid());
+
+                if (is_dir($privateTarget) && !rename($privateTarget, $privateRollback)) {
+                    $this->error('Could not stage the current private storage for safe replacement.');
+                    return self::FAILURE;
+                }
+
+                if (!rename($storedPrivate, $privateTarget)) {
+                    if (is_dir($privateRollback)) {
+                        rename($privateRollback, $privateTarget);
+                    }
+                    $this->error('Could not activate the restored private storage.');
+                    return self::FAILURE;
+                }
+
+                $privateActivated = true;
+            }
+
             if ($driver === 'sqlite') {
                 $source = $work.'/database.sqlite';
                 $target = config('database.connections.sqlite.database');
@@ -208,8 +236,27 @@ class ZazuRestoreCommand extends Command
                 }
 
                 DB::disconnect();
-                if (!copy($source, $target)) {
-                    $this->error('Could not restore the SQLite database.');
+
+                $databaseStage = storage_path('app/.zazu-database-restore-'.Str::ulid().'.sqlite');
+                if (!copy($source, $databaseStage)) {
+                    $this->error('Could not stage the SQLite database for restore.');
+                    return self::FAILURE;
+                }
+
+                $databaseRollback = storage_path('app/.zazu-database-rollback-'.Str::ulid().'.sqlite');
+
+                if (is_file($target) && !rename($target, $databaseRollback)) {
+                    File::delete($databaseStage);
+                    $this->error('Could not stage the current SQLite database for safe replacement.');
+                    return self::FAILURE;
+                }
+
+                if (!rename($databaseStage, $target)) {
+                    File::delete($databaseStage);
+                    if (is_file($databaseRollback)) {
+                        rename($databaseRollback, $target);
+                    }
+                    $this->error('Could not activate the restored SQLite database.');
                     return self::FAILURE;
                 }
             } elseif ($driver === 'mysql') {
@@ -242,37 +289,43 @@ class ZazuRestoreCommand extends Command
                 return self::FAILURE;
             }
 
-            $storedPrivate = $work.'/storage/private';
-            if ($hasPrivateStorage && is_dir($storedPrivate)) {
-                $privateTarget = storage_path('app/private');
-                $privateRollback = storage_path('app/.zazu-private-rollback-'.Str::ulid());
+            if ($databaseRollback !== null) {
+                File::delete($databaseRollback);
+                $databaseRollback = null;
+            }
 
-                if (is_dir($privateTarget) && !rename($privateTarget, $privateRollback)) {
-                    $this->error('Could not stage the current private storage for safe replacement.');
-                    return self::FAILURE;
-                }
-
-                try {
-                    if (!rename($storedPrivate, $privateTarget)) {
-                        throw new \RuntimeException('Could not activate the restored private storage.');
-                    }
-                    File::deleteDirectory($privateRollback);
-                } catch (\Throwable $exception) {
-                    File::deleteDirectory($privateTarget);
-                    if (is_dir($privateRollback)) {
-                        rename($privateRollback, $privateTarget);
-                    }
-                    throw $exception;
-                }
+            if ($privateRollback !== null) {
+                File::deleteDirectory($privateRollback);
+                $privateRollback = null;
             }
 
             $this->info('Zazu restore completed from '.$archive);
             return self::SUCCESS;
         } catch (\Throwable $exception) {
+            if ($databaseRollback !== null && is_file($databaseRollback)) {
+                $target = config('database.connections.sqlite.database');
+                DB::disconnect();
+                File::delete($target);
+                rename($databaseRollback, $target);
+            }
+
+            if ($privateActivated) {
+                File::deleteDirectory(storage_path('app/private'));
+            }
+            if ($privateRollback !== null && is_dir($privateRollback)) {
+                rename($privateRollback, storage_path('app/private'));
+            }
+
             $this->error('Zazu restore failed safely: '.$exception->getMessage());
             return self::FAILURE;
         } finally {
             File::deleteDirectory($work);
+            if ($databaseRollback !== null) {
+                File::delete($databaseRollback);
+            }
+            if ($privateRollback !== null) {
+                File::deleteDirectory($privateRollback);
+            }
         }
     }
 }
