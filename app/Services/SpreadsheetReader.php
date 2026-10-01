@@ -7,7 +7,6 @@ use RuntimeException;
 class SpreadsheetReader
 {
     public function __construct(
-        private readonly XlsxSpreadsheetReader $xlsxReader,
         private readonly SpreadsheetRowNormalizer $normalizer,
     ) {
     }
@@ -29,7 +28,7 @@ class SpreadsheetReader
         }
 
         if ($extension === 'xlsx' || $mimeType === 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet') {
-            return $this->xlsxReader->read($path);
+            return app(XlsxSpreadsheetReader::class)->read($path);
         }
 
         throw new RuntimeException('Unsupported spreadsheet format. Use CSV or XLSX.');
