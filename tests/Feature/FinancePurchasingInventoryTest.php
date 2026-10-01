@@ -506,7 +506,10 @@ class FinancePurchasingInventoryTest extends TestCase
 
         $this->actingAs($staff)
             ->get(route('finance.index'))
-            ->assertOk();
+            ->assertOk()
+            ->assertDontSee('New invoice')
+            ->assertDontSee('Record payment')
+            ->assertDontSee('New expense');
 
         $this->actingAs($staff)
             ->get(route('settings.index'))
