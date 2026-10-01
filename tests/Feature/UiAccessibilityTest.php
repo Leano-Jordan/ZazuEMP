@@ -2,6 +2,9 @@
 
 namespace Tests\Feature;
 
+use App\Models\Business;
+use App\Models\Customer;
+use App\Models\Event;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
