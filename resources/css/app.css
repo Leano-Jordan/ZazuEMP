@@ -8153,7 +8153,14 @@ textarea:focus {
     border-color: var(--zazu-border-strong);
 }
 .zazu-financial-summary {
+    position: sticky;
+    top: 88px;
     z-index: 2;
+}
+@media (max-width: 820px) {
+    .zazu-financial-summary {
+        position: static;
+    }
 }
 .zazu-financial-summary-list {
     display: grid;
