@@ -63,3 +63,22 @@ Durable decisions governing the Zazu engineering system.
 **Decision:** Every new open-source library or external API considered for Zazu must be recorded with license, data-egress, offline, security, product-surface and release-priority information before adoption.
 **Reason:** Prevent dependency sprawl, licensing surprises and accidental online coupling.
 **Status:** ACTIVE
+
+
+## DEC-011 — Verification is a first-class control plane
+**Date:** 2026-10-01
+**Decision:** Test, browser, static-analysis, CI/workflow, dependency, runtime and recovery evidence are separate verification layers. Failures must be classified before application correction.
+**Reason:** Prevent test defects, fixtures, CI/tooling failures and application defects from being mixed together and causing regression chains.
+**Status:** ACTIVE
+
+## DEC-012 — Main-only Director execution
+**Date:** 2026-10-01
+**Decision:** Ordinary Director execution targets main directly. Temporary branches are not part of the Zazu execution model unless the owner explicitly authorizes another ref.
+**Reason:** Prevent abandoned branches, sync residue and fragmented working state.
+**Status:** ACTIVE
+
+## DEC-013 — Single visual token authority
+**Date:** 2026-10-01
+**Decision:** Zazu must not accumulate append-only visual token/sweep layers. Shared visual tokens are consolidated into one light-theme root and one dark-theme root; components inherit them.
+**Reason:** Prevent conflicting colour, typography and surface relationships.
+**Status:** ACTIVE
