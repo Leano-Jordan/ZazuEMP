@@ -250,7 +250,7 @@ return [
                 'work.view', 'work.create', 'work.update', 'work.delete',
                 'customers.view', 'customers.create', 'customers.update', 'customers.contacts.manage',
                 'quotes.view', 'quotes.create', 'quotes.update', 'quotes.status',
-                'finance.view', 'finance.invoice.create', 'finance.payment.create', 'finance.expense.create',
+                'finance.view',
                 'purchasing.view', 'purchasing.create', 'purchasing.status',
                 'inventory.view', 'inventory.create', 'inventory.movement',
                 'assets.view', 'assets.create', 'assets.update', 'assets.allocate', 'assets.release',
