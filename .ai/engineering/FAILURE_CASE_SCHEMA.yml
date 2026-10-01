@@ -1,0 +1,72 @@
+version: 2
+engine: failure-case-loop-breaking
+registry: .ai/engineering/FAILURE_CASES.md
+
+states:
+  - OBSERVED
+  - INVESTIGATING
+  - FORENSICS
+  - CORRECTED
+  - VERIFIED
+  - BLOCKED
+  - CLOSED
+
+classifications:
+  - F1
+  - F2
+  - F3
+  - F4
+  - F5
+  - F6
+  - F7
+  - F8
+
+budgets:
+  correction_attempts_per_hypothesis: 2
+  no_progress_cycles_per_case: 3
+
+escalation:
+  - reproduction
+  - assertion_test_contract
+  - application_path
+  - fixture_data_state
+  - runtime_state
+  - browser_real_workflow
+  - instrumentation
+  - architecture_design_boundary
+  - blocked_owner_decision
+
+required_fields:
+  - case_id
+  - first_observed_head
+  - current_head
+  - target
+  - workflow
+  - verification_layer
+  - expected
+  - actual
+  - failure_fingerprint
+  - runtime_data_state
+  - classification
+  - hypotheses
+  - experiments
+  - rejected_approaches
+  - confirmed_root_cause
+  - correction
+  - regression_family
+  - remaining_uncertainty
+  - closure_evidence
+
+closure_requirements:
+  - supported_root_cause
+  - correction_implemented
+  - narrow_regression_passed
+  - regression_family_passed
+  - required_runtime_or_adversarial_evidence
+  - remaining_uncertainty_recorded
+
+rules:
+  repeated_fingerprint_loads_existing_case: true
+  rejected_hypothesis_requires_new_evidence: true
+  green_rerun_without_new_evidence_is_not_closure: true
+  blocked_is_valid_terminal_state: true
