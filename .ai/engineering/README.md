@@ -9,7 +9,7 @@ It exists to turn AI assistance from a sequence of conversations into a **contro
 ### MASTER CONTROL
 **Morpheus** — owner-facing nickname **Jarvis**
 
-Morpheus owns engineering state, target selection, routing, scope control, cycle management, evidence state, loop prevention and readiness progression.
+Morpheus owns engineering state, target selection, routing, scope control, cycle management, evidence state, loop prevention and readiness progression. **Morpheus/Director is the single entry point; specialist engines are synchronized capabilities under that control.**
 
 ### SPECIALIST ENGINES
 
@@ -47,6 +47,19 @@ Morpheus owns engineering state, target selection, routing, scope control, cycle
 
 **05 — UI/UX IMPROVEMENT**
 Cross-cutting and automatically active on every UI/UX-affecting task.
+
+Includes the **Human-Eye / Creative Critique** capability. It is not a separate engine.
+
+It owns the expert visual critique layer covering:
+- semantic colour systems and theme relationships;
+- information hierarchy and scan path;
+- field sizing and form density;
+- table width and avoidable horizontal eye tracking;
+- spacing, alignment and visual rhythm;
+- responsive composition;
+- visual consistency;
+- commercial SaaS polish;
+- detection of technically valid but visually weak/generated UI.
 
 **06 — VERIFICATION & QUALITY**
 Independent verification orchestration across PHPUnit, Playwright, UI/accessibility checks, static analysis, CI/YAML, dependencies and runtime evidence. It classifies failures before application correction.
@@ -243,3 +256,52 @@ Persistent case history: .ai/engineering/FAILURE_CASES.md.
 The Director must load the existing case before attempting another correction against a repeated failure. Two correction attempts against one hypothesis or three no-progress cycles against one case trigger FORENSICS / ESCALATION.
 
 A green test only closes the verification layer it actually exercised.
+
+
+## SINGLE-ENTRY / SYNCHRONIZED ENGINE MODEL
+
+**Director/Morpheus is the sole entry point.**
+
+Specialist engines do not operate as independent chatbots or maintain competing state.
+
+Execution follows:
+
+`DIRECTOR → ROUTE → SPECIALIST → DIRECTOR → CHANGE → VERIFY → DIRECTOR → GUARDIAN → DIRECTOR → ACCEPT/REPAIR → RECORD`
+
+Every engine consumes the same current state and returns evidence to Director.
+
+A specialist cannot declare final acceptance independently.
+
+### Human-eye UI quality
+
+Zazu's UI/UX engine is expected to know and apply established interface principles without requiring the owner to provide UI theory.
+
+For relevant screens it must actively challenge:
+
+- poor semantic colour usage;
+- weak light/dark relationships;
+- unnecessary wide form fields;
+- unnecessarily wide tables;
+- excessive horizontal scanning;
+- poor information grouping;
+- competing visual priorities;
+- weak typography hierarchy;
+- excessive visual noise;
+- generic/generated interface patterns;
+- responsive layouts that technically fit but feel poor.
+
+The goal is not decoration.
+
+The goal is **clearer work, lower cognitive load, less visual search, predictable interaction and commercially credible presentation**.
+
+### UI acceptance rule
+
+For UI-affecting work:
+
+**AUTOMATED PASS ≠ VISUAL ACCEPTANCE.**
+
+Rendered evidence is required when the target materially changes the visual interface.
+
+### Design-system rule
+
+Colour, typography, spacing and component geometry remain under one shared visual authority. Do not create competing page-level palettes or append-only token sweeps.
