@@ -583,3 +583,33 @@ UI quality requirements:
 The owner is not expected to supply UI theory. UI/UX is responsible for applying established principles and surfacing concrete findings relevant to the current target.
 
 No standalone Engine 08 is created.
+
+## Director SaaS-readiness architecture cycle — 2026-10-02
+
+Target: establish a controlled path from the current Zazu modular monolith to future hosted multi-business SaaS without introducing premature distributed infrastructure.
+
+Executed:
+- created `docs/ZAZU_SAAS_READINESS_ARCHITECTURE.md` as the living architecture contract;
+- retained Director/Morpheus as the sole entry point and acceptance authority;
+- formalized business ownership and parent/child invariant requirements for future hosted isolation;
+- formalized idempotency, concurrency, state, offline dependency and data-migration rules;
+- established evidence-driven progression from modular monolith → measurement → targeted optimisation → scaling → selective extraction;
+- explicitly rejected speculative microservices, Kubernetes, sharding, distributed caching and cloud-only core dependencies;
+- recorded DEC-015 in the durable decision log;
+- added the SaaS-readiness architecture gate to the engine router.
+
+Contradiction check:
+- current Zazu V1 remains a coherent operational product;
+- SaaS-readiness is treated as an architectural foundation, not as a claim that public multi-tenant SaaS certification is complete;
+- local-first core operation remains protected;
+- existing Director/engine authority remains unchanged;
+- no application business rules were duplicated or replaced by a new SaaS layer.
+
+Current evidence boundary:
+- source architecture/control changes are committed to `main`;
+- runtime populated-data isolation, adversarial authorization, recovery, deployment and upgrade evidence remain required before a hosted SaaS release can be certified.
+
+Next Director target:
+**COMMERCIAL SAAS ISOLATION PROOF — inspect the actual current business-owned models, queries, exports, attachments, search and route boundaries; then close only evidence-backed isolation gaps and verify them against populated multi-business fixtures.**
+
+Last updated: 2026-10-02
