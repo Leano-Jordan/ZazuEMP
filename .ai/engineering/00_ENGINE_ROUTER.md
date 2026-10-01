@@ -23,6 +23,7 @@ The engines do not compete for authority.
 - **Guardian:** independent challenge, verification and forensic correction.
 - **UI/UX:** cross-cutting interface/product quality.
 - **Release:** commercial readiness and release evidence.
+- **Verification & Quality:** test/static/CI/browser evidence classification and failure routing.
 
 ## Routing
 
@@ -49,6 +50,11 @@ DISCOVERY → BUILDER as needed
 → GUARDIAN
 → RELEASE
 
+### Verification/test/CI failure
+VERIFICATION & QUALITY → classify F1–F8
+→ responsible specialist
+→ VERIFY → BREAK → ACCEPT
+
 ## Cycle states
 
 `BASELINE → TARGETED → INSPECTING → DESIGNING → IMPLEMENTING → VERIFYING → BREAKING → ACCEPTED`
@@ -71,6 +77,7 @@ Every meaningful cycle has:
 - stop condition;
 - verification evidence;
 - regression disposition.
+- verification-layer classification when a check fails.
 
 ## Continuous execution
 
@@ -85,6 +92,15 @@ Pause only when:
 - the mission is complete.
 
 The owner must not need to repeat the same broad directive after every successful cycle.
+
+## Branch policy
+
+Zazu engineering execution is main-only by default.
+
+- Do not create temporary, feature, experiment or test branches for ordinary Director execution.
+- All repository writes performed by the Director target main unless the owner explicitly names another Zazu ref.
+- Do not create a branch merely to make a change safer; use the cycle baseline, exact diff inspection and revertable commits instead.
+- If an external tool creates a temporary branch, it is execution residue and must not become part of the working model; remove it before handoff when the available GitHub control permits deletion.
 
 ## Anti-loop controls
 
