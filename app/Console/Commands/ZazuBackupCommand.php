@@ -70,7 +70,7 @@ class ZazuBackupCommand extends Command
                 // A raw file copy is unsafe when WAL is active because committed data can
                 // still live in the -wal sidecar. Keep one backup path for both real and
                 // in-memory SQLite databases.
-                if (!$source || !is_file($source) && $source !== ':memory:') {
+                if ($source !== ':memory:' && (!$source || !is_file($source))) {
                     $this->error('The SQLite database is unavailable.');
                     return self::FAILURE;
                 }
