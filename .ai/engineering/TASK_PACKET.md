@@ -84,3 +84,21 @@ Stop and escalate when:
 - Next target:
 
 The owner does not manually fill this for ordinary tasks. Engines maintain it as the execution contract.
+
+
+## Director V2 failure-case fields
+
+Add these fields whenever a check fails or the target is release-significant:
+
+- Failure case ID:
+- Failure fingerprint:
+- F1–F8 classification:
+- Current hypothesis:
+- Hypotheses rejected:
+- Attempts used / budget:
+- Current diagnostic layer:
+- Known-good checkpoint:
+- New evidence since last attempt:
+- Escalation decision:
+
+A repeated failure must not be treated as a fresh task without first loading its case history.
