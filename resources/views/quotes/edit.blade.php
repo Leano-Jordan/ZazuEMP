@@ -52,7 +52,7 @@
                                 <option value="">Keep current tax treatment</option>
                                 <option value="none" @selected(old('tax_rate_id') === 'none')>No tax / 0%</option>
                                 @foreach ($taxRates as $taxRate)
-                                    <option value="{{ $taxRate->id }}" @selected((string) old('tax_rate_id') === (string) $taxRate->id)>
+                                    <option value="{{ $taxRate->id }}" data-tax-rate="{{ $taxRate->rate }}" @selected((string) old('tax_rate_id') === (string) $taxRate->id)>
                                         {{ $taxRate->name }} · {{ $taxRate->rate }}%
                                     </option>
                                 @endforeach
@@ -99,7 +99,7 @@
                                 </div>
                                 <label class="w-40 shrink-0">
                                     <span class="zazu-label">Price ({{ $quote->currency }})</span>
-                                    <input type="number" min="0" step="0.01" inputmode="decimal" name="unit_price[{{ $requirement->id }}]" value="{{ old('unit_price.'.$requirement->id, $defaultPrice) }}" class="zazu-input" required>
+                                    <input type="number" min="0" step="0.01" inputmode="decimal" name="unit_price[{{ $requirement->id }}]" data-quote-quantity="{{ (float) $requirement->quantity }}" value="{{ old('unit_price.'.$requirement->id, $defaultPrice) }}" class="zazu-input" required>
                                     @if ($item)
                                         <span class="zazu-field-help">Carried forward from the previous revision.</span>
                                     @elseif ($defaultPrice !== null)
@@ -128,4 +128,44 @@
             </aside>
         </div>
     </form>
+
+    <script>
+        const editPriceInputs = [...document.querySelectorAll('[data-quote-quantity]')];
+        const editDepositInput = document.querySelector('input[name="deposit_percent"]');
+        const editTaxSelect = document.querySelector('select[name="tax_rate_id"]');
+        const editSummary = document.querySelector('[data-quote-summary]');
+        const editCurrency = @json($quote->currency);
+        const editMoney = new Intl.NumberFormat(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+
+        function refreshEditQuoteSummary() {
+            if (!editSummary) return;
+
+            let subtotal = 0;
+            editPriceInputs.forEach((input) => {
+                const quantity = Number.parseFloat(input.dataset.quoteQuantity || '1');
+                const price = Number.parseFloat(input.value || '');
+                if (Number.isFinite(quantity) && Number.isFinite(price)) subtotal += quantity * price;
+            });
+
+            const option = editTaxSelect?.selectedOptions[0];
+            const fallbackRate = Number.parseFloat(editSummary.dataset.currentTaxRate || '0');
+            const selectedRate = option?.value === 'none' ? 0 : Number.parseFloat(option?.dataset.taxRate ?? '');
+            const taxRate = Number.isFinite(selectedRate) ? selectedRate : fallbackRate;
+            const tax = subtotal * taxRate / 100;
+            const total = subtotal + tax;
+            const depositPercent = Number.parseFloat(editDepositInput?.value || '0');
+            const deposit = total * (Number.isFinite(depositPercent) ? depositPercent : 0) / 100;
+            const format = (value) => editCurrency + ' ' + editMoney.format(value);
+
+            editSummary.querySelector('[data-quote-subtotal]').textContent = format(subtotal);
+            editSummary.querySelector('[data-quote-tax]').textContent = format(tax);
+            editSummary.querySelector('[data-quote-total]').textContent = format(total);
+            editSummary.querySelector('[data-quote-deposit]').textContent = format(deposit);
+        }
+
+        editPriceInputs.forEach((input) => input.addEventListener('input', refreshEditQuoteSummary));
+        editDepositInput?.addEventListener('input', refreshEditQuoteSummary);
+        editTaxSelect?.addEventListener('change', refreshEditQuoteSummary);
+        refreshEditQuoteSummary();
+    </script>
 </x-app-layout>
