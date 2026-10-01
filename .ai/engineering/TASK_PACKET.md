@@ -57,7 +57,12 @@ What operational/commercial risk or capability changes?
 - [ ]
 
 ### UI/UX/accessibility
-- [ ]
+- [ ] Human-eye / creative critique completed where applicable
+- [ ] Colour/theme relationships reviewed
+- [ ] Form field widths appropriate to content
+- [ ] Table width / horizontal scan burden reviewed
+- [ ] Responsive composition reviewed
+- [ ] Visual hierarchy and scan path reviewed
 
 ## Stop conditions
 Stop and escalate when:
@@ -102,3 +107,12 @@ Add these fields whenever a check fails or the target is release-significant:
 - Escalation decision:
 
 A repeated failure must not be treated as a fresh task without first loading its case history.
+
+
+## Director synchronization
+
+The Task Packet is subordinate to Director state.
+
+Specialist engines update evidence here, but Director remains responsible for sequencing, reconciliation, acceptance and next target.
+
+For UI-affecting work, UI/UX records human-eye findings and Verification records rendered evidence where required.
