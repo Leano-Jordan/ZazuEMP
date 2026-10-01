@@ -128,4 +128,36 @@ class UiAccessibilityTest extends TestCase
     }
 
 
+
+    public function test_purchase_order_editor_exposes_multi_line_workflow(): void
+    {
+        $response = $this->get(route('purchasing.create'));
+
+        $response->assertOk()
+            ->assertSee('data-purchase-line-list', false)
+            ->assertSee('data-add-purchase-line', false)
+            ->assertSee('data-purchase-order-total', false);
+    }
+
+    public function test_quote_editor_exposes_live_financial_checkpoint(): void
+    {
+        $response = $this->get(route('work.quotes.create', $this->event));
+
+        $response->assertOk()
+            ->assertSee('data-quote-summary', false)
+            ->assertSee('data-quote-subtotal', false)
+            ->assertSee('data-quote-total', false)
+            ->assertSee('data-quote-deposit', false);
+    }
+
+    public function test_shared_ui_hardens_browser_storage_and_duplicate_submissions(): void
+    {
+        $script = file_get_contents(resource_path('js/app.js'));
+
+        $this->assertStringContainsString('function safeStorageGet', $script);
+        $this->assertStringContainsString('function safeStorageSet', $script);
+        $this->assertStringContainsString('function setupZazuFormSubmissionGuards', $script);
+        $this->assertStringContainsString('event.defaultPrevented', $script);
+    }
+
 }
