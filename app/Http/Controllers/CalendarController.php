@@ -31,6 +31,10 @@ class CalendarController extends Controller
             $days->push($day->copy());
         }
 
+        $monthEvents = $events->flatten(1);
+        $statusCounts = $monthEvents->groupBy('status')->map->count();
+        $attentionCount = ($statusCounts->get('draft', 0) + $statusCounts->get('cancelled', 0));
+
         return view('calendar.index', [
             'month' => $month,
             'monthLabel' => $month->format('F Y'),
@@ -38,6 +42,9 @@ class CalendarController extends Controller
             'nextMonth' => $month->copy()->addMonth()->format('Y-m'),
             'days' => $days,
             'eventsByDate' => $events,
+            'monthEventCount' => $monthEvents->count(),
+            'confirmedCount' => $statusCounts->get('confirmed', 0),
+            'attentionCount' => $attentionCount,
         ]);
     }
 
