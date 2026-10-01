@@ -135,11 +135,23 @@ class CustomerImportMatcher
      */
     private function matchRow(array $row, int $index, array $indexes, array $sourceKeys): array
     {
+        $fields = $this->rowFields($row);
+        $matches = $this->findCustomerMatches($fields, $indexes);
+        $duplicateRows = $this->findDuplicateRows($fields, $index, $sourceKeys);
+
+        return $this->buildMatchResult($matches, $duplicateRows);
+    }
+
+    /**
+     * @param array{customer: array<string, ?string>, primary_contact: array<string, ?string>} $row
+     * @return array<string, string>
+     */
+    private function rowFields(array $row): array
+    {
         $customer = $row['customer'];
         $contact = $row['primary_contact'];
 
-        $matches = [];
-        $fields = [
+        return [
             'name' => $this->normaliseText($customer['name']),
             'registration_number' => $this->normaliseIdentifier($customer['registration_number']),
             'tax_number' => $this->normaliseIdentifier($customer['tax_number']),
@@ -147,6 +159,16 @@ class CustomerImportMatcher
             'email' => $this->normaliseEmail($contact['email']),
             'phone' => $this->normalisePhone($contact['phone']),
         ];
+    }
+
+    /**
+     * @param array<string, string> $fields
+     * @param array<string, array<string, array<int, int>>> $indexes
+     * @return array<int, array<int, string>>
+     */
+    private function findCustomerMatches(array $fields, array $indexes): array
+    {
+        $matches = [];
 
         foreach ($fields as $field => $value) {
             if ($value === '') {
@@ -159,6 +181,16 @@ class CustomerImportMatcher
             }
         }
 
+        return $matches;
+    }
+
+    /**
+     * @param array<string, string> $fields
+     * @param array<string, array<int, int>> $sourceKeys
+     * @return array<int, int>
+     */
+    private function findDuplicateRows(array $fields, int $index, array $sourceKeys): array
+    {
         $duplicateRows = [];
 
         foreach ($fields as $field => $value) {
@@ -173,7 +205,16 @@ class CustomerImportMatcher
             }
         }
 
-        $duplicateRows = array_values(array_unique($duplicateRows));
+        return array_values(array_unique($duplicateRows));
+    }
+
+    /**
+     * @param array<int, array<int, string>> $matches
+     * @param array<int, int> $duplicateRows
+     * @return array{status: string, customer_id: int|null, matched_by: array<int, string>, source_duplicate_of_row: int|null, message: string}
+     */
+    private function buildMatchResult(array $matches, array $duplicateRows): array
+    {
         $customerIds = array_keys($matches);
 
         if (count($customerIds) > 1) {
@@ -187,10 +228,12 @@ class CustomerImportMatcher
         }
 
         if ($duplicateRows !== []) {
+            $hasSingleMatch = count($customerIds) === 1;
+
             return [
                 'status' => 'duplicate',
-                'customer_id' => count($customerIds) === 1 ? (int) $customerIds[0] : null,
-                'matched_by' => count($customerIds) === 1 ? $matches[$customerIds[0]] : [],
+                'customer_id' => $hasSingleMatch ? (int) $customerIds[0] : null,
+                'matched_by' => $hasSingleMatch ? $matches[$customerIds[0]] : [],
                 'source_duplicate_of_row' => $duplicateRows[0],
                 'message' => 'The same customer information appears on another spreadsheet row. Review the duplicate before importing.',
             ];
