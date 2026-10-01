@@ -22,13 +22,20 @@ class InventoryController extends Controller
         $items=InventoryItem::where('business_id',$businessId)->with(['capability','movements'])->orderBy('name')->get();
         $totalOnHand=$items->sum(fn($item)=>$item->on_hand);
         $lowStock=$items->filter(fn($item)=>$item->on_hand <= (float)$item->reorder_level)->count();
+        $events = \App\Models\Event::query()
+            ->where('business_id', $businessId)
+            ->whereIn('status', ['draft', 'confirmed', 'in_progress'])
+            ->orderBy('event_date')
+            ->orderBy('name')
+            ->get();
+
         $demand = EventRequirement::query()
             ->whereHas('event', fn ($query) => $query->where('business_id', $businessId)->whereNotIn('status', ['completed', 'cancelled']))
             ->whereHas('capability', fn ($query) => $query->where('business_id', $businessId)->where('capability_type', 'product'))
             ->with('event.customer', 'capability')
             ->orderBy('created_at')
             ->get();
-        return view('inventory.index',compact('items','totalOnHand','lowStock','demand'));
+        return view('inventory.index', compact('items', 'totalOnHand', 'lowStock', 'demand', 'events'));
     }
 
     public function create(Request $request): View
