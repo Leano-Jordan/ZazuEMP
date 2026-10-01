@@ -488,4 +488,62 @@ class QuoteWorkflowTest extends TestCase
         $response->assertSessionHasErrors('unit_price');
         $this->assertDatabaseCount('quotes', 0);
     }
+    public function test_accepted_quote_exposes_invoice_hand_off_and_preserves_existing_invoice_link(): void
+    {
+        $customer = Customer::create(['name' => 'Finance Handoff Customer']);
+
+        $event = Event::create([
+            'business_id' => app(\App\Support\CurrentBusiness::class)->id(auth()->user()),
+            'customer_id' => $customer->id,
+            'reference' => 'ZAZ-FINANCE-HANDOFF-001',
+            'name' => 'Finance Handoff Event',
+            'event_date' => now()->addDays(10)->toDateString(),
+            'status' => 'confirmed',
+        ]);
+
+        $quote = Quote::create([
+            'event_id' => $event->id,
+            'reference' => 'QUO-FINANCE-HANDOFF-001',
+            'status' => 'accepted',
+            'currency' => 'ZAR',
+        ]);
+
+        $version = $quote->versions()->create([
+            'version' => 1,
+            'status' => 'accepted',
+            'subtotal' => '1000.00',
+            'tax_total' => '150.00',
+            'total' => '1150.00',
+        ]);
+
+        $response = $this->get(route('quotes.show', $quote));
+
+        $response->assertOk()
+            ->assertSee('Accepted quote → invoice')
+            ->assertSee(route('finance.invoices.create', ['quote_id' => $quote->id]), false);
+
+        $invoice = \App\Models\Invoice::create([
+            'business_id' => $event->business_id,
+            'event_id' => $event->id,
+            'quote_id' => $quote->id,
+            'quote_version_id' => $version->id,
+            'number' => 'INV-FINANCE-HANDOFF-001',
+            'idempotency_key' => (string) \Illuminate\Support\Str::uuid(),
+            'business_legal_name' => 'Test Business',
+            'customer_name' => $customer->name,
+            'status' => 'issued',
+            'currency' => 'ZAR',
+            'subtotal' => '1000.00',
+            'tax_total' => '150.00',
+            'total' => '1150.00',
+        ]);
+
+        $response = $this->get(route('quotes.show', $quote));
+
+        $response->assertOk()
+            ->assertSee('Open invoice INV-FINANCE-HANDOFF-001')
+            ->assertSee(route('finance.invoices.show', $invoice), false);
+    }
+
+
 }
