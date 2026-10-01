@@ -9,6 +9,8 @@ Automated writing previously corrupted PHP namespace/import backslashes.
 
 **Status:** CONTROL ACTIVE
 
+**2026-10-01 recurrence:** a newly added UI regression test briefly received flattened model namespace references during automated repository writing. Director re-read the file, detected the corruption before closure and restored valid imports/usages. This remains a write-integrity control issue, not an application design issue.
+
 ## REG-002 — Repository migration vs existing database drift
 A repository migration can be correct while an existing local database remains behind.
 
