@@ -71,9 +71,9 @@ class UiAccessibilityTest extends TestCase
 
         $response->assertOk()
             ->assertSee('Workspace')
-            ->assertSee('Sales &amp; operations')
-            ->assertSee('Purchasing &amp; resources')
-            ->assertSee('Money &amp; control')
+            ->assertSee('Sales &amp; operations', false)
+            ->assertSee('Purchasing &amp; resources', false)
+            ->assertSee('Money &amp; control', false)
             ->assertSee('System')
             ->assertSee('data-zazu-nav-trigger', false)
             ->assertSee('data-zazu-nav-panel', false)
