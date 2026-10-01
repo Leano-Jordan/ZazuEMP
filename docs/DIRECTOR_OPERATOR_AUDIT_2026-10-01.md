@@ -157,3 +157,58 @@ Source verification was performed against the post-hardening commits. GitHub cur
 ### Release-risk focus after this pass
 
 The main remaining unknown is no longer whether obvious error handling exists; it is whether the complete populated workflow survives real runtime execution under the current build, migrations, database state and responsive layouts. That is the next hard gate before treating Zazu as payment-user ready.
+
+## Long-sprint hardening — 2026-10-01
+
+### Scope
+Page-to-page usability, workflow continuity, shared UI resilience and foundation readiness for a solo operator through a growing company. Changes were limited to evidence-backed friction; no new domain or parallel workflow authority was introduced.
+
+### Page-by-page disposition
+
+| Surface | Director disposition |
+|---|---|
+| Public landing / authentication | **Keep.** Entry states and recovery paths are coherent. No source-level defect justified further change this cycle. |
+| Setup Centre / onboarding | **Keep.** Progressive disclosure, defer/resume and the registration → setup → dashboard sequence remain the intended low-friction path. |
+| Dashboard / Command Centre | **Keep.** Populated attention signals already surface real work. Avoid adding another dashboard card layer until runtime use proves a missing decision. |
+| Jobs / Work | **Keep.** Job remains the user's mental container; operational chain and next-action guidance are coherent. Runtime populated walkthrough remains the real gate. |
+| Services / Requirements | **Keep.** Guided catalogue selection plus editable fallback supports both novice and experienced operators. No unnecessary form reduction added. |
+| Customers / Contacts | **Keep.** Relationship-first record structure is already reusable across work. No parallel contact authority introduced. |
+| Quotes | **Hardened.** Consequential quote creation/revision now exposes a live subtotal/tax/total/deposit checkpoint while retaining server-side recalculation and historical snapshot rules. |
+| Purchasing | **Hardened.** Purchase-order creation now exposes the existing multi-line backend capability with add/remove lines, per-line totals and an estimated order total; job context is retained on cancel. |
+| Inventory | **Keep.** Inline stock actions and active-job issue attribution are already direct. Avoid adding reservation/batch complexity without an operational need. |
+| Assets | **Keep.** Allocation/release/condition foundation exists. Evidence workflow remains a later bounded target rather than a reason to expand the current page. |
+| Preparation | **Keep.** Readiness lifecycle is understandable and attached to the job. |
+| Travel / Costs | **Keep.** Calculations remain contextual to the job; no new costing abstraction justified. |
+| Finance | **Hardened.** Entry permissions remain aligned with the visible actions; payment return now retains invoice context. Do not add a separate payment-management surface until search/history demand is demonstrated. |
+| Reports | **Keep.** Financial summaries are already currency-safe; no dashboard duplication added. |
+| Settings / Compliance | **Keep.** Owner/system boundary is established and advanced configuration remains progressively disclosed. |
+| Search / Calendar | **Keep.** Search remains an accelerator rather than a substitute for named navigation; calendar remains the planning surface. |
+| Shared shell / mobile navigation | **Hardened.** Shared browser storage access is failure-tolerant, and submit actions are protected against accidental duplicate clicks. Existing mobile drawer/focus handling remains the authority. |
+
+### Foundation hardening executed
+
+- Shared UI now treats local browser storage as optional. Theme persistence or last-destination persistence cannot break page initialization when storage is denied or unavailable.
+- Shared form submission guard disables the active submit control after a real submit event, while respecting confirmation handlers that prevent the submission first. An explicit data-zazu-no-submit-guard escape hatch exists for any future workflow that genuinely needs it.
+- Purchasing now matches the already-established array-based server contract instead of forcing a one-line operator experience.
+- Quote create/edit now follows the documented financial-workflow UI rule: a sticky financial checkpoint is visible where the user makes a consequential commercial revision.
+- Context-preserving cancel paths reduce navigation backtracking for job-scoped purchasing and invoice-scoped payment entry.
+- Regression contracts were added for these foundations; one test-source write defect was caught during the re-audit and corrected before closing the cycle.
+
+### Re-audit result
+
+The source re-audit found one genuine defect in the new quote work: the financial-summary JavaScript had been added before the summary markup was actually present in the quote sidebars. This was corrected by rendering the summary in both create and revision views. A second re-check confirmed no remaining flattened AppModels/AppSupport/AppHttp/AppServices tokens in application/test source.
+
+No higher-value source-only improvement was identified after this correction without either runtime evidence or materially widening scope. That is the stop point for this repository-only sprint.
+
+### Verification boundary
+
+- Current observed main-branch head: 5a460fe500afb5ac259b2dbecc665a0f726bcfac.
+- Changed source was re-read after each corrective write.
+- Current GitHub connector exposure still provides no usable workflow-run/status result for the latest main commits.
+- The development PC is off, so Laravel, PHPUnit, browser, responsive and backup/restore execution are not claimed.
+
+### Next hard gate
+
+When runtime is available: **fresh CI → migrations/config/build → full Laravel suite → populated desktop journey → populated mobile/tablet journey → deliberate failure/recovery paths → backup/restore drill → upgrade/migration drill → final Director re-audit.**
+
+The product is not being called release-green from source inspection alone.
