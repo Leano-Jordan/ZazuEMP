@@ -136,7 +136,7 @@
 
             <div class="zazu-actionbar zazu-actionbar-sticky">
                 <button class="zazu-btn zazu-btn-primary">Create purchase order</button>
-                <a href="{{ route('purchasing.index') }}" class="zazu-btn zazu-btn-ghost">Cancel</a>
+                <a href="{{ $selectedEventId ? route('purchasing.index', ['event_id' => $selectedEventId]) : route('purchasing.index') }}" class="zazu-btn zazu-btn-ghost">Cancel</a>
             </div>
         </form>
     </section>
