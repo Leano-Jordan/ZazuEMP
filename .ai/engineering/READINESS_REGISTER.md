@@ -59,32 +59,32 @@ Future architecture should remain compatible with these possibilities without al
 Last updated: 2026-10-01
 
 
-## Evidence snapshot — 2026-09-28
+## Evidence snapshot — 2026-10-01
 
 Current Director assessment:
 
 | Domain | Evidence maturity | Release condition |
 |---|---:|---|
-| Correctness | 3/5 | Runtime suite still required |
-| Architecture | 4/5 | No major V1 blocker identified |
+| Correctness | 4/5 | Current-head Laravel suite passed; populated business proof remains |
+| Architecture | 4/5 | Refactors reduced import complexity; no major V1 blocker identified |
 | Data Integrity | 3/5 | Populated-data/reconciliation proof required |
-| Security | 4/5 | Final release security review required |
+| Security | 4/5 | Current-head automated security/isolation coverage passed; final adversarial review remains |
 | Workflow Integrity | 4/5 | Populated end-to-end walkthrough required |
 | UX / Accessibility | 3/5 | Desktop/mobile/tablet/accessibility verification required |
 | Reliability / Recovery | 2/5 | Backup/restore proof required |
 | Operability | 3/5 | Final operational evidence required |
 | Deployment / Upgrade Safety | 2/5 | Existing populated database migration proof required |
 | Documentation / Ownership / Compliance | 4/5 | Release/runbook sign-off remains |
-| Release Evidence | 1/5 | Current-HEAD CI/browser/security evidence required |
+| Release Evidence | 4/5 | Current-head Laravel, browser, PHPMD, Psalm and Quality evidence observed |
 
-The major V1 capability surface is present. Remaining release risk is concentrated in proof, recovery, device QA and defects exposed by those checks.
+The major V1 capability surface is present. Current-head CI/runtime evidence is now green. Remaining release risk is concentrated in populated workflow proof, recovery, upgrade/rollback and final authorization/device acceptance.
 
 
 Current UI cycle does not create a new V1 feature expansion requirement.
 
 ## Source-hardening snapshot — 2026-10-01
 
-The long-sprint page audit tightened shared form submission safety, browser-storage failure tolerance, quote financial visibility, multi-line purchasing usability and context-preserving return paths. These changes improve the implemented foundations but do not increase runtime evidence maturity. Current release-critical evidence remains blocked on fresh execution of CI/runtime, populated browser journeys, recovery drills and upgrade verification.
+The long-sprint page audit tightened shared form submission safety, browser-storage failure tolerance, quote financial visibility, multi-line purchasing usability and context-preserving return paths. The current release candidate now has green Laravel/browser/static-quality evidence. The remaining maturity gap is proof of realistic populated operations, recovery and upgrade behaviour.
 
 
 
