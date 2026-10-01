@@ -234,7 +234,7 @@ class DemoScenarioSeeder extends Seeder
                         'quantity' => (string) $requirement->quantity,
                         'unit' => $requirement->unit,
                         'notes' => $requirement->notes,
-                        'capability_id' => null,
+                        'capability_id' => $requirement->capability_id ? (int) $requirement->capability_id : null,
                     ],
                 ]
             );
