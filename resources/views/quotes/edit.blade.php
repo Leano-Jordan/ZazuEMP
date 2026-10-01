@@ -121,7 +121,20 @@
                 </div>
             </div>
             <aside class="zazu-form-aside">
-                <div class="zazu-context-card zazu-next-card">
+                <div class="zazu-context-card zazu-financial-summary zazu-next-card"
+                     data-quote-summary
+                     data-current-tax-rate="{{ $version->tax_rate ?? 0 }}">
+                    <div class="zazu-context-title">Live quote summary</div>
+                    <div class="zazu-context-copy">Use this as a quick check before saving. Earlier quote revisions remain unchanged.</div>
+                    <dl class="zazu-financial-summary-list">
+                        <div><dt>Subtotal</dt><dd data-quote-subtotal>{{ $quote->currency }} 0.00</dd></div>
+                        <div><dt>Tax</dt><dd data-quote-tax>{{ $quote->currency }} 0.00</dd></div>
+                        <div class="is-total"><dt>Total</dt><dd data-quote-total>{{ $quote->currency }} 0.00</dd></div>
+                        <div><dt>Deposit</dt><dd data-quote-deposit>{{ $quote->currency }} 0.00</dd></div>
+                    </dl>
+                </div>
+
+                <div class="zazu-context-card">
                     <div class="zazu-context-title">Snapshot boundary</div>
                     <div class="zazu-context-copy">Save this revision to record the current Work services, quantities and prices without rewriting earlier revisions.</div>
                 </div>
