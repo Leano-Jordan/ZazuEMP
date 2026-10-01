@@ -23,7 +23,7 @@
                 <select name="quote_id" class="zazu-select">
                     <option value="">No quote</option>
                     @foreach($quotes as $quote)
-                        <option value="{{ $quote->id }}" @selected(old('quote_id') == $quote->id)>
+                        <option value="{{ $quote->id }}" @selected((string) old('quote_id', $selectedQuoteId) === (string) $quote->id)>
                             {{ $quote->reference }} · {{ $quote->status }} · {{ $quote->event?->customer?->name }} · {{ $quote->currency }} {{ $quote->latestVersion?->total ?? '0.00' }}
                         </option>
                     @endforeach
