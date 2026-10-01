@@ -229,7 +229,7 @@ class XlsxSpreadsheetReader
 
     private function columnIndex(string $reference): int
     {
-        if (!preg_match('/^([A-Z]+)\d+$/i', $reference, $matches)) {
+        if (!preg_match('~^([A-Z]+)[0-9]+$~i', $reference, $matches)) {
             throw new RuntimeException('The XLSX workbook contains an invalid cell reference.');
         }
 
