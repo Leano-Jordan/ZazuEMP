@@ -82,3 +82,14 @@ Durable decisions governing the Zazu engineering system.
 **Decision:** Zazu must not accumulate append-only visual token/sweep layers. Shared visual tokens are consolidated into one light-theme root and one dark-theme root; components inherit them.
 **Reason:** Prevent conflicting colour, typography and surface relationships.
 **Status:** ACTIVE
+
+
+## DEC-014 — Failure Case / Loop-Breaking control
+
+**Date:** 2026-10-01
+
+**Decision:** Repeated and release-significant failures use persistent case identity, failure fingerprints, hypothesis history, attempt budgets and mandatory diagnostic escalation. The Director must load the existing case before authorizing another correction.
+
+**Reason:** Prevent the engineering system from looping through variations of the same diagnosis or patch without materially new evidence.
+
+**Status:** ACTIVE
