@@ -152,3 +152,39 @@ Every verification result records:
 - remaining uncertainty;
 - regression disposition;
 - next target.
+
+
+## Director V2 — failure-case control
+
+A repeated verification failure is governed by the Failure Case Engine.
+
+Before another application correction:
+1. identify or create the persistent failure case;
+2. fingerprint the failure using stable observable facts;
+3. load previous hypotheses, experiments and rejected approaches;
+4. confirm whether materially new evidence exists;
+5. classify the failure F1–F8;
+6. choose the next diagnostic layer;
+7. authorize correction only when evidence supports it.
+
+### Attempt budget
+
+- Maximum 2 correction attempts per hypothesis.
+- Maximum 3 no-progress cycles per failure case.
+- Exceeding either threshold triggers STOP PATCHING → FORENSICS / ESCALATION.
+
+### Escalation ladder
+
+1. reproduction
+2. assertion/test contract
+3. application path
+4. fixture/data state
+5. session/auth/cache/filesystem/runtime
+6. browser/real workflow
+7. instrumentation
+8. architecture/design boundary
+9. BLOCKED / owner decision
+
+A green rerun without materially new evidence does not close a repeated or flaky case.
+
+Persistent case history is stored in .ai/engineering/FAILURE_CASES.md.
