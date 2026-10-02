@@ -262,29 +262,11 @@ class ZazuRestoreCommand extends Command
                 $source = $work.'/database.sqlite';
                 $target = config('database.connections.sqlite.database');
 
-                // A SQLite database may be in WAL mode. Checkpoint before closing the
-                // application connection so committed data is in the main file and the
-                // database can be safely replaced on Windows.
-                if ($target !== ':memory:' && is_file($target)) {
-                    try {
-                        // Never let a restore sit on SQLite's default busy timeout.
-                        // A restore must fail fast if another connection still owns the
-                        // database; silently waiting here is what turns a test failure
-                        // into a 60-second suite hang on Windows.
-                        DB::connection('sqlite')->statement('PRAGMA busy_timeout=0');
-                        $checkpoint = DB::connection('sqlite')->selectOne('PRAGMA wal_checkpoint(TRUNCATE)');
-                        if ((int) ($checkpoint->busy ?? $checkpoint['busy'] ?? 0) !== 0) {
-                            throw new \RuntimeException('The SQLite database is still busy and cannot be safely restored.');
-                        }
-                    } catch (\Throwable $exception) {
-                        throw new \RuntimeException('Could not prepare the SQLite database for restore: '.$exception->getMessage(), 0, $exception);
-                    }
-                }
-
-                // Explicitly disconnect and purge the resolved SQLite connection before
-                // replacing the database file. This matters on Windows because the PDO/SQLite
-                // handle can otherwise survive the logical connection reset long enough to keep
-                // the database file rename-locked.
+                // The existing database is being replaced, not preserved in-place.
+                // Do not checkpoint it: checkpointing can legitimately report SQLITE_BUSY
+                // while another reader is active and would make a valid restore fail.
+                // Instead, close the application connection and move the database plus its
+                // WAL/SHM sidecars together into the rollback set.
                 DB::disconnect('sqlite');
                 DB::purge('sqlite');
                 gc_collect_cycles();
@@ -295,25 +277,34 @@ class ZazuRestoreCommand extends Command
                 }
 
                 $databaseRollback = storage_path('app/.zazu-database-rollback-'.Str::ulid().'.sqlite');
-
-                // The WAL and SHM sidecars belong to the old database, not the restored
-                // snapshot. The checkpoint above makes the main file authoritative first.
                 $wal = $target.'-wal';
                 $shm = $target.'-shm';
+                $rollbackWal = $databaseRollback.'-wal';
+                $rollbackShm = $databaseRollback.'-shm';
 
                 if (is_file($target) && ! $this->renameWithRetry($target, $databaseRollback)) {
                     File::delete($databaseStage);
                     throw new \RuntimeException('Could not stage the current SQLite database for safe replacement.');
                 }
 
-                File::delete($wal);
-                File::delete($shm);
+                if (is_file($wal) && ! $this->renameWithRetry($wal, $rollbackWal)) {
+                    $this->renameWithRetry($databaseRollback, $target);
+                    File::delete($databaseStage);
+                    throw new \RuntimeException('Could not stage the current SQLite WAL file for safe replacement.');
+                }
+
+                if (is_file($shm) && ! $this->renameWithRetry($shm, $rollbackShm)) {
+                    $this->renameWithRetry($rollbackWal, $wal);
+                    $this->renameWithRetry($databaseRollback, $target);
+                    File::delete($databaseStage);
+                    throw new \RuntimeException('Could not stage the current SQLite shared-memory file for safe replacement.');
+                }
 
                 if (! $this->renameWithRetry($databaseStage, $target)) {
                     File::delete($databaseStage);
-                    if (is_file($databaseRollback)) {
-                        $this->renameWithRetry($databaseRollback, $target);
-                    }
+                    $this->renameWithRetry($rollbackShm, $shm);
+                    $this->renameWithRetry($rollbackWal, $wal);
+                    $this->renameWithRetry($databaseRollback, $target);
                     throw new \RuntimeException('Could not activate the restored SQLite database.');
                 }
             } elseif ($driver === 'mysql') {
@@ -357,7 +348,9 @@ class ZazuRestoreCommand extends Command
                 File::delete($target);
                 File::delete($target.'-wal');
                 File::delete($target.'-shm');
-                rename($databaseRollback, $target);
+                $this->renameWithRetry($databaseRollback.'-shm', $target.'-shm');
+                $this->renameWithRetry($databaseRollback.'-wal', $target.'-wal');
+                $this->renameWithRetry($databaseRollback, $target);
             }
 
             if ($privateActivated) {
