@@ -156,9 +156,16 @@ $this->assertSame(0, $exitCode);
             'format_version' => 1,
             'database_driver' => 'sqlite',
         ]));
-        $zip->addFromString('database.sqlite', 'first', 0);
-        $zip->addFromString('database.sqlite', 'second', 0);
+        // ZipArchive may overwrite/reject same-name additions depending on the
+        // libzip build. Build two distinct same-length names first, then make both
+        // archive entries resolve to the same name in the ZIP metadata.
+        $zip->addFromString('database.sqlite', 'first');
+        $zip->addFromString('database.sqlitf', 'second');
         $zip->close();
+
+        $raw = File::get($archive);
+        $this->assertGreaterThanOrEqual(2, substr_count($raw, 'database.sqlitf'));
+        File::put($archive, str_replace('database.sqlitf', 'database.sqlite', $raw));
 
         try {
             $this->artisan('zazu:restore', ['archive' => $archive, '--force' => true])
