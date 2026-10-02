@@ -128,12 +128,12 @@
                     <circle cx="30" cy="20" r="2" fill="white"/>
                     <path d="M14 30c4 0 7 2 9 5-5 2-10 0-12-4" fill="white" opacity=".72"/>
                 </svg>
+                <span class="zazu-helper-attention-dot" aria-hidden="true"></span>
             </span>
             <span class="zazu-helper-toggle-copy">
                 <strong>Zazu</strong>
                 <small data-zazu-helper-toggle-label>Guide</small>
             </span>
-            <span class="zazu-helper-attention-dot" aria-hidden="true"></span>
         </button>
         <div hidden>
             @foreach($steps as $index => $step)
