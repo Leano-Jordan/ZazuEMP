@@ -131,7 +131,10 @@ class ZazuRestoreCommand extends Command
                     $normalized !== $name
                     || $name === ''
                     || str_starts_with($name, '/')
-                    || preg_match('/^[A-Za-z]:[\\\/]/', $name)
+                    || (strlen($name) >= 3
+                        && ctype_alpha($name[0])
+                        && $name[1] === ':'
+                        && ($name[2] === '/' || $name[2] === '\\'))
                     || in_array('..', $parts, true)
                     || (in_array('', $parts, true) && !str_ends_with($name, '/'))
                 ) {
