@@ -156,7 +156,7 @@ $this->assertSame(0, $exitCode);
             'format_version' => 1,
             'database_driver' => 'sqlite',
         ]));
-        $zip->addFromString('database.sqlite', 'first');
+        $zip->addFromString('database.sqlite', 'first', 0);
         $zip->addFromString('database.sqlite', 'second', 0);
         $zip->close();
 
