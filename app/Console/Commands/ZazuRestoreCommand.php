@@ -281,8 +281,11 @@ class ZazuRestoreCommand extends Command
                     }
                 }
 
-                // Purge the resolved SQLite connection before replacing the database file.
-                // On Windows, disconnect alone can leave the PDO object holding a file handle.
+                // Explicitly disconnect and purge the resolved SQLite connection before
+                // replacing the database file. This matters on Windows because the PDO/SQLite
+                // handle can otherwise survive the logical connection reset long enough to keep
+                // the database file rename-locked.
+                DB::disconnect('sqlite');
                 DB::purge('sqlite');
                 gc_collect_cycles();
 
@@ -298,7 +301,7 @@ class ZazuRestoreCommand extends Command
                 $wal = $target.'-wal';
                 $shm = $target.'-shm';
 
-                if (is_file($target) && !rename($target, $databaseRollback)) {
+                if (is_file($target) && ! $this->renameWithRetry($target, $databaseRollback)) {
                     File::delete($databaseStage);
                     throw new \RuntimeException('Could not stage the current SQLite database for safe replacement.');
                 }
@@ -306,10 +309,10 @@ class ZazuRestoreCommand extends Command
                 File::delete($wal);
                 File::delete($shm);
 
-                if (!rename($databaseStage, $target)) {
+                if (! $this->renameWithRetry($databaseStage, $target)) {
                     File::delete($databaseStage);
                     if (is_file($databaseRollback)) {
-                        rename($databaseRollback, $target);
+                        $this->renameWithRetry($databaseRollback, $target);
                     }
                     throw new \RuntimeException('Could not activate the restored SQLite database.');
                 }
@@ -375,5 +378,19 @@ class ZazuRestoreCommand extends Command
                 File::deleteDirectory($privateRollback);
             }
         }
+    private function renameWithRetry(string $from, string $to): bool
+    {
+        for ($attempt = 0; $attempt < 5; $attempt++) {
+            if (rename($from, $to)) {
+                return true;
+            }
+
+            gc_collect_cycles();
+            usleep(100000);
+        }
+
+        return false;
+    }
+
     }
 }
