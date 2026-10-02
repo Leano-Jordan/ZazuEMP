@@ -682,23 +682,13 @@
     .zazu-helper-actions {
         flex-wrap: wrap;
     }
+
+    .zazu-helper-btn {
+        min-height: 40px;
+    }
 }
 
 @media (max-width: 520px) {
-    .zazu-topbar-inner {
-        grid-template-columns: 40px minmax(0, 1fr) 40px 40px;
-        grid-template-areas:
-            "menu context search theme"
-            "slots slots slots slots";
-        padding-inline: 9px;
-    }
-
-    .zazu-header-slot-actions > .zazu-btn {
-        min-height: 36px;
-        padding-inline: 12px;
-        font-size: 11px;
-    }
-
     .zazu-helper-panel {
         right: -2px;
         width: calc(100vw - 24px);
