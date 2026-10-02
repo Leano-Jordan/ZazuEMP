@@ -54,12 +54,12 @@ class ZazuBackupRestoreTest extends TestCase
 
             DB::table('backup_probe')->update(['value' => 'changed after backup']);
 
-            $restore = $this->artisan('zazu:restore', [
+            $this->withoutMockingConsoleOutput();
+
+$exitCode = $this->artisan('zazu:restore', [
     'archive' => $archive,
     '--force' => true,
 ]);
-
-$exitCode = $restore->run();
 
 if ($exitCode !== 0) {
     $this->fail('RESTORE COMMAND OUTPUT: '.trim(\Illuminate\Support\Facades\Artisan::output()));
