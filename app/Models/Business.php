@@ -78,6 +78,11 @@ class Business extends Model
         return $this->hasOne(BusinessTaxProfile::class);
     }
 
+    public function license(): HasOne
+    {
+        return $this->hasOne(BusinessLicense::class);
+    }
+
     public function taxRates(): HasMany
     {
         return $this->hasMany(TaxRate::class);
