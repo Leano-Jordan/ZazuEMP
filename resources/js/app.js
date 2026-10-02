@@ -626,7 +626,6 @@ function setupZazuHelper() {
 
         let index = 0;
         let enabled = localStorage.getItem(storageKey) !== 'off';
-        let autoOpenTimer = null;
 
         const render = () => {
             const step = data[index];
@@ -671,10 +670,6 @@ function setupZazuHelper() {
         const turnOff = () => {
             enabled = false;
             localStorage.setItem(storageKey, 'off');
-            if (autoOpenTimer !== null) {
-                window.clearTimeout(autoOpenTimer);
-                autoOpenTimer = null;
-            }
             syncEnabledState();
             close();
         };
@@ -713,15 +708,7 @@ function setupZazuHelper() {
         syncEnabledState();
         render();
 
-        if (enabled && localStorage.getItem(seenKey) !== '1') {
-            autoOpenTimer = window.setTimeout(() => {
-                autoOpenTimer = null;
-
-                if (enabled && localStorage.getItem(seenKey) !== '1') {
-                    open();
-                }
-            }, 450);
-        }
+        // The guide stays quiet until the user asks for it. Attention is surfaced by the helper control itself.
     });
 }
 
