@@ -647,7 +647,6 @@ function setupZazuHelper() {
 
         const syncEnabledState = () => {
             helper.dataset.zazuGuideEnabled = enabled ? 'on' : 'off';
-            toggle.setAttribute('aria-pressed', enabled ? 'true' : 'false');
             toggleLabel.textContent = enabled ? 'Guide' : 'Guide off';
         };
 

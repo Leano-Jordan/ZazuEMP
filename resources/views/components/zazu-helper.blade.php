@@ -120,7 +120,7 @@
                 </div>
             </div>
         </section>
-        <button type="button" class="zazu-helper-toggle" data-zazu-helper-toggle aria-expanded="false" aria-pressed="true" aria-controls="zazu-helper-panel" aria-label="Open Zazu guide">
+        <button type="button" class="zazu-helper-toggle" data-zazu-helper-toggle aria-expanded="false" aria-controls="zazu-helper-panel" aria-label="Open Zazu guide">
             <span class="zazu-helper-bird" aria-hidden="true">
                 <svg viewBox="0 0 48 48" fill="none" role="presentation">
                     <path d="M10 27c0-9 6-16 15-16 5 0 9 2 12 6-1 1-3 2-5 2 2 2 4 4 5 7-3-1-5-1-7-1 0 5-4 10-10 11-6 1-10-2-10-9Z" fill="currentColor"/>
@@ -128,12 +128,12 @@
                     <circle cx="30" cy="20" r="2" fill="white"/>
                     <path d="M14 30c4 0 7 2 9 5-5 2-10 0-12-4" fill="white" opacity=".72"/>
                 </svg>
+                <span class="zazu-helper-attention-dot" aria-hidden="true"></span>
             </span>
             <span class="zazu-helper-toggle-copy">
                 <strong>Zazu</strong>
                 <small data-zazu-helper-toggle-label>Guide</small>
             </span>
-            <span class="zazu-helper-attention-dot" aria-hidden="true"></span>
         </button>
         <div hidden>
             @foreach($steps as $index => $step)
