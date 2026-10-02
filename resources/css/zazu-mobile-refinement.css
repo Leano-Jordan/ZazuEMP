@@ -24,16 +24,15 @@
     }
 
     .zazu-topbar-inner {
-        position: relative;
         min-height: 0;
-        padding: max(8px, env(safe-area-inset-top)) 12px 9px;
+        padding: max(8px, env(safe-area-inset-top)) 12px 10px;
         display: grid;
-        grid-template-columns: 44px minmax(0, 1fr) 44px 44px;
+        grid-template-columns: 40px minmax(0, 1fr);
         grid-template-areas:
-            "menu context search theme"
-            "slots slots slots slots";
+            "menu actions"
+            "context context";
         align-items: center;
-        gap: 8px;
+        gap: 8px 10px;
     }
 
     .zazu-mobile-menu-button {
@@ -93,8 +92,8 @@
         grid-area: context;
         min-width: 0;
         width: 100%;
-        text-align: left;
-        padding: 0 2px;
+        text-align: center;
+        padding-top: 1px;
     }
 
     .zazu-page-title {
@@ -110,14 +109,23 @@
     }
 
     .zazu-topbar-actions {
-        display: contents;
+        grid-area: actions;
+        min-width: 0;
+        max-width: 100%;
+        width: auto !important;
+        display: flex;
+        flex: none;
+        flex-wrap: nowrap !important;
+        align-items: center;
+        justify-content: flex-end;
+        gap: 8px;
+        padding: 0 !important;
+        justify-self: end;
     }
 
     .zazu-command-search {
-        grid-area: search;
-        width: 44px;
-        flex: 0 0 44px;
-        justify-self: end;
+        width: 40px;
+        flex: 0 0 40px;
     }
 
     .zazu-command-trigger {
@@ -163,14 +171,20 @@
     /* Mobile search must become a real input when opened; the previous 40px transparent input made it effectively unusable. */
     .zazu-command-search:focus-within,
     .zazu-command-search.is-open {
-        width: min(220px, calc(100vw - 74px));
-        flex: 0 1 min(220px, calc(100vw - 74px));
+        position: absolute;
+        top: max(8px, env(safe-area-inset-top));
+        right: 60px;
+        z-index: 2;
+        width: min(240px, calc(100vw - 120px));
+        flex: none;
     }
 
     .zazu-command-search:focus-within .zazu-command-trigger,
     .zazu-command-search.is-open .zazu-command-trigger {
         width: 100%;
         min-width: 0;
+        height: 44px;
+        min-height: 44px;
         justify-content: flex-start;
         padding: 0 10px 0 34px;
     }
@@ -194,40 +208,29 @@
     }
 
     .zazu-header-slot-actions {
-        grid-area: slots;
         display: flex;
-        width: 100%;
+        flex: 0 1 auto;
         min-width: 0;
-        max-width: none;
+        max-width: 100%;
         align-items: center;
-        justify-content: flex-start;
-        gap: 7px;
-        flex-wrap: nowrap;
-        overflow-x: auto;
-        overscroll-behavior-x: contain;
-        scrollbar-width: none;
-        padding: 1px 1px 2px;
-    }
-
-    .zazu-header-slot-actions::-webkit-scrollbar {
-        display: none;
+        justify-content: flex-end;
+        gap: 5px;
+        flex-wrap: wrap;
     }
 
     .zazu-header-slot-actions > .zazu-btn {
         min-height: 40px;
-        flex: 0 0 auto;
-        max-width: none;
+        flex: 0 1 auto;
+        max-width: 180px;
         white-space: nowrap;
         overflow: hidden;
         text-overflow: ellipsis;
     }
 
     .zazu-theme-toggle {
-        grid-area: theme;
         width: 44px;
         height: 44px;
         flex: 0 0 44px;
-        justify-self: end;
     }
 
     .zazu-mobile-nav-backdrop {
@@ -277,9 +280,9 @@
     }
 
     .zazu-mobile-sidebar-close {
-        width: 40px;
-        height: 40px;
-        flex: 0 0 40px;
+        width: 44px;
+        height: 44px;
+        flex: 0 0 44px;
         display: inline-grid;
         place-items: center;
         padding: 0;
@@ -366,10 +369,10 @@
 @media (max-width: 520px) {
     .zazu-topbar-inner {
         padding: max(7px, env(safe-area-inset-top)) 9px 9px;
-        grid-template-columns: 44px minmax(0, 1fr) 44px 44px;
+        grid-template-columns: 40px minmax(0, 1fr);
         grid-template-areas:
-            "menu context search theme"
-            "slots slots slots slots";
+            "menu actions"
+            "context context";
         gap: 7px 8px;
     }
 
@@ -389,7 +392,7 @@
     }
 
     .zazu-command-search {
-        width: 44px;
+        width: 40px;
         flex-basis: 44px;
     }
 
@@ -646,8 +649,7 @@
 .zazu-helper-btn-primary { border-color: var(--zazu-primary); background: var(--zazu-primary); color: #fff; }
 .zazu-helper-btn-primary:hover:not(:disabled) { color: #fff; }
 
-/* Helper responsive rules remain below; header rules are consolidated above. */
-
+@media (max-width: 820px) {
     .zazu-helper {
         right: 12px;
         bottom: max(12px, env(safe-area-inset-bottom));
@@ -682,13 +684,23 @@
     .zazu-helper-actions {
         flex-wrap: wrap;
     }
-
-    .zazu-helper-btn {
-        min-height: 40px;
-    }
 }
 
 @media (max-width: 520px) {
+    .zazu-topbar-inner {
+        grid-template-columns: 40px minmax(0, 1fr) 40px 40px;
+        grid-template-areas:
+            "menu context search theme"
+            "slots slots slots slots";
+        padding-inline: 9px;
+    }
+
+    .zazu-header-slot-actions > .zazu-btn {
+        min-height: 36px;
+        padding-inline: 12px;
+        font-size: 11px;
+    }
+
     .zazu-helper-panel {
         right: -2px;
         width: calc(100vw - 24px);
