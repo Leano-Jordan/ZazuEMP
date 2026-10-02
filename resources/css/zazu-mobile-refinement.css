@@ -24,22 +24,23 @@
     }
 
     .zazu-topbar-inner {
+        position: relative;
         min-height: 0;
-        padding: max(8px, env(safe-area-inset-top)) 12px 10px;
+        padding: max(8px, env(safe-area-inset-top)) 12px 9px;
         display: grid;
-        grid-template-columns: 40px minmax(0, 1fr);
+        grid-template-columns: 44px minmax(0, 1fr) 44px 44px;
         grid-template-areas:
-            "menu actions"
-            "context context";
+            "menu context search theme"
+            "slots slots slots slots";
         align-items: center;
-        gap: 8px 10px;
+        gap: 8px;
     }
 
     .zazu-mobile-menu-button {
         grid-area: menu;
-        width: 40px;
-        height: 40px;
-        flex: 0 0 40px;
+        width: 44px;
+        height: 44px;
+        flex: 0 0 44px;
         display: inline-grid;
         place-items: center;
         padding: 0;
@@ -92,8 +93,8 @@
         grid-area: context;
         min-width: 0;
         width: 100%;
-        text-align: center;
-        padding-top: 1px;
+        text-align: left;
+        padding: 0 2px;
     }
 
     .zazu-page-title {
@@ -109,31 +110,22 @@
     }
 
     .zazu-topbar-actions {
-        grid-area: actions;
-        min-width: 0;
-        max-width: 100%;
-        width: auto !important;
-        display: flex;
-        flex: none;
-        flex-wrap: nowrap !important;
-        align-items: center;
-        justify-content: flex-end;
-        gap: 8px;
-        padding: 0 !important;
-        justify-self: end;
+        display: contents;
     }
 
     .zazu-command-search {
-        width: 40px;
-        flex: 0 0 40px;
+        grid-area: search;
+        width: 44px;
+        flex: 0 0 44px;
+        justify-self: end;
     }
 
     .zazu-command-trigger {
         position: relative;
-        width: 40px;
-        min-width: 40px;
-        height: 40px;
-        min-height: 40px;
+        width: 44px;
+        min-width: 44px;
+        height: 44px;
+        min-height: 44px;
         padding: 0;
         border-radius: var(--zazu-radius-md);
         justify-content: center;
@@ -202,29 +194,40 @@
     }
 
     .zazu-header-slot-actions {
+        grid-area: slots;
         display: flex;
-        flex: 0 1 auto;
+        width: 100%;
         min-width: 0;
-        max-width: 100%;
+        max-width: none;
         align-items: center;
-        justify-content: flex-end;
-        gap: 5px;
-        flex-wrap: wrap;
+        justify-content: flex-start;
+        gap: 7px;
+        flex-wrap: nowrap;
+        overflow-x: auto;
+        overscroll-behavior-x: contain;
+        scrollbar-width: none;
+        padding: 1px 1px 2px;
+    }
+
+    .zazu-header-slot-actions::-webkit-scrollbar {
+        display: none;
     }
 
     .zazu-header-slot-actions > .zazu-btn {
         min-height: 40px;
-        flex: 0 1 auto;
-        max-width: 180px;
+        flex: 0 0 auto;
+        max-width: none;
         white-space: nowrap;
         overflow: hidden;
         text-overflow: ellipsis;
     }
 
     .zazu-theme-toggle {
-        width: 40px;
-        height: 40px;
-        flex: 0 0 40px;
+        grid-area: theme;
+        width: 44px;
+        height: 44px;
+        flex: 0 0 44px;
+        justify-self: end;
     }
 
     .zazu-mobile-nav-backdrop {
@@ -363,10 +366,10 @@
 @media (max-width: 520px) {
     .zazu-topbar-inner {
         padding: max(7px, env(safe-area-inset-top)) 9px 9px;
-        grid-template-columns: 40px minmax(0, 1fr);
+        grid-template-columns: 44px minmax(0, 1fr) 44px 44px;
         grid-template-areas:
-            "menu actions"
-            "context context";
+            "menu context search theme"
+            "slots slots slots slots";
         gap: 7px 8px;
     }
 
@@ -374,20 +377,20 @@
     .zazu-command-trigger,
     .zazu-header-create,
     .zazu-theme-toggle {
-        width: 40px;
-        height: 40px;
-        min-height: 40px !important;
+        width: 44px;
+        height: 44px;
+        min-height: 44px !important;
     }
 
     .zazu-mobile-menu-button,
     .zazu-header-create,
     .zazu-theme-toggle {
-        flex-basis: 40px;
+        flex-basis: 44px;
     }
 
     .zazu-command-search {
-        width: 40px;
-        flex-basis: 40px;
+        width: 44px;
+        flex-basis: 44px;
     }
 
     .zazu-page-title {
@@ -643,65 +646,7 @@
 .zazu-helper-btn-primary { border-color: var(--zazu-primary); background: var(--zazu-primary); color: #fff; }
 .zazu-helper-btn-primary:hover:not(:disabled) { color: #fff; }
 
-@media (max-width: 820px) {
-    .zazu-topbar-inner {
-        grid-template-columns: 40px minmax(0, 1fr) 40px 40px;
-        grid-template-areas:
-            "menu context search theme"
-            "slots slots slots slots";
-        align-items: center;
-        gap: 8px;
-        padding: max(7px, env(safe-area-inset-top)) 10px 9px;
-    }
-
-    .zazu-topbar-actions {
-        display: contents;
-    }
-
-    .zazu-header-context {
-        grid-area: context;
-        align-self: center;
-        text-align: left;
-        padding: 0;
-    }
-
-    .zazu-page-title {
-        font-size: 1rem;
-        line-height: 1.1;
-    }
-
-    .zazu-command-search {
-        grid-area: search;
-        width: 40px;
-        flex: 0 0 40px;
-    }
-
-    .zazu-theme-toggle {
-        grid-area: theme;
-    }
-
-    .zazu-header-slot-actions {
-        grid-area: slots;
-        width: 100%;
-        max-width: none;
-        min-width: 0;
-        flex-wrap: nowrap;
-        justify-content: flex-start;
-        overflow-x: auto;
-        overscroll-behavior-x: contain;
-        scrollbar-width: none;
-        padding: 1px 1px 2px;
-        gap: 7px;
-    }
-
-    .zazu-header-slot-actions::-webkit-scrollbar { display: none; }
-
-    .zazu-header-slot-actions > .zazu-btn {
-        flex: 0 0 auto;
-        max-width: none;
-        min-height: 38px;
-        white-space: nowrap;
-    }
+/* Helper responsive rules remain below; header rules are consolidated above. */
 
     .zazu-helper {
         right: 12px;
@@ -737,23 +682,13 @@
     .zazu-helper-actions {
         flex-wrap: wrap;
     }
+
+    .zazu-helper-btn {
+        min-height: 40px;
+    }
 }
 
 @media (max-width: 520px) {
-    .zazu-topbar-inner {
-        grid-template-columns: 40px minmax(0, 1fr) 40px 40px;
-        grid-template-areas:
-            "menu context search theme"
-            "slots slots slots slots";
-        padding-inline: 9px;
-    }
-
-    .zazu-header-slot-actions > .zazu-btn {
-        min-height: 36px;
-        padding-inline: 12px;
-        font-size: 11px;
-    }
-
     .zazu-helper-panel {
         right: -2px;
         width: calc(100vw - 24px);
