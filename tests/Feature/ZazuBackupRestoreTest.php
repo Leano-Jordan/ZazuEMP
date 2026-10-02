@@ -62,7 +62,7 @@ class ZazuBackupRestoreTest extends TestCase
 $exitCode = $restore->run();
 
 if ($exitCode !== 0) {
-    $this->fail('RESTORE COMMAND OUTPUT: '.trim(\\Illuminate\\Support\\Facades\\Artisan::output()));
+    $this->fail('RESTORE COMMAND OUTPUT: '.trim(\Illuminate\Support\Facades\Artisan::output()));
 }
 
 $this->assertSame(0, $exitCode);
