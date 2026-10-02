@@ -378,6 +378,8 @@ class ZazuRestoreCommand extends Command
                 File::deleteDirectory($privateRollback);
             }
         }
+    }
+
     private function renameWithRetry(string $from, string $to): bool
     {
         for ($attempt = 0; $attempt < 5; $attempt++) {
