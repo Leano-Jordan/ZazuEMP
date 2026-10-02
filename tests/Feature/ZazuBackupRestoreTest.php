@@ -54,10 +54,14 @@ class ZazuBackupRestoreTest extends TestCase
 
             DB::table('backup_probe')->update(['value' => 'changed after backup']);
 
-            $this->artisan('zazu:restore', [
-                'archive' => $archive,
-                '--force' => true,
-            ])->assertExitCode(0);
+            $restore = $this->artisan('zazu:restore', [
+    'archive' => $archive,
+    '--force' => true,
+]);
+
+$exitCode = $restore->run();
+
+$this->assertSame(0, $exitCode);
 
             DB::purge('sqlite');
 
