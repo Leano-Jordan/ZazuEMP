@@ -646,6 +646,7 @@
 .zazu-helper-btn-primary { border-color: var(--zazu-primary); background: var(--zazu-primary); color: #fff; }
 .zazu-helper-btn-primary:hover:not(:disabled) { color: #fff; }
 
+@media (max-width: 820px) {
 /* Helper responsive rules remain below; header rules are consolidated above. */
 
     .zazu-helper {
