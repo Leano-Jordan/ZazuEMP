@@ -74,9 +74,22 @@
 @endphp
 
 @if(!empty($steps))
-    <div class="zazu-helper" data-zazu-helper data-zazu-guide-route="{{ $routeName }}" data-zazu-guide-enabled="on">
+    <div class="zazu-helper" data-zazu-helper data-zazu-guide-route="{{ $routeName }}" data-zazu-guide-enabled="on" data-zazu-helper-attention="{{ count($attention) }}">
         <section id="zazu-helper-panel" class="zazu-helper-panel" data-zazu-helper-panel role="region" aria-label="Zazu workflow guide" hidden>
-            <div class="zazu-helper-kicker">Zazu guide · {{ ucfirst($level) }}</div>
+            <div class="zazu-helper-head">
+                <div class="zazu-helper-bird zazu-helper-bird-panel" aria-hidden="true">
+                    <svg viewBox="0 0 48 48" fill="none" role="presentation">
+                        <path d="M10 27c0-9 6-16 15-16 5 0 9 2 12 6-1 1-3 2-5 2 2 2 4 4 5 7-3-1-5-1-7-1 0 5-4 10-10 11-6 1-10-2-10-9Z" fill="currentColor"/>
+                        <path d="M37 17 44 13l-3 7" fill="currentColor"/>
+                        <circle cx="30" cy="20" r="2" fill="white"/>
+                        <path d="M14 30c4 0 7 2 9 5-5 2-10 0-12-4" fill="white" opacity=".72"/>
+                    </svg>
+                </div>
+                <div>
+                    <div class="zazu-helper-kicker">Zazu guide · {{ ucfirst($level) }}</div>
+                    <div class="zazu-helper-status">{{ count($attention) ? count($attention).' item'.(count($attention) === 1 ? '' : 's').' need attention' : 'Guidance for this workspace' }}</div>
+                </div>
+            </div>
             <div class="zazu-helper-title" data-zazu-helper-title aria-live="polite">{{ $steps[0]['title'] }}</div>
             <p class="zazu-helper-copy" data-zazu-helper-copy aria-live="polite">{{ $steps[0]['copy'] }}</p>
             @if(!empty($attention))
@@ -107,9 +120,20 @@
                 </div>
             </div>
         </section>
-        <button type="button" class="zazu-helper-toggle" data-zazu-helper-toggle aria-expanded="false" aria-pressed="true" aria-controls="zazu-helper-panel">
-            <span aria-hidden="true">?</span>
-            <span data-zazu-helper-toggle-label>Guide</span>
+        <button type="button" class="zazu-helper-toggle" data-zazu-helper-toggle aria-expanded="false" aria-pressed="true" aria-controls="zazu-helper-panel" aria-label="Open Zazu guide">
+            <span class="zazu-helper-bird" aria-hidden="true">
+                <svg viewBox="0 0 48 48" fill="none" role="presentation">
+                    <path d="M10 27c0-9 6-16 15-16 5 0 9 2 12 6-1 1-3 2-5 2 2 2 4 4 5 7-3-1-5-1-7-1 0 5-4 10-10 11-6 1-10-2-10-9Z" fill="currentColor"/>
+                    <path d="M37 17 44 13l-3 7" fill="currentColor"/>
+                    <circle cx="30" cy="20" r="2" fill="white"/>
+                    <path d="M14 30c4 0 7 2 9 5-5 2-10 0-12-4" fill="white" opacity=".72"/>
+                </svg>
+            </span>
+            <span class="zazu-helper-toggle-copy">
+                <strong>Zazu</strong>
+                <small data-zazu-helper-toggle-label>Guide</small>
+            </span>
+            <span class="zazu-helper-attention-dot" aria-hidden="true"></span>
         </button>
         <div hidden>
             @foreach($steps as $index => $step)
