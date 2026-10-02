@@ -391,6 +391,4 @@ class ZazuRestoreCommand extends Command
 
         return false;
     }
-
-    }
 }
