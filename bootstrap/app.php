@@ -6,8 +6,10 @@ use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
 use Illuminate\Http\Request;
+use Illuminate\Http\Exceptions\ThrottleRequestsException;
 use Illuminate\Support\Str;
 use Symfony\Component\HttpFoundation\Response;
+use Throwable;
 
 return Application::configure(basePath: dirname(__DIR__))
     ->withRouting(
@@ -34,6 +36,19 @@ return Application::configure(basePath: dirname(__DIR__))
 
         $exceptions->reportable(function (Throwable $exception): void {
             ZazuIncidentRecorder::record($exception);
+        });
+
+        $exceptions->render(function (ThrottleRequestsException $exception, Request $request) {
+            if ($request->expectsJson() || $request->is('api/*') || ! $request->is('login')) {
+                return null;
+            }
+
+            $retryAfter = max(1, (int) ($exception->getHeaders()['Retry-After'] ?? 60));
+
+            return redirect()
+                ->route('landing', ['auth' => 'login'])
+                ->with('auth_modal', 'login')
+                ->withErrors(['identifier' => "Too many sign-in attempts. Please wait {$retryAfter} seconds, then try again."]);
         });
 
         $exceptions->render(function (Throwable $exception, Request $request) {
@@ -74,7 +89,6 @@ return Application::configure(basePath: dirname(__DIR__))
                 return $response;
             }
 
-            // Mark this as having been processed to avoid infinite loops
             $response->headers->set('X-Zazu-Error-Code', 'APP-001');
 
             $definition = ZazuErrorCatalog::forStatus($response->getStatusCode());

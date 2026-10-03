@@ -99,7 +99,6 @@ class ExperienceLevelTest extends TestCase
         );
     }
 
-
     public function test_onboarding_saves_niche_and_experience_together(): void
     {
         $business = Business::create([
@@ -166,3 +165,4 @@ class ExperienceLevelTest extends TestCase
             app(NicheFocus::class)->supporting($business, NicheFocus::SOUND_DJ)
         );
     }
+}
