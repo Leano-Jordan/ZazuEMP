@@ -7,13 +7,14 @@ use App\Models\BusinessCapability;
 use App\Support\Audit;
 use App\Support\CurrentBusiness;
 use App\Support\ExperienceLevel;
+use App\Support\NicheFocus;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
 
 class OnboardingController extends Controller
 {
-    public function index(Request $request, ExperienceLevel $levels): View
+    public function index(Request $request, ExperienceLevel $levels, NicheFocus $niches): View
     {
         $business = $this->currentBusiness($request);
         $business->loadMissing('taxProfile');
@@ -33,6 +34,9 @@ class OnboardingController extends Controller
         $taxStatus = $business->taxProfile ? 'in_progress' : 'not_started';
         $experienceLevel = $levels->selected($request->user(), $business);
         $experienceStatus = $experienceLevel ? 'completed' : 'not_started';
+        $nicheFocus = $niches->selected($request->user(), $business);
+        $nicheStatus = $nicheFocus ? 'completed' : 'not_started';
+        $nicheDefinition = $niches->definition($nicheFocus ?? NicheFocus::DEFAULT);
 
         return view('onboarding.index', compact(
             'business',
@@ -40,7 +44,10 @@ class OnboardingController extends Controller
             'businessStatus',
             'taxStatus',
             'experienceLevel',
-            'experienceStatus'
+            'experienceStatus',
+            'nicheFocus',
+            'nicheStatus',
+            'nicheDefinition'
         ));
     }
 
@@ -138,33 +145,45 @@ class OnboardingController extends Controller
             ->with('info', 'Services setup was deferred. You can resume it from Setup Centre or Services & prices.');
     }
 
-    public function experience(Request $request, ExperienceLevel $levels): View|RedirectResponse
+    public function experience(Request $request, ExperienceLevel $levels, NicheFocus $niches): View|RedirectResponse
     {
         $business = $this->currentBusiness($request);
+        $experienceLevel = $levels->selected($request->user(), $business);
+        $primaryNiche = $niches->selected($request->user(), $business);
 
-        if ($levels->selected($request->user(), $business)) {
+        if ($experienceLevel && $primaryNiche) {
             return redirect()->route('onboarding.business');
         }
 
         return view('onboarding.experience', [
             'business' => $business,
             'options' => $levels->options(),
+            'nicheOptions' => $niches->options(),
+            'selectedNiche' => $primaryNiche,
+            'selectedLevel' => $experienceLevel,
         ]);
     }
 
-    public function storeExperience(Request $request, ExperienceLevel $levels): RedirectResponse
+    public function storeExperience(Request $request, ExperienceLevel $levels, NicheFocus $niches): RedirectResponse
     {
         $business = $this->currentBusiness($request);
         $validated = $request->validate([
             'experience_level' => ['required', 'in:basic,intermediate,advanced'],
+            'primary_niche' => ['nullable', 'string', 'in:'.implode(',', array_keys(config('zazu.niches', [])))],
         ]);
+
+        $primaryNiche = $validated['primary_niche']
+            ?? $niches->selected($request->user(), $business)
+            ?? NicheFocus::DEFAULT;
 
         $request->user()->businesses()->updateExistingPivot($business->id, [
             'experience_level' => $validated['experience_level'],
+            'primary_niche' => $primaryNiche,
         ]);
 
         Audit::record('onboarding.experience_level_selected', $business, [
             'experience_level' => $validated['experience_level'],
+            'primary_niche' => $primaryNiche,
         ], $business->id);
 
         return redirect()
