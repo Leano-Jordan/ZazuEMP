@@ -4,7 +4,7 @@
 
 Source: supplied WhatsApp Chat with Meta AI export.
 
-Repository: Leano-Jordan/ZazuEMP, current main HEAD f3892cb9617e92d0ac391f1d0da1f28be2a019c8.
+Repository: Leano-Jordan/ZazuEMP, current main HEAD 61e406f3bcf57bed48974564faa4902dc4b88d70.
 
 Historical brainstorming is mapped to repository evidence here; it is not treated as current implementation unless the repo supports it.
 
