@@ -2,6 +2,7 @@
 
 namespace App\Support\Offline;
 
+use App\Models\SyncDelivery;
 use App\Models\SyncDevice;
 use App\Models\SyncMutation;
 use Illuminate\Support\Str;
@@ -62,7 +63,7 @@ class SyncMutationRecorder
             $sequence = $counter->next_sequence;
             $counter->increment('next_sequence');
 
-            return SyncMutation::create([
+            $mutation = SyncMutation::create([
                 'business_id' => $device->business_id,
                 'sync_device_id' => $device->id,
                 'stream' => $stream,
@@ -75,6 +76,38 @@ class SyncMutationRecorder
                 'payload' => $payload,
                 'occurred_at' => now(),
             ]);
+
+            $this->queueDeliveries($mutation);
+
+            return $mutation;
         });
     }
+
+    private function queueDeliveries(SyncMutation $mutation): void
+    {
+        SyncDevice::query()
+            ->where('business_id', $mutation->business_id)
+            ->where('id', '!=', $mutation->sync_device_id)
+            ->where('status', 'active')
+            ->whereNull('revoked_at')
+            ->orderBy('id')
+            ->get()
+            ->each(function (SyncDevice $destination) use ($mutation): void {
+                $next = SyncDelivery::query()
+                    ->where('destination_device_id', $destination->id)
+                    ->where('stream', $mutation->stream)
+                    ->lockForUpdate()
+                    ->max('delivery_sequence');
+
+                SyncDelivery::create([
+                    'business_id' => $mutation->business_id,
+                    'sync_mutation_id' => $mutation->id,
+                    'destination_device_id' => $destination->id,
+                    'stream' => $mutation->stream,
+                    'delivery_sequence' => ((int) $next) + 1,
+                    'status' => 'pending',
+                ]);
+            });
+    }
 }
+
