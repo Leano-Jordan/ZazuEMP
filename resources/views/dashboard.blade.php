@@ -11,9 +11,9 @@
 
     <section class="zazu-dash-hero">
         <div class="zazu-dash-hero-main">
-            <div class="zazu-dash-kicker"><span class="zazu-dash-live"></span> ZAZU EMP / OPERATIONAL COMMAND</div>
+            <div class="zazu-dash-kicker"><span class="zazu-dash-live"></span> ZAZU EMP / OPERATIONAL COMMAND · {{ $nicheDefinition['label'] }}</div>
             <h2>{{ $experienceLevel === 'basic' ? 'Keep the next operational action clear.' : 'Everything important, closer to the work.' }}</h2>
-            <p>{{ $experienceLevel === 'basic' ? 'Start with customers, jobs and the commercial work that needs attention. More operational detail can be surfaced later.' : 'Use the event record as the centre of operations. Move from schedule to preparation, resources, commercial activity and control without losing context.' }}</p>
+            <p>{{ $nicheDefinition['description'] }} {{ $experienceLevel === 'basic' ? 'Start with the next action and keep the rest quiet until you need it.' : 'Use the event record as the centre of operations, then reveal deeper operational detail when it helps.' }}</p>
             <div class="zazu-dash-actions">
                 @if($workspaceTools['work'] && app(\App\Support\PermissionService::class)->allows('work.create', auth()->user(), $business))
                     <a href="{{ route('work.create') }}" class="zazu-btn zazu-btn-primary">Create work <span>+</span></a>
@@ -167,7 +167,7 @@
         @if($experienceLevel !== 'basic')
         <section class="zazu-dash-resources zazu-dash-surface">
             <header class="zazu-dash-surface-head">
-                <div><span class="zazu-dash-kicker">Resource readiness</span><h3>Equipment, stock &amp; money</h3><p>Live counts from the workspace show where an established business needs attention.</p></div>
+                <div><span class="zazu-dash-kicker">Resource readiness</span><h3>{{ $nicheDefinition['label'] }} · resources &amp; money</h3><p>Live counts from the workspace show where an established business needs attention.</p></div>
                 <div class="flex flex-wrap gap-2">
                     @if($workspaceTools['assets'])<a href="{{ route('assets.index') }}" class="zazu-text-action">Asset register →</a>@endif
                     @if($workspaceTools['inventory'])<a href="{{ route('inventory.index') }}" class="zazu-text-action">Stock control →</a>@endif
