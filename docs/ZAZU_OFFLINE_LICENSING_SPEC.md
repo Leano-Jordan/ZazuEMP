@@ -83,9 +83,11 @@ Do not use a shared secret embedded in the application as the final production l
 
 ## Current implementation stage
 
-The repository now contains the local entitlement data foundation and local validity service.
+The repository contains a local entitlement data foundation and local validity service.
 
-This stage intentionally does **not** enforce licensing across the application yet. Enforcement should only be introduced after the activation/recovery UX, renewal behaviour and owner-safe recovery path are tested.
+Licensing is intentionally separate from full offline application operation. A valid license permits entitled local use; it does not by itself provide phone-local data storage, offline mutation queues or synchronization.
+
+Full offline operation follows the separate contract in `docs/ZAZU_OFFLINE_FIRST_ARCHITECTURE.md`.
 
 ## Future stages
 
