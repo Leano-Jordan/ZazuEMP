@@ -654,3 +654,25 @@ Movement should be purposeful and event-driven. The Helper should normally remai
 The final visual design is intentionally deferred. The character-system foundation must exist independently of final artwork so that visual skins can be designed and attached later without changing the underlying product behaviour.
 
 See docs/ZAZU_HELPER_CHARACTER_SYSTEM.md for the detailed foundation.
+
+## 20. Helper implementation and R0 technology constraint
+
+The Zazu Helper architecture is intentionally designed for a zero-budget V1.
+
+The Helper must operate without a paid animation service, paid runtime, animation-hosting subscription or commercial character platform.
+
+The V1 renderer baseline is:
+
+Original Zazu artwork → SVG → CSS / Web Animations API
+
+The semantic Helper engine must remain separate from the renderer so that future technology changes do not change application behaviour.
+
+The final mascot visual design remains an owner/design decision. The implementation must not hard-code the product around a particular animal skin.
+
+See:
+- docs/ZAZU_HELPER_ENGINE_SPECIFICATION.md
+- docs/ZAZU_HELPER_SKIN_DESIGN_BRIEFS.md
+- docs/ZAZU_HELPER_FIRST_PRODUCTION_BEHAVIOURS.md
+- docs/ZAZU_HELPER_ANIMATION_TECHNOLOGY.md
+
+Commercial release proof remains separate from architecture: the Helper is not considered production-complete until its behaviour, mobile placement, accessibility, interruption handling and reduced-motion/static states are verified in the actual Zazu interface.
