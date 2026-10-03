@@ -720,3 +720,28 @@ CURRENT-HEAD VERIFICATION → POPULATED COMMERCIAL WORKFLOW → RECOVERY → UPG
 No feature expansion should displace these release-critical gates.
 
 Last updated: 2026-10-03
+ 
+## Director implementation hardening cycle — 2026-10-03
+
+Target: close concrete recovery, stale-client and baseline security weaknesses without expanding product scope.
+
+Implemented on main:
+- Restore now validates staged SQLite databases with a real SQLite integrity check before activation.
+- MySQL restore now stages a pre-restore database dump before replacing private storage and attempts database rollback if restore fails after mutation begins.
+- Service-worker caching is restricted to public static assets under /build/ and /images/; authenticated/private /media responses are excluded.
+- Previous Zazu static-cache generations are deleted during service-worker activation.
+- Added regression coverage for corrupt SQLite restore rejection and offline cache scope.
+- Added baseline web security response headers: X-Content-Type-Options, X-Frame-Options, Referrer-Policy and Permissions-Policy.
+- Added regression coverage for the security headers.
+
+Verification boundary:
+- Source was re-read after every changed-file write.
+- Tests were added but fresh CI/runtime execution was not available through the repository connector in this cycle.
+- Therefore these changes are recorded as IMPLEMENTED, not VERIFIED/PROVEN.
+
+No competing implementation was introduced. The existing backup/restore command remains the single restore authority, and the existing service worker remains the single offline asset-cache authority.
+
+Next Director target:
+CURRENT-HEAD CI/RUNTIME VERIFICATION → POPULATED COMMERCIAL WORKFLOW → RECOVERY DRILL → POPULATED UPGRADE/ROLLBACK
+
+Last updated: 2026-10-03
