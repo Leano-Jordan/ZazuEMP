@@ -129,3 +129,15 @@ The Zazu authority model is explicitly separate from experience level:
 - **Staff:** operational execution according to the existing staff permission matrix; finance remains view-only and owner-only administration remains restricted.
 
 Basic / Intermediate / Advanced remains an experience-level setting, never a permission level.
+
+## Zazu Helper character-system foundation — 2026-10-03
+
+Zazu Helper is now defined as one character framework with selectable mascot skins. The animal is the appearance; the Helper remains the same character, behaviour model and interaction system. Initial skin candidates are Gecko, Ant and Chameleon; visual design remains intentionally deferred to the owner/design phase.
+
+Basic / Intermediate / Advanced must not select different mascots. Experience level controls presentation and assistance depth. The selected Helper skin works across all experience levels.
+
+The Helper foundation must be lightweight: 2D/vector-oriented assets, reusable state-machine animation, semantic actions, responsive workspace anchors and no dependency on 3D/game-engine production. Movement is event-driven rather than continuous decoration. The Helper may travel to relevant workspace points, explain, notice, work, warn, synchronise or rest, while remaining quiet when nothing requires attention.
+
+The application should address the Helper through semantic intent such as notice, approach, point, explain, think, work, warn, sync and return rather than skin-specific animation commands. A responsive semantic-target layer must resolve workspace destinations so traversal works across desktop, tablet and mobile layouts.
+
+This is a product/architecture foundation, not a visual design commitment. The final appearance, proportions, colours, expressions and physical movement language remain a later design deliverable. See docs/ZAZU_HELPER_CHARACTER_SYSTEM.md for the authoritative foundation.
