@@ -5,7 +5,8 @@
 **Repository:** `Leano-Jordan/ZazuEMP`  
 **Branch:** `main`  
 **Last proven application assessment baseline:** `92730f7cb660ae06d9df3c014eccf4f0d3e9188e`  
-**Current unverified application candidate:** `aa1e3ca8921625abca16fe4bbc8546746b4bf135`  
+**Landing media:** real stock photography is vendored under `public/images/landing/stock/`; current-head runtime verification remains pending.  
+**Current unverified application candidate:** `33ec396f69ddcf50b217f986611b5120e9a58d4d`  
 **Note:** later UI/media hardening commits are part of the current candidate but do not constitute fresh runtime proof.
 
 ## Authority rule
