@@ -94,3 +94,20 @@ Still intentionally outside this layer:
 - cloud tenancy.
 
 Those require domain-specific rules before they are safe to automate.
+
+
+## Domain-safe application boundary
+
+Remote mutations are not allowed to write arbitrary model fields. The protocol now requires an explicit SyncMutationHandler for each entity type.
+
+SyncMutationApplier:
+- accepts only persisted pending mutations;
+- requires an explicitly registered handler;
+- locks the mutation before application;
+- runs the handler and status transition in one database transaction;
+- records applied time and attempt count;
+- safely treats an already-applied mutation as a no-op.
+
+Unknown entity types therefore fail closed instead of becoming a generic database update mechanism.
+
+Conflict recording also now rejects a device that belongs to another business or an inactive device.
