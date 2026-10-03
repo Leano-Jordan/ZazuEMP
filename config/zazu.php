@@ -3,29 +3,32 @@
 return [
     'platform_admin_emails' => array_values(array_filter(array_map('trim', explode(',', (string) env('ZAZU_PLATFORM_ADMIN_EMAILS', ''))))),
     'landing_image_library' => [
+        // Temporary real-world visual references for product/UI evaluation.
+        // These are external Pexels images and are intentionally easy to replace
+        // when the final Zazu visual library is selected.
         'catering_service' => [
-            'label' => 'Outdoor catered event',
-            'url' => '/images/landing/hero.svg',
+            'label' => 'South African outdoor event reception',
+            'url' => 'https://images.pexels.com/photos/30108843/pexels-photo-30108843.jpeg?auto=compress&cs=tinysrgb&w=1800',
         ],
         'event_catering' => [
-            'label' => 'Event catering service',
-            'url' => '/images/landing/operations.svg',
+            'label' => 'Outdoor wedding catering',
+            'url' => 'https://images.pexels.com/photos/19869792/pexels-photo-19869792.jpeg?auto=compress&cs=tinysrgb&w=1800',
         ],
         'sound_stage' => [
-            'label' => 'Sound and stage setup',
-            'url' => '/images/landing/resources.svg',
+            'label' => 'Johannesburg DJ setup',
+            'url' => 'https://images.pexels.com/photos/37288874/pexels-photo-37288874.jpeg?auto=compress&cs=tinysrgb&w=1800',
         ],
         'wedding_catering' => [
-            'label' => 'Wedding catering',
-            'url' => '/images/landing/control.svg',
+            'label' => 'Johannesburg outdoor wedding',
+            'url' => 'https://images.pexels.com/photos/36664148/pexels-photo-36664148.jpeg?auto=compress&cs=tinysrgb&w=1800',
         ],
         'luxury_banquet' => [
-            'label' => 'Event venue and service',
-            'url' => '/images/landing/hero.svg',
+            'label' => 'South African event reception',
+            'url' => 'https://images.pexels.com/photos/30108843/pexels-photo-30108843.jpeg?auto=compress&cs=tinysrgb&w=1800',
         ],
         'stage_av' => [
-            'label' => 'Event stage and AV',
-            'url' => '/images/landing/resources.svg',
+            'label' => 'Johannesburg DJ setup',
+            'url' => 'https://images.pexels.com/photos/37288874/pexels-photo-37288874.jpeg?auto=compress&cs=tinysrgb&w=1800',
         ],
     ],
     'errors' => [
