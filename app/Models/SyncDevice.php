@@ -42,6 +42,11 @@ class SyncDevice extends Model
         return $this->hasMany(SyncMutation::class);
     }
 
+    public function scopeActive($query)
+    {
+        return $query->where('status', 'active')->whereNull('revoked_at');
+    }
+
     public function isActive(): bool
     {
         return $this->status === 'active' && $this->revoked_at === null;
