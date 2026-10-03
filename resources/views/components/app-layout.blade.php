@@ -3,7 +3,7 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-    <meta name="theme-color" content="#E3EBF3">
+    <meta name="theme-color" content="#F1F5FB">
     <link rel="manifest" href="{{ asset('manifest.webmanifest') }}">
     @php
         $business = app(\App\Support\CurrentBusiness::class)->resolve(auth()->user());
