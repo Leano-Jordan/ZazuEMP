@@ -70,3 +70,27 @@ The next implementation layer is the sync application protocol:
 local business transaction → mutation record → device pull cursor → idempotent apply → acknowledgement → cursor advance → conflict path
 
 That layer must define payload/version rules and domain-specific conflict policies before any real LAN/cloud transport is introduced.
+
+
+## Ordered protocol layer
+
+The foundation now gives mutations an explicit stream and monotonic business-scoped sequence.
+
+Protocol responsibilities:
+1. A mutation is recorded locally with a stable mutation ID.
+2. The mutation receives a sequence within its stream.
+3. A sync device pulls pending mutations strictly after its acknowledged cursor.
+4. Acknowledgement can only advance through a contiguous sequence; gaps are rejected.
+5. Acknowledged mutations become applied and the device cursor advances atomically.
+6. Device status and business ownership are checked before synchronization.
+
+The protocol is deliberately transport-independent. LAN HTTP, phone-local storage, and future cloud transport can use the same pull/acknowledgement boundary.
+
+Still intentionally outside this layer:
+- applying arbitrary remote payloads directly to business models;
+- conflict resolution policy;
+- attachment transfer;
+- LAN/cloud transport;
+- cloud tenancy.
+
+Those require domain-specific rules before they are safe to automate.
