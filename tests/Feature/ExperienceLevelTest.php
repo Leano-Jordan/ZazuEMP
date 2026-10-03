@@ -86,7 +86,8 @@ class ExperienceLevelTest extends TestCase
 
         $this->get(route('onboarding.experience'))
             ->assertOk()
-            ->assertSee('Choose how much of Zazu you want surfaced.');
+            ->assertSee('What do you mainly provide?')
+            ->assertSee('Sound &amp; DJ', false);
 
         $this->post(route('onboarding.experience.store'), [
             'experience_level' => 'advanced',
@@ -98,7 +99,6 @@ class ExperienceLevelTest extends TestCase
         );
     }
 
-}
 
     public function test_onboarding_saves_niche_and_experience_together(): void
     {
