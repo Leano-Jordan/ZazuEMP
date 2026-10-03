@@ -70,11 +70,9 @@ See `READINESS_REGISTER.md` for live gate direction.
 
 ## Current release-candidate head
 
-`02299044aec9d80d158640d0f0775791febae659`
+Main now contains the completed niche-focus, progressive-disclosure, offline-first architecture and commercial-isolation source cycle from 2026-10-03.
 
-Previous verified evidence remains historical: Laravel **202 passed / 1,174 assertions**; browser **7 passed / 8 skipped**; Zazu Quality **passed**; PHPMD **passed**; Psalm **passed** with a narrow Laravel 13.34.0 compatibility shim.
-
-The latest main-head verification workflows are queued after the niche, offline-first and isolation cycle. Do not reuse the previous green results as current-head evidence.
+The latest main-head verification workflows are queued. Previous green Laravel/browser/static-quality figures remain historical and are not reused as current-head evidence.
 
 ## Current product-direction note
 
