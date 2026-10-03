@@ -70,9 +70,15 @@ See `READINESS_REGISTER.md` for live gate direction.
 
 ## Current release-candidate head
 
-`52d9b26bc17ddee8d1427032ecaf2fb8fc0b6350`
+`eb5ae3c21d1443eb95ef8df93a56f8aac46de2c3`
 
-Current-head evidence: Laravel **202 passed / 1,174 assertions**; browser **7 passed / 8 skipped**; Zazu Quality **passed**; PHPMD **passed**; Psalm **passed** with a narrow Laravel 13.34.0 compatibility shim. Remaining release proof is concentrated in populated workflows, authorization challenge, recovery, upgrade and rollback.
+Previous verified evidence: Laravel **202 passed / 1,174 assertions**; browser **7 passed / 8 skipped**; Zazu Quality **passed**; PHPMD **passed**; Psalm **passed** with a narrow Laravel 13.34.0 compatibility shim. The latest main-head workflow is currently queued after the niche/progressive-disclosure changes, so those results are not yet current-head evidence.
+
+## Current product-direction note
+
+- Primary niche focus is now a presentation preference stored per business membership, separate from experience level and permissions.
+- Progressive disclosure is being extended from the existing hierarchical navigation into high-value workspace surfaces.
+- Offline remains a core operating condition; the repository currently has offline licensing/static caching, not a full local data sync engine.
 
 ## Current next-target rule
 
