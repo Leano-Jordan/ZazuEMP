@@ -175,4 +175,18 @@ Before hosted multi-business release can be accepted, Director must have evidenc
 
 The next Director target is isolation proof against actual repository implementation and populated multi-business fixtures. This does not expand V1 feature scope by itself.
 
-Last updated: 2026-10-02
+Last updated: 2026-10-03
+
+
+## Director niche + offline + isolation cycle — 2026-10-03
+
+- Primary niche is explicitly non-exclusive: it controls emphasis, while active business capabilities determine supporting niche signals.
+- Sound & DJ was used as the reference niche; overlapping Chairs & tents capabilities remain visible when the business catalogue supports them.
+- Offline-first is now an explicit architecture contract in `docs/ZAZU_OFFLINE_FIRST_ARCHITECTURE.md`.
+- Static PWA caching and local licensing remain foundations; full disconnected phone data/write/sync capability is not claimed.
+- Commercial isolation source audit found no justified application rewrite. Active-business context, route-bound ownership, model save protection, parent/child database constraints, search scoping and private media checks are present.
+- Additional adversarial coverage was added for foreign search results and foreign attachment downloads.
+- Latest main-head CI workflows are queued, so current-head runtime/CI verification remains pending.
+
+Next Director target:
+**CURRENT-HEAD RUNTIME VERIFICATION → consume the queued Laravel, quality, PHPMD and browser results; classify failures; then run the populated multi-business isolation challenge against the latest verified head.**
