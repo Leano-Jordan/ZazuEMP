@@ -111,3 +111,19 @@ SyncMutationApplier:
 Unknown entity types therefore fail closed instead of becoming a generic database update mechanism.
 
 Conflict recording also now rejects a device that belongs to another business or an inactive device.
+
+
+## Per-device delivery correction
+
+The ordered mutation stream is a business-wide source sequence, but acknowledgement is a device-specific delivery concern.
+
+Zazu now records a sync_deliveries row for each active destination device when a mutation is created. The originating device does not receive its own mutation back as a remote change.
+
+Each destination has its own delivery sequence and cursor. Acknowledging a phone therefore marks that phone's delivery as applied without globally marking the source mutation applied. This prevents one device from consuming a mutation and accidentally hiding it from other devices.
+
+This distinction is required before real LAN or cloud transport is introduced:
+- mutation = durable source change;
+- delivery = a particular device's copy of that change;
+- cursor = that device's confirmed delivery position.
+
+New devices and initial dataset/bootstrap remain a separate provisioning concern.
