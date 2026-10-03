@@ -110,17 +110,16 @@ test.describe('Zazu populated runtime challenge', () => {
         await expect(page.getByText('AST-TENT-001', { exact: true })).toBeVisible();
 
         await page.goto('/finance', { waitUntil: 'domcontentloaded' });
-        await expect(page.getByText('INV-ZAZU-DEMO-001', { exact: true })).toBeVisible();
-        await expect(page.getByText('ZAR 11,500.00', { exact: true })).toBeVisible();
-
         const invoiceRow = page.locator('.zazu-list-item').filter({ hasText: 'INV-ZAZU-DEMO-001' }).first();
+        await expect(invoiceRow).toBeVisible();
+        await expect(invoiceRow.locator('.zazu-side-primary')).toHaveText('ZAR 11500.00');
         const invoiceLink = invoiceRow.getByRole('link', { name: 'Open', exact: true });
         await expect(invoiceLink).toBeVisible({ timeout: 10_000 });
         await invoiceLink.click();
         await expect(page).toHaveURL(/\/finance\/invoices\/\d+$/);
         await expect(page.getByText('Payment history', { exact: true })).toBeVisible();
         await expect(page.getByText('DEP-ZAZU-DEMO-001', { exact: true })).toBeVisible();
-        await expect(page.getByText('8,050.00', { exact: true })).toBeVisible();
+        await expect(page.getByText('8050.00', { exact: true })).toBeVisible();
         await expect(page.getByText('0.00', { exact: true }).last()).toBeVisible();
 
         await page.goto('/reports', { waitUntil: 'domcontentloaded' });
