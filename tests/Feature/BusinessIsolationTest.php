@@ -10,6 +10,7 @@ use App\Models\EventPreparationItem;
 use App\Models\EventAttachment;
 use App\Models\EventRequirement;
 use App\Models\User;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Support\Str;
@@ -241,7 +242,6 @@ class BusinessIsolationTest extends TestCase
             'description' => 'Closed work requirement',
         ]);
     }
-}
 
     public function test_search_does_not_return_foreign_business_records(): void
     {
@@ -274,7 +274,7 @@ class BusinessIsolationTest extends TestCase
         $path = 'jobs/'.$foreignEvent->id.'/attachments/foreign-secret.txt';
         Storage::disk('private')->put($path, 'foreign business confidential');
 
-        $attachment = IlluminateDatabaseEloquentModel::withoutEvents(fn () => EventAttachment::create([
+        $attachment = Model::withoutEvents(fn () => EventAttachment::create([
             'event_id' => $foreignEvent->id,
             'business_id' => $second->id,
             'uploaded_by' => null,
