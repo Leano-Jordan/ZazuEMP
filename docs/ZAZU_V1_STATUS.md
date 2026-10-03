@@ -20,7 +20,7 @@ Zazu EMP has a substantial connected operational foundation across:
 - reporting;
 - responsive/shared UI.
 
-The product is **not yet release-certified**. The current application assessment has green automated CI/browser/static-quality evidence, but several commercial-operational proof gates remain open.
+The product is **not yet release-certified**. Previous verified CI/browser/static-quality evidence exists, but the latest main-head verification run is queued and several commercial-operational proof gates remain open.
 
 ## Historical-chat reconciliation
 
@@ -36,6 +36,10 @@ The product is **not yet release-certified**. The current application assessment
 | Online/offline parity | DIRECTION ACTIVE — offline must remain useful and online should add connected richness rather than replacing the local experience. |
 | Local host / Wi-Fi clients | NOT IMPLEMENTED — remains an architecture target, not a current capability. |
 | Historical infrastructure/capacity claims | EXCLUDED — not treated as requirements without repository or measured evidence. |
+
+## Current-head verification boundary
+
+The latest repository head `02299044aec9d80d158640d0f0775791febae659` has queued Laravel, Zazu Quality, PHPMD, Psalm Security and browser workflows. Those results are not yet observed and therefore are not used as certification evidence.
 
 ## Release-critical work remaining
 
@@ -58,7 +62,7 @@ The product is **not yet release-certified**. The current application assessment
 - Operational diagnostics/observability
 - Final deployment/configuration review
 
-### Current release evidence
+### Previous verified release evidence
 
 - Laravel: **202 passed / 1,174 assertions**
 - Browser: **7 passed / 8 skipped**; the complete registration journey runs once on Chromium to avoid shared-IP registration throttling, while responsive entry coverage is separate
@@ -67,7 +71,7 @@ The product is **not yet release-certified**. The current application assessment
 - Psalm: **passed** after removing the redundant init step and applying a narrowly scoped Laravel 13.34.0 compatibility shim for one unsupported `@phpstan-this-out` annotation
 - Fresh SQLite migration, Blade compilation, asset build/manifest verification and application configuration validation: **passed**
 
-### Runtime proof
+### Runtime proof still required on the latest head
 - Browser critical-path traversal
 - Desktop/mobile verification
 - Light/dark verification
