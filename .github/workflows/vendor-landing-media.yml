@@ -1,0 +1,78 @@
+name: Vendor landing photography
+
+on:
+  push:
+    paths:
+      - ".github/workflows/vendor-landing-media.yml"
+
+permissions:
+  contents: write
+
+jobs:
+  vendor:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out main
+        uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 1
+
+      - name: Prepare image tools
+        run: python -m pip install --disable-pip-version-check pillow requests
+
+      - name: Download and optimise real stock photography
+        env:
+          HERO_URL: "https://images.pexels.com/photos/14703692/pexels-photo-14703692.jpeg?auto=compress&cs=tinysrgb&w=1800"
+          CATERING_URL: "https://images.pexels.com/photos/24407353/pexels-photo-24407353.jpeg?auto=compress&cs=tinysrgb&w=1800"
+          SOUND_URL: "https://images.pexels.com/photos/36856348/pexels-photo-36856348.jpeg?auto=compress&cs=tinysrgb&w=1800"
+          VENUE_URL: "https://images.pexels.com/photos/3835638/pexels-photo-3835638.jpeg?auto=compress&cs=tinysrgb&w=1800"
+          TENT_URL: "https://images.pexels.com/photos/8392460/pexels-photo-8392460.jpeg?auto=compress&cs=tinysrgb&w=1800"
+          DECOR_URL: "https://images.pexels.com/photos/30219469/pexels-photo-30219469.jpeg?auto=compress&cs=tinysrgb&w=1800"
+        run: |
+          python - <<'PY'
+          import io
+          import os
+          from pathlib import Path
+
+          import requests
+          from PIL import Image
+
+          assets = {
+              "hero.jpg": os.environ["HERO_URL"],
+              "catering.jpg": os.environ["CATERING_URL"],
+              "sound.jpg": os.environ["SOUND_URL"],
+              "venue.jpg": os.environ["VENUE_URL"],
+              "tent.jpg": os.environ["TENT_URL"],
+              "decor.jpg": os.environ["DECOR_URL"],
+          }
+
+          target = Path("public/images/landing/stock")
+          target.mkdir(parents=True, exist_ok=True)
+
+          headers = {
+              "User-Agent": "ZazuEMP landing-media vendor/1.0",
+              "Accept": "image/avif,image/webp,image/apng,image/svg+xml,image/*,*/*;q=0.8",
+          }
+
+          for filename, url in assets.items():
+              response = requests.get(url, headers=headers, timeout=45)
+              response.raise_for_status()
+              image = Image.open(io.BytesIO(response.content)).convert("RGB")
+              image.thumbnail((1800, 1200), Image.Resampling.LANCZOS)
+              destination = target / filename
+              image.save(destination, format="JPEG", quality=78, optimize=True, progressive=True)
+              print(f"{destination}: {image.width}x{image.height}, {destination.stat().st_size} bytes")
+          PY
+
+      - name: Commit vendored photography to main
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add public/images/landing/stock
+          if git diff --cached --quiet; then
+            echo "No image changes to commit."
+            exit 0
+          fi
+          git commit -m "chore: vendor landing photography"
+          git push origin HEAD:main
