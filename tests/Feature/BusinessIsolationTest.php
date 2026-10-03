@@ -7,11 +7,13 @@ use App\Models\BusinessCapability;
 use App\Models\Customer;
 use App\Models\Event;
 use App\Models\EventPreparationItem;
+use App\Models\EventAttachment;
 use App\Models\EventRequirement;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Support\Str;
+use Illuminate\Support\Facades\Storage;
 use Tests\TestCase;
 
 class BusinessIsolationTest extends TestCase
@@ -240,3 +242,51 @@ class BusinessIsolationTest extends TestCase
         ]);
     }
 }
+
+    public function test_search_does_not_return_foreign_business_records(): void
+    {
+        $first = $this->business('Search Own Business');
+        $second = $this->business('Search Foreign Business');
+        $user = $this->userFor($first);
+
+        Customer::create(['business_id' => $first->id, 'name' => 'Own Search Target']);
+        Customer::create(['business_id' => $second->id, 'name' => 'Foreign Search Secret']);
+
+        $response = $this->actingAs($user)->get(route('search.index', [
+            'q' => 'Search',
+            'type' => 'customer',
+        ]));
+
+        $response->assertOk();
+        $response->assertSee('Own Search Target');
+        $response->assertDontSee('Foreign Search Secret');
+    }
+
+    public function test_foreign_job_attachment_cannot_be_downloaded(): void
+    {
+        Storage::fake('private');
+
+        $first = $this->business('Attachment Own Business');
+        $second = $this->business('Attachment Foreign Business');
+        $user = $this->userFor($first);
+        $foreignEvent = $this->eventFor($second);
+
+        $path = 'jobs/'.$foreignEvent->id.'/attachments/foreign-secret.txt';
+        Storage::disk('private')->put($path, 'foreign business confidential');
+
+        $attachment = IlluminateDatabaseEloquentModel::withoutEvents(fn () => EventAttachment::create([
+            'event_id' => $foreignEvent->id,
+            'business_id' => $second->id,
+            'uploaded_by' => null,
+            'original_name' => 'foreign-secret.txt',
+            'disk' => 'private',
+            'path' => $path,
+            'mime_type' => 'text/plain',
+            'size' => 28,
+            'source' => 'upload',
+        ]));
+
+        $this->actingAs($user)
+            ->get(route('work.attachments.download', $attachment))
+            ->assertNotFound();
+    }
