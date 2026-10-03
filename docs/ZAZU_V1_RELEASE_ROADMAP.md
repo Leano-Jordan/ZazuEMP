@@ -593,3 +593,40 @@ The release-control relationship is now explicit:
 The checklist was rewritten after the Director found that the roadmap/checklist had fallen behind implementation. In particular, customer-facing quote presentation, signed quote acceptance and deposit handling were incorrectly represented as "not started" despite current source and regression coverage. They remain release-critical until runtime evidence proves the complete journey, but they are no longer build-from-zero work.
 
 The roadmap must not reintroduce stale status. When implementation changes, update the canonical checklist first; then record the reasoning/evidence in this roadmap.
+
+## Director commercial audit cycle — 2026-10-03
+
+The commercial audit is now recorded in docs/DIRECTOR_COMMERCIAL_AUDIT_2026-10-03.md.
+
+### Current commercial-health position
+
+67/100 commercial-readiness maturity — NOT CERTIFIED.
+
+The score is a weighted maturity assessment across product completeness, direction, UI/UX, mobile, accessibility, database/data integrity, security, finance, offline capability, recovery, deployment/upgrade, legal/privacy, IP/brand, dependencies, operations, Helper implementation and governance. It is not a percentage of code completed.
+
+### Current highest-risk work
+
+1. Current-head CI/runtime/browser/static evidence.
+2. Populated end-to-end customer → job → commercial → operational → finance workflow.
+3. Quote → acceptance → invoice → deposit/payment reconciliation.
+4. Final authorization/business-isolation challenge.
+5. Phone/tablet critical workflow and accessibility acceptance.
+6. Real backup/restore with private-media verification.
+7. Populated database upgrade and rollback exercise.
+8. Legal/privacy/operator/customer documentation.
+9. Trade-mark/name and release-level dependency clearance.
+10. Final Director certification.
+
+### Direction reconciliation
+
+The Helper is now formally one character framework with selectable skins. Current candidates are Gecko, Ant and Chameleon. Older fixed-bird wording has been corrected in the Director product definition.
+
+The Helper V1 animation foundation is R0: SVG + CSS + native Web Animations API, with no paid animation dependency.
+
+### Evidence rule
+
+The latest observed main ref during this audit did not return a current GitHub Actions run through the available connector. Historical green test figures remain historical until fresh current-head evidence is observed.
+
+The roadmap remains strategy/history/context. docs/V1_RELEASE_CHECKLIST.md remains the canonical V1 release gate.
+
+Last updated: 2026-10-03
