@@ -84,3 +84,19 @@ A verification failure can recur across cycles while the Director repeatedly rei
 **Control:** persistent failure case ID + fingerprint + hypothesis ledger + 2-attempt hypothesis budget + 3-cycle case budget + mandatory escalation. Rejected approaches remain recorded.
 
 **Status:** CONTROL ACTIVE
+
+## REG-012 — Offline cache privacy/staleness leakage
+
+A service worker that caches all same-origin images can accidentally retain authenticated/private media and stale business presentation assets on the device.
+
+**Control:** service-worker caching is restricted to public static asset paths under /build/ and /images/. Old Zazu static cache generations are deleted during activation. Private /media paths are never cacheable by this policy.
+
+**Status:** CONTROL ACTIVE
+
+## REG-013 — MySQL restore partial-failure exposure
+
+A restore can partially modify a MySQL database because the restore operation is not equivalent to an atomic SQLite file replacement.
+
+**Control:** before a MySQL restore, stage a pre-restore dump. On failure after database replacement has begun, attempt restoration from that pre-restore dump before reporting the failure. Never activate private-storage replacement before the rollback snapshot exists.
+
+**Status:** CONTROL ACTIVE
