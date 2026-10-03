@@ -290,3 +290,4 @@ class BusinessIsolationTest extends TestCase
             ->get(route('work.attachments.download', $attachment))
             ->assertNotFound();
     }
+}
