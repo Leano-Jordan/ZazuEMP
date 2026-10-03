@@ -3,6 +3,7 @@
 namespace Tests\Feature;
 
 use App\Models\Business;
+use App\Models\SyncDelivery;
 use App\Models\SyncDevice;
 use App\Models\SyncMutation;
 use App\Models\User;
@@ -197,29 +198,35 @@ class OfflineSyncFoundationTest extends TestCase
             'currency' => 'ZAR',
         ]);
 
-        $device = SyncDevice::create([
+        $sourceDevice = SyncDevice::create([
+            'business_id' => $business->id,
+            'installation_id' => (string) Str::uuid(),
+        ]);
+        $destinationDevice = SyncDevice::create([
             'business_id' => $business->id,
             'installation_id' => (string) Str::uuid(),
         ]);
 
         $recorder = app(SyncMutationRecorder::class);
-        $recorder->record($device, 'event', 'event-1', 'upsert', ['name' => 'First']);
-        $recorder->record($device, 'event', 'event-2', 'upsert', ['name' => 'Second']);
+        $recorder->record($sourceDevice, 'event', 'event-1', 'upsert', ['name' => 'First']);
+        $recorder->record($sourceDevice, 'event', 'event-2', 'upsert', ['name' => 'Second']);
 
         $protocol = app(SyncMutationProtocol::class);
-        $batch = $protocol->pull($device);
+        $batch = $protocol->pull($destinationDevice);
 
         $this->assertCount(2, $batch);
         $this->assertSame([1, 2], $batch->pluck('sequence')->all());
+        $this->assertSame(2, SyncDelivery::query()->where('destination_device_id', $destinationDevice->id)->count());
 
-        $protocol->acknowledgeThrough($device, 1);
+        $protocol->acknowledgeThrough($destinationDevice, 1);
 
-        $this->assertSame('applied', SyncMutation::query()->where('sequence', 1)->first()->status);
-        $this->assertSame(2, SyncMutation::query()->where('sequence', 2)->first()->sequence);
+        $this->assertSame('applied', SyncDelivery::query()->where('destination_device_id', $destinationDevice->id)->where('delivery_sequence', 1)->value('status'));
+        $this->assertSame('pending', SyncDelivery::query()->where('destination_device_id', $destinationDevice->id)->where('delivery_sequence', 2)->value('status'));
+        $this->assertSame('pending', SyncMutation::query()->where('sequence', 1)->first()->status);
 
         $this->expectException(\Illuminate\Validation\ValidationException::class);
 
-        $protocol->acknowledgeThrough($device, 3);
+        $protocol->acknowledgeThrough($destinationDevice, 3);
     }
 
 
