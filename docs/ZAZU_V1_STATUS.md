@@ -2,7 +2,7 @@
 
 **Assessment date:** 2026-10-03  
 **Repository:** `Leano-Jordan/ZazuEMP`  
-**Repository HEAD observed:** `61e406f3bcf57bed48974564faa4902dc4b88d70`
+**Latest main ref observed by Director:** `a419929ef15525ec52a6420b9130d4d81941e130`
 
 ## Current position
 
@@ -39,7 +39,7 @@ The product is **not yet release-certified**. Previous verified CI/browser/stati
 
 ## Current-head verification boundary
 
-The latest repository head `02299044aec9d80d158640d0f0775791febae659` has queued Laravel, Zazu Quality, PHPMD, Psalm Security and browser workflows. Those results are not yet observed and therefore are not used as certification evidence.
+The last pre-hardening application baseline was `92730f7cb660ae06d9df3c014eccf4f0d3e9188e`. Later main commits in this cycle are documentation/control or hardening changes. Fresh runtime certification is still not observed through the repository connector.
 
 ## Release-critical work remaining
 
