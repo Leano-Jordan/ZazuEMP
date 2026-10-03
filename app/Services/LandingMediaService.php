@@ -54,7 +54,8 @@ class LandingMediaService
         $candidate = (string) ($libraryEntry['url'] ?? '');
         $fallback = (string) ($libraryEntry['fallback'] ?? '');
 
-        return $candidate !== '' && is_file(public_path(ltrim($candidate, '/')))
+        return $candidate !== '' && str_starts_with($candidate, '/images/landing/stock/')
+            && is_file(public_path(ltrim($candidate, '/')))
             ? $candidate
             : $fallback;
     }
