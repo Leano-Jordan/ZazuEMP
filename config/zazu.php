@@ -6,23 +6,27 @@ return [
         // Bundled landing visuals. Keeping these under public/images/landing avoids
         // runtime dependency on third-party image hosts and keeps the first render self-contained.
         'catering_service' => [
-            'label' => 'South African outdoor event reception',
-            'url' => '/images/landing/hero.svg',
+            'label' => 'Event reception venue',
+            'url' => '/images/landing/stock/hero.jpg',
+            'fallback' => '/images/landing/hero.svg',
         ],
         'event_catering' => [
-            'label' => 'Outdoor wedding catering',
-            'url' => '/images/landing/operations.svg',
+            'label' => 'Catering buffet',
+            'url' => '/images/landing/stock/catering.jpg',
+            'fallback' => '/images/landing/operations.svg',
         ],
         'sound_stage' => [
-            'label' => 'Johannesburg DJ setup',
-            'url' => '/images/landing/resources.svg',
+            'label' => 'Outdoor event stage and sound setup',
+            'url' => '/images/landing/stock/sound.jpg',
+            'fallback' => '/images/landing/resources.svg',
         ],
         'wedding_catering' => [
-            'label' => 'Johannesburg outdoor wedding',
-            'url' => '/images/landing/control.svg',
+            'label' => 'Elegant event venue',
+            'url' => '/images/landing/stock/venue.jpg',
+            'fallback' => '/images/landing/control.svg',
         ],
         'luxury_banquet' => [
-            'label' => 'South African event reception',
+            'label' => 'Event reception venue',
             'url' => '/images/landing/hero.svg',
         ],
         'stage_av' => [
