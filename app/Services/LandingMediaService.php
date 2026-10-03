@@ -30,17 +30,32 @@ class LandingMediaService
         $settings = $this->current();
 
         return [
-            'hero' => $this->usablePath($settings->hero_image_path, $library['catering_service']['url']),
-            'operations' => $this->usablePath($settings->operations_image_path, $library['event_catering']['url']),
-            'resources' => $this->usablePath($settings->resources_image_path, $library['sound_stage']['url']),
-            'control' => $this->usablePath($settings->control_image_path, $library['wedding_catering']['url']),
+            'hero' => $this->usablePath($settings->hero_image_path, $library['catering_service']),
+            'operations' => $this->usablePath($settings->operations_image_path, $library['event_catering']),
+            'resources' => $this->usablePath($settings->resources_image_path, $library['sound_stage']),
+            'control' => $this->usablePath($settings->control_image_path, $library['wedding_catering']),
+            'venue' => $this->localPath($library['venue']),
+            'tent' => $this->localPath($library['tent']),
+            'decor' => $this->localPath($library['decor']),
         ];
     }
 
-    private function usablePath(?string $storedPath, string $fallback): string
+    private function usablePath(?string $storedPath, array $libraryEntry): string
     {
-        return $storedPath && str_starts_with($storedPath, '/images/landing/')
+        $fallback = $this->localPath($libraryEntry);
+
+        return $storedPath && str_starts_with($storedPath, '/images/landing/stock/')
             ? $storedPath
+            : $fallback;
+    }
+
+    private function localPath(array $libraryEntry): string
+    {
+        $candidate = (string) ($libraryEntry['url'] ?? '');
+        $fallback = (string) ($libraryEntry['fallback'] ?? '');
+
+        return $candidate !== '' && is_file(public_path(ltrim($candidate, '/')))
+            ? $candidate
             : $fallback;
     }
 
