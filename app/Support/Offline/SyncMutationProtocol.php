@@ -55,10 +55,16 @@ class SyncMutationProtocol
                 ->where('business_id', $device->business_id)
                 ->where('sync_device_id', $device->id)
                 ->where('stream', $stream)
-                ->firstOrCreate(
-                    [],
-                    ['last_acknowledged_sequence' => 0],
-                );
+                ->first();
+
+            if (! $cursor) {
+                $cursor = SyncCursor::create([
+                    'business_id' => $device->business_id,
+                    'sync_device_id' => $device->id,
+                    'stream' => $stream,
+                    'last_acknowledged_sequence' => 0,
+                ]);
+            }
 
             if ($sequence <= $cursor->last_acknowledged_sequence) {
                 return $cursor;
@@ -66,14 +72,13 @@ class SyncMutationProtocol
 
             $expected = $cursor->last_acknowledged_sequence + 1;
 
-            $missing = SyncMutation::query()
+            $present = SyncMutation::query()
                 ->where('business_id', $device->business_id)
                 ->where('stream', $stream)
                 ->whereBetween('sequence', [$expected, $sequence])
-                ->where('status', 'pending')
                 ->count();
 
-            if ($missing !== ($sequence - $expected + 1)) {
+            if ($present !== ($sequence - $expected + 1)) {
                 throw ValidationException::withMessages([
                     'sequence' => 'The acknowledgement would skip a pending mutation sequence.',
                 ]);
