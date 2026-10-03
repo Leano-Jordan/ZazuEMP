@@ -192,7 +192,6 @@ class UiAccessibilityTest extends TestCase
         $this->assertStringContainsString('Browser privacy/storage restrictions must not prevent the page from rendering.', $layout);
     }
 
-}
 
     public function test_workspace_focus_ui_exposes_niche_choices_and_progressive_disclosure(): void
     {
