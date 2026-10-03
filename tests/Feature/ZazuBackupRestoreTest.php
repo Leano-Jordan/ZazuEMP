@@ -112,6 +112,45 @@ $this->assertSame(0, $exitCode, Artisan::output());
         File::delete($archive);
     }
 
+    public function test_restore_rejects_a_corrupt_sqlite_database_before_replacing_private_storage(): void
+    {
+        if (!class_exists(ZipArchive::class)) {
+            $this->markTestSkipped('PHP Zip extension is required for backup/restore tests.');
+        }
+
+        $archive = storage_path('app/zazu-corrupt-sqlite-test.zip');
+        $probe = storage_path('app/private/corrupt-restore-probe.txt');
+        File::ensureDirectoryExists(dirname($archive));
+        File::ensureDirectoryExists(dirname($probe));
+        File::put($probe, 'must survive');
+
+        $zip = new ZipArchive();
+        $this->assertSame(true, $zip->open($archive, ZipArchive::CREATE | ZipArchive::OVERWRITE));
+        $zip->addFromString('manifest.json', json_encode([
+            'application' => 'Zazu EMP',
+            'format_version' => 1,
+            'database_driver' => 'sqlite',
+        ]));
+        $zip->addFromString('database.sqlite', 'not a sqlite database');
+        $zip->addFromString('storage/private/example.txt', 'restored later');
+        $zip->close();
+
+        $originalDefault = config('database.default');
+
+        config(['database.default' => 'sqlite']);
+
+        try {
+            $this->artisan('zazu:restore', ['archive' => $archive, '--force' => true])
+                ->assertExitCode(1);
+
+            $this->assertSame('must survive', File::get($probe));
+        } finally {
+            config(['database.default' => $originalDefault]);
+            File::delete($archive);
+            File::delete($probe);
+        }
+    }
+
     public function test_restore_rejects_unsupported_entries_before_touching_the_installation(): void
     {
         if (!class_exists(ZipArchive::class)) {
