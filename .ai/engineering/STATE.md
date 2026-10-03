@@ -70,9 +70,11 @@ See `READINESS_REGISTER.md` for live gate direction.
 
 ## Current release-candidate head
 
-`eb5ae3c21d1443eb95ef8df93a56f8aac46de2c3`
+`02299044aec9d80d158640d0f0775791febae659`
 
-Previous verified evidence: Laravel **202 passed / 1,174 assertions**; browser **7 passed / 8 skipped**; Zazu Quality **passed**; PHPMD **passed**; Psalm **passed** with a narrow Laravel 13.34.0 compatibility shim. The latest main-head workflow is currently queued after the niche/progressive-disclosure changes, so those results are not yet current-head evidence.
+Previous verified evidence remains historical: Laravel **202 passed / 1,174 assertions**; browser **7 passed / 8 skipped**; Zazu Quality **passed**; PHPMD **passed**; Psalm **passed** with a narrow Laravel 13.34.0 compatibility shim.
+
+The latest main-head verification workflows are queued after the niche, offline-first and isolation cycle. Do not reuse the previous green results as current-head evidence.
 
 ## Current product-direction note
 
@@ -618,4 +620,4 @@ Current evidence boundary:
 Next Director target:
 **COMMERCIAL SAAS ISOLATION PROOF — inspect the actual current business-owned models, queries, exports, attachments, search and route boundaries; then close only evidence-backed isolation gaps and verify them against populated multi-business fixtures.**
 
-Last updated: 2026-10-02
+Last updated: 2026-10-03
