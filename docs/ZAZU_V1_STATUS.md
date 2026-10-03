@@ -2,7 +2,7 @@
 
 **Assessment date:** 2026-10-03  
 **Repository:** `Leano-Jordan/ZazuEMP`  
-**Latest main ref observed by Director:** `aa1e3ca8921625abca16fe4bbc8546746b4bf135`
+**Latest application-changing candidate observed by Director:** `aa1e3ca8921625abca16fe4bbc8546746b4bf135`
 
 ## Current position
 
@@ -39,7 +39,7 @@ The product is **not yet release-certified**. Previous verified CI/browser/stati
 
 ## Current-head verification boundary
 
-The last pre-hardening application baseline was `92730f7cb660ae06d9df3c014eccf4f0d3e9188e`. Later main commits in this cycle include UI/media hardening plus documentation/control changes. Fresh runtime certification of the latest main candidate is still not observed through the repository connector.
+The last proven application baseline was `92730f7cb660ae06d9df3c014eccf4f0d3e9188e`. The current application candidate is `aa1e3ca8921625abca16fe4bbc8546746b4bf135`; later commits are documentation/control updates. Fresh runtime certification of that application candidate is still not observed through the repository connector.
 
 ## Release-critical work remaining
 
