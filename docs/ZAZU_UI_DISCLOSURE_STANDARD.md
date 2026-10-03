@@ -1,7 +1,7 @@
 # Zazu EMP — UI Disclosure Standard
 
 **Status:** ACTIVE DESIGN STANDARD  
-**Director update:** 2026-10-01
+**Director update:** 2026-10-03
 
 ## Purpose
 
@@ -106,3 +106,14 @@ Before adding a new visible panel/card/table:
 6. Does it remain understandable without technical knowledge?
 7. Does it improve the workflow enough to justify permanent screen space?
 
+
+
+## Current implementation foundation
+
+Primary business focus is a presentation lens stored per business membership. It supports Chairs & tents, Catering & baking, Sound & DJ and Mixed event services without creating separate applications or permission systems.
+
+Basic / Intermediate / Advanced remains a separate presentation control. The two settings can therefore express both the kind of work a user wants emphasised and the amount of detail they are comfortable seeing.
+
+The first applied progressive-disclosure surface is the workspace-focus setup/preferences screen: the business-focus question stays visible while experience detail is placed in one native disclosure panel.
+
+Shared navigation was corrected at the hierarchy level. Sidebar groups, desktop flyouts and mobile child lists now use one dark relationship, with neutral surfaces for structure and blue reserved for active/selected states.
