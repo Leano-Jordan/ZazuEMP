@@ -27,8 +27,8 @@ test.describe('Zazu UI theme and navigation', () => {
             };
         });
 
-        expect(lightTokens.canvas).toBe('#F2F7FF');
-        expect(lightTokens.blue).toBe('#416AD7');
+        expect(lightTokens.canvas).toBe('#F1F5FB');
+        expect(lightTokens.blue).toBe('#3949E8');
 
         const toggle = page.locator('[data-theme-toggle]').first();
         await expect(toggle).toBeVisible();
@@ -43,7 +43,7 @@ test.describe('Zazu UI theme and navigation', () => {
         });
 
         expect(darkTokens.canvas).toBe('#0B0E14');
-        expect(darkTokens.blue).toBe('#416AD7');
+        expect(darkTokens.blue).toBe('#7A78FF');
 
         await context.close();
     });
