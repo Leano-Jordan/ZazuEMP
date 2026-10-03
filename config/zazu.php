@@ -4,7 +4,7 @@ return [
     'platform_admin_emails' => array_values(array_filter(array_map('trim', explode(',', (string) env('ZAZU_PLATFORM_ADMIN_EMAILS', ''))))),
     'landing_image_library' => [
         // Bundled landing visuals. Keeping these under public/images/landing avoids
-        runtime dependency on third-party image hosts and keeps the first render self-contained.
+        // runtime dependency on third-party image hosts and keeps the first render self-contained.
         'catering_service' => [
             'label' => 'South African outdoor event reception',
             'url' => '/images/landing/hero.svg',
