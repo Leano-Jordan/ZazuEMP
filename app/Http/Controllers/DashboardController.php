@@ -51,6 +51,7 @@ class DashboardController extends Controller
         $experienceLevel = app(ExperienceLevel::class)->for($request->user(), $business);
         $primaryNiche = $niches->for($request->user(), $business);
         $nicheDefinition = $niches->definition($primaryNiche);
+        $supportingNiches = $niches->supporting($business, $primaryNiche);
 
         if ($experienceLevel !== 'basic') {
             $inventory = InventoryItem::query()
@@ -108,7 +109,8 @@ class DashboardController extends Controller
             'workspaceTools',
             'experienceLevel',
             'primaryNiche',
-            'nicheDefinition'
+            'nicheDefinition',
+            'supportingNiches'
         ));
     }
 }
