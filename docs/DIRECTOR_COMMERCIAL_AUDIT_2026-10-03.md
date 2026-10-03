@@ -3,8 +3,7 @@
 **Assessment date:** 2026-10-03
 **Repository:** `Leano-Jordan/ZazuEMP`
 **Branch:** `main`
-**Latest main ref observed before audit documentation commits:** `1de8153e3174001865c02f11133cafff7bfa44ee`  
-**Latest application-changing commit observed:** `92730f7cb660ae06d9df3c014eccf4f0d3e9188e` (asset-manifest reference correction)
+**Latest application-changing candidate observed after the visual/media hardening cycle:** `aa1e3ca8921625abca16fe4bbc8546746b4bf135` (bundled landing assets, light-theme hierarchy, and legacy remote-path rejection)
 **Application assessment baseline:** the canonical release checklist still records `52d9b26bc17ddee8d1427032ecaf2fb8fc0b6350` as the last application assessment candidate; later commits observed in this audit are primarily control/documentation changes and must not be treated as fresh application verification.
 
 ## 1. Executive health position
@@ -345,4 +344,4 @@ The next work should therefore be proof-heavy and release-controlled. More featu
 
 ## 16. Audit control update — 2026-10-03
 
-A subsequent visual/media hardening cycle changed the application candidate: landing assets are now bundled under `public/images/landing/`, legacy remote landing values are rejected, and the light theme/nav hierarchy was rebalanced without changing the dark theme. The current main ref is `aa1e3ca8921625abca16fe4bbc8546746b4bf135`. No fresh runtime certification is inferred from these commits.
+A subsequent visual/media hardening cycle changed the application candidate: landing assets are now bundled under `public/images/landing/`, legacy remote landing values are rejected, and the light theme/nav hierarchy was rebalanced without changing the dark theme. The application-changing candidate is `aa1e3ca8921625abca16fe4bbc8546746b4bf135`; later commits only reconcile Director records. No fresh runtime certification is inferred from these commits.
