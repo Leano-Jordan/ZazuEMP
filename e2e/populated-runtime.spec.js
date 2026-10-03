@@ -118,9 +118,10 @@ test.describe('Zazu populated runtime challenge', () => {
         await invoiceLink.click();
         await expect(page).toHaveURL(/\/finance\/invoices\/\d+$/);
         await expect(page.getByText('Payment history', { exact: true })).toBeVisible();
-        await expect(page.getByText('DEP-ZAZU-DEMO-001', { exact: true })).toBeVisible();
-        await expect(page.getByText('8050.00', { exact: true })).toBeVisible();
-        await expect(page.getByText('0.00', { exact: true }).last()).toBeVisible();
+        await expect(page.getByText('ZAR 11500.00 received · ZAR 0.00 outstanding', { exact: true })).toBeVisible();
+        await expect(page.locator('.zazu-list-item').filter({ hasText: 'DEP-ZAZU-DEMO-001' })).toBeVisible();
+        const balancePayment = page.locator('.zazu-list-item').filter({ hasText: 'BAL-ZAZU-DEMO-001' });
+        await expect(balancePayment.locator('.zazu-side-primary')).toHaveText('ZAR 8050.00');
 
         await page.goto('/reports', { waitUntil: 'domcontentloaded' });
         await expect(page.getByRole('heading', { name: 'Reports' })).toBeVisible();
