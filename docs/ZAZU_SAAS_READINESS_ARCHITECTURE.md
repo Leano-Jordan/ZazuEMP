@@ -147,7 +147,11 @@ Offline-capable core workflows must not acquire accidental dependencies on:
 - third-party search;
 - remote document processing.
 
-Optional enrichment may fail without taking core business operations with it.
+The local deployment must remain useful without ordinary internet access.
+
+Future hosted SaaS is an additional deployment mode, not permission to redesign the core around online-only operation.
+
+The detailed offline target and staged migration path live in `docs/ZAZU_OFFLINE_FIRST_ARCHITECTURE.md`.
 
 ## 9. State and idempotency
 
