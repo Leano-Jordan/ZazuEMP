@@ -54,9 +54,12 @@ test.describe('Zazu populated runtime challenge', () => {
         await expect(row).toContainText('ZAZU-DEMO-001');
         await expect(row).toContainText('80 guests');
 
-        await row.locator('[data-zazu-inspector-open]').first().click();
         const inspector = page.locator('[data-zazu-inspector-panel]').first();
+        await expect(inspector).toHaveAttribute('aria-hidden', 'true');
+        await expect(inspector).toHaveCSS('visibility', 'hidden');
+        await row.locator('[data-zazu-inspector-open]').first().click();
         await expect(inspector).toBeVisible();
+        await expect(inspector).toHaveAttribute('aria-hidden', 'false');
         await expect(inspector).toContainText('Mokoena Family Celebration');
         await expect(inspector).toContainText('Buffet catering');
         await expect(inspector).toContainText('Confirm buffet quantities');
@@ -162,7 +165,7 @@ test.describe('Zazu populated runtime challenge', () => {
         const replay = await page.request.post('/finance/payments', {
             form: {
                 _token: csrf,
-                idempotency_key: 'demo-payment-balance-001',
+                idempotency_key: '00000000-0000-4000-8000-000000000002',
                 type: 'payment',
                 invoice_id: invoiceId,
                 amount: '8050.00',
@@ -178,7 +181,7 @@ test.describe('Zazu populated runtime challenge', () => {
         const overpayment = await page.request.post('/finance/payments', {
             form: {
                 _token: csrf,
-                idempotency_key: '00000000-0000-4000-8000-000000000001',
+                idempotency_key: '00000000-0000-4000-8000-000000000003',
                 type: 'payment',
                 invoice_id: invoiceId,
                 amount: '0.01',

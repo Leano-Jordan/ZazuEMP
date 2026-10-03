@@ -42,7 +42,7 @@ test('registration flows through onboarding into the dashboard', async ({ page }
     await expect(page.getByRole('heading', { name: 'Workspace focus' })).toBeVisible();
     await expect(page.getByText('Sound & DJ', { exact: true })).toBeVisible();
 
-    await page.getByLabel('Catering & baking', { exact: true }).check();
+    await page.getByRole('radio', { name: /Catering & baking/ }).check();
     await page.getByLabel('Intermediate').check();
     await page.getByRole('button', { name: 'Continue setup' }).click();
 

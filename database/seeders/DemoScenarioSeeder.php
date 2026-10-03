@@ -349,12 +349,12 @@ class DemoScenarioSeeder extends Seeder
         }
 
         Payment::updateOrCreate(
-            ['business_id' => $business->id, 'idempotency_key' => 'demo-payment-deposit-001'],
+            ['business_id' => $business->id, 'idempotency_key' => '00000000-0000-4000-8000-000000000001'],
             [
                 'invoice_id' => $invoice->id,
                 'event_id' => $event->id,
                 'type' => 'deposit',
-                'idempotency_key' => 'demo-payment-deposit-001',
+                'idempotency_key' => '00000000-0000-4000-8000-000000000001',
                 'amount' => '3450.00',
                 'currency' => 'ZAR',
                 'method' => 'bank_transfer',
@@ -502,12 +502,12 @@ class DemoScenarioSeeder extends Seeder
         }
 
         Payment::updateOrCreate(
-            ['business_id' => $business->id, 'idempotency_key' => 'demo-payment-balance-001'],
+            ['business_id' => $business->id, 'idempotency_key' => '00000000-0000-4000-8000-000000000002'],
             [
                 'invoice_id' => $invoice->id,
                 'event_id' => $event->id,
                 'type' => 'payment',
-                'idempotency_key' => 'demo-payment-balance-001',
+                'idempotency_key' => '00000000-0000-4000-8000-000000000002',
                 'amount' => '8050.00',
                 'currency' => 'ZAR',
                 'method' => 'bank_transfer',

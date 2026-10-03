@@ -8273,7 +8273,8 @@ textarea:focus {
     display:flex; flex-direction:column; background:var(--zazu-surface); border-left:1px solid var(--zazu-border);
     box-shadow:-12px 0 36px rgba(28,26,23,.10); transform:translateX(100%); transition:transform 220ms ease;
 }
-.zazu-inspector.is-open { transform:translateX(0); }
+.zazu-inspector[aria-hidden="true"] { visibility:hidden; pointer-events:none; }
+.zazu-inspector.is-open { transform:translateX(0); visibility:visible; pointer-events:auto; }
 .zazu-inspector-head {
     display:flex; align-items:flex-start; justify-content:space-between; gap:16px;
     padding:22px; border-bottom:1px solid var(--zazu-border);

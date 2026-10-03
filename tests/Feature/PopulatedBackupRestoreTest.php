@@ -76,7 +76,7 @@ public function test_owner_backup_and_restore_round_trip_preserves_populated_bus
             $this->assertSame('Zazu Demo Catering', DB::table('businesses')->where('slug', 'zazu-demo-catering')->value('name'));
             $this->assertSame('restore me', File::get($privateProbe));
             $this->assertDatabaseHas('invoices', ['number' => 'INV-ZAZU-DEMO-001']);
-            $this->assertDatabaseHas('payments', ['idempotency_key' => 'demo-payment-balance-001']);
+            $this->assertDatabaseHas('payments', ['idempotency_key' => '00000000-0000-4000-8000-000000000002']);
         } finally {
             File::delete($privateProbe);
         }
