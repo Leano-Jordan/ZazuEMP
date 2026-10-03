@@ -9,6 +9,12 @@ use Illuminate\Support\Str;
 use Symfony\Component\Process\Process;
 use ZipArchive;
 
+/**
+ * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
+ *
+ * Restore deliberately keeps archive validation and rollback safety close to the command
+ * boundary so a restore cannot accidentally bypass the safety checks.
+ */
 class ZazuRestoreCommand extends Command
 {
     private const FORMAT_VERSION = 1;
