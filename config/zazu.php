@@ -61,6 +61,29 @@ return [
         ],
     ],
 
+    /*
+     * Primary business focus is a presentation preference. It does not change
+     * permissions or remove the underlying business capabilities.
+     */
+    'niches' => [
+        'chairs_tents' => [
+            'label' => 'Chairs & tents',
+            'description' => 'Keep hire bookings, availability, delivery/setup and money close to the work.',
+        ],
+        'catering_baking' => [
+            'label' => 'Catering & baking',
+            'description' => 'Keep food service, quantities, preparation, costs and money close to the work.',
+        ],
+        'sound_dj' => [
+            'label' => 'Sound & DJ',
+            'description' => 'Keep bookings, equipment, setup/travel and money close to the work.',
+        ],
+        'mixed' => [
+            'label' => 'Mixed event services',
+            'description' => 'Keep the shared event workflow visible without prioritising one service type.',
+        ],
+    ],
+
     'currencies' => [
         'ZAR' => 'South African rand (ZAR)',
         'BWP' => 'Botswana pula (BWP)',
