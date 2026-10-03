@@ -60,6 +60,14 @@ class NicheFocus
     public function supporting(Business $business, string $primaryNiche): array
     {
         $matched = [];
+        $categoriesInUse = BusinessCapability::query()
+            ->where('business_id', $business->id)
+            ->where('is_active', true)
+            ->pluck('category')
+            ->filter()
+            ->unique()
+            ->values()
+            ->all();
 
         foreach (config('zazu.niches', []) as $key => $definition) {
             if ($key === self::MIXED || $key === $primaryNiche) {
@@ -67,19 +75,11 @@ class NicheFocus
             }
 
             $categories = $definition['capability_categories'] ?? [];
-            if (!$categories) {
+            if (!$categories || !array_intersect($categories, $categoriesInUse)) {
                 continue;
             }
 
-            $hasCapability = BusinessCapability::query()
-                ->where('business_id', $business->id)
-                ->where('is_active', true)
-                ->whereIn('category', $categories)
-                ->exists();
-
-            if ($hasCapability) {
-                $matched[] = $this->label($key);
-            }
+            $matched[] = $this->label($key);
         }
 
         return $matched;
