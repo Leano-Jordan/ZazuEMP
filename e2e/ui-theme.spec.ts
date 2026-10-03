@@ -27,8 +27,8 @@ test.describe('Zazu UI theme and navigation', () => {
             };
         });
 
-        expect(lightTokens.canvas).toBe('#F1F5FB');
-        expect(lightTokens.blue).toBe('#3949E8');
+        expect(lightTokens.canvas.toLowerCase()).toBe('#f1f5fb');
+        expect(lightTokens.blue.toLowerCase()).toBe('#3949e8');
 
         const toggle = page.locator('[data-theme-toggle]').first();
         await expect(toggle).toBeVisible();
@@ -42,8 +42,8 @@ test.describe('Zazu UI theme and navigation', () => {
             };
         });
 
-        expect(darkTokens.canvas).toBe('#0B0E14');
-        expect(darkTokens.blue).toBe('#7A78FF');
+        expect(darkTokens.canvas.toLowerCase()).toBe('#0b0e14');
+        expect(darkTokens.blue.toLowerCase()).toBe('#7a78ff');
 
         await context.close();
     });
@@ -55,11 +55,13 @@ test.describe('Zazu UI theme and navigation', () => {
         });
 
         await page.goto('/');
-        await expect(page.getByRole('link', { name: 'Register' })).toBeVisible();
-        await expect(page.getByRole('link', { name: 'Log in' })).toBeVisible();
+        const publicNavigation = page.locator('nav[aria-label="Public navigation"]');
+        await expect(publicNavigation.getByRole('button', { name: 'Get started', exact: true })).toBeVisible();
+        await expect(publicNavigation.getByRole('button', { name: 'Log in', exact: true })).toBeVisible();
 
-        await page.getByRole('link', { name: 'Log in' }).click();
-        await expect(page).toHaveURL(/\/login$/);
+        await publicNavigation.getByRole('button', { name: 'Log in', exact: true }).click();
+        await expect(page.locator('[data-auth-modal]')).toBeVisible();
+        await expect(page.getByRole('heading', { name: 'Welcome back.' })).toBeVisible();
 
         const username = process.env.ZAZU_E2E_USERNAME;
         const password = process.env.ZAZU_E2E_PASSWORD;
@@ -69,9 +71,9 @@ test.describe('Zazu UI theme and navigation', () => {
             return;
         }
 
-        await page.locator('#identifier').fill(username);
-        await page.locator('#password').fill(password);
-        await page.getByRole('button', { name: /sign in/i }).click();
+        await page.getByLabel('Username or email').fill(username);
+        await page.locator('#auth_password').fill(password);
+        await page.locator('[data-auth-submit]').click();
 
         await expect(page).toHaveURL(/\/dashboard$/);
         await page.goto('/work');
