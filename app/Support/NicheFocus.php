@@ -3,6 +3,7 @@
 namespace App\Support;
 
 use App\Models\Business;
+use App\Models\BusinessCapability;
 use App\Models\User;
 
 class NicheFocus
@@ -48,5 +49,39 @@ class NicheFocus
     public function options(): array
     {
         return config('zazu.niches', []);
+    }
+
+    /**
+     * Detect additional business capabilities that naturally overlap the
+     * selected focus. These are informational only and never hide data.
+     *
+     * @return array<int, string>
+     */
+    public function supporting(Business $business, string $primaryNiche): array
+    {
+        $matched = [];
+
+        foreach (config('zazu.niches', []) as $key => $definition) {
+            if ($key === self::MIXED || $key === $primaryNiche) {
+                continue;
+            }
+
+            $categories = $definition['capability_categories'] ?? [];
+            if (!$categories) {
+                continue;
+            }
+
+            $hasCapability = BusinessCapability::query()
+                ->where('business_id', $business->id)
+                ->where('is_active', true)
+                ->whereIn('category', $categories)
+                ->exists();
+
+            if ($hasCapability) {
+                $matched[] = $this->label($key);
+            }
+        }
+
+        return $matched;
     }
 }
