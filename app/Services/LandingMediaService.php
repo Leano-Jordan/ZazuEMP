@@ -39,7 +39,7 @@ class LandingMediaService
 
     private function usablePath(?string $storedPath, string $fallback): string
     {
-        return $storedPath && ! str_starts_with($storedPath, '/images/landing/')
+        return $storedPath && str_starts_with($storedPath, '/images/landing/')
             ? $storedPath
             : $fallback;
     }
