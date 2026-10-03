@@ -44,3 +44,29 @@ The mutation record is transport/replay history. It does not replace the authori
 The next bounded architecture target is the **local business-data store + durable client mutation queue**, followed by a host synchronization protocol.
 
 No cloud dependency is required for that layer.
+
+
+## Layering now in place
+
+The foundation is now separated into four responsibilities:
+
+1. Business data remains the authoritative local application state.
+2. Mutation recording is a transport-independent application boundary. SyncMutationRecorder records a durable pending mutation only after a device is active and business-scoped.
+3. Replay tracking remains represented by stable mutation IDs and per-device cursors. Repeating the same mutation ID returns the existing mutation instead of creating a second logical change.
+4. Conflict recording is isolated in SyncConflictRecorder; conflict storage does not decide how a business domain should resolve the conflict.
+
+Query boundaries are explicit:
+
+- SyncDevice::active() finds usable installations.
+- SyncMutation::pending() provides ordered pending work.
+- SyncConflict::open() provides unresolved conflicts.
+
+This is deliberately not a transport implementation. HTTP, LAN, cloud sync and background workers can be attached later without making business models depend on a particular network mechanism.
+
+### Required next layer
+
+The next implementation layer is the sync application protocol:
+
+local business transaction → mutation record → device pull cursor → idempotent apply → acknowledgement → cursor advance → conflict path
+
+That layer must define payload/version rules and domain-specific conflict policies before any real LAN/cloud transport is introduced.
