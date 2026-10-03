@@ -124,3 +124,24 @@ Working commercial hypotheses:
 **Authority:** Detailed requirements live in docs/ZAZU_COMMERCIAL_REQUIREMENTS.md and the Product Specification.
 
 **Status:** ACTIVE
+
+
+## DEC-017 — Niche focus is non-exclusive and adaptive
+
+**Date:** 2026-10-03
+
+**Decision:** A primary niche is a presentation emphasis, not a business classification, capability filter or permission boundary. Zazu may detect supporting niches from the business's active capability catalogue and surface them alongside the selected focus.
+
+**Reason:** Real event businesses overlap. A DJ may also hire chairs, tents, décor or provide other services for the same job. Zazu must adapt to the actual business rather than forcing a single-industry identity.
+
+**Status:** ACTIVE
+
+## DEC-018 — Offline-first is the product architecture constraint
+
+**Date:** 2026-10-03
+
+**Decision:** Everyday Zazu business operation must be designed to work without ordinary internet access. Online mode enriches the product; it does not become the dependency for core local work.
+
+**Reason:** Connectivity and electricity availability are uneven and cannot be treated as universal infrastructure.
+
+**Status:** ACTIVE
