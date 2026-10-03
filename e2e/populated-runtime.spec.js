@@ -125,7 +125,7 @@ test.describe('Zazu populated runtime challenge', () => {
 
         await page.goto('/reports', { waitUntil: 'domcontentloaded' });
         await expect(page.getByRole('heading', { name: 'Reports' })).toBeVisible();
-        await expect(page.getByText('11,500.00', { exact: true }).first()).toBeVisible();
+        await expect(page.getByText('ZAR 11,500.00', { exact: true })).toBeVisible();
 
         await expectNoServerFailures(page, responses, errors);
     });
@@ -215,10 +215,15 @@ test.describe('Zazu populated runtime challenge', () => {
 
         const settings = await page.goto('/settings', { waitUntil: 'domcontentloaded' });
         expect(settings?.status(), 'manager settings denial').toBe(403);
+        await expect(page.locator('.zazu-error-shell')).toContainText('AUTHZ-001');
 
         const paymentCreate = await page.goto('/finance/payments/create', { waitUntil: 'domcontentloaded' });
         expect(paymentCreate?.status(), 'manager payment mutation denial').toBe(403);
+        await expect(page.locator('.zazu-error-shell')).toContainText('AUTHZ-001');
 
+        const dashboard = await page.goto('/dashboard', { waitUntil: 'domcontentloaded' });
+        expect(dashboard?.status(), 'manager dashboard after denied requests').toBe(200);
+        await expect(page.locator('.zazu-error-shell')).toHaveCount(0);
         await expectNoServerFailures(page, responses, errors);
     });
 
@@ -242,10 +247,15 @@ test.describe('Zazu populated runtime challenge', () => {
 
         const paymentCreate = await page.goto('/finance/payments/create', { waitUntil: 'domcontentloaded' });
         expect(paymentCreate?.status(), 'staff payment mutation denial').toBe(403);
+        await expect(page.locator('.zazu-error-shell')).toContainText('AUTHZ-001');
 
         const settings = await page.goto('/settings', { waitUntil: 'domcontentloaded' });
         expect(settings?.status(), 'staff settings denial').toBe(403);
+        await expect(page.locator('.zazu-error-shell')).toContainText('AUTHZ-001');
 
+        const financeRecovery = await page.goto('/finance', { waitUntil: 'domcontentloaded' });
+        expect(financeRecovery?.status(), 'staff finance after denied requests').toBe(200);
+        await expect(page.locator('.zazu-error-shell')).toHaveCount(0);
         await expectNoServerFailures(page, responses, errors);
     });
 });

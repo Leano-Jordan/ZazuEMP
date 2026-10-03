@@ -15,10 +15,10 @@ test('registration flows through onboarding into the dashboard', async ({ page }
     await expect(page.locator('nav[aria-label="Public navigation"]')).toBeVisible();
     await expect(page.locator('.zazu-error-shell')).toHaveCount(0);
     await expect(page.getByRole('heading', { name: 'Run every event. Stay ahead of the business.' })).toBeVisible();
-    await expect(page.locator('nav[aria-label="Public navigation"]').getByRole('button', { name: 'Register', exact: true })).toBeVisible();
+    await expect(page.locator('nav[aria-label="Public navigation"]').getByRole('button', { name: 'Get started', exact: true })).toBeVisible();
     await expect(page.locator('nav[aria-label="Public navigation"]').getByRole('button', { name: 'Log in', exact: true })).toBeVisible();
     await expect(page.locator('[data-auth-modal]')).toHaveCount(1);
-    await page.locator('nav[aria-label="Public navigation"]').getByRole('button', { name: 'Register', exact: true }).click();
+    await page.locator('nav[aria-label="Public navigation"]').getByRole('button', { name: 'Get started', exact: true }).click();
     await expect(page.locator('[data-auth-modal]')).toBeVisible();
     await expect(page.getByRole('heading', { name: 'Set up your Zazu workspace.' })).toBeVisible();
 
