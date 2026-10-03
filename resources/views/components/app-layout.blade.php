@@ -16,6 +16,8 @@
         $isPlatformAdmin = in_array(strtolower((string) auth()->user()->email), array_map('strtolower', config('zazu.platform_admin_emails', [])), true);
         $experienceLevel = app(\App\Support\ExperienceLevel::class)->for(auth()->user(), $business);
         $experienceLabel = app(\App\Support\ExperienceLevel::class)->label($experienceLevel);
+        $primaryNiche = app(\App\Support\NicheFocus::class)->for(auth()->user(), $business);
+        $nicheLabel = app(\App\Support\NicheFocus::class)->label($primaryNiche);
         $brandingVersion = $business?->updated_at?->timestamp ?? 0;
     @endphp
     <title>{{ $title ?? 'Zazu' }} · {{ $business?->name ?? 'Zazu EMP' }}</title>
@@ -37,7 +39,7 @@
     </script>
     @vite(['resources/css/app.css', 'resources/css/zazu-responsive-theme.css', 'resources/css/zazu-final-visual-sweep.css', 'resources/css/zazu-mobile-refinement.css', 'resources/js/app.js'])
 </head>
-<body data-zazu-route="{{ request()->route()?->getName() ?? '' }}" class="{{ $business?->wallpaper_path ? 'zazu-has-wallpaper' : '' }}" data-business-currency="{{ $business?->currency ?? 'ZAR' }}" @if($business?->wallpaper_path) style="--zazu-wallpaper: url('{{ e(route('business.media', ['type' => 'wallpaper']).'?v='.$brandingVersion) }}')" @endif>
+<body data-zazu-route="{{ request()->route()?->getName() ?? '' }}" data-zazu-niche="{{ $primaryNiche }}" data-zazu-experience="{{ $experienceLevel }}" class="{{ $business?->wallpaper_path ? 'zazu-has-wallpaper' : '' }}" data-business-currency="{{ $business?->currency ?? 'ZAR' }}" @if($business?->wallpaper_path) style="--zazu-wallpaper: url('{{ e(route('business.media', ['type' => 'wallpaper']).'?v='.$brandingVersion) }}')" @endif>
     <a class="zazu-skip-link" href="#main-content">Skip to main content</a>
     <div class="zazu-shell">
         <button type="button" class="zazu-mobile-nav-backdrop" data-mobile-sidebar-close aria-label="Close navigation"></button>
@@ -115,7 +117,7 @@
                 <div class="zazu-footer-workspace">
                     <span class="zazu-footer-workspace-label">Workspace</span>
                     <strong>{{ $business?->name ?? 'Zazu EMP' }}</strong>
-                    <span>Event operations</span>
+                    <span>{{ $nicheLabel }} · {{ $experienceLabel }}</span>
                 </div>
                 @auth
                     <div class="zazu-user-menu" data-user-menu>
