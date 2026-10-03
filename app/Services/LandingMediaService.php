@@ -30,11 +30,18 @@ class LandingMediaService
         $settings = $this->current();
 
         return [
-            'hero' => $settings->hero_image_path ?: $library['catering_service']['url'],
-            'operations' => $settings->operations_image_path ?: $library['event_catering']['url'],
-            'resources' => $settings->resources_image_path ?: $library['sound_stage']['url'],
-            'control' => $settings->control_image_path ?: $library['wedding_catering']['url'],
+            'hero' => $this->usablePath($settings->hero_image_path, $library['catering_service']['url']),
+            'operations' => $this->usablePath($settings->operations_image_path, $library['event_catering']['url']),
+            'resources' => $this->usablePath($settings->resources_image_path, $library['sound_stage']['url']),
+            'control' => $this->usablePath($settings->control_image_path, $library['wedding_catering']['url']),
         ];
+    }
+
+    private function usablePath(?string $storedPath, string $fallback): string
+    {
+        return $storedPath && ! str_starts_with($storedPath, '/images/landing/')
+            ? $storedPath
+            : $fallback;
     }
 
     public function save(array $selected): void
