@@ -93,6 +93,8 @@ class SyncMutationRecorder
             ->orderBy('id')
             ->get()
             ->each(function (SyncDevice $destination) use ($mutation): void {
+                SyncDevice::query()->whereKey($destination->id)->lockForUpdate()->firstOrFail();
+
                 $next = SyncDelivery::query()
                     ->where('destination_device_id', $destination->id)
                     ->where('stream', $mutation->stream)
