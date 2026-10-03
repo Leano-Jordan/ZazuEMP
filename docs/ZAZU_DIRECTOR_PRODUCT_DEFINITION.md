@@ -2,9 +2,41 @@
 
 > Living product-direction record for the Zazu EMP Director. This document records user-approved product decisions and principles so other Director sessions can continue from the same direction.
 >
-> **Current baseline checked:** `2cbb0869ec77bdcc1457cb6fce7c2c3a333720d7` — 2026-09-30.
+> **Current baseline checked:** `f3892cb9617e92d0ac391f1d0da1f28be2a019c8` — 2026-10-03.
 >
 > **Operating rule:** This is direction-setting, not a rewrite mandate. Protect working functionality. Make evidence-based nudges only. Before proposing a change, inspect the current implementation and compare it with this direction.
+
+## Current product-direction reconciliation — 2026-10-03
+
+The historical WhatsApp discussion is requirements evidence, not current-state authority. Current repository evidence wins where the two differ.
+
+### Business focus
+Zazu remains one shared operational product for event-service businesses. Primary niche is a presentation lens, not a separate product or permission boundary.
+
+Current choices:
+- Chairs & tents
+- Catering & baking
+- Sound & DJ
+- Mixed event services
+
+The third niche, Sound & DJ, is the concrete first niche-focused reference. Other supported capabilities remain available through the common workspace.
+
+### Progressive disclosure
+Primary niche and Basic / Intermediate / Advanced are complementary presentation controls:
+- primary niche decides which work should be emphasised;
+- experience level decides how much detail and guidance is surfaced;
+- neither changes roles, permissions or sources of truth.
+
+Prefer one disclosure pattern per user intent. Native disclosure is appropriate for secondary settings/detail; do not stack competing collapse mechanisms for the same task.
+
+### Connectivity
+Offline and online are two operating conditions of the same Zazu product:
+- offline users must retain a good core operating experience;
+- online users should receive the richer connected experience;
+- loss of connectivity must not break normal local work;
+- cloud synchronization is additional capability, not the foundation of local operation.
+
+Current repository evidence supports PWA/static-asset caching and an offline licensing foundation. A full local data/write/sync engine is not yet implemented.
 
 ## Core product definition
 
