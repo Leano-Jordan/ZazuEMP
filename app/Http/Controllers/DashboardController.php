@@ -12,13 +12,14 @@ use App\Models\PurchaseOrder;
 use App\Support\CurrentBusiness;
 use App\Support\PermissionService;
 use App\Support\ExperienceLevel;
+use App\Support\NicheFocus;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
 
 class DashboardController extends Controller
 {
-    public function __invoke(Request $request): View
+    public function __invoke(Request $request, NicheFocus $niches): View
     {
         $business = app(CurrentBusiness::class)->model($request->user());
         $businessId = $business->id;
@@ -48,6 +49,8 @@ class DashboardController extends Controller
         ];
 
         $experienceLevel = app(ExperienceLevel::class)->for($request->user(), $business);
+        $primaryNiche = $niches->for($request->user(), $business);
+        $nicheDefinition = $niches->definition($primaryNiche);
 
         if ($experienceLevel !== 'basic') {
             $inventory = InventoryItem::query()
@@ -103,7 +106,9 @@ class DashboardController extends Controller
             'business',
             'isOwner',
             'workspaceTools',
-            'experienceLevel'
+            'experienceLevel',
+            'primaryNiche',
+            'nicheDefinition'
         ));
     }
 }
