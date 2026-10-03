@@ -6,7 +6,7 @@ return [
         // Bundled landing visuals. Keeping these under public/images/landing avoids
         // runtime dependency on third-party image hosts and keeps the first render self-contained.
         'catering_service' => [
-            'label' => 'Event reception venue',
+            'label' => 'Elegant event reception',
             'url' => '/images/landing/stock/hero.jpg',
             'fallback' => '/images/landing/hero.svg',
         ],
