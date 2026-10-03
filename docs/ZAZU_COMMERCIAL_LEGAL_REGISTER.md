@@ -145,3 +145,63 @@ No part of this checklist should be represented to customers as a statement of l
 - South African Government - PAIA: https://www.gov.za/documents/promotion-access-information-act
 - South African Government - ECTA: https://www.gov.za/documents/electronic-communications-and-transactions-act
 - South African Government - CPA: https://www.gov.za/documents/consumer-protection-act
+
+
+
+## 11. Director commercial/legal refresh — 2026-10-03
+
+### Current launch position
+
+The legal/commercial engineering foundation is present, but Zazu is **not legally/commercially launch-cleared**.
+
+Current open items remain:
+- trade-mark/name clearance;
+- privacy notice;
+- POPIA operational responsibilities and safeguards;
+- retention/deletion policy;
+- operator/data-processing agreements where applicable;
+- customer terms/service agreement;
+- incident-response procedure;
+- release-level dependency/transitive licence audit;
+- production media rights/provenance review.
+
+POPIA is South African legislation governing personal-information processing by public and private bodies. The South African Government publishes the Act and current commencement record.  
+Reference: https://www.gov.za/documents/protection-personal-information-act
+
+The Consumer Protection Act and Electronic Communications and Transactions Act are also relevant legal frameworks to map against Zazu's eventual commercial model and customer contracts.  
+References:
+- https://www.gov.za/documents/consumer-protection-act
+- https://www.gov.za/documents/electronic-communications-and-transactions-act
+
+### Brand clearance finding
+
+The Director audit found current public use of the Zazu name in South Africa for a business-finance platform, as well as an unrelated Zazu Events event/catering business.
+
+This is **not a finding of infringement**. It is a material reason to complete the official South African trade-mark/name clearance before investing heavily in the Zazu brand.
+
+CIPC provides a free preliminary trade-mark search and a more detailed search service:
+- https://iponline.cipc.co.za/IPOnlineTest/Trademarks/Search/FreeTMSearchNotice.aspx
+- https://iponline.cipc.co.za/IPOnlineTest/Trademarks/Search/PaidTMSearch.aspx
+
+Current public examples observed during the Director audit:
+- Zazu South Africa business-finance platform: https://www.get-zazu.com/
+- Zazu Events: https://zazuevents.com/
+
+### Temporary landing imagery
+
+The landing page currently references Pexels imagery. Pexels states that its photos/videos may be used for commercial purposes, while separately warning against implied endorsement and noting that depicted people, trademarks and brands can carry additional rights.
+
+Release action:
+- record exact source/licence evidence for each retained image;
+- replace any image that creates avoidable person/brand-rights ambiguity;
+- do not treat the Pexels licence as ownership of the underlying photograph.
+
+References:
+- https://help.pexels.com/hc/en-us/articles/360042295214-Can-I-use-the-photos-and-videos-for-a-commercial-project
+- https://www.pexels.com/legal-pages/license/
+
+### Director conclusion
+
+Legal/commercial readiness should be treated as a release gate, not post-launch paperwork.
+
+Last updated: 2026-10-03
