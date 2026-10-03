@@ -14,6 +14,9 @@
             <div class="zazu-dash-kicker"><span class="zazu-dash-live"></span> ZAZU EMP / OPERATIONAL COMMAND · {{ $nicheDefinition['label'] }}</div>
             <h2>{{ $experienceLevel === 'basic' ? 'Keep the next operational action clear.' : 'Everything important, closer to the work.' }}</h2>
             <p>{{ $nicheDefinition['description'] }} {{ $experienceLevel === 'basic' ? 'Start with the next action and keep the rest quiet until you need it.' : 'Use the event record as the centre of operations, then reveal deeper operational detail when it helps.' }}</p>
+            @if(count($supportingNiches))
+                <div class="zazu-dash-context-note"><strong>Also in this business:</strong> {{ implode(' · ', $supportingNiches) }}. Zazu keeps these capabilities available when the job needs them.</div>
+            @endif
             <div class="zazu-dash-actions">
                 @if($workspaceTools['work'] && app(\App\Support\PermissionService::class)->allows('work.create', auth()->user(), $business))
                     <a href="{{ route('work.create') }}" class="zazu-btn zazu-btn-primary">Create work <span>+</span></a>
