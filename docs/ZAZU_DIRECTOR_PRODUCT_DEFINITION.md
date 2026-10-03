@@ -2,7 +2,7 @@
 
 > Living product-direction record for the Zazu EMP Director. This document records user-approved product decisions and principles so other Director sessions can continue from the same direction.
 >
-> **Current baseline checked:** `61e406f3bcf57bed48974564faa4902dc4b88d70` — 2026-10-03.
+> **Current baseline checked:** `b3f30534c68d7377754d585b107083f767ceb4d5` — 2026-10-03.
 >
 > **Operating rule:** This is direction-setting, not a rewrite mandate. Protect working functionality. Make evidence-based nudges only. Before proposing a change, inspect the current implementation and compare it with this direction.
 
