@@ -18,7 +18,15 @@ async function login(page, email, password) {
 async function expectNoServerFailures(page, responses, errors) {
     expect(responses, 'HTTP 5xx responses').toEqual([]);
     expect(errors, 'browser page errors').toEqual([]);
-    await expect(page.locator('.zazu-error-shell')).toHaveCount(0);
+
+    const errorShells = page.locator('.zazu-error-shell');
+    const shellCount = await errorShells.count();
+    if (shellCount > 0) {
+        const errorTexts = await errorShells.allTextContents();
+        console.error('Zazu error shells detected:', errorTexts);
+    }
+
+    await expect(errorShells).toHaveCount(0);
 }
 
 test.describe('Zazu populated runtime challenge', () => {
@@ -134,8 +142,10 @@ test.describe('Zazu populated runtime challenge', () => {
         const finance = await page.goto('/finance', { waitUntil: 'domcontentloaded' });
         expect(finance?.status()).toBe(200);
 
-        const invoiceLink = page.getByRole('link', { name: /INV-ZAZU-DEMO-001/ }).first();
-        await expect(invoiceLink).toBeVisible();
+        const invoiceRow = page.locator('.zazu-list-item').filter({ hasText: 'INV-ZAZU-DEMO-001' }).first();
+        await expect(invoiceRow).toBeVisible();
+        const invoiceLink = invoiceRow.getByRole('link', { name: 'Open', exact: true });
+        await expect(invoiceLink).toBeVisible({ timeout: 10_000 });
         const invoiceHref = await invoiceLink.getAttribute('href');
         expect(invoiceHref).toMatch(/\/finance\/invoices\/\d+$/);
         const invoiceId = invoiceHref.match(/\/(\d+)$/)?.[1];
