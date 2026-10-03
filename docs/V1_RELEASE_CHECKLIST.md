@@ -4,8 +4,9 @@
 **Last Director update:** 2026-10-03  
 **Repository:** `Leano-Jordan/ZazuEMP`  
 **Branch:** `main`  
-**Application assessment baseline:** `92730f7cb660ae06d9df3c014eccf4f0d3e9188e`  
-**Note:** subsequent documentation-only commits do not change the application assessment baseline.
+**Last proven application assessment baseline:** `92730f7cb660ae06d9df3c014eccf4f0d3e9188e`  
+**Current unverified application candidate:** `aa1e3ca8921625abca16fe4bbc8546746b4bf135`  
+**Note:** later UI/media hardening commits are part of the current candidate but do not constitute fresh runtime proof.
 
 ## Authority rule
 
@@ -40,19 +41,19 @@ This file is the **single authoritative V1 release-gate ledger**.
 | Roles / permissions | ✅ Implemented | 🟡 Full protected-action audit |
 | Auditability | ✅ Implemented | 🟡 End-to-end mutation trace |
 | Experience level | ✅ Implemented | 🟡 Fresh-account traversal |
-| Runtime regression suite | ✅ Implemented | 🟢 Current-head Laravel suite: 202 passed / 1,174 assertions |
+| Runtime regression suite | ✅ Implemented | 🟡 Historical pre-hardening run: 202 passed / 1,174 assertions; fresh current-head run pending |
 
 # Gate 2 — Onboarding
 
 | Area | Current state | Release proof |
 |---|---|---|
-| Registration → catalogue/setup | ✅ Implemented | 🟢 Current-head browser journey passed |
-| Basic / Intermediate / Advanced | ✅ Implemented | 🟢 Intermediate onboarding exercised in current-head browser run |
-| Business identity/setup | ✅ Implemented | 🟢 Current-head browser journey passed |
+| Registration → catalogue/setup | ✅ Implemented | 🟡 Historical browser journey passed; fresh current-head run pending |
+| Basic / Intermediate / Advanced | ✅ Implemented | 🟡 Intermediate onboarding was exercised in a historical browser run; current-head run pending |
+| Business identity/setup | ✅ Implemented | 🟡 Historical browser journey passed; fresh current-head run pending |
 | Deferral/resume behaviour | ✅ Implemented | 🟡 Current-head runtime |
 | Experience-level changes | ✅ Implemented | 🟡 Current-head runtime |
-| Orphan-account workspace recovery | ✅ Implemented | 🟢 Current-head Laravel suite passes recovery coverage |
-| Desktop onboarding | ✅ Implemented | 🟢 Current-head browser journey passed |
+| Orphan-account workspace recovery | ✅ Implemented | 🟡 Historical Laravel coverage passed; fresh current-head run pending |
+| Desktop onboarding | ✅ Implemented | 🟡 Historical browser journey passed; fresh current-head run pending |
 | Mobile onboarding | ✅ Implemented | 🟡 Responsive entry smoke passed; full registration journey remains Chromium-only |
 
 # Gate 3 — Core operations
@@ -186,9 +187,9 @@ The previous checklist incorrectly treated some commercial capabilities as not s
 
 All of the following are required before V1 is treated as release-ready:
 
-- [x] Current-head Laravel suite has an accepted release disposition with no unexplained release-blocking failures.
-- [x] Current-head browser smoke passes.
-- [x] Current-head static analysis passes or every deviation is explicitly dispositioned.
+- [ ] Current-head Laravel suite has an accepted release disposition with no unexplained release-blocking failures.
+- [ ] Current-head browser smoke passes.
+- [ ] Current-head static analysis passes or every deviation is explicitly dispositioned.
 - [x] Fresh migration succeeds.
 - [ ] Populated database upgrade succeeds without integrity loss.
 - [ ] Populated end-to-end business workflow succeeds.
