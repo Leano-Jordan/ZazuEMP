@@ -183,7 +183,7 @@ This is the persistent failure-history register for the Failure Case / Loop-Brea
 
 **First observed HEAD:** `28a80784995ec03565aae5d66358cac209508455`
 
-**Current HEAD:** `28a80784995ec03565aae5d66358cac209508455` (correction remains in the local worktree)
+**Current HEAD:** `4c467c6b7a6ca0f6022284a0dd8912102ed8d0a1` (correction is committed)
 
 **Target/workflow:** Artisan restore command discovery and populated backup restore.
 
@@ -203,14 +203,14 @@ This is the persistent failure-history register for the Failure Case / Loop-Brea
 
 | ID | Hypothesis | Evidence for | Evidence against | Result | Status |
 |---|---|---|---|---|---|
-| H1 | PHP parse failure prevents Artisan from discovering the restore command | Parser identified the malformed expression; after correction PHP lint and `php artisan list --raw` succeeded | None | Confirmed | CONFIRMED |
+| H1 | PHP parse failure prevents Artisan from discovering the restore command | Parser identified the malformed expression; after correction PHP lint and `php artisan help zazu:restore` succeeded | None | Confirmed | CONFIRMED |
 
 #### Experiments
 
 | Attempt | Hypothesis | Action | Evidence/result | Decision |
 |---|---|---|---|---|
 | 1 | H1 | Inspected the failing expression and corrected its closing parenthesis | PHP lint passed and `zazu:restore` appeared in Artisan command discovery | Retain the syntax correction |
-| 2 | H1 | Ran backup/restore integration tests and the complete PHPUnit suite | Restore tests passed; current full suite passed 235 tests / 1,330 assertions | CLOSED |
+| 2 | H1 | Ran backup/restore integration tests and the complete PHPUnit suite | Restore tests passed; current full suite passed 236 tests / 1,331 assertions | CLOSED |
 
 **Confirmed root cause:** The restore command file did not parse, so framework command discovery omitted it.
 
@@ -222,7 +222,7 @@ This is the persistent failure-history register for the Failure Case / Loop-Brea
 
 **Remaining uncertainty:** PHP still emits a startup warning because the configured `pdo_firebird` extension DLL is absent. It did not block the current suite.
 
-**Closure evidence:** PHP lint passed; command discovery includes `zazu:restore`; `composer test` passed 235 tests / 1,330 assertions.
+**Closure evidence:** PHP lint passed; `php artisan help zazu:restore` resolves successfully; `composer test` passed 236 tests / 1,331 assertions.
 
 **Rejected approaches retained for loop prevention:** Do not change restore data handling or weaken archive validation; the failure was a source syntax defect.
 

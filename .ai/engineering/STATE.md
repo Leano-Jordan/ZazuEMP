@@ -665,22 +665,22 @@ Disposition: DB-001 and the reproduced offline/restore failures are closed local
 
 ## Restore command and stable sync identity cycle — 2026-10-03
 
-Baseline: `main` at `28a80784995ec03565aae5d66358cac209508455`; changes are in the local worktree and have not been committed.
+Baseline: `main` at `28a80784995ec03565aae5d66358cac209508455`; the restore correction and identity foundation are now committed on `main` at `4c467c6b7a6ca0f6022284a0dd8912102ed8d0a1`. The evidence-count corrections in this entry remain in the local worktree.
 
 Completed:
 - repaired the missing closing parenthesis that prevented `ZazuRestoreCommand.php` from parsing and stopped Artisan from discovering `zazu:restore`;
 - added `sync_entity_identities`, mapping business-owned persisted records and stable entity types to business-scoped UUIDs;
 - added `SyncEntityIdentityRegistry::identify()` for repeatable local identity allocation and `register()` for idempotent imported identity registration;
-- guarded record/type reassignment, duplicate identity reuse within one business, malformed UUID/entity type input, and unsaved/non-business records;
+- guarded record/type reassignment, duplicate identity reuse within one business, malformed UUID/entity type input, unsaved/non-business records, and stale in-memory business ownership;
 - applied the additive identity migration locally; no database reset or existing data replacement;
 - recorded owner-approved pairing and selected-bootstrap scope in DEC-019.
 
 Verification:
-- focused identity feature tests: 5 passed, 12 assertions;
-- `composer test`: 235 passed, 1,330 assertions;
+- focused identity feature tests: 6 passed, 13 assertions;
+- `composer test`: 236 passed, 1,331 assertions;
 - `php artisan migrate:status`: all migrations report `Ran`, including the new identity migration;
 - PHP syntax checks, Laravel Pint `--test`, and `git diff --check` passed;
-- prior direct verification confirmed `zazu:restore` is registered and focused restore tests pass.
+- `php artisan help zazu:restore` confirms the command is registered and available.
 
 Remaining evidence boundary:
 - the configured `pdo_firebird` extension DLL is still missing and PHP emits a startup warning; it did not block the current checks;
