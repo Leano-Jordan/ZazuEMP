@@ -15,6 +15,12 @@ Control-system redesign began from main HEAD:
 
 The engineering-system commits that follow are documentation/control-plane changes. They do not by themselves constitute application-feature verification.
 
+## Current application candidate
+
+- Latest application-changing candidate for the landing/media cycle: `33ec396f69ddcf50b217f986611b5120e9a58d4d`.
+- This candidate includes bundled real stock landing photography, tighter landing composition, public navigation refinement, service-worker image precache, and regression coverage.
+- Later commits may update Director documentation without changing the application candidate.
+
 ## Current objective
 
 Move Zazu toward commercial readiness through:
