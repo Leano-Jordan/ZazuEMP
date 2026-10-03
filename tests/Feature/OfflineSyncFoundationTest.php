@@ -10,7 +10,10 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Str;
 use Illuminate\Database\QueryException;
 use App\Support\Offline\SyncMutationProtocol;
+use App\Support\Offline\SyncMutationApplier;
+use App\Support\Offline\SyncMutationHandler;
 use App\Support\Offline\SyncMutationRecorder;
+use App\Support\Offline\SyncConflictRecorder;
 use Tests\TestCase;
 
 class OfflineSyncFoundationTest extends TestCase
@@ -217,6 +220,66 @@ class OfflineSyncFoundationTest extends TestCase
         $this->expectException(\Illuminate\Validation\ValidationException::class);
 
         $protocol->acknowledgeThrough($device, 3);
+    }
+
+
+    public function test_sync_applier_requires_an_explicit_domain_handler(): void
+    {
+        $business = Business::create([
+            'name' => 'Handler Business',
+            'slug' => 'handler-'.Str::lower(Str::random(8)),
+            'status' => 'active',
+            'currency' => 'ZAR',
+        ]);
+
+        $device = SyncDevice::create([
+            'business_id' => $business->id,
+            'installation_id' => (string) Str::uuid(),
+        ]);
+
+        $mutation = app(SyncMutationRecorder::class)->record(
+            $device,
+            'event',
+            'event-1',
+            'upsert',
+            ['name' => 'Protected'],
+        );
+
+        $this->expectException(\Illuminate\Validation\ValidationException::class);
+
+        app(SyncMutationApplier::class)->apply($mutation, []);
+    }
+
+    public function test_conflict_recorder_rejects_a_device_from_another_business(): void
+    {
+        $first = Business::create([
+            'name' => 'First Conflict Business',
+            'slug' => 'first-conflict-'.Str::lower(Str::random(8)),
+            'status' => 'active',
+            'currency' => 'ZAR',
+        ]);
+
+        $second = Business::create([
+            'name' => 'Second Conflict Business',
+            'slug' => 'second-conflict-'.Str::lower(Str::random(8)),
+            'status' => 'active',
+            'currency' => 'ZAR',
+        ]);
+
+        $device = SyncDevice::create([
+            'business_id' => $second->id,
+            'installation_id' => (string) Str::uuid(),
+        ]);
+
+        $this->expectException(\Illuminate\Validation\ValidationException::class);
+
+        app(SyncConflictRecorder::class)->record(
+            $first->id,
+            'event',
+            'event-1',
+            'payload_mismatch',
+            $device,
+        );
     }
 
 }
