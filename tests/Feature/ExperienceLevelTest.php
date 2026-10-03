@@ -7,6 +7,7 @@ use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Str;
 use Tests\TestCase;
+use App\Support\NicheFocus;
 
 class ExperienceLevelTest extends TestCase
 {
@@ -34,12 +35,13 @@ class ExperienceLevelTest extends TestCase
 
         $this->put(route('preferences.experience.update'), [
             'experience_level' => 'advanced',
+            'primary_niche' => NicheFocus::SOUND_DJ,
         ])->assertRedirect(route('preferences.experience'));
 
-        $this->assertSame(
-            'advanced',
-            $user->businesses()->whereKey($business->id)->first()->pivot->experience_level
-        );
+        $membership = $user->businesses()->whereKey($business->id)->first()->pivot;
+
+        $this->assertSame('advanced', $membership->experience_level);
+        $this->assertSame(NicheFocus::SOUND_DJ, $membership->primary_niche);
     }
 
     public function test_staff_can_change_their_presentation_level_without_changing_role(): void
@@ -58,11 +60,13 @@ class ExperienceLevelTest extends TestCase
 
         $this->put(route('preferences.experience.update'), [
             'experience_level' => 'basic',
+            'primary_niche' => NicheFocus::SOUND_DJ,
         ])->assertRedirect(route('preferences.experience'));
 
         $membership = $user->businesses()->whereKey($business->id)->first()->pivot;
         $this->assertSame('staff', $membership->role);
         $this->assertSame('basic', $membership->experience_level);
+        $this->assertSame(NicheFocus::SOUND_DJ, $membership->primary_niche);
     }
 
     public function test_onboarding_requires_an_experience_level_before_business_setup(): void
@@ -94,3 +98,28 @@ class ExperienceLevelTest extends TestCase
     }
 
 }
+
+    public function test_onboarding_saves_niche_and_experience_together(): void
+    {
+        $business = Business::create([
+            'name' => 'Sound Business',
+            'slug' => 'sound-business-'.Str::lower(Str::random(8)),
+            'status' => 'active',
+            'currency' => 'ZAR',
+        ]);
+
+        $user = User::factory()->create();
+        $business->users()->attach($user->id, ['role' => 'owner']);
+
+        $this->actingAs($user);
+
+        $this->post(route('onboarding.experience.store'), [
+            'experience_level' => 'advanced',
+            'primary_niche' => NicheFocus::SOUND_DJ,
+        ])->assertRedirect(route('onboarding.business'));
+
+        $membership = $user->businesses()->whereKey($business->id)->first()->pivot;
+
+        $this->assertSame('advanced', $membership->experience_level);
+        $this->assertSame(NicheFocus::SOUND_DJ, $membership->primary_niche);
+    }
