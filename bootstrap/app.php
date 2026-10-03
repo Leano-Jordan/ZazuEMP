@@ -21,6 +21,7 @@ return Application::configure(basePath: dirname(__DIR__))
     ])
     ->withMiddleware(function (Middleware $middleware): void {
         $middleware->appendToGroup('web', \App\Http\Middleware\AttachRequestId::class);
+        $middleware->appendToGroup('web', \App\Http\Middleware\ApplySecurityHeaders::class);
         $middleware->alias([
             'owner' => \App\Http\Middleware\EnsureBusinessOwner::class,
             'platform.admin' => \App\Http\Middleware\EnsurePlatformAdmin::class,
