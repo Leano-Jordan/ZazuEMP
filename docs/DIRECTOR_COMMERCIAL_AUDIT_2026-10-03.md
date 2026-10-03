@@ -235,11 +235,12 @@ For application security verification, Zazu can use **OWASP ASVS 5.0.0** as the 
 
 These are benchmarks, not certification claims. Zazu still needs actual test evidence against the controls relevant to its deployment and data model.
 
-## 10. Landing-page temporary imagery
+## 10. Landing-page imagery
 
-The current landing page uses remote Pexels images configured in `config/zazu.php`. Pexels states that its photos/videos may be used commercially, but also warns against implying endorsement and notes that depicted people, trademarks and brands may have separate rights. urlPexels commercial-use guidancehttps://help.pexels.com/hc/en-us/articles/360042295214-Can-I-use-the-photos-and-videos-for-a-commercial-project
+The landing page now uses bundled assets from `public/images/landing/`, selected through `config/zazu.php`. The earlier runtime Pexels image dependency has been removed from the active landing-media path.
 
-**Audit position:** acceptable as a temporary visual-reference approach, but production should retain exact source/licence evidence and replace any imagery that creates avoidable person/brand-rights ambiguity.
+**Audit position:** the runtime visual path is now self-contained for these landing assets. Any final production imagery still needs retained source/provenance evidence and separate review of depicted people, trademarks or brands where applicable.
+
 
 ## 11. Feasibility
 
