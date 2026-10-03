@@ -54,14 +54,11 @@ class UiAccessibilityTest extends TestCase
         $themePosition = strpos($html, 'data-theme-toggle');
 
         $this->assertNotFalse($themePosition);
+        $this->assertSeePrimaryDestinations($response);
     }
 
-    public function test_primary_navigation_exposes_real_destinations(): void
+    private function assertSeePrimaryDestinations($response): void
     {
-        $response = $this->get(route('dashboard'));
-
-        $response->assertOk();
-        $response->assertSee('aria-label="Primary"', false);
         $response->assertSee('href="'.route('suppliers.index').'"', false);
         $response->assertSee('href="'.route('purchasing.index').'"', false);
         $response->assertSee('href="'.route('inventory.index').'"', false);
