@@ -690,3 +690,33 @@ Disposition: restore command discovery is closed as CASE-ZAZU-0004. Stable local
 
 Next Director target:
 **OWNER-APPROVED DEVICE PROVISIONING + SELECTED BOOTSTRAP — define the record-selection and transport contract, then implement and adversarially verify business scoping, pairing expiry/replay protection and selected-data completeness before activating a real domain handler.**
+
+## Director commercial audit cycle — 2026-10-03
+
+Target: assess Zazu against the product specification and commercial release requirements, with mobile-first acceptance and legal/recovery readiness treated as first-class release concerns.
+
+Completed:
+- audited current repository source and living product/release documents first;
+- created docs/DIRECTOR_COMMERCIAL_AUDIT_2026-10-03.md;
+- recorded overall commercial-readiness maturity at 67/100;
+- reconciled Helper direction from a fixed bird identity to one character framework with selectable skins;
+- established R0 Helper animation baseline as native SVG + CSS + browser WAAPI with no paid animation dependency;
+- refreshed docs/ZAZU_V1_STATUS.md;
+- refreshed .ai/engineering/READINESS_REGISTER.md;
+- refreshed docs/ZAZU_COMMERCIAL_LEGAL_REGISTER.md;
+- reconciled docs/V1_RELEASE_CHECKLIST.md;
+- updated Director Product Definition to remove the stale fixed-bird wording.
+
+Audit conclusion:
+- core operational product foundation is substantial;
+- commercial release is not yet certified;
+- remaining risk is concentrated in current-head verification, populated business workflow proof, recovery, upgrade/rollback, mobile/tablet acceptance, legal/privacy operations and final brand/licence clearance;
+- full phone-local offline operation remains unimplemented and must not be marketed as already available;
+- Helper documentation is ahead of the current live Helper implementation.
+
+Shared next target:
+CURRENT-HEAD VERIFICATION → POPULATED COMMERCIAL WORKFLOW → RECOVERY → UPGRADE/ROLLBACK → LEGAL/LICENCE/BRAND CLOSURE → FINAL DIRECTOR CERTIFICATION
+
+No feature expansion should displace these release-critical gates.
+
+Last updated: 2026-10-03
