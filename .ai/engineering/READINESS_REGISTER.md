@@ -190,3 +190,70 @@ Last updated: 2026-10-03
 
 Next Director target:
 **CURRENT-HEAD RUNTIME VERIFICATION → consume the queued Laravel, quality, PHPMD and browser results; classify failures; then run the populated multi-business isolation challenge against the latest verified head.**
+
+
+
+## Director commercial audit snapshot — 2026-10-03
+
+### Overall health
+
+**Commercial-readiness maturity: 67/100**
+
+This is a weighted maturity score, not a percentage of source-code completion. The remaining maturity gap is concentrated in proof and release controls rather than basic CRUD capability.
+
+### Scorecard
+
+| Domain | /100 | Work left | Current Director position |
+|---|---:|---:|---|
+| Correctness | 78 | 22 | Core paths implemented; populated end-to-end proof required |
+| Architecture | 84 | 16 | Modular monolith and staged offline architecture are coherent |
+| Data Integrity | 74 | 26 | Transactions/idempotency/ownership exist; populated reconciliation proof open |
+| Security | 76 | 24 | Isolation/authz foundations exist; final adversarial certification open |
+| Workflow Integrity | 72 | 28 | Connected chain exists; realistic populated traversal open |
+| UX / Accessibility | 68 | 32 | Strong source foundation; rendered mobile/tablet/WCAG-oriented proof open |
+| Reliability / Recovery | 42 | 58 | Real backup/restore drill remains release-critical |
+| Operability | 58 | 42 | Error/audit foundations exist; runbooks and recovery evidence remain |
+| Deployment / Upgrade Safety | 44 | 56 | Existing populated upgrade and rollback remain unproven |
+| Documentation / Ownership / Compliance | 68 | 32 | Governance strong; privacy/terms/brand/licence closure remains |
+| Release Evidence | 54 | 46 | Historical green evidence cannot certify latest observed main ref |
+| **Commercial readiness** | **67** | **33** | **Not certified** |
+
+### Release-critical findings
+
+**AUD-CRIT-01 — Populated operational workflow unproven**  
+Customer → job → requirements → quote → purchasing → preparation → costs → invoice → payment → completion requires one controlled populated-data proof run.
+
+**AUD-CRIT-02 — Backup/restore unproven**  
+Commands and safety logic exist, but customer recovery has not been exercised and evidenced.
+
+**AUD-CRIT-03 — Populated upgrade/rollback unproven**  
+Migration/repair history makes representative populated upgrade verification mandatory.
+
+**AUD-CRIT-04 — Current-head verification unobserved**  
+Latest observed main ref returned no associated workflow run through the available connector during this audit. Historical green runs remain historical.
+
+**AUD-HIGH-01 — Mobile acceptance incomplete**  
+Responsive source exists, but phone/tablet critical workflows need rendered acceptance.
+
+**AUD-HIGH-02 — Legal/privacy operational layer incomplete**  
+Privacy notice, POPIA operational controls, operator agreements where applicable, retention/deletion, incident response and customer terms remain open.
+
+**AUD-HIGH-03 — Zazu brand clearance required**  
+Current public market evidence shows unrelated Zazu uses, including a South African business-finance product and an event/catering business. This is a clearance risk, not a legal conclusion.
+
+**AUD-HIGH-04 — Helper implementation trails direction**  
+New Helper engine/skin architecture is documented, while the live component remains the legacy bird implementation.
+
+### Contradictions requiring reconciliation
+
+- Helper documentation now defines selectable skins; older Director wording used “bird mascot”.
+- Multiple status files contain historical/current HEAD values; living documents must distinguish the current main ref from the last application-assessment ref.
+- “Offline-first” is the target architecture; current release must not be described as fully disconnected phone-local operation.
+
+### Next Director priority
+
+**CURRENT-HEAD VERIFICATION → POPULATED COMMERCIAL WORKFLOW → RECOVERY → UPGRADE/ROLLBACK → LEGAL/LICENCE/BRAND CLOSURE → FINAL DIRECTOR CERTIFICATION**
+
+No feature expansion should displace a release-critical gate.
+
+Last updated: 2026-10-03
