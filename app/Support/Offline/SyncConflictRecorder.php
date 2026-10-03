@@ -5,6 +5,7 @@ namespace App\Support\Offline;
 use App\Models\SyncConflict;
 use App\Models\SyncDevice;
 use Illuminate\Support\Str;
+use Illuminate\Validation\ValidationException;
 
 class SyncConflictRecorder
 {
@@ -18,6 +19,16 @@ class SyncConflictRecorder
         ?array $localPayload = null,
         ?array $remotePayload = null,
     ): SyncConflict {
+        if ($device && (int) $device->business_id !== $businessId) {
+            throw ValidationException::withMessages([
+                'sync_device_id' => 'The sync device does not belong to the supplied business.',
+            ]);
+        }
+
+        if ($device && ! $device->isActive()) {
+            throw new \LogicException('Cannot attach a conflict to an inactive sync device.');
+        }
+
         return SyncConflict::create([
             'business_id' => $businessId,
             'sync_device_id' => $device?->id,
