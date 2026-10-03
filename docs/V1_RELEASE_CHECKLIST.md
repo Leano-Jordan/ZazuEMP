@@ -242,3 +242,56 @@ Current-head evidence is now available on the release candidate: Laravel **202 p
 8. Final Director re-audit
 
 No broad feature expansion should displace these gates while any Critical item remains open.
+
+
+
+# Director commercial audit reconciliation — 2026-10-03
+
+The canonical V1 checklist remains the release authority. The Director commercial audit adds the following explicit interpretation:
+
+**Overall commercial-readiness maturity: 67/100.**
+
+This score measures maturity across product, code, data, UX, mobile, security, recovery, deployment, legal and evidence domains. It is not a percentage of code completed.
+
+### Highest-risk unresolved gates
+
+| Gate | /100 | Work left | Release effect |
+|---|---:|---:|---|
+| Populated end-to-end commercial workflow | 60 | 40 | Blocks certification |
+| Commercial reconciliation | 60 | 40 | Blocks certification |
+| Current-head verification | 54 | 46 | Blocks certification |
+| Mobile/tablet critical workflows | 65 | 35 | Blocks mobile acceptance |
+| Backup / restore | 42 | 58 | Blocks certification |
+| Populated upgrade | 44 | 56 | Blocks certification |
+| Rollback exercise | 40 | 60 | Blocks certification |
+| Legal/privacy operational closure | 44 | 56 | Launch gate |
+| Brand/trade-mark clearance | 58 | 42 | Commercial gate |
+| Helper implementation | 42 | 58 | Helper-specific gate |
+
+### Director rule for this release
+
+Do not interpret “implemented” as “commercially proven”. V1 remains uncertified until the unchecked finish-line items in this document have current evidence.
+
+### Mobile-first acceptance rule
+
+Critical workflow acceptance must include a representative phone viewport and a tablet viewport, not merely responsive source inspection. Review:
+- navigation;
+- forms;
+- tables/lists;
+- quote presentation and acceptance;
+- finance/payment;
+- purchasing;
+- documents/media;
+- toasts/confirmation;
+- Helper presence/placement;
+- overflow, clipping and occlusion;
+- keyboard/focus/reduced-motion behaviour.
+
+### Current dependency/legal benchmark
+
+For accessibility, use WCAG 2.2 as the current target framework.  
+For web application security verification, use OWASP ASVS 5.0.0 as the engineering benchmark.
+
+These are benchmarks, not certification claims.
+
+Last updated: 2026-10-03
