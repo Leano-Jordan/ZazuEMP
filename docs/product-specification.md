@@ -636,3 +636,21 @@ The engineering sequence is:
 6. Build R1,299 capabilities only where complexity and willingness-to-pay are evidenced.
 
 This protects V1 from feature sprawl while giving pricing a concrete product architecture.
+
+## 19. Zazu Helper Character System
+
+Zazu Helper is a core product character and interaction layer. It is not merely decorative artwork.
+
+The system uses **one Helper character framework with selectable mascot skins**. Initial candidates are Gecko, Ant and Chameleon. The skin changes the physical expression of the character, not its personality, intelligence, permissions or experience level.
+
+Basic / Intermediate / Advanced remains a presentation and guidance setting. The same selected Helper skin operates across all three levels.
+
+The Helper must use semantic behaviour and responsive workspace targets rather than screen-specific animation logic. Its foundation includes reusable states such as idle, notice, approach, point, explain, think, working, warning, error, offline, syncing, return and sleep.
+
+Production weight is a hard design constraint. The preferred direction is lightweight 2D/vector assets with reusable animation/state-machine behaviour. Avoid 3D models, game engines, video-based ordinary interactions and duplicated per-page animation systems.
+
+Movement should be purposeful and event-driven. The Helper should normally remain quiet/resting and move only when relevant to the user or an active workflow. It must never obscure controls or become a substitute for ordinary UI.
+
+The final visual design is intentionally deferred. The character-system foundation must exist independently of final artwork so that visual skins can be designed and attached later without changing the underlying product behaviour.
+
+See docs/ZAZU_HELPER_CHARACTER_SYSTEM.md for the detailed foundation.
