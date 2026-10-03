@@ -20,10 +20,10 @@ class LandingMediaService
         // where the new platform-media migration has not run yet.
         if (!Schema::hasTable('platform_landing_settings')) {
             return [
-                'hero' => $library['catering_service']['url'],
-                'operations' => $library['event_catering']['url'],
-                'resources' => $library['sound_stage']['url'],
-                'control' => $library['wedding_catering']['url'],
+                'hero' => $this->localPath($library['catering_service']),
+                'operations' => $this->localPath($library['event_catering']),
+                'resources' => $this->localPath($library['sound_stage']),
+                'control' => $this->localPath($library['wedding_catering']),
             ];
         }
 
