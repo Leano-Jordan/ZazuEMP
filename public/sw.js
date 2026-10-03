@@ -1,6 +1,22 @@
-const CACHE_NAME = 'zazu-static-v2';
+const CACHE_NAME = 'zazu-static-v3';
 
-self.addEventListener('install', () => self.skipWaiting());
+const PRECACHE_ASSETS = [
+    '/images/landing/stock/hero.jpg',
+    '/images/landing/stock/catering.jpg',
+    '/images/landing/stock/sound.jpg',
+    '/images/landing/stock/venue.jpg',
+    '/images/landing/stock/tent.jpg',
+    '/images/landing/stock/decor.jpg',
+];
+
+self.addEventListener('install', (event) => {
+    event.waitUntil(
+        caches.open(CACHE_NAME)
+            .then((cache) => cache.addAll(PRECACHE_ASSETS))
+            .catch(() => undefined)
+            .finally(() => self.skipWaiting())
+    );
+});
 
 self.addEventListener('activate', (event) => {
     event.waitUntil(
