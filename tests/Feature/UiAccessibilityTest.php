@@ -211,3 +211,4 @@ class UiAccessibilityTest extends TestCase
             ->assertSee('zazu-disclosure', false)
             ->assertSee('Sound &amp; DJ', false);
     }
+}

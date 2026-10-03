@@ -619,3 +619,19 @@ Next Director target:
 **COMMERCIAL SAAS ISOLATION PROOF — inspect the actual current business-owned models, queries, exports, attachments, search and route boundaries; then close only evidence-backed isolation gaps and verify them against populated multi-business fixtures.**
 
 Last updated: 2026-10-03
+
+## PHPUnit parse-blocker correction — 2026-10-03
+
+Target: restore PHPUnit discovery for `UiAccessibilityTest`.
+
+Completed:
+- closed the test class, which had an unmatched opening brace at EOF;
+- `php -l tests/Feature/UiAccessibilityTest.php` passed;
+- `php artisan test tests/Feature/UiAccessibilityTest.php` passed: 11 tests, 91 assertions.
+
+Full-suite evidence:
+- `composer test` now runs 231 tests: 222 passed, 3 failed, 6 errored;
+- remaining failures/errors are in offline sync, offline license, and backup/restore tests and were not changed in this scoped correction;
+- local PHP still warns that `pdo_firebird` cannot be loaded, and PHPUnit reports the ineffective global `Throwable` import in `bootstrap/app.php`.
+
+Disposition: the parse blocker is resolved; unrelated suite failures and environment/bootstrap warnings remain untriaged.
