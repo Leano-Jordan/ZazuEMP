@@ -189,11 +189,14 @@ Current public examples observed during the Director audit:
 
 ### Landing imagery
 
-Landing-page visual references are now bundled in `public/images/landing/` and referenced through the platform landing-media configuration. Runtime page rendering does not depend on a third-party image host for these bundled visuals.
+The temporary landing photography library is now vendored into `public/images/landing/stock/`. The landing page and service layer use repository-local files at runtime, so stock-photo hosts are not part of the landing-page request path.
+
+The current temporary images come from Pexels. Pexels states that its images are free for commercial website/app use without attribution, while also noting that depicted people, trademarks, logos and brands can carry separate rights and that endorsement must not be implied. urlPexels commercial-use guidancehttps://help.pexels.com/hc/en-us/articles/360042295214-Can-I-use-the-photos-and-videos-for-a-commercial-project urlPexels licensehttps://www.pexels.com/license/
 
 Release action:
-- retain source/provenance evidence for any final imagery adopted into the product;
-- keep customer/business-uploaded media behind Zazu's existing authenticated media boundary.
+- replace the temporary stock library with Zazu-owned or separately cleared imagery;
+- retain source/provenance evidence for each final image;
+- do not use any temporary stock image as the Zazu trademark, logo, business name, or service mark.
 
 
 ### Director conclusion
