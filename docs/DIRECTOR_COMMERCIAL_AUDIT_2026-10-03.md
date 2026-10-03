@@ -345,4 +345,4 @@ The next work should therefore be proof-heavy and release-controlled. More featu
 
 ## 16. Audit control update — 2026-10-03
 
-The documentation pass after the audit produced only documentation/control changes. The latest application-changing commit observed before those documentation commits was 92730f7, a built asset-manifest reference correction. No fresh runtime certification is inferred from the documentation commits.
+A subsequent visual/media hardening cycle changed the application candidate: landing assets are now bundled under `public/images/landing/`, legacy remote landing values are rejected, and the light theme/nav hierarchy was rebalanced without changing the dark theme. The current main ref is `aa1e3ca8921625abca16fe4bbc8546746b4bf135`. No fresh runtime certification is inferred from these commits.
