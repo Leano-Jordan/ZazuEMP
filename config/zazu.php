@@ -3,32 +3,31 @@
 return [
     'platform_admin_emails' => array_values(array_filter(array_map('trim', explode(',', (string) env('ZAZU_PLATFORM_ADMIN_EMAILS', ''))))),
     'landing_image_library' => [
-        // Temporary real-world visual references for product/UI evaluation.
-        // These are external Pexels images and are intentionally easy to replace
-        // when the final Zazu visual library is selected.
+        // Bundled landing visuals. Keeping these under public/images/landing avoids
+        runtime dependency on third-party image hosts and keeps the first render self-contained.
         'catering_service' => [
             'label' => 'South African outdoor event reception',
-            'url' => 'https://images.pexels.com/photos/30108843/pexels-photo-30108843.jpeg?auto=compress&cs=tinysrgb&w=1800',
+            'url' => '/images/landing/hero.svg',
         ],
         'event_catering' => [
             'label' => 'Outdoor wedding catering',
-            'url' => 'https://images.pexels.com/photos/19869792/pexels-photo-19869792.jpeg?auto=compress&cs=tinysrgb&w=1800',
+            'url' => '/images/landing/operations.svg',
         ],
         'sound_stage' => [
             'label' => 'Johannesburg DJ setup',
-            'url' => 'https://images.pexels.com/photos/37288874/pexels-photo-37288874.jpeg?auto=compress&cs=tinysrgb&w=1800',
+            'url' => '/images/landing/resources.svg',
         ],
         'wedding_catering' => [
             'label' => 'Johannesburg outdoor wedding',
-            'url' => 'https://images.pexels.com/photos/36664148/pexels-photo-36664148.jpeg?auto=compress&cs=tinysrgb&w=1800',
+            'url' => '/images/landing/control.svg',
         ],
         'luxury_banquet' => [
             'label' => 'South African event reception',
-            'url' => 'https://images.pexels.com/photos/30108843/pexels-photo-30108843.jpeg?auto=compress&cs=tinysrgb&w=1800',
+            'url' => '/images/landing/hero.svg',
         ],
         'stage_av' => [
             'label' => 'Johannesburg DJ setup',
-            'url' => 'https://images.pexels.com/photos/37288874/pexels-photo-37288874.jpeg?auto=compress&cs=tinysrgb&w=1800',
+            'url' => '/images/landing/resources.svg',
         ],
     ],
     'errors' => [
