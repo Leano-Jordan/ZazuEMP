@@ -220,8 +220,8 @@ This is a weighted maturity score, not a percentage of source-code completion. T
 
 ### Release-critical findings
 
-**AUD-CRIT-01 — Populated operational workflow unproven**  
-Customer → job → requirements → quote → purchasing → preparation → costs → invoice → payment → completion requires one controlled populated-data proof run.
+**AUD-CRIT-01 — Populated operational workflow partially evidenced**
+The seeded owner journey now passes through Work inspection, requirements, preparation, purchasing, inventory/assets, invoice history and reporting; payment replay/overpayment and manager/staff authorization also pass. A controlled customer → job → quote creation/acceptance → invoice/payment → completion run remains required.
 
 **AUD-CRIT-02 — Backup/restore unproven**  
 Commands and safety logic exist, but customer recovery has not been exercised and evidenced.
@@ -229,11 +229,11 @@ Commands and safety logic exist, but customer recovery has not been exercised an
 **AUD-CRIT-03 — Populated upgrade/rollback unproven**  
 Migration/repair history makes representative populated upgrade verification mandatory.
 
-**AUD-CRIT-04 — Current-head verification unobserved**  
-Latest observed main ref returned no associated workflow run through the available connector during this audit. Historical green runs remain historical.
+**AUD-CRIT-04 — Current-head CI evidence unavailable**
+Local Laravel and desktop/mobile/tablet Playwright verification is observed for main `4b1fbb8c6139215d5338b442b73a943d820948d9`. GitHub Actions status remains unverified because the GitHub CLI is unauthenticated in this environment; local evidence does not substitute for CI.
 
-**AUD-HIGH-01 — Mobile acceptance incomplete**  
-Responsive source exists, but phone/tablet critical workflows need rendered acceptance.
+**AUD-HIGH-01 — Physical-device acceptance incomplete**
+Responsive critical workflows pass in Pixel 7 and tablet Playwright emulation, and a rendered inspector screenshot was reviewed. Physical phone/tablet acceptance remains open.
 
 **AUD-HIGH-02 — Legal/privacy operational layer incomplete**  
 Privacy notice, POPIA operational controls, operator agreements where applicable, retention/deletion, incident response and customer terms remain open.
@@ -257,3 +257,17 @@ New Helper engine/skin architecture is documented, while the live component rema
 No feature expansion should displace a release-critical gate.
 
 Last updated: 2026-10-03
+
+## Current-head verification update — 2026-10-04
+
+Baseline: remote `main` `4b1fbb8c6139215d5338b442b73a943d820948d9`.
+
+- Laravel: **241 passed / 1,377 assertions** (`composer test`).
+- Playwright: **25 passed / 2 intentionally skipped** across desktop Chromium, Pixel 7 emulation and tablet emulation. The only skips are the registration flow on mobile/tablet; that journey is run once on desktop to avoid shared-IP registration throttling.
+- The suite ran against a freshly migrated and demo-seeded temporary SQLite database. Theme/navigation checks no longer require external storage state.
+- Remaining release gates: authenticated CI status, complete newly created commercial workflow proof, physical-device acceptance, backup/restore drill, populated upgrade/rollback, and legal/licence/brand closure.
+- `pdo_firebird` startup warning remains a local PHP configuration issue; all tests completed.
+
+The 2026-10-03 numeric scorecard above is not recalculated from this single local evidence cycle.
+
+Last updated: 2026-10-04

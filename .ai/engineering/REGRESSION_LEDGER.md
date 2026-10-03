@@ -100,3 +100,11 @@ A restore can partially modify a MySQL database because the restore operation is
 **Control:** before a MySQL restore, stage a pre-restore dump. On failure after database replacement has begun, attempt restoration from that pre-restore dump before reporting the failure. Never activate private-storage replacement before the rollback snapshot exists.
 
 **Status:** CONTROL ACTIVE
+
+## REG-014 — E2E auth-state and responsive-navigation coverage gaps
+
+Browser suites can silently skip authenticated UI coverage when they depend on an externally generated storage-state file; desktop-only locators can also miss controls collapsed into mobile navigation.
+
+**Control:** Authenticate UI E2E tests through the seeded demo account by default, assert current semantic buttons, and explicitly open collapsed navigation before locating mobile actions. Keep only documented device-specific skips.
+
+**Status:** CONTROL ACTIVE

@@ -1,23 +1,22 @@
 import { test, expect } from '@playwright/test';
 
-const storageState = process.env.ZAZU_E2E_STORAGE_STATE;
+const username = process.env.ZAZU_E2E_USERNAME || process.env.ZAZU_DEMO_EMAIL || 'demo@zazu.local';
+const password = process.env.ZAZU_E2E_PASSWORD || process.env.ZAZU_DEMO_PASSWORD || 'password';
+
+async function login(page) {
+    await page.goto('/?auth=login');
+    await page.getByLabel('Username or email').fill(username);
+    await page.locator('#auth_password').fill(password);
+    await page.locator('[data-auth-submit]').click();
+    await expect(page).toHaveURL(/\/dashboard$/);
+}
 
 test.describe('Zazu UI theme and navigation', () => {
-    test.beforeEach(async ({}, testInfo) => {
-        testInfo.skip(
-            !storageState,
-            'Set ZAZU_E2E_STORAGE_STATE to an authenticated Playwright storage state for workspace UI verification.'
-        );
-    });
-
     test('asserts Signature Blue tokens in light and dark mode', async ({ browser }) => {
-        const context = await browser.newContext({
-            storageState,
-        });
+        const context = await browser.newContext();
         const page = await context.newPage();
 
-        await page.goto('/dashboard');
-        await expect(page).toHaveURL(/\/dashboard$/);
+        await login(page);
 
         const lightTokens = await page.evaluate(() => {
             const styles = getComputedStyle(document.documentElement);
@@ -56,20 +55,16 @@ test.describe('Zazu UI theme and navigation', () => {
 
         await page.goto('/');
         const publicNavigation = page.locator('nav[aria-label="Public navigation"]');
+        const mobileNavigationToggle = page.getByRole('button', { name: 'Open navigation' });
+        if (await mobileNavigationToggle.isVisible()) {
+            await mobileNavigationToggle.click();
+        }
         await expect(publicNavigation.getByRole('button', { name: 'Get started', exact: true })).toBeVisible();
         await expect(publicNavigation.getByRole('button', { name: 'Log in', exact: true })).toBeVisible();
 
         await publicNavigation.getByRole('button', { name: 'Log in', exact: true }).click();
         await expect(page.locator('[data-auth-modal]')).toBeVisible();
         await expect(page.getByRole('heading', { name: 'Welcome back.' })).toBeVisible();
-
-        const username = process.env.ZAZU_E2E_USERNAME;
-        const password = process.env.ZAZU_E2E_PASSWORD;
-
-        if (!username || !password) {
-            expect(responses).toEqual([]);
-            return;
-        }
 
         await page.getByLabel('Username or email').fill(username);
         await page.locator('#auth_password').fill(password);

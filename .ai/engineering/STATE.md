@@ -78,7 +78,22 @@ See `READINESS_REGISTER.md` for live gate direction.
 
 Main now contains the completed niche-focus, progressive-disclosure, offline-first architecture and commercial-isolation source cycle from 2026-10-03.
 
-The latest main-head verification workflows are queued. Previous green Laravel/browser/static-quality figures remain historical and are not reused as current-head evidence.
+Latest verified remote main: `4b1fbb8c6139215d5338b442b73a943d820948d9` (confirmed against `origin/main`).
+
+### Current-head verification — 2026-10-04
+
+- `composer test`: **241 passed, 1,377 assertions**.
+- Full Playwright suite against a fresh isolated seeded SQLite database: **25 passed, 2 intentionally skipped**. The skips are the registration journey's explicit mobile/tablet exclusions to avoid repeated shared-IP registration throttling; responsive entry surfaces ran on all three projects.
+- Desktop, Pixel 7 emulation and tablet projects exercised populated Work inspection, financial replay/overpayment, manager/staff authorization, onboarding, theme tokens and landing-to-workspace navigation.
+- Theme/navigation tests now authenticate through the seeded demo owner instead of silently skipping when an external storage-state file is absent. A local E2E-only adjustment opens the collapsed public navigation on mobile/tablet before asserting its actions; the full passing run included that working-tree change.
+- A four-worker local run produced two long-workflow timeouts; the same full suite passed serially. Classify those timeouts as runner-load-sensitive (F8), not application failures. CI is configured to use one worker.
+- A responsive Work-inspector screenshot was rendered and reviewed. Closed inspector state is now explicitly hidden and non-interactive; opened content remains vertically readable on phone emulation.
+- The PHP CLI still emits the missing `pdo_firebird` extension startup warning. It did not prevent the test suite from running. The earlier `Throwable` import warning did not recur in this run.
+- GitHub Actions run status remains **UNVERIFIED**: the GitHub CLI is not authenticated in this environment. The local test evidence is not represented as CI evidence.
+
+The 2026-10-03 readiness scorecard remains historical; this evidence does not certify backup/restore drills, populated upgrade/rollback, physical-device acceptance or legal/licence closure.
+
+Previous green figures are not reused in place of this current-head evidence.
 
 ## Current product-direction note
 
@@ -93,6 +108,8 @@ Select the highest-risk unresolved item that is:
 2. materially reducing release risk;
 3. supported by current evidence;
 4. bounded enough to execute safely.
+
+Next release-evidence target: obtain authenticated CI status for the current main head, then continue with a populated backup/restore drill and representative populated upgrade/rollback verification.
 
 ## Evidence boundary
 
