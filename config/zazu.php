@@ -26,12 +26,29 @@ return [
             'fallback' => '/images/landing/control.svg',
         ],
         'luxury_banquet' => [
-            'label' => 'Event reception venue',
-            'url' => '/images/landing/hero.svg',
+            'label' => 'Decorated reception venue',
+            'url' => '/images/landing/stock/decor.jpg',
+            'fallback' => '/images/landing/control.svg',
         ],
         'stage_av' => [
-            'label' => 'Johannesburg DJ setup',
-            'url' => '/images/landing/resources.svg',
+            'label' => 'Outdoor event stage and sound setup',
+            'url' => '/images/landing/stock/sound.jpg',
+            'fallback' => '/images/landing/resources.svg',
+        ],
+        'venue' => [
+            'label' => 'Outdoor event tent setup',
+            'url' => '/images/landing/stock/tent.jpg',
+            'fallback' => '/images/landing/operations.svg',
+        ],
+        'tent' => [
+            'label' => 'Outdoor event tent setup',
+            'url' => '/images/landing/stock/tent.jpg',
+            'fallback' => '/images/landing/operations.svg',
+        ],
+        'decor' => [
+            'label' => 'Decorated reception venue',
+            'url' => '/images/landing/stock/decor.jpg',
+            'fallback' => '/images/landing/control.svg',
         ],
     ],
     'errors' => [
