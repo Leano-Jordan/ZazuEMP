@@ -3,7 +3,8 @@
 **Assessment date:** 2026-10-03
 **Repository:** `Leano-Jordan/ZazuEMP`
 **Branch:** `main`
-**Latest main ref observed by Director:** `1de8153e3174001865c02f11133cafff7bfa44ee`
+**Latest main ref observed before audit documentation commits:** `1de8153e3174001865c02f11133cafff7bfa44ee`  
+**Latest application-changing commit observed:** `92730f7cb660ae06d9df3c014eccf4f0d3e9188e` (asset-manifest reference correction)
 **Application assessment baseline:** the canonical release checklist still records `52d9b26bc17ddee8d1427032ecaf2fb8fc0b6350` as the last application assessment candidate; later commits observed in this audit are primarily control/documentation changes and must not be treated as fresh application verification.
 
 ## 1. Executive health position
@@ -56,7 +57,7 @@ Therefore those items remain **unproven**, even where source code and older test
 | Data integrity | 74 | 26 | 🟡 | Transactions, idempotency, locking and audit foundations exist; realistic reconciliation and failure proof remain |
 | Code quality / maintainability | 76 | 24 | 🟡 | Architecture is a coherent modular monolith; some complexity suppression/large UI files need continued governance |
 | Security | 76 | 24 | 🟡 | Server-side authorization, isolation and private media controls exist; final adversarial certification is not current |
-| Commercial / finance truth | 72 | 28 | 🟡 | Quote → invoice → payment safeguards exist; populated reconciliation remains a release gate |
+| Commercial / finance truth | 72 | 28 | 🟡 | Quote → invoice → payment safeguards exist; populated reconciliation and tax-invoice presentation verification remain release gates |
 | Offline/local-first capability | 52 | 48 | 🟠 | Strong architecture and server-side sync foundation; no complete phone-local store/queue/domain sync handlers yet |
 | Backup / restore / recovery | 42 | 58 | 🔴 | Real commands exist, but real recovery evidence is still absent and release-critical |
 | Deployment / upgrade / rollback | 44 | 56 | 🔴 | Fresh install/tooling exists; populated upgrade and rollback exercises remain open |
@@ -154,6 +155,19 @@ Current public evidence shows a South African company trading as **Zazu SA (Pty)
 CIPC provides a free public preliminary trademark search and a more detailed paid professional search path. urlCIPC Intellectual Property Online — free trademark searchhttps://iponline.cipc.co.za/IPOnlineTest/Trademarks/Search/FreeTMSearchNotice.aspx
 
 Current public evidence for the other businesses: urlZazu South Africa business finance platformhttps://www.get-zazu.com/ urlZazu Eventshttps://zazuevents.com/
+
+
+### AUD-HIGH-05 — Tax-invoice presentation still needs release verification
+
+**Severity:** High  
+**Fix effort:** Medium  
+**Release impact:** Finance/document release gate
+
+The current invoice view conditionally presents 'Tax Invoice', supplier/customer tax identifiers, serialised invoice number, issue/due dates, line details, tax treatment, tax and total. That is a strong implementation foundation.
+
+SARS states that a valid tax invoice must contain prescribed supplier/recipient information, serial number/date, description, quantity/volume and value/tax/consideration fields, with the exact requirements depending on the invoice type. The current standard VAT rate is 15%, and SARS currently states a compulsory VAT registration threshold of R2.3 million in taxable sales. urlSARS Tax Invoiceshttps://www.sars.gov.za/businesses-and-employers/government/tax-invoices/ urlSARS VAT FAQhttps://www.sars.gov.za/faq/what-is-vat-and-who-needs-to-register/
+
+**What remains:** render and verify representative Zazu invoices against the applicable SARS requirements, including VAT/non-VAT presentation and stored tax snapshots. Do not hard-code tax registration assumptions that belong to the customer's actual tax status.
 
 ### AUD-HIGH-04 — Helper product direction is ahead of implementation
 
@@ -327,3 +341,7 @@ The next work should therefore be proof-heavy and release-controlled. More featu
 - `tests/Feature/BusinessIsolationTest.php`
 - `tests/Feature/ZazuBackupRestoreTest.php`
 - `tests/Feature/UiAccessibilityTest.php`
+
+## 16. Audit control update — 2026-10-03
+
+The documentation pass after the audit produced only documentation/control changes. The latest application-changing commit observed before those documentation commits was 92730f7, a built asset-manifest reference correction. No fresh runtime certification is inferred from the documentation commits.
