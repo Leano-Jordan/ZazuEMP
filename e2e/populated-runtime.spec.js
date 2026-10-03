@@ -99,7 +99,7 @@ test.describe('Zazu populated runtime challenge', () => {
         await page.locator('a.zazu-list-item').filter({ hasText: 'PO-ZAZU-DEMO-001' }).click();
         await expect(page).toHaveURL(/\/purchasing\/\d+$/);
         await expect(page.getByText('Status: Received', { exact: true })).toBeVisible();
-        await expect(page.getByText('Mokoena Family Celebration', { exact: true })).toBeVisible();
+        await expect(page.getByText('Job: Mokoena Family Celebration', { exact: true })).toBeVisible();
         await expect(page.getByText('Receive goods', { exact: true })).toHaveCount(0);
 
         await page.goto('/inventory', { waitUntil: 'domcontentloaded' });
