@@ -41,7 +41,11 @@ The mutation record is transport/replay history. It does not replace the authori
 
 ## Next implementation layer
 
-The next bounded architecture target is the **local business-data store + durable client mutation queue**, followed by a host synchronization protocol.
+The next bounded architecture target is owner-approved device provisioning and selected-data bootstrap. The owner has confirmed that devices require an owner-approved pairing code and that bootstrap includes business settings/catalogue plus only records explicitly selected by the owner.
+
+The initial stable-identity layer now exists as a business-scoped UUID registry for persisted local records. Its feature tests verify repeatability, import idempotency, cross-business isolation, and rejection of reassignment and malformed identity values. No domain mutation handler, device pairing flow, selected-data serializer, or phone-local queue has been activated.
+
+Before enabling a real device sync workflow, establish the selected-record contract and safe transport boundary; then add the local business-data store and durable client mutation queue.
 
 No cloud dependency is required for that layer.
 

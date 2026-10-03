@@ -78,7 +78,7 @@ The latest main-head verification workflows are queued. Previous green Laravel/b
 
 - Primary niche focus is now a presentation preference stored per business membership, separate from experience level and permissions.
 - Progressive disclosure is being extended from the existing hierarchical navigation into high-value workspace surfaces.
-- Offline remains a core operating condition; the repository currently has offline licensing/static caching, not a full local data sync engine.
+- Offline remains a core operating condition. The repository now has server-side source mutations, per-device delivery/cursors and a stable business-scoped local-record identity registry; it does not yet have a phone-local store, pairing/bootstrap flow, durable client queue or domain mutation handlers.
 
 ## Current next-target rule
 
@@ -662,3 +662,31 @@ Verification:
 Remaining environment warning: PHP still emits a startup warning because `pdo_firebird` is configured but its extension DLL is absent. This is outside repository code and was not changed.
 
 Disposition: DB-001 and the reproduced offline/restore failures are closed locally. Deployment environments must apply pending migrations before serving the updated application. Persistent evidence: CASE-ZAZU-0001 through CASE-ZAZU-0003 in `FAILURE_CASES.md`.
+
+## Restore command and stable sync identity cycle — 2026-10-03
+
+Baseline: `main` at `28a80784995ec03565aae5d66358cac209508455`; changes are in the local worktree and have not been committed.
+
+Completed:
+- repaired the missing closing parenthesis that prevented `ZazuRestoreCommand.php` from parsing and stopped Artisan from discovering `zazu:restore`;
+- added `sync_entity_identities`, mapping business-owned persisted records and stable entity types to business-scoped UUIDs;
+- added `SyncEntityIdentityRegistry::identify()` for repeatable local identity allocation and `register()` for idempotent imported identity registration;
+- guarded record/type reassignment, duplicate identity reuse within one business, malformed UUID/entity type input, and unsaved/non-business records;
+- applied the additive identity migration locally; no database reset or existing data replacement;
+- recorded owner-approved pairing and selected-bootstrap scope in DEC-019.
+
+Verification:
+- focused identity feature tests: 5 passed, 12 assertions;
+- `composer test`: 235 passed, 1,330 assertions;
+- `php artisan migrate:status`: all migrations report `Ran`, including the new identity migration;
+- PHP syntax checks, Laravel Pint `--test`, and `git diff --check` passed;
+- prior direct verification confirmed `zazu:restore` is registered and focused restore tests pass.
+
+Remaining evidence boundary:
+- the configured `pdo_firebird` extension DLL is still missing and PHP emits a startup warning; it did not block the current checks;
+- browser E2E, production recovery, real LAN sync, owner-approved pairing, selected-data serialization/bootstrap and phone-local queue remain unverified/not implemented.
+
+Disposition: restore command discovery is closed as CASE-ZAZU-0004. Stable local entity identity is implemented and tested as a foundation only; no domain mutation handler is attached.
+
+Next Director target:
+**OWNER-APPROVED DEVICE PROVISIONING + SELECTED BOOTSTRAP — define the record-selection and transport contract, then implement and adversarially verify business scoping, pairing expiry/replay protection and selected-data completeness before activating a real domain handler.**

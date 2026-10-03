@@ -145,3 +145,15 @@ Working commercial hypotheses:
 **Reason:** Connectivity and electricity availability are uneven and cannot be treated as universal infrastructure.
 
 **Status:** ACTIVE
+
+## DEC-019 — Owner-approved pairing and selected bootstrap
+
+**Date:** 2026-10-03
+
+**Decision:** New sync devices require an owner-approved pairing code. Initial bootstrap is limited to business settings/catalogue plus records explicitly selected by the owner. A device must not receive a full historical business snapshot merely because it was paired.
+
+**Reason:** Establish explicit business consent, minimize cross-device data exposure and preserve a bounded initial-sync contract.
+
+**Authority:** Confirmed by the product owner during the offline sync foundation cycle.
+
+**Status:** ACTIVE

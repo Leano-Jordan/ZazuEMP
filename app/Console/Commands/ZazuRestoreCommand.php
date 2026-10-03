@@ -42,7 +42,9 @@ class ZazuRestoreCommand extends Command
             return self::SUCCESS;
         }
 
-        $work = storage_path('app/.zazu-restore-'.now()->format('Ymd_His').'_' . Str::lower((string) Str::ulid());
+        $work = storage_path(
+            'app/.zazu-restore-'.now()->format('Ymd_His').'_' . Str::lower((string) Str::ulid())
+        );
         File::ensureDirectoryExists($work);
 
         $privateRollback = null;

@@ -18,6 +18,7 @@ This is the persistent failure-history register for the Failure Case / Loop-Brea
 | CASE-ZAZU-0001 | Dashboard account access | GET /dashboard queries missing business_user.primary_niche | CLOSED | Local SQLite schema was behind repository migrations | Monitor deploy/runtime migration evidence |
 | CASE-ZAZU-0002 | Offline and backup/restore regressions | Offline feature tests fail on model defaults/fixtures; Windows ZIP restore rejects generated paths | CLOSED | Eloquent defaults and ZIP entry separators diverged from their contracts | Full-suite regression |
 | CASE-ZAZU-0003 | Shared browser UI initialization | JavaScript calls undefined setupZazuBusinessSwitcher | CLOSED | Stale initializer remained after the feature was removed | Browser regression |
+| CASE-ZAZU-0004 | Backup restore command discovery | PHP cannot parse ZazuRestoreCommand::handle() | CLOSED | Work-directory expression was missing a closing parenthesis | Full backup/restore suite |
 
 ### CASE-ZAZU-0001
 
@@ -173,6 +174,57 @@ This is the persistent failure-history register for the Failure Case / Loop-Brea
 **Closure evidence:** Updated local build manifest and successful dashboard browser load.
 
 **Rejected approaches retained for loop prevention:** No no-op stub or broad catch; both would hide a nonexistent feature or mask later initializer failures.
+
+**Next action:** None for this case.
+
+### CASE-ZAZU-0004
+
+**Status:** CLOSED
+
+**First observed HEAD:** `28a80784995ec03565aae5d66358cac209508455`
+
+**Current HEAD:** `28a80784995ec03565aae5d66358cac209508455` (correction remains in the local worktree)
+
+**Target/workflow:** Artisan restore command discovery and populated backup restore.
+
+**Verification layer:** PHP source integrity, Artisan command discovery and PHPUnit backup/restore integration.
+
+**Expected:** Laravel parses and registers `zazu:restore`, allowing the restore workflow to run.
+
+**Actual:** PHPUnit reported an unclosed parenthesis in `ZazuRestoreCommand.php`; Laravel omitted the unparsable command, breaking restore.
+
+**Failure fingerprint:** The work-directory `storage_path(...)` expression in `ZazuRestoreCommand::handle()` lacked its closing parenthesis.
+
+**Runtime/data state:** No production data was changed. The local database was not reset or replaced.
+
+**F1–F8 classification:** F1 — application syntax defect.
+
+#### Hypotheses
+
+| ID | Hypothesis | Evidence for | Evidence against | Result | Status |
+|---|---|---|---|---|---|
+| H1 | PHP parse failure prevents Artisan from discovering the restore command | Parser identified the malformed expression; after correction PHP lint and `php artisan list --raw` succeeded | None | Confirmed | CONFIRMED |
+
+#### Experiments
+
+| Attempt | Hypothesis | Action | Evidence/result | Decision |
+|---|---|---|---|---|
+| 1 | H1 | Inspected the failing expression and corrected its closing parenthesis | PHP lint passed and `zazu:restore` appeared in Artisan command discovery | Retain the syntax correction |
+| 2 | H1 | Ran backup/restore integration tests and the complete PHPUnit suite | Restore tests passed; current full suite passed 235 tests / 1,330 assertions | CLOSED |
+
+**Confirmed root cause:** The restore command file did not parse, so framework command discovery omitted it.
+
+**Correction:** Closed the `storage_path(...)` expression in the restore command.
+
+**Regression family:** Backup/restore command discovery and populated restore.
+
+**Runtime/adversarial evidence:** Command registration and backup/restore tests passed; no browser E2E or production restore environment was exercised in this cycle.
+
+**Remaining uncertainty:** PHP still emits a startup warning because the configured `pdo_firebird` extension DLL is absent. It did not block the current suite.
+
+**Closure evidence:** PHP lint passed; command discovery includes `zazu:restore`; `composer test` passed 235 tests / 1,330 assertions.
+
+**Rejected approaches retained for loop prevention:** Do not change restore data handling or weaken archive validation; the failure was a source syntax defect.
 
 **Next action:** None for this case.
 

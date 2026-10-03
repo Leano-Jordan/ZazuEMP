@@ -205,6 +205,8 @@ Target concepts:
 
 Numeric database IDs remain useful inside one local database, but distributed synchronization must not depend on locally generated numeric IDs being globally unique.
 
+The initial stable-record-identity foundation is implemented in `sync_entity_identities`. It maps a business-owned local record and stable entity type to a UUID, scoped uniquely within that business. Repeated registration is idempotent; importing an identity cannot reassign it to another record or entity type. This registry is not yet connected to domain mutation handlers or a device bootstrap transport.
+
 ## 10. UI rule
 
 Offline mode should not be a degraded "error page".
@@ -265,13 +267,16 @@ Before claiming full offline operation:
 - local private storage;
 - offline licensing foundation;
 - static-asset service worker;
-- responsive UI.
+- responsive UI;
+- source mutations and per-device delivery/cursor tracking;
+- business-scoped stable UUID identity registry for existing local records.
 
 **Not yet implemented**
 - complete phone-local business data store;
 - durable offline mutation queue;
-- sync protocol;
-- conflict engine;
+- owner-approved device provisioning and bootstrap transport;
+- domain mutation handlers using the stable identity registry;
+- conflict resolution;
 - local host/device synchronization service;
 - cloud synchronization.
 
