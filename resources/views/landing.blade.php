@@ -34,53 +34,45 @@
         /* Public authentication modal. */
         .auth-modal{width:min(520px,calc(100% - 24px));max-width:none;padding:0;border:0;border-radius:16px;background:transparent;box-shadow:0 30px 90px rgba(15,23,42,.28);color:var(--ink)}.auth-modal::backdrop{background:rgba(15,23,42,.58);backdrop-filter:blur(5px)}.auth-modal-panel{position:relative;padding:30px;background:#fff;border:1px solid rgba(226,232,240,.95);border-radius:16px;max-height:calc(100vh - 24px);overflow-y:auto}.auth-modal-access{display:grid;grid-template-columns:1fr 1fr;gap:4px;margin:0 0 24px;padding:4px;border:1px solid #D8E2F0;border-radius:11px;background:#F3F7FC}.auth-modal-access button{min-height:40px;border:0;border-radius:8px;background:transparent;color:#64748B;font:800 10px Manrope,ui-sans-serif,system-ui,sans-serif;letter-spacing:.01em;cursor:pointer;transition:background-color 160ms ease,color 160ms ease,box-shadow 160ms ease,transform 160ms ease}.auth-modal-access button[aria-selected="true"]{background:#fff;color:#173B8F;box-shadow:0 2px 7px rgba(15,23,42,.09)}.auth-modal-access button:hover:not([aria-selected="true"]){color:var(--ink);background:rgba(255,255,255,.55)}.auth-modal-access button:active{transform:scale(.985)}.auth-modal-access button:focus-visible{outline:3px solid rgba(59,130,246,.18);outline-offset:1px}.auth-modal-close{position:absolute;top:14px;right:14px;width:36px;height:36px;border:1px solid var(--line);border-radius:9px;background:#fff;color:var(--muted);cursor:pointer;font-size:18px;line-height:1}.auth-modal-close:hover{color:var(--ink);background:var(--canvas)}.auth-modal-kicker{color:var(--blue);font:500 9px "DM Mono";letter-spacing:.13em;text-transform:uppercase}.auth-modal h2{margin:8px 45px 7px 0;font-family:"Space Grotesk",Manrope,ui-sans-serif,sans-serif;font-weight:600;font-size:30px;line-height:1.05;letter-spacing:-.045em}.auth-modal-copy{max-width:390px;margin:0 40px 24px 0;color:#5B6B82;font-size:12px;line-height:1.65;letter-spacing:-.005em}.auth-modal-form{display:grid;gap:15px}.auth-modal-field label{color:#1E293B;letter-spacing:-.01em}.auth-modal-field{display:grid;gap:6px}.auth-modal-field label{font-size:11px;font-weight:800}.auth-modal-field input{display:block;box-sizing:border-box;width:100%;min-height:46px;height:46px;margin:0;padding:0 13px;border:1px solid #D8E2F0;border-radius:9px;background:#FBFDFF;color:var(--ink);font:600 13px Manrope,ui-sans-serif,system-ui,sans-serif;line-height:1.2;transition:border-color 160ms ease,box-shadow 160ms ease,background-color 160ms ease}.auth-modal-field input:hover{border-color:#B9C8DC;background:#fff}.auth-modal-field input:focus{outline:none;border-color:var(--sapphire);background:#fff;box-shadow:0 0 0 3px rgba(59,130,246,.13)}.auth-modal-password{position:relative;width:100%}.auth-modal-password input{padding-right:68px}.auth-modal-password button{position:absolute;right:6px;top:7px;height:32px;padding:0 9px;border:0;border-radius:6px;background:var(--soft);color:var(--blue);font:700 10px Manrope;cursor:pointer}.auth-modal-error{margin:0;color:#B91C1C;font-size:10px;line-height:1.45}.auth-modal-help{margin-top:-5px;color:var(--muted);font-size:10px;line-height:1.45}.auth-modal-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}.auth-modal-submit{width:100%;border:0;cursor:pointer}.auth-modal-switch{margin-top:20px;padding-top:17px;border-top:1px solid #E5EAF1;text-align:center;color:#64748B;font-size:11px}.auth-modal-switch button{transition:color 140ms ease}.auth-modal-switch button:hover{color:#173B8F}.auth-modal-switch button,.auth-modal-forgot{border:0;background:none;padding:0;color:var(--blue);font:800 11px Manrope;cursor:pointer}.auth-modal-forgot{display:block;margin-top:9px;text-align:right}.auth-modal[open]{animation:authModalIn 160ms ease-out}@keyframes authModalIn{from{opacity:0;transform:translateY(8px) scale(.985)}to{opacity:1;transform:none}}[data-auth-panel]{transition:opacity 170ms ease,transform 190ms ease}[data-auth-panel][hidden]{display:none}[data-auth-panel].auth-panel-enter{animation:authPanelEnter 190ms ease-out}@keyframes authPanelEnter{from{opacity:0;transform:translateY(7px)}to{opacity:1;transform:none}}@media(max-width:640px){.auth-modal{width:calc(100% - 16px);margin:auto}.auth-modal-panel{padding:24px 18px 20px;border-radius:14px}.auth-modal-grid{grid-template-columns:1fr}.auth-modal h2{font-size:25px}.auth-modal-copy{margin-right:30px}.auth-modal-close{top:10px;right:10px}.auth-modal::backdrop{backdrop-filter:none}}@media(prefers-reduced-motion:reduce){.auth-modal[open]{animation:none}}
     
-        /* Landing photography: preserve focal content at narrow widths instead of letting cover-crops cut through people or equipment. */
-        .hero-photo--hero{background-position:center 42%;}
-        .feature-image--operations{background-position:center 42%;}
-        .feature-image--resources{background-position:center center;}
-        .feature-image--control{background-position:center 58%;}
-        @media(max-width:920px){
-            .hero-photo{height:220px;}
-            .feature.large .feature-image{height:220px;}
-            .feature-image.compact{height:110px;}
-        }
-        @media(max-width:640px){
-            .hero-photo{height:240px;border-radius:8px;}
-            .hero-photo--hero{background-position:center 42%;}
-            .feature.large .feature-image{height:220px;}
-            .feature-image.compact{height:120px;}
-            .feature-image--operations{background-position:center 42%;}
-            .feature-image--resources{background-position:center center;}
-            .feature-image--control{background-position:center 58%;}
-        }
-            
-        /* Director landing refinement: stronger imagery, tighter macro rhythm, clearer navigation. */
-        .nav-solutions{position:relative;}
-        .nav-solutions>summary{list-style:none;cursor:pointer;padding:9px 11px;border-radius:7px;color:var(--muted);font-size:11px;font-weight:700;}
+        /* Director landing composition — real stock photography, stronger rhythm, compact public nav. */
+        body:before{background:linear-gradient(180deg,#F4F8FD 0%,#EAF2FA 45%,#F8FAFC 100%)}
+        .top{position:sticky;top:0;z-index:80;background:rgba(244,248,253,.94);box-shadow:0 1px 0 rgba(190,205,222,.72);backdrop-filter:blur(16px)}
+        .hero{grid-template-columns:minmax(0,1fr) minmax(540px,.96fr);gap:clamp(32px,4.5vw,66px);min-height:auto;padding:52px 0 34px}
+        .hero-photo{height:clamp(390px,38vw,520px);aspect-ratio:16/12}
+        .hero .control-card{box-shadow:0 24px 60px rgba(30,63,105,.15)}
+        .section{padding:70px 0}
+        .service-strip{display:flex;align-items:center;justify-content:center;flex-wrap:wrap;gap:7px;padding:15px 0 9px;border-top:1px solid #D2DEEA;border-bottom:1px solid #D2DEEA}
+        .service-strip span{display:inline-flex;align-items:center;min-height:30px;padding:0 11px;border:1px solid #C4D2E1;border-radius:999px;background:#F5F8FC;color:#3F607C;font:700 9px ui-monospace,SFMono-Regular,Menlo,monospace;letter-spacing:.08em}
+        .nav-solutions{position:relative}
+        .nav-solutions>summary{list-style:none;cursor:pointer;padding:9px 11px;border-radius:7px;color:var(--muted);font-size:11px;font-weight:700}
         .nav-solutions>summary::-webkit-details-marker{display:none}
-        .nav-solutions>summary span{margin-left:4px;font-size:9px}
-        .nav-solutions[open]>summary{background:#EAF2FF;color:var(--blue)}
-        .nav-solutions-panel{position:absolute;top:42px;left:0;z-index:50;width:220px;display:grid;gap:2px;padding:7px;border:1px solid #CBD8E8;border-radius:10px;background:#fff;box-shadow:0 18px 40px rgba(15,23,42,.14)}
+        .nav-solutions>summary span{margin-left:4px;font-size:9px;transition:transform 140ms ease}
+        .nav-solutions[open]>summary{background:#E9F0FF;color:#173F7E}
+        .nav-solutions[open]>summary span{display:inline-block;transform:rotate(180deg)}
+        .nav-solutions-panel{position:absolute;top:42px;left:0;z-index:50;width:230px;display:grid;gap:2px;padding:7px;border:1px solid #C4D3E3;border-radius:10px;background:#fff;box-shadow:0 18px 40px rgba(15,23,42,.14)}
         .nav-solutions-panel a{padding:10px 11px!important;border-radius:7px;color:#355570!important;background:transparent!important;font-size:10px!important}
         .nav-solutions-panel a:hover{background:#EAF2FB!important;color:#173F6E!important}
-        .service-strip{display:flex;align-items:center;justify-content:center;flex-wrap:wrap;gap:7px;padding:16px 0 8px;border-top:1px solid #D8E3F0;border-bottom:1px solid #D8E3F0}
-        .service-strip span{display:inline-flex;align-items:center;min-height:30px;padding:0 11px;border:1px solid #C6D5E6;border-radius:999px;background:#F7FAFE;color:#476783;font:700 9px ui-monospace,SFMono-Regular,Menlo,monospace;letter-spacing:.08em}
-        .hero .control-card{box-shadow:0 24px 60px rgba(30,63,105,.15)}
-        .hero .hero-copy{max-width:610px}
-        .hero .hero-note{max-width:570px}
-        .bento{grid-template-columns:repeat(12,minmax(0,1fr));grid-template-rows:auto auto}
+        .bento{grid-template-columns:repeat(12,minmax(0,1fr));grid-template-rows:auto auto;gap:14px}
         .feature.large{grid-column:span 7;grid-row:span 2;min-height:0}
         .feature.mini{grid-column:span 5;min-height:0}
-        .feature.large .feature-image{height:290px}
+        .feature.large .feature-image{height:300px}
         .feature.mini .feature-image{height:175px}
-        .feature{padding:22px;background:#FFFFFF}
-        .feature h3{margin-top:18px}
-        .closing{padding:66px 0}
+        .feature{padding:22px;background:#fff}
+        .feature h3{margin-top:17px}
+        .visual-band{display:grid;grid-template-columns:minmax(0,1.08fr) minmax(0,.92fr);margin-top:14px;border:1px solid #C4D2E1;border-radius:12px;overflow:hidden;background:#fff;box-shadow:0 12px 30px rgba(31,76,132,.06)}
+        .visual-band-image{min-height:300px;background-size:cover;background-position:center}
+        .visual-band-copy{display:flex;flex-direction:column;justify-content:center;padding:36px}
+        .visual-band-copy h3{margin:10px 0;font-family:"Space Grotesk",Manrope,sans-serif;font-size:28px;line-height:1.06;letter-spacing:-.035em}
+        .visual-band-copy p{margin:0;color:var(--muted);font-size:12px;line-height:1.7}
+        .visual-band-points{display:flex;flex-wrap:wrap;gap:6px;margin-top:20px}
+        .visual-band-points span{padding:6px 8px;border:1px solid #CBD8E6;border-radius:999px;background:#F5F8FC;color:#476783;font:700 8px ui-monospace,SFMono-Regular,Menlo,monospace;letter-spacing:.04em}
+        .closing{padding:62px 0}
         @media(max-width:920px){
             .hero{grid-template-columns:1fr;padding-top:42px}
             .hero-photo{height:360px;aspect-ratio:16/10}
-            .feature.large{grid-column:1/-1;grid-row:auto}
-            .feature.mini{grid-column:1/-1}
+            .feature.large,.feature.mini{grid-column:1/-1;grid-row:auto}
+            .visual-band{grid-template-columns:1fr}
+            .visual-band-image{min-height:260px}
         }
         @media(max-width:640px){
             .service-strip{justify-content:flex-start;overflow:auto;flex-wrap:nowrap;padding:13px 0 8px}
@@ -89,9 +81,10 @@
             .nav-solutions>summary{display:flex!important;width:100%;box-sizing:border-box;align-items:center;justify-content:space-between;padding:11px 12px;margin:0;border-radius:7px;background:transparent;color:var(--ink)}
             .nav-solutions-panel{position:static;width:auto;margin:2px 0 2px 10px;padding:4px 0 4px 8px;border:0;border-left:2px solid #B6CCE5;border-radius:0;box-shadow:none;background:#F4F8FD}
             .nav-solutions-panel a{min-height:40px;padding:0 10px!important;display:flex!important;align-items:center}
-            .hero{padding:34px 0 38px}
+            .hero{padding:32px 0 36px}
             .hero-photo{height:300px;aspect-ratio:4/3}
-            .section{padding:58px 0}
+            .section{padding:56px 0}
+            .visual-band-copy{padding:26px 20px}
         }
         @media(prefers-reduced-motion:reduce){.nav-solutions-panel a,.nav-solutions>summary{transition:none!important}}
 </style>
@@ -100,8 +93,35 @@
 <div class="site">
 <header class="top">
     <a href="{{ url('/') }}" class="brand"><span class="mark">Z</span><span><strong>ZAZU</strong><span>Event Management Platform</span></span></a>
-    <nav class="topnav" aria-label="Public navigation"><div id="mobile-public-menu" class="mobile-menu" data-mobile-menu><a href="#capabilities">How it works</a><a href="#difference">Why Zazu</a>@if(!$isAuthenticated)<button type="button" class="register" data-auth-modal-open="register">Register</button><button type="button" class="login" data-auth-modal-open="login">Log in</button>@elseif($hasActiveWorkspace)<span class="account-state">You’re signed in</span><a class="launch" href="{{ route('dashboard') }}">Open workspace <span>↗</span></a><form method="POST" action="{{ route('logout') }}" class="topnav-form">@csrf<button type="submit" class="login">Sign out</button></form>@else<span class="account-state">You’re signed in</span><a class="launch" href="{{ route('workspace.recovery') }}">Set up workspace <span>↗</span></a><form method="POST" action="{{ route('logout') }}" class="topnav-form">@csrf<button type="submit" class="login">Sign out</button></form>@endif</div><button type="button" class="mobile-nav-toggle" aria-label="Open navigation" aria-expanded="false" aria-controls="mobile-public-menu"><span></span></button>
-</nav>
+    <nav class="topnav" aria-label="Public navigation">
+        <div id="mobile-public-menu" class="mobile-menu" data-mobile-menu>
+            <a href="#capabilities">Product</a>
+            <details class="nav-solutions">
+                <summary>Solutions <span aria-hidden="true">⌄</span></summary>
+                <div class="nav-solutions-panel">
+                    <a href="#capabilities">Catering &amp; baking</a>
+                    <a href="#capabilities">Rentals &amp; equipment</a>
+                    <a href="#capabilities">Sound &amp; DJ</a>
+                    <a href="#capabilities">Decor &amp; photography</a>
+                    <a href="#capabilities">Events &amp; venues</a>
+                </div>
+            </details>
+            <a href="#difference">Why Zazu</a>
+            @if(!$isAuthenticated)
+                <button type="button" class="register" data-auth-modal-open="register">Get started</button>
+                <button type="button" class="login" data-auth-modal-open="login">Log in</button>
+            @elseif($hasActiveWorkspace)
+                <span class="account-state">You’re signed in</span>
+                <a class="launch" href="{{ route('dashboard') }}">Open workspace <span>↗</span></a>
+                <form method="POST" action="{{ route('logout') }}" class="topnav-form">@csrf<button type="submit" class="login">Sign out</button></form>
+            @else
+                <span class="account-state">You’re signed in</span>
+                <a class="launch" href="{{ route('workspace.recovery') }}">Set up workspace <span>↗</span></a>
+                <form method="POST" action="{{ route('logout') }}" class="topnav-form">@csrf<button type="submit" class="login">Sign out</button></form>
+            @endif
+        </div>
+        <button type="button" class="mobile-nav-toggle" aria-label="Open navigation" aria-expanded="false" aria-controls="mobile-public-menu"><span></span></button>
+    </nav>
 </header>
 <main>
 <section class="hero">
@@ -119,7 +139,38 @@
 </section>
 <div class="service-strip" aria-label="Zazu business coverage"><span>EVENTS</span><span>CATERING</span><span>RENTALS</span><span>SOUND &amp; DJ</span><span>DECOR</span><span>PHOTOGRAPHY</span><span>BAKING</span></div>
 <section class="section" id="capabilities"><div class="section-head"><div><div class="eyebrow">Made for the work</div><h2>One event. A clear view from enquiry to payment.</h2></div><p class="intro">Keep the moving parts together as the business grows—from customer and quote through preparation, purchasing, costs and finance. Everyone works from the same operational record.</p></div>
-<div class="bento"><article class="feature large"><div class="feature-image feature-image--operations" style="background-image:url('{{ $landingImages['operations'] }}');"><span>Catering &amp; service</span></div><span class="num">01 / OPERATIONS</span><h3>Keep the whole booking together.</h3><p>Customer details, event dates, requirements, quotes, preparation and costs stay connected to the job from the first conversation through delivery.</p></article><article class="feature mini"><div class="feature-image feature-image--resources compact" style="background-image:url('{{ $landingImages['resources'] }}');"><span>Sound &amp; event setup</span></div><span class="num">02 / RESOURCES</span><h3>Know what the event needs.</h3><p>Keep services, equipment, suppliers and purchasing tied to the event, whether you are arranging catering, sound, staging or hire.</p></article><article class="feature mini"><div class="feature-image feature-image--control compact" style="background-image:url('{{ $landingImages['control'] }}');"><span>Venue &amp; reception</span></div><span class="num">03 / CONTROL</span><h3>Keep the commercial picture clear.</h3><p>See invoices, payments, expenses and costs with a direct line back to the event decisions that created them.</p></article><article class="feature mini"><div class="feature-image feature-image--venue compact" style="background-image:url('{{ $landingImages['venue'] }}');"><span>Venue &amp; planning</span></div><span class="num">04 / PLAN</span><h3>Give every event a visible plan.</h3><p>Keep dates, spaces, setup needs and the next actions visible without making the operator hunt across separate admin tools.</p></article></div></section>
+<div class="bento">
+<article class="feature large">
+    <div class="feature-image feature-image--operations" style="background-image:url('{{ $landingImages['operations'] }}');"><span>Catering &amp; service</span></div>
+    <span class="num">01 / OPERATIONS</span>
+    <h3>Keep the whole booking together.</h3>
+    <p>Customer details, event dates, requirements, quotes, preparation and costs stay connected to the job from the first conversation through delivery.</p>
+</article>
+<article class="feature mini">
+    <div class="feature-image feature-image--resources compact" style="background-image:url('{{ $landingImages['resources'] }}');"><span>Sound &amp; event setup</span></div>
+    <span class="num">02 / RESOURCES</span>
+    <h3>Know what the event needs.</h3>
+    <p>Keep services, equipment, suppliers and purchasing tied to the event, whether you are arranging catering, sound, staging or hire.</p>
+</article>
+<article class="feature mini">
+    <div class="feature-image feature-image--control compact" style="background-image:url('{{ $landingImages['control'] }}');"><span>Event venue</span></div>
+    <span class="num">03 / CONTROL</span>
+    <h3>Keep the commercial picture clear.</h3>
+    <p>See invoices, payments, expenses and costs with a direct line back to the event decisions that created them.</p>
+</article>
+<article class="feature mini">
+    <div class="feature-image feature-image--venue compact" style="background-image:url('{{ $landingImages['venue'] }}');"><span>Outdoor event setup</span></div>
+    <span class="num">04 / PLAN</span>
+    <h3>Give every event a visible plan.</h3>
+    <p>Keep dates, spaces, setup needs and the next actions visible without making the operator hunt across separate admin tools.</p>
+</article>
+<article class="feature mini">
+    <div class="feature-image feature-image--decor compact" style="background-image:url('{{ $landingImages['decor'] }}');"><span>Decor &amp; presentation</span></div>
+    <span class="num">05 / DELIVERY</span>
+    <h3>Make the final setup part of the record.</h3>
+    <p>Keep presentation, setup details and service decisions close to the same job instead of splitting them across disconnected notes.</p>
+</article>
+</div></section>
 <section class="section" id="difference"><div class="section-head"><div><div class="eyebrow">A better working record</div><h2>Replace scattered admin with one working record.</h2></div></div><div class="compare"><article><h3>Without a central record</h3><ul><li>WhatsApp messages, notebooks and spreadsheets each hold a piece of the event.</li><li>Quotes, preparation and delivery details can drift apart.</li><li>Supplier, equipment and hire decisions can disappear into the admin.</li><li>Costs can reach finance long after the decision was made.</li></ul></article><article><h3>With Zazu</h3><ul><li>One event record becomes the reference point for the team.</li><li>Operational and commercial context stays connected.</li><li>Purchasing and costs can be traced back to the event.</li><li>Finance can see the story behind the numbers.</li></ul></article></div></section>
 <section class="closing"><div class="closing-box"><div><div class="eyebrow closing-eyebrow">Ready for the next booking?</div><h2>{{ $hasActiveWorkspace ? 'Open your workspace.' : 'Restore your workspace access.' }}</h2><p>{{ $hasActiveWorkspace ? 'You are signed in. Open your workspace when you are ready.' : 'Your account is signed in. Finish workspace setup to continue.' }}</p></div><div class="actions">@if(!$isAuthenticated)<button type="button" class="btn" data-auth-modal-open="register">Register →</button><button type="button" class="btn" data-auth-modal-open="login">Log in →</button>@else
 @if($hasActiveWorkspace)<a class="btn" href="{{ route('dashboard') }}">Open workspace →</a>@else<a class="btn" href="{{ route('workspace.recovery') }}">Set up workspace →</a>@endif<form method="POST" action="{{ route('logout') }}" class="topnav-form">@csrf<button type="submit" class="btn">Sign out</button></form>@endif</div></div></section>
