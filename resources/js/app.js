@@ -575,6 +575,17 @@ const setupZazuHierarchicalNavigation = () => {
         });
     };
 
+    const syncActiveAreaForViewport = () => {
+        if (!window.matchMedia('(max-width: 820px)').matches) return;
+
+        const activeArea = areas.find((area) => area.classList.contains('is-active'));
+        if (!activeArea) return;
+
+        closeOthers(activeArea);
+        activeArea.classList.add('is-open');
+        activeArea.querySelector('[data-zazu-nav-trigger]')?.setAttribute('aria-expanded', 'true');
+    };
+
     areas.forEach((area) => {
         const trigger = area.querySelector('[data-zazu-nav-trigger]');
         if (!trigger) return;
@@ -589,6 +600,9 @@ const setupZazuHierarchicalNavigation = () => {
     document.addEventListener('click', (event) => {
         if (!areas.some((area) => area.contains(event.target))) closeOthers(null);
     });
+
+    syncActiveAreaForViewport();
+    window.matchMedia('(max-width: 820px)').addEventListener?.('change', syncActiveAreaForViewport);
 
     document.addEventListener('keydown', (event) => {
         if (event.key !== 'Escape') return;
