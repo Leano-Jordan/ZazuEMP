@@ -225,7 +225,7 @@ Online mode should enrich the experience without making offline users feel like 
 
 ## 11. What the current service worker should do
 
-The current conservative service worker correctly caches static assets while deliberately avoiding authenticated HTML and private business data.
+The current conservative service worker caches only explicitly public static asset paths under /build/ and /images/. It does not cache authenticated HTML, business data or /media/ responses, and it retires older Zazu static-cache generations during activation.
 
 That is the correct safety baseline until local business-data storage and synchronization rules exist.
 
