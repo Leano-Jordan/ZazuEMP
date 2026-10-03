@@ -4,6 +4,7 @@ namespace Tests\Feature;
 
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Artisan;
 use Tests\TestCase;
 use ZipArchive;
 
@@ -50,6 +51,11 @@ class ZazuBackupRestoreTest extends TestCase
             $this->assertSame(true, $zip->open($archive));
             $this->assertNotFalse($zip->locateName('manifest.json'));
             $this->assertNotFalse($zip->locateName('database.sqlite'));
+
+            for ($index = 0; $index < $zip->numFiles; $index++) {
+                $this->assertStringNotContainsString('\\', (string) $zip->getNameIndex($index));
+            }
+
             $zip->close();
 
             DB::table('backup_probe')->update(['value' => 'changed after backup']);
@@ -61,7 +67,7 @@ class ZazuBackupRestoreTest extends TestCase
 
 $exitCode = $restore->run();
 
-$this->assertSame(0, $exitCode);
+$this->assertSame(0, $exitCode, Artisan::output());
 
             DB::purge('sqlite');
 
