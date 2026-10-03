@@ -3,7 +3,7 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <meta name="theme-color" content="#F2F7FF">
+    <meta name="theme-color" content="#F1F5FB">
     <meta name="description" content="Zazu EMP helps South African event, catering and equipment-hire businesses keep customers, jobs, quotes, suppliers, costs and finance connected.">
     <title>Zazu EMP · Run the work. Know the numbers.</title>
     @vite(['resources/js/app.js'])
