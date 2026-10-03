@@ -64,7 +64,7 @@ test.describe('Zazu populated runtime challenge', () => {
         await inspector.getByRole('tab', { name: 'Equipment Hire Manifest' }).click();
         const equipmentPanel = inspector.locator('[data-zazu-tab-panel="equipment"]');
         await expect(equipmentPanel).toBeVisible();
-        await expect(equipmentPanel).toContainText('Prepare tables and chairs');
+        await expect(equipmentPanel).toContainText('6m x 12m stretch tent');
 
         await inspector.getByRole('tab', { name: 'Financial Ledger' }).click();
         const financePanel = inspector.locator('[data-zazu-tab-panel="finance"]');
@@ -81,7 +81,7 @@ test.describe('Zazu populated runtime challenge', () => {
         await page.goto(workPath + '/requirements', { waitUntil: 'domcontentloaded' });
         expect(page.url()).toMatch(/\/requirements$/);
         await expect(page.getByText('Buffet catering', { exact: true })).toBeVisible();
-        await expect(page.getByText('80.00', { exact: true }).first()).toBeVisible();
+        await expect(page.getByText('80.00 guests', { exact: true })).toBeVisible();
 
         await page.goto(workPath + '/preparation', { waitUntil: 'domcontentloaded' });
         expect(page.url()).toMatch(/\/preparation$/);
@@ -96,9 +96,9 @@ test.describe('Zazu populated runtime challenge', () => {
         await expect(page.getByText('PO-ZAZU-DEMO-001', { exact: true })).toBeVisible();
         await expect(page.getByText('PO-ZAZU-DEMO-002', { exact: true })).toHaveCount(0);
 
-        await page.getByRole('link', { name: 'PO-ZAZU-DEMO-001', exact: true }).click();
+        await page.locator('a.zazu-list-item').filter({ hasText: 'PO-ZAZU-DEMO-001' }).click();
         await expect(page).toHaveURL(/\/purchasing\/\d+$/);
-        await expect(page.getByText('Received', { exact: true })).toBeVisible();
+        await expect(page.getByText('Status: Received', { exact: true })).toBeVisible();
         await expect(page.getByText('Mokoena Family Celebration', { exact: true })).toBeVisible();
         await expect(page.getByText('Receive goods', { exact: true })).toHaveCount(0);
 
