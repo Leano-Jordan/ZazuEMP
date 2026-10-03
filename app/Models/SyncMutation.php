@@ -14,6 +14,8 @@ class SyncMutation extends Model
     protected $fillable = [
         'business_id',
         'sync_device_id',
+        'stream',
+        'sequence',
         'mutation_id',
         'entity_type',
         'entity_id',
