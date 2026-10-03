@@ -16,16 +16,14 @@ async function login(page, email, password) {
 }
 
 async function expectNoServerFailures(page, responses, errors) {
-    expect(responses, 'HTTP 5xx responses').toEqual([]);
-    expect(errors, 'browser page errors').toEqual([]);
-
     const errorShells = page.locator('.zazu-error-shell');
-    const shellCount = await errorShells.count();
-    if (shellCount > 0) {
-        const errorTexts = await errorShells.allTextContents();
+    const errorTexts = await errorShells.allTextContents();
+    if (errorTexts.length > 0) {
         console.error('Zazu error shells detected:', errorTexts);
     }
 
+    expect(responses, 'HTTP 5xx responses').toEqual([]);
+    expect(errors, 'browser page errors').toEqual([]);
     await expect(errorShells).toHaveCount(0);
 }
 
@@ -64,10 +62,14 @@ test.describe('Zazu populated runtime challenge', () => {
         await expect(inspector).toContainText('Confirm buffet quantities');
 
         await inspector.getByRole('tab', { name: 'Equipment Hire Manifest' }).click();
-        await expect(inspector).toContainText('Prepare tables and chairs');
+        const equipmentPanel = inspector.locator('[data-zazu-tab-panel="equipment"]');
+        await expect(equipmentPanel).toBeVisible();
+        await expect(equipmentPanel).toContainText('Prepare tables and chairs');
 
         await inspector.getByRole('tab', { name: 'Financial Ledger' }).click();
-        await expect(inspector).toContainText('11,500.00');
+        const financePanel = inspector.locator('[data-zazu-tab-panel="finance"]');
+        await expect(financePanel).toBeVisible();
+        await expect(financePanel).toContainText('11,500.00');
         await expect(inspector.getByRole('link', { name: 'Open job record' })).toBeVisible();
 
         await inspector.getByRole('link', { name: 'Open job record' }).click();
@@ -111,7 +113,10 @@ test.describe('Zazu populated runtime challenge', () => {
         await expect(page.getByText('INV-ZAZU-DEMO-001', { exact: true })).toBeVisible();
         await expect(page.getByText('ZAR 11,500.00', { exact: true })).toBeVisible();
 
-        await page.getByRole('link', { name: /INV-ZAZU-DEMO-001/ }).click();
+        const invoiceRow = page.locator('.zazu-list-item').filter({ hasText: 'INV-ZAZU-DEMO-001' }).first();
+        const invoiceLink = invoiceRow.getByRole('link', { name: 'Open', exact: true });
+        await expect(invoiceLink).toBeVisible({ timeout: 10_000 });
+        await invoiceLink.click();
         await expect(page).toHaveURL(/\/finance\/invoices\/\d+$/);
         await expect(page.getByText('Payment history', { exact: true })).toBeVisible();
         await expect(page.getByText('DEP-ZAZU-DEMO-001', { exact: true })).toBeVisible();

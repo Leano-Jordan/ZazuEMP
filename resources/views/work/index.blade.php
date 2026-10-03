@@ -302,7 +302,7 @@
                     item.tabIndex = active ? 0 : -1;
                 });
                 panel.querySelectorAll('[data-zazu-tab-panel]').forEach(section => {
-                    section.classList.toggle('hidden', section.dataset.zazuTab !== target);
+                    section.classList.toggle('hidden', section.dataset.zazuTabPanel !== target);
                 });
                 if (moveFocus) tab.focus();
             };
