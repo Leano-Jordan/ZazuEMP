@@ -8,6 +8,8 @@ use App\Models\SyncMutation;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Str;
+use Illuminate\Database\QueryException;
+use App\Support\Offline\SyncMutationRecorder;
 use Tests\TestCase;
 
 class OfflineSyncFoundationTest extends TestCase
@@ -77,7 +79,7 @@ class OfflineSyncFoundationTest extends TestCase
             'occurred_at' => now(),
         ]);
 
-        $this->expectException(IlluminateDatabaseQueryException::class);
+        $this->expectException(QueryException::class);
 
         SyncMutation::create([
             'business_id' => $business->id,
@@ -89,4 +91,72 @@ class OfflineSyncFoundationTest extends TestCase
             'occurred_at' => now(),
         ]);
     }
+
+    public function test_mutation_recorder_creates_pending_mutations_and_is_idempotent(): void
+    {
+        $business = Business::create([
+            'name' => 'Recorder Business',
+            'slug' => 'recorder-'.Str::lower(Str::random(8)),
+            'status' => 'active',
+            'currency' => 'ZAR',
+        ]);
+
+        $device = SyncDevice::create([
+            'business_id' => $business->id,
+            'installation_id' => (string) Str::uuid(),
+        ]);
+
+        $mutationId = (string) Str::uuid();
+        $recorder = app(SyncMutationRecorder::class);
+
+        $first = $recorder->record(
+            $device,
+            'event',
+            'local-event-1',
+            'upsert',
+            ['name' => 'Offline wedding'],
+            $mutationId,
+        );
+
+        $second = $recorder->record(
+            $device,
+            'event',
+            'local-event-1',
+            'upsert',
+            ['name' => 'Offline wedding'],
+            $mutationId,
+        );
+
+        $this->assertSame($first->id, $second->id);
+        $this->assertSame(1, SyncMutation::query()->where('mutation_id', $mutationId)->count());
+        $this->assertSame('pending', $first->status);
+    }
+
+    public function test_mutation_recorder_rejects_revoked_devices(): void
+    {
+        $business = Business::create([
+            'name' => 'Revoked Device Business',
+            'slug' => 'revoked-'.Str::lower(Str::random(8)),
+            'status' => 'active',
+            'currency' => 'ZAR',
+        ]);
+
+        $device = SyncDevice::create([
+            'business_id' => $business->id,
+            'installation_id' => (string) Str::uuid(),
+            'status' => 'revoked',
+            'revoked_at' => now(),
+        ]);
+
+        $this->expectException(\LogicException::class);
+
+        app(SyncMutationRecorder::class)->record(
+            $device,
+            'event',
+            'local-event-2',
+            'upsert',
+            ['name' => 'Should not queue'],
+        );
+    }
+
 }
