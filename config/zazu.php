@@ -69,18 +69,22 @@ return [
         'chairs_tents' => [
             'label' => 'Chairs & tents',
             'description' => 'Keep hire bookings, availability, delivery/setup and money close to the work.',
+            'capability_categories' => ['Furniture & equipment', 'Rentals'],
         ],
         'catering_baking' => [
             'label' => 'Catering & baking',
             'description' => 'Keep food service, quantities, preparation, costs and money close to the work.',
+            'capability_categories' => ['Catering', 'Baking'],
         ],
         'sound_dj' => [
             'label' => 'Sound & DJ',
             'description' => 'Keep bookings, equipment, setup/travel and money close to the work.',
+            'capability_categories' => ['Sound & entertainment', 'Audio & entertainment'],
         ],
         'mixed' => [
             'label' => 'Mixed event services',
             'description' => 'Keep the shared event workflow visible without prioritising one service type.',
+            'capability_categories' => [],
         ],
     ],
 
