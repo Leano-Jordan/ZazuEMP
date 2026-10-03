@@ -3,6 +3,7 @@
 namespace Tests\Feature;
 
 use App\Models\Business;
+use App\Models\BusinessCapability;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Str;
@@ -122,4 +123,46 @@ class ExperienceLevelTest extends TestCase
 
         $this->assertSame('advanced', $membership->experience_level);
         $this->assertSame(NicheFocus::SOUND_DJ, $membership->primary_niche);
+    }
+
+    public function test_niche_focus_keeps_overlapping_catalogue_capabilities_visible(): void
+    {
+        $business = Business::create([
+            'name' => 'DJ Hire Business',
+            'slug' => 'dj-hire-business-'.Str::lower(Str::random(8)),
+            'status' => 'active',
+            'currency' => 'ZAR',
+        ]);
+
+        $user = User::factory()->create();
+        $business->users()->attach($user->id, [
+            'role' => 'owner',
+            'experience_level' => 'intermediate',
+            'primary_niche' => NicheFocus::SOUND_DJ,
+        ]);
+
+        BusinessCapability::create([
+            'business_id' => $business->id,
+            'name' => 'DJ Package',
+            'category' => 'Sound & entertainment',
+            'capability_type' => 'service',
+            'pricing_basis' => 'per event',
+            'currency' => 'ZAR',
+            'is_active' => true,
+        ]);
+
+        BusinessCapability::create([
+            'business_id' => $business->id,
+            'name' => 'Banquet Chairs',
+            'category' => 'Furniture & equipment',
+            'capability_type' => 'rental',
+            'pricing_basis' => 'per unit',
+            'currency' => 'ZAR',
+            'is_active' => true,
+        ]);
+
+        $this->assertSame(
+            ['Chairs & tents'],
+            app(NicheFocus::class)->supporting($business, NicheFocus::SOUND_DJ)
+        );
     }
