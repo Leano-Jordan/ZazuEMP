@@ -39,8 +39,10 @@ test('registration flows through onboarding into the dashboard', async ({ page }
 
     await expect(page).toHaveURL(/\/setup\/experience$/);
     await expect(page.locator('.zazu-error-shell')).toHaveCount(0);
-    await expect(page.getByRole('heading', { name: 'Choose how much of Zazu you want surfaced.' })).toBeVisible();
+    await expect(page.getByRole('heading', { name: 'Workspace focus' })).toBeVisible();
+    await expect(page.getByText('Sound & DJ', { exact: true })).toBeVisible();
 
+    await page.getByLabel('Catering & baking', { exact: true }).check();
     await page.getByLabel('Intermediate').check();
     await page.getByRole('button', { name: 'Continue setup' }).click();
 
