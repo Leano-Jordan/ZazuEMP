@@ -35,6 +35,11 @@ class SyncMutation extends Model
         ];
     }
 
+    public function scopePending($query)
+    {
+        return $query->where('status', 'pending')->orderBy('occurred_at');
+    }
+
     public function business(): BelongsTo
     {
         return $this->belongsTo(Business::class);
