@@ -1,10 +1,10 @@
 # Zazu EMP — V1 Commercial Release Checklist
 
 **Authority:** ACTIVE / CANONICAL V1 RELEASE GATE  
-**Last Director update:** 2026-10-01  
+**Last Director update:** 2026-10-03  
 **Repository:** `Leano-Jordan/ZazuEMP`  
 **Branch:** `main`  
-**Application assessment HEAD:** `52d9b26bc17ddee8d1427032ecaf2fb8fc0b6350`  
+**Application assessment baseline:** `92730f7cb660ae06d9df3c014eccf4f0d3e9188e`  
 **Note:** subsequent documentation-only commits do not change the application assessment baseline.
 
 ## Authority rule
@@ -226,7 +226,7 @@ These remain outside V1 unless a verified release requirement proves they are ne
 
 The repository contains earlier CI/browser evidence for the access/onboarding path, including a successful targeted browser traversal. That evidence is retained as historical proof but does **not** automatically certify the current HEAD.
 
-Current-head evidence is now available on the release candidate: Laravel **202 passed / 1,174 assertions**, browser **7 passed / 8 skipped**, Zazu Quality **passed**, PHPMD **passed**, and Psalm **passed** using the narrow Laravel 13.34.0 compatibility shim. Fresh migration/build/Blade/asset-manifest checks also passed. Populated-data workflow proof, full authorization challenge, backup/restore, representative upgrade and rollback remain open.
+Historical/current-candidate evidence remains useful context but is not treated as fresh certification for the latest hardening ref. Populated-data workflow proof, full authorization challenge, backup/restore, representative upgrade and rollback remain open.
 
 ## Immediate execution priority
 
