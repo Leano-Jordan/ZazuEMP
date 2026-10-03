@@ -193,3 +193,22 @@ class UiAccessibilityTest extends TestCase
     }
 
 }
+
+    public function test_workspace_focus_ui_exposes_niche_choices_and_progressive_disclosure(): void
+    {
+        $onboarding = $this->get(route('onboarding.experience'));
+
+        $onboarding->assertOk()
+            ->assertSee('What do you mainly provide?')
+            ->assertSee('Sound &amp; DJ', false)
+            ->assertSee('Catering &amp; baking', false)
+            ->assertSee('Chairs &amp; tents', false)
+            ->assertSee('How much of Zazu should be visible?');
+
+        $preferences = $this->get(route('preferences.experience'));
+
+        $preferences->assertOk()
+            ->assertSee('Primary business focus')
+            ->assertSee('zazu-disclosure', false)
+            ->assertSee('Sound &amp; DJ', false);
+    }
