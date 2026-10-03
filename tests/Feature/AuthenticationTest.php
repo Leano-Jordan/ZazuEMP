@@ -269,6 +269,34 @@ class AuthenticationTest extends TestCase
         $this->assertAuthenticatedAs($user);
     }
 
+    public function test_login_throttle_returns_a_clear_lockout_message_after_repeated_attempts(): void
+    {
+        $user = User::factory()->create([
+            'username' => 'throttleowner',
+            'password' => 'password123',
+        ]);
+
+        for ($attempt = 0; $attempt < 6; $attempt++) {
+            $this->post(route('login.store'), [
+                'identifier' => $user->username,
+                'password' => 'wrong-password',
+            ])->assertSessionHasErrors('identifier');
+        }
+
+        $this->post(route('login.store'), [
+            'identifier' => $user->username,
+            'password' => 'wrong-password',
+        ])
+            ->assertRedirect(route('landing', ['auth' => 'login']))
+            ->assertSessionHas('auth_modal', 'login')
+            ->assertSessionHasErrors('identifier');
+
+        $this->assertStringContainsString(
+            'Too many sign-in attempts.',
+            session('errors')->getBag('default')->first('identifier'),
+        );
+    }
+
     public function test_invalid_login_does_not_authenticate_and_preserves_the_identifier_error(): void
     {
         $user = User::factory()->create([
