@@ -187,18 +187,14 @@ Current public examples observed during the Director audit:
 - Zazu South Africa business-finance platform: https://www.get-zazu.com/
 - Zazu Events: https://zazuevents.com/
 
-### Temporary landing imagery
+### Landing imagery
 
-The landing page currently references Pexels imagery. Pexels states that its photos/videos may be used for commercial purposes, while separately warning against implied endorsement and noting that depicted people, trademarks and brands can carry additional rights.
+Landing-page visual references are now bundled in `public/images/landing/` and referenced through the platform landing-media configuration. Runtime page rendering does not depend on a third-party image host for these bundled visuals.
 
 Release action:
-- record exact source/licence evidence for each retained image;
-- replace any image that creates avoidable person/brand-rights ambiguity;
-- do not treat the Pexels licence as ownership of the underlying photograph.
+- retain source/provenance evidence for any final imagery adopted into the product;
+- keep customer/business-uploaded media behind Zazu's existing authenticated media boundary.
 
-References:
-- https://help.pexels.com/hc/en-us/articles/360042295214-Can-I-use-the-photos-and-videos-for-a-commercial-project
-- https://www.pexels.com/legal-pages/license/
 
 ### Director conclusion
 
