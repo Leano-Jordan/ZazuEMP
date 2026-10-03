@@ -3,8 +3,8 @@
 namespace App\Support\Offline;
 
 use App\Models\SyncCursor;
+use App\Models\SyncDelivery;
 use App\Models\SyncDevice;
-use App\Models\SyncMutation;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\ValidationException;
@@ -22,19 +22,20 @@ class SyncMutationProtocol
                 'sync_device_id' => $device->id,
                 'stream' => $stream,
             ],
-            [
-                'last_acknowledged_sequence' => 0,
-            ],
+            ['last_acknowledged_sequence' => 0],
         );
 
-        return SyncMutation::query()
+        return SyncDelivery::query()
             ->where('business_id', $device->business_id)
+            ->where('destination_device_id', $device->id)
             ->where('stream', $stream)
-            ->where('sequence', '>', $cursor->last_acknowledged_sequence)
+            ->where('delivery_sequence', '>', $cursor->last_acknowledged_sequence)
             ->where('status', 'pending')
-            ->orderBy('sequence')
+            ->with('mutation')
+            ->orderBy('delivery_sequence')
             ->limit(max(1, min($limit, 500)))
-            ->get();
+            ->get()
+            ->map(fn (SyncDelivery $delivery) => $delivery->mutation);
     }
 
     public function acknowledgeThrough(
@@ -55,6 +56,7 @@ class SyncMutationProtocol
                 ->where('business_id', $device->business_id)
                 ->where('sync_device_id', $device->id)
                 ->where('stream', $stream)
+                ->lockForUpdate()
                 ->first();
 
             if (! $cursor) {
@@ -71,27 +73,29 @@ class SyncMutationProtocol
             }
 
             $expected = $cursor->last_acknowledged_sequence + 1;
-
-            $present = SyncMutation::query()
+            $deliveries = SyncDelivery::query()
                 ->where('business_id', $device->business_id)
+                ->where('destination_device_id', $device->id)
                 ->where('stream', $stream)
-                ->whereBetween('sequence', [$expected, $sequence])
-                ->count();
+                ->whereBetween('delivery_sequence', [$expected, $sequence])
+                ->orderBy('delivery_sequence')
+                ->lockForUpdate()
+                ->get();
 
-            if ($present !== ($sequence - $expected + 1)) {
+            if ($deliveries->count() !== ($sequence - $expected + 1)) {
                 throw ValidationException::withMessages([
-                    'sequence' => 'The acknowledgement would skip a pending mutation sequence.',
+                    'sequence' => 'The acknowledgement would skip a device delivery sequence.',
                 ]);
             }
 
-            SyncMutation::query()
-                ->where('business_id', $device->business_id)
-                ->where('stream', $stream)
-                ->whereBetween('sequence', [$expected, $sequence])
-                ->update([
+            $deliveries->each(function (SyncDelivery $delivery): void {
+                $delivery->update([
                     'status' => 'applied',
                     'applied_at' => now(),
+                    'attempts' => $delivery->attempts + 1,
+                    'last_error' => null,
                 ]);
+            });
 
             $cursor->update([
                 'last_acknowledged_sequence' => $sequence,
