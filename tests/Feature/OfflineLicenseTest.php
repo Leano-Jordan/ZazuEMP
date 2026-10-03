@@ -14,10 +14,11 @@ class OfflineLicenseTest extends TestCase
 
     public function test_a_business_can_have_a_local_license_without_any_online_service(): void
     {
-        $business = $this->signInAsOwner();
+        $user = $this->signInAsOwner();
+        $business = $user->businesses()->firstOrFail();
 
         $license = app(OfflineLicenseService::class)->issueLocalEntitlement(
-            $business = $business->fresh(),
+            $business,
             'solo',
             Carbon::parse('2026-10-01 00:00:00'),
             Carbon::parse('2026-10-31 23:59:59'),
@@ -33,7 +34,8 @@ class OfflineLicenseTest extends TestCase
 
     public function test_an_expired_local_license_is_not_valid(): void
     {
-        $business = $this->signInAsOwner();
+        $user = $this->signInAsOwner();
+        $business = $user->businesses()->firstOrFail();
 
         app(OfflineLicenseService::class)->issueLocalEntitlement(
             $business,

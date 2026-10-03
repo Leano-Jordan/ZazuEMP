@@ -140,7 +140,9 @@ class ZazuBackupCommand extends Command
             }
 
             foreach (File::allFiles($work) as $file) {
-                if (!$zip->addFile($file->getPathname(), $file->getRelativePathname())) {
+                $entryName = str_replace('\\', '/', $file->getRelativePathname());
+
+                if (!$zip->addFile($file->getPathname(), $entryName)) {
                     $zip->close();
                     $this->error('Could not add a file to the backup archive.');
                     return self::FAILURE;

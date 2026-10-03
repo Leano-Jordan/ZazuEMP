@@ -215,7 +215,7 @@ class OfflineSyncFoundationTest extends TestCase
         $protocol->acknowledgeThrough($device, 1);
 
         $this->assertSame('applied', SyncMutation::query()->where('sequence', 1)->first()->status);
-        $this->assertSame(1, SyncMutation::query()->where('sequence', 2)->first()->sequence);
+        $this->assertSame(2, SyncMutation::query()->where('sequence', 2)->first()->sequence);
 
         $this->expectException(\Illuminate\Validation\ValidationException::class);
 

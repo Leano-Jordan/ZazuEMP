@@ -631,7 +631,34 @@ Completed:
 
 Full-suite evidence:
 - `composer test` now runs 231 tests: 222 passed, 3 failed, 6 errored;
-- remaining failures/errors are in offline sync, offline license, and backup/restore tests and were not changed in this scoped correction;
-- local PHP still warns that `pdo_firebird` cannot be loaded, and PHPUnit reports the ineffective global `Throwable` import in `bootstrap/app.php`.
+- failures/errors were subsequently fingerprinted and corrected in the incident cycle below;
+- at that point, PHP warned that `pdo_firebird` could not be loaded and PHPUnit reported the ineffective global `Throwable` import in `bootstrap/app.php`; the repository warning was removed in the later cycle.
 
-Disposition: the parse blocker is resolved; unrelated suite failures and environment/bootstrap warnings remain untriaged.
+Disposition: the parse blocker was resolved; the remaining test failures were carried forward for root-cause correction in the incident cycle below.
+
+## Dashboard database incident and offline/restore regressions — 2026-10-03
+
+Target: restore local authenticated dashboard access and close the known offline and backup/restore regressions without weakening data or archive safeguards.
+
+Baseline: `main` at `9e6ff7cccf1c341b99bd7be767f714154d1ece81`; worktree was clean before this cycle.
+
+Completed:
+- traced DB-001 to `GET /dashboard` selecting `business_user.primary_niche` from a local SQLite database missing that column;
+- confirmed five additive repository migrations were pending, then applied them with `php artisan migrate --force --no-interaction`; no reset or data replacement;
+- corrected offline license tests to pass the `Business` required by the service;
+- aligned `SyncDevice` and `SyncMutation` model defaults with their database defaults so new Eloquent instances have valid active/pending state;
+- corrected the sync acknowledgement test to retain sequence 2 after acknowledging sequence 1;
+- normalized generated backup ZIP paths to `/`, preserving restore's rejection of ambiguous archive paths;
+- removed the stale call to the undefined `setupZazuBusinessSwitcher()` initializer, which stopped later shared UI initialization;
+- removed the ineffective global `Throwable` import warning from `bootstrap/app.php`.
+
+Verification:
+- all five pending migrations now report `Ran`; `business_user.primary_niche` is present;
+- authenticated browser rendered `Dashboard · Zazu Demo Catering` using the newly built Vite JavaScript asset;
+- focused offline, sync, backup/restore, accessibility and error handling tests: 33 passed, 190 assertions;
+- `composer test`: 231 passed, 1,318 assertions;
+- `npm run build`, changed PHP syntax checks and `git diff --check` passed.
+
+Remaining environment warning: PHP still emits a startup warning because `pdo_firebird` is configured but its extension DLL is absent. This is outside repository code and was not changed.
+
+Disposition: DB-001 and the reproduced offline/restore failures are closed locally. Deployment environments must apply pending migrations before serving the updated application. Persistent evidence: CASE-ZAZU-0001 through CASE-ZAZU-0003 in `FAILURE_CASES.md`.

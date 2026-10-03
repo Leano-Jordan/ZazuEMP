@@ -11,6 +11,11 @@ class SyncMutation extends Model
 {
     use BelongsToBusiness, HasFactory;
 
+    protected $attributes = [
+        'status' => 'pending',
+        'attempts' => 0,
+    ];
+
     protected $fillable = [
         'business_id',
         'sync_device_id',

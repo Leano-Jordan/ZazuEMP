@@ -12,6 +12,10 @@ class SyncDevice extends Model
 {
     use BelongsToBusiness, HasFactory;
 
+    protected $attributes = [
+        'status' => 'active',
+    ];
+
     protected $fillable = [
         'business_id',
         'installation_id',

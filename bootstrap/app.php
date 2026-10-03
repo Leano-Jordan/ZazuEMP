@@ -9,7 +9,6 @@ use Illuminate\Http\Request;
 use Illuminate\Http\Exceptions\ThrottleRequestsException;
 use Illuminate\Support\Str;
 use Symfony\Component\HttpFoundation\Response;
-use Throwable;
 
 return Application::configure(basePath: dirname(__DIR__))
     ->withRouting(

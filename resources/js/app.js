@@ -737,7 +737,6 @@ const initializeZazuUi = () => {
     setupZazuToasts();
     setupBrandingUploads();
     setupZazuHelper();
-    setupZazuBusinessSwitcher();
     setupZazuPrintButtons();
     setupZazuConfirmations();
     setupZazuFormSubmissionGuards();

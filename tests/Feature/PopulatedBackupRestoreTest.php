@@ -63,9 +63,14 @@ public function test_owner_backup_and_restore_round_trip_preserves_populated_bus
             File::put($privateProbe, 'changed after backup');
 
             $upload = UploadedFile::fake()->createWithContent('zazu-demo-backup.zip', File::get($archives[0]));
-            $this->post(route('settings.restore'), ['backup' => $upload])
-                ->assertRedirect(route('settings.index'))
-                ->assertSessionHas('success');
+            $response = $this->post(route('settings.restore'), ['backup' => $upload])
+                ->assertRedirect(route('settings.index'));
+
+            $this->assertSame(
+                'Backup restored successfully. Refresh Zazu if another browser tab was open during recovery.',
+                $response->getSession()->get('success'),
+                (string) $response->getSession()->get('error'),
+            );
 
             DB::purge('sqlite');
             $this->assertSame('Zazu Demo Catering', DB::table('businesses')->where('slug', 'zazu-demo-catering')->value('name'));
