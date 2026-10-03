@@ -50,6 +50,7 @@ class ZazuRestoreCommand extends Command
         $privateRollback = null;
         $privateActivated = false;
         $databaseRollback = null;
+        $driver = null;
 
         try {
             $prepared = $this->prepareArchive($archive, $work);
