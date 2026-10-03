@@ -3,7 +3,7 @@
 **Assessment date:** 2026-10-03
 **Repository:** `Leano-Jordan/ZazuEMP`
 **Branch:** `main`
-**Latest application-changing candidate observed after the visual/media hardening cycle:** `aa1e3ca8921625abca16fe4bbc8546746b4bf135` (bundled landing assets, light-theme hierarchy, and legacy remote-path rejection)
+**Latest application-changing candidate after the landing visual/media cycle:** `33ec396f69ddcf50b217f986611b5120e9a58d4d` (bundled stock photography, landing composition/nav refinement, offline precache, and regression coverage)
 **Application assessment baseline:** the canonical release checklist still records `52d9b26bc17ddee8d1427032ecaf2fb8fc0b6350` as the last application assessment candidate; later commits observed in this audit are primarily control/documentation changes and must not be treated as fresh application verification.
 
 ## 1. Executive health position
@@ -236,9 +236,11 @@ These are benchmarks, not certification claims. Zazu still needs actual test evi
 
 ## 10. Landing-page imagery
 
-The landing page now uses bundled assets from `public/images/landing/`, selected through `config/zazu.php`. The earlier runtime Pexels image dependency has been removed from the active landing-media path.
+The landing page now uses six real stock photographs vendored into `public/images/landing/stock/`. The active runtime path is repository-local; it no longer fetches landing photography from Pexels or another image host.
 
-**Audit position:** the runtime visual path is now self-contained for these landing assets. Any final production imagery still needs retained source/provenance evidence and separate review of depicted people, trademarks or brands where applicable.
+The temporary library covers reception/venue, catering, outdoor sound/stage, tent setup and decor. The files are optimized JPEGs and are included in the service worker's explicit precache list for offline-first rendering after service-worker installation.
+
+Pexels permits commercial website/app use under its license, but Pexels also notes separate rights considerations for people, trademarks, logos and brands. The current temporary library is therefore suitable for visual evaluation, not a final rights-clearance conclusion. urlPexels commercial-use guidancehttps://help.pexels.com/hc/en-us/articles/360042295214-Can-I-use-the-photos-and-videos-for-a-commercial-project
 
 
 ## 11. Feasibility
@@ -344,4 +346,6 @@ The next work should therefore be proof-heavy and release-controlled. More featu
 
 ## 16. Audit control update — 2026-10-03
 
-A subsequent visual/media hardening cycle changed the application candidate: landing assets are now bundled under `public/images/landing/`, legacy remote landing values are rejected, and the light theme/nav hierarchy was rebalanced without changing the dark theme. The application-changing candidate is `aa1e3ca8921625abca16fe4bbc8546746b4bf135`; later commits only reconcile Director records. No fresh runtime certification is inferred from these commits.
+The landing visual/media cycle changed the application candidate. Real stock photographs were downloaded from individually selected Pexels source URLs by a controlled GitHub Actions vendor job and committed under `public/images/landing/stock/`. The landing page was then tightened to reduce dead whitespace, enlarge the visual field, add service coverage, improve the public navigation hierarchy, and precache the images through the service worker.
+
+The current application candidate is `33ec396f69ddcf50b217f986611b5120e9a58d4d`. Fresh runtime certification is still not inferred from source-only inspection; the current-head workflows are the evidence gate.
