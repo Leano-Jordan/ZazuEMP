@@ -63,6 +63,14 @@ class ZazuRestoreCommand extends Command
                 return self::FAILURE;
             }
 
+            if (!$this->validateStagedDatabase($driver, $work)) {
+                return self::FAILURE;
+            }
+
+            if ($driver === 'mysql') {
+                $databaseRollback = $this->stageMysqlRollback();
+            }
+
             $privateRollback = $this->activatePrivateStorage($work, $hasPrivateStorage);
             $privateActivated = $hasPrivateStorage;
 
@@ -85,7 +93,7 @@ class ZazuRestoreCommand extends Command
             $this->info('Zazu restore completed from '.$archive);
             return self::SUCCESS;
         } catch (\Throwable $exception) {
-            $this->rollbackRestore($databaseRollback, $privateRollback, $privateActivated);
+            $this->rollbackRestore($driver ?? null, $databaseRollback, $privateRollback, $privateActivated);
             $this->error('Zazu restore failed safely: '.$exception->getMessage());
             return self::FAILURE;
         } finally {
@@ -428,10 +436,81 @@ class ZazuRestoreCommand extends Command
         $this->renameWithRetry($databaseRollback, $target);
     }
 
-    private function restoreMysql(string $work): void
+    private function validateStagedDatabase(string $driver, string $work): bool
+    {
+        if ($driver === 'sqlite') {
+            $path = $work.'/database.sqlite';
+
+            try {
+                $pdo = new \PDO('sqlite:'.$path);
+                $pdo->setAttribute(\PDO::ATTR_ERRMODE, \PDO::ERRMODE_EXCEPTION);
+                $result = $pdo->query('PRAGMA integrity_check')->fetchColumn();
+
+                if ($result !== 'ok') {
+                    $this->error('The backup SQLite database failed its integrity check.');
+                    return false;
+                }
+
+                return true;
+            } catch (\Throwable $exception) {
+                $this->error('The backup SQLite database could not be validated: '.$exception->getMessage());
+                return false;
+            }
+        }
+
+        if ($driver === 'mysql') {
+            $path = $work.'/database.sql';
+
+            if (!is_file($path) || filesize($path) === 0) {
+                $this->error('The MySQL backup dump is empty or unavailable.');
+                return false;
+            }
+
+            return true;
+        }
+
+        return false;
+    }
+
+    private function stageMysqlRollback(): string
     {
         $connection = config('database.connections.mysql');
-        $sql = $work.'/database.sql';
+        $rollback = storage_path('app/.zazu-mysql-rollback-'.Str::ulid().'.sql');
+
+        $process = new Process([
+            'mysqldump',
+            '--single-transaction',
+            '--routines',
+            '--triggers',
+            '--host='.$connection['host'],
+            '--port='.$connection['port'],
+            '--user='.$connection['username'],
+            $connection['database'],
+        ], null, array_filter(['MYSQL_PWD' => $connection['password'] ?? null]));
+
+        $process->setTimeout(300);
+        $process->run();
+
+        if (!$process->isSuccessful()) {
+            throw new \RuntimeException('Could not create the pre-restore MySQL rollback snapshot: '.$process->getErrorOutput());
+        }
+
+        if (File::put($rollback, $process->getOutput()) === false || !is_file($rollback) || filesize($rollback) === 0) {
+            File::delete($rollback);
+            throw new \RuntimeException('The pre-restore MySQL rollback snapshot was not created.');
+        }
+
+        return $rollback;
+    }
+
+    private function restoreMysql(string $work): void
+    {
+        $this->restoreMysqlDump(File::get($work.'/database.sql'), 'Database restore failed');
+    }
+
+    private function restoreMysqlDump(string $sql, string $failureMessage): void
+    {
+        $connection = config('database.connections.mysql');
 
         $process = new Process([
             'mysql',
@@ -442,26 +521,34 @@ class ZazuRestoreCommand extends Command
         ], null, array_filter(['MYSQL_PWD' => $connection['password'] ?? null]));
 
         $process->setTimeout(300);
-        $process->setInput(File::get($sql));
+        $process->setInput($sql);
         $process->run();
 
         if (!$process->isSuccessful()) {
-            throw new \RuntimeException('Database restore failed: '.$process->getErrorOutput());
+            throw new \RuntimeException($failureMessage.': '.$process->getErrorOutput());
         }
     }
 
-    private function rollbackRestore(?string $databaseRollback, ?string $privateRollback, bool $privateActivated): void
+    private function rollbackRestore(?string $driver, ?string $databaseRollback, ?string $privateRollback, bool $privateActivated): void
     {
         if ($databaseRollback !== null && is_file($databaseRollback)) {
-            $target = config('database.connections.sqlite.database');
-            DB::purge('sqlite');
-            gc_collect_cycles();
-            File::delete($target);
-            File::delete($target.'-wal');
-            File::delete($target.'-shm');
-            $this->renameWithRetry($databaseRollback.'-shm', $target.'-shm');
-            $this->renameWithRetry($databaseRollback.'-wal', $target.'-wal');
-            $this->renameWithRetry($databaseRollback, $target);
+            if ($driver === 'mysql') {
+                try {
+                    $this->restoreMysqlDump(File::get($databaseRollback), 'MySQL rollback restore failed');
+                } catch (\Throwable $exception) {
+                    $this->error('MySQL rollback could not be completed: '.$exception->getMessage());
+                }
+            } elseif ($driver === 'sqlite') {
+                $target = config('database.connections.sqlite.database');
+                DB::purge('sqlite');
+                gc_collect_cycles();
+                File::delete($target);
+                File::delete($target.'-wal');
+                File::delete($target.'-shm');
+                $this->renameWithRetry($databaseRollback.'-shm', $target.'-shm');
+                $this->renameWithRetry($databaseRollback.'-wal', $target.'-wal');
+                $this->renameWithRetry($databaseRollback, $target);
+            }
         }
 
         if ($privateActivated) {
