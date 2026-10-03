@@ -9,6 +9,7 @@ use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Str;
 use Illuminate\Database\QueryException;
+use App\Support\Offline\SyncMutationProtocol;
 use App\Support\Offline\SyncMutationRecorder;
 use Tests\TestCase;
 
@@ -157,6 +158,65 @@ class OfflineSyncFoundationTest extends TestCase
             'upsert',
             ['name' => 'Should not queue'],
         );
+    }
+
+
+    public function test_mutation_recorder_assigns_ordered_stream_sequences(): void
+    {
+        $business = Business::create([
+            'name' => 'Sequence Business',
+            'slug' => 'sequence-'.Str::lower(Str::random(8)),
+            'status' => 'active',
+            'currency' => 'ZAR',
+        ]);
+
+        $device = SyncDevice::create([
+            'business_id' => $business->id,
+            'installation_id' => (string) Str::uuid(),
+        ]);
+
+        $recorder = app(SyncMutationRecorder::class);
+
+        $first = $recorder->record($device, 'event', 'event-1', 'upsert', ['name' => 'First']);
+        $second = $recorder->record($device, 'event', 'event-2', 'upsert', ['name' => 'Second']);
+
+        $this->assertSame('business', $first->stream);
+        $this->assertSame(1, $first->sequence);
+        $this->assertSame(2, $second->sequence);
+    }
+
+    public function test_sync_protocol_pulls_in_order_and_acknowledges_without_skipping(): void
+    {
+        $business = Business::create([
+            'name' => 'Protocol Business',
+            'slug' => 'protocol-'.Str::lower(Str::random(8)),
+            'status' => 'active',
+            'currency' => 'ZAR',
+        ]);
+
+        $device = SyncDevice::create([
+            'business_id' => $business->id,
+            'installation_id' => (string) Str::uuid(),
+        ]);
+
+        $recorder = app(SyncMutationRecorder::class);
+        $recorder->record($device, 'event', 'event-1', 'upsert', ['name' => 'First']);
+        $recorder->record($device, 'event', 'event-2', 'upsert', ['name' => 'Second']);
+
+        $protocol = app(SyncMutationProtocol::class);
+        $batch = $protocol->pull($device);
+
+        $this->assertCount(2, $batch);
+        $this->assertSame([1, 2], $batch->pluck('sequence')->all());
+
+        $protocol->acknowledgeThrough($device, 1);
+
+        $this->assertSame('applied', SyncMutation::query()->where('sequence', 1)->first()->status);
+        $this->assertSame(1, SyncMutation::query()->where('sequence', 2)->first()->sequence);
+
+        $this->expectException(\Illuminate\Validation\ValidationException::class);
+
+        $protocol->acknowledgeThrough($device, 3);
     }
 
 }
