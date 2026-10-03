@@ -282,8 +282,8 @@
             setOpen(!nav.classList.contains('mobile-open'));
         });
         menu.addEventListener('click', (event) => {
-            const item = event.target.closest('a,button,summary');
-            if (item && !item.closest('.nav-solutions')) setOpen(false);
+            const item = event.target.closest('a,button');
+            if (item) setOpen(false);
         });
         document.addEventListener('click', (event) => {
             if (!nav.contains(event.target)) setOpen(false);
