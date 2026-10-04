@@ -990,8 +990,9 @@ Current source-level stylesheet state:
 - app.css: 7915 lines, 29 !important declarations.
 - zazu-responsive-theme.css: 523 lines, 3 !important declarations.
 - zazu-mobile-refinement.css: 735 lines, 7 !important declarations.
-- zazu-final-visual-sweep.css: 3978 lines, 7 !important declarations and zero root token blocks.
+- zazu-final-visual-sweep.css: 3927 lines, 7 !important declarations and zero root token blocks.
 - No exact selector duplication remains between the component extension stylesheet and the other three stylesheet files.
+- Removed six selectors found only in the former extension CSS: zazu-asset-manifest, zazu-dashboard-telemetry, zazu-report-grid, zazu-supplier-network, zazu-travel-register and zazu-workspace-online.
 
 Verification boundary:
 - changed files were re-read from GitHub after writes;
