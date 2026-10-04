@@ -47,3 +47,140 @@
 }
 .zazu-nav-area-trigger{letter-spacing:-.01em}
 @media (min-width:821px){.zazu-nav-area-trigger{min-height:44px;padding-inline:12px}.zazu-nav-flyout{width:220px}}
+
+/* DIRECTOR — dark-mode coherence for settings/forms and all shared surfaces */
+:root[data-theme="dark"] {
+    --zazu-card-bg: #10283F;
+    --zazu-card-border: #355879;
+    --zazu-canvas-bg: #0D1B2A;
+    --zazu-surface-card: #10283F;
+    --zazu-surface-canvas: #0D1B2A;
+    --zazu-surface: #10283F;
+    --zazu-surface-2: #152F4A;
+    --zazu-surface-3: #193A5C;
+    --zazu-field: #0C1B2B;
+    --zazu-ink: #E9F1F8;
+    --zazu-ink-2: #D2E0ED;
+    --zazu-muted: #B6CBE0;
+    --zazu-faint: #88A9C7;
+}
+
+:root[data-theme="dark"] .zazu-card,
+:root[data-theme="dark"] .zazu-panel,
+:root[data-theme="dark"] .zazu-form-section,
+:root[data-theme="dark"] .zazu-module,
+:root[data-theme="dark"] .zazu-metric-card,
+:root[data-theme="dark"] .zazu-document,
+:root[data-theme="dark"] .zazu-dash-commandbar,
+:root[data-theme="dark"] .zazu-dash-hero,
+:root[data-theme="dark"] .zazu-list {
+    background: #10283F;
+    color: #E9F1F8;
+    border-color: #355879;
+}
+
+:root[data-theme="dark"] .zazu-card-header,
+:root[data-theme="dark"] .zazu-panel-head,
+:root[data-theme="dark"] .zazu-form-section-head {
+    background: linear-gradient(180deg, #193A5C 0%, #10283F 100%);
+    color: #E9F1F8;
+    border-color: #355879;
+}
+
+:root[data-theme="dark"] .zazu-form-section-copy,
+:root[data-theme="dark"] .zazu-card-description,
+:root[data-theme="dark"] .zazu-panel-copy,
+:root[data-theme="dark"] .zazu-field-help {
+    color: #B6CBE0;
+}
+
+:root[data-theme="dark"] .zazu-label,
+:root[data-theme="dark"] .zazu-form .zazu-label,
+:root[data-theme="dark"] .zazu-form .zazu-field > span:first-child,
+:root[data-theme="dark"] .zazu-form label > span:first-child {
+    color: #D2E0ED !important;
+}
+
+:root[data-theme="dark"] .zazu-input,
+:root[data-theme="dark"] .zazu-select,
+:root[data-theme="dark"] .zazu-textarea,
+:root[data-theme="dark"] input,
+:root[data-theme="dark"] select,
+:root[data-theme="dark"] textarea {
+    background: #0C1B2B !important;
+    color: #E9F1F8 !important;
+    border-color: #5F88B0 !important;
+}
+
+:root[data-theme="dark"] .zazu-input::placeholder,
+:root[data-theme="dark"] .zazu-textarea::placeholder {
+    color: #88A9C7 !important;
+}
+
+:root[data-theme="dark"] .zazu-input:focus,
+:root[data-theme="dark"] .zazu-select:focus,
+:root[data-theme="dark"] .zazu-textarea:focus,
+:root[data-theme="dark"] input:focus,
+:root[data-theme="dark"] select:focus,
+:root[data-theme="dark"] textarea:focus {
+    background: #10283F !important;
+    border-color: #88A9C7 !important;
+    outline-color: rgba(136,169,199,.34);
+}
+
+:root[data-theme="dark"] .zazu-btn-secondary,
+:root[data-theme="dark"] .zazu-btn-ghost {
+    background: #152F4A !important;
+    color: #D2E0ED !important;
+    border-color: #5F88B0 !important;
+}
+
+:root[data-theme="dark"] .zazu-topbar,
+:root[data-theme="dark"] .zazu-brand {
+    background: rgba(17,41,68,.96);
+    border-color: #355879;
+}
+
+:root[data-theme="dark"] .zazu-sidebar {
+    background: linear-gradient(180deg, #112944 0%, #0D2236 100%);
+}
+
+:root[data-theme="dark"] .zazu-command-band {
+    background: linear-gradient(135deg, #173A5C 0%, #14334F 58%, #10283F 100%);
+}
+
+:root[data-theme="dark"] .zazu-dash-hero {
+    background: linear-gradient(120deg, #173A5C 0%, #14334F 52%, #10283F 100%);
+}
+
+:root[data-theme="dark"] .zazu-dash-hero-side,
+:root[data-theme="dark"] .zazu-dash-commandbar {
+    background: #152F4A;
+}
+
+:root[data-theme="dark"] .zazu-nav-flyout {
+    background: #132F49 !important;
+    border-color: #355879;
+}
+
+:root[data-theme="dark"] .zazu-calendar-toolbar,
+:root[data-theme="dark"] .zazu-calendar-cell,
+:root[data-theme="dark"] .zazu-calendar-mini-month,
+:root[data-theme="dark"] .zazu-calendar-agenda-event,
+:root[data-theme="dark"] .zazu-calendar-event {
+    background-color: #10283F;
+    color: #E9F1F8;
+}
+
+:root[data-theme="dark"] .zazu-calendar-event,
+:root[data-theme="dark"] .zazu-calendar-agenda-event {
+    border-color: #355879;
+}
+
+@media (max-width: 700px) {
+    :root[data-theme="dark"] .zazu-list-item,
+    :root[data-theme="dark"] .zazu-assets-directory .zazu-list-item,
+    :root[data-theme="dark"] .zazu-inventory-directory .zazu-list-item {
+        background: #10283F;
+    }
+}
