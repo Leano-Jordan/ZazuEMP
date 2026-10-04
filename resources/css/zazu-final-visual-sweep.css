@@ -714,7 +714,7 @@ width:100%;justify-items:start;align-items:flex-start
 }
 
 .zazu-chip-success {
-border-color:color-mix(in srgb,#16A34A 24%,var(--zazu-card-border));background:color-mix(in srgb,#DCFCE7 70%,var(--zazu-card-bg));color:#166534
+border-color:color-mix(in srgb,#16A34A 24%,var(--zazu-card-border));background:color-mix(in srgb,#DCFCE7 70%,var(--zazu-card-bg));color:var(--zazu-success-ink)
 }
 
 .zazu-chip-warning {
@@ -1071,7 +1071,7 @@ width:6px;height:6px;border-radius:50%;background:#16A34A
 }
 
 .zazu-dash-side-line b {
-margin-left:auto;color:#166534;font-size:7px
+margin-left:auto;color:var(--zazu-success-ink);font-size:7px
 }
 
 .zazu-dash-grid {
@@ -1993,7 +1993,7 @@ border-bottom: 0;
 }
 
 .zazu-form-control {
-background: #FFFFFF;
+background: var(--zazu-surface);
     border: 1px solid var(--zazu-border-strong);
     color: var(--zazu-ink);
     box-shadow: inset 0 1px 2px rgba(15,23,42,.04);
@@ -2273,7 +2273,7 @@ color: #4D6B8B;
 :root:not([data-theme="dark"]) .zazu-dash-surface,
 :root:not([data-theme="dark"]) .zazu-dash-commandbar {
 border-color: #BFD3EC;
-    background-color: #FFFFFF;
+    background-color: var(--zazu-surface);
     box-shadow: 0 2px 8px rgba(31, 76, 132, .06);
 }
 
@@ -2291,7 +2291,7 @@ border-color: #D0DDF0;
 }
 
 :root:not([data-theme="dark"]) .zazu-dash-metric {
-background: #FFFFFF;
+background: var(--zazu-surface);
     box-shadow: 0 1px 4px rgba(31, 76, 132, .04);
 }
 
@@ -2302,7 +2302,7 @@ border-color: #83B1EA;
 }
 
 :root:not([data-theme="dark"]) .zazu-dash-hero {
-background: linear-gradient(120deg, #FFFFFF 0%, #FFFFFF 55%, #EAF3FF 100%);
+background: linear-gradient(120deg, var(--zazu-surface) 0%, var(--zazu-surface) 55%, #EAF3FF 100%);
 }
 
 :root:not([data-theme="dark"]) .zazu-dash-hero-side {
@@ -2315,7 +2315,7 @@ border-top-color: #C9D9EE;
 }
 
 :root:not([data-theme="dark"]) .zazu-dash-commandbar {
-background: #FFFFFF;
+background: var(--zazu-surface);
 }
 
 :root:not([data-theme="dark"]) .zazu-dash-status {
@@ -2554,7 +2554,7 @@ border-bottom: 0;
 :root:not([data-theme="dark"]) .zazu-mobile-links {
 border: 1px solid #BFD3EC;
         border-top: 0;
-        background: #FFFFFF;
+        background: var(--zazu-surface);
 }
 }
 
@@ -2570,36 +2570,36 @@ white-space: normal;
 }
 
 :root:not([data-theme="dark"]) .zazu-footer-workspace {
-border-bottom-color: #CCD1DE;
+border-bottom-color: var(--zazu-border);
 }
 
 :root:not([data-theme="dark"]) .zazu-footer-workspace-label,
 :root:not([data-theme="dark"]) .zazu-user-kicker {
-color: #5E687F;
+color: var(--zazu-faint);
 }
 
 :root:not([data-theme="dark"]) .zazu-footer-workspace strong,
 :root:not([data-theme="dark"]) .zazu-user-workspace-name {
-color: #191D31;
+color: var(--zazu-ink);
 }
 
 :root:not([data-theme="dark"]) .zazu-footer-workspace > span:last-child,
 :root:not([data-theme="dark"]) .zazu-user-menu-link small {
-color: #566078;
+color: var(--zazu-muted);
 }
 
 :root:not([data-theme="dark"]) .zazu-user-role {
-color: #3949E8;
+color: var(--zazu-primary);
 }
 
 :root:not([data-theme="dark"]) .zazu-user-menu-link {
-color: #2D3650;
+color: var(--zazu-ink-2);
 }
 
 :root:not([data-theme="dark"]) .zazu-user-menu-link:hover {
-background: #EEF0FF;
-    border-left-color: #3949E8;
-    color: #252E9E;
+background: var(--zazu-primary-soft);
+    border-left-color: var(--zazu-primary);
+    color: var(--zazu-primary-deep);
 }
 
 :root:not([data-theme="dark"]) .zazu-command-meta-label,
@@ -2607,28 +2607,28 @@ background: #EEF0FF;
 :root:not([data-theme="dark"]) .zazu-side-secondary,
 :root:not([data-theme="dark"]) .zazu-dashboard-helper-copy,
 :root:not([data-theme="dark"]) .zazu-page-context {
-color: #566078;
+color: var(--zazu-muted);
 }
 
 :root:not([data-theme="dark"]) .zazu-document-title {
-color: #191D31;
+color: var(--zazu-ink);
 }
 
 :root:not([data-theme="dark"]) .zazu-document-muted {
-color: #566078;
+color: var(--zazu-muted);
 }
 
 :root:not([data-theme="dark"]) .zazu-chip-info,
 :root:not([data-theme="dark"]) .zazu-chip-accent {
-border-color: #C7C2FF;
-    background: #F0EEFF;
-    color: #3B348F;
+border-color: var(--zazu-info);
+    background: var(--zazu-info-soft);
+    color: var(--zazu-info-ink);
 }
 
 :root:not([data-theme="dark"]) .zazu-chip-success {
 border-color: #B9DEC8;
     background: #E8F6EE;
-    color: #166534;
+    color: var(--zazu-success-ink);
 }
 
 :root:not([data-theme="dark"]) .zazu-chip-warning {
@@ -2665,13 +2665,13 @@ border-color: #E4C77B;
 .zazu-dash-status.status-confirmed {
 border-color: #B9DEC8;
     background: #E8F6EE;
-    color: #166534;
+    color: var(--zazu-success-ink);
 }
 
 .zazu-dash-status.status-in-progress {
-border-color: #C7C2FF;
-    background: #F0EEFF;
-    color: #3B348F;
+border-color: var(--zazu-info);
+    background: var(--zazu-info-soft);
+    color: var(--zazu-info-ink);
 }
 
 .zazu-dash-status.status-completed {
@@ -2697,7 +2697,7 @@ background: #FFF4D6;
 
 .zazu-dash-queue-state.is-clear {
 background: #E8F6EE;
-    color: #166534;
+    color: var(--zazu-success-ink);
     border-color: #B9DEC8;
 }
 
@@ -2731,8 +2731,8 @@ transition: none !important;
 }
 
 :root:not([data-theme="dark"]) .zazu-dash-status.status-in-progress {
-background: #F0EEFF;
-    color: #3B348F;
+background: var(--zazu-info-soft);
+    color: var(--zazu-info-ink);
 }
 
 :root:not([data-theme="dark"]) .zazu-dash-focus-item.is-info .zazu-dash-focus-marker {
@@ -2888,30 +2888,30 @@ min-width: 0;
 }
 
 :root:not([data-theme="dark"]) .zazu-chip-accent {
-border-color: #A9D8D3;
-    background: #E7F8F6;
-    color: #006D68;
+border-color: var(--zazu-accent);
+    background: var(--zazu-accent-soft);
+    color: var(--zazu-accent-ink);
 }
 
 :root:not([data-theme="dark"]) .zazu-chip-info {
-border-color: #C7C2FF;
-    background: #F0EEFF;
-    color: #3B348F;
+border-color: var(--zazu-info);
+    background: var(--zazu-info-soft);
+    color: var(--zazu-info-ink);
 }
 
 :root:not([data-theme="dark"]) .zazu-form-control {
-background: #FFFFFF;
-    color: #191D31;
-    border-color: #9EA7BC;
+background: var(--zazu-surface);
+    color: var(--zazu-ink);
+    border-color: var(--zazu-border-strong);
 }
 
 :root:not([data-theme="dark"]) .zazu-status-active {
-color: #166534;
+color: var(--zazu-success-ink);
     font-weight: 800;
 }
 
 :root:not([data-theme="dark"]) .zazu-status-muted {
-color: #566078;
+color: var(--zazu-muted);
 }
 
 :root[data-theme="dark"] .zazu-chip-neutral {
