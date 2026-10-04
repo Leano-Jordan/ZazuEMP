@@ -1023,3 +1023,33 @@ Verification:
 
 Current visual state: IMPLEMENTED / VISUAL UNVERIFIED.
 Next target: actual browser render + human-eye comparison of Dashboard, Work, Forms and Calendar in desktop/mobile and light/dark before further broad visual changes.
+
+
+## Director commercial UI harmonization — 2026-10-04
+
+Objective: stop treating typography, palette, spacing and sizing as isolated fixes and establish one coherent Zazu application rhythm.
+
+Completed on `main`:
+- canonical application font/token scale established in `resources/css/app.css`;
+- stale @theme blue values aligned to the canonical Zazu blue family;
+- 14px body / 11px metadata / 13px nav / 24px page-title hierarchy introduced;
+- 8px-based spacing rhythm plus controlled micro steps introduced;
+- application shape scale normalised to 6/8/10px;
+- 240px sidebar / 64px topbar / 1320px content measure alignment established;
+- dashboard and calendar microtype raised out of sub-10px territory;
+- dashboard KPI and operational values use UI type + tabular numerics; mono retained for references/identifiers;
+- semantic state colours consolidated toward shared success/warning/danger/info tokens;
+- mobile content, tabs and action targets refined for touch-safe cross-device use;
+- reference collection explicitly treated as design evidence.
+
+Research basis recorded:
+- repository reference collection and prior visual baseline;
+- Atlassian 8px spacing/token system;
+- Carbon productive UI typography/spacing guidance;
+- current commercial SaaS density/responsive patterns.
+
+Verification:
+- source files re-fetched from GitHub after writes;
+- no <=9px font declarations remain in the four application stylesheets;
+- no root token system exists in final visual sweep;
+- visual state remains IMPLEMENTED / VISUAL UNVERIFIED pending a real browser render.
