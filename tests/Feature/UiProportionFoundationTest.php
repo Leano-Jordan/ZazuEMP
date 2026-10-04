@@ -14,7 +14,7 @@ class UiProportionFoundationTest extends TestCase
         $this->assertStringContainsString('--zazu-primary: #5592FC;', $css);
         $this->assertStringContainsString('--zazu-primary-soft: #D5E3F7;', $css);
         $this->assertStringContainsString('--zazu-primary-deep: #416AD7;', $css);
-        $this->assertStringContainsString('--zazu-page: #395886;', $css);
+        $this->assertStringContainsString('--zazu-page: #E7EFF7;', $css);
         $this->assertStringContainsString('--zazu-ui-control-height: 44px;', $css);
         $this->assertStringContainsString('--zazu-content-max: 1320px;', $css);
         $this->assertStringContainsString('--zazu-ui-radius: 10px;', $css);
@@ -29,7 +29,7 @@ class UiProportionFoundationTest extends TestCase
         $this->assertStringContainsString('    font-size: 13.5px;', $css);
         $this->assertStringContainsString('    min-height: 44px;', $css);
         $this->assertStringContainsString('.zazu-section-tabs {', $css);
-        $this->assertStringContainsString('    padding: 4px;', $css);
+        $this->assertStringContainsString('    padding: 3px;', $css);
         $this->assertStringContainsString('.zazu-btn-primary {', $css);
         $this->assertStringContainsString('    background: var(--zazu-primary);', $css);
     }
@@ -43,4 +43,14 @@ class UiProportionFoundationTest extends TestCase
         $this->assertStringContainsString('    width: 100%;', $css);
         $this->assertStringContainsString('    max-width: none;', $css);
     }
+    public function test_forms_keep_fields_flat_inside_a_single_surface(): void
+    {
+        $css = file_get_contents(resource_path('css/zazu-final-visual-sweep.css'));
+
+        $this->assertIsString($css);
+        $this->assertStringContainsString('.zazu-form-section .zazu-field {', $css);
+        $this->assertStringContainsString('    background: transparent;', $css);
+        $this->assertStringContainsString('    box-shadow: none;', $css);
+    }
+
 }
