@@ -264,8 +264,7 @@ class ZazuRestoreCommand extends Command
         }
 
         $size = (int) ($stat['size'] ?? 0);
-        if ($size < 0 || $size > self::MAX_UNCOMPRESSED_BYTES || $uncompressedBytes > self::MAX_UNCOMPRESSED_BYTES - $size) {
-            $this->error('The backup archive is too large to restore safely.');
+        if (!$this->validateEntrySize($size, $uncompressedBytes)) {
             return null;
         }
         $uncompressedBytes += $size;
@@ -290,6 +289,16 @@ class ZazuRestoreCommand extends Command
         }
 
         $seen[$normalized] = true;
+
+        return true;
+    }
+
+    private function validateEntrySize(int $size, int $uncompressedBytes): bool
+    {
+        if ($size < 0 || $size > self::MAX_UNCOMPRESSED_BYTES || $uncompressedBytes > self::MAX_UNCOMPRESSED_BYTES - $size) {
+            $this->error('The backup archive is too large to restore safely.');
+            return false;
+        }
 
         return true;
     }
