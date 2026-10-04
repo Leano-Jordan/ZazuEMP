@@ -17,7 +17,24 @@
                         <x-profile-avatar :name="$customer->name" :path="$customer->profile_photo_path" media-type="customer" :media-id="$customer->id" size="lg" />
                         <label class="zazu-field min-w-60 flex-1"><span class="zazu-label">Customer name <span class="zazu-required">*</span></span><input name="name" value="{{ old('name', $customer->name) }}" required class="zazu-input">@error('name')<span class="zazu-field-error">{{ $message }}</span>@enderror</label>
                     </div>
-                    <div class="mt-5 grid gap-4">
+                    
+                </section>
+
+<section class="zazu-form-section">
+                    <div class="zazu-form-section-head"><div class="zazu-form-section-title">Primary contact</div><div class="zazu-form-section-copy">Update the default customer contact used when new Work records inherit relationship details.</div></div>
+                    <div class="zazu-form-grid">
+                        <label class="zazu-field"><span class="zazu-label">Contact name <span class="zazu-required">*</span></span><input name="primary_contact_name" value="{{ old('primary_contact_name', $customer->primaryContact?->name) }}" required class="zazu-input">@error('primary_contact_name')<span class="zazu-field-error">{{ $message }}</span>@enderror</label>
+                        <label class="zazu-field"><span class="zazu-label">Phone</span><input type="tel" name="primary_contact_phone" value="{{ old('primary_contact_phone', $customer->primaryContact?->phone) }}" class="zazu-input" autocomplete="tel"></label>
+                        <label class="zazu-field zazu-field-wide"><span class="zazu-label">Email</span><input type="email" name="primary_contact_email" value="{{ old('primary_contact_email', $customer->primaryContact?->email) }}" autocomplete="email" class="zazu-input">@error('primary_contact_email')<span class="zazu-field-error">{{ $message }}</span>@enderror</label>
+                    </div>
+                </section>
+
+<section class="zazu-form-section">
+                    <div class="zazu-form-section-head">
+                        <div class="zazu-form-section-title">Business &amp; billing details</div>
+                        <div class="zazu-form-section-copy">Legal, billing and tax details used when the customer is represented in commercial documents.</div>
+                    </div>
+<div class="mt-5 grid gap-4">
                         <div class="zazu-form-grid">
                             <label class="zazu-field"><span class="zazu-label">Legal / billing name</span><input name="legal_name" value="{{ old('legal_name', $customer->legal_name) }}" class="zazu-input"></label>
                             <label class="zazu-field"><span class="zazu-label">Registration number</span><input name="registration_number" value="{{ old('registration_number', $customer->registration_number) }}" class="zazu-input"></label>
@@ -31,15 +48,7 @@
                         @endif
                         <label class="zazu-field"><span class="zazu-label">Notes</span><textarea name="notes" rows="5" class="zazu-textarea">{{ old('notes', $customer->notes) }}</textarea></label>
                     </div>
-                </section>
-
-                <section class="zazu-form-section">
-                    <div class="zazu-form-section-head"><div class="zazu-form-section-title">Primary contact</div><div class="zazu-form-section-copy">Update the default customer contact used when new Work records inherit relationship details.</div></div>
-                    <div class="zazu-form-grid">
-                        <label class="zazu-field"><span class="zazu-label">Contact name <span class="zazu-required">*</span></span><input name="primary_contact_name" value="{{ old('primary_contact_name', $customer->primaryContact?->name) }}" required class="zazu-input">@error('primary_contact_name')<span class="zazu-field-error">{{ $message }}</span>@enderror</label>
-                        <label class="zazu-field"><span class="zazu-label">Phone</span><input type="tel" name="primary_contact_phone" value="{{ old('primary_contact_phone', $customer->primaryContact?->phone) }}" class="zazu-input" autocomplete="tel"></label>
-                        <label class="zazu-field zazu-field-wide"><span class="zazu-label">Email</span><input type="email" name="primary_contact_email" value="{{ old('primary_contact_email', $customer->primaryContact?->email) }}" autocomplete="email" class="zazu-input">@error('primary_contact_email')<span class="zazu-field-error">{{ $message }}</span>@enderror</label>
-                    </div>
+                
                 </section>
 
                 <div class="zazu-actionbar zazu-actionbar-sticky"><a href="{{ route('customers.show', $customer) }}" class="zazu-btn zazu-btn-ghost">Cancel</a><button class="zazu-btn zazu-btn-primary">Save changes</button></div>
