@@ -21,6 +21,8 @@ class SyncMutation extends Model
         'sync_device_id',
         'stream',
         'sequence',
+        'stream',
+        'sequence',
         'mutation_id',
         'entity_type',
         'entity_id',
