@@ -1,6 +1,6 @@
 <x-app-layout>
     <x-slot:title>Dashboard</x-slot:title>
-    <x-slot:heading>Command Centre</x-slot:heading>
+    <x-slot:heading>Dashboard</x-slot:heading>
 
     @if ($isOwner && (! $business?->catalogue_setup_completed_at || ! $business?->business_setup_completed_at))
         <section class="zazu-dash-setup">
