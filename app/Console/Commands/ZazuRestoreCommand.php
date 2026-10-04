@@ -26,15 +26,7 @@ class ZazuRestoreCommand extends Command
 
     public function handle(): int
     {
-        if (!class_exists(ZipArchive::class)) {
-            $this->error('The PHP Zip extension is required for Zazu restores.');
-            return self::FAILURE;
-        }
-
-        $archive = $this->argument('archive');
-
-        if (!is_file($archive) || !is_readable($archive)) {
-            $this->error('Backup archive was not found or cannot be read.');
+        if (!$this->validateRestoreRequest()) {
             return self::FAILURE;
         }
 
@@ -42,72 +34,115 @@ class ZazuRestoreCommand extends Command
             return self::SUCCESS;
         }
 
+        $archive = $this->argument('archive');
         $work = storage_path(
             'app/.zazu-restore-'.now()->format('Ymd_His').'_' . Str::lower((string) Str::ulid())
         );
         File::ensureDirectoryExists($work);
 
-        $privateRollback = null;
-        $privateActivated = false;
-        $databaseRollback = null;
-        $driver = null;
-
         try {
-            $prepared = $this->prepareArchive($archive, $work);
-            if ($prepared === null) {
-                return self::FAILURE;
-            }
-
-            [$driver, $hasPrivateStorage] = $prepared;
-
-            if (!$this->prepareDatabaseTarget($driver, $work)) {
-                return self::FAILURE;
-            }
-
-            if (!$this->validateStagedDatabase($driver, $work)) {
-                return self::FAILURE;
-            }
-
-            if ($driver === 'mysql') {
-                $databaseRollback = $this->stageMysqlRollback();
-            }
-
-            $privateRollback = $this->activatePrivateStorage($work, $hasPrivateStorage);
-            $privateActivated = $hasPrivateStorage;
-
-            if ($driver === 'sqlite') {
-                $databaseRollback = $this->restoreSqlite($work);
-            } elseif ($driver === 'mysql') {
-                $this->restoreMysql($work);
-            }
-
-            if ($databaseRollback !== null) {
-                File::delete($databaseRollback);
-                $databaseRollback = null;
-            }
-
-            if ($privateRollback !== null) {
-                File::deleteDirectory($privateRollback);
-                $privateRollback = null;
-            }
-
-            $this->info('Zazu restore completed from '.$archive);
-            return self::SUCCESS;
-        } catch (\Throwable $exception) {
-            $this->rollbackRestore($driver ?? null, $databaseRollback, $privateRollback, $privateActivated);
+            return $this->executeRestore($archive, $work);
+        } catch (\\Throwable $exception) {
             $this->error('Zazu restore failed safely: '.$exception->getMessage());
             return self::FAILURE;
         } finally {
-            File::deleteDirectory($work);
-
-            if ($databaseRollback !== null) {
-                File::delete($databaseRollback);
-            }
-
-            if ($privateRollback !== null) {
-                File::deleteDirectory($privateRollback);
-            }
+            $this->cleanupRestoreWorkspace($work);
         }
+    }
+
+    private function validateRestoreRequest(): bool
+    {
+        if (!class_exists(ZipArchive::class)) {
+            $this->error('The PHP Zip extension is required for Zazu restores.');
+            return false;
+        }
+
+        $archive = $this->argument('archive');
+
+        if (!is_file($archive) || !is_readable($archive)) {
+            $this->error('Backup archive was not found or cannot be read.');
+            return false;
+        }
+
+        return true;
+    }
+
+    private function executeRestore(string $archive, string $work): int
+    {
+        $prepared = $this->prepareArchive($archive, $work);
+        if ($prepared === null) {
+            return self::FAILURE;
+        }
+
+        [$driver, $hasPrivateStorage] = $prepared;
+
+        if (!$this->prepareDatabaseTarget($driver, $work) || !$this->validateStagedDatabase($driver, $work)) {
+            return self::FAILURE;
+        }
+
+        $databaseRollback = $driver === 'mysql' ? $this->stageMysqlRollback() : null;
+        $privateRollback = null;
+        $privateActivated = false;
+
+        try {
+            $privateRollback = $this->activatePrivateStorage($work, $hasPrivateStorage);
+            $privateActivated = $hasPrivateStorage;
+
+            $databaseRollback = $this->restoreDatabase($driver, $work, $databaseRollback);
+
+            $this->completeRestore($databaseRollback, $privateRollback);
+            $databaseRollback = null;
+            $privateRollback = null;
+
+            $this->info('Zazu restore completed from '.$archive);
+            return self::SUCCESS;
+        } catch (\\Throwable $exception) {
+            $this->rollbackRestore($driver, $databaseRollback, $privateRollback, $privateActivated);
+            throw $exception;
+        } finally {
+            $this->cleanupRestoreArtifacts($databaseRollback, $privateRollback);
+        }
+    }
+
+    private function restoreDatabase(string $driver, string $work, ?string $databaseRollback): ?string
+    {
+        if ($driver === 'sqlite') {
+            return $this->restoreSqlite($work);
+        }
+
+        if ($driver === 'mysql') {
+            $this->restoreMysql($work);
+            return $databaseRollback;
+        }
+
+        throw new \\LogicException('Unsupported restore database driver.');
+    }
+
+    private function completeRestore(?string $databaseRollback, ?string $privateRollback): void
+    {
+        if ($databaseRollback !== null) {
+            File::delete($databaseRollback);
+        }
+
+        if ($privateRollback !== null) {
+            File::deleteDirectory($privateRollback);
+        }
+    }
+
+    private function cleanupRestoreArtifacts(?string $databaseRollback, ?string $privateRollback): void
+    {
+        if ($databaseRollback !== null) {
+            File::delete($databaseRollback);
+        }
+
+        if ($privateRollback !== null) {
+            File::deleteDirectory($privateRollback);
+        }
+    }
+
+    private function cleanupRestoreWorkspace(string $work): void
+    {
+        File::deleteDirectory($work);
     }
 
     private function prepareArchive(string $archive, string $work): ?array
@@ -120,43 +155,57 @@ class ZazuRestoreCommand extends Command
         }
 
         try {
-            $manifest = $this->readManifest($zip);
-            if ($manifest === null || !$this->validateManifest($manifest)) {
-                return null;
-            }
-
-            $driver = config('database.default');
-            if (($manifest['database_driver'] ?? null) !== $driver) {
-                $this->error('The backup database driver does not match the current Zazu database configuration.');
-                return null;
-            }
-
-            $databaseEntry = $driver === 'sqlite' ? 'database.sqlite' : 'database.sql';
-            $hasPrivateStorage = $this->validateEntries($zip, $databaseEntry);
-
-            if ($hasPrivateStorage === null) {
-                return null;
-            }
-
-            if ($zip->locateName($databaseEntry) === false) {
-                $this->error('The backup database is missing.');
-                return null;
-            }
-
-            if (!$zip->extractTo($work)) {
-                $this->error('Could not extract the verified backup archive.');
-                return null;
-            }
-
-            if (!is_file($work.'/manifest.json')) {
-                $this->error('The extracted backup manifest is missing.');
-                return null;
-            }
-
-            return [$driver, $hasPrivateStorage];
+            return $this->prepareOpenedArchive($zip, $work);
         } finally {
             $zip->close();
         }
+    }
+
+    private function prepareOpenedArchive(ZipArchive $zip, string $work): ?array
+    {
+        $manifest = $this->readManifest($zip);
+        if ($manifest === null || !$this->validateManifest($manifest)) {
+            return null;
+        }
+
+        $driver = config('database.default');
+        if (($manifest['database_driver'] ?? null) !== $driver) {
+            $this->error('The backup database driver does not match the current Zazu database configuration.');
+            return null;
+        }
+
+        $databaseEntry = $driver === 'sqlite' ? 'database.sqlite' : 'database.sql';
+        $hasPrivateStorage = $this->validateEntries($zip, $databaseEntry);
+
+        if ($hasPrivateStorage === null) {
+            return null;
+        }
+
+        if ($zip->locateName($databaseEntry) === false) {
+            $this->error('The backup database is missing.');
+            return null;
+        }
+
+        if (!$this->extractVerifiedArchive($zip, $work)) {
+            return null;
+        }
+
+        return [$driver, $hasPrivateStorage];
+    }
+
+    private function extractVerifiedArchive(ZipArchive $zip, string $work): bool
+    {
+        if (!$zip->extractTo($work)) {
+            $this->error('Could not extract the verified backup archive.');
+            return false;
+        }
+
+        if (!is_file($work.'/manifest.json')) {
+            $this->error('The extracted backup manifest is missing.');
+            return false;
+        }
+
+        return true;
     }
 
     private function readManifest(ZipArchive $zip): ?array
@@ -203,52 +252,74 @@ class ZazuRestoreCommand extends Command
 
     private function validateEntries(ZipArchive $zip, string $databaseEntry): ?bool
     {
-        $privateEntryPrefix = 'storage/private/';
         $hasPrivateStorage = false;
         $seen = [];
         $uncompressedBytes = 0;
 
         for ($index = 0; $index < $zip->numFiles; $index++) {
-            $name = $zip->getNameIndex($index);
-            $stat = $zip->statIndex($index);
+            $result = $this->validateEntry($zip, $index, $databaseEntry, $seen, $uncompressedBytes);
 
-            if (!$this->validateEntryMetadata($name, $stat)) {
+            if ($result === null) {
                 return null;
             }
 
-            $normalized = ltrim($name, '/');
-            if (!$this->validateEntryPath($name, $normalized)) {
-                return null;
-            }
-
-            if (isset($seen[$normalized])) {
-                $this->error('The backup archive contains duplicate entries.');
-                return null;
-            }
-            $seen[$normalized] = true;
-
-            $size = (int) ($stat['size'] ?? 0);
-            if ($size < 0 || $size > self::MAX_UNCOMPRESSED_BYTES || $uncompressedBytes > self::MAX_UNCOMPRESSED_BYTES - $size) {
-                $this->error('The backup archive is too large to restore safely.');
-                return null;
-            }
-            $uncompressedBytes += $size;
-
-            if (!$this->validateEntryType($name, $databaseEntry, $privateEntryPrefix)) {
-                return null;
-            }
-
-            if (str_starts_with($name, $privateEntryPrefix) && !str_ends_with($name, '/')) {
-                $hasPrivateStorage = true;
-            }
-
-            if ($this->containsSymbolicLink($zip, $index)) {
-                $this->error('The backup contains a symbolic link and cannot be restored safely.');
-                return null;
-            }
+            $hasPrivateStorage = $hasPrivateStorage || $result;
         }
 
         return $hasPrivateStorage;
+    }
+
+    private function validateEntry(
+        ZipArchive $zip,
+        int $index,
+        string $databaseEntry,
+        array &$seen,
+        int &$uncompressedBytes
+    ): ?bool {
+        $name = $zip->getNameIndex($index);
+        $stat = $zip->statIndex($index);
+
+        if (!$this->validateEntryMetadata($name, $stat)) {
+            return null;
+        }
+
+        $normalized = ltrim($name, '/');
+        if (!$this->validateEntryPath($name, $normalized)) {
+            return null;
+        }
+
+        if (isset($seen[$normalized])) {
+            $this->error('The backup archive contains duplicate entries.');
+            return null;
+        }
+        $seen[$normalized] = true;
+
+        $size = (int) ($stat['size'] ?? 0);
+        if (!$this->validateEntrySize($size, $uncompressedBytes)) {
+            return null;
+        }
+        $uncompressedBytes += $size;
+
+        if (!$this->validateEntryType($name, $databaseEntry, 'storage/private/')) {
+            return null;
+        }
+
+        if ($this->containsSymbolicLink($zip, $index)) {
+            $this->error('The backup contains a symbolic link and cannot be restored safely.');
+            return null;
+        }
+
+        return str_starts_with($name, 'storage/private/') && !str_ends_with($name, '/');
+    }
+
+    private function validateEntrySize(int $size, int $uncompressedBytes): bool
+    {
+        if ($size < 0 || $size > self::MAX_UNCOMPRESSED_BYTES || $uncompressedBytes > self::MAX_UNCOMPRESSED_BYTES - $size) {
+            $this->error('The backup archive is too large to restore safely.');
+            return false;
+        }
+
+        return true;
     }
 
     private function validateEntryMetadata(string|false $name, array|false $stat): bool
@@ -268,24 +339,36 @@ class ZazuRestoreCommand extends Command
 
     private function validateEntryPath(string $name, string $normalized): bool
     {
-        $parts = explode('/', $normalized);
-
-        if (
-            $normalized !== $name
-            || $name === ''
-            || str_starts_with($name, '/')
-            || (strlen($name) >= 3
-                && ctype_alpha($name[0])
-                && $name[1] === ':'
-                && ($name[2] === '/' || $name[2] === '\\'))
-            || in_array('..', $parts, true)
-            || (in_array('', $parts, true) && !str_ends_with($name, '/'))
-        ) {
+        if ($this->hasUnsafeEntryPathShape($name, $normalized)) {
             $this->error('The backup archive contains an unsafe path.');
             return false;
         }
 
         return true;
+    }
+
+    private function hasUnsafeEntryPathShape(string $name, string $normalized): bool
+    {
+        if ($normalized !== $name || $name === '' || str_starts_with($name, '/')) {
+            return true;
+        }
+
+        if ($this->isWindowsAbsolutePath($name)) {
+            return true;
+        }
+
+        $parts = explode('/', $normalized);
+
+        return in_array('..', $parts, true)
+            || (in_array('', $parts, true) && !str_ends_with($name, '/'));
+    }
+
+    private function isWindowsAbsolutePath(string $name): bool
+    {
+        return strlen($name) >= 3
+            && ctype_alpha($name[0])
+            && $name[1] === ':'
+            && ($name[2] === '/' || $name[2] === '\\');
     }
 
     private function validateEntryType(string $name, string $databaseEntry, string $privateEntryPrefix): bool
