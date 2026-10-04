@@ -1019,7 +1019,7 @@ margin:0;color:var(--zazu-text-muted);font-size:10px
 }
 
 .zazu-dash-hero {
-display:grid;grid-template-columns:minmax(0,1fr) 220px;gap:0;overflow:hidden;margin-bottom:16px;border:1px solid var(--zazu-card-border);border-radius:14px;background:linear-gradient(118deg,#fff 0%,#fff 58%,#EFF6FF 100%);box-shadow:0 12px 35px rgba(15,23,42,.055)
+display:grid;grid-template-columns:minmax(0,1fr) 220px;gap:0;overflow:hidden;margin-bottom:16px;border:1px solid var(--zazu-card-border);border-radius:14px;background:linear-gradient(118deg,#fff 0%,#fff 58%,var(--zazu-primary-soft) 100%);box-shadow:0 12px 35px rgba(15,23,42,.055)
 }
 
  .zazu-dash-hero-main {
