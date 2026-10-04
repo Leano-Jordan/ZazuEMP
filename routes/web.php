@@ -112,9 +112,10 @@ Route::middleware(['auth', 'auth.session', 'platform.admin'])->prefix('admin')->
     Route::put('/landing-settings', [PlatformLandingSettingsController::class, 'update'])->name('admin.landing.settings.update');
 });
 
+Route::get('/offline', [OfflineWorkspaceController::class, 'shell'])->name('offline.shell');
+
 Route::middleware(['auth', 'auth.session', 'business.context'])->group(function () {
     Route::get('/dashboard', DashboardController::class)->middleware('permission:dashboard.view')->name('dashboard');
-    Route::get('/offline', [OfflineWorkspaceController::class, 'shell'])->name('offline.shell');
     Route::get('/offline/bootstrap', [OfflineWorkspaceController::class, 'bootstrap'])->name('offline.bootstrap');
 
     Route::middleware('owner')->group(function () {
