@@ -42,8 +42,8 @@ class QuickCustomerFromWorkTest extends TestCase
 
     public function test_quick_customer_creation_remains_scoped_to_the_active_business(): void
     {
-        [$businessA, $userA] = [$this->businessUser()[0], $this->businessUser()[1]];
-        $this->actingAs($userA);
+        $user = $this->signInAsOwner();
+        $business = app(\App\Support\CurrentBusiness::class)->model($user);
 
         $this->postJson(route('customers.quick_from_work'), [
             'name' => 'Scoped Quick Customer',
@@ -51,7 +51,7 @@ class QuickCustomerFromWorkTest extends TestCase
         ])->assertCreated();
 
         $this->assertDatabaseHas('customers', [
-            'business_id' => $businessA->id,
+            'business_id' => $business->id,
             'name' => 'Scoped Quick Customer',
         ]);
     }
