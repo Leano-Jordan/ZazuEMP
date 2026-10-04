@@ -6380,118 +6380,218 @@ body.zazu-has-wallpaper {
 }
 
 /* ==========================================================================
-   ZAZU — FINAL VISUAL POLISH
+   ZAZU — SaaS SHELL & INTERACTION REFINEMENT
    2026-10-04
-   One canonical refinement layer. No new visual system.
+   Narrow pass: navigation authority, control hierarchy, interaction restraint.
    ========================================================================== */
-:root {
-    --zazu-page: #E7EFF7; --zazu-page-deep: #D8E6F3;
-    --zazu-surface: #F7FAFD; --zazu-surface-2: #EAF1F8; --zazu-surface-3: #D8E6F3;
-    --zazu-field: #EEF5FB; --zazu-ink: #16324A; --zazu-ink-2: #49657D;
-    --zazu-muted: #49657D; --zazu-faint: #617B91; --zazu-border: #B8CADB; --zazu-border-strong: #7FA4C6;
-    --zazu-primary: #5592FC; --zazu-primary-hover: #416AD7; --zazu-primary-deep: #416AD7; --zazu-primary-soft: #D5E3F7;
-    --zazu-blue-brand: #5592FC; --zazu-blue-vivid: #6FA4FF; --zazu-blue-glow: #9EC8FF; --zazu-blue-soft: #D5E3F7; --zazu-blue-canvas: #E7EFF7;
-    --zazu-card-bg: #F7FAFD; --zazu-card-border: #B8CADB; --zazu-card-shadow: 0 5px 18px rgba(25,56,84,.075); --zazu-card-shadow-hover: 0 10px 24px rgba(25,56,84,.12);
-    --zazu-text-ink: #16324A; --zazu-text-body: #49657D; --zazu-text-muted: #617B91;
+
+/* Sidebar reference treatment: dark, quiet, structured. */
+.zazu-brand-link {
+    min-height: 64px;
 }
-:root[data-theme="dark"] {
-    --zazu-page: #081F2F; --zazu-page-deep: #061926; --zazu-surface: #162F43; --zazu-surface-2: #1D3A50; --zazu-surface-3: #29475D;
-    --zazu-field: #102A3E; --zazu-ink: #F3F7FB; --zazu-ink-2: #D5E4EF; --zazu-muted: #B9CBDC; --zazu-faint: #93AFC5;
-    --zazu-border: #43627B; --zazu-border-strong: #6F8FA8; --zazu-primary: #6FA4FF; --zazu-primary-hover: #9EC8FF; --zazu-primary-deep: #D5E5FF; --zazu-primary-soft: #163A58;
-    --zazu-blue-brand: #6FA4FF; --zazu-blue-vivid: #9EC8FF; --zazu-blue-glow: #C2DCFF; --zazu-blue-soft: #163A58; --zazu-blue-canvas: #081F2F;
-    --zazu-card-bg: #162F43; --zazu-card-border: #43627B; --zazu-card-shadow: 0 8px 22px rgba(0,0,0,.24); --zazu-card-shadow-hover: 0 12px 28px rgba(0,0,0,.30);
-    --zazu-text-ink: #F3F7FB; --zazu-text-body: #D5E4EF; --zazu-text-muted: #B9CBDC;
+.zazu-nav {
+    padding-top: 8px;
 }
-html { background: var(--zazu-page); }
-body {
-    background: radial-gradient(circle at 92% -12%, color-mix(in srgb, var(--zazu-primary) 8%, transparent), transparent 30rem), var(--zazu-page);
+.zazu-nav-hierarchy {
+    gap: 3px;
+}
+.zazu-nav-area-trigger {
+    min-height: 44px;
+    padding-inline: 13px;
+    border-color: transparent;
+    border-radius: 8px;
+    background: transparent;
+    color: var(--zazu-sidebar-muted);
+}
+.zazu-nav-area-trigger:hover,
+.zazu-nav-area-trigger:focus-visible,
+.zazu-nav-area.is-open > .zazu-nav-area-trigger {
+    border-color: rgba(111,164,255,.18);
+    background: rgba(85,146,252,.10);
+    color: var(--zazu-sidebar-ink);
+}
+.zazu-nav-area.is-active > .zazu-nav-area-trigger {
+    border-color: rgba(111,164,255,.26);
+    background: linear-gradient(90deg, rgba(85,146,252,.20), rgba(85,146,252,.07));
+    color: #FFFFFF;
+    box-shadow: inset 3px 0 0 var(--zazu-blue-glow);
+}
+.zazu-nav-area.is-active > .zazu-nav-area-trigger .zazu-nav-area-chevron {
+    color: var(--zazu-blue-glow);
+}
+.zazu-nav-area-chevron {
+    color: var(--zazu-sidebar-label);
+}
+.zazu-nav-flyout {
+    width: 236px;
+    padding: 8px;
+    border-color: rgba(127,164,198,.42);
+    border-radius: 10px;
+    background: var(--zazu-surface);
+    box-shadow: 0 18px 40px rgba(8,31,47,.20);
+}
+.zazu-nav-flyout-heading {
+    padding: 5px 9px 7px;
+    color: var(--zazu-faint);
+}
+.zazu-nav-flyout .zazu-nav-link {
+    min-height: 37px;
+    border-radius: 7px;
+    color: var(--zazu-muted);
+}
+.zazu-nav-flyout .zazu-nav-link:hover,
+.zazu-nav-flyout .zazu-nav-link:focus-visible {
+    background: var(--zazu-surface-2);
     color: var(--zazu-ink);
 }
-.zazu-shell { min-height: 100vh; background: transparent; }
-.zazu-sidebar { background: linear-gradient(180deg, #0B2A43 0%, #081F2F 58%, #061926 100%); border-right-color: rgba(255,255,255,.09); }
-.zazu-main { min-width: 0; background: transparent; }
-.zazu-topbar { min-height: 64px; background: color-mix(in srgb, var(--zazu-surface) 96%, transparent); border-bottom: 1px solid var(--zazu-border); box-shadow: 0 2px 12px rgba(25,56,84,.045); backdrop-filter: blur(10px); }
-.zazu-topbar-inner { min-height: 64px; }
-.zazu-content { width: min(100%, var(--zazu-content-max, 1320px)); margin-inline: auto; padding: 18px clamp(16px, 2.2vw, 30px) 30px; }
-.zazu-content::before { display: none; }
-
-.zazu-page-title { color: var(--zazu-ink); font-size: clamp(1.15rem, 1.6vw, 1.45rem); font-weight: 760; letter-spacing: -.035em; }
-.zazu-section-tabs { gap: 4px; padding: 3px; border: 1px solid var(--zazu-border); border-radius: 9px; background: var(--zazu-surface-2); }
-.zazu-section-tabs a, .zazu-section-tabs span { min-height: 32px; display: inline-flex; align-items: center; padding: 0 10px; border-radius: 6px; color: var(--zazu-muted); font-size: 11px; font-weight: 720; white-space: nowrap; }
-.zazu-section-tabs a:hover { color: var(--zazu-primary-deep); background: var(--zazu-surface); }
-.zazu-section-tabs a.active { color: var(--zazu-primary-deep); background: var(--zazu-surface); box-shadow: 0 1px 3px rgba(25,56,84,.10); }
-
-.zazu-card, .zazu-panel, .zazu-form-section, .zazu-module, .zazu-metric-card, .zazu-document, .zazu-dash-surface {
-    border-color: var(--zazu-card-border); border-radius: 10px; background: var(--zazu-card-bg); box-shadow: var(--zazu-card-shadow);
+.zazu-nav-flyout .zazu-nav-link.active {
+    background: var(--zazu-primary-soft);
+    color: var(--zazu-primary-deep);
+    box-shadow: inset 3px 0 0 var(--zazu-primary);
+    font-weight: 760;
 }
-.zazu-card:hover, .zazu-panel:hover, .zazu-metric-card:hover { box-shadow: var(--zazu-card-shadow-hover); }
-.zazu-card-header, .zazu-panel-head, .zazu-form-section-head, .zazu-dash-surface-head { background: var(--zazu-surface-2); border-bottom-color: var(--zazu-card-border); }
-.zazu-card-title, .zazu-panel-title, .zazu-form-section-title { color: var(--zazu-text-ink); font-weight: 760; letter-spacing: -.02em; }
-.zazu-card-description, .zazu-panel-copy, .zazu-form-section-copy { color: var(--zazu-text-body); }
 
-.zazu-command-band {
-    min-height: 0; margin-bottom: 14px; padding: 18px 20px; border-radius: 10px; border: 1px solid var(--zazu-card-border); border-left: 4px solid var(--zazu-primary);
-    background: linear-gradient(110deg, color-mix(in srgb, var(--zazu-primary) 9%, var(--zazu-surface)) 0%, var(--zazu-surface) 72%); box-shadow: var(--zazu-card-shadow);
+/* Search and header controls should look like deliberate product chrome. */
+.zazu-command-trigger {
+    min-height: 40px;
+    border: 1px solid var(--zazu-card-border);
+    border-radius: 8px;
+    background: var(--zazu-card-bg);
+    color: var(--zazu-text-body);
+    box-shadow: 0 1px 3px rgba(25,56,84,.045);
 }
-.zazu-command-title { color: var(--zazu-text-ink); font-size: clamp(1.15rem, 1.7vw, 1.4rem); line-height: 1.15; font-weight: 760; letter-spacing: -.03em; }
-.zazu-command-copy { max-width: 760px; color: var(--zazu-text-body); line-height: 1.55; }
-.zazu-command-meta { border-left-color: var(--zazu-card-border); }
-
-.zazu-dash-hero {
-    grid-template-columns: minmax(0, 1fr) minmax(270px, 32%); margin-bottom: 14px; border-color: var(--zazu-card-border); border-radius: 12px;
-    background: linear-gradient(115deg, var(--zazu-surface) 0%, color-mix(in srgb, var(--zazu-primary) 4%, var(--zazu-surface)) 62%, var(--zazu-surface-2) 100%);
-    box-shadow: var(--zazu-card-shadow-hover);
+.zazu-command-trigger:hover {
+    border-color: var(--zazu-border-strong);
+    background: var(--zazu-surface);
 }
-.zazu-dash-hero-main { padding: 24px 26px 22px; }
-.zazu-dash-hero h2 { max-width: 680px; margin: 9px 0 7px; font-size: clamp(28px, 3.2vw, 40px); line-height: 1.02; letter-spacing: -.05em; }
-.zazu-dash-hero p { max-width: 700px; font-size: 12px; line-height: 1.55; }
-.zazu-dash-context-note { margin-top: 10px; color: var(--zazu-text-muted); font-size: 10px; line-height: 1.45; }
-.zazu-dash-actions { gap: 6px; margin-top: 15px; }
-.zazu-dash-hero-side { position: relative; min-height: 190px; padding: 20px; border-left-color: var(--zazu-card-border); background: var(--zazu-surface-2); overflow: hidden; }
-.zazu-dash-hero-visual { isolation: isolate; }
-.zazu-dash-hero-image { position: absolute; inset: 0; width: 100%; height: 100%; max-width: none; object-fit: cover; opacity: .82; z-index: -2; }
-.zazu-dash-hero-overlay { position: relative; z-index: 1; min-height: 150px; display: flex; flex-direction: column; justify-content: flex-end; margin: -4px; padding: 16px; border: 1px solid rgba(255,255,255,.22); border-radius: 8px; background: linear-gradient(180deg, rgba(5,20,34,.06), rgba(5,20,34,.72)); color: #fff; }
-.zazu-dash-hero-overlay .zazu-dash-side-label, .zazu-dash-hero-overlay > span:not(.zazu-dash-side-label) { color: rgba(255,255,255,.78); }
-.zazu-dash-hero-overlay strong { color: #fff; font-size: 22px; }
+.zazu-command-trigger:focus-within,
+.zazu-command-search.is-open .zazu-command-trigger {
+    border-color: var(--zazu-primary);
+    background: var(--zazu-surface);
+    box-shadow: 0 0 0 3px color-mix(in srgb, var(--zazu-primary) 16%, transparent);
+}
+.zazu-theme-toggle,
+.zazu-user-trigger,
+.zazu-header-settings,
+.zazu-mobile-toggle {
+    min-height: 40px;
+    border-radius: 8px;
+    background: var(--zazu-card-bg);
+    border-color: var(--zazu-card-border);
+    color: var(--zazu-text-body);
+}
+.zazu-theme-toggle:hover,
+.zazu-user-trigger:hover,
+.zazu-header-settings:hover,
+.zazu-mobile-toggle:hover {
+    background: var(--zazu-primary-soft);
+    border-color: color-mix(in srgb, var(--zazu-primary) 42%, var(--zazu-card-border));
+    color: var(--zazu-primary-deep);
+}
 
-.zazu-dash-grid { gap: 12px; }
-.zazu-dash-surface { background: var(--zazu-card-bg); }
-.zazu-dash-surface-head { padding: 16px 18px 13px; }
-.zazu-dash-surface-head h3 { font-size: 16px; }
-.zazu-dash-surface-head p { font-size: 10px; }
-.zazu-dash-event { min-height: 72px; padding: 9px 16px; }
-.zazu-dash-metric { padding: 14px 36px 13px 15px; }
-.zazu-dash-metric > strong, .zazu-dash-commercial-main strong { font-size: 26px; }
-.zazu-dash-commandbar { margin-top: 12px; border-color: var(--zazu-card-border); background: var(--zazu-card-bg); }
+/* Stop non-interactive cards from pretending to be buttons. */
+.zazu-card:hover,
+.zazu-panel:hover,
+.zazu-metric-card:hover {
+    box-shadow: var(--zazu-card-shadow);
+}
+.zazu-dash-metric:hover,
+.zazu-dash-commandbar nav a:hover,
+.zazu-list-item:hover {
+    box-shadow: none;
+}
+.zazu-dash-metric:hover {
+    border-color: color-mix(in srgb, var(--zazu-primary) 42%, var(--zazu-card-border));
+    background: var(--zazu-primary-soft);
+}
+.zazu-list-item:hover {
+    background: var(--zazu-surface-2);
+}
 
-.zazu-list-item { min-height: 62px; background: var(--zazu-card-bg); border-color: var(--zazu-card-border); }
-.zazu-list-item:hover { background: var(--zazu-primary-soft); box-shadow: inset 3px 0 0 var(--zazu-primary); }
-.zazu-list-title, .zazu-side-primary { color: var(--zazu-text-ink); }
-.zazu-list-meta { color: var(--zazu-text-muted); }
+/* Links should look like links; actions should look like controls. */
+.zazu-text-action {
+    text-underline-offset: 3px;
+}
+.zazu-card a:not(.zazu-btn):not(.zazu-text-action):not(.zazu-list-item),
+.zazu-panel a:not(.zazu-btn):not(.zazu-text-action):not(.zazu-list-item) {
+    color: var(--zazu-link);
+}
+.zazu-card a:not(.zazu-btn):not(.zazu-text-action):not(.zazu-list-item):hover,
+.zazu-panel a:not(.zazu-btn):not(.zazu-text-action):not(.zazu-list-item):hover {
+    color: var(--zazu-link-hover);
+    text-decoration: underline;
+    text-underline-offset: 3px;
+}
 
-.zazu-btn { min-height: 40px; border-radius: 7px; font-weight: 720; box-shadow: 0 1px 2px rgba(25,56,84,.06); }
-.zazu-btn-primary { background: var(--zazu-primary); border-color: var(--zazu-primary); color: #fff; box-shadow: 0 4px 12px color-mix(in srgb, var(--zazu-primary) 24%, transparent); }
-.zazu-btn-primary:hover { background: var(--zazu-primary-hover); border-color: var(--zazu-primary-hover); }
-.zazu-btn-secondary, .zazu-btn-ghost { border-color: var(--zazu-border-strong); background: var(--zazu-surface); color: var(--zazu-ink); }
-.zazu-btn-secondary:hover, .zazu-btn-ghost:hover { border-color: var(--zazu-primary); background: var(--zazu-primary-soft); color: var(--zazu-primary-deep); }
+/* Lists: make the scan line cleaner and reduce decorative noise. */
+.zazu-list-item {
+    transition: background-color 140ms ease, border-color 140ms ease;
+}
+.zazu-list-item + .zazu-list-item {
+    border-top-color: color-mix(in srgb, var(--zazu-card-border) 68%, transparent);
+}
+.zazu-list-title {
+    font-size: 12px;
+    letter-spacing: -.01em;
+}
+.zazu-list-meta {
+    font-size: 10px;
+}
 
-.zazu-form { background: transparent; }
-.zazu-field { gap: 5px; }
-.zazu-label, .zazu-form .zazu-label, .zazu-form .zazu-field > span:first-child, .zazu-form label > span:first-child { color: var(--zazu-ink-2); font-size: 11px; font-weight: 720; }
-.zazu-field-help { color: var(--zazu-muted); font-size: 10px; }
-.zazu-input, .zazu-select, .zazu-textarea, input, select, textarea { min-height: 40px; border-radius: 7px; border-color: var(--zazu-border-strong); background: var(--zazu-field); color: var(--zazu-ink); }
-.zazu-input:focus, .zazu-select:focus, .zazu-textarea:focus, input:focus, select:focus, textarea:focus { border-color: var(--zazu-primary); outline: 0; box-shadow: 0 0 0 3px color-mix(in srgb, var(--zazu-primary) 20%, transparent); }
-.zazu-chip, .zazu-badge, .zazu-pill { border-radius: 999px; }
+/* Consistent action grouping across forms and dense registers. */
+.zazu-action-group,
+.zazu-actionbar {
+    gap: 7px;
+}
+.zazu-actionbar {
+    padding-top: 14px;
+    border-top: 1px solid var(--zazu-card-border);
+}
+.zazu-btn:focus-visible,
+.zazu-theme-toggle:focus-visible,
+.zazu-user-trigger:focus-visible,
+.zazu-nav-area-trigger:focus-visible,
+.zazu-nav-link:focus-visible {
+    outline: 0;
+    box-shadow: 0 0 0 3px color-mix(in srgb, var(--zazu-primary) 20%, transparent);
+}
 
+/* Small typography correction: labels should be readable without competing
+   with the primary content. */
+.zazu-eyebrow,
+.zazu-dash-kicker {
+    letter-spacing: .08em;
+}
+.zazu-card-description,
+.zazu-panel-copy,
+.zazu-form-section-copy {
+    font-size: 11px;
+    line-height: 1.55;
+}
+
+/* Preserve touch usability while keeping the desktop chrome compact. */
+@media (max-width: 850px) {
+    .zazu-nav-area-trigger {
+        min-height: 46px;
+    }
+    .zazu-nav-flyout {
+        width: auto;
+        box-shadow: none;
+    }
+}
 @media (max-width: 700px) {
-    .zazu-content { padding: 12px 12px 24px; }
-    .zazu-topbar, .zazu-topbar-inner { min-height: 58px; }
-    .zazu-section-tabs { max-width: 100%; overflow-x: auto; scrollbar-width: none; }
-    .zazu-section-tabs::-webkit-scrollbar { display: none; }
-    .zazu-dash-hero { grid-template-columns: 1fr; }
-    .zazu-dash-hero-side { min-height: 150px; border-top: 1px solid var(--zazu-card-border); border-left: 0; }
-    .zazu-dash-hero-main { padding: 20px 17px 18px; }
-    .zazu-dash-hero h2 { font-size: 29px; }
-    .zazu-command-band { padding: 15px 16px; }
-    .zazu-card-header, .zazu-panel-head, .zazu-form-section-head { padding-inline: 15px; }
+    .zazu-command-trigger,
+    .zazu-theme-toggle,
+    .zazu-user-trigger,
+    .zazu-mobile-toggle {
+        min-height: 44px;
+    }
+    .zazu-dash-metric {
+        padding-block: 15px;
+    }
+}
+@media (prefers-reduced-motion: reduce) {
+    .zazu-list-item {
+        transition: none;
+    }
 }
