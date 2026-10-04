@@ -294,3 +294,37 @@ For web application security verification, use OWASP ASVS 5.0.0 as the engineeri
 These are benchmarks, not certification claims.
 
 Last updated: 2026-10-03
+
+
+## Director release-documentation closure — 2026-10-04
+
+### Documentation / compliance
+
+| Area | Status | Evidence |
+|---|---|---|
+| Release documentation set | 🟢 VERIFIED COMPLETE — design set | `docs/RELEASE_DOCUMENTATION_INDEX.md` |
+| Privacy notice | 🟡 FINALIZATION PENDING | Draft exists; real responsible-party/contact/deployment details required |
+| Data-subject requests | 🟡 MANUAL CONTROL | Procedure exists; no dedicated self-service request portal found |
+| Retention/disposal | 🟡 MANUAL CONTROL | Schedule exists; legal/accounting periods require approval |
+| Incident response | 🟡 OPERATIONAL COMPLETION PENDING | Technical incident recorder exists; named organisational escalation required |
+| Operator/data-processing | 🟡 CONDITIONAL | Template exists; execute where third-party processing exists |
+| Customer terms | 🟡 FINALIZATION PENDING | Draft exists; legal/commercial review required |
+| PAIA | 🟡 APPLICABILITY/PROCESS REVIEW | Operational control exists; legal determination required |
+| Media rights/provenance | 🟡 FINAL SIGN-OFF PENDING | Register exists; final asset evidence required |
+| Deployment / backup / restore / upgrade runbooks | 🟢 DOCUMENTED | Runbooks now present and aligned to implemented commands |
+
+The documentation-design gate is closed. The legal/privacy compliance gate remains open until the real-world completion evidence exists.
+
+### Brand
+
+`docs/ZAZU_BRAND_CLEARANCE.md` is now the active brand-clearance record.
+
+**Disposition:** 🔴 OPEN / HIGH RISK — official CIPC search and appropriate professional clearance remain outstanding.
+
+### Physical devices
+
+`docs/PHYSICAL_DEVICE_ACCEPTANCE.md` is now the acceptance record.
+
+**Disposition:** 🟡 OPEN — Playwright emulation is not promoted to physical-device acceptance.
+
+Last updated: 2026-10-04
