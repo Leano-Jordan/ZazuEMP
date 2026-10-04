@@ -936,3 +936,39 @@ Evidence boundary:
 
 Next Director target:
 PHYSICAL PHONE UI ACCEPTANCE → DISCONNECTED PHONE-LOCAL ARCHITECTURE → FINAL RELEASE RE-AUDIT.
+
+## Director Visual Recovery Pass — 2026-10-04
+
+The previous visual-sweep accumulation was replaced with a single compact canonical visual layer.
+
+Recovery authority:
+- shared colour/dimension tokens: `resources/css/app.css`;
+- final component visual authority: `resources/css/zazu-final-visual-sweep.css`;
+- responsive structure remains in the existing responsive/mobile stylesheets.
+
+Reference evidence:
+- complete `reference ui ux images/` collection inspected;
+- supplied mobile and desktop degraded screenshots treated as pre-recovery baseline evidence.
+
+Foundation now targets:
+- blue corporate page/shell foundation;
+- visibly separated blue-tinted light surfaces and layered dark surfaces;
+- readable 13.5px+ labels and 14px controls;
+- 44px shared control rhythm;
+- compact 1320px content measure;
+- segmented section tabs;
+- physical filled/outlined buttons;
+- underlined ordinary links;
+- dense readable lists/tables;
+- forms treated as one work surface instead of floating field cards;
+- mobile tabs retained as a horizontal scroll group;
+- no pure-white application backgrounds.
+
+The historical `zazu-final-visual-sweep.css` stack was reduced from approximately 213 KB / 1,263 CSS blocks to a compact canonical layer of approximately 27 KB / 1,100 lines.
+
+Verification:
+- CSS brace/source checks pass;
+- no rendered-browser claim is made because the user's local `127.0.0.1` runtime is not accessible from this environment;
+- screenshot golden baselines remain locked only after human approval of the recovered render.
+
+Future UI agents must modify this canonical system rather than append another visual sweep.
