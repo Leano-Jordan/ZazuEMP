@@ -2,10 +2,10 @@
 <html lang="en">
 <head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<meta name="theme-color" content="#245A9A"><meta name="mobile-web-app-capable" content="yes"><link rel="manifest" href="/manifest.webmanifest"><title>Zazu · Mobile</title>
+<meta name="theme-color" content="#0B3A66"><meta name="mobile-web-app-capable" content="yes"><link rel="manifest" href="/manifest.webmanifest"><title>Zazu · Mobile</title>
 <style>
-:root{color-scheme:light;font-family:Inter,ui-sans-serif,system-ui,-apple-system,sans-serif;--bg:#EAF1F8;--surface:#F9FBFD;--surface2:#E2ECF5;--ink:#183047;--muted:#5D7185;--line:#C5D5E2;--blue:#2563EB;--blue2:#DBEAFE;--blue3:#1D4ED8;--teal:#0F766E;--teal2:#CCFBF1;--success:#137333;--warn:#92400E}
-*{box-sizing:border-box}body{margin:0;background:linear-gradient(145deg,#EEF4FA,#F8FAFD 55%,#E4EEF7);color:var(--ink);min-height:100vh}
+:root{color-scheme:light;font-family:Inter,ui-sans-serif,system-ui,-apple-system,sans-serif;--bg:#0B3A66;--surface:#102C44;--surface2:#163A56;--ink:#F1F7FC;--muted:#A4BACC;--line:#365A75;--blue:#0B63CE;--blue2:#123C5F;--blue3:#1D78E5;--teal:#0E8F83;--teal2:#0F3B3A;--success:#6FD19A;--warn:#E5B96C}
+*{box-sizing:border-box}body{margin:0;background:linear-gradient(160deg,var(--bg),#082D4F 100%);color:var(--ink);min-height:100vh}
 main{width:min(1120px,100%);margin:auto;padding:18px 16px 52px}
 header{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:16px}.brand{display:flex;align-items:center;gap:10px}.mark{width:38px;height:38px;display:grid;place-items:center;border-radius:10px;background:var(--blue);color:#fff;font-weight:850}h1{font-size:1.25rem;margin:0}.state{font-size:.84rem;color:var(--muted);border:1px solid var(--line);background:var(--surface);border-radius:999px;padding:7px 10px}
 .hero{padding:20px;border:1px solid #B8CCDD;border-radius:16px;background:linear-gradient(135deg,#DDEBF7,#F9FBFD 72%);margin-bottom:12px}.hero h2{margin:0 0 5px;font-size:1.35rem}.hero p{margin:0;color:var(--muted);line-height:1.5}.hero-actions{display:flex;flex-wrap:wrap;gap:8px;margin-top:14px}
