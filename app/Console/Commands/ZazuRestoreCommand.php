@@ -9,6 +9,7 @@ use Illuminate\Support\Str;
 use Symfony\Component\Process\Process;
 use ZipArchive;
 
+/** @SuppressWarnings(PHPMD.ExcessiveClassComplexity) */
 class ZazuRestoreCommand extends Command
 {
     private const FORMAT_VERSION = 1;
