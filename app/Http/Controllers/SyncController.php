@@ -242,10 +242,15 @@ class SyncController extends Controller
                 continue;
             }
 
-            $record = $model::query()
-                ->where('id', $item['id'])
-                ->where('business_id', $business->id)
-                ->first();
+            $query = $model::query();
+
+            if ($item['type'] === 'quote') {
+                $query->whereHas('event', fn ($event) => $event->where('business_id', $business->id));
+            } else {
+                $query->where('business_id', $business->id);
+            }
+
+            $record = $query->where('id', $item['id'])->first();
 
             if (! $record) {
                 continue;
