@@ -4,13 +4,6 @@
  * professional density, and clear interaction states.
  */
 
-
-
-
-
-
-
-
 /* Perceptual foundation: the page is visibly a different plane from its cards. */
 body {
     background:
@@ -757,10 +750,6 @@ textarea:focus {
    stronger neutral planes, intentional semantic color, clearer focus strokes,
    explicit control affordances, compact scanning density, and visible grouping.
    ========================================================================== */
-
-
-
-
 
 /* Human-eye separation: the page plane, work surfaces, and controls must read as
    three different layers before any content is read. */
@@ -2280,9 +2269,6 @@ html[data-theme="dark"] body {
  * Final authority: Deep Slate Ink + Midnight Cobalt + Sapphire.
  * Kept here at the end of the visual layer so legacy aliases cannot win.
  */
-
-
-
 
 /* OPERATIONS HUB — CYCLE 1: structural hierarchy + mobile-first density */
 .zazu-ops-hero {
@@ -4495,8 +4481,6 @@ main {
     --zazu-blue-subtle: #C6D7F3;
 }
 
-
-
 /* Surfaces stay flat. Hierarchy comes from borders, spacing and restrained elevation. */
 body {
     background: var(--zazu-page);
@@ -6268,97 +6252,6 @@ body.zazu-has-wallpaper {
     border-color: rgba(125,169,214,.24);
     box-shadow: inset 3px 0 0 #6B9DD3;
 }
-
-:root[data-theme="dark"] .zazu-card-header,
-:root[data-theme="dark"] .zazu-form-section-head {
-    /* Canonical dark token set — merged from historical layers. */
-    color-scheme: dark;
-    --zazu-page: #0A1422;
-    --zazu-page-deep: #07101B;
-    --zazu-sidebar: #081321;
-    --zazu-sidebar-ink: #F4F5FA;
-    --zazu-sidebar-muted: #C5C9D8;
-    --zazu-sidebar-label: #959DB3;
-    --zazu-sidebar-hover: #10253D;
-    --zazu-sidebar-active: #173A60;
-    --zazu-sidebar-surface: #0E1C2D;
-    --zazu-surface: #101D2E;
-    --zazu-surface-2: #14263B;
-    --zazu-surface-3: #182D45;
-    --zazu-field: #0D1928;
-    --zazu-ink: #E7EFF8;
-    --zazu-ink-2: #CFDCEB;
-    --zazu-muted: #9FB2C7;
-    --zazu-faint: #7F95AC;
-    --zazu-nav-label: #A4ABBD;
-    --zazu-border: #29445F;
-    --zazu-border-strong: #3B5D7E;
-    --zazu-primary: #5C8FC8;
-    --zazu-primary-light: #9492FF;
-    --zazu-primary-pale: #315679;
-    --zazu-primary-shadow: #4C4C8D;
-    --zazu-primary-deep: #9ABBE0;
-    --zazu-primary-hover: #6B9DD3;
-    --zazu-primary-soft: #18334F;
-    --zazu-primary-ink: #0D1020;
-    --zazu-link: #79A8D6;
-    --zazu-link-hover: #9CC1E3;
-    --zazu-nav-active: #5C8FC8;
-    --zazu-accent: #6B9DD3;
-    --zazu-accent-ink: #A9C8E5;
-    --zazu-accent-soft: #15304A;
-    --zazu-focus: #9492FF;
-    --zazu-success: #6C9B91;
-    --zazu-success-ink: #9FC5BE;
-    --zazu-success-soft: #17312E;
-    --zazu-warning: #B09563;
-    --zazu-warning-ink: #D4BC8B;
-    --zazu-warning-soft: #382F20;
-    --zazu-danger: #B8797E;
-    --zazu-danger-ink: #DDA9AD;
-    --zazu-danger-soft: #3B2529;
-    --zazu-info: #6D9FD2;
-    --zazu-info-ink: #A9C8E5;
-    --zazu-info-soft: #17324D;
-    --zazu-shadow: 0 2px 10px rgba(0,0,0,.22);
-    --zazu-shadow-strong: 0 12px 30px rgba(0,0,0,.30);
-    --zazu-border-subtle: #526E83;
-    --zazu-violet: var(--zazu-primary);
-    --zazu-violet-ink: var(--zazu-primary-deep);
-    --zazu-violet-soft: var(--zazu-primary-soft);
-    --zazu-amber: #E0A85A;
-    --zazu-amber-ink: #F4C985;
-    --zazu-amber-soft: #3B301F;
-    --zazu-surface-canvas: #0A1422;
-    --zazu-surface-card: var(--zazu-card-bg);
-    --zazu-surface-border: var(--zazu-card-border);
-    --zazu-text-main: #F8FAFC;
-    --zazu-text-muted: #9FB2C7;
-    --zazu-blue-canvas: var(--zazu-blue-soft);
-    --zazu-blue-primary: var(--zazu-blue-brand);
-    --zazu-blue-accent: var(--zazu-blue-glow);
-    --zazu-blue-hover: var(--zazu-blue-vivid);
-    --zazu-blue-light: #6FA4FF;
-    --zazu-blue-soft: #18334F;
-    --zazu-blue-subtle: #315679;
-    --zazu-blue-brand: #5C8FC8;
-    --zazu-blue-vivid: #6B9DD3;
-    --zazu-blue-glow: #8BB2DC;
-    --zazu-canvas-bg: #0A1422;
-    --zazu-card-bg: #111F31;
-    --zazu-card-border: #29445F;
-    --zazu-card-shadow: 0 2px 10px rgba(0,0,0,.22);
-    --zazu-text-ink: #E7EFF8;
-    --zazu-text-body: #CFDCEB;
-    --zazu-status-draft: #422006;
-    --zazu-status-draft-text: #FDE68A;
-    --zazu-status-active: #052E16;
-    --zazu-status-active-text: #86EFAC;
-    --zazu-status-overdue: #450A0A;
-    --zazu-status-overdue-text: #FCA5A5;
-    --zazu-card-shadow-hover: 0 10px 24px rgba(0,0,0,.28);
-    --zazu-ui-focus: 0 0 0 3px rgba(96,165,250,.2);
-    --zazu-blue-deep: #5B59E0;\n}
 
 /*
  * ZAZU CANONICAL UI LAYER
