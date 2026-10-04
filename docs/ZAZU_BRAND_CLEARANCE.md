@@ -2,6 +2,8 @@
 
 **Status:** OPEN — NO TRADE-MARK CLEARANCE CLAIM  
 **Audit date:** 2026-10-04  
+**Current owner / developer:** Isaac Junior Lehlogonlo Maluleka  
+**Operating address:** 1068 Block JK, Soshanguve, Pretoria, South Africa  
 **Current mark under review:** Zazu / Zazu EMP  
 **Repository:** `Leano-Jordan/ZazuEMP`
 
