@@ -1346,7 +1346,7 @@ body {
 .zazu-stage-copy {
     margin-top: 2px;
     color: var(--zazu-faint);
-    font-size: 10px;
+    font-size: var(--zazu-font-size-small);
 }
 
 .zazu-work-hero {
@@ -6220,7 +6220,7 @@ body:not(.zazu-has-wallpaper) {
 }
 
 .zazu-content {
-    padding-top: 30px;
+    padding-top: var(--zazu-space-6);
 }
 
 .zazu-command-band {
@@ -6637,20 +6637,20 @@ body {
 }
 
 .zazu-brand {
-    min-height: 68px;
-    padding-inline: 20px;
+    min-height: 64px;
+    padding-inline: 18px;
     background: var(--zazu-surface);
     border-bottom: 1px solid var(--zazu-border);
 }
 
 .zazu-brand-word {
-    font-size: 1.42rem;
-    font-weight: 750;
-    letter-spacing: -.045em;
+    font-size: var(--zazu-font-size-page-title);
+    font-weight: var(--zazu-weight-semibold);
+    letter-spacing: -.04em;
 }
 
 .zazu-nav {
-    padding: 16px 12px;
+    padding: 12px 10px;
 }
 
 .zazu-nav-primary {
@@ -6658,13 +6658,13 @@ body {
 }
 
 .zazu-nav-link {
-    min-height: 42px;
-    padding-inline: 12px;
+    min-height: 40px;
+    padding-inline: 10px;
     border: 1px solid transparent;
-    border-radius: 5px;
-    color: var(--zazu-ink-2);
-    font-size: 12.5px;
-    font-weight: 650;
+    border-radius: var(--zazu-radius-md);
+    color: var(--zazu-muted);
+    font-size: var(--zazu-font-size-nav);
+    font-weight: var(--zazu-weight-semibold);
 }
 
 .zazu-nav-link:hover {
@@ -6689,9 +6689,9 @@ body {
 
 .zazu-sidebar-workspace-label {
     color: var(--zazu-faint);
-    font-size: 9px;
-    font-weight: 800;
-    letter-spacing: .11em;
+    font-size: var(--zazu-font-size-label);
+    font-weight: var(--zazu-weight-bold);
+    letter-spacing: .08em;
     text-transform: uppercase;
 }
 
@@ -6721,17 +6721,17 @@ body {
 }
 
 .zazu-topbar-inner {
-    min-height: 76px;
-    padding-inline: 30px;
+    min-height: 64px;
+    padding-inline: 24px;
 }
 
 .zazu-page-title {
-    font-size: 1.42rem;
-    font-weight: 750;
+    font-size: var(--zazu-font-size-page-title);
+    font-weight: var(--zazu-weight-semibold);
 }
 
 .zazu-section-tabs {
-    gap: 3px;
+    gap: 4px;
 }
 
 .zazu-section-tabs a {
@@ -6821,9 +6821,9 @@ body {
 
 .zazu-metric-label {
     color: var(--zazu-muted);
-    font-size: 10px;
-    font-weight: 800;
-    letter-spacing: .09em;
+    font-size: var(--zazu-font-size-label);
+    font-weight: var(--zazu-weight-bold);
+    letter-spacing: .07em;
     text-transform: uppercase;
 }
 
@@ -6934,8 +6934,9 @@ textarea:focus {
 
 .zazu-btn {
     min-height: 40px;
-    border-radius: 4px;
-    font-weight: 750;
+    border-radius: var(--zazu-radius-sm);
+    font-size: 12px;
+    font-weight: var(--zazu-weight-bold);
     letter-spacing: -.005em;
 }
 
