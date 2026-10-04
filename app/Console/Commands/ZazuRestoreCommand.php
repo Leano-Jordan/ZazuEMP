@@ -46,7 +46,7 @@ class ZazuRestoreCommand extends Command
             $this->error('Zazu restore failed safely: '.$exception->getMessage());
             return self::FAILURE;
         } finally {
-            $this->cleanupRestoreWorkspace($work);
+            File::deleteDirectory($work);
         }
     }
 
@@ -90,10 +90,6 @@ class ZazuRestoreCommand extends Command
 
             $databaseRollback = $this->restoreDatabase($driver, $work, $databaseRollback);
 
-            $this->completeRestore($databaseRollback, $privateRollback);
-            $databaseRollback = null;
-            $privateRollback = null;
-
             $this->info('Zazu restore completed from '.$archive);
             return self::SUCCESS;
         } catch (\Throwable $exception) {
@@ -118,17 +114,6 @@ class ZazuRestoreCommand extends Command
         throw new \LogicException('Unsupported restore database driver.');
     }
 
-    private function completeRestore(?string $databaseRollback, ?string $privateRollback): void
-    {
-        if ($databaseRollback !== null) {
-            File::delete($databaseRollback);
-        }
-
-        if ($privateRollback !== null) {
-            File::deleteDirectory($privateRollback);
-        }
-    }
-
     private function cleanupRestoreArtifacts(?string $databaseRollback, ?string $privateRollback): void
     {
         if ($databaseRollback !== null) {
@@ -138,11 +123,6 @@ class ZazuRestoreCommand extends Command
         if ($privateRollback !== null) {
             File::deleteDirectory($privateRollback);
         }
-    }
-
-    private function cleanupRestoreWorkspace(string $work): void
-    {
-        File::deleteDirectory($work);
     }
 
     private function prepareArchive(string $archive, string $work): ?array
@@ -186,26 +166,17 @@ class ZazuRestoreCommand extends Command
             return null;
         }
 
-        if (!$this->extractVerifiedArchive($zip, $work)) {
-            return null;
-        }
-
-        return [$driver, $hasPrivateStorage];
-    }
-
-    private function extractVerifiedArchive(ZipArchive $zip, string $work): bool
-    {
         if (!$zip->extractTo($work)) {
             $this->error('Could not extract the verified backup archive.');
-            return false;
+            return null;
         }
 
         if (!is_file($work.'/manifest.json')) {
             $this->error('The extracted backup manifest is missing.');
-            return false;
+            return null;
         }
 
-        return true;
+        return [$driver, $hasPrivateStorage];
     }
 
     private function readManifest(ZipArchive $zip): ?array
@@ -295,7 +266,8 @@ class ZazuRestoreCommand extends Command
         $seen[$normalized] = true;
 
         $size = (int) ($stat['size'] ?? 0);
-        if (!$this->validateEntrySize($size, $uncompressedBytes)) {
+        if ($size < 0 || $size > self::MAX_UNCOMPRESSED_BYTES || $uncompressedBytes > self::MAX_UNCOMPRESSED_BYTES - $size) {
+            $this->error('The backup archive is too large to restore safely.');
             return null;
         }
         $uncompressedBytes += $size;
@@ -310,65 +282,6 @@ class ZazuRestoreCommand extends Command
         }
 
         return str_starts_with($name, 'storage/private/') && !str_ends_with($name, '/');
-    }
-
-    private function validateEntrySize(int $size, int $uncompressedBytes): bool
-    {
-        if ($size < 0 || $size > self::MAX_UNCOMPRESSED_BYTES || $uncompressedBytes > self::MAX_UNCOMPRESSED_BYTES - $size) {
-            $this->error('The backup archive is too large to restore safely.');
-            return false;
-        }
-
-        return true;
-    }
-
-    private function validateEntryMetadata(string|false $name, array|false $stat): bool
-    {
-        if ($name === false || $stat === false || str_contains($name, " ")) {
-            $this->error('The backup archive contains an invalid entry.');
-            return false;
-        }
-
-        if (str_contains($name, '\\')) {
-            $this->error('The backup archive contains an ambiguous path.');
-            return false;
-        }
-
-        return true;
-    }
-
-    private function validateEntryPath(string $name, string $normalized): bool
-    {
-        if ($this->hasUnsafeEntryPathShape($name, $normalized)) {
-            $this->error('The backup archive contains an unsafe path.');
-            return false;
-        }
-
-        return true;
-    }
-
-    private function hasUnsafeEntryPathShape(string $name, string $normalized): bool
-    {
-        if ($normalized !== $name || $name === '' || str_starts_with($name, '/')) {
-            return true;
-        }
-
-        if ($this->isWindowsAbsolutePath($name)) {
-            return true;
-        }
-
-        $parts = explode('/', $normalized);
-
-        return in_array('..', $parts, true)
-            || (in_array('', $parts, true) && !str_ends_with($name, '/'));
-    }
-
-    private function isWindowsAbsolutePath(string $name): bool
-    {
-        return strlen($name) >= 3
-            && ctype_alpha($name[0])
-            && $name[1] === ':'
-            && ($name[2] === '/' || $name[2] === '\\');
     }
 
     private function validateEntryType(string $name, string $databaseEntry, string $privateEntryPrefix): bool
