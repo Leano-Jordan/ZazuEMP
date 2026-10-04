@@ -705,3 +705,27 @@
         width: min(380px, calc(100vw - 20px));
     }
 }
+
+
+/* DIRECTOR — readable mobile controls */
+@media (max-width: 820px) {
+    .zazu-header-slot-actions > .zazu-btn,
+    .zazu-actionbar > .zazu-btn,
+    .zazu-actionbar-sticky > .zazu-btn {
+        min-height: 40px;
+        height: 40px;
+        font-size: 13px;
+    }
+
+    .zazu-page-title {
+        font-size: 1.12rem;
+    }
+
+    .zazu-form-section-title {
+        font-size: 15px;
+    }
+
+    .zazu-form-section-copy {
+        font-size: 13px;
+    }
+}
