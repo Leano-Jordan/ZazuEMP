@@ -241,4 +241,24 @@ class WorkWorkflowTest extends TestCase
         $response->assertStatus(422);
         $this->assertDatabaseMissing('events', ['name' => 'Invalid Work']);
     }
+
+    public function test_work_can_continue_directly_to_quote_workflow(): void
+    {
+        $customer = Customer::create(['name' => 'Quote Start Customer']);
+
+        $response = $this->post(route('work.store'), [
+            'customer_id' => $customer->id,
+            'name' => 'Quote Start Work',
+            'event_type' => 'Catering order',
+            'event_date' => '2026-10-30',
+            'event_address' => 'Pretoria',
+            'start_intent' => 'quote',
+        ]);
+
+        $event = Event::query()->where('name', 'Quote Start Work')->firstOrFail();
+
+        $response->assertRedirect(route('work.quotes.create', $event));
+        $response->assertSessionHas('success', 'Job created. Zazu opened the quote workflow from your starting point.');
+    }
+
 }
