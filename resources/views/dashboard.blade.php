@@ -22,7 +22,7 @@
                     <a href="{{ route('customers.create') }}" class="zazu-btn zazu-btn-secondary">Start with customer <span>+</span></a>
                 @endif
                 @if($workspaceTools['work'] && app(\App\Support\PermissionService::class)->allows('work.create', auth()->user(), $business))
-                    <a href="{{ route('work.create') }}" class="zazu-btn zazu-btn-primary">Start with job <span>+</span></a>
+                    <a href="{{ route('work.create') }}" class="zazu-btn zazu-btn-cta">Start with job <span>+</span></a>
                     <a href="{{ route('work.create', ['start' => 'quote']) }}" class="zazu-btn zazu-btn-secondary">Start with quote <span>+</span></a>
                 @endif
                 @if($workspaceTools['calendar'])<a href="{{ route('calendar.index') }}" class="zazu-btn zazu-btn-secondary">Open calendar <span>→</span></a>@endif
