@@ -1146,3 +1146,12 @@ Acceptance boundary:
 - Navigation/routes/capabilities were preserved.
 - No new stylesheet or competing token-root system was introduced.
 - Runtime browser/device acceptance is still gated by the repository's CI/browser workflows; this execution surface cannot honestly mark live pixel-level render acceptance complete without those results.
+
+
+### Final acceptance checkpoint — 2026-10-04
+
+- Latest application commit on `main`: `0e70159559477397dec706514438c8ed697409f6`.
+- Post-change source re-read completed for application CSS, landing view, responsive CSS, regression tests and Director records.
+- CSS brace/parenthesis balance checks passed for the modified stylesheets/views.
+- GitHub Actions for the latest commit were observed at checkpoint: Zazu quality, Laravel, Psalm Security Scan, Zazu populated upgrade and rollback, PHPMD, Zazu browser smoke and Push on main were queued; SonarCloud was skipped.
+- Therefore the Director state is **SOURCE-ACCEPTED / CI-PENDING**, not CI-GREEN. No browser workflow is being represented as passed until GitHub reports a completed conclusion.
