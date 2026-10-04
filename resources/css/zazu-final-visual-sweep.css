@@ -3783,3 +3783,338 @@ padding-block: 15px;
 from { opacity: 0; transform: translateY(4px); }
     to { opacity: 1; transform: translateY(0); }
 }
+
+
+/* DIRECTOR — 2026-10-04 iteration: shell-safe account menu, non-white work surfaces,
+   dashboard title hierarchy, calendar density and cross-view holiday visibility.
+   Additive refinement only. Existing navigation/workflows remain intact.
+*/
+
+/* Account menu: mirror the hierarchical navigation relationship instead of
+   anchoring the panel back over the left edge of the viewport. */
+.zazu-user-popover {
+    left: calc(100% - 1px);
+    right: auto;
+    top: auto;
+    bottom: 0;
+    z-index: 160;
+    width: min(320px, calc(100vw - 24px));
+    max-height: min(620px, calc(100dvh - 24px));
+    overflow-y: auto;
+}
+
+:root:not([data-theme="dark"]) .zazu-user-menu-link {
+    color: var(--zazu-sidebar-ink);
+}
+
+:root:not([data-theme="dark"]) .zazu-user-menu-link small {
+    color: var(--zazu-sidebar-muted);
+}
+
+:root:not([data-theme="dark"]) .zazu-user-menu-link:hover,
+:root:not([data-theme="dark"]) .zazu-user-menu-link:focus-visible {
+    border-left-color: transparent;
+    background: var(--zazu-sidebar-hover);
+    color: var(--zazu-sidebar-ink);
+}
+
+:root:not([data-theme="dark"]) .zazu-user-role {
+    color: var(--zazu-primary-light);
+}
+
+.zazu-nav-flyout {
+    z-index: 180;
+}
+
+/* Never let the dashboard collapse into a near-white slab. */
+.zazu-dash-hero,
+.zazu-dash-surface,
+.zazu-dash-commandbar {
+    background: var(--zazu-surface-2);
+}
+
+:root:not([data-theme="dark"]) .zazu-dash-hero {
+    background:
+        linear-gradient(
+            120deg,
+            var(--zazu-surface-2) 0%,
+            color-mix(in srgb, var(--zazu-primary-soft) 26%, var(--zazu-surface-2)) 100%
+        );
+}
+
+:root:not([data-theme="dark"]) .zazu-dash-surface,
+:root:not([data-theme="dark"]) .zazu-dash-commandbar {
+    background: var(--zazu-surface-2);
+}
+
+.zazu-dash-hero-main {
+    background: transparent;
+}
+
+.zazu-dash-kicker {
+    color: var(--zazu-primary-deep);
+}
+
+.zazu-dash-hero h2 {
+    color: var(--zazu-ink);
+}
+
+/* The hero is the dashboard's real title/explanation band: rectangular, useful,
+   and visually connected to the data beneath it. */
+.zazu-dash-hero {
+    border-radius: 8px;
+    box-shadow: var(--zazu-shadow);
+}
+
+.zazu-dash-hero-main {
+    padding: 24px 26px;
+}
+
+.zazu-dash-hero-main > p {
+    max-width: 68ch;
+    color: var(--zazu-muted);
+}
+
+.zazu-dash-hero-main::before {
+    content: "Dashboard";
+    display: block;
+    margin-bottom: 7px;
+    color: var(--zazu-faint);
+    font-size: 10px;
+    font-weight: 800;
+    letter-spacing: .11em;
+    text-transform: uppercase;
+}
+
+.zazu-dashboard-visual,
+.zazu-dash-hero-visual {
+    background: var(--zazu-surface-3);
+}
+
+/* Calendar: make the working calendar visibly substantial and restore the
+   actual month grid on narrow screens when the user selects Month. */
+.zazu-calendar-hero {
+    border-radius: 8px;
+    padding: 20px 22px;
+    background:
+        linear-gradient(
+            135deg,
+            var(--zazu-surface-2),
+            color-mix(in srgb, var(--zazu-primary-soft) 24%, var(--zazu-surface-2))
+        );
+}
+
+.zazu-calendar-shell {
+    border-radius: 8px;
+    background: var(--zazu-surface-2);
+}
+
+.zazu-calendar-view-switch {
+    gap: 0;
+    border: 1px solid var(--zazu-border);
+    background: var(--zazu-surface-3);
+}
+
+.zazu-calendar-view-switch a {
+    min-height: 40px;
+    padding-inline: 14px;
+    border-right: 1px solid var(--zazu-border);
+    border-radius: 0;
+    color: var(--zazu-muted);
+}
+
+.zazu-calendar-view-switch a:last-child {
+    border-right: 0;
+}
+
+.zazu-calendar-view-switch a:hover,
+.zazu-calendar-view-switch a:focus-visible {
+    background: var(--zazu-surface-2);
+    color: var(--zazu-ink);
+}
+
+.zazu-calendar-view-switch a.is-active {
+    background: var(--zazu-primary);
+    color: var(--zazu-primary-ink);
+    box-shadow: inset 0 -2px 0 var(--zazu-primary-deep);
+}
+
+.zazu-calendar-grid {
+    display: grid;
+    gap: 1px;
+    padding: 1px;
+    background: var(--zazu-border);
+}
+
+.zazu-calendar-grid > .zazu-calendar-cell {
+    min-height: 122px;
+    padding: 9px;
+    background: var(--zazu-surface);
+}
+
+.zazu-calendar-grid > .zazu-calendar-label {
+    padding: 8px;
+    background: var(--zazu-surface-3);
+    color: var(--zazu-muted);
+    text-transform: uppercase;
+    letter-spacing: .08em;
+}
+
+.zazu-calendar-cell.is-adjacent {
+    background: var(--zazu-surface-2);
+}
+
+.zazu-calendar-cell.is-today {
+    box-shadow: inset 0 0 0 2px var(--zazu-primary);
+}
+
+.zazu-calendar-holidays {
+    display: grid;
+    gap: 3px;
+    margin: 5px 0 4px;
+}
+
+.zazu-calendar-holiday {
+    display: flex;
+    align-items: flex-start;
+    gap: 5px;
+    min-width: 0;
+    padding: 4px 5px;
+    border-left: 3px solid var(--zazu-primary);
+    background: var(--zazu-primary-soft);
+    color: var(--zazu-primary-deep);
+    font-size: 10px;
+    font-weight: 700;
+    line-height: 1.25;
+}
+
+.zazu-calendar-holiday.holiday-public {
+    border-left-color: var(--zazu-primary);
+}
+
+.zazu-calendar-holiday.holiday-christian,
+.zazu-calendar-holiday.holiday-muslim,
+.zazu-calendar-holiday.holiday-hindu,
+.zazu-calendar-holiday.holiday-jewish {
+    border-left-color: var(--zazu-accent);
+}
+
+.zazu-calendar-holiday-dot,
+.zazu-calendar-holiday-dot-mini {
+    flex: 0 0 auto;
+}
+
+.zazu-calendar-mini-month,
+.zazu-calendar-year-month {
+    background: var(--zazu-surface);
+    border-radius: 8px;
+}
+
+.zazu-calendar-mini-holidays,
+.zazu-calendar-year-holidays {
+    margin-top: 8px;
+    padding-top: 8px;
+    border-top: 1px solid var(--zazu-border);
+    color: var(--zazu-muted);
+}
+
+.zazu-calendar-mini-holidays-label,
+.zazu-calendar-year-holidays-label {
+    display: block;
+    margin-bottom: 3px;
+    color: var(--zazu-faint);
+    font-size: 9px;
+    font-weight: 800;
+    letter-spacing: .08em;
+    text-transform: uppercase;
+}
+
+.zazu-calendar-mini-holidays strong,
+.zazu-calendar-year-holidays strong {
+    display: block;
+    overflow: hidden;
+    color: var(--zazu-ink);
+    font-size: 10px;
+    line-height: 1.3;
+    text-overflow: ellipsis;
+}
+
+.zazu-calendar-mini-holidays small,
+.zazu-calendar-year-holidays small {
+    display: block;
+    margin-top: 2px;
+    color: var(--zazu-muted);
+    font-size: 9px;
+}
+
+.zazu-calendar-agenda-day {
+    background: var(--zazu-surface);
+}
+
+.zazu-calendar-agenda-holidays {
+    display: grid;
+    gap: 5px;
+    margin-bottom: 7px;
+}
+
+.zazu-calendar-agenda-holiday {
+    display: flex;
+    align-items: flex-start;
+    gap: 9px;
+    min-height: 40px;
+    padding: 8px 10px;
+    border-left: 3px solid var(--zazu-primary);
+    background: var(--zazu-primary-soft);
+}
+
+.zazu-calendar-agenda-holiday strong {
+    display: block;
+    color: var(--zazu-ink);
+    font-size: 11px;
+    font-weight: 750;
+}
+
+.zazu-calendar-agenda-holiday small {
+    display: block;
+    margin-top: 2px;
+    color: var(--zazu-muted);
+    font-size: 10px;
+}
+
+.zazu-calendar-agenda-holiday.holiday-christian,
+.zazu-calendar-agenda-holiday.holiday-muslim,
+.zazu-calendar-agenda-holiday.holiday-hindu,
+.zazu-calendar-agenda-holiday.holiday-jewish {
+    border-left-color: var(--zazu-accent);
+}
+
+/* Keep Helper below navigation overlays; JS also moves it away when an
+   open navigation flyout physically intersects it. */
+.zazu-helper {
+    z-index: 70;
+}
+
+@media (max-width: 850px) {
+    .zazu-user-popover {
+        left: 0;
+        right: auto;
+        bottom: calc(100% + 8px);
+        width: min(320px, calc(100vw - 20px));
+    }
+
+    .zazu-calendar-grid {
+        overflow-x: auto;
+        grid-template-columns: repeat(7, minmax(104px, 1fr));
+        min-width: 770px;
+    }
+
+    .zazu-calendar-grid > .zazu-calendar-cell {
+        min-height: 108px;
+    }
+}
+
+@media (max-width: 700px) {
+    .zazu-calendar-page .zazu-calendar-grid {
+        display: grid;
+    }
+}
