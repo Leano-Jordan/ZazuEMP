@@ -2970,7 +2970,7 @@ color: var(--zazu-muted);
 
 :root:not([data-theme="dark"]) .zazu-status-active {
 padding: 2px 6px;
-    border: 1px solid #B9DEC8;
+    border: 1px solid color-mix(in srgb,var(--zazu-success) 28%,var(--zazu-card-border));
     border-radius: 999px;
     background: var(--zazu-success-soft);
 }
