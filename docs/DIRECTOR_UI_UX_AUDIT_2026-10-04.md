@@ -80,3 +80,31 @@ Source-level verification on main confirms:
 - landing, offline workspace, error surface and application shell all use the corporate-blue direction.
 
 Browser screenshot verification is still required to confirm the rendered result after asset rebuild/cache refresh; the current environment does not provide a running Zazu browser session.
+
+## 2026-10-04 — interrupted mobile visual recovery continued
+
+### Evidence
+The supplied mobile screenshot exposed three concrete defects that remained after the earlier source-level pass:
+- the mobile application header used competing grid/positioning contracts, forcing section tabs into a narrow wrapped column and placing the page action in a detached lower/right region;
+- catalogue-tab text could inherit a dark foreground on a dark theme surface;
+- catalogue command-banner content could render visually flush against the card boundary in the affected runtime.
+
+### Director correction
+- consolidated resources/css/zazu-mobile-refinement.css to one mobile header contract;
+- removed the stale "menu context actions" grid and absolute left-offset action row;
+- mobile header now uses explicit rows for title/shell actions, horizontally scrolling section navigation, and page actions;
+- search expansion remains an active-state overlay instead of affecting resting layout;
+- added explicit dark-theme catalogue tab foregrounds in resources/css/zazu-final-visual-sweep.css;
+- added an explicit catalogue command inner-padding contract;
+- added regression assertions to tests/Feature/InterfaceRegressionTest.php.
+
+### Acceptance
+Source verification passed after the writes:
+- legacy mobile grid contract removed;
+- legacy left: 56px action positioning removed;
+- fixed min-height: 112px mobile header reservation removed;
+- canonical mobile grid contract present;
+- explicit dark catalogue-tab foreground contract present;
+- explicit catalogue command padding contract present.
+
+Rendered browser acceptance is still not claimed from this execution surface. The supplied screenshot is recorded as pre-fix evidence. Rebuild Vite assets and inspect the real local runtime at phone width before any further broad styling work.
