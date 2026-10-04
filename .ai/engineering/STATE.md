@@ -936,33 +936,3 @@ Evidence boundary:
 
 Next Director target:
 PHYSICAL PHONE UI ACCEPTANCE → DISCONNECTED PHONE-LOCAL ARCHITECTURE → FINAL RELEASE RE-AUDIT.
-
-
-## Director canonical visual-system execution — 2026-10-04
-
-Target: recover the operational UI from the degraded visual state and establish one authoritative 2026 blue hospitality visual layer.
-
-Executed on `main`:
-- Replaced the conflicting pale/white-heavy visual token direction with a corporate-blue application canvas and blue surface hierarchy.
-- Kept the repository's documented blue reference family as the brand anchor, while using deeper action blue where white button text needs stronger contrast.
-- Added a warm hospitality amber accent for operational attention instead of making every state blue.
-- Increased form-label and mobile-control readability.
-- Made inputs visibly distinct from cards without reverting to white fields.
-- Made primary buttons, secondary buttons, ghost actions, navigation links and section tabs visually distinct by shape, fill, border and state rather than colour alone.
-- Strengthened active navigation and active contextual tabs.
-- Removed the superseded `zazu-final-visual-sweep.css` layer from the application shell so the visual system is no longer being maintained by a competing stylesheet.
-- Retained `zazu-responsive-theme.css` and `zazu-mobile-refinement.css` as responsive/structural layers.
-
-Repository commits:
-- `15aae154ee9db6fbbd7e00864ef113c836415dee` — canonical visual system in `app.css`
-- `3032a3d5a96b48dbe4d0d6038b963e9f1d5750a1` — remove superseded stylesheet from Vite entry
-- `a8485d4dfd56db2d9572169ea19bd31289809c46` — delete superseded visual sweep file
-
-Verification boundary:
-- GitHub source was re-read before and during execution.
-- Repository reference evidence identifies `images/blue pallette.jpg` as the blue visual anchor.
-- Current screenshots were used as direct visual evidence of the degraded form and workspace states.
-- Browser/device rendering after these new commits has not been observed in this environment and is therefore not claimed.
-
-Next UI verification target:
-render the same registration/form and Quotes/workspace screens on desktop + phone, then correct only any remaining shared-shell defects rather than creating another competing CSS layer.
