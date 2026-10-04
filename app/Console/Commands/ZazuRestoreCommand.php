@@ -388,6 +388,7 @@ class ZazuRestoreCommand extends Command
         return false;
     }
 }
+
     private function validateStagedDatabase(string $driver, string $work): bool
     {
         if ($driver === 'sqlite') {
