@@ -273,3 +273,36 @@ Verification boundary:
 - CSS/JS brace and parenthesis balance passed;
 - Blade conditional counts balanced for changed Blade views;
 - rendered desktop/tablet/mobile visual acceptance remains pending an actual runtime/browser render.
+
+
+## Deep contrast/layout re-audit — 2026-10-04
+
+This pass treated the reported failures as cascade and regression defects rather than isolated styling preferences.
+
+### Verified source causes
+- Asset/inventory register rules only constrained min-width; the base list item remained flex-based and the action cluster was right-biased, so useful content could collapse toward the far edge.
+- The shared command band was still a pale gradient surface, unlike the dashboard workspace-state hero.
+- The landing page contained a broad dark-shell block followed by a light public block. The later block did not reset every earlier foreground/background pairing. Notable bad pairs included light ZAZU text on the light header and a near-white comparison surface carrying white text.
+- Business logo sizing was split across several rules without one explicit identity-zone fit contract.
+- Landing bento placement relied partly on auto-placement, so Plan/Delivery had no protected 50/50 invariant.
+
+### Corrections
+- Resource registers now use explicit grid regions with bounded forms and deterministic responsive collapse.
+- Command banners now use the dashboard image variable with a dark readability overlay and explicit light foregrounds.
+- Brand presentation reserves a 40px identity slot in a 72px shell zone and contains the supplied artwork.
+- Public navigation uses a common 40px control rhythm.
+- Plan/Delivery occupy 6 columns + 6 columns on the final desktop row.
+- Public landing foreground/background pairings are explicitly normalized for light surfaces, dark comparison surfaces and the intentionally dark operational-flow strip.
+
+### Acceptance invariants
+1. Resource register content must not be forced into a right-edge-only flex cluster.
+2. A single asset or inventory item must retain compact row height and distribute record/state/action content across the available width.
+3. Every shared page command banner must inherit the workspace-state image/readability treatment.
+4. Business logos are contained, not cropped or stretched, inside the dedicated identity slot.
+5. Public navigation links and actions share one 40px baseline.
+6. Plan and Delivery remain 50/50 on the final desktop bento row.
+7. Light landing surfaces use dark foregrounds; dark or image-backed surfaces use light foregrounds.
+8. Hover/focus states preserve the same foreground/surface relationship rather than swapping to an unreadable token.
+
+### Runtime acceptance boundary
+Source acceptance is implemented. GitHub Actions for the resulting commit must still be observed before this cycle is marked fully accepted.
