@@ -1167,3 +1167,16 @@ Acceptance boundary:
 - Source verification: passed; legacy mobile grid, 56px action offset and 112px reserved header height are absent; canonical header and readability contracts are present.
 - Visual acceptance: PENDING. The supplied screenshot is pre-fix evidence; local browser rendering is not exposed to this execution surface.
 - Next gate: rebuild Vite assets, hard refresh the local phone view, inspect header/tab/banner at the target viewport, then check desktop + mobile and both themes before another broad UI batch.
+
+
+### Director commercial UI harmonisation recovery — 2026-10-05
+
+- Benchmarked current UI direction against Carbon search guidance and Linear contextual command-menu patterns; retained Zazu's own blue operational language rather than copying either.
+- Light mode is now deliberately blue-slate rather than white: richer page canvas, cool elevated surfaces, blue-tinted header and blue-toned dark rail.
+- Existing card primitive owns the subtle glass treatment; later visual sweep no longer duplicates `.zazu-card` glass rules.
+- Dashboard operational surfaces also receive the same restrained glass/depth treatment.
+- Dashboard hero image overlay was reduced from the previous heavy darkening to a lighter 43% lower gradient while preserving white-on-image text.
+- Primary actions have stronger CTA geometry/depth; dashboard job entry has explicit `.zazu-btn-cta` semantics.
+- Mobile search is now a full-width focused search row with integrated shortcut affordance and a contextual command palette below it; the icon-only compressed treatment was removed.
+- Regression tests were expanded for palette, glass, CTA and mobile-search contracts.
+- Visual state: IMPLEMENTED / VISUAL UNVERIFIED until the local runtime is rendered at desktop/mobile in both themes.
