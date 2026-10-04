@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Business;
 use App\Models\Customer;
 use App\Support\CurrentBusiness;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -78,6 +79,57 @@ class CustomerController extends Controller
         return redirect()
             ->route('customers.index')
             ->with('success', 'Customer created successfully.');
+    }
+
+    public function quickStoreFromWork(Request $request): JsonResponse
+    {
+        $business = $this->business($request);
+
+        $validated = $request->validate([
+            'name' => [
+                'required',
+                'string',
+                'max:255',
+                Rule::unique('customers', 'name')->where(fn ($query) => $query->where('business_id', $business->id)),
+            ],
+            'primary_contact_name' => ['required', 'string', 'max:255'],
+            'primary_contact_phone' => ['nullable', 'string', 'max:50'],
+            'primary_contact_email' => ['nullable', 'email', 'max:255'],
+        ]);
+
+        $customer = DB::transaction(function () use ($validated, $business): Customer {
+            $customer = Customer::create([
+                'business_id' => $business->id,
+                'name' => trim($validated['name']),
+            ]);
+
+            $customer->contacts()->create([
+                'name' => trim($validated['primary_contact_name']),
+                'phone' => $validated['primary_contact_phone'] ?? null,
+                'email' => $validated['primary_contact_email'] ?? null,
+                'label' => 'Primary',
+                'is_primary' => true,
+            ]);
+
+            return $customer->load('contacts');
+        });
+
+        Audit::record('customer.created', $customer, [
+            'creation_surface' => 'work.quick_customer',
+        ], $business->id);
+
+        return response()->json([
+            'customer' => [
+                'id' => $customer->id,
+                'name' => $customer->name,
+                'contacts' => $customer->contacts->map(fn ($contact) => [
+                    'id' => $contact->id,
+                    'name' => $contact->name,
+                    'phone' => $contact->phone,
+                    'label' => $contact->label,
+                ])->values()->all(),
+            ],
+        ], 201);
     }
 
     public function show(Request $request, Customer $customer): View
