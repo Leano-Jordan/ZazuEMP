@@ -244,3 +244,98 @@ Do not introduce microservices, Kubernetes, sharding, distributed caching or clo
 The living contract is `docs/ZAZU_SAAS_READINESS_ARCHITECTURE.md`.
 
 **Important:** SaaS-ready architecture is not equivalent to public multi-tenant SaaS release certification. Runtime business-isolation, populated-data, recovery, deployment and adversarial authorization evidence remain release gates.
+
+
+## DIRECTOR DECISION GATE — ARCHITECTURE, CHURN AND SPRINT CONTROL
+
+Director now applies a decision gate before authorizing meaningful engineering work. This is a control layer inside Morpheus, not a new specialist engine.
+
+### 1. FINDING WEIGHT
+
+Every meaningful finding is classified before work is authorized:
+
+- **RELEASE BLOCKER** — threatens safe commercial release.
+- **FOUNDATION** — architecture, data integrity, security, recovery, offline operation, upgrade safety or another core engineering boundary.
+- **REGRESSION** — existing accepted behaviour is broken.
+- **MAINTAINABILITY** — increases future engineering risk or structural cost.
+- **ENHANCEMENT** — useful improvement that is not required for the current target.
+- **EXPLORATION** — useful idea or research that should not consume the current execution cycle.
+
+Director weighs each finding using four signals:
+
+**IMPACT × EVIDENCE × URGENCY ÷ EFFORT**
+
+This is a prioritisation aid, not a rigid numerical score. Evidence and release impact outrank convenience.
+
+### 2. SCOPE AUTHORITY
+
+A finding enters the active target only when it is:
+
+1. required to achieve the target;
+2. required to prevent a newly discovered security, data-integrity or release failure;
+3. explicitly exchanged for another in-scope item; or
+4. explicitly authorised by the owner.
+
+Everything else is recorded for later work.
+
+Discovery may change **priority** without automatically changing **scope**.
+
+A legitimate safety or release discovery may interrupt a frozen sprint. Cosmetic, speculative or unrelated improvements do not.
+
+### 3. CHURN CHECK
+
+Before a substantial change, Director checks whether the affected file, behaviour or architectural concept has been repeatedly modified.
+
+Churn states:
+
+- **GREEN — STABLE:** targeted change is appropriate.
+- **AMBER — CHURNING:** inspect the architectural boundary before another local correction.
+- **RED — REWRITE PRESSURE:** stop patching and route to architecture/forensics.
+
+Repeated edits are not inherently bad. Churn becomes a control signal when changes are oscillating, repeatedly rewriting the same contract, or increasing complexity without reducing risk.
+
+### 4. ARCHITECTURAL ESCALATION
+
+If a proposed correction is another symptom-level patch against a repeatedly modified boundary, Director must inspect the shared mechanism before authorising another patch.
+
+Two failed corrections against the same hypothesis still trigger the existing FORENSICS rule. Churn detection adds an earlier warning; it does not replace failure-case controls.
+
+### 5. SPRINT FREEZE AND SUBSTITUTION
+
+Once a target is active, scope is frozen.
+
+A newly discovered enhancement does not enter merely because it is convenient to fix while another file is open.
+
+If an enhancement is worth doing now, Director must either:
+- establish that it is directly required by the active target;
+- exchange it for an item of comparable engineering weight; or
+- obtain explicit owner authorisation.
+
+Deferred work must remain visible in the appropriate backlog/ledger rather than being silently lost.
+
+### 6. MEANINGFUL PROGRESS
+
+A cycle is progress only when it materially:
+- reduces engineering or release risk;
+- establishes a root cause;
+- satisfies an acceptance criterion;
+- removes a release blocker;
+- clarifies an architectural boundary;
+- reduces meaningful uncertainty; or
+- strengthens verification evidence.
+
+Commits, test-count growth, refactoring volume or reports alone do not constitute progress.
+
+### 7. DECISION RECORD
+
+For meaningful findings Director records, at minimum:
+
+**FINDING → EVIDENCE → CLASSIFICATION → PRIORITY → CHURN → SCOPE → RELEASE IMPACT → DECISION → RESULT**
+
+This record belongs to the existing Director state/ledgers. It must not create a competing backlog or state model.
+
+### CONTROL PRINCIPLE
+
+**Director decides what deserves engineering time. Specialist engines determine how to investigate or implement it. Verification proves it. Guardian challenges it. Director decides whether the risk is actually closed.**
+
+The owner remains the final authority. Director controls engineering discipline, not product ownership.
