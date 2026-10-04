@@ -119,10 +119,17 @@ class CustomerController extends Controller
             'creation_surface' => 'work.quick_customer',
         ], $business->id);
 
+        $canUpdate = app(\App\Support\PermissionService::class)->allows(
+            'customers.update',
+            $request->user(),
+            $business
+        );
+
         return response()->json([
             'customer' => [
                 'id' => $customer->id,
                 'name' => $customer->name,
+                'edit_url' => $canUpdate ? route('customers.edit', $customer) : null,
                 'contacts' => $customer->contacts->map(fn ($contact) => [
                     'id' => $contact->id,
                     'name' => $contact->name,
