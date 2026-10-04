@@ -2,6 +2,8 @@
 
 **Status:** PRE-LAUNCH CONTROL SET / REQUIRES OWNER + LEGAL/ACCOUNTING REVIEW  
 **Date:** 2026-10-04  
+**Current solo business owner / developer:** Isaac Junior Lehlogonolo Maluleka  
+**Operating address:** 1068 Block JK, Soshanguve, Pretoria, South Africa  
 **Repository:** `Leano-Jordan/ZazuEMP`  
 **Branch:** `main`
 
