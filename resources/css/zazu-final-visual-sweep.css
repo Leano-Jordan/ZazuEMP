@@ -6953,3 +6953,150 @@ body.zazu-has-wallpaper {
         background: #10283F;
     }
 }
+
+/* DIRECTOR — global readability + page banner pass
+ * The page banner is the shared command surface. It uses the business dashboard
+ * artwork across operational pages while preserving readable text through overlays.
+ */
+.zazu-command-band {
+    position: relative;
+    isolation: isolate;
+    min-height: 168px;
+    padding: 28px 30px;
+    overflow: hidden;
+    background:
+        linear-gradient(90deg, rgba(7,20,38,.94) 0%, rgba(9,31,58,.82) 48%, rgba(9,31,58,.48) 100%),
+        var(--zazu-dashboard-image),
+        linear-gradient(135deg, #123A68 0%, #1D63A8 100%);
+    background-size: cover;
+    background-position: center;
+    color: #F7FBFF;
+    border-color: #2B5D8F;
+    box-shadow: 0 12px 30px rgba(9,31,58,.16);
+}
+.zazu-command-band > * {
+    position: relative;
+    z-index: 1;
+}
+.zazu-command-band .zazu-eyebrow,
+.zazu-command-band .zazu-command-title,
+.zazu-command-band .zazu-command-copy,
+.zazu-command-band .zazu-command-meta-label,
+.zazu-command-band .zazu-command-meta-value {
+    color: #F7FBFF !important;
+    text-shadow: 0 1px 2px rgba(0,0,0,.24);
+}
+.zazu-command-band .zazu-command-copy {
+    color: #E4EFF9 !important;
+}
+.zazu-command-band .zazu-command-meta {
+    border-left-color: rgba(255,255,255,.28);
+}
+.zazu-command-band::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+    pointer-events: none;
+    background: linear-gradient(90deg, transparent 0%, rgba(15,86,150,.08) 55%, rgba(4,15,28,.18) 100%);
+}
+
+:root[data-theme="dark"] .zazu-topbar {
+    background: rgba(10,20,36,.96) !important;
+    border-bottom-color: #355879 !important;
+}
+:root[data-theme="dark"] .zazu-section-tabs {
+    background: #122A43 !important;
+    border: 1px solid #355879 !important;
+    border-radius: 10px;
+    padding: 3px;
+}
+:root[data-theme="dark"] .zazu-section-name {
+    color: #C6D8E9 !important;
+}
+:root[data-theme="dark"] .zazu-section-tabs a {
+    color: #C9D9E8 !important;
+    background: transparent !important;
+}
+:root[data-theme="dark"] .zazu-section-tabs a.active {
+    color: #FFFFFF !important;
+    background: #1F5E99 !important;
+    border-color: #5F88B0 !important;
+    box-shadow: none !important;
+}
+:root[data-theme="dark"] .zazu-section-tabs a:hover,
+:root[data-theme="dark"] .zazu-section-tabs a:focus-visible {
+    color: #FFFFFF !important;
+    background: #1A466E !important;
+}
+
+:root[data-theme="dark"] .zazu-eyebrow,
+:root[data-theme="dark"] .zazu-card-description,
+:root[data-theme="dark"] .zazu-panel-copy,
+:root[data-theme="dark"] .zazu-command-copy,
+:root[data-theme="dark"] .zazu-form-section-copy,
+:root[data-theme="dark"] .zazu-field-help,
+:root[data-theme="dark"] .zazu-list-meta,
+:root[data-theme="dark"] .zazu-dash-surface-head p,
+:root[data-theme="dark"] .zazu-dash-note,
+:root[data-theme="dark"] small {
+    color: #BFD0E0 !important;
+}
+:root[data-theme="dark"] .zazu-card-title,
+:root[data-theme="dark"] .zazu-panel-title,
+:root[data-theme="dark"] .zazu-form-section-title,
+:root[data-theme="dark"] .zazu-list-title,
+:root[data-theme="dark"] .zazu-dash-surface-head h3,
+:root[data-theme="dark"] .zazu-dash-metric strong,
+:root[data-theme="dark"] .zazu-dash-hero h2 {
+    color: #F1F6FA !important;
+}
+:root[data-theme="dark"] .zazu-dash-surface,
+:root[data-theme="dark"] .zazu-card,
+:root[data-theme="dark"] .zazu-panel,
+:root[data-theme="dark"] .zazu-form-section,
+:root[data-theme="dark"] .zazu-list {
+    color: #EAF2F8;
+}
+:root[data-theme="dark"] .zazu-form .zazu-field > span:first-child,
+:root[data-theme="dark"] .zazu-form label > span:first-child,
+:root[data-theme="dark"] .zazu-label,
+:root[data-theme="dark"] label {
+    color: #D9E6F0 !important;
+}
+:root[data-theme="dark"] .zazu-input,
+:root[data-theme="dark"] .zazu-select,
+:root[data-theme="dark"] .zazu-textarea,
+:root[data-theme="dark"] input,
+:root[data-theme="dark"] select,
+:root[data-theme="dark"] textarea {
+    background: #0B1C2D !important;
+    color: #F3F7FA !important;
+    border-color: #5A82A8 !important;
+}
+:root[data-theme="dark"] option {
+    background: #0B1C2D;
+    color: #F3F7FA;
+}
+
+.zazu-calendar-holiday-dot-mini {
+    width: 5px;
+    height: 5px;
+    display: inline-block;
+    margin-left: 2px;
+    vertical-align: middle;
+    border-radius: 50%;
+    flex: 0 0 5px;
+    background: var(--zazu-primary);
+}
+.zazu-calendar-holiday-dot-mini.holiday-public { background: #3B82F6; }
+.zazu-calendar-holiday-dot-mini.holiday-muslim { background: #16A085; }
+.zazu-calendar-holiday-dot-mini.holiday-hindu { background: #D97706; }
+.zazu-calendar-holiday-dot-mini.holiday-christian { background: #8B5CF6; }
+.zazu-calendar-holiday-dot-mini.holiday-jewish { background: #EAB308; }
+.zazu-calendar-holiday-dot-mini.holiday-cultural { background: #EC4899; }
+
+.zazu-calendar-mini-grid a,
+.zazu-calendar-mini-grid span {
+    gap: 2px;
+}
