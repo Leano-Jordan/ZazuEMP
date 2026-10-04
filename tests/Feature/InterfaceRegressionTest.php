@@ -122,6 +122,8 @@ class InterfaceRegressionTest extends TestCase
         $this->assertStringContainsString('.topnav .register,.topnav .login{', $view);
         $this->assertStringContainsString('.telemetry small,.record small,.record-label{color:#496A83}', $view);
         $this->assertStringContainsString('.compare>article+article{background:#0B2A40;color:#F5FAFF}', $view);
+        $this->assertStringContainsString('.mark{background:#126BD8;color:#FFFFFF}', $view);
+        $this->assertStringContainsString('.btn.primary{background:#126BD8;border-color:#126BD8;color:#FFFFFF}', $view);
         $this->assertStringContainsString('.feature.mini:nth-of-type(4){grid-column:1 / span 6;grid-row:3}', $view);
         $this->assertStringContainsString('.feature.mini:nth-of-type(5){grid-column:7 / -1;grid-row:3}', $view);
     }
