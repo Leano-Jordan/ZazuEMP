@@ -293,7 +293,7 @@
         .workflow-grid h3{margin:42px 0 9px;font-family:"Space Grotesk Variable","Space Grotesk",Manrope,sans-serif;font-size:20px;line-height:1.1}
         .workflow-grid p{margin:0;color:#4B6B84;font-size:12px;line-height:1.65}
         .closing{padding:74px 0 90px}
-        .closing-box{padding:44px;background:linear-gradient(120deg,#2478ED,#36A5FF 56%,#13A98C);color:#fff}
+        .closing-box{padding:44px;background:linear-gradient(120deg,#1459AD,#1769C2 56%,#08755F);color:#fff}
         .closing-box p{color:#EAF6FF;font-size:13px;line-height:1.55}
         .closing-box .btn{background:rgba(255,255,255,.92);color:#14549A;border-color:rgba(255,255,255,.88)}
         @media(max-width:1100px){.site{width:min(100% - 40px,1680px)}.hero{grid-template-columns:1fr}.hero-photo{height:440px}.workflow-grid{grid-template-columns:repeat(3,minmax(0,1fr))}}
@@ -342,7 +342,7 @@
             color:#173F63;
         }
         .topnav .register:hover,.topnav .login:hover{background:#FFFFFF;color:#0F3658}
-        .topnav .launch{min-height:40px;background:#2F80FF;color:#FFFFFF;border-color:#2F80FF}
+        .mark{background:#126BD8;color:#FFFFFF}.btn.primary{background:#126BD8;border-color:#126BD8;color:#FFFFFF}.topnav .launch{min-height:40px;background:#126BD8;color:#FFFFFF;border-color:#126BD8}
         .mobile-menu{
             border-color:#BDD5E8;
             background:#F7FBFF;
