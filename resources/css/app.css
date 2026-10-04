@@ -5843,11 +5843,11 @@ html[data-theme="dark"] .zazu-public-party,html[data-theme="dark"] .zazu-public-
 .zazu-calendar-cell.is-today { box-shadow:inset 0 2px 0 var(--zazu-primary); background:var(--zazu-primary-soft); }
 .zazu-calendar-cell.is-current-month .zazu-calendar-date { color:var(--zazu-ink); }
 .zazu-calendar-date-row { display:flex; align-items:center; justify-content:space-between; gap:8px; }
-.zazu-calendar-today { color:var(--zazu-primary-deep); font-size:9px; font-weight:800; text-transform:uppercase; letter-spacing:.08em; }
+.zazu-calendar-today { color:var(--zazu-primary-deep); font-size:var(--zazu-font-size-meta); font-weight:var(--zazu-weight-bold); text-transform:uppercase; letter-spacing:.08em; }
 .zazu-calendar-events { display:grid; gap:4px; margin-top:7px; }
 .zazu-calendar-event { display:block; width:100%; padding:5px 7px; overflow:hidden; border:1px solid color-mix(in srgb,var(--zazu-primary) 20%,var(--zazu-border)); border-radius:var(--zazu-radius-md); background:var(--zazu-primary-soft); color:var(--zazu-primary-deep); white-space:nowrap; text-overflow:ellipsis; font-size:10px; line-height:1.25; }
 .zazu-calendar-event:hover { border-color:var(--zazu-primary); background:var(--zazu-surface); }
-.zazu-calendar-more { color:var(--zazu-muted); font-size:9px; font-weight:700; }
+.zazu-calendar-more { color:var(--zazu-muted); font-size:var(--zazu-font-size-meta); font-weight:var(--zazu-weight-semibold); }
 .zazu-calendar-agenda { display:none; }
 @media(max-width:700px){
  .zazu-calendar-grid { display:none; }
