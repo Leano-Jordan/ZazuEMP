@@ -30,7 +30,7 @@ function applyTheme(theme) {
     document.documentElement.dataset.theme = theme;
 
     const themeColor = document.querySelector('meta[name="theme-color"]');
-    if (themeColor) themeColor.setAttribute('content', theme === 'dark' ? '#081A2A' : '#E3EBF3');
+    if (themeColor) themeColor.setAttribute('content', theme === 'dark' ? '#071B2C' : '#0B3A66');
 
 document.querySelectorAll('[data-theme-toggle]').forEach((button) => {
         const isDark = theme === 'dark';
