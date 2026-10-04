@@ -69,6 +69,47 @@ class InterfaceRegressionTest extends TestCase
             ->assertSee('class="zazu-nav-link active" aria-current="page">Calendar</a>', false);
     }
 
+    public function test_calendar_permission_is_explicit_for_configured_operational_roles(): void
+    {
+        [$business] = $this->workspace();
+
+        foreach (['staff', 'manager'] as $role) {
+            $user = User::factory()->create();
+            $business->users()->attach($user, ['role' => $role]);
+
+            $this->assertContains(
+                'calendar.view',
+                config('zazu.permissions.roles.'.$role, []),
+                "Role [{$role}] must explicitly retain calendar.view."
+            );
+
+            $this->actingAs($user)
+                ->get(route('calendar.index'))
+                ->assertOk();
+        }
+    }
+
+    public function test_calendar_navigation_has_a_server_rendered_mobile_recovery_contract(): void
+    {
+        $layout = file_get_contents(resource_path('views/components/app-layout.blade.php'));
+        $mobileCss = file_get_contents(resource_path('css/zazu-mobile-refinement.css'));
+        $js = file_get_contents(resource_path('js/app.js'));
+
+        $this->assertStringContainsString(
+            "request()->routeIs('dashboard','work.*','customers.*','calendar.*')",
+            $layout
+        );
+        $this->assertStringContainsString('@media (max-width: 850px)', $mobileCss);
+        $this->assertStringContainsString(
+            '.zazu-nav-area.is-active > .zazu-nav-flyout',
+            $mobileCss
+        );
+        $this->assertStringContainsString(
+            "window.matchMedia('(max-width: 850px)')",
+            $js
+        );
+    }
+
     public function test_resource_register_pages_render_without_horizontal_layout_assumptions(): void
     {
         [$business, $user] = $this->workspace();
