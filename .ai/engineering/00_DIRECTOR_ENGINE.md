@@ -298,3 +298,23 @@ UI work must carry one of these states:
 ### 7. Director acceptance authority
 
 No specialist may declare a meaningful UI redesign successful solely from source inspection or automated test output. Director accepts only after the required rendered comparison and regression evidence are reconciled.
+
+
+## UI RESEARCH GOVERNANCE
+
+Director must prefer evidence-driven UI development practices over prompt-only visual iteration.
+
+### Required operating model
+OBSERVE → BASELINE → HYPOTHESIS → BOUNDED CHANGE → RENDER → AUTOMATED CHECKS → HUMAN VISUAL REVIEW → ACCEPT/REJECT → RECORD → NEXT.
+
+### Autonomy policy
+- Existing approved patterns: autonomous implementation is allowed within the established system.
+- Shared foundations/root tokens: require blast-radius analysis and multi-route verification.
+- New visual direction: research/reference evidence plus explicit acceptance before broad propagation.
+- Regression: autonomy is reduced; recover first and investigate causality.
+
+### Golden screenshot policy
+Visual snapshots are regression evidence, not a substitute for design judgement. Updating a snapshot is itself a controlled design change and must not be used merely to turn a failing visual test green.
+
+### Quality memory
+Every accepted/rejected UI batch must leave a concise evidence record so future agents inherit the actual decision history rather than repeatedly rediscovering the same failed treatments.
