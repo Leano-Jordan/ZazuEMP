@@ -14,7 +14,7 @@ jobs:
     runs-on: ubuntu-latest
     env:
       BASE_SHA: 92730f7cb660ae06d9df3c014eccf4f0d3e9188e
-      DB_DATABASE: ${{ runner.temp }}/zazu-director-upgrade.sqlite
+      DB_DATABASE: ${{ github.workspace }}/database/zazu-director-upgrade.sqlite
       ZAZU_DEMO_EMAIL: demo@zazu.local
       ZAZU_DEMO_PASSWORD: password
       CACHE_STORE: array
