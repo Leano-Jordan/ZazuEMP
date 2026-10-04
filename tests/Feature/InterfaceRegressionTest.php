@@ -132,6 +132,22 @@ class InterfaceRegressionTest extends TestCase
         $this->assertStringContainsString('padding:20px 18px 18px;', $visualCss);
     }
 
+    public function test_commercial_visual_system_has_glass_depth_rich_light_surfaces_and_non_dark_mobile_search(): void
+    {
+        $appCss = file_get_contents(resource_path('css/app.css'));
+        $sweepCss = file_get_contents(resource_path('css/zazu-final-visual-sweep.css'));
+        $mobileCss = file_get_contents(resource_path('css/zazu-mobile-refinement.css'));
+
+        $this->assertStringContainsString('--zazu-page: #D9E8F5;', $appCss);
+        $this->assertStringContainsString('--zazu-surface: #F2F7FC;', $appCss);
+        $this->assertStringContainsString('backdrop-filter: blur(12px) saturate(115%);', $appCss);
+        $this->assertStringContainsString('.zazu-btn-cta {', $sweepCss);
+        $this->assertStringContainsString('background: linear-gradient(135deg, var(--zazu-primary), var(--zazu-primary-deep));', $sweepCss);
+        $this->assertStringContainsString('rgba(15,23,42,.43)', $sweepCss);
+        $this->assertStringContainsString('"search search search"', $mobileCss);
+        $this->assertStringContainsString('width: 100%;', $mobileCss);
+    }
+
     public function test_public_landing_has_explicit_foreground_surface_pairings_and_balanced_plan_delivery(): void
     {
         $view = file_get_contents(resource_path('views/landing.blade.php'));
