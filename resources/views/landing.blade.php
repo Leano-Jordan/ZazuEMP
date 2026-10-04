@@ -87,7 +87,173 @@
             .visual-band-copy{padding:26px 20px}
         }
         @media(prefers-reduced-motion:reduce){.nav-solutions-panel a,.nav-solutions>summary{transition:none!important}}
-</style>
+
+        /* DIRECTOR — public shell readability / reference alignment.
+           Keep the landing page's dark Zazu shell consistent with the product shell. */
+        :root{
+            --ui-font:ui-sans-serif,system-ui,-apple-system,"Segoe UI",sans-serif;
+            --ui-mono:ui-monospace,SFMono-Regular,Menlo,monospace;
+            --shell:#081F2F;
+            --shell-surface:#0D2A42;
+            --shell-hover:#12344F;
+            --shell-ink:#F5FAFF;
+            --shell-muted:#C2D3E3;
+            --shell-label:#9DB7CD;
+            --shell-line:rgba(194,211,227,.22);
+        }
+        body{font-family:var(--ui-font)}
+        .mono,
+        .eyebrow,
+        .hero-note,
+        .control-head,
+        .telemetry small,
+        .telemetry strong,
+        .record-label,
+        .record .ref,
+        .tag,
+        .flow,
+        .brand span:last-child{font-family:var(--ui-mono)}
+        .top{
+            height:72px;
+            border-bottom-color:var(--shell-line);
+            background:color-mix(in srgb,var(--shell) 94%,transparent);
+        }
+        .brand strong{color:var(--shell-ink)}
+        .brand span:last-child{color:var(--shell-label)}
+        .topnav{gap:2px}
+        .topnav a,
+        .topnav button{
+            min-height:40px;
+            padding:0 12px;
+            border-radius:0;
+            color:var(--shell-muted);
+            font-family:var(--ui-font);
+            font-size:12px;
+            font-weight:700;
+        }
+        .topnav a:hover,
+        .topnav button:hover{
+            background:var(--shell-hover);
+            color:var(--shell-ink);
+        }
+        .topnav .register{
+            background:color-mix(in srgb,var(--blue) 18%,var(--shell-surface));
+            color:#9CCBFF;
+            border:1px solid color-mix(in srgb,var(--blue) 48%,var(--shell-line));
+        }
+        .topnav .login{
+            background:var(--shell-surface);
+            color:var(--shell-ink);
+            border:1px solid var(--shell-line);
+        }
+        .topnav .launch{
+            background:var(--blue);
+            color:#fff;
+        }
+        .hero-copy{color:var(--body);font-family:var(--ui-font)}
+        .hero-note{font-size:10px;color:var(--shell-label)}
+        .btn{
+            border-radius:0;
+            font-family:var(--ui-font);
+            font-size:12px;
+        }
+        .mobile-nav-toggle{
+            border-radius:0;
+            background:var(--shell-surface);
+            border-color:var(--shell-line);
+            color:var(--shell-ink);
+        }
+        .mobile-menu{
+            top:50px;
+            border-radius:0;
+            border-color:var(--shell-line);
+            background:var(--shell-surface);
+            box-shadow:0 18px 40px rgba(0,0,0,.28);
+        }
+        .mobile-menu a,
+        .mobile-menu button{
+            border-radius:0;
+            color:var(--shell-ink);
+            font-family:var(--ui-font);
+            font-size:13px;
+        }
+        .mobile-menu a:hover,
+        .mobile-menu button:hover{background:var(--shell-hover);color:var(--shell-ink)}
+
+        /* The public auth dialog was mixing dark surfaces with light-mode text. */
+        .auth-modal-panel{
+            color:var(--shell-ink);
+            background:var(--shell-surface);
+            border-color:var(--shell-line);
+            border-radius:0;
+        }
+        .auth-modal-access{
+            border-color:var(--shell-line);
+            background:var(--shell);
+            border-radius:0;
+        }
+        .auth-modal-access button{
+            border-radius:0;
+            color:var(--shell-muted);
+            font-family:var(--ui-font);
+            font-size:12px;
+        }
+        .auth-modal-access button[aria-selected="true"]{
+            background:var(--blue);
+            color:#fff;
+            box-shadow:none;
+        }
+        .auth-modal-access button:hover:not([aria-selected="true"]){
+            color:var(--shell-ink);
+            background:var(--shell-hover);
+        }
+        .auth-modal-kicker{color:#8FC5FF;font-family:var(--ui-mono);font-size:10px}
+        .auth-modal h2{
+            color:var(--shell-ink);
+            font-family:var(--ui-font);
+        }
+        .auth-modal-copy{color:var(--shell-muted)}
+        .auth-modal-field label{color:var(--shell-ink)}
+        .auth-modal-field input{
+            border-color:var(--shell-line);
+            border-radius:0;
+            background:var(--shell);
+            color:var(--shell-ink);
+            font-family:var(--ui-font);
+        }
+        .auth-modal-field input::placeholder{color:var(--shell-label)}
+        .auth-modal-field input:focus{
+            border-color:#78B7FF;
+            box-shadow:0 0 0 3px rgba(99,174,255,.16);
+            background:var(--shell);
+        }
+        .auth-modal-password button{
+            color:#9CCBFF;
+            background:transparent;
+        }
+        .auth-modal-help{color:var(--shell-muted)}
+        .auth-modal-switch{color:var(--shell-muted)}
+        .auth-modal-switch button,
+        .auth-modal-forgot{color:#9CCBFF}
+        .auth-modal-close{
+            border-radius:0;
+            border-color:var(--shell-line);
+            background:var(--shell);
+            color:var(--shell-muted);
+        }
+        .auth-modal-close:hover{background:var(--shell-hover);color:var(--shell-ink)}
+        .auth-modal-error{color:#FFB4B4}
+
+        @media(max-width:640px){
+            .top{height:auto;padding:10px 0}
+            .topnav .launch{min-height:40px}
+            .mobile-menu{top:48px}
+            .hero{padding-top:42px}
+            h1{font-size:clamp(42px,13vw,54px);line-height:.96}
+            .hero-copy{font-size:16px;line-height:1.6}
+        }
+
+    </style>
 </head>
 <body>
 <div class="site">
