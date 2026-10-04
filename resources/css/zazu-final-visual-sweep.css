@@ -1019,7 +1019,7 @@ margin:0;color:var(--zazu-text-muted);font-size:10px
 }
 
 .zazu-dash-hero {
-display:grid;grid-template-columns:minmax(0,1fr) 220px;gap:0;overflow:hidden;margin-bottom:16px;border:1px solid var(--zazu-card-border);border-radius:14px;background:linear-gradient(118deg,#fff 0%,#fff 58%,var(--zazu-primary-soft) 100%);box-shadow:0 12px 35px rgba(15,23,42,.055)
+display:grid;grid-template-columns:minmax(0,1fr) 220px;gap:0;overflow:hidden;margin-bottom:16px;border:1px solid var(--zazu-card-border);border-radius:14px;background:var(--zazu-card-bg);box-shadow:0 12px 35px rgba(15,23,42,.055)
 }
 
  .zazu-dash-hero-main {
@@ -1079,7 +1079,7 @@ display:grid;grid-template-columns:minmax(0,1.55fr) minmax(240px,.65fr);gap:16px
 }
 
 .zazu-dash-surface {
-min-width:0;border:1px solid var(--zazu-card-border);border-radius:12px;background:rgba(255,255,255,.94);box-shadow:var(--zazu-card-shadow)
+min-width:0;border:1px solid var(--zazu-card-border);border-radius:12px;background:var(--zazu-card-bg);box-shadow:var(--zazu-card-shadow)
 }
 
 .zazu-dash-run {
@@ -1267,7 +1267,7 @@ color:var(--zazu-text-muted);font-size:11px
 }
 
 .zazu-dash-commandbar {
-display:flex;align-items:center;justify-content:space-between;gap:18px;margin-top:12px;padding:14px 17px;border:1px solid var(--zazu-card-border);border-radius:10px;background:rgba(255,255,255,.86);box-shadow:var(--zazu-card-shadow)
+display:flex;align-items:center;justify-content:space-between;gap:18px;margin-top:12px;padding:14px 17px;border:1px solid var(--zazu-card-border);border-radius:10px;background:var(--zazu-card-bg);box-shadow:var(--zazu-card-shadow)
 }
 
 .zazu-dash-commandbar>div {
