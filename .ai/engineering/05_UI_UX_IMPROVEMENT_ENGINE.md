@@ -344,3 +344,93 @@ It must return:
 Director reconciles the finding with Builder, Verification, Guardian, Failure Case and Release state.
 
 The next engine action is always derived from the shared Director state.
+
+
+## VISUAL RECOVERY / NON-DESTRUCTIVE IMPLEMENTATION GATE
+
+The UI/UX engine is an improvement engine, not a visual-reset engine. Its job is to improve the existing product without destroying useful identity, hierarchy or working patterns.
+
+### Baseline first
+
+Before a meaningful visual change:
+1. inspect the current rendered target;
+2. inspect the existing shared visual authority;
+3. inspect recent UI changes when available;
+4. inspect repository reference images;
+5. record the specific visual characteristics being targeted;
+6. identify the smallest shared cause that can address the finding.
+
+Never infer the desired design from the words "modern SaaS" alone.
+
+### Reference-to-implementation rule
+
+Reference images must produce an explicit visual brief before implementation. The brief should identify observable characteristics, not vague adjectives:
+- dominant/background surface relationship;
+- accent hierarchy;
+- contrast relationship;
+- typography hierarchy;
+- density and whitespace balance;
+- navigation/control distinction;
+- panel and table treatment;
+- responsive composition.
+
+The implementation should adapt these principles to Zazu's existing system rather than replacing Zazu with a generic template aesthetic.
+
+### Anti-demolition rule
+
+Do not perform a broad visual rewrite merely because several screens look imperfect.
+
+Do not simultaneously replace the root palette, typography, spacing, component geometry, shell and responsive layout without evidence of one shared root cause.
+
+Do not solve a visual conflict by adding another competing stylesheet, override chain, !important rule or page-specific palette.
+
+### Visual change budget
+
+Each meaningful UI batch must state:
+- target surface;
+- intended visual delta;
+- shared authority touched;
+- expected benefit;
+- affected consumers;
+- regression risks;
+- required rendered views.
+
+If the expected benefit cannot be stated concretely, do not implement the change.
+
+### WORSE-THAN-BASELINE REJECTION
+
+After implementation, compare the rendered result with the recorded baseline.
+
+Reject the change when it materially worsens any of:
+- readability/contrast;
+- hierarchy;
+- navigation distinction;
+- primary-action clarity;
+- information density;
+- useful whitespace balance;
+- form usability;
+- table scanability;
+- responsive composition;
+- theme coherence;
+- reference alignment;
+- commercial polish.
+
+Passing tests does not cancel a visual rejection.
+
+### Recovery procedure
+
+When a visual batch is rejected:
+**STOP → capture/retain evidence → isolate the responsible change → restore the previous known-good visual state or revert the responsible change → record the rejected treatment → reassess from the clean baseline.**
+
+Do not layer a second cosmetic patch over a rejected first patch.
+
+### Human-eye acceptance language
+
+The engine must return one explicit visual state:
+- BASELINE RECORDED;
+- IMPLEMENTED / VISUAL UNVERIFIED;
+- VISUAL VERIFIED;
+- VISUAL REJECTED / RECOVERY REQUIRED;
+- BLOCKED / INSUFFICIENT EVIDENCE.
+
+A source-level statement such as "tokens are correct" is not visual acceptance.
