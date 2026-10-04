@@ -141,8 +141,8 @@
                     <div class="zazu-step-list">
                         <div class="zazu-step"><span class="zazu-step-dot"></span><div><div class="zazu-step-title">Requirements</div><div class="zazu-step-copy">Source record</div></div></div>
                         <div class="zazu-step"><span class="zazu-step-dot"></span><div><div class="zazu-step-title">Quote v1</div><div class="zazu-step-copy">Current commercial draft</div></div></div>
-                        <div class="zazu-step"><span class="zazu-step-dot"></span><div><div class="zazu-step-title">Travel & costing</div><div class="zazu-step-copy">Later foundation</div></div></div>
-                        <div class="zazu-step"><span class="zazu-step-dot"></span><div><div class="zazu-step-title">Customer acceptance</div><div class="zazu-step-copy">Later workflow</div></div></div>
+                        <div class="zazu-step"><span class="zazu-step-dot"></span><div><div class="zazu-step-title">Travel & costing</div><div class="zazu-step-copy">Available from this job</div></div></div>
+                        <div class="zazu-step"><span class="zazu-step-dot"></span><div><div class="zazu-step-title">Customer decision</div><div class="zazu-step-copy">Review and accept the quote</div></div></div>
                     </div>
                 </div>
             </aside>
