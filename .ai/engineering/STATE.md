@@ -768,3 +768,18 @@ Next Director target:
 CURRENT-HEAD CI/RUNTIME VERIFICATION → POPULATED COMMERCIAL WORKFLOW → RECOVERY DRILL → POPULATED UPGRADE/ROLLBACK
 
 Last updated: 2026-10-03
+
+
+## Director Decision Gate integration — 2026-10-04
+
+The Senior Architect/Sprint Controller discipline is now integrated into Morpheus/Director rather than introduced as a separate engine.
+
+Active controls:
+- finding classification and weighted prioritisation;
+- explicit scope authority and sprint freeze;
+- GREEN/AMBER/RED churn detection;
+- architectural escalation when local patching stops being rational;
+- meaningful-progress criteria based on risk/evidence rather than commit or test count;
+- persistent decision recording through existing Director state and ledgers.
+
+This is a control-plane enhancement. It does not change Zazu's product scope or create a competing backlog/acceptance authority.
