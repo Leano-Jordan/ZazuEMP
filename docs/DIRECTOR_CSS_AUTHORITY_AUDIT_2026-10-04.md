@@ -214,3 +214,38 @@ Verification boundary:
 - this remains SOURCE-VERIFIED / VISUAL-UNVERIFIED;
 - the repository connector does not expose the user's live local browser runtime, so post-change Dashboard/Work/Forms/Calendar renders could not be captured here;
 - the next acceptance gate remains an actual Vite rebuild and browser comparison across desktop/tablet/mobile plus light/dark before another broad styling pass.
+
+
+## Director shell readability correction — 2026-10-04
+
+User-reported defects were treated as usability failures, not as justification for removing interface capability.
+
+Observed/identified causes:
+- the late visual refinement layer had changed the sidebar to a light surface while hierarchical navigation still used dark-shell assumptions;
+- the hierarchical trigger and flyout therefore did not share one reliable foreground/background relationship;
+- the account popover was positioned below the sidebar footer, allowing it to extend beyond the viewport and hide the Sign out action;
+- the public landing page's dark authentication panel still contained several light-theme label/input colours, producing the same dark-text-on-dark-surface failure.
+
+Correction on main:
+- restored the sidebar as a consistently dark shell using sidebar-specific foreground tokens;
+- made the topbar use the same dark shell so page title, section tabs and header controls remain readable;
+- made desktop nav flyouts use the same dark shell family as the navigation rather than a light surface;
+- removed rounding from hierarchical nav triggers and flyout links so the navigation and attached popover read as one symmetrical system;
+- kept the flyout physically attached to its trigger;
+- moved the account popover above the footer trigger, constrained its height to the viewport and made its surface/foreground explicitly dark-shell readable;
+- retained a readable, semantic Sign out state;
+- made mobile hierarchical flyouts use the same dark shell surface while preserving inline behaviour;
+- harmonized the public landing header/navigation and authentication modal with the same shell font/foreground relationships;
+- no interface capability or navigation section was removed.
+
+Research applied:
+- Carbon UI shell guidance treats header/left navigation as a coordinated shell and stresses consistent interaction across the shell. citeturn0search5turn0search11
+- Carbon popover guidance requires the layer to sit above page content, stay connected to its trigger when using a tab-tip relationship, and avoid clipped overflow. citeturn0search1turn0search4
+- Carbon accessibility guidance requires keyboard-reachable header/nav controls and predictable nested navigation. citeturn0search2turn0search9
+- Atlassian specifically warns that dark-mode overlay/background combinations must be checked independently for contrast and stacking. citeturn0search8
+
+Verification:
+- modified files were re-read from `main`;
+- source brace/parenthesis checks are balanced;
+- no navigation capability was deleted;
+- rendered browser acceptance remains pending because the live local Zazu runtime is not exposed through this connector.
