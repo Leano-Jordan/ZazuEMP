@@ -62,6 +62,17 @@
                     @php $key=$day->format('Y-m-d'); $isCurrentMonthDay=$day->month===$month->month && $day->year===$month->year; $dayEvents=$eventsByDate->get($key,collect()); @endphp
                     <div class="zazu-calendar-cell {{ $isCurrentMonthDay ? 'is-current-month' : 'is-adjacent' }} {{ $day->isToday() ? 'is-today' : '' }}">
                         <div class="zazu-calendar-date-row"><span class="zazu-calendar-date">{{ $day->format('j') }}</span>@if($day->isToday())<span class="zazu-calendar-today">Today</span>@endif</div>
+                        @php $dayHolidays = $holidays->get($key, collect()); @endphp
+                        @if($dayHolidays->isNotEmpty())
+                            <div class="zazu-calendar-holidays">
+                                @foreach($dayHolidays as $holiday)
+                                    <div class="zazu-calendar-holiday holiday-{{ $holiday['category'] }}" title="{{ $holiday['name'] }}">
+                                        <span class="zazu-calendar-holiday-dot"></span>
+                                        <span>{{ $holiday['name'] }}</span>
+                                    </div>
+                                @endforeach
+                            </div>
+                        @endif
                         @if($dayEvents->isNotEmpty())
                             <div class="zazu-calendar-events">
                                 @foreach($dayEvents->take(3) as $event)
