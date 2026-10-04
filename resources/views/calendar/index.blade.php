@@ -93,8 +93,8 @@
                         <div class="zazu-calendar-mini-weekdays">@foreach(['M','T','W','T','F','S','S'] as $weekday)<span>{{ $weekday }}</span>@endforeach</div>
                         <div class="zazu-calendar-mini-grid">
                             @foreach($block['days'] as $day)
-                                @php $key=$day->format('Y-m-d'); $inMonth=$day->month===$block['month']->month && $day->year===$block['month']->year; $count=$block['eventsByDate']->get($key,collect())->count(); @endphp
-                                <a href="{{ route('calendar.index',['month'=>$block['month']->format('Y-m'),'view'=>'month']) }}" class="{{ $inMonth ? '' : 'is-adjacent' }} {{ $day->isToday() ? 'is-today' : '' }}" title="{{ $count }} {{ $count===1?'job':'jobs' }}">{{ $day->format('j') }}@if($count)<i></i>@endif</a>
+                                @php $key=$day->format('Y-m-d'); $inMonth=$day->month===$block['month']->month && $day->year===$block['month']->year; $count=$block['eventsByDate']->get($key,collect())->count(); $dayHolidays=$block['holidays']->get($key,collect()); @endphp
+                                <a href="{{ route('calendar.index',['month'=>$block['month']->format('Y-m'),'view'=>'month']) }}" class="{{ $inMonth ? '' : 'is-adjacent' }} {{ $day->isToday() ? 'is-today' : '' }}" title="{{ $dayHolidays->pluck('name')->implode(', ') ?: ($count.' '.($count===1?'job':'jobs')) }}">{{ $day->format('j') }}@if($count)<i></i>@endif @if($dayHolidays->isNotEmpty())<b class="zazu-calendar-holiday-dot-mini holiday-{{ $dayHolidays->first()['category'] }}" title="{{ $dayHolidays->pluck('name')->implode(', ') }}"></b>@endif</a>
                             @endforeach
                         </div>
                         <footer>{{ $block['eventsByDate']->flatten(1)->count() }} {{ $block['eventsByDate']->flatten(1)->count()===1?'job':'jobs' }}</footer>
@@ -110,8 +110,8 @@
                         <div class="zazu-calendar-mini-weekdays">@foreach(['M','T','W','T','F','S','S'] as $weekday)<span>{{ $weekday }}</span>@endforeach</div>
                         <div class="zazu-calendar-mini-grid">
                             @foreach($yearMonth['days'] as $day)
-                                @php $inMonth=$day->month===$yearMonth['month']->month && $day->year===$yearMonth['month']->year; $dayCount=$yearMonth['eventsByDate']->get($day->format('Y-m-d'),collect())->count(); @endphp
-                                <span class="{{ $inMonth?'':'is-adjacent' }} {{ $day->isToday()?'is-today':'' }}">{{ $day->format('j') }}@if($dayCount)<i></i>@endif</span>
+                                @php $key=$day->format('Y-m-d'); $inMonth=$day->month===$yearMonth['month']->month && $day->year===$yearMonth['month']->year; $dayCount=$yearMonth['eventsByDate']->get($key,collect())->count(); $dayHolidays=$yearMonth['holidays']->get($key,collect()); @endphp
+                                <span class="{{ $inMonth?'':'is-adjacent' }} {{ $day->isToday()?'is-today':'' }}" title="{{ $dayHolidays->pluck('name')->implode(', ') }}">{{ $day->format('j') }}@if($dayCount)<i></i>@endif @if($dayHolidays->isNotEmpty())<b class="zazu-calendar-holiday-dot-mini holiday-{{ $dayHolidays->first()['category'] }}"></b>@endif</span>
                             @endforeach
                         </div>
                     </a>
