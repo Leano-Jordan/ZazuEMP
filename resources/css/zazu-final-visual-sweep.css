@@ -3161,7 +3161,7 @@ border-top-color: rgba(255,255,255,.22);
 }
 
 .zazu-dash-hero-visual .zazu-dash-side-line b {
-color: var(--zazu-success-soft);
+color: var(--zazu-success-ink);
 }
 
 @media (max-width: 980px) {
@@ -3222,7 +3222,7 @@ min-width:38px; height:38px; display:inline-grid; place-items:center; padding:0 
 }
 
 .zazu-calendar-today-btn {
-background:var(--zazu-primary); color:#fff; border-color:var(--zazu-primary);
+background:var(--zazu-primary); color:var(--zazu-primary-ink); border-color:var(--zazu-primary);
 }
 
 .zazu-calendar-nav-btn:hover,
@@ -3488,7 +3488,7 @@ height:34px;padding:0 8px;border:1px solid var(--zazu-card-border);border-radius
 }
 
 .zazu-calendar-jump button {
-height:34px;padding:0 10px;border:1px solid var(--zazu-primary);border-radius:8px;background:var(--zazu-primary);color:#fff;font-size:10px;font-weight:800;
+height:34px;padding:0 10px;border:1px solid var(--zazu-primary);border-radius:8px;background:var(--zazu-primary);color:var(--zazu-primary-ink);font-size:10px;font-weight:800;
 }
 
 .zazu-calendar-multi-grid {
