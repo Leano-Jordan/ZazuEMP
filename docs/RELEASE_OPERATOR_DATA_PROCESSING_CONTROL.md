@@ -1,7 +1,8 @@
 # Zazu EMP — Operator / Data-Processing Control
 
 **Status:** CONTRACT TEMPLATE — USE ONLY WHERE APPLICABLE  
-**Owner:** `[RESPONSIBLE PARTY]`
+**Current owner:** Isaac Junior Lehlogonolo Maluleka  
+**Operating address:** 1068 Block JK, Soshanguve, Pretoria, South Africa
 
 ## Purpose
 
