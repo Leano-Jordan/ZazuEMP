@@ -155,7 +155,7 @@ class BusinessMediaSecurityTest extends TestCase
         $css = file_get_contents(resource_path('css/zazu-final-visual-sweep.css'));
 
         $this->assertIsString($css);
-        $marker = strpos($css, '/* DIRECTOR WALLPAPER FIX — 2026-10-04 */');
+        $marker = strpos($css, 'body.zazu-has-wallpaper {');
 
         $this->assertNotFalse($marker);
         $this->assertStringContainsString(
@@ -163,7 +163,7 @@ class BusinessMediaSecurityTest extends TestCase
             substr($css, (int) $marker)
         );
         $this->assertStringContainsString(
-            'var(--zazu-wallpaper)',
+            'var(--zazu-wallpaper)'
             substr($css, (int) $marker)
         );
     }
