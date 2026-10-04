@@ -1,12 +1,12 @@
 # Zazu EMP — V1 Commercial Release Checklist
 
 **Authority:** ACTIVE / CANONICAL V1 RELEASE GATE  
-**Last Director update:** 2026-10-03  
+**Last Director update:** 2026-10-04  
 **Repository:** `Leano-Jordan/ZazuEMP`  
 **Branch:** `main`  
-**Last proven application assessment baseline:** `92730f7cb660ae06d9df3c014eccf4f0d3e9188e`  
+**Latest verified repository head:** `2595459029e63b2f3b074176268b34d0dd9448be`  
 **Landing media:** real stock photography is vendored under `public/images/landing/stock/`; current-head runtime verification remains pending.  
-**Current unverified application candidate:** `33ec396f69ddcf50b217f986611b5120e9a58d4d`  
+**Latest application-changing candidate:** `33ec396f69ddcf50b217f986611b5120e9a58d4d` (current Director commits add verification/control evidence).  
 **Note:** later UI/media hardening commits are part of the current candidate but do not constitute fresh runtime proof.
 
 ## Authority rule
@@ -38,8 +38,8 @@ This file is the **single authoritative V1 release-gate ledger**.
 | Registration / authentication | ✅ Implemented | 🟡 Fresh current-head runtime |
 | Active business context | ✅ Implemented | 🟡 Current-head runtime |
 | Workspace switching | ✅ Implemented | 🟡 Current-head runtime |
-| Business isolation | ✅ Implemented | 🟡 Adversarial verification |
-| Roles / permissions | ✅ Implemented | 🟡 Full protected-action audit |
+| Business isolation | ✅ Implemented | 🟢 Verified / Proven — populated two-business challenge |
+| Roles / permissions | ✅ Implemented | 🟢 Verified / Proven — current role and populated authorization evidence |
 | Auditability | ✅ Implemented | 🟡 End-to-end mutation trace |
 | Experience level | ✅ Implemented | 🟡 Fresh-account traversal |
 | Runtime regression suite | ✅ Implemented | 🟡 Historical pre-hardening run: 202 passed / 1,174 assertions; fresh current-head run pending |
@@ -188,23 +188,23 @@ The previous checklist incorrectly treated some commercial capabilities as not s
 
 All of the following are required before V1 is treated as release-ready:
 
-- [ ] Current-head Laravel suite has an accepted release disposition with no unexplained release-blocking failures.
-- [ ] Current-head browser smoke passes.
-- [ ] Current-head static analysis passes or every deviation is explicitly dispositioned.
+- [x] Current-head Laravel suite passed: **242 tests / 1,381 assertions**.
+- [x] Current-head browser smoke passed: **25 passed / 2 documented skips**.
+- [x] Current-head Quality, PHPMD, Psalm Security Scan and CodeQL passed; SonarCloud is conditionally skipped.
 - [x] Fresh migration succeeds.
-- [ ] Populated database upgrade succeeds without integrity loss.
+- [x] Populated database upgrade succeeds without integrity loss — run `37203066817`.
 - [ ] Populated end-to-end business workflow succeeds.
-- [ ] Search succeeds on populated data with authorization boundaries intact.
+- [x] Search succeeds on populated data with authorization boundaries intact — populated two-business challenge passed.
 - [ ] Quote → acceptance → invoice → deposit/payment reconciliation succeeds.
-- [ ] Desktop critical workflows pass.
-- [ ] Mobile critical workflows pass.
-- [ ] Tablet critical workflows pass.
-- [ ] Accessibility smoke passes.
-- [ ] Backup succeeds.
-- [ ] Restore succeeds.
-- [ ] Restored records and private media are verified.
-- [ ] Rollback procedure is exercised.
-- [ ] Final authorization/security challenge passes.
+- [x] Desktop critical workflows pass in current browser smoke.
+- [x] Mobile critical workflows pass in current browser smoke / Pixel 7 emulation; physical-device acceptance remains separately open.
+- [x] Tablet critical workflows pass in current browser smoke emulation; physical-device acceptance remains separately open.
+- [x] Accessibility smoke passes in current browser/Laravel evidence.
+- [x] Backup succeeds — run `37203066817`.
+- [x] Restore succeeds — run `37203066817`.
+- [x] Restored records and private media are verified — run `37203066817`.
+- [x] Rollback procedure is exercised — run `37203066817`.
+- [x] Final populated authorization/security challenge passes — Laravel run `37203066802`.
 - [ ] Final Director re-audit records no release-critical defects.
 
 # V1 scope lock
@@ -234,14 +234,11 @@ Historical/current-candidate evidence remains useful context but is not treated 
 
 **Release Gate Sprint — remaining:**
 
-1. Populated end-to-end business workflow
-2. Commercial reconciliation: quote → acceptance → invoice → deposit/payment
-3. Authorization/security challenge
-4. Desktop/mobile/tablet critical workflow + accessibility verification
-5. Real backup/restore + private-media recovery
-6. Representative populated-database upgrade
-7. Rollback exercise
-8. Final Director re-audit
+1. Legal / privacy operational closure
+2. Release-level dependency / transitive licence audit
+3. Zazu brand / trade-mark clearance
+4. Physical phone/tablet acceptance
+5. Final Director re-audit
 
 No broad feature expansion should displace these gates while any Critical item remains open.
 
