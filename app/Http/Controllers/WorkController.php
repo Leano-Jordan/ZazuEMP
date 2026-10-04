@@ -170,6 +170,12 @@ class WorkController extends Controller
             return $event;
         });
 
+        if ($request->string('start_intent')->toString() === 'quote') {
+            return redirect()
+                ->route('work.quotes.create', $event)
+                ->with('success', 'Job created. Zazu opened the quote workflow from your starting point.');
+        }
+
         return redirect()
             ->route('work.show', $event)
             ->with('success', 'Job created. Start by checking the services below.');
