@@ -4,17 +4,17 @@
 @source '../../storage/framework/views/*.php';
 
 @theme {
-    --color-zazu-blue-primary: #3949E8;
-    --color-zazu-blue-accent: #5B5CFF;
-    --color-zazu-blue-hover: #2834B8;
-    --color-zazu-blue-light: #7C7FFF;
-    --color-zazu-blue-soft: #EEF0FF;
-    --color-zazu-blue-subtle: #E0E3FF;
-    --color-zazu-blue-canvas: #F6F7FB;
-    --color-zazu-surface-card: #FFFFFF;
-    --color-zazu-surface-border: #E2E8F0;
-    --color-zazu-text-main: #0F172A;
-    --color-zazu-text-muted: #64748B;
+    --color-zazu-blue-primary: #2F629F;
+    --color-zazu-blue-accent: #4D78B0;
+    --color-zazu-blue-hover: #234D7D;
+    --color-zazu-blue-light: #789BC0;
+    --color-zazu-blue-soft: #E8F0F8;
+    --color-zazu-blue-subtle: #D9E5F1;
+    --color-zazu-blue-canvas: #EFF4F9;
+    --color-zazu-surface-card: #FAFCFE;
+    --color-zazu-surface-border: #D3DFEA;
+    --color-zazu-text-main: #172B3F;
+    --color-zazu-text-muted: #60758B;
 
     --font-sans: Inter, "Plus Jakarta Sans", "Segoe UI Variable Text", "Segoe UI", ui-sans-serif, system-ui, sans-serif;
 }
@@ -23,66 +23,66 @@
     color-scheme: light;
 
     /* Soft blue product system */
-    --zazu-page: #F6F7FB;
-    --zazu-page-deep: #E7E9F1;
+    --zazu-page: #EFF4F9;
+    --zazu-page-deep: #E3EBF3;
 
     /* Navigation rail */
-    --zazu-sidebar: #EEF1FA;
-    --zazu-sidebar-ink: #191D31;
-    --zazu-sidebar-muted: #343B52;
-    --zazu-sidebar-label: #5B647C;
-    --zazu-sidebar-hover: #E5E7F0;
-    --zazu-sidebar-active: #FFFFFF;
-    --zazu-sidebar-surface: #FFFFFF;
+    --zazu-sidebar: #E7EEF6;
+    --zazu-sidebar-ink: #172B3F;
+    --zazu-sidebar-muted: #3E5268;
+    --zazu-sidebar-label: #65798D;
+    --zazu-sidebar-hover: #DCE6EF;
+    --zazu-sidebar-active: #FAFCFE;
+    --zazu-sidebar-surface: #FAFCFE;
 
     /* Surfaces */
-    --zazu-surface: #FFFFFF;
+    --zazu-surface: #FAFCFE;
     --zazu-surface-2: #F0F1F6;
-    --zazu-surface-3: #E7E9F1;
-    --zazu-field: #FFFFFF;
+    --zazu-surface-3: #E3EBF3;
+    --zazu-field: #FAFCFE;
 
     /* Typography */
-    --zazu-ink: #191D31;
-    --zazu-ink-2: #343B52;
+    --zazu-ink: #172B3F;
+    --zazu-ink-2: #3E5268;
     --zazu-muted: #566078;
     --zazu-faint: #68728A;
     --zazu-nav-label: #58627B;
 
     /* Structure */
-    --zazu-border: #C9CEDC;
-    --zazu-border-strong: #9EA7BC;
+    --zazu-border: #C4D3E0;
+    --zazu-border-strong: #8FA7BC;
 
     /* Brand / actions */
-    --zazu-primary: #3949E8;
-    --zazu-primary-light: #7C7FFF;
-    --zazu-primary-pale: #D9DBFF;
-    --zazu-primary-shadow: #AEB3EA;
-    --zazu-primary-deep: #2834B8;
-    --zazu-primary-hover: #2834B8;
-    --zazu-primary-soft: #EEF0FF;
-    --zazu-primary-ink: #FFFFFF;
-    --zazu-link: #2F39C7;
-    --zazu-link-hover: #20298F;
-    --zazu-nav-active: #3949E8;
+    --zazu-primary: #2F629F;
+    --zazu-primary-light: #789BC0;
+    --zazu-primary-pale: #C6D8E8;
+    --zazu-primary-shadow: #9DB6CF;
+    --zazu-primary-deep: #234D7D;
+    --zazu-primary-hover: #234D7D;
+    --zazu-primary-soft: #E8F0F8;
+    --zazu-primary-ink: #FAFCFE;
+    --zazu-link: #2F629F;
+    --zazu-link-hover: #234D7D;
+    --zazu-nav-active: #2F629F;
 
     /* Semantic */
-    --zazu-accent: #008E88;
-    --zazu-accent-ink: #006D68;
-    --zazu-accent-soft: #E7F8F6;
-    --zazu-focus: #5B5CFF;
+    --zazu-accent: #3C7F7A;
+    --zazu-accent-ink: #316B67;
+    --zazu-accent-soft: #E5F1F0;
+    --zazu-focus: #4D78B0;
 
-    --zazu-success: #247A63;
-    --zazu-success-ink: #1C624F;
-    --zazu-success-soft: #E3F4EE;
-    --zazu-warning: #8A641E;
-    --zazu-warning-ink: #694A14;
-    --zazu-warning-soft: #FFF3D9;
-    --zazu-danger: #B44D5B;
-    --zazu-danger-ink: #8E3847;
-    --zazu-danger-soft: #FBE8EB;
-    --zazu-info: #4F46C5;
-    --zazu-info-ink: #3B348F;
-    --zazu-info-soft: #F0EEFF;
+    --zazu-success: #4C806F;
+    --zazu-success-ink: #3C6B5D;
+    --zazu-success-soft: #E4EFEB;
+    --zazu-warning: #8A714A;
+    --zazu-warning-ink: #705A35;
+    --zazu-warning-soft: #F2ECDF;
+    --zazu-danger: #A86870;
+    --zazu-danger-ink: #87535A;
+    --zazu-danger-soft: #F1E4E6;
+    --zazu-info: #5279A8;
+    --zazu-info-ink: #456688;
+    --zazu-info-soft: #E7EEF5;
 
     /* Elevation / shape / motion */
     --zazu-shadow: 0 1px 2px rgba(23, 49, 90, 0.035);
@@ -110,60 +110,60 @@
 :root[data-theme="dark"] {
     color-scheme: dark;
 
-    --zazu-page: #0D1F3A;
-    --zazu-page-deep: #09172B;
+    --zazu-page: #0D1B2A;
+    --zazu-page-deep: #091520;
 
-    --zazu-sidebar: #10294B;
-    --zazu-sidebar-ink: #F2F7FF;
-    --zazu-sidebar-muted: #C2DCFF;
-    --zazu-sidebar-label: #9EC8FF;
-    --zazu-sidebar-hover: #173A67;
-    --zazu-sidebar-active: #1D4380;
-    --zazu-sidebar-surface: #14335D;
+    --zazu-sidebar: #112944;
+    --zazu-sidebar-ink: #E9F1F8;
+    --zazu-sidebar-muted: #B6CBE0;
+    --zazu-sidebar-label: #88A9C7;
+    --zazu-sidebar-hover: #173A5E;
+    --zazu-sidebar-active: #1B416B;
+    --zazu-sidebar-surface: #153553;
 
-    --zazu-surface: #102743;
-    --zazu-surface-2: #153252;
-    --zazu-surface-3: #1B3E68;
-    --zazu-field: #0C1D35;
+    --zazu-surface: #10283F;
+    --zazu-surface-2: #152F4A;
+    --zazu-surface-3: #193A5C;
+    --zazu-field: #0C1B2B;
 
-    --zazu-ink: #F2F7FF;
-    --zazu-ink-2: #DCEAFF;
-    --zazu-muted: #C2DCFF;
-    --zazu-faint: #9EC8FF;
-    --zazu-nav-label: #9EC8FF;
+    --zazu-ink: #E9F1F8;
+    --zazu-ink-2: #D2E0ED;
+    --zazu-muted: #B6CBE0;
+    --zazu-faint: #88A9C7;
+    --zazu-nav-label: #88A9C7;
 
-    --zazu-border: #31588C;
-    --zazu-border-strong: #6FA4FF;
+    --zazu-border: #355879;
+    --zazu-border-strong: #5F88B0;
 
-    --zazu-primary: #6FA4FF;
-    --zazu-primary-light: #9EC8FF;
-    --zazu-primary-pale: #D9DBFF;
-    --zazu-primary-shadow: #31588C;
-    --zazu-primary-deep: #9EC8FF;
-    --zazu-primary-hover: #9EC8FF;
-    --zazu-primary-soft: #1A3D68;
-    --zazu-primary-ink: #0D1F3A;
-    --zazu-link: #9EC8FF;
-    --zazu-link-hover: #C2DCFF;
-    --zazu-nav-active: #6FA4FF;
+    --zazu-primary: #5F88B0;
+    --zazu-primary-light: #88A9C7;
+    --zazu-primary-pale: #C6D8E8;
+    --zazu-primary-shadow: #355879;
+    --zazu-primary-deep: #88A9C7;
+    --zazu-primary-hover: #88A9C7;
+    --zazu-primary-soft: #183752;
+    --zazu-primary-ink: #0D1B2A;
+    --zazu-link: #88A9C7;
+    --zazu-link-hover: #B6CBE0;
+    --zazu-nav-active: #5F88B0;
 
-    --zazu-accent: #9EC8FF;
-    --zazu-accent-ink: #C2DCFF;
-    --zazu-accent-soft: #1A3D68;
-    --zazu-focus: #9EC8FF;
+    --zazu-accent: #88A9C7;
+    --zazu-accent-ink: #B6CBE0;
+    --zazu-accent-soft: #183752;
+    --zazu-focus: #88A9C7;
 
-    --zazu-success: #59B69A;
-    --zazu-success-ink: #76CAAE;
-    --zazu-success-soft: #193A31;
-    --zazu-warning: #D7AD67;
-    --zazu-warning-ink: #E6C184;
-    --zazu-warning-soft: #3A3121;
-    --zazu-danger: #DE9292;
-    --zazu-danger-ink: #EFAAAA;
-    --zazu-danger-soft: #42292A;
-    --zazu-info: #6FA4FF;
-    --zazu-info-ink: #C2DCFF;
-    --zazu-info-soft: #1A3D68;
+    --zazu-success: #6B9A8D;
+    --zazu-success-ink: #8CB7AA;
+    --zazu-success-soft: #1C332F;
+    --zazu-warning: #B59B6A;
+    --zazu-warning-ink: #C8B58B;
+    --zazu-warning-soft: #342D22;
+    --zazu-danger: #BD858A;
+    --zazu-danger-ink: #D19FA3;
+    --zazu-danger-soft: #352629;
+    --zazu-info: #5F88B0;
+    --zazu-info-ink: #B6CBE0;
+    --zazu-info-soft: #183752;
 
     --zazu-shadow: 0 1px 2px rgba(0,0,0,.24), 0 8px 24px rgba(0,0,0,.18);
     --zazu-shadow-strong: 0 4px 14px rgba(0,0,0,.24);
@@ -5659,7 +5659,7 @@ html[data-theme="dark"] .zazu-public-party,html[data-theme="dark"] .zazu-public-
 }
 
 .zazu-confirm-dialog::backdrop {
-    background: color-mix(in srgb, #0D1F3A 38%, transparent);
+    background: color-mix(in srgb, #0D1B2A 38%, transparent);
 }
 
 .zazu-confirm-panel {
@@ -5692,7 +5692,7 @@ html[data-theme="dark"] .zazu-public-party,html[data-theme="dark"] .zazu-public-
 .zazu-btn-danger {
     border-color: var(--zazu-danger);
     background: var(--zazu-danger);
-    color: #FFFFFF;
+    color: #FAFCFE;
 }
 
 .zazu-btn-danger:hover {
@@ -5850,7 +5850,7 @@ html[data-theme="dark"] .zazu-public-party,html[data-theme="dark"] .zazu-public-
 
 :root {
     --zazu-page: #F7FAFF;
-    --zazu-surface: #FFFFFF;
+    --zazu-surface: #FAFCFE;
     --zazu-surface-2: #F0F1F6;
     --zazu-surface-3: #EAF2FF;
     --zazu-border: color-mix(in srgb, var(--zazu-ink) 7%, transparent);
