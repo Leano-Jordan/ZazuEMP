@@ -310,6 +310,87 @@
             .section{padding:60px 0}
         }
 
+        /* ------------------------------------------------------------------
+           DIRECTOR — visual acceptance authority: public landing page
+           Explicit foreground/surface pairings prevent legacy dark-shell rules
+           from leaking into the light summer landing composition.
+           ------------------------------------------------------------------ */
+        .brand strong{color:#12324D}
+        .brand span:last-child{color:#496A83}
+        .topnav{display:flex;align-items:center;gap:6px}
+        .topnav a,.topnav button{
+            min-height:40px;
+            box-sizing:border-box;
+            display:inline-flex;
+            align-items:center;
+            justify-content:center;
+            padding:0 12px;
+            border:1px solid transparent;
+            border-radius:7px;
+            background:transparent;
+            color:#35556F;
+            font-family:var(--ui-font);
+            font-size:12px;
+            font-weight:700;
+            line-height:1.2;
+        }
+        .topnav a:hover,.topnav button:hover{background:#E1F0FF;color:#173F63}
+        .topnav .register,.topnav .login{
+            min-height:40px;
+            background:rgba(255,255,255,.72);
+            border-color:#BDD5E8;
+            color:#173F63;
+        }
+        .topnav .register:hover,.topnav .login:hover{background:#FFFFFF;color:#0F3658}
+        .topnav .launch{min-height:40px;background:#2F80FF;color:#FFFFFF;border-color:#2F80FF}
+        .mobile-menu{
+            border-color:#BDD5E8;
+            background:#F7FBFF;
+            box-shadow:0 22px 44px rgba(24,76,124,.16);
+        }
+        .mobile-menu a,.mobile-menu button{color:#173F63}
+        .mobile-menu a:hover,.mobile-menu button:hover{background:#E1F0FF;color:#0F3658}
+
+        /* Hero workspace preview: light surfaces use dark readable foregrounds;
+           the intentionally dark event-flow strip keeps its own light text. */
+        .control-card{color:#173F63;background:rgba(255,255,255,.78);border-color:#B8D1E6}
+        .control-head{color:#173F63;background:rgba(240,248,255,.86)}
+        .telemetry,.record{background:rgba(250,253,255,.68);color:#173F63}
+        .telemetry small,.record small,.record-label{color:#496A83}
+        .telemetry strong,.record strong{color:#12324D}
+        .record-meta{color:#4B6B84}
+        .online{color:#0B7A56}
+        .online i{background:#0B7A56}
+        .tag{background:#FFF2D2;color:#7A4A00}
+        .flow{background:#0B2235;color:#D8E8F3}
+        .flow b{color:#A7D0F4}
+
+        /* The comparison's right-hand panel is an intentional dark surface.
+           Keep its entire foreground in the light-on-dark family. */
+        .compare>article+article{background:#0B2A40;color:#F5FAFF}
+        .compare>article+article h3{color:#BFD8E8}
+        .compare>article+article li{color:#D6E6F1}
+        .compare>article+article li:before{color:#76B9FF}
+
+        /* Plan and Delivery deliberately become a full-width 50/50 row. */
+        .bento{grid-template-columns:repeat(12,minmax(0,1fr));grid-template-rows:auto auto auto;gap:14px}
+        .feature.large{grid-column:1 / span 7;grid-row:1 / span 2}
+        .feature.mini:nth-of-type(2){grid-column:8 / -1;grid-row:1}
+        .feature.mini:nth-of-type(3){grid-column:8 / -1;grid-row:2}
+        .feature.mini:nth-of-type(4){grid-column:1 / span 6;grid-row:3}
+        .feature.mini:nth-of-type(5){grid-column:7 / -1;grid-row:3}
+        .feature.mini:nth-of-type(4),.feature.mini:nth-of-type(5){min-width:0}
+
+        @media(max-width:920px){
+            .feature.large,.feature.mini,
+            .feature.mini:nth-of-type(2),.feature.mini:nth-of-type(3),
+            .feature.mini:nth-of-type(4),.feature.mini:nth-of-type(5){grid-column:1/-1;grid-row:auto}
+        }
+        @media(max-width:640px){
+            .topnav a,.topnav button{min-height:40px}
+            .mobile-menu{width:min(280px,calc(100vw - 24px))}
+        }
+
     </style>
 </head>
 <body>
