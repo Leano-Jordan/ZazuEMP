@@ -5282,21 +5282,6 @@ button,
 
 /* DIRECTOR — mascot navigation yield */
 .zazu-helper {
-    transition: right 260ms cubic-bezier(.22,.8,.3,1), transform 240ms cubic-bezier(.22,.8,.3,1), opacity 180ms ease;
-}
-
-.zazu-helper.is-nav-avoiding {
-    right: var(--zazu-helper-nav-right, max(12px, env(safe-area-inset-right)));
-}
-
-@media (prefers-reduced-motion: reduce) {
-    .zazu-helper {
-        transition: none;
-    }
-}
-
-/* DIRECTOR — helper presence should support work, not compete with it. */
-.zazu-helper {
     position: fixed;
     right: max(12px, env(safe-area-inset-right));
     bottom: max(12px, env(safe-area-inset-bottom));
@@ -5304,6 +5289,11 @@ button,
     width: auto;
     max-width: calc(100vw - 24px);
     pointer-events: none;
+    transition: right 260ms cubic-bezier(.22,.8,.3,1), transform 240ms cubic-bezier(.22,.8,.3,1), opacity 180ms ease;
+}
+
+.zazu-helper.is-nav-avoiding {
+    right: var(--zazu-helper-nav-right, max(12px, env(safe-area-inset-right)));
 }
 
 .zazu-helper-toggle,
@@ -5338,10 +5328,6 @@ body.zazu-mobile-menu-open .zazu-helper {
     visibility: visible;
     pointer-events: none;
     transform: translateX(calc(100% + 28px)) rotate(5deg);
-}
-
-.zazu-helper {
-    transition: transform 240ms cubic-bezier(.22,.8,.3,1), opacity 180ms ease;
 }
 
 @media (prefers-reduced-motion: reduce) {
