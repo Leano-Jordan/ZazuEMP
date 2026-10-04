@@ -329,3 +329,43 @@ Last updated: 2026-10-04
 **No regression intent:** existing job creation, customer storage, business isolation, private media serving and branding storage were preserved. New tests cover the new boundaries.
 
 Last updated: 2026-10-04
+
+## Director UI/UX + commercial re-audit — 2026-10-04
+
+Source-level refinement completed:
+- base form surfaces are theme-aware;
+- final visual CSS duplicate selectors were reduced from approximately 1,561 blocks to 1,263;
+- dark-form regression coverage added;
+- shared command-band/calendar artwork and compact holiday markers retained;
+- repository hygiene scan found no dump(), var_dump(), console.log(), browser alert(), or NotImplemented residue.
+
+Updated assessment:
+- Correctness: 84/100
+- Architecture: 87/100
+- Data Integrity: 82/100
+- Security: 88/100
+- Workflow Integrity: 78/100
+- UX / Accessibility: 78/100
+- Reliability / Recovery: 80/100
+- Operability: 72/100
+- Deployment / Upgrade Safety: 82/100
+- Documentation / Ownership / Compliance: 72/100
+- Release Evidence: 82/100
+- Overall commercial readiness: 80/100
+
+This is a maturity score, not a release approval.
+
+Remaining material gates:
+1. final populated commercial workflow traversal;
+2. physical phone/tablet acceptance;
+3. disconnected phone-local store/pairing/bootstrap;
+4. legal/privacy operational closure;
+5. dependency/licence notice closure;
+6. Zazu brand/trademark clearance.
+
+Current valuation view:
+- replacement-cost reference: R450k–R900k;
+- realistic current early software/product asset value: R150k–R400k;
+- recurring revenue and retention are required to support a materially higher SaaS valuation.
+
+Last updated: 2026-10-04
