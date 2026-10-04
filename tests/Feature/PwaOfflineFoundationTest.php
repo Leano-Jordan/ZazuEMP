@@ -43,7 +43,7 @@ class PwaOfflineFoundationTest extends TestCase
 
         $this->assertStringContainsString("const OFFLINE_SHELL = '/offline';", $worker);
         $this->assertStringContainsString("OFFLINE_SHELL,", $worker);
-        $this->assertStringContainsString("return caches.match(OFFLINE_SHELL)", $worker);
+        $this->assertStringContainsString(".catch(() => caches.match(OFFLINE_SHELL))", $worker);
     }
 
     public function test_pwa_icon_files_are_present(): void
