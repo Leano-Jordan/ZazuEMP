@@ -5223,7 +5223,7 @@ body {
 
 /* Customer-facing quote surface */
 .zazu-public-shell{min-height:100vh;padding:2rem 1rem;display:grid;place-items:start center;background:var(--zazu-bg,#f4f7fb);color:var(--zazu-ink,#17202a)}
-.zazu-public-card{width:min(760px,100%);margin-top:clamp(1rem,6vw,4rem);background:var(--zazu-surface,#fff);border:1px solid var(--zazu-border,#dce4ec);border-radius:6px;box-shadow:var(--zazu-shadow-strong);overflow:hidden}
+.zazu-public-card{width:min(760px,100%);margin-top:clamp(1rem,6vw,4rem);background:var(--zazu-surface);border:1px solid var(--zazu-border,#dce4ec);border-radius:6px;box-shadow:var(--zazu-shadow-strong);overflow:hidden}
 .zazu-public-header,.zazu-public-party,.zazu-public-total,.zazu-public-accept,.zazu-public-accepted{padding:1.5rem}
 .zazu-public-header{display:flex;gap:1rem;align-items:flex-start;justify-content:space-between;border-bottom:1px solid var(--zazu-border,#dce4ec)}
 .zazu-public-title{margin:.25rem 0 0;font-size:clamp(1.7rem,4vw,2.35rem);font-weight:700;letter-spacing:-.03em}
