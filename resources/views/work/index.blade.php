@@ -228,7 +228,7 @@
 
             <section id="zazu-inspector-panel-finance" role="tabpanel" tabindex="0" class="hidden" data-zazu-tab-panel="finance">
                 <div data-zazu-inspector-content></div>
-                <a href="#" class="zazu-btn zazu-btn-primary w-full mt-4" data-zazu-finance-link>Open job record</a>
+                <a href="{{ route('work.index') }}" class="zazu-btn zazu-btn-primary w-full mt-4" data-zazu-finance-link>Open job record</a>
             </section>
         </div>
     </aside>
