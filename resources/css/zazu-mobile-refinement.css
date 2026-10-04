@@ -583,8 +583,8 @@
 
 .zazu-helper-btn:hover:not(:disabled) { border-color: var(--zazu-primary); color: var(--zazu-primary); }
 .zazu-helper-btn:disabled { opacity: .45; cursor: not-allowed; }
-.zazu-helper-btn-primary { border-color: var(--zazu-primary); background: var(--zazu-primary); color: #fff; }
-.zazu-helper-btn-primary:hover:not(:disabled) { color: #fff; }
+.zazu-helper-btn-primary { border-color: var(--zazu-primary); background: var(--zazu-primary); color: var(--zazu-primary-ink); }
+.zazu-helper-btn-primary:hover:not(:disabled) { color: var(--zazu-primary-ink); }
 
 @media (max-width: 820px) {
     .zazu-helper {
