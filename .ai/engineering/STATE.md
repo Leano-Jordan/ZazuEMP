@@ -78,7 +78,7 @@ See `READINESS_REGISTER.md` for live gate direction.
 
 Main now contains the completed niche-focus, progressive-disclosure, offline-first architecture and commercial-isolation source cycle from 2026-10-03.
 
-Latest verified remote main: `4b1fbb8c6139215d5338b442b73a943d820948d9` (confirmed against `origin/main`).
+Latest verified remote main: `d81c1bc81326ae2bfc471cdd43981795aa00f4b3` (CI-workflow correction; application behaviour is unchanged from the previously assessed application candidate).
 
 ### Current-head verification — 2026-10-04
 
@@ -89,11 +89,35 @@ Latest verified remote main: `4b1fbb8c6139215d5338b442b73a943d820948d9` (confirm
 - A four-worker local run produced two long-workflow timeouts; the same full suite passed serially. Classify those timeouts as runner-load-sensitive (F8), not application failures. CI is configured to use one worker.
 - A responsive Work-inspector screenshot was rendered and reviewed. Closed inspector state is now explicitly hidden and non-interactive; opened content remains vertically readable on phone emulation.
 - The PHP CLI still emits the missing `pdo_firebird` extension startup warning. It did not prevent the test suite from running. The earlier `Throwable` import warning did not recur in this run.
-- GitHub Actions run status remains **UNVERIFIED**: the GitHub CLI is not authenticated in this environment. The local test evidence is not represented as CI evidence.
+- GitHub Actions on current `main` `d81c1bc81326ae2bfc471cdd43981795aa00f4b3` are now **VERIFIED / PASSED**: Laravel, Quality, PHPMD, Psalm Security Scan, browser smoke, CodeQL and populated upgrade/rollback all completed successfully. SonarCloud remains intentionally skipped by workflow condition.
+- Populated upgrade/rollback run `37202719119` exercised baseline seeding, backup creation, current migrations, populated-data preservation, backup restore, private-media recovery, migration reapplication and final migration-state verification; all passed.
 
-The 2026-10-03 readiness scorecard remains historical; this evidence does not certify backup/restore drills, populated upgrade/rollback, physical-device acceptance or legal/licence closure.
+The 2026-10-03 readiness scorecard remains historical. Recovery and upgrade/rollback evidence is now current and verified; physical-device acceptance, final adversarial authorization/isolation certification and legal/licence/brand closure remain open.
 
 Previous green figures are not reused in place of this current-head evidence.
+
+## Director release-evidence cycle — 2026-10-04
+
+Target: close the highest-risk recovery/upgrade evidence gate and reconcile current-head CI evidence without changing product scope.
+
+Completed:
+- corrected the populated upgrade workflow's invalid job-level `runner.temp` context usage on `main`;
+- verified Laravel, Quality, PHPMD, Psalm Security Scan, browser smoke and CodeQL success;
+- verified populated upgrade + rollback recovery, including populated records, private media and migration reapplication;
+- confirmed the apparent Work quote/requirements authorization gap was an extraction artefact; the current routes carry the intended permission middleware;
+- advanced the Director evidence state for Recovery and Deployment/Upgrade Safety.
+
+Release disposition:
+- Recovery / backup / restore: VERIFIED at maturity 4/5; repeated production-style proof remains desirable.
+- Deployment / upgrade / rollback: VERIFIED at maturity 4/5; representative populated drill passed on current `main`.
+- Current-head CI evidence: VERIFIED / PASSED.
+- Release is not yet certified. Remaining material gates are final populated authorization/isolation challenge, physical phone/tablet acceptance, and legal/privacy/licence/brand closure. Full disconnected phone-local operation remains outside the current implementation claim.
+
+Next Director target:
+FINAL AUTHORIZATION / ISOLATION CHALLENGE → LEGAL, LICENCE & BRAND CLOSURE → PHYSICAL-DEVICE ACCEPTANCE → FINAL RELEASE RE-AUDIT
+
+Last updated: 2026-10-04
+
 
 ## Current product-direction note
 
@@ -109,7 +133,7 @@ Select the highest-risk unresolved item that is:
 3. supported by current evidence;
 4. bounded enough to execute safely.
 
-Next release-evidence target: obtain authenticated CI status for the current main head, then continue with a populated backup/restore drill and representative populated upgrade/rollback verification.
+Next release-evidence target: final populated authorization/isolation challenge, then legal/licence/brand closure and physical-device acceptance before final Director re-audit.
 
 ## Evidence boundary
 
