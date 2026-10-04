@@ -488,6 +488,55 @@ This is the persistent failure-history register for the Failure Case / Loop-Brea
 
 **Next action:** None for this case.
 
+### CASE-ZAZU-0010
+
+**Status:** CORRECTED
+
+**First observed HEAD:** `94914d1f0fcda07156d129c4c17ce2604f1634e2`
+
+**Current application HEAD:** `7fce57b7daaa25305df16d70f8502c0f8c41174a`
+
+**Target/workflow:** Calendar access through the primary navigation on desktop and mobile.
+
+**Verification layer:** F1 — application UI state defect; browser regression coverage added for the affected workflow.
+
+**Expected:** The Calendar route is owned by the Work navigation group. When the Calendar route is active, Work must be marked active and the mobile drawer must auto-expand Work so Calendar is immediately reachable.
+
+**Actual:** Calendar had been moved from Sales to Work, but the Work group's active-route predicate still matched only dashboard/work/customer routes. The Calendar link itself existed and was permission-gated, but the Calendar route produced no active primary navigation group. On mobile, the existing active-group auto-open logic therefore found no active area and left Calendar collapsed inside Work, creating a navigation dead end.
+
+**Failure fingerprint:** `/calendar` → Work active predicate omits `calendar.*` → no active primary group → mobile auto-open has no target → Calendar remains hidden behind collapsed Work.
+
+**Runtime/data state:** Route, permission map and Calendar controller were present; failure was in navigation state composition, not missing Calendar data or route registration.
+
+**F1–F8 classification:** F1 — application UI state defect.
+
+#### Hypotheses
+
+| ID | Hypothesis | Evidence for | Evidence against | Result | Status |
+|---|---|---|---|---|---|
+| H1 | Calendar permission or route registration was denying access | Calendar route is permission-protected | Route exists; owners and configured staff/manager roles include `calendar.view`; Calendar controller resolves correctly | Rejected | REJECTED |
+| H2 | Moving Calendar under Work left the Work active-route predicate stale | Calendar link is inside Work, but `is-active` omitted `calendar.*`; mobile logic only auto-opens the active group | None | Confirmed | CONFIRMED |
+
+#### Experiments
+
+| Attempt | Hypothesis | Action | Evidence/result | Decision |
+|---|---|---|---|---|
+| 1 | H2 | Add `calendar.*` to the existing Work active-route predicate; add feature and browser regression assertions | Source re-read shows Calendar now activates Work; browser test explicitly checks Work active state and mobile expansion behavior | Retain bounded fix; do not duplicate Calendar in another group |
+
+**Confirmed root cause:** Navigation ownership was moved without updating the contextual active-state contract.
+
+**Correction:** Work now treats `calendar.*` as an active route. Calendar remains in the existing Work flyout and contextual section navigation; no duplicate route or second navigation authority was introduced.
+
+**Regression family:** Primary navigation, mobile drawer auto-expansion, Calendar route access, contextual section tabs.
+
+**Runtime/adversarial evidence:** Not executed through the current repository connector. A Playwright regression was added to exercise direct Calendar navigation, active Work state, and mobile drawer expansion.
+
+**Remaining uncertainty:** Current source is corrected, but rendered browser/device acceptance still requires the local runtime/CI execution path.
+
+**Closure evidence:** Application source and regression coverage are committed on `main`; visual/browser closure remains pending execution.
+
+**Rejected approaches retained for loop prevention:** Do not restore Calendar to Sales merely to make the current state appear active. Do not duplicate Calendar in multiple primary groups. Do not add JavaScript exceptions to force-open Work on Calendar; the route ownership predicate is the authoritative fix.
+
 ## Case record template
 
 ### CASE-ZAZU-XXXX
