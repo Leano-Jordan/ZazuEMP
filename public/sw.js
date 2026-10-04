@@ -57,7 +57,7 @@ self.addEventListener('fetch', (event) => {
         event.respondWith(
             fetch(request)
                 .then((response) => {
-                    if (response.ok) {
+                    if (response.ok && url.pathname === OFFLINE_SHELL) {
                         const copy = response.clone();
                         caches.open(CACHE_NAME).then((cache) => cache.put(OFFLINE_SHELL, copy));
                     }
