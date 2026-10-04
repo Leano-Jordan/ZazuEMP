@@ -1,6 +1,8 @@
 # Zazu EMP — Release Documentation vs Implementation Audit
 
 **Director audit date:** 2026-10-04  
+**Audit owner:** Isaac Junior Lehlogonolo Maluleka, solo developer / solo business owner  
+**Operating address:** 1068 Block JK, Soshanguve, Pretoria, South Africa  
 **Repository:** `Leano-Jordan/ZazuEMP`  
 **Branch:** `main`
 
