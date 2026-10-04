@@ -1,95 +1,128 @@
 :root {
-    --zazu-page: #0B3A66;
-    --zazu-page-deep: #082D4F;
-    --zazu-sidebar: #062A49;
+    /* Page structure & navigation */
+    --zazu-page: #0A3D66;
+    --zazu-page-deep: #071F2E;
+    --zazu-sidebar: #051F34;
     --zazu-sidebar-ink: #F5FAFF;
-    --zazu-sidebar-muted: #BCD0E1;
-    --zazu-sidebar-label: #8FB0CA;
-    --zazu-sidebar-hover: #0E416B;
-    --zazu-sidebar-active: #0B63CE;
-    --zazu-sidebar-surface: #0A3558;
-    --zazu-surface: #E7F1FA;
-    --zazu-surface-2: #D9E8F6;
-    --zazu-surface-3: #C9DDF0;
+    --zazu-sidebar-muted: #B8CEDD;
+    --zazu-sidebar-label: #8BA4BB;
+    --zazu-sidebar-hover: #0D384D;
+    --zazu-sidebar-active: #1066D6;
+    --zazu-sidebar-surface: #091E2D;
+    
+    /* Surface layers */
+    --zazu-surface: #EEF5FB;
+    --zazu-surface-2: #E0ECFB;
+    --zazu-surface-3: #D2E4F8;
     --zazu-field: #D6E6F4;
-    --zazu-ink: #0E263B;
+    
+    /* Text hierarchy */
+    --zazu-ink: #0D2438;
     --zazu-ink-2: var(--zazu-text-body);
-    --zazu-muted: #46677F;
-    --zazu-faint: #587A94;
-    --zazu-nav-label: #C7D7E5;
-    --zazu-border: #8EACC5;
-    --zazu-border-strong: #6F94B0;
-    --zazu-primary: #0B63CE;
-    --zazu-primary-light: #70B8FF;
-    --zazu-primary-pale: #B9D7F5;
-    --zazu-primary-shadow: #507AA0;
-    --zazu-primary-deep: #063F88;
-    --zazu-primary-hover: #084FA8;
-    --zazu-primary-soft: #C8E2FA;
+    --zazu-muted: #436678;
+    --zazu-faint: #54717E;
+    --zazu-nav-label: #C2D3E0;
+    
+    /* Borders & contrast */
+    --zazu-border: #8BA7C7;
+    --zazu-border-strong: #6A8EB8;
+    
+    /* Primary blue — commanding yet refined */
+    --zazu-primary: #1066D6;
+    --zazu-primary-light: #6BA3FF;
+    --zazu-primary-pale: #C8DFF9;
+    --zazu-primary-shadow: #4B7BAA;
+    --zazu-primary-deep: #084BA8;
+    --zazu-primary-hover: #0A54BB;
+    --zazu-primary-soft: #E0EFF9;
     --zazu-primary-ink: #FFFFFF;
-    --zazu-link: #0759B8;
-    --zazu-link-hover: #043F88;
-    --zazu-nav-active: #1D78E5;
-    --zazu-accent: #0E8F83;
-    --zazu-accent-ink: #0A6A61;
-    --zazu-accent-soft: #C8EFEA;
-    --zazu-focus: #2A8AFF;
-    --zazu-success: #137A3A;
-    --zazu-success-ink: #126631;
-    --zazu-success-soft: #E6F4EA;
-    --zazu-warning: #9A5B08;
-    --zazu-warning-ink: #7B4704;
-    --zazu-warning-soft: #FEF3C7;
-    --zazu-danger: #B42318;
-    --zazu-danger-ink: #9E1D13;
-    --zazu-danger-soft: #FEE2E2;
-    --zazu-info: #0B63CE;
-    --zazu-info-ink: #0755B5;
-    --zazu-info-soft: #D4E9FC;
+    
+    /* Links & navigation */
+    --zazu-link: #0F60C9;
+    --zazu-link-hover: #084BA8;
+    --zazu-nav-active: #2575E8;
+    
+    /* Secondary accent — warm, hospitality-forward */
+    --zazu-accent: #D97706;
+    --zazu-accent-ink: #A85C00;
+    --zazu-accent-soft: #FEF3E5;
+    
+    /* Status & semantic */
+    --zazu-focus: #4A90FF;
+    --zazu-success: #149856;
+    --zazu-success-ink: #10734A;
+    --zazu-success-soft: #E8F5EF;
+    --zazu-warning: #C17D00;
+    --zazu-warning-ink: #8A5800;
+    --zazu-warning-soft: #FEF5E8;
+    --zazu-danger: #C23B34;
+    --zazu-danger-ink: #9B2B23;
+    --zazu-danger-soft: #FEE4E0;
+    --zazu-info: #1066D6;
+    --zazu-info-ink: #0A54BB;
+    --zazu-info-soft: #E0EFF9;
+    
+    /* Shadows */
     --zazu-shadow: var(--zazu-card-shadow);
-    --zazu-shadow-strong: 0 12px 30px rgba(15,23,42,.10);
-    --zazu-border-subtle: #B8C7D3;
+    --zazu-shadow-strong: 0 10px 28px rgba(10,20,35,.12);
+    --zazu-border-subtle: #B5C7D6;
+    
+    /* Color aliases */
     --zazu-violet: var(--zazu-primary);
     --zazu-violet-ink: var(--zazu-primary-deep);
     --zazu-violet-soft: var(--zazu-primary-soft);
-    --zazu-amber: #C9790B;
-    --zazu-amber-ink: #855207;
-    --zazu-amber-soft: #FFF0D2;
-    --zazu-surface-canvas: #DCEAF8;
-    --zazu-surface-card: #E7F1FA;
-    --zazu-surface-border: #8EACC5;
-    --zazu-text-main: #0E263B;
-    --zazu-text-muted: #46677F;
-    --zazu-blue-primary: #0B63CE;
-    --zazu-blue-accent: #63AEFF;
-    --zazu-blue-hover: #084FA8;
-    --zazu-blue-light: #74B9FF;
-    --zazu-blue-soft: #C8E2FA;
-    --zazu-blue-subtle: #B2D1EE;
-    --zazu-blue-canvas: #D9E8F6;
-    --zazu-status-draft: #FEF3C7;
-    --zazu-status-draft-text: #92400E;
-    --zazu-status-active: #DCFCE7;
-    --zazu-status-active-text: #166534;
-    --zazu-status-overdue: #FEE2E2;
-    --zazu-status-overdue-text: #991B1B;
+    --zazu-amber: #D97706;
+    --zazu-amber-ink: #A85C00;
+    --zazu-amber-soft: #FEF3E5;
+    
+    /* Canvas & surfaces */
+    --zazu-surface-canvas: #E0ECFB;
+    --zazu-surface-card: #EEF5FB;
+    --zazu-surface-border: #8BA7C7;
+    --zazu-text-main: #0D2438;
+    --zazu-text-muted: #436678;
+    
+    /* Blue palette — refined for modern SaaS */
+    --zazu-blue-primary: #1066D6;
+    --zazu-blue-accent: #6BA3FF;
+    --zazu-blue-hover: #0A54BB;
+    --zazu-blue-light: #7AABFF;
+    --zazu-blue-soft: #E0EFF9;
+    --zazu-blue-subtle: #C8DFF9;
+    --zazu-blue-canvas: #E0ECFB;
+    
+    /* Status states */
+    --zazu-status-draft: #FEF5E8;
+    --zazu-status-draft-text: #8A5800;
+    --zazu-status-active: #E8F5EF;
+    --zazu-status-active-text: #10734A;
+    --zazu-status-overdue: #FEE4E0;
+    --zazu-status-overdue-text: #9B2B23;
+    
+    /* UI dimensions & spacing */
     --zazu-ui-radius: 10px;
     --zazu-ui-radius-sm: 6px;
     --zazu-ui-control-height: 40px;
     --zazu-ui-border: var(--zazu-surface-border);
     --zazu-ui-shadow: var(--zazu-card-shadow);
-    --zazu-ui-shadow-hover: 0 6px 18px rgba(15,23,42,.08);
-    --zazu-blue-brand: #2563EB;
-    --zazu-blue-vivid: #3B82F6;
-    --zazu-blue-glow: #60A5FA;
-    --zazu-canvas-bg: #0B3A66;
-    --zazu-card-bg: #E7F1FA;
-    --zazu-card-border: #8EACC5;
-    --zazu-card-shadow: 0 1px 3px 0 rgba(15,23,42,.05), 0 1px 2px -1px rgba(15,23,42,.05);
-    --zazu-text-ink: #0E263B;
-    --zazu-text-body: #274B68;
-    --zazu-card-shadow-hover: 0 10px 26px rgba(15,23,42,.07);
-    --zazu-ui-focus: 0 0 0 3px rgba(37,99,235,.14);
+    --zazu-ui-shadow-hover: 0 8px 20px rgba(10,20,35,.08);
+    
+    /* Brand blues */
+    --zazu-blue-brand: #1066D6;
+    --zazu-blue-vivid: #2575E8;
+    --zazu-blue-glow: #6BA3FF;
+    
+    /* Canvas & cards */
+    --zazu-canvas-bg: #0A3D66;
+    --zazu-card-bg: #EEF5FB;
+    --zazu-card-border: #8BA7C7;
+    --zazu-card-shadow: 0 1px 3px 0 rgba(10,20,35,.06), 0 1px 2px -1px rgba(10,20,35,.04);
+    --zazu-text-ink: #0D2438;
+    --zazu-text-body: #2A4B66;
+    --zazu-card-shadow-hover: 0 8px 22px rgba(10,20,35,.09);
+    --zazu-ui-focus: 0 0 0 3px rgba(16,102,214,.15);
+    
+    /* Brand assets & layout */
     --zazu-master-bg: url('../../images/Background-ZAZU.jpg');
     --zazu-content-max: 1320px;
     --zazu-shell-gap: clamp(14px, 1.8vw, 26px);
