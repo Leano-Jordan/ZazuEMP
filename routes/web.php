@@ -26,6 +26,7 @@ use App\Http\Controllers\PlatformLandingSettingsController;
 use App\Http\Controllers\QuoteController;
 use App\Http\Controllers\RequirementController;
 use App\Http\Controllers\SupplierController;
+use App\Http\Controllers\SyncController;
 use App\Http\Controllers\TravelCostController;
 use App\Http\Controllers\WorkController;
 use Illuminate\Support\Facades\Route;
@@ -178,6 +179,7 @@ Route::middleware(['auth', 'auth.session', 'business.context'])->group(function 
 
     Route::middleware('owner')->group(function () {
         Route::get('/settings', [BusinessSettingsController::class, 'edit'])->name('settings.index');
+        Route::post('/settings/sync/pairing', [SyncController::class, 'createPairing'])->middleware('throttle:20,1')->name('settings.sync.pairing');
         Route::get('/settings/backup', [BusinessSettingsController::class, 'backup'])->name('settings.backup');
         Route::post('/settings/restore', [BusinessSettingsController::class, 'restore'])->name('settings.restore');
         Route::get('/settings/audit', [AuditLogController::class, 'index'])->name('settings.audit');
