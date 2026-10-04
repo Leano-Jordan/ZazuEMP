@@ -1180,3 +1180,11 @@ Acceptance boundary:
 - Mobile search is now a full-width focused search row with integrated shortcut affordance and a contextual command palette below it; the icon-only compressed treatment was removed.
 - Regression tests were expanded for palette, glass, CTA and mobile-search contracts.
 - Visual state: IMPLEMENTED / VISUAL UNVERIFIED until the local runtime is rendered at desktop/mobile in both themes.
+
+### Director search/Helper regression recovery — 2026-10-05
+
+- Current root cause: desktop search was allowed to participate in intrinsic header sizing; mobile contained a duplicate fixed-position command-palette authority; Helper JavaScript moved its fixed control horizontally when nav flyouts opened.
+- Recovery: search is now width-contained and flex-shrinking inside desktop utility chrome; mobile palette is anchored to the search row only; Helper is a compact fixed dock with lower stacking and no collision-repositioning code.
+- Mobile header order is now title row → search utility → section navigation → page actions.
+- Current visual state: IMPLEMENTED / SOURCE-VERIFIED / VISUAL-UNVERIFIED.
+- No CI status checks are attached to the latest code commit; actual browser render remains mandatory before visual acceptance.
