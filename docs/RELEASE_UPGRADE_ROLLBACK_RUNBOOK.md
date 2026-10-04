@@ -1,6 +1,8 @@
 # Zazu EMP — Upgrade / Rollback Runbook
 
 **Status:** OPERATIONAL DRAFT  
+**Operational owner:** Isaac Junior Lehlogonolo Maluleka  
+**Operating address:** 1068 Block JK, Soshanguve, Pretoria, South Africa  
 **Scope:** representative existing installations
 
 ## Before upgrade
