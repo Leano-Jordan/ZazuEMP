@@ -23,23 +23,23 @@
     color-scheme: light;
 
     /* Soft blue product system */
-    --zazu-page: #EFF4F9;
-    --zazu-page-deep: #E3EBF3;
+    --zazu-page: #E5EFF7;
+    --zazu-page-deep: #D7E5F1;
 
     /* Navigation rail */
-    --zazu-sidebar: #E7EEF6;
+    --zazu-sidebar: #D9E7F3;
     --zazu-sidebar-ink: #172B3F;
     --zazu-sidebar-muted: #3E5268;
     --zazu-sidebar-label: #65798D;
-    --zazu-sidebar-hover: #DCE6EF;
-    --zazu-sidebar-active: #FAFCFE;
-    --zazu-sidebar-surface: #FAFCFE;
+    --zazu-sidebar-hover: #C9DBEB;
+    --zazu-sidebar-active: #EAF3FA;
+    --zazu-sidebar-surface: #EDF5FA;
 
     /* Surfaces */
-    --zazu-surface: #FAFCFE;
-    --zazu-surface-2: #F0F1F6;
-    --zazu-surface-3: #E3EBF3;
-    --zazu-field: #FAFCFE;
+    --zazu-surface: #F2F7FB;
+    --zazu-surface-2: #E3EDF5;
+    --zazu-surface-3: #D6E4EF;
+    --zazu-field: #F8FBFD;
 
     /* Typography */
     --zazu-ink: #172B3F;
