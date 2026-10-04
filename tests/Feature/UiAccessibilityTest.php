@@ -113,12 +113,12 @@ class UiAccessibilityTest extends TestCase
         $finalCss = file_get_contents(resource_path('css/zazu-final-visual-sweep.css'));
 
         $this->assertLessThan(
-            strpos($create, 'Primary contact'),
-            strpos($create, 'Tax reference')
+            strpos($create, 'Tax reference'),
+            strpos($create, 'Primary contact')
         );
         $this->assertLessThan(
-            strpos($edit, 'Primary contact'),
-            strpos($edit, 'Tax reference')
+            strpos($edit, 'Tax reference'),
+            strpos($edit, 'Primary contact')
         );
         $this->assertStringContainsString('id="quick-customer-edit-link"', $work);
         $this->assertStringContainsString('position: fixed;', $finalCss);
