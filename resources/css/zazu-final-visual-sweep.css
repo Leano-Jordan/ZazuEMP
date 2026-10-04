@@ -6443,3 +6443,128 @@ body.zazu-has-wallpaper {
         max-width:calc(100vw - 20px);
     }
 }
+
+
+/* Director harmony correction — restrained blue family, including dark mode. */
+:root {
+    --zazu-page: #EAF1FA;
+    --zazu-page-deep: #DDE8F5;
+    --zazu-surface: #F8FBFF;
+    --zazu-surface-2: #EAF2FB;
+    --zazu-surface-3: #E2ECF7;
+    --zazu-card-bg: #F9FBFE;
+    --zazu-card-border: #C9D8E8;
+    --zazu-border: #C3D3E3;
+    --zazu-border-strong: #91A9C1;
+    --zazu-blue-brand: #245A9A;
+    --zazu-blue-vivid: #2F6FBE;
+    --zazu-blue-glow: #4B87CC;
+    --zazu-primary: #245A9A;
+    --zazu-primary-hover: #2F6FBE;
+    --zazu-primary-soft: #DCEAF8;
+    --zazu-primary-deep: #173F6E;
+    --zazu-primary-pale: #C7DCF1;
+    --zazu-link: #245A9A;
+    --zazu-link-hover: #173F6E;
+    --zazu-accent: #4B87CC;
+    --zazu-accent-ink: #245A9A;
+    --zazu-accent-soft: #E7F0F9;
+    --zazu-info: #3F78B8;
+    --zazu-info-ink: #245A9A;
+    --zazu-info-soft: #E0ECF8;
+    --zazu-success: #3C7A70;
+    --zazu-success-ink: #2E655D;
+    --zazu-success-soft: #E2F0ED;
+    --zazu-warning: #92713A;
+    --zazu-warning-ink: #765A2C;
+    --zazu-warning-soft: #F3EBD9;
+    --zazu-danger: #A05A60;
+    --zazu-danger-ink: #87464D;
+    --zazu-danger-soft: #F4E3E5;
+    --zazu-shadow: 0 2px 9px rgba(25,55,86,.07);
+    --zazu-shadow-strong: 0 12px 30px rgba(25,55,86,.10);
+}
+
+:root[data-theme="dark"] {
+    --zazu-page: #0A1422;
+    --zazu-page-deep: #07101B;
+    --zazu-sidebar: #081321;
+    --zazu-sidebar-hover: #10253D;
+    --zazu-sidebar-active: #173A60;
+    --zazu-sidebar-surface: #0E1C2D;
+    --zazu-surface: #101D2E;
+    --zazu-surface-2: #14263B;
+    --zazu-surface-3: #182D45;
+    --zazu-field: #0D1928;
+    --zazu-ink: #E7EFF8;
+    --zazu-ink-2: #CFDCEB;
+    --zazu-muted: #9FB2C7;
+    --zazu-faint: #7F95AC;
+    --zazu-border: #29445F;
+    --zazu-border-strong: #3B5D7E;
+    --zazu-primary: #5C8FC8;
+    --zazu-primary-hover: #6B9DD3;
+    --zazu-primary-deep: #9ABBE0;
+    --zazu-primary-soft: #18334F;
+    --zazu-primary-pale: #315679;
+    --zazu-link: #79A8D6;
+    --zazu-link-hover: #9CC1E3;
+    --zazu-nav-active: #5C8FC8;
+    --zazu-accent: #6B9DD3;
+    --zazu-accent-ink: #A9C8E5;
+    --zazu-accent-soft: #15304A;
+    --zazu-info: #6D9FD2;
+    --zazu-info-ink: #A9C8E5;
+    --zazu-info-soft: #17324D;
+    --zazu-success: #6C9B91;
+    --zazu-success-ink: #9FC5BE;
+    --zazu-success-soft: #17312E;
+    --zazu-warning: #B09563;
+    --zazu-warning-ink: #D4BC8B;
+    --zazu-warning-soft: #382F20;
+    --zazu-danger: #B8797E;
+    --zazu-danger-ink: #DDA9AD;
+    --zazu-danger-soft: #3B2529;
+    --zazu-card-bg: #111F31;
+    --zazu-card-border: #29445F;
+    --zazu-card-shadow: 0 2px 10px rgba(0,0,0,.22);
+    --zazu-card-shadow-hover: 0 10px 24px rgba(0,0,0,.28);
+    --zazu-shadow: 0 2px 10px rgba(0,0,0,.22);
+    --zazu-shadow-strong: 0 12px 30px rgba(0,0,0,.30);
+    --zazu-text-ink: #E7EFF8;
+    --zazu-text-body: #CFDCEB;
+    --zazu-text-muted: #9FB2C7;
+    --zazu-blue-brand: #5C8FC8;
+    --zazu-blue-vivid: #6B9DD3;
+    --zazu-blue-glow: #8BB2DC;
+    --zazu-blue-soft: #18334F;
+    --zazu-blue-subtle: #315679;
+    --zazu-canvas-bg: #0A1422;
+    --zazu-surface-canvas: #0A1422;
+}
+
+:root[data-theme="dark"] .zazu-sidebar {
+    background: linear-gradient(180deg, #0B1C2E 0%, #081321 58%, #07101B 100%);
+}
+
+:root[data-theme="dark"] .zazu-nav-link.active {
+    background: linear-gradient(90deg, rgba(92,143,200,.26), rgba(92,143,200,.08));
+    border-color: rgba(125,169,214,.24);
+    box-shadow: inset 3px 0 0 #6B9DD3;
+}
+
+:root[data-theme="dark"] .zazu-card-header,
+:root[data-theme="dark"] .zazu-panel-head,
+:root[data-theme="dark"] .zazu-form-section-head {
+    background: linear-gradient(180deg, #162A41, #101D2E);
+}
+
+:root[data-theme="dark"] .zazu-command-band {
+    background: linear-gradient(135deg, rgba(92,143,200,.16), rgba(92,143,200,.06) 55%, #101D2E);
+}
+
+:root[data-theme="dark"] .zazu-status-draft,
+:root[data-theme="dark"] .zazu-status-active,
+:root[data-theme="dark"] .zazu-status-overdue {
+    filter: saturate(.72);
+}
