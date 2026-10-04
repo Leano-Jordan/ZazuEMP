@@ -68,26 +68,24 @@ class SyncController extends Controller
     {
         $validated = $request->validate([
             'pairing_code' => ['required', 'digits:6'],
-            'installation_id' => ['required', 'uuid'],
             'device_name' => ['nullable', 'string', 'max:120'],
             'device_type' => ['nullable', 'string', 'max:32'],
         ]);
 
-        $device = SyncDevice::query()
-            ->where('installation_id', $validated['installation_id'])
-            ->where('status', 'pending')
-            ->first();
+        $device = SyncDevice::query()->where('status', 'pending')->orderBy('id')->get()->first(function (SyncDevice $candidate): bool {
+            $metadata = $candidate->metadata ?? [];
+            $expiresAt = isset($metadata['pairing_expires_at']) ? now()->parse($metadata['pairing_expires_at']) : null;
+
+            return $expiresAt && $expiresAt->isFuture()
+                && isset($metadata['pairing_code_hash'])
+                && Hash::check(request()->input('pairing_code'), $metadata['pairing_code_hash']);
+        });
 
         if (! $device) {
-            throw ValidationException::withMessages(['pairing_code' => 'The pairing code is invalid or already used.']);
+            throw ValidationException::withMessages(['pairing_code' => 'The pairing code is invalid or expired.']);
         }
 
         $metadata = $device->metadata ?? [];
-        $expiresAt = isset($metadata['pairing_expires_at']) ? now()->parse($metadata['pairing_expires_at']) : null;
-
-        if (! $expiresAt || $expiresAt->isPast() || ! isset($metadata['pairing_code_hash']) || ! Hash::check($validated['pairing_code'], $metadata['pairing_code_hash'])) {
-            throw ValidationException::withMessages(['pairing_code' => 'The pairing code is invalid or expired.']);
-        }
 
         $token = Str::random(64);
         $device->update([
@@ -160,10 +158,43 @@ class SyncController extends Controller
         ]);
     }
 
-    public function push(Request $request): JsonResponse
+    public function push(Request $request, \App\Support\Offline\SyncMutationRecorder $recorder): JsonResponse
     {
-        throw ValidationException::withMessages([
-            'mutations' => 'Phone-to-host mutation application is not activated until a domain-safe handler is registered for the requested entity type.',
+        /** @var SyncDevice $device */
+        $device = $request->attributes->get('sync_device');
+
+        $validated = $request->validate([
+            'mutations' => ['required', 'array', 'min:1', 'max:100'],
+            'mutations.*.id' => ['required', 'uuid'],
+            'mutations.*.entity_type' => ['required', 'string', 'max:255'],
+            'mutations.*.entity_id' => ['required', 'string', 'max:255'],
+            'mutations.*.operation' => ['required', 'string', 'max:32'],
+            'mutations.*.payload' => ['nullable', 'array'],
+        ]);
+
+        $recorded = [];
+        foreach ($validated['mutations'] as $item) {
+            $mutation = $recorder->record(
+                $device,
+                $item['entity_type'],
+                $item['entity_id'],
+                $item['operation'],
+                $item['payload'] ?? [],
+                $item['id'],
+            );
+            $recorded[] = [
+                'id' => $mutation->mutation_id,
+                'sequence' => $mutation->sequence,
+                'status' => $mutation->status,
+            ];
+        }
+
+        $device->update(['last_seen_at' => now()]);
+
+        return response()->json([
+            'recorded' => $recorded,
+            'applied' => false,
+            'message' => 'Mutations are durably recorded for domain-safe application; the phone must retain them until application acknowledgement is added.',
         ]);
     }
 
@@ -175,10 +206,15 @@ class SyncController extends Controller
             $type = $item['type'];
             $model = self::SELECTION_TYPES[$type];
 
-            $record = $model::query()
-                ->where('id', $item['id'])
-                ->where('business_id', $business->id)
-                ->first();
+            $query = $model::query();
+
+            if ($item['type'] === 'quote') {
+                $query->whereHas('event', fn ($event) => $event->where('business_id', $business->id));
+            } else {
+                $query->where('business_id', $business->id);
+            }
+
+            $record = $query->where('id', $item['id'])->first();
 
             if (! $record) {
                 throw ValidationException::withMessages([
