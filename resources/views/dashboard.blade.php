@@ -26,7 +26,7 @@
                     <a href="{{ route('work.create', ['start' => 'quote']) }}" class="zazu-btn zazu-btn-secondary">Start with quote <span>+</span></a>
                 @endif
                 @if($workspaceTools['calendar'])<a href="{{ route('calendar.index') }}" class="zazu-btn zazu-btn-secondary">Open calendar <span>→</span></a>@endif
-                <a href="{{ route('offline.shell') }}" class="zazu-btn zazu-btn-secondary">Prepare this phone <span>↗</span></a>
+                <a href="{{ route('offline.shell') }}" class="zazu-btn zazu-btn-secondary">Open Zazu on phone <span>↗</span></a>
             </div>        </div>
         <div class="zazu-dash-hero-side zazu-dash-hero-visual">
             @if($business?->dashboard_image_path)
