@@ -7915,3 +7915,284 @@ body.zazu-inspector-open { overflow:hidden; }
 .zazu-nav-hierarchical{overflow:visible}.zazu-nav-hierarchy{display:grid;gap:5px}.zazu-nav-area{position:relative}.zazu-nav-area-trigger{position:relative;z-index:2;width:100%;min-height:46px;display:flex;align-items:center;justify-content:space-between;gap:12px;padding:0 12px;border:1px solid transparent;border-radius:8px;background:transparent;color:var(--zazu-sidebar-ink);font:700 12px/1.2 inherit;text-align:left;cursor:pointer}.zazu-nav-area-trigger:hover,.zazu-nav-area-trigger:focus-visible,.zazu-nav-area.is-open .zazu-nav-area-trigger{border-color:var(--zazu-border);background:var(--zazu-sidebar-hover)}.zazu-nav-area.is-active>.zazu-nav-area-trigger{border-color:color-mix(in srgb,var(--zazu-nav-active) 30%,var(--zazu-border));background:color-mix(in srgb,var(--zazu-primary-soft) 58%,transparent);color:var(--zazu-ink)}.zazu-nav-area-title{min-width:0}.zazu-nav-area-chevron{color:var(--zazu-faint);font-size:18px;line-height:1;transition:transform 140ms ease}.zazu-nav-area.is-open .zazu-nav-area-chevron{transform:rotate(90deg)}.zazu-nav-flyout{position:absolute;left:calc(100% - 1px);top:0;z-index:90;width:228px;padding:9px;border:1px solid var(--zazu-border-strong);border-radius:0 9px 9px 9px;background:var(--zazu-surface);box-shadow:var(--zazu-shadow-float);opacity:0;visibility:hidden;pointer-events:none;transform:none;transition:opacity 120ms ease,visibility 120ms ease}.zazu-nav-area:hover>.zazu-nav-flyout,.zazu-nav-area:focus-within>.zazu-nav-flyout,.zazu-nav-area.is-open>.zazu-nav-flyout{opacity:1;visibility:visible;pointer-events:auto}.zazu-nav-flyout-heading{padding:4px 9px 8px;color:var(--zazu-faint);font-size:9px;font-weight:850;letter-spacing:.1em;text-transform:uppercase}.zazu-nav-flyout-links{display:grid;gap:2px}.zazu-nav-flyout .zazu-nav-link{min-height:36px;padding:0 9px;border-radius:7px;color:var(--zazu-muted);font-size:11.5px}.zazu-nav-flyout .zazu-nav-link:hover,.zazu-nav-flyout .zazu-nav-link:focus-visible{background:var(--zazu-surface-2);color:var(--zazu-ink)}.zazu-nav-flyout .zazu-nav-link.active{background:var(--zazu-primary-soft);color:var(--zazu-ink);box-shadow:inset 3px 0 0 var(--zazu-nav-active)}
 @media(max-width:850px){.zazu-nav-hierarchical{overflow-y:auto}.zazu-nav-flyout{position:static;width:auto;margin:2px 0 2px 10px;padding:4px 0 4px 10px;border:0;border-left:2px solid var(--zazu-border);border-radius:0;background:transparent;box-shadow:none;opacity:1;visibility:visible;transform:none;display:none}.zazu-nav-area.is-open>.zazu-nav-flyout,.zazu-nav-area:focus-within>.zazu-nav-flyout{display:block}.zazu-nav-area-trigger{min-height:44px}.zazu-nav-flyout .zazu-nav-link{min-height:40px}}
 @media(prefers-reduced-motion:reduce){.zazu-nav-flyout,.zazu-nav-area-chevron{transition:none}}
+/* DIRECTOR — shell readability + navigation relationship polish
+   Keep the navigation/header as one dark shell. Do not use page ink tokens
+   inside dark navigation surfaces; use sidebar-specific foreground tokens.
+*/
+.zazu-sidebar {
+    background: var(--zazu-sidebar);
+    border-right-color: color-mix(in srgb, var(--zazu-sidebar-muted) 18%, transparent);
+}
+
+.zazu-brand {
+    background: var(--zazu-sidebar);
+    border-bottom-color: color-mix(in srgb, var(--zazu-sidebar-muted) 18%, transparent);
+}
+
+.zazu-brand-lockup strong,
+.zazu-brand-lockup span {
+    color: var(--zazu-sidebar-ink);
+}
+
+.zazu-brand-lockup span {
+    color: var(--zazu-sidebar-label);
+}
+
+.zazu-nav-hierarchy {
+    gap: 2px;
+}
+
+.zazu-nav-area-trigger {
+    min-height: 44px;
+    padding-inline: 12px;
+    border-radius: 0;
+    border-color: transparent;
+    background: transparent;
+    color: var(--zazu-sidebar-ink);
+    font-size: var(--zazu-font-size-nav);
+    font-weight: var(--zazu-weight-semibold);
+}
+
+.zazu-nav-area-trigger:hover,
+.zazu-nav-area-trigger:focus-visible,
+.zazu-nav-area.is-open > .zazu-nav-area-trigger {
+    border-color: color-mix(in srgb, var(--zazu-sidebar-muted) 18%, transparent);
+    background: var(--zazu-sidebar-hover);
+    color: var(--zazu-sidebar-ink);
+}
+
+.zazu-nav-area.is-active > .zazu-nav-area-trigger {
+    border-color: color-mix(in srgb, var(--zazu-primary) 42%, var(--zazu-sidebar));
+    background: color-mix(in srgb, var(--zazu-primary) 18%, var(--zazu-sidebar));
+    color: var(--zazu-sidebar-ink);
+    box-shadow: inset 3px 0 0 var(--zazu-primary);
+}
+
+.zazu-nav-area-chevron {
+    color: var(--zazu-sidebar-label);
+}
+
+.zazu-nav-flyout {
+    left: calc(100% - 1px);
+    top: 0;
+    width: 236px;
+    padding: 8px;
+    border-color: color-mix(in srgb, var(--zazu-sidebar-muted) 22%, var(--zazu-sidebar));
+    border-radius: 0;
+    background: var(--zazu-sidebar-surface);
+    box-shadow: 12px 18px 36px color-mix(in srgb, #000 28%, transparent);
+}
+
+.zazu-nav-flyout-heading {
+    padding: 5px 10px 8px;
+    color: var(--zazu-sidebar-label);
+    font-size: var(--zazu-font-size-meta);
+    font-weight: var(--zazu-weight-bold);
+    letter-spacing: .08em;
+}
+
+.zazu-nav-flyout-links {
+    gap: 1px;
+}
+
+.zazu-nav-flyout .zazu-nav-link {
+    min-height: 40px;
+    padding-inline: 10px;
+    border: 0;
+    border-radius: 0;
+    color: var(--zazu-sidebar-muted);
+    font-size: var(--zazu-font-size-nav);
+    font-weight: var(--zazu-weight-semibold);
+}
+
+.zazu-nav-flyout .zazu-nav-link:hover,
+.zazu-nav-flyout .zazu-nav-link:focus-visible {
+    background: var(--zazu-sidebar-hover);
+    color: var(--zazu-sidebar-ink);
+}
+
+.zazu-nav-flyout .zazu-nav-link.active {
+    background: color-mix(in srgb, var(--zazu-primary) 18%, var(--zazu-sidebar-surface));
+    color: var(--zazu-sidebar-ink);
+    box-shadow: inset 3px 0 0 var(--zazu-primary);
+}
+
+.zazu-sidebar-footer {
+    background: var(--zazu-sidebar);
+    border-top-color: color-mix(in srgb, var(--zazu-sidebar-muted) 18%, transparent);
+}
+
+.zazu-footer-workspace,
+.zazu-user-trigger {
+    color: var(--zazu-sidebar-ink);
+}
+
+.zazu-footer-workspace-label,
+.zazu-user-kicker {
+    color: var(--zazu-sidebar-label);
+}
+
+.zazu-user-trigger:hover,
+.zazu-user-trigger[aria-expanded="true"] {
+    border-color: color-mix(in srgb, var(--zazu-sidebar-muted) 20%, transparent);
+    background: var(--zazu-sidebar-hover);
+    color: var(--zazu-sidebar-ink);
+}
+
+.zazu-user-identity strong {
+    color: var(--zazu-sidebar-ink);
+}
+
+.zazu-user-identity span,
+.zazu-user-chevron {
+    color: var(--zazu-sidebar-muted);
+}
+
+.zazu-user-popover {
+    top: auto;
+    right: 0;
+    bottom: calc(100% + 8px);
+    z-index: 140;
+    width: min(320px, calc(100vw - 24px));
+    max-height: min(620px, calc(100dvh - 24px));
+    overflow-y: auto;
+    padding: 10px;
+    border-color: color-mix(in srgb, var(--zazu-sidebar-muted) 22%, var(--zazu-sidebar));
+    border-radius: 0;
+    background: var(--zazu-sidebar-surface);
+    color: var(--zazu-sidebar-ink);
+    box-shadow: 12px 18px 36px color-mix(in srgb, #000 30%, transparent);
+}
+
+.zazu-user-popover-name,
+.zazu-user-workspace-name {
+    color: var(--zazu-sidebar-ink);
+}
+
+.zazu-user-popover-label {
+    color: var(--zazu-sidebar-label);
+}
+
+.zazu-user-popover-email,
+.zazu-user-popover-role {
+    color: var(--zazu-sidebar-muted);
+}
+
+.zazu-user-popover-section {
+    color: var(--zazu-sidebar-ink);
+}
+
+.zazu-user-popover-divider {
+    background: color-mix(in srgb, var(--zazu-sidebar-muted) 18%, transparent);
+}
+
+.zazu-user-menu-link {
+    color: var(--zazu-sidebar-ink);
+    border-radius: 0;
+}
+
+.zazu-user-menu-link:hover,
+.zazu-user-menu-link:focus-visible {
+    background: var(--zazu-sidebar-hover);
+    color: var(--zazu-sidebar-ink);
+}
+
+.zazu-user-menu-link small {
+    color: var(--zazu-sidebar-muted);
+}
+
+.zazu-user-switch-select {
+    border-color: color-mix(in srgb, var(--zazu-sidebar-muted) 22%, transparent);
+    background: var(--zazu-sidebar);
+    color: var(--zazu-sidebar-ink);
+}
+
+.zazu-user-signout {
+    border-radius: 0;
+    color: #FFB4B4;
+}
+
+.zazu-user-signout:hover,
+.zazu-user-signout:focus-visible {
+    background: color-mix(in srgb, #D14343 18%, var(--zazu-sidebar-surface));
+    color: #FFD5D5;
+}
+
+/* The topbar belongs to the same shell as the navigation. */
+.zazu-topbar {
+    background: var(--zazu-sidebar);
+    border-bottom-color: color-mix(in srgb, var(--zazu-sidebar-muted) 18%, transparent);
+    box-shadow: 0 1px 0 color-mix(in srgb, #000 18%, transparent);
+    color: var(--zazu-sidebar-ink);
+}
+
+.zazu-page-title {
+    color: var(--zazu-sidebar-ink);
+}
+
+.zazu-eyebrow {
+    color: var(--zazu-sidebar-label);
+}
+
+.zazu-workspace-name,
+.zazu-workspace-status,
+.zazu-theme-toggle {
+    border-color: color-mix(in srgb, var(--zazu-sidebar-muted) 22%, transparent);
+    background: var(--zazu-sidebar-surface);
+    color: var(--zazu-sidebar-ink);
+}
+
+.zazu-workspace-status {
+    color: var(--zazu-primary-ink);
+    background: color-mix(in srgb, var(--zazu-primary) 18%, var(--zazu-sidebar-surface));
+}
+
+.zazu-section-tabs a {
+    border-radius: 0;
+    color: var(--zazu-sidebar-muted);
+}
+
+.zazu-section-tabs a:hover,
+.zazu-section-tabs a:focus-visible {
+    background: var(--zazu-sidebar-hover);
+    color: var(--zazu-sidebar-ink);
+}
+
+.zazu-section-tabs a.active {
+    border-color: color-mix(in srgb, var(--zazu-sidebar-muted) 22%, transparent);
+    background: var(--zazu-sidebar-surface);
+    color: var(--zazu-sidebar-ink);
+    box-shadow: inset 0 -2px 0 var(--zazu-primary);
+}
+
+@media (max-width: 1023px) {
+    .zazu-topbar {
+        background: var(--zazu-sidebar);
+    }
+
+    .zazu-mobile-menu-button {
+        border-radius: 0;
+        border-color: color-mix(in srgb, var(--zazu-sidebar-muted) 22%, transparent);
+        background: var(--zazu-sidebar-surface);
+        color: var(--zazu-sidebar-ink);
+    }
+
+    .zazu-mobile-menu-button:hover,
+    .zazu-mobile-menu-button:focus-visible {
+        border-color: var(--zazu-primary);
+        background: var(--zazu-sidebar-hover);
+        color: var(--zazu-sidebar-ink);
+    }
+}
+
+@media (max-width: 850px) {
+    .zazu-nav-flyout {
+        border-radius: 0;
+        background: transparent;
+        box-shadow: none;
+    }
+
+    .zazu-nav-flyout .zazu-nav-link {
+        border-radius: 0;
+    }
+}
