@@ -794,3 +794,260 @@ body.zazu-mobile-menu-open .zazu-helper {
 .zazu-helper.is-nav-avoiding {
     transform: translate3d(10px, -2px, 0) scale(.985);
 }
+
+
+/* --------------------------------------------------------------------------
+   Director — mobile shell refinement
+   -------------------------------------------------------------------------- */
+@media (max-width: 820px) {
+    .zazu-topbar-inner {
+        position: relative;
+        min-height: 112px;
+        padding: max(8px, env(safe-area-inset-top)) 12px 50px;
+        display: grid;
+        grid-template-columns: 44px minmax(0, 1fr) auto;
+        grid-template-areas: "menu context actions";
+        align-items: start;
+        gap: 8px;
+    }
+
+    .zazu-header-context {
+        align-self: center;
+        min-height: 44px;
+        padding-top: 0;
+        display: grid;
+        align-content: center;
+        gap: 5px;
+        text-align: left;
+    }
+
+    .zazu-page-title {
+        font-size: 18px;
+        line-height: 1.15;
+    }
+
+    .zazu-section-tabs {
+        order: 2;
+        width: 100%;
+        gap: 2px;
+        padding: 0 0 2px;
+        justify-content: flex-start;
+    }
+
+    .zazu-section-tabs a,
+    .zazu-section-name {
+        flex: 0 0 auto;
+        min-height: 30px;
+        padding: 0 9px;
+        display: inline-flex;
+        align-items: center;
+        font-size: 11px;
+    }
+
+    .zazu-topbar-actions {
+        position: static;
+        grid-area: actions;
+        width: 88px !important;
+        min-width: 88px;
+        height: 44px;
+        display: grid;
+        grid-template-columns: 40px 40px;
+        grid-template-areas: "search theme";
+        align-items: center;
+        gap: 8px;
+        padding: 0 !important;
+    }
+
+    .zazu-command-search {
+        position: relative;
+        grid-area: search;
+        width: 40px;
+        min-width: 40px;
+        flex: 0 0 40px;
+    }
+
+    .zazu-command-trigger,
+    .zazu-command-search.is-open .zazu-command-trigger,
+    .zazu-command-search:focus-within .zazu-command-trigger {
+        width: 40px;
+        min-width: 40px;
+        height: 40px;
+        min-height: 40px;
+        padding: 0;
+        justify-content: center;
+    }
+
+    .zazu-command-trigger input,
+    .zazu-command-search.is-open .zazu-command-trigger input,
+    .zazu-command-search:focus-within .zazu-command-trigger input {
+        position: absolute;
+        inset: 0;
+        width: 100%;
+        min-height: 100%;
+        padding: 0;
+        opacity: 1;
+        color: transparent;
+        background: transparent;
+        caret-color: transparent;
+        cursor: pointer;
+        z-index: 2;
+    }
+
+    .zazu-command-search.is-open,
+    .zazu-command-search:focus-within {
+        position: absolute;
+        top: max(8px, env(safe-area-inset-top));
+        left: 12px;
+        right: 12px;
+        z-index: 150;
+        width: auto;
+    }
+
+    .zazu-command-search.is-open .zazu-command-trigger,
+    .zazu-command-search:focus-within .zazu-command-trigger {
+        width: 100%;
+        min-width: 0;
+        padding: 0 42px 0 40px;
+        justify-content: flex-start;
+        background: var(--zazu-surface);
+        box-shadow: 0 12px 32px color-mix(in srgb, var(--zazu-ink) 14%, transparent);
+    }
+
+    .zazu-command-search.is-open .zazu-command-trigger input,
+    .zazu-command-search:focus-within .zazu-command-trigger input {
+        position: static;
+        width: 100%;
+        min-height: 100%;
+        padding: 0;
+        opacity: 1;
+        color: var(--zazu-ink);
+        caret-color: var(--zazu-primary);
+        cursor: text;
+        z-index: 3;
+    }
+
+    .zazu-command-search-icon {
+        position: absolute;
+        left: 12px;
+        z-index: 4;
+        line-height: 1;
+    }
+
+    .zazu-command-search.is-open .zazu-command-search-icon,
+    .zazu-command-search:focus-within .zazu-command-search-icon {
+        left: 14px;
+    }
+
+    .zazu-header-slot-actions {
+        position: absolute;
+        left: 56px;
+        right: 12px;
+        bottom: 10px;
+        width: auto;
+        max-width: none;
+        min-width: 0;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        flex-wrap: nowrap;
+        overflow-x: auto;
+        overflow-y: hidden;
+        padding: 0 0 2px;
+        scrollbar-width: none;
+    }
+
+    .zazu-header-slot-actions::-webkit-scrollbar {
+        display: none;
+    }
+
+    .zazu-header-slot-actions > .zazu-btn {
+        flex: 0 0 auto;
+        max-width: none;
+        min-height: 38px;
+        padding-inline: 11px;
+    }
+
+    .zazu-theme-toggle {
+        grid-area: theme;
+        width: 40px;
+        height: 40px;
+        min-width: 40px;
+    }
+
+    .zazu-command-palette {
+        position: fixed !important;
+        top: calc(max(8px, env(safe-area-inset-top)) + 52px);
+        left: 12px !important;
+        right: 12px !important;
+        width: auto !important;
+        max-height: calc(100dvh - 70px);
+        border-radius: 16px;
+        box-shadow: 0 24px 70px color-mix(in srgb, var(--zazu-ink) 24%, transparent);
+        backdrop-filter: blur(18px);
+        -webkit-backdrop-filter: blur(18px);
+    }
+
+    .zazu-command-results {
+        max-height: min(60dvh, 470px);
+        padding: 7px;
+    }
+
+    .zazu-command-results [data-command-item] {
+        min-height: 54px;
+        padding: 10px 11px;
+        border-radius: 10px;
+    }
+
+    .zazu-content {
+        padding: 18px 14px 40px;
+    }
+
+    .zazu-brand-logo {
+        width: 36px;
+        height: 36px;
+        flex-basis: 36px;
+    }
+
+    .zazu-brand-mark {
+        width: 36px;
+        height: 36px;
+        flex-basis: 36px;
+    }
+}
+
+@media (max-width: 520px) {
+    .zazu-topbar-inner {
+        grid-template-columns: 42px minmax(0, 1fr) auto;
+        gap: 6px;
+    }
+
+    .zazu-topbar-actions {
+        width: 84px !important;
+        min-width: 84px;
+        grid-template-columns: 38px 38px;
+        gap: 8px;
+    }
+
+    .zazu-mobile-menu-button,
+    .zazu-theme-toggle,
+    .zazu-command-trigger,
+    .zazu-command-search {
+        width: 38px;
+        min-width: 38px;
+    }
+
+    .zazu-mobile-menu-button,
+    .zazu-theme-toggle,
+    .zazu-command-trigger {
+        height: 38px;
+        min-height: 38px;
+    }
+
+    .zazu-header-slot-actions {
+        left: 50px;
+    }
+
+    .zazu-page-title {
+        font-size: 17px;
+    }
+}
