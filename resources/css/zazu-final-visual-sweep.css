@@ -37,18 +37,18 @@ body {
 }
 
 .zazu-sidebar {
-    width: 256px;
-    flex-basis: 256px;
+    width: 248px;
+    flex: 0 0 248px;
     background: var(--zazu-sidebar);
     border-right: 1px solid color-mix(in srgb, var(--zazu-primary-light) 18%, var(--zazu-sidebar));
-    box-shadow: 10px 0 28px rgba(0, 0, 0, .14);
+    box-shadow: 8px 0 24px rgba(7, 25, 42, .12);
 }
 
 .zazu-brand {
     min-height: 68px;
     padding: 0 18px;
     background: var(--zazu-sidebar);
-    border-bottom: 1px solid color-mix(in srgb, var(--zazu-sidebar-muted) 14%, transparent);
+    border-bottom: 1px solid color-mix(in srgb, var(--zazu-sidebar-muted) 15%, transparent);
 }
 
 .zazu-brand-link,
@@ -58,18 +58,76 @@ body {
 }
 
 .zazu-brand-mark {
-    border-color: color-mix(in srgb, var(--zazu-primary-light) 55%, var(--zazu-sidebar));
-    background: color-mix(in srgb, var(--zazu-primary) 18%, var(--zazu-sidebar));
+    border-color: color-mix(in srgb, var(--zazu-primary-light) 52%, var(--zazu-sidebar));
+    background: color-mix(in srgb, var(--zazu-primary) 16%, var(--zazu-sidebar));
     color: var(--zazu-primary-light);
+}
+
+.zazu-sidebar-workspace {
+    margin: 10px 8px 14px;
+    padding: 11px 12px;
+    border: 1px solid color-mix(in srgb, var(--zazu-primary-light) 16%, transparent);
+    border-radius: 9px;
+    background: var(--zazu-sidebar-surface);
 }
 
 .zazu-sidebar-workspace-label {
     color: var(--zazu-sidebar-label);
 }
 
+.zazu-sidebar-workspace-name {
+    margin-top: 3px;
+    color: var(--zazu-sidebar-ink);
+    font-size: 13px;
+    font-weight: 760;
+}
+
+.zazu-sidebar-workspace-meta {
+    margin-top: 5px;
+    color: var(--zazu-sidebar-muted);
+    font-size: 10.5px;
+}
+
 .zazu-sidebar-workspace-dot {
     background: var(--zazu-accent);
-    box-shadow: 0 0 0 3px color-mix(in srgb, var(--zazu-accent) 16%, transparent);
+    box-shadow: 0 0 0 3px color-mix(in srgb, var(--zazu-accent) 15%, transparent);
+}
+
+.zazu-nav {
+    min-height: 0;
+}
+
+.zazu-nav-link {
+    min-height: 40px;
+    padding: 0 11px;
+    border: 1px solid transparent;
+    border-radius: 8px;
+    color: var(--zazu-sidebar-muted);
+    font-size: 12.5px;
+    font-weight: 650;
+}
+
+.zazu-nav-link:hover,
+.zazu-nav-link:focus-visible {
+    background: var(--zazu-sidebar-hover);
+    color: var(--zazu-sidebar-ink);
+}
+
+.zazu-nav-link.active {
+    background: color-mix(in srgb, var(--zazu-primary) 20%, var(--zazu-sidebar));
+    border-color: color-mix(in srgb, var(--zazu-primary) 34%, transparent);
+    color: var(--zazu-primary-light);
+    box-shadow: inset 3px 0 0 var(--zazu-primary);
+}
+
+.zazu-nav-label {
+    display: block;
+    margin: 14px 10px 5px;
+    color: var(--zazu-sidebar-label);
+    font-size: 9px;
+    font-weight: 800;
+    letter-spacing: .12em;
+    text-transform: uppercase;
 }
 
 .zazu-sidebar-footer {
@@ -77,79 +135,36 @@ body {
     border-top: 1px solid color-mix(in srgb, var(--zazu-sidebar-muted) 14%, transparent);
 }
 
-.zazu-nav {
-    min-height: 0;
+.zazu-footer-card {
+    padding: 11px 12px;
+    border: 1px solid color-mix(in srgb, var(--zazu-sidebar-muted) 16%, transparent);
+    border-radius: 9px;
+    background: color-mix(in srgb, var(--zazu-sidebar-surface) 86%, var(--zazu-primary) 14%);
 }
 
-.zazu-nav-area-trigger {
-    min-height: 46px;
-    padding: 0 12px;
-    border: 1px solid transparent;
-    border-radius: 8px;
-    background: transparent;
+.zazu-footer-title {
     color: var(--zazu-sidebar-ink);
-    font-size: 13px;
-    font-weight: 750;
+    font-size: 11.5px;
+    font-weight: 760;
 }
 
-.zazu-nav-area-trigger:hover,
-.zazu-nav-area-trigger:focus-visible,
-.zazu-nav-area.is-open > .zazu-nav-area-trigger {
-    border-color: color-mix(in srgb, var(--zazu-primary-light) 34%, transparent);
-    background: color-mix(in srgb, var(--zazu-primary) 14%, var(--zazu-sidebar));
+.zazu-footer-copy {
+    margin-top: 3px;
+    color: var(--zazu-sidebar-muted);
+    font-size: 10.5px;
 }
 
-.zazu-nav-area.is-active > .zazu-nav-area-trigger {
-    border-color: color-mix(in srgb, var(--zazu-primary) 62%, transparent);
-    background: color-mix(in srgb, var(--zazu-primary) 22%, var(--zazu-sidebar));
-    color: var(--zazu-primary-light);
-    box-shadow: inset 3px 0 0 var(--zazu-primary);
-}
-
-.zazu-nav-area-chevron {
-    color: var(--zazu-sidebar-label);
-}
-
-.zazu-nav-flyout {
-    width: 238px;
-    border: 1px solid var(--zazu-border-strong);
-    border-radius: 10px;
-    background: var(--zazu-surface);
-    box-shadow: 0 18px 40px rgba(10, 30, 52, .24);
-}
-
-.zazu-nav-flyout-heading {
-    padding: 6px 10px 9px;
-    color: var(--zazu-faint);
-    font-size: 10px;
-    font-weight: 800;
-}
-
-.zazu-nav-flyout .zazu-nav-link {
-    min-height: 38px;
-    padding: 0 10px;
-    border-radius: 7px;
-    color: var(--zazu-ink);
-    font-size: 12.5px;
-}
-
-.zazu-nav-flyout .zazu-nav-link:hover,
-.zazu-nav-flyout .zazu-nav-link:focus-visible {
-    background: var(--zazu-surface-2);
-    color: var(--zazu-ink);
-}
-
-.zazu-nav-flyout .zazu-nav-link.active {
-    background: var(--zazu-primary-soft);
-    color: var(--zazu-primary-deep);
-    box-shadow: inset 3px 0 0 var(--zazu-primary);
+.zazu-main {
+    min-width: 0;
+    flex: 1;
+    background: var(--zazu-page);
 }
 
 .zazu-topbar {
     min-height: 66px;
-    background: var(--zazu-page-deep);
-    border-bottom: 1px solid color-mix(in srgb, var(--zazu-primary-light) 18%, var(--zazu-page-deep));
-    box-shadow: 0 5px 18px rgba(4, 18, 32, .16);
+    background: var(--zazu-surface);
+    border-bottom: 1px solid var(--zazu-border);
+    box-shadow: 0 2px 10px rgba(20, 50, 76, .06);
 }
 
 .zazu-topbar-inner {
@@ -164,7 +179,7 @@ body {
 
 .zazu-page-title {
     margin: 0;
-    color: var(--zazu-sidebar-ink);
+    color: var(--zazu-ink);
     font-size: clamp(20px, 2vw, 27px);
     font-weight: 780;
     line-height: 1.08;
@@ -173,9 +188,9 @@ body {
 
 .zazu-workspace-name,
 .zazu-workspace-status {
-    border-color: color-mix(in srgb, var(--zazu-primary-light) 30%, transparent);
-    background: color-mix(in srgb, var(--zazu-primary) 12%, var(--zazu-page-deep));
-    color: var(--zazu-sidebar-muted);
+    border-color: var(--zazu-border);
+    background: var(--zazu-surface-2);
+    color: var(--zazu-muted);
 }
 
 .zazu-section-tabs {
@@ -183,13 +198,13 @@ body {
     align-items: center;
     gap: 3px;
     margin-top: 6px;
-    padding: 4px;
+    padding: 3px;
     max-width: 100%;
     overflow-x: auto;
     scrollbar-width: thin;
-    border: 1px solid color-mix(in srgb, var(--zazu-primary-light) 22%, transparent);
+    border: 1px solid var(--zazu-border);
     border-radius: 9px;
-    background: color-mix(in srgb, var(--zazu-sidebar) 74%, var(--zazu-primary) 26%);
+    background: var(--zazu-surface-2);
 }
 
 .zazu-section-tabs a,
@@ -201,7 +216,7 @@ body {
     flex: 0 0 auto;
     border: 1px solid transparent;
     border-radius: 7px;
-    color: var(--zazu-sidebar-muted);
+    color: var(--zazu-muted);
     font-size: 12px;
     font-weight: 750;
     text-decoration: none;
@@ -209,15 +224,15 @@ body {
 }
 
 .zazu-section-tabs a:hover {
-    color: var(--zazu-sidebar-ink);
-    background: color-mix(in srgb, var(--zazu-primary) 14%, transparent);
+    color: var(--zazu-ink);
+    background: var(--zazu-surface);
 }
 
 .zazu-section-tabs a.active {
     color: #fff;
     background: var(--zazu-primary);
-    border-color: var(--zazu-primary-light);
-    box-shadow: 0 3px 10px color-mix(in srgb, var(--zazu-primary) 24%, transparent);
+    border-color: var(--zazu-primary);
+    box-shadow: 0 3px 8px color-mix(in srgb, var(--zazu-primary) 20%, transparent);
 }
 
 .zazu-topbar-actions {
@@ -230,10 +245,10 @@ body {
 .zazu-user-trigger,
 .zazu-header-settings,
 .zazu-mobile-toggle {
-    border: 1px solid color-mix(in srgb, var(--zazu-primary-light) 30%, transparent);
+    border: 1px solid var(--zazu-border);
     border-radius: 8px;
-    background: color-mix(in srgb, var(--zazu-primary) 10%, var(--zazu-page-deep));
-    color: var(--zazu-sidebar-ink);
+    background: var(--zazu-surface-2);
+    color: var(--zazu-ink);
 }
 
 .zazu-theme-toggle:hover,
@@ -241,22 +256,22 @@ body {
 .zazu-header-settings:hover,
 .zazu-mobile-toggle:hover {
     border-color: var(--zazu-primary);
-    background: color-mix(in srgb, var(--zazu-primary) 20%, var(--zazu-page-deep));
-    color: var(--zazu-sidebar-ink);
+    background: var(--zazu-primary-soft);
+    color: var(--zazu-primary-deep);
 }
 
 .zazu-command-trigger {
-    border-color: color-mix(in srgb, var(--zazu-primary-light) 34%, transparent);
-    background: color-mix(in srgb, var(--zazu-sidebar) 78%, var(--zazu-primary) 22%);
-    color: var(--zazu-sidebar-ink);
+    border-color: var(--zazu-border-strong);
+    background: var(--zazu-surface-2);
+    color: var(--zazu-ink);
 }
 
 .zazu-command-trigger input {
-    color: var(--zazu-sidebar-ink);
+    color: var(--zazu-ink);
 }
 
 .zazu-command-trigger input::placeholder {
-    color: var(--zazu-sidebar-muted);
+    color: var(--zazu-faint);
 }
 
 /* --------------------------------------------------------------------------
@@ -270,22 +285,22 @@ body {
 .zazu-content {
     width: 100%;
     max-width: var(--zazu-content-max);
-    padding: 20px 22px 38px;
-    color: var(--zazu-sidebar-ink);
+    padding: 22px 22px 40px;
+    color: var(--zazu-ink);
 }
 
 .zazu-page-intro,
 .zazu-section-heading,
 .zazu-detail-header,
 .zazu-empty {
-    color: var(--zazu-sidebar-ink);
+    color: var(--zazu-ink);
 }
 
 .zazu-page-intro h2,
 .zazu-page-intro h3,
 .zazu-section-heading h2,
 .zazu-section-heading h3 {
-    color: var(--zazu-sidebar-ink);
+    color: var(--zazu-ink);
     font-size: clamp(19px, 2vw, 26px);
     font-weight: 760;
     line-height: 1.16;
@@ -295,25 +310,27 @@ body {
 .zazu-page-intro p,
 .zazu-command-copy {
     max-width: 72ch;
-    color: color-mix(in srgb, var(--zazu-sidebar-ink) 78%, transparent);
+    color: var(--zazu-muted);
     font-size: 13.5px;
     line-height: 1.55;
 }
 
 .zazu-eyebrow,
 .zazu-command-meta-label {
-    color: color-mix(in srgb, var(--zazu-primary-light) 88%, var(--zazu-sidebar-ink));
-    font-size: 11px;
+    color: var(--zazu-primary-deep);
+    font-size: 10px;
     font-weight: 800;
     letter-spacing: .12em;
     text-transform: uppercase;
 }
 
 .zazu-command-meta-value {
-    color: var(--zazu-sidebar-ink);
+    color: var(--zazu-ink);
 }
 
 /* --------------------------------------------------------------------------
+   BLUE COMMAND / HERO AREAS
+   ---------------/* --------------------------------------------------------------------------
    BLUE COMMAND / HERO AREAS
    -------------------------------------------------------------------------- */
 .zazu-command-band,
@@ -323,15 +340,14 @@ body {
     align-items: center;
     justify-content: space-between;
     gap: 18px;
+    min-height: 104px;
     margin-bottom: 16px;
-    padding: 17px 18px;
-    border: 1px solid color-mix(in srgb, var(--zazu-primary-light) 35%, var(--zazu-page-deep));
-    border-radius: 10px;
-    background:
-        linear-gradient(135deg,
-            color-mix(in srgb, var(--zazu-primary) 84%, var(--zazu-page-deep)),
-            var(--zazu-page-deep) 78%);
-    box-shadow: 0 10px 24px rgba(5, 24, 40, .18);
+    padding: 18px 20px;
+    border: 1px solid color-mix(in srgb, var(--zazu-primary) 48%, var(--zazu-border));
+    border-radius: 11px;
+    background: linear-gradient(115deg, #315F9C 0%, #234A79 62%, #173A62 100%);
+    color: #F7FBFF;
+    box-shadow: 0 10px 22px rgba(20, 53, 86, .14);
     overflow: hidden;
 }
 
@@ -339,13 +355,18 @@ body {
 .zazu-work-hero::after {
     content: "";
     position: absolute;
-    inset: auto 18px 0;
+    inset: auto 20px 0;
     height: 3px;
     background: var(--zazu-primary-light);
 }
 
+.zazu-command-band .zazu-eyebrow,
+.zazu-work-hero .zazu-eyebrow {
+    color: #C7E0FF;
+}
+
 .zazu-command-title {
-    color: var(--zazu-sidebar-ink);
+    color: #FFFFFF;
     font-size: clamp(17px, 1.8vw, 23px);
     font-weight: 780;
     line-height: 1.12;
@@ -353,18 +374,25 @@ body {
 }
 
 .zazu-command-band .zazu-command-copy,
-.zazu-command-band .zazu-command-meta,
 .zazu-work-hero .zazu-command-copy,
+.zazu-command-band .zazu-command-meta,
 .zazu-work-hero .zazu-command-meta {
-    color: var(--zazu-sidebar-muted);
+    color: #D8E8F8;
 }
 
-.zazu-command-band .zazu-command-title,
-.zazu-command-band .zazu-command-copy,
-.zazu-work-hero .zazu-command-title,
-.zazu-work-hero .zazu-command-copy {
-    position: relative;
-    z-index: 1;
+.zazu-command-band .zazu-btn-primary,
+.zazu-work-hero .zazu-btn-primary {
+    background: #FFFFFF;
+    border-color: #FFFFFF;
+    color: #214B7C;
+    box-shadow: none;
+}
+
+.zazu-command-band .zazu-btn-primary:hover,
+.zazu-work-hero .zazu-btn-primary:hover {
+    background: #EEF6FF;
+    border-color: #EEF6FF;
+    color: #173A62;
 }
 
 /* --------------------------------------------------------------------------
@@ -439,7 +467,8 @@ body {
 
 .zazu-form .zazu-field,
 .zazu-form label.zazu-field,
-.zazu-form-grid .zazu-field {
+.zazu-form-grid .zazu-field,
+.zazu-form-section .zazu-field {
     min-width: 0;
     padding: 0;
     border: 0;
@@ -1003,20 +1032,17 @@ button:focus-visible {
 
 @media (max-width: 820px) {
     .zazu-content {
-        padding: 16px 12px 88px;
+        padding: 16px 12px 82px;
     }
 
     .zazu-topbar-inner {
         padding-inline: 10px;
     }
 
-    .zazu-page-title {
-        font-size: 18px;
-    }
-
     .zazu-command-band,
     .zazu-work-hero {
-        padding: 15px 14px;
+        min-height: 0;
+        padding: 16px;
         flex-direction: column;
         align-items: flex-start;
     }
@@ -1028,13 +1054,6 @@ button:focus-visible {
 
     .zazu-form-section {
         padding: 16px;
-    }
-
-    .zazu-label,
-    .zazu-form .zazu-label,
-    .zazu-form .zazu-field > span:first-child,
-    .zazu-form label > span:first-child {
-        font-size: 13.5px;
     }
 
     .zazu-input,
@@ -1051,58 +1070,22 @@ button:focus-visible {
         min-height: 44px;
     }
 
-    .zazu-actionbar {
-        position: sticky;
-        bottom: max(8px, env(safe-area-inset-bottom));
-        z-index: 30;
-    }
-
     .zazu-section-tabs {
-        margin-top: 5px;
-    }
-
-    .zazu-section-tabs a,
-    .zazu-section-name {
-        min-height: 34px;
-        font-size: 12px;
-    }
-
-    .zazu-card-header,
-    .zazu-panel-head,
-    .zazu-form-section-head {
-        padding: 14px 15px;
-    }
-
-    .zazu-list-item {
-        min-height: 52px;
-        padding: 12px 13px;
+        max-width: 100%;
     }
 
     .zazu-table {
         min-width: 650px;
     }
-
-    .zazu-empty {
-        min-height: 100px;
-        padding: 20px 15px;
-    }
 }
 
 @media (max-width: 520px) {
     .zazu-content {
-        padding-inline: 10px;
-    }
-
-    .zazu-onboarding-title {
-        font-size: 26px;
+        padding: 12px 10px 76px;
     }
 
     .zazu-form-section {
         padding: 14px;
-    }
-
-    .zazu-form-grid {
-        gap: 12px;
     }
 
     .zazu-card,
@@ -1111,23 +1094,20 @@ button:focus-visible {
         border-radius: 9px;
     }
 
-    .zazu-btn {
-        padding-inline: 12px;
-    }
-
     .zazu-actionbar {
-        padding: 10px;
+        padding: 9px;
     }
 }
 
 @media (prefers-reduced-motion: reduce) {
     .zazu-btn,
     .zazu-section-tabs a,
-    .zazu-nav-area-trigger,
+    .zazu-nav-link,
     .zazu-input,
-    .zazu-select {
+    .zazu-select,
+    .zazu-textarea {
         transition: none !important;
     }
 }
 
-/* No pure-white application backgrounds. White is reserved for deliberate text/icons. */
+/* No pure-white application canvas. White is reserved for deliberate controls/text. */
