@@ -20,10 +20,11 @@ class CalendarController extends Controller
             $holidayPreferences = json_decode($holidayPreferences, true) ?: [];
         }
         $month = $this->resolveMonth($request->string('month')->toString());
-        $holidayMap = collect($holidays->visibleForYear($month->year, $holidayPreferences))
-            ->groupBy(fn (array $holiday) => $holiday['date']->format('Y-m-d'));
         $view = $this->resolveView($request->string('view')->toString());
         [$rangeStart, $rangeEnd] = $this->viewRange($month, $view);
+        $holidayMap = collect(range($rangeStart->year, $rangeEnd->year))
+            ->flatMap(fn (int $year) => $holidays->visibleForYear($year, $holidayPreferences))
+            ->groupBy(fn (array $holiday) => $holiday['date']->format('Y-m-d'));
 
         $events = Event::query()
             ->where('business_id', $businessId)
