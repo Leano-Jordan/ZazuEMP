@@ -303,7 +303,7 @@
         <div class="flex flex-wrap gap-3 mt-4">
             <a href="{{ route('settings.backup') }}" class="zazu-btn zazu-btn-secondary" data-zazu-backup-download>Download backup</a>
         </div>
-        <div class="mt-5 pt-5 border-t border-slate-200/70 dark:border-slate-700/70">
+        <div class="zazu-divider mt-5 pt-5">
             <div class="zazu-context-title">Restore a backup</div>
             <p class="zazu-context-copy mt-1">Use a Zazu backup ZIP created by this installation. Existing data will be replaced by the backup contents.</p>
             <form method="POST" action="{{ route('settings.restore') }}" enctype="multipart/form-data" class="mt-4" data-zazu-restore-form>
