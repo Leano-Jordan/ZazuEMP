@@ -82,3 +82,35 @@ Before committing to substantial brand spend:
 **Reason:** direct South African software/business-name use exists and the official register search has not yet been evidenced in the project.
 
 No infringement conclusion is made here.
+
+
+## Director scan update — 2026-10-04 (additional South African evidence)
+
+The preliminary web scan found an additional important direct collision that makes the clearance issue stronger:
+
+### BR-03 — ZAZU Life is an established South African brand
+
+CIPC's October 2025 Patent Journal records the word mark **ZAZU** in the name of **ZAZU LIFE (PTY) LTD**, with filings in South Africa. The published entries include at least Class 45 and Class 44 services. ZAZU Life's own current site identifies the business as a South African financial-services/insurance business with a Gauteng head office.
+
+Source evidence:
+- CIPC October 2025 Patent Journal: https://iponline.cipc.co.za/Publications/PublishedJournals/E_Journal_October%202025%20Part%201.pdf
+- ZAZU Life: https://zazulife.co.za/
+
+### BR-04 — Zazu Finance is active in South Africa-facing business software
+
+The current Google Play listing for **Zazu Finance** says the product is a business-finance system for Morocco and South Africa and includes business accounts, invoicing, expense tracking and team permissions. The developer is ZAZU GROUP LTD.
+
+Source evidence:
+- Google Play listing: https://play.google.com/store/apps/details?id=zazu.superapp
+- Zazu business-finance site: https://www.get-zazu.com/
+
+### Revised Director risk
+
+The evidence is now more than a generic same-name search:
+
+- established South African ZAZU Life use;
+- active South African-facing Zazu business-finance software;
+- separate event-sector use internationally.
+
+This makes **Zazu / Zazu EMP a high-priority clearance item before commercial launch**. It still does not establish infringement or determine registration rights; only the official register and appropriate professional clearance can do that.
+
