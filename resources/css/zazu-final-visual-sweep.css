@@ -6378,3 +6378,68 @@ body.zazu-has-wallpaper {
         max-width: none;
     }
 }
+
+
+/* Director attention-map refinement: semantic colour should guide the eye without turning every surface into a different colour. */
+.zazu-card,
+.zazu-panel,
+.zazu-form-section,
+.zazu-module,
+.zazu-metric-card,
+.zazu-document {
+    --zazu-section-accent: var(--zazu-primary);
+    position: relative;
+}
+.zazu-card[data-tone="success"],
+.zazu-panel[data-tone="success"] { --zazu-section-accent: #16826f; }
+.zazu-card[data-tone="warning"],
+.zazu-panel[data-tone="warning"] { --zazu-section-accent: #a66a12; }
+.zazu-card[data-tone="info"],
+.zazu-panel[data-tone="info"] { --zazu-section-accent: #3568a8; }
+.zazu-card[data-tone="attention"],
+.zazu-panel[data-tone="attention"] { --zazu-section-accent: #7a4ca5; }
+.zazu-card[data-tone],
+.zazu-panel[data-tone] {
+    border-left: 3px solid color-mix(in srgb, var(--zazu-section-accent) 58%, var(--zazu-border));
+}
+.zazu-calendar-holidays { display:grid; gap:3px; margin-top:5px; }
+.zazu-calendar-holiday { display:flex; align-items:center; gap:5px; min-width:0; color:var(--zazu-muted); font-size:9px; line-height:1.25; }
+.zazu-calendar-holiday span:last-child { overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+.zazu-calendar-holiday-dot { width:5px; height:5px; flex:0 0 5px; border-radius:50%; background:var(--zazu-primary); }
+.zazu-calendar-holiday.holiday-public .zazu-calendar-holiday-dot { background:var(--zazu-primary); }
+.zazu-calendar-holiday.holiday-muslim .zazu-calendar-holiday-dot { background:#16826f; }
+.zazu-calendar-holiday.holiday-hindu .zazu-calendar-holiday-dot { background:#a66a12; }
+.zazu-calendar-holiday.holiday-christian .zazu-calendar-holiday-dot { background:#3568a8; }
+.zazu-calendar-holiday.holiday-jewish .zazu-calendar-holiday-dot { background:#5f63a6; }
+.zazu-calendar-holiday.holiday-cultural .zazu-calendar-holiday-dot { background:#7a4ca5; }
+
+/* Native dialogs are deliberately centered; no viewport-edge drift. */
+.zazu-quick-customer-dialog,
+.zazu-command-dialog,
+.auth-modal {
+    margin:auto;
+    inset:0;
+}
+.zazu-quick-customer-dialog[open],
+.zazu-command-dialog[open],
+.auth-modal[open] {
+    position:fixed;
+    top:50%;
+    left:50%;
+    right:auto;
+    bottom:auto;
+    transform:translate(-50%, -50%);
+}
+.zazu-quick-customer-dialog-panel,
+.zazu-command-dialog {
+    max-height:calc(100dvh - 32px);
+    overflow:auto;
+}
+@media(max-width:620px) {
+    .zazu-quick-customer-dialog[open],
+    .zazu-command-dialog[open],
+    .auth-modal[open] {
+        width:calc(100vw - 20px);
+        max-width:calc(100vw - 20px);
+    }
+}
