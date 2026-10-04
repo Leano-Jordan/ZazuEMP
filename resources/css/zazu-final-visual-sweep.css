@@ -5103,3 +5103,36 @@ button,
     font-family: var(--zazu-font-display);
     font-size: 14px;
 }
+
+
+.zazu-start-intent {
+    display: grid;
+    gap: 4px;
+    margin-bottom: 14px;
+    padding: 12px 15px 12px 17px;
+    border: 1px solid color-mix(in srgb, var(--zazu-primary) 28%, var(--zazu-border));
+    border-left: 4px solid var(--zazu-primary);
+    border-radius: 10px;
+    background: color-mix(in srgb, var(--zazu-primary-soft) 54%, var(--zazu-surface));
+}
+
+.zazu-start-intent-kicker {
+    color: var(--zazu-primary-deep);
+    font-size: 10px;
+    font-weight: 800;
+    letter-spacing: .08em;
+    text-transform: uppercase;
+}
+
+.zazu-start-intent strong {
+    color: var(--zazu-ink);
+    font-family: var(--zazu-font-display);
+    font-size: 14px;
+    line-height: 1.35;
+}
+
+.zazu-start-intent span:last-child {
+    color: var(--zazu-muted);
+    font-size: 11px;
+    line-height: 1.45;
+}
