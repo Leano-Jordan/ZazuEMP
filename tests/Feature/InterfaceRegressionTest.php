@@ -110,6 +110,29 @@ class InterfaceRegressionTest extends TestCase
         );
     }
 
+    public function test_cross_theme_ui_contracts_reject_known_light_on_light_and_dark_on_dark_regressions(): void
+    {
+        $appCss = file_get_contents(resource_path('css/app.css'));
+        $visualCss = file_get_contents(resource_path('css/zazu-final-visual-sweep.css'));
+        $mobileCss = file_get_contents(resource_path('css/zazu-mobile-refinement.css'));
+        $offline = file_get_contents(resource_path('views/offline.blade.php'));
+
+        $this->assertStringContainsString(':root[data-theme="dark"] .zazu-btn-danger', $appCss);
+        $this->assertStringContainsString('background: var(--zazu-danger-soft);', $appCss);
+        $this->assertStringContainsString('color: var(--zazu-danger-ink);', $appCss);
+
+        $this->assertStringNotContainsString('background:var(--zazu-primary); color:#fff;', $visualCss);
+        $this->assertStringNotContainsString('background:var(--zazu-primary);color:#fff;', $visualCss);
+        $this->assertStringContainsString('color:var(--zazu-primary-ink);', $visualCss);
+        $this->assertStringContainsString('color: var(--zazu-success-ink);', $visualCss);
+
+        $this->assertStringContainsString(':root{color-scheme:dark;', $offline);
+        $this->assertStringContainsString('background:linear-gradient(135deg,var(--surface),var(--surface2) 72%)', $offline);
+        $this->assertStringContainsString('color:var(--ink)', $offline);
+
+        $this->assertStringContainsString('@media (max-width: 850px)', $mobileCss);
+    }
+
     public function test_resource_register_pages_render_without_horizontal_layout_assumptions(): void
     {
         [$business, $user] = $this->workspace();
