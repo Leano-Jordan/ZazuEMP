@@ -1106,3 +1106,43 @@ Acceptance boundary:
 - Strengthened global field spacing, selection contrast, dashboard hierarchy, and branding validation feedback.
 - Branding image inputs now receive direct size/type errors; the shared error binding includes branding tiles.
 - Acceptance boundary: source-level checks only. Full PHPUnit/Playwright and browser/device screenshot validation still require the Zazu runtime.
+
+
+## Director UI/UX deep audit and acceptance pass — 2026-10-04
+
+### Baseline
+- Canonical repository: `Leano-Jordan/ZazuEMP`
+- Canonical branch: `main`
+- Starting HEAD for this pass: `724c81b80ee73778e650b49c05ba4060e815fa27`
+- Current supplied dashboard renders were inspected before the correction pass.
+
+### Regression risks recorded
+- Asset and inventory register rows could collapse useful content into a right-edge action cluster.
+- Shared page command banners did not inherit the dashboard workspace-state visual language.
+- Business logo sizing lacked a strong identity-zone fit contract.
+- Landing navigation controls could drift vertically because the CTA variants did not share one explicit geometry.
+- Plan and Delivery lacked an explicit full-width 50/50 placement invariant.
+- Landing CSS mixed legacy dark-shell colours into the later light public composition, causing the reported light-on-light and dark-on-dark failures.
+- Page UI hierarchy needs readable productive type, deliberate spacing and explicit foreground/surface pairing rather than tiny labels and accidental colour inversion.
+
+### Research basis
+- W3C WCAG guidance: meaningful text contrast must meet the applicable minimum for normal/large text, and UI components/state indicators require at least 3:1 contrast against adjacent colours.
+- Carbon current typography guidance: productive UI uses a 14px base and controlled sizes, weights and line heights to establish hierarchy.
+- Carbon UI-shell guidance: navigation/header controls share a consistent shell structure and predictable sizing.
+- Carbon content-switcher guidance: peer controls should use equal-sized containers, reinforcing common control geometry for landing navigation.
+- Current SaaS landing references reviewed during this cycle consistently use clear navigation, strong headline hierarchy and a visual product/workspace story rather than mixing unrelated control sizes.
+
+### Changes executed
+- Asset/inventory registers now use explicit three-region desktop grids with bounded forms and left-aligned actions, then deliberately collapse at responsive thresholds.
+- Shared `.zazu-command-band` now reuses `--zazu-dashboard-image`, adds a dark readability layer and presents its meta block as a workspace-state surface.
+- Brand presentation now reserves a 40px identity slot inside a 72px shell row and contains the supplied logo without distortion/cropping.
+- Landing navigation uses one 40px control rhythm.
+- Plan and Delivery explicitly occupy the final 6-column + 6-column desktop row.
+- Landing light surfaces and intentionally dark surfaces now have explicit, separate foreground palettes.
+
+### Acceptance
+- Modified source files were re-read from `main` after every write.
+- Regression Feature checks now assert the register grid, banner visual contract, landing contrast pairs and Plan/Delivery geometry.
+- Navigation/routes/capabilities were preserved.
+- No new stylesheet or competing token-root system was introduced.
+- Runtime browser/device acceptance is still gated by the repository's CI/browser workflows; this execution surface cannot honestly mark live pixel-level render acceptance complete without those results.
