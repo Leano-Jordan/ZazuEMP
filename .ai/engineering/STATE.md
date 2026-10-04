@@ -903,3 +903,36 @@ Regression coverage verifies empty customer state, successful quick creation, du
 Release documents now identify the real current solo business owner/developer as **Isaac Junior Lehlogonolo Maluleka** and the supplied operating address as **1068 Block JK, Soshanguve, Pretoria, South Africa**. The documents continue to avoid inventing a registered company or unsupported legal contact channel.
 
 Last updated: 2026-10-04
+
+## Director UI/UX + commercial audit — 2026-10-04
+
+Target: full Zazu UI/UX refinement, dark-mode form correction, CSS authority cleanup, repository audit and commercial valuation.
+
+Completed:
+- made base form surfaces theme-aware instead of hard-coded white;
+- deduplicated the final visual stylesheet from approximately 257 KB / 1,561 blocks to approximately 213 KB / 1,263 blocks;
+- added dark-form Playwright regression coverage;
+- retained dashboard-art command-band and calendar visual treatment;
+- retained holiday dots in compact calendar views;
+- completed repository hygiene scan for common debug residue.
+
+Current scorecard: 80/100 commercial readiness, not certified.
+
+Material remaining gates:
+- final populated commercial traversal;
+- physical phone/tablet acceptance;
+- fully disconnected phone-local store/pairing/bootstrap implementation;
+- legal/privacy/licence/brand closure;
+- final physical-device UI regression after the latest CSS/build cycle.
+
+Valuation view:
+- estimated replacement cost: R450k–R900k;
+- realistic current early software/product asset value: R150k–R400k;
+- valuation should move materially only after recurring paid usage and retention are proven.
+
+Evidence boundary:
+- current engineering state records 242 Laravel tests / 1,381 assertions and 25 Playwright passes / 2 intentional skips, plus populated authorization/isolation and recovery/upgrade evidence;
+- this cycle's UI changes are source-level until the refreshed local Vite build and physical phone are actually inspected.
+
+Next Director target:
+PHYSICAL PHONE UI ACCEPTANCE → DISCONNECTED PHONE-LOCAL ARCHITECTURE → FINAL RELEASE RE-AUDIT.
