@@ -66,7 +66,7 @@ Disposition: removed the stale declaration so <=520px now inherits the later int
 
 ## Current stylesheet metrics
 
-- app.css: 7915 lines, 29 !important declarations.
+- app.css: 7878 lines, 29 !important declarations.
 - zazu-responsive-theme.css: 523 lines, 3 !important declarations.
 - zazu-mobile-refinement.css: 735 lines, 7 !important declarations.
 - zazu-final-visual-sweep.css: 3978 lines, 7 !important declarations, 0 root token blocks.
