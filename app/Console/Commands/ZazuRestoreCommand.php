@@ -374,21 +374,6 @@ class ZazuRestoreCommand extends Command
         }
     }
 
-    private function renameWithRetry(string $from, string $to): bool
-    {
-        for ($attempt = 0; $attempt < 5; $attempt++) {
-            if (rename($from, $to)) {
-                return true;
-            }
-
-            gc_collect_cycles();
-            usleep(100000);
-        }
-
-        return false;
-    }
-}
-
     private function validateStagedDatabase(string $driver, string $work): bool
     {
         if ($driver === 'sqlite') {
@@ -424,4 +409,20 @@ class ZazuRestoreCommand extends Command
 
         return false;
     }
+
+    private function renameWithRetry(string $from, string $to): bool
+    {
+        for ($attempt = 0; $attempt < 5; $attempt++) {
+            if (rename($from, $to)) {
+                return true;
+            }
+
+            gc_collect_cycles();
+            usleep(100000);
+        }
+
+        return false;
+    }
+}
+
 
