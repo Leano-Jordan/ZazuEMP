@@ -29,4 +29,17 @@ class ZazuHelperTest extends TestCase
             ->assertSee('data-auth-modal', false)
             ->assertDontSee('data-zazu-helper', false);
     }
+
+    public function test_helper_collision_and_motion_hooks_are_present_in_the_workspace_bundle(): void
+    {
+        $script = file_get_contents(resource_path('js/app.js'));
+        $css = file_get_contents(resource_path('css/zazu-mobile-refinement.css'));
+
+        $this->assertStringContainsString('maxSafeRight', $script);
+        $this->assertStringContainsString('is-nav-avoiding', $script);
+        $this->assertStringContainsString('5 * 1024 * 1024', $script);
+        $this->assertStringContainsString('transform: translate3d(10px, -2px, 0) scale(.985);', $css);
+        $this->assertStringNotContainsString('window.innerWidth - flyoutRect.left + 14', $script);
+    }
+
 }
