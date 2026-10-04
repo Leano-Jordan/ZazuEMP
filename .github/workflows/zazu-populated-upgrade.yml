@@ -14,7 +14,7 @@ jobs:
     runs-on: ubuntu-latest
     env:
       BASE_SHA: 92730f7cb660ae06d9df3c014eccf4f0d3e9188e
-      DB_DATABASE: ${{ github.workspace }}/database/director-upgrade.sqlite
+      DB_DATABASE: ${{ runner.temp }}/zazu-director-upgrade.sqlite
       ZAZU_DEMO_EMAIL: demo@zazu.local
       ZAZU_DEMO_PASSWORD: password
       CACHE_STORE: array
@@ -28,36 +28,46 @@ jobs:
           php-version: '8.4'
           extensions: mbstring, sqlite3, pdo_sqlite
 
-      - name: Prepare baseline environment
+      - name: Prepare current environment
         run: |
           php -r "copy('.env.example', '.env');"
           php artisan key:generate --force
-          mkdir -p database
-          rm -f database/director-upgrade.sqlite
-          touch database/director-upgrade.sqlite
+          mkdir -p "$(dirname \"${DB_DATABASE}\")"
+          rm -f "${DB_DATABASE}"
+          touch "${DB_DATABASE}"
+          php artisan optimize:clear
+
+      - name: Check out last proven application baseline
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          ref: ${{ env.BASE_SHA }}
+          path: baseline
+          fetch-depth: 1
 
       - name: Build and populate last proven application baseline
+        working-directory: baseline
         run: |
-          git fetch --no-tags --depth=1 origin "${BASE_SHA}"
-          git checkout "${BASE_SHA}" -- .
+          php -r "copy('.env.example', '.env');"
+          php artisan key:generate --force
+          php artisan optimize:clear
           composer install --no-interaction --prefer-dist --no-progress
-          php artisan config:clear
+          php artisan optimize:clear
           php artisan migrate --force
           php artisan db:seed --class=Database\\Seeders\\DemoScenarioSeeder --force
           mkdir -p storage/app/private
           printf '%s' 'pre-upgrade-private-marker' > storage/app/private/director-upgrade-marker.txt
 
       - name: Create pre-upgrade recovery backup
+        working-directory: baseline
         run: |
           mkdir -p storage/app/director-upgrade-backups
           php artisan zazu:backup --output=storage/app/director-upgrade-backups
           test "$(find storage/app/director-upgrade-backups -name 'zazu-backup-*.zip' | wc -l)" -eq 1
 
-      - name: Restore current candidate source
+      - name: Prepare current candidate dependencies
         run: |
-          git checkout "${GITHUB_SHA}" -- .
           composer install --no-interaction --prefer-dist --no-progress
-          php artisan config:clear
+          php artisan optimize:clear
 
       - name: Upgrade populated database
         run: |
@@ -88,7 +98,7 @@ jobs:
 
       - name: Exercise rollback to the pre-upgrade recovery point
         run: |
-          ARCHIVE="$(find storage/app/director-upgrade-backups -name 'zazu-backup-*.zip' | head -n 1)"
+          ARCHIVE="$(find baseline/storage/app/director-upgrade-backups -name 'zazu-backup-*.zip' | head -n 1)"
           test -n "${ARCHIVE}"
           php artisan zazu:restore "${ARCHIVE}" --force
 
