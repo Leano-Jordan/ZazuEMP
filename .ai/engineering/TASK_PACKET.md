@@ -116,3 +116,28 @@ The Task Packet is subordinate to Director state.
 Specialist engines update evidence here, but Director remains responsible for sequencing, reconciliation, acceptance and next target.
 
 For UI-affecting work, UI/UX records human-eye findings and Verification records rendered evidence where required.
+
+
+## Director Decision Gate
+
+Before meaningful work is authorised, Director records:
+
+- Finding class: RELEASE BLOCKER / FOUNDATION / REGRESSION / MAINTAINABILITY / ENHANCEMENT / EXPLORATION
+- Evidence:
+- Impact:
+- Urgency:
+- Effort:
+- Priority decision:
+- Churn state: GREEN / AMBER / RED
+- Scope decision: IN / DIRECTLY RELATED / DEFERRED / OUT
+- Release impact:
+- Decision:
+- Required scope substitution, if any:
+
+### Scope substitution rule
+
+New work enters the active target only when required by the target, required by a newly discovered security/data-integrity/release risk, exchanged for another in-scope item, or explicitly authorised by the owner.
+
+### Meaningful-progress rule
+
+The cycle must produce a material reduction in risk/uncertainty, root-cause knowledge, acceptance progress, architectural clarity or verification evidence. Additional commits or tests without such a delta do not count as progress.
