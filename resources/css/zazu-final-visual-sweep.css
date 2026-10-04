@@ -7154,3 +7154,51 @@ body.zazu-has-wallpaper {
     color: #F3F7FA;
     border: 1px solid #5A82A8;
 }
+
+/* Calendar is a custom page hero rather than a command band; give it the same artwork treatment. */
+.zazu-calendar-hero {
+    position: relative;
+    isolation: isolate;
+    overflow: hidden;
+    background:
+        linear-gradient(90deg, rgba(7,20,38,.92) 0%, rgba(9,31,58,.76) 55%, rgba(9,31,58,.38) 100%),
+        var(--zazu-dashboard-image),
+        linear-gradient(135deg, #123A68 0%, #1D63A8 100%);
+    background-size: cover;
+    background-position: center;
+    border-color: #2B5D8F;
+    box-shadow: 0 12px 30px rgba(9,31,58,.16);
+}
+.zazu-calendar-hero > * {
+    position: relative;
+    z-index: 1;
+}
+.zazu-calendar-hero .zazu-eyebrow,
+.zazu-calendar-hero .zazu-calendar-title,
+.zazu-calendar-hero .zazu-calendar-subtitle {
+    color: #F3F8FC !important;
+}
+.zazu-calendar-hero .zazu-calendar-summary-item {
+    background: rgba(8,28,49,.58);
+    border-color: rgba(218,235,248,.28);
+    backdrop-filter: blur(8px);
+}
+.zazu-calendar-hero .zazu-calendar-summary-value {
+    color: #FFFFFF !important;
+}
+.zazu-calendar-hero .zazu-calendar-summary-label {
+    color: #C7D9E8 !important;
+}
+.zazu-calendar-hero .zazu-calendar-nav-btn {
+    background: rgba(8,28,49,.72);
+    border-color: rgba(218,235,248,.32);
+    color: #FFFFFF;
+}
+.zazu-calendar-hero::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+    pointer-events: none;
+    background: linear-gradient(90deg, transparent 0%, rgba(15,86,150,.06) 55%, rgba(4,15,28,.18) 100%);
+}
