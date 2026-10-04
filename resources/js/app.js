@@ -676,51 +676,6 @@ function setupZazuHelper() {
 
         let index = 0;
         let enabled = localStorage.getItem(storageKey) !== 'off';
-        const desktopViewport = window.matchMedia('(min-width: 851px)');
-        const navRoot = document.querySelector('.zazu-nav-hierarchical');
-
-        const syncHelperCollision = () => {
-            const baseRight = desktopViewport.matches ? 18 : 10;
-
-            if (!desktopViewport.matches) {
-                helper.style.removeProperty('right');
-                helper.classList.remove('is-nav-avoiding');
-                return;
-            }
-
-            helper.style.right = baseRight + 'px';
-            helper.classList.remove('is-nav-avoiding');
-
-            const helperRect = helper.getBoundingClientRect();
-            let safeRight = baseRight;
-            let avoidingNav = false;
-
-            document.querySelectorAll('.zazu-nav-area.is-open .zazu-nav-flyout').forEach((flyout) => {
-                const flyoutRect = flyout.getBoundingClientRect();
-                const overlaps =
-                    flyoutRect.left < helperRect.right &&
-                    flyoutRect.right > helperRect.left &&
-                    flyoutRect.top < helperRect.bottom &&
-                    flyoutRect.bottom > helperRect.top;
-
-                if (!overlaps) return;
-
-                avoidingNav = true;
-
-                const maxSafeRight = window.innerWidth - flyoutRect.right - helperRect.width - 14;
-                safeRight = Math.min(
-                    safeRight,
-                    Math.max(8, maxSafeRight)
-                );
-            });
-
-            helper.style.right = safeRight + 'px';
-            helper.classList.toggle('is-nav-avoiding', avoidingNav);
-        };
-
-        const scheduleHelperCollisionSync = () => {
-            window.requestAnimationFrame(syncHelperCollision);
-        };
 
         const render = () => {
             const step = data[index];
@@ -774,7 +729,6 @@ function setupZazuHelper() {
             } else {
                 close();
             }
-            scheduleHelperCollisionSync();
         });
 
         offButton?.addEventListener('click', turnOff);
@@ -802,15 +756,7 @@ function setupZazuHelper() {
 
         syncEnabledState();
         render();
-        scheduleHelperCollisionSync();
 
-        window.addEventListener('resize', scheduleHelperCollisionSync, { passive: true });
-        desktopViewport.addEventListener?.('change', scheduleHelperCollisionSync);
-
-        if (navRoot) {
-            const observer = new MutationObserver(scheduleHelperCollisionSync);
-            observer.observe(navRoot, { subtree: true, attributes: true, attributeFilter: ['class'] });
-        }
 
         // The guide stays quiet until the user asks for it. Attention is surfaced by the helper control itself.
     });
