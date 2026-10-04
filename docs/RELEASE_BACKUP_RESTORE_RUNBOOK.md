@@ -1,6 +1,8 @@
 # Zazu EMP — Backup / Restore Runbook
 
 **Status:** OPERATIONAL DRAFT  
+**Operational owner:** Isaac Junior Lehlogonolo Maluleka  
+**Operating address:** 1068 Block JK, Soshanguve, Pretoria, South Africa  
 **Commands:** `php artisan zazu:backup` / `php artisan zazu:restore`
 
 ## Backup
