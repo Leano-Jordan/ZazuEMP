@@ -11,12 +11,22 @@ async function login(page) {
     await expect(page).toHaveURL(/\/dashboard$/);
 }
 
+async function expectNoViewportOverflow(page) {
+    const dimensions = await page.evaluate(() => ({
+        scrollWidth: document.documentElement.scrollWidth,
+        clientWidth: document.documentElement.clientWidth,
+    }));
+
+    expect(dimensions.scrollWidth).toBeLessThanOrEqual(dimensions.clientWidth);
+}
+
 test.describe('Zazu UI theme and navigation', () => {
     test('asserts Signature Blue tokens in light and dark mode', async ({ browser }) => {
         const context = await browser.newContext();
         const page = await context.newPage();
 
         await login(page);
+        await expectNoViewportOverflow(page);
 
         const lightTokens = await page.evaluate(() => {
             const styles = getComputedStyle(document.documentElement);
@@ -73,6 +83,7 @@ test.describe('Zazu UI theme and navigation', () => {
         await expect(page).toHaveURL(/\/dashboard$/);
         await page.goto('/work');
         await expect(page).toHaveURL(/\/work/);
+        await expectNoViewportOverflow(page);
         await expect(page.locator('[data-zazu-inspector-open]').first()).toBeVisible();
         await page.locator('[data-zazu-inspector-open]').first().click();
         await expect(page.locator('[data-zazu-inspector-panel]').first()).toBeVisible();
