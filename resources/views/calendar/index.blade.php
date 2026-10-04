@@ -98,13 +98,21 @@
                             @endforeach
                         </div>
                         <footer>{{ $block['eventsByDate']->flatten(1)->count() }} {{ $block['eventsByDate']->flatten(1)->count()===1?'job':'jobs' }}</footer>
+                        @php $blockHolidays = $block['holidays']->flatten(1); @endphp
+                        @if($blockHolidays->isNotEmpty())
+                            <div class="zazu-calendar-mini-holidays">
+                                <span class="zazu-calendar-mini-holidays-label">Holidays</span>
+                                <strong>{{ $blockHolidays->take(2)->pluck('name')->implode(' · ') }}</strong>
+                                @if($blockHolidays->count() > 2)<small>+{{ $blockHolidays->count() - 2 }} more</small>@endif
+                            </div>
+                        @endif
                     </section>
                 @endforeach
             </div>
         @elseif($view === 'year')
             <div class="zazu-calendar-year-grid">
                 @foreach($yearMonths as $yearMonth)
-                    @php $count=$yearMonth['eventsByDate']->flatten(1)->count(); @endphp
+                    @php $count=$yearMonth['eventsByDate']->flatten(1)->count(); $yearMonthHolidays=$yearMonth['holidays']->flatten(1); @endphp
                     <a href="{{ route('calendar.index',['month'=>$yearMonth['month']->format('Y-m'),'view'=>'month']) }}" class="zazu-calendar-year-month {{ $yearMonth['month']->isSameMonth(now())?'is-current':'' }}">
                         <header><strong>{{ $yearMonth['month']->format('F') }}</strong><span>{{ $count }} {{ $count===1?'job':'jobs' }}</span></header>
                         <div class="zazu-calendar-mini-weekdays">@foreach(['M','T','W','T','F','S','S'] as $weekday)<span>{{ $weekday }}</span>@endforeach</div>
@@ -114,6 +122,13 @@
                                 <span class="{{ $inMonth?'':'is-adjacent' }} {{ $day->isToday()?'is-today':'' }}" title="{{ $dayHolidays->pluck('name')->implode(', ') }}">{{ $day->format('j') }}@if($dayCount)<i></i>@endif @if($dayHolidays->isNotEmpty())<b class="zazu-calendar-holiday-dot-mini holiday-{{ $dayHolidays->first()['category'] }}"></b>@endif</span>
                             @endforeach
                         </div>
+                        @if($yearMonthHolidays->isNotEmpty())
+                            <div class="zazu-calendar-year-holidays">
+                                <span class="zazu-calendar-year-holidays-label">Holiday</span>
+                                <strong>{{ $yearMonthHolidays->first()['name'] }}</strong>
+                                @if($yearMonthHolidays->count() > 1)<small>+{{ $yearMonthHolidays->count() - 1 }} more this month</small>@endif
+                            </div>
+                        @endif
                     </a>
                 @endforeach
             </div>
@@ -125,7 +140,22 @@
                     @php $key=$day->format('Y-m-d'); $dayEvents=$eventsByDate->get($key,collect()); $show=$day->month===$month->month && $day->year===$month->year && $dayEvents->isNotEmpty() && (!$isCurrentMonth || $day->gte(now()->startOfDay())); @endphp
                     @if($show)
                         @php $agendaHasEvents=true; @endphp
-                        <div class="zazu-calendar-agenda-day {{ $day->isToday()?'is-today':'' }}"><div class="zazu-calendar-agenda-date"><strong>{{ $day->format('D') }}</strong><span>{{ $day->format('j M') }}</span>@if($day->isToday())<em>Today</em>@endif</div><div class="zazu-calendar-agenda-events">
+                        <div class="zazu-calendar-agenda-day {{ $day->isToday()?'is-today':'' }}"><div class="zazu-calendar-agenda-date"><strong>{{ $day->format('D') }}</strong><span>{{ $day->format('j M') }}</span>@if($day->isToday())<em>Today</em>@endif</div>
+                        @php $dayHolidays = $holidays->get(key, collect()); @endphp
+                        @if($dayHolidays->isNotEmpty())
+                            <div class="zazu-calendar-agenda-holidays" aria-label="Holidays">
+                                @foreach($dayHolidays as $holiday)
+                                    <div class="zazu-calendar-agenda-holiday holiday-{{ $holiday['category'] }}">
+                                        <span class="zazu-calendar-holiday-dot"></span>
+                                        <div>
+                                            <strong>{{ $holiday['name'] }}</strong>
+                                            <small>{{ $holidayCategories[$holiday['category']] ?? ucfirst($holiday['category']) }}</small>
+                                        </div>
+                                    </div>
+                                @endforeach
+                            </div>
+                        @endif
+<div class="zazu-calendar-agenda-events">
                             @foreach($dayEvents as $event)
                                 @php $status=$event->status?:'draft'; @endphp
                                 <a href="{{ route('work.show',$event) }}" class="zazu-calendar-agenda-event status-{{ $status }}"><span class="zazu-calendar-event-accent"></span><span class="zazu-calendar-agenda-event-main"><strong>{{ $event->name }}</strong><small>{{ $event->event_type ?: 'Event' }}@if($event->customer_name) · {{ $event->customer_name }}@endif @if($event->event_address) · {{ $event->event_address }}@endif</small></span><span class="zazu-calendar-agenda-status">{{ str_replace('_',' ',ucfirst($status)) }}</span><span class="zazu-calendar-open" aria-hidden="true">→</span></a>
@@ -145,7 +175,22 @@
                     @php $key=$day->format('Y-m-d'); $dayEvents=$eventsByDate->get($key,collect()); $show=$day->month===$month->month && $day->year===$month->year && $dayEvents->isNotEmpty() && (!$isCurrentMonth || $day->gte(now()->startOfDay())); @endphp
                     @if($show)
                         @php $agendaHasEvents=true; @endphp
-                        <div class="zazu-calendar-agenda-day {{ $day->isToday()?'is-today':'' }}"><div class="zazu-calendar-agenda-date"><strong>{{ $day->format('D') }}</strong><span>{{ $day->format('j M') }}</span>@if($day->isToday())<em>Today</em>@endif</div><div class="zazu-calendar-agenda-events">
+                        <div class="zazu-calendar-agenda-day {{ $day->isToday()?'is-today':'' }}"><div class="zazu-calendar-agenda-date"><strong>{{ $day->format('D') }}</strong><span>{{ $day->format('j M') }}</span>@if($day->isToday())<em>Today</em>@endif</div>
+                        @php $dayHolidays = $holidays->get(key, collect()); @endphp
+                        @if($dayHolidays->isNotEmpty())
+                            <div class="zazu-calendar-agenda-holidays" aria-label="Holidays">
+                                @foreach($dayHolidays as $holiday)
+                                    <div class="zazu-calendar-agenda-holiday holiday-{{ $holiday['category'] }}">
+                                        <span class="zazu-calendar-holiday-dot"></span>
+                                        <div>
+                                            <strong>{{ $holiday['name'] }}</strong>
+                                            <small>{{ $holidayCategories[$holiday['category']] ?? ucfirst($holiday['category']) }}</small>
+                                        </div>
+                                    </div>
+                                @endforeach
+                            </div>
+                        @endif
+<div class="zazu-calendar-agenda-events">
                             @foreach($dayEvents as $event)
                                 @php $status=$event->status?:'draft'; @endphp
                                 <a href="{{ route('work.show',$event) }}" class="zazu-calendar-agenda-event status-{{ $status }}"><span class="zazu-calendar-event-accent"></span><span class="zazu-calendar-agenda-event-main"><strong>{{ $event->name }}</strong><small>{{ $event->event_type ?: 'Event' }}@if($event->customer_name) · {{ $event->customer_name }}@endif @if($event->event_address) · {{ $event->event_address }}@endif</small></span><span class="zazu-calendar-agenda-status">{{ str_replace('_',' ',ucfirst($status)) }}</span><span class="zazu-calendar-open" aria-hidden="true">→</span></a>
