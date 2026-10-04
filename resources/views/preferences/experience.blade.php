@@ -20,6 +20,30 @@
             @include('components.niche-focus-options', ['options' => $nicheOptions, 'selected' => $primaryNiche, 'name' => 'primary_niche'])
         </fieldset>
 
+
+        <fieldset class="zazu-fieldset">
+            <legend class="zazu-fieldset-legend">Calendar dates that matter to you</legend>
+            <p class="zazu-fieldset-help">Zazu includes South African public holidays automatically. Optional faith and cultural dates are shown by default and can be muted here without affecting your jobs or schedules.</p>
+            <div class="zazu-form-grid">
+                @foreach($holidayCategories as $key => $label)
+                    <label class="zazu-panel p-5 cursor-pointer">
+                        <div class="flex items-start gap-3">
+                            <input type="checkbox" name="holiday_categories[]" value="{{ $key }}" @checked($holidayPreferences[$key] ?? true) class="mt-1" @disabled($key === 'public')>
+                            <span>
+                                <strong class="block">{{ $label }}</strong>
+                                @if($key === 'public')
+                                    <span class="zazu-field-help block mt-2">Always shown because these are official South African public holidays.</span>
+                                @else
+                                    <span class="zazu-field-help block mt-2">Show these dates in the calendar.</span>
+                                @endif
+                            </span>
+                        </div>
+                    </label>
+                @endforeach
+            </div>
+            <input type="hidden" name="holiday_categories[]" value="public">
+        </fieldset>
+
         <details class="zazu-disclosure" open>
             <summary>
                 <span>
