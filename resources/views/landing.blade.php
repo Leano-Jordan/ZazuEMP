@@ -43,15 +43,6 @@
         .section{padding:70px 0}
         .service-strip{display:flex;align-items:center;justify-content:center;flex-wrap:wrap;gap:7px;padding:15px 0 9px;border-top:1px solid #D2DEEA;border-bottom:1px solid #D2DEEA}
         .service-strip span{display:inline-flex;align-items:center;min-height:30px;padding:0 11px;border:1px solid #C4D2E1;border-radius:999px;background:#F5F8FC;color:#3F607C;font:700 9px ui-monospace,SFMono-Regular,Menlo,monospace;letter-spacing:.08em}
-        .nav-solutions{position:relative}
-        .nav-solutions>summary{list-style:none;cursor:pointer;padding:9px 11px;border-radius:7px;color:var(--muted);font-size:11px;font-weight:700}
-        .nav-solutions>summary::-webkit-details-marker{display:none}
-        .nav-solutions>summary span{margin-left:4px;font-size:9px;transition:transform 140ms ease}
-        .nav-solutions[open]>summary{background:#E9F0FF;color:#173F7E}
-        .nav-solutions[open]>summary span{display:inline-block;transform:rotate(180deg)}
-        .nav-solutions-panel{position:absolute;top:42px;left:0;z-index:50;width:230px;display:grid;gap:2px;padding:7px;border:1px solid #C4D3E3;border-radius:10px;background:var(--card);box-shadow:0 18px 40px rgba(15,23,42,.14)}
-        .nav-solutions-panel a{padding:10px 11px!important;border-radius:7px;color:#355570!important;background:transparent!important;font-size:10px!important}
-        .nav-solutions-panel a:hover{background:#EAF2FB!important;color:#173F6E!important}
         .bento{grid-template-columns:repeat(12,minmax(0,1fr));grid-template-rows:auto auto;gap:14px}
         .feature.large{grid-column:span 7;grid-row:span 2;min-height:0}
         .feature.mini{grid-column:span 5;min-height:0}
@@ -77,10 +68,6 @@
         @media(max-width:640px){
             .service-strip{justify-content:flex-start;overflow:auto;flex-wrap:nowrap;padding:13px 0 8px}
             .service-strip span{flex:0 0 auto}
-            .nav-solutions{width:100%}
-            .nav-solutions>summary{display:flex!important;width:100%;box-sizing:border-box;align-items:center;justify-content:space-between;padding:11px 12px;margin:0;border-radius:7px;background:transparent;color:var(--ink)}
-            .nav-solutions-panel{position:static;width:auto;margin:2px 0 2px 10px;padding:4px 0 4px 8px;border:0;border-left:2px solid #B6CCE5;border-radius:0;box-shadow:none;background:#F4F8FD}
-            .nav-solutions-panel a{min-height:40px;padding:0 10px!important;display:flex!important;align-items:center}
             .hero{padding:32px 0 36px}
             .hero-photo{height:300px;aspect-ratio:4/3}
             .section{padding:56px 0}
@@ -256,7 +243,7 @@
         /* ------------------------------------------------------------------
            DIRECTOR — public landing conversion / responsive authority
            ------------------------------------------------------------------ */
-        .site{width:min(1680px,calc(100% - 56px))}
+        .site{width:min(1760px,calc(100% - 48px))}
         .top{height:78px}
         .mark{width:40px;height:40px;flex-basis:40px;border-radius:10px}
         .brand{gap:12px}
@@ -332,8 +319,9 @@
     <nav class="topnav" aria-label="Public navigation">
         <div id="mobile-public-menu" class="mobile-menu" data-mobile-menu>
             <a href="#capabilities">Product</a>
-            <a href="#capabilities">Solutions</a>
-            <a href="#workflow">How it works</a><a href="#difference">Why Zazu</a>
+            <a href="#workflow">How it works</a>
+            <a href="#difference">Why Zazu</a>
+            
             @if(!$isAuthenticated)
                 <button type="button" class="register" data-auth-modal-open="register">Get started</button>
                 <button type="button" class="login" data-auth-modal-open="login">Log in</button>
