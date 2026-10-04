@@ -5,23 +5,13 @@
         <a href="{{ route('work.index') }}" class="zazu-btn zazu-btn-ghost">Cancel</a>
     </x-slot:headerAction>
 
-    @if ($customers->isEmpty())
-        <section class="zazu-command-band">
-            <div>
-                <div class="zazu-eyebrow">Start here</div>
-                <h2 class="zazu-command-title">Add the customer first</h2>
-                <p class="zazu-command-copy">Every job needs a customer. Add the customer once, then Zazu will bring their details into the job automatically.</p>
-                <a href="{{ route('customers.create') }}" class="zazu-btn zazu-btn-primary mt-5">Add customer</a>
-            </div>
-        </section>
-    @else
-        <section class="zazu-command-band">
-            <div>
-                <div class="zazu-eyebrow">New job</div>
-                <h2 class="zazu-command-title">Start with the job essentials</h2>
-                <p class="zazu-command-copy">Capture only what you need to get this job onto the schedule. Add operational detail after the job exists.</p>
-            </div>
-        </section>
+    <section class="zazu-command-band">
+        <div>
+            <div class="zazu-eyebrow">New job</div>
+            <h2 class="zazu-command-title">Start with the job essentials</h2>
+            <p class="zazu-command-copy">Capture only what you need to get this job onto the schedule. Add operational detail after the job exists.</p>
+        </div>
+    </section>
 
         <form method="POST" action="{{ route('work.store') }}" id="new-job-form">
             @csrf
@@ -33,16 +23,24 @@
                             <div class="zazu-form-section-copy">Select an existing customer. Their saved contact details will be available on the job.</div>
                         </div>
                         <div class="zazu-form-grid">
-                            <label class="zazu-field zazu-field-wide">
+                            <div class="zazu-field zazu-field-wide">
                                 <span class="zazu-label">Customer <span class="zazu-required">*</span></span>
-                                <select id="customer_id" name="customer_id" required class="zazu-select">
-                                    <option value="">Choose a customer</option>
-                                    @foreach ($customers as $customer)
-                                        <option value="{{ $customer->id }}" @selected(old('customer_id', $selectedCustomerId) == $customer->id)>{{ $customer->name }}</option>
-                                    @endforeach
-                                </select>
+                                <div class="zazu-inline-control">
+                                    <select id="customer_id" name="customer_id" required class="zazu-select">
+                                        <option value="">Choose a customer</option>
+                                        @foreach ($customers as $customer)
+                                            <option value="{{ $customer->id }}" @selected(old('customer_id', $selectedCustomerId) == $customer->id)>{{ $customer->name }}</option>
+                                        @endforeach
+                                    </select>
+                                    <button type="button" class="zazu-btn zazu-btn-secondary" data-open-quick-customer>Add customer</button>
+                                </div>
+                                @if ($customers->isEmpty())
+                                    <span class="zazu-field-help">No customer yet? Add their essentials here without leaving this job.</span>
+                                @else
+                                    <span class="zazu-field-help">Need a new customer? Add them here and Zazu will select them for this job.</span>
+                                @endif
                                 @error('customer_id')<span class="zazu-field-error">{{ $message }}</span>@enderror
-                            </label>
+                            </div>
                         </div>
                     </section>
 
@@ -175,6 +173,46 @@
             </div>
         </form>
 
+        <dialog class="zazu-quick-customer-dialog" id="quick-customer-dialog" aria-labelledby="quick-customer-title">
+            <div class="zazu-quick-customer-dialog-panel">
+                <div class="zazu-quick-customer-dialog-head">
+                    <div>
+                        <div class="zazu-eyebrow">New customer</div>
+                        <h2 class="zazu-quick-customer-dialog-title" id="quick-customer-title">Add a customer to this job</h2>
+                        <p class="zazu-quick-customer-dialog-copy">Capture the essentials now. You can complete the customer's full profile later.</p>
+                    </div>
+                    <button type="button" class="zazu-quick-customer-close" data-close-quick-customer aria-label="Close">×</button>
+                </div>
+
+                <form id="quick-customer-form" action="{{ route('customers.quick_from_work') }}" method="POST">
+                    @csrf
+                    <div class="zazu-form-grid mt-5">
+                        <label class="zazu-field zazu-field-wide">
+                            <span class="zazu-label">Customer name <span class="zazu-required">*</span></span>
+                            <input class="zazu-input" name="name" required maxlength="255" autocomplete="name" placeholder="e.g. Mokoena Family Events">
+                        </label>
+                        <label class="zazu-field">
+                            <span class="zazu-label">Contact name <span class="zazu-required">*</span></span>
+                            <input class="zazu-input" name="primary_contact_name" required maxlength="255" autocomplete="name" placeholder="e.g. Thandi Mokoena">
+                        </label>
+                        <label class="zazu-field">
+                            <span class="zazu-label">Phone</span>
+                            <input class="zazu-input" type="tel" name="primary_contact_phone" maxlength="50" autocomplete="tel" placeholder="071 234 5678">
+                        </label>
+                        <label class="zazu-field zazu-field-wide">
+                            <span class="zazu-label">Email</span>
+                            <input class="zazu-input" type="email" name="primary_contact_email" maxlength="255" autocomplete="email" placeholder="customer@example.com">
+                        </label>
+                    </div>
+                    <div class="zazu-quick-customer-status" id="quick-customer-status" role="status" aria-live="polite"></div>
+                    <div class="zazu-quick-customer-dialog-actions">
+                        <button type="button" class="zazu-btn zazu-btn-ghost" data-close-quick-customer>Cancel</button>
+                        <button type="submit" class="zazu-btn zazu-btn-primary">Save and use customer</button>
+                    </div>
+                </form>
+            </div>
+        </dialog>
+
         <script>
             const customers = {{ Illuminate\Support\Js::from($customerOptions) }};
             const oldDayContactId = {{ Illuminate\Support\Js::from(old('event_day_contact_id')) }};
@@ -185,6 +223,11 @@
             const otherToggle = document.getElementById('other-service-toggle');
             const otherWrap = document.getElementById('other-service-wrap');
             const serviceSummary = document.getElementById('service-selection-summary');
+            const quickCustomerDialog = document.getElementById('quick-customer-dialog');
+            const quickCustomerForm = document.getElementById('quick-customer-form');
+            const quickCustomerStatus = document.getElementById('quick-customer-status');
+            const quickCustomerOpen = document.querySelector('[data-open-quick-customer]');
+            const quickCustomerCloseButtons = document.querySelectorAll('[data-close-quick-customer]');
 
             function refreshContacts(selectedDay = oldDayContactId, selectedNight = oldNightContactId) {
                 const customer = customers.find(item => String(item.id) === customerSelect.value);
@@ -218,9 +261,61 @@
             customerSelect.addEventListener('change', () => refreshContacts('', ''));
             otherToggle?.addEventListener('change', refreshOtherService);
             document.querySelectorAll('input[name="services[]"]').forEach(input => input.addEventListener('change', refreshServiceSummary));
+
+            quickCustomerOpen?.addEventListener('click', () => {
+                quickCustomerStatus.textContent = '';
+                quickCustomerForm.reset();
+                quickCustomerDialog.showModal();
+                quickCustomerForm.elements.name.focus();
+            });
+
+            quickCustomerCloseButtons.forEach(button => {
+                button.addEventListener('click', () => quickCustomerDialog.close());
+            });
+
+            quickCustomerDialog?.addEventListener('click', (event) => {
+                if (event.target === quickCustomerDialog) quickCustomerDialog.close();
+            });
+
+            quickCustomerForm?.addEventListener('submit', async (event) => {
+                event.preventDefault();
+                quickCustomerStatus.textContent = 'Saving customer…';
+
+                const response = await fetch(quickCustomerForm.action, {
+                    method: 'POST',
+                    headers: {
+                        'X-CSRF-TOKEN': quickCustomerForm.querySelector('input[name="_token"]').value,
+                        'Accept': 'application/json',
+                    },
+                    body: new FormData(quickCustomerForm),
+                    credentials: 'same-origin',
+                });
+
+                if (response.ok) {
+                    const payload = await response.json();
+                    const customer = payload.customer;
+                    customers.push(customer);
+
+                    const option = new Option(customer.name, customer.id, true, true);
+                    customerSelect.add(option);
+                    customerSelect.value = String(customer.id);
+                    refreshContacts('', '');
+                    quickCustomerDialog.close();
+                    return;
+                }
+
+                if (response.status === 422) {
+                    const payload = await response.json();
+                    const errors = Object.values(payload.errors ?? {}).flat();
+                    quickCustomerStatus.textContent = errors[0] ?? 'Check the customer details and try again.';
+                    return;
+                }
+
+                quickCustomerStatus.textContent = 'Zazu could not add the customer. Please try again.';
+            });
+
             refreshContacts();
             refreshOtherService();
             refreshServiceSummary();
         </script>
-    @endif
 </x-app-layout>
