@@ -105,6 +105,28 @@ class UiAccessibilityTest extends TestCase
         $response->assertSee('autocomplete="email"', false);
     }
 
+    public function test_customer_information_starts_with_contact_and_quick_add_can_handoff_to_full_profile(): void
+    {
+        $create = file_get_contents(resource_path('views/customers/create.blade.php'));
+        $edit = file_get_contents(resource_path('views/customers/edit.blade.php'));
+        $work = file_get_contents(resource_path('views/work/create.blade.php'));
+        $finalCss = file_get_contents(resource_path('css/zazu-final-visual-sweep.css'));
+
+        $this->assertLessThan(
+            strpos($create, 'Primary contact'),
+            strpos($create, 'Tax reference')
+        );
+        $this->assertLessThan(
+            strpos($edit, 'Primary contact'),
+            strpos($edit, 'Tax reference')
+        );
+        $this->assertStringContainsString('id="quick-customer-edit-link"', $work);
+        $this->assertStringContainsString('position: fixed;', $finalCss);
+        $this->assertStringContainsString('inset: 0;', $finalCss);
+        $this->assertStringContainsString('margin: auto;', $finalCss);
+        $this->assertStringContainsString('zazu-command-band', $finalCss);
+    }
+
     public function test_key_forms_keep_required_controls_and_error_help_available(): void
     {
         $response = $this->get(route('work.create'));
@@ -225,9 +247,9 @@ class UiAccessibilityTest extends TestCase
     {
         $css = file_get_contents(resource_path('css/app.css'));
 
-        $this->assertStringContainsString('--zazu-sidebar-ink: #F5FAFF;', $css);
-        $this->assertStringContainsString('--zazu-ink: #12324D;', $css);
-        $this->assertStringContainsString('--zazu-muted: #496A83;', $css);
+        $this->assertStringContainsString('--zazu-sidebar-ink: #F3F8FC;', $css);
+        $this->assertStringContainsString('--zazu-ink: #102C43;', $css);
+        $this->assertStringContainsString('--zazu-muted: #425F76;', $css);
         $this->assertStringContainsString('.zazu-command-title {', $css);
         $this->assertStringContainsString('color: #F7FBFF;', $css);
     }
