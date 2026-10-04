@@ -640,6 +640,43 @@ function setupZazuHelper() {
 
         let index = 0;
         let enabled = localStorage.getItem(storageKey) !== 'off';
+        const desktopViewport = window.matchMedia('(min-width: 851px)');
+        const navRoot = document.querySelector('.zazu-nav-hierarchical');
+
+        const syncHelperCollision = () => {
+            const baseRight = desktopViewport.matches ? 18 : 10;
+
+            if (!desktopViewport.matches) {
+                helper.style.removeProperty('right');
+                return;
+            }
+
+            helper.style.right = baseRight + 'px';
+            const helperRect = helper.getBoundingClientRect();
+            let requiredRight = baseRight;
+
+            document.querySelectorAll('.zazu-nav-area.is-open .zazu-nav-flyout').forEach((flyout) => {
+                const flyoutRect = flyout.getBoundingClientRect();
+                const overlaps =
+                    flyoutRect.left < helperRect.right &&
+                    flyoutRect.right > helperRect.left &&
+                    flyoutRect.top < helperRect.bottom &&
+                    flyoutRect.bottom > helperRect.top;
+
+                if (overlaps) {
+                    requiredRight = Math.max(
+                        requiredRight,
+                        window.innerWidth - flyoutRect.left + 14
+                    );
+                }
+            });
+
+            helper.style.right = requiredRight + 'px';
+        };
+
+        const scheduleHelperCollisionSync = () => {
+            window.requestAnimationFrame(syncHelperCollision);
+        };
 
         const render = () => {
             const step = data[index];
@@ -693,6 +730,7 @@ function setupZazuHelper() {
             } else {
                 close();
             }
+            scheduleHelperCollisionSync();
         });
 
         offButton?.addEventListener('click', turnOff);
@@ -720,6 +758,15 @@ function setupZazuHelper() {
 
         syncEnabledState();
         render();
+        scheduleHelperCollisionSync();
+
+        window.addEventListener('resize', scheduleHelperCollisionSync, { passive: true });
+        desktopViewport.addEventListener?.('change', scheduleHelperCollisionSync);
+
+        if (navRoot) {
+            const observer = new MutationObserver(scheduleHelperCollisionSync);
+            observer.observe(navRoot, { subtree: true, attributes: true, attributeFilter: ['class'] });
+        }
 
         // The guide stays quiet until the user asks for it. Attention is surfaced by the helper control itself.
     });
