@@ -6322,3 +6322,33 @@ body.zazu-has-wallpaper {
     background-repeat: no-repeat;
     background-attachment: fixed;
 }
+
+
+/* DIRECTOR QUICK CUSTOMER DIALOG — 2026-10-04 */
+.zazu-quick-customer-dialog {
+    width: min(92vw, 560px);
+    max-width: 560px;
+    padding: 0;
+    border: 1px solid var(--zazu-border-strong);
+    border-radius: 10px;
+    background: var(--zazu-surface);
+    color: var(--zazu-ink);
+    box-shadow: var(--zazu-shadow-strong);
+}
+.zazu-quick-customer-dialog::backdrop {
+    background: rgba(8, 18, 40, .42);
+    backdrop-filter: blur(2px);
+}
+.zazu-quick-customer-dialog-panel { padding: 22px; }
+.zazu-quick-customer-dialog-head { display:flex; align-items:flex-start; justify-content:space-between; gap:16px; }
+.zazu-quick-customer-dialog-title { color:var(--zazu-ink); font-size:1.05rem; font-weight:800; }
+.zazu-quick-customer-dialog-copy { margin-top:5px; color:var(--zazu-muted); font-size:.78rem; line-height:1.5; }
+.zazu-quick-customer-close { min-width:36px; width:36px; height:36px; padding:0; border:1px solid var(--zazu-border); border-radius:6px; background:var(--zazu-surface-2); color:var(--zazu-muted); cursor:pointer; }
+.zazu-quick-customer-close:hover { border-color:var(--zazu-primary); color:var(--zazu-ink); }
+.zazu-quick-customer-status { min-height:18px; margin-top:10px; color:var(--zazu-danger-ink); font-size:11px; }
+.zazu-quick-customer-dialog-actions { display:flex; justify-content:flex-end; gap:8px; margin-top:18px; }
+@media (max-width: 600px) {
+    .zazu-quick-customer-dialog { width: calc(100vw - 24px); }
+    .zazu-quick-customer-dialog-actions { flex-direction:column-reverse; }
+    .zazu-quick-customer-dialog-actions .zazu-btn { width:100%; max-width:none; }
+}
