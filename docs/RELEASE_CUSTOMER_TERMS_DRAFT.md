@@ -1,9 +1,10 @@
 # Zazu EMP — Customer / Service Terms (Draft)
 
 **Status:** PRE-LAUNCH DRAFT — REQUIRES LEGAL/COMMERCIAL REVIEW  
-**Provider:** `[LEGAL ENTITY / PERSON]`  
+**Provider:** Isaac Junior Lehlogonolo Maluleka, current solo business owner/developer of Zazu EMP  
+**Operating address:** 1068 Block JK, Soshanguve, Pretoria, South Africa  
 **Customer:** the business/customer accepting the final terms  
-**Effective date:** `[DATE]`
+**Effective date:** `[DATE OF FINAL PUBLICATION]`
 
 > This is a drafting scaffold, not legal advice. Final commercial terms must match the actual Zazu deployment and pricing model.
 
