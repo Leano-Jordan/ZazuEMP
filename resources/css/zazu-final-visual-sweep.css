@@ -4157,3 +4157,239 @@ from { opacity: 0; transform: translateY(4px); }
         white-space: nowrap;
     }
 }
+
+
+/* DIRECTOR — typography / contrast refinement, 2026-10-04.
+   Based on UXPeak's visual-hierarchy principles plus current Carbon/Atlassian
+   product-typography guidance. Keep one coherent UI family; use size, weight,
+   colour and spacing to establish hierarchy instead of multiplying fonts.
+*/
+
+/* Raise the floor for readable UI copy. 11px remains reserved for true micro
+   metadata; normal labels and supporting text start at 12px. */
+:root {
+    --zazu-font-size-meta: 12px;
+    --zazu-font-size-label: 12px;
+}
+
+/* Product UI uses one type family. Mono is deliberately restricted to
+   identifiers, codes and operational data rather than headings/KPIs. */
+body,
+button,
+input,
+select,
+textarea {
+    font-family: var(--zazu-font-ui);
+    font-synthesis: none;
+}
+
+code,
+pre,
+.zazu-mono,
+.zazu-reference,
+[data-format="mono"] {
+    font-family: var(--zazu-font-mono);
+}
+
+/* Primary reading hierarchy */
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+    color: var(--zazu-ink);
+    font-family: var(--zazu-font-ui);
+    font-synthesis: none;
+    letter-spacing: -0.012em;
+}
+
+h1 {
+    font-size: clamp(24px, 2.2vw, 30px);
+    line-height: 1.16;
+    font-weight: 700;
+}
+
+h2 {
+    font-size: clamp(20px, 1.8vw, 24px);
+    line-height: 1.2;
+    font-weight: 700;
+}
+
+h3 {
+    font-size: 17px;
+    line-height: 1.3;
+    font-weight: 650;
+}
+
+h4 {
+    font-size: 15px;
+    line-height: 1.35;
+    font-weight: 650;
+}
+
+/* Supporting text is subordinate through colour/weight, not tiny type. */
+p,
+li {
+    line-height: 1.5;
+}
+
+.zazu-muted,
+.zazu-help-text,
+.zazu-description,
+.zazu-field-help {
+    color: var(--zazu-muted);
+}
+
+/* Labels identify; values lead. This is the hierarchy UXPeak's guidance
+   calls for: don't make the label compete with the information itself. */
+.zazu-label,
+.zazu-field-label,
+.zazu-kpi-label,
+.zazu-metric-label {
+    color: var(--zazu-muted);
+    font-size: 12px;
+    font-weight: 600;
+    line-height: 1.3;
+}
+
+.zazu-kpi-value,
+.zazu-metric-value,
+.zazu-stat-value {
+    color: var(--zazu-ink);
+    font-size: clamp(20px, 2vw, 28px);
+    font-weight: 700;
+    line-height: 1.1;
+    letter-spacing: -0.02em;
+}
+
+.zazu-kpi-label + .zazu-kpi-value,
+.zazu-metric-label + .zazu-metric-value {
+    margin-top: 5px;
+}
+
+/* Metadata may be compact, but must remain legible. */
+.zazu-meta,
+.zazu-caption,
+.zazu-eyebrow,
+.zazu-table-meta {
+    font-size: 12px;
+    line-height: 1.35;
+}
+
+.zazu-eyebrow {
+    font-weight: 700;
+    letter-spacing: .055em;
+    text-transform: none;
+}
+
+/* Navigation and controls should read as controls, not miniature headings. */
+.zazu-nav-link,
+.zazu-nav-area-trigger,
+.zazu-user-menu-link,
+.zazu-section-tabs a,
+.zazu-topbar button,
+.zazu-button,
+button,
+[role="button"] {
+    font-family: var(--zazu-font-ui);
+}
+
+.zazu-nav-link,
+.zazu-nav-area-trigger {
+    font-size: 13px;
+    font-weight: 600;
+    line-height: 1.25;
+}
+
+.zazu-button,
+button,
+[role="button"] {
+    font-size: 13px;
+    font-weight: 600;
+    line-height: 1.25;
+}
+
+/* Connected contrast: don't use faint grey text against a tinted surface
+   when the content carries meaning. */
+.zazu-surface,
+.zazu-card,
+.zazu-panel,
+.zazu-section,
+.zazu-dash-surface,
+.zazu-dash-commandbar,
+.zazu-calendar-shell {
+    color: var(--zazu-ink);
+}
+
+.zazu-surface p,
+.zazu-card p,
+.zazu-panel p,
+.zazu-section p,
+.zazu-dash-surface p,
+.zazu-dash-commandbar p,
+.zazu-calendar-shell p {
+    color: var(--zazu-muted);
+}
+
+/* Keep micro labels visibly secondary without falling into illegible grey. */
+.zazu-faint,
+.zazu-nav-flyout-heading,
+.zazu-calendar-mini-holidays-label,
+.zazu-calendar-year-holidays-label {
+    color: var(--zazu-faint);
+    font-size: 12px;
+    font-weight: 650;
+}
+
+/* Statuses use semantic colour as a cue, but retain readable text contrast. */
+.zazu-status,
+.zazu-badge,
+.zazu-pill {
+    font-size: 12px;
+    font-weight: 650;
+    line-height: 1.25;
+}
+
+/* Don't let uppercase become the primary hierarchy mechanism. */
+.zazu-nav-flyout-heading,
+.zazu-calendar-mini-holidays-label,
+.zazu-calendar-year-holidays-label {
+    letter-spacing: .055em;
+    text-transform: uppercase;
+}
+
+/* Tables and operational lists benefit from a clear text/value distinction. */
+.zazu-table th,
+.zazu-table thead th {
+    color: var(--zazu-muted);
+    font-size: 12px;
+    font-weight: 650;
+    line-height: 1.3;
+}
+
+.zazu-table td {
+    color: var(--zazu-ink);
+    font-size: 13px;
+    line-height: 1.4;
+}
+
+@media (max-width: 700px) {
+    h1 {
+        font-size: 22px;
+    }
+
+    h2 {
+        font-size: 19px;
+    }
+
+    h3 {
+        font-size: 16px;
+    }
+
+    .zazu-kpi-value,
+    .zazu-metric-value,
+    .zazu-stat-value {
+        font-size: 22px;
+    }
+}
