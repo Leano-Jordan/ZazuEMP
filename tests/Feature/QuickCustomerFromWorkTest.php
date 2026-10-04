@@ -34,6 +34,16 @@ class QuickCustomerFromWorkTest extends TestCase
             'name' => 'New Job Customer',
         ]);
 
+        $customer = Customer::query()->where('name', 'New Job Customer')->firstOrFail();
+        $response->assertJsonPath('customer.edit_url', route('customers.edit', $customer));
+
+        $this->get(route('customers.edit', $customer))
+            ->assertOk()
+            ->assertSee('Business &amp; billing details', false)
+            ->assertSee('Tax reference', false)
+            ->assertSee('Billing address', false)
+            ->assertSee('Contact name', false);
+
         $this->assertDatabaseHas('customer_contacts', [
             'name' => 'Thandi Mokoena',
             'is_primary' => true,
