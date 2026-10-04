@@ -2,9 +2,11 @@
 
 **Status:** PRE-LAUNCH DRAFT — REQUIRES RESPONSIBLE-PARTY + LEGAL REVIEW  
 **Applies to:** the actual Zazu deployment named in the final release record  
-**Effective date:** `[TO BE COMPLETED]`  
-**Responsible party:** `[LEGAL ENTITY / PERSON TO BE COMPLETED]`  
-**Privacy contact:** `[EMAIL / ADDRESS TO BE COMPLETED]`
+**Effective date:** `[TO BE PUBLISHED]`  
+**Current responsible-party owner:** Isaac Junior Lehlogonolo Maluleka  
+**Operating address:** 1068 Block JK, Soshanguve, Pretoria, South Africa  
+**Privacy contact:** Isaac Junior Lehlogonolo Maluleka, 1068 Block JK, Soshanguve, Pretoria, South Africa  
+**Email contact:** `[TO BE SUPPLIED BEFORE PUBLICATION]`
 
 > This draft must be completed against the real commercial deployment. It must not be published with placeholders.
 
