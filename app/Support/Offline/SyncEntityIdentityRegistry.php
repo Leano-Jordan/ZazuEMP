@@ -107,6 +107,22 @@ class SyncEntityIdentityRegistry
     {
         $recordId = $record->getRawOriginal($record->getKeyName());
 
+        $this->validateRecordCoordinates($record, $recordId);
+
+        $businessId = $record->getAttribute('business_id');
+        $persistedBusinessId = $record->newQueryWithoutScopes()
+            ->whereKey($recordId)
+            ->value('business_id');
+        $recordType = $record->getMorphClass();
+
+        $this->validateBusinessCoordinates($businessId, $persistedBusinessId, $recordType);
+        $this->validateEntityType($entityType);
+
+        return [(int) $businessId, $recordType, (int) $recordId];
+    }
+
+    private function validateRecordCoordinates(Model $record, mixed $recordId): void
+    {
         if (
             ! $record->exists
             || ! is_numeric($record->getKey())
@@ -115,13 +131,13 @@ class SyncEntityIdentityRegistry
         ) {
             throw new LogicException('A persisted record with an integer key is required for synchronization identity.');
         }
+    }
 
-        $businessId = $record->getAttribute('business_id');
-        $persistedBusinessId = $record->newQueryWithoutScopes()
-            ->whereKey($recordId)
-            ->value('business_id');
-        $recordType = $record->getMorphClass();
-
+    private function validateBusinessCoordinates(
+        mixed $businessId,
+        mixed $persistedBusinessId,
+        string $recordType
+    ): void {
         if (
             ! is_numeric($businessId)
             || ! is_numeric($persistedBusinessId)
@@ -131,13 +147,13 @@ class SyncEntityIdentityRegistry
         ) {
             throw new LogicException('Synchronization identity requires a business-owned record.');
         }
+    }
 
+    private function validateEntityType(string $entityType): void
+    {
         if (! preg_match('/^[a-z][a-z0-9._-]{0,63}$/', $entityType)) {
             throw ValidationException::withMessages([
                 'entity_type' => 'The synchronization entity type is invalid.',
             ]);
         }
-
-        return [(int) $businessId, $recordType, (int) $recordId];
-    }
-}
+    }}
