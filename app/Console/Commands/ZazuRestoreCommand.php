@@ -115,7 +115,7 @@ class ZazuRestoreCommand extends Command
             return $databaseRollback;
         }
 
-        throw new \\LogicException('Unsupported restore database driver.');
+        throw new \LogicException('Unsupported restore database driver.');
     }
 
     private function completeRestore(?string $databaseRollback, ?string $privateRollback): void
