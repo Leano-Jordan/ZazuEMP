@@ -8188,11 +8188,19 @@ body.zazu-inspector-open { overflow:hidden; }
 @media (max-width: 850px) {
     .zazu-nav-flyout {
         border-radius: 0;
-        background: transparent;
+        border-left-color: color-mix(in srgb, var(--zazu-sidebar-muted) 24%, transparent);
+        background: var(--zazu-sidebar-surface);
         box-shadow: none;
     }
 
     .zazu-nav-flyout .zazu-nav-link {
         border-radius: 0;
+        color: var(--zazu-sidebar-muted);
+    }
+
+    .zazu-nav-flyout .zazu-nav-link:hover,
+    .zazu-nav-flyout .zazu-nav-link:focus-visible {
+        background: var(--zazu-sidebar-hover);
+        color: var(--zazu-sidebar-ink);
     }
 }
