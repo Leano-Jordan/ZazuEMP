@@ -767,3 +767,16 @@
         font-size: 10px;
     }
 }
+
+
+/* DIRECTOR — 2026-10-04 navigation collision hardening.
+   The helper must yield to navigation while the mobile shell is open.
+*/
+body.zazu-mobile-menu-open .zazu-helper {
+    visibility: hidden;
+    pointer-events: none;
+}
+
+.zazu-helper {
+    z-index: 70;
+}
