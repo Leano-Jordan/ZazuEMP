@@ -1698,81 +1698,175 @@ min-height: 42px;
 .zazu-finance-directory,
 .zazu-assets-directory,
 .zazu-inventory-directory {
-min-width: 0;
+    min-width: 0;
 }
 
-.zazu-assets-directory .zazu-list-item,
-.zazu-inventory-directory .zazu-list-item,
-.zazu-finance-directory ~ .zazu-card .zazu-list-item {
-min-width: 0;
-}
-
-.zazu-assets-directory .zazu-action-group,
-.zazu-inventory-directory .zazu-action-group {
-min-width: 0;
-}
-
-.zazu-assets-directory .zazu-action-group form,
-.zazu-inventory-directory .zazu-action-group form {
-min-width: 0;
-}
-
-.zazu-assets-directory input,
-.zazu-assets-directory select,
-.zazu-inventory-directory input,
-.zazu-inventory-directory select {
-min-width: 0;
-}
-
-@media (max-width: 760px) {
+/* Resource registers use a bounded three-region desktop layout instead of
+   pushing all controls into a right-edge flex cluster. */
 .zazu-assets-directory .zazu-list-item,
 .zazu-inventory-directory .zazu-list-item {
-display: grid;
-        grid-template-columns: minmax(0,1fr) auto;
-        gap: 10px;
+    display: grid;
+    grid-template-columns: minmax(260px, 1.2fr) minmax(130px, .55fr) minmax(0, 2.3fr);
+    align-items: center;
+    gap: 16px;
+    min-width: 0;
+    min-height: 0;
+    padding: 14px 18px;
 }
 
 .zazu-assets-directory .zazu-list-main,
-.zazu-inventory-directory .zazu-list-main {
-min-width: 0;
+.zazu-inventory-directory .zazu-list-main,
+.zazu-assets-directory .zazu-list-side,
+.zazu-inventory-directory .zazu-list-side,
+.zazu-assets-directory .zazu-action-group,
+.zazu-inventory-directory .zazu-action-group {
+    min-width: 0;
+    max-width: 100%;
+}
+
+.zazu-assets-directory .zazu-list-side,
+.zazu-inventory-directory .zazu-list-side {
+    padding-left: 14px;
+    border-left: 1px solid var(--zazu-border);
+    text-align: left;
 }
 
 .zazu-assets-directory .zazu-action-group,
 .zazu-inventory-directory .zazu-action-group {
-grid-column: 1 / -1;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: flex-start;
+    gap: 8px;
+    width: 100%;
+    padding-left: 14px;
+    border-left: 1px solid var(--zazu-border);
+}
+
+.zazu-assets-directory .zazu-action-group > .zazu-btn {
+    flex: 0 0 auto;
+}
+
+.zazu-assets-directory .zazu-action-group form {
+    display: grid;
+    grid-template-columns: minmax(150px, 1.2fr) minmax(116px, .75fr) auto;
+    align-items: center;
+    gap: 8px;
+    min-width: 0;
+    flex: 1 1 390px;
+}
+
+.zazu-assets-directory .zazu-action-group input,
+.zazu-assets-directory .zazu-action-group select,
+.zazu-inventory-directory .zazu-action-group input,
+.zazu-inventory-directory .zazu-action-group select {
+    min-width: 0;
+    max-width: 100%;
+    width: 100%;
+}
+
+.zazu-inventory-directory .zazu-action-group {
+    display: grid;
+    gap: 8px;
+}
+
+.zazu-inventory-directory .zazu-action-group form {
+    display: grid;
+    align-items: center;
+    gap: 8px;
+    min-width: 0;
+    width: 100%;
+}
+
+.zazu-inventory-directory .zazu-action-group form:first-of-type {
+    grid-template-columns: repeat(3, minmax(92px, 1fr)) auto;
+}
+
+.zazu-inventory-directory .zazu-action-group form:last-of-type {
+    grid-template-columns: minmax(150px, 1.25fr) repeat(3, minmax(88px, 1fr)) auto;
+}
+
+@media (max-width: 1100px) {
+    .zazu-assets-directory .zazu-list-item,
+    .zazu-inventory-directory .zazu-list-item {
+        grid-template-columns: minmax(0, 1fr) minmax(120px, .55fr);
+    }
+
+    .zazu-assets-directory .zazu-action-group,
+    .zazu-inventory-directory .zazu-action-group {
+        grid-column: 1 / -1;
+        padding-top: 12px;
+        padding-left: 0;
+        border-left: 0;
+        border-top: 1px solid var(--zazu-border);
+    }
+}
+
+@media (max-width: 760px) {
+    .zazu-assets-directory .zazu-list-item,
+    .zazu-inventory-directory .zazu-list-item {
+        grid-template-columns: minmax(0, 1fr) auto;
+        gap: 10px;
+        align-items: start;
+    }
+
+    .zazu-assets-directory .zazu-list-side,
+    .zazu-inventory-directory .zazu-list-side {
+        padding-left: 0;
+        border-left: 0;
+        text-align: right;
+    }
+
+    .zazu-assets-directory .zazu-action-group,
+    .zazu-inventory-directory .zazu-action-group {
+        grid-column: 1 / -1;
+        width: 100%;
         display: grid;
         gap: 8px;
+        padding-top: 10px;
+        border-top: 1px solid var(--zazu-border);
+    }
+
+    .zazu-assets-directory .zazu-action-group form,
+    .zazu-inventory-directory .zazu-action-group form,
+    .zazu-inventory-directory .zazu-action-group form:first-of-type,
+    .zazu-inventory-directory .zazu-action-group form:last-of-type {
+        grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) auto;
         width: 100%;
-}
+    }
 
-.zazu-assets-directory .zazu-action-group form,
-.zazu-inventory-directory .zazu-action-group form {
-display: grid;
-        grid-template-columns: minmax(0,1fr) minmax(0,1fr) auto;
+    .zazu-assets-directory .zazu-action-group .zazu-btn,
+    .zazu-inventory-directory .zazu-action-group .zazu-btn {
         width: 100%;
-        gap: 8px;
-}
-
-.zazu-assets-directory .zazu-action-group form:first-of-type {
-grid-template-columns: minmax(0,1fr) minmax(0,1fr) auto;
-}
-
-.zazu-assets-directory .zazu-action-group .zazu-btn,
-.zazu-inventory-directory .zazu-action-group .zazu-btn {
-width: 100%;
-}
+    }
 }
 
 @media (max-width: 520px) {
-.zazu-assets-directory .zazu-action-group form,
-.zazu-inventory-directory .zazu-action-group form {
-grid-template-columns: 1fr 1fr;
+    .zazu-assets-directory .zazu-action-group form,
+    .zazu-inventory-directory .zazu-action-group form,
+    .zazu-inventory-directory .zazu-action-group form:first-of-type,
+    .zazu-inventory-directory .zazu-action-group form:last-of-type {
+        grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    }
+
+    .zazu-assets-directory .zazu-action-group form .zazu-btn,
+    .zazu-inventory-directory .zazu-action-group form .zazu-btn {
+        grid-column: 1 / -1;
+    }
 }
 
-.zazu-assets-directory .zazu-action-group form .zazu-btn,
-.zazu-inventory-directory .zazu-action-group form .zazu-btn {
-grid-column: 1 / -1;
-}
+@media (max-width: 400px) {
+    .zazu-assets-directory .zazu-action-group form,
+    .zazu-inventory-directory .zazu-action-group form,
+    .zazu-inventory-directory .zazu-action-group form:first-of-type,
+    .zazu-inventory-directory .zazu-action-group form:last-of-type {
+        grid-template-columns: 1fr;
+    }
+
+    .zazu-assets-directory .zazu-action-group form .zazu-btn,
+    .zazu-inventory-directory .zazu-action-group form .zazu-btn {
+        grid-column: auto;
+    }
 }
 
 @media (max-width: 700px) {
@@ -4334,7 +4428,6 @@ button,
 
 /* Keep micro labels visibly secondary without falling into illegible grey. */
 .zazu-faint,
-.zazu-nav-flyout-heading,
 .zazu-calendar-mini-holidays-label,
 .zazu-calendar-year-holidays-label {
     color: var(--zazu-faint);
@@ -4352,7 +4445,6 @@ button,
 }
 
 /* Don't let uppercase become the primary hierarchy mechanism. */
-.zazu-nav-flyout-heading,
 .zazu-calendar-mini-holidays-label,
 .zazu-calendar-year-holidays-label {
     letter-spacing: .055em;
