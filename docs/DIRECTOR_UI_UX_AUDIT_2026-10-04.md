@@ -172,3 +172,26 @@ Atlassian's spacing system emphasizes constrained, repeatable spacing values so 
 IMPLEMENTED / SOURCE-VERIFIED / VISUAL UNVERIFIED
 
 The repository now has one authoritative desktop search contract, one mobile palette position, and one stable Helper behavior. Browser rendering remains the required final gate.
+
+
+## 2026-10-05 — customer flow and mascot recovery
+
+### Findings
+- Shared page banners had a cascade conflict: a later light-mode page-introduction rule targeted .zazu-command-band, overriding the established dark/image banner and producing the reported light-on-light state.
+- The Helper movement request is contextual, not generic collision avoidance: only the Work and Sales popovers should cause the mascot to yield space.
+- The customer quick-add workflow created a valid minimal customer record but did not expose a direct full-profile editing handoff.
+- The native quick-customer dialog had width rules but no explicit viewport-centering contract.
+- Customer create/edit placed tax/business fields inside the first profile section before the primary contact section.
+
+### Corrections
+- Removed .zazu-command-band from the later generic light-mode harmonization authority and added a protected dark/image banner contract.
+- Added measured Work/Sales-only Helper movement based on the active popover getBoundingClientRect() edge, with CSS transition; no global collision engine.
+- Added a permissioned edit_url to quick-customer JSON and a Complete customer profile link in the current Work surface.
+- Explicitly centered the native customer dialog with fixed viewport bounds and safe height.
+- Reordered create/edit customer surfaces to identity → primary contact → business/billing details.
+- Replaced stale Helper and theme regression assertions with current behavior contracts.
+
+### Release classification
+All changes are UI/UX or workflow-access refinements. No data model or existing customer update path was removed. The controller's full update path was retained as the authoritative customer editor.
+
+**Status:** IMPLEMENTED / SOURCE-VERIFIED / RENDERED QA PENDING
