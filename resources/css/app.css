@@ -5787,6 +5787,18 @@ html[data-theme="dark"] .zazu-public-party,html[data-theme="dark"] .zazu-public-
     border-color: var(--zazu-danger-ink);
 }
 
+:root[data-theme="dark"] .zazu-btn-danger {
+    border-color: var(--zazu-danger-soft);
+    background: var(--zazu-danger-soft);
+    color: var(--zazu-danger-ink);
+}
+
+:root[data-theme="dark"] .zazu-btn-danger:hover {
+    border-color: var(--zazu-danger);
+    background: var(--zazu-danger);
+    color: var(--zazu-primary-ink);
+}
+
 .zazu-metric-currency-stack {
     display: grid;
     gap: 4px;
