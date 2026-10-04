@@ -25,7 +25,7 @@ nav{display:grid;grid-template-columns:repeat(5,1fr);gap:7px;margin:12px 0}.tab{
 <h2 id="business-name">Run Zazu from your phone</h2>
 <p id="hero-copy">Your phone can hold a local Zazu workspace. No laptop is required for everyday mobile operation.</p>
 <div class="hero-actions">
-<button class="button" id="new-customer">New customer</button><button class="button secondary" id="new-job">New job</button><button class="button secondary" id="new-quote">New quote</button><button class="button secondary" id="install-zazu" hidden>Install Zazu</button>
+<button class="button" id="new-customer">New customer</button><button class="button secondary" id="new-job">New job</button><button class="button secondary" id="new-quote">New quote</button><button class="button secondary" id="pair-zazu">Connect to business</button><button class="button secondary" id="install-zazu" hidden>Install Zazu</button>
 </div>
 </section>
 <nav aria-label="Zazu mobile sections">
@@ -42,6 +42,10 @@ async function load(){const db=await openDb();return new Promise((ok,no)=>{const
 async function queueMutation(type,action,payload){const db=await openDb();const mutation={id:crypto.randomUUID(),entity_type:type,action,payload,created_at:new Date().toISOString(),status:'pending'};return new Promise((ok,no)=>{const tx=db.transaction(QUEUE,'readwrite');tx.objectStore(QUEUE).put(mutation);tx.oncomplete=async()=>{await refreshQueueState();ok(mutation)};tx.onerror=()=>no(tx.error)})}
 async function pendingMutations(){const db=await openDb();return new Promise((ok,no)=>{const q=db.transaction(QUEUE).objectStore(QUEUE).index('status').getAll('pending');q.onsuccess=()=>ok(q.result||[]);q.onerror=()=>no(q.error)})}
 async function refreshQueueState(){const count=(await pendingMutations()).length;document.getElementById('queue-state').textContent=count+' pending';return count}
+async function syncFetch(path,options={}){if(!data?.sync?.token)return null;const headers={Accept:'application/json',Authorization:'Bearer '+data.sync.token,...(options.headers||{})};return fetch(path,{...options,headers})}
+async function pairPhone(){const code=window.prompt('Enter the 6-digit pairing code shown in Zazu on the owner PC.');if(!code)return;const r=await fetch('/api/sync/provision',{method:'POST',headers:{'Content-Type':'application/json',Accept:'application/json'},body:JSON.stringify({pairing_code:code,device_name:'Zazu phone',device_type:'phone'})});if(!r.ok){document.getElementById('state').textContent='Pairing failed';return}const result=await r.json();data.sync={token:result.token,device:result.device};applyBootstrap(result.bootstrap);data.local_dirty=false;await save();document.getElementById('state').textContent='Connected to Zazu';await pushPending();render()}
+function applyBootstrap(bootstrap){if(!bootstrap)return;data.business=bootstrap.business||data.business;data.capabilities=(bootstrap.catalogue||[]).map(x=>({...x.record,local_id:x.local_id,id:x.server_id}));const targets={customer:data.customers,job:data.events,quote:data.quotes,service:data.capabilities};for(const item of bootstrap.selected||[]){const target=targets[item.type];if(!target)continue;const record={...item.record,local_id:item.local_id,id:item.server_id};const existing=target.findIndex(x=>x.local_id===item.local_id||x.id===item.server_id);if(existing>=0)target[existing]=record;else target.push(record)}}
+async function pushPending(){if(!navigator.onLine||!data?.sync?.token)return;const mutations=await pendingMutations();if(!mutations.length)return;const r=await syncFetch('/api/sync/push',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({mutations:mutations.map(m=>({id:m.id,entity_type:m.entity_type,entity_id:m.payload?.local_id||m.payload?.server_id||m.id,operation:m.action,payload:m.payload||{}}))})});if(!r||!r.ok)return;const result=await r.json();const ids=new Set((result.recorded||[]).map(x=>x.id));const db=await openDb();await new Promise((ok,no)=>{const tx=db.transaction(QUEUE,'readwrite');const store=tx.objectStore(QUEUE);mutations.filter(m=>ids.has(m.id)).forEach(m=>store.put({...m,status:'recorded',recorded_at:new Date().toISOString()}));tx.oncomplete=ok;tx.onerror=()=>no(tx.error)});await refreshQueueState()}
 const esc=v=>String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[c]));
 function header(){document.getElementById('business-name').textContent=data.business.name;document.getElementById('hero-copy').textContent=data.customers.length+' customers · '+data.events.length+' jobs · '+data.quotes.length+' quotes · '+data.capabilities.length+' services stored on this phone.'}
 function render(){header();document.querySelectorAll('.tab').forEach(b=>b.classList.toggle('active',b.dataset.tab===tab));const c=document.getElementById('content');
@@ -61,14 +65,14 @@ function f(id){return document.getElementById(id)?.value?.trim()||''}
 function editRecord(type,i){form(type,i)}
 function newRecord(type){form(type)}
 document.querySelectorAll('.tab').forEach(b=>b.onclick=()=>{tab=b.dataset.tab;render()});
-document.getElementById('new-customer').onclick=()=>newRecord('customer');document.getElementById('new-job').onclick=()=>newRecord('job');document.getElementById('new-quote').onclick=()=>newRecord('quote');
+document.getElementById('new-customer').onclick=()=>newRecord('customer');document.getElementById('new-job').onclick=()=>newRecord('job');document.getElementById('new-quote').onclick=()=>newRecord('quote');document.getElementById('pair-zazu').onclick=pairPhone;
 let deferredInstallPrompt = null;
 
 function setState(){
     document.getElementById('state').textContent = navigator.onLine ? 'Phone workspace · local' : 'Phone workspace · offline';
 }
 
-window.addEventListener('online', setState);
+window.addEventListener('online', async ()=>{setState();await pushPending();});
 window.addEventListener('offline', setState);
 
 window.addEventListener('beforeinstallprompt', (event) => {
@@ -119,6 +123,7 @@ async function boot(){
 
     setState();
     await refreshQueueState();
+    if (data.sync?.token && navigator.onLine) { try { const r=await syncFetch('/api/sync/bootstrap'); if(r?.ok){ applyBootstrap(await r.json()); await save(); } await pushPending(); } catch(e) {} }
     render();
 }
 
