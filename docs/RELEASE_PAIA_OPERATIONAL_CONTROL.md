@@ -1,8 +1,9 @@
 # Zazu EMP — PAIA Operational Control
 
 **Status:** OPERATIONAL DRAFT — APPLICABILITY AND DETAILS REQUIRE REVIEW  
-**Responsible party:** `[TO BE COMPLETED]`  
-**Records/contact channel:** `[TO BE COMPLETED]`
+**Current responsible-party owner:** Isaac Junior Lehlogonolo Maluleka  
+**Operating address:** 1068 Block JK, Soshanguve, Pretoria, South Africa  
+**Records/contact channel:** `[PUBLISHED REQUEST CHANNEL TO BE SUPPLIED]`
 
 ## Purpose
 
