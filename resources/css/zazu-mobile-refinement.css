@@ -498,11 +498,12 @@ body.zazu-mobile-menu-open .zazu-helper {
         min-height: 0;
         padding: max(8px, env(safe-area-inset-top)) 10px 9px;
         display: grid;
-        grid-template-columns: 40px minmax(0, 1fr) 40px 40px;
+        grid-template-columns: 40px minmax(0, 1fr) 40px;
         grid-template-areas:
-            "menu title search theme"
-            "tabs tabs tabs tabs"
-            "page-action page-action page-action page-action";
+            "menu title theme"
+            "tabs tabs tabs"
+            "search search search"
+            "page-action page-action page-action";
         align-items: center;
         gap: 6px 8px;
     }
@@ -619,79 +620,31 @@ body.zazu-mobile-menu-open .zazu-helper {
 
     .zazu-command-search {
         grid-area: search;
-        width: 40px;
-        min-width: 40px;
+        width: 100%;
+        min-width: 0;
         position: relative;
-        justify-self: end;
+        z-index: 4;
     }
 
     .zazu-command-trigger {
         position: relative;
-        width: 40px;
-        min-width: 40px;
-        height: 40px;
-        min-height: 40px;
-        padding: 0;
-        border-radius: var(--zazu-radius-md);
-        justify-content: center;
+        width: 100%;
+        min-width: 0;
+        height: 42px;
+        min-height: 42px;
+        padding: 0 48px 0 40px;
+        border-radius: 10px;
+        justify-content: flex-start;
+        background: color-mix(in srgb, var(--zazu-primary-soft) 56%, var(--zazu-surface));
+        color: var(--zazu-muted);
+        box-shadow: inset 0 1px 0 color-mix(in srgb, #fff 55%, transparent), 0 5px 16px color-mix(in srgb, var(--zazu-ink) 7%, transparent);
     }
 
     .zazu-command-trigger input {
-        position: absolute;
-        inset: 0;
+        position: static;
+        inset: auto;
         width: 100%;
         height: 100%;
-        min-height: 100%;
-        padding: 0;
-        opacity: 0;
-        cursor: pointer;
-        caret-color: transparent;
-    }
-
-    .zazu-command-search-icon {
-        position: relative;
-        z-index: 1;
-        pointer-events: none;
-    }
-
-    .zazu-command-trigger kbd {
-        display: none !important;
-    }
-
-    .zazu-command-search:focus-within .zazu-command-trigger,
-    .zazu-command-search.is-open .zazu-command-trigger {
-        border-color: var(--zazu-primary);
-        background: var(--zazu-surface);
-        color: var(--zazu-ink);
-    }
-
-    /* Search expands over the shell only while active; it does not distort the resting header. */
-    .zazu-command-search:focus-within,
-    .zazu-command-search.is-open {
-        position: absolute;
-        top: max(8px, env(safe-area-inset-top));
-        left: 10px;
-        right: 10px;
-        z-index: 150;
-        width: auto;
-    }
-
-    .zazu-command-search:focus-within .zazu-command-trigger,
-    .zazu-command-search.is-open .zazu-command-trigger {
-        width: 100%;
-        min-width: 0;
-        height: 40px;
-        min-height: 40px;
-        justify-content: flex-start;
-        padding: 0 42px 0 40px;
-        background: var(--zazu-surface);
-        box-shadow: 0 12px 32px color-mix(in srgb, var(--zazu-ink) 14%, transparent);
-    }
-
-    .zazu-command-search:focus-within .zazu-command-trigger input,
-    .zazu-command-search.is-open .zazu-command-trigger input {
-        position: static;
-        width: 100%;
         min-height: 100%;
         padding: 0;
         opacity: 1;
@@ -701,13 +654,56 @@ body.zazu-mobile-menu-open .zazu-helper {
         z-index: 3;
     }
 
-    .zazu-command-search-icon,
-    .zazu-command-search:focus-within .zazu-command-search-icon,
-    .zazu-command-search.is-open .zazu-command-search-icon {
+    .zazu-command-trigger input::placeholder {
+        color: var(--zazu-muted);
+        opacity: 1;
+    }
+
+    .zazu-command-search-icon {
         position: absolute;
-        left: 12px;
+        left: 13px;
         z-index: 4;
+        pointer-events: none;
+        color: var(--zazu-primary);
+        font-size: 18px;
         line-height: 1;
+    }
+
+    .zazu-command-trigger kbd {
+        display: inline-flex !important;
+        position: absolute;
+        right: 10px;
+        top: 50%;
+        transform: translateY(-50%);
+        margin: 0;
+        z-index: 4;
+        min-width: 38px;
+        padding: 5px 6px;
+        border: 1px solid var(--zazu-border);
+        border-radius: 6px;
+        background: color-mix(in srgb, var(--zazu-surface) 86%, transparent);
+        color: var(--zazu-faint);
+        font: 700 9px/1 var(--zazu-font-mono);
+        text-align: center;
+    }
+
+    .zazu-command-search:focus-within .zazu-command-trigger,
+    .zazu-command-search.is-open .zazu-command-trigger {
+        border-color: var(--zazu-primary);
+        background: var(--zazu-surface);
+        color: var(--zazu-ink);
+        box-shadow: 0 8px 22px color-mix(in srgb, var(--zazu-primary) 12%, transparent);
+    }
+
+    .zazu-command-palette {
+        position: absolute !important;
+        top: calc(100% + 8px);
+        left: 0 !important;
+        right: 0 !important;
+        width: 100% !important;
+        max-height: min(66dvh, 520px);
+        border-radius: 14px;
+        box-shadow: 0 22px 56px color-mix(in srgb, var(--zazu-ink) 20%, transparent);
     }
 
     .zazu-header-slot-actions {
@@ -780,7 +776,7 @@ body.zazu-mobile-menu-open .zazu-helper {
 
 @media (max-width: 520px) {
     .zazu-topbar-inner {
-        grid-template-columns: 40px minmax(0, 1fr) 40px 40px;
+        grid-template-columns: 40px minmax(0, 1fr) 40px;
         padding-inline: 9px;
     }
 
