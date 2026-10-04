@@ -174,3 +174,11 @@ A destination can remain present and permission-gated while becoming operational
 **Control:** whenever a destination is moved between primary navigation groups, update and verify all three contracts together: route ownership/permission, active-group predicate, and responsive auto-expansion. Add a direct-route browser regression that proves the destination remains reachable from its owning group. Do not solve ownership drift by duplicating destinations across groups.
 
 **Status:** CONTROL ACTIVE
+
+## REG-021 — Cross-theme foreground/surface mismatch
+
+Light-mode and dark-mode tokens can be semantically reused in the wrong role, producing light text on light surfaces or dark text on dark surfaces. This is especially dangerous when action fills switch between themes.
+
+**Control:** use semantic foreground tokens (`--zazu-primary-ink`, `--zazu-danger-ink`, `--zazu-success-ink`, etc.) rather than hard-coded white/dark text on theme-variable fills. Contrast-sensitive shared components require both-theme regression assertions. Standalone surfaces such as Offline must declare a matching `color-scheme` and keep foreground/background relationships internally coherent.
+
+**Status:** CONTROL ACTIVE
