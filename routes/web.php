@@ -19,6 +19,7 @@ use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\FinanceController;
 use App\Http\Controllers\InventoryController;
 use App\Http\Controllers\OnboardingController;
+use App\Http\Controllers\OfflineWorkspaceController;
 use App\Http\Controllers\PasswordResetController;
 use App\Http\Controllers\PurchaseOrderController;
 use App\Http\Controllers\PlatformLandingSettingsController;
@@ -113,6 +114,8 @@ Route::middleware(['auth', 'auth.session', 'platform.admin'])->prefix('admin')->
 
 Route::middleware(['auth', 'auth.session', 'business.context'])->group(function () {
     Route::get('/dashboard', DashboardController::class)->middleware('permission:dashboard.view')->name('dashboard');
+    Route::get('/offline', [OfflineWorkspaceController::class, 'shell'])->name('offline.shell');
+    Route::get('/offline/bootstrap', [OfflineWorkspaceController::class, 'bootstrap'])->name('offline.bootstrap');
 
     Route::middleware('owner')->group(function () {
         Route::get('/setup', [OnboardingController::class, 'index'])->name('onboarding.index');
