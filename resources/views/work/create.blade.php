@@ -15,6 +15,7 @@
 
         <form method="POST" action="{{ route('work.store') }}" id="new-job-form">
             @csrf
+        <input type="hidden" name="start_intent" value="{{ request('start') === 'quote' ? 'quote' : '' }}">
             <div class="zazu-editor">
                 <div class="zazu-form-main">
                     <section class="zazu-form-section">
