@@ -48,9 +48,8 @@ jobs:
         working-directory: baseline
         run: |
           php -r "copy('.env.example', '.env');"
-          php artisan key:generate --force
-          php artisan optimize:clear
           composer install --no-interaction --prefer-dist --no-progress
+          php artisan key:generate --force
           php artisan optimize:clear
           php artisan migrate --force
           php artisan db:seed --class=Database\\Seeders\\DemoScenarioSeeder --force
@@ -67,6 +66,7 @@ jobs:
       - name: Prepare current candidate dependencies
         run: |
           composer install --no-interaction --prefer-dist --no-progress
+          php artisan key:generate --force
           php artisan optimize:clear
 
       - name: Upgrade populated database
