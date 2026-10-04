@@ -6270,7 +6270,7 @@ body.zazu-has-wallpaper {
 }
 
 :root[data-theme="dark"] .zazu-card-header,
-:root[data-theme="dark"] .:root[data-theme="dark"] {
+:root[data-theme="dark"] .zazu-form-section-head {
     /* Canonical dark token set — merged from historical layers. */
     color-scheme: dark;
     --zazu-page: #0A1422;
