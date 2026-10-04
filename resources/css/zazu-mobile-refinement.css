@@ -456,32 +456,6 @@
 }
 
 
-/* DIRECTOR — 2026-10-04 navigation collision hardening.
-   The helper must yield to navigation while the mobile shell is open.
-*/
-body.zazu-mobile-menu-open .zazu-helper {
-    visibility: hidden;
-    pointer-events: none;
-}
-
-.zazu-helper {
-    z-index: 70;
-}
-
-
-/* Director Helper: purposeful movement when navigation claims its working area. */
-.zazu-helper {
-    transition:
-        right 220ms cubic-bezier(.2,.8,.2,1),
-        bottom 220ms cubic-bezier(.2,.8,.2,1),
-        transform 220ms cubic-bezier(.2,.8,.2,1);
-    will-change: right, bottom, transform;
-}
-
-.zazu-helper.is-nav-avoiding {
-    transform: translate3d(10px, -2px, 0) scale(.985);
-}
-
 /* --------------------------------------------------------------------------
    DIRECTOR — canonical mobile application header
    One source of truth: title/actions row → section navigation row → page action row.
