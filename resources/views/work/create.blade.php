@@ -13,6 +13,14 @@
         </div>
     </section>
 
+        @if(request('start') === 'quote')
+            <section class="zazu-start-intent zazu-start-intent-quote" aria-label="Quote start">
+                <span class="zazu-start-intent-kicker">Quote workflow</span>
+                <strong>Create the job details first, then Zazu will open the quote builder.</strong>
+                <span>Customer, event and service details become the foundation for the quote.</span>
+            </section>
+        @endif
+
         <form method="POST" action="{{ route('work.store') }}" id="new-job-form">
             @csrf
         <input type="hidden" name="start_intent" value="{{ request('start') === 'quote' ? 'quote' : '' }}">
@@ -156,7 +164,7 @@
 
                     <div class="zazu-actionbar">
                         <a href="{{ route('work.index') }}" class="zazu-btn zazu-btn-ghost">Cancel</a>
-                        <button class="zazu-btn zazu-btn-primary">Create job</button>
+                        <button class="zazu-btn zazu-btn-primary">{{ request('start') === 'quote' ? 'Create job & continue to quote' : 'Create job' }}</button>
                     </div>
                 </div>
 
