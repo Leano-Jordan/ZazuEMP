@@ -237,3 +237,28 @@ Remaining manual release evidence:
 Status: dependency metadata audit complete; final licence compliance clearance remains open.
 
 Last updated: 2026-10-04
+
+
+## 13. Director POPIA operational-closure audit — 2026-10-04
+
+Primary-source review confirms the Information Regulator expects an operational privacy layer in addition to technical controls. The current repository has a privacy engineering baseline, but the following release artefacts are not yet evidenced as final production documents:
+
+- Privacy Notice / Collection Notice describing the actual Zazu processing purposes and responsible-party contact details.
+- Data-subject request procedure covering access, correction/deletion and objection handling.
+- Retention and secure-disposal schedule tied to actual Zazu record classes and legal/business retention needs.
+- Security-incident response procedure assigning the Information Officer/Deputy Information Officer escalation path and section 22 notification process.
+- Operator/data-processing contractual controls where Zazu or its customers use third parties to process personal information.
+- Final customer Terms / acceptable-use / service terms appropriate to the actual deployment and commercial model.
+- Final PAIA documentation/operational determination for the responsible party where applicable.
+
+The Information Regulator's current eServices materials identify registration of Information Officers, POPIA self-assessment, PAIA self-assessment, security-compromise reporting and prior-authorisation services. citeturn0search0turn0search5
+
+The Regulator states that security compromises must be reported and that the responsible party should notify the Regulator and affected data subjects as soon as reasonably possible; operators should immediately notify the responsible party. citeturn0search1turn0search23
+
+The Regulator's privacy notice guidance also illustrates the expected operational treatment of access/correction/deletion requests, retention and disposal, and controls for operators. citeturn0search3
+
+**Director disposition:** Technical privacy/security evidence is sufficient to continue. Legal/privacy operational closure is **OPEN** until these artefacts are completed and reviewed for the actual commercial deployment.
+
+**Important:** This is a release-readiness finding, not legal advice or a determination that Zazu is currently non-compliant.
+
+Last updated: 2026-10-04
