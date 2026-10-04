@@ -6835,7 +6835,8 @@ textarea:disabled,
    Purpose: replace generic SaaS surfaces with clearer operational hierarchy,
    stronger field boundaries, deliberate navigation states, and dashboard rhythm.
 */
-:root { {
+:root {
+
     color-scheme: light;
     /* Soft blue product system */
     --zazu-page: #E5EFF7;
@@ -6917,7 +6918,8 @@ textarea:disabled,
     --zazu-accent: #245fae;
 }
 
-:root[data-theme="dark"] { {
+:root[data-theme="dark"] {
+
     color-scheme: dark;
     --zazu-page: #0b1726;
     --zazu-page-deep: #091321;
