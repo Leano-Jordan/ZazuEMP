@@ -150,6 +150,24 @@ class BusinessMediaSecurityTest extends TestCase
         $response->assertSee(route('business.media', ['type' => 'wallpaper']).'?v='.$version, false);
     }
 
+    public function test_wallpaper_visibility_rule_is_final_and_not_overridden_by_global_body_backgrounds(): void
+    {
+        $css = file_get_contents(resource_path('css/zazu-final-visual-sweep.css'));
+
+        $this->assertIsString($css);
+        $marker = strpos($css, '/* DIRECTOR WALLPAPER FIX — 2026-10-04 */');
+
+        $this->assertNotFalse($marker);
+        $this->assertStringContainsString(
+            'body.zazu-has-wallpaper {',
+            substr($css, (int) $marker)
+        );
+        $this->assertStringContainsString(
+            'var(--zazu-wallpaper)',
+            substr($css, (int) $marker)
+        );
+    }
+
     public function test_settings_page_does_not_decrypt_legacy_tcs_pin_just_to_render(): void
     {
         $this->signInAsOwner();
