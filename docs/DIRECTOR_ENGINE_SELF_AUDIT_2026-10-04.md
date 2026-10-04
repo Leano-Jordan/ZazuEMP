@@ -103,3 +103,17 @@ Before any further broad Zazu UI redesign:
 7. only then continue.
 
 No broad UI rewrite should be authorized until that evidence loop succeeds.
+
+
+## Research update — effective AI-assisted UI engineering
+
+External research confirms the direction of the hardened engine:
+- Playwright supports committed screenshot baselines and repeatable visual comparisons; its documentation warns that rendering varies by environment, so baseline generation must be controlled. Reference updates are deliberate rather than automatic. (Playwright documentation reviewed 2026-10-04.)
+- GitHub recommends required status checks and protected branches for enforcing validation before merge. Checks can represent builds, tests and deployments, but they do not replace human review of the result. (GitHub documentation reviewed 2026-10-04.)
+- Recent agent-governance research reinforces constrained authority, strong context and progressive autonomy rather than unrestricted autonomous modification.
+
+### Applied to Zazu
+The Director/UI engines now explicitly use:
+OBSERVE → BASELINE → HYPOTHESIS → BOUNDED CHANGE → RENDER → AUTOMATED CHECKS → HUMAN VISUAL REVIEW → ACCEPT/REJECT → RECORD → NEXT.
+
+This is the intended operating model for the next Zazu visual recovery pass.
