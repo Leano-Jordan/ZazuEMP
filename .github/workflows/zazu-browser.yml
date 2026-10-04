@@ -18,6 +18,8 @@ jobs:
       ZAZU_MANAGER_EMAIL: operations@zazu.local
       ZAZU_STAFF_EMAIL: finance@zazu.local
       ZAZU_ROLE_PASSWORD: password
+      # Browser smoke intentionally isolates rate-limit state between requests; authentication throttling is covered by dedicated security tests.
+      CACHE_STORE: array
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
 
