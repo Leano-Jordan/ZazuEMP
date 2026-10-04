@@ -4214,11 +4214,6 @@ from { opacity: 0; transform: translateY(4px); }
     border-left-color: var(--zazu-accent);
 }
 
-/* Keep Helper below navigation overlays; JS also moves it away when an
-   open navigation flyout physically intersects it. */
-.zazu-helper {
-    z-index: 70;
-}
 
 @media (max-width: 850px) {
     .zazu-user-popover {
@@ -4770,19 +4765,64 @@ button,
 
 
 /* --------------------------------------------------------------------------
-   Director — modern global search / command palette
+   Director — contained global search / command palette
+   Search is utility chrome: it must never dictate shell width.
    -------------------------------------------------------------------------- */
+.zazu-topbar-inner {
+    width: 100%;
+    box-sizing: border-box;
+}
+
+@media (min-width: 821px) {
+    .zazu-header-context {
+        flex: 1 1 0;
+        min-width: 0;
+        overflow: hidden;
+    }
+
+    .zazu-section-tabs {
+        min-width: 0;
+        max-width: 100%;
+        overflow-x: auto;
+        overflow-y: hidden;
+        scrollbar-width: none;
+        white-space: nowrap;
+    }
+
+    .zazu-section-tabs::-webkit-scrollbar {
+        display: none;
+    }
+
+    .zazu-topbar-actions {
+        flex: 0 0 auto;
+        min-width: 0;
+        flex-wrap: nowrap;
+    }
+}
+
 .zazu-command-search {
-    min-width: 300px;
-    width: min(360px, 32vw);
+    flex: 0 1 clamp(250px, 22vw, 330px);
+    width: clamp(250px, 22vw, 330px);
+    min-width: 0;
     position: relative;
 }
 
 .zazu-command-trigger {
+    width: 100%;
+    min-width: 0;
     min-height: 42px;
+    display: flex;
+    align-items: center;
+    gap: 9px;
+    box-sizing: border-box;
+    padding-inline: 12px;
     border: 1px solid var(--zazu-border-strong);
     border-radius: 10px;
-    background: linear-gradient(135deg, color-mix(in srgb, var(--zazu-primary-soft) 55%, var(--zazu-surface)), color-mix(in srgb, var(--zazu-surface) 92%, transparent));
+    background: linear-gradient(
+        135deg,
+        color-mix(in srgb, var(--zazu-primary-soft) 55%, var(--zazu-surface)),
+        color-mix(in srgb, var(--zazu-surface) 92%, transparent)
+    );
     color: var(--zazu-muted);
     box-shadow: 0 4px 14px color-mix(in srgb, var(--zazu-ink) 5%, transparent);
     transition: border-color 160ms ease, background-color 160ms ease, box-shadow 160ms ease, color 160ms ease;
@@ -4798,11 +4838,22 @@ button,
 }
 
 .zazu-command-trigger input {
+    flex: 1 1 auto;
+    width: 100%;
+    min-width: 0;
+    height: 100%;
+    box-sizing: border-box;
+    padding: 0;
+    border: 0;
+    outline: 0;
+    background: transparent;
     color: var(--zazu-ink);
+    font: inherit;
 }
 
 .zazu-command-trigger input::placeholder {
     color: var(--zazu-faint);
+    opacity: 1;
 }
 
 .zazu-command-search-icon {
@@ -4812,11 +4863,13 @@ button,
     min-width: 20px;
     color: var(--zazu-primary);
     font-size: 17px;
+    line-height: 1;
 }
 
 .zazu-command-trigger kbd {
-    margin-left: auto;
+    flex: 0 0 auto;
     min-width: 34px;
+    margin: 0;
     padding: 4px 6px;
     border: 1px solid var(--zazu-border);
     border-radius: 6px;
@@ -4827,13 +4880,22 @@ button,
 }
 
 .zazu-command-palette {
-    width: min(500px, calc(100vw - 32px));
+    position: absolute;
+    top: calc(100% + 8px);
+    left: auto;
+    right: 0;
+    z-index: 120;
+    width: min(500px, calc(100vw - 40px));
     border: 1px solid color-mix(in srgb, var(--zazu-primary) 18%, var(--zazu-border));
     border-radius: 16px;
     background: color-mix(in srgb, var(--zazu-surface) 88%, transparent);
     box-shadow: 0 28px 80px color-mix(in srgb, var(--zazu-ink) 18%, transparent);
     backdrop-filter: blur(18px) saturate(1.04);
     -webkit-backdrop-filter: blur(18px) saturate(1.04);
+}
+
+.zazu-command-palette[hidden] {
+    display: none !important;
 }
 
 .zazu-command-results-head {
@@ -4893,24 +4955,6 @@ button,
     border-color: color-mix(in srgb, var(--zazu-primary) 30%, var(--zazu-border));
     background: var(--zazu-primary-soft);
 }
-
-.zazu-command-empty {
-    margin: 5px;
-    padding: 18px 14px;
-    border: 1px dashed var(--zazu-border-strong);
-    border-radius: 10px;
-    background: var(--zazu-surface-2);
-    color: var(--zazu-muted);
-    font-size: 12px;
-    line-height: 1.5;
-}
-
-@media (max-width: 820px) {
-    .zazu-command-search {
-        min-width: 40px;
-    }
-}
-
 
 /* Director — full-page workspace search */
 .zazu-search-page-form {
@@ -5425,5 +5469,63 @@ button,
     .zazu-calendar-jump input {
         flex: 1 1 auto;
         min-width: 0;
+    }
+}
+
+/* DIRECTOR — helper presence should support work, not compete with it. */
+.zazu-helper {
+    right: max(12px, env(safe-area-inset-right));
+    bottom: max(12px, env(safe-area-inset-bottom));
+    z-index: 50;
+    width: auto;
+    max-width: calc(100vw - 24px);
+}
+
+.zazu-helper-toggle {
+    width: 46px;
+    height: 46px;
+    min-width: 46px;
+    min-height: 46px;
+    justify-content: center;
+    gap: 0;
+    padding: 5px;
+    border-radius: 14px;
+}
+
+.zazu-helper-toggle-copy {
+    display: none;
+}
+
+.zazu-helper-panel {
+    right: 0;
+    bottom: 54px;
+    width: min(350px, calc(100vw - 24px));
+    max-height: min(68vh, 540px);
+}
+
+body.zazu-mobile-menu-open .zazu-helper {
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+}
+
+@media (max-width: 520px) {
+    .zazu-helper {
+        right: 10px;
+        bottom: 10px;
+    }
+
+    .zazu-helper-toggle {
+        width: 44px;
+        height: 44px;
+        min-width: 44px;
+        min-height: 44px;
+        border-radius: 13px;
+    }
+
+    .zazu-helper-panel {
+        width: min(350px, calc(100vw - 20px));
+        right: 0;
+        bottom: 52px;
     }
 }
