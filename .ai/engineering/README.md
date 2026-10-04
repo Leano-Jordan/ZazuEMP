@@ -343,3 +343,43 @@ The objective is lower cognitive load, clearer hierarchy, predictable scanning a
 Rendered evidence is required when the visual target materially changes the interface.
 
 One shared visual token authority remains mandatory.
+
+
+## DIRECTOR DECISION DOCTRINE — ARCHITECTURE, CHURN AND SPRINT CONTROL
+
+The Director control plane now weighs findings before routing them to specialist engines. This prevents legitimate findings from becoming uncontrolled scope and prevents repeated local fixes from masquerading as architectural progress.
+
+### Finding classes
+
+- **RELEASE BLOCKER** — threatens safe commercial release.
+- **FOUNDATION** — architecture, integrity, security, recovery, offline, upgrade or other core engineering risk.
+- **REGRESSION** — accepted behaviour has broken.
+- **MAINTAINABILITY** — increases future engineering cost or structural risk.
+- **ENHANCEMENT** — useful but not required for the active target.
+- **EXPLORATION** — useful future investigation.
+
+Director weighs **impact, evidence, urgency and effort** before selecting work.
+
+### Scope rule
+
+A finding may enter an active target only when it is required for the target, required to prevent a newly discovered security/data-integrity/release failure, exchanged for another in-scope item, or explicitly authorised by the owner.
+
+Discovery can change priority without automatically changing scope.
+
+### Churn rule
+
+Before substantial modification, Director checks recent changes to the affected file, behaviour and architectural boundary:
+
+- **GREEN:** stable; targeted change is appropriate.
+- **AMBER:** repeated modification; inspect the boundary before patching again.
+- **RED:** rewrite pressure; stop symptom patching and escalate to architecture/forensics.
+
+### Sprint freeze
+
+Once a target is active, unrelated enhancements are deferred. A new enhancement requires a valid scope substitution or owner authorisation. Safety, security, integrity and release discoveries may interrupt a frozen target when evidence makes them necessary.
+
+### Meaningful progress
+
+Progress means reduced risk, established causality, satisfied acceptance criteria, removed release blockers, clarified architecture or materially stronger evidence. Commit count, test count and report count are not progress metrics by themselves.
+
+This doctrine is implemented inside Morpheus/Director. It does not create another engine, backlog or acceptance authority.
