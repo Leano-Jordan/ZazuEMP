@@ -6352,3 +6352,29 @@ body.zazu-has-wallpaper {
     .zazu-quick-customer-dialog-actions { flex-direction:column-reverse; }
     .zazu-quick-customer-dialog-actions .zazu-btn { width:100%; max-width:none; }
 }
+
+
+/* DIRECTOR INLINE CUSTOMER CONTROL — 2026-10-04 */
+.zazu-inline-control {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+.zazu-inline-control .zazu-select {
+    flex: 1 1 auto;
+    min-width: 0;
+}
+.zazu-inline-control .zazu-btn {
+    flex: 0 0 auto;
+    white-space: nowrap;
+}
+@media (max-width: 600px) {
+    .zazu-inline-control {
+        align-items: stretch;
+        flex-direction: column;
+    }
+    .zazu-inline-control .zazu-btn {
+        width: 100%;
+        max-width: none;
+    }
+}
