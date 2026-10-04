@@ -7,6 +7,8 @@ use App\Support\CurrentBusiness;
 use App\Support\SouthAfricaHolidayCalendar;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Schema;
 use Illuminate\View\View;
 
 class CalendarController extends Controller
@@ -14,10 +16,23 @@ class CalendarController extends Controller
     public function __invoke(Request $request, SouthAfricaHolidayCalendar $holidays): View
     {
         $businessId = app(CurrentBusiness::class)->id($request->user());
-        $membership = $request->user()->businesses()->whereKey($businessId)->firstOrFail();
-        $holidayPreferences = $membership->pivot->calendar_holiday_preferences ?? [];
-        if (is_string($holidayPreferences)) {
-            $holidayPreferences = json_decode($holidayPreferences, true) ?: [];
+        $request->user()->businesses()->whereKey($businessId)->firstOrFail();
+
+        // Holiday preferences are optional presentation data. Calendar must not
+        // become unavailable merely because an existing local database has not
+        // yet applied the preference migration.
+        $holidayPreferences = [];
+        if (Schema::hasColumn('business_user', 'calendar_holiday_preferences')) {
+            $storedHolidayPreferences = DB::table('business_user')
+                ->where('business_id', $businessId)
+                ->where('user_id', $request->user()->getAuthIdentifier())
+                ->value('calendar_holiday_preferences');
+
+            if (is_string($storedHolidayPreferences)) {
+                $holidayPreferences = json_decode($storedHolidayPreferences, true) ?: [];
+            } elseif (is_array($storedHolidayPreferences)) {
+                $holidayPreferences = $storedHolidayPreferences;
+            }
         }
         $month = $this->resolveMonth($request->string('month')->toString());
         $view = $this->resolveView($request->string('view')->toString());
