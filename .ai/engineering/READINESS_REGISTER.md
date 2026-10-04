@@ -318,3 +318,14 @@ Remaining material gates are now explicitly:
 5. final Director re-audit against the selected release commit.
 
 Last updated: 2026-10-04
+
+
+## Director defect refinement — 2026-10-04
+
+**Wallpaper:** previously documented as implemented, but the rendered path was not actually effective because later global body background rules overrode the selected wallpaper image. **Resolved at source** with a final specific wallpaper rule; regression coverage added.
+
+**New-job customer creation:** existing flow was valid but operationally inefficient because a new customer required leaving the job flow. **Resolved at source** with an in-context customer-creation dialog using the existing permission/business boundary and immediate selection in the current job form.
+
+**No regression intent:** existing job creation, customer storage, business isolation, private media serving and branding storage were preserved. New tests cover the new boundaries.
+
+Last updated: 2026-10-04
