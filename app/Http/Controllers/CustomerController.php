@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Business;
 use App\Models\Customer;
+use App\Support\Audit;
 use App\Support\CurrentBusiness;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
