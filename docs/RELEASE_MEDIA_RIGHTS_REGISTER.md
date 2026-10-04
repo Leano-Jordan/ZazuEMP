@@ -1,6 +1,8 @@
 # Zazu EMP — Media Provenance and Rights Register
 
 **Status:** OPERATIONAL RELEASE CONTROL  
+**Current owner:** Isaac Junior Lehlogonolo Maluleka  
+**Operating address:** 1068 Block JK, Soshanguve, Pretoria, South Africa  
 **Purpose:** separate Zazu software ownership from photographs, illustrations, icons, fonts, stock images and other third-party media.
 
 ## Rules
