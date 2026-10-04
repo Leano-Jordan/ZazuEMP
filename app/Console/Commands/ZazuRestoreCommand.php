@@ -388,3 +388,39 @@ class ZazuRestoreCommand extends Command
         return false;
     }
 }
+    private function validateStagedDatabase(string $driver, string $work): bool
+    {
+        if ($driver === 'sqlite') {
+            $path = $work.'/database.sqlite';
+
+            try {
+                $pdo = new \PDO('sqlite:'.$path);
+                $pdo->setAttribute(\PDO::ATTR_ERRMODE, \PDO::ERRMODE_EXCEPTION);
+                $result = $pdo->query('PRAGMA integrity_check')->fetchColumn();
+
+                if ($result !== 'ok') {
+                    $this->error('The backup SQLite database failed its integrity check.');
+                    return false;
+                }
+
+                return true;
+            } catch (\Throwable $exception) {
+                $this->error('The backup SQLite database could not be validated: '.$exception->getMessage());
+                return false;
+            }
+        }
+
+        if ($driver === 'mysql') {
+            $path = $work.'/database.sql';
+
+            if (!is_file($path) || filesize($path) === 0) {
+                $this->error('The MySQL backup dump is empty or unavailable.');
+                return false;
+            }
+
+            return true;
+        }
+
+        return false;
+    }
+
