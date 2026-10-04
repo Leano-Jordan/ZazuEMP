@@ -131,3 +131,18 @@ This distinction is required before real LAN or cloud transport is introduced:
 - cursor = that device's confirmed delivery position.
 
 New devices and initial dataset/bootstrap remain a separate provisioning concern.
+
+
+## 2026-10-04 transport execution
+
+The next bounded transport layer is now implemented on main:
+
+- owner-only pairing creation stores a short-lived hashed six-digit pairing code and an explicit bootstrap selection;
+- phone provisioning consumes the pairing code once and receives a revocable device token;
+- bootstrap returns business settings, the full business catalogue, and only records explicitly selected by the owner;
+- phone requests authenticate with the paired device token;
+- phone mutations can be durably recorded through the existing SyncMutationRecorder with stable client mutation IDs and idempotent replay;
+- existing pull/cursor/acknowledgement boundaries are exposed through the same sync protocol;
+- the phone retains locally queued mutations until domain-safe application acknowledgement exists.
+
+Still outside this execution slice: applying phone-originated mutations to authoritative domain models, conflict resolution, attachment transfer, and full V1 domain mirroring.
