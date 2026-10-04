@@ -48,6 +48,7 @@
                                 @else
                                     <span class="zazu-field-help">Need a new customer? Add them here and Zazu will select them for this job.</span>
                                 @endif
+                                <a id="quick-customer-edit-link" href="#" class="zazu-text-action mt-2 inline-flex" hidden>Complete customer profile →</a>
                                 @error('customer_id')<span class="zazu-field-error">{{ $message }}</span>@enderror
                             </div>
                         </div>
@@ -235,6 +236,7 @@
             const quickCustomerDialog = document.getElementById('quick-customer-dialog');
             const quickCustomerForm = document.getElementById('quick-customer-form');
             const quickCustomerStatus = document.getElementById('quick-customer-status');
+            const quickCustomerEditLink = document.getElementById('quick-customer-edit-link');
             const quickCustomerOpen = document.querySelector('[data-open-quick-customer]');
             const quickCustomerCloseButtons = document.querySelectorAll('[data-close-quick-customer]');
 
@@ -273,6 +275,10 @@
 
             quickCustomerOpen?.addEventListener('click', () => {
                 quickCustomerStatus.textContent = '';
+                if (quickCustomerEditLink) {
+                    quickCustomerEditLink.hidden = true;
+                    quickCustomerEditLink.removeAttribute('href');
+                }
                 quickCustomerForm.reset();
                 quickCustomerDialog.showModal();
                 quickCustomerForm.elements.name.focus();
@@ -309,6 +315,12 @@
                     customerSelect.add(option);
                     customerSelect.value = String(customer.id);
                     refreshContacts('', '');
+
+                    if (quickCustomerEditLink && customer.edit_url) {
+                        quickCustomerEditLink.href = customer.edit_url;
+                        quickCustomerEditLink.hidden = false;
+                    }
+
                     quickCustomerDialog.close();
                     return;
                 }
