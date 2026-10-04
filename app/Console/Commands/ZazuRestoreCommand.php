@@ -120,17 +120,7 @@ class ZazuRestoreCommand extends Command
     private function prepareOpenedArchive(ZipArchive $zip, string $work): ?array
     {
         $manifest = $this->readManifest($zip);
-        if ($manifest === null) {
-            return null;
-        }
-
-        if (($manifest['application'] ?? null) !== 'Zazu EMP') {
-            $this->error('The backup manifest is not for Zazu EMP.');
-            return null;
-        }
-
-        if (isset($manifest['format_version']) && (int) $manifest['format_version'] !== self::FORMAT_VERSION) {
-            $this->error('The backup format version is not supported by this Zazu installation.');
+        if ($manifest === null || !$this->validateManifest($manifest)) {
             return null;
         }
 
@@ -190,6 +180,21 @@ class ZazuRestoreCommand extends Command
             $this->error('The backup manifest is invalid.');
             return null;
         }
+    }
+
+    private function validateManifest(array $manifest): bool
+    {
+        if (($manifest['application'] ?? null) !== 'Zazu EMP') {
+            $this->error('The backup manifest is not for Zazu EMP.');
+            return false;
+        }
+
+        if (isset($manifest['format_version']) && (int) $manifest['format_version'] !== self::FORMAT_VERSION) {
+            $this->error('The backup format version is not supported by this Zazu installation.');
+            return false;
+        }
+
+        return true;
     }
 
     private function validateEntries(ZipArchive $zip, string $databaseEntry): ?bool
