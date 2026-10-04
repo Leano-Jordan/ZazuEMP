@@ -1,54 +1,70 @@
+@font-face {
+    font-family: "Manrope Variable";
+    font-style: normal;
+    font-weight: 200 800;
+    font-display: swap;
+    src: url("../fonts/manrope-latin-wght-normal.woff2") format("woff2");
+}
+
+@font-face {
+    font-family: "Space Grotesk Variable";
+    font-style: normal;
+    font-weight: 300 700;
+    font-display: swap;
+    src: url("../fonts/space-grotesk-latin-wght-normal.woff2") format("woff2");
+}
+
 :root {
     /* Page structure & navigation */
-    --zazu-page: #E7EFF7;
-    --zazu-page-deep: #102A43;
+    --zazu-page: #EAF5FF;
+    --zazu-page-deep: #12385A;
     --zazu-sidebar: #081F2F;
     --zazu-sidebar-ink: #F5FAFF;
-    --zazu-sidebar-muted: #C2D3E3;
-    --zazu-sidebar-label: #9DB7CD;
-    --zazu-sidebar-hover: #12344F;
-    --zazu-sidebar-active: #5592FC;
-    --zazu-sidebar-surface: #0D2A42;
+    --zazu-sidebar-muted: #C9DCEE;
+    --zazu-sidebar-label: #A9C2D8;
+    --zazu-sidebar-hover: #104364;
+    --zazu-sidebar-active: #4D91FF;
+    --zazu-sidebar-surface: #0C2A43;
     
     /* Surface layers */
-    --zazu-surface: #F7FAFD;
-    --zazu-surface-2: #EAF1F8;
-    --zazu-surface-3: #D8E6F3;
-    --zazu-field: #EEF5FB;
+    --zazu-surface: #FAFDFF;
+    --zazu-surface-2: #F0F8FF;
+    --zazu-surface-3: #DCEEFF;
+    --zazu-field: #F5FAFF;
     
     /* Text hierarchy */
-    --zazu-ink: #16324A;
+    --zazu-ink: #12324D;
     --zazu-ink-2: var(--zazu-text-body);
-    --zazu-muted: #49657D;
-    --zazu-faint: #617B91;
-    --zazu-nav-label: #D5E2EE;
+    --zazu-muted: #496A83;
+    --zazu-faint: #5C7890;
+    --zazu-nav-label: #D7E7F5;
     
     /* Borders & contrast */
-    --zazu-border: #B8CADB;
-    --zazu-border-strong: #7FA4C6;
+    --zazu-border: #B9D0E5;
+    --zazu-border-strong: #82B2D8;
     
     /* Primary blue — commanding yet refined */
-    --zazu-primary: #5592FC;
-    --zazu-primary-light: #6FA4FF;
-    --zazu-primary-pale: #9EC8FF;
-    --zazu-primary-shadow: #C2DCFF;
-    --zazu-primary-deep: #416AD7;
-    --zazu-primary-hover: #416AD7;
-    --zazu-primary-soft: #D5E3F7;
+    --zazu-primary: #2F80FF;
+    --zazu-primary-light: #63A5FF;
+    --zazu-primary-pale: #A9D3FF;
+    --zazu-primary-shadow: #D4E9FF;
+    --zazu-primary-deep: #1F5FC7;
+    --zazu-primary-hover: #245FC7;
+    --zazu-primary-soft: #DCEEFF;
     --zazu-primary-ink: #FFFFFF;
     
     /* Links & navigation */
-    --zazu-link: #235EA8;
-    --zazu-link-hover: #173F7A;
-    --zazu-nav-active: #5592FC;
+    --zazu-link: #1167B1;
+    --zazu-link-hover: #0D4F8F;
+    --zazu-nav-active: #2F80FF;
     
     /* Secondary accent — warm, hospitality-forward */
-    --zazu-accent: #0E8F83;
-    --zazu-accent-ink: #0A6A61;
-    --zazu-accent-soft: #D8F1ED;
+    --zazu-accent: #10A889;
+    --zazu-accent-ink: #08735F;
+    --zazu-accent-soft: #D8F4EC;
     
     /* Status & semantic */
-    --zazu-focus: #5592FC;
+    --zazu-focus: #2F80FF;
     --zazu-success: #137A3A;
     --zazu-success-ink: #0F6332;
     --zazu-success-soft: #E0F2E8;
@@ -58,14 +74,14 @@
     --zazu-danger: #B42318;
     --zazu-danger-ink: #9E1D13;
     --zazu-danger-soft: #FEE2E2;
-    --zazu-info: #5592FC;
-    --zazu-info-ink: #235EA8;
-    --zazu-info-soft: #DCE9FB;
+    --zazu-info: #2F80FF;
+    --zazu-info-ink: #1167B1;
+    --zazu-info-soft: #E0F0FF;
     
     /* Shadows */
-    --zazu-shadow: 0 8px 24px rgba(25,56,84,.10);
-    --zazu-shadow-strong: 0 16px 36px rgba(20,43,64,.14);
-    --zazu-border-subtle: #B8C8D8;
+    --zazu-shadow: 0 10px 28px rgba(35,100,168,.12);
+    --zazu-shadow-strong: 0 18px 40px rgba(24,76,124,.15);
+    --zazu-border-subtle: #C5D8E8;
     
     /* Color aliases */
     --zazu-violet: var(--zazu-primary);
@@ -76,20 +92,20 @@
     --zazu-amber-soft: #FEF3E5;
     
     /* Canvas & surfaces */
-    --zazu-surface-canvas: #E7EFF7;
-    --zazu-surface-card: #F7FAFD;
-    --zazu-surface-border: #B8CADB;
-    --zazu-text-main: #16324A;
-    --zazu-text-muted: #49657D;
+    --zazu-surface-canvas: #EAF5FF;
+    --zazu-surface-card: #FAFDFF;
+    --zazu-surface-border: #B9D0E5;
+    --zazu-text-main: #12324D;
+    --zazu-text-muted: #496A83;
     
     /* Blue palette — refined for modern SaaS */
-    --zazu-blue-primary: #5592FC;
-    --zazu-blue-accent: #6FA4FF;
-    --zazu-blue-hover: #416AD7;
-    --zazu-blue-light: #7FAEFF;
-    --zazu-blue-soft: #D5E3F7;
-    --zazu-blue-subtle: #B1C9EF;
-    --zazu-blue-canvas: #E7EFF7;
+    --zazu-blue-primary: #2F80FF;
+    --zazu-blue-accent: #63A5FF;
+    --zazu-blue-hover: #245FC7;
+    --zazu-blue-light: #82B9FF;
+    --zazu-blue-soft: #DCEEFF;
+    --zazu-blue-subtle: #BBD8F6;
+    --zazu-blue-canvas: #EAF5FF;
     
     /* Status states */
     --zazu-status-draft: #FEF0C7;
@@ -108,14 +124,14 @@
     --zazu-ui-shadow-hover: var(--zazu-card-shadow-hover);
     
     /* Brand blues */
-    --zazu-blue-brand: #5592FC;
-    --zazu-blue-vivid: #6FA4FF;
-    --zazu-blue-glow: #9EC8FF;
+    --zazu-blue-brand: #2F80FF;
+    --zazu-blue-vivid: #63A5FF;
+    --zazu-blue-glow: #A9D3FF;
     
     /* Canvas & cards */
-    --zazu-canvas-bg: #E7EFF7;
-    --zazu-card-bg: #F7FAFD;
-    --zazu-card-border: #B8CADB;
+    --zazu-canvas-bg: #EAF5FF;
+    --zazu-card-bg: #FAFDFF;
+    --zazu-card-border: #B9D0E5;
     --zazu-card-shadow: var(--zazu-shadow);
     --zazu-text-ink: var(--zazu-ink);
     --zazu-text-body: var(--zazu-muted);
@@ -123,7 +139,8 @@
     --zazu-ui-focus: 0 0 0 3px rgba(85,146,252,.24);
     
     /* Typography — application UI */
-    --zazu-font-ui: -apple-system, BlinkMacSystemFont, "Segoe UI Variable Text", "Segoe UI", "Noto Sans", "Helvetica Neue", Arial, sans-serif;
+    --zazu-font-ui: "Manrope Variable", "Manrope", "Segoe UI Variable Text", "Segoe UI", "Noto Sans", "Helvetica Neue", Arial, sans-serif;
+    --zazu-font-display: "Space Grotesk Variable", "Space Grotesk", "Manrope Variable", "Manrope", "Segoe UI Variable Text", "Segoe UI", "Noto Sans", "Helvetica Neue", Arial, sans-serif;
     --zazu-font-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace;
     --zazu-font-size-body: 14px;
     --zazu-font-size-small: 12px;
@@ -8239,4 +8256,70 @@ body.zazu-has-wallpaper .zazu-main {
 
 body.zazu-has-wallpaper .zazu-content {
     background: transparent;
+}
+
+
+/* --------------------------------------------------------------------------
+   Director — deterministic type, spacing, contrast and selection foundation
+   -------------------------------------------------------------------------- */
+.zazu-shell {
+    font-family: var(--zazu-font-ui);
+    font-optical-sizing: auto;
+    font-synthesis: none;
+}
+
+.zazu-page-title,
+.zazu-command-title,
+.zazu-card-title,
+.zazu-panel-title,
+.zazu-form-section-title {
+    font-family: var(--zazu-font-display);
+}
+
+.zazu-field {
+    gap: var(--zazu-space-2);
+}
+
+.zazu-field > .zazu-label,
+.zazu-field > label {
+    margin-bottom: 0;
+    line-height: 1.35;
+}
+
+.zazu-field-help,
+.zazu-field-error {
+    margin-top: 0;
+    line-height: 1.5;
+}
+
+.zazu-form-grid {
+    row-gap: var(--zazu-space-5);
+}
+
+::selection {
+    background: var(--zazu-primary);
+    color: var(--zazu-primary-ink);
+    text-shadow: none;
+}
+
+::-moz-selection {
+    background: var(--zazu-primary);
+    color: var(--zazu-primary-ink);
+    text-shadow: none;
+}
+
+:root[data-theme="dark"] ::selection,
+:root[data-theme="dark"] ::-moz-selection {
+    background: var(--zazu-primary-soft);
+    color: var(--zazu-ink);
+}
+
+.zazu-section-tabs a.active,
+.zazu-catalogue-tab.is-active {
+    color: var(--zazu-primary-deep);
+}
+
+.zazu-section-tabs a.active {
+    background: var(--zazu-primary-soft);
+    border-color: var(--zazu-primary);
 }
