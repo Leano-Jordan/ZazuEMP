@@ -81,6 +81,28 @@ test.describe('Zazu UI theme and navigation', () => {
         }
     });
 
+    test('keeps calendar reachable from the active Work navigation group', async ({ page }) => {
+        await login(page);
+        await page.goto('/calendar');
+        await expect(page).toHaveURL(/\/calendar/);
+
+        const workArea = page.locator('[data-zazu-nav-area]').filter({ hasText: 'Work' }).first();
+        const calendarLink = workArea.getByRole('link', { name: 'Calendar', exact: true });
+
+        await expect(workArea).toHaveClass(/is-active/);
+        await expect(calendarLink).toHaveAttribute('aria-current', 'page');
+
+        const mobileNavigationToggle = page.getByRole('button', { name: 'Open navigation' });
+        if (await mobileNavigationToggle.isVisible()) {
+            await mobileNavigationToggle.click();
+            await expect(workArea).toHaveClass(/is-open/);
+        } else {
+            await workArea.getByRole('button', { name: 'Work', exact: true }).click();
+        }
+
+        await expect(calendarLink).toBeVisible();
+    });
+
     test('navigates landing to login and workspace operations without server errors', async ({ page }) => {
         const responses: number[] = [];
         page.on('response', (response) => {
