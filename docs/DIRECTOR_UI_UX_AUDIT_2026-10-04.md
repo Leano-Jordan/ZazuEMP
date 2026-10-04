@@ -139,3 +139,36 @@ Rendered browser acceptance is still not claimed from this execution surface. Th
 
 ### Acceptance boundary
 Source-level verification is the current gate. Browser/device rendering is still required before claiming visual acceptance at desktop/mobile and light/dark widths.
+
+## 2026-10-05 — search shell regression recovery
+
+### User-reported regression
+The previous commercial search refinement produced two runtime-level layout defects:
+- desktop search width participated in the header's intrinsic flex sizing and could force the shell to redistribute or overflow;
+- mobile retained a stale fixed-position command-palette override, producing inconsistent placement;
+- the Helper also retained JavaScript collision-repositioning that actively changed its horizontal position when navigation flyouts opened.
+
+### Root causes
+- search trigger had no explicit flex-contained input geometry;
+- desktop header context and actions had no explicit utility-chrome contract preventing search from dictating shell width;
+- mobile stylesheet contained two command-palette authorities with different positioning modes;
+- Helper collision logic treated a visual overlap as something to solve by moving the Helper rather than by establishing a stable layer hierarchy and compact footprint.
+
+### Corrective action
+- desktop search now uses a bounded flex basis with min-width: 0; the trigger and input use explicit flex containment;
+- topbar inner is width-constrained to its container and the header context can shrink without forcing the shell wider;
+- command palette is anchored to the search component rather than the viewport;
+- stale mobile fixed-palette rule removed;
+- mobile search remains its own utility row, before section navigation;
+- Helper is a compact docked control with a smaller footprint and lower stacking layer;
+- Helper is hidden while the mobile navigation drawer is open;
+- runtime collision-repositioning JS removed entirely.
+
+### Commercial UX rationale
+Carbon's current search guidance treats search as core discovery, recommends predictable sizing and alignment, and supports focused search with results presented directly below the field. Its UI shell guidance places search on the left side of the header utility group specifically so expansion does not disturb the positions of other utility controls. citeturn792949search2turn792949search3turn792949search1
+Atlassian's spacing system emphasizes constrained, repeatable spacing values so responsive relationships remain predictable. citeturn792949search0
+
+### Acceptance state
+IMPLEMENTED / SOURCE-VERIFIED / VISUAL UNVERIFIED
+
+The repository now has one authoritative desktop search contract, one mobile palette position, and one stable Helper behavior. Browser rendering remains the required final gate.
