@@ -67,10 +67,6 @@ class ZazuBackupRestoreTest extends TestCase
 
 $exitCode = $restore->run();
 
-if ($exitCode !== 0) {
-    fwrite(STDERR, "\nRESTORE COMMAND OUTPUT: ".trim($restore->output())."\n");
-}
-
 $this->assertSame(0, $exitCode, Artisan::output());
 
             DB::purge('sqlite');
