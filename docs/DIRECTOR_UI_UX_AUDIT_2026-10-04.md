@@ -108,3 +108,34 @@ Source verification passed after the writes:
 - explicit catalogue command padding contract present.
 
 Rendered browser acceptance is still not claimed from this execution surface. The supplied screenshot is recorded as pre-fix evidence. Rebuild Vite assets and inspect the real local runtime at phone width before any further broad styling work.
+
+## 2026-10-05 — commercial-grade UI/UX harmonisation audit
+
+### External benchmark applied
+- Carbon treats search as a core discovery pattern and distinguishes basic, active and focused search; focused search is particularly suitable inside a product suite where users may need to narrow results or widen scope.
+- Linear groups command-menu commands around the user's current context rather than presenting an undifferentiated action dump.
+- Carbon specifies consistent search sizing and readable field text; icon-reveal variants are acceptable, but the revealed state remains a proper text-entry interaction.
+- The existing Zazu competitive benchmark identifies operational source-of-truth, contextual next actions, progressive disclosure and an operational rather than KPI-only dashboard as the relevant competitive patterns.
+
+### Findings
+| ID | Finding | Severity | Fix effort | Release impact |
+|---|---|---|---|---|
+| UX-UI-01 | Mobile global search was reduced to icon-first chrome and then visually compressed by overlapping header rules. | High | Low | Direct mobile usability/readiness improvement |
+| UX-UI-02 | Cards were flatter than the repository reference direction after the earlier low-stock glass treatment was removed. | Medium | Low | Commercial polish improvement |
+| UX-UI-03 | Light mode lacked enough blue/slate identity in the shell/header and risked reading as generic pale SaaS UI. | Medium | Low | Brand/UI differentiation improvement |
+| UX-UI-04 | Dashboard hero imagery used an unnecessarily heavy dark overlay that suppressed useful visual identity. | Medium | Low | Perceived dashboard quality improvement |
+| UX-UI-05 | Primary actions were visually too close to ordinary buttons; hierarchy needed more confidence without creating another button language. | Medium | Low | Action discoverability improvement |
+| UX-UI-06 | Existing command palette was structurally useful but visually closer to a generic dropdown than a focused command surface. | Medium | Low | Search/navigation refinement |
+| UX-UI-07 | Some action labels remain view-specific, so semantic CTA quality still depends on page content rather than CSS alone. | Low | Medium | Incremental UX clarity |
+
+### Changes executed
+- Rebalanced the light-mode canvas, surface, sidebar and header into a richer blue-slate family without turning light mode white.
+- Added subtle glass/depth to existing cards and operational dashboard surfaces; no competing stylesheet or token root was introduced.
+- Strengthened the existing primary action treatment and added an explicit `zazu-btn-cta` hook to the dashboard's main job-entry action.
+- Reduced the dashboard image overlay from 68% to 43% at the dark end of the gradient while retaining white-on-image readability.
+- Replaced the mobile icon-only search composition with a full-width focused search field and integrated shortcut badge.
+- Kept the command palette available as the contextual result layer rather than replacing navigation with search.
+- Added regression assertions covering the new visual contracts.
+
+### Acceptance boundary
+Source-level verification is the current gate. Browser/device rendering is still required before claiming visual acceptance at desktop/mobile and light/dark widths.
