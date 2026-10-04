@@ -107,3 +107,51 @@ Runtime limitation:
 ## Director next gate
 
 Rebuild Vite assets, load the actual authenticated dashboard/work/finance/calendar views in the real browser, and compare desktop + mobile + light + dark against the recorded reference baseline before any new visual styling is added.
+
+
+## Director UI/UX polish cycle — 2026-10-04
+
+### Rendered evidence inspected
+
+The supplied desktop screenshots were reviewed as current visual evidence. They exposed:
+- navigation/flyout behaviour that could be obscured by the application content;
+- a flyout hover dead-zone caused by physical separation from its trigger;
+- dashboard content losing grouping/visual hierarchy and reading too much like a text stream;
+- an oversized/over-emphasised hero treatment relative to operational content;
+- legacy light-mode colour treatment leaking indigo/purple into otherwise blue/teal Zazu surfaces.
+
+### Corrections executed
+
+1. **Desktop hierarchical navigation**
+   - desktop nav overflow is now visible so the nested flyout can cross the sidebar edge;
+   - mobile keeps the bounded nav scroll behaviour because mobile flyouts are inline;
+   - flyout is physically attached to the trigger (`left: calc(100% - 1px)`, `top: 0`) rather than separated by a 7px gap;
+   - flyout no longer animates through a temporary horizontal gap;
+   - hidden flyouts have `pointer-events:none`; visible flyouts regain pointer interaction;
+   - sidebar remains above the main application content via the existing z-index contract.
+
+2. **Dashboard visual authority cleanup**
+   - removed a 141-line obsolete hard-coded dashboard visual override block from the extension stylesheet;
+   - removed the legacy indigo/white dashboard treatment and a mobile table rule that disabled horizontal overflow;
+   - dashboard components now inherit the canonical Zazu token system instead of the obsolete colour layer.
+
+3. **Remaining component colour normalization**
+   - account menu, document, form-control and semantic-chip exceptions that still used legacy indigo/purple hard-coded colours were converted to canonical semantic tokens.
+
+### Verification
+
+Source verification after implementation confirms:
+- desktop nav no longer has the `overflow-x:hidden` clipping rule;
+- mobile nav retains bounded scrolling;
+- flyout has no physical hover gap;
+- final visual extension remains free of root token blocks;
+- dashboard legacy purple/white override block was removed;
+- no new stylesheet was introduced.
+
+### Visual state
+
+**IMPLEMENTED / VISUAL UNVERIFIED**
+
+The supplied screenshots are pre-change rendered evidence. This environment cannot render the user's local Zazu runtime after the change, so the final visual state must still be checked in the actual browser at desktop/mobile and light/dark widths.
+
+Next gate: rebuild assets → render Dashboard, Work, Forms and Calendar → inspect navigation hover/click/keyboard → compare against the approved references → then accept or repair.
