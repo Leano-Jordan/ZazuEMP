@@ -10,23 +10,26 @@
         </div>
     </section>
 
-    <form method="GET" action="{{ route('search.index') }}" class="zazu-form mb-6">
-        <div class="zazu-form-grid">
-            <label class="zazu-field zazu-field-wide">
-                <span class="zazu-label">Search</span>
-                <input class="zazu-input" type="search" name="q" value="{{ $filters['q'] }}" autofocus placeholder="Customer, job, supplier, invoice, quote…">
-            </label>
-            <label class="zazu-field">
-                <span class="zazu-label">Record type</span>
+    <form method="GET" action="{{ route('search.index') }}" class="zazu-form zazu-search-page-form mb-6">
+        <div class="zazu-search-primary">
+            <span class="zazu-search-icon" aria-hidden="true">⌕</span>
+            <label class="sr-only" for="workspace-search-page-input">Search the workspace</label>
+            <input id="workspace-search-page-input" class="zazu-search-page-input" type="search" name="q" value="{{ $filters['q'] }}" autofocus placeholder="Search customers, jobs, suppliers, invoices or quotes…" autocomplete="off">
+            <kbd>⌘K</kbd>
+        </div>
+
+        <div class="zazu-search-filter-row">
+            <label class="zazu-search-filter">
+                <span>Record type</span>
                 <select class="zazu-input" name="type">
-                    <option value="">All record types</option>
+                    <option value="">All records</option>
                     @foreach($types as $type)
                         <option value="{{ $type }}" @selected($filters['type'] === $type)>{{ ucwords(str_replace('_', ' ', $type)) }}</option>
                     @endforeach
                 </select>
             </label>
-            <label class="zazu-field">
-                <span class="zazu-label">Status</span>
+            <label class="zazu-search-filter">
+                <span>Status</span>
                 <select class="zazu-input" name="status">
                     <option value="">Any status</option>
                     @foreach($statuses as $status)
@@ -34,22 +37,26 @@
                     @endforeach
                 </select>
             </label>
-            <label class="zazu-field">
-                <span class="zazu-label">From</span>
+            <label class="zazu-search-filter">
+                <span>From</span>
                 <input class="zazu-input" type="date" name="from" value="{{ $filters['from'] }}">
             </label>
-            <label class="zazu-field">
-                <span class="zazu-label">To</span>
+            <label class="zazu-search-filter">
+                <span>To</span>
                 <input class="zazu-input" type="date" name="to" value="{{ $filters['to'] }}">
             </label>
         </div>
-        <div class="zazu-actionbar mt-5">
-            <a href="{{ route('search.index') }}" class="zazu-btn zazu-btn-secondary">Clear</a>
-            <button type="submit" class="zazu-btn zazu-btn-primary">Search workspace</button>
+
+        <div class="zazu-search-form-footer">
+            <span>Search stays inside this workspace and respects your current access.</span>
+            <div>
+                <a href="{{ route('search.index') }}" class="zazu-btn zazu-btn-ghost">Clear</a>
+                <button type="submit" class="zazu-btn zazu-btn-primary">Search workspace <span>→</span></button>
+            </div>
         </div>
     </form>
 
-    <section class="zazu-panel">
+    <section class="zazu-panel zazu-search-results-panel">
         <header class="zazu-section-head">
             <div>
                 <span class="zazu-eyebrow">Results</span>
@@ -63,18 +70,19 @@
                 <span>Try a broader name, reference, status or date range.</span>
             </div>
         @else
-            <div class="divide-y">
+            <div class="zazu-search-results-list">
                 @foreach($results as $result)
-                    <a href="{{ $result['href'] }}" class="flex items-center justify-between gap-4 px-4 py-4 hover:bg-[var(--zazu-blue-soft)]">
-                        <div class="min-w-0">
-                            <div class="text-xs uppercase tracking-wide opacity-70">{{ $result['type_label'] }}</div>
-                            <strong class="block truncate">{{ $result['title'] }}</strong>
-                            <span class="block text-sm opacity-75 truncate">{{ $result['meta'] }}</span>
+                    <a href="{{ $result['href'] }}" class="zazu-search-result">
+                        <span class="zazu-search-result-mark" aria-hidden="true"></span>
+                        <div class="zazu-search-result-main">
+                            <div class="zazu-search-result-type">{{ $result['type_label'] }}</div>
+                            <strong>{{ $result['title'] }}</strong>
+                            <span>{{ $result['meta'] }}</span>
                         </div>
-                        <div class="text-right shrink-0">
-                            @if($result['status'])<div class="text-xs uppercase tracking-wide opacity-70">{{ str_replace('_', ' ', $result['status']) }}</div>@endif
-                            @if($result['date'])<div class="text-sm opacity-75">{{ $result['date'] }}</div>@endif
-                            <span class="text-sm">Open →</span>
+                        <div class="zazu-search-result-side">
+                            @if($result['status'])<span class="zazu-search-result-status">{{ str_replace('_', ' ', $result['status']) }}</span>@endif
+                            @if($result['date'])<time>{{ $result['date'] }}</time>@endif
+                            <b aria-hidden="true">→</b>
                         </div>
                     </a>
                 @endforeach
