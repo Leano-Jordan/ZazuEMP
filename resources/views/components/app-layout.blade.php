@@ -37,7 +37,7 @@
             document.documentElement.dataset.theme = theme;
         })();
     </script>
-    @vite(['resources/css/app.css', 'resources/js/app.js'])
+    @vite(['resources/css/zazu.css', 'resources/js/app.js'])
 </head>
 <body data-zazu-route="{{ request()->route()?->getName() ?? '' }}" data-zazu-niche="{{ $primaryNiche }}" data-zazu-experience="{{ $experienceLevel }}" class="{{ $business?->wallpaper_path ? 'zazu-has-wallpaper' : '' }}" data-business-currency="{{ $business?->currency ?? 'ZAR' }}" style="--zazu-dashboard-image: url('{{ e($business?->dashboard_image_path ? route('business.media', ['type' => 'dashboard']).'?v='.$brandingVersion : asset('images/Background-ZAZU.jpg')) }}'){{ $business?->wallpaper_path ? ';--zazu-wallpaper: url(\''.e(route('business.media', ['type' => 'wallpaper']).'?v='.$brandingVersion).'\')' : '' }}">
     <a class="zazu-skip-link" href="#main-content">Skip to main content</a>
