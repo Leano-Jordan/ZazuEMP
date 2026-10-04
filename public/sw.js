@@ -1,7 +1,11 @@
-const CACHE_NAME = 'zazu-static-v4';
+const CACHE_NAME = 'zazu-static-v5';
 const OFFLINE_SHELL = '/offline';
 
 const PRECACHE_ASSETS = [
+    OFFLINE_SHELL,
+    '/manifest.webmanifest',
+    '/icons/zazu-192.svg',
+    '/icons/zazu-512.svg',
     '/images/landing/stock/hero.jpg',
     '/images/landing/stock/catering.jpg',
     '/images/landing/stock/sound.jpg',
@@ -13,8 +17,17 @@ const PRECACHE_ASSETS = [
 self.addEventListener('install', (event) => {
     event.waitUntil(
         caches.open(CACHE_NAME)
-            .then((cache) => cache.addAll(PRECACHE_ASSETS))
-            .catch(() => undefined)
+            .then(async (cache) => {
+                await Promise.all(
+                    PRECACHE_ASSETS.map(async (asset) => {
+                        try {
+                            await cache.add(asset);
+                        } catch {
+                            // One optional visual asset must never prevent the offline app shell from installing.
+                        }
+                    })
+                );
+            })
             .finally(() => self.skipWaiting())
     );
 });
@@ -35,6 +48,7 @@ function isCacheableStaticAsset(url, request) {
     if (request.method !== 'GET' || url.origin !== self.location.origin) return false;
 
     const path = url.pathname;
+
     return (
         request.destination === 'style' && path.startsWith('/build/')
     ) || (
@@ -68,19 +82,24 @@ self.addEventListener('fetch', (event) => {
         return;
     }
 
-    if (!isCacheableStaticAsset(url, request)) return;
+    if (request.method === 'GET' && url.origin === self.location.origin && url.pathname === '/manifest.webmanifest') {
+        event.respondWith(caches.match(request).then((cached) => cached || fetch(request)));
+        return;
+    }
 
-    event.respondWith(
-        caches.match(request).then((cached) => {
-            const network = fetch(request).then((response) => {
-                if (response.ok) {
-                    const copy = response.clone();
-                    caches.open(CACHE_NAME).then((cache) => cache.put(request, copy));
-                }
-                return response;
-            }).catch(() => cached);
+    if (isCacheableStaticAsset(url, request)) {
+        event.respondWith(
+            caches.match(request).then((cached) => {
+                const network = fetch(request).then((response) => {
+                    if (response.ok) {
+                        const copy = response.clone();
+                        caches.open(CACHE_NAME).then((cache) => cache.put(request, copy));
+                    }
+                    return response;
+                }).catch(() => cached);
 
-            return cached || network;
-        })
-    );
+                return cached || network;
+            })
+        );
+    }
 });
