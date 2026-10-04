@@ -4,15 +4,23 @@ namespace App\Http\Controllers;
 
 use App\Models\Event;
 use App\Support\CurrentBusiness;
+use App\Support\SouthAfricaHolidayCalendar;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
 
 class CalendarController extends Controller
 {
-    public function __invoke(Request $request): View
+    public function __invoke(Request $request, SouthAfricaHolidayCalendar $holidays): View
     {
         $businessId = app(CurrentBusiness::class)->id($request->user());
+        $membership = $request->user()->businesses()->whereKey($businessId)->firstOrFail();
+        $holidayPreferences = $membership->pivot->calendar_holiday_preferences ?? [];
+        if (is_string($holidayPreferences)) {
+            $holidayPreferences = json_decode($holidayPreferences, true) ?: [];
+        }
+        $holidayMap = collect($holidays->visibleForYear($month->year, $holidayPreferences))
+            ->groupBy(fn (array $holiday) => $holiday['date']->format('Y-m-d'));
         $month = $this->resolveMonth($request->string('month')->toString());
         $view = $this->resolveView($request->string('view')->toString());
         [$rangeStart, $rangeEnd] = $this->viewRange($month, $view);
@@ -50,6 +58,9 @@ class CalendarController extends Controller
             'isCurrentMonth' => $isCurrentMonth,
             'threeMonthBlocks' => $this->threeMonthBlocks($month, $eventsByDate),
             'yearMonths' => $this->yearMonths($month, $eventsByDate),
+            'holidays' => $holidayMap,
+            'holidayCategories' => SouthAfricaHolidayCalendar::CATEGORIES,
+            'holidayPreferences' => $holidayPreferences,
         ]);
     }
 
