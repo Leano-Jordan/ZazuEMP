@@ -1,0 +1,120 @@
+name: Zazu populated upgrade and rollback
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  populated-upgrade:
+    runs-on: ubuntu-latest
+    env:
+      BASE_SHA: 92730f7cb660ae06d9df3c014eccf4f0d3e9188e
+      DB_DATABASE: ${{ github.workspace }}/database/director-upgrade.sqlite
+      ZAZU_DEMO_EMAIL: demo@zazu.local
+      ZAZU_DEMO_PASSWORD: password
+      CACHE_STORE: array
+    steps:
+      - name: Check out current candidate
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+
+      - name: Set up PHP
+        uses: shivammathur/setup-php@f3e473d116dcccaddc5834248c87452386958240
+        with:
+          php-version: '8.4'
+          extensions: mbstring, sqlite3, pdo_sqlite
+
+      - name: Prepare baseline environment
+        run: |
+          php -r "copy('.env.example', '.env');"
+          php artisan key:generate --force
+          mkdir -p database
+          rm -f database/director-upgrade.sqlite
+          touch database/director-upgrade.sqlite
+
+      - name: Build and populate last proven application baseline
+        run: |
+          git fetch --no-tags --depth=1 origin "${BASE_SHA}"
+          git checkout "${BASE_SHA}" -- .
+          composer install --no-interaction --prefer-dist --no-progress
+          php artisan config:clear
+          php artisan migrate --force
+          php artisan db:seed --class=Database\\Seeders\\DemoScenarioSeeder --force
+          mkdir -p storage/app/private
+          printf '%s' 'pre-upgrade-private-marker' > storage/app/private/director-upgrade-marker.txt
+
+      - name: Create pre-upgrade recovery backup
+        run: |
+          mkdir -p storage/app/director-upgrade-backups
+          php artisan zazu:backup --output=storage/app/director-upgrade-backups
+          test "$(find storage/app/director-upgrade-backups -name 'zazu-backup-*.zip' | wc -l)" -eq 1
+
+      - name: Restore current candidate source
+        run: |
+          git checkout "${GITHUB_SHA}" -- .
+          composer install --no-interaction --prefer-dist --no-progress
+          php artisan config:clear
+
+      - name: Upgrade populated database
+        run: |
+          php artisan migrate --force
+
+      - name: Verify populated upgrade
+        run: |
+          php artisan tinker --execute="
+          if (DB::table('businesses')->where('slug', 'zazu-demo-catering')->value('name') !== 'Zazu Demo Catering') {
+              throw new RuntimeException('Populated business was not preserved during upgrade.');
+          }
+          if (DB::table('events')->where('reference', 'ZAZU-DEMO-001')->doesntExist()) {
+              throw new RuntimeException('Populated event was not preserved during upgrade.');
+          }
+          if (DB::table('invoices')->where('number', 'INV-ZAZU-DEMO-001')->value('total') != '11500.00') {
+              throw new RuntimeException('Populated invoice total was not preserved during upgrade.');
+          }
+          if (DB::table('payments')->where('idempotency_key', 'demo-payment-balance-001')->doesntExist()) {
+              throw new RuntimeException('Populated payment was not preserved during upgrade.');
+          }
+          if (!Schema::hasColumn('business_user', 'primary_niche')) {
+              throw new RuntimeException('Current migration did not add business_user.primary_niche.');
+          }
+          if (!Schema::hasTable('sync_streams')) {
+              throw new RuntimeException('Current migration did not create sync_streams.');
+          }
+          "
+
+      - name: Exercise rollback to the pre-upgrade recovery point
+        run: |
+          ARCHIVE="$(find storage/app/director-upgrade-backups -name 'zazu-backup-*.zip' | head -n 1)"
+          test -n "${ARCHIVE}"
+          php artisan zazu:restore "${ARCHIVE}" --force
+
+      - name: Reapply current migrations after rollback
+        run: |
+          php artisan migrate --force
+
+      - name: Verify rollback recovery
+        run: |
+          php artisan tinker --execute="
+          if (DB::table('businesses')->where('slug', 'zazu-demo-catering')->value('name') !== 'Zazu Demo Catering') {
+              throw new RuntimeException('Business data was not recovered after rollback.');
+          }
+          if (DB::table('invoices')->where('number', 'INV-ZAZU-DEMO-001')->value('total') != '11500.00') {
+              throw new RuntimeException('Invoice data was not recovered after rollback.');
+          }
+          if (DB::table('payments')->where('idempotency_key', 'demo-payment-balance-001')->doesntExist()) {
+              throw new RuntimeException('Payment data was not recovered after rollback.');
+          }
+          if (file_get_contents(storage_path('app/private/director-upgrade-marker.txt')) !== 'pre-upgrade-private-marker') {
+              throw new RuntimeException('Private media was not recovered after rollback.');
+          }
+          if (!Schema::hasColumn('business_user', 'primary_niche') || !Schema::hasTable('sync_streams')) {
+              throw new RuntimeException('Current schema was not reapplied after rollback recovery.');
+          }
+          "
+
+      - name: Verify migration state
+        run: php artisan migrate:status --database=sqlite
