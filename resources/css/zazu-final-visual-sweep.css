@@ -5159,17 +5159,17 @@ button,
 /* --------------------------------------------------------------------------
    Director — controlled glass surfaces / background-safe cards
    -------------------------------------------------------------------------- */
-.zazu-card,
-.zazu-panel,
 .zazu-form-section,
 .zazu-metric-card,
 .zazu-setting-card,
 .zazu-context-card,
 .zazu-dash-surface,
-.zazu-dash-commandbar {
-    background: color-mix(in srgb, var(--zazu-surface) 82%, transparent);
-    backdrop-filter: blur(11px) saturate(1.03);
-    -webkit-backdrop-filter: blur(11px) saturate(1.03);
+.zazu-dash-commandbar,
+.zazu-module,
+.zazu-route-card {
+    background: color-mix(in srgb, var(--zazu-surface) 88%, transparent);
+    backdrop-filter: blur(10px) saturate(110%);
+    -webkit-backdrop-filter: blur(10px) saturate(110%);
 }
 
 .zazu-card-header,
@@ -5264,28 +5264,6 @@ button,
 }
 
 /* DIRECTOR — commercial surface depth + intentional action hierarchy. */
-.zazu-panel,
-.zazu-module,
-.zazu-route-card,
-.zazu-dash-surface {
-    background: color-mix(in srgb, var(--zazu-card-bg) 84%, transparent);
-    border-color: color-mix(in srgb, var(--zazu-card-border) 88%, var(--zazu-primary-soft));
-    box-shadow:
-        0 1px 0 color-mix(in srgb, #fff 38%, transparent),
-        0 10px 30px color-mix(in srgb, var(--zazu-ink) 7%, transparent);
-    backdrop-filter: blur(12px) saturate(115%);
-    -webkit-backdrop-filter: blur(12px) saturate(115%);
-}
-
-.zazu-panel:hover,
-.zazu-module:hover,
-.zazu-route-card:hover,
-.zazu-dash-surface:hover {
-    box-shadow:
-        0 1px 0 color-mix(in srgb, #fff 45%, transparent),
-        0 14px 34px color-mix(in srgb, var(--zazu-primary) 10%, transparent);
-}
-
 .zazu-btn-primary,
 .zazu-btn-cta {
     border: 1px solid var(--zazu-primary);
