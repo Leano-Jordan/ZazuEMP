@@ -1188,3 +1188,14 @@ Acceptance boundary:
 - Mobile header order is now title row → search utility → section navigation → page actions.
 - Current visual state: IMPLEMENTED / SOURCE-VERIFIED / VISUAL-UNVERIFIED.
 - No CI status checks are attached to the latest code commit; actual browser render remains mandatory before visual acceptance.
+
+
+### Director visual recovery / customer flow checkpoint — 2026-10-05
+
+- Root causes confirmed: late generic page-surface CSS flattened the shared dark image banner; desktop search intrinsic width could redistribute the shell; mobile had stale palette positioning; Helper had no active Work/Sales yield state after generic collision logic was removed.
+- Protected good improvements: blue-slate light mode, subtle canonical glass cards, bounded search, intentional CTA hierarchy, lighter dashboard hero treatment.
+- Helper contract: mascot size remains unchanged; only Work and Sales desktop popovers trigger a right-of-popover movement using the measured active panel edge. Other navigation areas leave it alone.
+- Customer contract: quick-created customer receives a permissioned edit URL; the current job surface exposes Complete customer profile after creation. Full editor remains the authoritative update surface.
+- Form contract: customer identity → primary contact → business/billing/tax details.
+- Dialog contract: customer quick-add is explicitly centered with viewport bounds.
+- Visual acceptance: SOURCE-VERIFIED; rendered browser acceptance remains a separate gate.
