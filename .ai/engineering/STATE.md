@@ -987,7 +987,7 @@ Completed on main:
 - Added docs/DIRECTOR_CSS_AUTHORITY_AUDIT_2026-10-04.md with the ownership map, findings and verification boundary.
 
 Current source-level stylesheet state:
-- app.css: 7915 lines, 29 !important declarations.
+- app.css: 7878 lines, 29 !important declarations.
 - zazu-responsive-theme.css: 523 lines, 3 !important declarations.
 - zazu-mobile-refinement.css: 735 lines, 7 !important declarations.
 - zazu-final-visual-sweep.css: 3927 lines, 7 !important declarations and zero root token blocks.
