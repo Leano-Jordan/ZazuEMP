@@ -9,6 +9,10 @@ The current owner of Zazu EMP is:
 
 **Isaac Junior Lehlogonolo Maluleka**
 
+**Operating address:** 1068 Block JK, Soshanguve, Pretoria, South Africa
+
+Isaac is the current solo business owner and developer of Zazu EMP, and all current project responsibility sits with him.
+
 Zazu EMP is currently being developed and controlled by Isaac as a solo independent developer.
 
 **Rosscore Labs is not currently registered as a company and is not recorded in this repository as the present legal owner.**
