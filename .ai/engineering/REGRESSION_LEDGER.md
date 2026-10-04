@@ -108,3 +108,10 @@ Browser suites can silently skip authenticated UI coverage when they depend on a
 **Control:** Authenticate UI E2E tests through the seeded demo account by default, assert current semantic buttons, and explicitly open collapsed navigation before locating mobile actions. Keep only documented device-specific skips.
 
 **Status:** CONTROL ACTIVE
+
+
+## REG-015 — UI layout and contrast regression family
+
+Record asset/inventory register layout, page-banner state parity, brand fit, landing navigation geometry, Plan/Delivery balance, and explicit foreground/surface contrast as protected UI invariants.
+
+**Status:** CONTROL ACTIVE
