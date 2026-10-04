@@ -1,3 +1,17 @@
+/* Zazu base theme contract — component CSS consumes these tokens; dark mode never relies on a later override. */
+:root {
+    --zazu-base-form-bg: #FFFFFF;
+    --zazu-base-surface-bg: #FFFFFF;
+    --zazu-base-form-ink: #17315A;
+    --zazu-base-border: #78AEF5;
+}
+:root[data-theme="dark"] {
+    --zazu-base-form-bg: #091C2D;
+    --zazu-base-surface-bg: #10283F;
+    --zazu-base-form-ink: #F4F8FB;
+    --zazu-base-border: #638CB3;
+}
+
 @import 'tailwindcss';
 
 @source '../../vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php';
