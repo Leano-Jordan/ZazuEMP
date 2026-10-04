@@ -210,20 +210,20 @@
                         </div>
                         <nav class="zazu-section-tabs" aria-label="Section navigation">
                             @if(request()->routeIs('work.*','capabilities.*','quotes.*','calendar.*'))
-                                <span class="zazu-section-name">Operations</span>
+                                
                                 @if($can('work.view'))<a href="{{ route('work.index') }}" class="{{ request()->routeIs('work.*') ? 'active' : '' }}">Jobs</a>@endif
                                 @if($can('capabilities.view'))<a href="{{ route('capabilities.index') }}" class="{{ request()->routeIs('capabilities.*') ? 'active' : '' }}">Services & prices</a>@endif
                                 @if($can('quotes.view'))<a href="{{ route('quotes.index') }}" class="{{ request()->routeIs('quotes.*') ? 'active' : '' }}">Quotes</a>@endif
                                 @if($can('calendar.view'))<a href="{{ route('calendar.index') }}" class="{{ request()->routeIs('calendar.*') ? 'active' : '' }}">Calendar</a>@endif
                             @elseif(request()->routeIs('customers.*'))
-                                <span class="zazu-section-name">Customers</span><a href="{{ route('customers.index') }}" class="active">Customers</a>
+                                <a href="{{ route('customers.index') }}" class="active">Customers</a>
                             @elseif(request()->routeIs('finance.*'))
-                                <span class="zazu-section-name">Finance</span><a href="{{ route('finance.index') }}" class="active">Overview</a>
+                                <a href="{{ route('finance.index') }}" class="active">Overview</a>
                                 @if($can('finance.invoice.create'))<a href="{{ route('finance.invoices.create') }}">New invoice</a>@endif
                                 @if($can('finance.payment.create'))<a href="{{ route('finance.payments.create') }}">Payment</a>@endif
                                 @if($can('finance.expense.create'))<a href="{{ route('finance.expenses.create') }}">Expense</a>@endif
                             @elseif(request()->routeIs('purchasing.*','suppliers.*','inventory.*','assets.*'))
-                                <span class="zazu-section-name">Resources</span>
+                                
                                 @if($can('purchasing.view'))<a href="{{ route('purchasing.index') }}" class="{{ request()->routeIs('purchasing.*') ? 'active' : '' }}">Purchasing</a>@endif
                                 @if($can('suppliers.view'))<a href="{{ route('suppliers.index') }}" class="{{ request()->routeIs('suppliers.*') ? 'active' : '' }}">Suppliers</a>@endif
                                 @if($can('inventory.view'))<a href="{{ route('inventory.index') }}" class="{{ request()->routeIs('inventory.*') ? 'active' : '' }}">Inventory</a>@endif
@@ -231,7 +231,7 @@
                             @elseif(request()->routeIs('reports.*'))
                                 <span class="zazu-section-name">Insights</span><a href="{{ route('reports.index') }}" class="active">Reports</a>
                             @elseif(request()->routeIs('settings.*'))
-                                <span class="zazu-section-name">System</span><a href="{{ route('settings.index') }}" class="{{ request()->routeIs('settings.index') ? 'active' : '' }}">Business</a>
+                                <a href="{{ route('settings.index') }}" class="{{ request()->routeIs('settings.index') ? 'active' : '' }}">Business</a>
                                 @if($isOwner)<a href="{{ route('settings.compliance') }}" class="{{ request()->routeIs('settings.compliance*') ? 'active' : '' }}">Compliance</a><a href="{{ route('settings.audit') }}" class="{{ request()->routeIs('settings.audit') ? 'active' : '' }}">Audit</a>@endif
                             @endif
                         </nav>
