@@ -170,3 +170,55 @@ For every critical Zazu workflow, audit the user's intent as:
 **What am I trying to accomplish? → What does Zazu need from me? → What happens if something is missing? → What happens after I save? → What should I do next? → Can I recover without losing my place?**
 
 A page being reachable is not sufficient evidence that the workflow is coherent.
+
+
+## 7. Calendar / local South African context refinement
+
+The calendar now includes a local, code-owned 2026 South African holiday catalogue rather than relying on a remote calendar API. Official South African public holidays are the mandatory baseline. The 2026 catalogue also accounts for the 4 November 2026 local-government-election public holiday declared by the President.
+
+Optional observance categories are available for:
+- Muslim
+- Hindu
+- Christian
+- Jewish
+- South African/cultural observances
+
+Users can mute optional categories from Workspace Preferences. Official public holidays remain visible.
+
+**Important date-quality rule:** Islamic and other lunar/religious dates can vary by authority, moon sighting and timezone. They are therefore treated as planning observances, not as statutory/public-holiday assertions. The UI should make this distinction clear where necessary.
+
+## 8. Starting-point flexibility
+
+The dashboard now exposes multiple legitimate entry points:
+- Start with customer
+- Start with job
+- Start with quote
+
+The quote-first route creates the required job context and then takes the user directly into quote creation. This preserves the existing domain relationship rather than creating an orphan quote.
+
+This is the beginning of the "start anywhere, connect internally" model recorded in the product definition. The next audit should extend this pattern to missing supplier, capability, inventory and asset dependencies.
+
+## 9. Visual attention-map direction
+
+Director added a semantic monochrome-compatible card accent mechanism. It deliberately avoids turning every card into a different coloured box.
+
+The design rule is:
+- neutral surfaces remain dominant;
+- one restrained accent identifies the semantic section;
+- stronger colour is reserved for meaning, not decoration;
+- adjacent sections should be recognisable in seconds through position, title, accent and spacing;
+- cards should not become a rainbow.
+
+The next visual pass should apply these semantic tones only to genuinely distinct operational groups and validate them on dashboard, job workspace, finance and calendar.
+
+## 10. Dialog centering
+
+Shared native dialog surfaces were given an explicit viewport-centering rule and bounded mobile height/width. This addresses the observed class of popup drift where a modal can appear visually offset depending on viewport/layout context.
+
+Physical-device confirmation remains required.
+
+## 11. Evidence boundary
+
+The latest main head is e7fd90da7fd40fc7a37c679da346ea0298baf07f.
+
+Current-head GitHub Actions are still queued. Do not classify these changes as CI-green until those runs complete.
