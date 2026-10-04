@@ -1155,3 +1155,15 @@ Acceptance boundary:
 - CSS brace/parenthesis balance checks passed for the modified stylesheets/views.
 - GitHub Actions for the latest commit were observed at checkpoint: Zazu quality, Laravel, Psalm Security Scan, Zazu populated upgrade and rollback, PHPMD, Zazu browser smoke and Push on main were queued; SonarCloud was skipped.
 - Therefore the Director state is **SOURCE-ACCEPTED / CI-PENDING**, not CI-GREEN. No browser workflow is being represented as passed until GitHub reports a completed conclusion.
+
+### Director recovery checkpoint — 2026-10-04T23:47 SAST
+
+- Target: authenticated mobile Services & Prices UI.
+- Evidence: supplied Chrome screenshot showing wrapped/fragmented mobile header, detached page action, catalogue command text visually touching its boundary, and dark catalogue-tab text on a dark surface.
+- Root cause confirmed in source history: commit 709dd6c4 introduced a large mobile-shell override stack; later refinements added overlapping header grids and absolute action positioning instead of one composition contract.
+- Correction: consolidated resources/css/zazu-mobile-refinement.css into one explicit mobile header grid with title/search/theme, horizontally scrollable section navigation, and a dedicated page-action row.
+- Correction: hardened resources/css/zazu-final-visual-sweep.css with explicit dark catalogue-tab foregrounds and catalogue command inner padding.
+- Regression protection: added InterfaceRegressionTest coverage for the canonical mobile grid and dark catalogue readability contract.
+- Source verification: passed; legacy mobile grid, 56px action offset and 112px reserved header height are absent; canonical header and readability contracts are present.
+- Visual acceptance: PENDING. The supplied screenshot is pre-fix evidence; local browser rendering is not exposed to this execution surface.
+- Next gate: rebuild Vite assets, hard refresh the local phone view, inspect header/tab/banner at the target viewport, then check desktop + mobile and both themes before another broad UI batch.
