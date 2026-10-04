@@ -262,3 +262,42 @@ The Regulator's privacy notice guidance also illustrates the expected operationa
 **Important:** This is a release-readiness finding, not legal advice or a determination that Zazu is currently non-compliant.
 
 Last updated: 2026-10-04
+
+
+## 14. Director release-documentation closure — 2026-10-04
+
+The minimum V1 release documentation set has now been created under `docs/RELEASE_*.md` and audited against the current repository implementation.
+
+### Documentation set created
+
+- privacy / collection notice draft;
+- data-subject request procedure;
+- retention and secure-disposal schedule;
+- security-incident response runbook;
+- operator/data-processing control;
+- customer/service terms draft;
+- PAIA operational control;
+- media provenance and rights register;
+- deployment runbook;
+- backup/restore runbook;
+- upgrade/rollback runbook;
+- implementation audit and release-documentation index.
+
+### Audit result
+
+The technical foundations are stronger than the organisational documentation layer:
+
+- authentication, business isolation, roles/permissions and private media are implemented;
+- incident recording and authoritative audit logging are implemented;
+- backup/restore and upgrade/rollback commands exist and recorded CI evidence is available;
+- no dedicated self-service privacy export/deletion portal was found;
+- no dedicated customer Terms or Privacy publication route was found;
+- retention/disposal and PAIA/privacy requests therefore remain controlled manual processes;
+- operator contracts, legal review, real contact details and final retention periods remain external completion items;
+- final media rights/provenance still requires release-specific sign-off.
+
+**Director disposition:** documentation-design gap CLOSED. Legal/privacy operational gate remains **OPEN** until the final real-world details and required review are completed.
+
+This is a release-readiness record, not legal advice.
+
+Last updated: 2026-10-04
