@@ -30,7 +30,7 @@ Current offline licensing layer:
 
 Current limitation:
 
-The phone workspace now maintains a local IndexedDB working copy and supports local creation/editing of core demo/operational records without a PC. The complete production business domain is not yet mirrored locally and offline writes are not yet queued for authoritative synchronization.
+The phone workspace now maintains a local IndexedDB working copy and supports local creation/editing of the current mobile operational records without a PC. Offline writes are durably queued locally and can be transmitted to the host sync foundation after owner-approved pairing. The complete production business domain is not yet mirrored locally.
 
 Therefore the present application is **phone-capable and locally persistent for the current mobile workspace, but not yet fully synchronized offline across the complete Zazu business domain**.
 
@@ -273,9 +273,9 @@ Before claiming full offline operation:
 
 **Not yet implemented**
 - complete phone-local mirror of every V1 business domain;
-- durable offline mutation queue and replay;
-- owner-approved device provisioning and bootstrap transport;
+- complete phone-local mirror of every V1 business domain;
 - domain mutation handlers using the stable identity registry;
+- application acknowledgement/conflict resolution for phone-originated mutations;
 - conflict resolution;
 - local host/device synchronization service;
 - cloud synchronization.
