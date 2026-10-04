@@ -42,7 +42,7 @@ class ZazuRestoreCommand extends Command
 
         try {
             return $this->executeRestore($archive, $work);
-        } catch (\\Throwable $exception) {
+        } catch (\Throwable $exception) {
             $this->error('Zazu restore failed safely: '.$exception->getMessage());
             return self::FAILURE;
         } finally {
@@ -96,7 +96,7 @@ class ZazuRestoreCommand extends Command
 
             $this->info('Zazu restore completed from '.$archive);
             return self::SUCCESS;
-        } catch (\\Throwable $exception) {
+        } catch (\Throwable $exception) {
             $this->rollbackRestore($driver, $databaseRollback, $privateRollback, $privateActivated);
             throw $exception;
         } finally {
