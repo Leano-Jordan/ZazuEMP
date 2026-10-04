@@ -132,6 +132,17 @@ class InterfaceRegressionTest extends TestCase
         $this->assertStringContainsString('padding:20px 18px 18px;', $visualCss);
     }
 
+    public function test_mobile_search_does_not_collapse_at_520px_and_active_nav_keeps_sidebar_contrast(): void
+    {
+        $appCss = file_get_contents(resource_path('css/app.css'));
+        $mobileCss = file_get_contents(resource_path('css/zazu-mobile-refinement.css'));
+
+        $this->assertStringContainsString('color:var(--zazu-sidebar-ink)', $appCss);
+        $this->assertStringContainsString('.zazu-command-search {', $mobileCss);
+        $this->assertStringContainsString('width: 100%;', $mobileCss);
+        $this->assertStringNotContainsString('.zazu-command-search {\n        width: 40px;', $mobileCss);
+    }
+
     public function test_commercial_visual_system_has_glass_depth_rich_light_surfaces_and_non_dark_mobile_search(): void
     {
         $appCss = file_get_contents(resource_path('css/app.css'));
