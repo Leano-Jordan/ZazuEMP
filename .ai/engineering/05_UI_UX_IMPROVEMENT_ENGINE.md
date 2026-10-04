@@ -434,3 +434,83 @@ The engine must return one explicit visual state:
 - BLOCKED / INSUFFICIENT EVIDENCE.
 
 A source-level statement such as "tokens are correct" is not visual acceptance.
+
+
+## EVIDENCE-DRIVEN UI AGENT WORKFLOW — RESEARCH-ALIGNED
+
+The engine must operate as a controlled design-development loop, not as a prompt-driven makeover.
+
+### A. Observe before acting
+
+For every meaningful UI batch, gather:
+1. current rendered screenshots at defined viewports;
+2. relevant reference screenshots/images;
+3. current DOM/component structure;
+4. shared token/style ownership;
+5. recent diff/history for affected UI;
+6. existing visual snapshots when available.
+
+Do not infer a visual defect from source code alone when the defect is perceptual.
+
+### B. Write a visual hypothesis
+
+Before implementation state:
+- WHAT looks wrong;
+- WHY it is wrong;
+- WHAT observable change should improve it;
+- WHICH component/token owns that change;
+- WHAT must remain unchanged;
+- HOW the result will be judged.
+
+"Make it more modern/professional" is not an actionable hypothesis.
+
+### C. Work in reversible slices
+
+Prefer small, reviewable batches with one visual objective. Keep changes isolated enough that a regression can be attributed and reverted. Do not mix unrelated shell, typography, palette, component and responsive changes merely because they are all visual.
+
+### D. Compare rendered output, not intent
+
+For stable pages, maintain browser screenshot baselines. Playwright-style screenshot comparison is an appropriate implementation mechanism. Reference snapshots must be generated in a controlled environment and updated deliberately, never automatically after every change.
+
+Pixel differences are evidence, not automatic acceptance. Dynamic regions may be masked or stabilised. Human review remains required for hierarchy, density, readability and commercial polish.
+
+### E. Separate objective gates from human visual judgement
+
+Automated gates should check:
+- build/syntax;
+- route availability;
+- console/runtime errors;
+- responsive overflow;
+- screenshot regression thresholds;
+- accessibility/contrast where automatable;
+- relevant workflow tests.
+
+Human visual review should judge:
+- hierarchy;
+- clarity;
+- visual density;
+- action distinction;
+- consistency;
+- reference alignment;
+- whether the product actually looks commercially credible.
+
+A green automated suite cannot make an ugly UI green.
+
+### F. Golden-reference discipline
+
+A visual baseline may only be replaced when the intended design change has been explicitly accepted. Never use a changed screenshot to make the screenshot test pass without first establishing why the changed appearance is better.
+
+### G. Escalating autonomy
+
+The engine may operate autonomously only within an established design system and proven component patterns. New visual directions require observation and review first. Autonomy increases after repeated verified improvements; it decreases after regressions.
+
+### H. Change budget / blast radius
+
+The larger the shared blast radius, the stronger the evidence required. Root tokens, typography, shell layout and shared controls are high-blast-radius changes. They require affected-consumer inspection and multi-route rendered verification before acceptance.
+
+### I. Review artifact
+
+Every meaningful UI batch should leave a compact evidence record:
+BASELINE → HYPOTHESIS → CHANGE → RENDERED RESULT → AUTOMATED RESULT → HUMAN VISUAL DECISION → ACCEPT / REJECT → NEXT ACTION.
+
+This record is the memory the next agent needs. Do not rely on conversational memory alone.
