@@ -4,16 +4,19 @@
     "src": "images/Background-ZAZU.jpg"
   },
   "resources/css/app.css": {
-    "file": "assets/app-DaHIbvmM.css",
+    "file": "assets/app-BVMaBtMk.css",
     "name": "app",
     "names": [
       "app.css"
     ],
     "src": "resources/css/app.css",
-    "isEntry": true
+    "isEntry": true,
+    "assets": [
+      "assets/Background-ZAZU-BKmA5Uiu.jpg"
+    ]
   },
   "resources/css/zazu-final-visual-sweep.css": {
-    "file": "assets/zazu-final-visual-sweep-A99wdCqc.css",
+    "file": "assets/zazu-final-visual-sweep-BgB5BMEi.css",
     "name": "zazu-final-visual-sweep",
     "names": [
       "zazu-final-visual-sweep.css"
