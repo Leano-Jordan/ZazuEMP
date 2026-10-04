@@ -5503,3 +5503,26 @@ body.zazu-mobile-menu-open .zazu-helper {
 :root:not([data-theme="dark"]) .zazu-command-band .zazu-command-copy {
     color: #D7E7F3;
 }
+
+/* DIRECTOR — centered customer quick-add dialog */
+.zazu-quick-customer-dialog {
+    position: fixed;
+    inset: 0;
+    margin: auto;
+    width: min(92vw, 560px);
+    max-width: 560px;
+    max-height: min(88dvh, 720px);
+    overflow: auto;
+    box-sizing: border-box;
+}
+
+.zazu-quick-customer-dialog-panel {
+    min-width: 0;
+}
+
+@media (max-width: 600px) {
+    .zazu-quick-customer-dialog {
+        width: calc(100vw - 24px);
+        max-height: calc(100dvh - 24px);
+    }
+}
