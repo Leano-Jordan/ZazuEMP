@@ -16,7 +16,7 @@ class PwaOfflineFoundationTest extends TestCase
         $manifest = json_decode($response->getContent(), true, 512, JSON_THROW_ON_ERROR);
 
         $this->assertSame('Zazu', $manifest['short_name']);
-        $this->assertSame('/dashboard', $manifest['start_url']);
+        $this->assertSame('/offline', $manifest['start_url']);
         $this->assertSame('standalone', $manifest['display']);
         $this->assertCount(2, $manifest['icons']);
         $this->assertSame('/icons/zazu-192.svg', $manifest['icons'][0]['src']);
@@ -41,6 +41,7 @@ class PwaOfflineFoundationTest extends TestCase
     {
         $worker = File::get(public_path('sw.js'));
 
+        $this->assertStringContainsString("const CACHE_NAME = 'zazu-static-v6';", $worker);
         $this->assertStringContainsString("const OFFLINE_SHELL = '/offline';", $worker);
         $this->assertStringContainsString("OFFLINE_SHELL,", $worker);
         $this->assertStringContainsString(".catch(() => caches.match(OFFLINE_SHELL))", $worker);
