@@ -5028,3 +5028,78 @@ button,
         font-size: 12px;
     }
 }
+
+
+/* --------------------------------------------------------------------------
+   Director — controlled glass surfaces / background-safe cards
+   -------------------------------------------------------------------------- */
+.zazu-card,
+.zazu-panel,
+.zazu-form-section,
+.zazu-metric-card,
+.zazu-setting-card,
+.zazu-context-card,
+.zazu-dash-surface,
+.zazu-dash-commandbar {
+    background: color-mix(in srgb, var(--zazu-surface) 82%, transparent);
+    backdrop-filter: blur(11px) saturate(1.03);
+    -webkit-backdrop-filter: blur(11px) saturate(1.03);
+}
+
+.zazu-card-header,
+.zazu-form-section-head {
+    background: color-mix(in srgb, var(--zazu-surface-2) 78%, transparent);
+}
+
+.zazu-dash-resources .zazu-dash-surface-head {
+    position: relative;
+    background:
+        linear-gradient(115deg,
+            color-mix(in srgb, var(--zazu-primary-soft) 70%, var(--zazu-surface-2)) 0%,
+            color-mix(in srgb, var(--zazu-surface) 88%, transparent) 72%);
+}
+
+.zazu-dash-resources .zazu-dash-surface-head::before {
+    content: "";
+    position: absolute;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    width: 4px;
+    background: linear-gradient(180deg, var(--zazu-primary), var(--zazu-blue-vivid));
+}
+
+.zazu-dash-resource-grid {
+    background: color-mix(in srgb, var(--zazu-border) 55%, transparent);
+}
+
+.zazu-dash-resource-grid > .zazu-quick-link {
+    background: color-mix(in srgb, var(--zazu-surface) 88%, transparent);
+}
+
+.zazu-dash-resource-grid > .zazu-quick-link:hover {
+    background: color-mix(in srgb, var(--zazu-primary-soft) 72%, var(--zazu-surface));
+}
+
+.zazu-has-wallpaper .zazu-card,
+.zazu-has-wallpaper .zazu-panel,
+.zazu-has-wallpaper .zazu-form-section,
+.zazu-has-wallpaper .zazu-metric-card,
+.zazu-has-wallpaper .zazu-setting-card,
+.zazu-has-wallpaper .zazu-context-card,
+.zazu-has-wallpaper .zazu-dash-surface,
+.zazu-has-wallpaper .zazu-dash-commandbar {
+    background: color-mix(in srgb, var(--zazu-surface) 86%, transparent);
+}
+
+.zazu-brand-logo,
+.zazu-brand-mark {
+    width: 36px;
+    height: 36px;
+    flex-basis: 36px;
+}
+
+.zazu-brand-lockup strong {
+    font-family: var(--zazu-font-display);
+    font-size: 14px;
+}
