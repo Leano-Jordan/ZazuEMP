@@ -140,7 +140,7 @@ class InterfaceRegressionTest extends TestCase
 
         $this->assertStringContainsString('--zazu-page: #D9E8F5;', $appCss);
         $this->assertStringContainsString('--zazu-surface: #F2F7FC;', $appCss);
-        $this->assertStringContainsString('backdrop-filter: blur(12px) saturate(115%);', $appCss);
+        $this->assertStringContainsString('backdrop-filter: blur(10px) saturate(110%);', $appCss);
         $this->assertStringContainsString('.zazu-btn-cta {', $sweepCss);
         $this->assertStringContainsString('background: linear-gradient(135deg, var(--zazu-primary), var(--zazu-primary-deep));', $sweepCss);
         $this->assertStringContainsString('rgba(15,23,42,.43)', $sweepCss);
