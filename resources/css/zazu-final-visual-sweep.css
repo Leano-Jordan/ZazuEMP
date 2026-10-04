@@ -5264,7 +5264,6 @@ button,
 }
 
 /* DIRECTOR — commercial surface depth + intentional action hierarchy. */
-.zazu-card,
 .zazu-panel,
 .zazu-module,
 .zazu-route-card,
@@ -5278,7 +5277,6 @@ button,
     -webkit-backdrop-filter: blur(12px) saturate(115%);
 }
 
-.zazu-card:hover,
 .zazu-panel:hover,
 .zazu-module:hover,
 .zazu-route-card:hover,
