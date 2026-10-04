@@ -1053,3 +1053,24 @@ Verification:
 - no <=9px font declarations remain in the four application stylesheets;
 - no root token system exists in final visual sweep;
 - visual state remains IMPLEMENTED / VISUAL UNVERIFIED pending a real browser render.
+
+
+## Director current UI refinement cycle — 2026-10-04
+
+User-reported defects addressed on the current main branch:
+
+- Account popover was anchoring toward the left edge; it now mirrors the navigation flyout relationship on desktop and opens upward within the mobile shell.
+- Zazu Helper now yields to navigation layering, dynamically avoids an intersecting desktop flyout, and becomes non-interactive while the mobile navigation drawer is open.
+- Wallpaper visibility was re-hardened after a cascade regression: the application shell is transparent over the wallpaper layer and the page overlay is intentionally translucent rather than opaque.
+- Page-introduction rectangles now use blue-tinted Zazu surfaces rather than near-white presentation, with the dashboard explicitly identified as the Dashboard command/title band.
+- Calendar was strengthened as an operational surface. Month view remains dense and readable; 3 Months and Year expose holiday names instead of only dots/tooltips; Agenda exposes holiday rows, including holiday-only dates.
+- Calendar view controls are now rectangular and visually related to the shell, and dense month layout remains horizontally usable on narrow screens.
+
+Preservation rule:
+- This cycle is refinement/hardening only. No working navigation section, workflow, route or UI capability was intentionally removed.
+- Existing reference-led blue/nav system remains the governing visual direction.
+- Avoid introducing another token root or competing visual stylesheet.
+
+Verification boundary:
+- GitHub source re-read after writes; CSS/JS/Blade structural balance checks passed.
+- Rendered browser/device acceptance was not available through this environment; visual acceptance remains pending runtime/screenshot verification.
