@@ -3130,7 +3130,7 @@ content: "";
     position: absolute;
     inset: 0;
     z-index: -1;
-    background: linear-gradient(180deg, rgba(15,23,42,.08), rgba(15,23,42,.68));
+    background: linear-gradient(180deg, rgba(15,23,42,.01), rgba(15,23,42,.43));
     pointer-events: none;
 }
 
@@ -4773,14 +4773,16 @@ button,
    Director — modern global search / command palette
    -------------------------------------------------------------------------- */
 .zazu-command-search {
-    min-width: 240px;
+    min-width: 300px;
+    width: min(360px, 32vw);
+    position: relative;
 }
 
 .zazu-command-trigger {
     min-height: 42px;
     border: 1px solid var(--zazu-border-strong);
-    border-radius: 11px;
-    background: color-mix(in srgb, var(--zazu-surface) 88%, transparent);
+    border-radius: 10px;
+    background: linear-gradient(135deg, color-mix(in srgb, var(--zazu-primary-soft) 55%, var(--zazu-surface)), color-mix(in srgb, var(--zazu-surface) 92%, transparent));
     color: var(--zazu-muted);
     box-shadow: 0 4px 14px color-mix(in srgb, var(--zazu-ink) 5%, transparent);
     transition: border-color 160ms ease, background-color 160ms ease, box-shadow 160ms ease, color 160ms ease;
@@ -5260,3 +5262,52 @@ button,
     font-size: 11px;
     line-height: 1.45;
 }
+
+/* DIRECTOR — commercial surface depth + intentional action hierarchy. */
+.zazu-card,
+.zazu-panel,
+.zazu-module,
+.zazu-route-card,
+.zazu-dash-surface {
+    background: color-mix(in srgb, var(--zazu-card-bg) 84%, transparent);
+    border-color: color-mix(in srgb, var(--zazu-card-border) 88%, var(--zazu-primary-soft));
+    box-shadow:
+        0 1px 0 color-mix(in srgb, #fff 38%, transparent),
+        0 10px 30px color-mix(in srgb, var(--zazu-ink) 7%, transparent);
+    backdrop-filter: blur(12px) saturate(115%);
+    -webkit-backdrop-filter: blur(12px) saturate(115%);
+}
+
+.zazu-card:hover,
+.zazu-panel:hover,
+.zazu-module:hover,
+.zazu-route-card:hover,
+.zazu-dash-surface:hover {
+    box-shadow:
+        0 1px 0 color-mix(in srgb, #fff 45%, transparent),
+        0 14px 34px color-mix(in srgb, var(--zazu-primary) 10%, transparent);
+}
+
+.zazu-btn-primary,
+.zazu-btn-cta {
+    border: 1px solid var(--zazu-primary);
+    background: linear-gradient(135deg, var(--zazu-primary), var(--zazu-primary-deep));
+    color: var(--zazu-primary-ink);
+    font-weight: 800;
+    box-shadow: 0 8px 20px color-mix(in srgb, var(--zazu-primary) 22%, transparent);
+}
+
+.zazu-btn-primary:hover,
+.zazu-btn-cta:hover {
+    border-color: var(--zazu-primary-hover);
+    background: linear-gradient(135deg, var(--zazu-primary-hover), var(--zazu-primary-deep));
+    box-shadow: 0 11px 24px color-mix(in srgb, var(--zazu-primary) 25%, transparent);
+    transform: translateY(-1px);
+}
+
+.zazu-btn-secondary {
+    background: color-mix(in srgb, var(--zazu-surface-2) 72%, transparent);
+    color: var(--zazu-ink);
+    border-color: var(--zazu-border-strong);
+}
+
