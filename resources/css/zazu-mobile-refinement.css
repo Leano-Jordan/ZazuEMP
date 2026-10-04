@@ -503,8 +503,8 @@
 .zazu-helper-kicker,
 .zazu-helper-step-label {
     color: var(--zazu-primary);
-    font-size: 9px;
-    font-weight: 850;
+    font-size: var(--zazu-font-size-meta);
+    font-weight: var(--zazu-weight-bold);
     letter-spacing: .09em;
     text-transform: uppercase;
 }
