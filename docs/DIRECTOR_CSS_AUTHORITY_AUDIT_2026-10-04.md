@@ -81,10 +81,13 @@ Remaining !important declarations are predominantly accessibility, reduced-motio
 3. App-level obsolete contrast/form hard-coded colour layer.
 4. App-level obsolete compact-navigation override layer.
 5. Stale mobile title override.
+6. Six CSS-only dead component selectors from the former extension layer.
 
 ## Blade selector discipline
 
 The extension layer is now constrained by component-specific class ownership rather than generic selectors. This reduces the risk that a selector intended for one specialized surface silently becomes a global application rule.
+
+Source checks also identified six selectors that existed only in the former extension CSS: zazu-asset-manifest, zazu-dashboard-telemetry, zazu-report-grid, zazu-supplier-network, zazu-travel-register and zazu-workspace-online. Their rules were removed.
 
 A complete semantic selector-vs-Blade inventory remains a source-analysis task; rendered browser inspection is still required before declaring visual acceptance.
 
