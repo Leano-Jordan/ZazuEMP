@@ -1111,3 +1111,375 @@ button:focus-visible {
 }
 
 /* No pure-white application canvas. White is reserved for deliberate controls/text. */
+
+/* ==========================================================================
+   DIRECTOR SAAS POLISH PASS — 2026-10-04
+   Reference-led refinement:
+   - blue palette reference: restrained blue accents, not blue-everything
+   - navbar reference: compact hierarchy and strong active state
+   - booking/calendar references: dense information, clear grouping
+   - dashboard references: metrics + work areas with deliberate whitespace
+   - landing references: strong hierarchy without oversized decoration
+   ========================================================================== */
+
+:root {
+    --zazu-saas-radius: 10px;
+    --zazu-saas-radius-sm: 8px;
+    --zazu-saas-gap: 14px;
+    --zazu-saas-section-gap: 20px;
+    --zazu-saas-shadow: 0 3px 12px rgba(24, 52, 78, .07);
+    --zazu-saas-shadow-hover: 0 7px 18px rgba(24, 52, 78, .10);
+}
+
+/* Stop nested surfaces from looking like a stack of boxes. */
+.zazu-card,
+.zazu-panel,
+.zazu-form-section,
+.zazu-module,
+.zazu-document,
+.zazu-route-card,
+.zazu-choice-card,
+.zazu-catalogue-card,
+.zazu-filter-card,
+.zazu-context-card,
+.zazu-calendar-shell,
+.zazu-next-action,
+.zazu-dashboard-attention,
+.zazu-dashboard-workbench {
+    border-radius: var(--zazu-saas-radius);
+    box-shadow: var(--zazu-saas-shadow);
+}
+
+.zazu-card:hover,
+.zazu-panel:hover,
+.zazu-route-card:hover,
+.zazu-choice-card:hover,
+.zazu-catalogue-card:hover {
+    box-shadow: var(--zazu-saas-shadow-hover);
+}
+
+/* Give dashboard content a deliberate rhythm rather than isolated widgets. */
+.zazu-dashboard-grid,
+.zazu-dashboard-layout,
+.zazu-dashboard-bento,
+.zazu-workbench-grid,
+.zazu-module-grid {
+    gap: var(--zazu-saas-gap);
+}
+
+.zazu-dashboard-section,
+.zazu-dashboard-block,
+.zazu-workbench-section {
+    margin-top: var(--zazu-saas-section-gap);
+}
+
+/* Metric cards: compact, legible, useful at a glance. */
+.zazu-metric-card {
+    position: relative;
+    overflow: hidden;
+    padding: 15px 16px 14px;
+    border-radius: var(--zazu-saas-radius);
+}
+
+.zazu-metric-card::before {
+    left: 0;
+    right: auto;
+    width: 3px;
+    height: 34px;
+    top: 16px;
+    border-radius: 0 3px 3px 0;
+}
+
+.zazu-metric-label {
+    color: var(--zazu-muted);
+    font-size: 10px;
+    font-weight: 800;
+    letter-spacing: .06em;
+    text-transform: uppercase;
+}
+
+.zazu-metric-value {
+    margin-top: 5px;
+    font-size: clamp(21px, 2vw, 28px);
+    font-weight: 800;
+    letter-spacing: -.035em;
+    font-variant-numeric: tabular-nums;
+}
+
+.zazu-metric-trend {
+    margin-top: 5px;
+    color: var(--zazu-muted);
+    font-size: 10.5px;
+}
+
+/* Page headers: compact SaaS hierarchy, not giant marketing banners. */
+.zazu-page-header,
+.zazu-page-intro {
+    margin-bottom: 16px;
+}
+
+.zazu-page-header-actions {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+
+.zazu-page-header .zazu-eyebrow {
+    margin-bottom: 4px;
+}
+
+/* Tables should feel like operational software, not spreadsheets pasted into cards. */
+.zazu-table-wrap,
+.zazu-table-container,
+.zazu-record-list {
+    overflow: hidden;
+    border: 1px solid var(--zazu-border);
+    border-radius: var(--zazu-saas-radius);
+    background: var(--zazu-surface);
+}
+
+.zazu-table {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0;
+}
+
+.zazu-table thead th {
+    height: 38px;
+    padding: 0 12px;
+    color: var(--zazu-sidebar-ink);
+    background: var(--zazu-page-deep);
+    font-size: 9.5px;
+    font-weight: 800;
+    letter-spacing: .055em;
+    text-transform: uppercase;
+    white-space: nowrap;
+}
+
+.zazu-table tbody td {
+    height: 48px;
+    vertical-align: middle;
+}
+
+.zazu-table tbody tr:last-child td {
+    border-bottom: 0;
+}
+
+/* Filter/search rows become one coherent control strip. */
+.zazu-filter-bar,
+.zazu-toolbar,
+.zazu-list-toolbar {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: wrap;
+    padding: 10px;
+    border: 1px solid var(--zazu-border);
+    border-radius: var(--zazu-saas-radius-sm);
+    background: var(--zazu-surface-2);
+}
+
+.zazu-filter-bar .zazu-input,
+.zazu-toolbar .zazu-input,
+.zazu-list-toolbar .zazu-input {
+    min-height: 38px;
+}
+
+.zazu-filter-bar .zazu-btn,
+.zazu-toolbar .zazu-btn,
+.zazu-list-toolbar .zazu-btn {
+    min-height: 38px;
+}
+
+/* Calendar / scheduling surfaces: stronger grid hierarchy and less empty chrome. */
+.zazu-calendar-shell {
+    overflow: hidden;
+}
+
+.zazu-calendar-toolbar {
+    min-height: 50px;
+    padding: 8px 12px;
+    border-bottom: 1px solid var(--zazu-border);
+    background: var(--zazu-surface-2);
+}
+
+.zazu-calendar-grid {
+    border-color: var(--zazu-border);
+    background: var(--zazu-surface);
+}
+
+.zazu-calendar-day,
+.zazu-calendar-cell {
+    min-height: 82px;
+    border-color: var(--zazu-border);
+}
+
+.zazu-calendar-day.is-today,
+.zazu-calendar-cell.is-today {
+    background: var(--zazu-primary-soft);
+    box-shadow: inset 0 2px 0 var(--zazu-primary);
+}
+
+.zazu-calendar-event {
+    border-radius: 5px;
+    border-left: 3px solid var(--zazu-primary);
+    background: var(--zazu-primary-soft);
+    color: var(--zazu-primary-deep);
+    font-size: 10px;
+    font-weight: 700;
+}
+
+/* Detail pages: predictable label/value rhythm. */
+.zazu-detail-grid,
+.zazu-info-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0;
+    border-top: 1px solid var(--zazu-border);
+}
+
+.zazu-detail-grid > *,
+.zazu-info-grid > * {
+    min-width: 0;
+    padding: 12px 14px;
+    border-right: 1px solid var(--zazu-border);
+    border-bottom: 1px solid var(--zazu-border);
+}
+
+.zazu-detail-label,
+.zazu-info-label {
+    color: var(--zazu-muted);
+    font-size: 10px;
+    font-weight: 750;
+    text-transform: uppercase;
+    letter-spacing: .045em;
+}
+
+.zazu-detail-value,
+.zazu-info-value {
+    margin-top: 4px;
+    font-size: 12.5px;
+    line-height: 1.4;
+}
+
+/* Secondary actions should stop competing with the primary action. */
+.zazu-actionbar,
+.zazu-form-actions,
+.zazu-page-actions {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+
+.zazu-actionbar {
+    padding: 10px 12px;
+    border-top: 1px solid var(--zazu-border);
+    background: var(--zazu-surface-2);
+}
+
+.zazu-actionbar .zazu-btn-primary,
+.zazu-form-actions .zazu-btn-primary {
+    min-width: 112px;
+}
+
+/* Notifications / alerts: clear semantic hierarchy, no giant coloured boxes. */
+.zazu-alert,
+.zazu-toast,
+.zazu-notice {
+    border-radius: var(--zazu-saas-radius-sm);
+    box-shadow: 0 5px 16px rgba(24, 52, 78, .10);
+}
+
+.zazu-alert-title,
+.zazu-toast-title,
+.zazu-notice-title {
+    font-weight: 800;
+}
+
+.zazu-alert-copy,
+.zazu-toast-copy,
+.zazu-notice-copy {
+    line-height: 1.45;
+}
+
+/* Consistent keyboard focus across the product. */
+.zazu-btn:focus-visible,
+.zazu-nav-link:focus-visible,
+.zazu-section-tabs a:focus-visible,
+.zazu-input:focus-visible,
+.zazu-select:focus-visible,
+.zazu-textarea:focus-visible,
+.zazu-user-trigger:focus-visible,
+.zazu-theme-toggle:focus-visible,
+.zazu-header-settings:focus-visible {
+    outline: 2px solid var(--zazu-primary);
+    outline-offset: 2px;
+}
+
+/* Mobile: preserve hierarchy instead of simply stacking desktop blocks. */
+@media (max-width: 820px) {
+    .zazu-page-header,
+    .zazu-page-intro {
+        margin-bottom: 12px;
+    }
+
+    .zazu-page-header-actions,
+    .zazu-form-actions,
+    .zazu-page-actions {
+        width: 100%;
+    }
+
+    .zazu-page-header-actions .zazu-btn,
+    .zazu-form-actions .zazu-btn,
+    .zazu-page-actions .zazu-btn {
+        flex: 1 1 auto;
+    }
+
+    .zazu-detail-grid,
+    .zazu-info-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .zazu-detail-grid > *,
+    .zazu-info-grid > * {
+        border-right: 0;
+    }
+
+    .zazu-calendar-day,
+    .zazu-calendar-cell {
+        min-height: 64px;
+    }
+
+    .zazu-filter-bar,
+    .zazu-toolbar,
+    .zazu-list-toolbar {
+        align-items: stretch;
+    }
+
+    .zazu-filter-bar > *,
+    .zazu-toolbar > *,
+    .zazu-list-toolbar > * {
+        min-width: 0;
+    }
+}
+
+@media (max-width: 520px) {
+    .zazu-card,
+    .zazu-panel,
+    .zazu-form-section {
+        border-radius: 8px;
+    }
+
+    .zazu-metric-card {
+        padding: 13px 14px;
+    }
+
+    .zazu-table-wrap,
+    .zazu-table-container,
+    .zazu-record-list {
+        border-radius: 8px;
+    }
+}
