@@ -92,4 +92,38 @@ class InterfaceRegressionTest extends TestCase
             ->assertDontSee('Purchasing &amp; resources', false)
             ->assertDontSee('Money &amp; control', false);
     }
+
+    public function test_resource_register_layout_keeps_content_distributed_and_actions_bounded(): void
+    {
+        $css = file_get_contents(resource_path('css/zazu-final-visual-sweep.css'));
+
+        $this->assertStringContainsString('grid-template-columns: minmax(260px, 1.2fr) minmax(130px, .55fr) minmax(0, 2.3fr);', $css);
+        $this->assertStringContainsString('.zazu-assets-directory .zazu-action-group {', $css);
+        $this->assertStringContainsString('.zazu-inventory-directory .zazu-action-group {', $css);
+        $this->assertStringContainsString('grid-template-columns: minmax(150px, 1.25fr) repeat(3, minmax(88px, 1fr)) auto;', $css);
+        $this->assertStringNotContainsString('justify-content: flex-end;\n    gap: 8px;\n    padding-left: 16px;', $css);
+    }
+
+    public function test_shared_page_banners_inherit_workspace_state_visual_contract(): void
+    {
+        $css = file_get_contents(resource_path('css/app.css'));
+
+        $this->assertStringContainsString('var(--zazu-dashboard-image)', $css);
+        $this->assertStringContainsString('.zazu-command-band .zazu-eyebrow', $css);
+        $this->assertStringContainsString('.zazu-command-meta {', $css);
+        $this->assertStringContainsString('background: rgba(2, 15, 27, .44);', $css);
+    }
+
+    public function test_public_landing_has_explicit_foreground_surface_pairings_and_balanced_plan_delivery(): void
+    {
+        $view = file_get_contents(resource_path('views/landing.blade.php'));
+
+        $this->assertStringContainsString('.brand strong{color:#12324D}', $view);
+        $this->assertStringContainsString('.topnav .register,.topnav .login{', $view);
+        $this->assertStringContainsString('.telemetry small,.record small,.record-label{color:#496A83}', $view);
+        $this->assertStringContainsString('.compare>article+article{background:#0B2A40;color:#F5FAFF}', $view);
+        $this->assertStringContainsString('.feature.mini:nth-of-type(4){grid-column:1 / span 6;grid-row:3}', $view);
+        $this->assertStringContainsString('.feature.mini:nth-of-type(5){grid-column:7 / -1;grid-row:3}', $view);
+    }
+
 }
