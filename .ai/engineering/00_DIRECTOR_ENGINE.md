@@ -218,3 +218,83 @@ When engines disagree:
 5. never merge contradictory engine conclusions silently.
 
 The Director is responsible for producing one current next action from the combined evidence.
+
+
+## Director UI SAFETY GATE — RECOVERY BEFORE RE-DESIGN
+
+This section is mandatory for UI-affecting execution. It exists because technically valid CSS changes can still make the product materially worse.
+
+### 1. Establish a visual baseline before changing anything
+
+Before authorizing a meaningful UI change, record:
+- current HEAD/ref;
+- affected screens/routes;
+- current shared visual authority/token source;
+- current component owners/selectors;
+- known-good visual evidence when available;
+- repository reference images and the concrete visual characteristics they are intended to communicate;
+- current automated/browser evidence;
+- known recent UI regressions and rejected approaches.
+
+If a recent known-good implementation exists, it is the recovery baseline. Do not treat the current degraded screen as the only truth.
+
+### 2. Reference images are evidence, not decoration
+
+When the repository contains reference images, the UI/UX engine must inspect them before proposing a visual direction. It must extract observable characteristics such as:
+- surface/background relationships;
+- colour hierarchy;
+- typography scale and weight;
+- density;
+- spacing rhythm;
+- navigation treatment;
+- control hierarchy;
+- panel/card treatment;
+- contrast and readability;
+- responsive composition.
+
+Do not copy an image literally and do not invent a generic SaaS treatment merely because the task says "professional".
+
+### 3. Smallest justified visual delta
+
+Prefer one bounded visual target per cycle. Do not combine palette, typography, shell, forms, tables and responsive restructuring in one speculative sweep unless evidence establishes a single shared root cause.
+
+Shared-token changes require explicit blast-radius review before implementation.
+
+### 4. WORSE-THAN-BASELINE VETO
+
+A UI change is rejected when rendered evidence shows a material regression against the recorded baseline, including:
+- lower readability or contrast;
+- weaker primary/secondary action distinction;
+- increased unnecessary whitespace;
+- reduced useful information density;
+- more ambiguous interactive states;
+- weaker navigation distinction;
+- worse form or table usability;
+- increased visual inconsistency;
+- loss of important reference characteristics;
+- new clipping, overlap or responsive failure;
+- generic/generated visual treatment replacing deliberate Zazu styling.
+
+A cleaner stylesheet, passing build, or passing automated test does not override this veto.
+
+### 5. Recovery rule
+
+If a UI batch is materially worse than its baseline:
+**STOP → preserve evidence → identify responsible change → revert or restore the affected visual state → record the failed approach → do not stack another cosmetic patch.**
+
+If causality cannot be established safely, mark the case BLOCKED/FORENSICS rather than guessing.
+
+### 6. Visual acceptance state
+
+UI work must carry one of these states:
+- VISUAL BASELINE RECORDED;
+- IMPLEMENTED / VISUAL UNVERIFIED;
+- VISUAL VERIFIED;
+- VISUAL REJECTED / RECOVERY REQUIRED;
+- BLOCKED / INSUFFICIENT EVIDENCE.
+
+"Implemented" and "tested" are never synonyms for "looks better".
+
+### 7. Director acceptance authority
+
+No specialist may declare a meaningful UI redesign successful solely from source inspection or automated test output. Director accepts only after the required rendered comparison and regression evidence are reconciled.
