@@ -841,7 +841,9 @@ body {
 .zazu-panel {
     border: 1px solid var(--zazu-border);
     border-radius: var(--zazu-radius-lg);
-    background: var(--zazu-surface);
+    background: color-mix(in srgb, var(--zazu-surface) 90%, transparent);
+    backdrop-filter: blur(10px) saturate(110%);
+    -webkit-backdrop-filter: blur(10px) saturate(110%);
     box-shadow: var(--zazu-shadow);
 }
 
