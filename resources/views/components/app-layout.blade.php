@@ -68,7 +68,7 @@
             <nav class="zazu-nav zazu-nav-hierarchical" aria-label="Primary">
                 <div class="zazu-nav-hierarchy">
                     <div class="zazu-nav-area {{ request()->routeIs('dashboard','work.*','customers.*','calendar.*') ? 'is-active' : '' }}" data-zazu-nav-area>
-                        <button type="button" class="zazu-nav-area-trigger" data-zazu-nav-trigger aria-expanded="{{ request()->routeIs('dashboard','work.*','customers.*','calendar.*') ? 'true' : 'false' }}" aria-controls="zazu-nav-workspace"><span class="zazu-nav-area-title">Work</span><span class="zazu-nav-area-chevron" aria-hidden="true">›</span></button>
+                        <button type="button" class="zazu-nav-area-trigger" data-zazu-nav-trigger aria-expanded="false" aria-controls="zazu-nav-workspace"><span class="zazu-nav-area-title">Work</span><span class="zazu-nav-area-chevron" aria-hidden="true">›</span></button>
                         <div class="zazu-nav-flyout" id="zazu-nav-workspace" data-zazu-nav-panel><div class="zazu-nav-flyout-links">
                             <a href="{{ route('dashboard') }}" class="zazu-nav-link {{ request()->routeIs('dashboard') ? 'active' : '' }}" @if(request()->routeIs('dashboard')) aria-current="page" @endif>Dashboard</a>
                             @if($can('work.view'))<a href="{{ route('work.index') }}" class="zazu-nav-link {{ request()->routeIs('work.*') ? 'active' : '' }}" @if(request()->routeIs('work.*')) aria-current="page" @endif>Jobs</a>@endif
