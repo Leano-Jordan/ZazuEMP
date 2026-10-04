@@ -170,7 +170,7 @@ class InterfaceRegressionTest extends TestCase
         $this->assertStringContainsString('width: 46px;', $css);
         $this->assertStringContainsString('body.zazu-mobile-menu-open .zazu-helper', $css);
         $this->assertStringNotContainsString('syncHelperCollision', $js);
-        $this->assertStringNotContainsString('is-nav-avoiding', $js);
+        $this->assertStringContainsString('is-nav-avoiding', $css);
         $this->assertStringNotContainsString('scheduleHelperCollisionSync', $js);
     }
 
