@@ -149,3 +149,20 @@ Public navigation links, CTAs and later bento items can drift vertically or leav
 **Control:** landing navigation uses a common 40px control rhythm; Plan and Delivery explicitly occupy the final 50/50 desktop row; responsive rules reset explicit placement below 920px. Do not reintroduce uneven CTA heights or unbounded final-row auto-placement.
 
 **Status:** CONTROL ACTIVE
+
+## REG-017 — Director visual recovery invariants
+
+The 2026-10-05 UI recovery exposed a cluster of regressions caused by later CSS/JS overrides defeating earlier visual decisions.
+
+**Control:** treat these as protected shared contracts:
+- `.zazu-command-band` remains an intentionally dark, image-led page-introduction surface with explicit light foregrounds. Late generic light-surface harmonization must never target it.
+- The light application palette remains blue-slate and must not drift back to white/near-white as the default shell direction.
+- The canonical card/panel primitive owns the restrained 10px/110% glass treatment; later visual sweeps must not remove or duplicate that authority.
+- Global desktop search is bounded utility chrome and must not expand the application shell. Mobile search stays a full-width utility row.
+- The Zazu Helper remains the established mascot size. It yields specifically to Work and Sales navigation popovers by moving to the right edge of the active popover; generic collision engines must not be reintroduced.
+- Customer quick-create must expose a permissioned path to the full customer editor after creation.
+- Customer forms present identity and primary contact information before business, billing and tax details.
+- Native customer dialogs must have an explicit viewport-centering contract.
+- Any broad visual change touching these contracts requires source re-read, regression review and rendered desktop/mobile/light/dark acceptance before closure.
+
+**Status:** CONTROL ACTIVE
