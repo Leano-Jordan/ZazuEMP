@@ -238,6 +238,7 @@ Route::middleware(['auth', 'auth.session', 'business.context'])->group(function 
     Route::post('/customers/import', [CustomerImportController::class, 'import'])->middleware('permission:customers.create')->name('customers.import.store');
     Route::get('/customers/create', [CustomerController::class, 'create'])->middleware('permission:customers.create')->name('customers.create');
     Route::post('/customers', [CustomerController::class, 'store'])->middleware('permission:customers.create')->name('customers.store');
+    Route::post('/customers/quick-from-work', [CustomerController::class, 'quickStoreFromWork'])->middleware('permission:customers.create')->name('customers.quick_from_work');
     Route::get('/customers/{customer}', [CustomerController::class, 'show'])->middleware('permission:customers.view')->name('customers.show');
     Route::get('/customers/{customer}/edit', [CustomerController::class, 'edit'])->middleware('permission:customers.update')->name('customers.edit');
     Route::put('/customers/{customer}', [CustomerController::class, 'update'])->middleware('permission:customers.update')->name('customers.update');
