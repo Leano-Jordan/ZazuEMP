@@ -78,21 +78,21 @@ See `READINESS_REGISTER.md` for live gate direction.
 
 Main now contains the completed niche-focus, progressive-disclosure, offline-first architecture and commercial-isolation source cycle from 2026-10-03.
 
-Latest verified remote main: `d81c1bc81326ae2bfc471cdd43981795aa00f4b3` (CI-workflow correction; application behaviour is unchanged from the previously assessed application candidate).
+Latest verified remote main: `b6495964f5f39e2caea4c6512e5900e0784b9e4d` (current-head populated authorization/isolation challenge added and passed; prior d81c1bc... remains the CI-workflow correction).
 
 ### Current-head verification — 2026-10-04
 
-- `composer test`: **241 passed, 1,377 assertions**.
+- `composer test`: **242 passed, 1,381 assertions**.
 - Full Playwright suite against a fresh isolated seeded SQLite database: **25 passed, 2 intentionally skipped**. The skips are the registration journey's explicit mobile/tablet exclusions to avoid repeated shared-IP registration throttling; responsive entry surfaces ran on all three projects.
 - Desktop, Pixel 7 emulation and tablet projects exercised populated Work inspection, financial replay/overpayment, manager/staff authorization, onboarding, theme tokens and landing-to-workspace navigation.
 - Theme/navigation tests now authenticate through the seeded demo owner instead of silently skipping when an external storage-state file is absent. A local E2E-only adjustment opens the collapsed public navigation on mobile/tablet before asserting its actions; the full passing run included that working-tree change.
 - A four-worker local run produced two long-workflow timeouts; the same full suite passed serially. Classify those timeouts as runner-load-sensitive (F8), not application failures. CI is configured to use one worker.
 - A responsive Work-inspector screenshot was rendered and reviewed. Closed inspector state is now explicitly hidden and non-interactive; opened content remains vertically readable on phone emulation.
 - The PHP CLI still emits the missing `pdo_firebird` extension startup warning. It did not prevent the test suite from running. The earlier `Throwable` import warning did not recur in this run.
-- GitHub Actions on current `main` `d81c1bc81326ae2bfc471cdd43981795aa00f4b3` are now **VERIFIED / PASSED**: Laravel, Quality, PHPMD, Psalm Security Scan, browser smoke, CodeQL and populated upgrade/rollback all completed successfully. SonarCloud remains intentionally skipped by workflow condition.
+- GitHub Actions on current `main` `b6495964f5f39e2caea4c6512e5900e0784b9e4d` are **VERIFIED / PASSED**: Laravel, Quality, PHPMD, Psalm Security Scan, browser smoke, CodeQL and populated upgrade/rollback all completed successfully. SonarCloud remains intentionally skipped by workflow condition.
 - Populated upgrade/rollback run `37202719119` exercised baseline seeding, backup creation, current migrations, populated-data preservation, backup restore, private-media recovery, migration reapplication and final migration-state verification; all passed.
 
-The 2026-10-03 readiness scorecard remains historical. Recovery and upgrade/rollback evidence is now current and verified; physical-device acceptance, final adversarial authorization/isolation certification and legal/licence/brand closure remain open.
+The 2026-10-03 readiness scorecard remains historical. Current-head recovery, upgrade/rollback and populated authorization/isolation evidence are now verified; physical-device acceptance and legal/licence/brand closure remain open.
 
 Previous green figures are not reused in place of this current-head evidence.
 
@@ -119,6 +119,32 @@ FINAL AUTHORIZATION / ISOLATION CHALLENGE → LEGAL, LICENCE & BRAND CLOSURE →
 Last updated: 2026-10-04
 
 
+## Director populated authorization/isolation cycle — 2026-10-04
+
+Target: prove populated multi-business read, search and mutation isolation on the current main head.
+
+Completed:
+- added PopulatedAuthorizationIsolationTest;
+- seeded the complete Demo Scenario in Business A;
+- created a separate Business B with its own owner and customer;
+- verified Business B cannot view Business A's populated customer, Work/Event or invoice;
+- verified Business B search cannot surface Business A's customer;
+- verified Business B cannot create Work against Business A's customer;
+- verified Business B's own customer remains available;
+- current Laravel CI run 37203066802 passed the challenge as part of 242 tests / 1,381 assertions;
+- current Psalm, PHPMD, Quality, CodeQL, browser and populated upgrade/rollback workflows also passed for the same head.
+
+Security disposition:
+- Final populated authorization/isolation challenge: VERIFIED / PROVEN at maturity 4/5.
+- No cross-business data disclosure or mutation was evidenced by the challenge.
+- This is application/runtime evidence, not a claim of formal security certification.
+
+Next Director target:
+LEGAL / LICENCE / BRAND CLOSURE → PHYSICAL-DEVICE ACCEPTANCE → FINAL DIRECTOR RE-AUDIT
+
+Last updated: 2026-10-04
+
+
 ## Current product-direction note
 
 - Primary niche focus is now a presentation preference stored per business membership, separate from experience level and permissions.
@@ -133,7 +159,7 @@ Select the highest-risk unresolved item that is:
 3. supported by current evidence;
 4. bounded enough to execute safely.
 
-Next release-evidence target: final populated authorization/isolation challenge, then legal/licence/brand closure and physical-device acceptance before final Director re-audit.
+Next release-evidence target: legal/licence/brand closure and physical-device acceptance before final Director re-audit.
 
 ## Evidence boundary
 
@@ -150,7 +176,7 @@ After every meaningful cycle:
 - update READINESS_REGISTER when a gate changes;
 - create a dated historical record only when the event is significant.
 
-Last updated: 2026-10-01
+Last updated: 2026-10-04
 
 
 ## Latest completed cycle — 2026-09-28
