@@ -833,3 +833,37 @@ Active controls:
 - persistent decision recording through existing Director state and ledgers.
 
 This is a control-plane enhancement. It does not change Zazu's product scope or create a competing backlog/acceptance authority.
+
+
+## Director continuation — 2026-10-04
+
+### Current main
+- Current head after release-documentation and UI refinement: `3f8c0862d0825dd14fef2bb88442862d2779bc75`.
+- Release-documentation design set is present and implementation-audited.
+- Brand clearance record is present and remains OPEN/HIGH.
+- Physical phone/tablet acceptance record is present and remains OPEN pending human real-device testing.
+
+### UI/UX refinement
+Director reviewed Elizabeth Alli / DesignerUp's practical colour guidance and applied the lesson to the existing final visual authority rather than adding another stylesheet:
+- consolidated the effective light UI around the existing cobalt-iris primary family;
+- reinstated sea-glass as a restrained supporting accent;
+- increased plane/card separation to reduce the white-on-white slab effect;
+- reduced the content maximum from 1480px to 1320px;
+- reduced shared surface radii to 10px/6px;
+- constrained common form controls and filter controls;
+- made desktop `.zazu-btn.w-full` actions intrinsic-width while preserving mobile full-width behaviour;
+- kept the authentication primary intentionally full-width;
+- tightened table cell padding and command-surface height.
+
+A regression test now checks the key colour/proportion tokens.
+
+### Verification state
+The latest push has triggered the normal GitHub Actions suite. At the time of this state update the newest runs for `3f8c0862...` are not yet observed as completed, so no new CI green claim is made.
+
+### Release gate interpretation
+Technical evidence previously accepted remains valid. The next release gates are:
+1. complete real-world privacy/legal details and review;
+2. finish dependency/licence/notice evidence;
+3. clear the Zazu brand;
+4. complete physical phone/tablet acceptance;
+5. final Director re-audit on the selected release commit.
