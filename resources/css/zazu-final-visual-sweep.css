@@ -1027,7 +1027,7 @@ padding:24px 28px
 }
 
 .zazu-dash-kicker {
-display:inline-flex;align-items:center;gap:7px;color:var(--zazu-blue-brand);font-family:var(--zazu-font-ui);font-size:11px;font-weight:700,ui-monospace,monospace;letter-spacing:.11em;text-transform:uppercase
+display:inline-flex;align-items:center;gap:7px;color:var(--zazu-blue-brand);font-family:var(--zazu-font-ui);font-size:11px;font-weight:700;letter-spacing:.11em;text-transform:uppercase
 }
 
 .zazu-dash-hero h2 {
@@ -4391,5 +4391,255 @@ button,
     .zazu-metric-value,
     .zazu-stat-value {
         font-size: 22px;
+    }
+}
+
+
+/* --------------------------------------------------------------------------
+   Director — dashboard rendering hardening
+   Exact selectors mirror dashboard.blade.php.
+   -------------------------------------------------------------------------- */
+.zazu-dash-hero {
+    background: linear-gradient(120deg, var(--zazu-surface) 0%, var(--zazu-surface-2) 62%, var(--zazu-primary-soft) 100%);
+}
+
+.zazu-dash-hero-main {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    min-width: 0;
+}
+
+.zazu-dash-hero h2 {
+    font-family: var(--zazu-font-display);
+    font-size: clamp(28px, 3vw, 40px);
+    line-height: 1.02;
+}
+
+.zazu-dash-hero-main > p {
+    font-size: 13px;
+    line-height: 1.65;
+}
+
+.zazu-dash-hero-side:not(.zazu-dash-hero-visual) {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: 6px;
+}
+
+.zazu-dash-hero-side:not(.zazu-dash-hero-visual) > .zazu-dash-side-label,
+.zazu-dash-hero-side:not(.zazu-dash-hero-visual) > strong,
+.zazu-dash-hero-side:not(.zazu-dash-hero-visual) > span:not(.zazu-dash-side-label) {
+    display: block;
+}
+
+.zazu-dash-hero-side:not(.zazu-dash-hero-visual) > strong {
+    margin-top: 0;
+    font-family: var(--zazu-font-display);
+}
+
+.zazu-dash-surface-head {
+    padding: 18px 20px 16px;
+}
+
+.zazu-dash-surface-head h3 {
+    font-family: var(--zazu-font-display);
+    font-size: 18px;
+    line-height: 1.2;
+}
+
+.zazu-dash-surface-head p {
+    font-size: 12px;
+    line-height: 1.55;
+}
+
+.zazu-dash-event {
+    padding-block: 13px;
+}
+
+.zazu-dash-event-copy strong {
+    font-size: 13px;
+    line-height: 1.35;
+}
+
+.zazu-dash-event-copy span,
+.zazu-dash-event-copy small {
+    font-size: 12px;
+    line-height: 1.4;
+}
+
+.zazu-dash-empty {
+    display: grid;
+    gap: 10px;
+    padding: 34px 22px;
+    font-size: 12px;
+    line-height: 1.55;
+}
+
+.zazu-dash-empty strong {
+    display: block;
+    font-family: var(--zazu-font-display);
+    font-size: 15px;
+    line-height: 1.3;
+}
+
+.zazu-dash-empty span {
+    display: block;
+}
+
+.zazu-dash-metrics {
+    display: grid;
+    gap: 10px;
+    align-content: start;
+}
+
+.zazu-dash-metric {
+    display: grid;
+    gap: 4px;
+    align-content: start;
+    min-height: 108px;
+    padding: 17px 40px 16px 18px;
+}
+
+.zazu-dash-metric > span,
+.zazu-dash-metric > strong,
+.zazu-dash-metric > small {
+    display: block;
+}
+
+.zazu-dash-metric > span {
+    font-size: 12px;
+    line-height: 1.35;
+}
+
+.zazu-dash-metric > strong {
+    margin: 2px 0 0;
+    font-family: var(--zazu-font-display);
+    font-size: 31px;
+    line-height: 1;
+}
+
+.zazu-dash-metric > small {
+    font-size: 12px;
+    line-height: 1.45;
+}
+
+.zazu-dash-commercial-main > div {
+    display: grid;
+    gap: 4px;
+}
+
+.zazu-dash-commercial-main span {
+    line-height: 1.35;
+}
+
+.zazu-dash-commercial-main strong {
+    font-family: var(--zazu-font-display);
+}
+
+.zazu-dash-note {
+    align-items: flex-start;
+    gap: 10px;
+    padding: 11px 12px;
+    font-size: 12px;
+}
+
+.zazu-dash-note b {
+    margin-top: 1px;
+}
+
+.zazu-dash-hero-overlay {
+    gap: 6px;
+}
+
+.zazu-dash-hero-visual .zazu-dash-hero-overlay > .zazu-dash-side-label,
+.zazu-dash-hero-visual .zazu-dash-hero-overlay > strong,
+.zazu-dash-hero-visual .zazu-dash-hero-overlay > span:not(.zazu-dash-side-label) {
+    display: block;
+}
+
+.zazu-dash-hero-visual .zazu-dash-hero-overlay > strong {
+    margin: 0;
+    font-family: var(--zazu-font-display);
+    font-size: 24px;
+    line-height: 1.05;
+}
+
+.zazu-dash-hero-visual .zazu-dash-hero-overlay > span:not(.zazu-dash-side-label) {
+    margin: 0;
+    font-size: 12px;
+    line-height: 1.45;
+}
+
+.zazu-dash-hero-visual .zazu-dash-side-line {
+    width: 100%;
+    margin-top: 8px;
+}
+
+.zazu-dash-resource-grid > .zazu-quick-link {
+    min-width: 0;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    min-height: 72px;
+    padding: 14px 18px;
+    border: 0;
+    border-right: 1px solid var(--zazu-border);
+    border-radius: 0;
+}
+
+.zazu-dash-resource-grid > .zazu-quick-link:last-child {
+    border-right: 0;
+}
+
+.zazu-dash-resource-grid > .zazu-quick-link span:first-child {
+    min-width: 0;
+    display: grid;
+    gap: 4px;
+}
+
+.zazu-dash-resource-grid > .zazu-quick-link strong {
+    font-size: 12px;
+    line-height: 1.35;
+}
+
+.zazu-dash-resource-grid > .zazu-quick-link small {
+    font-size: 11px;
+    line-height: 1.4;
+}
+
+@media (max-width: 900px) {
+    .zazu-dash-resource-grid {
+        grid-template-columns: 1fr 1fr;
+    }
+
+    .zazu-dash-resource-grid > .zazu-quick-link:nth-child(2n) {
+        border-right: 0;
+    }
+
+    .zazu-dash-resource-grid > .zazu-quick-link {
+        border-bottom: 1px solid var(--zazu-border);
+    }
+
+    .zazu-dash-resource-grid > .zazu-quick-link:nth-last-child(-n + 2) {
+        border-bottom: 0;
+    }
+}
+
+@media (max-width: 620px) {
+    .zazu-dash-resource-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .zazu-dash-resource-grid > .zazu-quick-link,
+    .zazu-dash-resource-grid > .zazu-quick-link:nth-child(2n) {
+        border-right: 0;
+        border-bottom: 1px solid var(--zazu-border);
+    }
+
+    .zazu-dash-resource-grid > .zazu-quick-link:last-child {
+        border-bottom: 0;
     }
 }

@@ -1096,3 +1096,13 @@ Zazu application of those principles:
 Acceptance boundary:
 - Source-level checks passed after the typography pass.
 - Actual browser rendering/device comparison remains required before calling the visual pass fully accepted.
+
+
+## Director UI recovery — 2026-10-04
+- Re-read current `main` before editing; recovery started from `1607f23ccc9272535bf7b722b345fd55d6f5ab96` and preserved the existing application shell and dark-theme token set.
+- Dashboard CSS was syntactically balanced but several selectors had drifted from live Blade markup; notably `.zazu-dash-resource-grid > div` targeted children that are actually `<a class="zazu-quick-link">`.
+- Helper collision math was inverted: the previous calculation used the flyout left edge and `Math.max`, which could push the Helper into the open navigation popover. It now calculates safe space from the flyout right edge and animates a purposeful avoidance move.
+- Added locally bundled Manrope Variable for UI copy and Space Grotesk Variable for display hierarchy. Light mode was shifted to a brighter blue-led summer palette; dark tokens were not changed.
+- Strengthened global field spacing, selection contrast, dashboard hierarchy, and branding validation feedback.
+- Branding image inputs now receive direct size/type errors; the shared error binding includes branding tiles.
+- Acceptance boundary: source-level checks only. Full PHPUnit/Playwright and browser/device screenshot validation still require the Zazu runtime.

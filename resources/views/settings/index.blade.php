@@ -214,6 +214,7 @@
                             <input type="file" name="logo" accept="image/jpeg,image/png,image/webp" class="hidden" data-branding-upload="logo">
                         </label>
                         <span class="zazu-branding-file" data-branding-file="logo" aria-live="polite"></span>
+                        <span class="zazu-field-error zazu-branding-error" data-branding-error="logo" role="alert" hidden>@error('logo'){{ $message }}@enderror</span>
                         @if ($business->logo_path)
                             <label class="zazu-check-row mt-3"><input type="checkbox" name="remove_logo" value="1"><span>Remove current logo</span></label>
                         @endif
@@ -239,6 +240,7 @@
                             <input type="file" name="dashboard_image" accept="image/jpeg,image/png,image/webp" class="hidden" data-branding-upload="dashboard_image">
                         </label>
                         <span class="zazu-branding-file" data-branding-file="dashboard_image" aria-live="polite"></span>
+                        <span class="zazu-field-error zazu-branding-error" data-branding-error="dashboard_image" role="alert" hidden>@error('dashboard_image'){{ $message }}@enderror</span>
                         @if ($business->dashboard_image_path)
                             <label class="zazu-check-row mt-3"><input type="checkbox" name="remove_dashboard_image" value="1"><span>Remove current picture</span></label>
                         @endif
@@ -264,6 +266,7 @@
                             <input type="file" name="wallpaper" accept="image/jpeg,image/png,image/webp" class="hidden" data-branding-upload="wallpaper">
                         </label>
                         <span class="zazu-branding-file" data-branding-file="wallpaper" aria-live="polite"></span>
+                        <span class="zazu-field-error zazu-branding-error" data-branding-error="wallpaper" role="alert" hidden>@error('wallpaper'){{ $message }}@enderror</span>
                         @if ($business->wallpaper_path)
                             <label class="zazu-check-row mt-3"><input type="checkbox" name="remove_wallpaper" value="1"><span>Remove current wallpaper</span></label>
                         @endif

@@ -208,4 +208,16 @@ class UiAccessibilityTest extends TestCase
             ->assertSee('zazu-disclosure', false)
             ->assertSee('Sound &amp; DJ', false);
     }
+
+    public function test_settings_branding_errors_have_dedicated_controls(): void
+    {
+        $response = $this->get(route('settings.index'));
+
+        $response->assertOk()
+            ->assertSee('data-branding-error="logo"', false)
+            ->assertSee('data-branding-error="dashboard_image"', false)
+            ->assertSee('data-branding-error="wallpaper"', false)
+            ->assertSee('Please correct the highlighted fields.', false);
+    }
+
 }

@@ -309,7 +309,7 @@
 <div class="zazu-content">
                 @if ($errors->any())
                     <div class="zazu-error-summary" role="alert" tabindex="-1" data-error-summary>
-                        <div class="zazu-error-summary-title">Please check the highlighted fields.</div>
+                        <div class="zazu-error-summary-title">Please correct the highlighted fields.</div>
                         <ul class="zazu-error-summary-list" data-error-summary-list></ul>
                     </div>
                 @endif
@@ -519,7 +519,7 @@
 
         const serverErrors = @json($errors->toArray());
 
-        document.querySelectorAll('.zazu-field').forEach((field) => {
+        document.querySelectorAll('.zazu-field, .zazu-branding-preview').forEach((field) => {
             const control = field.querySelector('input, select, textarea');
             if (!control) return;
 
@@ -572,7 +572,7 @@
 
         if (summary && list) {
             document.querySelectorAll('.zazu-field-error').forEach((error) => {
-                const field = error.closest('.zazu-field');
+                const field = error.closest('.zazu-field, .zazu-branding-preview');
                 const control = field?.querySelector('input, select, textarea');
                 if (!control || !error.textContent.trim()) return;
 
