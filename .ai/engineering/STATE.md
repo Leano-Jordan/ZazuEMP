@@ -867,3 +867,39 @@ Technical evidence previously accepted remains valid. The next release gates are
 3. clear the Zazu brand;
 4. complete physical phone/tablet acceptance;
 5. final Director re-audit on the selected release commit.
+
+
+## Director defect refinement — 2026-10-04
+
+### Wallpaper visibility — ROOT CAUSE CONFIRMED / FIXED AT SOURCE
+
+The business-settings save path correctly stores `wallpaper_path` in private `business-branding/` storage, the authenticated `business.media` route correctly serves it, and `app-layout.blade.php` correctly adds `zazu-has-wallpaper` plus `--zazu-wallpaper` to the body.
+
+The actual defect was CSS cascade order: later global `body { background: ... }` rules in `resources/css/zazu-final-visual-sweep.css` replaced the earlier background image declaration, so the selected wallpaper was never allowed to remain visible.
+
+Director fixed this by adding a final, more-specific `body.zazu-has-wallpaper` rule in the existing visual authority. No storage, route, database or working branding path was rewritten.
+
+Regression coverage was added to protect the rule from later cascade regressions.
+
+### New-job customer creation — UX GAP CONFIRMED / FIXED
+
+The existing create-job flow was technically correct but operationally inconvenient:
+- the job form required an existing customer;
+- when no customers existed, the page replaced the job form with a separate customer-navigation state;
+- even with existing customers, there was no in-context creation path.
+
+Director added a small in-context Add customer dialog to the existing new-job surface. It:
+- uses the existing customer-create permission boundary;
+- creates the customer inside the active business only;
+- creates a primary contact;
+- returns the new customer to the page;
+- immediately adds/selects it in the existing customer selector;
+- leaves the existing job-store transaction and customer-selection logic intact.
+
+Regression coverage verifies empty customer state, successful quick creation, duplicate-name rejection and active-business scoping.
+
+### Release-doc owner data
+
+Release documents now identify the real current solo business owner/developer as **Isaac Junior Lehlogonolo Maluleka** and the supplied operating address as **1068 Block JK, Soshanguve, Pretoria, South Africa**. The documents continue to avoid inventing a registered company or unsupported legal contact channel.
+
+Last updated: 2026-10-04
