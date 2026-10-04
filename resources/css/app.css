@@ -44,12 +44,12 @@
     --zazu-border-strong: #82B2D8;
     
     /* Primary blue — commanding yet refined */
-    --zazu-primary: #2F80FF;
+    --zazu-primary: #126BD8;
     --zazu-primary-light: #63A5FF;
     --zazu-primary-pale: #A9D3FF;
     --zazu-primary-shadow: #D4E9FF;
-    --zazu-primary-deep: #1F5FC7;
-    --zazu-primary-hover: #245FC7;
+    --zazu-primary-deep: #0F5FB8;
+    --zazu-primary-hover: #0D5CB9;
     --zazu-primary-soft: #DCEEFF;
     --zazu-primary-ink: #FFFFFF;
     
@@ -99,9 +99,9 @@
     --zazu-text-muted: #496A83;
     
     /* Blue palette — refined for modern SaaS */
-    --zazu-blue-primary: #2F80FF;
+    --zazu-blue-primary: #126BD8;
     --zazu-blue-accent: #63A5FF;
-    --zazu-blue-hover: #245FC7;
+    --zazu-blue-hover: #0D5CB9;
     --zazu-blue-light: #82B9FF;
     --zazu-blue-soft: #DCEEFF;
     --zazu-blue-subtle: #BBD8F6;
@@ -124,7 +124,7 @@
     --zazu-ui-shadow-hover: var(--zazu-card-shadow-hover);
     
     /* Brand blues */
-    --zazu-blue-brand: #2F80FF;
+    --zazu-blue-brand: #126BD8;
     --zazu-blue-vivid: #63A5FF;
     --zazu-blue-glow: #A9D3FF;
     
