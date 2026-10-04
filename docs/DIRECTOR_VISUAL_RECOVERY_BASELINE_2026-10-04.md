@@ -83,3 +83,20 @@ Before any further UI change:
 3. change the existing canonical visual system rather than adding another visual-sweep file;
 4. render desktop + mobile in both themes where applicable;
 5. reject any result that is less readable, less differentiated or more spacious than the approved baseline.
+
+## Refinement pass — 2026-10-04
+
+The first recovery established the palette but over-applied the blue canvas to light-mode application content. That produced the wrong visual relationship: light cards floating on a medium-blue page with white page typography.
+
+Refinement decision:
+- light mode canvas is now a very pale blue-gray (#E7EFF7);
+- light application surfaces are near-white blue-tinted (#F7FAFD);
+- the sidebar remains deep navy;
+- the topbar is a light elevated surface in light mode;
+- page/content typography is dark ink;
+- blue is concentrated into navigation states, primary actions and command/hero surfaces;
+- command/hero blocks are compact and visibly blue rather than oversized pale rectangles;
+- form fields are explicitly flat inside the form surface, preventing each field from becoming a separate floating card;
+- mobile controls remain touch-sized while information density is improved.
+
+This is the preferred light-mode hierarchy going forward: navy shell → pale blue canvas → elevated light surfaces → blue action accents.
