@@ -259,11 +259,9 @@ class ZazuRestoreCommand extends Command
             return null;
         }
 
-        if (isset($seen[$normalized])) {
-            $this->error('The backup archive contains duplicate entries.');
+        if (!$this->markEntrySeen($normalized, $seen)) {
             return null;
         }
-        $seen[$normalized] = true;
 
         $size = (int) ($stat['size'] ?? 0);
         if ($size < 0 || $size > self::MAX_UNCOMPRESSED_BYTES || $uncompressedBytes > self::MAX_UNCOMPRESSED_BYTES - $size) {
@@ -282,6 +280,18 @@ class ZazuRestoreCommand extends Command
         }
 
         return str_starts_with($name, 'storage/private/') && !str_ends_with($name, '/');
+    }
+
+    private function markEntrySeen(string $normalized, array &$seen): bool
+    {
+        if (isset($seen[$normalized])) {
+            $this->error('The backup archive contains duplicate entries.');
+            return false;
+        }
+
+        $seen[$normalized] = true;
+
+        return true;
     }
 
     private function validateEntryType(string $name, string $databaseEntry, string $privateEntryPrefix): bool
