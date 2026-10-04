@@ -155,3 +155,62 @@ Source verification after implementation confirms:
 The supplied screenshots are pre-change rendered evidence. This environment cannot render the user's local Zazu runtime after the change, so the final visual state must still be checked in the actual browser at desktop/mobile and light/dark widths.
 
 Next gate: rebuild assets → render Dashboard, Work, Forms and Calendar → inspect navigation hover/click/keyboard → compare against the approved references → then accept or repair.
+
+
+## Director commercial UI harmonization pass — 2026-10-04
+
+Objective: harmonize typography, colour, sizing, spacing and component relationships against the repository reference collection and current commercial SaaS conventions, while preserving Zazu's established blue corporate direction.
+
+Reference evidence applied:
+- The complete `reference ui ux images/` collection remains the design evidence set, including `blue pallette.jpg`, `NAVBAR INSPIRATION.png`, `booking calendar example.jpg`, `Background-ZAZU.jpg` and the broader dashboard/application examples.
+- The recorded reference language is now treated as an application system rather than page decoration: dark navigation rail, pale-blue canvas, elevated light surfaces, restrained blue actions, dense operational tables/calendars, readable hierarchy and mobile-first composition.
+
+External design-system research applied:
+- Atlassian: one token source for colour/spacing/typography and an 8px spacing foundation.
+- Carbon: productive UI uses a 14px base type size, spacing creates perceived relationships, and sizing/spacing scales should remain constrained.
+- Current SaaS dashboard guidance: high information density without clutter, restrained accents, tabular numeric alignment and responsive prioritisation.
+
+Changes executed on main:
+1. `resources/css/app.css`
+   - added canonical UI font, mono font, type, spacing and shape tokens;
+   - aligned the Tailwind `@theme` colour/font aliases with the same Zazu token family instead of the stale blue palette;
+   - unified the application body font stack;
+   - established a 14px body / 11px metadata / 13px nav / 24px page-title hierarchy;
+   - established 4/8/12/16/20/24/32/40px spacing steps;
+   - established 6/8/10px application radii;
+   - aligned shell geometry around a 240px navigation rail, 1320px content measure and a 64px top bar;
+   - removed the last sub-9px shared operational labels from the core stylesheet.
+
+2. `resources/css/zazu-final-visual-sweep.css`
+   - removed remaining legacy semantic colour fragments in dashboard, status, account and calendar components;
+   - moved dashboard KPIs/statuses away from JetBrains Mono; mono remains reserved for operational references/data identifiers;
+   - raised dashboard/calendar/table supporting text into the shared readable metadata range;
+   - reduced dashboard hero dominance and tightened the main dashboard grid relationships;
+   - aligned component status colours to the canonical success/warning/danger/info tokens;
+   - kept the image-overlay white treatment only where it is intentionally required for image contrast.
+
+3. `resources/css/zazu-responsive-theme.css`
+   - aligned footer/container width to the shared 1320px content measure;
+   - raised footer/context microtype to the metadata scale;
+   - brought section tabs onto the shared 32px desktop / 40px mobile rhythm;
+   - kept mobile navigation scroll ownership intact.
+
+4. `resources/css/zazu-mobile-refinement.css`
+   - changed the mobile header grid to prevent action crowding;
+   - restored a 20px mobile page-title hierarchy;
+   - increased mobile content/form breathing room without returning to excessive whitespace;
+   - preserved 44px touch-safe action targets;
+   - raised mobile calendar/supporting text to readable sizes;
+   - kept the helper/status indicator on semantic colour tokens.
+
+Source-level verification after implementation:
+- core stylesheets now report no <=9px font declarations;
+- `zazu-final-visual-sweep.css` still contains no root token system;
+- JetBrains Mono remains in only two operational reference/data contexts in the final sweep;
+- no new stylesheet was introduced;
+- remaining literal hex values in `app.css` are primarily the canonical token definitions themselves, not competing visual roots.
+
+Verification boundary:
+- this remains SOURCE-VERIFIED / VISUAL-UNVERIFIED;
+- the repository connector does not expose the user's live local browser runtime, so post-change Dashboard/Work/Forms/Calendar renders could not be captured here;
+- the next acceptance gate remains an actual Vite rebuild and browser comparison across desktop/tablet/mobile plus light/dark before another broad styling pass.
