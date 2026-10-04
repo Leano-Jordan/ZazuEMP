@@ -4643,3 +4643,144 @@ button,
         border-bottom: 0;
     }
 }
+
+
+/* --------------------------------------------------------------------------
+   Director — modern global search / command palette
+   -------------------------------------------------------------------------- */
+.zazu-command-search {
+    min-width: 240px;
+}
+
+.zazu-command-trigger {
+    min-height: 42px;
+    border: 1px solid var(--zazu-border-strong);
+    border-radius: 11px;
+    background: color-mix(in srgb, var(--zazu-surface) 88%, transparent);
+    color: var(--zazu-muted);
+    box-shadow: 0 4px 14px color-mix(in srgb, var(--zazu-ink) 5%, transparent);
+    transition: border-color 160ms ease, background-color 160ms ease, box-shadow 160ms ease, color 160ms ease;
+}
+
+.zazu-command-trigger:hover,
+.zazu-command-search.is-open .zazu-command-trigger,
+.zazu-command-search:focus-within .zazu-command-trigger {
+    border-color: var(--zazu-primary);
+    background: var(--zazu-surface);
+    color: var(--zazu-ink);
+    box-shadow: 0 8px 24px color-mix(in srgb, var(--zazu-primary) 10%, transparent);
+}
+
+.zazu-command-trigger input {
+    color: var(--zazu-ink);
+}
+
+.zazu-command-trigger input::placeholder {
+    color: var(--zazu-faint);
+}
+
+.zazu-command-search-icon {
+    display: inline-grid;
+    place-items: center;
+    width: 20px;
+    min-width: 20px;
+    color: var(--zazu-primary);
+    font-size: 17px;
+}
+
+.zazu-command-trigger kbd {
+    margin-left: auto;
+    min-width: 34px;
+    padding: 4px 6px;
+    border: 1px solid var(--zazu-border);
+    border-radius: 6px;
+    background: var(--zazu-surface-2);
+    color: var(--zazu-faint);
+    font: 700 10px/1 var(--zazu-font-mono);
+    text-align: center;
+}
+
+.zazu-command-palette {
+    width: min(500px, calc(100vw - 32px));
+    border: 1px solid color-mix(in srgb, var(--zazu-primary) 18%, var(--zazu-border));
+    border-radius: 16px;
+    background: color-mix(in srgb, var(--zazu-surface) 88%, transparent);
+    box-shadow: 0 28px 80px color-mix(in srgb, var(--zazu-ink) 18%, transparent);
+    backdrop-filter: blur(18px) saturate(1.04);
+    -webkit-backdrop-filter: blur(18px) saturate(1.04);
+}
+
+.zazu-command-results-head {
+    min-height: 48px;
+    padding: 10px 13px;
+    background: color-mix(in srgb, var(--zazu-primary-soft) 48%, var(--zazu-surface));
+}
+
+.zazu-command-results-head span {
+    font-family: var(--zazu-font-display);
+    font-size: 12px;
+    font-weight: 650;
+}
+
+.zazu-command-results {
+    padding: 8px;
+}
+
+.zazu-command-results [data-command-item] {
+    position: relative;
+    min-height: 56px;
+    padding: 10px 12px 10px 14px;
+    border: 1px solid transparent;
+    border-radius: 10px;
+    grid-template-columns: minmax(0, 1fr) auto;
+}
+
+.zazu-command-results [data-command-item]::before {
+    content: "";
+    width: 3px;
+    position: absolute;
+    inset: 10px auto 10px 0;
+    border-radius: 999px;
+    background: var(--zazu-border);
+    transition: background-color 140ms ease, transform 140ms ease;
+}
+
+.zazu-command-results [data-command-item]:hover::before,
+.zazu-command-results [data-command-item]:focus-visible::before,
+.zazu-command-results [data-command-item].is-command-active::before {
+    background: var(--zazu-primary);
+    transform: scaleY(1.12);
+}
+
+.zazu-command-results [data-command-item] span {
+    font-size: 13px;
+    font-weight: 700;
+    line-height: 1.35;
+}
+
+.zazu-command-results [data-command-item] small {
+    font-size: 11px;
+    line-height: 1.45;
+}
+
+.zazu-command-results [data-command-item].is-command-active {
+    border-color: color-mix(in srgb, var(--zazu-primary) 30%, var(--zazu-border));
+    background: var(--zazu-primary-soft);
+}
+
+.zazu-command-empty {
+    margin: 5px;
+    padding: 18px 14px;
+    border: 1px dashed var(--zazu-border-strong);
+    border-radius: 10px;
+    background: var(--zazu-surface-2);
+    color: var(--zazu-muted);
+    font-size: 12px;
+    line-height: 1.5;
+}
+
+@media (max-width: 820px) {
+    .zazu-command-search {
+        min-width: 40px;
+    }
+}
