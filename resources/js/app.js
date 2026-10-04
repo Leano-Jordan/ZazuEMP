@@ -499,14 +499,16 @@ function setupZazuCommandNavigation() {
 
     const close = (restoreFocus = false) => {
         palette.hidden = true;
+        shell.classList.remove('is-open');
         input.setAttribute('aria-expanded', 'false');
         if (restoreFocus) input.focus();
     };
 
-    const open = () => {
+    const open = (focusInput = true) => {
         palette.hidden = false;
+        shell.classList.add('is-open');
         input.setAttribute('aria-expanded', 'true');
-        input.focus();
+        if (focusInput) input.focus();
         select(0);
     };
 
