@@ -273,11 +273,9 @@ Before claiming full offline operation:
 
 **Not yet implemented**
 - complete phone-local mirror of every V1 business domain;
-- complete phone-local mirror of every V1 business domain;
 - domain mutation handlers using the stable identity registry;
 - application acknowledgement/conflict resolution for phone-originated mutations;
-- conflict resolution;
-- local host/device synchronization service;
+- attachment synchronization;
 - cloud synchronization.
 
 This contract therefore establishes the architecture direction without falsely claiming those future layers already exist.
