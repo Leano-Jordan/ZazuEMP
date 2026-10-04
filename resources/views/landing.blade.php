@@ -253,6 +253,76 @@
             .hero-copy{font-size:16px;line-height:1.6}
         }
 
+        /* ------------------------------------------------------------------
+           DIRECTOR — public landing conversion / responsive authority
+           ------------------------------------------------------------------ */
+        .site{width:min(1680px,calc(100% - 56px))}
+        .top{height:78px}
+        .mark{width:40px;height:40px;flex-basis:40px;border-radius:10px}
+        .brand{gap:12px}
+        .brand strong{font-size:16px}
+        body{background:
+            radial-gradient(circle at 88% 4%,rgba(62,154,255,.20),transparent 26rem),
+            radial-gradient(circle at 10% 36%,rgba(16,168,137,.09),transparent 24rem),
+            linear-gradient(180deg,#EAF5FF 0%,#F8FBFF 46%,#EFF9FF 100%);
+            color:#12324D}
+        body:before{background:
+            linear-gradient(135deg,rgba(255,255,255,.66),rgba(224,241,255,.45)),
+            radial-gradient(circle at 75% 10%,rgba(92,176,255,.20),transparent 24rem)}
+        body:after{background:
+            radial-gradient(circle at 78% 16%,rgba(47,128,255,.14),transparent 22rem),
+            radial-gradient(circle at 22% 70%,rgba(16,168,137,.08),transparent 18rem)}
+        .top{border-bottom:1px solid rgba(121,165,202,.36);background:rgba(244,250,255,.78)}
+        .topnav a,.topnav button{color:#46657E;font-size:12px}
+        .topnav a:hover,.topnav button:hover{background:#E1F0FF;color:#173F63}
+        .topnav .launch{background:#2F80FF}
+        .hero{grid-template-columns:minmax(0,1.05fr) minmax(560px,.95fr);gap:clamp(44px,5vw,88px);padding:72px 0 58px}
+        h1{max-width:880px;font-family:"Space Grotesk Variable","Space Grotesk",Manrope,ui-sans-serif,sans-serif;font-size:clamp(56px,6.2vw,96px);line-height:.91;font-weight:650}
+        h1 em{color:#126BD8}
+        .hero-copy{max-width:720px;color:#375873;font-size:18px;line-height:1.7}
+        .eyebrow{color:#1E70D5;font-size:10px}
+        .btn{border-color:#BDD5EA;background:rgba(255,255,255,.68);color:#173F63}
+        .btn.primary{border-color:#2F80FF;background:#2F80FF;box-shadow:0 12px 26px rgba(47,128,255,.20)}
+        .hero-note{margin-top:20px;color:#5C7790;font-size:10px}
+        .control-card,.feature,.visual-band,.compare,.closing-box{border-color:rgba(117,159,198,.42);box-shadow:0 20px 60px rgba(31,87,137,.10);backdrop-filter:blur(14px)}
+        .control-card,.feature{background:rgba(255,255,255,.70)}
+        .hero-photo:after,.feature-image:after{background:linear-gradient(180deg,rgba(15,23,42,.02),rgba(15,23,42,.48))}
+        .telemetry div,.record,.flow{border-color:rgba(177,204,226,.70)}
+        .control-head,.telemetry,.record{background:rgba(255,255,255,.44)}
+        .service-strip{justify-content:flex-start;gap:8px;padding:17px 0 12px;border-top-color:#BFD6E9;border-bottom-color:#BFD6E9}
+        .service-strip span{background:rgba(255,255,255,.66);color:#3D6483;border-color:#BCD3E8;font-size:9px}
+        .section{padding:86px 0}
+        .section-head{margin-bottom:36px}
+        .section h2{font-family:"Space Grotesk Variable","Space Grotesk",Manrope,sans-serif;font-size:clamp(36px,4.1vw,62px);font-weight:620}
+        .intro{color:#4B6B84;font-size:14px;line-height:1.75}
+        .feature{padding:24px}
+        .feature h3{font-family:"Space Grotesk Variable","Space Grotesk",Manrope,sans-serif;font-size:26px}
+        .feature p{color:#4D6D85;font-size:13px;line-height:1.75}
+        .zazu-landing-workflow{position:relative;overflow:hidden}
+        .workflow-grid{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:10px}
+        .workflow-grid article{min-height:190px;padding:22px;border:1px solid #BFD7EB;border-radius:13px;background:rgba(255,255,255,.72);box-shadow:0 12px 30px rgba(40,102,148,.07);transition:transform 160ms ease,border-color 160ms ease,background-color 160ms ease}
+        .workflow-grid article:hover{transform:translateY(-2px);border-color:#62A5FF;background:rgba(242,249,255,.94)}
+        .workflow-grid article>span{color:#2876D6;font:800 10px ui-monospace,SFMono-Regular,Menlo,monospace;letter-spacing:.08em}
+        .workflow-grid h3{margin:42px 0 9px;font-family:"Space Grotesk Variable","Space Grotesk",Manrope,sans-serif;font-size:20px;line-height:1.1}
+        .workflow-grid p{margin:0;color:#4B6B84;font-size:12px;line-height:1.65}
+        .closing{padding:74px 0 90px}
+        .closing-box{padding:44px;background:linear-gradient(120deg,#2478ED,#36A5FF 56%,#13A98C);color:#fff}
+        .closing-box p{color:#EAF6FF;font-size:13px;line-height:1.55}
+        .closing-box .btn{background:rgba(255,255,255,.92);color:#14549A;border-color:rgba(255,255,255,.88)}
+        @media(max-width:1100px){.site{width:min(100% - 40px,1680px)}.hero{grid-template-columns:1fr}.hero-photo{height:440px}.workflow-grid{grid-template-columns:repeat(3,minmax(0,1fr))}}
+        @media(max-width:720px){
+            .site{width:calc(100% - 24px)}
+            .top{height:auto;padding:10px 0}
+            .brand .brand-lockup{}
+            .hero{padding:40px 0 48px;gap:28px}
+            h1{font-size:clamp(44px,13vw,62px)}
+            .hero-copy{font-size:16px;line-height:1.62}
+            .hero-photo{height:300px}
+            .workflow-grid{grid-template-columns:1fr}
+            .workflow-grid article{min-height:0}
+            .section{padding:60px 0}
+        }
+
     </style>
 </head>
 <body>
@@ -262,17 +332,8 @@
     <nav class="topnav" aria-label="Public navigation">
         <div id="mobile-public-menu" class="mobile-menu" data-mobile-menu>
             <a href="#capabilities">Product</a>
-            <details class="nav-solutions">
-                <summary>Solutions <span aria-hidden="true">⌄</span></summary>
-                <div class="nav-solutions-panel">
-                    <a href="#capabilities">Catering &amp; baking</a>
-                    <a href="#capabilities">Rentals &amp; equipment</a>
-                    <a href="#capabilities">Sound &amp; DJ</a>
-                    <a href="#capabilities">Decor &amp; photography</a>
-                    <a href="#capabilities">Events &amp; venues</a>
-                </div>
-            </details>
-            <a href="#difference">Why Zazu</a>
+            <a href="#capabilities">Solutions</a>
+            <a href="#workflow">How it works</a><a href="#difference">Why Zazu</a>
             @if(!$isAuthenticated)
                 <button type="button" class="register" data-auth-modal-open="register">Get started</button>
                 <button type="button" class="login" data-auth-modal-open="login">Log in</button>
@@ -304,6 +365,22 @@
 </div>
 </section>
 <div class="service-strip" aria-label="Zazu business coverage"><span>EVENTS</span><span>CATERING</span><span>RENTALS</span><span>SOUND &amp; DJ</span><span>DECOR</span><span>PHOTOGRAPHY</span><span>BAKING</span></div>
+<section class="section zazu-landing-workflow" id="workflow">
+    <div class="section-head">
+        <div>
+            <div class="eyebrow">How the work flows</div>
+            <h2>The event record carries the story.</h2>
+        </div>
+        <p class="intro">Zazu is designed around how event businesses actually work: capture the booking, build the commercial record, prepare the delivery, track resources and keep the financial result connected.</p>
+    </div>
+    <div class="workflow-grid">
+        <article><span>01</span><h3>Capture</h3><p>Keep the customer, event date, requirements and notes together from the first enquiry.</p></article>
+        <article><span>02</span><h3>Quote</h3><p>Turn the agreed services and quantities into a clear commercial record.</p></article>
+        <article><span>03</span><h3>Prepare</h3><p>Track the operational details that have to be ready before the event reaches delivery.</p></article>
+        <article><span>04</span><h3>Resource</h3><p>Keep equipment, suppliers, purchasing and stock decisions visible against the work.</p></article>
+        <article><span>05</span><h3>Know the result</h3><p>Connect invoices, payments, expenses and costs back to the work that created them.</p></article>
+    </div>
+</section>
 <section class="section" id="capabilities"><div class="section-head"><div><div class="eyebrow">Made for the work</div><h2>One event. A clear view from enquiry to payment.</h2></div><p class="intro">Keep the moving parts together as the business grows—from customer and quote through preparation, purchasing, costs and finance. Everyone works from the same operational record.</p></div>
 <div class="bento">
 <article class="feature large">
