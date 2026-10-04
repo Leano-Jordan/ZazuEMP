@@ -674,7 +674,7 @@ const setupZazuHierarchicalNavigation = () => {
     };
 
     const syncActiveAreaForViewport = () => {
-        if (!window.matchMedia('(max-width: 820px)').matches) {
+        if (!window.matchMedia('(max-width: 850px)').matches) {
             restoreHelperPosition();
             return;
         }
@@ -740,7 +740,7 @@ const setupZazuHierarchicalNavigation = () => {
     }, { passive: true });
 
     syncActiveAreaForViewport();
-    window.matchMedia('(max-width: 820px)').addEventListener?.('change', syncActiveAreaForViewport);
+    window.matchMedia('(max-width: 850px)').addEventListener?.('change', syncActiveAreaForViewport);
 };
 
 function setupZazuHelper() {
@@ -888,7 +888,7 @@ function setupZazuMobileNavigation() {
     const closers = document.querySelectorAll('[data-mobile-sidebar-close]');
     if (!sidebar || !toggle) return;
 
-    const media = window.matchMedia('(max-width: 820px)');
+    const media = window.matchMedia('(max-width: 850px)');
     const focusable = () => [...sidebar.querySelectorAll('a,button,input,select,textarea,[tabindex]:not([tabindex="-1"])')]
         .filter((element) => !element.hidden && !element.disabled && element.offsetParent !== null);
 
