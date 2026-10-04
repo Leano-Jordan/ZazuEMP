@@ -8204,3 +8204,39 @@ body.zazu-inspector-open { overflow:hidden; }
         color: var(--zazu-sidebar-ink);
     }
 }
+
+
+/* DIRECTOR — 2026-10-04 current polish / wallpaper visibility hardening.
+   Preserve wallpaper behind the working surface while keeping content readable.
+   This is an additive cascade correction; no UI capability is removed.
+*/
+.zazu-shell {
+    background: transparent;
+}
+
+body.zazu-has-wallpaper {
+    background-color: var(--zazu-page);
+    background-image:
+        linear-gradient(
+            145deg,
+            color-mix(in srgb, var(--zazu-page) 62%, transparent),
+            color-mix(in srgb, var(--zazu-page-deep) 74%, transparent)
+        ),
+        var(--zazu-wallpaper),
+        radial-gradient(
+            circle at 88% -8%,
+            color-mix(in srgb, var(--zazu-primary) 11%, transparent),
+            transparent 30rem
+        );
+    background-size: cover, cover, auto;
+    background-position: center, center, center;
+    background-attachment: fixed, fixed, fixed;
+}
+
+body.zazu-has-wallpaper .zazu-main {
+    background: transparent;
+}
+
+body.zazu-has-wallpaper .zazu-content {
+    background: transparent;
+}
