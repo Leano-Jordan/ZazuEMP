@@ -8426,7 +8426,7 @@ body.zazu-has-wallpaper .zazu-content {
 .zazu-command-band .zazu-btn-primary {
     background: var(--zazu-primary);
     border-color: var(--zazu-primary);
-    color: #FFFFFF;
+    color: var(--zazu-primary-ink);
 }
 
 @media (max-width: 720px) {
@@ -8487,7 +8487,7 @@ body.zazu-has-wallpaper .zazu-content {
     place-items: center;
     border-radius: 9px;
     background: var(--zazu-primary);
-    color: #FFFFFF;
+    color: var(--zazu-primary-ink);
     font-family: var(--zazu-font-display);
     font-weight: 800;
 }
