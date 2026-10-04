@@ -166,3 +166,11 @@ The 2026-10-05 UI recovery exposed a cluster of regressions caused by later CSS/
 - Any broad visual change touching these contracts requires source re-read, regression review and rendered desktop/mobile/light/dark acceptance before closure.
 
 **Status:** CONTROL ACTIVE
+
+## REG-020 — Calendar active-route drift / mobile navigation dead end
+
+A destination can remain present and permission-gated while becoming operationally unreachable when its navigation-group ownership changes without updating the group's active-route predicate. Calendar was moved into Work, but Work did not recognize `calendar.*`; mobile active-group auto-expansion therefore had no target.
+
+**Control:** whenever a destination is moved between primary navigation groups, update and verify all three contracts together: route ownership/permission, active-group predicate, and responsive auto-expansion. Add a direct-route browser regression that proves the destination remains reachable from its owning group. Do not solve ownership drift by duplicating destinations across groups.
+
+**Status:** CONTROL ACTIVE
