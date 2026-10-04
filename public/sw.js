@@ -1,9 +1,10 @@
-const CACHE_NAME = 'zazu-static-v5';
+const CACHE_NAME = 'zazu-static-v6';
 const OFFLINE_SHELL = '/offline';
 
 const PRECACHE_ASSETS = [
     OFFLINE_SHELL,
     '/manifest.webmanifest',
+    '/offline',
     '/icons/zazu-192.svg',
     '/icons/zazu-512.svg',
     '/images/landing/stock/hero.jpg',
