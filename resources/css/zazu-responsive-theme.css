@@ -209,7 +209,7 @@
     border-radius: 4px;
     background: var(--zazu-surface);
     color: var(--zazu-muted);
-    font-size: 9px;
+    font-size: var(--zazu-font-size-meta);
     font-family: inherit;
     font-weight: 750;
 }
@@ -423,9 +423,9 @@ textarea {
 .zazu-job-context-grid span {
     display: block;
     color: var(--zazu-faint);
-    font-size: 9px;
-    font-weight: 800;
-    letter-spacing: .08em;
+    font-size: var(--zazu-font-size-meta);
+    font-weight: var(--zazu-weight-bold);
+    letter-spacing: .06em;
     text-transform: uppercase;
 }
 
