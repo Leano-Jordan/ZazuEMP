@@ -1,10 +1,11 @@
 # Zazu EMP — Security Incident Response
 
 **Status:** OPERATIONAL DRAFT — REAL CONTACTS REQUIRED BEFORE RELEASE  
-**Incident owner:** `[RESPONSIBLE PARTY / SECURITY OWNER]`  
-**Information Officer:** `[NAME]`  
-**Deputy / escalation:** `[NAME]`  
-**Regulatory contact process:** `[APPROVED CHANNEL]`
+**Incident owner:** Isaac Junior Lehlogonolo Maluleka  
+**Operating address:** 1068 Block JK, Soshanguve, Pretoria, South Africa  
+**Information Officer:** Isaac Junior Lehlogonolo Maluleka — formal registration/appointment status to be confirmed before publication  
+**Deputy / escalation:** Not applicable to the current solo-operator model; external legal/regulatory support to be engaged when required  
+**Regulatory contact process:** `[APPROVED CHANNEL TO BE CONFIRMED BEFORE PUBLICATION]`
 
 ## Purpose
 
