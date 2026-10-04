@@ -13,14 +13,22 @@
 
 .zazu-nav {
     min-height: 0;
-    overflow-y: auto;
-    overflow-x: hidden;
+    overflow: visible;
 }
 
 .zazu-sidebar-footer {
     position: relative;
     flex: 0 0 auto;
     overflow: visible;
+}
+
+/* Desktop hierarchical flyouts must be allowed to cross the sidebar edge.
+   Mobile switches back to a bounded scroll region because its flyouts are inline. */
+@media (max-width: 850px) {
+    .zazu-nav {
+        overflow-y: auto;
+        overflow-x: hidden;
+    }
 }
 
 .zazu-app-footer {
