@@ -42,7 +42,7 @@ class PopulatedAuthorizationIsolationTest extends TestCase
 
         $customer = Customer::query()
             ->where('business_id', $demoBusiness->id)
-            ->where('name', 'Mokoena Family Celebration Customer')
+            ->where('name', 'Mokoena Family Events')
             ->firstOrFail();
 
         $event = Event::query()
