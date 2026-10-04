@@ -537,6 +537,53 @@ This is the persistent failure-history register for the Failure Case / Loop-Brea
 
 **Rejected approaches retained for loop prevention:** Do not restore Calendar to Sales merely to make the current state appear active. Do not duplicate Calendar in multiple primary groups. Do not add JavaScript exceptions to force-open Work on Calendar; the route ownership predicate is the authoritative fix.
 
+
+### CASE-ZAZU-0011
+
+**Status:** INVESTIGATING
+
+**First observed HEAD:** `6f0774a2fa07136bb242de17e61e5b2bbcf64f90`
+
+**Current application HEAD:** `12eeb3aa3396b0091527d2cbfc845854170dd374`
+
+**Target/workflow:** Owner-reported Calendar lockout recurrence after a prior navigation repair.
+
+**Verification layer:** F1/F2 — application route/navigation behavior plus verification-contract coverage.
+
+**Expected:** An authorized active workspace user can always reach Calendar from the primary Work navigation, including mobile/tablet widths, and Calendar must not fail because optional presentation preferences are unavailable.
+
+**Actual:** Owner reports Calendar remains inaccessible after the first active-route correction. Repository inspection shows the previous correction addressed only navigation active-state ownership; it did not prove runtime access, and Calendar also had an optional database-backed holiday-preference dependency.
+
+**Failure fingerprint:** Calendar reported inaccessible despite route registration and configured `calendar.view` permissions.
+
+#### Hypotheses
+
+| ID | Hypothesis | Evidence for | Evidence against | Result | Status |
+|---|---|---|---|---|---|
+| H1 | Calendar permission map drift | Historical fix `9fc9cae...` previously restored `calendar.view` for staff | Current config contains Calendar permission for staff and manager | Not sufficient to explain current report | OPEN |
+| H2 | Navigation ownership / mobile expansion defect | Calendar was moved under Work while the prior Work active predicate omitted `calendar.*`; mobile auto-open relied on an active group | Server-rendered active-state fallback is now added | New runtime evidence required | OPEN |
+| H3 | Optional holiday-preference schema dependency can break Calendar on a stale local DB | Calendar previously read a newly added `business_user.calendar_holiday_preferences` field | Current Calendar path now checks column existence and falls back safely | Corrected in source | CORRECTED |
+
+#### Experiments
+
+| Attempt | Hypothesis | Action | Evidence/result | Decision |
+|---|---|---|---|---|
+| 1 | H2 | Restore `calendar.*` to Work active-state ownership and add browser regression | Source contract corrected; owner still reports failure | Not closed |
+| 2 | H2/H3 | Make Work active navigation server-revealing on mobile and make optional holiday preference schema non-blocking | Source now contains both safeguards | Requires runtime verification |
+| 3 | H1/H2 | Add explicit staff/manager Calendar permission tests plus direct browser navigation coverage | Future config/navigation drift will fail verification instead of silently removing Calendar | Retain |
+
+**Current root-cause state:** Runtime causality remains unproven. Repository evidence now covers the known navigation and optional-schema failure modes, but the reported recurrence must not be declared fixed until a real authenticated runtime reproduces the failing workflow and captures the response/UI state.
+
+**Correction in current cycle:** Added server-rendered mobile recovery, aligned mobile breakpoint contracts to 850px, normalized Calendar's optional holiday-preference lookup, and expanded regression coverage.
+
+**Regression family:** Calendar route access, primary navigation ownership, mobile drawer expansion, role permissions, business context, optional schema dependencies.
+
+**Remaining uncertainty:** Exact runtime failure observed by the owner remains unresolved in the repository-only environment.
+
+**Required closure evidence:** Authenticated owner/staff/manager Calendar navigation on current `main`, mobile and desktop; response status captured; no blocked overlay; Calendar content rendered; then full UI regression sweep.
+
+**Rejected approaches retained for loop prevention:** Do not keep appending Calendar links, duplicate the destination into another nav group, or declare success from source inspection alone.
+
 ## Case record template
 
 ### CASE-ZAZU-XXXX
