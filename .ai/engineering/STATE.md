@@ -1199,3 +1199,27 @@ Acceptance boundary:
 - Form contract: customer identity → primary contact → business/billing/tax details.
 - Dialog contract: customer quick-add is explicitly centered with viewport bounds.
 - Visual acceptance: SOURCE-VERIFIED; rendered browser acceptance remains a separate gate.
+
+## Director calendar navigation recovery — 2026-10-05
+
+Target: restore direct Calendar reachability and protect the recent navigation/UI refinements.
+
+Completed:
+- confirmed the failure was not Calendar routing, data, or permission registration;
+- traced the dead end to the Work navigation group's stale active-route predicate after Calendar was moved under Work;
+- restored `calendar.*` to the Work active-state contract;
+- added feature regression coverage proving Calendar marks Work active and the Calendar link is the current page;
+- added browser regression coverage proving the active Work group exposes Calendar and auto-expands on mobile;
+- recorded persistent failure case `CASE-ZAZU-0010` and regression control `REG-020`.
+
+Preserved:
+- Calendar remains intentionally under Work;
+- existing calendar visual refinement, holiday presentation and dense information hierarchy are unchanged;
+- existing blue-slate visual direction, bounded search, restrained glass surfaces, intentional CTA hierarchy and Helper Work/Sales yield contract are not replaced by another visual sweep.
+
+Verification boundary:
+- source changes and regression coverage are committed on `main`;
+- rendered browser/device execution is not available through the current repository connector, so visual acceptance remains a separate runtime gate.
+
+Next target:
+CURRENT-HEAD BROWSER/DEVICE ACCEPTANCE → RE-AUDIT NAVIGATION + CALENDAR + RECENT UI RECOVERY CONTRACTS
