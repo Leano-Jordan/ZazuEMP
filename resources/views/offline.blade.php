@@ -45,6 +45,7 @@ if(tab==='events')c.innerHTML='<section class="panel"><h2>Jobs</h2><div class="l
 if(tab==='quotes')c.innerHTML='<section class="panel"><h2>Quotes</h2><div class="list">'+data.quotes.map(function(x){return '<div class="row"><strong>'+esc(x.reference||'Quote')+'</strong><span>'+esc(x.event_name||'No job')+' · '+esc(x.status||'draft')+'</span></div>'}).join('')+'</div></section>';
 }
 function prepare(){fetch('/offline/bootstrap',{headers:{Accept:'application/json'},credentials:'same-origin'}).then(function(r){if(!r.ok)throw new Error('bootstrap failed');return r.json()}).then(function(value){data=value;return saveSnapshot(value)}).then(function(){render('overview');document.getElementById('state').textContent='Saved on this phone'}).catch(function(){return loadSnapshot().then(function(value){data=value;render('overview');document.getElementById('state').textContent=data?'Offline':'Not prepared'})})}
+if ('serviceWorker' in navigator) navigator.serviceWorker.register('/sw.js').catch(function(){});
 document.querySelectorAll('.tab').forEach(function(b){b.addEventListener('click',function(){render(b.dataset.tab)})});prepare();
 </script>
 </body>
