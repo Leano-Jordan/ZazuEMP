@@ -189,7 +189,7 @@
                     <div>
                         <div class="zazu-eyebrow">New customer</div>
                         <h2 class="zazu-quick-customer-dialog-title" id="quick-customer-title">Add a customer to this job</h2>
-                        <p class="zazu-quick-customer-dialog-copy">Capture the essentials now. You can complete the customer's full profile later.</p>
+                        <p class="zazu-quick-customer-dialog-copy">Capture the essentials now. Zazu keeps the customer linked to this job, and you can complete the full profile from the customer editor.</p>
                     </div>
                     <button type="button" class="zazu-quick-customer-close" data-close-quick-customer aria-label="Close">×</button>
                 </div>
