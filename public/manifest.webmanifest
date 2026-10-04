@@ -1,15 +1,15 @@
 {
   "name": "Zazu EMP",
   "short_name": "Zazu",
-  "id": "/",
+  "id": "/offline",
   "description": "Zazu EMP — event and catering management.",
   "lang": "en-ZA",
-  "start_url": "/dashboard",
+  "start_url": "/offline",
   "scope": "/",
   "display": "standalone",
   "display_override": ["window-controls-overlay", "standalone"],
-  "background_color": "#F8FAFC",
-  "theme_color": "#245A9A",
+  "background_color": "#EEF4FA",
+  "theme_color": "#2563EB",
   "orientation": "any",
   "icons": [
     {
