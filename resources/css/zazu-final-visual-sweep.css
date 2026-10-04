@@ -6568,3 +6568,251 @@ body.zazu-has-wallpaper {
 :root[data-theme="dark"] .zazu-status-overdue {
     filter: saturate(.72);
 }
+
+
+/* DIRECTOR — 2026-10-04 responsive/resource + color balance pass
+ * Resource registers keep record details visible; actions get their own row.
+ * Light theme uses blue-tinted surfaces rather than repeated white cards.
+ */
+@media (min-width: 701px) {
+    .zazu-list-item {
+        flex-wrap: wrap;
+        align-items: flex-start;
+    }
+
+    .zazu-list-main {
+        flex: 1 1 280px;
+        min-width: 0;
+    }
+
+    .zazu-list-side {
+        flex: 0 1 132px;
+        min-width: 108px;
+    }
+
+    .zazu-action-group {
+        min-width: 0;
+        max-width: 100%;
+    }
+
+    .zazu-action-group form {
+        min-width: 0;
+        max-width: 100%;
+    }
+
+    .zazu-action-group input,
+    .zazu-action-group select {
+        min-width: 0;
+        max-width: 100%;
+    }
+
+    .zazu-assets-directory .zazu-list-item,
+    .zazu-inventory-directory .zazu-list-item {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) minmax(108px, auto);
+        column-gap: 18px;
+        row-gap: 0;
+    }
+
+    .zazu-assets-directory .zazu-list-side,
+    .zazu-inventory-directory .zazu-list-side {
+        justify-self: end;
+        width: 100%;
+        padding-left: 16px;
+        border-left: 1px solid var(--zazu-border);
+    }
+
+    .zazu-assets-directory .zazu-action-group,
+    .zazu-inventory-directory .zazu-action-group {
+        grid-column: 1 / -1;
+        width: 100%;
+        padding: 12px 0 0;
+        margin-top: 12px;
+        border-top: 1px solid var(--zazu-border);
+        border-left: 0;
+        justify-content: flex-start;
+    }
+
+    .zazu-assets-directory .zazu-action-group > form,
+    .zazu-inventory-directory .zazu-action-group > form {
+        flex: 1 1 100%;
+    }
+
+    .zazu-assets-directory .zazu-action-group select,
+    .zazu-inventory-directory .zazu-action-group select {
+        flex: 1 1 220px;
+    }
+
+    .zazu-assets-directory .zazu-action-group input,
+    .zazu-inventory-directory .zazu-action-group input {
+        flex: 1 1 130px;
+    }
+}
+
+.zazu-calendar-page {
+    overflow: visible;
+}
+
+:root:not([data-theme="dark"]) {
+    --zazu-card-bg: #EFF6FB;
+    --zazu-card-border: #B9CFE0;
+    --zazu-canvas-bg: #E2EDF6;
+    --zazu-surface-card: #EFF6FB;
+    --zazu-surface-canvas: #E2EDF6;
+}
+
+:root:not([data-theme="dark"]) .zazu-sidebar {
+    background: linear-gradient(180deg, #D5E4F0 0%, #E4EEF6 100%);
+}
+
+:root:not([data-theme="dark"]) .zazu-brand,
+:root:not([data-theme="dark"]) .zazu-topbar {
+    background: color-mix(in srgb, #DCEAF5 88%, transparent);
+}
+
+:root:not([data-theme="dark"]) .zazu-card,
+:root:not([data-theme="dark"]) .zazu-panel,
+:root:not([data-theme="dark"]) .zazu-module,
+:root:not([data-theme="dark"]) .zazu-metric-card,
+:root:not([data-theme="dark"]) .zazu-document,
+:root:not([data-theme="dark"]) .zazu-form-section,
+:root:not([data-theme="dark"]) .zazu-dash-commandbar,
+:root:not([data-theme="dark"]) .zazu-dash-hero,
+:root:not([data-theme="dark"]) .zazu-list {
+    background: var(--zazu-card-bg);
+}
+
+:root:not([data-theme="dark"]) .zazu-list-item {
+    background: color-mix(in srgb, #DCEAF5 42%, var(--zazu-card-bg));
+}
+
+:root:not([data-theme="dark"]) .zazu-list-item:hover {
+    background: #DFEDF7;
+}
+
+:root:not([data-theme="dark"]) .zazu-card-header,
+:root:not([data-theme="dark"]) .zazu-panel-head,
+:root:not([data-theme="dark"]) .zazu-form-section-head {
+    background: linear-gradient(180deg, #E1EDF6 0%, #EFF6FB 100%);
+}
+
+:root:not([data-theme="dark"]) .zazu-command-band {
+    background:
+        linear-gradient(135deg, #D5E7F4 0%, #E7F1F8 58%, #F0F6FB 100%);
+}
+
+:root:not([data-theme="dark"]) .zazu-dash-hero {
+    background:
+        linear-gradient(120deg, #D5E7F4 0%, #E6F0F7 52%, #EFF6FB 100%);
+}
+
+:root:not([data-theme="dark"]) .zazu-dash-hero-side {
+    background: #DCEAF5;
+}
+
+:root:not([data-theme="dark"]) .zazu-dash-commandbar {
+    background: #E1EDF6;
+}
+
+:root:not([data-theme="dark"]) .zazu-input,
+:root:not([data-theme="dark"]) .zazu-select,
+:root:not([data-theme="dark"]) .zazu-textarea,
+:root:not([data-theme="dark"]) input,
+:root:not([data-theme="dark"]) select,
+:root:not([data-theme="dark"]) textarea {
+    background: #F4F8FB;
+}
+
+:root:not([data-theme="dark"]) .zazu-btn-secondary {
+    background: #E5EFF6 !important;
+}
+
+:root:not([data-theme="dark"]) .zazu-nav-flyout {
+    background: #E8F2F8;
+}
+
+:root:not([data-theme="dark"]) .zazu-nav-flyout .zazu-nav-link:hover,
+:root:not([data-theme="dark"]) .zazu-nav-flyout .zazu-nav-link:focus-visible {
+    background: #D8E9F5;
+}
+
+:root:not([data-theme="dark"]) .zazu-calendar-toolbar,
+:root:not([data-theme="dark"]) .zazu-calendar-cell,
+:root:not([data-theme="dark"]) .zazu-calendar-mini-month,
+:root:not([data-theme="dark"]) .zazu-calendar-agenda-event,
+:root:not([data-theme="dark"]) .zazu-calendar-event {
+    background-color: #EDF5FA;
+}
+
+@media (max-width: 700px) {
+    .zazu-list-item {
+        display: flex;
+        flex-wrap: wrap;
+    }
+
+    .zazu-list-main,
+    .zazu-list-side,
+    .zazu-action-group {
+        width: 100%;
+        max-width: 100%;
+        min-width: 0;
+    }
+
+    .zazu-assets-directory .zazu-list-side,
+    .zazu-inventory-directory .zazu-list-side {
+        justify-self: stretch;
+        padding-left: 0;
+        border-left: 0;
+    }
+
+    .zazu-assets-directory .zazu-action-group,
+    .zazu-inventory-directory .zazu-action-group {
+        border-top: 1px solid var(--zazu-border);
+    }
+}
+
+@media (max-width: 520px) {
+    .zazu-calendar-toolbar {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .zazu-calendar-view-switch {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .zazu-calendar-view-switch a {
+        justify-content: center;
+    }
+
+    .zazu-calendar-jump {
+        width: 100%;
+        flex-wrap: wrap;
+    }
+
+    .zazu-calendar-jump input {
+        min-width: 0;
+        flex: 1 1 150px;
+    }
+
+    .zazu-calendar-jump button {
+        flex: 0 0 auto;
+    }
+}
+
+/* DIRECTOR NAV COPY CLEANUP */
+.zazu-nav-area-trigger {
+    letter-spacing: -.01em;
+}
+
+@media (min-width: 821px) {
+    .zazu-nav-area-trigger {
+        min-height: 44px;
+        padding-inline: 12px;
+    }
+
+    .zazu-nav-flyout {
+        width: 220px;
+    }
+}
