@@ -110,8 +110,42 @@ Browser suites can silently skip authenticated UI coverage when they depend on a
 **Status:** CONTROL ACTIVE
 
 
-## REG-015 — UI layout and contrast regression family
+## REG-015 — Resource register right-edge collapse / single-item layout regression
 
-Record asset/inventory register layout, page-banner state parity, brand fit, landing navigation geometry, Plan/Delivery balance, and explicit foreground/surface contrast as protected UI invariants.
+Asset and inventory registers previously regressed into a flex row where useful record content became squeezed while the action cluster consumed disproportionate right-edge space. A single record could therefore look like a large empty container with controls visually detached.
+
+**Control:** asset/inventory rows use an explicit three-region desktop grid (record / state / actions), bounded action forms, left-aligned action groups, and deterministic 1100px/760px/520px/400px breakpoints. Do not restore generic right-justified flex treatment for these registers.
+
+**Status:** CONTROL ACTIVE
+
+## REG-016 — Foreground/surface theme contrast regression
+
+Legacy landing and shared-banner declarations mixed dark-shell foreground tokens with light landing surfaces and dark page text with dark/image-backed surfaces.
+
+**Control:** meaningful text uses an explicit foreground family matched to its surface. Image-backed banners are intentionally dark surfaces with light foregrounds. Light public landing surfaces use dark blue foregrounds. Contrast review covers default, hover, focus and state surfaces.
+
+**Status:** CONTROL ACTIVE
+
+## REG-017 — Workspace-state visual language drift
+
+Page command banners previously used a separate pale-card treatment while the dashboard workspace-state area carried the stronger image-led operational language.
+
+**Control:** shared .zazu-command-band is the page-banner authority and inherits the dashboard image variable, dark readability overlay, explicit light foregrounds and workspace-style state meta panel. Page-specific selectors must not replace this with unrelated light/dark text combinations.
+
+**Status:** CONTROL ACTIVE
+
+## REG-018 — Business logo presentation drift
+
+Business logos are identity-critical. Treating the logo as a small decorative square or allowing arbitrary image sizing makes customer branding look unfinished and can create distorted or cropped marks.
+
+**Control:** shared brand area reserves a 40px identity slot, keeps 72px shell height, uses object-fit: contain, centered positioning and a controlled shell surface. Preserve the supplied logo without distortion/cropping.
+
+**Status:** CONTROL ACTIVE
+
+## REG-019 — Landing navigation/composition geometry drift
+
+Public navigation links, CTAs and later bento items can drift vertically or leave unused horizontal space when individual elements use unrelated sizing or implicit auto-placement.
+
+**Control:** landing navigation uses a common 40px control rhythm; Plan and Delivery explicitly occupy the final 50/50 desktop row; responsive rules reset explicit placement below 920px. Do not reintroduce uneven CTA heights or unbounded final-row auto-placement.
 
 **Status:** CONTROL ACTIVE
