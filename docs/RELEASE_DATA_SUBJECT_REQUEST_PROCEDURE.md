@@ -1,9 +1,10 @@
 # Zazu EMP — Data-Subject Request Procedure
 
 **Status:** OPERATIONAL DRAFT — COMPLETE WITH REAL CONTACTS BEFORE RELEASE  
-**Owner:** `[RESPONSIBLE PARTY]`  
-**Request channel:** `[PRIVACY REQUEST CHANNEL]`  
-**Information Officer:** `[NAME / ROLE]`
+**Operational privacy owner:** Isaac Junior Lehlogonolo Maluleka  
+**Operating address:** 1068 Block JK, Soshanguve, Pretoria, South Africa  
+**Request channel:** `[EMAIL / PUBLISHED PRIVACY CHANNEL TO BE SUPPLIED]`  
+**Information Officer:** Isaac Junior Lehlogonolo Maluleka — formal registration/appointment status to be confirmed before publication
 
 ## Purpose
 
