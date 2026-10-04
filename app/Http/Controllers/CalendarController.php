@@ -56,8 +56,8 @@ class CalendarController extends Controller
             'confirmedCount' => $statusCounts->get('confirmed', 0),
             'attentionCount' => $attentionCount,
             'isCurrentMonth' => $isCurrentMonth,
-            'threeMonthBlocks' => $this->threeMonthBlocks($month, $eventsByDate),
-            'yearMonths' => $this->yearMonths($month, $eventsByDate),
+            'threeMonthBlocks' => $this->threeMonthBlocks($month, $eventsByDate, $holidayMap),
+            'yearMonths' => $this->yearMonths($month, $eventsByDate, $holidayMap),
             'holidays' => $holidayMap,
             'holidayCategories' => SouthAfricaHolidayCalendar::CATEGORIES,
             'holidayPreferences' => $holidayPreferences,
@@ -91,26 +91,28 @@ class CalendarController extends Controller
         return $days;
     }
 
-    private function threeMonthBlocks(Carbon $month, $eventsByDate)
+    private function threeMonthBlocks(Carbon $month, $eventsByDate, $holidays)
     {
-        return collect(range(0, 2))->map(function ($offset) use ($month, $eventsByDate) {
+        return collect(range(0, 2))->map(function ($offset) use ($month, $eventsByDate, $holidays) {
             $blockMonth = $month->copy()->addMonths($offset);
             return [
                 'month' => $blockMonth,
                 'days' => $this->monthDays($blockMonth),
                 'eventsByDate' => $eventsByDate->filter(fn ($events, $date) => Carbon::parse($date)->isSameMonth($blockMonth)),
+                'holidays' => $holidays->filter(fn ($dayHolidays, $date) => Carbon::parse($date)->isSameMonth($blockMonth)),
             ];
         });
     }
 
-    private function yearMonths(Carbon $month, $eventsByDate)
+    private function yearMonths(Carbon $month, $eventsByDate, $holidays)
     {
-        return collect(range(0, 11))->map(function ($offset) use ($month, $eventsByDate) {
+        return collect(range(0, 11))->map(function ($offset) use ($month, $eventsByDate, $holidays) {
             $yearMonth = $month->copy()->startOfYear()->addMonths($offset);
             return [
                 'month' => $yearMonth,
                 'days' => $this->monthDays($yearMonth),
                 'eventsByDate' => $eventsByDate->filter(fn ($events, $date) => Carbon::parse($date)->isSameMonth($yearMonth)),
+                'holidays' => $holidays->filter(fn ($dayHolidays, $date) => Carbon::parse($date)->isSameMonth($yearMonth)),
             ];
         });
     }
