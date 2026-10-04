@@ -291,3 +291,30 @@ Disposition: Security evidence is VERIFIED / PROVEN at current runtime level. Th
 Remaining material release gates: physical phone/tablet acceptance; legal/privacy operational closure; release-level dependency/transitive licence audit; Zazu brand/trade-mark clearance; final Director re-audit.
 
 Last updated: 2026-10-04
+
+
+## Director release-documentation closure — 2026-10-04
+
+The minimum V1 release documentation set now exists in `docs/RELEASE_*.md` and has been audited against the repository implementation.
+
+**Documentation-design maturity:** 5/5.
+
+The audit confirms:
+
+- technical privacy/security controls are implemented in the application foundation;
+- data-subject rights, retention/disposal, PAIA handling and customer terms are currently manual/documentary controls, not self-service application features;
+- incident response has technical evidence but still requires named organisational escalation and notification handling;
+- operator/data-processing controls depend on the actual deployment/vendor relationships;
+- deployment, backup/restore and upgrade/rollback runbooks now have explicit operating procedures.
+
+**Release interpretation:** this closes the missing-document-set problem but does **not** make Zazu legally cleared.
+
+Remaining material gates are now explicitly:
+
+1. final privacy/legal operational completion;
+2. release-level dependency/licence notice completion;
+3. Zazu brand/trade-mark clearance;
+4. physical phone/tablet acceptance;
+5. final Director re-audit against the selected release commit.
+
+Last updated: 2026-10-04
