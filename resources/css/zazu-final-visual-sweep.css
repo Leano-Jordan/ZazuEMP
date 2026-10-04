@@ -5448,9 +5448,20 @@ button,
 }
 
 body.zazu-mobile-menu-open .zazu-helper {
-    opacity: 0;
-    visibility: hidden;
+    opacity: 1;
+    visibility: visible;
     pointer-events: none;
+    transform: translateX(calc(100% + 28px)) rotate(5deg);
+}
+
+.zazu-helper {
+    transition: transform 240ms cubic-bezier(.22,.8,.3,1), opacity 180ms ease;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .zazu-helper {
+        transition: none;
+    }
 }
 
 @media (max-width: 520px) {
