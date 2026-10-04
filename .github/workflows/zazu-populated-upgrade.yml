@@ -78,10 +78,10 @@ jobs:
           if (DB::table('payments')->where('idempotency_key', 'demo-payment-balance-001')->doesntExist()) {
               throw new RuntimeException('Populated payment was not preserved during upgrade.');
           }
-          if (!Schema::hasColumn('business_user', 'primary_niche')) {
+          if (!\\Illuminate\\Support\\Facades\\Schema::hasColumn('business_user', 'primary_niche')) {
               throw new RuntimeException('Current migration did not add business_user.primary_niche.');
           }
-          if (!Schema::hasTable('sync_streams')) {
+          if (!\\Illuminate\\Support\\Facades\\Schema::hasTable('sync_streams')) {
               throw new RuntimeException('Current migration did not create sync_streams.');
           }
           "
@@ -111,7 +111,7 @@ jobs:
           if (file_get_contents(storage_path('app/private/director-upgrade-marker.txt')) !== 'pre-upgrade-private-marker') {
               throw new RuntimeException('Private media was not recovered after rollback.');
           }
-          if (!Schema::hasColumn('business_user', 'primary_niche') || !Schema::hasTable('sync_streams')) {
+          if (!\\Illuminate\\Support\\Facades\\Schema::hasColumn('business_user', 'primary_niche') || !\\Illuminate\\Support\\Facades\\Schema::hasTable('sync_streams')) {
               throw new RuntimeException('Current schema was not reapplied after rollback recovery.');
           }
           "
