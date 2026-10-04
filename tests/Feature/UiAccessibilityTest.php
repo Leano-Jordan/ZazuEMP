@@ -220,4 +220,16 @@ class UiAccessibilityTest extends TestCase
             ->assertSee('Please correct the highlighted fields.', false);
     }
 
+
+    public function test_theme_contrast_contract_keeps_shell_and_surface_foregrounds_explicit(): void
+    {
+        $css = file_get_contents(resource_path('css/app.css'));
+
+        $this->assertStringContainsString('--zazu-sidebar-ink: #F5FAFF;', $css);
+        $this->assertStringContainsString('--zazu-ink: #12324D;', $css);
+        $this->assertStringContainsString('--zazu-muted: #496A83;', $css);
+        $this->assertStringContainsString('.zazu-command-title {', $css);
+        $this->assertStringContainsString('color: #F7FBFF;', $css);
+    }
+
 }
