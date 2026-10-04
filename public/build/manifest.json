@@ -13,7 +13,7 @@
     ]
   },
   "resources/css/zazu-final-visual-sweep.css": {
-    "file": "assets/zazu-final-visual-sweep-BbAmEVpR.css",
+    "file": "assets/zazu-final-visual-sweep-BgMMGRHD.css",
     "name": "zazu-final-visual-sweep",
     "names": [
       "zazu-final-visual-sweep.css"
@@ -22,7 +22,7 @@
     "isEntry": true
   },
   "resources/css/zazu-mobile-refinement.css": {
-    "file": "assets/zazu-mobile-refinement-BuQqWlaw.css",
+    "file": "assets/zazu-mobile-refinement-BJr6OuXS.css",
     "name": "zazu-mobile-refinement",
     "names": [
       "zazu-mobile-refinement.css"
@@ -48,7 +48,7 @@
     "src": "resources/fonts/space-grotesk-latin-wght-normal.woff2"
   },
   "resources/js/app.js": {
-    "file": "assets/app-DlLWybEY.js",
+    "file": "assets/app-C4mvXUs1.js",
     "name": "app",
     "src": "resources/js/app.js",
     "isEntry": true
