@@ -249,3 +249,27 @@ Verification:
 - source brace/parenthesis checks are balanced;
 - no navigation capability was deleted;
 - rendered browser acceptance remains pending because the live local Zazu runtime is not exposed through this connector.
+
+
+## 2026-10-04 current refinement / defect hardening
+
+### FIXED — account navigation placement
+The authenticated account popover is now aligned to the same outward navigation relationship as the Work/System flyouts on desktop, while mobile places it above the account trigger. Light-theme account links are explicitly scoped to the dark navigation tokens so they cannot inherit page text colours.
+
+### FIXED — Helper/navigation collision
+The Helper is now below navigation flyouts in the visual stack. A small runtime collision check moves it horizontally when an open desktop flyout intersects it; the mobile shell suppresses Helper interaction while the navigation drawer is open.
+
+### FIXED — wallpaper regression
+The shell no longer paints an opaque page colour over the body wallpaper when a business wallpaper is configured. The wallpaper readability treatment was recalibrated to a translucent blue overlay rather than an almost-opaque page layer.
+
+### REFINED — dashboard/title surfaces
+Dashboard keeps all existing operational content, but the top hero now clearly reads as the Dashboard command/title band. Shared command/title rectangles are blue-tinted and distinct from the canvas rather than presenting as near-white slabs.
+
+### REFINED — calendar
+Calendar remains a multi-view operational surface. Holiday names are now surfaced in Month, 3 Months, Year and Agenda representations; Agenda also keeps dates that contain a holiday even when no job is scheduled. View controls use the same rectangular relationship as the navigation language.
+
+Verification boundary:
+- changed source files were fetched again from main;
+- CSS/JS brace and parenthesis balance passed;
+- Blade conditional counts balanced for changed Blade views;
+- rendered desktop/tablet/mobile visual acceptance remains pending an actual runtime/browser render.
