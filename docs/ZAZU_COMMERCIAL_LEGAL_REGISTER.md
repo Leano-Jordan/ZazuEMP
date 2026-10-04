@@ -204,3 +204,36 @@ Release action:
 Legal/commercial readiness should be treated as a release gate, not post-launch paperwork.
 
 Last updated: 2026-10-03
+
+
+## 12. Director dependency/licence metadata audit — 2026-10-04
+
+The release lockfiles were inspected at current main. This is a metadata audit, not legal clearance.
+
+### Composer
+
+- 109 locked packages total: 76 runtime + 33 development.
+- Runtime licence metadata: 68 MIT, 5 BSD-3-Clause, 2 dual BSD-3-Clause / GPL-2.0-only / GPL-3.0-only, 1 Apache-2.0.
+- Development licence metadata: 9 MIT, 24 BSD-3-Clause.
+
+### npm
+
+- 148 lockfile package entries.
+- Licence metadata: 108 MIT, 24 MPL-2.0, 5 Apache-2.0, 7 ISC, 1 OFL-1.1, 1 BSD-3-Clause, 1 0BSD and 1 MIT-or-CC0 entry.
+- Runtime dependency @fontsource/anton@5.3.0 declares OFL-1.1.
+- Playwright/browser tooling declares Apache-2.0; Lightning CSS packages declare MPL-2.0.
+
+### Release interpretation
+
+The lockfiles provide useful declared licence metadata but do not by themselves constitute commercial compliance clearance.
+
+Remaining manual release evidence:
+- verify exact licence texts/notices for the distributed dependency set;
+- confirm attribution/notice obligations and preserve required notice files;
+- review dual/multi-licence packages for the selected distribution path;
+- separate production/runtime dependencies from development-only tooling in the final notice set;
+- retain provenance and rights evidence for final landing/media assets.
+
+Status: dependency metadata audit complete; final licence compliance clearance remains open.
+
+Last updated: 2026-10-04
