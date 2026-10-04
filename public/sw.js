@@ -1,4 +1,5 @@
-const CACHE_NAME = 'zazu-static-v3';
+const CACHE_NAME = 'zazu-static-v4';
+const OFFLINE_SHELL = '/offline';
 
 const PRECACHE_ASSETS = [
     '/images/landing/stock/hero.jpg',
@@ -51,6 +52,21 @@ function isCacheableStaticAsset(url, request) {
 self.addEventListener('fetch', (event) => {
     const request = event.request;
     const url = new URL(request.url);
+
+    if (request.method === 'GET' && request.mode === 'navigate' && url.origin === self.location.origin) {
+        event.respondWith(
+            fetch(request)
+                .then((response) => {
+                    if (response.ok) {
+                        const copy = response.clone();
+                        caches.open(CACHE_NAME).then((cache) => cache.put(OFFLINE_SHELL, copy));
+                    }
+                    return response;
+                })
+                .catch(() => caches.match(OFFLINE_SHELL))
+        );
+        return;
+    }
 
     if (!isCacheableStaticAsset(url, request)) return;
 
