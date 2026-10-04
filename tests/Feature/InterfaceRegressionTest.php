@@ -114,6 +114,24 @@ class InterfaceRegressionTest extends TestCase
         $this->assertStringContainsString('background: rgba(2, 15, 27, .44);', $css);
     }
 
+    public function test_mobile_header_uses_one_explicit_grid_contract_and_catalogue_tabs_remain_readable_in_dark_mode(): void
+    {
+        $mobileCss = file_get_contents(resource_path('css/zazu-mobile-refinement.css'));
+        $visualCss = file_get_contents(resource_path('css/zazu-final-visual-sweep.css'));
+
+        $this->assertStringContainsString('"menu title search theme"', $mobileCss);
+        $this->assertStringContainsString('"tabs tabs tabs tabs"', $mobileCss);
+        $this->assertStringContainsString('"page-action page-action page-action page-action"', $mobileCss);
+        $this->assertStringNotContainsString('grid-template-areas: "menu context actions";', $mobileCss);
+        $this->assertStringNotContainsString('left: 56px;', $mobileCss);
+        $this->assertStringNotContainsString('min-height: 112px;', $mobileCss);
+
+        $this->assertStringContainsString('[data-theme="dark"] .zazu-catalogue-tab {', $visualCss);
+        $this->assertStringContainsString('color:var(--zazu-text-main);', $visualCss);
+        $this->assertStringContainsString('.zazu-catalogue-command > :first-child {', $visualCss);
+        $this->assertStringContainsString('padding:20px 18px 18px;', $visualCss);
+    }
+
     public function test_public_landing_has_explicit_foreground_surface_pairings_and_balanced_plan_delivery(): void
     {
         $view = file_get_contents(resource_path('views/landing.blade.php'));
