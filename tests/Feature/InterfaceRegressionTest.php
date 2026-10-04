@@ -132,6 +132,20 @@ class InterfaceRegressionTest extends TestCase
         $this->assertStringContainsString('padding:20px 18px 18px;', $visualCss);
     }
 
+    public function test_helper_is_docked_without_runtime_collision_repositioning(): void
+    {
+        $css = file_get_contents(resource_path('css/zazu-final-visual-sweep.css'));
+        $js = file_get_contents(resource_path('js/app.js'));
+
+        $this->assertStringContainsString('.zazu-helper {', $css);
+        $this->assertStringContainsString('z-index: 50;', $css);
+        $this->assertStringContainsString('width: 46px;', $css);
+        $this->assertStringContainsString('body.zazu-mobile-menu-open .zazu-helper', $css);
+        $this->assertStringNotContainsString('syncHelperCollision', $js);
+        $this->assertStringNotContainsString('is-nav-avoiding', $js);
+        $this->assertStringNotContainsString('scheduleHelperCollisionSync', $js);
+    }
+
     public function test_mobile_search_does_not_collapse_at_520px_and_active_nav_keeps_sidebar_contrast(): void
     {
         $appCss = file_get_contents(resource_path('css/app.css'));
