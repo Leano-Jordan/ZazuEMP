@@ -1,6 +1,8 @@
 # Zazu EMP — V1 Deployment Runbook
 
 **Status:** OPERATIONAL DRAFT  
+**Operational owner:** Isaac Junior Lehlogonolo Maluleka  
+**Operating address:** 1068 Block JK, Soshanguve, Pretoria, South Africa  
 **Scope:** clean installation and controlled deployment
 
 ## Preconditions
