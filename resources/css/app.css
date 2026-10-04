@@ -19,157 +19,9 @@
     --font-sans: Inter, "Plus Jakarta Sans", "Segoe UI Variable Text", "Segoe UI", ui-sans-serif, system-ui, sans-serif;
 }
 
-:root {
-    color-scheme: light;
 
-    /* Soft blue product system */
-    --zazu-page: #E5EFF7;
-    --zazu-page-deep: #D7E5F1;
 
-    /* Navigation rail */
-    --zazu-sidebar: #D9E7F3;
-    --zazu-sidebar-ink: #172B3F;
-    --zazu-sidebar-muted: #3E5268;
-    --zazu-sidebar-label: #65798D;
-    --zazu-sidebar-hover: #C9DBEB;
-    --zazu-sidebar-active: #EAF3FA;
-    --zazu-sidebar-surface: #EDF5FA;
 
-    /* Surfaces */
-    --zazu-surface: #F2F7FB;
-    --zazu-surface-2: #E3EDF5;
-    --zazu-surface-3: #D6E4EF;
-    --zazu-field: #F8FBFD;
-
-    /* Typography */
-    --zazu-ink: #172B3F;
-    --zazu-ink-2: #3E5268;
-    --zazu-muted: #566078;
-    --zazu-faint: #68728A;
-    --zazu-nav-label: #58627B;
-
-    /* Structure */
-    --zazu-border: #C4D3E0;
-    --zazu-border-strong: #8FA7BC;
-
-    /* Brand / actions */
-    --zazu-primary: #2F629F;
-    --zazu-primary-light: #789BC0;
-    --zazu-primary-pale: #C6D8E8;
-    --zazu-primary-shadow: #9DB6CF;
-    --zazu-primary-deep: #234D7D;
-    --zazu-primary-hover: #234D7D;
-    --zazu-primary-soft: #E8F0F8;
-    --zazu-primary-ink: #FAFCFE;
-    --zazu-link: #2F629F;
-    --zazu-link-hover: #234D7D;
-    --zazu-nav-active: #2F629F;
-
-    /* Semantic */
-    --zazu-accent: #3C7F7A;
-    --zazu-accent-ink: #316B67;
-    --zazu-accent-soft: #E5F1F0;
-    --zazu-focus: #4D78B0;
-
-    --zazu-success: #4C806F;
-    --zazu-success-ink: #3C6B5D;
-    --zazu-success-soft: #E4EFEB;
-    --zazu-warning: #8A714A;
-    --zazu-warning-ink: #705A35;
-    --zazu-warning-soft: #F2ECDF;
-    --zazu-danger: #A86870;
-    --zazu-danger-ink: #87535A;
-    --zazu-danger-soft: #F1E4E6;
-    --zazu-info: #5279A8;
-    --zazu-info-ink: #456688;
-    --zazu-info-soft: #E7EEF5;
-
-    /* Elevation / shape / motion */
-    --zazu-shadow: 0 1px 2px rgba(23, 49, 90, 0.035);
-    --zazu-shadow-strong: 0 4px 14px rgba(23, 49, 90, 0.07);
-
-    --zazu-radius-sm: 2px;
-    --zazu-radius-md: 4px;
-    --zazu-radius-lg: 6px;
-    --zazu-radius-xl: 6px;
-    --zazu-radius-pill: 999px;
-
-    --zazu-motion-fast: 120ms;
-    --zazu-motion-base: 160ms;
-    --zazu-motion-slow: 220ms;
-    --zazu-ease: cubic-bezier(0.2, 0, 0.38, 0.9);
-
-    --zazu-border-subtle: color-mix(in srgb, var(--zazu-border) 72%, transparent);
-    --zazu-surface-raised: color-mix(in srgb, var(--zazu-surface) 88%, var(--zazu-surface-2));
-    --zazu-shadow-none: none;
-    --zazu-shadow-soft: 0 1px 2px color-mix(in srgb, var(--zazu-ink) 7%, transparent);
-    --zazu-shadow-float: 0 8px 24px color-mix(in srgb, var(--zazu-ink) 10%, transparent);
-    --zazu-radius-pill: 999px;
-}
-
-:root[data-theme="dark"] {
-    color-scheme: dark;
-
-    --zazu-page: #0D1B2A;
-    --zazu-page-deep: #091520;
-
-    --zazu-sidebar: #112944;
-    --zazu-sidebar-ink: #E9F1F8;
-    --zazu-sidebar-muted: #B6CBE0;
-    --zazu-sidebar-label: #88A9C7;
-    --zazu-sidebar-hover: #173A5E;
-    --zazu-sidebar-active: #1B416B;
-    --zazu-sidebar-surface: #153553;
-
-    --zazu-surface: #10283F;
-    --zazu-surface-2: #152F4A;
-    --zazu-surface-3: #193A5C;
-    --zazu-field: #0C1B2B;
-
-    --zazu-ink: #E9F1F8;
-    --zazu-ink-2: #D2E0ED;
-    --zazu-muted: #B6CBE0;
-    --zazu-faint: #88A9C7;
-    --zazu-nav-label: #88A9C7;
-
-    --zazu-border: #355879;
-    --zazu-border-strong: #5F88B0;
-
-    --zazu-primary: #5F88B0;
-    --zazu-primary-light: #88A9C7;
-    --zazu-primary-pale: #C6D8E8;
-    --zazu-primary-shadow: #355879;
-    --zazu-primary-deep: #88A9C7;
-    --zazu-primary-hover: #88A9C7;
-    --zazu-primary-soft: #183752;
-    --zazu-primary-ink: #0D1B2A;
-    --zazu-link: #88A9C7;
-    --zazu-link-hover: #B6CBE0;
-    --zazu-nav-active: #5F88B0;
-
-    --zazu-accent: #88A9C7;
-    --zazu-accent-ink: #B6CBE0;
-    --zazu-accent-soft: #183752;
-    --zazu-focus: #88A9C7;
-
-    --zazu-success: #6B9A8D;
-    --zazu-success-ink: #8CB7AA;
-    --zazu-success-soft: #1C332F;
-    --zazu-warning: #B59B6A;
-    --zazu-warning-ink: #C8B58B;
-    --zazu-warning-soft: #342D22;
-    --zazu-danger: #BD858A;
-    --zazu-danger-ink: #D19FA3;
-    --zazu-danger-soft: #352629;
-    --zazu-info: #5F88B0;
-    --zazu-info-ink: #B6CBE0;
-    --zazu-info-soft: #183752;
-
-    --zazu-shadow: 0 1px 2px rgba(0,0,0,.24), 0 8px 24px rgba(0,0,0,.18);
-    --zazu-shadow-strong: 0 4px 14px rgba(0,0,0,.24);
-    --zazu-shadow-soft: 0 1px 2px rgba(0, 0, 0, 0.22);
-    --zazu-shadow-float: 0 10px 28px rgba(0, 0, 0, 0.24);
-}
 * {
     border-color: var(--zazu-border);
 }
@@ -2481,19 +2333,9 @@ body {
 }
 
 @media (prefers-contrast: more) {
-    :root {
-        --zazu-border: #5a7188;
-        --zazu-border-strong: #31536e;
-        --zazu-muted: #3f5c73;
-        --zazu-faint: #4f6a80;
-    }
+    
 
-    :root[data-theme="dark"] {
-        --zazu-border: #63809b;
-        --zazu-border-strong: #a7c7df;
-        --zazu-muted: #b9cddf;
-        --zazu-faint: #a6bdd0;
-    }
+    
 
     .zazu-card,
     .zazu-panel,
@@ -5848,26 +5690,9 @@ html[data-theme="dark"] .zazu-public-party,html[data-theme="dark"] .zazu-public-
    Inspired by current Linear/Vercel/Stripe/Attio patterns: reduce chrome, let typography,
    spacing, tonal surfaces and microstates carry hierarchy. */
 
-:root {
-    --zazu-page: #F7FAFF;
-    --zazu-surface: #FAFCFE;
-    --zazu-surface-2: #F0F1F6;
-    --zazu-surface-3: #EAF2FF;
-    --zazu-border: color-mix(in srgb, var(--zazu-ink) 7%, transparent);
-    --zazu-border-strong: color-mix(in srgb, var(--zazu-primary) 30%, transparent);
-    --zazu-shadow: 0 1px 2px color-mix(in srgb, var(--zazu-ink) 5%, transparent);
-    --zazu-shadow-soft: 0 1px 2px color-mix(in srgb, var(--zazu-ink) 5%, transparent);
-    --zazu-shadow-float: 0 14px 38px color-mix(in srgb, var(--zazu-ink) 10%, transparent);
-}
 
-:root[data-theme="dark"] {
-    --zazu-page: #0A1628;
-    --zazu-surface: #0F2038;
-    --zazu-surface-2: #132943;
-    --zazu-surface-3: #183451;
-    --zazu-border: color-mix(in srgb, var(--zazu-ink) 13%, transparent);
-    --zazu-border-strong: color-mix(in srgb, var(--zazu-primary) 38%, transparent);
-}
+
+
 
 body {
     background:
@@ -6576,14 +6401,7 @@ body:not(.zazu-has-wallpaper) {
 /* 2026 VISUAL CONTRAST REFINEMENT
    Separation must be perceptible, not merely mathematically different.
    Use stronger tonal surfaces, clear field wells and section anchors. */
-:root {
-    --zazu-page: #eaf2ff;
-    --zazu-surface: #ffffff;
-    --zazu-surface-2: #dceaff;
-    --zazu-field: #f4f8ff;
-    --zazu-border: #9ec8ff;
-    --zazu-border-strong: #78aef5;
-}
+
 
 .zazu-main {
     background:
@@ -7017,31 +6835,99 @@ textarea:disabled,
    Purpose: replace generic SaaS surfaces with clearer operational hierarchy,
    stronger field boundaries, deliberate navigation states, and dashboard rhythm.
 */
-:root {
-    --zazu-page: #eef3f8;
+:root { {
+    color-scheme: light;
+    /* Soft blue product system */
+    --zazu-page: #E5EFF7;
     --zazu-page-deep: #dbe6f1;
-    --zazu-surface: #ffffff;
+    /* Navigation rail */
+    --zazu-sidebar: #D9E7F3;
+    --zazu-sidebar-ink: #172B3F;
+    --zazu-sidebar-muted: #3E5268;
+    --zazu-sidebar-label: #65798D;
+    --zazu-sidebar-hover: #C9DBEB;
+    --zazu-sidebar-active: #EAF3FA;
+    --zazu-sidebar-surface: #EDF5FA;
+    /* Surfaces */
+    --zazu-surface: #F2F7FB;
     --zazu-surface-2: #f5f8fb;
     --zazu-surface-3: #edf3f8;
     --zazu-field: #ffffff;
-    --zazu-ink: #14253a;
+    /* Typography */
+    --zazu-ink: #172B3F;
     --zazu-ink-2: #2f465f;
     --zazu-muted: #52687d;
     --zazu-faint: #6c8195;
-    --zazu-border: #b9c8d6;
+    --zazu-nav-label: #58627B;
+    /* Structure */
+    --zazu-border: #C4D3E0;
     --zazu-border-strong: #879bad;
-    --zazu-primary: #2f6fca;
+    /* Brand / actions */
+    --zazu-primary: #2F629F;
+    --zazu-primary-light: #789BC0;
+    --zazu-primary-pale: #C6D8E8;
+    --zazu-primary-shadow: #9DB6CF;
     --zazu-primary-deep: #1f579f;
     --zazu-primary-hover: #244f8f;
     --zazu-primary-soft: #e5effb;
-    --zazu-accent: #245fae;
-    --zazu-shadow: 0 1px 2px rgba(20,37,58,.05);
+    --zazu-primary-ink: #FAFCFE;
+    --zazu-link: #2F629F;
+    --zazu-link-hover: #234D7D;
+    --zazu-nav-active: #2F629F;
+    /* Semantic */
+    --zazu-accent: #3C7F7A;
+    --zazu-accent-ink: #316B67;
+    --zazu-accent-soft: #E5F1F0;
+    --zazu-focus: #4D78B0;
+    --zazu-success: #4C806F;
+    --zazu-success-ink: #3C6B5D;
+    --zazu-success-soft: #E4EFEB;
+    --zazu-warning: #8A714A;
+    --zazu-warning-ink: #705A35;
+    --zazu-warning-soft: #F2ECDF;
+    --zazu-danger: #A86870;
+    --zazu-danger-ink: #87535A;
+    --zazu-danger-soft: #F1E4E6;
+    --zazu-info: #5279A8;
+    --zazu-info-ink: #456688;
+    --zazu-info-soft: #E7EEF5;
+    /* Elevation / shape / motion */
+    --zazu-shadow: 0 1px 2px rgba(23, 49, 90, 0.035);
     --zazu-shadow-strong: 0 8px 24px rgba(20,37,58,.09);
+    --zazu-radius-sm: 2px;
+    --zazu-radius-md: 4px;
+    --zazu-radius-lg: 6px;
+    --zazu-radius-xl: 6px;
+    --zazu-radius-pill: 999px;
+    --zazu-motion-fast: 120ms;
+    --zazu-motion-base: 160ms;
+    --zazu-motion-slow: 220ms;
+    --zazu-ease: cubic-bezier(0.2, 0, 0.38, 0.9);
+    --zazu-border-subtle: color-mix(in srgb, var(--zazu-border) 72%, transparent);
+    --zazu-surface-raised: color-mix(in srgb, var(--zazu-surface) 88%, var(--zazu-surface-2));
+    --zazu-shadow-none: none;
+    --zazu-shadow-soft: 0 1px 2px color-mix(in srgb, var(--zazu-ink) 5%, transparent);
+    --zazu-shadow-float: 0 14px 38px color-mix(in srgb, var(--zazu-ink) 10%, transparent);
+    --zazu-border: #b9c8d6;
+    --zazu-page: #eef3f8;
+    --zazu-surface: #ffffff;
+    --zazu-shadow: 0 1px 2px rgba(20,37,58,.05);
+    --zazu-ink: #14253a;
+    --zazu-primary: #2f6fca;
+    --zazu-accent: #245fae;
 }
 
-:root[data-theme="dark"] {
+:root[data-theme="dark"] { {
+    color-scheme: dark;
     --zazu-page: #0b1726;
     --zazu-page-deep: #091321;
+    --zazu-sidebar: #112944;
+    --zazu-sidebar-ink: #E9F1F8;
+    --zazu-sidebar-muted: #B6CBE0;
+    --zazu-sidebar-label: #88A9C7;
+    --zazu-sidebar-hover: #173A5E;
+    --zazu-sidebar-active: #1B416B;
+    --zazu-sidebar-surface: #153553;
     --zazu-surface: #102235;
     --zazu-surface-2: #142b43;
     --zazu-surface-3: #19344f;
@@ -7050,12 +6936,40 @@ textarea:disabled,
     --zazu-ink-2: #d4e0eb;
     --zazu-muted: #b2c2d1;
     --zazu-faint: #91a7bb;
+    --zazu-nav-label: #88A9C7;
     --zazu-border: #34516c;
     --zazu-border-strong: #53728f;
     --zazu-primary: #72a9ed;
+    --zazu-primary-light: #88A9C7;
+    --zazu-primary-pale: #C6D8E8;
+    --zazu-primary-shadow: #355879;
     --zazu-primary-deep: #91bdf1;
     --zazu-primary-hover: #a6c9f4;
     --zazu-primary-soft: #193b5d;
+    --zazu-primary-ink: #0D1B2A;
+    --zazu-link: #88A9C7;
+    --zazu-link-hover: #B6CBE0;
+    --zazu-nav-active: #5F88B0;
+    --zazu-accent: #88A9C7;
+    --zazu-accent-ink: #B6CBE0;
+    --zazu-accent-soft: #183752;
+    --zazu-focus: #88A9C7;
+    --zazu-success: #6B9A8D;
+    --zazu-success-ink: #8CB7AA;
+    --zazu-success-soft: #1C332F;
+    --zazu-warning: #B59B6A;
+    --zazu-warning-ink: #C8B58B;
+    --zazu-warning-soft: #342D22;
+    --zazu-danger: #BD858A;
+    --zazu-danger-ink: #D19FA3;
+    --zazu-danger-soft: #352629;
+    --zazu-info: #5F88B0;
+    --zazu-info-ink: #B6CBE0;
+    --zazu-info-soft: #183752;
+    --zazu-shadow: 0 1px 2px rgba(0,0,0,.24), 0 8px 24px rgba(0,0,0,.18);
+    --zazu-shadow-strong: 0 4px 14px rgba(0,0,0,.24);
+    --zazu-shadow-soft: 0 1px 2px rgba(0, 0, 0, 0.22);
+    --zazu-shadow-float: 0 10px 28px rgba(0, 0, 0, 0.24);
 }
 
 body {
