@@ -501,8 +501,8 @@ body.zazu-mobile-menu-open .zazu-helper {
         grid-template-columns: 40px minmax(0, 1fr) 40px;
         grid-template-areas:
             "menu title theme"
-            "tabs tabs tabs"
             "search search search"
+            "tabs tabs tabs"
             "page-action page-action page-action";
         align-items: center;
         gap: 6px 8px;
@@ -743,19 +743,6 @@ body.zazu-mobile-menu-open .zazu-helper {
         min-width: 40px;
         min-height: 40px;
         justify-self: end;
-    }
-
-    .zazu-command-palette {
-        position: fixed !important;
-        top: calc(max(8px, env(safe-area-inset-top)) + 50px);
-        left: 10px !important;
-        right: 10px !important;
-        width: auto !important;
-        max-height: calc(100dvh - 68px);
-        border-radius: 16px;
-        box-shadow: 0 24px 70px color-mix(in srgb, var(--zazu-ink) 24%, transparent);
-        backdrop-filter: blur(18px);
-        -webkit-backdrop-filter: blur(18px);
     }
 
     .zazu-command-results {
