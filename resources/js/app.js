@@ -283,6 +283,28 @@ function setupBrandingUploads() {
             const allowedMimeTypes = ['image/jpeg', 'image/png', 'image/webp'];
             const allowed = allowedExtensions.includes(extension)
                 && (!file.type || allowedMimeTypes.includes(file.type));
+            const maxBytes = 5 * 1024 * 1024;
+            const error = document.querySelector('[data-branding-error="' + type + '"]');
+
+            const clearError = () => {
+                input.setCustomValidity('');
+                input.removeAttribute('aria-invalid');
+                if (error) {
+                    error.hidden = true;
+                    error.textContent = '';
+                }
+            };
+
+            const showError = (message) => {
+                input.setCustomValidity(message);
+                input.setAttribute('aria-invalid', 'true');
+                if (error) {
+                    error.hidden = false;
+                    error.textContent = message;
+                }
+            };
+
+            clearError();
 
             if (!allowed) {
                 input.value = '';
@@ -291,6 +313,18 @@ function setupBrandingUploads() {
                 if (placeholder) placeholder.hidden = false;
                 container.setAttribute('aria-busy', 'false');
                 if (filename) filename.textContent = 'Choose a JPG, PNG or WebP image.';
+                showError('Choose a JPG, PNG or WebP image.');
+                return;
+            }
+
+            if (file.size > maxBytes) {
+                input.value = '';
+                preview.hidden = true;
+                loading.hidden = true;
+                if (placeholder) placeholder.hidden = false;
+                container.setAttribute('aria-busy', 'false');
+                if (filename) filename.textContent = 'Image is larger than 5 MB.';
+                showError('This image is larger than 5 MB. Choose a smaller image.');
                 return;
             }
 
@@ -648,12 +682,16 @@ function setupZazuHelper() {
 
             if (!desktopViewport.matches) {
                 helper.style.removeProperty('right');
+                helper.classList.remove('is-nav-avoiding');
                 return;
             }
 
             helper.style.right = baseRight + 'px';
+            helper.classList.remove('is-nav-avoiding');
+
             const helperRect = helper.getBoundingClientRect();
-            let requiredRight = baseRight;
+            let safeRight = baseRight;
+            let avoidingNav = false;
 
             document.querySelectorAll('.zazu-nav-area.is-open .zazu-nav-flyout').forEach((flyout) => {
                 const flyoutRect = flyout.getBoundingClientRect();
@@ -663,15 +701,19 @@ function setupZazuHelper() {
                     flyoutRect.top < helperRect.bottom &&
                     flyoutRect.bottom > helperRect.top;
 
-                if (overlaps) {
-                    requiredRight = Math.max(
-                        requiredRight,
-                        window.innerWidth - flyoutRect.left + 14
-                    );
-                }
+                if (!overlaps) return;
+
+                avoidingNav = true;
+
+                const maxSafeRight = window.innerWidth - flyoutRect.right - helperRect.width - 14;
+                safeRight = Math.min(
+                    safeRight,
+                    Math.max(8, maxSafeRight)
+                );
             });
 
-            helper.style.right = requiredRight + 'px';
+            helper.style.right = safeRight + 'px';
+            helper.classList.toggle('is-nav-avoiding', avoidingNav);
         };
 
         const scheduleHelperCollisionSync = () => {
