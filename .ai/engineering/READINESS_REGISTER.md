@@ -271,3 +271,23 @@ Baseline: remote `main` `4b1fbb8c6139215d5338b442b73a943d820948d9`.
 The 2026-10-03 numeric scorecard above is not recalculated from this single local evidence cycle.
 
 Last updated: 2026-10-04
+
+
+## Current populated authorization/isolation evidence — 2026-10-04
+
+Target: final populated multi-business authorization/isolation challenge.
+
+Evidence:
+- PopulatedAuthorizationIsolationTest seeds Business A from the Demo Scenario and creates a separate Business B owner/customer.
+- Business B cannot view Business A's populated customer, Work/Event or invoice.
+- Business B search cannot surface Business A's customer.
+- Business B cannot create Work against Business A's customer; no unauthorized event is created.
+- Business B's own customer remains available.
+- Laravel CI run 37203066802 passed the new challenge as part of 242 tests / 1,381 assertions.
+- Current-head Psalm Security Scan, PHPMD, Quality, CodeQL, browser smoke and populated upgrade/rollback also passed.
+
+Disposition: Security evidence is VERIFIED / PROVEN at current runtime level. This is not a formal security certification.
+
+Remaining material release gates: physical phone/tablet acceptance; legal/privacy operational closure; release-level dependency/transitive licence audit; Zazu brand/trade-mark clearance; final Director re-audit.
+
+Last updated: 2026-10-04
