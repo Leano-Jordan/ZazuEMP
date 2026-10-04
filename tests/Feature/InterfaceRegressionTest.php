@@ -111,7 +111,12 @@ class InterfaceRegressionTest extends TestCase
         $this->assertStringContainsString('var(--zazu-dashboard-image)', $css);
         $this->assertStringContainsString('.zazu-command-band .zazu-eyebrow', $css);
         $this->assertStringContainsString('.zazu-command-meta {', $css);
-        $this->assertStringContainsString('background: rgba(2, 15, 27, .44);', $css);
+        $this->assertStringContainsString('background: rgba(2, 15, 27, .44);', $css);        $sweep = file_get_contents(resource_path('css/zazu-final-visual-sweep.css'));
+
+        $this->assertStringContainsString('.zazu-command-band', $sweep);
+        $this->assertStringContainsString('protected shared banner contrast', $sweep);
+        $this->assertStringNotContainsString(':where(.zazu-command-band, .zazu-page-header, .zazu-dashboard-command)', $sweep);
+
     }
 
     public function test_mobile_header_uses_one_explicit_grid_contract_and_catalogue_tabs_remain_readable_in_dark_mode(): void
@@ -119,9 +124,10 @@ class InterfaceRegressionTest extends TestCase
         $mobileCss = file_get_contents(resource_path('css/zazu-mobile-refinement.css'));
         $visualCss = file_get_contents(resource_path('css/zazu-final-visual-sweep.css'));
 
-        $this->assertStringContainsString('"menu title search theme"', $mobileCss);
+        $this->assertStringContainsString('"menu title theme"', $mobileCss);
+        $this->assertStringContainsString('"search search search"', $mobileCss);
         $this->assertStringContainsString('"tabs tabs tabs tabs"', $mobileCss);
-        $this->assertStringContainsString('"page-action page-action page-action page-action"', $mobileCss);
+        $this->assertStringContainsString('"page-action page-action page-action"', $mobileCss);
         $this->assertStringNotContainsString('grid-template-areas: "menu context actions";', $mobileCss);
         $this->assertStringNotContainsString('left: 56px;', $mobileCss);
         $this->assertStringNotContainsString('min-height: 112px;', $mobileCss);
@@ -140,6 +146,18 @@ class InterfaceRegressionTest extends TestCase
         $this->assertStringContainsString('translateX(calc(100% + 28px))', $css);
         $this->assertStringContainsString('opacity: 1;', $css);
         $this->assertStringNotContainsString('body.zazu-mobile-menu-open .zazu-helper {\n    opacity: 0;', $css);
+    }
+
+    public function test_helper_moves_for_work_and_sales_popovers(): void
+    {
+        $css = file_get_contents(resource_path('css/zazu-final-visual-sweep.css'));
+        $js = file_get_contents(resource_path('js/app.js'));
+
+        $this->assertStringContainsString('.zazu-helper.is-nav-avoiding', $css);
+        $this->assertStringContainsString('--zazu-helper-nav-right', $css);
+        $this->assertStringContainsString("new Set(['zazu-nav-workspace', 'zazu-nav-sales'])", $js);
+        $this->assertStringContainsString('getBoundingClientRect()', $js);
+        $this->assertStringContainsString('helper.style.setProperty', $js);
     }
 
     public function test_helper_is_docked_without_runtime_collision_repositioning(): void
