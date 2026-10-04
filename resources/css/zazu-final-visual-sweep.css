@@ -6307,3 +6307,18 @@ body {
         max-width: max-content;
     }
 }
+
+
+/* DIRECTOR WALLPAPER FIX — 2026-10-04 */
+/* Keep the selected business wallpaper above the later global body background passes. */
+body.zazu-has-wallpaper {
+    background-color: var(--zazu-page);
+    background-image:
+        linear-gradient(135deg, color-mix(in srgb, var(--zazu-page) 76%, transparent), color-mix(in srgb, var(--zazu-page-deep) 84%, transparent)),
+        var(--zazu-wallpaper),
+        linear-gradient(145deg, var(--zazu-page) 0%, var(--zazu-page-deep) 100%);
+    background-size: cover, cover, cover;
+    background-position: center, center, center;
+    background-repeat: no-repeat;
+    background-attachment: fixed;
+}
