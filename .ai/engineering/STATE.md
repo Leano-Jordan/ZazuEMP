@@ -1001,3 +1001,25 @@ Verification boundary:
 
 Next Director target:
 REBUILD/REAL BROWSER RENDER → DESKTOP + MOBILE + LIGHT + DARK CASCADE CHECK → REFERENCE COMPARISON → ONLY THEN VISUAL REFINEMENT.
+
+
+## Director UI/UX polish cycle — 2026-10-04
+
+Objective: resolve rendered navigation/content hierarchy defects without another visual rewrite.
+
+Changed:
+- resources/css/zazu-responsive-theme.css — desktop nav overflow no longer clips nested flyouts; mobile keeps bounded scrolling.
+- resources/css/app.css — hierarchical flyout is physically attached to its trigger, removes hover dead-zone, and keeps hidden panels non-interactive.
+- resources/css/zazu-final-visual-sweep.css — removed obsolete 141-line hard-coded dashboard visual override layer and normalized remaining legacy component colours to semantic tokens.
+
+Observed evidence:
+- supplied desktop screenshots showed weak dashboard grouping/text-stream presentation and navigation/flyout layering problems.
+- source audit confirmed overflow-x clipping and a 7px flyout gap as direct navigation causes.
+
+Verification:
+- changed files re-read from main after commits.
+- source-level checks confirm desktop flyout is not clipped by nav overflow, mobile remains bounded, and no root token system was added.
+- visual acceptance remains open because post-change local browser rendering is unavailable through the repository connector.
+
+Current visual state: IMPLEMENTED / VISUAL UNVERIFIED.
+Next target: actual browser render + human-eye comparison of Dashboard, Work, Forms and Calendar in desktop/mobile and light/dark before further broad visual changes.
