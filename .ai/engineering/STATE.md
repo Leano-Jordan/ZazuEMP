@@ -1223,3 +1223,43 @@ Verification boundary:
 
 Next target:
 CURRENT-HEAD BROWSER/DEVICE ACCEPTANCE → RE-AUDIT NAVIGATION + CALENDAR + RECENT UI RECOVERY CONTRACTS
+
+## Director UI integrity recovery — 2026-10-05
+
+Target: resolve the recurring Calendar lockout without another symptom patch, then harden the Zazu visual system against cross-page/cross-theme drift.
+
+Completed in this cycle:
+- Calendar remains owned by Work and Work now recognizes `calendar.*` as an active route.
+- Mobile/tablet navigation breakpoint contracts are aligned at 850px across CSS and JavaScript.
+- Active Work has a server-rendered flyout recovery path so Calendar remains reachable if JavaScript fails or stale assets load.
+- Calendar's optional holiday-preference schema is now non-blocking; stale local databases without that optional column no longer have to take Calendar down.
+- Staff/manager Calendar permission coverage is explicitly regression-tested.
+- Calendar CSS was consolidated from competing canonical/late blocks into one visual authority.
+- Helper CSS was consolidated from multiple competing root declarations into one visual authority while retaining the protected Work/Sales movement behavior.
+- Dark destructive-action contrast was corrected and hard-coded white foregrounds on theme-variable Calendar actions were removed.
+- Offline mobile surface contrast was corrected so its dark shell no longer contains light-on-light hero/notice content.
+- Cross-theme UI regression coverage now protects the known light-on-light/dark-on-dark failure family.
+
+Protected UI direction:
+- blue-slate light mode;
+- restrained glass/depth cards;
+- bounded search;
+- intentional CTA hierarchy;
+- dark image-led command/banner surfaces with light foregrounds;
+- Calendar information density and holiday visibility;
+- Helper Work/Sales yield behavior;
+- no competing token roots or generic late visual sweeps.
+
+Failure control:
+- `CASE-ZAZU-0010` records the first navigation-state recurrence.
+- `CASE-ZAZU-0011` is the current owner-reported Calendar lockout recurrence and remains INVESTIGATING until authenticated runtime evidence reproduces and closes the failure.
+- `REG-020` protects navigation ownership/active-state/responsive auto-expansion as one contract.
+- `REG-021` protects cross-theme foreground/surface relationships.
+
+Verification boundary:
+- Changed source and control documents are committed to `main` and re-read.
+- Current repository connector does not expose a usable CI result for the latest commits.
+- Browser/device rendering remains the required closure gate for the owner's live lockout and final visual acceptance; no runtime success is being claimed.
+
+Next Director target:
+CURRENT-HEAD AUTHENTICATED CALENDAR RUNTIME REPRODUCTION → FULL DESKTOP/MOBILE/TABLET UI CONTRAST + NAVIGATION SWEEP → FINAL REGRESSION RE-AUDIT
