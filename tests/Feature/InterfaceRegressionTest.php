@@ -58,6 +58,17 @@ class InterfaceRegressionTest extends TestCase
             ->assertSee('Agenda');
     }
 
+    public function test_calendar_keeps_work_navigation_active_for_mobile_drawer_recovery(): void
+    {
+        [$business, $user] = $this->workspace();
+
+        $response = $this->actingAs($user)->get(route('calendar.index'));
+
+        $response->assertOk()
+            ->assertSee('class="zazu-nav-area is-active" data-zazu-nav-area', false)
+            ->assertSee('class="zazu-nav-link active" aria-current="page">Calendar</a>', false);
+    }
+
     public function test_resource_register_pages_render_without_horizontal_layout_assumptions(): void
     {
         [$business, $user] = $this->workspace();
