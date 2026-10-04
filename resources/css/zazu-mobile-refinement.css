@@ -781,18 +781,27 @@ body.zazu-mobile-menu-open .zazu-helper {
     }
 
     .zazu-mobile-menu-button,
-    .zazu-theme-toggle,
-    .zazu-command-trigger,
-    .zazu-command-search {
+    .zazu-theme-toggle {
         width: 40px;
         min-width: 40px;
     }
 
     .zazu-mobile-menu-button,
-    .zazu-theme-toggle,
-    .zazu-command-trigger {
+    .zazu-theme-toggle {
         height: 40px;
         min-height: 40px;
+    }
+
+    .zazu-command-search {
+        width: 100%;
+        min-width: 0;
+    }
+
+    .zazu-command-trigger {
+        width: 100%;
+        min-width: 0;
+        height: 42px;
+        min-height: 42px;
     }
 
     .zazu-page-title {
