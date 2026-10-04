@@ -972,3 +972,31 @@ Verification:
 - screenshot golden baselines remain locked only after human approval of the recovered render.
 
 Future UI agents must modify this canonical system rather than append another visual sweep.
+
+## Director CSS authority stabilization — 2026-10-04
+
+Target: make the existing styling system deterministic before further visual refinement.
+
+Completed on main:
+- app.css is now explicitly the canonical owner for design tokens and shared visual components.
+- zazu-final-visual-sweep.css was reconstructed as a component-specific extension layer only; all root token systems and generic shared selectors were removed.
+- The final sweep's competing light/dark token roots, including the late indigo/purple palette, are no longer active.
+- Removed the obsolete hard-coded contrast/form refinement block from app.css (433 lines).
+- Removed the obsolete compact navigation override block from app.css (37 lines), including legacy !important navigation shadow rules.
+- Removed one stale <=520px page-title override from the mobile stylesheet.
+- Added docs/DIRECTOR_CSS_AUTHORITY_AUDIT_2026-10-04.md with the ownership map, findings and verification boundary.
+
+Current source-level stylesheet state:
+- app.css: 7915 lines, 29 !important declarations.
+- zazu-responsive-theme.css: 523 lines, 3 !important declarations.
+- zazu-mobile-refinement.css: 735 lines, 7 !important declarations.
+- zazu-final-visual-sweep.css: 3978 lines, 7 !important declarations and zero root token blocks.
+- No exact selector duplication remains between the component extension stylesheet and the other three stylesheet files.
+
+Verification boundary:
+- changed files were re-read from GitHub after writes;
+- source-level authority/cascade checks pass;
+- rendered browser/Vite runtime is not available through this connector, so no visual acceptance claim is made.
+
+Next Director target:
+REBUILD/REAL BROWSER RENDER → DESKTOP + MOBILE + LIGHT + DARK CASCADE CHECK → REFERENCE COMPARISON → ONLY THEN VISUAL REFINEMENT.
