@@ -109,7 +109,7 @@
             <div class="zazu-helper-step">
                 <div class="zazu-helper-step-label" data-zazu-helper-step-label>{{ $steps[0]['label'] }}</div>
                 <div data-zazu-helper-count>1 of {{ count($steps) }}</div>
-                <a href="#" class="zazu-helper-link" data-zazu-helper-link hidden></a>
+                <a href="{{ route('dashboard') }}" class="zazu-helper-link" data-zazu-helper-link hidden></a>
             </div>
             <div class="zazu-helper-actions">
                 <button type="button" class="zazu-helper-btn" data-zazu-helper-close>Close</button>
