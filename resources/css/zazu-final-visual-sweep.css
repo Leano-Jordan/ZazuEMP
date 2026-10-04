@@ -409,6 +409,16 @@ body {
     line-height: 1.25;
 }
 
+
+.zazu-card .zazu-section-heading h2,
+.zazu-card .zazu-section-heading h3,
+.zazu-panel .zazu-section-heading h2,
+.zazu-panel .zazu-section-heading h3,
+.zazu-form-section .zazu-section-heading h2,
+.zazu-form-section .zazu-section-heading h3 {
+    color: var(--zazu-ink);
+}
+
 .zazu-card-description,
 .zazu-panel-copy,
 .zazu-form-section-copy,
