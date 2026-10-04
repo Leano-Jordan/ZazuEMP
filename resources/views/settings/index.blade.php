@@ -306,7 +306,7 @@
         <div class="zazu-divider mt-5 pt-5">
             <div class="zazu-context-title">Restore a backup</div>
             <p class="zazu-context-copy mt-1">Use a Zazu backup ZIP created by this installation. Existing data will be replaced by the backup contents.</p>
-            <form method="POST" action="{{ route('settings.restore') }}" enctype="multipart/form-data" class="mt-4" data-zazu-restore-form>
+            <form method="POST" action="{{ route('settings.restore') }}" enctype="multipart/form-data" class="mt-4" data-zazu-restore-form data-zazu-confirm="Restoring this backup replaces the current Zazu database and private files." data-zazu-confirm-title="Restore Zazu backup?" data-zazu-confirm-action="Restore backup">
                 @csrf
                 <label class="zazu-field">
                     <span class="zazu-label">Backup ZIP</span>
@@ -336,17 +336,6 @@
 
         restoreFile?.addEventListener('change', syncRestoreState);
         restoreConfirm?.addEventListener('change', syncRestoreState);
-
-        restoreForm?.addEventListener('submit', (event) => {
-            if (!restoreFile?.files?.length || !restoreConfirm?.checked) {
-                event.preventDefault();
-                return;
-            }
-
-            if (!window.confirm('Restore this Zazu backup? The current database and private files will be replaced.')) {
-                event.preventDefault();
-            }
-        });
 
         syncRestoreState();
     });
