@@ -19,9 +19,9 @@ class CalendarController extends Controller
         if (is_string($holidayPreferences)) {
             $holidayPreferences = json_decode($holidayPreferences, true) ?: [];
         }
+        $month = $this->resolveMonth($request->string('month')->toString());
         $holidayMap = collect($holidays->visibleForYear($month->year, $holidayPreferences))
             ->groupBy(fn (array $holiday) => $holiday['date']->format('Y-m-d'));
-        $month = $this->resolveMonth($request->string('month')->toString());
         $view = $this->resolveView($request->string('view')->toString());
         [$rangeStart, $rangeEnd] = $this->viewRange($month, $view);
 
