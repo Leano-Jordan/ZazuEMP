@@ -7100,3 +7100,57 @@ body.zazu-has-wallpaper {
 .zazu-calendar-mini-grid span {
     gap: 2px;
 }
+
+/* DIRECTOR — light-theme typography: darker secondary text and a structured tab rail */
+:root:not([data-theme="dark"]) .zazu-eyebrow,
+:root:not([data-theme="dark"]) .zazu-section-name {
+    color: #475569 !important;
+}
+:root:not([data-theme="dark"]) .zazu-card-description,
+:root:not([data-theme="dark"]) .zazu-panel-copy,
+:root:not([data-theme="dark"]) .zazu-form-section-copy,
+:root:not([data-theme="dark"]) .zazu-field-help,
+:root:not([data-theme="dark"]) .zazu-list-meta,
+:root:not([data-theme="dark"]) .zazu-dash-surface-head p,
+:root:not([data-theme="dark"]) .zazu-dash-note,
+:root:not([data-theme="dark"]) .zazu-detail-label {
+    color: #475569 !important;
+}
+:root:not([data-theme="dark"]) .zazu-section-tabs {
+    background: #E3EEF8;
+    border: 1px solid #B7CBDD;
+    border-radius: 10px;
+    padding: 3px;
+}
+:root:not([data-theme="dark"]) .zazu-section-tabs a {
+    color: #334155 !important;
+}
+:root:not([data-theme="dark"]) .zazu-section-tabs a.active {
+    color: #173E68 !important;
+    background: #CFE3F5 !important;
+    border-color: #9DBBD4 !important;
+    box-shadow: none !important;
+}
+:root:not([data-theme="dark"]) .zazu-section-tabs a:hover,
+:root:not([data-theme="dark"]) .zazu-section-tabs a:focus-visible {
+    color: #123A68 !important;
+    background: #D6E8F6 !important;
+}
+
+/* Dark mode: no pale text on pale controls, including native/file controls. */
+:root[data-theme="dark"] .zazu-form,
+:root[data-theme="dark"] .zazu-form-section,
+:root[data-theme="dark"] .zazu-form-section-head,
+:root[data-theme="dark"] .zazu-branding-preview,
+:root[data-theme="dark"] .zazu-context-card {
+    color: #EAF2F8;
+}
+:root[data-theme="dark"] .zazu-form input[type="file"] {
+    background: #0B1C2D !important;
+    color: #D9E6F0 !important;
+}
+:root[data-theme="dark"] .zazu-form input[type="file"]::file-selector-button {
+    background: #193A5C;
+    color: #F3F7FA;
+    border: 1px solid #5A82A8;
+}
