@@ -603,16 +603,81 @@ const setupZazuHierarchicalNavigation = () => {
     const areas = [...document.querySelectorAll('[data-zazu-nav-area]')];
     if (!areas.length) return;
 
+    const helper = document.querySelector('[data-zazu-helper]');
+    const helperMoveAreaIds = new Set(['zazu-nav-workspace', 'zazu-nav-sales']);
+    const desktop = () => window.matchMedia('(min-width: 851px)').matches;
+    let helperNavArea = null;
+    let helperMoveFrame = 0;
+
+    const restoreHelperPosition = () => {
+        cancelAnimationFrame(helperMoveFrame);
+        helperNavArea = null;
+        if (!helper) return;
+        helper.classList.remove('is-nav-avoiding');
+        helper.style.removeProperty('--zazu-helper-nav-right');
+    };
+
+    const moveHelperForNav = (area) => {
+        if (!helper || !area || !desktop()) {
+            restoreHelperPosition();
+            return;
+        }
+
+        const panel = area.querySelector('[data-zazu-nav-panel]');
+        if (!panel || !helperMoveAreaIds.has(panel.id)) {
+            restoreHelperPosition();
+            return;
+        }
+
+        helperNavArea = area;
+        cancelAnimationFrame(helperMoveFrame);
+        helperMoveFrame = requestAnimationFrame(() => {
+            const panelRect = panel.getBoundingClientRect();
+            const helperRect = helper.getBoundingClientRect();
+            const viewportRight = window.innerWidth;
+            const viewportPadding = 14;
+            const gap = 16;
+            const desiredLeft = Math.min(
+                panelRect.right + gap,
+                viewportRight - helperRect.width - viewportPadding
+            );
+            const desiredRight = Math.max(
+                viewportPadding,
+                viewportRight - desiredLeft - helperRect.width
+            );
+
+            helper.style.setProperty('--zazu-helper-nav-right', desiredRight + 'px');
+            helper.classList.add('is-nav-avoiding');
+        });
+    };
+
+    const syncHelperForAreaState = (area) => {
+        if (!area || !helperMoveAreaIds.has(area.querySelector('[data-zazu-nav-panel]')?.id)) {
+            restoreHelperPosition();
+            return;
+        }
+
+        if (area.classList.contains('is-open')) moveHelperForNav(area);
+        else restoreHelperPosition();
+    };
+
     const closeOthers = (except) => {
         areas.forEach((area) => {
             if (area === except) return;
             area.classList.remove('is-open');
             area.querySelector('[data-zazu-nav-trigger]')?.setAttribute('aria-expanded', 'false');
         });
+
+        if (!except || !helperMoveAreaIds.has(except.querySelector('[data-zazu-nav-panel]')?.id)) {
+            restoreHelperPosition();
+        }
     };
 
     const syncActiveAreaForViewport = () => {
-        if (!window.matchMedia('(max-width: 820px)').matches) return;
+        if (!window.matchMedia('(max-width: 820px)').matches) {
+            restoreHelperPosition();
+            return;
+        }
 
         const activeArea = areas.find((area) => area.classList.contains('is-active'));
         if (!activeArea) return;
@@ -624,27 +689,58 @@ const setupZazuHierarchicalNavigation = () => {
 
     areas.forEach((area) => {
         const trigger = area.querySelector('[data-zazu-nav-trigger]');
+        const panel = area.querySelector('[data-zazu-nav-panel]');
         if (!trigger) return;
+
+        const movesHelper = helperMoveAreaIds.has(panel?.id);
 
         trigger.addEventListener('click', () => {
             const open = area.classList.toggle('is-open');
             closeOthers(area);
             trigger.setAttribute('aria-expanded', open ? 'true' : 'false');
+
+            if (movesHelper) {
+                if (open) moveHelperForNav(area);
+                else restoreHelperPosition();
+            }
         });
+
+        if (movesHelper) {
+            area.addEventListener('mouseenter', () => moveHelperForNav(area));
+            area.addEventListener('focusin', () => moveHelperForNav(area));
+            area.addEventListener('mouseleave', () => {
+                if (!area.classList.contains('is-open')) restoreHelperPosition();
+            });
+            area.addEventListener('focusout', (event) => {
+                if (!area.contains(event.relatedTarget)) {
+                    if (!area.classList.contains('is-open')) restoreHelperPosition();
+                }
+            });
+        }
     });
 
     document.addEventListener('click', (event) => {
-        if (!areas.some((area) => area.contains(event.target))) closeOthers(null);
+        if (!areas.some((area) => area.contains(event.target))) {
+            closeOthers(null);
+        }
     });
-
-    syncActiveAreaForViewport();
-    window.matchMedia('(max-width: 820px)').addEventListener?.('change', syncActiveAreaForViewport);
 
     document.addEventListener('keydown', (event) => {
         if (event.key !== 'Escape') return;
         closeOthers(null);
         document.querySelector('[data-zazu-nav-trigger][aria-expanded="true"]')?.focus();
     });
+
+    window.addEventListener('resize', () => {
+        if (helperNavArea?.classList.contains('is-open')) {
+            moveHelperForNav(helperNavArea);
+        } else if (!desktop()) {
+            restoreHelperPosition();
+        }
+    }, { passive: true });
+
+    syncActiveAreaForViewport();
+    window.matchMedia('(max-width: 820px)').addEventListener?.('change', syncActiveAreaForViewport);
 };
 
 function setupZazuHelper() {
