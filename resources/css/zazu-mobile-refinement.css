@@ -96,14 +96,18 @@
 
     .zazu-page-title {
         max-width: 100%;
-        font-size: 1.06rem;
+        font-size: 1.12rem;
         white-space: nowrap;
         overflow: hidden;
         text-overflow: ellipsis;
     }
 
     .zazu-section-tabs {
-        display: none !important;
+        display: flex !important;
+        max-width: 100%;
+        overflow-x: auto;
+        scrollbar-width: thin;
+        padding-bottom: 2px;
     }
 
     .zazu-topbar-actions {
