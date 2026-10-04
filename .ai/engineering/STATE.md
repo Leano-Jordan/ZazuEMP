@@ -1074,3 +1074,25 @@ Preservation rule:
 Verification boundary:
 - GitHub source re-read after writes; CSS/JS/Blade structural balance checks passed.
 - Rendered browser/device acceptance was not available through this environment; visual acceptance remains pending runtime/screenshot verification.
+
+
+## Director typography / contrast refinement — 2026-10-04
+
+Research basis:
+- UXPeak's "Top 5 UX/UI Design Tips and Tricks" emphasizes differentiating information through size, weight, colour and visual cues, and prioritizing important information rather than giving every element equal emphasis.
+- Carbon's current typography guidance uses calibrated type scales, weights and line heights to create hierarchy; productive UI uses a 14px base.
+- Atlassian's current guidance recommends typography tokens, contrast-aware text colours, clear heading hierarchy and avoiding very small type except for fine print.
+
+Zazu application of those principles:
+- Kept the existing single UI font family; did not introduce another competing font.
+- Raised normal metadata/label typography from 11px to 12px; 11px is no longer the normal hierarchy level.
+- Established stronger title/heading/value separation using size + weight + colour rather than excessive colour changes.
+- Kept monospace restricted to identifiers/codes/operational data.
+- Strengthened KPI/metric values so the value leads while labels recede.
+- Increased supporting text line-height and maintained the existing 14px productive body base.
+- Reduced dependence on all-caps as a hierarchy mechanism; retained it only for compact navigational labels where it remains useful.
+- Preserved the existing blue-tinted non-white surface system and dark shell.
+
+Acceptance boundary:
+- Source-level checks passed after the typography pass.
+- Actual browser rendering/device comparison remains required before calling the visual pass fully accepted.
