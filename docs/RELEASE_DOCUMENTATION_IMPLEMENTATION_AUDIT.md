@@ -68,3 +68,19 @@ It does **not** close the legal/privacy gate until:
 - final production documents are published through the chosen commercial channel.
 
 This is a release-readiness control record, not legal advice.
+
+
+## Director implementation correction notes — 2026-10-04
+
+### Wallpaper
+
+Previous audit treated wallpaper as implemented because storage, route and body-variable plumbing existed. A deeper cascade review found that later global `body` background declarations in the same visual stylesheet overrode the wallpaper rule.
+
+**Corrective status:** source fixed; regression test added. Rendered device verification remains part of final UI acceptance.
+
+### New-job customer creation
+
+Previous audit correctly identified normal customer creation as implemented but did not treat the missing in-context creation path as a UX gap.
+
+**Corrective status:** the new-job flow now provides an inline/secondary customer creation dialog. The existing job form remains authoritative; the new customer is returned into the existing selector and selected automatically.
+
