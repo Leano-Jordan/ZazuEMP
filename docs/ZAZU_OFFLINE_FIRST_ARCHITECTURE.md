@@ -30,9 +30,9 @@ Current offline licensing layer:
 
 Current limitation:
 
-The browser does not yet maintain a complete local copy of business data and does not yet queue offline writes.
+The phone workspace now maintains a local IndexedDB working copy and supports local creation/editing of core demo/operational records without a PC. The complete production business domain is not yet mirrored locally and offline writes are not yet queued for authoritative synchronization.
 
-Therefore the present application is **local-first in its server/runtime architecture, but not yet fully offline-capable on a disconnected phone/browser**.
+Therefore the present application is **phone-capable and locally persistent for the current mobile workspace, but not yet fully synchronized offline across the complete Zazu business domain**.
 
 ## 3. Target operating modes
 
@@ -272,8 +272,8 @@ Before claiming full offline operation:
 - business-scoped stable UUID identity registry for existing local records.
 
 **Not yet implemented**
-- complete phone-local business data store;
-- durable offline mutation queue;
+- complete phone-local mirror of every V1 business domain;
+- durable offline mutation queue and replay;
 - owner-approved device provisioning and bootstrap transport;
 - domain mutation handlers using the stable identity registry;
 - conflict resolution;
