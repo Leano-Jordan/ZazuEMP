@@ -13,6 +13,7 @@ use Symfony\Component\HttpFoundation\Response;
 return Application::configure(basePath: dirname(__DIR__))
     ->withRouting(
         web: __DIR__.'/../routes/web.php',
+        api: __DIR__.'/../routes/api.php',
         commands: __DIR__.'/../routes/console.php',
         health: '/up',
     )
@@ -99,7 +100,7 @@ return Application::configure(basePath: dirname(__DIR__))
                 'headline' => $definition['headline'],
                 'messageText' => $definition['message'],
             ], $response->getStatusCode())
-                ->header('X-Zazu-Request-Id', $requestId)
-                ->header('X-Zazu-Error-Code', $definition['code']);
+                ->header('X-Zazu-Error-Code', $definition['code'])
+                ->header('X-Zazu-Request-Id', $requestId);
         });
     })->create();
