@@ -240,6 +240,10 @@ class ZazuRestoreCommand extends Command
                 return self::FAILURE;
             }
 
+            if (!$this->validateStagedDatabase($driver, $work)) {
+                return self::FAILURE;
+            }
+
             // Stage private storage before changing the database. Every mutation after this
             // point either completes or throws so the catch block can restore the originals.
             if ($hasPrivateStorage && is_dir($storedPrivate)) {
