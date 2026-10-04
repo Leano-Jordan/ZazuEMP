@@ -62,7 +62,6 @@
                     @php $key=$day->format('Y-m-d'); $isCurrentMonthDay=$day->month===$month->month && $day->year===$month->year; $dayEvents=$eventsByDate->get($key,collect()); @endphp
                     <div class="zazu-calendar-cell {{ $isCurrentMonthDay ? 'is-current-month' : 'is-adjacent' }} {{ $day->isToday() ? 'is-today' : '' }}">
                         <div class="zazu-calendar-date-row"><span class="zazu-calendar-date">{{ $day->format('j') }}</span>@if($day->isToday())<span class="zazu-calendar-today">Today</span>@endif</div>
-                        @php $dayHolidays = $holidays->get($key, collect()); @endphp
                         @if($dayHolidays->isNotEmpty())
                             <div class="zazu-calendar-holidays">
                                 @foreach($dayHolidays as $holiday)
@@ -137,11 +136,10 @@
                 <div class="zazu-calendar-agenda-header"><div><span class="zazu-eyebrow">Scheduled work</span><h3>Jobs in {{ $monthLabel }}</h3></div><span class="zazu-calendar-agenda-count">{{ $monthEventCount }} {{ $monthEventCount===1?'job':'jobs' }}</span></div>
                 @php $agendaHasEvents=false; @endphp
                 @foreach($days as $day)
-                    @php $key=$day->format('Y-m-d'); $dayEvents=$eventsByDate->get($key,collect()); $show=$day->month===$month->month && $day->year===$month->year && $dayEvents->isNotEmpty() && (!$isCurrentMonth || $day->gte(now()->startOfDay())); @endphp
+                    @php $key=$day->format('Y-m-d'); $dayEvents=$eventsByDate->get($key,collect()); $dayHolidays=$holidays->get($key, collect()); $show=$day->month===$month->month && $day->year===$month->year && ($dayEvents->isNotEmpty() || $dayHolidays->isNotEmpty()) && (!$isCurrentMonth || $day->gte(now()->startOfDay())); @endphp
                     @if($show)
                         @php $agendaHasEvents=true; @endphp
                         <div class="zazu-calendar-agenda-day {{ $day->isToday()?'is-today':'' }}"><div class="zazu-calendar-agenda-date"><strong>{{ $day->format('D') }}</strong><span>{{ $day->format('j M') }}</span>@if($day->isToday())<em>Today</em>@endif</div>
-                        @php $dayHolidays = $holidays->get(key, collect()); @endphp
                         @if($dayHolidays->isNotEmpty())
                             <div class="zazu-calendar-agenda-holidays" aria-label="Holidays">
                                 @foreach($dayHolidays as $holiday)
@@ -172,11 +170,10 @@
                 <div class="zazu-calendar-agenda-header"><div><span class="zazu-eyebrow">{{ $isCurrentMonth?'Upcoming work':'Scheduled work' }}</span><h3>{{ $isCurrentMonth?'What is happening next':'Jobs in this month' }}</h3></div><span class="zazu-calendar-agenda-count">{{ $upcomingCount }} {{ $upcomingCount===1?'job':'jobs' }}</span></div>
                 @php $agendaHasEvents=false; @endphp
                 @foreach($days as $day)
-                    @php $key=$day->format('Y-m-d'); $dayEvents=$eventsByDate->get($key,collect()); $show=$day->month===$month->month && $day->year===$month->year && $dayEvents->isNotEmpty() && (!$isCurrentMonth || $day->gte(now()->startOfDay())); @endphp
+                    @php $key=$day->format('Y-m-d'); $dayEvents=$eventsByDate->get($key,collect()); $dayHolidays=$holidays->get($key, collect()); $show=$day->month===$month->month && $day->year===$month->year && ($dayEvents->isNotEmpty() || $dayHolidays->isNotEmpty()) && (!$isCurrentMonth || $day->gte(now()->startOfDay())); @endphp
                     @if($show)
                         @php $agendaHasEvents=true; @endphp
                         <div class="zazu-calendar-agenda-day {{ $day->isToday()?'is-today':'' }}"><div class="zazu-calendar-agenda-date"><strong>{{ $day->format('D') }}</strong><span>{{ $day->format('j M') }}</span>@if($day->isToday())<em>Today</em>@endif</div>
-                        @php $dayHolidays = $holidays->get(key, collect()); @endphp
                         @if($dayHolidays->isNotEmpty())
                             <div class="zazu-calendar-agenda-holidays" aria-label="Holidays">
                                 @foreach($dayHolidays as $holiday)
