@@ -6297,3 +6297,13 @@ body {
         max-width: none;
     }
 }
+
+
+/* DIRECTOR CONTROL-WIDTH FINALIZATION — 2026-10-04 */
+/* Full-width is a mobile fallback, not the default desktop action treatment. */
+@media (min-width: 701px) {
+    .zazu-btn.w-full {
+        width: auto;
+        max-width: max-content;
+    }
+}
