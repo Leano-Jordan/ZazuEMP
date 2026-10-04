@@ -57,6 +57,30 @@ test.describe('Zazu UI theme and navigation', () => {
         await context.close();
     });
 
+    test('keeps all primary form controls dark in dark mode', async ({ page }) => {
+        await login(page);
+        await page.goto('/settings');
+        await page.locator('[data-theme-toggle]').first().click();
+
+        const result = await page.evaluate(() => {
+            const controls = Array.from(document.querySelectorAll('input:not([type="hidden"]):not([type="checkbox"]):not([type="radio"]), select, textarea'));
+            return controls.map((control) => {
+                const style = getComputedStyle(control);
+                return {
+                    tag: control.tagName,
+                    background: style.backgroundColor,
+                    color: style.color,
+                };
+            }).filter((item) => item.background !== 'rgba(0, 0, 0, 0)');
+        });
+
+        expect(result.length).toBeGreaterThan(0);
+        for (const control of result) {
+            expect(control.background).not.toMatch(/rgb\(255,\s*255,\s*255\)|rgba\(255,\s*255,\s*255,/);
+            expect(control.background).not.toMatch(/rgb\(248,\s*250,\s*252\)|rgba\(248,\s*250,\s*252,/);
+        }
+    });
+
     test('navigates landing to login and workspace operations without server errors', async ({ page }) => {
         const responses: number[] = [];
         page.on('response', (response) => {
