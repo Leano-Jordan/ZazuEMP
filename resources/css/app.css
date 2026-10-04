@@ -122,10 +122,45 @@
     --zazu-card-shadow-hover: 0 12px 28px rgba(36,56,78,.16);
     --zazu-ui-focus: 0 0 0 3px rgba(85,146,252,.24);
     
+    /* Typography — application UI */
+    --zazu-font-ui: -apple-system, BlinkMacSystemFont, "Segoe UI Variable Text", "Segoe UI", "Noto Sans", "Helvetica Neue", Arial, sans-serif;
+    --zazu-font-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace;
+    --zazu-font-size-body: 14px;
+    --zazu-font-size-small: 12px;
+    --zazu-font-size-meta: 11px;
+    --zazu-font-size-label: 11px;
+    --zazu-font-size-nav: 13px;
+    --zazu-font-size-card: 14px;
+    --zazu-font-size-section: 16px;
+    --zazu-font-size-page-title: 24px;
+    --zazu-font-size-display: clamp(28px, 3vw, 36px);
+    --zazu-line-body: 1.5;
+    --zazu-line-tight: 1.25;
+    --zazu-weight-regular: 400;
+    --zazu-weight-medium: 500;
+    --zazu-weight-semibold: 600;
+    --zazu-weight-bold: 700;
+    
+    /* Spacing — 8px foundation with 4/6px micro steps */
+    --zazu-space-1: 4px;
+    --zazu-space-2: 8px;
+    --zazu-space-3: 12px;
+    --zazu-space-4: 16px;
+    --zazu-space-5: 20px;
+    --zazu-space-6: 24px;
+    --zazu-space-8: 32px;
+    --zazu-space-10: 40px;
+    
+    /* Shape — one restrained application scale */
+    --zazu-radius-sm: 6px;
+    --zazu-radius-md: 8px;
+    --zazu-radius-lg: 10px;
+    --zazu-radius-pill: 999px;
+    
     /* Brand assets & layout */
     --zazu-master-bg: url('../../images/Background-ZAZU.jpg');
     --zazu-content-max: 1320px;
-    --zazu-shell-gap: clamp(14px, 1.8vw, 26px);
+    --zazu-shell-gap: var(--zazu-space-6);
 }
 
 :root[data-theme="dark"] {
@@ -223,19 +258,19 @@
 @source '../../storage/framework/views/*.php';
 
 @theme {
-    --color-zazu-blue-primary: #0B63CE;
-    --color-zazu-blue-accent: #63AEFF;
-    --color-zazu-blue-hover: #084FA8;
-    --color-zazu-blue-light: #74B9FF;
-    --color-zazu-blue-soft: #C8E2FA;
-    --color-zazu-blue-subtle: #B2D1EE;
-    --color-zazu-blue-canvas: #D9E8F6;
-    --color-zazu-surface-card: #E7F1FA;
-    --color-zazu-surface-border: #8EACC5;
-    --color-zazu-text-main: #0E263B;
-    --color-zazu-text-muted: #46677F;
+    --color-zazu-blue-primary: var(--zazu-primary);
+    --color-zazu-blue-accent: var(--zazu-primary-light);
+    --color-zazu-blue-hover: var(--zazu-primary-hover);
+    --color-zazu-blue-light: var(--zazu-primary-pale);
+    --color-zazu-blue-soft: var(--zazu-primary-soft);
+    --color-zazu-blue-subtle: var(--zazu-primary-shadow);
+    --color-zazu-blue-canvas: var(--zazu-page);
+    --color-zazu-surface-card: var(--zazu-surface);
+    --color-zazu-surface-border: var(--zazu-border);
+    --color-zazu-text-main: var(--zazu-ink);
+    --color-zazu-text-muted: var(--zazu-muted);
 
-    --font-sans: Inter, "Plus Jakarta Sans", "Segoe UI Variable Text", "Segoe UI", ui-sans-serif, system-ui, sans-serif;
+    --font-sans: var(--zazu-font-ui);
 }
 
 
@@ -253,6 +288,9 @@ body {
     min-height: 100vh;
     background: var(--zazu-page);
     color: var(--zazu-ink);
+    font-family: var(--zazu-font-ui);
+    font-size: var(--zazu-font-size-body);
+    line-height: var(--zazu-line-body);
     font-feature-settings: "cv02", "cv03", "cv04", "cv11";
 }
 
@@ -3163,7 +3201,7 @@ body.zazu-has-wallpaper {
 
 /* Zazu visual polish: local typography, branded surfaces and richer module states. */
 body {
-    font-family: 'Segoe UI Variable Text', 'Segoe UI', 'Noto Sans', 'Helvetica Neue', Arial, ui-sans-serif, sans-serif;
+    font-family: var(--zazu-font-ui);
     font-optical-sizing: auto;
     text-rendering: optimizeLegibility;
     -webkit-font-smoothing: antialiased;
