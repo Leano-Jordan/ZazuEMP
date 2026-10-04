@@ -1,8 +1,9 @@
 # Zazu EMP — Retention and Secure-Disposal Schedule
 
 **Status:** CONTROL DRAFT — LEGAL/ACCOUNTING PERIODS MUST BE CONFIRMED  
-**Owner:** `[RESPONSIBLE PARTY]`  
-**Review cycle:** `[TO BE COMPLETED]`
+**Owner:** Isaac Junior Lehlogonolo Maluleka  
+**Operating address:** 1068 Block JK, Soshanguve, Pretoria, South Africa  
+**Review cycle:** At least annually and whenever the deployment, data categories, legal obligations or operators materially change
 
 > Do not invent statutory retention periods here. Final periods must be confirmed against the actual business, accounting, tax, contractual and regulatory requirements.
 
