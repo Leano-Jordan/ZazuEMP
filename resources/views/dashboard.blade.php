@@ -18,12 +18,15 @@
                 <div class="zazu-dash-context-note"><strong>Also in this business:</strong> {{ implode(' · ', $supportingNiches) }}. Zazu keeps these capabilities available when the job needs them.</div>
             @endif
             <div class="zazu-dash-actions">
+                @if($workspaceTools['customers'] && app(\App\Support\PermissionService::class)->allows('customers.create', auth()->user(), $business))
+                    <a href="{{ route('customers.create') }}" class="zazu-btn zazu-btn-secondary">Start with customer <span>+</span></a>
+                @endif
                 @if($workspaceTools['work'] && app(\App\Support\PermissionService::class)->allows('work.create', auth()->user(), $business))
-                    <a href="{{ route('work.create') }}" class="zazu-btn zazu-btn-primary">Create work <span>+</span></a>
+                    <a href="{{ route('work.create') }}" class="zazu-btn zazu-btn-primary">Start with job <span>+</span></a>
+                    <a href="{{ route('work.create', ['start' => 'quote']) }}" class="zazu-btn zazu-btn-secondary">Start with quote <span>+</span></a>
                 @endif
                 @if($workspaceTools['calendar'])<a href="{{ route('calendar.index') }}" class="zazu-btn zazu-btn-secondary">Open calendar <span>→</span></a>@endif
-            </div>
-        </div>
+            </div>        </div>
         <div class="zazu-dash-hero-side zazu-dash-hero-visual">
             @if($business?->dashboard_image_path)
                 <img
