@@ -36,8 +36,8 @@ test.describe('Zazu UI theme and navigation', () => {
             };
         });
 
-        expect(lightTokens.canvas.toLowerCase()).toBe('#f1f5fb');
-        expect(lightTokens.blue.toLowerCase()).toBe('#3949e8');
+        expect(lightTokens.canvas.toLowerCase()).toBe('#d9e8f5');
+        expect(lightTokens.blue.toLowerCase()).toBe('#1b67c9');
 
         const toggle = page.locator('[data-theme-toggle]').first();
         await expect(toggle).toBeVisible();
@@ -51,8 +51,8 @@ test.describe('Zazu UI theme and navigation', () => {
             };
         });
 
-        expect(darkTokens.canvas.toLowerCase()).toBe('#0b0e14');
-        expect(darkTokens.blue.toLowerCase()).toBe('#7a78ff');
+        expect(darkTokens.canvas.toLowerCase()).toBe('#081f2f');
+        expect(darkTokens.blue.toLowerCase()).toBe('#6fa4ff');
 
         await context.close();
     });
