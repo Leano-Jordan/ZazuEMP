@@ -157,3 +157,20 @@ Working commercial hypotheses:
 **Authority:** Confirmed by the product owner during the offline sync foundation cycle.
 
 **Status:** ACTIVE
+
+
+## DEC-020 — Director decision gate for finding weight, churn and sprint scope
+
+**Date:** 2026-10-04
+
+**Decision:** Morpheus/Director shall act as the decision gate above the existing specialist engines. Before meaningful work is authorised, findings are classified, weighed by impact/evidence/urgency/effort, checked for modification churn, assigned an explicit scope decision and assessed for release impact.
+
+**Scope rule:** Discovery may change priority without automatically changing the active sprint. New enhancements enter an active target only when required by the target, required by a newly discovered security/data-integrity/release risk, exchanged for comparable in-scope work, or explicitly authorised by the owner.
+
+**Churn rule:** Repeated modification of the same file, behaviour or architectural boundary triggers GREEN/AMBER/RED churn assessment. RED stops symptom patching and routes to architecture/forensics. Existing failure-case attempt limits remain authoritative.
+
+**Progress rule:** Commits, test-count growth, refactoring volume and reports are not progress metrics by themselves. Meaningful progress requires reduced risk, established causality, satisfied acceptance criteria, removed release blockers, clearer architecture or materially stronger evidence.
+
+**Reason:** Combine the new Senior Architect/Sprint Controller discipline with Zazu's existing single-entry Director architecture without creating parallel engines, backlogs or acceptance authority.
+
+**Status:** ACTIVE
