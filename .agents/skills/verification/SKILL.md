@@ -18,3 +18,7 @@ Rules:
 - Distinguish IMPLEMENTED, TESTED, VERIFIED, PROVEN, UNVERIFIED and BLOCKED.
 - For UI, automated pass does not replace rendered acceptance.
 - Route recurring failures through failure-forensics.
+
+
+Deep domain reference: `.agents/skills/verification/references/06_VERIFICATION_AND_QUALITY_ENGINE.md`.
+Load it only when the active target requires the deeper contract detail.
