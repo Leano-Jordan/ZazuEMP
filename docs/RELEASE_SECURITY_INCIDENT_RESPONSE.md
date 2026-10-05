@@ -2,7 +2,7 @@
 
 **Status:** OPERATIONAL DRAFT — REAL CONTACTS REQUIRED BEFORE RELEASE  
 **Incident owner:** Isaac Junior Lehlogonolo Maluleka  
-**Operating address:** 1068 Block JK, Soshanguve, Pretoria, South Africa  
+**Operating address:** [Operating address — see private records]
 **Information Officer:** Isaac Junior Lehlogonolo Maluleka — formal registration/appointment status to be confirmed before publication  
 **Deputy / escalation:** Not applicable to the current solo-operator model; external legal/regulatory support to be engaged when required  
 **Regulatory contact process:** `[APPROVED CHANNEL TO BE CONFIRMED BEFORE PUBLICATION]`
