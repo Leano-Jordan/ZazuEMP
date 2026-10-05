@@ -279,3 +279,18 @@ Before claiming full offline operation:
 - cloud synchronization.
 
 This contract therefore establishes the architecture direction without falsely claiming those future layers already exist.
+
+## Director implementation update — 2026-10-06
+
+The phone-local foundation is now implemented beyond static PWA caching:
+
+- IndexedDB persists the local workspace and durable mutation queue.
+- The installed phone workspace supports offline customer, job and service creation/update.
+- Browser storage persistence is requested where supported to reduce eviction risk.
+- Reconnect pushes queued mutations to the sync endpoint.
+- Customer, job/event and service mutations now have explicit server-side handlers with business scoping, whitelisted fields and synchronization identities.
+- Replayed applied mutations are idempotent and do not duplicate records.
+- Unsupported mutation types remain pending rather than being guessed into domain state.
+- Local dirty state prevents a bootstrap refresh from overwriting unsynchronised phone changes.
+
+The phone workspace is therefore a real offline operational foundation, but it is **not yet a complete disconnected replacement for the full web application**. Finance, purchasing/inventory, quote acceptance and other domain workflows still require dedicated offline contracts before they may be advertised as fully offline-capable.
