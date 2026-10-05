@@ -73,6 +73,21 @@ class InterfaceRegressionTest extends TestCase
             ->assertSee('zazu-calendar-grid');
     }
 
+    public function test_calendar_mobile_month_view_preserves_all_seven_columns_and_holiday_markers(): void
+    {
+        $view = file_get_contents(resource_path('views/calendar/index.blade.php'));
+        $css = file_get_contents(resource_path('css/zazu-final-visual-sweep.css'));
+
+        $this->assertStringContainsString('zazu-calendar-grid-scroll', $view);
+        $this->assertStringContainsString('has-holiday', $view);
+        $this->assertStringContainsString('zazu-calendar-holiday-marker', $view);
+        $this->assertStringContainsString('grid-template-columns: repeat(7, minmax(104px, 1fr));', $css);
+        $this->assertStringContainsString('min-width: 728px;', $css);
+        $this->assertStringContainsString('grid-template-columns: repeat(7, minmax(92px, 1fr));', $css);
+        $this->assertStringContainsString('.zazu-calendar-cell.has-holiday', $css);
+        $this->assertStringContainsString('.zazu-calendar-holiday-marker', $css);
+    }
+
     public function test_calendar_keeps_work_navigation_active_for_mobile_drawer_recovery(): void
     {
         [$business, $user] = $this->workspace();
