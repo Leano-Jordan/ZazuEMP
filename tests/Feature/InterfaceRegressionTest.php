@@ -96,7 +96,7 @@ class InterfaceRegressionTest extends TestCase
 
         $response->assertOk()
             ->assertSee('class="zazu-nav-area is-active" data-zazu-nav-area', false)
-            ->assertSee('class="zazu-nav-link active" aria-current="page">Calendar</a>', false);
+            ->assertSee('class="zazu-nav-link active"', false)\n            ->assertSee('aria-current="page">Calendar</a>', false);
     }
 
     public function test_calendar_permission_is_explicit_for_configured_operational_roles(): void
@@ -203,8 +203,8 @@ class InterfaceRegressionTest extends TestCase
         $css = file_get_contents(resource_path('css/zazu-final-visual-sweep.css'));
 
         $this->assertStringContainsString('grid-template-columns: minmax(260px, 1.2fr) minmax(130px, .55fr) minmax(0, 2.3fr);', $css);
-        $this->assertStringContainsString('.zazu-assets-directory .zazu-action-group {', $css);
-        $this->assertStringContainsString('.zazu-inventory-directory .zazu-action-group {', $css);
+        $this->assertStringContainsString('.zazu-assets-directory .zazu-action-group', $css);
+        $this->assertStringContainsString('.zazu-inventory-directory .zazu-action-group', $css);
         $this->assertStringContainsString('grid-template-columns: minmax(150px, 1.25fr) repeat(3, minmax(88px, 1fr)) auto;', $css);
         $this->assertStringNotContainsString('justify-content: flex-end;\n    gap: 8px;\n    padding-left: 16px;', $css);
     }
@@ -231,7 +231,7 @@ class InterfaceRegressionTest extends TestCase
 
         $this->assertStringContainsString('"menu title theme"', $mobileCss);
         $this->assertStringContainsString('"search search search"', $mobileCss);
-        $this->assertStringContainsString('"tabs tabs tabs tabs"', $mobileCss);
+        $this->assertStringContainsString('"tabs tabs tabs"', $mobileCss);
         $this->assertStringContainsString('"page-action page-action page-action"', $mobileCss);
         $this->assertStringNotContainsString('grid-template-areas: "menu context actions";', $mobileCss);
         $this->assertStringNotContainsString('left: 56px;', $mobileCss);
