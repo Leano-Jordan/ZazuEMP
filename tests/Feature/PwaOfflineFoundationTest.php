@@ -34,8 +34,10 @@ class PwaOfflineFoundationTest extends TestCase
         $response->assertOk()
             ->assertSee('/manifest.webmanifest')
             ->assertSee('Install Zazu')
-            ->assertSee("const DB='zazu-phone-workspace'")
             ->assertSee('data.local_dirty=true');
+
+        $html = html_entity_decode($response->getContent(), ENT_QUOTES | ENT_HTML5);
+        $this->assertStringContainsString("const DB='zazu-phone-workspace'", $html);
 
         $this->assertStringContainsString(
             "navigator.serviceWorker.register('/sw.js')",
