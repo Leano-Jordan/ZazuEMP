@@ -3,7 +3,7 @@
 **Record date:** 2026-09-28  
 **Current owner:** Isaac Junior Lehlogonolo Maluleka  
 **Current development model:** Solo developer / solo business owner  
-**Operating address:** 1068 Block JK, Soshanguve, Pretoria, South Africa  
+**Operating address:** [Operating address — see private records]
 **Future business identity:** Rosscore Labs, not yet registered
 
 This is a project-control register, not legal advice. It records engineering actions and known legal/commercial gates so that launch decisions are based on evidence rather than assumptions.
