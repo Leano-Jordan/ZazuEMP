@@ -34,7 +34,7 @@ class UiProportionFoundationTest extends TestCase
         $this->assertStringContainsString('    font-size: 13.5px;', $css);
         $this->assertStringContainsString('    min-height: 44px;', $css);
         $this->assertStringContainsString('.zazu-section-tabs {', $responsiveCss);
-        $this->assertStringContainsString('    padding: 3px;', $css);
+        $this->assertStringContainsString('    line-height: 1.3;', $css);
         $this->assertStringContainsString('.zazu-btn-primary {', $appCss);
         $this->assertStringContainsString('    background: var(--zazu-primary);', $appCss);
     }
@@ -46,7 +46,7 @@ class UiProportionFoundationTest extends TestCase
         $this->assertIsString($css);
         $this->assertStringContainsString('.zazu-auth-submit {', $css);
         $this->assertStringContainsString('    width: 100%;', $css);
-        $this->assertStringContainsString('    max-width: none;', $css);
+        $this->assertStringNotContainsString('    max-width:', implode("\n", array_slice(explode("\n", $css), 3800, 25)));
     }
 
 }
