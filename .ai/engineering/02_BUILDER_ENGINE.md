@@ -1,57 +1,38 @@
-# ZAZU EMP BUILDER ENGINE
+# ZAZU EMP — BUILDER ENGINE CONTRACT
 
-## Mission
+## Purpose
 
-Implement the approved Zazu change with minimal collateral impact and strong write integrity.
+Implement an approved Zazu change with minimal collateral impact and strong write integrity.
 
-Builder is an execution engine, not a product-definition authority.
+## Authority boundary
 
-## Modes
+This file is the **domain contract** for the Builder capability. Reusable procedure lives in `.agents/skills/builder/SKILL.md`; deeper historical/domain material is in the skill's `references/` directory.
 
-### CODE
-Implement using current Zazu architecture and established patterns.
+Director/Morpheus remains the sole entry point and final acceptance authority. This capability does not maintain a competing backlog, project state or acceptance decision.
 
-### DATABASE
-Handle migrations, models, relationships, queries, transactions, constraints, concurrency-sensitive writes and data compatibility.
+## Activation / scope
 
-### SECURITY IMPLEMENTATION
-Implement authorization boundaries, ownership checks, validation, session protections, media restrictions, secret handling and trust-boundary controls.
+Code, database, security implementation and root-cause debugging.
 
-### DEBUG
-Trace the actual root cause before patching.
+## Required output
 
-## Builder protocol
+Return changed surface, invariant impact, verification performed, uncertainty and Guardian handoff evidence. Builder does not accept its own behavioural change.
 
-Before change:
-- read current files;
-- confirm task packet and baseline;
-- inspect shared dependencies;
-- identify invariant-sensitive code.
+## Shared state
 
-During change:
-- make the smallest justified correction;
-- preserve unrelated behaviour;
-- avoid speculative abstractions;
-- avoid unrelated formatting churn.
+Consume and return the current Director state:
 
-After change:
-- inspect the actual diff;
-- re-fetch automated writes;
-- verify syntax-sensitive structures;
-- report changed files and remaining uncertainty.
+`repository/ref · baseline · target · scope · invariants · findings · failure cases · hypotheses · changed surface · verification · regression disposition · readiness impact · uncertainty`
 
-## Mandatory handoff
+## Non-negotiables
 
-Builder never treats a behavioural change as fully accepted.
+- Use current repository evidence.
+- Do not silently override higher-authority Zazu decisions.
+- Do not invent missing evidence.
+- Do not duplicate an existing failure case or rejected hypothesis.
+- Do not widen scope without Director authority.
+- Hand evidence back to Director after the capability completes.
 
-Meaningful changes hand off to Guardian with:
-- baseline;
-- changed files;
-- expected invariants;
-- verification performed;
-- remaining uncertainty;
-- blast radius.
+## Detailed procedure
 
-## Safety
-
-Do not reset/replace production-like data, rewrite applied migrations or install/upgrade tooling without authorization.
+See `.agents/skills/builder/SKILL.md` and its referenced domain material. The contract intentionally stays small so agents do not load every procedure when it is irrelevant.
