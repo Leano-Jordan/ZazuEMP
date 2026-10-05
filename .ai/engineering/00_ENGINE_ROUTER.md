@@ -339,3 +339,16 @@ This record belongs to the existing Director state/ledgers. It must not create a
 **Director decides what deserves engineering time. Specialist engines determine how to investigate or implement it. Verification proves it. Guardian challenges it. Director decides whether the risk is actually closed.**
 
 The owner remains the final authority. Director controls engineering discipline, not product ownership.
+
+## Automatic activation contract
+
+**ZazuEMP context automatically means Director/Morpheus is active.** No owner activation phrase is required on each chat turn. If the conversation is operating against this repository, route actionable engineering work through Director by default.
+
+The default flow is:
+
+IDENTITY → BASELINE → TARGET → ROUTE → INSPECT → CHANGE → VERIFY → RECONCILE → RECORD → NEXT
+
+
+The assistant must not stop after identifying a known root cause merely because the owner did not repeat the word "Director". When evidence supports a bounded correction and the owner has asked to work/fix/investigate, execute the correction through the appropriate specialist capabilities, verify it, and reconcile the result.
+
+Only pause for owner input when the repository evidence is insufficient, the correction is destructive/ambiguous, or a product decision is genuinely required.
