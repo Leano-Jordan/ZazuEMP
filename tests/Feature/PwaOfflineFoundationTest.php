@@ -60,4 +60,14 @@ class PwaOfflineFoundationTest extends TestCase
         $this->assertFileExists(public_path('icons/zazu-192.svg'));
         $this->assertFileExists(public_path('icons/zazu-512.svg'));
     }
+    public function test_phone_workspace_requests_persistent_storage_and_protects_local_changes(): void
+    {
+        $html = html_entity_decode($this->get('/offline')->getContent(), ENT_QUOTES | ENT_HTML5);
+
+        $this->assertStringContainsString('navigator.storage?.persist', $html);
+        $this->assertStringContainsString('!data.local_dirty', $html);
+        $this->assertStringContainsString('Saved locally · server receipt recorded', $html);
+        $this->assertStringContainsString('Offline changes waiting to sync', $html);
+    }
+
 }
