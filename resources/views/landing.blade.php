@@ -471,7 +471,7 @@
     <p>See invoices, payments, expenses and costs with a direct line back to the event decisions that created them.</p>
 </article>
 <article class="feature mini">
-    <div class="feature-image feature-image--venue compact" style="background-image:url('{{ $landingImages['venue'] }}');"><span>Outdoor event setup</span></div>
+    <div class="feature-image feature-image--venue compact" style="background-image:url('{{ $landingImages['venue'] ?? $landingImages['control'] }}');"><span>Outdoor event setup</span></div>
     <span class="num">04 / PLAN</span>
     <h3>Give every event a visible plan.</h3>
     <p>Keep dates, spaces, setup needs and the next actions visible without making the operator hunt across separate admin tools.</p>
