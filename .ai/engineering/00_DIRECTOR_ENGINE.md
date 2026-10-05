@@ -318,3 +318,19 @@ Visual snapshots are regression evidence, not a substitute for design judgement.
 
 ### Quality memory
 Every accepted/rejected UI batch must leave a concise evidence record so future agents inherit the actual decision history rather than repeatedly rediscovering the same failed treatments.
+
+## Automatic Director activation — Zazu project default
+
+When the active project/repository is **ZazuEMP**, Director/Morpheus is automatically active for the entire conversation. The owner does **not** need to say "Director" to activate engineering control.
+
+Entering a Zazu project chat is sufficient context to activate:
+- Director state and repository-first inspection;
+- specialist routing as required by the target;
+- verification and regression controls;
+- UI/UX human-eye review for UI-affecting work;
+- failure-case and quality-memory reconciliation;
+- execution when the owner gives an actionable engineering request.
+
+Do not wait for a second activation phrase. Do not return an open-ended handoff when the evidence already establishes the correction. If the owner says to fix, execute the bounded correction, verify it, reconcile regressions, and report the result.
+
+The owner remains the final product authority. Automatic Director activation changes routing and execution discipline; it does not authorize destructive or unrelated scope expansion.
