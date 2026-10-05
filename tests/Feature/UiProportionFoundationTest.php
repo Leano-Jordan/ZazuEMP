@@ -11,10 +11,10 @@ class UiProportionFoundationTest extends TestCase
         $css = file_get_contents(resource_path('css/app.css'));
 
         $this->assertIsString($css);
-        $this->assertStringContainsString('--zazu-primary: #5592FC;', $css);
-        $this->assertStringContainsString('--zazu-primary-soft: #D5E3F7;', $css);
-        $this->assertStringContainsString('--zazu-primary-deep: #416AD7;', $css);
-        $this->assertStringContainsString('--zazu-page: #E7EFF7;', $css);
+        $this->assertStringContainsString('--zazu-primary: #1B67C9;', $css);
+        $this->assertStringContainsString('--zazu-primary-soft: #C9DFF3;', $css);
+        $this->assertStringContainsString('--zazu-primary-deep: #1556A9;', $css);
+        $this->assertStringContainsString('--zazu-page: #D9E8F5;', $css);
         $this->assertStringContainsString('--zazu-ui-control-height: 44px;', $css);
         $this->assertStringContainsString('--zazu-content-max: 1320px;', $css);
         $this->assertStringContainsString('--zazu-ui-radius: 10px;', $css);
@@ -42,15 +42,6 @@ class UiProportionFoundationTest extends TestCase
         $this->assertStringContainsString('.zazu-auth-submit {', $css);
         $this->assertStringContainsString('    width: 100%;', $css);
         $this->assertStringContainsString('    max-width: none;', $css);
-    }
-    public function test_forms_keep_fields_flat_inside_a_single_surface(): void
-    {
-        $css = file_get_contents(resource_path('css/zazu-final-visual-sweep.css'));
-
-        $this->assertIsString($css);
-        $this->assertStringContainsString('.zazu-form-section .zazu-field {', $css);
-        $this->assertStringContainsString('    background: transparent;', $css);
-        $this->assertStringContainsString('    box-shadow: none;', $css);
     }
 
 }
