@@ -7,6 +7,7 @@ use App\Models\BusinessCapability;
 use App\Models\Customer;
 use App\Models\Event;
 use App\Models\Quote;
+use App\Models\EventPreparationItem;
 use App\Models\SyncDevice;
 use App\Support\CurrentBusiness;
 use App\Support\Offline\SyncEntityIdentityRegistry;
@@ -37,7 +38,7 @@ class SyncController extends Controller
         $validated = $request->validate([
             'expires_in_minutes' => ['nullable', 'integer', 'min:5', 'max:30'],
             'selection' => ['nullable', 'array', 'max:100'],
-            'selection.*.type' => ['required', 'string', 'in:customer,job,quote,service'],
+            'selection.*.type' => ['required', 'string', 'in:customer,job,quote,service,preparation'],
             'selection.*.id' => ['required', 'integer', 'min:1'],
         ]);
 
@@ -224,6 +225,10 @@ class SyncController extends Controller
 
             if ($item['type'] === 'quote') {
                 $query->whereHas('event', fn ($event) => $event->where('business_id', $business->id));
+            } elseif ($item['type'] === 'preparation') {
+                $query->where('business_id', $business->id);
+            } elseif ($item['type'] === 'preparation') {
+                $query->where('business_id', $business->id);
             } else {
                 $query->where('business_id', $business->id);
             }
