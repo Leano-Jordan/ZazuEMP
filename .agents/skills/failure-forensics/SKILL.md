@@ -17,3 +17,7 @@ Use this skill whenever a check fails, an owner reports a recurring problem, or 
 10. Closure requires root-cause evidence plus the required verification layer(s); a green rerun alone is not enough.
 
 The purpose is not merely to fix today's failure. It is to make the same failure recognizable next time.
+
+
+Deep domain reference: `.agents/skills/failure-forensics/references/07_FAILURE_CASE_ENGINE.md`.
+Load it only when the active target requires the deeper contract detail.
