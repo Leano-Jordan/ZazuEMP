@@ -10,6 +10,8 @@ use App\Models\Quote;
 use App\Models\SyncDevice;
 use App\Support\CurrentBusiness;
 use App\Support\Offline\SyncEntityIdentityRegistry;
+use App\Support\Offline\OfflineDomainMutationHandler;
+use App\Support\Offline\SyncMutationApplier;
 use App\Support\Offline\SyncMutationProtocol;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -158,7 +160,7 @@ class SyncController extends Controller
         ]);
     }
 
-    public function push(Request $request, \App\Support\Offline\SyncMutationRecorder $recorder): JsonResponse
+    public function push(Request $request, \App\Support\Offline\SyncMutationRecorder $recorder, SyncMutationApplier $applier, OfflineDomainMutationHandler $handler): JsonResponse
     {
         /** @var SyncDevice $device */
         $device = $request->attributes->get('sync_device');
@@ -173,6 +175,7 @@ class SyncController extends Controller
         ]);
 
         $recorded = [];
+        $applied = [];
         foreach ($validated['mutations'] as $item) {
             $mutation = $recorder->record(
                 $device,
@@ -182,10 +185,21 @@ class SyncController extends Controller
                 $item['payload'] ?? [],
                 $item['id'],
             );
+            try {
+                $mutation = $applier->apply($mutation, [$mutation->entity_type => $handler]);
+                $applied[] = $mutation->mutation_id;
+            } catch (\Throwable $exception) {
+                $mutation->update([
+                    'attempts' => $mutation->attempts + 1,
+                    'last_error' => mb_substr($exception->getMessage(), 0, 1000),
+                ]);
+            }
+
             $recorded[] = [
                 'id' => $mutation->mutation_id,
                 'sequence' => $mutation->sequence,
                 'status' => $mutation->status,
+                'applied' => $mutation->status === 'applied',
             ];
         }
 
@@ -193,8 +207,8 @@ class SyncController extends Controller
 
         return response()->json([
             'recorded' => $recorded,
-            'applied' => false,
-            'message' => 'Mutations are durably recorded for domain-safe application; the phone must retain them until application acknowledgement is added.',
+            'applied' => $applied,
+            'message' => 'Supported offline mutations are applied idempotently; unsupported or rejected mutations remain queued with an error for later handling.',
         ]);
     }
 
