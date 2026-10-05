@@ -18,3 +18,7 @@ Rules:
 - Surface uncertainty explicitly.
 - Return a bounded target with invariants, acceptance evidence, blast radius and stop condition.
 - Do not implement unless implementation is explicitly part of the routed task.
+
+
+Deep domain reference: `.agents/skills/discovery-design/references/01_DISCOVERY_DESIGN_ENGINE.md`.
+Load it only when the active target requires the deeper contract detail.
