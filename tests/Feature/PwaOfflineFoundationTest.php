@@ -9,11 +9,13 @@ class PwaOfflineFoundationTest extends TestCase
 {
     public function test_manifest_exposes_installable_zazu_icons(): void
     {
+        $manifestPath = public_path('manifest.webmanifest');
+
+        $this->assertFileExists($manifestPath);
+        $manifest = json_decode(File::get($manifestPath), true, 512, JSON_THROW_ON_ERROR);
+
         $response = $this->get('/manifest.webmanifest');
-
-        $response->assertOk();
-
-        $manifest = json_decode($response->getContent(), true, 512, JSON_THROW_ON_ERROR);
+        $response->assertOk()->assertHeader('Content-Type', 'application/manifest+json');
 
         $this->assertSame('Zazu', $manifest['short_name']);
         $this->assertSame('/offline', $manifest['start_url']);
