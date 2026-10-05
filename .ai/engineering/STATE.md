@@ -1224,6 +1224,29 @@ Verification boundary:
 Next target:
 CURRENT-HEAD BROWSER/DEVICE ACCEPTANCE → RE-AUDIT NAVIGATION + CALENDAR + RECENT UI RECOVERY CONTRACTS
 
+## Director page-by-page hardening sweep — 2026-10-05
+
+New source-confirmed Calendar defect:
+- Calendar month view referenced `$dayHolidays` before assigning it in the month-day loop.
+- This was corrected by resolving each day's holiday collection from the holiday map.
+- A regression test now renders April 2026 month view and asserts public-holiday content.
+- A conflicting mobile Calendar rule that first hid the month grid at <=700px and later re-enabled it was removed; the intended dense calendar/mobile treatment now has one clear display rule.
+- `CASE-ZAZU-0011` remains INVESTIGATING because the owner's live lockout still requires authenticated runtime evidence.
+
+Page-family sweep findings retained:
+- Shared shell: preserve blue-slate canvas, dark rail, bounded search, CTA hierarchy, Helper Work/Sales movement and banner authority.
+- Dashboard: no source evidence justifies a redesign; retain current command-centre hierarchy and image-led hero.
+- Work / Requirements / Customers: forms generally use the shared two-column grid and wide fields only for descriptions/notes; keep field widths content-driven and do not widen short identifiers.
+- Inventory / Assets / Suppliers / Capabilities: register/list surfaces retain bounded action groups and distributed content; continue checking mobile row stacking and action width.
+- Purchasing / Preparation / Travel / Costs: editor forms retain shared controls; wide fields are appropriate for notes/descriptions, while short codes/currency/unit controls should remain compact.
+- Quotes / Finance: preserve dense commercial tables and numeric alignment; horizontal table scrolling remains an intentional fallback for inherently wide datasets.
+- Reports / Search: preserve metric/filter hierarchy; avoid stretching filters or repeating information already represented by record links.
+- Settings / Preferences / Onboarding: preserve progressive disclosure and guided controls; do not turn bounded identity/configuration fields into viewport-wide inputs.
+- Calendar: treat route access, month rendering, holiday markers, view switching and mobile density as one protected workflow.
+- Standalone Landing / Offline / Error surfaces: retain their separate presentation authority but enforce foreground/surface contrast and mobile bounds.
+
+Director rule for this sweep: correct concrete source defects and conflicting declarations; do not add cosmetic override layers or redesign working page structures without rendered evidence.
+
 ## Director UI integrity recovery — 2026-10-05
 
 Target: resolve the recurring Calendar lockout without another symptom patch, then harden the Zazu visual system against cross-page/cross-theme drift.
