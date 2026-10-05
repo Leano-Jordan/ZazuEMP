@@ -289,4 +289,52 @@ class OfflineSyncFoundationTest extends TestCase
         );
     }
 
+    public function test_supported_offline_mutations_apply_to_business_data_idempotently(): void
+    {
+        $business = Business::create([
+            'name' => 'Offline Apply Business',
+            'slug' => 'offline-apply-'.Str::lower(Str::random(8)),
+            'status' => 'active',
+            'currency' => 'ZAR',
+        ]);
+
+        $device = SyncDevice::create([
+            'business_id' => $business->id,
+            'installation_id' => (string) Str::uuid(),
+        ]);
+
+        $mutationId = (string) Str::uuid();
+        $localId = (string) Str::uuid();
+        $recorder = app(SyncMutationRecorder::class);
+
+        $mutation = $recorder->record(
+            $device,
+            'customer',
+            $localId,
+            'create',
+            [
+                'local_id' => $localId,
+                'server_id' => null,
+                'record' => [
+                    'name' => 'Offline Customer',
+                    'phone' => '0123456789',
+                    'email' => 'customer@example.test',
+                ],
+            ],
+            $mutationId,
+        );
+
+        $applier = app(SyncMutationApplier::class);
+        $handler = app(\App\Support\Offline\OfflineDomainMutationHandler::class);
+
+        $first = $applier->apply($mutation, ['customer' => $handler]);
+        $second = $applier->apply($first, ['customer' => $handler]);
+
+        $this->assertSame('applied', $first->status);
+        $this->assertSame($first->id, $second->id);
+        $this->assertSame(1, \App\Models\Customer::query()->where('business_id', $business->id)->where('name', 'Offline Customer')->count());
+        $this->assertSame('0123456789', \App\Models\CustomerContact::query()->whereHas('customer', fn ($q) => $q->where('business_id', $business->id))->value('phone'));
+    }
+
+
 }
