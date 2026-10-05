@@ -113,6 +113,13 @@ Route::middleware(['auth', 'auth.session', 'platform.admin'])->prefix('admin')->
     Route::put('/landing-settings', [PlatformLandingSettingsController::class, 'update'])->name('admin.landing.settings.update');
 });
 
+Route::get('/manifest.webmanifest', static function () {
+    return response()->file(
+        public_path('manifest.webmanifest'),
+        ['Content-Type' => 'application/manifest+json']
+    );
+})->name('pwa.manifest');
+
 Route::get('/offline', [OfflineWorkspaceController::class, 'shell'])->name('offline.shell');
 
 Route::middleware(['auth', 'auth.session', 'business.context'])->group(function () {
