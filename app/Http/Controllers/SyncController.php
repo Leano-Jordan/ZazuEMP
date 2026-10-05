@@ -6,12 +6,14 @@ use App\Models\Business;
 use App\Models\BusinessCapability;
 use App\Models\Customer;
 use App\Models\Event;
-use App\Models\Quote;
 use App\Models\EventPreparationItem;
+use App\Models\PurchaseOrder;
+use App\Models\Quote;
+use App\Models\Supplier;
 use App\Models\SyncDevice;
 use App\Support\CurrentBusiness;
-use App\Support\Offline\SyncEntityIdentityRegistry;
 use App\Support\Offline\OfflineDomainMutationHandler;
+use App\Support\Offline\SyncEntityIdentityRegistry;
 use App\Support\Offline\SyncMutationApplier;
 use App\Support\Offline\SyncMutationProtocol;
 use Illuminate\Http\JsonResponse;
@@ -28,18 +30,19 @@ class SyncController extends Controller
         'quote' => Quote::class,
         'service' => BusinessCapability::class,
         'preparation' => EventPreparationItem::class,
+        'supplier' => Supplier::class,
+        'purchase_order' => PurchaseOrder::class,
     ];
 
     public function createPairing(Request $request, CurrentBusiness $currentBusiness): JsonResponse
     {
         $business = $currentBusiness->resolve($request->user());
-
         abort_unless($business, 404);
 
         $validated = $request->validate([
             'expires_in_minutes' => ['nullable', 'integer', 'min:5', 'max:30'],
             'selection' => ['nullable', 'array', 'max:100'],
-            'selection.*.type' => ['required', 'string', 'in:customer,job,quote,service,preparation'],
+            'selection.*.type' => ['required', 'string', 'in:customer,job,quote,service,preparation,supplier,purchase_order'],
             'selection.*.id' => ['required', 'integer', 'min:1'],
         ]);
 
@@ -90,8 +93,8 @@ class SyncController extends Controller
         }
 
         $metadata = $device->metadata ?? [];
-
         $token = Str::random(64);
+
         $device->update([
             'device_name' => $validated['device_name'] ?? 'Zazu phone',
             'device_type' => $validated['device_type'] ?? 'phone',
@@ -118,7 +121,6 @@ class SyncController extends Controller
 
     public function bootstrap(Request $request): JsonResponse
     {
-        /** @var SyncDevice $device */
         $device = $request->attributes->get('sync_device');
         $device->update(['last_seen_at' => now()]);
 
@@ -127,22 +129,16 @@ class SyncController extends Controller
 
     public function pull(Request $request, SyncMutationProtocol $protocol): JsonResponse
     {
-        /** @var SyncDevice $device */
         $device = $request->attributes->get('sync_device');
         $limit = (int) $request->integer('limit', 100);
-
         $mutations = $protocol->pull($device, (string) $request->input('stream', 'business'), $limit);
-
         $device->update(['last_seen_at' => now()]);
 
-        return response()->json([
-            'mutations' => $mutations->values(),
-        ]);
+        return response()->json(['mutations' => $mutations->values()]);
     }
 
     public function acknowledge(Request $request, SyncMutationProtocol $protocol): JsonResponse
     {
-        /** @var SyncDevice $device */
         $device = $request->attributes->get('sync_device');
         $validated = $request->validate([
             'sequence' => ['required', 'integer', 'min:0'],
@@ -156,15 +152,11 @@ class SyncController extends Controller
         );
 
         $device->update(['last_seen_at' => now()]);
-
-        return response()->json([
-            'cursor' => $cursor,
-        ]);
+        return response()->json(['cursor' => $cursor]);
     }
 
     public function push(Request $request, \App\Support\Offline\SyncMutationRecorder $recorder, SyncMutationApplier $applier, OfflineDomainMutationHandler $handler): JsonResponse
     {
-        /** @var SyncDevice $device */
         $device = $request->attributes->get('sync_device');
 
         $validated = $request->validate([
@@ -178,15 +170,10 @@ class SyncController extends Controller
 
         $recorded = [];
         $applied = [];
+
         foreach ($validated['mutations'] as $item) {
-            $mutation = $recorder->record(
-                $device,
-                $item['entity_type'],
-                $item['entity_id'],
-                $item['operation'],
-                $item['payload'] ?? [],
-                $item['id'],
-            );
+            $mutation = $recorder->record($device, $item['entity_type'], $item['entity_id'], $item['operation'], $item['payload'] ?? [], $item['id']);
+
             try {
                 $mutation = $applier->apply($mutation, [$mutation->entity_type => $handler]);
                 $applied[] = $mutation->mutation_id;
@@ -221,18 +208,15 @@ class SyncController extends Controller
         foreach ($selection as $item) {
             $type = $item['type'];
             $model = self::SELECTION_TYPES[$type];
-
             $query = $model::query();
 
             if ($item['type'] === 'quote') {
                 $query->whereHas('event', fn ($event) => $event->where('business_id', $business->id));
-            } elseif ($item['type'] === 'preparation') {
-                $query->where('business_id', $business->id);
             } else {
                 $query->where('business_id', $business->id);
             }
 
-            $record = $query->where('id', $item['id'])->first();
+            $record = $query->whereKey($item['id'])->first();
 
             if (! $record) {
                 throw ValidationException::withMessages([
@@ -255,7 +239,6 @@ class SyncController extends Controller
 
         foreach ($metadata['bootstrap_selection'] ?? [] as $item) {
             $model = self::SELECTION_TYPES[$item['type']] ?? null;
-
             if (! $model) {
                 continue;
             }
@@ -268,8 +251,7 @@ class SyncController extends Controller
                 $query->where('business_id', $business->id);
             }
 
-            $record = $query->where('id', $item['id'])->first();
-
+            $record = $query->whereKey($item['id'])->first();
             if (! $record) {
                 continue;
             }
@@ -283,6 +265,30 @@ class SyncController extends Controller
                 'record' => $record->toArray(),
             ];
         }
+
+        $suppliers = Supplier::query()
+            ->where('business_id', $business->id)
+            ->orderBy('name')
+            ->get()
+            ->map(fn (Supplier $supplier) => [
+                'local_id' => $registry->identify($supplier, 'supplier')->entity_uuid,
+                'server_id' => $supplier->id,
+                'record' => $supplier->toArray(),
+            ])
+            ->values();
+
+        $purchaseOrders = PurchaseOrder::query()
+            ->where('business_id', $business->id)
+            ->with('items')
+            ->latest()
+            ->get()
+            ->map(fn (PurchaseOrder $order) => [
+                'local_id' => $registry->identify($order, 'purchase_order')->entity_uuid,
+                'server_id' => $order->id,
+                'record' => $order->toArray(),
+                'items' => $order->items->map(fn ($item) => $item->toArray())->values(),
+            ])
+            ->values();
 
         return [
             'version' => 1,
@@ -305,6 +311,8 @@ class SyncController extends Controller
                     'record' => $capability->toArray(),
                 ])
                 ->values(),
+            'suppliers' => $suppliers,
+            'purchase_orders' => $purchaseOrders,
             'selected' => $selected,
             'device' => [
                 'id' => $device->id,
