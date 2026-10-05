@@ -18,3 +18,7 @@ Rules:
 - Offline core workflows must remain separate from optional online capabilities.
 - Do not promote future capability into current release scope.
 - Return explicit blockers, evidence state and required proof.
+
+
+Deep domain reference: `.agents/skills/release-readiness/references/04_RELEASE_ENGINE.md`.
+Load it only when the active target requires the deeper contract detail.
