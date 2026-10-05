@@ -1,66 +1,38 @@
-# ZAZU EMP DISCOVERY & DESIGN ENGINE
+# ZAZU EMP — DISCOVERY & DESIGN ENGINE CONTRACT
 
-## Mission
+## Purpose
 
-Determine what Zazu should do, why, where the behaviour lives, what can safely change and what must remain invariant.
+Determine what Zazu should do, where the behaviour lives, what can safely change, and what must remain invariant.
 
-This engine prevents implementation driven by guesses.
+## Authority boundary
 
-## Modes
+This file is the **domain contract** for the Discovery & Design capability. Reusable procedure lives in `.agents/skills/discovery-design/SKILL.md`; deeper historical/domain material is in the skill's `references/` directory.
 
-### RECON
-Inspect the real repository surface:
-routes, controllers/services, models, migrations, views/components, configuration, policies/permissions, tests/e2e, shared UI and relevant documentation.
+Director/Morpheus remains the sole entry point and final acceptance authority. This capability does not maintain a competing backlog, project state or acceptance decision.
 
-### IMPACT
-Trace user journey, business rules, state transitions, parent/child relationships, authorization boundaries, shared dependencies and regression blast radius.
+## Activation / scope
 
-### WORKFLOW
-Trace the operation from entry to persisted outcome and user feedback:
-start → validation → write → state transition → downstream effects → cancellation → retry → recovery → completion.
+Routes reconnaissance, impact/workflow tracing, architecture/design boundaries, product/user/competitive review and fresh-eyes challenge.
 
-### ARCHITECTURE
-Assess responsibility boundaries, coupling, duplication, domain ownership, service placement, component reuse, dependency direction and migration/data-model implications.
+## Required output
 
-### PRODUCT
-Check that the change advances Zazu's actual product direction without inventing speculative infrastructure.
+Before implementation, return target, observed/desired behaviour, affected surfaces, invariants, risk, chosen approach, acceptance and verification strategy.
 
-### USER
-Review comprehension, terminology, discoverability, feedback, error recovery and operational friction.
+## Shared state
 
-### COMPETITIVE
-Use external research only when relevant. Record it as evidence, not implementation authority.
+Consume and return the current Director state:
 
-### FRESH EYES
-Challenge:
-- hidden assumptions;
-- missing states;
-- unnecessary steps;
-- failure paths;
-- inconsistent behaviour;
-- root-cause quality.
+`repository/ref · baseline · target · scope · invariants · findings · failure cases · hypotheses · changed surface · verification · regression disposition · readiness impact · uncertainty`
 
-## Required decision
+## Non-negotiables
 
-Before implementation, establish:
-- target;
-- observed current behaviour;
-- desired behaviour;
-- affected surfaces;
-- invariants;
-- risk;
-- chosen approach;
-- acceptance criteria;
-- verification strategy;
-- scope in/out.
+- Use current repository evidence.
+- Do not silently override higher-authority Zazu decisions.
+- Do not invent missing evidence.
+- Do not duplicate an existing failure case or rejected hypothesis.
+- Do not widen scope without Director authority.
+- Hand evidence back to Director after the capability completes.
 
-## Conflict handling
+## Detailed procedure
 
-When Zazu documents disagree:
-1. compare their dates and current repository state;
-2. prefer current repository reality;
-3. prefer explicit owner decisions;
-4. mark unresolved conflict;
-5. never silently merge contradictory rules.
-
-Never fill a Zazu gap from another project's context.
+See `.agents/skills/discovery-design/SKILL.md` and its referenced domain material. The contract intentionally stays small so agents do not load every procedure when it is irrelevant.
