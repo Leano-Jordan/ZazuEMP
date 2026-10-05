@@ -17,7 +17,7 @@ class ApplySecurityHeaders
         $response->headers->set('Referrer-Policy', 'strict-origin-when-cross-origin');
         $response->headers->set('Permissions-Policy', 'geolocation=(), microphone=()');
 
-        if (app()->environment('production') && $request->isSecure()) {
+        if (app()->environment('production') && ($request->isSecure() || $request->server->get('HTTPS') === 'on')) {
             $response->headers->set(
                 'Strict-Transport-Security',
                 'max-age=31536000; includeSubDomains',
