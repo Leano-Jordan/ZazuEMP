@@ -17,6 +17,9 @@ use App\Support\Offline\SyncMutationRecorder;
 use App\Support\Offline\SyncConflictRecorder;
 use Tests\TestCase;
 
+/**
+ * @SuppressWarnings(PHPMD.TooManyPublicMethods)
+ */
 class OfflineSyncFoundationTest extends TestCase
 {
     use RefreshDatabase;
