@@ -34,9 +34,13 @@ class PwaOfflineFoundationTest extends TestCase
         $response->assertOk()
             ->assertSee('/manifest.webmanifest')
             ->assertSee('Install Zazu')
-            ->assertSee("navigator.serviceWorker.register('/sw.js')")
             ->assertSee("const DB='zazu-phone-workspace'")
             ->assertSee('data.local_dirty=true');
+
+        $this->assertStringContainsString(
+            "navigator.serviceWorker.register('/sw.js')",
+            html_entity_decode($response->getContent(), ENT_QUOTES | ENT_HTML5)
+        );
     }
 
     public function test_service_worker_guarantees_the_offline_shell_is_precached(): void
