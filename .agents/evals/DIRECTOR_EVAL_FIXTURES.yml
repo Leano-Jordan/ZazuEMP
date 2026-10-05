@@ -1,0 +1,43 @@
+version: 1
+
+fixtures:
+  baseline:
+    repository_state: current
+    active_target:
+      id: TARGET-TEST
+      scope: bounded
+      authorized: true
+    evidence: []
+
+  rejected_fix:
+    failure_case:
+      id: CASE-EVAL-001
+      fingerprint: FP-EVAL-REPEAT-001
+      engineering_error_code: ENG-TEST-001
+      rejected_hypotheses:
+        - hypothesis: change unrelated application CSS
+          result: rejected
+          evidence: no causal relationship
+    new_evidence: false
+
+  stale_state:
+    state_version: 4
+    latest_repository_state_version: 5
+    changed_surface_since_read: true
+
+  green_narrow_test:
+    check:
+      name: calendar unit test
+      result: PASS
+      exercised_layer: backend-domain
+    requested_claim: calendar workflow is fully verified
+
+  wrong_layer:
+    failure_class: F4
+    observed_environment: missing PHP runtime
+    proposed_correction: edit Laravel application code
+
+  acceptance:
+    builder_result: PASS
+    independent_verification: null
+    requested_disposition: ACCEPT
