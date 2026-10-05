@@ -336,5 +336,106 @@ class OfflineSyncFoundationTest extends TestCase
         $this->assertSame('0123456789', \App\Models\CustomerContact::query()->whereHas('customer', fn ($q) => $q->where('business_id', $business->id))->value('phone'));
     }
 
+    public function test_offline_preparation_create_and_status_update_are_business_scoped_and_idempotent(): void
+    {
+        $business = Business::create([
+            'name' => 'Preparation Business',
+            'slug' => 'preparation-'.Str::lower(Str::random(8)),
+            'status' => 'active',
+            'currency' => 'ZAR',
+        ]);
+
+        $device = SyncDevice::create([
+            'business_id' => $business->id,
+            'installation_id' => (string) Str::uuid(),
+        ]);
+        $event = \App\Models\Event::create([
+            'business_id' => $business->id,
+            'reference' => 'OFF-PREP-001',
+            'name' => 'Offline Wedding',
+            'customer_name' => 'Test Customer',
+            'event_date' => now()->addDays(14)->toDateString(),
+            'status' => 'draft',
+        ]);
+        $eventIdentity = app(\App\Support\Offline\SyncEntityIdentityRegistry::class)->identify($event, 'job');
+        $localId = (string) Str::uuid();
+        $recorder = app(SyncMutationRecorder::class);
+        $mutation = $recorder->record(
+            $device,
+            'preparation',
+            $localId,
+            'create',
+            [
+                'local_id' => $localId,
+                'event_local_id' => $eventIdentity->entity_uuid,
+                'record' => [
+                    'title' => 'Confirm buffet equipment',
+                    'category' => 'equipment',
+                    'quantity' => 20,
+                    'unit' => 'items',
+                    'status' => 'ready',
+                    'due_date' => now()->addDays(7)->toDateString(),
+                ],
+            ],
+        );
+
+        $applier = app(SyncMutationApplier::class);
+        $handler = app(\App\Support\Offline\OfflineDomainMutationHandler::class);
+        $first = $applier->apply($mutation, ['preparation' => $handler]);
+        $second = $applier->apply($first, ['preparation' => $handler]);
+
+        $this->assertSame('applied', $first->status);
+        $this->assertSame($first->id, $second->id);
+        $this->assertSame(1, \App\Models\EventPreparationItem::query()
+            ->where('business_id', $business->id)
+            ->where('event_id', $event->id)
+            ->where('title', 'Confirm buffet equipment')
+            ->count());
+        $this->assertSame('ready', \App\Models\EventPreparationItem::query()->where('event_id', $event->id)->value('status'));
+    }
+
+    public function test_offline_preparation_rejects_cross_business_job_identity(): void
+    {
+        $first = Business::create([
+            'name' => 'Preparation First',
+            'slug' => 'prep-first-'.Str::lower(Str::random(8)),
+            'status' => 'active',
+            'currency' => 'ZAR',
+        ]);
+        $second = Business::create([
+            'name' => 'Preparation Second',
+            'slug' => 'prep-second-'.Str::lower(Str::random(8)),
+            'status' => 'active',
+            'currency' => 'ZAR',
+        ]);
+        $device = SyncDevice::create([
+            'business_id' => $first->id,
+            'installation_id' => (string) Str::uuid(),
+        ]);
+        $event = \App\Models\Event::create([
+            'business_id' => $second->id,
+            'reference' => 'OTHER-001',
+            'name' => 'Other Business Event',
+            'status' => 'draft',
+        ]);
+        $eventIdentity = app(\App\Support\Offline\SyncEntityIdentityRegistry::class)->identify($event, 'job');
+        $localId = (string) Str::uuid();
+        $mutation = app(SyncMutationRecorder::class)->record(
+            $device,
+            'preparation',
+            $localId,
+            'create',
+            [
+                'local_id' => $localId,
+                'event_local_id' => $eventIdentity->entity_uuid,
+                'record' => ['title' => 'Must reject'],
+            ],
+        );
+
+        $this->expectException(\Illuminate\Validation\ValidationException::class);
+        app(SyncMutationApplier::class)->apply($mutation, [
+            'preparation' => app(\App\Support\Offline\OfflineDomainMutationHandler::class),
+        ]);
+    }
 
 }
