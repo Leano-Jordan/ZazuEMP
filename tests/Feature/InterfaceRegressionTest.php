@@ -96,7 +96,8 @@ class InterfaceRegressionTest extends TestCase
 
         $response->assertOk()
             ->assertSee('class="zazu-nav-area is-active" data-zazu-nav-area', false)
-            ->assertSee('class="zazu-nav-link active"', false)\n            ->assertSee('aria-current="page">Calendar</a>', false);
+            ->assertSee('class="zazu-nav-link active"', false)
+            ->assertSee('aria-current="page">Calendar</a>', false);
     }
 
     public function test_calendar_permission_is_explicit_for_configured_operational_roles(): void
