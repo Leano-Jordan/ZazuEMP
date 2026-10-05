@@ -9,7 +9,7 @@ The current owner of Zazu EMP is:
 
 **Isaac Junior Lehlogonolo Maluleka**
 
-**Operating address:** 1068 Block JK, Soshanguve, Pretoria, South Africa
+**Operating address:** Private residential address intentionally omitted from the public repository.
 
 Isaac is the current solo business owner and developer of Zazu EMP, and all current project responsibility sits with him.
 
