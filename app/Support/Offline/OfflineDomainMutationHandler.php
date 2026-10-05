@@ -17,6 +17,9 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Str;
 use Illuminate\Validation\ValidationException;
 
+/**
+ * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
+ */
 class OfflineDomainMutationHandler implements SyncMutationHandler
 {
     public function __construct(
@@ -118,6 +121,9 @@ class OfflineDomainMutationHandler implements SyncMutationHandler
         return Event::create($attributes);
     }
 
+    /**
+     * @SuppressWarnings(PHPMD.NPathComplexity)
+     */
     private function preparation(SyncMutation $mutation): EventPreparationItem
     {
         if (! in_array($mutation->operation, ['create', 'upsert', 'update'], true)) {
@@ -179,6 +185,10 @@ class OfflineDomainMutationHandler implements SyncMutationHandler
         return EventPreparationItem::create($attributes);
     }
 
+    /**
+     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
+     * @SuppressWarnings(PHPMD.NPathComplexity)
+     */
     private function purchaseOrder(SyncMutation $mutation): PurchaseOrder
     {
         if (! in_array($mutation->operation, ['create', 'upsert'], true)) {
