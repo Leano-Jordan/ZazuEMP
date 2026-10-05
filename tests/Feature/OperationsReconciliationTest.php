@@ -29,7 +29,11 @@ class OperationsReconciliationTest extends TestCase
 
         $this->actingAs($user)->withSession(['zazu_business_id' => $business->id]);
 
-        $order->update(['status' => 'ordered']);
+        $order->update(['status' => 'sent']);
+
+        $this->post(route('purchasing.status', $order), [
+            'status' => 'ordered',
+        ])->assertRedirect();
         $item = $order->items->firstOrFail();
         $item->update(['received_quantity' => '0.00']);
 
