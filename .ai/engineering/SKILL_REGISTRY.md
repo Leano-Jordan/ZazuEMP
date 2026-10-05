@@ -52,3 +52,9 @@ Ledgers/state contain current project facts.
 Failure index contains institutional memory.
 
 When a procedure becomes broadly reusable and independently triggerable, extract it into a skill instead of enlarging the master prompt.
+
+## Director self-evaluation
+
+The Director control plane has its own regression suite under `.agents/evals/`.
+
+Control-plane changes must be evaluated against the stable scenarios before acceptance when execution support is available. A Director eval failure is not a Zazu application failure; it is a control-plane regression.
