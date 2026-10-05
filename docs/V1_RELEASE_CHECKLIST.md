@@ -375,4 +375,9 @@ Application HEAD: `1fe4e94602373fdea56061862b63073f5f32d19f`
 
 ## Director verification checkpoint — 2026-10-05
 
-Current-head verification is being executed against the release-gate candidate. This checkpoint contains no product-scope change.
+**Current main HEAD at verification merge:** `6d860404e1d0873590a0b6fe8021e9879bca9daa`
+
+PR #24 merged the current-head verification checkpoint. The operator subsequently reported the current verification stack as passing.
+
+**Director reconciliation:** populated commercial reconciliation, populated operational reconciliation through event completion, HSTS regression coverage, and current-head verification are treated as verified evidence. V1 remains **NOT CERTIFIED** because physical-device acceptance, legal/privacy operational closure, brand clearance, and final release-owner sign-off remain open.
+
