@@ -238,11 +238,12 @@ class UiAccessibilityTest extends TestCase
         $response->assertOk()
             ->assertSee('data-branding-error="logo"', false)
             ->assertSee('data-branding-error="dashboard_image"', false)
-            ->assertSee('data-branding-error="wallpaper"', false)
-            ->assertStringContainsString(
-                'Please correct the highlighted fields.',
-                file_get_contents(resource_path('views/components/app-layout.blade.php'))
-            );
+            ->assertSee('data-branding-error="wallpaper"', false);
+
+        $this->assertStringContainsString(
+            'Please correct the highlighted fields.',
+            file_get_contents(resource_path('views/components/app-layout.blade.php'))
+        );
     }
 
 
