@@ -19,6 +19,7 @@ class ZazuBackupRestoreTest extends TestCase
 
         $database = storage_path('app/zazu-roundtrip.sqlite');
         $output = storage_path('app/zazu-roundtrip-backups');
+        $privateProbe = storage_path('app/private/zazu-roundtrip/media-probe.txt');
         $originalDefault = config('database.default');
         $originalDatabase = config('database.connections.sqlite.database');
 
@@ -26,6 +27,8 @@ class ZazuBackupRestoreTest extends TestCase
         File::delete($database);
         File::put($database, '');
         File::deleteDirectory($output);
+        File::ensureDirectoryExists(dirname($privateProbe));
+        File::put($privateProbe, 'private media before backup');
 
         config([
             'database.default' => 'sqlite',
@@ -59,6 +62,7 @@ class ZazuBackupRestoreTest extends TestCase
             $zip->close();
 
             DB::table('backup_probe')->update(['value' => 'changed after backup']);
+            File::delete($privateProbe);
 
             $restore = $this->artisan('zazu:restore', [
     'archive' => $archive,
@@ -75,10 +79,13 @@ $this->assertSame(0, $exitCode, Artisan::output());
                 'before backup',
                 DB::connection('sqlite')->table('backup_probe')->value('value')
             );
+            $this->assertFileExists($privateProbe);
+            $this->assertSame('private media before backup', File::get($privateProbe));
         } finally {
             DB::purge('sqlite');
             File::delete($database);
             File::deleteDirectory($output);
+            File::delete($privateProbe);
             config([
                 'database.default' => $originalDefault,
                 'database.connections.sqlite.database' => $originalDatabase,
