@@ -29,6 +29,9 @@ class OperationsReconciliationTest extends TestCase
 
         $this->actingAs($user)->withSession(['zazu_business_id' => $business->id]);
 
+        // The demo seed is intentionally final-state; reopen the event so the real
+        // purchasing transition guard can exercise an operational workflow.
+        $event->update(['status' => 'confirmed']);
         $order->update(['status' => 'sent']);
 
         $this->patch(route('purchasing.status', $order), [
