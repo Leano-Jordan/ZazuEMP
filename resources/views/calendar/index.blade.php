@@ -54,14 +54,15 @@
             <div class="zazu-calendar-legend" aria-label="Event status legend">
                 <span><i class="zazu-calendar-dot is-draft"></i>Planning</span><span><i class="zazu-calendar-dot is-confirmed"></i>Confirmed</span><span><i class="zazu-calendar-dot is-progress"></i>In progress</span><span><i class="zazu-calendar-dot is-complete"></i>Complete</span><span><i class="zazu-calendar-dot is-cancelled"></i>Cancelled</span>
             </div>
-            <div class="zazu-calendar-grid">
+            <div class="zazu-calendar-grid-scroll" tabindex="0" aria-label="Scrollable month calendar">
+                <div class="zazu-calendar-grid">
                 @foreach ([['short' => 'Mon', 'full' => 'Monday'], ['short' => 'Tue', 'full' => 'Tuesday'], ['short' => 'Wed', 'full' => 'Wednesday'], ['short' => 'Thu', 'full' => 'Thursday'], ['short' => 'Fri', 'full' => 'Friday'], ['short' => 'Sat', 'full' => 'Saturday'], ['short' => 'Sun', 'full' => 'Sunday']] as $label)
                     <div class="zazu-calendar-label" aria-label="{{ $label['full'] }}">{{ $label['short'] }}</div>
                 @endforeach
                 @foreach ($days as $day)
                     @php $key=$day->format('Y-m-d'); $isCurrentMonthDay=$day->month===$month->month && $day->year===$month->year; $dayEvents=$eventsByDate->get($key,collect()); $dayHolidays=$holidays->get($key,collect()); @endphp
-                    <div class="zazu-calendar-cell {{ $isCurrentMonthDay ? 'is-current-month' : 'is-adjacent' }} {{ $day->isToday() ? 'is-today' : '' }}">
-                        <div class="zazu-calendar-date-row"><span class="zazu-calendar-date">{{ $day->format('j') }}</span>@if($day->isToday())<span class="zazu-calendar-today">Today</span>@endif</div>
+                    <div class="zazu-calendar-cell {{ $isCurrentMonthDay ? 'is-current-month' : 'is-adjacent' }} {{ $day->isToday() ? 'is-today' : '' }} {{ $dayHolidays->isNotEmpty() ? 'has-holiday holiday-'.($dayHolidays->first()['category'] ?? 'public') : '' }}">
+                        <div class="zazu-calendar-date-row"><span class="zazu-calendar-date">{{ $day->format('j') }}</span>@if($dayHolidays->isNotEmpty())<span class="zazu-calendar-holiday-marker holiday-{{ $dayHolidays->first()['category'] ?? 'public' }}" title="{{ $dayHolidays->pluck('name')->implode(', ') }}" aria-label="Holiday: {{ $dayHolidays->pluck('name')->implode(', ') }}"></span>@endif @if($day->isToday())<span class="zazu-calendar-today">Today</span>@endif</div>
                         @if($dayHolidays->isNotEmpty())
                             <div class="zazu-calendar-holidays">
                                 @foreach($dayHolidays as $holiday)
@@ -83,8 +84,8 @@
                         @else <span class="zazu-calendar-empty-cell">—</span> @endif
                     </div>
                 @endforeach
+                </div>
             </div>
-        @elseif($view === '3-months')
             <div class="zazu-calendar-multi-grid">
                 @foreach($threeMonthBlocks as $block)
                     <section class="zazu-calendar-mini-month">
