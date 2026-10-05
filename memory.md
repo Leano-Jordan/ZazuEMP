@@ -26,6 +26,7 @@ Morpheus is the Master ENGINE identity. The owner refers to the engine as Jarvis
 When the owner explicitly says **execute**, execution is the default response. Do not substitute a plan, progress speech, token warning, or unsolicited report for the requested work.
 
 During execution:
+
 - Inspect the current Zazu repository before changing it.
 - Work the repository, not only the defects the owner happened to name.
 - Inspect adjacent high-impact correctness, accessibility, reliability, maintainability and workflow defects in the touched surface.
@@ -61,6 +62,7 @@ The current repository-side engineering system is the Zazu Engineering Operating
 Master control: Morpheus (owner-facing nickname: Jarvis).
 
 Specialist engines:
+
 - Discovery & Design
 - Builder
 - Guardian
@@ -96,6 +98,7 @@ Server-side authorization and business isolation are mandatory before production
 ## Technical foundation
 
 Verified:
+
 - PHP 8.4.26
 - Laravel 13.33.0
 - Composer dependencies installed
@@ -105,6 +108,7 @@ Verified:
 - .env and application key exist
 
 Known non-blocking warnings:
+
 - missing pdo_firebird PHP extension
 - optional Vite fontaine optimization
 
@@ -115,6 +119,7 @@ Do not derail development for those warnings unless they cause a real Zazu failu
 IMPLEMENTED on laravel-foundation:
 
 New migrations:
+
 - businesses
 - business_user membership
 - customers
@@ -122,6 +127,7 @@ New migrations:
 - business/customer/event-day-contact links on events
 
 New/updated models:
+
 - Business
 - Customer
 - CustomerContact
@@ -129,6 +135,7 @@ New/updated models:
 - User businesses relationship
 
 Test added:
+
 - tests/Feature/FoundationRelationshipsTest.php
 
 The original events migration remains unchanged. Legacy customer snapshot fields remain temporarily so migration/backfill can be handled safely later.
@@ -138,6 +145,7 @@ Current foreign keys for business/customer/event context are nullable because au
 ## Batch 02 — Customer + Work workflow
 
 IMPLEMENTED:
+
 - Customer creation workflow
 - primary customer contact creation
 - Work index/show/edit/create workflow
@@ -148,6 +156,7 @@ IMPLEMENTED:
 - Work action renamed from `New work` to `Create work`
 
 REMAINS TO VERIFY LOCALLY:
+
 - fresh Work creation after clearing compiled Blade views
 - full feature test suite
 - fresh migration run against the current local database
@@ -155,6 +164,7 @@ REMAINS TO VERIFY LOCALLY:
 ## Batch 04 — Business capabilities foundation
 
 IMPLEMENTED:
+
 - business_capabilities migration
 - BusinessCapability model
 - Business -> capabilities relationship
@@ -165,6 +175,7 @@ IMPLEMENTED:
 - BusinessCapability feature coverage for create/update
 
 Foundation fields:
+
 - business_id nullable
 - name
 - category
@@ -179,6 +190,7 @@ The capability catalogue is intentionally foundational. Work-specific quantities
 ## Work creation hardening
 
 IMPLEMENTED:
+
 - moved nested customer/contact data preparation out of the Create Work Blade template
 - Create Work now uses prepared JSON data, removing the fragile nested Blade/PHP expression that caused the recurring compiled-view parse failure
 - contact selector clearly handles customers with no contacts
@@ -206,6 +218,7 @@ The order can change when verified dependencies or evidence justify it.
 ## Verification scoreboard
 
 DONE:
+
 - Laravel foundation
 - environment/application key
 - database infrastructure
@@ -217,6 +230,7 @@ DONE:
 - Batch 01 relationship test added
 
 NOT YET VERIFIED locally after Batch 01:
+
 - fresh migration run
 - feature test execution
 - compatibility with any existing local event data
@@ -228,6 +242,7 @@ NOT YET VERIFIED locally after Batch 01:
 ## Navigation + workflow connectivity pass — 2026-09-26
 
 IMPLEMENTED:
+
 - Customer directory rows now open a real customer relationship workspace.
 - Customer workspace exposes contacts, work history and Start Work.
 - Work workspace links directly to Customer and Requirements.
@@ -239,6 +254,7 @@ IMPLEMENTED:
 - Feature coverage updated for the Requirements redirect and Customer relationship workspace.
 
 Navigation rule:
+
 - Every implemented page must have a valid path forward and a valid path back to its parent workflow.
 - Do not render a clickable UI element for a workflow stage until its destination route exists, unless it is explicitly styled as a non-interactive future stage.
 - Contextual workflow pages should link back to their parent workspace rather than becoming isolated global navigation items.
@@ -252,6 +268,7 @@ php artisan view:clear
 php artisan test
 
 Then manually verify:
+
 1. Customers -> open a customer -> Start Work -> Work.
 2. Work -> Customer -> back to Work.
 3. Work -> Requirements -> Add Requirement -> save -> Requirements -> Work.
@@ -260,7 +277,6 @@ Then manually verify:
 6. Theme toggle remains functional across all connected pages.
 
 If those pass, proceed to the next roster slice after Requirements, which is the versioned Quote foundation, while keeping all existing navigation connected.
-
 
 ## Master ENGINE identity + UI audit — 2026-09-26
 
@@ -299,6 +315,7 @@ If those pass, proceed to the next roster slice after Requirements, which is the
 ### Next UI/link verification pass
 
 Verify the actual rendered application, not source alone:
+
 - every visible navigation link
 - every contextual back link
 - every forward workflow link
@@ -311,10 +328,10 @@ Verify the actual rendered application, not source alone:
 
 **Rule:** do not fix individual symptoms before checking the shared component/layout/token that controls them.
 
-
 NaN## Execution fix pass — 2026-09-26
 
 IMPLEMENTED in Zazu EMP:
+
 - shared dark-theme primary button contrast fix
 - semantic colour-token layer for action/link/navigation/focus meaning
 - stronger actionable "Start work" link treatment
@@ -326,22 +343,24 @@ IMPLEMENTED in Zazu EMP:
 - duplicate unused application layout removed
 
 UNVERIFIED:
+
 - actual browser/runtime link traversal
 - mobile visual inspection
 - light/dark rendered inspection
 - local PHPUnit execution after the latest changes
 - local build after the latest changes
 
-
 ## Ownership correction and Work recovery - 2026-09-26
 
 Implemented:
+
 - Current project ownership record corrected to Isaac Junior Lehlogonolo Maluleka as the present solo developer/owner.
 - Rosscore Labs is recorded as a planned future business identity only; it is not currently treated as an incorporated owner.
 - Proprietary LICENSE and IP ownership documentation aligned with that reality.
 - Added a commercial/legal protection register covering copyright provenance, future company transfer, trade marks, third-party material, POPIA/PAIA/ECTA/CPA considerations and production release gates.
 
 Work recovery findings:
+
 - Existing repository migration `2026_09_26_000008_add_event_night_contact_and_soft_deletes_to_events_table.php` defines `events.deleted_at`, but an existing development database can still be out of sync with repository migration state.
 - Added a resilient repair migration `2026_09_26_000011_repair_event_workflow_schema.php` so missing Work columns are restored without requiring a destructive schema replacement.
 - Fixed a Work creation defect where `$event` was referenced before the record was created.
@@ -355,6 +374,7 @@ Work recovery findings:
 Execution batch expanded the existing Zazu foundation across relationship, Work, navigation, accessibility/privacy and file-profile foundations.
 
 Implemented:
+
 - Customer edit/update surface and visible lifecycle controls.
 - Customer creation now accepts optional profile photo plus optional Day and Night contacts.
 - Customer contact create/edit/remove surface; primary contact removal is protected.
@@ -371,25 +391,28 @@ Implemented:
 - POPIA/OWASP/WCAG engineering baseline documented in docs/ZAZU_PRIVACY_BASELINE.md.
 
 Verification boundary:
+
 - GitHub main branch was re-inspected after the sweep.
 - Route references were statically reviewed and a repository test was added for automated verification.
 - PHPUnit, fresh migrations and browser/light-dark/responsive runtime traversal have not been executed in this environment.
 - Zazu still lacks authentication, active business context, server-side business isolation, roles/permissions and private/authenticated media delivery. These remain production security/privacy gates, not cosmetic follow-ups.
 
 Legal/security design:
+
 - Personal information minimisation, purpose limitation, security safeguards and retention/deletion principles are reflected in the feature design.
 - Soft delete is used for operational history preservation but is not treated as a permanent retention policy.
 - Profile-photo uploads use an allowlist and size limit, while production should serve identifiable images through an authenticated/authorised boundary.
 
-
 ## Regression prevention — PHP write integrity — 2026-09-26
 
 Incident:
+
 - A repository write to `app/Http/Controllers/DashboardController.php` produced malformed PHP namespace/import declarations: `AppHttpControllers` and `AppModelsBusiness` instead of namespaced forms.
 - The controller file physically existed, but Laravel could not resolve the class, making the dashboard/UI appear unavailable.
 - Root cause was a write-integrity failure in the automation path, not a missing Laravel controller scaffold.
 
 Permanent rules:
+
 - Treat PHP namespace/import backslashes as critical syntax, never cosmetic text.
 - After every automated PHP file write, re-fetch the exact file from the repository and inspect its namespace, imports and class declaration before considering the batch complete.
 - Never report a PHP implementation as verified from the write operation alone.
@@ -400,6 +423,7 @@ Permanent rules:
 ## Execution cycle — 2026-09-26: guided interaction + commercial hardening
 
 Implemented:
+
 - Local-only system typography end-to-end; removed the remaining external Bunny font declaration from Vite.
 - Guided currency/category/unit controls and business-default currency.
 - Explicit visual distinction between section headers, column headers, records, metadata and row actions.
@@ -412,15 +436,16 @@ Implemented:
 - Added cross-business and workload regression coverage.
 
 Verification boundary:
+
 - Repository source was re-inspected after changes.
 - Automated PHP source write integrity was rechecked on critical files.
 - Local runtime execution remains unverified because this environment cannot reach GitHub, so PHPUnit, migrations, Blade compilation and browser traversal were not run here.
 - Full authentication, explicit business selection, roles/permissions and private media authorization remain production gates.
 
-
 ## Commercial UI hardening cycle — 2026-09-26
 
 Implemented:
+
 - icon-only light/dark theme control
 - compact signed-in account menu with sign-out
 - removal of implementation/source language from user-facing recently added surfaces
@@ -430,18 +455,20 @@ Implemented:
 - UI accessibility regression assertions updated
 
 Architecture boundary:
+
 - Existing business-scope guards and CurrentBusiness logic were preserved.
 - No working workflow routes or business-domain behaviour were deliberately rewritten in this UI hardening cycle.
 
 Verification:
+
 - GitHub source re-inspected after each change.
 - Static checks confirmed changed files contain the intended new controls and no read-only/system-filled service description UI.
 - Local runtime execution remains required for PHPUnit, migrations, Blade rendering and browser responsive/light-dark verification.
 
-
 ## Full foundation integration sweep — 2026-09-26
 
 Implemented:
+
 - Connected Suppliers, Inventory and Assets foundation pages to live Work requirements and the reusable capability catalogue.
 - Connected Reports to current-business operational, quote and cost records without mixing currencies or businesses.
 - Replaced static foundation routes with controller-backed, business-scoped views.
@@ -456,6 +483,7 @@ Implemented:
 - Added integration and role/context regression coverage.
 
 Important verification incidents caught and resolved:
+
 - Foundation integration test data was initially not isolated with RefreshDatabase, contaminating later tests. Fixed.
 - Resource eager-load callback initially used an Eloquent Builder type against a BelongsTo relation. Fixed.
 - Controller route integrity initially did not recognise invokable controller actions. Fixed.
@@ -463,15 +491,16 @@ Important verification incidents caught and resolved:
 - Quote revision lifecycle checking initially occurred before business authorization. Fixed.
 
 Verification:
+
 - GitHub Actions run 309 passed 50 tests and 263 assertions after the major foundation corrections.
 - Subsequent runs are validating the final owner/security refinements.
 - Frontend dependency installation and build have passed in the CI workflow on the verified runs.
 - Local Windows browser traversal, rendered responsive/light-dark inspection and direct local runtime checks still require the owner's checkout.
 
-
 ## Authentication recovery + usability hardening — 2026-09-26
 
 Implemented:
+
 - Username is a first-class user identity and login identifier.
 - Login accepts username or email, with case-normalized lookup and Laravel's native Auth::attempt path.
 - Dedicated owner login route remains protected by server-side owner membership checks.
@@ -487,13 +516,13 @@ Implemented:
 - Account identity now uses @username in the signed-in account control.
 
 Verification:
+
 - Laravel CI run 370 on commit 5231cf passed the full suite with 61 tests and 310 assertions after the rendered-URL test corrections.
 - Password recovery, username login, owner login, logout, token reuse and identifier-collision tests passed in that verified run.
 - CodeQL actions analysis on the preceding auth context completed successfully; the current post-hardening CodeQL run is still in progress.
 - Current Laravel CI run for commit 04bd790 is still in progress after the cross-field identifier hardening.
 - Browser traversal, real email delivery and the owner's local Windows database remain runtime-only verification boundaries.
 - The example environment uses the log mailer, so local reset messages are logged rather than delivered externally unless deployment configuration supplies a real mail transport.
-
 
 ## Git control policy — owner directive — 2026-09-26
 
@@ -502,7 +531,6 @@ Verification:
 - All implementation, hardening, verification fixes and documentation updates are committed directly to main.
 - No branch-merging workflow is used.
 - Repository branch state verified after cleanup: main only.
-
 
 ## Branch-control correction — owner directive — 2026-09-27
 
@@ -518,7 +546,6 @@ Verification:
 - Snapshot construction is centralized in `QuoteService` so initial quote creation and revision creation use the same evidence shape.
 - Regression coverage now checks that a revised requirement's description and quantity are reflected in the new revision snapshot.
 
-
 ## Business-boundary hardening — 2026-09-26
 
 - `BelongsToBusiness` now enforces the active business boundary for authenticated model saves.
@@ -527,10 +554,10 @@ Verification:
 - Authenticated attempts to move an existing business-owned record to another business are rejected.
 - Regression tests cover both direct creation and cross-business reassignment.
 
-
 ## Bug-fix sweep — 2026-09-26
 
 Implemented:
+
 - Work Edit no longer performs nested collection/arrow-function transformation inside the Blade @json directive.
 - WorkController now prepares the Work Edit customer/contact JSON payload before rendering, matching the safer Create Work pattern.
 - Added a Work Edit rendering regression test covering the day/night contact data and rendered form controls.
@@ -540,6 +567,7 @@ Implemented:
 - Fixed Reports quote-total formatting to render thousands separators expected by the reporting contract.
 
 CI failure root causes addressed:
+
 - test namespace/import defect
 - test fixtures violating the newly hardened business-boundary write guard
 - test fixture created after switching business context
@@ -547,6 +575,7 @@ CI failure root causes addressed:
 - fragile Work Edit Blade compilation surface
 
 Verification boundary:
+
 - Every changed repository file was re-fetched after writing and matched the intended content.
 - GitHub Actions was triggered on main after the fixes.
 - The latest Laravel workflow was still in progress at the end of this execution window.
@@ -559,15 +588,16 @@ Verification boundary:
 - Work Edit rendering regression test now verifies the rendered JavaScript uses JSON.parse output and contains no legacy @json( marker.
 - Local generated storage/framework/views cache remains runtime-owned; after source changes the owner's Windows checkout should run php artisan view:clear before browser/test verification.
 
-
 ## Core re-audit + regression consolidation — 2026-09-26
 
 Verified on current main:
+
 - Full Laravel CI suite passed on commit `d7e2ad63489c00d5374e5cd3500873c00a586b29` with the current application test set.
 - Frontend dependency install/build passed in the same CI sequence.
 - Earlier failure wall was traced to malformed compiled Blade PHP, not fifteen unrelated application failures.
 
 Implemented in this sweep:
+
 - Restored onboarding route ownership enforcement and registration -> catalogue -> business setup flow.
 - Added missing Work attachment routes and ownership checks.
 - Added onboarding regression coverage.
@@ -580,14 +610,15 @@ Implemented in this sweep:
 - Fixed CI/runtime diagnosis so compiled Blade PHP syntax can be detected separately from template caching.
 
 Current architectural risks:
+
 - Business isolation remains controller/context-centric because `BelongsToBusiness` is not yet consistently applied across every business-owned model.
 - Psalm security workflow currently fails, but the repository has no `psalm.xml` and no direct Psalm dev dependency; root cause is not yet verified as an application vulnerability.
 - Composer lock/platform metadata and CI action runtime warnings require release-hygiene review.
 - Browser traversal, local Windows database state, backup/restore, licensing evidence and real deployment runtime remain outside this CI verification boundary.
 
 Regression rule:
-- Do not treat a green feature suite as proof that every Blade view compiles. Keep a dedicated all-view Blade syntax check in the audit process before release.
 
+- Do not treat a green feature suite as proof that every Blade view compiles. Keep a dedicated all-view Blade syntax check in the audit process before release.
 
 ## South Africa compliance + commercial workflow standard — 2026-09-27
 
@@ -611,8 +642,6 @@ Regression rule:
 - Current high-priority risks not yet cleared remain: purchasing state machine/GRN, receiving and payment idempotency, inventory movement idempotency, parent/child business invariants, audit trail, backup/restore/export, granular permissions, notification/reminder workflows, migration-upgrade evidence and browser/E2E verification.
 - Current expansion code is committed directly to main; final CI/runtime verification is still required before declaring this expansion green.
 
-
-
 ### Invoice/document evidence standard — extended 2026-09-27
 
 - A SARS-facing invoice must be self-contained at issue time. Do not rely on a live customer, quote or business record to reconstruct an old invoice later.
@@ -634,9 +663,8 @@ Regression rule:
 - Business branding files are private-storage assets; an upgrade migration moves existing business-branding files off the public disk.
 - Sweep record: `docs/ZAZU_SWEEP_AUDIT_2026-09-27.md`.
 
-
-
 ## Director hardening pass — 2026-09-27
+
 - Added idempotency protection for finance, purchasing and inventory commercial mutations.
 - Added operational audit log storage/view and audit records for important commercial and onboarding actions.
 - Added centralized staff permission mapping and server-side permission middleware for finance, purchasing and inventory.
@@ -645,6 +673,7 @@ Regression rule:
 - Final CI/runtime verification remains required; do not declare this hardening pass green until repository checks and a real backup/restore drill succeed.
 
 ## Director hardening loop — 2026-09-27
+
 - Hardened finance idempotency for invoices, payments and expenses, including transaction-scoped duplicate checks and quote-version locking during invoice conversion.
 - Hardened purchase-order and inventory idempotency checks and retained serialized stock/receipt processing.
 - Matured server-side staff permissions across finance, purchasing, inventory, assets, suppliers, customers and quotes/work access while preserving owner-only settings/catalogue boundaries.
@@ -653,15 +682,14 @@ Regression rule:
 - Corrected one malformed PHP namespace discovered during the self-recheck.
 - Latest hardening source state is commit `9c06e3dd1c1e4bc4c7514c2625945411c634a325`; CI/runtime execution still needs to run in the repository environment before declaring the pass green.
 
-
 ## Director UI/UX improvement pass — 2026-09-28
+
 - Activated the dedicated Zazu UI/UX Improvement Engine against current `main`.
 - Reconciled the interface with the established Operational Premium doctrine: controlled density, workflow-first hierarchy, micro-radii, borders before shadows, tabular numerics, restrained motion and accessible states.
 - Corrected the shared visual token layer toward neutral workbench/deep-green light/dark themes.
 - Streamlined the Dashboard into attention, compact metrics, upcoming work and contextual quick access; removed redundant module cards and decorative dashboard artwork from the operational surface.
 - Final fresh-eyes source review found and corrected remaining oversized rectangular radii.
 - Changes committed directly to `main`; browser-rendered QA remains a runtime verification boundary.
-
 
 ## Director UI/UX blue reference pass — 2026-09-28
 
@@ -672,14 +700,12 @@ Regression rule:
 - Error surfaces were aligned with the same blue visual system.
 - Source-level verification passed; rendered browser QA and full runtime test execution remain unverified.
 
-
 ## Director iterative commercial hardening loop — 2026-09-28
 
 - Continued UI/UX and product-integrity iteration beyond the initial blue palette pass.
 - Fixed permission-aware Dashboard/navigation discovery, branded confirmations, workspace-switch initialization, mixed-currency finance handling, integer-cent invoice balance arithmetic, Purchase Order and Quote transition centralization, money overflow and negative-input handling, remaining monetary float presentation, and duplicate CSS theme-token systems.
 - Browser smoke registration was made safe under parallel desktop/mobile execution and updated to the current Dashboard hierarchy.
 - Latest completed automated gates at the time of this record: Laravel, Psalm and PHPMD green on commit 613f0f0; browser smoke was still executing on that head.
-
 
 ## Director deep-dive UI/UX batch — 2026-09-28
 
@@ -692,7 +718,6 @@ Regression rule:
 - Hardened mobile form layouts, action groups, document padding and shell behaviour.
 - Latest batch source checks were clean; rendered browser QA remains unverified.
 
-
 ## Director comparative product-pattern cycle — 2026-09-28
 
 - Benchmarked current event-management patterns from HoneyBook, Tripleseat and Event Temple.
@@ -701,7 +726,6 @@ Regression rule:
 - Added compact Job “At a glance” context and removed duplicate Dashboard quick-access entries.
 - Normalized customer contact surface styling and hardened mobile action-heavy headers.
 - Rendered QA remains unverified.
-
 
 ## Director visual-attraction refinement cycle — 2026-09-28
 
@@ -712,7 +736,6 @@ Regression rule:
 - Kept the interface operational and dense without making it look like a generic card-grid SaaS template.
 - Browser-rendered visual QA remains unverified.
 
-
 ## Director modern SaaS attraction cycle — 2026-09-28
 
 - Benchmarked current 2026 UI patterns from Linear/Notion-style calm interfaces, Attio record-page redesign, Vercel navigation redesign and modern SaaS trend research.
@@ -721,7 +744,6 @@ Regression rule:
 - Calendar cells now read as separated day surfaces rather than a continuous spreadsheet grid.
 - Remaining inline content borders were removed from pagination, customer disclosures and work warnings, with semantic accent treatment retained where useful.
 - Inputs retain clear control boundaries and focus states for usability/accessibility.
-
 
 ## Director V1 capability deep-dive and execution — 2026-09-28
 
@@ -740,7 +762,6 @@ Regression rule:
 - Deliberately contained compliance, inventory, assets, travel, BI and AI autonomy rather than expanding them into separate V1 systems.
 - Runtime Laravel/browser execution remains outstanding because this environment could not clone the public repository due unavailable outbound DNS/network access. Source-level review of the executed changes was performed; release certification still requires repository-environment runtime checks, browser QA, backup/restore and populated-database migration verification.
 
-
 ## Director visual visibility and landing correction — 2026-09-28
 
 - Corrected the base visual rule that forced the Zazu navigation rail into a dark treatment even in light mode.
@@ -754,8 +775,6 @@ Regression rule:
 - Added LandingPageTest coverage for public root and logout destination.
 - Runtime rendered QA remains pending; source changes are committed on main and require browser verification in the repository environment.
 
-
-
 ## Director revelation — 2026-10-01
 
 - Progressive disclosure is now a formal Zazu UX principle: primary → expandable → advanced → specialist.
@@ -766,15 +785,15 @@ Regression rule:
 - Open-source libraries/APIs are optional enhancements unless explicitly promoted to core. Core offline-capable workflows must not depend on online services.
 - New persistent control docs: docs/ZAZU_EXTERNAL_CAPABILITY_REGISTER.md and docs/ZAZU_UI_DISCLOSURE_STANDARD.md.
 
-
 ## Director — 2026-10-05 regression reconciliation
+
 - SecurityHeadersTest exposed a real landing view failure: missing optional venue image key.
 - Landing now uses a safe fallback for the venue image.
 - HSTS test handling was hardened to recognize the explicit HTTPS server flag while remaining production-only.
 - Local pdo_firebird startup warning is a PHP installation issue, not a Zazu application failure; do not treat it as a release defect.
 
-
 ## Director — 2026-10-05 HSTS regression root cause indexed
+
 - Current local suite result: 279 passed, 1 failed, 1642 assertions.
 - The remaining failure is isolated to SecurityHeadersTest HSTS verification, not the security middleware baseline or landing view.
 - Root cause: the feature test depended on Laravel test-server HTTPS variables to make the request secure. That harness path did not produce a secure Symfony Request in the local runtime, so the production-only HSTS branch was never entered.
