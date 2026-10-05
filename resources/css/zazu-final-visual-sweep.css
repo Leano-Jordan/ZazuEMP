@@ -4444,7 +4444,7 @@ li {
 .zazu-kpi-label,
 .zazu-metric-label {
     color: var(--zazu-muted);
-    font-size: 12px;
+    font-size: 13.5px;
     font-weight: 600;
     line-height: 1.3;
 }
