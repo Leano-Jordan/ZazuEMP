@@ -1334,3 +1334,11 @@ Scoreboard:
 
 Next Director target:
 **REBUILD ASSETS → RUN CURRENT TEST SUITE → RENDER DASHBOARD / WORK / FORMS / CALENDAR → VISUAL ACCEPTANCE**
+
+### Director — PHPUnit reconciliation (2026-10-05)
+- Local run reached 269 passed / 7 failed; all seven fingerprints were traced.
+- GitHub main was reconciled to remove stale/brittle contracts and align tests with current canonical CSS/navigation ownership.
+- Commits: d8ce0eaf calendar assertion hardening; 6b84177a manifest contract hardening; 60dc69a3 accessibility contract alignment; 125bd7b5 auth proportion contract scoping; 793e0f1b visual-layer proportion alignment.
+- Important verification boundary: the user's local checkout is demonstrably behind main for several of these test files because the reported failures contain assertions already corrected on main. Local PHPUnit must be rerun after synchronizing the checkout.
+- pdo_firebird startup messages are PHP warnings and are not the PHPUnit failure cause.
+
