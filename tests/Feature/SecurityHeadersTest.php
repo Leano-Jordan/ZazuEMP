@@ -2,6 +2,9 @@
 
 namespace Tests\Feature;
 
+use App\Http\Middleware\ApplySecurityHeaders;
+use Illuminate\Http\Request;
+use Symfony\Component\HttpFoundation\Response;
 use Tests\TestCase;
 
 class SecurityHeadersTest extends TestCase
@@ -13,13 +16,15 @@ class SecurityHeadersTest extends TestCase
         try {
             $this->app->instance('env', 'production');
 
-            $response = $this->withServerVariables([
-                'HTTPS' => 'on',
-            ])->get('/');
+            $request = Request::create('https://zazu.test/', 'GET');
+            $response = (new ApplySecurityHeaders())->handle(
+                $request,
+                fn () => new Response('ok'),
+            );
 
-            $response->assertHeader(
-                'Strict-Transport-Security',
+            $this->assertSame(
                 'max-age=31536000; includeSubDomains',
+                $response->headers->get('Strict-Transport-Security'),
             );
         } finally {
             $this->app->instance('env', $originalEnvironment);
@@ -33,9 +38,13 @@ class SecurityHeadersTest extends TestCase
         try {
             $this->app->instance('env', 'production');
 
-            $response = $this->get('/');
+            $request = Request::create('http://zazu.test/', 'GET');
+            $response = (new ApplySecurityHeaders())->handle(
+                $request,
+                fn () => new Response('ok'),
+            );
 
-            $response->assertHeaderMissing('Strict-Transport-Security');
+            $this->assertNull($response->headers->get('Strict-Transport-Security'));
         } finally {
             $this->app->instance('env', $originalEnvironment);
         }
