@@ -351,3 +351,16 @@ The documentation-design gate is closed. The legal/privacy compliance gate remai
 **Disposition:** 🟡 OPEN — Playwright emulation is not promoted to physical-device acceptance.
 
 Last updated: 2026-10-04
+
+
+## Director acceleration update — 2026-10-05
+
+Application HEAD: `1fe4e94602373fdea56061862b63073f5f32d19f`
+
+- Commercial proof harness expanded: populated quote acceptance → invoice → deposit → final payment reconciliation.
+- Operations proof harness expanded: populated PO → receipt → inventory movement → incurred cost → real event `confirmed → in_progress → completed` lifecycle transition.
+- Production audit gap fixed in receiving: inventory receipt movements now emit `inventory.movement.recorded` audit evidence.
+- Current GitHub workflow/status lookup has not yet produced a run for `1fe4e946`; current-head green remains unclaimed.
+- Director operating mode is now **batch execution**: group independent release blockers into one inspection/change/verification cycle rather than advancing one test at a time.
+
+**Next batch:** current-head CI reconciliation + release-critical field workflow/device evidence + final security/recovery gate sweep. Cosmetic work is subordinate to these gates.
