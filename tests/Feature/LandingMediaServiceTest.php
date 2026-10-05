@@ -17,6 +17,13 @@ class LandingMediaServiceTest extends TestCase
 
         $this->assertNotEmpty($library);
 
+        $images = app(LandingMediaService::class)->images();
+
+        $this->assertSame(
+            ['hero', 'operations', 'resources', 'control', 'venue', 'tent', 'decor'],
+            array_keys($images),
+        );
+
         foreach ($library as $image) {
             $path = (string) ($image['url'] ?? '');
 
