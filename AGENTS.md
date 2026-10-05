@@ -252,3 +252,25 @@ A wide field is not automatically wrong, and a wide table is not automatically w
 For UI changes, automated pass is not equivalent to visual acceptance. Rendered evidence is required where the visual target warrants it.
 
 All findings return to Director state. No separate UI backlog or competing next-action authority is permitted.
+
+
+## 17. MODULAR SKILL LAYER
+
+Reusable engineering procedures live under `.agents/skills/*/SKILL.md`.
+
+Current skills:
+- director-recon — current-state reconnaissance and safe targeting.
+- failure-forensics — recurring-failure recognition, classification and loop breaking.
+- regression-audit — post-change verification and regression protection.
+- ui-recovery — bounded visual refinement and recovery.
+
+Load only the relevant skill for the current target. Do not copy skill procedures into the master contract unless the rule is globally authoritative.
+
+The skill layer complements, rather than replaces, Morpheus and the specialist engines:
+Director → state/authority
+Specialist engine → bounded capability
+Skill → reusable procedure
+Verification/Guardian → evidence/challenge
+Director → reconcile/accept
+
+Engineering failure recognition uses `.ai/engineering/ERROR_INDEX.md` and `.ai/engineering/ERROR_TAXONOMY.yml`. The existing runtime catalog in `config/zazu.php` remains the operator-facing error authority.
