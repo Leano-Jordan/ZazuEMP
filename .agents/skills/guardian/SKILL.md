@@ -16,3 +16,7 @@ Rules:
 - Use failure-forensics for recurring failures.
 - Record concrete evidence, not impressions.
 - Return VERIFIED, UNVERIFIED or BLOCKED with the exact reason.
+
+
+Deep domain reference: `.agents/skills/guardian/references/03_GUARDIAN_ENGINE.md`.
+Load it only when the active target requires the deeper contract detail.
