@@ -30,13 +30,14 @@ class OperationsReconciliationTest extends TestCase
         $this->actingAs($user)->withSession(['zazu_business_id' => $business->id]);
 
         // The demo seed is intentionally final-state; reopen the event so the real
-        // purchasing transition guard can exercise an operational workflow.
+        // purchasing and lifecycle guards can exercise an operational workflow.
         $event->update(['status' => 'confirmed']);
         $order->update(['status' => 'sent']);
 
         $this->patch(route('purchasing.status', $order), [
             'status' => 'ordered',
         ])->assertRedirect();
+
         $item = $order->items->firstOrFail();
         $item->update(['received_quantity' => '0.00']);
 
@@ -85,6 +86,33 @@ class OperationsReconciliationTest extends TestCase
             )
         );
 
+        // The populated demo already contains an accepted quote, paid invoice,
+        // completed preparation items and reconciled seeded costs. With the
+        // operational PO now received, exercise the real completion gate.
+        $this->put(route('work.update', $event), [
+            'customer_id' => $event->customer_id,
+            'name' => $event->name,
+            'event_type' => $event->event_type,
+            'event_date' => $event->event_date?->toDateString(),
+            'event_address' => $event->event_address,
+            'notes' => $event->notes,
+            'status' => 'in_progress',
+        ])->assertRedirect();
+
+        $this->put(route('work.update', $event), [
+            'customer_id' => $event->customer_id,
+            'name' => $event->name,
+            'event_type' => $event->event_type,
+            'event_date' => $event->event_date?->toDateString(),
+            'event_address' => $event->event_address,
+            'notes' => $event->notes,
+            'status' => 'completed',
+        ])->assertRedirect();
+
+        $event->refresh();
+
+        $this->assertSame('completed', $event->status);
+
         $this->assertDatabaseHas('audit_logs', [
             'business_id' => $business->id,
             'action' => 'purchasing.order.received',
@@ -94,6 +122,11 @@ class OperationsReconciliationTest extends TestCase
             'business_id' => $business->id,
             'action' => 'inventory.movement.recorded',
             'subject_id' => $receipt->id,
+        ]);
+        $this->assertDatabaseHas('audit_logs', [
+            'business_id' => $business->id,
+            'action' => 'work.status_changed',
+            'subject_id' => $event->id,
         ]);
     }
 }
