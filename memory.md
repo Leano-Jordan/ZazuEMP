@@ -765,3 +765,10 @@ Regression rule:
 - The landing page is a brand/identity surface and may remain visually expressive during development. Temporary/reference imagery, mascot exploration and custom-art concepts should not be removed merely because release licensing has not yet been cleared. Release requires a separate asset/IP/license audit.
 - Open-source libraries/APIs are optional enhancements unless explicitly promoted to core. Core offline-capable workflows must not depend on online services.
 - New persistent control docs: docs/ZAZU_EXTERNAL_CAPABILITY_REGISTER.md and docs/ZAZU_UI_DISCLOSURE_STANDARD.md.
+
+
+## Director — 2026-10-05 regression reconciliation
+- SecurityHeadersTest exposed a real landing view failure: missing optional venue image key.
+- Landing now uses a safe fallback for the venue image.
+- HSTS test handling was hardened to recognize the explicit HTTPS server flag while remaining production-only.
+- Local pdo_firebird startup warning is a PHP installation issue, not a Zazu application failure; do not treat it as a release defect.
