@@ -25,7 +25,7 @@ nav{display:grid;grid-template-columns:repeat(5,1fr);gap:7px;margin:12px 0}.tab{
 <h2 id="business-name">Run Zazu from your phone</h2>
 <p id="hero-copy">Your phone can hold a local Zazu workspace. No laptop is required for everyday mobile operation.</p>
 <div class="hero-actions">
-<button class="button" id="new-customer">New customer</button><button class="button secondary" id="new-job">New job</button><button class="button secondary" id="new-quote">New quote</button><button class="button secondary" id="pair-zazu">Connect to business</button><button class="button secondary" id="install-zazu" hidden>Install Zazu</button>
+<button class="button" id="new-customer">New customer</button><button class="button secondary" id="new-job">New job</button><button class="button secondary" id="new-quote" disabled title="Quote editing will be enabled in a later offline domain release">Quotes stay read-only offline</button><button class="button secondary" id="pair-zazu">Connect to business</button><button class="button secondary" id="install-zazu" hidden>Install Zazu</button>
 </div>
 </section>
 <nav aria-label="Zazu mobile sections">
@@ -66,7 +66,7 @@ function f(id){return document.getElementById(id)?.value?.trim()||''}
 function editRecord(type,i){form(type,i)}
 function newRecord(type){form(type)}
 document.querySelectorAll('.tab').forEach(b=>b.onclick=()=>{tab=b.dataset.tab;render()});
-document.getElementById('new-customer').onclick=()=>newRecord('customer');document.getElementById('new-job').onclick=()=>newRecord('job');document.getElementById('new-quote').onclick=()=>newRecord('quote');document.getElementById('pair-zazu').onclick=pairPhone;
+document.getElementById('new-customer').onclick=()=>newRecord('customer');document.getElementById('new-job').onclick=()=>newRecord('job');document.getElementById('new-quote').onclick=()=>{document.getElementById('state').textContent='Quote editing requires a connected Zazu business for now'};document.getElementById('pair-zazu').onclick=pairPhone;
 let deferredInstallPrompt = null;
 
 function setState(){
