@@ -900,7 +900,7 @@ Regression coverage verifies empty customer state, successful quick creation, du
 
 ### Release-doc owner data
 
-Release documents now identify the real current solo business owner/developer as **Isaac Junior Lehlogonolo Maluleka** and the supplied operating address as **1068 Block JK, Soshanguve, Pretoria, South Africa**. The documents continue to avoid inventing a registered company or unsupported legal contact channel.
+**Operating address:** [Operating address — see private records]
 
 Last updated: 2026-10-04
 
