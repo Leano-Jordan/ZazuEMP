@@ -3,7 +3,6 @@
 **Status:** OPEN — HUMAN DEVICE TEST REQUIRED  
 **Date:** 2026-10-04  
 **Release owner:** Isaac Junior Lehlogonolo Maluleka  
-**Operating address:** 1068 Block JK, Soshanguve, Pretoria, South Africa  
 **Rule:** browser emulation does not equal physical-device acceptance.
 
 ## Purpose
