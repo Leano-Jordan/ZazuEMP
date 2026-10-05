@@ -58,6 +58,21 @@ class InterfaceRegressionTest extends TestCase
             ->assertSee('Agenda');
     }
 
+    public function test_calendar_month_view_renders_holiday_cells_without_missing_day_state(): void
+    {
+        [$business, $user] = $this->workspace();
+
+        $response = $this->actingAs($user)->get(route('calendar.index', [
+            'month' => '2026-04',
+            'view' => 'month',
+        ]));
+
+        $response->assertOk()
+            ->assertSee('Freedom Day')
+            ->assertSee('Good Friday')
+            ->assertSee('zazu-calendar-grid');
+    }
+
     public function test_calendar_keeps_work_navigation_active_for_mobile_drawer_recovery(): void
     {
         [$business, $user] = $this->workspace();
