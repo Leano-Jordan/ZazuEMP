@@ -772,3 +772,12 @@ Regression rule:
 - Landing now uses a safe fallback for the venue image.
 - HSTS test handling was hardened to recognize the explicit HTTPS server flag while remaining production-only.
 - Local pdo_firebird startup warning is a PHP installation issue, not a Zazu application failure; do not treat it as a release defect.
+
+
+## Director — 2026-10-05 HSTS regression root cause indexed
+- Current local suite result: 279 passed, 1 failed, 1642 assertions.
+- The remaining failure is isolated to SecurityHeadersTest HSTS verification, not the security middleware baseline or landing view.
+- Root cause: the feature test depended on Laravel test-server HTTPS variables to make the request secure. That harness path did not produce a secure Symfony Request in the local runtime, so the production-only HSTS branch was never entered.
+- Corrected the regression test to exercise ApplySecurityHeaders directly with explicit HTTPS/HTTP Request URLs. This preserves the production + secure gating under test without relying on test-server variable translation.
+- Commit: e8d1743.
+- pdo_firebird remains a local PHP CLI configuration warning and is not a Zazu repository defect; it must be removed from the local PHP configuration separately rather than masking it in application code.
