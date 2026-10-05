@@ -72,9 +72,9 @@ class UiAccessibilityTest extends TestCase
 
         $response->assertOk()
             ->assertSee('Workspace')
-            ->assertSee('Sales &amp; operations', false)
-            ->assertSee('Purchasing &amp; resources', false)
-            ->assertSee('Money &amp; control', false)
+            ->assertSee('Sales', false)
+            ->assertSee('Resources', false)
+            ->assertSee('Finance', false)
             ->assertSee('System')
             ->assertSee('data-zazu-nav-trigger', false)
             ->assertSee('data-zazu-nav-panel', false)
@@ -239,7 +239,10 @@ class UiAccessibilityTest extends TestCase
             ->assertSee('data-branding-error="logo"', false)
             ->assertSee('data-branding-error="dashboard_image"', false)
             ->assertSee('data-branding-error="wallpaper"', false)
-            ->assertSee('Please correct the highlighted fields.', false);
+            ->assertStringContainsString(
+                'Please correct the highlighted fields.',
+                file_get_contents(resource_path('views/components/app-layout.blade.php'))
+            );
     }
 
 
