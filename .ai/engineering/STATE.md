@@ -1309,3 +1309,28 @@ Resolved at repository level:
 No obsolete CSS selector was resurrected solely to satisfy a test. No generic override layer was added.
 
 Verification boundary: repository source has been reconciled and re-read. Local PHPUnit execution still requires the owner's VS Code runtime; no local green result is claimed until that runtime is rerun.
+
+
+## Director P0 CSS forensic cycle — 2026-10-05
+
+Target: remove deterministic same-file duplicate visual rules before any further UI refinement.
+
+Completed:
+- inspected all four active application stylesheets on current `main`;
+- found 3 exact duplicate rule blocks in `zazu-final-visual-sweep.css`;
+- removed the duplicate `.zazu-document-total-value`, `.zazu-chip-neutral` and `.zazu-command-palette[hidden]` blocks;
+- re-fetched the stylesheet after the write;
+- final visual stylesheet now has 0 exact duplicate blocks;
+- `!important` count in the final visual stylesheet reduced from 8 to 7;
+- no new stylesheet or visual capability was introduced or removed.
+
+Verification boundary:
+- SOURCE-VERIFIED on GitHub current main;
+- local browser/Vite runtime was not available through the repository connector, so this cycle is not visually/runtime verified.
+
+Scoreboard:
+- Conversation baseline remains 67/100 until runtime acceptance changes it.
+- Repository readiness record remains 80/100 overall; this source-only cleanup does not justify increasing commercial readiness.
+
+Next Director target:
+**REBUILD ASSETS → RUN CURRENT TEST SUITE → RENDER DASHBOARD / WORK / FORMS / CALENDAR → VISUAL ACCEPTANCE**
