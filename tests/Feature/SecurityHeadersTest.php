@@ -1,29 +1,43 @@
 <?php
 
-namespace App\Http\Middleware;
+namespace Tests\Feature;
 
-use Closure;
-use Illuminate\Http\Request;
-use Symfony\Component\HttpFoundation\Response;
+use Tests\TestCase;
 
-class ApplySecurityHeaders
+class SecurityHeadersTest extends TestCase
 {
-    public function handle(Request $request, Closure $next): Response
+    public function test_secure_production_responses_include_hsts(): void
     {
-        $response = $next($request);
+        $originalEnvironment = $this->app->environment();
 
-        $response->headers->set('X-Content-Type-Options', 'nosniff');
-        $response->headers->set('X-Frame-Options', 'SAMEORIGIN');
-        $response->headers->set('Referrer-Policy', 'strict-origin-when-cross-origin');
-        $response->headers->set('Permissions-Policy', 'geolocation=(), microphone=()');
+        try {
+            $this->app->instance('env', 'production');
 
-        if (app()->environment('production') && $request->isSecure()) {
-            $response->headers->set(
+            $response = $this->withServerVariables([
+                'HTTPS' => 'on',
+            ])->get('/');
+
+            $response->assertHeader(
                 'Strict-Transport-Security',
                 'max-age=31536000; includeSubDomains',
             );
+        } finally {
+            $this->app->instance('env', $originalEnvironment);
         }
+    }
 
-        return $response;
+    public function test_http_production_responses_do_not_include_hsts(): void
+    {
+        $originalEnvironment = $this->app->environment();
+
+        try {
+            $this->app->instance('env', 'production');
+
+            $response = $this->get('/');
+
+            $response->assertHeaderMissing('Strict-Transport-Security');
+        } finally {
+            $this->app->instance('env', $originalEnvironment);
+        }
     }
 }
