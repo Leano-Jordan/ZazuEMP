@@ -15,3 +15,7 @@ Use this skill for UI/UX-affecting work.
 8. Update the failure/error index when a UI failure creates a reusable failure signature.
 
 Do not replace deliberate Zazu styling with a generic modern-SaaS treatment merely because it sounds professional.
+
+
+Deep domain reference: `.agents/skills/ui-recovery/references/05_UI_UX_IMPROVEMENT_ENGINE.md`.
+Load it only when the active target requires the deeper contract detail.
