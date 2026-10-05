@@ -1,10 +1,20 @@
 # Zazu EMP — V1 Commercial Release Checklist
 
+# Director repository audit — 2026-10-05
+
+**Assessed main HEAD:** `4cadd614548bc15d60ccc3f55759d4c2c5ce5610`
+
+The independent repository audit is materially confirmed against main. Three hygiene defects were directly verified and corrected in the current tree: the private residential address was removed from `IP_OWNERSHIP.md`, the committed browser-E2E SQLite artifact was removed and its path is now ignored, and the malformed literal `\\n` in `.env.example` was corrected. The tracked `vendor/` tree was also removed from the current main tree; historical Git objects are not rewritten by this cleanup.
+
+**Still open:** current-head CI is not yet green/proven; CSP/HSTS hardening is not yet implemented; populated commercial workflow, device acceptance, backup/restore, upgrade/rollback, legal/privacy/licence and brand gates remain release evidence items. The current main CI set is queued on the assessed head, so no green claim is made until those runs complete.
+
+**Director decision:** V1 remains **BLOCKED / NOT CERTIFIED**. Hygiene cleanup is executed. Next execution target is current-head CI/release-evidence reconciliation, followed by security-header hardening only after the existing runtime surface is understood.
+
 **Authority:** ACTIVE / CANONICAL V1 RELEASE GATE  
 **Last Director update:** 2026-10-04  
 **Repository:** `Leano-Jordan/ZazuEMP`  
 **Branch:** `main`  
-**Latest verified repository head:** `2595459029e63b2f3b074176268b34d0dd9448be`  
+**Latest verified repository head:** `4cadd614548bc15d60ccc3f55759d4c2c5ce5610`  
 **Landing media:** real stock photography is vendored under `public/images/landing/stock/`; current-head runtime verification remains pending.  
 **Latest application-changing candidate:** `33ec396f69ddcf50b217f986611b5120e9a58d4d` (current Director commits add verification/control evidence).  
 **Note:** later UI/media hardening commits are part of the current candidate but do not constitute fresh runtime proof.
