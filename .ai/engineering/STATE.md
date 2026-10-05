@@ -1286,3 +1286,26 @@ Verification boundary:
 
 Next Director target:
 CURRENT-HEAD AUTHENTICATED CALENDAR RUNTIME REPRODUCTION → FULL DESKTOP/MOBILE/TABLET UI CONTRAST + NAVIGATION SWEEP → FINAL REGRESSION RE-AUDIT
+
+
+## Director test-contract reconciliation — 2026-10-05
+
+A 12-failure PHPUnit batch was traced to a mix of stale source-location assertions and two real contract gaps.
+
+Resolved at repository level:
+- wallpaper visibility assertion now follows canonical resources/css/app.css ownership;
+- Calendar active-link assertion now checks stable semantic state rather than brittle full-attribute ordering;
+- Asset/Inventory action selectors now accept their grouped canonical selector ownership;
+- mobile header test now matches the current three-row tab grid contract;
+- offline cache test follows current service-worker cache v6;
+- PWA manifest is exposed through a Laravel-testable /manifest.webmanifest route;
+- offline service-worker assertion no longer contains a regex escape in a literal string;
+- accessibility navigation test follows current compact Sales / Resources / Finance labels;
+- error-summary copy is verified against its layout owner rather than a GET response with no validation errors;
+- visual proportion tests now follow canonical token/component authorities;
+- form label readability restored to the documented 13.5px scale;
+- authentication submit contract follows app.css ownership.
+
+No obsolete CSS selector was resurrected solely to satisfy a test. No generic override layer was added.
+
+Verification boundary: repository source has been reconciled and re-read. Local PHPUnit execution still requires the owner's VS Code runtime; no local green result is claimed until that runtime is rerun.
