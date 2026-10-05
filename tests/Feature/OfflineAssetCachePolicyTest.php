@@ -11,7 +11,7 @@ class OfflineAssetCachePolicyTest extends TestCase
         $source = file_get_contents(public_path('sw.js'));
 
         $this->assertIsString($source);
-        $this->assertStringContainsString("const CACHE_NAME = 'zazu-static-v3';", $source);
+        $this->assertStringContainsString("const CACHE_NAME = 'zazu-static-v6';", $source);
         $this->assertStringContainsString("path.startsWith('/build/')", $source);
         $this->assertStringContainsString("'/images/landing/stock/hero.jpg'", $source);
         $this->assertStringContainsString("'/images/landing/stock/catering.jpg'", $source);
