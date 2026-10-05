@@ -4,7 +4,7 @@
 **Applies to:** the actual Zazu deployment named in the final release record  
 **Effective date:** `[TO BE PUBLISHED]`  
 **Current responsible-party owner:** Isaac Junior Lehlogonolo Maluleka  
-**Operating address:** 1068 Block JK, Soshanguve, Pretoria, South Africa  
+**Operating address:** [Operating address — see private records]
 **Privacy contact:** Isaac Junior Lehlogonolo Maluleka, 1068 Block JK, Soshanguve, Pretoria, South Africa  
 **Email contact:** `[TO BE SUPPLIED BEFORE PUBLICATION]`
 

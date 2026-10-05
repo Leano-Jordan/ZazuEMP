@@ -2,7 +2,7 @@
 
 **Status:** OPERATIONAL DRAFT — APPLICABILITY AND DETAILS REQUIRE REVIEW  
 **Current responsible-party owner:** Isaac Junior Lehlogonolo Maluleka  
-**Operating address:** 1068 Block JK, Soshanguve, Pretoria, South Africa  
+****Operating address:** [Operating address — see private records]
 **Records/contact channel:** `[PUBLISHED REQUEST CHANNEL TO BE SUPPLIED]`
 
 ## Purpose

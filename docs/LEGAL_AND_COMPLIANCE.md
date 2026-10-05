@@ -3,7 +3,7 @@
 **Status:** Initial control register  
 **Date:** 2026-09-22  
 **Current solo business owner / developer:** Isaac Junior Lehlogonolo Maluleka  
-**Operating address:** 1068 Block JK, Soshanguve, Pretoria, South Africa  
+****Operating address:** [Operating address — see private records]
 **Jurisdictional context:** South Africa is relevant to the current owner context, but the project must assess all jurisdictions in which it operates.
 
 ## 1. Intellectual property
