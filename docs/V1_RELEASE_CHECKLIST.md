@@ -372,3 +372,7 @@ Application HEAD: `1fe4e94602373fdea56061862b63073f5f32d19f`
 - A repository privacy sweep found the physical-device and brand-clearance records still contained a private residential address; both records were corrected and the address removed.
 - Current GitHub workflow lookup still exposes no run for the latest hardening commits, so no fresh green CI claim is made.
 - Release priority remains: current-head verification → populated commercial/operational proof → security/recovery evidence → physical-device acceptance → legal/brand closure → final Director certification.
+
+## Director verification checkpoint — 2026-10-05
+
+Current-head verification is being executed against the release-gate candidate. This checkpoint contains no product-scope change.
