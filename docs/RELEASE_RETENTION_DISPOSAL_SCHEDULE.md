@@ -2,7 +2,7 @@
 
 **Status:** CONTROL DRAFT — LEGAL/ACCOUNTING PERIODS MUST BE CONFIRMED  
 **Owner:** Isaac Junior Lehlogonolo Maluleka  
-**Operating address:** 1068 Block JK, Soshanguve, Pretoria, South Africa  
+**Operating address:** [Operating address — see private records]
 **Review cycle:** At least annually and whenever the deployment, data categories, legal obligations or operators materially change
 
 > Do not invent statutory retention periods here. Final periods must be confirmed against the actual business, accounting, tax, contractual and regulatory requirements.

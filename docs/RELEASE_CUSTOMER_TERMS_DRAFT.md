@@ -2,7 +2,7 @@
 
 **Status:** PRE-LAUNCH DRAFT — REQUIRES LEGAL/COMMERCIAL REVIEW  
 **Provider:** Isaac Junior Lehlogonolo Maluleka, current solo business owner/developer of Zazu EMP  
-**Operating address:** 1068 Block JK, Soshanguve, Pretoria, South Africa  
+****Operating address:** [Operating address — see private records]
 **Customer:** the business/customer accepting the final terms  
 **Effective date:** `[DATE OF FINAL PUBLICATION]`
 

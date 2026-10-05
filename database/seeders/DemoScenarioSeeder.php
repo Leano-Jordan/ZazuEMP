@@ -37,8 +37,14 @@ class DemoScenarioSeeder extends Seeder
 {
     public function run(): void
     {
+        if (! app()->environment(['local', 'testing'])) {
+            return;
+        }
+
         $email = (string) env('ZAZU_DEMO_EMAIL', 'demo@zazu.local');
         $password = (string) env('ZAZU_DEMO_PASSWORD', 'password');
+        $operationsPassword = (string) env('ZAZU_DEMO_OPERATIONS_PASSWORD', $password);
+        $financePassword = (string) env('ZAZU_DEMO_FINANCE_PASSWORD', $password);
 
         $user = User::updateOrCreate(
             ['email' => $email],
@@ -72,7 +78,7 @@ class DemoScenarioSeeder extends Seeder
         ] as $teamMember) {
             $member = User::updateOrCreate(
                 ['email' => $teamMember['email']],
-                ['name' => $teamMember['name'], 'username' => $teamMember['username'], 'password' => Hash::make('password'), 'email_verified_at' => now()]
+                ['name' => $teamMember['name'], 'username' => $teamMember['username'], 'password' => Hash::make($teamMember['email'] === 'operations@zazu.local' ? $operationsPassword : $financePassword), 'email_verified_at' => now()]
             );
             $business->users()->syncWithoutDetaching([
                 $member->id => ['role' => $teamMember['role'], 'experience_level' => $teamMember['experience_level']],

@@ -2,7 +2,7 @@
 
 **Status:** CONTRACT TEMPLATE — USE ONLY WHERE APPLICABLE  
 **Current owner:** Isaac Junior Lehlogonolo Maluleka  
-**Operating address:** 1068 Block JK, Soshanguve, Pretoria, South Africa
+****Operating address:** [Operating address — see private records]
 
 ## Purpose
 

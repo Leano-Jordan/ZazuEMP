@@ -48,5 +48,15 @@ class AppServiceProvider extends ServiceProvider
         RateLimiter::for('password.reset', function (Request $request) {
             return Limit::perMinute(10)->by('password-reset:ip:'.$request->ip());
         });
+
+        RateLimiter::for('quote.public', function (Request $request) {
+            return Limit::perMinute(60)->by('quote-public:'.$request->ip());
+        });
+
+        RateLimiter::for('sync', function (Request $request) {
+            $token = $request->bearerToken();
+
+            return Limit::perMinute(120)->by('sync:'.($token ? hash('sha256', $token) : $request->ip()));
+        });
     }
 }

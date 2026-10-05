@@ -2,7 +2,7 @@
 
 **Status:** OPERATIONAL RELEASE CONTROL  
 **Current owner:** Isaac Junior Lehlogonolo Maluleka  
-**Operating address:** 1068 Block JK, Soshanguve, Pretoria, South Africa  
+****Operating address:** [Operating address — see private records]
 **Purpose:** separate Zazu software ownership from photographs, illustrations, icons, fonts, stock images and other third-party media.
 
 ## Rules
