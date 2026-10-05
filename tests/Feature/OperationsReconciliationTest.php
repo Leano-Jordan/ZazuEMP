@@ -31,7 +31,7 @@ class OperationsReconciliationTest extends TestCase
 
         $order->update(['status' => 'sent']);
 
-        $this->post(route('purchasing.status', $order), [
+        $this->patch(route('purchasing.status', $order), [
             'status' => 'ordered',
         ])->assertRedirect();
         $item = $order->items->firstOrFail();
