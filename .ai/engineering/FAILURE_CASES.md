@@ -544,7 +544,7 @@ This is the persistent failure-history register for the Failure Case / Loop-Brea
 
 **First observed HEAD:** `6f0774a2fa07136bb242de17e61e5b2bbcf64f90`
 
-**Current application HEAD:** `9777b0ed00b2a36eb829b1c4a2af631acf716a33`
+**Current application HEAD:** `a4084628416c7c4e7ffa38fb980d9914a8e7031e`
 
 **Target/workflow:** Owner-reported Calendar lockout recurrence after a prior navigation repair.
 
