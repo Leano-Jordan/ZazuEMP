@@ -261,4 +261,59 @@ test.describe('Zazu populated runtime challenge', () => {
         await expect(page.locator('.zazu-error-shell')).toHaveCount(0);
         await expectNoServerFailures(page, responses, errors);
     });
+
+
+    test('owner can traverse customer-facing quote and calendar planning surfaces', async ({ page }) => {
+        test.setTimeout(60_000);
+        const responses = [];
+        const errors = [];
+        page.on('response', response => {
+            if (response.status() >= 500) responses.push({ status: response.status(), url: response.url() });
+        });
+        page.on('pageerror', error => errors.push(error.message));
+        await login(page, DEMO_EMAIL, DEMO_PASSWORD);
+
+        const quotes = await page.goto('/quotes', { waitUntil: 'domcontentloaded' });
+        expect(quotes?.status()).toBe(200);
+        const quoteRow = page.locator('.zazu-list-item').filter({ hasText: 'QUO-ZAZU-DEMO-001' }).first();
+        await expect(quoteRow).toBeVisible();
+        await quoteRow.getByRole('link', { name: 'Open', exact: true }).click();
+        await expect(page).toHaveURL(/\/quotes\/\d+$/);
+
+        const customerView = page.getByRole('link', { name: 'Customer view', exact: true });
+        await expect(customerView).toBeVisible();
+        const customerHref = await customerView.getAttribute('href');
+        expect(customerHref).toMatch(/\/quotes\/\d+\/view/);
+        const customerResponse = await page.request.get(customerHref);
+        expect(customerResponse.status()).toBe(200);
+        expect(await customerResponse.text()).toContain('QUO-ZAZU-DEMO-001');
+
+        const calendar = await page.goto('/calendar', { waitUntil: 'domcontentloaded' });
+        expect(calendar?.status()).toBe(200);
+        await expect(page.getByRole('heading', { name: 'Calendar' })).toBeVisible();
+        await expect(page.getByRole('navigation', { name: 'Calendar views' })).toBeVisible();
+        await expect(page.getByRole('link', { name: '3 Months', exact: true })).toBeVisible();
+        await expect(page.getByRole('link', { name: 'Year', exact: true })).toBeVisible();
+        await expect(page.getByRole('link', { name: 'Agenda', exact: true })).toBeVisible();
+        await page.getByRole('link', { name: 'Agenda', exact: true }).click();
+        await expect(page).toHaveURL(/view=agenda/);
+        await expect(page.getByText('Scheduled work', { exact: true }).first()).toBeVisible();
+        await expectNoServerFailures(page, responses, errors);
+    });
+
+    test('critical field surfaces remain usable without horizontal viewport overflow', async ({ page }) => {
+        test.setTimeout(60_000);
+        await login(page, DEMO_EMAIL, DEMO_PASSWORD);
+
+        for (const path of ['/dashboard', '/work', '/calendar', '/quotes', '/finance', '/purchasing', '/inventory']) {
+            const response = await page.goto(path, { waitUntil: 'domcontentloaded' });
+            expect(response?.status(), path + ' status').toBe(200);
+            const viewport = await page.evaluate(() => ({
+                width: document.documentElement.clientWidth,
+                scrollWidth: document.documentElement.scrollWidth,
+            }));
+            expect(viewport.scrollWidth, path + ' horizontal overflow').toBeLessThanOrEqual(viewport.width);
+            await expect(page.locator('.zazu-error-shell')).toHaveCount(0);
+        }
+    });
 });
