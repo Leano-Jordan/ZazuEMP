@@ -46,7 +46,9 @@ class UiProportionFoundationTest extends TestCase
         $this->assertIsString($css);
         $this->assertStringContainsString('.zazu-auth-submit {', $css);
         $this->assertStringContainsString('    width: 100%;', $css);
-        $this->assertStringNotContainsString('    max-width:', implode("\n", array_slice(explode("\n", $css), 3800, 25)));
+        preg_match('/\\.zazu-auth-submit \\{.*?\\}/s', $css, $authSubmit);
+        $this->assertNotEmpty($authSubmit);
+        $this->assertStringNotContainsString('max-width:', $authSubmit[0]);
     }
 
 }
