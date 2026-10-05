@@ -152,7 +152,7 @@ class BusinessMediaSecurityTest extends TestCase
 
     public function test_wallpaper_visibility_rule_is_final_and_not_overridden_by_global_body_backgrounds(): void
     {
-        $css = file_get_contents(resource_path('css/zazu-final-visual-sweep.css'));
+        $css = file_get_contents(resource_path('css/app.css'));
 
         $this->assertIsString($css);
         $marker = strpos($css, 'body.zazu-has-wallpaper {');
