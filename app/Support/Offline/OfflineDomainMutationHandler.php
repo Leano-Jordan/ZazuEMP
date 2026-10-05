@@ -270,9 +270,9 @@ class OfflineDomainMutationHandler implements SyncMutationHandler
             ]);
         }
 
-        return $order->fresh(['items'])->tap(
-            fn (PurchaseOrder $fresh): PurchaseOrder => $fresh->update(['total_amount' => number_format($total, 2, '.', '')])
-        );
+        $order->update(['total_amount' => number_format($total, 2, '.', '')]);
+
+        return $order->fresh(['items']);
     }
 
     private function purchaseReceipt(SyncMutation $mutation): PurchaseOrder
