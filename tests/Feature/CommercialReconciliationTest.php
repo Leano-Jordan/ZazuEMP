@@ -26,8 +26,11 @@ class CommercialReconciliationTest extends TestCase
         $event = Event::query()->where('business_id', $business->id)->where('reference', 'ZAZU-DEMO-001')->firstOrFail();
         $quote = Quote::query()->where('event_id', $event->id)->where('reference', 'QUO-ZAZU-DEMO-001')->firstOrFail();
 
-        Invoice::query()->where('business_id', $business->id)->where('event_id', $event->id)->delete();
         Payment::query()->where('business_id', $business->id)->where('event_id', $event->id)->delete();
+        Invoice::query()->where('business_id', $business->id)->where('event_id', $event->id)->each(function (Invoice $invoice): void {
+            $invoice->items()->delete();
+            $invoice->delete();
+        });
 
         $event->update(['status' => 'confirmed']);
         $quote->update(['status' => 'sent']);
