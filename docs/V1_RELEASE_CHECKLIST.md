@@ -15,11 +15,11 @@ Executed against the current main source:
 
 # Director repository audit — 2026-10-05
 
-**Assessed main HEAD:** `4cadd614548bc15d60ccc3f55759d4c2c5ce5610`
+**Assessed main HEAD:** `e90243ae12b1162b772fae882754e1b30b975f30`
 
 The independent repository audit is materially confirmed against main. Three hygiene defects were directly verified and corrected in the current tree: the private residential address was removed from `IP_OWNERSHIP.md`, the committed browser-E2E SQLite artifact was removed and its path is now ignored, and the malformed literal `\\n` in `.env.example` was corrected. The tracked `vendor/` tree was also removed from the current main tree; historical Git objects are not rewritten by this cleanup.
 
-**Still open:** current-head CI is not yet green/proven; CSP/HSTS hardening is not yet implemented; populated commercial workflow, device acceptance, backup/restore, upgrade/rollback, legal/privacy/licence and brand gates remain release evidence items. The current main CI set is queued on the assessed head, so no green claim is made until those runs complete.
+**Still open:** current-head CI is not yet green/proven; CSP remains open and HSTS is implemented with regression coverage pending current-head execution; populated commercial workflow, device acceptance, backup/restore, upgrade/rollback, legal/privacy/licence and brand gates remain release evidence items. The current main CI set is queued on the assessed head, so no green claim is made until those runs complete.
 
 **Director decision:** V1 remains **BLOCKED / NOT CERTIFIED**. Hygiene cleanup is executed. Next execution target is current-head CI/release-evidence reconciliation, followed by security-header hardening only after the existing runtime surface is understood.
 
@@ -29,7 +29,7 @@ The independent repository audit is materially confirmed against main. Three hyg
 **Branch:** `main`  
 **Latest verified repository head:** `4cadd614548bc15d60ccc3f55759d4c2c5ce5610`  
 **Landing media:** real stock photography is vendored under `public/images/landing/stock/`; current-head runtime verification remains pending.  
-**Latest application-changing candidate:** `33ec396f69ddcf50b217f986611b5120e9a58d4d` (current Director commits add verification/control evidence).  
+**Latest application-changing candidate:** `e8d174388d3f9195885c183abac74b5bf16d673c` (security-header hardening and HSTS regression correction).  
 **Note:** later UI/media hardening commits are part of the current candidate but do not constitute fresh runtime proof.
 
 ## Authority rule
@@ -364,3 +364,11 @@ Application HEAD: `1fe4e94602373fdea56061862b63073f5f32d19f`
 - Director operating mode is now **batch execution**: group independent release blockers into one inspection/change/verification cycle rather than advancing one test at a time.
 
 **Next batch:** current-head CI reconciliation + release-critical field workflow/device evidence + final security/recovery gate sweep. Cosmetic work is subordinate to these gates.
+
+
+## Director acceleration continuation — 2026-10-05
+
+- HSTS is now implemented in production HTTPS responses and has a direct middleware regression test; current-head execution evidence is still pending.
+- A repository privacy sweep found the physical-device and brand-clearance records still contained a private residential address; both records were corrected and the address removed.
+- Current GitHub workflow lookup still exposes no run for the latest hardening commits, so no fresh green CI claim is made.
+- Release priority remains: current-head verification → populated commercial/operational proof → security/recovery evidence → physical-device acceptance → legal/brand closure → final Director certification.
