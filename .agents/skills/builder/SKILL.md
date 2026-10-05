@@ -17,3 +17,7 @@ Rules:
 - Re-read every automated write.
 - For repeated failures, load failure-forensics first.
 - Return changed surface, behavioural delta, verification performed, uncertainty and blast radius.
+
+
+Deep domain reference: `.agents/skills/builder/references/02_BUILDER_ENGINE.md`.
+Load it only when the active target requires the deeper contract detail.
