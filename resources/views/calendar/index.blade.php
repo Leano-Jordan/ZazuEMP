@@ -59,7 +59,7 @@
                     <div class="zazu-calendar-label" aria-label="{{ $label['full'] }}">{{ $label['short'] }}</div>
                 @endforeach
                 @foreach ($days as $day)
-                    @php $key=$day->format('Y-m-d'); $isCurrentMonthDay=$day->month===$month->month && $day->year===$month->year; $dayEvents=$eventsByDate->get($key,collect()); @endphp
+                    @php $key=$day->format('Y-m-d'); $isCurrentMonthDay=$day->month===$month->month && $day->year===$month->year; $dayEvents=$eventsByDate->get($key,collect()); $dayHolidays=$holidays->get($key,collect()); @endphp
                     <div class="zazu-calendar-cell {{ $isCurrentMonthDay ? 'is-current-month' : 'is-adjacent' }} {{ $day->isToday() ? 'is-today' : '' }}">
                         <div class="zazu-calendar-date-row"><span class="zazu-calendar-date">{{ $day->format('j') }}</span>@if($day->isToday())<span class="zazu-calendar-today">Today</span>@endif</div>
                         @if($dayHolidays->isNotEmpty())
