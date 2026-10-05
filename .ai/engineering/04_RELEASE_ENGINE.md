@@ -1,76 +1,38 @@
-# ZAZU EMP RELEASE ENGINE
+# ZAZU EMP — RELEASE ENGINE CONTRACT
 
-## Mission
+## Purpose
 
-Continuously move Zazu toward **commercially usable software** by maintaining release gates and closing the highest-risk remaining gaps.
+Continuously assess commercial readiness, release gates, recovery, deployment and operational safety.
 
-Release is not a last-minute checklist.
+## Authority boundary
 
-## Activation
+This file is the **domain contract** for the Release capability. Reusable procedure lives in `.agents/skills/release-readiness/SKILL.md`; deeper historical/domain material is in the skill's `references/` directory.
 
-Release activates when:
-- a change affects a release gate;
-- a dependency/configuration/migration/security/recovery decision is involved;
-- a readiness review is requested;
-- the system reaches release-candidate preparation.
+Director/Morpheus remains the sole entry point and final acceptance authority. This capability does not maintain a competing backlog, project state or acceptance decision.
 
-The engine remains aware of the complete readiness register even during ordinary feature work.
+## Activation / scope
 
-## Gate domains
+Correctness, architecture, data integrity, security, workflow integrity, UX/accessibility, recovery, operability, deployment, documentation, dependency/IP and release evidence.
 
-- Correctness
-- Architecture
-- Data integrity
-- Security
-- Workflow integrity
-- UX/accessibility
-- Reliability/recovery
-- Operability/observability
-- Deployment/configuration
-- Documentation/runbooks
-- Dependency/licensing/IP
-- Release evidence
+## Required output
 
-## Commercial-readiness rule
+Return evidence maturity, exact blocker/fix, gate disposition and next closure target. Release is continuous, not a final checklist.
 
-Commercially usable means the product can be safely operated, maintained, upgraded and recovered by its intended owner/users.
+## Shared state
 
-It does not mean every future feature or scale programme is implemented.
+Consume and return the current Director state:
 
-## Evidence maturity
+`repository/ref · baseline · target · scope · invariants · findings · failure cases · hypotheses · changed surface · verification · regression disposition · readiness impact · uncertainty`
 
-0 = not started
-1 = designed
-2 = implemented
-3 = automated evidence
-4 = runtime/CI verified
-5 = repeatedly proven through realistic/production/recovery evidence
+## Non-negotiables
 
-## Release gate
+- Use current repository evidence.
+- Do not silently override higher-authority Zazu decisions.
+- Do not invent missing evidence.
+- Do not duplicate an existing failure case or rejected hypothesis.
+- Do not widen scope without Director authority.
+- Hand evidence back to Director after the capability completes.
 
-A release candidate requires evidence that:
-- critical workflows work;
-- critical data invariants hold;
-- security boundaries are enforced;
-- failure/recovery behaviour is understood;
-- migrations are safe for clean and representative existing states;
-- backup/restore is demonstrated;
-- required browser/runtime paths are verified;
-- operational documentation exists;
-- known exceptions are explicitly recorded.
+## Detailed procedure
 
-## Anti-inflation
-
-Do not raise readiness because:
-- files were created;
-- tests were counted;
-- a report was written;
-- a screen exists without complete workflow behaviour.
-
-Readiness rises when meaningful risk is removed and evidence matures.
-
-## Escalation
-
-Record the exact blocker, required evidence/fix and next actionable closure target.
-
-Do not repeatedly rerun a gate whose prerequisite evidence is still unavailable.
+See `.agents/skills/release-readiness/SKILL.md` and its referenced domain material. The contract intentionally stays small so agents do not load every procedure when it is irrelevant.
