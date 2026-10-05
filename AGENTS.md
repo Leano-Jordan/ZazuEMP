@@ -274,3 +274,17 @@ Verification/Guardian → evidence/challenge
 Director → reconcile/accept
 
 Engineering failure recognition uses `.ai/engineering/ERROR_INDEX.md` and `.ai/engineering/ERROR_TAXONOMY.yml`. The existing runtime catalog in `config/zazu.php` remains the operator-facing error authority.
+
+
+## 18. DIRECTOR CONTROL-PLANE EVALS
+
+The Director itself is a regression surface.
+
+Machine-checkable control-plane scenarios live in:
+- `.agents/evals/director-evals.yml`
+- `.agents/evals/DIRECTOR_EVAL_FIXTURES.yml`
+- `.agents/evals/README.md`
+
+Before accepting a material change to Director routing, failure governance, verification, scope control, state reconciliation or acceptance behaviour, run the relevant Director evals when the execution environment supports them.
+
+A failed Director eval is an engineering failure of the control plane and must not be “fixed” by weakening the expected disposition.
