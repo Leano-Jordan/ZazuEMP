@@ -7,20 +7,23 @@ use App\Models\Customer;
 use App\Models\CustomerContact;
 use App\Models\Event;
 use App\Models\EventPreparationItem;
-use App\Services\EventLifecycleService;
+use App\Models\PurchaseOrder;
+use App\Models\Supplier;
 use App\Models\SyncEntityIdentity;
 use App\Models\SyncMutation;
+use App\Services\EventLifecycleService;
+use App\Services\PurchaseOrderReceivingService;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Validation\ValidationException;
 use Illuminate\Support\Str;
+use Illuminate\Validation\ValidationException;
 
 class OfflineDomainMutationHandler implements SyncMutationHandler
 {
     public function __construct(
         private readonly SyncEntityIdentityRegistry $identities,
         private readonly EventLifecycleService $lifecycle,
-    )
-    {
+        private readonly PurchaseOrderReceivingService $receivingService,
+    ) {
     }
 
     public function apply(SyncMutation $mutation): void
@@ -30,12 +33,16 @@ class OfflineDomainMutationHandler implements SyncMutationHandler
             'job' => $this->event($mutation),
             'service' => $this->capability($mutation),
             'preparation' => $this->preparation($mutation),
+            'purchase_order' => $this->purchaseOrder($mutation),
+            'purchase_receipt' => $this->purchaseReceipt($mutation),
             default => throw ValidationException::withMessages([
                 'entity_type' => 'This offline entity is not enabled for server application yet.',
             ]),
         };
 
-        $this->identities->register($record, $mutation->entity_type, $this->entityUuid($mutation));
+        if ($record instanceof Model) {
+            $this->identities->register($record, $mutation->entity_type, $this->entityUuid($mutation));
+        }
     }
 
     private function customer(SyncMutation $mutation): Customer
@@ -172,6 +179,175 @@ class OfflineDomainMutationHandler implements SyncMutationHandler
         return EventPreparationItem::create($attributes);
     }
 
+    private function purchaseOrder(SyncMutation $mutation): PurchaseOrder
+    {
+        if (! in_array($mutation->operation, ['create', 'upsert'], true)) {
+            throw ValidationException::withMessages(['operation' => 'Offline purchase orders only support create/upsert.']);
+        }
+
+        $payload = $this->recordPayload($mutation);
+        $existing = $this->existing($mutation);
+
+        if ($existing instanceof PurchaseOrder) {
+            return $existing->fresh(['items']);
+        }
+
+        $supplierUuid = $payload['supplier_local_id'] ?? null;
+        if (! is_string($supplierUuid) || ! Str::isUuid($supplierUuid)) {
+            throw ValidationException::withMessages(['payload' => 'A valid local supplier identity is required.']);
+        }
+
+        $supplierIdentity = SyncEntityIdentity::query()
+            ->where('business_id', $mutation->business_id)
+            ->where('entity_type', 'supplier')
+            ->where('entity_uuid', Str::lower($supplierUuid))
+            ->first();
+
+        $supplier = $supplierIdentity
+            ? Supplier::query()->where('business_id', $mutation->business_id)->find($supplierIdentity->record_id)
+            : null;
+
+        if (! $supplier) {
+            throw ValidationException::withMessages(['payload' => 'The offline purchase order references an unknown supplier.']);
+        }
+
+        $event = $this->resolveOfflineEvent($mutation->business_id, $payload['event_local_id'] ?? null);
+
+        $currency = strtoupper((string) ($payload['currency'] ?? ''));
+        $businessCurrency = strtoupper((string) $supplier->business?->currency);
+
+        if ($currency === '' || $currency !== $businessCurrency) {
+            throw ValidationException::withMessages(['currency' => 'Offline purchase orders must use the active business currency.']);
+        }
+
+        $lines = $payload['lines'] ?? [];
+        if (! is_array($lines) || $lines === []) {
+            throw ValidationException::withMessages(['lines' => 'At least one purchase order line is required.']);
+        }
+
+        $order = PurchaseOrder::create([
+            'business_id' => $mutation->business_id,
+            'event_id' => $event?->id,
+            'supplier_id' => $supplier->id,
+            'idempotency_key' => $mutation->mutation_id,
+            'reference' => 'PO-OFFLINE-'.strtoupper(substr($this->entityUuid($mutation), 0, 8)),
+            'status' => 'draft',
+            'currency' => $currency,
+            'expected_at' => $this->nullableDate($payload['expected_at'] ?? null),
+            'notes' => $this->nullableString($payload['notes'] ?? null, 5000),
+            'total_amount' => '0.00',
+        ]);
+
+        $total = 0.0;
+        foreach ($lines as $line) {
+            if (! is_array($line)) {
+                throw ValidationException::withMessages(['lines' => 'Offline purchase order lines must be objects.']);
+            }
+
+            $description = $this->requiredString($line['description'] ?? null, 'description', 255);
+            $quantity = $this->positiveQuantity($line['quantity'] ?? null);
+            $unitPrice = $this->nonNegativeMoney($line['unit_price'] ?? null);
+            $lineTotal = round($quantity * $unitPrice, 2);
+            $total += $lineTotal;
+
+            $capabilityId = $line['capability_id'] ?? null;
+            if ($capabilityId !== null && (
+                ! is_numeric($capabilityId)
+                || ! BusinessCapability::query()->where('business_id', $mutation->business_id)->whereKey((int) $capabilityId)->exists()
+            )) {
+                throw ValidationException::withMessages(['lines' => 'An offline purchase order line references an invalid catalogue item.']);
+            }
+
+            $order->items()->create([
+                'business_id' => $mutation->business_id,
+                'capability_id' => $capabilityId,
+                'description' => $description,
+                'quantity' => number_format($quantity, 2, '.', ''),
+                'received_quantity' => '0.00',
+                'unit' => $this->nullableString($line['unit'] ?? null, 50),
+                'unit_price' => number_format($unitPrice, 2, '.', ''),
+                'line_total' => number_format($lineTotal, 2, '.', ''),
+            ]);
+        }
+
+        return $order->fresh(['items'])->tap(
+            fn (PurchaseOrder $fresh): PurchaseOrder => $fresh->update(['total_amount' => number_format($total, 2, '.', '')])
+        );
+    }
+
+    private function purchaseReceipt(SyncMutation $mutation): PurchaseOrder
+    {
+        if (! in_array($mutation->operation, ['create', 'upsert'], true)) {
+            throw ValidationException::withMessages(['operation' => 'Offline purchase receipts only support create/upsert.']);
+        }
+
+        $payload = $this->recordPayload($mutation);
+        $purchaseOrderUuid = $payload['purchase_order_local_id'] ?? null;
+
+        if (! is_string($purchaseOrderUuid) || ! Str::isUuid($purchaseOrderUuid)) {
+            throw ValidationException::withMessages(['payload' => 'A valid local purchase order identity is required.']);
+        }
+
+        $identity = SyncEntityIdentity::query()
+            ->where('business_id', $mutation->business_id)
+            ->where('entity_type', 'purchase_order')
+            ->where('entity_uuid', Str::lower($purchaseOrderUuid))
+            ->first();
+
+        $order = $identity
+            ? PurchaseOrder::query()->where('business_id', $mutation->business_id)->find($identity->record_id)
+            : null;
+
+        if (! $order) {
+            throw ValidationException::withMessages(['payload' => 'The offline purchase receipt references an unknown purchase order.']);
+        }
+
+        $received = $payload['received_quantities'] ?? [];
+        if (! is_array($received) || $received === []) {
+            throw ValidationException::withMessages(['received_quantities' => 'At least one receipt quantity is required.']);
+        }
+
+        $this->receivingService->receive(
+            $order,
+            $mutation->business_id,
+            $received,
+            $mutation->mutation_id,
+            $this->lifecycle,
+        );
+
+        return $order->fresh(['items']);
+    }
+
+    private function resolveOfflineEvent(int $businessId, mixed $eventUuid): ?Event
+    {
+        if ($eventUuid === null || $eventUuid === '') {
+            return null;
+        }
+
+        if (! is_string($eventUuid) || ! Str::isUuid($eventUuid)) {
+            throw ValidationException::withMessages(['payload' => 'The offline purchase order job identity is invalid.']);
+        }
+
+        $identity = SyncEntityIdentity::query()
+            ->where('business_id', $businessId)
+            ->where('entity_type', 'job')
+            ->where('entity_uuid', Str::lower($eventUuid))
+            ->first();
+
+        $event = $identity
+            ? Event::query()->where('business_id', $businessId)->find($identity->record_id)
+            : null;
+
+        if (! $event) {
+            throw ValidationException::withMessages(['payload' => 'The offline purchase order references an unknown job.']);
+        }
+
+        $event = $this->lifecycle->lock($businessId, $event->id);
+        $this->lifecycle->assertOperational($event);
+
+        return $event;
+    }
+
     private function preparationStatus(mixed $value): string
     {
         if (! is_string($value) || ! in_array($value, ['open', 'blocked', 'ready'], true)) {
@@ -194,6 +370,24 @@ class OfflineDomainMutationHandler implements SyncMutationHandler
         return (float) $value;
     }
 
+    private function positiveQuantity(mixed $value): float
+    {
+        if (! is_numeric($value) || (float) $value <= 0) {
+            throw ValidationException::withMessages(['quantity' => 'Offline purchase order quantity must be greater than zero.']);
+        }
+
+        return round((float) $value, 2);
+    }
+
+    private function nonNegativeMoney(mixed $value): float
+    {
+        if (! is_numeric($value) || (float) $value < 0) {
+            throw ValidationException::withMessages(['unit_price' => 'Offline purchase order price must be zero or greater.']);
+        }
+
+        return round((float) $value, 2);
+    }
+
     private function nullableDate(mixed $value): ?string
     {
         if ($value === null || $value === '') {
@@ -201,7 +395,7 @@ class OfflineDomainMutationHandler implements SyncMutationHandler
         }
 
         if (! is_string($value) || ! preg_match('/^\d{4}-\d{2}-\d{2}$/', $value) || ! strtotime($value)) {
-            throw ValidationException::withMessages(['due_date' => 'Offline preparation due date must be a valid date.']);
+            throw ValidationException::withMessages(['date' => 'Offline date must be a valid date.']);
         }
 
         return $value;
