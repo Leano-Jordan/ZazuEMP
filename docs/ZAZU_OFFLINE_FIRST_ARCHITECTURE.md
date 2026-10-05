@@ -294,3 +294,16 @@ The phone-local foundation is now implemented beyond static PWA caching:
 - Local dirty state prevents a bootstrap refresh from overwriting unsynchronised phone changes.
 
 The phone workspace is therefore a real offline operational foundation, but it is **not yet a complete disconnected replacement for the full web application**. Finance, purchasing/inventory, quote acceptance and other domain workflows still require dedicated offline contracts before they may be advertised as fully offline-capable.
+
+
+## Director hardening update — 2026-10-06
+
+The offline phone queue now reconciles server receipts deterministically:
+
+- successfully applied mutations are removed from the local pending queue;
+- rejected mutations remain visible as failed/pending rather than being silently discarded;
+- local dirty state is recalculated after every reconnect attempt;
+- already-applied mutations are therefore not repeatedly resent merely because the phone restarted;
+- the phone UI no longer offers quote creation as an offline mutation while the server-side quote domain handler is not implemented.
+
+This preserves the rule that offline capability must expose only workflows that have a safe synchronization contract.
