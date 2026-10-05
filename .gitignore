@@ -34,6 +34,11 @@ Thumbs.db
 /database/*.sqlite-wal
 /storage/logs/*
 
+/storage/framework/*.sqlite
+/storage/framework/*.sqlite-journal
+/storage/framework/*.sqlite-shm
+/storage/framework/*.sqlite-wal
+
 # Playwright
 node_modules/
 /test-results/
