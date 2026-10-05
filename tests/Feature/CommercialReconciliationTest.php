@@ -19,6 +19,18 @@ class CommercialReconciliationTest extends TestCase
 
     public function test_populated_quote_acceptance_invoice_deposit_and_final_payment_reconcile(): void
     {
+        [$user, $business, $event, $quote] = $this->prepareCommercialScenario();
+
+        $this->acceptQuote($business, $quote, $event);
+        $invoice = $this->createInvoice($user, $business, $quote);
+        $this->recordDeposit($business, $invoice);
+        $this->recordFinalPayment($business, $invoice);
+
+        $this->assertPaidInvoice($business, $invoice);
+    }
+
+    private function prepareCommercialScenario(): array
+    {
         $this->seed(DemoScenarioSeeder::class);
 
         $user = User::query()->where('email', 'demo@zazu.local')->firstOrFail();
@@ -36,6 +48,11 @@ class CommercialReconciliationTest extends TestCase
         $quote->update(['status' => 'sent']);
         $quote->latestVersion()->update(['status' => 'sent']);
 
+        return [$user, $business, $event, $quote];
+    }
+
+    private function acceptQuote($business, $quote, $event): void
+    {
         $this->withSession(['zazu_business_id' => $business->id]);
 
         $acceptUrl = URL::temporarySignedRoute(
@@ -49,8 +66,7 @@ class CommercialReconciliationTest extends TestCase
             'acceptance' => '1',
         ])->assertRedirect();
 
-        $quote->refresh();
-        $quote->load('latestVersion');
+        $quote->refresh()->load('latestVersion');
         $event->refresh();
 
         $this->assertSame('accepted', $quote->status);
@@ -62,7 +78,10 @@ class CommercialReconciliationTest extends TestCase
             'action' => 'quote.customer.accepted',
             'subject_id' => $quote->id,
         ]);
+    }
 
+    private function createInvoice($user, $business, $quote): Invoice
+    {
         $this->actingAs($user)
             ->withSession(['zazu_business_id' => $business->id])
             ->post(route('finance.invoices.store'), [
@@ -80,6 +99,11 @@ class CommercialReconciliationTest extends TestCase
         $this->assertSame('11500.00', (string) $invoice->total);
         $this->assertCount(3, $invoice->items()->get());
 
+        return $invoice;
+    }
+
+    private function recordDeposit($business, $invoice): void
+    {
         $this->post(route('finance.payments.store'), [
             'invoice_id' => $invoice->id,
             'type' => 'deposit',
@@ -93,7 +117,10 @@ class CommercialReconciliationTest extends TestCase
         $invoice->refresh();
         $this->assertSame('issued', $invoice->status);
         $this->assertSame('8050.00', number_format((float) $invoice->total - (float) $invoice->payments()->sum('amount'), 2, '.', ''));
+    }
 
+    private function recordFinalPayment($business, $invoice): void
+    {
         $this->post(route('finance.payments.store'), [
             'invoice_id' => $invoice->id,
             'type' => 'payment',
@@ -103,7 +130,10 @@ class CommercialReconciliationTest extends TestCase
             'paid_at' => now()->toDateString(),
             'idempotency_key' => '33333333-3333-4333-8333-333333333333',
         ])->assertRedirect();
+    }
 
+    private function assertPaidInvoice($business, $invoice): void
+    {
         $invoice->refresh()->load('payments');
 
         $this->assertSame('paid', $invoice->status);
@@ -124,4 +154,5 @@ class CommercialReconciliationTest extends TestCase
                 ->count()
         );
     }
+
 }

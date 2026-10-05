@@ -9,6 +9,9 @@ use App\Models\EventRequirement;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
+/**
+ * @SuppressWarnings(PHPMD.TooManyPublicMethods)
+ */
 class UiAccessibilityTest extends TestCase
 {
     use RefreshDatabase;

@@ -16,6 +16,18 @@ class OperationsReconciliationTest extends TestCase
 
     public function test_populated_purchase_order_receipt_creates_inventory_and_event_cost_trace(): void
     {
+        [$user, $business, $event, $order, $item] = $this->prepareOperationsScenario();
+
+        $this->receivePurchaseOrder($order, $item);
+        $receipt = $this->assertReceipt($business, $event, $order, $item);
+        $this->recordEventCost($event);
+        $this->completeEvent($event);
+
+        $this->assertOperationalAuditTrail($business, $event, $order, $receipt);
+    }
+
+    private function prepareOperationsScenario(): array
+    {
         $this->seed(DemoScenarioSeeder::class);
 
         $user = \App\Models\User::query()->where('email', 'demo@zazu.local')->firstOrFail();
@@ -28,19 +40,19 @@ class OperationsReconciliationTest extends TestCase
             ->firstOrFail();
 
         $this->actingAs($user)->withSession(['zazu_business_id' => $business->id]);
-
-        // The demo seed is intentionally final-state; reopen the event so the real
-        // purchasing and lifecycle guards can exercise an operational workflow.
         $event->update(['status' => 'confirmed']);
         $order->update(['status' => 'sent']);
 
-        $this->patch(route('purchasing.status', $order), [
-            'status' => 'ordered',
-        ])->assertRedirect();
+        $this->patch(route('purchasing.status', $order), ['status' => 'ordered'])->assertRedirect();
 
         $item = $order->items->firstOrFail();
         $item->update(['received_quantity' => '0.00']);
 
+        return [$user, $business, $event, $order, $item];
+    }
+
+    private function receivePurchaseOrder($order, $item): void
+    {
         $this->post(route('purchasing.receive', $order), [
             'idempotency_key' => (string) Str::uuid(),
             'received_quantity' => [$item->id => '1.00'],
@@ -51,7 +63,10 @@ class OperationsReconciliationTest extends TestCase
 
         $this->assertSame('received', $order->status);
         $this->assertSame('1.00', (string) $item->received_quantity);
+    }
 
+    private function assertReceipt($business, $event, $order, $item): InventoryMovement
+    {
         $receipt = InventoryMovement::query()
             ->where('business_id', $business->id)
             ->where('purchase_order_id', $order->id)
@@ -64,6 +79,11 @@ class OperationsReconciliationTest extends TestCase
         $this->assertSame('2800.00', (string) $receipt->unit_cost);
         $this->assertSame($event->id, $receipt->event_id);
 
+        return $receipt;
+    }
+
+    private function recordEventCost($event): void
+    {
         $this->post(route('work.costs.store', $event), [
             'category' => 'Food',
             'description' => 'Fresh catering supplies received',
@@ -75,44 +95,32 @@ class OperationsReconciliationTest extends TestCase
         ])->assertRedirect();
 
         $event->refresh();
-
         $this->assertSame(
             '2800.00',
-            number_format(
-                (float) $event->costs()->where('status', 'incurred')->sum('actual_amount'),
-                2,
-                '.',
-                ''
-            )
+            number_format((float) $event->costs()->where('status', 'incurred')->sum('actual_amount'), 2, '.', '')
         );
+    }
 
-        // The populated demo already contains an accepted quote, paid invoice,
-        // completed preparation items and reconciled seeded costs. With the
-        // operational PO now received, exercise the real completion gate.
-        $this->put(route('work.update', $event), [
+    private function completeEvent($event): void
+    {
+        $payload = [
             'customer_id' => $event->customer_id,
             'name' => $event->name,
             'event_type' => $event->event_type,
             'event_date' => $event->event_date?->toDateString(),
             'event_address' => $event->event_address,
             'notes' => $event->notes,
-            'status' => 'in_progress',
-        ])->assertRedirect();
+        ];
 
-        $this->put(route('work.update', $event), [
-            'customer_id' => $event->customer_id,
-            'name' => $event->name,
-            'event_type' => $event->event_type,
-            'event_date' => $event->event_date?->toDateString(),
-            'event_address' => $event->event_address,
-            'notes' => $event->notes,
-            'status' => 'completed',
-        ])->assertRedirect();
+        $this->put(route('work.update', $event), $payload + ['status' => 'in_progress'])->assertRedirect();
+        $this->put(route('work.update', $event), $payload + ['status' => 'completed'])->assertRedirect();
 
         $event->refresh();
-
         $this->assertSame('completed', $event->status);
+    }
 
+    private function assertOperationalAuditTrail($business, $event, $order, $receipt): void
+    {
         $this->assertDatabaseHas('audit_logs', [
             'business_id' => $business->id,
             'action' => 'purchasing.order.received',
@@ -129,4 +137,5 @@ class OperationsReconciliationTest extends TestCase
             'subject_id' => $event->id,
         ]);
     }
+
 }
