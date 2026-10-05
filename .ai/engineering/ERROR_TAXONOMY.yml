@@ -1,0 +1,51 @@
+version: 1
+name: zazu-engineering-error-taxonomy
+purpose: stable recognition and naming of recurring engineering failures
+code_format: ENG-FAMILY-NNN
+source_of_truth:
+  runtime_user_errors: config/zazu.php
+  engineering_errors: .ai/engineering/ERROR_INDEX.md
+  failure_cases: .ai/engineering/FAILURE_CASES.md
+  failure_classification: .ai/engineering/FAILURE_CASE_SCHEMA.yml
+
+families:
+  SYNTAX:
+    signatures: [parse-error, unmatched-delimiter, class-discovery]
+  SCHEMA:
+    signatures: [missing-table, missing-column, migration-drift, schema-version]
+  ROUTE:
+    signatures: [404, wrong-owner, inactive-route, navigation-dead-end]
+  AUTH:
+    signatures: [missing-session, expired-session, auth-state]
+  AUTHZ:
+    signatures: [permission-mismatch, role-map-drift, direct-bypass]
+  CONTRACT:
+    signatures: [stale-assertion, selector-drift, response-contract, semantic-state]
+  FIXTURE:
+    signatures: [invalid-type, invalid-uuid, missing-default, sequence-mismatch, invalid-state]
+  RUNTIME:
+    signatures: [extension-mismatch, cache-state, asset-runtime, php-runtime]
+  CI:
+    signatures: [workflow-config, runner-state, permission, job-environment]
+  TOOL:
+    signatures: [phpmd, psalm, lint, dependency-version]
+  JS:
+    signatures: [stale-initializer, undefined-function, event-wiring]
+  CSS:
+    signatures: [duplicate-rule, cascade-conflict, specificity-order, token-drift]
+  UI:
+    signatures: [overlay-hit-test, clipping, overlap, responsive-state, interaction-state]
+  DATA:
+    signatures: [duplicate-mutation, ownership, partial-write, invariant-violation]
+  RECOVERY:
+    signatures: [backup, restore, rollback, update-safety]
+  FLAKE:
+    signatures: [timeout, race, concurrency, worker-sensitivity]
+
+rules:
+  never_recycle_codes: true
+  repeated_signature_reuses_case: true
+  changed_line_is_not_new_failure: true
+  green_rerun_is_not_closure: true
+  require_f1_f8_classification: true
+  require_case_history_for_repeated_failure: true
