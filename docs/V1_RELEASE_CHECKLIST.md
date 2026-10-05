@@ -1,3 +1,16 @@
+# Director execution cycle — 2026-10-05 — commercial + operations proof harness
+
+**Application HEAD:** `42cdabeb3ca08acb0715c0a189c5212d52c331fe`
+
+Executed against the current main source:
+- Added `CommercialReconciliationTest` covering populated quote → customer acceptance → invoice creation → R3,450 deposit → R8,050 final payment → R11,500 paid reconciliation, including audit evidence.
+- Added `OperationsReconciliationTest` covering populated purchase order → receipt → inventory receipt movement → incurred event cost reconciliation, including audit evidence.
+- No production workflow/UI changes were made; this cycle adds release-proof coverage only.
+
+**Verification state:** tests are committed but not yet CI-verified on this HEAD. Do not mark the gates proven until the run completes.
+
+---
+
 # Zazu EMP — V1 Commercial Release Checklist
 
 # Director repository audit — 2026-10-05
