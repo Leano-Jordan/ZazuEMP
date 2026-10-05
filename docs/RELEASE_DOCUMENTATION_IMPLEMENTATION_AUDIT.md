@@ -2,7 +2,7 @@
 
 **Director audit date:** 2026-10-04  
 **Audit owner:** Isaac Junior Lehlogonolo Maluleka, solo developer / solo business owner  
-**Operating address:** 1068 Block JK, Soshanguve, Pretoria, South Africa  
+**Operating address:** [Operating address — see private records]
 **Repository:** `Leano-Jordan/ZazuEMP`  
 **Branch:** `main`
 
