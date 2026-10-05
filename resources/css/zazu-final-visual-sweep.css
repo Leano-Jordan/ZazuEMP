@@ -52,10 +52,6 @@ color: var(--zazu-muted);
 font-variant-numeric: tabular-nums;
 }
 
-.zazu-document-total-value {
-font-variant-numeric: tabular-nums;
-}
-
 .zazu-chip-info {
 border-color: color-mix(in srgb, var(--zazu-primary) 50%, var(--zazu-border));
     background: var(--zazu-info-soft);
@@ -151,12 +147,6 @@ font-variant-numeric:tabular-nums;
 
 .zazu-work-ref {
 font-family:"JetBrains Mono",ui-monospace,SFMono-Regular,Menlo,monospace;
-}
-
-.zazu-chip-neutral {
-background:var(--zazu-surface-2);
-    color:var(--zazu-muted);
-    border-color:var(--zazu-border);
 }
 
 .zazu-chip-info,
@@ -4965,9 +4955,6 @@ button,
     -webkit-backdrop-filter: blur(18px) saturate(1.04);
 }
 
-.zazu-command-palette[hidden] {
-    display: none !important;
-}
 /* Director — full-page workspace search */
 .zazu-search-page-form {
     padding: 18px;
