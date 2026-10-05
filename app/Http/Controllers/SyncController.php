@@ -27,6 +27,7 @@ class SyncController extends Controller
         'job' => Event::class,
         'quote' => Quote::class,
         'service' => BusinessCapability::class,
+        'preparation' => EventPreparationItem::class,
     ];
 
     public function createPairing(Request $request, CurrentBusiness $currentBusiness): JsonResponse
@@ -225,8 +226,6 @@ class SyncController extends Controller
 
             if ($item['type'] === 'quote') {
                 $query->whereHas('event', fn ($event) => $event->where('business_id', $business->id));
-            } elseif ($item['type'] === 'preparation') {
-                $query->where('business_id', $business->id);
             } elseif ($item['type'] === 'preparation') {
                 $query->where('business_id', $business->id);
             } else {
