@@ -544,7 +544,7 @@ This is the persistent failure-history register for the Failure Case / Loop-Brea
 
 **First observed HEAD:** `6f0774a2fa07136bb242de17e61e5b2bbcf64f90`
 
-**Current application HEAD:** `12eeb3aa3396b0091527d2cbfc845854170dd374`
+**Current application HEAD:** `9777b0ed00b2a36eb829b1c4a2af631acf716a33`
 
 **Target/workflow:** Owner-reported Calendar lockout recurrence after a prior navigation repair.
 
@@ -563,6 +563,7 @@ This is the persistent failure-history register for the Failure Case / Loop-Brea
 | H1 | Calendar permission map drift | Historical fix `9fc9cae...` previously restored `calendar.view` for staff | Current config contains Calendar permission for staff and manager | Not sufficient to explain current report | OPEN |
 | H2 | Navigation ownership / mobile expansion defect | Calendar was moved under Work while the prior Work active predicate omitted `calendar.*`; mobile auto-open relied on an active group | Server-rendered active-state fallback is now added | New runtime evidence required | OPEN |
 | H3 | Optional holiday-preference schema dependency can break Calendar on a stale local DB | Calendar previously read a newly added `business_user.calendar_holiday_preferences` field | Current Calendar path now checks column existence and falls back safely | Corrected in source | CORRECTED |
+| H4 | Calendar month view referenced an undefined `$dayHolidays` variable | Month template called `$dayHolidays->isNotEmpty()` without assigning it in the day loop | Current month loop now resolves `$dayHolidays` from the holiday map; regression test covers April 2026 holiday rendering | Confirmed source defect; corrected | CORRECTED |
 
 #### Experiments
 
@@ -572,9 +573,9 @@ This is the persistent failure-history register for the Failure Case / Loop-Brea
 | 2 | H2/H3 | Make Work active navigation server-revealing on mobile and make optional holiday preference schema non-blocking | Source now contains both safeguards | Requires runtime verification |
 | 3 | H1/H2 | Add explicit staff/manager Calendar permission tests plus direct browser navigation coverage | Future config/navigation drift will fail verification instead of silently removing Calendar | Retain |
 
-**Current root-cause state:** Runtime causality remains unproven. Repository evidence now covers the known navigation and optional-schema failure modes, but the reported recurrence must not be declared fixed until a real authenticated runtime reproduces the failing workflow and captures the response/UI state.
+**Current root-cause state:** A separate Calendar month-render defect is now confirmed and corrected: the month view referenced an undefined `$dayHolidays` variable. This could produce a render failure after Calendar was successfully reached. The original owner-reported lockout may therefore have been a route/render combination; runtime causality is still not proven.
 
-**Correction in current cycle:** Added server-rendered mobile recovery, aligned mobile breakpoint contracts to 850px, normalized Calendar's optional holiday-preference lookup, and expanded regression coverage.
+**Correction in current cycle:** Added server-rendered mobile recovery, aligned mobile breakpoint contracts to 850px, normalized Calendar's optional holiday-preference lookup, corrected the undefined month-view holiday state, removed the conflicting mobile calendar display rule, and expanded regression coverage.
 
 **Regression family:** Calendar route access, primary navigation ownership, mobile drawer expansion, role permissions, business context, optional schema dependencies.
 
