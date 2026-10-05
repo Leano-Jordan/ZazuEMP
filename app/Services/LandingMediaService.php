@@ -16,28 +16,30 @@ class LandingMediaService
     {
         $library = config('zazu.landing_image_library', []);
 
-        // The public landing page must remain available during a deployment
-        // where the new platform-media migration has not run yet.
-        if (!Schema::hasTable('platform_landing_settings')) {
-            return [
-                'hero' => $this->localPath($library['catering_service']),
-                'operations' => $this->localPath($library['event_catering']),
-                'resources' => $this->localPath($library['sound_stage']),
-                'control' => $this->localPath($library['wedding_catering']),
-            ];
-        }
-
-        $settings = $this->current();
-
-        return [
-            'hero' => $this->usablePath($settings->hero_image_path, $library['catering_service']),
-            'operations' => $this->usablePath($settings->operations_image_path, $library['event_catering']),
-            'resources' => $this->usablePath($settings->resources_image_path, $library['sound_stage']),
-            'control' => $this->usablePath($settings->control_image_path, $library['wedding_catering']),
+        $images = [
+            'hero' => $this->localPath($library['catering_service']),
+            'operations' => $this->localPath($library['event_catering']),
+            'resources' => $this->localPath($library['sound_stage']),
+            'control' => $this->localPath($library['wedding_catering']),
             'venue' => $this->localPath($library['venue']),
             'tent' => $this->localPath($library['tent']),
             'decor' => $this->localPath($library['decor']),
         ];
+
+        // The public landing page must remain available during a deployment
+        // where the new platform-media migration has not run yet.
+        if (!Schema::hasTable('platform_landing_settings')) {
+            return $images;
+        }
+
+        $settings = $this->current();
+
+        $images['hero'] = $this->usablePath($settings->hero_image_path, $library['catering_service']);
+        $images['operations'] = $this->usablePath($settings->operations_image_path, $library['event_catering']);
+        $images['resources'] = $this->usablePath($settings->resources_image_path, $library['sound_stage']);
+        $images['control'] = $this->usablePath($settings->control_image_path, $library['wedding_catering']);
+
+        return $images;
     }
 
     private function usablePath(?string $storedPath, array $libraryEntry): string
