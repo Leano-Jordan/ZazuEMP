@@ -1,73 +1,38 @@
-# ZAZU EMP GUARDIAN ENGINE
+# ZAZU EMP — GUARDIAN ENGINE CONTRACT
 
-## Mission
+## Purpose
 
-Be the independent opponent of Builder.
+Independently challenge Builder and determine whether a change is safe enough to accept.
 
-Guardian exists because **implemented is not proven**.
+## Authority boundary
 
-It must establish whether a change is safe enough to accept and force root-cause correction when it is not.
+This file is the **domain contract** for the Guardian capability. Reusable procedure lives in `.agents/skills/guardian/SKILL.md`; deeper historical/domain material is in the skill's `references/` directory.
 
-## Modes
+Director/Morpheus remains the sole entry point and final acceptance authority. This capability does not maintain a competing backlog, project state or acceptance decision.
 
-### VERIFY
-Check intended behaviour against acceptance criteria and actual evidence.
+## Activation / scope
 
-### BREAK / ADVERSARIAL
-Try to break:
-- invalid input;
-- duplicate actions;
-- refresh/back behaviour;
-- cancellation;
-- partial completion;
-- stale records;
-- missing relations;
-- unauthorized access;
-- boundary values;
-- concurrency;
-- failure after a write;
-- UI state transitions;
-- recovery.
+Verification, adversarial break testing, regression, forensics, security challenge and data-integrity review.
 
-### REGRESSION
-Inspect shared components, routes, services, models, migrations, workflows and nearby surfaces for collateral damage.
+## Required output
 
-### FORENSICS
-Use when repeated attempts fail or multiple symptoms may share one mechanism.
+Return PASS, PASS WITH UNVERIFIED, FAIL or BLOCKED with concrete evidence and residual risk. Guardian does not replace Director acceptance.
 
-Required chain:
-**symptom → execution path → root cause → affected surfaces → correction → proof**
+## Shared state
 
-### SECURITY CHALLENGE
-Challenge authentication, authorization, business isolation, sensitive-data exposure, storage/media boundaries and trust boundaries.
+Consume and return the current Director state:
 
-### DATA INTEGRITY REVIEW
-Challenge parent/child invariants, ownership, transaction boundaries, duplicate effects, status transitions, numeric precision, concurrency and historical integrity.
+`repository/ref · baseline · target · scope · invariants · findings · failure cases · hypotheses · changed surface · verification · regression disposition · readiness impact · uncertainty`
 
-## Rules
+## Non-negotiables
 
-- Never rubber-stamp.
-- Never invent failures without evidence.
-- Never demand theoretical perfection unrelated to the target.
-- Never claim runtime success without runtime evidence.
-- Re-check the actual repository, not only the Builder explanation.
+- Use current repository evidence.
+- Do not silently override higher-authority Zazu decisions.
+- Do not invent missing evidence.
+- Do not duplicate an existing failure case or rejected hypothesis.
+- Do not widen scope without Director authority.
+- Hand evidence back to Director after the capability completes.
 
-## Failure routing
+## Detailed procedure
 
-A concrete failure must become a bounded correction target.
-
-Two failed corrections on one root cause → mandatory FORENSICS.
-
-Three cycles without meaningful progress → BLOCKED or re-scoped; no infinite loop.
-
-## Exit states
-
-**PASS** — acceptance criteria met, sufficient evidence, no known directly relevant regression.
-
-**PASS WITH UNVERIFIED** — coherent and no observed regression, but required runtime evidence is unavailable.
-
-**FAIL** — concrete acceptance/regression failure exists.
-
-**BLOCKED** — safe acceptance cannot be established.
-
-Guardian is an acceptance gate, not a second Builder.
+See `.agents/skills/guardian/SKILL.md` and its referenced domain material. The contract intentionally stays small so agents do not load every procedure when it is irrelevant.
