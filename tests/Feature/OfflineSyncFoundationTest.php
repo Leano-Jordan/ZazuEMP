@@ -367,8 +367,8 @@ class OfflineSyncFoundationTest extends TestCase
             'create',
             [
                 'local_id' => $localId,
-                'event_local_id' => $eventIdentity->entity_uuid,
                 'record' => [
+                    'event_local_id' => $eventIdentity->entity_uuid,
                     'title' => 'Confirm buffet equipment',
                     'category' => 'equipment',
                     'quantity' => 20,
@@ -427,8 +427,10 @@ class OfflineSyncFoundationTest extends TestCase
             'create',
             [
                 'local_id' => $localId,
-                'event_local_id' => $eventIdentity->entity_uuid,
-                'record' => ['title' => 'Must reject'],
+                'record' => [
+                    'event_local_id' => $eventIdentity->entity_uuid,
+                    'title' => 'Must reject',
+                ],
             ],
         );
 
