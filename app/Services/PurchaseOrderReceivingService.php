@@ -174,7 +174,7 @@ final class PurchaseOrderReceivingService
             ]);
         }
 
-        $inventoryItem->movements()->create([
+        $movement = $inventoryItem->movements()->create([
             'business_id' => $businessId,
             'idempotency_key' => (string) Str::uuid(),
             'purchase_order_id' => $purchaseOrder->id,
@@ -187,6 +187,14 @@ final class PurchaseOrderReceivingService
             'reference' => $purchaseOrder->reference,
             'notes' => 'Receipt from purchase order.',
         ]);
+
+        Audit::record('inventory.movement.recorded', $movement, [
+            'type' => $movement->type,
+            'quantity' => $movement->quantity,
+            'item_id' => $inventoryItem->id,
+            'purchase_order_id' => $purchaseOrder->id,
+            'purchase_order_item_id' => $item->id,
+        ], $businessId);
 
         $item->update([
             'received_quantity' => Money::fromCents(
