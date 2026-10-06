@@ -110,6 +110,8 @@ test('public entry and login surfaces render without Zazu error pages', async ({
 test('landing authentication modal is keyboard-safe and switches between login and registration', async ({ page }) => {
     await page.goto('/', { waitUntil: 'domcontentloaded' });
     await openPublicNavigation(page);
+    const publicNavToggle = page.getByRole('button', { name: 'Open navigation' });
+    const mobileNavigationWasVisible = await publicNavToggle.isVisible();
     const loginTrigger = page.getByRole('button', { name: 'Log in', exact: true }).first();
     await loginTrigger.click();
     const modal = page.locator('[data-auth-modal]');
@@ -137,8 +139,12 @@ test('landing authentication modal is keyboard-safe and switches between login a
 
     await page.keyboard.press('Escape');
     await expect(modal).toBeHidden();
-    await expect.poll(
-        () => page.evaluate(() => document.activeElement?.getAttribute('data-auth-modal-open') || null),
-        { message: 'auth modal should restore focus to the login trigger' },
-    ).toBe('login');
+    if (mobileNavigationWasVisible) {
+        await expect(publicNavToggle).toBeFocused();
+    } else {
+        await expect.poll(
+            () => page.evaluate(() => document.activeElement?.getAttribute('data-auth-modal-open') || null),
+            { message: 'auth modal should restore focus to the login trigger' },
+        ).toBe('login');
+    }
 });
