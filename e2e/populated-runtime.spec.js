@@ -297,7 +297,7 @@ test.describe('Zazu populated runtime challenge', () => {
         await expect(page.getByRole('link', { name: 'Agenda', exact: true })).toBeVisible();
         await page.getByRole('link', { name: 'Agenda', exact: true }).click();
         await expect(page).toHaveURL(/view=agenda/);
-        await expect(page.getByText('Scheduled work', { exact: true }).first()).toBeVisible();
+        await expect(page.locator('.zazu-calendar-agenda').getByText('Scheduled work', { exact: true })).toBeVisible();
         await expectNoServerFailures(page, responses, errors);
     });
 
