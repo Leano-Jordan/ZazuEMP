@@ -137,5 +137,8 @@ test('landing authentication modal is keyboard-safe and switches between login a
 
     await page.keyboard.press('Escape');
     await expect(modal).toBeHidden();
-    await expect(loginTrigger).toBeFocused();
+    await expect.poll(
+        () => page.evaluate(() => document.activeElement?.getAttribute('data-auth-modal-open') || null),
+        { message: 'auth modal should restore focus to the login trigger' },
+    ).toBe('login');
 });
