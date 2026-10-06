@@ -51,8 +51,8 @@ Goal: smaller, self-consistent, genuinely testable control plane. No new enginee
 - Green rerun without materially new evidence is not closure.
 
 ## Current control-plane head
-- main: `99a3fb50ba5118ca063c2d8882c9752ee025bc10`
-- This head contains the complete Director V2 cleanup changes recorded below.
+- main: current canonical branch head; reconcile with repository before each state-changing cycle.
+- This current state file records the completed Director V2 cleanup changes below.
 
 ## CI evidence
 - Director contract lint: **UNVERIFIED** for this exact head through the available connector.
