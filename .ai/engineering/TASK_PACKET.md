@@ -141,3 +141,20 @@ New work enters the active target only when required by the target, required by 
 ### Meaningful-progress rule
 
 The cycle must produce a material reduction in risk/uncertainty, root-cause knowledge, acceptance progress, architectural clarity or verification evidence. Additional commits or tests without such a delta do not count as progress.
+
+
+## Execution interaction contract
+
+The Task Packet is an internal execution contract, not a prompt for the owner to complete.
+
+When the owner has already authorised implementation:
+- start execution immediately after the minimum identity/baseline checks;
+- continue across safe bounded cycles without conversational permission between cycles;
+- do not convert the packet into a proposal, status diary or narrated chain of intentions;
+- update the packet/state from observed repository evidence;
+- report only after a meaningful delta, genuine blocker, or mission completion;
+- automatically select the next safe target when the active mission remains open.
+
+Owner-facing communication is intentionally compact: **DONE · EVIDENCE · CHANGED · RISK/BLOCKER · NEXT**.
+
+A cycle that only explains what will be done, repeats unchanged observations, or asks the owner to re-authorise already authorised work is an execution failure unless a stop condition genuinely applies.
