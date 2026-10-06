@@ -35,6 +35,8 @@ families:
     signatures: [duplicate-rule, cascade-conflict, specificity-order, token-drift]
   UI:
     signatures: [overlay-hit-test, clipping, overlap, responsive-state, interaction-state]
+  CALENDAR:
+    signatures: [active-state, holiday-preference, month-rendering]
   DATA:
     signatures: [duplicate-mutation, ownership, partial-write, invariant-violation]
   RECOVERY:
