@@ -86,7 +86,8 @@ test.describe('Zazu UI theme and navigation', () => {
         await page.goto('/calendar');
         await expect(page).toHaveURL(/\/calendar/);
 
-        const workArea = page.locator('[data-zazu-nav-area]').filter({ hasText: 'Work' }).first();
+        const workAreas = page.locator('[data-zazu-nav-area]').filter({ hasText: 'Work' });
+        const workArea = workAreas.filter({ has: page.getByRole('link', { name: 'Calendar', exact: true }) }).first();
         const calendarLink = workArea.getByRole('link', { name: 'Calendar', exact: true });
 
         await expect(workArea).toHaveClass(/is-active/);
@@ -95,6 +96,10 @@ test.describe('Zazu UI theme and navigation', () => {
         const mobileNavigationToggle = page.getByRole('button', { name: 'Open navigation' });
         if (await mobileNavigationToggle.isVisible()) {
             await mobileNavigationToggle.click();
+            const workTrigger = workArea.getByRole('button', { name: 'Work', exact: true });
+            if (await workTrigger.isVisible()) {
+                await workTrigger.click();
+            }
             await expect(workArea).toHaveClass(/is-open/);
         } else {
             await workArea.getByRole('button', { name: 'Work', exact: true }).click();
