@@ -685,11 +685,15 @@
         const opener = lastFocus.element;
         lastFocus.element = null;
         const isVisible = (element) => element?.isConnected && element.getClientRects().length > 0 && !element.hasAttribute('hidden');
-        const fallback = isVisible(opener)
-            ? opener
-            : (isVisible(document.querySelector('.mobile-nav-toggle'))
-                ? document.querySelector('.mobile-nav-toggle')
-                : document.querySelector('[data-auth-modal-open="login"]'));
+        const mobileNavToggle = document.querySelector('.mobile-nav-toggle');
+        const mobileMenuOpener = opener?.closest?.('.mobile-menu');
+        const fallback = mobileMenuOpener && isVisible(mobileNavToggle)
+            ? mobileNavToggle
+            : (isVisible(opener)
+                ? opener
+                : (isVisible(mobileNavToggle)
+                    ? mobileNavToggle
+                    : document.querySelector('[data-auth-modal-open="login"]')));
 
         if (!isVisible(fallback)) return;
 
