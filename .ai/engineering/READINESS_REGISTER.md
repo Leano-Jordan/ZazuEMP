@@ -56,7 +56,7 @@ Future architecture should remain compatible with these possibilities without al
 
 **Close existing correctness, architecture, integrity, security, reliability and release-evidence gaps before speculative feature expansion.**
 
-Last updated: 2026-10-01
+Last updated: 2026-10-06
 
 
 ## Evidence snapshot — 2026-10-01
@@ -369,3 +369,23 @@ Current valuation view:
 - recurring revenue and retention are required to support a materially higher SaaS valuation.
 
 Last updated: 2026-10-04
+
+
+## Control-plane cleanup status — 2026-10-06
+
+The Director control plane has been reconciled against current `main`. Cases 0012 and 0013 are **CORRECTED / VERIFICATION PENDING**, not closed. The canonical read order is now owned by `.ai/engineering/00_DIRECTOR_ENGINE.md`; the historical router path is compatibility-only. Director eval dispositions are pinned and `.agents/evals/**` is owner-review scoped.
+
+**Release evidence rule:** no readiness gate is marked CLOSED from source inspection alone. The exact current-head CI run must be recorded before closing verification-dependent cases.
+
+Current application gates remain:
+1. current-head CI/browser evidence;
+2. populated commercial workflow traversal;
+3. backup/restore;
+4. populated upgrade/rollback;
+5. physical phone/tablet acceptance;
+6. legal/privacy operational completion;
+7. dependency/licence notice closure;
+8. Zazu brand/trade-mark clearance;
+9. final Director re-audit.
+
+Last updated: 2026-10-06
