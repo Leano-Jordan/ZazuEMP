@@ -3,7 +3,7 @@
 **Status:** ACTIVE / CANONICAL  
 **Repository:** `Leano-Jordan/ZazuEMP`  
 **Branch:** `main`  
-**Current main HEAD:** `e2fdbcca798adbef3f10f35e48f1865af792c4db`  
+**Current main HEAD:** `c0bd5df9f5ba80e0d1f4dee7934d0cfb797b75e7`  
 **Last Director reconciliation:** 2026-10-06
 
 ## Evidence rule
@@ -24,10 +24,10 @@ This ledger records the current release truth. Older Director audits remain hist
 | CodeQL | 🟢 PASS |
 | Full-history secret scan | 🟢 PASS |
 | Populated upgrade | 🟢 PASS |
-| Browser smoke | 🟡 IN PROGRESS at reconciliation time |
+| Browser smoke | 🟢 PASS — owner-reported current-head execution |
 | SonarCloud | ⚪ Conditionally skipped |
 
-No final browser-green claim is made until the in-progress job completes.
+Owner-reported browser execution is now green; retain this as runtime evidence distinct from physical-device acceptance.
 
 ## V1 capability gates
 
@@ -68,8 +68,8 @@ Automated backup/restore and recovery-safety tests are present. Release certific
 ### 5. Rollback exercise — 🟡 OPEN
 The rollback runbook and recovery mechanisms exist. A real release/deployment rollback exercise remains required.
 
-### 6. Final current-head browser evidence — 🟡 IN PROGRESS
-The browser job was still running when this reconciliation was recorded.
+### 6. Final current-head browser evidence — 🟢 OWNER-VERIFIED
+Owner executed the current-head browser suite and reported all tests green. This closes the browser convergence gate; physical-device acceptance remains separate.
 
 ### 7. Final Director certification — ⬜ NOT STARTED
 Certification waits for the gates above; no rushed release claim.
@@ -88,8 +88,7 @@ Certification waits for the gates above; no rushed release claim.
 
 ## Next execution order
 
-1. Close current-head browser evidence.
-2. Reconcile physical-device acceptance evidence.
+1. Reconcile physical-device acceptance evidence.
 3. Execute/record real recovery + rollback drills.
 4. Close dependency/licence release review.
 5. Close legal/privacy operational controls.
