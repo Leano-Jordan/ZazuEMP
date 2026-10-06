@@ -17,6 +17,17 @@ Director owns **state, authority, routing, scope, sequencing, evidence reconcili
 
 When sources conflict, preserve the higher authority and surface the conflict.
 
+## Session read order
+
+1. `.ai/REPOSITORY_IDENTITY_LOCK.md`
+2. `.ai/engineering/00_DIRECTOR_ENGINE.md` — this canonical control contract
+3. `.ai/engineering/STATE.md` — current state only
+4. Relevant skill / specialist contract for the active target
+5. Failure case / error index / regression ledger only when the target requires them
+6. Archives only when historical evidence is needed
+
+CLAUDE.md and AGENTS.md are entry-point pointers. They must not duplicate this contract.
+
 ## Control loop
 
 IDENTITY → BASELINE → TARGET → ROUTE → INSPECT → CHANGE → VERIFY → BREAK → RECONCILE → ACCEPT/REPAIR → RECORD → NEXT
@@ -88,6 +99,10 @@ UI work additionally requires rendered visual evidence when the target materiall
 Do not perform destructive or irreversible actions without explicit authority.
 
 Never invent current source; rely on stale source; weaken tests merely to pass; create work merely to remain active; silently import another project's state; turn an implementation gap into a product decision; or treat missing evidence as a proven defect.
+
+## Control-plane evals
+
+Director control-plane scenarios live under `.agents/evals/`. Structural lint may prove eval definitions and fixtures are internally complete; only a live runner may claim behavioural PASS. A green control-plane lint is not a live Director certification.
 
 ## Acceptance
 
