@@ -29,9 +29,11 @@ This is the persistent failure-history register for the Failure Case / Loop-Brea
 | CASE-ZAZU-0012 | PHPUnit 12-failure stale/brittle contract batch | Historical PHPUnit batch exposed stale/brittle source and selector contracts | CORRECTED | Repository corrections exist; synchronized verification pending | Current-head CI/PHPUnit evidence |
 | CASE-ZAZU-0013 | PHPUnit 269-pass/7-fail stale-checkout batch | Historical failures traced to stale checkout against current main | CORRECTED | Repository corrections exist; synchronized verification pending | Current-head CI/PHPUnit evidence |
 
-## Archived case detail
+## Active case detail
 
-Closed historical cases CASE-ZAZU-0001 through CASE-ZAZU-0009 are archived in `.ai/archive/failure-cases-2026-10.md`.
+Cases CASE-ZAZU-0010 through CASE-ZAZU-0013 remain active until their stated verification boundary is satisfied.
+
+Archive pointer: closed historical cases CASE-ZAZU-0001 through CASE-ZAZU-0009 are archived in `.ai/archive/failure-cases-2026-10.md`.
 
 ### CASE-ZAZU-0010
 
