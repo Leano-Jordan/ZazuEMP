@@ -1,5 +1,12 @@
 import { test, expect } from '@playwright/test';
 
+async function openPublicNavigation(page) {
+    const toggle = page.getByRole('button', { name: 'Open navigation' });
+    if (await toggle.isVisible()) {
+        await toggle.click();
+    }
+}
+
 test('registration flows through onboarding into the dashboard', async ({ page }, testInfo) => {
     test.setTimeout(60_000);
     test.skip(testInfo.project.name !== 'chromium', 'The complete registration flow runs once to avoid shared-IP registration throttling; responsive entry surfaces are covered separately.');
@@ -102,6 +109,7 @@ test('public entry and login surfaces render without Zazu error pages', async ({
 
 test('landing authentication modal is keyboard-safe and switches between login and registration', async ({ page }) => {
     await page.goto('/', { waitUntil: 'domcontentloaded' });
+    await openPublicNavigation(page);
     const loginTrigger = page.getByRole('button', { name: 'Log in', exact: true }).first();
     await loginTrigger.click();
     const modal = page.locator('[data-auth-modal]');
