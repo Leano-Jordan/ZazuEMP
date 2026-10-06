@@ -19,6 +19,10 @@ on:
       - ".ai/engineering/**"
       - "AGENTS.md"
       - "CLAUDE.md"
+      - "README.md"
+      - "memory.md"
+      - ".github/**"
+      - ".ai/archive/**"
       - "docs/**"
 
 permissions:
