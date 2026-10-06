@@ -461,7 +461,6 @@ class OfflineSyncFoundationTest extends TestCase
             'name' => 'Offline Supplier',
         ]);
         $supplierIdentity = app(\App\Support\Offline\SyncEntityIdentityRegistry::class)->identify($supplier, 'supplier');
-        $foreignSupplierUuid = (string) Str::uuid();
         $localId = (string) Str::uuid();
 
         $mutation = app(SyncMutationRecorder::class)->record(
@@ -472,7 +471,7 @@ class OfflineSyncFoundationTest extends TestCase
             [
                 'local_id' => $localId,
                 'record' => [
-                    'supplier_local_id' => $foreignSupplierUuid,
+                    'supplier_local_id' => $supplierIdentity->entity_uuid,
                     'currency' => 'ZAR',
                     'notes' => 'Offline replenishment',
                     'lines' => [
@@ -593,10 +592,10 @@ class OfflineSyncFoundationTest extends TestCase
         $mutation = app(SyncMutationRecorder::class)->record(
             $device,
             'purchase_receipt',
-            (string) Str::uuid(),
+            $receiptLocalId = (string) Str::uuid();
             'create',
             [
-                'local_id' => (string) Str::uuid(),
+                'local_id' => $receiptLocalId,
                 'record' => [
                     'purchase_order_local_id' => $orderIdentity->entity_uuid,
                     'received_quantities' => [$line->id => '4.00'],
