@@ -18,13 +18,15 @@ Zazu EMP is a proprietary event-management platform for small businesses operati
 
 **Read [memory.md](memory.md) first.**
 
-For AI/coding work, also read:
+For AI/coding work, read:
 1. [.ai/REPOSITORY_IDENTITY_LOCK.md](.ai/REPOSITORY_IDENTITY_LOCK.md)
-2. [.ai/engineering/README.md](.ai/engineering/README.md)
-3. [.ai/engineering/00_ENGINE_ROUTER.md](.ai/engineering/00_ENGINE_ROUTER.md)
-4. [.ai/engineering/STATE.md](.ai/engineering/STATE.md)
+2. [.ai/engineering/00_DIRECTOR_ENGINE.md](.ai/engineering/00_DIRECTOR_ENGINE.md) — canonical Director control contract
+3. [.ai/engineering/STATE.md](.ai/engineering/STATE.md) — current state only
+4. The relevant specialist skill/contract for the active target
+5. Failure ledgers only when the active target requires them
+6. Archives only when historical evidence is needed
 
-The canonical control contract is `.ai/engineering/00_DIRECTOR_ENGINE.md`; `.ai/engineering/00_ENGINE_ROUTER.md` is a compatibility pointer.
+The canonical control contract is `.ai/engineering/00_DIRECTOR_ENGINE.md`; `.ai/engineering/00_ENGINE_ROUTER.md` is a compatibility pointer only and is not part of the canonical read order.
 
 The repository-side engineering system is the authoritative control layer for Zazu execution.
 
