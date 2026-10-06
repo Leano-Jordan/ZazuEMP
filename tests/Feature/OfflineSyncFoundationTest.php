@@ -589,10 +589,11 @@ class OfflineSyncFoundationTest extends TestCase
         $orderIdentity = app(\App\Support\Offline\SyncEntityIdentityRegistry::class)->identify($order, 'purchase_order');
         $mutationId = (string) Str::uuid();
 
+        $receiptLocalId = (string) Str::uuid();
         $mutation = app(SyncMutationRecorder::class)->record(
             $device,
             'purchase_receipt',
-            $receiptLocalId = (string) Str::uuid();
+            $receiptLocalId,
             'create',
             [
                 'local_id' => $receiptLocalId,
