@@ -56,20 +56,20 @@ Codes are permanent once assigned. Never recycle a code.
 | ENG-CONTRACT-002 | CASE-ZAZU-0008 | Browser verification setup/locator drift | F2 | VERIFIED |
 | ENG-FLAKE-001 | CASE-ZAZU-0009 | Parallel browser load timeout | F8 | CLOSED |
 | ENG-ROUTE-001 | CASE-ZAZU-0010 | Navigation active-route ownership drift | F1 | CORRECTED |
-| ENG-UI-002 | CASE-ZAZU-0011 | Calendar runtime lockout/reachability failure | F1/F2 | INVESTIGATING |
+| ENG-UI-002 | CASE-ZAZU-0011 | Calendar runtime lockout/reachability failure | F1/F2 | BLOCKED |\n| ENG-CONTRACT-003 | CASE-ZAZU-0012 | PHPUnit 12-failure stale/brittle contract batch | F2/F7 | CLOSED |\n| ENG-CONTRACT-004 | CASE-ZAZU-0013 | PHPUnit 269-pass/7-fail stale-checkout batch | F2/F7 | CLOSED |
 
 ## Known related mechanisms
 
 Secondary codes may be attached when evidence shows they contribute to the same case:
 
-- ENG-CALENDAR-001 — optional Calendar preference/schema dependency.
-- ENG-CALENDAR-002 — Calendar month rendering references invalid day-holiday state.
-- ENG-CSS-001 — competing/duplicate visual declarations.
-- ENG-AUTHZ-001 — role-to-permission mapping drift.
-- ENG-RUNTIME-001 — PHP/runtime extension or environment mismatch.
-- ENG-CI-001 — CI workflow execution/configuration mismatch.
-- ENG-DATA-001 — unsafe duplicate or partial mutation.
-- ENG-RECOVERY-001 — backup/restore/rollback safety failure.
+- ENG-CALENDAR-001 — linked to CASE-ZAZU-0012 as the Calendar semantic active-state contract mechanism.
+- ENG-CALENDAR-002 — linked to CASE-ZAZU-0011 as the corrected Calendar month/holiday rendering mechanism; CASE-ZAZU-0011 remains BLOCKED pending runtime evidence.
+- ENG-CSS-001 — linked to CASE-ZAZU-0012 where canonical visual ownership was the affected contract.
+- ENG-AUTHZ-001 — RESERVED; no confirmed current case linkage.
+- ENG-RUNTIME-001 — RESERVED; no confirmed current case linkage.
+- ENG-CI-001 — RESERVED; no confirmed current case linkage.
+- ENG-DATA-001 — RESERVED; no confirmed current case linkage.
+- ENG-RECOVERY-001 — RESERVED; no confirmed current case linkage.
 
 These codes are not interchangeable with the primary case code and must only be attached when evidence supports them.
 
