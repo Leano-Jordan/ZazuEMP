@@ -128,6 +128,66 @@ class QuoteWorkflowTest extends TestCase
             ->assertForbidden();
     }
 
+    public function test_signed_customer_quote_can_be_viewed_and_accepted(): void
+    {
+        $customer = Customer::create(['name' => 'Customer Acceptance']);
+        $event = Event::create([
+            'business_id' => app(\App\Support\CurrentBusiness::class)->id(auth()->user()),
+            'customer_id' => $customer->id,
+            'reference' => 'ZAZ-PUBLIC-003',
+            'name' => 'Customer Acceptance Event',
+            'event_date' => now()->addDays(14)->toDateString(),
+            'status' => 'confirmed',
+        ]);
+
+        $requirement = $event->requirements()->create([
+            'description' => 'Catering service',
+            'category' => 'service',
+            'quantity' => '1.00',
+            'unit' => 'event',
+        ]);
+
+        $quote = app(\App\Services\QuoteService::class)->createFromRequirements(
+            $event,
+            collect([$requirement->load('capability')]),
+            [$requirement->id => '2500.00'],
+            'ZAR',
+            null,
+            'Customer-facing acceptance test',
+            '20.00'
+        );
+
+        $quote->update(['status' => 'sent']);
+        $quote->latestVersion()->update(['status' => 'sent']);
+
+        $viewUrl = \Illuminate\Support\Facades\URL::temporarySignedRoute(
+            'quotes.public',
+            now()->addMinutes(10),
+            ['quote' => $quote->id]
+        );
+
+        $view = $this->get($viewUrl);
+        $view->assertOk();
+        $view->assertSee('ZAZ-PUBLIC-003');
+        $view->assertSee('Customer Acceptance');
+        $view->assertSee('ZAR 2,500.00');
+        $view->assertSee('Accept quote');
+
+        $acceptUrl = \Illuminate\Support\Facades\URL::temporarySignedRoute(
+            'quotes.public.accept',
+            now()->addMinutes(10),
+            ['quote' => $quote->id]
+        );
+
+        $this->post($acceptUrl, [
+            'customer_name' => 'Customer Acceptance',
+            'acceptance' => '1',
+        ])->assertRedirect();
+
+        $this->assertSame('accepted', $quote->fresh()->status);
+        $this->assertSame('accepted', $quote->latestVersion()->fresh()->status);
+    }
+
     public function test_quote_revision_rebuilds_from_current_requirements_and_preserves_previous_snapshot_until_saved(): void
     {
         $customer = Customer::create([
