@@ -286,7 +286,7 @@ class OfflineDomainMutationHandler implements SyncMutationHandler
         return $order->fresh(['items']);
     }
 
-    private function purchaseReceipt(SyncMutation $mutation): PurchaseOrder
+    private function purchaseReceipt(SyncMutation $mutation): ?Model
     {
         if (! in_array($mutation->operation, ['create', 'upsert'], true)) {
             throw ValidationException::withMessages(['operation' => 'Offline purchase receipts only support create/upsert.']);
@@ -326,7 +326,10 @@ class OfflineDomainMutationHandler implements SyncMutationHandler
             $this->lifecycle,
         );
 
-        return $order->fresh(['items']);
+        // A receipt mutation is an operation against an existing purchase order;
+        // it is not a replacement identity for that purchase order. The receipt
+        // itself is tracked by the mutation idempotency key in the receiving service.
+        return null;
     }
 
     private function resolveOfflineEvent(int $businessId, mixed $eventUuid): ?Event
