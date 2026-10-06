@@ -55,23 +55,19 @@ Codes are permanent once assigned. Never recycle a code.
 | ENG-UI-001 | CASE-ZAZU-0007 | Closed inspector intercepts mobile input | F1 | CLOSED |
 | ENG-CONTRACT-002 | CASE-ZAZU-0008 | Browser verification setup/locator drift | F2 | VERIFIED |
 | ENG-FLAKE-001 | CASE-ZAZU-0009 | Parallel browser load timeout | F8 | CLOSED |
-| ENG-ROUTE-001 | CASE-ZAZU-0010 | Navigation active-route ownership drift | F1 | CORRECTED |
-| ENG-UI-002 | CASE-ZAZU-0011 | Calendar runtime lockout/reachability failure | F1/F2 | BLOCKED |
-| ENG-CONTRACT-003 | CASE-ZAZU-0012 | PHPUnit 12-failure stale/brittle contract batch | F2/F7 | CORRECTED / VERIFICATION PENDING |
-| ENG-CONTRACT-004 | CASE-ZAZU-0013 | PHPUnit 269-pass/7-fail stale-checkout batch | F2/F7 | CORRECTED / VERIFICATION PENDING |
-| PENDING | CASE-ZAZU-0017 | Finance payment replay returns 422 instead of idempotent redirect | F1/F2/F3 unresolved | FORENSICS |
-| PENDING | CASE-ZAZU-0018 | Calendar agenda hidden on desktop/tablet | F1/F2 unresolved | FORENSICS |
-| PENDING | CASE-ZAZU-0019 | Horizontal overflow at 1280px | F1/F2 unresolved | FORENSICS |
-| PENDING | CASE-ZAZU-0020 | Theme token state differs by browser/viewport | F1/F2/F4 unresolved | FORENSICS |
+| ENG-ROUTE-001 | CASE-ZAZU-0010 | Navigation active-route ownership drift | F1 | VERIFIED |
+| ENG-UI-002 | CASE-ZAZU-0011 | Calendar runtime lockout/reachability failure | F1/F2 | VERIFIED — browser suite green |
+| ENG-CONTRACT-003 | CASE-ZAZU-0012 | PHPUnit 12-failure stale/brittle contract batch | F2/F7 | VERIFIED — current suite green |
+| ENG-CONTRACT-004 | CASE-ZAZU-0013 | PHPUnit 269-pass/7-fail stale-checkout batch | F2/F7 | VERIFIED — current suite green |
+| ENG-DATA-002 | CASE-ZAZU-0017 | Finance payment replay returns 422 instead of idempotent redirect | F1/F2/F3 | VERIFIED — current browser suite green |
+| ENG-UI-003 | CASE-ZAZU-0018 | Calendar agenda hidden on desktop/tablet | F1/F2 | VERIFIED — current browser suite green |
+| ENG-CSS-002 | CASE-ZAZU-0019 | Horizontal overflow at 1280px | F1/F2 | VERIFIED — current browser suite green |
+| ENG-CSS-003 | CASE-ZAZU-0020 | Theme token state differs by browser/viewport | F1/F2/F4 | VERIFIED — current browser suite green |
 
 
-## Latest browser failure fingerprints — 2026-10-06
+## Latest browser failure fingerprints — 2026-10-06 — reconciled
 
-- CASE-ZAZU-0016: desktop Calendar link cannot be found inside active Work after selector correction; reopened for forensics.
-- CASE-ZAZU-0017: seeded payment replay returns 422 instead of expected idempotent 302.
-- CASE-ZAZU-0018: Calendar Agenda expected content is hidden on Chromium/tablet.
-- CASE-ZAZU-0019: Chromium at 1280px reports 1330px document width.
-- CASE-ZAZU-0020: theme token assertions differ by browser/viewport.
+- CASE-ZAZU-0016 through CASE-ZAZU-0020 are historical failure fingerprints. Owner-reported current-head browser execution is green; retain the fingerprints for recurrence detection and do not reopen without a new failing fingerprint.
 
 **Rule:** capture exact response/DOM/computed-style/layout evidence before another patch.
 
