@@ -57,8 +57,11 @@ The core model is software product development followed by commercial licensing.
 - Website design/development
 - Graphic and logo design
 - Large-format printing and related services
+- Selective custom software development
 
-Secondary work should support cash flow without distracting from the primary software-product strategy.
+**Custom-work rule:** Roscor Labs may accept custom development when the project is within current delivery capability and the commercial return justifies the time. Work that is materially beyond current capability or creates unacceptable delivery risk should be declined or partnered on.
+
+Secondary work should support cash flow, experience and customer relationships without permanently displacing the company's own product development.
 
 ## 5. Product Portfolio
 
@@ -88,13 +91,24 @@ Primary revenue: recurring software licensing.
 
 Secondary possibility: outright product/software sales when commercially advantageous.
 
-Additional service revenue may be accepted when it provides useful cash flow without undermining product development.
+Additional service and custom-development revenue may be accepted when it provides useful cash flow without undermining product development.
+
+The founder's current personal financial reference points are:
+- R5,000/month: minimum meaningful income.
+- R10,000/month: major personal improvement.
+- R20,000/month: major life-changing milestone.
+
+These are **personal financial markers, not Roscor Labs' revenue ceiling or corporate targets**. The company's long-term revenue potential must be assessed independently through product economics, market research and actual customer demand.
 
 Pricing, packaging, margins and customer acquisition economics: TBD.
 
 ## 9. Sales & Marketing
 
-TBD. The initial approach should be designed around the company's actual resources as a founder-led business rather than assuming a large sales or marketing department.
+The first-customer strategy favors **selling early once a product is genuinely usable**, then improving it through real customer feedback and usage.
+
+The company should not wait for theoretical perfection before testing whether customers will pay.
+
+Detailed sales process and marketing channels: TBD.
 
 ## 10. Operations
 
@@ -149,7 +163,11 @@ Hire people, expand product capability, strengthen operations and broaden the cu
 
 Develop Roscor Labs into a substantial South African technology company with multiple teams, products and community impact programmes.
 
-Exact targets and timelines: TBD.
+### Long-term strategic flexibility
+
+The company is not being locked into today's product categories. If future capital, capability and opportunity justify expansion into other technology areas — including additional software products, technology services or potentially hardware/electronics — those opportunities can be evaluated on their merits.
+
+The current plan therefore establishes direction without pretending the founder already knows what Roscor Labs will look like decades from now.
 
 ## 16. 12–36 Month Roadmap
 
@@ -181,23 +199,29 @@ Targets: TBD.
 | Core business | Develop and license software | Confirmed |
 | Primary pricing model | Recurring licensing/payments | Confirmed working direction |
 | Outright software sales | Open when commercially attractive | Confirmed working direction |
+| First-customer strategy | Sell early once genuinely usable; iterate from customer feedback | Confirmed |
+| Custom development | Accept worthwhile work within capability and risk tolerance | Confirmed |
 | Secondary services | Websites, graphic/logo design, large-format printing | Long-term/secondary |
 | Initial geography | South Africa | Confirmed direction |
 | Long-term ambition | Major South African-owned technology company | Confirmed |
 | Employment ambition | Grow toward a large workforce | Confirmed ambition |
 | Community ambition | Jobs, knowledge and opportunity in underserved communities | Confirmed ambition |
+| Business scope | Product-led software company with freedom to expand into services and other technology areas | Confirmed direction |
+| First strategic hire | Strong technical/product-development capability | Confirmed |
+| Sales capability | Required as the company scales | Confirmed |
 | Vision | Major South African-owned technology company with employment and community impact | Working draft |
 | Mission | Build useful software, grow sustainably and create opportunities | Working draft |
 | Pricing | TBD | Interview/research |
 | Target customers | TBD | Interview/research |
 | Financial targets | TBD | Interview |
+| Hiring sequence beyond first technical hire | TBD | Interview |
 
-## 19. Owner Interview — Round 2
+## 19. Owner Interview — Round 3
 
-### Founder and Business Reality
+### Market and Product Strategy
 
-1. **What is the minimum monthly income Roscor Labs needs to eventually generate before you can consider yourself financially independent from employment?**
-2. **For the first paying customers, which matters more: getting customers quickly, or getting the products highly polished before selling?**
-3. **Are you willing to do custom software work when necessary to generate cash, or do you want to protect the product-development focus even if that slows short-term income?**
-4. **Do you want Roscor Labs to remain primarily a product company even after websites/design/printing become possible revenue streams?**
-5. **If Roscor Labs becomes successful, what is the first kind of person you would want to hire?**
+1. **Between Swift Order and Zazu EMP, which one do you believe has the best chance of getting Roscor Labs its first paying customer?**
+2. **Who is the most obvious first customer for that product? Describe the actual business/person, not a broad industry.**
+3. **What problem are you confident enough that product solves that you would be willing to ask someone to pay for it today?**
+4. **Do you currently know any potential customers personally or through your community/network who could become early testers or paying customers?**
+5. **What would make you personally comfortable saying, "This product is ready to sell"?**
