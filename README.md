@@ -24,6 +24,8 @@ For AI/coding work, also read:
 3. [.ai/engineering/00_ENGINE_ROUTER.md](.ai/engineering/00_ENGINE_ROUTER.md)
 4. [.ai/engineering/STATE.md](.ai/engineering/STATE.md)
 
+The canonical control contract is `.ai/engineering/00_DIRECTOR_ENGINE.md`; `.ai/engineering/00_ENGINE_ROUTER.md` is a compatibility pointer.
+
 The repository-side engineering system is the authoritative control layer for Zazu execution.
 
 ## Engineering system
