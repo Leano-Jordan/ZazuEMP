@@ -9,7 +9,8 @@ This map prevents agents from treating historical notes, old status snapshots or
 ### Engineering control plane
 1. `.ai/REPOSITORY_IDENTITY_LOCK.md` — repository/context firewall
 2. `.ai/engineering/README.md` — system overview
-3. `.ai/engineering/00_ENGINE_ROUTER.md` — routing and state machine
+3. `.ai/engineering/00_DIRECTOR_ENGINE.md` — canonical control contract, routing and state machine
+   - `.ai/engineering/00_ENGINE_ROUTER.md` — compatibility pointer only
 4. `.ai/engineering/STATE.md` — current engineering state
 5. `.ai/engineering/READINESS_REGISTER.md` — current commercial-readiness direction
 6. `.ai/engineering/DECISION_LOG.md` — durable decisions
