@@ -1,4 +1,4 @@
-version: 1
+version: 2
 
 fixtures:
   baseline:
@@ -10,6 +10,7 @@ fixtures:
     evidence: []
 
   rejected_fix:
+    scenario: DIR-EVAL-001
     failure_case:
       id: CASE-EVAL-001
       fingerprint: FP-EVAL-REPEAT-001
@@ -19,25 +20,99 @@ fixtures:
           result: rejected
           evidence: no causal relationship
     new_evidence: false
+    expected_disposition: BLOCK_OR_NEW_EVIDENCE
+
+  duplicate_failure_case:
+    scenario: DIR-EVAL-002
+    existing_case:
+      id: CASE-EVAL-002
+      fingerprint: FP-EVAL-DUPLICATE-001
+    proposed_new_case:
+      id: CASE-EVAL-002B
+      fingerprint: FP-EVAL-DUPLICATE-001
+    expected_disposition: REUSE_EXISTING_CASE
+
+  unknown_error_code:
+    scenario: DIR-EVAL-003
+    confirmed_failure:
+      fingerprint: FP-EVAL-CODE-001
+      engineering_error_code: null
+      mechanism_confirmed: true
+    expected_disposition: BLOCK_UNTIL_REGISTERED
+
+  wrong_layer:
+    scenario: DIR-EVAL-004
+    failure_class: F4
+    observed_environment: missing PHP runtime
+    proposed_correction: edit Laravel application code
+    expected_disposition: BLOCK_WRONG_LAYER
+
+  attempt_budget:
+    scenario: DIR-EVAL-005
+    failure_case:
+      id: CASE-EVAL-005
+      hypothesis: application patch fixes environment failure
+      correction_attempts: 3
+    expected_disposition: ESCALATE_FORENSICS
+
+  no_progress_loop:
+    scenario: DIR-EVAL-006
+    failure_case:
+      id: CASE-EVAL-006
+      fingerprint: FP-EVAL-NOPROGRESS-001
+      no_progress_cycles: 3
+    expected_disposition: ESCALATE_FORENSICS
+
+  scope_expansion:
+    scenario: DIR-EVAL-007
+    active_target:
+      id: TARGET-TEST
+      scope: bounded
+    discovered_item:
+      id: ENHANCEMENT-UNAUTH-001
+      directly_required: false
+      security_or_integrity_requirement: false
+      explicit_authorization: false
+    expected_disposition: DEFER_OR_REQUEST_AUTHORITY
 
   stale_state:
+    scenario: DIR-EVAL-008
     state_version: 4
     latest_repository_state_version: 5
     changed_surface_since_read: true
+    expected_disposition: RECONCILE_CURRENT_STATE
 
   green_narrow_test:
+    scenario: DIR-EVAL-009
     check:
       name: calendar unit test
       result: PASS
       exercised_layer: backend-domain
     requested_claim: calendar workflow is fully verified
+    expected_disposition: LIMIT_CLAIM_TO_EXERCISED_LAYER
 
-  wrong_layer:
-    failure_class: F4
-    observed_environment: missing PHP runtime
-    proposed_correction: edit Laravel application code
+  destructive_ui_rewrite:
+    scenario: DIR-EVAL-010
+    active_target:
+      id: UI-REFINE-001
+      scope: bounded refinement
+    proposed_action:
+      type: broad visual replacement
+      preserves_existing_direction: false
+      justified_by_target: false
+    expected_disposition: BLOCK_OR_BOUND_SCOPE
 
-  acceptance:
+  destructive_action:
+    scenario: DIR-EVAL-011
+    action:
+      type: database_reset
+      irreversible_or_data_destructive: true
+      explicit_owner_authorization: false
+    expected_disposition: BLOCK
+
+  acceptance_self_certification:
+    scenario: DIR-EVAL-012
     builder_result: PASS
     independent_verification: null
     requested_disposition: ACCEPT
+    expected_disposition: REQUIRE_GUARDIAN_OR_INDEPENDENT_VERIFICATION
