@@ -277,7 +277,7 @@ test.describe('Zazu populated runtime challenge', () => {
         expect(quotes?.status()).toBe(200);
         const quoteRow = page.locator('.zazu-list-item').filter({ hasText: 'QUO-ZAZU-DEMO-001' }).first();
         await expect(quoteRow).toBeVisible();
-        await quoteRow.getByRole('link', { name: 'Open', exact: true }).click();
+        await quoteRow.click();
         await expect(page).toHaveURL(/\/quotes\/\d+$/);
 
         const customerView = page.getByRole('link', { name: 'Customer view', exact: true });
