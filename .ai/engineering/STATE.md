@@ -51,7 +51,7 @@ Goal: smaller, self-consistent, genuinely testable control plane. No new enginee
 - Green rerun without materially new evidence is not closure.
 
 ## Current control-plane head
-- main: `65b241a70a20153c222f6e10aef1f9acf48c6ced`
+- main: `99a3fb50ba5118ca063c2d8882c9752ee025bc10`
 - This head contains the complete Director V2 cleanup changes recorded below.
 
 ## CI evidence
