@@ -560,7 +560,12 @@ This is the persistent failure-history register for the Failure Case / Loop-Brea
 
 ### CASE-ZAZU-0011
 
-**Status:** INVESTIGATING
+**Status:** BLOCKED
+
+**Block reason:** Owner runtime evidence required; correction budget exhausted. Do not patch this case further until authenticated runtime evidence is available.
+
+**Correction-attempt state:** 3 attempts/cycles reached; Director rule is STOP PATCHING → FORENSICS / owner runtime evidence.
+
 
 **Engineering diagnostic code:** ENG-UI-002
 
@@ -606,6 +611,64 @@ This is the persistent failure-history register for the Failure Case / Loop-Brea
 **Required closure evidence:** Authenticated owner/staff/manager Calendar navigation on current `main`, mobile and desktop; response status captured; no blocked overlay; Calendar content rendered; then full UI regression sweep.
 
 **Rejected approaches retained for loop prevention:** Do not keep appending Calendar links, duplicate the destination into another nav group, or declare success from source inspection alone.
+
+### CASE-ZAZU-0012
+
+**Status:** CLOSED
+
+**Engineering diagnostic code:** ENG-CONTRACT-003
+
+**First observed date:** 2026-10-05
+
+**Target/workflow:** PHPUnit test-contract reconciliation batch.
+
+**Verification layer:** PHPUnit source-contract assertions.
+
+**Expected:** Tests assert stable, current ownership contracts without encoding stale selectors, source locations, viewport-specific markup, cache versions or unrelated response bodies.
+
+**Actual:** A 12-failure PHPUnit batch contained stale source-location/selector assertions plus two real contract gaps. Repository evidence records all twelve findings and their repository-level corrections.
+
+**Failure fingerprint:** PHPUnit → stale/brittle source or selector contract → assertion disagrees with current canonical CSS/navigation/PWA ownership.
+
+**F1–F8 classification:** F2/F7 — verification contract defect / contract drift.
+
+**Evidence-backed findings:** wallpaper ownership; Calendar semantic active state; Asset/Inventory grouped selectors; three-row mobile header; service-worker cache v6; manifest file/route contract; service-worker string assertion; accessibility navigation labels; error-summary ownership; canonical visual proportions; 13.5px form-label readability; authentication submit ownership.
+
+**Confirmed disposition:** All twelve findings were reconciled on repository `main`. No obsolete CSS selector or generic override was resurrected solely to satisfy a test.
+
+**Verification boundary:** Repository source was re-read after correction. Local PHPUnit execution still requires the owner's VS Code runtime; no local green result is claimed from this record.
+
+**Rejected approaches retained for loop prevention:** Do not restore obsolete selectors, broaden assertions to unrelated source ranges, or weaken the current application contract merely to obtain a green assertion.
+
+**Next action:** Rerun the current PHPUnit suite from a checkout synchronized to `main`.
+
+### CASE-ZAZU-0013
+
+**Status:** CLOSED
+
+**Engineering diagnostic code:** ENG-CONTRACT-004
+
+**First observed date:** 2026-10-05
+
+**Target/workflow:** PHPUnit reconciliation batch reported at 269 passed / 7 failed.
+
+**Verification layer:** PHPUnit source-contract assertions.
+
+**Expected:** The current checkout executes the same current contract assertions that are present on repository `main`.
+
+**Actual:** The reported seven failures were traced; repository `main` contains the corresponding stale/brittle contract corrections. The available repository record does not preserve seven independent failure fingerprints, so this case intentionally does not invent them.
+
+**Failure fingerprint:** Local PHPUnit batch → 269 passed / 7 failed → reported assertions correspond to a checkout behind current `main`.
+
+**F1–F8 classification:** F2/F7 — verification contract defect / contract drift.
+
+**Evidence-backed corrections:** Calendar navigation assertion; PWA manifest contract; accessibility/navigation and error-summary ownership; authentication width contract; canonical visual-layer proportion contract.
+
+**Verification boundary:** The repository records the seven-failure result and its traced correction commits, but a synchronized local rerun is still required before claiming the current suite is green.
+
+**Rejected approaches retained for loop prevention:** Do not weaken tests or count the historical seven failures as current failures when the checkout is stale. Synchronize first, then classify any remaining failures by fresh fingerprint.
+
+**Next action:** Synchronize local checkout and run the current suite. If any failure remains, create/reuse its individual fingerprinted case rather than reusing this batch case.
 
 ## Case record template
 
