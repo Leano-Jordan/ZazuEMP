@@ -686,11 +686,20 @@
         lastFocus.element = null;
 
         if (opener?.isConnected && opener.getClientRects().length > 0 && !opener.hasAttribute('hidden')) {
-            opener.focus();
-            return;
+            opener.focus({ preventScroll: true });
+            if (document.activeElement === opener) return;
         }
 
-        document.querySelector('.mobile-nav-toggle')?.focus();
+        const mobileToggle = document.querySelector('.mobile-nav-toggle');
+        if (mobileToggle?.isConnected && mobileToggle.getClientRects().length > 0) {
+            mobileToggle.focus({ preventScroll: true });
+            if (document.activeElement === mobileToggle) return;
+        }
+
+        const publicLogin = document.querySelector('[data-auth-modal-open="login"]');
+        if (publicLogin?.isConnected && publicLogin.getClientRects().length > 0) {
+            publicLogin.focus({ preventScroll: true });
+        }
     };
 
     openers.forEach((button) => button.addEventListener('click', () => open(button.dataset.authModalOpen, button)));
