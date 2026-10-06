@@ -12,9 +12,13 @@ Use this as a compact bootstrap for a new Zazu conversation. It is intentionally
 
 Read:
 1. `.ai/REPOSITORY_IDENTITY_LOCK.md`
-2. `.ai/engineering/README.md`
-3. `.ai/engineering/00_ENGINE_ROUTER.md`
-4. `.ai/engineering/STATE.md`
+2. `.ai/engineering/00_DIRECTOR_ENGINE.md` — canonical Director control contract
+3. `.ai/engineering/STATE.md` — current state only
+4. Relevant skill / specialist contract for the active target
+5. Failure case / error index / regression ledger only when the target requires them
+6. Archives only when historical evidence is needed
+
+The historical router path `.ai/engineering/00_ENGINE_ROUTER.md` is compatibility-only and is not a read-order authority.
 
 Do not use another project's memory, prompts, agent roster, architecture or requirements as Zazu authority.
 
