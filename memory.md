@@ -72,7 +72,7 @@ Specialist engines:
 Current delivery state machine:
 BASELINE -> TARGET -> INSPECT -> DESIGN -> CHANGE -> VERIFY -> BREAK -> ACCEPT -> RECORD -> NEXT
 
-Use `.ai/engineering/STATE.md` for current state, `.ai/engineering/00_ENGINE_ROUTER.md` for routing, and `.ai/engineering/READINESS_REGISTER.md` for release direction.
+Use `.ai/engineering/STATE.md` for current state, `.ai/engineering/00_DIRECTOR_ENGINE.md` for routing and control, and `.ai/engineering/READINESS_REGISTER.md` for release direction.
 
 Tests are evidence, not the engineering objective. Repository/GitHub is the primary source of truth.
 
