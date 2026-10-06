@@ -7,13 +7,15 @@
 **Repository:** Leano-Jordan/ZazuEMP
 **Default branch:** main
 **Active development branch:** main
-**Context updated:** 2026-09-28
+**Context updated:** 2026-10-06
 
 Repository state outranks stale conversation memory. Inspect the current repository before acting.
 
 **CURRENT CONTROL STATE:** `.ai/engineering/STATE.md`
 
-**CURRENT ENGINE ROUTER:** `.ai/engineering/00_ENGINE_ROUTER.md`
+**CURRENT DIRECTOR CONTROL:** `.ai/engineering/00_DIRECTOR_ENGINE.md`
+
+**HISTORICAL ROUTER POINTER:** `.ai/engineering/00_ENGINE_ROUTER.md` (compatibility only; not canonical)
 
 **CURRENT READINESS REGISTER:** `.ai/engineering/READINESS_REGISTER.md`
 
