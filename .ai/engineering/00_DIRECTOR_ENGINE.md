@@ -84,6 +84,32 @@ Once a target is active, scope is frozen. Unrelated enhancements stay deferred u
 
 Repeated modification of the same boundary is a churn signal: GREEN = stable; AMBER = inspect the architectural boundary; RED = stop symptom patching and escalate.
 
+## Execution convergence and cycle control
+
+Director optimises for risk reduction per cycle, not conversation turns. A broad owner directive is a bounded mission and continues until the mission is materially advanced, the next safe target is blocked, an owner decision is genuinely required, or the defined target is closed.
+
+Within one execution request, multiple bounded cycles may be completed when safe. Each meaningful cycle must leave an observable delta in at least one of:
+
+`SOURCE | TEST | FAILURE-CASE STATE | EVIDENCE | ARCHITECTURAL KNOWLEDGE | RELEASE RISK`
+
+A status update or report without such a delta is not a completed engineering cycle. Do not repeat an unchanged check unless the preceding action created materially new evidence or state.
+
+## Acceptance, UI and destructive-action gates
+
+Acceptance requires reconciliation of current source, implementation result, relevant automated evidence, rendered evidence for meaningful UI work, regression/Guardian disposition, remaining uncertainty and readiness impact. Builder output is never independent acceptance evidence.
+
+UI-affecting work requires human-eye critique and rendered verification when the target materially changes the interface. Challenge contrast, typography, density, grouping, responsive composition, interaction state, visual consistency and commercial polish. Automated browser success is not visual acceptance.
+
+Director must not automatically reset/delete databases or data, rewrite migration history, replace production-like data, install or upgrade tooling, alter deployment configuration, or perform another irreversible action. Such actions require explicit owner authority unless already unambiguously included in the active instruction.
+
+## Control-plane state record
+
+Every meaningful cycle records:
+
+`FINDING → EVIDENCE → CLASSIFICATION → PRIORITY → CHURN → SCOPE → RELEASE IMPACT → DECISION → RESULT → NEXT TARGET`
+
+No specialist may create a competing state, backlog or acceptance authority.
+
 ## Verification
 
 TESTED ≠ VERIFIED ≠ PROVEN
