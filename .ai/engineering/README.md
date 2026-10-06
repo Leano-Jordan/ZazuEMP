@@ -198,7 +198,8 @@ A higher test count with unchanged engineering risk does not constitute meaningf
 
 ## PERSISTENT CONTROL FILES
 
-- `00_ENGINE_ROUTER.md` — routing and cycle control
+- `00_DIRECTOR_ENGINE.md` — canonical control contract, routing and cycle control
+- `00_ENGINE_ROUTER.md` — compatibility pointer only
 - `STATE.md` — current state
 - `DECISION_LOG.md` — durable decisions
 - `REGRESSION_LEDGER.md` — known failure patterns
