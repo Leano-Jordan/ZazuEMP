@@ -681,8 +681,16 @@
     const close = () => {
         if (typeof modal.close === 'function' && modal.open) modal.close();
         else modal.removeAttribute('open');
-        lastFocus.element?.focus?.();
+
+        const opener = lastFocus.element;
         lastFocus.element = null;
+
+        if (opener?.isConnected && opener.getClientRects().length > 0 && !opener.hasAttribute('hidden')) {
+            opener.focus();
+            return;
+        }
+
+        document.querySelector('.mobile-nav-toggle')?.focus();
     };
 
     openers.forEach((button) => button.addEventListener('click', () => open(button.dataset.authModalOpen, button)));
