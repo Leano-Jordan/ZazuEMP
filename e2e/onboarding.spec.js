@@ -89,7 +89,7 @@ test('registration flows through onboarding into the dashboard', async ({ page }
 
     await expect(page).toHaveURL(/\/dashboard$/);
     await expect(page.locator('.zazu-error-shell')).toHaveCount(0);
-    await expect(page.getByRole('heading', { name: 'Command Centre' })).toBeVisible();
+    await expect(page.getByRole('heading', { name: 'Dashboard' })).toBeVisible();
 });
 
 test('public entry and login surfaces render without Zazu error pages', async ({ page }) => {
