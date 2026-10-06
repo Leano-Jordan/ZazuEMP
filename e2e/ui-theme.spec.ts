@@ -86,10 +86,10 @@ test.describe('Zazu UI theme and navigation', () => {
         await page.goto('/calendar');
         await expect(page).toHaveURL(/\/calendar/);
 
-        const workAreas = page.locator('[data-zazu-nav-area]').filter({ hasText: 'Work' });
-        const workArea = workAreas.filter({ has: page.getByRole('link', { name: 'Calendar', exact: true }) }).first();
+        const workArea = page.locator('[data-zazu-nav-area].is-active').filter({ hasText: 'Work' }).first();
         const calendarLink = workArea.getByRole('link', { name: 'Calendar', exact: true });
 
+        await expect(workArea).toHaveCount(1);
         await expect(workArea).toHaveClass(/is-active/);
         await expect(calendarLink).toHaveAttribute('aria-current', 'page');
 
