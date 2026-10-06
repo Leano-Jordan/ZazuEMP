@@ -2,11 +2,12 @@
 
 ## Identity
 - Company: Rosscore Labs
+- Company Director: **Ross**
 - Project: Zazu EMP
 - Repository: Leano-Jordan/ZazuEMP
 - Local root: C:\Projects\ZazuEMP
 - Canonical branch: main
-- Project Director: Zazu Director / Morpheus
+- Project Director: **Jarvis** (internal engine: Morpheus)
 
 ## Active-project rule
 
