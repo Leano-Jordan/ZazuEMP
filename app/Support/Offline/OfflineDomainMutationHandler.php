@@ -122,6 +122,7 @@ class OfflineDomainMutationHandler implements SyncMutationHandler
     }
 
     /**
+     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      * @SuppressWarnings(PHPMD.NPathComplexity)
      */
     private function preparation(SyncMutation $mutation): EventPreparationItem
