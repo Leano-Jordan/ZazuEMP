@@ -44,7 +44,7 @@ test.describe('Zazu populated runtime challenge', () => {
 
         const dashboard = await page.goto('/dashboard', { waitUntil: 'domcontentloaded' });
         expect(dashboard?.status()).toBe(200);
-        await expect(page.getByRole('heading', { name: 'Command Centre' })).toBeVisible();
+        await expect(page.getByRole('heading', { name: 'Dashboard' })).toBeVisible();
         await expect(page.getByText('Zazu Demo Catering', { exact: true }).first()).toBeVisible();
 
         const work = await page.goto('/work', { waitUntil: 'domcontentloaded' });
