@@ -84,6 +84,24 @@ Once a target is active, scope is frozen. Unrelated enhancements stay deferred u
 
 Repeated modification of the same boundary is a churn signal: GREEN = stable; AMBER = inspect the architectural boundary; RED = stop symptom patching and escalate.
 
+### Bounded refinement rule
+
+Do not turn a bounded refinement target into a broad visual rewrite. Preserve the existing product direction, information architecture and working interaction model unless the active target explicitly authorises a wider replacement. A visual improvement must be traceable to the stated target, evidence or a directly required correctness/accessibility constraint.
+
+### Active-target admission rule
+
+New work may enter an active target only when at least one of these is true:
+1. it is directly required to satisfy the target's acceptance criteria;
+2. it is required to protect security, data integrity or correctness of the target;
+3. it is required to remove a verified blocker in the target's dependency path; or
+4. the owner explicitly authorises the scope substitution or expansion.
+
+Otherwise record it and defer it; do not silently expand the active target.
+
+### Test-failure correction rule
+
+Never change application code solely because a test failed. First classify the failure F1–F8, identify the layer that owns the contract, and determine whether the test or application is stale/incorrect. Application code is changed only when repository/runtime evidence establishes an application defect or the active target explicitly requires that application change.
+
 ## Execution convergence and cycle control
 
 Director optimises for risk reduction per cycle, not conversation turns. A broad owner directive is a bounded mission and continues until the mission is materially advanced, the next safe target is blocked, an owner decision is genuinely required, or the defined target is closed.
@@ -116,7 +134,7 @@ TESTED ≠ VERIFIED ≠ PROVEN
 
 A green test proves only the behaviour it exercised.
 
-Every failed check is classified F1–F8 before application correction.
+Every failed check is classified F1–F8 before application correction. A failed check is not, by itself, permission to patch the application.
 
 UI work additionally requires rendered visual evidence when the target materially changes the interface.
 
