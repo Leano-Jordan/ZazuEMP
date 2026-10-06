@@ -231,8 +231,51 @@ Archive pointer: closed historical cases CASE-ZAZU-0001 through CASE-ZAZU-0009 a
 2. Populated runtime dashboard assertion was aligned from stale Command Centre to the current Dashboard heading.
 3. CI browser execution remains serial (--workers=1); the required serial experiment now passes desktop registration, confirming the parallel-run desktop failure is not a reproducible application-session defect.
 
-**Remaining uncertainty:** The remaining failure is limited to the mobile focus assertion. The current application close() path intentionally falls back to the visible mobile navigation toggle when the modal opener is hidden by the open drawer; the E2E assertion has been corrected to capture the toggle before opening the drawer/modal. Fresh serial execution after that correction is still required.
+**New evidence:** The full 39-test serial suite reproduced the mobile focus failure on Chromium and Chromium-tablet. The failure now occurs after the application fallback focus path, so the application focus restoration is being hardened with a post-close animation-frame focus restore. The same run also exposed two separate stale browser contracts: the populated quote traversal expected an Open child link although the current quote row is itself the navigable anchor; and the Calendar navigation test selected the first matching Work group instead of the Work group that owns Calendar, then assumed mobile auto-open behavior that the current responsive navigation does not guarantee.
 
-**Required closure evidence:** npx playwright test e2e/onboarding.spec.js --workers=1 after the current assertion correction. If it still fails, classify the fresh mobile failure from its trace/context before changing application code.
+**Remaining uncertainty:** Fresh serial execution after these bounded corrections is required. No auth/session regression is currently evidenced.
+
+**Required closure evidence:** Run npm run test:e2e -- --workers=1 from a checkout synchronized to the latest main. Close this case only after current-head browser evidence is green or remaining failures have their own fingerprinted cases.
 
 **Rejected approaches retained for loop prevention:** Do not weaken or delete the focus assertion. Do not force desktop focus behavior onto hidden mobile controls. Do not change authentication/session code until serial execution or server logs establish an application defect.
+
+
+### CASE-ZAZU-0015
+
+**Status:** CORRECTED — verification pending
+
+**Engineering diagnostic code:** ENG-BROWSER-002
+
+**First observed date:** 2026-10-06
+
+**Target/workflow:** Populated quote → customer-facing quote browser traversal.
+
+**Expected:** The seeded quote row opens its quote detail route.
+
+**Actual:** The browser test waited for a child link named Open inside the quote row and timed out. Current resources/views/quotes/index.blade.php renders the quote row itself as the navigable anchor.
+
+**Classification:** F2/F7 — stale browser selector contract.
+
+**Correction:** The E2E now clicks the navigable quote row itself. No application selector was added solely to satisfy the stale test.
+
+**Verification:** Pending current-head browser run.
+
+### CASE-ZAZU-0016
+
+**Status:** CORRECTED — verification pending
+
+**Engineering diagnostic code:** ENG-BROWSER-003
+
+**First observed date:** 2026-10-06
+
+**Target/workflow:** Calendar reachability from the Work navigation group across desktop/mobile/tablet.
+
+**Expected:** Calendar is owned by Work, marks the Work group active on /calendar, and remains reachable when the responsive navigation is opened.
+
+**Actual:** The browser test selected the first matching Work navigation area and, on responsive layouts, assumed the active Work area would already be is-open after opening the outer mobile navigation. Current navigation contains the Calendar link in the Work area and responsive logic does not require that exact interaction sequence.
+
+**Classification:** F2/F7 — brittle responsive selector/interaction contract.
+
+**Correction:** The E2E now selects the Work area that actually contains the Calendar link and explicitly opens its Work trigger when the responsive navigation exposes it.
+
+**Verification:** Pending current-head browser run.
