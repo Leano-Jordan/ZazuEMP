@@ -24,6 +24,10 @@ This is the persistent failure-history register for the Failure Case / Loop-Brea
 | CASE-ZAZU-0007 | Mobile Work inspector | Closed inspector overlays the Work page and captures taps | CLOSED | Closed state relied on transform without a hidden/interactivity guard | Desktop/mobile/tablet Work E2E |
 | CASE-ZAZU-0008 | Theme/navigation browser gate | UI-theme tests were skipped without external storage state and contained stale viewport assertions | VERIFIED | Test setup/locators did not follow the current seeded-login and responsive-navigation contract | Full Playwright suite |
 | CASE-ZAZU-0009 | Local browser-suite timeouts | Two long journeys timed out in a four-worker run but passed serially | CLOSED | Local browser/server load under parallel execution | Serial full-suite regression |
+| CASE-ZAZU-0010 | Calendar navigation active-route ownership drift | /calendar route owned by Work but active-group contract was stale | CORRECTED | Source correction exists; browser/runtime evidence pending | Current-head browser verification |
+| CASE-ZAZU-0011 | Calendar runtime lockout/reachability | Calendar remains owner-reported inaccessible despite source safeguards | BLOCKED | Runtime causality remains unproven; owner-authenticated evidence required | Owner runtime forensics |
+| CASE-ZAZU-0012 | PHPUnit 12-failure stale/brittle contract batch | Historical PHPUnit batch exposed stale/brittle source and selector contracts | CORRECTED | Repository corrections exist; synchronized verification pending | Current-head CI/PHPUnit evidence |
+| CASE-ZAZU-0013 | PHPUnit 269-pass/7-fail stale-checkout batch | Historical failures traced to stale checkout against current main | CORRECTED | Repository corrections exist; synchronized verification pending | Current-head CI/PHPUnit evidence |
 
 ## Archived case detail
 
@@ -136,7 +140,7 @@ Closed historical cases CASE-ZAZU-0001 through CASE-ZAZU-0009 are archived in `.
 
 ### CASE-ZAZU-0012
 
-**Status:** CLOSED
+**Status:** CORRECTED — verification pending
 
 **Engineering diagnostic code:** ENG-CONTRACT-003
 
@@ -166,7 +170,7 @@ Closed historical cases CASE-ZAZU-0001 through CASE-ZAZU-0009 are archived in `.
 
 ### CASE-ZAZU-0013
 
-**Status:** CLOSED
+**Status:** CORRECTED — verification pending
 
 **Engineering diagnostic code:** ENG-CONTRACT-004
 
@@ -191,84 +195,3 @@ Closed historical cases CASE-ZAZU-0001 through CASE-ZAZU-0009 are archived in `.
 **Rejected approaches retained for loop prevention:** Do not weaken tests or count the historical seven failures as current failures when the checkout is stale. Synchronize first, then classify any remaining failures by fresh fingerprint.
 
 **Next action:** Synchronize local checkout and run the current suite. If any failure remains, create/reuse its individual fingerprinted case rather than reusing this batch case.
-
-
-
-# ZAZU EMP — FAILURE CASE REGISTRY
-
-This is the persistent failure-history register for the Failure Case / Loop-Breaking Engine.
-
-## Registry rules
-
-- Stable case IDs are never recycled.
-- Active cases remain visible until CLOSED or BLOCKED.
-- Rejected hypotheses and failed approaches are retained.
-- A repeated fingerprint must reuse the existing case unless materially new evidence establishes a distinct failure.
-- Do not record speculation as confirmed root cause.
-- Keep sensitive secrets, credentials and personal data out of this registry.
-
-## Case index
-
-| Case ID | Target | Fingerprint | Status | Current hypothesis | Next layer |
-|---|---|---|---|---|---|
-| CASE-ZAZU-0001 | Dashboard account access | GET /dashboard queries missing business_user.primary_niche | CLOSED | Local SQLite schema was behind repository migrations | Monitor deploy/runtime migration evidence |
-| CASE-ZAZU-0002 | Offline and backup/restore regressions | Offline feature tests fail on model defaults/fixtures; Windows ZIP restore rejects generated paths | CLOSED | Eloquent defaults and ZIP entry separators diverged from their contracts | Full-suite regression |
-| CASE-ZAZU-0003 | Shared browser UI initialization | JavaScript calls undefined setupZazuBusinessSwitcher | CLOSED | Stale initializer remained after the feature was removed | Browser regression |
-| CASE-ZAZU-0004 | Backup restore command discovery | PHP cannot parse ZazuRestoreCommand::handle() | CLOSED | Work-directory expression was missing a closing parenthesis | Full backup/restore suite |
-| CASE-ZAZU-0005 | Onboarding focus selection | Playwright exact label does not match radio card accessible name | CLOSED | Card description is part of the wrapped radio label | Onboarding E2E |
-| CASE-ZAZU-0006 | Demo payment replay | Seeded idempotency values violate UUID validation | CLOSED | Fixture did not satisfy the controller's UUID contract | Seeder, replay and restore tests |
-| CASE-ZAZU-0007 | Mobile Work inspector | Closed inspector overlays the Work page and captures taps | CLOSED | Closed state relied on transform without a hidden/interactivity guard | Desktop/mobile/tablet Work E2E |
-| CASE-ZAZU-0008 | Theme/navigation browser gate | UI-theme tests were skipped without external storage state and contained stale viewport assertions | VERIFIED | Test setup/locators did not follow the current seeded-login and responsive-navigation contract | Full Playwright suite |
-| CASE-ZAZU-0009 | Local browser-suite timeouts | Two long journeys timed out in a four-worker run but passed serially | CLOSED | Local browser/server load under parallel execution | Serial full-suite regression |
-
-## Case record template
-
-### CASE-ZAZU-XXXX
-
-**Status:** OBSERVED / INVESTIGATING / FORENSICS / CORRECTED / VERIFIED / BLOCKED / CLOSED
-
-**First observed HEAD:**
-
-**Current HEAD:**
-
-**Target/workflow:**
-
-**Verification layer:**
-
-**Expected:**
-
-**Actual:**
-
-**Failure fingerprint:**
-
-**Runtime/data state:**
-
-**F1–F8 classification:**
-
-#### Hypotheses
-
-| ID | Hypothesis | Evidence for | Evidence against | Result | Status |
-|---|---|---|---|---|---|
-| H1 | | | | | |
-
-#### Experiments
-
-| Attempt | Hypothesis | Action | Evidence/result | Decision |
-|---|---|---|---|---|
-| 1 | | | | |
-
-**Confirmed root cause:**
-
-**Correction:**
-
-**Regression family:**
-
-**Runtime/adversarial evidence:**
-
-**Remaining uncertainty:**
-
-**Closure evidence:**
-
-**Rejected approaches retained for loop prevention:**
-
-**Next action:**
