@@ -24,23 +24,11 @@ Entry files must point to the canonical contract and must not define a competing
 IDENTITY → BASELINE → TARGET → ROUTE → INSPECT → CHANGE → VERIFY → BREAK → RECONCILE → ACCEPT/REPAIR → RECORD → NEXT
 
 ## Active target
-**Browser smoke regression convergence / onboarding authentication evidence**
+**Commercial release-gate acceleration: populated workflow → recovery → upgrade/rollback → physical acceptance → legal/licence/brand closure**
 
-Completed in this cycle:
-- CASE-ZAZU-0012 and CASE-ZAZU-0013 reopened as **CORRECTED / VERIFICATION PENDING**.
-- FAILURE_CASES duplicate registry block removed; active index now includes CASE-ZAZU-0010–0013.
-- Router-only execution/acceptance rules consolidated into the canonical Director contract.
-- Stale canonical-control pointers reconciled.
-- Director eval dispositions pinned; owner review declared for `.agents/evals/**`.
-- Control-plane formatting guard widened to `.ai/**`, `.agents/**`, `docs/**`, `.github/**`, plus root entry files.
-- STATE shortened to current control-plane facts.
+Browser smoke convergence is now **VERIFIED by owner-reported green current-head execution**. The previously indexed browser cases CASE-ZAZU-0016–0020 are no longer active blockers; retain their fingerprints in the error history for regression traceability.
 
 ## Open / blocked cases
-- CASE-ZAZU-0010 — CORRECTED; browser/runtime verification pending.
-- CASE-ZAZU-0011 — BLOCKED; owner-authenticated Calendar runtime evidence required. Do not patch further without new evidence.
-- CASE-ZAZU-0012 — CORRECTED / VERIFICATION PENDING; current-head PHPUnit/CI evidence required.
-- CASE-ZAZU-0013 — CORRECTED / VERIFICATION PENDING; current-head PHPUnit/CI evidence required.
-- CASE-ZAZU-0014 — CORRECTED / VERIFICATION PENDING; serial onboarding browser evidence required to classify the desktop session failure.
 
 ## Evidence rules
 - IMPLEMENTED = repository change exists.
@@ -55,18 +43,17 @@ Completed in this cycle:
 ## Current CI boundary
 The earlier browser run for `0a10d05` is not evidence for this final control-plane head. Current-head CI must be observed after this cycle. Record the exact run URL and SHA before closing any pending case.
 
-## Application gates after control-plane cleanup
-1. Resolve CASE-ZAZU-0016–0020 with evidence-first forensics; do not repeat symptom patches.
-2. Close or reclassify CASE-ZAZU-0014 from a serial onboarding run; do not patch authentication/session code from parallel-only evidence.
-3. Complete populated commercial workflow traversal.
-4. Exercise backup/restore.
-5. Exercise populated upgrade/rollback.
-6. Complete physical phone/tablet acceptance.
-7. Complete legal/privacy operational controls.
-8. Complete dependency/licence notice audit.
-9. Complete Zazu brand/trade-mark clearance.
-10. Final Director re-audit against the selected release head.
+## Application gates after browser convergence
 
-Do not reopen blocked Calendar patching without authenticated runtime evidence.
+1. Complete the populated commercial workflow traversal.
+2. Execute the real backup/restore drill, including representative private media.
+3. Execute the populated upgrade/rollback drill.
+4. Complete physical phone/tablet acceptance.
+5. Complete legal/privacy operational controls.
+6. Complete dependency/licence notice closure.
+7. Complete Zazu brand/trade-mark clearance.
+8. Final Director re-audit against the selected release head.
 
-Last updated: 2026-10-06 — active browser target reconciled by Director
+**Current execution priority:** commercial proof first; no feature expansion.
+
+Last updated: 2026-10-06 — browser regression gate cleared; commercial release gates now active
