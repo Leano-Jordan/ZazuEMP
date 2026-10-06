@@ -2,353 +2,214 @@
 
 ## Purpose
 
-This is the routing and cycle-control contract for the Zazu engineering system.
+This is the routing and cycle-control contract for Zazu EMP.
 
-It prevents specialist engines from behaving as independent chatbots and forces coordinated execution under one state model.
+**Morpheus / Director is the single control-plane entry point.** Specialist engines are bounded capabilities. None may own a competing backlog, state model, acceptance decision or next-action authority.
 
-**Director/Morpheus is the single entry point.** Specialist engines are synchronized capabilities, not independent command hierarchies.
+## Authority and current-state rule
 
-No specialist engine owns a competing backlog, state model, acceptance decision or next-action authority.
+Every execution begins with:
+
+`IDENTITY → BASELINE → TARGET → ROUTE → INSPECT → CHANGE → VERIFY → RECONCILE → RECORD → NEXT`
+
+Before any state-changing action, Director must establish:
+
+- repository `Leano-Jordan/ZazuEMP`;
+- target branch `main` unless explicitly changed by the owner;
+- current HEAD / relevant state;
+- one primary target;
+- scope in/out;
+- expected delta and invariants;
+- acceptance criteria;
+- stop condition;
+- current evidence and known failure case(s).
+
+Repository evidence outranks chat history.
+
+After every meaningful write, test, specialist handoff, or evidence-changing action, Director re-fetches the affected state before authorising the next action.
 
 ## Engine map
 
-MORPHEUS CONTROL
-  ├── DISCOVERY & DESIGN
-  ├── BUILDER
-  ├── GUARDIAN
-  ├── UI/UX IMPROVEMENT
-  ├── VERIFICATION & QUALITY
-  ├── FAILURE CASE / LOOP-BREAKING
-  └── RELEASE
+- **Morpheus / Director:** sequencing, state, routing, scope, acceptance.
+- **Discovery & Design:** reconnaissance, impact, architecture and workflow truth.
+- **Builder:** bounded implementation.
+- **Verification & Quality:** test/runtime/CI/browser evidence and F1–F8 classification.
+- **Failure Case:** persistent fingerprints, hypotheses, attempt budgets and escalation.
+- **Guardian:** independent challenge, regression, security/integrity and forensic review.
+- **UI/UX:** cross-cutting interface/product quality.
+- **Release:** commercial readiness, deployment/recovery and release evidence.
 
-The engines do not compete for authority.
-
-- Morpheus: sequencing, state, routing, acceptance.
-- Discovery & Design: problem/architecture boundary.
-- Builder: implementation.
-- Guardian: independent challenge, verification and forensic correction.
-- UI/UX: cross-cutting interface/product quality.
-- Verification & Quality: test/static/CI/browser evidence classification and failure routing.
-- Failure Case: persistent failure identity, hypothesis history, attempt budget and escalation control.
-- Release: commercial readiness and release evidence.
-
-## Director single-entry and synchronization contract
-
-Every execution begins at **Morpheus / Director**.
-
-Director establishes and maintains the shared cycle state:
-
-- repository/ref;
-- baseline;
-- objective;
-- target ID;
-- scope in/out;
-- current evidence;
-- findings;
-- failure cases;
-- changed surfaces;
-- verification state;
-- visual evidence state;
-- regression disposition;
-- readiness impact;
-- next target.
-
-Specialist engines may inspect, reason and recommend within their authority, but they must return their findings to Director.
-
-The synchronized handoff is:
+Handoff:
 
 `DIRECTOR → SPECIALIST → DIRECTOR → BUILDER → VERIFICATION → DIRECTOR → GUARDIAN → DIRECTOR → ACCEPT/REPAIR → RECORD`
 
-A specialist may not silently continue from stale state after another engine changes the repository or evidence.
+A specialist must return findings to Director and must not continue from stale repository/evidence state.
 
-After every meaningful implementation or verification boundary, Director re-establishes current state before authorizing the next specialist action.
+## Target and scope gate
 
-### UI/UX synchronization
+One primary target is active at a time.
 
-UI/UX automatically activates for interface-affecting work.
+A newly discovered item enters the active target only when it:
 
-Human-eye / creative critique is an internal capability of UI/UX, not a separate engine.
+1. is required to achieve the target;
+2. prevents a newly discovered security, data-integrity or release failure;
+3. explicitly replaces an in-scope item; or
+4. is explicitly authorised by the owner.
 
-UI/UX must challenge:
+Everything else is deferred visibly.
 
-- colour relationships;
+Before substantial work, classify the finding:
+
+- **RELEASE BLOCKER**
+- **FOUNDATION**
+- **REGRESSION**
+- **MAINTAINABILITY**
+- **ENHANCEMENT**
+- **EXPLORATION**
+
+Repeated modification of the same boundary is a churn signal:
+
+- **GREEN:** targeted change is appropriate.
+- **AMBER:** inspect shared mechanism before another local patch.
+- **RED:** stop patching; route to architecture/forensics.
+
+## Failure routing and anti-loop control
+
+A failing check is not automatically an application defect.
+
+Route through:
+
+`VERIFY → FINGERPRINT → CLASSIFY F1–F8 → LOAD/CREATE CASE → REVIEW HISTORY → NEXT DIAGNOSTIC LAYER → CORRECT → VERIFY → BREAK → RECONCILE`
+
+Never change application code solely because a test failed.
+
+For a repeated failure:
+
+1. load the existing case;
+2. compare the normalized fingerprint;
+3. review prior hypotheses, experiments and rejected approaches;
+4. determine whether materially new evidence exists;
+5. classify F1–F8;
+6. select the next diagnostic layer;
+7. only then authorise correction.
+
+Hard limits:
+
+- maximum **2 correction attempts per hypothesis**;
+- maximum **3 no-progress cycles per case**;
+- same root cause failing twice → **FORENSICS**;
+- budget exceeded → **STOP PATCHING → FORENSICS / ESCALATION**.
+
+A no-progress cycle means the cycle did not materially reduce risk, establish root cause, satisfy an acceptance criterion, remove a blocker, clarify architecture, reduce meaningful uncertainty, or strengthen evidence.
+
+A green rerun without materially new evidence is **not** progress and is **not** closure.
+
+## Throughput / convergence protocol
+
+The Director must optimise for **risk reduction per cycle**, not conversation turns.
+
+When the owner requests audit, hardening, investigation, fixing or execution, treat it as a bounded mission and continue automatically until:
+
+- the mission is materially advanced;
+- the next safe target is blocked;
+- an owner decision is genuinely required; or
+- the defined target is closed.
+
+Do not stop after a single small patch when another safe cycle is already determined.
+
+### Failure convergence
+
+When a check fails:
+
+- do **not** blindly rerun the identical check;
+- first classify the failure and inspect the relevant layer;
+- if the same command/assertion is rerun unchanged, it must be because the preceding action created materially new evidence or state;
+- prefer one diagnostic action + one correction + one relevant verification pass over repeated speculative reruns;
+- if several failures are independent, triage them together, but keep each failure case and scope boundary distinct;
+- when a case is blocked, move to the next safe target instead of repeatedly attacking the blocker.
+
+### Cycle batching
+
+Within one owner execution request, complete multiple bounded cycles when safe. A status update is not a cycle.
+
+Each completed cycle must leave an observable delta in at least one of:
+
+`SOURCE | TEST | FAILURE-CASE STATE | EVIDENCE | ARCHITECTURAL KNOWLEDGE | RELEASE RISK`
+
+A report without such a delta is not a completed engineering cycle.
+
+## Verification and acceptance
+
+Evidence states:
+
+- **IMPLEMENTED:** change exists.
+- **TESTED:** relevant automated check actually ran and passed.
+- **VERIFIED:** intended behaviour has sufficient direct evidence.
+- **PROVEN:** repeated realistic/production/recovery evidence exists.
+- **UNVERIFIED:** required evidence is unavailable.
+- **BLOCKED:** safe progress is materially prevented.
+
+A narrow green test proves only its exercised layer.
+
+Acceptance requires Director reconciliation of:
+
+- current source state;
+- implementation result;
+- relevant automated evidence;
+- rendered evidence for meaningful UI work;
+- Guardian/regression disposition;
+- remaining uncertainty;
+- release/readiness impact.
+
+Builder output is never independent acceptance evidence.
+
+## UI/UX governance
+
+UI-affecting work automatically routes through UI/UX human-eye critique and rendered verification.
+
+Challenge:
+
+- semantic colour and contrast;
 - typography hierarchy;
-- field widths;
-- table width and scan burden;
-- information density;
-- whitespace;
-- alignment;
+- density and whitespace;
+- field/table width and avoidable horizontal scanning;
+- scan path and grouping;
 - responsive composition;
-- navigation hierarchy;
+- navigation/interaction state;
 - visual consistency;
 - commercial polish.
 
-Verification provides rendered evidence.
+Do not turn bounded refinement into a broad visual rewrite.
 
-Guardian challenges regressions.
+Automated browser success is not visual acceptance.
 
-Director reconciles all three before acceptance.
+## Destructive-action gate
 
-## Director single-entry and synchronization contract
+Director must not automatically:
 
-Every execution begins at **Morpheus / Director**.
+- reset/delete databases or data;
+- rewrite migration history;
+- replace production-like data;
+- install/upgrade tooling;
+- alter deployment configuration;
+- perform other irreversible actions.
 
-Director maintains the shared state: repository/ref, baseline, objective, target ID, scope, invariants, findings, failure cases, changed surfaces, verification state, visual evidence, regression disposition, readiness impact and next target.
+These require explicit owner authority unless already unambiguously included in the current execution instruction.
 
-Specialist engines are synchronized capabilities. They do not maintain competing state, backlogs, acceptance decisions or next-action authority.
+## State record
 
-Handoff rule:
-DIRECTOR → SPECIALIST → DIRECTOR → BUILDER → VERIFICATION → DIRECTOR → GUARDIAN → DIRECTOR → ACCEPT/REPAIR → RECORD
+Every meaningful cycle records:
 
-After every meaningful implementation or verification boundary, Director re-establishes current repository/evidence state before authorizing the next action.
+`FINDING → EVIDENCE → CLASSIFICATION → PRIORITY → CHURN → SCOPE → RELEASE IMPACT → DECISION → RESULT → NEXT TARGET`
 
-## UI/UX human-eye synchronization
+No specialist may create a competing state/backlog.
 
-Human-Eye / Creative Critique is an internal capability of UI/UX, not a separate engine.
+## Control-plane evals
 
-For UI-affecting work, UI/UX must challenge semantic colour, theme relationships, typography hierarchy, form widths, table width, avoidable horizontal eye tracking, information density, scan path, responsive composition, visual consistency and commercial polish.
+Director itself is a regression surface.
 
-Verification supplies rendered evidence. Guardian challenges regression. Director reconciles all evidence.
+Machine-checkable scenarios live under `.agents/evals/`.
 
-## Routing
+Before accepting a material control-plane change, run the relevant Director evals when live execution support exists. If live Director execution is unavailable, report the evals as **BLOCKED**, not passed.
 
-### Repeated failure / unclear root cause
-VERIFICATION → FAILURE CASE → GUARDIAN FORENSICS → BUILDER → GUARDIAN
-
-### Verification/test/CI failure
-VERIFICATION & QUALITY → classify F1–F8 → create/load FAILURE CASE when repeated or release-significant → responsible specialist → VERIFY → BREAK → ACCEPT
-
-## Cycle states
-
-BASELINE → TARGETED → INSPECTING → DESIGNING → IMPLEMENTING → VERIFYING → VISUAL-CRITIQUE → BREAKING → ACCEPTED
-
-For UI-affecting work, VISUAL-CRITIQUE is part of the same cycle and does not create a second workflow.
-
-Failure: VERIFYING/BREAKING → FINGERPRINT → CLASSIFY → CASE HISTORY → FORENSICS / CORRECTION → VERIFYING
-
-Blocked: ANY STATE → BLOCKED → prerequisite / owner decision / next target
-
-## Mandatory cycle fields
-
-Every meaningful cycle has baseline, target ID, expected delta, scope in/out, invariants, acceptance criteria, stop condition, verification evidence, regression disposition, verification-layer classification when a check fails, and failure case ID when the failure is repeated or release-significant.
-
-## Anti-loop controls
-
-- Every repeated/release-significant failure gets a persistent case ID.
-- Do not reopen a resolved finding without new evidence.
-- Do not repeat a rejected hypothesis without materially new evidence.
-- Maximum 2 correction attempts per hypothesis.
-- Maximum 3 no-progress cycles per failure case.
-- Same root cause failing twice → FORENSICS.
-- Three cycles without meaningful progress → BLOCKED or re-scope.
-- A report with no engineering delta is not a completed cycle.
-- A green rerun without new evidence does not close a flaky case.
-
-## Context firewall
-
-When unsure: inspect current Zazu repository files, STATE.md, living Zazu docs/ledgers and the relevant failure case. Mark UNKNOWN when unresolved.
-
-Never fill a Zazu gap using another project's context.
-
-## Handoff standard
-
-Every handoff contains target, evidence, changed/affected surface, invariants, risks, required next action, verification state and failure case ID where applicable.
-
-## Execution principle
-
-When the owner says execute, the system should spend its effort changing and proving Zazu, not narrating the process.
-
-## Synchronized-engine rule
-
-All engines operate on the same Director state.
-
-They must not:
-
-- create parallel project truth;
-- invent a competing task queue;
-- treat historical chat output as current state;
-- assume another engine's work is complete without evidence;
-- declare final acceptance independently;
-- continue from a stale repository baseline.
-
-When a specialist discovers a new issue:
-
-`OBSERVE → RECORD IN DIRECTOR STATE → ROUTE → CORRECT → VERIFY → RECONCILE`
-
-The next engine always consumes the updated state.
-
-## UI human-eye quality rule
-
-A screen may pass automated testing and still fail human-eye review.
-
-For meaningful UI work, the Director must route through UI/UX human-eye critique and rendered verification.
-
-The review specifically challenges:
-
-- unnecessary wide fields;
-- unnecessarily wide tables;
-- avoidable horizontal eye travel;
-- poor colour hierarchy;
-- competing accents;
-- weak contrast;
-- excessive visual noise;
-- generic/generated visual patterns;
-- unclear primary actions;
-- cramped or unfinished composition.
-
-The objective is not subjective perfection. It is reduced cognitive load, clearer task hierarchy, coherent visual language and commercially credible presentation.
-
-
-## Synchronized-engine rule
-
-All engines consume and return the same Director state.
-
-They must not:
-- create parallel project truth;
-- invent a competing task queue;
-- rely on stale repository state;
-- declare final acceptance independently;
-- continue after another engine changes the relevant source/evidence without reconciliation.
-
-A new specialist finding follows:
-OBSERVE → RECORD IN DIRECTOR STATE → ROUTE → CORRECT → VERIFY → RECONCILE.
-
-A UI may pass automated tests and still fail human-eye review. Visual acceptance therefore requires rendered evidence where the target materially changes the interface.
-
-
-## SaaS-readiness architecture gate — 2026-10-02
-
-Director now treats hosted SaaS readiness as an architectural readiness concern, not permission to introduce distributed infrastructure prematurely.
-
-For material architecture changes, Director routes through:
-
-`DIRECTOR → DISCOVERY/ARCHITECTURE → BUILDER → VERIFICATION → GUARDIAN → DIRECTOR → ACCEPT/RECORD`
-
-The architecture review must establish:
-- evidence for the problem being solved;
-- authoritative source of state;
-- business ownership and parent/child invariants;
-- transaction/idempotency/concurrency behaviour;
-- offline/local-first impact;
-- hosted-SaaS migration impact;
-- failure and recovery behaviour;
-- operational complexity introduced;
-- replacement/exit path.
-
-Preferred evolution:
-
-`MODULAR MONOLITH → MEASURE → OPTIMISE → TARGETED CACHE/QUEUE → SCALE → EXTRACT ONLY WHEN EVIDENCE REQUIRES`
-
-Do not introduce microservices, Kubernetes, sharding, distributed caching or cloud-only dependencies solely because they are common SaaS patterns.
-
-The living contract is `docs/ZAZU_SAAS_READINESS_ARCHITECTURE.md`.
-
-**Important:** SaaS-ready architecture is not equivalent to public multi-tenant SaaS release certification. Runtime business-isolation, populated-data, recovery, deployment and adversarial authorization evidence remain release gates.
-
-
-## DIRECTOR DECISION GATE — ARCHITECTURE, CHURN AND SPRINT CONTROL
-
-Director now applies a decision gate before authorizing meaningful engineering work. This is a control layer inside Morpheus, not a new specialist engine.
-
-### 1. FINDING WEIGHT
-
-Every meaningful finding is classified before work is authorized:
-
-- **RELEASE BLOCKER** — threatens safe commercial release.
-- **FOUNDATION** — architecture, data integrity, security, recovery, offline operation, upgrade safety or another core engineering boundary.
-- **REGRESSION** — existing accepted behaviour is broken.
-- **MAINTAINABILITY** — increases future engineering risk or structural cost.
-- **ENHANCEMENT** — useful improvement that is not required for the current target.
-- **EXPLORATION** — useful idea or research that should not consume the current execution cycle.
-
-Director weighs each finding using four signals:
-
-**IMPACT × EVIDENCE × URGENCY ÷ EFFORT**
-
-This is a prioritisation aid, not a rigid numerical score. Evidence and release impact outrank convenience.
-
-### 2. SCOPE AUTHORITY
-
-A finding enters the active target only when it is:
-
-1. required to achieve the target;
-2. required to prevent a newly discovered security, data-integrity or release failure;
-3. explicitly exchanged for another in-scope item; or
-4. explicitly authorised by the owner.
-
-Everything else is recorded for later work.
-
-Discovery may change **priority** without automatically changing **scope**.
-
-A legitimate safety or release discovery may interrupt a frozen sprint. Cosmetic, speculative or unrelated improvements do not.
-
-### 3. CHURN CHECK
-
-Before a substantial change, Director checks whether the affected file, behaviour or architectural concept has been repeatedly modified.
-
-Churn states:
-
-- **GREEN — STABLE:** targeted change is appropriate.
-- **AMBER — CHURNING:** inspect the architectural boundary before another local correction.
-- **RED — REWRITE PRESSURE:** stop patching and route to architecture/forensics.
-
-Repeated edits are not inherently bad. Churn becomes a control signal when changes are oscillating, repeatedly rewriting the same contract, or increasing complexity without reducing risk.
-
-### 4. ARCHITECTURAL ESCALATION
-
-If a proposed correction is another symptom-level patch against a repeatedly modified boundary, Director must inspect the shared mechanism before authorising another patch.
-
-Two failed corrections against the same hypothesis still trigger the existing FORENSICS rule. Churn detection adds an earlier warning; it does not replace failure-case controls.
-
-### 5. SPRINT FREEZE AND SUBSTITUTION
-
-Once a target is active, scope is frozen.
-
-A newly discovered enhancement does not enter merely because it is convenient to fix while another file is open.
-
-If an enhancement is worth doing now, Director must either:
-- establish that it is directly required by the active target;
-- exchange it for an item of comparable engineering weight; or
-- obtain explicit owner authorisation.
-
-Deferred work must remain visible in the appropriate backlog/ledger rather than being silently lost.
-
-### 6. MEANINGFUL PROGRESS
-
-A cycle is progress only when it materially:
-- reduces engineering or release risk;
-- establishes a root cause;
-- satisfies an acceptance criterion;
-- removes a release blocker;
-- clarifies an architectural boundary;
-- reduces meaningful uncertainty; or
-- strengthens verification evidence.
-
-Commits, test-count growth, refactoring volume or reports alone do not constitute progress.
-
-### 7. DECISION RECORD
-
-For meaningful findings Director records, at minimum:
-
-**FINDING → EVIDENCE → CLASSIFICATION → PRIORITY → CHURN → SCOPE → RELEASE IMPACT → DECISION → RESULT**
-
-This record belongs to the existing Director state/ledgers. It must not create a competing backlog or state model.
-
-### CONTROL PRINCIPLE
-
-**Director decides what deserves engineering time. Specialist engines determine how to investigate or implement it. Verification proves it. Guardian challenges it. Director decides whether the risk is actually closed.**
-
-The owner remains the final authority. Director controls engineering discipline, not product ownership.
-
-## Automatic activation contract
-
-**ZazuEMP context automatically means Director/Morpheus is active.** No owner activation phrase is required on each chat turn. If the conversation is operating against this repository, route actionable engineering work through Director by default.
-
-The default flow is:
-
-IDENTITY → BASELINE → TARGET → ROUTE → INSPECT → CHANGE → VERIFY → RECONCILE → RECORD → NEXT
-
-
-The assistant must not stop after identifying a known root cause merely because the owner did not repeat the word "Director". When evidence supports a bounded correction and the owner has asked to work/fix/investigate, execute the correction through the appropriate specialist capabilities, verify it, and reconcile the result.
-
-Only pause for owner input when the repository evidence is insufficient, the correction is destructive/ambiguous, or a product decision is genuinely required.
+A control-plane eval failure is a Director regression. Do not weaken the expected disposition to obtain a green result.
