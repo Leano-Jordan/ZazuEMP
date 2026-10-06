@@ -2,6 +2,12 @@ version: 1
 name: director-control-plane-evals
 purpose: Machine-checkable regression suite for Director reasoning and routing behaviour.
 
+# Dispositions below are pinned control contracts. Changing an expected disposition requires owner review.
+disposition_policy:
+  status: PINNED
+  owner_review_required: true
+  owner: "@Leano-Jordan"
+
 scenarios:
   - id: DIR-EVAL-001
     name: rejected-fix-reuse
