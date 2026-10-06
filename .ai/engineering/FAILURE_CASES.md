@@ -28,7 +28,9 @@ This is the persistent failure-history register for the Failure Case / Loop-Brea
 ### CASE-ZAZU-0001
 
 **Status:** CLOSED
-\n**Engineering diagnostic code:** ENG-SCHEMA-001\n
+
+**Engineering diagnostic code:** ENG-SCHEMA-001
+
 **First observed HEAD:** `9e6ff7cccf1c341b99bd7be767f714154d1ece81`
 
 **Current HEAD:** `9e6ff7cccf1c341b99bd7be767f714154d1ece81`
@@ -79,7 +81,9 @@ This is the persistent failure-history register for the Failure Case / Loop-Brea
 ### CASE-ZAZU-0002
 
 **Status:** CLOSED
-\n**Engineering diagnostic code:** ENG-FIXTURE-001\n
+
+**Engineering diagnostic code:** ENG-FIXTURE-001
+
 **First observed HEAD:** `9e6ff7cccf1c341b99bd7be767f714154d1ece81`
 
 **Current HEAD:** `9e6ff7cccf1c341b99bd7be767f714154d1ece81`
@@ -134,7 +138,9 @@ This is the persistent failure-history register for the Failure Case / Loop-Brea
 ### CASE-ZAZU-0003
 
 **Status:** CLOSED
-\n**Engineering diagnostic code:** ENG-JS-001\n
+
+**Engineering diagnostic code:** ENG-JS-001
+
 **First observed HEAD:** `9e6ff7cccf1c341b99bd7be767f714154d1ece81`
 
 **Current HEAD:** `9e6ff7cccf1c341b99bd7be767f714154d1ece81`
@@ -185,7 +191,9 @@ This is the persistent failure-history register for the Failure Case / Loop-Brea
 ### CASE-ZAZU-0004
 
 **Status:** CLOSED
-\n**Engineering diagnostic code:** ENG-SYNTAX-001\n
+
+**Engineering diagnostic code:** ENG-SYNTAX-001
+
 **First observed HEAD:** `28a80784995ec03565aae5d66358cac209508455`
 
 **Current HEAD:** `4c467c6b7a6ca0f6022284a0dd8912102ed8d0a1` (correction is committed)
@@ -236,7 +244,9 @@ This is the persistent failure-history register for the Failure Case / Loop-Brea
 ### CASE-ZAZU-0005
 
 **Status:** CLOSED
-\n**Engineering diagnostic code:** ENG-CONTRACT-001\n
+
+**Engineering diagnostic code:** ENG-CONTRACT-001
+
 **First observed HEAD:** `a43e7ac827b2c88e3f167b1c7fd29299035f6933`
 
 **Current HEAD:** `4b1fbb8c6139215d5338b442b73a943d820948d9`
@@ -287,7 +297,9 @@ This is the persistent failure-history register for the Failure Case / Loop-Brea
 ### CASE-ZAZU-0006
 
 **Status:** CLOSED
-\n**Engineering diagnostic code:** ENG-FIXTURE-002\n
+
+**Engineering diagnostic code:** ENG-FIXTURE-002
+
 **First observed HEAD:** `a43e7ac827b2c88e3f167b1c7fd29299035f6933`
 
 **Current HEAD:** `4b1fbb8c6139215d5338b442b73a943d820948d9`
@@ -338,7 +350,9 @@ This is the persistent failure-history register for the Failure Case / Loop-Brea
 ### CASE-ZAZU-0007
 
 **Status:** CLOSED
-\n**Engineering diagnostic code:** ENG-UI-001\n
+
+**Engineering diagnostic code:** ENG-UI-001
+
 **First observed HEAD:** `a43e7ac827b2c88e3f167b1c7fd29299035f6933`
 
 **Current HEAD:** `4b1fbb8c6139215d5338b442b73a943d820948d9`
@@ -389,7 +403,9 @@ This is the persistent failure-history register for the Failure Case / Loop-Brea
 ### CASE-ZAZU-0008
 
 **Status:** VERIFIED
-\n**Engineering diagnostic code:** ENG-CONTRACT-002\n
+
+**Engineering diagnostic code:** ENG-CONTRACT-002
+
 **First observed HEAD:** `4b1fbb8c6139215d5338b442b73a943d820948d9`
 
 **Current HEAD:** `4b1fbb8c6139215d5338b442b73a943d820948d9` (additional mobile-toggle locator is in the working tree)
@@ -440,7 +456,9 @@ This is the persistent failure-history register for the Failure Case / Loop-Brea
 ### CASE-ZAZU-0009
 
 **Status:** CLOSED
-\n**Engineering diagnostic code:** ENG-FLAKE-001\n
+
+**Engineering diagnostic code:** ENG-FLAKE-001
+
 **First observed HEAD:** `4b1fbb8c6139215d5338b442b73a943d820948d9`
 
 **Current HEAD:** `4b1fbb8c6139215d5338b442b73a943d820948d9`
@@ -491,7 +509,9 @@ This is the persistent failure-history register for the Failure Case / Loop-Brea
 ### CASE-ZAZU-0010
 
 **Status:** CORRECTED
-\n**Engineering diagnostic code:** ENG-ROUTE-001\n
+
+**Engineering diagnostic code:** ENG-ROUTE-001
+
 **First observed HEAD:** `94914d1f0fcda07156d129c4c17ce2604f1634e2`
 
 **Current application HEAD:** `7fce57b7daaa25305df16d70f8502c0f8c41174a`
@@ -541,7 +561,9 @@ This is the persistent failure-history register for the Failure Case / Loop-Brea
 ### CASE-ZAZU-0011
 
 **Status:** INVESTIGATING
-\n**Engineering diagnostic code:** ENG-UI-002\n
+
+**Engineering diagnostic code:** ENG-UI-002
+
 **First observed HEAD:** `6f0774a2fa07136bb242de17e61e5b2bbcf64f90`
 
 **Current application HEAD:** `a4084628416c7c4e7ffa38fb980d9914a8e7031e`
