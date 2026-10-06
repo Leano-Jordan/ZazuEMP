@@ -24,7 +24,7 @@ Entry files must point to the canonical contract and must not define a competing
 IDENTITY → BASELINE → TARGET → ROUTE → INSPECT → CHANGE → VERIFY → BREAK → RECONCILE → ACCEPT/REPAIR → RECORD → NEXT
 
 ## Active target
-**Director V2 control-plane cleanup / hardening**
+**Browser smoke regression convergence / onboarding authentication evidence**
 
 Completed in this cycle:
 - CASE-ZAZU-0012 and CASE-ZAZU-0013 reopened as **CORRECTED / VERIFICATION PENDING**.
@@ -40,6 +40,7 @@ Completed in this cycle:
 - CASE-ZAZU-0011 — BLOCKED; owner-authenticated Calendar runtime evidence required. Do not patch further without new evidence.
 - CASE-ZAZU-0012 — CORRECTED / VERIFICATION PENDING; current-head PHPUnit/CI evidence required.
 - CASE-ZAZU-0013 — CORRECTED / VERIFICATION PENDING; current-head PHPUnit/CI evidence required.
+- CASE-ZAZU-0014 — CORRECTED / VERIFICATION PENDING; serial onboarding browser evidence required to classify the desktop session failure.
 
 ## Evidence rules
 - IMPLEMENTED = repository change exists.
@@ -56,15 +57,16 @@ The earlier browser run for `0a10d05` is not evidence for this final control-pla
 
 ## Application gates after control-plane cleanup
 1. Consume current-head Laravel/quality/PHPMD/Psalm/CodeQL/browser CI results.
-2. Complete populated commercial workflow traversal.
-3. Exercise backup/restore.
-4. Exercise populated upgrade/rollback.
-5. Complete physical phone/tablet acceptance.
-6. Complete legal/privacy operational controls.
-7. Complete dependency/licence notice audit.
-8. Complete Zazu brand/trade-mark clearance.
-9. Final Director re-audit against the selected release head.
+2. Close or reclassify CASE-ZAZU-0014 from a serial onboarding run; do not patch authentication/session code from parallel-only evidence.
+3. Complete populated commercial workflow traversal.
+4. Exercise backup/restore.
+5. Exercise populated upgrade/rollback.
+6. Complete physical phone/tablet acceptance.
+7. Complete legal/privacy operational controls.
+8. Complete dependency/licence notice audit.
+9. Complete Zazu brand/trade-mark clearance.
+10. Final Director re-audit against the selected release head.
 
 Do not reopen blocked Calendar patching without authenticated runtime evidence.
 
-Last updated: 2026-10-06
+Last updated: 2026-10-06 — active browser target reconciled by Director
