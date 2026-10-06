@@ -684,22 +684,19 @@
 
         const opener = lastFocus.element;
         lastFocus.element = null;
+        const isVisible = (element) => element?.isConnected && element.getClientRects().length > 0 && !element.hasAttribute('hidden');
+        const fallback = isVisible(opener)
+            ? opener
+            : (isVisible(document.querySelector('.mobile-nav-toggle'))
+                ? document.querySelector('.mobile-nav-toggle')
+                : document.querySelector('[data-auth-modal-open="login"]'));
 
-        if (opener?.isConnected && opener.getClientRects().length > 0 && !opener.hasAttribute('hidden')) {
-            opener.focus({ preventScroll: true });
-            if (document.activeElement === opener) return;
-        }
+        if (!isVisible(fallback)) return;
 
-        const mobileToggle = document.querySelector('.mobile-nav-toggle');
-        if (mobileToggle?.isConnected && mobileToggle.getClientRects().length > 0) {
-            mobileToggle.focus({ preventScroll: true });
-            if (document.activeElement === mobileToggle) return;
-        }
-
-        const publicLogin = document.querySelector('[data-auth-modal-open="login"]');
-        if (publicLogin?.isConnected && publicLogin.getClientRects().length > 0) {
-            publicLogin.focus({ preventScroll: true });
-        }
+        window.requestAnimationFrame(() => {
+            if (!isVisible(fallback)) return;
+            fallback.focus({ preventScroll: true });
+        });
     };
 
     openers.forEach((button) => button.addEventListener('click', () => open(button.dataset.authModalOpen, button)));
