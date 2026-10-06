@@ -5,21 +5,19 @@ from pathlib import Path
 import sys
 
 ROOT = Path(__file__).resolve().parents[2]
-SCAN_ROOTS = [
-    ROOT / ".ai",
-    ROOT / ".agents",
-    ROOT / "docs",
-    ROOT / ".github",
-]
+SCAN_ROOTS = [ROOT / ".ai", ROOT / ".agents", ROOT / "docs"]
+GITHUB_MARKDOWN_ROOT = ROOT / ".github"
 ROOT_FILES = [ROOT / "AGENTS.md", ROOT / "CLAUDE.md", ROOT / "README.md", ROOT / "memory.md"]
 EXTENSIONS = {".md", ".yml", ".yaml"}
 
 violations = []
-for base in SCAN_ROOTS:
+
+
+def scan_tree(base: Path, extensions: set[str]) -> None:
     if not base.exists():
-        continue
+        return
     for path in base.rglob("*"):
-        if path.is_file() and path.suffix.lower() in EXTENSIONS:
+        if path.is_file() and path.suffix.lower() in extensions:
             try:
                 text = path.read_text(encoding="utf-8")
             except UnicodeDecodeError:
@@ -27,6 +25,14 @@ for base in SCAN_ROOTS:
             for line_no, line in enumerate(text.splitlines(), 1):
                 if "\\n" in line:
                     violations.append(f"{path.relative_to(ROOT)}:{line_no}")
+
+
+for base in SCAN_ROOTS:
+    scan_tree(base, EXTENSIONS)
+
+# .github contains executable workflow YAML where literal "\n" can be
+# intentional inside scripts. Only Markdown under .github is control-plane prose.
+scan_tree(GITHUB_MARKDOWN_ROOT, {".md"})
 
 for path in ROOT_FILES:
     if path.is_file():
@@ -43,4 +49,4 @@ if violations:
     print("\n".join(violations))
     sys.exit(1)
 
-print("PASS: no literal \\n found in control-plane roots, .github/ or designated root entry files.")
+print("PASS: no literal \\n found in control-plane roots, .github Markdown, or designated root entry files.")
