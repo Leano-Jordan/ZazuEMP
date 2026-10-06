@@ -197,3 +197,42 @@ Archive pointer: closed historical cases CASE-ZAZU-0001 through CASE-ZAZU-0009 a
 **Rejected approaches retained for loop prevention:** Do not weaken tests or count the historical seven failures as current failures when the checkout is stale. Synchronize first, then classify any remaining failures by fresh fingerprint.
 
 **Next action:** Synchronize local checkout and run the current suite. If any failure remains, create/reuse its individual fingerprinted case rather than reusing this batch case.
+
+
+### CASE-ZAZU-0014
+
+**Status:** CORRECTED — verification pending
+
+**Engineering diagnostic code:** ENG-BROWSER-001
+
+**First observed date:** 2026-10-06
+
+**Target/workflow:** Onboarding Playwright browser regression on the current main checkout.
+
+**Expected:** The registration journey completes into /dashboard with the authenticated session intact, and closing the authentication modal restores focus to the correct visible control on desktop and responsive navigation surfaces.
+
+**Actual:** A local headed run using 3 workers reported two failures: desktop registration redirected to /?auth=login after onboarding catalogue continuation; mobile auth-modal closure reported no data-auth-modal-open focus target.
+
+**Failure fingerprint:** onboarding.spec.js + parallel local workers → registration completes /setup/catalogue then loses authenticated state before /setup/experience; mobile auth modal closes while its opener is hidden by the mobile navigation drawer, so the application correctly falls back to the visible navigation toggle.
+
+**F1–F8 classification:** F1/F2 — application interaction state / verification-contract mismatch. The desktop registration cause remains a hypothesis until a serial run confirms it.
+
+#### Hypotheses
+
+| ID | Hypothesis | Evidence for | Evidence against | Result | Status |
+|---|---|---|---|---|---|
+| H1 | Mobile focus assertion encoded the hidden modal opener rather than the visible recovery control | Mobile drawer is closed when the modal opens; close() intentionally falls back to the navigation toggle | None | Confirmed | CONFIRMED |
+| H2 | Parallel local workers caused session instability against the shared local SQLite/database session environment | CI already forces one worker; historical CASE-ZAZU-0009 records local browser instability under parallel load; failure occurs after registration itself succeeds | No serial rerun yet | Unverified | OPEN |
+| H3 | Catalogue/onboarding request raised a server-side exception or throttle | Registration reaches /setup/catalogue successfully | No local Laravel log evidence in the repository connector | Unverified | OPEN |
+
+#### Corrections
+
+1. Mobile auth E2E now records whether the responsive navigation toggle was visible before opening the modal and expects focus on that toggle after Escape; desktop retains the login-trigger focus contract.
+2. Populated runtime dashboard assertion was aligned from stale Command Centre to the current Dashboard heading.
+3. CI browser execution remains serial (--workers=1); no claim is made that the local desktop registration failure is closed until the serial local experiment completes.
+
+**Remaining uncertainty:** The desktop registration failure is not yet causally proven. Do not patch authentication/session application code from the 3-worker result alone.
+
+**Required closure evidence:** npx playwright test e2e/onboarding.spec.js --workers=1 on a checkout containing the current main commits. If it still fails, capture the final Laravel log lines and failure trace/context before changing application code.
+
+**Rejected approaches retained for loop prevention:** Do not weaken or delete the focus assertion. Do not force desktop focus behavior onto hidden mobile controls. Do not change authentication/session code until serial execution or server logs establish an application defect.
