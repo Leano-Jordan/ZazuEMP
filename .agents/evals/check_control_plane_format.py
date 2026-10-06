@@ -49,6 +49,16 @@ for base in SCAN_ROOTS:
             if ".ai/engineering/00_ENGINE_ROUTER.md" in line and re.match(r"^\s*\d+\.", line):
                 read_order_violations.append(f"{path.relative_to(ROOT)}:{line_no}")
 
+for path in ROOT_FILES:
+    if path.is_file():
+        try:
+            text = path.read_text(encoding="utf-8")
+        except UnicodeDecodeError:
+            continue
+        for line_no, line in enumerate(text.splitlines(), 1):
+            if ".ai/engineering/00_ENGINE_ROUTER.md" in line and re.match(r"^\s*\d+\.", line):
+                read_order_violations.append(f"{path.relative_to(ROOT)}:{line_no}")
+
 if read_order_violations:
     print("FAIL: historical router appears as a numbered read-order step:")
     print("\n".join(read_order_violations))
