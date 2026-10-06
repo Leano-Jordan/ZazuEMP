@@ -894,12 +894,28 @@ function setupZazuMobileNavigation() {
 
     let returnFocus = null;
 
+    const syncActiveNavigationGroup = () => {
+        if (!media.matches) return;
+
+        const areas = [...sidebar.querySelectorAll('[data-zazu-nav-area]')];
+        const activeArea = areas.find((area) => area.classList.contains('is-active'));
+        if (!activeArea) return;
+
+        areas.forEach((area) => {
+            const isActive = area === activeArea;
+            area.classList.toggle('is-open', isActive);
+            area.querySelector('[data-zazu-nav-trigger]')?.setAttribute('aria-expanded', isActive ? 'true' : 'false');
+        });
+    };
+
     const sync = (open, moveFocus = false) => {
         const active = open && media.matches;
         document.body.classList.toggle('zazu-mobile-menu-open', active);
         toggle.setAttribute('aria-expanded', active ? 'true' : 'false');
         toggle.setAttribute('aria-label', active ? 'Close navigation' : 'Open navigation');
         sidebar.toggleAttribute('inert', !active && media.matches);
+
+        if (active) syncActiveNavigationGroup();
 
         if (moveFocus && active) {
             (sidebar.querySelector('[data-mobile-sidebar-close]') || focusable()[0])?.focus();
