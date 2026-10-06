@@ -13,6 +13,21 @@ ROOT = Path(__file__).resolve().parents[2]
 EVALS = ROOT / ".agents" / "evals" / "director-evals.yml"
 FIXTURES = ROOT / ".agents" / "evals" / "DIRECTOR_EVAL_FIXTURES.yml"
 
+PINNED_DISPOSITIONS = {
+    "DIR-EVAL-001": "BLOCK_OR_NEW_EVIDENCE",
+    "DIR-EVAL-002": "REUSE_EXISTING_CASE",
+    "DIR-EVAL-003": "BLOCK_UNTIL_REGISTERED",
+    "DIR-EVAL-004": "BLOCK_WRONG_LAYER",
+    "DIR-EVAL-005": "ESCALATE_FORENSICS",
+    "DIR-EVAL-006": "ESCALATE_FORENSICS",
+    "DIR-EVAL-007": "DEFER_OR_REQUEST_AUTHORITY",
+    "DIR-EVAL-008": "RECONCILE_CURRENT_STATE",
+    "DIR-EVAL-009": "LIMIT_CLAIM_TO_EXERCISED_LAYER",
+    "DIR-EVAL-010": "BLOCK_OR_BOUND_SCOPE",
+    "DIR-EVAL-011": "BLOCK",
+    "DIR-EVAL-012": "REQUIRE_GUARDIAN_OR_INDEPENDENT_VERIFICATION",
+}
+
 if not EVALS.exists() or not FIXTURES.exists():
     print("FAIL: Director eval files are missing")
     sys.exit(1)
@@ -32,8 +47,13 @@ for scenario_id, block in scenario_blocks:
         sys.exit(1)
     expected_by_id[scenario_id] = match.group(1)
 
-if len(expected_by_id) != 12:
-    print(f"FAIL: expected 12 eval scenarios, found {len(expected_by_id)}")
+if expected_by_id != PINNED_DISPOSITIONS:
+    print("FAIL: eval dispositions differ from the hard-coded Director pin set")
+    for scenario_id in sorted(PINNED_DISPOSITIONS):
+        print(
+            f"  {scenario_id}: pinned={PINNED_DISPOSITIONS[scenario_id]} "
+            f"file={expected_by_id.get(scenario_id)}"
+        )
     sys.exit(1)
 
 fixture_blocks = re.findall(
@@ -56,8 +76,8 @@ for fixture_name, block in fixture_blocks:
             sys.exit(1)
         fixture_by_id[scenario_id] = expected_match.group(1)
 
-missing = sorted(set(expected_by_id) - set(fixture_by_id))
-extra = sorted(set(fixture_by_id) - set(expected_by_id))
+missing = sorted(set(PINNED_DISPOSITIONS) - set(fixture_by_id))
+extra = sorted(set(fixture_by_id) - set(PINNED_DISPOSITIONS))
 
 if missing:
     print("FAIL: scenarios without fixtures:", ", ".join(missing))
@@ -69,17 +89,17 @@ if extra:
 
 mismatches = sorted(
     scenario_id
-    for scenario_id, expected in expected_by_id.items()
+    for scenario_id, expected in PINNED_DISPOSITIONS.items()
     if fixture_by_id.get(scenario_id) != expected
 )
 if mismatches:
-    print("FAIL: fixture expected disposition does not match scenario:")
+    print("FAIL: fixture expected disposition does not match pinned scenario:")
     for scenario_id in mismatches:
         print(
-            f"  {scenario_id}: scenario={expected_by_id[scenario_id]} "
+            f"  {scenario_id}: pinned={PINNED_DISPOSITIONS[scenario_id]} "
             f"fixture={fixture_by_id.get(scenario_id)}"
         )
     sys.exit(1)
 
-print("PASS: 12 Director eval scenarios each have a matching fixture and own expected disposition.")
+print("PASS: 12 Director eval scenarios match the pinned disposition map and fixtures.")
 print("NOTE: this validates the eval contract only; it does not execute a live Director.")
