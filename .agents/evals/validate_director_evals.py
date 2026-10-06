@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
 """Static integrity check for the Director control-plane eval contract.
 
-This does not execute a live Director. It only proves that the repository's
-machine-readable eval definitions are internally complete and consistent.
+This validates the machine-readable eval contract and fixture pairing.
+It does not execute a live Director and therefore cannot claim behavioural PASS.
 """
 
 from pathlib import Path
@@ -20,38 +20,66 @@ if not EVALS.exists() or not FIXTURES.exists():
 eval_text = EVALS.read_text(encoding="utf-8")
 fixture_text = FIXTURES.read_text(encoding="utf-8")
 
-ids = re.findall(r"^\s*- id: (DIR-EVAL-\d{3})\s*$", eval_text, re.M)
-expected = re.findall(r"^\s*expected:\s*([A-Z0-9_]+)\s*$", eval_text, re.M)
+scenario_blocks = re.findall(
+    r"(?ms)^  - id: (DIR-EVAL-\d{3})\n(.*?)(?=^  - id: DIR-EVAL-\d{3}\n|\Z)",
+    eval_text,
+)
+expected_by_id = {}
+for scenario_id, block in scenario_blocks:
+    match = re.search(r"^    expected: ([A-Z0-9_]+)\s*$", block, re.M)
+    if not match:
+        print(f"FAIL: {scenario_id} has no expected disposition")
+        sys.exit(1)
+    expected_by_id[scenario_id] = match.group(1)
 
-if len(ids) != 12:
-    print(f"FAIL: expected 12 eval scenarios, found {len(ids)}")
+if len(expected_by_id) != 12:
+    print(f"FAIL: expected 12 eval scenarios, found {len(expected_by_id)}")
     sys.exit(1)
 
-if len(set(ids)) != len(ids):
-    print("FAIL: duplicate Director eval IDs")
-    sys.exit(1)
+fixture_blocks = re.findall(
+    r"(?ms)^  ([A-Za-z0-9_-]+):\n(.*?)(?=^  [A-Za-z0-9_-]+:\n|\Z)",
+    fixture_text,
+)
+fixture_by_id = {}
+for fixture_name, block in fixture_blocks:
+    scenario_match = re.search(r"^    scenario: (DIR-EVAL-\d{3})\s*$", block, re.M)
+    if scenario_match:
+        scenario_id = scenario_match.group(1)
+        expected_match = re.search(
+            r"^    expected_disposition: ([A-Z0-9_]+)\s*$", block, re.M
+        )
+        if not expected_match:
+            print(f"FAIL: fixture {fixture_name} for {scenario_id} has no own expected_disposition")
+            sys.exit(1)
+        if scenario_id in fixture_by_id:
+            print(f"FAIL: duplicate fixture for {scenario_id}")
+            sys.exit(1)
+        fixture_by_id[scenario_id] = expected_match.group(1)
 
-fixture_ids = re.findall(r"^\s*scenario:\s*(DIR-EVAL-\d{3})\s*$", fixture_text, re.M)
-
-missing = sorted(set(ids) - set(fixture_ids))
-duplicates = sorted({x for x in fixture_ids if fixture_ids.count(x) > 1})
+missing = sorted(set(expected_by_id) - set(fixture_by_id))
+extra = sorted(set(fixture_by_id) - set(expected_by_id))
 
 if missing:
     print("FAIL: scenarios without fixtures:", ", ".join(missing))
     sys.exit(1)
 
-if duplicates:
-    print("FAIL: duplicate fixtures:", ", ".join(duplicates))
+if extra:
+    print("FAIL: fixtures reference unknown scenarios:", ", ".join(extra))
     sys.exit(1)
 
-if len(set(fixture_ids)) != 12:
-    print(f"FAIL: expected fixtures for 12 scenarios, found {len(set(fixture_ids))}")
+mismatches = sorted(
+    scenario_id
+    for scenario_id, expected in expected_by_id.items()
+    if fixture_by_id.get(scenario_id) != expected
+)
+if mismatches:
+    print("FAIL: fixture expected disposition does not match scenario:")
+    for scenario_id in mismatches:
+        print(
+            f"  {scenario_id}: scenario={expected_by_id[scenario_id]} "
+            f"fixture={fixture_by_id.get(scenario_id)}"
+        )
     sys.exit(1)
 
-for disposition in expected:
-    if disposition not in fixture_text:
-        print(f"FAIL: expected disposition {disposition} is not represented by fixtures")
-        sys.exit(1)
-
-print("PASS: 12 Director eval scenarios and fixtures are structurally complete.")
+print("PASS: 12 Director eval scenarios each have a matching fixture and own expected disposition.")
 print("NOTE: this validates the eval contract only; it does not execute a live Director.")
