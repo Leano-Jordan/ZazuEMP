@@ -7924,7 +7924,7 @@ textarea:focus {
 .zazu-inspector-empty { margin:0; }
 body.zazu-inspector-open { overflow:hidden; }
 
-@media (max-width: 1100px) {
+@media (max-width: 1300px) {
     .zazu-ops-table-head { display:none; }
     .zazu-ops-row { grid-template-columns:1fr; grid-template-areas:"main" "actions"; gap:0; padding:0 16px; }
     .zazu-ops-row-main { grid-template-columns:1fr 1fr; grid-template-areas:"ref client" "function date" "status status"; gap:14px; padding:16px 0 12px; }
