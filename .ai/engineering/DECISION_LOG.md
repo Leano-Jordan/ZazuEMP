@@ -185,3 +185,13 @@ Working commercial hypotheses:
 **Reason:** Remove contradictory entry paths, prevent stale control-plane pointers and protect the Director regression contract from unilateral weakening.
 
 **Status:** ACTIVE
+
+
+## DEC-022 — Director control-plane review corrections
+
+- **Date:** 2026-10-06
+- **Status:** ACTIVE
+- **Finding:** Independent review identified five control-plane gaps after the prior reconciliation: executable workflow YAML was incorrectly included in the literal-\\n guard; eval dispositions were documentation-only pins; stale numbered router read-order pointers remained; three router rules were absent from the canonical contract; the active-case heading was misleading.
+- **Decision:** Keep workflow YAML out of the literal-\\n scan; hard-pin all 12 eval dispositions in the validator; make the canonical Director contract explicit on bounded refinement, active-target admission and test-failure classification; reconcile known read-order pointers; add a stale numbered-router guard; rename the active case section.
+- **Evidence boundary:** Repository edits are implemented on main. CI/runtime verification remains pending and no application or control-plane closure is claimed from source edits alone.
+- **Owner review:** Eval disposition changes remain owner-review-sensitive. CODEOWNERS declares the owner for .agents/evals/**; GitHub branch-protection enforcement is a repository setting and is not claimed as configured by this record.
