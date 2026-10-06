@@ -8,7 +8,8 @@ For Zazu EMP execution, the authoritative repository-side system is:
 
 - `.ai/REPOSITORY_IDENTITY_LOCK.md`
 - `.ai/engineering/README.md`
-- `.ai/engineering/00_ENGINE_ROUTER.md`
+- `.ai/engineering/00_DIRECTOR_ENGINE.md` — canonical control contract
+- `.ai/engineering/00_ENGINE_ROUTER.md` — compatibility pointer only
 - `.ai/engineering/STATE.md`
 - specialist engine contracts in `.ai/engineering/`
 
