@@ -50,6 +50,14 @@ Goal: smaller, self-consistent, genuinely testable control plane. No new enginee
 - Budget exceeded → STOP PATCHING → FORENSICS / ESCALATION.
 - Green rerun without materially new evidence is not closure.
 
+## Current control-plane head
+- main: `65b241a70a20153c222f6e10aef1f9acf48c6ced`
+- This head contains the complete Director V2 cleanup changes recorded below.
+
+## CI evidence
+- Director contract lint: **UNVERIFIED** for this exact head through the available connector.
+- No CI link/run is claimed until the actual workflow run is observed.
+
 ## Current verification boundary
 - Repository-side control-plane changes are inspectable through GitHub.
 - Live Director behavioural execution is not available through the repository connector.
