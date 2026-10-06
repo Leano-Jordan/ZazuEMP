@@ -4,7 +4,7 @@
 - Product: Zazu – Event Management Platform
 - Repository: Leano-Jordan/ZazuEMP
 - Canonical branch: main
-- Master ENGINE: Morpheus
+- Master control: Morpheus / Director
 - Owner-facing nickname: Jarvis
 
 ## Authority
@@ -15,83 +15,56 @@
 5. Verified external research
 6. Historical records / chat memory
 
-## Current control model
-BASELINE → TARGET → INSPECT → DESIGN → CHANGE → VERIFY → BREAK → ACCEPT → RECORD → NEXT
+## Canonical control contract
+`.ai/engineering/00_DIRECTOR_ENGINE.md` is the single canonical Director contract.
+`.ai/engineering/00_ENGINE_ROUTER.md` is a compatibility pointer only.
+Entry files must point to the canonical contract and must not define a competing read order.
 
-Director owns authority, routing, scope, sequencing, evidence reconciliation and acceptance. Specialist engines are bounded capabilities and do not maintain competing state or acceptance authority.
+## Control loop
+IDENTITY → BASELINE → TARGET → ROUTE → INSPECT → CHANGE → VERIFY → BREAK → RECONCILE → ACCEPT/REPAIR → RECORD → NEXT
 
-## Active Director target
-DIRECTOR V2 CONTROL-PLANE CLEANUP / HARDENING
+## Active target
+**Director V2 control-plane cleanup / hardening**
 
-Goal: smaller, self-consistent, genuinely testable control plane. No new engineering engines, F1–F8 redesign or application feature work.
-
-### This cycle completed
-- Failure-case registry literal escaped-newline corruption repaired.
-- Control-plane formatting guard added.
-- Director contract CI renamed to Director contract lint.
-- Director eval contract validator remains in the lint job.
-- PHPUnit 12-failure and 269-pass/7-fail historical batches registered as persistent cases/codes.
-- Calendar error family added to engineering taxonomy.
-- Reserved engineering codes explicitly marked linked or reserved.
-- CASE-ZAZU-0011 moved to BLOCKED after correction/no-progress budget exhaustion.
-- October historical state moved to .ai/archive/2026-10.md.
-- This STATE file is now the short current-state authority.
+Completed in this cycle:
+- CASE-ZAZU-0012 and CASE-ZAZU-0013 reopened as **CORRECTED / VERIFICATION PENDING**.
+- FAILURE_CASES duplicate registry block removed; active index now includes CASE-ZAZU-0010–0013.
+- Router-only execution/acceptance rules consolidated into the canonical Director contract.
+- Stale canonical-control pointers reconciled.
+- Director eval dispositions pinned; owner review declared for `.agents/evals/**`.
+- Control-plane formatting guard widened to `.ai/**`, `.agents/**`, `docs/**`, `.github/**`, plus root entry files.
+- STATE shortened to current control-plane facts.
 
 ## Open / blocked cases
-- CASE-ZAZU-0011 — Calendar runtime lockout/reachability: BLOCKED. Owner-authenticated runtime evidence is required. Do not patch further until that evidence exists.
-- Other active cases: consult .ai/engineering/FAILURE_CASES.md only when the active target requires them.
+- CASE-ZAZU-0010 — CORRECTED; browser/runtime verification pending.
+- CASE-ZAZU-0011 — BLOCKED; owner-authenticated Calendar runtime evidence required. Do not patch further without new evidence.
+- CASE-ZAZU-0012 — CORRECTED / VERIFICATION PENDING; current-head PHPUnit/CI evidence required.
+- CASE-ZAZU-0013 — CORRECTED / VERIFICATION PENDING; current-head PHPUnit/CI evidence required.
 
-## Failure-loop rules
-- Load the persistent case before correcting a repeated failure.
-- Same fingerprint reuses the existing case.
-- Hypothesis renaming does not reset the budget.
-- Maximum 2 correction attempts per hypothesis/mechanism.
-- Maximum 3 no-progress cycles per case.
-- Budget exceeded → STOP PATCHING → FORENSICS / ESCALATION.
-- Green rerun without materially new evidence is not closure.
+## Evidence rules
+- IMPLEMENTED = repository change exists.
+- TESTED = relevant automated check actually ran and passed.
+- VERIFIED = intended behaviour has sufficient evidence.
+- PROVEN = repeated realistic/production/recovery evidence exists.
+- UNVERIFIED = required evidence unavailable.
+- BLOCKED = safe progress materially prevented.
+- A green narrow check never closes a broader behaviour gate.
+- No case is CLOSED without its required evidence.
 
-## Current control-plane head
-- main: current canonical branch head; reconcile with repository before each state-changing cycle.
-- This current state file records the completed Director V2 cleanup changes below.
+## Current CI boundary
+The earlier browser run for `0a10d05` is not evidence for this final control-plane head. Current-head CI must be observed after this cycle. Record the exact run URL and SHA before closing any pending case.
 
-## CI evidence
-- Director contract lint: **UNVERIFIED** for this exact head through the available connector.
-- No CI link/run is claimed until the actual workflow run is observed.
+## Application gates after control-plane cleanup
+1. Consume current-head Laravel/quality/PHPMD/Psalm/CodeQL/browser CI results.
+2. Complete populated commercial workflow traversal.
+3. Exercise backup/restore.
+4. Exercise populated upgrade/rollback.
+5. Complete physical phone/tablet acceptance.
+6. Complete legal/privacy operational controls.
+7. Complete dependency/licence notice audit.
+8. Complete Zazu brand/trade-mark clearance.
+9. Final Director re-audit against the selected release head.
 
-## Current verification boundary
-- Repository-side control-plane changes are inspectable through GitHub.
-- Live Director behavioural execution is not available through the repository connector.
-- Director evals may be structurally validated, but must not be reported as live behavioural PASS without a live runner.
-- Local PHPUnit/browser/runtime evidence requires the owner's runtime and must be recorded from actual execution.
-
-## Current application direction
-Zazu remains offline-first and commercially focused. Core release assurance prioritizes correctness, data integrity, security, workflow integrity, UX/accessibility, recovery, operability, deployment safety and release evidence.
-
-## Current next application target
-After control-plane cleanup: reconcile current CI evidence, then continue the highest-risk offline foundation target. Do not reopen blocked Calendar work without runtime evidence.
-
-## Control-plane cleanup sequence
-1. Formatting guard / registry repair / failure registration / taxonomy cleanup — completed.
-2. Block exhausted Calendar case — completed.
-3. Keep STATE short and archive dated history — completed.
-4. Make CLAUDE.md / AGENTS.md point to one canonical control contract where needed.
-5. Strengthen eval fixture/disposition validation.
-6. Record CI evidence against the exact head.
-7. Commit-prefix discipline and weekly archive operation.
-
-## Evidence language
-- IMPLEMENTED — repository change exists.
-- TESTED — relevant automated check actually ran and passed.
-- VERIFIED — intended behaviour has sufficient evidence.
-- PROVEN — repeated realistic/production/recovery evidence exists.
-- UNVERIFIED — required evidence unavailable.
-- BLOCKED — safe progress materially prevented.
-
-## Update rule
-After every meaningful cycle:
-- reconcile this file;
-- update failure cases / regression ledger when a new pattern appears;
-- update decision log when a durable rule changes;
-- update readiness register when a release gate changes.
+Do not reopen blocked Calendar patching without authenticated runtime evidence.
 
 Last updated: 2026-10-06
