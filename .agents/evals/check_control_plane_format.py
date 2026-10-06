@@ -5,7 +5,13 @@ from pathlib import Path
 import sys
 
 ROOT = Path(__file__).resolve().parents[2]
-SCAN_ROOTS = [ROOT / ".ai", ROOT / ".agents", ROOT / "docs"]
+SCAN_ROOTS = [
+    ROOT / ".ai",
+    ROOT / ".agents",
+    ROOT / "docs",
+    ROOT / ".github",
+]
+ROOT_FILES = [ROOT / "AGENTS.md", ROOT / "CLAUDE.md", ROOT / "README.md", ROOT / "memory.md"]
 EXTENSIONS = {".md", ".yml", ".yaml"}
 
 violations = []
@@ -22,9 +28,19 @@ for base in SCAN_ROOTS:
                 if "\\n" in line:
                     violations.append(f"{path.relative_to(ROOT)}:{line_no}")
 
+for path in ROOT_FILES:
+    if path.is_file():
+        try:
+            text = path.read_text(encoding="utf-8")
+        except UnicodeDecodeError:
+            continue
+        for line_no, line in enumerate(text.splitlines(), 1):
+            if "\\n" in line:
+                violations.append(f"{path.relative_to(ROOT)}:{line_no}")
+
 if violations:
     print("FAIL: literal \\n found in control-plane Markdown/YAML:")
     print("\n".join(violations))
     sys.exit(1)
 
-print("PASS: no literal \\n found under .ai/, .agents/ or docs/.")
+print("PASS: no literal \\n found in control-plane roots, .github/ or designated root entry files.")
