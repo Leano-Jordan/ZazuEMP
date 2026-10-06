@@ -104,6 +104,10 @@ Never invent current source; rely on stale source; weaken tests merely to pass; 
 
 Director control-plane scenarios live under `.agents/evals/`. Structural lint may prove eval definitions and fixtures are internally complete; only a live runner may claim behavioural PASS. A green control-plane lint is not a live Director certification.
 
+## Archive discipline
+
+Dated control history is not current authority. At the end of each week, move completed historical cycle detail and closed case detail out of active control files into `.ai/archive/YYYY-MM.md` or a clearly named archive, while retaining a current index and pointers.
+
 ## Acceptance
 
 Director is the only final acceptance authority for engineering state.
