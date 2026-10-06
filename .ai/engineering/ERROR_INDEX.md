@@ -57,8 +57,8 @@ Codes are permanent once assigned. Never recycle a code.
 | ENG-FLAKE-001 | CASE-ZAZU-0009 | Parallel browser load timeout | F8 | CLOSED |
 | ENG-ROUTE-001 | CASE-ZAZU-0010 | Navigation active-route ownership drift | F1 | CORRECTED |
 | ENG-UI-002 | CASE-ZAZU-0011 | Calendar runtime lockout/reachability failure | F1/F2 | BLOCKED |
-| ENG-CONTRACT-003 | CASE-ZAZU-0012 | PHPUnit 12-failure stale/brittle contract batch | F2/F7 | CLOSED |
-| ENG-CONTRACT-004 | CASE-ZAZU-0013 | PHPUnit 269-pass/7-fail stale-checkout batch | F2/F7 | CLOSED |
+| ENG-CONTRACT-003 | CASE-ZAZU-0012 | PHPUnit 12-failure stale/brittle contract batch | F2/F7 | CORRECTED / VERIFICATION PENDING |
+| ENG-CONTRACT-004 | CASE-ZAZU-0013 | PHPUnit 269-pass/7-fail stale-checkout batch | F2/F7 | CORRECTED / VERIFICATION PENDING |
 
 ## Known related mechanisms
 
