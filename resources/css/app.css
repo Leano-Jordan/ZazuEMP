@@ -5886,6 +5886,7 @@ html[data-theme="dark"] .zazu-public-party,html[data-theme="dark"] .zazu-public-
 .zazu-calendar-event:hover { border-color:var(--zazu-primary); background:var(--zazu-surface); }
 .zazu-calendar-more { color:var(--zazu-muted); font-size:var(--zazu-font-size-meta); font-weight:var(--zazu-weight-semibold); }
 .zazu-calendar-agenda { display:none; }
+.zazu-calendar-agenda-standalone { display:grid; }
 @media(max-width:700px){
  .zazu-calendar-grid { display:none; }
  .zazu-calendar-agenda { display:grid; }
