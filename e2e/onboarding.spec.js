@@ -66,7 +66,7 @@ test('registration flows through onboarding into the dashboard', async ({ page }
     if (testInfo.project.name !== 'chromium') {
         await expect(page.getByRole('button', { name: 'Open navigation' })).toBeVisible();
     }
-    await expect(page.getByRole('heading', { name: 'Command Centre' })).toBeVisible();
+    await expect(page.getByRole('heading', { name: 'Dashboard' })).toBeVisible();
     await expect(page.locator('.zazu-footer-workspace strong')).toHaveText(businessName);
 
     const signedInLandingResponse = await page.goto('/', { waitUntil: 'domcontentloaded' });
