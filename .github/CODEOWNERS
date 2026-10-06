@@ -1,3 +1,6 @@
 # Default code ownership
 # Repository owner is the required reviewer for protected changes.
 * @Leano-Jordan
+
+# Director control-plane evals require repository-owner review.
+/.agents/evals/ @Leano-Jordan
