@@ -9,7 +9,7 @@ Use this skill whenever meaningful Zazu engineering work starts.
 2. Read repository-side control state before relying on conversation history:
    - .ai/REPOSITORY_IDENTITY_LOCK.md
    - .ai/engineering/README.md
-   - .ai/engineering/00_ENGINE_ROUTER.md
+   - .ai/engineering/00_DIRECTOR_ENGINE.md
    - .ai/engineering/STATE.md
    - .ai/engineering/FAILURE_CASES.md when a failure is involved
    - .ai/engineering/ERROR_INDEX.md when an error/failure is involved
