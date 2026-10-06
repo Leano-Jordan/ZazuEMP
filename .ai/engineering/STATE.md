@@ -24,9 +24,15 @@ Entry files must point to the canonical contract and must not define a competing
 IDENTITY → BASELINE → TARGET → ROUTE → INSPECT → CHANGE → VERIFY → BREAK → RECONCILE → ACCEPT/REPAIR → RECORD → NEXT
 
 ## Active target
-**Commercial release-gate acceleration: populated workflow → recovery → upgrade/rollback → physical acceptance → legal/licence/brand closure**
+**Release certification: backup/restore → physical device acceptance → legal/licence/brand closure → final Director audit**
 
-Browser smoke convergence is now **VERIFIED by owner-reported green current-head execution**. The previously indexed browser cases CASE-ZAZU-0016–0020 are no longer active blockers; retain their fingerprints in the error history for regression traceability.
+Verified gates:
+- Current-head browser suite: GREEN (owner-reported).
+- Current-head Zazu quality CI: GREEN.
+- Current-head populated upgrade/rollback CI: GREEN.
+- Populated commercial financial chain automated coverage: GREEN.
+
+Next hard gate: **customer-environment backup/restore proof**.
 
 ## Open / blocked cases
 
@@ -56,4 +62,4 @@ The earlier browser run for `0a10d05` is not evidence for this final control-pla
 
 **Current execution priority:** commercial proof first; no feature expansion.
 
-Last updated: 2026-10-06 — browser regression gate cleared; commercial release gates now active
+Last updated: 2026-10-06 — browser, quality and populated upgrade/rollback gates green; recovery certification active
