@@ -174,3 +174,14 @@ Working commercial hypotheses:
 **Reason:** Combine the new Senior Architect/Sprint Controller discipline with Zazu's existing single-entry Director architecture without creating parallel engines, backlogs or acceptance authority.
 
 **Status:** ACTIVE
+
+
+## DEC-021 — One canonical Director read order and eval-owner gate
+
+**Date:** 2026-10-06
+
+**Decision:** `.ai/engineering/00_DIRECTOR_ENGINE.md` is the single canonical Director control contract and session read-order authority. `.ai/engineering/00_ENGINE_ROUTER.md` remains only as a compatibility pointer. Entry files must point to the canonical contract and must not define competing read-order rules. Director control-plane eval dispositions are pinned and changes to `.agents/evals/**` require repository-owner review.
+
+**Reason:** Remove contradictory entry paths, prevent stale control-plane pointers and protect the Director regression contract from unilateral weakening.
+
+**Status:** ACTIVE
