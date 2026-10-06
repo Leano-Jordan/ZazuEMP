@@ -7928,7 +7928,9 @@ body.zazu-inspector-open { overflow:hidden; }
 @media (max-width: 1300px) {
     .zazu-ops-table-head { display:none; }
     .zazu-ops-row { grid-template-columns:1fr; grid-template-areas:"main" "actions"; gap:0; padding:0 16px; }
-    .zazu-ops-row-main { grid-template-columns:1fr 1fr; grid-template-areas:"ref client" "function date" "status status"; gap:14px; padding:16px 0 12px; }
+    .zazu-ops-row-main { grid-template-columns:minmax(0,1fr) minmax(0,1fr); grid-template-areas:"ref client" "function date" "status status"; gap:14px; padding:16px 0 12px; }
+    .zazu-ops-row-main > * { min-width:0; }
+    .zazu-ops-actions { min-width:0; }
     .zazu-ops-ref { grid-area:ref; } .zazu-ops-client { grid-area:client; } .zazu-ops-function { grid-area:function; }
     .zazu-ops-date { grid-area:date; } .zazu-ops-row-main > span:last-child { grid-area:status; }
     .zazu-ops-actions { justify-content:flex-start; padding:0 0 14px; flex-wrap:wrap; }
