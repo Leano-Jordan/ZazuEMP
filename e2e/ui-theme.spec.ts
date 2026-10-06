@@ -25,6 +25,7 @@ test.describe('Zazu UI theme and navigation', () => {
         const context = await browser.newContext();
         const page = await context.newPage();
 
+        await page.addInitScript(() => window.localStorage.setItem('zazu-theme', 'light'));
         await login(page);
         await expectNoViewportOverflow(page);
 
@@ -87,7 +88,7 @@ test.describe('Zazu UI theme and navigation', () => {
         await expect(page).toHaveURL(/\/calendar/);
 
         const workArea = page.locator('[data-zazu-nav-area].is-active').filter({ hasText: 'Work' }).first();
-        const calendarLink = workArea.getByRole('link', { name: 'Calendar', exact: true });
+        const calendarLink = workArea.locator('a.zazu-nav-link').filter({ hasText: /^Calendar$/ });
 
         await expect(workArea).toHaveCount(1);
         await expect(workArea).toHaveClass(/is-active/);
