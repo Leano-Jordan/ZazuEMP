@@ -140,7 +140,10 @@ test('landing authentication modal is keyboard-safe and switches between login a
     await page.keyboard.press('Escape');
     await expect(modal).toBeHidden();
     if (mobileNavigationWasVisible) {
-        await expect(mobileNavToggle).toBeFocused();
+        await expect.poll(
+            () => page.evaluate(() => document.activeElement?.classList.contains('mobile-nav-toggle') || false),
+            { message: 'auth modal should restore focus to the visible mobile navigation toggle' },
+        ).toBe(true);
     } else {
         await expect.poll(
             () => page.evaluate(() => document.activeElement?.getAttribute('data-auth-modal-open') || null),
