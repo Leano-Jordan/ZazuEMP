@@ -191,7 +191,16 @@ Working commercial hypotheses:
 
 - **Date:** 2026-10-06
 - **Status:** ACTIVE
-- **Finding:** Independent review identified five control-plane gaps after the prior reconciliation: executable workflow YAML was incorrectly included in the literal-\\n guard; eval dispositions were documentation-only pins; stale numbered router read-order pointers remained; three router rules were absent from the canonical contract; the active-case heading was misleading.
-- **Decision:** Keep workflow YAML out of the literal-\\n scan; hard-pin all 12 eval dispositions in the validator; make the canonical Director contract explicit on bounded refinement, active-target admission and test-failure classification; reconcile known read-order pointers; add a stale numbered-router guard; rename the active case section.
+- **Finding:** Independent review identified five control-plane gaps after the prior reconciliation: executable workflow YAML was incorrectly included in the literal backslash-n guard; eval dispositions were documentation-only pins; stale numbered router read-order pointers remained; three router rules were absent from the canonical contract; the active-case heading was misleading.
+- **Decision:** Keep workflow YAML out of the literal backslash-n scan; hard-pin all 12 eval dispositions in the validator; make the canonical Director contract explicit on bounded refinement, active-target admission and test-failure classification; reconcile known read-order pointers; add a stale numbered-router guard; rename the active case section.
 - **Evidence boundary:** Repository edits are implemented on main. CI/runtime verification remains pending and no application or control-plane closure is claimed from source edits alone.
 - **Owner review:** Eval disposition changes remain owner-review-sensitive. CODEOWNERS declares the owner for .agents/evals/**; GitHub branch-protection enforcement is a repository setting and is not claimed as configured by this record.
+
+## DEC-023 — Source-map-js security patch
+
+- **Date:** 2026-10-06
+- **Status:** ACTIVE
+- **Finding:** The transitive development dependency `source-map-js` was pinned at vulnerable version 1.2.1; patched version 1.2.2 is available.
+- **Decision:** Update the lockfile entry to `source-map-js` 1.2.2 without changing application code. Treat the asset build, dependency installation and browser checks as required verification before considering the security finding closed.
+- **Reason:** Remove the known indexed-source-map offset validation denial-of-service exposure while keeping the dependency surface unchanged.
+- **Evidence boundary:** Lockfile change is implemented; CI/runtime verification remains required.
