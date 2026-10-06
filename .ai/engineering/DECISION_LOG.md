@@ -204,3 +204,13 @@ Working commercial hypotheses:
 - **Decision:** Update the lockfile entry to `source-map-js` 1.2.2 without changing application code. Treat the asset build, dependency installation and browser checks as required verification before considering the security finding closed.
 - **Reason:** Remove the known indexed-source-map offset validation denial-of-service exposure while keeping the dependency surface unchanged.
 - **Evidence boundary:** Lockfile change is implemented; CI/runtime verification remains required.
+
+
+## DEC-024 — Execution-first Director interaction
+
+- **Date:** 2026-10-06
+- **Status:** ACTIVE
+- **Finding:** The control plane already required continuous execution, but its owner-facing contract did not explicitly prohibit intention-heavy/status-only interaction. In practice this allowed Jarvis sessions to consume conversational turns on planning/narration instead of repository progress.
+- **Decision:** Owner-issued implementation requests are execution commands by default. After minimum identity and baseline checks, Jarvis must act immediately, continue through safe bounded cycles without re-authorisation, suppress internal reasoning/play-by-play narration, communicate only on meaningful deltas or genuine blockers, and automatically select the next safe target while the mission remains active.
+- **Acceptance rule:** A response that only announces intention, repeats unchanged observations, or asks the owner to re-authorise already authorised work is an execution failure unless a defined stop condition applies.
+- **Reason:** Maximise engineering progress per owner interaction and prevent the Director from behaving like a planning chatbot instead of an active engineering control plane.
