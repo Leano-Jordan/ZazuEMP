@@ -1355,3 +1355,28 @@ Next Director target:
 - Important verification boundary: the user's local checkout is demonstrably behind main for several of these test files because the reported failures contain assertions already corrected on main. Local PHPUnit must be rerun after synchronizing the checkout.
 - pdo_firebird startup messages are PHP warnings and are not the PHPUnit failure cause.
 
+
+
+## Director offline receiving identity correction — 2026-10-06
+
+Target: reconcile offline purchase-receipt mutation identity with the existing purchase-order identity registry.
+
+Finding:
+- purchase receipt application correctly operated on an existing PurchaseOrder, but the generic mutation finalizer then attempted to register the receipt mutation's local UUID as that PurchaseOrder's synchronization identity.
+- This produced the protected error: "A synchronization identity cannot be reassigned to another record or type."
+
+Correction:
+- purchase receipt application now returns no domain record for generic identity registration because the mutation is an operation against an existing purchase order, not a replacement purchase-order identity.
+- Receipt idempotency remains owned by PurchaseOrderReceivingService through the mutation idempotency key.
+- No business-isolation protection was weakened.
+
+Commit: cf1e4e84e67b690b01272154228378476875b28d
+
+Verification boundary:
+- source correction is committed on main;
+- fresh Laravel/quality/PHPMD/Psalm/browser CI runs are queued for this commit;
+- no green result is claimed until those runs complete.
+
+Next target: reconcile current CI evidence, then continue the highest-risk offline foundation target.
+
+Last updated: 2026-10-06
