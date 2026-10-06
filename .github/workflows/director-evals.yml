@@ -1,0 +1,26 @@
+name: Director Control-Plane Evals
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - ".agents/evals/**"
+      - ".ai/engineering/00_ENGINE_ROUTER.md"
+      - "AGENTS.md"
+  pull_request:
+    paths:
+      - ".agents/evals/**"
+      - ".ai/engineering/00_ENGINE_ROUTER.md"
+      - "AGENTS.md"
+
+permissions:
+  contents: read
+
+jobs:
+  eval-contract:
+    name: Validate Director eval contract
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Validate eval scenarios and fixtures
+        run: python3 .agents/evals/validate_director_evals.py
