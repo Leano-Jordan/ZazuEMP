@@ -1,26 +1,32 @@
-name: Director Control-Plane Evals
+name: Director Contract Lint
 
 on:
   push:
     branches: [main]
     paths:
       - ".agents/evals/**"
-      - ".ai/engineering/00_ENGINE_ROUTER.md"
+      - ".ai/engineering/**"
       - "AGENTS.md"
+      - "CLAUDE.md"
+      - "docs/**"
   pull_request:
     paths:
       - ".agents/evals/**"
-      - ".ai/engineering/00_ENGINE_ROUTER.md"
+      - ".ai/engineering/**"
       - "AGENTS.md"
+      - "CLAUDE.md"
+      - "docs/**"
 
 permissions:
   contents: read
 
 jobs:
-  eval-contract:
-    name: Validate Director eval contract
+  contract-lint:
+    name: Director contract lint
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - name: Validate eval scenarios and fixtures
+      - name: Check control-plane formatting
+        run: python3 .agents/evals/check_control_plane_format.py
+      - name: Validate Director eval definitions and fixtures
         run: python3 .agents/evals/validate_director_evals.py
