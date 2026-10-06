@@ -74,6 +74,19 @@ The control system now uses:
 
 See `READINESS_REGISTER.md` for live gate direction.
 
+## Current control-plane head
+
+Director control-plane hardening is now on `main` through commit `912b66c4d70fab817c0a53a7de44aa533ef3260d`.
+
+Changes in this control-plane cycle:
+- Director router deduplicated and tightened around current-state reconciliation.
+- Execution throughput/convergence rules added so unchanged failing checks are not blindly rerun and safe bounded cycles continue without owner repetition.
+- All 12 Director eval scenarios now have explicit fixtures.
+- Static eval-contract validator added.
+- CI guard added for eval-definition/fixture integrity.
+
+Live Director execution remains unavailable through the connected repository environment. The eval contract is therefore **STRUCTURALLY VALIDATED**, not live-Director **PASSED**.
+
 ## Current release-candidate head
 
 Main now contains the completed niche-focus, progressive-disclosure, offline-first architecture and commercial-isolation source cycle from 2026-10-03.
