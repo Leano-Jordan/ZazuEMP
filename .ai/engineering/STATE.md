@@ -56,7 +56,7 @@ Completed in this cycle:
 The earlier browser run for `0a10d05` is not evidence for this final control-plane head. Current-head CI must be observed after this cycle. Record the exact run URL and SHA before closing any pending case.
 
 ## Application gates after control-plane cleanup
-1. Consume current-head Laravel/quality/PHPMD/Psalm/CodeQL/browser CI results.
+1. Resolve CASE-ZAZU-0016–0020 with evidence-first forensics; do not repeat symptom patches.
 2. Close or reclassify CASE-ZAZU-0014 from a serial onboarding run; do not patch authentication/session code from parallel-only evidence.
 3. Complete populated commercial workflow traversal.
 4. Exercise backup/restore.
