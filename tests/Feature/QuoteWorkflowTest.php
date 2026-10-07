@@ -168,7 +168,7 @@ class QuoteWorkflowTest extends TestCase
 
         $view = $this->get($viewUrl);
         $view->assertOk();
-        $view->assertSee('ZAZ-PUBLIC-003');
+        $view->assertSee($quote->reference);
         $view->assertSee('Customer Acceptance');
         $view->assertSee('ZAR 2,500.00');
         $view->assertSee('Accept quote');
