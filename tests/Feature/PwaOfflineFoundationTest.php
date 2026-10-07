@@ -131,6 +131,14 @@ class PwaOfflineFoundationTest extends TestCase
         $this->assertFileDoesNotExist(resource_path('views/offline.blade.php'));
     }
 
+    public function test_invoice_create_form_is_offline_enabled(): void
+    {
+        $view = file_get_contents(resource_path('views/finance/invoice-create.blade.php'));
+
+        $this->assertStringContainsString('data-zazu-offline-entity="invoice"', $view);
+        $this->assertStringContainsString('name="quote_id"', $view);
+    }
+
     public function test_offline_route_no_longer_exposes_a_second_zazu_workspace(): void
     {
         $response = $this->get('/offline');
