@@ -219,8 +219,12 @@ class OfflineSyncFoundationTest extends TestCase
         ]);
 
         $recorder = app(SyncMutationRecorder::class);
-        $recorder->record($sourceDevice, 'event', 'event-1', 'upsert', ['name' => 'First']);
-        $recorder->record($sourceDevice, 'event', 'event-2', 'upsert', ['name' => 'Second']);
+        $first = $recorder->record($sourceDevice, 'event', 'event-1', 'upsert', ['name' => 'First']);
+        $second = $recorder->record($sourceDevice, 'event', 'event-2', 'upsert', ['name' => 'Second']);
+        $first->update(['status' => 'applied', 'applied_at' => now()]);
+        $second->update(['status' => 'applied', 'applied_at' => now()]);
+        $recorder->publish($first);
+        $recorder->publish($second);
 
         $protocol = app(SyncMutationProtocol::class);
         $batch = $protocol->pull($destinationDevice);
@@ -238,6 +242,39 @@ class OfflineSyncFoundationTest extends TestCase
         $this->expectException(\Illuminate\Validation\ValidationException::class);
 
         $protocol->acknowledgeThrough($destinationDevice, 3);
+    }
+
+
+    public function test_pending_mutation_is_not_published_until_applied(): void
+    {
+        $business = Business::create([
+            'name' => 'Publish Gate Business',
+            'slug' => 'publish-gate-'.Str::lower(Str::random(8)),
+            'status' => 'active',
+            'currency' => 'ZAR',
+        ]);
+        $sourceDevice = SyncDevice::create([
+            'business_id' => $business->id,
+            'installation_id' => (string) Str::uuid(),
+        ]);
+        $destinationDevice = SyncDevice::create([
+            'business_id' => $business->id,
+            'installation_id' => (string) Str::uuid(),
+        ]);
+
+        $recorder = app(SyncMutationRecorder::class);
+        $mutation = $recorder->record($sourceDevice, 'event', 'event-race', 'upsert', ['name' => 'Race safe']);
+        $protocol = app(SyncMutationProtocol::class);
+
+        $this->assertCount(0, $protocol->pull($destinationDevice));
+        $this->assertDatabaseCount('sync_deliveries', 0);
+
+        $mutation->update(['status' => 'applied', 'applied_at' => now()]);
+        $recorder->publish($mutation);
+
+        $batch = $protocol->pull($destinationDevice);
+        $this->assertCount(1, $batch);
+        $this->assertSame('event-race', $batch->first()->entity_id);
     }
 
 
