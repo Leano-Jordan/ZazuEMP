@@ -1094,6 +1094,118 @@ class OfflineSyncFoundationTest extends TestCase
 
 
     /** @SuppressWarnings(PHPMD.ExcessiveMethodLength) */
+    public function test_sync_push_orders_reversed_commercial_chain_by_dependency(): void
+    {
+        $business = Business::create([
+            'name' => 'Offline Commercial Ordering Business',
+            'slug' => 'offline-commercial-ordering-'.Str::lower(Str::random(8)),
+            'status' => 'active',
+            'currency' => 'ZAR',
+        ]);
+        $device = SyncDevice::create([
+            'business_id' => $business->id,
+            'installation_id' => (string) Str::uuid(),
+        ]);
+        $event = \App\Models\Event::create([
+            'business_id' => $business->id,
+            'reference' => 'OFF-COMM-001',
+            'name' => 'Offline Commercial Event',
+            'status' => 'draft',
+        ]);
+        $eventIdentity = app(\App\Support\Offline\SyncEntityIdentityRegistry::class)->identify($event, 'job');
+        $quoteLocalId = (string) Str::uuid();
+        $acceptanceLocalId = (string) Str::uuid();
+        $invoiceLocalId = (string) Str::uuid();
+        $paymentLocalId = (string) Str::uuid();
+
+        $quoteMutation = [
+            'id' => (string) Str::uuid(),
+            'entity_type' => 'quote',
+            'entity_id' => $quoteLocalId,
+            'operation' => 'create',
+            'payload' => [
+                'local_id' => $quoteLocalId,
+                'record' => [
+                    'event_local_id' => $eventIdentity->entity_uuid,
+                    'reference' => 'QUO-OFF-COMM-001',
+                    'currency' => 'ZAR',
+                    'status' => 'sent',
+                    'deposit_percent' => '25.00',
+                    'items' => [[
+                        'description' => 'Offline commercial service',
+                        'quantity' => '1.00',
+                        'unit' => 'service',
+                        'unit_price' => '1000.00',
+                    ]],
+                ],
+            ],
+        ];
+        $acceptanceMutation = [
+            'id' => (string) Str::uuid(),
+            'entity_type' => 'quote_acceptance',
+            'entity_id' => $acceptanceLocalId,
+            'operation' => 'create',
+            'payload' => [
+                'local_id' => $acceptanceLocalId,
+                'record' => [
+                    'quote_local_id' => $quoteLocalId,
+                    'customer_name' => 'Offline Customer',
+                ],
+            ],
+        ];
+        $invoiceMutation = [
+            'id' => (string) Str::uuid(),
+            'entity_type' => 'invoice',
+            'entity_id' => $invoiceLocalId,
+            'operation' => 'create',
+            'payload' => [
+                'local_id' => $invoiceLocalId,
+                'record' => [
+                    'quote_local_id' => $quoteLocalId,
+                    'depends_on_local_id' => $acceptanceLocalId,
+                ],
+            ],
+        ];
+        $paymentMutation = [
+            'id' => (string) Str::uuid(),
+            'entity_type' => 'payment',
+            'entity_id' => $paymentLocalId,
+            'operation' => 'create',
+            'payload' => [
+                'local_id' => $paymentLocalId,
+                'record' => [
+                    'invoice_local_id' => $invoiceLocalId,
+                    'type' => 'deposit',
+                    'amount' => '250.00',
+                    'method' => 'bank_transfer',
+                    'paid_at' => now()->toDateString(),
+                ],
+            ],
+        ];
+
+        $request = \Illuminate\Http\Request::create('/api/sync/push', 'POST', [
+            'mutations' => [$paymentMutation, $invoiceMutation, $acceptanceMutation, $quoteMutation],
+        ]);
+        $request->attributes->set('sync_device', $device);
+
+        $response = app(\App\Http\Controllers\SyncController::class)->push(
+            $request,
+            app(SyncMutationRecorder::class),
+            app(SyncMutationApplier::class),
+            app(\App\Support\Offline\OfflineDomainMutationHandler::class),
+        );
+        $data = $response->getData(true);
+
+        $this->assertCount(4, $data['applied']);
+        $this->assertSame([], array_filter($data['recorded'], fn (array $item) => $item['status'] !== 'applied'));
+
+        $invoice = \App\Models\Invoice::query()->where('business_id', $business->id)->firstOrFail();
+        $this->assertSame('1000.00', $invoice->total);
+        $this->assertSame('250.00', $invoice->paid_amount);
+        $this->assertSame('accepted', \App\Models\Quote::query()->whereKey($invoice->quote_id)->value('status'));
+    }
+
+    /** @SuppressWarnings(PHPMD.ExcessiveMethodLength) */
     public function test_offline_finance_can_invoice_accepted_quote_record_payment_and_expense(): void
     {
         $business = Business::create([
