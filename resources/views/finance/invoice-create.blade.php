@@ -14,7 +14,7 @@
             <div class="zazu-card-title">Invoice source</div>
         </div>
 
-        <form method="POST" action="{{ route('finance.invoices.store') }}" class="zazu-form p-5">
+        <form method="POST" action="{{ route('finance.invoices.store') }}" class="zazu-form p-5" data-zazu-offline-entity="invoice">
             @csrf
             <input type="hidden" name="idempotency_key" value="{{ $idempotencyKey }}">
 
