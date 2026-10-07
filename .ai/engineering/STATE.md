@@ -76,3 +76,11 @@ Offline operational depth expanded in current `main` through:
 Current evidence status: **IMPLEMENTED; runtime TESTED/VERIFIED pending execution of the new regression set.** No release score uplift is claimed from source changes alone.
 
 Last updated: 2026-10-07 — offline operational depth and parity hardened; current release gates remain current-head verification, recovery, rollback, legal/privacy and brand closure.
+
+## PHPUnit / offline parity defect cycle — 2026-10-07
+
+- Root cause of PHPUnit exit 255: malformed `catch (\\RuntimeException ...)` syntax in `tests/Feature/OfflineSyncFoundationTest.php`.
+- Adjacent malformed test marker introduced during test-contract editing was also removed before validation.
+- Offline local reconciliation was hardened for payments and purchase receipts so local invoice/payment and inventory state reflects accepted offline actions immediately.
+- Targeted PWA regression assertions now cover those reconciliation boundaries.
+- Current head CI is queued; runtime closure remains pending fresh Laravel/PHPMD/browser results.
