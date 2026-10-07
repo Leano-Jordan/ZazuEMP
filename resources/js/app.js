@@ -1470,7 +1470,8 @@ function setupZazuOfflineForms() {
                 return;
             }
 
-            if (!payload.name && entity !== 'quote') return;
+            const entitiesRequiringName = ['customer', 'job', 'supplier', 'inventory_item', 'asset', 'service'];
+            if (entitiesRequiringName.includes(entity) && !payload.name) return;
 
             const operation = payload.__operation || 'create';
             delete payload.__operation;
