@@ -70,6 +70,18 @@ class PwaOfflineFoundationTest extends TestCase
         $this->assertStringContainsString('await cache.put(new Request(new URL(path, self.location.origin)), response.clone())', $worker);
     }
 
+    public function test_existing_zazu_create_forms_are_marked_for_local_mutation_queueing(): void
+    {
+        $customer = File::get(resource_path('views/customers/create.blade.php'));
+        $job = File::get(resource_path('views/work/create.blade.php'));
+        $quote = File::get(resource_path('views/quotes/create.blade.php'));
+
+        $this->assertStringContainsString('data-zazu-offline-entity="customer"', $customer);
+        $this->assertStringContainsString('data-zazu-offline-entity="job"', $job);
+        $this->assertStringContainsString('data-zazu-offline-entity="quote"', $quote);
+        $this->assertStringContainsString('data-zazu-offline-job-id=', $quote);
+    }
+
     public function test_shared_zazu_local_client_is_real_application_infrastructure_not_a_second_workspace(): void
     {
         $client = File::get(public_path('zazu-offline.js'));
