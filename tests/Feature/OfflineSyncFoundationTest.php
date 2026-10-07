@@ -1115,12 +1115,12 @@ class OfflineSyncFoundationTest extends TestCase
         $quote = \App\Models\Quote::create([
             'event_id' => $event->id,
             'reference' => 'QUO-OFF-FIN-001',
-            'status' => 'accepted',
+            'status' => 'sent',
             'currency' => 'ZAR',
         ]);
         $version = $quote->versions()->create([
             'version' => 1,
-            'status' => 'accepted',
+            'status' => 'sent',
             'subtotal' => '1000.00',
             'tax_total' => '0.00',
             'total' => '1000.00',
@@ -1146,6 +1146,19 @@ class OfflineSyncFoundationTest extends TestCase
         $handler = app(\App\Support\Offline\OfflineDomainMutationHandler::class);
         $recorder = app(SyncMutationRecorder::class);
         $applier = app(SyncMutationApplier::class);
+
+        $acceptanceLocalId = (string) Str::uuid();
+        $acceptanceMutation = $recorder->record($device, 'quote_acceptance', $acceptanceLocalId, 'create', [
+            'local_id' => $acceptanceLocalId,
+            'record' => [
+                'quote_local_id' => $quoteIdentity->entity_uuid,
+                'customer_name' => 'Offline Customer',
+            ],
+        ]);
+        $applier->apply($acceptanceMutation, ['quote_acceptance' => $handler]);
+
+        $this->assertSame('accepted', $quote->fresh()->status);
+        $this->assertSame('accepted', $version->fresh()->status);
 
         $invoiceLocalId = (string) Str::uuid();
         $invoiceMutation = $recorder->record($device, 'invoice', $invoiceLocalId, 'create', [
