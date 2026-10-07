@@ -116,9 +116,10 @@
             local_id: x.local_id,
             id: x.server_id,
             movements: (x.record?.movements || []).map(movement => ({
-                ...movement,
+                ...(movement.record || {}),
                 local_id: movement.local_id,
                 id: movement.server_id,
+                server_id: movement.server_id,
             })),
         }));
         state.assets = (bootstrap.assets || []).map(x => ({
@@ -126,9 +127,10 @@
             local_id: x.local_id,
             id: x.server_id,
             allocations: (x.record?.allocations || []).map(allocation => ({
-                ...allocation,
+                ...(allocation.record || {}),
                 local_id: allocation.local_id,
                 id: allocation.server_id,
+                server_id: allocation.server_id,
             })),
         }));
         state.costs = (bootstrap.costs || []).map(x => ({
