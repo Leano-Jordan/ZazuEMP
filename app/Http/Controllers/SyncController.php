@@ -216,47 +216,72 @@ class SyncController extends Controller
         }
 
         $depth = [];
-        $visit = function (int $index, array $trail = []) use (&$visit, &$depth, $mutations, $byEntityId): int {
-            if (isset($depth[$index])) {
-                return $depth[$index];
-            }
-
-            if (isset($trail[$index])) {
-                return 0;
-            }
-
-            $trail[$index] = true;
-            $max = 0;
-            $payload = $mutations[$index]['payload'] ?? [];
-            $scan = function (mixed $value) use (&$scan, &$max, $trail, $byEntityId, &$visit): void {
-                if (is_array($value)) {
-                    foreach ($value as $key => $child) {
-                        if (is_string($key) && str_ends_with($key, '_local_id') && is_string($child) && isset($byEntityId[$child])) {
-                            $max = max($max, $visit($byEntityId[$child], $trail) + 1);
-                        } else {
-                            $scan($child);
-                        }
-                    }
-                }
-            };
-            $scan($payload);
-            return $depth[$index] = $max;
-        };
-
         foreach (array_keys($mutations) as $index) {
-            $depth[$index] = $visit($index);
+            $depth[$index] = $this->dependencyDepth($index, $mutations, $byEntityId, $depth);
         }
 
-        $indexed = array_values(array_map(
+        $indexed = array_map(
             fn (int $index): array => ['index' => $index, 'mutation' => $mutations[$index]],
             array_keys($mutations),
-        ));
+        );
 
         usort($indexed, function (array $a, array $b) use ($depth): int {
             return ($depth[$a['index']] <=> $depth[$b['index']]) ?: ($a['index'] <=> $b['index']);
         });
 
         return array_column($indexed, 'mutation');
+    }
+
+    /**
+     * @param array<int, array<string, mixed>> $mutations
+     * @param array<string, int> $byEntityId
+     * @param array<int, int> $depth
+     */
+    private function dependencyDepth(int $index, array $mutations, array $byEntityId, array &$depth, array $trail = []): int
+    {
+        if (isset($depth[$index])) {
+            return $depth[$index];
+        }
+
+        if (isset($trail[$index])) {
+            return 0;
+        }
+
+        $trail[$index] = true;
+        $maxDepth = 0;
+
+        foreach ($this->dependencyLocalIds($mutations[$index]['payload'] ?? []) as $localId) {
+            if (isset($byEntityId[$localId])) {
+                $maxDepth = max(
+                    $maxDepth,
+                    $this->dependencyDepth($byEntityId[$localId], $mutations, $byEntityId, $depth, $trail) + 1,
+                );
+            }
+        }
+
+        return $depth[$index] = $maxDepth;
+    }
+
+    /**
+     * @return array<int, string>
+     */
+    private function dependencyLocalIds(mixed $value): array
+    {
+        if (! is_array($value)) {
+            return [];
+        }
+
+        $identities = [];
+        foreach ($value as $key => $child) {
+            if (is_string($key) && str_ends_with($key, '_local_id') && is_string($child)) {
+                $identities[] = $child;
+                continue;
+            }
+
+            $identities = array_merge($identities, $this->dependencyLocalIds($child));
+        }
+
+        return array_values(array_unique($identities));
     }
 
     private function validateSelection(Business $business, array $selection): array
