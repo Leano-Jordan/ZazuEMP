@@ -73,7 +73,7 @@ class OfflineWorkspaceController extends Controller
                 ->values(),
             'quotes' => Quote::query()
                 ->whereHas('event', fn ($query) => $query->where('business_id', $business->id))
-                ->with('event')
+                ->with(['event', 'latestVersion.items'])
                 ->latest('id')
                 ->limit(500)
                 ->get()
@@ -85,6 +85,7 @@ class OfflineWorkspaceController extends Controller
                     'currency' => $quote->currency,
                     'event_id' => $quote->event_id,
                     'event_name' => $quote->event?->name,
+                    'latest_version' => $quote->latestVersion?->toArray(),
                 ])
                 ->values(),
             'suppliers' => Supplier::query()
