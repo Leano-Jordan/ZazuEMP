@@ -13,7 +13,7 @@
     <section class="zazu-card">
         <div class="zazu-card-header"><div class="zazu-card-title">Asset details</div></div>
 
-        <form method="POST" action="{{ isset($asset) ? route('assets.update', $asset) : route('assets.store') }}" class="zazu-form p-5">
+        <form method="POST" action="{{ isset($asset) ? route('assets.update', $asset) : route('assets.store') }}" class="zazu-form p-5" data-zazu-offline-entity="asset" data-zazu-offline-server-id="{{ $asset->id ?? '' }}">
             @csrf
             @if(isset($asset)) @method('PUT') @endif
 

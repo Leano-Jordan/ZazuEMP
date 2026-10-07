@@ -1313,6 +1313,7 @@ class OfflineDomainMutationHandler implements SyncMutationHandler
         $attributes = [
             'business_id' => $mutation->business_id,
             'name' => $this->requiredString($payload['name'] ?? null, 'name', 255),
+            'contact_name' => $this->nullableString($payload['contact_name'] ?? null, 255),
             'email' => $this->nullableString($payload['email'] ?? null, 255),
             'phone' => $this->nullableString($payload['phone'] ?? null, 64),
             'notes' => $this->nullableString($payload['notes'] ?? null, 5000),
