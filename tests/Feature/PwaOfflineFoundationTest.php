@@ -80,6 +80,20 @@ class PwaOfflineFoundationTest extends TestCase
         $this->assertStringContainsString('data-zazu-offline-entity="job"', $job);
         $this->assertStringContainsString('data-zazu-offline-entity="quote"', $quote);
         $this->assertStringContainsString('data-zazu-offline-job-id=', $quote);
+
+        $expense = File::get(resource_path('views/finance/expense-create.blade.php'));
+        $payment = File::get(resource_path('views/finance/payment-create.blade.php'));
+        $preparation = File::get(resource_path('views/preparation/create.blade.php'));
+        $cost = File::get(resource_path('views/costs/create.blade.php'));
+
+        $this->assertStringContainsString('data-zazu-offline-entity="expense"', $expense);
+        $this->assertStringContainsString('data-zazu-offline-entity="payment"', $payment);
+        $this->assertStringContainsString('data-zazu-offline-entity="preparation"', $preparation);
+        $this->assertStringContainsString('data-zazu-offline-entity="event_cost"', $cost);
+        $this->assertStringContainsString("entity === 'expense'", File::get(resource_path('js/app.js')));
+        $this->assertStringContainsString("entity === 'payment'", File::get(resource_path('js/app.js')));
+        $this->assertStringContainsString("entity === 'preparation'", File::get(resource_path('js/app.js')));
+        $this->assertStringContainsString("entity === 'event_cost'", File::get(resource_path('js/app.js')));
     }
 
     public function test_shared_zazu_local_client_is_real_application_infrastructure_not_a_second_workspace(): void
