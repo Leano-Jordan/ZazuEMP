@@ -1047,10 +1047,36 @@ window.addEventListener('popstate', restoreZazuAuthRoute);
 function registerZazuServiceWorker() {
     if (!('serviceWorker' in navigator)) return;
 
+    const primeInstalledPages = (registration) => {
+        const routes = [...new Set(
+            [...document.querySelectorAll('.zazu-sidebar a[href], .zazu-section-tabs a[href]')]
+                .map((link) => {
+                    try {
+                        const url = new URL(link.href, window.location.href);
+                        if (url.origin !== window.location.origin) return null;
+                        if (url.search || url.hash) return null;
+                        if (url.pathname === '/logout' || url.pathname.startsWith('/api/')) return null;
+                        return url.pathname;
+                    } catch {
+                        return null;
+                    }
+                })
+                .filter(Boolean)
+        )];
+
+        const target = navigator.serviceWorker.controller || registration.active;
+        target?.postMessage({ type: 'prime-pages', routes });
+    };
+
     window.addEventListener('load', () => {
-        navigator.serviceWorker.register('/sw.js', { scope: '/' }).catch(() => {
-            // Offline asset support is an enhancement; application behaviour must not depend on it.
-        });
+        navigator.serviceWorker.register('/sw.js', { scope: '/' })
+            .then((registration) => {
+                primeInstalledPages(registration);
+                navigator.serviceWorker.ready.then((ready) => primeInstalledPages(ready));
+            })
+            .catch(() => {
+                // Offline asset support is an enhancement; application behaviour must not depend on it.
+            });
     });
 }
 
