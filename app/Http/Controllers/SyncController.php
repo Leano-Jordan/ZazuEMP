@@ -313,6 +313,7 @@ class SyncController extends Controller
         return $result;
     }
 
+    /** @SuppressWarnings(PHPMD.ExcessiveMethodLength) */
     private function bootstrapPayload(SyncDevice $device): array
     {
         $business = Business::query()->findOrFail($device->business_id);
