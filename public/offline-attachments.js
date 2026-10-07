@@ -1,6 +1,7 @@
 (() => {
     const DB = 'zazu-phone-attachments';
     const STORE = 'files';
+    let flushing = false;
 
     function openAttachmentDb() {
         return new Promise((resolve, reject) => {
@@ -84,15 +85,20 @@
     }
 
     async function flush() {
-        if (!navigator.onLine || !data?.sync?.token) return;
-        await reconcileEventIds();
-        const files = await getFiles();
-        for (const record of files.filter(x => x.status === 'pending' && Number(x.event_id) > 0)) {
-            try {
-                if (await upload(record)) message('Offline attachment synced');
-            } catch (e) {}
+        if (flushing || !navigator.onLine || !data?.sync?.token) return;
+        flushing = true;
+        try {
+            await reconcileEventIds();
+            const files = await getFiles();
+            for (const record of files.filter(x => x.status === 'pending' && Number(x.event_id) > 0)) {
+                try {
+                    if (await upload(record)) message('Offline attachment synced');
+                } catch (e) {}
+            }
+            if (typeof refreshQueueState === 'function') refreshQueueState();
+        } finally {
+            flushing = false;
         }
-        if (typeof refreshQueueState === 'function') refreshQueueState();
     }
 
     async function downloadForEvent(eventId) {
