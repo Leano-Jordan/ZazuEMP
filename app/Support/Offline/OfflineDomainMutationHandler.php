@@ -507,8 +507,12 @@ class OfflineDomainMutationHandler implements SyncMutationHandler
 
         $payload = $this->recordPayload($mutation);
         $event = $this->resolveOfflineEvent($mutation->business_id, $payload['event_local_id'] ?? null);
-        $order = $this->resolveIdentityRecord($mutation->business_id, 'purchase_order', $payload['purchase_order_local_id'] ?? null, PurchaseOrder::class);
-        $supplier = $this->resolveIdentityRecord($mutation->business_id, 'supplier', $payload['supplier_local_id'] ?? null, Supplier::class);
+        $order = array_key_exists('purchase_order_local_id', $payload)
+            ? $this->resolveIdentityRecord($mutation->business_id, 'purchase_order', $payload['purchase_order_local_id'], PurchaseOrder::class)
+            : null;
+        $supplier = array_key_exists('supplier_local_id', $payload)
+            ? $this->resolveIdentityRecord($mutation->business_id, 'supplier', $payload['supplier_local_id'], Supplier::class)
+            : null;
 
         $this->finance->recordExpense($mutation->business_id, $this->businessCurrency($mutation->business_id), [
             'idempotency_key' => $mutation->mutation_id,
