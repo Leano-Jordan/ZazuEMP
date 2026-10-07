@@ -218,13 +218,19 @@ class OfflineDomainMutationHandler implements SyncMutationHandler
             throw ValidationException::withMessages(['lines' => 'At least one purchase order line is required.']);
         }
 
+        $status = $payload['status'] ?? 'draft';
+        if (! in_array($status, ['draft', 'ordered'], true)) {
+            throw ValidationException::withMessages(['status' => 'Offline purchase orders may only be created as draft or ordered.']);
+        }
+
         $order = PurchaseOrder::create([
             'business_id' => $mutation->business_id,
             'event_id' => $event?->id,
             'supplier_id' => $supplier->id,
             'idempotency_key' => $mutation->mutation_id,
             'reference' => 'PO-OFFLINE-'.strtoupper(substr($this->entityUuid($mutation), 0, 8)),
-            'status' => 'draft',
+            'status' => $status,
+            'ordered_at' => $status === 'ordered' ? now()->toDateString() : null,
             'currency' => $currency,
             'expected_at' => $this->nullableDate($payload['expected_at'] ?? null),
             'notes' => $this->nullableString($payload['notes'] ?? null, 5000),
