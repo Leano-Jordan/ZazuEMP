@@ -41,8 +41,7 @@ class PwaOfflineFoundationTest extends TestCase
 
         $app = File::get(resource_path('js/app.js'));
         $this->assertStringContainsString("navigator.serviceWorker.register('/sw.js', { scope: '/' })", $app);
-        $this->assertStringContainsString("target?.postMessage({ type: 'prime-pages', routes })", $app);
-        $this->assertStringContainsString("type: 'set-user', userId", $app);
+        $this->assertStringContainsString("target?.postMessage({ type: 'prime-pages', userId, routes })", $app);
     }
 
     public function test_service_worker_uses_the_real_zazu_shell_and_cached_pages_for_offline_navigation(): void
@@ -55,10 +54,11 @@ class PwaOfflineFoundationTest extends TestCase
         $this->assertStringContainsString("'/offline-attachments.js'", $worker);
         $this->assertStringContainsString('caches.match(request)', $worker);
         $this->assertStringContainsString('cache.put(request, copy)', $worker);
-        $this->assertStringContainsString("event.data?.type === 'set-user'", $worker);
-        $this->assertStringContainsString('function userCacheName()', $worker);
-        $this->assertStringContainsString("CACHE_NAME + '-user-' + activeUserId", $worker);
         $this->assertStringContainsString("event.data?.type !== 'prime-pages'", $worker);
+        $this->assertStringContainsString('function userCacheName()', $worker);
+        $this->assertStringContainsString("const ACTIVE_USER_STATE = new Request('/__zazu-active-user__');", $worker);
+        $this->assertStringContainsString('async function loadActiveUser()', $worker);
+        $this->assertStringContainsString("CACHE_NAME + '-user-' + activeUserId", $worker);
         $this->assertStringContainsString('await cache.put(new Request(new URL(path, self.location.origin)), response.clone())', $worker);
     }
 
