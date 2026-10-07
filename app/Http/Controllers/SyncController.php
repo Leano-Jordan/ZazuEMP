@@ -7,6 +7,9 @@ use App\Models\BusinessCapability;
 use App\Models\Customer;
 use App\Models\Event;
 use App\Models\EventPreparationItem;
+use App\Models\FinanceExpense;
+use App\Models\Invoice;
+use App\Models\Payment;
 use App\Models\PurchaseOrder;
 use App\Models\Quote;
 use App\Models\Supplier;
@@ -395,6 +398,40 @@ class SyncController extends Controller
             ])
             ->values();
 
+        $invoices = Invoice::query()
+            ->where('business_id', $business->id)
+            ->with(['items', 'payments'])
+            ->latest('id')
+            ->limit(500)
+            ->get()
+            ->map(fn (Invoice $invoice) => [
+                'local_id' => $registry->identify($invoice, 'invoice')->entity_uuid,
+                'server_id' => $invoice->id,
+                'record' => array_merge($invoice->toArray(), [
+                    'paid_amount' => $invoice->paid_amount,
+                    'balance' => $invoice->balance,
+                    'items' => $invoice->items->map(fn ($item) => $item->toArray())->values(),
+                    'payments' => $invoice->payments->map(fn (Payment $payment) => [
+                        'local_id' => $registry->identify($payment, 'payment')->entity_uuid,
+                        'server_id' => $payment->id,
+                        'record' => $payment->toArray(),
+                    ])->values(),
+                ]),
+            ])
+            ->values();
+
+        $expenses = FinanceExpense::query()
+            ->where('business_id', $business->id)
+            ->latest('id')
+            ->limit(500)
+            ->get()
+            ->map(fn (FinanceExpense $expense) => [
+                'local_id' => $registry->identify($expense, 'expense')->entity_uuid,
+                'server_id' => $expense->id,
+                'record' => $expense->toArray(),
+            ])
+            ->values();
+
         return [
             'version' => 1,
             'business' => [
@@ -418,6 +455,8 @@ class SyncController extends Controller
                 ->values(),
             'suppliers' => $suppliers,
             'purchase_orders' => $purchaseOrders,
+            'invoices' => $invoices,
+            'expenses' => $expenses,
             'selected' => $selected,
             'device' => [
                 'id' => $device->id,
