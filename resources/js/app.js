@@ -1044,6 +1044,26 @@ async function restoreZazuAuthRoute() {
 
 window.addEventListener('popstate', restoreZazuAuthRoute);
 
+function handleZazuPhonePairing() {
+    if (!window.ZazuOffline || window.ZazuOffline.isPaired()) return;
+
+    const params = new URLSearchParams(window.location.search);
+    if (params.get('zazu-pair') !== '1') return;
+
+    const code = window.prompt('Enter the 6-digit Zazu phone pairing code from the owner Zazu settings.');
+    if (!code) return;
+
+    window.ZazuOffline.pair(code)
+        .then(() => {
+            params.delete('zazu-pair');
+            const query = params.toString();
+            window.location.replace(window.location.pathname + (query ? '?' + query : '') + window.location.hash);
+        })
+        .catch((error) => window.alert(error.message || 'Zazu phone pairing failed.'));
+}
+
+window.addEventListener('zazu:offline-ready', handleZazuPhonePairing);
+
 function registerZazuServiceWorker() {
     if (!('serviceWorker' in navigator)) return;
 
