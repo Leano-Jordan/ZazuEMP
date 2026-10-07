@@ -1435,7 +1435,7 @@ class OfflineSyncFoundationTest extends TestCase
         ]);
 
         $idempotencyKey = (string) Str::uuid();
-        $makeRequest = function () use ($device, $event, $idempotencyKey): \Illuminate\\Http\\Request {
+        $makeRequest = function () use ($device, $event, $idempotencyKey): \Illuminate\Http\Request {
             $request = \Illuminate\Http\Request::create('/api/sync/attachments', 'POST', [
                 'event_id' => $event->id,
                 'idempotency_key' => $idempotencyKey,
