@@ -1327,4 +1327,86 @@ class OfflineSyncFoundationTest extends TestCase
         ]);
     }
 
+    public function test_sync_push_records_rejected_mutations_as_open_conflicts_without_duplicates(): void
+    {
+        $business = Business::create([
+            'name' => 'Conflict Push Business',
+            'slug' => 'conflict-push-' . Str::lower(Str::random(8)),
+            'status' => 'active',
+            'currency' => 'ZAR',
+        ]);
+
+        $device = SyncDevice::create([
+            'business_id' => $business->id,
+            'installation_id' => (string) Str::uuid(),
+        ]);
+
+        $mutationId = (string) Str::uuid();
+        $localId = (string) Str::uuid();
+
+        $request = \Illuminate\Http\Request::create('/api/sync/push', 'POST', [
+            'mutations' => [[
+                'id' => $mutationId,
+                'entity_type' => 'customer',
+                'entity_id' => $localId,
+                'operation' => 'create',
+                'payload' => [
+                    'local_id' => $localId,
+                    'record' => [
+                        'name' => '',
+                    ],
+                ],
+            ]],
+        ]);
+        $request->attributes->set('sync_device', $device);
+
+        $response = app(\App\Http\Controllers\SyncController::class)->push(
+            $request,
+            app(SyncMutationRecorder::class),
+            app(SyncMutationApplier::class),
+            app(\App\Support\Offline\OfflineDomainMutationHandler::class),
+            app(SyncConflictRecorder::class),
+        );
+        $data = $response->getData(true);
+
+        $conflict = \App\Models\SyncConflict::query()
+            ->where('business_id', $business->id)
+            ->where('mutation_id', $mutationId)
+            ->firstOrFail();
+
+        $this->assertSame('pending', $data['recorded'][0]['status']);
+        $this->assertSame($conflict->id, $data['recorded'][0]['conflict_id']);
+        $this->assertSame('open', $conflict->status);
+        $this->assertSame('domain_rejection', $conflict->conflict_type);
+
+        $secondRequest = \Illuminate\Http\Request::create('/api/sync/push', 'POST', [
+            'mutations' => [[
+                'id' => $mutationId,
+                'entity_type' => 'customer',
+                'entity_id' => $localId,
+                'operation' => 'create',
+                'payload' => [
+                    'local_id' => $localId,
+                    'record' => [
+                        'name' => '',
+                    ],
+                ],
+            ]],
+        ]);
+        $secondRequest->attributes->set('sync_device', $device);
+
+        app(\App\Http\Controllers\SyncController::class)->push(
+            $secondRequest,
+            app(SyncMutationRecorder::class),
+            app(SyncMutationApplier::class),
+            app(\App\Support\Offline\OfflineDomainMutationHandler::class),
+            app(SyncConflictRecorder::class),
+        );
+
+        $this->assertSame(1, \App\Models\SyncConflict::query()
+            ->where('business_id', $business->id)
+            ->where('mutation_id', $mutationId)
+            ->count());
+    }
+
 }
