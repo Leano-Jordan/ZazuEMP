@@ -64,7 +64,7 @@ Current main now contains phone-local and server synchronization coverage for in
 
 Evidence boundary: IMPLEMENTED only for this new cycle until the current regression suite executes successfully in CI/runtime. No numerical readiness uplift is claimed from source changes alone.
 
-Remaining offline gaps: attachment synchronization, explicit conflict detection/resolution, and full disconnected parity across every desktop capability.
+Remaining offline gaps: runtime/device proof, broader disconnected parity across every desktop capability, and full recovery/real-world sync proof. Attachment synchronization and explicit conflict detection/resolution are now implemented and covered by targeted tests.
 
 Last updated: 2026-10-07
 
@@ -193,7 +193,7 @@ Last updated: 2026-10-03
 - Primary niche is explicitly non-exclusive: it controls emphasis, while active business capabilities determine supporting niche signals.
 - Sound & DJ was used as the reference niche; overlapping Chairs & tents capabilities remain visible when the business catalogue supports them.
 - Offline-first is now an explicit architecture contract in `docs/ZAZU_OFFLINE_FIRST_ARCHITECTURE.md`.
-- Static PWA caching and local licensing remain foundations; full disconnected phone data/write/sync capability is not claimed.
+- Static PWA caching and local licensing remain foundations; broad disconnected phone data/write/sync capability is now implemented in the workspace, but final release claims remain gated on runtime/device evidence and broader parity/recovery proof.
 - Commercial isolation source audit found no justified application rewrite. Active-business context, route-bound ownership, model save protection, parent/child database constraints, search scoping and private media checks are present.
 - Additional adversarial coverage was added for foreign search results and foreign attachment downloads.
 - Latest main-head CI workflows are queued, so current-head runtime/CI verification remains pending.
