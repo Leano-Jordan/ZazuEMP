@@ -230,6 +230,7 @@ class OfflineOperationalDepthTest extends TestCase
         $applier->apply($create, ['asset_allocation' => $handler]);
 
         $this->assertSame('allocated', $asset->fresh()->status);
+        $this->assertSame(1, $asset->allocations()->where('status', 'allocated')->count());
         $allocation = $asset->allocations()->firstOrFail();
         $allocationIdentity = $registry->identify($allocation, 'asset_allocation')->entity_uuid;
 
