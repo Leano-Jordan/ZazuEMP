@@ -131,6 +131,7 @@
             const record = {
                 idempotency_key: crypto.randomUUID(),
                 event_id: eventId,
+                event_local_id: eventLocalId,
                 original_name: file.name,
                 description: document.getElementById('attachment-description').value.trim(),
                 status: 'pending',
@@ -147,8 +148,10 @@
     async function listAttachments() {
         const target = document.getElementById('attachment-list');
         if (!target) return;
-        const eventId = Number(document.getElementById('attachment-event')?.value || 0);
-        const files = (await getFiles()).filter(x => Number(x.event_id) === eventId);
+        const selectedEvent = (data.events || []).find(x => Number(x.id) === Number(document.getElementById('attachment-event')?.value || 0));
+        const eventId = Number(selectedEvent?.id || 0);
+        const eventLocalId = selectedEvent?.local_id || null;
+        const files = (await getFiles()).filter(x => Number(x.event_id) === eventId || (eventLocalId && x.event_local_id === eventLocalId));
         target.innerHTML = files.length ? files.map((x, i) =>
             '<div class="row"><div><strong>' + esc(x.original_name) + '</strong><span>' +
             esc(x.status === 'pending' ? 'Waiting for connection' : 'Stored on this phone') +
