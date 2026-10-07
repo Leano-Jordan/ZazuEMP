@@ -5,6 +5,9 @@ namespace App\Http\Controllers;
 use App\Models\BusinessCapability;
 use App\Models\Customer;
 use App\Models\Event;
+use App\Models\FinanceExpense;
+use App\Models\Invoice;
+use App\Models\Payment;
 use App\Models\PurchaseOrder;
 use App\Models\Quote;
 use App\Models\Supplier;
@@ -130,6 +133,69 @@ class OfflineWorkspaceController extends Controller
                         'unit_price' => $item->unit_price,
                         'line_total' => $item->line_total,
                     ])->values(),
+                ])
+                ->values(),
+            'invoices' => Invoice::query()
+                ->where('business_id', $business->id)
+                ->with(['items', 'payments'])
+                ->latest('id')
+                ->limit(500)
+                ->get()
+                ->map(fn (Invoice $invoice) => [
+                    'id' => $invoice->id,
+                    'local_id' => $registry->identify($invoice, 'invoice')->entity_uuid,
+                    'number' => $invoice->number,
+                    'event_id' => $invoice->event_id,
+                    'quote_id' => $invoice->quote_id,
+                    'quote_version_id' => $invoice->quote_version_id,
+                    'status' => $invoice->status,
+                    'currency' => $invoice->currency,
+                    'subtotal' => $invoice->subtotal,
+                    'tax_total' => $invoice->tax_total,
+                    'total' => $invoice->total,
+                    'paid_amount' => $invoice->paid_amount,
+                    'balance' => $invoice->balance,
+                    'issued_at' => $invoice->issued_at?->toDateString(),
+                    'due_at' => $invoice->due_at?->toDateString(),
+                    'notes' => $invoice->notes,
+                    'items' => $invoice->items->map(fn ($item) => [
+                        'id' => $item->id,
+                        'description' => $item->description,
+                        'quantity' => $item->quantity,
+                        'unit' => $item->unit,
+                        'unit_price' => $item->unit_price,
+                        'line_total' => $item->line_total,
+                    ])->values(),
+                    'payments' => $invoice->payments->map(fn (Payment $payment) => [
+                        'id' => $payment->id,
+                        'local_id' => $registry->identify($payment, 'payment')->entity_uuid,
+                        'type' => $payment->type,
+                        'amount' => $payment->amount,
+                        'currency' => $payment->currency,
+                        'method' => $payment->method,
+                        'reference' => $payment->reference,
+                        'paid_at' => $payment->paid_at?->toDateString(),
+                    ])->values(),
+                ])
+                ->values(),
+            'expenses' => FinanceExpense::query()
+                ->where('business_id', $business->id)
+                ->latest('id')
+                ->limit(500)
+                ->get()
+                ->map(fn (FinanceExpense $expense) => [
+                    'id' => $expense->id,
+                    'local_id' => $registry->identify($expense, 'expense')->entity_uuid,
+                    'event_id' => $expense->event_id,
+                    'supplier_id' => $expense->supplier_id,
+                    'purchase_order_id' => $expense->purchase_order_id,
+                    'description' => $expense->description,
+                    'amount' => $expense->amount,
+                    'currency' => $expense->currency,
+                    'expense_date' => $expense->expense_date?->toDateString(),
+                    'status' => $expense->status,
+                    'reference' => $expense->reference,
+                    'notes' => $expense->notes,
                 ])
                 ->values(),
             'capabilities' => BusinessCapability::query()
