@@ -71,6 +71,10 @@ class PwaOfflineFoundationTest extends TestCase
         $this->assertStringContainsString("const offlineShell = cache ? await cache.match(new Request(new URL(OFFLINE_SHELL, self.location.origin))) : null;", $worker);
         $this->assertStringNotContainsString("return cachedPage || caches.match(OFFLINE_SHELL);", $worker);
         $this->assertStringContainsString("event.data?.type !== 'prime-pages'", $worker);
+        $this->assertStringContainsString('const MAX_PRIME_ROUTES = 100;', $worker);
+        $this->assertStringContainsString('const PRIME_CONCURRENCY = 6;', $worker);
+        $this->assertStringContainsString('.slice(0, MAX_PRIME_ROUTES)', $worker);
+        $this->assertStringContainsString('for (let offset = 0; offset < uniqueRoutes.length; offset += PRIME_CONCURRENCY)', $worker);
         $this->assertStringContainsString('function userCacheName()', $worker);
         $this->assertStringContainsString("const ACTIVE_USER_STATE = new Request('/__zazu-active-user__');", $worker);
         $this->assertStringContainsString('async function loadActiveUser()', $worker);
@@ -129,7 +133,6 @@ class PwaOfflineFoundationTest extends TestCase
 
         $inventory = File::get(resource_path('views/inventory/index.blade.php'));
 
-        $this->assertStringContainsString('data-zazu-offline-entity="inventory_movement"', $inventory);
         $this->assertStringContainsString('data-zazu-offline-entity="inventory_movement"', $inventory);
         $this->assertStringContainsString("entity === 'service'", $app);
         $this->assertStringContainsString("entity === 'inventory_movement'", $app);
