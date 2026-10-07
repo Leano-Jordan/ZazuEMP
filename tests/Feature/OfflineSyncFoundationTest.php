@@ -695,6 +695,14 @@ class OfflineSyncFoundationTest extends TestCase
         ]);
         $supplierIdentity = app(\App\Support\Offline\SyncEntityIdentityRegistry::class)
             ->identify($supplier, 'supplier');
+        $event = \App\Models\Event::create([
+            'business_id' => $business->id,
+            'reference' => 'OFF-CHAIN-001',
+            'name' => 'Offline Chain Event',
+            'status' => 'draft',
+        ]);
+        $eventIdentity = app(\App\Support\Offline\SyncEntityIdentityRegistry::class)
+            ->identify($event, 'job');
 
         $orderLocalId = (string) Str::uuid();
         $lineLocalId = (string) Str::uuid();
@@ -708,6 +716,7 @@ class OfflineSyncFoundationTest extends TestCase
                 'local_id' => $orderLocalId,
                 'record' => [
                     'supplier_local_id' => $supplierIdentity->entity_uuid,
+                    'event_local_id' => $eventIdentity->entity_uuid,
                     'currency' => 'ZAR',
                     'status' => 'ordered',
                     'lines' => [[
@@ -763,6 +772,7 @@ class OfflineSyncFoundationTest extends TestCase
             ->firstOrFail();
         $this->assertSame('3.00', $movement->quantity);
         $this->assertSame('100.00', $movement->unit_cost);
+        $this->assertSame($event->id, $movement->event_id);
     }
 
     public function test_offline_purchase_receipts_support_partial_then_final_receipt_without_duplicate_inventory(): void
