@@ -1,4 +1,4 @@
-const CACHE_NAME = 'zazu-static-v10';
+const CACHE_NAME = 'zazu-static-v11';
 const OFFLINE_SHELL = '/dashboard';
 let activeUserId = null;
 const ACTIVE_USER_STATE = new Request('/__zazu-active-user__');
@@ -6,6 +6,7 @@ const ACTIVE_USER_STATE = new Request('/__zazu-active-user__');
 const PRECACHE_ASSETS = [
     '/manifest.webmanifest',
     '/offline-attachments.js',
+    '/zazu-offline.js',
     '/icons/zazu-192.svg',
     '/icons/zazu-512.svg',
     '/images/landing/stock/hero.jpg',
