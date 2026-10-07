@@ -404,3 +404,18 @@ Last updated: 2026-10-06
 ### 2026-10-07 — offline attachment evidence boundary
 
 Jarvis added the attachment transfer layer to the offline implementation. Repository evidence now covers business-scoped listing, upload/download endpoints, idempotency, separate local binary storage, and online retry wiring. Runtime/device proof remains a release gate; this change does not by itself certify physical-device offline recovery.
+
+## Offline parity hardening — 2026-10-07
+
+Current main closed several source-level offline workflow gaps without creating a second UI/workspace:
+- quote acceptance is locally queueable against the existing accepted-status action;
+- purchasing receipt is locally queueable against the existing receiving form;
+- asset allocation/return uses the existing asset controls and offline allocation contract;
+- service edits reuse the existing service editor and preserve the existing offline service contract;
+- offline submit validation no longer rejects legitimate mutations merely because they lack a `name` field;
+- inventory movement and asset allocation bootstrap data are normalized into the same local record shape as the other synced collections;
+- the purchasing receipt idempotency UUID helper typo is corrected.
+
+Relevant main commits: `34d3cc7`, `9e6c6a0`, `31ba0d6`, `127ee92`, `94921ed`, `dc435ad`.
+
+Evidence boundary: **IMPLEMENTED / targeted source regression added; current-head runtime and CI evidence remains pending**. GitHub Actions for the current main head are queued.
