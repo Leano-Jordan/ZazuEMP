@@ -1260,6 +1260,46 @@ function setupZazuOfflineForms() {
                     status: get('status') || 'planned',
                     notes: get('notes') || null,
                 };
+            }            } else if (entity === 'service') {
+                payload = {
+                    local_id: localId,
+                    server_id: null,
+                    name: get('name'),
+                    capability_type: get('capability_type') || 'service',
+                    pricing_basis: get('pricing_basis') || 'custom',
+                    default_price: get('default_price') || null,
+                    currency: get('currency') || 'ZAR',
+                    default_unit: get('default_unit') || null,
+                    description: get('description') || null,
+                    category: form.querySelector('input[name="category"]:checked')?.value || null,
+                    active: form.querySelector('input[name="is_active"]')?.checked !== false,
+                };
+            } else if (entity === 'inventory_movement') {
+                const state = window.ZazuOffline.getState();
+                const itemServerId = form.dataset.zazuOfflineItemId;
+                const item = state?.inventory_items?.find(record => Number(record.id ?? record.server_id) === Number(itemServerId));
+                if (!item?.local_id) {
+                    window.alert('This inventory item is not available in this device copy yet.');
+                    return;
+                }
+                const eventServerId = get('event_id');
+                const event = eventServerId ? state?.jobs?.find(record => Number(record.id ?? record.server_id) === Number(eventServerId)) : null;
+                if (eventServerId && !event?.local_id) {
+                    window.alert('This job is not available in this device copy yet.');
+                    return;
+                }
+                payload = {
+                    local_id: localId,
+                    server_id: null,
+                    inventory_item_local_id: item.local_id,
+                    type: get('type'),
+                    quantity: get('quantity'),
+                    unit_cost: get('unit_cost'),
+                    movement_date: get('movement_date'),
+                    reference: get('reference') || null,
+                    notes: get('notes') || null,
+                    event_local_id: event?.local_id || null,
+                };
             }            } else if (entity === 'purchase_order') {
                 const state = window.ZazuOffline.getState();
                 const supplierId = get('supplier_id');
@@ -1334,6 +1374,7 @@ function setupZazuOfflineForms() {
                 expense: state.expenses,
                 preparation: state.preparations,
                 event_cost: state.costs,
+                service: state.catalogue,
             };
             const collection = collections[entity];
             if (collection) {
