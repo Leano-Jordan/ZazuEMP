@@ -11,5 +11,6 @@ Route::middleware([AuthenticateSyncDevice::class, 'throttle:sync'])->prefix('syn
     Route::post('/acknowledge', [SyncController::class, 'acknowledge']);
     Route::post('/push', [SyncController::class, 'push']);
     Route::post('/attachments', [SyncController::class, 'uploadAttachment']);
+    Route::get('/attachments', [SyncController::class, 'listAttachments']);
     Route::get('/attachments/{attachment}', [SyncController::class, 'downloadAttachment']);
 });
