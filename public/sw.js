@@ -133,9 +133,6 @@ async function primePages(routes) {
         .filter((path) => typeof path === 'string' && path.startsWith('/') && !path.startsWith('/api/'))
         .slice(0, 30);
 
-    const cache = await dynamicCache();
-    if (!cache) return;
-
     await Promise.all(uniqueRoutes.map(async (path) => {
         try {
             const request = new Request(new URL(path, self.location.origin), {
@@ -157,6 +154,9 @@ async function primePages(routes) {
             if (pageUserId !== activeUserId) {
                 await setUser(pageUserId);
             }
+
+            const cache = await dynamicCache();
+            if (!cache) return;
 
             await cache.put(new Request(new URL(path, self.location.origin)), response.clone());
         } catch {
