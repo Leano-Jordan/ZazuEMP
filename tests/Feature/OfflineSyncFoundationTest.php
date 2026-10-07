@@ -913,4 +913,106 @@ class OfflineSyncFoundationTest extends TestCase
         $this->assertSame('0.00', $foreignLine->fresh()->received_quantity);
     }
 
+
+    public function test_sync_push_orders_purchase_receipt_after_parent_purchase_order_even_when_batch_is_reversed(): void
+    {
+        $business = Business::create([
+            'name' => 'Offline Push Ordering Business',
+            'slug' => 'offline-push-ordering-'.Str::lower(Str::random(8)),
+            'status' => 'active',
+            'currency' => 'ZAR',
+        ]);
+
+        $device = SyncDevice::create([
+            'business_id' => $business->id,
+            'installation_id' => (string) Str::uuid(),
+        ]);
+
+        $supplier = \App\Models\Supplier::create([
+            'business_id' => $business->id,
+            'name' => 'Offline Push Supplier',
+        ]);
+        $supplierIdentity = app(\App\Support\Offline\SyncEntityIdentityRegistry::class)
+            ->identify($supplier, 'supplier');
+
+        $purchaseOrderLocalId = (string) Str::uuid();
+        $lineLocalId = (string) Str::uuid();
+        $receiptLocalId = (string) Str::uuid();
+
+        $purchaseOrderMutation = [
+            'id' => (string) Str::uuid(),
+            'entity_type' => 'purchase_order',
+            'entity_id' => $purchaseOrderLocalId,
+            'operation' => 'create',
+            'payload' => [
+                'local_id' => $purchaseOrderLocalId,
+                'record' => [
+                    'supplier_local_id' => $supplierIdentity->entity_uuid,
+                    'currency' => 'ZAR',
+                    'status' => 'ordered',
+                    'lines' => [[
+                        'local_id' => $lineLocalId,
+                        'description' => 'Offline batch chairs',
+                        'quantity' => 4,
+                        'unit' => 'units',
+                        'unit_price' => 100.00,
+                    ]],
+                ],
+            ],
+        ];
+
+        $receiptMutation = [
+            'id' => (string) Str::uuid(),
+            'entity_type' => 'purchase_receipt',
+            'entity_id' => $receiptLocalId,
+            'operation' => 'create',
+            'payload' => [
+                'local_id' => $receiptLocalId,
+                'record' => [
+                    'purchase_order_local_id' => $purchaseOrderLocalId,
+                    'received_quantities' => [
+                        $lineLocalId => '4.00',
+                    ],
+                ],
+            ],
+        ];
+
+        $request = \Illuminate\Http\Request::create('/api/sync/push', 'POST', [
+            'mutations' => [$receiptMutation, $purchaseOrderMutation],
+        ]);
+        $request->attributes->set('sync_device', $device);
+
+        $response = app(\App\Http\Controllers\SyncController::class)->push(
+            $request,
+            app(SyncMutationRecorder::class),
+            app(SyncMutationApplier::class),
+            app(\App\Support\Offline\OfflineDomainMutationHandler::class),
+        );
+
+        $data = $response->getData(true);
+
+        $this->assertSame(2, count($data['recorded']));
+        $this->assertCount(2, $data['applied']);
+        $this->assertSame([], array_filter($data['recorded'], fn (array $item) => $item['status'] !== 'applied'));
+
+        $order = \App\Models\PurchaseOrder::query()
+            ->where('business_id', $business->id)
+            ->where('reference', 'PO-OFFLINE-'.strtoupper(substr($purchaseOrderLocalId, 0, 8)))
+            ->firstOrFail();
+
+        $line = $order->items()->firstOrFail();
+
+        $this->assertSame('received', $order->status);
+        $this->assertSame('4.00', $line->received_quantity);
+        $this->assertSame(1, \App\Models\InventoryMovement::query()
+            ->where('business_id', $business->id)
+            ->where('reference_type', 'purchase_order')
+            ->where('reference_id', $order->id)
+            ->count());
+        $this->assertSame(0, \App\Models\SyncMutation::query()
+            ->where('business_id', $business->id)
+            ->where('status', 'pending')
+            ->count());
+    }
+
 }
