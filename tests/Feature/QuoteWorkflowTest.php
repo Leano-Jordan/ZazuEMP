@@ -185,7 +185,7 @@ class QuoteWorkflowTest extends TestCase
         ])->assertRedirect();
 
         $this->assertSame('accepted', $quote->fresh()->status);
-        $this->assertSame('accepted', $quote->latestVersion()->fresh()->status);
+        $this->assertSame('accepted', $quote->latestVersion()->firstOrFail()->fresh()->status);
     }
 
     public function test_quote_revision_rebuilds_from_current_requirements_and_preserves_previous_snapshot_until_saved(): void
