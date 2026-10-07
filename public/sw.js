@@ -5,7 +5,6 @@ const PRECACHE_ASSETS = [
     OFFLINE_SHELL,
     '/manifest.webmanifest',
     '/offline-attachments.js',
-    '/offline',
     '/icons/zazu-192.svg',
     '/icons/zazu-512.svg',
     '/images/landing/stock/hero.jpg',
@@ -73,13 +72,16 @@ self.addEventListener('fetch', (event) => {
         event.respondWith(
             fetch(request)
                 .then((response) => {
-                    if (response.ok && url.pathname === OFFLINE_SHELL) {
+                    if (response.ok) {
                         const copy = response.clone();
-                        caches.open(CACHE_NAME).then((cache) => cache.put(OFFLINE_SHELL, copy));
+                        caches.open(CACHE_NAME).then((cache) => cache.put(request, copy));
                     }
                     return response;
                 })
-                .catch(() => caches.match(OFFLINE_SHELL))
+                .catch(async () => {
+                    const cachedPage = await caches.match(request);
+                    return cachedPage || caches.match(OFFLINE_SHELL);
+                })
         );
         return;
     }
