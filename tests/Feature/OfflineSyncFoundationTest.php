@@ -462,6 +462,7 @@ class OfflineSyncFoundationTest extends TestCase
         ]);
         $supplierIdentity = app(\App\Support\Offline\SyncEntityIdentityRegistry::class)->identify($supplier, 'supplier');
         $localId = (string) Str::uuid();
+        $lineLocalId = (string) Str::uuid();
 
         $mutation = app(SyncMutationRecorder::class)->record(
             $device,
@@ -475,7 +476,7 @@ class OfflineSyncFoundationTest extends TestCase
                     'currency' => 'ZAR',
                     'notes' => 'Offline replenishment',
                     'lines' => [
-                        ['description' => 'Folding chairs', 'quantity' => 20, 'unit' => 'units', 'unit_price' => 125.00],
+                        ['local_id' => $lineLocalId, 'description' => 'Folding chairs', 'quantity' => 20, 'unit' => 'units', 'unit_price' => 125.00],
                     ],
                 ],
             ],
@@ -498,6 +499,11 @@ class OfflineSyncFoundationTest extends TestCase
             ->value('total_amount'));
         $this->assertSame(1, \App\Models\PurchaseOrderItem::query()
             ->where('business_id', $business->id)
+            ->count());
+        $this->assertSame(1, \App\Models\SyncEntityIdentity::query()
+            ->where('business_id', $business->id)
+            ->where('entity_type', 'purchase_order_item')
+            ->where('entity_uuid', $lineLocalId)
             ->count());
     }
 
@@ -587,6 +593,7 @@ class OfflineSyncFoundationTest extends TestCase
             'line_total' => '500.00',
         ]);
         $orderIdentity = app(\App\Support\Offline\SyncEntityIdentityRegistry::class)->identify($order, 'purchase_order');
+        $lineIdentity = app(\App\Support\Offline\SyncEntityIdentityRegistry::class)->identify($line, 'purchase_order_item');
         $mutationId = (string) Str::uuid();
 
         $receiptLocalId = (string) Str::uuid();
@@ -599,7 +606,7 @@ class OfflineSyncFoundationTest extends TestCase
                 'local_id' => $receiptLocalId,
                 'record' => [
                     'purchase_order_local_id' => $orderIdentity->entity_uuid,
-                    'received_quantities' => [$line->id => '4.00'],
+                    'received_quantities' => [$lineIdentity->entity_uuid => '4.00'],
                 ],
             ],
             $mutationId,
