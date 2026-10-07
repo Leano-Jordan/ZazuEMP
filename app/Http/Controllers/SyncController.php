@@ -171,7 +171,7 @@ class SyncController extends Controller
         $recorded = [];
         $applied = [];
 
-        foreach ($validated['mutations'] as $item) {
+        foreach ($this->orderMutationsByDependencies($validated['mutations']) as $item) {
             $mutation = $recorder->record($device, $item['entity_type'], $item['entity_id'], $item['operation'], $item['payload'] ?? [], $item['id']);
 
             try {
@@ -200,6 +200,63 @@ class SyncController extends Controller
             'applied' => $applied,
             'message' => 'Supported offline mutations are applied idempotently; unsupported or rejected mutations remain queued with an error for later handling.',
         ]);
+    }
+
+    /**
+     * Keep dependent offline mutations behind mutations that create their referenced local identities.
+     *
+     * @param array<int, array<string, mixed>> $mutations
+     * @return array<int, array<string, mixed>>
+     */
+    private function orderMutationsByDependencies(array $mutations): array
+    {
+        $byEntityId = [];
+        foreach ($mutations as $index => $mutation) {
+            $byEntityId[$mutation['entity_id']] = $index;
+        }
+
+        $depth = [];
+        $visit = function (int $index, array $trail = []) use (&$visit, &$depth, $mutations, $byEntityId): int {
+            if (isset($depth[$index])) {
+                return $depth[$index];
+            }
+
+            if (isset($trail[$index])) {
+                return 0;
+            }
+
+            $trail[$index] = true;
+            $max = 0;
+            $payload = $mutations[$index]['payload'] ?? [];
+            $scan = function (mixed $value) use (&$scan, &$max, $trail, $byEntityId, &$visit): void {
+                if (is_array($value)) {
+                    foreach ($value as $key => $child) {
+                        if (is_string($key) && str_ends_with($key, '_local_id') && is_string($child) && isset($byEntityId[$child])) {
+                            $max = max($max, $visit($byEntityId[$child], $trail) + 1);
+                        } else {
+                            $scan($child);
+                        }
+                    }
+                }
+            };
+            $scan($payload);
+            return $depth[$index] = $max;
+        };
+
+        foreach (array_keys($mutations) as $index) {
+            $depth[$index] = $visit($index);
+        }
+
+        $indexed = array_values(array_map(
+            fn (int $index): array => ['index' => $index, 'mutation' => $mutations[$index]],
+            array_keys($mutations),
+        ));
+
+        usort($indexed, function (array $a, array $b) use ($depth): int {
+            return ($depth[$a['index']] <=> $depth[$b['index']]) ?: ($a['index'] <=> $b['index']);
+        });
+
+        return array_column($indexed, 'mutation');
     }
 
     private function validateSelection(Business $business, array $selection): array
