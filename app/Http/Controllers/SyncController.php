@@ -286,7 +286,11 @@ class SyncController extends Controller
                 'local_id' => $registry->identify($order, 'purchase_order')->entity_uuid,
                 'server_id' => $order->id,
                 'record' => $order->toArray(),
-                'items' => $order->items->map(fn ($item) => $item->toArray())->values(),
+                'items' => $order->items->map(fn ($item) => [
+                    'local_id' => $registry->identify($item, 'purchase_order_item')->entity_uuid,
+                    'server_id' => $item->id,
+                    'record' => $item->toArray(),
+                ])->values(),
             ])
             ->values();
 
