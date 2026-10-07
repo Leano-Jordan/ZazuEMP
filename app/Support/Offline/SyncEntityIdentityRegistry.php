@@ -109,16 +109,40 @@ class SyncEntityIdentityRegistry
 
         $this->validateRecordCoordinates($record, $recordId);
 
-        $businessId = $record->getAttribute('business_id');
-        $persistedBusinessId = $record->newQueryWithoutScopes()
-            ->whereKey($recordId)
-            ->value('business_id');
+        $businessId = $this->resolveBusinessId($record);
+        $persistedBusinessId = $this->resolvePersistedBusinessId($record, $recordId);
         $recordType = $record->getMorphClass();
 
         $this->validateBusinessCoordinates($businessId, $persistedBusinessId, $recordType);
         $this->validateEntityType($entityType);
 
         return [(int) $businessId, $recordType, (int) $recordId];
+    }
+
+    private function resolveBusinessId(Model $record): mixed
+    {
+        if ($record->getAttribute('business_id') !== null) {
+            return $record->getAttribute('business_id');
+        }
+
+        if (method_exists($record, 'event')) {
+            return $record->event()->withTrashed()->value('business_id');
+        }
+
+        return null;
+    }
+
+    private function resolvePersistedBusinessId(Model $record, int $recordId): mixed
+    {
+        if ($record->getAttribute('business_id') !== null) {
+            return $record->newQueryWithoutScopes()->whereKey($recordId)->value('business_id');
+        }
+
+        if (method_exists($record, 'event')) {
+            return $record->event()->withTrashed()->value('business_id');
+        }
+
+        return null;
     }
 
     private function validateRecordCoordinates(Model $record, mixed $recordId): void
