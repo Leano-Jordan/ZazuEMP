@@ -27,7 +27,7 @@
             </div>
         </div>
 
-        <form method="POST" action="{{ route('purchasing.store') }}" class="zazu-form p-5" id="purchase-order-form">
+        <form method="POST" action="{{ route('purchasing.store') }}" class="zazu-form p-5" id="purchase-order-form" data-zazu-offline-entity="purchase_order">
             @csrf
             <input type="hidden" name="idempotency_key" value="{{ $idempotencyKey }}">
 
