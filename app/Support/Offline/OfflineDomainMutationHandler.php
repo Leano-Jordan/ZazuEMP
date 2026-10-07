@@ -488,7 +488,19 @@ class OfflineDomainMutationHandler implements SyncMutationHandler
             ->where('entity_uuid', Str::lower($uuid))
             ->first();
 
-        return $identity ? $model::query()->where('business_id', $businessId)->find($identity->record_id) : null;
+        if (! $identity) {
+            return null;
+        }
+
+        $query = $model::query()->whereKey($identity->record_id);
+
+        if ($entityType === 'quote') {
+            $query->whereHas('event', fn ($event) => $event->where('business_id', $businessId));
+        } else {
+            $query->where('business_id', $businessId);
+        }
+
+        return $query->first();
     }
 
     private function businessCurrency(int $businessId): string
