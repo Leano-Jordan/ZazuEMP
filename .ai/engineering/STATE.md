@@ -32,7 +32,7 @@ Verified gates:
 - Current-head populated upgrade/rollback CI: GREEN.
 - Populated commercial financial chain automated coverage: GREEN.
 
-Next hard gate: **customer-environment backup/restore proof**.
+Next hard gate: **customer-environment backup/restore proof** after the newly added offline operational-depth regression set is executed and reconciled.
 
 Physical device acceptance is now owner-verified: Zazu installed on PC and mobile; screen rotation and presentation reported in order.
 
@@ -62,6 +62,18 @@ The earlier browser run for `0a10d05` is not evidence for this final control-pla
 7. Complete Zazu brand/trade-mark clearance.
 8. Final Director re-audit against the selected release head.
 
-**Current execution priority:** offline purchasing/receiving/inventory/cost integrity first; certification paperwork remains deferred.
+**Current execution priority:** execute and reconcile the new offline inventory/cost/asset regression coverage; then close customer-environment recovery and rollback proof.
 
-Last updated: 2026-10-07 — offline purchasing/receiving hardening active; physical device acceptance remains recorded.
+## Director cycle update — 2026-10-07
+
+Offline operational depth expanded in current `main` through:
+- inventory item + inventory movement handlers with business scoping, negative-stock protection and mutation idempotency;
+- operational event-cost create/update handling with financial-state validation;
+- asset create/update and allocation/return handling with explicit state-transition protection;
+- direct and paired phone bootstrap coverage for inventory, assets and costs;
+- phone-local UI actions for inventory, assets and costs;
+- focused regression coverage for the new offline boundaries.
+
+Current evidence status: **IMPLEMENTED; runtime TESTED/VERIFIED pending execution of the new regression set.** No release score uplift is claimed from source changes alone.
+
+Last updated: 2026-10-07 — offline operational depth expanded; current release gates remain recovery, rollback, legal/privacy and brand closure.
