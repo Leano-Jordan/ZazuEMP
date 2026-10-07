@@ -1409,4 +1409,58 @@ class OfflineSyncFoundationTest extends TestCase
             ->count());
     }
 
+
+    public function test_sync_attachment_upload_is_business_scoped_and_idempotent(): void
+    {
+        \Illuminate\Support\Facades\Storage::fake('private');
+
+        $business = Business::create([
+            'name' => 'Attachment Sync Business',
+            'slug' => 'attachment-sync-'.Str::lower(Str::random(8)),
+            'status' => 'active',
+            'currency' => 'ZAR',
+        ]);
+
+        $device = SyncDevice::create([
+            'business_id' => $business->id,
+            'installation_id' => (string) Str::uuid(),
+            'status' => 'active',
+        ]);
+
+        $event = \App\Models\Event::create([
+            'business_id' => $business->id,
+            'reference' => 'ATT-SYNC-001',
+            'name' => 'Attachment Sync Event',
+            'status' => 'draft',
+        ]);
+
+        $idempotencyKey = (string) Str::uuid();
+        $makeRequest = function () use ($device, $event, $idempotencyKey): \Illuminate\\Http\\Request {
+            $request = \Illuminate\Http\Request::create('/api/sync/attachments', 'POST', [
+                'event_id' => $event->id,
+                'idempotency_key' => $idempotencyKey,
+            ], [], [
+                'file' => \Illuminate\Http\UploadedFile::fake()->create('menu.pdf', 10, 'application/pdf'),
+            ]);
+            $request->attributes->set('sync_device', $device);
+            return $request;
+        };
+
+        $controller = app(\App\Http\Controllers\SyncController::class);
+        $first = $controller->uploadAttachment($makeRequest());
+        $second = $controller->uploadAttachment($makeRequest());
+
+        $this->assertSame(201, $first->getStatusCode());
+        $this->assertSame(200, $second->getStatusCode());
+        $this->assertFalse($first->getData(true)['duplicate']);
+        $this->assertTrue($second->getData(true)['duplicate']);
+        $this->assertSame(1, \App\Models\EventAttachment::query()
+            ->where('business_id', $business->id)
+            ->where('idempotency_key', $idempotencyKey)
+            ->count());
+
+        $attachment = \App\Models\EventAttachment::query()->firstOrFail();
+        \Illuminate\Support\Facades\Storage::disk('private')->assertExists($attachment->path);
+    }
+
 }
