@@ -213,14 +213,19 @@ class SyncController extends Controller
      */
     private function orderMutationsByDependencies(array $mutations): array
     {
-        $byEntityId = [];
+        $byLocalId = [];
         foreach ($mutations as $index => $mutation) {
-            $byEntityId[$mutation['entity_id']] = $index;
+            $byLocalId[$mutation['entity_id']][] = $index;
+
+            $payloadLocalId = $mutation['payload']['local_id'] ?? null;
+            if (is_string($payloadLocalId) && $payloadLocalId !== $mutation['entity_id']) {
+                $byLocalId[$payloadLocalId][] = $index;
+            }
         }
 
         $depth = [];
         foreach (array_keys($mutations) as $index) {
-            $depth[$index] = $this->dependencyDepth($index, $mutations, $byEntityId, $depth);
+            $depth[$index] = $this->dependencyDepth($index, $mutations, $byLocalId, $depth);
         }
 
         $indexed = array_map(
@@ -237,10 +242,10 @@ class SyncController extends Controller
 
     /**
      * @param array<int, array<string, mixed>> $mutations
-     * @param array<string, int> $byEntityId
+     * @param array<string, array<int, int>> $byLocalId
      * @param array<int, int> $depth
      */
-    private function dependencyDepth(int $index, array $mutations, array $byEntityId, array &$depth, array $trail = []): int
+    private function dependencyDepth(int $index, array $mutations, array $byLocalId, array &$depth, array $trail = []): int
     {
         if (isset($depth[$index])) {
             return $depth[$index];
@@ -254,10 +259,14 @@ class SyncController extends Controller
         $maxDepth = 0;
 
         foreach ($this->dependencyLocalIds($mutations[$index]['payload'] ?? []) as $localId) {
-            if (isset($byEntityId[$localId])) {
+            foreach ($byLocalId[$localId] ?? [] as $dependencyIndex) {
+                if ($dependencyIndex === $index) {
+                    continue;
+                }
+
                 $maxDepth = max(
                     $maxDepth,
-                    $this->dependencyDepth($byEntityId[$localId], $mutations, $byEntityId, $depth, $trail) + 1,
+                    $this->dependencyDepth($dependencyIndex, $mutations, $byLocalId, $depth, $trail) + 1,
                 );
             }
         }
