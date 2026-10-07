@@ -34,6 +34,8 @@ Verified gates:
 
 Next hard gate: **customer-environment backup/restore proof**.
 
+Physical device acceptance is now owner-verified: Zazu installed on PC and mobile; screen rotation and presentation reported in order.
+
 ## Open / blocked cases
 
 ## Evidence rules
@@ -62,4 +64,4 @@ The earlier browser run for `0a10d05` is not evidence for this final control-pla
 
 **Current execution priority:** commercial proof first; no feature expansion.
 
-Last updated: 2026-10-06 — browser, quality and populated upgrade/rollback gates green; recovery certification active
+Last updated: 2026-10-07 — physical device acceptance owner-verified; recovery certification active
