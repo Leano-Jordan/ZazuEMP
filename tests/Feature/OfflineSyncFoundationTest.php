@@ -6,6 +6,7 @@ use App\Models\Business;
 use App\Models\SyncDelivery;
 use App\Models\SyncDevice;
 use App\Models\SyncMutation;
+use App\Models\SyncEntityIdentity;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Str;
