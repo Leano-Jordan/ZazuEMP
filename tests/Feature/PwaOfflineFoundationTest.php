@@ -69,6 +69,11 @@ class PwaOfflineFoundationTest extends TestCase
         $this->assertFileExists(public_path('icons/zazu-192.svg'));
         $this->assertFileExists(public_path('icons/zazu-512.svg'));
     }
+    public function test_legacy_offline_workspace_view_is_removed(): void
+    {
+        $this->assertFileDoesNotExist(resource_path('views/offline.blade.php'));
+    }
+
     public function test_offline_route_no_longer_exposes_a_second_zazu_workspace(): void
     {
         $response = $this->get('/offline');
