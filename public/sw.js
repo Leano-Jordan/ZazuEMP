@@ -1,6 +1,7 @@
-const CACHE_NAME = 'zazu-static-v12';
+const CACHE_NAME = 'zazu-static-v13';
 const OFFLINE_SHELL = '/dashboard';
 let activeUserId = null;
+let activePrimeController = null;
 const ACTIVE_USER_STATE = new Request('/__zazu-active-user__');
 
 const PRECACHE_ASSETS = [
@@ -130,17 +131,22 @@ async function setUser(userId) {
 }
 
 async function primePages(routes) {
+    activePrimeController?.abort();
+    const controller = new AbortController();
+    activePrimeController = controller;
+
     const uniqueRoutes = [...new Set(Array.isArray(routes) ? routes : [])]
         .filter((path) => typeof path === 'string' && path.startsWith('/') && !path.startsWith('/api/'))
         .slice(0, 30);
 
-    await Promise.all(uniqueRoutes.map(async (path) => {
-        try {
-            const request = new Request(new URL(path, self.location.origin), {
-                credentials: 'include',
-                cache: 'no-store',
-            });
-            const response = await fetch(request);
+    try {
+        await Promise.all(uniqueRoutes.map(async (path) => {
+            try {
+                const request = new Request(new URL(path, self.location.origin), {
+                    credentials: 'include',
+                    cache: 'no-store',
+                });
+                const response = await fetch(request, { signal: controller.signal });
             if (!response.ok) return;
 
             const contentType = response.headers.get('content-type') || '';
@@ -160,13 +166,39 @@ async function primePages(routes) {
             if (!cache) return;
 
             await cache.put(new Request(new URL(path, self.location.origin)), response.clone());
-        } catch {
-            // A single page failing to prime must never block the installed Zazu shell.
+            } catch {
+                // A single page failing to prime must never block the installed Zazu shell.
+            }
+        }));
+    } finally {
+        if (activePrimeController === controller) {
+            activePrimeController = null;
         }
-    }));
+    }
+}
+
+async function clearActiveUser() {
+    activePrimeController?.abort();
+    activePrimeController = null;
+    activeUserId = null;
+
+    const keys = await caches.keys();
+    await Promise.all(
+        keys
+            .filter((key) => key.startsWith(CACHE_NAME + '-user-'))
+            .map((key) => caches.delete(key))
+    );
+
+    const state = await caches.open(CACHE_NAME);
+    await state.delete(ACTIVE_USER_STATE);
 }
 
 self.addEventListener('message', (event) => {
+    if (event.data?.type === 'clear-user') {
+        event.waitUntil(clearActiveUser());
+        return;
+    }
+
     if (event.data?.type !== 'prime-pages') return;
 
     event.waitUntil((async () => {
@@ -197,7 +229,8 @@ self.addEventListener('fetch', (event) => {
                 .catch(async () => {
                     const cache = await dynamicCache();
                     const cachedPage = cache ? await cache.match(new Request(request.url)) : null;
-                    return cachedPage || caches.match(OFFLINE_SHELL);
+                    const offlineShell = cache ? await cache.match(new Request(new URL(OFFLINE_SHELL, self.location.origin))) : null;
+                    return cachedPage || offlineShell || Response.error();
                 })
         );
         return;

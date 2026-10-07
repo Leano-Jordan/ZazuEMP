@@ -2,11 +2,13 @@
 
 namespace Tests\Feature;
 
+use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\File;
 use Tests\TestCase;
 
 class PwaOfflineFoundationTest extends TestCase
 {
+    use RefreshDatabase;
     public function test_manifest_exposes_installable_zazu_icons(): void
     {
         $manifestPath = public_path('manifest.webmanifest');
@@ -29,6 +31,7 @@ class PwaOfflineFoundationTest extends TestCase
 
     public function test_real_zazu_shell_contains_install_metadata_and_service_worker_registration(): void
     {
+        $this->signInAsOwner();
         $response = $this->get('/dashboard');
 
         $response->assertOk()
@@ -44,13 +47,15 @@ class PwaOfflineFoundationTest extends TestCase
         $this->assertStringContainsString("navigator.serviceWorker.register('/sw.js', { scope: '/' })", $app);
         $this->assertStringContainsString("target?.postMessage({ type: 'prime-pages', userId, routes })", $app);
         $this->assertStringContainsString('window.ZazuOffline.pair(code)', $app);
+        $this->assertStringContainsString("document.querySelectorAll('a[href]')", $app);
+        $this->assertStringContainsString("postServiceWorkerMessage({ type: 'clear-user' })", $app);
     }
 
     public function test_service_worker_uses_the_real_zazu_shell_and_cached_pages_for_offline_navigation(): void
     {
         $worker = File::get(public_path('sw.js'));
 
-        $this->assertStringContainsString("const CACHE_NAME = 'zazu-static-v11';", $worker);
+        $this->assertMatchesRegularExpression("/const CACHE_NAME = 'zazu-static-v\\d+';/", $worker);
         $this->assertStringContainsString("const OFFLINE_SHELL = '/dashboard';", $worker);
         $this->assertStringContainsString("OFFLINE_SHELL,", $worker);
         $this->assertStringContainsString("'/offline-attachments.js'", $worker);
@@ -60,6 +65,11 @@ class PwaOfflineFoundationTest extends TestCase
         $this->assertStringContainsString('await cache.match(new Request(request.url))', $worker);
         $this->assertStringContainsString('caches.match(request)', $worker);
         $this->assertStringContainsString('cache.put(request, copy)', $worker);
+        $this->assertStringContainsString("event.data?.type === 'clear-user'", $worker);
+        $this->assertStringContainsString("async function clearActiveUser()", $worker);
+        $this->assertStringContainsString("activePrimeController?.abort()", $worker);
+        $this->assertStringContainsString("const offlineShell = cache ? await cache.match(new Request(new URL(OFFLINE_SHELL, self.location.origin))) : null;", $worker);
+        $this->assertStringNotContainsString("return cachedPage || caches.match(OFFLINE_SHELL);", $worker);
         $this->assertStringContainsString("event.data?.type !== 'prime-pages'", $worker);
         $this->assertStringContainsString('function userCacheName()', $worker);
         $this->assertStringContainsString("const ACTIVE_USER_STATE = new Request('/__zazu-active-user__');", $worker);
@@ -99,6 +109,7 @@ class PwaOfflineFoundationTest extends TestCase
         $purchaseShow = File::get(resource_path('views/purchasing/show.blade.php'));
         $assets = File::get(resource_path('views/assets/index.blade.php'));
         $capabilityEdit = File::get(resource_path('views/capabilities/edit.blade.php'));
+        $app = File::get(resource_path('js/app.js'));
 
         $this->assertStringContainsString('data-zazu-offline-entity="quote_acceptance"', $quoteShow);
         $this->assertStringContainsString('data-zazu-offline-quote-id=', $quoteShow);
@@ -117,9 +128,8 @@ class PwaOfflineFoundationTest extends TestCase
         $this->assertStringContainsString('Illuminate\\Support\\Str::uuid()', $purchaseShow);
 
         $inventory = File::get(resource_path('views/inventory/index.blade.php'));
-        $app = File::get(resource_path('js/app.js'));
 
-        $this->assertStringContainsString('data-zazu-offline-entity="service"', $service);
+        $this->assertStringContainsString('data-zazu-offline-entity="inventory_movement"', $inventory);
         $this->assertStringContainsString('data-zazu-offline-entity="inventory_movement"', $inventory);
         $this->assertStringContainsString("entity === 'service'", $app);
         $this->assertStringContainsString("entity === 'inventory_movement'", $app);

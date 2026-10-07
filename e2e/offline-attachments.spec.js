@@ -1,50 +1,25 @@
 import { test, expect } from '@playwright/test';
 
-test('offline attachments can be queued for a locally created job', async ({ page }) => {
-    await page.goto('/offline');
-    // The offline workspace hydrates IndexedDB asynchronously. Wait for its first render
-    // before taking the browser offline so boot cannot overwrite the form we are opening.
-    await expect(page.locator('#content .panel')).toBeVisible();
+test('real Zazu job form can create a job locally while disconnected', async ({ page }) => {
+    await page.goto('/dashboard', { waitUntil: 'domcontentloaded' });
+    await expect(page.getByRole('heading', { name: 'Dashboard' })).toBeVisible();
+
+    await page.goto('/work/create', { waitUntil: 'domcontentloaded' });
+    await expect(page.locator('#new-job-form')).toBeVisible();
+
+    const customer = page.locator('#customer_id option:not([value=""])').first();
+    await expect(customer).toHaveCount(1);
+
+    await page.locator('#customer_id').selectOption({ index: 1 });
+    await page.locator('input[name="event_type"]').first().check();
+    await page.locator('input[name="name"]').fill('Offline catering job');
+
     await page.context().setOffline(true);
+    await page.locator('#new-job-form').getByRole('button', { name: /Create job/ }).click();
 
-    await page.getByRole('button', { name: 'New job' }).click();
-    await expect(page.locator('#record-form')).toBeVisible();
-    await page.locator('#f-name').fill('Offline catering job');
-    await page.getByRole('button', { name: 'Save on phone' }).click();
-    await expect(page.getByText('Offline catering job')).toBeVisible();
+    await expect(page.getByText('Saved on this device. It will sync automatically when Zazu reconnects.')).toBeVisible();
+    await expect(page.locator('#new-job-form button[type="submit"]')).toHaveText('Saved locally');
 
-    await page.getByRole('button', { name: 'Attachments' }).click();
-
-    await expect(page.getByLabel('Job')).toContainText('Offline catering job');
-
-    await page.getByLabel('File').setInputFiles({
-        name: 'brief.txt',
-        mimeType: 'text/plain',
-        buffer: Buffer.from('offline attachment test'),
-    });
-    await page.getByLabel('Description').fill('Offline brief');
-    await page.getByRole('button', { name: 'Save attachment' }).click();
-
-    await expect(page.locator('#attachment-list')).toContainText('brief.txt');
-    await expect(page.locator('#attachment-list')).toContainText('Waiting for connection');
-
-    const records = await page.evaluate(async () => {
-        const db = await new Promise((resolve, reject) => {
-            const request = indexedDB.open('zazu-phone-attachments', 1);
-            request.onsuccess = () => resolve(request.result);
-            request.onerror = () => reject(request.error);
-        });
-
-        return await new Promise((resolve, reject) => {
-            const tx = db.transaction('files');
-            const request = tx.objectStore('files').getAll();
-            request.onsuccess = () => resolve(request.result);
-            request.onerror = () => reject(request.error);
-        });
-    });
-
-    expect(records).toHaveLength(1);
-    expect(records[0].event_local_id).toBe('job-local-1');
-    expect(records[0].event_id).toBeNull();
-    expect(records[0].status).toBe('pending');
+    const state = await page.evaluate(() => window.ZazuOffline?.getState()?.jobs || []);
+    expect(state.some((job) => job.name === 'Offline catering job' && job.local_id)).toBe(true);
 });

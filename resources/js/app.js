@@ -1671,13 +1671,19 @@ setupZazuOfflineForms();
 function registerZazuServiceWorker() {
     if (!('serviceWorker' in navigator)) return;
 
+    const postServiceWorkerMessage = async (message) => {
+        const registration = await navigator.serviceWorker.ready;
+        const target = navigator.serviceWorker.controller || registration.active;
+        target?.postMessage(message);
+    };
+
     const primeInstalledPages = (registration) => {
         const userId = document.body?.dataset.zazuUserId;
         if (!userId) return;
 
         const routes = [...new Set([
             window.location.pathname,
-            ...[...document.querySelectorAll('.zazu-sidebar a[href], .zazu-section-tabs a[href]')]
+            ...[...document.querySelectorAll('a[href]')]
                 .map((link) => {
                     try {
                         const url = new URL(link.href, window.location.href);
@@ -1695,6 +1701,20 @@ function registerZazuServiceWorker() {
         const target = navigator.serviceWorker.controller || registration.active;
         target?.postMessage({ type: 'prime-pages', userId, routes });
     };
+
+    document.addEventListener('submit', (event) => {
+        const form = event.target;
+        if (!(form instanceof HTMLFormElement)) return;
+
+        try {
+            const action = new URL(form.action || window.location.href, window.location.href);
+            if (action.origin === window.location.origin && action.pathname === '/logout') {
+                postServiceWorkerMessage({ type: 'clear-user' }).catch(() => {});
+            }
+        } catch {
+            // A service-worker cleanup failure must never block the real logout request.
+        }
+    });
 
     window.addEventListener('load', () => {
         navigator.serviceWorker.register('/sw.js', { scope: '/' })
