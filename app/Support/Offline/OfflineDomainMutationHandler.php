@@ -48,6 +48,7 @@ class OfflineDomainMutationHandler implements SyncMutationHandler
             'preparation' => $this->preparation($mutation),
             'purchase_order' => $this->purchaseOrder($mutation),
             'quote' => $this->quote($mutation),
+            'quote_acceptance' => $this->quoteAcceptance($mutation),
             'invoice' => $this->invoice($mutation),
             'payment' => $this->payment($mutation),
             'expense' => $this->expense($mutation),
@@ -331,6 +332,46 @@ class OfflineDomainMutationHandler implements SyncMutationHandler
      * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      * @SuppressWarnings(PHPMD.NPathComplexity)
      */
+    private function quoteAcceptance(SyncMutation $mutation): \App\Models\Quote
+    {
+        if (! in_array($mutation->operation, ['create', 'upsert'], true)) {
+            throw ValidationException::withMessages(['operation' => 'Offline quote acceptance only supports create/upsert.']);
+        }
+
+        $payload = $this->recordPayload($mutation);
+        $quote = $this->resolveIdentityRecord($mutation->business_id, 'quote', $payload['quote_local_id'] ?? null, \App\Models\Quote::class);
+
+        if (! $quote) {
+            throw ValidationException::withMessages(['quote_local_id' => 'The offline acceptance references an unknown quote.']);
+        }
+
+        $customerName = $this->requiredString($payload['customer_name'] ?? null, 'customer_name', 255);
+        $event = $this->lifecycle->lock($mutation->business_id, $quote->event_id);
+        $this->lifecycle->assertOperational($event);
+
+        $quote->refresh();
+        if ($quote->status !== 'sent') {
+            throw ValidationException::withMessages(['quote' => 'Only a sent quote can be accepted offline.']);
+        }
+
+        $version = $quote->versions()->orderByDesc('version')->lockForUpdate()->firstOrFail();
+        if ($version->status !== 'sent') {
+            throw ValidationException::withMessages(['quote' => 'The latest quote version is not awaiting acceptance.']);
+        }
+
+        $version->update(['status' => 'accepted']);
+        $quote->update(['status' => 'accepted']);
+        $this->lifecycle->confirmAfterQuoteAcceptance($event);
+
+        Audit::record('quote.customer.accepted', $quote, [
+            'customer_name' => $customerName,
+            'quote_version' => $version->version,
+            'offline' => true,
+        ], $mutation->business_id);
+
+        return $quote->fresh(['latestVersion.items']);
+    }
+
     private function invoice(SyncMutation $mutation): Invoice
     {
         if (! in_array($mutation->operation, ['create', 'upsert'], true)) {
