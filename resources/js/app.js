@@ -1058,6 +1058,7 @@ function setupZazuOfflineForms() {
             const formData = new FormData(form);
             const get = (name) => String(formData.get(name) || '').trim();
             const localId = crypto.randomUUID();
+            const getInputValue = (input) => String(input?.value || '').trim();
 
             let payload;
             if (entity === 'customer') {
@@ -1079,11 +1080,50 @@ function setupZazuOfflineForms() {
                     event_date: get('event_date') || null,
                     notes: get('notes') || null,
                 };
+            } else if (entity === 'quote') {
+                const state = window.ZazuOffline.getState();
+                const serverJobId = form.dataset.zazuOfflineJobId;
+                const job = state?.jobs?.find(item => Number(item.id) === Number(serverJobId));
+                if (!job?.local_id) {
+                    window.alert('This job is not available in this device copy yet.');
+                    return;
+                }
+
+                const items = [...form.querySelectorAll('[name^="unit_price["]')].map((input) => {
+                    const row = input.closest('.zazu-list-item');
+                    const description = row?.querySelector('.zazu-list-title')?.textContent?.trim() || 'Quote line';
+                    const meta = row?.querySelector('.zazu-list-meta')?.textContent?.trim() || '';
+                    const quantity = Number.parseFloat(meta.match(/^[0-9]+(?:\\.[0-9]+)?/)?.[0] || '1');
+
+                    return {
+                        description,
+                        quantity: Number.isFinite(quantity) ? quantity : 1,
+                        unit: null,
+                        unit_price: getInputValue(input),
+                    };
+                }).filter(item => item.unit_price !== '');
+
+                payload = {
+                    local_id: localId,
+                    server_id: null,
+                    event_local_id: job.local_id,
+                    reference: null,
+                    status: 'draft',
+                    currency: get('currency') || state.business?.currency || 'ZAR',
+                    deposit_percent: get('deposit_percent') || '0',
+                    notes: get('notes') || null,
+                    items,
+                };
             } else {
                 return;
             }
 
-            if (!payload.name) return;
+            if (entity === 'quote' && !payload.items.length) {
+                window.alert('Add at least one quote line before saving.');
+                return;
+            }
+
+            if (!payload.name && entity !== 'quote') return;
 
             await window.ZazuOffline.queueMutation(entity, 'create', payload);
 
