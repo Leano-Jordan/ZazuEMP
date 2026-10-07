@@ -95,8 +95,25 @@ class PwaOfflineFoundationTest extends TestCase
         $this->assertStringContainsString("entity === 'preparation'", File::get(resource_path('js/app.js')));
         $this->assertStringContainsString("entity === 'event_cost'", File::get(resource_path('js/app.js')));
 
-        $service = File::get(resource_path('views/capabilities/create.blade.php'));
-        $inventory = File::get(resource_path('views/inventory/index.blade.php'));
+        $quoteShow = File::get(resource_path('views/quotes/show.blade.php'));
+        $purchaseShow = File::get(resource_path('views/purchasing/show.blade.php'));
+        $assets = File::get(resource_path('views/assets/index.blade.php'));
+        $capabilityEdit = File::get(resource_path('views/capabilities/edit.blade.php'));
+
+        $this->assertStringContainsString('data-zazu-offline-entity="quote_acceptance"', $quoteShow);
+        $this->assertStringContainsString('data-zazu-offline-quote-id=', $quoteShow);
+        $this->assertStringContainsString('data-zazu-offline-entity="purchase_receipt"', $purchaseShow);
+        $this->assertStringContainsString('data-zazu-offline-purchase-order-id=', $purchaseShow);
+        $this->assertStringContainsString('data-zazu-offline-entity="asset_allocation"', $assets);
+        $this->assertStringContainsString('data-zazu-offline-allocation-id=', $assets);
+        $this->assertStringContainsString('data-zazu-offline-entity="service"', $capabilityEdit);
+        $this->assertStringContainsString("entity === 'quote_acceptance'", $app);
+        $this->assertStringContainsString("entity === 'purchase_receipt'", $app);
+        $this->assertStringContainsString("entity === 'asset_allocation'", $app);
+        $this->assertStringContainsString("const entitiesRequiringName = ['customer', 'job', 'supplier', 'inventory_item', 'asset', 'service'];", $app);
+        $this->assertStringContainsString('Illuminate\\Support\\Str::uuid()', $purchaseShow);
+
+$marker        $inventory = File::get(resource_path('views/inventory/index.blade.php'));
         $app = File::get(resource_path('js/app.js'));
 
         $this->assertStringContainsString('data-zazu-offline-entity="service"', $service);
