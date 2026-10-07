@@ -1,6 +1,7 @@
 const CACHE_NAME = 'zazu-static-v10';
 const OFFLINE_SHELL = '/dashboard';
 let activeUserId = null;
+const ACTIVE_USER_STATE = new Request('/__zazu-active-user__');
 
 const PRECACHE_ASSETS = [
     '/manifest.webmanifest',
@@ -38,7 +39,11 @@ self.addEventListener('activate', (event) => {
         caches.keys().then((keys) =>
             Promise.all(
                 keys
-                    .filter((key) => key.startsWith('zazu-static-') && key !== CACHE_NAME)
+                    .filter((key) =>
+                        key.startsWith('zazu-static-')
+                        && key !== CACHE_NAME
+                        && !key.startsWith(CACHE_NAME + '-user-')
+                    )
                     .map((key) => caches.delete(key))
             )
         ).then(() => self.clients.claim())
@@ -49,8 +54,22 @@ function userCacheName() {
     return activeUserId ? CACHE_NAME + '-user-' + activeUserId : null;
 }
 
+async function loadActiveUser() {
+    if (activeUserId) return activeUserId;
+
+    const cache = await caches.open(CACHE_NAME);
+    const stored = await cache.match(ACTIVE_USER_STATE);
+    if (!stored) return null;
+
+    activeUserId = sanitizeUserId(await stored.text());
+    return activeUserId;
+}
+
 async function dynamicCache() {
-    const name = userCacheName();
+    const name = activeUserId
+        ? userCacheName()
+        : ((await loadActiveUser()) ? userCacheName() : null);
+
     return name ? caches.open(name) : null;
 }
 
@@ -80,14 +99,20 @@ function isCacheableStaticAsset(url, request) {
 
 async function setUser(userId) {
     const nextUserId = sanitizeUserId(userId);
-    if (!nextUserId || nextUserId === activeUserId) return;
+    if (!nextUserId) return;
 
     const previous = activeUserId;
     activeUserId = nextUserId;
 
-    if (previous && previous !== activeUserId) {
-        await caches.delete(CACHE_NAME + '-user-' + previous);
-    }
+    const keys = await caches.keys();
+    await Promise.all(
+        keys
+            .filter((key) => key.startsWith(CACHE_NAME + '-user-') && key !== userCacheName())
+            .map((key) => caches.delete(key))
+    );
+
+    const state = await caches.open(CACHE_NAME);
+    await state.put(ACTIVE_USER_STATE, new Response(activeUserId));
 }
 
 async function primePages(routes) {
@@ -118,13 +143,12 @@ async function primePages(routes) {
 }
 
 self.addEventListener('message', (event) => {
-    if (event.data?.type === 'set-user') {
-        event.waitUntil(setUser(event.data.userId));
-        return;
-    }
-
     if (event.data?.type !== 'prime-pages') return;
-    event.waitUntil(primePages(event.data.routes));
+
+    event.waitUntil((async () => {
+        await setUser(event.data.userId);
+        await primePages(event.data.routes);
+    })());
 });
 
 self.addEventListener('fetch', (event) => {
