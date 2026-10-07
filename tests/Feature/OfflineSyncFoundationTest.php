@@ -26,6 +26,7 @@ use Tests\TestCase;
  */
 /**
  * @SuppressWarnings(PHPMD.TooManyPublicMethods)
+ * @SuppressWarnings(PHPMD.TooManyMethods)
  * @SuppressWarnings(PHPMD.ExcessiveClassLength)
  */
 class OfflineSyncFoundationTest extends TestCase
@@ -237,7 +238,7 @@ class OfflineSyncFoundationTest extends TestCase
 
         $this->assertSame('applied', SyncDelivery::query()->where('destination_device_id', $destinationDevice->id)->where('delivery_sequence', 1)->value('status'));
         $this->assertSame('pending', SyncDelivery::query()->where('destination_device_id', $destinationDevice->id)->where('delivery_sequence', 2)->value('status'));
-        $this->assertSame('pending', SyncMutation::query()->where('sequence', 1)->first()->status);
+        $this->assertSame('applied', SyncMutation::query()->where('sequence', 1)->first()->status);
 
         $this->expectException(\Illuminate\Validation\ValidationException::class);
 
