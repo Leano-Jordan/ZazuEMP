@@ -1276,6 +1276,11 @@ function setupZazuOfflineForms() {
                 };
             } else if (entity === 'service') {
                 const state = window.ZazuOffline.getState();
+                const image = formData.get('image');
+                if (image instanceof File && image.size > 0) {
+                    window.alert('Service images need a connection. Save the service details first, then add the image while Zazu is online.');
+                    return;
+                }
                 const serverId = form.dataset.zazuOfflineServerId;
                 const existing = serverId
                     ? state?.catalogue?.find(item => Number(item.id ?? item.server_id) === Number(serverId))
@@ -1478,6 +1483,55 @@ function setupZazuOfflineForms() {
             await window.ZazuOffline.queueMutation(entity, operation, payload);
 
             const state = window.ZazuOffline.getState();
+
+            if (entity === 'quote_acceptance') {
+                const quote = state.quotes?.find(item => item.local_id === payload.quote_local_id);
+                if (quote) {
+                    quote.status = 'accepted';
+                    if (quote.latest_version) quote.latest_version.status = 'accepted';
+                }
+            }
+
+            if (entity === 'purchase_receipt') {
+                const order = state.purchase_orders?.find(item => item.local_id === payload.purchase_order_local_id);
+                if (order?.items) {
+                    for (const [lineLocalId, quantity] of Object.entries(payload.received_quantities)) {
+                        const line = order.items.find(item => item.local_id === lineLocalId);
+                        if (!line) continue;
+                        const received = Number.parseFloat(String(line.received_quantity ?? 0)) + Number.parseFloat(String(quantity));
+                        line.received_quantity = received.toFixed(2);
+                    }
+                    const complete = order.items.every(item =>
+                        Number.parseFloat(String(item.received_quantity ?? 0)) >= Number.parseFloat(String(item.quantity ?? 0))
+                    );
+                    if (complete) order.status = 'received';
+                }
+            }
+
+            if (entity === 'asset_allocation') {
+                const asset = state.assets?.find(item => Number(item.id ?? item.server_id) === Number(payload.server_id || form.dataset.zazuOfflineAssetId));
+                if (asset) {
+                    if (operation === 'update') {
+                        const allocation = asset.allocations?.find(item => item.local_id === payload.local_id);
+                        if (allocation) allocation.status = 'returned';
+                        asset.status = 'available';
+                    } else {
+                        const event = state.jobs?.find(item => item.local_id === payload.event_local_id);
+                        asset.status = 'allocated';
+                        asset.allocations = asset.allocations || [];
+                        asset.allocations.push({
+                            local_id: payload.local_id,
+                            server_id: null,
+                            asset_id: asset.id,
+                            event_id: event?.id ?? null,
+                            allocated_from: payload.allocated_from,
+                            allocated_until: payload.allocated_until,
+                            status: 'allocated',
+                            notes: payload.notes || null,
+                        });
+                    }
+                }
+            }
             const collections = {
                 customer: state.customers,
                 job: state.jobs,
