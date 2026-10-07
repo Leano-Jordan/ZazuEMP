@@ -33,6 +33,7 @@ class PwaOfflineFoundationTest extends TestCase
 
         $response->assertOk()
             ->assertSee('/manifest.webmanifest')
+            ->assertSee('/zazu-offline.js')
             ->assertSee('data-zazu-user-id="', false);
 
         $html = html_entity_decode($response->getContent(), ENT_QUOTES | ENT_HTML5);
@@ -42,16 +43,18 @@ class PwaOfflineFoundationTest extends TestCase
         $app = File::get(resource_path('js/app.js'));
         $this->assertStringContainsString("navigator.serviceWorker.register('/sw.js', { scope: '/' })", $app);
         $this->assertStringContainsString("target?.postMessage({ type: 'prime-pages', userId, routes })", $app);
+        $this->assertStringContainsString('window.ZazuOffline.pair(code)', $app);
     }
 
     public function test_service_worker_uses_the_real_zazu_shell_and_cached_pages_for_offline_navigation(): void
     {
         $worker = File::get(public_path('sw.js'));
 
-        $this->assertStringContainsString("const CACHE_NAME = 'zazu-static-v10';", $worker);
+        $this->assertStringContainsString("const CACHE_NAME = 'zazu-static-v11';", $worker);
         $this->assertStringContainsString("const OFFLINE_SHELL = '/dashboard';", $worker);
         $this->assertStringContainsString("OFFLINE_SHELL,", $worker);
         $this->assertStringContainsString("'/offline-attachments.js'", $worker);
+        $this->assertStringContainsString("'/zazu-offline.js'", $worker);
         $this->assertStringContainsString('caches.match(request)', $worker);
         $this->assertStringContainsString('cache.put(request, copy)', $worker);
         $this->assertStringContainsString("event.data?.type !== 'prime-pages'", $worker);
