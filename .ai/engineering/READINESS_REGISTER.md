@@ -399,3 +399,8 @@ Current application gates remain:
 9. final Director re-audit.
 
 Last updated: 2026-10-06
+
+
+### 2026-10-07 — offline attachment evidence boundary
+
+Jarvis added the attachment transfer layer to the offline implementation. Repository evidence now covers business-scoped listing, upload/download endpoints, idempotency, separate local binary storage, and online retry wiring. Runtime/device proof remains a release gate; this change does not by itself certify physical-device offline recovery.
