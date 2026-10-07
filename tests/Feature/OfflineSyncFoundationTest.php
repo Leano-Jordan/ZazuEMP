@@ -992,6 +992,7 @@ class OfflineSyncFoundationTest extends TestCase
             app(SyncMutationRecorder::class),
             app(SyncMutationApplier::class),
             app(\App\Support\Offline\OfflineDomainMutationHandler::class),
+            app(SyncConflictRecorder::class),
         );
 
         $data = $response->getData(true);
@@ -1196,6 +1197,7 @@ class OfflineSyncFoundationTest extends TestCase
             app(SyncMutationRecorder::class),
             app(SyncMutationApplier::class),
             app(\App\Support\Offline\OfflineDomainMutationHandler::class),
+            app(SyncConflictRecorder::class),
         );
         $data = $response->getData(true);
 
