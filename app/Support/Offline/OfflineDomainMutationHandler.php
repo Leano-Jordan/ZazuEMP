@@ -204,27 +204,8 @@ class OfflineDomainMutationHandler implements SyncMutationHandler
             return $existing->fresh(['items']);
         }
 
-        $supplierUuid = $payload['supplier_local_id'] ?? null;
-        if (! is_string($supplierUuid) || ! Str::isUuid($supplierUuid)) {
-            throw ValidationException::withMessages(['payload' => 'A valid local supplier identity is required.']);
-        }
-
-        $supplierIdentity = SyncEntityIdentity::query()
-            ->where('business_id', $mutation->business_id)
-            ->where('entity_type', 'supplier')
-            ->where('entity_uuid', Str::lower($supplierUuid))
-            ->first();
-
-        $supplier = $supplierIdentity
-            ? Supplier::query()->where('business_id', $mutation->business_id)->find($supplierIdentity->record_id)
-            : null;
-
-        if (! $supplier) {
-            throw ValidationException::withMessages(['payload' => 'The offline purchase order references an unknown supplier.']);
-        }
-
+        $supplier = $this->resolveOfflineSupplier($mutation->business_id, $payload['supplier_local_id'] ?? null);
         $event = $this->resolveOfflineEvent($mutation->business_id, $payload['event_local_id'] ?? null);
-
         $currency = strtoupper((string) ($payload['currency'] ?? ''));
         $businessCurrency = strtoupper((string) $supplier->business?->currency);
 
@@ -252,45 +233,74 @@ class OfflineDomainMutationHandler implements SyncMutationHandler
 
         $total = 0.0;
         foreach ($lines as $line) {
-            if (! is_array($line)) {
-                throw ValidationException::withMessages(['lines' => 'Offline purchase order lines must be objects.']);
-            }
-
-            $description = $this->requiredString($line['description'] ?? null, 'description', 255);
-            $quantity = $this->positiveQuantity($line['quantity'] ?? null);
-            $unitPrice = $this->nonNegativeMoney($line['unit_price'] ?? null);
-            $lineTotal = round($quantity * $unitPrice, 2);
-            $total += $lineTotal;
-
-            $capabilityId = $line['capability_id'] ?? null;
-            if ($capabilityId !== null && (
-                ! is_numeric($capabilityId)
-                || ! BusinessCapability::query()->where('business_id', $mutation->business_id)->whereKey((int) $capabilityId)->exists()
-            )) {
-                throw ValidationException::withMessages(['lines' => 'An offline purchase order line references an invalid catalogue item.']);
-            }
-
-            $lineLocalId = $line['local_id'] ?? null;
-            if (! is_string($lineLocalId) || ! Str::isUuid($lineLocalId)) {
-                throw ValidationException::withMessages(['lines' => 'Each offline purchase order line requires a valid local identity.']);
-            }
-
-            $item = $order->items()->create([
-                'business_id' => $mutation->business_id,
-                'capability_id' => $capabilityId,
-                'description' => $description,
-                'quantity' => number_format($quantity, 2, '.', ''),
-                'received_quantity' => '0.00',
-                'unit' => $this->nullableString($line['unit'] ?? null, 50),
-                'unit_price' => number_format($unitPrice, 2, '.', ''),
-                'line_total' => number_format($lineTotal, 2, '.', ''),
-            ]);
-            $this->identities->register($item, 'purchase_order_item', $lineLocalId);
+            $total += $this->createOfflinePurchaseOrderLine($order, $mutation, $line);
         }
 
         $order->update(['total_amount' => number_format($total, 2, '.', '')]);
 
         return $order->fresh(['items']);
+    }
+
+    private function resolveOfflineSupplier(int $businessId, mixed $supplierUuid): Supplier
+    {
+        if (! is_string($supplierUuid) || ! Str::isUuid($supplierUuid)) {
+            throw ValidationException::withMessages(['payload' => 'A valid local supplier identity is required.']);
+        }
+
+        $identity = SyncEntityIdentity::query()
+            ->where('business_id', $businessId)
+            ->where('entity_type', 'supplier')
+            ->where('entity_uuid', Str::lower($supplierUuid))
+            ->first();
+
+        $supplier = $identity
+            ? Supplier::query()->where('business_id', $businessId)->find($identity->record_id)
+            : null;
+
+        if (! $supplier) {
+            throw ValidationException::withMessages(['payload' => 'The offline purchase order references an unknown supplier.']);
+        }
+
+        return $supplier;
+    }
+
+    private function createOfflinePurchaseOrderLine(PurchaseOrder $order, SyncMutation $mutation, mixed $line): float
+    {
+        if (! is_array($line)) {
+            throw ValidationException::withMessages(['lines' => 'Offline purchase order lines must be objects.']);
+        }
+
+        $description = $this->requiredString($line['description'] ?? null, 'description', 255);
+        $quantity = $this->positiveQuantity($line['quantity'] ?? null);
+        $unitPrice = $this->nonNegativeMoney($line['unit_price'] ?? null);
+        $lineTotal = round($quantity * $unitPrice, 2);
+
+        $capabilityId = $line['capability_id'] ?? null;
+        if ($capabilityId !== null && (
+            ! is_numeric($capabilityId)
+            || ! BusinessCapability::query()->where('business_id', $mutation->business_id)->whereKey((int) $capabilityId)->exists()
+        )) {
+            throw ValidationException::withMessages(['lines' => 'An offline purchase order line references an invalid catalogue item.']);
+        }
+
+        $lineLocalId = $line['local_id'] ?? null;
+        if (! is_string($lineLocalId) || ! Str::isUuid($lineLocalId)) {
+            throw ValidationException::withMessages(['lines' => 'Each offline purchase order line requires a valid local identity.']);
+        }
+
+        $item = $order->items()->create([
+            'business_id' => $mutation->business_id,
+            'capability_id' => $capabilityId,
+            'description' => $description,
+            'quantity' => number_format($quantity, 2, '.', ''),
+            'received_quantity' => '0.00',
+            'unit' => $this->nullableString($line['unit'] ?? null, 50),
+            'unit_price' => number_format($unitPrice, 2, '.', ''),
+            'line_total' => number_format($lineTotal, 2, '.', ''),
+        ]);
+        $this->identities->register($item, 'purchase_order_item', $lineLocalId);
+
+        return $lineTotal;
     }
 
     private function purchaseReceipt(SyncMutation $mutation): ?Model
@@ -301,7 +311,6 @@ class OfflineDomainMutationHandler implements SyncMutationHandler
 
         $payload = $this->recordPayload($mutation);
         $purchaseOrderUuid = $payload['purchase_order_local_id'] ?? null;
-
         if (! is_string($purchaseOrderUuid) || ! Str::isUuid($purchaseOrderUuid)) {
             throw ValidationException::withMessages(['payload' => 'A valid local purchase order identity is required.']);
         }
@@ -315,7 +324,6 @@ class OfflineDomainMutationHandler implements SyncMutationHandler
         $order = $identity
             ? PurchaseOrder::query()->where('business_id', $mutation->business_id)->find($identity->record_id)
             : null;
-
         if (! $order) {
             throw ValidationException::withMessages(['payload' => 'The offline purchase receipt references an unknown purchase order.']);
         }
@@ -325,51 +333,59 @@ class OfflineDomainMutationHandler implements SyncMutationHandler
             throw ValidationException::withMessages(['received_quantities' => 'At least one receipt quantity is required.']);
         }
 
-        $resolvedReceived = [];
-        foreach ($received as $lineIdentityOrId => $quantity) {
-            $line = null;
-
-            if (is_string($lineIdentityOrId) && Str::isUuid($lineIdentityOrId)) {
-                $lineIdentity = SyncEntityIdentity::query()
-                    ->where('business_id', $mutation->business_id)
-                    ->where('entity_type', 'purchase_order_item')
-                    ->where('entity_uuid', Str::lower($lineIdentityOrId))
-                    ->first();
-
-                if ($lineIdentity) {
-                    $line = PurchaseOrderItem::query()
-                        ->where('business_id', $mutation->business_id)
-                        ->where('purchase_order_id', $order->id)
-                        ->find($lineIdentity->record_id);
-                }
-            } elseif (is_numeric($lineIdentityOrId)) {
-                $line = PurchaseOrderItem::query()
-                    ->where('business_id', $mutation->business_id)
-                    ->where('purchase_order_id', $order->id)
-                    ->find((int) $lineIdentityOrId);
-            }
-
-            if (! $line) {
-                throw ValidationException::withMessages([
-                    'received_quantities' => 'The receipt references an unknown purchase order line for this business and order.',
-                ]);
-            }
-
-            $resolvedReceived[$line->id] = $quantity;
-        }
-
         $this->receivingService->receive(
             $order,
             $mutation->business_id,
-            $resolvedReceived,
+            $this->resolveOfflineReceiptQuantities($order, $mutation->business_id, $received),
             $mutation->mutation_id,
             $this->lifecycle,
         );
 
-        // A receipt mutation is an operation against an existing purchase order;
-        // it is not a replacement identity for that purchase order. The receipt
-        // itself is tracked by the mutation idempotency key in the receiving service.
         return null;
+    }
+
+    private function resolveOfflineReceiptQuantities(PurchaseOrder $order, int $businessId, array $received): array
+    {
+        $resolved = [];
+        foreach ($received as $lineIdentityOrId => $quantity) {
+            $line = $this->resolveOfflinePurchaseOrderLine($order, $businessId, $lineIdentityOrId);
+            $resolved[$line->id] = $quantity;
+        }
+
+        return $resolved;
+    }
+
+    private function resolveOfflinePurchaseOrderLine(PurchaseOrder $order, int $businessId, mixed $lineIdentityOrId): PurchaseOrderItem
+    {
+        $line = null;
+
+        if (is_string($lineIdentityOrId) && Str::isUuid($lineIdentityOrId)) {
+            $lineIdentity = SyncEntityIdentity::query()
+                ->where('business_id', $businessId)
+                ->where('entity_type', 'purchase_order_item')
+                ->where('entity_uuid', Str::lower($lineIdentityOrId))
+                ->first();
+
+            if ($lineIdentity) {
+                $line = PurchaseOrderItem::query()
+                    ->where('business_id', $businessId)
+                    ->where('purchase_order_id', $order->id)
+                    ->find($lineIdentity->record_id);
+            }
+        } elseif (is_numeric($lineIdentityOrId)) {
+            $line = PurchaseOrderItem::query()
+                ->where('business_id', $businessId)
+                ->where('purchase_order_id', $order->id)
+                ->find((int) $lineIdentityOrId);
+        }
+
+        if (! $line) {
+            throw ValidationException::withMessages([
+                'received_quantities' => 'The receipt references an unknown purchase order line for this business and order.',
+            ]);
+        }
+
+        return $line;
     }
 
     private function resolveOfflineEvent(int $businessId, mixed $eventUuid): ?Event
