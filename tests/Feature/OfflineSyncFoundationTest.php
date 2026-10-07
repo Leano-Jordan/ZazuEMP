@@ -693,8 +693,11 @@ class OfflineSyncFoundationTest extends TestCase
 
         $applier->apply($receipt, ['purchase_receipt' => $handler]);
 
-        $orderIdentity = app(\App\Support\Offline\SyncEntityIdentityRegistry::class)
-            ->identifyByUuid($business->id, 'purchase_order', $orderLocalId);
+        $orderIdentity = \App\Models\SyncEntityIdentity::query()
+            ->where('business_id', $business->id)
+            ->where('entity_type', 'purchase_order')
+            ->where('entity_uuid', $orderLocalId)
+            ->firstOrFail();
         $order = \App\Models\PurchaseOrder::findOrFail($orderIdentity->record_id);
         $line = $order->items()->firstOrFail();
 
