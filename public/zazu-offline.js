@@ -378,6 +378,7 @@
         pair,
         sync,
         refreshBootstrap,
+        persist: writeState,
         pending,
         ready,
     };
