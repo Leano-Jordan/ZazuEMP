@@ -379,6 +379,10 @@ class OfflineDomainMutationHandler implements SyncMutationHandler
         return null;
     }
 
+    /**
+     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
+     * @SuppressWarnings(PHPMD.NPathComplexity)
+     */
     private function invoice(SyncMutation $mutation): Invoice
     {
         if (! in_array($mutation->operation, ['create', 'upsert'], true)) {
