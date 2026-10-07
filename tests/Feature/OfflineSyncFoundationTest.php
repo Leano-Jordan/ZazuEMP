@@ -662,6 +662,7 @@ class OfflineSyncFoundationTest extends TestCase
                 'record' => [
                     'supplier_local_id' => $supplierIdentity->entity_uuid,
                     'currency' => 'ZAR',
+                    'status' => 'ordered',
                     'lines' => [[
                         'local_id' => $lineLocalId,
                         'description' => 'Offline chairs',
