@@ -78,6 +78,19 @@ function sanitizeUserId(value) {
     return /^\d+$/.test(id) ? id : null;
 }
 
+async function cacheRenderedPage(request, response) {
+    const probe = response.clone();
+    const html = await probe.text();
+    const match = html.match(/data-zazu-user-id="(\\d+)"/);
+    const pageUserId = sanitizeUserId(match?.[1]);
+
+    if (!pageUserId) return;
+
+    await setUser(pageUserId);
+    const cache = await caches.open(userCacheName());
+    await cache.put(new Request(request.url), response.clone());
+}
+
 function isCacheableStaticAsset(url, request) {
     if (request.method !== 'GET' || url.origin !== self.location.origin) return false;
 
@@ -135,6 +148,16 @@ async function primePages(routes) {
             const contentType = response.headers.get('content-type') || '';
             if (!contentType.includes('text/html')) return;
 
+            const probe = response.clone();
+            const html = await probe.text();
+            const match = html.match(/data-zazu-user-id="(\\d+)"/);
+            const pageUserId = sanitizeUserId(match?.[1]);
+            if (!pageUserId) return;
+
+            if (pageUserId !== activeUserId) {
+                await setUser(pageUserId);
+            }
+
             await cache.put(new Request(new URL(path, self.location.origin)), response.clone());
         } catch {
             // A single page failing to prime must never block the installed Zazu shell.
@@ -160,8 +183,7 @@ self.addEventListener('fetch', (event) => {
             fetch(request)
                 .then((response) => {
                     if (response.ok) {
-                        const copy = response.clone();
-                        dynamicCache().then((cache) => cache?.put(request, copy));
+                        cacheRenderedPage(request, response.clone()).catch(() => {});
                     }
                     return response;
                 })
