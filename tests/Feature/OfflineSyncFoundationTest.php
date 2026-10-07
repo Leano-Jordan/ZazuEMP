@@ -630,6 +630,53 @@ class OfflineSyncFoundationTest extends TestCase
             ->count());
     }
 
+    public function test_offline_purchase_order_rejects_reused_line_identity(): void
+    {
+        $business = Business::create([
+            'name' => 'Offline Identity Business',
+            'slug' => 'offline-identity-'.Str::lower(Str::random(8)),
+            'status' => 'active',
+            'currency' => 'ZAR',
+        ]);
+        $device = SyncDevice::create([
+            'business_id' => $business->id,
+            'installation_id' => (string) Str::uuid(),
+        ]);
+        $supplier = \App\Models\Supplier::create([
+            'business_id' => $business->id,
+            'name' => 'Identity Supplier',
+        ]);
+        $supplierIdentity = app(\App\Support\Offline\SyncEntityIdentityRegistry::class)->identify($supplier, 'supplier');
+        $lineLocalId = (string) Str::uuid();
+        $handler = app(\App\Support\Offline\OfflineDomainMutationHandler::class);
+        $applier = app(SyncMutationApplier::class);
+
+        $first = app(SyncMutationRecorder::class)->record($device, 'purchase_order', (string) Str::uuid(), 'create', [
+            'local_id' => (string) Str::uuid(),
+            'record' => [
+                'supplier_local_id' => $supplierIdentity->entity_uuid,
+                'currency' => 'ZAR',
+                'status' => 'ordered',
+                'lines' => [['local_id' => $lineLocalId, 'description' => 'First line', 'quantity' => 1, 'unit_price' => 10]],
+            ],
+        ]);
+        $applier->apply($first, ['purchase_order' => $handler]);
+
+        $second = app(SyncMutationRecorder::class)->record($device, 'purchase_order', (string) Str::uuid(), 'create', [
+            'local_id' => (string) Str::uuid(),
+            'record' => [
+                'supplier_local_id' => $supplierIdentity->entity_uuid,
+                'currency' => 'ZAR',
+                'status' => 'ordered',
+                'lines' => [['local_id' => $lineLocalId, 'description' => 'Conflicting line', 'quantity' => 1, 'unit_price' => 20]],
+            ],
+        ]);
+
+        $this->expectException(\Illuminate\Validation\ValidationException::class);
+        $applier->apply($second, ['purchase_order' => $handler]);
+        $this->assertSame(1, \App\Models\PurchaseOrderItem::query()->where('business_id', $business->id)->count());
+    }
+
     public function test_offline_purchase_order_can_be_created_then_received_by_local_line_identity(): void
     {
         $business = Business::create([
@@ -703,11 +750,19 @@ class OfflineSyncFoundationTest extends TestCase
         $line = $order->items()->firstOrFail();
 
         $this->assertSame('3.00', $line->received_quantity);
+        $this->assertSame('received', $order->fresh()->status);
         $this->assertSame(1, \App\Models\InventoryMovement::query()
             ->where('business_id', $business->id)
             ->where('purchase_order_id', $order->id)
             ->where('purchase_order_item_id', $line->id)
             ->count());
+        $movement = \App\Models\InventoryMovement::query()
+            ->where('business_id', $business->id)
+            ->where('purchase_order_id', $order->id)
+            ->where('purchase_order_item_id', $line->id)
+            ->firstOrFail();
+        $this->assertSame('3.00', $movement->quantity);
+        $this->assertSame('100.00', $movement->unit_cost);
     }
 
 }
