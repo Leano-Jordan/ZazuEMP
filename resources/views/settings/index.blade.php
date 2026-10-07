@@ -300,6 +300,15 @@
         </aside>
     </form>
 
+    <section class="zazu-context-card mt-4" data-zazu-phone-sync>
+        <div class="zazu-context-title">Phone sync</div>
+        <div class="zazu-context-copy">Pair an installed Zazu phone with this business. The code is temporary and authorizes that phone to receive the business data allowed by this installation.</div>
+        <div class="flex flex-wrap gap-3 mt-4">
+            <button type="button" class="zazu-btn zazu-btn-secondary" data-zazu-generate-pairing>Generate phone pairing code</button>
+            <span class="zazu-field-help" data-zazu-pairing-result aria-live="polite"></span>
+        </div>
+    </section>
+
     <section class="zazu-context-card mt-4" data-zazu-backup-controls>
         <div class="zazu-context-title">Backup &amp; recovery</div>
         <div class="zazu-context-copy">Create a portable Zazu backup containing the database and private business files. Restore is owner-only and replaces the current business database and private files.</div>
@@ -327,6 +336,36 @@
 
 <script>
     document.addEventListener('DOMContentLoaded', () => {
+        const pairingButton = document.querySelector('[data-zazu-generate-pairing]');
+        const pairingResult = document.querySelector('[data-zazu-pairing-result]');
+
+        pairingButton?.addEventListener('click', async () => {
+            pairingButton.disabled = true;
+            pairingResult.textContent = 'Generating…';
+
+            try {
+                const response = await fetch('{{ route('settings.sync.pairing') }}', {
+                    method: 'POST',
+                    headers: {
+                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.content || '{{ csrf_token() }}',
+                        'Accept': 'application/json',
+                    },
+                    body: JSON.stringify({ expires_in_minutes: 10, selection: [] }),
+                });
+
+                const result = await response.json().catch(() => ({}));
+                if (!response.ok || !result.pairing_code) {
+                    throw new Error(result.message || 'Could not generate a pairing code.');
+                }
+
+                pairingResult.textContent = 'Code: ' + result.pairing_code + ' · expires ' + new Date(result.expires_at).toLocaleTimeString();
+            } catch (error) {
+                pairingResult.textContent = error.message || 'Could not generate a pairing code.';
+            } finally {
+                pairingButton.disabled = false;
+            }
+        });
+
         const restoreForm = document.querySelector('[data-zazu-restore-form]');
         const restoreFile = document.querySelector('[data-zazu-restore-file]');
         const restoreConfirm = document.querySelector('[data-zazu-restore-confirm]');
