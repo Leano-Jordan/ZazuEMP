@@ -195,7 +195,7 @@
     }
 
     async function push() {
-        if (syncing || !navigator.onLine || !state?.sync?.token) return;
+        if (!navigator.onLine || !state?.sync?.token) return;
         const mutations = await pending();
         if (!mutations.length) return;
 
@@ -242,6 +242,36 @@
             tx.oncomplete = resolve;
             tx.onerror = () => reject(tx.error);
         });
+
+        const identityTargets = {
+            customer: 'customers',
+            job: 'jobs',
+            quote: 'quotes',
+            preparation: 'preparations',
+            supplier: 'suppliers',
+            purchase_order: 'purchase_orders',
+            invoice: 'invoices',
+            expense: 'expenses',
+            inventory_item: 'inventory_items',
+            asset: 'assets',
+            cost: 'costs',
+        };
+
+        for (const mutation of mutations) {
+            const remote = recorded.get(mutation.id);
+            const identity = remote?.identity;
+            const target = identity ? identityTargets[identity.entity_type] : null;
+            if (!target) continue;
+
+            const list = state[target] || [];
+            const localId = identity.local_id || mutation.payload?.local_id;
+            const record = list.find(item => item.local_id === localId);
+            if (record && remote.status === 'applied') {
+                record.id = Number(identity.server_id);
+                record.server_id = Number(identity.server_id);
+                record.local_id = localId;
+            }
+        }
 
         state.local_dirty = (await pending()).length > 0;
         await writeState();
