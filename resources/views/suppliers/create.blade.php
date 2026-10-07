@@ -3,7 +3,7 @@
 <x-slot:heading>{{ isset($supplier) ? 'Edit supplier' : 'New supplier' }}</x-slot:heading>
 <section class="zazu-command-band zazu-compact-editor-command"><div><div class="zazu-eyebrow">Resources / Supplier register</div><h2 class="zazu-command-title">{{ isset($supplier) ? 'Maintain supplier details' : 'Add a supplier' }}</h2><p class="zazu-command-copy">Keep the relationship record used by purchasing accurate without changing existing purchase history.</p></div></section>
 <section class="zazu-card zazu-compact-editor-card"><div class="zazu-card-header"><div class="zazu-eyebrow">Supplier register</div><div class="zazu-card-title mt-1">Supplier details</div></div>
-<form method="POST" action="{{ isset($supplier) ? route('suppliers.update', $supplier) : route('suppliers.store') }}" class="zazu-form p-5">@csrf
+<form method="POST" action="{{ isset($supplier) ? route('suppliers.update', $supplier) : route('suppliers.store') }}" class="zazu-form p-5" data-zazu-offline-entity="supplier" data-zazu-offline-server-id="{{ $supplier->id ?? '' }}">@csrf
 @if(isset($supplier)) @method('PUT') @endif
 <div class="zazu-form-grid"><label class="zazu-field"><span>Name</span><input name="name" value="{{ old('name', $supplier->name ?? '') }}" required>@error('name')<span class="zazu-field-error">{{ $message }}</span>@enderror</label>
 <label class="zazu-field"><span>Contact name</span><input name="contact_name" value="{{ old('contact_name', $supplier->contact_name ?? '') }}"></label>
