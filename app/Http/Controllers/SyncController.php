@@ -16,6 +16,7 @@ use App\Models\Payment;
 use App\Models\PurchaseOrder;
 use App\Models\Quote;
 use App\Models\Supplier;
+use App\Models\SyncConflict;
 use App\Models\SyncDevice;
 use App\Support\CurrentBusiness;
 use App\Support\Offline\OfflineDomainMutationHandler;
@@ -180,14 +181,41 @@ class SyncController extends Controller
         foreach ($this->orderMutationsByDependencies($validated['mutations']) as $item) {
             $mutation = $recorder->record($device, $item['entity_type'], $item['entity_id'], $item['operation'], $item['payload'] ?? [], $item['id']);
 
+            $conflictId = null;
+
             try {
                 $mutation = $applier->apply($mutation, [$mutation->entity_type => $handler]);
                 $applied[] = $mutation->mutation_id;
             } catch (\Throwable $exception) {
+                $error = mb_substr($exception->getMessage(), 0, 1000);
+
                 $mutation->update([
                     'attempts' => $mutation->attempts + 1,
-                    'last_error' => mb_substr($exception->getMessage(), 0, 1000),
+                    'last_error' => $error,
                 ]);
+
+                if ($exception instanceof ValidationException) {
+                    $conflict = SyncConflict::query()
+                        ->where('business_id', $mutation->business_id)
+                        ->where('mutation_id', $mutation->mutation_id)
+                        ->where('status', 'open')
+                        ->first();
+
+                    if (! $conflict) {
+                        $conflict = $conflictRecorder->record(
+                            $mutation->business_id,
+                            $mutation->entity_type,
+                            $mutation->entity_id,
+                            'domain_rejection',
+                            $device,
+                            $mutation->mutation_id,
+                            $mutation->payload,
+                            ['message' => $error],
+                        );
+                    }
+
+                    $conflictId = $conflict->id;
+                }
             }
 
             $recorded[] = [
@@ -196,6 +224,7 @@ class SyncController extends Controller
                 'status' => $mutation->status,
                 'applied' => $mutation->status === 'applied',
                 'error' => $mutation->status === 'pending' ? $mutation->last_error : null,
+                'conflict_id' => $conflictId,
             ];
         }
 
