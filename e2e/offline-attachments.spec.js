@@ -7,10 +7,13 @@ test('real Zazu job form can create a job locally while disconnected', async ({ 
     await page.goto('/work/create', { waitUntil: 'domcontentloaded' });
     await expect(page.locator('#new-job-form')).toBeVisible();
 
-    const customer = page.locator('#customer_id option:not([value=""])').first();
-    await expect(customer).toHaveCount(1);
-
-    await page.locator('#customer_id').selectOption({ index: 1 });
+    await page.getByRole('button', { name: 'Add customer', exact: true }).click();
+    await expect(page.locator('#quick-customer-dialog')).toBeVisible();
+    await page.getByLabel('Customer name').fill('Offline Browser Customer');
+    await page.getByLabel('Contact name').fill('Offline Browser Contact');
+    await page.getByRole('button', { name: 'Save and use customer', exact: true }).click();
+    await expect(page.locator('#quick-customer-dialog')).toBeHidden();
+    await expect(page.locator('#customer_id')).not.toHaveValue('');
     await page.locator('input[name="event_type"]').first().check();
     await page.locator('input[name="name"]').fill('Offline catering job');
 

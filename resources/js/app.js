@@ -1671,10 +1671,16 @@ setupZazuOfflineForms();
 function registerZazuServiceWorker() {
     if (!('serviceWorker' in navigator)) return;
 
-    const postServiceWorkerMessage = async (message) => {
-        const registration = await navigator.serviceWorker.ready;
-        const target = navigator.serviceWorker.controller || registration.active;
-        target?.postMessage(message);
+    const postServiceWorkerMessage = (message) => {
+        const target = navigator.serviceWorker.controller;
+        if (target) {
+            target.postMessage(message);
+            return Promise.resolve();
+        }
+
+        return navigator.serviceWorker.getRegistration().then((registration) => {
+            registration?.active?.postMessage(message);
+        });
     };
 
     const primeInstalledPages = (registration) => {
