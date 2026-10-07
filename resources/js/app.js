@@ -1128,7 +1128,11 @@ function setupZazuOfflineForms() {
             await window.ZazuOffline.queueMutation(entity, 'create', payload);
 
             const state = window.ZazuOffline.getState();
-            const collection = entity === 'customer' ? state.customers : state.jobs;
+            const collection = entity === 'customer'
+                ? state.customers
+                : entity === 'job'
+                    ? state.jobs
+                    : state.quotes;
             collection.push(payload);
             state.local_dirty = true;
             await window.ZazuOffline.persist();
