@@ -71,7 +71,11 @@ The rollback runbook and recovery mechanisms exist. A real release/deployment ro
 ### 6. Final current-head browser evidence — 🟢 OWNER-VERIFIED
 Owner executed the current-head browser suite and reported all tests green. This closes the browser convergence gate; physical-device acceptance remains separate.
 
-### 7. Final Director certification — ⬜ NOT STARTED
+### 7. Dependency/licence engineering inventory — 🟢 VERIFIED
+
+Exact locked Composer and npm manifests were reconciled on 2026-10-07. See `docs/RELEASE_DEPENDENCY_LICENCE_AUDIT.md`. Final legal/distribution review remains separate.
+
+### 8. Final Director certification — ⬜ NOT STARTED
 Certification waits for the gates above; no rushed release claim.
 
 ## Deliberately outside V1
