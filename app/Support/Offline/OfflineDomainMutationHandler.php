@@ -8,6 +8,7 @@ use App\Models\CustomerContact;
 use App\Models\Event;
 use App\Models\EventPreparationItem;
 use App\Models\PurchaseOrder;
+use App\Models\PurchaseOrderItem;
 use App\Models\Supplier;
 use App\Models\SyncEntityIdentity;
 use App\Models\SyncMutation;
@@ -269,7 +270,12 @@ class OfflineDomainMutationHandler implements SyncMutationHandler
                 throw ValidationException::withMessages(['lines' => 'An offline purchase order line references an invalid catalogue item.']);
             }
 
-            $order->items()->create([
+            $lineLocalId = $line['local_id'] ?? null;
+            if (! is_string($lineLocalId) || ! Str::isUuid($lineLocalId)) {
+                throw ValidationException::withMessages(['lines' => 'Each offline purchase order line requires a valid local identity.']);
+            }
+
+            $item = $order->items()->create([
                 'business_id' => $mutation->business_id,
                 'capability_id' => $capabilityId,
                 'description' => $description,
@@ -279,6 +285,7 @@ class OfflineDomainMutationHandler implements SyncMutationHandler
                 'unit_price' => number_format($unitPrice, 2, '.', ''),
                 'line_total' => number_format($lineTotal, 2, '.', ''),
             ]);
+            $this->identities->register($item, 'purchase_order_item', $lineLocalId);
         }
 
         $order->update(['total_amount' => number_format($total, 2, '.', '')]);
@@ -318,10 +325,43 @@ class OfflineDomainMutationHandler implements SyncMutationHandler
             throw ValidationException::withMessages(['received_quantities' => 'At least one receipt quantity is required.']);
         }
 
+        $resolvedReceived = [];
+        foreach ($received as $lineIdentityOrId => $quantity) {
+            $line = null;
+
+            if (is_string($lineIdentityOrId) && Str::isUuid($lineIdentityOrId)) {
+                $lineIdentity = SyncEntityIdentity::query()
+                    ->where('business_id', $mutation->business_id)
+                    ->where('entity_type', 'purchase_order_item')
+                    ->where('entity_uuid', Str::lower($lineIdentityOrId))
+                    ->first();
+
+                if ($lineIdentity) {
+                    $line = PurchaseOrderItem::query()
+                        ->where('business_id', $mutation->business_id)
+                        ->where('purchase_order_id', $order->id)
+                        ->find($lineIdentity->record_id);
+                }
+            } elseif (is_numeric($lineIdentityOrId)) {
+                $line = PurchaseOrderItem::query()
+                    ->where('business_id', $mutation->business_id)
+                    ->where('purchase_order_id', $order->id)
+                    ->find((int) $lineIdentityOrId);
+            }
+
+            if (! $line) {
+                throw ValidationException::withMessages([
+                    'received_quantities' => 'The receipt references an unknown purchase order line for this business and order.',
+                ]);
+            }
+
+            $resolvedReceived[$line->id] = $quantity;
+        }
+
         $this->receivingService->receive(
             $order,
             $mutation->business_id,
-            $received,
+            $resolvedReceived,
             $mutation->mutation_id,
             $this->lifecycle,
         );
