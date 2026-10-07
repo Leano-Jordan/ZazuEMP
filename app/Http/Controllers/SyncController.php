@@ -18,6 +18,7 @@ use App\Models\PurchaseOrder;
 use App\Models\Quote;
 use App\Models\Supplier;
 use App\Models\SyncConflict;
+use App\Models\SyncEntityIdentity;
 use App\Models\SyncDevice;
 use App\Models\SyncMutation;
 use App\Support\CurrentBusiness;
