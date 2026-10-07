@@ -23,6 +23,7 @@ use App\Support\Offline\OfflineDomainMutationHandler;
 use App\Support\Offline\SyncEntityIdentityRegistry;
 use App\Support\Offline\SyncMutationApplier;
 use App\Support\Offline\SyncMutationProtocol;
+use App\Support\Offline\SyncConflictRecorder;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
@@ -162,7 +163,7 @@ class SyncController extends Controller
         return response()->json(['cursor' => $cursor]);
     }
 
-    public function push(Request $request, \App\Support\Offline\SyncMutationRecorder $recorder, SyncMutationApplier $applier, OfflineDomainMutationHandler $handler): JsonResponse
+    public function push(Request $request, \App\Support\Offline\SyncMutationRecorder $recorder, SyncMutationApplier $applier, OfflineDomainMutationHandler $handler, SyncConflictRecorder $conflictRecorder): JsonResponse
     {
         $device = $request->attributes->get('sync_device');
 
