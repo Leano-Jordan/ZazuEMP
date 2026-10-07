@@ -1047,6 +1047,17 @@ window.addEventListener('popstate', restoreZazuAuthRoute);
 function registerZazuServiceWorker() {
     if (!('serviceWorker' in navigator)) return;
 
+    const sendServiceWorkerMessage = (registration, message) => {
+        const target = navigator.serviceWorker.controller || registration.active;
+        target?.postMessage(message);
+    };
+
+    const setUserCache = (registration) => {
+        const userId = document.body?.dataset.zazuUserId;
+        if (!userId) return;
+        sendServiceWorkerMessage(registration, { type: 'set-user', userId });
+    };
+
     const primeInstalledPages = (registration) => {
         const routes = [...new Set(
             [...document.querySelectorAll('.zazu-sidebar a[href], .zazu-section-tabs a[href]')]
@@ -1071,8 +1082,12 @@ function registerZazuServiceWorker() {
     window.addEventListener('load', () => {
         navigator.serviceWorker.register('/sw.js', { scope: '/' })
             .then((registration) => {
+                setUserCache(registration);
                 primeInstalledPages(registration);
-                navigator.serviceWorker.ready.then((ready) => primeInstalledPages(ready));
+                navigator.serviceWorker.ready.then((ready) => {
+                    setUserCache(ready);
+                    primeInstalledPages(ready);
+                });
             })
             .catch(() => {
                 // Offline asset support is an enhancement; application behaviour must not depend on it.
