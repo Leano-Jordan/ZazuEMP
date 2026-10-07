@@ -1092,4 +1092,108 @@ class OfflineSyncFoundationTest extends TestCase
         $this->assertSame('Updated catering package', $version->items->first()->description);
     }
 
+
+    public function test_offline_finance_can_invoice_accepted_quote_record_payment_and_expense(): void
+    {
+        $business = Business::create([
+            'name' => 'Offline Finance Business',
+            'slug' => 'offline-finance-'.Str::lower(Str::random(8)),
+            'status' => 'active',
+            'currency' => 'ZAR',
+        ]);
+        $device = SyncDevice::create([
+            'business_id' => $business->id,
+            'installation_id' => (string) Str::uuid(),
+        ]);
+        $event = \App\Models\Event::create([
+            'business_id' => $business->id,
+            'reference' => 'OFF-FIN-001',
+            'name' => 'Offline Finance Event',
+            'status' => 'draft',
+        ]);
+        $quote = \App\Models\Quote::create([
+            'event_id' => $event->id,
+            'reference' => 'QUO-OFF-FIN-001',
+            'status' => 'accepted',
+            'currency' => 'ZAR',
+        ]);
+        $version = $quote->versions()->create([
+            'version' => 1,
+            'status' => 'accepted',
+            'subtotal' => '1000.00',
+            'tax_total' => '0.00',
+            'total' => '1000.00',
+            'deposit_percent' => '25.00',
+            'deposit_amount' => '250.00',
+            'tax_label' => 'No tax',
+            'tax_treatment' => 'out_of_scope',
+            'tax_rate' => '0.00',
+            'tax_snapshot_at' => now(),
+        ]);
+        $version->items()->create([
+            'description' => 'Offline finance service',
+            'quantity' => '1.00',
+            'unit' => 'service',
+            'unit_price' => '1000.00',
+            'line_total' => '1000.00',
+            'source_snapshot' => ['offline' => false],
+        ]);
+
+        $registry = app(\App\Support\Offline\SyncEntityIdentityRegistry::class);
+        $quoteIdentity = $registry->identify($quote, 'quote');
+        $eventIdentity = $registry->identify($event, 'job');
+        $handler = app(\App\Support\Offline\OfflineDomainMutationHandler::class);
+        $recorder = app(SyncMutationRecorder::class);
+        $applier = app(SyncMutationApplier::class);
+
+        $invoiceLocalId = (string) Str::uuid();
+        $invoiceMutation = $recorder->record($device, 'invoice', $invoiceLocalId, 'create', [
+            'local_id' => $invoiceLocalId,
+            'record' => [
+                'quote_local_id' => $quoteIdentity->entity_uuid,
+            ],
+        ]);
+        $applier->apply($invoiceMutation, ['invoice' => $handler]);
+
+        $invoice = \App\Models\Invoice::query()->where('business_id', $business->id)->firstOrFail();
+        $this->assertSame('1000.00', $invoice->total);
+
+        $paymentLocalId = (string) Str::uuid();
+        $paymentMutation = $recorder->record($device, 'payment', $paymentLocalId, 'create', [
+            'local_id' => $paymentLocalId,
+            'record' => [
+                'invoice_local_id' => app(\App\Support\Offline\SyncEntityIdentityRegistry::class)->identify($invoice, 'invoice')->entity_uuid,
+                'type' => 'deposit',
+                'amount' => '250.00',
+                'method' => 'bank_transfer',
+                'paid_at' => now()->toDateString(),
+            ],
+        ]);
+        $applier->apply($paymentMutation, ['payment' => $handler]);
+
+        $invoice->refresh();
+        $this->assertSame('issued', $invoice->status);
+        $this->assertSame('250.00', $invoice->paid_amount);
+
+        $expenseLocalId = (string) Str::uuid();
+        $expenseMutation = $recorder->record($device, 'expense', $expenseLocalId, 'create', [
+            'local_id' => $expenseLocalId,
+            'record' => [
+                'event_local_id' => $eventIdentity->entity_uuid,
+                'description' => 'Offline supplier expense',
+                'amount' => '75.00',
+                'status' => 'unpaid',
+                'expense_date' => now()->toDateString(),
+            ],
+        ]);
+        $applier->apply($expenseMutation, ['expense' => $handler]);
+
+        $this->assertDatabaseHas('finance_expenses', [
+            'business_id' => $business->id,
+            'idempotency_key' => $expenseMutation->mutation_id,
+            'amount' => '75.00',
+            'event_id' => $event->id,
+        ]);
+    }
+
 }
