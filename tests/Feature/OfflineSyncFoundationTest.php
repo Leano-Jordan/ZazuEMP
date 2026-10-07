@@ -324,7 +324,7 @@ class OfflineSyncFoundationTest extends TestCase
                 'test_atomic_publish' => $handler,
             ]);
             $this->fail('The simulated publish failure should have been thrown.');
-        } catch (\\RuntimeException $exception) {
+        } catch (\RuntimeException $exception) {
             $this->assertSame('simulated delivery failure', $exception->getMessage());
         }
 
