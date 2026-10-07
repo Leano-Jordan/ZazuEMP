@@ -111,6 +111,9 @@ class PwaOfflineFoundationTest extends TestCase
         $this->assertStringContainsString("entity === 'purchase_receipt'", $app);
         $this->assertStringContainsString("entity === 'asset_allocation'", $app);
         $this->assertStringContainsString("const entitiesRequiringName = ['customer', 'job', 'supplier', 'inventory_item', 'asset', 'service'];", $app);
+        $this->assertStringContainsString("invoice.payments = invoice.payments || [];", $app);
+        $this->assertStringContainsString("inventoryItem.on_hand = Number.parseFloat(String(inventoryItem.on_hand ?? 0)) + quantity;", $app);
+        $this->assertStringContainsString("entity === 'purchase_receipt'", $app);
         $this->assertStringContainsString('Illuminate\\Support\\Str::uuid()', $purchaseShow);
 
         $inventory = File::get(resource_path('views/inventory/index.blade.php'));
