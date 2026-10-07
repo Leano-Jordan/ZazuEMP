@@ -12,7 +12,7 @@
     @if($purchaseOrder->status === 'ordered')
         <div class="zazu-panel-title mt-1">Receive goods</div>
         <div class="zazu-panel-copy">Record what actually arrived. Zazu prevents receiving more than ordered and keeps partial receipts in inventory history.</div>
-        <form method="POST" action="{{ route('purchasing.receive', $purchaseOrder) }}" class="zazu-form mt-4">
+        <form method="POST" action="{{ route('purchasing.receive', $purchaseOrder) }}" class="zazu-form mt-4" data-zazu-offline-entity="purchase_receipt" data-zazu-offline-purchase-order-id="{{ $purchaseOrder->id }}">
             @csrf
             <input type="hidden" name="idempotency_key" value="{{ (string) Illuminate\Support\Str::uuid() }}">
             @foreach($purchaseOrder->items as $item)
