@@ -225,11 +225,11 @@ Online mode should enrich the experience without making offline users feel like 
 
 ## 11. What the current service worker should do
 
-The current conservative service worker caches only explicitly public static asset paths under /build/ and /images/. It does not cache authenticated HTML, business data or /media/ responses, and it retires older Zazu static-cache generations during activation.
+The service worker now supports the implemented device-local continuity model. It precaches the shared Zazu client assets and the real application shell, then caches successful authenticated HTML responses only inside a user-scoped cache derived from the authenticated Zazu user identity. It also retires older cache generations during activation.
 
-That is the correct safety baseline until local business-data storage and synchronization rules exist.
+The service worker is not the business-data authority. Business records and pending mutations remain in the local IndexedDB client store; synchronized server data remains business-scoped on the Laravel backend. The cache must never be treated as a substitute for local business state or as a cross-user shared cache.
 
-Do not expand the service worker to cache authenticated workspace data simply to claim "offline support".
+Do not broaden authenticated caching beyond this user-scoped shell/navigation role merely to claim "offline support".
 
 ## 12. Migration path
 
@@ -271,11 +271,10 @@ Before claiming full offline operation:
 - source mutations and per-device delivery/cursor tracking;
 - business-scoped stable UUID identity registry for existing local records.
 
-**Not yet implemented**
-- complete phone-local mirror of every V1 business domain;
-- domain mutation handlers using the stable identity registry;
-- application acknowledgement/conflict resolution for phone-originated mutations;
-- attachment synchronization;
+**Not yet complete**
+- complete phone-local mirror/read parity for every V1 business screen and workflow;
+- explicit conflict-resolution UX for consequential concurrent changes;
+- full bidirectional incremental synchronization/read reconciliation across the complete business domain;
 - cloud synchronization.
 
 The current implementation now covers the major operational mutation domains listed above, but source implementation alone is not release proof. Runtime execution of the newly added regression set, physical disconnected-device trials, attachment synchronization and conflict/recovery behaviour still require evidence.
