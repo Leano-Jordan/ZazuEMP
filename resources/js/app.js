@@ -1114,6 +1114,84 @@ function setupZazuOfflineForms() {
                     notes: get('notes') || null,
                     items,
                 };
+            } else if (entity === 'supplier') {
+                const state = window.ZazuOffline.getState();
+                const serverId = form.dataset.zazuOfflineServerId;
+                const existing = serverId
+                    ? state?.suppliers?.find(item => Number(item.id ?? item.server_id) === Number(serverId))
+                    : null;
+                payload = {
+                    local_id: existing?.local_id || localId,
+                    server_id: existing?.server_id ?? (serverId ? Number(serverId) : null),
+                    name: get('name'),
+                    contact_name: get('contact_name') || null,
+                    email: get('email') || null,
+                    phone: get('phone') || null,
+                    notes: get('notes') || null,
+                };
+                payload.__operation = existing?.local_id ? 'update' : 'create';
+            } else if (entity === 'inventory_item') {
+                const state = window.ZazuOffline.getState();
+                const capabilityId = get('capability_id');
+                const capability = capabilityId
+                    ? state?.catalogue?.find(item => Number(item.id ?? item.server_id) === Number(capabilityId))
+                    : null;
+                payload = {
+                    local_id: localId,
+                    server_id: null,
+                    name: get('name'),
+                    sku: get('sku') || null,
+                    unit: get('unit') || 'unit',
+                    reorder_level: get('reorder_level') || '0',
+                    capability_local_id: capability?.local_id || null,
+                };
+            } else if (entity === 'purchase_order') {
+                const state = window.ZazuOffline.getState();
+                const supplierId = get('supplier_id');
+                const supplier = state?.suppliers?.find(item => Number(item.id ?? item.server_id) === Number(supplierId));
+                if (!supplier?.local_id) {
+                    window.alert('This supplier is not available in this device copy yet.');
+                    return;
+                }
+                const eventId = get('event_id');
+                const event = eventId
+                    ? state?.jobs?.find(item => Number(item.id ?? item.server_id) === Number(eventId))
+                    : null;
+                if (eventId && !event?.local_id) {
+                    window.alert('This job is not available in this device copy yet.');
+                    return;
+                }
+                const descriptions = formData.getAll('description[]').map(value => String(value).trim());
+                const quantities = formData.getAll('quantity[]');
+                const units = formData.getAll('unit[]');
+                const prices = formData.getAll('unit_price[]');
+                const capabilities = formData.getAll('capability_id[]');
+                const lines = descriptions.map((description, index) => {
+                    const capability = state?.catalogue?.find(item => Number(item.id ?? item.server_id) === Number(capabilities[index] || 0));
+                    return {
+                        local_id: crypto.randomUUID(),
+                        description,
+                        quantity: String(quantities[index] ?? '').trim(),
+                        unit: String(units[index] ?? 'unit').trim() || 'unit',
+                        unit_price: String(prices[index] ?? '').trim(),
+                        capability_id: capability?.server_id ?? (capabilities[index] ? Number(capabilities[index]) : null),
+                    };
+                }).filter(line => line.description && line.quantity && line.unit_price !== '');
+                if (!lines.length) {
+                    window.alert('Add at least one purchase order line before saving.');
+                    return;
+                }
+                payload = {
+                    local_id: localId,
+                    server_id: null,
+                    supplier_local_id: supplier.local_id,
+                    event_local_id: event?.local_id || null,
+                    currency: get('currency') || state.business?.currency || 'ZAR',
+                    expected_at: get('expected_at') || null,
+                    notes: get('notes') || null,
+                    status: 'draft',
+                    lines,
+                };
             } else {
                 return;
             }
@@ -1125,15 +1203,25 @@ function setupZazuOfflineForms() {
 
             if (!payload.name && entity !== 'quote') return;
 
-            await window.ZazuOffline.queueMutation(entity, 'create', payload);
+            const operation = payload.__operation || 'create';
+            delete payload.__operation;
+            await window.ZazuOffline.queueMutation(entity, operation, payload);
 
             const state = window.ZazuOffline.getState();
-            const collection = entity === 'customer'
-                ? state.customers
-                : entity === 'job'
-                    ? state.jobs
-                    : state.quotes;
-            collection.push(payload);
+            const collections = {
+                customer: state.customers,
+                job: state.jobs,
+                quote: state.quotes,
+                supplier: state.suppliers,
+                inventory_item: state.inventory_items,
+                purchase_order: state.purchase_orders,
+            };
+            const collection = collections[entity];
+            if (collection) {
+                const existingIndex = collection.findIndex(item => payload.local_id && item.local_id === payload.local_id);
+                if (existingIndex >= 0) collection[existingIndex] = { ...collection[existingIndex], ...payload };
+                else collection.push(payload);
+            }
             state.local_dirty = true;
             await window.ZazuOffline.persist();
 
