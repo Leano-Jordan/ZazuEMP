@@ -8,6 +8,9 @@ use App\Models\Customer;
 use App\Models\Event;
 use App\Models\EventPreparationItem;
 use App\Models\FinanceExpense;
+use App\Models\Asset;
+use App\Models\EventCost;
+use App\Models\InventoryItem;
 use App\Models\Invoice;
 use App\Models\Payment;
 use App\Models\PurchaseOrder;
@@ -429,6 +432,60 @@ class SyncController extends Controller
             ])
             ->values();
 
+        $inventoryItems = InventoryItem::query()
+            ->where('business_id', $business->id)
+            ->with('movements')
+            ->orderBy('name')
+            ->limit(500)
+            ->get()
+            ->map(fn (InventoryItem $item) => [
+                'local_id' => $registry->identify($item, 'inventory_item')->entity_uuid,
+                'server_id' => $item->id,
+                'record' => array_merge($item->toArray(), [
+                    'on_hand' => $item->on_hand,
+                    'movements' => $item->movements->map(fn ($movement) => [
+                        'local_id' => $registry->identify($movement, 'inventory_movement')->entity_uuid,
+                        'server_id' => $movement->id,
+                        'record' => $movement->toArray(),
+                    ])->values()->all(),
+                ]),
+            ])
+            ->values();
+
+        $assets = Asset::query()
+            ->where('business_id', $business->id)
+            ->with(['allocations' => fn ($query) => $query->where('status', 'allocated')])
+            ->orderBy('name')
+            ->limit(500)
+            ->get()
+            ->map(fn (Asset $asset) => [
+                'local_id' => $registry->identify($asset, 'asset')->entity_uuid,
+                'server_id' => $asset->id,
+                'record' => array_merge($asset->toArray(), [
+                    'allocations' => $asset->allocations->map(fn ($allocation) => [
+                        'local_id' => $registry->identify($allocation, 'asset_allocation')->entity_uuid,
+                        'server_id' => $allocation->id,
+                        'record' => $allocation->toArray(),
+                    ])->values()->all(),
+                ]),
+            ])
+            ->values();
+
+        $costs = EventCost::query()
+            ->where('business_id', $business->id)
+            ->with('event')
+            ->latest('id')
+            ->limit(500)
+            ->get()
+            ->map(fn (EventCost $cost) => [
+                'local_id' => $registry->identify($cost, 'event_cost')->entity_uuid,
+                'server_id' => $cost->id,
+                'record' => array_merge($cost->toArray(), [
+                    'event_name' => $cost->event?->name,
+                ]),
+            ])
+            ->values();
+
         $expenses = FinanceExpense::query()
             ->where('business_id', $business->id)
             ->latest('id')
@@ -466,6 +523,9 @@ class SyncController extends Controller
             'purchase_orders' => $purchaseOrders,
             'invoices' => $invoices,
             'expenses' => $expenses,
+            'inventory_items' => $inventoryItems,
+            'assets' => $assets,
+            'costs' => $costs,
             'selected' => $selected,
             'device' => [
                 'id' => $device->id,
