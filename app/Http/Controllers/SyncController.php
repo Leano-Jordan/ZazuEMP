@@ -19,6 +19,7 @@ use App\Models\Quote;
 use App\Models\Supplier;
 use App\Models\SyncConflict;
 use App\Models\SyncDevice;
+use App\Models\SyncMutation;
 use App\Support\CurrentBusiness;
 use App\Support\Offline\OfflineDomainMutationHandler;
 use App\Support\Offline\SyncEntityIdentityRegistry;
@@ -163,6 +164,98 @@ class SyncController extends Controller
 
         $device->update(['last_seen_at' => now()]);
         return response()->json(['cursor' => $cursor]);
+    }
+
+    public function listConflicts(Request $request): JsonResponse
+    {
+        $device = $request->attributes->get('sync_device');
+        $status = (string) $request->query('status', 'open');
+
+        if (! in_array($status, ['open', 'resolved', 'all'], true)) {
+            throw ValidationException::withMessages(['status' => 'Unsupported conflict status.']);
+        }
+
+        $query = SyncConflict::query()
+            ->where('business_id', $device->business_id)
+            ->where('sync_device_id', $device->id)
+            ->latest('id');
+
+        if ($status !== 'all') {
+            $query->where('status', $status);
+        }
+
+        return response()->json([
+            'conflicts' => $query->limit(100)->get()->map(fn (SyncConflict $conflict) => $this->conflictPayload($conflict))->values(),
+        ]);
+    }
+
+    public function resolveConflict(Request $request, SyncConflict $conflict): JsonResponse
+    {
+        $device = $request->attributes->get('sync_device');
+        abort_unless(
+            (int) $conflict->business_id === (int) $device->business_id
+            && (int) $conflict->sync_device_id === (int) $device->id,
+            404
+        );
+
+        $validated = $request->validate([
+            'action' => ['required', 'string', 'in:retry,discard'],
+            'note' => ['nullable', 'string', 'max:1000'],
+        ]);
+
+        if ($conflict->status !== 'open') {
+            return response()->json(['conflict' => $this->conflictPayload($conflict)]);
+        }
+
+        $mutation = null;
+        if ($conflict->mutation_id) {
+            $mutation = SyncMutation::query()
+                ->where('business_id', $device->business_id)
+                ->where('sync_device_id', $device->id)
+                ->where('mutation_id', $conflict->mutation_id)
+                ->first();
+        }
+
+        if ($validated['action'] === 'retry') {
+            abort_unless($mutation, 404);
+            $mutation->update([
+                'status' => 'pending',
+                'last_error' => null,
+            ]);
+        } elseif ($mutation) {
+            $mutation->update([
+                'status' => 'discarded',
+                'last_error' => $validated['note'] ?? 'Offline change discarded after conflict resolution.',
+            ]);
+        }
+
+        $conflict->update([
+            'status' => 'resolved',
+            'resolution_note' => $validated['note'] ?? ($validated['action'] === 'retry' ? 'Queued for retry.' : 'Discarded.'),
+            'resolved_at' => now(),
+        ]);
+
+        return response()->json([
+            'conflict' => $this->conflictPayload($conflict->fresh()),
+            'mutation_status' => $mutation?->fresh()->status,
+        ]);
+    }
+
+    private function conflictPayload(SyncConflict $conflict): array
+    {
+        return [
+            'id' => $conflict->id,
+            'mutation_id' => $conflict->mutation_id,
+            'entity_type' => $conflict->entity_type,
+            'entity_id' => $conflict->entity_id,
+            'conflict_type' => $conflict->conflict_type,
+            'status' => $conflict->status,
+            'local_payload' => $conflict->local_payload,
+            'remote_payload' => $conflict->remote_payload,
+            'resolution_note' => $conflict->resolution_note,
+            'resolved_at' => $conflict->resolved_at?->toIso8601String(),
+            'created_at' => $conflict->created_at?->toIso8601String(),
+        ];
     }
 
     public function uploadAttachment(Request $request): JsonResponse
