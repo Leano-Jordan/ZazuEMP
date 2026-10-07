@@ -1145,6 +1145,29 @@ function setupZazuOfflineForms() {
                     reorder_level: get('reorder_level') || '0',
                     capability_local_id: capability?.local_id || null,
                 };
+            } else if (entity === 'asset') {
+                const state = window.ZazuOffline.getState();
+                const serverId = form.dataset.zazuOfflineServerId;
+                const existing = serverId
+                    ? state?.assets?.find(item => Number(item.id ?? item.server_id) === Number(serverId))
+                    : null;
+                const capabilityId = get('capability_id');
+                const capability = capabilityId
+                    ? state?.catalogue?.find(item => Number(item.id ?? item.server_id) === Number(capabilityId))
+                    : null;
+                payload = {
+                    local_id: existing?.local_id || localId,
+                    server_id: existing?.server_id ?? (serverId ? Number(serverId) : null),
+                    asset_tag: get('asset_tag'),
+                    name: get('name'),
+                    condition: get('condition') || 'good',
+                    location: get('location') || null,
+                    acquired_at: get('acquired_at') || null,
+                    purchase_cost: get('purchase_cost') || '0',
+                    capability_local_id: capability?.local_id || null,
+                    notes: get('notes') || null,
+                };
+                payload.__operation = existing?.local_id ? 'update' : 'create';
             } else if (entity === 'purchase_order') {
                 const state = window.ZazuOffline.getState();
                 const supplierId = get('supplier_id');
@@ -1215,6 +1238,7 @@ function setupZazuOfflineForms() {
                 supplier: state.suppliers,
                 inventory_item: state.inventory_items,
                 purchase_order: state.purchase_orders,
+                asset: state.assets,
             };
             const collection = collections[entity];
             if (collection) {
