@@ -849,13 +849,13 @@ class OfflineDomainMutationHandler implements SyncMutationHandler
         }
 
         if ($allocation instanceof AssetAllocation) {
-            if ($mutation->operation === 'create' && $allocation->status !== 'returned') {
+            if ($allocation->status === 'returned' && $mutation->operation === 'create') {
                 return $allocation->fresh();
             }
 
             $status = $payload['status'] ?? 'returned';
-            if (! in_array($status, ['allocated', 'returned'], true)) {
-                throw ValidationException::withMessages(['status' => 'Offline asset allocation status is invalid.']);
+            if ($status !== 'returned') {
+                throw ValidationException::withMessages(['status' => 'Offline asset allocation updates may only return an existing allocation.']);
             }
 
             \Illuminate\Support\Facades\DB::transaction(function () use ($mutation, $asset, $allocation, $status, $payload): void {
