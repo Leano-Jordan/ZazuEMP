@@ -1336,12 +1336,22 @@ class OfflineDomainMutationHandler implements SyncMutationHandler
             throw ValidationException::withMessages(['entity_id' => 'The offline service does not exist on the server.']);
         }
 
+        $currency = strtoupper((string) ($payload['currency'] ?? ''));
+        if ($currency === '' || $currency !== $this->businessCurrency($mutation->business_id)) {
+            throw ValidationException::withMessages(['currency' => 'Offline catalogue items must use the active business currency.']);
+        }
+
         $attributes = [
             'business_id' => $mutation->business_id,
             'name' => $this->requiredString($payload['name'] ?? null, 'name', 255),
+            'capability_type' => $this->requiredEnum($payload['capability_type'] ?? null, ['service', 'rental', 'product', 'package', 'other'], 'capability_type'),
+            'pricing_basis' => $this->requiredEnum($payload['pricing_basis'] ?? null, ['custom', 'fixed', 'per_unit', 'per_person', 'per_hour', 'per_day'], 'pricing_basis'),
+            'default_price' => $payload['default_price'] === null || $payload['default_price'] === '' ? null : number_format($this->nonNegativeMoney($payload['default_price']), 2, '.', ''),
+            'currency' => $currency,
+            'default_unit' => $this->nullableString($payload['default_unit'] ?? null, 50),
             'description' => $this->nullableString($payload['description'] ?? null, 5000),
+            'category' => $this->requiredString($payload['category'] ?? null, 'category', 100),
             'is_active' => (bool) ($payload['active'] ?? true),
-            'currency' => 'ZAR',
         ];
 
         if ($capability instanceof BusinessCapability) {
