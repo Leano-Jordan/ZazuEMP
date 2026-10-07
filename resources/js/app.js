@@ -1300,6 +1300,23 @@ function setupZazuOfflineForms() {
                     notes: get('notes') || null,
                     event_local_id: event?.local_id || null,
                 };
+            } else if (entity === 'invoice') {
+                const state = window.ZazuOffline.getState();
+                const quoteId = get('quote_id');
+                const quote = quoteId
+                    ? state?.quotes?.find(item => Number(item.id ?? item.server_id) === Number(quoteId))
+                    : null;
+                if (!quote?.local_id || quote.status !== 'accepted') {
+                    window.alert('Offline invoices require an accepted quote available in this device copy.');
+                    return;
+                }
+                payload = {
+                    local_id: localId,
+                    server_id: null,
+                    quote_local_id: quote.local_id,
+                    issued_at: get('issued_at') || null,
+                    due_at: get('due_at') || null,
+                };
             } else if (entity === 'purchase_order') {
                 const state = window.ZazuOffline.getState();
                 const supplierId = get('supplier_id');
@@ -1371,6 +1388,7 @@ function setupZazuOfflineForms() {
                 inventory_item: state.inventory_items,
                 purchase_order: state.purchase_orders,
                 asset: state.assets,
+                invoice: state.invoices,
                 expense: state.expenses,
                 preparation: state.preparations,
                 event_cost: state.costs,
