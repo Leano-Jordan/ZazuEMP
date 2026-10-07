@@ -45,6 +45,7 @@ class OfflineDomainMutationHandler implements SyncMutationHandler
             'customer' => $this->customer($mutation),
             'job' => $this->event($mutation),
             'service' => $this->capability($mutation),
+            'supplier' => $this->supplier($mutation),
             'preparation' => $this->preparation($mutation),
             'purchase_order' => $this->purchaseOrder($mutation),
             'quote' => $this->quote($mutation),
@@ -838,6 +839,31 @@ class OfflineDomainMutationHandler implements SyncMutationHandler
         }
 
         return $value;
+    }
+
+    private function supplier(SyncMutation $mutation): Supplier
+    {
+        if (! in_array($mutation->operation, ['create', 'upsert', 'update'], true)) {
+            throw ValidationException::withMessages(['operation' => 'Offline suppliers only support create/upsert/update.']);
+        }
+
+        $payload = $this->recordPayload($mutation);
+        $supplier = $this->existing($mutation);
+
+        $attributes = [
+            'business_id' => $mutation->business_id,
+            'name' => $this->requiredString($payload['name'] ?? null, 'name', 255),
+            'email' => $this->nullableString($payload['email'] ?? null, 255),
+            'phone' => $this->nullableString($payload['phone'] ?? null, 64),
+            'notes' => $this->nullableString($payload['notes'] ?? null, 5000),
+        ];
+
+        if ($supplier instanceof Supplier) {
+            $supplier->update($attributes);
+            return $supplier->fresh();
+        }
+
+        return Supplier::create($attributes);
     }
 
     private function capability(SyncMutation $mutation): BusinessCapability
