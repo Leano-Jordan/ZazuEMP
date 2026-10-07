@@ -32,7 +32,8 @@ class PwaOfflineFoundationTest extends TestCase
         $response = $this->get('/dashboard');
 
         $response->assertOk()
-            ->assertSee('/manifest.webmanifest');
+            ->assertSee('/manifest.webmanifest')
+            ->assertSee('data-zazu-user-id="', false);
 
         $html = html_entity_decode($response->getContent(), ENT_QUOTES | ENT_HTML5);
         $this->assertStringNotContainsString("navigator.serviceWorker.register('/sw.js')", $html);
@@ -41,18 +42,22 @@ class PwaOfflineFoundationTest extends TestCase
         $app = File::get(resource_path('js/app.js'));
         $this->assertStringContainsString("navigator.serviceWorker.register('/sw.js', { scope: '/' })", $app);
         $this->assertStringContainsString("target?.postMessage({ type: 'prime-pages', routes })", $app);
+        $this->assertStringContainsString("type: 'set-user', userId", $app);
     }
 
     public function test_service_worker_uses_the_real_zazu_shell_and_cached_pages_for_offline_navigation(): void
     {
         $worker = File::get(public_path('sw.js'));
 
-        $this->assertStringContainsString("const CACHE_NAME = 'zazu-static-v9';", $worker);
+        $this->assertStringContainsString("const CACHE_NAME = 'zazu-static-v10';", $worker);
         $this->assertStringContainsString("const OFFLINE_SHELL = '/dashboard';", $worker);
         $this->assertStringContainsString("OFFLINE_SHELL,", $worker);
         $this->assertStringContainsString("'/offline-attachments.js'", $worker);
         $this->assertStringContainsString('caches.match(request)', $worker);
         $this->assertStringContainsString('cache.put(request, copy)', $worker);
+        $this->assertStringContainsString("event.data?.type === 'set-user'", $worker);
+        $this->assertStringContainsString('function userCacheName()', $worker);
+        $this->assertStringContainsString("CACHE_NAME + '-user-' + activeUserId", $worker);
         $this->assertStringContainsString("event.data?.type !== 'prime-pages'", $worker);
         $this->assertStringContainsString('await cache.put(new Request(new URL(path, self.location.origin)), response.clone())', $worker);
     }
