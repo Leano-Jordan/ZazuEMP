@@ -1044,6 +1044,69 @@ async function restoreZazuAuthRoute() {
 
 window.addEventListener('popstate', restoreZazuAuthRoute);
 
+function setupZazuOfflineForms() {
+    document.querySelectorAll('form[data-zazu-offline-entity]').forEach((form) => {
+        if (form.dataset.zazuOfflineBound === '1') return;
+        form.dataset.zazuOfflineBound = '1';
+
+        form.addEventListener('submit', async (event) => {
+            if (navigator.onLine || !window.ZazuOffline) return;
+
+            event.preventDefault();
+
+            const entity = form.dataset.zazuOfflineEntity;
+            const formData = new FormData(form);
+            const get = (name) => String(formData.get(name) || '').trim();
+            const localId = crypto.randomUUID();
+
+            let payload;
+            if (entity === 'customer') {
+                payload = {
+                    local_id: localId,
+                    server_id: null,
+                    name: get('name'),
+                    notes: get('notes') || null,
+                    phone: get('phone') || null,
+                    email: get('email') || null,
+                };
+            } else if (entity === 'job') {
+                const customer = form.querySelector('[name="customer_id"]')?.selectedOptions?.[0];
+                payload = {
+                    local_id: localId,
+                    server_id: null,
+                    name: get('name'),
+                    customer_name: customer && customer.value ? customer.textContent.trim() : (get('customer_name') || null),
+                    event_date: get('event_date') || null,
+                    notes: get('notes') || null,
+                };
+            } else {
+                return;
+            }
+
+            if (!payload.name) return;
+
+            await window.ZazuOffline.queueMutation(entity, 'create', payload);
+
+            const state = window.ZazuOffline.getState();
+            const collection = entity === 'customer' ? state.customers : state.jobs;
+            collection.push(payload);
+            state.local_dirty = true;
+
+            const submit = form.querySelector('button[type="submit"], input[type="submit"]');
+            if (submit) {
+                submit.disabled = true;
+                submit.textContent = 'Saved locally';
+            }
+
+            const notice = document.createElement('div');
+            notice.className = 'zazu-notice';
+            notice.setAttribute('role', 'status');
+            notice.textContent = 'Saved on this device. It will sync automatically when Zazu reconnects.';
+            form.prepend(notice);
+        });
+    });
+}
+
 function handleZazuPhonePairing() {
     if (!window.ZazuOffline || window.ZazuOffline.isPaired()) return;
 
@@ -1063,6 +1126,8 @@ function handleZazuPhonePairing() {
 }
 
 window.addEventListener('zazu:offline-ready', handleZazuPhonePairing);
+
+setupZazuOfflineForms();
 
 function registerZazuServiceWorker() {
     if (!('serviceWorker' in navigator)) return;
