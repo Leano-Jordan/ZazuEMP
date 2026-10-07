@@ -258,6 +258,7 @@ class SyncController extends Controller
             'original_name' => $attachment->original_name,
             'mime_type' => $attachment->mime_type,
             'size' => $attachment->size,
+            'idempotency_key' => $attachment->idempotency_key,
             'source' => $attachment->source,
             'description' => $attachment->description,
             'created_at' => $attachment->created_at?->toIso8601String(),
