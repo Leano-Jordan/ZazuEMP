@@ -316,6 +316,10 @@ class OfflineDomainMutationHandler implements SyncMutationHandler
         return number_format((float) $value, 2, '.', '');
     }
 
+    /**
+     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
+     * @SuppressWarnings(PHPMD.NPathComplexity)
+     */
     private function purchaseOrder(SyncMutation $mutation): PurchaseOrder
     {
         if (! in_array($mutation->operation, ['create', 'upsert'], true)) {
