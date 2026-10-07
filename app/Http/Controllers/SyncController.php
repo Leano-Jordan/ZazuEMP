@@ -378,10 +378,17 @@ class SyncController extends Controller
             $mutation = $recorder->record($device, $item['entity_type'], $item['entity_id'], $item['operation'], $item['payload'] ?? [], $item['id']);
 
             $conflictId = null;
+            $identity = null;
 
             try {
                 $mutation = $applier->apply($mutation, [$mutation->entity_type => $handler]);
                 $applied[] = $mutation->mutation_id;
+
+                $identity = SyncEntityIdentity::query()
+                    ->where('business_id', $mutation->business_id)
+                    ->where('entity_type', $mutation->entity_type)
+                    ->where('entity_uuid', $mutation->entity_id)
+                    ->first();
             } catch (\Throwable $exception) {
                 $error = mb_substr($exception->getMessage(), 0, 1000);
 
@@ -421,6 +428,11 @@ class SyncController extends Controller
                 'applied' => $mutation->status === 'applied',
                 'error' => $mutation->status === 'pending' ? $mutation->last_error : null,
                 'conflict_id' => $conflictId,
+                'identity' => $identity ? [
+                    'entity_type' => $identity->entity_type,
+                    'local_id' => $identity->entity_uuid,
+                    'server_id' => $identity->record_id,
+                ] : null,
             ];
         }
 
