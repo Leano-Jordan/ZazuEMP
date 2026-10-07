@@ -20,6 +20,10 @@ use Tests\TestCase;
 /**
  * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  */
+/**
+ * @SuppressWarnings(PHPMD.TooManyPublicMethods)
+ * @SuppressWarnings(PHPMD.ExcessiveClassLength)
+ */
 class OfflineSyncFoundationTest extends TestCase
 {
     use RefreshDatabase;
@@ -628,6 +632,697 @@ class OfflineSyncFoundationTest extends TestCase
             ->where('business_id', $business->id)
             ->where('purchase_order_id', $order->id)
             ->count());
+    }
+
+    public function test_offline_purchase_order_rejects_reused_line_identity(): void
+    {
+        $business = Business::create([
+            'name' => 'Offline Identity Business',
+            'slug' => 'offline-identity-'.Str::lower(Str::random(8)),
+            'status' => 'active',
+            'currency' => 'ZAR',
+        ]);
+        $device = SyncDevice::create([
+            'business_id' => $business->id,
+            'installation_id' => (string) Str::uuid(),
+        ]);
+        $supplier = \App\Models\Supplier::create([
+            'business_id' => $business->id,
+            'name' => 'Identity Supplier',
+        ]);
+        $supplierIdentity = app(\App\Support\Offline\SyncEntityIdentityRegistry::class)->identify($supplier, 'supplier');
+        $lineLocalId = (string) Str::uuid();
+        $handler = app(\App\Support\Offline\OfflineDomainMutationHandler::class);
+        $applier = app(SyncMutationApplier::class);
+
+        $first = app(SyncMutationRecorder::class)->record($device, 'purchase_order', (string) Str::uuid(), 'create', [
+            'local_id' => (string) Str::uuid(),
+            'record' => [
+                'supplier_local_id' => $supplierIdentity->entity_uuid,
+                'currency' => 'ZAR',
+                'status' => 'ordered',
+                'lines' => [['local_id' => $lineLocalId, 'description' => 'First line', 'quantity' => 1, 'unit_price' => 10]],
+            ],
+        ]);
+        $applier->apply($first, ['purchase_order' => $handler]);
+
+        $second = app(SyncMutationRecorder::class)->record($device, 'purchase_order', (string) Str::uuid(), 'create', [
+            'local_id' => (string) Str::uuid(),
+            'record' => [
+                'supplier_local_id' => $supplierIdentity->entity_uuid,
+                'currency' => 'ZAR',
+                'status' => 'ordered',
+                'lines' => [['local_id' => $lineLocalId, 'description' => 'Conflicting line', 'quantity' => 1, 'unit_price' => 20]],
+            ],
+        ]);
+
+        $this->expectException(\Illuminate\Validation\ValidationException::class);
+        $applier->apply($second, ['purchase_order' => $handler]);
+        $this->assertSame(1, \App\Models\PurchaseOrderItem::query()->where('business_id', $business->id)->count());
+    }
+
+    public function test_offline_purchase_order_can_be_created_then_received_by_local_line_identity(): void
+    {
+        $business = Business::create([
+            'name' => 'Offline Chain Business',
+            'slug' => 'offline-chain-'.Str::lower(Str::random(8)),
+            'status' => 'active',
+            'currency' => 'ZAR',
+        ]);
+        $device = SyncDevice::create([
+            'business_id' => $business->id,
+            'installation_id' => (string) Str::uuid(),
+        ]);
+        $supplier = \App\Models\Supplier::create([
+            'business_id' => $business->id,
+            'name' => 'Chain Supplier',
+        ]);
+        $supplierIdentity = app(\App\Support\Offline\SyncEntityIdentityRegistry::class)
+            ->identify($supplier, 'supplier');
+        $event = \App\Models\Event::create([
+            'business_id' => $business->id,
+            'reference' => 'OFF-CHAIN-001',
+            'name' => 'Offline Chain Event',
+            'status' => 'draft',
+        ]);
+        $eventIdentity = app(\App\Support\Offline\SyncEntityIdentityRegistry::class)
+            ->identify($event, 'job');
+
+        $orderLocalId = (string) Str::uuid();
+        $lineLocalId = (string) Str::uuid();
+
+        $create = app(SyncMutationRecorder::class)->record(
+            $device,
+            'purchase_order',
+            $orderLocalId,
+            'create',
+            [
+                'local_id' => $orderLocalId,
+                'record' => [
+                    'supplier_local_id' => $supplierIdentity->entity_uuid,
+                    'event_local_id' => $eventIdentity->entity_uuid,
+                    'currency' => 'ZAR',
+                    'status' => 'ordered',
+                    'lines' => [[
+                        'local_id' => $lineLocalId,
+                        'description' => 'Offline chairs',
+                        'quantity' => 6,
+                        'unit' => 'units',
+                        'unit_price' => 100,
+                    ]],
+                ],
+            ],
+        );
+
+        $applier = app(SyncMutationApplier::class);
+        $handler = app(\App\Support\Offline\OfflineDomainMutationHandler::class);
+        $applier->apply($create, ['purchase_order' => $handler]);
+
+        $receipt = app(SyncMutationRecorder::class)->record(
+            $device,
+            'purchase_receipt',
+            (string) Str::uuid(),
+            'create',
+            [
+                'local_id' => (string) Str::uuid(),
+                'record' => [
+                    'purchase_order_local_id' => $orderLocalId,
+                    'received_quantities' => [$lineLocalId => '3.00'],
+                ],
+            ],
+        );
+
+        $applier->apply($receipt, ['purchase_receipt' => $handler]);
+
+        $orderIdentity = \App\Models\SyncEntityIdentity::query()
+            ->where('business_id', $business->id)
+            ->where('entity_type', 'purchase_order')
+            ->where('entity_uuid', $orderLocalId)
+            ->firstOrFail();
+        $order = \App\Models\PurchaseOrder::findOrFail($orderIdentity->record_id);
+        $line = $order->items()->firstOrFail();
+
+        $this->assertSame('3.00', $line->received_quantity);
+        $this->assertSame('ordered', $order->fresh()->status);
+        $this->assertSame(1, \App\Models\InventoryMovement::query()
+            ->where('business_id', $business->id)
+            ->where('purchase_order_id', $order->id)
+            ->where('purchase_order_item_id', $line->id)
+            ->count());
+        $movement = \App\Models\InventoryMovement::query()
+            ->where('business_id', $business->id)
+            ->where('purchase_order_id', $order->id)
+            ->where('purchase_order_item_id', $line->id)
+            ->firstOrFail();
+        $this->assertSame('3.00', $movement->quantity);
+        $this->assertSame('100.00', $movement->unit_cost);
+        $this->assertSame($event->id, $movement->event_id);
+    }
+
+    public function test_offline_purchase_receipts_support_partial_then_final_receipt_without_duplicate_inventory(): void
+    {
+        $business = Business::create([
+            'name' => 'Offline Partial Receiving Business',
+            'slug' => 'offline-partial-'.Str::lower(Str::random(8)),
+            'status' => 'active',
+            'currency' => 'ZAR',
+        ]);
+        $device = SyncDevice::create([
+            'business_id' => $business->id,
+            'installation_id' => (string) Str::uuid(),
+        ]);
+        $supplier = \App\Models\Supplier::create([
+            'business_id' => $business->id,
+            'name' => 'Partial Supplier',
+        ]);
+        $supplierIdentity = app(\App\Support\Offline\SyncEntityIdentityRegistry::class)->identify($supplier, 'supplier');
+        $orderLocalId = (string) Str::uuid();
+        $lineOne = (string) Str::uuid();
+        $lineTwo = (string) Str::uuid();
+        $handler = app(\App\Support\Offline\OfflineDomainMutationHandler::class);
+        $applier = app(SyncMutationApplier::class);
+
+        $create = app(SyncMutationRecorder::class)->record($device, 'purchase_order', $orderLocalId, 'create', [
+            'local_id' => $orderLocalId,
+            'record' => [
+                'supplier_local_id' => $supplierIdentity->entity_uuid,
+                'currency' => 'ZAR',
+                'status' => 'ordered',
+                'lines' => [
+                    ['local_id' => $lineOne, 'description' => 'Plates', 'quantity' => 10, 'unit_price' => 20],
+                    ['local_id' => $lineTwo, 'description' => 'Cups', 'quantity' => 8, 'unit_price' => 10],
+                ],
+            ],
+        ]);
+        $applier->apply($create, ['purchase_order' => $handler]);
+
+        $partial = app(SyncMutationRecorder::class)->record($device, 'purchase_receipt', (string) Str::uuid(), 'create', [
+            'local_id' => (string) Str::uuid(),
+            'record' => [
+                'purchase_order_local_id' => $orderLocalId,
+                'received_quantities' => [$lineOne => '4.00', $lineTwo => '3.00'],
+            ],
+        ]);
+        $applier->apply($partial, ['purchase_receipt' => $handler]);
+
+        $orderIdentity = \App\Models\SyncEntityIdentity::query()
+            ->where('business_id', $business->id)
+            ->where('entity_type', 'purchase_order')
+            ->where('entity_uuid', $orderLocalId)
+            ->firstOrFail();
+        $order = \App\Models\PurchaseOrder::findOrFail($orderIdentity->record_id);
+        $items = $order->items()->orderBy('id')->get();
+        $this->assertSame(['4.00', '3.00'], $items->pluck('received_quantity')->all());
+        $this->assertSame('ordered', $order->fresh()->status);
+        $this->assertSame(2, \App\Models\InventoryMovement::query()->where('purchase_order_id', $order->id)->count());
+
+        $final = app(SyncMutationRecorder::class)->record($device, 'purchase_receipt', (string) Str::uuid(), 'create', [
+            'local_id' => (string) Str::uuid(),
+            'record' => [
+                'purchase_order_local_id' => $orderLocalId,
+                'received_quantities' => [$lineOne => '6.00', $lineTwo => '5.00'],
+            ],
+        ]);
+        $applier->apply($final, ['purchase_receipt' => $handler]);
+        $applier->apply($final, ['purchase_receipt' => $handler]);
+
+        $this->assertSame(['10.00', '8.00'], $order->fresh()->items()->orderBy('id')->pluck('received_quantity')->all());
+        $this->assertSame('received', $order->fresh()->status);
+        $this->assertSame(4, \App\Models\InventoryMovement::query()->where('purchase_order_id', $order->id)->count());
+        $this->assertSame(2, \App\Models\PurchaseOrderReceipt::query()->where('business_id', $business->id)->count());
+    }
+
+    public function test_offline_receipt_rejects_a_line_identity_from_another_business(): void
+    {
+        $first = Business::create([
+            'name' => 'Receipt Identity First',
+            'slug' => 'receipt-identity-first-'.Str::lower(Str::random(8)),
+            'status' => 'active',
+            'currency' => 'ZAR',
+        ]);
+        $second = Business::create([
+            'name' => 'Receipt Identity Second',
+            'slug' => 'receipt-identity-second-'.Str::lower(Str::random(8)),
+            'status' => 'active',
+            'currency' => 'ZAR',
+        ]);
+        $device = SyncDevice::create([
+            'business_id' => $first->id,
+            'installation_id' => (string) Str::uuid(),
+        ]);
+        $supplier = \App\Models\Supplier::create(['business_id' => $first->id, 'name' => 'First Supplier']);
+        $foreignSupplier = \App\Models\Supplier::create(['business_id' => $second->id, 'name' => 'Second Supplier']);
+        $order = \App\Models\PurchaseOrder::create([
+            'business_id' => $first->id,
+            'supplier_id' => $supplier->id,
+            'idempotency_key' => (string) Str::uuid(),
+            'reference' => 'PO-IDENTITY-FIRST',
+            'status' => 'ordered',
+            'currency' => 'ZAR',
+            'total_amount' => '100.00',
+        ]);
+        $foreignOrder = \App\Models\PurchaseOrder::create([
+            'business_id' => $second->id,
+            'supplier_id' => $foreignSupplier->id,
+            'idempotency_key' => (string) Str::uuid(),
+            'reference' => 'PO-IDENTITY-SECOND',
+            'status' => 'ordered',
+            'currency' => 'ZAR',
+            'total_amount' => '100.00',
+        ]);
+        $foreignLine = \App\Models\PurchaseOrderItem::create([
+            'business_id' => $second->id,
+            'purchase_order_id' => $foreignOrder->id,
+            'description' => 'Foreign line',
+            'quantity' => '1.00',
+            'received_quantity' => '0.00',
+            'unit_price' => '100.00',
+            'line_total' => '100.00',
+        ]);
+        $orderIdentity = app(\App\Support\Offline\SyncEntityIdentityRegistry::class)->identify($order, 'purchase_order');
+        $foreignLineIdentity = app(\App\Support\Offline\SyncEntityIdentityRegistry::class)->identify($foreignLine, 'purchase_order_item');
+        $mutation = app(SyncMutationRecorder::class)->record($device, 'purchase_receipt', (string) Str::uuid(), 'create', [
+            'local_id' => (string) Str::uuid(),
+            'record' => [
+                'purchase_order_local_id' => $orderIdentity->entity_uuid,
+                'received_quantities' => [$foreignLineIdentity->entity_uuid => '1.00'],
+            ],
+        ]);
+
+        $this->expectException(\Illuminate\Validation\ValidationException::class);
+        app(SyncMutationApplier::class)->apply($mutation, [
+            'purchase_receipt' => app(\App\Support\Offline\OfflineDomainMutationHandler::class),
+        ]);
+        $this->assertSame(0, \App\Models\InventoryMovement::query()->where('business_id', $first->id)->count());
+        $this->assertSame('0.00', $foreignLine->fresh()->received_quantity);
+    }
+
+
+    /** @SuppressWarnings(PHPMD.ExcessiveMethodLength) */
+    public function test_sync_push_orders_purchase_receipt_after_parent_purchase_order_even_when_batch_is_reversed(): void
+    {
+        $business = Business::create([
+            'name' => 'Offline Push Ordering Business',
+            'slug' => 'offline-push-ordering-'.Str::lower(Str::random(8)),
+            'status' => 'active',
+            'currency' => 'ZAR',
+        ]);
+
+        $device = SyncDevice::create([
+            'business_id' => $business->id,
+            'installation_id' => (string) Str::uuid(),
+        ]);
+
+        $supplier = \App\Models\Supplier::create([
+            'business_id' => $business->id,
+            'name' => 'Offline Push Supplier',
+        ]);
+        $supplierIdentity = app(\App\Support\Offline\SyncEntityIdentityRegistry::class)
+            ->identify($supplier, 'supplier');
+
+        $purchaseOrderLocalId = (string) Str::uuid();
+        $lineLocalId = (string) Str::uuid();
+        $receiptLocalId = (string) Str::uuid();
+
+        $purchaseOrderMutation = [
+            'id' => (string) Str::uuid(),
+            'entity_type' => 'purchase_order',
+            'entity_id' => $purchaseOrderLocalId,
+            'operation' => 'create',
+            'payload' => [
+                'local_id' => $purchaseOrderLocalId,
+                'record' => [
+                    'supplier_local_id' => $supplierIdentity->entity_uuid,
+                    'currency' => 'ZAR',
+                    'status' => 'ordered',
+                    'lines' => [[
+                        'local_id' => $lineLocalId,
+                        'description' => 'Offline batch chairs',
+                        'quantity' => 4,
+                        'unit' => 'units',
+                        'unit_price' => 100.00,
+                    ]],
+                ],
+            ],
+        ];
+
+        $receiptMutation = [
+            'id' => (string) Str::uuid(),
+            'entity_type' => 'purchase_receipt',
+            'entity_id' => $receiptLocalId,
+            'operation' => 'create',
+            'payload' => [
+                'local_id' => $receiptLocalId,
+                'record' => [
+                    'purchase_order_local_id' => $purchaseOrderLocalId,
+                    'received_quantities' => [
+                        $lineLocalId => '4.00',
+                    ],
+                ],
+            ],
+        ];
+
+        $request = \Illuminate\Http\Request::create('/api/sync/push', 'POST', [
+            'mutations' => [$receiptMutation, $purchaseOrderMutation],
+        ]);
+        $request->attributes->set('sync_device', $device);
+
+        $response = app(\App\Http\Controllers\SyncController::class)->push(
+            $request,
+            app(SyncMutationRecorder::class),
+            app(SyncMutationApplier::class),
+            app(\App\Support\Offline\OfflineDomainMutationHandler::class),
+        );
+
+        $data = $response->getData(true);
+
+        $this->assertSame(2, count($data['recorded']));
+        $this->assertCount(2, $data['applied']);
+        $this->assertSame([], array_filter($data['recorded'], fn (array $item) => $item['status'] !== 'applied'));
+
+        $order = \App\Models\PurchaseOrder::query()
+            ->where('business_id', $business->id)
+            ->where('reference', 'PO-OFFLINE-'.strtoupper(substr($purchaseOrderLocalId, 0, 8)))
+            ->firstOrFail();
+
+        $line = $order->items()->firstOrFail();
+
+        $this->assertSame('received', $order->status);
+        $this->assertSame('4.00', $line->received_quantity);
+        $this->assertSame(1, \App\Models\InventoryMovement::query()
+            ->where('business_id', $business->id)
+            ->where('purchase_order_id', $order->id)
+            ->count());
+        $this->assertSame(0, \App\Models\SyncMutation::query()
+            ->where('business_id', $business->id)
+            ->where('status', 'pending')
+            ->count());
+    }
+
+
+    public function test_offline_quote_create_and_draft_update_preserve_local_identity_and_totals(): void
+    {
+        $business = Business::create([
+            'name' => 'Offline Quote Business',
+            'slug' => 'offline-quote-'.Str::lower(Str::random(8)),
+            'status' => 'active',
+            'currency' => 'ZAR',
+        ]);
+        $device = SyncDevice::create([
+            'business_id' => $business->id,
+            'installation_id' => (string) Str::uuid(),
+        ]);
+        $event = \App\Models\Event::create([
+            'business_id' => $business->id,
+            'reference' => 'OFF-QUOTE-001',
+            'name' => 'Offline Quote Event',
+            'status' => 'draft',
+        ]);
+        $eventIdentity = app(\App\Support\Offline\SyncEntityIdentityRegistry::class)->identify($event, 'job');
+        $quoteLocalId = (string) Str::uuid();
+        $handler = app(\App\Support\Offline\OfflineDomainMutationHandler::class);
+        $applier = app(SyncMutationApplier::class);
+
+        $create = app(SyncMutationRecorder::class)->record($device, 'quote', $quoteLocalId, 'create', [
+            'local_id' => $quoteLocalId,
+            'record' => [
+                'event_local_id' => $eventIdentity->entity_uuid,
+                'reference' => 'QUO-OFFLINE-001',
+                'currency' => 'ZAR',
+                'status' => 'draft',
+                'deposit_percent' => '25.00',
+                'items' => [[
+                    'description' => 'Offline catering package',
+                    'quantity' => '2.00',
+                    'unit' => 'packages',
+                    'unit_price' => '500.00',
+                ]],
+            ],
+        ]);
+
+        $applier->apply($create, ['quote' => $handler]);
+
+        $quote = \App\Models\Quote::query()->where('event_id', $event->id)->firstOrFail();
+        $version = $quote->latestVersion()->firstOrFail();
+        $this->assertSame($quoteLocalId, \App\Models\SyncEntityIdentity::query()
+            ->where('business_id', $business->id)
+            ->where('entity_type', 'quote')
+            ->where('record_id', $quote->id)
+            ->value('entity_uuid'));
+        $this->assertSame('1000.00', $version->total);
+        $this->assertSame('250.00', $version->deposit_amount);
+
+        $update = app(SyncMutationRecorder::class)->record($device, 'quote', $quoteLocalId, 'update', [
+            'local_id' => $quoteLocalId,
+            'record' => [
+                'event_local_id' => $eventIdentity->entity_uuid,
+                'status' => 'draft',
+                'deposit_percent' => '50.00',
+                'items' => [[
+                    'description' => 'Updated catering package',
+                    'quantity' => '3.00',
+                    'unit' => 'packages',
+                    'unit_price' => '400.00',
+                ]],
+            ],
+        ]);
+
+        $applier->apply($update, ['quote' => $handler]);
+
+        $version = $quote->fresh('latestVersion.items')->latestVersion()->firstOrFail();
+        $this->assertSame('1200.00', $version->total);
+        $this->assertSame('600.00', $version->deposit_amount);
+        $this->assertSame('Updated catering package', $version->items->first()->description);
+    }
+
+
+    /** @SuppressWarnings(PHPMD.ExcessiveMethodLength) */
+    public function test_sync_push_orders_reversed_commercial_chain_by_dependency(): void
+    {
+        $business = Business::create([
+            'name' => 'Offline Commercial Ordering Business',
+            'slug' => 'offline-commercial-ordering-'.Str::lower(Str::random(8)),
+            'status' => 'active',
+            'currency' => 'ZAR',
+        ]);
+        $device = SyncDevice::create([
+            'business_id' => $business->id,
+            'installation_id' => (string) Str::uuid(),
+        ]);
+        $event = \App\Models\Event::create([
+            'business_id' => $business->id,
+            'reference' => 'OFF-COMM-001',
+            'name' => 'Offline Commercial Event',
+            'status' => 'draft',
+        ]);
+        $eventIdentity = app(\App\Support\Offline\SyncEntityIdentityRegistry::class)->identify($event, 'job');
+        $quoteLocalId = (string) Str::uuid();
+        $acceptanceLocalId = (string) Str::uuid();
+        $invoiceLocalId = (string) Str::uuid();
+        $paymentLocalId = (string) Str::uuid();
+
+        $quoteMutation = [
+            'id' => (string) Str::uuid(),
+            'entity_type' => 'quote',
+            'entity_id' => $quoteLocalId,
+            'operation' => 'create',
+            'payload' => [
+                'local_id' => $quoteLocalId,
+                'record' => [
+                    'event_local_id' => $eventIdentity->entity_uuid,
+                    'reference' => 'QUO-OFF-COMM-001',
+                    'currency' => 'ZAR',
+                    'status' => 'sent',
+                    'deposit_percent' => '25.00',
+                    'items' => [[
+                        'description' => 'Offline commercial service',
+                        'quantity' => '1.00',
+                        'unit' => 'service',
+                        'unit_price' => '1000.00',
+                    ]],
+                ],
+            ],
+        ];
+        $acceptanceMutation = [
+            'id' => (string) Str::uuid(),
+            'entity_type' => 'quote_acceptance',
+            'entity_id' => $acceptanceLocalId,
+            'operation' => 'create',
+            'payload' => [
+                'local_id' => $acceptanceLocalId,
+                'record' => [
+                    'quote_local_id' => $quoteLocalId,
+                    'customer_name' => 'Offline Customer',
+                ],
+            ],
+        ];
+        $invoiceMutation = [
+            'id' => (string) Str::uuid(),
+            'entity_type' => 'invoice',
+            'entity_id' => $invoiceLocalId,
+            'operation' => 'create',
+            'payload' => [
+                'local_id' => $invoiceLocalId,
+                'record' => [
+                    'quote_local_id' => $quoteLocalId,
+                    'depends_on_local_id' => $acceptanceLocalId,
+                ],
+            ],
+        ];
+        $paymentMutation = [
+            'id' => (string) Str::uuid(),
+            'entity_type' => 'payment',
+            'entity_id' => $paymentLocalId,
+            'operation' => 'create',
+            'payload' => [
+                'local_id' => $paymentLocalId,
+                'record' => [
+                    'invoice_local_id' => $invoiceLocalId,
+                    'type' => 'deposit',
+                    'amount' => '250.00',
+                    'method' => 'bank_transfer',
+                    'paid_at' => now()->toDateString(),
+                ],
+            ],
+        ];
+
+        $request = \Illuminate\Http\Request::create('/api/sync/push', 'POST', [
+            'mutations' => [$paymentMutation, $invoiceMutation, $acceptanceMutation, $quoteMutation],
+        ]);
+        $request->attributes->set('sync_device', $device);
+
+        $response = app(\App\Http\Controllers\SyncController::class)->push(
+            $request,
+            app(SyncMutationRecorder::class),
+            app(SyncMutationApplier::class),
+            app(\App\Support\Offline\OfflineDomainMutationHandler::class),
+        );
+        $data = $response->getData(true);
+
+        $this->assertCount(4, $data['applied']);
+        $this->assertSame([], array_filter($data['recorded'], fn (array $item) => $item['status'] !== 'applied'));
+
+        $invoice = \App\Models\Invoice::query()->where('business_id', $business->id)->firstOrFail();
+        $this->assertSame('1000.00', $invoice->total);
+        $this->assertSame('250.00', $invoice->paid_amount);
+        $this->assertSame('accepted', \App\Models\Quote::query()->whereKey($invoice->quote_id)->value('status'));
+    }
+
+    /** @SuppressWarnings(PHPMD.ExcessiveMethodLength) */
+    public function test_offline_finance_can_invoice_accepted_quote_record_payment_and_expense(): void
+    {
+        $business = Business::create([
+            'name' => 'Offline Finance Business',
+            'slug' => 'offline-finance-'.Str::lower(Str::random(8)),
+            'status' => 'active',
+            'currency' => 'ZAR',
+        ]);
+        $device = SyncDevice::create([
+            'business_id' => $business->id,
+            'installation_id' => (string) Str::uuid(),
+        ]);
+        $event = \App\Models\Event::create([
+            'business_id' => $business->id,
+            'reference' => 'OFF-FIN-001',
+            'name' => 'Offline Finance Event',
+            'status' => 'draft',
+        ]);
+        $quote = \App\Models\Quote::create([
+            'event_id' => $event->id,
+            'reference' => 'QUO-OFF-FIN-001',
+            'status' => 'sent',
+            'currency' => 'ZAR',
+        ]);
+        $version = $quote->versions()->create([
+            'version' => 1,
+            'status' => 'sent',
+            'subtotal' => '1000.00',
+            'tax_total' => '0.00',
+            'total' => '1000.00',
+            'deposit_percent' => '25.00',
+            'deposit_amount' => '250.00',
+            'tax_label' => 'No tax',
+            'tax_treatment' => 'out_of_scope',
+            'tax_rate' => '0.00',
+            'tax_snapshot_at' => now(),
+        ]);
+        $version->items()->create([
+            'description' => 'Offline finance service',
+            'quantity' => '1.00',
+            'unit' => 'service',
+            'unit_price' => '1000.00',
+            'line_total' => '1000.00',
+            'source_snapshot' => ['offline' => false],
+        ]);
+
+        $registry = app(\App\Support\Offline\SyncEntityIdentityRegistry::class);
+        $quoteIdentity = $registry->identify($quote, 'quote');
+        $eventIdentity = $registry->identify($event, 'job');
+        $handler = app(\App\Support\Offline\OfflineDomainMutationHandler::class);
+        $recorder = app(SyncMutationRecorder::class);
+        $applier = app(SyncMutationApplier::class);
+
+        $acceptanceLocalId = (string) Str::uuid();
+        $acceptanceMutation = $recorder->record($device, 'quote_acceptance', $acceptanceLocalId, 'create', [
+            'local_id' => $acceptanceLocalId,
+            'record' => [
+                'quote_local_id' => $quoteIdentity->entity_uuid,
+                'customer_name' => 'Offline Customer',
+            ],
+        ]);
+        $applier->apply($acceptanceMutation, ['quote_acceptance' => $handler]);
+
+        $this->assertSame('accepted', $quote->fresh()->status);
+        $this->assertSame('accepted', $version->fresh()->status);
+
+        $invoiceLocalId = (string) Str::uuid();
+        $invoiceMutation = $recorder->record($device, 'invoice', $invoiceLocalId, 'create', [
+            'local_id' => $invoiceLocalId,
+            'record' => [
+                'quote_local_id' => $quoteIdentity->entity_uuid,
+            ],
+        ]);
+        $applier->apply($invoiceMutation, ['invoice' => $handler]);
+
+        $invoice = \App\Models\Invoice::query()->where('business_id', $business->id)->firstOrFail();
+        $this->assertSame('1000.00', $invoice->total);
+
+        $paymentLocalId = (string) Str::uuid();
+        $paymentMutation = $recorder->record($device, 'payment', $paymentLocalId, 'create', [
+            'local_id' => $paymentLocalId,
+            'record' => [
+                'invoice_local_id' => app(\App\Support\Offline\SyncEntityIdentityRegistry::class)->identify($invoice, 'invoice')->entity_uuid,
+                'type' => 'deposit',
+                'amount' => '250.00',
+                'method' => 'bank_transfer',
+                'paid_at' => now()->toDateString(),
+            ],
+        ]);
+        $applier->apply($paymentMutation, ['payment' => $handler]);
+
+        $invoice->refresh();
+        $this->assertSame('issued', $invoice->status);
+        $this->assertSame('250.00', $invoice->paid_amount);
+
+        $expenseLocalId = (string) Str::uuid();
+        $expenseMutation = $recorder->record($device, 'expense', $expenseLocalId, 'create', [
+            'local_id' => $expenseLocalId,
+            'record' => [
+                'event_local_id' => $eventIdentity->entity_uuid,
+                'description' => 'Offline supplier expense',
+                'amount' => '75.00',
+                'status' => 'unpaid',
+                'expense_date' => now()->toDateString(),
+            ],
+        ]);
+        $applier->apply($expenseMutation, ['expense' => $handler]);
+
+        $this->assertDatabaseHas('finance_expenses', [
+            'business_id' => $business->id,
+            'idempotency_key' => $expenseMutation->mutation_id,
+            'amount' => '75.00',
+            'event_id' => $event->id,
+        ]);
     }
 
 }

@@ -7,6 +7,9 @@ use App\Models\BusinessCapability;
 use App\Models\Customer;
 use App\Models\Event;
 use App\Models\EventPreparationItem;
+use App\Models\FinanceExpense;
+use App\Models\Invoice;
+use App\Models\Payment;
 use App\Models\PurchaseOrder;
 use App\Models\Quote;
 use App\Models\Supplier;
@@ -171,7 +174,7 @@ class SyncController extends Controller
         $recorded = [];
         $applied = [];
 
-        foreach ($validated['mutations'] as $item) {
+        foreach ($this->orderMutationsByDependencies($validated['mutations']) as $item) {
             $mutation = $recorder->record($device, $item['entity_type'], $item['entity_id'], $item['operation'], $item['payload'] ?? [], $item['id']);
 
             try {
@@ -189,6 +192,7 @@ class SyncController extends Controller
                 'sequence' => $mutation->sequence,
                 'status' => $mutation->status,
                 'applied' => $mutation->status === 'applied',
+                'error' => $mutation->status === 'pending' ? $mutation->last_error : null,
             ];
         }
 
@@ -199,6 +203,97 @@ class SyncController extends Controller
             'applied' => $applied,
             'message' => 'Supported offline mutations are applied idempotently; unsupported or rejected mutations remain queued with an error for later handling.',
         ]);
+    }
+
+    /**
+     * Keep dependent offline mutations behind mutations that create their referenced local identities.
+     *
+     * @param array<int, array<string, mixed>> $mutations
+     * @return array<int, array<string, mixed>>
+     */
+    private function orderMutationsByDependencies(array $mutations): array
+    {
+        $byLocalId = [];
+        foreach ($mutations as $index => $mutation) {
+            $byLocalId[$mutation['entity_id']][] = $index;
+
+            $payloadLocalId = $mutation['payload']['local_id'] ?? null;
+            if (is_string($payloadLocalId) && $payloadLocalId !== $mutation['entity_id']) {
+                $byLocalId[$payloadLocalId][] = $index;
+            }
+        }
+
+        $depth = [];
+        foreach (array_keys($mutations) as $index) {
+            $depth[$index] = $this->dependencyDepth($index, $mutations, $byLocalId, $depth);
+        }
+
+        $indexed = array_map(
+            fn (int $index): array => ['index' => $index, 'mutation' => $mutations[$index]],
+            array_keys($mutations),
+        );
+
+        usort($indexed, function (array $a, array $b) use ($depth): int {
+            return ($depth[$a['index']] <=> $depth[$b['index']]) ?: ($a['index'] <=> $b['index']);
+        });
+
+        return array_column($indexed, 'mutation');
+    }
+
+    /**
+     * @param array<int, array<string, mixed>> $mutations
+     * @param array<string, array<int, int>> $byLocalId
+     * @param array<int, int> $depth
+     */
+    private function dependencyDepth(int $index, array $mutations, array $byLocalId, array &$depth, array $trail = []): int
+    {
+        if (isset($depth[$index])) {
+            return $depth[$index];
+        }
+
+        if (isset($trail[$index])) {
+            return 0;
+        }
+
+        $trail[$index] = true;
+        $maxDepth = 0;
+
+        foreach ($this->dependencyLocalIds($mutations[$index]['payload'] ?? []) as $localId) {
+            foreach ($byLocalId[$localId] ?? [] as $dependencyIndex) {
+                if ($dependencyIndex === $index) {
+                    continue;
+                }
+
+                $maxDepth = max(
+                    $maxDepth,
+                    $this->dependencyDepth($dependencyIndex, $mutations, $byLocalId, $depth, $trail) + 1,
+                );
+            }
+        }
+
+        return $depth[$index] = $maxDepth;
+    }
+
+    /**
+     * @return array<int, string>
+     */
+    private function dependencyLocalIds(mixed $value): array
+    {
+        if (! is_array($value)) {
+            return [];
+        }
+
+        $identities = [];
+        foreach ($value as $key => $child) {
+            if (is_string($key) && str_ends_with($key, '_local_id') && is_string($child)) {
+                $identities[] = $child;
+                continue;
+            }
+
+            $identities = array_merge($identities, $this->dependencyLocalIds($child));
+        }
+
+        return array_values(array_unique($identities));
     }
 
     private function validateSelection(Business $business, array $selection): array
@@ -230,6 +325,7 @@ class SyncController extends Controller
         return $result;
     }
 
+    /** @SuppressWarnings(PHPMD.ExcessiveMethodLength) */
     private function bootstrapPayload(SyncDevice $device): array
     {
         $business = Business::query()->findOrFail($device->business_id);
@@ -257,12 +353,29 @@ class SyncController extends Controller
             }
 
             $identity = $registry->identify($record, $item['type']);
+            $recordData = $record->toArray();
+
+            if ($item['type'] === 'quote') {
+                $record->loadMissing('latestVersion.items');
+                $recordData['latest_version'] = $record->latestVersion?->toArray();
+            }
+
+            if ($item['type'] === 'job') {
+                $record->loadMissing('requirements');
+                $recordData['requirements'] = $record->requirements->map(function ($requirement) use ($registry): array {
+                    return [
+                        'local_id' => $registry->identify($requirement, 'event_requirement')->entity_uuid,
+                        'server_id' => $requirement->id,
+                        'record' => $requirement->toArray(),
+                    ];
+                })->values()->all();
+            }
 
             $selected[] = [
                 'type' => $item['type'],
                 'local_id' => $identity->entity_uuid,
                 'server_id' => $record->id,
-                'record' => $record->toArray(),
+                'record' => $recordData,
             ];
         }
 
@@ -294,6 +407,40 @@ class SyncController extends Controller
             ])
             ->values();
 
+        $invoices = Invoice::query()
+            ->where('business_id', $business->id)
+            ->with(['items', 'payments'])
+            ->latest('id')
+            ->limit(500)
+            ->get()
+            ->map(fn (Invoice $invoice) => [
+                'local_id' => $registry->identify($invoice, 'invoice')->entity_uuid,
+                'server_id' => $invoice->id,
+                'record' => array_merge($invoice->toArray(), [
+                    'paid_amount' => $invoice->paid_amount,
+                    'balance' => $invoice->balance,
+                    'items' => $invoice->items->map(fn ($item) => $item->toArray())->values(),
+                    'payments' => $invoice->payments->map(fn (Payment $payment) => [
+                        'local_id' => $registry->identify($payment, 'payment')->entity_uuid,
+                        'server_id' => $payment->id,
+                        'record' => $payment->toArray(),
+                    ])->values(),
+                ]),
+            ])
+            ->values();
+
+        $expenses = FinanceExpense::query()
+            ->where('business_id', $business->id)
+            ->latest('id')
+            ->limit(500)
+            ->get()
+            ->map(fn (FinanceExpense $expense) => [
+                'local_id' => $registry->identify($expense, 'expense')->entity_uuid,
+                'server_id' => $expense->id,
+                'record' => $expense->toArray(),
+            ])
+            ->values();
+
         return [
             'version' => 1,
             'business' => [
@@ -317,6 +464,8 @@ class SyncController extends Controller
                 ->values(),
             'suppliers' => $suppliers,
             'purchase_orders' => $purchaseOrders,
+            'invoices' => $invoices,
+            'expenses' => $expenses,
             'selected' => $selected,
             'device' => [
                 'id' => $device->id,
