@@ -39,3 +39,8 @@ This register is a top-level inventory, not a complete transitive dependency aud
 ## Licence caution
 
 A dependency's licence may impose obligations that affect distribution, source availability, notices, attribution or commercial use. Review the actual licence before adopting it.
+
+
+## Locked dependency audit
+
+The 2026-10-07 release audit in `docs/RELEASE_DEPENDENCY_LICENCE_AUDIT.md` reconciles licence metadata from the exact locked Composer and npm manifests, including transitive packages. It identifies MIT, BSD, Apache-2.0, ISC, OFL-1.1, MPL-2.0, 0BSD and MIT-or-CC0 metadata, with the multi-licensed Composer packages and MPL-2.0 Lightning CSS family explicitly recorded. This is the engineering inventory; final legal/distribution review remains separate.
