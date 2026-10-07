@@ -3,7 +3,7 @@
 **Status:** ACTIVE / CANONICAL  
 **Repository:** `Leano-Jordan/ZazuEMP`  
 **Branch:** `main`  
-**Current main HEAD:** `8ef30d474cab22f0652bc61abfdd81ab01874de4`  
+**Current main HEAD:** `90f3dee6d5ec2011db668bf3647fcd007f03218e`  
 **Last Director reconciliation:** 2026-10-07
 
 ## Evidence rule
@@ -48,7 +48,7 @@ These are GitHub Actions results for the exact current main HEAD above. They sup
 | Populated upgrade | 🟢 | Current-head GitHub check passed |
 | Rollback procedure | 🟢 AUTOMATED / 🟡 OPERATIONAL DRILL | Procedure and recovery path exist; real deployment exercise remains |
 | Desktop/mobile/tablet browser coverage | 🟢 AUTOMATED | Physical-device acceptance separately verified |
-| Offline-first foundation | 🟡 | Local/server-first architecture exists; fully disconnected phone-local operation is not a V1 claim |
+| Offline-first foundation | 🟡 | Phone-local IndexedDB + queued sync now covers customer/job/service/preparation/supplier/purchasing/receiving/quote/acceptance/invoice/payment/expense/inventory/costs/assets; conflict/file-sync and full bidirectional parity remain outside the claim |
 | Zazu Helper | 🟡 | Foundation exists; broader autonomous behaviour remains outside V1 |
 
 ## Remaining V1 certification gates
@@ -71,7 +71,10 @@ The rollback runbook and recovery mechanisms exist. A real release/deployment ro
 ### 6. Dependency/licence engineering inventory — 🟢 VERIFIED
 Exact locked Composer and npm manifests were reconciled on 2026-10-07. See `docs/RELEASE_DEPENDENCY_LICENCE_AUDIT.md`. Final legal/distribution review remains separate.
 
-### 7. Final Director certification — ⬜ NOT STARTED
+### 7. Offline operational depth — 🟡 IN PROGRESS
+Phone-local inventory, operational cost and asset workflows are now represented in the local store, queued for synchronization, and protected by server-side domain handlers. Automated runtime execution of the new regression set remains required before promoting this from IMPLEMENTED to TESTED/VERIFIED.
+
+### 8. Final Director certification — ⬜ NOT STARTED
 Certification waits for the remaining operational/legal/brand gates; no rushed release claim.
 
 ## Deliberately outside V1
