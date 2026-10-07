@@ -1015,4 +1015,80 @@ class OfflineSyncFoundationTest extends TestCase
             ->count());
     }
 
+
+    public function test_offline_quote_create_and_draft_update_preserve_local_identity_and_totals(): void
+    {
+        $business = Business::create([
+            'name' => 'Offline Quote Business',
+            'slug' => 'offline-quote-'.Str::lower(Str::random(8)),
+            'status' => 'active',
+            'currency' => 'ZAR',
+        ]);
+        $device = SyncDevice::create([
+            'business_id' => $business->id,
+            'installation_id' => (string) Str::uuid(),
+        ]);
+        $event = \App\Models\Event::create([
+            'business_id' => $business->id,
+            'reference' => 'OFF-QUOTE-001',
+            'name' => 'Offline Quote Event',
+            'status' => 'draft',
+        ]);
+        $eventIdentity = app(\App\Support\Offline\SyncEntityIdentityRegistry::class)->identify($event, 'job');
+        $quoteLocalId = (string) Str::uuid();
+        $handler = app(\App\Support\Offline\OfflineDomainMutationHandler::class);
+        $applier = app(SyncMutationApplier::class);
+
+        $create = app(SyncMutationRecorder::class)->record($device, 'quote', $quoteLocalId, 'create', [
+            'local_id' => $quoteLocalId,
+            'record' => [
+                'event_local_id' => $eventIdentity->entity_uuid,
+                'reference' => 'QUO-OFFLINE-001',
+                'currency' => 'ZAR',
+                'status' => 'draft',
+                'deposit_percent' => '25.00',
+                'items' => [[
+                    'description' => 'Offline catering package',
+                    'quantity' => '2.00',
+                    'unit' => 'packages',
+                    'unit_price' => '500.00',
+                ]],
+            ],
+        ]);
+
+        $applier->apply($create, ['quote' => $handler]);
+
+        $quote = \App\Models\Quote::query()->where('event_id', $event->id)->firstOrFail();
+        $version = $quote->latestVersion()->firstOrFail();
+        $this->assertSame($quoteLocalId, \App\Models\SyncEntityIdentity::query()
+            ->where('business_id', $business->id)
+            ->where('entity_type', 'quote')
+            ->where('record_id', $quote->id)
+            ->value('entity_uuid'));
+        $this->assertSame('1000.00', $version->total);
+        $this->assertSame('250.00', $version->deposit_amount);
+
+        $update = app(SyncMutationRecorder::class)->record($device, 'quote', $quoteLocalId, 'update', [
+            'local_id' => $quoteLocalId,
+            'record' => [
+                'event_local_id' => $eventIdentity->entity_uuid,
+                'status' => 'draft',
+                'deposit_percent' => '50.00',
+                'items' => [[
+                    'description' => 'Updated catering package',
+                    'quantity' => '3.00',
+                    'unit' => 'packages',
+                    'unit_price' => '400.00',
+                ]],
+            ],
+        ]);
+
+        $applier->apply($update, ['quote' => $handler]);
+
+        $version = $quote->fresh('latestVersion.items')->latestVersion()->firstOrFail();
+        $this->assertSame('1200.00', $version->total);
+        $this->assertSame('600.00', $version->deposit_amount);
+        $this->assertSame('Updated catering package', $version->items->first()->description);
+    }
+
 }
