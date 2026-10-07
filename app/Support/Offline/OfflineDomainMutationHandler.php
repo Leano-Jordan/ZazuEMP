@@ -14,6 +14,7 @@ use App\Models\SyncEntityIdentity;
 use App\Models\SyncMutation;
 use App\Services\EventLifecycleService;
 use App\Services\PurchaseOrderReceivingService;
+use App\Support\Money;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Str;
 use Illuminate\Validation\ValidationException;
@@ -38,6 +39,7 @@ class OfflineDomainMutationHandler implements SyncMutationHandler
             'service' => $this->capability($mutation),
             'preparation' => $this->preparation($mutation),
             'purchase_order' => $this->purchaseOrder($mutation),
+            'quote' => $this->quote($mutation),
             'purchase_receipt' => $this->purchaseReceipt($mutation),
             default => throw ValidationException::withMessages([
                 'entity_type' => 'This offline entity is not enabled for server application yet.',
@@ -191,6 +193,129 @@ class OfflineDomainMutationHandler implements SyncMutationHandler
      * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      * @SuppressWarnings(PHPMD.NPathComplexity)
      */
+    private function quote(SyncMutation $mutation): \App\Models\Quote
+    {
+        if (! in_array($mutation->operation, ['create', 'upsert', 'update'], true)) {
+            throw ValidationException::withMessages(['operation' => 'Offline quotes only support create/upsert/update.']);
+        }
+
+        $payload = $this->recordPayload($mutation);
+        $event = $this->resolveOfflineEvent($mutation->business_id, $payload['event_local_id'] ?? null);
+        if (! $event) {
+            throw ValidationException::withMessages(['payload' => 'An offline quote requires a local job identity.']);
+        }
+
+        $quote = $this->existing($mutation);
+        if ($quote instanceof \App\Models\Quote) {
+            if ($quote->status !== 'draft') {
+                throw ValidationException::withMessages(['quote' => 'Only draft offline quotes can be edited.']);
+            }
+
+            $version = $quote->versions()->orderByDesc('version')->firstOrFail();
+            $this->writeOfflineQuoteVersion($version, $payload);
+            return $quote->fresh(['latestVersion.items']);
+        }
+
+        $status = $payload['status'] ?? 'draft';
+        if (! in_array($status, ['draft', 'sent'], true)) {
+            throw ValidationException::withMessages(['status' => 'Offline quotes may only be created as draft or sent.']);
+        }
+
+        $quote = \App\Models\Quote::create([
+            'event_id' => $event->id,
+            'reference' => $this->nullableString($payload['reference'] ?? null, 100)
+                ?? 'QUO-OFFLINE-'.strtoupper(substr($this->entityUuid($mutation), 0, 8)),
+            'status' => $status,
+            'currency' => strtoupper((string) ($payload['currency'] ?? 'ZAR')),
+        ]);
+
+        $version = $quote->versions()->create([
+            'version' => 1,
+            'status' => $status,
+            'subtotal' => '0.00',
+            'tax_total' => '0.00',
+            'total' => '0.00',
+            'deposit_percent' => $this->offlineDepositPercent($payload['deposit_percent'] ?? '0.00'),
+            'deposit_amount' => '0.00',
+            'notes' => $this->nullableString($payload['notes'] ?? null, 5000),
+            'tax_rate_id' => null,
+            'tax_code' => null,
+            'tax_label' => 'No tax',
+            'tax_treatment' => 'out_of_scope',
+            'tax_rate' => '0.00',
+            'tax_snapshot_at' => now(),
+        ]);
+
+        $this->writeOfflineQuoteVersion($version, $payload);
+
+        return $quote->fresh(['latestVersion.items']);
+    }
+
+    private function writeOfflineQuoteVersion(\App\Models\QuoteVersion $version, array $payload): void
+    {
+        $items = $payload['items'] ?? [];
+        if (! is_array($items) || $items === []) {
+            throw ValidationException::withMessages(['items' => 'An offline quote requires at least one line.']);
+        }
+
+        $version->items()->delete();
+        $subtotalCents = 0;
+
+        foreach ($items as $item) {
+            if (! is_array($item)) {
+                throw ValidationException::withMessages(['items' => 'Offline quote lines must be objects.']);
+            }
+
+            $quantityHundredths = $this->positiveQuantity($item['quantity'] ?? null);
+            $unitPriceCents = Money::toCents((string) ($item['unit_price'] ?? '0.00'));
+            if ($unitPriceCents < 0) {
+                throw ValidationException::withMessages(['items' => 'Offline quote prices cannot be negative.']);
+            }
+
+            $lineTotalCents = Money::multiplyQuantityByPrice(
+                Money::toHundredths((string) $quantityHundredths),
+                $unitPriceCents
+            );
+
+            $version->items()->create([
+                'description' => $this->requiredString($item['description'] ?? null, 'description', 500),
+                'quantity' => number_format($quantityHundredths, 2, '.', ''),
+                'unit' => $this->nullableString($item['unit'] ?? null, 100),
+                'unit_price' => Money::fromCents($unitPriceCents),
+                'line_total' => Money::fromCents($lineTotalCents),
+                'capability_id' => null,
+                'event_requirement_id' => null,
+                'source_snapshot' => [
+                    'offline' => true,
+                    'quote_currency' => $version->quote->currency,
+                ],
+            ]);
+
+            $subtotalCents += $lineTotalCents;
+        }
+
+        $taxCents = 0;
+        $totalCents = $subtotalCents;
+        $depositPercent = Money::toCents((string) ($version->deposit_percent ?? '0.00'));
+        $depositCents = intdiv(($totalCents * $depositPercent) + 5000, 10000);
+
+        $version->update([
+            'subtotal' => Money::fromCents($subtotalCents),
+            'tax_total' => Money::fromCents($taxCents),
+            'total' => Money::fromCents($totalCents),
+            'deposit_amount' => Money::fromCents($depositCents),
+        ]);
+    }
+
+    private function offlineDepositPercent(mixed $value): string
+    {
+        if (! is_numeric($value) || (float) $value < 0 || (float) $value > 100) {
+            throw ValidationException::withMessages(['deposit_percent' => 'Offline quote deposit percentage must be between 0 and 100.']);
+        }
+
+        return number_format((float) $value, 2, '.', '');
+    }
+
     private function purchaseOrder(SyncMutation $mutation): PurchaseOrder
     {
         if (! in_array($mutation->operation, ['create', 'upsert'], true)) {
