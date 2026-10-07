@@ -509,6 +509,10 @@ class OfflineDomainMutationHandler implements SyncMutationHandler
         return strtoupper((string) Business::query()->whereKey($businessId)->value('currency'));
     }
 
+    /**
+     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
+     * @SuppressWarnings(PHPMD.NPathComplexity)
+     */
     private function purchaseOrder(SyncMutation $mutation): PurchaseOrder
     {
         if (! in_array($mutation->operation, ['create', 'upsert'], true)) {
