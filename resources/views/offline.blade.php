@@ -160,5 +160,6 @@ async function boot(){
 if('serviceWorker' in navigator) navigator.serviceWorker.register('/sw.js').catch(()=>{});
 boot();
 </script>
+<script src="/offline-attachments.js"></script>
 </body>
 </html>
