@@ -113,7 +113,7 @@ class PwaOfflineFoundationTest extends TestCase
         $this->assertStringContainsString("const entitiesRequiringName = ['customer', 'job', 'supplier', 'inventory_item', 'asset', 'service'];", $app);
         $this->assertStringContainsString('Illuminate\\Support\\Str::uuid()', $purchaseShow);
 
-$marker        $inventory = File::get(resource_path('views/inventory/index.blade.php'));
+        $inventory = File::get(resource_path('views/inventory/index.blade.php'));
         $app = File::get(resource_path('js/app.js'));
 
         $this->assertStringContainsString('data-zazu-offline-entity="service"', $service);
