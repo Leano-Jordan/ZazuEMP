@@ -311,3 +311,16 @@ The offline phone queue now reconciles server receipts deterministically:
 - the phone UI no longer offers quote creation as an offline mutation while the server-side quote domain handler is not implemented.
 
 This preserves the rule that offline capability must expose only workflows that have a safe synchronization contract.
+
+
+## 2026-10-07 attachment sync implementation
+
+The phone workspace now has a dedicated attachment transfer layer alongside the mutation queue:
+- attachments use separate IndexedDB storage so binary files do not inflate the JSON mutation queue;
+- files up to 20 MB use the existing private attachment storage policy and an idempotency UUID;
+- online upload is business-scoped and retry-safe;
+- offline-created attachment records remain on the phone as pending files and are retried when connectivity returns;
+- synced attachment metadata can be listed by event and downloaded back into local phone storage;
+- local phone opening does not require the PC after the attachment has been stored locally.
+
+This still deliberately distinguishes **server identity** from local identity: the current attachment transfer targets already-synced jobs with a server event ID. Attachments on a brand-new local job remain queued until that job receives its server identity.
