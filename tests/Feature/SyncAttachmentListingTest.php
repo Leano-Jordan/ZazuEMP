@@ -133,7 +133,8 @@ class SyncAttachmentListingTest extends TestCase
         $this->assertFalse($first->getData(true)['duplicate']);
         $this->assertTrue($second->getData(true)['duplicate']);
         $this->assertDatabaseCount('event_attachments', 1);
-        Storage::disk('private')->assertExists($first->getData(true)['attachment']['path'] ?? '');
+        $stored = EventAttachment::query()->firstOrFail();
+        Storage::disk('private')->assertExists($stored->path);
     }
 
 }
