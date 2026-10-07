@@ -179,7 +179,13 @@ self.addEventListener('fetch', (event) => {
     const request = event.request;
     const url = new URL(request.url);
 
-    if (request.method === 'GET' && request.mode === 'navigate' && url.origin === self.location.origin) {
+    const acceptsHtml = (request.headers.get('accept') || '').includes('text/html');
+    const isAppPage = request.method === 'GET'
+        && url.origin === self.location.origin
+        && !url.pathname.startsWith('/api/')
+        && (request.mode === 'navigate' || acceptsHtml);
+
+    if (isAppPage) {
         event.respondWith(
             fetch(request)
                 .then((response) => {
@@ -190,7 +196,7 @@ self.addEventListener('fetch', (event) => {
                 })
                 .catch(async () => {
                     const cache = await dynamicCache();
-                    const cachedPage = cache ? await cache.match(request) : null;
+                    const cachedPage = cache ? await cache.match(new Request(request.url)) : null;
                     return cachedPage || caches.match(OFFLINE_SHELL);
                 })
         );
