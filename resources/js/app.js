@@ -1131,6 +1131,7 @@ function setupZazuOfflineForms() {
             const collection = entity === 'customer' ? state.customers : state.jobs;
             collection.push(payload);
             state.local_dirty = true;
+            await window.ZazuOffline.persist();
 
             const submit = form.querySelector('button[type="submit"], input[type="submit"]');
             if (submit) {
