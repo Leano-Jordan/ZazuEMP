@@ -20,7 +20,10 @@ use Tests\TestCase;
 /**
  * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  */
-/** @SuppressWarnings(PHPMD.ExcessiveClassLength) */
+/**
+ * @SuppressWarnings(PHPMD.TooManyPublicMethods)
+ * @SuppressWarnings(PHPMD.ExcessiveClassLength)
+ */
 class OfflineSyncFoundationTest extends TestCase
 {
     use RefreshDatabase;
