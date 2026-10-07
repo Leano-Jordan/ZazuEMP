@@ -11,7 +11,7 @@
                 <button class="zazu-btn zazu-btn-secondary">Mark as sent</button>
             </form>
         @elseif ($quote->status === 'sent')
-            <form method="POST" action="{{ route('quotes.status', $quote) }}">
+            <form method="POST" action="{{ route('quotes.status', $quote) }}" data-zazu-offline-entity="quote_acceptance" data-zazu-offline-quote-id="{{ $quote->id }}" data-zazu-offline-customer-name="{{ $quote->event->customer?->name ?? $quote->event->customer_name ?? 'Customer' }}">
                 @csrf
                 @method('PATCH')
                 <input type="hidden" name="status" value="accepted">
