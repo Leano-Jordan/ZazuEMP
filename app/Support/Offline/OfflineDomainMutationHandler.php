@@ -333,7 +333,7 @@ class OfflineDomainMutationHandler implements SyncMutationHandler
      * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      * @SuppressWarnings(PHPMD.NPathComplexity)
      */
-    private function quoteAcceptance(SyncMutation $mutation): \App\Models\Quote
+    private function quoteAcceptance(SyncMutation $mutation): ?Model
     {
         if (! in_array($mutation->operation, ['create', 'upsert'], true)) {
             throw ValidationException::withMessages(['operation' => 'Offline quote acceptance only supports create/upsert.']);
@@ -370,7 +370,7 @@ class OfflineDomainMutationHandler implements SyncMutationHandler
             'offline' => true,
         ], $mutation->business_id);
 
-        return $quote->fresh(['latestVersion.items']);
+        return null;
     }
 
     private function invoice(SyncMutation $mutation): Invoice
