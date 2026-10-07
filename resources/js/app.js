@@ -1260,7 +1260,7 @@ function setupZazuOfflineForms() {
                     status: get('status') || 'planned',
                     notes: get('notes') || null,
                 };
-            }            } else if (entity === 'service') {
+            } else if (entity === 'service') {
                 payload = {
                     local_id: localId,
                     server_id: null,
@@ -1300,7 +1300,7 @@ function setupZazuOfflineForms() {
                     notes: get('notes') || null,
                     event_local_id: event?.local_id || null,
                 };
-            }            } else if (entity === 'purchase_order') {
+            } else if (entity === 'purchase_order') {
                 const state = window.ZazuOffline.getState();
                 const supplierId = get('supplier_id');
                 const supplier = state?.suppliers?.find(item => Number(item.id ?? item.server_id) === Number(supplierId));
