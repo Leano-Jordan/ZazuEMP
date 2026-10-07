@@ -62,7 +62,7 @@ Codes are permanent once assigned. Never recycle a code.
 | ENG-DATA-002 | CASE-ZAZU-0017 | Finance payment replay returns 422 instead of idempotent redirect | F1/F2/F3 | VERIFIED — current browser suite green |
 | ENG-UI-003 | CASE-ZAZU-0018 | Calendar agenda hidden on desktop/tablet | F1/F2 | VERIFIED — current browser suite green |
 | ENG-CSS-002 | CASE-ZAZU-0019 | Horizontal overflow at 1280px | F1/F2 | VERIFIED — current browser suite green |
-| ENG-CSS-003 | CASE-ZAZU-0020 | Theme token state differs by browser/viewport | F1/F2/F4 | VERIFIED — current browser suite green |
+| ENG-CSS-003 | CASE-ZAZU-0020 | Theme token state differs by browser/viewport | F1/F2/F4 | VERIFIED — current browser suite green |\n| ENG-CONTRACT-005 | CASE-ZAZU-0021 | Quote latest-version assertion calls fresh on relation | F2 | OPEN — corrected, current-head CI pending |
 
 
 ## Latest browser failure fingerprints — 2026-10-06 — reconciled
