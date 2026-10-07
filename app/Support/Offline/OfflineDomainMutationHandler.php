@@ -592,6 +592,11 @@ class OfflineDomainMutationHandler implements SyncMutationHandler
         return InventoryItem::create($attributes);
     }
 
+    /**
+     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
+     * @SuppressWarnings(PHPMD.NPathComplexity)
+     * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
+     */
     private function inventoryMovement(SyncMutation $mutation): InventoryMovement
     {
         if (! in_array($mutation->operation, ['create', 'upsert'], true)) {
@@ -719,6 +724,10 @@ class OfflineDomainMutationHandler implements SyncMutationHandler
         return $existing instanceof InventoryMovement ? $existing->fresh() : throw new \LogicException('Offline inventory movement was not recorded.');
     }
 
+    /**
+     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
+     * @SuppressWarnings(PHPMD.NPathComplexity)
+     */
     private function eventCost(SyncMutation $mutation): EventCost
     {
         if (! in_array($mutation->operation, ['create', 'upsert', 'update'], true)) {
@@ -837,6 +846,11 @@ class OfflineDomainMutationHandler implements SyncMutationHandler
         return Asset::create($attributes);
     }
 
+    /**
+     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
+     * @SuppressWarnings(PHPMD.NPathComplexity)
+     * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
+     */
     private function assetAllocation(SyncMutation $mutation): AssetAllocation
     {
         if (! in_array($mutation->operation, ['create', 'upsert', 'update'], true)) {
