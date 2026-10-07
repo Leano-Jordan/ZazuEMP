@@ -1481,7 +1481,7 @@ class OfflineSyncFoundationTest extends TestCase
 
         $mutationId = (string) Str::uuid();
         $localId = (string) Str::uuid();
-        $request = \\Illuminate\\Http\\Request::create('/api/sync/push', 'POST', [
+        $request = \Illuminate\\Http\\Request::create('/api/sync/push', 'POST', [
             'mutations' => [[
                 'id' => $mutationId,
                 'entity_type' => 'customer',
@@ -1497,11 +1497,11 @@ class OfflineSyncFoundationTest extends TestCase
         ]);
         $request->attributes->set('sync_device', $device);
 
-        $response = app(\\App\\Http\\Controllers\\SyncController::class)->push(
+        $response = app(\App\\Http\\Controllers\\SyncController::class)->push(
             $request,
             app(SyncMutationRecorder::class),
             app(SyncMutationApplier::class),
-            app(\\App\\Support\\Offline\\OfflineDomainMutationHandler::class),
+            app(\App\\Support\\Offline\\OfflineDomainMutationHandler::class),
             app(SyncConflictRecorder::class),
         );
         $data = $response->getData(true);
