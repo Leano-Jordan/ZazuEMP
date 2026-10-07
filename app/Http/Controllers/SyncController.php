@@ -394,7 +394,6 @@ class SyncController extends Controller
                     ->where('entity_type', $mutation->entity_type)
                     ->where('entity_uuid', $mutation->entity_id)
                     ->first();
-                $recorder->publish($mutation);
 
             } catch (\Throwable $exception) {
                 $error = mb_substr($exception->getMessage(), 0, 1000);
