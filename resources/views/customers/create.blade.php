@@ -13,7 +13,7 @@
         </div>
     </section>
 
-    <form method="POST" action="{{ route('customers.store') }}" enctype="multipart/form-data">
+    <form method="POST" action="{{ route('customers.store') }}" enctype="multipart/form-data" data-zazu-offline-entity="customer">
         @csrf
 
         <div class="zazu-editor">
