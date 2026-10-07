@@ -94,6 +94,17 @@ class PwaOfflineFoundationTest extends TestCase
         $this->assertStringContainsString("entity === 'payment'", File::get(resource_path('js/app.js')));
         $this->assertStringContainsString("entity === 'preparation'", File::get(resource_path('js/app.js')));
         $this->assertStringContainsString("entity === 'event_cost'", File::get(resource_path('js/app.js')));
+
+        $service = File::get(resource_path('views/capabilities/create.blade.php'));
+        $inventory = File::get(resource_path('views/inventory/index.blade.php'));
+        $app = File::get(resource_path('js/app.js'));
+
+        $this->assertStringContainsString('data-zazu-offline-entity="service"', $service);
+        $this->assertStringContainsString('data-zazu-offline-entity="inventory_movement"', $inventory);
+        $this->assertStringContainsString("entity === 'service'", $app);
+        $this->assertStringContainsString("entity === 'inventory_movement'", $app);
+        $this->assertStringContainsString("capability_type", File::get(app_path('Support/Offline/OfflineDomainMutationHandler.php')));
+        $this->assertStringContainsString("pricing_basis", File::get(app_path('Support/Offline/OfflineDomainMutationHandler.php')));
     }
 
     public function test_shared_zazu_local_client_is_real_application_infrastructure_not_a_second_workspace(): void
