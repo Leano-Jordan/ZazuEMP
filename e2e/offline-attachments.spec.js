@@ -5,7 +5,8 @@ test('offline attachments can be queued for a locally created job', async ({ pag
     await page.context().setOffline(true);
 
     await page.getByRole('button', { name: 'New job' }).click();
-    await page.getByLabel('Job name').fill('Offline catering job');
+    await expect(page.locator('#record-form')).toBeVisible();
+    await page.locator('#f-name').fill('Offline catering job');
     await page.getByRole('button', { name: 'Save on phone' }).click();
     await expect(page.getByText('Offline catering job')).toBeVisible();
 
