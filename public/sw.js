@@ -1,5 +1,5 @@
-const CACHE_NAME = 'zazu-static-v7';
-const OFFLINE_SHELL = '/offline';
+const CACHE_NAME = 'zazu-static-v8';
+const OFFLINE_SHELL = '/dashboard';
 
 const PRECACHE_ASSETS = [
     OFFLINE_SHELL,
