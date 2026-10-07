@@ -558,7 +558,7 @@ class OfflineDomainMutationHandler implements SyncMutationHandler
         }
 
         $capability = array_key_exists('capability_local_id', $payload)
-            ? $this->resolveOfflineCapability($mutation->business_id, $payload['capability_local_id'])
+            ? $this->resolveOfflineCapability($mutation->business_id, $payload['capability_local_id'], 'product')
             : null;
 
         $sku = $this->nullableString($payload['sku'] ?? null, 100);
@@ -761,10 +761,15 @@ class OfflineDomainMutationHandler implements SyncMutationHandler
             throw ValidationException::withMessages(['actual_amount' => 'An incurred cost must have an actual amount.']);
         }
 
+        $category = $this->requiredString($payload['category'] ?? null, 'category', 100);
+        if (! array_key_exists($category, config('zazu.cost_categories'))) {
+            throw ValidationException::withMessages(['category' => 'Offline cost category is invalid.']);
+        }
+
         $attributes = [
             'business_id' => $mutation->business_id,
             'event_id' => $event->id,
-            'category' => $this->requiredString($payload['category'] ?? null, 'category', 100),
+            'category' => $category,
             'description' => $this->requiredString($payload['description'] ?? null, 'description', 255),
             'currency' => $currency,
             'projected_amount' => number_format($projected, 2, '.', ''),
@@ -795,7 +800,7 @@ class OfflineDomainMutationHandler implements SyncMutationHandler
         }
 
         $capability = array_key_exists('capability_local_id', $payload)
-            ? $this->resolveOfflineCapability($mutation->business_id, $payload['capability_local_id'])
+            ? $this->resolveOfflineCapability($mutation->business_id, $payload['capability_local_id'], 'rental')
             : null;
 
         $assetTag = $this->requiredString($payload['asset_tag'] ?? null, 'asset_tag', 100);
@@ -933,13 +938,19 @@ class OfflineDomainMutationHandler implements SyncMutationHandler
         return $allocation->fresh();
     }
 
-    private function resolveOfflineCapability(int $businessId, mixed $uuid): ?BusinessCapability
+    private function resolveOfflineCapability(int $businessId, mixed $uuid, ?string $expectedType = null): ?BusinessCapability
     {
         if ($uuid === null || $uuid === '') {
             return null;
         }
 
-        return $this->resolveIdentityRecord($businessId, 'service', $uuid, BusinessCapability::class);
+        $capability = $this->resolveIdentityRecord($businessId, 'service', $uuid, BusinessCapability::class);
+
+        if ($capability && $expectedType !== null && $capability->capability_type !== $expectedType) {
+            throw ValidationException::withMessages(['capability_local_id' => "This offline record requires a {$expectedType} catalogue capability."]);
+        }
+
+        return $capability;
     }
 
     private function requiredEnum(mixed $value, array $allowed, string $field): string
