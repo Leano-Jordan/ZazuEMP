@@ -51,7 +51,7 @@
     }
 
     async function upload(record) {
-        if (!navigator.onLine || !data?.sync?.token || !record.file) return false;
+        if (!navigator.onLine || !data?.sync?.token || !record.file || !Number(record.event_id)) return false;
 
         const form = new FormData();
         form.append('event_id', String(record.event_id));
@@ -67,10 +67,23 @@
         return true;
     }
 
+    async function reconcileEventIds() {
+        if (!data?.sync?.token) return;
+        const files = await getFiles();
+        const localEvents = data.events || [];
+        for (const record of files.filter(x => x.status === 'pending' && x.event_local_id)) {
+            const event = localEvents.find(x => x.local_id === record.event_local_id);
+            if (!event || !Number(event.id)) continue;
+            record.event_id = Number(event.id);
+            await putFile(record);
+        }
+    }
+
     async function flush() {
         if (!navigator.onLine || !data?.sync?.token) return;
+        await reconcileEventIds();
         const files = await getFiles();
-        for (const record of files.filter(x => x.status === 'pending')) {
+        for (const record of files.filter(x => x.status === 'pending' && Number(x.event_id) > 0)) {
             try {
                 if (await upload(record)) message('Offline attachment synced');
             } catch (e) {}
