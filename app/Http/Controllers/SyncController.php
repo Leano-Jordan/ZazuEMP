@@ -189,6 +189,7 @@ class SyncController extends Controller
                 'sequence' => $mutation->sequence,
                 'status' => $mutation->status,
                 'applied' => $mutation->status === 'applied',
+                'error' => $mutation->status === 'pending' ? $mutation->last_error : null,
             ];
         }
 
