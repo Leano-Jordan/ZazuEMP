@@ -10,6 +10,10 @@ use LogicException;
 
 class SyncMutationApplier
 {
+    public function __construct(private readonly SyncMutationRecorder $recorder)
+    {
+    }
+
     /**
      * @param array<string, SyncMutationHandler> $handlers
      */
@@ -53,6 +57,10 @@ class SyncMutationApplier
                 'attempts' => $locked->attempts + 1,
                 'last_error' => null,
             ]);
+
+            // Publish inside the same database transaction as the domain mutation.
+            // If delivery creation fails, the domain mutation and applied marker roll back together.
+            $this->recorder->publish($locked);
 
             return $locked->fresh();
         });
