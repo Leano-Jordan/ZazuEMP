@@ -49,9 +49,10 @@ class PwaOfflineFoundationTest extends TestCase
     {
         $worker = File::get(public_path('sw.js'));
 
-        $this->assertStringContainsString("const CACHE_NAME = 'zazu-static-v6';", $worker);
+        $this->assertStringContainsString("const CACHE_NAME = 'zazu-static-v7';", $worker);
         $this->assertStringContainsString("const OFFLINE_SHELL = '/offline';", $worker);
         $this->assertStringContainsString("OFFLINE_SHELL,", $worker);
+        $this->assertStringContainsString("'/offline-attachments.js'", $worker);
         $this->assertStringContainsString(".catch(() => caches.match(OFFLINE_SHELL))", $worker);
     }
 

@@ -18,6 +18,7 @@ use App\Models\PurchaseOrder;
 use App\Models\Quote;
 use App\Models\Supplier;
 use App\Models\SyncConflict;
+use App\Models\SyncEntityIdentity;
 use App\Models\SyncDevice;
 use App\Models\SyncMutation;
 use App\Support\CurrentBusiness;
@@ -33,6 +34,10 @@ use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 use Illuminate\Validation\ValidationException;
 
+/**
+ * @SuppressWarnings(PHPMD.TooManyPublicMethods)
+ * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
+ */
 class SyncController extends Controller
 {
     private const SELECTION_TYPES = [
@@ -389,6 +394,8 @@ class SyncController extends Controller
                     ->where('entity_type', $mutation->entity_type)
                     ->where('entity_uuid', $mutation->entity_id)
                     ->first();
+                $recorder->publish($mutation);
+
             } catch (\Throwable $exception) {
                 $error = mb_substr($exception->getMessage(), 0, 1000);
 

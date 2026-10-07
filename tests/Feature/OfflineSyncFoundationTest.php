@@ -3,11 +3,15 @@
 namespace Tests\Feature;
 
 use App\Models\Business;
+use App\Http\Controllers\SyncController;
 use App\Models\SyncDelivery;
 use App\Models\SyncDevice;
 use App\Models\SyncMutation;
+use App\Models\SyncEntityIdentity;
+use App\Support\Offline\OfflineDomainMutationHandler;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 use Illuminate\Database\QueryException;
 use App\Support\Offline\SyncMutationProtocol;
@@ -22,6 +26,7 @@ use Tests\TestCase;
  */
 /**
  * @SuppressWarnings(PHPMD.TooManyPublicMethods)
+ * @SuppressWarnings(PHPMD.TooManyMethods)
  * @SuppressWarnings(PHPMD.ExcessiveClassLength)
  */
 class OfflineSyncFoundationTest extends TestCase
@@ -215,8 +220,12 @@ class OfflineSyncFoundationTest extends TestCase
         ]);
 
         $recorder = app(SyncMutationRecorder::class);
-        $recorder->record($sourceDevice, 'event', 'event-1', 'upsert', ['name' => 'First']);
-        $recorder->record($sourceDevice, 'event', 'event-2', 'upsert', ['name' => 'Second']);
+        $first = $recorder->record($sourceDevice, 'event', 'event-1', 'upsert', ['name' => 'First']);
+        $second = $recorder->record($sourceDevice, 'event', 'event-2', 'upsert', ['name' => 'Second']);
+        $first->update(['status' => 'applied', 'applied_at' => now()]);
+        $second->update(['status' => 'applied', 'applied_at' => now()]);
+        $recorder->publish($first);
+        $recorder->publish($second);
 
         $protocol = app(SyncMutationProtocol::class);
         $batch = $protocol->pull($destinationDevice);
@@ -229,11 +238,44 @@ class OfflineSyncFoundationTest extends TestCase
 
         $this->assertSame('applied', SyncDelivery::query()->where('destination_device_id', $destinationDevice->id)->where('delivery_sequence', 1)->value('status'));
         $this->assertSame('pending', SyncDelivery::query()->where('destination_device_id', $destinationDevice->id)->where('delivery_sequence', 2)->value('status'));
-        $this->assertSame('pending', SyncMutation::query()->where('sequence', 1)->first()->status);
+        $this->assertSame('applied', SyncMutation::query()->where('sequence', 1)->first()->status);
 
         $this->expectException(\Illuminate\Validation\ValidationException::class);
 
         $protocol->acknowledgeThrough($destinationDevice, 3);
+    }
+
+
+    public function test_pending_mutation_is_not_published_until_applied(): void
+    {
+        $business = Business::create([
+            'name' => 'Publish Gate Business',
+            'slug' => 'publish-gate-'.Str::lower(Str::random(8)),
+            'status' => 'active',
+            'currency' => 'ZAR',
+        ]);
+        $sourceDevice = SyncDevice::create([
+            'business_id' => $business->id,
+            'installation_id' => (string) Str::uuid(),
+        ]);
+        $destinationDevice = SyncDevice::create([
+            'business_id' => $business->id,
+            'installation_id' => (string) Str::uuid(),
+        ]);
+
+        $recorder = app(SyncMutationRecorder::class);
+        $mutation = $recorder->record($sourceDevice, 'event', 'event-race', 'upsert', ['name' => 'Race safe']);
+        $protocol = app(SyncMutationProtocol::class);
+
+        $this->assertCount(0, $protocol->pull($destinationDevice));
+        $this->assertDatabaseCount('sync_deliveries', 0);
+
+        $mutation->update(['status' => 'applied', 'applied_at' => now()]);
+        $recorder->publish($mutation);
+
+        $batch = $protocol->pull($destinationDevice);
+        $this->assertCount(1, $batch);
+        $this->assertSame('event-race', $batch->first()->entity_id);
     }
 
 
@@ -1480,7 +1522,7 @@ class OfflineSyncFoundationTest extends TestCase
 
         $mutationId = (string) Str::uuid();
         $localId = (string) Str::uuid();
-        $request = \\Illuminate\\Http\\Request::create('/api/sync/push', 'POST', [
+        $request = Request::create('/api/sync/push', 'POST', [
             'mutations' => [[
                 'id' => $mutationId,
                 'entity_type' => 'customer',
@@ -1496,11 +1538,11 @@ class OfflineSyncFoundationTest extends TestCase
         ]);
         $request->attributes->set('sync_device', $device);
 
-        $response = app(\\App\\Http\\Controllers\\SyncController::class)->push(
+        $response = app(SyncController::class)->push(
             $request,
             app(SyncMutationRecorder::class),
             app(SyncMutationApplier::class),
-            app(\\App\\Support\\Offline\\OfflineDomainMutationHandler::class),
+            app(OfflineDomainMutationHandler::class),
             app(SyncConflictRecorder::class),
         );
         $data = $response->getData(true);

@@ -77,9 +77,18 @@ class SyncMutationRecorder
                 'occurred_at' => now(),
             ]);
 
-            $this->queueDeliveries($mutation);
-
             return $mutation;
+        });
+    }
+
+    public function publish(SyncMutation $mutation): void
+    {
+        if (! $mutation->exists || $mutation->status !== 'applied') {
+            throw new LogicException('Only an applied sync mutation can be published.');
+        }
+
+        DB::transaction(function () use ($mutation): void {
+            $this->queueDeliveries($mutation);
         });
     }
 
@@ -94,6 +103,15 @@ class SyncMutationRecorder
             ->get()
             ->each(function (SyncDevice $destination) use ($mutation): void {
                 SyncDevice::query()->whereKey($destination->id)->lockForUpdate()->firstOrFail();
+
+                $existing = SyncDelivery::query()
+                    ->where('sync_mutation_id', $mutation->id)
+                    ->where('destination_device_id', $destination->id)
+                    ->first();
+
+                if ($existing) {
+                    return;
+                }
 
                 $next = SyncDelivery::query()
                     ->where('destination_device_id', $destination->id)

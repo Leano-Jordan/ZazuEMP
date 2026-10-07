@@ -9,6 +9,8 @@ use App\Models\EventAttachment;
 use App\Models\SyncDevice;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Http\Request;
+use Illuminate\Http\UploadedFile;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 use Tests\TestCase;
 
@@ -86,4 +88,53 @@ class SyncAttachmentListingTest extends TestCase
         $this->assertSame('first.pdf', $payload['attachments'][0]['original_name']);
         $this->assertSame($firstEvent->id, $payload['attachments'][0]['event_id']);
     }
+    public function test_sync_attachment_upload_is_idempotent_for_retries(): void
+    {
+        Storage::fake('private');
+
+        $business = Business::create([
+            'name' => 'Attachment Retry',
+            'slug' => 'attachment-retry-'.Str::lower(Str::random(8)),
+            'status' => 'active',
+            'currency' => 'ZAR',
+        ]);
+        $event = Event::create([
+            'business_id' => $business->id,
+            'reference' => 'ATT-RETRY-001',
+            'name' => 'Retry event',
+            'status' => 'draft',
+        ]);
+        $device = SyncDevice::create([
+            'business_id' => $business->id,
+            'installation_id' => (string) Str::uuid(),
+            'device_name' => 'Retry phone',
+            'device_type' => 'phone',
+            'status' => 'active',
+        ]);
+
+        $idempotencyKey = (string) Str::uuid();
+        $makeRequest = function () use ($event, $device, $idempotencyKey): Request {
+            $request = Request::create('/api/sync/attachments', 'POST', [
+                'event_id' => $event->id,
+                'idempotency_key' => $idempotencyKey,
+                'description' => 'Retry-safe file',
+            ], [], [
+                'file' => UploadedFile::fake()->createWithContent('brief.txt', 'offline attachment'),
+            ]);
+            $request->attributes->set('sync_device', $device);
+            return $request;
+        };
+
+        $first = app(SyncController::class)->uploadAttachment($makeRequest());
+        $second = app(SyncController::class)->uploadAttachment($makeRequest());
+
+        $this->assertSame(201, $first->getStatusCode());
+        $this->assertSame(200, $second->getStatusCode());
+        $this->assertFalse($first->getData(true)['duplicate']);
+        $this->assertTrue($second->getData(true)['duplicate']);
+        $this->assertDatabaseCount('event_attachments', 1);
+        $stored = EventAttachment::query()->firstOrFail();
+        Storage::disk('private')->assertExists($stored->path);
+    }
+
 }

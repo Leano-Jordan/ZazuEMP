@@ -16,6 +16,7 @@ class SyncConflictResolutionTest extends TestCase
 {
     use RefreshDatabase;
 
+    /** @SuppressWarnings(PHPMD.ExcessiveMethodLength) */
     public function test_conflicts_are_device_scoped_and_can_be_retried_or_discarded(): void
     {
         $first = Business::create([
