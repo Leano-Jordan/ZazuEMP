@@ -2,6 +2,9 @@ import { test, expect } from '@playwright/test';
 
 test('offline attachments can be queued for a locally created job', async ({ page }) => {
     await page.goto('/offline');
+    // The offline workspace hydrates IndexedDB asynchronously. Wait for its first render
+    // before taking the browser offline so boot cannot overwrite the form we are opening.
+    await expect(page.locator('#content .panel')).toBeVisible();
     await page.context().setOffline(true);
 
     await page.getByRole('button', { name: 'New job' }).click();
