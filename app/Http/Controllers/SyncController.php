@@ -7,6 +7,7 @@ use App\Models\BusinessCapability;
 use App\Models\Customer;
 use App\Models\Event;
 use App\Models\EventPreparationItem;
+use App\Models\EventAttachment;
 use App\Models\FinanceExpense;
 use App\Models\Asset;
 use App\Models\EventCost;
@@ -27,6 +28,7 @@ use App\Support\Offline\SyncConflictRecorder;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 use Illuminate\Validation\ValidationException;
 
@@ -161,6 +163,84 @@ class SyncController extends Controller
 
         $device->update(['last_seen_at' => now()]);
         return response()->json(['cursor' => $cursor]);
+    }
+
+    public function uploadAttachment(Request $request): JsonResponse
+    {
+        $device = $request->attributes->get('sync_device');
+        $validated = $request->validate([
+            'event_id' => ['required', 'integer', 'min:1'],
+            'idempotency_key' => ['required', 'uuid'],
+            'description' => ['nullable', 'string', 'max:255'],
+            'file' => ['required', 'file', 'max:20480', 'mimetypes:image/jpeg,image/png,image/webp,application/pdf,text/plain,text/csv,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document,application/vnd.ms-excel,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'],
+        ]);
+
+        $existing = EventAttachment::query()
+            ->where('business_id', $device->business_id)
+            ->where('idempotency_key', $validated['idempotency_key'])
+            ->first();
+
+        if ($existing) {
+            return response()->json([
+                'attachment' => $this->attachmentPayload($existing),
+                'duplicate' => true,
+            ]);
+        }
+
+        $event = Event::query()
+            ->where('business_id', $device->business_id)
+            ->findOrFail($validated['event_id']);
+
+        $path = $request->file('file')->store('jobs/'.$event->id.'/attachments', 'private');
+
+        try {
+            $attachment = EventAttachment::create([
+                'event_id' => $event->id,
+                'business_id' => $event->business_id,
+                'uploaded_by' => null,
+                'original_name' => $request->file('file')->getClientOriginalName(),
+                'disk' => 'private',
+                'path' => $path,
+                'mime_type' => $request->file('file')->getMimeType(),
+                'size' => $request->file('file')->getSize(),
+                'source' => 'sync',
+                'description' => $validated['description'] ?? null,
+                'idempotency_key' => $validated['idempotency_key'],
+            ]);
+        } catch (\Throwable $exception) {
+            Storage::disk('private')->delete($path);
+            throw $exception;
+        }
+
+        $device->update(['last_seen_at' => now()]);
+
+        return response()->json([
+            'attachment' => $this->attachmentPayload($attachment),
+            'duplicate' => false,
+        ], 201);
+    }
+
+    public function downloadAttachment(Request $request, EventAttachment $attachment)
+    {
+        $device = $request->attributes->get('sync_device');
+        abort_unless((int) $attachment->business_id === (int) $device->business_id, 404);
+        abort_unless(Storage::disk($attachment->disk)->exists($attachment->path), 404);
+
+        return Storage::disk($attachment->disk)->download($attachment->path, $attachment->original_name);
+    }
+
+    private function attachmentPayload(EventAttachment $attachment): array
+    {
+        return [
+            'id' => $attachment->id,
+            'event_id' => $attachment->event_id,
+            'original_name' => $attachment->original_name,
+            'mime_type' => $attachment->mime_type,
+            'size' => $attachment->size,
+            'source' => $attachment->source,
+            'description' => $attachment->description,
+            'created_at' => $attachment->created_at?->toIso8601String(),
+        ];
     }
 
     public function push(Request $request, \App\Support\Offline\SyncMutationRecorder $recorder, SyncMutationApplier $applier, OfflineDomainMutationHandler $handler, SyncConflictRecorder $conflictRecorder): JsonResponse
