@@ -27,12 +27,11 @@ IDENTITY → BASELINE → TARGET → ROUTE → INSPECT → CHANGE → VERIFY →
 **Product hardening: offline operational depth → reconciliation → workflow integrity → final certification later**
 
 Verified gates:
-- Current-head browser suite: GREEN (owner-reported).
-- Current-head Zazu quality CI: GREEN.
-- Current-head populated upgrade/rollback CI: GREEN.
-- Populated commercial financial chain automated coverage: GREEN.
+- Previously verified browser, quality and populated upgrade/rollback suites remain green at their assessed heads.
+- Populated commercial financial chain automated coverage remains green.
+- Current main after the offline parity hardening cycle is **not yet runtime-verified**; GitHub Actions for the current head are queued.
 
-Next hard gate: **customer-environment backup/restore proof** after the newly added offline operational-depth regression set is executed and reconciled.
+Next hard gate: **reconcile current-head regression/CI evidence, then customer-environment backup/restore proof**.
 
 Physical device acceptance is now owner-verified: Zazu installed on PC and mobile; screen rotation and presentation reported in order.
 
@@ -76,4 +75,4 @@ Offline operational depth expanded in current `main` through:
 
 Current evidence status: **IMPLEMENTED; runtime TESTED/VERIFIED pending execution of the new regression set.** No release score uplift is claimed from source changes alone.
 
-Last updated: 2026-10-07 — offline operational depth expanded; current release gates remain recovery, rollback, legal/privacy and brand closure.
+Last updated: 2026-10-07 — offline operational depth and parity hardened; current release gates remain current-head verification, recovery, rollback, legal/privacy and brand closure.
