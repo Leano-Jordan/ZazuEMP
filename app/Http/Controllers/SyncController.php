@@ -340,12 +340,29 @@ class SyncController extends Controller
             }
 
             $identity = $registry->identify($record, $item['type']);
+            $recordData = $record->toArray();
+
+            if ($item['type'] === 'quote') {
+                $record->loadMissing('latestVersion.items');
+                $recordData['latest_version'] = $record->latestVersion?->toArray();
+            }
+
+            if ($item['type'] === 'job') {
+                $record->loadMissing('requirements');
+                $recordData['requirements'] = $record->requirements->map(function ($requirement) use ($registry): array {
+                    return [
+                        'local_id' => $registry->identify($requirement, 'event_requirement')->entity_uuid,
+                        'server_id' => $requirement->id,
+                        'record' => $requirement->toArray(),
+                    ];
+                })->values()->all();
+            }
 
             $selected[] = [
                 'type' => $item['type'],
                 'local_id' => $identity->entity_uuid,
                 'server_id' => $record->id,
-                'record' => $record->toArray(),
+                'record' => $recordData,
             ];
         }
 
