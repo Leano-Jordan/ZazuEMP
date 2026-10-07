@@ -266,6 +266,12 @@ class OfflineDomainMutationHandler implements SyncMutationHandler
 
     private function writeOfflineQuoteVersion(\App\Models\QuoteVersion $version, array $payload): void
     {
+        if (array_key_exists('deposit_percent', $payload)) {
+            $version->update([
+                'deposit_percent' => $this->offlineDepositPercent($payload['deposit_percent']),
+            ]);
+        }
+
         $items = $payload['items'] ?? [];
         if (! is_array($items) || $items === []) {
             throw ValidationException::withMessages(['items' => 'An offline quote requires at least one line.']);
@@ -385,7 +391,7 @@ class OfflineDomainMutationHandler implements SyncMutationHandler
         }
 
         $payload = $this->recordPayload($mutation);
-        $quote = $this->resolveIdentityRecord($mutation->business_id, 'quote', $payload['quote_local_id'] ?? null, AppModelsQuote::class);
+        $quote = $this->resolveIdentityRecord($mutation->business_id, 'quote', $payload['quote_local_id'] ?? null, \App\Models\Quote::class);
         if (! $quote || $quote->status !== 'accepted') {
             throw ValidationException::withMessages(['quote_local_id' => 'Offline invoices require an accepted quote.']);
         }
