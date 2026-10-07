@@ -27,6 +27,7 @@ use Illuminate\Validation\ValidationException;
 
 /**
  * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
+ * @SuppressWarnings(PHPMD.TooManyMethods)
  */
 class OfflineDomainMutationHandler implements SyncMutationHandler
 {
