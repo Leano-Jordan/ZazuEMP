@@ -279,6 +279,57 @@ class OfflineSyncFoundationTest extends TestCase
     }
 
 
+    public function test_sync_applier_rolls_back_domain_application_when_delivery_publish_fails(): void
+    {
+        $business = Business::create([
+            'name' => 'Atomic Publish Business',
+            'slug' => 'atomic-publish-'.Str::lower(Str::random(8)),
+            'status' => 'active',
+            'currency' => 'ZAR',
+        ]);
+
+        $sourceDevice = SyncDevice::create([
+            'business_id' => $business->id,
+            'installation_id' => (string) Str::uuid(),
+        ]);
+        SyncDevice::create([
+            'business_id' => $business->id,
+            'installation_id' => (string) Str::uuid(),
+        ]);
+
+        $mutation = app(SyncMutationRecorder::class)->record(
+            $sourceDevice,
+            'test_atomic_publish',
+            (string) Str::uuid(),
+            'create',
+            ['record' => ['name' => 'atomic']],
+        );
+
+        app()->instance(SyncMutationRecorder::class, new class extends SyncMutationRecorder {
+            public function publish(SyncMutation $mutation): void
+            {
+                throw new \RuntimeException('simulated delivery failure');
+            }
+        });
+
+        $handler = new class implements SyncMutationHandler {
+            public function apply(SyncMutation $mutation): void
+            {
+                $mutation->update(['last_error' => 'handler side effect']);
+            }
+        };
+
+        $this->expectException(\RuntimeException::class);
+        app(SyncMutationApplier::class)->apply($mutation, [
+            'test_atomic_publish' => $handler,
+        ]);
+
+        $fresh = $mutation->fresh();
+        $this->assertSame('pending', $fresh->status);
+        $this->assertNull($fresh->last_error);
+        $this->assertDatabaseCount('sync_deliveries', 0);
+    }
+
     public function test_sync_applier_requires_an_explicit_domain_handler(): void
     {
         $business = Business::create([
