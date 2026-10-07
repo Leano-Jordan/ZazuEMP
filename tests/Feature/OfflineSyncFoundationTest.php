@@ -319,10 +319,14 @@ class OfflineSyncFoundationTest extends TestCase
             }
         };
 
-        $this->expectException(\RuntimeException::class);
-        app(SyncMutationApplier::class)->apply($mutation, [
-            'test_atomic_publish' => $handler,
-        ]);
+        try {
+            app(SyncMutationApplier::class)->apply($mutation, [
+                'test_atomic_publish' => $handler,
+            ]);
+            $this->fail('The simulated publish failure should have been thrown.');
+        } catch (\\RuntimeException $exception) {
+            $this->assertSame('simulated delivery failure', $exception->getMessage());
+        }
 
         $fresh = $mutation->fresh();
         $this->assertSame('pending', $fresh->status);
