@@ -54,6 +54,15 @@ class ZazuBackupRestoreTest extends TestCase
             $this->assertSame(true, $zip->open($archive));
             $this->assertNotFalse($zip->locateName('manifest.json'));
             $this->assertNotFalse($zip->locateName('database.sqlite'));
+            $this->assertNotFalse($zip->locateName('storage/private/zazu-roundtrip/media-probe.txt'));
+
+            $manifest = json_decode((string) $zip->getFromName('manifest.json'), true, 512, JSON_THROW_ON_ERROR);
+            $this->assertSame('Zazu EMP', $manifest['application'] ?? null);
+            $this->assertSame(1, $manifest['format_version'] ?? null);
+            $this->assertSame('sqlite', $manifest['database_driver'] ?? null);
+            $this->assertSame(['database', 'private_storage'], $manifest['contents'] ?? null);
+            $this->assertNotEmpty($manifest['backup_id'] ?? null);
+            $this->assertNotEmpty($manifest['created_at'] ?? null);
 
             for ($index = 0; $index < $zip->numFiles; $index++) {
                 $this->assertStringNotContainsString('\\', (string) $zip->getNameIndex($index));
