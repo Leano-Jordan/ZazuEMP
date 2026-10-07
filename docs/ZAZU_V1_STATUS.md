@@ -102,3 +102,15 @@ Historical CI/test figures in older records remain historical and are not restat
 ## Direction
 
 The next Zazu engineering effort should close the highest-risk remaining release gate: populated commercial workflow → real recovery → representative upgrade → rollback → final Director certification.
+
+
+## Jarvis update — 2026-10-07
+
+Offline attachment transfer has advanced from server-only foundation to phone-local queued storage and retry:
+- private, business-scoped upload/download/list endpoints;
+- idempotent attachment identity exposed in sync payloads;
+- separate IndexedDB binary storage on the phone;
+- offline attachment queue with automatic online retry;
+- local opening of stored files without a network connection.
+
+Remaining attachment gate: prove the browser/device flow against a real populated workspace, including a newly created offline job receiving its server identity before its queued attachment uploads.
