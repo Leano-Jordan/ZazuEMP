@@ -220,6 +220,27 @@ class SyncController extends Controller
         ], 201);
     }
 
+    public function listAttachments(Request $request): JsonResponse
+    {
+        $device = $request->attributes->get('sync_device');
+        $eventId = $request->query('event_id');
+
+        $query = EventAttachment::query()
+            ->where('business_id', $device->business_id)
+            ->when($eventId, fn ($q) => $q->where('event_id', $eventId))
+            ->latest('id');
+
+        if ($eventId !== null) {
+            Event::query()
+                ->where('business_id', $device->business_id)
+                ->findOrFail($eventId);
+        }
+
+        return response()->json([
+            'attachments' => $query->get()->map(fn (EventAttachment $attachment) => $this->attachmentPayload($attachment))->values(),
+        ]);
+    }
+
     public function downloadAttachment(Request $request, EventAttachment $attachment)
     {
         $device = $request->attributes->get('sync_device');
