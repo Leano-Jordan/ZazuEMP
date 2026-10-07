@@ -1463,4 +1463,57 @@ class OfflineSyncFoundationTest extends TestCase
         \Illuminate\Support\Facades\Storage::disk('private')->assertExists($attachment->path);
     }
 
+    public function test_sync_push_returns_server_identity_for_new_offline_record(): void
+    {
+        $business = Business::create([
+            'name' => 'Identity Handoff Business',
+            'slug' => 'identity-handoff-' . Str::lower(Str::random(8)),
+            'status' => 'active',
+            'currency' => 'ZAR',
+        ]);
+
+        $device = SyncDevice::create([
+            'business_id' => $business->id,
+            'installation_id' => (string) Str::uuid(),
+            'status' => 'active',
+        ]);
+
+        $mutationId = (string) Str::uuid();
+        $localId = (string) Str::uuid();
+        $request = \\Illuminate\\Http\\Request::create('/api/sync/push', 'POST', [
+            'mutations' => [[
+                'id' => $mutationId,
+                'entity_type' => 'customer',
+                'entity_id' => $localId,
+                'operation' => 'create',
+                'payload' => [
+                    'local_id' => $localId,
+                    'record' => [
+                        'name' => 'Identity Handoff Customer',
+                    ],
+                ],
+            ]],
+        ]);
+        $request->attributes->set('sync_device', $device);
+
+        $response = app(\\App\\Http\\Controllers\\SyncController::class)->push(
+            $request,
+            app(SyncMutationRecorder::class),
+            app(SyncMutationApplier::class),
+            app(\\App\\Support\\Offline\\OfflineDomainMutationHandler::class),
+            app(SyncConflictRecorder::class),
+        );
+        $data = $response->getData(true);
+        $customer = Business::query()->findOrFail($business->id)->customers()->where('name', 'Identity Handoff Customer')->firstOrFail();
+
+        $identity = $data['recorded'][0]['identity'];
+        $this->assertSame('customer', $identity['entity_type']);
+        $this->assertSame($localId, $identity['local_id']);
+        $this->assertSame($customer->id, $identity['server_id']);
+        $this->assertSame($customer->id, SyncEntityIdentity::query()
+            ->where('business_id', $business->id)
+            ->where('entity_uuid', $localId)
+            ->value('record_id'));
+    }
+
 }
