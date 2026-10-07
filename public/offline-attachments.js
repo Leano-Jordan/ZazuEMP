@@ -50,6 +50,10 @@
         if (state) state.textContent = text;
     }
 
+    function eventSelectionKey(event) {
+        return event?.local_id || String(event?.id ?? '');
+    }
+
     async function upload(record) {
         if (!navigator.onLine || !data?.sync?.token || !record.file || !Number(record.event_id)) return false;
 
@@ -119,12 +123,12 @@
     function panel() {
         const content = document.getElementById('content');
         if (!content) return;
-        const events = (data?.events || []).filter(x => Number(x.id) > 0);
+        const events = data?.events || [];
         content.innerHTML = '<section class="panel"><h2>Offline attachments</h2>' +
             '<div class="notice">Files are kept on this phone. New files can be queued without internet and uploaded automatically when Zazu reconnects.</div>' +
             '<form class="form" id="attachment-form" style="margin-top:12px">' +
             '<label>Job<select id="attachment-event" required>' +
-            events.map(x => '<option value="' + esc(x.id) + '">' + esc(x.name || x.reference || ('Job ' + x.id)) + '</option>').join('') +
+            events.map(x => '<option value="' + esc(eventSelectionKey(x)) + '">' + esc(x.name || x.reference || ('Job ' + (x.id || x.local_id))) + (Number(x.id) > 0 ? '' : ' · offline') + '</option>').join('') +
             '</select></label>' +
             '<label>File<input id="attachment-file" type="file" required accept="image/jpeg,image/png,image/webp,application/pdf,text/plain,text/csv,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document,application/vnd.ms-excel,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"></label>' +
             '<label>Description<input id="attachment-description"></label>' +
@@ -135,15 +139,18 @@
         document.getElementById('attachment-form').onsubmit = async event => {
             event.preventDefault();
             const file = document.getElementById('attachment-file').files[0];
-            const eventId = Number(document.getElementById('attachment-event').value);
-            if (!file || !eventId) return;
+            const selectedKey = document.getElementById('attachment-event').value;
+            const selectedEvent = (data.events || []).find(x => eventSelectionKey(x) === selectedKey);
+            if (!file || !selectedEvent) return;
+            const eventId = Number(selectedEvent.id);
+            const eventLocalId = selectedEvent.local_id || null;
             if (file.size > 20 * 1024 * 1024) {
                 message('Attachment is limited to 20 MB');
                 return;
             }
             const record = {
                 idempotency_key: crypto.randomUUID(),
-                event_id: eventId,
+                event_id: Number.isInteger(eventId) && eventId > 0 ? eventId : null,
                 event_local_id: eventLocalId,
                 original_name: file.name,
                 description: document.getElementById('attachment-description').value.trim(),
@@ -161,10 +168,22 @@
     async function listAttachments() {
         const target = document.getElementById('attachment-list');
         if (!target) return;
-        const selectedEvent = (data.events || []).find(x => Number(x.id) === Number(document.getElementById('attachment-event')?.value || 0));
+
+        const selectedKey = document.getElementById('attachment-event')?.value || '';
+        const selectedEvent = (data.events || []).find(x => eventSelectionKey(x) === selectedKey);
         const eventId = Number(selectedEvent?.id || 0);
         const eventLocalId = selectedEvent?.local_id || null;
-        const files = (await getFiles()).filter(x => Number(x.event_id) === eventId || (eventLocalId && x.event_local_id === eventLocalId));
+
+        if (eventId > 0 && navigator.onLine && data?.sync?.token) {
+            await downloadForEvent(eventId);
+        }
+
+        const files = (await getFiles()).filter(x =>
+            (eventId > 0 && Number(x.event_id) === eventId) ||
+            (eventLocalId && x.event_local_id === eventLocalId) ||
+            (eventId <= 0 && Number(x.event_id) === eventId && eventId !== 0)
+        );
+
         target.innerHTML = files.length ? files.map((x, i) =>
             '<div class="row"><div><strong>' + esc(x.original_name) + '</strong><span>' +
             esc(x.status === 'pending' ? 'Waiting for connection' : 'Stored on this phone') +
@@ -173,7 +192,7 @@
 
         target.querySelectorAll('[data-attachment-index]').forEach(button => {
             button.onclick = async () => {
-                const current = (await getFiles()).filter(x => Number(x.event_id) === eventId)[Number(button.dataset.attachmentIndex)];
+                const current = files[Number(button.dataset.attachmentIndex)];
                 if (!current?.file) return;
                 const url = URL.createObjectURL(current.file);
                 window.open(url, '_blank', 'noopener');
