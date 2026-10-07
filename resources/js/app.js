@@ -1492,6 +1492,36 @@ function setupZazuOfflineForms() {
                 }
             }
 
+            if (entity === 'payment') {
+                const invoice = state.invoices?.find(item => item.local_id === payload.invoice_local_id);
+                if (invoice) {
+                    invoice.payments = invoice.payments || [];
+                    invoice.payments.push({
+                        local_id: payload.local_id,
+                        server_id: null,
+                        id: null,
+                        invoice_id: invoice.id,
+                        type: payload.type,
+                        amount: payload.amount,
+                        currency: invoice.currency,
+                        method: payload.method,
+                        reference: payload.reference,
+                        paid_at: payload.paid_at,
+                        notes: payload.notes || null,
+                    });
+
+                    const amount = Number.parseFloat(String(payload.amount || 0));
+                    const currentPaid = Number.parseFloat(String(invoice.paid_amount || 0));
+                    if (Number.isFinite(amount)) {
+                        invoice.paid_amount = (currentPaid + amount).toFixed(2);
+                        const total = Number.parseFloat(String(invoice.total || 0));
+                        if (Number.isFinite(total)) {
+                            invoice.balance = Math.max(0, total - currentPaid - amount).toFixed(2);
+                        }
+                    }
+                }
+            }
+
             if (entity === 'purchase_receipt') {
                 const order = state.purchase_orders?.find(item => item.local_id === payload.purchase_order_local_id);
                 if (order?.items) {
@@ -1505,6 +1535,52 @@ function setupZazuOfflineForms() {
                         Number.parseFloat(String(item.received_quantity ?? 0)) >= Number.parseFloat(String(item.quantity ?? 0))
                     );
                     if (complete) order.status = 'received';
+
+                    for (const [lineLocalId, quantityValue] of Object.entries(payload.received_quantities)) {
+                        const line = order.items.find(item => item.local_id === lineLocalId);
+                        if (!line) continue;
+
+                        const quantity = Number.parseFloat(String(quantityValue));
+                        if (!Number.isFinite(quantity) || quantity <= 0) continue;
+
+                        let inventoryItem = state.inventory_items?.find(item =>
+                            (line.capability_id != null && Number(item.capability_id) === Number(line.capability_id))
+                            || String(item.name || '').trim().toLowerCase() === String(line.description || '').trim().toLowerCase()
+                        );
+
+                        if (!inventoryItem) {
+                            inventoryItem = {
+                                local_id: crypto.randomUUID(),
+                                server_id: null,
+                                id: null,
+                                capability_id: line.capability_id ?? null,
+                                name: line.description,
+                                unit: line.unit || 'unit',
+                                reorder_level: '0',
+                                on_hand: 0,
+                                movements: [],
+                            };
+                            state.inventory_items = state.inventory_items || [];
+                            state.inventory_items.push(inventoryItem);
+                        }
+
+                        inventoryItem.on_hand = Number.parseFloat(String(inventoryItem.on_hand ?? 0)) + quantity;
+                        inventoryItem.movements = inventoryItem.movements || [];
+                        inventoryItem.movements.push({
+                            local_id: crypto.randomUUID(),
+                            server_id: null,
+                            id: null,
+                            inventory_item_id: inventoryItem.id,
+                            purchase_order_id: order.id,
+                            purchase_order_item_id: line.id,
+                            type: 'receipt',
+                            quantity: quantity.toFixed(2),
+                            unit_cost: line.unit_price,
+                            movement_date: new Date().toISOString().slice(0, 10),
+                            reference: order.reference,
+                            notes: 'Receipt from purchase order.',
+                        });
+                    }
                 }
             }
 
