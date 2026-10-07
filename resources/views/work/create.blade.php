@@ -21,7 +21,7 @@
             </section>
         @endif
 
-        <form method="POST" action="{{ route('work.store') }}" id="new-job-form">
+        <form method="POST" action="{{ route('work.store') }}" id="new-job-form" data-zazu-offline-entity="job">
             @csrf
         <input type="hidden" name="start_intent" value="{{ request('start') === 'quote' ? 'quote' : '' }}">
             <div class="zazu-editor">
