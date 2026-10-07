@@ -323,3 +323,8 @@ The phone workspace now has a dedicated attachment transfer layer alongside the 
 - local phone opening does not require the PC after the attachment has been stored locally.
 
 This still deliberately distinguishes **server identity** from local identity: the current attachment transfer targets already-synced jobs with a server event ID. Attachments on a brand-new local job remain queued until that job receives its server identity.
+
+
+## 2026-10-07 sync atomicity hardening
+
+The server-side mutation path now publishes the resulting sync delivery inside the same database transaction that applies the domain mutation. If delivery creation fails, the domain write and applied marker roll back together instead of leaving an applied mutation with no downstream delivery. A focused regression test covers this failure boundary.
