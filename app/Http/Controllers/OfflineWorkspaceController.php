@@ -5,7 +5,6 @@ namespace App\Http\Controllers;
 use App\Models\BusinessCapability;
 use App\Models\Customer;
 use App\Models\Event;
-use App\Models\EventRequirement;
 use App\Models\PurchaseOrder;
 use App\Models\Quote;
 use App\Models\Supplier;
