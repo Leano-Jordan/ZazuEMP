@@ -3,7 +3,7 @@
 **Status:** ACTIVE / CANONICAL  
 **Repository:** `Leano-Jordan/ZazuEMP`  
 **Branch:** `main`  
-**Current main HEAD:** `90f3dee6d5ec2011db668bf3647fcd007f03218e`  
+**Current main HEAD:** `d65f0f8ad8837306ee2726185292e4a9b25d6938`  
 **Last Director reconciliation:** 2026-10-07
 
 ## Evidence rule
