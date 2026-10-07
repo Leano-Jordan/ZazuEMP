@@ -82,7 +82,7 @@ function sanitizeUserId(value) {
 async function cacheRenderedPage(request, response) {
     const probe = response.clone();
     const html = await probe.text();
-    const match = html.match(/data-zazu-user-id="(\\d+)"/);
+    const match = html.match(/data-zazu-user-id="(\d+)"/);
     const pageUserId = sanitizeUserId(match?.[1]);
 
     if (!pageUserId) return;
@@ -148,7 +148,7 @@ async function primePages(routes) {
 
             const probe = response.clone();
             const html = await probe.text();
-            const match = html.match(/data-zazu-user-id="(\\d+)"/);
+            const match = html.match(/data-zazu-user-id="(\d+)"/);
             const pageUserId = sanitizeUserId(match?.[1]);
             if (!pageUserId) return;
 
