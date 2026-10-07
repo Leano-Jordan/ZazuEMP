@@ -2,6 +2,8 @@ const CACHE_NAME = 'zazu-static-v13';
 const OFFLINE_SHELL = '/dashboard';
 let activeUserId = null;
 let activePrimeController = null;
+const MAX_PRIME_ROUTES = 100;
+const PRIME_CONCURRENCY = 6;
 const ACTIVE_USER_STATE = new Request('/__zazu-active-user__');
 
 const PRECACHE_ASSETS = [
@@ -137,39 +139,43 @@ async function primePages(routes) {
 
     const uniqueRoutes = [...new Set(Array.isArray(routes) ? routes : [])]
         .filter((path) => typeof path === 'string' && path.startsWith('/') && !path.startsWith('/api/'))
-        .slice(0, 30);
+        .slice(0, MAX_PRIME_ROUTES);
 
     try {
-        await Promise.all(uniqueRoutes.map(async (path) => {
-            try {
-                const request = new Request(new URL(path, self.location.origin), {
-                    credentials: 'include',
-                    cache: 'no-store',
-                });
-                const response = await fetch(request, { signal: controller.signal });
-            if (!response.ok) return;
+        for (let offset = 0; offset < uniqueRoutes.length; offset += PRIME_CONCURRENCY) {
+            const batch = uniqueRoutes.slice(offset, offset + PRIME_CONCURRENCY);
 
-            const contentType = response.headers.get('content-type') || '';
-            if (!contentType.includes('text/html')) return;
+            await Promise.all(batch.map(async (path) => {
+                try {
+                    const request = new Request(new URL(path, self.location.origin), {
+                        credentials: 'include',
+                        cache: 'no-store',
+                    });
+                    const response = await fetch(request, { signal: controller.signal });
+                    if (!response.ok) return;
 
-            const probe = response.clone();
-            const html = await probe.text();
-            const match = html.match(/data-zazu-user-id="(\d+)"/);
-            const pageUserId = sanitizeUserId(match?.[1]);
-            if (!pageUserId) return;
+                    const contentType = response.headers.get('content-type') || '';
+                    if (!contentType.includes('text/html')) return;
 
-            if (pageUserId !== activeUserId) {
-                await setUser(pageUserId);
-            }
+                    const probe = response.clone();
+                    const html = await probe.text();
+                    const match = html.match(/data-zazu-user-id="(\d+)"/);
+                    const pageUserId = sanitizeUserId(match?.[1]);
+                    if (!pageUserId) return;
 
-            const cache = await dynamicCache();
-            if (!cache) return;
+                    if (pageUserId !== activeUserId) {
+                        await setUser(pageUserId);
+                    }
 
-            await cache.put(new Request(new URL(path, self.location.origin)), response.clone());
-            } catch {
-                // A single page failing to prime must never block the installed Zazu shell.
-            }
-        }));
+                    const cache = await dynamicCache();
+                    if (!cache) return;
+
+                    await cache.put(new Request(new URL(path, self.location.origin)), response.clone());
+                } catch {
+                    // A single page failing to prime must never block the installed Zazu shell.
+                }
+            }));
+        }
     } finally {
         if (activePrimeController === controller) {
             activePrimeController = null;
