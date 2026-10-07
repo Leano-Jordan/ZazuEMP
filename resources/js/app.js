@@ -1332,7 +1332,6 @@ function setupZazuOfflineForms() {
                 purchase_order: state.purchase_orders,
                 asset: state.assets,
                 expense: state.expenses,
-                payment: state.invoices,
                 preparation: state.preparations,
                 event_cost: state.costs,
             };
