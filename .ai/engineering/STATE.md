@@ -24,7 +24,7 @@ Entry files must point to the canonical contract and must not define a competing
 IDENTITY → BASELINE → TARGET → ROUTE → INSPECT → CHANGE → VERIFY → BREAK → RECONCILE → ACCEPT/REPAIR → RECORD → NEXT
 
 ## Active target
-**Release certification: backup/restore → physical device acceptance → legal/licence/brand closure → final Director audit**
+**Product hardening: offline operational depth → reconciliation → workflow integrity → final certification later**
 
 Verified gates:
 - Current-head browser suite: GREEN (owner-reported).
@@ -62,6 +62,6 @@ The earlier browser run for `0a10d05` is not evidence for this final control-pla
 7. Complete Zazu brand/trade-mark clearance.
 8. Final Director re-audit against the selected release head.
 
-**Current execution priority:** commercial proof first; no feature expansion.
+**Current execution priority:** offline purchasing/receiving/inventory/cost integrity first; certification paperwork remains deferred.
 
-Last updated: 2026-10-07 — physical device acceptance owner-verified; recovery certification active
+Last updated: 2026-10-07 — offline purchasing/receiving hardening active; physical device acceptance remains recorded.
