@@ -67,6 +67,20 @@ class PwaOfflineFoundationTest extends TestCase
         $this->assertStringContainsString('await cache.put(new Request(new URL(path, self.location.origin)), response.clone())', $worker);
     }
 
+    public function test_shared_zazu_local_client_is_real_application_infrastructure_not_a_second_workspace(): void
+    {
+        $client = File::get(public_path('zazu-offline.js'));
+
+        $this->assertStringContainsString("const DB_NAME = 'zazu-client';", $client);
+        $this->assertStringContainsString("window.ZazuOffline =", $client);
+        $this->assertStringContainsString("async function pair(pairingCode)", $client);
+        $this->assertStringContainsString("async function sync()", $client);
+        $this->assertStringContainsString("/api/sync/push", $client);
+        $this->assertStringContainsString("/api/sync/pull?stream=business&limit=100", $client);
+        $this->assertStringContainsString("/api/sync/acknowledge", $client);
+        $this->assertStringContainsString("crypto.randomUUID()", $client);
+    }
+
     public function test_pwa_icon_files_are_present(): void
     {
         $this->assertFileExists(public_path('icons/zazu-192.svg'));
