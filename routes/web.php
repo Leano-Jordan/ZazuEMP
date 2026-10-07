@@ -120,7 +120,7 @@ Route::get('/manifest.webmanifest', static function () {
     );
 })->name('pwa.manifest');
 
-Route::get('/offline', [OfflineWorkspaceController::class, 'shell'])->name('offline.shell');
+Route::get('/offline', fn () => redirect()->route('dashboard'))->name('offline.shell');
 
 Route::middleware(['auth', 'auth.session', 'business.context'])->group(function () {
     Route::get('/dashboard', DashboardController::class)->middleware('permission:dashboard.view')->name('dashboard');
