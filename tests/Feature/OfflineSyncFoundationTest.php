@@ -914,6 +914,7 @@ class OfflineSyncFoundationTest extends TestCase
     }
 
 
+    /** @SuppressWarnings(PHPMD.ExcessiveMethodLength) */
     public function test_sync_push_orders_purchase_receipt_after_parent_purchase_order_even_when_batch_is_reversed(): void
     {
         $business = Business::create([
