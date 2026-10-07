@@ -18,15 +18,9 @@ use App\Support\CurrentBusiness;
 use App\Support\Offline\SyncEntityIdentityRegistry;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
-use Illuminate\View\View;
 
 class OfflineWorkspaceController extends Controller
 {
-    public function shell(): View
-    {
-        return view('offline');
-    }
-
     /** @SuppressWarnings(PHPMD.ExcessiveMethodLength) */
     public function bootstrap(Request $request, CurrentBusiness $currentBusiness, SyncEntityIdentityRegistry $registry): JsonResponse
     {
