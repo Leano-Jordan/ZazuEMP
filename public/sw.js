@@ -1,8 +1,8 @@
-const CACHE_NAME = 'zazu-static-v9';
+const CACHE_NAME = 'zazu-static-v10';
 const OFFLINE_SHELL = '/dashboard';
+let activeUserId = null;
 
 const PRECACHE_ASSETS = [
-    OFFLINE_SHELL,
     '/manifest.webmanifest',
     '/offline-attachments.js',
     '/icons/zazu-192.svg',
@@ -45,6 +45,20 @@ self.addEventListener('activate', (event) => {
     );
 });
 
+function userCacheName() {
+    return activeUserId ? CACHE_NAME + '-user-' + activeUserId : null;
+}
+
+async function dynamicCache() {
+    const name = userCacheName();
+    return name ? caches.open(name) : null;
+}
+
+function sanitizeUserId(value) {
+    const id = String(value || '');
+    return /^\d+$/.test(id) ? id : null;
+}
+
 function isCacheableStaticAsset(url, request) {
     if (request.method !== 'GET' || url.origin !== self.location.origin) return false;
 
@@ -64,12 +78,25 @@ function isCacheableStaticAsset(url, request) {
     );
 }
 
+async function setUser(userId) {
+    const nextUserId = sanitizeUserId(userId);
+    if (!nextUserId || nextUserId === activeUserId) return;
+
+    const previous = activeUserId;
+    activeUserId = nextUserId;
+
+    if (previous && previous !== activeUserId) {
+        await caches.delete(CACHE_NAME + '-user-' + previous);
+    }
+}
+
 async function primePages(routes) {
     const uniqueRoutes = [...new Set(Array.isArray(routes) ? routes : [])]
         .filter((path) => typeof path === 'string' && path.startsWith('/') && !path.startsWith('/api/'))
         .slice(0, 30);
 
-    const cache = await caches.open(CACHE_NAME);
+    const cache = await dynamicCache();
+    if (!cache) return;
 
     await Promise.all(uniqueRoutes.map(async (path) => {
         try {
@@ -91,6 +118,11 @@ async function primePages(routes) {
 }
 
 self.addEventListener('message', (event) => {
+    if (event.data?.type === 'set-user') {
+        event.waitUntil(setUser(event.data.userId));
+        return;
+    }
+
     if (event.data?.type !== 'prime-pages') return;
     event.waitUntil(primePages(event.data.routes));
 });
@@ -105,12 +137,13 @@ self.addEventListener('fetch', (event) => {
                 .then((response) => {
                     if (response.ok) {
                         const copy = response.clone();
-                        caches.open(CACHE_NAME).then((cache) => cache.put(request, copy));
+                        dynamicCache().then((cache) => cache?.put(request, copy));
                     }
                     return response;
                 })
                 .catch(async () => {
-                    const cachedPage = await caches.match(request);
+                    const cache = await dynamicCache();
+                    const cachedPage = cache ? await cache.match(request) : null;
                     return cachedPage || caches.match(OFFLINE_SHELL);
                 })
         );
