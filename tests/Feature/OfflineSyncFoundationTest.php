@@ -630,4 +630,80 @@ class OfflineSyncFoundationTest extends TestCase
             ->count());
     }
 
+    public function test_offline_purchase_order_can_be_created_then_received_by_local_line_identity(): void
+    {
+        $business = Business::create([
+            'name' => 'Offline Chain Business',
+            'slug' => 'offline-chain-'.Str::lower(Str::random(8)),
+            'status' => 'active',
+            'currency' => 'ZAR',
+        ]);
+        $device = SyncDevice::create([
+            'business_id' => $business->id,
+            'installation_id' => (string) Str::uuid(),
+        ]);
+        $supplier = \App\Models\Supplier::create([
+            'business_id' => $business->id,
+            'name' => 'Chain Supplier',
+        ]);
+        $supplierIdentity = app(\App\Support\Offline\SyncEntityIdentityRegistry::class)
+            ->identify($supplier, 'supplier');
+
+        $orderLocalId = (string) Str::uuid();
+        $lineLocalId = (string) Str::uuid();
+
+        $create = app(SyncMutationRecorder::class)->record(
+            $device,
+            'purchase_order',
+            $orderLocalId,
+            'create',
+            [
+                'local_id' => $orderLocalId,
+                'record' => [
+                    'supplier_local_id' => $supplierIdentity->entity_uuid,
+                    'currency' => 'ZAR',
+                    'lines' => [[
+                        'local_id' => $lineLocalId,
+                        'description' => 'Offline chairs',
+                        'quantity' => 6,
+                        'unit' => 'units',
+                        'unit_price' => 100,
+                    ]],
+                ],
+            ],
+        );
+
+        $applier = app(SyncMutationApplier::class);
+        $handler = app(\App\Support\Offline\OfflineDomainMutationHandler::class);
+        $applier->apply($create, ['purchase_order' => $handler]);
+
+        $receipt = app(SyncMutationRecorder::class)->record(
+            $device,
+            'purchase_receipt',
+            (string) Str::uuid(),
+            'create',
+            [
+                'local_id' => (string) Str::uuid(),
+                'record' => [
+                    'purchase_order_local_id' => $orderLocalId,
+                    'received_quantities' => [$lineLocalId => '3.00'],
+                ],
+            ],
+        );
+
+        $applier->apply($receipt, ['purchase_receipt' => $handler]);
+
+        $orderIdentity = app(\App\Support\Offline\SyncEntityIdentityRegistry::class)
+            ->identifyByUuid($business->id, 'purchase_order', $orderLocalId);
+        $order = \App\Models\PurchaseOrder::findOrFail($orderIdentity->record_id);
+        $line = $order->items()->firstOrFail();
+
+        $this->assertSame('3.00', $line->received_quantity);
+        $this->assertSame(1, \App\Models\InventoryMovement::query()
+            ->where('business_id', $business->id)
+            ->where('purchase_order_id', $order->id)
+            ->where('purchase_order_item_id', $line->id)
+            ->count());
+    }
+
 }
