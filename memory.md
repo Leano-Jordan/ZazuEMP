@@ -802,3 +802,8 @@ Regression rule:
 - Corrected the regression test to exercise ApplySecurityHeaders directly with explicit HTTPS/HTTP Request URLs. This preserves the production + secure gating under test without relying on test-server variable translation.
 - Commit: e8d1743.
 - pdo_firebird remains a local PHP CLI configuration warning and is not a Zazu repository defect; it must be removed from the local PHP configuration separately rather than masking it in application code.
+## Owner workflow directive — main-only execution reaffirmed — 2026-10-07
+
+- The owner has explicitly reaffirmed that Zazu Director/Jarvis work must **never create extra branches**.
+- Execute fixes, audits, hardening, tests and normal development directly on canonical `main`.
+- Do not create a temporary feature, repair, audit or verification branch unless the owner explicitly authorizes a different ref.
