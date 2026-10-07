@@ -14,7 +14,7 @@
         <div class="zazu-panel-copy">Record what actually arrived. Zazu prevents receiving more than ordered and keeps partial receipts in inventory history.</div>
         <form method="POST" action="{{ route('purchasing.receive', $purchaseOrder) }}" class="zazu-form mt-4">
             @csrf
-            <input type="hidden" name="idempotency_key" value="{{ (string) IlluminateSupportStr::uuid() }}">
+            <input type="hidden" name="idempotency_key" value="{{ (string) Illuminate\Support\Str::uuid() }}">
             @foreach($purchaseOrder->items as $item)
                 <label class="zazu-field">
                     <span class="zazu-label">{{ $item->description }}</span>
