@@ -1114,6 +1114,20 @@ function setupZazuOfflineForms() {
                     notes: get('notes') || null,
                     items,
                 };
+            } else if (entity === 'quote_acceptance') {
+                const state = window.ZazuOffline.getState();
+                const serverQuoteId = form.dataset.zazuOfflineQuoteId;
+                const quote = state?.quotes?.find(item => Number(item.id ?? item.server_id) === Number(serverQuoteId));
+                if (!quote?.local_id || quote.status !== 'sent') {
+                    window.alert('This quote is not available as a sent quote in this device copy yet.');
+                    return;
+                }
+                payload = {
+                    local_id: localId,
+                    server_id: null,
+                    quote_local_id: quote.local_id,
+                    customer_name: form.dataset.zazuOfflineCustomerName || 'Customer',
+                };
             } else if (entity === 'supplier') {
                 const state = window.ZazuOffline.getState();
                 const serverId = form.dataset.zazuOfflineServerId;
@@ -1261,19 +1275,25 @@ function setupZazuOfflineForms() {
                     notes: get('notes') || null,
                 };
             } else if (entity === 'service') {
+                const state = window.ZazuOffline.getState();
+                const serverId = form.dataset.zazuOfflineServerId;
+                const existing = serverId
+                    ? state?.catalogue?.find(item => Number(item.id ?? item.server_id) === Number(serverId))
+                    : null;
                 payload = {
-                    local_id: localId,
-                    server_id: null,
+                    local_id: existing?.local_id || localId,
+                    server_id: existing?.server_id ?? (serverId ? Number(serverId) : null),
                     name: get('name'),
-                    capability_type: get('capability_type') || 'service',
-                    pricing_basis: get('pricing_basis') || 'custom',
-                    default_price: get('default_price') || null,
-                    currency: get('currency') || 'ZAR',
-                    default_unit: get('default_unit') || null,
-                    description: get('description') || null,
-                    category: form.querySelector('input[name="category"]:checked')?.value || null,
+                    capability_type: get('capability_type') || existing?.capability_type || 'service',
+                    pricing_basis: get('pricing_basis') || existing?.pricing_basis || 'custom',
+                    default_price: get('default_price') || existing?.default_price || null,
+                    currency: get('currency') || existing?.currency || state.business?.currency || 'ZAR',
+                    default_unit: get('default_unit') || existing?.default_unit || null,
+                    description: get('description') || existing?.description || null,
+                    category: form.querySelector('input[name="category"]:checked')?.value || get('category') || existing?.category || null,
                     active: form.querySelector('input[name="is_active"]')?.checked !== false,
                 };
+                payload.__operation = existing?.local_id ? 'update' : 'create';
             } else if (entity === 'inventory_movement') {
                 const state = window.ZazuOffline.getState();
                 const itemServerId = form.dataset.zazuOfflineItemId;
@@ -1300,6 +1320,38 @@ function setupZazuOfflineForms() {
                     notes: get('notes') || null,
                     event_local_id: event?.local_id || null,
                 };
+            } else if (entity === 'purchase_receipt') {
+                const state = window.ZazuOffline.getState();
+                const serverOrderId = form.dataset.zazuOfflinePurchaseOrderId;
+                const order = state?.purchase_orders?.find(item => Number(item.id ?? item.server_id) === Number(serverOrderId));
+                if (!order?.local_id) {
+                    window.alert('This purchase order is not available in this device copy yet.');
+                    return;
+                }
+
+                const receivedQuantities = {};
+                for (const input of form.querySelectorAll('[name^="received_quantity["]')) {
+                    const quantity = Number.parseFloat(String(input.value || '').trim());
+                    if (!Number.isFinite(quantity) || quantity <= 0) continue;
+                    const match = input.name.match(/^received_quantity\[(\d+)\]$/);
+                    const item = match ? order.items?.find(line => Number(line.id ?? line.server_id) === Number(match[1])) : null;
+                    if (!item?.local_id) {
+                        window.alert('A purchase order line is not available in this device copy yet.');
+                        return;
+                    }
+                    receivedQuantities[item.local_id] = String(quantity);
+                }
+                if (!Object.keys(receivedQuantities).length) {
+                    window.alert('Enter at least one received quantity before saving.');
+                    return;
+                }
+
+                payload = {
+                    local_id: localId,
+                    server_id: null,
+                    purchase_order_local_id: order.local_id,
+                    received_quantities: receivedQuantities,
+                };
             } else if (entity === 'invoice') {
                 const state = window.ZazuOffline.getState();
                 const quoteId = get('quote_id');
@@ -1317,6 +1369,51 @@ function setupZazuOfflineForms() {
                     issued_at: get('issued_at') || null,
                     due_at: get('due_at') || null,
                 };
+            } else if (entity === 'asset_allocation') {
+                const state = window.ZazuOffline.getState();
+                const serverAssetId = form.dataset.zazuOfflineAssetId;
+                const asset = state?.assets?.find(item => Number(item.id ?? item.server_id) === Number(serverAssetId));
+                if (!asset?.local_id) {
+                    window.alert('This asset is not available in this device copy yet.');
+                    return;
+                }
+
+                const allocationLocalId = form.dataset.zazuOfflineAllocationId
+                    ? asset.allocations?.find(item => Number(item.id ?? item.server_id) === Number(form.dataset.zazuOfflineAllocationId))?.local_id
+                    : null;
+
+                if (form.dataset.zazuOfflineAllocationId && !allocationLocalId) {
+                    window.alert('This asset allocation is not available in this device copy yet.');
+                    return;
+                }
+
+                if (allocationLocalId) {
+                    payload = {
+                        local_id: allocationLocalId,
+                        server_id: Number(form.dataset.zazuOfflineAllocationId),
+                        asset_local_id: asset.local_id,
+                        status: 'returned',
+                    };
+                    payload.__operation = 'update';
+                } else {
+                    const eventId = get('event_id');
+                    const event = eventId
+                        ? state?.jobs?.find(item => Number(item.id ?? item.server_id) === Number(eventId))
+                        : null;
+                    if (!event?.local_id) {
+                        window.alert('This job is not available in this device copy yet.');
+                        return;
+                    }
+                    payload = {
+                        local_id: localId,
+                        server_id: null,
+                        asset_local_id: asset.local_id,
+                        event_local_id: event.local_id,
+                        allocated_from: get('allocated_from') || null,
+                        allocated_until: get('allocated_until') || null,
+                        notes: get('notes') || null,
+                    };
+                }
             } else if (entity === 'purchase_order') {
                 const state = window.ZazuOffline.getState();
                 const supplierId = get('supplier_id');
