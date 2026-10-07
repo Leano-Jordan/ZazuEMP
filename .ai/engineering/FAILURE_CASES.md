@@ -279,3 +279,30 @@ Archive pointer: closed historical cases CASE-ZAZU-0001 through CASE-ZAZU-0009 a
 **Correction:** The E2E now selects the Work area that actually contains the Calendar link and explicitly opens its Work trigger when the responsive navigation exposes it.
 
 **Verification:** Pending current-head browser run.
+
+
+### CASE-ZAZU-0021
+
+**Status:** CORRECTED — verification pending
+
+**Engineering diagnostic code:** ENG-CONTRACT-005
+
+**First observed date:** 2026-10-07
+
+**Target/workflow:** Signed customer quote acceptance PHPUnit coverage.
+
+**Expected:** The acceptance test refreshes the latest quote version model and verifies its accepted status.
+
+**Actual:** The test called fresh() on Quote::latestVersion(), which returns a HasOne relation; Laravel raised BadMethodCallException: HasOne::fresh().
+
+**Failure fingerprint:** PHPUnit → QuoteWorkflowTest signed customer quote acceptance → HasOne::fresh() undefined → 1 failed / 288 passed.
+
+**F1–F8 classification:** F2 — verification/test contract defect.
+
+**Correction:** Changed the assertion to fetch the related latest version with firstOrFail() before calling fresh(). Application behavior was not changed.
+
+**Verification boundary:** Current-head CI must pass before this case is marked VERIFIED.
+
+**Rejected approach:** Do not alter the Quote model relationship merely to accommodate an invalid test call.
+
+**Next action:** Reconcile current-head Laravel and Zazu quality runs; close the case only after both pass.
