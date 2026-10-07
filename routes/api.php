@@ -10,6 +10,8 @@ Route::middleware([AuthenticateSyncDevice::class, 'throttle:sync'])->prefix('syn
     Route::get('/pull', [SyncController::class, 'pull']);
     Route::post('/acknowledge', [SyncController::class, 'acknowledge']);
     Route::post('/push', [SyncController::class, 'push']);
+    Route::get('/conflicts', [SyncController::class, 'listConflicts']);
+    Route::post('/conflicts/{conflict}/resolve', [SyncController::class, 'resolveConflict']);
     Route::post('/attachments', [SyncController::class, 'uploadAttachment']);
     Route::get('/attachments', [SyncController::class, 'listAttachments']);
     Route::get('/attachments/{attachment}', [SyncController::class, 'downloadAttachment']);
