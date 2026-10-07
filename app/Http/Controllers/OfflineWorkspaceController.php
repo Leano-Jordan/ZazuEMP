@@ -191,6 +191,7 @@ class OfflineWorkspaceController extends Controller
                     'id' => $item->id,
                     'local_id' => $registry->identify($item, 'inventory_item')->entity_uuid,
                     'capability_id' => $item->capability_id,
+                    'capability_local_id' => $item->capability ? $registry->identify($item->capability, 'service')->entity_uuid : null,
                     'name' => $item->name,
                     'sku' => $item->sku,
                     'unit' => $item->unit,
@@ -222,6 +223,7 @@ class OfflineWorkspaceController extends Controller
                     'id' => $asset->id,
                     'local_id' => $registry->identify($asset, 'asset')->entity_uuid,
                     'capability_id' => $asset->capability_id,
+                    'capability_local_id' => $asset->capability ? $registry->identify($asset->capability, 'service')->entity_uuid : null,
                     'asset_tag' => $asset->asset_tag,
                     'name' => $asset->name,
                     'status' => $asset->status,
@@ -293,6 +295,7 @@ class OfflineWorkspaceController extends Controller
                     'local_id' => $registry->identify($capability, 'service')->entity_uuid,
                     'name' => $capability->name,
                     'description' => $capability->description,
+                    'capability_type' => $capability->capability_type,
                     'active' => (bool) $capability->is_active,
                 ])
                 ->values(),
