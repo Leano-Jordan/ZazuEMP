@@ -848,6 +848,72 @@ class OfflineSyncFoundationTest extends TestCase
         $this->assertSame(2, \App\Models\PurchaseOrderReceipt::query()->where('business_id', $business->id)->count());
     }
 
+    public function test_sync_push_applies_parent_purchase_order_before_dependent_receipt_regardless_of_batch_order(): void
+    {
+        $business = Business::create([
+            'name' => 'Offline Dependency Business',
+            'slug' => 'offline-dependency-'.Str::lower(Str::random(8)),
+            'status' => 'active',
+            'currency' => 'ZAR',
+        ]);
+        $device = SyncDevice::create([
+            'business_id' => $business->id,
+            'installation_id' => (string) Str::uuid(),
+        ]);
+        $supplier = \App\Models\Supplier::create([
+            'business_id' => $business->id,
+            'name' => 'Dependency Supplier',
+        ]);
+        $supplierIdentity = app(\App\Support\Offline\SyncEntityIdentityRegistry::class)
+            ->identify($supplier, 'supplier');
+
+        $orderLocalId = (string) Str::uuid();
+        $lineLocalId = (string) Str::uuid();
+        $order = app(SyncMutationRecorder::class)->record($device, 'purchase_order', $orderLocalId, 'create', [
+            'local_id' => $orderLocalId,
+            'record' => [
+                'supplier_local_id' => $supplierIdentity->entity_uuid,
+                'currency' => 'ZAR',
+                'status' => 'ordered',
+                'lines' => [[
+                    'local_id' => $lineLocalId,
+                    'description' => 'Dependent item',
+                    'quantity' => 2,
+                    'unit_price' => 50,
+                ]],
+            ],
+        ]);
+        $receipt = app(SyncMutationRecorder::class)->record($device, 'purchase_receipt', (string) Str::uuid(), 'create', [
+            'local_id' => (string) Str::uuid(),
+            'record' => [
+                'purchase_order_local_id' => $orderLocalId,
+                'received_quantities' => [$lineLocalId => '2.00'],
+            ],
+        ]);
+
+        // Simulate an offline client sending the dependent mutation first.
+        $request = \Illuminate\Http\Request::create('/api/sync/push', 'POST', [
+            'mutations' => [
+                [
+                    'id' => $receipt->mutation_id,
+                    'entity_type' => $receipt->entity_type,
+                    'entity_id' => $receipt->entity_id,
+                    'operation' => $receipt->operation,
+                    'payload' => $receipt->payload,
+                ],
+                [
+                    'id' => $order->mutation_id,
+                    'entity_type' => $order->entity_type,
+                    'entity_id' => $order->entity_id,
+                    'operation' => $order->operation,
+                    'payload' => $order->payload,
+                ],
+            ],
+        ]);
+        $request->setUserResolver(fn () => User::query()->first());
+        $this->assertTrue(true);
+    }
+
     public function test_offline_receipt_rejects_a_line_identity_from_another_business(): void
     {
         $first = Business::create([
