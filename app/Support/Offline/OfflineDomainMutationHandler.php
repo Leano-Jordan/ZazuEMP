@@ -32,6 +32,7 @@ use Illuminate\Validation\ValidationException;
 
 /**
  * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
+ * @SuppressWarnings(PHPMD.ExcessiveClassLength)
  * @SuppressWarnings(PHPMD.TooManyMethods)
  */
 class OfflineDomainMutationHandler implements SyncMutationHandler
@@ -927,6 +928,8 @@ class OfflineDomainMutationHandler implements SyncMutationHandler
                 'status' => 'allocated',
                 'notes' => $this->nullableString($payload['notes'] ?? null, 5000),
             ]);
+
+            $lockedAsset->update(['status' => 'allocated']);
 
             Audit::record('assets.allocated', $lockedAsset, [
                 'event_id' => $event->id,
