@@ -150,8 +150,6 @@ class InterfaceRegressionTest extends TestCase
         $appCss = file_get_contents(resource_path('css/app.css'));
         $visualCss = file_get_contents(resource_path('css/zazu-final-visual-sweep.css'));
         $mobileCss = file_get_contents(resource_path('css/zazu-mobile-refinement.css'));
-        $offline = file_get_contents(resource_path('views/offline.blade.php'));
-
         $this->assertStringContainsString(':root[data-theme="dark"] .zazu-btn-danger', $appCss);
         $this->assertStringContainsString('background: var(--zazu-danger-soft);', $appCss);
         $this->assertStringContainsString('color: var(--zazu-danger-ink);', $appCss);
@@ -160,10 +158,6 @@ class InterfaceRegressionTest extends TestCase
         $this->assertStringNotContainsString('background:var(--zazu-primary);color:#fff;', $visualCss);
         $this->assertStringContainsString('color:var(--zazu-primary-ink);', $visualCss);
         $this->assertStringContainsString('color: var(--zazu-success-ink);', $visualCss);
-
-        $this->assertStringContainsString(':root{color-scheme:dark;', $offline);
-        $this->assertStringContainsString('background:linear-gradient(135deg,var(--surface),var(--surface2) 72%)', $offline);
-        $this->assertStringContainsString('color:var(--ink)', $offline);
 
         $this->assertStringContainsString('@media (max-width: 850px)', $mobileCss);
     }
@@ -183,6 +177,17 @@ class InterfaceRegressionTest extends TestCase
             ->assertSee('Stock register')
             ->assertSee('New inventory item')
             ->assertSee('zazu-inventory-directory');
+    }
+
+    public function test_dashboard_does_not_expose_the_legacy_phone_workspace(): void
+    {
+        [$business, $user] = $this->workspace();
+
+        $this->actingAs($user)
+            ->get(route('dashboard'))
+            ->assertOk()
+            ->assertDontSee('Open Zazu on phone')
+            ->assertDontSee('offline.shell');
     }
 
     public function test_navigation_places_calendar_under_work_and_uses_compact_group_labels(): void
