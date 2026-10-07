@@ -20,6 +20,7 @@ class EventAttachment extends Model
         'size',
         'source',
         'description',
+        'idempotency_key',
     ];
 
     public function event(): BelongsTo
