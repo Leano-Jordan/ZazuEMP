@@ -10,7 +10,12 @@ use App\Models\Payment;
 use App\Models\Customer;
 use App\Models\CustomerContact;
 use App\Models\Event;
+use App\Models\EventCost;
 use App\Models\EventPreparationItem;
+use App\Models\InventoryItem;
+use App\Models\InventoryMovement;
+use App\Models\Asset;
+use App\Models\AssetAllocation;
 use App\Models\PurchaseOrder;
 use App\Models\PurchaseOrderItem;
 use App\Models\Supplier;
@@ -54,6 +59,11 @@ class OfflineDomainMutationHandler implements SyncMutationHandler
             'payment' => $this->payment($mutation),
             'expense' => $this->expense($mutation),
             'purchase_receipt' => $this->purchaseReceipt($mutation),
+            'inventory_item' => $this->inventoryItem($mutation),
+            'inventory_movement' => $this->inventoryMovement($mutation),
+            'event_cost' => $this->eventCost($mutation),
+            'asset' => $this->asset($mutation),
+            'asset_allocation' => $this->assetAllocation($mutation),
             default => throw ValidationException::withMessages([
                 'entity_type' => 'This offline entity is not enabled for server application yet.',
             ]),
@@ -531,6 +541,414 @@ class OfflineDomainMutationHandler implements SyncMutationHandler
             ->where('business_id', $mutation->business_id)
             ->where('idempotency_key', $mutation->mutation_id)
             ->firstOrFail();
+    }
+
+
+    private function inventoryItem(SyncMutation $mutation): InventoryItem
+    {
+        if (! in_array($mutation->operation, ['create', 'upsert', 'update'], true)) {
+            throw ValidationException::withMessages(['operation' => 'Offline inventory items only support create/upsert/update.']);
+        }
+
+        $payload = $this->recordPayload($mutation);
+        $item = $this->existing($mutation);
+
+        if ($mutation->operation !== 'create' && ! $item instanceof InventoryItem) {
+            throw ValidationException::withMessages(['entity_id' => 'The offline inventory item does not exist on the server.']);
+        }
+
+        $capability = array_key_exists('capability_local_id', $payload)
+            ? $this->resolveOfflineCapability($mutation->business_id, $payload['capability_local_id'])
+            : null;
+
+        $sku = $this->nullableString($payload['sku'] ?? null, 100);
+        if ($sku !== null) {
+            $duplicate = InventoryItem::query()
+                ->where('business_id', $mutation->business_id)
+                ->where('sku', $sku)
+                ->when($item instanceof InventoryItem, fn ($query) => $query->where('id', '!=', $item->id))
+                ->exists();
+
+            if ($duplicate) {
+                throw ValidationException::withMessages(['sku' => 'An inventory item with this SKU already exists in this business.']);
+            }
+        }
+
+        $attributes = [
+            'business_id' => $mutation->business_id,
+            'capability_id' => $capability?->id,
+            'sku' => $sku,
+            'name' => $this->requiredString($payload['name'] ?? null, 'name', 255),
+            'unit' => $this->requiredString($payload['unit'] ?? 'unit', 'unit', 50),
+            'reorder_level' => number_format((float) ($payload['reorder_level'] ?? '0'), 2, '.', ''),
+        ];
+
+        if ($item instanceof InventoryItem) {
+            $item->update($attributes);
+            return $item->fresh();
+        }
+
+        return InventoryItem::create($attributes);
+    }
+
+    private function inventoryMovement(SyncMutation $mutation): InventoryMovement
+    {
+        if (! in_array($mutation->operation, ['create', 'upsert'], true)) {
+            throw ValidationException::withMessages(['operation' => 'Offline inventory movements only support create/upsert.']);
+        }
+
+        $existing = $this->existing($mutation);
+        if ($existing instanceof InventoryMovement) {
+            return $existing->fresh();
+        }
+
+        $payload = $this->recordPayload($mutation);
+        $item = $this->resolveIdentityRecord(
+            $mutation->business_id,
+            'inventory_item',
+            $payload['inventory_item_local_id'] ?? null,
+            InventoryItem::class,
+        );
+
+        if (! $item instanceof InventoryItem) {
+            throw ValidationException::withMessages(['inventory_item_local_id' => 'The offline inventory movement references an unknown inventory item.']);
+        }
+
+        $event = array_key_exists('event_local_id', $payload)
+            ? $this->resolveOfflineEvent($mutation->business_id, $payload['event_local_id'])
+            : null;
+
+        $purchaseOrder = array_key_exists('purchase_order_local_id', $payload)
+            ? $this->resolveIdentityRecord($mutation->business_id, 'purchase_order', $payload['purchase_order_local_id'], PurchaseOrder::class)
+            : null;
+
+        if (array_key_exists('purchase_order_local_id', $payload) && ! $purchaseOrder instanceof PurchaseOrder) {
+            throw ValidationException::withMessages(['purchase_order_local_id' => 'The offline inventory movement references an unknown purchase order.']);
+        }
+
+        $purchaseOrderItem = null;
+        if (array_key_exists('purchase_order_item_local_id', $payload)) {
+            $purchaseOrderItem = $this->resolveIdentityRecord(
+                $mutation->business_id,
+                'purchase_order_item',
+                $payload['purchase_order_item_local_id'],
+                PurchaseOrderItem::class,
+            );
+
+            if (! $purchaseOrderItem instanceof PurchaseOrderItem || ! $purchaseOrder) {
+                throw ValidationException::withMessages(['purchase_order_item_local_id' => 'The offline inventory movement references an invalid purchase-order line.']);
+            }
+
+            if ((int) $purchaseOrderItem->purchase_order_id !== (int) $purchaseOrder->id) {
+                throw ValidationException::withMessages(['purchase_order_item_local_id' => 'The purchase-order line does not belong to the referenced purchase order.']);
+            }
+        }
+
+        $type = $payload['type'] ?? null;
+        if (! is_string($type) || ! in_array($type, ['receipt', 'issue', 'return', 'adjustment_in', 'adjustment_out'], true)) {
+            throw ValidationException::withMessages(['type' => 'Offline inventory movement type is invalid.']);
+        }
+
+        $quantity = $this->positiveQuantity($payload['quantity'] ?? null);
+        $unitCost = $this->nonNegativeMoney($payload['unit_cost'] ?? '0.00');
+        $movementDate = $this->nullableDate($payload['movement_date'] ?? now()->toDateString()) ?? now()->toDateString();
+
+        \Illuminate\Support\Facades\DB::transaction(function () use (
+            $mutation,
+            $item,
+            $event,
+            $purchaseOrder,
+            $purchaseOrderItem,
+            $type,
+            $quantity,
+            $unitCost,
+            $movementDate,
+            $payload,
+            &$existing,
+        ): void {
+            \App\Models\Business::query()->whereKey($mutation->business_id)->lockForUpdate()->firstOrFail();
+
+            $lockedItem = InventoryItem::query()
+                ->where('business_id', $mutation->business_id)
+                ->lockForUpdate()
+                ->findOrFail($item->id);
+
+            if (in_array($type, ['issue', 'adjustment_out'], true)) {
+                $onHand = $lockedItem->on_hand_hundredths;
+                $requested = Money::toHundredths((string) $quantity);
+                if ($requested > $onHand) {
+                    throw ValidationException::withMessages([
+                        'quantity' => 'This offline movement would make stock on hand negative.',
+                    ]);
+                }
+            }
+
+            $existing = InventoryMovement::query()
+                ->where('business_id', $mutation->business_id)
+                ->where('idempotency_key', $mutation->mutation_id)
+                ->first();
+
+            if ($existing instanceof InventoryMovement) {
+                return;
+            }
+
+            $existing = InventoryMovement::create([
+                'business_id' => $mutation->business_id,
+                'inventory_item_id' => $lockedItem->id,
+                'idempotency_key' => $mutation->mutation_id,
+                'event_id' => $event?->id,
+                'purchase_order_id' => $purchaseOrder?->id,
+                'purchase_order_item_id' => $purchaseOrderItem?->id,
+                'type' => $type,
+                'quantity' => number_format($quantity, 2, '.', ''),
+                'unit_cost' => number_format($unitCost, 2, '.', ''),
+                'movement_date' => $movementDate,
+                'reference' => $this->nullableString($payload['reference'] ?? null, 255),
+                'notes' => $this->nullableString($payload['notes'] ?? null, 5000),
+            ]);
+
+            Audit::record('inventory.movement.recorded', $existing, [
+                'type' => $existing->type,
+                'quantity' => $existing->quantity,
+                'item_id' => $lockedItem->id,
+                'offline' => true,
+            ], $mutation->business_id);
+        });
+
+        return $existing instanceof InventoryMovement ? $existing->fresh() : throw new \LogicException('Offline inventory movement was not recorded.');
+    }
+
+    private function eventCost(SyncMutation $mutation): EventCost
+    {
+        if (! in_array($mutation->operation, ['create', 'upsert', 'update'], true)) {
+            throw ValidationException::withMessages(['operation' => 'Offline event costs only support create/upsert/update.']);
+        }
+
+        $payload = $this->recordPayload($mutation);
+        $event = $this->resolveOfflineEvent($mutation->business_id, $payload['event_local_id'] ?? null);
+        if (! $event) {
+            throw ValidationException::withMessages(['event_local_id' => 'An offline cost requires a valid local job identity.']);
+        }
+
+        $cost = $this->existing($mutation);
+        if ($mutation->operation !== 'create' && ! $cost instanceof EventCost) {
+            throw ValidationException::withMessages(['entity_id' => 'The offline cost does not exist on the server.']);
+        }
+
+        $currency = strtoupper((string) ($payload['currency'] ?? ''));
+        $businessCurrency = $this->businessCurrency($mutation->business_id);
+        if ($currency === '' || $currency !== $businessCurrency) {
+            throw ValidationException::withMessages(['currency' => 'Offline costs must use the active business currency.']);
+        }
+
+        $status = $payload['status'] ?? 'planned';
+        if (! is_string($status) || ! in_array($status, ['planned', 'incurred', 'cancelled'], true)) {
+            throw ValidationException::withMessages(['status' => 'Offline cost status is invalid.']);
+        }
+
+        $projected = $this->nonNegativeMoney($payload['projected_amount'] ?? '0.00');
+        $actual = array_key_exists('actual_amount', $payload) && $payload['actual_amount'] !== null && $payload['actual_amount'] !== ''
+            ? $this->nonNegativeMoney($payload['actual_amount'])
+            : null;
+
+        if ($status === 'planned' && $actual !== null) {
+            throw ValidationException::withMessages(['actual_amount' => 'A planned cost cannot have an actual amount yet.']);
+        }
+        if ($status === 'cancelled' && $actual !== null) {
+            throw ValidationException::withMessages(['actual_amount' => 'A cancelled cost cannot have an actual amount.']);
+        }
+        if ($status === 'incurred' && $actual === null) {
+            throw ValidationException::withMessages(['actual_amount' => 'An incurred cost must have an actual amount.']);
+        }
+
+        $attributes = [
+            'business_id' => $mutation->business_id,
+            'event_id' => $event->id,
+            'category' => $this->requiredString($payload['category'] ?? null, 'category', 100),
+            'description' => $this->requiredString($payload['description'] ?? null, 'description', 255),
+            'currency' => $currency,
+            'projected_amount' => number_format($projected, 2, '.', ''),
+            'actual_amount' => $actual === null ? null : number_format($actual, 2, '.', ''),
+            'status' => $status,
+            'notes' => $this->nullableString($payload['notes'] ?? null, 5000),
+        ];
+
+        if ($cost instanceof EventCost) {
+            $cost->update($attributes);
+            return $cost->fresh();
+        }
+
+        return EventCost::create($attributes);
+    }
+
+    private function asset(SyncMutation $mutation): Asset
+    {
+        if (! in_array($mutation->operation, ['create', 'upsert', 'update'], true)) {
+            throw ValidationException::withMessages(['operation' => 'Offline assets only support create/upsert/update.']);
+        }
+
+        $payload = $this->recordPayload($mutation);
+        $asset = $this->existing($mutation);
+
+        if ($mutation->operation !== 'create' && ! $asset instanceof Asset) {
+            throw ValidationException::withMessages(['entity_id' => 'The offline asset does not exist on the server.']);
+        }
+
+        $capability = array_key_exists('capability_local_id', $payload)
+            ? $this->resolveOfflineCapability($mutation->business_id, $payload['capability_local_id'])
+            : null;
+
+        $assetTag = $this->requiredString($payload['asset_tag'] ?? null, 'asset_tag', 100);
+        $duplicate = Asset::query()
+            ->where('business_id', $mutation->business_id)
+            ->where('asset_tag', $assetTag)
+            ->when($asset instanceof Asset, fn ($query) => $query->whereKey('!=', $asset->id))
+            ->exists();
+
+        if ($duplicate) {
+            throw ValidationException::withMessages(['asset_tag' => 'An asset with this tag already exists in this business.']);
+        }
+
+        $attributes = [
+            'business_id' => $mutation->business_id,
+            'capability_id' => $capability?->id,
+            'asset_tag' => $assetTag,
+            'name' => $this->requiredString($payload['name'] ?? null, 'name', 255),
+            'status' => $asset instanceof Asset ? ($asset->status ?: 'available') : 'available',
+            'condition' => $this->requiredEnum($payload['condition'] ?? 'good', ['good', 'fair', 'poor', 'damaged'], 'condition'),
+            'location' => $this->nullableString($payload['location'] ?? null, 255),
+            'acquired_at' => $this->nullableDate($payload['acquired_at'] ?? null),
+            'purchase_cost' => number_format($this->nonNegativeMoney($payload['purchase_cost'] ?? '0.00'), 2, '.', ''),
+            'currency' => $this->businessCurrency($mutation->business_id),
+            'notes' => $this->nullableString($payload['notes'] ?? null, 5000),
+        ];
+
+        if ($asset instanceof Asset) {
+            $asset->update($attributes);
+            return $asset->fresh();
+        }
+
+        return Asset::create($attributes);
+    }
+
+    private function assetAllocation(SyncMutation $mutation): AssetAllocation
+    {
+        if (! in_array($mutation->operation, ['create', 'upsert', 'update'], true)) {
+            throw ValidationException::withMessages(['operation' => 'Offline asset allocations only support create/upsert/update.']);
+        }
+
+        $payload = $this->recordPayload($mutation);
+        $allocation = $this->existing($mutation);
+
+        $asset = array_key_exists('asset_local_id', $payload)
+            ? $this->resolveIdentityRecord($mutation->business_id, 'asset', $payload['asset_local_id'], Asset::class)
+            : ($allocation instanceof AssetAllocation ? $allocation->asset()->where('business_id', $mutation->business_id)->first() : null);
+
+        if (! $asset instanceof Asset) {
+            throw ValidationException::withMessages(['asset_local_id' => 'The offline allocation references an unknown asset.']);
+        }
+
+        if ($allocation instanceof AssetAllocation) {
+            if ($mutation->operation === 'create' && $allocation->status !== 'returned') {
+                return $allocation->fresh();
+            }
+
+            $status = $payload['status'] ?? 'returned';
+            if (! in_array($status, ['allocated', 'returned'], true)) {
+                throw ValidationException::withMessages(['status' => 'Offline asset allocation status is invalid.']);
+            }
+
+            \Illuminate\Support\Facades\DB::transaction(function () use ($mutation, $asset, $allocation, $status, $payload): void {
+                $lockedAsset = Asset::query()->where('business_id', $mutation->business_id)->lockForUpdate()->findOrFail($asset->id);
+                $lockedAllocation = AssetAllocation::query()
+                    ->where('business_id', $mutation->business_id)
+                    ->lockForUpdate()
+                    ->findOrFail($allocation->id);
+
+                $lockedAllocation->update([
+                    'status' => $status,
+                    'allocated_until' => $status === 'returned'
+                        ? ($lockedAllocation->allocated_until?->toDateString() ?? now()->toDateString())
+                        : $this->nullableDate($payload['allocated_until'] ?? null),
+                    'notes' => $this->nullableString($payload['notes'] ?? $lockedAllocation->notes, 5000),
+                ]);
+
+                $lockedAsset->update(['status' => $status === 'returned' ? 'available' : 'allocated']);
+
+                Audit::record(
+                    $status === 'returned' ? 'assets.released' : 'assets.allocated',
+                    $lockedAsset,
+                    ['allocation_id' => $lockedAllocation->id, 'offline' => true],
+                    $mutation->business_id,
+                );
+            });
+
+            return $allocation->fresh();
+        }
+
+        if (! $this->resolveOfflineEvent($mutation->business_id, $payload['event_local_id'] ?? null)) {
+            throw ValidationException::withMessages(['event_local_id' => 'An offline allocation requires a valid local job identity.']);
+        }
+
+        $event = $this->resolveOfflineEvent($mutation->business_id, $payload['event_local_id']);
+        $from = $this->nullableDate($payload['allocated_from'] ?? now()->toDateString());
+        $until = $this->nullableDate($payload['allocated_until'] ?? null);
+        if ($from === null) {
+            throw ValidationException::withMessages(['allocated_from' => 'An allocation start date is required.']);
+        }
+        if ($until !== null && $until < $from) {
+            throw ValidationException::withMessages(['allocated_until' => 'Allocation dates are invalid.']);
+        }
+
+        \Illuminate\Support\Facades\DB::transaction(function () use ($mutation, $asset, $event, $payload, $from, $until, &$allocation): void {
+            $lockedAsset = Asset::query()->where('business_id', $mutation->business_id)->lockForUpdate()->findOrFail($asset->id);
+            abort_if($lockedAsset->status !== 'available', 422, 'Only available assets can be allocated offline.');
+
+            $overlap = $lockedAsset->allocations()
+                ->where('status', 'allocated')
+                ->whereDate('allocated_from', '<=', $until ?: $from)
+                ->where(function ($query) use ($from): void {
+                    $query->whereNull('allocated_until')->orWhereDate('allocated_until', '>=', $from);
+                })
+                ->exists();
+
+            abort_if($overlap, 422, 'This asset is already allocated for the selected period.');
+
+            $allocation = $lockedAsset->allocations()->create([
+                'business_id' => $mutation->business_id,
+                'event_id' => $event->id,
+                'allocated_from' => $from,
+                'allocated_until' => $until,
+                'status' => 'allocated',
+                'notes' => $this->nullableString($payload['notes'] ?? null, 5000),
+            ]);
+
+            Audit::record('assets.allocated', $lockedAsset, [
+                'event_id' => $event->id,
+                'allocation_id' => $allocation->id,
+                'offline' => true,
+            ], $mutation->business_id);
+        });
+
+        return $allocation->fresh();
+    }
+
+    private function resolveOfflineCapability(int $businessId, mixed $uuid): ?BusinessCapability
+    {
+        if ($uuid === null || $uuid === '') {
+            return null;
+        }
+
+        return $this->resolveIdentityRecord($businessId, 'service', $uuid, BusinessCapability::class);
+    }
+
+    private function requiredEnum(mixed $value, array $allowed, string $field): string
+    {
+        if (! is_string($value) || ! in_array($value, $allowed, true)) {
+            throw ValidationException::withMessages([$field => "Offline {$field} is invalid."]);
+        }
+
+        return $value;
     }
 
     private function resolveIdentityRecord(int $businessId, string $entityType, mixed $uuid, string $model): ?Model
