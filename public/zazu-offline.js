@@ -7,6 +7,8 @@
     const QUEUE = 'mutations';
     let state = null;
     let syncing = false;
+    let resolveReady;
+    const ready = new Promise((resolve) => { resolveReady = resolve; });
 
     const blank = () => ({
         version: new Date().toISOString(),
@@ -171,6 +173,7 @@
     }
 
     async function queueMutation(entityType, operation, payload) {
+        await ready;
         const mutation = {
             id: crypto.randomUUID(),
             entity_type: entityType,
@@ -364,6 +367,7 @@
             await sync();
         }
 
+        resolveReady(state);
         window.dispatchEvent(new CustomEvent('zazu:offline-ready', { detail: api }));
     }
 
@@ -375,6 +379,7 @@
         sync,
         refreshBootstrap,
         pending,
+        ready,
     };
 
     window.addEventListener('online', sync);
