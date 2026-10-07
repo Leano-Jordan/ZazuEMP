@@ -3,12 +3,15 @@
 namespace Tests\Feature;
 
 use App\Models\Business;
+use App\Http\Controllers\SyncController;
 use App\Models\SyncDelivery;
 use App\Models\SyncDevice;
 use App\Models\SyncMutation;
 use App\Models\SyncEntityIdentity;
+use App\Support\Offline\OfflineDomainMutationHandler;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 use Illuminate\Database\QueryException;
 use App\Support\Offline\SyncMutationProtocol;
@@ -1481,7 +1484,7 @@ class OfflineSyncFoundationTest extends TestCase
 
         $mutationId = (string) Str::uuid();
         $localId = (string) Str::uuid();
-        $request = \Illuminate\\Http\\Request::create('/api/sync/push', 'POST', [
+        $request = Request::create('/api/sync/push', 'POST', [
             'mutations' => [[
                 'id' => $mutationId,
                 'entity_type' => 'customer',
@@ -1497,11 +1500,11 @@ class OfflineSyncFoundationTest extends TestCase
         ]);
         $request->attributes->set('sync_device', $device);
 
-        $response = app(\App\\Http\\Controllers\\SyncController::class)->push(
+        $response = app(SyncController::class)->push(
             $request,
             app(SyncMutationRecorder::class),
             app(SyncMutationApplier::class),
-            app(\App\\Support\\Offline\\OfflineDomainMutationHandler::class),
+            app(OfflineDomainMutationHandler::class),
             app(SyncConflictRecorder::class),
         );
         $data = $response->getData(true);
