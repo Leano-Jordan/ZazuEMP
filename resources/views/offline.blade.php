@@ -136,7 +136,6 @@ async function boot(){
     render();
 }
 
-if(tab==='preparation'&&edit){document.getElementById('f-event').value=x.event_local_id||x.event_id||'';document.getElementById('f-status').value=x.status||'open'}
 if('serviceWorker' in navigator) navigator.serviceWorker.register('/sw.js').catch(()=>{});
 boot();
 </script>
