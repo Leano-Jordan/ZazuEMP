@@ -1007,8 +1007,7 @@ class OfflineSyncFoundationTest extends TestCase
         $this->assertSame('4.00', $line->received_quantity);
         $this->assertSame(1, \App\Models\InventoryMovement::query()
             ->where('business_id', $business->id)
-            ->where('reference_type', 'purchase_order')
-            ->where('reference_id', $order->id)
+            ->where('purchase_order_id', $order->id)
             ->count());
         $this->assertSame(0, \App\Models\SyncMutation::query()
             ->where('business_id', $business->id)
