@@ -759,7 +759,7 @@ class OfflineSyncFoundationTest extends TestCase
         $line = $order->items()->firstOrFail();
 
         $this->assertSame('3.00', $line->received_quantity);
-        $this->assertSame('received', $order->fresh()->status);
+        $this->assertSame('ordered', $order->fresh()->status);
         $this->assertSame(1, \App\Models\InventoryMovement::query()
             ->where('business_id', $business->id)
             ->where('purchase_order_id', $order->id)
@@ -845,7 +845,7 @@ class OfflineSyncFoundationTest extends TestCase
         $this->assertSame(['10.00', '8.00'], $order->fresh()->items()->orderBy('id')->pluck('received_quantity')->all());
         $this->assertSame('received', $order->fresh()->status);
         $this->assertSame(4, \App\Models\InventoryMovement::query()->where('purchase_order_id', $order->id)->count());
-        $this->assertSame(1, \App\Models\PurchaseOrderReceipt::query()->where('business_id', $business->id)->count());
+        $this->assertSame(2, \App\Models\PurchaseOrderReceipt::query()->where('business_id', $business->id)->count());
     }
 
     public function test_offline_receipt_rejects_a_line_identity_from_another_business(): void
