@@ -1,4 +1,4 @@
-const CACHE_NAME = 'zazu-static-v8';
+const CACHE_NAME = 'zazu-static-v9';
 const OFFLINE_SHELL = '/dashboard';
 
 const PRECACHE_ASSETS = [
@@ -63,6 +63,37 @@ function isCacheableStaticAsset(url, request) {
         )
     );
 }
+
+async function primePages(routes) {
+    const uniqueRoutes = [...new Set(Array.isArray(routes) ? routes : [])]
+        .filter((path) => typeof path === 'string' && path.startsWith('/') && !path.startsWith('/api/'))
+        .slice(0, 30);
+
+    const cache = await caches.open(CACHE_NAME);
+
+    await Promise.all(uniqueRoutes.map(async (path) => {
+        try {
+            const request = new Request(new URL(path, self.location.origin), {
+                credentials: 'include',
+                cache: 'no-store',
+            });
+            const response = await fetch(request);
+            if (!response.ok) return;
+
+            const contentType = response.headers.get('content-type') || '';
+            if (!contentType.includes('text/html')) return;
+
+            await cache.put(new Request(new URL(path, self.location.origin)), response.clone());
+        } catch {
+            // A single page failing to prime must never block the installed Zazu shell.
+        }
+    }));
+}
+
+self.addEventListener('message', (event) => {
+    if (event.data?.type !== 'prime-pages') return;
+    event.waitUntil(primePages(event.data.routes));
+});
 
 self.addEventListener('fetch', (event) => {
     const request = event.request;
