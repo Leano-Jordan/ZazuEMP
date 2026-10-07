@@ -58,6 +58,16 @@ Future architecture should remain compatible with these possibilities without al
 
 Last updated: 2026-10-06
 
+## Offline operational depth update — 2026-10-07
+
+Current main now contains phone-local and server synchronization coverage for inventory items/movements, operational event costs, assets and asset allocation/return, alongside the previously implemented commercial offline chain. Direct and paired bootstrap payloads carry these domains, and focused regression tests have been added.
+
+Evidence boundary: IMPLEMENTED only for this new cycle until the current regression suite executes successfully in CI/runtime. No numerical readiness uplift is claimed from source changes alone.
+
+Remaining offline gaps: attachment synchronization, explicit conflict detection/resolution, and full disconnected parity across every desktop capability.
+
+Last updated: 2026-10-07
+
 
 ## Evidence snapshot — 2026-10-01
 
