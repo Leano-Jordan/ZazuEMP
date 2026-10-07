@@ -5,7 +5,10 @@ namespace App\Http\Controllers;
 use App\Models\BusinessCapability;
 use App\Models\Customer;
 use App\Models\Event;
+use App\Models\Asset;
+use App\Models\EventCost;
 use App\Models\FinanceExpense;
+use App\Models\InventoryItem;
 use App\Models\Invoice;
 use App\Models\Payment;
 use App\Models\PurchaseOrder;
@@ -176,6 +179,88 @@ class OfflineWorkspaceController extends Controller
                         'reference' => $payment->reference,
                         'paid_at' => $payment->paid_at?->toDateString(),
                     ])->values(),
+                ])
+                ->values(),
+            'inventory_items' => InventoryItem::query()
+                ->where('business_id', $business->id)
+                ->with('movements')
+                ->orderBy('name')
+                ->limit(500)
+                ->get()
+                ->map(fn (InventoryItem $item) => [
+                    'id' => $item->id,
+                    'local_id' => $registry->identify($item, 'inventory_item')->entity_uuid,
+                    'capability_id' => $item->capability_id,
+                    'name' => $item->name,
+                    'sku' => $item->sku,
+                    'unit' => $item->unit,
+                    'reorder_level' => $item->reorder_level,
+                    'on_hand' => $item->on_hand,
+                    'movements' => $item->movements->map(fn ($movement) => [
+                        'id' => $movement->id,
+                        'local_id' => $registry->identify($movement, 'inventory_movement')->entity_uuid,
+                        'inventory_item_id' => $movement->inventory_item_id,
+                        'event_id' => $movement->event_id,
+                        'purchase_order_id' => $movement->purchase_order_id,
+                        'purchase_order_item_id' => $movement->purchase_order_item_id,
+                        'type' => $movement->type,
+                        'quantity' => $movement->quantity,
+                        'unit_cost' => $movement->unit_cost,
+                        'movement_date' => $movement->movement_date?->toDateString(),
+                        'reference' => $movement->reference,
+                        'notes' => $movement->notes,
+                    ])->values(),
+                ])
+                ->values(),
+            'assets' => Asset::query()
+                ->where('business_id', $business->id)
+                ->with(['allocations' => fn ($query) => $query->where('status', 'allocated')])
+                ->orderBy('name')
+                ->limit(500)
+                ->get()
+                ->map(fn (Asset $asset) => [
+                    'id' => $asset->id,
+                    'local_id' => $registry->identify($asset, 'asset')->entity_uuid,
+                    'capability_id' => $asset->capability_id,
+                    'asset_tag' => $asset->asset_tag,
+                    'name' => $asset->name,
+                    'status' => $asset->status,
+                    'condition' => $asset->condition,
+                    'location' => $asset->location,
+                    'acquired_at' => $asset->acquired_at?->toDateString(),
+                    'purchase_cost' => $asset->purchase_cost,
+                    'currency' => $asset->currency,
+                    'notes' => $asset->notes,
+                    'allocations' => $asset->allocations->map(fn ($allocation) => [
+                        'id' => $allocation->id,
+                        'local_id' => $registry->identify($allocation, 'asset_allocation')->entity_uuid,
+                        'asset_id' => $allocation->asset_id,
+                        'event_id' => $allocation->event_id,
+                        'allocated_from' => $allocation->allocated_from?->toDateString(),
+                        'allocated_until' => $allocation->allocated_until?->toDateString(),
+                        'status' => $allocation->status,
+                        'notes' => $allocation->notes,
+                    ])->values(),
+                ])
+                ->values(),
+            'costs' => EventCost::query()
+                ->where('business_id', $business->id)
+                ->with('event')
+                ->latest('id')
+                ->limit(500)
+                ->get()
+                ->map(fn (EventCost $cost) => [
+                    'id' => $cost->id,
+                    'local_id' => $registry->identify($cost, 'event_cost')->entity_uuid,
+                    'event_id' => $cost->event_id,
+                    'event_name' => $cost->event?->name,
+                    'category' => $cost->category,
+                    'description' => $cost->description,
+                    'currency' => $cost->currency,
+                    'projected_amount' => $cost->projected_amount,
+                    'actual_amount' => $cost->actual_amount,
+                    'status' => $cost->status,
+                    'notes' => $cost->notes,
                 ])
                 ->values(),
             'expenses' => FinanceExpense::query()
