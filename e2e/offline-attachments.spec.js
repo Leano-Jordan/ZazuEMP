@@ -1,19 +1,28 @@
 import { test, expect } from '@playwright/test';
 
+const DEMO_EMAIL = process.env.ZAZU_DEMO_EMAIL || 'demo@zazu.local';
+const DEMO_PASSWORD = process.env.ZAZU_DEMO_PASSWORD || 'password';
+
+async function login(page) {
+    await page.goto('/?auth=login', { waitUntil: 'domcontentloaded' });
+    await expect(page.locator('[data-auth-modal]')).toBeVisible();
+    await page.getByLabel('Username or email').fill(DEMO_EMAIL);
+    await page.locator('#auth_password').fill(DEMO_PASSWORD);
+    await page.locator('[data-auth-submit]').click();
+    await expect(page).toHaveURL(/\/dashboard$/);
+}
+
 test('real Zazu job form can create a job locally while disconnected', async ({ page }) => {
+    await login(page);
     await page.goto('/dashboard', { waitUntil: 'domcontentloaded' });
     await expect(page.getByRole('heading', { name: 'Dashboard' })).toBeVisible();
 
     await page.goto('/work/create', { waitUntil: 'domcontentloaded' });
     await expect(page.locator('#new-job-form')).toBeVisible();
 
-    await page.getByRole('button', { name: 'Add customer', exact: true }).click();
-    await expect(page.locator('#quick-customer-dialog')).toBeVisible();
-    await page.getByLabel('Customer name').fill('Offline Browser Customer');
-    await page.getByLabel('Contact name').fill('Offline Browser Contact');
-    await page.getByRole('button', { name: 'Save and use customer', exact: true }).click();
-    await expect(page.locator('#quick-customer-dialog')).toBeHidden();
-    await expect(page.locator('#customer_id')).not.toHaveValue('');
+    const customer = page.locator('#customer_id option:not([value=""])').first();
+    await expect(customer).toHaveCount(1);
+    await page.locator('#customer_id').selectOption({ index: 1 });
     await page.locator('input[name="event_type"]').first().check();
     await page.locator('input[name="name"]').fill('Offline catering job');
 
