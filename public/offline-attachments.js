@@ -220,6 +220,7 @@
         };
     }
 
+    window.flushOfflineAttachments = flush;
     window.addEventListener('online', flush);
     setTimeout(() => {
         addAction();
