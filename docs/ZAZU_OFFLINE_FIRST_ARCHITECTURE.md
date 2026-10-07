@@ -278,6 +278,8 @@ Before claiming full offline operation:
 - attachment synchronization;
 - cloud synchronization.
 
+The current implementation now covers the major operational mutation domains listed above, but source implementation alone is not release proof. Runtime execution of the newly added regression set, physical disconnected-device trials, attachment synchronization and conflict/recovery behaviour still require evidence.
+
 This contract therefore establishes the architecture direction without falsely claiming those future layers already exist.
 
 ## Director implementation update — 2026-10-06
@@ -289,11 +291,13 @@ The phone-local foundation is now implemented beyond static PWA caching:
 - Browser storage persistence is requested where supported to reduce eviction risk.
 - Reconnect pushes queued mutations to the sync endpoint.
 - Customer, job/event and service mutations now have explicit server-side handlers with business scoping, whitelisted fields and synchronization identities.
+- Purchasing, receiving, supplier maintenance, quotes, quote acceptance, invoices, payments and expenses now have explicit offline domain contracts.
+- Inventory items, inventory movements, operational event costs, assets and asset allocation/return now have explicit offline domain contracts.
 - Replayed applied mutations are idempotent and do not duplicate records.
 - Unsupported mutation types remain pending rather than being guessed into domain state.
 - Local dirty state prevents a bootstrap refresh from overwriting unsynchronised phone changes.
 
-The phone workspace is therefore a real offline operational foundation, but it is **not yet a complete disconnected replacement for the full web application**. Finance, purchasing/inventory, quote acceptance and other domain workflows still require dedicated offline contracts before they may be advertised as fully offline-capable.
+The phone workspace is therefore a **broad offline operational foundation**, but it is **not yet a complete disconnected replacement for the full web application**. Attachment/file synchronization, explicit conflict-resolution UX, full incremental bidirectional synchronization and final realistic offline/recovery proof remain open.
 
 
 ## Director hardening update — 2026-10-06
