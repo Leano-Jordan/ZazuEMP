@@ -13,7 +13,7 @@
         </div>
     </section>
 
-    <form method="POST" action="{{ route('work.costs.store', $event) }}">
+    <form method="POST" action="{{ route('work.costs.store', $event) }}" data-zazu-offline-entity="event_cost" data-zazu-offline-job-id="{{ $event->id }}">
         @csrf
         <div class="zazu-editor">
             <div class="zazu-form-main">
