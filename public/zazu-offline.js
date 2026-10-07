@@ -199,8 +199,12 @@
 
     async function push() {
         if (!navigator.onLine || !state?.sync?.token) return;
-        const mutations = await pending();
-        if (!mutations.length) return;
+        const allMutations = await pending();
+        if (!allMutations.length) return;
+
+        // The server accepts at most 100 mutations per request. Keep the
+        // client durable queue larger than that and drain it in ordered batches.
+        const mutations = allMutations.slice(0, 100);
 
         const response = await api('/api/sync/push', {
             method: 'POST',
