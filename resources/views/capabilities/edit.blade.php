@@ -22,7 +22,7 @@
         </div>
     </section>
 
-    <form method="POST" action="{{ route('capabilities.update', $capability) }}" enctype="multipart/form-data">
+    <form method="POST" action="{{ route('capabilities.update', $capability) }}" enctype="multipart/form-data" data-zazu-offline-entity="service" data-zazu-offline-server-id="{{ $capability->id }}">
         @csrf @method('PUT')
         <div class="zazu-editor">
             <div class="zazu-form-main">
