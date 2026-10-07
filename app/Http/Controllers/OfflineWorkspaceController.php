@@ -21,6 +21,7 @@ class OfflineWorkspaceController extends Controller
         return view('offline');
     }
 
+    /** @SuppressWarnings(PHPMD.ExcessiveMethodLength) */
     public function bootstrap(Request $request, CurrentBusiness $currentBusiness, SyncEntityIdentityRegistry $registry): JsonResponse
     {
         $business = $currentBusiness->resolve($request->user());
