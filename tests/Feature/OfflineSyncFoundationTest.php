@@ -1093,6 +1093,7 @@ class OfflineSyncFoundationTest extends TestCase
     }
 
 
+    /** @SuppressWarnings(PHPMD.ExcessiveMethodLength) */
     public function test_offline_finance_can_invoice_accepted_quote_record_payment_and_expense(): void
     {
         $business = Business::create([
