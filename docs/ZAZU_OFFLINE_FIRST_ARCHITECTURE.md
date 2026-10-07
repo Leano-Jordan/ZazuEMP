@@ -297,7 +297,7 @@ The phone-local foundation is now implemented beyond static PWA caching:
 - Unsupported mutation types remain pending rather than being guessed into domain state.
 - Local dirty state prevents a bootstrap refresh from overwriting unsynchronised phone changes.
 
-The phone workspace is therefore a **broad offline operational foundation**, but it is **not yet a complete disconnected replacement for the full web application**. Attachment/file synchronization, explicit conflict-resolution UX, full incremental bidirectional synchronization and final realistic offline/recovery proof remain open.
+The phone workspace is a **broad offline operational foundation**. Attachment/file synchronization and explicit conflict-resolution UX are now implemented, including local attachment queuing, server transfer, idempotency, conflict retry/discard and browser regression coverage. It is **not yet a complete disconnected replacement for the full web application**; full incremental bidirectional synchronization, broader capability parity and final realistic offline/recovery proof remain open.
 
 
 ## Director hardening update — 2026-10-06
