@@ -1,8 +1,8 @@
 # Zazu EMP — V1 Software / Commercial Status
 
-**Assessment date:** 2026-10-03  
+**Assessment date:** 2026-10-07
 **Repository:** `Leano-Jordan/ZazuEMP`  
-**Latest application-changing candidate observed by Director:** `aa1e3ca8921625abca16fe4bbc8546746b4bf135`
+**Current main HEAD observed by Director:** `90f3dee6d5ec2011db668bf3647fcd007f03218e`
 
 ## Current position
 
@@ -20,7 +20,7 @@ Zazu EMP has a substantial connected operational foundation across:
 - reporting;
 - responsive/shared UI.
 
-The product is **not yet release-certified**. Previous verified CI/browser/static-quality evidence exists, but the latest main-head verification run is queued and several commercial-operational proof gates remain open.
+The product is **not yet release-certified**. The current main line contains a broad offline operational foundation, while release certification remains gated by real recovery/rollback evidence, legal/privacy closure and Zazu brand clearance.
 
 ## Historical-chat reconciliation
 
@@ -32,8 +32,8 @@ The product is **not yet release-certified**. Previous verified CI/browser/stati
 | Progressive disclosure | PARTIAL / FOUNDATION — hierarchical navigation already exists; the workspace-focus screen now uses a native disclosure for secondary experience detail. Wider page-by-page adoption remains future iteration. |
 | Command palette | IMPLEMENTED — global workspace search / quick access is present. |
 | Niche-specific dashboard emphasis | PARTIAL — selected niche now appears in workspace context and dashboard copy; deeper niche-specific surfacing is not yet implemented. |
-| Full offline business-data operation | NOT IMPLEMENTED — PWA static caching and offline licensing foundations exist, but there is no full local write/queue/sync engine. |
-| Online/offline parity | DIRECTION ACTIVE — offline must remain useful and online should add connected richness rather than replacing the local experience. |
+| Full offline business-data operation | PARTIAL / IN PROGRESS — IndexedDB local store + durable queue + reconnect sync now cover customer/job/service/preparation/supplier/purchasing/receiving/quote/acceptance/invoice/payment/expense/inventory/cost/assets; attachment synchronization, explicit conflict handling and full disconnected parity remain open. |
+| Online/offline parity | DIRECTION ACTIVE — the phone workspace is now a real local operational surface; it is not yet a complete disconnected replacement for every desktop workflow. |
 | Local host / Wi-Fi clients | NOT IMPLEMENTED — remains an architecture target, not a current capability. |
 | Historical infrastructure/capacity claims | EXCLUDED — not treated as requirements without repository or measured evidence. |
 
