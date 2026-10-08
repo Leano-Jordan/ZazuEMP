@@ -30,6 +30,7 @@ use App\Support\Offline\SyncConflictRecorder;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 use Illuminate\Validation\ValidationException;
@@ -95,34 +96,49 @@ class SyncController extends Controller
             'device_type' => ['nullable', 'string', 'max:32'],
         ]);
 
-        $device = SyncDevice::query()->where('status', 'pending')->orderBy('id')->get()->first(function (SyncDevice $candidate): bool {
-            $metadata = $candidate->metadata ?? [];
-            $expiresAt = isset($metadata['pairing_expires_at']) ? now()->parse($metadata['pairing_expires_at']) : null;
+        [$device, $token] = DB::transaction(function () use ($validated): array {
+            $candidates = SyncDevice::query()
+                ->where('status', 'pending')
+                ->whereNull('revoked_at')
+                ->orderBy('id')
+                ->lockForUpdate()
+                ->get();
 
-            return $expiresAt && $expiresAt->isFuture()
-                && isset($metadata['pairing_code_hash'])
-                && Hash::check(request()->input('pairing_code'), $metadata['pairing_code_hash']);
+            foreach ($candidates as $candidate) {
+                $metadata = $candidate->metadata ?? [];
+                $expiresAt = isset($metadata['pairing_expires_at'])
+                    ? now()->parse($metadata['pairing_expires_at'])
+                    : null;
+
+                if (! $expiresAt || ! $expiresAt->isFuture() || ! isset($metadata['pairing_code_hash'])) {
+                    continue;
+                }
+
+                if (! Hash::check($validated['pairing_code'], $metadata['pairing_code_hash'])) {
+                    continue;
+                }
+
+                $token = Str::random(64);
+                $candidate->update([
+                    'device_name' => $validated['device_name'] ?? 'Zazu phone',
+                    'device_type' => $validated['device_type'] ?? 'phone',
+                    'status' => 'active',
+                    'last_seen_at' => now(),
+                    'metadata' => array_merge($metadata, [
+                        'sync_token_hash' => hash('sha256', $token),
+                        'paired_at' => now()->toIso8601String(),
+                        'pairing_code_hash' => null,
+                        'pairing_expires_at' => null,
+                    ]),
+                ]);
+
+                return [$candidate->fresh(), $token];
+            }
+
+            throw ValidationException::withMessages([
+                'pairing_code' => 'The pairing code is invalid or expired.',
+            ]);
         });
-
-        if (! $device) {
-            throw ValidationException::withMessages(['pairing_code' => 'The pairing code is invalid or expired.']);
-        }
-
-        $metadata = $device->metadata ?? [];
-        $token = Str::random(64);
-
-        $device->update([
-            'device_name' => $validated['device_name'] ?? 'Zazu phone',
-            'device_type' => $validated['device_type'] ?? 'phone',
-            'status' => 'active',
-            'last_seen_at' => now(),
-            'metadata' => array_merge($metadata, [
-                'sync_token_hash' => hash('sha256', $token),
-                'paired_at' => now()->toIso8601String(),
-                'pairing_code_hash' => null,
-                'pairing_expires_at' => null,
-            ]),
-        ]);
 
         return response()->json([
             'device' => [
