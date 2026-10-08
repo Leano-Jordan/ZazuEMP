@@ -1560,6 +1560,91 @@ class OfflineSyncFoundationTest extends TestCase
         \Illuminate\Support\Facades\Storage::disk('private')->assertExists($attachment->path);
     }
 
+
+    public function test_sync_pairing_code_is_consumed_once(): void
+    {
+        $business = Business::create([
+            'name' => 'Pairing Business',
+            'slug' => 'pairing-' . Str::lower(Str::random(8)),
+            'status' => 'active',
+            'currency' => 'ZAR',
+        ]);
+        $code = '482731';
+
+        $device = SyncDevice::create([
+            'business_id' => $business->id,
+            'installation_id' => (string) Str::uuid(),
+            'status' => 'pending',
+            'metadata' => [
+                'pairing_code_hash' => IlluminateSupportFacadesHash::make($code),
+                'pairing_expires_at' => now()->addMinutes(10)->toIso8601String(),
+            ],
+        ]);
+
+        $controller = app(SyncController::class);
+        $makeRequest = fn () => Request::create('/api/sync/provision', 'POST', [
+            'pairing_code' => $code,
+            'device_name' => 'Owner phone',
+            'device_type' => 'phone',
+        ]);
+
+        $first = $controller->provision($makeRequest());
+        $this->assertSame(200, $first->getStatusCode());
+        $this->assertSame('active', $device->fresh()->status);
+        $this->assertNull($device->fresh()->metadata['pairing_code_hash']);
+
+        $this->expectException(IlluminateValidationValidationException::class);
+        $controller->provision($makeRequest());
+    }
+
+    public function test_sync_mutation_rejection_is_recorded_as_a_conflict_without_losing_queue_traceability(): void
+    {
+        $business = Business::create([
+            'name' => 'Conflict Business',
+            'slug' => 'conflict-' . Str::lower(Str::random(8)),
+            'status' => 'active',
+            'currency' => 'ZAR',
+        ]);
+        $device = SyncDevice::create([
+            'business_id' => $business->id,
+            'installation_id' => (string) Str::uuid(),
+            'status' => 'active',
+        ]);
+
+        $mutationId = (string) Str::uuid();
+        $request = Request::create('/api/sync/push', 'POST', [
+            'mutations' => [[
+                'id' => $mutationId,
+                'entity_type' => 'event',
+                'entity_id' => (string) Str::uuid(),
+                'operation' => 'create',
+                'payload' => [
+                    'local_id' => (string) Str::uuid(),
+                    'record' => [],
+                ],
+            ]],
+        ]);
+        $request->attributes->set('sync_device', $device);
+
+        $response = app(SyncController::class)->push(
+            $request,
+            app(SyncMutationRecorder::class),
+            app(SyncMutationApplier::class),
+            app(OfflineDomainMutationHandler::class),
+            app(SyncConflictRecorder::class),
+        );
+
+        $recorded = $response->getData(true)['recorded'][0];
+        $this->assertSame('pending', $recorded['status']);
+        $this->assertNotNull($recorded['error']);
+        $this->assertNotNull($recorded['conflict_id']);
+        $this->assertDatabaseHas('sync_conflicts', [
+            'id' => $recorded['conflict_id'],
+            'mutation_id' => $mutationId,
+            'status' => 'open',
+        ]);
+    }
+
     public function test_sync_push_returns_server_identity_for_new_offline_record(): void
     {
         $business = Business::create([
