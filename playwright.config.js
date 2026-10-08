@@ -4,7 +4,7 @@ export default defineConfig({
     testDir: './e2e',
     fullyParallel: false,
     forbidOnly: !!process.env.CI,
-    retries: 0,
+    retries: process.env.CI ? 1 : 0,
     workers: process.env.CI ? 1 : undefined,
     reporter: process.env.CI ? 'github' : 'list',
     use: {
@@ -13,6 +13,14 @@ export default defineConfig({
         screenshot: 'only-on-failure',
         video: 'retain-on-failure',
         colorScheme: 'light',
+    },
+    webServer: {
+        command: 'php artisan serve --host=127.0.0.1 --port=8000',
+        url: 'http://127.0.0.1:8000',
+        reuseExistingServer: !process.env.CI,
+        timeout: 120_000,
+        stdout: 'pipe',
+        stderr: 'pipe',
     },
     projects: [
         {
