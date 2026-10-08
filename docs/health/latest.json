@@ -1,0 +1,66 @@
+{
+  "schema": "roscore-director-health/v2",
+  "generated_at_utc": "2026-10-08T19:59:47.153952+00:00",
+  "repository": "Leano-Jordan/ZazuEMP",
+  "branch": "jarvis/hardening-2026-10-08",
+  "commit": "b9f38b51bc7d2557be89565ef17e1cb0a8794ae2",
+  "director": "Jarvis",
+  "commit_message": "test: correct offline pairing exception namespace",
+  "commit_author": "Isaac Junior",
+  "changed_files": [
+    "tests/Feature/OfflineSyncFoundationTest.php"
+  ],
+  "engineering": {
+    "active_target": "",
+    "next_hard_gate": "reconcile current-head regression/CI evidence, then customer-environment backup/restore proof**.",
+    "readiness_register_present": true
+  },
+  "ci": {
+    "target_commit": "b9f38b51bc7d2557be89565ef17e1cb0a8794ae2",
+    "overall": "PENDING",
+    "required_workflows": [
+      {
+        "name": "Laravel",
+        "status": "not_found",
+        "conclusion": null,
+        "run_id": null,
+        "url": null
+      },
+      {
+        "name": "Zazu browser smoke",
+        "status": "not_found",
+        "conclusion": null,
+        "run_id": null,
+        "url": null
+      }
+    ]
+  },
+  "signals": {
+    "manifest": false,
+    "agents_contract": true,
+    "package_json": true,
+    "composer_json": true,
+    "requirements": false,
+    "github_actions": true,
+    "tests_directory": true,
+    "readme": true,
+    "test_script": false,
+    "build_script": true,
+    "lint_script": false
+  },
+  "latest_commit_age": "9 seconds ago",
+  "package": {
+    "name": null,
+    "version": null,
+    "scripts": [
+      "build",
+      "dev",
+      "test:e2e"
+    ]
+  },
+  "readiness": "PARTIAL_DIRECTOR_CONTRACT",
+  "risk_flags": [
+    "NO_ROSSCORE_MANIFEST",
+    "CURRENT_HEAD_CI_PENDING"
+  ]
+}
