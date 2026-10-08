@@ -15,7 +15,7 @@ export default defineConfig({
         colorScheme: 'light',
     },
     webServer: {
-        command: 'php artisan serve --host=127.0.0.1 --port=8000',
+        command: 'php artisan serve --host=127.0.0.1 --port=8000 > storage/logs/browser-server.log 2>&1',
         url: 'http://127.0.0.1:8000',
         reuseExistingServer: !process.env.CI,
         timeout: 120_000,
