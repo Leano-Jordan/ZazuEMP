@@ -54,3 +54,15 @@ jobs:
 
       - name: Run browser regression suite
         run: npm run test:e2e -- --workers=1
+
+      - name: Upload browser diagnostics
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: zazu-browser-diagnostics-${{ github.sha }}
+          path: |
+            test-results/
+            playwright-report/
+            storage/logs/browser-server.log
+          if-no-files-found: ignore
+          retention-days: 14
