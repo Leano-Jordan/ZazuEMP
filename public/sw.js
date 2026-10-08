@@ -227,9 +227,12 @@ self.addEventListener('fetch', (event) => {
         event.respondWith(
             fetch(request)
                 .then((response) => {
-                    if (response.ok) {
-                        cacheRenderedPage(request, response.clone()).catch(() => {});
-                    }
+                    if (!response.ok) return response;
+
+                    // Keep the authenticated page cache operation attached to the
+                    // navigation event. Mobile browsers may terminate a worker
+                    // immediately after returning the response otherwise.
+                    event.waitUntil(cacheRenderedPage(request, response.clone()));
                     return response;
                 })
                 .catch(async () => {
