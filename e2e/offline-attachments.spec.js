@@ -24,7 +24,7 @@ test('real Zazu job form can create a job locally while disconnected', async ({ 
     await expect(customer).toHaveCount(1);
     await page.locator('#customer_id').selectOption({ index: 1 });
     await page.locator('label.zazu-choice-card:has(input[name="event_type"])').first().click();
-    await page.locator('input[name="name"]').fill('Offline catering job');
+    await page.locator('#new-job-form input[name="name"]').fill('Offline catering job');
 
     await page.context().setOffline(true);
     await page.locator('#new-job-form').getByRole('button', { name: /Create job/ }).click();
