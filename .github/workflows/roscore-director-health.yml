@@ -4,10 +4,20 @@ on:
   push:
     paths-ignore:
       - 'docs/health/**'
+  workflow_run:
+    workflows:
+      - Laravel
+      - Zazu browser smoke
+    types: [completed]
   workflow_dispatch:
 
 permissions:
   contents: write
+  actions: read
+
+concurrency:
+  group: director-health-${{ github.event_name == 'workflow_run' && github.event.workflow_run.head_sha || github.sha }}
+  cancel-in-progress: false
 
 jobs:
   health-report:
@@ -15,13 +25,62 @@ jobs:
     env:
       DIRECTOR: "Jarvis"
       REPOSITORY: "${{ github.repository }}"
-      COMMIT_SHA: "${{ github.sha }}"
-      BRANCH: "${{ github.ref_name }}"
+      COMMIT_SHA: "${{ github.event_name == 'workflow_run' && github.event.workflow_run.head_sha || github.sha }}"
+      BRANCH: "${{ github.event_name == 'workflow_run' && github.event.workflow_run.head_branch || github.ref_name }}"
+      GH_TOKEN: "${{ github.token }}"
     steps:
-      - name: Checkout
+      - name: Checkout target commit
         uses: actions/checkout@v4
         with:
+          ref: ${{ github.event_name == 'workflow_run' && github.event.workflow_run.head_sha || github.sha }}
           fetch-depth: 20
+
+      - name: Collect current-head CI evidence
+        shell: bash
+        run: |
+          gh api --paginate "repos/$REPOSITORY/actions/runs?head_sha=$COMMIT_SHA&per_page=100" > /tmp/runs.json
+          python3 - <<'PY'
+          import json, os
+          from pathlib import Path
+
+          data = json.load(open("/tmp/runs.json"))
+          required = {"Laravel", "Zazu browser smoke"}
+          latest = {}
+          for run in data.get("workflow_runs", []):
+              name = run.get("name", "")
+              if name not in required:
+                  continue
+              row = {
+                  "name": name,
+                  "status": run.get("status"),
+                  "conclusion": run.get("conclusion"),
+                  "run_id": run.get("id"),
+                  "url": run.get("html_url"),
+                  "created_at": run.get("created_at"),
+                  "updated_at": run.get("updated_at"),
+              }
+              if name not in latest or row["run_id"] > latest[name]["run_id"]:
+                  latest[name] = row
+
+          required_rows = [latest.get(name, {
+              "name": name, "status": "not_found", "conclusion": None,
+              "run_id": None, "url": None
+          }) for name in sorted(required)]
+
+          conclusions = [r["conclusion"] for r in required_rows]
+          if any(c in {"failure", "cancelled", "timed_out", "action_required", "stale"} for c in conclusions):
+              overall = "FAIL"
+          elif all(c == "success" for c in conclusions):
+              overall = "PASS"
+          else:
+              overall = "PENDING"
+
+          Path("ci-evidence.json").write_text(json.dumps({
+              "target_commit": os.environ["COMMIT_SHA"],
+              "overall": overall,
+              "required_workflows": required_rows,
+          }, indent=2) + "\n")
+          PY
 
       - name: Generate post-commit health report
         shell: bash
@@ -41,6 +100,8 @@ jobs:
 
           sha = os.environ["COMMIT_SHA"]
           state_text = (root / ".ai/engineering/STATE.md").read_text(errors="ignore") if exists(".ai/engineering/STATE.md") else ""
+          ci = json.loads(pathlib.Path("ci-evidence.json").read_text())
+
           def section_value(text, label):
               for line in text.splitlines():
                   if line.strip().startswith(label):
@@ -48,7 +109,7 @@ jobs:
               return ""
 
           report = {
-              "schema": "roscore-director-health/v1",
+              "schema": "roscore-director-health/v2",
               "generated_at_utc": datetime.datetime.now(datetime.timezone.utc).isoformat(),
               "repository": os.environ["REPOSITORY"],
               "branch": os.environ["BRANCH"],
@@ -62,6 +123,7 @@ jobs:
                   "next_hard_gate": section_value(state_text, "Next hard gate:"),
                   "readiness_register_present": exists(".ai/engineering/READINESS_REGISTER.md"),
               },
+              "ci": ci,
               "signals": {
                   "manifest": exists("ROSCORE_PROJECT_MANIFEST.md"),
                   "agents_contract": exists("AGENTS.md"),
@@ -80,11 +142,7 @@ jobs:
               try:
                   pkg = json.loads(p.read_text())
                   scripts = pkg.get("scripts", {})
-                  report["package"] = {
-                      "name": pkg.get("name"),
-                      "version": pkg.get("version"),
-                      "scripts": sorted(scripts.keys()),
-                  }
+                  report["package"] = {"name": pkg.get("name"), "version": pkg.get("version"), "scripts": sorted(scripts.keys())}
                   report["signals"]["test_script"] = "test" in scripts
                   report["signals"]["build_script"] = "build" in scripts
                   report["signals"]["lint_script"] = "lint" in scripts
@@ -95,17 +153,13 @@ jobs:
               report["signals"]["build_script"] = False
               report["signals"]["lint_script"] = False
 
-          present = [k for k,v in report["signals"].items() if v]
-          missing = [k for k,v in report["signals"].items() if not v]
-
           if report["signals"].get("manifest") and report["signals"].get("agents_contract"):
-              readiness = "DIRECTOR_READY"
+              report["readiness"] = "DIRECTOR_READY"
           elif report["signals"].get("manifest") or report["signals"].get("agents_contract"):
-              readiness = "PARTIAL_DIRECTOR_CONTRACT"
+              report["readiness"] = "PARTIAL_DIRECTOR_CONTRACT"
           else:
-              readiness = "NO_DIRECTOR_CONTRACT"
+              report["readiness"] = "NO_DIRECTOR_CONTRACT"
 
-          report["readiness"] = readiness
           report["risk_flags"] = []
           if not report["signals"].get("test_script") and not report["signals"].get("tests_directory"):
               report["risk_flags"].append("NO_TEST_SIGNAL")
@@ -115,37 +169,45 @@ jobs:
               report["risk_flags"].append("NO_README")
           if not report["signals"].get("manifest"):
               report["risk_flags"].append("NO_ROSSCORE_MANIFEST")
+          if ci["overall"] == "FAIL":
+              report["risk_flags"].append("CURRENT_HEAD_CI_FAILURE")
+          elif ci["overall"] == "PENDING":
+              report["risk_flags"].append("CURRENT_HEAD_CI_PENDING")
 
-          out = pathlib.Path("roscore-director-health.json")
-          out.write_text(json.dumps(report, indent=2) + "\n")
+          pathlib.Path("roscore-director-health.json").write_text(json.dumps(report, indent=2) + "\n")
 
-          md = pathlib.Path("roscore-director-health.md")
           lines = [
-              "# Rosscore Director Health Report",
-              "",
+              "# Rosscore Director Health Report", "",
               f"- **Repository:** {report['repository']}",
               f"- **Director:** {report['director']}",
               f"- **Branch:** {report['branch']}",
               f"- **Commit:** {report['commit']}",
               f"- **Commit message:** {report['commit_message']}",
               f"- **Readiness:** **{report['readiness']}**",
-              "",
-              "## Health Signals",
-              ""
+              f"- **Current-head CI:** **{ci['overall']}**", "",
+              "## Current-head CI Evidence", ""
           ]
+          for item in ci["required_workflows"]:
+              label = item["conclusion"] or item["status"] or "unknown"
+              suffix = f" — {item['url']}" if item.get("url") else ""
+              lines.append(f"- **{item['name']}**: {label}{suffix}")
+          lines += ["", "## Health Signals", ""]
           for k,v in report["signals"].items():
               lines.append(f"- {'PASS' if v else 'WARN'} — {k}")
           lines += ["", "## Risk Flags", ""]
           lines += [f"- {x}" for x in report["risk_flags"]] or ["- None detected by the automated baseline."]
-          lines += ["", "## Changed Files", ""]
+          lines += ["", "## Engineering State", "",
+                    f"- **Active target:** {report['engineering']['active_target'] or 'not recorded'}",
+                    f"- **Next hard gate:** {report['engineering']['next_hard_gate'] or 'not recorded'}",
+                    "", "## Changed Files", ""]
           lines += [f"- {x}" for x in report["changed_files"][:100]] or ["- No file list available."]
-          md.write_text("\n".join(lines) + "\n")
+          pathlib.Path("roscore-director-health.md").write_text("\n".join(lines) + "\n")
           PY
 
       - name: Publish report artifact
         uses: actions/upload-artifact@v4
         with:
-          name: roscore-director-health-${{ github.sha }}
+          name: roscore-director-health-${{ env.COMMIT_SHA }}
           path: |
             roscore-director-health.json
             roscore-director-health.md
