@@ -238,12 +238,39 @@
 
                 if (remote.status === 'applied' || remote.status === 'discarded') {
                     store.delete(mutation.id);
+                } else if (remote.error) {
+                    // A domain rejection is not a transient network failure.
+                    // Keep the failed mutation for inspection/reconciliation, but
+                    // stop treating it as dirty work or it will block pulls forever.
+                    store.put({
+                        ...mutation,
+                        status: 'failed',
+                        server_sequence: remote.sequence,
+                        server_status: remote.status,
+                        conflict_id: remote.conflict_id || null,
+                        last_error: remote.error,
+                    });
+
+                    if (remote.conflict_id) {
+                        state.conflicts = state.conflicts || [];
+                        state.conflicts = [
+                            ...state.conflicts.filter(item => item.id !== remote.conflict_id),
+                            {
+                                id: remote.conflict_id,
+                                mutation_id: mutation.id,
+                                entity_type: mutation.entity_type,
+                                entity_id: mutation.entity_id,
+                                message: remote.error,
+                                status: 'open',
+                            },
+                        ];
+                    }
                 } else {
                     store.put({
                         ...mutation,
                         server_sequence: remote.sequence,
                         server_status: remote.status,
-                        last_error: remote.error || 'Server rejected this offline change',
+                        last_error: remote.error || 'The server did not confirm this offline change',
                     });
                 }
             }
