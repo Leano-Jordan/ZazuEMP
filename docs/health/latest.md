@@ -3,8 +3,8 @@
 - **Repository:** Leano-Jordan/ZazuEMP
 - **Director:** Jarvis
 - **Branch:** jarvis/hardening-2026-10-08
-- **Commit:** 3282b01b46498cfb67028e006cca62f09d655585
-- **Commit message:** ci: publish Director health snapshots to report branch
+- **Commit:** 54b3ba73708ff7c72a95ab123f5a8315722ed679
+- **Commit message:** ci: isolate generated Director reports before branch switch
 - **Readiness:** **PARTIAL_DIRECTOR_CONTRACT**
 - **Current-head CI:** **PENDING**
 

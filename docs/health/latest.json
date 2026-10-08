@@ -1,11 +1,11 @@
 {
   "schema": "roscore-director-health/v2",
-  "generated_at_utc": "2026-10-08T19:59:53.452899+00:00",
+  "generated_at_utc": "2026-10-08T20:04:04.297802+00:00",
   "repository": "Leano-Jordan/ZazuEMP",
   "branch": "jarvis/hardening-2026-10-08",
-  "commit": "3282b01b46498cfb67028e006cca62f09d655585",
+  "commit": "54b3ba73708ff7c72a95ab123f5a8315722ed679",
   "director": "Jarvis",
-  "commit_message": "ci: publish Director health snapshots to report branch",
+  "commit_message": "ci: isolate generated Director reports before branch switch",
   "commit_author": "Isaac Junior",
   "changed_files": [
     ".github/workflows/roscore-director-health.yml"
@@ -16,7 +16,7 @@
     "readiness_register_present": true
   },
   "ci": {
-    "target_commit": "3282b01b46498cfb67028e006cca62f09d655585",
+    "target_commit": "54b3ba73708ff7c72a95ab123f5a8315722ed679",
     "overall": "PENDING",
     "required_workflows": [
       {
@@ -48,7 +48,7 @@
     "build_script": true,
     "lint_script": false
   },
-  "latest_commit_age": "9 seconds ago",
+  "latest_commit_age": "8 seconds ago",
   "package": {
     "name": null,
     "version": null,
