@@ -28,24 +28,29 @@ class SyncMutationRecorder
 
         $mutationId ??= (string) Str::uuid();
 
-        $existing = SyncMutation::query()
-            ->where('mutation_id', $mutationId)
-            ->first();
+        return DB::transaction(function () use ($device, $stream, $mutationId, $entityType, $entityId, $operation, $payload): SyncMutation {
+            // Serialize duplicate replay checks with the same business lock used
+            // by domain application so two tabs/devices cannot create the same
+            // mutation concurrently and turn an idempotent retry into a 500.
+            DB::table('businesses')->where('id', $device->business_id)->lockForUpdate()->first();
 
-        if ($existing) {
-            if (
-                $existing->business_id !== $device->business_id
-                || $existing->sync_device_id !== $device->id
-            ) {
-                throw ValidationException::withMessages([
-                    'mutation_id' => 'The mutation identifier is already owned by another business or device.',
-                ]);
+            $existing = SyncMutation::query()
+                ->where('mutation_id', $mutationId)
+                ->first();
+
+            if ($existing) {
+                if (
+                    $existing->business_id !== $device->business_id
+                    || $existing->sync_device_id !== $device->id
+                ) {
+                    throw ValidationException::withMessages([
+                        'mutation_id' => 'The mutation identifier is already owned by another business or device.',
+                    ]);
+                }
+
+                return $existing;
             }
 
-            return $existing;
-        }
-
-        return DB::transaction(function () use ($device, $stream, $mutationId, $entityType, $entityId, $operation, $payload): SyncMutation {
             $counter = SyncStream::query()
                 ->where('business_id', $device->business_id)
                 ->where('stream', $stream)
