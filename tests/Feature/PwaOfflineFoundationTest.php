@@ -152,6 +152,9 @@ class PwaOfflineFoundationTest extends TestCase
         $this->assertStringContainsString("/api/sync/push", $client);
         $this->assertStringContainsString("/api/sync/pull?stream=business&limit=100", $client);
         $this->assertStringContainsString("/api/sync/acknowledge", $client);
+        $this->assertStringContainsString("status: 'failed'", $client);
+        $this->assertStringContainsString('state.local_dirty = (await pending()).length > 0;', $client);
+        $this->assertStringContainsString('remote.conflict_id', $client);
         $this->assertStringContainsString("crypto.randomUUID()", $client);
     }
 
