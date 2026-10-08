@@ -38,12 +38,15 @@ jobs:
       - name: Collect current-head CI evidence
         shell: bash
         run: |
-          gh api --paginate "repos/$REPOSITORY/actions/runs?head_sha=$COMMIT_SHA&per_page=100" > /tmp/runs.json
+          gh api --paginate --slurp "repos/$REPOSITORY/actions/runs?head_sha=$COMMIT_SHA&per_page=100" > /tmp/runs-pages.json
           python3 - <<'PY'
           import json, os
           from pathlib import Path
 
-          data = json.load(open("/tmp/runs.json"))
+          pages = json.load(open("/tmp/runs-pages.json"))
+          data = {"workflow_runs": []}
+          for page in pages:
+              data["workflow_runs"].extend(page.get("workflow_runs", []))
           required = {"Laravel", "Zazu browser smoke"}
           latest = {}
           for run in data.get("workflow_runs", []):
@@ -214,6 +217,7 @@ jobs:
           retention-days: 30
 
       - name: Persist latest Director report
+        if: github.event_name != 'workflow_run' || github.event.workflow_run.head_branch == 'main'
         shell: bash
         run: |
           mkdir -p docs/health
