@@ -84,3 +84,12 @@ Last updated: 2026-10-07 — offline operational depth and parity hardened; curr
 - Offline local reconciliation was hardened for payments and purchase receipts so local invoice/payment and inventory state reflects accepted offline actions immediately.
 - Targeted PWA regression assertions now cover those reconciliation boundaries.
 - Current head CI is queued; runtime closure remains pending fresh Laravel/PHPMD/browser results.
+
+
+## Director health-report hardening — 2026-10-08
+
+- Post-commit Director health reporting is now persistent rather than artifact-only.
+- The health workflow writes `docs/health/latest.json` and `docs/health/latest.md` for the latest source commit and retains the downloadable artifact.
+- Report generation now includes current engineering-state signals alongside repository baseline signals.
+- The workflow ignores `docs/health/**` push events to prevent report commits from recursively triggering the health workflow.
+- Current implementation commit: `614f15ac4c0c7884e7af2194733a1ce0e6429657`.
