@@ -226,9 +226,10 @@ jobs:
           PERSIST_BRANCH: director-health
         run: |
           set -euo pipefail
-          mkdir -p docs/health
-          cp roscore-director-health.json docs/health/latest.json
-          cp roscore-director-health.md docs/health/latest.md
+          report_dir="${RUNNER_TEMP}/roscore-director-health"
+          mkdir -p "$report_dir"
+          cp roscore-director-health.json "$report_dir/latest.json"
+          cp roscore-director-health.md "$report_dir/latest.md"
           git config user.name "Rosscore Director"
           git config user.email "director@roscore.local"
 
@@ -240,8 +241,8 @@ jobs:
             git fetch origin "$PERSIST_BRANCH"
             git checkout -B director-health-publish "origin/$PERSIST_BRANCH"
 
-            cp roscore-director-health.json docs/health/latest.json
-            cp roscore-director-health.md docs/health/latest.md
+            cp "$report_dir/latest.json" docs/health/latest.json
+            cp "$report_dir/latest.md" docs/health/latest.md
             git add docs/health/latest.json docs/health/latest.md
 
             if git diff --cached --quiet; then
