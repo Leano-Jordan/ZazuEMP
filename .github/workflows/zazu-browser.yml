@@ -52,8 +52,5 @@ jobs:
       - name: Install Playwright browsers
         run: npx playwright install --with-deps chromium
 
-      - name: Start application
-        run: php artisan serve --host=127.0.0.1 --port=8000 > storage/logs/browser-server.log 2>&1 &
-
       - name: Run browser regression suite
         run: npm run test:e2e -- --workers=1
