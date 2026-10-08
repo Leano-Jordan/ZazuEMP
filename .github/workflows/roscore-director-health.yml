@@ -16,7 +16,8 @@ permissions:
   actions: read
 
 concurrency:
-  group: director-health-${{ github.event_name == 'workflow_run' && github.event.workflow_run.head_sha || github.sha }}
+  # Serialize report publication so successive CI completions cannot race the report branch.
+  group: director-health-publisher
   cancel-in-progress: false
 
 jobs:
@@ -220,7 +221,9 @@ jobs:
         if: github.event_name != 'workflow_run' || github.event.workflow_run.head_branch == 'main'
         shell: bash
         env:
-          PERSIST_BRANCH: ${{ github.event_name == 'workflow_run' && github.event.workflow_run.head_branch || github.ref_name }}
+          # `main` is intentionally protected. Health snapshots live on a dedicated
+          # report branch while their source commit/branch remains recorded in the report.
+          PERSIST_BRANCH: director-health
         run: |
           set -euo pipefail
           mkdir -p docs/health
