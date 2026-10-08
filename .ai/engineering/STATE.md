@@ -102,3 +102,38 @@ Last updated: 2026-10-07 — offline operational depth and parity hardened; curr
 - Workflow-run-triggered reports serialize per target SHA to prevent competing report commits.
 - Implementation commit: `af0f4158160488873bbaf072de5db75ccdc10192`.
 
+
+## Director deep software audit — 2026-10-08
+
+Jarvis completed a deep repository audit against docs/product-specification.md and the V1 capability map.
+
+Confirmed defects corrected in this cycle:
+- authenticated PWA page-cache lifecycle race;
+- Director health report non-fast-forward publication race;
+- concurrent offline pairing-code consumption race;
+- concurrent offline mutation replay race;
+- rejected offline mutation permanently blocking later sync pulls.
+
+Regression coverage was added for authenticated offline navigation, pairing/conflict behavior and rejected-mutation recovery. A newly added pairing regression initially failed CI because of a test namespace typo; this was corrected immediately in de2413d.
+
+Current audited application HEAD: de2413d78f1efbb8a511fadd78375f1ceba025ce.
+
+Conservative assessment:
+- V1 implementation maturity: approximately 87%.
+- Commercial software readiness: approximately 72%.
+- Current release is not certified.
+
+Release-critical gates remaining:
+1. current-head CI/browser/security convergence;
+2. real offline installed-device proof and restart/reconciliation;
+3. populated commercial workflow certification;
+4. real backup/restore including representative private media;
+5. populated upgrade/rollback drill;
+6. final authorization/security challenge;
+7. production hardening and operational runbooks;
+8. offline licensing activation/signing/enforcement where required for the commercial model;
+9. final Director release audit.
+
+Explicit exclusion from these scores: logo, artwork, photography, branding, trademark and other human-controlled creative/legal tasks.
+
+Audit record: docs/DIRECTOR_DEEP_AUDIT_2026-10-08.md.
