@@ -137,3 +137,15 @@ Release-critical gates remaining:
 Explicit exclusion from these scores: logo, artwork, photography, branding, trademark and other human-controlled creative/legal tasks.
 
 Audit record: docs/DIRECTOR_DEEP_AUDIT_2026-10-08.md.
+
+
+## 2026-10-08 — Jarvis hardening cycle
+
+- Latest verified main failure fingerprints were isolated to three owning layers: an offline pairing regression namespace typo, a browser test targeting a covered radio input, and the Director health publisher attempting to push directly to protected `main`.
+- Corrected the regression namespace to fully-qualified `\\Illuminate\\Validation\\ValidationException`.
+- Corrected the offline job journey to click the visible job-type card rather than the covered radio input, without hardcoding a specific job type.
+- Moved persistent Director health snapshots to the dedicated `director-health` branch and serialized publication; the patched health workflow completed successfully and persisted `docs/health/latest.json` and `docs/health/latest.md`.
+- CodeQL validation for PR #29 completed successfully.
+- Evidence boundary: patched application Laravel / quality / browser runtime results have not yet been observed on the patched head, so no release-evidence uplift is claimed from these source/test fixes alone.
+- Active PR: #29, Jarvis hardening.
+- Next hard gate: obtain fresh Laravel + quality + browser evidence on the patched head, then reconcile release readiness and continue populated commercial/recovery certification.
