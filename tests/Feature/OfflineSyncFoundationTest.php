@@ -1576,7 +1576,7 @@ class OfflineSyncFoundationTest extends TestCase
             'installation_id' => (string) Str::uuid(),
             'status' => 'pending',
             'metadata' => [
-                'pairing_code_hash' => IlluminateSupportFacadesHash::make($code),
+                'pairing_code_hash' => \Illuminate\Support\Facades\Hash::make($code),
                 'pairing_expires_at' => now()->addMinutes(10)->toIso8601String(),
             ],
         ]);
