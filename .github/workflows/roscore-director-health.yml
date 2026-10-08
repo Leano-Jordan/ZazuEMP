@@ -2,10 +2,12 @@ name: Rosscore Director Health Report
 
 on:
   push:
+    paths-ignore:
+      - 'docs/health/**'
   workflow_dispatch:
 
 permissions:
-  contents: read
+  contents: write
 
 jobs:
   health-report:
@@ -38,6 +40,13 @@ jobs:
               return (root / p).exists()
 
           sha = os.environ["COMMIT_SHA"]
+          state_text = (root / ".ai/engineering/STATE.md").read_text(errors="ignore") if exists(".ai/engineering/STATE.md") else ""
+          def section_value(text, label):
+              for line in text.splitlines():
+                  if line.strip().startswith(label):
+                      return line.split(label, 1)[1].strip().lstrip(":").strip("* ")[:500]
+              return ""
+
           report = {
               "schema": "roscore-director-health/v1",
               "generated_at_utc": datetime.datetime.now(datetime.timezone.utc).isoformat(),
@@ -48,6 +57,11 @@ jobs:
               "commit_message": run("git","log","-1","--pretty=%s"),
               "commit_author": run("git","log","-1","--pretty=%an"),
               "changed_files": run("git","show","--pretty=","--name-only","--format=",sha).splitlines(),
+              "engineering": {
+                  "active_target": section_value(state_text, "**Active target**"),
+                  "next_hard_gate": section_value(state_text, "Next hard gate:"),
+                  "readiness_register_present": exists(".ai/engineering/READINESS_REGISTER.md"),
+              },
               "signals": {
                   "manifest": exists("ROSCORE_PROJECT_MANIFEST.md"),
                   "agents_contract": exists("AGENTS.md"),
@@ -113,7 +127,7 @@ jobs:
               f"- **Director:** {report['director']}",
               f"- **Branch:** {report['branch']}",
               f"- **Commit:** {report['commit']}",
-              f"- **Commit:** {report['commit_message']}",
+              f"- **Commit message:** {report['commit_message']}",
               f"- **Readiness:** **{report['readiness']}**",
               "",
               "## Health Signals",
@@ -136,3 +150,19 @@ jobs:
             roscore-director-health.json
             roscore-director-health.md
           retention-days: 30
+
+      - name: Persist latest Director report
+        shell: bash
+        run: |
+          mkdir -p docs/health
+          cp roscore-director-health.json docs/health/latest.json
+          cp roscore-director-health.md docs/health/latest.md
+          git config user.name "Rosscore Director"
+          git config user.email "director@roscore.local"
+          git add docs/health/latest.json docs/health/latest.md
+          if git diff --cached --quiet; then
+            echo "Director health report unchanged."
+          else
+            git commit -m "chore: update director health report [skip ci]"
+            git push origin HEAD:${GITHUB_REF_NAME}
+          fi
