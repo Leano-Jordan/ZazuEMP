@@ -93,3 +93,12 @@ Last updated: 2026-10-07 — offline operational depth and parity hardened; curr
 - Report generation now includes current engineering-state signals alongside repository baseline signals.
 - The workflow ignores `docs/health/**` push events to prevent report commits from recursively triggering the health workflow.
 - Current implementation commit: `614f15ac4c0c7884e7af2194733a1ce0e6429657`.
+
+## Current-head CI reconciliation automation — 2026-10-08
+
+- Director health reporting now observes the actual Laravel and Zazu browser smoke workflow results for the target commit.
+- The health workflow runs on completion of those required workflows as well as on source pushes/manual dispatch.
+- Reports distinguish PASS, FAIL and PENDING current-head CI state and retain the workflow run URLs.
+- Workflow-run-triggered reports serialize per target SHA to prevent competing report commits.
+- Implementation commit: `af0f4158160488873bbaf072de5db75ccdc10192`.
+
