@@ -1,14 +1,14 @@
 {
   "schema": "roscore-director-health/v2",
-  "generated_at_utc": "2026-10-08T20:04:04.297802+00:00",
+  "generated_at_utc": "2026-10-08T20:11:32.595765+00:00",
   "repository": "Leano-Jordan/ZazuEMP",
   "branch": "jarvis/hardening-2026-10-08",
-  "commit": "54b3ba73708ff7c72a95ab123f5a8315722ed679",
+  "commit": "f1276c787a78735de4baf2fd9843d20aaeacf7c8",
   "director": "Jarvis",
-  "commit_message": "ci: isolate generated Director reports before branch switch",
+  "commit_message": "test: scope offline job name field to job form",
   "commit_author": "Isaac Junior",
   "changed_files": [
-    ".github/workflows/roscore-director-health.yml"
+    "e2e/offline-attachments.spec.js"
   ],
   "engineering": {
     "active_target": "",
@@ -16,22 +16,26 @@
     "readiness_register_present": true
   },
   "ci": {
-    "target_commit": "54b3ba73708ff7c72a95ab123f5a8315722ed679",
+    "target_commit": "f1276c787a78735de4baf2fd9843d20aaeacf7c8",
     "overall": "PENDING",
     "required_workflows": [
       {
         "name": "Laravel",
-        "status": "not_found",
+        "status": "in_progress",
         "conclusion": null,
-        "run_id": null,
-        "url": null
+        "run_id": 37837573758,
+        "url": "https://github.com/Leano-Jordan/ZazuEMP/actions/runs/37837573758",
+        "created_at": "2026-10-08T20:11:26Z",
+        "updated_at": "2026-10-08T20:11:29Z"
       },
       {
         "name": "Zazu browser smoke",
-        "status": "not_found",
+        "status": "in_progress",
         "conclusion": null,
-        "run_id": null,
-        "url": null
+        "run_id": 37837573833,
+        "url": "https://github.com/Leano-Jordan/ZazuEMP/actions/runs/37837573833",
+        "created_at": "2026-10-08T20:11:26Z",
+        "updated_at": "2026-10-08T20:11:29Z"
       }
     ]
   },
@@ -48,7 +52,7 @@
     "build_script": true,
     "lint_script": false
   },
-  "latest_commit_age": "8 seconds ago",
+  "latest_commit_age": "13 seconds ago",
   "package": {
     "name": null,
     "version": null,

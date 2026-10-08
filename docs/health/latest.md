@@ -3,15 +3,15 @@
 - **Repository:** Leano-Jordan/ZazuEMP
 - **Director:** Jarvis
 - **Branch:** jarvis/hardening-2026-10-08
-- **Commit:** 54b3ba73708ff7c72a95ab123f5a8315722ed679
-- **Commit message:** ci: isolate generated Director reports before branch switch
+- **Commit:** f1276c787a78735de4baf2fd9843d20aaeacf7c8
+- **Commit message:** test: scope offline job name field to job form
 - **Readiness:** **PARTIAL_DIRECTOR_CONTRACT**
 - **Current-head CI:** **PENDING**
 
 ## Current-head CI Evidence
 
-- **Laravel**: not_found
-- **Zazu browser smoke**: not_found
+- **Laravel**: in_progress — https://github.com/Leano-Jordan/ZazuEMP/actions/runs/37837573758
+- **Zazu browser smoke**: in_progress — https://github.com/Leano-Jordan/ZazuEMP/actions/runs/37837573833
 
 ## Health Signals
 
@@ -39,4 +39,4 @@
 
 ## Changed Files
 
-- .github/workflows/roscore-director-health.yml
+- e2e/offline-attachments.spec.js
