@@ -1593,7 +1593,7 @@ class OfflineSyncFoundationTest extends TestCase
         $this->assertSame('active', $device->fresh()->status);
         $this->assertNull($device->fresh()->metadata['pairing_code_hash']);
 
-        $this->expectException(IlluminateValidationValidationException::class);
+        $this->expectException(\Illuminate\Validation\ValidationException::class);
         $controller->provision($makeRequest());
     }
 
