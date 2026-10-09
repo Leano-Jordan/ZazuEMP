@@ -32,7 +32,7 @@ test('real Zazu job form can create a job locally while disconnected', async ({ 
     await page.locator('#new-job-form').getByRole('button', { name: /Create job/ }).click();
 
     await expect(page.getByText('Saved on this device. It will sync automatically when Zazu reconnects.')).toBeVisible();
-    await expect(page.locator('#new-job-form button[type="submit"]')).toHaveText('Saved locally');
+    await expect(page.locator('#new-job-form button:not([type])')).toHaveText('Saved locally');
 
     const state = await page.evaluate(() => window.ZazuOffline?.getState()?.jobs || []);
     expect(state.some((job) => job.name === 'Offline catering job' && job.local_id)).toBe(true);
