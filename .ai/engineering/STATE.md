@@ -149,3 +149,11 @@ Audit record: docs/DIRECTOR_DEEP_AUDIT_2026-10-08.md.
 - Evidence boundary: patched application Laravel / quality / browser runtime results have not yet been observed on the patched head, so no release-evidence uplift is claimed from these source/test fixes alone.
 - Active PR: #29, Jarvis hardening.
 - Next hard gate: obtain fresh Laravel + quality + browser evidence on the patched head, then reconcile release readiness and continue populated commercial/recovery certification.
+
+## 2026-10-09 — Offline job submission initialization defect
+
+- Latest browser smoke failed in all three Chromium profiles because the expected offline-save confirmation never appeared after submitting a new job while disconnected.
+- Root cause identified in `resources/js/app.js`: `setupZazuOfflineForms()` was invoked immediately during script evaluation, before the DOM-ready UI initialization. If the script runs before the job form exists, the form receives no offline submit handler; the browser then follows the ordinary POST path while offline.
+- Fixed by moving `setupZazuOfflineForms()` into `initializeZazuUi()`, which runs on `DOMContentLoaded` when required, and removing the premature standalone call.
+- Fix commit: `621dd8c8b791c21870c0c3f5a07317449429038a`.
+- Verification boundary: fresh CI for this fix is queued; offline persistence and desktop/mobile/tablet browser regression are not yet confirmed. Do not claim release readiness or score uplift until current-head checks settle.
