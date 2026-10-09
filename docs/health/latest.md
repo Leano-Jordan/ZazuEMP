@@ -3,8 +3,8 @@
 - **Repository:** Leano-Jordan/ZazuEMP
 - **Director:** Jarvis
 - **Branch:** jarvis/hardening-2026-10-08
-- **Commit:** 443851dc305f05bd4aa9e6fada82477dee6bedc7
-- **Commit message:** Handle implicit submit buttons in offline forms
+- **Commit:** e47c1bcdf1bc0309afb35a4de86c62886e39f308
+- **Commit message:** Assert implicit submit button offline state
 - **Readiness:** **PARTIAL_DIRECTOR_CONTRACT**
 - **Current-head CI:** **PENDING**
 
@@ -39,4 +39,4 @@
 
 ## Changed Files
 
-- resources/js/app.js
+- e2e/offline-attachments.spec.js

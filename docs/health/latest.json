@@ -1,14 +1,14 @@
 {
   "schema": "roscore-director-health/v2",
-  "generated_at_utc": "2026-10-09T07:44:19.760457+00:00",
+  "generated_at_utc": "2026-10-09T07:44:31.402853+00:00",
   "repository": "Leano-Jordan/ZazuEMP",
   "branch": "jarvis/hardening-2026-10-08",
-  "commit": "443851dc305f05bd4aa9e6fada82477dee6bedc7",
+  "commit": "e47c1bcdf1bc0309afb35a4de86c62886e39f308",
   "director": "Jarvis",
-  "commit_message": "Handle implicit submit buttons in offline forms",
+  "commit_message": "Assert implicit submit button offline state",
   "commit_author": "Isaac Junior",
   "changed_files": [
-    "resources/js/app.js"
+    "e2e/offline-attachments.spec.js"
   ],
   "engineering": {
     "active_target": "",
@@ -16,7 +16,7 @@
     "readiness_register_present": true
   },
   "ci": {
-    "target_commit": "443851dc305f05bd4aa9e6fada82477dee6bedc7",
+    "target_commit": "e47c1bcdf1bc0309afb35a4de86c62886e39f308",
     "overall": "PENDING",
     "required_workflows": [
       {
