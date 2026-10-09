@@ -157,3 +157,11 @@ Audit record: docs/DIRECTOR_DEEP_AUDIT_2026-10-08.md.
 - Fixed by moving `setupZazuOfflineForms()` into `initializeZazuUi()`, which runs on `DOMContentLoaded` when required, and removing the premature standalone call.
 - Fix commit: `621dd8c8b791c21870c0c3f5a07317449429038a`.
 - Verification boundary: fresh CI for this fix is queued; offline persistence and desktop/mobile/tablet browser regression are not yet confirmed. Do not claim release readiness or score uplift until current-head checks settle.
+
+
+## 2026-10-09 — Browser smoke diagnosis correction
+
+- The browser run on `3166989771cfbee762a7845c5fa9fded786aaf54` still failed in desktop, mobile and tablet Chromium after the offline-form initialization change.
+- Re-inspection of `resources/views/work/create.blade.php` found that `event_date` is a native required field, but `e2e/offline-attachments.spec.js` never populated it. Native HTML constraint validation therefore prevents the submit event from firing, so the offline handler and its confirmation cannot run. The earlier attribution solely to initialization timing was premature and is not treated as verified root cause.
+- Corrected the E2E fixture to enter a valid job date before submitting. Test-fixture fix commit: `6d8b2baf64cb16a82910aa175a1ef8b4a3a24b47`.
+- Verification boundary: the correction has not yet passed a fresh browser run. Keep PR #29 open and release certification blocked until current-head browser smoke and all required checks are green.
