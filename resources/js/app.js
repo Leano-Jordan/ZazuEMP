@@ -1632,7 +1632,7 @@ function setupZazuOfflineForms() {
             state.local_dirty = true;
             await window.ZazuOffline.persist();
 
-            const submit = form.querySelector('button[type="submit"], input[type="submit"]');
+            const submit = form.querySelector('button[type="submit"], button:not([type]), input[type="submit"]');
             if (submit) {
                 submit.disabled = true;
                 submit.textContent = 'Saved locally';
