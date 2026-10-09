@@ -3,15 +3,15 @@
 - **Repository:** Leano-Jordan/ZazuEMP
 - **Director:** Jarvis
 - **Branch:** jarvis/hardening-2026-10-08
-- **Commit:** c071888174c10d1429e6a4f848766252ba274930
-- **Commit message:** Correct Director record for offline smoke diagnosis
+- **Commit:** 443851dc305f05bd4aa9e6fada82477dee6bedc7
+- **Commit message:** Handle implicit submit buttons in offline forms
 - **Readiness:** **PARTIAL_DIRECTOR_CONTRACT**
 - **Current-head CI:** **PENDING**
 
 ## Current-head CI Evidence
 
-- **Laravel**: in_progress — https://github.com/Leano-Jordan/ZazuEMP/actions/runs/37897488482
-- **Zazu browser smoke**: in_progress — https://github.com/Leano-Jordan/ZazuEMP/actions/runs/37897488565
+- **Laravel**: not_found
+- **Zazu browser smoke**: not_found
 
 ## Health Signals
 
@@ -39,4 +39,4 @@
 
 ## Changed Files
 
-- .ai/engineering/STATE.md
+- resources/js/app.js
