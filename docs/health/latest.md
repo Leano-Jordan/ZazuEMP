@@ -3,33 +3,39 @@
 - **Repository:** Leano-Jordan/ZazuEMP
 - **Director:** Jarvis
 - **Branch:** jarvis/hardening-2026-10-08
-- **Commit:** c27251600806df6ca32c858b4f0ed2b2d580d1fc
-- **Commit message:** Record offline save button selector defect
-- **Readiness:** **PARTIAL_DIRECTOR_CONTRACT**
+- **Commit:** f103dd1af234a75838f9766099f942de3fd7a52d
+- **Commit message:** fix: make Director health checks project-aware and reconcile required CI
+- **Readiness:** **DIRECTOR_READY**
 - **Current-head CI:** **PENDING**
 
 ## Current-head CI Evidence
 
-- **Laravel**: in_progress — https://github.com/Leano-Jordan/ZazuEMP/actions/runs/37900758662
-- **Zazu browser smoke**: queued — https://github.com/Leano-Jordan/ZazuEMP/actions/runs/37900759144
+- **Director Contract Lint**: in_progress — https://github.com/Leano-Jordan/ZazuEMP/actions/runs/37920876120
+- **Laravel**: in_progress — https://github.com/Leano-Jordan/ZazuEMP/actions/runs/37920876211
+- **PHPMD**: in_progress — https://github.com/Leano-Jordan/ZazuEMP/actions/runs/37920876157
+- **Psalm Security Scan**: in_progress — https://github.com/Leano-Jordan/ZazuEMP/actions/runs/37920876302
+- **Zazu browser smoke**: in_progress — https://github.com/Leano-Jordan/ZazuEMP/actions/runs/37920876328
+- **Zazu populated upgrade and rollback**: in_progress — https://github.com/Leano-Jordan/ZazuEMP/actions/runs/37920876225
+- **Zazu quality**: in_progress — https://github.com/Leano-Jordan/ZazuEMP/actions/runs/37920876180
 
 ## Health Signals
 
-- WARN — manifest
+- PASS — director_contract
+- PASS — engineering_state
 - PASS — agents_contract
 - PASS — package_json
 - PASS — composer_json
-- WARN — requirements
+- PASS — dependency_lockfiles
 - PASS — github_actions
 - PASS — tests_directory
 - PASS — readme
-- WARN — test_script
+- PASS — frontend_test_script
 - PASS — build_script
-- WARN — lint_script
+- PASS — backend_test_script
+- PASS — quality_workflows
 
 ## Risk Flags
 
-- NO_ROSSCORE_MANIFEST
 - CURRENT_HEAD_CI_PENDING
 
 ## Engineering State
@@ -39,4 +45,4 @@
 
 ## Changed Files
 
-- .ai/engineering/STATE.md
+- .github/workflows/roscore-director-health.yml
