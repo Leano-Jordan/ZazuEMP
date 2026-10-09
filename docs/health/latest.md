@@ -3,15 +3,15 @@
 - **Repository:** Leano-Jordan/ZazuEMP
 - **Director:** Jarvis
 - **Branch:** jarvis/hardening-2026-10-08
-- **Commit:** e47c1bcdf1bc0309afb35a4de86c62886e39f308
-- **Commit message:** Assert implicit submit button offline state
+- **Commit:** c27251600806df6ca32c858b4f0ed2b2d580d1fc
+- **Commit message:** Record offline save button selector defect
 - **Readiness:** **PARTIAL_DIRECTOR_CONTRACT**
 - **Current-head CI:** **PENDING**
 
 ## Current-head CI Evidence
 
-- **Laravel**: not_found
-- **Zazu browser smoke**: not_found
+- **Laravel**: in_progress — https://github.com/Leano-Jordan/ZazuEMP/actions/runs/37900758662
+- **Zazu browser smoke**: queued — https://github.com/Leano-Jordan/ZazuEMP/actions/runs/37900759144
 
 ## Health Signals
 
@@ -39,4 +39,4 @@
 
 ## Changed Files
 
-- e2e/offline-attachments.spec.js
+- .ai/engineering/STATE.md

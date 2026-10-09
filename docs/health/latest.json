@@ -1,14 +1,14 @@
 {
   "schema": "roscore-director-health/v2",
-  "generated_at_utc": "2026-10-09T07:44:31.402853+00:00",
+  "generated_at_utc": "2026-10-09T07:44:52.171815+00:00",
   "repository": "Leano-Jordan/ZazuEMP",
   "branch": "jarvis/hardening-2026-10-08",
-  "commit": "e47c1bcdf1bc0309afb35a4de86c62886e39f308",
+  "commit": "c27251600806df6ca32c858b4f0ed2b2d580d1fc",
   "director": "Jarvis",
-  "commit_message": "Assert implicit submit button offline state",
+  "commit_message": "Record offline save button selector defect",
   "commit_author": "Isaac Junior",
   "changed_files": [
-    "e2e/offline-attachments.spec.js"
+    ".ai/engineering/STATE.md"
   ],
   "engineering": {
     "active_target": "",
@@ -16,22 +16,26 @@
     "readiness_register_present": true
   },
   "ci": {
-    "target_commit": "e47c1bcdf1bc0309afb35a4de86c62886e39f308",
+    "target_commit": "c27251600806df6ca32c858b4f0ed2b2d580d1fc",
     "overall": "PENDING",
     "required_workflows": [
       {
         "name": "Laravel",
-        "status": "not_found",
+        "status": "in_progress",
         "conclusion": null,
-        "run_id": null,
-        "url": null
+        "run_id": 37900758662,
+        "url": "https://github.com/Leano-Jordan/ZazuEMP/actions/runs/37900758662",
+        "created_at": "2026-10-09T07:44:31Z",
+        "updated_at": "2026-10-09T07:44:37Z"
       },
       {
         "name": "Zazu browser smoke",
-        "status": "not_found",
+        "status": "queued",
         "conclusion": null,
-        "run_id": null,
-        "url": null
+        "run_id": 37900759144,
+        "url": "https://github.com/Leano-Jordan/ZazuEMP/actions/runs/37900759144",
+        "created_at": "2026-10-09T07:44:32Z",
+        "updated_at": "2026-10-09T07:44:32Z"
       }
     ]
   },
@@ -48,7 +52,7 @@
     "build_script": true,
     "lint_script": false
   },
-  "latest_commit_age": "8 seconds ago",
+  "latest_commit_age": "26 seconds ago",
   "package": {
     "name": null,
     "version": null,
