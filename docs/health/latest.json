@@ -1,14 +1,14 @@
 {
   "schema": "roscore-director-health/v2",
-  "generated_at_utc": "2026-10-09T06:57:16.267904+00:00",
+  "generated_at_utc": "2026-10-09T07:10:04.002272+00:00",
   "repository": "Leano-Jordan/ZazuEMP",
   "branch": "jarvis/hardening-2026-10-08",
-  "commit": "3166989771cfbee762a7845c5fa9fded786aaf54",
+  "commit": "6d8b2baf64cb16a82910aa175a1ef8b4a3a24b47",
   "director": "Jarvis",
-  "commit_message": "Record offline form initialization defect and fix",
+  "commit_message": "Fix offline job smoke fixture required date",
   "commit_author": "Isaac Junior",
   "changed_files": [
-    ".ai/engineering/STATE.md"
+    "e2e/offline-attachments.spec.js"
   ],
   "engineering": {
     "active_target": "",
@@ -16,26 +16,26 @@
     "readiness_register_present": true
   },
   "ci": {
-    "target_commit": "3166989771cfbee762a7845c5fa9fded786aaf54",
+    "target_commit": "6d8b2baf64cb16a82910aa175a1ef8b4a3a24b47",
     "overall": "PENDING",
     "required_workflows": [
       {
         "name": "Laravel",
-        "status": "queued",
+        "status": "in_progress",
         "conclusion": null,
-        "run_id": 37896271032,
-        "url": "https://github.com/Leano-Jordan/ZazuEMP/actions/runs/37896271032",
-        "created_at": "2026-10-09T06:57:12Z",
-        "updated_at": "2026-10-09T06:57:12Z"
+        "run_id": 37897467947,
+        "url": "https://github.com/Leano-Jordan/ZazuEMP/actions/runs/37897467947",
+        "created_at": "2026-10-09T07:09:58Z",
+        "updated_at": "2026-10-09T07:10:01Z"
       },
       {
         "name": "Zazu browser smoke",
-        "status": "queued",
+        "status": "in_progress",
         "conclusion": null,
-        "run_id": 37896270999,
-        "url": "https://github.com/Leano-Jordan/ZazuEMP/actions/runs/37896270999",
-        "created_at": "2026-10-09T06:57:12Z",
-        "updated_at": "2026-10-09T06:57:12Z"
+        "run_id": 37897467864,
+        "url": "https://github.com/Leano-Jordan/ZazuEMP/actions/runs/37897467864",
+        "created_at": "2026-10-09T07:09:58Z",
+        "updated_at": "2026-10-09T07:10:01Z"
       }
     ]
   },
@@ -52,7 +52,7 @@
     "build_script": true,
     "lint_script": false
   },
-  "latest_commit_age": "8 seconds ago",
+  "latest_commit_age": "12 seconds ago",
   "package": {
     "name": null,
     "version": null,

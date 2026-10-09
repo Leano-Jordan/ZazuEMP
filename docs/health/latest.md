@@ -3,15 +3,15 @@
 - **Repository:** Leano-Jordan/ZazuEMP
 - **Director:** Jarvis
 - **Branch:** jarvis/hardening-2026-10-08
-- **Commit:** 3166989771cfbee762a7845c5fa9fded786aaf54
-- **Commit message:** Record offline form initialization defect and fix
+- **Commit:** 6d8b2baf64cb16a82910aa175a1ef8b4a3a24b47
+- **Commit message:** Fix offline job smoke fixture required date
 - **Readiness:** **PARTIAL_DIRECTOR_CONTRACT**
 - **Current-head CI:** **PENDING**
 
 ## Current-head CI Evidence
 
-- **Laravel**: queued — https://github.com/Leano-Jordan/ZazuEMP/actions/runs/37896271032
-- **Zazu browser smoke**: queued — https://github.com/Leano-Jordan/ZazuEMP/actions/runs/37896270999
+- **Laravel**: in_progress — https://github.com/Leano-Jordan/ZazuEMP/actions/runs/37897467947
+- **Zazu browser smoke**: in_progress — https://github.com/Leano-Jordan/ZazuEMP/actions/runs/37897467864
 
 ## Health Signals
 
@@ -39,4 +39,4 @@
 
 ## Changed Files
 
-- .ai/engineering/STATE.md
+- e2e/offline-attachments.spec.js
