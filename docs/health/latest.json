@@ -1,14 +1,14 @@
 {
   "schema": "roscore-director-health/v2",
-  "generated_at_utc": "2026-10-09T07:10:04.002272+00:00",
+  "generated_at_utc": "2026-10-09T07:10:16.772441+00:00",
   "repository": "Leano-Jordan/ZazuEMP",
   "branch": "jarvis/hardening-2026-10-08",
-  "commit": "6d8b2baf64cb16a82910aa175a1ef8b4a3a24b47",
+  "commit": "c071888174c10d1429e6a4f848766252ba274930",
   "director": "Jarvis",
-  "commit_message": "Fix offline job smoke fixture required date",
+  "commit_message": "Correct Director record for offline smoke diagnosis",
   "commit_author": "Isaac Junior",
   "changed_files": [
-    "e2e/offline-attachments.spec.js"
+    ".ai/engineering/STATE.md"
   ],
   "engineering": {
     "active_target": "",
@@ -16,26 +16,26 @@
     "readiness_register_present": true
   },
   "ci": {
-    "target_commit": "6d8b2baf64cb16a82910aa175a1ef8b4a3a24b47",
+    "target_commit": "c071888174c10d1429e6a4f848766252ba274930",
     "overall": "PENDING",
     "required_workflows": [
       {
         "name": "Laravel",
         "status": "in_progress",
         "conclusion": null,
-        "run_id": 37897467947,
-        "url": "https://github.com/Leano-Jordan/ZazuEMP/actions/runs/37897467947",
-        "created_at": "2026-10-09T07:09:58Z",
-        "updated_at": "2026-10-09T07:10:01Z"
+        "run_id": 37897488482,
+        "url": "https://github.com/Leano-Jordan/ZazuEMP/actions/runs/37897488482",
+        "created_at": "2026-10-09T07:10:10Z",
+        "updated_at": "2026-10-09T07:10:14Z"
       },
       {
         "name": "Zazu browser smoke",
         "status": "in_progress",
         "conclusion": null,
-        "run_id": 37897467864,
-        "url": "https://github.com/Leano-Jordan/ZazuEMP/actions/runs/37897467864",
-        "created_at": "2026-10-09T07:09:58Z",
-        "updated_at": "2026-10-09T07:10:01Z"
+        "run_id": 37897488565,
+        "url": "https://github.com/Leano-Jordan/ZazuEMP/actions/runs/37897488565",
+        "created_at": "2026-10-09T07:10:10Z",
+        "updated_at": "2026-10-09T07:10:14Z"
       }
     ]
   },
@@ -52,7 +52,7 @@
     "build_script": true,
     "lint_script": false
   },
-  "latest_commit_age": "12 seconds ago",
+  "latest_commit_age": "11 seconds ago",
   "package": {
     "name": null,
     "version": null,

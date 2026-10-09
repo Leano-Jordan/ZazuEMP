@@ -3,15 +3,15 @@
 - **Repository:** Leano-Jordan/ZazuEMP
 - **Director:** Jarvis
 - **Branch:** jarvis/hardening-2026-10-08
-- **Commit:** 6d8b2baf64cb16a82910aa175a1ef8b4a3a24b47
-- **Commit message:** Fix offline job smoke fixture required date
+- **Commit:** c071888174c10d1429e6a4f848766252ba274930
+- **Commit message:** Correct Director record for offline smoke diagnosis
 - **Readiness:** **PARTIAL_DIRECTOR_CONTRACT**
 - **Current-head CI:** **PENDING**
 
 ## Current-head CI Evidence
 
-- **Laravel**: in_progress — https://github.com/Leano-Jordan/ZazuEMP/actions/runs/37897467947
-- **Zazu browser smoke**: in_progress — https://github.com/Leano-Jordan/ZazuEMP/actions/runs/37897467864
+- **Laravel**: in_progress — https://github.com/Leano-Jordan/ZazuEMP/actions/runs/37897488482
+- **Zazu browser smoke**: in_progress — https://github.com/Leano-Jordan/ZazuEMP/actions/runs/37897488565
 
 ## Health Signals
 
@@ -39,4 +39,4 @@
 
 ## Changed Files
 
-- e2e/offline-attachments.spec.js
+- .ai/engineering/STATE.md
