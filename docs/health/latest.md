@@ -3,8 +3,8 @@
 - **Repository:** Leano-Jordan/ZazuEMP
 - **Director:** Jarvis
 - **Branch:** jarvis/hardening-2026-10-08
-- **Commit:** 8e1e9390e39c86c880f09a989aeba98033bba5c2
-- **Commit message:** docs: reconcile Zazu audit findings and current CI scorecard
+- **Commit:** 5b47343fa551066fe21a24efae478255c8dd5b1e
+- **Commit message:** docs: consolidate Zazu audit and scorecard
 - **Readiness:** **DIRECTOR_READY**
 - **Current-head CI:** **PENDING**
 
@@ -45,4 +45,4 @@
 
 ## Changed Files
 
-- .ai/engineering/STATE.md
+- docs/DIRECTOR_DEEP_AUDIT_2026-10-09.md

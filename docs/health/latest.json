@@ -1,14 +1,14 @@
 {
   "schema": "roscore-director-health/v2",
-  "generated_at_utc": "2026-10-09T10:58:57.886397+00:00",
+  "generated_at_utc": "2026-10-09T10:59:35.091424+00:00",
   "repository": "Leano-Jordan/ZazuEMP",
   "branch": "jarvis/hardening-2026-10-08",
-  "commit": "8e1e9390e39c86c880f09a989aeba98033bba5c2",
+  "commit": "5b47343fa551066fe21a24efae478255c8dd5b1e",
   "director": "Jarvis",
-  "commit_message": "docs: reconcile Zazu audit findings and current CI scorecard",
+  "commit_message": "docs: consolidate Zazu audit and scorecard",
   "commit_author": "Isaac Junior",
   "changed_files": [
-    ".ai/engineering/STATE.md"
+    "docs/DIRECTOR_DEEP_AUDIT_2026-10-09.md"
   ],
   "engineering": {
     "active_target": "",
@@ -16,7 +16,7 @@
     "readiness_register_present": true
   },
   "ci": {
-    "target_commit": "8e1e9390e39c86c880f09a989aeba98033bba5c2",
+    "target_commit": "5b47343fa551066fe21a24efae478255c8dd5b1e",
     "overall": "PENDING",
     "required_workflows": [
       {
@@ -85,7 +85,7 @@
     "backend_test_script": true,
     "quality_workflows": true
   },
-  "latest_commit_age": "7 seconds ago",
+  "latest_commit_age": "8 seconds ago",
   "package": {
     "name": null,
     "version": null,
