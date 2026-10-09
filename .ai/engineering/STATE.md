@@ -165,3 +165,12 @@ Audit record: docs/DIRECTOR_DEEP_AUDIT_2026-10-08.md.
 - Re-inspection of `resources/views/work/create.blade.php` found that `event_date` is a native required field, but `e2e/offline-attachments.spec.js` never populated it. Native HTML constraint validation therefore prevents the submit event from firing, so the offline handler and its confirmation cannot run. The earlier attribution solely to initialization timing was premature and is not treated as verified root cause.
 - Corrected the E2E fixture to enter a valid job date before submitting. Test-fixture fix commit: `6d8b2baf64cb16a82910aa175a1ef8b4a3a24b47`.
 - Verification boundary: the correction has not yet passed a fresh browser run. Keep PR #29 open and release certification blocked until current-head browser smoke and all required checks are green.
+
+
+## 2026-10-09 — Offline save confirmation follow-up defect
+
+- Latest browser run after adding the required job date advanced past the offline-save notice, proving the submit handler now ran, but still failed across desktop/mobile/tablet when asserting the submit button state.
+- Root cause: the real job form's submit button omits an explicit `type="submit"` attribute (HTML defaults it to submit). The offline handler searched only `button[type="submit"]` and `input[type="submit"]`, so it never disabled or relabelled the actual button.
+- Fixed `resources/js/app.js` to include implicit submit buttons in the selector and aligned the browser assertion to the real form markup.
+- Application fix commit: `443851dc305f05bd4aa9e6fada82477dee6bedc7`. Test selector commit: `e47c1bcdf1bc0309afb35a4de86c62886e39f308`.
+- Verification boundary: new current-head browser smoke is pending; keep release certification blocked until it passes.
