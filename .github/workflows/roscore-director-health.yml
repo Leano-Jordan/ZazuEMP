@@ -8,6 +8,11 @@ on:
     workflows:
       - Laravel
       - Zazu browser smoke
+      - Zazu quality
+      - Psalm Security Scan
+      - PHPMD
+      - Zazu populated upgrade and rollback
+      - Director Contract Lint
     types: [completed]
   workflow_dispatch:
 
@@ -16,7 +21,8 @@ permissions:
   actions: read
 
 concurrency:
-  group: director-health-${{ github.event_name == 'workflow_run' && github.event.workflow_run.head_sha || github.sha }}
+  # Serialize report publication so successive CI completions cannot race the report branch.
+  group: director-health-publisher
   cancel-in-progress: false
 
 jobs:
@@ -47,7 +53,15 @@ jobs:
           data = {"workflow_runs": []}
           for page in pages:
               data["workflow_runs"].extend(page.get("workflow_runs", []))
-          required = {"Laravel", "Zazu browser smoke"}
+          required = {
+              "Laravel",
+              "Zazu browser smoke",
+              "Zazu quality",
+              "Psalm Security Scan",
+              "PHPMD",
+              "Zazu populated upgrade and rollback",
+              "Director Contract Lint",
+          }
           latest = {}
           for run in data.get("workflow_runs", []):
               name = run.get("name", "")
@@ -128,11 +142,12 @@ jobs:
               },
               "ci": ci,
               "signals": {
-                  "manifest": exists("ROSCORE_PROJECT_MANIFEST.md"),
+                  "director_contract": exists(".ai/engineering/00_DIRECTOR_ENGINE.md"),
+                  "engineering_state": exists(".ai/engineering/STATE.md"),
                   "agents_contract": exists("AGENTS.md"),
                   "package_json": exists("package.json"),
                   "composer_json": exists("composer.json"),
-                  "requirements": exists("requirements.txt") or exists("pyproject.toml"),
+                  "dependency_lockfiles": exists("composer.lock") and exists("package-lock.json"),
                   "github_actions": exists(".github/workflows"),
                   "tests_directory": exists("tests") or exists("test"),
                   "readme": exists("README.md"),
@@ -146,32 +161,42 @@ jobs:
                   pkg = json.loads(p.read_text())
                   scripts = pkg.get("scripts", {})
                   report["package"] = {"name": pkg.get("name"), "version": pkg.get("version"), "scripts": sorted(scripts.keys())}
-                  report["signals"]["test_script"] = "test" in scripts
+                  report["signals"]["frontend_test_script"] = any(k in scripts for k in ("test", "test:e2e"))
                   report["signals"]["build_script"] = "build" in scripts
-                  report["signals"]["lint_script"] = "lint" in scripts
+                  composer_path = root / "composer.json"
+                  composer_scripts = json.loads(composer_path.read_text()).get("scripts", {}) if composer_path.exists() else {}
+                  report["signals"]["backend_test_script"] = "test" in composer_scripts
+                  report["signals"]["quality_workflows"] = any(
+                      p.name in {"laravel.yml", "zazu-quality.yml", "phpmd.yml", "psalm.yml"}
+                      or any(token in p.name.lower() for token in ("quality", "phpmd", "psalm", "security"))
+                      for p in (root / ".github/workflows").glob("*.yml")
+                  ) if (root / ".github/workflows").exists() else False
               except Exception as e:
                   report["package_error"] = str(e)
           else:
-              report["signals"]["test_script"] = False
+              report["signals"]["frontend_test_script"] = False
               report["signals"]["build_script"] = False
-              report["signals"]["lint_script"] = False
+              report["signals"]["backend_test_script"] = False
+              report["signals"]["quality_workflows"] = False
 
-          if report["signals"].get("manifest") and report["signals"].get("agents_contract"):
+          if report["signals"].get("director_contract") and report["signals"].get("engineering_state"):
               report["readiness"] = "DIRECTOR_READY"
-          elif report["signals"].get("manifest") or report["signals"].get("agents_contract"):
+          elif report["signals"].get("director_contract") or report["signals"].get("engineering_state"):
               report["readiness"] = "PARTIAL_DIRECTOR_CONTRACT"
           else:
               report["readiness"] = "NO_DIRECTOR_CONTRACT"
 
           report["risk_flags"] = []
-          if not report["signals"].get("test_script") and not report["signals"].get("tests_directory"):
+          if not (
+              report["signals"].get("frontend_test_script")
+              or report["signals"].get("backend_test_script")
+              or report["signals"].get("tests_directory")
+          ):
               report["risk_flags"].append("NO_TEST_SIGNAL")
           if not report["signals"].get("github_actions"):
               report["risk_flags"].append("NO_GITHUB_ACTIONS")
           if not report["signals"].get("readme"):
               report["risk_flags"].append("NO_README")
-          if not report["signals"].get("manifest"):
-              report["risk_flags"].append("NO_ROSSCORE_MANIFEST")
           if ci["overall"] == "FAIL":
               report["risk_flags"].append("CURRENT_HEAD_CI_FAILURE")
           elif ci["overall"] == "PENDING":
@@ -217,15 +242,17 @@ jobs:
           retention-days: 30
 
       - name: Persist latest Director report
-        if: github.event_name != 'workflow_run' || github.event.workflow_run.head_branch == 'main'
         shell: bash
         env:
-          PERSIST_BRANCH: ${{ github.event_name == 'workflow_run' && github.event.workflow_run.head_branch || github.ref_name }}
+          # `main` is intentionally protected. Health snapshots live on a dedicated
+          # report branch while their source commit/branch remains recorded in the report.
+          PERSIST_BRANCH: director-health
         run: |
           set -euo pipefail
-          mkdir -p docs/health
-          cp roscore-director-health.json docs/health/latest.json
-          cp roscore-director-health.md docs/health/latest.md
+          report_dir="${RUNNER_TEMP}/roscore-director-health"
+          mkdir -p "$report_dir"
+          cp roscore-director-health.json "$report_dir/latest.json"
+          cp roscore-director-health.md "$report_dir/latest.md"
           git config user.name "Rosscore Director"
           git config user.email "director@roscore.local"
 
@@ -237,8 +264,8 @@ jobs:
             git fetch origin "$PERSIST_BRANCH"
             git checkout -B director-health-publish "origin/$PERSIST_BRANCH"
 
-            cp roscore-director-health.json docs/health/latest.json
-            cp roscore-director-health.md docs/health/latest.md
+            cp "$report_dir/latest.json" docs/health/latest.json
+            cp "$report_dir/latest.md" docs/health/latest.md
             git add docs/health/latest.json docs/health/latest.md
 
             if git diff --cached --quiet; then

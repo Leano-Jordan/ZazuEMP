@@ -23,14 +23,16 @@ test('real Zazu job form can create a job locally while disconnected', async ({ 
     const customer = page.locator('#customer_id option:not([value=""])').first();
     await expect(customer).toHaveCount(1);
     await page.locator('#customer_id').selectOption({ index: 1 });
-    await page.locator('input[name="event_type"]').first().check();
-    await page.locator('input[name="name"]').fill('Offline catering job');
+    await page.locator('label.zazu-choice-card:has(input[name="event_type"])').first().click();
+    await page.locator('#new-job-form input[name="name"]').fill('Offline catering job');
+    // Keep native required-field validation realistic: offline saves still require a job date.
+    await page.locator('#new-job-form input[name="event_date"]').fill('2030-01-15');
 
     await page.context().setOffline(true);
     await page.locator('#new-job-form').getByRole('button', { name: /Create job/ }).click();
 
     await expect(page.getByText('Saved on this device. It will sync automatically when Zazu reconnects.')).toBeVisible();
-    await expect(page.locator('#new-job-form button[type="submit"]')).toHaveText('Saved locally');
+    await expect(page.locator('#new-job-form button:not([type])')).toHaveText('Saved locally');
 
     const state = await page.evaluate(() => window.ZazuOffline?.getState()?.jobs || []);
     expect(state.some((job) => job.name === 'Offline catering job' && job.local_id)).toBe(true);
