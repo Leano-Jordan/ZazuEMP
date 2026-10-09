@@ -25,6 +25,8 @@ test('real Zazu job form can create a job locally while disconnected', async ({ 
     await page.locator('#customer_id').selectOption({ index: 1 });
     await page.locator('label.zazu-choice-card:has(input[name="event_type"])').first().click();
     await page.locator('#new-job-form input[name="name"]').fill('Offline catering job');
+    // Keep native required-field validation realistic: offline saves still require a job date.
+    await page.locator('#new-job-form input[name="event_date"]').fill('2030-01-15');
 
     await page.context().setOffline(true);
     await page.locator('#new-job-form').getByRole('button', { name: /Create job/ }).click();
