@@ -1,86 +1,72 @@
 {
   "schema": "roscore-director-health/v2",
-  "generated_at_utc": "2026-10-09T10:58:36.331864+00:00",
+  "generated_at_utc": "2026-10-09T10:58:57.886397+00:00",
   "repository": "Leano-Jordan/ZazuEMP",
   "branch": "jarvis/hardening-2026-10-08",
-  "commit": "f103dd1af234a75838f9766099f942de3fd7a52d",
+  "commit": "8e1e9390e39c86c880f09a989aeba98033bba5c2",
   "director": "Jarvis",
-  "commit_message": "fix: make Director health checks project-aware and reconcile required CI",
+  "commit_message": "docs: reconcile Zazu audit findings and current CI scorecard",
   "commit_author": "Isaac Junior",
   "changed_files": [
-    ".github/workflows/roscore-director-health.yml"
+    ".ai/engineering/STATE.md"
   ],
   "engineering": {
     "active_target": "",
-    "next_hard_gate": "reconcile current-head regression/CI evidence, then customer-environment backup/restore proof**.",
+    "next_hard_gate": "verify the revised health-report workflow on its own head, then execute customer-environment backup/restore proof including private media**.",
     "readiness_register_present": true
   },
   "ci": {
-    "target_commit": "f103dd1af234a75838f9766099f942de3fd7a52d",
+    "target_commit": "8e1e9390e39c86c880f09a989aeba98033bba5c2",
     "overall": "PENDING",
     "required_workflows": [
       {
         "name": "Director Contract Lint",
-        "status": "in_progress",
+        "status": "not_found",
         "conclusion": null,
-        "run_id": 37920876120,
-        "url": "https://github.com/Leano-Jordan/ZazuEMP/actions/runs/37920876120",
-        "created_at": "2026-10-09T10:58:32Z",
-        "updated_at": "2026-10-09T10:58:34Z"
+        "run_id": null,
+        "url": null
       },
       {
         "name": "Laravel",
-        "status": "in_progress",
+        "status": "not_found",
         "conclusion": null,
-        "run_id": 37920876211,
-        "url": "https://github.com/Leano-Jordan/ZazuEMP/actions/runs/37920876211",
-        "created_at": "2026-10-09T10:58:32Z",
-        "updated_at": "2026-10-09T10:58:34Z"
+        "run_id": null,
+        "url": null
       },
       {
         "name": "PHPMD",
-        "status": "in_progress",
+        "status": "not_found",
         "conclusion": null,
-        "run_id": 37920876157,
-        "url": "https://github.com/Leano-Jordan/ZazuEMP/actions/runs/37920876157",
-        "created_at": "2026-10-09T10:58:32Z",
-        "updated_at": "2026-10-09T10:58:35Z"
+        "run_id": null,
+        "url": null
       },
       {
         "name": "Psalm Security Scan",
-        "status": "in_progress",
+        "status": "not_found",
         "conclusion": null,
-        "run_id": 37920876302,
-        "url": "https://github.com/Leano-Jordan/ZazuEMP/actions/runs/37920876302",
-        "created_at": "2026-10-09T10:58:32Z",
-        "updated_at": "2026-10-09T10:58:35Z"
+        "run_id": null,
+        "url": null
       },
       {
         "name": "Zazu browser smoke",
-        "status": "in_progress",
+        "status": "not_found",
         "conclusion": null,
-        "run_id": 37920876328,
-        "url": "https://github.com/Leano-Jordan/ZazuEMP/actions/runs/37920876328",
-        "created_at": "2026-10-09T10:58:32Z",
-        "updated_at": "2026-10-09T10:58:35Z"
+        "run_id": null,
+        "url": null
       },
       {
         "name": "Zazu populated upgrade and rollback",
-        "status": "in_progress",
+        "status": "not_found",
         "conclusion": null,
-        "run_id": 37920876225,
-        "url": "https://github.com/Leano-Jordan/ZazuEMP/actions/runs/37920876225",
-        "created_at": "2026-10-09T10:58:32Z",
-        "updated_at": "2026-10-09T10:58:35Z"
+        "run_id": null,
+        "url": null
       },
       {
         "name": "Zazu quality",
-        "status": "in_progress",
+        "status": "not_found",
         "conclusion": null,
-        "run_id": 37920876180,
-        "url": "https://github.com/Leano-Jordan/ZazuEMP/actions/runs/37920876180",
-        "created_at": "2026-10-09T10:58:32Z",
-        "updated_at": "2026-10-09T10:58:35Z"
+        "run_id": null,
+        "url": null
       }
     ]
   },
@@ -99,7 +85,7 @@
     "backend_test_script": true,
     "quality_workflows": true
   },
-  "latest_commit_age": "10 seconds ago",
+  "latest_commit_age": "7 seconds ago",
   "package": {
     "name": null,
     "version": null,

@@ -3,20 +3,20 @@
 - **Repository:** Leano-Jordan/ZazuEMP
 - **Director:** Jarvis
 - **Branch:** jarvis/hardening-2026-10-08
-- **Commit:** f103dd1af234a75838f9766099f942de3fd7a52d
-- **Commit message:** fix: make Director health checks project-aware and reconcile required CI
+- **Commit:** 8e1e9390e39c86c880f09a989aeba98033bba5c2
+- **Commit message:** docs: reconcile Zazu audit findings and current CI scorecard
 - **Readiness:** **DIRECTOR_READY**
 - **Current-head CI:** **PENDING**
 
 ## Current-head CI Evidence
 
-- **Director Contract Lint**: in_progress — https://github.com/Leano-Jordan/ZazuEMP/actions/runs/37920876120
-- **Laravel**: in_progress — https://github.com/Leano-Jordan/ZazuEMP/actions/runs/37920876211
-- **PHPMD**: in_progress — https://github.com/Leano-Jordan/ZazuEMP/actions/runs/37920876157
-- **Psalm Security Scan**: in_progress — https://github.com/Leano-Jordan/ZazuEMP/actions/runs/37920876302
-- **Zazu browser smoke**: in_progress — https://github.com/Leano-Jordan/ZazuEMP/actions/runs/37920876328
-- **Zazu populated upgrade and rollback**: in_progress — https://github.com/Leano-Jordan/ZazuEMP/actions/runs/37920876225
-- **Zazu quality**: in_progress — https://github.com/Leano-Jordan/ZazuEMP/actions/runs/37920876180
+- **Director Contract Lint**: not_found
+- **Laravel**: not_found
+- **PHPMD**: not_found
+- **Psalm Security Scan**: not_found
+- **Zazu browser smoke**: not_found
+- **Zazu populated upgrade and rollback**: not_found
+- **Zazu quality**: not_found
 
 ## Health Signals
 
@@ -41,8 +41,8 @@
 ## Engineering State
 
 - **Active target:** not recorded
-- **Next hard gate:** reconcile current-head regression/CI evidence, then customer-environment backup/restore proof**.
+- **Next hard gate:** verify the revised health-report workflow on its own head, then execute customer-environment backup/restore proof including private media**.
 
 ## Changed Files
 
-- .github/workflows/roscore-director-health.yml
+- .ai/engineering/STATE.md
