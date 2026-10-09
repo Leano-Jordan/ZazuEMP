@@ -860,6 +860,7 @@ function setupZazuHelper() {
 
 
 const initializeZazuUi = () => {
+    setupZazuOfflineForms();
     setupZazuAuthExperience();
     setupZazuMobileNavigation();
     setupZazuHierarchicalNavigation();
@@ -1665,8 +1666,6 @@ function handleZazuPhonePairing() {
 }
 
 window.addEventListener('zazu:offline-ready', handleZazuPhonePairing);
-
-setupZazuOfflineForms();
 
 function registerZazuServiceWorker() {
     if (!('serviceWorker' in navigator)) return;
