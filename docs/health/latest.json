@@ -1,0 +1,102 @@
+{
+  "schema": "roscore-director-health/v2",
+  "generated_at_utc": "2026-10-09T10:59:35.091424+00:00",
+  "repository": "Leano-Jordan/ZazuEMP",
+  "branch": "jarvis/hardening-2026-10-08",
+  "commit": "5b47343fa551066fe21a24efae478255c8dd5b1e",
+  "director": "Jarvis",
+  "commit_message": "docs: consolidate Zazu audit and scorecard",
+  "commit_author": "Isaac Junior",
+  "changed_files": [
+    "docs/DIRECTOR_DEEP_AUDIT_2026-10-09.md"
+  ],
+  "engineering": {
+    "active_target": "",
+    "next_hard_gate": "verify the revised health-report workflow on its own head, then execute customer-environment backup/restore proof including private media**.",
+    "readiness_register_present": true
+  },
+  "ci": {
+    "target_commit": "5b47343fa551066fe21a24efae478255c8dd5b1e",
+    "overall": "PENDING",
+    "required_workflows": [
+      {
+        "name": "Director Contract Lint",
+        "status": "not_found",
+        "conclusion": null,
+        "run_id": null,
+        "url": null
+      },
+      {
+        "name": "Laravel",
+        "status": "not_found",
+        "conclusion": null,
+        "run_id": null,
+        "url": null
+      },
+      {
+        "name": "PHPMD",
+        "status": "not_found",
+        "conclusion": null,
+        "run_id": null,
+        "url": null
+      },
+      {
+        "name": "Psalm Security Scan",
+        "status": "not_found",
+        "conclusion": null,
+        "run_id": null,
+        "url": null
+      },
+      {
+        "name": "Zazu browser smoke",
+        "status": "not_found",
+        "conclusion": null,
+        "run_id": null,
+        "url": null
+      },
+      {
+        "name": "Zazu populated upgrade and rollback",
+        "status": "not_found",
+        "conclusion": null,
+        "run_id": null,
+        "url": null
+      },
+      {
+        "name": "Zazu quality",
+        "status": "not_found",
+        "conclusion": null,
+        "run_id": null,
+        "url": null
+      }
+    ]
+  },
+  "signals": {
+    "director_contract": true,
+    "engineering_state": true,
+    "agents_contract": true,
+    "package_json": true,
+    "composer_json": true,
+    "dependency_lockfiles": true,
+    "github_actions": true,
+    "tests_directory": true,
+    "readme": true,
+    "frontend_test_script": true,
+    "build_script": true,
+    "backend_test_script": true,
+    "quality_workflows": true
+  },
+  "latest_commit_age": "8 seconds ago",
+  "package": {
+    "name": null,
+    "version": null,
+    "scripts": [
+      "build",
+      "dev",
+      "test:e2e"
+    ]
+  },
+  "readiness": "DIRECTOR_READY",
+  "risk_flags": [
+    "CURRENT_HEAD_CI_PENDING"
+  ]
+}
