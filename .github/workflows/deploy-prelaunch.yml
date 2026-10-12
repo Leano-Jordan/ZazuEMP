@@ -26,7 +26,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Check out repository
-        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
 
       - name: Validate static site files
         shell: bash
@@ -43,7 +43,7 @@ jobs:
             exit 1
           fi
 
-      - name: Audit page assets, local links, and security policy
+      - name: Audit page assets, links, form labels, and content policy
         shell: bash
         run: |
           python3 - <<'PY'
@@ -58,20 +58,33 @@ jobs:
 
           if not pages:
               raise SystemExit("No HTML pages were found.")
+          if css.count("{") != css.count("}"):
+              raise SystemExit("CSS braces are unbalanced.")
           if re.search(r"""url\(\s*['"]?https?://""", css, re.IGNORECASE) or re.search(r"""@import\s+['"]?https?://""", css, re.IGNORECASE):
-              raise SystemExit("CSS must not depend on remotely hosted visual assets.")
+              raise SystemExit("CSS must not depend on remote assets.")
 
           class PageAudit(HTMLParser):
               def __init__(self):
                   super().__init__()
                   self.ids = set()
+                  self.duplicate_ids = []
                   self.h1_count = 0
                   self.has_main = False
                   self.has_language = False
                   self.references = []
+                  self.label_targets = []
+                  self.controls = []
+                  self.label_depth = 0
+                  self.inline_styles = 0
+                  self.images_without_alt = []
+                  self.inline_scripts = 0
               def handle_starttag(self, tag, attrs):
                   attrs = dict(attrs)
+                  if "style" in attrs:
+                      self.inline_styles += 1
                   if "id" in attrs:
+                      if attrs["id"] in self.ids:
+                          self.duplicate_ids.append(attrs["id"])
                       self.ids.add(attrs["id"])
                   if tag == "h1":
                       self.h1_count += 1
@@ -79,9 +92,28 @@ jobs:
                       self.has_main = True
                   if tag == "html" and attrs.get("lang"):
                       self.has_language = True
+                  if tag == "label":
+                      self.label_depth += 1
+                      if attrs.get("for"):
+                          self.label_targets.append(attrs["for"])
+                  if tag in ("input", "select", "textarea"):
+                      field_type = attrs.get("type", "").lower()
+                      if field_type != "hidden" and attrs.get("name") != "_honey":
+                          self.controls.append({
+                              "id": attrs.get("id"),
+                              "name": attrs.get("name", ""),
+                              "wrapped": self.label_depth > 0,
+                          })
+                  if tag == "img" and "alt" not in attrs:
+                      self.images_without_alt.append(attrs.get("src", "(missing src)"))
+                  if tag == "script" and not attrs.get("src"):
+                      self.inline_scripts += 1
                   for key in ("href", "src"):
                       if key in attrs:
                           self.references.append((key, attrs[key]))
+              def handle_endtag(self, tag):
+                  if tag == "label":
+                      self.label_depth = max(0, self.label_depth - 1)
 
           parsed_pages = {}
           for page in pages:
@@ -97,6 +129,22 @@ jobs:
                   raise SystemExit(f"{page}: missing main landmark.")
               if audit.h1_count != 1:
                   raise SystemExit(f"{page}: expected exactly one h1, got {audit.h1_count}.")
+              if audit.inline_styles:
+                  raise SystemExit(f"{page}: inline style attributes are blocked by policy; move styling to styles.css.")
+              if audit.inline_scripts:
+                  raise SystemExit(f"{page}: inline scripts are blocked by policy; use script.js.")
+              if audit.duplicate_ids:
+                  raise SystemExit(f"{page}: duplicate id values: {audit.duplicate_ids}.")
+              if audit.images_without_alt:
+                  raise SystemExit(f"{page}: image(s) missing alt text: {audit.images_without_alt}.")
+              unresolved_labels = [target for target in audit.label_targets if target not in audit.ids]
+              if unresolved_labels:
+                  raise SystemExit(f"{page}: labels refer to missing controls: {unresolved_labels}.")
+              missing_labels = [control for control in audit.controls
+                                if not control["wrapped"] and
+                                (not control["id"] or control["id"] not in audit.label_targets)]
+              if missing_labels:
+                  raise SystemExit(f"{page}: form controls without associated visible labels: {missing_labels}.")
 
           for page in pages:
               _, audit = parsed_pages[page.name]
@@ -122,10 +170,9 @@ jobs:
               raise SystemExit("Homepage canonical/social URL metadata is incomplete.")
           if "form-action https://formsubmit.co" not in homepage:
               raise SystemExit("CSP does not explicitly allow the intended enquiry form endpoint.")
-          if "images.pexels.com" in css or "images.unsplash.com" in css:
-              raise SystemExit("Remote stock-photo dependencies must remain removed.")
-
-          print(f"Pre-launch audit passed for {len(pages)} HTML pages; local references, landmarks, CSP policies and visual-asset rules are valid.")
+          if "unsafe-inline" in "".join(item[0] for item in parsed_pages.values()):
+              raise SystemExit("CSP contains an unsafe-inline directive.")
+          print(f"Pre-launch audit passed for {len(pages)} HTML pages: local links, unique IDs, form labels, image alt text, strict CSP, and CSS integrity.")
           PY
 
       - name: Assemble static Pages artifact with bundled imagery
@@ -176,13 +223,13 @@ jobs:
           PY
 
       - name: Configure GitHub Pages
-        uses: actions/configure-pages@983d7736d9b0ae728b81ab479565c72886d7745b # v5
+        uses: actions/configure-pages@45bfe0192ca1faeb007ade9deae92b16b8254a0d # v6
 
       - name: Upload static site artifact
-        uses: actions/upload-pages-artifact@56afc609e74202658d3ffba0e8f6dda462b719fa # v3
+        uses: actions/upload-pages-artifact@7b1f4a764d45c48632c6b24a0339c27f5614fb0b # v4
         with:
           path: site
 
       - name: Deploy to GitHub Pages
         id: deployment
-        uses: actions/deploy-pages@d6db90164ac5ed86f2b6aed7e0febac5b3c0c03e # v4
+        uses: actions/deploy-pages@368f82528645a54fb793d4d04e342629a3f51346 # v5
