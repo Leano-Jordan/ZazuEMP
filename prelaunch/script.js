@@ -13,6 +13,60 @@
     });
   });
 
+  const sectionNavigator = document.querySelector("[data-section-navigator]");
+  const sectionNext = document.querySelector("[data-section-next]");
+  const sectionCurrent = document.querySelector("[data-section-current]");
+  const sections = Array.from(document.querySelectorAll("main section[id]"));
+  const sectionNames = new Map(sections.map((section) => {
+    const heading = section.querySelector("h1, h2, h3");
+    const name = section.id === "top" ? "Intro"
+      : section.id === "principles" ? "Principles"
+      : section.id === "how-it-helps" ? "What it does"
+      : section.id === "who-its-for" ? "Who it helps"
+      : section.id === "workflow" ? "How it works"
+      : section.id === "early-access" ? "Early access"
+      : section.id === "questions" ? "FAQs"
+      : section.id === "closing-cta" ? "Next steps"
+      : (heading?.textContent || section.id).trim();
+    return [section.id, name];
+  }));
+  let activeSectionId = sections[0]?.id || "top";
+  const updateSectionNavigator = (id) => {
+    activeSectionId = id;
+    const activeIndex = sections.findIndex((section) => section.id === id);
+    const nextSection = sections[Math.min(activeIndex + 1, sections.length - 1)];
+    if (sectionCurrent) sectionCurrent.textContent = sectionNames.get(id) || "Explore";
+    if (sectionNext && nextSection) {
+      const nextName = sectionNames.get(nextSection.id) || "Next section";
+      sectionNext.href = "#" + nextSection.id;
+      sectionNext.setAttribute("aria-label", "Next section: " + nextName);
+      sectionNext.title = activeIndex >= sections.length - 1 ? "Back to the introduction" : "Next section: " + nextName;
+      if (activeIndex >= sections.length - 1) {
+        sectionNext.href = "#top";
+        sectionNext.setAttribute("aria-label", "Back to the introduction");
+        sectionNext.title = "Back to the introduction";
+      }
+    }
+  };
+  if (sections.length && sectionNavigator) {
+    updateSectionNavigator(activeSectionId);
+    if ("IntersectionObserver" in window) {
+      const sectionObserver = new IntersectionObserver((entries) => {
+        const visible = entries.filter((entry) => entry.isIntersecting)
+          .sort((a, b) => b.intersectionRatio - a.intersectionRatio)[0];
+        if (visible) updateSectionNavigator(visible.target.id);
+      }, { rootMargin: "-18% 0px -58% 0px", threshold: [0, 0.1, 0.25, 0.5] });
+      sections.forEach((section) => sectionObserver.observe(section));
+    } else {
+      window.addEventListener("hashchange", () => {
+        const id = window.location.hash.slice(1);
+        if (sections.some((section) => section.id === id)) updateSectionNavigator(id);
+      });
+    }
+  } else if (sectionNavigator) {
+    sectionNavigator.hidden = true;
+  }
+
   const progress = document.getElementById("scroll-progress-fill");
   let progressTicking = false;
   const updateScrollProgress = () => {
