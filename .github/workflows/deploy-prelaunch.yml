@@ -1,0 +1,55 @@
+name: Deploy Zazu pre-launch site
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "prelaunch/**"
+      - ".github/workflows/deploy-prelaunch.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: zazu-prelaunch-pages
+  cancel-in-progress: true
+
+jobs:
+  deploy:
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Validate static site files
+        shell: bash
+        run: |
+          set -euo pipefail
+          test -s prelaunch/index.html
+          test -s prelaunch/styles.css
+          test -s prelaunch/script.js
+          test -s prelaunch/privacy.html
+          test -s prelaunch/thanks.html
+          test -s prelaunch/favicon.svg
+          if grep -RInE 'AKIA[0-9A-Z]{16}|gh[pousr]_[A-Za-z0-9_]{20,}|-----BEGIN (RSA |EC |OPENSSH )?PRIVATE KEY-----' prelaunch; then
+            echo "Potential secret material found in prelaunch site."
+            exit 1
+          fi
+
+      - name: Configure GitHub Pages
+        uses: actions/configure-pages@v5
+
+      - name: Upload static site artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: prelaunch
+
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
