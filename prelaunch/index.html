@@ -3,23 +3,32 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="theme-color" content="#123a5a">
+  <meta name="theme-color" content="#091f33">
   <meta name="referrer" content="strict-origin-when-cross-origin">
-  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; base-uri 'self'; object-src 'none'; img-src 'self'; style-src 'self'; script-src 'self'; form-action https://formsubmit.co">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; base-uri 'self'; object-src 'none'; img-src 'self'; style-src 'self'; script-src 'self'; connect-src 'self' https://formsubmit.co; form-action https://formsubmit.co">
   <link rel="canonical" href="https://leano-jordan.github.io/ZazuEMP/">
   <meta name="description" content="Zazu EMP helps event and catering businesses bring enquiries, quotes, purchasing, preparation and job costs into one connected workspace. Join early access or request a demonstration.">
   <meta property="og:type" content="website">
+  <meta property="og:site_name" content="Zazu EMP">
+  <meta property="og:locale" content="en_ZA">
   <meta property="og:url" content="https://leano-jordan.github.io/ZazuEMP/">
   <meta name="twitter:card" content="summary">
   <meta property="og:title" content="Zazu EMP — Run the work behind every event">
-  <meta property="og:description" content="One connected workspace for event and catering operations. Join the early-access list or request a demo.">
+  <meta property="og:description" content="Bring enquiries, quotes, purchasing, preparation and job costs into one connected event-operations workspace.">
+  <meta property="og:image" content="https://leano-jordan.github.io/ZazuEMP/images/landing/hero.jpg">
+  <meta property="og:image:alt" content="A prepared event venue representing the work behind every event">
+  <meta name="twitter:title" content="Zazu EMP — Run the work behind every event">
+  <meta name="twitter:description" content="One connected workspace for event and catering operations. Request early access or a demonstration.">
+  <meta name="twitter:image" content="https://leano-jordan.github.io/ZazuEMP/images/landing/hero.jpg">
   <title>Zazu EMP — Run the work behind every event</title>
   <link rel="icon" href="./favicon.svg" type="image/svg+xml">
-  <link rel="stylesheet" href="./styles.css?v=20261012-5">
+  <link rel="stylesheet" href="./styles.css?v=20261013-1">
   <script defer src="./script.js"></script>
 </head>
 <body>
+  <div class="scroll-progress" aria-hidden="true"><span id="scroll-progress-fill"></span></div>
   <a class="skip-link" href="#main">Skip to content</a>
+  <div class="launch-bar"><span class="launch-signal" aria-hidden="true"></span><span class="launch-bar-label">ZAZU EMP <i aria-hidden="true">/</i> EARLY ACCESS</span><span class="launch-bar-copy">The work behind every event, brought into view.</span><a href="#early-access">Join the first conversations <span aria-hidden="true">↗</span></a></div>
   <header class="site-header">
     <a class="brand" href="#top" aria-label="Zazu EMP home">
       <span class="brand-mark" aria-hidden="true">Z</span>
@@ -34,7 +43,7 @@
 
   <main id="main">
     <section class="hero section-wrap" id="top">
-      <div class="hero-copy">
+      <div class="hero-copy" data-reveal>
         <p class="eyebrow"><span class="status-dot"></span> NOW PREPARING FOR EARLY ACCESS</p>
         <h1>Run the work<br>behind <span>every event.</span></h1>
         <p class="hero-lede">Less chasing paperwork. More control over the jobs, people, purchases and numbers that make an event happen.</p>
@@ -69,7 +78,7 @@
           </div>
         </div>
         <figure class="hero-photo-pin" data-reveal>
-          <img src="../public/images/landing/stock/hero.jpg" alt="Wedding reception venue prepared for an event" width="600" height="400" loading="eager" decoding="async">
+          <img src="../public/images/landing/stock/hero.jpg" alt="Wedding reception venue prepared for an event" width="600" height="400" loading="eager" fetchpriority="high" decoding="async">
           <figcaption><span>REAL-WORLD WORK</span><strong>Before the doors open</strong></figcaption>
         </figure>
         <div class="float-note"><span class="float-check">✓</span><span><strong>One connected job</strong><small>From enquiry to completion</small></span></div>
@@ -221,6 +230,8 @@
         </div>
         <label class="consent"><input type="checkbox" name="privacy_consent" value="Agreed" required><span>I agree that Zazu may use these details to respond to this request. See the <a href="./privacy.html" target="_blank" rel="noopener">privacy notice</a>. *</span></label>
         <button class="button button-primary submit-button" type="submit">Send my request <span aria-hidden="true">→</span></button>
+        <p class="form-status" id="form-status" role="status" aria-live="polite" aria-atomic="true" tabindex="-1" hidden></p>
+        <p class="form-fallback" id="form-fallback" hidden>If the form service cannot confirm your request, email <a href="mailto:rosscorelabs@outlook.com">rosscorelabs@outlook.com</a> directly.</p>
         <p class="form-footnote">Your details are for responding to this enquiry. We won’t publish them on this page.</p>
       </form>
     </div></section>
@@ -231,8 +242,17 @@
       <details data-reveal><summary>Will Zazu work offline?</summary><p>Offline capability is part of the product direction. Exact availability and limits will depend on the workflows and release version; ask for a demo to discuss your needs.</p></details>
       <details data-reveal><summary>How much will it cost?</summary><p>Pricing has not been published on this pre-launch page. Request a demo and we’ll share relevant information when it is available.</p></details>
     </div></section>
+    <section class="closing-cta" aria-labelledby="closing-cta-title">
+      <div class="section-wrap closing-cta-inner" data-reveal>
+        <p class="eyebrow"><span class="status-dot"></span> START WITH THE WORK</p>
+        <h2 id="closing-cta-title">Tell us what slows your event business down.</h2>
+        <p>We’re shaping Zazu around the operational work between the first enquiry and event day. Your workflow can help set the priorities.</p>
+        <a class="button button-primary" href="#early-access" data-intent="Early access">Start the conversation <span aria-hidden="true">→</span></a>
+        <span class="closing-cta-note">IN DEVELOPMENT · EARLY ACCESS & DEMONSTRATIONS</span>
+      </div>
+    </section>
   </main>
 
-  <footer class="site-footer"><div class="section-wrap footer-main"><a class="brand footer-brand" href="#top"><span class="brand-mark" aria-hidden="true">Z</span><span class="brand-copy"><strong>ZAZU</strong><small>EVENT MANAGEMENT PLATFORM</small></span></a><p>More control over the work behind every event.</p><div class="footer-links"><a href="./privacy.html">Privacy notice</a><a href="#early-access">Early access & demos</a></div></div><div class="section-wrap footer-bottom"><span>© <span id="year">2026</span> Zazu EMP. All rights reserved.</span><span>In development · South Africa</span></div></footer>
+  <footer class="site-footer"><div class="section-wrap footer-main"><a class="brand footer-brand" href="#top"><span class="brand-mark" aria-hidden="true">Z</span><span class="brand-copy"><strong>ZAZU</strong><small>EVENT MANAGEMENT PLATFORM</small></span></a><div class="footer-promise"><span class="footer-kicker">BUILT AROUND THE WORK</span><p>Enquiries, quotations, purchasing, preparation and job costs — designed to make more sense together.</p></div><div class="footer-links"><a href="./privacy.html">Privacy notice</a><a href="#early-access">Early access & demos</a><a class="footer-contact" href="mailto:rosscorelabs@outlook.com">Talk to the team <span aria-hidden="true">↗</span></a></div></div><div class="section-wrap footer-bottom"><span>© <span id="year">2026</span> Zazu EMP. All rights reserved.</span><span>In development · South Africa</span></div></footer>
 </body>
 </html>

@@ -55,6 +55,7 @@ jobs:
           root = Path("prelaunch")
           pages = sorted(root.glob("*.html"))
           css = (root / "styles.css").read_text(encoding="utf-8")
+          js = (root / "script.js").read_text(encoding="utf-8")
 
           if not pages:
               raise SystemExit("No HTML pages were found.")
@@ -170,9 +171,17 @@ jobs:
               raise SystemExit("Homepage canonical/social URL metadata is incomplete.")
           if "form-action https://formsubmit.co" not in homepage:
               raise SystemExit("CSP does not explicitly allow the intended enquiry form endpoint.")
+          if "connect-src 'self' https://formsubmit.co" not in homepage:
+              raise SystemExit("CSP does not explicitly allow the AJAX form connection.")
+          if "https://formsubmit.co/ajax/rosscorelabs@outlook.com" not in js:
+              raise SystemExit("The enquiry form is missing the expected AJAX endpoint.")
+          if 'id="form-status"' not in homepage or 'id="form-fallback"' not in homepage:
+              raise SystemExit("The enquiry form must expose accessible status and direct-email fallback regions.")
+          if 'String(result.success) !== "true"' not in js:
+              raise SystemExit("The form must explicitly reject FormSubmit responses where success is false.")
           if "unsafe-inline" in "".join(item[0] for item in parsed_pages.values()):
               raise SystemExit("CSP contains an unsafe-inline directive.")
-          print(f"Pre-launch audit passed for {len(pages)} HTML pages: local links, unique IDs, form labels, image alt text, strict CSP, and CSS integrity.")
+          print(f"Pre-launch audit passed for {len(pages)} HTML pages: local links, unique IDs, form labels, image alt text, strict CSP, AJAX form response handling, direct-email fallback, and CSS integrity.")
           PY
 
       - name: Assemble static Pages artifact with bundled imagery
