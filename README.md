@@ -100,3 +100,13 @@ Do not commit passwords, API keys, private keys, tokens, customer personal infor
 Do not publish private residential/contact information in project documentation unless there is a specific legal or operational reason.
 
 See [SECURITY.md](SECURITY.md) and [IP_OWNERSHIP.md](IP_OWNERSHIP.md).
+
+
+## Pre-launch website
+
+The separate static pre-launch site lives in [`prelaunch/`](prelaunch/) and is deployed by [`.github/workflows/deploy-prelaunch.yml`](.github/workflows/deploy-prelaunch.yml). It does not replace or run inside the Laravel application.
+
+- Expected GitHub Pages URL: https://leano-jordan.github.io/ZazuEMP/
+- Publish source: GitHub Actions; repository Pages settings may require a one-time source selection.
+- Lead capture currently routes through FormSubmit to `rosscorelabs@outlook.com`. The mailbox must be activated with the provider and end-to-end delivery verified before public promotion.
+- See [pre-launch setup notes](prelaunch/README.md) and [privacy notice](prelaunch/privacy.html) for deployment and lead-capture limitations.
