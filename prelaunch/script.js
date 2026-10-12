@@ -18,7 +18,6 @@
   const sectionCurrent = document.querySelector("[data-section-current]");
   const sections = Array.from(document.querySelectorAll("main section[id]"));
   const sectionNames = new Map(sections.map((section) => {
-    const heading = section.querySelector("h1, h2, h3");
     const knownNames = {
       top: "Introduction",
       principles: "Key principles",
@@ -29,48 +28,92 @@
       questions: "FAQs",
       "closing-cta": "Next steps"
     };
-    const name = knownNames[section.id] || (heading?.textContent || section.id).trim().replace(/\\s+/g, " ");
+    const heading = section.querySelector("h1, h2, h3");
+    const name = knownNames[section.id] || (heading?.textContent || section.id).trim().replace(/\s+/g, " ");
     return [section.id, name];
   }));
   let activeSectionId = sections[0]?.id || "top";
-  let sectionObserver;
+  let hideNavigatorTimer = 0;
+  let scrollFrame = 0;
+  const showNavigator = () => {
+    if (!sectionNavigator) return;
+    sectionNavigator.classList.add("is-visible");
+    window.clearTimeout(hideNavigatorTimer);
+    hideNavigatorTimer = window.setTimeout(() => {
+      if (!sectionNavigator.matches(":hover, :focus-within")) {
+        sectionNavigator.classList.remove("is-visible");
+      }
+    }, 1800);
+  };
   const updateSectionNavigator = (id) => {
     const activeIndex = sections.findIndex((section) => section.id === id);
     if (activeIndex < 0) return;
     activeSectionId = id;
     const currentName = sectionNames.get(id) || "Explore";
-    const atEnd = activeIndex === sections.length - 1;
-    const nextSection = atEnd ? sections[0] : sections[activeIndex + 1];
+    const nextSection = sections[(activeIndex + 1) % sections.length];
     if (sectionCurrent) {
       sectionCurrent.textContent = currentName;
       sectionCurrent.setAttribute("aria-label", "Current section: " + currentName);
     }
     if (sectionNext && nextSection) {
-      const destinationName = atEnd ? "the introduction" : (sectionNames.get(nextSection.id) || "next section");
+      const destinationName = sectionNames.get(nextSection.id) || "next section";
+      const atEnd = activeIndex === sections.length - 1;
       sectionNext.href = "#" + nextSection.id;
       sectionNext.setAttribute("aria-label", atEnd ? "Return to the introduction" : "Next section: " + destinationName);
       sectionNext.title = atEnd ? "Return to the introduction" : "Next section: " + destinationName;
     }
   };
+  const detectActiveSection = () => {
+    if (!sections.length) return;
+    const marker = Math.min(window.innerHeight * 0.36, 280);
+    let candidate = sections[0];
+    for (const section of sections) {
+      if (section.getBoundingClientRect().top <= marker) candidate = section;
+      else break;
+    }
+    updateSectionNavigator(candidate.id);
+  };
   if (sections.length && sectionNavigator) {
     const hashTarget = decodeURIComponent(window.location.hash.slice(1));
     updateSectionNavigator(sections.some((section) => section.id === hashTarget) ? hashTarget : activeSectionId);
-    if ("IntersectionObserver" in window) {
-      sectionObserver = new IntersectionObserver((entries) => {
-        const visible = entries.filter((entry) => entry.isIntersecting)
-          .sort((a, b) => b.intersectionRatio - a.intersectionRatio)[0];
-        if (visible) updateSectionNavigator(visible.target.id);
-      }, { rootMargin: "-16% 0px -62% 0px", threshold: [0, 0.12, 0.25, 0.5] });
-      sections.forEach((section) => sectionObserver.observe(section));
-    }
+    showNavigator();
+    window.setTimeout(() => sectionNavigator.classList.remove("is-visible"), 2600);
+    window.addEventListener("scroll", () => {
+      if (!scrollFrame) {
+        scrollFrame = window.requestAnimationFrame(() => {
+          detectActiveSection();
+          scrollFrame = 0;
+        });
+      }
+      showNavigator();
+    }, { passive: true });
+    window.addEventListener("wheel", showNavigator, { passive: true });
+    window.addEventListener("touchstart", showNavigator, { passive: true });
+    window.addEventListener("pointermove", (event) => {
+      if (event.pointerType === "mouse" && event.clientX > window.innerWidth - 180 && event.clientY > window.innerHeight - 140) showNavigator();
+    }, { passive: true });
+    sectionNavigator.addEventListener("pointerenter", () => {
+      window.clearTimeout(hideNavigatorTimer);
+      sectionNavigator.classList.add("is-visible");
+    });
+    sectionNavigator.addEventListener("pointerleave", () => {
+      hideNavigatorTimer = window.setTimeout(() => sectionNavigator.classList.remove("is-visible"), 900);
+    });
+    sectionNavigator.addEventListener("focusin", () => {
+      window.clearTimeout(hideNavigatorTimer);
+      sectionNavigator.classList.add("is-visible");
+    });
+    sectionNavigator.addEventListener("focusout", showNavigator);
     window.addEventListener("hashchange", () => {
       const id = decodeURIComponent(window.location.hash.slice(1));
       if (sections.some((section) => section.id === id)) updateSectionNavigator(id);
+      window.setTimeout(detectActiveSection, 80);
     });
     window.addEventListener("pageshow", () => {
-      const id = decodeURIComponent(window.location.hash.slice(1));
-      if (sections.some((section) => section.id === id)) updateSectionNavigator(id);
+      detectActiveSection();
+      showNavigator();
     });
+    detectActiveSection();
   } else if (sectionNavigator) {
     sectionNavigator.hidden = true;
   }
