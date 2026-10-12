@@ -11,7 +11,7 @@ This directory is a standalone static marketing site intended for GitHub Pages. 
 - `thanks.html` — form redirect destination
 - `favicon.svg` — simple site-specific mark
 
-The hero uses a clearly labelled conceptual CSS dashboard illustration, not a screenshot of a live customer account. The audience section uses three bundled, licensed temporary photographs as labelled cards—not as full-section wallpaper. The Pages workflow copies those images into the deployed artifact, so the page does not request images from third-party hosts at runtime. Their provenance and temporary-use limitations are recorded in `docs/ZAZU_LANDING_MEDIA_SOURCES.md`. No remote font dependency is loaded.
+The hero uses a clearly labelled conceptual CSS dashboard illustration, not a screenshot of a live customer account. The images are distributed across the hero, individual feature cards and the audience section rather than compressed into one gallery. Six bundled, licensed temporary photographs are copied into the deployed artifact, so the page does not request images from third-party hosts at runtime. Their provenance and temporary-use limitations are recorded in `docs/ZAZU_LANDING_MEDIA_SOURCES.md`. No remote font dependency is loaded.
 
 ## Publish
 
@@ -52,4 +52,4 @@ The page uses restrained interface animation and respects reduced-motion prefere
 
 ## Local checks
 
-In addition to desktop/mobile visual review, verify that the page loads without requests to third-party image hosts, that all local links/assets resolve, and that Content Security Policy does not block the stylesheet, script, favicon or enquiry form.
+In addition to desktop/mobile visual review, verify that the page loads without requests to third-party image hosts, that all six bundled image paths are included in the Pages artifact, and that all local links/assets resolve, and that Content Security Policy does not block the stylesheet, script, favicon or enquiry form.
