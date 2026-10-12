@@ -19,6 +19,7 @@ concurrency:
 
 jobs:
   deploy:
+    if: github.ref == 'refs/heads/main'
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
@@ -41,6 +42,88 @@ jobs:
             echo "Potential secret material found in prelaunch site."
             exit 1
           fi
+
+      - name: Audit page assets, local links, and security policy
+        shell: bash
+        run: |
+          python3 - <<'PY'
+          from html.parser import HTMLParser
+          from pathlib import Path
+          from urllib.parse import urlsplit
+          import re
+
+          root = Path("prelaunch")
+          pages = sorted(root.glob("*.html"))
+          css_path = root / "styles.css"
+          css = css_path.read_text(encoding="utf-8")
+
+          if not pages:
+              raise SystemExit("No HTML pages were found.")
+          if re.search(r"url\\(\\s*[\"']?https?://", css, re.IGNORECASE):
+              raise SystemExit("CSS must not depend on remotely hosted visual assets.")
+
+          class PageAudit(HTMLParser):
+              def __init__(self):
+                  super().__init__()
+                  self.ids = set()
+                  self.h1_count = 0
+                  self.has_main = False
+                  self.has_language = False
+                  self.references = []
+              def handle_starttag(self, tag, attrs):
+                  attrs = dict(attrs)
+                  if "id" in attrs:
+                      self.ids.add(attrs["id"])
+                  if tag == "h1":
+                      self.h1_count += 1
+                  if tag == "main":
+                      self.has_main = True
+                  if tag == "html" and attrs.get("lang"):
+                      self.has_language = True
+                  for key in ("href", "src"):
+                      if key in attrs:
+                          self.references.append((key, attrs[key]))
+
+          parsed_pages = {}
+          for page in pages:
+              content = page.read_text(encoding="utf-8")
+              audit = PageAudit()
+              audit.feed(content)
+              parsed_pages[page.name] = (content, audit)
+              if "Content-Security-Policy" not in content:
+                  raise SystemExit(f"{page}: missing Content-Security-Policy.")
+              if not audit.has_language:
+                  raise SystemExit(f"{page}: missing document language.")
+              if not audit.has_main:
+                  raise SystemExit(f"{page}: missing main landmark.")
+              if audit.h1_count != 1:
+                  raise SystemExit(f"{page}: expected exactly one h1, got {audit.h1_count}.")
+
+          for page in pages:
+              _, audit = parsed_pages[page.name]
+              for _kind, reference in audit.references:
+                  parsed = urlsplit(reference)
+                  if parsed.scheme or parsed.netloc or not parsed.path:
+                      continue
+                  target_path = (root / parsed.path.removeprefix("./")).resolve()
+                  if not target_path.is_file():
+                      raise SystemExit(f"{page}: broken local reference {reference!r}.")
+                  if parsed.fragment:
+                      target_content = target_path.read_text(encoding="utf-8")
+                      known_ids = set(re.findall(r"\\bid=[\"']([^\"']+)[\"']", target_content))
+                      if parsed.fragment not in known_ids:
+                          raise SystemExit(f"{page}: missing fragment #{parsed.fragment} in {target_path.name}.")
+
+          homepage = parsed_pages["index.html"][0]
+          if 'rel="canonical"' not in homepage or 'property="og:url"' not in homepage:
+              raise SystemExit("Homepage canonical/social URL metadata is incomplete.")
+          if "form-action https://formsubmit.co" not in homepage:
+              raise SystemExit("CSP does not explicitly allow the intended enquiry form endpoint.")
+          if "images.pexels.com" in css or "images.unsplash.com" in css:
+              raise SystemExit("Remote stock-photo dependencies must remain removed.")
+
+          print(f"Pre-launch audit passed for {len(pages)} HTML pages; all local references, landmarks, CSP policies and visual-asset rules are valid.")
+          PY
 
       - name: Configure GitHub Pages
         uses: actions/configure-pages@v5
