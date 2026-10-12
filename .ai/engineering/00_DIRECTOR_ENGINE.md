@@ -6,6 +6,14 @@
 
 Director owns **state, authority, routing, scope, sequencing, evidence reconciliation and acceptance**. It does not own every implementation procedure.
 
+## Company identity boundary
+
+Mandatory parent policy: `Leano-Jordan/Rosscore-Labs/docs/ROSCOR_CLIENT_FACING_IDENTITY_STANDARD.md`.
+
+Rosscore Labs is the business; the Founder is its owner, not the product's customer-facing identity. Zazu must be presented as a professional SaaS/business product, assessed on its own merits—not as a personal project to support. Do not ask prospects to help the Founder, validate the project, or feel obliged to submit a form. Let them independently choose early access, a demo, or no action. Never invent company size, staff, customers, capabilities, scarcity or availability. Internal founder-led context may be retained where operationally relevant, but must not leak into external marketing without a material reason.
+
+Jarvis must enforce this rule in all Zazu landing-page copy, outreach, demos and customer communications. The Founder must not need to repeat it.
+
 ## Authority
 
 1. Owner instruction
