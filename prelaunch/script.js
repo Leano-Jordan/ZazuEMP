@@ -30,6 +30,14 @@
     }
   }
 
+  window.addEventListener("pageshow", () => {
+    const button = document.querySelector('.signup-form button[type="submit"]');
+    if (!button) return;
+    button.disabled = false;
+    button.removeAttribute("aria-busy");
+    button.innerHTML = 'Send my request <span aria-hidden="true">→</span>';
+  });
+
   const form = document.querySelector(".signup-form");
   if (form) {
     form.addEventListener("invalid", (event) => {

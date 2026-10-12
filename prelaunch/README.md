@@ -11,7 +11,7 @@ This directory is a standalone static marketing site intended for GitHub Pages. 
 - `thanks.html` — form redirect destination
 - `favicon.svg` — simple site-specific mark
 
-The hero uses a clearly labelled conceptual CSS dashboard illustration, not a screenshot of a live customer account. The images are distributed across the hero, individual feature cards and the audience section rather than compressed into one gallery. Six bundled, licensed temporary photographs are copied into the deployed artifact, so the page does not request images from third-party hosts at runtime. Their provenance and temporary-use limitations are recorded in `docs/ZAZU_LANDING_MEDIA_SOURCES.md`. No remote font dependency is loaded.
+The hero uses a clearly labelled conceptual CSS dashboard illustration, not a screenshot of a live customer account. The images are distributed across the hero, individual feature cards and the audience section. The 'Built around the job' section pairs a prominent venue photo with a compact service-category grid and a clearly labelled conceptual workflow card. Six bundled, licensed temporary photographs are copied into the deployed artifact, so the page does not request images from third-party hosts at runtime. Their provenance and temporary-use limitations are recorded in `docs/ZAZU_LANDING_MEDIA_SOURCES.md`. No remote font dependency is loaded.
 
 ## Publish
 
@@ -48,7 +48,7 @@ The page is plain HTML/CSS/JavaScript and has no build step. For a source-level 
 
 The software preview is illustrative only. Do not present its sample counts, event names or status labels as live customer data or as proof that every shown workflow is released. Before wider promotion, replace or supplement it with owner-approved screenshots from the actual Zazu product and an approved social-sharing image. Keep genuine UI screenshots self-hosted, compressed, cropped for the target viewport, and free of customer/personal data. Do not reintroduce unrelated stock photographs merely to fill space.
 
-The page uses restrained interface animation and respects reduced-motion preferences. The product preview is an honest conceptual UI illustration; the supporting event photography is self-hosted from the repository’s documented temporary stock library. Replace those photos with Zazu-owned or fully cleared South Africa-relevant imagery before commercial promotion.
+The page uses restrained interface animation, an IntersectionObserver-based reveal enhancement with no-JavaScript-safe defaults, and respects reduced-motion preferences. The stylesheet is maintained as one consolidated source rather than appended override blocks. The product preview is an honest conceptual UI illustration; the supporting event photography is self-hosted from the repository’s documented temporary stock library. Replace those photos with Zazu-owned or fully cleared South Africa-relevant imagery before commercial promotion.
 
 ## Local checks
 

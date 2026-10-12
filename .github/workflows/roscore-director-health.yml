@@ -13,7 +13,7 @@ on:
   workflow_dispatch:
 
 permissions:
-  contents: write
+  contents: read
   actions: read
 
 concurrency:
@@ -32,7 +32,7 @@ jobs:
       GH_TOKEN: "${{ github.token }}"
     steps:
       - name: Checkout target commit
-        uses: actions/checkout@v4
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
         with:
           ref: ${{ github.event_name == 'workflow_run' && 'main' || github.sha }}
           fetch-depth: 0
@@ -210,7 +210,7 @@ jobs:
           PY
 
       - name: Publish report artifact
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
         with:
           name: roscore-director-health-${{ env.COMMIT_SHA }}
           path: |
@@ -218,46 +218,10 @@ jobs:
             roscore-director-health.md
           retention-days: 30
 
-      - name: Persist latest Director report
-        if: github.event_name != 'workflow_run' || github.event.workflow_run.head_branch == 'main'
+      - name: Publish report in Actions run summary
+        if: always() && hashFiles('roscore-director-health.md') != ''
         shell: bash
-        env:
-          PERSIST_BRANCH: ${{ github.event_name == 'workflow_run' && github.event.workflow_run.head_branch || github.ref_name }}
         run: |
-          set -euo pipefail
-          mkdir -p docs/health
-          cp roscore-director-health.json docs/health/latest.json
-          cp roscore-director-health.md docs/health/latest.md
-          git config user.name "Rosscore Director"
-          git config user.email "director@roscore.local"
-
-          # workflow_run events check out the target SHA, which may be behind a
-          # newer health-report commit already published by another completed CI
-          # workflow. Always rebase the generated report onto the current remote
-          # branch before publishing so report writers cannot create stale pushes.
-          for attempt in 1 2 3 4 5; do
-            git fetch origin "$PERSIST_BRANCH"
-            git checkout -B director-health-publish "origin/$PERSIST_BRANCH"
-
-            cp roscore-director-health.json docs/health/latest.json
-            cp roscore-director-health.md docs/health/latest.md
-            git add docs/health/latest.json docs/health/latest.md
-
-            if git diff --cached --quiet; then
-              echo "Director health report unchanged."
-              exit 0
-            fi
-
-            git commit -m "chore: update director health report [skip ci]"
-
-            if git push origin HEAD:"$PERSIST_BRANCH"; then
-              echo "Director health report published on attempt $attempt."
-              exit 0
-            fi
-
-            echo "Remote branch moved during publish; retrying."
-            git reset --hard "origin/$PERSIST_BRANCH"
-          done
-
-          echo "Unable to publish Director health report after 5 attempts."
-          exit 1
+          cat roscore-director-health.md >> "$GITHUB_STEP_SUMMARY"
+          echo "" >> "$GITHUB_STEP_SUMMARY"
+          echo "The report above belongs to this workflow run. Download the JSON and Markdown artifacts for the machine-readable report." >> "$GITHUB_STEP_SUMMARY"
