@@ -9,9 +9,10 @@ This directory is a standalone static marketing site intended for GitHub Pages. 
 - `script.js` — small progressive-enhancement interactions
 - `privacy.html` — enquiry privacy notice
 - `thanks.html` — form redirect destination
+- `image-credits.html` — public photo attribution and licence register
 - `favicon.svg` — simple site-specific mark
 
-The hero uses a clearly labelled conceptual CSS dashboard illustration, not a screenshot of a live customer account. The images are distributed across the hero, individual feature cards and the audience section. The 'Built around the job' section pairs a prominent venue photo with a compact service-category grid and a clearly labelled conceptual workflow card. Six bundled, licensed temporary photographs are copied into the deployed artifact, so the page does not request images from third-party hosts at runtime. Their provenance and temporary-use limitations are recorded in `docs/ZAZU_LANDING_MEDIA_SOURCES.md`. No remote font dependency is loaded.
+The hero uses a clearly labelled conceptual CSS dashboard illustration, not a screenshot of a live customer account. The photography shows a selection of South African event, performance and community settings rather than catering displays alone. Six openly licensed photographs are loaded from Wikimedia Commons in responsive width variants using srcset and sizes. Their authors, file pages and CC BY-SA 4.0 licences are credited in the public image-credits.html page and recorded in docs/ZAZU_LANDING_MEDIA_SOURCES.md. This is an intentional, limited exception to the previous no-remote-image policy: browsers request image variants from upload.wikimedia.org; the site still has no remote font dependency, and the workflow permits no other remote image host.
 
 ## Publish
 
@@ -48,8 +49,8 @@ The page is plain HTML/CSS/JavaScript and has no build step. For a source-level 
 
 The software preview is illustrative only. Do not present its sample counts, event names or status labels as live customer data or as proof that every shown workflow is released. Before wider promotion, replace or supplement it with owner-approved screenshots from the actual Zazu product and an approved social-sharing image. Keep genuine UI screenshots self-hosted, compressed, cropped for the target viewport, and free of customer/personal data. Do not reintroduce unrelated stock photographs merely to fill space.
 
-The page uses restrained interface animation, an IntersectionObserver-based reveal enhancement with no-JavaScript-safe defaults, and respects reduced-motion preferences. The stylesheet is maintained as one consolidated source rather than appended override blocks. Inline styles are prohibited by the page's Content Security Policy; all visual styling must live in `styles.css`. The product preview is an honest conceptual UI illustration; the supporting event photography is self-hosted from the repository’s documented temporary stock library. Replace those photos with Zazu-owned or fully cleared South Africa-relevant imagery before commercial promotion.
+The page uses restrained interface animation, an IntersectionObserver-based reveal enhancement with no-JavaScript-safe defaults, and respects reduced-motion preferences. The stylesheet is maintained as one consolidated source. Inline styles are prohibited by the page's Content Security Policy; all visual styling must live in styles.css. The product preview is an honest conceptual UI illustration. Photography is illustrative only and must not imply that pictured people or organisations use or endorse Zazu. Any future replacement must have a verified licence and public attribution; Zazu-owned imagery can be substituted later without changing the responsive image pattern.
 
 ## Local checks
 
-In addition to desktop/mobile visual review, verify that the page loads without requests to third-party image hosts, that all six bundled image paths are included in the Pages artifact, and that all local links/assets resolve, and that Content Security Policy does not block the stylesheet, script, favicon or enquiry form.
+In addition to desktop/mobile visual review, verify that the six image elements use responsive srcset/sizes, that every image request targets only upload.wikimedia.org, that the public credits page is deployed, that local links/assets resolve, and that Content Security Policy does not block the stylesheet, script, favicon or enquiry form.
