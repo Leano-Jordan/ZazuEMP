@@ -6,7 +6,6 @@ on:
     paths:
       - "prelaunch/**"
       - ".github/workflows/deploy-prelaunch.yml"
-  workflow_dispatch:
 
 permissions:
   contents: read
