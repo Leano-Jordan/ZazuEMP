@@ -16,9 +16,6 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       contents: read
-      security-events: write
-      actions: read
-
     steps:
       - name: Checkout code
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
@@ -51,8 +48,32 @@ jobs:
       - name: Run Psalm security analysis
         run: psalm --taint-analysis --no-progress --report=results.sarif
 
-      - name: Upload Security Analysis results to GitHub
+      - name: Preserve SARIF report for trusted upload job
         if: always() && hashFiles('results.sarif') != ''
+        uses: actions/upload-artifact@v4
+        with:
+          name: psalm-sarif
+          path: results.sarif
+          if-no-files-found: error
+          retention-days: 3
+
+  publish-security-results:
+    if: always() && github.event_name != 'pull_request'
+    needs: php-security
+    runs-on: ubuntu-latest
+    permissions:
+      actions: read
+      security-events: write
+    steps:
+      - name: Download Psalm SARIF report
+        uses: actions/download-artifact@v4
+        continue-on-error: true
+        with:
+          name: psalm-sarif
+          path: results
+
+      - name: Upload trusted-branch security results
+        if: hashFiles('results/results.sarif') != ''
         uses: github/codeql-action/upload-sarif@v3
         with:
-          sarif_file: results.sarif
+          sarif_file: results/results.sarif
