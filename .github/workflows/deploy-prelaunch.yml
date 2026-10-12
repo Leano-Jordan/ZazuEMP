@@ -128,13 +128,49 @@ jobs:
           print(f"Pre-launch audit passed for {len(pages)} HTML pages; local references, landmarks, CSP policies and visual-asset rules are valid.")
           PY
 
+      - name: Assemble static Pages artifact with bundled imagery
+        shell: bash
+        run: |
+          set -euo pipefail
+          rm -rf site
+          mkdir -p site/images/landing
+          cp prelaunch/index.html prelaunch/styles.css prelaunch/script.js prelaunch/privacy.html prelaunch/thanks.html prelaunch/favicon.svg site/
+          cp public/images/landing/stock/hero.jpg site/images/landing/hero.jpg
+          cp public/images/landing/stock/catering.jpg site/images/landing/catering.jpg
+          cp public/images/landing/stock/sound.jpg site/images/landing/sound.jpg
+          python3 - <<'PY'
+          from pathlib import Path
+
+          index = Path("site/index.html")
+          content = index.read_text(encoding="utf-8")
+          replacements = {
+              "../public/images/landing/stock/hero.jpg": "./images/landing/hero.jpg",
+              "../public/images/landing/stock/catering.jpg": "./images/landing/catering.jpg",
+              "../public/images/landing/stock/sound.jpg": "./images/landing/sound.jpg",
+          }
+          for source, deployed in replacements.items():
+              if content.count(source) != 1:
+                  raise SystemExit(f"Expected exactly one reference to {source!r}.")
+              content = content.replace(source, deployed)
+          index.write_text(content, encoding="utf-8")
+          for path in (
+              "site/images/landing/hero.jpg",
+              "site/images/landing/catering.jpg",
+              "site/images/landing/sound.jpg",
+          ):
+              asset = Path(path)
+              if not asset.is_file() or asset.stat().st_size < 10_000:
+                  raise SystemExit(f"Missing or unexpectedly small bundled image: {path}")
+          print("Assembled the standalone site with three local, bundled image assets.")
+          PY
+
       - name: Configure GitHub Pages
         uses: actions/configure-pages@v5
 
       - name: Upload static site artifact
         uses: actions/upload-pages-artifact@v3
         with:
-          path: prelaunch
+          path: site
 
       - name: Deploy to GitHub Pages
         id: deployment
