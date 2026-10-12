@@ -37,7 +37,7 @@ GitHub Pages itself does not store form submissions. A successful page deploymen
 
 ## Local checks
 
-The page is plain HTML/CSS/JavaScript and has no build step. Serve the `prelaunch/` directory using any local static file server and check:
+The page is plain HTML/CSS/JavaScript and has no build step. For a source-level local preview, serve the repository root and open `/prelaunch/` (the source HTML references the bundled imagery in `public/`; the Pages workflow rewrites those paths into the deployment artifact). Then check:
 - mobile widths (320–390 px) and desktop layout;
 - nav, CTA intent selection, keyboard navigation and reduced-motion preference;
 - required fields and privacy consent;
