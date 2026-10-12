@@ -11,7 +11,7 @@ This directory is a standalone static marketing site intended for GitHub Pages. 
 - `thanks.html` — form redirect destination
 - `favicon.svg` — simple site-specific mark
 
-The dashboard is a clearly labelled conceptual CSS illustration, not a screenshot of a live customer account. Licensed stock photography is used as CSS background imagery from Pexels and Unsplash; those background images require an internet connection. No remote font dependency is loaded.
+The hero uses a clearly labelled conceptual CSS dashboard illustration, not a screenshot of a live customer account. The page intentionally uses no third-party stock photography or remotely hosted visual assets: decorative backgrounds are CSS gradients and patterns, so missing photo CDNs cannot break the design. No remote font dependency is loaded.
 
 ## Publish
 
@@ -44,10 +44,12 @@ The page is plain HTML/CSS/JavaScript and has no build step. Serve the `prelaunc
 - the actual external form delivery and redirect, once the recipient is activated.
 
 
-## Photography and motion
+## Visual policy and motion
 
-The pre-launch page uses two remote background photographs:
-- Catering staff preparing an event outdoors: [Pexels photo 37485594](https://www.pexels.com/photo/catering-staff-preparing-glassware-outdoors-37485594/), used under the [Pexels licence](https://www.pexels.com/license/).
-- Formal event table: [Unsplash photo](https://unsplash.com/photos/a-table-set-up-for-a-formal-event-9WlBSDqBlZc), used under the [Unsplash licence](https://unsplash.com/license).
+The software preview is illustrative only. Do not present its sample counts, event names or status labels as live customer data or as proof that every shown workflow is released. Before wider promotion, replace or supplement it with owner-approved screenshots from the actual Zazu product and an approved social-sharing image. Keep genuine UI screenshots self-hosted, compressed, cropped for the target viewport, and free of customer/personal data. Do not reintroduce unrelated stock photographs merely to fill space.
 
-The page includes subtle entrance and floating-card animations, with reduced-motion preferences respected. Images are remotely hosted, so they require an internet connection and may be unavailable if the image provider changes its URL; self-host optimized, licensed copies if offline asset independence is required. The photos are illustrative and do not represent Zazu customers or product screenshots.
+The page uses restrained interface animation and respects reduced-motion preferences. Visuals are local CSS and HTML; the landing page does not require external image or font hosts.
+
+## Local checks
+
+In addition to desktop/mobile visual review, verify that the page loads without requests to third-party image hosts, that all local links/assets resolve, and that Content Security Policy does not block the stylesheet, script, favicon or enquiry form.
