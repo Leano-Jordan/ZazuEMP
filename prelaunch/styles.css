@@ -726,3 +726,22 @@ a:focus-visible,button:focus-visible,input:focus-visible,select:focus-visible,te
  .section-navigator.is-visible { transform:none; }
  .section-navigator a:hover { transform:none; }
 }
+
+
+/* Image credits page — separate semantic components, responsive without inline styles. */
+.image-credits-page { max-width: 1040px; }
+.image-credits-page > h1 { margin: 14px 0 18px; color: var(--navy-deep); font-size: clamp(36px, 4.5vw, 58px); font-weight: 850; letter-spacing: -.055em; line-height: 1.08; }
+.credits-intro { max-width: 780px; color: var(--navy); font-size: 18px; font-weight: 650; line-height: 1.65; }
+.image-credits-page > p:not(.eyebrow) { max-width: 800px; color: var(--muted); }
+.image-credits-page a { text-decoration-thickness: 1px; text-underline-offset: 3px; }
+.image-credit-list { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px; margin-top: 28px; }
+.image-credit-list article { min-width: 0; padding: 20px; border: 1px solid var(--line); border-radius: 13px; background: #fff; box-shadow: 0 8px 22px #123a5a08; }
+.image-credit-list h2 { margin: 0 0 12px; color: var(--navy); font-size: 17px; line-height: 1.4; overflow-wrap: anywhere; }
+.image-credit-list h2 a { color: var(--navy); }
+.image-credit-list p { margin: 8px 0 0; color: var(--muted); font-size: 13px; line-height: 1.65; }
+.credits-note { margin-top: 26px; padding-top: 18px; border-top: 1px solid var(--line); font-size: 13px; }
+@media (max-width: 680px) {
+  .image-credits-page { padding-block: 58px; }
+  .image-credit-list { grid-template-columns: minmax(0, 1fr); gap: 11px; }
+  .image-credit-list article { padding: 17px; }
+}
