@@ -224,7 +224,7 @@ jobs:
               raise SystemExit("A removed stock-image path remains in the deployed homepage.")
           if content.count("srcset=") != 6 or content.count("sizes=") != 6:
               raise SystemExit("Expected six responsive Wikimedia Commons image references.")
-          urls = re.findall(r'https://upload\\.wikimedia\\.org/wikipedia/commons/thumb/[^\\s\\"]+', content)
+          urls = re.findall(r'https://upload\.wikimedia\.org/wikipedia/commons/thumb/[^\s"]+', content)
           if len(urls) < 24:
               raise SystemExit(f"Expected at least 24 width-specific Commons image variants; found {len(urls)}.")
           if not Path("site/image-credits.html").is_file():
