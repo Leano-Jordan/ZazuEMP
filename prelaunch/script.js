@@ -19,50 +19,58 @@
   const sections = Array.from(document.querySelectorAll("main section[id]"));
   const sectionNames = new Map(sections.map((section) => {
     const heading = section.querySelector("h1, h2, h3");
-    const name = section.id === "top" ? "Intro"
-      : section.id === "principles" ? "Principles"
-      : section.id === "how-it-helps" ? "What it does"
-      : section.id === "who-its-for" ? "Who it helps"
-      : section.id === "workflow" ? "How it works"
-      : section.id === "early-access" ? "Early access"
-      : section.id === "questions" ? "FAQs"
-      : section.id === "closing-cta" ? "Next steps"
-      : (heading?.textContent || section.id).trim();
+    const knownNames = {
+      top: "Introduction",
+      principles: "Key principles",
+      "how-it-helps": "What it does",
+      "who-its-for": "Who it helps",
+      workflow: "How it works",
+      "early-access": "Early access",
+      questions: "FAQs",
+      "closing-cta": "Next steps"
+    };
+    const name = knownNames[section.id] || (heading?.textContent || section.id).trim().replace(/\\s+/g, " ");
     return [section.id, name];
   }));
   let activeSectionId = sections[0]?.id || "top";
+  let sectionObserver;
   const updateSectionNavigator = (id) => {
-    activeSectionId = id;
     const activeIndex = sections.findIndex((section) => section.id === id);
-    const nextSection = sections[Math.min(activeIndex + 1, sections.length - 1)];
-    if (sectionCurrent) sectionCurrent.textContent = sectionNames.get(id) || "Explore";
+    if (activeIndex < 0) return;
+    activeSectionId = id;
+    const currentName = sectionNames.get(id) || "Explore";
+    const atEnd = activeIndex === sections.length - 1;
+    const nextSection = atEnd ? sections[0] : sections[activeIndex + 1];
+    if (sectionCurrent) {
+      sectionCurrent.textContent = currentName;
+      sectionCurrent.setAttribute("aria-label", "Current section: " + currentName);
+    }
     if (sectionNext && nextSection) {
-      const nextName = sectionNames.get(nextSection.id) || "Next section";
+      const destinationName = atEnd ? "the introduction" : (sectionNames.get(nextSection.id) || "next section");
       sectionNext.href = "#" + nextSection.id;
-      sectionNext.setAttribute("aria-label", "Next section: " + nextName);
-      sectionNext.title = activeIndex >= sections.length - 1 ? "Back to the introduction" : "Next section: " + nextName;
-      if (activeIndex >= sections.length - 1) {
-        sectionNext.href = "#top";
-        sectionNext.setAttribute("aria-label", "Back to the introduction");
-        sectionNext.title = "Back to the introduction";
-      }
+      sectionNext.setAttribute("aria-label", atEnd ? "Return to the introduction" : "Next section: " + destinationName);
+      sectionNext.title = atEnd ? "Return to the introduction" : "Next section: " + destinationName;
     }
   };
   if (sections.length && sectionNavigator) {
-    updateSectionNavigator(activeSectionId);
+    const hashTarget = decodeURIComponent(window.location.hash.slice(1));
+    updateSectionNavigator(sections.some((section) => section.id === hashTarget) ? hashTarget : activeSectionId);
     if ("IntersectionObserver" in window) {
-      const sectionObserver = new IntersectionObserver((entries) => {
+      sectionObserver = new IntersectionObserver((entries) => {
         const visible = entries.filter((entry) => entry.isIntersecting)
           .sort((a, b) => b.intersectionRatio - a.intersectionRatio)[0];
         if (visible) updateSectionNavigator(visible.target.id);
-      }, { rootMargin: "-18% 0px -58% 0px", threshold: [0, 0.1, 0.25, 0.5] });
+      }, { rootMargin: "-16% 0px -62% 0px", threshold: [0, 0.12, 0.25, 0.5] });
       sections.forEach((section) => sectionObserver.observe(section));
-    } else {
-      window.addEventListener("hashchange", () => {
-        const id = window.location.hash.slice(1);
-        if (sections.some((section) => section.id === id)) updateSectionNavigator(id);
-      });
     }
+    window.addEventListener("hashchange", () => {
+      const id = decodeURIComponent(window.location.hash.slice(1));
+      if (sections.some((section) => section.id === id)) updateSectionNavigator(id);
+    });
+    window.addEventListener("pageshow", () => {
+      const id = decodeURIComponent(window.location.hash.slice(1));
+      if (sections.some((section) => section.id === id)) updateSectionNavigator(id);
+    });
   } else if (sectionNavigator) {
     sectionNavigator.hidden = true;
   }
