@@ -11,7 +11,7 @@ This directory is a standalone static marketing site intended for GitHub Pages. 
 - `thanks.html` — form redirect destination
 - `favicon.svg` — simple site-specific mark
 
-The dashboard image is a clearly labelled conceptual CSS illustration, not a screenshot of a live customer account. No third-party stock photography or remote font dependency is loaded.
+The dashboard is a clearly labelled conceptual CSS illustration, not a screenshot of a live customer account. Licensed stock photography is used as CSS background imagery from Pexels and Unsplash; those background images require an internet connection. No remote font dependency is loaded.
 
 ## Publish
 
