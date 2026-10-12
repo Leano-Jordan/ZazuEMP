@@ -42,3 +42,12 @@ The page is plain HTML/CSS/JavaScript and has no build step. Serve the `prelaunc
 - nav, CTA intent selection, keyboard navigation and reduced-motion preference;
 - required fields and privacy consent;
 - the actual external form delivery and redirect, once the recipient is activated.
+
+
+## Photography and motion
+
+The pre-launch page uses two remote background photographs:
+- Catering staff preparing an event outdoors: [Pexels photo 37485594](https://www.pexels.com/photo/catering-staff-preparing-glassware-outdoors-37485594/), used under the [Pexels licence](https://www.pexels.com/license/).
+- Formal event table: [Unsplash photo](https://unsplash.com/photos/a-table-set-up-for-a-formal-event-9WlBSDqBlZc), used under the [Unsplash licence](https://unsplash.com/license).
+
+The page includes subtle entrance and floating-card animations, with reduced-motion preferences respected. Images are remotely hosted, so they require an internet connection and may be unavailable if the image provider changes its URL; self-host optimized, licensed copies if offline asset independence is required. The photos are illustrative and do not represent Zazu customers or product screenshots.
