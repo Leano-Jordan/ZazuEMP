@@ -63,9 +63,24 @@
       sectionNext.title = atEnd ? "Return to the introduction" : "Next section: " + destinationName;
     }
   };
+  let navigationTargetId = null;
+  let navigationFallbackTimer = 0;
+  const clearNavigationTarget = () => {
+    navigationTargetId = null;
+    window.clearTimeout(navigationFallbackTimer);
+    navigationFallbackTimer = 0;
+  };
   const detectActiveSection = () => {
     if (!sections.length) return;
     const marker = Math.min(window.innerHeight * 0.36, 280);
+    if (navigationTargetId) {
+      const target = sections.find((section) => section.id === navigationTargetId);
+      if (target && target.getBoundingClientRect().top > marker) {
+        updateSectionNavigator(navigationTargetId);
+        return;
+      }
+      clearNavigationTarget();
+    }
     let candidate = sections[0];
     for (const section of sections) {
       if (section.getBoundingClientRect().top <= marker) candidate = section;
@@ -76,6 +91,33 @@
   if (sections.length && sectionNavigator) {
     const hashTarget = decodeURIComponent(window.location.hash.slice(1));
     updateSectionNavigator(sections.some((section) => section.id === hashTarget) ? hashTarget : activeSectionId);
+    if (sectionNext) {
+      sectionNext.addEventListener("click", (event) => {
+        const currentIndex = sections.findIndex((section) => section.id === activeSectionId);
+        if (currentIndex < 0 || !sections.length) return;
+        event.preventDefault();
+        const nextSection = sections[(currentIndex + 1) % sections.length];
+        clearNavigationTarget();
+        navigationTargetId = nextSection.id;
+        updateSectionNavigator(nextSection.id);
+        navigationFallbackTimer = window.setTimeout(() => {
+          clearNavigationTarget();
+          detectActiveSection();
+        }, 2600);
+        const nextHash = "#" + nextSection.id;
+        if (window.location.hash !== nextHash) window.history.pushState(null, "", nextHash);
+        nextSection.scrollIntoView({
+          behavior: window.matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth",
+          block: "start"
+        });
+        showNavigator();
+      });
+      window.addEventListener("scrollend", () => {
+        if (!navigationTargetId) return;
+        clearNavigationTarget();
+        detectActiveSection();
+      }, { passive: true });
+    }
     showNavigator();
     window.setTimeout(() => sectionNavigator.classList.remove("is-visible"), 2600);
     window.addEventListener("scroll", () => {
@@ -105,8 +147,13 @@
     });
     sectionNavigator.addEventListener("focusout", showNavigator);
     window.addEventListener("hashchange", () => {
+      clearNavigationTarget();
       const id = decodeURIComponent(window.location.hash.slice(1));
       if (sections.some((section) => section.id === id)) updateSectionNavigator(id);
+      window.setTimeout(detectActiveSection, 80);
+    });
+    window.addEventListener("popstate", () => {
+      clearNavigationTarget();
       window.setTimeout(detectActiveSection, 80);
     });
     window.addEventListener("pageshow", () => {
