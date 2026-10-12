@@ -73,6 +73,7 @@ jobs:
                   self.has_main = False
                   self.has_language = False
                   self.references = []
+                  self.srcsets = []
                   self.label_targets = []
                   self.controls = []
                   self.label_depth = 0
@@ -112,6 +113,8 @@ jobs:
                   for key in ("href", "src"):
                       if key in attrs:
                           self.references.append((key, attrs[key]))
+                  if tag == "img" and attrs.get("srcset"):
+                      self.srcsets.append(attrs["srcset"])
               def handle_endtag(self, tag):
                   if tag == "label":
                       self.label_depth = max(0, self.label_depth - 1)
@@ -152,8 +155,15 @@ jobs:
               for kind, reference in audit.references:
                   parsed = urlsplit(reference)
                   if parsed.scheme or parsed.netloc:
-                      if kind == "src":
-                          raise SystemExit(f"{page}: remote resource dependency is not allowed: {reference!r}.")
+                      allowed_wikimedia_image = (
+                          page.name == "index.html"
+                          and kind == "src"
+                          and parsed.scheme == "https"
+                          and parsed.netloc == "upload.wikimedia.org"
+                          and parsed.path.startswith("/wikipedia/commons/thumb/")
+                      )
+                      if kind == "src" and not allowed_wikimedia_image:
+                          raise SystemExit(f"{page}: unapproved remote resource dependency: {reference!r}.")
                       continue
                   if not parsed.path:
                       target_path = root / page.name
@@ -165,6 +175,14 @@ jobs:
                       target_page = parsed_pages.get(target_path.name)
                       if target_page is None or parsed.fragment not in target_page[1].ids:
                           raise SystemExit(f"{page}: missing fragment #{parsed.fragment} in {target_path.name}.")
+              for srcset in audit.srcsets:
+                  for candidate in srcset.split(","):
+                      image_url = candidate.strip().split()[0]
+                      parsed_image = urlsplit(image_url)
+                      if (parsed_image.scheme != "https" or
+                              parsed_image.netloc != "upload.wikimedia.org" or
+                              not parsed_image.path.startswith("/wikipedia/commons/thumb/")):
+                          raise SystemExit(f"{page}: srcset contains an unapproved image host/path: {image_url!r}.")
 
           homepage = parsed_pages["index.html"][0]
           if 'rel="canonical"' not in homepage or 'property="og:url"' not in homepage:
@@ -173,6 +191,12 @@ jobs:
               raise SystemExit("CSP does not explicitly allow the intended enquiry form endpoint.")
           if "connect-src 'self' https://formsubmit.co" not in homepage:
               raise SystemExit("CSP does not explicitly allow the AJAX form connection.")
+          if "img-src 'self' https://upload.wikimedia.org" not in homepage:
+              raise SystemExit("CSP must allow local files and the documented Wikimedia Commons image host only.")
+          if homepage.count("srcset=") != 6 or homepage.count("sizes=") != 6:
+              raise SystemExit("All six homepage photographs must have responsive srcset and sizes attributes.")
+          if 'href="./image-credits.html"' not in homepage:
+              raise SystemExit("The homepage must link to the public image credit and licence page.")
           if "https://formsubmit.co/ajax/rosscorelabs@outlook.com" not in js:
               raise SystemExit("The enquiry form is missing the expected AJAX endpoint.")
           if 'id="form-status"' not in homepage or 'id="form-fallback"' not in homepage:
@@ -184,51 +208,28 @@ jobs:
           print(f"Pre-launch audit passed for {len(pages)} HTML pages: local links, unique IDs, form labels, image alt text, strict CSP, AJAX form response handling, direct-email fallback, and CSS integrity.")
           PY
 
-      - name: Assemble static Pages artifact with bundled imagery
+      - name: Assemble static Pages artifact with responsive Commons imagery
         shell: bash
         run: |
           set -euo pipefail
           rm -rf site
-          mkdir -p site/images/landing
-          cp prelaunch/index.html prelaunch/styles.css prelaunch/script.js prelaunch/privacy.html prelaunch/thanks.html prelaunch/favicon.svg site/
-          cp public/images/landing/stock/hero.jpg site/images/landing/hero.jpg
-          cp public/images/landing/stock/tent.jpg site/images/landing/tent.jpg
-          cp public/images/landing/stock/catering.jpg site/images/landing/catering.jpg
-          cp public/images/landing/stock/sound.jpg site/images/landing/sound.jpg
-          cp public/images/landing/stock/decor.jpg site/images/landing/decor.jpg
-          cp public/images/landing/stock/venue.jpg site/images/landing/venue.jpg
+          mkdir -p site
+          cp prelaunch/index.html prelaunch/styles.css prelaunch/script.js prelaunch/privacy.html prelaunch/thanks.html prelaunch/image-credits.html prelaunch/favicon.svg site/
           python3 - <<'PY'
           from pathlib import Path
-
+          import re
           index = Path("site/index.html")
           content = index.read_text(encoding="utf-8")
-          replacements = {
-              "../public/images/landing/stock/hero.jpg": "./images/landing/hero.jpg",
-              "../public/images/landing/stock/tent.jpg": "./images/landing/tent.jpg",
-              "../public/images/landing/stock/catering.jpg": "./images/landing/catering.jpg",
-              "../public/images/landing/stock/sound.jpg": "./images/landing/sound.jpg",
-              "../public/images/landing/stock/decor.jpg": "./images/landing/decor.jpg",
-              "../public/images/landing/stock/venue.jpg": "./images/landing/venue.jpg",
-          }
-          for source, deployed in replacements.items():
-              if content.count(source) != 1:
-                  raise SystemExit(f"Expected exactly one reference to {source!r}.")
-              content = content.replace(source, deployed)
-          index.write_text(content, encoding="utf-8")
-          for path in (
-              "site/images/landing/hero.jpg",
-              "site/images/landing/tent.jpg",
-              "site/images/landing/catering.jpg",
-              "site/images/landing/sound.jpg",
-              "site/images/landing/decor.jpg",
-              "site/images/landing/venue.jpg",
-          ):
-              asset = Path(path)
-              if not asset.is_file() or asset.stat().st_size < 10_000:
-                  raise SystemExit(f"Missing or unexpectedly small bundled image: {path}")
           if "../public/images/landing/stock/" in content:
-              raise SystemExit("A source-only image path remains in the deployed homepage.")
-          print("Assembled the standalone site with six local, bundled image assets.")
+              raise SystemExit("A removed stock-image path remains in the deployed homepage.")
+          if content.count("srcset=") != 6 or content.count("sizes=") != 6:
+              raise SystemExit("Expected six responsive Wikimedia Commons image references.")
+          urls = re.findall(r'https://upload\\.wikimedia\\.org/wikipedia/commons/thumb/[^\\s\\"]+', content)
+          if len(urls) < 24:
+              raise SystemExit(f"Expected at least 24 width-specific Commons image variants; found {len(urls)}.")
+          if not Path("site/image-credits.html").is_file():
+              raise SystemExit("The public attribution/licence page is missing from the Pages artifact.")
+          print(f"Assembled standalone Pages site with {len(urls)} Wikimedia Commons image variants and public attribution.")
           PY
 
       - name: Configure GitHub Pages
