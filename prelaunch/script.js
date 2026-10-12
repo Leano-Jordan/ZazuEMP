@@ -106,7 +106,8 @@
         }, 2600);
         const nextHash = "#" + nextSection.id;
         if (window.location.hash !== nextHash) window.history.pushState(null, "", nextHash);
-        nextSection.scrollIntoView({
+        const destinationHeading = nextSection.querySelector("h1, h2, h3") || nextSection;
+        destinationHeading.scrollIntoView({
           behavior: window.matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth",
           block: "start"
         });
