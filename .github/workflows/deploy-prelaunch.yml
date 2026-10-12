@@ -54,12 +54,11 @@ jobs:
 
           root = Path("prelaunch")
           pages = sorted(root.glob("*.html"))
-          css_path = root / "styles.css"
-          css = css_path.read_text(encoding="utf-8")
+          css = (root / "styles.css").read_text(encoding="utf-8")
 
           if not pages:
               raise SystemExit("No HTML pages were found.")
-          if re.search(r"url\\(\\s*[\"']?https?://", css, re.IGNORECASE):
+          if re.search(r"""url\(\s*['"]?https?://""", css, re.IGNORECASE) or re.search(r"""@import\s+['"]?https?://""", css, re.IGNORECASE):
               raise SystemExit("CSS must not depend on remotely hosted visual assets.")
 
           class PageAudit(HTMLParser):
@@ -101,17 +100,21 @@ jobs:
 
           for page in pages:
               _, audit = parsed_pages[page.name]
-              for _kind, reference in audit.references:
+              for kind, reference in audit.references:
                   parsed = urlsplit(reference)
-                  if parsed.scheme or parsed.netloc or not parsed.path:
+                  if parsed.scheme or parsed.netloc:
+                      if kind == "src":
+                          raise SystemExit(f"{page}: remote resource dependency is not allowed: {reference!r}.")
                       continue
-                  target_path = (root / parsed.path.removeprefix("./")).resolve()
+                  if not parsed.path:
+                      target_path = root / page.name
+                  else:
+                      target_path = (root / parsed.path.removeprefix("./")).resolve()
                   if not target_path.is_file():
                       raise SystemExit(f"{page}: broken local reference {reference!r}.")
                   if parsed.fragment:
-                      target_content = target_path.read_text(encoding="utf-8")
-                      known_ids = set(re.findall(r"\\bid=[\"']([^\"']+)[\"']", target_content))
-                      if parsed.fragment not in known_ids:
+                      target_page = parsed_pages.get(target_path.name)
+                      if target_page is None or parsed.fragment not in target_page[1].ids:
                           raise SystemExit(f"{page}: missing fragment #{parsed.fragment} in {target_path.name}.")
 
           homepage = parsed_pages["index.html"][0]
@@ -122,7 +125,7 @@ jobs:
           if "images.pexels.com" in css or "images.unsplash.com" in css:
               raise SystemExit("Remote stock-photo dependencies must remain removed.")
 
-          print(f"Pre-launch audit passed for {len(pages)} HTML pages; all local references, landmarks, CSP policies and visual-asset rules are valid.")
+          print(f"Pre-launch audit passed for {len(pages)} HTML pages; local references, landmarks, CSP policies and visual-asset rules are valid.")
           PY
 
       - name: Configure GitHub Pages
