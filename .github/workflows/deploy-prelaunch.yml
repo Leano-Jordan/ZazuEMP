@@ -193,8 +193,8 @@ jobs:
               raise SystemExit("CSP does not explicitly allow the AJAX form connection.")
           if "img-src 'self' https://upload.wikimedia.org" not in homepage:
               raise SystemExit("CSP must allow local files and the documented Wikimedia Commons image host only.")
-          if homepage.count("srcset=") != 6 or homepage.count("sizes=") != 6:
-              raise SystemExit("All six homepage photographs must have responsive srcset and sizes attributes.")
+          if homepage.count("srcset=") != 5 or homepage.count("sizes=") != 5:
+              raise SystemExit("All five homepage photographs must have responsive srcset and sizes attributes.")
           if 'href="./image-credits.html"' not in homepage:
               raise SystemExit("The homepage must link to the public image credit and licence page.")
           if "https://formsubmit.co/ajax/rosscorelabs@outlook.com" not in js:
@@ -208,7 +208,7 @@ jobs:
           print(f"Pre-launch audit passed for {len(pages)} HTML pages: local links, unique IDs, form labels, image alt text, strict CSP, AJAX form response handling, direct-email fallback, and CSS integrity.")
           PY
 
-      - name: Assemble Pages artifact and self-host the six licensed photographs
+      - name: Assemble Pages artifact and self-host the five licensed photographs
         shell: bash
         run: |
           set -euo pipefail
@@ -223,8 +223,8 @@ jobs:
           index = Path("site/index.html")
           content = index.read_text(encoding="utf-8")
           image_tags = list(re.finditer(r"<img\b[^>]*>", content))
-          if len(image_tags) != 6:
-              raise SystemExit(f"Expected six photographic image elements, found {len(image_tags)}.")
+          if len(image_tags) != 5:
+              raise SystemExit(f"Expected five photographic image elements, found {len(image_tags)}.")
 
           updated = content
           for number, match in reversed(list(enumerate(image_tags, start=1))):
@@ -256,12 +256,12 @@ jobs:
           )
           if "https://upload.wikimedia.org" in updated:
               raise SystemExit("Deployed homepage still contains a runtime Wikimedia dependency.")
-          if updated.count('src="./images/event-photo-') != 6:
-              raise SystemExit("Expected six same-origin deployed photo references.")
+          if updated.count('src="./images/event-photo-') != 5:
+              raise SystemExit("Expected five same-origin deployed photo references.")
           index.write_text(updated, encoding="utf-8")
           if not Path("site/image-credits.html").is_file():
               raise SystemExit("The public photo attribution/licence page is missing.")
-          print("Assembled Pages artifact with six locally hosted photographs and no third-party image requests.")
+          print("Assembled Pages artifact with five locally hosted photographs and no third-party image requests.")
           PY
           test "$(find site/images -maxdepth 1 -type f -name 'event-photo-*.jpg' | wc -l)" -eq 6
 
