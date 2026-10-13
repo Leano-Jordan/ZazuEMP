@@ -696,8 +696,11 @@ a:focus-visible,button:focus-visible,input:focus-visible,select:focus-visible,te
  background:rgba(8,29,47,.94); color:#f3f8fc;
  box-shadow:0 8px 24px rgba(3,19,33,.18);
  backdrop-filter:blur(14px) saturate(125%); -webkit-backdrop-filter:blur(14px) saturate(125%);
- opacity:1;
+ opacity:.24;
+ transition:opacity .45s ease;
 }
+.section-navigator.is-visible { opacity:.92; }
+.section-navigator:hover,.section-navigator:focus-within { opacity:1; }
 .section-navigator a {
  display:grid; width:38px; height:38px; place-items:center;
  border:1px solid transparent; border-radius:50%; color:#eaf3fb; text-decoration:none;
@@ -718,7 +721,7 @@ a:focus-visible,button:focus-visible,input:focus-visible,select:focus-visible,te
  .section-navigator svg { width:17px; height:17px; }
 }
 @media (prefers-reduced-motion:reduce) {
- .section-navigator a { transition:none !important; }
+ .section-navigator,.section-navigator a { transition:none !important; }
 }
 
 
