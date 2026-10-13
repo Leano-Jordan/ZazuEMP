@@ -161,9 +161,8 @@ Audit record: docs/DIRECTOR_DEEP_AUDIT_2026-10-08.md.
 
 ## Landing-page reliability and first-impression refinement — 2026-10-13
 
-- Replaced unreliable remote Wikimedia image URLs with six original, locally served SVG illustrations representing South African event hosting, weddings, community events, live performance/AV, cultural gatherings, and event planning.
-- Updated deployment audit to block remote image dependencies and verify all six SVGs are present in the built Pages artifact.
-- Rewrote the hero headline to communicate the product outcome immediately: "Keep every event job organised and on track." The hero copy now names enquiries, quotes, suppliers, schedules and job costs directly.
-- Replaced "Less chasing" with explicit early-access and product-demo calls to action; removed stale remote social image metadata and external image-host privacy disclosure.
-- Published local illustration attribution and CC BY 4.0 reuse terms.
-- Remaining acceptance: verify the latest GitHub Actions Pages deployment succeeds and inspect the live page at mobile and desktop breakpoints. Source edits alone do not prove deployment success.
+- The SVG illustration substitution was unauthorised and has been fully removed from the landing page, media credits, privacy notice, source notes, and deployment workflow.
+- Restored the six existing Wikimedia Commons photographic image references and responsive srcset variants, along with the required CSP host permission and original image-credit/privacy documentation.
+- Removed all six newly added illustration assets from the repository. No AI-generated artwork is approved for this page.
+- Kept the clearer hero headline and early-access/product-demo calls to action.
+- Remaining acceptance: diagnose why the original photos did not display on the live GitHub Pages deployment, verify the current Actions deployment, then inspect image loading on desktop and mobile. Restoring source references does not prove live image delivery.
