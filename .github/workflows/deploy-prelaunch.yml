@@ -38,6 +38,8 @@ jobs:
           test -s prelaunch/privacy.html
           test -s prelaunch/thanks.html
           test -s prelaunch/favicon.svg
+          test -s prelaunch/assets/hero.jpg
+          test -s prelaunch/assets/sound.jpg
           if grep -RInE 'AKIA[0-9A-Z]{16}|gh[pousr]_[A-Za-z0-9_]{20,}|-----BEGIN (RSA |EC |OPENSSH )?PRIVATE KEY-----' prelaunch; then
             echo "Potential secret material found in prelaunch site."
             exit 1
@@ -207,10 +209,15 @@ jobs:
               raise SystemExit("CSP does not explicitly allow the intended enquiry form endpoint.")
           if "connect-src 'self' https://formsubmit.co" not in homepage:
               raise SystemExit("CSP does not explicitly allow the AJAX form connection.")
-          if "img-src 'self' https://images.pexels.com;" not in homepage:
-              raise SystemExit("CSP must allow same-origin images and the approved Pexels image CDN.")
-          if homepage.count("<img") < 5 or "images.pexels.com/photos/" not in homepage or "upload.wikimedia.org" in homepage:
-              raise SystemExit("Homepage must include the approved real-photo set and must not reintroduce Wikimedia hotlinks.")
+          if "img-src 'self';" not in homepage or "https://images.pexels.com" in homepage:
+              raise SystemExit("Homepage image CSP must remain same-origin; remote image hosts are not approved.")
+          if (homepage.count("<img") != 2 or
+                  'src="./assets/hero.jpg"' not in homepage or
+                  'src="./assets/sound.jpg"' not in homepage or
+                  "images.pexels.com" in homepage or "upload.wikimedia.org" in homepage):
+              raise SystemExit("Homepage must use exactly two bundled local photographs and no remote image hotlinks.")
+          if homepage.count('class="feature-ui-visual"') != 4:
+              raise SystemExit("Homepage must keep all four product-led SVG feature previews.")
           if "https://formsubmit.co/ajax/rosscorelabs@outlook.com" not in js:
               raise SystemExit("The enquiry form is missing the expected AJAX endpoint.")
           if 'id="form-status"' not in homepage or 'id="form-fallback"' not in homepage:
@@ -222,22 +229,28 @@ jobs:
           print(f"Pre-launch audit passed for {len(pages)} HTML pages: local links, unique IDs, form labels, image alt text, strict CSP, AJAX form response handling, direct-email fallback, and CSS integrity.")
           PY
 
-      - name: Assemble Pages artifact with approved Pexels photography
+      - name: Assemble Pages artifact with local photos and product UI previews
         shell: bash
         run: |
           set -euo pipefail
           rm -rf site
           mkdir -p site
           cp prelaunch/index.html prelaunch/styles.css prelaunch/script.js prelaunch/privacy.html prelaunch/thanks.html prelaunch/image-credits.html prelaunch/favicon.svg site/
-          if ! grep -q 'images.pexels.com/photos/' site/index.html || grep -q 'upload.wikimedia.org' site/index.html; then
-            echo "Homepage must use the approved Pexels photos, not removed Wikimedia hotlinks."
+          mkdir -p site/assets
+          cp -R prelaunch/assets/. site/assets/
+          if grep -q 'images.pexels.com\|upload.wikimedia.org' site/index.html || ! test -s site/assets/hero.jpg || ! test -s site/assets/sound.jpg; then
+            echo "Homepage must use the bundled local photos with no remote image hotlinks."
             exit 1
           fi
-          if ! grep -q "img-src 'self' https://images.pexels.com;" site/index.html; then
-            echo "Homepage CSP must permit the approved Pexels image CDN."
+          if ! grep -q "img-src 'self';" site/index.html; then
+            echo "Homepage CSP must keep images same-origin."
             exit 1
           fi
-          echo "Assembled Pages artifact with approved Pexels photography."
+          if [ "$(grep -o 'class="feature-ui-visual"' site/index.html | wc -l)" -ne 4 ]; then
+            echo "Homepage must keep all four product-led SVG feature previews."
+            exit 1
+          fi
+          echo "Assembled Pages artifact with local photos and product UI previews."
 
       - name: Configure GitHub Pages
         uses: actions/configure-pages@45bfe0192ca1faeb007ade9deae92b16b8254a0d # v6

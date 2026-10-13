@@ -1,29 +1,34 @@
-# Zazu EMP — Pre-launch photography sources
+# Zazu EMP — Pre-launch visual sources
 
-**Current host:** Pexels image CDN (`images.pexels.com`)  
-**Attribution page:** `prelaunch/image-credits.html`  
-**Role:** illustrative photography for the Zazu EMP pre-launch site
+**Current deployment:** static site under `prelaunch/` on GitHub Pages  
+**Photo policy:** two bundled Pexels photographs; four hand-authored SVG product UI previews  
+**Public credits:** `prelaunch/image-credits.html`
 
-The current page uses real Pexels photographs, not generated artwork. The public media credits page links to source pages and the Pexels licence. The photos are illustrative only and do not imply customer use or endorsement.
+## Bundled photographs
 
-## Source register
-
-| Placement | Subject | Creator/source | Pexels source page |
+| Placement | Local asset | Source record | Use |
 |---|---|---|---|
-| Hero and feature: get ready | Community gathering in South Africa | Blinkiing Studio | https://www.pexels.com/photo/crowd-on-a-bazaar-in-south-africa-10807180/ |
-| Feature: plan the job | People reviewing event-planning material | RDNE Stock project | https://www.pexels.com/photo/two-people-looking-at-an-event-planner-paper-7648033/ |
-| Feature: stay in step | Live music and audience | Josh Sorenson | https://www.pexels.com/photo/people-gathering-at-concert-894566/ |
-| Feature: costs and audience | Business meeting / conference attendees | Matheus Bertelli | https://www.pexels.com/photo/team-of-workers-in-meeting-15141493/ |
+| Hero | `prelaunch/assets/hero.jpg` | Pexels image source ID 14703692; original download URL recorded in `.github/workflows/vendor-landing-media.yml` | One contextual event photograph |
+| Audience section | `prelaunch/assets/sound.jpg` | Pexels image source ID 36856348; original download URL recorded in `.github/workflows/vendor-landing-media.yml` | One contextual event sound/stage photograph |
 
-Four source photographs are reused across six page placements. Requests are made to HTTPS `images.pexels.com/photos/...` URLs. GitHub Pages does not bundle these remote images; availability depends on the image host and visitor connection.
+The images are stored in the repository and served from the same origin as the pre-launch page. The homepage CSP uses `img-src 'self'`; no third-party image CDN is required for the hero or audience sections. The assets reuse the already-vendored image blobs in `public/images/landing/stock/`, rather than fetching the photos at page-load time.
 
-## Reuse and presentation safeguards
+Pexels images can be used for commercial projects subject to the [Pexels licence](https://www.pexels.com/license/) and separate rights considerations. Preserve the explicit no-endorsement rule. Bundling a photograph is not evidence that Zazu owns the photograph.
 
-- The public `prelaunch/image-credits.html` page links to Pexels' licence: https://www.pexels.com/license/.
-- Photography is illustrative only; do not claim pictured people are Zazu customers, partners or endorsers.
-- Do not replace these photographs with generated illustrations. Keep the page photo-led until approved product screenshots are available.
-- The CSP and deploy audit allow remote images only from `images.pexels.com` beneath `/photos/`. Review policy and workflow if the host changes.
-- Do not hotlink extra photos merely to fill whitespace. Choose imagery that supports the section's message and remains relevant to South African event-related businesses.
-- Recheck current Pexels terms and source pages before reuse, cropping, modification or redistribution.
+## Product-led illustrations
 
-The image CDN is a runtime dependency. If an image fails on the published site, verify its exact URL in the browser/network panel before changing assets or provider.
+The four feature panels in `prelaunch/index.html` are hand-authored SVG interface previews:
+- enquiry and quotation pipeline;
+- purchasing and job-readiness checklist;
+- schedule and resource plan;
+- job-cost breakdown with explicitly labelled illustrative values.
+
+These are product illustrations, not screenshots from a live customer account, generated artwork, verified customer records or performance claims. Keep the relevant disclosure visible whenever sample financial or workflow values are shown.
+
+## Maintenance rules
+
+- The landing page must not add a remote photo host merely to populate whitespace.
+- Keep all four feature mockups accessible via an SVG role and descriptive label.
+- Keep photo credits and licence information on the public image-credits page, not in a long promotional disclaimer between feature sections.
+- If a future page adds real Zazu screenshots, use owner-approved captures, remove customer/personal data, optimise the files, self-host the assets and label unreleased functionality accurately.
+- The deploy workflow validates local references, content policy, responsive-centering guardrails and the presence of exactly two local photographs plus four SVG previews.
