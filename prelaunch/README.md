@@ -1,56 +1,43 @@
 # Zazu EMP pre-launch site
 
-This directory is a standalone static marketing site intended for GitHub Pages. It is deliberately separate from the Laravel/Vite application so marketing deployment does not replace the product runtime or PWA assets.
+This directory is a standalone static marketing site for GitHub Pages, separate from the Laravel/Vite application.
 
 ## Contents
 
 - `index.html` — landing page and early-access/demo enquiry form
-- `styles.css` — responsive styles, using Zazu's existing blue/navy/mint palette
-- `script.js` — small progressive-enhancement interactions
+- `styles.css` — responsive layout, visual system and motion
+- `script.js` — section navigation, scroll progress, scroll reveals and form interaction
 - `privacy.html` — enquiry privacy notice
 - `thanks.html` — form redirect destination
-- `image-credits.html` — public photo attribution and licence register
-- `favicon.svg` — simple site-specific mark
+- `image-credits.html` — public photograph sources and licence notes
+- `favicon.svg` — site mark
 
-The hero uses a clearly labelled conceptual CSS dashboard illustration, not a screenshot of a live customer account. The photography shows a selection of South African event, performance and community settings rather than catering displays alone. Six openly licensed photographs are loaded from Wikimedia Commons in responsive width variants using srcset and sizes. Their authors, file pages and CC BY-SA 4.0 licences are credited in the public image-credits.html page and recorded in docs/ZAZU_LANDING_MEDIA_SOURCES.md. This is an intentional, limited exception to the previous no-remote-image policy: browsers request image variants from upload.wikimedia.org; the site still has no remote font dependency, and the workflow permits no other remote image host.
+The hero contains an explicitly labelled conceptual interface preview, not a screenshot of a live customer account. Its example work and statuses must not be represented as real customer records or proof that every depicted workflow is released. The page uses real photographs served from Pexels' image CDN. Source pages and licence information are listed on `image-credits.html`; four distinct source photographs are reused across five placements. Pexels images are remote dependencies, not bundled assets, so they require access to `images.pexels.com`. The homepage Content Security Policy and deploy audit permit that host and no other external image host. The site has no remote font dependency and does not use generated artwork.
 
 ## Publish
 
-The workflow at `.github/workflows/deploy-prelaunch.yml` deploys only this directory to GitHub Pages when files under `prelaunch/` or the workflow itself change on `main`.
+The workflow at `.github/workflows/deploy-prelaunch.yml` deploys only this directory to GitHub Pages when files under `prelaunch/` or the workflow change on `main`.
 
-1. In repository **Settings → Pages**, set the build/deployment source to **GitHub Actions** if it is not already selected.
+1. In repository **Settings → Pages**, set the deployment source to **GitHub Actions** if it is not already selected.
 2. Ensure GitHub Actions are permitted for this repository.
 3. Check the **Actions → Deploy Zazu pre-launch site** run.
-4. The expected project-page URL is `https://leano-jordan.github.io/ZazuEMP/`; confirm the actual URL in the workflow deployment output and repository Pages settings.
+4. Confirm the published URL from deployment output and repository Pages settings. The expected URL is `https://leano-jordan.github.io/ZazuEMP/`.
 
 ## Lead capture — activation required
 
-The form currently posts to FormSubmit and is addressed to `rosscorelabs@outlook.com`. FormSubmit requires recipient verification/activation before first use. This has **not** been verified by this repository change.
+The form posts to FormSubmit and is addressed to `rosscorelabs@outlook.com`. Recipient verification/activation and end-to-end delivery have not been proven by source-level checks. Before public promotion, submit a real test from desktop and Android, verify delivery and spam handling, check required-field/consent validation, confirm the redirect and review the provider's current privacy/retention terms. GitHub Pages does not store submissions. Never put private API keys in this static site.
 
-Before public promotion:
-1. Confirm the recipient mailbox is correct and controlled by the site owner.
-2. Complete FormSubmit's recipient activation using a real test submission.
-3. Verify delivery, spam handling, the confirmation redirect and required-field validation on desktop and Android.
-4. Confirm the service's current privacy/retention terms and ensure the privacy notice matches the intended operation.
-5. If a more controlled lead pipeline is required, replace the form service with a dedicated backend/CRM endpoint; do not put API keys in this static site.
+## Responsive, accessibility and visual checks
 
-GitHub Pages itself does not store form submissions. A successful page deployment is not proof that email delivery is active.
+Review desktop, tablet and phone widths (including 320–390px and the 391–700px breakpoint), keyboard focus, reduced-motion preferences, page centring, horizontal overflow, local links, form state and image loading. Fix overflow at its source; root-level clipping is only a safety boundary, not a substitute for correct sizing. Keep one owner for each responsive rule rather than appending blanket override blocks.
 
-## Local checks
+Motion should support the scan path: a restrained hero sequence, finite preview entrances, hover feedback and scroll reveals. Avoid constant floating/shimmering decoration, huge stagger delays, autoplay content or movement that competes with the message. Respect `prefers-reduced-motion`.
 
-The page is plain HTML/CSS/JavaScript and has no build step. For a source-level local preview, serve the repository root and open `/prelaunch/` (the source HTML references the bundled imagery in `public/`; the Pages workflow rewrites those paths into the deployment artifact). Then check:
-- mobile widths (320–390 px) and desktop layout;
-- nav, CTA intent selection, keyboard navigation and reduced-motion preference;
-- required fields and privacy consent;
-- the actual external form delivery and redirect, once the recipient is activated.
+Photographs illustrate types of occasions Zazu is designed to support. They do not imply pictured people, event organisers or venues use or endorse Zazu. Preserve source notes and review relevant terms before reuse. Prefer actual, owner-approved Zazu screenshots when available; keep them self-hosted, compressed and free of customer/personal data.
 
+## Security and content policy
 
-## Visual policy and motion
-
-The software preview is illustrative only. Do not present its sample counts, event names or status labels as live customer data or as proof that every shown workflow is released. Before wider promotion, replace or supplement it with owner-approved screenshots from the actual Zazu product and an approved social-sharing image. Keep genuine UI screenshots self-hosted, compressed, cropped for the target viewport, and free of customer/personal data. Do not reintroduce unrelated stock photographs merely to fill space.
-
-The page uses restrained interface animation, an IntersectionObserver-based reveal enhancement with no-JavaScript-safe defaults, and respects reduced-motion preferences. The stylesheet is maintained as one consolidated source. Inline styles are prohibited by the page's Content Security Policy; all visual styling must live in styles.css. The product preview is an honest conceptual UI illustration. Photography is illustrative only and must not imply that pictured people or organisations use or endorse Zazu. Any future replacement must have a verified licence and public attribution; Zazu-owned imagery can be substituted later without changing the responsive image pattern.
-
-## Local checks
-
-In addition to desktop/mobile visual review, verify that the six image elements use responsive srcset/sizes, that every image request targets only upload.wikimedia.org, that the public credits page is deployed, that local links/assets resolve, and that Content Security Policy does not block the stylesheet, script, favicon or enquiry form.
+- Keep the strict Content Security Policy and CSS/JavaScript external to the HTML.
+- Do not add inline style attributes or inline scripts.
+- Do not introduce fonts, analytics or image hosts outside the documented allowlist without reviewing privacy and deployment checks.
+- Do not include credentials, personal customer data, fake testimonials, invented social proof or unverified availability claims.
