@@ -715,9 +715,10 @@ a:focus-visible,button:focus-visible,input:focus-visible,select:focus-visible,te
 .section-nav-current { grid-column:4; grid-row:1; display:block; max-width:112px; padding:0 0 0 2px; overflow:hidden; color:#d5e3ee; font-size:10px; font-weight:700; letter-spacing:.015em; line-height:1.25; text-align:left; text-overflow:ellipsis; white-space:nowrap; }
 .section-nav-next-label { display:none; }
 @media (hover:none) {
- .section-navigator { opacity:.72; }
+ /* Touch users should always have a clearly visible navigation control. */
+ .section-navigator { opacity:1; transform:none; }
  .section-navigator.is-visible,
- .section-navigator:focus-within { opacity:1; }
+ .section-navigator:focus-within { opacity:1; transform:none; }
 }
 @media (max-width:700px) {
  .section-navigator { display:grid; right:10px; bottom:calc(10px + env(safe-area-inset-bottom,0px)); grid-template-columns:36px 1px 36px minmax(58px,auto); grid-template-rows:36px; gap:0 4px; padding:4px 7px 4px 4px; }
