@@ -216,21 +216,20 @@ jobs:
           mkdir -p site/images
           cp prelaunch/index.html prelaunch/styles.css prelaunch/script.js prelaunch/privacy.html prelaunch/thanks.html prelaunch/image-credits.html prelaunch/favicon.svg site/
           python3 - <<'PY'
-          from html.parser import HTMLParser
           from pathlib import Path
           from urllib.request import Request, urlopen
           import re
 
           index = Path("site/index.html")
           content = index.read_text(encoding="utf-8")
-          image_tags = list(re.finditer(r"<img\\b[^>]*>", content))
+          image_tags = list(re.finditer(r"<img\b[^>]*>", content))
           if len(image_tags) != 6:
               raise SystemExit(f"Expected six photographic image elements, found {len(image_tags)}.")
 
           updated = content
           for number, match in reversed(list(enumerate(image_tags, start=1))):
               tag = match.group(0)
-              source_match = re.search(r'\\bsrc="(https://upload\\.wikimedia\\.org/wikipedia/commons/thumb/[^"]+)"', tag)
+              source_match = re.search(r'\bsrc="(https://upload\.wikimedia\.org/wikipedia/commons/thumb/[^"]+)"', tag)
               if not source_match:
                   raise SystemExit(f"Photo {number} does not use the approved original Commons source.")
               source_url = source_match.group(1)
@@ -245,9 +244,9 @@ jobs:
                   raise SystemExit(f"Photo {number} returned unexpected content ({content_type}, {len(image_bytes)} bytes).")
               local_name = f"event-photo-{number}.jpg"
               Path("site/images", local_name).write_bytes(image_bytes)
-              local_tag = re.sub(r'\\bsrc="[^"]+"', f'src="./images/{local_name}"', tag, count=1)
-              local_tag = re.sub(r'\\s+srcset="[^"]*"', "", local_tag, count=1)
-              local_tag = re.sub(r'\\s+sizes="[^"]*"', "", local_tag, count=1)
+              local_tag = re.sub(r'\bsrc="[^"]+"', f'src="./images/{local_name}"', tag, count=1)
+              local_tag = re.sub(r'\s+srcset="[^"]*"', "", local_tag, count=1)
+              local_tag = re.sub(r'\s+sizes="[^"]*"', "", local_tag, count=1)
               updated = updated[:match.start()] + local_tag + updated[match.end():]
               print(f"Self-hosted photo {number}: {local_name} ({len(image_bytes)} bytes)")
 
