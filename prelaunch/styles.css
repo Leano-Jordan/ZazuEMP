@@ -23,7 +23,9 @@
   -webkit-font-smoothing: antialiased;
 }
 * { box-sizing: border-box; }
-html { scroll-behavior: smooth; scroll-padding-top: 104px; }
+/* Keep decorative elements and the floating section navigator from widening the page. */
+html { width: 100%; max-width: 100%; overflow-x: clip; scroll-behavior: smooth; scroll-padding-top: 104px; }
+body { width: 100%; max-width: 100%; overflow-x: clip; }
 main section[id] h1,
 main section[id] h2,
 main section[id] h3 { scroll-margin-top: 104px; }
@@ -31,7 +33,8 @@ body { margin: 0; background: #fff; color: var(--ink); font-size: 16px; line-hei
 a { color: inherit; }
 button, input, select, textarea { font: inherit; }
 img { max-width: 100%; }
-.section-wrap { width: min(1160px, calc(100% - 48px)); margin-inline: auto; }
+.section-wrap { width: min(1160px, calc(100% - 48px)); max-width: 100%; margin-inline: auto; }
+main, header, footer { max-width: 100%; }
 .skip-link { position: absolute; top: -70px; left: 14px; z-index: 20; padding: 12px 15px; background: #fff; color: var(--navy); border: 2px solid var(--blue); border-radius: 8px; }
 .skip-link:focus { top: 12px; }
 .site-header { width: min(1280px, calc(100% - 48px)); min-height: 82px; margin: auto; display: flex; align-items: center; justify-content: space-between; gap: 24px; }
