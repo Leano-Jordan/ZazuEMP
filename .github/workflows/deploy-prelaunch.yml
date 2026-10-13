@@ -188,7 +188,7 @@ jobs:
               raise SystemExit("Homepage images must be self-hosted with no remote image dependency.")
           if homepage.count("<img ") != 6:
               raise SystemExit("Expected six self-hosted South African event illustrations.")
-          for image in re.findall(r'<img\\b[^>]*\\bsrc="([^"]+)"', homepage):
+          for image in re.findall(r'<img\b[^>]*\bsrc="([^"]+)"', homepage):
               target = (root / image.removeprefix("./")).resolve()
               if not target.is_file() or target.suffix.lower() != ".svg":
                   raise SystemExit(f"Homepage illustration is missing or not SVG: {image!r}.")
@@ -238,7 +238,7 @@ jobs:
           print(f"Assembled Pages artifact with {len(image_paths)} self-hosted event illustrations.")
           if not Path("site/image-credits.html").is_file():
               raise SystemExit("The public attribution/licence page is missing from the Pages artifact.")
-          print(f"Assembled standalone Pages site with {len(urls)} Wikimedia Commons image variants and public attribution.")
+
           PY
 
       - name: Configure GitHub Pages
