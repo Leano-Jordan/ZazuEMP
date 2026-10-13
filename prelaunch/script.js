@@ -16,6 +16,9 @@
   const sectionNavigator = document.querySelector("[data-section-navigator]");
   const sectionNext = document.querySelector("[data-section-next]");
   const sectionCurrent = document.querySelector("[data-section-current]");
+  const decodeHash = (value) => {
+    try { return decodeURIComponent(value); } catch { return value; }
+  };
   const sections = Array.from(document.querySelectorAll("main section[id]"));
   const sectionNames = new Map(sections.map((section) => {
     const knownNames = {
@@ -89,7 +92,7 @@
     updateSectionNavigator(candidate.id);
   };
   if (sections.length && sectionNavigator) {
-    const hashTarget = decodeURIComponent(window.location.hash.slice(1));
+    const hashTarget = decodeHash(window.location.hash.slice(1));
     updateSectionNavigator(sections.some((section) => section.id === hashTarget) ? hashTarget : activeSectionId);
     if (sectionNext) {
       sectionNext.addEventListener("click", (event) => {
@@ -151,7 +154,7 @@
     sectionNavigator.addEventListener("focusout", showNavigator);
     window.addEventListener("hashchange", () => {
       clearNavigationTarget();
-      const id = decodeURIComponent(window.location.hash.slice(1));
+      const id = decodeHash(window.location.hash.slice(1));
       if (sections.some((section) => section.id === id)) updateSectionNavigator(id);
       window.setTimeout(detectActiveSection, 80);
     });
