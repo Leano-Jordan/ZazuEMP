@@ -173,15 +173,8 @@ jobs:
               for kind, reference in audit.references:
                   parsed = urlsplit(reference)
                   if parsed.scheme or parsed.netloc:
-                      allowed_pexels_image = (
-                          page.name == "index.html"
-                          and kind == "src"
-                          and parsed.scheme == "https"
-                          and parsed.netloc == "images.pexels.com"
-                          and parsed.path.startswith("/photos/")
-                      )
-                      if kind == "src" and not allowed_pexels_image:
-                          raise SystemExit(f"{page}: unapproved remote resource dependency: {reference!r}.")
+                      if kind == "src":
+                          raise SystemExit(f"{page}: remote resource dependencies are blocked; bundle assets locally: {reference!r}.")
                       continue
                   if not parsed.path:
                       target_path = root / page.name
@@ -193,14 +186,8 @@ jobs:
                       target_page = parsed_pages.get(target_path.name)
                       if target_page is None or parsed.fragment not in target_page[1].ids:
                           raise SystemExit(f"{page}: missing fragment #{parsed.fragment} in {target_path.name}.")
-              for srcset in audit.srcsets:
-                  for candidate in srcset.split(","):
-                      image_url = candidate.strip().split()[0]
-                      parsed_image = urlsplit(image_url)
-                      if (parsed_image.scheme != "https" or
-                              parsed_image.netloc != "images.pexels.com" or
-                              not parsed_image.path.startswith("/photos/")):
-                          raise SystemExit(f"{page}: srcset contains an unapproved image host/path: {image_url!r}.")
+              if audit.srcsets:
+                  raise SystemExit(f"{page}: srcset is not used on the pre-launch site; use verified same-origin assets instead.")
 
           homepage = parsed_pages["index.html"][0]
           if 'rel="canonical"' not in homepage or 'property="og:url"' not in homepage:
@@ -209,7 +196,7 @@ jobs:
               raise SystemExit("CSP does not explicitly allow the intended enquiry form endpoint.")
           if "connect-src 'self' https://formsubmit.co" not in homepage:
               raise SystemExit("CSP does not explicitly allow the AJAX form connection.")
-          if "img-src 'self';" not in homepage or "https://images.pexels.com" in homepage:
+          if "img-src 'self';" not in homepage or "images.pexels.com" in homepage:
               raise SystemExit("Homepage image CSP must remain same-origin; remote image hosts are not approved.")
           if (homepage.count("<img") != 2 or
                   'src="./assets/hero.jpg"' not in homepage or
@@ -218,6 +205,13 @@ jobs:
               raise SystemExit("Homepage must use exactly two bundled local photographs and no remote image hotlinks.")
           if homepage.count('class="feature-ui-visual"') != 4:
               raise SystemExit("Homepage must keep all four product-led SVG feature previews.")
+          if 'class="section-navigator"' not in homepage or 'class="scroll-progress"' not in homepage:
+              raise SystemExit("Homepage must keep both scroll-progress and floating section navigation controls.")
+          css = (root / "styles.css").read_text(encoding="utf-8")
+          if ".section-navigator { display:none" in css or ".section-navigator { display: none" in css:
+              raise SystemExit("Floating section navigation must not be disabled on small screens.")
+          if ".feature-card:hover .feature-media img" in css or ".feature-media > span" in css:
+              raise SystemExit("Obsolete stock-photo feature styles remain after migration to SVG UI previews.")
           if "https://formsubmit.co/ajax/rosscorelabs@outlook.com" not in js:
               raise SystemExit("The enquiry form is missing the expected AJAX endpoint.")
           if 'id="form-status"' not in homepage or 'id="form-fallback"' not in homepage:
