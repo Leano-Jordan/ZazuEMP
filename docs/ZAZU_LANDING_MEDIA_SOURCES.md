@@ -10,12 +10,12 @@ The current page uses real Pexels photographs, not generated artwork. The public
 
 | Placement | Subject | Creator/source | Pexels source page |
 |---|---|---|---|
-| Hero and audience | Community gathering in South Africa | Blinkiing Studio | https://www.pexels.com/photo/crowd-on-a-bazaar-in-south-africa-10807180/ |
+| Hero and feature: get ready | Community gathering in South Africa | Blinkiing Studio | https://www.pexels.com/photo/crowd-on-a-bazaar-in-south-africa-10807180/ |
 | Feature: plan the job | People reviewing event-planning material | RDNE Stock project | https://www.pexels.com/photo/two-people-looking-at-an-event-planner-paper-7648033/ |
 | Feature: stay in step | Live music and audience | Josh Sorenson | https://www.pexels.com/photo/people-gathering-at-concert-894566/ |
-| Feature: costs and visibility | Business meeting / conference attendees | Matheus Bertelli | https://www.pexels.com/photo/team-of-workers-in-meeting-15141493/ |
+| Feature: costs and audience | Business meeting / conference attendees | Matheus Bertelli | https://www.pexels.com/photo/team-of-workers-in-meeting-15141493/ |
 
-Four source photographs are reused across five page placements. Requests are made to HTTPS `images.pexels.com/photos/...` URLs. GitHub Pages does not bundle these remote images; availability depends on the image host and visitor connection.
+Four source photographs are reused across six page placements. Requests are made to HTTPS `images.pexels.com/photos/...` URLs. GitHub Pages does not bundle these remote images; availability depends on the image host and visitor connection.
 
 ## Reuse and presentation safeguards
 
