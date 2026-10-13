@@ -45,6 +45,9 @@ jobs:
             exit 1
           fi
 
+      - name: Check JavaScript syntax
+        run: node --check prelaunch/script.js
+
       - name: Audit page assets, links, form labels, and content policy
         shell: bash
         run: |
@@ -216,6 +219,24 @@ jobs:
               raise SystemExit("The enquiry form is missing the expected AJAX endpoint.")
           if 'id="form-status"' not in homepage or 'id="form-fallback"' not in homepage:
               raise SystemExit("The enquiry form must expose accessible status and direct-email fallback regions.")
+          if 'property="og:image"' not in homepage or 'name="twitter:card" content="summary_large_image"' not in homepage:
+              raise SystemExit("Social previews must use the bundled homepage photograph and a large image card.")
+          if "nearNavigator" not in js or "Math.abs(event.clientY - window.innerHeight / 2) < 130" not in js:
+              raise SystemExit("The floating navigator must reveal when the pointer approaches its actual vertical position.")
+          if 'if (fallback) fallback.hidden = true;' not in js:
+              raise SystemExit("A successful form submission must not display the failure-only email fallback.")
+          if "new AbortController()" not in js or "}, 15000);" not in js or "requestTimedOut" not in js:
+              raise SystemExit("The AJAX enquiry form must have a bounded request timeout and clear failure feedback.")
+          if "opacity:.24;" not in css or ".section-navigator.is-visible { opacity:.92; }" not in css:
+              raise SystemExit("The floating navigator must fade while idle and become visible during interaction.")
+          stylesheet_versions = {
+              re.search(r'styles\\.css\\?v=([^"]+)', content).group(1)
+              for content, _ in parsed_pages.values()
+              if re.search(r'styles\\.css\\?v=([^"]+)', content)
+          }
+          if len(stylesheet_versions) != 1 or any("styles.css?v=" not in content for content, _ in parsed_pages.values()):
+              raise SystemExit("Every pre-launch page must use the same versioned stylesheet URL.")
+
           if 'String(result.success) !== "true"' not in js:
               raise SystemExit("The form must explicitly reject FormSubmit responses where success is false.")
           if "unsafe-inline" in "".join(item[0] for item in parsed_pages.values()):
