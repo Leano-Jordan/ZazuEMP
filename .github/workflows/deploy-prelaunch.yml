@@ -263,7 +263,7 @@ jobs:
               raise SystemExit("The public photo attribution/licence page is missing.")
           print("Assembled Pages artifact with five locally hosted photographs and no third-party image requests.")
           PY
-          test "$(find site/images -maxdepth 1 -type f -name 'event-photo-*.jpg' | wc -l)" -eq 6
+          test "$(find site/images -maxdepth 1 -type f -name 'event-photo-*.jpg' | wc -l)" -eq 5
 
       - name: Configure GitHub Pages
         uses: actions/configure-pages@45bfe0192ca1faeb007ade9deae92b16b8254a0d # v6
