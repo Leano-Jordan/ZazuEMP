@@ -61,6 +61,22 @@ jobs:
               raise SystemExit("No HTML pages were found.")
           if css.count("{") != css.count("}"):
               raise SystemExit("CSS braces are unbalanced.")
+
+          # Protect the exact responsive defects found in the pre-launch visual review.
+          if "Mobile quality pass:" in css:
+              raise SystemExit("Do not append another mobile override layer; update the existing breakpoint owner.")
+          if "width:min(1360px,calc(100% - 80px));" not in css:
+              raise SystemExit("The hero must stay aligned to the centred content grid.")
+          if re.search(r"\.hero-photo-pin\s*\{[^}]*right:\s*-\d+px", css) or re.search(r"\.float-note\s*\{[^}]*left:\s*-\d+px", css):
+              raise SystemExit("Hero photo/callout must stay inside the viewport content bounds.")
+          if re.search(r"zazu-float|atmosphere-drift|logo-sheen", css):
+              raise SystemExit("Perpetual decorative motion is disallowed; use finite, purposeful motion.")
+          if "@keyframes photo-enter" not in css or "@keyframes preview-note-enter" not in css:
+              raise SystemExit("The purposeful hero entrance motion has been removed.")
+          if "grid-template-columns:minmax(0,1fr); align-items:start; gap:18px; padding-block:29px;" not in css:
+              raise SystemExit("The mobile footer must collapse into one bounded column.")
+          if "prefers-reduced-motion: reduce" not in css or ".hero-photo-pin, .metric, .work-row" not in css:
+              raise SystemExit("Reduced-motion support must cover the preview entrance animations.")
           if re.search(r"""url\(\s*['"]?https?://""", css, re.IGNORECASE) or re.search(r"""@import\s+['"]?https?://""", css, re.IGNORECASE):
               raise SystemExit("CSS must not depend on remote assets.")
 
