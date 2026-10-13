@@ -191,10 +191,10 @@ jobs:
               raise SystemExit("CSP does not explicitly allow the intended enquiry form endpoint.")
           if "connect-src 'self' https://formsubmit.co" not in homepage:
               raise SystemExit("CSP does not explicitly allow the AJAX form connection.")
-          if "img-src 'self';" not in homepage:
-              raise SystemExit("CSP must restrict images to same-origin assets.")
-          if "<img" in homepage or "srcset=" in homepage or "upload.wikimedia.org" in homepage:
-              raise SystemExit("Pre-launch page must not contain the removed external photographs.")
+          if "img-src 'self' https://images.pexels.com;" not in homepage:
+              raise SystemExit("CSP must allow same-origin images and the approved Pexels image CDN.")
+          if homepage.count("<img") < 5 or "images.pexels.com/photos/" not in homepage or "upload.wikimedia.org" in homepage:
+              raise SystemExit("Homepage must include the approved real-photo set and must not reintroduce Wikimedia hotlinks.")
           if "https://formsubmit.co/ajax/rosscorelabs@outlook.com" not in js:
               raise SystemExit("The enquiry form is missing the expected AJAX endpoint.")
           if 'id="form-status"' not in homepage or 'id="form-fallback"' not in homepage:
