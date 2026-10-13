@@ -208,29 +208,63 @@ jobs:
           print(f"Pre-launch audit passed for {len(pages)} HTML pages: local links, unique IDs, form labels, image alt text, strict CSP, AJAX form response handling, direct-email fallback, and CSS integrity.")
           PY
 
-      - name: Assemble static Pages artifact with responsive Commons imagery
+      - name: Assemble Pages artifact and self-host the six licensed photographs
         shell: bash
         run: |
           set -euo pipefail
           rm -rf site
-          mkdir -p site
+          mkdir -p site/images
           cp prelaunch/index.html prelaunch/styles.css prelaunch/script.js prelaunch/privacy.html prelaunch/thanks.html prelaunch/image-credits.html prelaunch/favicon.svg site/
           python3 - <<'PY'
+          from html.parser import HTMLParser
           from pathlib import Path
+          from urllib.request import Request, urlopen
           import re
+
           index = Path("site/index.html")
           content = index.read_text(encoding="utf-8")
-          if "../public/images/landing/stock/" in content:
-              raise SystemExit("A removed stock-image path remains in the deployed homepage.")
-          if content.count("srcset=") != 6 or content.count("sizes=") != 6:
-              raise SystemExit("Expected six responsive Wikimedia Commons image references.")
-          urls = re.findall(r'https://upload\.wikimedia\.org/wikipedia/commons/thumb/[^\s"]+', content)
-          if len(urls) < 24:
-              raise SystemExit(f"Expected at least 24 width-specific Commons image variants; found {len(urls)}.")
+          image_tags = list(re.finditer(r"<img\\b[^>]*>", content))
+          if len(image_tags) != 6:
+              raise SystemExit(f"Expected six photographic image elements, found {len(image_tags)}.")
+
+          updated = content
+          for number, match in reversed(list(enumerate(image_tags, start=1))):
+              tag = match.group(0)
+              source_match = re.search(r'\\bsrc="(https://upload\\.wikimedia\\.org/wikipedia/commons/thumb/[^"]+)"', tag)
+              if not source_match:
+                  raise SystemExit(f"Photo {number} does not use the approved original Commons source.")
+              source_url = source_match.group(1)
+              request = Request(source_url, headers={"User-Agent": "RosscoreLabs-ZazuPrelaunch/1.0 (licensed-image-mirroring)"})
+              try:
+                  with urlopen(request, timeout=30) as response:
+                      image_bytes = response.read()
+                      content_type = response.headers.get("Content-Type", "").split(";")[0].lower()
+              except Exception as exc:
+                  raise SystemExit(f"Could not fetch original photo {number} from Wikimedia Commons: {exc}") from exc
+              if content_type not in ("image/jpeg", "image/jpg") or len(image_bytes) < 2048:
+                  raise SystemExit(f"Photo {number} returned unexpected content ({content_type}, {len(image_bytes)} bytes).")
+              local_name = f"event-photo-{number}.jpg"
+              Path("site/images", local_name).write_bytes(image_bytes)
+              local_tag = re.sub(r'\\bsrc="[^"]+"', f'src="./images/{local_name}"', tag, count=1)
+              local_tag = re.sub(r'\\s+srcset="[^"]*"', "", local_tag, count=1)
+              local_tag = re.sub(r'\\s+sizes="[^"]*"', "", local_tag, count=1)
+              updated = updated[:match.start()] + local_tag + updated[match.end():]
+              print(f"Self-hosted photo {number}: {local_name} ({len(image_bytes)} bytes)")
+
+          updated = updated.replace(
+              "img-src 'self' https://upload.wikimedia.org;",
+              "img-src 'self';"
+          )
+          if "https://upload.wikimedia.org" in updated:
+              raise SystemExit("Deployed homepage still contains a runtime Wikimedia dependency.")
+          if updated.count('src="./images/event-photo-') != 6:
+              raise SystemExit("Expected six same-origin deployed photo references.")
+          index.write_text(updated, encoding="utf-8")
           if not Path("site/image-credits.html").is_file():
-              raise SystemExit("The public attribution/licence page is missing from the Pages artifact.")
-          print(f"Assembled standalone Pages site with {len(urls)} Wikimedia Commons image variants and public attribution.")
+              raise SystemExit("The public photo attribution/licence page is missing.")
+          print("Assembled Pages artifact with six locally hosted photographs and no third-party image requests.")
           PY
+          test "$(find site/images -maxdepth 1 -type f -name 'event-photo-*.jpg' | wc -l)" -eq 6
 
       - name: Configure GitHub Pages
         uses: actions/configure-pages@45bfe0192ca1faeb007ade9deae92b16b8254a0d # v6
