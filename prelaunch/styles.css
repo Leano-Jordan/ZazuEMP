@@ -742,3 +742,10 @@ a:focus-visible,button:focus-visible,input:focus-visible,select:focus-visible,te
   .image-credit-list { grid-template-columns: minmax(0, 1fr); gap: 11px; }
   .image-credit-list article { padding: 17px; }
 }
+/* Keep the three dashboard metric values compact and on one line. */
+.metric strong {
+  font-size: clamp(10px, 1vw, 14px);
+  letter-spacing: -.04em;
+  white-space: nowrap;
+  overflow-wrap: normal;
+}
