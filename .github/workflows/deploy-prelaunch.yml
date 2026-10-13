@@ -155,14 +155,14 @@ jobs:
               for kind, reference in audit.references:
                   parsed = urlsplit(reference)
                   if parsed.scheme or parsed.netloc:
-                      allowed_wikimedia_image = (
+                      allowed_pexels_image = (
                           page.name == "index.html"
                           and kind == "src"
                           and parsed.scheme == "https"
-                          and parsed.netloc == "upload.wikimedia.org"
-                          and parsed.path.startswith("/wikipedia/commons/thumb/")
+                          and parsed.netloc == "images.pexels.com"
+                          and parsed.path.startswith("/photos/")
                       )
-                      if kind == "src" and not allowed_wikimedia_image:
+                      if kind == "src" and not allowed_pexels_image:
                           raise SystemExit(f"{page}: unapproved remote resource dependency: {reference!r}.")
                       continue
                   if not parsed.path:
@@ -180,8 +180,8 @@ jobs:
                       image_url = candidate.strip().split()[0]
                       parsed_image = urlsplit(image_url)
                       if (parsed_image.scheme != "https" or
-                              parsed_image.netloc != "upload.wikimedia.org" or
-                              not parsed_image.path.startswith("/wikipedia/commons/thumb/")):
+                              parsed_image.netloc != "images.pexels.com" or
+                              not parsed_image.path.startswith("/photos/")):
                           raise SystemExit(f"{page}: srcset contains an unapproved image host/path: {image_url!r}.")
 
           homepage = parsed_pages["index.html"][0]
@@ -206,22 +206,22 @@ jobs:
           print(f"Pre-launch audit passed for {len(pages)} HTML pages: local links, unique IDs, form labels, image alt text, strict CSP, AJAX form response handling, direct-email fallback, and CSS integrity.")
           PY
 
-      - name: Assemble Pages artifact without external photography
+      - name: Assemble Pages artifact with approved Pexels photography
         shell: bash
         run: |
           set -euo pipefail
           rm -rf site
           mkdir -p site
           cp prelaunch/index.html prelaunch/styles.css prelaunch/script.js prelaunch/privacy.html prelaunch/thanks.html prelaunch/image-credits.html prelaunch/favicon.svg site/
-          if grep -Eiq '<img[[:space:]]|srcset=|upload\.wikimedia\.org' site/index.html; then
-            echo "Removed external photographs must not be reintroduced into the deployed homepage."
+          if ! grep -q 'images.pexels.com/photos/' site/index.html || grep -q 'upload.wikimedia.org' site/index.html; then
+            echo "Homepage must use the approved Pexels photos, not removed Wikimedia hotlinks."
             exit 1
           fi
-          if grep -Eiq 'img-src[^;]*https?://' site/index.html; then
-            echo "Homepage image policy must not allow remote image hosts."
+          if ! grep -q "img-src 'self' https://images.pexels.com;" site/index.html; then
+            echo "Homepage CSP must permit the approved Pexels image CDN."
             exit 1
           fi
-          echo "Assembled Pages artifact with no external photography dependencies."
+          echo "Assembled Pages artifact with approved Pexels photography."
 
       - name: Configure GitHub Pages
         uses: actions/configure-pages@45bfe0192ca1faeb007ade9deae92b16b8254a0d # v6
