@@ -133,7 +133,9 @@
     window.addEventListener("wheel", showNavigator, { passive: true });
     window.addEventListener("touchstart", showNavigator, { passive: true });
     window.addEventListener("pointermove", (event) => {
-      if (event.pointerType === "mouse" && event.clientX > window.innerWidth - 180 && event.clientY > window.innerHeight - 140) showNavigator();
+      const nearNavigator = event.clientX > window.innerWidth - 100 &&
+        Math.abs(event.clientY - window.innerHeight / 2) < 130;
+      if (event.pointerType === "mouse" && nearNavigator) showNavigator();
     }, { passive: true });
     sectionNavigator.addEventListener("pointerenter", () => {
       window.clearTimeout(hideNavigatorTimer);
@@ -241,17 +243,27 @@
       if (submit) { submit.disabled = true; submit.setAttribute("aria-busy", "true"); submit.textContent = "Sending securely…"; }
       if (fallback) fallback.hidden = true;
       setStatus("pending", "Sending your request. Please keep this page open.");
+      let timeoutId = 0;
+      let requestTimedOut = false;
       try {
         const payload = Object.fromEntries(new FormData(form).entries());
         delete payload._next;
         payload._ts = String(Date.now());
+        const controller = new AbortController();
+        timeoutId = window.setTimeout(() => {
+          requestTimedOut = true;
+          controller.abort();
+        }, 15000);
         const response = await fetch("https://formsubmit.co/ajax/rosscorelabs@outlook.com", {
           method: "POST",
           headers: { "Content-Type": "application/json", "Accept": "application/json" },
-          body: JSON.stringify(payload)
+          body: JSON.stringify(payload),
+          signal: controller.signal
         });
         let result;
         try { result = await response.json(); } catch { throw new Error("unreadable-response"); }
+        window.clearTimeout(timeoutId);
+        timeoutId = 0;
         // The provider may return HTTP 200 even when it refuses a submission.
         if (!response.ok || String(result.success) !== "true") {
           const providerMessage = String(result.message || "");
@@ -261,11 +273,14 @@
         form.dataset.submitted = "true";
         form.reset();
         setStatus("success", "Request received by the form service. Thank you for your interest in Zazu EMP.");
-        if (fallback) fallback.hidden = false;
+        if (fallback) fallback.hidden = true;
         if (submit) { submit.textContent = "Request received ✓"; submit.removeAttribute("aria-busy"); }
         form.querySelectorAll('input:not([type="hidden"]), select, textarea').forEach((field) => { field.disabled = true; });
       } catch (error) {
-        if (error instanceof Error && error.message === "activation-required") {
+        window.clearTimeout(timeoutId);
+        if (requestTimedOut) {
+          setStatus("error", "The request timed out before we could confirm receipt. Please retry or email us directly below.");
+        } else if (error instanceof Error && error.message === "activation-required") {
           setStatus("error", "The form service still needs its one-time email activation. Please contact us directly using the email link below.");
         } else {
           setStatus("error", "We could not confirm that your request was accepted. It has not been marked as sent. Please retry or email us directly below.");
