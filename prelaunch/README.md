@@ -12,9 +12,7 @@ This directory is a standalone static marketing site intended for GitHub Pages. 
 - `image-credits.html` — public photo attribution and licence register
 - `favicon.svg` — simple site-specific mark
 
-The hero uses a clearly labelled conceptual CSS dashboard illustration, not a screenshot of a live customer account. Six original vector illustrations are stored in `images/` and served locally. They depict a range of South African event contexts rather than catering displays alone. The artwork is licensed under CC BY 4.0 and credited on `image-credits.html`. All images load from the same GitHub Pages site, so the page does not rely on third-party image hosting or image-CDN availability.
-
-The illustrations are conceptual artwork, not photographs, real customer accounts, testimonials or endorsements. They can be replaced with licensed photography later without changing the page's local asset approach. The site uses no remote font dependency and the Content Security Policy allows image loading from `'self'` only.
+The hero uses a clearly labelled conceptual CSS dashboard illustration, not a screenshot of a live customer account. The photography shows a selection of South African event, performance and community settings rather than catering displays alone. Six openly licensed photographs are loaded from Wikimedia Commons in responsive width variants using srcset and sizes. Their authors, file pages and CC BY-SA 4.0 licences are credited in the public image-credits.html page and recorded in docs/ZAZU_LANDING_MEDIA_SOURCES.md. This is an intentional, limited exception to the previous no-remote-image policy: browsers request image variants from upload.wikimedia.org; the site still has no remote font dependency, and the workflow permits no other remote image host.
 
 ## Publish
 
