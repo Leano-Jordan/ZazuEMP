@@ -230,9 +230,9 @@ jobs:
           if "opacity:.24;" not in css or ".section-navigator.is-visible { opacity:.92; }" not in css:
               raise SystemExit("The floating navigator must fade while idle and become visible during interaction.")
           stylesheet_versions = {
-              re.search(r'styles\\.css\\?v=([^"]+)', content).group(1)
+              content.split("styles.css?v=", 1)[1].split('"', 1)[0]
               for content, _ in parsed_pages.values()
-              if re.search(r'styles\\.css\\?v=([^"]+)', content)
+              if "styles.css?v=" in content
           }
           if len(stylesheet_versions) != 1 or any("styles.css?v=" not in content for content, _ in parsed_pages.values()):
               raise SystemExit("Every pre-launch page must use the same versioned stylesheet URL.")
