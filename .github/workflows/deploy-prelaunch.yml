@@ -191,12 +191,10 @@ jobs:
               raise SystemExit("CSP does not explicitly allow the intended enquiry form endpoint.")
           if "connect-src 'self' https://formsubmit.co" not in homepage:
               raise SystemExit("CSP does not explicitly allow the AJAX form connection.")
-          if "img-src 'self' https://upload.wikimedia.org" not in homepage:
-              raise SystemExit("CSP must allow local files and the documented Wikimedia Commons image host only.")
-          if homepage.count("srcset=") != 5 or homepage.count("sizes=") != 5:
-              raise SystemExit("All five homepage photographs must have responsive srcset and sizes attributes.")
-          if 'href="./image-credits.html"' not in homepage:
-              raise SystemExit("The homepage must link to the public image credit and licence page.")
+          if "img-src 'self';" not in homepage:
+              raise SystemExit("CSP must restrict images to same-origin assets.")
+          if "<img" in homepage or "srcset=" in homepage or "upload.wikimedia.org" in homepage:
+              raise SystemExit("Pre-launch page must not contain the removed external photographs.")
           if "https://formsubmit.co/ajax/rosscorelabs@outlook.com" not in js:
               raise SystemExit("The enquiry form is missing the expected AJAX endpoint.")
           if 'id="form-status"' not in homepage or 'id="form-fallback"' not in homepage:
@@ -208,62 +206,22 @@ jobs:
           print(f"Pre-launch audit passed for {len(pages)} HTML pages: local links, unique IDs, form labels, image alt text, strict CSP, AJAX form response handling, direct-email fallback, and CSS integrity.")
           PY
 
-      - name: Assemble Pages artifact and self-host the five licensed photographs
+      - name: Assemble Pages artifact without external photography
         shell: bash
         run: |
           set -euo pipefail
           rm -rf site
-          mkdir -p site/images
+          mkdir -p site
           cp prelaunch/index.html prelaunch/styles.css prelaunch/script.js prelaunch/privacy.html prelaunch/thanks.html prelaunch/image-credits.html prelaunch/favicon.svg site/
-          python3 - <<'PY'
-          from pathlib import Path
-          from urllib.request import Request, urlopen
-          import re
-
-          index = Path("site/index.html")
-          content = index.read_text(encoding="utf-8")
-          image_tags = list(re.finditer(r"<img\b[^>]*>", content))
-          if len(image_tags) != 5:
-              raise SystemExit(f"Expected five photographic image elements, found {len(image_tags)}.")
-
-          updated = content
-          for number, match in reversed(list(enumerate(image_tags, start=1))):
-              tag = match.group(0)
-              source_match = re.search(r'\bsrc="(https://upload\.wikimedia\.org/wikipedia/commons/thumb/[^"]+)"', tag)
-              if not source_match:
-                  raise SystemExit(f"Photo {number} does not use the approved original Commons source.")
-              source_url = source_match.group(1)
-              request = Request(source_url, headers={"User-Agent": "RosscoreLabs-ZazuPrelaunch/1.0 (licensed-image-mirroring)"})
-              try:
-                  with urlopen(request, timeout=30) as response:
-                      image_bytes = response.read()
-                      content_type = response.headers.get("Content-Type", "").split(";")[0].lower()
-              except Exception as exc:
-                  raise SystemExit(f"Could not fetch original photo {number} from Wikimedia Commons: {exc}") from exc
-              if content_type not in ("image/jpeg", "image/jpg") or len(image_bytes) < 2048:
-                  raise SystemExit(f"Photo {number} returned unexpected content ({content_type}, {len(image_bytes)} bytes).")
-              local_name = f"event-photo-{number}.jpg"
-              Path("site/images", local_name).write_bytes(image_bytes)
-              local_tag = re.sub(r'\bsrc="[^"]+"', f'src="./images/{local_name}"', tag, count=1)
-              local_tag = re.sub(r'\s+srcset="[^"]*"', "", local_tag, count=1)
-              local_tag = re.sub(r'\s+sizes="[^"]*"', "", local_tag, count=1)
-              updated = updated[:match.start()] + local_tag + updated[match.end():]
-              print(f"Self-hosted photo {number}: {local_name} ({len(image_bytes)} bytes)")
-
-          updated = updated.replace(
-              "img-src 'self' https://upload.wikimedia.org;",
-              "img-src 'self';"
-          )
-          if "https://upload.wikimedia.org" in updated:
-              raise SystemExit("Deployed homepage still contains a runtime Wikimedia dependency.")
-          if updated.count('src="./images/event-photo-') != 5:
-              raise SystemExit("Expected five same-origin deployed photo references.")
-          index.write_text(updated, encoding="utf-8")
-          if not Path("site/image-credits.html").is_file():
-              raise SystemExit("The public photo attribution/licence page is missing.")
-          print("Assembled Pages artifact with five locally hosted photographs and no third-party image requests.")
-          PY
-          test "$(find site/images -maxdepth 1 -type f -name 'event-photo-*.jpg' | wc -l)" -eq 5
+          if grep -Eiq '<img[[:space:]]|srcset=|upload\.wikimedia\.org' site/index.html; then
+            echo "Removed external photographs must not be reintroduced into the deployed homepage."
+            exit 1
+          fi
+          if grep -Eiq 'img-src[^;]*https?://' site/index.html; then
+            echo "Homepage image policy must not allow remote image hosts."
+            exit 1
+          fi
+          echo "Assembled Pages artifact with no external photography dependencies."
 
       - name: Configure GitHub Pages
         uses: actions/configure-pages@45bfe0192ca1faeb007ade9deae92b16b8254a0d # v6
