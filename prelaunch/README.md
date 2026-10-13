@@ -12,7 +12,7 @@ This directory is a standalone static marketing site for GitHub Pages, separate 
 - `image-credits.html` — public photograph sources and licence notes
 - `favicon.svg` — site mark
 
-The hero contains an explicitly labelled conceptual interface preview, not a screenshot of a live customer account. Its example work and statuses must not be represented as real customer records or proof that every depicted workflow is released. The page uses real photographs served from Pexels' image CDN. Source pages and licence information are listed on `image-credits.html`; four distinct source photographs are reused across five placements. Pexels images are remote dependencies, not bundled assets, so they require access to `images.pexels.com`. The homepage Content Security Policy and deploy audit permit that host and no other external image host. The site has no remote font dependency and does not use generated artwork.
+The hero contains an explicitly labelled conceptual interface preview, not a screenshot of a live customer account. Its example work and statuses must not be represented as real customer records or proof that every depicted workflow is released. The page uses real photographs served from Pexels' image CDN. Source pages and licence information are listed on `image-credits.html`; four distinct source photographs are reused across six placements. Pexels images are remote dependencies, not bundled assets, so they require access to `images.pexels.com`. The homepage Content Security Policy and deploy audit permit that host and no other external image host. The site has no remote font dependency and does not use generated artwork.
 
 ## Publish
 
