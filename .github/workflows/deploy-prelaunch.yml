@@ -155,15 +155,8 @@ jobs:
               for kind, reference in audit.references:
                   parsed = urlsplit(reference)
                   if parsed.scheme or parsed.netloc:
-                      allowed_wikimedia_image = (
-                          page.name == "index.html"
-                          and kind == "src"
-                          and parsed.scheme == "https"
-                          and parsed.netloc == "upload.wikimedia.org"
-                          and parsed.path.startswith("/wikipedia/commons/thumb/")
-                      )
-                      if kind == "src" and not allowed_wikimedia_image:
-                          raise SystemExit(f"{page}: unapproved remote resource dependency: {reference!r}.")
+                      if kind == "src":
+                          raise SystemExit(f"{page}: remote image/script/style dependencies are not allowed: {reference!r}.")
                       continue
                   if not parsed.path:
                       target_path = root / page.name
@@ -191,10 +184,14 @@ jobs:
               raise SystemExit("CSP does not explicitly allow the intended enquiry form endpoint.")
           if "connect-src 'self' https://formsubmit.co" not in homepage:
               raise SystemExit("CSP does not explicitly allow the AJAX form connection.")
-          if "img-src 'self' https://upload.wikimedia.org" not in homepage:
-              raise SystemExit("CSP must allow local files and the documented Wikimedia Commons image host only.")
-          if homepage.count("srcset=") != 6 or homepage.count("sizes=") != 6:
-              raise SystemExit("All six homepage photographs must have responsive srcset and sizes attributes.")
+          if "img-src 'self'" not in homepage or "upload.wikimedia.org" in homepage:
+              raise SystemExit("Homepage images must be self-hosted with no remote image dependency.")
+          if homepage.count("<img ") != 6:
+              raise SystemExit("Expected six self-hosted South African event illustrations.")
+          for image in re.findall(r'<img\\b[^>]*\\bsrc="([^"]+)"', homepage):
+              target = (root / image.removeprefix("./")).resolve()
+              if not target.is_file() or target.suffix.lower() != ".svg":
+                  raise SystemExit(f"Homepage illustration is missing or not SVG: {image!r}.")
           if 'href="./image-credits.html"' not in homepage:
               raise SystemExit("The homepage must link to the public image credit and licence page.")
           if "https://formsubmit.co/ajax/rosscorelabs@outlook.com" not in js:
@@ -208,25 +205,37 @@ jobs:
           print(f"Pre-launch audit passed for {len(pages)} HTML pages: local links, unique IDs, form labels, image alt text, strict CSP, AJAX form response handling, direct-email fallback, and CSS integrity.")
           PY
 
-      - name: Assemble static Pages artifact with responsive Commons imagery
+      - name: Assemble static Pages artifact with self-hosted event illustrations
         shell: bash
         run: |
           set -euo pipefail
           rm -rf site
           mkdir -p site
           cp prelaunch/index.html prelaunch/styles.css prelaunch/script.js prelaunch/privacy.html prelaunch/thanks.html prelaunch/image-credits.html prelaunch/favicon.svg site/
+          cp -R prelaunch/images site/images
           python3 - <<'PY'
           from pathlib import Path
           import re
           index = Path("site/index.html")
           content = index.read_text(encoding="utf-8")
-          if "../public/images/landing/stock/" in content:
-              raise SystemExit("A removed stock-image path remains in the deployed homepage.")
-          if content.count("srcset=") != 6 or content.count("sizes=") != 6:
-              raise SystemExit("Expected six responsive Wikimedia Commons image references.")
-          urls = re.findall(r'https://upload\.wikimedia\.org/wikipedia/commons/thumb/[^\s"]+', content)
-          if len(urls) < 24:
-              raise SystemExit(f"Expected at least 24 width-specific Commons image variants; found {len(urls)}.")
+          if "upload.wikimedia.org" in content:
+              raise SystemExit("Homepage must not depend on remote image hosting.")
+          image_paths = [
+              "images/south-african-event-host.svg",
+              "images/wedding-celebration.svg",
+              "images/community-event.svg",
+              "images/live-performance.svg",
+              "images/cultural-festival.svg",
+              "images/event-planning-team.svg",
+          ]
+          for relative in image_paths:
+              asset = Path("site") / relative
+              if not asset.is_file() or asset.stat().st_size < 500:
+                  raise SystemExit(f"Missing or unexpectedly small self-hosted illustration: {asset}")
+              source = asset.read_text(encoding="utf-8")
+              if "<svg" not in source or "viewBox=" not in source:
+                  raise SystemExit(f"Illustration is not a valid standalone SVG: {asset}")
+          print(f"Assembled Pages artifact with {len(image_paths)} self-hosted event illustrations.")
           if not Path("site/image-credits.html").is_file():
               raise SystemExit("The public attribution/licence page is missing from the Pages artifact.")
           print(f"Assembled standalone Pages site with {len(urls)} Wikimedia Commons image variants and public attribution.")
