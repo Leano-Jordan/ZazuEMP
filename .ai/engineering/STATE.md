@@ -157,3 +157,13 @@ Audit record: docs/DIRECTOR_DEEP_AUDIT_2026-10-08.md.
 - Replaced six catering/venue-led photo references with responsive Wikimedia Commons image variants; added srcset/sizes, a public author/licence page, and privacy disclosure for the Wikimedia image host.
 - Changed the pre-launch policy intentionally: image requests are remote but restricted by CSP and the deployment audit to HTTPS upload.wikimedia.org/wikipedia/commons/thumb/. This is not a self-hosted/offline image set.
 - Verification remains pending: the changed deployment workflow must run on the new main HEAD, the deployed page must be checked in desktop and mobile browsers, and image loading/credits must be verified from the published artifact. FormSubmit delivery remains separately unverified.
+
+
+## Landing-page reliability and first-impression refinement — 2026-10-13
+
+- Replaced unreliable remote Wikimedia image URLs with six original, locally served SVG illustrations representing South African event hosting, weddings, community events, live performance/AV, cultural gatherings, and event planning.
+- Updated deployment audit to block remote image dependencies and verify all six SVGs are present in the built Pages artifact.
+- Rewrote the hero headline to communicate the product outcome immediately: "Keep every event job organised and on track." The hero copy now names enquiries, quotes, suppliers, schedules and job costs directly.
+- Replaced "Less chasing" with explicit early-access and product-demo calls to action; removed stale remote social image metadata and external image-host privacy disclosure.
+- Published local illustration attribution and CC BY 4.0 reuse terms.
+- Remaining acceptance: verify the latest GitHub Actions Pages deployment succeeds and inspect the live page at mobile and desktop breakpoints. Source edits alone do not prove deployment success.
