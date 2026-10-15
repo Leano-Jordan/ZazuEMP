@@ -60,6 +60,10 @@ class PwaOfflineFoundationTest extends TestCase
         $this->assertStringContainsString("OFFLINE_SHELL,", $worker);
         $this->assertStringContainsString("'/offline-attachments.js'", $worker);
         $this->assertStringContainsString("'/zazu-offline.js'", $worker);
+        $this->assertStringContainsString("const CACHE_NAME = 'zazu-static-v14';", $worker);
+        $this->assertStringContainsString("['/zazu-offline.js', '/offline-attachments.js'].includes(url.pathname)", $worker);
+        $this->assertStringContainsString('const cached = await cache.match(cacheKey);', $worker);
+        $this->assertStringContainsString('if (cached) return cached;', $worker);
         $this->assertStringContainsString("const acceptsHtml = (request.headers.get('accept') || '').includes('text/html');", $worker);
         $this->assertStringContainsString("const isAppPage = request.method === 'GET'", $worker);
         $this->assertStringContainsString('await cache.match(new Request(request.url))', $worker);
@@ -93,6 +97,7 @@ class PwaOfflineFoundationTest extends TestCase
 
         $this->assertStringContainsString('data-zazu-offline-entity="customer"', $customer);
         $this->assertStringContainsString('data-zazu-offline-entity="job"', $job);
+        $this->assertStringContainsString('<button type="submit" class="zazu-btn zazu-btn-primary">', $job);
         $this->assertStringContainsString('data-zazu-offline-entity="quote"', $quote);
         $this->assertStringContainsString('data-zazu-offline-job-id=', $quote);
 
@@ -156,6 +161,12 @@ class PwaOfflineFoundationTest extends TestCase
         $this->assertStringContainsString('state.local_dirty = (await pending()).length > 0;', $client);
         $this->assertStringContainsString('remote.conflict_id', $client);
         $this->assertStringContainsString("crypto.randomUUID()", $client);
+        $this->assertStringContainsString("Local offline state write was aborted.", $client);
+        $this->assertStringContainsString("Offline queue acknowledgement was aborted.", $client);
+        $app = File::get(resource_path('js/app.js'));
+        $this->assertStringContainsString("data-zazu-offline-save-error", $app);
+        $this->assertStringContainsString("Check the offline queue before trying again.", $app);
+        $this->assertStringContainsString("delete form.dataset.zazuSubmitting;", $app);
     }
 
     public function test_pwa_icon_files_are_present(): void

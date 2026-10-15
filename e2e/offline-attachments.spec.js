@@ -23,8 +23,13 @@ test('real Zazu job form can create a job locally while disconnected', async ({ 
     const customer = page.locator('#customer_id option:not([value=""])').first();
     await expect(customer).toHaveCount(1);
     await page.locator('#customer_id').selectOption({ index: 1 });
-    await page.locator('input[name="event_type"]').first().check();
-    await page.locator('input[name="name"]').fill('Offline catering job');
+    // The visible choice card overlays the native radio input on mobile/tablet.
+    // Click the user-facing label instead of forcing Playwright to click the obscured input.
+    await page.locator('label.zazu-choice-card').filter({ has: page.locator('input[name="event_type"]') }).first().click();
+    await page.locator('#new-job-form input[name="name"]').fill('Offline catering job');
+    // The production form requires a job date; without it the browser blocks
+    // submission before the offline handler can run.
+    await page.locator('#new-job-form input[name="event_date"]').fill('2026-11-15');
 
     await page.context().setOffline(true);
     await page.locator('#new-job-form').getByRole('button', { name: /Create job/ }).click();
@@ -34,4 +39,15 @@ test('real Zazu job form can create a job locally while disconnected', async ({ 
 
     const state = await page.evaluate(() => window.ZazuOffline?.getState()?.jobs || []);
     expect(state.some((job) => job.name === 'Offline catering job' && job.local_id)).toBe(true);
+    const queued = await page.evaluate(async () => await window.ZazuOffline?.pending());
+    expect(queued.some((mutation) => mutation.entity_type === 'job' && mutation.payload?.name === 'Offline catering job')).toBe(true);
+
+    // A reload while disconnected must recover the same locally persisted job.
+    await page.reload({ waitUntil: 'domcontentloaded' });
+    await page.waitForFunction(() => Boolean(window.ZazuOffline?.ready));
+    await page.evaluate(() => window.ZazuOffline.ready);
+    const persisted = await page.evaluate(() => window.ZazuOffline?.getState()?.jobs || []);
+    expect(persisted.some((job) => job.name === 'Offline catering job' && job.local_id)).toBe(true);
+    const persistedQueue = await page.evaluate(async () => await window.ZazuOffline?.pending());
+    expect(persistedQueue.some((mutation) => mutation.entity_type === 'job' && mutation.payload?.name === 'Offline catering job')).toBe(true);
 });

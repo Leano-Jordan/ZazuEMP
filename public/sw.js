@@ -1,4 +1,4 @@
-const CACHE_NAME = 'zazu-static-v13';
+const CACHE_NAME = 'zazu-static-v14';
 const OFFLINE_SHELL = '/dashboard';
 let activeUserId = null;
 let activePrimeController = null;
@@ -247,6 +247,27 @@ self.addEventListener('fetch', (event) => {
 
     if (request.method === 'GET' && url.origin === self.location.origin && url.pathname === '/manifest.webmanifest') {
         event.respondWith(caches.match(request).then((cached) => cached || fetch(request)));
+        return;
+    }
+
+    // These two scripts are precached as part of the offline client, but they
+    // are not Vite /build assets. Serve the cached copies when disconnected.
+    if (
+        request.method === 'GET'
+        && url.origin === self.location.origin
+        && ['/zazu-offline.js', '/offline-attachments.js'].includes(url.pathname)
+    ) {
+        event.respondWith((async () => {
+            const cache = await caches.open(CACHE_NAME);
+            const cacheKey = new Request(new URL(url.pathname, self.location.origin));
+            const cached = await cache.match(cacheKey);
+
+            if (cached) return cached;
+
+            const response = await fetch(request);
+            if (response.ok) await cache.put(cacheKey, response.clone());
+            return response;
+        })());
         return;
     }
 

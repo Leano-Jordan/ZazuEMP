@@ -1054,6 +1054,7 @@ function setupZazuOfflineForms() {
 
             event.preventDefault();
 
+            try {
             const entity = form.dataset.zazuOfflineEntity;
             const formData = new FormData(form);
             const get = (name) => String(formData.get(name) || '').trim();
@@ -1642,6 +1643,29 @@ function setupZazuOfflineForms() {
             notice.setAttribute('role', 'status');
             notice.textContent = 'Saved on this device. It will sync automatically when Zazu reconnects.';
             form.prepend(notice);
+            } catch (error) {
+                // IndexedDB quota, blocked upgrades, and transaction failures
+                // must not leave the submit button stuck or silently lose the user's work.
+                const submit = form.querySelector('button[type="submit"], input[type="submit"]');
+                if (submit) {
+                    submit.disabled = false;
+                    submit.removeAttribute('aria-busy');
+                    delete form.dataset.zazuSubmitting;
+                    if (submit.dataset.zazuSubmitLabel) {
+                        submit.textContent = submit.dataset.zazuSubmitLabel;
+                        delete submit.dataset.zazuSubmitLabel;
+                    }
+                }
+
+                const existingNotice = form.querySelector('[data-zazu-offline-save-error]');
+                if (existingNotice) existingNotice.remove();
+                const notice = document.createElement('div');
+                notice.className = 'zazu-notice';
+                notice.setAttribute('role', 'alert');
+                notice.dataset.zazuOfflineSaveError = '1';
+                notice.textContent = 'Zazu could not confirm that this change was saved locally. Check the offline queue before trying again.';
+                form.prepend(notice);
+            }
         });
     });
 }

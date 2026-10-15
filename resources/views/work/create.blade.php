@@ -165,7 +165,7 @@
 
                     <div class="zazu-actionbar">
                         <a href="{{ route('work.index') }}" class="zazu-btn zazu-btn-ghost">Cancel</a>
-                        <button class="zazu-btn zazu-btn-primary">{{ request('start') === 'quote' ? 'Create job & continue to quote' : 'Create job' }}</button>
+                        <button type="submit" class="zazu-btn zazu-btn-primary">{{ request('start') === 'quote' ? 'Create job & continue to quote' : 'Create job' }}</button>
                     </div>
                 </div>
 
