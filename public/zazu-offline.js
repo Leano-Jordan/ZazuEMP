@@ -62,7 +62,8 @@
             const tx = db.transaction(STATE, 'readwrite');
             tx.objectStore(STATE).put(state, 'current');
             tx.oncomplete = resolve;
-            tx.onerror = () => reject(tx.error);
+            tx.onerror = () => reject(tx.error || new Error('Local offline state write failed.'));
+            tx.onabort = () => reject(tx.error || new Error('Local offline state write was aborted.'));
         });
     }
 
@@ -303,7 +304,8 @@
             }
 
             tx.oncomplete = resolve;
-            tx.onerror = () => reject(tx.error);
+            tx.onerror = () => reject(tx.error || new Error('Offline queue acknowledgement failed.'));
+            tx.onabort = () => reject(tx.error || new Error('Offline queue acknowledgement was aborted.'));
         });
 
         const identityTargets = {
