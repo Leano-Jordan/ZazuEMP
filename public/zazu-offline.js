@@ -42,7 +42,8 @@
                 }
             };
             request.onsuccess = () => resolve(request.result);
-            request.onerror = () => reject(request.error);
+            request.onerror = () => reject(request.error || new Error('Could not open local offline storage.'));
+            request.onblocked = () => reject(new Error('Local offline storage is blocked by another open tab.'));
         });
     }
 
