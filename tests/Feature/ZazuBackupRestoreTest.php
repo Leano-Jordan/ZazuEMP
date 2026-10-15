@@ -271,7 +271,7 @@ $this->assertSame(0, $exitCode, Artisan::output());
             '$count=$((count + 1))'."\n".
             'printf "%s" "$count" > '.escapeshellarg($countFile)."\n".
             'cat > '.escapeshellarg($logDirectory).'/import-"$count".sql'."\n".
-            'if [ "$count" -eq 1 ]; then echo "simulated partial import failure" >&2; exit 1; fi'."\n".
+            'if grep -q "candidate restore SQL" '.escapeshellarg($logDirectory).'/import-"$count".sql; then echo "simulated partial import failure" >&2; exit 1; fi'."\n".
             "exit 0\n");
         chmod($bin.'/mysqldump', 0755);
         chmod($bin.'/mysql', 0755);
