@@ -301,13 +301,13 @@ $this->assertSame(0, $exitCode, Artisan::output());
         $_SERVER['PATH'] = $bin.PATH_SEPARATOR.$originalPath;
 
         try {
-            $command = $this->artisan('zazu:restore', [
+            $exitCode = Artisan::call('zazu:restore', [
                 'archive' => $archive,
                 '--force' => true,
             ]);
-            $exitCode = $command->run();
+            $output = Artisan::output();
 
-            $this->assertSame(1, $exitCode);
+            $this->assertSame(1, $exitCode, $output);
             $this->assertSame('2', trim(File::get($countFile)), 'MySQL should be invoked once for candidate import and once for rollback.');
             $this->assertStringContainsString('-- candidate restore SQL', File::get($logDirectory.'/import-1.sql'));
             $this->assertStringContainsString('-- pre-restore snapshot marker', File::get($logDirectory.'/import-2.sql'));
