@@ -36,4 +36,11 @@ test('real Zazu job form can create a job locally while disconnected', async ({ 
 
     const state = await page.evaluate(() => window.ZazuOffline?.getState()?.jobs || []);
     expect(state.some((job) => job.name === 'Offline catering job' && job.local_id)).toBe(true);
+
+    // A reload while disconnected must recover the same locally persisted job.
+    await page.reload({ waitUntil: 'domcontentloaded' });
+    await page.waitForFunction(() => Boolean(window.ZazuOffline?.ready));
+    await page.evaluate(() => window.ZazuOffline.ready);
+    const persisted = await page.evaluate(() => window.ZazuOffline?.getState()?.jobs || []);
+    expect(persisted.some((job) => job.name === 'Offline catering job' && job.local_id)).toBe(true);
 });
