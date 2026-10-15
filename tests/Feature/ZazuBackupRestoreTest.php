@@ -236,4 +236,92 @@ $this->assertSame(0, $exitCode, Artisan::output());
         }
     }
 
+
+    public function test_mysql_restore_attempts_pre_restore_rollback_after_partial_import_failure(): void
+    {
+        if (!class_exists(ZipArchive::class)) {
+            $this->markTestSkipped('PHP Zip extension is required for backup/restore tests.');
+        }
+
+        if (PHP_OS_FAMILY === 'Windows') {
+            $this->markTestSkipped('Fake MySQL command integration uses POSIX shell scripts.');
+        }
+
+        $root = storage_path('app/zazu-mysql-rollback-test-'.\Illuminate\Support\Str::ulid());
+        $bin = $root.'/bin';
+        $archive = $root.'/candidate.zip';
+        $countFile = $root.'/mysql-count.txt';
+        $logDirectory = $root.'/imports';
+        $privateProbe = storage_path('app/private/zazu-mysql-rollback-probe.txt');
+        $originalPath = getenv('PATH') ?: '';
+        $originalDefault = config('database.default');
+        $originalMysql = config('database.connections.mysql');
+
+        File::ensureDirectoryExists($bin);
+        File::ensureDirectoryExists($logDirectory);
+        File::ensureDirectoryExists(dirname($privateProbe));
+        File::put($privateProbe, 'original private data');
+
+        File::put($bin.'/mysqldump', "#!/bin/sh\nprintf '%s\\n' '-- pre-restore snapshot marker'\n");
+        File::put($bin.'/mysql', "#!/bin/sh\n".
+            '$count=0'."\n".
+            '[ -f '.escapeshellarg($countFile).' ] && count=$(cat '.escapeshellarg($countFile).")\n".
+            '$count=$((count + 1))'."\n".
+            'printf "%s" "$count" > '.escapeshellarg($countFile)."\n".
+            'cat > '.escapeshellarg($logDirectory).'/import-"$count".sql'."\n".
+            'if [ "$count" -eq 1 ]; then echo "simulated partial import failure" >&2; exit 1; fi'."\n".
+            "exit 0\n");
+        chmod($bin.'/mysqldump', 0755);
+        chmod($bin.'/mysql', 0755);
+
+        $zip = new ZipArchive();
+        $this->assertSame(true, $zip->open($archive, ZipArchive::CREATE | ZipArchive::OVERWRITE));
+        $zip->addFromString('manifest.json', json_encode([
+            'application' => 'Zazu EMP',
+            'format_version' => 1,
+            'database_driver' => 'mysql',
+            'contents' => ['database', 'private_storage'],
+        ], JSON_THROW_ON_ERROR));
+        $zip->addFromString('database.sql', '-- candidate restore SQL');
+        $zip->addFromString('storage/private/restored-probe.txt', 'candidate private data');
+        $zip->close();
+
+        config([
+            'database.default' => 'mysql',
+            'database.connections.mysql' => array_merge($originalMysql, [
+                'host' => '127.0.0.1',
+                'port' => 3306,
+                'username' => 'zazu-test',
+                'password' => 'not-used',
+                'database' => 'zazu_test',
+            ]),
+        ]);
+        putenv('PATH='.$bin.PATH_SEPARATOR.$originalPath);
+
+        try {
+            $command = $this->artisan('zazu:restore', [
+                'archive' => $archive,
+                '--force' => true,
+            ]);
+            $exitCode = $command->run();
+
+            $this->assertSame(1, $exitCode);
+            $this->assertSame('2', trim(File::get($countFile)), 'MySQL should be invoked once for candidate import and once for rollback.');
+            $this->assertStringContainsString('-- candidate restore SQL', File::get($logDirectory.'/import-1.sql'));
+            $this->assertStringContainsString('-- pre-restore snapshot marker', File::get($logDirectory.'/import-2.sql'));
+            $this->assertSame('original private data', File::get($privateProbe), 'Private storage must roll back when the database import fails.');
+            $this->assertFileDoesNotExist(storage_path('app/private/restored-probe.txt'));
+        } finally {
+            putenv('PATH='.$originalPath);
+            config([
+                'database.default' => $originalDefault,
+                'database.connections.mysql' => $originalMysql,
+            ]);
+            File::delete($archive);
+            File::delete($privateProbe);
+            File::deleteDirectory($root);
+        }
+    }
+
+
 }
