@@ -254,6 +254,7 @@ $this->assertSame(0, $exitCode, Artisan::output());
         $logDirectory = $root.'/imports';
         $privateProbe = storage_path('app/private/zazu-mysql-rollback-probe.txt');
         $originalPath = getenv('PATH') ?: '';
+        $originalServerPath = $_SERVER['PATH'] ?? null;
         $originalDefault = config('database.default');
         $originalMysql = config('database.connections.mysql');
 
@@ -297,6 +298,7 @@ $this->assertSame(0, $exitCode, Artisan::output());
             ]),
         ]);
         putenv('PATH='.$bin.PATH_SEPARATOR.$originalPath);
+        $_SERVER['PATH'] = $bin.PATH_SEPARATOR.$originalPath;
 
         try {
             $command = $this->artisan('zazu:restore', [
@@ -313,6 +315,11 @@ $this->assertSame(0, $exitCode, Artisan::output());
             $this->assertFileDoesNotExist(storage_path('app/private/restored-probe.txt'));
         } finally {
             putenv('PATH='.$originalPath);
+            if ($originalServerPath === null) {
+                unset($_SERVER['PATH']);
+            } else {
+                $_SERVER['PATH'] = $originalServerPath;
+            }
             config([
                 'database.default' => $originalDefault,
                 'database.connections.mysql' => $originalMysql,
