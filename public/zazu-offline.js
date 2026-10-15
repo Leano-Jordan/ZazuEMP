@@ -7,6 +7,7 @@
     const QUEUE = 'mutations';
     let state = null;
     let syncing = false;
+    let storageAvailable = true;
     let resolveReady;
     const ready = new Promise((resolve) => { resolveReady = resolve; });
 
@@ -176,6 +177,9 @@
 
     async function queueMutation(entityType, operation, payload) {
         await ready;
+        if (!storageAvailable) {
+            throw new Error('Local offline storage is unavailable; this change was not saved.');
+        }
         const mutation = {
             id: crypto.randomUUID(),
             entity_type: entityType,
@@ -394,10 +398,26 @@
     }
 
     async function boot() {
-        state = (await readState()) || blank();
+        try {
+            state = (await readState()) || blank();
+        } catch (error) {
+            // A storage failure must not leave every caller waiting on ready.
+            // Resolve startup, but refuse local mutations because they cannot be
+            // promised durable when IndexedDB itself is unavailable.
+            storageAvailable = false;
+            state = blank();
+            state.storage_error = 'Local offline storage is unavailable.';
+        }
 
-        if (state.sync?.token && navigator.onLine) {
-            await sync();
+        if (storageAvailable && state.sync?.token && navigator.onLine) {
+            try {
+                await sync();
+            } catch (error) {
+                // Connectivity can be unreliable even when navigator.onLine is
+                // true. Keep the local workspace usable and let later online
+                // events retry synchronization instead of blocking initialization.
+                state.last_sync_error = 'Initial synchronization failed; local work remains available.';
+            }
         }
 
         resolveReady(state);
