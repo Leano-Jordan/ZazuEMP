@@ -23,7 +23,9 @@ test('real Zazu job form can create a job locally while disconnected', async ({ 
     const customer = page.locator('#customer_id option:not([value=""])').first();
     await expect(customer).toHaveCount(1);
     await page.locator('#customer_id').selectOption({ index: 1 });
-    await page.locator('input[name="event_type"]').first().check();
+    // The visible choice card overlays the native radio input on mobile/tablet.
+    // Click the user-facing label instead of forcing Playwright to click the obscured input.
+    await page.locator('label.zazu-choice-card').filter({ has: page.locator('input[name="event_type"]') }).first().click();
     await page.locator('input[name="name"]').fill('Offline catering job');
 
     await page.context().setOffline(true);
