@@ -97,6 +97,7 @@ class PwaOfflineFoundationTest extends TestCase
 
         $this->assertStringContainsString('data-zazu-offline-entity="customer"', $customer);
         $this->assertStringContainsString('data-zazu-offline-entity="job"', $job);
+        $this->assertStringContainsString('<button type="submit" class="zazu-btn zazu-btn-primary">', $job);
         $this->assertStringContainsString('data-zazu-offline-entity="quote"', $quote);
         $this->assertStringContainsString('data-zazu-offline-job-id=', $quote);
 
