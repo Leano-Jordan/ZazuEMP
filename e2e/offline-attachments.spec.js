@@ -26,7 +26,7 @@ test('real Zazu job form can create a job locally while disconnected', async ({ 
     // The visible choice card overlays the native radio input on mobile/tablet.
     // Click the user-facing label instead of forcing Playwright to click the obscured input.
     await page.locator('label.zazu-choice-card').filter({ has: page.locator('input[name="event_type"]') }).first().click();
-    await page.locator('input[name="name"]').fill('Offline catering job');
+    await page.locator('#new-job-form input[name="name"]').fill('Offline catering job');
 
     await page.context().setOffline(true);
     await page.locator('#new-job-form').getByRole('button', { name: /Create job/ }).click();
