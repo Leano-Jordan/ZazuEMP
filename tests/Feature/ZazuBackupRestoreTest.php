@@ -266,9 +266,9 @@ $this->assertSame(0, $exitCode, Artisan::output());
 
         File::put($bin.'/mysqldump', "#!/bin/sh\nprintf '%s\\n' '-- pre-restore snapshot marker'\n");
         File::put($bin.'/mysql', "#!/bin/sh\n".
-            '$count=0'."\n".
+            'count=0'."\n".
             '[ -f '.escapeshellarg($countFile).' ] && count=$(cat '.escapeshellarg($countFile).")\n".
-            '$count=$((count + 1))'."\n".
+            'count=$((count + 1))'."\n".
             'printf "%s" "$count" > '.escapeshellarg($countFile)."\n".
             'cat > '.escapeshellarg($logDirectory).'/import-"$count".sql'."\n".
             'if grep -q "candidate restore SQL" '.escapeshellarg($logDirectory).'/import-"$count".sql; then echo "simulated partial import failure" >&2; exit 1; fi'."\n".
