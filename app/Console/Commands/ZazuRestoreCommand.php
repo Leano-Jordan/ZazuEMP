@@ -48,6 +48,9 @@ class ZazuRestoreCommand extends Command
         $privateRollback = null;
         $privateActivated = false;
         $databaseRollback = null;
+        $mysqlRollbackPath = null;
+        $mysqlRestoreStarted = false;
+        $preserveWork = false;
 
         try {
             $zip = new ZipArchive();
@@ -244,8 +247,15 @@ class ZazuRestoreCommand extends Command
                 return self::FAILURE;
             }
 
-            // Stage private storage before changing the database. Every mutation after this
-            // point either completes or throws so the catch block can restore the originals.
+            // MySQL imports are not atomic. Capture a verified pre-restore dump before
+            // touching private storage or importing any candidate SQL.
+            if ($driver === 'mysql') {
+                $mysqlRollbackPath = $work.'/pre-restore-database.sql';
+                $this->snapshotMysqlForRollback($mysqlRollbackPath);
+            }
+
+            // Stage private storage only after every required database rollback point exists.
+            // Every mutation after this point either completes or throws so catch can recover.
             if ($hasPrivateStorage && is_dir($storedPrivate)) {
                 $privateRollback = storage_path('app/.zazu-private-rollback-'.Str::ulid());
 
@@ -313,24 +323,8 @@ class ZazuRestoreCommand extends Command
                     throw new \RuntimeException('Could not activate the restored SQLite database.');
                 }
             } elseif ($driver === 'mysql') {
-                $connection = config('database.connections.mysql');
-                $sql = $work.'/database.sql';
-
-                $process = new Process([
-                    'mysql',
-                    '--host='.$connection['host'],
-                    '--port='.$connection['port'],
-                    '--user='.$connection['username'],
-                    $connection['database'],
-                ], null, array_filter(['MYSQL_PWD' => $connection['password'] ?? null]));
-
-                $process->setTimeout(300);
-                $process->setInput(File::get($sql));
-                $process->run();
-
-                if (!$process->isSuccessful()) {
-                    throw new \RuntimeException('Database restore failed: '.$process->getErrorOutput());
-                }
+                $mysqlRestoreStarted = true;
+                $this->importMysqlDump($work.'/database.sql');
             }
 
             if ($databaseRollback !== null) {
@@ -346,6 +340,18 @@ class ZazuRestoreCommand extends Command
             $this->info('Zazu restore completed from '.$archive);
             return self::SUCCESS;
         } catch (\Throwable $exception) {
+            $rollbackFailure = null;
+
+            if ($mysqlRestoreStarted && $mysqlRollbackPath !== null && is_file($mysqlRollbackPath)) {
+                try {
+                    $this->importMysqlDump($mysqlRollbackPath);
+                } catch (\Throwable $rollbackException) {
+                    $rollbackFailure = $rollbackException->getMessage();
+                    // Keep the only pre-restore database snapshot available for manual recovery.
+                    $preserveWork = true;
+                }
+            }
+
             if ($databaseRollback !== null && is_file($databaseRollback)) {
                 $target = config('database.connections.sqlite.database');
                 DB::purge('sqlite');
@@ -365,16 +371,77 @@ class ZazuRestoreCommand extends Command
                 rename($privateRollback, storage_path('app/private'));
             }
 
-            $this->error('Zazu restore failed safely: '.$exception->getMessage());
+            if ($rollbackFailure !== null) {
+                $this->error('Zazu restore failed and automatic MySQL rollback also failed: '.$rollbackFailure);
+                $this->error('Pre-restore database snapshot preserved at: '.$mysqlRollbackPath);
+                $this->error('The database may require operator recovery; do not retry against this installation.');
+            } else {
+                $this->error('Zazu restore failed; rollback was attempted where required: '.$exception->getMessage());
+            }
+
             return self::FAILURE;
         } finally {
-            File::deleteDirectory($work);
+            if (!$preserveWork) {
+                File::deleteDirectory($work);
+            }
             if ($databaseRollback !== null) {
                 File::delete($databaseRollback);
             }
             if ($privateRollback !== null) {
                 File::deleteDirectory($privateRollback);
             }
+        }
+    }
+
+    private function snapshotMysqlForRollback(string $path): void
+    {
+        $connection = config('database.connections.mysql');
+        $process = new Process([
+            'mysqldump',
+            '--single-transaction',
+            '--routines',
+            '--triggers',
+            '--host='.$connection['host'],
+            '--port='.$connection['port'],
+            '--user='.$connection['username'],
+            $connection['database'],
+        ], null, array_filter(['MYSQL_PWD' => $connection['password'] ?? null]));
+
+        $process->setTimeout(300);
+        $process->run();
+
+        if (!$process->isSuccessful() || trim($process->getOutput()) === '') {
+            throw new \RuntimeException('Could not create the pre-restore MySQL rollback snapshot: '.$process->getErrorOutput());
+        }
+
+        File::put($path, $process->getOutput());
+
+        if (!is_file($path) || filesize($path) === 0) {
+            throw new \RuntimeException('The pre-restore MySQL rollback snapshot is empty.');
+        }
+    }
+
+    private function importMysqlDump(string $path): void
+    {
+        if (!is_file($path) || filesize($path) === 0) {
+            throw new \RuntimeException('MySQL import dump is empty or unavailable.');
+        }
+
+        $connection = config('database.connections.mysql');
+        $process = new Process([
+            'mysql',
+            '--host='.$connection['host'],
+            '--port='.$connection['port'],
+            '--user='.$connection['username'],
+            $connection['database'],
+        ], null, array_filter(['MYSQL_PWD' => $connection['password'] ?? null]));
+
+        $process->setTimeout(300);
+        $process->setInput(File::get($path));
+        $process->run();
+
+        if (!$process->isSuccessful()) {
+            throw new \RuntimeException('MySQL import failed: '.$process->getErrorOutput());
         }
     }
 
