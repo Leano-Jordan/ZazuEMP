@@ -27,6 +27,9 @@ test('real Zazu job form can create a job locally while disconnected', async ({ 
     // Click the user-facing label instead of forcing Playwright to click the obscured input.
     await page.locator('label.zazu-choice-card').filter({ has: page.locator('input[name="event_type"]') }).first().click();
     await page.locator('#new-job-form input[name="name"]').fill('Offline catering job');
+    // The production form requires a job date; without it the browser blocks
+    // submission before the offline handler can run.
+    await page.locator('#new-job-form input[name="event_date"]').fill('2026-11-15');
 
     await page.context().setOffline(true);
     await page.locator('#new-job-form').getByRole('button', { name: /Create job/ }).click();
