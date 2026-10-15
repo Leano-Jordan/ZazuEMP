@@ -190,16 +190,38 @@
             status: 'pending',
         };
 
-        const db = await openDb();
+        let db;
+        try {
+            db = await openDb();
+        } catch (error) {
+            storageAvailable = false;
+            throw new Error('Local offline storage is unavailable; this change was not saved.');
+        }
+
         return new Promise((resolve, reject) => {
+            let settled = false;
+            const fail = (error) => {
+                if (settled) return;
+                settled = true;
+                reject(error);
+            };
             const tx = db.transaction(QUEUE, 'readwrite');
             tx.objectStore(QUEUE).put(mutation);
             tx.oncomplete = async () => {
-                state.local_dirty = true;
-                await writeState();
-                resolve(mutation);
+                try {
+                    state.local_dirty = true;
+                    await writeState();
+                    if (!settled) {
+                        settled = true;
+                        resolve(mutation);
+                    }
+                } catch (error) {
+                    storageAvailable = false;
+                    fail(new Error('Local offline storage failed while saving; this change may not be safely queued.'));
+                }
             };
-            tx.onerror = () => reject(tx.error);
+            tx.onerror = () => fail(tx.error || new Error('Local offline queue write failed.'));
+            tx.onabort = () => fail(tx.error || new Error('Local offline queue write was aborted.'));
         });
     }
 
@@ -436,6 +458,16 @@
         ready,
     };
 
-    window.addEventListener('online', sync);
-    boot().catch(() => {});
+    window.addEventListener('online', () => {
+        sync().catch(() => {
+            // Reconnection failures are recoverable; keep the local workspace
+            // available and avoid an unhandled promise rejection.
+            if (state) state.last_sync_error = 'Synchronization failed; queued work will retry.';
+        });
+    });
+    boot().catch(() => {
+        // Never leave callers waiting forever if an unexpected boot error escapes.
+        resolveReady(state || blank());
+        window.dispatchEvent(new CustomEvent('zazu:offline-ready', { detail: api }));
+    });
 })();
