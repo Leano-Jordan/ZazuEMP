@@ -60,6 +60,10 @@ class PwaOfflineFoundationTest extends TestCase
         $this->assertStringContainsString("OFFLINE_SHELL,", $worker);
         $this->assertStringContainsString("'/offline-attachments.js'", $worker);
         $this->assertStringContainsString("'/zazu-offline.js'", $worker);
+        $this->assertStringContainsString("const CACHE_NAME = 'zazu-static-v14';", $worker);
+        $this->assertStringContainsString("['/zazu-offline.js', '/offline-attachments.js'].includes(url.pathname)", $worker);
+        $this->assertStringContainsString('const cached = await cache.match(cacheKey);', $worker);
+        $this->assertStringContainsString('if (cached) return cached;', $worker);
         $this->assertStringContainsString("const acceptsHtml = (request.headers.get('accept') || '').includes('text/html');", $worker);
         $this->assertStringContainsString("const isAppPage = request.method === 'GET'", $worker);
         $this->assertStringContainsString('await cache.match(new Request(request.url))', $worker);
