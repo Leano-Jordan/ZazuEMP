@@ -160,6 +160,8 @@ class PwaOfflineFoundationTest extends TestCase
         $this->assertStringContainsString('state.local_dirty = (await pending()).length > 0;', $client);
         $this->assertStringContainsString('remote.conflict_id', $client);
         $this->assertStringContainsString("crypto.randomUUID()", $client);
+        $this->assertStringContainsString("Local offline state write was aborted.", $client);
+        $this->assertStringContainsString("Offline queue acknowledgement was aborted.", $client);
         $app = File::get(resource_path('js/app.js'));
         $this->assertStringContainsString("data-zazu-offline-save-error", $app);
         $this->assertStringContainsString("Check the offline queue before trying again.", $app);
