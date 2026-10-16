@@ -91,6 +91,129 @@ test.describe('Zazu installed PWA offline shell', () => {
         expect(localState.pendingCount).toBe(1);
     });
 
+    test('late authenticated HTML cannot repopulate the private cache after logout starts', async ({ page }, testInfo) => {
+        test.setTimeout(20_000);
+        test.skip(testInfo.project.name !== 'chromium', 'Service-worker cache race contract runs once.');
+
+        await login(page);
+        const userCaches = await page.evaluate(async () => {
+            const workerSource = await fetch('/sw.js', { cache: 'no-store' }).then(response => response.text());
+            const handlers = {};
+            const cacheStores = new Map();
+            const NativeRequest = window.Request;
+
+            class WorkerRequest extends NativeRequest {
+                constructor(input, init) {
+                    const resolved = typeof input === 'string' && input.startsWith('/')
+                        ? new URL(input, window.location.origin).href
+                        : input;
+                    super(resolved, init);
+                }
+            }
+
+            const requestKey = request => typeof request === 'string'
+                ? new URL(request, window.location.origin).href
+                : request.url;
+
+            const cachesApi = {
+                async open(name) {
+                    if (!cacheStores.has(name)) {
+                        const records = new Map();
+                        cacheStores.set(name, {
+                            async match(request) {
+                                const value = records.get(requestKey(request));
+                                return value ? value.clone() : null;
+                            },
+                            async put(request, response) {
+                                records.set(requestKey(request), response.clone());
+                            },
+                            async delete(request) {
+                                return records.delete(requestKey(request));
+                            },
+                            async add(request) {
+                                records.set(requestKey(request), new Response('cached'));
+                            },
+                        });
+                    }
+                    return cacheStores.get(name);
+                },
+                async keys() {
+                    return [...cacheStores.keys()];
+                },
+                async delete(name) {
+                    return cacheStores.delete(name);
+                },
+                async match(request) {
+                    for (const cache of cacheStores.values()) {
+                        const response = await cache.match(request);
+                        if (response) return response;
+                    }
+                    return null;
+                },
+            };
+
+            const mockSelf = {
+                location: { origin: window.location.origin },
+                addEventListener(type, callback) {
+                    handlers[type] = callback;
+                },
+                skipWaiting: () => Promise.resolve(),
+                clients: { claim: () => Promise.resolve() },
+            };
+
+            let resolveHtml;
+            let markNetworkStarted;
+            const networkStarted = new Promise(resolve => { markNetworkStarted = resolve; });
+            const stalledHtml = new Promise(resolve => { resolveHtml = resolve; });
+            const mockFetch = input => {
+                const url = new URL(typeof input === 'string' ? input : input.url, window.location.origin);
+                if (url.pathname === '/dashboard') {
+                    markNetworkStarted();
+                    return stalledHtml;
+                }
+                return Promise.reject(new Error('Unexpected network request in cache-race test: ' + url.pathname));
+            };
+
+            const evaluateWorker = new Function(
+                'self', 'caches', 'fetch', 'Request', 'Response', 'AbortController', 'setTimeout', 'clearTimeout', 'URL',
+                workerSource
+            );
+            evaluateWorker(mockSelf, cachesApi, mockFetch, WorkerRequest, window.Response, window.AbortController, window.setTimeout.bind(window), window.clearTimeout.bind(window), window.URL);
+
+            const cacheWaits = [];
+            let navigationResponse;
+            const navigation = new WorkerRequest(new URL('/dashboard?late-cache-test=1', window.location.origin).href, {
+                headers: { Accept: 'text/html' },
+            });
+
+            handlers.fetch({
+                request: navigation,
+                respondWith(promise) { navigationResponse = Promise.resolve(promise); },
+                waitUntil(promise) { cacheWaits.push(promise); },
+            });
+
+            await networkStarted;
+
+            const logoutWaits = [];
+            handlers.fetch({
+                request: new WorkerRequest(new URL('/logout', window.location.origin).href, { method: 'POST' }),
+                waitUntil(promise) { logoutWaits.push(promise); },
+            });
+            await Promise.all(logoutWaits);
+
+            resolveHtml(new window.Response(
+                '<!doctype html><html><body data-zazu-user-id="123">stale authenticated page</body></html>',
+                { status: 200, headers: { 'content-type': 'text/html; charset=utf-8' } }
+            ));
+            await navigationResponse;
+            await Promise.all(cacheWaits);
+
+            return (await cachesApi.keys()).filter(name => name.includes('-user-'));
+        });
+
+        expect(userCaches).toEqual([]);
+    });
+
     test('logout protects queued offline work and clears the local session after explicit discard', async ({ page }) => {
         test.setTimeout(60_000);
 
