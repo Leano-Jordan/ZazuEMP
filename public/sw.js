@@ -1,4 +1,4 @@
-const CACHE_NAME = 'zazu-static-v15';
+const CACHE_NAME = 'zazu-static-v16';
 const OFFLINE_SHELL = '/dashboard';
 let activeUserId = null;
 let activePrimeController = null;
@@ -213,6 +213,17 @@ self.addEventListener('message', (event) => {
     })());
 });
 
+async function fetchWithTimeout(request, timeoutMs = 4000) {
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), timeoutMs);
+
+    try {
+        return await fetch(request, { signal: controller.signal });
+    } finally {
+        clearTimeout(timeout);
+    }
+}
+
 self.addEventListener('fetch', (event) => {
     const request = event.request;
     const url = new URL(request.url);
@@ -225,7 +236,7 @@ self.addEventListener('fetch', (event) => {
 
     if (isAppPage) {
         event.respondWith(
-            fetch(request)
+            fetchWithTimeout(request)
                 .then((response) => {
                     if (!response.ok) return response;
 
