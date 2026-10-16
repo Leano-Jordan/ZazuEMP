@@ -73,7 +73,7 @@ class PwaOfflineFoundationTest extends TestCase
         $this->assertStringContainsString("const isAppPage = request.method === 'GET'", $worker);
         $this->assertStringContainsString('await cache.match(new Request(request.url))', $worker);
         $this->assertStringContainsString('caches.match(request)', $worker);
-        $this->assertStringContainsString('cache.put(request, copy)', $worker);
+        $this->assertStringNotContainsString('cache.put(request, copy)', $worker);
         $this->assertStringContainsString("event.data?.type === 'clear-user'", $worker);
         $this->assertStringContainsString("async function clearActiveUser()", $worker);
         $this->assertStringContainsString("activePrimeController?.abort()", $worker);
@@ -92,6 +92,19 @@ class PwaOfflineFoundationTest extends TestCase
         $this->assertStringContainsString('data-zazu-user-id="(\\d+)"', $worker);
         $this->assertStringContainsString("CACHE_NAME + '-user-' + activeUserId", $worker);
         $this->assertStringContainsString('await cache.put(new Request(new URL(path, self.location.origin)), response.clone())', $worker);
+    }
+
+
+    public function test_insecure_network_origins_explain_the_offline_installation_requirement(): void
+    {
+        $app = File::get(resource_path('js/app.js'));
+        $styles = File::get(resource_path('css/app.css'));
+
+        $this->assertStringContainsString('if (window.isSecureContext === false)', $app);
+        $this->assertStringContainsString('showZazuOfflineOriginNotice();', $app);
+        $this->assertStringContainsString('This plain-HTTP network address depends on a reachable PC/server', $app);
+        $this->assertStringContainsString('Use a secure HTTPS install address or a self-contained app build', $app);
+        $this->assertStringContainsString('.zazu-offline-origin-notice', $styles);
     }
 
     public function test_existing_zazu_create_forms_are_marked_for_local_mutation_queueing(): void

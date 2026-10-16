@@ -8514,3 +8514,29 @@ body.zazu-has-wallpaper .zazu-content {
     font-family: var(--zazu-font-display);
     font-weight: 800;
 }
+
+/* Offline installation origin: explain unsupported plain-HTTP LAN addresses. */
+.zazu-offline-origin-notice {
+    box-sizing: border-box;
+    display: grid;
+    gap: 0.35rem;
+    width: min(1200px, calc(100% - 2rem));
+    margin: 1rem auto;
+    padding: 1rem 1.125rem;
+    border: 1px solid #f59e0b;
+    border-left-width: 4px;
+    border-radius: 0.75rem;
+    background: #fffbeb;
+    color: #78350f;
+    line-height: 1.5;
+}
+
+.zazu-offline-origin-notice strong {
+    color: #78350f;
+    font-weight: 750;
+}
+
+.zazu-offline-origin-notice p {
+    margin: 0;
+    color: inherit;
+}

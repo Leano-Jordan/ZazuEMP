@@ -328,3 +328,34 @@ This still deliberately distinguishes **server identity** from local identity: t
 ## 2026-10-07 sync atomicity hardening
 
 The server-side mutation path now publishes the resulting sync delivery inside the same database transaction that applies the domain mutation. If delivery creation fails, the domain write and applied marker roll back together instead of leaving an applied mutation with no downstream delivery. A focused regression test covers this failure boundary.
+
+## Director offline-origin and acceptance contract — 2026-10-16
+
+### Supported launch origin
+
+The reported address `http://192.168.137.237:8000` is a PC-hosted LAN development address. It has two separate failure modes:
+
+- `ERR_CONNECTION_REFUSED` means the browser could not reach a server accepting connections at that address and port. A cached PWA cannot make a stopped Laravel server available for server-dependent requests.
+- Plain HTTP on a non-loopback LAN IP is not a secure browser context. Browsers restrict service-worker registration to secure contexts (normally HTTPS; loopback development origins are treated specially). See [MDN secure contexts](https://developer.mozilla.org/en-US/docs/Web/Security/Secure_Contexts).
+
+Changing the LAN IP, leaving the PC server running, or opening the same development URL is not an offline delivery solution. A PWA must first be installed from a supported secure origin, then its shell, required assets, application data and declared offline workflows must be persisted locally. A packaged local app is the alternative when the intended delivery cannot depend on a secure hosted origin.
+
+### Current implementation boundary
+
+The service worker caches the static shell assets and selected authenticated HTML routes. The phone workspace separately persists a bounded set of operational records and queued mutations in IndexedDB. These mechanisms do not yet constitute a complete local replacement for every server-rendered screen and business workflow. Do not describe the current source as fully offline-capable across the entire Zazu domain until that parity has been implemented and proven.
+
+The client now shows an explicit notice when opened in a browser context that cannot register a service worker, rather than silently pretending offline installation is available. This notice diagnoses the launch origin; it does not itself make the application offline.
+
+### Required offline acceptance evidence
+
+The offline release gate is only satisfied when a cleanly installed application:
+
+1. Opens from its installed app icon after force-close, with both internet connectivity and the PC/development host unavailable.
+2. Navigates the declared core screens without network calls being required to render the supported offline UI.
+3. Reads locally persisted records and saves each declared offline mutation durably.
+4. Retains changes after reload and a full close/reopen, with pending sync state visible where applicable.
+5. Reconnects and reconciles queued work without losing changes or duplicating consequential records.
+6. Reports online-only features honestly and fails gracefully when disconnected.
+
+Source assertions and cloud CI are necessary but are not physical-device proof. The actual installed-phone test remains an explicit release gate.
+

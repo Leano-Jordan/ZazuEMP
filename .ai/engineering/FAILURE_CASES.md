@@ -306,3 +306,48 @@ Archive pointer: closed historical cases CASE-ZAZU-0001 through CASE-ZAZU-0009 a
 **Rejected approach:** Do not alter the Quote model relationship merely to accommodate an invalid test call.
 
 **Next action:** Reconcile current-head Laravel and Zazu quality runs; close the case only after both pass.
+
+### CASE-ZAZU-0022
+
+**Status:** CORRECTED — current-head verification pending
+
+**Engineering diagnostic code:** ENG-CONTRACT-006
+
+**First observed:** 2026-10-16, current-head Laravel and Zazu quality workflows.
+
+**Target:** `tests/Feature/PwaOfflineFoundationTest.php` → service-worker static asset cache contract.
+
+**Expected:** The test asserts the current cache-first/awaited-write contract in `public/sw.js`.
+
+**Actual:** One assertion still required the removed `cache.put(request, copy)` expression. The worker now awaits `cache.put(request, response.clone())`; the stale assertion failed the only Laravel feature test at that checkpoint (318 passed, 1 failed) and also failed the Zazu quality test job.
+
+**Classification:** F2/F7 — test contract drift after a source implementation change.
+
+**Correction:** Removed the stale positive assertion and added explicit regression checks for the unsupported-origin notice. No application cache behavior was weakened to satisfy the test.
+
+**Required closure:** Laravel and Zazu quality must pass on the resulting commit SHA. Do not close from a previous green run.
+
+**Loop prevention:** Do not reintroduce `cache.put(request, copy)` or rewrite working service-worker code to satisfy the obsolete string assertion.
+
+### CASE-ZAZU-0023
+
+**Status:** OPEN — offline delivery/installation boundary unresolved
+
+**Engineering diagnostic code:** ENG-RUNTIME-002
+
+**First observed:** 2026-10-16, owner-supplied Chrome screenshot and current-source audit.
+
+**Target:** Installed phone launch with PC/server and internet unavailable.
+
+**Expected:** Zazu launches from its installed app icon and supports the declared core offline UI and local operations without the PC or dev server.
+
+**Actual:** Screenshot shows `http://192.168.137.237:8000` and `ERR_CONNECTION_REFUSED`. The address depends on a reachable PC-hosted server; additionally, plain HTTP on a non-loopback LAN IP is not a secure origin for service-worker registration. The current architecture also explicitly lacks full phone-local parity for every Zazu screen/workflow.
+
+**Classification:** F4/F7 — launch environment and product offline-delivery contract mismatch. The screenshot does not, by itself, prove whether a separately installed HTTPS PWA shell was previously cached.
+
+**Correction in this cycle:** Add an in-app diagnostic notice for non-secure contexts and document supported origin and device acceptance requirements.
+
+**Still required:** Complete and verify the intended independent offline delivery path and phone-local workflow parity. Do not close this case on a source-level test, static cache check, or CI pass. Require a force-closed installed-app relaunch with both internet and the PC/server unavailable, plus offline data persistence and reconnect reconciliation.
+
+**Loop prevention:** Do not repeat IP/port changes or add another cache-only patch as a substitute for a self-contained offline launch path.
+

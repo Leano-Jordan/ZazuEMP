@@ -1692,7 +1692,31 @@ window.addEventListener('zazu:offline-ready', handleZazuPhonePairing);
 
 setupZazuOfflineForms();
 
+function showZazuOfflineOriginNotice() {
+    if (document.querySelector('[data-zazu-offline-origin-notice]')) return;
+
+    const notice = document.createElement('aside');
+    notice.dataset.zazuOfflineOriginNotice = '1';
+    notice.className = 'zazu-offline-origin-notice';
+    notice.setAttribute('role', 'status');
+    notice.setAttribute('aria-live', 'polite');
+
+    const title = document.createElement('strong');
+    title.textContent = 'Offline installation unavailable from this address.';
+
+    const description = document.createElement('p');
+    description.textContent = 'This plain-HTTP network address depends on a reachable PC/server and cannot register Zazu’s service worker. Use a secure HTTPS install address or a self-contained app build before relying on independent offline launch.';
+
+    notice.append(title, description);
+    document.body.prepend(notice);
+}
+
 function registerZazuServiceWorker() {
+    if (window.isSecureContext === false) {
+        showZazuOfflineOriginNotice();
+        return;
+    }
+
     if (!('serviceWorker' in navigator)) return;
 
     const postServiceWorkerMessage = (message) => {

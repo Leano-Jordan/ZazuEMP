@@ -207,3 +207,12 @@ Last updated: 2026-10-15 — MySQL rollback behavior and regression evidence rec
 - Bumped the static cache from v14 to v15 so installed clients activate a fresh cache namespace for the changed worker behavior.
 - Added regression assertions for cache-first handling, awaited writes and the new cache version.
 - Status: source and regression changes committed to `main`; current-head CI and actual installed-device offline launch remain **PENDING/UNVERIFIED**. The cache priming and asset-cache defects are evidence-backed contributors, not proof they explain every part of the reported failure.
+
+## Director offline-origin correction — 2026-10-16
+
+- Confirmed current source on canonical `main` at baseline `10f432bdd6a4d501bbd949c7973283e3ef8f7b66`.
+- Current-head Laravel and Zazu quality workflows both failed because `tests/Feature/PwaOfflineFoundationTest.php` still asserted the removed `cache.put(request, copy)` implementation after the service-worker handler had been changed to await `cache.put(request, response.clone())`. This is test-contract drift (F2/F7), not evidence that the current asset-cache implementation failed.
+- Corrected the stale assertion and added a regression contract for a user-facing warning when the app is opened in a non-secure context. The notice explains that a plain-HTTP LAN address depends on a reachable PC/server and cannot register the service worker.
+- Updated the offline architecture contract to record the exact LAN-origin failure and the full disconnected-device acceptance gate.
+- Current-head CI and actual installed-device offline relaunch are **PENDING** until new evidence is observed. The product-wide offline parity gap remains open; no full-offline claim is made from this correction.
+
