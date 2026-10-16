@@ -8,6 +8,19 @@ This repository is **Zazu EMP only**.
 - Product: Zazu – Event Management Platform
 - Local root when locally available: `C:\Projects\ZazuEMP`
 
+## ABSOLUTE SINGLE-BRANCH POLICY — OWNER MANDATE
+
+**ZazuEMP is a `main`-only repository. Branches are prohibited.** This is a standing owner constraint, not a default preference.
+
+- Never create, checkout, switch to, push to, or base work on any non-`main` branch.
+- Every code, test, documentation, audit, and maintenance write must target `main` directly.
+- Do not propose a feature branch or silently use a branch because a tool/workflow suggests it.
+- If a write cannot be safely completed directly on `main`, stop and report the specific tooling blocker; do not create a branch as a workaround.
+- If an existing non-`main` branch is discovered, treat it as policy drift. Do not work on it. Report it for owner-directed cleanup; do not delete it without explicit authorization.
+- Before each write, explicitly confirm the target is `Leano-Jordan/ZazuEMP` on `main`.
+
+This rule overrides any generic Git workflow, assistant convention, tool default, historical branch, or other repository's instructions. Only a new explicit owner instruction in the current task may change it.
+
 ## WRITE GATE
 
 Before any state-changing operation, establish:
