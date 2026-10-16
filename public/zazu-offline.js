@@ -461,7 +461,10 @@
         ready,
     };
 
-    window.addEventListener('online', () => {
+    window.addEventListener('online', async () => {
+        // The browser can reconnect while IndexedDB is still opening. Wait for
+        // boot to finish so the first reconnect cannot be silently ignored.
+        await ready;
         sync().catch(() => {
             // Reconnection failures are recoverable; keep the local workspace
             // available and avoid an unhandled promise rejection.
