@@ -18,6 +18,19 @@ Jarvis must enforce this rule in all Zazu landing-page copy, outreach, demos and
 
 For any target involving offline installation, local storage, synchronization, network loss or customer-facing offline claims, read and enforce `Leano-Jordan/Rosscore-Labs/docs/ROSCOR_OFFLINE_FIRST_STANDARD.md`. That file is the single company-wide authority for offline terminology and evidence. Zazu-specific capabilities, gaps, and acceptance remain recorded in this repository's offline architecture and failure cases; do not create a competing standard or infer full offline support from service-worker caching.
 
+## Mandatory Git policy — main only, no branches
+
+The owner has explicitly prohibited branches for ZazuEMP. This is absolute standing policy:
+
+1. Use only `Leano-Jordan/ZazuEMP` on `main`.
+2. Never create, switch to, checkout, push to, or develop on a non-`main` branch.
+3. All source, test, documentation, audit and maintenance changes go directly to `main`.
+4. If a tool or process cannot write directly to `main`, stop and report the blocker; never work around it by creating a branch.
+5. Discovery of any non-`main` branch is policy drift, not permission to use it. Do not delete it without explicit owner authorization.
+6. Verify repository and `main` target before every write. After each write, re-read the changed file and reconcile the resulting commit.
+
+This is a hard constraint, not a preference or default. Generic Git best practices and other project workflows do not override it. Only an explicit new owner instruction may change it.
+
 ## Authority
 
 1. Owner instruction
