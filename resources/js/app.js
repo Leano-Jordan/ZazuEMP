@@ -1719,18 +1719,6 @@ function registerZazuServiceWorker() {
 
     if (!('serviceWorker' in navigator)) return;
 
-    const postServiceWorkerMessage = (message) => {
-        const target = navigator.serviceWorker.controller;
-        if (target) {
-            target.postMessage(message);
-            return Promise.resolve();
-        }
-
-        return navigator.serviceWorker.getRegistration().then((registration) => {
-            registration?.active?.postMessage(message);
-        });
-    };
-
     const primeInstalledPages = (registration) => {
         const userId = document.body?.dataset.zazuUserId;
         if (!userId) return;
@@ -1756,20 +1744,6 @@ function registerZazuServiceWorker() {
         target?.postMessage({ type: 'prime-pages', userId, routes });
     };
 
-    document.addEventListener('submit', (event) => {
-        const form = event.target;
-        if (!(form instanceof HTMLFormElement)) return;
-
-        try {
-            const action = new URL(form.action || window.location.href, window.location.href);
-            if (action.origin === window.location.origin && action.pathname === '/logout') {
-                postServiceWorkerMessage({ type: 'clear-user' }).catch(() => {});
-            }
-        } catch {
-            // A service-worker cleanup failure must never block the real logout request.
-        }
-    });
-
     window.addEventListener('load', () => {
         navigator.serviceWorker.register('/sw.js', { scope: '/' })
             .then(() => navigator.serviceWorker.ready)
@@ -1785,3 +1759,74 @@ function registerZazuServiceWorker() {
 }
 
 registerZazuServiceWorker();
+
+let zazuLogoutInProgress = false;
+
+async function handleZazuLogout(form) {
+    const offline = window.ZazuOffline;
+    if (!offline || typeof offline.assessLogout !== 'function' || typeof offline.clearLocalSession !== 'function') {
+        window.alert('Zazu could not verify the local offline queue. Reload while connected and retry signing out so unsynchronized work is not lost.');
+        return;
+    }
+
+    const assessment = await offline.assessLogout();
+    if (assessment.inspectionFailed) {
+        window.alert('Zazu could not safely inspect local offline changes. Close other Zazu tabs, reload, and retry signing out.');
+        return;
+    }
+
+    if (assessment.total > 0 || assessment.conflictCount > 0) {
+        const details = [
+            assessment.pendingCount ? assessment.pendingCount + ' pending change(s)' : '',
+            assessment.failedCount ? assessment.failedCount + ' rejected/failed change(s)' : '',
+            assessment.conflictCount ? assessment.conflictCount + ' unresolved conflict(s)' : '',
+        ].filter(Boolean).join(', ');
+
+        const message = 'This device still has ' + details + '. Signing out will permanently clear the local offline copy and queued changes. Cancel to stay signed in and reconcile them first. Continue and discard this local copy?';
+        if (!window.confirm(message)) return;
+    }
+
+    try {
+        await offline.clearLocalSession();
+    } catch {
+        window.alert('Zazu could not safely clear the local offline session. Your data was left in place; close other Zazu tabs and retry.');
+        return;
+    }
+
+    if ('serviceWorker' in navigator) {
+        try {
+            const registration = await navigator.serviceWorker.getRegistration();
+            const target = navigator.serviceWorker.controller || registration?.active;
+            target?.postMessage({ type: 'clear-user' });
+        } catch {
+            // IndexedDB is cleared before logout; service-worker cleanup is best-effort.
+        }
+    }
+
+    HTMLFormElement.prototype.submit.call(form);
+}
+
+document.addEventListener('submit', async (event) => {
+    const form = event.target;
+    if (!(form instanceof HTMLFormElement)) return;
+
+    let action;
+    try {
+        action = new URL(form.action || window.location.href, window.location.href);
+    } catch {
+        return;
+    }
+    if (action.origin !== window.location.origin || action.pathname !== '/logout') return;
+
+    event.preventDefault();
+    if (zazuLogoutInProgress) return;
+    zazuLogoutInProgress = true;
+
+    try {
+        await handleZazuLogout(form);
+    } catch {
+        window.alert('Zazu could not complete safe local-session cleanup. Your data was left in place; retry after reloading.');
+    } finally {
+        zazuLogoutInProgress = false;
+    }
+});
