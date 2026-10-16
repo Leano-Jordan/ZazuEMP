@@ -374,3 +374,9 @@ A logout request must treat the service-worker page cache and IndexedDB workspac
 - Notify other same-origin tabs to discard in-memory offline credentials and prevent new offline writes from the signed-out session.
 - This is a local-device cleanup control, not proof that a paired device token has been revoked server-side. Server-side revocation remains a separate control.
 - Automated regression coverage must verify cancel-preserves-queue and confirm-clears-token, workspace and queue. Installed-device acceptance remains a separate verification layer.
+
+
+## Offline asset cache versioning
+
+The service worker serves `/zazu-offline.js` and `/offline-attachments.js` cache-first. Once an installed client has cached those paths, changing the server-side file alone does not invalidate the old cached response. Any behavior change to a precached offline client or its startup contract must bump `CACHE_NAME`, update the matching regression assertion, and verify the newly activated worker on the target SHA. Otherwise an installed phone can keep running obsolete code indefinitely while CI passes against a clean browser profile.
+
