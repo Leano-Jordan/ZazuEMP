@@ -13,6 +13,73 @@ async function login(page) {
 }
 
 test.describe('Zazu installed PWA offline shell', () => {
+    test('logout protects queued offline work and clears the local session after explicit discard', async ({ page }) => {
+        test.setTimeout(60_000);
+
+        await login(page);
+        await page.evaluate(async () => {
+            await window.ZazuOffline.ready;
+            await window.ZazuOffline.queueMutation('customer', 'create', {
+                local_id: crypto.randomUUID(),
+                name: 'Logout guard test fixture',
+            });
+        });
+
+        let confirmDiscard = false;
+        const confirmMessages = [];
+        page.on('dialog', async dialog => {
+            if (dialog.type !== 'confirm') {
+                await dialog.dismiss();
+                return;
+            }
+
+            confirmMessages.push(dialog.message());
+            if (confirmDiscard) await dialog.accept();
+            else await dialog.dismiss();
+        });
+
+        await page.evaluate(() => {
+            const form = document.querySelector('form[action$="/logout"]');
+            if (!form) throw new Error('Logout form was not found');
+            form.requestSubmit();
+        });
+
+        await expect.poll(() => new URL(page.url()).pathname).toBe('/dashboard');
+        expect(confirmMessages).toHaveLength(1);
+        expect(confirmMessages[0]).toContain('pending change(s)');
+        expect(await page.evaluate(async () => (await window.ZazuOffline.pending()).length)).toBe(1);
+
+        confirmDiscard = true;
+        await Promise.all([
+            page.waitForURL(url => !url.pathname.endsWith('/dashboard')),
+            page.evaluate(() => document.querySelector('form[action$="/logout"]').requestSubmit()),
+        ]);
+
+        const localData = await page.evaluate(() => new Promise((resolve, reject) => {
+            const request = indexedDB.open('zazu-client', 1);
+            request.onerror = () => reject(request.error || new Error('Could not inspect local offline storage'));
+            request.onsuccess = () => {
+                const db = request.result;
+                const tx = db.transaction(['state', 'mutations'], 'readonly');
+                const stateRequest = tx.objectStore('state').get('current');
+                const queueRequest = tx.objectStore('mutations').getAll();
+                tx.oncomplete = () => {
+                    resolve({
+                        tokenPresent: Boolean(stateRequest.result?.sync?.token),
+                        queueCount: (queueRequest.result || []).length,
+                        workspacePresent: Boolean(stateRequest.result?.business),
+                    });
+                    db.close();
+                };
+                tx.onerror = () => reject(tx.error || new Error('Could not inspect local offline state'));
+            };
+        }));
+
+        expect(localData.tokenPresent).toBe(false);
+        expect(localData.queueCount).toBe(0);
+        expect(localData.workspacePresent).toBe(false);
+    });
+
     test('authenticated dashboard survives a real offline navigation', async ({ page, context }) => {
         test.setTimeout(60_000);
 
