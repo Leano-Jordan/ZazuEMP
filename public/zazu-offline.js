@@ -562,24 +562,28 @@
             state.storage_error = 'Local offline storage is unavailable.';
         }
 
-        if (
+        const shouldSync = Boolean(
             storageAvailable
             && state.sync?.token
             && navigator.onLine
             && window.__ZAZU_OFFLINE_DEFER_INITIAL_SYNC !== true
-        ) {
-            try {
-                await sync();
-            } catch (error) {
-                // Connectivity can be unreliable even when navigator.onLine is
-                // true. Keep the local workspace usable and let later online
-                // events retry synchronization instead of blocking initialization.
-                state.last_sync_error = 'Initial synchronization failed; local work remains available.';
-            }
-        }
+        );
 
+        // Local startup is the critical path. Resolve readiness from durable
+        // IndexedDB state before starting any network operation, so a server
+        // that is slow or unreachable cannot hold the installed app hostage.
         resolveReady(state);
         window.dispatchEvent(new CustomEvent('zazu:offline-ready', { detail: api }));
+
+        if (shouldSync) {
+            sync().catch(() => {
+                // A failed background sync must not undo local readiness. Record
+                // the recoverable error without blocking the application shell.
+                if (!state || sessionCleared || !state.sync?.token) return;
+                state.last_sync_error = 'Initial synchronization failed; local work remains available.';
+                writeState().catch(() => {});
+            });
+        }
     }
 
     window.ZazuOffline = {

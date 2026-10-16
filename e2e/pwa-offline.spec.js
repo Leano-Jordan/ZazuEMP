@@ -13,6 +13,41 @@ async function login(page) {
 }
 
 test.describe('Zazu installed PWA offline shell', () => {
+    test('local client becomes ready before an unresponsive initial sync', async ({ page }, testInfo) => {
+        test.setTimeout(20_000);
+        test.skip(testInfo.project.name !== 'chromium', 'Network-stall startup contract runs once; responsive viewports are covered separately.');
+
+        await login(page);
+        await page.evaluate(async () => {
+            await window.ZazuOffline.ready;
+            const state = window.ZazuOffline.getState();
+            state.sync = { token: 'startup-readiness-test-token', device: { id: 999999 } };
+            state.local_dirty = false;
+            await window.ZazuOffline.persist();
+        });
+
+        // Simulate a network request which never resolves instead of a fast 401/500.
+        // A local-first boot must still resolve ready from IndexedDB.
+        await page.addInitScript(() => {
+            const originalFetch = window.fetch.bind(window);
+            window.fetch = (input, init) => {
+                const rawUrl = typeof input === 'string' ? input : input?.url;
+                const url = new URL(rawUrl, window.location.href);
+                if (url.pathname === '/api/sync/pull') return new Promise(() => {});
+                return originalFetch(input, init);
+            };
+        });
+
+        await page.reload({ waitUntil: 'domcontentloaded' });
+        await expect(page.getByRole('heading', { name: 'Dashboard' })).toBeVisible();
+
+        const readiness = await Promise.race([
+            page.evaluate(() => window.ZazuOffline.ready.then(() => 'ready')),
+            page.waitForTimeout(4_000).then(() => 'blocked'),
+        ]);
+        expect(readiness).toBe('ready');
+    });
+
     test('logout protects queued offline work and clears the local session after explicit discard', async ({ page }) => {
         test.setTimeout(60_000);
 
