@@ -29,8 +29,23 @@
         conflicts: [],
     });
 
+    let dbPromise = null;
+    let sessionCleared = false;
+    let sessionChannel = null;
+
+    try {
+        if ('BroadcastChannel' in window) {
+            sessionChannel = new BroadcastChannel('zazu-offline-session');
+        }
+    } catch {
+        // Cross-tab signalling is best-effort; IndexedDB transactions remain authoritative.
+    }
+
     function openDb() {
-        return new Promise((resolve, reject) => {
+        if (dbPromise) return dbPromise;
+
+        let opening;
+        opening = new Promise((resolve, reject) => {
             const request = indexedDB.open(DB_NAME, DB_VERSION);
             request.onupgradeneeded = () => {
                 const db = request.result;
@@ -41,10 +56,23 @@
                     store.createIndex('created_at', 'created_at');
                 }
             };
-            request.onsuccess = () => resolve(request.result);
+            request.onsuccess = () => {
+                const db = request.result;
+                db.onversionchange = () => {
+                    db.close();
+                    if (dbPromise === opening) dbPromise = null;
+                };
+                resolve(db);
+            };
             request.onerror = () => reject(request.error || new Error('Could not open local offline storage.'));
             request.onblocked = () => reject(new Error('Local offline storage is blocked by another open tab.'));
         });
+
+        dbPromise = opening;
+        opening.catch(() => {
+            if (dbPromise === opening) dbPromise = null;
+        });
+        return opening;
     }
 
     async function readState() {
@@ -176,9 +204,85 @@
             request.onerror = () => reject(request.error);
         });
     }
+    async function allMutations() {
+        const db = await openDb();
+        return new Promise((resolve, reject) => {
+            const request = db.transaction(QUEUE).objectStore(QUEUE).getAll();
+            request.onsuccess = () => resolve(request.result || []);
+            request.onerror = () => reject(request.error || new Error('Offline queue inspection failed.'));
+        });
+    }
+
+    async function assessLogout() {
+        await ready;
+
+        if (!storageAvailable) {
+            return { inspectionFailed: true, total: null, pendingCount: null, failedCount: null, conflictCount: null };
+        }
+
+        try {
+            const records = await allMutations();
+            const pendingCount = records.filter(item => item.status === 'pending').length;
+            const failedCount = records.length - pendingCount;
+            const conflictCount = (state?.conflicts || []).filter(item => item.status === 'open').length;
+
+            return {
+                inspectionFailed: false,
+                total: records.length,
+                pendingCount,
+                failedCount,
+                conflictCount,
+            };
+        } catch {
+            return { inspectionFailed: true, total: null, pendingCount: null, failedCount: null, conflictCount: null };
+        }
+    }
+
+    async function clearStoredWorkspace(broadcast = true) {
+        const wasCleared = sessionCleared;
+        sessionCleared = true;
+
+        try {
+            const db = await openDb();
+            await new Promise((resolve, reject) => {
+                const tx = db.transaction([STATE, QUEUE], 'readwrite');
+                tx.objectStore(STATE).clear();
+                tx.objectStore(QUEUE).clear();
+                tx.oncomplete = resolve;
+                tx.onerror = () => reject(tx.error || new Error('Local offline session cleanup failed.'));
+                tx.onabort = () => reject(tx.error || new Error('Local offline session cleanup was aborted.'));
+            });
+
+            state = blank();
+            storageAvailable = true;
+            if (broadcast) sessionChannel?.postMessage({ type: 'clear-session' });
+        } catch (error) {
+            sessionCleared = wasCleared;
+            throw error;
+        }
+    }
+
+    async function clearLocalSession() {
+        await ready;
+        await clearStoredWorkspace(true);
+    }
+
+    sessionChannel?.addEventListener('message', event => {
+        if (event.data?.type !== 'clear-session') return;
+
+        sessionCleared = true;
+        state = blank();
+        clearStoredWorkspace(false).catch(() => {
+            storageAvailable = false;
+        });
+    });
+
 
     async function queueMutation(entityType, operation, payload) {
         await ready;
+        if (sessionCleared) {
+            throw new Error('This device session has been signed out. Sign in and pair the device again before making offline changes.');
+        }
         if (!storageAvailable) {
             throw new Error('Local offline storage is unavailable; this change was not saved.');
         }
@@ -416,6 +520,7 @@
         if (!response.ok) throw new Error('The Zazu phone pairing code is invalid or expired.');
 
         const result = await response.json();
+        sessionCleared = false;
         state = { ...blank(), sync: { token: result.token, device: result.device }, local_dirty: false };
         applyBootstrap(result.bootstrap);
         await writeState();
@@ -455,6 +560,8 @@
         queueMutation,
         pair,
         sync,
+        assessLogout,
+        clearLocalSession,
         refreshBootstrap,
         persist: writeState,
         pending,
