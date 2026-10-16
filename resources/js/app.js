@@ -1762,9 +1762,39 @@ registerZazuServiceWorker();
 
 let zazuLogoutInProgress = false;
 
+async function loadZazuOfflineClient() {
+    if (window.ZazuOffline) {
+        await window.ZazuOffline.ready;
+        return window.ZazuOffline;
+    }
+
+    await new Promise((resolve, reject) => {
+        const script = document.createElement('script');
+        script.src = '/zazu-offline.js';
+        script.async = true;
+        script.onload = resolve;
+        script.onerror = () => reject(new Error('The local offline client could not be loaded.'));
+        document.head.appendChild(script);
+    });
+
+    if (!window.ZazuOffline) {
+        throw new Error('The local offline client did not initialize.');
+    }
+
+    await window.ZazuOffline.ready;
+    return window.ZazuOffline;
+}
+
 async function handleZazuLogout(form) {
-    const offline = window.ZazuOffline;
-    if (!offline || typeof offline.assessLogout !== 'function' || typeof offline.clearLocalSession !== 'function') {
+    let offline;
+    try {
+        offline = await loadZazuOfflineClient();
+    } catch {
+        window.alert('Zazu could not load the local offline client to verify pending changes. Reload while connected and retry signing out.');
+        return;
+    }
+
+    if (typeof offline.assessLogout !== 'function' || typeof offline.clearLocalSession !== 'function') {
         window.alert('Zazu could not verify the local offline queue. Reload while connected and retry signing out so unsynchronized work is not lost.');
         return;
     }

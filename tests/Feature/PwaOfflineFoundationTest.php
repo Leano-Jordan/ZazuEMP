@@ -50,6 +50,8 @@ class PwaOfflineFoundationTest extends TestCase
         $this->assertStringNotContainsString('primeInstalledPages(registration)', $app);
         $this->assertStringContainsString('window.ZazuOffline.pair(code)', $app);
         $this->assertStringContainsString("document.querySelectorAll('a[href]')", $app);
+        $this->assertStringContainsString('async function loadZazuOfflineClient()', $app);
+        $this->assertStringContainsString("script.src = '/zazu-offline.js';", $app);
         $this->assertStringContainsString('async function handleZazuLogout(form)', $app);
         $this->assertStringContainsString('offline.assessLogout()', $app);
         $this->assertStringContainsString('offline.clearLocalSession()', $app);
