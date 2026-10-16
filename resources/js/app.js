@@ -1775,11 +1775,12 @@ async function handleZazuLogout(form) {
         return;
     }
 
-    if (assessment.total > 0 || assessment.conflictCount > 0) {
+    if (assessment.total > 0 || assessment.conflictCount > 0 || assessment.localDirty) {
         const details = [
             assessment.pendingCount ? assessment.pendingCount + ' pending change(s)' : '',
             assessment.failedCount ? assessment.failedCount + ' rejected/failed change(s)' : '',
             assessment.conflictCount ? assessment.conflictCount + ' unresolved conflict(s)' : '',
+            assessment.localDirty ? 'local workspace marked unsynchronized' : '',
         ].filter(Boolean).join(', ');
 
         const message = 'This device still has ' + details + '. Signing out will permanently clear the local offline copy and queued changes. Cancel to stay signed in and reconcile them first. Continue and discard this local copy?';
