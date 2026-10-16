@@ -45,7 +45,7 @@ test.describe('Zazu installed PWA offline shell', () => {
         });
 
         await expect.poll(() => new URL(page.url()).pathname).toBe('/dashboard');
-        expect(confirmMessages).toHaveLength(1);
+        await expect.poll(() => confirmMessages.length).toBe(1);
         expect(confirmMessages[0]).toContain('pending change(s)');
         expect(await page.evaluate(async () => (await window.ZazuOffline.pending()).length)).toBe(1);
 

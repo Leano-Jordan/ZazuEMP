@@ -7,6 +7,7 @@
     const QUEUE = 'mutations';
     let state = null;
     let syncing = false;
+    let activeSyncController = null;
     let storageAvailable = true;
     let resolveReady;
     const ready = new Promise((resolve) => { resolveReady = resolve; });
@@ -99,7 +100,11 @@
         const headers = new Headers(options.headers || {});
         headers.set('Accept', 'application/json');
         if (state?.sync?.token) headers.set('Authorization', 'Bearer ' + state.sync.token);
-        return fetch(path, { ...options, headers });
+        return fetch(path, {
+            ...options,
+            headers,
+            signal: options.signal ?? activeSyncController?.signal,
+        });
     }
 
     function applyBootstrap(bootstrap) {
@@ -242,6 +247,7 @@
     async function clearStoredWorkspace(broadcast = true) {
         const wasCleared = sessionCleared;
         sessionCleared = true;
+        activeSyncController?.abort();
 
         try {
             const db = await openDb();
@@ -333,9 +339,9 @@
     }
 
     async function push() {
-        if (!navigator.onLine || !state?.sync?.token) return;
+        if (sessionCleared || !navigator.onLine || !state?.sync?.token) return;
         const allMutations = await pending();
-        if (!allMutations.length) return;
+        if (sessionCleared || !state?.sync?.token || !allMutations.length) return;
 
         // The server accepts at most 100 mutations per request. Keep the
         // client durable queue larger than that and drain it in ordered batches.
@@ -358,6 +364,7 @@
         if (!response.ok) return;
 
         const result = await response.json();
+        if (sessionCleared || !state?.sync?.token) return;
         const recorded = new Map((result.recorded || []).map(item => [item.id, item]));
         const db = await openDb();
 
@@ -444,27 +451,33 @@
         }
 
         state.local_dirty = (await pending()).length > 0;
+        if (sessionCleared || !state?.sync?.token) return;
         await writeState();
     }
 
     async function pull() {
-        if (!navigator.onLine || !state?.sync?.token || state.local_dirty) return;
+        if (sessionCleared || !navigator.onLine || !state?.sync?.token || state.local_dirty) return;
 
         for (let batch = 0; batch < 20; batch++) {
+            if (sessionCleared || !state?.sync?.token) return;
             const response = await api('/api/sync/pull?stream=business&limit=100');
-            if (!response.ok) return;
+            if (!response.ok || sessionCleared || !state?.sync?.token) return;
 
             const result = await response.json();
+            if (sessionCleared || !state?.sync?.token) return;
             const mutations = result.mutations || [];
             if (!mutations.length) return;
 
             const bootstrap = await api('/api/sync/bootstrap');
-            if (!bootstrap.ok) return;
+            if (!bootstrap.ok || sessionCleared || !state?.sync?.token) return;
 
-            applyBootstrap(await bootstrap.json());
+            const snapshot = await bootstrap.json();
+            if (sessionCleared || !state?.sync?.token) return;
+            applyBootstrap(snapshot);
             await writeState();
 
             const highest = Math.max(...mutations.map(m => Number(m.sequence || 0)));
+            if (sessionCleared || !state?.sync?.token) return;
             const ack = await api('/api/sync/acknowledge', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
@@ -476,29 +489,38 @@
     }
 
     async function sync() {
-        if (syncing || !navigator.onLine || !state?.sync?.token) return;
+        if (syncing || sessionCleared || !navigator.onLine || !state?.sync?.token) return;
         syncing = true;
+        const controller = new AbortController();
+        activeSyncController = controller;
         try {
             for (let batch = 0; batch < 20; batch++) {
+                if (sessionCleared || !state?.sync?.token) return;
                 const before = (await pending()).length;
-                if (!before) break;
+                if (!before || sessionCleared || !state?.sync?.token) break;
                 await push();
+                if (sessionCleared || !state?.sync?.token) return;
                 const after = (await pending()).length;
                 if (after >= before) break;
             }
 
+            if (sessionCleared || !state?.sync?.token) return;
             await pull();
+            if (sessionCleared || !state?.sync?.token) return;
             await refreshBootstrap();
         } finally {
+            if (activeSyncController === controller) activeSyncController = null;
             syncing = false;
         }
     }
 
     async function refreshBootstrap() {
-        if (!navigator.onLine || !state?.sync?.token || state.local_dirty) return;
+        if (sessionCleared || !navigator.onLine || !state?.sync?.token || state.local_dirty) return;
         const response = await api('/api/sync/bootstrap');
-        if (!response.ok) return;
-        applyBootstrap(await response.json());
+        if (!response.ok || sessionCleared || !state?.sync?.token) return;
+        const bootstrap = await response.json();
+        if (sessionCleared || !state?.sync?.token) return;
+        applyBootstrap(bootstrap);
         await writeState();
     }
 
