@@ -46,6 +46,8 @@ class PwaOfflineFoundationTest extends TestCase
         $app = File::get(resource_path('js/app.js'));
         $this->assertStringContainsString("navigator.serviceWorker.register('/sw.js', { scope: '/' })", $app);
         $this->assertStringContainsString("target?.postMessage({ type: 'prime-pages', userId, routes })", $app);
+        $this->assertSame(1, substr_count($app, 'primeInstalledPages(ready)'));
+        $this->assertStringNotContainsString('primeInstalledPages(registration)', $app);
         $this->assertStringContainsString('window.ZazuOffline.pair(code)', $app);
         $this->assertStringContainsString("document.querySelectorAll('a[href]')", $app);
         $this->assertStringContainsString("postServiceWorkerMessage({ type: 'clear-user' })", $app);
