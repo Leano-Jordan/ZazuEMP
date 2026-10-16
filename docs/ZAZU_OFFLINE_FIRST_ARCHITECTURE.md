@@ -331,6 +331,8 @@ The server-side mutation path now publishes the resulting sync delivery inside t
 
 ## Director offline-origin and acceptance contract — 2026-10-16
 
+**Parent policy:** [Rosscore Labs Offline-First and Disconnected-Operation Standard](https://github.com/Leano-Jordan/Rosscore-Labs/blob/main/docs/ROSCOR_OFFLINE_FIRST_STANDARD.md). Zazu inherits that terminology and evidence contract; this file records Zazu-specific capability and proof.
+
 ### Supported launch origin
 
 The reported address `http://192.168.137.237:8000` is a PC-hosted LAN development address. It has two separate failure modes:

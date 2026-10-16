@@ -309,7 +309,7 @@ Archive pointer: closed historical cases CASE-ZAZU-0001 through CASE-ZAZU-0009 a
 
 ### CASE-ZAZU-0022
 
-**Status:** CORRECTED — current-head verification pending
+**Status:** VERIFIED — source/test commit 3f5d1f1
 
 **Engineering diagnostic code:** ENG-CONTRACT-006
 
@@ -325,7 +325,7 @@ Archive pointer: closed historical cases CASE-ZAZU-0001 through CASE-ZAZU-0009 a
 
 **Correction:** Removed the stale positive assertion and added explicit regression checks for the unsupported-origin notice. No application cache behavior was weakened to satisfy the test.
 
-**Required closure:** Laravel and Zazu quality must pass on the resulting commit SHA. Do not close from a previous green run.
+**Verification:** Laravel and Zazu quality passed on the commit containing the corrected source/test set (`3f5d1f1`). Runs: [Laravel](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/38891784115), [Zazu quality](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/38891784112). The subsequent commit in which this record is reconciled changes control documentation only; the verified source/test blobs are unchanged.
 
 **Loop prevention:** Do not reintroduce `cache.put(request, copy)` or rewrite working service-worker code to satisfy the obsolete string assertion.
 

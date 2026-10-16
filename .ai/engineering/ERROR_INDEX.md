@@ -64,7 +64,7 @@ Codes are permanent once assigned. Never recycle a code.
 | ENG-CSS-002 | CASE-ZAZU-0019 | Horizontal overflow at 1280px | F1/F2 | VERIFIED — current browser suite green |
 | ENG-CSS-003 | CASE-ZAZU-0020 | Theme token state differs by browser/viewport | F1/F2/F4 | VERIFIED — current browser suite green |
 | ENG-CONTRACT-005 | CASE-ZAZU-0021 | Quote latest-version assertion calls fresh on relation | F2 | OPEN — corrected, current-head CI pending |
-| ENG-CONTRACT-006 | CASE-ZAZU-0022 | Stale service-worker cache test assertion | F2/F7 | CORRECTED — verification pending |
+| ENG-CONTRACT-006 | CASE-ZAZU-0022 | Stale service-worker cache test assertion | F2/F7 | VERIFIED — Laravel + Zazu quality passed on 3f5d1f1 |
 | ENG-RUNTIME-002 | CASE-ZAZU-0023 | Offline launch relies on insecure PC-hosted LAN origin | F4/F7 | OPEN — delivery architecture and device proof required |
 
 

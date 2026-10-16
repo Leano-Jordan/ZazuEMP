@@ -14,6 +14,10 @@ Rosscore Labs is the business; the Founder is its owner, not the product's custo
 
 Jarvis must enforce this rule in all Zazu landing-page copy, outreach, demos and customer communications. The Founder must not need to repeat it.
 
+## Offline / local-first boundary — mandatory parent policy
+
+For any target involving offline installation, local storage, synchronization, network loss or customer-facing offline claims, read and enforce `Leano-Jordan/Rosscore-Labs/docs/ROSCOR_OFFLINE_FIRST_STANDARD.md`. That file is the single company-wide authority for offline terminology and evidence. Zazu-specific capabilities, gaps, and acceptance remain recorded in this repository's offline architecture and failure cases; do not create a competing standard or infer full offline support from service-worker caching.
+
 ## Authority
 
 1. Owner instruction
