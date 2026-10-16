@@ -381,3 +381,10 @@ A logout request must treat the service-worker page cache and IndexedDB workspac
 
 The service worker serves `/zazu-offline.js` and `/offline-attachments.js` cache-first. Once an installed client has cached those paths, changing the server-side file alone does not invalidate the old cached response. Any behavior change to a precached offline client or its startup contract must bump `CACHE_NAME`, update the matching regression assertion, and verify the newly activated worker on the target SHA. Otherwise an installed phone can keep running obsolete code indefinitely while CI passes against a clean browser profile.
 
+
+
+## Logout requires a reachable authentication host
+
+The Laravel web session cookie is server-managed. A disconnected browser cannot reliably complete the `POST /logout` action, and deleting IndexedDB first would create a false logout: local business data/token would be erased while the server session cookie remained valid. The client now probes the same-origin authentication route with a bounded, uncached `HEAD` request before local cleanup. If the host cannot be reached, the app keeps the local workspace and queue intact and asks the user to reconnect before trying again.
+
+This is a safety guard, not a claim that every ambiguous network failure is impossible after the probe. The actual installed-device and disconnected-server acceptance remains required.

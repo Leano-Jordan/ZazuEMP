@@ -1762,6 +1762,27 @@ registerZazuServiceWorker();
 
 let zazuLogoutInProgress = false;
 
+async function canReachZazuLogoutServer() {
+    if (!navigator.onLine) return false;
+
+    const controller = new AbortController();
+    const timeout = window.setTimeout(() => controller.abort(), 2500);
+
+    try {
+        const response = await fetch('/login', {
+            method: 'HEAD',
+            credentials: 'same-origin',
+            cache: 'no-store',
+            signal: controller.signal,
+        });
+        return response.ok;
+    } catch {
+        return false;
+    } finally {
+        window.clearTimeout(timeout);
+    }
+}
+
 async function loadZazuOfflineClient() {
     if (window.ZazuOffline) {
         await window.ZazuOffline.ready;
@@ -1824,6 +1845,12 @@ async function handleZazuLogout(form) {
             offline.sync().catch(() => {});
             return;
         }
+    }
+
+    const logoutServerReachable = await canReachZazuLogoutServer();
+    if (!logoutServerReachable) {
+        window.alert('Zazu cannot reach the authentication server, so it cannot securely end this web session. Your local offline data and device token were left untouched. Reconnect to the server and retry signing out.');
+        return;
     }
 
     let revocation;
