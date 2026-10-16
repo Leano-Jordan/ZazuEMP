@@ -58,6 +58,29 @@ test.describe('Zazu installed PWA offline shell', () => {
                 local_id: crypto.randomUUID(),
                 name: 'Logout guard test fixture',
             });
+
+            // Use a failed mutation for a deterministic persistence test. A
+            // pending mutation would legitimately auto-sync during the reload
+            // and make the fixture depend on server timing.
+            const db = await new Promise((resolve, reject) => {
+                const request = indexedDB.open('zazu-client', 1);
+                request.onsuccess = () => resolve(request.result);
+                request.onerror = () => reject(request.error || new Error('Could not open local offline storage'));
+            });
+            await new Promise((resolve, reject) => {
+                const tx = db.transaction(['mutations'], 'readwrite');
+                const store = tx.objectStore('mutations');
+                const request = store.getAll();
+                request.onsuccess = () => {
+                    for (const record of request.result || []) {
+                        store.put({ ...record, status: 'failed' });
+                    }
+                };
+                tx.oncomplete = resolve;
+                tx.onerror = () => reject(tx.error || new Error('Could not mark mutation as failed'));
+                tx.onabort = () => reject(tx.error || new Error('Offline mutation transaction aborted'));
+            });
+            db.close();
         });
 
         let confirmDiscard = false;
@@ -81,14 +104,28 @@ test.describe('Zazu installed PWA offline shell', () => {
 
         await expect.poll(() => new URL(page.url()).pathname).toBe('/dashboard');
         await expect.poll(() => confirmMessages.length).toBe(1);
-        expect(confirmMessages[0]).toContain('pending change(s)');
-        expect(await page.evaluate(async () => (await window.ZazuOffline.pending()).length)).toBe(1);
+        expect(confirmMessages[0]).toContain('rejected/failed change(s)');
+        const queueCount = () => page.evaluate(() => new Promise((resolve, reject) => {
+            const request = indexedDB.open('zazu-client', 1);
+            request.onerror = () => reject(request.error || new Error('Could not inspect offline queue'));
+            request.onsuccess = () => {
+                const db = request.result;
+                const tx = db.transaction(['mutations'], 'readonly');
+                const read = tx.objectStore('mutations').getAll();
+                tx.oncomplete = () => {
+                    resolve((read.result || []).length);
+                    db.close();
+                };
+                tx.onerror = () => reject(tx.error || new Error('Could not inspect offline queue'));
+            };
+        }));
+        expect(await queueCount()).toBe(1);
 
         // A cancelled sign-out must survive a cold page reload without losing queued work.
         await page.reload({ waitUntil: 'domcontentloaded' });
         await expect(page.getByRole('heading', { name: 'Dashboard' })).toBeVisible();
         await page.evaluate(async () => window.ZazuOffline.ready);
-        await expect.poll(() => page.evaluate(async () => (await window.ZazuOffline.pending()).length)).toBe(1);
+        await expect.poll(queueCount).toBe(1);
 
         confirmDiscard = true;
         await Promise.all([
