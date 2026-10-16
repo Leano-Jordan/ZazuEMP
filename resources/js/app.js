@@ -1748,9 +1748,11 @@ function registerZazuServiceWorker() {
 
     window.addEventListener('load', () => {
         navigator.serviceWorker.register('/sw.js', { scope: '/' })
-            .then((registration) => {
-                primeInstalledPages(registration);
-                navigator.serviceWorker.ready.then((ready) => primeInstalledPages(ready));
+            .then(() => navigator.serviceWorker.ready)
+            .then((ready) => {
+                // Prime once only: prime-pages aborts any earlier priming run, so
+                // sending the same route set twice can cancel the dashboard cache fill.
+                primeInstalledPages(ready);
             })
             .catch(() => {
                 // Offline asset support is an enhancement; application behaviour must not depend on it.
