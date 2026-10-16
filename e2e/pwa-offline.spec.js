@@ -49,6 +49,12 @@ test.describe('Zazu installed PWA offline shell', () => {
         expect(confirmMessages[0]).toContain('pending change(s)');
         expect(await page.evaluate(async () => (await window.ZazuOffline.pending()).length)).toBe(1);
 
+        // A cancelled sign-out must survive a cold page reload without losing queued work.
+        await page.reload({ waitUntil: 'domcontentloaded' });
+        await expect(page.getByRole('heading', { name: 'Dashboard' })).toBeVisible();
+        await page.evaluate(async () => window.ZazuOffline.ready);
+        await expect.poll(() => page.evaluate(async () => (await window.ZazuOffline.pending()).length)).toBe(1);
+
         confirmDiscard = true;
         await Promise.all([
             page.waitForURL(url => !url.pathname.endsWith('/dashboard')),

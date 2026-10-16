@@ -562,7 +562,12 @@
             state.storage_error = 'Local offline storage is unavailable.';
         }
 
-        if (storageAvailable && state.sync?.token && navigator.onLine) {
+        if (
+            storageAvailable
+            && state.sync?.token
+            && navigator.onLine
+            && window.__ZAZU_OFFLINE_DEFER_INITIAL_SYNC !== true
+        ) {
             try {
                 await sync();
             } catch (error) {

@@ -1768,6 +1768,10 @@ async function loadZazuOfflineClient() {
         return window.ZazuOffline;
     }
 
+    // Do not let a best-effort network sync hold a public-page logout hostage.
+    // The caller decides whether to keep the queue or explicitly discard it first.
+    window.__ZAZU_OFFLINE_DEFER_INITIAL_SYNC = true;
+
     await new Promise((resolve, reject) => {
         const script = document.createElement('script');
         script.src = '/zazu-offline.js';
@@ -1814,7 +1818,12 @@ async function handleZazuLogout(form) {
         ].filter(Boolean).join(', ');
 
         const message = 'This device still has ' + details + '. Signing out will permanently clear the local offline copy and queued changes. Cancel to stay signed in and reconcile them first. Continue and discard this local copy?';
-        if (!window.confirm(message)) return;
+        if (!window.confirm(message)) {
+            // If the client was loaded just for this logout, resume sync after
+            // the user chooses to stay signed in rather than blocking the prompt.
+            offline.sync().catch(() => {});
+            return;
+        }
     }
 
     try {
