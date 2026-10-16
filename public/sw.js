@@ -1,6 +1,7 @@
-const CACHE_NAME = 'zazu-static-v21';
+const CACHE_NAME = 'zazu-static-v22';
 const OFFLINE_SHELL = '/dashboard';
 let activeUserId = null;
+let activeUserGeneration = 0;
 let activePrimeController = null;
 const MAX_PRIME_ROUTES = 100;
 const PRIME_CONCURRENCY = 6;
@@ -82,17 +83,31 @@ function sanitizeUserId(value) {
     return /^\d+$/.test(id) ? id : null;
 }
 
-async function cacheRenderedPage(request, response) {
+async function cacheRenderedPage(request, response, requestGeneration) {
     const probe = response.clone();
     const html = await probe.text();
+    if (requestGeneration !== activeUserGeneration) return;
+
     const match = html.match(/data-zazu-user-id="(\d+)"/);
     const pageUserId = sanitizeUserId(match?.[1]);
-
     if (!pageUserId) return;
 
-    await setUser(pageUserId);
-    const cache = await caches.open(userCacheName());
-    await cache.put(new Request(request.url), response.clone());
+    await loadActiveUser();
+    if (requestGeneration !== activeUserGeneration) return;
+
+    const cacheGeneration = await setUser(pageUserId, requestGeneration);
+    if (cacheGeneration === null || cacheGeneration !== activeUserGeneration) return;
+
+    const cacheName = userCacheName();
+    const cache = cacheName ? await caches.open(cacheName) : null;
+    if (!cache || cacheGeneration !== activeUserGeneration || activeUserId !== pageUserId) return;
+
+    const requestKey = new Request(request.url);
+    await cache.put(requestKey, response.clone());
+
+    if (cacheGeneration !== activeUserGeneration || activeUserId !== pageUserId) {
+        await caches.delete(cacheName);
+    }
 }
 
 function isCacheableStaticAsset(url, request) {
@@ -114,12 +129,15 @@ function isCacheableStaticAsset(url, request) {
     );
 }
 
-async function setUser(userId) {
+async function setUser(userId, expectedGeneration = null) {
     const nextUserId = sanitizeUserId(userId);
-    if (!nextUserId) return;
+    if (!nextUserId) return null;
+    if (expectedGeneration !== null && expectedGeneration !== activeUserGeneration) return null;
 
     const previous = activeUserId;
+    if (previous && previous !== nextUserId) activeUserGeneration += 1;
     activeUserId = nextUserId;
+    const generation = activeUserGeneration;
 
     const keys = await caches.keys();
     await Promise.all(
@@ -128,11 +146,14 @@ async function setUser(userId) {
             .map((key) => caches.delete(key))
     );
 
+    if (generation !== activeUserGeneration || activeUserId !== nextUserId) return null;
     const state = await caches.open(CACHE_NAME);
+    if (generation !== activeUserGeneration || activeUserId !== nextUserId) return null;
     await state.put(ACTIVE_USER_STATE, new Response(activeUserId));
+    return generation === activeUserGeneration && activeUserId === nextUserId ? generation : null;
 }
 
-async function primePages(routes) {
+async function primePages(routes, primeGeneration = activeUserGeneration, primeUserId = activeUserId) {
     activePrimeController?.abort();
     const controller = new AbortController();
     activePrimeController = controller;
@@ -163,14 +184,15 @@ async function primePages(routes) {
                     const pageUserId = sanitizeUserId(match?.[1]);
                     if (!pageUserId) return;
 
-                    if (pageUserId !== activeUserId) {
-                        await setUser(pageUserId);
-                    }
+                    if (primeGeneration !== activeUserGeneration || pageUserId !== primeUserId || pageUserId !== activeUserId) return;
 
                     const cache = await dynamicCache();
-                    if (!cache) return;
+                    if (!cache || primeGeneration !== activeUserGeneration || pageUserId !== activeUserId) return;
 
                     await cache.put(new Request(new URL(path, self.location.origin)), response.clone());
+                    if (primeGeneration !== activeUserGeneration || pageUserId !== activeUserId) {
+                        await caches.delete(CACHE_NAME + '-user-' + pageUserId);
+                    }
                 } catch {
                     // A single page failing to prime must never block the installed Zazu shell.
                 }
@@ -184,6 +206,7 @@ async function primePages(routes) {
 }
 
 async function clearActiveUser() {
+    activeUserGeneration += 1;
     activePrimeController?.abort();
     activePrimeController = null;
     activeUserId = null;
@@ -208,8 +231,11 @@ self.addEventListener('message', (event) => {
     if (event.data?.type !== 'prime-pages') return;
 
     event.waitUntil((async () => {
-        await setUser(event.data.userId);
-        await primePages(event.data.routes);
+        const generation = activeUserGeneration;
+        await loadActiveUser();
+        const activeGeneration = await setUser(event.data.userId, generation);
+        if (activeGeneration === null) return;
+        await primePages(event.data.routes, activeGeneration, activeUserId);
     })());
 });
 
@@ -228,6 +254,12 @@ self.addEventListener('fetch', (event) => {
     const request = event.request;
     const url = new URL(request.url);
 
+    if (request.method === 'POST' && url.origin === self.location.origin && url.pathname === '/logout') {
+        event.waitUntil(clearActiveUser());
+        return;
+    }
+
+    const requestGeneration = activeUserGeneration;
     const acceptsHtml = (request.headers.get('accept') || '').includes('text/html');
     const isAppPage = request.method === 'GET'
         && url.origin === self.location.origin
@@ -243,7 +275,7 @@ self.addEventListener('fetch', (event) => {
                     // Keep the authenticated page cache operation attached to the
                     // navigation event. Mobile browsers may terminate a worker
                     // immediately after returning the response otherwise.
-                    event.waitUntil(cacheRenderedPage(request, response.clone()));
+                    event.waitUntil(cacheRenderedPage(request, response.clone(), requestGeneration));
                     return response;
                 })
                 .catch(async () => {

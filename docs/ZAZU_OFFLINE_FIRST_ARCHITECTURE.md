@@ -388,3 +388,8 @@ The service worker serves `/zazu-offline.js` and `/offline-attachments.js` cache
 The Laravel web session cookie is server-managed. A disconnected browser cannot reliably complete the `POST /logout` action, and deleting IndexedDB first would create a false logout: local business data/token would be erased while the server session cookie remained valid. The client now probes the same-origin authentication route with a bounded, uncached `HEAD` request before local cleanup. If the host cannot be reached, the app keeps the local workspace and queue intact and asks the user to reconnect before trying again.
 
 This is a safety guard, not a claim that every ambiguous network failure is impossible after the probe. The actual installed-device and disconnected-server acceptance remains required.
+
+
+## Authenticated page-cache generation boundary
+
+Private HTML responses may finish after logout or another authenticated user takes over. The service worker now attaches an identity-generation snapshot to each navigation/HTML request and rejects late cache writes once logout or an identity switch advances the generation. The `POST /logout` request invalidates the generation immediately; queued page priming is aborted and late responses cannot silently restore a previous user's cache. This protects the asynchronous cache boundary; cross-user privacy acceptance still requires a real browser regression with delayed responses and multi-account sessions.

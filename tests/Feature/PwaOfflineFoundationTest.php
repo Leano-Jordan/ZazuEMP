@@ -87,7 +87,7 @@ class PwaOfflineFoundationTest extends TestCase
         $this->assertStringContainsString("OFFLINE_SHELL,", $worker);
         $this->assertStringContainsString("'/offline-attachments.js'", $worker);
         $this->assertStringContainsString("'/zazu-offline.js'", $worker);
-        $this->assertStringContainsString("const CACHE_NAME = 'zazu-static-v21';", $worker);
+        $this->assertStringContainsString("const CACHE_NAME = 'zazu-static-v22';", $worker);
         $this->assertStringContainsString('await cache.put(request, response.clone());', $worker);
         $this->assertStringContainsString('const cached = await caches.match(request);', $worker);
         $this->assertStringContainsString('if (cached) return cached;', $worker);
@@ -101,6 +101,11 @@ class PwaOfflineFoundationTest extends TestCase
         $this->assertStringNotContainsString('cache.put(request, copy)', $worker);
         $this->assertStringContainsString("event.data?.type === 'clear-user'", $worker);
         $this->assertStringContainsString("async function clearActiveUser()", $worker);
+        $this->assertStringContainsString('let activeUserGeneration = 0;', $worker);
+        $this->assertStringContainsString('requestGeneration !== activeUserGeneration', $worker);
+        $this->assertStringContainsString("url.pathname === '/logout'", $worker);
+        $this->assertStringContainsString('cacheRenderedPage(request, response.clone(), requestGeneration)', $worker);
+        $this->assertStringContainsString('async function setUser(userId, expectedGeneration = null)', $worker);
         $this->assertStringContainsString("activePrimeController?.abort()", $worker);
         $this->assertStringContainsString("const offlineShell = cache ? await cache.match(new Request(new URL(OFFLINE_SHELL, self.location.origin))) : null;", $worker);
         $this->assertStringNotContainsString("return cachedPage || caches.match(OFFLINE_SHELL);", $worker);
