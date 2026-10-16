@@ -361,3 +361,16 @@ The offline release gate is only satisfied when a cleanly installed application:
 
 Source assertions and cloud CI are necessary but are not physical-device proof. The actual installed-phone test remains an explicit release gate.
 
+
+
+## Device-local logout and queued-change safety
+
+A logout request must treat the service-worker page cache and IndexedDB workspace as separate data stores. Clearing only cached HTML is insufficient: the local client database contains workspace data, queued mutations and the device sync token.
+
+- Inspect the full local mutation queue before logout, including rejected/failed entries and unresolved conflicts.
+- If queued work or conflicts remain, explain that signing out clears the local offline copy and request explicit confirmation. Cancelling must keep the device data intact.
+- If IndexedDB cannot be inspected or cleared safely, do not silently sign out and leave the offline token/workspace behind. Explain the recovery action.
+- On confirmed logout, clear both the local state store and mutation queue, then clear the authenticated service-worker page cache.
+- Notify other same-origin tabs to discard in-memory offline credentials and prevent new offline writes from the signed-out session.
+- This is a local-device cleanup control, not proof that a paired device token has been revoked server-side. Server-side revocation remains a separate control.
+- Automated regression coverage must verify cancel-preserves-queue and confirm-clears-token, workspace and queue. Installed-device acceptance remains a separate verification layer.
