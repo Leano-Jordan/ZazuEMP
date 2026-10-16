@@ -393,3 +393,6 @@ This is a safety guard, not a claim that every ambiguous network failure is impo
 ## Authenticated page-cache generation boundary
 
 Private HTML responses may finish after logout or another authenticated user takes over. The service worker now attaches an identity-generation snapshot to each navigation/HTML request and rejects late cache writes once logout or an identity switch advances the generation. The `POST /logout` request invalidates the generation immediately; queued page priming is aborted and late responses cannot silently restore a previous user's cache. This protects the asynchronous cache boundary; cross-user privacy acceptance still requires a real browser regression with delayed responses and multi-account sessions.
+
+
+The persisted active-user identity read is generation-checked at every asynchronous boundary as well. A delayed Cache API read can no longer repopulate the in-memory active identity after logout has cleared it.

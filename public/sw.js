@@ -1,4 +1,4 @@
-const CACHE_NAME = 'zazu-static-v22';
+const CACHE_NAME = 'zazu-static-v23';
 const OFFLINE_SHELL = '/dashboard';
 let activeUserId = null;
 let activeUserGeneration = 0;
@@ -59,14 +59,20 @@ function userCacheName() {
     return activeUserId ? CACHE_NAME + '-user-' + activeUserId : null;
 }
 
-async function loadActiveUser() {
+async function loadActiveUser(expectedGeneration = activeUserGeneration) {
+    if (expectedGeneration !== activeUserGeneration) return null;
     if (activeUserId) return activeUserId;
 
     const cache = await caches.open(CACHE_NAME);
-    const stored = await cache.match(ACTIVE_USER_STATE);
-    if (!stored) return null;
+    if (expectedGeneration !== activeUserGeneration) return null;
 
-    activeUserId = sanitizeUserId(await stored.text());
+    const stored = await cache.match(ACTIVE_USER_STATE);
+    if (!stored || expectedGeneration !== activeUserGeneration) return null;
+
+    const storedUserId = sanitizeUserId(await stored.text());
+    if (expectedGeneration !== activeUserGeneration) return null;
+
+    activeUserId = storedUserId;
     return activeUserId;
 }
 
@@ -92,7 +98,7 @@ async function cacheRenderedPage(request, response, requestGeneration) {
     const pageUserId = sanitizeUserId(match?.[1]);
     if (!pageUserId) return;
 
-    await loadActiveUser();
+    await loadActiveUser(requestGeneration);
     if (requestGeneration !== activeUserGeneration) return;
 
     const cacheGeneration = await setUser(pageUserId, requestGeneration);
@@ -232,7 +238,8 @@ self.addEventListener('message', (event) => {
 
     event.waitUntil((async () => {
         const generation = activeUserGeneration;
-        await loadActiveUser();
+        await loadActiveUser(generation);
+        if (generation !== activeUserGeneration) return;
         const activeGeneration = await setUser(event.data.userId, generation);
         if (activeGeneration === null) return;
         await primePages(event.data.routes, activeGeneration, activeUserId);
