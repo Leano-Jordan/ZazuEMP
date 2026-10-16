@@ -199,3 +199,11 @@ Last updated: 2026-10-15 — MySQL rollback behavior and regression evidence rec
 - Changed registration to await `navigator.serviceWorker.ready` and prime the installed pages once.
 - Added regression assertions in `tests/Feature/PwaOfflineFoundationTest.php` to prevent the duplicate priming path returning.
 - Status: source change committed to `main`; current-head CI and real installed-device offline relaunch are **PENDING**. This does not yet prove the user's offline launch issue is resolved.
+
+## Director offline asset-cache hardening — 2026-10-16
+
+- Further inspection found the service worker's static-asset handler started cache writes without awaiting them, then returned the network response. Browsers can suspend the worker before that write completes, leaving required JS/CSS unavailable offline.
+- Reworked static-asset handling to return a cache hit immediately; on a cache miss, fetch and await the cache write before completing the event. Cache-storage failures do not break an otherwise successful online response.
+- Bumped the static cache from v14 to v15 so installed clients activate a fresh cache namespace for the changed worker behavior.
+- Added regression assertions for cache-first handling, awaited writes and the new cache version.
+- Status: source and regression changes committed to `main`; current-head CI and actual installed-device offline launch remain **PENDING/UNVERIFIED**. The cache priming and asset-cache defects are evidence-backed contributors, not proof they explain every part of the reported failure.
