@@ -79,7 +79,7 @@ class PwaOfflineFoundationTest extends TestCase
         $this->assertStringContainsString("OFFLINE_SHELL,", $worker);
         $this->assertStringContainsString("'/offline-attachments.js'", $worker);
         $this->assertStringContainsString("'/zazu-offline.js'", $worker);
-        $this->assertStringContainsString("const CACHE_NAME = 'zazu-static-v19';", $worker);
+        $this->assertStringContainsString("const CACHE_NAME = 'zazu-static-v20';", $worker);
         $this->assertStringContainsString('await cache.put(request, response.clone());', $worker);
         $this->assertStringContainsString('const cached = await caches.match(request);', $worker);
         $this->assertStringContainsString('if (cached) return cached;', $worker);
@@ -190,6 +190,9 @@ class PwaOfflineFoundationTest extends TestCase
         $this->assertStringContainsString("async function pair(pairingCode)", $client);
         $this->assertStringContainsString('async function assessLogout()', $client);
         $this->assertStringContainsString('async function clearLocalSession()', $client);
+        $this->assertStringContainsString("fetch('/api/sync/revoke'", $client);
+        $this->assertStringContainsString('return revokeDeviceToken(token);', $client);
+        $this->assertStringContainsString('could not confirm server-side revocation', $app);
         $this->assertStringContainsString('let activeSyncController = null;', $client);
         $this->assertStringContainsString('activeSyncController?.abort();', $client);
         $this->assertStringContainsString('sessionCleared || !state?.sync?.token', $client);

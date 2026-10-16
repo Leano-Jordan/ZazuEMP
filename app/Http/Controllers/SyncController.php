@@ -151,6 +151,25 @@ class SyncController extends Controller
         ]);
     }
 
+    public function revoke(Request $request): JsonResponse
+    {
+        /** @var SyncDevice $device */
+        $device = $request->attributes->get('sync_device');
+        $metadata = $device->metadata ?? [];
+        unset($metadata['sync_token_hash']);
+
+        $device->forceFill([
+            'status' => 'revoked',
+            'revoked_at' => now(),
+            'metadata' => $metadata,
+        ])->save();
+
+        return response()->json([
+            'revoked' => true,
+            'device_id' => (int) $device->id,
+        ]);
+    }
+
     public function bootstrap(Request $request): JsonResponse
     {
         $device = $request->attributes->get('sync_device');

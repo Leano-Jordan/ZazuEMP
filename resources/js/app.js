@@ -1826,11 +1826,16 @@ async function handleZazuLogout(form) {
         }
     }
 
+    let revocation;
     try {
-        await offline.clearLocalSession();
+        revocation = await offline.clearLocalSession();
     } catch {
         window.alert('Zazu could not safely clear the local offline session. Your data was left in place; close other Zazu tabs and retry.');
         return;
+    }
+
+    if (revocation && !revocation.ok) {
+        window.alert('Zazu cleared this phone’s local offline copy, but could not confirm server-side revocation of its sync token. The token may remain active on the server; the workspace owner must revoke this device before it is trusted again.');
     }
 
     if ('serviceWorker' in navigator) {

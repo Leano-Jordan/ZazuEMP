@@ -372,7 +372,8 @@ A logout request must treat the service-worker page cache and IndexedDB workspac
 - If IndexedDB cannot be inspected or cleared safely, do not silently sign out and leave the offline token/workspace behind. Explain the recovery action.
 - On confirmed logout, clear both the local state store and mutation queue, then clear the authenticated service-worker page cache.
 - Notify other same-origin tabs to discard in-memory offline credentials and prevent new offline writes from the signed-out session.
-- This is a local-device cleanup control, not proof that a paired device token has been revoked server-side. Server-side revocation remains a separate control.
+- After local data has been cleared, the client attempts a bounded server-side token revocation through `POST /api/sync/revoke`. If offline or unreachable, logout continues but warns that the server token may still be active.
+- The endpoint invalidates the current bearer token immediately for subsequent sync requests. It does not provide a remote owner/admin device-management screen, and offline revocation cannot be proven. Treat manual device revocation/management and device-offline cleanup as a separate release risk.
 - Automated regression coverage must verify cancel-preserves-queue and confirm-clears-token, workspace and queue. Installed-device acceptance remains a separate verification layer.
 
 

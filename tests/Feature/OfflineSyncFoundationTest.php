@@ -1698,4 +1698,44 @@ class OfflineSyncFoundationTest extends TestCase
             ->value('record_id'));
     }
 
+    public function test_sync_device_can_revoke_its_bearer_token_and_cannot_reuse_it(): void
+    {
+        $business = Business::create([
+            'name' => 'Device Revocation Business',
+            'slug' => 'device-revoke-'.Str::lower(Str::random(8)),
+            'status' => 'active',
+            'currency' => 'ZAR',
+        ]);
+        $plainToken = Str::random(64);
+        $device = SyncDevice::create([
+            'business_id' => $business->id,
+            'installation_id' => (string) Str::uuid(),
+            'device_name' => 'Revocation test phone',
+            'device_type' => 'phone',
+            'status' => 'active',
+            'metadata' => [
+                'sync_token_hash' => hash('sha256', $plainToken),
+                'preserved_metadata' => 'kept',
+            ],
+        ]);
+
+        $this->withToken($plainToken)
+            ->postJson('/api/sync/revoke')
+            ->assertOk()
+            ->assertJson([
+                'revoked' => true,
+                'device_id' => $device->id,
+            ]);
+
+        $device->refresh();
+        $this->assertSame('revoked', $device->status);
+        $this->assertNotNull($device->revoked_at);
+        $this->assertArrayNotHasKey('sync_token_hash', $device->metadata ?? []);
+        $this->assertSame('kept', $device->metadata['preserved_metadata']);
+
+        $this->withToken($plainToken)
+            ->getJson('/api/sync/bootstrap')
+            ->assertUnauthorized();
+    }
+
 }

@@ -269,9 +269,42 @@
         }
     }
 
+    async function revokeDeviceToken(token) {
+        if (!token) return { ok: true, reason: 'not_paired' };
+        if (!navigator.onLine) return { ok: false, reason: 'offline' };
+
+        const controller = new AbortController();
+        const timeout = window.setTimeout(() => controller.abort(), 1800);
+
+        try {
+            const response = await fetch('/api/sync/revoke', {
+                method: 'POST',
+                headers: {
+                    'Accept': 'application/json',
+                    'Authorization': 'Bearer ' + token,
+                },
+                cache: 'no-store',
+                signal: controller.signal,
+            });
+
+            return response.ok
+                ? { ok: true, reason: null }
+                : { ok: false, reason: 'server_rejected' };
+        } catch {
+            return { ok: false, reason: controller.signal.aborted ? 'timeout' : 'unreachable' };
+        } finally {
+            window.clearTimeout(timeout);
+        }
+    }
+
     async function clearLocalSession() {
         await ready;
+        const token = state?.sync?.token || null;
         await clearStoredWorkspace(true);
+
+        // Local logout must succeed even without the server. Remote revocation
+        // is bounded and its result is returned so the UI can warn accurately.
+        return revokeDeviceToken(token);
     }
 
     sessionChannel?.addEventListener('message', event => {
