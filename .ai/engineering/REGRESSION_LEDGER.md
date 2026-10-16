@@ -64,7 +64,9 @@ Zazu accumulated repeated visual sweep/root-token layers. Later declarations sil
 ## REG-009 — Temporary branch residue
 Ordinary Director execution created multiple non-main branches around isolated work, increasing repository/sync clutter and fragmenting the working state.
 
-**Control:** main-only Director execution unless the owner explicitly authorizes another ref. Do not create temporary branches for routine verification.
+**Control:** The owner mandates canonical `main` only. Never create, checkout, switch to, push to, or develop on a non-`main` branch. Every code/test/doc/audit change goes directly to `main`. If direct-main writing is blocked, stop and report the blocker rather than creating a branch. This is not a default or routine-only restriction; it is absolute unless a new explicit owner instruction in the current task changes it.
+
+**Observed residue (2026-10-16, comparison base `90f0b5b`):** `director/fix-offline-job-browser-selector` diverged 16 commits ahead / 43 behind. Its six changed paths contain older versions of code already superseded on `main`; no unique work was imported from the branch. The connected GitHub tool exposes no ref-delete operation, so this session cannot remove that remote ref. It remains policy drift and must not be used.
 
 **Status:** CONTROL ACTIVE
 

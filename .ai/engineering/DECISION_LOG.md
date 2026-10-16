@@ -73,7 +73,7 @@ Durable decisions governing the Zazu engineering system.
 
 ## DEC-012 — Main-only Director execution
 **Date:** 2026-10-01
-**Decision:** Ordinary Director execution targets main directly. Temporary branches are not part of the Zazu execution model unless the owner explicitly authorizes another ref.
+**Decision:** All Director execution targets canonical `main` directly. Non-`main` branches are prohibited for normal and exceptional work alike. Only a new explicit owner instruction in the current task may change this hard rule; generic Git workflow conventions, historical records, and tool defaults cannot override it.
 **Reason:** Prevent abandoned branches, sync residue and fragmented working state.
 **Status:** ACTIVE
 

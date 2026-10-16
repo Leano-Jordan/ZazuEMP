@@ -183,6 +183,7 @@ class PwaOfflineFoundationTest extends TestCase
 
     public function test_shared_zazu_local_client_is_real_application_infrastructure_not_a_second_workspace(): void
     {
+        $app = File::get(resource_path('js/app.js'));
         $client = File::get(public_path('zazu-offline.js'));
 
         $this->assertStringContainsString("const DB_NAME = 'zazu-client';", $client);

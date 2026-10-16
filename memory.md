@@ -807,3 +807,15 @@ Regression rule:
 - The owner has explicitly reaffirmed that Zazu Director/Jarvis work must **never create extra branches**.
 - Execute fixes, audits, hardening, tests and normal development directly on canonical `main`.
 - Do not create a temporary feature, repair, audit or verification branch unless the owner explicitly authorizes a different ref.
+
+
+## Owner mandate — absolute no-branch rule — 2026-10-16
+
+Zazu EMP / Zazu Director has exactly one permitted development ref: canonical `main`.
+
+- Do not create, maintain, checkout, switch to, push to, cherry-pick from, or develop on any non-`main` branch.
+- All implementation, tests, defect fixes, audits, hardening and documentation are committed directly to `main`.
+- A tool or workflow limitation is a blocker to report, never a reason to create a branch.
+- Existing non-main branches are policy drift. Inspect them read-only only when needed to identify whether they contain unique work; migrate only explicitly reviewed missing value directly to `main`, never use them as a work base, and remove stale remote refs when the available authorized tooling supports deletion.
+- This instruction supersedes older wording that calls main-only a default or permits exceptions by generic prior authorization. Only a new explicit owner instruction in the current task can change this mandate.
+- Verified branch residue on 2026-10-16: `director/fix-offline-job-browser-selector` was 16 commits ahead / 43 behind the then-current main SHA `90f0b5b`; its changed files were older than main's later changes. No new work was done on that branch. The connected GitHub tool available to this execution has no branch-ref deletion operation, so the ref could not be deleted here.
