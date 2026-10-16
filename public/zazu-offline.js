@@ -232,6 +232,7 @@
                 pendingCount,
                 failedCount,
                 conflictCount,
+                localDirty: Boolean(state?.local_dirty),
             };
         } catch {
             return { inspectionFailed: true, total: null, pendingCount: null, failedCount: null, conflictCount: null };
