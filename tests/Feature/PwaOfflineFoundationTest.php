@@ -50,7 +50,10 @@ class PwaOfflineFoundationTest extends TestCase
         $this->assertStringNotContainsString('primeInstalledPages(registration)', $app);
         $this->assertStringContainsString('window.ZazuOffline.pair(code)', $app);
         $this->assertStringContainsString("document.querySelectorAll('a[href]')", $app);
-        $this->assertStringContainsString("postServiceWorkerMessage({ type: 'clear-user' })", $app);
+        $this->assertStringContainsString('async function handleZazuLogout(form)', $app);
+        $this->assertStringContainsString('offline.assessLogout()', $app);
+        $this->assertStringContainsString('offline.clearLocalSession()', $app);
+        $this->assertStringContainsString("target?.postMessage({ type: 'clear-user' })", $app);
     }
 
     public function test_service_worker_uses_the_real_zazu_shell_and_cached_pages_for_offline_navigation(): void
@@ -65,7 +68,7 @@ class PwaOfflineFoundationTest extends TestCase
         $this->assertStringContainsString("OFFLINE_SHELL,", $worker);
         $this->assertStringContainsString("'/offline-attachments.js'", $worker);
         $this->assertStringContainsString("'/zazu-offline.js'", $worker);
-        $this->assertStringContainsString("const CACHE_NAME = 'zazu-static-v17';", $worker);
+        $this->assertStringContainsString("const CACHE_NAME = 'zazu-static-v18';", $worker);
         $this->assertStringContainsString('await cache.put(request, response.clone());', $worker);
         $this->assertStringContainsString('const cached = await caches.match(request);', $worker);
         $this->assertStringContainsString('if (cached) return cached;', $worker);
@@ -174,6 +177,11 @@ class PwaOfflineFoundationTest extends TestCase
         $this->assertStringContainsString("const DB_NAME = 'zazu-client';", $client);
         $this->assertStringContainsString("window.ZazuOffline =", $client);
         $this->assertStringContainsString("async function pair(pairingCode)", $client);
+        $this->assertStringContainsString('async function assessLogout()', $client);
+        $this->assertStringContainsString('async function clearLocalSession()', $client);
+        $this->assertStringContainsString("tx.objectStore(QUEUE).clear();", $client);
+        $this->assertStringContainsString("new BroadcastChannel('zazu-offline-session')", $client);
+        $this->assertStringContainsString('sessionCleared', $client);
         $this->assertStringContainsString("async function sync()", $client);
         $this->assertStringContainsString("/api/sync/push", $client);
         $this->assertStringContainsString("/api/sync/pull?stream=business&limit=100", $client);
