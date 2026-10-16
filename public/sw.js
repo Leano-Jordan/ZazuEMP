@@ -1,4 +1,4 @@
-const CACHE_NAME = 'zazu-static-v14';
+const CACHE_NAME = 'zazu-static-v15';
 const OFFLINE_SHELL = '/dashboard';
 let activeUserId = null;
 let activePrimeController = null;
@@ -272,18 +272,25 @@ self.addEventListener('fetch', (event) => {
     }
 
     if (isCacheableStaticAsset(url, request)) {
-        event.respondWith(
-            caches.match(request).then((cached) => {
-                const network = fetch(request).then((response) => {
-                    if (response.ok) {
-                        const copy = response.clone();
-                        caches.open(CACHE_NAME).then((cache) => cache.put(request, copy));
-                    }
-                    return response;
-                }).catch(() => cached);
+        event.respondWith((async () => {
+            // Cache-first keeps already downloaded application assets usable
+            // offline and avoids an untracked background fetch on every visit.
+            const cached = await caches.match(request);
+            if (cached) return cached;
 
-                return cached || network;
-            })
-        );
+            const response = await fetch(request);
+            if (response.ok) {
+                try {
+                    // Await the write before completing the fetch event. A worker
+                    // can be suspended immediately after returning the response.
+                    const cache = await caches.open(CACHE_NAME);
+                    await cache.put(request, response.clone());
+                } catch {
+                    // A cache quota/storage failure must not break the online page.
+                }
+            }
+
+            return response;
+        })());
     }
 });
