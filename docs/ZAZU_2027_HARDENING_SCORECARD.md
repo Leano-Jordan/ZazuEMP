@@ -15,6 +15,28 @@ This scorecard separates implementation from evidence maturity and separates **V
 4 — runtime/CI verified  
 5 — repeatedly proven through realistic/production/recovery evidence
 
+## Current Director assessment — 2026-10-19
+
+**Assessment boundary:** current main has advanced beyond the last broad green application run. The last recorded broad green baseline is `7940033b6fd4f691692eec5e9d7f6ad587486f61` (2026-10-15); that result does not certify later commits. Exact current-head CI for the new service-worker behavioral suite is **UNVERIFIED** until its run is observed.
+
+| V1 domain | Current evidence position | Remaining release work |
+|---|---|---|
+| Correctness | Behavioral regression suite added for three logout/identity/cache races; fresh CI execution unobserved | Verify the exact current-main run and repair any genuine regression |
+| Architecture | Identity cache mutation/clear operations are now serialized in the service worker | Validate the serialized boundary through CI/browser execution; continue bounded dead-code analysis |
+| Data integrity | Existing transaction, idempotency and ownership controls remain in source; newest-head execution unverified | Current-head tests and populated commercial traversal |
+| Security | Generation guards plus behavioral tests now target stale identity reads, late HTML writes and identity writes racing logout | Latest-run evidence and real multi-account installed-browser challenge |
+| Workflow integrity | Connected commercial flow exists; previous populated proof is for an earlier SHA | Re-run current-head workflow and reconcile job → quote → invoice/payment → purchasing/costs |
+| UX / accessibility | Earlier responsive/browser acceptance is historical; this audit introduces no UI redesign | Re-run browser checks after the current code changes and preserve owner-confirmed device acceptance boundary |
+| Reliability / recovery | Automated restore/rollback coverage existed at the earlier verified baseline | Real deployment-environment backup/restore (including private media) and rollback drills remain open |
+| Operability | Stale health snapshots are archived; current health workflow publishes per-run artifacts and summary only | Open the exact current-main workflow run; do not rely on a persistent `latest` file |
+| Upgrade / deployment | Previous populated upgrade/rollback run was green at the recorded baseline | Confirm current-head results and perform real release rollback exercise |
+| Documentation / compliance | V1 ledger reconciled; stale health claims removed | Legal/privacy operator controls, brand/trade-mark clearance and final dependency distribution review |
+| Release evidence | Current exact-head results are not yet reconciled | Record SHA + run URLs + conclusions before promoting evidence maturity |
+
+### Score disposition
+
+The previously recorded **80/100 commercial-readiness figure is historical (2026-10-04)**, not a current live score. This audit does **not** award a numerical uplift: source changes and new tests are implementation evidence, not a passing runtime result. Re-score only after current-head CI is observed and the open V1 operational gates are reconciled.
+
 ## V1 gate domains
 
 | Domain | What must be true |
