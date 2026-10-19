@@ -19,6 +19,15 @@ Scope is intentionally bounded to **P0 commercial hand-off** and **P1 operationa
 
 Evidence boundary: source changes and test additions are **IMPLEMENTED**; current-head execution and rendered browser behaviour remain **UNVERIFIED**. No readiness score uplift.
 
+
+## CI failure triage — 2026-10-20
+
+- [x] Inspect failed Laravel and quality workflow logs on current observed head.
+- [x] Root cause found in `PwaOfflineFoundationTest`: three legacy string assertions still expected pre-generation-guard service-worker signatures even though the test already asserts the newer `expectedGeneration` signatures. Removed the obsolete assertions; the implementation was not weakened.
+- [ ] Verify this test correction on fresh current-main CI.
+- [ ] Browser smoke has independent failures: the cache-race test constructs the worker with `new Function`, blocked by the app's intentional CSP (no `unsafe-eval`); logout persistence scenario also times out waiting for the failed-queue confirmation. Refactor the test harness to execute worker source without weakening CSP, then debug logout queue fixture/confirmation.
+- [ ] Re-run Laravel, quality and browser smoke after the fixes; do not mark green until the new SHA completes.
+
 ## 01 Core product workflow
 
 - [x] Authentication/business foundation implemented
