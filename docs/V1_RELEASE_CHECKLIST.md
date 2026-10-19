@@ -3,8 +3,9 @@
 **Status:** ACTIVE / CANONICAL  
 **Repository:** `Leano-Jordan/ZazuEMP`  
 **Branch:** `main`  
-**Current main HEAD:** `d65f0f8ad8837306ee2726185292e4a9b25d6938`  
-**Last Director reconciliation:** 2026-10-07
+**Main-ref rule:** query the live `main` ref; this ledger does not pin a moving HEAD.  
+**Last Director reconciliation:** 2026-10-19  
+**Latest reviewed test/code sequence:** service-worker behavioral tests and serialized identity-cache mutation were added directly to `main`; current-head execution remains unverified.
 
 ## Evidence rule
 
@@ -12,22 +13,22 @@
 
 This ledger records the current release truth. Older Director audits remain historical evidence; they do not override this snapshot.
 
-## Current-head CI
+## Current-head CI evidence
 
-| Check | Current HEAD |
+| Check | Evidence status at latest audited main |
 |---|---|
-| Laravel tests | 🟢 PASS |
-| Application/build | 🟢 PASS |
-| Quality | 🟢 PASS |
-| PHPMD | 🟢 PASS |
-| Psalm / PHP security | 🟢 PASS |
-| Populated upgrade + rollback | 🟢 PASS |
-| Browser smoke | 🟢 PASS |
-| Director Contract Lint | 🟢 PASS |
-| Push/main workflow | 🟢 PASS |
-| SonarCloud | ⚪ Conditionally skipped |
+| Laravel tests | 🟡 NOT RECONCILED for the latest main SHA |
+| Application/build | 🟡 NOT RECONCILED for the latest main SHA |
+| Quality + service-worker behavioral race suite | 🟡 NEW CHECK; fresh run result not yet observed |
+| PHPMD | 🟡 Latest-main result not observed |
+| Psalm / PHP security | 🟡 Latest-main result not observed |
+| Populated upgrade + rollback | 🟡 Latest-main result not observed |
+| Browser smoke | 🟡 Latest-main result not observed |
+| Director Contract Lint | 🟡 Latest-main result not observed |
+| Push/main workflow | 🟡 Latest-main result not observed |
+| SonarCloud | ⚪ Previously conditionally skipped; not a pass |
 
-These are GitHub Actions results for the exact current main HEAD above. They supersede older CI references.
+The last source-recorded broad green main run is commit `7940033b6fd4f691692eec5e9d7f6ad587486f61` (2026-10-15), including Laravel run 38789104896, Quality 38789104893, PHPMD 38789105223, Psalm Security Scan 38789105085, browser smoke 38789104865, and populated upgrade/rollback 38789104911. This is historical evidence for that SHA only. Do not promote it to current-head PASS. The current health workflow emits a per-run artifact and Actions summary; it does not publish a persistent latest report.
 
 ## V1 capability gates
 
@@ -48,13 +49,13 @@ These are GitHub Actions results for the exact current main HEAD above. They sup
 | Populated upgrade | 🟢 | Current-head GitHub check passed |
 | Rollback procedure | 🟢 AUTOMATED / 🟡 OPERATIONAL DRILL | Procedure and recovery path exist; real deployment exercise remains |
 | Desktop/mobile/tablet browser coverage | 🟢 AUTOMATED | Physical-device acceptance separately verified |
-| Offline-first foundation | 🟡 | Phone-local IndexedDB + queued sync now covers customer/job/service/preparation/supplier/purchasing/receiving/quote/acceptance/invoice/payment/expense/inventory/costs/assets; conflict/file-sync and full bidirectional parity remain outside the claim |
+| Offline-first foundation | 🟡 | Phone-local IndexedDB + queued sync covers the documented commercial/operational chain, including attachments and explicit conflict detection/resolution; full disconnected parity across every desktop workflow remains unproven and outside the current claim |
 | Zazu Helper | 🟡 | Foundation exists; broader autonomous behaviour remains outside V1 |
 
 ## Remaining V1 certification gates
 
 ### 1. Physical device acceptance — 🟢 VERIFIED
-Owner verified on 2026-10-07 that Zazu is installed on PC and mobile, presentation is in order, and screen rotation works. This verifies physical acceptance for the reported devices; it does not prove fully disconnected phone-local operation.
+Owner verified on 2026-10-07 that Zazu was installed on PC and mobile, presentation was in order, and screen rotation worked. This remains physical acceptance for the reported devices only; it does not verify the post-2026-10-16 service-worker/logout changes or prove fully disconnected phone-local operation.
 
 ### 2. Legal / privacy operational closure — 🟡 OPEN
 Still requires real operator/deployment details, final privacy/terms decisions, retention/disposal ownership, incident escalation and any applicable processing agreements.
@@ -72,7 +73,7 @@ The rollback runbook and recovery mechanisms exist. A real release/deployment ro
 Exact locked Composer and npm manifests were reconciled on 2026-10-07. See `docs/RELEASE_DEPENDENCY_LICENCE_AUDIT.md`. Final legal/distribution review remains separate.
 
 ### 7. Offline operational depth — 🟡 IN PROGRESS
-Phone-local inventory, operational cost and asset workflows are now represented in the local store, queued for synchronization, and protected by server-side domain handlers. Automated runtime execution of the new regression set remains required before promoting this from IMPLEMENTED to TESTED/VERIFIED.
+Phone-local inventory, operational cost and asset workflows are now represented in the local store, queued for synchronization, and protected by server-side domain handlers. The new Node behavioral race suite is now wired into the Quality workflow, but execution on the latest main and the resulting CI conclusion remain UNVERIFIED until the exact run is observed.
 
 ### 8. Final Director certification — ⬜ NOT STARTED
 Certification waits for the remaining operational/legal/brand gates; no rushed release claim.
