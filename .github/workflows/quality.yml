@@ -40,6 +40,9 @@ jobs:
       - name: Build frontend
         run: npm run build
 
+      - name: Test service-worker authentication cache races
+        run: npm run test:service-worker
+
       - name: Run application tests
         run: php artisan test
 
