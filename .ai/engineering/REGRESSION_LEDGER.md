@@ -152,7 +152,9 @@ Public navigation links, CTAs and later bento items can drift vertically or leav
 
 **Status:** CONTROL ACTIVE
 
-## REG-017 — Director visual recovery invariants
+## REG-022 — Director visual recovery invariants
+
+**ID correction — 2026-10-19:** This control previously duplicated `REG-017`, which remains assigned to “Workspace-state visual language drift”. The duplicate is corrected to the next unused permanent ID, `REG-022`. Historical references to this visual-recovery control should use `REG-022`.
 
 The 2026-10-05 UI recovery exposed a cluster of regressions caused by later CSS/JS overrides defeating earlier visual decisions.
 
