@@ -2,6 +2,23 @@
 
 This document is the current execution map. Dated implementation records remain historical evidence.
 
+## Focused Director workflow audit — 2026-10-20
+
+Scope is intentionally bounded to **P0 commercial hand-off** and **P1 operational consistency**.
+
+- [x] Inspect quote → invoice → payment source path and confirm server-side quote/job mismatch protection.
+- [x] Fix invoice form ambiguity: quote mode derives/locks the linked job, disables direct lines and tax override, and explains the authoritative source.
+- [x] Add focused regression assertion for the quote-bound invoice form.
+- [x] Confirm source-level overlap guards exist in both online and offline asset allocation paths.
+- [x] Confirm existing populated reconciliation scenario covers quote acceptance → R11,500 invoice → R3,450 deposit → R8,050 final payment → paid state.
+- [ ] Run current-main `QuoteCommercialHandoffTest`, `CommercialReconciliationTest` and relevant asset/offline tests.
+- [ ] Observe current-main CI result and record exact SHA/run URL.
+- [ ] Browser-test quote selection/switch/clear, direct-invoice fallback, keyboard interaction, validation recovery and mobile layout.
+- [ ] Traverse one populated job across Work, Quote, Finance, Payments, Assets and completion; compare linked IDs, version, tax, totals, balances and asset dates.
+- [ ] Reconcile any failures and rerun affected tests before closing P0/P1.
+
+Evidence boundary: source changes and test additions are **IMPLEMENTED**; current-head execution and rendered browser behaviour remain **UNVERIFIED**. No readiness score uplift.
+
 ## 01 Core product workflow
 
 - [x] Authentication/business foundation implemented
