@@ -812,7 +812,7 @@ color:var(--zazu-text-ink);font-size:11px;font-weight:750
 }
 
 .zazu-report-value {
-color:var(--zazu-text-ink);text-align:right;font-family:var(--zazu-font-ui);font-size:12px;font-weight:700;font-variant-numeric:tabular-nums;font-variant-numeric:tabular-nums
+color:var(--zazu-text-ink);text-align:right;font-family:var(--zazu-font-ui);font-size:12px;font-weight:700;font-variant-numeric:tabular-nums
 }
 
 .zazu-table-wrap {
@@ -1213,7 +1213,7 @@ display:block;color:var(--zazu-text-muted);font-family:var(--zazu-font-ui);font-
 }
 
 .zazu-dash-metric>strong {
-display:block;margin:7px 0 3px;color:var(--zazu-text-ink);font-family:var(--zazu-font-ui);font-size:28px;font-weight:700;font-variant-numeric:tabular-nums;font-variant-numeric:tabular-nums
+display:block;margin:7px 0 3px;color:var(--zazu-text-ink);font-family:var(--zazu-font-ui);font-size:28px;font-weight:700;font-variant-numeric:tabular-nums
 }
 
 .zazu-dash-metric>small {
