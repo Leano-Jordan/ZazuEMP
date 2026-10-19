@@ -20,10 +20,10 @@
 
             <label class="zazu-field">
                 <span class="zazu-label">Accepted quote</span>
-                <select name="quote_id" class="zazu-select">
+                <select name="quote_id" class="zazu-select" data-invoice-quote>
                     <option value="">No quote</option>
                     @foreach($quotes as $quote)
-                        <option value="{{ $quote->id }}" @selected((string) old('quote_id', $selectedQuoteId) === (string) $quote->id)>
+                        <option value="{{ $quote->id }}" data-event-id="{{ $quote->event_id }}" data-event-name="{{ $quote->event?->name }}" data-customer-name="{{ $quote->event?->customer?->name }}" data-currency="{{ $quote->currency }}" data-total="{{ $quote->latestVersion?->total ?? '0.00' }}" @selected((string) old('quote_id', $selectedQuoteId) === (string) $quote->id)>
                             {{ $quote->reference }} · {{ $quote->status }} · {{ $quote->event?->customer?->name }} · {{ $quote->currency }} {{ $quote->latestVersion?->total ?? '0.00' }}
                         </option>
                     @endforeach
@@ -34,7 +34,7 @@
 
             <label class="zazu-field mt-4">
                 <span class="zazu-label">Job (when invoicing without a quote)</span>
-                <select name="event_id" class="zazu-select">
+                <select name="event_id" class="zazu-select" data-invoice-event>
                     <option value="">No job</option>
                     @foreach($events as $event)
                         <option value="{{ $event->id }}" @selected(old('event_id') == $event->id)>{{ $event->name }} · {{ $event->event_date?->format('d M Y') }}</option>
@@ -78,7 +78,7 @@
             <div class="zazu-form-grid mt-5">
                 <label class="zazu-field">
                     <span class="zazu-label">Tax treatment</span>
-                    <select name="tax_rate_id" class="zazu-select">
+                    <select name="tax_rate_id" class="zazu-select" data-invoice-tax-rate>
                         <option value="">No tax / 0%</option>
                         @foreach($taxRates as $taxRate)
                             <option value="{{ $taxRate->id }}" @selected((string)old('tax_rate_id', $defaultTaxRate?->id) === (string)$taxRate->id)>
@@ -109,6 +109,8 @@
                 @error('notes')<span class="zazu-field-error">{{ $message }}</span>@enderror
             </label>
 
+            <p class="zazu-field-help mt-4" data-invoice-source-summary aria-live="polite"></p>
+
             <div class="zazu-actionbar">
                 <a href="{{ route('finance.index') }}" class="zazu-btn zazu-btn-ghost">Cancel</a>
                 <button class="zazu-btn zazu-btn-primary">Create invoice</button>
@@ -124,6 +126,46 @@
             if (!root || !list || !add) return;
 
             let index = 1;
+            const form = root.closest('form');
+            const quoteSelect = form?.querySelector('[data-invoice-quote]');
+            const eventSelect = form?.querySelector('[data-invoice-event]');
+            const taxSelect = form?.querySelector('[data-invoice-tax-rate]');
+            const summary = form?.querySelector('[data-invoice-source-summary]');
+            const directControls = () => [...root.querySelectorAll('input, button, select, textarea')];
+
+            if (quoteSelect && eventSelect && taxSelect && summary) {
+                let manualEventId = eventSelect.value;
+
+                const syncInvoiceSource = () => {
+                    const option = quoteSelect.selectedOptions[0];
+                    const quoteSelected = Boolean(quoteSelect.value);
+
+                    if (quoteSelected) {
+                        const linkedEventId = option.dataset.eventId ?? '';
+                        if ([...eventSelect.options].some((item) => item.value === linkedEventId)) {
+                            eventSelect.value = linkedEventId;
+                        }
+                    } else {
+                        eventSelect.value = manualEventId;
+                    }
+
+                    eventSelect.disabled = quoteSelected;
+                    taxSelect.disabled = quoteSelected;
+                    directControls().forEach((control) => { control.disabled = quoteSelected; });
+                    root.hidden = quoteSelected;
+
+                    summary.textContent = quoteSelected
+                        ? 'Invoice source: ' + option.textContent.trim() + '. Job, lines, currency and tax treatment come from this accepted quote version.'
+                        : 'Invoice source: direct job invoice. Choose a job and enter invoice lines; the selected tax treatment applies.';
+                };
+
+                eventSelect.addEventListener('change', () => {
+                    if (!quoteSelect.value) manualEventId = eventSelect.value;
+                });
+                quoteSelect.addEventListener('change', syncInvoiceSource);
+                syncInvoiceSource();
+            }
+
             const createField = (labelText, attributes = {}) => {
                 const label = document.createElement('label');
                 label.className = 'zazu-field';
