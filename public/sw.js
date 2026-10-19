@@ -135,6 +135,14 @@ function isCacheableStaticAsset(url, request) {
     );
 }
 
+let userCacheMutationQueue = Promise.resolve();
+
+function serializeUserCacheMutation(mutation) {
+    const result = userCacheMutationQueue.then(mutation, mutation);
+    userCacheMutationQueue = result.catch(() => {});
+    return result;
+}
+
 async function setUser(userId, expectedGeneration = null) {
     const nextUserId = sanitizeUserId(userId);
     if (!nextUserId) return null;
@@ -145,18 +153,22 @@ async function setUser(userId, expectedGeneration = null) {
     activeUserId = nextUserId;
     const generation = activeUserGeneration;
 
-    const keys = await caches.keys();
-    await Promise.all(
-        keys
-            .filter((key) => key.startsWith(CACHE_NAME + '-user-') && key !== userCacheName())
-            .map((key) => caches.delete(key))
-    );
+    return serializeUserCacheMutation(async () => {
+        if (generation !== activeUserGeneration || activeUserId !== nextUserId) return null;
 
-    if (generation !== activeUserGeneration || activeUserId !== nextUserId) return null;
-    const state = await caches.open(CACHE_NAME);
-    if (generation !== activeUserGeneration || activeUserId !== nextUserId) return null;
-    await state.put(ACTIVE_USER_STATE, new Response(activeUserId));
-    return generation === activeUserGeneration && activeUserId === nextUserId ? generation : null;
+        const keys = await caches.keys();
+        await Promise.all(
+            keys
+                .filter((key) => key.startsWith(CACHE_NAME + '-user-') && key !== userCacheName())
+                .map((key) => caches.delete(key))
+        );
+
+        if (generation !== activeUserGeneration || activeUserId !== nextUserId) return null;
+        const state = await caches.open(CACHE_NAME);
+        if (generation !== activeUserGeneration || activeUserId !== nextUserId) return null;
+        await state.put(ACTIVE_USER_STATE, new Response(activeUserId));
+        return generation === activeUserGeneration && activeUserId === nextUserId ? generation : null;
+    });
 }
 
 async function primePages(routes, primeGeneration = activeUserGeneration, primeUserId = activeUserId) {
@@ -217,15 +229,17 @@ async function clearActiveUser() {
     activePrimeController = null;
     activeUserId = null;
 
-    const keys = await caches.keys();
-    await Promise.all(
-        keys
-            .filter((key) => key.startsWith(CACHE_NAME + '-user-'))
-            .map((key) => caches.delete(key))
-    );
+    return serializeUserCacheMutation(async () => {
+        const keys = await caches.keys();
+        await Promise.all(
+            keys
+                .filter((key) => key.startsWith(CACHE_NAME + '-user-'))
+                .map((key) => caches.delete(key))
+        );
 
-    const state = await caches.open(CACHE_NAME);
-    await state.delete(ACTIVE_USER_STATE);
+        const state = await caches.open(CACHE_NAME);
+        await state.delete(ACTIVE_USER_STATE);
+    });
 }
 
 self.addEventListener('message', (event) => {
