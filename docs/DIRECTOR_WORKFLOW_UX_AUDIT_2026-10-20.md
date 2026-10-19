@@ -61,3 +61,14 @@ Source inspection and a passing focused test are not substitutes for current-mai
 - Re-read-after-write confirmed the invoice view, regression test, checklist, chat context, engineering state, readiness register and canonical Director engine contain the intended changes.
 
 The release boundary remains unchanged until the queued/current-head checks complete and the rendered workflow is actually exercised.
+
+
+## CI failure triage — 2026-10-20
+
+Inspection of failed current-main workflow logs found:
+
+1. **Laravel / quality:** 321+ application tests pass, but `PwaOfflineFoundationTest` fails because three stale assertions expect old service-worker function signatures. The worker and the same test already use generation-aware signatures. The obsolete assertions were removed without changing runtime code; a fresh CI run is required to verify the correction.
+2. **Browser smoke — CSP:** cache-race regression test calls `new Function` to evaluate worker source inside the page, which the app's intentional CSP blocks because `unsafe-eval` is absent. Do not weaken production CSP to satisfy the test; move the harness to a CSP-compatible execution context.
+3. **Browser smoke — logout queue:** the logout persistence test times out waiting for the expected rejected/failed-change confirmation in desktop, mobile and tablet runs. Inspect the fixture's failed mutation state and confirmation flow before changing product behaviour.
+
+The quote-to-invoice source fix remains pending fresh current-head CI and browser proof. The current P0/P1 gate is not closed.
