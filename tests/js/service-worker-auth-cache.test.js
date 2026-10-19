@@ -16,7 +16,7 @@ function deferred() {
     return { promise, resolve, reject };
 }
 
-function bootWorker(fetchImplementation = async () => new MockResponse('online')) {
+function bootWorker(fetchImplementation = async () => new MockResponse('online'), cacheHooks = {}) {
     const listeners = new Map();
     const cacheStore = new Map();
     const fetchCalls = [];
@@ -70,7 +70,11 @@ function bootWorker(fetchImplementation = async () => new MockResponse('online')
         const entries = cacheStore.get(name);
         return {
             match: async (key) => entries.get(requestUrl(key)) ?? null,
-            put: async (key, response) => { entries.set(requestUrl(key), response); },
+            put: async (key, response) => {
+                const normalizedKey = requestUrl(key);
+                if (cacheHooks.beforePut) await cacheHooks.beforePut({ name, key: normalizedKey, response });
+                entries.set(normalizedKey, response);
+            },
             add: async (key) => { entries.set(requestUrl(key), new MockResponse('asset')); },
             delete: async (key) => entries.delete(requestUrl(key)),
         };
@@ -209,4 +213,38 @@ test('an authenticated HTML response finishing after logout cannot repopulate th
         'a late response must not recreate the logged-out user cache',
     );
     assert.equal(await staticCache.match('/__zazu-active-user__'), null, 'the persisted identity must remain cleared');
+});
+
+
+test('an identity write already in flight cannot finish after logout cleanup', async () => {
+    const putStarted = deferred();
+    const releasePut = deferred();
+    const worker = bootWorker(undefined, {
+        beforePut: async ({ name, key }) => {
+            if (name === 'zazu-static-v23' && key === new URL('/__zazu-active-user__', ORIGIN).href) {
+                putStarted.resolve();
+                await releasePut.promise;
+            }
+        },
+    });
+
+    const priming = worker.dispatchMessage({
+        type: 'prime-pages',
+        userId: '41',
+        routes: [],
+    });
+
+    await putStarted.promise;
+    const logout = worker.dispatchMessage({ type: 'clear-user' });
+    releasePut.resolve();
+
+    await Promise.all([priming, logout]);
+
+    const state = await worker.caches.open('zazu-static-v23');
+    assert.equal(await state.match('/__zazu-active-user__'), null, 'logout must win over any identity write already in flight');
+    assert.equal(
+        (await worker.caches.keys()).some((name) => name.startsWith('zazu-static-v23-user-')),
+        false,
+        'the stale identity operation must not leave a private page cache',
+    );
 });
