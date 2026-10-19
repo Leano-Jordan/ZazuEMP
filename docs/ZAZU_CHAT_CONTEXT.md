@@ -56,6 +56,17 @@ Specialists:
 Flow:
 `BASELINE → TARGET → INSPECT → DESIGN → CHANGE → VERIFY → BREAK → ACCEPT → RECORD → NEXT`
 
+## TOOL / PLUGIN SELECTION DISCIPLINE
+
+Before each plugin/tool call, identify the exact evidence or action required, why that tool fits, whether it has already failed/exhausted quota in this task, and the fallback.
+
+- GitHub: repository source, history, issues, pull requests and CI evidence.
+- Firecrawl: live public-source search/scraping only when external discovery is needed. If it reports exhausted credits, mark it unavailable for this task and do not retry without new quota evidence. Use native web search and official public sources as fallback.
+- Quartr: investor relations, earnings, filings and transcripts; not a general application UX auditor.
+- EdgePilot: public market strategy/backtesting; not repository or browser-flow verification.
+- Browser/Playwright: rendered screen and interaction proof where available. Source inspection alone never certifies the UI.
+- Never invoke a plugin just because it is connected or mentioned. Report failed, unavailable, or unused tools honestly; never claim work they did not perform.
+
 ## ANTI-LOOP
 
 - Findings use stable IDs.
@@ -80,6 +91,10 @@ The central operational model is:
 Business → Customer → Job/Event → Requirements/Services → Quote → Confirmation/Deposit → Purchasing/Hiring → Preparation → Execution → Finance/Completion
 
 Treat that as product context, not permission to invent unimplemented modules.
+
+## Current execution note — 2026-10-20
+
+P0/P1 workflow audit: invoice form source ambiguity has been corrected at source and a focused regression assertion added. The form now treats an accepted quote as the authority for job, lines, currency and historical tax snapshot. Current-main tests/CI and rendered browser traversal remain unverified. See `docs/ZAZU_DEVELOPMENT_CHECKLIST.md` and `docs/DIRECTOR_WORKFLOW_UX_AUDIT_2026-10-20.md`.
 
 ## NOTE
 
