@@ -187,4 +187,41 @@ class QuoteCommercialHandoffTest extends TestCase
             ->assertSee('Open invoice INV-FINANCE-HANDOFF-001')
             ->assertSee(route('finance.invoices.show', $invoice), false);
     }
+
+    public function test_invoice_form_binds_quote_to_its_job_and_disables_conflicting_inputs(): void
+    {
+        $customer = Customer::create(['name' => 'Invoice Source Customer']);
+        $event = Event::create([
+            'business_id' => app(\\App\\Support\\CurrentBusiness::class)->id(auth()->user()),
+            'customer_id' => $customer->id,
+            'reference' => 'ZAZ-INVOICE-SOURCE-001',
+            'name' => 'Invoice Source Event',
+            'event_date' => now()->addDays(10)->toDateString(),
+            'status' => 'confirmed',
+        ]);
+        $quote = Quote::create([
+            'event_id' => $event->id,
+            'reference' => 'QUO-INVOICE-SOURCE-001',
+            'status' => 'accepted',
+            'currency' => 'ZAR',
+        ]);
+        $quote->versions()->create([
+            'version' => 1,
+            'status' => 'accepted',
+            'subtotal' => '1000.00',
+            'tax_total' => '150.00',
+            'total' => '1150.00',
+        ]);
+
+        $this->get(route('finance.invoices.create', ['quote_id' => $quote->id]))
+            ->assertOk()
+            ->assertSee('data-invoice-quote', false)
+            ->assertSee('data-invoice-event', false)
+            ->assertSee('data-invoice-tax-rate', false)
+            ->assertSee('data-invoice-source-summary', false)
+            ->assertSee('data-event-id="' . $event->id . '"', false)
+            ->assertSee('data-invoice-lines', false)
+            ->assertSee('syncInvoiceSource', false);
+    }
+
 }
