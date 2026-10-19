@@ -192,7 +192,7 @@ class QuoteCommercialHandoffTest extends TestCase
     {
         $customer = Customer::create(['name' => 'Invoice Source Customer']);
         $event = Event::create([
-            'business_id' => app(\\App\\Support\\CurrentBusiness::class)->id(auth()->user()),
+            'business_id' => app(\App\Support\CurrentBusiness::class)->id(auth()->user()),
             'customer_id' => $customer->id,
             'reference' => 'ZAZ-INVOICE-SOURCE-001',
             'name' => 'Invoice Source Event',
