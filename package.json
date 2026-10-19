@@ -6,7 +6,8 @@
   "scripts": {
     "build": "vite build",
     "dev": "vite",
-    "test:e2e": "playwright test"
+    "test:e2e": "playwright test",
+    "test:service-worker": "node --test tests/js/service-worker-auth-cache.test.js"
   },
   "devDependencies": {
     "@playwright/test": "^1.63.0",
