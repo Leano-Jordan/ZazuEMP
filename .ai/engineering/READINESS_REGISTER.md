@@ -14,6 +14,8 @@ Readiness is tracked by domain and evidence maturity rather than by a single inf
 - The V1 gate ledger previously labelled a 2026-10-07 SHA as current and presented earlier CI results as current-head PASS. It now distinguishes the last broad green evidence baseline (`7940033b6fd4f691692eec5e9d7f6ad587486f61`) from unverified later commits.
 - `docs/health/latest.md` and `latest.json` were an October 12 Dependabot-branch report with queued CI. They have been moved to `docs/health/archive/`; the misleading root-level `latest.*` pointers were removed. The current health workflow is artifact-and-summary only, read-only for repository contents.
 - The V1 scorecard now exposes a current evidence snapshot while preserving prior numeric scores as historical.
+- A bounded scan across four active authored CSS files found and removed two duplicate `font-variant-numeric: tabular-nums` declarations. The duplicate `REG-017` entry was corrected to `REG-022` and ledger headings are now unique.
+- Removed unreferenced `@fontsource/anton`; package/lock were changed together and the dependency licence audit/notice pointer refreshed. Latest-main install/build is pending.
 
 ### Implementation / verification boundary
 - A Node built-in behavioral harness now runs the actual `public/sw.js` and covers three async logout races: stale persisted-identity read, late authenticated HTML response, and identity-state write already in flight during logout.

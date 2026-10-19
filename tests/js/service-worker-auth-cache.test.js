@@ -8,12 +8,10 @@ const workerSource = await readFile(new URL('../../public/sw.js', import.meta.ur
 
 function deferred() {
     let resolve;
-    let reject;
-    const promise = new Promise((resolvePromise, rejectPromise) => {
+    const promise = new Promise((resolvePromise) => {
         resolve = resolvePromise;
-        reject = rejectPromise;
     });
-    return { promise, resolve, reject };
+    return { promise, resolve };
 }
 
 function bootWorker(fetchImplementation = async () => new MockResponse('online'), cacheHooks = {}) {

@@ -22,7 +22,7 @@ This scorecard separates implementation from evidence maturity and separates **V
 | V1 domain | Current evidence position | Remaining release work |
 |---|---|---|
 | Correctness | Behavioral regression suite added for three logout/identity/cache races; fresh CI execution unobserved | Verify the exact current-main run and repair any genuine regression |
-| Architecture | Identity cache mutation/clear operations are now serialized in the service worker | Validate the serialized boundary through CI/browser execution; continue bounded dead-code analysis |
+| Architecture | Identity cache mutation/clear operations are serialized; duplicate CSS declarations and one unreferenced font dependency were removed | Validate through CI/browser execution; broader PHP/Blade/JS reachability scan remains open |
 | Data integrity | Existing transaction, idempotency and ownership controls remain in source; newest-head execution unverified | Current-head tests and populated commercial traversal |
 | Security | Generation guards plus behavioral tests now target stale identity reads, late HTML writes and identity writes racing logout | Latest-run evidence and real multi-account installed-browser challenge |
 | Workflow integrity | Connected commercial flow exists; previous populated proof is for an earlier SHA | Re-run current-head workflow and reconcile job → quote → invoice/payment → purchasing/costs |
@@ -30,7 +30,7 @@ This scorecard separates implementation from evidence maturity and separates **V
 | Reliability / recovery | Automated restore/rollback coverage existed at the earlier verified baseline | Real deployment-environment backup/restore (including private media) and rollback drills remain open |
 | Operability | Stale health snapshots are archived; current health workflow publishes per-run artifacts and summary only | Open the exact current-main workflow run; do not rely on a persistent `latest` file |
 | Upgrade / deployment | Previous populated upgrade/rollback run was green at the recorded baseline | Confirm current-head results and perform real release rollback exercise |
-| Documentation / compliance | V1 ledger reconciled; stale health claims removed | Legal/privacy operator controls, brand/trade-mark clearance and final dependency distribution review |
+| Documentation / compliance | V1 ledger reconciled; stale health claims removed; duplicate control ID and dependency inventory corrected | Legal/privacy operator controls, brand/trade-mark clearance and final dependency distribution review |
 | Release evidence | Current exact-head results are not yet reconciled | Record SHA + run URLs + conclusions before promoting evidence maturity |
 
 ### Score disposition
