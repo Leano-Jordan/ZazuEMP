@@ -6,6 +6,45 @@ This is the live release-risk register.
 
 Readiness is tracked by domain and evidence maturity rather than by a single inflated percentage.
 
+## Director audit snapshot — 2026-10-19
+
+**Canonical ref:** `main` only. Current main is the source of truth; dated SHA values below identify evidence, not a moving branch pointer.
+
+### Verified documentation/control defects corrected
+- The V1 gate ledger previously labelled a 2026-10-07 SHA as current and presented earlier CI results as current-head PASS. It now distinguishes the last broad green evidence baseline (`7940033b6fd4f691692eec5e9d7f6ad587486f61`) from unverified later commits.
+- `docs/health/latest.md` and `latest.json` were an October 12 Dependabot-branch report with queued CI. They have been moved to `docs/health/archive/`; the misleading root-level `latest.*` pointers were removed. The current health workflow is artifact-and-summary only, read-only for repository contents.
+- The V1 scorecard now exposes a current evidence snapshot while preserving prior numeric scores as historical.
+
+### Implementation / verification boundary
+- A Node built-in behavioral harness now runs the actual `public/sw.js` and covers three async logout races: stale persisted-identity read, late authenticated HTML response, and identity-state write already in flight during logout.
+- `package.json` exposes `npm run test:service-worker`; `.github/workflows/quality.yml` executes it.
+- Service-worker identity mutation and logout cache cleanup are serialized through a shared promise queue so logout cleanup runs after already-started identity writes. Read-after-write source reconciliation succeeded; **runtime/CI result for the latest main is still UNVERIFIED**.
+- This is not a full offline-parity claim. Multi-account installed-browser proof and fully disconnected parity remain outstanding.
+
+### Current V1 evidence disposition
+
+| Domain | Current disposition | Remaining V1 gate |
+|---|---|---|
+| Correctness | New behavioral coverage IMPLEMENTED; latest-head execution unverified | Observe current-main CI and fix confirmed regressions |
+| Architecture | Cache identity writes/clears serialized at source | Current-run regression evidence; continue evidence-led dead/stale-code review |
+| Data integrity | Earlier transaction/idempotency/ownership evidence remains tied to its recorded SHA | Current-head suite plus populated commercial reconciliation |
+| Security | Logout/cache race guards and three behavioral cases added | Current-head CI and real multi-account browser challenge |
+| Workflow integrity | Main operational chain exists; earlier populated run is historical | Current-head and realistic populated chain evidence |
+| UX/accessibility | Prior responsive and owner-device acceptance remain dated evidence | Reconfirm after latest deploy/runtime changes where affected |
+| Reliability/recovery | Automated backup/restore and upgrade/rollback evidence exists at earlier heads | Representative customer-environment restore including private media; actual rollback drill |
+| Operability | Health output is now explicitly artifact/summary-based; stale persistent snapshot removed | Reconcile actual current-main workflow runs and URLs |
+| Upgrade/deployment | Earlier populated upgrade/rollback pass is historical | Current-head workflow plus real deployment rollback |
+| Documentation/compliance | V1 ledger and health-report authority corrected | Legal/privacy operations, brand clearance, final distribution/licence review |
+| Release evidence | Current exact-head conclusions not yet observed in this audit | Record current SHA, run URLs and conclusions before any readiness uplift |
+
+### Numeric score policy
+
+The previously recorded **80/100 commercial-readiness figure is historical (2026-10-04)**. Do not present it as a recalculated current score. No numeric uplift is awarded for source/test additions until the exact current-main checks pass and remaining operational V1 gates are reconciled.
+
+Next hard gate: **current-main CI reconciliation for the new service-worker race suite, then controlled customer-environment backup/restore and rollback drills.**
+
+---
+
 ## Evidence maturity
 
 0 — not started  
