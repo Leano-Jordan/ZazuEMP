@@ -79,6 +79,25 @@ Director selects capabilities; specialists do not create competing backlogs or a
 
 Load only the skill relevant to the current target. Skills are procedures; repository state is facts; specialist engine documents are deeper reference contracts.
 
+## Tool and plugin selection discipline — mandatory
+
+Before a tool/plugin call, decide and record in the active task notes when material:
+1. What exact evidence or action is needed.
+2. Why this tool is the best fit.
+3. Whether it has failed, lacks access, or exhausted quota during this task.
+4. What fallback can still complete the work.
+
+Routing rules:
+- GitHub connector: repository state, source edits, issues, commits, and CI/workflow evidence.
+- Browser/Playwright-capable tooling: rendered visual and interaction proof. Source inspection alone does not certify a rendered workflow.
+- Firecrawl: public web/source discovery and scraping only when external research is required. If it reports exhausted credits, mark it unavailable for the current task and do not retry without new quota evidence; use native web search and official sources as fallback.
+- Quartr: public-company investor relations, filings, earnings and transcripts; not a general product-screen audit.
+- EdgePilot: public market strategy/backtesting; not repository editing or browser verification.
+- Prefer purpose-built connectors/APIs/CLIs when they can perform the current operation. Use browser interaction only when rendered UI evidence is required and browser capability is available.
+- Never call a plugin merely because it is connected or named by the owner. Match it to the evidence need, conserve quotas, and report failed/unavailable/unused tools honestly.
+- Never claim a plugin performed work when it was not invoked or did not succeed.
+- If required browser access is unavailable, complete source-level work where safe and leave rendered verification explicitly UNVERIFIED; do not imply visual acceptance.
+
 ## Shared state contract
 
 All capabilities consume and return the same state: repository/ref · baseline · objective · target ID · scope · invariants · findings · failure cases · hypotheses · changed surface · verification · regression disposition · readiness impact · uncertainty.
