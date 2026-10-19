@@ -47,3 +47,17 @@ The invoice creation page showed four conflicting controls together: accepted qu
 ## Release boundary
 
 Source inspection and a passing focused test are not substitutes for current-main CI, rendered browser proof, populated customer workflow, backup/restore or upgrade/rollback. Do not mark any of those gates closed until their evidence is observed.
+
+
+## Verification observation — 2026-10-20
+
+- Current `main` HEAD observed after the changes: `0976247f15b843bf679cdff6cf23d820de097a8c`.
+- [Laravel](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/39336417268): **QUEUED** at the time checked.
+- [Zazu quality](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/39336417314): **QUEUED** at the time checked.
+- [Zazu browser smoke](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/39336417303): **IN PROGRESS** at the time checked; no conclusion observed.
+- [Director Contract Lint](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/39336417340): **QUEUED** at the time checked.
+- Connected-browser inspection could not start because the browser integration reported that the originating browser context was unavailable. No manual rendered-screen acceptance is claimed.
+- Firecrawl previously exhausted its credits and was not retried. Quartr and EdgePilot were not used because their documented roles do not fit this code/UI audit.
+- Re-read-after-write confirmed the invoice view, regression test, checklist, chat context, engineering state, readiness register and canonical Director engine contain the intended changes.
+
+The release boundary remains unchanged until the queued/current-head checks complete and the rendered workflow is actually exercised.
