@@ -24,14 +24,17 @@ Entry files must point to the canonical contract and must not define a competing
 IDENTITY → BASELINE → TARGET → ROUTE → INSPECT → CHANGE → VERIFY → BREAK → RECONCILE → ACCEPT/REPAIR → RECORD → NEXT
 
 ## Active target
-**Product hardening: offline operational depth → reconciliation → workflow integrity → final certification later**
+**V1 hardening audit: logout/cache identity race closure → latest-main CI reconciliation → populated workflow and recovery gates.**
 
-Verified gates:
-- Previously verified browser, quality and populated upgrade/rollback suites remain green at their assessed heads.
-- Populated commercial financial chain automated coverage remains green.
-- Current main after the offline parity hardening cycle is **not yet runtime-verified**; GitHub Actions for the current head are queued.
+Current state:
+- Canonical repository/ref: `Leano-Jordan/ZazuEMP` / `main` only. No branches are to be created or used.
+- Broad green CI evidence recorded for `7940033b6fd4f691692eec5e9d7f6ad587486f61` (2026-10-15) is historical and does not certify later commits.
+- Service-worker identity-state writes and logout cleanup are now serialized through a shared promise queue.
+- Three Node behavioral regressions exercise the actual `public/sw.js`: delayed persisted identity read, delayed authenticated HTML response, and identity-cache write already in flight during logout.
+- `npm run test:service-worker` is wired into `.github/workflows/quality.yml`. Repository files were re-read after writes; current-main runtime/CI result remains **UNVERIFIED** until the exact workflow run is observed.
+- Stale health report snapshots from an October 12 Dependabot branch were archived and misleading root-level `docs/health/latest.*` files removed. The current health workflow is artifact/summary-only with `contents: read`; use exact Actions run evidence, not a persistent latest file.
 
-Next hard gate: **reconcile current-head regression/CI evidence, then customer-environment backup/restore proof**.
+Next hard gate: **observe current-main Quality/Laravel/browser checks and the three behavioral regressions; then execute the documented customer-environment backup/restore and rollback drills**.
 
 Physical device acceptance is now owner-verified: Zazu installed on PC and mobile; screen rotation and presentation reported in order.
 
@@ -86,13 +89,12 @@ Last updated: 2026-10-07 — offline operational depth and parity hardened; curr
 - Current head CI is queued; runtime closure remains pending fresh Laravel/PHPMD/browser results.
 
 
-## Director health-report hardening — 2026-10-08
+## Director health-report hardening — 2026-10-08 (historical; superseded)
 
-- Post-commit Director health reporting is now persistent rather than artifact-only.
-- The health workflow writes `docs/health/latest.json` and `docs/health/latest.md` for the latest source commit and retains the downloadable artifact.
-- Report generation now includes current engineering-state signals alongside repository baseline signals.
-- The workflow ignores `docs/health/**` push events to prevent report commits from recursively triggering the health workflow.
-- Current implementation commit: `614f15ac4c0c7884e7af2194733a1ce0e6429657`.
+- A prior implementation experimented with persistent `docs/health/latest.json` and `latest.md` files alongside downloadable artifacts.
+- That persistence is not present in the current `.github/workflows/roscore-director-health.yml`, which has repository contents permission set to read-only and publishes the per-run artifact and Actions summary.
+- The October 12 committed `latest.*` snapshots described a Dependabot branch with queued CI, not current `main`. They have now been retained under `docs/health/archive/` and the root-level misleading pointers removed.
+- Do not restore a privileged persistent publisher without a separate least-privilege, main-only design and verified security controls. The workflow must never check out untrusted refs or create working branches.
 
 ## Current-head CI reconciliation automation — 2026-10-08
 
@@ -218,3 +220,13 @@ Last updated: 2026-10-15 — MySQL rollback behavior and regression evidence rec
 - Browser smoke [run 38891784057](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/38891784057) remains **in progress** and is not represented as passed. Actual installed-device offline relaunch remains **UNVERIFIED**.
 - The product-wide offline parity gap remains open; no full-offline claim is made from this correction.
 
+
+
+## Director audit — 2026-10-19
+
+- Current control files now mark current-main CI as unverified rather than reusing green results from October 15 or the stale October 12 health artifact.
+- Added three direct behavioral tests for service-worker identity/cache races and integrated them into the Quality workflow.
+- Serialized `setUser` identity-state mutations with `clearActiveUser` cleanup in `public/sw.js` to prevent an in-flight identity write from surviving logout cleanup.
+- Corrected V1 checklist/scorecard evidence language, archived and removed the misleading stale health pointers, and documented the current artifact-only health-report contract.
+- Verification disposition: IMPLEMENTED at source; **latest-main execution and browser regression remain UNVERIFIED**. No numerical readiness increase is claimed.
+- Next: reconcile the exact current-main Actions run, then perform installed-customer backup/restore including private media and an actual rollback exercise. Legal/privacy operations and trademark clearance remain external release gates.
