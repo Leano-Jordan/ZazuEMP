@@ -174,11 +174,22 @@ test.describe('Zazu installed PWA offline shell', () => {
                 return Promise.reject(new Error('Unexpected network request in cache-race test: ' + url.pathname));
             };
 
-            const evaluateWorker = new Function(
-                'self', 'caches', 'fetch', 'Request', 'Response', 'AbortController', 'setTimeout', 'clearTimeout', 'URL',
-                workerSource
-            );
-            evaluateWorker(mockSelf, cachesApi, mockFetch, WorkerRequest, window.Response, window.AbortController, window.setTimeout.bind(window), window.clearTimeout.bind(window), window.URL);
+            // Execute the worker in an inline script instead of Function/eval:
+            // the app's CSP intentionally disallows unsafe-eval.
+            const workerScript = document.createElement('script');
+            workerScript.textContent = `(function(self, caches, fetch, Request, Response, AbortController, setTimeout, clearTimeout, URL) {
+                ${workerSource}
+            })(window.__zazuMockSelf, window.__zazuMockCaches, window.__zazuMockFetch, window.__zazuMockRequest, window.Response, window.AbortController, window.setTimeout.bind(window), window.clearTimeout.bind(window), window.URL);`;
+            window.__zazuMockSelf = mockSelf;
+            window.__zazuMockCaches = cachesApi;
+            window.__zazuMockFetch = mockFetch;
+            window.__zazuMockRequest = WorkerRequest;
+            document.head.appendChild(workerScript);
+            workerScript.remove();
+            delete window.__zazuMockSelf;
+            delete window.__zazuMockCaches;
+            delete window.__zazuMockFetch;
+            delete window.__zazuMockRequest;
 
             const cacheWaits = [];
             let navigationResponse;
@@ -252,7 +263,7 @@ test.describe('Zazu installed PWA offline shell', () => {
         let confirmDiscard = false;
         const confirmMessages = [];
         page.on('dialog', async dialog => {
-            if (dialog.type !== 'confirm') {
+            if (dialog.type() !== 'confirm') {
                 await dialog.dismiss();
                 return;
             }
