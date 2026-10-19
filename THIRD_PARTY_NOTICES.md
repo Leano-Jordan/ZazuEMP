@@ -43,4 +43,4 @@ A dependency's licence may impose obligations that affect distribution, source a
 
 ## Locked dependency audit
 
-The 2026-10-07 release audit in `docs/RELEASE_DEPENDENCY_LICENCE_AUDIT.md` reconciles licence metadata from the exact locked Composer and npm manifests, including transitive packages. It identifies MIT, BSD, Apache-2.0, ISC, OFL-1.1, MPL-2.0, 0BSD and MIT-or-CC0 metadata, with the multi-licensed Composer packages and MPL-2.0 Lightning CSS family explicitly recorded. This is the engineering inventory; final legal/distribution review remains separate.
+The current engineering inventory in `docs/RELEASE_DEPENDENCY_LICENCE_AUDIT.md` was refreshed on 2026-10-19 against the locked Composer and npm manifests, including transitive packages. The unused Anton font package was removed because active application source did not import or use it. The inventory is engineering evidence only; final legal/distribution review remains separate.

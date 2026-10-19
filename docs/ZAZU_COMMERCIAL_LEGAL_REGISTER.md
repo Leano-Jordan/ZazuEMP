@@ -302,3 +302,16 @@ The technical foundations are stronger than the organisational documentation lay
 This is a release-readiness record, not legal advice.
 
 Last updated: 2026-10-04
+
+
+## 13. Current locked dependency snapshot — 2026-10-19
+
+The October 4 numeric npm inventory above is historical. The lockfile was reconciled again on 2026-10-19; see `docs/RELEASE_DEPENDENCY_LICENCE_AUDIT.md` for current counts from the actual manifests.
+
+- Composer: 76 runtime packages and 33 development packages with declared licence metadata.
+- npm: 153 locked package entries with declared licence metadata.
+- Removed `@fontsource/anton` after verifying no source import or font-family usage; the current display font stack uses Space Grotesk/Manrope font faces in `resources/css/app.css`.
+- The package manifest and lockfile changed together. Current-main `npm ci`, build and behavioral tests must pass before this cleanup is runtime-verified.
+- Final legal/commercial approval, applicable notice obligations and trademark clearance remain open release gates.
+
+Status: **engineering metadata refreshed; legal clearance still open.**
