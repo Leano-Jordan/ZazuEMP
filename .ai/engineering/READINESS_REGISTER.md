@@ -460,3 +460,28 @@ Current main closed several source-level offline workflow gaps without creating 
 Relevant main commits: `34d3cc7`, `9e6c6a0`, `31ba0d6`, `127ee92`, `94921ed`, `dc435ad`.
 
 Evidence boundary: **IMPLEMENTED / targeted source regression added; current-head runtime and CI evidence remains pending**. GitHub Actions for the current main head are queued.
+
+
+## Focused P0/P1 workflow audit — 2026-10-20
+
+### P0 — commercial source consistency
+- Finding: invoice creation showed accepted quote, independent job, direct invoice lines and tax treatment together. Backend mismatch guards existed, so this was confirmed workflow ambiguity/avoidable validation failure, not a proven data-integrity bypass.
+- Source correction: quote mode binds the job to the quote's event, disables job and tax controls, hides/disables direct lines and displays an explicit source summary. Clearing quote selection restores direct mode and the manually selected job.
+- Regression assertion added to `QuoteCommercialHandoffTest`.
+- Existing populated reconciliation test covers quote acceptance → R11,500 invoice → R3,450 deposit → R8,050 final payment → paid status.
+- Disposition: **IMPLEMENTED at source; current-head test/CI/browser verification UNVERIFIED.**
+
+### P1 — operational consistency and double booking
+- Online asset allocation and offline mutation paths both contain overlap checks protected by transaction/locking; existing offline operational tests cover allocation/release boundaries.
+- Populated cross-screen job traversal and rendered mobile/keyboard review remain open.
+- No current readiness score uplift. Source inspection and added tests are not evidence of current-head execution.
+
+### Tool-selection discipline
+- GitHub is used for repository changes and CI evidence.
+- Firecrawl exhausted its credits earlier in this task and is not retried without new quota evidence; use native web search/official sources for external competitor research.
+- Quartr is for investor relations/filings, not UX flow audits. EdgePilot is for strategy/backtesting, not source or browser testing.
+- Select tools for a specific evidence need; do not call plugins merely because they are connected or named.
+
+Next gate: targeted Laravel tests → current-main CI/run URL → rendered browser traversal → populated job reconciliation. Continue backup/restore and rollback gates separately. Do not mark them closed.
+
+Last updated: 2026-10-20
