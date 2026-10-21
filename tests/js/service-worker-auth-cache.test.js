@@ -246,3 +246,32 @@ test('an identity write already in flight cannot finish after logout cleanup', a
         'the stale identity operation must not leave a private page cache',
     );
 });
+
+test('a cached authenticated dashboard opens locally when the host server is unavailable', async () => {
+    let hostAvailable = true;
+    const worker = bootWorker(async () => {
+        if (!hostAvailable) throw new Error('Host server unavailable');
+        return new worker.Response(
+            '<!doctype html><html><body data-zazu-user-id="41"><main>Saved local dashboard</main></body></html>',
+            { headers: { 'content-type': 'text/html; charset=utf-8' } },
+        );
+    });
+
+    await worker.dispatchMessage({
+        type: 'prime-pages',
+        userId: '41',
+        routes: ['/dashboard'],
+    });
+
+    hostAvailable = false;
+    const navigation = worker.dispatchFetch(new worker.Request('/dashboard', {
+        method: 'GET',
+        mode: 'navigate',
+        headers: { accept: 'text/html' },
+    }));
+
+    const response = await navigation.response;
+    assert.equal(response.ok, true, 'the saved dashboard should be returned without the host');
+    assert.match(await response.text(), /Saved local dashboard/);
+    await navigation.finished();
+});
