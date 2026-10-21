@@ -396,3 +396,29 @@ Private HTML responses may finish after logout or another authenticated user tak
 
 
 The persisted active-user identity read is generation-checked at every asynchronous boundary as well. A delayed Cache API read can no longer repopulate the in-memory active identity after logout has cleared it.
+
+## Director offline continuity cycle — 2026-10-21
+
+### Confirmed launch boundary
+
+The phone's current origin `http://192.168.137.237:8000` remains tied to the PC-hosted Laravel process. Closing that process removes the origin's server responses. On this non-loopback plain-HTTP address, the browser also cannot register the service worker because the origin is not a secure context. The client warning for this case is implemented; it diagnoses the unsupported origin but does not provide hosting.
+
+### New regression coverage
+
+Added a behavioral test that loads the real `public/sw.js`, primes an authenticated dashboard into the user-scoped cache, makes the simulated host unavailable, and verifies navigation returns the saved dashboard. This extends the current service-worker race tests from logout privacy to the disconnected dashboard path.
+
+Source/test status: **IMPLEMENTED**. The new test has not yet been run by current-main CI; do not mark it TESTED until the exact run completes.
+
+### Deployment boundary
+
+The connected Render workspace was inspected and currently has no Zazu EMP web service; the listed service belongs to a different product. Therefore there is no verified stable HTTPS production origin to install from in that workspace. Do not create a production deployment against an ephemeral filesystem or without durable database and private-file storage. Hosting must be configured as a separate, explicit deployment target; creating an arbitrary free service is not proof of durable customer data.
+
+### Remaining acceptance
+
+1. Run the new service-worker test and all current-main CI checks on the exact resulting SHA.
+2. Establish a stable HTTPS Zazu host with durable database, private-file storage, backups and a documented recovery path; the VS Code development server must not be the production origin.
+3. Install/update the PWA from that HTTPS origin on the target phone.
+4. Force-close the app, switch off the PC, disable internet, and verify launch, cached navigation, local reads, supported mutations, reload/restart persistence, visible pending work, and reconnect reconciliation.
+5. Test logout, user switching, queue preservation, conflict handling and attachment recovery on the installed device.
+
+**Current disposition:** source regression coverage expanded; production hosting and physical disconnected-device proof remain **OPEN**. Zazu is offline-first by architecture, but complete disconnected parity and VS Code independence are not yet certified.
