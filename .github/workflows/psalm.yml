@@ -32,7 +32,7 @@ jobs:
 
       - name: Apply pinned Laravel Psalm compatibility shim
         run: |
-          php -r '$lock = json_decode(file_get_contents("composer.lock"), true, 512, JSON_THROW_ON_ERROR); $found = false; foreach ($lock["packages"] as $package) { if ($package["name"] === "laravel/framework") { $found = true; if (($package["version"] ?? null) !== "v13.35.0" || ($package["dist"]["reference"] ?? null) !== "a413a9da94884e5e9d58f4e6612884f712827804") { fwrite(STDERR, "Laravel Psalm shim pin does not match composer.lock; review the upstream annotation before changing the pin.".PHP_EOL); exit(1); } break; } } if (!$found) { fwrite(STDERR, "laravel/framework was not found in composer.lock.".PHP_EOL); exit(1); }'
+          php -r '$lock = json_decode(file_get_contents("composer.lock"), true, 512, JSON_THROW_ON_ERROR); $found = false; foreach ($lock["packages"] as $package) { if ($package["name"] === "laravel/framework") { $found = true; if (($package["version"] ?? null) !== "v13.36.0" || ($package["dist"]["reference"] ?? null) !== "e5626e38137cf0d82b1e52f15b16283e8442c13c") { fwrite(STDERR, "Laravel Psalm shim pin does not match composer.lock; review the upstream annotation before changing the pin.".PHP_EOL); exit(1); } break; } } if (!$found) { fwrite(STDERR, "laravel/framework was not found in composer.lock.".PHP_EOL); exit(1); }'
           python3 - <<'PY'
           from pathlib import Path
           path = Path("vendor/laravel/framework/src/Illuminate/Collections/Collection.php")
