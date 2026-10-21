@@ -252,3 +252,20 @@ Last updated: 2026-10-15 — MySQL rollback behavior and regression evidence rec
 - Next: run targeted commercial and asset/offline tests, observe exact current-main CI, then browser-traverse quote select/switch/clear and one populated job end-to-end.
 
 Last updated: 2026-10-20
+
+## Director offline continuity cycle — 2026-10-21
+
+- Re-read the canonical Director contract, current engineering state, offline architecture contract, service worker, local IndexedDB client, mobile bootstrap controller and PWA regression tests before making changes.
+- Confirmed the existing offline-first implementation is established work, not a new proposal. It includes a user-scoped service-worker page cache, IndexedDB local workspace and mutation queue, pairing/sync endpoints, and explicit offline domain handlers. Full disconnected parity is still explicitly unproven.
+- Confirmed the immediate origin blocker: `http://192.168.137.237:8000` is a PC-hosted plain-HTTP LAN origin. When its server process stops, server-dependent requests fail; because it is not a secure browser context, service-worker registration is unavailable there. The source already contains a user-facing diagnostic for this case.
+- Added a direct behavioral regression in `tests/js/service-worker-auth-cache.test.js`: prime the authenticated dashboard, make the simulated host unavailable, and verify the service worker serves the saved dashboard from the user-scoped cache.
+- Recorded the exact hosting and installed-device acceptance gate in `docs/ZAZU_OFFLINE_FIRST_ARCHITECTURE.md`.
+- Changes were committed directly to canonical `main`; no branch was created.
+- New test status: **IMPLEMENTED, execution pending**. A source write and a passing static assertion are not runtime proof.
+- Deployment reconnaissance: the connected Render workspace currently lists no Zazu EMP service; its listed web service is for ZIA Inventory. No verified stable HTTPS production origin is configured through that workspace. Do not deploy Zazu to ephemeral storage or create a potentially billable production service without durable database/private-file storage and recovery configuration.
+
+### Active target
+
+**P0 — finish VS Code-independent offline continuity:** observe current-main CI for the new offline-navigation regression; establish a durable HTTPS production origin separate from the VS Code server; install/update from that origin; then perform physical-device acceptance with the PC and internet unavailable, followed by reconnect/idempotency/conflict and logout/privacy checks.
+
+**Acceptance rule:** no claim of "solid offline" until current-head CI and the realistic installed-device gate both pass. The host-independent launch gate and full offline-domain parity remain **OPEN**.
