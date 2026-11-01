@@ -1,46 +1,39 @@
-# Zazu EMP — Field Testing During Load Shedding
+# Zazu EMP — Local-Network Mobile Test Runbook
 
-## Purpose
+**Purpose:** Temporary development testing from a phone while the laptop hosts Laravel. This is not the customer PC-host deployment procedure; use [Local PC Host Deployment](LOCAL_PC_HOST_DEPLOYMENT.md) for that.
 
-Zazu is currently a Laravel application. It is **not yet a full offline-first application**. During load shedding, the safest current test setup is to keep the development server running on the laptop and connect the phone directly to that laptop over a local network.
+## Temporary development setup
 
-This works without GitHub and without internet access.
+1. Keep the laptop powered and connected to the phone hotspot or trusted private Wi-Fi.
+2. Build frontend assets once: `npm run build`.
+3. Start Laravel for development only: `php artisan serve --host=0.0.0.0 --port=8000`.
+4. Find the laptop's current LAN IPv4 address with `ipconfig`.
+5. On the phone, open `http://LAPTOP-IP:8000`.
 
-## Recommended setup: phone hotspot + laptop
+The phone does not need GitHub. The laptop serves the application locally.
 
-1. Keep the Zazu laptop on battery power.
-2. Turn on the phone's mobile hotspot.
-3. Connect the laptop to the phone hotspot.
-4. In the Zazu project on the laptop, build the frontend assets once: npm run build
-5. Start Laravel so it listens beyond localhost: php artisan serve --host=0.0.0.0 --port=8000
-6. Find the laptop's hotspot/LAN IPv4 address with Windows ipconfig.
-7. On the phone, open: http://LAPTOP-IP:8000
-8. Sign in and use Zazu from the phone browser.
+**Security boundary:** this plain-HTTP Artisan server is temporary development tooling. Use only on a trusted private network. Do not expose it to a public network or use it as the permanent customer server. A changing IP and non-secure HTTP origin are known limitations: service-worker registration requires a secure context, so this address is not the target install origin.
 
-The phone does **not** need GitHub. The laptop serves the application locally.
+## What this test proves
 
-## If Windows Firewall blocks the phone
+- Phone can reach the Laravel application over the local network.
+- Responsive pages, forms and server-backed workflows work on the phone.
+- Local network access can continue when the internet/GitHub is unavailable, provided the laptop and hotspot/router remain running.
 
-Allow PHP/Laravel on the **Private network** when Windows asks. Do not expose the development server to a public network.
+## What this test does not prove
 
-## What this currently proves
+- A stable hostname or customer-grade HTTPS.
+- Server operation after VS Code is closed or Windows restarts.
+- Phone operation while the laptop is powered off.
+- Full offline parity across every Zazu business workflow.
+- Durable production backups or successful customer recovery.
 
-- Real Zazu pages on a phone.
-- Mobile navigation and responsive UI.
-- Forms and server-side workflows.
-- Real local database behaviour.
-- Behaviour while the internet/GitHub is unavailable.
+## Current offline/PWA implementation boundary
 
-## What it does not prove
+Zazu has progressed beyond a static-asset-only service worker. Current source includes a user-scoped authenticated page cache, a phone-local IndexedDB workspace and durable mutation queue, owner-approved pairing/sync foundations, and domain-specific offline mutation handlers. This provides meaningful device-local continuity for supported workflows.
 
-- Full offline operation with the laptop powered off.
-- Offline writes that synchronise later.
-- Production hosting or production TLS.
+It is still not a complete disconnected replacement for every web-app screen and workflow. Offline reads, writes, attachments, conflict handling, restart persistence and reconnect reconciliation must be judged against their specific automated and physical-device acceptance tests. Do not infer complete parity from the presence of the PWA or service worker.
 
-Those require a separate offline-first architecture and are **not** being faked by the current PWA asset cache.
+## Customer deployment
 
-## Current offline/PWA boundary
-
-Zazu now has an installable web-app manifest and a conservative service worker that caches static assets only. It deliberately does **not** cache authenticated HTML or business data. This reduces the risk of exposing stale/private workspace data while still allowing previously loaded assets to remain available when the network disappears.
-
-Full offline business operation remains a later architecture decision. The immediate goal is reliable **local-network mobile testing** during load shedding.
+The customer target is a stable local HTTPS hostname served by a persistent Windows web/database runtime, independent of VS Code and the Artisan development server. Follow the deployment plan's phased inspection and acceptance gates. Do not install certificates, change firewall rules, alter services or migrate customer data until the actual PC/network configuration has been inspected and backed up.
