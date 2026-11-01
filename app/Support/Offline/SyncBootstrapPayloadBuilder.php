@@ -259,7 +259,9 @@ class SyncBootstrapPayloadBuilder
         SyncEntityIdentityRegistry $registry,
     ): array {
         $metadata = $device->metadata ?? [];
-        $selection = ($metadata['bootstrap_selection_mode'] ?? 'recent') === 'recent'
+        $selectionMode = $metadata['bootstrap_selection_mode']
+            ?? (! empty($metadata['bootstrap_selection']) ? 'explicit' : 'recent');
+        $selection = $selectionMode === 'recent'
             ? $this->defaultSelection($business)
             : ($metadata['bootstrap_selection'] ?? []);
 

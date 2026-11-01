@@ -1899,69 +1899,107 @@ class OfflineSyncFoundationTest extends TestCase
         $this->assertSame($jobRow['local_id'], $preparationRow['record']['event_local_id']);
         $this->assertSame($event->id, $preparation->event_id);
 
-        // The default working set is live, not frozen at the moment the phone
-        // is paired. New desktop-created records must arrive on the next bootstrap.
-        $newCustomer = \App\Models\Customer::create([
+    }
+
+    public function test_default_pairing_bootstrap_refresh_includes_records_created_after_pairing(): void
+    {
+        $user = $this->signInAsOwner();
+        $business = $user->businesses()->firstOrFail();
+
+        $pairingRequest = Request::create('/settings/sync/pairing', 'POST', ['selection' => []]);
+        $pairingRequest->setUserResolver(fn () => $user);
+        $pairing = app(SyncController::class)->createPairing(
+            $pairingRequest,
+            app(\App\Support\CurrentBusiness::class),
+        )->getData(true);
+
+        $device = SyncDevice::query()->where('business_id', $business->id)->latest('id')->firstOrFail();
+        app(SyncController::class)->provision(Request::create('/api/sync/provision', 'POST', [
+            'pairing_code' => $pairing['pairing_code'],
+            'device_name' => 'Recent working set phone',
+            'device_type' => 'phone',
+        ]));
+
+        $customer = \App\Models\Customer::create([
             'business_id' => $business->id,
             'name' => 'Customer Added After Pairing',
             'legal_name' => 'Post Pairing Events',
         ]);
-        $newEvent = \App\Models\Event::create([
+        $event = \App\Models\Event::create([
             'business_id' => $business->id,
-            'customer_id' => $newCustomer->id,
+            'customer_id' => $customer->id,
             'reference' => 'PAIRING-002',
             'name' => 'Work Added After Pairing',
-            'customer_name' => $newCustomer->name,
+            'customer_name' => $customer->name,
             'event_date' => now()->addDays(21)->toDateString(),
             'status' => 'confirmed',
         ]);
-        $newQuote = \App\Models\Quote::create([
-            'event_id' => $newEvent->id,
+        $quote = \App\Models\Quote::create([
+            'event_id' => $event->id,
             'reference' => 'PAIRING-Q-002',
             'status' => 'draft',
             'currency' => 'ZAR',
         ]);
         \App\Models\EventPreparationItem::create([
             'business_id' => $business->id,
-            'event_id' => $newEvent->id,
+            'event_id' => $event->id,
             'title' => 'New post-pairing preparation',
             'status' => 'pending',
         ]);
 
         $refreshRequest = Request::create('/api/sync/bootstrap', 'GET');
         $refreshRequest->attributes->set('sync_device', $device->fresh());
-        $refreshed = collect(
-            app(SyncController::class)->bootstrap($refreshRequest)->getData(true)['selected']
-        );
+        $selected = collect(app(SyncController::class)->bootstrap($refreshRequest)->getData(true)['selected']);
 
-        $this->assertSame($newCustomer->id, $refreshed->firstWhere('type', 'customer')['server_id']);
-        $this->assertSame($newEvent->id, $refreshed->firstWhere('type', 'job')['server_id']);
-        $this->assertSame($newQuote->id, $refreshed->firstWhere('type', 'quote')['server_id']);
+        $this->assertSame($customer->id, $selected->firstWhere('type', 'customer')['server_id']);
+        $this->assertSame($event->id, $selected->firstWhere('type', 'job')['server_id']);
+        $this->assertSame($quote->id, $selected->firstWhere('type', 'quote')['server_id']);
         $this->assertSame(
-            $newEvent->id,
-            $refreshed->firstWhere('type', 'preparation')['record']['event_id'],
+            $event->id,
+            $selected->firstWhere('type', 'preparation')['record']['event_id'],
         );
+    }
 
-        // Explicit selections remain pinned to the owner's chosen records.
-        $explicitPairingRequest = Request::create('/settings/sync/pairing', 'POST', [
-            'selection' => [['type' => 'customer', 'id' => $customer->id]],
+    public function test_legacy_explicit_pairing_selection_remains_pinned_during_bootstrap_refresh(): void
+    {
+        $user = $this->signInAsOwner();
+        $business = $user->businesses()->firstOrFail();
+        $selectedCustomer = \App\Models\Customer::create([
+            'business_id' => $business->id,
+            'name' => 'Pinned Offline Customer',
         ]);
-        $explicitPairingRequest->setUserResolver(fn () => $user);
-        $explicitPairing = app(SyncController::class)->createPairing(
-            $explicitPairingRequest,
+
+        $pairingRequest = Request::create('/settings/sync/pairing', 'POST', [
+            'selection' => [['type' => 'customer', 'id' => $selectedCustomer->id]],
+        ]);
+        $pairingRequest->setUserResolver(fn () => $user);
+        $pairing = app(SyncController::class)->createPairing(
+            $pairingRequest,
             app(\App\Support\CurrentBusiness::class),
         )->getData(true);
 
-        $explicitDevice = SyncDevice::query()->where('business_id', $business->id)->latest('id')->firstOrFail();
-        $this->assertSame('explicit', $explicitDevice->metadata['bootstrap_selection_mode']);
-        $explicitProvision = app(SyncController::class)->provision(Request::create('/api/sync/provision', 'POST', [
-            'pairing_code' => $explicitPairing['pairing_code'],
-            'device_name' => 'Explicit selection phone',
-            'device_type' => 'phone',
-        ]))->getData(true);
+        $device = SyncDevice::query()->where('business_id', $business->id)->latest('id')->firstOrFail();
+        $metadata = $device->metadata;
+        unset($metadata['bootstrap_selection_mode']);
+        $device->update(['metadata' => $metadata]);
 
-        $this->assertCount(1, $explicitProvision['bootstrap']['selected']);
-        $this->assertSame($customer->id, $explicitProvision['bootstrap']['selected'][0]['server_id']);
+        app(SyncController::class)->provision(Request::create('/api/sync/provision', 'POST', [
+            'pairing_code' => $pairing['pairing_code'],
+            'device_name' => 'Legacy explicit phone',
+            'device_type' => 'phone',
+        ]));
+
+        \App\Models\Customer::create([
+            'business_id' => $business->id,
+            'name' => 'Newer Customer Not Selected',
+        ]);
+
+        $refreshRequest = Request::create('/api/sync/bootstrap', 'GET');
+        $refreshRequest->attributes->set('sync_device', $device->fresh());
+        $selected = app(SyncController::class)->bootstrap($refreshRequest)->getData(true)['selected'];
+
+        $this->assertCount(1, $selected);
+        $this->assertSame($selectedCustomer->id, $selected[0]['server_id']);
     }
 
     public function test_sync_mutation_rejection_is_recorded_as_a_conflict_without_losing_queue_traceability(): void
