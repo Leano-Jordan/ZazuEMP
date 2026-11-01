@@ -285,6 +285,11 @@ class BusinessIsolationTest extends TestCase
         ]));
 
         $this->actingAs($user)
+            ->get(route('work.show', $event))
+            ->assertOk()
+            ->assertSee(route('work.attachments.download', $attachment), false);
+
+        $this->actingAs($user)
             ->get(route('work.attachments.download', $attachment))
             ->assertOk()
             ->assertDownload('brief.txt');
