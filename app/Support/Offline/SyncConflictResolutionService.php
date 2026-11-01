@@ -91,14 +91,16 @@ final class SyncConflictResolutionService
         string $action,
         ?string $note
     ): ?string {
+        if ($conflict->conflict_type === 'mutation_identity_mismatch') {
+            // The original mutation remains immutable, but the edited local
+            // payload must still be retried under a fresh mutation ID.
+            return $this->resolveMutationIdentityMismatch($mutation, $action);
+        }
+
         // An already-applied domain operation is immutable. Conflict UI
         // actions may acknowledge it but must never requeue or discard it.
         if ($mutation?->status === 'applied') {
             return 'applied';
-        }
-
-        if ($conflict->conflict_type === 'mutation_identity_mismatch') {
-            return $this->resolveMutationIdentityMismatch($mutation, $action);
         }
 
         if ($action === 'retry') {
