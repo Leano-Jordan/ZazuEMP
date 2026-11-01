@@ -149,6 +149,91 @@ class OfflineSyncFoundationTest extends TestCase
         $this->assertSame('pending', $first->status);
     }
 
+    public function test_mutation_recorder_rejects_reused_ids_with_changed_mutation_identity_or_payload(): void
+    {
+        $business = Business::create([
+            'name' => 'Mutation Identity Business',
+            'slug' => 'mutation-identity-'.Str::lower(Str::random(8)),
+            'status' => 'active',
+            'currency' => 'ZAR',
+        ]);
+
+        $device = SyncDevice::create([
+            'business_id' => $business->id,
+            'installation_id' => (string) Str::uuid(),
+        ]);
+
+        $mutationId = (string) Str::uuid();
+        $recorder = app(SyncMutationRecorder::class);
+        $payload = [
+            'record' => [
+                'name' => 'Offline wedding',
+                'details' => [
+                    'location' => 'Pretoria',
+                    'guests' => 80,
+                ],
+            ],
+            'local_id' => 'local-event-9',
+        ];
+
+        $first = $recorder->record(
+            $device,
+            'event',
+            'local-event-9',
+            'upsert',
+            $payload,
+            $mutationId,
+        );
+
+        // Object key order is not part of mutation identity; list order and
+        // actual values are. A byte-equivalent retry must remain idempotent.
+        $reorderedPayload = [
+            'local_id' => 'local-event-9',
+            'record' => [
+                'details' => [
+                    'guests' => 80,
+                    'location' => 'Pretoria',
+                ],
+                'name' => 'Offline wedding',
+            ],
+        ];
+        $replay = $recorder->record(
+            $device,
+            'event',
+            'local-event-9',
+            'upsert',
+            $reorderedPayload,
+            $mutationId,
+        );
+        $this->assertSame($first->id, $replay->id);
+
+        $invalidRetries = [
+            ['event', 'local-event-9', 'upsert', [...$payload, 'record' => ['name' => 'Changed']]],
+            ['customer', 'local-event-9', 'upsert', $payload],
+            ['event', 'different-local-id', 'upsert', $payload],
+            ['event', 'local-event-9', 'update', $payload],
+        ];
+
+        foreach ($invalidRetries as [$entityType, $entityId, $operation, $changedPayload]) {
+            try {
+                $recorder->record(
+                    $device,
+                    $entityType,
+                    $entityId,
+                    $operation,
+                    $changedPayload,
+                    $mutationId,
+                );
+                $this->fail('A reused mutation ID with changed content must be rejected.');
+            } catch (\Symfony\Component\HttpKernel\Exception\HttpException $exception) {
+                $this->assertSame(409, $exception->getStatusCode());
+            }
+        }
+
+        $this->assertSame(1, SyncMutation::query()->where('mutation_id', $mutationId)->count());
+        $this->assertSame($payload, $first->fresh()->payload);
+    }
+
     public function test_mutation_recorder_rejects_revoked_devices(): void
     {
         $business = Business::create([
