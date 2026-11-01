@@ -137,4 +137,63 @@ class SyncAttachmentListingTest extends TestCase
         Storage::disk('private')->assertExists($stored->path);
     }
 
+    public function test_attachment_idempotency_rejects_a_different_job_or_file_payload(): void
+    {
+        Storage::fake('private');
+
+        $business = Business::create([
+            'name' => 'Attachment Identity',
+            'slug' => 'attachment-identity-'.Str::lower(Str::random(8)),
+            'status' => 'active',
+            'currency' => 'ZAR',
+        ]);
+        $firstEvent = Event::create([
+            'business_id' => $business->id,
+            'reference' => 'ATT-IDENTITY-001',
+            'name' => 'Original job',
+            'status' => 'draft',
+        ]);
+        $secondEvent = Event::create([
+            'business_id' => $business->id,
+            'reference' => 'ATT-IDENTITY-002',
+            'name' => 'Different job',
+            'status' => 'draft',
+        ]);
+        $device = SyncDevice::create([
+            'business_id' => $business->id,
+            'installation_id' => (string) Str::uuid(),
+            'device_name' => 'Identity phone',
+            'device_type' => 'phone',
+            'status' => 'active',
+        ]);
+
+        $idempotencyKey = (string) Str::uuid();
+        $makeRequest = function (int $eventId, string $contents) use ($device, $idempotencyKey): Request {
+            $request = Request::create('/api/sync/attachments', 'POST', [
+                'event_id' => $eventId,
+                'idempotency_key' => $idempotencyKey,
+                'description' => 'Identity test',
+            ], [], [
+                'file' => UploadedFile::fake()->createWithContent('brief.txt', $contents),
+            ]);
+            $request->attributes->set('sync_device', $device);
+
+            return $request;
+        };
+
+        $controller = app(SyncController::class);
+        $first = $controller->uploadAttachment($makeRequest($firstEvent->id, 'original file bytes'));
+        $crossJobRetry = $controller->uploadAttachment($makeRequest($secondEvent->id, 'original file bytes'));
+        $changedFileRetry = $controller->uploadAttachment($makeRequest($firstEvent->id, 'different file bytes'));
+
+        $this->assertSame(201, $first->getStatusCode());
+        $this->assertSame(409, $crossJobRetry->getStatusCode());
+        $this->assertSame(409, $changedFileRetry->getStatusCode());
+        $this->assertDatabaseCount('event_attachments', 1);
+
+        $stored = EventAttachment::query()->firstOrFail();
+        $this->assertSame($firstEvent->id, $stored->event_id);
+        Storage::disk('private')->assertExists($stored->path);
+    }
+
 }
