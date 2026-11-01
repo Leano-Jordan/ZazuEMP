@@ -79,6 +79,9 @@ test.describe('Zazu installed PWA offline shell', () => {
         await page.locator('input[name="day_contact_name"]').fill('Day Coordinator');
         await page.locator('input[name="day_contact_phone"]').fill('0123456788');
         await page.locator('input[name="day_contact_email"]').fill('day@example.test');
+        // Night contact fields live inside a collapsed disclosure on the
+        // real form; open it before filling rather than bypassing visibility.
+        await page.locator('details').filter({ has: page.locator('summary', { hasText: 'Night contact' }) }).locator('summary').click();
         await page.locator('input[name="night_contact_name"]').fill('Night Coordinator');
         await page.locator('input[name="night_contact_phone"]').fill('0123456787');
         await page.locator('input[name="night_contact_email"]').fill('night@example.test');
@@ -174,7 +177,8 @@ test.describe('Zazu installed PWA offline shell', () => {
         const selector = page.locator('select[name="customer_id"]');
         await expect(selector.locator('option[value^="local:"]')).toHaveCount(1);
         await selector.selectOption({ label: 'Local only linked customer' });
-        await page.locator('input[name="event_type"][value="Wedding"]').check();
+        // The visible choice card overlays the native radio input.
+        await page.locator('label.zazu-choice-card').filter({ has: page.locator('input[name="event_type"][value="Wedding"]') }).click();
         await page.locator('input[name="event_date"]').fill('2026-11-15');
         await page.locator('input[name="event_address"]').fill('Pretoria');
         await page.locator('input[name="services[]"][value="Catering"]').check();
