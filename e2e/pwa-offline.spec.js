@@ -759,7 +759,7 @@ test.describe('Zazu installed PWA offline shell', () => {
                 };
                 tx.onerror = () => reject(tx.error || new Error('Could not inspect offline queue'));
             };
-        }));
+        }), businessDatabaseName);
         expect(await queueCount()).toBe(1);
 
         // A cancelled sign-out must survive a cold page reload without losing queued work.
