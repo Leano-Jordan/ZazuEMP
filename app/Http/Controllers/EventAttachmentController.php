@@ -118,7 +118,7 @@ class EventAttachmentController extends Controller
 
         try {
             if (! Storage::disk($fileToDelete['disk'])->delete($fileToDelete['path'])) {
-                report(new \\RuntimeException('Private attachment file cleanup returned false for attachment '.$attachment->id));
+                report(new \RuntimeException('Private attachment file cleanup returned false for attachment '.$attachment->id));
             }
         } catch (Throwable $exception) {
             report($exception);
