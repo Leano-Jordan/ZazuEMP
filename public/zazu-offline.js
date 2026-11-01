@@ -417,7 +417,8 @@
         }
 
         const mutationStatus = result.mutation_status;
-        const shouldRetry = mutationStatus === 'pending';
+        const retryWithNewMutationId = mutationStatus === 'new_mutation_required';
+        const shouldRetry = mutationStatus === 'pending' || retryWithNewMutationId;
         const shouldDiscard = ['discarded', 'applied'].includes(mutationStatus);
         if (!shouldRetry && !shouldDiscard) {
             throw new Error('The server did not confirm whether this offline change should be retried or removed.');
@@ -437,6 +438,14 @@
                 const mutation = (all.result || []).find(item => Number(item.conflict_id) === id);
                 if (mutation && shouldRetry) {
                     const retry = { ...mutation, status: 'pending' };
+                    if (retryWithNewMutationId) {
+                        // The server has permanently bound the old ID to a
+                        // different payload. Keep the edited work, but retry
+                        // it as a new immutable mutation.
+                        retry.id = crypto.randomUUID();
+                        retry.created_at = new Date().toISOString();
+                        store.delete(mutation.id);
+                    }
                     delete retry.conflict_id;
                     delete retry.server_sequence;
                     delete retry.server_status;
@@ -599,6 +608,7 @@
                                 mutation_id: mutation.id,
                                 entity_type: mutation.entity_type,
                                 entity_id: mutation.entity_id,
+                                conflict_type: remote.conflict_type || 'domain_rejection',
                                 message: remote.error,
                                 status: 'open',
                             },
