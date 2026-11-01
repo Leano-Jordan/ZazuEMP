@@ -315,7 +315,7 @@ class BusinessIsolationTest extends TestCase
 
         EventAttachment::deleting(function (EventAttachment $deleting) use ($attachment): void {
             if ((int) $deleting->id === (int) $attachment->id) {
-                throw new \\RuntimeException('Simulated attachment metadata delete failure.');
+                throw new \RuntimeException('Simulated attachment metadata delete failure.');
             }
         });
 
@@ -324,7 +324,7 @@ class BusinessIsolationTest extends TestCase
         try {
             $this->actingAs($user)->delete(route('work.attachments.destroy', $attachment));
             $this->fail('The simulated metadata deletion failure should be raised.');
-        } catch (\\RuntimeException $exception) {
+        } catch (\RuntimeException $exception) {
             $this->assertSame('Simulated attachment metadata delete failure.', $exception->getMessage());
         }
 
