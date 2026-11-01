@@ -328,42 +328,7 @@ class SyncController extends Controller
             ->first();
 
         if ($existing) {
-            $incomingFile = $request->file('file');
-            $incomingHash = hash_file('sha256', $incomingFile->getRealPath());
-            $existingStream = Storage::disk($existing->disk)->readStream($existing->path);
-
-            if (! is_resource($existingStream) || $incomingHash === false) {
-                if (is_resource($existingStream)) {
-                    fclose($existingStream);
-                }
-
-                return response()->json([
-                    'message' => 'The previous attachment could not be verified. Keep this upload queued and contact the workspace owner.',
-                ], 503);
-            }
-
-            $hashContext = hash_init('sha256');
-            hash_update_stream($hashContext, $existingStream);
-            fclose($existingStream);
-            $existingHash = hash_final($hashContext);
-
-            $samePayload = (int) $existing->event_id === (int) $event->id
-                && $existing->original_name === $incomingFile->getClientOriginalName()
-                && (int) $existing->size === (int) $incomingFile->getSize()
-                && $existing->mime_type === $incomingFile->getMimeType()
-                && $existing->description === ($validated['description'] ?? null)
-                && hash_equals($existingHash, $incomingHash);
-
-            if (! $samePayload) {
-                return response()->json([
-                    'message' => 'This idempotency key is already assigned to a different attachment. Keep the local file and create a new upload attempt.',
-                ], 409);
-            }
-
-            return response()->json([
-                'attachment' => $this->attachmentPayload($existing),
-                'duplicate' => true,
-            ]);
+            return $this->existingAttachmentResponse($existing, $event, $request, $validated);
         }
 
         $path = $request->file('file')->store('jobs/'.$event->id.'/attachments', 'private');
@@ -382,8 +347,21 @@ class SyncController extends Controller
                 'description' => $validated['description'] ?? null,
                 'idempotency_key' => $validated['idempotency_key'],
             ]);
-        } catch (\Throwable $exception) {
+        } catch (\\Throwable $exception) {
             Storage::disk('private')->delete($path);
+
+            // Another request may have won the unique idempotency-key insert.
+            // Return duplicate success only after verifying that it stored the
+            // exact same job and file payload.
+            $concurrent = EventAttachment::query()
+                ->where('business_id', $device->business_id)
+                ->where('idempotency_key', $validated['idempotency_key'])
+                ->first();
+
+            if ($concurrent) {
+                return $this->existingAttachmentResponse($concurrent, $event, $request, $validated);
+            }
+
             throw $exception;
         }
 
@@ -393,6 +371,55 @@ class SyncController extends Controller
             'attachment' => $this->attachmentPayload($attachment),
             'duplicate' => false,
         ], 201);
+    }
+
+    /**
+     * Verify that an idempotent upload is the same file assigned to the same job.
+     *
+     * @param array<string, mixed> $validated
+     */
+    private function existingAttachmentResponse(
+        EventAttachment $existing,
+        Event $event,
+        Request $request,
+        array $validated
+    ): JsonResponse {
+        $incomingFile = $request->file('file');
+        $incomingHash = hash_file('sha256', $incomingFile->getRealPath());
+        $existingStream = Storage::disk($existing->disk)->readStream($existing->path);
+
+        if (! is_resource($existingStream) || $incomingHash === false) {
+            if (is_resource($existingStream)) {
+                fclose($existingStream);
+            }
+
+            return response()->json([
+                'message' => 'The previous attachment could not be verified. Keep this upload queued and contact the workspace owner.',
+            ], 503);
+        }
+
+        $hashContext = hash_init('sha256');
+        hash_update_stream($hashContext, $existingStream);
+        fclose($existingStream);
+        $existingHash = hash_final($hashContext);
+
+        $samePayload = (int) $existing->event_id === (int) $event->id
+            && $existing->original_name === $incomingFile->getClientOriginalName()
+            && (int) $existing->size === (int) $incomingFile->getSize()
+            && $existing->mime_type === $incomingFile->getMimeType()
+            && $existing->description === ($validated['description'] ?? null)
+            && hash_equals($existingHash, $incomingHash);
+
+        if (! $samePayload) {
+            return response()->json([
+                'message' => 'This idempotency key is already assigned to a different attachment. Keep the local file and create a new upload attempt.',
+            ], 409);
+        }
+
+        return response()->json([
+            'attachment' => $this->attachmentPayload($existing),
+            'duplicate' => true,
+        ]);
     }
 
     public function listAttachments(Request $request): JsonResponse
