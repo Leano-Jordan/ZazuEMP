@@ -240,17 +240,33 @@ class PurchaseOrderController extends Controller
         int $supplierId,
         ?int $eventId
     ): bool {
-        if (
-            (int) $order->business_id !== $businessId
-            || (int) $order->supplier_id !== $supplierId
-            || (int) ($order->event_id ?? 0) !== (int) ($eventId ?? 0)
-            || strtoupper((string) $order->currency) !== strtoupper((string) $data['currency'])
-            || $order->expected_at?->toDateString() !== ($data['expected_at'] ?? null)
-            || $order->notes !== ($data['notes'] ?? null)
-        ) {
-            return false;
-        }
+        return $this->purchaseOrderHeaderMatches($order, $data, $businessId, $supplierId, $eventId)
+            && $this->purchaseOrderItemsMatch($order, $data);
+    }
 
+    /**
+     * @param array<string, mixed> $data
+     */
+    private function purchaseOrderHeaderMatches(
+        PurchaseOrder $order,
+        array $data,
+        int $businessId,
+        int $supplierId,
+        ?int $eventId
+    ): bool {
+        return (int) $order->business_id === $businessId
+            && (int) $order->supplier_id === $supplierId
+            && (int) ($order->event_id ?? 0) === (int) ($eventId ?? 0)
+            && strtoupper((string) $order->currency) === strtoupper((string) $data['currency'])
+            && $order->expected_at?->toDateString() === ($data['expected_at'] ?? null)
+            && $order->notes === ($data['notes'] ?? null);
+    }
+
+    /**
+     * @param array<string, mixed> $data
+     */
+    private function purchaseOrderItemsMatch(PurchaseOrder $order, array $data): bool
+    {
         $items = $order->items()->orderBy('id')->get();
 
         if ($items->count() !== count($data['description'])) {
@@ -258,23 +274,32 @@ class PurchaseOrderController extends Controller
         }
 
         foreach ($data['description'] as $index => $description) {
-            $item = $items[$index];
-            $capabilityId = ! empty($data['capability_id'][$index])
-                ? (int) $data['capability_id'][$index]
-                : null;
-
-            if (
-                $item->description !== trim((string) $description)
-                || Money::toHundredths((string) $item->quantity) !== Money::toHundredths((string) $data['quantity'][$index])
-                || $item->unit !== ($data['unit'][$index] ?? null)
-                || Money::toCents((string) $item->unit_price) !== Money::toCents((string) $data['unit_price'][$index])
-                || (int) ($item->capability_id ?? 0) !== (int) ($capabilityId ?? 0)
-            ) {
+            if (! $this->purchaseOrderItemMatches($items[$index], $data, $index, (string) $description)) {
                 return false;
             }
         }
 
         return true;
+    }
+
+    /**
+     * @param array<string, mixed> $data
+     */
+    private function purchaseOrderItemMatches(
+        \App\Models\PurchaseOrderItem $item,
+        array $data,
+        int $index,
+        string $description
+    ): bool {
+        $capabilityId = ! empty($data['capability_id'][$index])
+            ? (int) $data['capability_id'][$index]
+            : null;
+
+        return $item->description === trim($description)
+            && Money::toHundredths((string) $item->quantity) === Money::toHundredths((string) $data['quantity'][$index])
+            && $item->unit === ($data['unit'][$index] ?? null)
+            && Money::toCents((string) $item->unit_price) === Money::toCents((string) $data['unit_price'][$index])
+            && (int) ($item->capability_id ?? 0) === (int) ($capabilityId ?? 0);
     }
 
     public function show(Request $request, PurchaseOrder $purchaseOrder): View
