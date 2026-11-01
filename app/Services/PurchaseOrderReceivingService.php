@@ -53,12 +53,14 @@ final class PurchaseOrderReceivingService
                 $lifecycle->assertOperational($lockedEvent);
             }
 
-            $this->assertReceivable($lockedOrder);
-
+            // A retry of an already committed receipt remains idempotent even
+            // after that receipt moved the order into the fully-received state.
             if ($this->receiptAlreadyProcessed($businessId, $lockedOrder->id, $idempotencyKey)) {
                 $alreadyProcessed = true;
                 return;
             }
+
+            $this->assertReceivable($lockedOrder);
 
             PurchaseOrderReceipt::create([
                 'business_id' => $businessId,
