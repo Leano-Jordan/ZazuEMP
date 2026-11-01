@@ -1558,9 +1558,10 @@ function setupZazuOfflineForms() {
 
             const operation = payload.__operation || 'create';
             delete payload.__operation;
-            await window.ZazuOffline.queueMutation(entity, operation, payload);
 
-            const state = window.ZazuOffline.getState();
+            // Stage the optimistic working copy separately, then commit it in
+            // the same IndexedDB transaction as its queued mutation.
+            const state = JSON.parse(JSON.stringify(window.ZazuOffline.getState()));
 
             if (entity === 'quote_acceptance') {
                 const quote = state.quotes?.find(item => item.local_id === payload.quote_local_id);
@@ -1707,7 +1708,7 @@ function setupZazuOfflineForms() {
                 else collection.push(payload);
             }
             state.local_dirty = true;
-            await window.ZazuOffline.persist();
+            await window.ZazuOffline.queueMutation(entity, operation, payload, state);
             form.dataset.zazuOfflineSaved = '1';
 
             const submit = form.querySelector('button[type="submit"], input[type="submit"]');
