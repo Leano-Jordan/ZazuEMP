@@ -14,6 +14,9 @@ class OfflineLicenseTest extends TestCase
 
     public function test_a_business_can_have_a_local_license_without_any_online_service(): void
     {
+        // Keep the entitlement validity assertion deterministic as the calendar advances.
+        $this->travelTo(Carbon::parse('2026-10-15 12:00:00'));
+
         $user = $this->signInAsOwner();
         $business = $user->businesses()->firstOrFail();
 
