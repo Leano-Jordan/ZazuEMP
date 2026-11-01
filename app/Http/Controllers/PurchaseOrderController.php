@@ -164,6 +164,18 @@ class PurchaseOrderController extends Controller
                 ->first();
 
             if ($existingOrder) {
+                abort_unless(
+                    $this->purchaseOrderPayloadMatches(
+                        $existingOrder,
+                        $data,
+                        $businessId,
+                        (int) $supplier->id,
+                        $eventId
+                    ),
+                    409,
+                    'This purchase order key was already used for different supplier or order details. Refresh the form before retrying.'
+                );
+
                 return $existingOrder;
             }
 
@@ -215,6 +227,54 @@ class PurchaseOrderController extends Controller
 
             return $order;
         });
+    }
+
+
+    /**
+     * @param array<string, mixed> $data
+     */
+    private function purchaseOrderPayloadMatches(
+        PurchaseOrder $order,
+        array $data,
+        int $businessId,
+        int $supplierId,
+        ?int $eventId
+    ): bool {
+        if (
+            (int) $order->business_id !== $businessId
+            || (int) $order->supplier_id !== $supplierId
+            || (int) ($order->event_id ?? 0) !== (int) ($eventId ?? 0)
+            || strtoupper((string) $order->currency) !== strtoupper((string) $data['currency'])
+            || $order->expected_at?->toDateString() !== ($data['expected_at'] ?? null)
+            || $order->notes !== ($data['notes'] ?? null)
+        ) {
+            return false;
+        }
+
+        $items = $order->items()->orderBy('id')->get();
+
+        if ($items->count() !== count($data['description'])) {
+            return false;
+        }
+
+        foreach ($data['description'] as $index => $description) {
+            $item = $items[$index];
+            $capabilityId = ! empty($data['capability_id'][$index])
+                ? (int) $data['capability_id'][$index]
+                : null;
+
+            if (
+                $item->description !== trim((string) $description)
+                || Money::toHundredths((string) $item->quantity) !== Money::toHundredths((string) $data['quantity'][$index])
+                || $item->unit !== ($data['unit'][$index] ?? null)
+                || Money::toCents((string) $item->unit_price) !== Money::toCents((string) $data['unit_price'][$index])
+                || (int) ($item->capability_id ?? 0) !== (int) ($capabilityId ?? 0)
+            ) {
+                return false;
+            }
+        }
+
+        return true;
     }
 
     public function show(Request $request, PurchaseOrder $purchaseOrder): View
