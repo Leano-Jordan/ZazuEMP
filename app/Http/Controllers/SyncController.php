@@ -27,6 +27,7 @@ use App\Support\Offline\SyncEntityIdentityRegistry;
 use App\Support\Offline\SyncMutationApplier;
 use App\Support\Offline\SyncMutationProtocol;
 use App\Support\Offline\SyncConflictRecorder;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
@@ -645,92 +646,52 @@ class SyncController extends Controller
     private function bootstrapPayload(SyncDevice $device): array
     {
         $business = Business::query()->findOrFail($device->business_id);
-        $metadata = $device->metadata ?? [];
         $registry = app(SyncEntityIdentityRegistry::class);
-        $selected = [];
 
-        foreach ($metadata['bootstrap_selection'] ?? [] as $item) {
-            $model = self::SELECTION_TYPES[$item['type']] ?? null;
-            if (! $model) {
-                continue;
-            }
+        return [
+            'version' => 1,
+            'business' => [
+                'id' => $business->id,
+                'name' => $business->name,
+                'currency' => $business->currency,
+                'email' => $business->email,
+                'phone' => $business->phone,
+                'address' => $business->address,
+                'website' => $business->website,
+                'tax_number' => $business->tax_number,
+            ],
+            'catalogue' => $this->bootstrapCatalogue($business, $registry),
+            'suppliers' => $this->bootstrapSuppliers($business, $registry),
+            'purchase_orders' => $this->bootstrapPurchaseOrders($business, $registry),
+            'invoices' => $this->bootstrapInvoices($business, $registry),
+            'expenses' => $this->bootstrapExpenses($business, $registry),
+            'inventory_items' => $this->bootstrapInventoryItems($business, $registry),
+            'assets' => $this->bootstrapAssets($business, $registry),
+            'costs' => $this->bootstrapCosts($business, $registry),
+            'selected' => $this->bootstrapSelectedRecords($device, $business, $registry),
+            'device' => [
+                'id' => $device->id,
+                'installation_id' => $device->installation_id,
+            ],
+        ];
+    }
 
-            $query = $model::query();
+    private function bootstrapCatalogue(Business $business, SyncEntityIdentityRegistry $registry)
+    {
+        return BusinessCapability::query()
+            ->where('business_id', $business->id)
+            ->get()
+            ->map(fn (BusinessCapability $capability) => [
+                'local_id' => $registry->identify($capability, 'service')->entity_uuid,
+                'server_id' => $capability->id,
+                'record' => $capability->toArray(),
+            ])
+            ->values();
+    }
 
-            if ($item['type'] === 'quote') {
-                $query->whereHas('event', fn ($event) => $event->where('business_id', $business->id));
-            } else {
-                $query->where('business_id', $business->id);
-            }
-
-            $record = $query->whereKey($item['id'])->first();
-            if (! $record) {
-                continue;
-            }
-
-            $identity = $registry->identify($record, $item['type']);
-
-            if ($item['type'] === 'customer') {
-                $record->loadMissing('contacts');
-            }
-
-            if ($item['type'] === 'quote') {
-                $record->loadMissing('latestVersion.items', 'event.customer');
-            }
-
-            if ($item['type'] === 'job') {
-                $record->loadMissing('requirements', 'customer');
-            }
-
-            if ($item['type'] === 'preparation') {
-                $record->loadMissing('event.customer');
-            }
-
-            $recordData = $record->toArray();
-
-            if ($item['type'] === 'customer') {
-                $primaryContact = $record->contacts->firstWhere('is_primary', true);
-                $recordData['contact_name'] = $primaryContact?->name;
-                $recordData['phone'] = $primaryContact?->phone;
-                $recordData['email'] = $primaryContact?->email;
-            }
-
-            if ($item['type'] === 'quote') {
-                $recordData['event_local_id'] = $record->event
-                    ? $registry->identify($record->event, 'job')->entity_uuid
-                    : null;
-                $recordData['event_name'] = $record->event?->name;
-            }
-
-            if ($item['type'] === 'job') {
-                $recordData['customer_local_id'] = $record->customer
-                    ? $registry->identify($record->customer, 'customer')->entity_uuid
-                    : null;
-                $recordData['requirements'] = $record->requirements->map(function ($requirement) use ($registry): array {
-                    return [
-                        'local_id' => $registry->identify($requirement, 'event_requirement')->entity_uuid,
-                        'server_id' => $requirement->id,
-                        'record' => $requirement->toArray(),
-                    ];
-                })->values()->all();
-            }
-
-            if ($item['type'] === 'preparation') {
-                $recordData['event_local_id'] = $record->event
-                    ? $registry->identify($record->event, 'job')->entity_uuid
-                    : null;
-                $recordData['event_name'] = $record->event?->name;
-            }
-
-            $selected[] = [
-                'type' => $item['type'],
-                'local_id' => $identity->entity_uuid,
-                'server_id' => $record->id,
-                'record' => $recordData,
-            ];
-        }
-
-        $suppliers = Supplier::query()
+    private function bootstrapSuppliers(Business $business, SyncEntityIdentityRegistry $registry)
+    {
+        return Supplier::query()
             ->where('business_id', $business->id)
             ->orderBy('name')
             ->limit(500)
@@ -741,8 +702,11 @@ class SyncController extends Controller
                 'record' => $supplier->toArray(),
             ])
             ->values();
+    }
 
-        $purchaseOrders = PurchaseOrder::query()
+    private function bootstrapPurchaseOrders(Business $business, SyncEntityIdentityRegistry $registry)
+    {
+        return PurchaseOrder::query()
             ->where('business_id', $business->id)
             ->with('items')
             ->latest()
@@ -759,8 +723,11 @@ class SyncController extends Controller
                 ])->values(),
             ])
             ->values();
+    }
 
-        $invoices = Invoice::query()
+    private function bootstrapInvoices(Business $business, SyncEntityIdentityRegistry $registry)
+    {
+        return Invoice::query()
             ->where('business_id', $business->id)
             ->with(['items', 'payments'])
             ->latest('id')
@@ -781,8 +748,11 @@ class SyncController extends Controller
                 ]),
             ])
             ->values();
+    }
 
-        $inventoryItems = InventoryItem::query()
+    private function bootstrapInventoryItems(Business $business, SyncEntityIdentityRegistry $registry)
+    {
+        return InventoryItem::query()
             ->where('business_id', $business->id)
             ->with('movements')
             ->orderBy('name')
@@ -801,8 +771,11 @@ class SyncController extends Controller
                 ]),
             ])
             ->values();
+    }
 
-        $assets = Asset::query()
+    private function bootstrapAssets(Business $business, SyncEntityIdentityRegistry $registry)
+    {
+        return Asset::query()
             ->where('business_id', $business->id)
             ->with(['allocations' => fn ($query) => $query->where('status', 'allocated')])
             ->orderBy('name')
@@ -820,8 +793,11 @@ class SyncController extends Controller
                 ]),
             ])
             ->values();
+    }
 
-        $costs = EventCost::query()
+    private function bootstrapCosts(Business $business, SyncEntityIdentityRegistry $registry)
+    {
+        return EventCost::query()
             ->where('business_id', $business->id)
             ->with('event')
             ->latest('id')
@@ -835,8 +811,11 @@ class SyncController extends Controller
                 ]),
             ])
             ->values();
+    }
 
-        $expenses = FinanceExpense::query()
+    private function bootstrapExpenses(Business $business, SyncEntityIdentityRegistry $registry)
+    {
+        return FinanceExpense::query()
             ->where('business_id', $business->id)
             ->latest('id')
             ->limit(500)
@@ -847,40 +826,125 @@ class SyncController extends Controller
                 'record' => $expense->toArray(),
             ])
             ->values();
-
-        return [
-            'version' => 1,
-            'business' => [
-                'id' => $business->id,
-                'name' => $business->name,
-                'currency' => $business->currency,
-                'email' => $business->email,
-                'phone' => $business->phone,
-                'address' => $business->address,
-                'website' => $business->website,
-                'tax_number' => $business->tax_number,
-            ],
-            'catalogue' => BusinessCapability::query()
-                ->where('business_id', $business->id)
-                ->get()
-                ->map(fn (BusinessCapability $capability) => [
-                    'local_id' => $registry->identify($capability, 'service')->entity_uuid,
-                    'server_id' => $capability->id,
-                    'record' => $capability->toArray(),
-                ])
-                ->values(),
-            'suppliers' => $suppliers,
-            'purchase_orders' => $purchaseOrders,
-            'invoices' => $invoices,
-            'expenses' => $expenses,
-            'inventory_items' => $inventoryItems,
-            'assets' => $assets,
-            'costs' => $costs,
-            'selected' => $selected,
-            'device' => [
-                'id' => $device->id,
-                'installation_id' => $device->installation_id,
-            ],
-        ];
     }
+
+    /**
+     * @return array<int, array<string, mixed>>
+     */
+    private function bootstrapSelectedRecords(
+        SyncDevice $device,
+        Business $business,
+        SyncEntityIdentityRegistry $registry,
+    ): array {
+        $selected = [];
+        foreach ($device->metadata['bootstrap_selection'] ?? [] as $item) {
+            $record = $this->findSelectedRecord($business, $item);
+            if (! $record) {
+                continue;
+            }
+
+            $identity = $registry->identify($record, $item['type']);
+            $selected[] = [
+                'type' => $item['type'],
+                'local_id' => $identity->entity_uuid,
+                'server_id' => $record->id,
+                'record' => $this->selectedRecordData($record, $registry),
+            ];
+        }
+
+        return $selected;
+    }
+
+    private function findSelectedRecord(Business $business, array $item): ?Model
+    {
+        $type = $item['type'] ?? '';
+        $model = self::SELECTION_TYPES[$type] ?? null;
+        if (! $model) {
+            return null;
+        }
+
+        $query = $model::query();
+        if ($type === 'quote') {
+            $query->whereHas('event', fn ($event) => $event->where('business_id', $business->id));
+        } else {
+            $query->where('business_id', $business->id);
+        }
+
+        return $query->whereKey($item['id'] ?? null)->first();
+    }
+
+    private function selectedRecordData(Model $record, SyncEntityIdentityRegistry $registry): array
+    {
+        if ($record instanceof Customer) {
+            return $this->selectedCustomerData($record);
+        }
+        if ($record instanceof Quote) {
+            return $this->selectedQuoteData($record, $registry);
+        }
+        if ($record instanceof Event) {
+            return $this->selectedJobData($record, $registry);
+        }
+        if ($record instanceof EventPreparationItem) {
+            return $this->selectedPreparationData($record, $registry);
+        }
+
+        return $record->toArray();
+    }
+
+    private function selectedCustomerData(Customer $customer): array
+    {
+        $customer->loadMissing('contacts');
+        $data = $customer->toArray();
+        $primaryContact = $customer->contacts->firstWhere('is_primary', true);
+        $data['contact_name'] = $primaryContact?->name;
+        $data['phone'] = $primaryContact?->phone;
+        $data['email'] = $primaryContact?->email;
+
+        return $data;
+    }
+
+    private function selectedQuoteData(Quote $quote, SyncEntityIdentityRegistry $registry): array
+    {
+        $quote->loadMissing('latestVersion.items', 'event.customer');
+        $data = $quote->toArray();
+        $data['event_local_id'] = $quote->event
+            ? $registry->identify($quote->event, 'job')->entity_uuid
+            : null;
+        $data['event_name'] = $quote->event?->name;
+
+        return $data;
+    }
+
+    private function selectedJobData(Event $event, SyncEntityIdentityRegistry $registry): array
+    {
+        $event->loadMissing('requirements', 'customer');
+        $data = $event->toArray();
+        $data['customer_local_id'] = $event->customer
+            ? $registry->identify($event->customer, 'customer')->entity_uuid
+            : null;
+        $data['requirements'] = $event->requirements->map(function ($requirement) use ($registry): array {
+            return [
+                'local_id' => $registry->identify($requirement, 'event_requirement')->entity_uuid,
+                'server_id' => $requirement->id,
+                'record' => $requirement->toArray(),
+            ];
+        })->values()->all();
+
+        return $data;
+    }
+
+    private function selectedPreparationData(
+        EventPreparationItem $preparation,
+        SyncEntityIdentityRegistry $registry,
+    ): array {
+        $preparation->loadMissing('event.customer');
+        $data = $preparation->toArray();
+        $data['event_local_id'] = $preparation->event
+            ? $registry->identify($preparation->event, 'job')->entity_uuid
+            : null;
+        $data['event_name'] = $preparation->event?->name;
+
+        return $data;
+    }
+
 }
