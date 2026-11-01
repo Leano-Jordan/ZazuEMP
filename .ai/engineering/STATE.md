@@ -24,7 +24,7 @@ Entry files must point to the canonical contract and must not define a competing
 IDENTITY → BASELINE → TARGET → ROUTE → INSPECT → CHANGE → VERIFY → BREAK → RECONCILE → ACCEPT/REPAIR → RECORD → NEXT
 
 ## Active target
-**V1 hardening audit: logout/cache identity race closure → latest-main CI reconciliation → populated workflow and recovery gates.**
+**P0 active mission: finish VS Code-independent offline continuity; reconcile current-main offline/workflow CI; establish a durable HTTPS install origin; prove disconnected-device operation and recovery.**
 
 Current state:
 - Canonical repository/ref: `Leano-Jordan/ZazuEMP` / `main` only. No branches are to be created or used.
@@ -64,7 +64,7 @@ The earlier browser run for `0a10d05` is not evidence for this final control-pla
 7. Complete Zazu brand/trade-mark clearance.
 8. Final Director re-audit against the selected release head.
 
-**Current execution priority:** execute and reconcile the new offline inventory/cost/asset regression coverage; then close customer-environment recovery and rollback proof.
+**Current execution priority:** reconcile the 2026-11-01 offline-continuity source/test batch on exact `main`; then establish the independent HTTPS install origin and run installed-device disconnected/reconnect drills.
 
 ## Director cycle update — 2026-10-07
 
@@ -269,3 +269,41 @@ Last updated: 2026-10-20
 **P0 — finish VS Code-independent offline continuity:** observe current-main CI for the new offline-navigation regression; establish a durable HTTPS production origin separate from the VS Code server; install/update from that origin; then perform physical-device acceptance with the PC and internet unavailable, followed by reconnect/idempotency/conflict and logout/privacy checks.
 
 **Acceptance rule:** no claim of "solid offline" until current-head CI and the realistic installed-device gate both pass. The host-independent launch gate and full offline-domain parity remain **OPEN**.
+
+## Director offline continuity and V1 workflow hardening — 2026-11-01
+
+**Source baseline for this cycle:** `main` at `ddf2d72bf79365c94f05a1a69784d6a404116cb7`; later same-day commits remain governed by the live `main` ref. All implementation and documentation writes target `main`; no working branch was created.
+
+### Implemented in source
+
+- Offline form submission probes the Zazu origin with a bounded same-origin request. It no longer assumes `navigator.onLine` means the Laravel host is reachable; supported forms can enter the local queue while Wi-Fi/network-interface status remains online.
+- The offline mutation, the `local_dirty` marker and the staged optimistic workspace copy are committed in one IndexedDB transaction. The client adopts the new in-memory state only after transaction completion.
+- The service-worker cache generation is `zazu-static-v25`, invalidating the older precached offline client after the persistence changes.
+- Offline customer creation carries the primary contact, legal name, registration/tax/VAT details, billing address, notes and day/night contacts. Offline profile-photo upload is explicitly declined while disconnected; metadata is not presented as proof that a file was saved.
+- Owner pairing with an empty selection now bootstraps a bounded recent working set: up to 25 customers, 25 jobs, 25 quotes and 25 preparation items, alongside the existing supporting catalogue, suppliers, purchasing, inventory, assets, costs, invoices and expenses. The settings screen explains the data copied to the paired device.
+- Selected customer/job/quote/preparation records carry stable local identities and relationship references into the phone's IndexedDB store.
+- Offline Work creation carries the selected customer's local identity, job type, date, address and services. The server resolves the customer identity within the same business, creates service requirements, and rejects a customer identity belonging to another business.
+- The sync dependency sorter is covered with a reversed customer/job batch so the customer mutation must apply before its dependent Work record.
+
+### Regression coverage added
+
+- Browser coverage for an online browser with an unreachable Zazu origin, full offline customer details, queue persistence after reload, and a phone-local customer selected in offline Work creation.
+- Laravel coverage for customer profile/contact persistence, bounded pairing bootstrap and parent identities, offline Work/customer linking, service requirement creation, reversed dependency ordering and cross-business customer rejection.
+- Existing service-worker behavioral assertions now follow cache generation v25.
+
+### Evidence disposition
+
+- Source and tests: **IMPLEMENTED**.
+- Exact-main Laravel, Quality, browser, PHPMD, Psalm and populated upgrade/rollback: **PENDING / UNVERIFIED** until the current `main` Actions runs finish and their exact SHA is recorded. Earlier successful runs do not certify these later changes.
+- Real installed-device operation with the PC and internet unavailable: **UNVERIFIED**.
+- Stable HTTPS Zazu origin with durable database/private-file storage and recovery: **NOT ESTABLISHED**.
+- Full offline parity across every V1 screen, complete bidirectional reconciliation, attachment/file parity and real-world conflict recovery: **OPEN**.
+- No readiness-score uplift is awarded for source/test additions alone.
+
+### Next acceptance gate
+
+1. Reconcile current-main Laravel, Quality, browser, PHPMD, Psalm and populated upgrade/rollback runs.
+2. Resolve every confirmed regression on `main`; queued jobs are not passes.
+3. Establish an independent HTTPS deployment target with durable persistence and tested backup/restore.
+4. Install from that origin and complete disconnected/reconnect/logout/multi-user device acceptance.
+5. Re-audit complete workflow parity and recovery before V1 release acceptance.
