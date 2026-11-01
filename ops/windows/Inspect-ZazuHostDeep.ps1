@@ -89,7 +89,7 @@ Get-CimInstance Win32_Service -ErrorAction SilentlyContinue |
         $_.Name -match 'apache|httpd|mysql|maria|nginx' -or
         $_.DisplayName -match 'apache|httpd|mysql|maria|nginx'
     } |
-    Select-Object Name, DisplayName, State, StartMode, StartName, PathName |
+    Select-Object Name, DisplayName, State, StartMode, StartName, @{Name='PathName';Expression={ Safe-CommandLine $_.PathName }} |
     Format-List | Out-String | Write-Output
 
 Section "AMPPS INSTALLATION AND EXECUTABLE VERSIONS"
