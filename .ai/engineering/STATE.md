@@ -453,3 +453,14 @@ No release-readiness score uplift is claimed from these source fixes or CI passe
 - Source changes in this cycle: documentation only. No runtime code, database schema or customer data changed. No tests were run in this remote GitHub-only cycle.
 - **Next P0:** inspect the exact origin migration and attachment retry behaviour in the client, add automated guardrails for migration readiness where feasible, then reconcile the latest browser Actions run. Physical LAN HTTPS and disconnected-device tests remain pending until the PC is available.
 - All work committed directly to canonical `main`; no branch created.
+
+
+## Director offline attachment integration audit — 2026-11-01
+
+- Inspected the current Work attachment partial/controller, authenticated app layout, service worker, standalone `public/offline-attachments.js`, sync attachment API and existing attachment feature tests.
+- Found that the server-side upload/list/download endpoints and the online Work attachment panel exist, but the standalone phone transfer script is not imported by any active view. Its expected globals (`data`, `syncFetch`, `render`, `#content`, `.hero-actions`) are not provided by the current authenticated layout. The script is only referenced by service-worker caching rules, tests and docs.
+- Corrected `docs/ZAZU_OFFLINE_FIRST_ARCHITECTURE.md` and `docs/ZAZU_V1_STATUS.md`: online job attachments are implemented; offline attachment queue/upload/download is **NOT IMPLEMENTED in the active app**. Do not include the orphaned script in the app layout without adapting its contracts and adding business-scope, logout, origin-migration and retry tests.
+- This correction prevents the project from counting a precached but unreachable script as a shipped offline capability. No runtime app changes were made for this discovery.
+- Separately tightened sync attachment idempotency: an existing key is now checked against the requested business-owned job, original file name, size, MIME type, description and SHA-256 content before returning duplicate success. A mismatched key reuse returns HTTP 409; inability to verify the existing stored file returns HTTP 503 and leaves the client upload queued.
+- Added regression coverage for key reuse across a different job and for changed file contents. Exact-main execution is pending on the latest commit.
+- No database schema, database data or branch changes. All commits remain direct to `main`.
