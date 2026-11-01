@@ -38,7 +38,7 @@ class EventAttachmentController extends Controller
                 $lifecycle->assertOperational($lockedEvent);
 
                 foreach ($request->file('files', []) as $file) {
-                    $path = $file->store('jobs/' . $event->id . '/attachments', 'private');
+                    $path = $this->storePrivateAttachment($file, (int) $event->id);
                     $storedPaths[] = $path;
 
                     EventAttachment::create([
@@ -127,6 +127,19 @@ class EventAttachmentController extends Controller
         return redirect()
             ->route('work.show', $event)
             ->with('success', 'File removed from the job.');
+    }
+
+    private function storePrivateAttachment(UploadedFile $file, int $eventId): string
+    {
+        $path = $file->store('jobs/'.$eventId.'/attachments', 'private');
+
+        abort_unless(
+            is_string($path) && $path !== '',
+            503,
+            'Private attachment storage is unavailable. No attachment record was created.'
+        );
+
+        return $path;
     }
 
     private function business(Request $request): Business
