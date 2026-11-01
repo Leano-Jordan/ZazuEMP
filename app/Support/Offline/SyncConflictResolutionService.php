@@ -91,6 +91,12 @@ final class SyncConflictResolutionService
         string $action,
         ?string $note
     ): ?string {
+        // An already-applied domain operation is immutable. Conflict UI
+        // actions may acknowledge it but must never requeue or discard it.
+        if ($mutation?->status === 'applied') {
+            return 'applied';
+        }
+
         if ($conflict->conflict_type === 'mutation_identity_mismatch') {
             return $this->resolveMutationIdentityMismatch($mutation, $action);
         }
@@ -160,7 +166,7 @@ final class SyncConflictResolutionService
         return $action === 'retry' ? 'new_mutation_required' : 'discarded';
     }
 
-    private function conflictPayload(SyncConflict $conflict): array
+    public function payload(SyncConflict $conflict): array
     {
         return [
             'id' => $conflict->id,
