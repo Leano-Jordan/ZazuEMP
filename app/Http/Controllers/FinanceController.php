@@ -15,6 +15,7 @@ use App\Support\CurrentBusiness;
 use App\Services\EventLifecycleService;
 use App\Support\Money;
 use App\Services\FinanceTransactionService;
+use App\Services\InvoiceIdempotencyMatcher;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -219,6 +220,24 @@ class FinanceController extends Controller
 
         $customer = $event?->customer;
         $quoteVersionId = $quote?->latestVersion?->id;
+        $invoiceIntent = [
+            'event_id' => $event?->id,
+            'quote_id' => $data['quote_id'] ?? null,
+            'quote_version_id' => $quoteVersionId,
+            'currency' => $currency,
+            'subtotal' => $subtotal,
+            'tax_total' => $tax,
+            'total' => $total,
+            'tax_rate_id' => $taxRateId,
+            'tax_code' => $taxCode,
+            'tax_label' => $taxLabel,
+            'tax_treatment' => $taxTreatment,
+            'tax_rate' => $taxRate,
+            'issued_at' => $data['issued_at'] ?? null,
+            'due_at' => $data['due_at'] ?? null,
+            'notes' => $data['notes'] ?? null,
+            'lines' => $invoiceLines,
+        ];
 
         $alreadyProcessed = false;
 
@@ -239,6 +258,7 @@ class FinanceController extends Controller
             $taxTreatment,
             $taxRate,
             $invoiceLines,
+            $invoiceIntent,
             $lifecycle,
             &$alreadyProcessed
         ): Invoice {
@@ -260,22 +280,7 @@ class FinanceController extends Controller
 
             if ($existingInvoice) {
                 abort_unless(
-                    $this->invoicePayloadMatches(
-                        $existingInvoice,
-                        $data,
-                        $event,
-                        $quoteVersionId,
-                        $currency,
-                        $subtotal,
-                        $tax,
-                        $total,
-                        $taxRateId,
-                        $taxCode,
-                        $taxLabel,
-                        $taxTreatment,
-                        $taxRate,
-                        $invoiceLines
-                    ),
+                    app(InvoiceIdempotencyMatcher::class)->matches($existingInvoice, $invoiceIntent),
                     409,
                     'This invoice key was already used for different invoice details. Refresh the form before retrying.'
                 );
@@ -364,112 +369,6 @@ class FinanceController extends Controller
      * @param array<string, mixed> $data
      * @param array<int, array<string, mixed>> $invoiceLines
      */
-    /**
-     * @param array<string, mixed> $data
-     * @param array<int, array<string, mixed>> $invoiceLines
-     */
-    private function invoicePayloadMatches(
-        Invoice $invoice,
-        array $data,
-        ?Event $event,
-        ?int $quoteVersionId,
-        string $currency,
-        string $subtotal,
-        string $tax,
-        string $total,
-        ?int $taxRateId,
-        ?string $taxCode,
-        string $taxLabel,
-        string $taxTreatment,
-        string $taxRate,
-        array $invoiceLines
-    ): bool {
-        return $this->invoiceContextMatches($invoice, $data, $event, $quoteVersionId, $currency)
-            && $this->invoiceTotalsMatch($invoice, $subtotal, $tax, $total, $taxRateId, $taxCode, $taxLabel, $taxTreatment, $taxRate)
-            && $this->invoiceDatesAndNotesMatch($invoice, $data)
-            && $this->invoiceItemsMatch($invoice, $invoiceLines);
-    }
-
-    /**
-     * @param array<string, mixed> $data
-     */
-    private function invoiceContextMatches(
-        Invoice $invoice,
-        array $data,
-        ?Event $event,
-        ?int $quoteVersionId,
-        string $currency
-    ): bool {
-        return (int) ($invoice->event_id ?? 0) === (int) ($event?->id ?? 0)
-            && (int) ($invoice->quote_id ?? 0) === (int) ($data['quote_id'] ?? 0)
-            && (int) ($invoice->quote_version_id ?? 0) === (int) ($quoteVersionId ?? 0)
-            && strtoupper((string) $invoice->currency) === strtoupper($currency);
-    }
-
-    private function invoiceTotalsMatch(
-        Invoice $invoice,
-        string $subtotal,
-        string $tax,
-        string $total,
-        ?int $taxRateId,
-        ?string $taxCode,
-        string $taxLabel,
-        string $taxTreatment,
-        string $taxRate
-    ): bool {
-        return Money::toCents((string) $invoice->subtotal) === Money::toCents($subtotal)
-            && Money::toCents((string) $invoice->tax_total) === Money::toCents($tax)
-            && Money::toCents((string) $invoice->total) === Money::toCents($total)
-            && (int) ($invoice->tax_rate_id ?? 0) === (int) ($taxRateId ?? 0)
-            && $invoice->tax_code === $taxCode
-            && $invoice->tax_label === $taxLabel
-            && $invoice->tax_treatment === $taxTreatment
-            && Money::toCents((string) $invoice->tax_rate) === Money::toCents($taxRate);
-    }
-
-    /**
-     * @param array<string, mixed> $data
-     */
-    private function invoiceDatesAndNotesMatch(Invoice $invoice, array $data): bool
-    {
-        return (! isset($data['issued_at']) || $invoice->issued_at?->toDateString() === $data['issued_at'])
-            && (! isset($data['due_at']) || $invoice->due_at?->toDateString() === $data['due_at'])
-            && $invoice->notes === ($data['notes'] ?? null);
-    }
-
-    /**
-     * @param array<int, array<string, mixed>> $invoiceLines
-     */
-    private function invoiceItemsMatch(Invoice $invoice, array $invoiceLines): bool
-    {
-        $existingLines = $invoice->items()->orderBy('id')->get();
-
-        if ($existingLines->count() !== count($invoiceLines)) {
-            return false;
-        }
-
-        foreach ($invoiceLines as $index => $line) {
-            if (! $this->invoiceItemMatches($existingLines[$index], $line)) {
-                return false;
-            }
-        }
-
-        return true;
-    }
-
-    /**
-     * @param array<string, mixed> $line
-     */
-    private function invoiceItemMatches(\App\Models\InvoiceItem $existing, array $line): bool
-    {
-        return $existing->description === $line['description']
-            && Money::toHundredths((string) $existing->quantity) === Money::toHundredths((string) $line['quantity'])
-            && $existing->unit === $line['unit']
-            && Money::toCents((string) $existing->unit_price) === Money::toCents((string) $line['unit_price'])
-            && Money::toCents((string) $existing->line_total) === Money::toCents((string) $line['line_total'])
-            && (int) ($existing->quote_item_id ?? 0) === (int) ($line['quote_item_id'] ?? 0);
-    }
-
     public function showInvoice(Request $request, Invoice $invoice): View
     {
         $businessId = app(CurrentBusiness::class)->id($request->user());
