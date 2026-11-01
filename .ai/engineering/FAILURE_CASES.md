@@ -351,3 +351,48 @@ Archive pointer: closed historical cases CASE-ZAZU-0001 through CASE-ZAZU-0009 a
 
 **Loop prevention:** Do not repeat IP/port changes or add another cache-only patch as a substitute for a self-contained offline launch path.
 
+
+
+### CASE-ZAZU-0024
+
+**Status:** CORRECTED — Laravel regression coverage passed; browser smoke pending.  
+**First observed:** 2026-11-01.  
+**Target:** Default phone pairing / `SyncBootstrapPayloadBuilder::bootstrapSelectedRecords()`.  
+**Actual:** Empty-selection pairing stored a fixed list of recent customer, job, quote and preparation IDs. Later bootstrap refreshes reused that frozen list, so records created after pairing were not introduced into the phone working set.  
+**Correction:** Default selection is now recalculated from current business records at bootstrap time. Explicit and legacy non-empty selections remain pinned.  
+**Regression coverage:** Records created after pairing appear after refresh; legacy explicit selections remain pinned.  
+**Verification:** [Laravel](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/41299518930) and [Zazu quality](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/41299518886) passed on candidate `c3370a3`.  
+**Classification:** F4/F7 — offline dataset freshness / stale bootstrap contract.
+
+### CASE-ZAZU-0025
+
+**Status:** CORRECTED — Laravel regression coverage passed.  
+**First observed:** 2026-11-01.  
+**Target:** `OfflineDomainMutationHandler` asset update duplicate-tag validation.  
+**Actual:** The duplicate guard called `whereKey('!=', $asset->id)`, which is not the correct Eloquent key-exclusion API. The guard could fail to exclude the current asset and allow a duplicate to reach the database unique constraint, surfacing as a database exception instead of a clean validation error.  
+**Correction:** Use `whereKeyNot($asset->id)`.  
+**Regression coverage:** Attempt to reuse another asset's tag; assert a validation rejection and unchanged persisted tags.  
+**Verification:** [Laravel](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/41299518930), [Zazu quality](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/41299518886) and [PHPMD](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/41299518954) passed on candidate `c3370a3`.  
+**Classification:** F2/F4 — validation contract and predictable error handling.
+
+### CASE-ZAZU-0026
+
+**Status:** CORRECTED — server tests passed; browser smoke pending.  
+**First observed:** 2026-11-01.  
+**Target:** Paired-device sync conflict resolution.  
+**Actual:** Server retry/discard endpoints existed, but the client exposed no recovery UI and did not restore failed mutations to its pending IndexedDB queue. Concurrent retry/discard requests could also race, while the client assumed the requested action had won.  
+**Correction:** Added Settings conflict controls, local queue retry/discard handling, transactional server resolution with row locks, and client reconciliation against authoritative server mutation status.  
+**Regression coverage:** Laravel verifies a repeated conflicting resolution cannot overwrite the first result; Playwright verifies retry/discard queue effects.  
+**Verification:** [Laravel](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/41299518930) passed; [browser smoke](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/41299519019) pending.  
+**Classification:** F4/F7 — recoverability and concurrent state reconciliation.
+
+### CASE-ZAZU-0027
+
+**Status:** IMPLEMENTED — business-scope source guard and PHP contract tests passed; browser migration/isolation tests pending.  
+**First observed:** 2026-11-01.  
+**Target:** Phone-local IndexedDB workspace and mutation queue.  
+**Actual:** Every business using the same browser origin used the same `zazu-client` database. The service-worker cache was user-scoped, but local operational data and queued mutations were not scoped by business, creating a cross-business data exposure path on a shared browser profile.  
+**Correction:** Namespace IndexedDB by active business ID. Migrate the legacy database only when both its business ID and paired-device business ID match the active business. Preserve a migration tombstone through local logout. Advance service-worker cache to v28.  
+**Regression coverage:** Playwright tests cover successful matching migration with queued work, logout non-reimport and foreign-business refusal.  
+**Verification:** [Laravel](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/41299518930) and [Zazu quality](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/41299518886) passed; [browser smoke](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/41299519019) pending.  
+**Classification:** F4/F7 — tenant isolation / local data boundary.
