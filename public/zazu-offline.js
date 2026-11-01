@@ -372,6 +372,7 @@
                     tx.oncomplete = () => {
                         state = nextState;
                         window.dispatchEvent(new CustomEvent('zazu:offline-state-updated'));
+                        resolve();
                     };
                 };
                 pendingCount.onerror = () => tx.abort();
