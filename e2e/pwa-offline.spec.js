@@ -473,6 +473,7 @@ test.describe('Zazu installed PWA offline shell', () => {
         expect(retryQueue).toHaveLength(1);
         expect(retryQueue[0].id).not.toBe(fixture.firstId);
         expect(retryQueue[0].entity_id).not.toBe('');
+        expect(retryQueue[0].payload.record.name).toBe('Retry this failed Work change');
         expect(retryQueue[0].status).toBe('pending');
         expect(retryQueue[0].conflict_id).toBeUndefined();
 
