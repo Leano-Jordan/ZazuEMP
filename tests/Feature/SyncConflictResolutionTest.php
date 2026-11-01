@@ -193,4 +193,59 @@ class SyncConflictResolutionTest extends TestCase
         $this->expectException(\Symfony\Component\HttpKernel\Exception\HttpException::class);
         app(SyncController::class)->resolveConflict($request, $conflict);
     }
+
+    public function test_resolved_conflict_returns_authoritative_mutation_status_without_overwriting_it(): void
+    {
+        $business = Business::create([
+            'name' => 'Conflict Race Business',
+            'slug' => 'conflict-race-'.Str::lower(Str::random(8)),
+            'status' => 'active',
+            'currency' => 'ZAR',
+        ]);
+        $device = SyncDevice::create([
+            'business_id' => $business->id,
+            'installation_id' => (string) Str::uuid(),
+            'device_name' => 'Conflict race phone',
+            'device_type' => 'phone',
+            'status' => 'active',
+        ]);
+        $mutation = SyncMutation::create([
+            'business_id' => $business->id,
+            'sync_device_id' => $device->id,
+            'stream' => 'business',
+            'sequence' => 1,
+            'mutation_id' => (string) Str::uuid(),
+            'entity_type' => 'job',
+            'entity_id' => 'job-race',
+            'operation' => 'create',
+            'status' => 'pending',
+            'payload' => ['local_id' => 'job-race'],
+            'occurred_at' => now(),
+        ]);
+        $conflict = SyncConflict::create([
+            'business_id' => $business->id,
+            'sync_device_id' => $device->id,
+            'mutation_id' => $mutation->mutation_id,
+            'entity_type' => 'job',
+            'entity_id' => 'job-race',
+            'conflict_type' => 'domain_rejection',
+            'status' => 'open',
+        ]);
+
+        $firstRequest = Request::create('/api/sync/conflicts/'.$conflict->id.'/resolve', 'POST', [
+            'action' => 'discard',
+        ]);
+        $firstRequest->attributes->set('sync_device', $device);
+        app(SyncController::class)->resolveConflict($firstRequest, $conflict);
+
+        $secondRequest = Request::create('/api/sync/conflicts/'.$conflict->id.'/resolve', 'POST', [
+            'action' => 'retry',
+        ]);
+        $secondRequest->attributes->set('sync_device', $device);
+        $response = app(SyncController::class)->resolveConflict($secondRequest, $conflict)->getData(true);
+
+        $this->assertSame('resolved', $response['conflict']['status']);
+        $this->assertSame('discarded', $response['mutation_status']);
+        $this->assertSame('discarded', $mutation->fresh()->status);
+    }
 }

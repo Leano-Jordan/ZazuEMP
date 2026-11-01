@@ -336,6 +336,13 @@
             throw new Error(result.message || 'Zazu could not resolve this offline sync conflict.');
         }
 
+        const mutationStatus = result.mutation_status;
+        const shouldRetry = mutationStatus === 'pending';
+        const shouldDiscard = ['discarded', 'applied'].includes(mutationStatus);
+        if (!shouldRetry && !shouldDiscard) {
+            throw new Error('The server did not confirm whether this offline change should be retried or removed.');
+        }
+
         const db = await openDb();
         await new Promise((resolve, reject) => {
             const tx = db.transaction([STATE, QUEUE], 'readwrite');
@@ -348,14 +355,14 @@
 
             all.onsuccess = () => {
                 const mutation = (all.result || []).find(item => Number(item.conflict_id) === id);
-                if (mutation && action === 'retry') {
+                if (mutation && shouldRetry) {
                     const retry = { ...mutation, status: 'pending' };
                     delete retry.conflict_id;
                     delete retry.server_sequence;
                     delete retry.server_status;
                     delete retry.last_error;
                     store.put(retry);
-                } else if (mutation) {
+                } else if (mutation && shouldDiscard) {
                     store.delete(mutation.id);
                 }
 
@@ -380,7 +387,7 @@
             all.onerror = () => tx.abort();
         });
 
-        if (action === 'retry') {
+        if (shouldRetry) {
             sync().catch(() => {
                 if (state) state.last_sync_error = 'The saved change is queued for retry when Zazu reconnects.';
             });

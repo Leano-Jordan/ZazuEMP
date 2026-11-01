@@ -228,53 +228,64 @@ class SyncController extends Controller
     public function resolveConflict(Request $request, SyncConflict $conflict): JsonResponse
     {
         $device = $request->attributes->get('sync_device');
-        abort_unless(
-            (int) $conflict->business_id === (int) $device->business_id
-            && (int) $conflict->sync_device_id === (int) $device->id,
-            404
-        );
-
         $validated = $request->validate([
             'action' => ['required', 'string', 'in:retry,discard'],
             'note' => ['nullable', 'string', 'max:1000'],
         ]);
 
-        if ($conflict->status !== 'open') {
-            return response()->json(['conflict' => $this->conflictPayload($conflict)]);
-        }
+        return DB::transaction(function () use ($device, $conflict, $validated): JsonResponse {
+            $lockedConflict = SyncConflict::query()
+                ->whereKey($conflict->id)
+                ->lockForUpdate()
+                ->firstOrFail();
 
-        $mutation = null;
-        if ($conflict->mutation_id) {
-            $mutation = SyncMutation::query()
-                ->where('business_id', $device->business_id)
-                ->where('sync_device_id', $device->id)
-                ->where('mutation_id', $conflict->mutation_id)
-                ->first();
-        }
+            abort_unless(
+                (int) $lockedConflict->business_id === (int) $device->business_id
+                && (int) $lockedConflict->sync_device_id === (int) $device->id,
+                404
+            );
 
-        if ($validated['action'] === 'retry') {
-            abort_unless($mutation, 404);
-            $mutation->update([
-                'status' => 'pending',
-                'last_error' => null,
+            $mutation = null;
+            if ($lockedConflict->mutation_id) {
+                $mutation = SyncMutation::query()
+                    ->where('business_id', $device->business_id)
+                    ->where('sync_device_id', $device->id)
+                    ->where('mutation_id', $lockedConflict->mutation_id)
+                    ->lockForUpdate()
+                    ->first();
+            }
+
+            if ($lockedConflict->status !== 'open') {
+                return response()->json([
+                    'conflict' => $this->conflictPayload($lockedConflict),
+                    'mutation_status' => $mutation?->status,
+                ]);
+            }
+
+            if ($validated['action'] === 'retry') {
+                abort_unless($mutation, 404);
+                $mutation->update([
+                    'status' => 'pending',
+                    'last_error' => null,
+                ]);
+            } elseif ($mutation) {
+                $mutation->update([
+                    'status' => 'discarded',
+                    'last_error' => $validated['note'] ?? 'Offline change discarded after conflict resolution.',
+                ]);
+            }
+
+            $lockedConflict->update([
+                'status' => 'resolved',
+                'resolution_note' => $validated['note'] ?? ($validated['action'] === 'retry' ? 'Queued for retry.' : 'Discarded.'),
+                'resolved_at' => now(),
             ]);
-        } elseif ($mutation) {
-            $mutation->update([
-                'status' => 'discarded',
-                'last_error' => $validated['note'] ?? 'Offline change discarded after conflict resolution.',
+
+            return response()->json([
+                'conflict' => $this->conflictPayload($lockedConflict->fresh()),
+                'mutation_status' => $mutation?->fresh()->status,
             ]);
-        }
-
-        $conflict->update([
-            'status' => 'resolved',
-            'resolution_note' => $validated['note'] ?? ($validated['action'] === 'retry' ? 'Queued for retry.' : 'Discarded.'),
-            'resolved_at' => now(),
-        ]);
-
-        return response()->json([
-            'conflict' => $this->conflictPayload($conflict->fresh()),
-            'mutation_status' => $mutation?->fresh()->status,
-        ]);
+        });
     }
 
     private function conflictPayload(SyncConflict $conflict): array
