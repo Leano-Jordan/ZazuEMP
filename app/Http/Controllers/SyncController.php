@@ -27,6 +27,7 @@ use App\Support\Offline\SyncEntityIdentityRegistry;
 use App\Support\Offline\SyncMutationApplier;
 use App\Support\Offline\SyncMutationProtocol;
 use App\Support\Offline\SyncConflictRecorder;
+use App\Support\Offline\SyncConflictResolutionService;
 use App\Support\Offline\SyncBootstrapPayloadBuilder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\JsonResponse;
@@ -221,7 +222,7 @@ class SyncController extends Controller
             $query->where('status', $status);
         }
 
-        $resolver = app(\\App\\Support\\Offline\\SyncConflictResolutionService::class);
+        $resolver = app(SyncConflictResolutionService::class);
 
         return response()->json([
             'conflicts' => $query->limit(100)->get()->map(fn (SyncConflict $conflict) => $resolver->payload($conflict))->values(),
@@ -236,7 +237,7 @@ class SyncController extends Controller
             'note' => ['nullable', 'string', 'max:1000'],
         ]);
 
-        return ($resolver ?? app(\\App\\Support\\Offline\\SyncConflictResolutionService::class))->resolve($device, $conflict, $validated);
+        return ($resolver ?? app(SyncConflictResolutionService::class))->resolve($device, $conflict, $validated);
     }
 
     public function uploadAttachment(Request $request): JsonResponse
