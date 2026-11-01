@@ -464,6 +464,13 @@ class FinancePurchasingInventoryTest extends TestCase
         $this->post(route('inventory.movement', $item), $payload)->assertRedirect();
         $this->post(route('inventory.movement', $item), $payload)->assertRedirect();
 
+        $this->from(route('inventory.index'))
+            ->post(route('inventory.movement', $item), [
+                ...$payload,
+                'quantity' => '12',
+            ])
+            ->assertStatus(409);
+
         $this->assertDatabaseCount('inventory_movements', 1);
         $this->assertSame(10.0, $item->fresh()->on_hand);
         $this->assertDatabaseHas('audit_logs', ['action' => 'inventory.movement.recorded', 'business_id' => $business->id]);
