@@ -485,3 +485,21 @@ Evidence boundary: **IMPLEMENTED / targeted source regression added; current-hea
 Next gate: targeted Laravel tests → current-main CI/run URL → rendered browser traversal → populated job reconciliation. Continue backup/restore and rollback gates separately. Do not mark them closed.
 
 Last updated: 2026-10-20
+
+
+## Director execution update — 2026-11-01
+
+**Scope:** offline continuity and the customer → Work dependency path. Changes were committed directly to canonical `main`.
+
+| Area | Source disposition | V1 evidence still required |
+|---|---|---|
+| Origin-loss fallback | Implemented bounded origin probe; marked forms queue locally when the host is unavailable even if the browser reports online | Current-head browser/Quality run and physical installed-device test |
+| Local persistence | Mutation, optimistic workspace state and dirty marker now share one IndexedDB transaction | Current-head browser regression, force-close/reopen and storage-failure acceptance |
+| Customer offline create | Full supported text profile and primary/day/night contacts are included; photo upload is honestly blocked while disconnected | Current-head Laravel/E2E and later private-file sync parity |
+| Pairing bootstrap | Empty selection produces a bounded recent customer/job/quote/preparation working set and owner disclosure | Current-head Laravel test, paired-device bootstrap and data-volume/performance check |
+| Offline Work creation | Stable customer local identity, job type/date/address/services and requirement creation are applied business-scoped | Current-head Laravel/E2E, reversed dependency push and populated Work workflow |
+| Security / isolation | Customer identity resolution is explicitly business-scoped; cross-business regression added | Current-head Psalm/Laravel and adversarial multi-business device test |
+
+**Verification boundary:** changes are **IMPLEMENTED** at source and regression tests are **ADDED**. Current-main Actions results must be observed on the exact resulting SHA before marking these tests passed. No numerical readiness uplift is claimed.
+
+**Still release-blocking:** stable HTTPS hosting with durable database/private-file storage; actual disconnected app-icon launch and full close/reopen; complete V1 offline screen/data parity; deterministic attachment handling; end-to-end conflict recovery; customer-environment backup/restore and rollback; final privacy, legal, licence and brand clearance.
