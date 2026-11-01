@@ -259,7 +259,7 @@ class SyncController extends Controller
             if ($lockedConflict->status !== 'open') {
                 return response()->json([
                     'conflict' => $this->conflictPayload($lockedConflict),
-                    'mutation_status' => $mutation?->status,
+                    'mutation_status' => $this->resolvedConflictMutationStatus($lockedConflict, $mutation),
                 ]);
             }
 
@@ -281,9 +281,19 @@ class SyncController extends Controller
                 $mutationStatus = 'discarded';
             }
 
+            $resolutionNote = $validated['note'] ?? ($validated['action'] === 'retry' ? 'Queued for retry.' : 'Discarded.');
+            if (
+                $lockedConflict->conflict_type === 'mutation_identity_mismatch'
+                && $validated['action'] === 'retry'
+            ) {
+                // Persist the retry contract so a lost response can be replayed
+                // without mistaking the original applied mutation for a discard.
+                $resolutionNote = '[retry-new-mutation-id] '.$resolutionNote;
+            }
+
             $lockedConflict->update([
                 'status' => 'resolved',
-                'resolution_note' => $validated['note'] ?? ($validated['action'] === 'retry' ? 'Queued for retry.' : 'Discarded.'),
+                'resolution_note' => $resolutionNote,
                 'resolved_at' => now(),
             ]);
 
@@ -292,6 +302,20 @@ class SyncController extends Controller
                 'mutation_status' => $mutationStatus,
             ]);
         });
+    }
+
+    private function resolvedConflictMutationStatus(
+        SyncConflict $conflict,
+        ?SyncMutation $mutation
+    ): ?string {
+        if (
+            $conflict->conflict_type === 'mutation_identity_mismatch'
+            && str_starts_with((string) $conflict->resolution_note, '[retry-new-mutation-id]')
+        ) {
+            return 'new_mutation_required';
+        }
+
+        return $mutation?->status;
     }
 
     private function resolveMutationIdentityMismatch(?SyncMutation $mutation, string $action): string
