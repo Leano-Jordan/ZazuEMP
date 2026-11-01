@@ -100,7 +100,15 @@ final class FinanceTransactionService
         return DB::transaction(function () use ($businessId, $currency, $data, $lifecycle): bool {
             $this->lockBusiness($businessId);
 
-            if ($this->expenseAlreadyProcessed($businessId, $data['idempotency_key'])) {
+            $existingExpense = $this->existingExpense($businessId, $data['idempotency_key']);
+
+            if ($existingExpense) {
+                abort_unless(
+                    $this->expensePayloadMatches($existingExpense, $businessId, $currency, $data),
+                    409,
+                    'This expense key was already used for different expense details. Refresh the form before retrying.'
+                );
+
                 return true;
             }
 
@@ -168,12 +176,50 @@ final class FinanceTransactionService
             && $payment->notes === ($data['notes'] ?? null);
     }
 
-    private function expenseAlreadyProcessed(int $businessId, string $idempotencyKey): bool
+    private function existingExpense(int $businessId, string $idempotencyKey): ?FinanceExpense
     {
         return FinanceExpense::query()
             ->where('business_id', $businessId)
             ->where('idempotency_key', $idempotencyKey)
-            ->exists();
+            ->first();
+    }
+
+    /**
+     * @param array<string, mixed> $data
+     */
+    private function expensePayloadMatches(
+        FinanceExpense $expense,
+        int $businessId,
+        string $currency,
+        array $data
+    ): bool {
+        $eventId = ! empty($data['event_id']) ? (int) $data['event_id'] : null;
+        $purchaseOrderId = ! empty($data['purchase_order_id']) ? (int) $data['purchase_order_id'] : null;
+        $supplierId = ! empty($data['supplier_id']) ? (int) $data['supplier_id'] : null;
+
+        if ($purchaseOrderId !== null) {
+            $purchaseOrder = PurchaseOrder::query()
+                ->where('business_id', $businessId)
+                ->find($purchaseOrderId);
+
+            if (! $purchaseOrder) {
+                return false;
+            }
+
+            $eventId ??= $purchaseOrder->event_id ? (int) $purchaseOrder->event_id : null;
+            $supplierId ??= (int) $purchaseOrder->supplier_id;
+        }
+
+        return (int) ($expense->event_id ?? 0) === (int) ($eventId ?? 0)
+            && (int) ($expense->purchase_order_id ?? 0) === (int) ($purchaseOrderId ?? 0)
+            && (int) ($expense->supplier_id ?? 0) === (int) ($supplierId ?? 0)
+            && $expense->description === trim((string) $data['description'])
+            && Money::toCents((string) $expense->amount) === Money::toCents((string) $data['amount'])
+            && strtoupper((string) $expense->currency) === strtoupper($currency)
+            && $expense->expense_date?->toDateString() === date('Y-m-d', strtotime((string) $data['expense_date']))
+            && $expense->status === $data['status']
+            && $expense->reference === ($data['reference'] ?? null)
+            && $expense->notes === ($data['notes'] ?? null);
     }
 
     private function lockInvoice(int $businessId, int $invoiceId): Invoice
