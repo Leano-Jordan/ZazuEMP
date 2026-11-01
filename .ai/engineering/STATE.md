@@ -307,3 +307,34 @@ Last updated: 2026-10-20
 3. Establish an independent HTTPS deployment target with durable persistence and tested backup/restore.
 4. Install from that origin and complete disconnected/reconnect/logout/multi-user device acceptance.
 5. Re-audit complete workflow parity and recovery before V1 release acceptance.
+
+
+## Director current-main CI reconciliation — 2026-11-01
+
+**Canonical target:** `Leano-Jordan/ZazuEMP` / `main`  
+**Exact application SHA:** `6b16b74a7b773ac2797bf7135f85d38b8af0de8d`
+
+### Observed current-head Actions evidence
+
+The following workflows completed successfully against the exact SHA above:
+
+- [Zazu quality](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/41290751642)
+- [Laravel](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/41290751650)
+- [Psalm Security Scan](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/41290751603)
+- [PHPMD](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/41290751665)
+- [Zazu populated upgrade and rollback](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/41290751645)
+
+The quality workflow includes frontend build, the Node behavioral service-worker authentication-cache race suite, and the Laravel application suite. The populated upgrade/rollback workflow is a CI result, not a substitute for a customer-environment drill.
+
+**Browser smoke:** [run 41290751609](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/41290751609) was still `in_progress` when reconciled. It is not counted as PASS.
+
+### Acceptance disposition
+
+- Current-main source/automated quality: **TESTED — PASS** for the workflows listed above.
+- Browser smoke: **PENDING**.
+- Offline launch with PC and internet unavailable on an installed customer device: **UNVERIFIED**.
+- Independent HTTPS hosting with durable database and private-file storage: **NOT ESTABLISHED**.
+- Real customer-environment backup/restore and rollback: **OPEN**.
+- Full offline parity and multi-device conflict/recovery: **OPEN**.
+
+No V1 readiness uplift is claimed from these CI passes alone. Continue the P0 offline-continuity gate, then execute the populated customer workflow and real recovery drills. All work remains on `main`; do not create branches.
