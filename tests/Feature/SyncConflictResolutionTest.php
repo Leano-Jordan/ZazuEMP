@@ -218,9 +218,10 @@ class SyncConflictResolutionTest extends TestCase
             'entity_type' => 'job',
             'entity_id' => 'job-race',
             'operation' => 'create',
-            'status' => 'pending',
+            'status' => 'applied',
             'payload' => ['local_id' => 'job-race'],
             'occurred_at' => now(),
+            'applied_at' => now(),
         ]);
         $conflict = SyncConflict::create([
             'business_id' => $business->id,
@@ -245,7 +246,7 @@ class SyncConflictResolutionTest extends TestCase
         $response = app(SyncController::class)->resolveConflict($secondRequest, $conflict)->getData(true);
 
         $this->assertSame('resolved', $response['conflict']['status']);
-        $this->assertSame('discarded', $response['mutation_status']);
-        $this->assertSame('discarded', $mutation->fresh()->status);
+        $this->assertSame('applied', $response['mutation_status']);
+        $this->assertSame('applied', $mutation->fresh()->status);
     }
 }
