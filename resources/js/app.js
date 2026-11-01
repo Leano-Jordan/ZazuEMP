@@ -145,7 +145,7 @@ function setupZazuFormSubmissionGuards() {
 
             const submitter = event.submitter instanceof HTMLElement
                 ? event.submitter
-                : form.querySelector('button[type="submit"], button:not([type]), input[type="submit"]);
+                : form.querySelector('button[type="submit"], button:not([type]), input[type="submit"]');
 
             if (!submitter) return;
 
@@ -1132,7 +1132,7 @@ function setupZazuOfflineForms() {
             const localId = crypto.randomUUID();
             const getInputValue = (input) => String(input?.value || '').trim();
             const releaseSubmitLock = () => {
-                const submit = form.querySelector('button[type="submit"], button:not([type]), input[type="submit"]);
+                const submit = form.querySelector('button[type="submit"], button:not([type]), input[type="submit"]');
                 if (submit) {
                     submit.disabled = false;
                     submit.removeAttribute('aria-busy');
@@ -1769,7 +1769,7 @@ function setupZazuOfflineForms() {
             await window.ZazuOffline.queueMutation(entity, operation, payload, state);
             form.dataset.zazuOfflineSaved = '1';
 
-            const submit = form.querySelector('button[type="submit"], button:not([type]), input[type="submit"]);
+            const submit = form.querySelector('button[type="submit"], button:not([type]), input[type="submit"]');
             if (submit) {
                 submit.disabled = true;
                 submit.textContent = 'Saved locally';
@@ -1783,7 +1783,7 @@ function setupZazuOfflineForms() {
             } catch (error) {
                 // IndexedDB quota, blocked upgrades, and transaction failures
                 // must not leave the submit button stuck or silently lose the user's work.
-                const submit = form.querySelector('button[type="submit"], button:not([type]), input[type="submit"]);
+                const submit = form.querySelector('button[type="submit"], button:not([type]), input[type="submit"]');
                 if (submit) {
                     submit.disabled = false;
                     submit.removeAttribute('aria-busy');
@@ -1810,7 +1810,7 @@ function setupZazuOfflineForms() {
                     // submit control before this async offline handler finished.
                     // Any rejected/unsupported offline mutation must release it,
                     // otherwise the user cannot correct the form and retry.
-                    const submit = form.querySelector('button[type="submit"], button:not([type]), input[type="submit"]);
+                    const submit = form.querySelector('button[type="submit"], button:not([type]), input[type="submit"]');
                     if (submit) {
                         submit.disabled = false;
                         submit.removeAttribute('aria-busy');
