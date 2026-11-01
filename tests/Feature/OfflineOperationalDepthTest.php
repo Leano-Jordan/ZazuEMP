@@ -246,4 +246,50 @@ class OfflineOperationalDepthTest extends TestCase
         $this->assertSame('available', $asset->fresh()->status);
         $this->assertSame('returned', $allocation->fresh()->status);
     }
+
+    public function test_offline_asset_update_rejects_another_assets_tag_without_database_exception(): void
+    {
+        $business = $this->business();
+        $device = $this->device($business);
+        $asset = Asset::create([
+            'business_id' => $business->id,
+            'asset_tag' => 'OFF-ASSET-ORIGINAL',
+            'name' => 'Portable Sound System',
+            'status' => 'available',
+            'condition' => 'good',
+            'purchase_cost' => '5000.00',
+            'currency' => 'ZAR',
+        ]);
+        $otherAsset = Asset::create([
+            'business_id' => $business->id,
+            'asset_tag' => 'OFF-ASSET-OTHER',
+            'name' => 'Backup Sound System',
+            'status' => 'available',
+            'condition' => 'good',
+            'purchase_cost' => '4500.00',
+            'currency' => 'ZAR',
+        ]);
+
+        $registry = app(\App\Support\Offline\SyncEntityIdentityRegistry::class);
+        $assetUuid = $registry->identify($asset, 'asset')->entity_uuid;
+        $mutation = app(SyncMutationRecorder::class)->record($device, 'asset', $assetUuid, 'update', [
+            'local_id' => $assetUuid,
+            'record' => [
+                'asset_tag' => $otherAsset->asset_tag,
+                'name' => 'Portable Sound System',
+                'condition' => 'good',
+                'purchase_cost' => '5000.00',
+            ],
+        ]);
+
+        try {
+            app(SyncMutationApplier::class)->apply($mutation, [
+                'asset' => app(\App\Support\Offline\OfflineDomainMutationHandler::class),
+            ]);
+            $this->fail('The offline update must reject a tag already owned by another asset.');
+        } catch (ValidationException) {
+            $this->assertSame('OFF-ASSET-ORIGINAL', $asset->fresh()->asset_tag);
+            $this->assertSame('OFF-ASSET-OTHER', $otherAsset->fresh()->asset_tag);
+        }
+    }
 }

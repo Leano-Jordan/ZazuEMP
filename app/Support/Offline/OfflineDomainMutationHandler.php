@@ -1067,7 +1067,7 @@ class OfflineDomainMutationHandler implements SyncMutationHandler
         $duplicate = Asset::query()
             ->where('business_id', $mutation->business_id)
             ->where('asset_tag', $assetTag)
-            ->when($asset instanceof Asset, fn ($query) => $query->whereKey('!=', $asset->id))
+            ->when($asset instanceof Asset, fn ($query) => $query->whereKeyNot($asset->id))
             ->exists();
 
         if ($duplicate) {
