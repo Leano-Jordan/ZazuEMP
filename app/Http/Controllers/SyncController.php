@@ -221,8 +221,10 @@ class SyncController extends Controller
             $query->where('status', $status);
         }
 
+        $resolver = app(\\App\\Support\\Offline\\SyncConflictResolutionService::class);
+
         return response()->json([
-            'conflicts' => $query->limit(100)->get()->map(fn (SyncConflict $conflict) => $this->conflictPayload($conflict))->values(),
+            'conflicts' => $query->limit(100)->get()->map(fn (SyncConflict $conflict) => $resolver->payload($conflict))->values(),
         ]);
     }
 
