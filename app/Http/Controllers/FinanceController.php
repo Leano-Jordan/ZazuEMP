@@ -161,12 +161,6 @@ class FinanceController extends Controller
 
             $version = $quote->latestVersion;
 
-            abort_if(
-                Invoice::query()->where('quote_version_id', $version->id)->exists(),
-                422,
-                'This accepted quote version has already been invoiced.'
-            );
-
             foreach ($version->items as $item) {
                 $invoiceLines[] = [
                     'description' => $item->description,
