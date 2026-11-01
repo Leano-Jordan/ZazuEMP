@@ -262,6 +262,34 @@ class BusinessIsolationTest extends TestCase
         $response->assertDontSee('Foreign Search Secret');
     }
 
+    public function test_own_job_attachment_can_be_downloaded_from_private_storage(): void
+    {
+        Storage::fake('private');
+
+        $business = $this->business('Attachment Download Business');
+        $user = $this->userFor($business);
+        $event = $this->eventFor($business);
+        $path = 'jobs/'.$event->id.'/attachments/brief.txt';
+        Storage::disk('private')->put($path, 'Approved event brief');
+
+        $attachment = Model::withoutEvents(fn () => EventAttachment::create([
+            'event_id' => $event->id,
+            'business_id' => $business->id,
+            'uploaded_by' => $user->id,
+            'original_name' => 'brief.txt',
+            'disk' => 'private',
+            'path' => $path,
+            'mime_type' => 'text/plain',
+            'size' => 20,
+            'source' => 'upload',
+        ]));
+
+        $this->actingAs($user)
+            ->get(route('work.attachments.download', $attachment))
+            ->assertOk()
+            ->assertDownload('brief.txt');
+    }
+
     public function test_foreign_job_attachment_cannot_be_downloaded(): void
     {
         Storage::fake('private');
