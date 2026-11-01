@@ -253,7 +253,7 @@ test.describe('Zazu installed PWA offline shell', () => {
             await offline.persist();
 
             const db = await new Promise((resolve, reject) => {
-                const request = indexedDB.open('zazu-client', 1);
+                const request = indexedDB.open('zazu-client-business-' + document.body.dataset.zazuBusinessId, 1);
                 request.onsuccess = () => resolve(request.result);
                 request.onerror = () => reject(request.error || new Error('Could not open offline storage'));
             });
@@ -313,7 +313,7 @@ test.describe('Zazu installed PWA offline shell', () => {
 
         const remaining = await page.evaluate(async () => {
             const db = await new Promise((resolve, reject) => {
-                const request = indexedDB.open('zazu-client', 1);
+                const request = indexedDB.open('zazu-client-business-' + document.body.dataset.zazuBusinessId, 1);
                 request.onsuccess = () => resolve(request.result);
                 request.onerror = () => reject(request.error || new Error('Could not open offline storage'));
             });
@@ -529,7 +529,7 @@ test.describe('Zazu installed PWA offline shell', () => {
             // pending mutation would legitimately auto-sync during the reload
             // and make the fixture depend on server timing.
             const db = await new Promise((resolve, reject) => {
-                const request = indexedDB.open('zazu-client', 1);
+                const request = indexedDB.open('zazu-client-business-' + document.body.dataset.zazuBusinessId, 1);
                 request.onsuccess = () => resolve(request.result);
                 request.onerror = () => reject(request.error || new Error('Could not open local offline storage'));
             });
@@ -572,7 +572,7 @@ test.describe('Zazu installed PWA offline shell', () => {
         await expect.poll(() => confirmMessages.length).toBe(1);
         expect(confirmMessages[0]).toContain('rejected/failed change(s)');
         const queueCount = () => page.evaluate(() => new Promise((resolve, reject) => {
-            const request = indexedDB.open('zazu-client', 1);
+            const request = indexedDB.open('zazu-client-business-' + document.body.dataset.zazuBusinessId, 1);
             request.onerror = () => reject(request.error || new Error('Could not inspect offline queue'));
             request.onsuccess = () => {
                 const db = request.result;
@@ -600,7 +600,7 @@ test.describe('Zazu installed PWA offline shell', () => {
         ]);
 
         const localData = await page.evaluate(() => new Promise((resolve, reject) => {
-            const request = indexedDB.open('zazu-client', 1);
+            const request = indexedDB.open('zazu-client-business-' + document.body.dataset.zazuBusinessId, 1);
             request.onerror = () => reject(request.error || new Error('Could not inspect local offline storage'));
             request.onsuccess = () => {
                 const db = request.result;

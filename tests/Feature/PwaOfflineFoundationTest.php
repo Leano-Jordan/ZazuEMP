@@ -37,7 +37,8 @@ class PwaOfflineFoundationTest extends TestCase
         $response->assertOk()
             ->assertSee('/manifest.webmanifest')
             ->assertSee('/zazu-offline.js')
-            ->assertSee('data-zazu-user-id="', false);
+            ->assertSee('data-zazu-user-id="', false)
+            ->assertSee('data-zazu-business-id="', false);
 
         $html = html_entity_decode($response->getContent(), ENT_QUOTES | ENT_HTML5);
         $this->assertStringNotContainsString("navigator.serviceWorker.register('/sw.js')", $html);
@@ -199,7 +200,9 @@ class PwaOfflineFoundationTest extends TestCase
         $app = File::get(resource_path('js/app.js'));
         $client = File::get(public_path('zazu-offline.js'));
 
-        $this->assertStringContainsString("const DB_NAME = 'zazu-client';", $client);
+        $this->assertStringContainsString("const LEGACY_DB_NAME = 'zazu-client';", $client);
+        $this->assertStringContainsString("const DB_NAME = ACTIVE_BUSINESS_ID > 0", $client);
+        $this->assertStringContainsString('async function migrateLegacyWorkspace(targetDb)', $client);
         $this->assertStringContainsString("window.ZazuOffline =", $client);
         $this->assertStringContainsString("async function pair(pairingCode)", $client);
         $this->assertStringContainsString('async function assessLogout()', $client);

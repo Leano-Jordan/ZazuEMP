@@ -452,3 +452,8 @@ The bootstrap remains bounded rather than mirroring the entire database. Support
 The source changes and focused regression cases are implemented. Current-main CI/E2E remains unverified until the exact resulting SHA completes Laravel, Quality, browser, PHPMD, Psalm and populated upgrade/rollback. A browser regression is not a substitute for an installed-device test.
 
 This work does **not** certify complete offline parity. Still open: every V1 screen's disconnected read/write parity, complete bidirectional reconciliation, attachment/private-file offline parity, real conflict-resolution recovery, fresh installed-app launch while both PC and internet are unavailable, stable HTTPS hosting with durable storage, and customer-environment backup/restore/rollback.
+
+
+## Business-scoped phone storage
+
+The phone's IndexedDB workspace is namespaced by the active business ID from the authenticated application shell. A legacy `zazu-client` workspace is migrated only when both its saved business and paired device business IDs match the active business. The scoped database keeps a migration tombstone through local logout so cleared legacy work cannot be re-imported. This prevents a different business using the same browser origin from inheriting another business's local workspace or queued mutations.

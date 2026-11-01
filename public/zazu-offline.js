@@ -1,7 +1,11 @@
 (() => {
     'use strict';
 
-    const DB_NAME = 'zazu-client';
+    const LEGACY_DB_NAME = 'zazu-client';
+    const ACTIVE_BUSINESS_ID = Number(document.body?.dataset.zazuBusinessId || 0);
+    const DB_NAME = ACTIVE_BUSINESS_ID > 0
+        ? 'zazu-client-business-' + ACTIVE_BUSINESS_ID
+        : 'zazu-client-unscoped';
     const DB_VERSION = 1;
     const STATE = 'state';
     const QUEUE = 'mutations';
@@ -42,12 +46,12 @@
         // Cross-tab signalling is best-effort; IndexedDB transactions remain authoritative.
     }
 
-    function openDb() {
-        if (dbPromise) return dbPromise;
+    function openDb(name = DB_NAME) {
+        if (name === DB_NAME && dbPromise) return dbPromise;
 
         let opening;
         opening = new Promise((resolve, reject) => {
-            const request = indexedDB.open(DB_NAME, DB_VERSION);
+            const request = indexedDB.open(name, DB_VERSION);
             request.onupgradeneeded = () => {
                 const db = request.result;
                 if (!db.objectStoreNames.contains(STATE)) db.createObjectStore(STATE);
@@ -61,7 +65,7 @@
                 const db = request.result;
                 db.onversionchange = () => {
                     db.close();
-                    if (dbPromise === opening) dbPromise = null;
+                    if (name === DB_NAME && dbPromise === opening) dbPromise = null;
                 };
                 resolve(db);
             };
@@ -69,20 +73,88 @@
             request.onblocked = () => reject(new Error('Local offline storage is blocked by another open tab.'));
         });
 
-        dbPromise = opening;
-        opening.catch(() => {
-            if (dbPromise === opening) dbPromise = null;
-        });
+        if (name === DB_NAME) {
+            dbPromise = opening;
+            opening.catch(() => {
+                if (dbPromise === opening) dbPromise = null;
+            });
+        }
         return opening;
     }
 
     async function readState() {
         const db = await openDb();
-        return new Promise((resolve, reject) => {
-            const request = db.transaction(STATE).objectStore(STATE).get('current');
-            request.onsuccess = () => resolve(request.result || null);
-            request.onerror = () => reject(request.error);
+        const stored = await new Promise((resolve, reject) => {
+            const tx = db.transaction(STATE, 'readonly');
+            const currentRequest = tx.objectStore(STATE).get('current');
+            const migrationRequest = tx.objectStore(STATE).get('legacy-migrated');
+            tx.oncomplete = () => resolve({
+                state: currentRequest.result || null,
+                migrated: Boolean(migrationRequest.result),
+            });
+            tx.onerror = () => reject(tx.error || new Error('Local offline state could not be inspected.'));
+            tx.onabort = () => reject(tx.error || new Error('Local offline state inspection was aborted.'));
         });
+
+        if (stored.state) {
+            const storedBusinessId = Number(stored.state.business?.id || stored.state.sync?.device?.business_id || 0);
+            if (ACTIVE_BUSINESS_ID > 0 && storedBusinessId > 0 && storedBusinessId !== ACTIVE_BUSINESS_ID) {
+                throw new Error('Local offline data belongs to a different business workspace.');
+            }
+            return stored.state;
+        }
+
+        if (stored.migrated || ACTIVE_BUSINESS_ID < 1) return null;
+        return migrateLegacyWorkspace(db);
+    }
+
+    async function migrateLegacyWorkspace(targetDb) {
+        const legacyDb = await openDb(LEGACY_DB_NAME);
+        try {
+            const legacy = await new Promise((resolve, reject) => {
+                const tx = legacyDb.transaction([STATE, QUEUE], 'readonly');
+                const stateRequest = tx.objectStore(STATE).get('current');
+                const queueRequest = tx.objectStore(QUEUE).getAll();
+                tx.oncomplete = () => resolve({
+                    state: stateRequest.result || null,
+                    mutations: queueRequest.result || [],
+                });
+                tx.onerror = () => reject(tx.error || new Error('Legacy offline data could not be inspected.'));
+                tx.onabort = () => reject(tx.error || new Error('Legacy offline data inspection was aborted.'));
+            });
+
+            const stateBusinessId = Number(legacy.state?.business?.id || 0);
+            const deviceBusinessId = Number(legacy.state?.sync?.device?.business_id || 0);
+            if (!legacy.state || stateBusinessId !== ACTIVE_BUSINESS_ID || deviceBusinessId !== ACTIVE_BUSINESS_ID) {
+                return null;
+            }
+
+            await new Promise((resolve, reject) => {
+                const tx = targetDb.transaction([STATE, QUEUE], 'readwrite');
+                tx.objectStore(STATE).put(legacy.state, 'current');
+                tx.objectStore(STATE).put({
+                    business_id: ACTIVE_BUSINESS_ID,
+                    migrated_at: new Date().toISOString(),
+                }, 'legacy-migrated');
+                for (const mutation of legacy.mutations) tx.objectStore(QUEUE).put(mutation);
+                tx.oncomplete = resolve;
+                tx.onerror = () => reject(tx.error || new Error('Legacy offline data migration failed.'));
+                tx.onabort = () => reject(tx.error || new Error('Legacy offline data migration was aborted.'));
+            });
+
+            await new Promise((resolve, reject) => {
+                const tx = legacyDb.transaction([STATE, QUEUE], 'readwrite');
+                tx.objectStore(STATE).delete('current');
+                tx.objectStore(QUEUE).clear();
+                tx.oncomplete = resolve;
+                tx.onerror = () => reject(tx.error || new Error('Legacy offline data cleanup failed.'));
+                tx.onabort = () => reject(tx.error || new Error('Legacy offline data cleanup was aborted.'));
+            });
+
+            return legacy.state;
+        } finally {
+            legacyDb.close();
+        }
     }
 
     async function writeState() {
@@ -251,9 +323,17 @@
 
         try {
             const db = await openDb();
+            const migrationMarker = await new Promise((resolve, reject) => {
+                const request = db.transaction(STATE, 'readonly')
+                    .objectStore(STATE)
+                    .get('legacy-migrated');
+                request.onsuccess = () => resolve(request.result || null);
+                request.onerror = () => reject(request.error || new Error('Local migration state could not be inspected.'));
+            });
             await new Promise((resolve, reject) => {
                 const tx = db.transaction([STATE, QUEUE], 'readwrite');
                 tx.objectStore(STATE).clear();
+                if (migrationMarker) tx.objectStore(STATE).put(migrationMarker, 'legacy-migrated');
                 tx.objectStore(QUEUE).clear();
                 tx.oncomplete = resolve;
                 tx.onerror = () => reject(tx.error || new Error('Local offline session cleanup failed.'));
