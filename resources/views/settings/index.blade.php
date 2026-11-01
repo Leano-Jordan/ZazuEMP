@@ -302,7 +302,7 @@
 
     <section class="zazu-context-card mt-4" data-zazu-phone-sync>
         <div class="zazu-context-title">Phone sync</div>
-        <div class="zazu-context-copy">Pair an installed Zazu phone with this business. The code is temporary and authorizes that phone to receive the business data allowed by this installation.</div>
+        <div class="zazu-context-copy">Pair a trusted Zazu phone. The initial offline working set includes up to 25 recent customers, Work records, quotes and preparation records, plus the business catalogue, suppliers, purchasing, inventory, assets, costs, invoices and expenses. Business data is stored on the paired device.</div>
         <div class="flex flex-wrap gap-3 mt-4">
             <button type="button" class="zazu-btn zazu-btn-secondary" data-zazu-generate-pairing>Generate phone pairing code</button>
             <span class="zazu-field-help" data-zazu-pairing-result aria-live="polite"></span>
