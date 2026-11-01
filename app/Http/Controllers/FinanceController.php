@@ -269,10 +269,6 @@ class FinanceController extends Controller
                 ? $lifecycle->lock($businessId, $event->id)
                 : null;
 
-            if ($lockedEvent) {
-                $lifecycle->assertFinanciallyActive($lockedEvent);
-            }
-
             $existingInvoice = Invoice::query()
                 ->where('business_id', $businessId)
                 ->where('idempotency_key', $data['idempotency_key'])
@@ -287,6 +283,10 @@ class FinanceController extends Controller
 
                 $alreadyProcessed = true;
                 return $existingInvoice;
+            }
+
+            if ($lockedEvent) {
+                $lifecycle->assertFinanciallyActive($lockedEvent);
             }
 
             if ($quoteVersionId) {
