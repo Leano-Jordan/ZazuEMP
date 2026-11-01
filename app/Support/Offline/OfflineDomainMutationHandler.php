@@ -96,19 +96,24 @@ class OfflineDomainMutationHandler implements SyncMutationHandler
             $customer = Customer::create($attributes);
         }
 
+        $contactName = $this->nullableString($payload['contact_name'] ?? null, 255);
         $phone = $this->nullableString($payload['phone'] ?? null, 64);
         $email = $this->nullableString($payload['email'] ?? null, 255);
 
-        if ($phone !== null || $email !== null) {
+        if ($contactName !== null || $phone !== null || $email !== null) {
             $contact = $customer->contacts()->where('is_primary', true)->first()
                 ?? $customer->contacts()->first();
 
             if ($contact) {
-                $contact->update(['phone' => $phone, 'email' => $email]);
+                $contact->update([
+                    'name' => $contactName ?? $contact->name ?? $customer->name,
+                    'phone' => array_key_exists('phone', $payload) ? $phone : $contact->phone,
+                    'email' => array_key_exists('email', $payload) ? $email : $contact->email,
+                ]);
             } else {
                 CustomerContact::create([
                     'customer_id' => $customer->id,
-                    'name' => $customer->name,
+                    'name' => $contactName ?? $customer->name,
                     'phone' => $phone,
                     'email' => $email,
                     'label' => 'Primary',
