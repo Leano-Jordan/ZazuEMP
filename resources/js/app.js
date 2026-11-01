@@ -1805,6 +1805,21 @@ function setupZazuOfflineForms() {
             } finally {
                 if (form.dataset.zazuOfflineSaved !== '1') {
                     delete form.dataset.zazuOfflineSubmitting;
+
+                    // The global submit guard may already have disabled the
+                    // submit control before this async offline handler finished.
+                    // Any rejected/unsupported offline mutation must release it,
+                    // otherwise the user cannot correct the form and retry.
+                    const submit = form.querySelector('button[type="submit"], input[type="submit"]');
+                    if (submit) {
+                        submit.disabled = false;
+                        submit.removeAttribute('aria-busy');
+                        if (submit.dataset.zazuSubmitLabel) {
+                            submit.textContent = submit.dataset.zazuSubmitLabel;
+                            delete submit.dataset.zazuSubmitLabel;
+                        }
+                    }
+                    delete form.dataset.zazuSubmitting;
                 }
             }
         });
