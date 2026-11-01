@@ -93,7 +93,10 @@ class EventAttachmentController extends Controller
 
         $event = $attachment->event;
 
-        DB::transaction(function () use ($attachment, $business, $lifecycle): void {
+        // Commit the metadata deletion before removing the private file. A
+        // database rollback must never leave a live attachment record pointing
+        // at a file that was already deleted from storage.
+        $fileToDelete = DB::transaction(function () use ($attachment, $business, $lifecycle): array {
             $lockedEvent = $lifecycle->lock($business->id, $attachment->event_id);
             $lifecycle->assertOperational($lockedEvent);
 
@@ -103,9 +106,23 @@ class EventAttachmentController extends Controller
                 ->lockForUpdate()
                 ->findOrFail($attachment->id);
 
-            Storage::disk($lockedAttachment->disk)->delete($lockedAttachment->path);
+            $file = [
+                'disk' => $lockedAttachment->disk,
+                'path' => $lockedAttachment->path,
+            ];
+
             $lockedAttachment->delete();
+
+            return $file;
         });
+
+        try {
+            if (! Storage::disk($fileToDelete['disk'])->delete($fileToDelete['path'])) {
+                report(new \\RuntimeException('Private attachment file cleanup returned false for attachment '.$attachment->id));
+            }
+        } catch (Throwable $exception) {
+            report($exception);
+        }
 
         return redirect()
             ->route('work.show', $event)
