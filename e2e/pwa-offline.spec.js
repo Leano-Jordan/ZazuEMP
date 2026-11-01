@@ -211,6 +211,169 @@ test.describe('Zazu installed PWA offline shell', () => {
         expect(jobMutation.payload.services).toEqual(['Catering']);
     });
 
+    test('migrates legacy offline data only into its matching business workspace', async ({ page }) => {
+        await login(page);
+        const businessId = await page.evaluate(() => Number(document.body.dataset.zazuBusinessId));
+        expect(businessId).toBeGreaterThan(0);
+
+        const fixture = await page.evaluate(async (activeBusinessId) => {
+            const localId = crypto.randomUUID();
+            const mutationId = crypto.randomUUID();
+            const db = await new Promise((resolve, reject) => {
+                const request = indexedDB.open('zazu-client', 1);
+                request.onupgradeneeded = () => {
+                    const storeDb = request.result;
+                    if (!storeDb.objectStoreNames.contains('state')) storeDb.createObjectStore('state');
+                    if (!storeDb.objectStoreNames.contains('mutations')) {
+                        const store = storeDb.createObjectStore('mutations', { keyPath: 'id' });
+                        store.createIndex('status', 'status');
+                        store.createIndex('created_at', 'created_at');
+                    }
+                };
+                request.onsuccess = () => resolve(request.result);
+                request.onerror = () => reject(request.error || new Error('Could not open legacy offline storage'));
+            });
+
+            const legacyState = {
+                version: 'legacy-fixture',
+                business: { id: activeBusinessId, name: 'Legacy migration business' },
+                sync: { token: 'legacy-migration-token', device: { id: 12345, business_id: activeBusinessId } },
+                customers: [{ local_id: localId, name: 'Preserved offline customer' }],
+                local_dirty: true,
+            };
+            const mutation = {
+                id: mutationId,
+                entity_type: 'customer',
+                entity_id: localId,
+                operation: 'create',
+                payload: { local_id: localId, name: 'Preserved offline customer' },
+                created_at: new Date().toISOString(),
+                status: 'pending',
+            };
+
+            await new Promise((resolve, reject) => {
+                const tx = db.transaction(['state', 'mutations'], 'readwrite');
+                tx.objectStore('state').put(legacyState, 'current');
+                tx.objectStore('mutations').put(mutation);
+                tx.oncomplete = resolve;
+                tx.onerror = () => reject(tx.error || new Error('Could not seed legacy offline workspace'));
+                tx.onabort = () => reject(tx.error || new Error('Legacy workspace setup aborted'));
+            });
+            db.close();
+            return { localId, mutationId };
+        }, businessId);
+
+        await page.reload({ waitUntil: 'domcontentloaded' });
+        await expect(page.getByRole('heading', { name: 'Dashboard' })).toBeVisible();
+        await page.evaluate(() => window.ZazuOffline.ready);
+
+        const migrated = await page.evaluate(async () => ({
+            state: window.ZazuOffline.getState(),
+            queue: await window.ZazuOffline.pending(),
+        }));
+        expect(migrated.state.business.id).toBe(businessId);
+        expect(migrated.state.customers.some(customer => customer.name === 'Preserved offline customer')).toBe(true);
+        expect(migrated.queue).toHaveLength(1);
+        expect(migrated.queue[0].id).toBe(fixture.mutationId);
+
+        const legacyCounts = await page.evaluate(() => new Promise((resolve, reject) => {
+            const request = indexedDB.open('zazu-client', 1);
+            request.onsuccess = () => {
+                const db = request.result;
+                const tx = db.transaction(['state', 'mutations'], 'readonly');
+                const state = tx.objectStore('state').get('current');
+                const queue = tx.objectStore('mutations').count();
+                tx.oncomplete = () => {
+                    resolve({ statePresent: Boolean(state.result), queueCount: queue.result });
+                    db.close();
+                };
+                tx.onerror = () => reject(tx.error || new Error('Could not verify legacy cleanup'));
+            };
+            request.onerror = () => reject(request.error || new Error('Could not reopen legacy offline storage'));
+        }));
+        expect(legacyCounts).toEqual({ statePresent: false, queueCount: 0 });
+
+        await page.evaluate(() => window.ZazuOffline.clearLocalSession());
+        await page.reload({ waitUntil: 'domcontentloaded' });
+        await page.evaluate(() => window.ZazuOffline.ready);
+        expect(await page.evaluate(() => window.ZazuOffline.getState().business)).toBeNull();
+        expect(await page.evaluate(() => window.ZazuOffline.pending())).toHaveLength(0);
+    });
+
+    test('refuses to import legacy offline data belonging to a different business', async ({ page }) => {
+        await login(page);
+        const businessId = await page.evaluate(() => Number(document.body.dataset.zazuBusinessId));
+        const foreignBusinessId = businessId + 100000;
+
+        await page.evaluate(async (foreignId) => {
+            const db = await new Promise((resolve, reject) => {
+                const request = indexedDB.open('zazu-client', 1);
+                request.onupgradeneeded = () => {
+                    const storeDb = request.result;
+                    if (!storeDb.objectStoreNames.contains('state')) storeDb.createObjectStore('state');
+                    if (!storeDb.objectStoreNames.contains('mutations')) {
+                        const store = storeDb.createObjectStore('mutations', { keyPath: 'id' });
+                        store.createIndex('status', 'status');
+                        store.createIndex('created_at', 'created_at');
+                    }
+                };
+                request.onsuccess = () => resolve(request.result);
+                request.onerror = () => reject(request.error || new Error('Could not open legacy offline storage'));
+            });
+
+            await new Promise((resolve, reject) => {
+                const tx = db.transaction(['state', 'mutations'], 'readwrite');
+                tx.objectStore('state').put({
+                    business: { id: foreignId, name: 'Another business private data' },
+                    sync: { token: 'foreign-business-token', device: { id: 12346, business_id: foreignId } },
+                    customers: [{ name: 'Must not be exposed' }],
+                }, 'current');
+                tx.objectStore('mutations').put({
+                    id: crypto.randomUUID(),
+                    entity_type: 'customer',
+                    entity_id: 'foreign-customer',
+                    operation: 'create',
+                    payload: { name: 'Must not be exposed' },
+                    created_at: new Date().toISOString(),
+                    status: 'pending',
+                });
+                tx.oncomplete = resolve;
+                tx.onerror = () => reject(tx.error || new Error('Could not seed foreign legacy workspace'));
+            });
+            db.close();
+        }, foreignBusinessId);
+
+        await page.reload({ waitUntil: 'domcontentloaded' });
+        await expect(page.getByRole('heading', { name: 'Dashboard' })).toBeVisible();
+        await page.evaluate(() => window.ZazuOffline.ready);
+
+        const localState = await page.evaluate(async () => ({
+            business: window.ZazuOffline.getState().business,
+            customers: window.ZazuOffline.getState().customers,
+            queue: await window.ZazuOffline.pending(),
+        }));
+        expect(localState.business).toBeNull();
+        expect(localState.customers).toEqual([]);
+        expect(localState.queue).toHaveLength(0);
+
+        const legacyStillExists = await page.evaluate(() => new Promise((resolve, reject) => {
+            const request = indexedDB.open('zazu-client', 1);
+            request.onsuccess = () => {
+                const db = request.result;
+                const tx = db.transaction(['state', 'mutations'], 'readonly');
+                const state = tx.objectStore('state').get('current');
+                const queue = tx.objectStore('mutations').count();
+                tx.oncomplete = () => {
+                    resolve(Boolean(state.result) && queue.result === 1);
+                    db.close();
+                };
+                tx.onerror = () => reject(tx.error || new Error('Could not inspect foreign legacy workspace'));
+            };
+            request.onerror = () => reject(request.error || new Error('Could not reopen legacy offline storage'));
+        }));
+        expect(legacyStillExists).toBe(true);
+    });
+
     test('paired device can retry or discard a failed offline sync change', async ({ page }, testInfo) => {
         test.setTimeout(30_000);
         test.skip(testInfo.project.name !== 'chromium', 'Sync conflict controls run once; responsive layouts are covered by the settings suite.');
