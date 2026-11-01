@@ -29,8 +29,8 @@
                     <div class="flex flex-wrap items-center gap-2">
                         <a href="{{ route('work.attachments.download', $attachment) }}" class="zazu-btn zazu-btn-secondary">Download</a>
                         <form method="POST" action="{{ route('work.attachments.destroy', $attachment) }}">
-                        @csrf
-                        @method('DELETE')
+                            @csrf
+                            @method('DELETE')
                             <button class="zazu-btn zazu-btn-ghost" type="submit">Remove</button>
                         </form>
                     </div>
