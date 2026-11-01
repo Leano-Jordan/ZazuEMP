@@ -464,3 +464,44 @@ No release-readiness score uplift is claimed from these source fixes or CI passe
 - Separately tightened sync attachment idempotency: an existing key is now checked against the requested business-owned job, original file name, size, MIME type, description and SHA-256 content before returning duplicate success. A mismatched key reuse returns HTTP 409; inability to verify the existing stored file returns HTTP 503 and leaves the client upload queued.
 - Added regression coverage for key reuse across a different job and for changed file contents. Exact-main execution is pending on the latest commit.
 - No database schema, database data or branch changes. All commits remain direct to `main`.
+
+
+## Director transaction integrity and attachment storage hardening — 2026-11-01
+
+**Canonical target:** main only. No branch was created. No database schema or customer data was changed.
+
+### Verified source corrections committed
+
+- Attachment deletion now commits the business-scoped metadata deletion before removing the private file. A rolled-back DB transaction can no longer leave a live attachment row pointing at a file already deleted from storage.
+- Added focused attachment tests for both rollback retention and successful row/file removal.
+- Both normal Work uploads and device-sync attachment uploads now reject a failed private store() operation with HTTP 503 before attempting to create attachment metadata.
+- Sync attachment retries validate the same business-owned job, file name, byte size, MIME type, description and SHA-256 file content. Reusing a key for a different payload returns 409; inability to verify the stored file returns 503. Concurrent same-key insert races are checked against the same payload before duplicate success.
+- Finance payment retries now compare invoice, event, currency, type, amount, method, reference, paid date and notes. A changed payload using the same key returns 409.
+- Finance expense retries compare business-bound event/purchase-order/supplier links, description, amount, currency, expense date, status, reference and notes. A changed payload returns 409.
+- Inventory movement retries compare item, type, quantity, unit cost, date, event, reference and notes. A changed payload returns 409.
+- Purchase-order creation retries compare supplier, event, currency, expected date, notes and all line details. A changed supplier commitment returns 409.
+- Invoice creation retries compare event/quote identity, currency, totals, tax snapshot, submitted dates/notes and invoice lines. A changed invoice returns 409.
+- Removed an early quote-version “already invoiced” guard that previously ran before invoice idempotency lookup. The transactional guard remains after same-key replay handling, allowing a legitimate retry of the accepted quote conversion.
+- Purchase receipt replay now checks whether the key was already committed before rejecting a fully received or subsequently closed order/job. Regression coverage verifies replay after the order reaches received.
+
+### Test coverage added or expanded
+
+- Offline conflict fixture now reacquires the live workspace object after queue writes replace it.
+- Offline logout tests capture the authenticated business DB name before redirecting to the public page; IndexedDB blocked conditions fail explicitly instead of hanging.
+- Attachment idempotency rejects the same key when used for a different job or different file bytes.
+- Attachment deletion rollback and success paths are covered.
+- Payment, expense, inventory movement, purchase order and invoice tests now verify that changed payloads with the same key return HTTP 409 without duplicate posting.
+- Commercial reconciliation now retries a quote-derived invoice after initial conversion and verifies the invoice count remains one.
+- Purchase receipt test replays the final receipt key after the order becomes fully received.
+
+### Known remaining integrity limitation
+
+The purchase_order_receipts table stores only the business, purchase order and idempotency key. It does not persist the line quantities/payload applied by a receipt. Current code safely suppresses duplicate stock posting and permits retries after completion, but cannot prove that a same-key replay carries the same quantities. Full payload-mismatch rejection requires an additive persisted receipt-line fingerprint or receipt-line table. This is deliberately left open pending approval for a database migration; no schema change is made here.
+
+### Current verification disposition
+
+- Source changes are committed, but automated workflows must be reconciled against the exact current main SHA before any new tests are claimed as passed.
+- Browser smoke on earlier candidates remained in progress; the latest run must complete before the offline fixture corrections are certified.
+- Local Windows PC host installation, stable HTTPS, installed-device disconnected launch, and physical reconnect/restore drills remain unverified.
+- Offline phone attachment upload/download is still NOT IMPLEMENTED in the active app. The standalone legacy script remains dormant and is not loaded into the authenticated layout.
+- No release-readiness score uplift is claimed from source changes alone.
