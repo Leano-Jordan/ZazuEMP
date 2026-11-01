@@ -39,21 +39,9 @@ class SyncMutationRecorder
                 ->first();
 
             if ($existing) {
-                if (
-                    (int) $existing->business_id !== (int) $device->business_id
-                    || (int) $existing->sync_device_id !== (int) $device->id
-                ) {
-                    throw ValidationException::withMessages([
-                        'mutation_id' => 'The mutation identifier is already owned by another business or device.',
-                    ]);
-                }
-
+                $this->assertMutationOwner($existing, $device);
                 abort_unless(
-                    $existing->stream === $stream
-                        && $existing->entity_type === $entityType
-                        && $existing->entity_id === $entityId
-                        && $existing->operation === $operation
-                        && $this->canonicalizePayload($existing->payload ?? []) === $this->canonicalizePayload($payload),
+                    $this->sameMutationIdentity($existing, $stream, $entityType, $entityId, $operation, $payload),
                     409,
                     'This mutation identifier was already used for a different offline change. Keep the original change and create a new mutation.'
                 );
@@ -115,6 +103,36 @@ class SyncMutationRecorder
         }
 
         return $payload;
+    }
+
+    private function assertMutationOwner(SyncMutation $existing, SyncDevice $device): void
+    {
+        if (
+            (int) $existing->business_id !== (int) $device->business_id
+            || (int) $existing->sync_device_id !== (int) $device->id
+        ) {
+            throw ValidationException::withMessages([
+                'mutation_id' => 'The mutation identifier is already owned by another business or device.',
+            ]);
+        }
+    }
+
+    /**
+     * @param array<mixed> $payload
+     */
+    private function sameMutationIdentity(
+        SyncMutation $existing,
+        string $stream,
+        string $entityType,
+        string $entityId,
+        string $operation,
+        array $payload
+    ): bool {
+        return $existing->stream === $stream
+            && $existing->entity_type === $entityType
+            && $existing->entity_id === $entityId
+            && $existing->operation === $operation
+            && $this->canonicalizePayload($existing->payload ?? []) === $this->canonicalizePayload($payload);
     }
 
     public function publish(SyncMutation $mutation): void
