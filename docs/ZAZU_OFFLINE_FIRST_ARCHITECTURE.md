@@ -442,7 +442,7 @@ Marked offline forms now probe the actual same-origin Zazu endpoint with a short
 
 ### Atomic local persistence
 
-The local mutation queue, the `local_dirty` marker and the staged optimistic workspace copy are now written in one IndexedDB read/write transaction over the state and mutations stores. The client adopts the new in-memory state only after transaction completion. A transaction failure therefore cannot intentionally leave the queue and displayed working copy diverged. The service-worker cache was advanced to `zazu-static-v28` because the offline client is precached.
+The local mutation queue, the `local_dirty` marker and the staged optimistic workspace copy are now written in one IndexedDB read/write transaction over the state and mutations stores. The client adopts the new in-memory state only after transaction completion. A transaction failure therefore cannot intentionally leave the queue and displayed working copy diverged. The service-worker cache was advanced to `zazu-static-v29` because the offline client is precached.
 
 ### Offline customer and Work records
 
