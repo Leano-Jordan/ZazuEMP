@@ -315,21 +315,56 @@ class SyncController extends Controller
             'file' => ['required', 'file', 'max:20480', 'mimetypes:image/jpeg,image/png,image/webp,application/pdf,text/plain,text/csv,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document,application/vnd.ms-excel,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'],
         ]);
 
+        // Resolve the target event before checking the idempotency key. A
+        // reused key must never make an attachment appear to belong to another
+        // job, even when the caller is otherwise authorized for this business.
+        $event = Event::query()
+            ->where('business_id', $device->business_id)
+            ->findOrFail($validated['event_id']);
+
         $existing = EventAttachment::query()
             ->where('business_id', $device->business_id)
             ->where('idempotency_key', $validated['idempotency_key'])
             ->first();
 
         if ($existing) {
+            $incomingFile = $request->file('file');
+            $incomingHash = hash_file('sha256', $incomingFile->getRealPath());
+            $existingStream = Storage::disk($existing->disk)->readStream($existing->path);
+
+            if (! is_resource($existingStream) || $incomingHash === false) {
+                if (is_resource($existingStream)) {
+                    fclose($existingStream);
+                }
+
+                return response()->json([
+                    'message' => 'The previous attachment could not be verified. Keep this upload queued and contact the workspace owner.',
+                ], 503);
+            }
+
+            $hashContext = hash_init('sha256');
+            hash_update_stream($hashContext, $existingStream);
+            fclose($existingStream);
+            $existingHash = hash_final($hashContext);
+
+            $samePayload = (int) $existing->event_id === (int) $event->id
+                && $existing->original_name === $incomingFile->getClientOriginalName()
+                && (int) $existing->size === (int) $incomingFile->getSize()
+                && $existing->mime_type === $incomingFile->getMimeType()
+                && $existing->description === ($validated['description'] ?? null)
+                && hash_equals($existingHash, $incomingHash);
+
+            if (! $samePayload) {
+                return response()->json([
+                    'message' => 'This idempotency key is already assigned to a different attachment. Keep the local file and create a new upload attempt.',
+                ], 409);
+            }
+
             return response()->json([
                 'attachment' => $this->attachmentPayload($existing),
                 'duplicate' => true,
             ]);
         }
-
-        $event = Event::query()
-            ->where('business_id', $device->business_id)
-            ->findOrFail($validated['event_id']);
 
         $path = $request->file('file')->store('jobs/'.$event->id.'/attachments', 'private');
 
