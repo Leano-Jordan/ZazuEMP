@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\BusinessCapability;
 use App\Models\InventoryItem;
+use App\Models\InventoryMovement;
 use App\Models\EventRequirement;
 use App\Services\EventLifecycleService;
 use App\Support\Audit;
@@ -79,11 +80,18 @@ class InventoryController extends Controller
             // Serialize business-level idempotency checks before locking the stock row.
             \App\Models\Business::query()->whereKey($businessId)->lockForUpdate()->firstOrFail();
 
-            if (\App\Models\InventoryMovement::query()
+            $existingMovement = InventoryMovement::query()
                 ->where('business_id', $businessId)
                 ->where('idempotency_key', $data['idempotency_key'])
-                ->exists()
-            ) {
+                ->first();
+
+            if ($existingMovement) {
+                abort_unless(
+                    $this->movementPayloadMatches($existingMovement, $inventoryItem, $data),
+                    409,
+                    'This stock movement key was already used for different stock details. Refresh the form before retrying.'
+                );
+
                 $alreadyProcessed = true;
                 return;
             }
@@ -126,4 +134,24 @@ class InventoryController extends Controller
 
         return back()->with('success','Inventory movement recorded.');
     }
+
+    /**
+     * @param array<string, mixed> $data
+     */
+    private function movementPayloadMatches(
+        InventoryMovement $movement,
+        InventoryItem $inventoryItem,
+        array $data
+    ): bool {
+        return (int) $movement->inventory_item_id === (int) $inventoryItem->id
+            && (int) $movement->business_id === (int) $inventoryItem->business_id
+            && $movement->type === $data['type']
+            && Money::toHundredths((string) $movement->quantity) === Money::toHundredths((string) $data['quantity'])
+            && Money::toCents((string) $movement->unit_cost) === Money::toCents((string) $data['unit_cost'])
+            && $movement->movement_date?->toDateString() === date('Y-m-d', strtotime((string) $data['movement_date']))
+            && $movement->reference === ($data['reference'] ?? null)
+            && $movement->notes === ($data['notes'] ?? null)
+            && (int) ($movement->event_id ?? 0) === (int) ($data['event_id'] ?? 0);
+    }
+
 }
