@@ -4,8 +4,8 @@
 **Repository:** `Leano-Jordan/ZazuEMP`  
 **Branch:** `main`  
 **Main-ref rule:** query the live `main` ref; this ledger does not pin a moving HEAD.  
-**Last Director reconciliation:** 2026-10-19  
-**Latest reviewed test/code sequence:** service-worker behavioral tests and serialized identity-cache mutation were added directly to `main`; current-head execution remains unverified.
+**Last Director reconciliation:** 2026-11-01  
+**Latest application evidence SHA:** `6b16b74a7b773ac2797bf7135f85d38b8af0de8d` (documentation reconciliation subsequently committed on `main` as `18b60aeb3bbcaecaa1ab5b08baa8ec3d1f1e4afe`).
 
 ## Evidence rule
 
@@ -15,20 +15,17 @@ This ledger records the current release truth. Older Director audits remain hist
 
 ## Current-head CI evidence
 
-| Check | Evidence status at latest audited main |
-|---|---|
-| Laravel tests | 🟡 NOT RECONCILED for the latest main SHA |
-| Application/build | 🟡 NOT RECONCILED for the latest main SHA |
-| Quality + service-worker behavioral race suite | 🟡 NEW CHECK; fresh run result not yet observed |
-| PHPMD | 🟡 Latest-main result not observed |
-| Psalm / PHP security | 🟡 Latest-main result not observed |
-| Populated upgrade + rollback | 🟡 Latest-main result not observed |
-| Browser smoke | 🟡 Latest-main result not observed |
-| Director Contract Lint | 🟡 Latest-main result not observed |
-| Push/main workflow | 🟡 Latest-main result not observed |
-| SonarCloud | ⚪ Previously conditionally skipped; not a pass |
+| Check | Exact application SHA | Result |
+|---|---|---|
+| Laravel tests | `6b16b74a7b773ac2797bf7135f85d38b8af0de8d` | 🟢 PASS — [run 41290751650](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/41290751650) |
+| Application/build + service-worker behavioral race suite | `6b16b74a7b773ac2797bf7135f85d38b8af0de8d` | 🟢 PASS — [Quality run 41290751642](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/41290751642) |
+| PHPMD | `6b16b74a7b773ac2797bf7135f85d38b8af0de8d` | 🟢 PASS — [run 41290751665](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/41290751665) |
+| Psalm / PHP security | `6b16b74a7b773ac2797bf7135f85d38b8af0de8d` | 🟢 PASS — [run 41290751603](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/41290751603) |
+| Populated upgrade + rollback | `6b16b74a7b773ac2797bf7135f85d38b8af0de8d` | 🟢 PASS — [run 41290751645](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/41290751645) |
+| Browser smoke | `6b16b74a7b773ac2797bf7135f85d38b8af0de8d` | 🟡 IN PROGRESS at reconciliation — [run 41290751609](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/41290751609) |
+| SonarCloud | `6b16b74a7b773ac2797bf7135f85d38b8af0de8d` | ⚪ SKIPPED; not a pass |
 
-The last source-recorded broad green main run is commit `7940033b6fd4f691692eec5e9d7f6ad587486f61` (2026-10-15), including Laravel run 38789104896, Quality 38789104893, PHPMD 38789105223, Psalm Security Scan 38789105085, browser smoke 38789104865, and populated upgrade/rollback 38789104911. This is historical evidence for that SHA only. Do not promote it to current-head PASS. The current health workflow emits a per-run artifact and Actions summary; it does not publish a persistent latest report.
+These results apply only to the exact application SHA shown. The current `main` ref has since advanced through a documentation-only Director reconciliation commit. The current health workflow emits per-run artifacts and Actions summaries; it does not publish a persistent latest report.
 
 ## V1 capability gates
 
@@ -73,7 +70,7 @@ The rollback runbook and recovery mechanisms exist. A real release/deployment ro
 Exact locked Composer and npm manifests were reconciled on 2026-10-07. See `docs/RELEASE_DEPENDENCY_LICENCE_AUDIT.md`. Final legal/distribution review remains separate.
 
 ### 7. Offline operational depth — 🟡 IN PROGRESS
-Phone-local inventory, operational cost and asset workflows are now represented in the local store, queued for synchronization, and protected by server-side domain handlers. The new Node behavioral race suite is now wired into the Quality workflow, but execution on the latest main and the resulting CI conclusion remain UNVERIFIED until the exact run is observed.
+Phone-local customer/job/quote/preparation and supporting inventory, operational cost, asset, supplier, purchasing and finance data are represented in the IndexedDB workspace and sync foundation. Offline form submissions use origin reachability rather than trusting `navigator.onLine`; local mutation, dirty marker and optimistic workspace copy are committed transactionally. Current-main Quality and Laravel workflows passed on application SHA `6b16b74a7b773ac2797bf7135f85d38b8af0de8d`, including the Node service-worker race suite. The browser smoke run was still in progress at reconciliation. This does not prove disconnected installed-device launch, full screen parity, attachment parity or real-world sync/conflict recovery.
 
 ### 8. Final Director certification — ⬜ NOT STARTED
 Certification waits for the remaining operational/legal/brand gates; no rushed release claim.
