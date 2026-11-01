@@ -139,13 +139,21 @@ class FinancePurchasingInventoryTest extends TestCase
 
         $this->assertDatabaseCount('inventory_movements', 1);
 
-        $this->post(route('purchasing.receive', $order), [
-            'idempotency_key' => (string) Str::uuid(),
+        $finalReceiptKey = (string) Str::uuid();
+        $finalReceipt = [
+            'idempotency_key' => $finalReceiptKey,
             'received_quantity' => [$line->id => '12'],
-        ])->assertRedirect();
+        ];
+
+        $this->post(route('purchasing.receive', $order), $finalReceipt)->assertRedirect();
 
         $this->assertSame('received', $order->fresh()->status);
         $this->assertSame('20.00', $line->fresh()->received_quantity);
+        $this->assertDatabaseCount('inventory_movements', 2);
+
+        // Retrying the same committed receipt after the order is complete
+        // must remain a safe duplicate, not fail the current status check.
+        $this->post(route('purchasing.receive', $order), $finalReceipt)->assertRedirect();
         $this->assertDatabaseCount('inventory_movements', 2);
     }
 
