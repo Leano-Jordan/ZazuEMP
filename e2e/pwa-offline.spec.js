@@ -178,9 +178,14 @@ test.describe('Zazu installed PWA offline shell', () => {
         await page.locator('input[name="event_date"]').fill('2026-11-15');
         await page.locator('input[name="event_address"]').fill('Pretoria');
         await page.locator('input[name="services[]"][value="Catering"]').check();
-        await page.route('**/work/create*', async route => {
-            if (route.request().method() === 'HEAD') await route.abort('failed');
-            else await route.continue();
+        let normalWorkPostAttempted = false;
+        await page.route('**/work', async route => {
+            if (route.request().method() === 'POST') {
+                normalWorkPostAttempted = true;
+                await route.abort('failed');
+                return;
+            }
+            await route.continue();
         });
         await page.locator('input[name="name"]').fill('Offline job for local customer');
         await page.getByRole('button', { name: /Create job/i }).click();
@@ -192,6 +197,7 @@ test.describe('Zazu installed PWA offline shell', () => {
         expect(customerMutation).toBeTruthy();
         expect(jobMutation).toBeTruthy();
         expect(jobMutation.payload.customer_local_id).toBe(customerMutation.payload.local_id);
+        expect(normalWorkPostAttempted).toBe(false);
         expect(jobMutation.payload.event_type).toBe('Wedding');
         expect(jobMutation.payload.event_date).toBe('2026-11-15');
         expect(jobMutation.payload.event_address).toBe('Pretoria');
