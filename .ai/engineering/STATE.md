@@ -338,3 +338,31 @@ The quality workflow includes frontend build, the Node behavioral service-worker
 - Full offline parity and multi-device conflict/recovery: **OPEN**.
 
 No V1 readiness uplift is claimed from these CI passes alone. Continue the P0 offline-continuity gate, then execute the populated customer workflow and real recovery drills. All work remains on `main`; do not create branches.
+
+
+## Director browser-regression repair cycle — 2026-11-01
+
+**Target:** `main` only.  
+**Failure baseline:** application SHA `6b16b74a7b773ac2797bf7135f85d38b8af0de8d`.  
+**Failure evidence:** [Browser smoke run 41290751609](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/41290751609), [job logs](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/41290751609/job/124801314146).
+
+### Diagnosis
+
+The browser run had 46 passing tests and 6 failures (14 skipped). The failures were concentrated in offline form coverage:
+
+- Job-create offline test selected a server-rendered customer that was not guaranteed to exist in the device-local workspace. The offline handler correctly rejected the unresolved relationship, but its early-return path could leave the generic form submit lock engaged.
+- The customer-photo offline rejection path also exposed a submit-lock recovery gap: any unsuccessful offline submit must restore the button so the user can correct the form and retry.
+- The customer-contact test attempted to fill Night contact inputs inside a collapsed `details` disclosure.
+- The local-customer-to-Work test attempted to click a native radio obscured by its visible choice-card label.
+
+### Changes committed directly to main
+
+- `resources/js/app.js`: unsaved offline form attempts now release the generic submit lock, restore the original button label, and clear `aria-busy` in the finalizer. A rejected local mutation no longer strands the form disabled.
+- `e2e/offline-attachments.spec.js`: seed a customer into IndexedDB/local mutation queue before creating a disconnected job; exercise a real local customer relationship and service selection.
+- `e2e/pwa-offline.spec.js`: expand the Night contact disclosure and interact with the visible event-type choice card.
+
+### Verification status
+
+These changes are committed on `main` through application commit `df52f7c0a5b0d7c9a21a50db479cae6ee446246e`. Fresh Quality, Laravel, Psalm, PHPMD, populated upgrade/rollback and browser smoke workflows have been triggered for this SHA. Their results are pending; no repair is marked verified until those exact runs complete.
+
+**Do not certify offline continuity from this repair alone.** Installed-device disconnected launch, data persistence after process restart, real sync/reconciliation and production recovery drills remain release gates.
