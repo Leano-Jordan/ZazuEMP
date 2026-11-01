@@ -111,6 +111,13 @@ test.describe('Zazu installed PWA offline shell', () => {
         expect(restoredQueue[0].id).toBe(queued[0].id);
         expect(restoredQueue[0].payload.day_contact_name).toBe('Day Coordinator');
         expect(restoredQueue[0].payload.night_contact_name).toBe('Night Coordinator');
+
+        const restoredState = await page.evaluate(() => window.ZazuOffline.getState());
+        expect(restoredState.customers.some(customer =>
+            customer.local_id === queued[0].payload.local_id
+            && customer.legal_name === 'Mandla Events'
+            && customer.billing_address === '12 Market Street, Pretoria'
+        )).toBe(true);
     });
 
     test('does not claim an offline customer photo was saved when only metadata can be queued', async ({ page }, testInfo) => {
