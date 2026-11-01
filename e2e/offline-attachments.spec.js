@@ -20,12 +20,34 @@ test('real Zazu job form can create a job locally while disconnected', async ({ 
     await page.goto('/work/create', { waitUntil: 'domcontentloaded' });
     await expect(page.locator('#new-job-form')).toBeVisible();
 
-    const customer = page.locator('#customer_id option:not([value=""])').first();
-    await expect(customer).toHaveCount(1);
-    await page.locator('#customer_id').selectOption({ index: 1 });
+    // A job may only reference a customer already present in this device's
+    // offline workspace. Seed a realistic phone-local customer rather than
+    // relying on a server-rendered option that may not have been synced.
+    await page.evaluate(async () => {
+        await window.ZazuOffline.ready;
+        const state = structuredClone(window.ZazuOffline.getState());
+        const localId = crypto.randomUUID();
+        const customer = {
+            local_id: localId,
+            server_id: null,
+            id: null,
+            name: 'Offline test customer',
+            contact_name: 'Offline test contact',
+            phone: '0123456789',
+            email: 'offline@example.test',
+        };
+        state.customers = [...(state.customers || []), customer];
+        await window.ZazuOffline.queueMutation('customer', 'create', customer, state);
+        const select = document.querySelector('#customer_id');
+        const option = new Option(customer.name, 'local:' + localId);
+        option.dataset.zazuLocalId = localId;
+        select.add(option);
+        select.value = option.value;
+    });
     // The visible choice card overlays the native radio input on mobile/tablet.
     // Click the user-facing label instead of forcing Playwright to click the obscured input.
     await page.locator('label.zazu-choice-card').filter({ has: page.locator('input[name="event_type"]') }).first().click();
+    await page.locator('#new-job-form input[name="services[]"][value="Catering"]').check();
     await page.locator('#new-job-form input[name="name"]').fill('Offline catering job');
     // The production form requires a job date; without it the browser blocks
     // submission before the offline handler can run.
