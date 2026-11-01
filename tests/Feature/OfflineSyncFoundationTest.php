@@ -536,6 +536,109 @@ class OfflineSyncFoundationTest extends TestCase
         $this->assertSame('ready', \App\Models\EventPreparationItem::query()->where('event_id', $event->id)->value('status'));
     }
 
+    public function test_offline_job_creation_preserves_customer_relationship_by_local_identity(): void
+    {
+        $business = Business::create([
+            'name' => 'Offline Work Business',
+            'slug' => 'offline-work-'.Str::lower(Str::random(8)),
+            'status' => 'active',
+            'currency' => 'ZAR',
+        ]);
+        $device = SyncDevice::create([
+            'business_id' => $business->id,
+            'installation_id' => (string) Str::uuid(),
+        ]);
+        $customer = \App\Models\Customer::create([
+            'business_id' => $business->id,
+            'name' => 'Offline Linked Customer',
+        ]);
+        $customer->contacts()->create([
+            'name' => 'Primary Contact',
+            'phone' => '0123456789',
+            'email' => 'contact@example.test',
+            'label' => 'Primary',
+            'is_primary' => true,
+        ]);
+        $customerIdentity = app(\App\Support\Offline\SyncEntityIdentityRegistry::class)
+            ->identify($customer, 'customer');
+
+        $localId = (string) Str::uuid();
+        $mutation = app(SyncMutationRecorder::class)->record(
+            $device,
+            'job',
+            $localId,
+            'create',
+            [
+                'local_id' => $localId,
+                'record' => [
+                    'name' => 'Offline linked job',
+                    'customer_local_id' => $customerIdentity->entity_uuid,
+                    'customer_name' => 'Offline Linked Customer',
+                    'event_date' => now()->addDays(14)->toDateString(),
+                ],
+            ],
+        );
+
+        $handler = app(OfflineDomainMutationHandler::class);
+        $applied = app(SyncMutationApplier::class)->apply($mutation, ['job' => $handler]);
+        $event = \App\Models\Event::query()
+            ->where('business_id', $business->id)
+            ->where('name', 'Offline linked job')
+            ->firstOrFail();
+
+        $this->assertSame('applied', $applied->status);
+        $this->assertSame($customer->id, $event->customer_id);
+        $this->assertSame('Offline Linked Customer', $event->customer_name);
+        $this->assertSame('0123456789', $event->customer_phone);
+        $this->assertSame('contact@example.test', $event->customer_email);
+        $this->assertSame($customer->id, $event->customer()->value('id'));
+    }
+
+    public function test_offline_job_rejects_customer_identity_from_another_business(): void
+    {
+        $firstBusiness = Business::create([
+            'name' => 'Offline Job First',
+            'slug' => 'offline-job-first-'.Str::lower(Str::random(8)),
+            'status' => 'active',
+            'currency' => 'ZAR',
+        ]);
+        $secondBusiness = Business::create([
+            'name' => 'Offline Job Second',
+            'slug' => 'offline-job-second-'.Str::lower(Str::random(8)),
+            'status' => 'active',
+            'currency' => 'ZAR',
+        ]);
+        $device = SyncDevice::create([
+            'business_id' => $firstBusiness->id,
+            'installation_id' => (string) Str::uuid(),
+        ]);
+        $customer = \App\Models\Customer::create([
+            'business_id' => $secondBusiness->id,
+            'name' => 'Foreign Customer',
+        ]);
+        $identity = app(\App\Support\Offline\SyncEntityIdentityRegistry::class)
+            ->identify($customer, 'customer');
+        $localId = (string) Str::uuid();
+        $mutation = app(SyncMutationRecorder::class)->record(
+            $device,
+            'job',
+            $localId,
+            'create',
+            [
+                'local_id' => $localId,
+                'record' => [
+                    'name' => 'Must not link across businesses',
+                    'customer_local_id' => $identity->entity_uuid,
+                ],
+            ],
+        );
+
+        $this->expectException(\Illuminate\Validation\ValidationException::class);
+        app(SyncMutationApplier::class)->apply($mutation, [
+            'job' => app(OfflineDomainMutationHandler::class),
+        ]);
+    }
+
     public function test_offline_preparation_rejects_cross_business_job_identity(): void
     {
         $first = Business::create([
