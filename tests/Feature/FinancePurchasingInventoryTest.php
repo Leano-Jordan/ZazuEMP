@@ -722,6 +722,16 @@ class FinancePurchasingInventoryTest extends TestCase
             ->assertStatus(409);
 
         $this->assertDatabaseCount('invoices', 1);
+
+        // A retry is still a no-op after the original invoice is later voided
+        // and the job is cancelled. It must not be treated as a new issuance.
+        $invoice = Invoice::query()->firstOrFail();
+        $invoice->update(['status' => 'void']);
+        $event->update(['status' => 'cancelled']);
+        $this->post(route('finance.invoices.store'), $payload)->assertRedirect();
+        $this->assertSame('void', $invoice->fresh()->status);
+        $this->assertDatabaseCount('invoices', 1);
+
         $this->assertDatabaseHas('audit_logs', [
             'action' => 'finance.invoice.created',
             'business_id' => $business->id,
