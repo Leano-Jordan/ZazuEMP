@@ -56,10 +56,9 @@ class SyncController extends Controller
         ]);
 
         $requestedSelection = $validated['selection'] ?? [];
-        $selection = $this->validateSelection(
-            $business,
-            $requestedSelection ?: $this->defaultBootstrapSelection($business),
-        );
+        $selection = $requestedSelection
+            ? $this->validateSelection($business, $requestedSelection)
+            : app(SyncBootstrapPayloadBuilder::class)->defaultSelection($business);
         $pairingCode = (string) random_int(100000, 999999);
         $installationId = (string) Str::uuid();
         $expiresAt = now()->addMinutes($validated['expires_in_minutes'] ?? 10);
@@ -73,6 +72,7 @@ class SyncController extends Controller
             'metadata' => [
                 'pairing_code_hash' => Hash::make($pairingCode),
                 'pairing_expires_at' => $expiresAt->toIso8601String(),
+                'bootstrap_selection_mode' => $requestedSelection ? 'explicit' : 'recent',
                 'bootstrap_selection' => $selection,
             ],
         ]);
@@ -571,37 +571,6 @@ class SyncController extends Controller
         }
 
         return array_values(array_unique($identities));
-    }
-
-    private function defaultBootstrapSelection(Business $business): array
-    {
-        $queries = [
-            'customer' => Customer::query()
-                ->where('business_id', $business->id)
-                ->latest('updated_at')
-                ->latest('id'),
-            'job' => Event::query()
-                ->where('business_id', $business->id)
-                ->latest('updated_at')
-                ->latest('id'),
-            'quote' => Quote::query()
-                ->whereHas('event', fn ($event) => $event->where('business_id', $business->id))
-                ->latest('updated_at')
-                ->latest('id'),
-            'preparation' => EventPreparationItem::query()
-                ->where('business_id', $business->id)
-                ->latest('updated_at')
-                ->latest('id'),
-        ];
-
-        $selection = [];
-        foreach ($queries as $type => $query) {
-            foreach ($query->limit(25)->pluck('id') as $id) {
-                $selection[] = ['type' => $type, 'id' => (int) $id];
-            }
-        }
-
-        return $selection;
     }
 
     private function validateSelection(Business $business, array $selection): array

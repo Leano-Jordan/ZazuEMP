@@ -64,6 +64,40 @@ class SyncBootstrapPayloadBuilder
         ];
     }
 
+    /**
+     * @return array<int, array{type: string, id: int}>
+     */
+    public function defaultSelection(Business $business): array
+    {
+        $queries = [
+            'customer' => Customer::query()
+                ->where('business_id', $business->id)
+                ->latest('updated_at')
+                ->latest('id'),
+            'job' => Event::query()
+                ->where('business_id', $business->id)
+                ->latest('updated_at')
+                ->latest('id'),
+            'quote' => Quote::query()
+                ->whereHas('event', fn ($event) => $event->where('business_id', $business->id))
+                ->latest('updated_at')
+                ->latest('id'),
+            'preparation' => EventPreparationItem::query()
+                ->where('business_id', $business->id)
+                ->latest('updated_at')
+                ->latest('id'),
+        ];
+
+        $selection = [];
+        foreach ($queries as $type => $query) {
+            foreach ($query->limit(25)->pluck('id') as $id) {
+                $selection[] = ['type' => $type, 'id' => (int) $id];
+            }
+        }
+
+        return $selection;
+    }
+
     private function bootstrapCatalogue(Business $business, SyncEntityIdentityRegistry $registry)
     {
         return BusinessCapability::query()
@@ -224,8 +258,13 @@ class SyncBootstrapPayloadBuilder
         Business $business,
         SyncEntityIdentityRegistry $registry,
     ): array {
+        $metadata = $device->metadata ?? [];
+        $selection = ($metadata['bootstrap_selection_mode'] ?? 'recent') === 'recent'
+            ? $this->defaultSelection($business)
+            : ($metadata['bootstrap_selection'] ?? []);
+
         $selected = [];
-        foreach ($device->metadata['bootstrap_selection'] ?? [] as $item) {
+        foreach ($selection as $item) {
             $record = $this->findSelectedRecord($business, $item);
             if (! $record) {
                 continue;
