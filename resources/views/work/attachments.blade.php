@@ -26,11 +26,14 @@
                         <div class="zazu-list-title">{{ $attachment->original_name }}</div>
                         <div class="zazu-list-meta">{{ strtoupper(pathinfo($attachment->original_name, PATHINFO_EXTENSION) ?: 'FILE') }} · {{ number_format(($attachment->size ?? 0) / 1024, 0) }} KB · {{ $attachment->created_at->format('d M Y H:i') }}</div>
                     </div>
-                    <form method="POST" action="{{ route('work.attachments.destroy', $attachment) }}">
+                    <div class="flex flex-wrap items-center gap-2">
+                        <a href="{{ route('work.attachments.download', $attachment) }}" class="zazu-btn zazu-btn-secondary">Download</a>
+                        <form method="POST" action="{{ route('work.attachments.destroy', $attachment) }}">
                         @csrf
                         @method('DELETE')
-                        <button class="zazu-btn zazu-btn-ghost" type="submit">Remove</button>
-                    </form>
+                            <button class="zazu-btn zazu-btn-ghost" type="submit">Remove</button>
+                        </form>
+                    </div>
                 </div>
             @endforeach
         </div>
