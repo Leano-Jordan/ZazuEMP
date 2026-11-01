@@ -263,17 +263,34 @@ class SyncController extends Controller
                 ]);
             }
 
-            if ($validated['action'] === 'retry') {
+            $mutationStatus = $mutation?->status;
+            if ($lockedConflict->conflict_type === 'mutation_identity_mismatch') {
+                if ($mutation && $mutation->status === 'pending') {
+                    $mutation->update([
+                        'status' => 'discarded',
+                        'last_error' => 'Superseded by a new mutation identifier after payload mismatch.',
+                    ]);
+                }
+
+                // The server-owned mutation ID is immutable. Retrying the local
+                // edited payload must create a fresh ID; the original applied
+                // mutation, if any, remains untouched.
+                $mutationStatus = $validated['action'] === 'retry'
+                    ? 'new_mutation_required'
+                    : 'discarded';
+            } elseif ($validated['action'] === 'retry') {
                 abort_unless($mutation, 404);
                 $mutation->update([
                     'status' => 'pending',
                     'last_error' => null,
                 ]);
+                $mutationStatus = 'pending';
             } elseif ($mutation) {
                 $mutation->update([
                     'status' => 'discarded',
                     'last_error' => $validated['note'] ?? 'Offline change discarded after conflict resolution.',
                 ]);
+                $mutationStatus = 'discarded';
             }
 
             $lockedConflict->update([
@@ -284,7 +301,7 @@ class SyncController extends Controller
 
             return response()->json([
                 'conflict' => $this->conflictPayload($lockedConflict->fresh()),
-                'mutation_status' => $mutation?->fresh()->status,
+                'mutation_status' => $mutationStatus,
             ]);
         });
     }
@@ -528,9 +545,19 @@ class SyncController extends Controller
         $applied = [];
 
         foreach ($this->orderMutationsByDependencies($validated['mutations']) as $item) {
-            $mutation = $recorder->record($device, $item['entity_type'], $item['entity_id'], $item['operation'], $item['payload'] ?? [], $item['id']);
+            try {
+                $mutation = $recorder->record($device, $item['entity_type'], $item['entity_id'], $item['operation'], $item['payload'] ?? [], $item['id']);
+            } catch (\\Symfony\\Component\\HttpKernel\\Exception\\HttpException $exception) {
+                if ($exception->getStatusCode() !== 409) {
+                    throw $exception;
+                }
+
+                $recorded[] = $this->mutationIdentityMismatchResponse($device, $item, $conflictRecorder, $exception->getMessage());
+                continue;
+            }
 
             $conflictId = null;
+            $conflictType = null;
             $identity = null;
 
             try {
@@ -572,6 +599,7 @@ class SyncController extends Controller
                     }
 
                     $conflictId = $conflict->id;
+                    $conflictType = 'domain_rejection';
                 }
             }
 
@@ -582,6 +610,7 @@ class SyncController extends Controller
                 'applied' => $mutation->status === 'applied',
                 'error' => $mutation->status === 'pending' ? $mutation->last_error : null,
                 'conflict_id' => $conflictId,
+                'conflict_type' => $conflictType,
                 'identity' => $identity ? [
                     'entity_type' => $identity->entity_type,
                     'local_id' => $identity->entity_uuid,
@@ -597,6 +626,78 @@ class SyncController extends Controller
             'applied' => $applied,
             'message' => 'Supported offline mutations are applied idempotently; unsupported or rejected mutations remain queued with an error for later handling.',
         ]);
+    }
+
+    /**
+     * Turn a changed-payload replay into a per-mutation conflict instead of
+     * aborting the complete push batch with an opaque HTTP 409.
+     *
+     * @param array<string, mixed> $item
+     * @return array<string, mixed>
+     */
+    private function mutationIdentityMismatchResponse(
+        SyncDevice $device,
+        array $item,
+        SyncConflictRecorder $conflictRecorder,
+        string $message
+    ): array {
+        $existing = SyncMutation::query()
+            ->where('business_id', $device->business_id)
+            ->where('sync_device_id', $device->id)
+            ->where('mutation_id', $item['id'])
+            ->firstOrFail();
+
+        $localPayload = [
+            'entity_type' => $item['entity_type'],
+            'entity_id' => $item['entity_id'],
+            'operation' => $item['operation'],
+            'payload' => $item['payload'] ?? [],
+        ];
+        $remotePayload = [
+            'entity_type' => $existing->entity_type,
+            'entity_id' => $existing->entity_id,
+            'operation' => $existing->operation,
+            'payload' => $existing->payload ?? [],
+        ];
+
+        $conflict = SyncConflict::query()
+            ->where('business_id', $device->business_id)
+            ->where('sync_device_id', $device->id)
+            ->where('mutation_id', $existing->mutation_id)
+            ->where('conflict_type', 'mutation_identity_mismatch')
+            ->where('status', 'open')
+            ->first();
+
+        if ($conflict) {
+            $conflict->update([
+                'entity_type' => $item['entity_type'],
+                'entity_id' => $item['entity_id'],
+                'local_payload' => $localPayload,
+                'remote_payload' => $remotePayload,
+            ]);
+        } else {
+            $conflict = $conflictRecorder->record(
+                (int) $device->business_id,
+                $item['entity_type'],
+                $item['entity_id'],
+                'mutation_identity_mismatch',
+                $device,
+                $existing->mutation_id,
+                $localPayload,
+                $remotePayload,
+            );
+        }
+
+        return [
+            'id' => $existing->mutation_id,
+            'sequence' => $existing->sequence,
+            'status' => 'pending',
+            'applied' => false,
+            'error' => mb_substr($message, 0, 1000),
+            'conflict_id' => $conflict->id,
+            'conflict_type' => 'mutation_identity_mismatch',
+            'identity' => null,
+        ];
     }
 
     /**
