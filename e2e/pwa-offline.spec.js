@@ -48,6 +48,41 @@ test.describe('Zazu installed PWA offline shell', () => {
         expect(readiness).toBe('ready');
     });
 
+    test('queues supported changes when the Zazu origin is unreachable but the browser reports online', async ({ page }, testInfo) => {
+        test.setTimeout(20_000);
+        test.skip(testInfo.project.name !== 'chromium', 'Origin-reachability fallback contract runs once.');
+
+        await login(page);
+        await page.goto('/customers/create', { waitUntil: 'domcontentloaded' });
+        await page.evaluate(() => window.ZazuOffline.ready);
+
+        expect(await page.evaluate(() => navigator.onLine)).toBe(true);
+
+        // Keep the browser online while making the application origin unavailable.
+        await page.route('**/customers/create*', async route => {
+            if (route.request().method() === 'HEAD') {
+                await route.abort('failed');
+                return;
+            }
+            await route.continue();
+        });
+
+        await page.locator('input[name="name"]').fill('Offline network customer');
+        await page.locator('input[name="primary_contact_name"]').fill('Mandla Dlamini');
+        await page.locator('input[name="primary_contact_phone"]').fill('0123456789');
+        await page.locator('input[name="primary_contact_email"]').fill('mandla@example.test');
+        await page.getByRole('button', { name: 'Save customer' }).click();
+
+        await expect(page.getByText('Saved on this device. It will sync automatically when Zazu reconnects.')).toBeVisible();
+
+        const queued = await page.evaluate(async () => window.ZazuOffline.pending());
+        expect(queued).toHaveLength(1);
+        expect(queued[0].entity_type).toBe('customer');
+        expect(queued[0].payload.contact_name).toBe('Mandla Dlamini');
+        expect(queued[0].payload.phone).toBe('0123456789');
+        expect(queued[0].payload.email).toBe('mandla@example.test');
+    });
+
     test('offline logout keeps local data when the server cannot end the web session', async ({ page, context }, testInfo) => {
         test.setTimeout(20_000);
         test.skip(testInfo.project.name !== 'chromium', 'Disconnected logout contract runs once; viewport behaviour is covered elsewhere.');
