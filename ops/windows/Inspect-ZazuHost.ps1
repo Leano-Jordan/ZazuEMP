@@ -55,10 +55,10 @@ foreach ($name in @('php', 'composer', 'node', 'npm')) {
 
 Write-Section "COMMON AMPPS LOCATIONS"
 $amppsCandidates = @(
-    'C:\\Program Files\\Ampps',
-    'C:\\Program Files (x86)\\Ampps',
-    'C:\\Ampps',
-    'D:\\Ampps'
+    'C:\Program Files\Ampps',
+    'C:\Program Files (x86)\Ampps',
+    'C:\Ampps',
+    'D:\Ampps'
 )
 foreach ($candidate in $amppsCandidates) {
     if (Test-Path $candidate) {
@@ -83,7 +83,7 @@ Write-Section "LISTENING WEB/DATABASE PORTS"
 $listeners = Get-NetTCPConnection -State Listen -ErrorAction SilentlyContinue |
     Where-Object { $_.LocalPort -in @(80, 443, 3306, 8000, 8080) } |
     Select-Object LocalAddress, LocalPort, OwningProcess
-foreach ($listener in $listeners) {
+$listenerRows = foreach ($listener in $listeners) {
     $process = Get-Process -Id $listener.OwningProcess -ErrorAction SilentlyContinue
     [pscustomobject]@{
         Address = $listener.LocalAddress
@@ -91,11 +91,12 @@ foreach ($listener in $listeners) {
         PID     = $listener.OwningProcess
         Process = $process.ProcessName
     }
-} | Format-Table -AutoSize | Out-String | Write-Output
+}
+$listenerRows | Format-Table -AutoSize | Out-String | Write-Output
 
 Write-Section "PROJECT CHECK"
 if (Test-Path $ProjectPath) {
-    foreach ($relative in @('artisan', 'public\\index.php', 'vendor\\autoload.php', 'public\\build\\manifest.json', '.env')) {
+    foreach ($relative in @('artisan', 'public\index.php', 'vendor\autoload.php', 'public\build\manifest.json', '.env')) {
         $path = Join-Path $ProjectPath $relative
         Write-Output ("{0}: {1}" -f $relative, (Test-Path $path))
     }
