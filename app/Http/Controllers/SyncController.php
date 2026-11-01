@@ -374,7 +374,7 @@ class SyncController extends Controller
     }
 
     /**
-     * Verify that an idempotent upload is the same file assigned to the same job.
+     * Verify an idempotent retry without accepting a reused key for different data.
      *
      * @param array<string, mixed> $validated
      */
@@ -384,31 +384,13 @@ class SyncController extends Controller
         Request $request,
         array $validated
     ): JsonResponse {
-        $incomingFile = $request->file('file');
-        $incomingHash = hash_file('sha256', $incomingFile->getRealPath());
-        $existingStream = Storage::disk($existing->disk)->readStream($existing->path);
+        $samePayload = $this->existingAttachmentPayloadMatches($existing, $event, $request, $validated);
 
-        if (! is_resource($existingStream) || $incomingHash === false) {
-            if (is_resource($existingStream)) {
-                fclose($existingStream);
-            }
-
+        if ($samePayload === null) {
             return response()->json([
                 'message' => 'The previous attachment could not be verified. Keep this upload queued and contact the workspace owner.',
             ], 503);
         }
-
-        $hashContext = hash_init('sha256');
-        hash_update_stream($hashContext, $existingStream);
-        fclose($existingStream);
-        $existingHash = hash_final($hashContext);
-
-        $samePayload = (int) $existing->event_id === (int) $event->id
-            && $existing->original_name === $incomingFile->getClientOriginalName()
-            && (int) $existing->size === (int) $incomingFile->getSize()
-            && $existing->mime_type === $incomingFile->getMimeType()
-            && $existing->description === ($validated['description'] ?? null)
-            && hash_equals($existingHash, $incomingHash);
 
         if (! $samePayload) {
             return response()->json([
@@ -420,6 +402,54 @@ class SyncController extends Controller
             'attachment' => $this->attachmentPayload($existing),
             'duplicate' => true,
         ]);
+    }
+
+    /**
+     * @param array<string, mixed> $validated
+     */
+    private function existingAttachmentPayloadMatches(
+        EventAttachment $existing,
+        Event $event,
+        Request $request,
+        array $validated
+    ): ?bool {
+        $incomingFile = $request->file('file');
+
+        if (
+            (int) $existing->event_id !== (int) $event->id
+            || $existing->original_name !== $incomingFile->getClientOriginalName()
+            || (int) $existing->size !== (int) $incomingFile->getSize()
+            || $existing->mime_type !== $incomingFile->getMimeType()
+            || $existing->description !== ($validated['description'] ?? null)
+        ) {
+            return false;
+        }
+
+        return $this->attachmentFileContentMatches($existing, $incomingFile->getRealPath());
+    }
+
+    private function attachmentFileContentMatches(EventAttachment $existing, string|false $incomingPath): ?bool
+    {
+        if ($incomingPath === false) {
+            return null;
+        }
+
+        $incomingHash = hash_file('sha256', $incomingPath);
+        $existingStream = Storage::disk($existing->disk)->readStream($existing->path);
+
+        if (! is_resource($existingStream) || $incomingHash === false) {
+            if (is_resource($existingStream)) {
+                fclose($existingStream);
+            }
+
+            return null;
+        }
+
+        $hashContext = hash_init('sha256');
+        hash_update_stream($hashContext, $existingStream);
+        fclose($existingStream);
+
+        return hash_equals(hash_final($hashContext), $incomingHash);
     }
 
     public function listAttachments(Request $request): JsonResponse
