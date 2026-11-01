@@ -18,7 +18,7 @@ if ([string]::IsNullOrWhiteSpace($ProjectPath)) {
     if ([string]::IsNullOrWhiteSpace($scriptDirectory)) {
         throw 'Cannot determine script directory. Run this file with -File or supply -ProjectPath.'
     }
-    $ProjectPath = (Resolve-Path (Join-Path $scriptDirectory '..\\..')).Path
+    $ProjectPath = (Resolve-Path (Join-Path $scriptDirectory '..\..')).Path
 }
 
 function Section([string]$Name) {
