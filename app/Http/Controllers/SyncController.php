@@ -63,7 +63,11 @@ class SyncController extends Controller
             'selection.*.id' => ['required', 'integer', 'min:1'],
         ]);
 
-        $selection = $this->validateSelection($business, $validated['selection'] ?? []);
+        $requestedSelection = $validated['selection'] ?? [];
+        $selection = $this->validateSelection(
+            $business,
+            $requestedSelection ?: $this->defaultBootstrapSelection($business),
+        );
         $pairingCode = (string) random_int(100000, 999999);
         $installationId = (string) Str::uuid();
         $expiresAt = now()->addMinutes($validated['expires_in_minutes'] ?? 10);
@@ -577,6 +581,37 @@ class SyncController extends Controller
         return array_values(array_unique($identities));
     }
 
+    private function defaultBootstrapSelection(Business $business): array
+    {
+        $queries = [
+            'customer' => Customer::query()
+                ->where('business_id', $business->id)
+                ->latest('updated_at')
+                ->latest('id'),
+            'job' => Event::query()
+                ->where('business_id', $business->id)
+                ->latest('updated_at')
+                ->latest('id'),
+            'quote' => Quote::query()
+                ->whereHas('event', fn ($event) => $event->where('business_id', $business->id))
+                ->latest('updated_at')
+                ->latest('id'),
+            'preparation' => EventPreparationItem::query()
+                ->where('business_id', $business->id)
+                ->latest('updated_at')
+                ->latest('id'),
+        ];
+
+        $selection = [];
+        foreach ($queries as $type => $query) {
+            foreach ($query->limit(25)->pluck('id') as $id) {
+                $selection[] = ['type' => $type, 'id' => (int) $id];
+            }
+        }
+
+        return $selection;
+    }
+
     private function validateSelection(Business $business, array $selection): array
     {
         $result = [];
@@ -634,15 +669,43 @@ class SyncController extends Controller
             }
 
             $identity = $registry->identify($record, $item['type']);
-            $recordData = $record->toArray();
+
+            if ($item['type'] === 'customer') {
+                $record->loadMissing('contacts');
+            }
 
             if ($item['type'] === 'quote') {
-                $record->loadMissing('latestVersion.items');
-                $recordData['latest_version'] = $record->latestVersion?->toArray();
+                $record->loadMissing('latestVersion.items', 'event.customer');
             }
 
             if ($item['type'] === 'job') {
-                $record->loadMissing('requirements');
+                $record->loadMissing('requirements', 'customer');
+            }
+
+            if ($item['type'] === 'preparation') {
+                $record->loadMissing('event.customer');
+            }
+
+            $recordData = $record->toArray();
+
+            if ($item['type'] === 'customer') {
+                $primaryContact = $record->contacts->firstWhere('is_primary', true);
+                $recordData['contact_name'] = $primaryContact?->name;
+                $recordData['phone'] = $primaryContact?->phone;
+                $recordData['email'] = $primaryContact?->email;
+            }
+
+            if ($item['type'] === 'quote') {
+                $recordData['event_local_id'] = $record->event
+                    ? $registry->identify($record->event, 'job')->entity_uuid
+                    : null;
+                $recordData['event_name'] = $record->event?->name;
+            }
+
+            if ($item['type'] === 'job') {
+                $recordData['customer_local_id'] = $record->customer
+                    ? $registry->identify($record->customer, 'customer')->entity_uuid
+                    : null;
                 $recordData['requirements'] = $record->requirements->map(function ($requirement) use ($registry): array {
                     return [
                         'local_id' => $registry->identify($requirement, 'event_requirement')->entity_uuid,
@@ -650,6 +713,13 @@ class SyncController extends Controller
                         'record' => $requirement->toArray(),
                     ];
                 })->values()->all();
+            }
+
+            if ($item['type'] === 'preparation') {
+                $recordData['event_local_id'] = $record->event
+                    ? $registry->identify($record->event, 'job')->entity_uuid
+                    : null;
+                $recordData['event_name'] = $record->event?->name;
             }
 
             $selected[] = [
@@ -663,6 +733,7 @@ class SyncController extends Controller
         $suppliers = Supplier::query()
             ->where('business_id', $business->id)
             ->orderBy('name')
+            ->limit(500)
             ->get()
             ->map(fn (Supplier $supplier) => [
                 'local_id' => $registry->identify($supplier, 'supplier')->entity_uuid,
@@ -675,6 +746,7 @@ class SyncController extends Controller
             ->where('business_id', $business->id)
             ->with('items')
             ->latest()
+            ->limit(500)
             ->get()
             ->map(fn (PurchaseOrder $order) => [
                 'local_id' => $registry->identify($order, 'purchase_order')->entity_uuid,
