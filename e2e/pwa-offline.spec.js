@@ -384,8 +384,8 @@ test.describe('Zazu installed PWA offline shell', () => {
 
         const fixture = await page.evaluate(async () => {
             const offline = window.ZazuOffline;
-            const state = offline.getState();
-            state.sync = { token: 'sync-conflict-e2e-token', device: { id: 987650 } };
+            const initialState = offline.getState();
+            initialState.sync = { token: 'sync-conflict-e2e-token', device: { id: 987650 } };
 
             const first = await offline.queueMutation('job', 'create', {
                 local_id: crypto.randomUUID(),
@@ -396,7 +396,10 @@ test.describe('Zazu installed PWA offline shell', () => {
                 record: { name: 'Discard this failed customer change' },
             });
 
-            state.conflicts = [
+            // queueMutation commits a replacement workspace object. Re-read the
+            // current state after queue writes instead of mutating a stale reference.
+            const currentState = offline.getState();
+            currentState.conflicts = [
                 {
                     id: 987651,
                     entity_type: 'job',
@@ -412,7 +415,7 @@ test.describe('Zazu installed PWA offline shell', () => {
                     status: 'open',
                 },
             ];
-            state.local_dirty = false;
+            currentState.local_dirty = false;
             await offline.persist();
 
             const db = await new Promise((resolve, reject) => {
@@ -681,7 +684,14 @@ test.describe('Zazu installed PWA offline shell', () => {
         test.setTimeout(60_000);
 
         await login(page);
-        await page.evaluate(async () => {
+        const businessDatabaseName = await page.evaluate(() => {
+            const businessId = Number(document.body.dataset.zazuBusinessId);
+            if (!Number.isSafeInteger(businessId) || businessId < 1) {
+                throw new Error('Authenticated page did not expose its active business ID');
+            }
+            return 'zazu-client-business-' + businessId;
+        });
+        await page.evaluate(async databaseName => {
             await window.ZazuOffline.ready;
             await window.ZazuOffline.queueMutation('customer', 'create', {
                 local_id: crypto.randomUUID(),
@@ -692,9 +702,10 @@ test.describe('Zazu installed PWA offline shell', () => {
             // pending mutation would legitimately auto-sync during the reload
             // and make the fixture depend on server timing.
             const db = await new Promise((resolve, reject) => {
-                const request = indexedDB.open('zazu-client-business-' + document.body.dataset.zazuBusinessId, 1);
+                const request = indexedDB.open(databaseName, 1);
                 request.onsuccess = () => resolve(request.result);
                 request.onerror = () => reject(request.error || new Error('Could not open local offline storage'));
+                request.onblocked = () => reject(new Error('Local offline storage remains blocked by another open connection'));
             });
             await new Promise((resolve, reject) => {
                 const tx = db.transaction(['mutations'], 'readwrite');
@@ -710,7 +721,7 @@ test.describe('Zazu installed PWA offline shell', () => {
                 tx.onabort = () => reject(tx.error || new Error('Offline mutation transaction aborted'));
             });
             db.close();
-        });
+        }, businessDatabaseName);
 
         let confirmDiscard = false;
         const confirmMessages = [];
@@ -734,9 +745,10 @@ test.describe('Zazu installed PWA offline shell', () => {
         await expect.poll(() => new URL(page.url()).pathname).toBe('/dashboard');
         await expect.poll(() => confirmMessages.length).toBe(1);
         expect(confirmMessages[0]).toContain('rejected/failed change(s)');
-        const queueCount = () => page.evaluate(() => new Promise((resolve, reject) => {
-            const request = indexedDB.open('zazu-client-business-' + document.body.dataset.zazuBusinessId, 1);
+        const queueCount = () => page.evaluate(databaseName => new Promise((resolve, reject) => {
+            const request = indexedDB.open(databaseName, 1);
             request.onerror = () => reject(request.error || new Error('Could not inspect offline queue'));
+            request.onblocked = () => reject(new Error('Offline queue inspection was blocked by another open connection'));
             request.onsuccess = () => {
                 const db = request.result;
                 const tx = db.transaction(['mutations'], 'readonly');
@@ -762,9 +774,10 @@ test.describe('Zazu installed PWA offline shell', () => {
             page.evaluate(() => document.querySelector('form[action$="/logout"]').requestSubmit()),
         ]);
 
-        const localData = await page.evaluate(() => new Promise((resolve, reject) => {
-            const request = indexedDB.open('zazu-client-business-' + document.body.dataset.zazuBusinessId, 1);
+        const localData = await page.evaluate(databaseName => new Promise((resolve, reject) => {
+            const request = indexedDB.open(databaseName, 1);
             request.onerror = () => reject(request.error || new Error('Could not inspect local offline storage'));
+            request.onblocked = () => reject(new Error('Local offline storage inspection was blocked by another open connection'));
             request.onsuccess = () => {
                 const db = request.result;
                 const tx = db.transaction(['state', 'mutations'], 'readonly');
@@ -780,7 +793,7 @@ test.describe('Zazu installed PWA offline shell', () => {
                 };
                 tx.onerror = () => reject(tx.error || new Error('Could not inspect local offline state'));
             };
-        }));
+        }), businessDatabaseName);
 
         expect(localData.tokenPresent).toBe(false);
         expect(localData.queueCount).toBe(0);
