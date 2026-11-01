@@ -1,8 +1,8 @@
 # Zazu EMP — V1 Software / Commercial Status
 
-**Assessment date:** 2026-10-07
+**Assessment date:** 2026-11-01
 **Repository:** `Leano-Jordan/ZazuEMP`  
-**Current main HEAD observed by Director:** `90f3dee6d5ec2011db668bf3647fcd007f03218e`
+**Current main HEAD observed by Director:** `5f4d7f3767ed79a095a5644107000f0dcaa2566f` (before this status-document reconciliation)
 
 ## Current position
 
@@ -32,14 +32,14 @@ The product is **not yet release-certified**. The current main line contains a b
 | Progressive disclosure | PARTIAL / FOUNDATION — hierarchical navigation already exists; the workspace-focus screen now uses a native disclosure for secondary experience detail. Wider page-by-page adoption remains future iteration. |
 | Command palette | IMPLEMENTED — global workspace search / quick access is present. |
 | Niche-specific dashboard emphasis | PARTIAL — selected niche now appears in workspace context and dashboard copy; deeper niche-specific surfacing is not yet implemented. |
-| Full offline business-data operation | PARTIAL / IN PROGRESS — IndexedDB local store + durable queue + reconnect sync now cover customer/job/service/preparation/supplier/purchasing/receiving/quote/acceptance/invoice/payment/expense/inventory/cost/assets; attachment synchronization, explicit conflict handling and full disconnected parity remain open. |
+| Full offline business-data operation | PARTIAL / IN PROGRESS — IndexedDB local store + durable queue + reconnect sync now cover customer/job/service/preparation/supplier/purchasing/receiving/quote/acceptance/invoice/payment/expense/inventory/cost/assets; offline attachment synchronization and full disconnected parity remain open; explicit sync-conflict review and retry/discard controls are implemented at source. |
 | Online/offline parity | DIRECTION ACTIVE — the phone workspace is now a real local operational surface; it is not yet a complete disconnected replacement for every desktop workflow. |
 | Local host / Wi-Fi clients | NOT IMPLEMENTED — remains an architecture target, not a current capability. |
 | Historical infrastructure/capacity claims | EXCLUDED — not treated as requirements without repository or measured evidence. |
 
 ## Current-head verification boundary
 
-The last proven application baseline was `92730f7cb660ae06d9df3c014eccf4f0d3e9188e`. The current application candidate is `aa1e3ca8921625abca16fe4bbc8546746b4bf135`; later commits are documentation/control updates. Fresh runtime certification of that application candidate is still not observed through the repository connector.
+The last proven application baseline was `92730f7cb660ae06d9df3c014eccf4f0d3e9188e`. The previously recorded candidate `aa1e3ca8921625abca16fe4bbc8546746b4bf135` is historical and must not be presented as the current application head. Subsequent source changes and the latest attachment retrieval correction require fresh exact-head Actions reconciliation. This status page is not a substitute for that run evidence.
 
 ## Release-critical work remaining
 
@@ -119,3 +119,12 @@ Remaining attachment gate: prove the browser/device flow against a real populate
 ### Offline attachment integration correction — 2026-11-01
 
 The earlier phone-local attachment transfer note is not a verified active feature. Current-main inspection shows `/offline-attachments.js` is precached but is not loaded by the authenticated application layout and expects legacy globals absent from the current app shell. The Work screen supports online job attachments only. Phone-local attachment queueing/upload/download remains **NOT IMPLEMENTED** until the component is properly integrated and covered by browser/device tests. See `docs/ZAZU_OFFLINE_FIRST_ARCHITECTURE.md`.
+
+
+### Current Director reconciliation — 2026-11-01
+
+- The Work attachment panel now exposes the existing private download endpoint alongside Remove. The endpoint retains the `work.view` permission and controller business-isolation checks.
+- A feature regression now checks that the Work page renders the download link and that an authorized user receives the private file download. A separate existing regression continues to reject foreign-business attachment downloads.
+- These changes are committed to canonical `main`; their exact-head Laravel/quality/browser execution is **PENDING**. No current-head test pass is claimed here.
+- The active phone PWA still does not load the legacy offline attachment script. Offline attachment queue/upload/download remains **NOT IMPLEMENTED** in the active app. Do not confuse online Work attachment retrieval with offline phone attachment parity.
+- Stable HTTPS local-PC hosting, origin migration, disconnected installed-device launch, full offline parity, populated backup/restore, rollback and legal/privacy/brand closure remain open release gates.
