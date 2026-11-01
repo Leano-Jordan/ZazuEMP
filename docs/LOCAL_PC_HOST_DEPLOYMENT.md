@@ -46,7 +46,7 @@ If the router cannot provide local DNS, use the reserved LAN IP as the host name
 
 ## 4. Server runtime
 
-Use the existing Windows PHP/Apache stack where it is already installed and maintained (the owner's AMPPS environment is the first candidate), configured as a proper Apache virtual host with the Laravel `public/` directory as document root.
+Select a persistent Windows host stack only after comparing the actual installed runtimes, HTTPS support and service-recovery capabilities. AMPPS is installed on the owner's PC but was not used to run Zazu; it is an unselected candidate, not the assumed or preferred host. The observed Zazu development runtime is standalone PHP 8.4 running `php artisan serve`. Any selected host must provide PHP 8.4+, the required extensions, a supported auto-start/recovery mechanism, HTTPS, durable database storage and private-file storage. AMPPS's bundled PHP runtime must not be treated as compatible merely because its Apache executable is present.
 
 Requirements:
 
@@ -60,7 +60,7 @@ Requirements:
 - Runtime logs rotate and have a documented location.
 - No development server, debug mode or demo credentials are used for customer runtime.
 
-Do not configure a production database until the existing customer data, current database driver and AMPPS service layout have been inspected. Do not replace or recreate an existing database as part of host setup.
+Do not configure a production database until the existing customer data, current database driver, selected host's database layout and service lifecycle have been inspected. Do not replace or recreate an existing database as part of host setup.
 
 ## 5. Stable HTTPS on a private LAN
 
@@ -116,7 +116,7 @@ The host must not depend on an interactive VS Code terminal or a user rememberin
 - Document a safe shutdown/restart procedure.
 - Verify that closing VS Code, closing the browser and signing out of the Windows desktop do not stop the host services.
 
-Do not add a custom background PowerShell service wrapper until the actual AMPPS installation and service names are inspected. Avoid running two competing Apache/PHP servers on the same ports.
+Do not add a custom background PowerShell service wrapper until the selected web-server binary, service registration, startup behavior and recovery mechanism are inspected. Avoid running two competing Apache/PHP servers on the same ports.
 
 ## 8. Backup and storage
 
@@ -201,7 +201,7 @@ Interpretation:
 Next read-only inspection when the PC is available:
 
 - Identify PID 10268's full executable path, command line and parent process.
-- Inspect AMPPS version, Apache configuration and service registration.
+- Evaluate available Windows web-server/PHP candidates, including AMPPS only as an installed-but-unused option; verify PHP 8.4 compatibility and service support before selection.
 - Identify the actual database driver, executable, data directory and service/start mechanism used by the current Zazu environment.
 - Compare PHP CLI with the PHP module/FastCGI runtime Apache would use.
 - Confirm the current database and private attachment paths, backup destination, and Windows ESU/security update state.
