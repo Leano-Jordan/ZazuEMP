@@ -265,19 +265,7 @@ class SyncController extends Controller
 
             $mutationStatus = $mutation?->status;
             if ($lockedConflict->conflict_type === 'mutation_identity_mismatch') {
-                if ($mutation && $mutation->status === 'pending') {
-                    $mutation->update([
-                        'status' => 'discarded',
-                        'last_error' => 'Superseded by a new mutation identifier after payload mismatch.',
-                    ]);
-                }
-
-                // The server-owned mutation ID is immutable. Retrying the local
-                // edited payload must create a fresh ID; the original applied
-                // mutation, if any, remains untouched.
-                $mutationStatus = $validated['action'] === 'retry'
-                    ? 'new_mutation_required'
-                    : 'discarded';
+                $mutationStatus = $this->resolveMutationIdentityMismatch($mutation, $validated['action']);
             } elseif ($validated['action'] === 'retry') {
                 abort_unless($mutation, 404);
                 $mutation->update([
@@ -304,6 +292,19 @@ class SyncController extends Controller
                 'mutation_status' => $mutationStatus,
             ]);
         });
+    }
+
+    private function resolveMutationIdentityMismatch(?SyncMutation $mutation, string $action): string
+    {
+        if ($mutation && $mutation->status === 'pending') {
+            $mutation->update([
+                'status' => 'discarded',
+                'last_error' => 'Superseded by a new mutation identifier after payload mismatch.',
+            ]);
+        }
+
+        // Keep an applied original immutable. A retry receives a new local ID.
+        return $action === 'retry' ? 'new_mutation_required' : 'discarded';
     }
 
     private function conflictPayload(SyncConflict $conflict): array
