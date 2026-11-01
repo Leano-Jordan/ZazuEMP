@@ -532,3 +532,5 @@ The purchase_order_receipts table stores only the business, purchase order and i
 - No database/schema changes, no branch, and no attachment storage permissions were broadened.
 
 - Follow-up refinement: added a rendered Work-screen assertion to the positive download regression, so it checks both that the download link is present and that the private file endpoint returns a download response. Tidied the Blade action markup. Follow-up commits: `56cf37bdf4f49c25f6cd06507af8a06b61a2626d` and `2ff49d6b0853f08cc9f5a539f49fe3583e660136`, direct to `main`.
+
+- Reconciled `docs/ZAZU_V1_STATUS.md` on 2026-11-01: corrected stale assessment date/head, clarified that the old application candidate is historical, corrected the conflict-control status, and recorded the online attachment-download fix separately from still-unimplemented offline attachment transfer. The page now explicitly leaves exact-head CI pending and does not reuse historical green runs.
