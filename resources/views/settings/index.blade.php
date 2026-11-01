@@ -407,7 +407,6 @@
                         conflictStatus.textContent = error.message || 'Could not retry this saved change.';
                     } finally {
                         setBusy(false);
-                        await renderOfflineConflicts();
                     }
                 });
 
@@ -422,7 +421,6 @@
                         conflictStatus.textContent = error.message || 'Could not discard this saved change.';
                     } finally {
                         setBusy(false);
-                        await renderOfflineConflicts();
                     }
                 });
 

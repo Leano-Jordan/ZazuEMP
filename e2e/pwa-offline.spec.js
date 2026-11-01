@@ -211,6 +211,132 @@ test.describe('Zazu installed PWA offline shell', () => {
         expect(jobMutation.payload.services).toEqual(['Catering']);
     });
 
+    test('paired device can retry or discard a failed offline sync change', async ({ page }, testInfo) => {
+        test.setTimeout(30_000);
+        test.skip(testInfo.project.name !== 'chromium', 'Sync conflict controls run once; responsive layouts are covered by the settings suite.');
+
+        await login(page);
+        await page.goto('/settings', { waitUntil: 'domcontentloaded' });
+        await page.evaluate(() => window.ZazuOffline.ready);
+
+        const fixture = await page.evaluate(async () => {
+            const offline = window.ZazuOffline;
+            const state = offline.getState();
+            state.sync = { token: 'sync-conflict-e2e-token', device: { id: 987650 } };
+
+            const first = await offline.queueMutation('job', 'create', {
+                local_id: crypto.randomUUID(),
+                record: { name: 'Retry this failed Work change' },
+            });
+            const second = await offline.queueMutation('customer', 'create', {
+                local_id: crypto.randomUUID(),
+                record: { name: 'Discard this failed customer change' },
+            });
+
+            state.conflicts = [
+                {
+                    id: 987651,
+                    entity_type: 'job',
+                    entity_id: first.entity_id,
+                    message: 'The related customer is not available on the server yet.',
+                    status: 'open',
+                },
+                {
+                    id: 987652,
+                    entity_type: 'customer',
+                    entity_id: second.entity_id,
+                    message: 'This customer change needs review.',
+                    status: 'open',
+                },
+            ];
+            state.local_dirty = false;
+            await offline.persist();
+
+            const db = await new Promise((resolve, reject) => {
+                const request = indexedDB.open('zazu-client', 1);
+                request.onsuccess = () => resolve(request.result);
+                request.onerror = () => reject(request.error || new Error('Could not open offline storage'));
+            });
+            await new Promise((resolve, reject) => {
+                const tx = db.transaction(['mutations'], 'readwrite');
+                const store = tx.objectStore('mutations');
+                store.put({ ...first, status: 'failed', conflict_id: 987651, last_error: 'Related customer missing' });
+                store.put({ ...second, status: 'failed', conflict_id: 987652, last_error: 'Review required' });
+                tx.oncomplete = resolve;
+                tx.onerror = () => reject(tx.error || new Error('Could not stage failed sync records'));
+                tx.onabort = () => reject(tx.error || new Error('Failed sync staging was aborted'));
+            });
+            db.close();
+            window.dispatchEvent(new CustomEvent('zazu:offline-state-updated'));
+
+            return { firstId: first.id, secondId: second.id };
+        });
+
+        const resolutions = [];
+        await page.route('**/api/sync/conflicts/*/resolve', async route => {
+            const requestUrl = new URL(route.request().url());
+            const conflictId = Number(requestUrl.pathname.split('/').slice(-2, -1)[0]);
+            const body = route.request().postDataJSON();
+            resolutions.push({ conflictId, action: body.action });
+            await route.fulfill({
+                status: 200,
+                contentType: 'application/json',
+                body: JSON.stringify({
+                    conflict: { id: conflictId, status: 'resolved' },
+                    mutation_status: body.action === 'retry' ? 'pending' : 'discarded',
+                }),
+            });
+        });
+        await page.route('**/api/sync/push', route => route.fulfill({
+            status: 503,
+            contentType: 'application/json',
+            body: JSON.stringify({ message: 'Sync server unavailable for this test.' }),
+        }));
+
+        await expect(page.locator('[data-zazu-offline-conflicts]')).toBeVisible();
+        await expect(page.locator('[data-zazu-offline-conflict-list] article')).toHaveCount(2);
+
+        await page.getByRole('button', { name: 'Retry sync' }).first().click();
+        await expect.poll(() => resolutions.length).toBe(1);
+        await expect.poll(() => page.locator('[data-zazu-offline-conflict-list] article').count()).toBe(1);
+
+        const retryQueue = await page.evaluate(async () => window.ZazuOffline.pending());
+        expect(retryQueue).toHaveLength(1);
+        expect(retryQueue[0].id).toBe(fixture.firstId);
+        expect(retryQueue[0].status).toBe('pending');
+        expect(retryQueue[0].conflict_id).toBeUndefined();
+
+        page.once('dialog', dialog => dialog.accept());
+        await page.getByRole('button', { name: 'Discard change' }).click();
+        await expect.poll(() => resolutions.length).toBe(2);
+        await expect.poll(() => page.locator('[data-zazu-offline-conflicts]').isVisible()).toBe(false);
+
+        const remaining = await page.evaluate(async () => {
+            const db = await new Promise((resolve, reject) => {
+                const request = indexedDB.open('zazu-client', 1);
+                request.onsuccess = () => resolve(request.result);
+                request.onerror = () => reject(request.error || new Error('Could not open offline storage'));
+            });
+            const records = await new Promise((resolve, reject) => {
+                const tx = db.transaction(['mutations'], 'readonly');
+                const request = tx.objectStore('mutations').getAll();
+                tx.oncomplete = () => resolve(request.result || []);
+                tx.onerror = () => reject(tx.error || new Error('Could not inspect offline queue'));
+            });
+            db.close();
+            return records;
+        });
+
+        expect(resolutions).toEqual([
+            { conflictId: 987651, action: 'retry' },
+            { conflictId: 987652, action: 'discard' },
+        ]);
+        expect(remaining).toHaveLength(1);
+        expect(remaining[0].id).toBe(fixture.firstId);
+        expect(remaining[0].status).toBe('pending');
+        expect(remaining.some(item => item.id === fixture.secondId)).toBe(false);
+    });
+
     test('offline logout keeps local data when the server cannot end the web session', async ({ page, context }, testInfo) => {
         test.setTimeout(20_000);
         test.skip(testInfo.project.name !== 'chromium', 'Disconnected logout contract runs once; viewport behaviour is covered elsewhere.');
