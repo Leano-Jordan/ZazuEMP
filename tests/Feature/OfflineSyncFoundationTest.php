@@ -2135,6 +2135,74 @@ class OfflineSyncFoundationTest extends TestCase
         ]);
     }
 
+    public function test_changed_mutation_replay_becomes_a_conflict_and_retries_with_a_new_identity(): void
+    {
+        $business = Business::create([
+            'name' => 'Mutation Replay Conflict Business',
+            'slug' => 'mutation-replay-conflict-'.Str::lower(Str::random(8)),
+            'status' => 'active',
+            'currency' => 'ZAR',
+        ]);
+        $device = SyncDevice::create([
+            'business_id' => $business->id,
+            'installation_id' => (string) Str::uuid(),
+            'status' => 'active',
+        ]);
+
+        $mutationId = (string) Str::uuid();
+        $entityId = (string) Str::uuid();
+        $recorder = app(SyncMutationRecorder::class);
+        $original = $recorder->record(
+            $device,
+            'customer',
+            $entityId,
+            'create',
+            ['local_id' => $entityId, 'record' => ['name' => 'Original customer']],
+            $mutationId,
+        );
+        $original->update(['status' => 'applied', 'applied_at' => now()]);
+
+        $request = Request::create('/api/sync/push', 'POST', [
+            'mutations' => [[
+                'id' => $mutationId,
+                'entity_type' => 'customer',
+                'entity_id' => $entityId,
+                'operation' => 'create',
+                'payload' => [
+                    'local_id' => $entityId,
+                    'record' => ['name' => 'Edited customer'],
+                ],
+            ]],
+        ]);
+        $request->attributes->set('sync_device', $device);
+
+        $controller = app(SyncController::class);
+        $response = $controller->push(
+            $request,
+            $recorder,
+            app(SyncMutationApplier::class),
+            app(OfflineDomainMutationHandler::class),
+            app(SyncConflictRecorder::class),
+        );
+        $recorded = $response->getData(true)['recorded'][0];
+        $conflict = \App\Models\SyncConflict::query()->findOrFail($recorded['conflict_id']);
+
+        $this->assertSame('mutation_identity_mismatch', $recorded['conflict_type']);
+        $this->assertSame('pending', $recorded['status']);
+        $this->assertSame('Edited customer', $conflict->local_payload['payload']['record']['name']);
+        $this->assertSame('Original customer', $conflict->remote_payload['payload']['record']['name']);
+
+        $resolveRequest = Request::create('/api/sync/conflicts/'.$conflict->id.'/resolve', 'POST', [
+            'action' => 'retry',
+        ]);
+        $resolveRequest->attributes->set('sync_device', $device);
+        $resolved = $controller->resolveConflict($resolveRequest, $conflict);
+
+        $this->assertSame('new_mutation_required', $resolved->getData(true)['mutation_status']);
+        $this->assertSame('applied', $original->fresh()->status);
+        $this->assertSame('resolved', $conflict->fresh()->status);
+    }
+
     public function test_sync_push_returns_server_identity_for_new_offline_record(): void
     {
         $business = Business::create([
