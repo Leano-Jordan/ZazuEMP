@@ -38,7 +38,7 @@ final class SyncConflictResolutionService
 
         if ($lockedConflict->status !== 'open') {
             return response()->json([
-                'conflict' => $this->conflictPayload($lockedConflict),
+                'conflict' => $this->payload($lockedConflict),
                 'mutation_status' => $this->resolvedConflictMutationStatus($lockedConflict, $mutation),
             ]);
         }
@@ -57,7 +57,7 @@ final class SyncConflictResolutionService
         ]);
 
         return response()->json([
-            'conflict' => $this->conflictPayload($lockedConflict->fresh()),
+            'conflict' => $this->payload($lockedConflict->fresh()),
             'mutation_status' => $mutationStatus,
         ]);
     }
