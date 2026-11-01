@@ -307,6 +307,87 @@
         return revokeDeviceToken(token);
     }
 
+    async function resolveConflict(conflictId, action, note = null) {
+        await ready;
+
+        const id = Number(conflictId);
+        if (!Number.isSafeInteger(id) || id < 1) {
+            throw new Error('A valid sync conflict is required.');
+        }
+        if (!['retry', 'discard'].includes(action)) {
+            throw new Error('Choose whether to retry or discard the saved change.');
+        }
+        if (sessionCleared || !state?.sync?.token) {
+            throw new Error('Pair this device with Zazu before resolving its sync conflicts.');
+        }
+
+        const queued = await allMutations();
+        if (!queued.some(item => Number(item.conflict_id) === id)) {
+            throw new Error('The saved offline change could not be found on this device. Refresh the sync state before resolving it.');
+        }
+
+        const response = await api('/api/sync/conflicts/' + id + '/resolve', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ action, note }),
+        });
+        const result = await response.json().catch(() => ({}));
+        if (!response.ok) {
+            throw new Error(result.message || 'Zazu could not resolve this offline sync conflict.');
+        }
+
+        const db = await openDb();
+        await new Promise((resolve, reject) => {
+            const tx = db.transaction([STATE, QUEUE], 'readwrite');
+            const store = tx.objectStore(QUEUE);
+            const all = store.getAll();
+
+            tx.oncomplete = resolve;
+            tx.onerror = () => reject(tx.error || new Error('Offline conflict resolution could not be saved locally.'));
+            tx.onabort = () => reject(tx.error || new Error('Offline conflict resolution transaction was aborted.'));
+
+            all.onsuccess = () => {
+                const mutation = (all.result || []).find(item => Number(item.conflict_id) === id);
+                if (mutation && action === 'retry') {
+                    const retry = { ...mutation, status: 'pending' };
+                    delete retry.conflict_id;
+                    delete retry.server_sequence;
+                    delete retry.server_status;
+                    delete retry.last_error;
+                    store.put(retry);
+                } else if (mutation) {
+                    store.delete(mutation.id);
+                }
+
+                const pendingCount = store.index('status').count('pending');
+                pendingCount.onsuccess = () => {
+                    const nextState = {
+                        ...state,
+                        conflicts: (state.conflicts || []).map(conflict =>
+                            Number(conflict.id) === id ? { ...conflict, status: 'resolved' } : conflict
+                        ),
+                        local_dirty: pendingCount.result > 0,
+                    };
+                    tx.objectStore(STATE).put(nextState, 'current');
+                    tx.oncomplete = () => {
+                        state = nextState;
+                        window.dispatchEvent(new CustomEvent('zazu:offline-state-updated'));
+                    };
+                };
+                pendingCount.onerror = () => tx.abort();
+            };
+            all.onerror = () => tx.abort();
+        });
+
+        if (action === 'retry') {
+            sync().catch(() => {
+                if (state) state.last_sync_error = 'The saved change is queued for retry when Zazu reconnects.';
+            });
+        }
+
+        return result;
+    }
+
     sessionChannel?.addEventListener('message', event => {
         if (event.data?.type !== 'clear-session') return;
 
@@ -483,6 +564,7 @@
         state.local_dirty = (await pending()).length > 0;
         if (sessionCleared || !state?.sync?.token) return;
         await writeState();
+        window.dispatchEvent(new CustomEvent('zazu:offline-state-updated'));
     }
 
     async function pull() {
@@ -624,6 +706,7 @@
         sync,
         assessLogout,
         clearLocalSession,
+        resolveConflict,
         refreshBootstrap,
         persist: writeState,
         pending,

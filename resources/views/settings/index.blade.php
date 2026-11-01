@@ -309,6 +309,13 @@
         </div>
     </section>
 
+    <section class="zazu-context-card mt-4" data-zazu-offline-conflicts hidden>
+        <div class="zazu-context-title">Offline sync exceptions</div>
+        <p class="zazu-context-copy mt-1">These changes were saved on this device but need attention before they can sync. Fix the underlying issue before retrying, or discard a change you no longer need.</p>
+        <div class="grid gap-3 mt-4" data-zazu-offline-conflict-list></div>
+        <p class="zazu-field-help mt-3" data-zazu-offline-conflict-status role="status" aria-live="polite"></p>
+    </section>
+
     <section class="zazu-context-card mt-4" data-zazu-backup-controls>
         <div class="zazu-context-title">Backup &amp; recovery</div>
         <div class="zazu-context-copy">Create a portable Zazu backup containing the database and private business files. Restore is owner-only and replaces the current business database and private files.</div>
@@ -338,6 +345,100 @@
     document.addEventListener('DOMContentLoaded', () => {
         const pairingButton = document.querySelector('[data-zazu-generate-pairing]');
         const pairingResult = document.querySelector('[data-zazu-pairing-result]');
+
+        const conflictSection = document.querySelector('[data-zazu-offline-conflicts]');
+        const conflictList = document.querySelector('[data-zazu-offline-conflict-list]');
+        const conflictStatus = document.querySelector('[data-zazu-offline-conflict-status]');
+
+        const renderOfflineConflicts = async () => {
+            const offline = window.ZazuOffline;
+            if (!conflictSection || !conflictList || !offline) return;
+
+            await offline.ready;
+            const conflicts = (offline.getState()?.conflicts || [])
+                .filter(conflict => conflict.status === 'open');
+
+            conflictList.replaceChildren();
+            conflictSection.hidden = !offline.isPaired() || conflicts.length === 0;
+            if (conflicts.length === 0) return;
+
+            for (const conflict of conflicts) {
+                const row = document.createElement('article');
+                row.className = 'zazu-list-item';
+
+                const details = document.createElement('div');
+                details.className = 'min-w-0 flex-1';
+
+                const title = document.createElement('strong');
+                title.className = 'block';
+                title.textContent = (conflict.entity_type || 'Offline change') + ' · ' + (conflict.entity_id || 'record');
+
+                const message = document.createElement('p');
+                message.className = 'zazu-context-copy mt-1';
+                message.textContent = conflict.message || 'The server rejected this saved change.';
+
+                details.append(title, message);
+
+                const actions = document.createElement('div');
+                actions.className = 'flex flex-wrap gap-2 mt-3';
+
+                const retry = document.createElement('button');
+                retry.type = 'button';
+                retry.className = 'zazu-btn zazu-btn-secondary';
+                retry.textContent = 'Retry sync';
+
+                const discard = document.createElement('button');
+                discard.type = 'button';
+                discard.className = 'zazu-btn zazu-btn-ghost';
+                discard.textContent = 'Discard change';
+
+                const setBusy = (busy) => {
+                    retry.disabled = busy;
+                    discard.disabled = busy;
+                };
+
+                retry.addEventListener('click', async () => {
+                    setBusy(true);
+                    conflictStatus.textContent = 'Returning the saved change to the sync queue…';
+                    try {
+                        await offline.resolveConflict(conflict.id, 'retry');
+                        conflictStatus.textContent = 'Retry queued. Zazu will sync it now or when the connection returns.';
+                    } catch (error) {
+                        conflictStatus.textContent = error.message || 'Could not retry this saved change.';
+                    } finally {
+                        setBusy(false);
+                        await renderOfflineConflicts();
+                    }
+                });
+
+                discard.addEventListener('click', async () => {
+                    if (!window.confirm('Discard this saved offline change? This cannot be undone.')) return;
+                    setBusy(true);
+                    conflictStatus.textContent = 'Discarding the saved change…';
+                    try {
+                        await offline.resolveConflict(conflict.id, 'discard');
+                        conflictStatus.textContent = 'Saved change discarded.';
+                    } catch (error) {
+                        conflictStatus.textContent = error.message || 'Could not discard this saved change.';
+                    } finally {
+                        setBusy(false);
+                        await renderOfflineConflicts();
+                    }
+                });
+
+                actions.append(retry, discard);
+                details.append(actions);
+                row.append(details);
+                conflictList.append(row);
+            }
+        };
+
+        renderOfflineConflicts().catch(() => {
+            if (conflictSection) conflictSection.hidden = true;
+        });
+        window.addEventListener('zazu:offline-state-updated', () => {
+            renderOfflineConflicts().catch(() => {});
+        });
 
         pairingButton?.addEventListener('click', async () => {
             pairingButton.disabled = true;
