@@ -71,6 +71,17 @@ test.describe('Zazu installed PWA offline shell', () => {
         await page.locator('input[name="primary_contact_name"]').fill('Mandla Dlamini');
         await page.locator('input[name="primary_contact_phone"]').fill('0123456789');
         await page.locator('input[name="primary_contact_email"]').fill('mandla@example.test');
+        await page.locator('input[name="legal_name"]').fill('Mandla Events');
+        await page.locator('input[name="registration_number"]').fill('2026/12345');
+        await page.locator('input[name="tax_number"]').fill('TAX-7788');
+        await page.locator('input[name="vat_number"]').fill('VAT-1122');
+        await page.locator('textarea[name="billing_address"]').fill('12 Market Street, Pretoria');
+        await page.locator('input[name="day_contact_name"]').fill('Day Coordinator');
+        await page.locator('input[name="day_contact_phone"]').fill('0123456788');
+        await page.locator('input[name="day_contact_email"]').fill('day@example.test');
+        await page.locator('input[name="night_contact_name"]').fill('Night Coordinator');
+        await page.locator('input[name="night_contact_phone"]').fill('0123456787');
+        await page.locator('input[name="night_contact_email"]').fill('night@example.test');
         await page.getByRole('button', { name: 'Save customer' }).click();
 
         await expect(page.getByText('Saved on this device. It will sync automatically when Zazu reconnects.')).toBeVisible();
@@ -81,6 +92,50 @@ test.describe('Zazu installed PWA offline shell', () => {
         expect(queued[0].payload.contact_name).toBe('Mandla Dlamini');
         expect(queued[0].payload.phone).toBe('0123456789');
         expect(queued[0].payload.email).toBe('mandla@example.test');
+        expect(queued[0].payload.legal_name).toBe('Mandla Events');
+        expect(queued[0].payload.registration_number).toBe('2026/12345');
+        expect(queued[0].payload.tax_number).toBe('TAX-7788');
+        expect(queued[0].payload.vat_number).toBe('VAT-1122');
+        expect(queued[0].payload.billing_address).toBe('12 Market Street, Pretoria');
+        expect(queued[0].payload.day_contact_name).toBe('Day Coordinator');
+        expect(queued[0].payload.day_contact_phone).toBe('0123456788');
+        expect(queued[0].payload.day_contact_email).toBe('day@example.test');
+        expect(queued[0].payload.night_contact_name).toBe('Night Coordinator');
+        expect(queued[0].payload.night_contact_phone).toBe('0123456787');
+        expect(queued[0].payload.night_contact_email).toBe('night@example.test');
+    });
+
+    test('does not claim an offline customer photo was saved when only metadata can be queued', async ({ page }, testInfo) => {
+        test.setTimeout(20_000);
+        test.skip(testInfo.project.name !== 'chromium', 'Offline file boundary contract runs once.');
+
+        await login(page);
+        await page.goto('/customers/create', { waitUntil: 'domcontentloaded' });
+        await page.evaluate(() => window.ZazuOffline.ready);
+        await page.route('**/customers/create*', async route => {
+            if (route.request().method() === 'HEAD') {
+                await route.abort('failed');
+                return;
+            }
+            await route.continue();
+        });
+
+        await page.locator('input[name="name"]').fill('Photo boundary customer');
+        await page.locator('input[name="primary_contact_name"]').fill('Photo Contact');
+        await page.locator('input[name="profile_photo"]').setInputFiles({
+            name: 'profile.png',
+            mimeType: 'image/png',
+            buffer: Buffer.from('offline-photo-fixture'),
+        });
+
+        const dialog = page.waitForEvent('dialog');
+        await page.getByRole('button', { name: 'Save customer' }).click();
+        const alert = await dialog;
+        expect(alert.message()).toContain('Customer profile photos need a connection');
+        await alert.accept();
+
+        await expect(page.getByRole('button', { name: 'Save customer' })).toBeEnabled();
+        expect(await page.evaluate(async () => window.ZazuOffline.pending())).toHaveLength(0);
     });
 
     test('offline logout keeps local data when the server cannot end the web session', async ({ page, context }, testInfo) => {
