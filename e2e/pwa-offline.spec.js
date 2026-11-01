@@ -174,17 +174,28 @@ test.describe('Zazu installed PWA offline shell', () => {
         const selector = page.locator('select[name="customer_id"]');
         await expect(selector.locator('option[value^="local:"]')).toHaveCount(1);
         await selector.selectOption({ label: 'Local only linked customer' });
+        await page.locator('input[name="event_type"][value="Wedding"]').check();
+        await page.locator('input[name="event_date"]').fill('2026-11-15');
+        await page.locator('input[name="event_address"]').fill('Pretoria');
+        await page.locator('input[name="services[]"][value="Catering"]').check();
         await page.route('**/work/create*', async route => {
             if (route.request().method() === 'HEAD') await route.abort('failed');
             else await route.continue();
         });
         await page.locator('input[name="name"]').fill('Offline job for local customer');
-        await page.getByRole('button', { name: /Create work/i }).click();
+        await page.getByRole('button', { name: /Create job/i }).click();
 
         await expect(page.getByText('Saved on this device. It will sync automatically when Zazu reconnects.')).toBeVisible();
         const queued = await page.evaluate(async () => window.ZazuOffline.pending());
-        expect(queued.map(item => item.entity_type)).toEqual(['customer', 'job']);
-        expect(queued[1].payload.customer_local_id).toBe(queued[0].payload.local_id);
+        const customerMutation = queued.find(item => item.entity_type === 'customer');
+        const jobMutation = queued.find(item => item.entity_type === 'job');
+        expect(customerMutation).toBeTruthy();
+        expect(jobMutation).toBeTruthy();
+        expect(jobMutation.payload.customer_local_id).toBe(customerMutation.payload.local_id);
+        expect(jobMutation.payload.event_type).toBe('Wedding');
+        expect(jobMutation.payload.event_date).toBe('2026-11-15');
+        expect(jobMutation.payload.event_address).toBe('Pretoria');
+        expect(jobMutation.payload.services).toEqual(['Catering']);
     });
 
     test('offline logout keeps local data when the server cannot end the web session', async ({ page, context }, testInfo) => {
