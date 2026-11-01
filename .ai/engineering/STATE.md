@@ -519,3 +519,14 @@ The purchase_order_receipts table stores only the business, purchase order and i
 - Deployment plan updated with these findings and the next read-only inspection checklist. No local services, firewall, router, DNS, certificates, database or files were changed.
 - Latest observed main SHA at review: `2c984a71724fe8aebaf57cbb777fa029ca45ec12`. Exact-head workflows: Laravel PASS, Zazu quality PASS, PHPMD PASS, populated upgrade/rollback PASS, Psalm security PASS, browser smoke PASS, push checks PASS; SonarCloud SKIPPED.
 - Remaining work: inspect exact PHP server process and AMPPS Apache/database layout, determine active DB driver/data paths and backup target, verify Windows security-update/ESU state, then design a safe deployment plan. No host configuration until these are known.
+
+
+## Director attachment retrieval defect — 2026-11-01
+
+- Expanded the audit beyond the offline host work into the active Work attachment workflow.
+- **Defect found:** the Work attachment panel displayed uploaded filenames and a Remove action, but omitted the already-implemented authorized download route. Users could store files but had no download control in the normal job screen.
+- Fixed `resources/views/work/attachments.blade.php` to expose a Download action using the existing `work.attachments.download` route. No public file URL was introduced; the route retains the `work.view` permission and controller business-boundary checks.
+- Added a positive feature regression in `tests/Feature/BusinessIsolationTest.php` verifying an authorized user can download their own private job attachment. Existing foreign-business download rejection remains intact.
+- Commits: `7a4ea84f214f3766bcecf4ea3a7f76a2a8f0c51f` (UI) and `f626522b5043549617e6a4689f695afb79c4f53d` (test), both directly on `main`.
+- Verification status: source and test committed; PHPUnit/CI execution on this exact head is pending. Do not mark the defect runtime-verified until the Laravel workflow passes.
+- No database/schema changes, no branch, and no attachment storage permissions were broadened.
