@@ -422,3 +422,33 @@ The connected Render workspace was inspected and currently has no Zazu EMP web s
 5. Test logout, user switching, queue preservation, conflict handling and attachment recovery on the installed device.
 
 **Current disposition:** source regression coverage expanded; production hosting and physical disconnected-device proof remain **OPEN**. Zazu is offline-first by architecture, but complete disconnected parity and VS Code independence are not yet certified.
+
+## Director offline continuity and Work workflow update — 2026-11-01
+
+### Host reachability versus browser connectivity
+
+Marked offline forms now probe the actual same-origin Zazu endpoint with a short timeout. If the network interface reports online but the Zazu host cannot respond, supported forms use the device-local mutation queue instead of attempting a normal Laravel POST. This covers the case where Wi-Fi remains connected but the PC-hosted development server has stopped. A reachable origin retains the normal server-rendered Laravel flow.
+
+### Atomic local persistence
+
+The local mutation queue, the `local_dirty` marker and the staged optimistic workspace copy are now written in one IndexedDB read/write transaction over the state and mutations stores. The client adopts the new in-memory state only after transaction completion. A transaction failure therefore cannot intentionally leave the queue and displayed working copy diverged. The service-worker cache was advanced to `zazu-static-v25` because the offline client is precached.
+
+### Offline customer and Work records
+
+Customer creation now carries the supported text profile, including primary/day/night contacts and billing/registration/tax fields. A profile-photo upload is rejected with a clear message while disconnected; the client does not claim an unqueued file was saved.
+
+The Work form resolves a selected server-backed or phone-local customer to its stable local UUID. Phone-local customer options are added to the customer selector from IndexedDB. A queued Work mutation includes that UUID, job type/date/address, optional selected server contact IDs and service selections. On synchronization, the server resolves the customer UUID within the paired device's business, stores the actual customer foreign key and snapshots primary contact data, then creates the selected service requirements.
+
+The sync dependency sorter recognizes `customer_local_id`, so a batch submitted with a Work mutation before its local customer is reordered to apply the customer first. Unknown or cross-business customer identities are rejected and retained as traceable conflicts.
+
+### Pairing bootstrap
+
+The owner settings screen previously requested a pairing code with `selection: []`, while the provisioning endpoint interpreted that as an intentionally empty selection. Pairing now treats an empty selection as the default bounded working set: up to 25 recent customers, 25 jobs, 25 quotes and 25 preparation records. Each is selected through active-business queries and receives a stable local identity. Job records carry their customer local identity; quote and preparation records carry their parent job identity. The settings page discloses the initial business data copied to the trusted paired phone.
+
+The bootstrap remains bounded rather than mirroring the entire database. Supporting catalogues, suppliers, purchase orders, invoices, expenses, inventory, assets and costs remain capped in the controller.
+
+### Evidence and limits
+
+The source changes and focused regression cases are implemented. Current-main CI/E2E remains unverified until the exact resulting SHA completes Laravel, Quality, browser, PHPMD, Psalm and populated upgrade/rollback. A browser regression is not a substitute for an installed-device test.
+
+This work does **not** certify complete offline parity. Still open: every V1 screen's disconnected read/write parity, complete bidirectional reconciliation, attachment/private-file offline parity, real conflict-resolution recovery, fresh installed-app launch while both PC and internet are unavailable, stable HTTPS hosting with durable storage, and customer-environment backup/restore/rollback.
