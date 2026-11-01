@@ -344,30 +344,27 @@
             throw new Error('Local offline storage is unavailable; this change was not saved.');
         }
 
+        if (sessionCleared) {
+            throw new Error('This device session has been signed out. Sign in and pair the device again before making offline changes.');
+        }
+
         return new Promise((resolve, reject) => {
-            let settled = false;
-            const fail = (error) => {
-                if (settled) return;
-                settled = true;
-                reject(error);
-            };
-            const tx = db.transaction(QUEUE, 'readwrite');
+            const nextState = { ...state, local_dirty: true };
+            const tx = db.transaction([STATE, QUEUE], 'readwrite');
             tx.objectStore(QUEUE).put(mutation);
-            tx.oncomplete = async () => {
-                try {
-                    state.local_dirty = true;
-                    await writeState();
-                    if (!settled) {
-                        settled = true;
-                        resolve(mutation);
-                    }
-                } catch (error) {
-                    storageAvailable = false;
-                    fail(new Error('Local offline storage failed while saving; this change may not be safely queued.'));
-                }
+            tx.objectStore(STATE).put(nextState, 'current');
+            tx.oncomplete = () => {
+                state = nextState;
+                resolve(mutation);
             };
-            tx.onerror = () => fail(tx.error || new Error('Local offline queue write failed.'));
-            tx.onabort = () => fail(tx.error || new Error('Local offline queue write was aborted.'));
+            tx.onerror = () => {
+                storageAvailable = false;
+                reject(tx.error || new Error('Local offline queue transaction failed.'));
+            };
+            tx.onabort = () => {
+                storageAvailable = false;
+                reject(tx.error || new Error('Local offline queue transaction was aborted.'));
+            };
         });
     }
 
