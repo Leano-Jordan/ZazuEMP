@@ -318,7 +318,7 @@
     });
 
 
-    async function queueMutation(entityType, operation, payload) {
+    async function queueMutation(entityType, operation, payload, nextState = null) {
         await ready;
         if (sessionCleared) {
             throw new Error('This device session has been signed out. Sign in and pair the device again before making offline changes.');
@@ -349,12 +349,12 @@
         }
 
         return new Promise((resolve, reject) => {
-            const nextState = { ...state, local_dirty: true };
+            const stateToPersist = { ...(nextState || state), local_dirty: true };
             const tx = db.transaction([STATE, QUEUE], 'readwrite');
             tx.objectStore(QUEUE).put(mutation);
-            tx.objectStore(STATE).put(nextState, 'current');
+            tx.objectStore(STATE).put(stateToPersist, 'current');
             tx.oncomplete = () => {
-                state = nextState;
+                state = stateToPersist;
                 resolve(mutation);
             };
             tx.onerror = () => {
