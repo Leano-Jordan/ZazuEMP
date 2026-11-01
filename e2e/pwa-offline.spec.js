@@ -194,7 +194,7 @@ test.describe('Zazu installed PWA offline shell', () => {
             }
             await route.continue();
         });
-        await page.locator('input[name="name"]').fill('Offline job for local customer');
+        await page.locator('#new-job-form input[name="name"]').fill('Offline job for local customer');
         await page.getByRole('button', { name: /Create job/i }).click();
 
         await expect(page.getByText('Saved on this device. It will sync automatically when Zazu reconnects.')).toBeVisible();
