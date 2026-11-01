@@ -347,7 +347,7 @@ class SyncController extends Controller
                 'description' => $validated['description'] ?? null,
                 'idempotency_key' => $validated['idempotency_key'],
             ]);
-        } catch (\\Throwable $exception) {
+        } catch (\Throwable $exception) {
             Storage::disk('private')->delete($path);
 
             // Another request may have won the unique idempotency-key insert.
