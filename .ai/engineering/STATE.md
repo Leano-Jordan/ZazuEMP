@@ -23,6 +23,18 @@ Entry files must point to the canonical contract and must not define a competing
 ## Control loop
 IDENTITY → BASELINE → TARGET → ROUTE → INSPECT → CHANGE → VERIFY → BREAK → RECONCILE → ACCEPT/REPAIR → RECORD → NEXT
 
+## Local PC host deployment cycle — 2026-11-01
+
+- Active deployment target: stable local HTTPS hostname → persistent Windows Apache/PHP host → local authoritative database/private storage → phone/tablet PWA clients.
+- No feature branches; all changes land directly on `main`.
+- Added `docs/LOCAL_PC_HOST_DEPLOYMENT.md` with the target topology, secure-origin design, Windows service requirements, network boundaries, backup plan, phases and acceptance gates.
+- Added `ops/windows/Inspect-ZazuHost.ps1`, a read-only inventory script. It must be run on the actual owner PC before touching AMPPS, Apache, database services, firewall, certificates or customer data.
+- Corrected `.env.example`: removed the explicit `SESSION_SECURE_COOKIE=false` override. `config/session.php` already defaults the cookie to secure when `APP_ENV=production`; the explicit false value would have defeated that production default in copied environments.
+- Rewrote `docs/LOAD_SHEDDING_MOBILE_TEST_RUNBOOK.md` to distinguish temporary Artisan/HTTP LAN testing from customer hosting and to reflect the current IndexedDB/offline mutation implementation rather than the obsolete static-cache-only description.
+- Source files were re-read after the writes. No PHP/Node test suite or Windows host inspection has been executed in this remote repository-only cycle.
+- Next remote gate: audit all origin-dependent code, service-worker registration/scope, generated URLs, cookie/CSRF behaviour and host availability/reconnect assumptions; add automated regression coverage where source evidence supports it.
+- Next physical gate: run the read-only host inspection, then select the existing Windows stack and configure it only after backup and compatibility checks.
+
 ## Active target
 **P0 active mission: finish VS Code-independent offline continuity; reconcile current-main offline/workflow CI; establish a durable HTTPS install origin; prove disconnected-device operation and recovery.**
 
