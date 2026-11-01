@@ -422,8 +422,20 @@ class OfflineSyncFoundationTest extends TestCase
                 'record' => [
                     'name' => 'Offline Customer',
                     'contact_name' => 'Mandla Dlamini',
+                    'legal_name' => 'Mandla Events',
+                    'registration_number' => '2026/12345',
+                    'tax_number' => 'TAX-7788',
+                    'vat_number' => 'VAT-1122',
+                    'billing_address' => '12 Market Street, Pretoria',
+                    'notes' => 'Prefers email contact.',
                     'phone' => '0123456789',
                     'email' => 'customer@example.test',
+                    'day_contact_name' => 'Day Coordinator',
+                    'day_contact_phone' => '0123456788',
+                    'day_contact_email' => 'day@example.test',
+                    'night_contact_name' => 'Night Coordinator',
+                    'night_contact_phone' => '0123456787',
+                    'night_contact_email' => 'night@example.test',
                 ],
             ],
             $mutationId,
@@ -444,6 +456,26 @@ class OfflineSyncFoundationTest extends TestCase
         $this->assertSame('Mandla Dlamini', $contact?->name);
         $this->assertSame('0123456789', $contact?->phone);
         $this->assertSame('customer@example.test', $contact?->email);
+
+        $customer = \App\Models\Customer::query()->where('business_id', $business->id)->where('name', 'Offline Customer')->firstOrFail();
+        $this->assertSame('Mandla Events', $customer->legal_name);
+        $this->assertSame('2026/12345', $customer->registration_number);
+        $this->assertSame('TAX-7788', $customer->tax_number);
+        $this->assertSame('VAT-1122', $customer->vat_number);
+        $this->assertSame('12 Market Street, Pretoria', $customer->billing_address);
+        $this->assertSame('Prefers email contact.', $customer->notes);
+
+        $dayContact = $customer->contacts()->where('label', 'Day')->first();
+        $this->assertSame('Day Coordinator', $dayContact?->name);
+        $this->assertSame('0123456788', $dayContact?->phone);
+        $this->assertSame('day@example.test', $dayContact?->email);
+        $this->assertFalse((bool) $dayContact?->is_primary);
+
+        $nightContact = $customer->contacts()->where('label', 'Night')->first();
+        $this->assertSame('Night Coordinator', $nightContact?->name);
+        $this->assertSame('0123456787', $nightContact?->phone);
+        $this->assertSame('night@example.test', $nightContact?->email);
+        $this->assertFalse((bool) $nightContact?->is_primary);
     }
 
     public function test_offline_preparation_create_and_status_update_are_business_scoped_and_idempotent(): void
