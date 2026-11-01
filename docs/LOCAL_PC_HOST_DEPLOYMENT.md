@@ -77,6 +77,22 @@ Acceptance requirements:
 
 A self-signed leaf certificate with a browser warning is not an acceptable workaround. A trusted certificate must be installed on each client device. Public ACME certificates are not the default for a private-only hostname.
 
+
+## 5A. Origin migration is a data migration
+
+The current client stores business workspaces in origin-scoped browser storage. The active workspace database is named `zazu-client-business-<business-id>`; the offline attachment queue is stored separately in `zazu-phone-attachments`. IndexedDB, Cache Storage, service-worker registrations and browser cookies are isolated by origin (scheme + host + port). Moving from `http://192.168.137.237:8000` to `https://zazu.home.arpa` therefore creates a **new, empty browser storage partition**. The old phone workspace, pending mutations, cached pages, attachment blobs and pairing session do not automatically move with it.
+
+Treat the cutover as a controlled data migration, not a URL change:
+
+1. Keep the old origin available while preparing the cutover. On each paired device, open Zazu on the old origin and confirm it has synchronized; inspect pending mutations, unresolved conflicts and queued attachments.
+2. Do not proceed with an old-origin device that has unsynchronized work or unresolved conflicts. Resolve/retry it while the old host is still available. If the old origin cannot be reached, preserve that browser profile and its storage; do not clear site data, uninstall the PWA or assume a fresh pairing recovers its local queue.
+3. Deploy the same business database and private files to the new host without recreating them. Back up first and verify the restored business identity and records.
+4. Open the new HTTPS origin, install/update the PWA, sign in and pair the device again. The new origin must bootstrap the expected business workspace from the authoritative server.
+5. Verify customer/job/quote/preparation counts and relationships, then create a harmless test mutation and confirm it syncs exactly once. Confirm attachments are present before retiring the old install.
+6. Retain the old origin/profile until all devices pass reconciliation. Only then retire the old endpoint. Never instruct users to clear browser storage as a migration step.
+
+**Release gate:** add a tested export/import or explicit migration mechanism before promising preservation of unsynchronized local-only work across an origin change. Until then, cutover is permitted only after old-origin queues, conflicts and attachment uploads are drained and verified. Server-backed records can be bootstrapped again; unsynchronized device-only data cannot be assumed recoverable from the new origin.
+
 ## 6. Network and security boundaries
 
 - Reserve the PC address in the router.
