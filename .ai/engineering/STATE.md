@@ -505,3 +505,17 @@ The purchase_order_receipts table stores only the business, purchase order and i
 - Local Windows PC host installation, stable HTTPS, installed-device disconnected launch, and physical reconnect/restore drills remain unverified.
 - Offline phone attachment upload/download is still NOT IMPLEMENTED in the active app. The standalone legacy script remains dormant and is not loaded into the authenticated layout.
 - No release-readiness score uplift is claimed from source changes alone.
+
+
+## Director local PC host inspection — 2026-11-01 22:24 +02:00
+
+- Owner supplied read-only output from `ops/windows/Inspect-ZazuHost.ps1` for the actual Zazu PC.
+- Windows 10 Pro build 19045; ESU/security-update enrollment and UBR remain unknown. Standard Windows 10 support ended 2025-10-14; do not certify this machine as a long-term host until its supported update state or OS migration is confirmed.
+- PHP CLI 8.4.26 satisfies `^8.4`; common required extensions including PDO MySQL and OpenSSL are present. Apache's PHP runtime still needs independent verification.
+- AMPPS exists under `C:\Program Files\Ampps`, but the inventory found no Apache/MySQL/MariaDB Windows services.
+- Only detected listener: PHP on `0.0.0.0:8000` (PID 10268). It is consistent with a development server; full executable/command line was not captured. Do not use it as permanent customer endpoint.
+- Current Wi-Fi address `192.168.137.237`, gateway/DNS `192.168.137.1`; require router DHCP reservation before stable hostname/certificate setup.
+- Project dependencies/assets are present; C: free space approximately 127.8 GB.
+- Deployment plan updated with these findings and the next read-only inspection checklist. No local services, firewall, router, DNS, certificates, database or files were changed.
+- Latest observed main SHA at review: `2c984a71724fe8aebaf57cbb777fa029ca45ec12`. Exact-head workflows: Laravel PASS, Zazu quality PASS, PHPMD PASS, populated upgrade/rollback PASS, Psalm security PASS, browser smoke PASS, push checks PASS; SonarCloud SKIPPED.
+- Remaining work: inspect exact PHP server process and AMPPS Apache/database layout, determine active DB driver/data paths and backup target, verify Windows security-update/ESU state, then design a safe deployment plan. No host configuration until these are known.
