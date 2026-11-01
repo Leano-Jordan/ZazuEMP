@@ -181,7 +181,7 @@ test.describe('Zazu installed PWA offline shell', () => {
         await page.locator('label.zazu-choice-card').filter({ has: page.locator('input[name="event_type"][value="Wedding"]') }).click();
         await page.locator('input[name="event_date"]').fill('2026-11-15');
         await page.locator('input[name="event_address"]').fill('Pretoria');
-        await page.locator('input[name="services[]"][value="Catering"]').check();
+        await page.locator('label.zazu-service-choice').filter({ has: page.locator('input[name="services[]"][value="Catering"]') }).click();
         let normalWorkPostAttempted = false;
         await page.route('**/work', async route => {
             if (route.request().method() === 'POST') {
