@@ -103,6 +103,14 @@ test.describe('Zazu installed PWA offline shell', () => {
         expect(queued[0].payload.night_contact_name).toBe('Night Coordinator');
         expect(queued[0].payload.night_contact_phone).toBe('0123456787');
         expect(queued[0].payload.night_contact_email).toBe('night@example.test');
+
+        await page.reload({ waitUntil: 'domcontentloaded' });
+        await page.evaluate(() => window.ZazuOffline.ready);
+        const restoredQueue = await page.evaluate(async () => window.ZazuOffline.pending());
+        expect(restoredQueue).toHaveLength(1);
+        expect(restoredQueue[0].id).toBe(queued[0].id);
+        expect(restoredQueue[0].payload.day_contact_name).toBe('Day Coordinator');
+        expect(restoredQueue[0].payload.night_contact_name).toBe('Night Coordinator');
     });
 
     test('does not claim an offline customer photo was saved when only metadata can be queued', async ({ page }, testInfo) => {
