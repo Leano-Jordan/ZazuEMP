@@ -547,7 +547,7 @@ class SyncController extends Controller
         foreach ($this->orderMutationsByDependencies($validated['mutations']) as $item) {
             try {
                 $mutation = $recorder->record($device, $item['entity_type'], $item['entity_id'], $item['operation'], $item['payload'] ?? [], $item['id']);
-            } catch (\\Symfony\\Component\\HttpKernel\\Exception\\HttpException $exception) {
+            } catch (\Symfony\Component\HttpKernel\Exception\HttpException $exception) {
                 if ($exception->getStatusCode() !== 409) {
                     throw $exception;
                 }
