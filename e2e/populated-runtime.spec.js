@@ -170,8 +170,9 @@ test.describe('Zazu populated runtime challenge', () => {
                 invoice_id: invoiceId,
                 amount: '8050.00',
                 method: 'bank_transfer',
-                paid_at: new Date().toISOString().slice(0, 10),
-                reference: 'DIRECTOR-REPLAY-001',
+                paid_at: new Date(Date.now() - (2 * 24 * 60 * 60 * 1000)).toISOString().slice(0, 10),
+                reference: 'BAL-ZAZU-DEMO-001',
+                notes: 'Demo final balance payment.',
             },
             maxRedirects: 0,
         });
