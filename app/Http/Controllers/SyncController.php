@@ -236,7 +236,7 @@ class SyncController extends Controller
             'note' => ['nullable', 'string', 'max:1000'],
         ]);
 
-        return $resolver->resolve($device, $conflict, $validated);
+        return ($resolver ?? app(\\App\\Support\\Offline\\SyncConflictResolutionService::class))->resolve($device, $conflict, $validated);
     }
 
     public function uploadAttachment(Request $request): JsonResponse
