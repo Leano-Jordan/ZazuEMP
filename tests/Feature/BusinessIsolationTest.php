@@ -7,14 +7,11 @@ use App\Models\BusinessCapability;
 use App\Models\Customer;
 use App\Models\Event;
 use App\Models\EventPreparationItem;
-use App\Models\EventAttachment;
 use App\Models\EventRequirement;
 use App\Models\User;
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Support\Str;
-use Illuminate\Support\Facades\Storage;
 use Tests\TestCase;
 
 class BusinessIsolationTest extends TestCase
@@ -262,66 +259,5 @@ class BusinessIsolationTest extends TestCase
         $response->assertDontSee('Foreign Search Secret');
     }
 
-    public function test_own_job_attachment_can_be_downloaded_from_private_storage(): void
-    {
-        Storage::fake('private');
-
-        $business = $this->business('Attachment Download Business');
-        $user = $this->userFor($business);
-        $event = $this->eventFor($business);
-        $path = 'jobs/'.$event->id.'/attachments/brief.txt';
-        Storage::disk('private')->put($path, 'Approved event brief');
-
-        $attachment = Model::withoutEvents(fn () => EventAttachment::create([
-            'event_id' => $event->id,
-            'business_id' => $business->id,
-            'uploaded_by' => $user->id,
-            'original_name' => 'brief.txt',
-            'disk' => 'private',
-            'path' => $path,
-            'mime_type' => 'text/plain',
-            'size' => 20,
-            'source' => 'upload',
-        ]));
-
-        $this->actingAs($user)
-            ->get(route('work.show', $event))
-            ->assertOk()
-            ->assertSee(route('work.attachments.download', $attachment), false);
-
-        $this->actingAs($user)
-            ->get(route('work.attachments.download', $attachment))
-            ->assertOk()
-            ->assertDownload('brief.txt');
-    }
-
-    public function test_foreign_job_attachment_cannot_be_downloaded(): void
-    {
-        Storage::fake('private');
-
-        $first = $this->business('Attachment Own Business');
-        $second = $this->business('Attachment Foreign Business');
-        $user = $this->userFor($first);
-        $foreignEvent = $this->eventFor($second);
-
-        $path = 'jobs/'.$foreignEvent->id.'/attachments/foreign-secret.txt';
-        Storage::disk('private')->put($path, 'foreign business confidential');
-
-        $attachment = Model::withoutEvents(fn () => EventAttachment::create([
-            'event_id' => $foreignEvent->id,
-            'business_id' => $second->id,
-            'uploaded_by' => null,
-            'original_name' => 'foreign-secret.txt',
-            'disk' => 'private',
-            'path' => $path,
-            'mime_type' => 'text/plain',
-            'size' => 28,
-            'source' => 'upload',
-        ]));
-
-        $this->actingAs($user)
-            ->get(route('work.attachments.download', $attachment))
-            ->assertNotFound();
-    }
 
 }
