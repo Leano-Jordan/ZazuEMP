@@ -173,6 +173,41 @@ Run the acceptance tests below, including host restart, internet-off/LAN-on, hos
 - Router DNS and private CA trust must be configured on the customer network/devices.
 - Cloud hosting may be offered later as an optional mode; it is not required for this local-host target.
 
+## 13. Read-only host inspection — 2026-11-01
+
+The owner supplied the output of `ops/windows/Inspect-ZazuHost.ps1`. This was a read-only inventory; no PC settings were changed.
+
+Observed:
+
+- Windows 10 Pro, build 19045, 64-bit. The output does not include the UBR/revision or confirm Windows 10 Extended Security Updates enrollment.
+- LAN interface: Wi-Fi, current address `192.168.137.237`, gateway/DNS `192.168.137.1`.
+- Standalone PHP CLI: `C:\PHP84\php.exe`, version 8.4.26. It satisfies the repository's PHP `^8.4` constraint.
+- Required common extensions observed include `openssl`, `pdo_mysql`, `mbstring`, `fileinfo`, `gd`, `intl`, `zip` and `curl`.
+- Composer 2.10.3, Node 26.10.0 and npm 12.1.0 are installed.
+- AMPPS is present under `C:\Program Files\Ampps`; its Apache, PHP and MySQL directories exist.
+- No Apache or MySQL/MariaDB Windows services were detected by the inventory.
+- The only detected web/database listener was PHP on `0.0.0.0:8000` (PID 10268), consistent with a development server. Process command line and executable path were not captured, so the exact launcher remains to be confirmed.
+- Project files, Composer vendor autoload, frontend manifest and `.env` are present.
+- C: has approximately 127.8 GB free.
+
+Interpretation:
+
+1. The host has a compatible PHP CLI, but the Apache-served PHP runtime still needs separate verification. CLI PHP does not prove Apache is using the same version/extensions.
+2. AMPPS being installed does not prove Apache or its database are installed as services, currently running, or configured for automatic startup.
+3. The current port 8000 listener is not an acceptable permanent host endpoint. Do not expose it as the customer endpoint.
+4. The current DHCP address must be reserved before relying on it for local DNS or certificate identity.
+5. Windows 10 Pro 22H2 reached end of standard support on 2025-10-14. Confirm the device's current security-update/ESU status or plan migration to a supported OS before treating it as a long-term customer host. See Microsoft's [Windows 10 lifecycle](https://learn.microsoft.com/en-us/lifecycle/products/windows-10-home-and-pro) and [ESU guidance](https://support.microsoft.com/en-us/windows/deployment/updates-lifecycle/windows-10-support-has-ended-on-october-14-2025).
+
+Next read-only inspection when the PC is available:
+
+- Identify PID 10268's full executable path, command line and parent process.
+- Inspect AMPPS version, Apache configuration and service registration.
+- Identify the actual database driver, executable, data directory and service/start mechanism used by the current Zazu environment.
+- Compare PHP CLI with the PHP module/FastCGI runtime Apache would use.
+- Confirm the current database and private attachment paths, backup destination, and Windows ESU/security update state.
+
+No Apache, database, firewall, router, certificate, DNS, or Windows service changes are authorized or implied by this inventory.
+
 ## 12. Current execution boundary
 
 Repository source and documentation can be prepared remotely. The actual PC, AMPPS services, router, certificate trust store and physical Android installation cannot be configured or certified from a GitHub-only session. Phase 0 must therefore be performed against the owner's actual Windows PC before any service, firewall, database or certificate changes are made.
