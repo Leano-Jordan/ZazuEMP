@@ -1095,17 +1095,58 @@ function setupZazuOfflineForms() {
             const get = (name) => String(formData.get(name) || '').trim();
             const localId = crypto.randomUUID();
             const getInputValue = (input) => String(input?.value || '').trim();
+            const releaseSubmitLock = () => {
+                const submit = form.querySelector('button[type="submit"], input[type="submit"]');
+                if (submit) {
+                    submit.disabled = false;
+                    submit.removeAttribute('aria-busy');
+                    if (submit.dataset.zazuSubmitLabel) {
+                        submit.textContent = submit.dataset.zazuSubmitLabel;
+                        delete submit.dataset.zazuSubmitLabel;
+                    }
+                }
+                delete form.dataset.zazuSubmitting;
+            };
 
             let payload;
             if (entity === 'customer') {
+                const profilePhoto = formData.get('profile_photo');
+                if (profilePhoto instanceof File && profilePhoto.size > 0) {
+                    releaseSubmitLock();
+                    window.alert('Customer profile photos need a connection. Save the customer details first, then upload the photo when Zazu is online.');
+                    return;
+                }
+
+                for (const period of ['day', 'night']) {
+                    const contactName = get(period + '_contact_name');
+                    const contactPhone = get(period + '_contact_phone');
+                    const contactEmail = get(period + '_contact_email');
+                    if ((contactPhone || contactEmail) && !contactName) {
+                        releaseSubmitLock();
+                        window.alert('Enter a ' + period + ' contact name before saving its phone number or email.');
+                        return;
+                    }
+                }
+
                 payload = {
                     local_id: localId,
                     server_id: null,
                     name: get('name'),
                     contact_name: get('primary_contact_name') || get('name'),
+                    legal_name: get('legal_name') || null,
+                    registration_number: get('registration_number') || null,
+                    tax_number: get('tax_number') || null,
+                    vat_number: get('vat_number') || null,
+                    billing_address: get('billing_address') || null,
                     notes: get('notes') || null,
                     phone: get('primary_contact_phone') || get('phone') || null,
                     email: get('primary_contact_email') || get('email') || null,
+                    day_contact_name: get('day_contact_name') || null,
+                    day_contact_phone: get('day_contact_phone') || null,
+                    day_contact_email: get('day_contact_email') || null,
+                    night_contact_name: get('night_contact_name') || null,
+                    night_contact_phone: get('night_contact_phone') || null,
+                    night_contact_email: get('night_contact_email') || null,
                 };
             } else if (entity === 'job') {
                 const customer = form.querySelector('[name="customer_id"]')?.selectedOptions?.[0];
