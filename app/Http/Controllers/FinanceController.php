@@ -265,6 +265,27 @@ class FinanceController extends Controller
                 ->first();
 
             if ($existingInvoice) {
+                abort_unless(
+                    $this->invoicePayloadMatches(
+                        $existingInvoice,
+                        $data,
+                        $event,
+                        $quoteVersionId,
+                        $currency,
+                        $subtotal,
+                        $tax,
+                        $total,
+                        $taxRateId,
+                        $taxCode,
+                        $taxLabel,
+                        $taxTreatment,
+                        $taxRate,
+                        $invoiceLines
+                    ),
+                    409,
+                    'This invoice key was already used for different invoice details. Refresh the form before retrying.'
+                );
+
                 $alreadyProcessed = true;
                 return $existingInvoice;
             }
@@ -343,6 +364,72 @@ class FinanceController extends Controller
             ->route('finance.invoices.show', $invoice)
             ->with('success', 'Invoice '.$invoice->number.' created.');
     }
+
+
+    /**
+     * @param array<string, mixed> $data
+     * @param array<int, array<string, mixed>> $invoiceLines
+     */
+    private function invoicePayloadMatches(
+        Invoice $invoice,
+        array $data,
+        ?Event $event,
+        ?int $quoteVersionId,
+        string $currency,
+        string $subtotal,
+        string $tax,
+        string $total,
+        ?int $taxRateId,
+        ?string $taxCode,
+        string $taxLabel,
+        string $taxTreatment,
+        string $taxRate,
+        array $invoiceLines
+    ): bool {
+        if (
+            (int) ($invoice->event_id ?? 0) !== (int) ($event?->id ?? 0)
+            || (int) ($invoice->quote_id ?? 0) !== (int) ($data['quote_id'] ?? 0)
+            || (int) ($invoice->quote_version_id ?? 0) !== (int) ($quoteVersionId ?? 0)
+            || strtoupper((string) $invoice->currency) !== strtoupper($currency)
+            || Money::toCents((string) $invoice->subtotal) !== Money::toCents($subtotal)
+            || Money::toCents((string) $invoice->tax_total) !== Money::toCents($tax)
+            || Money::toCents((string) $invoice->total) !== Money::toCents($total)
+            || (int) ($invoice->tax_rate_id ?? 0) !== (int) ($taxRateId ?? 0)
+            || $invoice->tax_code !== $taxCode
+            || $invoice->tax_label !== $taxLabel
+            || $invoice->tax_treatment !== $taxTreatment
+            || Money::toCents((string) $invoice->tax_rate) !== Money::toCents($taxRate)
+            || $invoice->issued_at?->toDateString() !== ($data['issued_at'] ?? now()->toDateString())
+            || $invoice->due_at?->toDateString() !== ($data['due_at'] ?? now()->addDays(7)->toDateString())
+            || $invoice->notes !== ($data['notes'] ?? null)
+        ) {
+            return false;
+        }
+
+        $existingLines = $invoice->items()->orderBy('id')->get();
+
+        if ($existingLines->count() !== count($invoiceLines)) {
+            return false;
+        }
+
+        foreach ($invoiceLines as $index => $line) {
+            $existing = $existingLines[$index];
+
+            if (
+                $existing->description !== $line['description']
+                || Money::toHundredths((string) $existing->quantity) !== Money::toHundredths((string) $line['quantity'])
+                || $existing->unit !== $line['unit']
+                || Money::toCents((string) $existing->unit_price) !== Money::toCents((string) $line['unit_price'])
+                || Money::toCents((string) $existing->line_total) !== Money::toCents((string) $line['line_total'])
+                || (int) ($existing->quote_item_id ?? 0) !== (int) ($line['quote_item_id'] ?? 0)
+            ) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
 
     public function showInvoice(Request $request, Invoice $invoice): View
     {
