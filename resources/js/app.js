@@ -1067,6 +1067,38 @@ async function canReachZazuOrigin() {
     }
 }
 
+function setupZazuOfflineCustomerOptions() {
+    const select = document.querySelector('select[name="customer_id"]');
+    if (!select || !window.ZazuOffline) return;
+
+    window.ZazuOffline.ready.then(() => {
+        const customers = window.ZazuOffline.getState()?.customers || [];
+
+        for (const customer of customers) {
+            const localId = customer.local_id;
+            if (!localId) continue;
+
+            const serverId = customer.server_id ?? customer.id;
+            const value = serverId !== null && serverId !== undefined
+                ? String(serverId)
+                : 'local:' + localId;
+            let option = [...select.options].find(item =>
+                item.value === value || item.dataset.zazuLocalId === localId
+            );
+
+            if (!option) {
+                option = new Option(customer.name || 'Saved offline customer', value);
+                select.add(option);
+            }
+
+            option.dataset.zazuLocalId = localId;
+            option.dataset.zazuOfflineCustomer = '1';
+        }
+    }).catch(() => {
+        // A customer selector enhancement must never prevent ordinary Work entry.
+    });
+}
+
 function setupZazuOfflineForms() {
     document.querySelectorAll('form[data-zazu-offline-entity]').forEach((form) => {
         if (form.dataset.zazuOfflineBound === '1') return;
@@ -1149,12 +1181,28 @@ function setupZazuOfflineForms() {
                     night_contact_email: get('night_contact_email') || null,
                 };
             } else if (entity === 'job') {
-                const customer = form.querySelector('[name="customer_id"]')?.selectedOptions?.[0];
+                const customerOption = form.querySelector('[name="customer_id"]')?.selectedOptions?.[0];
+                const customerValue = customerOption?.value || '';
+                const offlineState = window.ZazuOffline.getState();
+                const customer = customerValue
+                    ? offlineState?.customers?.find(item =>
+                        item.local_id === customerOption?.dataset.zazuLocalId
+                        || String(item.id ?? item.server_id ?? '') === customerValue
+                        || ('local:' + item.local_id) === customerValue
+                    )
+                    : null;
+
+                if (customerValue && !customer?.local_id) {
+                    window.alert('This customer is not available in the local Zazu copy yet. Reconnect and refresh the customer list before creating this job.');
+                    return;
+                }
+
                 payload = {
                     local_id: localId,
                     server_id: null,
                     name: get('name'),
-                    customer_name: customer && customer.value ? customer.textContent.trim() : (get('customer_name') || null),
+                    customer_local_id: customer?.local_id || null,
+                    customer_name: customer?.name || (customerOption && customerValue ? customerOption.textContent.trim() : (get('customer_name') || null)),
                     event_date: get('event_date') || null,
                     notes: get('notes') || null,
                 };
@@ -1774,6 +1822,7 @@ function handleZazuPhonePairing() {
 window.addEventListener('zazu:offline-ready', handleZazuPhonePairing);
 
 setupZazuOfflineForms();
+setupZazuOfflineCustomerOptions();
 
 function showZazuOfflineOriginNotice() {
     if (document.querySelector('[data-zazu-offline-origin-notice]')) return;
