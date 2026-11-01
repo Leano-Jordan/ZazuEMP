@@ -421,6 +421,7 @@ class OfflineSyncFoundationTest extends TestCase
                 'server_id' => null,
                 'record' => [
                     'name' => 'Offline Customer',
+                    'contact_name' => 'Mandla Dlamini',
                     'phone' => '0123456789',
                     'email' => 'customer@example.test',
                 ],
@@ -437,7 +438,12 @@ class OfflineSyncFoundationTest extends TestCase
         $this->assertSame('applied', $first->status);
         $this->assertSame($first->id, $second->id);
         $this->assertSame(1, \App\Models\Customer::query()->where('business_id', $business->id)->where('name', 'Offline Customer')->count());
-        $this->assertSame('0123456789', \App\Models\CustomerContact::query()->whereHas('customer', fn ($q) => $q->where('business_id', $business->id))->value('phone'));
+        $contact = \App\Models\CustomerContact::query()
+            ->whereHas('customer', fn ($q) => $q->where('business_id', $business->id))
+            ->first();
+        $this->assertSame('Mandla Dlamini', $contact?->name);
+        $this->assertSame('0123456789', $contact?->phone);
+        $this->assertSame('customer@example.test', $contact?->email);
     }
 
     public function test_offline_preparation_create_and_status_update_are_business_scoped_and_idempotent(): void
