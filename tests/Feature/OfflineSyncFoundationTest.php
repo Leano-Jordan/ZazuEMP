@@ -1635,6 +1635,84 @@ class OfflineSyncFoundationTest extends TestCase
         $controller->provision($makeRequest());
     }
 
+    public function test_empty_pairing_selection_bootstraps_a_bounded_offline_working_set_with_local_relationships(): void
+    {
+        $user = $this->signInAsOwner();
+        $business = $user->businesses()->firstOrFail();
+
+        $customer = \App\Models\Customer::create([
+            'business_id' => $business->id,
+            'name' => 'Offline Pairing Customer',
+            'legal_name' => 'Offline Pairing Events',
+        ]);
+        $customer->contacts()->create([
+            'name' => 'Primary Contact',
+            'phone' => '0123456789',
+            'email' => 'primary@example.test',
+            'label' => 'Primary',
+            'is_primary' => true,
+        ]);
+
+        $event = \App\Models\Event::create([
+            'business_id' => $business->id,
+            'customer_id' => $customer->id,
+            'reference' => 'PAIRING-001',
+            'name' => 'Offline Pairing Work',
+            'customer_name' => $customer->name,
+            'event_date' => now()->addDays(14)->toDateString(),
+            'status' => 'confirmed',
+        ]);
+        $quote = \App\Models\Quote::create([
+            'event_id' => $event->id,
+            'reference' => 'PAIRING-Q-001',
+            'status' => 'draft',
+            'currency' => 'ZAR',
+        ]);
+        $preparation = \App\Models\EventPreparationItem::create([
+            'business_id' => $business->id,
+            'event_id' => $event->id,
+            'title' => 'Confirm venue access',
+            'status' => 'pending',
+        ]);
+
+        $pairingRequest = Request::create('/settings/sync/pairing', 'POST', [
+            'expires_in_minutes' => 10,
+            'selection' => [],
+        ]);
+        $pairingRequest->setUserResolver(fn () => $user);
+
+        $pairingResponse = app(SyncController::class)->createPairing(
+            $pairingRequest,
+            app(\App\Support\CurrentBusiness::class),
+        );
+        $pairing = $pairingResponse->getData(true);
+        $this->assertSame(4, $pairing['selection_count']);
+
+        $device = SyncDevice::query()->where('business_id', $business->id)->latest('id')->firstOrFail();
+        $selectedTypes = collect($device->metadata['bootstrap_selection'])->pluck('type')->sort()->values()->all();
+        $this->assertSame(['customer', 'job', 'preparation', 'quote'], $selectedTypes);
+
+        $provisionResponse = app(SyncController::class)->provision(Request::create('/api/sync/provision', 'POST', [
+            'pairing_code' => $pairing['pairing_code'],
+            'device_name' => 'Owner phone',
+            'device_type' => 'phone',
+        ]));
+        $bootstrap = $provisionResponse->getData(true)['bootstrap'];
+        $selected = collect($bootstrap['selected']);
+
+        $customerRow = $selected->firstWhere('type', 'customer');
+        $jobRow = $selected->firstWhere('type', 'job');
+        $quoteRow = $selected->firstWhere('type', 'quote');
+        $preparationRow = $selected->firstWhere('type', 'preparation');
+
+        $this->assertSame('Primary Contact', $customerRow['record']['contact_name']);
+        $this->assertSame('0123456789', $customerRow['record']['phone']);
+        $this->assertSame($customerRow['local_id'], $jobRow['record']['customer_local_id']);
+        $this->assertSame($jobRow['local_id'], $quoteRow['record']['event_local_id']);
+        $this->assertSame($jobRow['local_id'], $preparationRow['record']['event_local_id']);
+        $this->assertSame($event->id, $preparation->event_id);
+    }
+
     public function test_sync_mutation_rejection_is_recorded_as_a_conflict_without_losing_queue_traceability(): void
     {
         $business = Business::create([
