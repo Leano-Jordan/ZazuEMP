@@ -399,8 +399,8 @@ class FinanceController extends Controller
             || $invoice->tax_label !== $taxLabel
             || $invoice->tax_treatment !== $taxTreatment
             || Money::toCents((string) $invoice->tax_rate) !== Money::toCents($taxRate)
-            || $invoice->issued_at?->toDateString() !== ($data['issued_at'] ?? now()->toDateString())
-            || $invoice->due_at?->toDateString() !== ($data['due_at'] ?? now()->addDays(7)->toDateString())
+            || (isset($data['issued_at']) && $invoice->issued_at?->toDateString() !== $data['issued_at'])
+            || (isset($data['due_at']) && $invoice->due_at?->toDateString() !== $data['due_at'])
             || $invoice->notes !== ($data['notes'] ?? null)
         ) {
             return false;
