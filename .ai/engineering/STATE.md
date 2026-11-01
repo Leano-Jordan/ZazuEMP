@@ -546,3 +546,5 @@ The purchase_order_receipts table stores only the business, purchase order and i
 - Script was committed directly to `main` as `f71fb703cf0565f8839bd7a197b18e9ce56d1f3e` and re-fetched from GitHub for content verification.
 - Runtime result: **PENDING owner execution**. The remote GitHub session cannot inspect the local Windows process table, AMPPS installation, actual `.env`, database files or ESU state.
 - Next gate: owner runs the deep inspection script from `C:\Projects\ZazuEMP` and returns its output. Use that evidence to choose the existing PHP/Apache/database runtime; do not configure services or certificates before the process and data paths are known.
+
+- Branch-policy reconciliation during this cycle: GitHub branch search exposed `main` plus existing Dependabot refs `dependabot/composer/laravel/framework-13.39.0` and `dependabot/composer/phpunit/phpunit-13.4.5`. No branch was created or used by this Director cycle. Treat both Dependabot refs as existing policy drift; do not work on or delete them without owner authorization.
