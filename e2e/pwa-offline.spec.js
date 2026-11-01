@@ -153,6 +153,40 @@ test.describe('Zazu installed PWA offline shell', () => {
         expect(await page.evaluate(async () => window.ZazuOffline.pending())).toHaveLength(0);
     });
 
+    test('links a phone-local customer to an offline Work record', async ({ page }, testInfo) => {
+        test.setTimeout(25_000);
+        test.skip(testInfo.project.name !== 'chromium', 'Offline customer-to-Work contract runs once.');
+
+        await login(page);
+        await page.goto('/customers/create', { waitUntil: 'domcontentloaded' });
+        await page.evaluate(() => window.ZazuOffline.ready);
+        await page.route('**/customers/create*', async route => {
+            if (route.request().method() === 'HEAD') await route.abort('failed');
+            else await route.continue();
+        });
+        await page.locator('input[name="name"]').fill('Local only linked customer');
+        await page.locator('input[name="primary_contact_name"]').fill('Local Customer Contact');
+        await page.getByRole('button', { name: 'Save customer' }).click();
+        await expect(page.getByText('Saved on this device. It will sync automatically when Zazu reconnects.')).toBeVisible();
+
+        await page.goto('/work/create', { waitUntil: 'domcontentloaded' });
+        await page.evaluate(() => window.ZazuOffline.ready);
+        const selector = page.locator('select[name="customer_id"]');
+        await expect(selector.locator('option[value^="local:"]')).toHaveCount(1);
+        await selector.selectOption({ label: 'Local only linked customer' });
+        await page.route('**/work/create*', async route => {
+            if (route.request().method() === 'HEAD') await route.abort('failed');
+            else await route.continue();
+        });
+        await page.locator('input[name="name"]').fill('Offline job for local customer');
+        await page.getByRole('button', { name: /Create work/i }).click();
+
+        await expect(page.getByText('Saved on this device. It will sync automatically when Zazu reconnects.')).toBeVisible();
+        const queued = await page.evaluate(async () => window.ZazuOffline.pending());
+        expect(queued.map(item => item.entity_type)).toEqual(['customer', 'job']);
+        expect(queued[1].payload.customer_local_id).toBe(queued[0].payload.local_id);
+    });
+
     test('offline logout keeps local data when the server cannot end the web session', async ({ page, context }, testInfo) => {
         test.setTimeout(20_000);
         test.skip(testInfo.project.name !== 'chromium', 'Disconnected logout contract runs once; viewport behaviour is covered elsewhere.');
