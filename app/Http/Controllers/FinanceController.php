@@ -370,6 +370,10 @@ class FinanceController extends Controller
      * @param array<string, mixed> $data
      * @param array<int, array<string, mixed>> $invoiceLines
      */
+    /**
+     * @param array<string, mixed> $data
+     * @param array<int, array<string, mixed>> $invoiceLines
+     */
     private function invoicePayloadMatches(
         Invoice $invoice,
         array $data,
@@ -386,26 +390,64 @@ class FinanceController extends Controller
         string $taxRate,
         array $invoiceLines
     ): bool {
-        if (
-            (int) ($invoice->event_id ?? 0) !== (int) ($event?->id ?? 0)
-            || (int) ($invoice->quote_id ?? 0) !== (int) ($data['quote_id'] ?? 0)
-            || (int) ($invoice->quote_version_id ?? 0) !== (int) ($quoteVersionId ?? 0)
-            || strtoupper((string) $invoice->currency) !== strtoupper($currency)
-            || Money::toCents((string) $invoice->subtotal) !== Money::toCents($subtotal)
-            || Money::toCents((string) $invoice->tax_total) !== Money::toCents($tax)
-            || Money::toCents((string) $invoice->total) !== Money::toCents($total)
-            || (int) ($invoice->tax_rate_id ?? 0) !== (int) ($taxRateId ?? 0)
-            || $invoice->tax_code !== $taxCode
-            || $invoice->tax_label !== $taxLabel
-            || $invoice->tax_treatment !== $taxTreatment
-            || Money::toCents((string) $invoice->tax_rate) !== Money::toCents($taxRate)
-            || (isset($data['issued_at']) && $invoice->issued_at?->toDateString() !== $data['issued_at'])
-            || (isset($data['due_at']) && $invoice->due_at?->toDateString() !== $data['due_at'])
-            || $invoice->notes !== ($data['notes'] ?? null)
-        ) {
-            return false;
-        }
+        return $this->invoiceContextMatches($invoice, $data, $event, $quoteVersionId, $currency)
+            && $this->invoiceTotalsMatch($invoice, $subtotal, $tax, $total, $taxRateId, $taxCode, $taxLabel, $taxTreatment, $taxRate)
+            && $this->invoiceDatesAndNotesMatch($invoice, $data)
+            && $this->invoiceItemsMatch($invoice, $invoiceLines);
+    }
 
+    /**
+     * @param array<string, mixed> $data
+     */
+    private function invoiceContextMatches(
+        Invoice $invoice,
+        array $data,
+        ?Event $event,
+        ?int $quoteVersionId,
+        string $currency
+    ): bool {
+        return (int) ($invoice->event_id ?? 0) === (int) ($event?->id ?? 0)
+            && (int) ($invoice->quote_id ?? 0) === (int) ($data['quote_id'] ?? 0)
+            && (int) ($invoice->quote_version_id ?? 0) === (int) ($quoteVersionId ?? 0)
+            && strtoupper((string) $invoice->currency) === strtoupper($currency);
+    }
+
+    private function invoiceTotalsMatch(
+        Invoice $invoice,
+        string $subtotal,
+        string $tax,
+        string $total,
+        ?int $taxRateId,
+        ?string $taxCode,
+        string $taxLabel,
+        string $taxTreatment,
+        string $taxRate
+    ): bool {
+        return Money::toCents((string) $invoice->subtotal) === Money::toCents($subtotal)
+            && Money::toCents((string) $invoice->tax_total) === Money::toCents($tax)
+            && Money::toCents((string) $invoice->total) === Money::toCents($total)
+            && (int) ($invoice->tax_rate_id ?? 0) === (int) ($taxRateId ?? 0)
+            && $invoice->tax_code === $taxCode
+            && $invoice->tax_label === $taxLabel
+            && $invoice->tax_treatment === $taxTreatment
+            && Money::toCents((string) $invoice->tax_rate) === Money::toCents($taxRate);
+    }
+
+    /**
+     * @param array<string, mixed> $data
+     */
+    private function invoiceDatesAndNotesMatch(Invoice $invoice, array $data): bool
+    {
+        return (! isset($data['issued_at']) || $invoice->issued_at?->toDateString() === $data['issued_at'])
+            && (! isset($data['due_at']) || $invoice->due_at?->toDateString() === $data['due_at'])
+            && $invoice->notes === ($data['notes'] ?? null);
+    }
+
+    /**
+     * @param array<int, array<string, mixed>> $invoiceLines
+     */
+    private function invoiceItemsMatch(Invoice $invoice, array $invoiceLines): bool
+    {
         $existingLines = $invoice->items()->orderBy('id')->get();
 
         if ($existingLines->count() !== count($invoiceLines)) {
@@ -413,16 +455,7 @@ class FinanceController extends Controller
         }
 
         foreach ($invoiceLines as $index => $line) {
-            $existing = $existingLines[$index];
-
-            if (
-                $existing->description !== $line['description']
-                || Money::toHundredths((string) $existing->quantity) !== Money::toHundredths((string) $line['quantity'])
-                || $existing->unit !== $line['unit']
-                || Money::toCents((string) $existing->unit_price) !== Money::toCents((string) $line['unit_price'])
-                || Money::toCents((string) $existing->line_total) !== Money::toCents((string) $line['line_total'])
-                || (int) ($existing->quote_item_id ?? 0) !== (int) ($line['quote_item_id'] ?? 0)
-            ) {
+            if (! $this->invoiceItemMatches($existingLines[$index], $line)) {
                 return false;
             }
         }
@@ -430,6 +463,18 @@ class FinanceController extends Controller
         return true;
     }
 
+    /**
+     * @param array<string, mixed> $line
+     */
+    private function invoiceItemMatches(\App\Models\InvoiceItem $existing, array $line): bool
+    {
+        return $existing->description === $line['description']
+            && Money::toHundredths((string) $existing->quantity) === Money::toHundredths((string) $line['quantity'])
+            && $existing->unit === $line['unit']
+            && Money::toCents((string) $existing->unit_price) === Money::toCents((string) $line['unit_price'])
+            && Money::toCents((string) $existing->line_total) === Money::toCents((string) $line['line_total'])
+            && (int) ($existing->quote_item_id ?? 0) === (int) ($line['quote_item_id'] ?? 0);
+    }
 
     public function showInvoice(Request $request, Invoice $invoice): View
     {
