@@ -229,12 +229,31 @@ class OfflineDomainMutationHandler implements SyncMutationHandler
             throw ValidationException::withMessages(['entity_id' => 'The offline job does not exist on the server.']);
         }
 
+        $customer = null;
+        $customerLocalId = $payload['customer_local_id'] ?? null;
+        if ($customerLocalId !== null && $customerLocalId !== '') {
+            $customer = $this->resolveIdentityRecord(
+                $mutation->business_id,
+                'customer',
+                $customerLocalId,
+                Customer::class,
+            );
+            if (! $customer instanceof Customer) {
+                throw ValidationException::withMessages([
+                    'customer_local_id' => 'The offline job references an unknown customer in this business.',
+                ]);
+            }
+        }
+
         $status = $event?->status ?: 'draft';
         $attributes = [
             'business_id' => $mutation->business_id,
+            'customer_id' => $customer?->id ?? $event?->customer_id,
             'reference' => $event?->reference ?: 'OFFLINE-'.strtoupper(substr($this->entityUuid($mutation), 0, 8)),
             'name' => $this->requiredString($payload['name'] ?? null, 'name', 255),
-            'customer_name' => $this->nullableString($payload['customer_name'] ?? null, 255),
+            'customer_name' => $customer?->name ?? $this->nullableString($payload['customer_name'] ?? null, 255),
+            'customer_phone' => $customer?->primaryContact?->phone ?? $event?->customer_phone,
+            'customer_email' => $customer?->primaryContact?->email ?? $event?->customer_email,
             'event_date' => $payload['event_date'] ?? null,
             'notes' => $this->nullableString($payload['notes'] ?? null, 5000),
             'status' => $status,
