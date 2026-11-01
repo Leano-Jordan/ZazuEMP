@@ -2,11 +2,24 @@
 # Does not start/stop services, edit files, inspect credentials, or change network settings.
 [CmdletBinding()]
 param(
-    [string]$ProjectPath = (Resolve-Path (Join-Path $PSScriptRoot '..\..')).Path,
+    [string]$ProjectPath,
     [int]$KnownPhpPid = 10268
 )
 
 $ErrorActionPreference = 'Continue'
+
+# Resolve the default only after script startup; parameter defaults can run before
+# $PSScriptRoot is populated in some Windows PowerShell invocation contexts.
+if ([string]::IsNullOrWhiteSpace($ProjectPath)) {
+    $scriptDirectory = $PSScriptRoot
+    if ([string]::IsNullOrWhiteSpace($scriptDirectory)) {
+        $scriptDirectory = Split-Path -Parent $PSCommandPath
+    }
+    if ([string]::IsNullOrWhiteSpace($scriptDirectory)) {
+        throw 'Cannot determine script directory. Run this file with -File or supply -ProjectPath.'
+    }
+    $ProjectPath = (Resolve-Path (Join-Path $scriptDirectory '..\\..')).Path
+}
 
 function Section([string]$Name) {
     Write-Output ""
