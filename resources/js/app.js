@@ -136,7 +136,10 @@ document.querySelectorAll('[data-zazu-print]').forEach((button) => {
 
 function setupZazuFormSubmissionGuards() {
     document.querySelectorAll('form').forEach((form) => {
-        if (form.dataset.zazuSubmitGuardBound === '1' || form.dataset.zazuNoSubmitGuard === '1') return;
+        // Offline forms own their async IndexedDB save lifecycle. The generic
+        // guard disables submitters synchronously before that handler can decide
+        // whether to queue, reject an attachment, or recover from a storage error.
+        if (form.hasAttribute('data-zazu-offline-entity') || form.dataset.zazuSubmitGuardBound === '1' || form.dataset.zazuNoSubmitGuard === '1') return;
 
         form.dataset.zazuSubmitGuardBound = '1';
 
