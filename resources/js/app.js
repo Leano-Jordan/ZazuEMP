@@ -1044,17 +1044,52 @@ async function restoreZazuAuthRoute() {
 
 window.addEventListener('popstate', restoreZazuAuthRoute);
 
+async function canReachZazuOrigin() {
+    const controller = new AbortController();
+    const timeout = window.setTimeout(() => controller.abort(), 1200);
+
+    try {
+        const response = await fetch(window.location.href, {
+            method: 'HEAD',
+            credentials: 'same-origin',
+            cache: 'no-store',
+            headers: { 'X-Zazu-Connectivity-Probe': '1' },
+            signal: controller.signal,
+        });
+
+        return response.status < 500;
+    } catch {
+        // navigator.onLine only describes the browser's network interface. The
+        // Zazu origin itself can still be unavailable while Wi-Fi remains up.
+        return false;
+    } finally {
+        window.clearTimeout(timeout);
+    }
+}
+
 function setupZazuOfflineForms() {
     document.querySelectorAll('form[data-zazu-offline-entity]').forEach((form) => {
         if (form.dataset.zazuOfflineBound === '1') return;
         form.dataset.zazuOfflineBound = '1';
 
         form.addEventListener('submit', async (event) => {
-            if (navigator.onLine || !window.ZazuOffline) return;
+            if (!window.ZazuOffline) return;
 
             event.preventDefault();
+            if (form.dataset.zazuOfflineSubmitting === '1') return;
+            form.dataset.zazuOfflineSubmitting = '1';
 
             try {
+                await window.ZazuOffline.ready;
+
+                if (navigator.onLine && await canReachZazuOrigin()) {
+                    delete form.dataset.zazuOfflineSubmitting;
+                    // Preserve the browser's normal Laravel form/redirect flow
+                    // after the origin has been confirmed reachable.
+                    HTMLFormElement.prototype.submit.call(form);
+                    return;
+                }
+
             const entity = form.dataset.zazuOfflineEntity;
             const formData = new FormData(form);
             const get = (name) => String(formData.get(name) || '').trim();
@@ -1067,9 +1102,10 @@ function setupZazuOfflineForms() {
                     local_id: localId,
                     server_id: null,
                     name: get('name'),
+                    contact_name: get('primary_contact_name') || get('name'),
                     notes: get('notes') || null,
-                    phone: get('phone') || null,
-                    email: get('email') || null,
+                    phone: get('primary_contact_phone') || get('phone') || null,
+                    email: get('primary_contact_email') || get('email') || null,
                 };
             } else if (entity === 'job') {
                 const customer = form.querySelector('[name="customer_id"]')?.selectedOptions?.[0];
@@ -1631,6 +1667,7 @@ function setupZazuOfflineForms() {
             }
             state.local_dirty = true;
             await window.ZazuOffline.persist();
+            form.dataset.zazuOfflineSaved = '1';
 
             const submit = form.querySelector('button[type="submit"], input[type="submit"]');
             if (submit) {
@@ -1665,6 +1702,10 @@ function setupZazuOfflineForms() {
                 notice.dataset.zazuOfflineSaveError = '1';
                 notice.textContent = 'Zazu could not confirm that this change was saved locally. Check the offline queue before trying again.';
                 form.prepend(notice);
+            } finally {
+                if (form.dataset.zazuOfflineSaved !== '1') {
+                    delete form.dataset.zazuOfflineSubmitting;
+                }
             }
         });
     });
