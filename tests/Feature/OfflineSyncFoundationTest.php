@@ -605,6 +605,79 @@ class OfflineSyncFoundationTest extends TestCase
         $this->assertSame('Other', $requirements['Cold room']->category);
     }
 
+    public function test_sync_push_orders_offline_job_after_its_customer_even_when_batch_is_reversed(): void
+    {
+        $business = Business::create([
+            'name' => 'Offline Customer Job Ordering',
+            'slug' => 'offline-customer-job-ordering-'.Str::lower(Str::random(8)),
+            'status' => 'active',
+            'currency' => 'ZAR',
+        ]);
+        $device = SyncDevice::create([
+            'business_id' => $business->id,
+            'installation_id' => (string) Str::uuid(),
+        ]);
+        $customerLocalId = (string) Str::uuid();
+        $jobLocalId = (string) Str::uuid();
+
+        $jobMutation = [
+            'id' => (string) Str::uuid(),
+            'entity_type' => 'job',
+            'entity_id' => $jobLocalId,
+            'operation' => 'create',
+            'payload' => [
+                'local_id' => $jobLocalId,
+                'record' => [
+                    'name' => 'Dependent offline job',
+                    'customer_local_id' => $customerLocalId,
+                    'event_type' => 'Wedding',
+                    'event_date' => now()->addDays(10)->toDateString(),
+                ],
+            ],
+        ];
+        $customerMutation = [
+            'id' => (string) Str::uuid(),
+            'entity_type' => 'customer',
+            'entity_id' => $customerLocalId,
+            'operation' => 'create',
+            'payload' => [
+                'local_id' => $customerLocalId,
+                'record' => [
+                    'name' => 'Dependency-created customer',
+                    'contact_name' => 'Primary Contact',
+                    'phone' => '0123456789',
+                ],
+            ],
+        ];
+
+        $request = Request::create('/api/sync/push', 'POST', [
+            'mutations' => [$jobMutation, $customerMutation],
+        ]);
+        $request->attributes->set('sync_device', $device);
+
+        $response = app(SyncController::class)->push(
+            $request,
+            app(SyncMutationRecorder::class),
+            app(SyncMutationApplier::class),
+            app(OfflineDomainMutationHandler::class),
+            app(SyncConflictRecorder::class),
+        );
+        $data = $response->getData(true);
+        $event = \App\Models\Event::query()
+            ->where('business_id', $business->id)
+            ->where('name', 'Dependent offline job')
+            ->firstOrFail();
+        $customer = \App\Models\Customer::query()
+            ->where('business_id', $business->id)
+            ->where('name', 'Dependency-created customer')
+            ->firstOrFail();
+
+        $this->assertCount(2, $data['applied']);
+        $this->assertSame($customer->id, $event->customer_id);
+        $this->assertSame('Dependency-created customer', $event->customer_name);
+        $this->assertSame([], array_filter($data['recorded'], fn (array $item) => $item['status'] !== 'applied'));
+    }
+
     public function test_offline_job_rejects_customer_identity_from_another_business(): void
     {
         $firstBusiness = Business::create([
