@@ -314,31 +314,49 @@ class OfflineDomainMutationHandler implements SyncMutationHandler
         ?Event $event,
     ): ?int {
         $field = 'event_'.$period.'_contact_id';
-        if (! array_key_exists($field, $payload) || $payload[$field] === null || $payload[$field] === '') {
-            $existingContactId = $event?->getAttribute($field);
-            if (! $customer || ! is_numeric($existingContactId)) {
-                return null;
-            }
+        $contactId = $payload[$field] ?? null;
 
-            return $customer->contacts()->whereKey((int) $existingContactId)->value('id')
-                ? (int) $existingContactId
-                : null;
+        if ($contactId === null || $contactId === '') {
+            return $this->existingOfflineJobContactId($customer, $event, $field);
         }
 
-        if (! $customer || ! is_numeric($payload[$field])) {
+        if (! $customer) {
             throw ValidationException::withMessages([
                 $field => 'The offline job contact must belong to its selected customer.',
             ]);
         }
 
-        $contactId = $customer->contacts()->whereKey((int) $payload[$field])->value('id');
-        if (! $contactId) {
+        return $this->selectedOfflineJobContactId($customer, $contactId, $field);
+    }
+
+    private function existingOfflineJobContactId(?Customer $customer, ?Event $event, string $field): ?int
+    {
+        $contactId = $event?->getAttribute($field);
+        if (! $customer || ! is_numeric($contactId)) {
+            return null;
+        }
+
+        $id = (int) $contactId;
+
+        return $customer->contacts()->whereKey($id)->exists() ? $id : null;
+    }
+
+    private function selectedOfflineJobContactId(Customer $customer, mixed $value, string $field): int
+    {
+        if (! is_numeric($value)) {
+            throw ValidationException::withMessages([
+                $field => 'The offline job contact must belong to its selected customer.',
+            ]);
+        }
+
+        $contactId = (int) $value;
+        if (! $customer->contacts()->whereKey($contactId)->exists()) {
             throw ValidationException::withMessages([
                 $field => 'The offline job contact does not belong to the selected customer.',
             ]);
         }
 
-        return (int) $contactId;
+        return $contactId;
     }
 
     /**
