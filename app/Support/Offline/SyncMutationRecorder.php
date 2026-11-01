@@ -40,13 +40,23 @@ class SyncMutationRecorder
 
             if ($existing) {
                 if (
-                    $existing->business_id !== $device->business_id
-                    || $existing->sync_device_id !== $device->id
+                    (int) $existing->business_id !== (int) $device->business_id
+                    || (int) $existing->sync_device_id !== (int) $device->id
                 ) {
                     throw ValidationException::withMessages([
                         'mutation_id' => 'The mutation identifier is already owned by another business or device.',
                     ]);
                 }
+
+                abort_unless(
+                    $existing->stream === $stream
+                        && $existing->entity_type === $entityType
+                        && $existing->entity_id === $entityId
+                        && $existing->operation === $operation
+                        && $this->canonicalizePayload($existing->payload ?? []) === $this->canonicalizePayload($payload),
+                    409,
+                    'This mutation identifier was already used for a different offline change. Keep the original change and create a new mutation.'
+                );
 
                 return $existing;
             }
@@ -84,6 +94,27 @@ class SyncMutationRecorder
 
             return $mutation;
         });
+    }
+
+    /**
+     * Sort associative payload keys recursively while preserving list order.
+     *
+     * @param array<mixed> $payload
+     * @return array<mixed>
+     */
+    private function canonicalizePayload(array $payload): array
+    {
+        if (! array_is_list($payload)) {
+            ksort($payload);
+        }
+
+        foreach ($payload as $key => $value) {
+            if (is_array($value)) {
+                $payload[$key] = $this->canonicalizePayload($value);
+            }
+        }
+
+        return $payload;
     }
 
     public function publish(SyncMutation $mutation): void
