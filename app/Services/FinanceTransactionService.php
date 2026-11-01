@@ -27,7 +27,15 @@ final class FinanceTransactionService
         return DB::transaction(function () use ($businessId, $data, $lifecycle): bool {
             $this->lockBusiness($businessId);
 
-            if ($this->paymentAlreadyProcessed($businessId, $data['idempotency_key'])) {
+            $existingPayment = $this->existingPayment($businessId, $data['idempotency_key']);
+
+            if ($existingPayment) {
+                abort_unless(
+                    $this->paymentPayloadMatches($existingPayment, $businessId, $data),
+                    409,
+                    'This payment key was already used for a different payment. Refresh the form before retrying.'
+                );
+
                 return true;
             }
 
@@ -128,12 +136,36 @@ final class FinanceTransactionService
         });
     }
 
-    private function paymentAlreadyProcessed(int $businessId, string $idempotencyKey): bool
+    private function existingPayment(int $businessId, string $idempotencyKey): ?Payment
     {
         return Payment::query()
             ->where('business_id', $businessId)
             ->where('idempotency_key', $idempotencyKey)
-            ->exists();
+            ->first();
+    }
+
+    /**
+     * @param array<string, mixed> $data
+     */
+    private function paymentPayloadMatches(Payment $payment, int $businessId, array $data): bool
+    {
+        $invoice = Invoice::query()
+            ->where('business_id', $businessId)
+            ->find($data['invoice_id']);
+
+        if (! $invoice) {
+            return false;
+        }
+
+        return (int) $payment->invoice_id === (int) $invoice->id
+            && (int) $payment->event_id === (int) $invoice->event_id
+            && strtoupper((string) $payment->currency) === strtoupper((string) $invoice->currency)
+            && $payment->type === ($data['type'] ?? 'payment')
+            && Money::toCents((string) $payment->amount) === Money::toCents((string) $data['amount'])
+            && $payment->method === $data['method']
+            && $payment->reference === ($data['reference'] ?? null)
+            && $payment->paid_at?->toDateString() === date('Y-m-d', strtotime((string) $data['paid_at']))
+            && $payment->notes === ($data['notes'] ?? null);
     }
 
     private function expenseAlreadyProcessed(int $businessId, string $idempotencyKey): bool
