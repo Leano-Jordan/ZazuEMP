@@ -404,7 +404,8 @@ test.describe('Zazu installed PWA offline shell', () => {
                     id: 987651,
                     entity_type: 'job',
                     entity_id: first.entity_id,
-                    message: 'The related customer is not available on the server yet.',
+                    conflict_type: 'mutation_identity_mismatch',
+                    message: 'This edited change needs a new mutation identity before retry.',
                     status: 'open',
                 },
                 {
@@ -449,7 +450,9 @@ test.describe('Zazu installed PWA offline shell', () => {
                 contentType: 'application/json',
                 body: JSON.stringify({
                     conflict: { id: conflictId, status: 'resolved' },
-                    mutation_status: body.action === 'retry' ? 'pending' : 'discarded',
+                    mutation_status: body.action === 'retry'
+                        ? (conflictId === 987651 ? 'new_mutation_required' : 'pending')
+                        : 'discarded',
                 }),
             });
         });
@@ -468,7 +471,8 @@ test.describe('Zazu installed PWA offline shell', () => {
 
         const retryQueue = await page.evaluate(async () => window.ZazuOffline.pending());
         expect(retryQueue).toHaveLength(1);
-        expect(retryQueue[0].id).toBe(fixture.firstId);
+        expect(retryQueue[0].id).not.toBe(fixture.firstId);
+        expect(retryQueue[0].entity_id).not.toBe('');
         expect(retryQueue[0].status).toBe('pending');
         expect(retryQueue[0].conflict_id).toBeUndefined();
 
@@ -498,7 +502,7 @@ test.describe('Zazu installed PWA offline shell', () => {
             { conflictId: 987652, action: 'discard' },
         ]);
         expect(remaining).toHaveLength(1);
-        expect(remaining[0].id).toBe(fixture.firstId);
+        expect(remaining[0].id).not.toBe(fixture.firstId);
         expect(remaining[0].status).toBe('pending');
         expect(remaining.some(item => item.id === fixture.secondId)).toBe(false);
     });
