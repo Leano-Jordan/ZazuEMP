@@ -1901,12 +1901,12 @@ class OfflineSyncFoundationTest extends TestCase
 
         // The default working set is live, not frozen at the moment the phone
         // is paired. New desktop-created records must arrive on the next bootstrap.
-        $newCustomer = \\App\\Models\\Customer::create([
+        $newCustomer = \App\Models\Customer::create([
             'business_id' => $business->id,
             'name' => 'Customer Added After Pairing',
             'legal_name' => 'Post Pairing Events',
         ]);
-        $newEvent = \\App\\Models\\Event::create([
+        $newEvent = \App\Models\Event::create([
             'business_id' => $business->id,
             'customer_id' => $newCustomer->id,
             'reference' => 'PAIRING-002',
@@ -1915,13 +1915,13 @@ class OfflineSyncFoundationTest extends TestCase
             'event_date' => now()->addDays(21)->toDateString(),
             'status' => 'confirmed',
         ]);
-        $newQuote = \\App\\Models\\Quote::create([
+        $newQuote = \App\Models\Quote::create([
             'event_id' => $newEvent->id,
             'reference' => 'PAIRING-Q-002',
             'status' => 'draft',
             'currency' => 'ZAR',
         ]);
-        \\App\\Models\\EventPreparationItem::create([
+        \App\Models\EventPreparationItem::create([
             'business_id' => $business->id,
             'event_id' => $newEvent->id,
             'title' => 'New post-pairing preparation',
@@ -1949,7 +1949,7 @@ class OfflineSyncFoundationTest extends TestCase
         $explicitPairingRequest->setUserResolver(fn () => $user);
         $explicitPairing = app(SyncController::class)->createPairing(
             $explicitPairingRequest,
-            app(\\App\\Support\\CurrentBusiness::class),
+            app(\App\Support\CurrentBusiness::class),
         )->getData(true);
 
         $explicitDevice = SyncDevice::query()->where('business_id', $business->id)->latest('id')->firstOrFail();
