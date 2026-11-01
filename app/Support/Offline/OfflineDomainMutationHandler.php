@@ -315,7 +315,14 @@ class OfflineDomainMutationHandler implements SyncMutationHandler
     ): ?int {
         $field = 'event_'.$period.'_contact_id';
         if (! array_key_exists($field, $payload) || $payload[$field] === null || $payload[$field] === '') {
-            return $event?->getAttribute($field);
+            $existingContactId = $event?->getAttribute($field);
+            if (! $customer || ! is_numeric($existingContactId)) {
+                return null;
+            }
+
+            return $customer->contacts()->whereKey((int) $existingContactId)->value('id')
+                ? (int) $existingContactId
+                : null;
         }
 
         if (! $customer || ! is_numeric($payload[$field])) {
