@@ -534,3 +534,15 @@ The purchase_order_receipts table stores only the business, purchase order and i
 - Follow-up refinement: added a rendered Work-screen assertion to the positive download regression, so it checks both that the download link is present and that the private file endpoint returns a download response. Tidied the Blade action markup. Follow-up commits: `56cf37bdf4f49c25f6cd06507af8a06b61a2626d` and `2ff49d6b0853f08cc9f5a539f49fe3583e660136`, direct to `main`.
 
 - Reconciled `docs/ZAZU_V1_STATUS.md` on 2026-11-01: corrected stale assessment date/head, clarified that the old application candidate is historical, corrected the conflict-control status, and recorded the online attachment-download fix separately from still-unimplemented offline attachment transfer. The page now explicitly leaves exact-head CI pending and does not reuse historical green runs.
+
+
+## Director deep host-forensics preparation — 2026-11-01
+
+- Reconfirmed canonical repository `Leano-Jordan/ZazuEMP` and only visible branch `main`.
+- Current observed main before this inspection-script commit: `a60d403c6305444f2f4a67ea72a398555a7261df` (V1 status reconciliation).
+- Added `ops/windows/Inspect-ZazuHostDeep.ps1`, a read-only follow-up to the first host inventory.
+- It captures the previously missing PHP listener executable/command line and parent PID; Windows build/UBR and recent hotfix indicators; AMPPS executable versions; PHP CLI and AMPPS PHP configuration/extensions; relevant Apache directives; non-secret Laravel DB connection/database/path metadata; SQLite file presence/size when applicable; database datadir config references; private-storage footprint; and disk space.
+- It deliberately does not read database credentials, start/stop services, edit files, connect to the database, change firewall/router/certificate settings or migrate data.
+- Script was committed directly to `main` as `f71fb703cf0565f8839bd7a197b18e9ce56d1f3e` and re-fetched from GitHub for content verification.
+- Runtime result: **PENDING owner execution**. The remote GitHub session cannot inspect the local Windows process table, AMPPS installation, actual `.env`, database files or ESU state.
+- Next gate: owner runs the deep inspection script from `C:\Projects\ZazuEMP` and returns its output. Use that evidence to choose the existing PHP/Apache/database runtime; do not configure services or certificates before the process and data paths are known.
