@@ -229,7 +229,7 @@ class SyncController extends Controller
         ]);
     }
 
-    public function resolveConflict(Request $request, SyncConflict $conflict, \App\Support\Offline\SyncConflictResolutionService $resolver): JsonResponse
+    public function resolveConflict(Request $request, SyncConflict $conflict, ?SyncConflictResolutionService $resolver = null): JsonResponse
     {
         $device = $request->attributes->get('sync_device');
         $validated = $request->validate([
