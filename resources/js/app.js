@@ -1114,10 +1114,14 @@ function setupZazuOfflineForms() {
             try {
                 await window.ZazuOffline.ready;
 
-                if (navigator.onLine && await canReachZazuOrigin()) {
+                const selectedCustomerValue = form.querySelector('select[name="customer_id"]')?.value || '';
+                const hasUnresolvedLocalCustomer = selectedCustomerValue.startsWith('local:');
+
+                if (navigator.onLine && !hasUnresolvedLocalCustomer && await canReachZazuOrigin()) {
                     delete form.dataset.zazuOfflineSubmitting;
                     // Preserve the browser's normal Laravel form/redirect flow
-                    // after the origin has been confirmed reachable.
+                    // after the origin has been confirmed reachable. A phone-local
+                    // customer must stay queued until its server identity is known.
                     HTMLFormElement.prototype.submit.call(form);
                     return;
                 }
