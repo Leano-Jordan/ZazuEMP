@@ -31,6 +31,7 @@ use App\Support\Offline\SyncBootstrapPayloadBuilder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
@@ -331,7 +332,7 @@ class SyncController extends Controller
             return $this->existingAttachmentResponse($existing, $event, $request, $validated);
         }
 
-        $path = $request->file('file')->store('jobs/'.$event->id.'/attachments', 'private');
+        $path = $this->storePrivateAttachment($request->file('file'), (int) $event->id);
 
         try {
             $attachment = EventAttachment::create([
@@ -450,6 +451,19 @@ class SyncController extends Controller
         fclose($existingStream);
 
         return hash_equals(hash_final($hashContext), $incomingHash);
+    }
+
+    private function storePrivateAttachment(UploadedFile $file, int $eventId): string
+    {
+        $path = $file->store('jobs/'.$eventId.'/attachments', 'private');
+
+        abort_unless(
+            is_string($path) && $path !== '',
+            503,
+            'Private attachment storage is unavailable. Keep the upload queued and retry.'
+        );
+
+        return $path;
     }
 
     public function listAttachments(Request $request): JsonResponse
