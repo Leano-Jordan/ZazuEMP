@@ -574,7 +574,11 @@ class OfflineSyncFoundationTest extends TestCase
                     'name' => 'Offline linked job',
                     'customer_local_id' => $customerIdentity->entity_uuid,
                     'customer_name' => 'Offline Linked Customer',
+                    'event_type' => 'Wedding',
                     'event_date' => now()->addDays(14)->toDateString(),
+                    'event_address' => 'Pretoria',
+                    'services' => ['Catering', 'Chairs'],
+                    'other_service' => 'Cold room',
                 ],
             ],
         );
@@ -592,6 +596,13 @@ class OfflineSyncFoundationTest extends TestCase
         $this->assertSame('0123456789', $event->customer_phone);
         $this->assertSame('contact@example.test', $event->customer_email);
         $this->assertSame($customer->id, $event->customer()->value('id'));
+        $this->assertSame('Wedding', $event->event_type);
+        $this->assertSame('Pretoria', $event->event_address);
+        $requirements = $event->requirements()->orderBy('description')->get()->keyBy('description');
+        $this->assertCount(3, $requirements);
+        $this->assertSame('Catering', $requirements['Catering']->category);
+        $this->assertSame('Furniture & equipment', $requirements['Chairs']->category);
+        $this->assertSame('Other', $requirements['Cold room']->category);
     }
 
     public function test_offline_job_rejects_customer_identity_from_another_business(): void
