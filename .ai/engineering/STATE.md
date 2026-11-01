@@ -366,3 +366,65 @@ The browser run had 46 passing tests and 6 failures (14 skipped). The failures w
 These changes are committed on `main` through application commit `df52f7c0a5b0d7c9a21a50db479cae6ee446246e`. Fresh Quality, Laravel, Psalm, PHPMD, populated upgrade/rollback and browser smoke workflows have been triggered for this SHA. Their results are pending; no repair is marked verified until those exact runs complete.
 
 **Do not certify offline continuity from this repair alone.** Installed-device disconnected launch, data persistence after process restart, real sync/reconciliation and production recovery drills remain release gates.
+
+
+## Director software audit and repair cycle — 2026-11-01
+
+**Canonical target:** `Leano-Jordan/ZazuEMP` / `main`  
+**Application/test candidate:** `c3370a317b016be8355df799f1eed37bc55c4488`  
+**Working tree discipline:** main only; no branches; no database mutations.
+
+### Verified source repairs
+
+1. **Default phone working-set freshness**
+   - Empty-selection pairing no longer freezes the first 25 customer/job/quote/preparation IDs at pairing time.
+   - Bootstrap now recalculates the recent working set on refresh.
+   - Explicit selections remain pinned; legacy devices with non-empty selections preserve their prior semantics.
+   - Regression coverage: post-pairing records appear on refresh; explicit/legacy selections remain bounded and pinned.
+
+2. **Offline asset update validation**
+   - Replaced invalid Eloquent `whereKey('!=', $asset->id)` usage with `whereKeyNot($asset->id)`.
+   - Duplicate asset tags now produce the intended validation response instead of falling through to the database unique constraint.
+   - Regression test verifies both original asset tags remain unchanged.
+
+3. **Sync conflict recovery**
+   - Added an actionable Settings panel for per-device sync exceptions, with retry and discard actions.
+   - Retry restores the failed IndexedDB mutation to the pending queue; discard removes it locally.
+   - Server resolution is transactional and locks both conflict and mutation; repeat/concurrent requests return the authoritative mutation status.
+   - Client now follows the server's final status instead of assuming its requested action won.
+   - Playwright coverage exercises retry and discard; pending browser run below.
+
+4. **Cross-business offline storage isolation**
+   - Replaced the origin-wide IndexedDB workspace with a business-scoped database name.
+   - Added the active business ID to the app shell.
+   - Legacy storage is migrated only when the stored business and paired-device business IDs both match the active business.
+   - A migration tombstone survives local logout, preventing already-cleared legacy queue data from being imported again.
+   - Added browser tests for matching legacy migration, queue preservation, logout tombstone behaviour and foreign-business rejection.
+   - Service-worker static cache generation advanced to `zazu-static-v28` so installed clients do not continue using the prior offline JS.
+
+### Exact-main CI evidence
+
+Against application candidate `c3370a317b016be8355df799f1eed37bc55c4488`:
+
+- **PASS** — [Zazu quality](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/41299518886)
+- **PASS** — [Laravel](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/41299518930)
+- **PASS** — [Psalm Security Scan](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/41299518944)
+- **PASS** — [PHPMD](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/41299518954)
+- **PASS** — [Populated upgrade and rollback](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/41299518856)
+- **PASS** — [Push on main](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/41299519274)
+- **PENDING at reconciliation** — [Zazu browser smoke](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/41299519019)
+- **SKIPPED** — SonarCloud analysis; not counted as a pass.
+- Director health-report workflows succeeded; they are status/reporting workflows, not application-test substitutes.
+
+### Release disposition
+
+Source changes and automated server/security/quality checks are green. Browser smoke is still pending and must be reconciled before the new Playwright cases are accepted.
+
+Still **OPEN / NOT CERTIFIED**:
+- Installed-device launch after force-close with both PC/server and internet unavailable.
+- Complete offline parity across every V1 workflow and reliable cross-device reconciliation beyond the bounded local working set.
+- Independent stable HTTPS hosting with durable database and private-file storage.
+- Real customer-environment backup/restore and deployment rollback drills.
+- Final privacy/legal and Zazu brand clearance.
+
+No release-readiness score uplift is claimed from these source fixes or CI passes alone.
