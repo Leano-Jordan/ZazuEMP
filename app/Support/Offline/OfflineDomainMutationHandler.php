@@ -84,11 +84,11 @@ class OfflineDomainMutationHandler implements SyncMutationHandler
             throw ValidationException::withMessages(['entity_id' => 'The offline customer does not exist on the server.']);
         }
 
-        $attributes = [
-            'business_id' => $mutation->business_id,
-            'name' => $this->requiredString($payload['name'] ?? null, 'name', 255),
-            'notes' => $this->nullableString($payload['notes'] ?? null, 5000),
-        ];
+        $attributes = $this->customerAttributes(
+            $mutation->business_id,
+            $payload,
+            $customer instanceof Customer ? $customer : null,
+        );
 
         if ($customer instanceof Customer) {
             $customer->update($attributes);
@@ -97,8 +97,41 @@ class OfflineDomainMutationHandler implements SyncMutationHandler
         }
 
         $this->syncPrimaryContact($customer, $payload);
+        $this->syncAdditionalContact($customer, $payload, 'day');
+        $this->syncAdditionalContact($customer, $payload, 'night');
 
         return $customer->fresh();
+    }
+
+    /**
+     * @param array<string, mixed> $payload
+     * @return array<string, mixed>
+     */
+    private function customerAttributes(int $businessId, array $payload, ?Customer $customer): array
+    {
+        $attributes = [
+            'business_id' => $businessId,
+            'name' => $this->requiredString($payload['name'] ?? null, 'name', 255),
+        ];
+
+        $optionalFields = [
+            'legal_name' => 255,
+            'registration_number' => 100,
+            'tax_number' => 100,
+            'vat_number' => 100,
+            'billing_address' => 1000,
+            'notes' => 5000,
+        ];
+
+        foreach ($optionalFields as $field => $maxLength) {
+            if ($customer && ! array_key_exists($field, $payload)) {
+                continue;
+            }
+
+            $attributes[$field] = $this->nullableString($payload[$field] ?? null, $maxLength);
+        }
+
+        return $attributes;
     }
 
     /**
@@ -134,6 +167,57 @@ class OfflineDomainMutationHandler implements SyncMutationHandler
             'label' => 'Primary',
             'is_primary' => true,
         ]);
+    }
+
+    /**
+     * @param array<string, mixed> $payload
+     */
+    private function syncAdditionalContact(Customer $customer, array $payload, string $period): void
+    {
+        $nameKey = $period.'_contact_name';
+        $phoneKey = $period.'_contact_phone';
+        $emailKey = $period.'_contact_email';
+
+        if (! array_key_exists($nameKey, $payload)
+            && ! array_key_exists($phoneKey, $payload)
+            && ! array_key_exists($emailKey, $payload)) {
+            return;
+        }
+
+        $name = $this->nullableString($payload[$nameKey] ?? null, 255);
+        $phone = $this->nullableString($payload[$phoneKey] ?? null, 50);
+        $email = $this->nullableString($payload[$emailKey] ?? null, 255);
+
+        if ($name === null && $phone === null && $email === null) {
+            return;
+        }
+
+        if ($name === null) {
+            throw ValidationException::withMessages([
+                $nameKey => 'A contact name is required when a phone number or email is supplied.',
+            ]);
+        }
+
+        $label = Str::ucfirst($period);
+        $contact = $customer->contacts()
+            ->where('label', $label)
+            ->where('is_primary', false)
+            ->first();
+
+        $attributes = [
+            'name' => $name,
+            'phone' => $phone,
+            'email' => $email,
+            'label' => $label,
+            'is_primary' => false,
+        ];
+
+        if ($contact) {
+            $contact->update($attributes);
+            return;
+        }
+
+        $customer->contacts()->create($attributes);
     }
 
     private function event(SyncMutation $mutation): Event
