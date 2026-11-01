@@ -1,18 +1,18 @@
 <?php
 
-namespace Tests\\Feature;
+namespace Tests\Feature;
 
-use App\\Models\\Business;
-use App\\Models\\Customer;
-use App\\Models\\Event;
-use App\\Models\\EventAttachment;
-use App\\Models\\User;
-use Illuminate\\Database\\Eloquent\\Model;
-use Illuminate\\Foundation\\Testing\\RefreshDatabase;
-use Illuminate\\Support\\Facades\\Storage;
-use Illuminate\\Support\\Str;
+use App\Models\Business;
+use App\Models\Customer;
+use App\Models\Event;
+use App\Models\EventAttachment;
+use App\Models\User;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Str;
 use RuntimeException;
-use Tests\\TestCase;
+use Tests\TestCase;
 
 class EventAttachmentStorageTest extends TestCase
 {
