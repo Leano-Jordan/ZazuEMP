@@ -229,42 +229,148 @@ class OfflineDomainMutationHandler implements SyncMutationHandler
             throw ValidationException::withMessages(['entity_id' => 'The offline job does not exist on the server.']);
         }
 
-        $customer = null;
-        $customerLocalId = $payload['customer_local_id'] ?? null;
-        if ($customerLocalId !== null && $customerLocalId !== '') {
-            $customer = $this->resolveIdentityRecord(
-                $mutation->business_id,
-                'customer',
-                $customerLocalId,
-                Customer::class,
-            );
-            if (! $customer instanceof Customer) {
-                throw ValidationException::withMessages([
-                    'customer_local_id' => 'The offline job references an unknown customer in this business.',
-                ]);
-            }
-        }
-
-        $status = $event?->status ?: 'draft';
-        $attributes = [
-            'business_id' => $mutation->business_id,
-            'customer_id' => $customer?->id ?? $event?->customer_id,
-            'reference' => $event?->reference ?: 'OFFLINE-'.strtoupper(substr($this->entityUuid($mutation), 0, 8)),
-            'name' => $this->requiredString($payload['name'] ?? null, 'name', 255),
-            'customer_name' => $customer?->name ?? $this->nullableString($payload['customer_name'] ?? null, 255),
-            'customer_phone' => $customer?->primaryContact?->phone ?? $event?->customer_phone,
-            'customer_email' => $customer?->primaryContact?->email ?? $event?->customer_email,
-            'event_date' => $payload['event_date'] ?? null,
-            'notes' => $this->nullableString($payload['notes'] ?? null, 5000),
-            'status' => $status,
-        ];
+        $customer = $this->resolveOfflineJobCustomer($mutation, $payload, $event);
+        $attributes = $this->offlineJobAttributes($mutation, $payload, $event, $customer);
 
         if ($event instanceof Event) {
             $event->update($attributes);
             return $event->fresh();
         }
 
-        return Event::create($attributes);
+        $event = Event::create($attributes);
+        $this->createOfflineJobRequirements($event, $payload);
+
+        return $event->fresh(['requirements']);
+    }
+
+    /**
+     * @param array<string, mixed> $payload
+     */
+    private function resolveOfflineJobCustomer(
+        SyncMutation $mutation,
+        array $payload,
+        ?Event $event,
+    ): ?Customer {
+        if (! array_key_exists('customer_local_id', $payload) || $payload['customer_local_id'] === null) {
+            return $event?->customer;
+        }
+
+        $customer = $this->resolveIdentityRecord(
+            $mutation->business_id,
+            'customer',
+            $payload['customer_local_id'],
+            Customer::class,
+        );
+
+        if (! $customer instanceof Customer) {
+            throw ValidationException::withMessages([
+                'customer_local_id' => 'The offline job references an unknown customer in this business.',
+            ]);
+        }
+
+        return $customer->loadMissing('primaryContact');
+    }
+
+    /**
+     * @param array<string, mixed> $payload
+     * @return array<string, mixed>
+     */
+    private function offlineJobAttributes(
+        SyncMutation $mutation,
+        array $payload,
+        ?Event $event,
+        ?Customer $customer,
+    ): array {
+        $eventType = $this->requiredString($payload['event_type'] ?? 'Other', 'event_type', 100);
+        if (! in_array($eventType, config('zazu.job_types', []), true)) {
+            throw ValidationException::withMessages(['event_type' => 'The offline job type is not supported.']);
+        }
+
+        return [
+            'business_id' => $mutation->business_id,
+            'customer_id' => $customer?->id ?? $event?->customer_id,
+            'event_day_contact_id' => $this->offlineJobContactId($customer, $payload, 'day', $event),
+            'event_night_contact_id' => $this->offlineJobContactId($customer, $payload, 'night', $event),
+            'reference' => $event?->reference ?: 'OFFLINE-'.strtoupper(substr($this->entityUuid($mutation), 0, 8)),
+            'name' => $this->requiredString($payload['name'] ?? null, 'name', 255),
+            'event_type' => $eventType,
+            'customer_name' => $customer?->name ?? $this->nullableString($payload['customer_name'] ?? null, 255),
+            'customer_phone' => $customer?->primaryContact?->phone ?? $event?->customer_phone,
+            'customer_email' => $customer?->primaryContact?->email ?? $event?->customer_email,
+            'event_date' => $this->nullableDate($payload['event_date'] ?? null),
+            'event_address' => $this->nullableString($payload['event_address'] ?? null, 255),
+            'notes' => $this->nullableString($payload['notes'] ?? null, 5000),
+            'status' => $event?->status ?: 'draft',
+        ];
+    }
+
+    /**
+     * @param array<string, mixed> $payload
+     */
+    private function offlineJobContactId(
+        ?Customer $customer,
+        array $payload,
+        string $period,
+        ?Event $event,
+    ): ?int {
+        $field = 'event_'.$period.'_contact_id';
+        if (! array_key_exists($field, $payload) || $payload[$field] === null || $payload[$field] === '') {
+            return $event?->getAttribute($field);
+        }
+
+        if (! $customer || ! is_numeric($payload[$field])) {
+            throw ValidationException::withMessages([
+                $field => 'The offline job contact must belong to its selected customer.',
+            ]);
+        }
+
+        $contactId = $customer->contacts()->whereKey((int) $payload[$field])->value('id');
+        if (! $contactId) {
+            throw ValidationException::withMessages([
+                $field => 'The offline job contact does not belong to the selected customer.',
+            ]);
+        }
+
+        return (int) $contactId;
+    }
+
+    /**
+     * @param array<string, mixed> $payload
+     */
+    private function createOfflineJobRequirements(Event $event, array $payload): void
+    {
+        $services = $payload['services'] ?? [];
+        if (! is_array($services)) {
+            throw ValidationException::withMessages(['services' => 'Offline job services must be a list.']);
+        }
+
+        $categoryByService = [];
+        foreach (config('zazu.service_categories', []) as $category => $availableServices) {
+            foreach ($availableServices as $service) {
+                $categoryByService[$service] = $category;
+            }
+        }
+
+        $requirements = [];
+        foreach ($services as $service) {
+            $description = $this->requiredString($service, 'services', 100);
+            $requirements[$description] = $categoryByService[$description] ?? 'Other';
+        }
+
+        $otherService = $this->nullableString($payload['other_service'] ?? null, 100);
+        if ($otherService !== null) {
+            $requirements[$otherService] = 'Other';
+        }
+
+        foreach ($requirements as $description => $category) {
+            $event->requirements()->create([
+                'description' => $description,
+                'category' => $category,
+                'quantity' => 1,
+                'unit' => 'service',
+                'status' => 'open',
+            ]);
+        }
     }
 
     /**
