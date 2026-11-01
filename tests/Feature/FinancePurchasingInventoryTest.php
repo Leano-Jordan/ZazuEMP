@@ -724,6 +724,13 @@ class FinancePurchasingInventoryTest extends TestCase
         $this->post(route('finance.expenses.store'), $payload)->assertRedirect();
         $this->post(route('finance.expenses.store'), $payload)->assertRedirect();
 
+        $this->from(route('finance.expenses.create'))
+            ->post(route('finance.expenses.store'), [
+                ...$payload,
+                'amount' => '275.00',
+            ])
+            ->assertStatus(409);
+
         $this->assertDatabaseCount('finance_expenses', 1);
         $this->assertDatabaseHas('audit_logs', [
             'action' => 'finance.expense.recorded',
