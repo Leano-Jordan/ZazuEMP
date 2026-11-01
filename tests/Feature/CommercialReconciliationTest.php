@@ -82,15 +82,22 @@ class CommercialReconciliationTest extends TestCase
 
     private function createInvoice($user, $business, $quote): Invoice
     {
+        $invoicePayload = [
+            'quote_id' => $quote->id,
+            'idempotency_key' => '11111111-1111-4111-8111-111111111111',
+            'issued_at' => now()->toDateString(),
+            'due_at' => now()->addDays(7)->toDateString(),
+        ];
+
         $this->actingAs($user)
             ->withSession(['zazu_business_id' => $business->id])
-            ->post(route('finance.invoices.store'), [
-                'quote_id' => $quote->id,
-                'idempotency_key' => '11111111-1111-4111-8111-111111111111',
-                'issued_at' => now()->toDateString(),
-                'due_at' => now()->addDays(7)->toDateString(),
-            ])
+            ->post(route('finance.invoices.store'), $invoicePayload)
             ->assertRedirect();
+
+        // The quote version is now invoiced, but retrying the original request
+        // with the same key must return that invoice instead of failing early.
+        $this->post(route('finance.invoices.store'), $invoicePayload)->assertRedirect();
+        $this->assertDatabaseCount('invoices', 1);
 
         $invoice = Invoice::query()->where('quote_id', $quote->id)->firstOrFail();
 
