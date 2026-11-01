@@ -234,74 +234,122 @@ class SyncController extends Controller
             'note' => ['nullable', 'string', 'max:1000'],
         ]);
 
-        return DB::transaction(function () use ($device, $conflict, $validated): JsonResponse {
-            $lockedConflict = SyncConflict::query()
-                ->whereKey($conflict->id)
-                ->lockForUpdate()
-                ->firstOrFail();
+        return DB::transaction(
+            fn (): JsonResponse => $this->resolveLockedConflict($device, $conflict, $validated)
+        );
+    }
 
-            abort_unless(
-                (int) $lockedConflict->business_id === (int) $device->business_id
-                && (int) $lockedConflict->sync_device_id === (int) $device->id,
-                404
-            );
+    /**
+     * @param array{action:string,note?:?string} $validated
+     */
+    private function resolveLockedConflict(
+        SyncDevice $device,
+        SyncConflict $conflict,
+        array $validated
+    ): JsonResponse {
+        $lockedConflict = SyncConflict::query()
+            ->whereKey($conflict->id)
+            ->lockForUpdate()
+            ->firstOrFail();
 
-            $mutation = null;
-            if ($lockedConflict->mutation_id) {
-                $mutation = SyncMutation::query()
-                    ->where('business_id', $device->business_id)
-                    ->where('sync_device_id', $device->id)
-                    ->where('mutation_id', $lockedConflict->mutation_id)
-                    ->lockForUpdate()
-                    ->first();
-            }
+        $this->assertConflictOwnership($lockedConflict, $device);
+        $mutation = $this->lockConflictMutation($lockedConflict, $device);
 
-            if ($lockedConflict->status !== 'open') {
-                return response()->json([
-                    'conflict' => $this->conflictPayload($lockedConflict),
-                    'mutation_status' => $this->resolvedConflictMutationStatus($lockedConflict, $mutation),
-                ]);
-            }
-
-            $mutationStatus = $mutation?->status;
-            if ($lockedConflict->conflict_type === 'mutation_identity_mismatch') {
-                $mutationStatus = $this->resolveMutationIdentityMismatch($mutation, $validated['action']);
-            } elseif ($validated['action'] === 'retry') {
-                abort_unless($mutation, 404);
-                $mutation->update([
-                    'status' => 'pending',
-                    'last_error' => null,
-                ]);
-                $mutationStatus = 'pending';
-            } elseif ($mutation) {
-                $mutation->update([
-                    'status' => 'discarded',
-                    'last_error' => $validated['note'] ?? 'Offline change discarded after conflict resolution.',
-                ]);
-                $mutationStatus = 'discarded';
-            }
-
-            $resolutionNote = $validated['note'] ?? ($validated['action'] === 'retry' ? 'Queued for retry.' : 'Discarded.');
-            if (
-                $lockedConflict->conflict_type === 'mutation_identity_mismatch'
-                && $validated['action'] === 'retry'
-            ) {
-                // Persist the retry contract so a lost response can be replayed
-                // without mistaking the original applied mutation for a discard.
-                $resolutionNote = '[retry-new-mutation-id] '.$resolutionNote;
-            }
-
-            $lockedConflict->update([
-                'status' => 'resolved',
-                'resolution_note' => $resolutionNote,
-                'resolved_at' => now(),
-            ]);
-
+        if ($lockedConflict->status !== 'open') {
             return response()->json([
-                'conflict' => $this->conflictPayload($lockedConflict->fresh()),
-                'mutation_status' => $mutationStatus,
+                'conflict' => $this->conflictPayload($lockedConflict),
+                'mutation_status' => $this->resolvedConflictMutationStatus($lockedConflict, $mutation),
             ]);
-        });
+        }
+
+        $mutationStatus = $this->applyOpenConflictResolution(
+            $lockedConflict,
+            $mutation,
+            $validated['action'],
+            $validated['note'] ?? null,
+        );
+
+        $lockedConflict->update([
+            'status' => 'resolved',
+            'resolution_note' => $this->conflictResolutionNote($lockedConflict, $validated),
+            'resolved_at' => now(),
+        ]);
+
+        return response()->json([
+            'conflict' => $this->conflictPayload($lockedConflict->fresh()),
+            'mutation_status' => $mutationStatus,
+        ]);
+    }
+
+    private function assertConflictOwnership(SyncConflict $conflict, SyncDevice $device): void
+    {
+        abort_unless(
+            (int) $conflict->business_id === (int) $device->business_id
+                && (int) $conflict->sync_device_id === (int) $device->id,
+            404
+        );
+    }
+
+    private function lockConflictMutation(SyncConflict $conflict, SyncDevice $device): ?SyncMutation
+    {
+        if (! $conflict->mutation_id) {
+            return null;
+        }
+
+        return SyncMutation::query()
+            ->where('business_id', $device->business_id)
+            ->where('sync_device_id', $device->id)
+            ->where('mutation_id', $conflict->mutation_id)
+            ->lockForUpdate()
+            ->first();
+    }
+
+    private function applyOpenConflictResolution(
+        SyncConflict $conflict,
+        ?SyncMutation $mutation,
+        string $action,
+        ?string $note
+    ): ?string {
+        if ($conflict->conflict_type === 'mutation_identity_mismatch') {
+            return $this->resolveMutationIdentityMismatch($mutation, $action);
+        }
+
+        if ($action === 'retry') {
+            abort_unless($mutation, 404);
+            $mutation->update([
+                'status' => 'pending',
+                'last_error' => null,
+            ]);
+
+            return 'pending';
+        }
+
+        if ($mutation) {
+            $mutation->update([
+                'status' => 'discarded',
+                'last_error' => $note ?? 'Offline change discarded after conflict resolution.',
+            ]);
+
+            return 'discarded';
+        }
+
+        return null;
+    }
+
+    private function conflictResolutionNote(SyncConflict $conflict, array $validated): string
+    {
+        $note = $validated['note'] ?? ($validated['action'] === 'retry' ? 'Queued for retry.' : 'Discarded.');
+
+        if (
+            $conflict->conflict_type === 'mutation_identity_mismatch'
+            && $validated['action'] === 'retry'
+        ) {
+            // Persist the retry contract so a lost response can be replayed
+            // without mistaking the original applied mutation for a discard.
+            return '[retry-new-mutation-id] '.$note;
+        }
+
+        return $note;
     }
 
     private function resolvedConflictMutationStatus(
