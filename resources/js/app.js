@@ -1203,7 +1203,13 @@ function setupZazuOfflineForms() {
                     name: get('name'),
                     customer_local_id: customer?.local_id || null,
                     customer_name: customer?.name || (customerOption && customerValue ? customerOption.textContent.trim() : (get('customer_name') || null)),
+                    event_type: get('event_type'),
                     event_date: get('event_date') || null,
+                    event_address: get('event_address') || null,
+                    event_day_contact_id: get('event_day_contact_id') || null,
+                    event_night_contact_id: get('event_night_contact_id') || null,
+                    services: formData.getAll('services[]').map(value => String(value).trim()).filter(Boolean),
+                    other_service: get('other_service') || null,
                     notes: get('notes') || null,
                 };
             } else if (entity === 'quote') {
