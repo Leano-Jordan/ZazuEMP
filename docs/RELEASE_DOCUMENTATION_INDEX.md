@@ -17,6 +17,7 @@ This directory contains the minimum operational documentation set required befor
 | `RELEASE_DATA_SUBJECT_REQUEST_PROCEDURE.md` | Access, correction, deletion and objection handling | Operational draft — contact/process completion required |
 | `RELEASE_RETENTION_DISPOSAL_SCHEDULE.md` | Record-class retention and secure disposal control | Draft — legal/accounting periods must be confirmed |
 | `RELEASE_SECURITY_INCIDENT_RESPONSE.md` | Security incident triage, containment and notification runbook | Operational draft — named escalation contacts required |
+| `ZAZU_SECURITY_AUDIT_2026-11-03.md` | Current repository security findings, fixes and verification boundary | Source audit recorded — exact-head CI and live staging tests pending |
 | `RELEASE_OPERATOR_DATA_PROCESSING_CONTROL.md` | Operator/vendor processing control | Template — use where a third party processes personal information |
 | `RELEASE_CUSTOMER_TERMS_DRAFT.md` | Commercial/customer service terms | Draft — legal review required |
 | `RELEASE_PAIA_OPERATIONAL_CONTROL.md` | PAIA records/request handling | Operational draft — applicability and details require review |
