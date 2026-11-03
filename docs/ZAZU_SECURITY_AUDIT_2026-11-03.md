@@ -1,0 +1,123 @@
+# Zazu EMP — Security & Repository Audit
+
+**Audit date:** 3 November 2026  
+**Repository:** `Leano-Jordan/ZazuEMP`  
+**Branch:** `main`  
+**Source baseline:** `6aec3b3e48c10a713dc1786a7f6df93baa64384c`  
+**Assessment type:** source-level white-box review, test-coverage review, CI/configuration review and documentation reconciliation.
+
+## Executive disposition
+
+**Do not label Zazu security-cleared or production-ready from this audit.** The repository has meaningful security controls: business-scoped models and queries, role middleware, rate-limited authentication, one-time device pairing, hashed sync tokens, transactional mutation handling, conflict ownership checks and private media delivery. Existing tests also include adversarial cross-business record access.
+
+This review found and addressed:
+- CSV/XLSX import resource limits were checked too late or not at all, allowing authenticated import users to submit oversized row sets or highly expanded XLSX packages.
+- The customer import controller read a workbook using the wrong return shape; it requested a top-level `rows` key even though the reader returns worksheets keyed by sheet name.
+- The API middleware group did not receive the same security headers and request correlation IDs as web requests.
+
+The main unresolved security issue is **account isolation of local offline data**: the IndexedDB workspace is keyed by business ID, not by authenticated user ID. Explicit logout clears the workspace, but a different user signing into the same business after session expiry or an interrupted logout can reuse the same browser database and paired-device token. This requires a deliberate, data-preserving account-binding change and adversarial browser tests before shared-device use.
+
+## Findings register
+
+| ID | Severity | Finding | Disposition |
+|---|---|---|---|
+| ZAZU-SEC-01 | **High** | Local offline database and stored sync bearer token are business-scoped, not user-scoped. | Open — release blocker for shared-user/shared-device use |
+| ZAZU-SEC-02 | Medium | CSV/XLSX parsing lacked bounded row, cell, column and expanded-archive limits during parsing. | Fixed in this audit; CI proof pending |
+| ZAZU-SEC-03 | Medium | Customer import controller expected a response shape the spreadsheet reader does not return. | Fixed in this audit; feature regression added |
+| ZAZU-SEC-04 | Low | API requests were outside the web-only request-ID and security-header middleware. | Fixed in this audit; feature regression added |
+| ZAZU-SEC-05 | Medium | Content Security Policy still allows inline scripts and styles. | Open — nonce/hash migration required |
+| ZAZU-SEC-06 | Medium | Sync device tokens have no automatic expiry; security depends on explicit revocation and device-loss procedures. | Open — define expiry/rotation policy |
+| ZAZU-SEC-07 | Medium | Incident logs retain exception messages, stack traces and SQL text. | Open — verify log access, retention and sensitive-field redaction |
+| ZAZU-SEC-08 | Medium | Main is protected but currently has no required status-check contexts. | Owner action — require quality and security checks |
+| ZAZU-SEC-09 | Not assessed | GitHub code-scanning, Dependabot and secret-scanning alert endpoints were not readable through the available connector. | Verify in GitHub Security tab; no clean result is claimed |
+
+## Detail and evidence
+
+### ZAZU-SEC-01 — Offline account isolation (High / open)
+
+`public/zazu-offline.js` names its primary IndexedDB database using `business_id` only and accepts an existing state when the stored business ID matches the active business. The authenticated user ID is present in the page shell and is used by the service worker's HTML cache, but it is not part of the offline database identity or state acceptance check. The database stores the sync bearer token and broad business workspace data.
+
+The normal logout path clears the local state and then attempts remote token revocation. That does not cover every interrupted or expired-session transition. On a shared browser, a different member of the same business can therefore inherit the existing offline workspace unless the account transition is explicitly bound and rejected.
+
+**Required fix:** bind each sync device to the user who authorized pairing; enforce the binding and the user's current membership/permissions on sync requests; make the browser database and stored state user+business scoped; fail closed on account mismatch. Do not silently migrate an existing unowned queue to the first account that logs in. Preserve it for explicit, verified recovery. Add E2E tests for user A logout/session expiry, user B login into the same business, token reuse, cached data visibility and revoke/re-pair behavior.
+
+### ZAZU-SEC-02 — Spreadsheet parser resource exhaustion (Medium / fixed in source)
+
+The upload endpoint already limited the compressed file to 5 MB and the parser used `LIBXML_NONET`, but the parser accumulated CSV rows before the controller's row-count check and expanded XLSX archive entries without a decompressed-size budget.
+
+The reader now enforces:
+- 5 MB source-file limit;
+- 5,000 data rows (plus header);
+- 100 columns;
+- 8 KB per cell;
+- 250,000 XLSX cells;
+- 20 worksheets;
+- 256 archive entries;
+- 8 MB per expanded archive entry and 20 MB total expanded archive data.
+
+Regression tests cover the CSV row and column limits and an oversized XLSX archive entry. Exact-main CI must pass before this is treated as verified.
+
+### ZAZU-SEC-03 — Customer import response-shape mismatch (Medium / fixed in source)
+
+The reader returns a map of worksheet names to `headers` and `rows`; the controller previously indexed that map as if `rows` existed at its top level. The controller now previews rows from the first worksheet, with a feature test proving preview is read-only and does not create customers.
+
+### ZAZU-SEC-04 — API response middleware (Low / fixed in source)
+
+The `web` middleware group already received `AttachRequestId` and `ApplySecurityHeaders`; the `api` group did not. Both are now attached to `api`, with a feature test covering the sync provisioning validation response. This applies baseline headers and request correlation to API responses as well.
+
+### ZAZU-SEC-05 — Inline CSP allowance (Medium / open)
+
+Current CSP uses `script-src 'self' 'unsafe-inline'` and `style-src 'self' 'unsafe-inline'`. This is not a standalone exploit, but it weakens the browser's protection against injected inline script/style if a separate injection defect is found. Do not remove it blindly: the current UI includes inline code. Plan a nonce/hash migration and test every Blade entrypoint before tightening.
+
+### ZAZU-SEC-06 — Sync token lifecycle (Medium / open)
+
+The raw device token is generated with high entropy and only its SHA-256 hash is stored server-side. Device authentication checks active status and hash; revocation is present. However, there is no automatic token expiry. Lost-device response therefore depends on the owner revoking the device promptly. Decide whether device tokens should expire, rotate, or require periodic owner confirmation.
+
+### ZAZU-SEC-07 — Incident-log sensitivity (Medium / open)
+
+The incident recorder logs exception text, stack trace, file/line and SQL text for database exceptions. These are useful diagnostics but may carry business or personal data. Restrict log access, confirm vendor retention and export controls, and redact credentials, bearer tokens and sensitive SQL bindings before production use.
+
+### ZAZU-SEC-08 — Branch protection (Medium / owner action)
+
+The current `main` branch is protected, but GitHub reports empty required status-check contexts. Protection is also configured with enforcement for non-admins, so repository administrators can bypass the checks. Require the actual quality/security workflows before merge and avoid relying on protection as evidence that CI passed.
+
+## Controls observed in source
+
+- Authentication uses identifier/IP rate limits and generic failed-login messaging; registration and password-reset requests are throttled.
+- Password reset rotates the remember token and removes other database-backed sessions.
+- Business context and business-aware model safeguards prevent explicit cross-business writes; current tests cover direct-ID reads across customers, jobs, invoices, purchasing and assets.
+- Permission middleware is applied to business routes.
+- Device pairing codes are random, hashed, time-limited and rate-limited; device bearer tokens are stored as hashes.
+- Sync mutation IDs are immutable/idempotent; domain writes and delivery publication run transactionally; acknowledgements cannot skip a delivery sequence.
+- Conflict resolution checks both business and device ownership.
+- Event attachments and customer/profile/business media use private storage and authorization-aware download routes.
+- Explicit logout clears the local offline workspace before remote token revocation.
+- Phone-local attachment queuing is **not implemented** in the active app. The precached legacy script must not be represented as a shipped feature.
+
+## Test and verification boundary
+
+**White-box:** source and test review completed for routing/middleware, authentication/session handling, business tenancy, sync protocols, attachment/media access, PWA cache/storage, spreadsheet parsing and CI workflows.
+
+**Automated cases added in this change:** API security headers/request IDs; customer import preview data shape/read-only behavior; CSV row cap; CSV column cap; XLSX expanded-entry cap.
+
+**Black-box:** not run against a live Zazu deployment. The connected Render workspace currently lists a ZIA preview service, not a Zazu service. Do not substitute ZIA as a Zazu target. No production database, credentials or live Zazu host was used.
+
+**Security tooling:** repository branch metadata was readable; GitHub Security alert endpoints were not available through the current connector. Secret/dependency/code-scanning status remains unverified until checked directly in GitHub.
+
+**CI:** the pre-audit `Rosscore Director Health Report` run for the baseline commit succeeded, but that is not the Laravel/PHP test suite. The new commit must be evaluated by the exact-head `Zazu quality` and Laravel workflows before any test is marked passed.
+
+## Required next security gate
+
+1. Bind offline devices and IndexedDB state to the authenticated account; add same-business multi-user E2E tests.
+2. Require quality, test and security checks on protected `main`.
+3. Review GitHub secret/dependency/code-scanning alerts and the Gitleaks history-scan result.
+4. Tighten CSP with nonces/hashes after removing inline script dependence.
+5. Set a sync-token expiry/rotation and lost-device response policy.
+6. Validate deployed HTTPS, trusted-proxy/HSTS behavior, persistent private storage, backup/restore and rate limits on the actual paid host.
+7. Run authenticated and unauthenticated black-box tests against a designated Zazu staging deployment before release.
+
+## References
+
+- OWASP File Upload Cheat Sheet: https://cheatsheetseries.owasp.org/cheatsheets/File_Upload_Cheat_Sheet.html
+- PHP `ZipArchive::statIndex`: https://www.php.net/manual/en/ziparchive.statindex.php
+- Laravel 13 middleware groups: https://laravel.com/docs/13.x/middleware
