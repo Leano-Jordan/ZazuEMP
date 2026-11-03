@@ -144,7 +144,7 @@ Do not expose development tools, debug endpoints, database ports, private storag
 |---|---|
 | Local PHP 8.4 development runtime | OBSERVED |
 | Current local SQLite database | OBSERVED |
-| VS Code-independent local runtime | NOT YET ESTABLISHED |
+| VS Code-independent local runtime launcher | IMPLEMENTED; owner-PC execution not yet verified |
 | Production provider/server selected | NOT SELECTED — intentionally deferred |
 | Production release artifact/deployment pipeline | NOT ESTABLISHED |
 | Production database engine certified | NOT ESTABLISHED |
