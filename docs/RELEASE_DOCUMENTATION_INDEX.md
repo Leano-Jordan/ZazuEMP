@@ -23,7 +23,7 @@ This directory contains the minimum operational documentation set required befor
 | `RELEASE_PAIA_OPERATIONAL_CONTROL.md` | PAIA records/request handling | Operational draft — applicability and details require review |
 | `RELEASE_MEDIA_RIGHTS_REGISTER.md` | Provenance and rights register for event/landing media | Operational register — final assets/rights evidence required |
 | `RELEASE_DEPLOYMENT_RUNBOOK.md` | Deployment and clean-install control | Operational draft |
-| `RELEASE_BACKUP_RESTORE_RUNBOOK.md` | Backup, restore and recovery procedure | Operational draft |
+| `RELEASE_BACKUP_RESTORE_RUNBOOK.md` | Installation-wide operator backup/restore and recovery procedure | Operational draft — tenant self-service is not implemented |
 | `RELEASE_UPGRADE_ROLLBACK_RUNBOOK.md` | Existing-install upgrade and rollback control | Operational draft |
 | `RELEASE_DOCUMENTATION_IMPLEMENTATION_AUDIT.md` | Evidence audit against current implementation | Director audit |
 

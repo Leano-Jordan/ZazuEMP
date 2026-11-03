@@ -188,8 +188,6 @@ Route::middleware(['auth', 'auth.session', 'business.context'])->group(function 
         Route::get('/settings', [BusinessSettingsController::class, 'edit'])->name('settings.index');
         Route::post('/settings/sync/pairing', [SyncController::class, 'createPairing'])->middleware('throttle:20,1')->name('settings.sync.pairing');
         Route::post('/settings/sync/devices/{device}/revoke', [BusinessSettingsController::class, 'revokeSyncDevice'])->name('settings.sync.devices.revoke');
-        Route::get('/settings/backup', [BusinessSettingsController::class, 'backup'])->name('settings.backup');
-        Route::post('/settings/restore', [BusinessSettingsController::class, 'restore'])->name('settings.restore');
         Route::get('/settings/audit', [AuditLogController::class, 'index'])->name('settings.audit');
         Route::put('/settings', [BusinessSettingsController::class, 'update'])->name('settings.update');
         Route::get('/settings/compliance', [ComplianceDocumentController::class, 'index'])->name('settings.compliance');

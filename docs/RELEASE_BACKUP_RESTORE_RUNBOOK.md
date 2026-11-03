@@ -1,13 +1,19 @@
 # Zazu EMP — Backup / Restore Runbook
 
-**Status:** OPERATIONAL DRAFT  
+**Status:** OPERATIONAL DRAFT — INSTALLATION-LEVEL OPERATOR PROCEDURE  
 **Operational owner:** Isaac Junior Lehlogonolo Maluleka  
 ****Operating address:** [Operating address — see private records]
 **Commands:** `php artisan zazu:backup` / `php artisan zazu:restore`
 
+## Scope and access boundary
+
+The current `zazu:backup` and `zazu:restore` commands operate on the **entire installation database and private storage**. They are not business-scoped. They must only be run by the installation operator through a controlled command-line session. They must never be exposed as ordinary business-owner settings or self-service routes. A restore replaces data for every business in that installation.
+
+Business-level export/restore is a separate product capability and is not implemented by these commands.
+
 ## Backup
 
-1. Confirm the target installation and active business.
+1. Confirm the target installation and record that the operation affects every business in that installation.
 2. Ensure no known corruption is present.
 3. Execute the supported Zazu backup command.
 4. Confirm the archive was created successfully.
@@ -18,7 +24,7 @@ Backups may contain database records and private storage. Treat backup artifacts
 
 ## Restore preflight
 
-1. Identify the intended backup artifact.
+1. Identify the intended installation-wide backup artifact and confirm explicit operator authority.
 2. Verify it came from an approved source.
 3. Confirm database driver compatibility.
 4. Confirm the archive is not unexpectedly large or malformed.
@@ -28,7 +34,7 @@ Backups may contain database records and private storage. Treat backup artifacts
 
 ## Restore
 
-Use the supported Zazu restore command. Do not manually replace the database or private storage unless performing a controlled engineering recovery under the documented process.
+Use the supported Zazu restore command from a restricted operator session during a maintenance window. Do not expose this operation through a business-owner account. Confirm that all businesses in the installation are expected to be rolled back to the archive state. Do not manually replace the database or private storage unless performing a controlled engineering recovery under the documented process.
 
 The current restore implementation stages and validates the restore input, protects private-storage replacement, and retains rollback handling for supported drivers.
 
@@ -119,3 +125,8 @@ Verify all of these in the restored installation:
 **PASS** only when the archive was created, restored successfully, and the representative data/media/security checks above pass in the real installed environment.
 
 A CI round-trip is supporting evidence, not a substitute for this release-environment drill.
+
+
+## Multi-business safety restriction — 2026-11-04
+
+The business settings UI no longer exposes the installation-wide backup or restore commands. The previous controls implied that an owner was exporting/restoring only their business, while the commands snapshot or replace the entire installation database and private storage. This was an unsafe scope mismatch. The CLI commands remain available to the installation operator; business-level self-service export/restore remains a V1 gap until a tenant-scoped format and safe import strategy are implemented and tested.

@@ -345,29 +345,9 @@
         <p class="zazu-field-help mt-3" data-zazu-offline-conflict-status role="status" aria-live="polite"></p>
     </section>
 
-    <section class="zazu-context-card mt-4" data-zazu-backup-controls>
-        <div class="zazu-context-title">Backup &amp; recovery</div>
-        <div class="zazu-context-copy">Create a portable Zazu backup containing the database and private business files. Restore is owner-only and replaces the current business database and private files.</div>
-        <div class="flex flex-wrap gap-3 mt-4">
-            <a href="{{ route('settings.backup') }}" class="zazu-btn zazu-btn-secondary" data-zazu-backup-download>Download backup</a>
-        </div>
-        <div class="zazu-divider mt-5 pt-5">
-            <div class="zazu-context-title">Restore a backup</div>
-            <p class="zazu-context-copy mt-1">Use a Zazu backup ZIP created by this installation. Existing data will be replaced by the backup contents.</p>
-            <form method="POST" action="{{ route('settings.restore') }}" enctype="multipart/form-data" class="mt-4" data-zazu-restore-form data-zazu-confirm="Restoring this backup replaces the current Zazu database and private files." data-zazu-confirm-title="Restore Zazu backup?" data-zazu-confirm-action="Restore backup">
-                @csrf
-                <label class="zazu-field">
-                    <span class="zazu-label">Backup ZIP</span>
-                    <input type="file" name="backup" accept=".zip,application/zip" class="zazu-input" required data-zazu-restore-file>
-                    @error('backup')<span class="zazu-field-error">{{ $message }}</span>@enderror
-                </label>
-                <label class="zazu-check-row mt-3">
-                    <input type="checkbox" required data-zazu-restore-confirm>
-                    <span>I understand that restoring replaces the current Zazu database and private files.</span>
-                </label>
-                <button type="submit" class="zazu-btn zazu-btn-primary mt-4" data-zazu-restore-submit disabled>Restore backup</button>
-            </form>
-        </div>
+    <section class="zazu-context-card mt-4" aria-labelledby="zazu-data-protection-title">
+        <div class="zazu-context-title" id="zazu-data-protection-title">Data protection</div>
+        <p class="zazu-context-copy mt-1">Installation-wide backups and restores are managed by the system operator. Business self-service export and restore is not available in this build.</p>
     </section>
 
 <script>

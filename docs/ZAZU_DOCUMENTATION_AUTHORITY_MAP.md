@@ -30,6 +30,7 @@ This map prevents agents from treating historical notes, old status snapshots or
 - `docs/ZAZU_COMMERCIAL_LEGAL_REGISTER.md` — current legal/commercial control register.
 - `docs/ZAZU_PRIVACY_BASELINE.md` — privacy/security engineering baseline
 - `docs/ZAZU_SECURITY_AUDIT_2026-11-03.md` — current source security findings, hardening changes and verification boundary.
+- `docs/V1_RELEASE_CHECKLIST.md` — canonical V1 release-gate ledger, including the 2026-11-04 recovery authority correction.
 
 ### Compatibility entry point
 - `docs/ROSSCORE_ENGINEERING_COMMAND_ENGINE.md` — compatibility/integration pointer. It does not outrank the repository-side Zazu control plane.

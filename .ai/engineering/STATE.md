@@ -601,3 +601,18 @@ The purchase_order_receipts table stores only the business, purchase order and i
 - Security-audit correction: business-scoped IndexedDB and device tokens are intentional under DEC-019 owner-approved trusted-device pairing. The owner selects and discloses the bounded data copied to the paired device; normal staff web permissions are not a separate record-level security boundary inside that trusted offline device. Remaining controls are device inventory/revocation, physical device lock and a lost/reassigned-device response. Do not redesign as user-scoped storage without an owner-approved architecture change.
 - GitHub reports `main` protected with no required status-check contexts. Owner must configure required checks; no setting was changed in this audit.
 - No live Zazu black-box test was performed in this repository-only review because no Zazu runtime URL and test credentials were supplied. No security-alert clean bill is claimed.
+
+
+## Director cycle — 2026-11-04 — installation recovery scope
+
+A source audit found that business-owner settings exposed installation-wide backup and restore commands. The commands operate on the full database and private storage, not one tenant. This was a cross-business disclosure/destructive-restore boundary defect.
+
+Corrective source changes on main:
+- Removed business-owner backup/restore routes and controller actions.
+- Removed misleading tenant-scoped backup/restore controls from settings.
+- Added an explicit installation-operator / tenant self-service limitation notice.
+- Updated regression tests and the recovery runbook.
+
+Evidence: exact-head CI pending for this commit. Existing CLI command tests do not prove a real recovery drill. Business-scoped export/restore remains unimplemented and must not be claimed.
+
+Next priority: finish V1 recovery design with explicit tenant-vs-installation scope, then verify remaining current-head CI and continue populated commercial workflow and offline device acceptance. Keep all work in this repository and on main.

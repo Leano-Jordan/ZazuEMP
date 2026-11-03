@@ -630,3 +630,21 @@ The latest observed main ref during this audit did not return a current GitHub A
 The roadmap remains strategy/history/context. docs/V1_RELEASE_CHECKLIST.md remains the canonical V1 release gate.
 
 Last updated: 2026-10-03
+
+# Director execution cycle — 2026-11-04 — recovery authority boundary
+
+## Finding
+Business-owner settings exposed the installation-wide `zazu:backup` and `zazu:restore` commands. These commands include the full configured database and private storage. The former UI copy incorrectly described them as business-scoped. In a multi-business installation this allowed one tenant owner to download all installation data or restore an archive over all tenants.
+
+## Executed
+- Removed the business-owner backup and restore routes.
+- Removed the corresponding controller actions and UI forms.
+- Added explicit settings disclosure that installation-level recovery is operator-managed and business self-service export/restore is not available in this build.
+- Updated regression tests to assert the routes do not exist and settings do not advertise tenant-scoped recovery.
+- Updated the recovery runbook to distinguish installation-wide operator recovery from future tenant-scoped export/restore.
+
+## Verification boundary
+The source changes and tests are committed on `main`. Exact-head CI is pending. Existing CLI round-trip and hostile-archive tests are still the evidence for command-level safety; a real deployment recovery drill remains open.
+
+## Director decision
+Treat the old settings exposure as a security defect corrected at source. Do not award a tenant backup/restore capability score. Keep V1 recovery amber until the operator drill is performed and a tenant-scoped export requirement is either implemented or explicitly excluded from the V1 customer promise.

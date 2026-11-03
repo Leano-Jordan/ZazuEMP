@@ -519,3 +519,17 @@ Last updated: 2026-10-20
 | Live black-box verification | No Zazu runtime URL and authenticated test account were supplied for this repository-only audit | Open — run black-box tests against the owner-designated Zazu environment |
 
 **Evidence rule:** source changes and tests added are implementation evidence only. Do not mark the new cases as passed until Actions reports success for the resulting exact `main` SHA.
+
+
+## Recovery authority finding — 2026-11-04
+
+A newly confirmed security defect was the mismatch between business-scoped settings access and installation-wide backup/restore commands. A business owner could download the full installation archive or replace the complete installation database/private storage. Business-owner routes and UI have been removed; CLI recovery remains operator-only.
+
+| Domain | Disposition | Evidence still required |
+|---|---|---|
+| Security / tenant isolation | Source correction IMPLEMENTED | Exact-head CI and route/view regression pass |
+| Installation backup/restore | CLI IMPLEMENTED / AUTOMATED | Real operator recovery drill on intended deployment |
+| Tenant self-service export/restore | NOT IMPLEMENTED | Define and test tenant-scoped export/import semantics |
+| Release readiness | OPEN | Do not claim tenant backup/restore as a V1 capability |
+
+No numeric uplift is awarded until exact-head CI passes. This correction reduces exposure; it does not complete the recovery gate.

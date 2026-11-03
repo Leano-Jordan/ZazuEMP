@@ -7,7 +7,6 @@ use App\Models\PurchaseOrder;
 use App\Models\User;
 use Database\Seeders\DemoScenarioSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use Illuminate\Http\UploadedFile;
 use Tests\TestCase;
 
 class DemoScenarioSeederTest extends TestCase
@@ -126,20 +125,15 @@ class DemoScenarioSeederTest extends TestCase
         $this->assertDatabaseCount('purchase_order_receipts', 1);
     }
 
-    public function test_non_owner_cannot_trigger_backup_or_restore(): void
+    public function test_installation_wide_backup_and_restore_are_not_exposed_to_business_users(): void
     {
         $this->seed(DemoScenarioSeeder::class);
-
         $manager = User::query()->where('email', 'operations@zazu.local')->firstOrFail();
         $this->actingAs($manager);
-
-        $this->get(route('settings.backup'))
-            ->assertForbidden();
-
-        $upload = UploadedFile::fake()->create('not-a-backup.zip', 1, 'application/zip');
-
-        $this->post(route('settings.restore'), ['backup' => $upload])
-            ->assertForbidden();
+        $this->get('/settings/backup')->assertNotFound();
+        $this->post('/settings/restore')->assertNotFound();
+        $this->assertFalse(\\Illuminate\\Support\\Facades\\Route::has('settings.backup'));
+        $this->assertFalse(\\Illuminate\\Support\\Facades\\Route::has('settings.restore'));
     }
 
 }
