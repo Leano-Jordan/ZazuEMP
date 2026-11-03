@@ -37,7 +37,7 @@ if ($Stop) {
         }
 
         $parent = Get-ProcessDetails ([int]$server.ParentProcessId)
-        if ($parent -and $parent.Name -eq 'php.exe' -and $parent.CommandLine -like "*$ProjectPath*" -and $parent.CommandLine -like '*artisan serve*') {
+        if ($parent -and $parent.Name -eq 'php.exe' -and $parent.ExecutablePath -eq $server.ExecutablePath -and $parent.CommandLine -like '*artisan serve*') {
             if (-not $stopped.ContainsKey([string]$server.ProcessId)) {
                 Stop-Process -Id ([int]$server.ProcessId) -Force
                 $stopped[[string]$server.ProcessId] = $true
