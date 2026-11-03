@@ -39,7 +39,7 @@ The overall score is an unweighted average. A high average cannot override a Cri
 
 **Unweighted evidence-maturity average: 3.0/5 — 60/100.**
 
-This is not “60% of the software built”. It is a weighted-risk-neutral summary of how far the V1 specification is supported by implementation and evidence. The product is not release-certified.
+This is not “60% of the software built”. It is an unweighted summary of how far the V1 specification is supported by implementation and evidence. The product is not release-certified.
 
 ## Release blockers
 
@@ -47,7 +47,7 @@ This is not “60% of the software built”. It is a weighted-risk-neutral summa
 2. **Real recovery drill:** automated command tests do not prove a real backup → restore → data/media/security verification on the intended deployment.
 3. **Offline acceptance:** bounded offline workflows need repeatable installed-device disconnect/restart/reconnect tests. Phone-local attachment sync remains unimplemented.
 4. **Security review:** complete the offline account/session transition challenge and CSP nonce/hash migration plan.
-5. **Current-head verification:** all CI and browser checks for the assessment SHA must pass; the runs were queued when this scorecard was prepared.
+5. **Current-head verification:** Laravel, quality, Psalm, PHPMD, populated upgrade/rollback and push-on-main passed for the assessed source SHA. Browser smoke is still running; SonarCloud was skipped and is not counted as a pass.
 6. **Legal and brand:** complete operational privacy/terms controls and trade-mark clearance before commercial release.
 7. **Deployment:** exercise upgrade and rollback on the selected paid persistent server when that environment is funded and available. The development PC is not the production target.
 
