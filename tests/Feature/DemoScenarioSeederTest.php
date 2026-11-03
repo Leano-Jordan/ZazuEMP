@@ -8,7 +8,6 @@ use App\Models\User;
 use Database\Seeders\DemoScenarioSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Route;
-use Illuminate\Support\Facades\Route;
 use Tests\TestCase;
 
 class DemoScenarioSeederTest extends TestCase
