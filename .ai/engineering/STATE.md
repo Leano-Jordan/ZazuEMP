@@ -582,3 +582,11 @@ The purchase_order_receipts table stores only the business, purchase order and i
 - Static source re-read completed. Owner-PC execution, process survival after VS Code closure and stop behaviour are **NOT YET VERIFIED**. No claim of runtime success.
 - Commits: `412b979` launcher; `8323d97` start wrapper; `b28445f` stop wrapper; `dc11eb9` process verification; `bc1ea51` bind-address validation; `f821ea6` local test runbook; `4d7e4eb` deployment-readiness status.
 - The future production target remains a paid server selected later; no local-PC hosting configuration or infrastructure purchase is authorized or planned in this cycle.
+
+
+## Offline architecture alignment and evidence hygiene — 2026-11-03
+
+- Updated `docs/ZAZU_OFFLINE_FIRST_ARCHITECTURE.md` to match the owner's clarified deployment direction: paid persistent production server in future; Windows PC development-only; device-local IndexedDB continuity during internet/server outages; server remains shared business-data authority when reachable.
+- Explicitly ruled out an implied multi-device LAN sync mode while the cloud server is unreachable. That would require a separate approved architecture.
+- Corrected a misleading browser-test filename: `e2e/offline-attachments.spec.js` contained only an offline job-creation test and did not test attachment transfer. Renamed it to `e2e/offline-work-creation.spec.js`; test content unchanged. Offline attachment integration remains NOT IMPLEMENTED in the active app.
+- Current main after this batch: `a0637f15efbf05330c6d561bf4cfbcf1431bbdbe`. Exact-head CI has been triggered and is pending reconciliation.
