@@ -533,3 +533,8 @@ A newly confirmed security defect was the mismatch between business-scoped setti
 | Release readiness | OPEN | Do not claim tenant backup/restore as a V1 capability |
 
 No numeric uplift is awarded until exact-head CI passes. This correction reduces exposure; it does not complete the recovery gate.
+
+
+## V1 scorecard reconciliation — 2026-11-04
+
+The detailed 13-domain V1 evidence scorecard is `docs/ZAZU_V1_SCORECARD_2026-11-04.md`. Its unweighted average is **3.0/5 (60/100)**. This is evidence maturity, not percentage of code or features complete. Exact assessment head `d1e2a4397b064d3fbfe7fc2cf1dc59236e00922f` had CI queued at assessment time. Keep commercial readiness NO-GO until the critical operational, security, legal and brand gates are closed.

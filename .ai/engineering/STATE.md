@@ -616,3 +616,10 @@ Corrective source changes on main:
 Evidence: exact-head CI pending for this commit. Existing CLI command tests do not prove a real recovery drill. Business-scoped export/restore remains unimplemented and must not be claimed.
 
 Next priority: finish V1 recovery design with explicit tenant-vs-installation scope, then verify remaining current-head CI and continue populated commercial workflow and offline device acceptance. Keep all work in this repository and on main.
+
+
+## Director V1 scorecard — 2026-11-04
+
+The V1 specification scorecard is recorded in `docs/ZAZU_V1_SCORECARD_2026-11-04.md`. Current unweighted evidence-maturity average: **3.0/5 (60/100) across 13 domains**. This is not a feature-completion percentage.
+
+Assessment source head: `d1e2a4397b064d3fbfe7fc2cf1dc59236e00922f`; CI for that exact head was queued when assessed. Do not promote the score or readiness until the latest-head checks finish. Commercial release remains NO-GO.
