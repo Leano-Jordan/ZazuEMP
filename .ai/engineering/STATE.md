@@ -271,7 +271,7 @@ Last updated: 2026-10-20
 - Recorded the exact hosting and installed-device acceptance gate in `docs/ZAZU_OFFLINE_FIRST_ARCHITECTURE.md`.
 - Changes were committed directly to canonical `main`; no branch was created.
 - New test status: **IMPLEMENTED, execution pending**. A source write and a passing static assertion are not runtime proof.
-- Deployment reconnaissance: the connected Render workspace currently lists no Zazu EMP service; its listed web service is for ZIA Inventory. No verified stable HTTPS production origin is configured through that workspace. Do not deploy Zazu to ephemeral storage or create a potentially billable production service without durable database/private-file storage and recovery configuration.
+- Deployment reconnaissance: hosting configuration was not part of this repository-only review. Production provider, URL, database and durable storage status must be established from Zazu-specific deployment evidence; do not infer them from another product.
 
 ### Active target
 
@@ -600,4 +600,4 @@ The purchase_order_receipts table stores only the business, purchase order and i
 - Recorded the complete findings and evidence limits in `docs/ZAZU_SECURITY_AUDIT_2026-11-03.md`.
 - High-priority open issue: local IndexedDB and its sync bearer token are business-scoped rather than authenticated-user-scoped. Normal logout clears the workspace, but interrupted/expired sessions can leave a same-business account transition exposed on a shared browser. Do not treat shared-device/offline account isolation as closed.
 - GitHub reports `main` protected with no required status-check contexts. Owner must configure required checks; no setting was changed in this audit.
-- No live Zazu black-box test was performed: the connected Render workspace listed ZIA preview only, not Zazu. No security-alert clean bill is claimed.
+- No live Zazu black-box test was performed in this repository-only review because no Zazu runtime URL and test credentials were supplied. No security-alert clean bill is claimed.
