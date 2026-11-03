@@ -11,6 +11,8 @@ This directory contains the minimum operational documentation set required befor
 
 ## Document set
 
+| `ZAZU_V1_SCORECARD_2026-11-04.md` | Current evidence-maturity score against the V1 product specification | Snapshot — latest-head CI pending |
+
 | Document | Purpose | Current status |
 |---|---|---|
 | `RELEASE_PRIVACY_NOTICE_DRAFT.md` | Customer/data-subject privacy and collection notice | Draft — owner/legal completion required |

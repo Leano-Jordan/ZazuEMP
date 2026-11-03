@@ -648,3 +648,8 @@ The source changes and tests are committed on `main`. Exact-head CI is pending. 
 
 ## Director decision
 Treat the old settings exposure as a security defect corrected at source. Do not award a tenant backup/restore capability score. Keep V1 recovery amber until the operator drill is performed and a tenant-scoped export requirement is either implemented or explicitly excluded from the V1 customer promise.
+
+
+# Director V1 scorecard — 2026-11-04
+
+The current specification scorecard is `docs/ZAZU_V1_SCORECARD_2026-11-04.md`: **3.0/5 (60/100)** evidence maturity across 12 V1 domains. This is not a percentage of features built. V1 remains NO-GO pending the blockers listed in the scorecard. Exact-head CI for `d1e2a4397b064d3fbfe7fc2cf1dc59236e00922f` was queued when assessed.

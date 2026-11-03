@@ -25,6 +25,7 @@ This map prevents agents from treating historical notes, old status snapshots or
 
 ### Current product/release views
 - `docs/ZAZU_V1_STATUS.md` — current V1/release position.
+- `docs/ZAZU_V1_SCORECARD_2026-11-04.md` — current evidence-maturity score against the V1 specification; snapshot only, not release certification.
 - `docs/ZAZU_DEVELOPMENT_CHECKLIST.md` — current gate map.
 - `docs/ZAZU_2027_HARDENING_SCORECARD.md` — evidence maturity and future-scale separation.
 - `docs/ZAZU_COMMERCIAL_LEGAL_REGISTER.md` — current legal/commercial control register.

@@ -130,3 +130,14 @@ Repairs in this audit cycle: live default pairing selection, offline asset dupli
 - Real customer-environment recovery drill: OPEN.
 - Do not count installation-level restore as a tenant-scoped restore capability.
 - Next: design a tenant-scoped export format with explicit dependency closure and safe import semantics, or retain operator-managed installation recovery and document the product boundary.
+
+
+## V1 specification scorecard — 2026-11-04
+
+Current scorecard: `docs/ZAZU_V1_SCORECARD_2026-11-04.md`.
+
+- Evidence maturity: **3.0/5 (60/100)** across 12 V1 domains.
+- This is not a feature-completion percentage and does not override release gates.
+- Commercial release remains **NO-GO**.
+- Exact-head CI for `d1e2a4397b064d3fbfe7fc2cf1dc59236e00922f` was queued at the time of assessment.
+- Critical open gates: real recovery/rollback, offline device acceptance, offline account/session security review, tenant-scoped export/restore decision, legal/privacy operations and brand clearance.
