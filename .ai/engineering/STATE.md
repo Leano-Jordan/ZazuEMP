@@ -43,7 +43,7 @@ Current state:
 - `npm run test:service-worker` is wired into `.github/workflows/quality.yml`. Repository files were re-read after writes; current-main runtime/CI result remains **UNVERIFIED** until the exact workflow run is observed.
 - Stale health report snapshots from an October 12 Dependabot branch were archived and misleading root-level `docs/health/latest.*` files removed. The current health workflow is artifact/summary-only with `contents: read`; use exact Actions run evidence, not a persistent latest file.
 
-Next hard gate: **observe current-main Quality/Laravel/browser checks and the three behavioral regressions; then execute the documented customer-environment backup/restore and rollback drills**.
+Next hard gate: **close offline attachment integration as a bounded feature against the current business-scoped IndexedDB workspace and sync API; do not load the orphaned legacy script. In parallel, reconcile exact-main CI and preserve physical-device acceptance as unproven until tested on a secure origin.**
 
 Physical device acceptance is now owner-verified: Zazu installed on PC and mobile; screen rotation and presentation reported in order.
 
@@ -571,3 +571,14 @@ The purchase_order_receipts table stores only the business, purchase order and i
 - Commit: `f638437097b94f5a87f37179efe492719dcf7ba6` on `main`. Deployment document was re-fetched and its updated content SHA verified.
 - No local PC settings/services, database, firewall, router, certificates, browser storage or customer data were changed. No branch was created or used.
 - Active next target: repository-only production portability audit. Remove verified environment-specific assumptions and establish repeatable release/deployment requirements; defer infrastructure purchase and owner-PC hosting changes.
+
+
+## Local development runtime decoupling — 2026-11-03
+
+- Added `Start-Zazu-Dev.cmd` and `Stop-Zazu-Dev.cmd` wrappers with `ops/windows/Start-ZazuDev.ps1`.
+- Purpose: let the owner start/stop the temporary Laravel development server without leaving VS Code open. This is explicitly **not** a production host or Windows service.
+- Launcher validates PHP 8.4+, project dependencies and `.env`; defaults to loopback; refuses to take over an occupied port; logs to timestamped files under `storage/logs`; and stops only a process chain it can identify as this Zazu project.
+- A non-loopback bind can be supplied for trusted-LAN testing, but plain HTTP on a LAN IP is not a secure origin and cannot prove phone service-worker/PWA offline operation.
+- Static source re-read completed. Owner-PC execution, process survival after VS Code closure and stop behaviour are **NOT YET VERIFIED**. No claim of runtime success.
+- Commits: `412b979` launcher; `8323d97` start wrapper; `b28445f` stop wrapper; `dc11eb9` process verification; `bc1ea51` bind-address validation; `f821ea6` local test runbook; `4d7e4eb` deployment-readiness status.
+- The future production target remains a paid server selected later; no local-PC hosting configuration or infrastructure purchase is authorized or planned in this cycle.
