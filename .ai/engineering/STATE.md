@@ -590,3 +590,14 @@ The purchase_order_receipts table stores only the business, purchase order and i
 - Explicitly ruled out an implied multi-device LAN sync mode while the cloud server is unreachable. That would require a separate approved architecture.
 - Corrected a misleading browser-test filename: `e2e/offline-attachments.spec.js` contained only an offline job-creation test and did not test attachment transfer. Renamed it to `e2e/offline-work-creation.spec.js`; test content unchanged. Offline attachment integration remains NOT IMPLEMENTED in the active app.
 - Current main after this batch: `a0637f15efbf05330c6d561bf4cfbcf1431bbdbe`. Exact-head CI has been triggered and is pending reconciliation.
+
+
+## Director repository security audit — 2026-11-03
+
+- Completed a main-branch source review of authentication/session handling, tenant boundaries, permissions, sync pairing/token handling, mutation idempotency, attachment/media storage, PWA cache/offline persistence, spreadsheet parsing, tests, workflows and current security documentation.
+- Hardened CSV/XLSX parser resource boundaries, corrected the customer import controller's workbook response-shape mismatch, and applied request-ID/security-header middleware to the API group.
+- Added regression coverage for parser budgets, customer import preview and API response headers. These are **implemented, not yet CI-verified** until the new exact-main SHA completes its test workflows.
+- Recorded the complete findings and evidence limits in `docs/ZAZU_SECURITY_AUDIT_2026-11-03.md`.
+- High-priority open issue: local IndexedDB and its sync bearer token are business-scoped rather than authenticated-user-scoped. Normal logout clears the workspace, but interrupted/expired sessions can leave a same-business account transition exposed on a shared browser. Do not treat shared-device/offline account isolation as closed.
+- GitHub reports `main` protected with no required status-check contexts. Owner must configure required checks; no setting was changed in this audit.
+- No live Zazu black-box test was performed: the connected Render workspace listed ZIA preview only, not Zazu. No security-alert clean bill is claimed.
