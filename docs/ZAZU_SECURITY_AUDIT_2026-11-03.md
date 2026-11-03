@@ -102,7 +102,7 @@ The current `main` branch is protected, but GitHub reports empty required status
 
 **Automated cases added in this change:** API security headers/request IDs; customer import preview data shape/read-only behavior; CSV row cap; CSV column cap; XLSX expanded-entry cap.
 
-**Black-box:** not run against a live Zazu deployment. The connected Render workspace currently lists a ZIA preview service, not a Zazu service. Do not substitute ZIA as a Zazu target. No production database, credentials or live Zazu host was used.
+**Black-box:** not run against a live Zazu deployment in this repository-only review. No Zazu runtime URL or authenticated test account was provided for an external black-box session. No production database or customer credentials were accessed.
 
 **Security tooling:** repository branch metadata was readable; GitHub Security alert endpoints were not available through the current connector. Secret/dependency/code-scanning status remains unverified until checked directly in GitHub.
 
