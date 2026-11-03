@@ -15,13 +15,13 @@ This review found and addressed:
 - The customer import controller read a workbook using the wrong return shape; it requested a top-level `rows` key even though the reader returns worksheets keyed by sheet name.
 - The API middleware group did not receive the same security headers and request correlation IDs as web requests.
 
-The main unresolved security issue is **account isolation of local offline data**: the IndexedDB workspace is keyed by business ID, not by authenticated user ID. Explicit logout clears the workspace, but a different user signing into the same business after session expiry or an interrupted logout can reuse the same browser database and paired-device token. This requires a deliberate, data-preserving account-binding change and adversarial browser tests before shared-device use.
+The main offline security boundary is **owner-approved trusted-device access**, not per-staff account isolation. Repository decision DEC-019 explicitly defines pairing as business consent: an owner generates the code, selects the initial data set, and the paired device receives a bounded business-scoped workspace. The settings screen discloses that business data is stored on the paired device. The business-scoped IndexedDB design is therefore intentional and supports the approved shared-device workflow; forcing user-scoped storage would contradict that architecture and risk breaking offline continuity. It does mean that anyone with access to a trusted paired device/browser may be able to use the owner's approved offline data even when their normal web role is narrower. Treat the physical device and browser profile as part of the business trust boundary. Owner revocation, lost-device handling, secure screen/device lock and staff-use expectations must be explicit before customer deployment.
 
 ## Findings register
 
 | ID | Severity | Finding | Disposition |
 |---|---|---|---|
-| ZAZU-SEC-01 | **High** | Local offline database and stored sync bearer token are business-scoped, not user-scoped. | Open — release blocker for shared-user/shared-device use |
+| ZAZU-SEC-01 | Medium / accepted architecture constraint | Owner-approved phone workspace is business-scoped; normal staff web permissions are not a per-record security boundary inside that explicitly trusted device workspace. | Owner pairing and data disclosure exist; physical device trust, device inventory and lost-device/revocation procedure remain release controls |
 | ZAZU-SEC-02 | Medium | CSV/XLSX parsing lacked bounded row, cell, column and expanded-archive limits during parsing. | Fixed in this audit; CI proof pending |
 | ZAZU-SEC-03 | Medium | Customer import controller expected a response shape the spreadsheet reader does not return. | Fixed in this audit; feature regression added |
 | ZAZU-SEC-04 | Low | API requests were outside the web-only request-ID and security-header middleware. | Fixed in this audit; feature regression added |
@@ -33,15 +33,15 @@ The main unresolved security issue is **account isolation of local offline data*
 
 ## Detail and evidence
 
-### ZAZU-SEC-01 — Offline account isolation (High / open)
+### ZAZU-SEC-01 — Owner-approved trusted-device boundary (Medium / release control)
 
 `public/zazu-offline.js` names its primary IndexedDB database using `business_id` only and accepts an existing state when the stored business ID matches the active business. The authenticated user ID is present in the page shell and is used by the service worker's HTML cache, but it is not part of the offline database identity or state acceptance check. The database stores the sync bearer token and broad business workspace data.
 
-Device creation is mitigated by an owner-only settings route, and the owner explicitly generates the pairing code. However, provisioning turns that business-authorized pairing into a bearer token that is not associated with the initiating user; the sync API checks active device status and token hash, not the current web user's membership or role. The primary IndexedDB database and stored token are also keyed by business, not user.
+The repository's explicit design decision is owner-approved, business-scoped device trust. Pair-code creation is restricted to the owner route; the owner chooses or accepts a bounded bootstrap dataset; the settings UI states that business data is stored on the paired device. The sync token represents that trusted device, and its workspace is deliberately business-scoped so authorised operational staff can use the paired phone for the selected business work.
 
-The normal logout path clears the local state and then attempts remote token revocation. That does not cover every interrupted or expired-session transition. On a shared browser, a different member of the same business can therefore inherit the existing owner-authorized offline workspace and use its device token, even if that member's normal web role would not expose the same records. The severity depends on the owner's selected sync dataset and whether devices/browsers are shared.
+This is not the same security boundary as the normal server-rendered web UI. A narrower staff role does not automatically make records copied to an owner-trusted device private from that device's other users. Explicit logout clears the local workspace and attempts remote token revocation, but an interrupted logout cannot guarantee server revocation. A lost, stolen or reassigned paired device therefore remains a meaningful exposure risk until its token is revoked.
 
-**Required fix:** bind each sync device to the user who authorized pairing; enforce the binding and the user's current membership/permissions on sync requests; make the browser database and stored state user+business scoped; fail closed on account mismatch. Do not silently migrate an existing unowned queue to the first account that logs in. Preserve it for explicit, verified recovery. Add E2E tests for user A logout/session expiry, user B login into the same business, token reuse, cached data visibility and revoke/re-pair behavior.
+**Release controls:** document that the owner is authorising the selected data for use by anyone with access to the trusted paired device; require device screen lock and business custody; make the owner able to identify/revoke devices; train the owner to revoke immediately on loss/reassignment; retain the local-clear-before-revoke behaviour. If per-staff record isolation on shared phones becomes a requirement, design it as a separate capability with explicit server permission projection and offline tests. Do not silently change the business-scoped offline architecture or drop local queues.
 
 ### ZAZU-SEC-02 — Spreadsheet parser resource exhaustion (Medium / fixed in source)
 
@@ -110,7 +110,7 @@ The current `main` branch is protected, but GitHub reports empty required status
 
 ## Required next security gate
 
-1. Bind offline devices and IndexedDB state to the authenticated account; add same-business multi-user E2E tests.
+1. Complete trusted-device lifecycle controls: visible device inventory/revocation, owner lost-device runbook and physical-device lock acceptance; keep business-scoped offline storage as the owner-approved V1 model.
 2. Require quality, test and security checks on protected `main`.
 3. Review GitHub secret/dependency/code-scanning alerts and the Gitleaks history-scan result.
 4. Tighten CSP with nonces/hashes after removing inline script dependence.
