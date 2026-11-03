@@ -137,14 +137,16 @@ class SpreadsheetReader
         }
 
         $sheets = [];
+        $sheetCount = 0;
         $totalCells = 0;
 
         foreach ($workbook->sheets->sheet as $sheet) {
-            if (count($sheets) >= self::MAX_WORKSHEETS) {
+            $sheetCount++;
+            if ($sheetCount > self::MAX_WORKSHEETS) {
                 throw new RuntimeException('The XLSX workbook exceeds the limit of 20 worksheets.');
             }
 
-            $name = trim((string) $sheet['name']) ?: 'Sheet ' . (count($sheets) + 1);
+            $name = trim((string) $sheet['name']) ?: 'Sheet ' . $sheetCount;
             $relationshipId = (string) $sheet
                 ->attributes('http://schemas.openxmlformats.org/officeDocument/2006/relationships')->id;
             $target = $relationshipMap[$relationshipId] ?? null;
@@ -201,9 +203,11 @@ class SpreadsheetReader
         int &$totalCells,
     ): array {
         $rows = [];
+        $rowCount = 0;
 
         foreach ($sheetData->sheetData->row as $row) {
-            if (count($rows) >= self::MAX_TOTAL_ROWS) {
+            $rowCount++;
+            if ($rowCount > self::MAX_TOTAL_ROWS) {
                 throw new RuntimeException('The spreadsheet exceeds the limit of 5,000 data rows per worksheet.');
             }
 
