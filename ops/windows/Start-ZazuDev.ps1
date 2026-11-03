@@ -9,6 +9,10 @@ param(
 
 $ErrorActionPreference = 'Stop'
 $ProjectPath = [System.IO.Path]::GetFullPath($ProjectPath).TrimEnd('\\')
+$parsedAddress = $null
+if (-not [System.Net.IPAddress]::TryParse($BindAddress, [ref]$parsedAddress)) {
+    throw 'BindAddress must be an IP address such as 127.0.0.1 or 0.0.0.0.'
+}
 $artisan = Join-Path $ProjectPath 'artisan'
 $autoload = Join-Path $ProjectPath 'vendor\\autoload.php'
 $environment = Join-Path $ProjectPath '.env'
