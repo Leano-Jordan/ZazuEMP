@@ -23,20 +23,17 @@ Entry files must point to the canonical contract and must not define a competing
 ## Control loop
 IDENTITY → BASELINE → TARGET → ROUTE → INSPECT → CHANGE → VERIFY → BREAK → RECONCILE → ACCEPT/REPAIR → RECORD → NEXT
 
-## Local PC host deployment cycle — 2026-11-01
+## Historical local-PC hosting investigation — superseded 2026-11-03
 
-- Active deployment target: stable local HTTPS hostname → persistent Windows Apache/PHP host → local authoritative database/private storage → phone/tablet PWA clients.
-- No feature branches; all changes land directly on `main`.
-- Added `docs/LOCAL_PC_HOST_DEPLOYMENT.md` with the target topology, secure-origin design, Windows service requirements, network boundaries, backup plan, phases and acceptance gates.
-- Added `ops/windows/Inspect-ZazuHost.ps1`, a read-only inventory script. It must be run on the actual owner PC before touching AMPPS, Apache, database services, firewall, certificates or customer data.
-- Corrected `.env.example`: removed the explicit `SESSION_SECURE_COOKIE=false` override. `config/session.php` already defaults the cookie to secure when `APP_ENV=production`; the explicit false value would have defeated that production default in copied environments.
-- Rewrote `docs/LOAD_SHEDDING_MOBILE_TEST_RUNBOOK.md` to distinguish temporary Artisan/HTTP LAN testing from customer hosting and to reflect the current IndexedDB/offline mutation implementation rather than the obsolete static-cache-only description.
-- Source files were re-read after the writes. No PHP/Node test suite or Windows host inspection has been executed in this remote repository-only cycle.
-- Next remote gate: audit all origin-dependent code, service-worker registration/scope, generated URLs, cookie/CSRF behaviour and host availability/reconnect assumptions; add automated regression coverage where source evidence supports it.
-- Next physical gate: run the read-only host inspection, then select the existing Windows stack and configure it only after backup and compatibility checks.
+The 2026-11-01 local Windows-host proposal was exploratory and is no longer the active deployment target. The owner has clarified that this PC is a development workstation; future production hosting will be a paid server when funding and release readiness permit. The 2026-11-03 host diagnostic is recorded below. Do not configure this PC as production infrastructure.
 
 ## Active target
-**P0 active mission: finish VS Code-independent offline continuity; reconcile current-main offline/workflow CI; establish a durable HTTPS install origin; prove disconnected-device operation and recovery.**
+**P0 active mission: make Zazu's installed-device offline workflows reliable and recoverable; close the orphaned offline-attachment integration gap; reconcile exact-main CI and realistic disconnect/reconnect behaviour. Keep the current PC as development only; prepare provider-neutral portability for a future paid production server.**
+
+Current deployment boundary:
+- The Windows PC is development-only. No permanent local-PC host, AMPPS production setup, Windows service, router/DNS or private-CA work is in scope.
+- A paid production server is a future owner-approved decision. No provider, monthly spend, production DB engine or instance size is selected.
+- The current production-readiness plan is `docs/LOCAL_PC_HOST_DEPLOYMENT.md` (renamed content; historical filename retained).
 
 Current state:
 - Canonical repository/ref: `Leano-Jordan/ZazuEMP` / `main` only. No branches are to be created or used.
