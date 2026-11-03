@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Business;
 use App\Models\BusinessTaxProfile;
+use App\Models\SyncDevice;
 use App\Models\TaxRate;
 use App\Support\CurrentBusiness;
 use App\Support\Audit;
@@ -27,6 +28,7 @@ class BusinessSettingsController extends Controller
 
         return view('settings.index', [
             'business' => $business,
+            'syncDevices' => SyncDevice::query()->where('business_id', $business->id)->latest('id')->limit(20)->get(),
             'currencies' => config('zazu.currencies'),
             'taxRegimes' => config('zazu.tax.regimes'),
             'vatStatuses' => config('zazu.tax.vat_statuses'),
@@ -36,6 +38,32 @@ class BusinessSettingsController extends Controller
             // contains a legacy/plaintext value that predates encrypted storage.
             'hasTcsPin' => filled($business->taxProfile?->getRawOriginal('tcs_pin')),
         ]);
+    }
+
+
+    public function revokeSyncDevice(Request $request, SyncDevice $device): RedirectResponse
+    {
+        $business = app(CurrentBusiness::class)->model($request->user());
+        abort_unless((int) $device->business_id === (int) $business->id, 404);
+
+        if ($device->status !== 'revoked' && $device->revoked_at === null) {
+            $metadata = $device->metadata ?? [];
+            unset($metadata['sync_token_hash'], $metadata['pairing_code_hash'], $metadata['pairing_expires_at']);
+
+            $device->forceFill([
+                'status' => 'revoked',
+                'revoked_at' => now(),
+                'metadata' => $metadata,
+            ])->save();
+
+            Audit::record('sync.device.revoked', $business, [
+                'device_id' => (int) $device->id,
+                'device_name' => $device->device_name,
+                'device_type' => $device->device_type,
+            ], $business->id);
+        }
+
+        return redirect()->route('settings.index')->with('success', 'Phone access revoked. The device must be paired again before it can sync.');
     }
 
     public function backup(Request $request)

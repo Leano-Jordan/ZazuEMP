@@ -309,6 +309,35 @@
         </div>
     </section>
 
+    <section class="zazu-context-card mt-4" aria-labelledby="zazu-trusted-devices-title">
+        <div class="zazu-context-title" id="zazu-trusted-devices-title">Trusted phone access</div>
+        <p class="zazu-context-copy mt-1">Review phones paired with this business. Revoking a phone blocks its sync token immediately; queued changes remaining only on that phone will not be uploaded unless it is paired again.</p>
+        @if ($syncDevices->isEmpty())
+            <p class="zazu-field-help mt-3">No phones have been paired with this business.</p>
+        @else
+            <div class="grid gap-3 mt-4">
+                @foreach ($syncDevices as $device)
+                    <article class="zazu-list-item">
+                        <div class="min-w-0 flex-1">
+                            <strong class="block">{{ $device->device_name ?: 'Unpaired phone' }}</strong>
+                            <p class="zazu-context-copy mt-1">
+                                {{ ucfirst($device->device_type ?: 'device') }}
+                                · {{ ucfirst($device->status) }}
+                                · Last seen {{ $device->last_seen_at?->diffForHumans() ?? 'Never' }}
+                            </p>
+                        </div>
+                        @if ($device->status !== 'revoked' && $device->revoked_at === null)
+                            <form method="POST" action="{{ route('settings.sync.devices.revoke', $device) }}" data-zazu-confirm="Revoke this phone's access to business sync?" data-zazu-confirm-title="Revoke trusted phone?" data-zazu-confirm-action="Revoke access">
+                                @csrf
+                                <button type="submit" class="zazu-btn zazu-btn-ghost">Revoke access</button>
+                            </form>
+                        @endif
+                    </article>
+                @endforeach
+            </div>
+        @endif
+    </section>
+
     <section class="zazu-context-card mt-4" data-zazu-offline-conflicts hidden>
         <div class="zazu-context-title">Offline sync exceptions</div>
         <p class="zazu-context-copy mt-1">These changes were saved on this device but need attention before they can sync. Fix the underlying issue before retrying, or discard a change you no longer need.</p>
