@@ -2,8 +2,6 @@
 
 namespace Tests\Feature;
 
-use App\Models\Invoice;
-use App\Models\PurchaseOrder;
 use App\Models\User;
 use Database\Seeders\DemoScenarioSeeder;
 use Illuminate\Support\Facades\DB;
@@ -12,16 +10,16 @@ use Tests\TestCase;
 
 class PopulatedBackupRestoreTest extends TestCase
 {
-public function test_business_settings_do_not_expose_installation_wide_backup_or_restore(): void
-{
-    if (!class_exists(\\ZipArchive::class)) {
+    public function test_business_settings_do_not_expose_installation_wide_backup_or_restore(): void 
+    {
+        if (!class_exists(\\ZipArchive::class)) {
         $this->markTestSkipped('PHP Zip extension is required for backup tests.');
     }
 
-    $database = storage_path('app/director-populated-backup.sqlite');
-    $output = storage_path('app/director-backup-test');
-    $originalDefault = config('database.default');
-    $originalDatabase = config('database.connections.sqlite.database');
+        $database = storage_path('app/director-populated-backup.sqlite');
+        $output = storage_path('app/director-backup-test');
+        $originalDefault = config('database.default');
+        $originalDatabase = config('database.connections.sqlite.database');
     File::ensureDirectoryExists(dirname($database));
     File::delete($database);
     File::deleteDirectory($output);
@@ -62,6 +60,4 @@ public function test_business_settings_do_not_expose_installation_wide_backup_or
         DB::purge('sqlite');
     }
 }
-}
-
 }
