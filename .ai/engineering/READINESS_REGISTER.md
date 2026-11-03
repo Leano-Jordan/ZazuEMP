@@ -503,3 +503,19 @@ Last updated: 2026-10-20
 **Verification boundary:** changes are **IMPLEMENTED** at source and regression tests are **ADDED**. Current-main Actions results must be observed on the exact resulting SHA before marking these tests passed. No numerical readiness uplift is claimed.
 
 **Still release-blocking:** stable HTTPS hosting with durable database/private-file storage; actual disconnected app-icon launch and full close/reopen; complete V1 offline screen/data parity; deterministic attachment handling; end-to-end conflict recovery; customer-environment backup/restore and rollback; final privacy, legal, licence and brand clearance.
+
+
+## Security audit update — 2026-11-03
+
+| Control | Evidence now recorded | Current status / required proof |
+|---|---|---|
+| Spreadsheet import resource bounds | Source caps CSV/XLSX bytes, rows, columns, cell size, expanded archive size/entries, workbook sheets and cell count; regression cases added | Implemented; exact-head PHP/quality CI pending |
+| Customer import preview | Controller now extracts first worksheet rows using the reader's real response contract; read-only feature case added | Implemented; exact-head PHP/quality CI pending |
+| API response security baseline | Request-ID and security-header middleware now append to API group; regression case added | Implemented; exact-head PHP/quality CI pending |
+| Offline account isolation | IndexedDB name and stored device token remain business-scoped rather than user-scoped | **Open / high risk** — bind device and local data to account; test same-business account switching |
+| CSP inline allowance | Inline script/style remain allowed | Open — nonce/hash migration |
+| Sync token lifecycle | Hashed bearer token and explicit revoke exist; no automatic expiry | Open — define expiry/rotation policy |
+| GitHub branch checks | Protected main reports no required status-check contexts | Owner action — require quality/security checks |
+| Live black-box verification | No Zazu service is present in connected Render workspace | Open — designated staging target and authenticated test credentials required |
+
+**Evidence rule:** source changes and tests added are implementation evidence only. Do not mark the new cases as passed until Actions reports success for the resulting exact `main` SHA.
