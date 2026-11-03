@@ -512,7 +512,7 @@ Last updated: 2026-10-20
 | Spreadsheet import resource bounds | Source caps CSV/XLSX bytes, rows, columns, cell size, expanded archive size/entries, workbook sheets and cell count; regression cases added | Implemented; exact-head PHP/quality CI pending |
 | Customer import preview | Controller now extracts first worksheet rows using the reader's real response contract; read-only feature case added | Implemented; exact-head PHP/quality CI pending |
 | API response security baseline | Request-ID and security-header middleware now append to API group; regression case added | Implemented; exact-head PHP/quality CI pending |
-| Offline account isolation | IndexedDB name and stored device token remain business-scoped rather than user-scoped | **Open / high risk** — bind device and local data to account; test same-business account switching |
+| Trusted-device security boundary | Owner-only pairing, bounded business bootstrap, explicit settings disclosure, local logout clearing and token revocation exist | V1 model is intentionally business-scoped; complete device inventory/revocation UI and lost-device/physical-lock acceptance |
 | CSP inline allowance | Inline script/style remain allowed | Open — nonce/hash migration |
 | Sync token lifecycle | Hashed bearer token and explicit revoke exist; no automatic expiry | Open — define expiry/rotation policy |
 | GitHub branch checks | Protected main reports no required status-check contexts | Owner action — require quality/security checks |
