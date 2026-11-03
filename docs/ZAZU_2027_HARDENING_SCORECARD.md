@@ -22,7 +22,7 @@ The 19 October assessment below is retained as historical evidence. The 3 Novemb
 - Parser resource bounds, API security headers/request IDs and the customer-import reader/controller contract have been hardened in source; their new regression tests await exact-head CI.
 - A high-priority account-isolation issue remains open: offline IndexedDB and sync-token state is scoped to a business, not an authenticated user. Shared-browser account switching must be secured before shared-device use.
 - Main is protected but has no required status-check contexts. The owner must require current quality/security workflows.
-- No Zazu deployment is available in the connected Render workspace, so no live black-box verification was performed.
+- No live black-box verification was performed in this repository-only review because a Zazu runtime URL and test credentials were not supplied.
 - No numerical readiness uplift is awarded until exact-head CI and the open security gate are addressed.
 
 ## Previous Director assessment — 2026-10-19 (historical)
