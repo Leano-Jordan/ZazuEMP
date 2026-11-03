@@ -92,6 +92,71 @@ class SpreadsheetReaderTest extends TestCase
         }
     }
 
+    public function test_csv_reader_rejects_more_than_5000_data_rows_during_parsing(): void
+    {
+        $path = tempnam(sys_get_temp_dir(), 'zazu-csv-limit-');
+        $handle = fopen($path, 'wb');
+        fwrite($handle, "Customer Name,Contact\n");
+
+        for ($row = 1; $row <= 5001; $row++) {
+            fwrite($handle, "Customer {$row},Contact {$row}\n");
+        }
+
+        fclose($handle);
+
+        try {
+            $this->expectException(RuntimeException::class);
+            $this->expectExceptionMessage('5,000 data rows');
+
+            app(SpreadsheetReader::class)->read($path, 'customers.csv', 'text/csv');
+        } finally {
+            @unlink($path);
+        }
+    }
+
+    public function test_csv_reader_rejects_more_than_100_columns(): void
+    {
+        $path = tempnam(sys_get_temp_dir(), 'zazu-csv-columns-');
+        $headers = array_map(fn (int $index): string => 'Column '.$index, range(1, 101));
+        file_put_contents($path, implode(',', $headers)."\n");
+
+        try {
+            $this->expectException(RuntimeException::class);
+            $this->expectExceptionMessage('100 columns');
+
+            app(SpreadsheetReader::class)->read($path, 'customers.csv', 'text/csv');
+        } finally {
+            @unlink($path);
+        }
+    }
+
+    public function test_xlsx_reader_rejects_oversized_uncompressed_archive_entries(): void
+    {
+        if (! class_exists(\ZipArchive::class)) {
+            $this->markTestSkipped('PHP ZIP extension is not available.');
+        }
+
+        $path = tempnam(sys_get_temp_dir(), 'zazu-xlsx-limit-');
+        $zip = new \ZipArchive();
+
+        $this->assertSame(true, $zip->open($path));
+        $zip->addFromString('xl/sharedStrings.xml', str_repeat('A', (8 * 1024 * 1024) + 1));
+        $zip->close();
+
+        try {
+            $this->expectException(RuntimeException::class);
+            $this->expectExceptionMessage('8 MB processing limit');
+
+            app(SpreadsheetReader::class)->read(
+                $path,
+                'customers.xlsx',
+                'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+            );
+        } finally {
+            @unlink($path);
+        }
+    }
+
     public function test_unsupported_format_is_rejected_before_import_work(): void
     {
         $path = tempnam(sys_get_temp_dir(), 'zazu-text-');
