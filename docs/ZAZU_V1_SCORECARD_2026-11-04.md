@@ -4,7 +4,7 @@
 **Repository:** `Leano-Jordan/ZazuEMP`  
 **Branch:** `main`  
 **Assessment HEAD:** `d1e2a4397b064d3fbfe7fc2cf1dc59236e00922f`  
-**Evidence status:** latest-head CI queued; do not treat this snapshot as release certification.
+**Evidence status:** exact source-head CI mostly passed; browser smoke still running; not release certification.
 
 ## Scoring method
 
@@ -69,3 +69,21 @@ This is not “60% of the software built”. It is a weighted-risk-neutral summa
 6. Perform final V1 release certification.
 
 **Director decision: V1 remains NO-GO for commercial release.** The core product is substantial, but recovery, offline acceptance, security review, legal/brand and deployment evidence are not yet closed.
+
+
+## Exact source-head CI reconciliation — 2026-11-04
+
+Application source SHA: `d1e2a4397b064d3fbfe7fc2cf1dc59236e00922f`.
+
+| Check | Result |
+|---|---|
+| Laravel | PASS — [run 41727830781](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/41727830781) |
+| Zazu quality (build, tests and secret scan) | PASS — [run 41727830645](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/41727830645) |
+| Psalm security scan | PASS — [run 41727830698](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/41727830698) |
+| PHPMD | PASS — [run 41727830700](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/41727830700) |
+| Populated upgrade and rollback | PASS — [run 41727830659](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/41727830659) |
+| Push on main / CodeQL | PASS — [run 41727830881](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/41727830881) |
+| Browser smoke | IN PROGRESS at reconciliation — [run 41727830682](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/41727830682) |
+| SonarCloud | SKIPPED — [run 41727830643](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/41727830643); not counted as a pass |
+
+The documentation-only commits after `d1e2a439` do not change application source. Browser smoke remains the only observed pending required check for this source SHA. Do not mark the candidate fully CI-verified until it concludes.

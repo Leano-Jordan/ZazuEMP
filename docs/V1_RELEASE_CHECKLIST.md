@@ -141,3 +141,13 @@ Current scorecard: `docs/ZAZU_V1_SCORECARD_2026-11-04.md`.
 - Commercial release remains **NO-GO**.
 - Exact-head CI for `d1e2a4397b064d3fbfe7fc2cf1dc59236e00922f` was queued at the time of assessment.
 - Critical open gates: real recovery/rollback, offline device acceptance, offline account/session security review, tenant-scoped export/restore decision, legal/privacy operations and brand clearance.
+
+
+## Current source CI evidence — 2026-11-04
+
+Application source SHA `d1e2a4397b064d3fbfe7fc2cf1dc59236e00922f`:
+- 🟢 Laravel, Zazu quality, Psalm, PHPMD, populated upgrade/rollback and push-on-main passed.
+- 🟡 Browser smoke remains in progress.
+- ⚪ SonarCloud skipped; not counted as pass.
+
+Run links and exact IDs are recorded in `docs/ZAZU_V1_SCORECARD_2026-11-04.md`. Documentation-only commits after the source SHA do not change application code.

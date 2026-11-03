@@ -623,3 +623,8 @@ Next priority: finish V1 recovery design with explicit tenant-vs-installation sc
 The V1 specification scorecard is recorded in `docs/ZAZU_V1_SCORECARD_2026-11-04.md`. Current unweighted evidence-maturity average: **3.0/5 (60/100) across 13 domains**. This is not a feature-completion percentage.
 
 Assessment source head: `d1e2a4397b064d3fbfe7fc2cf1dc59236e00922f`; CI for that exact head was queued when assessed. Do not promote the score or readiness until the latest-head checks finish. Commercial release remains NO-GO.
+
+
+## Exact source CI — 2026-11-04
+
+For application SHA `d1e2a4397b064d3fbfe7fc2cf1dc59236e00922f`, Laravel, quality/secret scan, Psalm, PHPMD, populated upgrade/rollback and push-on-main passed. Browser smoke remains in progress; SonarCloud was skipped. Documentation-only commits followed; no application source changed after the assessed source SHA. Release certification remains blocked by browser acceptance and the operational/legal/brand gates.

@@ -538,3 +538,8 @@ No numeric uplift is awarded until exact-head CI passes. This correction reduces
 ## V1 scorecard reconciliation — 2026-11-04
 
 The detailed 13-domain V1 evidence scorecard is `docs/ZAZU_V1_SCORECARD_2026-11-04.md`. Its unweighted average is **3.0/5 (60/100)**. This is evidence maturity, not percentage of code or features complete. Exact assessment head `d1e2a4397b064d3fbfe7fc2cf1dc59236e00922f` had CI queued at assessment time. Keep commercial readiness NO-GO until the critical operational, security, legal and brand gates are closed.
+
+
+## Exact source-head CI — 2026-11-04
+
+Application source SHA `d1e2a4397b064d3fbfe7fc2cf1dc59236e00922f` has passing Laravel, Zazu quality/secret scan, Psalm, PHPMD, populated upgrade/rollback and push-on-main checks. Browser smoke is still running. SonarCloud is skipped. The latest documentation commits do not alter application source. Maintain the NO-GO release position until browser and operational gates close.
