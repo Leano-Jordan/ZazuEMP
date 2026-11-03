@@ -407,7 +407,7 @@ Source/test status: **IMPLEMENTED**. The new test has not yet been run by curren
 
 ### Deployment boundary
 
-The connected Render workspace was inspected and currently has no Zazu EMP web service; the listed service belongs to a different product. Therefore there is no verified stable HTTPS production origin to install from in that workspace. Do not create a production deployment against an ephemeral filesystem or without durable database and private-file storage. Hosting must be configured as a separate, explicit deployment target; creating an arbitrary free service is not proof of durable customer data.
+This architecture specification does not select or configure a production hosting provider. Production deployment is a separate Zazu-specific release activity and must verify the actual PHP runtime, database, persistent private-file storage, backups, HTTPS, monitoring and rollback path. Hosting choices must not be inferred from another product's infrastructure.
 
 ### Remaining acceptance
 
