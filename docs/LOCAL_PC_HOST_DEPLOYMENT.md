@@ -1,213 +1,160 @@
-# Zazu EMP — Local PC Host Deployment Plan
+# Zazu EMP — Production Deployment Readiness
 
-**Status:** IMPLEMENTATION PLAN — PC/runtime verification pending  
-**Target mode:** Local-network Zazu (Mode B) with device-local continuity (Mode C)  
-**Repository policy:** `main` only; no feature branches  
-**Scope:** Turn the owner's Windows PC into a stable, always-available local Zazu host without making VS Code part of runtime operation.
+**Status:** FUTURE PRODUCTION TARGET — no production host selected or purchased  
+**Current environment:** Owner development workstation; temporary development runtime only  
+**Production direction:** Paid, persistent server when the owner is ready  
+**Repository policy:** `main` only; no feature branches
 
-## 1. Outcome
+## 1. Deployment boundary
 
-A customer installs and runs Zazu from a stable HTTPS address on their own local network. The PC hosts Laravel, the authoritative database and private files. Phones and tablets connect over the same Wi-Fi/router. Internet access is not required for local-network operation.
+The owner's Windows PC is a development machine. It is not the planned permanent Zazu host and must not be configured, budgeted or documented as the customer production server.
 
-If the PC is unavailable, a phone can still use only the workflows and records already supported by its local IndexedDB workspace. Shared database access and synchronization resume when the host returns. This is not a claim that every Zazu screen is already a complete offline replacement.
+Current observed development runtime:
+- Project: `C:\Projects\ZazuEMP`
+- PHP CLI: standalone PHP 8.4.26 at `C:\PHP84\php.exe`
+- Web process: Laravel's built-in PHP development server on port 8000, launched from the VS Code integrated terminal
+- Active database: SQLite at `database/database.sqlite`
+- Private business files: `storage/app/private`
+- AMPPS is installed but is not used to run Zazu. Its bundled PHP 7.4.33 does not satisfy the application's PHP `^8.4` requirement.
 
-## 2. Current blocker confirmed in source
+The development server is temporary. Its process lifetime is tied to the terminal/process chain. The purpose of local development is implementation and testing, not production hosting.
 
-The previously used origin, `http://192.168.137.237:8000`, is a development address served by Laravel's built-in server. It is plain HTTP on a LAN IP, so it is not a secure browser context for service-worker registration. The current client already displays a diagnostic notice for this case.
+## 2. Future production outcome
 
-Do not solve this by merely changing the IP or leaving VS Code open. Do not use `php artisan serve` as the permanent customer-facing server.
+When funding and release readiness permit, deploy Zazu to a paid persistent server with:
+- a stable public HTTPS domain;
+- supported PHP 8.4+ runtime and required extensions;
+- a production web server (Nginx or Apache with PHP-FPM);
+- a durable production database selected through compatibility and recovery testing;
+- persistent private attachment storage;
+- a managed process for Laravel queue workers and scheduled tasks where required;
+- automated, off-server backups and a tested restore procedure;
+- monitoring, logs, security updates and a documented recovery path.
 
-## 3. Target topology
+No cloud provider, server size, operating system image, database engine, or monthly price is selected by this document. Those decisions require a release workload estimate and current market pricing. Do not purchase infrastructure merely to remove the development terminal dependency.
 
-```text
-                 Local Wi-Fi router
-           DHCP reservation + local DNS
-                         |
-             https://zazu.home.arpa
-                         |
-             Windows PC — Zazu host
-        +--------------------------------+
-        | Apache HTTPS virtual host      |
-        | Laravel application            |
-        | Local database (PC only)       |
-        | Private business file storage  |
-        | Scheduled local backups        |
-        +--------------------------------+
-                 |              |
-             Phone/PWA      Tablet/browser
-          IndexedDB queue    Browser client
-                 \              /
-                  Local network only
-```
+## 3. Application deployment requirements
 
-The router is the network naming authority. Prefer a DHCP reservation for the PC and a local DNS record such as `zazu.home.arpa` (the reserved home-network namespace). Do not assume that `.local` resolves consistently on every Android/router combination.
+- Serve only Laravel's `public/` directory; never expose the repository root, `.env`, database files, or private storage.
+- Use `APP_ENV=production`, `APP_DEBUG=false`, a stable HTTPS `APP_URL`, secure session cookies and a unique production `APP_KEY`.
+- Install PHP dependencies from the committed lock file with production dependencies only; do not run development setup scripts blindly against live data.
+- Build frontend assets before deployment. Node/Vite and VS Code must not be required by the running customer application.
+- Keep private business attachments outside the public web root and preserve existing authorization checks.
+- Configure writable Laravel runtime directories with least privilege; source code should not be broadly writable by the web process.
+- Run database migrations as a controlled release step after a verified backup, not automatically on every web process start.
+- Configure queue workers and the Laravel scheduler only for workloads that actually require them; ensure process supervision and restart behaviour.
+- Keep secrets, production environment files, signing keys and customer data out of Git.
 
-If the router cannot provide local DNS, use the reserved LAN IP as the host name and issue a certificate containing that exact IP address as a subject alternative name. Do not rely on a manually typed, changing DHCP address.
+## 4. Database and file-storage decision gate
 
-## 4. Server runtime
+The current development environment uses SQLite. The repository also contains SQLite/MySQL backup and restore paths. This does not by itself certify a production database choice.
 
-Select a persistent Windows host stack only after comparing the actual installed runtimes, HTTPS support and service-recovery capabilities. AMPPS is installed on the owner's PC but was not used to run Zazu; it is an unselected candidate, not the assumed or preferred host. The observed Zazu development runtime is standalone PHP 8.4 running `php artisan serve`. Any selected host must provide PHP 8.4+, the required extensions, a supported auto-start/recovery mechanism, HTTPS, durable database storage and private-file storage. AMPPS's bundled PHP runtime must not be treated as compatible merely because its Apache executable is present.
+Before selecting the production database:
+1. Run the full migration and feature-test suite against the candidate engine.
+2. Audit application queries, constraints, locking, transaction boundaries and concurrency-sensitive workflows for engine-specific assumptions.
+3. Exercise business isolation, financial mutations, inventory movements, idempotency and offline synchronization under concurrent requests.
+4. Run populated backup, restore, upgrade and rollback drills using representative private attachments.
+5. Compare operational cost, managed-service availability, backup retention and recovery objectives.
 
-Requirements:
+Do not silently switch engines or assume a database migration is a simple file copy. SQLite-to-server-database migration needs a rehearsed export/import and reconciliation procedure.
 
-- Apache listens on HTTPS port 443 for the LAN host name.
-- Apache serves only Laravel's `public/` directory; never expose the repository root.
-- PHP 8.4+ and required extensions match the locked Composer/runtime requirements.
-- Frontend assets are built before deployment with `npm run build`; customer runtime does not need Node/Vite or VS Code.
-- Database listens on loopback only; LAN clients never connect directly to MySQL/SQLite.
-- Laravel sessions, cache, queue and private files use durable local storage appropriate to the selected database driver.
-- Apache and the database start automatically with Windows and recover after restart.
-- Runtime logs rotate and have a documented location.
-- No development server, debug mode or demo credentials are used for customer runtime.
+Private attachments are part of the business data set. A database-only backup is incomplete. The backup set must include the database, private storage, required configuration/recovery material and a manifest/checksum strategy. Backups must be stored independently of the production server.
 
-Do not configure a production database until the existing customer data, current database driver, selected host's database layout and service lifecycle have been inspected. Do not replace or recreate an existing database as part of host setup.
+## 5. Offline behaviour is a separate product requirement
 
-## 5. Stable HTTPS on a private LAN
+A paid cloud server does not make Zazu offline-first. The app must continue to distinguish:
+- **Online:** server-backed workflows and synchronization available.
+- **Offline on a device:** only declared local workflows and previously available local records work from the installed app.
+- **Reconnect:** queued mutations are retried safely, with idempotency, conflict handling and no duplicate financial or inventory effects.
 
-Use a private local certificate authority (for example, mkcert) to issue a certificate for the router-provided host name. Install the CA trust certificate on each device that will install/use the PWA.
+If a customer loses internet access, their device cannot reach the cloud server. Their installed PWA may continue only the workflows actually implemented in its local IndexedDB workspace and cached shell. The current app is not a complete local mirror of Laravel; do not claim that every screen or workflow remains available.
 
-Acceptance requirements:
+Service-worker registration requires a secure browser context. Production HTTPS is therefore required for normal PWA installation and service-worker operation. Offline attachment handling and physical disconnected-device proof remain explicit acceptance gates.
 
-- The PC serves the exact same HTTPS origin after reboot.
-- The phone resolves the local host name while connected to the LAN.
-- The browser reports a secure context and no certificate warning.
-- Service-worker registration succeeds and controls the installed app.
-- The certificate remains valid for the configured name/IP and has a renewal/replacement procedure.
-- The private CA signing key stays on the PC and is backed up securely; never put it in Git.
+## 6. Origin and customer-data migration
 
-A self-signed leaf certificate with a browser warning is not an acceptable workaround. A trusted certificate must be installed on each client device. Public ACME certificates are not the default for a private-only hostname.
+Browser storage is origin-scoped. Changing scheme, hostname or port creates a separate storage partition for IndexedDB, Cache Storage, service workers and cookies.
 
+When moving from the current development origin to a production domain:
+1. Do not clear browser storage or uninstall the existing app as a migration shortcut.
+2. Inspect local mutation queues, conflicts and attachment queues on every paired device.
+3. Synchronize and reconcile all pending work while the old origin is still available.
+4. Back up the server database and private files, then restore/import into the production environment.
+5. Sign in and pair on the new HTTPS origin; verify business identity, record relationships and representative attachments.
+6. Submit a harmless test mutation and prove it synchronizes exactly once.
+7. Retain the old origin/profile until reconciliation is complete.
 
-## 5A. Origin migration is a data migration
+Until a tested local-workspace export/import mechanism exists, unsynchronized device-only work must be drained before origin migration. A new origin cannot automatically read the old origin's IndexedDB.
 
-The current client stores business workspaces in origin-scoped browser storage. The active workspace database is named `zazu-client-business-<business-id>`; the offline attachment queue is stored separately in `zazu-phone-attachments`. IndexedDB, Cache Storage, service-worker registrations and browser cookies are isolated by origin (scheme + host + port). Moving from `http://192.168.137.237:8000` to `https://zazu.home.arpa` therefore creates a **new, empty browser storage partition**. The old phone workspace, pending mutations, cached pages, attachment blobs and pairing session do not automatically move with it.
+## 7. Security and operations
 
-Treat the cutover as a controlled data migration, not a URL change:
+Production acceptance requires:
+- HTTPS with automated renewal and verified certificate chain;
+- least-privilege server and database access;
+- database not exposed directly to the public internet;
+- firewall rules limited to required public endpoints;
+- secure production secrets and key recovery procedures;
+- routine OS, PHP and dependency security updates;
+- application and infrastructure logs with rotation and alerting;
+- health checks and documented incident/restart procedures;
+- automated off-server backups with retention;
+- a successful restore drill to an isolated target;
+- documented deployment, rollback and data-recovery steps.
 
-1. Keep the old origin available while preparing the cutover. On each paired device, open Zazu on the old origin and confirm it has synchronized; inspect pending mutations, unresolved conflicts and queued attachments.
-2. Do not proceed with an old-origin device that has unsynchronized work or unresolved conflicts. Resolve/retry it while the old host is still available. If the old origin cannot be reached, preserve that browser profile and its storage; do not clear site data, uninstall the PWA or assume a fresh pairing recovers its local queue.
-3. Deploy the same business database and private files to the new host without recreating them. Back up first and verify the restored business identity and records.
-4. Open the new HTTPS origin, install/update the PWA, sign in and pair the device again. The new origin must bootstrap the expected business workspace from the authoritative server.
-5. Verify customer/job/quote/preparation counts and relationships, then create a harmless test mutation and confirm it syncs exactly once. Confirm attachments are present before retiring the old install.
-6. Retain the old origin/profile until all devices pass reconciliation. Only then retire the old endpoint. Never instruct users to clear browser storage as a migration step.
+Do not expose development tools, debug endpoints, database ports, private storage or administrative services publicly.
 
-**Release gate:** add a tested export/import or explicit migration mechanism before promising preservation of unsynchronized local-only work across an origin change. Until then, cutover is permitted only after old-origin queues, conflicts and attachment uploads are drained and verified. Server-backed records can be bootstrapped again; unsynchronized device-only data cannot be assumed recoverable from the new origin.
+## 8. Delivery sequence
 
-## 6. Network and security boundaries
+### Phase A — Development independence
+- Stop treating the VS Code terminal as the only way to keep a local development instance running when a repeatable local runtime is useful.
+- Keep local setup disposable and reproducible.
+- Do not configure the owner's PC as a customer production host.
+- Keep local development data clearly separate from future customer/production data.
 
-- Reserve the PC address in the router.
-- Permit inbound HTTPS (TCP 443) only from the trusted private LAN/subnet.
-- Do not expose Apache, database ports, remote administration or SMB shares to the public internet.
-- Keep the database bound to loopback.
-- Keep Laravel authorization/business isolation authoritative on the server.
-- Keep private attachments outside the public web root and preserve existing access controls.
-- Use unique owner credentials; remove demo users and demo seed data from customer installations.
-- Set production environment values: `APP_ENV=production`, `APP_DEBUG=false`, `APP_URL=https://zazu.home.arpa`, secure session cookies, and a generated unique `APP_KEY`.
-- Because Apache terminates TLS directly, do not add broad trusted-proxy rules unless a real reverse proxy is introduced and explicitly configured.
+### Phase B — Production portability
+- Audit environment-specific paths, URLs, filesystem assumptions, PHP extensions and process dependencies.
+- Define a reproducible production build/release artifact.
+- Document production environment variables and secret provisioning.
+- Verify deployment does not require Node/Vite or development dependencies at runtime.
+- Add deployment smoke checks and safe migration/rollback gates.
 
-## 7. Windows startup and recovery
+### Phase C — Production infrastructure selection
+- Estimate expected users, concurrent requests, storage growth, attachment traffic and background jobs.
+- Compare paid server options and total monthly operating costs.
+- Select the database, backup destination and monitoring approach based on tested compatibility and recovery.
+- Purchase infrastructure only after owner approval.
 
-The host must not depend on an interactive VS Code terminal or a user remembering to run Artisan.
+### Phase D — Production deployment
+- Provision the selected server and domain.
+- Deploy a release artifact, configure HTTPS, secrets, database, private storage, queues and scheduler.
+- Restore/migrate representative data safely.
+- Run security, workflow, backup and recovery acceptance.
 
-- Configure Apache and the database as Windows services or supported auto-start services in the installed stack.
-- Set service recovery to restart on failure.
-- Confirm services start after a full Windows reboot and before a user signs in, if the installed stack supports it.
-- Add a local health check for the HTTPS application and database.
-- Document a safe shutdown/restart procedure.
-- Verify that closing VS Code, closing the browser and signing out of the Windows desktop do not stop the host services.
+### Phase E — Offline and reconnect acceptance
+- Install on supported phones/tablets from the production HTTPS origin.
+- Close and reopen the app with internet disabled.
+- Verify only declared offline workflows and records are available.
+- Verify local writes survive reload and device restart.
+- Restore connectivity and verify queue retries, idempotency, conflicts and attachment transfer.
+- Repeat realistic outage and recovery tests; record limitations honestly.
 
-Do not add a custom background PowerShell service wrapper until the selected web-server binary, service registration, startup behavior and recovery mechanism are inspected. Avoid running two competing Apache/PHP servers on the same ports.
+## 9. Current acceptance status
 
-## 8. Backup and storage
-
-The PC becomes the local authority, so it also becomes a single point of failure.
-
-- Keep database and private-file backups on a separate physical drive or other independent destination.
-- Schedule backups and retain multiple restore points.
-- Include database, private attachments, environment/configuration recovery material and certificate renewal instructions.
-- Protect secrets and CA private keys; never commit them.
-- Run a restore drill to a separate test location before the first customer uses the host.
-- A second drive in the same PC is not an off-site backup; an additional copy should be stored separately.
-
-## 9. Implementation sequence
-
-### Phase 0 — Inspect the actual PC (no changes)
-Record Windows version, AMPPS version, PHP CLI and Apache PHP versions, enabled extensions, Apache service name/status, database service/driver, current Zazu path, current database path, storage path, router capabilities and current LAN subnet. Confirm available disk space and backup destination.
-
-### Phase 1 — Prepare the app for a stable origin
-Audit hard-coded origins, absolute URLs, cookie settings, service-worker scope/cache behavior, CORS, CSRF, OAuth/callback assumptions and any origin-bound pairing state. Make the app use the configured HTTPS host consistently. Add automated checks for secure-context/service-worker registration and same-origin behaviour.
-
-### Phase 2 — Configure local network identity and HTTPS
-Reserve the PC's LAN address, configure local DNS, issue the private certificate, install CA trust on target devices, and validate HTTPS from PC and phone.
-
-### Phase 3 — Install persistent host services
-Configure the existing Apache/PHP and database services to start automatically. Deploy Laravel from a release artifact, point Apache at `public/`, build assets, set production environment and verify logs/health.
-
-### Phase 4 — Install and prove the PWA
-Install from the stable HTTPS origin. Confirm service-worker control, cached shell and local workspace. Pair devices through the supported owner flow.
-
-### Phase 5 — Prove resilience
-Run the acceptance tests below, including host restart, internet-off/LAN-on, host-off, phone restart and data restore.
-
-## 10. Acceptance gates
-
-| Test | Pass condition |
+| Area | Status |
 |---|---|
-| Stable origin | Same HTTPS hostname resolves after PC/router reboot |
-| Secure context | No certificate warning; `isSecureContext === true` |
-| Service worker | Registration and controller persist after install/restart |
-| No VS Code | Close VS Code; phone and PC still reach Zazu |
-| Windows reboot | Apache and database return without manual terminal commands |
-| LAN without internet | Phone reaches host and completes server-backed workflows with WAN disconnected |
-| Host unavailable | Installed phone opens and supports only its declared local workflows; pending state is visible |
-| Reconnect | Queued work reconciles without loss or duplicate financial/inventory effects |
-| Firewall | LAN clients reach HTTPS; public/WAN clients cannot reach the host |
-| Restore | Database and private files restore successfully to a separate test location |
-| Update | App update and rollback preserve existing business data |
+| Local PHP 8.4 development runtime | OBSERVED |
+| Current local SQLite database | OBSERVED |
+| VS Code-independent local runtime | NOT YET ESTABLISHED |
+| Production provider/server selected | NOT SELECTED — intentionally deferred |
+| Production release artifact/deployment pipeline | NOT ESTABLISHED |
+| Production database engine certified | NOT ESTABLISHED |
+| Production backup/restore drill | NOT PROVEN |
+| Installed-device offline workflows | PARTIALLY IMPLEMENTED; full acceptance pending |
+| Offline attachment transfer | NOT ACCEPTED |
+| Reconnect/recovery under realistic outage | NOT PROVEN |
 
-## 11. Explicit limits
+## 10. Current next engineering target
 
-- This is a local-network product mode, not remote access from outside the premises.
-- When the PC is off, the central database is unavailable. Device-local continuity is limited to implemented and tested offline workflows.
-- A PC-hosted system needs reliable power, storage health and independent backups.
-- Router DNS and private CA trust must be configured on the customer network/devices.
-- Cloud hosting may be offered later as an optional mode; it is not required for this local-host target.
+**Production portability audit — repository-only first.**
 
-## 13. Read-only host inspection — 2026-11-01
-
-The owner supplied the output of `ops/windows/Inspect-ZazuHost.ps1`. This was a read-only inventory; no PC settings were changed.
-
-Observed:
-
-- Windows 10 Pro, build 19045, 64-bit. The output does not include the UBR/revision or confirm Windows 10 Extended Security Updates enrollment.
-- LAN interface: Wi-Fi, current address `192.168.137.237`, gateway/DNS `192.168.137.1`.
-- Standalone PHP CLI: `C:\PHP84\php.exe`, version 8.4.26. It satisfies the repository's PHP `^8.4` constraint.
-- Required common extensions observed include `openssl`, `pdo_mysql`, `mbstring`, `fileinfo`, `gd`, `intl`, `zip` and `curl`.
-- Composer 2.10.3, Node 26.10.0 and npm 12.1.0 are installed.
-- AMPPS is present under `C:\Program Files\Ampps`; its Apache, PHP and MySQL directories exist.
-- No Apache or MySQL/MariaDB Windows services were detected by the inventory.
-- The only detected web/database listener was PHP on `0.0.0.0:8000` (PID 10268), consistent with a development server. Process command line and executable path were not captured, so the exact launcher remains to be confirmed.
-- Project files, Composer vendor autoload, frontend manifest and `.env` are present.
-- C: has approximately 127.8 GB free.
-
-Interpretation:
-
-1. The host has a compatible PHP CLI, but the Apache-served PHP runtime still needs separate verification. CLI PHP does not prove Apache is using the same version/extensions.
-2. AMPPS being installed does not prove Apache or its database are installed as services, currently running, or configured for automatic startup.
-3. The current port 8000 listener is not an acceptable permanent host endpoint. Do not expose it as the customer endpoint.
-4. The current DHCP address must be reserved before relying on it for local DNS or certificate identity.
-5. Windows 10 Pro 22H2 reached end of standard support on 2025-10-14. Confirm the device's current security-update/ESU status or plan migration to a supported OS before treating it as a long-term customer host. See Microsoft's [Windows 10 lifecycle](https://learn.microsoft.com/en-us/lifecycle/products/windows-10-home-and-pro) and [ESU guidance](https://support.microsoft.com/en-us/windows/deployment/updates-lifecycle/windows-10-support-has-ended-on-october-14-2025).
-
-Next read-only inspection when the PC is available:
-
-- Identify PID 10268's full executable path, command line and parent process.
-- Evaluate available Windows web-server/PHP candidates, including AMPPS only as an installed-but-unused option; verify PHP 8.4 compatibility and service support before selection.
-- Identify the actual database driver, executable, data directory and service/start mechanism used by the current Zazu environment.
-- Compare PHP CLI with the PHP module/FastCGI runtime Apache would use.
-- Confirm the current database and private attachment paths, backup destination, and Windows ESU/security update state.
-
-No Apache, database, firewall, router, certificate, DNS, or Windows service changes are authorized or implied by this inventory.
-
-## 12. Current execution boundary
-
-Repository source and documentation can be prepared remotely. The actual PC, AMPPS services, router, certificate trust store and physical Android installation cannot be configured or certified from a GitHub-only session. Phase 0 must therefore be performed against the owner's actual Windows PC before any service, firewall, database or certificate changes are made.
+Inspect environment-specific assumptions, runtime dependencies, asset build requirements, storage paths, queue/scheduler needs, database compatibility and deployment automation. Fix verified portability defects and add regression checks where justified. Keep production provider selection and spending deferred until the software is ready and the owner authorizes infrastructure procurement.
