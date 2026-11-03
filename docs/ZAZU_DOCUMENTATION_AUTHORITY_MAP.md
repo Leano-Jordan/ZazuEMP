@@ -28,7 +28,8 @@ This map prevents agents from treating historical notes, old status snapshots or
 - `docs/ZAZU_DEVELOPMENT_CHECKLIST.md` — current gate map.
 - `docs/ZAZU_2027_HARDENING_SCORECARD.md` — evidence maturity and future-scale separation.
 - `docs/ZAZU_COMMERCIAL_LEGAL_REGISTER.md` — current legal/commercial control register.
-- `docs/ZAZU_PRIVACY_BASELINE.md` — privacy/security engineering baseline.
+- `docs/ZAZU_PRIVACY_BASELINE.md` — privacy/security engineering baseline
+- `docs/ZAZU_SECURITY_AUDIT_2026-11-03.md` — current source security findings, hardening changes and verification boundary.
 
 ### Compatibility entry point
 - `docs/ROSSCORE_ENGINEERING_COMMAND_ENGINE.md` — compatibility/integration pointer. It does not outrank the repository-side Zazu control plane.
