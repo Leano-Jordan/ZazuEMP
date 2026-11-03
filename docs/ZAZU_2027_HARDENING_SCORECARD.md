@@ -15,7 +15,17 @@ This scorecard separates implementation from evidence maturity and separates **V
 4 — runtime/CI verified  
 5 — repeatedly proven through realistic/production/recovery evidence
 
-## Current Director assessment — 2026-10-19
+## Current Director assessment — 2026-11-03
+
+The 19 October assessment below is retained as historical evidence. The 3 November source audit is recorded in `docs/ZAZU_SECURITY_AUDIT_2026-11-03.md`.
+
+- Parser resource bounds, API security headers/request IDs and the customer-import reader/controller contract have been hardened in source; their new regression tests await exact-head CI.
+- A high-priority account-isolation issue remains open: offline IndexedDB and sync-token state is scoped to a business, not an authenticated user. Shared-browser account switching must be secured before shared-device use.
+- Main is protected but has no required status-check contexts. The owner must require current quality/security workflows.
+- No Zazu deployment is available in the connected Render workspace, so no live black-box verification was performed.
+- No numerical readiness uplift is awarded until exact-head CI and the open security gate are addressed.
+
+## Previous Director assessment — 2026-10-19 (historical)
 
 **Assessment boundary:** current main has advanced beyond the last broad green application run. The last recorded broad green baseline is `7940033b6fd4f691692eec5e9d7f6ad587486f61` (2026-10-15); that result does not certify later commits. Exact current-head CI for the new service-worker behavioral suite is **UNVERIFIED** until its run is observed.
 
