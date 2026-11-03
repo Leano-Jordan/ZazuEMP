@@ -15,6 +15,16 @@ use ZipArchive;
  */
 class SpreadsheetReader
 {
+    private const MAX_SOURCE_BYTES = 5 * 1024 * 1024;
+    private const MAX_DATA_ROWS = 5000;
+    private const MAX_TOTAL_ROWS = self::MAX_DATA_ROWS + 1;
+    private const MAX_COLUMNS = 100;
+    private const MAX_CELL_BYTES = 8192;
+    private const MAX_CELLS = 250000;
+    private const MAX_ARCHIVE_ENTRIES = 256;
+    private const MAX_ARCHIVE_UNCOMPRESSED_BYTES = 20 * 1024 * 1024;
+    private const MAX_ARCHIVE_ENTRY_BYTES = 8 * 1024 * 1024;
+    private const MAX_WORKSHEETS = 20;
     /**
      * Read a CSV or XLSX workbook into a predictable, row-oriented structure.
      *
@@ -25,6 +35,7 @@ class SpreadsheetReader
      */
     public function read(string $path, ?string $originalName = null, ?string $mimeType = null): array
     {
+        $this->assertSourceSize($path);
         $extension = strtolower(pathinfo($originalName ?: $path, PATHINFO_EXTENSION));
 
         if ($extension === 'csv' || $this->isCsvMime($mimeType)) {
@@ -52,6 +63,11 @@ class SpreadsheetReader
         try {
             $rows = [];
             while (($row = fgetcsv($handle)) !== false) {
+                if (count($rows) >= self::MAX_TOTAL_ROWS) {
+                    throw new RuntimeException('The spreadsheet exceeds the limit of 5,000 data rows.');
+                }
+
+                $this->assertBoundedRow($row);
                 $rows[] = array_map(
                     fn ($value) => trim((string) ($value ?? '')),
                     $row
@@ -87,6 +103,8 @@ class SpreadsheetReader
         }
 
         try {
+            $this->assertSafeArchive($zip);
+
             $workbookXml = $zip->getFromName('xl/workbook.xml');
             $relationshipsXml = $zip->getFromName('xl/_rels/workbook.xml.rels');
 
@@ -104,8 +122,13 @@ class SpreadsheetReader
             }
 
             $sheets = [];
+            $totalCells = 0;
 
             foreach ($workbook->sheets->sheet as $sheet) {
+                if (count($sheets) >= self::MAX_WORKSHEETS) {
+                    throw new RuntimeException('The XLSX workbook exceeds the limit of 20 worksheets.');
+                }
+
                 $name = trim((string) $sheet['name']) ?: 'Sheet ' . (count($sheets) + 1);
                 $relationshipId = (string) $sheet->attributes('http://schemas.openxmlformats.org/officeDocument/2006/relationships')->id;
                 $target = $relationshipMap[$relationshipId] ?? null;
@@ -126,11 +149,25 @@ class SpreadsheetReader
                 $rawRows = [];
 
                 foreach ($sheetData->sheetData->row as $row) {
+                    if (count($rawRows) >= self::MAX_TOTAL_ROWS) {
+                        throw new RuntimeException('The spreadsheet exceeds the limit of 5,000 data rows per worksheet.');
+                    }
+
                     $values = [];
 
                     foreach ($row->c as $cell) {
                         $reference = (string) $cell['r'];
                         $column = $this->columnIndex($reference);
+
+                        if ($column >= self::MAX_COLUMNS) {
+                            throw new RuntimeException('The spreadsheet exceeds the limit of 100 columns.');
+                        }
+
+                        $totalCells++;
+                        if ($totalCells > self::MAX_CELLS) {
+                            throw new RuntimeException('The XLSX workbook exceeds the limit of 250,000 cells.');
+                        }
+
                         $type = (string) $cell['t'];
                         $value = (string) ($cell->v ?? '');
 
@@ -142,8 +179,11 @@ class SpreadsheetReader
                             $value = $value === '1' ? 'TRUE' : 'FALSE';
                         }
 
+                        $this->assertCellSize($value);
                         $values[$column] = trim($value);
                     }
+
+                    $this->assertBoundedRow($values);
 
                     if ($values !== []) {
                         $rawRows[] = $values;
@@ -178,7 +218,13 @@ class SpreadsheetReader
         $strings = [];
 
         foreach ($document->si as $item) {
-            $strings[] = trim($this->xmlText($item));
+            if (count($strings) >= self::MAX_CELLS) {
+                throw new RuntimeException('The XLSX workbook contains too many shared strings.');
+            }
+
+            $value = trim($this->xmlText($item));
+            $this->assertCellSize($value);
+            $strings[] = $value;
         }
 
         return $strings;
@@ -240,6 +286,14 @@ class SpreadsheetReader
      */
     private function normaliseRows(array $rows): array
     {
+        if (count($rows) > self::MAX_TOTAL_ROWS) {
+            throw new RuntimeException('The spreadsheet exceeds the limit of 5,000 data rows.');
+        }
+
+        foreach ($rows as $row) {
+            $this->assertBoundedRow($row);
+        }
+
         if ($rows === []) {
             return ['headers' => [], 'rows' => []];
         }
@@ -290,6 +344,72 @@ class SpreadsheetReader
         }
 
         return ['headers' => array_values($headers), 'rows' => $normalisedRows];
+    }
+
+    private function assertSourceSize(string $path): void
+    {
+        if (! is_file($path) || ! is_readable($path)) {
+            throw new RuntimeException('Unable to read the spreadsheet.');
+        }
+
+        $size = filesize($path);
+        if ($size === false || $size > self::MAX_SOURCE_BYTES) {
+            throw new RuntimeException('The spreadsheet exceeds the 5 MB processing limit.');
+        }
+    }
+
+    private function assertSafeArchive(ZipArchive $zip): void
+    {
+        if ($zip->numFiles > self::MAX_ARCHIVE_ENTRIES) {
+            throw new RuntimeException('The XLSX workbook contains too many archive entries.');
+        }
+
+        $totalBytes = 0;
+
+        for ($index = 0; $index < $zip->numFiles; $index++) {
+            $entry = $zip->statIndex($index);
+
+            if ($entry === false || ! isset($entry['size']) || ! is_numeric($entry['size'])) {
+                throw new RuntimeException('The XLSX workbook contains an invalid archive entry.');
+            }
+
+            $entryBytes = (int) $entry['size'];
+            if ($entryBytes > self::MAX_ARCHIVE_ENTRY_BYTES) {
+                throw new RuntimeException('The XLSX workbook contains an archive entry above the 8 MB processing limit.');
+            }
+
+            $totalBytes += $entryBytes;
+            if ($totalBytes > self::MAX_ARCHIVE_UNCOMPRESSED_BYTES) {
+                throw new RuntimeException('The XLSX workbook exceeds the 20 MB uncompressed processing limit.');
+            }
+        }
+    }
+
+    /**
+     * @param array<int|string, mixed> $row
+     */
+    private function assertBoundedRow(array $row): void
+    {
+        if (count($row) > self::MAX_COLUMNS) {
+            throw new RuntimeException('The spreadsheet exceeds the limit of 100 columns.');
+        }
+
+        foreach (array_keys($row) as $key) {
+            if (is_int($key) && $key >= self::MAX_COLUMNS) {
+                throw new RuntimeException('The spreadsheet exceeds the limit of 100 columns.');
+            }
+        }
+
+        foreach ($row as $value) {
+            $this->assertCellSize((string) ($value ?? ''));
+        }
+    }
+
+    private function assertCellSize(string $value): void
+    {
+        if (strlen($value) > self::MAX_CELL_BYTES) {
+            throw new RuntimeException('The spreadsheet contains a cell larger than the 8 KB processing limit.');
+        }
     }
 
     private function isCsvMime(?string $mimeType): bool
