@@ -6,71 +6,58 @@
 
 ## 1. Non-negotiable product rule
 
-Zazu is **offline-first**.
+Zazu is **offline-first at the device workflow level**.
 
-Internet connectivity is an enhancement, not the foundation of everyday business operation.
+A supported installed device must remain useful when internet access or the production server is unavailable. Connectivity adds shared data access, synchronization, remote backup and integrations; it must not erase the device's ability to continue declared offline workflows.
 
-The core product must be capable of doing normal business work when the internet is unavailable. Online mode may add richer connected features, synchronization, remote backup and integrations, but it must not make the local business workflow dependent on the cloud.
+Offline support is workflow-specific. It does not mean the complete Laravel application or every V1 screen is mirrored locally.
+
+**Production deployment direction:** Zazu will use a paid persistent server when the owner is ready to fund production hosting. The owner's Windows PC is development-only. Do not treat it as the permanent customer host or make a local Windows/LAN server a prerequisite for the product architecture.
 
 ## 2. Current architecture
 
-The current repository is a Laravel modular monolith with a local relational database.
+The current repository is a Laravel modular monolith with a relational database and private file storage. During development it runs locally; the future customer deployment target is a paid persistent server, not the development workstation.
 
-Current local authority:
+The browser/PWA client has:
+- a service worker for the application shell and user-scoped authenticated page cache;
+- a business-scoped IndexedDB workspace containing the bounded working set copied to the device;
+- a durable local mutation queue;
+- an owner-approved device pairing and sync token;
+- server-side business-scoped mutation handlers, idempotency and conflict recording.
 
-**Laravel application + local database + local/private storage**
+When connected, the server is authoritative for shared business records. When disconnected, a device can read and mutate only the records and workflows already supported by its local workspace. Those local changes remain pending on that device until synchronization succeeds.
 
-Current browser layer:
-
-**responsive web UI + service worker for static assets**
-
-Current offline licensing layer:
-
-**local BusinessLicense + OfflineLicenseService**
-
-Current limitation:
-
-The phone workspace now maintains a local IndexedDB working copy and supports local creation/editing of the current mobile operational records without a PC. Offline writes are durably queued locally and can be transmitted to the host sync foundation after owner-approved pairing. The complete production business domain is not yet mirrored locally.
-
-Therefore the present application is **phone-capable and locally persistent for the current mobile workspace, but not yet fully synchronized offline across the complete Zazu business domain**.
+The complete production business domain is not mirrored locally. The current app is not yet a complete disconnected replacement for the full web application.
 
 ## 3. Target operating modes
 
-### Mode A — Local single-device
-Primary early-customer mode.
+### Mode A — Local development
+- Zazu runs on the developer's workstation for implementation and testing.
+- The Artisan development server is temporary tooling.
+- VS Code is an editor, not a runtime dependency; the local server can be started separately.
+- This mode is not a customer production topology.
 
-- Zazu runs locally on the owner's PC/laptop.
-- The local database is authoritative.
-- Core workflows continue without internet.
-- Backup/export are local operations.
-- Internet is optional.
-
-### Mode B — Local-network Zazu
-Next practical expansion.
-
-- The PC/laptop acts as the local Zazu host.
-- Phones/tablets connect over the owner's local network or hotspot.
-- The host database remains authoritative.
-- Mobile clients do not require public internet to use Zazu.
-- Losing internet must not break local-network operation.
+### Mode B — Connected production
+- A paid persistent server hosts Laravel, the shared database and private business files.
+- Supported devices connect over HTTPS.
+- The server is authoritative for shared business state while reachable.
+- Hosting provider, instance size and production database are selected later through compatibility, recovery and cost evidence.
 
 ### Mode C — Device-local continuity
-Required for true phone-first resilience when the host is unavailable.
+- An installed device keeps its bounded business working set in IndexedDB.
+- Supported reads remain available without internet/server access.
+- Approved mutations are durably queued and visibly pending.
+- Local work survives reload/restart within browser storage limits.
+- Another device does not automatically see these changes while disconnected.
 
-- The phone/browser keeps a safe local working set.
-- Local reads remain available.
-- Approved mutations are recorded locally.
-- Mutations receive durable local identifiers.
-- Pending work is visible to the user.
-- When a trusted host becomes reachable, queued mutations synchronize.
+### Mode D — Reconnection and reconciliation
+- Queued mutations synchronize when the production server is reachable again.
+- Retries must be idempotent.
+- Parent/child identities and business ownership must be preserved.
+- Consequential conflicts must be visible and recoverable, never silently overwritten.
+- Attachments require their own durable local-file and synchronization path.
 
-### Mode D — Connected cloud
-Later optional service.
-
-- Cloud becomes a synchronized copy/service layer.
-- It does not replace local authority for offline-capable installations.
-- Remote backup, cross-device access, collaboration and other connected features can be added.
-- Conflict handling becomes explicit rather than silent last-write-wins.
+**Not currently promised:** multi-device synchronization while the cloud server is unreachable. That would require a separately designed local peer/host mode and is not implied by device-local offline support.
 
 ## 4. Data ownership model
 
@@ -231,15 +218,13 @@ The service worker is not the business-data authority. Business records and pend
 
 Do not broaden authenticated caching beyond this user-scoped shell/navigation role merely to claim "offline support".
 
-## 12. Migration path
+## 12. Evolution path
 
 The architecture should evolve incrementally:
 
-**Current local database → resilient local reads → local business-data store → queued writes → synchronization protocol → conflict handling → optional cloud**
+**Current Laravel backend → paid production deployment → bounded device-local working set → durable offline writes → safe reconnect/reconciliation → expanded workflow and attachment parity**
 
-Each stage must be independently usable and testable.
-
-Do not build a complete distributed synchronization system before local offline workflows are measured and proven.
+Each stage must be independently usable and testable. The paid server is the planned connected production backend; device-local storage provides continuity during outages. Do not introduce a local Windows production host or multi-device peer synchronization without a separately approved architecture decision.
 
 ## 13. Release gates for true offline capability
 
@@ -468,3 +453,16 @@ This work does **not** certify complete offline parity. Still open: every V1 scr
 ## Business-scoped phone storage
 
 The phone's IndexedDB workspace is namespaced by the active business ID from the authenticated application shell. A legacy `zazu-client` workspace is migrated only when both its saved business and paired device business IDs match the active business. The scoped database keeps a migration tombstone through local logout so cleared legacy work cannot be re-imported. This prevents a different business using the same browser origin from inheriting another business's local workspace or queued mutations.
+
+
+## Owner deployment clarification — 2026-11-03
+
+This section supersedes earlier historical notes in this document that described local-PC hosting as the primary customer mode or cloud as a merely optional later add-on.
+
+- The owner's PC is a development workstation only.
+- The future production application will run on a paid persistent server when the owner approves the spend.
+- Offline capability belongs in the installed device's local workspace and durable mutation/file queues; it must continue when the paid server or internet cannot be reached.
+- The connected server remains the shared business-data authority when reachable.
+- A device operating offline is not a shared LAN database. Other devices will not see its pending changes until safe synchronization occurs.
+- No production provider, server size, DB engine or deployment spend is selected yet.
+- This architecture does not authorize configuring the owner's PC as a permanent host.
