@@ -20,7 +20,7 @@ This scorecard separates implementation from evidence maturity and separates **V
 The 19 October assessment below is retained as historical evidence. The 3 November source audit is recorded in `docs/ZAZU_SECURITY_AUDIT_2026-11-03.md`.
 
 - Parser resource bounds, API security headers/request IDs and the customer-import reader/controller contract have been hardened in source; their new regression tests await exact-head CI.
-- A high-priority account-isolation issue remains open: offline IndexedDB and sync-token state is scoped to a business, not an authenticated user. Shared-browser account switching must be secured before shared-device use.
+- The offline workspace is intentionally business-scoped under owner-approved trusted-device pairing (DEC-019). The remaining control is trusted-device lifecycle: owner-visible device inventory/revocation, physical device lock and lost-device procedure; per-staff offline isolation is not part of the current V1 architecture.
 - Main is protected but has no required status-check contexts. The owner must require current quality/security workflows.
 - No live black-box verification was performed in this repository-only review because a Zazu runtime URL and test credentials were not supplied.
 - No numerical readiness uplift is awarded until exact-head CI and the open security gate are addressed.
