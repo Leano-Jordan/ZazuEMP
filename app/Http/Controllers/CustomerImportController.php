@@ -34,11 +34,18 @@ class CustomerImportController extends Controller
         ]);
 
         $file = $validated['spreadsheet'];
-        $rows = $reader->read(
+        $workbook = $reader->read(
             $file->getRealPath(),
             $file->getClientOriginalName(),
             $file->getMimeType(),
-        )['rows'];
+        );
+
+        // SpreadsheetReader returns sheets keyed by their workbook names.
+        // Customer import intentionally previews the first worksheet.
+        $firstSheet = reset($workbook);
+        $rows = is_array($firstSheet) && is_array($firstSheet['rows'] ?? null)
+            ? $firstSheet['rows']
+            : [];
 
         if ($rows === []) {
             throw new RuntimeException('The spreadsheet contains no data rows.');
