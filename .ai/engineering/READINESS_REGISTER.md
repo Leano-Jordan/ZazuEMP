@@ -516,6 +516,6 @@ Last updated: 2026-10-20
 | CSP inline allowance | Inline script/style remain allowed | Open — nonce/hash migration |
 | Sync token lifecycle | Hashed bearer token and explicit revoke exist; no automatic expiry | Open — define expiry/rotation policy |
 | GitHub branch checks | Protected main reports no required status-check contexts | Owner action — require quality/security checks |
-| Live black-box verification | No Zazu service is present in connected Render workspace | Open — designated staging target and authenticated test credentials required |
+| Live black-box verification | No Zazu runtime URL and authenticated test account were supplied for this repository-only audit | Open — run black-box tests against the owner-designated Zazu environment |
 
 **Evidence rule:** source changes and tests added are implementation evidence only. Do not mark the new cases as passed until Actions reports success for the resulting exact `main` SHA.
