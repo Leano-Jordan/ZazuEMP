@@ -145,20 +145,21 @@ function bootWorker(fetchImplementation = async () => new MockResponse('online')
 
 test('a persisted identity read finishing after logout cannot restore the identity or prime private pages', async () => {
     const worker = bootWorker();
-    const cache = await worker.caches.open('zazu-static-v29');
+    const cache = await worker.caches.open('zazu-static-v30');
     const readStarted = deferred();
     const releaseRead = deferred();
 
-    await cache.put('/__zazu-active-user__', new worker.Response(() => {
+    await cache.put('/__zazu-active-context__', new worker.Response(() => {
         readStarted.resolve();
         return releaseRead.promise;
     }));
-    const privateCache = await worker.caches.open('zazu-static-v29-user-41');
+    const privateCache = await worker.caches.open('zazu-static-v30-user-41-business-10');
     await privateCache.put('/dashboard', new worker.Response('private dashboard'));
 
     const priming = worker.dispatchMessage({
         type: 'prime-pages',
         userId: '41',
+        businessId: '10',
         routes: ['/dashboard'],
     });
 
@@ -169,11 +170,11 @@ test('a persisted identity read finishing after logout cannot restore the identi
 
     assert.equal(worker.fetchCalls.length, 0, 'stale identity must not trigger page priming');
     assert.equal(
-        (await worker.caches.keys()).some((name) => name.startsWith('zazu-static-v29-user-')),
+        (await worker.caches.keys()).some((name) => name.startsWith('zazu-static-v30-user-')),
         false,
         'logout must leave no cached authenticated page',
     );
-    assert.equal(await cache.match('/__zazu-active-user__'), null, 'logout must leave no persisted active identity');
+    assert.equal(await cache.match('/__zazu-active-context__'), null, 'logout must leave no persisted active identity');
 });
 
 test('an authenticated HTML response finishing after logout cannot repopulate the private page cache', async () => {
@@ -184,9 +185,9 @@ test('an authenticated HTML response finishing after logout cannot repopulate th
         return networkResponse.promise;
     });
 
-    const staticCache = await worker.caches.open('zazu-static-v29');
-    await staticCache.put('/__zazu-active-user__', new worker.Response('41'));
-    const privateCache = await worker.caches.open('zazu-static-v29-user-41');
+    const staticCache = await worker.caches.open('zazu-static-v30');
+    await staticCache.put('/__zazu-active-context__', new worker.Response('{"user_id":"41","business_id":"10"}'));
+    const privateCache = await worker.caches.open('zazu-static-v30-user-41-business-10');
     await privateCache.put('/dashboard', new worker.Response('<main>private dashboard</main>'));
 
     const navigation = worker.dispatchFetch(new worker.Request('/dashboard', {
@@ -197,7 +198,7 @@ test('an authenticated HTML response finishing after logout cannot repopulate th
 
     await networkStarted.promise;
     await worker.dispatchFetch(new worker.Request('/logout', { method: 'POST' })).finished();
-    networkResponse.resolve(new worker.Response('<main data-zazu-user-id="41">late response</main>', {
+    networkResponse.resolve(new worker.Response('<main data-zazu-user-id="41" data-zazu-business-id="10">late response</main>', {
         headers: { 'content-type': 'text/html' },
     }));
 
@@ -206,11 +207,11 @@ test('an authenticated HTML response finishing after logout cannot repopulate th
     await navigation.finished();
 
     assert.equal(
-        (await worker.caches.keys()).some((name) => name.startsWith('zazu-static-v29-user-')),
+        (await worker.caches.keys()).some((name) => name.startsWith('zazu-static-v30-user-')),
         false,
         'a late response must not recreate the logged-out user cache',
     );
-    assert.equal(await staticCache.match('/__zazu-active-user__'), null, 'the persisted identity must remain cleared');
+    assert.equal(await staticCache.match('/__zazu-active-context__'), null, 'the persisted identity must remain cleared');
 });
 
 
@@ -219,7 +220,7 @@ test('an identity write already in flight cannot finish after logout cleanup', a
     const releasePut = deferred();
     const worker = bootWorker(undefined, {
         beforePut: async ({ name, key }) => {
-            if (name === 'zazu-static-v29' && key === new URL('/__zazu-active-user__', ORIGIN).href) {
+            if (name === 'zazu-static-v30' && key === new URL('/__zazu-active-context__', ORIGIN).href) {
                 putStarted.resolve();
                 await releasePut.promise;
             }
@@ -229,6 +230,7 @@ test('an identity write already in flight cannot finish after logout cleanup', a
     const priming = worker.dispatchMessage({
         type: 'prime-pages',
         userId: '41',
+        businessId: '10',
         routes: [],
     });
 
@@ -238,10 +240,10 @@ test('an identity write already in flight cannot finish after logout cleanup', a
 
     await Promise.all([priming, logout]);
 
-    const state = await worker.caches.open('zazu-static-v29');
-    assert.equal(await state.match('/__zazu-active-user__'), null, 'logout must win over any identity write already in flight');
+    const state = await worker.caches.open('zazu-static-v30');
+    assert.equal(await state.match('/__zazu-active-context__'), null, 'logout must win over any identity write already in flight');
     assert.equal(
-        (await worker.caches.keys()).some((name) => name.startsWith('zazu-static-v29-user-')),
+        (await worker.caches.keys()).some((name) => name.startsWith('zazu-static-v30-user-')),
         false,
         'the stale identity operation must not leave a private page cache',
     );
@@ -252,7 +254,7 @@ test('a cached authenticated dashboard opens locally when the host server is una
     const worker = bootWorker(async () => {
         if (!hostAvailable) throw new Error('Host server unavailable');
         return new worker.Response(
-            '<!doctype html><html><body data-zazu-user-id="41"><main>Saved local dashboard</main></body></html>',
+            '<!doctype html><html><body data-zazu-user-id="41" data-zazu-business-id="10"><main>Saved local dashboard</main></body></html>',
             { headers: { 'content-type': 'text/html; charset=utf-8' } },
         );
     });
@@ -260,6 +262,7 @@ test('a cached authenticated dashboard opens locally when the host server is una
     await worker.dispatchMessage({
         type: 'prime-pages',
         userId: '41',
+        businessId: '10',
         routes: ['/dashboard'],
     });
 
