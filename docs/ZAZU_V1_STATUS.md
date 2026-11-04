@@ -106,12 +106,7 @@ The next Zazu engineering effort should close the highest-risk remaining release
 
 ## Jarvis update — 2026-10-07
 
-Offline attachment transfer has advanced from server-only foundation to phone-local queued storage and retry:
-- private, business-scoped upload/download/list endpoints;
-- idempotent attachment identity exposed in sync payloads;
-- separate IndexedDB binary storage on the phone;
-- offline attachment queue with automatic online retry;
-- local opening of stored files without a network connection.
+Historical 2026-10-07 prototype note: a standalone phone-local attachment transfer layer was prototyped, but later inspection confirmed it is orphaned and not loaded by the authenticated application. It is not a working V1 feature. Server-side upload/download/list endpoints exist; the active Work panel remains online-only.
 
 Remaining attachment gate: prove the browser/device flow against a real populated workspace, including a newly created offline job receiving its server identity before its queued attachment uploads.
 
@@ -136,6 +131,13 @@ A security review found that the former business settings backup/restore endpoin
 
 The CLI backup/restore commands remain available for controlled installation-operator use. Automated command-level round-trip and hostile-archive tests remain supporting evidence, not proof of a real recovery drill. Tenant-scoped export/restore remains an explicit V1 gap.
 
+
+## Offline transition and attachment hardening — 2026-11-04
+
+- Phone-local attachment storage is now business-scoped; pending attachments are included in logout assessment; active-business attachment storage is cleared during local session cleanup.
+- This is storage/lifecycle hardening only. Offline attachment upload/download remains **NOT IMPLEMENTED** in the active Work screen.
+- DEC-019 retains the owner-approved business-trusted device model. Logout, expired sessions, same-business account changes, business switches, interrupted cleanup, late responses and remote device revocation still require acceptance testing.
+- Exact-head Actions are pending. See `docs/ZAZU_OFFLINE_TRANSITION_AND_ATTACHMENT_HARDENING_2026-11-04.md`.
 
 ## V1 specification scorecard — 2026-11-04
 
