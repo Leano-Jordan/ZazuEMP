@@ -29,4 +29,43 @@ class BusinessContextSecurityTest extends TestCase
         $this->assertGuest();
     }
 
+    public function test_business_switch_is_membership_scoped_and_preserves_the_selected_workspace(): void
+    {
+        $first = \App\Models\Business::create([
+            'name' => 'Switch First',
+            'slug' => 'switch-first-'.\Illuminate\Support\Str::lower(\Illuminate\Support\Str::random(8)),
+            'status' => 'active',
+            'currency' => 'ZAR',
+        ]);
+        $second = \App\Models\Business::create([
+            'name' => 'Switch Second',
+            'slug' => 'switch-second-'.\Illuminate\Support\Str::lower(\Illuminate\Support\Str::random(8)),
+            'status' => 'active',
+            'currency' => 'ZAR',
+        ]);
+        $foreign = \App\Models\Business::create([
+            'name' => 'Switch Foreign',
+            'slug' => 'switch-foreign-'.\Illuminate\Support\Str::lower(\Illuminate\Support\Str::random(8)),
+            'status' => 'active',
+            'currency' => 'ZAR',
+        ]);
+
+        $user = User::factory()->create();
+        $first->users()->attach($user->id, ['role' => 'owner']);
+        $second->users()->attach($user->id, ['role' => 'staff']);
+
+        $this->actingAs($user)
+            ->post(route('business.switch'), ['business_id' => $first->id])
+            ->assertRedirect();
+        $this->assertSame($first->id, app(\App\Support\CurrentBusiness::class)->id($user));
+
+        $this->post(route('business.switch'), ['business_id' => $second->id])
+            ->assertRedirect();
+        $this->assertSame($second->id, app(\App\Support\CurrentBusiness::class)->id($user));
+
+        $this->post(route('business.switch'), ['business_id' => $foreign->id])
+            ->assertForbidden();
+        $this->assertSame($second->id, app(\App\Support\CurrentBusiness::class)->id($user));
+    }
+
 }
