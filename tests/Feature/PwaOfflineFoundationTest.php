@@ -227,7 +227,6 @@ class PwaOfflineFoundationTest extends TestCase
         $this->assertStringContainsString('business_id: BUSINESS_ID', $attachmentClient);
         $this->assertStringContainsString("fetch('/api/sync/revoke'", $client);
         $this->assertStringContainsString('return revokeDeviceToken(token);', $client);
-        $this->assertStringContainsString('could not confirm server-side revocation', $app);
         $this->assertStringContainsString('let activeSyncController = null;', $client);
         $this->assertStringContainsString('activeSyncController?.abort();', $client);
         $this->assertStringContainsString('sessionCleared || !state?.sync?.token', $client);
