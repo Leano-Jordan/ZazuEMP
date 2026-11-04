@@ -1995,7 +1995,9 @@ async function handleZazuLogout(form) {
     }
 
     HTMLFormElement.prototype.submit.call(form);
-}cument.addEventListener('submit', async (event) => {
+}
+
+document.addEventListener('submit', async (event) => {
     const form = event.target;
     if (!(form instanceof HTMLFormElement)) return;
 
