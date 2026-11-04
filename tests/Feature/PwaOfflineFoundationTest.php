@@ -56,7 +56,7 @@ class PwaOfflineFoundationTest extends TestCase
         $this->assertStringContainsString('Do not reject prematurely.', $attachmentOpen);
         $this->assertStringNotContainsString('request.onblocked = () => reject', $attachmentOpen);
         $this->assertStringContainsString("navigator.serviceWorker.register('/sw.js', { scope: '/' })", $app);
-        $this->assertStringContainsString("target?.postMessage({ type: 'prime-pages', userId, routes })", $app);
+        $this->assertStringContainsString("target?.postMessage({ type: 'prime-pages', userId, businessId, routes })", $app);
         $this->assertSame(1, substr_count($app, 'primeInstalledPages(ready)'));
         $this->assertStringNotContainsString('primeInstalledPages(registration)', $app);
         $this->assertStringContainsString('window.ZazuOffline.pair(code)', $app);
