@@ -685,104 +685,73 @@ test.describe('Zazu installed PWA offline shell', () => {
         expect(userCaches).toEqual([]);
     });
 
-    test('logout protects queued offline work and clears the local session after explicit discard', async ({ page }) => {
+    test('logout preserves the business offline workspace and paired device across account sessions', async ({ page }) => {
         test.setTimeout(60_000);
 
         await login(page);
-        const businessDatabaseName = await page.evaluate(() => {
+        const databaseName = await page.evaluate(() => {
             const businessId = Number(document.body.dataset.zazuBusinessId);
             if (!Number.isSafeInteger(businessId) || businessId < 1) {
                 throw new Error('Authenticated page did not expose its active business ID');
             }
             return 'zazu-client-business-' + businessId;
         });
-        await page.evaluate(async databaseName => {
+
+        await page.evaluate(async name => {
             await window.ZazuOffline.ready;
+            const state = window.ZazuOffline.getState();
+            state.sync = {
+                token: 'business-device-token-fixture',
+                device: { id: 987650, business_id: Number(document.body.dataset.zazuBusinessId) },
+            };
+            await window.ZazuOffline.persist();
             await window.ZazuOffline.queueMutation('customer', 'create', {
                 local_id: crypto.randomUUID(),
-                name: 'Logout guard test fixture',
+                name: 'Keep this queued across account logout',
             });
 
-            // Use a failed mutation for a deterministic persistence test. A
-            // pending mutation would legitimately auto-sync during the reload
-            // and make the fixture depend on server timing.
+            // A failed mutation keeps the fixture durable without relying on
+            // network timing or an automatic sync during reload.
             const db = await new Promise((resolve, reject) => {
-                const request = indexedDB.open(databaseName, 1);
+                const request = indexedDB.open(name, 1);
                 request.onsuccess = () => resolve(request.result);
                 request.onerror = () => reject(request.error || new Error('Could not open local offline storage'));
-                request.onblocked = () => reject(new Error('Local offline storage remains blocked by another open connection'));
             });
             await new Promise((resolve, reject) => {
                 const tx = db.transaction(['mutations'], 'readwrite');
                 const store = tx.objectStore('mutations');
                 const request = store.getAll();
                 request.onsuccess = () => {
-                    for (const record of request.result || []) {
-                        store.put({ ...record, status: 'failed' });
-                    }
+                    for (const record of request.result || []) store.put({ ...record, status: 'failed' });
                 };
                 tx.oncomplete = resolve;
                 tx.onerror = () => reject(tx.error || new Error('Could not mark mutation as failed'));
                 tx.onabort = () => reject(tx.error || new Error('Offline mutation transaction aborted'));
             });
             db.close();
-        }, businessDatabaseName);
+        }, databaseName);
 
-        let confirmDiscard = false;
+        let confirmLogout = false;
         const confirmMessages = [];
         page.on('dialog', async dialog => {
             if (dialog.type() !== 'confirm') {
                 await dialog.dismiss();
                 return;
             }
-
             confirmMessages.push(dialog.message());
-            if (confirmDiscard) await dialog.accept();
+            if (confirmLogout) await dialog.accept();
             else await dialog.dismiss();
         });
 
-        await page.evaluate(() => {
+        const requestLogout = () => page.evaluate(() => {
             const form = document.querySelector('form[action$="/logout"]');
             if (!form) throw new Error('Logout form was not found');
             form.requestSubmit();
         });
-
-        await expect.poll(() => new URL(page.url()).pathname).toBe('/dashboard');
-        await expect.poll(() => confirmMessages.length).toBe(1);
-        expect(confirmMessages[0]).toContain('rejected/failed change(s)');
-        const queueCount = () => page.evaluate(databaseName => new Promise((resolve, reject) => {
-            const request = indexedDB.open(databaseName, 1);
-            request.onerror = () => reject(request.error || new Error('Could not inspect offline queue'));
-            request.onblocked = () => reject(new Error('Offline queue inspection was blocked by another open connection'));
-            request.onsuccess = () => {
-                const db = request.result;
-                const tx = db.transaction(['mutations'], 'readonly');
-                const read = tx.objectStore('mutations').getAll();
-                tx.oncomplete = () => {
-                    resolve((read.result || []).length);
-                    db.close();
-                };
-                tx.onerror = () => reject(tx.error || new Error('Could not inspect offline queue'));
-            };
-        }), businessDatabaseName);
-        expect(await queueCount()).toBe(1);
-
-        // A cancelled sign-out must survive a cold page reload without losing queued work.
-        await page.reload({ waitUntil: 'domcontentloaded' });
-        await expect(page.getByRole('heading', { name: 'Dashboard' })).toBeVisible();
-        await page.evaluate(async () => window.ZazuOffline.ready);
-        await expect.poll(queueCount).toBe(1);
-
-        confirmDiscard = true;
-        await Promise.all([
-            page.waitForURL(url => !url.pathname.endsWith('/dashboard')),
-            page.evaluate(() => document.querySelector('form[action$="/logout"]').requestSubmit()),
-        ]);
-
-        const localData = await page.evaluate(databaseName => new Promise((resolve, reject) => {
-            const request = indexedDB.open(databaseName, 1);
-            request.onerror = () => reject(request.error || new Error('Could not inspect local offline storage'));
-            request.onblocked = () => reject(new Error('Local offline storage inspection was blocked by another open connection'));
+        const inspectWorkspace = () => page.evaluate(name => new Promise((resolve, reject) => {
+            const request = indexedDB.open(name, 1);
+            request.onerror = () => reject(request.error || new Error('Could not inspect business offline storage'));
+            request.onblocked = () => reject(new Error('Business offline storage inspection was blocked'));
             request.onsuccess = () => {
                 const db = request.result;
                 const tx = db.transaction(['state', 'mutations'], 'readonly');
@@ -791,18 +760,62 @@ test.describe('Zazu installed PWA offline shell', () => {
                 tx.oncomplete = () => {
                     resolve({
                         tokenPresent: Boolean(stateRequest.result?.sync?.token),
+                        token: stateRequest.result?.sync?.token || null,
                         queueCount: (queueRequest.result || []).length,
                         workspacePresent: Boolean(stateRequest.result?.business),
                     });
                     db.close();
                 };
-                tx.onerror = () => reject(tx.error || new Error('Could not inspect local offline state'));
+                tx.onerror = () => reject(tx.error || new Error('Could not inspect business offline workspace'));
             };
-        }), businessDatabaseName);
+        }), databaseName);
 
-        expect(localData.tokenPresent).toBe(false);
-        expect(localData.queueCount).toBe(0);
-        expect(localData.workspacePresent).toBe(false);
+        await requestLogout();
+        await expect.poll(() => new URL(page.url()).pathname).toBe('/dashboard');
+        await expect.poll(() => confirmMessages.length).toBe(1);
+        expect(confirmMessages[0]).toContain('business-scoped offline workspace');
+        expect(confirmMessages[0]).toContain('will remain on this device');
+        expect(await inspectWorkspace()).toMatchObject({
+            tokenPresent: true,
+            token: 'business-device-token-fixture',
+            queueCount: 1,
+            workspacePresent: true,
+        });
+
+        // The local business workspace survives a cold reload and a full
+        // account logout. Only the user-scoped page cache is cleared.
+        await page.reload({ waitUntil: 'domcontentloaded' });
+        await expect(page.getByRole('heading', { name: 'Dashboard' })).toBeVisible();
+        await page.evaluate(() => window.ZazuOffline.ready);
+        expect(await inspectWorkspace()).toMatchObject({
+            tokenPresent: true,
+            token: 'business-device-token-fixture',
+            queueCount: 1,
+            workspacePresent: true,
+        });
+
+        confirmLogout = true;
+        await Promise.all([
+            page.waitForURL(url => url.pathname === '/'),
+            requestLogout(),
+        ]);
+        expect(await inspectWorkspace()).toMatchObject({
+            tokenPresent: true,
+            token: 'business-device-token-fixture',
+            queueCount: 1,
+            workspacePresent: true,
+        });
+
+        // Re-authenticating into the same business reopens the same trusted
+        // business workspace without requiring the owner to re-pair the phone.
+        await login(page);
+        await page.evaluate(() => window.ZazuOffline.ready);
+        expect(await inspectWorkspace()).toMatchObject({
+            tokenPresent: true,
+            token: 'business-device-token-fixture',
+            queueCount: 1,
+            workspacePresent: true,
+        });
     });
 
     test('authenticated dashboard survives a real offline navigation', async ({ page, context }) => {
