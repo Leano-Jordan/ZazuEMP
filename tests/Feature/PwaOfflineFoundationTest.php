@@ -77,9 +77,12 @@ class PwaOfflineFoundationTest extends TestCase
         $this->assertStringContainsString('async function handleZazuLogout(form)', $app);
         $logoutHandler = substr($app, strpos($app, 'async function handleZazuLogout(form)'));
         $this->assertLessThan(
-            strpos($logoutHandler, 'offline.clearLocalSession()'),
+            strpos($logoutHandler, 'HTMLFormElement.prototype.submit.call(form)'),
             strpos($logoutHandler, 'await canReachZazuLogoutServer()')
         );
+        $this->assertStringContainsString('business-scoped offline workspace', $logoutHandler);
+        $this->assertStringNotContainsString('offline.assessLogout()', $logoutHandler);
+        $this->assertStringNotContainsString('offline.clearLocalSession()', $logoutHandler);
         $this->assertStringContainsString('offline.assessLogout()', $app);
         $this->assertStringContainsString('offline.clearLocalSession()', $app);
         $this->assertStringContainsString("target?.postMessage({ type: 'clear-user' })", $app);
