@@ -41,6 +41,10 @@ class SyncDeviceManagementTest extends TestCase
         $this->assertSame('revoked', $device->status);
         $this->assertNotNull($device->revoked_at);
         $this->assertArrayNotHasKey('sync_token_hash', $device->metadata ?? []);
+
+        $this->withToken('secret-token')
+            ->getJson('/api/sync/bootstrap')
+            ->assertUnauthorized();
     }
 
     public function test_non_owner_cannot_revoke_a_paired_phone(): void
