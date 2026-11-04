@@ -2,12 +2,14 @@ import { test, expect } from '@playwright/test';
 
 const DEMO_EMAIL = process.env.ZAZU_DEMO_EMAIL || 'demo@zazu.local';
 const DEMO_PASSWORD = process.env.ZAZU_DEMO_PASSWORD || 'password';
+const MANAGER_EMAIL = process.env.ZAZU_MANAGER_EMAIL || 'operations@zazu.local';
+const ROLE_PASSWORD = process.env.ZAZU_ROLE_PASSWORD || 'password';
 
-async function login(page) {
+async function login(page, email = DEMO_EMAIL, password = DEMO_PASSWORD) {
     await page.goto('/?auth=login', { waitUntil: 'domcontentloaded' });
     await expect(page.locator('[data-auth-modal]')).toBeVisible();
-    await page.getByLabel('Username or email').fill(DEMO_EMAIL);
-    await page.locator('#auth_password').fill(DEMO_PASSWORD);
+    await page.getByLabel('Username or email').fill(email);
+    await page.locator('#auth_password').fill(password);
     await page.locator('[data-auth-submit]').click();
     await expect(page).toHaveURL(/\/dashboard$/);
 }
