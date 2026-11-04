@@ -74,7 +74,17 @@ test('registration flows through onboarding into the dashboard', async ({ page }
     await expect(page.locator('.zazu-error-shell')).toHaveCount(0);
     await expect(page.locator('nav[aria-label="Public navigation"]').getByText("You’re signed in", { exact: true })).toBeVisible();
 
+    // Logout may correctly ask for confirmation when onboarding left local offline data.
+    // Playwright dismisses unhandled dialogs by default, which would cancel logout.
+    let logoutDialogMessage = '';
+    page.once('dialog', async dialog => {
+        logoutDialogMessage = dialog.message();
+        await dialog.accept();
+    });
     await page.locator('nav[aria-label="Public navigation"]').getByRole('button', { name: 'Sign out', exact: true }).click();
+    if (logoutDialogMessage) {
+        expect(logoutDialogMessage).toContain('Signing out will permanently clear the local offline copy');
+    }
     await expect(page).toHaveURL(/\/$/);
     await expect(page.locator('.zazu-error-shell')).toHaveCount(0);
 
