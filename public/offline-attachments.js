@@ -1,5 +1,6 @@
 (() => {
-    const DB = 'zazu-phone-attachments';
+    const BUSINESS_ID = Number(document.body?.dataset.zazuBusinessId || 0);
+    const DB = BUSINESS_ID > 0 ? 'zazu-phone-attachments-business-' + BUSINESS_ID : 'zazu-phone-attachments-unscoped';
     const STORE = 'files';
     let flushing = false;
 
@@ -114,6 +115,7 @@
                 if (!fileResponse?.ok) continue;
                 const blob = await fileResponse.blob();
                 await putFile({
+                    business_id: BUSINESS_ID,
                     idempotency_key: attachment.idempotency_key || ('server-' + attachment.id),
                     event_id: attachment.event_id,
                     original_name: attachment.original_name,
@@ -154,7 +156,12 @@
                 message('Attachment is limited to 20 MB');
                 return;
             }
+            if (BUSINESS_ID < 1) {
+                message('Choose a business workspace before saving attachments.');
+                return;
+            }
             const record = {
+                business_id: BUSINESS_ID,
                 idempotency_key: crypto.randomUUID(),
                 event_id: Number.isInteger(eventId) && eventId > 0 ? eventId : null,
                 event_local_id: eventLocalId,
@@ -184,11 +191,11 @@
             await downloadForEvent(eventId);
         }
 
-        const files = (await getFiles()).filter(x =>
+        const files = (await getFiles()).filter(x => Number(x.business_id) === BUSINESS_ID && (
             (eventId > 0 && Number(x.event_id) === eventId) ||
             (eventLocalId && x.event_local_id === eventLocalId) ||
             (eventId <= 0 && Number(x.event_id) === eventId && eventId !== 0)
-        );
+        ));
 
         target.innerHTML = files.length ? files.map((x, i) =>
             '<div class="row"><div><strong>' + esc(x.original_name) + '</strong><span>' +
