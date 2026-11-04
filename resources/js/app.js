@@ -1993,6 +1993,7 @@ async function handleZazuLogout(form) {
     if (assessment.total > 0 || assessment.conflictCount > 0 || assessment.localDirty) {
         const details = [
             assessment.pendingCount ? assessment.pendingCount + ' pending change(s)' : '',
+            assessment.attachmentPendingCount ? assessment.attachmentPendingCount + ' pending attachment(s)' : '',
             assessment.failedCount ? assessment.failedCount + ' rejected/failed change(s)' : '',
             assessment.conflictCount ? assessment.conflictCount + ' unresolved conflict(s)' : '',
             assessment.localDirty ? 'local workspace marked unsynchronized' : '',
