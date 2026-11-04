@@ -207,6 +207,15 @@ class PwaOfflineFoundationTest extends TestCase
         $this->assertStringContainsString("async function pair(pairingCode)", $client);
         $this->assertStringContainsString('async function assessLogout()', $client);
         $this->assertStringContainsString('async function clearLocalSession()', $client);
+        $this->assertStringContainsString("'zazu-phone-attachments-business-' + ACTIVE_BUSINESS_ID", $client);
+        $this->assertStringContainsString('async function countPendingAttachments()', $client);
+        $this->assertStringContainsString('async function clearAttachmentWorkspace()', $client);
+        $this->assertStringContainsString('await clearAttachmentWorkspace();', $client);
+        $this->assertStringContainsString('attachmentPendingCount', $client);
+        $attachmentClient = File::get(public_path('offline-attachments.js'));
+        $this->assertStringContainsString("'zazu-phone-attachments-business-' + BUSINESS_ID", $attachmentClient);
+        $this->assertStringContainsString('business_id: BUSINESS_ID', $attachmentClient);
+        $this->assertStringContainsString('assessment.attachmentPendingCount', $app);
         $this->assertStringContainsString("fetch('/api/sync/revoke'", $client);
         $this->assertStringContainsString('return revokeDeviceToken(token);', $client);
         $this->assertStringContainsString('could not confirm server-side revocation', $app);
