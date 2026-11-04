@@ -687,6 +687,127 @@ test.describe('Zazu installed PWA offline shell', () => {
         expect(userCaches).toEqual([]);
     });
 
+    test('service-worker private page cache follows the active business, not just the account', async ({ page }) => {
+        await login(page);
+
+        const result = await page.evaluate(async () => {
+            const workerSource = await fetch('/sw.js', { cache: 'no-store' }).then(response => response.text());
+            const handlers = {};
+            const cacheStores = new Map();
+            const NativeRequest = window.Request;
+
+            class WorkerRequest extends NativeRequest {
+                constructor(input, init) {
+                    const resolved = typeof input === 'string' && input.startsWith('/')
+                        ? new URL(input, window.location.origin).href
+                        : input;
+                    super(resolved, init);
+                }
+            }
+
+            const requestKey = request => typeof request === 'string'
+                ? new URL(request, window.location.origin).href
+                : request.url;
+
+            const cachesApi = {
+                async open(name) {
+                    if (!cacheStores.has(name)) {
+                        const records = new Map();
+                        cacheStores.set(name, {
+                            async match(request) {
+                                const value = records.get(requestKey(request));
+                                return value ? value.clone() : null;
+                            },
+                            async put(request, response) {
+                                records.set(requestKey(request), response.clone());
+                            },
+                            async delete(request) {
+                                return records.delete(requestKey(request));
+                            },
+                            async add(request) {
+                                records.set(requestKey(request), new Response('cached'));
+                            },
+                        });
+                    }
+                    return cacheStores.get(name);
+                },
+                async keys() { return [...cacheStores.keys()]; },
+                async delete(name) { return cacheStores.delete(name); },
+                async match(request) {
+                    for (const cache of cacheStores.values()) {
+                        const response = await cache.match(request);
+                        if (response) return response;
+                    }
+                    return null;
+                },
+            };
+
+            const mockSelf = {
+                location: { origin: window.location.origin },
+                addEventListener(type, callback) { handlers[type] = callback; },
+                skipWaiting: () => Promise.resolve(),
+                clients: { claim: () => Promise.resolve() },
+            };
+
+            let responseBusinessId = '10';
+            const mockFetch = async input => {
+                const url = new URL(typeof input === 'string' ? input : input.url, window.location.origin);
+                return new Response(
+                    '<!doctype html><html><body data-zazu-user-id="123" data-zazu-business-id="' + responseBusinessId + '">Business ' + responseBusinessId + '</body></html>',
+                    { status: 200, headers: { 'content-type': 'text/html; charset=utf-8' } }
+                );
+            };
+
+            const workerScript = document.createElement('script');
+            workerScript.textContent = `(function(self, caches, fetch, Request, Response, AbortController, setTimeout, clearTimeout, URL) {
+                ${workerSource}
+            })(window.__zazuMockSelf, window.__zazuMockCaches, window.__zazuMockFetch, window.__zazuMockRequest, window.Response, window.AbortController, window.setTimeout.bind(window), window.clearTimeout.bind(window), window.URL);`;
+            window.__zazuMockSelf = mockSelf;
+            window.__zazuMockCaches = cachesApi;
+            window.__zazuMockFetch = mockFetch;
+            window.__zazuMockRequest = WorkerRequest;
+            document.head.appendChild(workerScript);
+            workerScript.remove();
+            delete window.__zazuMockSelf;
+            delete window.__zazuMockCaches;
+            delete window.__zazuMockFetch;
+            delete window.__zazuMockRequest;
+
+            const prime = async businessId => {
+                responseBusinessId = businessId;
+                const waits = [];
+                handlers.message({
+                    data: { type: 'prime-pages', userId: '123', businessId, routes: ['/dashboard'] },
+                    waitUntil(promise) { waits.push(promise); },
+                });
+                await Promise.all(waits);
+            };
+
+            await prime('10');
+            const firstCache = 'zazu-static-v30-user-123-business-10';
+            const firstWasCreated = cacheStores.has(firstCache);
+
+            await prime('20');
+            const secondCache = 'zazu-static-v30-user-123-business-20';
+            const staticCache = await cachesApi.open('zazu-static-v30');
+            const contextResponse = await staticCache.match('/__zazu-active-context__');
+
+            return {
+                firstWasCreated,
+                firstCacheRetained: cacheStores.has(firstCache),
+                secondCacheCreated: cacheStores.has(secondCache),
+                context: contextResponse ? JSON.parse(await contextResponse.text()) : null,
+            };
+        });
+
+        expect(result).toEqual({
+            firstWasCreated: true,
+            firstCacheRetained: false,
+            secondCacheCreated: true,
+            context: { user_id: '123', business_id: '20' },
+        });
+    });
+
     test('logout preserves the business offline workspace and paired device across account sessions', async ({ page }) => {
         test.setTimeout(60_000);
 
