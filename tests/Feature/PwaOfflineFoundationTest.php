@@ -232,7 +232,7 @@ class PwaOfflineFoundationTest extends TestCase
         $this->assertStringContainsString('activeSyncController?.abort();', $client);
         $this->assertStringContainsString('sessionCleared || !state?.sync?.token', $client);
         $this->assertStringContainsString("tx.objectStore(QUEUE).clear();", $client);
-        $this->assertStringContainsString("new BroadcastChannel('zazu-offline-session')", $client);
+        $this->assertStringContainsString("new BroadcastChannel('zazu-offline-session-' + ACTIVE_BUSINESS_ID)", $client);
         $this->assertStringContainsString('sessionCleared', $client);
         $this->assertStringContainsString('activeSyncController?.abort();', $client);
         $this->assertStringContainsString("async function sync()", $client);
