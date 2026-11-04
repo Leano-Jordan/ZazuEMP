@@ -105,7 +105,7 @@ Current main now contains phone-local and server synchronization coverage for in
 
 Evidence boundary: IMPLEMENTED only for this new cycle until the current regression suite executes successfully in CI/runtime. No numerical readiness uplift is claimed from source changes alone.
 
-Remaining offline gaps: runtime/device proof, broader disconnected parity across every desktop capability, and full recovery/real-world sync proof. Attachment synchronization and explicit conflict detection/resolution are now implemented and covered by targeted tests.
+Remaining offline gaps: runtime/device proof, broader disconnected parity across every desktop capability, and full recovery/real-world sync proof. Explicit conflict detection/resolution is implemented at source. Phone-local attachment upload/download is NOT integrated into the active Work screen; the dormant transfer client must not be counted as a working feature.
 
 Last updated: 2026-10-07
 
@@ -543,3 +543,13 @@ The detailed 13-domain V1 evidence scorecard is `docs/ZAZU_V1_SCORECARD_2026-11-
 ## Exact source-head CI — 2026-11-04
 
 Application source SHA `d1e2a4397b064d3fbfe7fc2cf1dc59236e00922f` has passing Laravel, Zazu quality/secret scan, Psalm, PHPMD, populated upgrade/rollback and push-on-main checks. Browser smoke is still running. SonarCloud is skipped. The latest documentation commits do not alter application source. Maintain the NO-GO release position until browser and operational gates close.
+
+
+### 2026-11-04 — trusted-device transition and attachment lifecycle
+
+- Retained DEC-019: the offline workspace is business-scoped by design because the owner authorizes the paired device as a business-trusted device. Do not redesign it as user-scoped without an approved architecture change.
+- Added a separate business-scoped attachment IndexedDB database, included pending local attachments in logout assessment, and clear the active business attachment store during local session cleanup.
+- The old unscoped attachment database is intentionally not migrated or deleted because its records lack reliable business ownership metadata.
+- Active Work attachment transfer remains unimplemented. The legacy transfer client is dormant and not loaded by the authenticated layout.
+- Remaining acceptance: logout/expired-session/business-switch/same-business account transition/interrupted cleanup/late response/device revocation; then integrate the attachment flow into the active Work page and test upload/retry/download/business isolation/logout.
+- Source/test exact head before this documentation update: `cdea317643dd5e226d685f84c32f51d875defc80`. GitHub Actions run `41882179271` was still in progress; no CI pass is claimed.
