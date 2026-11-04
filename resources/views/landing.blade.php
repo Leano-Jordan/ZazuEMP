@@ -393,7 +393,10 @@
 
     </style>
 </head>
-<body>
+<body
+    @if($isAuthenticated) data-zazu-user-id="{{ auth()->id() }}" @endif
+    @if($business) data-zazu-business-id="{{ $business->id }}" @endif
+>
 <div class="site">
 <header class="top">
     <a href="{{ url('/') }}" class="brand"><span class="mark">Z</span><span><strong>ZAZU</strong><span>Event Management Platform</span></span></a>
