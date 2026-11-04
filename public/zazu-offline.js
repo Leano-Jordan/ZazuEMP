@@ -303,9 +303,16 @@
                     request.result.createObjectStore(ATTACHMENT_STORE, { keyPath: 'idempotency_key' });
                 }
             };
-            request.onsuccess = () => resolve(request.result);
+            request.onsuccess = () => {
+                const db = request.result;
+                // A later tab may request a schema upgrade. Release this connection
+                // so the upgrade can finish instead of trapping logout behind it.
+                db.onversionchange = () => db.close();
+                resolve(db);
+            };
             request.onerror = () => reject(request.error || new Error('Local attachment storage could not be opened.'));
-            request.onblocked = () => reject(new Error('Local attachment storage is blocked by another tab.'));
+            // `blocked` is informational, not terminal: IndexedDB may still finish
+            // once an older tab releases its connection. Do not reject prematurely.
         });
     }
 
