@@ -1970,7 +1970,7 @@ async function loadZazuOfflineClient() {
     return window.ZazuOffline;
 }
 
-asyasync function handleZazuLogout(form) {
+async function handleZazuLogout(form) {
     const logoutServerReachable = await canReachZazuLogoutServer();
     if (!logoutServerReachable) {
         window.alert('Zazu cannot reach the authentication server, so it cannot securely end this web session. Your business offline workspace, pending changes and device token were left untouched. Reconnect to the server and retry signing out.');
