@@ -540,7 +540,7 @@ test.describe('Zazu installed PWA offline shell', () => {
 
         await expect.poll(() => dialogs.length).toBe(2);
         expect(dialogs[1].type).toBe('alert');
-        expect(dialogs[1].message).toContain('Your local offline data and device token were left untouched');
+        expect(dialogs[1].message).toContain('Your business offline workspace, pending changes and device token were left untouched');
         await expect.poll(() => new URL(page.url()).pathname).toBe('/dashboard');
 
         const localState = await page.evaluate(async () => ({
