@@ -44,7 +44,7 @@
 
     try {
         if ('BroadcastChannel' in window) {
-            sessionChannel = new BroadcastChannel('zazu-offline-session');
+            sessionChannel = new BroadcastChannel('zazu-offline-session-' + ACTIVE_BUSINESS_ID);
         }
     } catch {
         // Cross-tab signalling is best-effort; IndexedDB transactions remain authoritative.
