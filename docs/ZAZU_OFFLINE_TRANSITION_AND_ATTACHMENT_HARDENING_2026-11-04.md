@@ -37,13 +37,13 @@ The old global `zazu-phone-attachments` database is not automatically migrated o
 ## Verification
 
 - Source and test changes are committed directly to `main`.
-- Exact source/test head: `cdea317643dd5e226d685f84c32f51d875defc80`.
-- GitHub Actions run `41882179271` (Push on main / CodeQL) was still in progress at the time this note was written. No test pass is claimed from that run.
+- Application/test head under verification: `67332defe19d8370d963d563ec5ace9b4425df75`.
+- On that exact head, Laravel, Zazu Quality, Psalm Security, populated upgrade/rollback and PHPMD passed. Browser smoke run `41893159816` remained in progress; browser acceptance is PENDING.
 - No physical-device or live-server acceptance was performed.
 
 ## Next execution
 
-1. Complete the session-transition acceptance matrix against the approved DEC-019 trust model. Preserve pending work unless the owner explicitly confirms discard.
+1. Complete the session-transition acceptance matrix against the approved DEC-019 trust model. Preserve the business-scoped offline workspace and paired-device token across account logout; device revocation remains an owner action.
 2. Integrate attachments into the active Work page using the current sync-token API, business-scoped IndexedDB, server idempotency, offline retry, local open/download, and account/logout cleanup.
 3. Add active-path browser tests for offline create, reconnect upload, duplicate retry, downloaded file reuse, business separation, logout cleanup, and revocation.
 
