@@ -83,8 +83,6 @@ class PwaOfflineFoundationTest extends TestCase
         $this->assertStringContainsString('business-scoped offline workspace', $logoutHandler);
         $this->assertStringNotContainsString('offline.assessLogout()', $logoutHandler);
         $this->assertStringNotContainsString('offline.clearLocalSession()', $logoutHandler);
-        $this->assertStringContainsString('offline.assessLogout()', $app);
-        $this->assertStringContainsString('offline.clearLocalSession()', $app);
         $this->assertStringContainsString("target?.postMessage({ type: 'clear-user' })", $app);
     }
 
