@@ -814,7 +814,8 @@ test.describe('Zazu installed PWA offline shell', () => {
 
         // Re-authenticating into the same business reopens the same trusted
         // business workspace without requiring the owner to re-pair the phone.
-        await login(page);
+        await login(page, MANAGER_EMAIL, ROLE_PASSWORD);
+        await expect.poll(() => page.locator('body').evaluate(node => Number(node.dataset.zazuBusinessId))).toBe(Number(databaseName.slice('zazu-client-business-'.length)));
         await page.evaluate(() => window.ZazuOffline.ready);
         expect(await inspectWorkspace()).toMatchObject({
             tokenPresent: true,
