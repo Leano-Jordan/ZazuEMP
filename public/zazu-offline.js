@@ -7,6 +7,10 @@
         ? 'zazu-client-business-' + ACTIVE_BUSINESS_ID
         : 'zazu-client-unscoped';
     const DB_VERSION = 1;
+    const ATTACHMENT_DB_NAME = ACTIVE_BUSINESS_ID > 0
+        ? 'zazu-phone-attachments-business-' + ACTIVE_BUSINESS_ID
+        : 'zazu-phone-attachments-unscoped';
+    const ATTACHMENT_STORE = 'files';
     const STATE = 'state';
     const QUEUE = 'mutations';
     let state = null;
@@ -290,15 +294,59 @@
         });
     }
 
+    async function openAttachmentDb() {
+        if (ACTIVE_BUSINESS_ID < 1) throw new Error('A business workspace is required for local attachments.');
+        return new Promise((resolve, reject) => {
+            const request = indexedDB.open(ATTACHMENT_DB_NAME, 1);
+            request.onupgradeneeded = () => {
+                if (!request.result.objectStoreNames.contains(ATTACHMENT_STORE)) {
+                    request.result.createObjectStore(ATTACHMENT_STORE, { keyPath: 'idempotency_key' });
+                }
+            };
+            request.onsuccess = () => resolve(request.result);
+            request.onerror = () => reject(request.error || new Error('Local attachment storage could not be opened.'));
+            request.onblocked = () => reject(new Error('Local attachment storage is blocked by another tab.'));
+        });
+    }
+
+    async function countPendingAttachments() {
+        const db = await openAttachmentDb();
+        try {
+            return await new Promise((resolve, reject) => {
+                const request = db.transaction(ATTACHMENT_STORE, 'readonly').objectStore(ATTACHMENT_STORE).getAll();
+                request.onsuccess = () => resolve((request.result || []).filter(item => item.status === 'pending').length);
+                request.onerror = () => reject(request.error || new Error('Local attachments could not be inspected.'));
+            });
+        } finally {
+            db.close();
+        }
+    }
+
+    async function clearAttachmentWorkspace() {
+        if (ACTIVE_BUSINESS_ID < 1) return;
+        const db = await openAttachmentDb();
+        try {
+            await new Promise((resolve, reject) => {
+                const tx = db.transaction(ATTACHMENT_STORE, 'readwrite');
+                tx.objectStore(ATTACHMENT_STORE).clear();
+                tx.oncomplete = resolve;
+                tx.onerror = () => reject(tx.error || new Error('Local attachment cleanup failed.'));
+                tx.onabort = () => reject(tx.error || new Error('Local attachment cleanup was aborted.'));
+            });
+        } finally {
+            db.close();
+        }
+    }
+
     async function assessLogout() {
         await ready;
 
         if (!storageAvailable) {
-            return { inspectionFailed: true, total: null, pendingCount: null, failedCount: null, conflictCount: null };
+            return { inspectionFailed: true, total: null, pendingCount: null, failedCount: null, conflictCount: null, attachmentPendingCount: null };
         }
 
         try {
-            const records = await allMutations();
+            const [records, attachmentPendingCount] = await Promise.all([allMutations(), countPendingAttachments()]);
             const pendingCount = records.filter(item => item.status === 'pending').length;
             const failedCount = records.length - pendingCount;
             const conflictCount = (state?.conflicts || []).filter(item => item.status === 'open').length;
@@ -309,10 +357,11 @@
                 pendingCount,
                 failedCount,
                 conflictCount,
+                attachmentPendingCount,
                 localDirty: Boolean(state?.local_dirty),
             };
         } catch {
-            return { inspectionFailed: true, total: null, pendingCount: null, failedCount: null, conflictCount: null };
+            return { inspectionFailed: true, total: null, pendingCount: null, failedCount: null, conflictCount: null, attachmentPendingCount: null };
         }
     }
 
@@ -322,6 +371,9 @@
         activeSyncController?.abort();
 
         try {
+            // Attachments are business-scoped too. Clear them before the
+            // mutation workspace so a failed attachment cleanup blocks logout.
+            await clearAttachmentWorkspace();
             const db = await openDb();
             const migrationMarker = await new Promise((resolve, reject) => {
                 const request = db.transaction(STATE, 'readonly')
