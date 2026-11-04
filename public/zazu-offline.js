@@ -319,6 +319,7 @@
     }
 
     async function countPendingAttachments() {
+        if (!ACTIVE_BUSINESS_ID) return 0;
         const db = await openAttachmentDb();
         try {
             return await new Promise((resolve, reject) => {
