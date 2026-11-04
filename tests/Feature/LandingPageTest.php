@@ -20,12 +20,16 @@ class LandingPageTest extends TestCase
     public function test_authenticated_owner_sees_clear_workspace_state_on_the_public_landing_page(): void
     {
         $this->signInAsOwner();
+        $user = auth()->user();
+        $business = $user->businesses()->firstOrFail();
 
         $this->get(route('landing'))
             ->assertOk()
             ->assertSee("You’re signed in")
             ->assertSee('Open workspace')
-            ->assertSee('Sign out');
+            ->assertSee('Sign out')
+            ->assertSee('data-zazu-user-id="'.$user->id.'"', false)
+            ->assertSee('data-zazu-business-id="'.$business->id.'"', false);
     }
 
     public function test_authenticated_account_without_workspace_can_still_view_the_public_landing_page(): void
