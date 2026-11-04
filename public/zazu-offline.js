@@ -74,7 +74,9 @@
                 resolve(db);
             };
             request.onerror = () => reject(request.error || new Error('Could not open local offline storage.'));
-            request.onblocked = () => reject(new Error('Local offline storage is blocked by another open tab.'));
+            // IndexedDB's blocked event is a warning, not a failed request. Wait
+            // for an older tab to release its connection; onversionchange above
+            // asks updated tabs to close their connection automatically.
         });
 
         if (name === DB_NAME) {
