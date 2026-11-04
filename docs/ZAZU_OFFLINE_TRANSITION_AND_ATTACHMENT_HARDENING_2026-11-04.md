@@ -51,9 +51,11 @@ The old global `zazu-phone-attachments` database is not automatically migrated o
 
 The exact-head browser run `41883363935` failed after registration and sign-out. The captured Playwright trace shows the logout guard deliberately stopped the request with: `Zazu could not safely inspect local offline changes. Close other Zazu tabs, reload, and retry signing out.` The browser remained authenticated; this was not a successful logout.
 
-Code inspection found that the attachment IndexedDB open handler treated the IndexedDB `blocked` event as an immediate terminal error. The event is informational: the open request may still complete when an older tab releases its database connection. The active offline client now waits for that request to resolve and closes its attachment database connection on `versionchange`, allowing older tabs running the updated client to release the database for upgrades.
+Code inspection found that the attachment IndexedDB open handler treated the IndexedDB `blocked` event as an immediate terminal error. The event is informational: the open request may still complete when an older tab releases its database connection. The active offline client now waits for both workspace and attachment database open requests to resolve rather than rejecting immediately on `blocked`. Both connections close on `versionchange`, allowing updated older tabs to release a database for schema upgrades.
 
-- Application change: `b21514d0f1daac5cd1620de464832e867f4ccea9`
-- Regression assertion: `5afdd831a233b992818b440351e342ec188bacdc`
-- Exact-head CI and browser rerun: **not yet verified**.
+- Attachment database change: `b21514d0f1daac5cd1620de464832e867f4ccea9`
+- Workspace database change: `ff9adec55baae647b60b1fdb73454d8256e8011a`
+- Regression assertions: `5afdd831a233b992818b440351e342ec188bacdc` and `5656abe1751a28ab8818c99e19a28bea00f04b0a`
+- Current source/test head: `5656abe1751a28ab8818c99e19a28bea00f04b0a`
+- GitHub commit-status endpoint currently returns no status records for this head. Exact-head CI and browser rerun: **not yet verified**.
 - This is a targeted correction, not closure of the session-transition challenge. Same-business account changes, business switches, expiry, interrupted cleanup, stale async completions and remote revocation still need explicit acceptance.
