@@ -46,3 +46,14 @@ The old global `zazu-phone-attachments` database is not automatically migrated o
 1. Complete the session-transition acceptance matrix against the approved DEC-019 trust model. Preserve pending work unless the owner explicitly confirms discard.
 2. Integrate attachments into the active Work page using the current sync-token API, business-scoped IndexedDB, server idempotency, offline retry, local open/download, and account/logout cleanup.
 3. Add active-path browser tests for offline create, reconnect upload, duplicate retry, downloaded file reuse, business separation, logout cleanup, and revocation.
+
+## Follow-up: logout inspection regression — 2026-11-04
+
+The exact-head browser run `41883363935` failed after registration and sign-out. The captured Playwright trace shows the logout guard deliberately stopped the request with: `Zazu could not safely inspect local offline changes. Close other Zazu tabs, reload, and retry signing out.` The browser remained authenticated; this was not a successful logout.
+
+Code inspection found that the attachment IndexedDB open handler treated the IndexedDB `blocked` event as an immediate terminal error. The event is informational: the open request may still complete when an older tab releases its database connection. The active offline client now waits for that request to resolve and closes its attachment database connection on `versionchange`, allowing older tabs running the updated client to release the database for upgrades.
+
+- Application change: `b21514d0f1daac5cd1620de464832e867f4ccea9`
+- Regression assertion: `5afdd831a233b992818b440351e342ec188bacdc`
+- Exact-head CI and browser rerun: **not yet verified**.
+- This is a targeted correction, not closure of the session-transition challenge. Same-business account changes, business switches, expiry, interrupted cleanup, stale async completions and remote revocation still need explicit acceptance.
