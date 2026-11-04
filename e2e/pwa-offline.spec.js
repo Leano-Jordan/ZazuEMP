@@ -750,8 +750,7 @@ test.describe('Zazu installed PWA offline shell', () => {
             };
 
             let responseBusinessId = '10';
-            const mockFetch = async input => {
-                const url = new URL(typeof input === 'string' ? input : input.url, window.location.origin);
+            const mockFetch = async () => {
                 return new Response(
                     '<!doctype html><html><body data-zazu-user-id="123" data-zazu-business-id="' + responseBusinessId + '">Business ' + responseBusinessId + '</body></html>',
                     { status: 200, headers: { 'content-type': 'text/html; charset=utf-8' } }
