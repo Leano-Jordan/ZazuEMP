@@ -628,3 +628,16 @@ Assessment source head: `d1e2a4397b064d3fbfe7fc2cf1dc59236e00922f`; CI for that 
 ## Exact source CI — 2026-11-04
 
 For application SHA `d1e2a4397b064d3fbfe7fc2cf1dc59236e00922f`, Laravel, quality/secret scan, Psalm, PHPMD, populated upgrade/rollback and push-on-main passed. Browser smoke remains in progress; SonarCloud was skipped. Documentation-only commits followed; no application source changed after the assessed source SHA. Release certification remains blocked by browser acceptance and the operational/legal/brand gates.
+
+
+## Director offline transition and attachment lifecycle hardening — 2026-11-04
+
+- Preserved DEC-019's owner-approved business-trusted device architecture. Do not bind the offline business workspace to the current staff user or clear it on a same-business account transition without an approved architecture change; the paired device is explicitly trusted for the bounded business data selected by the owner.
+- Added business-scoped local attachment storage using `zazu-phone-attachments-business-<business-id>`; new and downloaded records carry the business ID.
+- Logout assessment now includes pending local attachments. The logout confirmation warns about pending attachment files, and local session cleanup clears the active business's attachment database.
+- Cleanup fails closed if attachment inspection or clearing fails. The old unscoped `zazu-phone-attachments` database is deliberately not migrated/deleted because its records lack reliable business ownership metadata.
+- Added PWA regression assertions for the attachment database boundary and logout cleanup.
+- Source/test commits: `92bb9c0`, `8a14965`, `ba48760`, `cdea317`. Source/test head: `cdea317643dd5e226d685f84c32f51d875defc80`.
+- CodeQL run `41882179271` completed successfully. This is not a substitute for Laravel, browser, or runtime acceptance; those checks were not present on the exact source SHA at the time of review.
+- **Not complete:** account/session transition acceptance (logout, expiry, same-business account change, business switch, interrupted cleanup, late responses and revocation) and active Work-screen offline attachment integration. The legacy attachment client remains dormant.
+- Evidence: `docs/ZAZU_OFFLINE_TRANSITION_AND_ATTACHMENT_HARDENING_2026-11-04.md`.
