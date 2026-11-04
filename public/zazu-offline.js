@@ -174,15 +174,24 @@
         });
     }
 
-    function api(path, options = {}) {
+    async function api(path, options = {}) {
+        const requestToken = state?.sync?.token || null;
         const headers = new Headers(options.headers || {});
         headers.set('Accept', 'application/json');
-        if (state?.sync?.token) headers.set('Authorization', 'Bearer ' + state.sync.token);
-        return fetch(path, {
+        if (requestToken) headers.set('Authorization', 'Bearer ' + requestToken);
+        const response = await fetch(path, {
             ...options,
             headers,
             signal: options.signal ?? activeSyncController?.signal,
         });
+
+        // A response from an earlier device session must not be applied after
+        // logout and re-pair, even if the transport completed after abort.
+        if (sessionCleared || requestToken !== (state?.sync?.token || null)) {
+            throw new Error('The offline device session changed while this request was in progress.');
+        }
+
+        return response;
     }
 
     function applyBootstrap(bootstrap) {
