@@ -46,6 +46,10 @@ class PwaOfflineFoundationTest extends TestCase
 
         $app = File::get(resource_path('js/app.js'));
         $client = File::get(public_path('zazu-offline.js'));
+        $attachmentOpen = substr($client, strpos($client, 'async function openAttachmentDb()'), strpos($client, 'async function countPendingAttachments()') - strpos($client, 'async function openAttachmentDb()'));
+        $this->assertStringContainsString('db.onversionchange = () => db.close();', $attachmentOpen);
+        $this->assertStringContainsString('Do not reject prematurely.', $attachmentOpen);
+        $this->assertStringNotContainsString('request.onblocked = () => reject', $attachmentOpen);
         $this->assertStringContainsString("navigator.serviceWorker.register('/sw.js', { scope: '/' })", $app);
         $this->assertStringContainsString("target?.postMessage({ type: 'prime-pages', userId, routes })", $app);
         $this->assertSame(1, substr_count($app, 'primeInstalledPages(ready)'));
