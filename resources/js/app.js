@@ -1881,6 +1881,7 @@ function registerZazuServiceWorker() {
 
     const primeInstalledPages = (registration) => {
         const userId = document.body?.dataset.zazuUserId;
+        const businessId = document.body?.dataset.zazuBusinessId || null;
         if (!userId) return;
 
         const routes = [...new Set([
@@ -1901,7 +1902,7 @@ function registerZazuServiceWorker() {
         ])];
 
         const target = navigator.serviceWorker.controller || registration.active;
-        target?.postMessage({ type: 'prime-pages', userId, routes });
+        target?.postMessage({ type: 'prime-pages', userId, businessId, routes });
     };
 
     window.addEventListener('load', () => {
