@@ -18,9 +18,9 @@ The server-rendered page cache remains user-scoped. The offline business workspa
 
 - Added a business-specific attachment database name: `zazu-phone-attachments-business-<business-id>`.
 - Updated the dormant attachment transfer client to use the same business-specific database and stamp new/downloaded records with the business ID.
-- Logout assessment now inspects pending local attachments as well as queued mutations and conflicts.
-- Logout confirmation includes the count of pending attachments before asking the owner to discard the local copy.
-- Local session cleanup clears the active business's attachment store as well as its offline mutation workspace. If attachment inspection or cleanup fails, logout cleanup fails closed rather than silently leaving an attachment copy behind.
+- The logout-time discard flow was superseded: account logout now preserves business-scoped local work and device trust.
+- Account logout ends the web session and clears only the user-scoped service-worker cache; it does not clear business-local data.
+- Device revocation remains an explicit owner action in Business Settings. Same-business logout/re-login retains the offline queue, attachments and sync token.
 - Updated the PWA regression assertions for business-scoped attachment storage and logout cleanup.
 
 ## Important migration and compatibility boundary
