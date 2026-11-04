@@ -116,9 +116,9 @@ class PwaOfflineFoundationTest extends TestCase
         $this->assertStringContainsString('requestGeneration !== activeUserGeneration', $worker);
         $this->assertStringContainsString("url.pathname === '/logout'", $worker);
         $this->assertStringContainsString('cacheRenderedPage(request, response.clone(), requestGeneration)', $worker);
-        $this->assertStringContainsString('async function setUser(userId, expectedGeneration = null)', $worker);
-        $this->assertStringContainsString('async function loadActiveUser(expectedGeneration = activeUserGeneration)', $worker);
-        $this->assertStringContainsString('await loadActiveUser(requestGeneration);', $worker);
+        $this->assertStringContainsString('async function setIdentity(userId, businessId, expectedGeneration = null)', $worker);
+        $this->assertStringContainsString('async function loadActiveIdentity(expectedGeneration = activeUserGeneration)', $worker);
+        $this->assertStringContainsString('await loadActiveIdentity(requestGeneration);', $worker);
         $this->assertStringContainsString('if (expectedGeneration !== activeUserGeneration) return null;', $worker);
         $this->assertStringContainsString("activePrimeController?.abort()", $worker);
         $this->assertStringContainsString("const offlineShell = cache ? await cache.match(new Request(new URL(OFFLINE_SHELL, self.location.origin))) : null;", $worker);
