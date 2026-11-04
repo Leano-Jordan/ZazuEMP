@@ -74,19 +74,30 @@ test('registration flows through onboarding into the dashboard', async ({ page }
     await expect(page.locator('.zazu-error-shell')).toHaveCount(0);
     await expect(page.locator('nav[aria-label="Public navigation"]').getByText("You’re signed in", { exact: true })).toBeVisible();
 
-    // Logout may correctly ask for confirmation when onboarding left local offline data.
-    // Playwright dismisses unhandled dialogs by default, which would cancel logout.
-    let logoutDialogMessage = '';
-    page.once('dialog', async dialog => {
-        logoutDialogMessage = dialog.message();
-        await dialog.accept();
+    // Capture every logout dialog. A confirmation is expected when local work exists;
+    // any alert is a real failure and must not be silently dismissed by Playwright.
+    const logoutDialogs = [];
+    page.on('dialog', async dialog => {
+        logoutDialogs.push({ type: dialog.type(), message: dialog.message() });
+        if (dialog.type() === 'confirm') {
+            await dialog.accept();
+        } else {
+            await dialog.dismiss();
+        }
     });
     await page.locator('nav[aria-label="Public navigation"]').getByRole('button', { name: 'Sign out', exact: true }).click();
-    if (logoutDialogMessage) {
-        expect(logoutDialogMessage).toContain('Signing out will permanently clear the local offline copy');
+    const confirmation = logoutDialogs.find(dialog => dialog.type === 'confirm');
+    if (confirmation) {
+        expect(confirmation.message).toContain('Signing out will permanently clear the local offline copy');
     }
+    const logoutAlerts = logoutDialogs.filter(dialog => dialog.type === 'alert');
+    expect(logoutAlerts, 'logout must not raise a safety or connectivity alert').toEqual([]);
     await expect(page).toHaveURL(/\/$/);
     await expect(page.locator('.zazu-error-shell')).toHaveCount(0);
+    await expect(
+        page.locator('nav[aria-label="Public navigation"]').getByRole('button', { name: 'Log in', exact: true }),
+        'successful logout must render the guest login control',
+    ).toBeVisible();
 
     await page.locator('nav[aria-label="Public navigation"]').getByRole('button', { name: 'Log in', exact: true }).click();
     await expect(page.locator('[data-auth-modal]')).toBeVisible();
