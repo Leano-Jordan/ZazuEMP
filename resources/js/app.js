@@ -1929,7 +1929,7 @@ async function canReachZazuLogoutServer() {
     const timeout = window.setTimeout(() => controller.abort(), 2500);
 
     try {
-        const response = await fetch('/login', {
+        const response = await fetch('/up', {
             method: 'HEAD',
             credentials: 'same-origin',
             cache: 'no-store',
@@ -1970,61 +1970,19 @@ async function loadZazuOfflineClient() {
     return window.ZazuOffline;
 }
 
-async function handleZazuLogout(form) {
-    let offline;
-    try {
-        offline = await loadZazuOfflineClient();
-    } catch {
-        window.alert('Zazu could not load the local offline client to verify pending changes. Reload while connected and retry signing out.');
-        return;
-    }
-
-    if (typeof offline.assessLogout !== 'function' || typeof offline.clearLocalSession !== 'function') {
-        window.alert('Zazu could not verify the local offline queue. Reload while connected and retry signing out so unsynchronized work is not lost.');
-        return;
-    }
-
-    const assessment = await offline.assessLogout();
-    if (assessment.inspectionFailed) {
-        window.alert('Zazu could not safely inspect local offline changes. Close other Zazu tabs, reload, and retry signing out.');
-        return;
-    }
-
-    if (assessment.total > 0 || assessment.conflictCount > 0 || assessment.localDirty) {
-        const details = [
-            assessment.pendingCount ? assessment.pendingCount + ' pending change(s)' : '',
-            assessment.attachmentPendingCount ? assessment.attachmentPendingCount + ' pending attachment(s)' : '',
-            assessment.failedCount ? assessment.failedCount + ' rejected/failed change(s)' : '',
-            assessment.conflictCount ? assessment.conflictCount + ' unresolved conflict(s)' : '',
-            assessment.localDirty ? 'local workspace marked unsynchronized' : '',
-        ].filter(Boolean).join(', ');
-
-        const message = 'This device still has ' + details + '. Signing out will permanently clear the local offline copy and queued changes. Cancel to stay signed in and reconcile them first. Continue and discard this local copy?';
-        if (!window.confirm(message)) {
-            // If the client was loaded just for this logout, resume sync after
-            // the user chooses to stay signed in rather than blocking the prompt.
-            offline.sync().catch(() => {});
-            return;
-        }
-    }
-
+asyasync function handleZazuLogout(form) {
     const logoutServerReachable = await canReachZazuLogoutServer();
     if (!logoutServerReachable) {
-        window.alert('Zazu cannot reach the authentication server, so it cannot securely end this web session. Your local offline data and device token were left untouched. Reconnect to the server and retry signing out.');
+        window.alert('Zazu cannot reach the authentication server, so it cannot securely end this web session. Your business offline workspace, pending changes and device token were left untouched. Reconnect to the server and retry signing out.');
         return;
     }
 
-    let revocation;
-    try {
-        revocation = await offline.clearLocalSession();
-    } catch {
-        window.alert('Zazu could not safely clear the local offline session. Your data was left in place; close other Zazu tabs and retry.');
-        return;
-    }
+    const businessId = Number(document.body?.dataset.zazuBusinessId || 0);
+    const message = businessId > 0
+        ? 'Signing out ends this web session. This browser’s business-scoped offline workspace and any queued changes or attachments will remain on this device. To remove this device from the business, an owner must revoke it in Business Settings. Continue?'
+        : 'Signing out ends this account’s web session. No active business workspace is attached to this account. Continue?';
 
-    if (revocation && !revocation.ok) {
-        window.alert('Zazu cleared this phone’s local offline copy, but could not confirm server-side revocation of its sync token. The token may remain active on the server; the workspace owner must revoke this device before it is trusted again.');
-    }
+    if (!window.confirm(message)) return;
 
     if ('serviceWorker' in navigator) {
         try {
@@ -2032,14 +1990,12 @@ async function handleZazuLogout(form) {
             const target = navigator.serviceWorker.controller || registration?.active;
             target?.postMessage({ type: 'clear-user' });
         } catch {
-            // IndexedDB is cleared before logout; service-worker cleanup is best-effort.
+            // User-scoped page-cache cleanup is best-effort; business offline data is preserved.
         }
     }
 
     HTMLFormElement.prototype.submit.call(form);
-}
-
-document.addEventListener('submit', async (event) => {
+}cument.addEventListener('submit', async (event) => {
     const form = event.target;
     if (!(form instanceof HTMLFormElement)) return;
 
