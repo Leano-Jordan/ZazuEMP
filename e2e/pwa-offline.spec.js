@@ -825,6 +825,77 @@ test.describe('Zazu installed PWA offline shell', () => {
         });
     });
 
+    test('late sync bootstrap from a previous device session cannot overwrite the active workspace', async ({ page }) => {
+        test.setTimeout(30_000);
+
+        await login(page);
+        await page.evaluate(async () => {
+            await window.ZazuOffline.ready;
+            const state = window.ZazuOffline.getState();
+            state.business = {
+                id: Number(document.body.dataset.zazuBusinessId),
+                name: 'Current trusted workspace',
+            };
+            state.sync = {
+                token: 'previous-device-session-token',
+                device: { id: 987651, business_id: Number(document.body.dataset.zazuBusinessId) },
+            };
+            state.local_dirty = false;
+            await window.ZazuOffline.persist();
+        });
+
+        let markRequestStarted;
+        let releaseResponse;
+        const requestStarted = new Promise(resolve => { markRequestStarted = resolve; });
+        const heldResponse = new Promise(resolve => { releaseResponse = resolve; });
+
+        await page.route('**/api/sync/bootstrap', async route => {
+            markRequestStarted();
+            await heldResponse;
+            await route.fulfill({
+                status: 200,
+                contentType: 'application/json',
+                body: JSON.stringify({
+                    business: {
+                        id: Number(await page.locator('body').getAttribute('data-zazu-business-id')),
+                        name: 'Stale response must not replace this workspace',
+                    },
+                    catalogue: [],
+                    suppliers: [],
+                    purchase_orders: [],
+                    invoices: [],
+                    expenses: [],
+                    inventory_items: [],
+                    assets: [],
+                    costs: [],
+                    selected: [],
+                }),
+            });
+        });
+
+        await page.evaluate(() => {
+            window.__zazuStaleBootstrap = window.ZazuOffline.refreshBootstrap()
+                .then(() => ({ ok: true }))
+                .catch(error => ({ ok: false, message: error.message }));
+        });
+        await requestStarted;
+
+        await page.evaluate(async () => {
+            const state = window.ZazuOffline.getState();
+            state.sync.token = 'replacement-device-session-token';
+            await window.ZazuOffline.persist();
+        });
+        releaseResponse();
+
+        const outcome = await page.evaluate(() => window.__zazuStaleBootstrap);
+        expect(outcome.ok).toBe(false);
+        expect(outcome.message).toContain('device session changed');
+
+        const state = await page.evaluate(() => window.ZazuOffline.getState());
+        expect(state.sync.token).toBe('replacement-device-session-token');
+        expect(state.business.name).toBe('Current trusted workspace');
+    });
+
     test('authenticated dashboard survives a real offline navigation', async ({ page, context }) => {
         test.setTimeout(60_000);
 
