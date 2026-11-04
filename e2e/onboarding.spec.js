@@ -88,7 +88,7 @@ test('registration flows through onboarding into the dashboard', async ({ page }
     await page.locator('nav[aria-label="Public navigation"]').getByRole('button', { name: 'Sign out', exact: true }).click();
     const confirmation = logoutDialogs.find(dialog => dialog.type === 'confirm');
     if (confirmation) {
-        expect(confirmation.message).toContain('Signing out will permanently clear the local offline copy');
+        expect(confirmation.message).toContain('business-scoped offline workspace and any queued changes or attachments will remain on this device');
     }
     const logoutAlerts = logoutDialogs.filter(dialog => dialog.type === 'alert');
     expect(logoutAlerts, 'logout must not raise a safety or connectivity alert').toEqual([]);
