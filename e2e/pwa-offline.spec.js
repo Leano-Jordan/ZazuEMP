@@ -700,6 +700,10 @@ test.describe('Zazu installed PWA offline shell', () => {
         await page.evaluate(async name => {
             await window.ZazuOffline.ready;
             const state = window.ZazuOffline.getState();
+            state.business = {
+                id: Number(document.body.dataset.zazuBusinessId),
+                name: 'Trusted business workspace fixture',
+            };
             state.sync = {
                 token: 'business-device-token-fixture',
                 device: { id: 987650, business_id: Number(document.body.dataset.zazuBusinessId) },
