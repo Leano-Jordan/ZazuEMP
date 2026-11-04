@@ -47,6 +47,7 @@ class PwaOfflineFoundationTest extends TestCase
         $app = File::get(resource_path('js/app.js'));
         $client = File::get(public_path('zazu-offline.js'));
         $workspaceOpen = substr($client, strpos($client, 'function openDb('), strpos($client, 'async function readState()') - strpos($client, 'function openDb('));
+        $this->assertStringContainsString('new BroadcastChannel(\'zazu-offline-session-\' + ACTIVE_BUSINESS_ID)', $client);
         $this->assertStringContainsString('db.onversionchange = () => {', $workspaceOpen);
         $this->assertStringContainsString('for an older tab to release its connection', $workspaceOpen);
         $this->assertStringNotContainsString('request.onblocked = () => reject', $workspaceOpen);
