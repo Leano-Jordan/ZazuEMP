@@ -451,3 +451,13 @@ Continue property-level analysis of the repeated `app.css` shell layers, beginni
 - Blade navigation markup and JavaScript interaction logic were not changed.
 - Source re-fetch confirms the canonical brand and navigation base rules, mobile sizing/scroll overrides, responsive flyout overflow, and unchanged navigation interaction code.
 - No Vite build, automated tests, browser rendering or physical mobile drawer acceptance was run.
+
+
+## Navigation link cascade pass — 2026-11-05
+
+- Re-fetched the current `main` branch and inspected the shared Blade navigation markup, all four CSS layers, navigation state selectors, responsive overrides and theme tokens.
+- Confirmed that route-active links are server-rendered with `.active` and, on primary Work links, `aria-current="page"`; hierarchical area state is independently represented by `.is-active`, `.is-open` and `aria-expanded`. These state contracts were left untouched.
+- Consolidated one proven duplicate in the late component-refinement layer: removed repeated `display:flex`, `align-items:center` and `gap:10px` declarations from its `.zazu-nav-link` rule. Those declarations already exist in the shared base rule and the later rule only needs `position:relative` for its active pseudo-element.
+- Preserved the distinct hover/active surfaces, focus-visible outline, active indicator, icon sizing reset, desktop flyout theme treatment, mobile 44px touch target, no-JS active-group recovery and reduced-motion/forced-colour behaviour.
+- No generic nav state overrides were moved between stylesheets; the remaining repeated state blocks have different media/theme/hierarchy contexts and require rendered acceptance before further merging.
+- Source-only verification: change committed directly to `main`; no Vite build, PHPUnit, browser rendering, contrast sampling or physical mobile acceptance was run.
