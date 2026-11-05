@@ -798,3 +798,12 @@ Latest source change: commit `29a38f55d3d3ff5979cf844ddbd624a9ea279515` consolid
 - Removed the now-unused KPI-caption CSS rule.
 - Added regression coverage for the four retained KPI labels and the absence of redundant captions/styling.
 - Source-level change only; runtime, PHPUnit, Vite and rendered viewport/theme acceptance remain unverified.
+
+
+## Theme default correction — 2026-11-06
+
+- Root cause: both the layout's pre-paint bootstrap and the shared JavaScript theme initializer selected dark mode from the operating-system preference whenever no explicit Zazu theme had been saved. This made the dashboard open in dark mode on devices configured for dark appearance, despite the light-theme dashboard references being the active design target.
+- Correction: default to the reference-aligned light theme when no explicit Zazu preference exists. A saved `light` or `dark` preference still takes precedence, and the manual theme toggle continues saving the user's selection.
+- Kept the dark palette and all explicit dark-theme component rules intact; this changes only the no-preference fallback.
+- Added a source regression test covering both initialization paths and persistence of an explicit toggle choice.
+- Source verification required after commit. PHPUnit, Vite and rendered browser checks remain unverified in this environment.
