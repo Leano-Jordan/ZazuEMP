@@ -6967,9 +6967,6 @@ textarea:focus {
 
 /* PRIMARY NAVIGATION */
 .zazu-nav-link {
-    display: flex;
-    align-items: center;
-    gap: 10px;
     position: relative;
 }
 .zazu-nav-icon {
