@@ -6463,6 +6463,7 @@ body {
     min-height: 52px;
     padding-bottom: 13px;
     border-bottom: 1px solid var(--zazu-border);
+    background: linear-gradient(105deg, var(--zazu-surface-2), var(--zazu-surface));
 }
 
 .zazu-panel-title {
