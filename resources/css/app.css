@@ -21,13 +21,13 @@
     --zazu-page: #F2FAFD;
     color-scheme: light;
     --zazu-page-deep: #DDF4FA;
-    --zazu-sidebar: #E4F6FC;
-    --zazu-sidebar-ink: #16445A;
-    --zazu-sidebar-muted: #426B7B;
-    --zazu-sidebar-label: #527A89;
-    --zazu-sidebar-hover: #CDEEF7;
-    --zazu-sidebar-active: #087FA8;
-    --zazu-sidebar-surface: #F4FBFD;
+    --zazu-sidebar: #B9D5EF;
+    --zazu-sidebar-ink: #173D66;
+    --zazu-sidebar-muted: #315A83;
+    --zazu-sidebar-label: #426B91;
+    --zazu-sidebar-hover: #D5E7F7;
+    --zazu-sidebar-active: #1768C4;
+    --zazu-sidebar-surface: #DCEBFA;
     
     /* Surface layers */
     --zazu-surface: #FFFFFF;
@@ -481,10 +481,10 @@ body {
     z-index: 20;
     border-bottom: 0;
     border-bottom-color: color-mix(in srgb, var(--zazu-sidebar-muted) 18%, transparent);
-    background: var(--zazu-sidebar);
+    background: color-mix(in srgb, var(--zazu-surface) 94%, var(--zazu-page));
     backdrop-filter: blur(18px) saturate(125%);
-    box-shadow: 0 1px 0 color-mix(in srgb, #000 18%, transparent);
-    color: var(--zazu-sidebar-ink);
+    box-shadow: 0 1px 0 var(--zazu-border);
+    color: var(--zazu-ink);
 }
 
 .zazu-topbar-inner {
@@ -501,7 +501,7 @@ body {
 }
 
 .zazu-eyebrow {
-    color: var(--zazu-sidebar-label);
+    color: var(--zazu-muted);
     font-size: 12px;
     font-weight: 700;
     line-height: 1.35;
@@ -511,7 +511,7 @@ body {
 
 .zazu-page-title {
     margin-top: 4px;
-    color: var(--zazu-sidebar-ink);
+    color: var(--zazu-ink);
     font-size: var(--zazu-font-size-page-title);
     font-weight: var(--zazu-weight-semibold);
     line-height: 1.15;
@@ -579,10 +579,10 @@ body {
     display: inline-grid;
     place-items: center;
     padding: 0;
-    border: 1px solid color-mix(in srgb, var(--zazu-sidebar-muted) 22%, transparent);
+    border: 1px solid var(--zazu-border);
     border-radius: var(--zazu-radius-sm);
-    background: var(--zazu-sidebar-surface);
-    color: var(--zazu-sidebar-ink);
+    background: var(--zazu-surface-2);
+    color: var(--zazu-ink);
     cursor: pointer;
     box-shadow: none;
     transition:
