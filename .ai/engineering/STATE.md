@@ -807,3 +807,13 @@ Latest source change: commit `29a38f55d3d3ff5979cf844ddbd624a9ea279515` consolid
 - Kept the dark palette and all explicit dark-theme component rules intact; this changes only the no-preference fallback.
 - Added a source regression test covering both initialization paths and persistence of an explicit toggle choice.
 - Source verification required after commit. PHPUnit, Vite and rendered browser checks remain unverified in this environment.
+
+
+## Light shell colour refinement — 2026-11-06
+
+- Adapted the existing light-theme shell to the supplied visual direction rather than copying either reference literally.
+- Shifted the light sidebar from a very pale cyan surface to a clearer mid-blue surface with coordinated navy-blue foreground, muted labels, hover and active tokens. Existing navigation, flyouts, footer and workspace panels inherit these shared tokens.
+- Separated the desktop topbar from the sidebar palette: it now uses the existing near-white page surface and normal page foreground, matching the references' lighter header/content relationship.
+- Updated page-title/eyebrow and theme-toggle colours to use page tokens instead of sidebar tokens. Dark-theme token values and explicit dark-mode overrides remain unchanged.
+- Added source regression coverage for the light shell palette and separate topbar surface.
+- Source-level only; rendered acceptance, PHPUnit and Vite build remain outstanding.
