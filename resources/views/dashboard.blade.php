@@ -58,7 +58,7 @@
             <div class="zazu-dash-timeline">
                 @forelse($upcoming as $event)
                     <a href="{{ $workspaceTools['work'] ? route('work.show', $event) : route('calendar.index') }}" class="zazu-dash-event">
-                        <div class="zazu-dash-event-time"><strong>{{ $event->event_date ? 'Time TBC' : 'Unscheduled' }}</strong><span>{{ $event->event_date?->format('d M Y') ?: 'Date to be confirmed' }}</span></div>
+                        <div class="zazu-dash-event-time"><strong>{{ $event->event_date ? 'DATE SET' : 'DATE TBC' }}</strong><span>{{ $event->event_date?->format('d M Y') ?: 'Date to be confirmed' }}</span></div>
                         <div class="zazu-dash-event-line"><i></i></div>
                         <div class="zazu-dash-event-copy"><strong>{{ $event->name }}</strong><span>{{ $event->customer?->name ?? 'No customer' }}</span><small class="mono">{{ $event->reference }}</small></div>
                         <span class="zazu-dash-status status-{{ str_replace('_', '-', strtolower($event->status ?? 'open')) }}">{{ strtoupper(str_replace('_',' ',$event->status ?? 'OPEN')) }}</span>
@@ -117,7 +117,7 @@
                     @php($nextEvent = $upcoming->first())
                     <a href="{{ $workspaceTools['work'] ? route('work.show', $nextEvent) : route('calendar.index') }}" class="zazu-dash-focus-item is-info">
                         <span class="zazu-dash-focus-marker"></span>
-                        <span><strong>Next scheduled work: {{ $nextEvent->name }}</strong><small>{{ $nextEvent->event_date?->format('d M Y · H:i') ?: 'Date to be confirmed' }} · {{ $nextEvent->customer?->name ?? 'No customer' }}</small></span>
+                        <span><strong>Next scheduled work: {{ $nextEvent->name }}</strong><small>{{ $nextEvent->event_date?->format('d M Y') ?: 'Date to be confirmed' }} · {{ $nextEvent->customer?->name ?? 'No customer' }}</small></span>
                         <b>→</b>
                     </a>
                 @endif
