@@ -386,3 +386,15 @@ Found a real interaction conflict in the mobile navigation cascade. The mobile f
 Correction: mobile flyout visibility now follows the explicit `.is-open` state only. Desktop hover/focus flyout behaviour is preserved. The mobile no-JavaScript recovery rule still exposes the server-rendered active group.
 
 Source verification: mobile open-state selector present; mobile focus-within visibility selector absent; desktop focus-within selector preserved; CSS brace balance zero. Rendered touch, keyboard and resize acceptance remains outstanding.
+
+## 2026-11-05 Director — mobile run-sheet information recovery
+
+The dashboard's narrow-screen run-sheet previously hid every event status badge at the 620px breakpoint. This removed operational state (for example, confirmed, in progress or completed) from the phone view rather than adapting its placement. Long event and customer names were also forced into single-line ellipses.
+
+Correction in `resources/css/zazu-final-visual-sweep.css`:
+- Keep the existing time and timeline marker in the first row.
+- Place the event name/customer/reference in a flexible content column and allow names to wrap.
+- Restore the status badge beneath the event details as a compact inline badge.
+- Keep the desktop/tablet run-sheet layout unchanged; apply the adjustment only at 620px and below.
+
+Verification boundary: source-level selector and cascade inspection only. Rendered phone/desktop checks and automated tests have not been run in this execution.
