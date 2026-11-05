@@ -8,16 +8,17 @@ Date: 2026-09-26
 
 This audit covers the shared application shell and the currently implemented Zazu EMP views in resources/views, with attention to visual hierarchy, interaction consistency, responsive behaviour, forms, content clarity, colour relationships, keyboard access, assistive technology cues, and suitability for South African small-business users.
 
-## Design direction applied
+## Current design direction — Coastal Blue (2026-11-05)
 
-The supplied visual direction was translated into a Zazu-specific system rather than copied literally:
+The active visual direction is a bright, calm coastal palette rather than the earlier forest-green/cream concept:
 
-- Warm cream and white surfaces with a deep forest-green navigation shell in light mode.
-- Deep emerald surfaces with bright mint primary actions in dark mode.
-- Distinct cards and sections using spacing, elevation and restrained top accents.
-- One coherent visual system across dashboard, Work, Customers, Requirements, Quotes, Calendar, Travel, Catalogue and Settings.
-- Rounded controls and cards with stronger separation between adjacent information groups.
-- Mobile layouts preserve the same hierarchy and allow dense calendar content to scroll instead of collapsing into unreadable cells.
+- Light mode uses cloud-white work surfaces, pale sky-blue structure, ocean-blue primary actions and restrained turquoise accents.
+- Dashboard presentation uses a sunlit blue-to-turquoise hero, clear typography, readable operational sections and quiet neutral surfaces.
+- Dark mode remains a separately designed deep-water theme; it is not recoloured from the light palette.
+- The dashboard and shared shell retain the existing business-owned artwork, responsive navigation, semantic statuses and keyboard interaction.
+- Mobile layouts preserve the same information order and keep dense calendar content usable without horizontal page overflow.
+
+The earlier forest-green/cream direction is superseded by this current palette.
 
 ## Accessibility and interaction hardening
 
@@ -345,3 +346,14 @@ Before changing the current landing implementation, perform a current rendered/s
 5. which changes affect tests or landing media configuration.
 
 Do not redesign the landing page from memory.
+
+
+## Dashboard Coastal Blue visual pass — 2026-11-05
+
+- Reworked the existing dashboard hero into a larger, brighter coastal gradient composition; the default workspace-state panel now uses an ocean-to-turquoise treatment.
+- Preserved business-uploaded dashboard imagery: the coastal fallback applies only when no business dashboard image is configured.
+- Increased dashboard section-heading and Priority Now text hierarchy so key labels are not rendered at the former 10–12px scale.
+- Changed the existing four-item resource-readiness row to four balanced desktop columns, retaining its two-column tablet and one-column phone layouts.
+- Refined dashboard surface spacing, card shape and the workspace command bar without adding data, routes, features or workflow behaviour.
+- Dark-mode dashboard surfaces continue to use their explicit dark-theme rules; the new hero gradient is light-theme-only.
+- Source-level implementation only. The current desktop/mobile light/dark render, Vite build and PHPUnit run have not been observed in this execution, so rendered visual acceptance remains pending.
