@@ -17,14 +17,15 @@
 :root {
     /* Page structure & navigation */
     --zazu-page: #D9E8F5;
-    --zazu-page-deep: #163A59;
-    --zazu-sidebar: #123A5A;
-    --zazu-sidebar-ink: #F3F8FC;
-    --zazu-sidebar-muted: #C4D8E8;
-    --zazu-sidebar-label: #AEC7DA;
-    --zazu-sidebar-hover: #194B6D;
-    --zazu-sidebar-active: #63A5FF;
-    --zazu-sidebar-surface: #164667;
+    color-scheme: light;
+    --zazu-page-deep: #C5D9EA;
+    --zazu-sidebar: #E7F0F8;
+    --zazu-sidebar-ink: #102C43;
+    --zazu-sidebar-muted: #425F76;
+    --zazu-sidebar-label: #5A748A;
+    --zazu-sidebar-hover: #DDEAF6;
+    --zazu-sidebar-active: #1B67C9;
+    --zazu-sidebar-surface: #F2F7FC;
     
     /* Surface layers */
     --zazu-surface: #F2F7FC;
@@ -144,8 +145,8 @@
     --zazu-font-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace;
     --zazu-font-size-body: 14px;
     --zazu-font-size-small: 12px;
-    --zazu-font-size-meta: 11px;
-    --zazu-font-size-label: 11px;
+    --zazu-font-size-meta: 12px;
+    --zazu-font-size-label: 12px;
     --zazu-font-size-nav: 13px;
     --zazu-font-size-card: 14px;
     --zazu-font-size-section: 16px;
@@ -181,6 +182,7 @@
 }
 
 :root[data-theme="dark"] {
+    color-scheme: dark;
     --zazu-page: #081F2F;
     --zazu-page-deep: #061926;
     --zazu-sidebar: #061826;
