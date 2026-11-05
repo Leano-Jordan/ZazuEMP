@@ -160,6 +160,23 @@ class UiProportionFoundationTest extends TestCase
         $this->assertStringContainsString('flex-direction: column;', $css);
     }
 
+
+    public function test_dashboard_cards_follow_compact_reference_proportions_and_balanced_resource_layout(): void
+    {
+        $css = file_get_contents(resource_path('css/zazu-final-visual-sweep.css'));
+
+        $this->assertIsString($css);
+        $this->assertStringContainsString('grid-template-columns: minmax(0, 1fr) minmax(300px, 34%);', $css);
+        $this->assertStringContainsString('min-height: 210px;', $css);
+        $this->assertStringContainsString('border-radius: 12px;', $css);
+        $this->assertStringContainsString('font-size: 17px;', $css);
+        $this->assertStringContainsString('min-height: 108px;', $css);
+        $this->assertStringContainsString('grid-template-columns: repeat(2, minmax(0, 1fr));', $css);
+        $this->assertStringContainsString('@media (max-width: 620px)', $css);
+        $this->assertStringContainsString('.zazu-dash-resource-grid {', $css);
+        $this->assertStringContainsString('grid-template-columns: 1fr;', $css);
+    }
+
     public function test_authentication_submit_remains_intentionally_full_width(): void
     {
         $css = file_get_contents(resource_path('css/app.css'));
