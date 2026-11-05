@@ -5487,3 +5487,84 @@ body.zazu-mobile-menu-open .zazu-helper {
         overflow-wrap: anywhere;
     }
 }
+
+
+/* DIRECTOR — dashboard hierarchy aligned to the operational reference.
+   KPI strip first; operational queues second; attention/readiness third. */
+.zazu-dash-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    align-items: start;
+}
+
+.zazu-dash-metrics {
+    grid-column: 1 / -1;
+    grid-row: 1;
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 190px), 1fr));
+    gap: 10px;
+    align-content: stretch;
+}
+
+.zazu-dash-metric {
+    min-width: 0;
+    min-height: 112px;
+    padding: 16px 38px 15px 17px;
+}
+
+.zazu-dash-run {
+    grid-column: 1;
+    grid-row: 2;
+}
+
+.zazu-dash-commercial {
+    grid-column: 2;
+    grid-row: 2;
+}
+
+.zazu-dash-focus {
+    grid-column: 1;
+    grid-row: 3;
+}
+
+.zazu-dash-resources {
+    grid-column: 2;
+    grid-row: 3;
+}
+
+.zazu-dash-hero .zazu-dash-actions {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 9px;
+    margin-top: 18px;
+}
+
+@media (max-width: 900px) {
+    .zazu-dash-grid {
+        grid-template-columns: minmax(0, 1fr);
+    }
+
+    .zazu-dash-metrics,
+    .zazu-dash-run,
+    .zazu-dash-commercial,
+    .zazu-dash-focus,
+    .zazu-dash-resources {
+        grid-column: 1;
+        grid-row: auto;
+    }
+
+    .zazu-dash-metrics {
+        grid-template-columns: repeat(auto-fit, minmax(min(100%, 190px), 1fr));
+    }
+}
+
+@media (max-width: 520px) {
+    .zazu-dash-metrics {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 8px;
+    }
+
+    .zazu-dash-metric {
+        min-height: 96px;
+        padding: 12px 28px 12px 12px;
+    }
+}
