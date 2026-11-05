@@ -438,3 +438,16 @@ Continue property-level analysis of the repeated `app.css` shell layers, beginni
 - Kept the mobile safe-area-aware footer padding in `zazu-mobile-refinement.css`; the mobile drawer's touch layout is unchanged.
 - Re-fetched source confirms one desktop footer presentation rule remains in `app.css`, while responsive and mobile ownership rules remain in their respective files.
 - No build, automated tests or rendered mobile acceptance were run.
+
+
+## Brand and navigation shell consolidation — 2026-11-05
+
+- Consolidated the shared brand container's desktop height, minimum height, alignment, spacing, padding, background and divider into its base `.zazu-brand` rule.
+- Retired later historical brand-container overrides that competed on height, padding, background and border. Kept the active brand link, supplied logo, fallback mark and lockup styling.
+- The mobile drawer now explicitly uses automatic brand height with a 60px minimum, so the desktop fixed-height contract does not constrain the mobile header.
+- Consolidated shared navigation sizing: `.zazu-nav` now owns its base flex, min-height, padding and scrollbar presentation. Removed superseded padding declarations from later visual layers.
+- Kept desktop flyout overflow in `zazu-responsive-theme.css`; its duplicate min-height declaration was removed. Kept mobile navigation scrolling/padding in `zazu-mobile-refinement.css`.
+- Did not merge navigation link, active, hover, focus, hierarchical trigger or flyout states. Those selectors encode distinct interaction and theme treatments.
+- Blade navigation markup and JavaScript interaction logic were not changed.
+- Source re-fetch confirms the canonical brand and navigation base rules, mobile sizing/scroll overrides, responsive flyout overflow, and unchanged navigation interaction code.
+- No Vite build, automated tests, browser rendering or physical mobile drawer acceptance was run.
