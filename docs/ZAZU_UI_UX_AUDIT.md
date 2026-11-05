@@ -357,3 +357,11 @@ Do not redesign the landing page from memory.
 - Refined dashboard surface spacing, card shape and the workspace command bar without adding data, routes, features or workflow behaviour.
 - Dark-mode dashboard surfaces continue to use their explicit dark-theme rules; the new hero gradient is light-theme-only.
 - Source-level implementation only. The current desktop/mobile light/dark render, Vite build and PHPUnit run have not been observed in this execution, so rendered visual acceptance remains pending.
+
+## Priority Now dashboard readability pass — 2026-11-05
+
+- Changed the existing Priority Now action area from three cramped columns to two readable columns on desktop; it remains a single column at tablet/mobile widths.
+- Each existing action is now a distinct, softly surfaced card with consistent spacing and a clearer touch target.
+- Removed single-line truncation from action titles and supporting descriptions so important context remains readable instead of being hidden behind ellipses.
+- Preserved the existing conditional action logic, links, status semantics and dark-theme token usage. No new dashboard data or workflow behaviour was introduced.
+- Source-level checks only; browser rendering and automated suites remain outstanding.
