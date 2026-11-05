@@ -30,6 +30,12 @@ class DashboardController extends Controller
         $quoteQuery = Quote::query()
             ->whereHas('event', fn (Builder $query) => $query->where('business_id', $businessId));
 
+        $quoteStatusCounts = (clone $quoteQuery)
+            ->select('status')
+            ->selectRaw('COUNT(*) as total')
+            ->groupBy('status')
+            ->pluck('total', 'status');
+
         $metrics = [
             'active_work' => (clone $eventQuery)->whereNotIn('status', ['completed', 'cancelled'])->count(),
             'upcoming_work' => (clone $eventQuery)
@@ -37,7 +43,7 @@ class DashboardController extends Controller
                 ->whereNotIn('status', ['completed', 'cancelled'])
                 ->count(),
             'customers' => (clone $customerQuery)->count(),
-            'draft_quotes' => (clone $quoteQuery)->where('status', 'draft')->count(),
+            'draft_quotes' => (int) ($quoteStatusCounts['draft'] ?? 0),
             'open_purchase_orders' => PurchaseOrder::query()
                 ->where('business_id', $businessId)
                 ->whereIn('status', ['draft', 'sent', 'ordered'])
@@ -103,6 +109,7 @@ class DashboardController extends Controller
 
         return view('dashboard', compact(
             'metrics',
+            'quoteStatusCounts',
             'upcoming',
             'business',
             'isOwner',
