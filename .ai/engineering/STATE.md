@@ -762,3 +762,11 @@ Latest source change: commit `29a38f55d3d3ff5979cf844ddbd624a9ea279515` consolid
 - Added a source regression test to prevent setup and upcoming-event duplication inside the priority panel.
 - Scope deliberately limited to dashboard content density; no unrelated shell, palette, route, permission, or data changes.
 - Source re-fetch and structural checks required after commit. PHPUnit, Vite, and rendered desktop/tablet/mobile plus light/dark acceptance remain unverified until executed in an available runtime/browser.
+
+
+## Dashboard run-sheet density refinement — 2026-11-06
+
+- Limited the dashboard run-sheet to the five nearest upcoming, non-completed events; the existing All work link remains the route to the complete work list.
+- Reduced dashboard event-row minimum height from 76px to 64px and tightened vertical padding. Existing mobile status placement and wrapping rules remain unchanged.
+- Added regression coverage for the five-record limit, compact row sizing and continued access to the full work list.
+- Source-level verification only; PHPUnit, build and rendered viewport/theme acceptance remain outstanding.
