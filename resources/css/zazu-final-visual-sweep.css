@@ -5489,8 +5489,10 @@ body.zazu-mobile-menu-open .zazu-helper {
 }
 
 
+
+
 /* DIRECTOR — dashboard hierarchy aligned to the operational reference.
-   KPI strip first; operational queues second; attention/readiness third. */
+   KPI strip, dedicated shortcuts, operational queues, then attention/readiness. */
 .zazu-dash-grid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
     align-items: start;
@@ -5510,32 +5512,59 @@ body.zazu-mobile-menu-open .zazu-helper {
     padding: 16px 38px 15px 17px;
 }
 
+.zazu-dash-quick-actions {
+    grid-column: 1 / -1;
+    grid-row: 2;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 18px;
+    min-width: 0;
+    padding: 14px 18px;
+}
+
+.zazu-dash-quick-actions-heading {
+    display: grid;
+    flex: 0 1 220px;
+    gap: 3px;
+}
+
+.zazu-dash-quick-actions-heading strong {
+    color: var(--zazu-ink);
+    font-family: var(--zazu-font-display);
+    font-size: 14px;
+    line-height: 1.3;
+}
+
+.zazu-dash-quick-actions .zazu-dash-actions {
+    display: flex;
+    flex: 1 1 auto;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 9px;
+    margin: 0;
+    padding: 0;
+}
+
 .zazu-dash-run {
     grid-column: 1;
-    grid-row: 2;
+    grid-row: 3;
 }
 
 .zazu-dash-commercial {
     grid-column: 2;
-    grid-row: 2;
+    grid-row: 3;
 }
 
 .zazu-dash-focus {
     grid-column: 1;
-    grid-row: 3;
+    grid-row: 4;
 }
 
 .zazu-dash-resources {
     grid-column: 2;
-    grid-row: 3;
-}
-
-.zazu-dash-hero .zazu-dash-actions {
-    display: flex;
-    flex-wrap: wrap;
-    align-items: center;
-    gap: 9px;
-    margin-top: 18px;
+    grid-row: 4;
 }
 
 @media (max-width: 900px) {
@@ -5544,6 +5573,7 @@ body.zazu-mobile-menu-open .zazu-helper {
     }
 
     .zazu-dash-metrics,
+    .zazu-dash-quick-actions,
     .zazu-dash-run,
     .zazu-dash-commercial,
     .zazu-dash-focus,
@@ -5554,6 +5584,23 @@ body.zazu-mobile-menu-open .zazu-helper {
 
     .zazu-dash-metrics {
         grid-template-columns: repeat(auto-fit, minmax(min(100%, 190px), 1fr));
+    }
+}
+
+@media (max-width: 620px) {
+    .zazu-dash-quick-actions {
+        align-items: stretch;
+        flex-direction: column;
+        gap: 10px;
+        padding: 13px;
+    }
+
+    .zazu-dash-quick-actions-heading {
+        flex-basis: auto;
+    }
+
+    .zazu-dash-quick-actions .zazu-dash-actions {
+        justify-content: flex-start;
     }
 }
 
