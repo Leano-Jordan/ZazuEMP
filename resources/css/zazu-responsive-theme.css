@@ -564,3 +564,32 @@ textarea {
         min-height: 40px;
     }
 }
+
+
+/* Desktop header/search constraints belong to the responsive shell layer. */
+@media (min-width: 821px) {
+    .zazu-header-context {
+        flex: 1 1 0;
+        min-width: 0;
+        overflow: hidden;
+    }
+
+    .zazu-section-tabs {
+        min-width: 0;
+        max-width: 100%;
+        overflow-x: auto;
+        overflow-y: hidden;
+        scrollbar-width: none;
+        white-space: nowrap;
+    }
+
+    .zazu-section-tabs::-webkit-scrollbar {
+        display: none;
+    }
+
+    .zazu-topbar-actions {
+        flex: 0 0 auto;
+        min-width: 0;
+        flex-wrap: nowrap;
+    }
+}
