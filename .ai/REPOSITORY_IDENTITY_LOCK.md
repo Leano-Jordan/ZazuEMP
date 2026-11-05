@@ -16,7 +16,7 @@ This repository is **Zazu EMP only**.
 - Every code, test, documentation, audit, and maintenance write must target `main` directly.
 - Do not propose a feature branch or silently use a branch because a tool/workflow suggests it.
 - If a write cannot be safely completed directly on `main`, stop and report the specific tooling blocker; do not create a branch as a workaround.
-- If an existing non-`main` branch is discovered, treat it as policy drift. Do not work on it. Report it for owner-directed cleanup; do not delete it without explicit authorization.
+- If an existing non-`main` branch is discovered, treat it as policy drift. Do not work on it. Inspect unique work read-only, migrate only reviewed required changes directly to `main`, then delete the remote ref. Owner explicitly authorized cleanup of all non-`main` refs on 2026-11-05.
 - Before each write, explicitly confirm the target is `Leano-Jordan/ZazuEMP` on `main`.
 
 This rule overrides any generic Git workflow, assistant convention, tool default, historical branch, or other repository's instructions. Only a new explicit owner instruction in the current task may change it.
