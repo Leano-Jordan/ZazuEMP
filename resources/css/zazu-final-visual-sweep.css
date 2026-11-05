@@ -4587,7 +4587,7 @@ button,
    -------------------------------------------------------------------------- */
 .zazu-dash-hero {
     border-radius: 18px;
-    background: linear-gradient(112deg, #FFFFFF 0%, var(--zazu-primary-soft) 62%, var(--zazu-accent-soft) 100%);
+    background: linear-gradient(112deg, var(--zazu-surface-2) 0%, color-mix(in srgb, var(--zazu-primary-soft) 62%, var(--zazu-surface-2)) 62%, color-mix(in srgb, var(--zazu-accent-soft) 48%, var(--zazu-surface-2)) 100%);
 }
 
 .zazu-dash-hero-main {

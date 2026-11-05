@@ -484,3 +484,12 @@ Continue property-level analysis of the repeated `app.css` shell layers, beginni
 - Source verification: re-fetched `app.css` from `main`; confirmed the old brand-fit block and duplicate late trigger/flyout geometry blocks are gone, and the new canonical declarations are present.
 - Commit: `29a38f55d3d3ff5979cf844ddbd624a9ea279515`.
 - No Vite build, automated test, browser rendering, contrast sampling or physical mobile acceptance was run. This pass is **SOURCE-VERIFIED; VISUAL/RUNTIME ACCEPTANCE UNVERIFIED**.
+
+
+## Dashboard hero theme-surface correction — 2026-11-05
+
+- Finding: the final dashboard-rendering rule applied a hard-coded white gradient to `.zazu-dash-hero` after the theme-specific surface declarations. Because the selector was not theme-scoped, it could override the dark theme's intended surface as well as the light theme's blue-slate treatment.
+- Correction: replaced the fixed white stop with the semantic `--zazu-surface-2` token and blended the primary/accent soft tokens into that surface. The existing gradient hierarchy and hero geometry remain intact; both themes now inherit their own surface mapping.
+- Added a source regression assertion to `UiProportionFoundationTest` that inspects the final hero rule and prevents a fixed-white background from returning.
+- Source verification: the last/global hero declaration changed once; regression assertion added.
+- Rendered light/dark desktop/mobile verification and PHPUnit execution remain **UNVERIFIED** in this session.

@@ -39,6 +39,20 @@ class UiProportionFoundationTest extends TestCase
         $this->assertStringContainsString('    background: var(--zazu-primary);', $appCss);
     }
 
+
+    public function test_dashboard_hero_final_rule_uses_theme_aware_surface_tokens(): void
+    {
+        $css = file_get_contents(resource_path('css/zazu-final-visual-sweep.css'));
+
+        $this->assertIsString($css);
+        preg_match_all('/\\.zazu-dash-hero\\s*\\{([^}]*)\\}/s', $css, $heroRules);
+        $this->assertNotEmpty($heroRules[1]);
+
+        $finalHeroRule = end($heroRules[1]);
+        $this->assertStringContainsString('var(--zazu-surface-2)', $finalHeroRule);
+        $this->assertStringNotContainsString('#FFFFFF', $finalHeroRule);
+    }
+
     public function test_authentication_submit_remains_intentionally_full_width(): void
     {
         $css = file_get_contents(resource_path('css/app.css'));

@@ -650,3 +650,12 @@ The owner has explicitly directed the current execution focus to **UI/UX improve
 Current UI/UX mission: continue the property-level consolidation of sidebar, brand and hierarchical navigation rules in `resources/css/app.css`, preserving the separate responsive/mobile ownership and all navigation interaction states. Keep the Designer 1 and Designer 2 references as design direction, not copy targets.
 
 Latest source change: commit `29a38f55d3d3ff5979cf844ddbd624a9ea279515` consolidated the brand lockup/logo/fallback mark base styling and hierarchical navigation trigger/flyout base geometry into their canonical declarations. Source re-fetch passed. Rendered visual acceptance and Vite/runtime verification remain **UNVERIFIED**.
+
+
+## Dashboard hero theme correction — 2026-11-05
+
+- Active UI/UX focus continues.
+- Corrected the final dashboard hero gradient so it uses semantic theme surface tokens instead of a fixed white background.
+- Added a source regression assertion in `tests/Feature/UiProportionFoundationTest.php`.
+- Commit evidence and source verification recorded in `docs/DIRECTOR_CSS_AUTHORITY_AUDIT_2026-10-04.md`.
+- Browser-rendered acceptance and PHPUnit execution remain open; no visual/runtime pass is claimed.
