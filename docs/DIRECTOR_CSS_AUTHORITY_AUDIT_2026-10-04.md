@@ -415,3 +415,16 @@ Continue property-level analysis of the repeated `app.css` shell layers, beginni
 - Kept the active brand lockup rules, supplied logo sizing/containment rules, fallback mark styling, and brand-link interaction rules.
 - This is verified dead-selector removal based on current Blade markup and repository search, not a visual redesign.
 - Verification: committed directly to `main`; source re-fetch and runtime checks pending. No build or browser rendering was run.
+
+
+## Sidebar shell cascade consolidation — 2026-11-05
+
+- Consolidated desktop sidebar width/flex-basis, theme-token background, border and shadow into the canonical base `.zazu-sidebar` rule in `resources/css/app.css`.
+- Standardized the desktop sidebar at 260px; retained the existing sticky positioning and layout behaviour.
+- Retired the historical gradient/background, border and shadow overrides from the 2026 product/visual refinement layers. The final effective appearance is now explicit at the base rule instead of being assembled through several later overrides.
+- Preserved the `max-width: 1023px` sidebar hide rule and bottom navigation.
+- Preserved the mobile drawer override in `zazu-mobile-refinement.css`: fixed positioning, responsive width, transform/open state, backdrop and close controls. Preserved responsive nav overflow ownership in `zazu-responsive-theme.css`.
+- Preserved the wallpaper-specific translucent background/backdrop-filter rule; it is a distinct user-selected wallpaper state, not a competing default surface.
+- Preserved footer, workspace card, hierarchical flyout and navigation state rules; this pass only consolidates the sidebar shell itself.
+- Source re-fetch confirmed one canonical base sidebar surface/dimension rule, the tablet hide rule, and the wallpaper state rule. Branch inventory remains `main` only.
+- No Vite build, PHPUnit, browser rendering or physical mobile drawer acceptance was run. The cascade is source-consolidated but visual/runtime acceptance remains outstanding.
