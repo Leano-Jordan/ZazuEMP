@@ -570,4 +570,21 @@ class UiProportionFoundationTest extends TestCase
     }
 
 
+
+    public function test_workspace_search_matches_the_wide_desktop_reference_without_overriding_mobile_layout(): void
+    {
+        $css = file_get_contents(resource_path('css/zazu-final-visual-sweep.css'));
+        $mobileCss = file_get_contents(resource_path('css/zazu-mobile-refinement.css'));
+        $layout = file_get_contents(resource_path('views/components/app-layout.blade.php'));
+
+        $this->assertIsString($css);
+        $this->assertIsString($mobileCss);
+        $this->assertIsString($layout);
+        $this->assertStringContainsString('@media (min-width: 1200px)', $css);
+        $this->assertStringContainsString('flex: 1 1 clamp(420px, 48vw, 760px);', $css);
+        $this->assertStringContainsString('max-width: 760px;', $css);
+        $this->assertStringContainsString('width: 100%;', $mobileCss);
+        $this->assertStringContainsString('placeholder="Search events, customers, quotes, inventory…"', $layout);
+    }
+
 }
