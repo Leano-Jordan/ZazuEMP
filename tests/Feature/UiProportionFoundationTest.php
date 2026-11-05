@@ -209,7 +209,6 @@ class UiProportionFoundationTest extends TestCase
             '.zazu-footer-title',
             '.zazu-footer-copy',
             '.zazu-nav-area-title',
-            '.zazu-nav-area-chevron',
             '.zazu-nav-flyout-heading',
             '.zazu-nav-flyout-links',
             '.zazu-nav-area.is-open .zazu-nav-area-trigger',
@@ -234,6 +233,7 @@ class UiProportionFoundationTest extends TestCase
         $this->assertStringContainsString('.zazu-nav-flyout .zazu-nav-link.active {', $appCss);
         $this->assertStringContainsString('@media (max-width: 850px)', $appCss);
         $this->assertStringContainsString('@media (prefers-reduced-motion: reduce)', $appCss);
+        $this->assertStringContainsString('.zazu-nav-area-chevron {', $appCss);
         $this->assertStringContainsString('overflow-y: auto;', $responsiveCss);
         $this->assertStringContainsString('body.zazu-mobile-menu-open .zazu-sidebar {', $mobileCss);
         $this->assertStringContainsString('min-height: 44px;', $mobileCss);
