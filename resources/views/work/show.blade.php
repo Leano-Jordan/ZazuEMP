@@ -68,7 +68,7 @@
     @endif
 
     <section class="zazu-work-progress zazu-work-progress-refined" aria-label="Job progress">
-        <a href="{{ route('work.show', $event) }}" class="zazu-work-progress-step current">
+        <a href="{{ route('work.show', $event) }}" class="zazu-work-progress-step {{ $event->status === 'completed' ? 'complete' : 'current' }}" @if ($event->status !== 'completed') aria-current="step" @endif>
             <span>1</span><strong>Job</strong><small>Details</small>
         </a>
         <a href="{{ route('work.requirements.index', $event) }}" class="zazu-work-progress-step {{ $hasRequirements ? 'complete' : '' }}">
@@ -80,7 +80,7 @@
         <a href="{{ route('work.preparation.index', $event) }}" class="zazu-work-progress-step">
             <span>4</span><strong>Prepare</strong><small>Get ready</small>
         </a>
-        <a href="{{ route('work.edit', $event) }}" class="zazu-work-progress-step {{ $event->status === 'completed' ? 'complete current' : '' }}">
+        <a href="{{ route('work.edit', $event) }}" class="zazu-work-progress-step {{ $event->status === 'completed' ? 'complete current' : '' }}" @if ($event->status === 'completed') aria-current="step" @endif>
             <span>5</span><strong>Complete</strong><small>{{ $event->status === 'completed' ? 'Completed' : 'Update status' }}</small>
         </a>
     </section>
