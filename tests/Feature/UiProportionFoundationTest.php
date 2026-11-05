@@ -416,4 +416,18 @@ class UiProportionFoundationTest extends TestCase
     }
 
 
+    public function test_dashboard_does_not_repeat_workspace_navigation_below_quick_actions(): void
+    {
+        $dashboard = file_get_contents(resource_path('views/dashboard.blade.php'));
+        $css = file_get_contents(resource_path('css/zazu-final-visual-sweep.css'));
+
+        $this->assertIsString($dashboard);
+        $this->assertIsString($css);
+        $this->assertStringNotContainsString('zazu-dash-commandbar', $dashboard);
+        $this->assertStringNotContainsString('Workspace surfaces', $dashboard);
+        $this->assertStringNotContainsString('.zazu-dash-commandbar', $css);
+        $this->assertStringContainsString('aria-label="Quick actions"', $dashboard);
+    }
+
+
 }
