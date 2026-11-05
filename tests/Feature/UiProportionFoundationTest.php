@@ -134,6 +134,32 @@ class UiProportionFoundationTest extends TestCase
         $this->assertStringContainsString('grid-row: 2;', $css);
     }
 
+
+    public function test_dashboard_uses_a_dedicated_quick_action_strip_between_metrics_and_work_queues(): void
+    {
+        $dashboard = file_get_contents(resource_path('views/dashboard.blade.php'));
+        $css = file_get_contents(resource_path('css/zazu-final-visual-sweep.css'));
+
+        $this->assertIsString($dashboard);
+        $this->assertIsString($css);
+
+        $heroStart = strpos($dashboard, '<section class="zazu-dash-hero">');
+        $heroEnd = strpos($dashboard, '</section>', $heroStart);
+        $metricsPosition = strpos($dashboard, '<aside class="zazu-dash-metrics">');
+        $quickActionsPosition = strpos($dashboard, '<section class="zazu-dash-quick-actions');
+        $runPosition = strpos($dashboard, '<section class="zazu-dash-run');
+        $this->assertNotFalse($heroStart);
+        $this->assertNotFalse($heroEnd);
+        $this->assertNotFalse($metricsPosition);
+        $this->assertNotFalse($quickActionsPosition);
+        $this->assertNotFalse($runPosition);
+        $this->assertFalse(strpos(substr($dashboard, $heroStart, $heroEnd - $heroStart), 'zazu-dash-actions'));
+        $this->assertLessThan($quickActionsPosition, $metricsPosition);
+        $this->assertLessThan($runPosition, $quickActionsPosition);
+        $this->assertStringContainsString('grid-row: 2;', $css);
+        $this->assertStringContainsString('flex-direction: column;', $css);
+    }
+
     public function test_authentication_submit_remains_intentionally_full_width(): void
     {
         $css = file_get_contents(resource_path('css/app.css'));
