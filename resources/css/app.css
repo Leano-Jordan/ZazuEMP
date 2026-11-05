@@ -452,21 +452,21 @@ body {
 }
 
 .zazu-footer-card {
-    padding: 12px 13px;
-    border: 1px solid var(--zazu-border);
-    border-radius: var(--zazu-radius-md);
-    background: var(--zazu-surface-2);
+    padding: 13px 14px;
+    border: 0;
+    border-radius: var(--zazu-radius-lg);
+    background: color-mix(in srgb, var(--zazu-primary-soft) 42%, transparent);
 }
 
 .zazu-footer-title {
-    color: var(--zazu-ink-2);
+    color: var(--zazu-sidebar-ink);
     font-size: 12px;
     font-weight: 700;
 }
 
 .zazu-footer-copy {
     margin-top: 3px;
-    color: var(--zazu-faint);
+    color: var(--zazu-sidebar-muted);
     font-size: 11px;
 }
 
@@ -2095,20 +2095,11 @@ body {
     transform: translateX(1px);
 }
 
-.zazu-footer-card {
-    padding: 13px 14px;
-    border-color: color-mix(in srgb, var(--zazu-sidebar-muted) 20%, transparent);
-    border-radius: var(--zazu-radius-lg);
-    background: color-mix(in srgb, var(--zazu-sidebar-surface) 88%, transparent);
-}
 
-.zazu-footer-title {
-    color: var(--zazu-sidebar-ink);
-}
 
-.zazu-footer-copy {
-    color: var(--zazu-sidebar-muted);
-}
+
+
+
 
 .zazu-sidebar-workspace {
     margin: 0 0 14px;
@@ -4662,19 +4653,11 @@ body {
 
 
 
-.zazu-footer-card {
-    border-color: color-mix(in srgb, var(--zazu-border) 90%, transparent);
-    border-radius: var(--zazu-radius-lg);
-    background: color-mix(in srgb, var(--zazu-sidebar-surface) 90%, var(--zazu-surface));
-}
 
-.zazu-footer-title {
-    color: var(--zazu-sidebar-ink);
-}
 
-.zazu-footer-copy {
-    color: var(--zazu-sidebar-muted);
-}
+
+
+
 
 .zazu-main {
     background: var(--zazu-page);
@@ -5798,10 +5781,7 @@ body {
 
 /* Historical borderless sidebar treatment retired; canonical shell edge remains. */
 
-.zazu-footer-card {
-    border: 0;
-    background: color-mix(in srgb, var(--zazu-primary-soft) 68%, var(--zazu-surface));
-}
+
 
 
 
@@ -6051,10 +6031,7 @@ body:not(.zazu-has-wallpaper) {
 
 /* Sidebar appearance is centralized in the canonical shell rule. */
 
-.zazu-footer-card {
-    border: 0;
-    background: color-mix(in srgb, var(--zazu-primary-soft) 42%, transparent);
-}
+
 
 
 
