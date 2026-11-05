@@ -93,7 +93,16 @@
 
         <section class="zazu-dash-commercial zazu-dash-surface">
             <header class="zazu-dash-surface-head"><div><span class="zazu-dash-kicker">Commercial queue</span><h3>Quote pipeline</h3><p>Turn outstanding commercial work into the next deliberate action.</p></div></header>
-            <div class="zazu-dash-commercial-main"><div><span>Draft quotes</span><strong>{{ number_format($metrics['draft_quotes']) }}</strong></div><span class="zazu-dash-queue-state {{ $metrics['draft_quotes'] > 0 ? 'is-warning' : 'is-clear' }}">{{ $metrics['draft_quotes'] > 0 ? 'ACTION REQUIRED' : 'QUEUE CLEAR' }}</span></div>
+            <div class="zazu-dash-quote-stages" aria-label="Quote status breakdown">
+                <div class="zazu-dash-quote-stage is-draft"><span>Draft</span><strong>{{ number_format((int) ($quoteStatusCounts['draft'] ?? 0)) }}</strong><small>Being prepared</small></div>
+                <div class="zazu-dash-quote-stage is-sent"><span>Sent</span><strong>{{ number_format((int) ($quoteStatusCounts['sent'] ?? 0)) }}</strong><small>Awaiting response</small></div>
+                <div class="zazu-dash-quote-stage is-accepted"><span>Accepted</span><strong>{{ number_format((int) ($quoteStatusCounts['accepted'] ?? 0)) }}</strong><small>Customer approved</small></div>
+                <div class="zazu-dash-quote-stage is-closed"><span>Closed</span><strong>{{ number_format((int) (($quoteStatusCounts['declined'] ?? 0) + ($quoteStatusCounts['expired'] ?? 0))) }}</strong><small>Declined or expired</small></div>
+            </div>
+            <div class="zazu-dash-queue-state {{ $metrics['draft_quotes'] > 0 ? 'is-warning' : 'is-clear' }}">
+                <strong>{{ $metrics['draft_quotes'] > 0 ? 'Action needed' : 'Queue clear' }}</strong>
+                <span>{{ $metrics['draft_quotes'] > 0 ? 'Draft quotes are waiting for the next step.' : 'No draft quotes are waiting for action.' }}</span>
+            </div>
             <div class="zazu-dash-actions">
                 @if($workspaceTools['quotes'])<a href="{{ route('quotes.index') }}" class="zazu-btn zazu-btn-primary">{{ $metrics['draft_quotes'] > 0 ? 'Review draft quotes' : 'Open quote queue' }}</a>@endif
                 @if($workspaceTools['finance'])<a href="{{ route('finance.index') }}" class="zazu-btn zazu-btn-secondary">Open finance</a>@endif
