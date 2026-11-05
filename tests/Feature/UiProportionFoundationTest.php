@@ -62,7 +62,8 @@ class UiProportionFoundationTest extends TestCase
         $dashboard = file_get_contents(resource_path('views/dashboard.blade.php'));
 
         $this->assertIsString($dashboard);
-        $this->assertStringContainsString("{{ \$event->event_date ? 'Time TBC' : 'Unscheduled' }}", $dashboard);
+        $this->assertStringContainsString("{{ \$event->event_date ? 'DATE SET' : 'DATE TBC' }}", $dashboard);
+        $this->assertStringContainsString("format('d M Y')", $dashboard);
         $this->assertStringNotContainsString("format('H:i')", $dashboard);
     }
 
@@ -93,6 +94,7 @@ class UiProportionFoundationTest extends TestCase
         $this->assertStringContainsString('grid-column: 1;', $css);
         $this->assertStringContainsString('.zazu-dash-resources {', $css);
         $this->assertStringContainsString('grid-column: 2;', $css);
+        $this->assertStringContainsString('grid-template-columns: 1fr;', $css);
     }
 
     public function test_dashboard_keeps_event_status_visible_on_mobile(): void
