@@ -493,3 +493,12 @@ Continue property-level analysis of the repeated `app.css` shell layers, beginni
 - Added a source regression assertion to `UiProportionFoundationTest` that inspects the final hero rule and prevents a fixed-white background from returning.
 - Source verification: the last/global hero declaration changed once; regression assertion added.
 - Rendered light/dark desktop/mobile verification and PHPUnit execution remain **UNVERIFIED** in this session.
+
+
+## Dashboard light-theme surface consistency — 2026-11-05
+
+- Follow-up inspection found a second, theme-scoped .zazu-dash-hero rule still hard-coded to pure white. It was separate from the global rule fixed in the preceding pass, so the earlier regression assertion did not cover it.
+- Replaced the light-only white stop with the same semantic surface blend used by the global hero treatment. The light theme now starts from its pale blue surface token rather than forcing white; dark mode remains token-driven.
+- Expanded the hero regression test to inspect both the final global rule and the light-theme-specific rule.
+- Source-level check: both declarations now reference --zazu-surface-2 and neither contains #FFFFFF.
+- Runtime PHPUnit and browser acceptance remain pending; the previous current-head Laravel, quality and browser workflows reported failures and must be diagnosed independently before release acceptance.
