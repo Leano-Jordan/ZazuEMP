@@ -76,7 +76,7 @@
             @if($workspaceTools['calendar'])
             <a href="{{ route('calendar.index') }}" class="zazu-dash-metric zazu-dash-surface"><span>Next 14 days</span><strong>{{ number_format($metrics['upcoming_work']) }}</strong><small>Scheduled work ahead</small><b>→</b></a>
             @endif
-            @if($workspaceTools['finance'])
+            @if($workspaceTools['finance'] && $experienceLevel !== 'basic')
             <a href="{{ route('finance.index') }}" class="zazu-dash-metric zazu-dash-surface"><span>Unpaid invoices</span><strong>{{ number_format($metrics['unpaid_invoices']) }}</strong><small>Issued invoices with a balance</small><b>→</b></a>
             @elseif($workspaceTools['quotes'])
             <a href="{{ route('quotes.index') }}" class="zazu-dash-metric zazu-dash-surface"><span>Draft quotes</span><strong>{{ number_format($metrics['draft_quotes']) }}</strong><small>Commercial records awaiting action</small><b>→</b></a>
