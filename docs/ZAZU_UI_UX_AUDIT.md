@@ -365,3 +365,16 @@ Do not redesign the landing page from memory.
 - Removed single-line truncation from action titles and supporting descriptions so important context remains readable instead of being hidden behind ellipses.
 - Preserved the existing conditional action logic, links, status semantics and dark-theme token usage. No new dashboard data or workflow behaviour was introduced.
 - Source-level checks only; browser rendering and automated suites remain outstanding.
+
+## 2026-11-05 Director regression audit — Coastal Blue and dashboard
+
+Audited the latest dashboard/navigation presentation changes against the live `main` source and corrected these defects:
+
+- Moved the Tailwind v4 `@import 'tailwindcss'` to the start of the canonical stylesheet. It had been placed after ordinary CSS rules, which violates CSS import ordering and risks the import being ignored or rejected by the build pipeline.
+- Replaced an invalid navigation trigger font shorthand (`font: 700 12px/1.2 inherit`) with explicit inherited font-family, size, weight and line-height declarations.
+- Corrected the final dashboard hero override: a later legacy radius declaration had reduced the intended 18px hero radius to 8px, and a later background override had displaced the approved white-to-ocean-to-turquoise Coastal Blue gradient.
+- Darkened the light-theme primary ocean token and its aliases from `#0787B5` to `#06749A`, with a deeper hover token, to bring white primary-action text from approximately 4.08:1 to 5.29:1 contrast. Dark-theme tokens remain unchanged.
+
+Source checks after the corrections: Tailwind import is first and unique; invalid font shorthand is absent; CSS brace balance is zero in both touched stylesheets; uploaded dashboard artwork and the no-image fallback classes remain intact; mobile navigation and reduced-motion rules remain present.
+
+Verification boundary: these are source-level corrections only. Vite build, PHPUnit, browser-rendered desktop/mobile light/dark inspection and actual contrast sampling in the rendered UI have not been run in this environment. Do not treat visual acceptance as complete until those checks pass.
