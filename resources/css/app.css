@@ -6162,10 +6162,6 @@ body:not(.zazu-has-wallpaper) {
     border-bottom: 0;
 }
 
-.zazu-sidebar-footer {
-    border-top: 0;
-}
-
 .zazu-footer-card {
     border: 0;
     background: color-mix(in srgb, var(--zazu-primary-soft) 42%, transparent);
