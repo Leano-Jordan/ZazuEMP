@@ -5867,3 +5867,96 @@ body.zazu-mobile-menu-open .zazu-helper {
         grid-template-columns: minmax(0, 1fr);
     }
 }
+
+
+/* Quote pipeline — real lifecycle distribution, styled as the supplied reference. */
+.zazu-dash-quote-stages {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 8px;
+    padding: 0 18px 12px;
+}
+
+.zazu-dash-quote-stage {
+    display: grid;
+    min-width: 0;
+    min-height: 84px;
+    align-content: start;
+    gap: 4px;
+    padding: 10px;
+    border: 1px solid var(--zazu-border);
+    border-radius: 9px;
+    background: var(--zazu-surface-2);
+}
+
+.zazu-dash-quote-stage > span {
+    color: var(--zazu-ink);
+    font-size: 11px;
+    font-weight: 700;
+    line-height: 1.3;
+}
+
+.zazu-dash-quote-stage > strong {
+    color: var(--zazu-ink);
+    font-family: var(--zazu-font-display);
+    font-size: 24px;
+    font-variant-numeric: tabular-nums;
+    line-height: 1;
+}
+
+.zazu-dash-quote-stage > small {
+    color: var(--zazu-muted);
+    font-size: 10px;
+    line-height: 1.3;
+}
+
+.zazu-dash-quote-stage.is-draft {
+    background: color-mix(in srgb, var(--zazu-warning-soft) 52%, var(--zazu-surface));
+}
+
+.zazu-dash-quote-stage.is-sent {
+    background: color-mix(in srgb, var(--zazu-info-soft) 62%, var(--zazu-surface));
+}
+
+.zazu-dash-quote-stage.is-accepted {
+    background: color-mix(in srgb, var(--zazu-success-soft) 62%, var(--zazu-surface));
+}
+
+.zazu-dash-quote-stage.is-closed {
+    background: color-mix(in srgb, var(--zazu-surface-3) 62%, var(--zazu-surface));
+}
+
+.zazu-dash-commercial .zazu-dash-queue-state {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin: 0 18px 12px;
+    padding: 10px 12px;
+    border-radius: 8px;
+}
+
+.zazu-dash-commercial .zazu-dash-queue-state strong {
+    flex: 0 0 auto;
+    font-size: 11px;
+    line-height: 1.3;
+}
+
+.zazu-dash-commercial .zazu-dash-queue-state span {
+    min-width: 0;
+    font-size: 11px;
+    line-height: 1.35;
+}
+
+@media (max-width: 620px) {
+    .zazu-dash-quote-stages {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        padding-inline: 14px;
+    }
+
+    .zazu-dash-commercial .zazu-dash-queue-state {
+        align-items: flex-start;
+        flex-direction: column;
+        gap: 3px;
+        margin-inline: 14px;
+    }
+}
