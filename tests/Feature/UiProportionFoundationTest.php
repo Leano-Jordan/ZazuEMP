@@ -385,4 +385,22 @@ class UiProportionFoundationTest extends TestCase
         $this->assertStringNotContainsString('max-width:', $authSubmit[0]);
     }
 
+    public function test_dashboard_priority_queue_does_not_repeat_setup_or_upcoming_events_already_shown_above(): void
+    {
+        $dashboard = file_get_contents(resource_path('views/dashboard.blade.php'));
+
+        $this->assertIsString($dashboard);
+        $focusStart = strpos($dashboard, '<section class="zazu-dash-focus');
+        $focusEnd = strpos($dashboard, '</section>', $focusStart);
+        $this->assertNotFalse($focusStart);
+        $this->assertNotFalse($focusEnd);
+
+        $priority = substr($dashboard, $focusStart, $focusEnd - $focusStart);
+        $this->assertStringNotContainsString('Finish workspace setup', $priority);
+        $this->assertStringNotContainsString('Next scheduled work:', $priority);
+        $this->assertStringContainsString('draft quote', $priority);
+        $this->assertStringContainsString('need replenishment', $priority);
+    }
+
+
 }
