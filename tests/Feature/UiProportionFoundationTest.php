@@ -67,13 +67,33 @@ class UiProportionFoundationTest extends TestCase
         $this->assertStringNotContainsString("format('H:i')", $dashboard);
     }
 
-    public function test_dashboard_only_surfaces_unpaid_invoice_metric_when_invoice_count_is_available(): void
+    public function test_dashboard_prioritises_quote_kpi_and_uses_invoice_kpi_only_as_a_fallback(): void
     {
         $dashboard = file_get_contents(resource_path('views/dashboard.blade.php'));
 
         $this->assertIsString($dashboard);
-        $this->assertStringContainsString("\$workspaceTools['finance'] && \$experienceLevel !== 'basic'", $dashboard);
-        $this->assertStringContainsString("@elseif(\$workspaceTools['quotes'])", $dashboard);
+        $quotesPosition = strpos($dashboard, "@if(\$workspaceTools['quotes'])");
+        $invoicesPosition = strpos($dashboard, "@elseif(\$workspaceTools['finance'] && \$experienceLevel !== 'basic')");
+        $this->assertNotFalse($quotesPosition);
+        $this->assertNotFalse($invoicesPosition);
+        $this->assertLessThan($invoicesPosition, $quotesPosition);
+    }
+
+    public function test_dashboard_welcome_and_capability_callout_follow_the_supplied_reference(): void
+    {
+        $dashboard = file_get_contents(resource_path('views/dashboard.blade.php'));
+        $css = file_get_contents(resource_path('css/zazu-final-visual-sweep.css'));
+
+        $this->assertIsString($dashboard);
+        $this->assertIsString($css);
+        $this->assertStringContainsString('zazu-dash-greeting', $dashboard);
+        $this->assertStringContainsString('auth()->user()->name', $dashboard);
+        $this->assertStringContainsString('Also in this business', $dashboard);
+        $this->assertStringContainsString('Zazu keeps these capabilities available', $dashboard);
+        $this->assertStringNotContainsString('Workspace state', $dashboard);
+        $this->assertStringContainsString('.zazu-dash-capability {', $css);
+        $this->assertStringContainsString('.zazu-dash-capability-art {', $css);
+        $this->assertStringContainsString('@media (max-width: 620px)', $css);
     }
 
     public function test_dashboard_does_not_present_static_network_connectivity_as_live_status(): void
