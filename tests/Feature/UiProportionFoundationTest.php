@@ -11,10 +11,14 @@ class UiProportionFoundationTest extends TestCase
         $css = file_get_contents(resource_path('css/app.css'));
 
         $this->assertIsString($css);
-        $this->assertStringContainsString('--zazu-primary: #06749A;', $css);
-        $this->assertStringContainsString('--zazu-primary-soft: #D8F1F6;', $css);
-        $this->assertStringContainsString('--zazu-primary-deep: #086B8F;', $css);
-        $this->assertStringContainsString('--zazu-page: #F2FAFD;', $css);
+        $this->assertStringContainsString('--zazu-primary: #159DD2;', $css);
+        $this->assertStringContainsString('--zazu-primary-soft: #DDF4FC;', $css);
+        $this->assertStringContainsString('--zazu-primary-deep: #087FA8;', $css);
+        $this->assertStringContainsString('--zazu-page: #F5FBFE;', $css);
+        $this->assertStringContainsString('--zazu-sidebar: #8ED8F8;', $css);
+        $this->assertStringContainsString('--zazu-primary-light: #35B9E8;', $css);
+        $this->assertStringContainsString('--zazu-accent: #49C7B8;', $css);
+        $this->assertStringContainsString('--zazu-page-deep: #DDF4FC;', $css);
         $this->assertStringContainsString('--zazu-ui-control-height: 44px;', $css);
         $this->assertStringContainsString('--zazu-content-max: 1320px;', $css);
         $this->assertStringContainsString('--zazu-ui-radius: var(--zazu-radius-lg);', $css);
