@@ -4586,7 +4586,8 @@ button,
    Exact selectors mirror dashboard.blade.php.
    -------------------------------------------------------------------------- */
 .zazu-dash-hero {
-    background: linear-gradient(120deg, var(--zazu-surface) 0%, var(--zazu-surface-2) 62%, var(--zazu-primary-soft) 100%);
+    border-radius: 18px;
+    background: linear-gradient(112deg, #FFFFFF 0%, var(--zazu-primary-soft) 62%, var(--zazu-accent-soft) 100%);
 }
 
 .zazu-dash-hero-main {
