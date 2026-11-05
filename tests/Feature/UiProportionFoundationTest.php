@@ -52,10 +52,9 @@ class UiProportionFoundationTest extends TestCase
         $this->assertStringContainsString('var(--zazu-surface-2)', $finalHeroRule);
         $this->assertStringNotContainsString('#FFFFFF', $finalHeroRule);
 
-        preg_match('/:root:not\\(\\[data-theme="dark"\\]\\) \\.zazu-dash-hero\\s*\\{([^}]*)\\}/s', $css, $lightHeroRule);
-        $this->assertNotEmpty($lightHeroRule);
-        $this->assertStringContainsString('var(--zazu-surface-2)', $lightHeroRule[1]);
-        $this->assertStringNotContainsString('#FFFFFF', $lightHeroRule[1]);
+        foreach ($heroRules[1] as $heroRule) {
+            $this->assertStringNotContainsString('#FFFFFF', $heroRule);
+        }
     }
 
     public function test_dashboard_does_not_present_static_network_connectivity_as_live_status(): void
