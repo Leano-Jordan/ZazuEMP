@@ -70,7 +70,7 @@ Disposition: removed the stale declaration so <=520px now inherits the later int
 - zazu-responsive-theme.css: 567 lines, 3 !important declarations.
 - zazu-mobile-refinement.css: 791 lines, 9 !important declarations.
 - zazu-final-visual-sweep.css: 5448 lines, 7 !important declarations, 0 root token blocks.
-- The 2026-11-05 exact-selector scan found 77 repeated selectors across the four active stylesheets. Many are responsive or state-specific overrides, but the property-level overlap set still requires classification. The previous zero-duplication claim is no longer accurate.
+- A structured 2026-11-05 scan found 61 selector groups repeated across stylesheets and 39 with differing declarations. Many differences are legitimate breakpoint/state variants; shared base selectors still need manual classification. The previous zero-duplication claim is no longer accurate.
 
 Remaining !important declarations are predominantly accessibility, reduced-motion, print/mobile state, or bounded interaction protections. They are not evidence that another colour/token authority exists.
 
@@ -332,4 +332,4 @@ The changed source files were re-fetched from `main` and the expected token, the
 
 ### Remaining consolidation work
 
-The 77 repeated selectors need a property-level pass to separate intentional breakpoint/state rules from genuine competing declarations. Do not treat the stylesheet stack as fully consolidated until that pass and rendered acceptance are complete.
+The 61 repeated selector groups (39 with differing declarations) need a property-level pass to separate intentional breakpoint/state rules from genuine competing declarations. Do not treat the stylesheet stack as fully consolidated until that pass and rendered acceptance are complete.
