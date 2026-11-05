@@ -490,4 +490,19 @@ class UiProportionFoundationTest extends TestCase
     }
 
 
+    public function test_light_shell_uses_blue_navigation_and_separate_light_topbar_surfaces(): void
+    {
+        $css = file_get_contents(resource_path('css/app.css'));
+
+        $this->assertIsString($css);
+        $this->assertStringContainsString('--zazu-sidebar: #B9D5EF;', $css);
+        $this->assertStringContainsString('--zazu-sidebar-ink: #173D66;', $css);
+        $this->assertStringContainsString('--zazu-sidebar-active: #1768C4;', $css);
+        $this->assertStringContainsString('background: color-mix(in srgb, var(--zazu-surface) 94%, var(--zazu-page));', $css);
+        $this->assertStringContainsString('color: var(--zazu-ink);', $css);
+        $this->assertStringContainsString(':root[data-theme="dark"] {', $css);
+        $this->assertStringContainsString('--zazu-sidebar: #061826;', $css);
+    }
+
+
 }
