@@ -199,6 +199,12 @@ class UiProportionFoundationTest extends TestCase
             '.zazu-sidebar-workspace-name',
             '.zazu-sidebar-workspace-meta',
             '.zazu-sidebar-workspace-dot',
+            '.zazu-nav-link:hover',
+            '.zazu-nav-link.active',
+            '.zazu-nav-link.active::after',
+            '.zazu-nav-link:hover .zazu-nav-icon',
+            '.zazu-nav-link.active .zazu-nav-icon',
+            '.zazu-nav-priority',
         ];
 
         foreach ($canonicalSelectors as $selector) {
@@ -214,6 +220,7 @@ class UiProportionFoundationTest extends TestCase
         $this->assertStringContainsString('.zazu-nav-link:hover {', $appCss);
         $this->assertStringContainsString('.zazu-nav-link.active {', $appCss);
         $this->assertStringContainsString('.zazu-nav-flyout .zazu-nav-link.active {', $appCss);
+        $this->assertStringContainsString(':root:not([data-theme="dark"]) .zazu-nav-link.active {', $appCss);
         $this->assertStringContainsString('overflow-y: auto;', $responsiveCss);
         $this->assertStringContainsString('body.zazu-mobile-menu-open .zazu-sidebar {', $mobileCss);
         $this->assertStringContainsString('min-height: 44px;', $mobileCss);
