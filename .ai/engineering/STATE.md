@@ -826,3 +826,11 @@ Latest source change: commit `29a38f55d3d3ff5979cf844ddbd624a9ea279515` consolid
 - No navigation structure, routes, permissions, interaction logic or dark-theme rules changed.
 - Added source regression coverage for the light navigation state declarations.
 - Source-level only; rendered visual acceptance and automated runtime checks remain outstanding.
+
+
+## Dashboard KPI surface treatment — 2026-11-06
+
+- Added four restrained semantic surface tints to dashboard KPI tiles, using existing info, success, primary and warning theme tokens blended with the current card surface.
+- Preserved the existing metric content, dimensions, links, hover behaviour and responsive grid. No positional business meaning is assigned to the tints; they are purely visual differentiation.
+- Added source regression coverage for all four token-based treatments.
+- The treatment uses theme tokens so the existing dark theme remains internally consistent; rendered contrast still requires browser acceptance.
