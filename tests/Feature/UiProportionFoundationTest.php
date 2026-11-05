@@ -430,4 +430,20 @@ class UiProportionFoundationTest extends TestCase
     }
 
 
+    public function test_dashboard_supporting_copy_stays_compact_and_non_repetitive(): void
+    {
+        $dashboard = file_get_contents(resource_path('views/dashboard.blade.php'));
+
+        $this->assertIsString($dashboard);
+        $this->assertStringNotContainsString('Start the next piece of work.', $dashboard);
+        $this->assertStringNotContainsString('Real events from the workspace, ordered by execution date.', $dashboard);
+        $this->assertStringNotContainsString('Turn outstanding commercial work into the next deliberate action.', $dashboard);
+        $this->assertStringNotContainsString('A short action queue based on the records already visible', $dashboard);
+        $this->assertStringNotContainsString('Finance remains authoritative in its own workspace.', $dashboard);
+        $this->assertStringContainsString('aria-label="Quick actions"', $dashboard);
+        $this->assertStringContainsString('Quote pipeline', $dashboard);
+        $this->assertStringContainsString('Operational readiness', $dashboard);
+    }
+
+
 }
