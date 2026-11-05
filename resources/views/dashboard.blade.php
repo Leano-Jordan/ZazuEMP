@@ -39,18 +39,18 @@
     <section class="zazu-dash-grid" aria-label="Dashboard operational overview">
         <aside class="zazu-dash-metrics">
             @if($workspaceTools['work'])
-            <a href="{{ route('work.index') }}" class="zazu-dash-metric zazu-dash-surface"><span>Active events</span><strong>{{ number_format($metrics['active_work']) }}</strong><small>Open operational records</small><b>→</b></a>
+            <a href="{{ route('work.index') }}" class="zazu-dash-metric zazu-dash-surface"><span>Active events</span><strong>{{ number_format($metrics['active_work']) }}</strong><b>→</b></a>
             @endif
             @if($workspaceTools['quotes'])
-            <a href="{{ route('quotes.index') }}" class="zazu-dash-metric zazu-dash-surface"><span>Draft quotes</span><strong>{{ number_format($metrics['draft_quotes']) }}</strong><small>Commercial records awaiting action</small><b>→</b></a>
+            <a href="{{ route('quotes.index') }}" class="zazu-dash-metric zazu-dash-surface"><span>Draft quotes</span><strong>{{ number_format($metrics['draft_quotes']) }}</strong><b>→</b></a>
             @elseif($workspaceTools['finance'] && $experienceLevel !== 'basic')
             <a href="{{ route('finance.index') }}" class="zazu-dash-metric zazu-dash-surface"><span>Unpaid invoices</span><strong>{{ number_format($metrics['unpaid_invoices']) }}</strong><small>Issued invoices with a balance</small><b>→</b></a>
             @endif
             @if($workspaceTools['customers'])
-            <a href="{{ route('customers.index') }}" class="zazu-dash-metric zazu-dash-surface"><span>Customers</span><strong>{{ number_format($metrics['customers']) }}</strong><small>People and organisations</small><b>→</b></a>
+            <a href="{{ route('customers.index') }}" class="zazu-dash-metric zazu-dash-surface"><span>Customers</span><strong>{{ number_format($metrics['customers']) }}</strong><b>→</b></a>
             @endif
             @if($workspaceTools['calendar'])
-            <a href="{{ route('calendar.index') }}" class="zazu-dash-metric zazu-dash-surface"><span>Next 14 days</span><strong>{{ number_format($metrics['upcoming_work']) }}</strong><small>Scheduled work ahead</small><b>→</b></a>
+            <a href="{{ route('calendar.index') }}" class="zazu-dash-metric zazu-dash-surface"><span>Next 14 days</span><strong>{{ number_format($metrics['upcoming_work']) }}</strong><b>→</b></a>
             @endif
         </aside>
 
