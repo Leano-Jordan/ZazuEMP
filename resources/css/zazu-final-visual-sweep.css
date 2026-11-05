@@ -1288,29 +1288,11 @@ color:var(--zazu-text-ink);font-size:10px
 color:var(--zazu-text-muted);font-size:11px
 }
 
-.zazu-dash-commandbar {
-display:flex;align-items:center;justify-content:space-between;gap:18px;margin-top:12px;padding:14px 17px;border:1px solid var(--zazu-card-border);border-radius:10px;background:var(--zazu-card-bg);box-shadow:var(--zazu-card-shadow)
-}
 
-.zazu-dash-commandbar>div {
-display:grid;gap:4px
-}
 
-.zazu-dash-commandbar strong {
-color:var(--zazu-text-ink);font-size:10px
-}
 
-.zazu-dash-commandbar nav {
-display:flex;flex-wrap:wrap;justify-content:flex-end;gap:4px
-}
 
-.zazu-dash-commandbar nav a {
-padding:6px 8px;border-radius:6px;color:var(--zazu-text-muted);font-size:10px;font-weight:700
-}
 
-.zazu-dash-commandbar nav a:hover {
-background:var(--zazu-blue-soft);color:var(--zazu-blue-brand)
-}
 
 @media(max-width:980px) {
 .zazu-dash-hero {
@@ -1335,8 +1317,7 @@ grid-column:auto
 }
 
 @media(max-width:620px) {
-.zazu-dash-setup,
-.zazu-dash-commandbar {
+.zazu-dash-setup {
 align-items:flex-start;flex-direction:column
 }
 
@@ -1376,9 +1357,6 @@ border-right:0;border-bottom:1px solid var(--zazu-card-border)
 border-bottom:0
 }
 
-.zazu-dash-commandbar nav {
-justify-content:flex-start
-}
 }
 
 .zazu-catalogue-shell {
@@ -2242,13 +2220,6 @@ grid-column: 2;
     margin-top: 0;
 }
 
-.zazu-dash-commandbar {
-margin-top: 14px;
-    border: 1px solid var(--zazu-card-border);
-    border-radius: 14px;
-    background: var(--zazu-card-bg);
-    box-shadow: var(--zazu-card-shadow);
-}
 
 @media (max-width: 900px) {
 .zazu-dash-hero {
@@ -2380,10 +2351,8 @@ position: absolute;
 :root:not([data-theme="dark"]) .zazu-page-context {
 color: var(--zazu-muted);
 }
-
 :root:not([data-theme="dark"]) .zazu-dash-hero,
-:root:not([data-theme="dark"]) .zazu-dash-surface,
-:root:not([data-theme="dark"]) .zazu-dash-commandbar {
+:root:not([data-theme="dark"]) .zazu-dash-surface {
 border-color: var(--zazu-border);
     background-color: var(--zazu-surface);
     box-shadow: 0 2px 8px rgba(31, 76, 132, .06);
@@ -2426,9 +2395,6 @@ background: var(--zazu-surface-2);
 border-top-color: var(--zazu-border);
 }
 
-:root:not([data-theme="dark"]) .zazu-dash-commandbar {
-background: var(--zazu-surface);
-}
 
 :root:not([data-theme="dark"]) .zazu-dash-status {
 border-color: var(--zazu-border);
@@ -2601,13 +2567,11 @@ color: var(--zazu-blue-brand);
     font-size: 12px;
     opacity: .8;
 }
-
 @media (prefers-reduced-motion: no-preference) {
 .zazu-user-menu-link,
 .zazu-dash-event,
 .zazu-dash-metric,
-.zazu-dash-focus-item,
-.zazu-dash-commandbar a {
+.zazu-dash-focus-item {
 transition:
             transform var(--zazu-motion-fast) var(--zazu-ease),
             background-color var(--zazu-motion-fast) ease,
@@ -2639,8 +2603,7 @@ animation-delay: 70ms;
 .zazu-user-menu-link,
 .zazu-dash-event,
 .zazu-dash-metric,
-.zazu-dash-focus-item,
-.zazu-dash-commandbar a {
+.zazu-dash-focus-item {
 transition: none !important;
         transform: none !important;
 }
@@ -2864,10 +2827,8 @@ background: var(--zazu-success);
 :root:not([data-theme="dark"]) .zazu-dash-hero-visual.has-coastal-fallback .zazu-dash-side-line b {
     color: #F1FFFC;
 }
-
 :root[data-theme="dark"] .zazu-dash-hero,
 :root[data-theme="dark"] .zazu-dash-surface,
-:root[data-theme="dark"] .zazu-dash-commandbar,
 :root[data-theme="dark"] .zazu-dash-setup {
 border-color: var(--zazu-border);
     background: var(--zazu-surface);
@@ -3892,8 +3853,7 @@ width: 100%;
 }
 }
 
-.zazu-dash-metric:hover,
-.zazu-dash-commandbar nav a:hover {
+.zazu-dash-metric:hover {
 box-shadow: none;
 }
 
@@ -3974,11 +3934,9 @@ from { opacity: 0; transform: translateY(4px); }
 .zazu-nav-flyout {
     z-index: 180;
 }
-
 /* Never let the dashboard collapse into a near-white slab. */
 .zazu-dash-hero,
-.zazu-dash-surface,
-.zazu-dash-commandbar {
+.zazu-dash-surface {
     background: var(--zazu-surface-2);
 }
 
@@ -3990,9 +3948,7 @@ from { opacity: 0; transform: translateY(4px); }
             color-mix(in srgb, var(--zazu-primary-soft) 26%, var(--zazu-surface-2)) 100%
         );
 }
-
-:root:not([data-theme="dark"]) .zazu-dash-surface,
-:root:not([data-theme="dark"]) .zazu-dash-commandbar {
+:root:not([data-theme="dark"]) .zazu-dash-surface {
     background: var(--zazu-surface-2);
 }
 
@@ -4490,7 +4446,6 @@ button,
     font-weight: 600;
     line-height: 1.25;
 }
-
 /* Connected contrast: don't use faint grey text against a tinted surface
    when the content carries meaning. */
 .zazu-surface,
@@ -4498,17 +4453,14 @@ button,
 .zazu-panel,
 .zazu-section,
 .zazu-dash-surface,
-.zazu-dash-commandbar,
 .zazu-calendar-shell {
     color: var(--zazu-ink);
 }
-
 .zazu-surface p,
 .zazu-card p,
 .zazu-panel p,
 .zazu-section p,
 .zazu-dash-surface p,
-.zazu-dash-commandbar p,
 .zazu-calendar-shell p {
     color: var(--zazu-muted);
 }
@@ -5159,18 +5111,18 @@ button,
     .zazu-search-result-side b {
         font-size: 12px;
     }
-}
-
-
 /* --------------------------------------------------------------------------
    Director — controlled glass surfaces / background-safe cards
    -------------------------------------------------------------------------- */
+}
+
+
+
 .zazu-form-section,
 .zazu-metric-card,
 .zazu-setting-card,
 .zazu-context-card,
 .zazu-dash-surface,
-.zazu-dash-commandbar,
 .zazu-module,
 .zazu-route-card {
     background: color-mix(in srgb, var(--zazu-surface) 88%, transparent);
@@ -5212,15 +5164,13 @@ button,
 .zazu-dash-resource-grid > .zazu-quick-link:hover {
     background: color-mix(in srgb, var(--zazu-primary-soft) 72%, var(--zazu-surface));
 }
-
 .zazu-has-wallpaper .zazu-card,
 .zazu-has-wallpaper .zazu-panel,
 .zazu-has-wallpaper .zazu-form-section,
 .zazu-has-wallpaper .zazu-metric-card,
 .zazu-has-wallpaper .zazu-setting-card,
 .zazu-has-wallpaper .zazu-context-card,
-.zazu-has-wallpaper .zazu-dash-surface,
-.zazu-has-wallpaper .zazu-dash-commandbar {
+.zazu-has-wallpaper .zazu-dash-surface {
     background: color-mix(in srgb, var(--zazu-surface) 86%, transparent);
 }
 
@@ -5455,30 +5405,8 @@ body.zazu-mobile-menu-open .zazu-helper {
         align-self: start;
         margin-top: 2px;
     }
-}
-
 /* Mobile dashboard shortcuts: make each destination a comfortable tap target. */
-@media (max-width: 620px) {
-    .zazu-dash-commandbar nav {
-        width: 100%;
-        display: grid;
-        grid-template-columns: repeat(2, minmax(0, 1fr));
-        gap: 6px;
-    }
 
-    .zazu-dash-commandbar nav a {
-        min-width: 0;
-        min-height: 40px;
-        display: inline-flex;
-        align-items: center;
-        padding: 8px 10px;
-        border: 1px solid var(--zazu-card-border);
-        border-radius: 8px;
-        background: var(--zazu-card-bg);
-        font-size: 12px;
-        line-height: 1.3;
-        overflow-wrap: anywhere;
-    }
 }
 
 
