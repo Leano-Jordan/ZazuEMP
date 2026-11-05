@@ -254,11 +254,24 @@ class UiAccessibilityTest extends TestCase
     {
         $css = file_get_contents(resource_path('css/app.css'));
 
-        $this->assertStringContainsString('--zazu-sidebar-ink: #F3F8FC;', $css);
+        $this->assertStringContainsString('--zazu-sidebar-ink: #102C43;', $css);
+        $this->assertStringContainsString('color-scheme: light;', $css);
+        $this->assertStringContainsString('color-scheme: dark;', $css);
         $this->assertStringContainsString('--zazu-ink: #102C43;', $css);
         $this->assertStringContainsString('--zazu-muted: #425F76;', $css);
         $this->assertStringContainsString('.zazu-command-title {', $css);
         $this->assertStringContainsString('color: #F7FBFF;', $css);
     }
+
+    public function test_theme_tokens_have_one_canonical_root_authority(): void
+    {
+        $appCss = file_get_contents(resource_path('css/app.css'));
+        $visualCss = file_get_contents(resource_path('css/zazu-final-visual-sweep.css'));
+
+        $this->assertStringContainsString('--zazu-font-size-meta: 12px;', $appCss);
+        $this->assertStringContainsString('--zazu-font-size-label: 12px;', $appCss);
+        $this->assertStringNotContainsString(':root {', $visualCss);
+    }
+
 
 }
