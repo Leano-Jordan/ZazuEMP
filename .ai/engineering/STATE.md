@@ -32,6 +32,17 @@ The 2026-11-01 local Windows-host proposal was exploratory and is no longer the 
 
 The installed-device offline continuity mission below remains open and is the next program after the current owner-directed dashboard/UI mission; this visual work does not close or weaken it.
 
+## Bright Coastal Blue palette implementation — 2026-11-06
+
+- Owner reaffirmed the sunny beach-day Coastal Blue direction; references remain inspiration, not literal templates.
+- Replaced the muted blue-slate light palette at the canonical `:root` token source with a visibly brighter sky/ocean/turquoise system.
+- Light canvas: cloud white `#F5FBFE`; sea mist `#DDF4FC`; sidebar sky blue `#8ED8F8`; ocean primary `#159DD2`; vivid ocean accent `#35B9E8`; turquoise `#49C7B8`.
+- Shifted supporting text, borders, hover/active navigation and surface tokens to harmonise with the brighter palette. Existing dark theme token block was left untouched.
+- All shared components inherit the new palette through canonical tokens; no new CSS override layer or structural changes.
+- Updated canonical palette regression assertions.
+- Commit: 500f1ba9d843044a78737c72be677b08bacc661c.
+- Automated tests and rendered desktop/mobile visual acceptance remain UNVERIFIED.
+
 ## KPI scan-order refinement — 2026-11-06
 
 - Ordered the four dashboard KPIs as Active Events → Draft Quotes → Customers → Next 14 Days, matching the primary reference's business-first scan path while retaining an honest scheduled-work metric instead of inventing revenue.
