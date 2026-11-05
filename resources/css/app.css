@@ -319,16 +319,17 @@ body {
 }
 
 .zazu-sidebar {
-    width: 248px;
-    flex: 0 0 248px;
+    width: 260px;
+    flex: 0 0 260px;
     position: sticky;
     top: 0;
     height: 100vh;
     min-height: 100vh;
     display: flex;
     flex-direction: column;
-    background: color-mix(in srgb, var(--zazu-sidebar) 94%, var(--zazu-page));
-    border-right: 1px solid var(--zazu-border);
+    background: var(--zazu-sidebar);
+    border-right: 1px solid color-mix(in srgb, var(--zazu-sidebar-muted) 18%, transparent);
+    box-shadow: 14px 0 36px color-mix(in srgb, var(--zazu-ink) 4%, transparent);
     overflow-y: auto;
     overscroll-behavior: contain;
 }
@@ -2017,12 +2018,7 @@ body {
     background: var(--zazu-page);
 }
 
-.zazu-sidebar {
-    background:
-        linear-gradient(180deg, color-mix(in srgb, var(--zazu-sidebar) 96%, var(--zazu-primary) 4%), var(--zazu-sidebar));
-    border-right-color: color-mix(in srgb, var(--zazu-border) 55%, transparent);
-    box-shadow: 8px 0 28px rgba(10, 34, 55, 0.08);
-}
+/* Sidebar base appearance is defined in the canonical shell rule above. */
 
 .zazu-brand {
     height: 76px;
@@ -4594,15 +4590,7 @@ body {
     background: var(--zazu-page);
 }
 
-.zazu-sidebar {
-    width: 260px;
-    flex-basis: 260px;
-    position: sticky;
-    border-right: 1px solid var(--zazu-border);
-    background:
-        linear-gradient(180deg, color-mix(in srgb, var(--zazu-sidebar) 97%, var(--zazu-primary) 3%), var(--zazu-sidebar));
-    box-shadow: 8px 0 26px rgba(41, 70, 92, 0.055);
-}
+/* Sidebar dimensions and surface are owned by the canonical shell rule. */
 
 .zazu-brand {
     min-height: 72px;
@@ -5916,10 +5904,7 @@ body {
         var(--zazu-page);
 }
 
-.zazu-sidebar {
-    border-right: 0;
-    background: color-mix(in srgb, var(--zazu-page) 94%, var(--zazu-surface));
-}
+/* Historical borderless sidebar treatment retired; canonical shell edge remains. */
 
 .zazu-brand {
     border-bottom: 0;
@@ -6185,11 +6170,7 @@ body:not(.zazu-has-wallpaper) {
         var(--zazu-page);
 }
 
-.zazu-sidebar {
-    border-right: 0;
-    background: color-mix(in srgb, var(--zazu-sidebar) 97%, var(--zazu-page));
-    box-shadow: 14px 0 36px color-mix(in srgb, var(--zazu-ink) 4%, transparent);
-}
+/* Sidebar appearance is centralized in the canonical shell rule. */
 
 .zazu-brand {
     border-bottom: 0;
@@ -6627,10 +6608,7 @@ body {
         linear-gradient(180deg, color-mix(in srgb, var(--zazu-page) 92%, var(--zazu-page-deep)), var(--zazu-page) 260px);
 }
 
-.zazu-sidebar {
-    background: var(--zazu-surface);
-    border-right: 1px solid var(--zazu-border-strong);
-}
+/* Sidebar surface and border are centralized in the canonical shell rule. */
 
 .zazu-brand {
     min-height: 64px;
@@ -7913,10 +7891,7 @@ body.zazu-inspector-open { overflow:hidden; }
    Keep the navigation/header as one dark shell. Do not use page ink tokens
    inside dark navigation surfaces; use sidebar-specific foreground tokens.
 */
-.zazu-sidebar {
-    background: var(--zazu-sidebar);
-    border-right-color: color-mix(in srgb, var(--zazu-sidebar-muted) 18%, transparent);
-}
+/* Theme-aware sidebar surface and border are defined in the canonical shell rule. */
 
 .zazu-brand {
     background: var(--zazu-sidebar);
