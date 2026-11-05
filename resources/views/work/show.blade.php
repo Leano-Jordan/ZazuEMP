@@ -92,7 +92,7 @@
                 <div class="zazu-panel-copy">Everything connected to this job stays together as the work moves from services to preparation, purchasing, costs and finance.</div>
             </div>
         </div>
-        <div class="grid gap-2 md:grid-cols-5">
+        <div class="grid gap-2 sm:grid-cols-2 xl:grid-cols-5">
             <a href="{{ route('work.requirements.index', $event) }}" class="zazu-quick-link">
                 <span><strong>Services</strong><small class="block opacity-70">{{ $event->requirements->count() }} linked</small></span><span>→</span>
             </a>
