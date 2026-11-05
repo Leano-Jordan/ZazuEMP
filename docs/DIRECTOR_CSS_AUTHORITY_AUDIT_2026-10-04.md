@@ -428,3 +428,13 @@ Continue property-level analysis of the repeated `app.css` shell layers, beginni
 - Preserved footer, workspace card, hierarchical flyout and navigation state rules; this pass only consolidates the sidebar shell itself.
 - Source re-fetch confirmed one canonical base sidebar surface/dimension rule, the tablet hide rule, and the wallpaper state rule. Branch inventory remains `main` only.
 - No Vite build, PHPUnit, browser rendering or physical mobile drawer acceptance was run. The cascade is source-consolidated but visual/runtime acceptance remains outstanding.
+
+
+## Sidebar footer cascade consolidation — 2026-11-05
+
+- Centralized desktop sidebar-footer padding and the intentional borderless treatment in its base rule.
+- Removed historical padding/border overrides and a redundant footer background declaration that simply repeated the parent sidebar token.
+- Kept footer positioning/flex/overflow ownership in `zazu-responsive-theme.css`.
+- Kept the mobile safe-area-aware footer padding in `zazu-mobile-refinement.css`; the mobile drawer's touch layout is unchanged.
+- Re-fetched source confirms one desktop footer presentation rule remains in `app.css`, while responsive and mobile ownership rules remain in their respective files.
+- No build, automated tests or rendered mobile acceptance were run.
