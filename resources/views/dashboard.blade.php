@@ -38,13 +38,13 @@
                     <span class="zazu-dash-side-label">Workspace state</span>
                     <strong>Operational</strong>
                     <span>Live workspace records</span>
-                    <div class="zazu-dash-side-line"><i></i><span>Event operations</span><b>ONLINE</b></div>
+                    <div class="zazu-dash-side-line"><i></i><span>Event operations</span><b>EVENTS</b></div>
                 </div>
             @else
                 <span class="zazu-dash-side-label">Workspace state</span>
                 <strong>Operational</strong>
                 <span>Live workspace records</span>
-                <div class="zazu-dash-side-line"><i></i><span>Event operations</span><b>ONLINE</b></div>
+                <div class="zazu-dash-side-line"><i></i><span>Event operations</span><b>EVENTS</b></div>
             @endif
         </div>
     </section>

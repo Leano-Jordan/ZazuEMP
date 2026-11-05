@@ -53,6 +53,15 @@ class UiProportionFoundationTest extends TestCase
         $this->assertStringNotContainsString('#FFFFFF', $finalHeroRule);
     }
 
+    public function test_dashboard_does_not_present_static_network_connectivity_as_live_status(): void
+    {
+        $dashboard = file_get_contents(resource_path('views/dashboard.blade.php'));
+
+        $this->assertIsString($dashboard);
+        $this->assertStringNotContainsString('<b>ONLINE</b>', $dashboard);
+        $this->assertSame(2, substr_count($dashboard, '<b>EVENTS</b>'));
+    }
+
     public function test_authentication_submit_remains_intentionally_full_width(): void
     {
         $css = file_get_contents(resource_path('css/app.css'));
