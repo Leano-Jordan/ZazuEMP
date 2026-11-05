@@ -106,6 +106,23 @@ class UiProportionFoundationTest extends TestCase
         $this->assertStringNotContainsString('<b>EVENTS</b>', $dashboard);
     }
 
+    public function test_dashboard_workspace_health_uses_four_compact_live_business_metrics(): void
+    {
+        $dashboard = file_get_contents(resource_path('views/dashboard.blade.php'));
+        $css = file_get_contents(resource_path('css/zazu-final-visual-sweep.css'));
+
+        $this->assertIsString($dashboard);
+        $this->assertIsString($css);
+        $this->assertStringContainsString('Workspace health', $dashboard);
+        $this->assertStringContainsString('Operational readiness', $dashboard);
+        $this->assertStringContainsString('Live business records at a glance', $dashboard);
+        $this->assertStringContainsString('grid-template-columns: repeat(4, minmax(0, 1fr));', $css);
+        $this->assertStringContainsString('grid-template-columns: repeat(2, minmax(0, 1fr));', $css);
+        $this->assertStringContainsString('@media (max-width: 380px)', $css);
+        $this->assertStringNotContainsString('System Operational', $dashboard);
+        $this->assertStringNotContainsString('Finance Connected', $dashboard);
+    }
+
     public function test_dashboard_priority_and_resource_readiness_use_a_balanced_lower_row(): void
     {
         $css = file_get_contents(resource_path('css/zazu-final-visual-sweep.css'));
