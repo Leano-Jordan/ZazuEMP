@@ -32,6 +32,18 @@ The 2026-11-01 local Windows-host proposal was exploratory and is no longer the 
 
 The installed-device offline continuity mission below remains open and is the next program after the current owner-directed dashboard/UI mission; this visual work does not close or weaken it.
 
+## Coastal dashboard visual treatment — 2026-11-06
+
+- Refined the existing dashboard hero into a visible sky-blue → sea-mist/turquoise → warm-sunlight wash using shared theme tokens.
+- Gave the existing capability side panel its own subtle blue/turquoise surface, preserving the current content and responsive stacking.
+- Dashboard operational cards now use a consistent coastal-tinted border and cleaner radius; section headers receive a soft blue-to-white wash.
+- KPI tiles use more visible coastal semantic tints; the former green KPI tint now uses the existing turquoise accent family.
+- Event hover uses a restrained blue wash. No markup, data, routes, permission checks or information architecture changed.
+- Dark theme continues to derive these treatments from its own dark token values.
+- Regression assertions added for the hero, capability panel and KPI surface treatment.
+- Commit: 4751d58b89bbb1fc612afe94f6dabd3fc815140b.
+- PHPUnit and rendered desktop/mobile visual acceptance remain UNVERIFIED.
+
 ## Bright Coastal Blue palette implementation — 2026-11-06
 
 - Owner reaffirmed the sunny beach-day Coastal Blue direction; references remain inspiration, not literal templates.
