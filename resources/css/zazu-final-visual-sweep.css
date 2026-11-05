@@ -2397,7 +2397,7 @@ background: var(--zazu-surface);
 :root:not([data-theme="dark"]) .zazu-dash-event,
 :root:not([data-theme="dark"]) .zazu-dash-metric,
 :root:not([data-theme="dark"]) .zazu-dash-note,
-:root:not([data-theme="dark"]) .zazu-dash-resource-grid > div,
+:root:not([data-theme="dark"]) .zazu-dash-resource-grid > .zazu-quick-link,
 :root:not([data-theme="dark"]) .zazu-dash-commercial-main {
 border-color: var(--zazu-border);
 }
@@ -2521,7 +2521,7 @@ color: var(--zazu-faint);
 }
 
 .zazu-dash-focus {
-grid-column: 1 / -1;
+grid-column: 1;
     overflow: hidden;
 }
 
@@ -4778,12 +4778,13 @@ button,
     min-height: 72px;
     padding: 14px 18px;
     border: 0;
-    border-right: 1px solid var(--zazu-border);
+    border-right: 0;
+    border-bottom: 1px solid var(--zazu-border);
     border-radius: 0;
 }
 
 .zazu-dash-resource-grid > .zazu-quick-link:last-child {
-    border-right: 0;
+    border-bottom: 0;
 }
 
 .zazu-dash-resource-grid > .zazu-quick-link span:first-child {
