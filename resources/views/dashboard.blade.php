@@ -17,16 +17,7 @@
             @if(count($supportingNiches))
                 <div class="zazu-dash-context-note"><strong>Also in this business:</strong> {{ implode(' · ', $supportingNiches) }}. Zazu keeps these capabilities available when the job needs them.</div>
             @endif
-            <div class="zazu-dash-actions">
-                @if($workspaceTools['customers'] && app(\App\Support\PermissionService::class)->allows('customers.create', auth()->user(), $business))
-                    <a href="{{ route('customers.create') }}" class="zazu-btn zazu-btn-secondary">Start with customer <span>+</span></a>
-                @endif
-                @if($workspaceTools['work'] && app(\App\Support\PermissionService::class)->allows('work.create', auth()->user(), $business))
-                    <a href="{{ route('work.create') }}" class="zazu-btn zazu-btn-cta">Start with job <span>+</span></a>
-                    <a href="{{ route('work.create', ['start' => 'quote']) }}" class="zazu-btn zazu-btn-secondary">Start with quote <span>+</span></a>
-                @endif
-                @if($workspaceTools['calendar'])<a href="{{ route('calendar.index') }}" class="zazu-btn zazu-btn-secondary">Open calendar <span>→</span></a>@endif
-            </div>        </div>
+        </div>
         <div class="zazu-dash-hero-side zazu-dash-hero-visual {{ $business?->dashboard_image_path ? 'has-dashboard-image' : 'has-coastal-fallback' }}">
             @if($business?->dashboard_image_path)
                 <img
@@ -66,6 +57,20 @@
             <a href="{{ route('customers.index') }}" class="zazu-dash-metric zazu-dash-surface"><span>Customers</span><strong>{{ number_format($metrics['customers']) }}</strong><small>People and organisations</small><b>→</b></a>
             @endif
         </aside>
+
+        <section class="zazu-dash-quick-actions zazu-dash-surface" aria-label="Quick actions">
+            <div class="zazu-dash-quick-actions-heading"><span class="zazu-dash-kicker">Quick actions</span><strong>Start the next piece of work.</strong></div>
+            <div class="zazu-dash-actions">
+                @if($workspaceTools['customers'] && app(\App\Support\PermissionService::class)->allows('customers.create', auth()->user(), $business))
+                    <a href="{{ route('customers.create') }}" class="zazu-btn zazu-btn-secondary">Start with customer <span>+</span></a>
+                @endif
+                @if($workspaceTools['work'] && app(\App\Support\PermissionService::class)->allows('work.create', auth()->user(), $business))
+                    <a href="{{ route('work.create') }}" class="zazu-btn zazu-btn-cta">Start with job <span>+</span></a>
+                    <a href="{{ route('work.create', ['start' => 'quote']) }}" class="zazu-btn zazu-btn-secondary">Start with quote <span>+</span></a>
+                @endif
+                @if($workspaceTools['calendar'])<a href="{{ route('calendar.index') }}" class="zazu-btn zazu-btn-secondary">Open calendar <span>→</span></a>@endif
+            </div>
+        </section>
 
         <section class="zazu-dash-run zazu-dash-surface">
             <header class="zazu-dash-surface-head">
