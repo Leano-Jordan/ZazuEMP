@@ -32,6 +32,12 @@ The 2026-11-01 local Windows-host proposal was exploratory and is no longer the 
 
 The installed-device offline continuity mission below remains open and is the next program after the current owner-directed dashboard/UI mission; this visual work does not close or weaken it.
 
+## KPI scan-order refinement — 2026-11-06
+
+- Ordered the four dashboard KPIs as Active Events → Draft Quotes → Customers → Next 14 Days, matching the primary reference's business-first scan path while retaining an honest scheduled-work metric instead of inventing revenue.
+- Added a source regression assertion for the order.
+- Runtime and rendered visual acceptance remain UNVERIFIED.
+
 ## Quote pipeline reference refinement — 2026-11-06
 
 - Replaced the single draft-quote count presentation with a four-stage dashboard breakdown matching the supplied reference's compact pipeline treatment.
