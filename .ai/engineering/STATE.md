@@ -789,3 +789,12 @@ Latest source change: commit `29a38f55d3d3ff5979cf844ddbd624a9ea279515` consolid
 - Kept action-specific priority explanations and the honest operational-readiness heading. No data, permissions, routes or calculations changed.
 - Added regression coverage for the compact copy and retained section identity.
 - Source re-fetch and structure checks required after commit; runtime and rendered acceptance remain outstanding.
+
+
+## Dashboard KPI density refinement — 2026-11-06
+
+- Removed four secondary KPI captions that repeated the meaning of each metric label or added no decision-making context.
+- Kept all permission-gated KPI cards, live values, labels, routes and calculations unchanged.
+- Removed the now-unused KPI-caption CSS rule.
+- Added regression coverage for the four retained KPI labels and the absence of redundant captions/styling.
+- Source-level change only; runtime, PHPUnit, Vite and rendered viewport/theme acceptance remain unverified.
