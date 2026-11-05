@@ -555,4 +555,19 @@ class UiProportionFoundationTest extends TestCase
     }
 
 
+    public function test_shared_panel_headers_use_the_same_soft_workspace_surface_language(): void
+    {
+        $css = file_get_contents(resource_path('css/app.css'));
+
+        $this->assertIsString($css);
+        $pattern = '/\\.zazu-panel-head \\{[^}]*\\}/s';
+        preg_match_all($pattern, $css, $matches);
+        $this->assertNotEmpty($matches[0]);
+        $effectiveRule = end($matches[0]);
+        $this->assertStringContainsString('var(--zazu-surface-2)', $effectiveRule);
+        $this->assertStringContainsString('var(--zazu-surface)', $effectiveRule);
+        $this->assertStringContainsString('border-bottom: 1px solid var(--zazu-border);', $effectiveRule);
+    }
+
+
 }
