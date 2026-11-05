@@ -517,4 +517,18 @@ class UiProportionFoundationTest extends TestCase
     }
 
 
+    public function test_dashboard_metric_tiles_use_soft_semantic_surface_tints(): void
+    {
+        $css = file_get_contents(resource_path('css/zazu-final-visual-sweep.css'));
+
+        $this->assertIsString($css);
+        $this->assertStringContainsString('.zazu-dash-metrics > .zazu-dash-metric:nth-child(4n + 1)', $css);
+        $this->assertStringContainsString('var(--zazu-info-soft)', $css);
+        $this->assertStringContainsString('var(--zazu-success-soft)', $css);
+        $this->assertStringContainsString('var(--zazu-primary-soft)', $css);
+        $this->assertStringContainsString('var(--zazu-warning-soft)', $css);
+        $this->assertStringContainsString('var(--zazu-card-bg)', $css);
+    }
+
+
 }
