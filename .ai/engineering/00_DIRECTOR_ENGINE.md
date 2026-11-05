@@ -26,7 +26,7 @@ The owner has explicitly prohibited branches for ZazuEMP. This is absolute stand
 2. Never create, switch to, checkout, push to, or develop on a non-`main` branch.
 3. All source, test, documentation, audit and maintenance changes go directly to `main`.
 4. If a tool or process cannot write directly to `main`, stop and report the blocker; never work around it by creating a branch.
-5. Discovery of any non-`main` branch is policy drift, not permission to use it. Do not delete it without explicit owner authorization.
+5. Discovery of any non-`main` branch is policy drift. Inspect it read-only, preserve any unique required work on `main`, then remove the stale remote ref when authorized tooling is available. The owner explicitly authorized consolidation to `main` only on 2026-11-05.
 6. Verify repository and `main` target before every write. After each write, re-read the changed file and reconcile the resulting commit.
 
 This is a hard constraint, not a preference or default. Generic Git best practices and other project workflows do not override it. Only an explicit new owner instruction may change it.
