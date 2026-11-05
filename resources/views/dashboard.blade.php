@@ -180,7 +180,7 @@
         @if($experienceLevel !== 'basic')
         <section class="zazu-dash-resources zazu-dash-surface">
             <header class="zazu-dash-surface-head">
-                <div><span class="zazu-dash-kicker">Resource readiness</span><h3>{{ $nicheDefinition['label'] }} · resources &amp; money</h3><p>Live counts from the workspace show where an established business needs attention.</p></div>
+                <div><span class="zazu-dash-kicker">Workspace health</span><h3>Operational readiness</h3><p>Live business records at a glance. These are operational counts, not connection or system-health claims.</p></div>
                 <div class="flex flex-wrap gap-2">
                     @if($workspaceTools['assets'])<a href="{{ route('assets.index') }}" class="zazu-text-action">Asset register →</a>@endif
                     @if($workspaceTools['inventory'])<a href="{{ route('inventory.index') }}" class="zazu-text-action">Stock control →</a>@endif
