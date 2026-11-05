@@ -434,3 +434,11 @@ Correction in `resources/views/work/show.blade.php`:
 - For all other statuses, keep Job as the current step.
 
 Verification boundary: source-level conditional and markup inspection only. Screen-reader/browser acceptance and automated tests have not been run in this execution.
+
+## Workspace search reference alignment — 2026-11-06
+
+- The supplied dashboard reference uses a prominent, wide workspace search field; the live desktop header constrained it to a maximum of 330px, materially weakening the shared-shell match.
+- Expanded the search field to a responsive 420px–760px range on wide desktop screens (1200px+), while retaining the existing compact sizing below that breakpoint and the existing full-width mobile rule.
+- Updated the placeholder to name the actual searchable business areas: events, customers, quotes and inventory.
+- Added a focused regression assertion covering the wide desktop sizing, mobile rule and search scope copy.
+- Source re-read confirms all three changes are present on main. Automated tests, Vite build and rendered desktop/mobile/light/dark acceptance remain UNVERIFIED; the browser-rendered appearance still requires owner review.
