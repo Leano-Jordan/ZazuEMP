@@ -411,8 +411,8 @@ body {
 }
 
 .zazu-sidebar-footer {
-    padding: 10px;
-    border-top: 1px solid var(--zazu-border);
+    padding: 10px 12px 12px;
+    border-top: 0;
 }
 
 .zazu-footer-card {
@@ -2102,11 +2102,6 @@ body {
 .zazu-nav-link:hover .zazu-nav-icon {
     opacity: 1;
     transform: translateX(1px);
-}
-
-.zazu-sidebar-footer {
-    padding: 12px 10px;
-    border-top-color: color-mix(in srgb, var(--zazu-sidebar-muted) 18%, transparent);
 }
 
 .zazu-footer-card {
@@ -4759,11 +4754,6 @@ body {
     box-shadow: 0 0 0 3px color-mix(in srgb, var(--zazu-primary) 11%, transparent);
 }
 
-.zazu-sidebar-footer {
-    padding: 10px 12px 12px;
-    border-top: 1px solid color-mix(in srgb, var(--zazu-border) 72%, transparent);
-}
-
 .zazu-footer-card {
     border-color: color-mix(in srgb, var(--zazu-border) 90%, transparent);
     border-radius: var(--zazu-radius-lg);
@@ -5908,10 +5898,6 @@ body {
 
 .zazu-brand {
     border-bottom: 0;
-}
-
-.zazu-sidebar-footer {
-    border-top: 0;
 }
 
 .zazu-footer-card {
@@ -7984,11 +7970,6 @@ body.zazu-inspector-open { overflow:hidden; }
     background: color-mix(in srgb, var(--zazu-primary) 18%, var(--zazu-sidebar-surface));
     color: var(--zazu-sidebar-ink);
     box-shadow: inset 3px 0 0 var(--zazu-primary);
-}
-
-.zazu-sidebar-footer {
-    background: var(--zazu-sidebar);
-    border-top-color: color-mix(in srgb, var(--zazu-sidebar-muted) 18%, transparent);
 }
 
 .zazu-footer-workspace,
