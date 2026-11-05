@@ -4822,41 +4822,7 @@ button,
 }
 
 
-/* --------------------------------------------------------------------------
-   Director — contained global search / command palette
-   Search is utility chrome: it must never dictate shell width.
-   -------------------------------------------------------------------------- */
-.zazu-topbar-inner {
-    width: 100%;
-    box-sizing: border-box;
-}
-
-@media (min-width: 821px) {
-    .zazu-header-context {
-        flex: 1 1 0;
-        min-width: 0;
-        overflow: hidden;
-    }
-
-    .zazu-section-tabs {
-        min-width: 0;
-        max-width: 100%;
-        overflow-x: auto;
-        overflow-y: hidden;
-        scrollbar-width: none;
-        white-space: nowrap;
-    }
-
-    .zazu-section-tabs::-webkit-scrollbar {
-        display: none;
-    }
-
-    .zazu-topbar-actions {
-        flex: 0 0 auto;
-        min-width: 0;
-        flex-wrap: nowrap;
-    }
-}
+/* Desktop search/header layout is owned by zazu-responsive-theme.css. */
 
 .zazu-command-search {
     flex: 0 1 clamp(240px, 22vw, 330px);
