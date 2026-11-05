@@ -32,6 +32,14 @@ The 2026-11-01 local Windows-host proposal was exploratory and is no longer the 
 
 The installed-device offline continuity mission below remains open and is the next program after the current owner-directed dashboard/UI mission; this visual work does not close or weaken it.
 
+## Shared shell topbar correction — 2026-11-06
+
+- Source audit found a later `.zazu-topbar` rule overriding the earlier near-white workspace surface with 88% sidebar colour. This was a direct conflict with the intended light workspace / blue sidebar composition.
+- Corrected the effective topbar rule to a near-white surface/page blend, with a restrained turquoise-tinted lower border. Sidebar colour remains owned by the sidebar only.
+- Added a regression test against the effective final topbar rule to prevent sidebar colour bleed.
+- Commit: 54391382052ac28e0da5fae834cf881c75a12b70.
+- Source verification and automated test execution: pending; rendered review remains with owner.
+
 ## Coastal dashboard visual treatment — 2026-11-06
 
 - Refined the existing dashboard hero into a visible sky-blue → sea-mist/turquoise → warm-sunlight wash using shared theme tokens.
