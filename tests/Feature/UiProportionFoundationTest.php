@@ -532,6 +532,11 @@ class UiProportionFoundationTest extends TestCase
         $this->assertStringContainsString('var(--zazu-primary-soft)', $css);
         $this->assertStringContainsString('var(--zazu-warning-soft)', $css);
         $this->assertStringContainsString('var(--zazu-card-bg)', $css);
+
+        $this->assertStringContainsString('linear-gradient(112deg', $css);
+        $this->assertStringContainsString('linear-gradient(145deg', $css);
+        $this->assertStringContainsString('var(--zazu-accent-soft) 72%', $css);
+        $this->assertStringContainsString('var(--zazu-blue-soft) 76%', $css);
     }
 
 
