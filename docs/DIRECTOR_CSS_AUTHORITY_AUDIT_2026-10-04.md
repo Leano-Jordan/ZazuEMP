@@ -461,3 +461,13 @@ Continue property-level analysis of the repeated `app.css` shell layers, beginni
 - Preserved the distinct hover/active surfaces, focus-visible outline, active indicator, icon sizing reset, desktop flyout theme treatment, mobile 44px touch target, no-JS active-group recovery and reduced-motion/forced-colour behaviour.
 - No generic nav state overrides were moved between stylesheets; the remaining repeated state blocks have different media/theme/hierarchy contexts and require rendered acceptance before further merging.
 - Source-only verification: change committed directly to `main`; no Vite build, PHPUnit, browser rendering, contrast sampling or physical mobile acceptance was run.
+
+
+## Coastal Blue navigation presentation pass — 2026-11-05
+
+- Gave the existing primary navigation areas more separation and a clearer 46px touch target.
+- Replaced the flat square area triggers with softly rounded surfaces; the active area now carries a restrained ocean-to-turquoise tint and a clear left-side state marker.
+- Refined desktop flyout width, shape, spacing and link targets to read as deliberate navigation panels rather than a flat list.
+- Preserved the existing hierarchy, route/permission logic, keyboard focus states, mobile expansion behaviour and theme-specific sidebar tokens. Mobile flyouts retain their nested-list presentation.
+- This is a presentation-only change; no navigation destinations or information architecture were altered.
+- Browser-rendered acceptance remains pending.
