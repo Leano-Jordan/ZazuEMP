@@ -106,6 +106,27 @@ class UiProportionFoundationTest extends TestCase
         $this->assertStringNotContainsString('<b>EVENTS</b>', $dashboard);
     }
 
+    public function test_dashboard_quote_pipeline_uses_real_quote_lifecycle_status_counts(): void
+    {
+        $controller = file_get_contents(app_path('Http/Controllers/DashboardController.php'));
+        $dashboard = file_get_contents(resource_path('views/dashboard.blade.php'));
+        $css = file_get_contents(resource_path('css/zazu-final-visual-sweep.css'));
+
+        $this->assertIsString($controller);
+        $this->assertIsString($dashboard);
+        $this->assertIsString($css);
+        $this->assertStringContainsString("->groupBy('status')", $controller);
+        $this->assertStringContainsString("->pluck('total', 'status')", $controller);
+        $this->assertStringContainsString("$"."quoteStatusCounts", $controller);
+        $this->assertStringContainsString("['declined']", $dashboard);
+        $this->assertStringContainsString("['expired']", $dashboard);
+        $this->assertStringContainsString('Quote status breakdown', $dashboard);
+        $this->assertStringContainsString('Accepted', $dashboard);
+        $this->assertStringContainsString('Declined or expired', $dashboard);
+        $this->assertStringContainsString('grid-template-columns: repeat(4, minmax(0, 1fr));', $css);
+        $this->assertStringContainsString('grid-template-columns: repeat(2, minmax(0, 1fr));', $css);
+    }
+
     public function test_dashboard_workspace_health_uses_four_compact_live_business_metrics(): void
     {
         $dashboard = file_get_contents(resource_path('views/dashboard.blade.php'));
