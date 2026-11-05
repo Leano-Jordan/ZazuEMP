@@ -245,6 +245,57 @@ class UiProportionFoundationTest extends TestCase
         $this->assertStringContainsString('min-height: 44px;', $mobileCss);
     }
 
+
+    public function test_topbar_title_and_theme_toggle_have_one_canonical_base_with_theme_and_viewport_overrides(): void
+    {
+        $appCss = file_get_contents(resource_path('css/app.css'));
+        $extensionCss = file_get_contents(resource_path('css/zazu-final-visual-sweep.css'));
+        $responsiveCss = file_get_contents(resource_path('css/zazu-responsive-theme.css'));
+        $mobileCss = file_get_contents(resource_path('css/zazu-mobile-refinement.css'));
+
+        $this->assertIsString($appCss);
+        $this->assertIsString($extensionCss);
+        $this->assertIsString($responsiveCss);
+        $this->assertIsString($mobileCss);
+
+        foreach ([
+            '.zazu-topbar',
+            '.zazu-topbar-inner',
+            '.zazu-page-title',
+            '.zazu-eyebrow',
+            '.zazu-theme-toggle',
+        ] as $selector) {
+            $pattern = '/^' . preg_quote($selector, '/') . '\\s*\\{/m';
+            $this->assertSame(
+                1,
+                preg_match_all($pattern, $appCss),
+                $selector . ' should have one canonical desktop base rule.'
+            );
+        }
+
+        // Shared eyebrow typography belongs to app.css, not the component extension layer.
+        $this->assertSame(0, preg_match('/^\\.zazu-eyebrow\\s*\\{/m', $extensionCss));
+        $this->assertStringNotContainsString(".zazu-caption,\\n.zazu-eyebrow,", $extensionCss);
+
+        // Theme values and wallpaper treatment remain token/state driven.
+        $this->assertStringContainsString('--zazu-sidebar: #E4F6FC;', $appCss);
+        $this->assertStringContainsString('--zazu-sidebar: #061826;', $appCss);
+        $this->assertStringContainsString('--zazu-sidebar-ink: #F3F7FB;', $appCss);
+        $this->assertStringContainsString('body.zazu-has-wallpaper .zazu-topbar', $appCss);
+        $this->assertStringContainsString('.zazu-theme-toggle:hover {', $appCss);
+        $this->assertStringContainsString('.zazu-theme-toggle:active {', $appCss);
+        $this->assertStringContainsString('.zazu-theme-toggle:focus-visible', $appCss);
+
+        // Responsive shell ownership stays in its dedicated stylesheets.
+        $this->assertStringContainsString('@media (min-width: 821px)', $responsiveCss);
+        $this->assertStringContainsString('.zazu-topbar-actions {', $responsiveCss);
+        $this->assertStringContainsString('@media (max-width: 850px)', $mobileCss);
+        $this->assertStringContainsString('grid-template-areas:', $mobileCss);
+        $this->assertStringContainsString('width: 40px;', $mobileCss);
+        $this->assertStringContainsString('font-size: 17px;', $mobileCss);
+        $this->assertStringContainsString('height: 40px;', $mobileCss);
+    }
+
     public function test_authentication_submit_remains_intentionally_full_width(): void
     {
         $css = file_get_contents(resource_path('css/app.css'));
