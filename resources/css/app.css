@@ -2121,8 +2121,6 @@ body {
 }
 
 .zazu-nav-icon {
-    width: 18px;
-    height: 18px;
     opacity: 0.9;
     transition: transform var(--zazu-motion-fast) var(--zazu-ease), opacity var(--zazu-motion-fast) ease;
 }
