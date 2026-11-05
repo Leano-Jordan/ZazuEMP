@@ -87,7 +87,7 @@ class DashboardController extends Controller
             ->whereNotIn('status', ['completed', 'cancelled'])
             ->orderBy('event_date')
             ->orderBy('name')
-            ->limit(8)
+            ->limit(5)
             ->get();
 
         $permissionService = app(PermissionService::class);
