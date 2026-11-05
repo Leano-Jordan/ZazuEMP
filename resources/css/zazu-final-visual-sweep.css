@@ -5491,11 +5491,45 @@ body.zazu-mobile-menu-open .zazu-helper {
 
 
 
-/* DIRECTOR — dashboard hierarchy aligned to the operational reference.
-   KPI strip, dedicated shortcuts, operational queues, then attention/readiness. */
+/* DIRECTOR — dashboard hierarchy and card proportions.
+   One final dashboard authority: KPI strip, shortcuts, paired work queues,
+   paired attention panels. Keep the phone layout linear and touch-friendly. */
+.zazu-dash-hero {
+    grid-template-columns: minmax(0, 1fr) minmax(300px, 34%);
+    min-height: 210px;
+    margin-bottom: 16px;
+}
+
+.zazu-dash-hero-main {
+    padding: 24px 26px;
+}
+
+.zazu-dash-hero-side {
+    padding: 22px 24px;
+}
+
 .zazu-dash-grid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
-    align-items: start;
+    align-items: stretch;
+    gap: 16px;
+}
+
+.zazu-dash-surface {
+    border-radius: 12px;
+}
+
+.zazu-dash-surface-head {
+    padding: 15px 18px 13px;
+}
+
+.zazu-dash-surface-head h3 {
+    font-size: 17px;
+    line-height: 1.25;
+}
+
+.zazu-dash-surface-head p {
+    font-size: 12px;
+    line-height: 1.45;
 }
 
 .zazu-dash-metrics {
@@ -5508,8 +5542,25 @@ body.zazu-mobile-menu-open .zazu-helper {
 
 .zazu-dash-metric {
     min-width: 0;
-    min-height: 112px;
-    padding: 16px 38px 15px 17px;
+    min-height: 108px;
+    padding: 14px 36px 13px 16px;
+    border-radius: 11px;
+}
+
+.zazu-dash-metric > span {
+    font-size: 11px;
+    line-height: 1.35;
+}
+
+.zazu-dash-metric > strong {
+    margin-top: 1px;
+    font-size: 30px;
+    line-height: 1;
+}
+
+.zazu-dash-metric > small {
+    font-size: 11px;
+    line-height: 1.4;
 }
 
 .zazu-dash-quick-actions {
@@ -5520,7 +5571,8 @@ body.zazu-mobile-menu-open .zazu-helper {
     justify-content: space-between;
     gap: 18px;
     min-width: 0;
-    padding: 14px 18px;
+    min-height: 72px;
+    padding: 12px 16px;
 }
 
 .zazu-dash-quick-actions-heading {
@@ -5542,7 +5594,7 @@ body.zazu-mobile-menu-open .zazu-helper {
     flex-wrap: wrap;
     align-items: center;
     justify-content: flex-end;
-    gap: 9px;
+    gap: 8px;
     margin: 0;
     padding: 0;
 }
@@ -5557,9 +5609,36 @@ body.zazu-mobile-menu-open .zazu-helper {
     grid-row: 3;
 }
 
+.zazu-dash-event {
+    min-height: 76px;
+    padding-block: 11px;
+}
+
+.zazu-dash-commercial-main {
+    padding: 15px 18px 4px;
+}
+
+.zazu-dash-commercial .zazu-dash-actions {
+    padding: 0 18px 14px;
+}
+
+.zazu-dash-note {
+    margin: 0 18px 18px;
+}
+
 .zazu-dash-focus {
     grid-column: 1;
     grid-row: 4;
+}
+
+.zazu-dash-focus-grid {
+    gap: 8px;
+    padding: 12px;
+}
+
+.zazu-dash-focus-item {
+    min-height: 74px;
+    padding: 13px 16px;
 }
 
 .zazu-dash-resources {
@@ -5567,7 +5646,32 @@ body.zazu-mobile-menu-open .zazu-helper {
     grid-row: 4;
 }
 
+.zazu-dash-resource-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.zazu-dash-resource-grid > .zazu-quick-link {
+    min-height: 68px;
+    padding: 12px 14px;
+    border-right: 1px solid var(--zazu-border);
+    border-bottom: 1px solid var(--zazu-border);
+}
+
+.zazu-dash-resource-grid > .zazu-quick-link:nth-child(2n),
+.zazu-dash-resource-grid > .zazu-quick-link:last-child {
+    border-right: 0;
+}
+
+.zazu-dash-resource-grid > .zazu-quick-link:nth-last-child(-n + 2) {
+    border-bottom: 0;
+}
+
 @media (max-width: 900px) {
+    .zazu-dash-hero {
+        grid-template-columns: 1fr;
+        min-height: 0;
+    }
+
     .zazu-dash-grid {
         grid-template-columns: minmax(0, 1fr);
     }
@@ -5588,6 +5692,11 @@ body.zazu-mobile-menu-open .zazu-helper {
 }
 
 @media (max-width: 620px) {
+    .zazu-dash-hero-main,
+    .zazu-dash-hero-side {
+        padding: 15px;
+    }
+
     .zazu-dash-quick-actions {
         align-items: stretch;
         flex-direction: column;
@@ -5602,6 +5711,21 @@ body.zazu-mobile-menu-open .zazu-helper {
     .zazu-dash-quick-actions .zazu-dash-actions {
         justify-content: flex-start;
     }
+
+    .zazu-dash-resource-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .zazu-dash-resource-grid > .zazu-quick-link,
+    .zazu-dash-resource-grid > .zazu-quick-link:nth-child(2n),
+    .zazu-dash-resource-grid > .zazu-quick-link:last-child {
+        border-right: 0;
+        border-bottom: 1px solid var(--zazu-border);
+    }
+
+    .zazu-dash-resource-grid > .zazu-quick-link:last-child {
+        border-bottom: 0;
+    }
 }
 
 @media (max-width: 520px) {
@@ -5613,5 +5737,9 @@ body.zazu-mobile-menu-open .zazu-helper {
     .zazu-dash-metric {
         min-height: 96px;
         padding: 12px 28px 12px 12px;
+    }
+
+    .zazu-dash-surface-head {
+        padding: 12px 14px;
     }
 }
