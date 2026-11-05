@@ -28,7 +28,24 @@ IDENTITY → BASELINE → TARGET → ROUTE → INSPECT → CHANGE → VERIFY →
 The 2026-11-01 local Windows-host proposal was exploratory and is no longer the active deployment target. The owner has clarified that this PC is a development workstation; future production hosting will be a paid server when funding and release readiness permit. The 2026-11-03 host diagnostic is recorded below. Do not configure this PC as production infrastructure.
 
 ## Active target
-**P0 active mission: make Zazu's installed-device offline workflows reliable and recoverable; close the orphaned offline-attachment integration gap; reconcile exact-main CI and realistic disconnect/reconnect behaviour. Keep the current PC as development only; prepare provider-neutral portability for a future paid production server.**
+**Owner-directed UI/UX mission: align the Dashboard and shared shell to the supplied Designer (1) and Designer (2) references. Designer (2) is the primary composition; Designer (1) informs the cleaner card treatment. Preserve real Zazu data, permission gates, routes, responsive behaviour and the coastal-blue light/deep-water dark theme. Do not invent revenue, online status or system-health metrics.**
+
+The installed-device offline continuity mission below remains open and is the next program after the current owner-directed dashboard/UI mission; this visual work does not close or weaken it.
+
+## Dashboard reference alignment — 2026-11-06
+
+- Inspected both supplied dashboard references and current main source before changing the UI.
+- Current Dashboard already had the KPI strip → quick actions → paired operational queues → paired lower panels grid foundation. The missing reference alignment was chiefly the welcome composition and KPI/action ordering, not a reason to rewrite the whole dashboard.
+- Replaced the oversized generic operational hero with a user greeting and a business-capabilities callout. The optional business-owned dashboard image remains supported as restrained decorative artwork.
+- Prioritised Draft Quotes in the KPI strip when the Quotes workspace is available; unpaid invoices remain the fallback when Quotes is unavailable and Finance is permitted.
+- Reordered quick actions to Create Event → Create Quote → Add Customer → Open Calendar, each retaining existing permission checks and routes.
+- Renamed the operational panels to Upcoming Events and Quote Pipeline. Existing Priority Now and Resource Readiness panels remain data-backed; no fabricated Workspace Health or revenue values were introduced.
+- Preserved the existing two-column desktop composition and single-column responsive collapse.
+- Changed files: resources/views/dashboard.blade.php, resources/css/zazu-final-visual-sweep.css, tests/Feature/UiProportionFoundationTest.php.
+- Commits: 4ca48de (dashboard source), 42799ea (dashboard styling), 6c3a4aa and dbdf432 (regression coverage).
+- Source re-read after writes; branch inventory confirms main only.
+- PHPUnit, Vite build and browser-rendered desktop/tablet/mobile acceptance were not run in this environment. Rendered visual acceptance remains **UNVERIFIED**.
+
 
 Current deployment boundary:
 - The Windows PC is development-only. No permanent local-PC host, AMPPS production setup, Windows service, router/DNS or private-CA work is in scope.
