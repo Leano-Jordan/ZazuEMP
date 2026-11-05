@@ -55,7 +55,6 @@
         </aside>
 
         <section class="zazu-dash-quick-actions zazu-dash-surface" aria-label="Quick actions">
-            <div class="zazu-dash-quick-actions-heading"><span class="zazu-dash-kicker">Quick actions</span><strong>Start the next piece of work.</strong></div>
             <div class="zazu-dash-actions">
                 @if($workspaceTools['work'] && app(\App\Support\PermissionService::class)->allows('work.create', auth()->user(), $business))
                     <a href="{{ route('work.create') }}" class="zazu-btn zazu-btn-cta">Create event <span>+</span></a>
@@ -72,7 +71,7 @@
 
         <section class="zazu-dash-run zazu-dash-surface">
             <header class="zazu-dash-surface-head">
-                <div><span class="zazu-dash-kicker">Run-sheet</span><h3>Upcoming events</h3><p>Real events from the workspace, ordered by execution date.</p></div>
+                <div><span class="zazu-dash-kicker">Run-sheet</span><h3>Upcoming events</h3></div>
                 @if($workspaceTools['work'])<a href="{{ route('work.index') }}" class="zazu-text-action">All work →</a>@endif
             </header>
             <div class="zazu-dash-timeline">
@@ -92,7 +91,7 @@
 
 
         <section class="zazu-dash-commercial zazu-dash-surface">
-            <header class="zazu-dash-surface-head"><div><span class="zazu-dash-kicker">Commercial queue</span><h3>Quote pipeline</h3><p>Turn outstanding commercial work into the next deliberate action.</p></div></header>
+            <header class="zazu-dash-surface-head"><div><span class="zazu-dash-kicker">Commercial queue</span><h3>Quote pipeline</h3></div></header>
             <div class="zazu-dash-quote-stages" aria-label="Quote status breakdown">
                 <div class="zazu-dash-quote-stage is-draft"><span>Draft</span><strong>{{ number_format((int) ($quoteStatusCounts['draft'] ?? 0)) }}</strong><small>Being prepared</small></div>
                 <div class="zazu-dash-quote-stage is-sent"><span>Sent</span><strong>{{ number_format((int) ($quoteStatusCounts['sent'] ?? 0)) }}</strong><small>Awaiting response</small></div>
@@ -107,7 +106,6 @@
                 @if($workspaceTools['quotes'])<a href="{{ route('quotes.index') }}" class="zazu-btn zazu-btn-primary">{{ $metrics['draft_quotes'] > 0 ? 'Review draft quotes' : 'Open quote queue' }}</a>@endif
                 @if($workspaceTools['finance'])<a href="{{ route('finance.index') }}" class="zazu-btn zazu-btn-secondary">Open finance</a>@endif
             </div>
-            <div class="zazu-dash-note"><b>i</b><span>Finance remains authoritative in its own workspace. This surface only tells you whether commercial records need attention.</span></div>
         </section>
 
         <section class="zazu-dash-focus zazu-dash-surface" aria-label="Priority actions">
@@ -115,7 +113,6 @@
                 <div>
                     <span class="zazu-dash-kicker">Priority now</span>
                     <h3>What needs your attention</h3>
-                    <p>A short action queue based on the records already visible in this workspace.</p>
                 </div>
             </header>
             <div class="zazu-dash-focus-grid">
@@ -171,7 +168,7 @@
         @if($experienceLevel !== 'basic')
         <section class="zazu-dash-resources zazu-dash-surface">
             <header class="zazu-dash-surface-head">
-                <div><span class="zazu-dash-kicker">Workspace health</span><h3>Operational readiness</h3><p>Live business records at a glance. These are operational counts, not connection or system-health claims.</p></div>
+                <div><span class="zazu-dash-kicker">Workspace health</span><h3>Operational readiness</h3></div>
                 <div class="flex flex-wrap gap-2">
                     @if($workspaceTools['assets'])<a href="{{ route('assets.index') }}" class="zazu-text-action">Asset register →</a>@endif
                     @if($workspaceTools['inventory'])<a href="{{ route('inventory.index') }}" class="zazu-text-action">Stock control →</a>@endif
@@ -179,16 +176,16 @@
             </header>
             <div class="zazu-dash-resource-grid">
                 @if($workspaceTools['purchasing'])
-                    <a href="{{ route('purchasing.index') }}" class="zazu-quick-link"><span><strong>Open purchase orders</strong><small class="block opacity-70">Supplier commitments still in motion</small></span><strong>{{ number_format($metrics['open_purchase_orders']) }}</strong></a>
+                    <a href="{{ route('purchasing.index') }}" class="zazu-quick-link"><span><strong>Open purchase orders</strong></span><strong>{{ number_format($metrics['open_purchase_orders']) }}</strong></a>
                 @endif
                 @if($workspaceTools['inventory'])
-                    <a href="{{ route('inventory.index') }}" class="zazu-quick-link"><span><strong>Low-stock items</strong><small class="block opacity-70">At or below reorder level</small></span><strong>{{ number_format($metrics['low_stock']) }}</strong></a>
+                    <a href="{{ route('inventory.index') }}" class="zazu-quick-link"><span><strong>Low-stock items</strong></span><strong>{{ number_format($metrics['low_stock']) }}</strong></a>
                 @endif
                 @if($workspaceTools['assets'])
-                    <a href="{{ route('assets.index') }}" class="zazu-quick-link"><span><strong>Available assets</strong><small class="block opacity-70">Ready for allocation</small></span><strong>{{ number_format($metrics['available_assets']) }}</strong></a>
+                    <a href="{{ route('assets.index') }}" class="zazu-quick-link"><span><strong>Available assets</strong></span><strong>{{ number_format($metrics['available_assets']) }}</strong></a>
                 @endif
                 @if($workspaceTools['finance'])
-                    <a href="{{ route('finance.index') }}" class="zazu-quick-link"><span><strong>Unpaid invoices</strong><small class="block opacity-70">Issued invoices with a balance</small></span><strong>{{ number_format($metrics['unpaid_invoices']) }}</strong></a>
+                    <a href="{{ route('finance.index') }}" class="zazu-quick-link"><span><strong>Unpaid invoices</strong></span><strong>{{ number_format($metrics['unpaid_invoices']) }}</strong></a>
                 @endif
             </div>
         </section>
