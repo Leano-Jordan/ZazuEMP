@@ -446,4 +446,29 @@ class UiProportionFoundationTest extends TestCase
     }
 
 
+    public function test_dashboard_kpis_keep_only_the_label_and_live_value(): void
+    {
+        $dashboard = file_get_contents(resource_path('views/dashboard.blade.php'));
+        $css = file_get_contents(resource_path('css/zazu-final-visual-sweep.css'));
+
+        $this->assertIsString($dashboard);
+        $this->assertIsString($css);
+
+        foreach ([
+            'Open operational records',
+            'Commercial records awaiting action',
+            'People and organisations',
+            'Scheduled work ahead',
+        ] as $redundantCaption) {
+            $this->assertStringNotContainsString($redundantCaption, $dashboard);
+        }
+
+        $this->assertStringContainsString('Active events', $dashboard);
+        $this->assertStringContainsString('Draft quotes', $dashboard);
+        $this->assertStringContainsString('Customers', $dashboard);
+        $this->assertStringContainsString('Next 14 days', $dashboard);
+        $this->assertStringNotContainsString('.zazu-dash-metric>small', $css);
+    }
+
+
 }
