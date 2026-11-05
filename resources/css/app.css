@@ -7687,9 +7687,14 @@ body.zazu-inspector-open { overflow:hidden; }
     cursor: pointer;
 }
 
+.zazu-nav-area.is-open .zazu-nav-area-trigger {
+    border-color: var(--zazu-border);
+    background: var(--zazu-sidebar-hover);
+}
+
 .zazu-nav-area-trigger:hover,
 .zazu-nav-area-trigger:focus-visible,
-.zazu-nav-area.is-open .zazu-nav-area-trigger {
+.zazu-nav-area.is-open > .zazu-nav-area-trigger {
     border-color: color-mix(in srgb, var(--zazu-sidebar-muted) 18%, transparent);
     background: var(--zazu-sidebar-hover);
     color: var(--zazu-sidebar-ink);
