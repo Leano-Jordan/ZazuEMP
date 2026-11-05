@@ -378,3 +378,11 @@ Audited the latest dashboard/navigation presentation changes against the live `m
 Source checks after the corrections: Tailwind import is first and unique; invalid font shorthand is absent; CSS brace balance is zero in both touched stylesheets; uploaded dashboard artwork and the no-image fallback classes remain intact; mobile navigation and reduced-motion rules remain present.
 
 Verification boundary: these are source-level corrections only. Vite build, PHPUnit, browser-rendered desktop/mobile light/dark inspection and actual contrast sampling in the rendered UI have not been run in this environment. Do not treat visual acceptance as complete until those checks pass.
+
+## 2026-11-05 Director mission — mobile navigation close-state regression
+
+Found a real interaction conflict in the mobile navigation cascade. The mobile flyout was displayed by either `.is-open` or `:focus-within`. Because the trigger button retains keyboard focus after a tap/click, toggling the active area closed removed `.is-open` but left `:focus-within` true, so the flyout could remain visible and appear impossible to close.
+
+Correction: mobile flyout visibility now follows the explicit `.is-open` state only. Desktop hover/focus flyout behaviour is preserved. The mobile no-JavaScript recovery rule still exposes the server-rendered active group.
+
+Source verification: mobile open-state selector present; mobile focus-within visibility selector absent; desktop focus-within selector preserved; CSS brace balance zero. Rendered touch, keyboard and resize acceptance remains outstanding.
