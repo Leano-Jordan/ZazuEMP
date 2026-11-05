@@ -80,6 +80,7 @@
     }
 
     .zazu-brand {
+        height: auto;
         min-height: 60px;
         padding-inline: 16px 12px;
         justify-content: space-between;
@@ -87,7 +88,6 @@
     }
 
     .zazu-nav {
-        min-height: 0;
         overflow-y: auto;
         overscroll-behavior: contain;
         padding: 14px 12px;
