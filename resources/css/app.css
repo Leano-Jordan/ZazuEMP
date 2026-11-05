@@ -6136,10 +6136,6 @@ body:not(.zazu-has-wallpaper) {
 
 /* Sidebar appearance is centralized in the canonical shell rule. */
 
-.zazu-brand {
-    border-bottom: 0;
-}
-
 .zazu-footer-card {
     border: 0;
     background: color-mix(in srgb, var(--zazu-primary-soft) 42%, transparent);
