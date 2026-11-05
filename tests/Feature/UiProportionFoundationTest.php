@@ -205,6 +205,9 @@ class UiProportionFoundationTest extends TestCase
             '.zazu-nav-link:hover .zazu-nav-icon',
             '.zazu-nav-link.active .zazu-nav-icon',
             '.zazu-nav-priority',
+            '.zazu-footer-card',
+            '.zazu-footer-title',
+            '.zazu-footer-copy',
         ];
 
         foreach ($canonicalSelectors as $selector) {
