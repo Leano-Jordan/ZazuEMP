@@ -366,3 +366,33 @@ The owner rejected dark navy as the dominant light-mode identity. The target is 
 - Coastal token and PWA theme-colour source changes are committed to `main`.
 - Runtime rendering, contrast sampling and automated test/build execution remain pending. Do not mark visual acceptance complete until those checks are run.
 - Next: inspect and consolidate shared-selector property conflicts in small batches, beginning with the application shell/navigation. Verify each batch against actual markup references and preserve responsive behaviour.
+
+
+## Shell/navigation CSS ownership pass — 2026-11-05
+
+### Source findings
+
+- The shell has historical repeated selector layers inside `app.css`; these are not safe to collapse wholesale because later blocks intentionally refine desktop shell appearance, mobile breakpoints, hierarchical navigation and dark-shell readability.
+- `zazu-mobile-refinement.css` owns the fixed off-canvas mobile sidebar, touch-sized links and mobile header grid. `zazu-responsive-theme.css` owns shared responsive layout and the bounded mobile nav scroll override.
+- The desktop header/search sizing rules had been placed in the visual extension stylesheet even though they are responsive shell layout, not component-specific visual extensions.
+
+### Consolidation executed on main
+
+- Moved the base `.zazu-topbar-inner` width/box-sizing contract into its canonical base rule in `app.css`.
+- Moved the desktop (min-width: 821px) header-context, section-tab overflow and topbar-action layout rules from `zazu-final-visual-sweep.css` into `zazu-responsive-theme.css` without changing declarations or breakpoint.
+- Replaced the moved block in the visual extension with an ownership note. No navigation markup, selectors used by runtime code, breakpoints or interaction behaviour were removed.
+
+### Remaining audit findings
+
+- Multiple `.zazu-sidebar`, `.zazu-brand`, `.zazu-nav-link` and `.zazu-topbar` layers remain in `app.css`. Their cascade order and media/state context require a dedicated property-level pass; no bulk consolidation is justified yet.
+- Mobile and responsive files both touch `.zazu-nav` and `.zazu-sidebar` intentionally at the mobile breakpoint. Preserve the scroll-container and off-canvas ownership split.
+- No dead-selector deletion was performed in this pass.
+
+### Verification boundary
+
+- All three changed stylesheets were re-fetched from `main`; confirm the base sizing rule is in `app.css`, desktop header layout is in the responsive layer, and the moved block is absent from the visual extension.
+- Source-only verification. Vite build, PHPUnit, and rendered desktop/mobile/light/dark acceptance were not run in this environment.
+
+### Next gate
+
+Continue property-level analysis of the repeated `app.css` shell layers, beginning with sidebar/brand/navigation. Only merge declarations when their effective media/state context and rendered intent are demonstrably equivalent.
