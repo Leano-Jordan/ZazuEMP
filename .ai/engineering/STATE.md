@@ -32,6 +32,16 @@ The 2026-11-01 local Windows-host proposal was exploratory and is no longer the 
 
 The installed-device offline continuity mission below remains open and is the next program after the current owner-directed dashboard/UI mission; this visual work does not close or weaken it.
 
+## Quote pipeline reference refinement — 2026-11-06
+
+- Replaced the single draft-quote count presentation with a four-stage dashboard breakdown matching the supplied reference's compact pipeline treatment.
+- Counts are queried from business-scoped Quote records grouped by their actual lifecycle status.
+- Displayed stages: Draft, Sent, Accepted, and Closed (Declined + Expired). The lifecycle vocabulary comes from Quote::STATUS_TRANSITIONS; no unsupported "Under review" state was invented.
+- Retained the draft queue warning/clear state and existing Quotes/Finance actions.
+- Added responsive four-column desktop and two-column mobile styling plus source regression coverage.
+- Changed files: app/Http/Controllers/DashboardController.php, resources/views/dashboard.blade.php, resources/css/zazu-final-visual-sweep.css, tests/Feature/UiProportionFoundationTest.php.
+- Runtime query execution and rendered acceptance remain UNVERIFIED.
+
 ## Workspace health panel refinement — 2026-11-06
 
 - Reconciled the lower-right panel against Designer 2: renamed Resource Readiness to Workspace Health with Operational Readiness as its heading.
