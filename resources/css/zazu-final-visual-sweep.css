@@ -5736,3 +5736,90 @@ body.zazu-mobile-menu-open .zazu-helper {
         padding: 12px 14px;
     }
 }
+
+
+/* Supplied dashboard references — welcome hierarchy and business-capability callout. */
+.zazu-dash-greeting {
+    display: block;
+    margin-top: 15px;
+    color: var(--zazu-text-body);
+    font-size: 20px;
+    font-weight: 650;
+    line-height: 1.2;
+}
+
+.zazu-dash-hero h2 {
+    margin-top: 2px;
+    font-size: clamp(30px, 3.2vw, 42px);
+    line-height: 1.08;
+    letter-spacing: -.045em;
+}
+
+.zazu-dash-capability {
+    position: relative;
+    overflow: hidden;
+    justify-content: center;
+    border-left: 0;
+    border-radius: 12px;
+    background: linear-gradient(125deg, color-mix(in srgb, var(--zazu-primary-soft) 78%, var(--zazu-card-bg)), var(--zazu-card-bg));
+}
+
+.zazu-dash-capability-copy {
+    position: relative;
+    z-index: 1;
+    display: grid;
+    justify-items: start;
+    gap: 9px;
+    max-width: 100%;
+}
+
+.zazu-dash-capability-copy strong {
+    max-width: 100%;
+    margin: 0;
+    color: var(--zazu-text-ink);
+    font-size: 18px;
+    line-height: 1.3;
+    overflow-wrap: anywhere;
+}
+
+.zazu-dash-capability-copy > span:not(.zazu-dash-side-label) {
+    max-width: 290px;
+    margin: 0;
+    color: var(--zazu-text-body);
+    font-size: 12px;
+    line-height: 1.55;
+}
+
+.zazu-dash-capability-copy .zazu-text-action {
+    padding: 7px 10px;
+    border: 1px solid color-mix(in srgb, var(--zazu-primary) 28%, var(--zazu-card-border));
+    border-radius: 8px;
+    background: color-mix(in srgb, var(--zazu-card-bg) 82%, transparent);
+    text-decoration: none;
+}
+
+.zazu-dash-capability-art {
+    position: absolute;
+    right: 12px;
+    bottom: 8px;
+    width: 104px;
+    height: 104px;
+    object-fit: contain;
+    opacity: .16;
+    pointer-events: none;
+}
+
+@media (max-width: 620px) {
+    .zazu-dash-greeting {
+        margin-top: 10px;
+        font-size: 17px;
+    }
+
+    .zazu-dash-hero h2 {
+        font-size: 30px;
+    }
+
+    .zazu-dash-capability {
+        min-height: 150px;
+    }
+}
