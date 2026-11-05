@@ -403,4 +403,17 @@ class UiProportionFoundationTest extends TestCase
     }
 
 
+    public function test_dashboard_run_sheet_is_limited_to_five_compact_upcoming_events(): void
+    {
+        $controller = file_get_contents(app_path('Http/Controllers/DashboardController.php'));
+        $css = file_get_contents(resource_path('css/zazu-final-visual-sweep.css'));
+
+        $this->assertIsString($controller);
+        $this->assertIsString($css);
+        $this->assertStringContainsString("->limit(5)", $controller);
+        $this->assertStringContainsString(".zazu-dash-event {\n    min-height: 64px;", $css);
+        $this->assertStringContainsString("All work", file_get_contents(resource_path('views/dashboard.blade.php')));
+    }
+
+
 }
