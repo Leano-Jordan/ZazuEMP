@@ -342,17 +342,9 @@ body {
     border-bottom: 1px solid var(--zazu-border);
 }
 
-.zazu-brand-word {
-    font-size: 1.55rem;
-    font-weight: 650;
-    letter-spacing: -0.055em;
-    color: var(--zazu-ink);
-    text-decoration: none;
-}
 
-.zazu-brand-dot {
-    color: var(--zazu-accent);
-}
+
+
 
 .zazu-nav {
     flex: 1;
@@ -2038,25 +2030,11 @@ body {
     border-bottom-color: color-mix(in srgb, var(--zazu-sidebar-muted) 18%, transparent);
 }
 
-.zazu-brand-word {
-    color: var(--zazu-sidebar-ink);
-    font-size: 1.43rem;
-    font-weight: 760;
-    letter-spacing: -0.045em;
-}
 
-.zazu-brand-word::before {
-    width: 34px;
-    height: 34px;
-    border-radius: var(--zazu-radius-lg);
-    background: linear-gradient(145deg, var(--zazu-primary), var(--zazu-link));
-    color: var(--zazu-primary-ink);
-    box-shadow: 0 8px 20px color-mix(in srgb, var(--zazu-primary) 20%, transparent);
-}
 
-.zazu-brand-dot {
-    color: var(--zazu-primary);
-}
+
+
+
 
 .zazu-nav {
     padding: 13px 10px;
@@ -3097,22 +3075,10 @@ body.zazu-has-wallpaper {
     background: var(--zazu-surface);
     border: 1px solid var(--zazu-border);
 }
-.zazu-brand-word {
-    max-width: 175px;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-}
-.zazu-brand-word::after {
-    content: ".";
-    color: var(--zazu-accent);
-}
-.zazu-brand-link:hover .zazu-brand-word {
-    color: var(--zazu-primary);
-}
-.zazu-brand-link:hover .zazu-brand-word::after {
-    color: var(--zazu-primary);
-}
+
+
+
+
 .zazu-branding-preview-grid {
     display: grid;
     grid-template-columns: repeat(3, minmax(0, 1fr));
@@ -4657,21 +4623,11 @@ body {
     transform: translateX(1px);
 }
 
-.zazu-brand-word {
-    color: var(--zazu-sidebar-ink);
-    font-size: 1.34rem;
-    font-weight: 720;
-    letter-spacing: -0.045em;
-}
 
-.zazu-brand-word::before {
-    background: var(--zazu-primary);
-    box-shadow: 0 6px 14px color-mix(in srgb, var(--zazu-primary) 16%, transparent);
-}
 
-.zazu-brand-dot {
-    color: var(--zazu-primary);
-}
+
+
+
 
 .zazu-nav {
     padding: 11px 12px 15px;
@@ -6683,11 +6639,7 @@ body {
     border-bottom: 1px solid var(--zazu-border);
 }
 
-.zazu-brand-word {
-    font-size: var(--zazu-font-size-page-title);
-    font-weight: var(--zazu-weight-semibold);
-    letter-spacing: -.04em;
-}
+
 
 .zazu-nav {
     padding: 12px 10px;
