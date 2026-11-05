@@ -67,6 +67,24 @@ class UiProportionFoundationTest extends TestCase
         $this->assertStringNotContainsString("format('H:i')", $dashboard);
     }
 
+    public function test_dashboard_kpi_order_matches_the_reference_scan_path(): void
+    {
+        $dashboard = file_get_contents(resource_path('views/dashboard.blade.php'));
+
+        $this->assertIsString($dashboard);
+        $active = strpos($dashboard, '<span>Active events</span>');
+        $quotes = strpos($dashboard, '<span>Draft quotes</span>');
+        $customers = strpos($dashboard, '<span>Customers</span>');
+        $upcoming = strpos($dashboard, '<span>Next 14 days</span>');
+        $this->assertNotFalse($active);
+        $this->assertNotFalse($quotes);
+        $this->assertNotFalse($customers);
+        $this->assertNotFalse($upcoming);
+        $this->assertLessThan($quotes, $active);
+        $this->assertLessThan($customers, $quotes);
+        $this->assertLessThan($upcoming, $customers);
+    }
+
     public function test_dashboard_prioritises_quote_kpi_and_uses_invoice_kpi_only_as_a_fallback(): void
     {
         $dashboard = file_get_contents(resource_path('views/dashboard.blade.php'));
