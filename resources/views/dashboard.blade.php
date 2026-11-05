@@ -195,16 +195,5 @@
         @endif
     </section>
 
-    <section class="zazu-dash-commandbar">
-        <div><span class="zazu-dash-kicker">Workspace surfaces</span><strong>Move directly into the record you need.</strong></div>
-        <nav>
-            @if($workspaceTools['services'])<a href="{{ route('capabilities.index') }}">Services &amp; prices</a>@endif
-            @if($workspaceTools['work'])<a href="{{ route('work.index') }}">Jobs</a>@endif
-            @if($workspaceTools['customers'])<a href="{{ route('customers.index') }}">Customers</a>@endif
-            @if($workspaceTools['quotes'])<a href="{{ route('quotes.index') }}">Quotes</a>@endif
-            @if($workspaceTools['calendar'])<a href="{{ route('calendar.index') }}">Calendar</a>@endif
-            @if($workspaceTools['finance'])<a href="{{ route('finance.index') }}">Finance</a>@endif
-            @if($workspaceTools['reports'])<a href="{{ route('reports.index') }}">Reports</a>@endif
-        </nav>
-    </section>
+
 </x-app-layout>
