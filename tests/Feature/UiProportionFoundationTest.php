@@ -208,6 +208,10 @@ class UiProportionFoundationTest extends TestCase
             '.zazu-footer-card',
             '.zazu-footer-title',
             '.zazu-footer-copy',
+            '.zazu-brand-link',
+            '.zazu-brand-logo',
+            '.zazu-brand-lockup strong',
+            '.zazu-brand-lockup span',
             '.zazu-nav-area-title',
             '.zazu-nav-flyout-heading',
             '.zazu-nav-flyout-links',
@@ -229,6 +233,8 @@ class UiProportionFoundationTest extends TestCase
         $this->assertStringContainsString('.zazu-nav-link:hover {', $appCss);
         $this->assertStringContainsString('.zazu-nav-link.active {', $appCss);
         $this->assertStringContainsString('.zazu-nav-flyout .zazu-nav-link.active {', $appCss);
+        $this->assertStringContainsString('.zazu-brand-logo,', $appCss);
+        $this->assertStringContainsString('.zazu-brand-mark {', $appCss);
         $this->assertStringContainsString(':root:not([data-theme="dark"]) .zazu-nav-link.active {', $appCss);
         $this->assertStringContainsString('.zazu-nav-flyout .zazu-nav-link.active {', $appCss);
         $this->assertStringContainsString('@media (max-width: 850px)', $appCss);
