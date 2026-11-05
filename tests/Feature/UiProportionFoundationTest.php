@@ -471,4 +471,23 @@ class UiProportionFoundationTest extends TestCase
     }
 
 
+    public function test_theme_defaults_to_reference_light_while_preserving_explicit_saved_choice(): void
+    {
+        $layout = file_get_contents(resource_path('views/components/app-layout.blade.php'));
+        $appJs = file_get_contents(resource_path('js/app.js'));
+
+        $this->assertIsString($layout);
+        $this->assertIsString($appJs);
+
+        $this->assertStringContainsString(
+            "saved === 'light' || saved === 'dark' ? saved : 'light'",
+            $layout
+        );
+        $this->assertStringContainsString("return 'light';", $appJs);
+        $this->assertStringNotContainsString("prefers-color-scheme: dark", $layout);
+        $this->assertStringNotContainsString("prefers-color-scheme: dark", $appJs);
+        $this->assertStringContainsString("safeStorageSet(storageKey, next);", $appJs);
+    }
+
+
 }
