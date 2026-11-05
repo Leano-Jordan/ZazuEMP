@@ -471,3 +471,16 @@ Continue property-level analysis of the repeated `app.css` shell layers, beginni
 - Preserved the existing hierarchy, route/permission logic, keyboard focus states, mobile expansion behaviour and theme-specific sidebar tokens. Mobile flyouts retain their nested-list presentation.
 - This is a presentation-only change; no navigation destinations or information architecture were altered.
 - Browser-rendered acceptance remains pending.
+
+
+## Sidebar, brand and hierarchical navigation property consolidation — 2026-11-05
+
+- Consolidated the brand link's spacing, minimum height and transition into its canonical base rule.
+- Moved the effective 40px supplied-logo/fallback-mark sizing, containment, surface, border and fallback mark presentation into the base brand block; removed the later duplicate brand-fit layer.
+- Consolidated hierarchical navigation trigger geometry and its effective typography/surface into the original navigation base rule. Kept hover, focus, active-area, expanded-state and chevron behaviour intact.
+- Consolidated desktop flyout geometry, width, surface, border and shadow into its base rule. Kept the mobile inline flyout conversion and <=850px presentation overrides intact.
+- Moved the 7px hierarchy gap into the base hierarchy rule and removed the later duplicate declaration.
+- No Blade markup, route/permission logic, JavaScript interaction logic, theme tokens or mobile/responsive ownership files were changed.
+- Source verification: re-fetched `app.css` from `main`; confirmed the old brand-fit block and duplicate late trigger/flyout geometry blocks are gone, and the new canonical declarations are present.
+- Commit: `29a38f55d3d3ff5979cf844ddbd624a9ea279515`.
+- No Vite build, automated test, browser rendering, contrast sampling or physical mobile acceptance was run. This pass is **SOURCE-VERIFIED; VISUAL/RUNTIME ACCEPTANCE UNVERIFIED**.

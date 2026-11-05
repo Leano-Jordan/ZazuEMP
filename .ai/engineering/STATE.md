@@ -641,3 +641,12 @@ For application SHA `d1e2a4397b064d3fbfe7fc2cf1dc59236e00922f`, Laravel, quality
 - CodeQL run `41882179271` completed successfully. This is not a substitute for Laravel, browser, or runtime acceptance; those checks were not present on the exact source SHA at the time of review.
 - **Not complete:** account/session transition acceptance (logout, expiry, same-business account change, business switch, interrupted cleanup, late responses and revocation) and active Work-screen offline attachment integration. The legacy attachment client remains dormant.
 - Evidence: `docs/ZAZU_OFFLINE_TRANSITION_AND_ATTACHMENT_HARDENING_2026-11-04.md`.
+
+
+## Owner-directed active focus — 2026-11-05
+
+The owner has explicitly directed the current execution focus to **UI/UX improvement**. This is the active session priority and supersedes the older offline-continuity sequencing until the owner redirects scope. Offline acceptance gates remain open; they are not being silently closed or reclassified.
+
+Current UI/UX mission: continue the property-level consolidation of sidebar, brand and hierarchical navigation rules in `resources/css/app.css`, preserving the separate responsive/mobile ownership and all navigation interaction states. Keep the Designer 1 and Designer 2 references as design direction, not copy targets.
+
+Latest source change: commit `29a38f55d3d3ff5979cf844ddbd624a9ea279515` consolidated the brand lockup/logo/fallback mark base styling and hierarchical navigation trigger/flyout base geometry into their canonical declarations. Source re-fetch passed. Rendered visual acceptance and Vite/runtime verification remain **UNVERIFIED**.
