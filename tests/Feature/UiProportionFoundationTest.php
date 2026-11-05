@@ -275,7 +275,7 @@ class UiProportionFoundationTest extends TestCase
 
         // Shared eyebrow typography belongs to app.css, not the component extension layer.
         $this->assertSame(0, preg_match('/^\\.zazu-eyebrow\\s*\\{/m', $extensionCss));
-        $this->assertStringNotContainsString(".zazu-caption,\\n.zazu-eyebrow,", $extensionCss);
+        $this->assertSame(0, preg_match('/\\.zazu-caption,\\s*\\.zazu-eyebrow,/', $extensionCss));
 
         // Theme values and wallpaper treatment remain token/state driven.
         $this->assertStringContainsString('--zazu-sidebar: #E4F6FC;', $appCss);
