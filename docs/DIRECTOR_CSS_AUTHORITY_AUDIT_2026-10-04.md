@@ -333,3 +333,36 @@ The changed source files were re-fetched from `main` and the expected token, the
 ### Remaining consolidation work
 
 The 61 repeated selector groups (39 with differing declarations) need a property-level pass to separate intentional breakpoint/state rules from genuine competing declarations. Do not treat the stylesheet stack as fully consolidated until that pass and rendered acceptance are complete.
+
+
+## Coastal Blue foundation — 2026-11-05
+
+### Approved visual direction
+
+The owner rejected dark navy as the dominant light-mode identity. The target is a sunny coastal palette: clear-sky blues, bright ocean blue, turquoise water, cloud white and restrained warm sand/sunlight accents. It must feel open, energetic and comfortable for long sessions while remaining professional and legible.
+
+### Foundation changes committed to main
+
+- Replaced the light theme's slate/navy-heavy page, sidebar, surface, border, text and primary-blue tokens with a lighter coastal blue/turquoise system.
+- Kept the sidebar light; no dark navy navigation block in light mode.
+- Set the light workspace to cloud-white with pale sea-mist surfaces and subtle aqua borders.
+- Shifted the primary action/link family to ocean blue and the secondary accent family to turquoise.
+- Kept semantic success, warning and danger colours separate from brand colours.
+- Aligned static and runtime PWA browser theme colours with the new light theme.
+- Dark theme tokens remain a separate dark experience and were not recoloured in this pass.
+
+### Consolidation discipline
+
+- `app.css` remains the only token authority.
+- `zazu-responsive-theme.css` owns shared responsive layout only.
+- `zazu-mobile-refinement.css` owns mobile shell/navigation/touch behaviour only.
+- `zazu-final-visual-sweep.css` is restricted to component-specific extension rules; it must not introduce root tokens or restyle generic shared components.
+- Do not delete selectors merely because they repeat across breakpoints. First establish whether a selector is a deliberate responsive/state override and whether it is referenced by Blade, JS, or dynamically generated markup.
+- Dead CSS removal requires a repository-wide usage check, including PHP/Blade, JS, Alpine attributes and runtime-generated class names. No unverified bulk deletion.
+
+### Current execution boundary
+
+- GitHub branch inventory was rechecked on 2026-11-05 after owner cleanup: only `main` remains.
+- Coastal token and PWA theme-colour source changes are committed to `main`.
+- Runtime rendering, contrast sampling and automated test/build execution remain pending. Do not mark visual acceptance complete until those checks are run.
+- Next: inspect and consolidate shared-selector property conflicts in small batches, beginning with the application shell/navigation. Verify each batch against actual markup references and preserve responsive behaviour.
