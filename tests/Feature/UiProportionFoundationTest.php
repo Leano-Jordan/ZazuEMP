@@ -108,6 +108,32 @@ class UiProportionFoundationTest extends TestCase
         $this->assertStringContainsString('display: inline-flex;', $css);
     }
 
+
+    public function test_dashboard_places_kpis_before_two_operational_queues_and_balances_the_lower_row(): void
+    {
+        $dashboard = file_get_contents(resource_path('views/dashboard.blade.php'));
+        $css = file_get_contents(resource_path('css/zazu-final-visual-sweep.css'));
+
+        $this->assertIsString($dashboard);
+        $this->assertIsString($css);
+
+        $metricsPosition = strpos($dashboard, '<aside class="zazu-dash-metrics">');
+        $runPosition = strpos($dashboard, '<section class="zazu-dash-run');
+        $commercialPosition = strpos($dashboard, '<section class="zazu-dash-commercial');
+        $this->assertNotFalse($metricsPosition);
+        $this->assertNotFalse($runPosition);
+        $this->assertNotFalse($commercialPosition);
+        $this->assertLessThan($runPosition, $metricsPosition);
+        $this->assertLessThan($commercialPosition, $runPosition);
+
+        $this->assertStringContainsString('grid-template-columns: repeat(2, minmax(0, 1fr));', $css);
+        $this->assertStringContainsString('grid-template-columns: repeat(auto-fit, minmax(min(100%, 190px), 1fr));', $css);
+        $this->assertStringContainsString('.zazu-dash-metrics {', $css);
+        $this->assertStringContainsString('grid-column: 1 / -1;', $css);
+        $this->assertStringContainsString('.zazu-dash-commercial {', $css);
+        $this->assertStringContainsString('grid-row: 2;', $css);
+    }
+
     public function test_authentication_submit_remains_intentionally_full_width(): void
     {
         $css = file_get_contents(resource_path('css/app.css'));
