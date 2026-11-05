@@ -25,6 +25,21 @@ class UiProportionFoundationTest extends TestCase
         $this->assertStringContainsString('--zazu-radius-lg: 10px;', $css);
     }
 
+    public function test_topbar_uses_a_light_workspace_surface_instead_of_repeating_the_sidebar_colour(): void
+    {
+        $css = file_get_contents(resource_path('css/app.css'));
+
+        $this->assertIsString($css);
+        preg_match_all('/\\.zazu-topbar\\s*\\{([^}]*)\\}/s', $css, $rules);
+        $this->assertNotEmpty($rules[1]);
+
+        $finalRule = end($rules[1]);
+        $this->assertStringContainsString('var(--zazu-surface)', $finalRule);
+        $this->assertStringContainsString('var(--zazu-page)', $finalRule);
+        $this->assertStringNotContainsString('var(--zazu-sidebar)', $finalRule);
+        $this->assertStringContainsString('var(--zazu-accent)', $finalRule);
+    }
+
     public function test_canonical_visual_layer_has_readable_controls_and_real_interaction_hierarchy(): void
     {
         $css = file_get_contents(resource_path('css/zazu-final-visual-sweep.css'));
