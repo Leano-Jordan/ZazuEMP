@@ -6,15 +6,15 @@ use Tests\TestCase;
 
 class UiProportionFoundationTest extends TestCase
 {
-    public function test_canonical_visual_tokens_use_the_blue_reference_family_and_disciplined_proportions(): void
+    public function test_canonical_visual_tokens_match_the_coastal_blue_reference_family_and_disciplined_proportions(): void
     {
         $css = file_get_contents(resource_path('css/app.css'));
 
         $this->assertIsString($css);
-        $this->assertStringContainsString('--zazu-primary: #1B67C9;', $css);
-        $this->assertStringContainsString('--zazu-primary-soft: #C9DFF3;', $css);
-        $this->assertStringContainsString('--zazu-primary-deep: #1556A9;', $css);
-        $this->assertStringContainsString('--zazu-page: #D9E8F5;', $css);
+        $this->assertStringContainsString('--zazu-primary: #06749A;', $css);
+        $this->assertStringContainsString('--zazu-primary-soft: #D8F1F6;', $css);
+        $this->assertStringContainsString('--zazu-primary-deep: #086B8F;', $css);
+        $this->assertStringContainsString('--zazu-page: #F2FAFD;', $css);
         $this->assertStringContainsString('--zazu-ui-control-height: 44px;', $css);
         $this->assertStringContainsString('--zazu-content-max: 1320px;', $css);
         $this->assertStringContainsString('--zazu-ui-radius: var(--zazu-radius-lg);', $css);
@@ -82,6 +82,15 @@ class UiProportionFoundationTest extends TestCase
         $this->assertIsString($dashboard);
         $this->assertStringNotContainsString('<b>ONLINE</b>', $dashboard);
         $this->assertSame(2, substr_count($dashboard, '<b>EVENTS</b>'));
+    }
+
+    public function test_dashboard_keeps_event_status_visible_on_mobile(): void
+    {
+        $css = file_get_contents(resource_path('css/zazu-final-visual-sweep.css'));
+
+        $this->assertIsString($css);
+        $this->assertStringContainsString('.zazu-dash-status {', $css);
+        $this->assertStringContainsString('grid-column:3;justify-self:start;margin-top:4px', $css);
     }
 
     public function test_authentication_submit_remains_intentionally_full_width(): void
