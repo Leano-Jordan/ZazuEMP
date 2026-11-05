@@ -7651,27 +7651,45 @@ body.zazu-inspector-open { overflow:hidden; }
 
 
 
-/* Director hierarchical navigation — compact areas with desktop flyouts and mobile expansion. */
-.zazu-nav-hierarchical{overflow:visible}.zazu-nav-hierarchy{display:grid;gap:7px}.zazu-nav-area{position:relative}.zazu-nav-area-trigger{position:relative;z-index:2;width:100%;min-height:46px;display:flex;align-items:center;justify-content:space-between;gap:12px;padding:0 14px;border:1px solid transparent;border-radius:11px;background:color-mix(in srgb,var(--zazu-sidebar-surface) 44%,transparent);color:var(--zazu-sidebar-ink);font-family:inherit;font-size:var(--zazu-font-size-nav);font-weight:var(--zazu-weight-semibold);line-height:1.2;text-align:left;cursor:pointer}.zazu-nav-area-trigger:hover,.zazu-nav-area-trigger:focus-visible,.zazu-nav-area.is-open .zazu-nav-area-trigger{border-color:var(--zazu-border);background:var(--zazu-sidebar-hover)}.zazu-nav-area.is-active>.zazu-nav-area-trigger{border-color:color-mix(in srgb,var(--zazu-nav-active) 34%,var(--zazu-border));background:color-mix(in srgb,var(--zazu-nav-active) 18%,var(--zazu-sidebar));color:var(--zazu-sidebar-ink)}.zazu-nav-area-title{min-width:0}.zazu-nav-area-chevron{color:var(--zazu-faint);font-size:18px;line-height:1;transition:transform 140ms ease}.zazu-nav-area.is-open .zazu-nav-area-chevron{transform:rotate(90deg)}.zazu-nav-flyout{position:absolute;left:calc(100% - 1px);top:0;z-index:90;width:244px;padding:9px;border:1px solid color-mix(in srgb,var(--zazu-sidebar-muted) 22%,var(--zazu-sidebar));border-radius:0 13px 13px 13px;background:var(--zazu-sidebar-surface);box-shadow:12px 18px 36px color-mix(in srgb,#000 22%,transparent);opacity:0;visibility:hidden;pointer-events:none;transform:none;transition:opacity 120ms ease,visibility 120ms ease}.zazu-nav-area:hover>.zazu-nav-flyout,.zazu-nav-area:focus-within>.zazu-nav-flyout,.zazu-nav-area.is-open>.zazu-nav-flyout{opacity:1;visibility:visible;pointer-events:auto}.zazu-nav-flyout-heading{padding:4px 9px 8px;color:var(--zazu-faint);font-size:9px;font-weight:850;letter-spacing:.1em;text-transform:uppercase}.zazu-nav-flyout-links{display:grid;gap:2px}.zazu-nav-flyout .zazu-nav-link{min-height:36px;padding:0 9px;border-radius:7px;color:var(--zazu-muted);font-size:11.5px}.zazu-nav-flyout .zazu-nav-link:hover,.zazu-nav-flyout .zazu-nav-link:focus-visible{background:var(--zazu-surface-2);color:var(--zazu-ink)}.zazu-nav-flyout .zazu-nav-link.active{background:var(--zazu-primary-soft);color:var(--zazu-ink);box-shadow:inset 3px 0 0 var(--zazu-nav-active)}
-@media(max-width:850px){.zazu-nav-hierarchical{overflow-y:auto}.zazu-nav-flyout{position:static;width:auto;margin:2px 0 2px 10px;padding:4px 0 4px 10px;border:0;border-left:2px solid var(--zazu-border);border-radius:0;background:transparent;box-shadow:none;opacity:1;visibility:visible;transform:none;display:none}.zazu-nav-area.is-open>.zazu-nav-flyout{display:block}.zazu-nav-area-trigger{min-height:44px}.zazu-nav-flyout .zazu-nav-link{min-height:40px}}
-@media(prefers-reduced-motion:reduce){.zazu-nav-flyout,.zazu-nav-area-chevron{transition:none}}
-/* DIRECTOR — shell readability + navigation relationship polish
-   Keep the navigation/header as one dark shell. Do not use page ink tokens
-   inside dark navigation surfaces; use sidebar-specific foreground tokens.
-*/
-/* Theme-aware sidebar surface and border are defined in the canonical shell rule. */
-
-.zazu-brand-lockup strong {
-    color: var(--zazu-sidebar-ink);
+/* Director hierarchical navigation — shared desktop geometry and state authority. */
+.zazu-nav-hierarchical {
+    overflow: visible;
 }
 
-.zazu-brand-lockup span {
-    color: var(--zazu-sidebar-label);
+.zazu-nav-hierarchy {
+    display: grid;
+    gap: 7px;
+}
+
+.zazu-nav-area {
+    position: relative;
+}
+
+.zazu-nav-area-trigger {
+    position: relative;
+    z-index: 2;
+    width: 100%;
+    min-height: 46px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 0 14px;
+    border: 1px solid transparent;
+    border-radius: 11px;
+    background: color-mix(in srgb, var(--zazu-sidebar-surface) 44%, transparent);
+    color: var(--zazu-sidebar-ink);
+    font-family: inherit;
+    font-size: var(--zazu-font-size-nav);
+    font-weight: var(--zazu-weight-semibold);
+    line-height: 1.2;
+    text-align: left;
+    cursor: pointer;
 }
 
 .zazu-nav-area-trigger:hover,
 .zazu-nav-area-trigger:focus-visible,
-.zazu-nav-area.is-open > .zazu-nav-area-trigger {
+.zazu-nav-area.is-open .zazu-nav-area-trigger {
     border-color: color-mix(in srgb, var(--zazu-sidebar-muted) 18%, transparent);
     background: var(--zazu-sidebar-hover);
     color: var(--zazu-sidebar-ink);
@@ -7679,13 +7697,54 @@ body.zazu-inspector-open { overflow:hidden; }
 
 .zazu-nav-area.is-active > .zazu-nav-area-trigger {
     border-color: color-mix(in srgb, var(--zazu-primary) 38%, var(--zazu-sidebar));
-    background: linear-gradient(105deg, color-mix(in srgb, var(--zazu-primary) 24%, var(--zazu-sidebar)), color-mix(in srgb, var(--zazu-accent) 12%, var(--zazu-sidebar)));
+    background: linear-gradient(
+        105deg,
+        color-mix(in srgb, var(--zazu-primary) 24%, var(--zazu-sidebar)),
+        color-mix(in srgb, var(--zazu-accent) 12%, var(--zazu-sidebar))
+    );
     color: var(--zazu-sidebar-ink);
     box-shadow: inset 3px 0 0 var(--zazu-primary), 0 4px 12px color-mix(in srgb, var(--zazu-primary) 10%, transparent);
 }
 
+.zazu-nav-area-title {
+    min-width: 0;
+}
+
 .zazu-nav-area-chevron {
     color: var(--zazu-sidebar-label);
+    font-size: 18px;
+    line-height: 1;
+    transition: transform 140ms ease;
+}
+
+.zazu-nav-area.is-open .zazu-nav-area-chevron {
+    transform: rotate(90deg);
+}
+
+.zazu-nav-flyout {
+    position: absolute;
+    left: calc(100% - 1px);
+    top: 0;
+    z-index: 90;
+    width: 244px;
+    padding: 9px;
+    border: 1px solid color-mix(in srgb, var(--zazu-sidebar-muted) 22%, var(--zazu-sidebar));
+    border-radius: 0 13px 13px 13px;
+    background: var(--zazu-sidebar-surface);
+    box-shadow: 12px 18px 36px color-mix(in srgb, #000 22%, transparent);
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+    transform: none;
+    transition: opacity 120ms ease, visibility 120ms ease;
+}
+
+.zazu-nav-area:hover > .zazu-nav-flyout,
+.zazu-nav-area:focus-within > .zazu-nav-flyout,
+.zazu-nav-area.is-open > .zazu-nav-flyout {
+    opacity: 1;
+    visibility: visible;
+    pointer-events: auto;
 }
 
 .zazu-nav-flyout-heading {
@@ -7694,9 +7753,11 @@ body.zazu-inspector-open { overflow:hidden; }
     font-size: var(--zazu-font-size-meta);
     font-weight: var(--zazu-weight-bold);
     letter-spacing: .08em;
+    text-transform: uppercase;
 }
 
 .zazu-nav-flyout-links {
+    display: grid;
     gap: 1px;
 }
 
@@ -7720,6 +7781,61 @@ body.zazu-inspector-open { overflow:hidden; }
     background: color-mix(in srgb, var(--zazu-primary) 18%, var(--zazu-sidebar-surface));
     color: var(--zazu-sidebar-ink);
     box-shadow: inset 3px 0 0 var(--zazu-primary);
+}
+
+@media (max-width: 850px) {
+    .zazu-nav-hierarchical {
+        overflow-y: auto;
+    }
+
+    .zazu-nav-flyout {
+        position: static;
+        width: auto;
+        margin: 2px 0 2px 10px;
+        padding: 4px 0 4px 10px;
+        border: 0;
+        border-left: 2px solid var(--zazu-border);
+        border-radius: 0;
+        background: transparent;
+        box-shadow: none;
+        opacity: 1;
+        visibility: visible;
+        transform: none;
+        display: none;
+    }
+
+    .zazu-nav-area.is-open > .zazu-nav-flyout {
+        display: block;
+    }
+
+    .zazu-nav-area-trigger {
+        min-height: 44px;
+    }
+
+    .zazu-nav-flyout .zazu-nav-link {
+        min-height: 40px;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .zazu-nav-flyout,
+    .zazu-nav-area-chevron {
+        transition: none;
+    }
+}
+
+/* DIRECTOR — shell readability + navigation relationship polish
+   Keep the navigation/header as one dark shell. Do not use page ink tokens
+   inside dark navigation surfaces; use sidebar-specific foreground tokens.
+*/
+/* Theme-aware sidebar surface and border are defined in the canonical shell rule. */
+
+.zazu-brand-lockup strong {
+    color: var(--zazu-sidebar-ink);
+}
+
+.zazu-brand-lockup span {
+    color: var(--zazu-sidebar-label);
 }
 
 .zazu-footer-workspace,
