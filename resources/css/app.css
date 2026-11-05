@@ -334,13 +334,15 @@ body {
     overscroll-behavior: contain;
 }
 
- .zazu-brand {
-    min-height: 64px;
+.zazu-brand {
+    height: 76px;
+    min-height: 72px;
     display: flex;
     align-items: center;
     gap: 10px;
-    padding: 0 22px;
-    border-bottom: 1px solid var(--zazu-border);
+    padding: 0 18px;
+    border-bottom: 1px solid color-mix(in srgb, var(--zazu-sidebar-muted) 18%, transparent);
+    background: var(--zazu-sidebar);
 }
 
 
@@ -349,7 +351,9 @@ body {
 
 .zazu-nav {
     flex: 1;
+    min-height: 0;
     padding: 12px 10px;
+    scrollbar-width: thin;
 }
 
 .zazu-nav-stack {
@@ -2020,21 +2024,11 @@ body {
 
 /* Sidebar base appearance is defined in the canonical shell rule above. */
 
-.zazu-brand {
-    height: 76px;
-    padding: 0 18px;
-    border-bottom-color: color-mix(in srgb, var(--zazu-sidebar-muted) 18%, transparent);
-}
 
 
 
 
 
-
-
-.zazu-nav {
-    padding: 13px 10px;
-}
 
 .zazu-nav-group {
     margin-bottom: 17px;
@@ -4587,13 +4581,6 @@ body {
 
 /* Sidebar dimensions and surface are owned by the canonical shell rule. */
 
-.zazu-brand {
-    min-height: 72px;
-    padding: 0 18px;
-    border-bottom: 1px solid color-mix(in srgb, var(--zazu-border) 72%, transparent);
-    background: color-mix(in srgb, var(--zazu-sidebar) 82%, var(--zazu-surface) 18%);
-}
-
 .zazu-brand-link {
     min-width: 0;
     display: inline-flex;
@@ -4611,11 +4598,6 @@ body {
 
 
 
-
-.zazu-nav {
-    padding: 11px 12px 15px;
-    scrollbar-width: thin;
-}
 
 .zazu-nav-label {
     display: flex;
@@ -5896,10 +5878,6 @@ body {
 
 /* Historical borderless sidebar treatment retired; canonical shell edge remains. */
 
-.zazu-brand {
-    border-bottom: 0;
-}
-
 .zazu-footer-card {
     border: 0;
     background: color-mix(in srgb, var(--zazu-primary-soft) 68%, var(--zazu-surface));
@@ -6592,18 +6570,7 @@ body {
 
 /* Sidebar surface and border are centralized in the canonical shell rule. */
 
-.zazu-brand {
-    min-height: 64px;
-    padding-inline: 18px;
-    background: var(--zazu-surface);
-    border-bottom: 1px solid var(--zazu-border);
-}
 
-
-
-.zazu-nav {
-    padding: 12px 10px;
-}
 
 .zazu-nav-primary {
     gap: 4px;
@@ -7875,11 +7842,6 @@ body.zazu-inspector-open { overflow:hidden; }
 */
 /* Theme-aware sidebar surface and border are defined in the canonical shell rule. */
 
-.zazu-brand {
-    background: var(--zazu-sidebar);
-    border-bottom-color: color-mix(in srgb, var(--zazu-sidebar-muted) 18%, transparent);
-}
-
 .zazu-brand-lockup strong,
 .zazu-brand-lockup span {
     color: var(--zazu-sidebar-ink);
@@ -8386,10 +8348,6 @@ body.zazu-has-wallpaper .zazu-content {
    The logo is a primary business identity element, not a decorative afterthought.
    Contain the supplied artwork inside the shell without cropping or distortion.
    -------------------------------------------------------------------------- */
-.zazu-brand {
-    min-height: 72px;
-}
-
 .zazu-brand-link {
     min-width: 0;
     min-height: 64px;
