@@ -505,4 +505,16 @@ class UiProportionFoundationTest extends TestCase
     }
 
 
+    public function test_light_sidebar_navigation_states_use_the_blue_shell_palette(): void
+    {
+        $css = file_get_contents(resource_path('css/app.css'));
+
+        $this->assertIsString($css);
+        $this->assertStringContainsString('background: var(--zazu-sidebar-hover);', $css);
+        $this->assertStringContainsString('background: var(--zazu-sidebar-surface);', $css);
+        $this->assertStringContainsString('color: var(--zazu-sidebar-muted);', $css);
+        $this->assertStringContainsString('box-shadow: inset 3px 0 0 var(--zazu-sidebar-active);', $css);
+    }
+
+
 }
