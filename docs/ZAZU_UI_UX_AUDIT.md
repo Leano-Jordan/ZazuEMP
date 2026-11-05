@@ -422,3 +422,15 @@ Correction in `resources/views/work/show.blade.php`:
 - Preserve all five existing destinations, counts, routes and workflow behaviour.
 
 Verification boundary: source-level inspection confirms the responsive utility classes and unchanged destination markup. Rendered tablet/desktop/phone acceptance and automated tests have not been run in this execution.
+
+## 2026-11-05 Director — Work progress state semantics
+
+A second pass on the Work progress strip found that the first step remained visually marked current even after a job was completed, while the final step was also marked current. The active step was not exposed with `aria-current`, leaving assistive technology without a clear current-position signal.
+
+Correction in `resources/views/work/show.blade.php`:
+- For completed jobs, mark the first step complete rather than current.
+- Mark the final Complete step as current only when the job status is completed.
+- Expose the active step with `aria-current="step"` and retain the existing route destinations and completion styling.
+- For all other statuses, keep Job as the current step.
+
+Verification boundary: source-level conditional and markup inspection only. Screen-reader/browser acceptance and automated tests have not been run in this execution.
