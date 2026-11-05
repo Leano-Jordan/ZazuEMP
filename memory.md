@@ -819,3 +819,13 @@ Zazu EMP / Zazu Director has exactly one permitted development ref: canonical `m
 - Existing non-main branches are policy drift. Inspect them read-only only when needed to identify whether they contain unique work; migrate only explicitly reviewed missing value directly to `main`, never use them as a work base, and remove stale remote refs when the available authorized tooling supports deletion.
 - This instruction supersedes older wording that calls main-only a default or permits exceptions by generic prior authorization. Only a new explicit owner instruction in the current task can change this mandate.
 - Verified branch residue on 2026-10-16: `director/fix-offline-job-browser-selector` was 16 commits ahead / 43 behind the then-current main SHA `90f0b5b`; its changed files were older than main's later changes. No new work was done on that branch. The connected GitHub tool available to this execution has no branch-ref deletion operation, so the ref could not be deleted here.
+
+
+## Branch consolidation — owner directive — 2026-11-05
+
+- Owner reaffirmed that ZazuEMP must contain exactly one branch: `main`. No feature, fix, release, Director, or dependency branches are permitted as working branches.
+- Owner explicitly authorized cleanup of all existing non-`main` remote refs.
+- Current GitHub inventory on 2026-11-05: `main`, `director/offline-session-boundary`, `dependabot/composer/laravel/framework-13.39.0`, and `dependabot/composer/phpunit/phpunit-13.4.5`.
+- Read-only comparison found the Director branch has unique business-scoped service-worker cache partitioning changes and tests (8 ahead / 7 behind); selectively reconcile those changes on `main` before deleting that ref. Never replace newer main files with stale branch snapshots.
+- The two Dependabot branches are each one commit ahead and 282 behind; their package updates require current dependency/security validation, not wholesale merging.
+- The connected GitHub tools available during this execution do not expose remote branch-ref deletion. Do not report a one-branch state until the extra refs are actually deleted and a fresh branch search confirms only `main`.
