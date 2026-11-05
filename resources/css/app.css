@@ -3189,8 +3189,9 @@ body.zazu-has-wallpaper {
 
 body.zazu-has-wallpaper .zazu-sidebar,
 body.zazu-has-wallpaper .zazu-topbar {
-    background-color: color-mix(in srgb, var(--zazu-sidebar) 88%, transparent);
-    backdrop-filter: blur(18px) saturate(1.05);
+    background-color: color-mix(in srgb, var(--zazu-surface) 94%, var(--zazu-page));
+    border-bottom: 1px solid color-mix(in srgb, var(--zazu-accent) 18%, var(--zazu-border));
+    backdrop-filter: blur(18px) saturate(1.08);
 }
 
 body.zazu-has-wallpaper .zazu-content > * {
