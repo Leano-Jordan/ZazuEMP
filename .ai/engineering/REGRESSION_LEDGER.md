@@ -62,13 +62,19 @@ Zazu accumulated repeated visual sweep/root-token layers. Later declarations sil
 **Status:** CONTROL ACTIVE
 
 ## REG-009 — Temporary branch residue
-Ordinary Director execution created multiple non-main branches around isolated work, increasing repository/sync clutter and fragmenting the working state.
 
-**Control:** The owner mandates canonical `main` only. Never create, checkout, switch to, push to, or develop on a non-`main` branch. Every code/test/doc/audit change goes directly to `main`. If direct-main writing is blocked, stop and report the blocker rather than creating a branch. This is not a default or routine-only restriction; it is absolute unless a new explicit owner instruction in the current task changes it.
+Ordinary Director execution created multiple non-main branches despite the owner's absolute main-only policy, increasing repository/sync clutter and fragmenting the working state.
 
-**Observed residue (2026-10-16, comparison base `90f0b5b`):** `director/fix-offline-job-browser-selector` diverged 16 commits ahead / 43 behind. Its six changed paths contain older versions of code already superseded on `main`; no unique work was imported from the branch. The connected GitHub tool exposes no ref-delete operation, so this session cannot remove that remote ref. It remains policy drift and must not be used.
+**Control:** The owner mandates canonical `main` only. Never create, checkout, switch to, push to, or develop on a non-`main` branch. Every code/test/doc/audit change goes directly to `main`. If direct-main writing is blocked, stop and report the blocker rather than creating a branch.
 
-**Status:** CONTROL ACTIVE
+**Current inventory (2026-11-05):** GitHub reports four branches: `main`, `director/offline-session-boundary`, `dependabot/composer/laravel/framework-13.39.0`, and `dependabot/composer/phpunit/phpunit-13.4.5`. The owner explicitly authorized consolidation to `main` only on 2026-11-05.
+
+**Read-only comparison against current main:**
+- `director/offline-session-boundary`: 8 commits ahead / 7 behind. It contains unique business-scoped service-worker cache partitioning and corresponding tests in `public/sw.js`, `resources/js/app.js`, `e2e/pwa-offline.spec.js`, `tests/Feature/PwaOfflineFoundationTest.php`, and `tests/js/service-worker-auth-cache.test.js`. This is not safe to discard without selectively reviewing and porting the business-context isolation work; the branch's older full-file snapshots must not replace newer main security/session work.
+- Laravel Dependabot branch: 1 commit ahead / 282 behind; only `composer.lock` differs. Treat as stale dependency automation, not a candidate for wholesale merge.
+- PHPUnit Dependabot branch: 1 commit ahead / 282 behind; `composer.json` and `composer.lock` differ. Treat as stale dependency automation, not a candidate for wholesale merge.
+
+**Execution boundary:** The connected GitHub action surface available to this Director session exposes branch search and commit comparison but no remote branch-ref deletion operation. Do not claim the refs have been deleted. Preserve this inventory until the business-context service-worker changes have been selectively reconciled on `main` and the owner-authorized remote ref deletion can be performed through an available GitHub interface/API.
 
 ## REG-010 — Role-to-permission drift
 A business role can be seeded or assigned in data without a corresponding permission definition, causing silent authorization denial across the application.
