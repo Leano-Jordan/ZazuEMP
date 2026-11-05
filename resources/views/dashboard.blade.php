@@ -119,23 +119,6 @@
                 </div>
             </header>
             <div class="zazu-dash-focus-grid">
-                @if($isOwner && (! $business?->catalogue_setup_completed_at || ! $business?->business_setup_completed_at))
-                    <a href="{{ route('onboarding.index') }}" class="zazu-dash-focus-item is-warning">
-                        <span class="zazu-dash-focus-marker"></span>
-                        <span><strong>Finish workspace setup</strong><small>Business identity and catalogue setup are still incomplete.</small></span>
-                        <b>→</b>
-                    </a>
-                @endif
-
-                @if($upcoming->isNotEmpty())
-                    @php($nextEvent = $upcoming->first())
-                    <a href="{{ $workspaceTools['work'] ? route('work.show', $nextEvent) : route('calendar.index') }}" class="zazu-dash-focus-item is-info">
-                        <span class="zazu-dash-focus-marker"></span>
-                        <span><strong>Next scheduled work: {{ $nextEvent->name }}</strong><small>{{ $nextEvent->event_date?->format('d M Y') ?: 'Date to be confirmed' }} · {{ $nextEvent->customer?->name ?? 'No customer' }}</small></span>
-                        <b>→</b>
-                    </a>
-                @endif
-
                 @if($workspaceTools['quotes'] && $metrics['draft_quotes'] > 0)
                     <a href="{{ route('quotes.index') }}" class="zazu-dash-focus-item is-warning">
                         <span class="zazu-dash-focus-marker"></span>
@@ -170,7 +153,6 @@
 
                 @if(
                     (!$isOwner || ($business?->catalogue_setup_completed_at && $business?->business_setup_completed_at))
-                    && $upcoming->isEmpty()
                     && (!$workspaceTools['quotes'] || $metrics['draft_quotes'] === 0)
                     && ($experienceLevel === 'basic' || (
                         $metrics['open_purchase_orders'] === 0
