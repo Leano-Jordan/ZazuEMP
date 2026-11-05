@@ -409,8 +409,8 @@ body {
 }
 
 .zazu-nav-link:hover {
-    background: var(--zazu-surface-2);
-    border-color: var(--zazu-border);
+    background: var(--zazu-sidebar-hover);
+    border-color: color-mix(in srgb, var(--zazu-sidebar-active) 18%, transparent);
     color: var(--zazu-sidebar-ink);
     transform: translateX(2px);
 }
@@ -426,8 +426,9 @@ body {
 
 :root:not([data-theme="dark"]) .zazu-nav-link.active {
     color: var(--zazu-sidebar-ink);
-    background: color-mix(in srgb, var(--zazu-primary) 24%, var(--zazu-sidebar));
-    box-shadow: inset 3px 0 0 var(--zazu-sidebar-active), 0 5px 16px rgba(4, 34, 56, .16);
+    background: var(--zazu-sidebar-surface);
+    border-color: color-mix(in srgb, var(--zazu-sidebar-active) 16%, transparent);
+    box-shadow: inset 3px 0 0 var(--zazu-sidebar-active);
 }
 .zazu-nav-icon {
     width: 18px;
@@ -437,8 +438,8 @@ body {
     place-items: center;
     padding: 4px;
     border-radius: var(--zazu-radius-md);
-    background: color-mix(in srgb, var(--zazu-primary) 7%, var(--zazu-sidebar-hover));
-    color: var(--zazu-muted);
+    background: color-mix(in srgb, var(--zazu-sidebar-active) 9%, var(--zazu-sidebar));
+    color: var(--zazu-sidebar-muted);
     opacity: 0.9;
     transition:
         background-color var(--zazu-motion-fast) ease,
