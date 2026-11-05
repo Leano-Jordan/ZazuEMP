@@ -4459,16 +4459,9 @@ li {
 /* Metadata may be compact, but must remain legible. */
 .zazu-meta,
 .zazu-caption,
-.zazu-eyebrow,
 .zazu-table-meta {
     font-size: 12px;
     line-height: 1.35;
-}
-
-.zazu-eyebrow {
-    font-weight: 700;
-    letter-spacing: .055em;
-    text-transform: none;
 }
 
 /* Navigation and controls should read as controls, not miniature headings. */
