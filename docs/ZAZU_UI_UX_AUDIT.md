@@ -410,3 +410,15 @@ Correction in `resources/css/zazu-final-visual-sweep.css` (620px and below):
 - Leave desktop and tablet shortcut navigation unchanged.
 
 Verification boundary: source-level only; no rendered-device or automated test run is claimed.
+
+## 2026-11-05 Director — Work workspace responsive shortcut grid
+
+The Work detail screen's five-item Operational chain used Tailwind's `md:grid-cols-5`, activating five narrow columns from 768px. At tablet and compact-laptop widths this compressed labels and supporting counts before the content area could comfortably support five destinations side by side.
+
+Correction in `resources/views/work/show.blade.php`:
+- Keep one column on narrow phones.
+- Use two columns from the small-screen breakpoint through tablet and compact desktop widths.
+- Expand to five columns only at the extra-large breakpoint, where the available width can support the full operational chain.
+- Preserve all five existing destinations, counts, routes and workflow behaviour.
+
+Verification boundary: source-level inspection confirms the responsive utility classes and unchanged destination markup. Rendered tablet/desktop/phone acceptance and automated tests have not been run in this execution.
