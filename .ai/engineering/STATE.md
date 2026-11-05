@@ -779,3 +779,13 @@ Latest source change: commit `29a38f55d3d3ff5979cf844ddbd624a9ea279515` consolid
 - Added regression coverage confirming the duplicate strip and its styling stay absent while Quick actions remain.
 - Dashboard layout is shorter and more focused; primary navigation remains the full route-discovery surface.
 - Source re-fetch and selector/structure checks required after commit. PHPUnit/build/browser visual acceptance remains outstanding.
+
+
+## Dashboard copy density pass — 2026-11-06
+
+- Removed secondary explanatory sentences from the Quick actions, Upcoming events, Quote pipeline, Priority now and Workspace health headers. The section labels and titles already communicate their purpose.
+- Removed repeated helper captions from the four Workspace health count tiles; each tile keeps its clear metric label and live count.
+- Removed the dashboard-only finance disclaimer from Quote pipeline; finance navigation remains available and the finance workspace remains the source of financial detail.
+- Kept action-specific priority explanations and the honest operational-readiness heading. No data, permissions, routes or calculations changed.
+- Added regression coverage for the compact copy and retained section identity.
+- Source re-fetch and structure checks required after commit; runtime and rendered acceptance remain outstanding.
