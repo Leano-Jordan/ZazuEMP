@@ -770,3 +770,12 @@ Latest source change: commit `29a38f55d3d3ff5979cf844ddbd624a9ea279515` consolid
 - Reduced dashboard event-row minimum height from 76px to 64px and tightened vertical padding. Existing mobile status placement and wrapping rules remain unchanged.
 - Added regression coverage for the five-record limit, compact row sizing and continued access to the full work list.
 - Source-level verification only; PHPUnit, build and rendered viewport/theme acceptance remain outstanding.
+
+
+## Dashboard navigation duplication removal — 2026-11-06
+
+- Removed the extra "Workspace surfaces" navigation strip beneath Quick actions. It repeated destinations already available through the primary navigation and the dashboard's own focused actions, adding a second navigation layer not present in the supplied reference.
+- Removed its now-unused component CSS selectors and removed only the commandbar selector from shared grouped rules, preserving unrelated selectors and declarations.
+- Added regression coverage confirming the duplicate strip and its styling stay absent while Quick actions remain.
+- Dashboard layout is shorter and more focused; primary navigation remains the full route-discovery surface.
+- Source re-fetch and selector/structure checks required after commit. PHPUnit/build/browser visual acceptance remains outstanding.
