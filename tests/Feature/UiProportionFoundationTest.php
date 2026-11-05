@@ -84,13 +84,26 @@ class UiProportionFoundationTest extends TestCase
         $this->assertSame(2, substr_count($dashboard, '<b>EVENTS</b>'));
     }
 
+    public function test_dashboard_priority_and_resource_readiness_use_a_balanced_lower_row(): void
+    {
+        $css = file_get_contents(resource_path('css/zazu-final-visual-sweep.css'));
+
+        $this->assertIsString($css);
+        $this->assertStringContainsString('.zazu-dash-focus {', $css);
+        $this->assertStringContainsString('grid-column: 1;', $css);
+        $this->assertStringContainsString('.zazu-dash-resources {', $css);
+        $this->assertStringContainsString('grid-column: 2;', $css);
+    }
+
     public function test_dashboard_keeps_event_status_visible_on_mobile(): void
     {
         $css = file_get_contents(resource_path('css/zazu-final-visual-sweep.css'));
 
         $this->assertIsString($css);
         $this->assertStringContainsString('.zazu-dash-status {', $css);
-        $this->assertStringContainsString('grid-column:3;justify-self:start;margin-top:4px', $css);
+        $this->assertStringContainsString('grid-column: 3;', $css);
+        $this->assertStringContainsString('grid-row: 2;', $css);
+        $this->assertStringContainsString('display: inline-flex;', $css);
     }
 
     public function test_authentication_submit_remains_intentionally_full_width(): void
