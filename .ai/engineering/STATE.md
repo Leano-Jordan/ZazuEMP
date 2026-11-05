@@ -865,3 +865,12 @@ Latest source change: commit `29a38f55d3d3ff5979cf844ddbd624a9ea279515` consolid
 - Preserved the existing metric content, dimensions, links, hover behaviour and responsive grid. No positional business meaning is assigned to the tints; they are purely visual differentiation.
 - Added source regression coverage for all four token-based treatments.
 - The treatment uses theme tokens so the existing dark theme remains internally consistent; rendered contrast still requires browser acceptance.
+
+
+## Shared panel header surface refinement — 2026-11-06
+
+- Source review found shared panel headers remained flat while form-section headers already used the workspace surface token family, creating a small but repeated component-language inconsistency.
+- Added a restrained surface-2 to surface gradient to the canonical shared `.zazu-panel-head` rule, retaining its existing dimensions, border, content, layout and responsive behaviour.
+- The treatment is token-driven and therefore follows the existing light/deep-water theme definitions; no page-specific overrides or new palette values were introduced.
+- Added a focused regression assertion against the effective final panel-header rule.
+- Source-level verification only. PHPUnit, Vite build and rendered desktop/mobile review have not been run in this environment.
