@@ -1216,10 +1216,6 @@ display:block;color:var(--zazu-text-muted);font-family:var(--zazu-font-ui);font-
 display:block;margin:7px 0 3px;color:var(--zazu-text-ink);font-family:var(--zazu-font-ui);font-size:28px;font-weight:700;font-variant-numeric:tabular-nums
 }
 
-.zazu-dash-metric>small {
-display:block;color:var(--zazu-text-muted);font-size:11px
-}
-
 .zazu-dash-metric>b {
 position:absolute;right:16px;top:50%;color:var(--zazu-blue-brand);font-size:12px;opacity:.55
 }
