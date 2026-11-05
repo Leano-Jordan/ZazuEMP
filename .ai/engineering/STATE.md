@@ -32,6 +32,16 @@ The 2026-11-01 local Windows-host proposal was exploratory and is no longer the 
 
 The installed-device offline continuity mission below remains open and is the next program after the current owner-directed dashboard/UI mission; this visual work does not close or weaken it.
 
+## Workspace health panel refinement — 2026-11-06
+
+- Reconciled the lower-right panel against Designer 2: renamed Resource Readiness to Workspace Health with Operational Readiness as its heading.
+- Kept the panel honest: its tiles remain business-scoped live counts (open purchase orders, low stock, available assets, unpaid invoices), not fabricated network, finance-connection or platform-health statuses.
+- Changed the desktop panel to four compact tiles and mobile to two columns, collapsing to one column on very narrow screens.
+- Preserved the existing permission-gated links and experience-level visibility.
+- Added regression coverage for the reference-aligned heading, live-count framing and responsive tile layout.
+- Changed files: resources/views/dashboard.blade.php, resources/css/zazu-final-visual-sweep.css, tests/Feature/UiProportionFoundationTest.php.
+- Runtime and rendered acceptance remain UNVERIFIED; source assertions alone do not certify the visual result.
+
 ## Dashboard reference alignment — 2026-11-06
 
 - Inspected both supplied dashboard references and current main source before changing the UI.
