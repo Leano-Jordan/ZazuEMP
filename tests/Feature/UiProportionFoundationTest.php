@@ -57,6 +57,15 @@ class UiProportionFoundationTest extends TestCase
         }
     }
 
+    public function test_dashboard_does_not_render_midnight_as_an_event_start_time(): void
+    {
+        $dashboard = file_get_contents(resource_path('views/dashboard.blade.php'));
+
+        $this->assertIsString($dashboard);
+        $this->assertStringContainsString("{{ $event->event_date ? 'Time TBC' : 'Unscheduled' }}", $dashboard);
+        $this->assertStringNotContainsString("format('H:i')", $dashboard);
+    }
+
     public function test_dashboard_only_surfaces_unpaid_invoice_metric_when_invoice_count_is_available(): void
     {
         $dashboard = file_get_contents(resource_path('views/dashboard.blade.php'));

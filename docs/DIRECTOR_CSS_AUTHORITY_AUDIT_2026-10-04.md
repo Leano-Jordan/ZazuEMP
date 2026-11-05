@@ -502,3 +502,10 @@ Continue property-level analysis of the repeated `app.css` shell layers, beginni
 - Expanded the hero regression test to inspect both the final global rule and the light-theme-specific rule.
 - Source-level check: both declarations now reference --zazu-surface-2 and neither contains #FFFFFF.
 - Runtime PHPUnit and browser acceptance remain pending; the previous current-head Laravel, quality and browser workflows reported failures and must be diagnosed independently before release acceptance.
+
+
+## Dashboard date-only event display — 2026-11-05
+
+- Event model casts `event_date` as a date, not a datetime. The dashboard previously formatted it with `H:i`, which rendered every event as `00:00` and falsely implied a midnight start.
+- Replaced the fabricated time with `Time TBC`; missing dates now read `Unscheduled` / `Date to be confirmed`.
+- Added a source regression test preventing time formatting on date-only event records.
