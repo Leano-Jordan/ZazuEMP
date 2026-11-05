@@ -246,7 +246,7 @@
                                     type="search"
                                     data-zazu-command-input
                                     data-search-url="{{ route('search.index') }}"
-                                    placeholder="Search the workspace…"
+                                    placeholder="Search events, customers, quotes, inventory…"
                                     autocomplete="off"
                                     spellcheck="false"
                                     role="combobox"
