@@ -11,33 +11,29 @@
 
     <section class="zazu-dash-hero">
         <div class="zazu-dash-hero-main">
-            <div class="zazu-dash-kicker"><span class="zazu-dash-live"></span> ZAZU EMP / OPERATIONAL COMMAND · {{ $nicheDefinition['label'] }}</div>
-            <h2>{{ $experienceLevel === 'basic' ? 'Keep the next operational action clear.' : 'Everything important, closer to the work.' }}</h2>
-            <p>{{ $nicheDefinition['description'] }} {{ $experienceLevel === 'basic' ? 'Start with the next action and keep the rest quiet until you need it.' : 'Use the event record as the centre of operations, then reveal deeper operational detail when it helps.' }}</p>
-            @if(count($supportingNiches))
-                <div class="zazu-dash-context-note"><strong>Also in this business:</strong> {{ implode(' · ', $supportingNiches) }}. Zazu keeps these capabilities available when the job needs them.</div>
-            @endif
+            <div class="zazu-dash-kicker"><span class="zazu-dash-live"></span> YOUR BUSINESS AT A GLANCE · {{ $nicheDefinition['label'] }}</div>
+            <span class="zazu-dash-greeting">{{ now()->hour < 12 ? 'Good morning' : (now()->hour < 18 ? 'Good afternoon' : 'Good evening') }}</span>
+            <h2>{{ auth()->user()->name }} <span aria-hidden="true">👋</span></h2>
+            <p>Run your event business from one place. Manage events, quotes, customers, inventory, purchasing and finance.</p>
         </div>
-        <div class="zazu-dash-hero-side zazu-dash-hero-visual {{ $business?->dashboard_image_path ? 'has-dashboard-image' : 'has-coastal-fallback' }}">
+        <aside class="zazu-dash-hero-side zazu-dash-capability" aria-label="Business capabilities">
+            <div class="zazu-dash-capability-copy">
+                <span class="zazu-dash-side-label">Also in this business</span>
+                <strong>{{ count($supportingNiches) ? implode(' · ', $supportingNiches) : $nicheDefinition['label'] }}</strong>
+                <span>Zazu keeps these capabilities available when the job needs them.</span>
+                @if($workspaceTools['services'])
+                    <a href="{{ route('capabilities.index') }}" class="zazu-text-action">View services →</a>
+                @endif
+            </div>
             @if($business?->dashboard_image_path)
                 <img
                     src="{{ route('business.media', ['type' => 'dashboard']) }}?v={{ $business->updated_at?->timestamp ?? 0 }}"
-                    alt="{{ $business->name }} dashboard image"
-                    class="zazu-dash-hero-image"
+                    alt=""
+                    aria-hidden="true"
+                    class="zazu-dash-capability-art"
                 >
-                <div class="zazu-dash-hero-overlay">
-                    <span class="zazu-dash-side-label">Workspace state</span>
-                    <strong>Operational</strong>
-                    <span>Live workspace records</span>
-                    <div class="zazu-dash-side-line"><i></i><span>Event operations</span><b>EVENTS</b></div>
-                </div>
-            @else
-                <span class="zazu-dash-side-label">Workspace state</span>
-                <strong>Operational</strong>
-                <span>Live workspace records</span>
-                <div class="zazu-dash-side-line"><i></i><span>Event operations</span><b>EVENTS</b></div>
             @endif
-        </div>
+        </aside>
     </section>
 
     <section class="zazu-dash-grid" aria-label="Dashboard operational overview">
@@ -48,10 +44,10 @@
             @if($workspaceTools['calendar'])
             <a href="{{ route('calendar.index') }}" class="zazu-dash-metric zazu-dash-surface"><span>Next 14 days</span><strong>{{ number_format($metrics['upcoming_work']) }}</strong><small>Scheduled work ahead</small><b>→</b></a>
             @endif
-            @if($workspaceTools['finance'] && $experienceLevel !== 'basic')
-            <a href="{{ route('finance.index') }}" class="zazu-dash-metric zazu-dash-surface"><span>Unpaid invoices</span><strong>{{ number_format($metrics['unpaid_invoices']) }}</strong><small>Issued invoices with a balance</small><b>→</b></a>
-            @elseif($workspaceTools['quotes'])
+            @if($workspaceTools['quotes'])
             <a href="{{ route('quotes.index') }}" class="zazu-dash-metric zazu-dash-surface"><span>Draft quotes</span><strong>{{ number_format($metrics['draft_quotes']) }}</strong><small>Commercial records awaiting action</small><b>→</b></a>
+            @elseif($workspaceTools['finance'] && $experienceLevel !== 'basic')
+            <a href="{{ route('finance.index') }}" class="zazu-dash-metric zazu-dash-surface"><span>Unpaid invoices</span><strong>{{ number_format($metrics['unpaid_invoices']) }}</strong><small>Issued invoices with a balance</small><b>→</b></a>
             @endif
             @if($workspaceTools['customers'])
             <a href="{{ route('customers.index') }}" class="zazu-dash-metric zazu-dash-surface"><span>Customers</span><strong>{{ number_format($metrics['customers']) }}</strong><small>People and organisations</small><b>→</b></a>
@@ -61,20 +57,22 @@
         <section class="zazu-dash-quick-actions zazu-dash-surface" aria-label="Quick actions">
             <div class="zazu-dash-quick-actions-heading"><span class="zazu-dash-kicker">Quick actions</span><strong>Start the next piece of work.</strong></div>
             <div class="zazu-dash-actions">
-                @if($workspaceTools['customers'] && app(\App\Support\PermissionService::class)->allows('customers.create', auth()->user(), $business))
-                    <a href="{{ route('customers.create') }}" class="zazu-btn zazu-btn-secondary">Start with customer <span>+</span></a>
-                @endif
                 @if($workspaceTools['work'] && app(\App\Support\PermissionService::class)->allows('work.create', auth()->user(), $business))
-                    <a href="{{ route('work.create') }}" class="zazu-btn zazu-btn-cta">Start with job <span>+</span></a>
-                    <a href="{{ route('work.create', ['start' => 'quote']) }}" class="zazu-btn zazu-btn-secondary">Start with quote <span>+</span></a>
+                    <a href="{{ route('work.create') }}" class="zazu-btn zazu-btn-cta">Create event <span>+</span></a>
+                    <a href="{{ route('work.create', ['start' => 'quote']) }}" class="zazu-btn zazu-btn-secondary">Create quote <span>+</span></a>
                 @endif
-                @if($workspaceTools['calendar'])<a href="{{ route('calendar.index') }}" class="zazu-btn zazu-btn-secondary">Open calendar <span>→</span></a>@endif
+                @if($workspaceTools['customers'] && app(\App\Support\PermissionService::class)->allows('customers.create', auth()->user(), $business))
+                    <a href="{{ route('customers.create') }}" class="zazu-btn zazu-btn-secondary">Add customer <span>+</span></a>
+                @endif
+                @if($workspaceTools['calendar'])
+                    <a href="{{ route('calendar.index') }}" class="zazu-btn zazu-btn-secondary">Open calendar <span>→</span></a>
+                @endif
             </div>
         </section>
 
         <section class="zazu-dash-run zazu-dash-surface">
             <header class="zazu-dash-surface-head">
-                <div><span class="zazu-dash-kicker">Run-sheet</span><h3>Upcoming work</h3><p>Real events from the workspace, ordered by execution date.</p></div>
+                <div><span class="zazu-dash-kicker">Run-sheet</span><h3>Upcoming events</h3><p>Real events from the workspace, ordered by execution date.</p></div>
                 @if($workspaceTools['work'])<a href="{{ route('work.index') }}" class="zazu-text-action">All work →</a>@endif
             </header>
             <div class="zazu-dash-timeline">
@@ -94,7 +92,7 @@
 
 
         <section class="zazu-dash-commercial zazu-dash-surface">
-            <header class="zazu-dash-surface-head"><div><span class="zazu-dash-kicker">Commercial queue</span><h3>Quote action</h3><p>Turn outstanding commercial work into the next deliberate action.</p></div></header>
+            <header class="zazu-dash-surface-head"><div><span class="zazu-dash-kicker">Commercial queue</span><h3>Quote pipeline</h3><p>Turn outstanding commercial work into the next deliberate action.</p></div></header>
             <div class="zazu-dash-commercial-main"><div><span>Draft quotes</span><strong>{{ number_format($metrics['draft_quotes']) }}</strong></div><span class="zazu-dash-queue-state {{ $metrics['draft_quotes'] > 0 ? 'is-warning' : 'is-clear' }}">{{ $metrics['draft_quotes'] > 0 ? 'ACTION REQUIRED' : 'QUEUE CLEAR' }}</span></div>
             <div class="zazu-dash-actions">
                 @if($workspaceTools['quotes'])<a href="{{ route('quotes.index') }}" class="zazu-btn zazu-btn-primary">{{ $metrics['draft_quotes'] > 0 ? 'Review draft quotes' : 'Open quote queue' }}</a>@endif
