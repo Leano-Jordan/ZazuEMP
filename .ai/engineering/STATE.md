@@ -659,3 +659,15 @@ Latest source change: commit `29a38f55d3d3ff5979cf844ddbd624a9ea279515` consolid
 - Added a source regression assertion in `tests/Feature/UiProportionFoundationTest.php`.
 - Commit evidence and source verification recorded in `docs/DIRECTOR_CSS_AUTHORITY_AUDIT_2026-10-04.md`.
 - Browser-rendered acceptance and PHPUnit execution remain open; no visual/runtime pass is claimed.
+
+## Dashboard hierarchy and visual proportion pass — 2026-11-05
+
+- Continued the owner-directed UI/UX reference pass on the dashboard, using Designer 2 as a design direction rather than copying its content or visuals.
+- Moved dashboard KPIs ahead of the work queues and separated create shortcuts into a dedicated Quick actions strip. Upcoming work and quote action now share the second row; Priority Now and Resource Readiness share the lower row.
+- Refined final dashboard proportions: widened the hero's contextual side panel, compacted card headers and KPI scale, normalized dashboard surface radii, tightened event/priority spacing, and laid out resource links in two desktop columns with a single-column phone fallback.
+- Consolidated the latest dashboard composition into one final CSS authority block instead of stacking another competing set of overrides.
+- Added source regression coverage for hierarchy, quick-action placement, card proportions and responsive resource layout.
+- Commits: 9fd69b9, 0046af8, dbb6a3a, 41bd22d, 03364ca, 99b25b4, 469c41e, a743263. Latest source/test head: a743263ef89ee0e664e6ef826d5327a53896fb1c.
+- Re-fetched CSS and test files from main; verified expected layout declarations and balanced CSS braces. Only main was visible.
+- Not verified: PHPUnit execution, Vite build, browser-rendered desktop/tablet/mobile acceptance, and light/dark rendered comparison. GitHub combined status was empty and the workflow-run wrapper returned no runs; neither is evidence of a pass.
+- Next UI/UX source objective remains the documented property-level consolidation of sidebar, brand and hierarchical navigation rules in resources/css/app.css, preserving responsive/mobile ownership and all navigation state dependencies.
