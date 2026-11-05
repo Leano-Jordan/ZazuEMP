@@ -683,3 +683,14 @@ Latest source change: commit `29a38f55d3d3ff5979cf844ddbd624a9ea279515` consolid
 - Source re-fetch checks confirm the 25 canonical base/state selectors each have one definition (chevron intentionally excluded because its reduced-motion override is separate), CSS braces are balanced, and no literal newline escape remains. Only `main` was visible.
 - Not verified: PHPUnit execution, Vite build, PHP/CSS toolchain lint, browser-rendered desktop/tablet/mobile acceptance, or light/dark rendered comparison. Empty status/workflow wrapper responses are not treated as passes.
 - Next UI/UX step: review the remaining brand lockup, logo/fallback mark and topbar identity rules against the canonical shell, then arrange a rendered acceptance pass before broad cleanup of unrelated app.css history.
+
+## Brand lockup and topbar cascade review — 2026-11-05
+
+- Reviewed brand identity and topbar-related rules after sidebar/navigation consolidation.
+- Brand link, logo image, lockup strong/span colour rules each have one canonical base declaration. The brand fallback mark intentionally shares geometry with the uploaded logo and has a separate appearance rule; these are complementary roles, not duplicate declarations.
+- Added regression coverage for the unique brand link/logo/lockup rules and retained assertions for the shared logo/fallback geometry.
+- Topbar, page title, eyebrow, workspace status and theme-toggle styles have multiple later declarations tied to sequential theme, wallpaper, mobile and shell treatments. They were deliberately not flattened: source inspection shows these are context-specific cascade overrides, not safe duplicate base rules. A follow-up should map their media/theme ownership before any migration.
+- No additional brand or topbar CSS was changed in this review. Responsive/mobile stylesheets remain unchanged.
+- Test update: `b06cc02e72fe7712671ab3058f1422d87907bd1d`.
+- Source verification: brand base selector counts and the final navigation/sidebar state checks are recorded in `tests/Feature/UiProportionFoundationTest.php`. Runtime and rendered acceptance remain pending.
+- Next objective: map the topbar/page-title/theme-toggle cascade by theme and viewport into explicit ownership, then consolidate only where computed property precedence is unchanged. Browser light/dark and mobile acceptance remains a release gate.
