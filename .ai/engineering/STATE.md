@@ -671,3 +671,15 @@ Latest source change: commit `29a38f55d3d3ff5979cf844ddbd624a9ea279515` consolid
 - Re-fetched CSS and test files from main; verified expected layout declarations and balanced CSS braces. Only main was visible.
 - Not verified: PHPUnit execution, Vite build, browser-rendered desktop/tablet/mobile acceptance, and light/dark rendered comparison. GitHub combined status was empty and the workflow-run wrapper returned no runs; neither is evidence of a pass.
 - Next UI/UX source objective remains the documented property-level consolidation of sidebar, brand and hierarchical navigation rules in resources/css/app.css, preserving responsive/mobile ownership and all navigation state dependencies.
+
+## Sidebar and hierarchical navigation cascade consolidation — 2026-11-05
+
+- Continued the owner-directed UI/UX work in `resources/css/app.css`, consolidating repeated sidebar/navigation base rules, active/hover states, priority treatment, sidebar workspace identity, footer card/title/copy, and hierarchical desktop flyout geometry.
+- Consolidated base selectors to one canonical rule: `.zazu-nav-stack`, `.zazu-nav-group`, `.zazu-nav-label`, `.zazu-nav-link`, `.zazu-nav-icon`, `.zazu-sidebar-workspace` and its label/name/meta/dot, `.zazu-nav-link:hover`, `.zazu-nav-link.active` and marker/icon states, `.zazu-nav-priority`, and sidebar footer card/title/copy.
+- Consolidated the desktop hierarchical-navigation styles into a readable canonical block. Preserved the distinct open-state descendant and direct-child selectors, active-area styling, hover/focus access, light-theme active override, flyout active styling, 850px inline expansion and reduced-motion rules.
+- Kept `resources/css/zazu-responsive-theme.css` and `resources/css/zazu-mobile-refinement.css` unchanged; their scrolling, off-canvas sidebar, mobile tap target and safe-area ownership remain intact.
+- Added regression checks in `tests/Feature/UiProportionFoundationTest.php` for canonical rule counts and preservation of navigation states, theme override, responsive ownership and reduced motion. The chevron has a legitimate reduced-motion override and is validated separately rather than incorrectly treated as a single-rule selector.
+- Commits: `faa5bd9`, `e2a4139`, `8649a6e`, `bea06b9`, `a8975f9`, `6c37f97`, `9461414`, `9bce61e`, `435454a`, `0a83eef`, `94479ce`. Current source/test verification to be reconciled at the latest commit below.
+- Source re-fetch checks confirm the 25 canonical base/state selectors each have one definition (chevron intentionally excluded because its reduced-motion override is separate), CSS braces are balanced, and no literal newline escape remains. Only `main` was visible.
+- Not verified: PHPUnit execution, Vite build, PHP/CSS toolchain lint, browser-rendered desktop/tablet/mobile acceptance, or light/dark rendered comparison. Empty status/workflow wrapper responses are not treated as passes.
+- Next UI/UX step: review the remaining brand lockup, logo/fallback mark and topbar identity rules against the canonical shell, then arrange a rendered acceptance pass before broad cleanup of unrelated app.css history.
