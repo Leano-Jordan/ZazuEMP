@@ -1212,6 +1212,28 @@ border-color:color-mix(in srgb,var(--zazu-blue-vivid) 35%,var(--zazu-card-border
 display:block;color:var(--zazu-text-muted);font-family:var(--zazu-font-ui);font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.07em
 }
 
+/* KPI tiles use restrained semantic tints to separate the four dashboard signals. */
+.zazu-dash-metrics > .zazu-dash-metric:nth-child(4n + 1) {
+    border-color: color-mix(in srgb, var(--zazu-info) 20%, var(--zazu-card-border));
+    background: color-mix(in srgb, var(--zazu-info-soft) 52%, var(--zazu-card-bg));
+}
+
+.zazu-dash-metrics > .zazu-dash-metric:nth-child(4n + 2) {
+    border-color: color-mix(in srgb, var(--zazu-success) 20%, var(--zazu-card-border));
+    background: color-mix(in srgb, var(--zazu-success-soft) 52%, var(--zazu-card-bg));
+}
+
+.zazu-dash-metrics > .zazu-dash-metric:nth-child(4n + 3) {
+    border-color: color-mix(in srgb, var(--zazu-primary) 20%, var(--zazu-card-border));
+    background: color-mix(in srgb, var(--zazu-primary-soft) 52%, var(--zazu-card-bg));
+}
+
+.zazu-dash-metrics > .zazu-dash-metric:nth-child(4n) {
+    border-color: color-mix(in srgb, var(--zazu-warning) 20%, var(--zazu-card-border));
+    background: color-mix(in srgb, var(--zazu-warning-soft) 52%, var(--zazu-card-bg));
+}
+
+
 .zazu-dash-metric>strong {
 display:block;margin:7px 0 3px;color:var(--zazu-text-ink);font-family:var(--zazu-font-ui);font-size:28px;font-weight:700;font-variant-numeric:tabular-nums
 }
