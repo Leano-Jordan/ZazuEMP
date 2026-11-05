@@ -398,3 +398,15 @@ Correction in `resources/css/zazu-final-visual-sweep.css`:
 - Keep the desktop/tablet run-sheet layout unchanged; apply the adjustment only at 620px and below.
 
 Verification boundary: source-level selector and cascade inspection only. Rendered phone/desktop checks and automated tests have not been run in this execution.
+
+## 2026-11-05 Director — mobile dashboard shortcut targets
+
+Source inspection found that the dashboard's final shortcut navigation used 10px text with only 6px vertical padding. On phones these destinations could render as cramped, low-confidence tap targets despite the surrounding command bar switching to a vertical layout.
+
+Correction in `resources/css/zazu-final-visual-sweep.css` (620px and below):
+- Lay out shortcuts in a two-column grid that uses the available width.
+- Give each destination a 40px minimum height and a clear, restrained surface/border.
+- Increase label size and allow long labels to wrap without forcing horizontal overflow.
+- Leave desktop and tablet shortcut navigation unchanged.
+
+Verification boundary: source-level only; no rendered-device or automated test run is claimed.
