@@ -96,13 +96,14 @@ class UiProportionFoundationTest extends TestCase
         $this->assertStringContainsString('@media (max-width: 620px)', $css);
     }
 
-    public function test_dashboard_does_not_present_static_network_connectivity_as_live_status(): void
+    public function test_dashboard_does_not_present_static_network_connectivity_or_fake_workspace_health(): void
     {
         $dashboard = file_get_contents(resource_path('views/dashboard.blade.php'));
 
         $this->assertIsString($dashboard);
         $this->assertStringNotContainsString('<b>ONLINE</b>', $dashboard);
-        $this->assertSame(2, substr_count($dashboard, '<b>EVENTS</b>'));
+        $this->assertStringNotContainsString('Workspace state', $dashboard);
+        $this->assertStringNotContainsString('<b>EVENTS</b>', $dashboard);
     }
 
     public function test_dashboard_priority_and_resource_readiness_use_a_balanced_lower_row(): void
