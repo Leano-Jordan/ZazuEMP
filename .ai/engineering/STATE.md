@@ -752,3 +752,13 @@ Latest source change: commit `29a38f55d3d3ff5979cf844ddbd624a9ea279515` consolid
 - Commits: `dc42c84` (canonical desktop header bases), `7a40909` (shared eyebrow ownership), `cafea19` (regression coverage). Latest source/test head to be verified below.
 - Not verified: PHPUnit execution, Vite build, browser-rendered desktop/tablet/mobile acceptance, light/dark rendered comparison, or physical touch/keyboard acceptance. Source checks do not replace those runtime gates.
 - Next objective: obtain rendered browser acceptance of the dashboard/shared shell at desktop, tablet and mobile widths in both themes. Do not continue broad CSS consolidation until those visual results are reviewed.
+
+
+## Dashboard density and duplicate-priority cleanup — 2026-11-06
+
+- Removed two repeated entries from the Priority Now panel: workspace setup (already presented in the dedicated setup banner) and the next scheduled event (already listed in Upcoming Events).
+- Priority Now now stays focused on distinct actions: quote review, open purchasing, low stock, unpaid invoices, and the setup banner remains separately visible to owners.
+- Removed the upcoming-event dependency from the empty-priority condition so a scheduled event alone no longer suppresses the truthful "No immediate priority flagged" state.
+- Added a source regression test to prevent setup and upcoming-event duplication inside the priority panel.
+- Scope deliberately limited to dashboard content density; no unrelated shell, palette, route, permission, or data changes.
+- Source re-fetch and structural checks required after commit. PHPUnit, Vite, and rendered desktop/tablet/mobile plus light/dark acceptance remain unverified until executed in an available runtime/browser.
