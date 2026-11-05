@@ -396,3 +396,13 @@ The owner rejected dark navy as the dominant light-mode identity. The target is 
 ### Next gate
 
 Continue property-level analysis of the repeated `app.css` shell layers, beginning with sidebar/brand/navigation. Only merge declarations when their effective media/state context and rendered intent are demonstrably equivalent.
+
+## Sidebar, brand and navigation property pass — 2026-11-05
+
+- Re-inspected the current `main` branch and the app shell Blade markup.
+- Confirmed the sidebar, brand and navigation have multiple historical cascade layers in `app.css`, including later overrides for desktop, tablet/mobile, theme and navigation hierarchy states. Repeated selectors are not automatically duplicates.
+- Removed only the proven redundant `width: 18px` and `height: 18px` declarations from the later `.zazu-nav-icon` rule (formerly around line 2123). The same base dimensions and flex basis already exist in the earlier base rule; subsequent explicit icon-size variants remain authoritative.
+- Preserved all breakpoint-specific, theme-specific, active/hover/focus, hierarchical flyout and mobile drawer declarations.
+- No brand pseudo-element or lockup declarations were removed: the current markup supports multiple logo/mark/lockup variants, and those rules are not safely interchangeable.
+- Remaining consolidation is not a blind selector merge. The next pass must map the remaining shell cascade by media-query scope and theme/state, then consolidate one component at a time with rendered acceptance.
+- Verification: source change committed directly to `main`; no build, automated test or browser rendering was run in this pass.
