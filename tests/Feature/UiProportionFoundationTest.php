@@ -62,8 +62,8 @@ class UiProportionFoundationTest extends TestCase
         $dashboard = file_get_contents(resource_path('views/dashboard.blade.php'));
 
         $this->assertIsString($dashboard);
-        $this->assertStringContainsString("$workspaceTools['finance'] && $experienceLevel !== 'basic'", $dashboard);
-        $this->assertStringContainsString("@elseif($workspaceTools['quotes'])", $dashboard);
+        $this->assertStringContainsString("\$workspaceTools['finance'] && \$experienceLevel !== 'basic'", $dashboard);
+        $this->assertStringContainsString("@elseif(\$workspaceTools['quotes'])", $dashboard);
     }
 
     public function test_dashboard_does_not_present_static_network_connectivity_as_live_status(): void
