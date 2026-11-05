@@ -817,3 +817,12 @@ Latest source change: commit `29a38f55d3d3ff5979cf844ddbd624a9ea279515` consolid
 - Updated page-title/eyebrow and theme-toggle colours to use page tokens instead of sidebar tokens. Dark-theme token values and explicit dark-mode overrides remain unchanged.
 - Added source regression coverage for the light shell palette and separate topbar surface.
 - Source-level only; rendered acceptance, PHPUnit and Vite build remain outstanding.
+
+
+## Light sidebar navigation state refinement — 2026-11-06
+
+- Tuned navigation hover and active states to stay within the new blue sidebar palette rather than borrowing the general content-surface colours.
+- Active navigation now reads as a light selected surface with a restrained blue edge indicator; hover uses a soft blue tint. Navigation icons inherit the sidebar's coordinated muted blue.
+- No navigation structure, routes, permissions, interaction logic or dark-theme rules changed.
+- Added source regression coverage for the light navigation state declarations.
+- Source-level only; rendered visual acceptance and automated runtime checks remain outstanding.
