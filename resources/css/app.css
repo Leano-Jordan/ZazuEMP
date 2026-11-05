@@ -456,6 +456,8 @@ body {
 }
 
 .zazu-topbar-inner {
+    width: 100%;
+    box-sizing: border-box;
     min-height: 72px;
     max-width: 1440px;
     margin: 0 auto;
