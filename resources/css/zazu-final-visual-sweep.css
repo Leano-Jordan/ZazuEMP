@@ -1265,7 +1265,7 @@ grid-column:1/-1;overflow:hidden
 }
 
 .zazu-dash-resource-grid {
-display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:0
+display:grid;grid-template-columns:1fr;gap:0
 }
 
 .zazu-dash-resource-grid>div {
@@ -2238,7 +2238,7 @@ grid-column: 2;
 }
 
 .zazu-dash-resources {
-grid-column: 1 / -1;
+grid-column: 2;
     margin-top: 0;
 }
 
