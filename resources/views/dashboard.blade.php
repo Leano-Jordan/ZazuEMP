@@ -27,7 +27,7 @@
                 @endif
                 @if($workspaceTools['calendar'])<a href="{{ route('calendar.index') }}" class="zazu-btn zazu-btn-secondary">Open calendar <span>→</span></a>@endif
             </div>        </div>
-        <div class="zazu-dash-hero-side zazu-dash-hero-visual">
+        <div class="zazu-dash-hero-side zazu-dash-hero-visual {{ $business?->dashboard_image_path ? 'has-dashboard-image' : 'has-coastal-fallback' }}">
             @if($business?->dashboard_image_path)
                 <img
                     src="{{ route('business.media', ['type' => 'dashboard']) }}?v={{ $business->updated_at?->timestamp ?? 0 }}"
