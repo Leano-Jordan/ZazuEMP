@@ -177,6 +177,48 @@ class UiProportionFoundationTest extends TestCase
         $this->assertStringContainsString('grid-template-columns: 1fr;', $css);
     }
 
+
+    public function test_sidebar_navigation_and_workspace_base_rules_have_one_canonical_definition(): void
+    {
+        $appCss = file_get_contents(resource_path('css/app.css'));
+        $responsiveCss = file_get_contents(resource_path('css/zazu-responsive-theme.css'));
+        $mobileCss = file_get_contents(resource_path('css/zazu-mobile-refinement.css'));
+
+        $this->assertIsString($appCss);
+        $this->assertIsString($responsiveCss);
+        $this->assertIsString($mobileCss);
+
+        $canonicalSelectors = [
+            '.zazu-nav-stack',
+            '.zazu-nav-group',
+            '.zazu-nav-label',
+            '.zazu-nav-link',
+            '.zazu-nav-icon',
+            '.zazu-sidebar-workspace',
+            '.zazu-sidebar-workspace-label',
+            '.zazu-sidebar-workspace-name',
+            '.zazu-sidebar-workspace-meta',
+            '.zazu-sidebar-workspace-dot',
+        ];
+
+        foreach ($canonicalSelectors as $selector) {
+            $pattern = '/^[ \\t]*' . preg_quote($selector, '/') . '\\s*\\{/m';
+            $this->assertSame(
+                1,
+                preg_match_all($pattern, $appCss),
+                $selector . ' should have one canonical base rule.'
+            );
+        }
+
+        // Keep state rules and responsive ownership separate from base geometry.
+        $this->assertStringContainsString('.zazu-nav-link:hover {', $appCss);
+        $this->assertStringContainsString('.zazu-nav-link.active {', $appCss);
+        $this->assertStringContainsString('.zazu-nav-flyout .zazu-nav-link.active {', $appCss);
+        $this->assertStringContainsString('overflow-y: auto;', $responsiveCss);
+        $this->assertStringContainsString('body.zazu-mobile-menu-open .zazu-sidebar {', $mobileCss);
+        $this->assertStringContainsString('min-height: 44px;', $mobileCss);
+    }
+
     public function test_authentication_submit_remains_intentionally_full_width(): void
     {
         $css = file_get_contents(resource_path('css/app.css'));
