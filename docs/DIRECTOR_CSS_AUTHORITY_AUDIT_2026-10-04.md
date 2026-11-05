@@ -64,13 +64,13 @@ zazu-mobile-refinement.css contained a stale max-width:520px page-title size tha
 
 Disposition: removed the stale declaration so <=520px now inherits the later intentional mobile title size.
 
-## Current stylesheet metrics
+## Current stylesheet metrics — refreshed 2026-11-05
 
-- app.css: 7878 lines, 29 !important declarations.
-- zazu-responsive-theme.css: 523 lines, 3 !important declarations.
-- zazu-mobile-refinement.css: 735 lines, 7 !important declarations.
-- zazu-final-visual-sweep.css: 3978 lines, 7 !important declarations, 0 root token blocks.
-- Exact selector duplication between the extension stylesheet and the other three stylesheet files: 0 after cleanup.
+- app.css: 8545 lines, 29 !important declarations.
+- zazu-responsive-theme.css: 567 lines, 3 !important declarations.
+- zazu-mobile-refinement.css: 791 lines, 9 !important declarations.
+- zazu-final-visual-sweep.css: 5448 lines, 7 !important declarations, 0 root token blocks.
+- The 2026-11-05 exact-selector scan found 77 repeated selectors across the four active stylesheets. Many are responsive or state-specific overrides, but the property-level overlap set still requires classification. The previous zero-duplication claim is no longer accurate.
 
 Remaining !important declarations are predominantly accessibility, reduced-motion, print/mobile state, or bounded interaction protections. They are not evidence that another colour/token authority exists.
 
@@ -306,3 +306,30 @@ This pass treated the reported failures as cascade and regression defects rather
 
 ### Runtime acceptance boundary
 Source acceptance is implemented. GitHub Actions for the resulting commit must still be observed before this cycle is marked fully accepted.
+
+
+## Light-theme consolidation — 2026-11-05
+
+### Defects confirmed and corrected
+
+- The light theme inherited a dark navy sidebar/topbar palette and dark page-deep gradients, making the nominal light theme visibly mixed with dark surfaces.
+- Browser-native controls had no explicit `color-scheme`, so their appearance could follow the operating system instead of Zazu's selected theme.
+- The visual-sweep stylesheet still contained a late `:root` typography-token override, contradicting the documented single-root authority.
+- The mobile browser theme colour stayed dark blue while the app was in light mode.
+
+### Changes committed to main
+
+- Replaced light-mode sidebar/topbar tokens with the blue-slate light surface and dark foreground system; dark-mode tokens remain separate and unchanged.
+- Rebalanced the light page-deep token to a light blue-slate shade.
+- Added explicit `color-scheme: light` and `color-scheme: dark` to their respective theme roots.
+- Moved typography metadata tokens into the canonical `app.css` root and removed the secondary root override from the visual-sweep stylesheet.
+- Matched the browser/PWA theme colour to the selected light theme.
+- Added regression coverage for the single root authority and explicit browser colour scheme.
+
+### Verification boundary
+
+The changed source files were re-fetched from `main` and the expected token, theme-colour, and regression-test assertions were confirmed. GitHub reported no status checks or workflow runs for the latest commit; PHPUnit/Vite and rendered desktop/mobile visual acceptance have therefore **not** been verified in this environment.
+
+### Remaining consolidation work
+
+The 77 repeated selectors need a property-level pass to separate intentional breakpoint/state rules from genuine competing declarations. Do not treat the stylesheet stack as fully consolidated until that pass and rendered acceptance are complete.
