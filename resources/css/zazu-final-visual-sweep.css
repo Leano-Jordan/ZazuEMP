@@ -4351,13 +4351,6 @@ background:color-mix(in srgb,var(--zazu-primary-soft) 26%,var(--zazu-surface));
    colour and spacing to establish hierarchy instead of multiplying fonts.
 */
 
-/* Raise the floor for readable UI copy. 11px remains reserved for true micro
-   metadata; normal labels and supporting text start at 12px. */
-:root {
-    --zazu-font-size-meta: 12px;
-    --zazu-font-size-label: 12px;
-}
-
 /* Product UI uses one type family. Mono is deliberately restricted to
    identifiers, codes and operational data rather than headings/KPIs. */
 body,
