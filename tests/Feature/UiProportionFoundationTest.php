@@ -62,7 +62,7 @@ class UiProportionFoundationTest extends TestCase
         $dashboard = file_get_contents(resource_path('views/dashboard.blade.php'));
 
         $this->assertIsString($dashboard);
-        $this->assertStringContainsString("{{ $event->event_date ? 'Time TBC' : 'Unscheduled' }}", $dashboard);
+        $this->assertStringContainsString("{{ \$event->event_date ? 'Time TBC' : 'Unscheduled' }}", $dashboard);
         $this->assertStringNotContainsString("format('H:i')", $dashboard);
     }
 
