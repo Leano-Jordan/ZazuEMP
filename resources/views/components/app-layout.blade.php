@@ -30,9 +30,7 @@
                 // Browser privacy/storage restrictions must not prevent the page from rendering.
             }
 
-            const theme = saved === 'light' || saved === 'dark'
-                ? saved
-                : (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+            const theme = saved === 'light' || saved === 'dark' ? saved : 'light';
 
             document.documentElement.dataset.theme = theme;
         })();
