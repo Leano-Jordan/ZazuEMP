@@ -694,3 +694,18 @@ Latest source change: commit `29a38f55d3d3ff5979cf844ddbd624a9ea279515` consolid
 - Test update: `b06cc02e72fe7712671ab3058f1422d87907bd1d`.
 - Source verification: brand base selector counts and the final navigation/sidebar state checks are recorded in `tests/Feature/UiProportionFoundationTest.php`. Runtime and rendered acceptance remain pending.
 - Next objective: map the topbar/page-title/theme-toggle cascade by theme and viewport into explicit ownership, then consolidate only where computed property precedence is unchanged. Browser light/dark and mobile acceptance remains a release gate.
+
+## Topbar, page title and theme-toggle cascade consolidation — 2026-11-05
+
+- Confirmed the actual shared layout asset order: `app.css` → `zazu-responsive-theme.css` → `zazu-final-visual-sweep.css` → `zazu-mobile-refinement.css`. The header markup is in `resources/views/components/app-layout.blade.php`.
+- Consolidated the desktop base rules in `app.css`: `.zazu-topbar`, `.zazu-topbar-inner`, `.zazu-page-title`, `.zazu-eyebrow`, and `.zazu-theme-toggle` now each have one canonical top-level definition.
+- The topbar retains its theme-token sidebar surface, blur, sticky desktop positioning and current shadow. Its user-wallpaper translucency remains a higher-specificity state rule.
+- The topbar inner container now has one desktop sizing rule. The <=1023px side padding and <=767px legacy layout declarations remain in their media scopes; the responsive layer retains the >=821px search/tab/action constraints.
+- The page title keeps its existing effective desktop size/weight/line-height/letter-spacing and sidebar-aware foreground. The mobile layer still owns the 18px mobile title and 17px <=520px title.
+- Moved shared `.zazu-eyebrow` typography out of `zazu-final-visual-sweep.css` and into the canonical `app.css` rule. The extension stylesheet no longer declares or groups the shared eyebrow selector. The effective 12px/700/1.35/.055em/non-uppercase typography and token-aware label colour are preserved; specific command-banner eyebrow contrast remains separate.
+- Consolidated the theme toggle's effective 36px desktop geometry, token-aware surface/border/foreground, radius, focus and transition base. Hover/active/focus/reduced-motion states remain distinct. The mobile layer continues to size the toggle at 40px.
+- Source property comparison against the pre-pass `b550514` tree found no effective declaration changes for topbar, page title or eyebrow. The topbar inner padding shorthand resolves to the same 11px vertical / 24px horizontal dimensions. The theme-toggle border shorthand carries the same token colour as the former border plus border-color cascade.
+- Kept `zazu-responsive-theme.css` and `zazu-mobile-refinement.css` unchanged. Added `test_topbar_title_and_theme_toggle_have_one_canonical_base_with_theme_and_viewport_overrides` to `tests/Feature/UiProportionFoundationTest.php`.
+- Commits: `dc42c84` (canonical desktop header bases), `7a40909` (shared eyebrow ownership), `cafea19` (regression coverage). Latest source/test head to be verified below.
+- Not verified: PHPUnit execution, Vite build, browser-rendered desktop/tablet/mobile acceptance, light/dark rendered comparison, or physical touch/keyboard acceptance. Source checks do not replace those runtime gates.
+- Next objective: obtain rendered browser acceptance of the dashboard/shared shell at desktop, tablet and mobile widths in both themes. Do not continue broad CSS consolidation until those visual results are reviewed.
