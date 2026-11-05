@@ -6737,7 +6737,7 @@ textarea:focus {
     .zazu-metric-card,
     .zazu-dashboard-attention,
     .zazu-next-action,
-    .zazu-form-section { border-radius: 4px; }
+    .zazu-form-section { border-radius: var(--zazu-radius-lg); }
 }
 
 
