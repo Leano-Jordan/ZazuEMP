@@ -993,3 +993,10 @@ Latest source change: commit `29a38f55d3d3ff5979cf844ddbd624a9ea279515` consolid
 - Dashboard-only Blade and test changes. No data, routes, permissions, panel structure, shared shell or theme changes.
 - Source changes committed; PHPUnit, Vite and rendered browser acceptance remain unverified.
 
+## Dashboard priority empty-state accuracy — 2026-11-06
+
+- Corrected the Priority Now clear-state sentence: its condition checks setup, quotes and resource actions, but does not check the event schedule. The copy no longer claims schedule status is part of that condition.
+- Added a regression assertion for the truthful empty-state wording.
+- Dashboard-only copy and test change; no priority logic, data, routes or permissions changed.
+- Source re-fetch verification required. PHPUnit and rendered acceptance remain unverified.
+
