@@ -649,4 +649,34 @@ class UiProportionFoundationTest extends TestCase
         $this->assertStringContainsString('aria-hidden="true"><svg', $dashboard);
     }
 
+
+    public function test_dashboard_event_and_quote_panels_follow_reference_hierarchy(): void
+    {
+        $dashboard = file_get_contents(resource_path('views/dashboard.blade.php'));
+        $css = file_get_contents(resource_path('css/zazu-final-visual-sweep.css'));
+
+        $this->assertIsString($dashboard);
+        $this->assertIsString($css);
+
+        foreach ([
+            'zazu-dash-panel-icon',
+            'zazu-dash-panel-heading',
+            'Real events from your workspace, ordered by date.',
+            'zazu-dash-event-date',
+            'zazu-dash-event-trailing',
+            'Turn outstanding commercial work into the next action.',
+            'Declined / expired',
+            "($quoteStatusCounts['accepted'] ?? 0)",
+        ] as $expected) {
+            $this->assertStringContainsString($expected, $dashboard);
+        }
+
+        $this->assertStringContainsString('.zazu-dash-panel-head {', $css);
+        $this->assertStringContainsString('.zazu-dash-event-date {', $css);
+        $this->assertStringContainsString('.zazu-dash-event-trailing {', $css);
+        $this->assertStringContainsString('.zazu-dash-commercial .zazu-dash-quote-stage > span::before {', $css);
+        $this->assertStringContainsString('@media (max-width: 380px)', $css);
+        $this->assertStringNotContainsString('zazu-dash-event-line', $dashboard);
+    }
+
 }
