@@ -5456,7 +5456,11 @@ body.zazu-mobile-menu-open .zazu-helper {
 }
 
 .zazu-dash-hero-main {
-    padding: 24px 26px;
+    display: flex;
+    min-width: 0;
+    flex-direction: column;
+    justify-content: center;
+    padding: 28px 34px;
 }
 
 .zazu-dash-hero-side {
