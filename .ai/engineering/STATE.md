@@ -60,6 +60,19 @@ Owner clarified that the authenticated index/dashboard must be refined alone unt
 - Re-read all three changed files from current `main`; source integrity checks passed. Automated test execution and rendered desktop/mobile acceptance remain **UNVERIFIED**. No styling rollout to other pages is authorized.
 
 
+## Dashboard events and quote panels — 2026-11-06
+
+- Reworked the Upcoming Events and Quote Pipeline panel headers to match the supplied reference hierarchy: compact icon tile, clear heading, supporting sentence and contextual action link.
+- Replaced the event timeline's narrow date/time column and connector line with a dedicated day / month / year date tile, event identity block, status and trailing navigation cue. Existing event links and status values remain intact.
+- Refined quote stage cards with clearer status labels, count emphasis and status-colour markers. Kept the actual persisted workflow semantics: draft, sent, accepted (presented as Approved), declined and expired (combined for the closed bucket). No unsupported "under review" state or count was fabricated.
+- Added responsive panel-header, event-card and two-column quote-stage treatments down to narrow mobile widths.
+- Added focused source regression coverage for the new panel hierarchy, date tile, status mapping, route preservation and responsive rules.
+- Changed files: `resources/views/dashboard.blade.php`, `resources/css/zazu-final-visual-sweep.css`, `tests/Feature/UiProportionFoundationTest.php`.
+- Commits: `86be043` (view), `de9f824` (CSS), `c7eb8fe` (test), `3dc8d11` (test literal correction).
+- Re-read current-main source and checked required markup, status-count expressions, routes, responsive rules and regression-test presence. Source checks pass. Automated test execution and rendered desktop/mobile acceptance remain **UNVERIFIED**. Dashboard-only scope remains in force; no styling rollout to other pages.
+
+
+
 ## Shared shell topbar correction — 2026-11-06
 
 - Source audit found a later `.zazu-topbar` rule overriding the earlier near-white workspace surface with 88% sidebar colour. This was a direct conflict with the intended light workspace / blue sidebar composition.
