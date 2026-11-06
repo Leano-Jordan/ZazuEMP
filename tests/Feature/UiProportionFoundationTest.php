@@ -710,4 +710,18 @@ class UiProportionFoundationTest extends TestCase
         $this->assertStringContainsString('@media (max-width: 620px)', $css);
     }
 
+
+    public function test_dashboard_panels_keep_compact_internal_density_and_aligned_rows(): void
+    {
+        $css = file_get_contents(resource_path('css/zazu-final-visual-sweep.css'));
+
+        $this->assertIsString($css);
+        $this->assertStringContainsString('min-height: 76px;', $css);
+        $this->assertStringContainsString('min-height: 58px;', $css);
+        $this->assertStringContainsString('min-height: 82px;', $css);
+        $this->assertStringContainsString('padding: 0 16px 10px;', $css);
+        $this->assertStringContainsString('min-height: 98px !important;', $css);
+        $this->assertStringContainsString('gap: 7px;', $css);
+    }
+
 }
