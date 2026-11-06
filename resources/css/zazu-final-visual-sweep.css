@@ -6147,3 +6147,282 @@ body.zazu-mobile-menu-open .zazu-helper {
         top: 11px;
     }
 }
+
+
+/* Director — reference-led upcoming events and quote pipeline panels. */
+.zazu-dash-panel-head {
+    display: grid;
+    grid-template-columns: 38px minmax(0, 1fr) auto;
+    align-items: center;
+    gap: 12px;
+    min-height: 76px;
+    padding: 14px 18px;
+}
+
+.zazu-dash-panel-icon {
+    display: grid;
+    width: 38px;
+    height: 38px;
+    place-items: center;
+    border-radius: 12px;
+    background: color-mix(in srgb, var(--zazu-blue-soft) 82%, var(--zazu-card-bg));
+    color: var(--zazu-blue-brand);
+}
+
+.zazu-dash-panel-icon svg {
+    display: block;
+    width: 21px;
+    height: 21px;
+    stroke: currentColor;
+    stroke-width: 1.8;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+}
+
+.zazu-dash-panel-heading {
+    min-width: 0;
+}
+
+.zazu-dash-panel-heading h3 {
+    margin: 0 0 3px;
+    color: var(--zazu-text-ink);
+    font-size: 16px;
+    font-weight: 750;
+    letter-spacing: -.035em;
+    line-height: 1.2;
+}
+
+.zazu-dash-panel-heading p {
+    margin: 0;
+    color: var(--zazu-text-muted);
+    font-size: 11px;
+    line-height: 1.4;
+}
+
+.zazu-dash-panel-head .zazu-text-action {
+    align-self: center;
+    padding: 0;
+    white-space: nowrap;
+}
+
+.zazu-dash-timeline {
+    display: grid;
+    gap: 8px;
+    padding: 0 14px 14px;
+}
+
+.zazu-dash-event {
+    display: grid;
+    grid-template-columns: 64px minmax(0, 1fr) auto;
+    align-items: center;
+    gap: 12px;
+    min-height: 88px;
+    padding: 10px 12px;
+    border: 1px solid var(--zazu-card-border);
+    border-radius: 11px;
+    background: color-mix(in srgb, var(--zazu-blue-soft) 18%, var(--zazu-card-bg));
+    text-decoration: none;
+    transition: border-color .16s ease, background .16s ease, transform .16s ease;
+}
+
+.zazu-dash-event:hover {
+    border-color: color-mix(in srgb, var(--zazu-blue-brand) 38%, var(--zazu-card-border));
+    background: color-mix(in srgb, var(--zazu-blue-soft) 42%, var(--zazu-card-bg));
+    transform: translateY(-1px);
+}
+
+.zazu-dash-event-date {
+    display: grid;
+    min-height: 66px;
+    align-content: center;
+    justify-items: center;
+    padding: 6px 4px;
+    border: 1px solid color-mix(in srgb, var(--zazu-blue-brand) 12%, var(--zazu-card-border));
+    border-radius: 9px;
+    background: color-mix(in srgb, var(--zazu-blue-soft) 52%, var(--zazu-card-bg));
+    color: var(--zazu-text-ink);
+    font-variant-numeric: tabular-nums;
+}
+
+.zazu-dash-event-date strong {
+    font-family: var(--zazu-font-display);
+    font-size: 23px;
+    font-weight: 750;
+    line-height: 1;
+}
+
+.zazu-dash-event-date span {
+    margin-top: 3px;
+    color: var(--zazu-blue-brand);
+    font-size: 10px;
+    font-weight: 750;
+    letter-spacing: .045em;
+    text-transform: uppercase;
+}
+
+.zazu-dash-event-date small {
+    margin-top: 2px;
+    color: var(--zazu-text-muted);
+    font-size: 9px;
+    line-height: 1.1;
+}
+
+.zazu-dash-event-copy {
+    display: grid;
+    min-width: 0;
+    gap: 4px;
+}
+
+.zazu-dash-event-copy strong {
+    color: var(--zazu-text-ink);
+    font-size: 12px;
+    font-weight: 750;
+    line-height: 1.3;
+}
+
+.zazu-dash-event-copy span {
+    margin: 0;
+    color: var(--zazu-text-body);
+    font-size: 11px;
+    line-height: 1.3;
+}
+
+.zazu-dash-event-copy small {
+    margin: 0;
+    color: var(--zazu-blue-brand);
+    font-size: 10px;
+}
+
+.zazu-dash-event-trailing {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.zazu-dash-event-arrow {
+    color: var(--zazu-blue-brand);
+    font-size: 23px;
+    line-height: 1;
+}
+
+.zazu-dash-commercial .zazu-dash-quote-stages {
+    gap: 8px;
+    padding: 0 16px 12px;
+}
+
+.zazu-dash-commercial .zazu-dash-quote-stage {
+    min-height: 94px;
+    align-content: start;
+    gap: 6px;
+    padding: 11px 10px;
+    border-color: color-mix(in srgb, var(--zazu-blue-brand) 8%, var(--zazu-card-border));
+    border-radius: 10px;
+}
+
+.zazu-dash-commercial .zazu-dash-quote-stage > span {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    min-height: 15px;
+    font-size: 10px;
+    font-weight: 700;
+    line-height: 1.25;
+}
+
+.zazu-dash-commercial .zazu-dash-quote-stage > span::before {
+    content: "";
+    width: 7px;
+    height: 7px;
+    flex: 0 0 7px;
+    border-radius: 50%;
+    background: currentColor;
+}
+
+.zazu-dash-commercial .zazu-dash-quote-stage.is-draft > span { color: var(--zazu-warning-ink); }
+.zazu-dash-commercial .zazu-dash-quote-stage.is-sent > span { color: var(--zazu-blue-brand); }
+.zazu-dash-commercial .zazu-dash-quote-stage.is-accepted > span { color: var(--zazu-success-ink); }
+.zazu-dash-commercial .zazu-dash-quote-stage.is-closed > span { color: var(--zazu-text-muted); }
+
+.zazu-dash-commercial .zazu-dash-quote-stage > strong {
+    font-size: 25px;
+    line-height: 1;
+}
+
+.zazu-dash-commercial .zazu-dash-quote-stage > small {
+    font-size: 10px;
+    line-height: 1.3;
+}
+
+@media (max-width: 620px) {
+    .zazu-dash-panel-head {
+        grid-template-columns: 34px minmax(0, 1fr);
+        gap: 9px;
+        padding: 12px 13px;
+    }
+
+    .zazu-dash-panel-icon {
+        width: 34px;
+        height: 34px;
+        border-radius: 10px;
+    }
+
+    .zazu-dash-panel-icon svg {
+        width: 19px;
+        height: 19px;
+    }
+
+    .zazu-dash-panel-head .zazu-text-action {
+        grid-column: 2;
+        justify-self: start;
+        margin-top: -2px;
+    }
+
+    .zazu-dash-timeline {
+        padding: 0 10px 10px;
+    }
+
+    .zazu-dash-event {
+        grid-template-columns: 54px minmax(0, 1fr) auto;
+        gap: 9px;
+        min-height: 78px;
+        padding: 8px;
+    }
+
+    .zazu-dash-event-date {
+        min-height: 60px;
+    }
+
+    .zazu-dash-event-date strong {
+        font-size: 20px;
+    }
+
+    .zazu-dash-event-trailing {
+        gap: 4px;
+    }
+
+    .zazu-dash-event-trailing .zazu-dash-status {
+        max-width: 76px;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+    .zazu-dash-commercial .zazu-dash-quote-stages {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        padding-inline: 12px;
+    }
+}
+
+@media (max-width: 380px) {
+    .zazu-dash-event {
+        grid-template-columns: 48px minmax(0, 1fr);
+    }
+
+    .zazu-dash-event-trailing {
+        grid-column: 2;
+        justify-self: start;
+    }
+
+    .zazu-dash-event-date strong {
+        font-size: 18px;
+    }
+}
