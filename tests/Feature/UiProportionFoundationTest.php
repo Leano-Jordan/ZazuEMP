@@ -622,4 +622,31 @@ class UiProportionFoundationTest extends TestCase
         $this->assertStringContainsString('@media (max-width: 380px)', $css);
     }
 
+
+    public function test_dashboard_quick_actions_use_reference_led_icon_and_supporting_copy(): void
+    {
+        $dashboard = file_get_contents(resource_path('views/dashboard.blade.php'));
+        $css = file_get_contents(resource_path('css/zazu-final-visual-sweep.css'));
+
+        $this->assertIsString($dashboard);
+        $this->assertIsString($css);
+
+        foreach ([
+            'zazu-dash-action-icon',
+            'zazu-dash-action-copy',
+            'Start a new job',
+            'Turn an enquiry into a proposal',
+            'People and organisations',
+            'View your schedule',
+        ] as $expected) {
+            $this->assertStringContainsString($expected, $dashboard);
+        }
+
+        $this->assertStringContainsString('.zazu-dash-action-icon {', $css);
+        $this->assertStringContainsString('.zazu-dash-action-copy strong {', $css);
+        $this->assertStringContainsString('.zazu-dash-action-copy small {', $css);
+        $this->assertStringContainsString('grid-template-columns: 34px minmax(0, 1fr);', $css);
+        $this->assertStringContainsString('aria-hidden="true"><svg', $dashboard);
+    }
+
 }
