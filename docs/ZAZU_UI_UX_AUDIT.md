@@ -442,3 +442,11 @@ Verification boundary: source-level conditional and markup inspection only. Scre
 - Updated the placeholder to name the actual searchable business areas: events, customers, quotes and inventory.
 - Added a focused regression assertion covering the wide desktop sizing, mobile rule and search scope copy.
 - Source re-read confirms all three changes are present on main. Automated tests, Vite build and rendered desktop/mobile/light/dark acceptance remain UNVERIFIED; the browser-rendered appearance still requires owner review.
+
+## Dashboard KPI icon hierarchy — 2026-11-06
+
+- Matched the supplied dashboard reference's icon-led KPI scan pattern using four lightweight inline SVG icons: active events, draft quotes, customers and the next 14 days.
+- Reworked the KPI cards into a two-column icon/content layout on desktop and a narrower icon/content layout on phones. The existing KPI labels, live Blade values, route destinations, permission gates and metric calculations remain unchanged.
+- Kept the icon treatment CSS-token-driven so the existing light and dark themes inherit their current semantic colours; no raster/generated assets were added.
+- Added a focused regression test for all four icons, desktop/mobile card geometry and continued live metric rendering. The stylesheet is included in the shared app Vite bundle.
+- Source re-fetch confirms the markup, CSS and regression assertion are present on main. PHPUnit, Vite build and rendered desktop/tablet/mobile light/dark acceptance remain UNVERIFIED; do not claim visual acceptance until rendered review is completed.
