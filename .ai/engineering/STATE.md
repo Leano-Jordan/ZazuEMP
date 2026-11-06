@@ -976,3 +976,12 @@ Latest source change: commit `29a38f55d3d3ff5979cf844ddbd624a9ea279515` consolid
 - Added an explicit regression assertion for the 760px dashboard stacking breakpoint.
 - No shared shell, non-dashboard page, business logic, routes, permissions or metrics changed.
 - Source-level verification only. PHPUnit, Vite build and rendered desktop/tablet/mobile light/dark acceptance remain unverified; browser access is unavailable in this session.
+
+## Dashboard panel density and alignment refinement — 2026-11-06
+
+- Tightened Upcoming Events row height and vertical spacing while retaining the date tile, event identity, reference and status hierarchy.
+- Reduced Quote Pipeline stage-card height and internal spacing, and tightened the queue-state strip so the four lifecycle stages remain the main visual focus.
+- Reduced Workspace Health tile height and padding to balance the paired lower panels without hiding labels or live values.
+- Kept Priority Now content, business data, routes, permissions, responsive breakpoints and shared shell unchanged.
+- Added source regression coverage for the compact panel dimensions. Source changes are committed; PHPUnit, Vite and rendered desktop/tablet/mobile light/dark acceptance remain unverified.
+
