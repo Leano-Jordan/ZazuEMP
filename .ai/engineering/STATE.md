@@ -60,6 +60,18 @@ Owner clarified that the authenticated index/dashboard must be refined alone unt
 - Re-read all three changed files from current `main`; source integrity checks passed. Automated test execution and rendered desktop/mobile acceptance remain **UNVERIFIED**. No styling rollout to other pages is authorized.
 
 
+## Dashboard priority and workspace health panels — 2026-11-06
+
+- Added the reference-style icon-led Priority Now header and a concise attention-focused subtitle.
+- Reframed the lower-right panel as Workspace Health with an icon-led header and four permission-gated resource cards for open purchase orders, low stock, available assets and unpaid invoices.
+- Kept each card tied to its real dashboard metric and existing destination. Status dots and supporting copy are derived from the actual metric values; no unverified claims about connectivity or system uptime were introduced.
+- Added responsive card styling and regression coverage for truthful zero/non-zero states, metric bindings and route preservation.
+- Changed files: `resources/views/dashboard.blade.php`, `resources/css/zazu-final-visual-sweep.css`, `tests/Feature/UiProportionFoundationTest.php`.
+- Commits: `1a2bcbc` (view), `bdf077d` (CSS), `0c58b35` (test), `de600fb` (test literal correction).
+- Re-read current-main source; markup, metrics, routes, responsive CSS and regression-test presence checks pass. Automated test execution and rendered desktop/mobile acceptance remain **UNVERIFIED**. Dashboard-only scope remains in force.
+
+
+
 ## Dashboard events and quote panels — 2026-11-06
 
 - Reworked the Upcoming Events and Quote Pipeline panel headers to match the supplied reference hierarchy: compact icon tile, clear heading, supporting sentence and contextual action link.
