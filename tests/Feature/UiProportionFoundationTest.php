@@ -587,4 +587,21 @@ class UiProportionFoundationTest extends TestCase
         $this->assertStringContainsString('placeholder="Search events, customers, quotes, inventory…"', $layout);
     }
 
+
+    public function test_dashboard_kpis_use_reference_aligned_icon_led_cards_on_desktop_and_mobile(): void
+    {
+        $dashboard = file_get_contents(resource_path('views/dashboard.blade.php'));
+        $css = file_get_contents(resource_path('css/zazu-final-visual-sweep.css'));
+
+        $this->assertIsString($dashboard);
+        $this->assertIsString($css);
+        $this->assertSame(4, substr_count($dashboard, 'class="zazu-dash-metric-icon"'));
+        $this->assertSame(4, substr_count($dashboard, '<svg viewBox="0 0 24 24" fill="none">'));
+        $this->assertStringContainsString('grid-template-columns: 48px minmax(0, 1fr);', $css);
+        $this->assertStringContainsString('@media (max-width: 520px)', $css);
+        $this->assertStringContainsString('grid-template-columns: 38px minmax(0, 1fr);', $css);
+        $this->assertStringContainsString("{{ number_format($metrics['active_work']) }}", $dashboard);
+        $this->assertStringContainsString("{{ number_format($metrics['draft_quotes']) }}", $dashboard);
+    }
+
 }
