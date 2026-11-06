@@ -5589,7 +5589,7 @@ body.zazu-mobile-menu-open .zazu-helper {
 
 .zazu-dash-commercial {
     grid-column: 2;
-    grid-row: 3;
+    grid-row: auto;
 }
 
 .zazu-dash-event {
@@ -5626,7 +5626,7 @@ body.zazu-mobile-menu-open .zazu-helper {
 
 .zazu-dash-resources {
     grid-column: 2;
-    grid-row: 4;
+    grid-row: auto;
 }
 
 .zazu-dash-resource-grid {
