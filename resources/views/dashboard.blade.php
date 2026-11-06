@@ -30,7 +30,7 @@
                     src="{{ route('business.media', ['type' => 'dashboard']) }}?v={{ $business->updated_at?->timestamp ?? 0 }}"
                     alt=""
                     aria-hidden="true"
-                    class="zazu-dash-capability-art zazu-dash-hero-image"
+                    class="zazu-dash-hero-image zazu-dash-capability-art"
                 >
             @endif
         </aside>
