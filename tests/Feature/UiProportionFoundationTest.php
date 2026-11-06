@@ -679,4 +679,34 @@ class UiProportionFoundationTest extends TestCase
         $this->assertStringNotContainsString('zazu-dash-event-line', $dashboard);
     }
 
+
+    public function test_dashboard_priority_and_workspace_health_panels_use_truthful_resource_states(): void
+    {
+        $dashboard = file_get_contents(resource_path('views/dashboard.blade.php'));
+        $css = file_get_contents(resource_path('css/zazu-final-visual-sweep.css'));
+
+        $this->assertIsString($dashboard);
+        $this->assertIsString($css);
+
+        foreach ([
+            'Priority now',
+            'What needs your attention today.',
+            'Workspace health',
+            'Key operational resources at a glance.',
+            'zazu-dash-health-item',
+            'Replenishment needed',
+            'No items need replenishment',
+            'Payment follow-up required',
+            'No outstanding invoices',
+            "$"."metrics['available_assets'] > 0",
+        ] as $expected) {
+            $this->assertStringContainsString($expected, $dashboard);
+        }
+
+        $this->assertStringContainsString('.zazu-dash-health-item {', $css);
+        $this->assertStringContainsString('.zazu-dash-health-label i.is-warning', $css);
+        $this->assertStringContainsString('.zazu-dash-health-label i.is-clear', $css);
+        $this->assertStringContainsString('@media (max-width: 620px)', $css);
+    }
+
 }
