@@ -5559,18 +5559,87 @@ body.zazu-mobile-menu-open .zazu-helper {
     padding: 0;
 }
 .zazu-dash-quick-actions .zazu-btn {
-    display: flex;
+    display: grid;
+    grid-template-columns: 40px minmax(0, 1fr);
     min-width: 0;
     min-height: 72px;
     align-items: center;
-    justify-content: space-between;
-    gap: 10px;
-    padding: 12px 15px;
+    justify-content: initial;
+    gap: 12px;
+    padding: 12px 14px;
     border-radius: 11px;
     font-size: 13px;
     line-height: 1.3;
     text-align: left;
     text-decoration: none;
+}
+
+.zazu-dash-action-icon {
+    display: grid;
+    width: 40px;
+    height: 40px;
+    place-items: center;
+    border-radius: 12px;
+    background: color-mix(in srgb, var(--zazu-primary-soft) 82%, var(--zazu-card-bg));
+    color: var(--zazu-primary);
+}
+
+.zazu-dash-action-icon svg {
+    display: block;
+    width: 21px;
+    height: 21px;
+    stroke: currentColor;
+    stroke-width: 1.8;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+}
+
+.zazu-dash-action-copy {
+    display: grid;
+    min-width: 0;
+    gap: 3px;
+}
+
+.zazu-dash-action-copy strong {
+    color: var(--zazu-text-ink);
+    font-size: 13px;
+    font-weight: 700;
+    line-height: 1.25;
+}
+
+.zazu-dash-action-copy small {
+    color: var(--zazu-text-body);
+    font-size: 10.5px;
+    font-weight: 450;
+    line-height: 1.35;
+}
+
+.zazu-dash-quick-actions .zazu-btn-cta .zazu-dash-action-icon {
+    background: color-mix(in srgb, white 16%, transparent);
+    color: white;
+}
+
+.zazu-dash-quick-actions .zazu-btn-cta .zazu-dash-action-copy strong,
+.zazu-dash-quick-actions .zazu-btn-cta .zazu-dash-action-copy small {
+    color: white;
+}
+
+@media (max-width: 620px) {
+    .zazu-dash-quick-actions .zazu-btn {
+        grid-template-columns: 34px minmax(0, 1fr);
+        gap: 9px;
+    }
+
+    .zazu-dash-action-icon {
+        width: 34px;
+        height: 34px;
+        border-radius: 10px;
+    }
+
+    .zazu-dash-action-icon svg {
+        width: 19px;
+        height: 19px;
+    }
 }
 .zazu-dash-quick-actions .zazu-btn-secondary {
     border: 1px solid var(--zazu-card-border);
