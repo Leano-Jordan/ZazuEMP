@@ -182,7 +182,7 @@
                 )
                     <div class="zazu-dash-focus-item is-clear">
                         <span class="zazu-dash-focus-marker"></span>
-                        <span><strong>No immediate priority flagged</strong><small>The workspace has no setup, schedule, quote or resource action to surface right now.</small></span>
+                        <span><strong>No immediate priority flagged</strong><small>No setup, quote or resource action needs attention right now.</small></span>
                     </div>
                 @endif
             </div>
