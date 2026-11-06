@@ -32,6 +32,21 @@ The 2026-11-01 local Windows-host proposal was exploratory and is no longer the 
 
 The installed-device offline continuity mission below remains open and is the next program after the current owner-directed dashboard/UI mission; this visual work does not close or weaken it.
 
+## Index-only dashboard refinement — 2026-11-06
+
+Owner clarified that the authenticated index/dashboard must be refined alone until visual approval; no rollout to other application pages is authorized.
+
+- Reworked the dashboard welcome hierarchy to match Designer (2): greeting, owner name, prominent lead line and secondary supporting line; removed the extra uppercase kicker.
+- Separated quick actions from the enclosing panel so they render as individual dashboard actions rather than a boxed toolbar.
+- Increased KPI label/supporting-text readability while retaining the four live, permission-aware business metrics.
+- Inset the business-capability callout within the welcome banner and preserved the optional business-owned artwork hook.
+- Kept the two-column run-sheet / quote-pipeline row and priority / operational-readiness row.
+- Dashboard-only selectors remain prefixed `.zazu-dash-*`; shared shell, navigation, global tokens and other page views were not intentionally changed.
+- Changed files: `resources/views/dashboard.blade.php`, `resources/css/zazu-final-visual-sweep.css`.
+- Latest source commit at record time: `58da15307477eb49a8adb2655585a1102735acda` (main).
+- Verification boundary: source re-read; current-head browser smoke and Laravel/quality workflows were still running at record time. Earlier quality runs exposed stale assertions for superseded shell palette/structure and a pre-existing PHPMD complexity threshold; those are not visual acceptance evidence.
+- Rendered desktop/mobile visual acceptance remains **UNVERIFIED**. Owner review is the design acceptance gate. Do not propagate styling to other pages before explicit approval.
+
 ## Shared shell topbar correction — 2026-11-06
 
 - Source audit found a later `.zazu-topbar` rule overriding the earlier near-white workspace surface with 88% sidebar colour. This was a direct conflict with the intended light workspace / blue sidebar composition.
