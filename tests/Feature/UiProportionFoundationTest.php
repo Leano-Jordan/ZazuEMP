@@ -603,4 +603,23 @@ class UiProportionFoundationTest extends TestCase
         $this->assertStringContainsString('number_format($metrics[', $dashboard);
     }
 
+
+    public function test_dashboard_grid_matches_reference_scan_order_and_paired_panel_layout(): void
+    {
+        $css = file_get_contents(resource_path('css/zazu-final-visual-sweep.css'));
+
+        $this->assertIsString($css);
+        $this->assertStringContainsString('/* INDEX DASHBOARD — final composition pass against Designer (2).', $css);
+        $this->assertStringContainsString('.zazu-dash-metrics {', $css);
+        $this->assertStringContainsString('grid-template-columns: repeat(4, minmax(0, 1fr));', $css);
+        $this->assertStringContainsString('.zazu-dash-run {', $css);
+        $this->assertStringContainsString('grid-column: 1;', $css);
+        $this->assertStringContainsString('.zazu-dash-commercial {', $css);
+        $this->assertStringContainsString('grid-column: 2;', $css);
+        $this->assertStringContainsString('.zazu-dash-focus {', $css);
+        $this->assertStringContainsString('.zazu-dash-resources {', $css);
+        $this->assertStringContainsString('@media (max-width: 900px)', $css);
+        $this->assertStringContainsString('@media (max-width: 380px)', $css);
+    }
+
 }
