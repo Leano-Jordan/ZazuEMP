@@ -47,6 +47,19 @@ Owner clarified that the authenticated index/dashboard must be refined alone unt
 - Verification boundary: source re-read; current-head browser smoke and Laravel/quality workflows were still running at record time. Earlier quality runs exposed stale assertions for superseded shell palette/structure and a pre-existing PHPMD complexity threshold; those are not visual acceptance evidence.
 - Rendered desktop/mobile visual acceptance remains **UNVERIFIED**. Owner review is the design acceptance gate. Do not propagate styling to other pages before explicit approval.
 
+
+## Dashboard quick-action refinement — 2026-11-06
+
+- Compared the current dashboard source with the supplied Designer (1) and Designer (2) references.
+- Finding: quick actions were plain text links with trailing symbols; the references use compact icon-led actions with a clear title and one-line task description.
+- Updated the four existing permission-gated actions (Create event, Create quote, Add customer, Open calendar) with inline SVG icons and concise supporting copy. Existing destinations and permission checks are unchanged.
+- Updated the existing dashboard quick-action CSS owner in place: 40px icon tiles, consistent two-line copy, stronger primary action contrast, and 34px icon tiles at mobile widths. No new global tokens, shared-shell rules, routes, or page styles were added.
+- Added a focused source regression test for action labels, supporting copy, icon treatment and mobile sizing.
+- Changed files: `resources/views/dashboard.blade.php`, `resources/css/zazu-final-visual-sweep.css`, `tests/Feature/UiProportionFoundationTest.php`.
+- Commits: `107377e` (view), `845bb39` (CSS), `7563404` (test).
+- Re-read all three changed files from current `main`; source integrity checks passed. Automated test execution and rendered desktop/mobile acceptance remain **UNVERIFIED**. No styling rollout to other pages is authorized.
+
+
 ## Shared shell topbar correction — 2026-11-06
 
 - Source audit found a later `.zazu-topbar` rule overriding the earlier near-white workspace surface with 88% sidebar colour. This was a direct conflict with the intended light workspace / blue sidebar composition.
