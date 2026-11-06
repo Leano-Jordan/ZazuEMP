@@ -134,11 +134,9 @@
         </section>
 
         <section class="zazu-dash-focus zazu-dash-surface" aria-label="Priority actions">
-            <header class="zazu-dash-surface-head">
-                <div>
-                    <span class="zazu-dash-kicker">Priority now</span>
-                    <h3>What needs your attention</h3>
-                </div>
+            <header class="zazu-dash-surface-head zazu-dash-panel-head">
+                <span class="zazu-dash-panel-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none"><path d="M13.2 2.8 5.5 13h5.8l-.5 8.2L18.5 11h-5.8l.5-8.2Z"/></svg></span>
+                <div class="zazu-dash-panel-heading"><h3>Priority now</h3><p>What needs your attention today.</p></div>
             </header>
             <div class="zazu-dash-focus-grid">
                 @if($workspaceTools['quotes'] && $metrics['draft_quotes'] > 0)
@@ -192,25 +190,39 @@
 
         @if($experienceLevel !== 'basic')
         <section class="zazu-dash-resources zazu-dash-surface">
-            <header class="zazu-dash-surface-head">
-                <div><span class="zazu-dash-kicker">Workspace health</span><h3>Operational readiness</h3></div>
-                <div class="flex flex-wrap gap-2">
-                    @if($workspaceTools['assets'])<a href="{{ route('assets.index') }}" class="zazu-text-action">Asset register →</a>@endif
-                    @if($workspaceTools['inventory'])<a href="{{ route('inventory.index') }}" class="zazu-text-action">Stock control →</a>@endif
-                </div>
+            <header class="zazu-dash-surface-head zazu-dash-panel-head">
+                <span class="zazu-dash-panel-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none"><path d="M3 12h4l2.2-6 4.1 12 2.2-6H21"/><path d="M12 3.5a8.5 8.5 0 1 0 8.5 8.5"/></svg></span>
+                <div class="zazu-dash-panel-heading"><h3>Workspace health</h3><p>Key operational resources at a glance.</p></div>
+                @if($workspaceTools['assets'])<a href="{{ route('assets.index') }}" class="zazu-text-action">Open assets →</a>@elseif($workspaceTools['inventory'])<a href="{{ route('inventory.index') }}" class="zazu-text-action">Open stock →</a>@endif
             </header>
             <div class="zazu-dash-resource-grid">
                 @if($workspaceTools['purchasing'])
-                    <a href="{{ route('purchasing.index') }}" class="zazu-quick-link"><span><strong>Open purchase orders</strong></span><strong>{{ number_format($metrics['open_purchase_orders']) }}</strong></a>
+                    <a href="{{ route('purchasing.index') }}" class="zazu-quick-link zazu-dash-health-item">
+                        <span class="zazu-dash-health-label"><i class="is-info"></i><strong>Open purchase orders</strong></span>
+                        <strong class="zazu-dash-health-value">{{ number_format($metrics['open_purchase_orders']) }}</strong>
+                        <small>Supplier orders awaiting closure</small>
+                    </a>
                 @endif
                 @if($workspaceTools['inventory'])
-                    <a href="{{ route('inventory.index') }}" class="zazu-quick-link"><span><strong>Low-stock items</strong></span><strong>{{ number_format($metrics['low_stock']) }}</strong></a>
+                    <a href="{{ route('inventory.index') }}" class="zazu-quick-link zazu-dash-health-item">
+                        <span class="zazu-dash-health-label"><i class="{{ $metrics['low_stock'] > 0 ? 'is-warning' : 'is-clear' }}"></i><strong>Low-stock items</strong></span>
+                        <strong class="zazu-dash-health-value">{{ number_format($metrics['low_stock']) }}</strong>
+                        <small>{{ $metrics['low_stock'] > 0 ? 'Replenishment needed' : 'No items need replenishment' }}</small>
+                    </a>
                 @endif
                 @if($workspaceTools['assets'])
-                    <a href="{{ route('assets.index') }}" class="zazu-quick-link"><span><strong>Available assets</strong></span><strong>{{ number_format($metrics['available_assets']) }}</strong></a>
+                    <a href="{{ route('assets.index') }}" class="zazu-quick-link zazu-dash-health-item">
+                        <span class="zazu-dash-health-label"><i class="{{ $metrics['available_assets'] > 0 ? 'is-clear' : 'is-neutral' }}"></i><strong>Available assets</strong></span>
+                        <strong class="zazu-dash-health-value">{{ number_format($metrics['available_assets']) }}</strong>
+                        <small>Ready for allocation</small>
+                    </a>
                 @endif
                 @if($workspaceTools['finance'])
-                    <a href="{{ route('finance.index') }}" class="zazu-quick-link"><span><strong>Unpaid invoices</strong></span><strong>{{ number_format($metrics['unpaid_invoices']) }}</strong></a>
+                    <a href="{{ route('finance.index') }}" class="zazu-quick-link zazu-dash-health-item">
+                        <span class="zazu-dash-health-label"><i class="{{ $metrics['unpaid_invoices'] > 0 ? 'is-warning' : 'is-clear' }}"></i><strong>Unpaid invoices</strong></span>
+                        <strong class="zazu-dash-health-value">{{ number_format($metrics['unpaid_invoices']) }}</strong>
+                        <small>{{ $metrics['unpaid_invoices'] > 0 ? 'Payment follow-up required' : 'No outstanding invoices' }}</small>
+                    </a>
                 @endif
             </div>
         </section>
