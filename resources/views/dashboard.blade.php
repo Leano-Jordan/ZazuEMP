@@ -30,13 +30,13 @@
                     src="{{ route('business.media', ['type' => 'dashboard']) }}?v={{ $business->updated_at?->timestamp ?? 0 }}"
                     alt=""
                     aria-hidden="true"
-                    class="zazu-dash-capability-art"
+                    class="zazu-dash-capability-art zazu-dash-hero-image"
                 >
             @endif
         </aside>
     </section>
 
-    <section class="zazu-dash-grid" aria-label="Dashboard operational overview">
+    <section class="zazu-dash-grid" aria-label="Live business records at a glance">
         <aside class="zazu-dash-metrics">
             @if($workspaceTools['work'])
             <a href="{{ route('work.index') }}" class="zazu-dash-metric zazu-dash-surface"><span class="zazu-dash-metric-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none"><rect x="3.5" y="5" width="17" height="15.5" rx="2.5"/><path d="M7.5 3.5v3M16.5 3.5v3M3.5 9.5h17"/></svg></span><span>Active events</span><strong>{{ number_format($metrics['active_work']) }}</strong><b>→</b></a>
