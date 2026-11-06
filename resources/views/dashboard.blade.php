@@ -57,14 +57,26 @@
         <section class="zazu-dash-quick-actions" aria-label="Quick actions">
             <div class="zazu-dash-actions">
                 @if($workspaceTools['work'] && app(\App\Support\PermissionService::class)->allows('work.create', auth()->user(), $business))
-                    <a href="{{ route('work.create') }}" class="zazu-btn zazu-btn-cta">Create event <span>+</span></a>
-                    <a href="{{ route('work.create', ['start' => 'quote']) }}" class="zazu-btn zazu-btn-secondary">Create quote <span>+</span></a>
+                    <a href="{{ route('work.create') }}" class="zazu-btn zazu-btn-cta">
+                        <span class="zazu-dash-action-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none"><rect x="3.5" y="5" width="17" height="15.5" rx="2.5"/><path d="M7.5 3.5v3M16.5 3.5v3M3.5 9.5h17M12 12v5M9.5 14.5h5"/></svg></span>
+                        <span class="zazu-dash-action-copy"><strong>Create event</strong><small>Start a new job</small></span>
+                    </a>
+                    <a href="{{ route('work.create', ['start' => 'quote']) }}" class="zazu-btn zazu-btn-secondary">
+                        <span class="zazu-dash-action-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none"><path d="M7 3.5h7l4.5 4.5v12A1.5 1.5 0 0 1 17 21.5H7A1.5 1.5 0 0 1 5.5 20V5A1.5 1.5 0 0 1 7 3.5Z"/><path d="M14 3.5V8h4.5M8.5 12h7M8.5 16h7"/></svg></span>
+                        <span class="zazu-dash-action-copy"><strong>Create quote</strong><small>Turn an enquiry into a proposal</small></span>
+                    </a>
                 @endif
                 @if($workspaceTools['customers'] && app(\App\Support\PermissionService::class)->allows('customers.create', auth()->user(), $business))
-                    <a href="{{ route('customers.create') }}" class="zazu-btn zazu-btn-secondary">Add customer <span>+</span></a>
+                    <a href="{{ route('customers.create') }}" class="zazu-btn zazu-btn-secondary">
+                        <span class="zazu-dash-action-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none"><circle cx="9" cy="8" r="3.25"/><path d="M3.5 19.5v-1.2a5.5 5.5 0 0 1 11 0v1.2M16 5.2a3.25 3.25 0 0 1 0 6.2M17 14.5a4.5 4.5 0 0 1 3.5 4.4v.6"/></svg></span>
+                        <span class="zazu-dash-action-copy"><strong>Add customer</strong><small>People and organisations</small></span>
+                    </a>
                 @endif
                 @if($workspaceTools['calendar'])
-                    <a href="{{ route('calendar.index') }}" class="zazu-btn zazu-btn-secondary">Open calendar <span>→</span></a>
+                    <a href="{{ route('calendar.index') }}" class="zazu-btn zazu-btn-secondary">
+                        <span class="zazu-dash-action-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none"><rect x="3.5" y="5" width="17" height="15.5" rx="2.5"/><path d="M7.5 3.5v3M16.5 3.5v3M3.5 9.5h17M12 12v4M10 14h4"/></svg></span>
+                        <span class="zazu-dash-action-copy"><strong>Open calendar</strong><small>View your schedule</small></span>
+                    </a>
                 @endif
             </div>
         </section>
