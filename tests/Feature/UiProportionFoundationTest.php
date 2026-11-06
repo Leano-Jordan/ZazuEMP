@@ -691,9 +691,7 @@ class UiProportionFoundationTest extends TestCase
 
         foreach ([
             'Priority now',
-            'What needs your attention today.',
             'Workspace health',
-            'Key operational resources at a glance.',
             'zazu-dash-health-item',
             'Replenishment needed',
             'No items need replenishment',
@@ -722,6 +720,31 @@ class UiProportionFoundationTest extends TestCase
         $this->assertStringContainsString('padding: 0 16px 10px;', $css);
         $this->assertStringContainsString('min-height: 98px !important;', $css);
         $this->assertStringContainsString('gap: 7px;', $css);
+    }
+
+
+    public function test_dashboard_panel_headers_keep_titles_without_redundant_subtitles(): void
+    {
+        $dashboard = file_get_contents(resource_path('views/dashboard.blade.php'));
+
+        $this->assertIsString($dashboard);
+        foreach ([
+            'Upcoming events',
+            'Quote pipeline',
+            'Priority now',
+            'Workspace health',
+        ] as $title) {
+            $this->assertStringContainsString('<h3>' . $title . '</h3>', $dashboard);
+        }
+
+        foreach ([
+            'Real events from your workspace, ordered by date.',
+            'Turn outstanding commercial work into the next action.',
+            'What needs your attention today.',
+            'Key operational resources at a glance.',
+        ] as $redundantCopy) {
+            $this->assertStringNotContainsString($redundantCopy, $dashboard);
+        }
     }
 
 }
