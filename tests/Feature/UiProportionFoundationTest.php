@@ -619,6 +619,7 @@ class UiProportionFoundationTest extends TestCase
         $this->assertStringContainsString('.zazu-dash-focus {', $css);
         $this->assertStringContainsString('.zazu-dash-resources {', $css);
         $this->assertStringContainsString('@media (max-width: 900px)', $css);
+        $this->assertStringContainsString('@media (max-width: 760px)', $css);
         $this->assertStringContainsString('@media (max-width: 380px)', $css);
     }
 
