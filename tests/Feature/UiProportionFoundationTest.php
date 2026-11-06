@@ -698,7 +698,7 @@ class UiProportionFoundationTest extends TestCase
             'No items need replenishment',
             'Payment follow-up required',
             'No outstanding invoices',
-            "$"."metrics['available_assets'] > 0",
+            '$metrics[\'available_assets\'] > 0',
         ] as $expected) {
             $this->assertStringContainsString($expected, $dashboard);
         }
