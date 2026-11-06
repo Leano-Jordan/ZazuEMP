@@ -82,17 +82,28 @@
         </section>
 
         <section class="zazu-dash-run zazu-dash-surface">
-            <header class="zazu-dash-surface-head">
-                <div><span class="zazu-dash-kicker">Run-sheet</span><h3>Upcoming events</h3></div>
-                @if($workspaceTools['work'])<a href="{{ route('work.index') }}" class="zazu-text-action">All work →</a>@endif
+            <header class="zazu-dash-surface-head zazu-dash-panel-head">
+                <span class="zazu-dash-panel-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none"><rect x="3.5" y="5" width="17" height="15.5" rx="2.5"/><path d="M7.5 3.5v3M16.5 3.5v3M3.5 9.5h17"/></svg></span>
+                <div class="zazu-dash-panel-heading"><h3>Upcoming events</h3><p>Real events from your workspace, ordered by date.</p></div>
+                @if($workspaceTools['work'])<a href="{{ route('work.index') }}" class="zazu-text-action">View all events →</a>@endif
             </header>
             <div class="zazu-dash-timeline">
                 @forelse($upcoming as $event)
                     <a href="{{ $workspaceTools['work'] ? route('work.show', $event) : route('calendar.index') }}" class="zazu-dash-event">
-                        <div class="zazu-dash-event-time"><strong>{{ $event->event_date ? 'DATE SET' : 'DATE TBC' }}</strong><span>{{ $event->event_date?->format('d M Y') ?: 'Date to be confirmed' }}</span></div>
-                        <div class="zazu-dash-event-line"><i></i></div>
-                        <div class="zazu-dash-event-copy"><strong>{{ $event->name }}</strong><span>{{ $event->customer?->name ?? 'No customer' }}</span><small class="mono">{{ $event->reference }}</small></div>
-                        <span class="zazu-dash-status status-{{ str_replace('_', '-', strtolower($event->status ?? 'open')) }}">{{ strtoupper(str_replace('_',' ',$event->status ?? 'OPEN')) }}</span>
+                        <span class="zazu-dash-event-date" aria-label="{{ $event->event_date?->format('d F Y') ?: 'Date to be confirmed' }}">
+                            <strong>{{ $event->event_date?->format('d') ?: 'TBC' }}</strong>
+                            <span>{{ $event->event_date?->format('M') ?: 'DATE' }}</span>
+                            <small>{{ $event->event_date?->format('Y') ?: 'PENDING' }}</small>
+                        </span>
+                        <span class="zazu-dash-event-copy">
+                            <strong>{{ $event->name }}</strong>
+                            <span>{{ $event->customer?->name ?? 'No customer' }}</span>
+                            <small class="mono">{{ $event->reference }}</small>
+                        </span>
+                        <span class="zazu-dash-event-trailing">
+                            <span class="zazu-dash-status status-{{ str_replace('_', '-', strtolower($event->status ?? 'open')) }}">{{ strtoupper(str_replace('_',' ',$event->status ?? 'OPEN')) }}</span>
+                            <span class="zazu-dash-event-arrow" aria-hidden="true">›</span>
+                        </span>
                     </a>
                 @empty
                     <div class="zazu-dash-empty"><strong>No scheduled work yet.</strong><span>Create a job with an event date and it will appear here.</span>@if($workspaceTools['work'])<a href="{{ route('work.create') }}" class="zazu-btn zazu-btn-primary">Create job</a>@endif</div>
@@ -100,15 +111,17 @@
             </div>
         </section>
 
-
-
         <section class="zazu-dash-commercial zazu-dash-surface">
-            <header class="zazu-dash-surface-head"><div><span class="zazu-dash-kicker">Commercial queue</span><h3>Quote pipeline</h3></div></header>
+            <header class="zazu-dash-surface-head zazu-dash-panel-head">
+                <span class="zazu-dash-panel-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none"><path d="M7 3.5h7l4.5 4.5v12A1.5 1.5 0 0 1 17 21.5H7A1.5 1.5 0 0 1 5.5 20V5A1.5 1.5 0 0 1 7 3.5Z"/><path d="M14 3.5V8h4.5M8.5 12h7M8.5 16h7"/></svg></span>
+                <div class="zazu-dash-panel-heading"><h3>Quote pipeline</h3><p>Turn outstanding commercial work into the next action.</p></div>
+                @if($workspaceTools['quotes'])<a href="{{ route('quotes.index') }}" class="zazu-text-action">Open quotes →</a>@endif
+            </header>
             <div class="zazu-dash-quote-stages" aria-label="Quote status breakdown">
                 <div class="zazu-dash-quote-stage is-draft"><span>Draft</span><strong>{{ number_format((int) ($quoteStatusCounts['draft'] ?? 0)) }}</strong><small>Being prepared</small></div>
                 <div class="zazu-dash-quote-stage is-sent"><span>Sent</span><strong>{{ number_format((int) ($quoteStatusCounts['sent'] ?? 0)) }}</strong><small>Awaiting response</small></div>
-                <div class="zazu-dash-quote-stage is-accepted"><span>Accepted</span><strong>{{ number_format((int) ($quoteStatusCounts['accepted'] ?? 0)) }}</strong><small>Customer approved</small></div>
-                <div class="zazu-dash-quote-stage is-closed"><span>Closed</span><strong>{{ number_format((int) (($quoteStatusCounts['declined'] ?? 0) + ($quoteStatusCounts['expired'] ?? 0))) }}</strong><small>Declined or expired</small></div>
+                <div class="zazu-dash-quote-stage is-accepted"><span>Approved</span><strong>{{ number_format((int) ($quoteStatusCounts['accepted'] ?? 0)) }}</strong><small>Won business</small></div>
+                <div class="zazu-dash-quote-stage is-closed"><span>Declined / expired</span><strong>{{ number_format((int) (($quoteStatusCounts['declined'] ?? 0) + ($quoteStatusCounts['expired'] ?? 0))) }}</strong><small>Not proceeding</small></div>
             </div>
             <div class="zazu-dash-queue-state {{ $metrics['draft_quotes'] > 0 ? 'is-warning' : 'is-clear' }}">
                 <strong>{{ $metrics['draft_quotes'] > 0 ? 'Action needed' : 'Queue clear' }}</strong>
