@@ -611,7 +611,7 @@ class UiProportionFoundationTest extends TestCase
         $this->assertIsString($css);
         $this->assertStringContainsString('/* DIRECTOR — dashboard hierarchy and card proportions.', $css);
         $this->assertStringContainsString('.zazu-dash-metrics {', $css);
-        $this->assertStringContainsString('grid-template-columns: repeat(4, minmax(0, 1fr));', $css);
+        $this->assertStringContainsString('grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));', $css);
         $this->assertStringContainsString('.zazu-dash-run {', $css);
         $this->assertStringContainsString('grid-column: 1;', $css);
         $this->assertStringContainsString('.zazu-dash-commercial {', $css);
