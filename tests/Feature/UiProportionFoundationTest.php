@@ -666,7 +666,7 @@ class UiProportionFoundationTest extends TestCase
             'zazu-dash-event-trailing',
             'Turn outstanding commercial work into the next action.',
             'Declined / expired',
-            "($quoteStatusCounts['accepted'] ?? 0)",
+            '($quoteStatusCounts[\'accepted\'] ?? 0)',
         ] as $expected) {
             $this->assertStringContainsString($expected, $dashboard);
         }
