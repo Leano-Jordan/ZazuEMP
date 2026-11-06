@@ -5446,11 +5446,11 @@ body.zazu-mobile-menu-open .zazu-helper {
    One final dashboard authority: KPI strip, shortcuts, paired work queues,
    paired attention panels. Keep the phone layout linear and touch-friendly. */
 .zazu-dash-hero {
-    grid-template-columns: minmax(0, 1fr) minmax(320px, 34%);
-    min-height: 220px;
+    grid-template-columns: minmax(0, 1fr) minmax(300px, 34%);
+    min-height: 210px;
     margin-bottom: 18px;
     background: linear-gradient(112deg,
-        color-mix(in srgb, var(--zazu-blue-soft) 90%, var(--zazu-card-bg)) 0%,
+        color-mix(in srgb, var(--zazu-blue-soft) 90%, var(--zazu-surface-2)) 0%,
         color-mix(in srgb, var(--zazu-accent-soft) 76%, var(--zazu-card-bg)) 72%,
         color-mix(in srgb, var(--zazu-warning-soft) 30%, var(--zazu-card-bg)) 100%);
 }
