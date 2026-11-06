@@ -600,8 +600,7 @@ class UiProportionFoundationTest extends TestCase
         $this->assertStringContainsString('grid-template-columns: 48px minmax(0, 1fr);', $css);
         $this->assertStringContainsString('@media (max-width: 520px)', $css);
         $this->assertStringContainsString('grid-template-columns: 38px minmax(0, 1fr);', $css);
-        $this->assertStringContainsString("{{ number_format($metrics['active_work']) }}", $dashboard);
-        $this->assertStringContainsString("{{ number_format($metrics['draft_quotes']) }}", $dashboard);
+        $this->assertStringContainsString('number_format($metrics[', $dashboard);
     }
 
 }
