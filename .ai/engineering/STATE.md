@@ -966,3 +966,13 @@ Latest source change: commit `29a38f55d3d3ff5979cf844ddbd624a9ea279515` consolid
 - No metric data, permissions, routes, dashboard section order, shared shell or non-dashboard page changed.
 - Source re-read confirms the canonical CSS rule and matching regression assertion on `main`. PHPUnit, Vite build and rendered desktop/tablet/mobile light/dark acceptance remain unverified. Browser connector was unavailable because no originating browser context was attached.
 - Next: review the dashboard's desktop/tablet breakpoints and shortcut-row density; retain the supplied reference scan order and do not propagate styling beyond the dashboard.
+
+
+## Dashboard desktop/tablet composition refinement — 2026-11-06
+
+- Kept the paired dashboard work panels in a two-column layout through tablet widths; the full single-column collapse now begins at 760px rather than 900px.
+- Preserved the 900px transition for the welcome hero and compact two-column KPI/quick-action rows, so the banner and dense controls adapt before the main work panels stack.
+- Corrected the quote-pipeline regression assertion to verify the actual four-stage quote grid instead of accidentally asserting the KPI grid rule.
+- Added an explicit regression assertion for the 760px dashboard stacking breakpoint.
+- No shared shell, non-dashboard page, business logic, routes, permissions or metrics changed.
+- Source-level verification only. PHPUnit, Vite build and rendered desktop/tablet/mobile light/dark acceptance remain unverified; browser access is unavailable in this session.
