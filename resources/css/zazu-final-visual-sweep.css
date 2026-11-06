@@ -5760,13 +5760,21 @@ body.zazu-mobile-menu-open .zazu-helper {
         min-height: 0;
         background: linear-gradient(112deg, var(--zazu-surface-2), var(--zazu-card-bg));
     }
+
     .zazu-dash-hero-side {
         margin: 0 12px 12px;
     }
+
     .zazu-dash-quick-actions .zazu-dash-actions {
         grid-template-columns: repeat(2, minmax(0, 1fr));
     }
 
+    .zazu-dash-metrics {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+}
+
+@media (max-width: 760px) {
     .zazu-dash-grid {
         grid-template-columns: minmax(0, 1fr);
     }
@@ -5779,10 +5787,6 @@ body.zazu-mobile-menu-open .zazu-helper {
     .zazu-dash-resources {
         grid-column: 1;
         grid-row: auto;
-    }
-
-    .zazu-dash-metrics {
-        grid-template-columns: repeat(2, minmax(0, 1fr));
     }
 }
 
