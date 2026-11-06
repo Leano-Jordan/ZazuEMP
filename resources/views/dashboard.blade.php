@@ -84,7 +84,7 @@
         <section class="zazu-dash-run zazu-dash-surface">
             <header class="zazu-dash-surface-head zazu-dash-panel-head">
                 <span class="zazu-dash-panel-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none"><rect x="3.5" y="5" width="17" height="15.5" rx="2.5"/><path d="M7.5 3.5v3M16.5 3.5v3M3.5 9.5h17"/></svg></span>
-                <div class="zazu-dash-panel-heading"><h3>Upcoming events</h3><p>Real events from your workspace, ordered by date.</p></div>
+                <div class="zazu-dash-panel-heading"><h3>Upcoming events</h3></div>
                 @if($workspaceTools['work'])<a href="{{ route('work.index') }}" class="zazu-text-action">View all events →</a>@endif
             </header>
             <div class="zazu-dash-timeline">
@@ -114,7 +114,7 @@
         <section class="zazu-dash-commercial zazu-dash-surface">
             <header class="zazu-dash-surface-head zazu-dash-panel-head">
                 <span class="zazu-dash-panel-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none"><path d="M7 3.5h7l4.5 4.5v12A1.5 1.5 0 0 1 17 21.5H7A1.5 1.5 0 0 1 5.5 20V5A1.5 1.5 0 0 1 7 3.5Z"/><path d="M14 3.5V8h4.5M8.5 12h7M8.5 16h7"/></svg></span>
-                <div class="zazu-dash-panel-heading"><h3>Quote pipeline</h3><p>Turn outstanding commercial work into the next action.</p></div>
+                <div class="zazu-dash-panel-heading"><h3>Quote pipeline</h3></div>
                 @if($workspaceTools['quotes'])<a href="{{ route('quotes.index') }}" class="zazu-text-action">Open quotes →</a>@endif
             </header>
             <div class="zazu-dash-quote-stages" aria-label="Quote status breakdown">
@@ -136,7 +136,7 @@
         <section class="zazu-dash-focus zazu-dash-surface" aria-label="Priority actions">
             <header class="zazu-dash-surface-head zazu-dash-panel-head">
                 <span class="zazu-dash-panel-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none"><path d="M13.2 2.8 5.5 13h5.8l-.5 8.2L18.5 11h-5.8l.5-8.2Z"/></svg></span>
-                <div class="zazu-dash-panel-heading"><h3>Priority now</h3><p>What needs your attention today.</p></div>
+                <div class="zazu-dash-panel-heading"><h3>Priority now</h3></div>
             </header>
             <div class="zazu-dash-focus-grid">
                 @if($workspaceTools['quotes'] && $metrics['draft_quotes'] > 0)
@@ -192,7 +192,7 @@
         <section class="zazu-dash-resources zazu-dash-surface">
             <header class="zazu-dash-surface-head zazu-dash-panel-head">
                 <span class="zazu-dash-panel-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none"><path d="M3 12h4l2.2-6 4.1 12 2.2-6H21"/><path d="M12 3.5a8.5 8.5 0 1 0 8.5 8.5"/></svg></span>
-                <div class="zazu-dash-panel-heading"><h3>Workspace health</h3><p>Key operational resources at a glance.</p></div>
+                <div class="zazu-dash-panel-heading"><h3>Workspace health</h3></div>
                 @if($workspaceTools['assets'])<a href="{{ route('assets.index') }}" class="zazu-text-action">Open assets →</a>@elseif($workspaceTools['inventory'])<a href="{{ route('inventory.index') }}" class="zazu-text-action">Open stock →</a>@endif
             </header>
             <div class="zazu-dash-resource-grid">
