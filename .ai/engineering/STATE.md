@@ -985,3 +985,11 @@ Latest source change: commit `29a38f55d3d3ff5979cf844ddbd624a9ea279515` consolid
 - Kept Priority Now content, business data, routes, permissions, responsive breakpoints and shared shell unchanged.
 - Added source regression coverage for the compact panel dimensions. Source changes are committed; PHPUnit, Vite and rendered desktop/tablet/mobile light/dark acceptance remain unverified.
 
+## Dashboard panel-header copy correction — 2026-11-06
+
+- Source audit found four explanatory subtitles still present in the dashboard panel headers despite the earlier copy-density objective.
+- Removed the leftover subtitles from Upcoming Events, Quote Pipeline, Priority Now and Workspace Health. Section titles, action links, quote-stage descriptions, live records and priority explanations remain.
+- Updated the Priority/Workspace Health source assertions and added a regression test for all four concise panel headers.
+- Dashboard-only Blade and test changes. No data, routes, permissions, panel structure, shared shell or theme changes.
+- Source changes committed; PHPUnit, Vite and rendered browser acceptance remain unverified.
+
