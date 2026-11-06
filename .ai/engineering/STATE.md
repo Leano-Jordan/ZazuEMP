@@ -905,3 +905,16 @@ Latest source change: commit `29a38f55d3d3ff5979cf844ddbd624a9ea279515` consolid
 - Kept the icon treatment CSS-token-driven so the existing light and dark themes inherit their current semantic colours; no raster/generated assets were added.
 - Added a focused regression test for all four icons, desktop/mobile card geometry and continued live metric rendering. The stylesheet is included in the shared app Vite bundle.
 - Source re-fetch confirms the markup, CSS and regression assertion are present on main. PHPUnit, Vite build and rendered desktop/tablet/mobile light/dark acceptance remain UNVERIFIED; do not claim visual acceptance until rendered review is completed.
+
+## Dashboard composition correction — 2026-11-06
+
+- Owner rejected the previous refinement as insufficiently close to the references. Re-inspection identified the main structural mismatch: KPI cards and lower operational panels were not consistently arranged in the reference scan order.
+- Corrected the existing canonical Director dashboard rule block rather than leaving a second appended override layer.
+- Desktop composition now follows: welcome banner → four KPI cards in one row → quick-action strip → Upcoming Events / Quote Pipeline side-by-side → Priority Now / Operational Readiness side-by-side.
+- Tablet and mobile breakpoints collapse the grid deliberately; KPI and quick-action cards use two columns on narrower screens and one column on very narrow screens.
+- Resource readiness tiles now use a compact two-column layout on desktop, matching the paired lower panel rather than stretching across the full dashboard.
+- Scope remains limited to dashboard CSS and its regression test. No shared shell, sidebar, navigation, other page views, data, routes or permission rules changed in this pass.
+- Canonical CSS correction: `4f0d2176f34a643ef68b05eae1cb6a2b937761d9`. Regression assertion update: `74165ccce0c4008471989b290af797e76723a417`.
+- CI evidence for the latest tested source: dashboard-specific assertions pass; Laravel reports 369 passed and 6 failures in legacy shell/onboarding expectations unrelated to this dashboard layout. PHPMD still flags the existing DashboardController `__invoke()` at 101 lines (threshold 100). Psalm and populated upgrade/rollback checks pass. Browser regression is still running; rendered visual acceptance remains UNVERIFIED.
+- Owner visual approval remains the acceptance gate. Do not propagate dashboard styling to other pages.
+
