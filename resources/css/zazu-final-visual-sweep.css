@@ -5495,8 +5495,8 @@ body.zazu-mobile-menu-open .zazu-helper {
 .zazu-dash-metrics {
     grid-column: 1 / -1;
     grid-row: 1;
-    grid-template-columns: repeat(auto-fit, minmax(min(100%, 190px), 1fr));
-    gap: 10px;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 12px;
     align-content: stretch;
 }
 
@@ -5584,7 +5584,7 @@ body.zazu-mobile-menu-open .zazu-helper {
 
 .zazu-dash-run {
     grid-column: 1;
-    grid-row: 3;
+    grid-row: auto;
 }
 
 .zazu-dash-commercial {
@@ -5611,7 +5611,7 @@ body.zazu-mobile-menu-open .zazu-helper {
 
 .zazu-dash-focus {
     grid-column: 1;
-    grid-row: 4;
+    grid-row: auto;
 }
 
 .zazu-dash-focus-grid {
@@ -5630,7 +5630,7 @@ body.zazu-mobile-menu-open .zazu-helper {
 }
 
 .zazu-dash-resource-grid {
-    grid-template-columns: repeat(4, minmax(0, 1fr));
+    grid-template-columns: repeat(2, minmax(0, 1fr));
     gap: 8px;
     padding: 12px;
 }
@@ -5713,7 +5713,7 @@ body.zazu-mobile-menu-open .zazu-helper {
     }
 
     .zazu-dash-metrics {
-        grid-template-columns: repeat(auto-fit, minmax(min(100%, 190px), 1fr));
+        grid-template-columns: repeat(2, minmax(0, 1fr));
     }
 }
 
@@ -6076,232 +6076,5 @@ body.zazu-mobile-menu-open .zazu-helper {
     .zazu-dash-metric > b {
         right: 9px;
         top: 11px;
-    }
-}
-
-
-/* INDEX DASHBOARD — final composition pass against Designer (2).
-   This restores the reference scan order: hero, four KPI cards, action strip,
-   paired operational panels, then paired attention/readiness panels. */
-.zazu-dash-grid {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    align-items: stretch;
-    column-gap: 16px;
-    row-gap: 16px;
-}
-
-.zazu-dash-metrics {
-    grid-column: 1 / -1;
-    display: grid;
-    grid-template-columns: repeat(4, minmax(0, 1fr));
-    align-items: stretch;
-    gap: 12px;
-}
-
-.zazu-dash-metric {
-    min-height: 116px;
-    padding: 16px 30px 16px 16px;
-    border-radius: 12px;
-}
-
-.zazu-dash-quick-actions {
-    grid-column: 1 / -1;
-    grid-row: auto;
-}
-
-.zazu-dash-quick-actions .zazu-dash-actions {
-    grid-template-columns: repeat(4, minmax(0, 1fr));
-    gap: 12px;
-}
-
-.zazu-dash-quick-actions .zazu-btn {
-    min-height: 74px;
-    justify-content: flex-start;
-    gap: 12px;
-    padding: 13px 16px;
-    border-radius: 10px;
-    font-size: 13px;
-    font-weight: 650;
-}
-
-.zazu-dash-quick-actions .zazu-btn span {
-    margin-left: auto;
-    font-size: 18px;
-}
-
-.zazu-dash-run,
-.zazu-dash-commercial,
-.zazu-dash-focus,
-.zazu-dash-resources {
-    grid-column: auto;
-    grid-row: auto;
-    min-width: 0;
-}
-
-.zazu-dash-run {
-    grid-column: 1;
-    grid-row: auto;
-}
-
-.zazu-dash-commercial {
-    grid-column: 2;
-    grid-row: auto;
-}
-
-.zazu-dash-focus {
-    grid-column: 1;
-}
-
-.zazu-dash-resources {
-    grid-column: 2;
-}
-
-.zazu-dash-run,
-.zazu-dash-commercial,
-.zazu-dash-focus,
-.zazu-dash-resources {
-    border-radius: 12px;
-}
-
-.zazu-dash-surface-head {
-    min-height: 72px;
-    padding: 16px 18px 13px;
-}
-
-.zazu-dash-surface-head h3 {
-    margin-top: 3px;
-    font-size: 17px;
-}
-
-.zazu-dash-quote-stages {
-    gap: 7px;
-    padding-inline: 14px;
-}
-
-.zazu-dash-quote-stage {
-    min-height: 88px;
-    padding: 10px 9px;
-}
-
-.zazu-dash-focus-grid {
-    gap: 8px;
-    padding: 12px;
-}
-
-.zazu-dash-focus-item {
-    min-height: 72px;
-    padding: 12px 14px;
-}
-
-.zazu-dash-resource-grid {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-}
-
-.zazu-dash-resource-grid > a {
-    display: flex;
-    min-width: 0;
-    min-height: 68px;
-    align-items: center;
-    justify-content: space-between;
-    gap: 12px;
-    padding: 12px 14px;
-    border-bottom: 1px solid var(--zazu-card-border);
-    text-decoration: none;
-}
-
-.zazu-dash-resource-grid > a:nth-child(odd) {
-    border-right: 1px solid var(--zazu-card-border);
-}
-
-.zazu-dash-resource-grid > a:nth-last-child(-n + 2) {
-    border-bottom: 0;
-}
-
-.zazu-dash-resource-grid > a > span strong {
-    color: var(--zazu-text-body);
-    font-size: 11px;
-    font-weight: 600;
-}
-
-.zazu-dash-resource-grid > a > strong {
-    color: var(--zazu-text-ink);
-    font-size: 21px;
-    font-variant-numeric: tabular-nums;
-}
-
-@media (max-width: 1050px) {
-    .zazu-dash-metrics {
-        grid-template-columns: repeat(2, minmax(0, 1fr));
-    }
-}
-
-@media (max-width: 900px) {
-    .zazu-dash-grid {
-        grid-template-columns: minmax(0, 1fr);
-    }
-
-    .zazu-dash-metrics,
-    .zazu-dash-quick-actions,
-    .zazu-dash-run,
-    .zazu-dash-commercial,
-    .zazu-dash-focus,
-    .zazu-dash-resources {
-        grid-column: 1;
-    }
-
-    .zazu-dash-quick-actions .zazu-dash-actions {
-        grid-template-columns: repeat(2, minmax(0, 1fr));
-    }
-}
-
-@media (max-width: 620px) {
-    .zazu-dash-grid {
-        row-gap: 12px;
-    }
-
-    .zazu-dash-metrics {
-        gap: 8px;
-    }
-
-    .zazu-dash-metric {
-        min-height: 92px;
-        padding: 11px 25px 11px 10px;
-    }
-
-    .zazu-dash-quick-actions .zazu-dash-actions {
-        gap: 8px;
-    }
-
-    .zazu-dash-quick-actions .zazu-btn {
-        min-height: 62px;
-        padding: 10px 11px;
-        font-size: 12px;
-    }
-
-    .zazu-dash-resource-grid {
-        grid-template-columns: repeat(2, minmax(0, 1fr));
-    }
-
-    .zazu-dash-resource-grid > a {
-        min-height: 62px;
-        padding: 10px;
-    }
-}
-
-@media (max-width: 380px) {
-    .zazu-dash-metrics,
-    .zazu-dash-quick-actions .zazu-dash-actions,
-    .zazu-dash-resource-grid {
-        grid-template-columns: minmax(0, 1fr);
-    }
-
-    .zazu-dash-resource-grid > a,
-    .zazu-dash-resource-grid > a:nth-child(odd) {
-        border-right: 0;
-        border-bottom: 1px solid var(--zazu-card-border);
-    }
-
-    .zazu-dash-resource-grid > a:last-child {
-        border-bottom: 0;
     }
 }
