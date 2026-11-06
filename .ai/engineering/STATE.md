@@ -956,3 +956,13 @@ Latest source change: commit `29a38f55d3d3ff5979cf844ddbd624a9ea279515` consolid
 - CI evidence for the latest tested source: dashboard-specific assertions pass; Laravel reports 369 passed and 6 failures in legacy shell/onboarding expectations unrelated to this dashboard layout. PHPMD still flags the existing DashboardController `__invoke()` at 101 lines (threshold 100). Psalm and populated upgrade/rollback checks pass. Browser regression completed with 56 passed and 6 failures: Finance horizontal overflow, offline Work-record checkbox interaction, and browser theme assertions still expecting the superseded palette. No dashboard-specific rendered screenshot/acceptance was produced; rendered visual acceptance remains UNVERIFIED.
 - Owner visual approval remains the acceptance gate. Do not propagate dashboard styling to other pages.
 
+
+
+## Dashboard adaptive KPI alignment — 2026-11-06
+
+- Corrected the canonical dashboard KPI grid from a fixed four-column layout to auto-fit columns with a 190px minimum card width. Permission-filtered workspaces now use the available row width instead of leaving a blank KPI slot for each hidden metric.
+- Reduced KPI grid gap from 12px to 10px to keep the strip proportionate as cards expand.
+- Updated the dashboard composition regression assertion to require the adaptive grid declaration.
+- No metric data, permissions, routes, dashboard section order, shared shell or non-dashboard page changed.
+- Source re-read confirms the canonical CSS rule and matching regression assertion on `main`. PHPUnit, Vite build and rendered desktop/tablet/mobile light/dark acceptance remain unverified. Browser connector was unavailable because no originating browser context was attached.
+- Next: review the dashboard's desktop/tablet breakpoints and shortcut-row density; retain the supplied reference scan order and do not propagate styling beyond the dashboard.
