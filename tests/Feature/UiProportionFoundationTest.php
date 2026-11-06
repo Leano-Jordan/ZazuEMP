@@ -609,7 +609,7 @@ class UiProportionFoundationTest extends TestCase
         $css = file_get_contents(resource_path('css/zazu-final-visual-sweep.css'));
 
         $this->assertIsString($css);
-        $this->assertStringContainsString('/* INDEX DASHBOARD — final composition pass against Designer (2).', $css);
+        $this->assertStringContainsString('/* DIRECTOR — dashboard hierarchy and card proportions.', $css);
         $this->assertStringContainsString('.zazu-dash-metrics {', $css);
         $this->assertStringContainsString('grid-template-columns: repeat(4, minmax(0, 1fr));', $css);
         $this->assertStringContainsString('.zazu-dash-run {', $css);
