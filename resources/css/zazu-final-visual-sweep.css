@@ -5689,6 +5689,7 @@ body.zazu-mobile-menu-open .zazu-helper {
     .zazu-dash-hero {
         grid-template-columns: 1fr;
         min-height: 0;
+        background: linear-gradient(112deg, var(--zazu-surface-2), var(--zazu-card-bg));
     }
     .zazu-dash-hero-side {
         margin: 0 12px 12px;
@@ -5847,7 +5848,8 @@ body.zazu-mobile-menu-open .zazu-helper {
     text-decoration: none;
 }
 
-.zazu-dash-capability-art {
+.zazu-dash-capability-art,
+.zazu-dash-hero-image {
     position: absolute;
     right: 12px;
     bottom: 8px;
