@@ -160,7 +160,7 @@ class UiProportionFoundationTest extends TestCase
         $this->assertStringContainsString('Quote status breakdown', $dashboard);
         $this->assertStringContainsString('Accepted', $dashboard);
         $this->assertStringContainsString('Declined or expired', $dashboard);
-        $this->assertStringContainsString('grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));', $css);
+        $this->assertStringContainsString('grid-template-columns: repeat(4, minmax(0, 1fr));', $css);
         $this->assertStringContainsString('grid-template-columns: repeat(2, minmax(0, 1fr));', $css);
     }
 
