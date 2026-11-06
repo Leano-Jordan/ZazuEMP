@@ -747,4 +747,14 @@ class UiProportionFoundationTest extends TestCase
         }
     }
 
+
+    public function test_dashboard_priority_empty_state_does_not_claim_schedule_is_checked(): void
+    {
+        $dashboard = file_get_contents(resource_path('views/dashboard.blade.php'));
+
+        $this->assertIsString($dashboard);
+        $this->assertStringContainsString('No setup, quote or resource action needs attention right now.', $dashboard);
+        $this->assertStringNotContainsString('no setup, schedule, quote or resource action', $dashboard);
+    }
+
 }
