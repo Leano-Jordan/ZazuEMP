@@ -6426,3 +6426,82 @@ body.zazu-mobile-menu-open .zazu-helper {
         font-size: 18px;
     }
 }
+
+
+/* Director — priority and workspace-health panels use the same visual language. */
+.zazu-dash-focus .zazu-dash-panel-head {
+    grid-template-columns: 38px minmax(0, 1fr);
+}
+
+.zazu-dash-health-item {
+    display: grid !important;
+    min-width: 0;
+    min-height: 112px !important;
+    align-content: start;
+    justify-content: initial !important;
+    gap: 7px !important;
+    padding: 12px !important;
+    border: 1px solid var(--zazu-card-border) !important;
+    border-radius: 10px !important;
+    background: color-mix(in srgb, var(--zazu-blue-soft) 16%, var(--zazu-card-bg)) !important;
+    text-decoration: none;
+}
+
+.zazu-dash-health-item:hover {
+    border-color: color-mix(in srgb, var(--zazu-blue-brand) 34%, var(--zazu-card-border)) !important;
+    background: color-mix(in srgb, var(--zazu-blue-soft) 36%, var(--zazu-card-bg)) !important;
+}
+
+.zazu-dash-health-label {
+    display: flex;
+    min-width: 0;
+    align-items: center;
+    gap: 7px;
+}
+
+.zazu-dash-health-label i {
+    width: 7px;
+    height: 7px;
+    flex: 0 0 7px;
+    border-radius: 50%;
+    background: var(--zazu-text-muted);
+}
+
+.zazu-dash-health-label i.is-info { background: var(--zazu-blue-brand); }
+.zazu-dash-health-label i.is-warning { background: var(--zazu-warning); }
+.zazu-dash-health-label i.is-clear { background: var(--zazu-success); }
+.zazu-dash-health-label i.is-neutral { background: var(--zazu-text-muted); }
+
+.zazu-dash-health-label strong {
+    min-width: 0;
+    color: var(--zazu-text-ink);
+    font-size: 10px;
+    font-weight: 700;
+    line-height: 1.3;
+}
+
+.zazu-dash-health-item > .zazu-dash-health-value {
+    color: var(--zazu-text-ink);
+    font-family: var(--zazu-font-display);
+    font-size: 24px;
+    font-weight: 750;
+    line-height: 1;
+    font-variant-numeric: tabular-nums;
+}
+
+.zazu-dash-health-item > small {
+    color: var(--zazu-text-muted);
+    font-size: 9.5px;
+    line-height: 1.35;
+}
+
+@media (max-width: 620px) {
+    .zazu-dash-health-item {
+        min-height: 102px !important;
+        padding: 10px !important;
+    }
+
+    .zazu-dash-health-label strong {
+        font-size: 10px;
+    }
+}
