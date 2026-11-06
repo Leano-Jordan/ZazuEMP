@@ -6023,8 +6023,8 @@ body.zazu-mobile-menu-open .zazu-helper {
     display: flex;
     align-items: center;
     gap: 10px;
-    margin: 0 18px 12px;
-    padding: 10px 12px;
+    margin: 0 18px 10px;
+    padding: 8px 10px;
     border-radius: 8px;
 }
 
@@ -6211,8 +6211,8 @@ body.zazu-mobile-menu-open .zazu-helper {
 
 .zazu-dash-timeline {
     display: grid;
-    gap: 8px;
-    padding: 0 14px 14px;
+    gap: 7px;
+    padding: 0 14px 12px;
 }
 
 .zazu-dash-event {
@@ -6220,8 +6220,8 @@ body.zazu-mobile-menu-open .zazu-helper {
     grid-template-columns: 64px minmax(0, 1fr) auto;
     align-items: center;
     gap: 12px;
-    min-height: 88px;
-    padding: 10px 12px;
+    min-height: 76px;
+    padding: 8px 11px;
     border: 1px solid var(--zazu-card-border);
     border-radius: 11px;
     background: color-mix(in srgb, var(--zazu-blue-soft) 18%, var(--zazu-card-bg));
@@ -6237,7 +6237,7 @@ body.zazu-mobile-menu-open .zazu-helper {
 
 .zazu-dash-event-date {
     display: grid;
-    min-height: 66px;
+    min-height: 58px;
     align-content: center;
     justify-items: center;
     padding: 6px 4px;
@@ -6274,7 +6274,7 @@ body.zazu-mobile-menu-open .zazu-helper {
 .zazu-dash-event-copy {
     display: grid;
     min-width: 0;
-    gap: 4px;
+    gap: 3px;
 }
 
 .zazu-dash-event-copy strong {
@@ -6310,15 +6310,15 @@ body.zazu-mobile-menu-open .zazu-helper {
 }
 
 .zazu-dash-commercial .zazu-dash-quote-stages {
-    gap: 8px;
-    padding: 0 16px 12px;
+    gap: 7px;
+    padding: 0 16px 10px;
 }
 
 .zazu-dash-commercial .zazu-dash-quote-stage {
-    min-height: 94px;
+    min-height: 82px;
     align-content: start;
-    gap: 6px;
-    padding: 11px 10px;
+    gap: 5px;
+    padding: 9px;
     border-color: color-mix(in srgb, var(--zazu-blue-brand) 8%, var(--zazu-card-border));
     border-radius: 10px;
 }
@@ -6388,12 +6388,12 @@ body.zazu-mobile-menu-open .zazu-helper {
     .zazu-dash-event {
         grid-template-columns: 54px minmax(0, 1fr) auto;
         gap: 9px;
-        min-height: 78px;
-        padding: 8px;
+        min-height: 70px;
+        padding: 7px;
     }
 
     .zazu-dash-event-date {
-        min-height: 60px;
+        min-height: 54px;
     }
 
     .zazu-dash-event-date strong {
@@ -6440,11 +6440,11 @@ body.zazu-mobile-menu-open .zazu-helper {
 .zazu-dash-health-item {
     display: grid !important;
     min-width: 0;
-    min-height: 112px !important;
+    min-height: 98px !important;
     align-content: start;
     justify-content: initial !important;
-    gap: 7px !important;
-    padding: 12px !important;
+    gap: 6px !important;
+    padding: 10px !important;
     border: 1px solid var(--zazu-card-border) !important;
     border-radius: 10px !important;
     background: color-mix(in srgb, var(--zazu-blue-soft) 16%, var(--zazu-card-bg)) !important;
@@ -6501,8 +6501,8 @@ body.zazu-mobile-menu-open .zazu-helper {
 
 @media (max-width: 620px) {
     .zazu-dash-health-item {
-        min-height: 102px !important;
-        padding: 10px !important;
+        min-height: 92px !important;
+        padding: 9px !important;
     }
 
     .zazu-dash-health-label strong {
