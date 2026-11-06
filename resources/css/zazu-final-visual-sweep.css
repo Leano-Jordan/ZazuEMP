@@ -3990,7 +3990,11 @@ from { opacity: 0; transform: translateY(4px); }
 }
 
 .zazu-dash-hero-main {
-    padding: 24px 26px;
+    display: flex;
+    min-width: 0;
+    flex-direction: column;
+    justify-content: center;
+    padding: 28px 34px;
 }
 
 .zazu-dash-hero-main > p {
@@ -5442,9 +5446,13 @@ body.zazu-mobile-menu-open .zazu-helper {
    One final dashboard authority: KPI strip, shortcuts, paired work queues,
    paired attention panels. Keep the phone layout linear and touch-friendly. */
 .zazu-dash-hero {
-    grid-template-columns: minmax(0, 1fr) minmax(300px, 34%);
-    min-height: 210px;
-    margin-bottom: 16px;
+    grid-template-columns: minmax(0, 1fr) minmax(320px, 34%);
+    min-height: 220px;
+    margin-bottom: 18px;
+    background: linear-gradient(112deg,
+        color-mix(in srgb, var(--zazu-blue-soft) 90%, var(--zazu-card-bg)) 0%,
+        color-mix(in srgb, var(--zazu-accent-soft) 76%, var(--zazu-card-bg)) 72%,
+        color-mix(in srgb, var(--zazu-warning-soft) 30%, var(--zazu-card-bg)) 100%);
 }
 
 .zazu-dash-hero-main {
@@ -5452,7 +5460,8 @@ body.zazu-mobile-menu-open .zazu-helper {
 }
 
 .zazu-dash-hero-side {
-    padding: 22px 24px;
+    margin: 16px;
+    padding: 20px 22px;
 }
 
 .zazu-dash-grid {
@@ -5513,13 +5522,15 @@ body.zazu-mobile-menu-open .zazu-helper {
 .zazu-dash-quick-actions {
     grid-column: 1 / -1;
     grid-row: 2;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 18px;
+    display: block;
     min-width: 0;
-    min-height: 72px;
-    padding: 12px 16px;
+    min-height: 0;
+    padding: 0;
+    border: 0;
+    border-radius: 0;
+    background: transparent;
+    box-shadow: none;
+    overflow: visible;
 }
 
 .zazu-dash-quick-actions-heading {
@@ -5536,14 +5547,35 @@ body.zazu-mobile-menu-open .zazu-helper {
 }
 
 .zazu-dash-quick-actions .zazu-dash-actions {
-    display: flex;
-    flex: 1 1 auto;
-    flex-wrap: wrap;
-    align-items: center;
-    justify-content: flex-end;
-    gap: 8px;
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    align-items: stretch;
+    gap: 10px;
     margin: 0;
     padding: 0;
+}
+.zazu-dash-quick-actions .zazu-btn {
+    display: flex;
+    min-width: 0;
+    min-height: 72px;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    padding: 12px 15px;
+    border-radius: 11px;
+    font-size: 13px;
+    line-height: 1.3;
+    text-align: left;
+    text-decoration: none;
+}
+.zazu-dash-quick-actions .zazu-btn-secondary {
+    border: 1px solid var(--zazu-card-border);
+    background: var(--zazu-card-bg);
+    box-shadow: var(--zazu-card-shadow);
+}
+.zazu-dash-quick-actions .zazu-btn-secondary:hover {
+    border-color: var(--zazu-primary);
+    background: var(--zazu-primary-soft);
 }
 
 .zazu-dash-run {
@@ -5654,6 +5686,12 @@ body.zazu-mobile-menu-open .zazu-helper {
         grid-template-columns: 1fr;
         min-height: 0;
     }
+    .zazu-dash-hero-side {
+        margin: 0 12px 12px;
+    }
+    .zazu-dash-quick-actions .zazu-dash-actions {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
 
     .zazu-dash-grid {
         grid-template-columns: minmax(0, 1fr);
@@ -5680,11 +5718,13 @@ body.zazu-mobile-menu-open .zazu-helper {
         padding: 15px;
     }
 
-    .zazu-dash-quick-actions {
-        align-items: stretch;
-        flex-direction: column;
-        gap: 10px;
-        padding: 13px;
+    .zazu-dash-quick-actions .zazu-dash-actions {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 8px;
+    }
+    .zazu-dash-quick-actions .zazu-btn {
+        min-height: 62px;
+        padding: 10px 12px;
     }
 
     .zazu-dash-quick-actions-heading {
@@ -5730,9 +5770,9 @@ body.zazu-mobile-menu-open .zazu-helper {
 
 
 /* Supplied dashboard references — welcome hierarchy and business-capability callout. */
-.zazu-dash-greeting {
+ .zazu-dash-greeting {
     display: block;
-    margin-top: 15px;
+    margin-top: 0;
     color: var(--zazu-text-body);
     font-size: 20px;
     font-weight: 650;
@@ -5744,6 +5784,20 @@ body.zazu-mobile-menu-open .zazu-helper {
     font-size: clamp(30px, 3.2vw, 42px);
     line-height: 1.08;
     letter-spacing: -.045em;
+}
+
+.zazu-dash-hero-lead {
+    margin: 7px 0 0;
+    color: var(--zazu-text-ink);
+    font-size: clamp(17px, 1.6vw, 21px);
+    font-weight: 650;
+    line-height: 1.35;
+}
+.zazu-dash-hero-support {
+    margin: 2px 0 0;
+    color: var(--zazu-text-body);
+    font-size: 14px;
+    line-height: 1.55;
 }
 
 .zazu-dash-capability {
@@ -5802,8 +5856,14 @@ body.zazu-mobile-menu-open .zazu-helper {
 
 @media (max-width: 620px) {
     .zazu-dash-greeting {
-        margin-top: 10px;
+        margin-top: 0;
         font-size: 17px;
+    }
+    .zazu-dash-hero-lead {
+        font-size: 17px;
+    }
+    .zazu-dash-hero-support {
+        font-size: 12px;
     }
 
     .zazu-dash-hero h2 {
@@ -5954,8 +6014,11 @@ body.zazu-mobile-menu-open .zazu-helper {
 .zazu-dash-metric > span:not(.zazu-dash-metric-icon) {
     grid-column: 2;
     align-self: end;
-    font-size: 10px;
-    letter-spacing: .055em;
+    color: var(--zazu-text-ink);
+    font-size: 13px;
+    font-weight: 650;
+    letter-spacing: 0;
+    line-height: 1.3;
 }
 
 .zazu-dash-metric > strong {
@@ -5970,8 +6033,8 @@ body.zazu-mobile-menu-open .zazu-helper {
     grid-column: 2;
     min-width: 0;
     color: var(--zazu-text-muted);
-    font-size: 10px;
-    line-height: 1.35;
+    font-size: 11px;
+    line-height: 1.4;
 }
 
 .zazu-dash-metric > b {
