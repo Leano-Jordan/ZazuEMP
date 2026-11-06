@@ -5495,8 +5495,8 @@ body.zazu-mobile-menu-open .zazu-helper {
 .zazu-dash-metrics {
     grid-column: 1 / -1;
     grid-row: 1;
-    grid-template-columns: repeat(4, minmax(0, 1fr));
-    gap: 12px;
+    grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
+    gap: 10px;
     align-content: stretch;
 }
 
