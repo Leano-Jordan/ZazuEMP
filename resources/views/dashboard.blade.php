@@ -11,10 +11,10 @@
 
     <section class="zazu-dash-hero">
         <div class="zazu-dash-hero-main">
-            <div class="zazu-dash-kicker"><span class="zazu-dash-live"></span> YOUR BUSINESS AT A GLANCE · {{ $nicheDefinition['label'] }}</div>
             <span class="zazu-dash-greeting">{{ now()->hour < 12 ? 'Good morning' : (now()->hour < 18 ? 'Good afternoon' : 'Good evening') }}</span>
             <h2>{{ auth()->user()->name }} <span aria-hidden="true">👋</span></h2>
-            <p>Run your event business from one place. Manage events, quotes, customers, inventory, purchasing and finance.</p>
+            <p class="zazu-dash-hero-lead">Run your event business from one place.</p>
+            <p class="zazu-dash-hero-support">Manage events, quotes, customers, inventory, purchasing and finance.</p>
         </div>
         <aside class="zazu-dash-hero-side zazu-dash-capability" aria-label="Business capabilities">
             <div class="zazu-dash-capability-copy">
@@ -54,7 +54,7 @@
             @endif
         </aside>
 
-        <section class="zazu-dash-quick-actions zazu-dash-surface" aria-label="Quick actions">
+        <section class="zazu-dash-quick-actions" aria-label="Quick actions">
             <div class="zazu-dash-actions">
                 @if($workspaceTools['work'] && app(\App\Support\PermissionService::class)->allows('work.create', auth()->user(), $business))
                     <a href="{{ route('work.create') }}" class="zazu-btn zazu-btn-cta">Create event <span>+</span></a>
