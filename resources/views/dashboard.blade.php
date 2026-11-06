@@ -39,18 +39,18 @@
     <section class="zazu-dash-grid" aria-label="Dashboard operational overview">
         <aside class="zazu-dash-metrics">
             @if($workspaceTools['work'])
-            <a href="{{ route('work.index') }}" class="zazu-dash-metric zazu-dash-surface"><span>Active events</span><strong>{{ number_format($metrics['active_work']) }}</strong><b>→</b></a>
+            <a href="{{ route('work.index') }}" class="zazu-dash-metric zazu-dash-surface"><span class="zazu-dash-metric-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none"><rect x="3.5" y="5" width="17" height="15.5" rx="2.5"/><path d="M7.5 3.5v3M16.5 3.5v3M3.5 9.5h17"/></svg></span><span>Active events</span><strong>{{ number_format($metrics['active_work']) }}</strong><b>→</b></a>
             @endif
             @if($workspaceTools['quotes'])
-            <a href="{{ route('quotes.index') }}" class="zazu-dash-metric zazu-dash-surface"><span>Draft quotes</span><strong>{{ number_format($metrics['draft_quotes']) }}</strong><b>→</b></a>
+            <a href="{{ route('quotes.index') }}" class="zazu-dash-metric zazu-dash-surface"><span class="zazu-dash-metric-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none"><path d="M7 3.5h7l4.5 4.5v12A1.5 1.5 0 0 1 17 21.5H7A1.5 1.5 0 0 1 5.5 20V5A1.5 1.5 0 0 1 7 3.5Z"/><path d="M14 3.5V8h4.5M8.5 12h7M8.5 16h7"/></svg></span><span>Draft quotes</span><strong>{{ number_format($metrics['draft_quotes']) }}</strong><b>→</b></a>
             @elseif($workspaceTools['finance'] && $experienceLevel !== 'basic')
             <a href="{{ route('finance.index') }}" class="zazu-dash-metric zazu-dash-surface"><span>Unpaid invoices</span><strong>{{ number_format($metrics['unpaid_invoices']) }}</strong><small>Issued invoices with a balance</small><b>→</b></a>
             @endif
             @if($workspaceTools['customers'])
-            <a href="{{ route('customers.index') }}" class="zazu-dash-metric zazu-dash-surface"><span>Customers</span><strong>{{ number_format($metrics['customers']) }}</strong><b>→</b></a>
+            <a href="{{ route('customers.index') }}" class="zazu-dash-metric zazu-dash-surface"><span class="zazu-dash-metric-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none"><circle cx="9" cy="8" r="3.25"/><path d="M3.5 19.5v-1.2a5.5 5.5 0 0 1 11 0v1.2M16 5.2a3.25 3.25 0 0 1 0 6.2M17 14.5a4.5 4.5 0 0 1 3.5 4.4v.6"/></svg></span><span>Customers</span><strong>{{ number_format($metrics['customers']) }}</strong><b>→</b></a>
             @endif
             @if($workspaceTools['calendar'])
-            <a href="{{ route('calendar.index') }}" class="zazu-dash-metric zazu-dash-surface"><span>Next 14 days</span><strong>{{ number_format($metrics['upcoming_work']) }}</strong><b>→</b></a>
+            <a href="{{ route('calendar.index') }}" class="zazu-dash-metric zazu-dash-surface"><span class="zazu-dash-metric-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none"><rect x="3.5" y="5" width="17" height="15.5" rx="2.5"/><path d="M7.5 3.5v3M16.5 3.5v3M3.5 9.5h17M12 12.5v3l2 1.2"/></svg></span><span>Next 14 days</span><strong>{{ number_format($metrics['upcoming_work']) }}</strong><b>→</b></a>
             @endif
         </aside>
 
