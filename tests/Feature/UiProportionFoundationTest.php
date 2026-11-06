@@ -129,7 +129,7 @@ class UiProportionFoundationTest extends TestCase
         $this->assertStringContainsString('Zazu keeps these capabilities available', $dashboard);
         $this->assertStringNotContainsString('Workspace state', $dashboard);
         $this->assertStringContainsString('.zazu-dash-capability {', $css);
-        $this->assertStringContainsString('.zazu-dash-capability-art {', $css);
+        $this->assertStringContainsString('.zazu-dash-capability-art,', $css);
         $this->assertStringContainsString('@media (max-width: 620px)', $css);
     }
 
@@ -223,7 +223,7 @@ class UiProportionFoundationTest extends TestCase
         $this->assertLessThan($commercialPosition, $runPosition);
 
         $this->assertStringContainsString('grid-template-columns: repeat(2, minmax(0, 1fr));', $css);
-        $this->assertStringContainsString('grid-template-columns: repeat(auto-fit, minmax(min(100%, 190px), 1fr));', $css);
+        $this->assertStringContainsString('grid-template-columns: repeat(4, minmax(0, 1fr));', $css);
         $this->assertStringContainsString('.zazu-dash-metrics {', $css);
         $this->assertStringContainsString('grid-column: 1 / -1;', $css);
         $this->assertStringContainsString('.zazu-dash-commercial {', $css);
