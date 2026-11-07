@@ -111,7 +111,8 @@ class ReportController extends Controller
             'costTotalsByCurrency',
             'financeTotalsByCurrency',
             'expenseTotalsByCurrency',
-            'eventProfitability'
+            'eventProfitability',
+            'business'
         ));
     }
 }

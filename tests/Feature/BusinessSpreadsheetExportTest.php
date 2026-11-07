@@ -4,6 +4,8 @@ namespace Tests\Feature;
 
 use App\Models\Business;
 use App\Models\Customer;
+use App\Models\User;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
@@ -31,9 +33,11 @@ class BusinessSpreadsheetExportTest extends TestCase
             'currency' => 'ZAR',
         ]);
 
-        Customer::create([
+        DB::table('customers')->insert([
             'business_id' => $foreignBusiness->id,
             'name' => 'FOREIGN TENANT CUSTOMER',
+            'created_at' => now(),
+            'updated_at' => now(),
         ]);
 
         $response = $this->get(route('exports.download', ['resource' => 'customers']));
@@ -99,6 +103,26 @@ class BusinessSpreadsheetExportTest extends TestCase
             $response->assertOk();
             $this->assertStringStartsWith("\xEF\xBB\xBF", $response->streamedContent());
         }
+    }
+
+    public function test_non_owner_cannot_open_or_download_business_exports(): void
+    {
+        $business = Business::create([
+            'name' => 'Manager Export Business',
+            'slug' => 'manager-export-business',
+            'status' => 'active',
+            'currency' => 'ZAR',
+        ]);
+        $manager = User::factory()->create();
+        $business->users()->attach($manager->id, ['role' => 'manager']);
+
+        $this->actingAs($manager)
+            ->get(route('exports.index'))
+            ->assertForbidden();
+
+        $this->actingAs($manager)
+            ->get(route('exports.download', ['resource' => 'customers']))
+            ->assertForbidden();
     }
 
     public function test_unknown_export_resource_is_not_exposed(): void
