@@ -6,6 +6,7 @@ use App\Models\Business;
 use App\Models\User;
 use App\Services\Search\AssetSearchHandler;
 use App\Services\Search\CostSearchHandler;
+use App\Services\Search\DocumentSearchHandler;
 use App\Services\Search\CustomerSearchHandler;
 use App\Services\Search\EventSearchHandler;
 use App\Services\Search\ExpenseSearchHandler;
@@ -21,6 +22,7 @@ class WorkspaceSearchService
     public const TYPES = [
         'customer',
         'event',
+        'document',
         'service',
         'supplier',
         'purchase_order',
@@ -35,6 +37,7 @@ class WorkspaceSearchService
     private const HANDLERS = [
         'customer' => CustomerSearchHandler::class,
         'event' => EventSearchHandler::class,
+        'document' => DocumentSearchHandler::class,
         'service' => ServiceSearchHandler::class,
         'supplier' => SupplierSearchHandler::class,
         'purchase_order' => PurchaseOrderSearchHandler::class,
@@ -108,6 +111,7 @@ class WorkspaceSearchService
             || match ($type) {
                 'customer' => in_array('customers.view', $permissions, true),
                 'event' => in_array('work.view', $permissions, true),
+                'document' => in_array('work.view', $permissions, true),
                 'service' => in_array('capabilities.view', $permissions, true),
                 'supplier' => in_array('suppliers.view', $permissions, true),
                 'purchase_order' => in_array('purchasing.view', $permissions, true),

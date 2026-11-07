@@ -1,4 +1,4 @@
-<section class="zazu-panel">
+<section class="zazu-panel" id="attachments">
     <div class="zazu-panel-head">
         <div>
             <div class="zazu-panel-title">Job files</div>

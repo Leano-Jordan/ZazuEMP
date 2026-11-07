@@ -246,7 +246,7 @@
                                     type="search"
                                     data-zazu-command-input
                                     data-search-url="{{ route('search.index') }}"
-                                    placeholder="Search events, customers, quotes, inventory…"
+                                    placeholder="Search events, customers, quotes, inventory or job files…"
                                     autocomplete="off"
                                     spellcheck="false"
                                     role="combobox"
@@ -262,7 +262,7 @@
                     <small data-zazu-command-count>Workspace destinations</small>
                 </div>
                 <div class="zazu-command-results" data-zazu-command-results role="listbox" aria-label="Quick access and workspace search">
-                    <a href="{{ route('search.index') }}" data-command-item data-search-terms="search find records workspace customers jobs suppliers quotes invoices purchasing finance advanced filters" data-command-search-action role="option"><span data-command-search-label>Search workspace</span><small data-command-search-meta>Find business records · filters and date range</small></a>
+                    <a href="{{ route('search.index') }}" data-command-item data-search-terms="search find records workspace customers jobs suppliers quotes invoices purchasing finance documents files attachments receipts advanced filters" data-command-search-action role="option"><span data-command-search-label>Search workspace</span><small data-command-search-meta>Find records and job files · filters and date range</small></a>
                     @if($can('work.view'))<a href="{{ route('work.index') }}" data-command-item data-search-terms="jobs work events operations event management schedule run sheet" role="option"><span>Jobs</span><small>Event operations · work register</small></a>@endif
                     @if($can('capabilities.view'))<a href="{{ route('capabilities.index') }}" data-command-item data-search-terms="services prices catalogue capabilities catering food packages equipment hire rates" role="option"><span>Services & prices</span><small>Capability catalogue · rates and packages</small></a>@endif
                     @if($can('quotes.view'))<a href="{{ route('quotes.index') }}" data-command-item data-search-terms="quotes quotation quotations commercial documents proposals" role="option"><span>Quotes</span><small>Commercial documents · quote queue</small></a>@endif
@@ -443,7 +443,7 @@
             if (commandSearchMeta) {
                 commandSearchMeta.textContent = query
                     ? 'Open full results and refine with filters'
-                    : 'Find business records · filters and date range';
+                    : 'Find records and job files · filters and date range';
             }
             if (commandSearchAction) {
                 commandSearchAction.hidden = false;

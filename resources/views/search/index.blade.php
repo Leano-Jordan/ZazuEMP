@@ -14,7 +14,7 @@
         <div class="zazu-search-primary">
             <span class="zazu-search-icon" aria-hidden="true">⌕</span>
             <label class="sr-only" for="workspace-search-page-input">Search the workspace</label>
-            <input id="workspace-search-page-input" class="zazu-search-page-input" type="search" name="q" value="{{ $filters['q'] }}" autofocus placeholder="Search customers, jobs, suppliers, invoices or quotes…" autocomplete="off">
+            <input id="workspace-search-page-input" class="zazu-search-page-input" type="search" name="q" value="{{ $filters['q'] }}" autofocus placeholder="Search customers, jobs, suppliers, invoices, quotes or job files…" autocomplete="off">
             <kbd>⌘K</kbd>
         </div>
 

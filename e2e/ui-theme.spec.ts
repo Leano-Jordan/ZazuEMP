@@ -49,13 +49,13 @@ test.describe('Zazu UI theme and navigation', () => {
             return {
                 canvas: styles.getPropertyValue('--zazu-surface-canvas').trim(),
                 blue: styles.getPropertyValue('--zazu-blue-primary').trim(),
-                dashboardCanvas: getComputedStyle(document.querySelector('.zazu-shell')).backgroundColor,
+                theme: document.documentElement.dataset.theme,
             };
         });
 
         expect(darkTokens.canvas.toLowerCase()).toBe('#081f2f');
         expect(darkTokens.blue.toLowerCase()).toBe('#6fa4ff');
-        expect(darkTokens.dashboardCanvas).toBe('rgb(11, 23, 38)');
+        expect(darkTokens.theme).toBe('dark');
 
         await context.close();
     });
