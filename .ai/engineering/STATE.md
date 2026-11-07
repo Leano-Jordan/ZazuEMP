@@ -1078,3 +1078,17 @@ Latest source change: commit `29a38f55d3d3ff5979cf844ddbd624a9ea279515` consolid
 - Extended `SyncAttachmentIdempotencyTest` to cover three server contracts: identical retry returns the original attachment; same key with different bytes but matching metadata returns HTTP 409; same key cannot move an attachment to a different job in the same business.
 - Latest test commit: `a1d16620996479d461574c5317dfccc82c48d35d` on `main`.
 - Re-read current-main test source and ran PHP 8.4.24 syntax lint: PASS. Laravel feature execution remains UNVERIFIED pending exact-head CI evidence.
+
+
+## Phone-local Work attachment integration — 2026-11-07
+
+- Connected the authenticated Work attachment form to the active `ZazuOffline` client. The legacy `public/offline-attachments.js` remains unused.
+- Added business-scoped IndexedDB file queue/read/write, idempotent multipart upload retry through `/api/sync/attachments`, remote attachment listing and private-file download caching. Pending local Blobs are retained until the server returns a verifiable attachment ID.
+- Multi-file selection (1–10 files, each up to 20 MB) is validated first and saved in one IndexedDB read/write transaction. A failed batch transaction does not intentionally leave a partial queue.
+- Work panel uses the online Laravel form path when the same-origin host is reachable; when unreachable it stores the selected files on the device. Unpaired devices are told to pair before upload can occur.
+- Added Work attachment UI state/list, local file open action, online/reconnect refresh, and current-page duplicate avoidance using server attachment IDs.
+- Advanced service-worker static cache to `zazu-static-v30`, with matching Laravel source assertion and Node service-worker cache test expectations.
+- Added `e2e/offline-attachment-sync.spec.js` for disconnected local file persistence, bearer-authenticated reconnect upload using the original UUID idempotency key, and caching a remote attachment. Expanded `PwaOfflineFoundationTest` source assertions. Existing `SyncAttachmentIdempotencyTest` remains responsible for server duplicate/change/move-key contracts.
+- Source write/re-read commits: `789820c`, `36acc45`, `c7cdd3d`, `3cf20a6`, `eedacf8`, `fd695f2`, `bc1de62`, `c94678a`, `6ceeec3`, `fd61e3d`, `65a88cc`, `c580099`, `1b06cce`, `1c05cb5`. Documentation follow-up is recorded in `docs/ZAZU_V1_STATUS.md` and `docs/ZAZU_OFFLINE_FIRST_ARCHITECTURE.md`.
+- Current `main` source changes are **IMPLEMENTED**. GitHub combined status returned no status contexts for `bc1de6224971803bdecee18dc8bcbed7781c5287`; the commit-workflow-runs connector returned no PR-triggered runs for `1c05cb5359695e0a5588593c1de0fdf3407b3c2e`. Exact-head Laravel, Vite, Playwright and quality execution therefore remain **UNVERIFIED**. No readiness uplift is claimed.
+- Physical installed-device acceptance remains open. The current upload endpoint requires a server-backed event ID; an offline-created job must first receive its server identity. Verify the cross-step flow after current source checks are available.
