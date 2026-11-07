@@ -1,6 +1,6 @@
 {
   "resources/css/app.css": {
-    "file": "assets/app-C5MmWAfT.css",
+    "file": "assets/app-BnDLO945.css",
     "name": "app",
     "names": [
       "app.css"
@@ -12,8 +12,17 @@
       "assets/space-grotesk-latin-wght-normal-BhU9QXUp.woff2"
     ]
   },
+  "resources/css/zazu-dashboard-authority.css": {
+    "file": "assets/zazu-dashboard-authority-CwrLiR_f.css",
+    "name": "zazu-dashboard-authority",
+    "names": [
+      "zazu-dashboard-authority.css"
+    ],
+    "src": "resources/css/zazu-dashboard-authority.css",
+    "isEntry": true
+  },
   "resources/css/zazu-final-visual-sweep.css": {
-    "file": "assets/zazu-final-visual-sweep-Dsk-v8x7.css",
+    "file": "assets/zazu-final-visual-sweep-CXDWXTnD.css",
     "name": "zazu-final-visual-sweep",
     "names": [
       "zazu-final-visual-sweep.css"
@@ -22,7 +31,7 @@
     "isEntry": true
   },
   "resources/css/zazu-mobile-refinement.css": {
-    "file": "assets/zazu-mobile-refinement-DGlVFRmO.css",
+    "file": "assets/zazu-mobile-refinement-BqRhRTWB.css",
     "name": "zazu-mobile-refinement",
     "names": [
       "zazu-mobile-refinement.css"
@@ -31,7 +40,7 @@
     "isEntry": true
   },
   "resources/css/zazu-responsive-theme.css": {
-    "file": "assets/zazu-responsive-theme-Cg5NSzoS.css",
+    "file": "assets/zazu-responsive-theme-Bmi8kzsN.css",
     "name": "zazu-responsive-theme",
     "names": [
       "zazu-responsive-theme.css"
@@ -48,7 +57,7 @@
     "src": "resources/fonts/space-grotesk-latin-wght-normal.woff2"
   },
   "resources/js/app.js": {
-    "file": "assets/app-D39QTxao.js",
+    "file": "assets/app-G7EIcvYP.js",
     "name": "app",
     "src": "resources/js/app.js",
     "isEntry": true
