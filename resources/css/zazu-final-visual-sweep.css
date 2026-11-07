@@ -6497,3 +6497,140 @@ body.zazu-mobile-menu-open .zazu-helper {
         line-height: 1.25;
     }
 }
+
+
+/* Dashboard finish — strengthen the welcome, KPI and work-panel hierarchy. */
+.zazu-dash-hero {
+    grid-template-columns: minmax(0, 1fr) minmax(250px, .34fr);
+    min-height: 218px;
+    border-color: color-mix(in srgb, var(--zazu-blue-brand) 24%, var(--zazu-card-border));
+    background:
+        linear-gradient(112deg,
+            color-mix(in srgb, var(--zazu-blue-soft) 84%, var(--zazu-card-bg)) 0%,
+            color-mix(in srgb, var(--zazu-card-bg) 96%, var(--zazu-accent-soft)) 72%,
+            var(--zazu-card-bg) 100%);
+}
+
+.zazu-dash-hero-main {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    padding: 28px 32px;
+}
+
+.zazu-dash-hero-side {
+    align-self: stretch;
+    margin: 14px;
+    border: 1px solid color-mix(in srgb, var(--zazu-blue-brand) 16%, var(--zazu-card-border));
+    border-radius: 13px;
+    background: color-mix(in srgb, var(--zazu-blue-soft) 62%, var(--zazu-card-bg));
+}
+
+.zazu-dash-greeting {
+    color: var(--zazu-blue-brand);
+    font-size: 17px;
+    font-weight: 700;
+}
+
+.zazu-dash-hero h2 {
+    margin: 7px 0 5px;
+    font-size: clamp(32px, 3.5vw, 44px);
+    line-height: 1.04;
+    letter-spacing: -.05em;
+}
+
+.zazu-dash-hero-lead {
+    margin-top: 8px;
+    font-size: clamp(17px, 1.65vw, 21px);
+}
+
+.zazu-dash-metric {
+    display: grid;
+    grid-template-columns: 42px minmax(0, 1fr);
+    grid-template-rows: auto 1fr;
+    align-content: center;
+    align-items: center;
+    column-gap: 12px;
+    row-gap: 4px;
+    min-height: 112px;
+    padding: 15px 34px 15px 16px;
+    border: 1px solid color-mix(in srgb, var(--zazu-blue-brand) 16%, var(--zazu-card-border));
+    box-shadow: 0 3px 12px rgba(22, 66, 96, .045);
+}
+
+.zazu-dash-metric > .zazu-dash-metric-icon {
+    grid-column: 1;
+    grid-row: 1 / span 2;
+    width: 42px;
+    height: 42px;
+    border-radius: 12px;
+}
+
+.zazu-dash-metric > span:not(.zazu-dash-metric-icon) {
+    align-self: end;
+    color: var(--zazu-text-body);
+    font-size: 10px;
+    letter-spacing: .075em;
+}
+
+.zazu-dash-metric > strong {
+    align-self: start;
+    margin-top: 2px;
+    font-size: 31px;
+    line-height: 1;
+}
+
+.zazu-dash-surface {
+    border-color: color-mix(in srgb, var(--zazu-blue-brand) 15%, var(--zazu-card-border));
+    border-radius: 14px;
+    box-shadow: 0 5px 20px rgba(22, 66, 96, .055);
+}
+
+.zazu-dash-surface-head {
+    background: linear-gradient(100deg,
+        color-mix(in srgb, var(--zazu-blue-soft) 48%, var(--zazu-card-bg)),
+        var(--zazu-card-bg) 78%);
+}
+
+.zazu-dash-panel-head {
+    min-height: 70px;
+    padding-top: 13px;
+    padding-bottom: 13px;
+}
+
+@media (max-width: 900px) {
+    .zazu-dash-hero {
+        grid-template-columns: minmax(0, 1fr);
+        min-height: 0;
+    }
+
+    .zazu-dash-hero-main {
+        padding: 22px 24px;
+    }
+
+    .zazu-dash-hero-side {
+        margin: 0 12px 12px;
+    }
+}
+
+@media (max-width: 620px) {
+    .zazu-dash-hero-main {
+        padding: 17px;
+    }
+
+    .zazu-dash-metric {
+        min-height: 98px;
+        padding: 11px 26px 11px 11px;
+        grid-template-columns: 36px minmax(0, 1fr);
+        column-gap: 8px;
+    }
+
+    .zazu-dash-metric > .zazu-dash-metric-icon {
+        width: 36px;
+        height: 36px;
+    }
+
+    .zazu-dash-metric > strong {
+        font-size: 26px;
+    }
+}
