@@ -145,7 +145,7 @@ function bootWorker(fetchImplementation = async () => new MockResponse('online')
 
 test('a persisted identity read finishing after logout cannot restore the identity or prime private pages', async () => {
     const worker = bootWorker();
-    const cache = await worker.caches.open('zazu-static-v29');
+    const cache = await worker.caches.open('zazu-static-v30');
     const readStarted = deferred();
     const releaseRead = deferred();
 
@@ -153,7 +153,7 @@ test('a persisted identity read finishing after logout cannot restore the identi
         readStarted.resolve();
         return releaseRead.promise;
     }));
-    const privateCache = await worker.caches.open('zazu-static-v29-user-41');
+    const privateCache = await worker.caches.open('zazu-static-v30-user-41');
     await privateCache.put('/dashboard', new worker.Response('private dashboard'));
 
     const priming = worker.dispatchMessage({
@@ -169,7 +169,7 @@ test('a persisted identity read finishing after logout cannot restore the identi
 
     assert.equal(worker.fetchCalls.length, 0, 'stale identity must not trigger page priming');
     assert.equal(
-        (await worker.caches.keys()).some((name) => name.startsWith('zazu-static-v29-user-')),
+        (await worker.caches.keys()).some((name) => name.startsWith('zazu-static-v30-user-')),
         false,
         'logout must leave no cached authenticated page',
     );
@@ -184,9 +184,9 @@ test('an authenticated HTML response finishing after logout cannot repopulate th
         return networkResponse.promise;
     });
 
-    const staticCache = await worker.caches.open('zazu-static-v29');
+    const staticCache = await worker.caches.open('zazu-static-v30');
     await staticCache.put('/__zazu-active-user__', new worker.Response('41'));
-    const privateCache = await worker.caches.open('zazu-static-v29-user-41');
+    const privateCache = await worker.caches.open('zazu-static-v30-user-41');
     await privateCache.put('/dashboard', new worker.Response('<main>private dashboard</main>'));
 
     const navigation = worker.dispatchFetch(new worker.Request('/dashboard', {
@@ -206,7 +206,7 @@ test('an authenticated HTML response finishing after logout cannot repopulate th
     await navigation.finished();
 
     assert.equal(
-        (await worker.caches.keys()).some((name) => name.startsWith('zazu-static-v29-user-')),
+        (await worker.caches.keys()).some((name) => name.startsWith('zazu-static-v30-user-')),
         false,
         'a late response must not recreate the logged-out user cache',
     );
@@ -219,7 +219,7 @@ test('an identity write already in flight cannot finish after logout cleanup', a
     const releasePut = deferred();
     const worker = bootWorker(undefined, {
         beforePut: async ({ name, key }) => {
-            if (name === 'zazu-static-v29' && key === new URL('/__zazu-active-user__', ORIGIN).href) {
+            if (name === 'zazu-static-v30' && key === new URL('/__zazu-active-user__', ORIGIN).href) {
                 putStarted.resolve();
                 await releasePut.promise;
             }
@@ -238,10 +238,10 @@ test('an identity write already in flight cannot finish after logout cleanup', a
 
     await Promise.all([priming, logout]);
 
-    const state = await worker.caches.open('zazu-static-v29');
+    const state = await worker.caches.open('zazu-static-v30');
     assert.equal(await state.match('/__zazu-active-user__'), null, 'logout must win over any identity write already in flight');
     assert.equal(
-        (await worker.caches.keys()).some((name) => name.startsWith('zazu-static-v29-user-')),
+        (await worker.caches.keys()).some((name) => name.startsWith('zazu-static-v30-user-')),
         false,
         'the stale identity operation must not leave a private page cache',
     );
