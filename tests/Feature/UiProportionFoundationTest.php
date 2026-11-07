@@ -845,4 +845,40 @@ class UiProportionFoundationTest extends TestCase
         }
     }
 
+
+    public function test_dashboard_hides_event_and_quote_details_without_their_view_permissions(): void
+    {
+        $dashboard = file_get_contents(resource_path('views/dashboard.blade.php'));
+
+        $this->assertIsString($dashboard);
+
+        $eventsGate = strpos($dashboard, "@if(\$workspaceTools['work'] || \$workspaceTools['calendar'])");
+        $eventsPanel = strpos($dashboard, '<section class="zazu-dash-run zazu-dash-surface">');
+        $quotesGate = strpos($dashboard, "@if(\$workspaceTools['quotes'])");
+        $quotesPanel = strpos($dashboard, '<section class="zazu-dash-commercial zazu-dash-surface">');
+
+        $this->assertNotFalse($eventsGate);
+        $this->assertNotFalse($eventsPanel);
+        $this->assertNotFalse($quotesGate);
+        $this->assertNotFalse($quotesPanel);
+        $this->assertLessThan($eventsPanel, $eventsGate);
+        $this->assertLessThan($quotesPanel, $quotesGate);
+    }
+
+
+    public function test_dashboard_priority_clear_state_ignores_metrics_for_hidden_resources(): void
+    {
+        $dashboard = file_get_contents(resource_path('views/dashboard.blade.php'));
+
+        $this->assertIsString($dashboard);
+
+        foreach ([
+            "(!\$workspaceTools['purchasing'] || \$experienceLevel === 'basic' || \$metrics['open_purchase_orders'] === 0)",
+            "(!\$workspaceTools['inventory'] || \$experienceLevel === 'basic' || \$metrics['low_stock'] === 0)",
+            "(!\$workspaceTools['finance'] || \$experienceLevel === 'basic' || \$metrics['unpaid_invoices'] === 0)",
+        ] as $permissionAwareMetric) {
+            $this->assertStringContainsString($permissionAwareMetric, $dashboard);
+        }
+    }
+
 }
