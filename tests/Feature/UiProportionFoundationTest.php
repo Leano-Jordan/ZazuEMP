@@ -667,6 +667,17 @@ class UiProportionFoundationTest extends TestCase
     }
 
 
+    public function test_dashboard_sparse_metrics_and_permission_filtered_actions_keep_balanced_columns(): void
+    {
+        $css = file_get_contents(resource_path('css/zazu-final-visual-sweep.css'));
+
+        $this->assertIsString($css);
+        $this->assertStringContainsString('.zazu-dash-metrics:has(> .zazu-dash-metric:only-child)', $css);
+        $this->assertStringContainsString('.zazu-dash-metrics:has(> .zazu-dash-metric:nth-child(2):last-child)', $css);
+        $this->assertStringContainsString('grid-template-columns: repeat(2, minmax(190px, 360px));', $css);
+        $this->assertStringContainsString('repeat(auto-fit, minmax(min(100%, 230px), 1fr))', $css);
+    }
+
     public function test_dashboard_event_and_quote_panels_follow_reference_hierarchy(): void
     {
         $dashboard = file_get_contents(resource_path('views/dashboard.blade.php'));
