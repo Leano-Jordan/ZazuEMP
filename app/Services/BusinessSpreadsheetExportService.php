@@ -17,7 +17,8 @@ use App\Models\Quote;
 use App\Models\Supplier;
 use App\Models\TravelCost;
 use App\Support\Audit;
-use Illuminate\Http\Response\StreamedResponse;
+use Closure;
+use Symfony\Component\HttpFoundation\StreamedResponse;
 use Illuminate\Support\Str;
 
 final class BusinessSpreadsheetExportService
@@ -143,108 +144,129 @@ final class BusinessSpreadsheetExportService
 
     private function commercialDefinitions(Business $business): array
     {
+        return array_merge(
+            $this->quoteInvoiceDefinitions($business),
+            $this->paymentExpenseDefinitions($business),
+            $this->eventCostDefinitions($business)
+        );
+    }
+
+    private function quoteInvoiceDefinitions(Business $business): array
+    {
         return [
-            'quotes' => [
-                'label' => 'Quotes',
-                'description' => 'Quote status, latest saved version, values and deposit terms.',
-                'query' => fn () => Quote::query()
-                    ->whereHas('event', fn ($query) => $query->where('business_id', $business->id))
-                    ->with(['event.customer', 'latestVersion'])
-                    ->orderBy('id')->lazy(500),
-                'columns' => [
-                    $this->column('Quote reference', 'reference'),
-                    $this->column('Event reference', 'event.reference'),
-                    $this->column('Event name', 'event.name'),
-                    $this->column('Customer', 'event.customer.name'),
-                    $this->column('Quote status', 'status'),
-                    $this->column('Currency', 'currency'),
-                    $this->column('Version', 'latestVersion.version', true),
-                    $this->column('Version status', 'latestVersion.status'),
-                    $this->column('Subtotal', 'latestVersion.subtotal', true),
-                    $this->column('Tax', 'latestVersion.tax_total', true),
-                    $this->column('Total', 'latestVersion.total', true),
-                    $this->column('Deposit percent', 'latestVersion.deposit_percent', true),
-                    $this->column('Deposit amount', 'latestVersion.deposit_amount', true),
-                    $this->column('Notes', 'latestVersion.notes'),
-                ],
-            ],
-            'invoices' => [
-                'label' => 'Invoices',
-                'description' => 'Issued and paid invoices, customer snapshots, dates and balances before payments.',
-                'query' => fn () => Invoice::query()->where('business_id', $business->id)
-                    ->with(['event', 'quote'])->whereIn('status', ['issued', 'paid'])
-                    ->orderBy('id')->lazy(500),
-                'columns' => [
-                    $this->column('Invoice number', 'number'),
-                    $this->column('Event reference', 'event.reference'),
-                    $this->column('Event name', 'event.name'),
-                    $this->column('Quote reference', 'quote.reference'),
-                    $this->column('Customer', 'customer_name'),
-                    $this->column('Customer email', 'customer_email'),
-                    $this->column('Status', 'status'),
-                    $this->column('Currency', 'currency'),
-                    $this->column('Subtotal', 'subtotal', true),
-                    $this->column('Tax', 'tax_total', true),
-                    $this->column('Total', 'total', true),
-                    $this->column('Issued at', 'issued_at'),
-                    $this->column('Due at', 'due_at'),
-                    $this->column('Notes', 'notes'),
-                ],
-            ],
-            'payments' => [
-                'label' => 'Payments',
-                'description' => 'Deposits and other payments linked to their invoice and event.',
-                'query' => fn () => Payment::query()->where('business_id', $business->id)
-                    ->with(['invoice', 'event'])->orderBy('id')->lazy(500),
-                'columns' => [
-                    $this->column('Event reference', 'event.reference'),
-                    $this->column('Event name', 'event.name'),
-                    $this->column('Invoice number', 'invoice.number'),
-                    $this->column('Payment type', 'type'),
-                    $this->column('Amount', 'amount', true),
-                    $this->column('Currency', 'currency'),
-                    $this->column('Method', 'method'),
-                    $this->column('Reference', 'reference'),
-                    $this->column('Paid at', 'paid_at'),
-                    $this->column('Notes', 'notes'),
-                ],
-            ],
-            'expenses' => [
-                'label' => 'Finance expenses',
-                'description' => 'Recorded finance expenses, linked suppliers and purchase orders.',
-                'query' => fn () => FinanceExpense::query()->where('business_id', $business->id)
-                    ->with(['supplier', 'purchaseOrder', 'event'])->orderBy('id')->lazy(500),
-                'columns' => [
-                    $this->column('Expense date', 'expense_date'),
-                    $this->column('Event reference', 'event.reference'),
-                    $this->column('Event name', 'event.name'),
-                    $this->column('Supplier', 'supplier.name'),
-                    $this->column('Purchase order', 'purchaseOrder.reference'),
-                    $this->column('Description', 'description'),
-                    $this->column('Amount', 'amount', true),
-                    $this->column('Currency', 'currency'),
-                    $this->column('Status', 'status'),
-                    $this->column('Reference', 'reference'),
-                    $this->column('Notes', 'notes'),
-                ],
-            ],
-            'event_costs' => [
-                'label' => 'Event costs',
-                'description' => 'Projected and actual cost records kept against individual events.',
-                'query' => fn () => EventCost::query()->where('business_id', $business->id)
-                    ->with('event')->orderBy('id')->lazy(500),
-                'columns' => [
-                    $this->column('Event reference', 'event.reference'),
-                    $this->column('Event name', 'event.name'),
-                    $this->column('Category', 'category'),
-                    $this->column('Description', 'description'),
-                    $this->column('Currency', 'currency'),
-                    $this->column('Projected amount', 'projected_amount', true),
-                    $this->column('Actual amount', 'actual_amount', true),
-                    $this->column('Status', 'status'),
-                    $this->column('Notes', 'notes'),
-                ],
-            ],
+                        'quotes' => [
+                            'label' => 'Quotes',
+                            'description' => 'Quote status, latest saved version, values and deposit terms.',
+                            'query' => fn () => Quote::query()
+                                ->whereHas('event', fn ($query) => $query->where('business_id', $business->id))
+                                ->with(['event.customer', 'latestVersion'])
+                                ->orderBy('id')->lazy(500),
+                            'columns' => [
+                                $this->column('Quote reference', 'reference'),
+                                $this->column('Event reference', 'event.reference'),
+                                $this->column('Event name', 'event.name'),
+                                $this->column('Customer', 'event.customer.name'),
+                                $this->column('Quote status', 'status'),
+                                $this->column('Currency', 'currency'),
+                                $this->column('Version', 'latestVersion.version', true),
+                                $this->column('Version status', 'latestVersion.status'),
+                                $this->column('Subtotal', 'latestVersion.subtotal', true),
+                                $this->column('Tax', 'latestVersion.tax_total', true),
+                                $this->column('Total', 'latestVersion.total', true),
+                                $this->column('Deposit percent', 'latestVersion.deposit_percent', true),
+                                $this->column('Deposit amount', 'latestVersion.deposit_amount', true),
+                                $this->column('Notes', 'latestVersion.notes'),
+                            ],
+                        ],
+                        'invoices' => [
+                            'label' => 'Invoices',
+                            'description' => 'Issued and paid invoices, customer snapshots, dates and balances before payments.',
+                            'query' => fn () => Invoice::query()->where('business_id', $business->id)
+                                ->with(['event', 'quote'])->whereIn('status', ['issued', 'paid'])
+                                ->orderBy('id')->lazy(500),
+                            'columns' => [
+                                $this->column('Invoice number', 'number'),
+                                $this->column('Event reference', 'event.reference'),
+                                $this->column('Event name', 'event.name'),
+                                $this->column('Quote reference', 'quote.reference'),
+                                $this->column('Customer', 'customer_name'),
+                                $this->column('Customer email', 'customer_email'),
+                                $this->column('Status', 'status'),
+                                $this->column('Currency', 'currency'),
+                                $this->column('Subtotal', 'subtotal', true),
+                                $this->column('Tax', 'tax_total', true),
+                                $this->column('Total', 'total', true),
+                                $this->column('Issued at', 'issued_at'),
+                                $this->column('Due at', 'due_at'),
+                                $this->column('Notes', 'notes'),
+                            ],
+                        ]
+        ];
+    }
+
+    private function paymentExpenseDefinitions(Business $business): array
+    {
+        return [
+                        'payments' => [
+                            'label' => 'Payments',
+                            'description' => 'Deposits and other payments linked to their invoice and event.',
+                            'query' => fn () => Payment::query()->where('business_id', $business->id)
+                                ->with(['invoice', 'event'])->orderBy('id')->lazy(500),
+                            'columns' => [
+                                $this->column('Event reference', 'event.reference'),
+                                $this->column('Event name', 'event.name'),
+                                $this->column('Invoice number', 'invoice.number'),
+                                $this->column('Payment type', 'type'),
+                                $this->column('Amount', 'amount', true),
+                                $this->column('Currency', 'currency'),
+                                $this->column('Method', 'method'),
+                                $this->column('Reference', 'reference'),
+                                $this->column('Paid at', 'paid_at'),
+                                $this->column('Notes', 'notes'),
+                            ],
+                        ],
+                        'expenses' => [
+                            'label' => 'Finance expenses',
+                            'description' => 'Recorded finance expenses, linked suppliers and purchase orders.',
+                            'query' => fn () => FinanceExpense::query()->where('business_id', $business->id)
+                                ->with(['supplier', 'purchaseOrder', 'event'])->orderBy('id')->lazy(500),
+                            'columns' => [
+                                $this->column('Expense date', 'expense_date'),
+                                $this->column('Event reference', 'event.reference'),
+                                $this->column('Event name', 'event.name'),
+                                $this->column('Supplier', 'supplier.name'),
+                                $this->column('Purchase order', 'purchaseOrder.reference'),
+                                $this->column('Description', 'description'),
+                                $this->column('Amount', 'amount', true),
+                                $this->column('Currency', 'currency'),
+                                $this->column('Status', 'status'),
+                                $this->column('Reference', 'reference'),
+                                $this->column('Notes', 'notes'),
+                            ],
+                        ]
+        ];
+    }
+
+    private function eventCostDefinitions(Business $business): array
+    {
+        return [
+                        'event_costs' => [
+                            'label' => 'Event costs',
+                            'description' => 'Projected and actual cost records kept against individual events.',
+                            'query' => fn () => EventCost::query()->where('business_id', $business->id)
+                                ->with('event')->orderBy('id')->lazy(500),
+                            'columns' => [
+                                $this->column('Event reference', 'event.reference'),
+                                $this->column('Event name', 'event.name'),
+                                $this->column('Category', 'category'),
+                                $this->column('Description', 'description'),
+                                $this->column('Currency', 'currency'),
+                                $this->column('Projected amount', 'projected_amount', true),
+                                $this->column('Actual amount', 'actual_amount', true),
+                                $this->column('Status', 'status'),
+                                $this->column('Notes', 'notes'),
+                            ],
+                        ]
         ];
     }
 
