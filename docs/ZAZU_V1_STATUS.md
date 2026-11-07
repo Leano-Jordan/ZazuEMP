@@ -185,3 +185,6 @@ The session-transition matrix now has additional source-level regression coverag
 New backups are now format version 2 and include SHA-256 checksums for the database snapshot and every private-storage payload file. Restore validates the exact payload/checksum file set and streams the payload hashes before extraction or installation mutation. Version-1 archives remain accepted for backward compatibility; new version-2 archives require the checksum manifest. Automated tests cover checksum generation and rejection of a modified private file without replacing the currently installed private probe.
 
 **Implementation:** committed on `main`. **Verification:** exact-head Laravel/quality execution remains UNVERIFIED. Checksums protect against accidental corruption/content drift, not archive forgery; the manifest is not signed. The real operator backup → restore → record/media/access verification drill remains a release blocker, so recovery readiness stays at 2/5 and V1 remains NO-GO.
+
+
+Backup compatibility coverage was extended after the initial integrity note: the test suite now verifies rejection of a version-2 archive with no checksum map and restores a valid version-1 archive without checksums. These cases are committed but remain unexecuted until exact-head CI is observed.
