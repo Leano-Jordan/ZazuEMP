@@ -895,4 +895,18 @@ class UiProportionFoundationTest extends TestCase
         $this->assertStringContainsString('@media (prefers-reduced-motion: reduce)', $css);
     }
 
+
+    public function test_dashboard_quick_actions_use_quiet_surfaces_with_theme_and_mobile_parity(): void
+    {
+        $css = file_get_contents(resource_path('css/zazu-dashboard-authority.css'));
+
+        $this->assertIsString($css);
+        $this->assertStringContainsString('Director iteration 02 — quiet the primary action row.', $css);
+        $this->assertStringContainsString('border: 1px solid #D7E2EB !important;', $css);
+        $this->assertStringContainsString('background: #F8FAFC !important;', $css);
+        $this->assertStringContainsString('html[data-theme="dark"] body.zazu-dashboard-page .zazu-dash-quick-actions .zazu-btn:not(.zazu-btn-cta)', $css);
+        $this->assertStringContainsString('@media (max-width: 420px)', $css);
+        $this->assertStringContainsString('@media (prefers-reduced-motion: reduce)', $css);
+    }
+
 }
