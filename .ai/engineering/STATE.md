@@ -1045,3 +1045,13 @@ Latest source change: commit `29a38f55d3d3ff5979cf844ddbd624a9ea279515` consolid
 - Added source-level regression coverage in `UiProportionFoundationTest`.
 - Commit sequence: `3173be5` (dashboard CSS), `e8f25b3` (regression test).
 - Runtime PHPUnit, Vite build and browser visual review remain unverified in this environment.
+
+
+## Dashboard visual identity refinement — 2026-11-07
+
+- Refined the dashboard welcome banner with a clearer primary-content/capability split, stronger greeting hierarchy and a softer coastal surface treatment.
+- Rebalanced KPI tiles around the icon, label and live value so the metric reads as one deliberate unit; retained sparse-workspace and mobile layout rules.
+- Unified dashboard work panels with a restrained blue-tinted border, softer shadow and more compact panel headers.
+- Added source regression coverage for the dashboard-only visual hierarchy.
+- The sidebar was intentionally left unchanged: it belongs to the shared application shell, and changing it would extend this dashboard-only approval scope to every page. Its deep-navy treatment remains a separate owner-approved shell objective.
+- GitHub source changes only. PHPUnit, Vite build and rendered desktop/tablet/mobile light/dark review remain unverified; visual approval is still pending.
