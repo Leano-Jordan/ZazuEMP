@@ -9,9 +9,14 @@ on:
 permissions:
   contents: read
 
+concurrency:
+  group: zazu-browser-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   browser:
     runs-on: ubuntu-latest
+    timeout-minutes: 30
     env:
       ZAZU_DEMO_EMAIL: demo@zazu.local
       ZAZU_DEMO_PASSWORD: password
