@@ -1975,14 +1975,15 @@ function setupZazuOfflineAttachments() {
                 return;
             }
 
-            for (const file of files) {
-                await client.queueAttachment(eventId, file, '');
-            }
+            await client.queueAttachments(eventId, files, '');
 
             input.value = '';
-            setStatus(files.length === 1
-                ? 'File saved on this phone. It will upload when Zazu reconnects.'
-                : files.length + ' files saved on this phone. They will upload when Zazu reconnects.');
+            const uploadGuidance = client.isPaired()
+                ? ' They will upload when Zazu reconnects.'
+                : ' Pair this device with Zazu before they can upload.';
+            setStatus((files.length === 1
+                ? 'File saved on this phone.'
+                : files.length + ' files saved on this phone.') + uploadGuidance);
 
             if (client.isPaired()) {
                 await client.syncAttachments();
