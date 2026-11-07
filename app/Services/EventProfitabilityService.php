@@ -1,13 +1,13 @@
 <?php
 
-namespace App\\Services;
+namespace App\Services;
 
-use App\\Models\\Business;
-use App\\Models\\Event;
-use App\\Models\\EventCost;
-use App\\Models\\Invoice;
-use App\\Support\\Money;
-use Illuminate\\Support\\Collection;
+use App\Models\Business;
+use App\Models\Event;
+use App\Models\EventCost;
+use App\Models\Invoice;
+use App\Support\Money;
+use Illuminate\Support\Collection;
 
 final class EventProfitabilityService
 {
