@@ -1,12 +1,14 @@
 # Zazu EMP — V1 Commercial Release Roadmap
 
 **Status:** LIVE  
-**Last Director cycle:** 2026-11-07  
+**Last Director cycle:** 2026-11-08  
 **Repository:** `Leano-Jordan/ZazuEMP`  
 **Branch:** `main`  
-**Latest application/test source SHA:** `89daa318f310b5cf873b50711e31eff73db12b92`  
+**Latest verified application/test source SHA:** `d44ec33a57a4958380f2cfe4624f040859cbcf7a`  
 **Release-control docs commits:** documentation-only commits may follow and do not change the application assessment baseline.  
 **Evidence rule:** Implemented ≠ Verified ≠ Proven.
+
+> **Current exact-head reconciliation (2026-11-08):** application/test SHA `d44ec33` passes Laravel (407 / 2,758 assertions), Quality, Psalm, PHPMD, populated upgrade/rollback and browser smoke (65 passed / 22 skipped). SonarCloud is skipped. The canonical `docs/V1_RELEASE_CHECKLIST.md` owns current release evidence; older run IDs and snapshots in this supporting roadmap are historical unless explicitly reconciled there.
 
 ## Director operating rule
 
@@ -35,7 +37,7 @@ A requirement is **🟢 VERIFIED COMPLETE** only when it is implemented, verifie
 | CTRL-02 | Repository truth | Inspect branch and HEAD before every execution | 🟢 VERIFIED COMPLETE | Current branch main; current HEAD recorded in both roadmap and canonical checklist | Low | Repeat each cycle |
 | CTRL-03 | Evidence discipline | Separate implemented/tested/verified/proven claims | 🟢 VERIFIED COMPLETE | Existing readiness register + release documentation | Low | Preserve distinction |
 | CTRL-04 | Regression control | Stop improvement work when a regression is found | 🟢 VERIFIED COMPLETE | Director operating rule | Medium | Apply every batch |
-| CTRL-05 | Release evidence | Current-head CI/browser/runtime evidence | 🟡 IN PROGRESS | Historical green runs exist, but exact current application/test SHA has no observed status contexts; latest Laravel/Quality/browser/security/upgrade checks are unverified | Critical | Obtain exact-head Actions evidence before certification |
+| CTRL-05 | Release evidence | Current-head CI/browser/runtime evidence | 🟢 AUTOMATED VERIFIED / OPERATIONAL GATES OPEN | Exact application/test SHA `d44ec33` passes Laravel, Quality, Psalm, PHPMD, browser smoke and populated upgrade/rollback; SonarCloud skipped | Critical | Execute physical offline, operator recovery/rollback, privacy/legal and brand gates |
 
 # Director execution cycle — 2026-10-01 — release evidence closure
 
@@ -128,7 +130,7 @@ Application assessment HEAD: 52d9b26bc17ddee8d1427032ecaf2fb8fc0b6350
 | COMM-07 | Inventory | Reservation/allocation where required by V1 | 🟡 IN PROGRESS | Inventory movement foundation exists; requirement boundary still needs populated-data verification | High | Verify actual V1 operational need before expansion |
 | COMM-08 | Assets | Condition/damage/loss evidence | 🟡 IN PROGRESS | Asset allocation/release foundation exists; evidence workflow remains incomplete | Medium | Verify whether current V1 requirement is satisfied without expansion |
 | COMM-09 | Activity | Activity/audit continuity across commercial workflow | 🟡 IN PROGRESS | Audit foundation exists; continuity not fully proven | High | Trace quote → invoice → payment → completion |
-| COMM-10 | Notifications | Required reminders/notifications | ⬜ NOT STARTED | Listed as release work; no verified evidence in current record | Medium | Determine minimum V1 operational requirement; avoid notification sprawl |
+| COMM-10 | Notifications | Scheduled reminders and staff-assignment alerts | 🟡 DEFERRED TO R799 | Core success/error feedback, status indicators and confirmations are implemented; scheduled reminders/assignment alerts remain team-tier gaps | Medium | Revisit after the R499 bridge and validated R799 team workflows |
 
 # Phase 5 — UX, responsive and accessibility
 
@@ -141,7 +143,7 @@ Application assessment HEAD: 52d9b26bc17ddee8d1427032ecaf2fb8fc0b6350
 | UX-05 | Navigation | Navigation remains coherent without dead ends or excessive chrome | 🟡 IN PROGRESS | Mobile/navigation refinements and command palette exist; runtime verification outstanding | Medium | Traverse critical routes |
 | UX-06 | Error states | Validation, empty, loading and failure states are usable | 🟡 IN PROGRESS | Existing UI foundations; broad runtime verification outstanding | High | Targeted failure-state sweep |
 | UX-07 | Dashboard | Dashboard refinement preserves working metrics/workflows | 🟡 OWNER ACCEPTED / QA PENDING | Owner accepted the current dashboard as sufficient for now; refinement mission is closed | Medium | Include in responsive critical-page QA; no active dashboard styling task |
-| UX-08 | Search | Search experience is usable across desktop/mobile | 🟡 IN PROGRESS | Database-backed permission-aware search implemented; rendered/runtime QA missing | Medium | Browser verify |
+| UX-08 | Search | Search experience is usable across desktop/mobile | 🟢 AUTOMATED VERIFIED / DEVICE QA OPEN | Permission-aware record search now includes job attachment metadata; Laravel and exact-head browser suites pass. Installed-device acceptance remains separate | Medium | Retain device/mobile acceptance gate |
 
 # Phase 6 — Reliability, recovery and operations
 

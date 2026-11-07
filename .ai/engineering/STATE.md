@@ -30,21 +30,23 @@ The 2026-11-01 local Windows-host proposal was exploratory and is no longer the 
 ## Active target
 **Owner-directed V1 convergence:** repair source defects, keep exact-main CI green, complete the remaining offline/device and commercial evidence, and remove every operational task that can be safely verified or automated from code. The owner-accepted dashboard remains closed. All implementation stays on canonical `main`.
 
-## Current verified source — 2026-11-07
+## Current verified source — 2026-11-08
 
-- Application/test source: `dd3e1d4c0e03c63c565d12fabf744b93b75dae52`.
-- Laravel: **405 tests / 2,715 assertions — PASS**.
+- Verified application/test source: `d44ec33a57a4958380f2cfe4624f040859cbcf7a` on canonical `main`.
+- Laravel: **407 tests / 2,758 assertions — PASS**.
 - Zazu quality + secret scan: PASS.
 - Psalm security scan: PASS.
 - PHPMD: PASS.
 - Populated upgrade/rollback: PASS.
-- Browser smoke: still running at latest reconciliation; do not claim complete.
+- Browser smoke: **65 passed / 22 skipped / 0 failed — PASS**.
+- Director health report: PASS.
 - SonarCloud: skipped, not a pass.
-- V1 business export: 13 owner-only, business-scoped CSV datasets; streaming, audit logged and formula-injection protected.
-- Event profitability: populated quote → payment → purchasing → receiving → actual cost → completion regression passes; draft/void invoices and planned/cancelled costs are excluded.
-- Device credentials: 180-day rolling idle expiry; authenticated sync refreshes expiry; expired tokens require re-pairing; owner revocation clears token expiry/hash.
-- Current release position remains NO-GO pending browser smoke, physical installed-device/offline acceptance, representative operator backup/restore and deployment rollback drills, operational walkthrough and legal/privacy/brand closure.
-- Canonical ledger: `docs/V1_RELEASE_CHECKLIST.md`. Never repeat a CI status from an older SHA as current evidence.
+- Business export: 23 owner-only, business-scoped CSV datasets; streaming, audit logged and formula-injection protected.
+- Global document search: filename/description/MIME type and linked job metadata search; business-scoped, permission-aware, no private storage path disclosure.
+- Offline Work attachments remain integrated into active Work; phone-local persistence/reconnect logic is automated-tested, but the installed-device disconnect/restart/reconnect sequence remains physically unverified.
+- The current application/test source has a fully green automated verification batch. The release remains NO-GO pending installed-device offline acceptance, representative operator backup/restore and deployment rollback drills, operational privacy/legal closure and official Zazu brand clearance.
+- Commercial follow-on gaps are explicitly tiered: product/service and supplier spreadsheet import for the R499 bridge; event/work staff assignment and scheduled reminders for the R799 team tier.
+- Canonical release ledger: `docs/V1_RELEASE_CHECKLIST.md`. Never repeat a CI status from an older SHA as current evidence.
 
 ## Index-only dashboard refinement — 2026-11-06
 

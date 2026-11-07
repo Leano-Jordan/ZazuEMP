@@ -4,8 +4,8 @@
 **Repository:** `Leano-Jordan/ZazuEMP`  
 **Branch:** `main`  
 **Main-ref rule:** query the live `main` ref; this ledger does not pin a moving HEAD.  
-**Last Director reconciliation:** 2026-11-07  
-**Latest verified application/test source SHA:** `dd3e1d4c0e03c63c565d12fabf744b93b75dae52`. Resolve the live `main` SHA from GitHub when starting a new cycle.
+**Last Director reconciliation:** 2026-11-08  
+**Latest verified application/test source SHA:** `d44ec33a57a4958380f2cfe4624f040859cbcf7a`. A documentation-only reconciliation may follow; the application/test source remains this exact verified SHA.
 
 ## Evidence rule
 
@@ -13,49 +13,51 @@
 
 This ledger records the current release truth. Older Director audits remain historical evidence; they do not override this snapshot.
 
+## Current V1 reconciliation — 2026-11-08
 
-## Current V1 reconciliation — 2026-11-07
+**Release position: NO-GO.** All required automated CI gates have passed on the same application/test source SHA. This closes the current automated source-verification batch, not the operational release gates. Installed-device offline acceptance, a real operator restore/rollback exercise, legal/privacy closure and official Zazu brand clearance remain open.
 
-**Release position: NO-GO.** Automated source verification is now green across the Laravel, quality, security, static-analysis and populated upgrade/rollback gates. Browser smoke is still running. Installed-device acceptance, real recovery/rollback exercises, operational legal/privacy closure and official brand clearance remain open.
-
-**Validated application/test source commit:** `dd3e1d4c0e03c63c565d12fabf744b93b75dae52`  
-**Canonical branch:** `main` (resolve live ref; no moving branch SHA is pinned beyond this evidence snapshot).
+**Validated application/test source commit:** `d44ec33a57a4958380f2cfe4624f040859cbcf7a`  
+**Canonical branch:** `main`.
 
 | Area | Current source/test position | Evidence state |
 |---|---|---|
-| Active Work attachments | Business-scoped local queue, atomic batch save, idempotent reconnect upload, private list/download caching and offline job-ID reconciliation integrated into active Work | IMPLEMENTED; Laravel PASS; browser/installed-device proof remains |
+| Core application and UI regression | Dark-theme authority restored; Finance header search is bounded where page actions exist; logout health probe uses the supported GET path; visible offline form controls and report/inspector assertions now match the user-facing workflow | IMPLEMENTED; Laravel and browser smoke PASS |
+| Active Work attachments | Business-scoped local queue, atomic batch save, idempotent reconnect upload, private list/download caching and offline job-ID reconciliation are integrated into active Work | IMPLEMENTED; Laravel and browser smoke PASS; installed-device proof remains |
+| Global document search | Existing job attachments are searchable by filename, description, MIME type and linked job metadata; search returns the job attachment section, is business-scoped and does not expose private storage paths | IMPLEMENTED; Laravel PASS |
 | Trusted-device lifecycle | Owner revocation, 180-day rolling inactivity expiry, automatic extension on authenticated sync and expired-token re-pair enforcement | Laravel PASS; physical device acceptance remains |
-| Backup / restore | Format-v2 SHA-256 manifest covers database and private files; restore validates payload set before installation mutation; legacy v1 remains supported | Laravel PASS; real operator restore drill remains |
-| Commercial workflow | Quote acceptance, invoice, deposit/final payment, purchase receiving, actual event cost, completion and event profitability reconciled in one populated regression | AUTOMATED PASS — 405 tests / 2,715 assertions |
-| Event profitability | Reports reconcile issued/paid invoice value to actual event costs by event and currency; draft/void invoices and planned/cancelled costs excluded | IMPLEMENTED; Laravel PASS |
-| Business data export | 23 CSV datasets: customers, events, quotes, invoices, payments, expenses, suppliers, purchase orders/lines, inventory items/movements, event costs and travel calculations. Owner-only, business-scoped, streamed, audited, formula-injection protected | IMPLEMENTED; Laravel PASS; records-only, not a restorable database backup |
+| Backup / restore | Format-v2 SHA-256 manifest covers database and private files; restore validates payload set before installation mutation; legacy v1 remains supported | Automated Laravel coverage PASS; real operator restore drill OPEN |
+| Commercial workflow | Quote acceptance, invoice, deposit/final payment, purchase receiving, actual event cost, completion and event profitability are covered by populated workflow regression | Laravel PASS; full operational/customer deployment proof remains |
+| Event profitability | Reports reconcile issued/paid invoice value to actual event costs by event and currency; draft/void invoices and planned/cancelled costs are excluded | IMPLEMENTED; Laravel PASS |
+| Business data export | 23 CSV datasets; owner-only, business-scoped, streamed, audited, formula-injection protected and Excel-compatible | IMPLEMENTED; Laravel and Quality PASS; records-only, not a restorable database backup |
 | Security | Psalm security scan and secret scan pass; paired-device credentials have rolling idle expiry; CSP inline script/style and broader adversarial review remain | AUTOMATED SECURITY GATES PASS; additional hardening/acceptance open |
 | Deployment / recovery | Populated existing-database upgrade and rollback workflow passes; no production deployment rollback drill or representative customer restore is recorded | AUTOMATED UPGRADE/ROLLBACK PASS; operational drills OPEN |
 | Legal / privacy / brand | Retention/disposal ownership, incident escalation, customer-facing privacy/terms decisions and official Zazu name clearance remain outstanding | OPEN / RELEASE BLOCKER |
 
 ### Exact-source automated verification
 
-All results below apply to source/test commit `dd3e1d4c0e03c63c565d12fabf744b93b75dae52`:
+All results below apply to application/test source commit `d44ec33a57a4958380f2cfe4624f040859cbcf7a`:
 
 | Check | Result |
 |---|---|
-| Laravel feature suite | 🟢 PASS — 405 tests, 2,715 assertions — [run 42419716104](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/42419716104) |
-| Zazu quality (application/build + secret scan) | 🟢 PASS — [run 42419716071](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/42419716071) |
-| Psalm security scan | 🟢 PASS — [run 42419716045](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/42419716045) |
-| PHPMD | 🟢 PASS — [run 42419716054](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/42419716054) |
-| Populated upgrade + rollback | 🟢 PASS — [run 42419716035](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/42419716035) |
-| Browser smoke | 🟡 IN PROGRESS at reconciliation — [run 42419716012](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/42419716012) |
-| Push on main | 🟡 IN PROGRESS at reconciliation — [run 42419715446](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/42419715446) |
-| SonarCloud | ⚪ SKIPPED; not a pass — [run 42419716026](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/42419716026) |
-| Director health report | 🟢 Completed — [run 42419716117](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/42419716117) |
+| Laravel feature suite | 🟢 PASS — 407 tests, 2,758 assertions — [run 42424637142](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/42424637142) |
+| Zazu quality (application/build + secret scan) | 🟢 PASS — [run 42424637115](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/42424637115) |
+| Psalm security scan | 🟢 PASS — [run 42424637178](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/42424637178) |
+| PHPMD | 🟢 PASS — [run 42424637119](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/42424637119) |
+| Populated upgrade + rollback | 🟢 PASS — [run 42424637129](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/42424637129) |
+| Browser smoke | 🟢 PASS — 65 passed, 22 skipped, 0 failed — [run 42424637118](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/42424637118) |
+| Director health report | 🟢 PASS — [run 42424637141](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/42424637141) |
+| SonarCloud | ⚪ SKIPPED; not a pass — [run 42424637162](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/42424637162) |
 
-**Verification boundary:** a green Director health workflow means the report job executed successfully; it does not override a failed or still-running underlying gate. Browser smoke remains pending. SonarCloud is skipped and is not counted as a pass.
+**Verification boundary:** the Laravel, Quality, Psalm, PHPMD, browser smoke and populated upgrade/rollback results above all target the same application/test SHA. SonarCloud was skipped and is not counted as a pass. Automated migration/rollback and archive-integrity tests do not substitute for a real operator recovery drill.
 
-**Physical acceptance boundary:** previous PC/mobile installation and screen-rotation confirmation is presentation evidence only. Disconnected installed-device launch/restart, attachment recovery, offline session transitions and secure-origin behaviour still require real-device evidence.
+**Physical acceptance boundary:** previous PC/mobile installation and screen-rotation confirmation is presentation evidence only. Disconnected installed-device launch/restart, offline Work and attachment recovery, session transitions and secure-origin behaviour still require the Rosscore offline-first physical acceptance sequence.
 
-**Export boundary:** CSV files provide portable structured business records. They do not contain uploaded binary attachments and are not installation-level backup archives or a database restore format. Exports are owner-only and the export action is recorded in the business audit history.
+**Commercial scope boundary:** the customer CSV/XLSX import preview/matching path exists. Product/service and supplier import coverage remains incomplete for the R499 commercial bridge. Staff assignment and scheduled reminders are R799 team-management gaps; these are not being misrepresented as implemented or as blockers to the R299/R499 baseline. Core meaningful feedback/toasts are implemented; they are distinct from scheduled reminders.
 
-No release certification or score uplift is awarded from CI alone. The 13-domain 60/100 evidence-maturity score remains the last formally reconciled baseline pending a full fresh domain audit and closure of operational blockers.
+**Export boundary:** CSV files provide portable structured business records. They do not contain uploaded binary attachments and are not installation-level backup archives or a database restore format. Exports are owner-only and export actions are recorded in business audit history.
+
+No release certification or score uplift is awarded from CI alone. The 13-domain 60/100 evidence-maturity score remains the last formally reconciled baseline pending a fresh full-domain audit and closure of operational blockers.
 
 ## Historical CI evidence — 2026-11-01 (not current)
 

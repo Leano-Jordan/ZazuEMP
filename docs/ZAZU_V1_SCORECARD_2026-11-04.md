@@ -30,7 +30,7 @@ The overall score is an unweighted average. A high average cannot override a Cri
 | Data integrity and auditability | **4/5** | Transactions, idempotency, business-parent constraints, audit records and adversarial tests are present. Broader real concurrency proof remains incomplete. |
 | Security and tenant isolation | **3/5** | Server-side permissions, business scoping, private media controls and sync-token controls exist. Offline account/session boundary and CSP hardening remain open review items. |
 | Offline continuity | **3/5** | Business-scoped IndexedDB workspace, durable mutation queue, reconnect sync and explicit conflict handling exist for a bounded set of workflows. Full disconnected parity is not promised or proven. |
-| Documents and attachments | **2/5** | Online private attachments are implemented. Active phone-local attachment queue/upload/download is not integrated; legacy offline script is not an active feature. |
+| Documents and attachments | **2/5** | Online private attachments and active Work phone-local queue/upload/download/reconnect safeguards are implemented; document metadata search is business-scoped. Automated Laravel/browser coverage passes. Physical installed-device recovery and real data/media restore remain unproven, so the maturity score is held. |
 | Search, reporting and Zazu Helper | **3/5** | Permission-aware search, essential reporting and contextual Helper foundation exist. Full end-to-end usability and acceptance evidence is incomplete. |
 | UX, mobile, tablet and accessibility | **3/5** | Responsive foundations and browser coverage exist; physical acceptance was previously owner-reported. Latest-head critical-flow and accessibility sweep remain outstanding. |
 | Recovery and data portability | **2/5** | Installation-level CLI backup/restore and automated round-trip/hostile-archive tests exist. Business self-service export/restore is not implemented; real operator recovery drill remains open. |
@@ -38,6 +38,8 @@ The overall score is an unweighted average. A high average cannot override a Cri
 | Legal, privacy and brand clearance | **1/5** | Draft controls and registers exist. Operational POPIA/legal sign-off and Zazu trade-mark clearance remain open. |
 
 **Unweighted evidence-maturity average: 3.0/5 — 60/100.**
+
+**2026-11-08 reconciliation:** the automated application/test batch now passes on `d44ec33` (407 Laravel tests / 2,758 assertions; 65 browser tests passed, 22 skipped). The 60/100 baseline is deliberately unchanged until a full independent 13-domain re-audit and the physical/recovery/legal/brand gates close.
 
 This is not “60% of the software built”. It is an unweighted summary of how far the V1 specification is supported by implementation and evidence. The product is not release-certified.
 

@@ -1,43 +1,46 @@
 # Zazu EMP — V1 Software / Commercial Status
 
-**Assessment date:** 2026-11-07
+**Assessment date:** 2026-11-08  
 **Repository:** `Leano-Jordan/ZazuEMP`  
-**Validated application/test source commit:** `2c9a03e5de80e5c0aceb47724fff6b8d3a8439f1` on canonical `main` (399 Laravel tests / 2,621 assertions pass; browser smoke still running at 2026-11-07 reconciliation). Resolve live main before later work.
+**Canonical branch:** `main`  
+**Verified application/test source commit:** `d44ec33a57a4958380f2cfe4624f040859cbcf7a`.
 
 ## Current position
 
-Zazu EMP has a substantial connected operational foundation across:
-- authentication/business context;
-- customers and jobs;
-- requirements/capabilities;
-- quotes and revisions;
-- travel and operational costs;
-- preparation;
-- finance;
-- purchasing;
-- inventory;
-- physical assets;
-- reporting;
-- responsive/shared UI.
+Zazu EMP has a substantial connected operational foundation across authentication/business context, customers and jobs, requirements/services, quotes and revisions, preparation, purchasing, inventory/assets, costs, finance, reporting, search, attachments and responsive UI.
 
-The product is **not yet release-certified**. The current main line contains a broad offline operational foundation, while release certification remains gated by real recovery/rollback evidence, legal/privacy closure and Zazu brand clearance.
+The latest exact-head automated verification batch is green:
+- Laravel: **407 passed / 2,758 assertions**
+- Zazu Quality + secret scan: **PASS**
+- Psalm: **PASS**
+- PHPMD: **PASS**
+- Populated upgrade/rollback: **PASS**
+- Browser smoke: **65 passed / 22 skipped / 0 failed**
+- Director health report: **PASS**
+- SonarCloud: **SKIPPED**, not a pass
 
-## Exact-source CI snapshot — 2026-11-07
+Run IDs and release evidence are recorded in `docs/V1_RELEASE_CHECKLIST.md`.
 
-Source/test commit: `dd3e1d4c0e03c63c565d12fabf744b93b75dae52`.
+**Release position: NO-GO.** The application/test source has a fully green automated verification batch, but this is not commercial release certification. Installed-device disconnected operation, representative customer data/private-media restore, deployment rollback, operational legal/privacy closure and official Zazu brand clearance remain outstanding.
 
-- Laravel: **405 passed / 2,715 assertions**.
-- Zazu quality + secret scan: PASS.
-- Psalm security scan: PASS.
-- PHPMD: PASS.
-- Populated upgrade/rollback: PASS.
-- Browser smoke: IN PROGRESS at reconciliation.
-- SonarCloud: SKIPPED, not counted as a pass.
-- Business export: 23 owner-only business-scoped CSV datasets; streamed, audit logged, Excel-compatible and formula-injection protected.
-- Commercial profitability chain regression: PASS.
-- The active Work attachment path, device expiry and backup-v2 integrity changes are included in the executed Laravel suite.
+## Current V1 capability reconciliation
 
-The complete run links and NO-GO gates are in `docs/V1_RELEASE_CHECKLIST.md`. PC/mobile installation and screen rotation do not establish disconnected installed-device acceptance. Real restore/rollback drills and legal/privacy/brand closure remain outstanding.
+- Global search now includes business-scoped metadata search of job attachments as well as the existing record domains.
+- Phone-local Work attachment queue/upload/download and reconnect safeguards exist and pass automated coverage; physical installed-device acceptance remains open.
+- Business export now covers 23 owner-only, tenant-scoped CSV datasets.
+- Customer CSV/XLSX import preview/matching exists. Product/service and supplier import coverage remains an R499 commercial gap.
+- The V1 system-feedback requirement is met by meaningful success/error toasts, status indicators and confirmation flows. Scheduled reminders are a separate R799 team-management gap.
+- Staff assignment to work records is not implemented in the current data model. It is recorded as an R799 team-management gap, not falsely marked complete or treated as a R299/R499 release blocker.
+- The dashboard remains owner-accepted as a design target; exact-head browser regression is green. No styling rollout was implied by that acceptance.
+
+## Current release gates
+
+1. Installed-device offline launch, local Work/attachment operation, force-close/reopen and reconnect acceptance on the intended secure origin.
+2. Representative backup → restore → data/private-media verification on an isolated target deployment.
+3. Real deployment rollback exercise.
+4. POPIA/privacy/terms, retention/disposal ownership and incident escalation closure.
+5. Official Zazu name/trade-mark clearance and professional review.
+6. Final Director release audit after the above evidence is recorded.
 
 ## Historical-chat reconciliation
 

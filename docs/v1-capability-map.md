@@ -81,7 +81,7 @@ This document translates the Product Specification into a practical V1 boundary.
 | Work/task creation | CORE | Yes |
 | Event work association | CORE | Yes |
 | Status/lifecycle | CORE | Yes |
-| Assignment | CORE | Yes |
+| Staff assignment to event/work records | SUPPORTING | Yes — R799 team tier; deferred until the R799 team-management phase |
 | Due dates/planning | CORE | Yes |
 | Completion tracking | CORE | Yes |
 | Relationship to resources/costs | CORE | Yes |
@@ -184,6 +184,7 @@ This document translates the Product Specification into a practical V1 boundary.
 | Professional forms | CORE | Yes |
 | Professional tables | CORE | Yes |
 | Meaningful notifications/toasts | CORE | Yes |
+| Scheduled reminders and assignment alerts | SUPPORTING | Yes — R799 team tier; distinct from core system feedback/toasts |
 | Empty/loading/error states | CORE | Yes |
 | Accessibility fundamentals | SUPPORTING | Yes |
 | Decorative redesigns without product value | OUT OF SCOPE | No |

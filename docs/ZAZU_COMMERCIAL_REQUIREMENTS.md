@@ -67,7 +67,7 @@ These are **working pricing hypotheses**, not final contractual entitlements. Fi
 
 **Outcome:** Zazu runs the operational and financial side rather than merely recording it.
 
-**Current position:** foundations exist, but the integrated populated workflow, export, profitability clarity and remaining import coverage need closure.
+**Current position:** the commercial workflow, 23-dataset export and profitability regression are automated-tested. Customer import preview/matching exists; product/service and supplier import expansion remains open. Operational recovery and customer migration proof remain separate gates.
 
 ### R799 — Business
 
@@ -87,7 +87,7 @@ These are **working pricing hypotheses**, not final contractual entitlements. Fi
 
 **Outcome:** a team can operate in Zazu while the owner/manager controls the operation.
 
-**Current position:** access-control foundations exist; operational coordination features remain a material build area.
+**Current position:** explicit staff/manager role permissions exist; record-level staff assignment, workload visibility and scheduled reminders remain missing. Keep these in the R799 team-management phase after the R499 bridge is stable.
 
 ### R1,299 — Business Plus
 
@@ -125,11 +125,11 @@ These are **working pricing hypotheses**, not final contractual entitlements. Fi
 | Profitability | Basic | MUST | Management | Advanced | Partial |
 | Search | MUST | MUST | MUST | MUST | Present |
 | Excel import | Basic | Core | Advanced | Migration | Customer path present; product/supplier expansion remains |
-| Excel export | MUST | MUST | MUST | MUST | IMPLEMENTED — 13 tenant-scoped owner CSV exports; Excel-compatible; automated verification PASS |
+| Excel export | MUST | MUST | MUST | MUST | IMPLEMENTED — 23 owner-only, business-scoped CSV datasets; streamed, audited, Excel-compatible and formula-injection protected; exact-head Laravel/Quality PASS |
 | Reports | Basic | Full | Management | Advanced | Present/partial |
 | Roles/permissions | Core | Core | MUST | MUST | Present; runtime challenge still matters |
-| Staff assignment | — | — | MUST | MUST | Missing/partial |
-| Notifications/reminders | — | — | MUST | Advanced | Missing |
+| Staff assignment | — | — | MUST | MUST | NOT IMPLEMENTED — R799 team-tier gap; no event/work assignee field or assignment workflow is present on current main |
+| Notifications/reminders | — | — | MUST | Advanced | Core success/error feedback and confirmation UX are implemented; scheduled reminders/assignment alerts remain an R799 gap |
 | Backup/restore | MUST | MUST | MUST | MUST | Tooling present; proof gate |
 | Mobile | MUST | MUST | MUST | MUST | Foundation present; critical-path proof required |
 | Offline/local-first | Core direction | Core direction | Core direction | Core direction | Foundation only; full offline operation is separate scope |
@@ -168,7 +168,7 @@ Then close:
 
 - purchasing → receiving → cost linkage;
 - event profitability;
-- spreadsheet export — owner-only CSV exports for 13 business datasets, audit logged and formula-injection protected;
+- spreadsheet export — owner-only CSV exports for 23 business datasets, audit logged and formula-injection protected;
 - products/services import;
 - supplier import;
 - populated Excel migration workflow;
