@@ -916,3 +916,150 @@ body.zazu-dashboard-page .zazu-dash-focus-item:focus-visible {
     body.zazu-dashboard-page .zazu-dash-focus-item,
     body.zazu-dashboard-page .zazu-dash-resource-grid > * { transition: none !important; }
 }
+
+/* Final consistency pass: dashboard accents stay within one Zazu blue family. */
+body.zazu-dashboard-page .zazu-dash-metric:nth-child(n) .zazu-dash-metric-icon {
+    background: #E8F0FA !important;
+    color: #315F91 !important;
+}
+
+/* The dashboard's explicit light surfaces must respect the global theme toggle. */
+html[data-theme="dark"] body.zazu-dashboard-page {
+    --dash-canvas: #0B1726;
+    --dash-surface: #122235;
+    --dash-surface-soft: #172B40;
+    --dash-border: #294057;
+    --dash-ink: #E6EEF7;
+    --dash-muted: #A4B5C8;
+    --dash-blue: #78A9E8;
+    --dash-sidebar: #091827;
+    background: var(--dash-canvas) !important;
+    color: var(--dash-ink) !important;
+}
+
+html[data-theme="dark"] body.zazu-dashboard-page .zazu-shell,
+html[data-theme="dark"] body.zazu-dashboard-page .zazu-main,
+html[data-theme="dark"] body.zazu-dashboard-page .zazu-content {
+    background: var(--dash-canvas) !important;
+    color: var(--dash-ink) !important;
+}
+
+html[data-theme="dark"] body.zazu-dashboard-page .zazu-sidebar {
+    background: #091827 !important;
+    color: #DCE7F5 !important;
+}
+
+html[data-theme="dark"] body.zazu-dashboard-page .zazu-topbar,
+html[data-theme="dark"] body.zazu-dashboard-page .zazu-dash-surface-head {
+    background: #122235 !important;
+    border-color: #294057 !important;
+}
+
+html[data-theme="dark"] body.zazu-dashboard-page .zazu-page-title,
+html[data-theme="dark"] body.zazu-dashboard-page .zazu-header-context,
+html[data-theme="dark"] body.zazu-dashboard-page .zazu-section-tabs a,
+html[data-theme="dark"] body.zazu-dashboard-page .zazu-dash-surface-head h3,
+html[data-theme="dark"] body.zazu-dashboard-page .zazu-dash-panel-heading h3,
+html[data-theme="dark"] body.zazu-dashboard-page .zazu-dash-event-copy strong,
+html[data-theme="dark"] body.zazu-dashboard-page .zazu-dash-focus-item strong,
+html[data-theme="dark"] body.zazu-dashboard-page .zazu-dash-health-label strong,
+html[data-theme="dark"] body.zazu-dashboard-page .zazu-dash-health-value,
+html[data-theme="dark"] body.zazu-dashboard-page .zazu-dash-quote-stage strong,
+html[data-theme="dark"] body.zazu-dashboard-page .zazu-dash-metric > strong {
+    color: #E6EEF7 !important;
+}
+
+html[data-theme="dark"] body.zazu-dashboard-page .zazu-dash-hero {
+    border-color: #29496B !important;
+    background: #152C46 !important;
+}
+
+html[data-theme="dark"] body.zazu-dashboard-page .zazu-dash-hero-side {
+    border-color: #29496B !important;
+    background: rgba(9,24,39,.38) !important;
+}
+
+html[data-theme="dark"] body.zazu-dashboard-page .zazu-dash-hero h2,
+html[data-theme="dark"] body.zazu-dashboard-page .zazu-dash-capability-copy strong {
+    color: #F0F6FD !important;
+}
+
+html[data-theme="dark"] body.zazu-dashboard-page .zazu-dash-hero .zazu-dash-greeting,
+html[data-theme="dark"] body.zazu-dashboard-page .zazu-dash-hero .zazu-dash-hero-lead,
+html[data-theme="dark"] body.zazu-dashboard-page .zazu-dash-capability-copy .zazu-dash-side-label {
+    color: #B8D0EA !important;
+}
+
+html[data-theme="dark"] body.zazu-dashboard-page .zazu-dash-hero .zazu-dash-hero-support,
+html[data-theme="dark"] body.zazu-dashboard-page .zazu-dash-capability-copy > span:not(.zazu-dash-side-label) {
+    color: #91AFCF !important;
+}
+
+html[data-theme="dark"] body.zazu-dashboard-page .zazu-dash-metric,
+html[data-theme="dark"] body.zazu-dashboard-page .zazu-dash-surface {
+    border-color: #294057 !important;
+    background: #122235 !important;
+    color: #E6EEF7 !important;
+    box-shadow: 0 2px 8px rgba(0,0,0,.16) !important;
+}
+
+html[data-theme="dark"] body.zazu-dashboard-page .zazu-dash-metric:nth-child(n) .zazu-dash-metric-icon {
+    background: #1B3550 !important;
+    color: #91B9EA !important;
+}
+
+html[data-theme="dark"] body.zazu-dashboard-page .zazu-dash-metric > span:not(.zazu-dash-metric-icon),
+html[data-theme="dark"] body.zazu-dashboard-page .zazu-dash-surface-head p,
+html[data-theme="dark"] body.zazu-dashboard-page .zazu-dash-panel-heading p,
+html[data-theme="dark"] body.zazu-dashboard-page .zazu-dash-event-copy span,
+html[data-theme="dark"] body.zazu-dashboard-page .zazu-dash-event-copy small,
+html[data-theme="dark"] body.zazu-dashboard-page .zazu-dash-focus-item small,
+html[data-theme="dark"] body.zazu-dashboard-page .zazu-dash-resource-grid small,
+html[data-theme="dark"] body.zazu-dashboard-page .zazu-dash-quote-stage span,
+html[data-theme="dark"] body.zazu-dashboard-page .zazu-dash-quote-stage small {
+    color: #A4B5C8 !important;
+}
+
+html[data-theme="dark"] body.zazu-dashboard-page .zazu-dash-event,
+html[data-theme="dark"] body.zazu-dashboard-page .zazu-dash-focus-item,
+html[data-theme="dark"] body.zazu-dashboard-page .zazu-dash-resource-grid > *,
+html[data-theme="dark"] body.zazu-dashboard-page .zazu-dash-quote-stage {
+    border-color: #294057 !important;
+    background: #172B40 !important;
+    color: #E6EEF7 !important;
+}
+
+html[data-theme="dark"] body.zazu-dashboard-page .zazu-dash-event:hover,
+html[data-theme="dark"] body.zazu-dashboard-page .zazu-dash-focus-item:hover,
+html[data-theme="dark"] body.zazu-dashboard-page .zazu-dash-resource-grid > *:hover {
+    border-color: #45688D !important;
+    background: #1B3550 !important;
+}
+
+html[data-theme="dark"] body.zazu-dashboard-page .zazu-dash-quick-actions .zazu-btn:not(.zazu-btn-cta),
+html[data-theme="dark"] body.zazu-dashboard-page .zazu-command-trigger,
+html[data-theme="dark"] body.zazu-dashboard-page .zazu-theme-toggle {
+    border-color: #36516C !important;
+    background: #172B40 !important;
+    color: #DCE7F5 !important;
+}
+
+html[data-theme="dark"] body.zazu-dashboard-page .zazu-dash-quick-actions .zazu-btn-cta {
+    border-color: #3977BD !important;
+    background: #2865A6 !important;
+    color: #FFFFFF !important;
+}
+
+html[data-theme="dark"] body.zazu-dashboard-page .zazu-dash-queue-state {
+    border-color: #285B4A !important;
+    background: #12372D !important;
+}
+
+html[data-theme="dark"] body.zazu-dashboard-page .zazu-dash-queue-state strong { color: #8AD3B1 !important; }
+html[data-theme="dark"] body.zazu-dashboard-page .zazu-dash-queue-state span { color: #B0D8C5 !important; }
+html[data-theme="dark"] body.zazu-dashboard-page .zazu-dash-empty { color: #A4B5C8 !important; }
+html[data-theme="dark"] body.zazu-dashboard-page .zazu-dash-empty strong { color: #E6EEF7 !important; }
+html[data-theme="dark"] body.zazu-dashboard-page .zazu-app-footer {
+    border-color: #294057 !important;
+    color: #91A4BA !important;
+}
