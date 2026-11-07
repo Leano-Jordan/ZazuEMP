@@ -1036,3 +1036,12 @@ Latest source change: commit `29a38f55d3d3ff5979cf844ddbd624a9ea279515` consolid
 - Added a regression test covering all four resource-tool gates and the placement of the section condition.
 - Dashboard Blade, its existing UI proportion feature test and this engineering state record only. No metrics, data, permissions, routes, shared shell or other page changed.
 - Source-level verification only. PHPUnit, Vite build and rendered desktop/tablet/mobile light/dark acceptance remain outstanding.
+
+
+### Dashboard reference refinement — sparse workspace layouts
+
+- Refined KPI layout for workspaces exposing only one or two metrics: a single KPI is capped and centered; two KPIs share a centered, bounded pair rather than stretching across the full dashboard.
+- Quick Actions now use an adaptive minimum tile width so permission-filtered action sets naturally reflow instead of leaving oversized empty columns.
+- Added source-level regression coverage in `UiProportionFoundationTest`.
+- Commit sequence: `3173be5` (dashboard CSS), `e8f25b3` (regression test).
+- Runtime PHPUnit, Vite build and browser visual review remain unverified in this environment.
