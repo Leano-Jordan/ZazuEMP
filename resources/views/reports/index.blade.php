@@ -128,6 +128,47 @@
         </div>
     </section>
 
+    <section class="zazu-panel mt-5">
+        <div class="zazu-panel-head">
+            <div>
+                <div class="zazu-panel-title">Event profitability</div>
+                <div class="zazu-panel-copy">Invoiced value less recorded actual job costs. Currency totals stay separate; planned costs are excluded.</div>
+            </div>
+        </div>
+        <div class="mt-4 grid gap-3">
+            @forelse ($eventProfitability as $eventResult)
+                <div class="zazu-context-card">
+                    <div class="flex flex-wrap items-start justify-between gap-3">
+                        <div>
+                            <div class="zazu-detail-label">{{ $eventResult['event_reference'] }} · {{ $eventResult['event_date'] ?? 'Date not set' }}</div>
+                            <div class="zazu-route-card-title mt-1">{{ $eventResult['event_name'] }}</div>
+                        </div>
+                        <div class="text-right">
+                            <div class="zazu-detail-label">Recorded profit</div>
+                            <div class="zazu-command-meta-value mt-1">{{ $eventResult['currency'] }} {{ \\App\\Support\\Money::formatCents($eventResult['profit_cents']) }}</div>
+                            <div class="zazu-field-help">{{ $eventResult['margin_percentage'] === null ? 'Margin unavailable' : number_format($eventResult['margin_percentage'], 2) . '%' }}</div>
+                        </div>
+                    </div>
+                    <div class="mt-3 grid gap-2 sm:grid-cols-2">
+                        <div class="zazu-detail-row">
+                            <div class="zazu-detail-label">Invoiced value</div>
+                            <div class="zazu-detail-value">{{ $eventResult['currency'] }} {{ \\App\\Support\\Money::formatCents($eventResult['invoiced_cents']) }}</div>
+                        </div>
+                        <div class="zazu-detail-row">
+                            <div class="zazu-detail-label">Actual costs</div>
+                            <div class="zazu-detail-value">{{ $eventResult['currency'] }} {{ \\App\\Support\\Money::formatCents($eventResult['actual_cost_cents']) }}</div>
+                        </div>
+                    </div>
+                </div>
+            @empty
+                <div class="zazu-placeholder">
+                    <div class="zazu-placeholder-title">No event profitability to report yet</div>
+                    <div class="zazu-placeholder-copy">Profitability appears when an event has invoiced value or recorded actual costs.</div>
+                </div>
+            @endforelse
+        </div>
+    </section>
+
     <section class="zazu-detail-grid mt-5">
         <div class="zazu-panel">
             <div class="zazu-panel-title">Reporting boundary</div>

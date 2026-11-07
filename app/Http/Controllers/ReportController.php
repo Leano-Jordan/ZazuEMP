@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Event;
 use App\Models\EventCost;
 use App\Models\EventPreparationItem;
+use App\Services\EventProfitabilityService;
 use App\Models\FinanceExpense;
 use App\Models\Invoice;
 use App\Models\Quote;
@@ -16,7 +17,7 @@ use Illuminate\View\View;
 
 class ReportController extends Controller
 {
-    public function __invoke(Request $request): View
+    public function __invoke(Request $request, EventProfitabilityService $profitability): View
     {
         $business = app(CurrentBusiness::class)->model($request->user());
         $businessId = $business->id;
@@ -91,6 +92,8 @@ class ReportController extends Controller
                 ),
             ]);
 
+        $eventProfitability = $profitability->forBusiness($business);
+
         $expenseTotalsByCurrency = FinanceExpense::query()
             ->where('business_id', $businessId)
             ->whereNotIn('status', ['cancelled'])
@@ -106,7 +109,8 @@ class ReportController extends Controller
             'quoteTotalsByCurrency',
             'costTotalsByCurrency',
             'financeTotalsByCurrency',
-            'expenseTotalsByCurrency'
+            'expenseTotalsByCurrency',
+            'eventProfitability'
         ));
     }
 }

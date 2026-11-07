@@ -4,13 +4,18 @@ namespace Tests\Feature;
 
 use App\Models\AuditLog;
 use App\Models\Event;
+use App\Models\EventCost;
+use App\Models\InventoryMovement;
 use App\Models\Invoice;
 use App\Models\Payment;
+use App\Models\PurchaseOrder;
 use App\Models\Quote;
 use App\Models\User;
+use App\Services\EventProfitabilityService;
 use Database\Seeders\DemoScenarioSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\URL;
+use Illuminate\Support\Str;
 use Tests\TestCase;
 
 class CommercialReconciliationTest extends TestCase
@@ -27,6 +32,36 @@ class CommercialReconciliationTest extends TestCase
         $this->recordFinalPayment($business, $invoice);
 
         $this->assertPaidInvoice($business, $invoice);
+    }
+
+    public function test_populated_commercial_and_operations_spine_reconciles_event_profit(): void
+    {
+        [$user, $business, $event, $quote] = $this->prepareCommercialScenario();
+
+        $this->acceptQuote($business, $quote, $event);
+        $invoice = $this->createInvoice($user, $business, $quote);
+        $this->recordDeposit($business, $invoice);
+        $this->recordFinalPayment($business, $invoice);
+        $this->assertPaidInvoice($business, $invoice);
+
+        $this->receivePurchaseOrderAndRecordActualCost($business, $event);
+        $this->completeEvent($event);
+
+        $profit = app(EventProfitabilityService::class)
+            ->forBusiness($business)
+            ->first(fn (array $row): bool => $row['event_id'] === $event->id && $row['currency'] === 'ZAR');
+
+        $this->assertNotNull($profit);
+        $this->assertSame(1150000, $profit['invoiced_cents']);
+        $this->assertSame(280000, $profit['actual_cost_cents']);
+        $this->assertSame(870000, $profit['profit_cents']);
+        $this->assertSame(75.65, $profit['margin_percentage']);
+
+        $this->get(route('reports.index'))
+            ->assertOk()
+            ->assertSee('Event profitability')
+            ->assertSee('ZAR 8,700.00')
+            ->assertSee('75.65%');
     }
 
     private function prepareCommercialScenario(): array
@@ -49,6 +84,69 @@ class CommercialReconciliationTest extends TestCase
         $quote->latestVersion()->update(['status' => 'sent']);
 
         return [$user, $business, $event, $quote];
+    }
+
+    private function receivePurchaseOrderAndRecordActualCost($business, Event $event): void
+    {
+        $order = PurchaseOrder::query()
+            ->where('business_id', $business->id)
+            ->where('reference', 'PO-ZAZU-DEMO-001')
+            ->with('items')
+            ->firstOrFail();
+        $item = $order->items->firstOrFail();
+
+        $order->update(['status' => 'sent']);
+        $item->update(['received_quantity' => '0.00']);
+
+        $this->patch(route('purchasing.status', $order), ['status' => 'ordered'])->assertRedirect();
+        $this->post(route('purchasing.receive', $order), [
+            'idempotency_key' => (string) Str::uuid(),
+            'received_quantity' => [$item->id => '1.00'],
+        ])->assertRedirect();
+
+        $receipt = InventoryMovement::query()
+            ->where('business_id', $business->id)
+            ->where('purchase_order_id', $order->id)
+            ->where('purchase_order_item_id', $item->id)
+            ->where('type', 'receipt')
+            ->latest('id')
+            ->firstOrFail();
+
+        $this->assertSame($event->id, $receipt->event_id);
+        $this->assertSame('2800.00', (string) $receipt->unit_cost);
+        $this->assertSame('received', $order->fresh()->status);
+
+        EventCost::query()
+            ->where('business_id', $business->id)
+            ->where('event_id', $event->id)
+            ->delete();
+
+        $this->post(route('work.costs.store', $event), [
+            'category' => 'Food',
+            'description' => 'Fresh catering supplies received',
+            'currency' => 'ZAR',
+            'projected_amount' => '2800.00',
+            'actual_amount' => '2800.00',
+            'status' => 'incurred',
+            'notes' => 'Integrated commercial reconciliation test.',
+        ])->assertRedirect();
+    }
+
+    private function completeEvent(Event $event): void
+    {
+        $payload = [
+            'customer_id' => $event->customer_id,
+            'name' => $event->name,
+            'event_type' => $event->event_type,
+            'event_date' => $event->event_date?->toDateString(),
+            'event_address' => $event->event_address,
+            'notes' => $event->notes,
+        ];
+
+        $this->put(route('work.update', $event), $payload + ['status' => 'in_progress'])->assertRedirect();
+        $this->put(route('work.update', $event), $payload + ['status' => 'completed'])->assertRedirect();
+
+        $this->assertSame('completed', $event->fresh()->status);
     }
 
     private function acceptQuote($business, $quote, $event): void
