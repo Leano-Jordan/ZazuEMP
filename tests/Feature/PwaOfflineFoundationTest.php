@@ -224,6 +224,7 @@ class PwaOfflineFoundationTest extends TestCase
         $this->assertStringContainsString('attachmentPendingCount', $client);
         $this->assertStringContainsString('async function queueAttachment(eventId, file, description', $client);
         $this->assertStringContainsString('async function queueAttachments(eventId, files', $client);
+        $this->assertStringContainsString('        queueAttachments,', $client);
         $this->assertStringContainsString('async function syncAttachments()', $client);
         $this->assertStringContainsString('async function loadAttachments(eventId)', $client);
         $this->assertStringContainsString('async function getAttachmentFile(idempotencyKey)', $client);
