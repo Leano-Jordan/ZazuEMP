@@ -68,7 +68,8 @@ class UiProportionFoundationTest extends TestCase
         $this->assertNotEmpty($heroRules[1]);
 
         $finalHeroRule = end($heroRules[1]);
-        $this->assertStringContainsString('var(--zazu-surface-2)', $finalHeroRule);
+        $this->assertStringContainsString('var(--zazu-blue-brand)', $finalHeroRule);
+        $this->assertStringContainsString('var(--zazu-card-bg)', $finalHeroRule);
         $this->assertStringNotContainsString('#FFFFFF', $finalHeroRule);
 
         foreach ($heroRules[1] as $heroRule) {
@@ -81,7 +82,8 @@ class UiProportionFoundationTest extends TestCase
         $dashboard = file_get_contents(resource_path('views/dashboard.blade.php'));
 
         $this->assertIsString($dashboard);
-        $this->assertStringContainsString("{{ \$event->event_date ? 'DATE SET' : 'DATE TBC' }}", $dashboard);
+        $this->assertStringContainsString("format('d') ?: 'TBC'", $dashboard);
+        $this->assertStringContainsString("format('M') ?: 'DATE'", $dashboard);
         $this->assertStringContainsString("format('d M Y')", $dashboard);
         $this->assertStringNotContainsString("format('H:i')", $dashboard);
     }
@@ -159,8 +161,8 @@ class UiProportionFoundationTest extends TestCase
         $this->assertStringContainsString("['declined']", $dashboard);
         $this->assertStringContainsString("['expired']", $dashboard);
         $this->assertStringContainsString('Quote status breakdown', $dashboard);
-        $this->assertStringContainsString('Accepted', $dashboard);
-        $this->assertStringContainsString('Declined or expired', $dashboard);
+        $this->assertStringContainsString('Approved', $dashboard);
+        $this->assertStringContainsString('Declined / expired', $dashboard);
         $this->assertStringContainsString('grid-template-columns: repeat(4, minmax(0, 1fr));', $css);
         $this->assertStringContainsString('grid-template-columns: repeat(2, minmax(0, 1fr));', $css);
     }
@@ -173,7 +175,7 @@ class UiProportionFoundationTest extends TestCase
         $this->assertIsString($dashboard);
         $this->assertIsString($css);
         $this->assertStringContainsString('Workspace health', $dashboard);
-        $this->assertStringContainsString('Operational readiness', $dashboard);
+        $this->assertStringContainsString('Workspace health', $dashboard);
         $this->assertStringContainsString('Live business records at a glance', $dashboard);
         $this->assertStringContainsString('grid-template-columns: repeat(4, minmax(0, 1fr));', $css);
         $this->assertStringContainsString('grid-template-columns: repeat(2, minmax(0, 1fr));', $css);
@@ -390,7 +392,7 @@ class UiProportionFoundationTest extends TestCase
         $this->assertSame(0, preg_match('/\\.zazu-caption,\\s*\\.zazu-eyebrow,/', $extensionCss));
 
         // Theme values and wallpaper treatment remain token/state driven.
-        $this->assertStringContainsString('--zazu-sidebar: #E4F6FC;', $appCss);
+        $this->assertStringContainsString('--zazu-sidebar: #8ED8F8;', $appCss);
         $this->assertStringContainsString('--zazu-sidebar: #061826;', $appCss);
         $this->assertStringContainsString('--zazu-sidebar-ink: #F3F7FB;', $appCss);
         $this->assertStringContainsString('body.zazu-has-wallpaper .zazu-topbar', $appCss);
@@ -447,7 +449,7 @@ class UiProportionFoundationTest extends TestCase
         $this->assertIsString($css);
         $this->assertStringContainsString("->limit(5)", $controller);
         $this->assertStringContainsString(".zazu-dash-event {\n    min-height: 64px;", $css);
-        $this->assertStringContainsString("All work", file_get_contents(resource_path('views/dashboard.blade.php')));
+        $this->assertStringContainsString('View all events', file_get_contents(resource_path('views/dashboard.blade.php')));
     }
 
 
