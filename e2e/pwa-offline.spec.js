@@ -181,12 +181,15 @@ test.describe('Zazu installed PWA offline shell', () => {
         const selector = page.locator('select[name="customer_id"]');
         await expect(selector.locator('option[value^="local:"]')).toHaveCount(1);
         await selector.selectOption({ label: 'Local only linked customer' });
-        // The visible choice card overlays the native radio input.
-        // The decorative card overlay intercepts pointer events on some viewports.
-        await page.locator('input[name="event_type"][value="Wedding"]').check({ force: true });
+        // Select the visible Wedding choice card, not its visually covered radio.
+        const weddingChoice = page.locator('label.zazu-choice-card:has(input[name="event_type"][value="Wedding"])');
+        await weddingChoice.click();
+        await expect(weddingChoice.locator('input[name="event_type"]')).toBeChecked();
         await page.locator('input[name="event_date"]').fill('2026-11-15');
         await page.locator('input[name="event_address"]').fill('Pretoria');
-        await page.locator('input[name="services[]"][value="Catering"]').check({ force: true });
+        const cateringChoice = page.locator('label.zazu-service-choice:has(input[name="services[]"][value="Catering"])');
+        await cateringChoice.click();
+        await expect(cateringChoice.locator('input[name="services[]"]')).toBeChecked();
         let normalWorkPostAttempted = false;
         await page.route('**/work', async route => {
             if (route.request().method() === 'POST') {

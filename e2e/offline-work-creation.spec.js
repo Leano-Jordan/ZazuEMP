@@ -44,10 +44,13 @@ test('real Zazu job form can create a job locally while disconnected', async ({ 
         select.add(option);
         select.value = option.value;
     });
-    // The visible choice card overlays the native radio input on mobile/tablet.
-    // Click the user-facing label instead of forcing Playwright to click the obscured input.
-    await page.locator('input[name="event_type"]').first().check({ force: true });
-    await page.locator('#new-job-form input[name="services[]"][value="Catering"]').check({ force: true });
+    // Use the visible choice cards exactly as an operator would.
+    const eventTypeChoice = page.locator('#new-job-form label.zazu-choice-card:has(input[name="event_type"])').first();
+    const cateringChoice = page.locator('#new-job-form label.zazu-service-choice:has(input[name="services[]"][value="Catering"])');
+    await eventTypeChoice.click();
+    await cateringChoice.click();
+    await expect(eventTypeChoice.locator('input[name="event_type"]')).toBeChecked();
+    await expect(cateringChoice.locator('input[name="services[]"]')).toBeChecked();
     await page.locator('#new-job-form input[name="name"]').fill('Offline catering job');
     // The production form requires a job date; without it the browser blocks
     // submission before the offline handler can run.

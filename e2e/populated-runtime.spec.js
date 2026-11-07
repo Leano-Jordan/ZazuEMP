@@ -128,7 +128,8 @@ test.describe('Zazu populated runtime challenge', () => {
 
         await page.goto('/reports', { waitUntil: 'domcontentloaded' });
         await expect(page.getByRole('heading', { name: 'Reports' })).toBeVisible();
-        await expect(page.getByText('ZAR 11,500.00', { exact: true })).toBeVisible();
+        const financialSnapshot = page.locator('.zazu-panel').filter({ hasText: 'Financial snapshot' });
+        await expect(financialSnapshot).toContainText('Invoiced ZAR 11,500.00');
 
         await expectNoServerFailures(page, responses, errors);
     });
@@ -314,6 +315,9 @@ test.describe('Zazu populated runtime challenge', () => {
                 scrollWidth: document.documentElement.scrollWidth,
             }));
             expect(viewport.scrollWidth, path + ' horizontal overflow').toBeLessThanOrEqual(viewport.width);
+            if (path === '/finance') {
+                await expect(page.locator('[data-theme-toggle]').first()).toBeInViewport();
+            }
             await expect(page.locator('.zazu-error-shell')).toHaveCount(0);
         }
     });

@@ -23,6 +23,8 @@ test('Work attachments persist offline, upload on reconnect and cache remote fil
     const jobRow = page.locator('[data-zazu-job-row]').filter({ hasText: 'Mokoena Family Celebration' }).first();
     await expect(jobRow).toBeVisible();
     await jobRow.locator('[data-zazu-inspector-open]').first().click();
+    await page.getByRole('tab', { name: 'Financial Ledger' }).click();
+    await expect(page.locator('[data-zazu-tab-panel="finance"]')).toBeVisible();
     await page.getByRole('link', { name: 'Open job record' }).click();
     await expect(page.locator('[data-zazu-offline-attachment-form]')).toBeVisible();
 
@@ -195,6 +197,8 @@ test('reconciles an offline-created Work attachment after its job receives a ser
     const jobRow = page.locator('[data-zazu-job-row]').filter({ hasText: 'Mokoena Family Celebration' }).first();
     await expect(jobRow).toBeVisible();
     await jobRow.locator('[data-zazu-inspector-open]').first().click();
+    await page.getByRole('tab', { name: 'Financial Ledger' }).click();
+    await expect(page.locator('[data-zazu-tab-panel="finance"]')).toBeVisible();
     await page.getByRole('link', { name: 'Open job record' }).click();
     await expect(page.locator('[data-zazu-offline-attachment-form]')).toBeVisible();
 
