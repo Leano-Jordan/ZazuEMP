@@ -80,7 +80,7 @@ class SyncAttachmentIdempotencyTest extends TestCase
 
         $download = $this->withToken($token)->get('/api/sync/attachments/'.$attachmentId);
         $download->assertOk()
-            ->assertHeader('content-disposition', 'attachment; filename=phone-brief.txt');
+            ->assertDownload('phone-brief.txt');
 
         Storage::disk('private')->assertExists(EventAttachment::query()->findOrFail($attachmentId)->path);
 
