@@ -48,6 +48,12 @@ class ZazuBackupCommand extends Command
                 return self::FAILURE;
             }
 
+            $checksums = $this->buildChecksums($work);
+            if ($checksums === null) {
+                return self::FAILURE;
+            }
+
+            $manifest['checksums'] = $checksums;
             File::put($work.'/manifest.json', json_encode($manifest, JSON_PRETTY_PRINT | JSON_THROW_ON_ERROR));
 
             if (!$this->createArchive($work, $temporaryArchive)) {
@@ -190,6 +196,31 @@ class ZazuBackupCommand extends Command
 
         File::copyDirectory($privateRoot, $work.'/storage/private');
         return true;
+    }
+
+
+    /**
+     * @return array<string, string>|null
+     */
+    private function buildChecksums(string $work): ?array
+    {
+        $checksums = [];
+
+        foreach (File::allFiles($work) as $file) {
+            $relative = str_replace('\\', '/', $file->getRelativePathname());
+            $checksum = hash_file('sha256', $file->getPathname());
+
+            if ($checksum === false) {
+                $this->error('Could not calculate a backup file integrity checksum.');
+                return null;
+            }
+
+            $checksums[$relative] = $checksum;
+        }
+
+        ksort($checksums);
+
+        return $checksums;
     }
 
     private function createArchive(string $work, string $temporaryArchive): bool
