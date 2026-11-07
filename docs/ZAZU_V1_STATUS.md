@@ -178,3 +178,10 @@ The session-transition matrix now has additional source-level regression coverag
 - Owner device revocation is tested against bootstrap, pull, push and attachment-list APIs using the formerly valid bearer token; cross-business owner revocation remains denied.
 
 **Implementation/test status:** tests added on `main`; **execution status: UNVERIFIED**. The exact current-main Laravel and browser workflows must pass before the security/offline evidence score can rise. Physical-device testing, expired web-session acceptance, interrupted logout, stale in-flight response handling and the owner lost-device runbook remain outstanding.
+
+
+## Recovery integrity hardening — 2026-11-07
+
+New backups are now format version 2 and include SHA-256 checksums for the database snapshot and every private-storage payload file. Restore validates the exact payload/checksum file set and streams the payload hashes before extraction or installation mutation. Version-1 archives remain accepted for backward compatibility; new version-2 archives require the checksum manifest. Automated tests cover checksum generation and rejection of a modified private file without replacing the currently installed private probe.
+
+**Implementation:** committed on `main`. **Verification:** exact-head Laravel/quality execution remains UNVERIFIED. Checksums protect against accidental corruption/content drift, not archive forgery; the manifest is not signed. The real operator backup → restore → record/media/access verification drill remains a release blocker, so recovery readiness stays at 2/5 and V1 remains NO-GO.
