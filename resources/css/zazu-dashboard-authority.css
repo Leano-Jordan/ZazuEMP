@@ -207,7 +207,7 @@ body.zazu-dashboard-page .zazu-dash-quick-actions {
     min-width: 0;
 }
 
-body.zazu-dashboard-page .zazu-dash-actions {
+body.zazu-dashboard-page .zazu-dash-quick-actions .zazu-dash-actions {
     display: grid !important;
     grid-template-columns: repeat(4, minmax(0, 1fr)) !important;
     gap: 10px !important;
