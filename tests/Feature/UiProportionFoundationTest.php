@@ -114,6 +114,7 @@ class UiProportionFoundationTest extends TestCase
         $this->assertNotFalse($quotesPosition);
         $this->assertNotFalse($invoicesPosition);
         $this->assertLessThan($invoicesPosition, $quotesPosition);
+        $this->assertStringContainsString('zazu-dash-metric-icon', substr($dashboard, $invoicesPosition, 900));
     }
 
     public function test_dashboard_welcome_and_capability_callout_follow_the_supplied_reference(): void
