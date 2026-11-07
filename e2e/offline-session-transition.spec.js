@@ -40,7 +40,7 @@ test('unreachable logout host preserves the signed-in session and queued busines
     page.on('dialog', async dialog => {
         dialogs.push({ type: dialog.type(), message: dialog.message() });
         if (dialog.type() === 'alert') await dialog.dismiss();
-        else await dialog.dismiss();
+        else await dialog.accept();
     });
 
     await page.route('**/up', route => route.abort());
