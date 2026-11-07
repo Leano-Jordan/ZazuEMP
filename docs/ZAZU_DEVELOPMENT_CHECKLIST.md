@@ -113,7 +113,7 @@ These items are deliberately **later priorities**, not current release blockers 
 
 ### Excel / spreadsheet interoperability
 - [ ] Excel import foundation
-- [ ] Excel export foundation
+- [x] Excel/CSV export foundation — 13 owner-only, business-scoped datasets; streamed, audit logged and formula-injection protected
 - [ ] Customers workbook import
 - [ ] Products/services workbook import
 - [ ] Suppliers workbook import

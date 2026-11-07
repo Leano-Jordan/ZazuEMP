@@ -8,21 +8,22 @@ Readiness is tracked by domain and evidence maturity rather than by a single inf
 
 ## Current verified snapshot — 2026-11-07
 
-**Validated source/test commit:** `2c9a03e5de80e5c0aceb47724fff6b8d3a8439f1` on canonical `main`.
+**Validated source/test commit:** `dd3e1d4c0e03c63c565d12fabf744b93b75dae52` on canonical `main`.
 
-- Laravel: **399 passed / 2,621 assertions**.
+- Laravel: **405 passed / 2,715 assertions**.
 - Zazu quality + secret scan: PASS.
 - Psalm security scan: PASS.
 - PHPMD: PASS.
 - Populated upgrade/rollback: PASS.
 - Browser smoke: IN PROGRESS at reconciliation.
 - SonarCloud: SKIPPED, not a pass.
-- Device credentials now have a 180-day rolling idle expiry, refreshed by authenticated sync; expired credentials require re-pairing.
+- Business data export: 13 tenant-scoped owner CSV exports; streamed, audited and formula-injection protected; export suite included in passing Laravel run.
+- Integrated commercial/profitability regression: PASS.
+- Device credentials use 180-day rolling inactivity expiry, refreshed by authenticated sync; expired credentials require re-pairing.
 - Backup-v2 checksum/tamper/legacy compatibility coverage executed within the passing Laravel suite.
-- No numerical score uplift is awarded until the remaining physical/operational/legal release gates and a fresh domain scorecard are reconciled.
+- No numerical score uplift is awarded until remaining physical/operational/legal gates and a fresh domain scorecard are reconciled.
 
 Exact Actions run URLs and remaining gates are maintained in `docs/V1_RELEASE_CHECKLIST.md`. Older snapshots below are historical.
-
 
 ## Director audit snapshot — 2026-10-19
 

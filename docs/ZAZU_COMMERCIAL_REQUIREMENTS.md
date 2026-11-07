@@ -125,7 +125,7 @@ These are **working pricing hypotheses**, not final contractual entitlements. Fi
 | Profitability | Basic | MUST | Management | Advanced | Partial |
 | Search | MUST | MUST | MUST | MUST | Present |
 | Excel import | Basic | Core | Advanced | Migration | Customer path present; product/supplier expansion remains |
-| Excel export | MUST | MUST | MUST | MUST | Missing |
+| Excel export | MUST | MUST | MUST | MUST | IMPLEMENTED — 13 tenant-scoped owner CSV exports; Excel-compatible; automated verification PASS |
 | Reports | Basic | Full | Management | Advanced | Present/partial |
 | Roles/permissions | Core | Core | MUST | MUST | Present; runtime challenge still matters |
 | Staff assignment | — | — | MUST | MUST | Missing/partial |
@@ -168,7 +168,7 @@ Then close:
 
 - purchasing → receiving → cost linkage;
 - event profitability;
-- spreadsheet export;
+- spreadsheet export — owner-only CSV exports for 13 business datasets, audit logged and formula-injection protected;
 - products/services import;
 - supplier import;
 - populated Excel migration workflow;

@@ -24,17 +24,18 @@ The product is **not yet release-certified**. The current main line contains a b
 
 ## Exact-source CI snapshot — 2026-11-07
 
-Source/test commit: `2c9a03e5de80e5c0aceb47724fff6b8d3a8439f1`.
+Source/test commit: `dd3e1d4c0e03c63c565d12fabf744b93b75dae52`.
 
-- Laravel: **399 passed / 2,621 assertions**.
+- Laravel: **405 passed / 2,715 assertions**.
 - Zazu quality + secret scan: PASS.
 - Psalm security scan: PASS.
 - PHPMD: PASS.
 - Populated upgrade/rollback: PASS.
 - Browser smoke: IN PROGRESS at reconciliation.
 - SonarCloud: SKIPPED, not counted as a pass.
-- The active Work attachment path and format-v2 backup/restore changes are now included in the executed Laravel suite.
-- Paired-device sync credentials now expire after 180 days of inactivity and extend on authenticated sync; expired devices must re-pair.
+- Business export: 13 owner-only business-scoped CSV datasets; streamed, audit logged, Excel-compatible and formula-injection protected.
+- Commercial profitability chain regression: PASS.
+- The active Work attachment path, device expiry and backup-v2 integrity changes are included in the executed Laravel suite.
 
 The complete run links and NO-GO gates are in `docs/V1_RELEASE_CHECKLIST.md`. PC/mobile installation and screen rotation do not establish disconnected installed-device acceptance. Real restore/rollback drills and legal/privacy/brand closure remain outstanding.
 

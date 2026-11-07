@@ -32,17 +32,19 @@ The 2026-11-01 local Windows-host proposal was exploratory and is no longer the 
 
 ## Current verified source — 2026-11-07
 
-- Application/test source: `2c9a03e5de80e5c0aceb47724fff6b8d3a8439f1`.
-- Laravel: **399 tests / 2,621 assertions — PASS**.
+- Application/test source: `dd3e1d4c0e03c63c565d12fabf744b93b75dae52`.
+- Laravel: **405 tests / 2,715 assertions — PASS**.
 - Zazu quality + secret scan: PASS.
 - Psalm security scan: PASS.
 - PHPMD: PASS.
 - Populated upgrade/rollback: PASS.
-- Browser smoke: still running at the latest reconciliation; do not claim complete.
-- Paired-device token security: 180-day rolling idle expiry; authenticated sync refreshes expiry; expired tokens require re-pairing; owner revocation clears token expiry/hash.
-- Current release position remains NO-GO pending browser smoke, physical installed-device/offline acceptance, representative operator backup/restore and deployment rollback drills, commercial operating walkthrough, and legal/privacy/brand closure.
+- Browser smoke: still running at latest reconciliation; do not claim complete.
+- SonarCloud: skipped, not a pass.
+- V1 business export: 13 owner-only, business-scoped CSV datasets; streaming, audit logged and formula-injection protected.
+- Event profitability: populated quote → payment → purchasing → receiving → actual cost → completion regression passes; draft/void invoices and planned/cancelled costs are excluded.
+- Device credentials: 180-day rolling idle expiry; authenticated sync refreshes expiry; expired tokens require re-pairing; owner revocation clears token expiry/hash.
+- Current release position remains NO-GO pending browser smoke, physical installed-device/offline acceptance, representative operator backup/restore and deployment rollback drills, operational walkthrough and legal/privacy/brand closure.
 - Canonical ledger: `docs/V1_RELEASE_CHECKLIST.md`. Never repeat a CI status from an older SHA as current evidence.
-
 
 ## Index-only dashboard refinement — 2026-11-06
 

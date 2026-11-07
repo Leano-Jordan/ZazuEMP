@@ -5,7 +5,7 @@
 **Branch:** `main`  
 **Main-ref rule:** query the live `main` ref; this ledger does not pin a moving HEAD.  
 **Last Director reconciliation:** 2026-11-07  
-**Latest application/test source SHA:** `89daa318f310b5cf873b50711e31eff73db12b92`. Resolve the live `main` SHA from GitHub when starting a new cycle.
+**Latest verified application/test source SHA:** `dd3e1d4c0e03c63c565d12fabf744b93b75dae52`. Resolve the live `main` SHA from GitHub when starting a new cycle.
 
 ## Evidence rule
 
@@ -16,42 +16,46 @@ This ledger records the current release truth. Older Director audits remain hist
 
 ## Current V1 reconciliation — 2026-11-07
 
-**Release position: NO-GO.** Automated evidence is materially stronger on this source head, but installed-device acceptance, real recovery/rollback exercises, operational legal/privacy closure and brand clearance remain open.
+**Release position: NO-GO.** Automated source verification is now green across the Laravel, quality, security, static-analysis and populated upgrade/rollback gates. Browser smoke is still running. Installed-device acceptance, real recovery/rollback exercises, operational legal/privacy closure and official brand clearance remain open.
 
-**Validated application/test source commit:** `2c9a03e5de80e5c0aceb47724fff6b8d3a8439f1`  
-**Current branch:** `main` (resolve live ref; this ledger does not pin a moving branch).
+**Validated application/test source commit:** `dd3e1d4c0e03c63c565d12fabf744b93b75dae52`  
+**Canonical branch:** `main` (resolve live ref; no moving branch SHA is pinned beyond this evidence snapshot).
 
 | Area | Current source/test position | Evidence state |
 |---|---|---|
-| Active Work attachments | Business-scoped local queue, atomic batch save, idempotent reconnect upload, private list/download caching and offline job-ID reconciliation are integrated into the active Work flow | IMPLEMENTED; Laravel suite PASS; browser/installed-device proof remains |
-| Trusted-device lifecycle | Owner revocation, 180-day rolling inactivity expiry, automatic extension on authenticated sync and expired-token re-pair enforcement; prior session-transition regression retained | Laravel suite PASS; physical device acceptance remains |
-| Backup / restore | Format-v2 SHA-256 manifest covers database and every private file; restore validates exact payload set before installation mutation; legacy v1 remains supported | Laravel suite PASS; real operator restore drill remains |
-| Commercial workflow | Quote, invoice, deposit/payment, purchasing, receiving, inventory and cost paths remain covered by current automated feature suite; owner-led representative operating walkthrough remains separate acceptance evidence | AUTOMATED SUITE PASS; operational traversal pending |
-| Security | Psalm security scan and secret scan pass on this source; paired-device credentials now expire after 180 idle days and refresh on use; CSP inline script/style and broader adversarial review remain open | AUTOMATED SECURITY GATES PASS; hardening/acceptance in progress |
+| Active Work attachments | Business-scoped local queue, atomic batch save, idempotent reconnect upload, private list/download caching and offline job-ID reconciliation integrated into active Work | IMPLEMENTED; Laravel PASS; browser/installed-device proof remains |
+| Trusted-device lifecycle | Owner revocation, 180-day rolling inactivity expiry, automatic extension on authenticated sync and expired-token re-pair enforcement | Laravel PASS; physical device acceptance remains |
+| Backup / restore | Format-v2 SHA-256 manifest covers database and private files; restore validates payload set before installation mutation; legacy v1 remains supported | Laravel PASS; real operator restore drill remains |
+| Commercial workflow | Quote acceptance, invoice, deposit/final payment, purchase receiving, actual event cost, completion and event profitability reconciled in one populated regression | AUTOMATED PASS — 405 tests / 2,715 assertions |
+| Event profitability | Reports reconcile issued/paid invoice value to actual event costs by event and currency; draft/void invoices and planned/cancelled costs excluded | IMPLEMENTED; Laravel PASS |
+| Business data export | 13 CSV datasets: customers, events, quotes, invoices, payments, expenses, suppliers, purchase orders/lines, inventory items/movements, event costs and travel calculations. Owner-only, business-scoped, streamed, audited, formula-injection protected | IMPLEMENTED; Laravel PASS; records-only, not a restorable database backup |
+| Security | Psalm security scan and secret scan pass; paired-device credentials have rolling idle expiry; CSP inline script/style and broader adversarial review remain | AUTOMATED SECURITY GATES PASS; additional hardening/acceptance open |
 | Deployment / recovery | Populated existing-database upgrade and rollback workflow passes; no production deployment rollback drill or representative customer restore is recorded | AUTOMATED UPGRADE/ROLLBACK PASS; operational drills OPEN |
 | Legal / privacy / brand | Retention/disposal ownership, incident escalation, customer-facing privacy/terms decisions and official Zazu name clearance remain outstanding | OPEN / RELEASE BLOCKER |
 
 ### Exact-source automated verification
 
-All results below apply to source/test commit `2c9a03e5de80e5c0aceb47724fff6b8d3a8439f1`:
+All results below apply to source/test commit `dd3e1d4c0e03c63c565d12fabf744b93b75dae52`:
 
 | Check | Result |
 |---|---|
-| Laravel feature suite | 🟢 PASS — 399 tests, 2,621 assertions — [run 42417869990](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/42417869990) |
-| Zazu quality (application/build + secret scan) | 🟢 PASS — [run 42417869951](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/42417869951) |
-| Psalm security scan | 🟢 PASS — [run 42417869970](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/42417869970) |
-| PHPMD | 🟢 PASS — [run 42417869972](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/42417869972) |
-| Populated upgrade + rollback | 🟢 PASS — [run 42417869922](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/42417869922) |
-| Browser smoke | 🟡 IN PROGRESS at reconciliation — [run 42417869962](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/42417869962) |
-| Push on main | 🟢 PASS — [run 42417870289](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/42417870289) |
-| SonarCloud | ⚪ SKIPPED; not a pass — [run 42417869966](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/42417869966) |
-| Director health report | 🟢 Completed; now waits on all six required V1 workflow names and reports their outcomes — [latest run 42417956342](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/42417956342) |
+| Laravel feature suite | 🟢 PASS — 405 tests, 2,715 assertions — [run 42419716104](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/42419716104) |
+| Zazu quality (application/build + secret scan) | 🟢 PASS — [run 42419716071](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/42419716071) |
+| Psalm security scan | 🟢 PASS — [run 42419716045](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/42419716045) |
+| PHPMD | 🟢 PASS — [run 42419716054](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/42419716054) |
+| Populated upgrade + rollback | 🟢 PASS — [run 42419716035](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/42419716035) |
+| Browser smoke | 🟡 IN PROGRESS at reconciliation — [run 42419716012](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/42419716012) |
+| Push on main | 🟡 IN PROGRESS at reconciliation — [run 42419715446](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/42419715446) |
+| SonarCloud | ⚪ SKIPPED; not a pass — [run 42419716026](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/42419716026) |
+| Director health report | 🟢 Completed — [run 42419716117](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/42419716117) |
 
-**Verification boundary:** the green Director health workflow means the report job executed successfully; it does not override a failed or still-running underlying gate. Browser smoke remains pending. SonarCloud is skipped and is not counted as a pass.
+**Verification boundary:** a green Director health workflow means the report job executed successfully; it does not override a failed or still-running underlying gate. Browser smoke remains pending. SonarCloud is skipped and is not counted as a pass.
 
-**Physical acceptance boundary:** previous owner confirmation of PC/mobile installation and screen rotation is presentation evidence only. Disconnected installed-device launch/restart, attachment recovery, offline session transitions and secure-origin behaviour still require a real device run.
+**Physical acceptance boundary:** previous PC/mobile installation and screen-rotation confirmation is presentation evidence only. Disconnected installed-device launch/restart, attachment recovery, offline session transitions and secure-origin behaviour still require real-device evidence.
 
-No release certification or score uplift is awarded from CI alone. The 13-domain 60/100 evidence-maturity score remains the last formally reconciled baseline pending a full fresh domain audit and closure of the operational blockers.
+**Export boundary:** CSV files provide portable structured business records. They do not contain uploaded binary attachments and are not installation-level backup archives or a database restore format. Exports are owner-only and the export action is recorded in the business audit history.
+
+No release certification or score uplift is awarded from CI alone. The 13-domain 60/100 evidence-maturity score remains the last formally reconciled baseline pending a full fresh domain audit and closure of operational blockers.
 
 ## Historical CI evidence — 2026-11-01 (not current)
 
