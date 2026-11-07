@@ -1108,3 +1108,11 @@ Latest source change: commit `29a38f55d3d3ff5979cf844ddbd624a9ea279515` consolid
 - Extended `SyncAttachmentIdempotencyTest` through the paired-device API: upload returns the idempotency key/event identity consumed by the client; list returns the expected attachment identity, original name and size; private file download returns the named file.
 - Added foreign-business negative cases for event-filtered listing and private download. The fixture confirms the foreign private file actually exists, so the download denial exercises the business boundary rather than a missing-file response.
 - Current implementation/test source is on `main`; latest test commit: `bd47ec672ea0f4b609614ce24c3baa9d1ac4bd0a`. Laravel/CI execution remains UNVERIFIED.
+
+
+### Trusted-device session transition coverage — 2026-11-07
+
+- Added `e2e/offline-session-transition.spec.js`: a paired business workspace with a pending customer mutation must remain signed in and retain its queue when the `/up` auth-host probe fails; after reachability returns, successful account logout and same-account re-login must preserve the paired device and pending mutation.
+- Extended `SyncDeviceManagementTest`: owner revocation must reject the old bearer token at bootstrap, pull, push and attachment-list endpoints. Existing non-owner and foreign-business revocation denial cases remain.
+- Exact source/test commits: `614c24131edc3023c05baad5e583614a8f4c7156` (browser test fixture), `4de9e8bf018404fe1b67e16a7d55b0ec09ef7109` (revocation matrix). Documentation updates: `0059793c55b8cd3abe13c6fea6bef636e9bcb9bc`, `252d0a4f79751280ea26113ad506ab5f846c6715`.
+- Tests are ADDED, not executed. Physical installed-device acceptance, expired-session, interrupted logout and stale async completion cases remain open. No V1 evidence score uplift.
