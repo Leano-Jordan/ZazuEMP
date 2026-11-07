@@ -660,7 +660,7 @@ The current specification scorecard is `docs/ZAZU_V1_SCORECARD_2026-11-04.md`: *
 ## Source and evidence baseline
 - Canonical repository: `Leano-Jordan/ZazuEMP`, branch `main`.
 - Latest application/test source SHA: `89daa318f310b5cf873b50711e31eff73db12b92`.
-- Latest observed `main` after release-control documentation: `108108de113a78eb7c782986270169a507cdfbe0`.
+- `main` remains the sole development target; resolve its live SHA at the start of each new cycle.
 - Exact-head combined status lookup returned no status contexts. The available commit-workflow-run query did not expose push-triggered runs for this SHA. No current Laravel, Quality, Psalm, PHPMD, browser or upgrade/rollback pass is claimed.
 
 ## Implemented and covered at source
