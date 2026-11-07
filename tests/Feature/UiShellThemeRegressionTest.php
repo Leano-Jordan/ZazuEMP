@@ -94,7 +94,7 @@ class UiShellThemeRegressionTest extends TestCase
         $this->assertStringContainsString('flex: 1 1 clamp(420px, 48vw, 760px);', $css);
         $this->assertStringContainsString('max-width: 760px;', $css);
         $this->assertStringContainsString('width: 100%;', $mobileCss);
-        $this->assertStringContainsString('placeholder="Search events, customers, quotes, inventory…"', $layout);
+        $this->assertStringContainsString('placeholder="Search events, customers, quotes, inventory or job files…"', $layout);
     }
 
     public function test_dashboard_kpis_use_reference_aligned_icon_led_cards_on_desktop_and_mobile(): void
