@@ -112,6 +112,40 @@ $this->assertSame(0, $exitCode, Artisan::output());
     }
 
 
+
+    public function test_restore_rejects_a_version_two_backup_without_its_integrity_manifest(): void
+    {
+        if (!class_exists(ZipArchive::class)) {
+            $this->markTestSkipped('PHP Zip extension is required for backup/restore tests.');
+        }
+
+        $archive = storage_path('app/zazu-missing-checksums-test.zip');
+        $probe = storage_path('app/private/missing-checksums-probe.txt');
+        File::ensureDirectoryExists(dirname($archive));
+        File::ensureDirectoryExists(dirname($probe));
+        File::put($probe, 'must survive missing manifest');
+
+        $zip = new ZipArchive();
+        $this->assertSame(true, $zip->open($archive, ZipArchive::CREATE | ZipArchive::OVERWRITE));
+        $zip->addFromString('manifest.json', json_encode([
+            'application' => 'Zazu EMP',
+            'format_version' => 2,
+            'database_driver' => 'sqlite',
+        ], JSON_THROW_ON_ERROR));
+        $zip->addFromString('database.sqlite', 'candidate database bytes');
+        $zip->close();
+
+        try {
+            $this->artisan('zazu:restore', ['archive' => $archive, '--force' => true])
+                ->assertExitCode(1);
+
+            $this->assertSame('must survive missing manifest', File::get($probe));
+        } finally {
+            File::delete($archive);
+            File::delete($probe);
+        }
+    }
+
     public function test_restore_rejects_a_private_file_that_fails_the_backup_checksum(): void
     {
         if (!class_exists(ZipArchive::class)) {
