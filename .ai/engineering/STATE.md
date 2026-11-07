@@ -1027,3 +1027,12 @@ Latest source change: commit `29a38f55d3d3ff5979cf844ddbd624a9ea279515` consolid
 - Replaced the stale regression assertions with checks against the current Blade structure and the actual status wrapper; added guards against reintroducing the removed selectors and invalid grid placement.
 - Dashboard CSS and the existing UI proportion feature test only. No business logic, data, routes, permissions, shared shell or non-dashboard pages changed.
 - Source-level verification only. PHPUnit, Vite build and rendered desktop/tablet/mobile light/dark acceptance remain outstanding.
+
+
+## Dashboard adaptive workspace-health panel — 2026-11-07
+
+- Adaptive configuration audit found the Workspace Health section was gated only by experience level. In a non-basic workspace with purchasing, inventory, assets and finance all disabled, the dashboard could render an empty panel.
+- Tightened the Blade visibility condition: Workspace Health now appears only for non-basic workspaces with at least one of those four resource tools enabled. Individual metric cards retain their existing per-tool gates.
+- Added a regression test covering all four resource-tool gates and the placement of the section condition.
+- Dashboard Blade, its existing UI proportion feature test and this engineering state record only. No metrics, data, permissions, routes, shared shell or other page changed.
+- Source-level verification only. PHPUnit, Vite build and rendered desktop/tablet/mobile light/dark acceptance remain outstanding.
