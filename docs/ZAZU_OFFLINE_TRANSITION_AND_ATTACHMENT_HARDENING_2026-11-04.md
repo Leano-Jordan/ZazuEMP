@@ -59,3 +59,16 @@ Code inspection found that the attachment IndexedDB open handler treated the Ind
 - Current source/test head: `5656abe1751a28ab8818c99e19a28bea00f04b0a`
 - GitHub commit-status endpoint currently returns no status records for this head. Exact-head CI and browser rerun: **not yet verified**.
 - This is a targeted correction, not closure of the session-transition challenge. Same-business account changes, business switches, expiry, interrupted cleanup, stale async completions and remote revocation still need explicit acceptance.
+
+
+## Session-transition acceptance extension — 2026-11-07
+
+The 4 November open acceptance matrix has been advanced with current-main regressions:
+
+- `e2e/offline-session-transition.spec.js` seeds a paired business-scoped device workspace and a pending customer mutation, makes the same-origin `/up` probe unreachable, and verifies logout is blocked with the safety alert while the authenticated session and pending mutation remain intact. It then restores reachability, completes account logout, signs into the same account again and verifies the business device pairing and pending mutation remain available.
+- `SyncDeviceManagementTest` now verifies owner revocation rejects the previously valid bearer token across bootstrap, pull, push and attachment-list endpoints, not only bootstrap.
+- Existing cross-business owner-revocation denial remains covered.
+
+**Source status:** IMPLEMENTED / tests added. **Runtime status:** UNVERIFIED until the exact `main` head reports passing Laravel and Chromium Playwright jobs. This does not replace physical-device acceptance, expired-session testing, interrupted logout, stale in-flight response testing or the owner-operated lost-device drill.
+
+Latest test source commits: `614c24131edc3023c05baad5e583614a8f4c7156` (browser fixture) and `4de9e8bf018404fe1b67e16a7d55b0ec09ef7109` (server revocation matrix).
