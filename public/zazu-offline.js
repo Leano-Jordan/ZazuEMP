@@ -357,6 +357,271 @@
         }
     }
 
+
+    async function readAttachmentRecords() {
+        if (ACTIVE_BUSINESS_ID < 1) return [];
+        const db = await openAttachmentDb();
+        try {
+            return await new Promise((resolve, reject) => {
+                const request = db.transaction(ATTACHMENT_STORE, 'readonly')
+                    .objectStore(ATTACHMENT_STORE)
+                    .getAll();
+                request.onsuccess = () => resolve(request.result || []);
+                request.onerror = () => reject(request.error || new Error('Local attachments could not be read.'));
+            });
+        } finally {
+            db.close();
+        }
+    }
+
+    async function readAttachmentRecord(idempotencyKey) {
+        const db = await openAttachmentDb();
+        try {
+            return await new Promise((resolve, reject) => {
+                const request = db.transaction(ATTACHMENT_STORE, 'readonly')
+                    .objectStore(ATTACHMENT_STORE)
+                    .get(idempotencyKey);
+                request.onsuccess = () => resolve(request.result || null);
+                request.onerror = () => reject(request.error || new Error('The local attachment could not be read.'));
+            });
+        } finally {
+            db.close();
+        }
+    }
+
+    async function writeAttachmentRecord(record) {
+        const db = await openAttachmentDb();
+        try {
+            await new Promise((resolve, reject) => {
+                const tx = db.transaction(ATTACHMENT_STORE, 'readwrite');
+                tx.objectStore(ATTACHMENT_STORE).put(record);
+                tx.oncomplete = resolve;
+                tx.onerror = () => reject(tx.error || new Error('The local attachment could not be saved.'));
+                tx.onabort = () => reject(tx.error || new Error('The local attachment save was aborted.'));
+            });
+        } finally {
+            db.close();
+        }
+    }
+
+    async function queueAttachment(eventId, file, description = '') {
+        await ready;
+        if (sessionCleared) throw new Error('The local device session has ended. Reload Zazu before saving attachments.');
+        if (ACTIVE_BUSINESS_ID < 1) throw new Error('Choose a business workspace before saving attachments locally.');
+
+        const targetEventId = Number(eventId);
+        if (!Number.isSafeInteger(targetEventId) || targetEventId < 1) {
+            throw new Error('This job does not have a server identity yet. Reconnect and open the saved job before attaching files.');
+        }
+        if (!(file instanceof Blob) || !file.name) {
+            throw new Error('Choose a file before saving the attachment.');
+        }
+        if (file.size < 1 || file.size > 20 * 1024 * 1024) {
+            throw new Error('Each attachment must be larger than 0 bytes and no bigger than 20 MB.');
+        }
+
+        const extension = String(file.name).split('.').pop().toLowerCase();
+        const allowedExtensions = new Set(['pdf', 'doc', 'docx', 'xls', 'xlsx', 'csv', 'txt', 'jpg', 'jpeg', 'png', 'webp']);
+        if (!allowedExtensions.has(extension)) {
+            throw new Error('Use a PDF, Office document, CSV, text file, JPG, PNG or WebP attachment.');
+        }
+
+        const record = {
+            business_id: ACTIVE_BUSINESS_ID,
+            event_id: targetEventId,
+            idempotency_key: crypto.randomUUID(),
+            original_name: file.name,
+            mime_type: file.type || 'application/octet-stream',
+            size: file.size,
+            description: String(description || '').trim().slice(0, 255),
+            status: 'pending',
+            file,
+            created_at: new Date().toISOString(),
+            attempts: 0,
+            last_error: null,
+        };
+
+        await writeAttachmentRecord(record);
+        window.dispatchEvent(new CustomEvent('zazu:offline-attachments-updated', {
+            detail: { event_id: targetEventId },
+        }));
+
+        if (navigator.onLine && state?.sync?.token) {
+            syncAttachments().catch(() => {});
+        }
+
+        return { idempotency_key: record.idempotency_key, status: record.status };
+    }
+
+    let attachmentSyncing = false;
+
+    async function syncAttachments() {
+        await ready;
+        if (
+            attachmentSyncing
+            || sessionCleared
+            || !navigator.onLine
+            || !state?.sync?.token
+            || ACTIVE_BUSINESS_ID < 1
+        ) {
+            return { uploaded: 0, pending: await countPendingAttachments() };
+        }
+
+        attachmentSyncing = true;
+        let uploaded = 0;
+
+        try {
+            const records = await readAttachmentRecords();
+            for (const record of records) {
+                if (
+                    sessionCleared
+                    || !state?.sync?.token
+                    || record.status !== 'pending'
+                    || Number(record.business_id) !== ACTIVE_BUSINESS_ID
+                    || !Number.isSafeInteger(Number(record.event_id))
+                    || Number(record.event_id) < 1
+                    || !(record.file instanceof Blob)
+                ) {
+                    continue;
+                }
+
+                const form = new FormData();
+                form.append('event_id', String(record.event_id));
+                form.append('idempotency_key', record.idempotency_key);
+                if (record.description) form.append('description', record.description);
+                form.append('file', record.file, record.original_name);
+
+                let response;
+                try {
+                    response = await api('/api/sync/attachments', {
+                        method: 'POST',
+                        body: form,
+                    });
+                } catch (error) {
+                    if (sessionCleared || !state?.sync?.token) break;
+                    await writeAttachmentRecord({
+                        ...record,
+                        attempts: Number(record.attempts || 0) + 1,
+                        last_error: 'Upload paused. Zazu will retry when the connection is available.',
+                    });
+                    break;
+                }
+
+                if (!response.ok) {
+                    const result = await response.json().catch(() => ({}));
+                    await writeAttachmentRecord({
+                        ...record,
+                        attempts: Number(record.attempts || 0) + 1,
+                        last_error: result.message || 'The server did not accept this attachment. It remains saved on this phone.',
+                    });
+                    if ([401, 403, 429].includes(response.status)) break;
+                    continue;
+                }
+
+                const result = await response.json();
+                if (!result.attachment?.id) {
+                    await writeAttachmentRecord({
+                        ...record,
+                        attempts: Number(record.attempts || 0) + 1,
+                        last_error: 'The server response could not be verified. This file remains queued.',
+                    });
+                    continue;
+                }
+
+                await writeAttachmentRecord({
+                    ...record,
+                    status: 'synced',
+                    attachment: result.attachment,
+                    attempts: Number(record.attempts || 0) + 1,
+                    last_error: null,
+                    synced_at: new Date().toISOString(),
+                });
+                uploaded++;
+                window.dispatchEvent(new CustomEvent('zazu:offline-attachments-updated', {
+                    detail: { event_id: Number(record.event_id) },
+                }));
+            }
+        } finally {
+            attachmentSyncing = false;
+        }
+
+        return { uploaded, pending: await countPendingAttachments() };
+    }
+
+    async function loadAttachments(eventId) {
+        await ready;
+        const targetEventId = Number(eventId);
+        if (!Number.isSafeInteger(targetEventId) || targetEventId < 1) return [];
+
+        if (navigator.onLine && state?.sync?.token && !sessionCleared) {
+            try {
+                await syncAttachments();
+                const response = await api('/api/sync/attachments?event_id=' + encodeURIComponent(targetEventId));
+                if (response.ok) {
+                    const result = await response.json();
+                    for (const attachment of result.attachments || []) {
+                        const key = attachment.idempotency_key || ('server-' + attachment.id);
+                        const existing = await readAttachmentRecord(key);
+
+                        // Keep an unconfirmed local upload intact. Retrying its
+                        // idempotency key is the only safe way to establish whether
+                        // the server accepted the exact bytes.
+                        if (existing?.status === 'pending' && existing.file instanceof Blob) continue;
+                        if (existing?.file instanceof Blob) {
+                            await writeAttachmentRecord({
+                                ...existing,
+                                status: 'synced',
+                                attachment,
+                                last_error: null,
+                            });
+                            continue;
+                        }
+
+                        try {
+                            const fileResponse = await api('/api/sync/attachments/' + encodeURIComponent(attachment.id));
+                            if (!fileResponse.ok) continue;
+                            const file = await fileResponse.blob();
+                            if (!file.size && Number(attachment.size || 0) > 0) continue;
+
+                            await writeAttachmentRecord({
+                                business_id: ACTIVE_BUSINESS_ID,
+                                event_id: Number(attachment.event_id),
+                                idempotency_key: key,
+                                original_name: attachment.original_name,
+                                mime_type: attachment.mime_type || file.type || 'application/octet-stream',
+                                size: Number(attachment.size || file.size),
+                                description: attachment.description || '',
+                                status: 'synced',
+                                attachment,
+                                file,
+                                created_at: attachment.created_at || new Date().toISOString(),
+                                attempts: 0,
+                                last_error: null,
+                            });
+                        } catch {
+                            // A failed download leaves the rest of the job files usable.
+                        }
+                    }
+                }
+            } catch {
+                // The local copy remains authoritative when the server is unreachable.
+            }
+        }
+
+        return (await readAttachmentRecords()).filter(record =>
+            Number(record.business_id) === ACTIVE_BUSINESS_ID
+            && Number(record.event_id) === targetEventId
+        ).sort((a, b) => String(a.created_at || '').localeCompare(String(b.created_at || '')));
+    }
+
+    async function getAttachmentFile(idempotencyKey) {
+        const record = await readAttachmentRecord(String(idempotencyKey || ''));
+        if (!record || Number(record.business_id) !== ACTIVE_BUSINESS_ID || !(record.file instanceof Blob)) {
+            throw new Error('This file is not available in the local phone copy.');
+        }
+        return record.file;
+    }
+
     async function assessLogout() {
         await ready;
 
@@ -789,6 +1054,8 @@
             await pull();
             if (sessionCleared || !state?.sync?.token) return;
             await refreshBootstrap();
+            if (sessionCleared || !state?.sync?.token) return;
+            await syncAttachments();
         } finally {
             if (activeSyncController === controller) activeSyncController = null;
             syncing = false;
@@ -828,6 +1095,7 @@
         state = { ...blank(), sync: { token: result.token, device: result.device }, local_dirty: false };
         applyBootstrap(result.bootstrap);
         await writeState();
+        syncAttachments().catch(() => {});
         return result.device;
     }
 
@@ -871,6 +1139,10 @@
         getState: () => state,
         isPaired: () => Boolean(state?.sync?.token),
         queueMutation,
+        queueAttachment,
+        loadAttachments,
+        getAttachmentFile,
+        syncAttachments,
         pair,
         sync,
         assessLogout,
