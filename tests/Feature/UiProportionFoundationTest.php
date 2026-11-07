@@ -758,4 +758,15 @@ class UiProportionFoundationTest extends TestCase
         $this->assertStringNotContainsString('no setup, schedule, quote or resource action', $dashboard);
     }
 
+
+    public function test_dashboard_event_status_remains_visible_in_compact_mobile_rows(): void
+    {
+        $css = file_get_contents(resource_path('css/zazu-final-visual-sweep.css'));
+
+        $this->assertIsString($css);
+        $this->assertStringContainsString('@media (max-width: 620px)', $css);
+        $this->assertStringContainsString('.zazu-dash-event-trailing .zazu-dash-status {', $css);
+        $this->assertStringContainsString('display: inline-flex;', $css);
+        $this->assertStringContainsString('text-overflow: ellipsis;', $css);
+    }
 }
