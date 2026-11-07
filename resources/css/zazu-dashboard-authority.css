@@ -392,6 +392,129 @@ body.zazu-dashboard-page .zazu-app-footer {
     color: #586F84 !important;
 }
 
+/* Commercial dashboard polish: tighter rhythm, balanced metrics and deliberate interaction states. */
+body.zazu-dashboard-page .zazu-content {
+    padding-top: 18px !important;
+}
+
+body.zazu-dashboard-page .zazu-dash-grid {
+    column-gap: 14px !important;
+    row-gap: 14px !important;
+}
+
+body.zazu-dashboard-page .zazu-dash-metrics {
+    grid-template-columns: repeat(auto-fit, minmax(175px, 1fr)) !important;
+    gap: 12px !important;
+}
+
+body.zazu-dashboard-page .zazu-dash-metric {
+    position: relative;
+    min-height: 72px !important;
+    padding: 10px 13px !important;
+    border-width: 1.5px !important;
+    border-radius: 11px !important;
+    transition: transform .16s ease, box-shadow .16s ease, border-color .16s ease;
+}
+
+body.zazu-dashboard-page .zazu-dash-metric::before {
+    content: "";
+    position: absolute;
+    inset: 0 auto 0 0;
+    width: 3px;
+    border-radius: 11px 0 0 11px;
+    background: #547D9C;
+}
+
+body.zazu-dashboard-page .zazu-dash-metric:nth-child(2)::before { background: #668A83; }
+body.zazu-dashboard-page .zazu-dash-metric:nth-child(3)::before { background: #9A8059; }
+body.zazu-dashboard-page .zazu-dash-metric:nth-child(4)::before { background: #7181A0; }
+body.zazu-dashboard-page .zazu-dash-metric:nth-child(5)::before { background: #728D9C; }
+
+body.zazu-dashboard-page .zazu-dash-metric:hover {
+    transform: translateY(-2px);
+    border-color: #829DB3 !important;
+    box-shadow: 0 6px 15px rgba(35, 61, 84, .14) !important;
+}
+
+body.zazu-dashboard-page .zazu-dash-metric:focus-visible,
+body.zazu-dashboard-page .zazu-dash-quick-actions .zazu-btn:focus-visible,
+body.zazu-dashboard-page .zazu-dash-event:focus-visible,
+body.zazu-dashboard-page .zazu-dash-focus-item:focus-visible {
+    outline: 3px solid #426987 !important;
+    outline-offset: 2px;
+}
+
+body.zazu-dashboard-page .zazu-dash-quick-actions .zazu-dash-actions {
+    grid-template-columns: repeat(auto-fit, minmax(205px, 1fr)) !important;
+    gap: 12px !important;
+}
+
+body.zazu-dashboard-page .zazu-dash-quick-actions .zazu-btn {
+    min-height: 58px;
+    border-radius: 10px !important;
+    transition: transform .16s ease, box-shadow .16s ease, background .16s ease;
+}
+
+body.zazu-dashboard-page .zazu-dash-quick-actions .zazu-btn:not(.zazu-btn-cta):hover {
+    background: #E3EAF0 !important;
+    border-color: #8EA5B9 !important;
+    transform: translateY(-1px);
+}
+
+body.zazu-dashboard-page .zazu-dash-quick-actions .zazu-btn-cta:hover {
+    background: #355B79 !important;
+    box-shadow: 0 5px 12px rgba(35, 61, 84, .18) !important;
+    transform: translateY(-1px);
+}
+
+body.zazu-dashboard-page .zazu-dash-surface {
+    overflow: hidden;
+    border-radius: 11px !important;
+}
+
+body.zazu-dashboard-page .zazu-dash-surface-head {
+    min-height: 46px;
+    background: #E1E9F0 !important;
+}
+
+body.zazu-dashboard-page .zazu-dash-surface-head h3 {
+    font-size: 13px !important;
+    font-weight: 750 !important;
+    letter-spacing: -.01em;
+}
+
+body.zazu-dashboard-page .zazu-dash-event,
+body.zazu-dashboard-page .zazu-dash-focus-item,
+body.zazu-dashboard-page .zazu-dash-resource-grid > * {
+    transition: background .15s ease, border-color .15s ease, transform .15s ease;
+}
+
+body.zazu-dashboard-page .zazu-dash-event:hover,
+body.zazu-dashboard-page .zazu-dash-focus-item:hover,
+body.zazu-dashboard-page .zazu-dash-resource-grid > *:hover {
+    background: #E5EDF3 !important;
+    border-color: #91A8BB !important;
+}
+
+body.zazu-dashboard-page .zazu-dash-quote-stage {
+    border-radius: 9px !important;
+    background: #E4EBF1 !important;
+}
+
+body.zazu-dashboard-page .zazu-dash-queue-state {
+    border: 1px solid var(--dash-border);
+}
+
+@media (prefers-reduced-motion: reduce) {
+    body.zazu-dashboard-page .zazu-dash-metric,
+    body.zazu-dashboard-page .zazu-dash-quick-actions .zazu-btn,
+    body.zazu-dashboard-page .zazu-dash-event,
+    body.zazu-dashboard-page .zazu-dash-focus-item,
+    body.zazu-dashboard-page .zazu-dash-resource-grid > * {
+        transition: none !important;
+    }
+}
+
 @media (max-width: 1050px) {
     body.zazu-dashboard-page .zazu-dash-grid {
         grid-template-columns: minmax(0, 1fr) !important;
