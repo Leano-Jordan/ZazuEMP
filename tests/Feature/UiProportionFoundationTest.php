@@ -820,4 +820,27 @@ class UiProportionFoundationTest extends TestCase
         $this->assertStringContainsString('Workspace health', substr($dashboard, $healthPanel, 700));
     }
 
+
+
+    public function test_dashboard_visual_finish_preserves_coastal_hero_kpi_and_panel_hierarchy(): void
+    {
+        $css = file_get_contents(resource_path('css/zazu-final-visual-sweep.css'));
+
+        $this->assertIsString($css);
+
+        foreach ([
+            '.zazu-dash-hero {',
+            'grid-template-columns: minmax(0, 1fr) minmax(250px, .34fr);',
+            '.zazu-dash-hero-side {',
+            'background: color-mix(in srgb, var(--zazu-blue-soft) 62%, var(--zazu-card-bg));',
+            '.zazu-dash-metric {',
+            'grid-template-columns: 42px minmax(0, 1fr);',
+            '.zazu-dash-surface {',
+            'box-shadow: 0 5px 20px rgba(22, 66, 96, .055);',
+            '@media (max-width: 900px)',
+        ] as $expected) {
+            $this->assertStringContainsString($expected, $css);
+        }
+    }
+
 }
