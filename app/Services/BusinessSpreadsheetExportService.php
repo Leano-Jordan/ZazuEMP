@@ -288,106 +288,127 @@ final class BusinessSpreadsheetExportService
 
     private function operationsDefinitions(Business $business): array
     {
+        return array_merge(
+            $this->purchaseOrderDefinitions($business),
+            $this->stockDefinitions($business),
+            $this->travelCostDefinitions($business)
+        );
+    }
+
+    private function purchaseOrderDefinitions(Business $business): array
+    {
         return [
-            'purchase_orders' => [
-                'label' => 'Purchase orders',
-                'description' => 'Supplier orders, event links, dates, currency and order state.',
-                'query' => fn () => PurchaseOrder::query()->where('business_id', $business->id)
-                    ->with(['supplier', 'event'])->orderBy('id')->lazy(500),
-                'columns' => [
-                    $this->column('Purchase order', 'reference'),
-                    $this->column('Supplier', 'supplier.name'),
-                    $this->column('Event reference', 'event.reference'),
-                    $this->column('Event name', 'event.name'),
-                    $this->column('Status', 'status'),
-                    $this->column('Currency', 'currency'),
-                    $this->column('Total amount', 'total_amount', true),
-                    $this->column('Ordered at', 'ordered_at'),
-                    $this->column('Expected at', 'expected_at'),
-                    $this->column('Notes', 'notes'),
-                ],
-            ],
-            'purchase_order_items' => [
-                'label' => 'Purchase order lines',
-                'description' => 'Ordered and received quantities and line values for each purchase order.',
-                'query' => fn () => PurchaseOrderItem::query()->where('business_id', $business->id)
-                    ->with(['purchaseOrder.supplier', 'purchaseOrder.event', 'capability'])
-                    ->orderBy('id')->lazy(500),
-                'columns' => [
-                    $this->column('Purchase order', 'purchaseOrder.reference'),
-                    $this->column('Supplier', 'purchaseOrder.supplier.name'),
-                    $this->column('Event reference', 'purchaseOrder.event.reference'),
-                    $this->column('Description', 'description'),
-                    $this->column('Capability', 'capability.name'),
-                    $this->column('Quantity', 'quantity', true),
-                    $this->column('Received quantity', 'received_quantity', true),
-                    $this->column('Unit', 'unit'),
-                    $this->column('Unit price', 'unit_price', true),
-                    $this->column('Line total', 'line_total', true),
-                ],
-            ],
-            'inventory_items' => [
-                'label' => 'Inventory items',
-                'description' => 'Product identifiers, units, reorder thresholds and on-hand quantity.',
-                'query' => fn () => InventoryItem::query()->where('inventory_items.business_id', $business->id)
-                    ->with('capability')
-                    ->select('inventory_items.*')
-                    ->selectSub(
-                        InventoryMovement::query()
-                            ->selectRaw("COALESCE(SUM(CASE WHEN type IN ('receipt', 'return', 'adjustment_in') THEN quantity ELSE -quantity END), 0)")
-                            ->whereColumn('inventory_item_id', 'inventory_items.id')
-                            ->where('business_id', $business->id),
-                        'export_on_hand'
-                    )
-                    ->orderBy('inventory_items.id')->lazy(250),
-                'columns' => [
-                    $this->column('SKU', 'sku'),
-                    $this->column('Item name', 'name'),
-                    $this->column('Capability', 'capability.name'),
-                    $this->column('Unit', 'unit'),
-                    $this->column('Reorder level', 'reorder_level', true),
-                    $this->column('On hand', 'export_on_hand', true),
-                ],
-            ],
-            'inventory_movements' => [
-                'label' => 'Stock movements',
-                'description' => 'Receipts, issues and adjustments with their event and purchase references.',
-                'query' => fn () => InventoryMovement::query()->where('business_id', $business->id)
-                    ->with(['item', 'event', 'purchaseOrder'])->orderBy('id')->lazy(500),
-                'columns' => [
-                    $this->column('Date', 'movement_date'),
-                    $this->column('Item SKU', 'item.sku'),
-                    $this->column('Item', 'item.name'),
-                    $this->column('Movement type', 'type'),
-                    $this->column('Quantity', 'quantity', true),
-                    $this->column('Unit cost', 'unit_cost', true),
-                    $this->column('Event reference', 'event.reference'),
-                    $this->column('Purchase order', 'purchaseOrder.reference'),
-                    $this->column('Reference', 'reference'),
-                    $this->column('Notes', 'notes'),
-                ],
-            ],
-            'travel_costs' => [
-                'label' => 'Travel calculations',
-                'description' => 'Event-linked distance, fuel estimates and customer travel charges.',
-                'query' => fn () => TravelCost::query()
-                    ->whereHas('event', fn ($query) => $query->where('business_id', $business->id))
-                    ->with('event')->orderBy('id')->lazy(500),
-                'columns' => [
-                    $this->column('Event reference', 'event.reference'),
-                    $this->column('Event name', 'event.name'),
-                    $this->column('Route', 'route_label'),
-                    $this->column('Provider', 'provider'),
-                    $this->column('Origin', 'origin'),
-                    $this->column('Destination', 'destination'),
-                    $this->column('Distance km', 'distance_km', true),
-                    $this->column('Total distance km', 'total_distance_km', true),
-                    $this->column('Fuel litres', 'fuel_litres', true),
-                    $this->column('Fuel cost', 'fuel_cost', true),
-                    $this->column('Customer charge', 'customer_charge', true),
-                    $this->column('Notes', 'notes'),
-                ],
-            ],
+                        'purchase_orders' => [
+                            'label' => 'Purchase orders',
+                            'description' => 'Supplier orders, event links, dates, currency and order state.',
+                            'query' => fn () => PurchaseOrder::query()->where('business_id', $business->id)
+                                ->with(['supplier', 'event'])->orderBy('id')->lazy(500),
+                            'columns' => [
+                                $this->column('Purchase order', 'reference'),
+                                $this->column('Supplier', 'supplier.name'),
+                                $this->column('Event reference', 'event.reference'),
+                                $this->column('Event name', 'event.name'),
+                                $this->column('Status', 'status'),
+                                $this->column('Currency', 'currency'),
+                                $this->column('Total amount', 'total_amount', true),
+                                $this->column('Ordered at', 'ordered_at'),
+                                $this->column('Expected at', 'expected_at'),
+                                $this->column('Notes', 'notes'),
+                            ],
+                        ],
+                        'purchase_order_items' => [
+                            'label' => 'Purchase order lines',
+                            'description' => 'Ordered and received quantities and line values for each purchase order.',
+                            'query' => fn () => PurchaseOrderItem::query()->where('business_id', $business->id)
+                                ->with(['purchaseOrder.supplier', 'purchaseOrder.event', 'capability'])
+                                ->orderBy('id')->lazy(500),
+                            'columns' => [
+                                $this->column('Purchase order', 'purchaseOrder.reference'),
+                                $this->column('Supplier', 'purchaseOrder.supplier.name'),
+                                $this->column('Event reference', 'purchaseOrder.event.reference'),
+                                $this->column('Description', 'description'),
+                                $this->column('Capability', 'capability.name'),
+                                $this->column('Quantity', 'quantity', true),
+                                $this->column('Received quantity', 'received_quantity', true),
+                                $this->column('Unit', 'unit'),
+                                $this->column('Unit price', 'unit_price', true),
+                                $this->column('Line total', 'line_total', true),
+                            ],
+                        ]
+        ];
+    }
+
+    private function stockDefinitions(Business $business): array
+    {
+        return [
+                        'inventory_items' => [
+                            'label' => 'Inventory items',
+                            'description' => 'Product identifiers, units, reorder thresholds and on-hand quantity.',
+                            'query' => fn () => InventoryItem::query()->where('inventory_items.business_id', $business->id)
+                                ->with('capability')
+                                ->select('inventory_items.*')
+                                ->selectSub(
+                                    InventoryMovement::query()
+                                        ->selectRaw("COALESCE(SUM(CASE WHEN type IN ('receipt', 'return', 'adjustment_in') THEN quantity ELSE -quantity END), 0)")
+                                        ->whereColumn('inventory_item_id', 'inventory_items.id')
+                                        ->where('business_id', $business->id),
+                                    'export_on_hand'
+                                )
+                                ->orderBy('inventory_items.id')->lazy(250),
+                            'columns' => [
+                                $this->column('SKU', 'sku'),
+                                $this->column('Item name', 'name'),
+                                $this->column('Capability', 'capability.name'),
+                                $this->column('Unit', 'unit'),
+                                $this->column('Reorder level', 'reorder_level', true),
+                                $this->column('On hand', 'export_on_hand', true),
+                            ],
+                        ],
+                        'inventory_movements' => [
+                            'label' => 'Stock movements',
+                            'description' => 'Receipts, issues and adjustments with their event and purchase references.',
+                            'query' => fn () => InventoryMovement::query()->where('business_id', $business->id)
+                                ->with(['item', 'event', 'purchaseOrder'])->orderBy('id')->lazy(500),
+                            'columns' => [
+                                $this->column('Date', 'movement_date'),
+                                $this->column('Item SKU', 'item.sku'),
+                                $this->column('Item', 'item.name'),
+                                $this->column('Movement type', 'type'),
+                                $this->column('Quantity', 'quantity', true),
+                                $this->column('Unit cost', 'unit_cost', true),
+                                $this->column('Event reference', 'event.reference'),
+                                $this->column('Purchase order', 'purchaseOrder.reference'),
+                                $this->column('Reference', 'reference'),
+                                $this->column('Notes', 'notes'),
+                            ],
+                        ]
+        ];
+    }
+
+    private function travelCostDefinitions(Business $business): array
+    {
+        return [
+                        'travel_costs' => [
+                            'label' => 'Travel calculations',
+                            'description' => 'Event-linked distance, fuel estimates and customer travel charges.',
+                            'query' => fn () => TravelCost::query()
+                                ->whereHas('event', fn ($query) => $query->where('business_id', $business->id))
+                                ->with('event')->orderBy('id')->lazy(500),
+                            'columns' => [
+                                $this->column('Event reference', 'event.reference'),
+                                $this->column('Event name', 'event.name'),
+                                $this->column('Route', 'route_label'),
+                                $this->column('Provider', 'provider'),
+                                $this->column('Origin', 'origin'),
+                                $this->column('Destination', 'destination'),
+                                $this->column('Distance km', 'distance_km', true),
+                                $this->column('Total distance km', 'total_distance_km', true),
+                                $this->column('Fuel litres', 'fuel_litres', true),
+                                $this->column('Fuel cost', 'fuel_cost', true),
+                                $this->column('Customer charge', 'customer_charge', true),
+                                $this->column('Notes', 'notes'),
+                            ],
+                        ]
         ];
     }
 
