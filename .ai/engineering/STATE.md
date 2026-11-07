@@ -1000,3 +1000,12 @@ Latest source change: commit `29a38f55d3d3ff5979cf844ddbd624a9ea279515` consolid
 - Dashboard-only copy and test change; no priority logic, data, routes or permissions changed.
 - Source re-fetch verification required. PHPUnit and rendered acceptance remain unverified.
 
+
+
+## Dashboard fallback KPI consistency — 2026-11-07
+
+- Source scan found the invoice KPI fallback (shown when quotes are unavailable) still used the older text-only markup while the other KPI cards use the icon-led reference layout. This produced a different grid structure for users whose workspace exposes finance but not quotes.
+- Added the same compact document icon treatment and explicit label span to the invoice fallback. Metric value, supporting copy, destination and permission/tool conditions remain unchanged.
+- Added a focused regression assertion that the invoice fallback includes the icon wrapper.
+- Dashboard Blade and its existing feature test only; no shared shell, non-dashboard pages, data, routes, metrics or permissions changed.
+- Source re-fetch verification completed after the commits. PHPUnit, Vite build and rendered desktop/tablet/mobile light/dark acceptance remain unverified.
