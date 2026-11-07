@@ -4,6 +4,9 @@
     <x-slot:headerAction>
         <a href="{{ route('dashboard') }}" class="zazu-btn zazu-btn-secondary">Dashboard</a>
         <a href="{{ route('work.index') }}" class="zazu-btn zazu-btn-ghost">Jobs</a>
+        @if (auth()->user()->businesses()->whereKey($business->id)->wherePivot('role', 'owner')->exists())
+            <a href="{{ route('exports.index') }}" class="zazu-btn zazu-btn-secondary">Export data</a>
+        @endif
     </x-slot:headerAction>
 
     <section class="zazu-command-band">

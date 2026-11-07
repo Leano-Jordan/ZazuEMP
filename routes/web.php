@@ -4,6 +4,7 @@ use App\Http\Controllers\AssetController;
 use App\Http\Controllers\AuditLogController;
 use App\Http\Controllers\BusinessCapabilityController;
 use App\Http\Controllers\BusinessContextController;
+use App\Http\Controllers\BusinessExportController;
 use App\Http\Controllers\BusinessSettingsController;
 use App\Http\Controllers\CalendarController;
 use App\Http\Controllers\ComplianceDocumentController;
@@ -137,6 +138,25 @@ Route::middleware(['auth', 'auth.session', 'business.context'])->group(function 
         Route::get('/setup/business', [OnboardingController::class, 'business'])->name('onboarding.business');
         Route::post('/setup/business', [OnboardingController::class, 'storeBusiness'])->name('onboarding.business.store');
         Route::post('/setup/business/skip', [OnboardingController::class, 'skipBusiness'])->name('onboarding.business.skip');
+
+        Route::get('/exports', [BusinessExportController::class, 'index'])->name('exports.index');
+        Route::get('/exports/{resource}', [BusinessExportController::class, 'download'])
+            ->whereIn('resource', [
+                'customers',
+                'events',
+                'quotes',
+                'invoices',
+                'payments',
+                'expenses',
+                'suppliers',
+                'purchase_orders',
+                'purchase_order_items',
+                'inventory_items',
+                'inventory_movements',
+                'event_costs',
+                'travel_costs',
+            ])
+            ->name('exports.download');
     });
 
     Route::get('/media/profile/{type}/{id}', [\App\Http\Controllers\ProfileMediaController::class, 'show'])->whereIn('type', ['customer', 'user'])->name('profile.media');
