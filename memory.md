@@ -829,3 +829,10 @@ Zazu EMP / Zazu Director has exactly one permitted development ref: canonical `m
 - Read-only comparison found the Director branch has unique business-scoped service-worker cache partitioning changes and tests (8 ahead / 7 behind); selectively reconcile those changes on `main` before deleting that ref. Never replace newer main files with stale branch snapshots.
 - The two Dependabot branches are each one commit ahead and 282 behind; their package updates require current dependency/security validation, not wholesale merging.
 - The connected GitHub tools available during this execution do not expose remote branch-ref deletion. Do not report a one-branch state until the extra refs are actually deleted and a fresh branch search confirms only `main`.
+
+## Owner communication directive — 2026-11-07
+
+- Do not introduce unsolicited commentary about adding features, not adding features, feature restraint, scope expansion, or what Jarvis would/would not build.
+- Discuss feature scope only when the owner explicitly asks about it or when a concrete implementation dependency requires a decision.
+- When the owner gives a development instruction, execute the next V1-relevant task directly and report the result concisely. Do not substitute unsolicited product advice or a roadmap speech for execution.
+- Treat the owner's stated acceptance of the current dashboard as sufficient to move the active development target forward.
