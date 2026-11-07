@@ -1064,3 +1064,11 @@ Latest source change: commit `29a38f55d3d3ff5979cf844ddbd624a9ea279515` consolid
 - Updated the onboarding dashboard assertion to the current Quick actions / Open finance surface, and updated the Playwright theme test to the current coastal palette while retaining the existing dark-mode expectations.
 - No application CSS, Blade, business logic, routes or permissions changed in this correction pass.
 - Changes are committed on `main`; source re-fetch verification is being completed. GitHub Actions rerun and runtime PHPUnit/Playwright results are not yet available, so do not treat these expectation updates as a green CI result. Finance overflow and other non-dashboard browser failures remain outside this dashboard-only objective.
+
+## Owner dashboard acceptance and V1 execution handoff — 2026-11-07
+
+- Owner accepted the current dashboard as sufficient for now and directed development to continue against V1 requirements. The dashboard refinement mission is closed by owner acceptance; no further dashboard iteration is active.
+- Active development focus: V1 implementation and release-evidence closure.
+- Added `tests/Feature/SyncAttachmentIdempotencyTest.php` on `main` (commit `d7debb0d8378633174f74479f26258d469799ed6`, corrected namespace commit `b3f9eb360e6259868993814419c09e939a3d372d`). The tests cover exact-content retry idempotency and reject reuse of the same key for different file bytes with otherwise matching metadata.
+- PHP syntax check passed locally under PHP 8.4.24. Laravel execution and exact-head CI remain UNVERIFIED; the available combined-status query returned no status contexts. Do not mark the tests passed until the Laravel/quality workflow reports success for the exact current main SHA.
+- Next V1 implementation target: integrate phone-local attachment queue/upload/download into the active Work attachment flow using the current business-scoped `ZazuOffline` contract. The existing `public/offline-attachments.js` is legacy code and must not be loaded unchanged; it depends on globals absent from the active Laravel shell. Preserve private storage, business isolation, retry/idempotency, logout cleanup and device-recovery behavior.
