@@ -6,7 +6,7 @@
         </div>
     </div>
 
-    <form method="POST" action="{{ route('work.attachments.store', $event) }}" enctype="multipart/form-data" class="mt-4">
+    <form method="POST" action="{{ route('work.attachments.store', $event) }}" enctype="multipart/form-data" class="mt-4" data-zazu-offline-attachment-form data-zazu-event-id="{{ $event->id }}" data-zazu-server-attachment-ids="{{ $event->attachments->pluck('id')->implode(',') }}" data-zazu-no-submit-guard="1">
         @csrf
         <div class="zazu-dropzone">
             <input type="file" name="files[]" multiple accept=".pdf,.doc,.docx,.xls,.xlsx,.csv,.txt,.jpg,.jpeg,.png,.webp" class="zazu-file-input" required>
@@ -14,9 +14,13 @@
             <div class="zazu-dropzone-copy">Up to 10 files per upload, 20 MB each. WhatsApp text exports and screenshots are supported as job evidence.</div>
         </div>
         <div class="mt-3 flex flex-wrap justify-end">
-            <button class="zazu-btn zazu-btn-primary">Add to job</button>
+            <button type="submit" class="zazu-btn zazu-btn-primary">Add to job</button>
+        </div>
+        <div data-zazu-offline-attachment-status class="zazu-panel-copy mt-3" role="status" aria-live="polite">
+            Files selected while offline are saved on this phone and uploaded when Zazu reconnects.
         </div>
     </form>
+    <div data-zazu-offline-attachment-list class="zazu-list mt-3" hidden></div>
 
     @if ($event->attachments->isNotEmpty())
         <div class="zazu-list mt-4">
