@@ -5,7 +5,7 @@
 **Branch:** `main`  
 **Main-ref rule:** query the live `main` ref; this ledger does not pin a moving HEAD.  
 **Last Director reconciliation:** 2026-11-07  
-**Latest application/test source SHA:** `89daa318f310b5cf873b50711e31eff73db12b92` (latest observed `main` ref at this reconciliation: `e6328e57e99bbb225b92fed5afacd85ea9e2b4c3`).
+**Latest application/test source SHA:** `89daa318f310b5cf873b50711e31eff73db12b92`. Resolve the live `main` SHA from GitHub when starting a new cycle.
 
 ## Evidence rule
 
