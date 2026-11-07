@@ -1,8 +1,8 @@
 # Zazu EMP — V1 Software / Commercial Status
 
-**Assessment date:** 2026-11-01
+**Assessment date:** 2026-11-07
 **Repository:** `Leano-Jordan/ZazuEMP`  
-**Current main HEAD observed by Director:** `5f4d7f3767ed79a095a5644107000f0dcaa2566f` (before this status-document reconciliation)
+**Current main HEAD observed by Director:** `1c05cb5359695e0a5588593c1de0fdf3407b3c2e` (source and test changes; exact-head runtime evidence pending)
 
 ## Current position
 
@@ -32,7 +32,7 @@ The product is **not yet release-certified**. The current main line contains a b
 | Progressive disclosure | PARTIAL / FOUNDATION — hierarchical navigation already exists; the workspace-focus screen now uses a native disclosure for secondary experience detail. Wider page-by-page adoption remains future iteration. |
 | Command palette | IMPLEMENTED — global workspace search / quick access is present. |
 | Niche-specific dashboard emphasis | PARTIAL — selected niche now appears in workspace context and dashboard copy; deeper niche-specific surfacing is not yet implemented. |
-| Full offline business-data operation | PARTIAL / IN PROGRESS — IndexedDB local store + durable queue + reconnect sync now cover customer/job/service/preparation/supplier/purchasing/receiving/quote/acceptance/invoice/payment/expense/inventory/cost/assets; offline attachment synchronization and full disconnected parity remain open; explicit sync-conflict review and retry/discard controls are implemented at source. |
+| Full offline business-data operation | PARTIAL / IN PROGRESS — IndexedDB local store + durable queue + reconnect sync cover the documented operational mutation domains. Phone-local Work attachment queue/upload/download is now IMPLEMENTED AT SOURCE with business-scoped persistence, batch idempotency, reconnect upload and attachment download caching; exact-head Laravel/Playwright execution and installed-device proof remain pending. Full disconnected parity remains open. |
 | Online/offline parity | DIRECTION ACTIVE — the phone workspace is now a real local operational surface; it is not yet a complete disconnected replacement for every desktop workflow. |
 | Local host / Wi-Fi clients | NOT IMPLEMENTED — remains an architecture target, not a current capability. |
 | Historical infrastructure/capacity claims | EXCLUDED — not treated as requirements without repository or measured evidence. |
@@ -149,3 +149,21 @@ The product has a substantial connected commercial and operational core. It rema
 ## Exact source-head verification — 2026-11-04
 
 Application source SHA `d1e2a4397b064d3fbfe7fc2cf1dc59236e00922f`: Laravel, Zazu quality, Psalm, PHPMD, populated upgrade/rollback and push-on-main checks passed. Browser smoke remains in progress; SonarCloud was skipped and is not counted as a pass. See run links in `docs/ZAZU_V1_SCORECARD_2026-11-04.md`. The documentation-only main commits after this source SHA do not alter application code. Do not close the browser gate until it passes.
+
+
+## Phone-local Work attachment integration — 2026-11-07
+
+**Source status: IMPLEMENTED. Runtime status: UNVERIFIED.**
+
+The active authenticated Work attachment panel is now connected to the current business-scoped `ZazuOffline` client. The phone can atomically save a selection of up to 10 supported files (20 MB each) into its business-scoped IndexedDB attachment store, retain each UUID idempotency key and retry upload through the paired device API. The Work panel can read locally cached files while disconnected; paired devices also fetch and cache private server attachments for later offline access. The existing Laravel authenticated upload/download controls remain the online path.
+
+The sync client keeps the local Blob until it receives a verifiable server attachment ID. Rejected or interrupted uploads remain on the phone with retry/error state. Logout assessment continues to include pending attachments; business-scoped local session cleanup continues to clear the attachment store. A server-backed event ID is required by the current upload contract.
+
+Regression coverage now includes:
+- Laravel source-contract assertions for the active offline attachment client and Work panel;
+- a Playwright scenario exercising a real Work page, offline local file persistence, reconnect upload with the original idempotency key, and caching a remote attachment;
+- existing server idempotency tests for duplicate retries and rejection of changed file content or event ownership.
+
+The service-worker cache was advanced to `zazu-static-v30` because `/zazu-offline.js` is served cache-first. All source and test changes are on `main`; latest observed SHA: `1c05cb5359695e0a5588593c1de0fdf3407b3c2e`.
+
+**Evidence boundary:** GitHub combined commit status returned no status contexts for the earlier `bc1de6224971803bdecee18dc8bcbed7781c5287` head; no Laravel, build or browser pass is claimed for the new source head. The added Playwright test and feature assertions remain unexecuted until exact-head CI is observed. Physical installed-device acceptance, disconnected Work-page availability, and attachment flow for a job created offline before it has a server ID remain unverified.
