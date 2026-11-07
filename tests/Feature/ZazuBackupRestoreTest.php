@@ -63,6 +63,14 @@ class ZazuBackupRestoreTest extends TestCase
             $this->assertSame(['database', 'private_storage'], $manifest['contents'] ?? null);
             $this->assertNotEmpty($manifest['backup_id'] ?? null);
             $this->assertNotEmpty($manifest['created_at'] ?? null);
+            $this->assertSame(
+                hash('sha256', (string) $zip->getFromName('database.sqlite')),
+                $manifest['checksums']['database.sqlite'] ?? null
+            );
+            $this->assertSame(
+                hash('sha256', 'private media before backup'),
+                $manifest['checksums']['storage/private/zazu-roundtrip/media-probe.txt'] ?? null
+            );
 
             for ($index = 0; $index < $zip->numFiles; $index++) {
                 $this->assertStringNotContainsString('\\', (string) $zip->getNameIndex($index));
@@ -100,6 +108,51 @@ $this->assertSame(0, $exitCode, Artisan::output());
                 'database.connections.sqlite.database' => $originalDatabase,
             ]);
             DB::purge('sqlite');
+        }
+    }
+
+
+    public function test_restore_rejects_a_private_file_that_fails_the_backup_checksum(): void
+    {
+        if (!class_exists(ZipArchive::class)) {
+            $this->markTestSkipped('PHP Zip extension is required for backup/restore tests.');
+        }
+
+        $archive = storage_path('app/zazu-checksum-mismatch-test.zip');
+        $probe = storage_path('app/private/checksum-probe.txt');
+        $databasePayload = 'candidate database bytes';
+        $expectedPrivatePayload = 'expected private media';
+        $actualPrivatePayload = 'tampered private media';
+
+        File::ensureDirectoryExists(dirname($archive));
+        File::ensureDirectoryExists(dirname($probe));
+        File::put($probe, 'must survive checksum rejection');
+
+        $manifest = [
+            'application' => 'Zazu EMP',
+            'format_version' => 1,
+            'database_driver' => 'sqlite',
+            'checksums' => [
+                'database.sqlite' => hash('sha256', $databasePayload),
+                'storage/private/checksum-probe.txt' => hash('sha256', $expectedPrivatePayload),
+            ],
+        ];
+
+        $zip = new ZipArchive();
+        $this->assertSame(true, $zip->open($archive, ZipArchive::CREATE | ZipArchive::OVERWRITE));
+        $zip->addFromString('manifest.json', json_encode($manifest, JSON_THROW_ON_ERROR));
+        $zip->addFromString('database.sqlite', $databasePayload);
+        $zip->addFromString('storage/private/checksum-probe.txt', $actualPrivatePayload);
+        $zip->close();
+
+        try {
+            $this->artisan('zazu:restore', ['archive' => $archive, '--force' => true])
+                ->assertExitCode(1);
+
+            $this->assertSame('must survive checksum rejection', File::get($probe));
+        } finally {
+            File::delete($archive);
+            File::delete($probe);
         }
     }
 
