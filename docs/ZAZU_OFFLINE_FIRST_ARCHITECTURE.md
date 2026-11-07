@@ -466,3 +466,14 @@ This section supersedes earlier historical notes in this document that described
 - A device operating offline is not a shared LAN database. Other devices will not see its pending changes until safe synchronization occurs.
 - No production provider, server size, DB engine or deployment spend is selected yet.
 - This architecture does not authorize configuring the owner's PC as a permanent host.
+
+
+## Active Work attachment integration — 2026-11-07
+
+The authenticated Work attachment panel now uses the active `ZazuOffline` client and its business-scoped `zazu-phone-attachments-business-<business-id>` IndexedDB store. A selected batch of up to 10 files is validated and written in one read/write transaction; a quota or transaction failure therefore leaves the batch unsaved rather than partially queued. Each record retains its UUID idempotency key, event/business identity, Blob, original name, MIME metadata and retry state.
+
+When connected, a paired device uploads pending files through the existing bearer-authenticated `/api/sync/attachments` endpoint. The local Blob is retained until the server returns a verifiable attachment ID. On Work record load, the client lists the business-scoped server attachments and caches their private download responses in the same local store. The Work panel can open locally stored files when disconnected; the existing Laravel upload and download flows remain active when the origin is reachable. Device unpair/revocation cleanup continues through the existing attachment workspace cleanup path.
+
+The service-worker static cache is now `zazu-static-v30`; this invalidates the earlier cache-first `/zazu-offline.js` response. Regression coverage includes source-contract assertions, a browser integration test for local save/reconnect upload/remote file caching, and server idempotency tests. Current source is implemented on `main`; exact-head CI and browser execution are not yet observed. This must not be described as physically proven offline operation until the installed-device acceptance sequence is completed.
+
+The current Work upload requires a server-backed event ID. A job created offline must first receive its server identity before its attachment can be synchronized. This remains a specific dependency to verify in the broader offline Work recovery flow.
