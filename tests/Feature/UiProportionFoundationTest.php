@@ -194,15 +194,22 @@ class UiProportionFoundationTest extends TestCase
         $this->assertStringContainsString('grid-template-columns: 1fr;', $css);
     }
 
-    public function test_dashboard_keeps_event_status_visible_on_mobile(): void
+    public function test_dashboard_mobile_event_rows_follow_the_current_three_item_markup(): void
     {
+        $dashboard = file_get_contents(resource_path('views/dashboard.blade.php'));
         $css = file_get_contents(resource_path('css/zazu-final-visual-sweep.css'));
 
+        $this->assertIsString($dashboard);
         $this->assertIsString($css);
-        $this->assertStringContainsString('.zazu-dash-status {', $css);
-        $this->assertStringContainsString('grid-column: 3;', $css);
-        $this->assertStringContainsString('grid-row: 2;', $css);
+        $this->assertStringContainsString('class="zazu-dash-event-date"', $dashboard);
+        $this->assertStringContainsString('class="zazu-dash-event-copy"', $dashboard);
+        $this->assertStringContainsString('class="zazu-dash-event-trailing"', $dashboard);
+        $this->assertStringContainsString('.zazu-dash-event-trailing .zazu-dash-status {', $css);
         $this->assertStringContainsString('display: inline-flex;', $css);
+        $this->assertStringNotContainsString('.zazu-dash-event-time', $css);
+        $this->assertStringNotContainsString('.zazu-dash-event-line', $css);
+        $this->assertStringNotContainsString('grid-column: 3;', $css);
+        $this->assertStringNotContainsString('grid-row: 2;', $css);
     }
 
 
