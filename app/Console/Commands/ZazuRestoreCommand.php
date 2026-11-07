@@ -195,7 +195,6 @@ class ZazuRestoreCommand extends Command
             // format-v1 archives without this optional map remain restorable.
             if (array_key_exists('checksums', $manifest)) {
                 $checksums = $manifest['checksums'];
-                $expectedFiles = array_keys($archiveFiles);
                 unset($archiveFiles['manifest.json']);
                 $actualFiles = array_keys($archiveFiles);
                 $checksumFiles = is_array($checksums) ? array_keys($checksums) : [];
