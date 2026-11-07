@@ -553,3 +553,18 @@ Application source SHA `d1e2a4397b064d3fbfe7fc2cf1dc59236e00922f` has passing La
 - Active Work attachment transfer remains unimplemented. The legacy transfer client is dormant and not loaded by the authenticated layout.
 - Remaining acceptance: logout/expired-session/business-switch/same-business account transition/interrupted cleanup/late response/device revocation; then integrate the attachment flow into the active Work page and test upload/retry/download/business isolation/logout.
 - Source/test exact head before this documentation update: `cdea317643dd5e226d685f84c32f51d875defc80`. GitHub Actions run `41882179271` was still in progress; no CI pass is claimed.
+
+
+## Phone-local Work attachment integration — 2026-11-07
+
+| Control | Evidence now recorded | Current status / required proof |
+|---|---|---|
+| Business-scoped attachment persistence | Active client reads/writes the existing business-namespaced attachment DB; selected files are atomically stored with UUID idempotency keys | IMPLEMENTED at source; exact-head browser persistence test pending |
+| Reconnect upload / retry | Multipart upload uses the paired device bearer token and existing idempotency contract; local Blob remains until an attachment ID is confirmed | IMPLEMENTED at source; exact-head Laravel + Playwright execution pending |
+| Private attachment retrieval | Active Work view lists server attachments and caches private download responses for local access | IMPLEMENTED at source; exact-head browser test and installed-device check pending |
+| Multi-file save integrity | Up to 10 files are written in a single IndexedDB transaction | IMPLEMENTED at source; storage-quota/transaction-abort runtime case not yet observed |
+| Logout/revocation lifecycle | Uses the existing pending attachment assessment and business workspace cleanup functions | Existing source path retained; logout/revocation adversarial acceptance pending |
+
+The service-worker cache is `zazu-static-v30`. Browser regression: `e2e/offline-attachment-sync.spec.js`. Laravel source contract: `PwaOfflineFoundationTest`. Server idempotency regressions: `SyncAttachmentIdempotencyTest` (exact retry, changed payload 409, changed event 409). Latest observed implementation SHA before this ledger update: `1c05cb5359695e0a5588593c1de0fdf3407b3c2e`.
+
+**Verification:** source files were re-fetched and reconciled. Combined commit status had no contexts on `bc1de6224971803bdecee18dc8bcbed7781c5287`; the commit workflow-run query exposed no push-run evidence for the later SHA. Laravel, frontend build, browser and static-quality checks remain **UNVERIFIED**. No numerical evidence-maturity uplift is awarded. Physical installed-device proof, independent offline Work page launch, and attachment upload following offline-created Work identity resolution remain open.
