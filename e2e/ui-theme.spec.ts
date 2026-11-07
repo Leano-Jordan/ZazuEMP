@@ -21,7 +21,7 @@ async function expectNoViewportOverflow(page) {
 }
 
 test.describe('Zazu UI theme and navigation', () => {
-    test('asserts Signature Blue tokens in light and dark mode', async ({ browser }) => {
+    test('asserts coastal-blue tokens in light and dark mode', async ({ browser }) => {
         const context = await browser.newContext();
         const page = await context.newPage();
 
@@ -37,8 +37,8 @@ test.describe('Zazu UI theme and navigation', () => {
             };
         });
 
-        expect(lightTokens.canvas.toLowerCase()).toBe('#d9e8f5');
-        expect(lightTokens.blue.toLowerCase()).toBe('#1b67c9');
+        expect(lightTokens.canvas.toLowerCase()).toBe('#f5fbfe');
+        expect(lightTokens.blue.toLowerCase()).toBe('#159dd2');
 
         const toggle = page.locator('[data-theme-toggle]').first();
         await expect(toggle).toBeVisible();
