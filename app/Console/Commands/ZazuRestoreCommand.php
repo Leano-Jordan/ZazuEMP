@@ -110,6 +110,7 @@ class ZazuRestoreCommand extends Command
             $privateEntryPrefix = 'storage/private/';
             $hasPrivateStorage = false;
             $seen = [];
+            $archiveFiles = [];
             $uncompressedBytes = 0;
 
             for ($index = 0; $index < $zip->numFiles; $index++) {
@@ -151,6 +152,10 @@ class ZazuRestoreCommand extends Command
                 }
                 $seen[$normalized] = true;
 
+                if (!str_ends_with($name, '/')) {
+                    $archiveFiles[$name] = true;
+                }
+
                 $size = (int) ($stat['size'] ?? 0);
                 if ($size < 0 || $size > self::MAX_UNCOMPRESSED_BYTES || $uncompressedBytes > self::MAX_UNCOMPRESSED_BYTES - $size) {
                     $zip->close();
@@ -181,6 +186,62 @@ class ZazuRestoreCommand extends Command
                     if ($opsys === ZipArchive::OPSYS_UNIX && (($attributes >> 16) & 0170000) === 0120000) {
                         $zip->close();
                         $this->error('The backup contains a symbolic link and cannot be restored safely.');
+                        return self::FAILURE;
+                    }
+                }
+            }
+
+            // New backups include a SHA-256 map for every payload file. Older
+            // format-v1 archives without this optional map remain restorable.
+            if (array_key_exists('checksums', $manifest)) {
+                $checksums = $manifest['checksums'];
+                $expectedFiles = array_keys($archiveFiles);
+                unset($archiveFiles['manifest.json']);
+                $actualFiles = array_keys($archiveFiles);
+                $checksumFiles = is_array($checksums) ? array_keys($checksums) : [];
+
+                sort($actualFiles, SORT_STRING);
+                sort($checksumFiles, SORT_STRING);
+
+                if (!is_array($checksums) || $actualFiles !== $checksumFiles) {
+                    $zip->close();
+                    $this->error('The backup integrity manifest does not match its archive contents.');
+                    return self::FAILURE;
+                }
+
+                foreach ($checksums as $name => $expectedChecksum) {
+                    if (!is_string($name) || !is_string($expectedChecksum) || !preg_match('/^[a-f0-9]{64}$/i', $expectedChecksum)) {
+                        $zip->close();
+                        $this->error('The backup integrity manifest contains an invalid checksum.');
+                        return self::FAILURE;
+                    }
+
+                    $stream = $zip->getStream($name);
+                    if ($stream === false) {
+                        $zip->close();
+                        $this->error('A backup file could not be read for integrity verification.');
+                        return self::FAILURE;
+                    }
+
+                    $context = hash_init('sha256');
+                    $readFailed = false;
+
+                    while (!feof($stream)) {
+                        $chunk = fread($stream, 1024 * 1024);
+                        if ($chunk === false) {
+                            $readFailed = true;
+                            break;
+                        }
+                        if ($chunk !== '') {
+                            hash_update($context, $chunk);
+                        }
+                    }
+
+                    fclose($stream);
+
+                    if ($readFailed || !hash_equals(strtolower($expectedChecksum), hash_final($context))) {
+                        $zip->close();
+                        $this->error('A backup file failed its SHA-256 integrity check.');
                         return self::FAILURE;
                     }
                 }
