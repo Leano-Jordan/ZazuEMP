@@ -159,6 +159,10 @@ test('Work attachments persist offline, upload on reconnect and cache remote fil
     await page.context().setOffline(false);
     await page.evaluate(async () => window.ZazuOffline.syncAttachments());
     await expect.poll(() => requests.uploads).toBe(1);
+    await expect.poll(async () => page.evaluate(async id => {
+        const records = await window.ZazuOffline.loadAttachments(id);
+        return records.find(record => record.original_name === 'offline-evidence.txt')?.status || null;
+    }, eventId)).toBe('synced');
     expect(requests.key).toBe(pending[0].idempotency_key);
     expect(requests.eventId).toBe(eventId);
 
