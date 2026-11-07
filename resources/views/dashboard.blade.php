@@ -188,7 +188,15 @@
             </div>
         </section>
 
-        @if($experienceLevel !== 'basic')
+        @if(
+            $experienceLevel !== 'basic'
+            && (
+                $workspaceTools['purchasing']
+                || $workspaceTools['inventory']
+                || $workspaceTools['assets']
+                || $workspaceTools['finance']
+            )
+        )
         <section class="zazu-dash-resources zazu-dash-surface">
             <header class="zazu-dash-surface-head zazu-dash-panel-head">
                 <span class="zazu-dash-panel-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none"><path d="M3 12h4l2.2-6 4.1 12 2.2-6H21"/><path d="M12 3.5a8.5 8.5 0 1 0 8.5 8.5"/></svg></span>
