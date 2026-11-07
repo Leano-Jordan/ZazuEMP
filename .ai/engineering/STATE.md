@@ -1009,3 +1009,12 @@ Latest source change: commit `29a38f55d3d3ff5979cf844ddbd624a9ea279515` consolid
 - Added a focused regression assertion that the invoice fallback includes the icon wrapper.
 - Dashboard Blade and its existing feature test only; no shared shell, non-dashboard pages, data, routes, metrics or permissions changed.
 - Source re-fetch verification completed after the commits. PHPUnit, Vite build and rendered desktop/tablet/mobile light/dark acceptance remain unverified.
+
+
+## Dashboard mobile event status visibility — 2026-11-07
+
+- Responsive cascade review found an older max-620px rule hiding `.zazu-dash-status`, while the refined event row retained a status-and-arrow trailing group. On phones this removed useful event state from the dashboard list.
+- Added a narrow final override to keep the status badge visible at compact size, constrain its width and ellipsize long labels. Desktop and tablet rules are unchanged.
+- Added a focused source-level regression test for the mobile status rule.
+- Dashboard visual CSS and its existing feature test only; no event data, status logic, routes, permissions, shared shell or non-dashboard pages changed.
+- Source re-fetch verification pending. PHPUnit, Vite build and rendered acceptance remain unverified.
