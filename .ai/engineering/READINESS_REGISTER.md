@@ -568,3 +568,10 @@ Application source SHA `d1e2a4397b064d3fbfe7fc2cf1dc59236e00922f` has passing La
 The service-worker cache is `zazu-static-v30`. Browser regression: `e2e/offline-attachment-sync.spec.js`. Laravel source contract: `PwaOfflineFoundationTest`. Server idempotency regressions: `SyncAttachmentIdempotencyTest` (exact retry, changed payload 409, changed event 409). Latest observed implementation SHA before this ledger update: `1c05cb5359695e0a5588593c1de0fdf3407b3c2e`.
 
 **Verification:** source files were re-fetched and reconciled. Combined commit status had no contexts on `bc1de6224971803bdecee18dc8bcbed7781c5287`; the commit workflow-run query exposed no push-run evidence for the later SHA. Laravel, frontend build, browser and static-quality checks remain **UNVERIFIED**. No numerical evidence-maturity uplift is awarded. Physical installed-device proof, independent offline Work page launch, and attachment upload following offline-created Work identity resolution remain open.
+
+
+### Offline-created Work identity handoff — 2026-11-07
+
+Pending phone attachment records that retain `event_local_id` are now reconciled against the synced business `state.jobs` record before upload. The corresponding Playwright regression verifies that the resolved server event ID and original idempotency key are sent. This closes the source-level orphaning gap for records created by the previous phone queue. The active Work detail upload form still requires a persisted job; the full rendered offline-create → reconnect → attachment journey remains unverified.
+
+**Evidence:** IMPLEMENTED at source; test added, not yet executed. No readiness score change.
