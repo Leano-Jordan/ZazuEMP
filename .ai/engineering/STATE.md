@@ -1124,3 +1124,6 @@ Latest source change: commit `29a38f55d3d3ff5979cf844ddbd624a9ea279515` consolid
 - `ZazuBackupRestoreTest` asserts database/private-file checksum generation and rejects a tampered private payload while preserving the installed private probe.
 - Source/test commits: `2c79de9`, `e49dfc7`, `e684203`, `6d361c8`, `6350760`, `1ac0a7e`, `3138d4f`. Docs: `f0e2410`, `e1be645`.
 - Integrity hashes detect corruption/drift; they are not a signed authenticity mechanism. Real operator backup/restore verification remains open. Exact-head Laravel/quality execution not yet observed; no recovery score uplift.
+
+
+- Backup test follow-up: `ZazuBackupRestoreTest` now also rejects a format-v2 archive missing its required checksum map and restores a valid legacy format-v1 archive without a checksum map. Latest backup test commit: `45f3cfed9bee48153d939932ba4c495c85c0b26b`; assertion formatting follow-up: `89daa318f310b5cf873b50711e31eff73db12b92`. Execution remains pending.
