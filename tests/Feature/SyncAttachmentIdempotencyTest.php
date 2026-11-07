@@ -96,12 +96,15 @@ class SyncAttachmentIdempotencyTest extends TestCase
             'name' => 'Foreign attachment job',
             'status' => 'draft',
         ]);
+        $foreignPath = 'jobs/'.$foreignEvent->id.'/attachments/foreign.txt';
+        Storage::disk('private')->put($foreignPath, 'foreign');
+
         $foreignAttachment = EventAttachment::create([
             'event_id' => $foreignEvent->id,
             'business_id' => $foreignBusiness->id,
             'original_name' => 'foreign.txt',
             'disk' => 'private',
-            'path' => 'jobs/'.$foreignEvent->id.'/attachments/foreign.txt',
+            'path' => $foreignPath,
             'mime_type' => 'text/plain',
             'size' => 7,
             'source' => 'sync',
