@@ -6634,3 +6634,206 @@ body.zazu-mobile-menu-open .zazu-helper {
         font-size: 26px;
     }
 }
+
+/* ==========================================================================
+   DASHBOARD REFERENCE LOCK — single page visual authority
+   Scope: dashboard only. Matches the approved light coastal dashboard layout.
+   This block intentionally sits last to neutralise legacy dashboard overrides.
+   ========================================================================== */
+:root[data-theme="dark"]:has(.zazu-dash-grid) {
+    color-scheme: light;
+    --zazu-page: #F5FBFE;
+    --zazu-page-deep: #DDF4FC;
+    --zazu-sidebar: #D8F1FA;
+    --zazu-sidebar-ink: #17445F;
+    --zazu-sidebar-muted: #286987;
+    --zazu-sidebar-label: #356F8C;
+    --zazu-sidebar-hover: #BCEBFA;
+    --zazu-sidebar-active: #168FCB;
+    --zazu-sidebar-surface: #C9F0FB;
+    --zazu-surface: #FFFFFF;
+    --zazu-surface-2: #EAF8FC;
+    --zazu-surface-3: #DDF4FC;
+    --zazu-field: #F5FBFE;
+    --zazu-ink: #17445A;
+    --zazu-ink-2: #286078;
+    --zazu-muted: #557889;
+    --zazu-faint: #648797;
+    --zazu-border: #C8E7EF;
+    --zazu-border-strong: #9DD8E8;
+    --zazu-primary: #159DD2;
+    --zazu-primary-light: #35B9E8;
+    --zazu-primary-deep: #087FA8;
+    --zazu-primary-hover: #08749A;
+    --zazu-primary-soft: #DDF4FC;
+    --zazu-primary-ink: #FFFFFF;
+    --zazu-link: #087FA8;
+    --zazu-accent: #49C7B8;
+    --zazu-accent-soft: #DDF8F2;
+    --zazu-success: #137A3A;
+    --zazu-success-ink: #0F6332;
+    --zazu-success-soft: #E0F2E8;
+    --zazu-warning: #9A5B08;
+    --zazu-warning-ink: #7B4704;
+    --zazu-warning-soft: #FEF0C7;
+    --zazu-danger: #B42318;
+    --zazu-danger-ink: #9E1D13;
+    --zazu-danger-soft: #FEE2E2;
+    --zazu-info: #168FCB;
+    --zazu-info-ink: #087FA8;
+    --zazu-info-soft: #DDF4FC;
+    --zazu-shadow: 0 10px 28px rgba(27,133,170,.10);
+    --zazu-shadow-strong: 0 18px 40px rgba(27,133,170,.15);
+    --zazu-surface-canvas: #F5FBFE;
+    --zazu-surface-card: #FFFFFF;
+    --zazu-surface-border: #C8E7EF;
+    --zazu-text-main: #17445A;
+    --zazu-text-muted: #557889;
+    --zazu-blue-primary: #159DD2;
+    --zazu-blue-accent: #35B9E8;
+    --zazu-blue-hover: #08749A;
+    --zazu-blue-light: #8ED8F8;
+    --zazu-blue-soft: #DDF4FC;
+    --zazu-blue-subtle: #BCEBFA;
+    --zazu-blue-canvas: #F5FBFE;
+    --zazu-status-draft: #FEF0C7;
+    --zazu-status-draft-text: #7B4704;
+    --zazu-status-active: #E0F2E8;
+    --zazu-status-active-text: #0F6332;
+    --zazu-status-overdue: #FEE2E2;
+    --zazu-status-overdue-text: #9E1D13;
+    --zazu-canvas-bg: #F5FBFE;
+    --zazu-card-bg: #FFFFFF;
+    --zazu-card-border: #C8E7EF;
+    --zazu-card-shadow: 0 10px 28px rgba(27,133,170,.10);
+    --zazu-text-ink: #17445A;
+    --zazu-text-body: #557889;
+}
+:root:has(.zazu-dash-grid) body {
+    background: #F5FBFE;
+    color: #17445A;
+}
+:root:has(.zazu-dash-grid) .zazu-sidebar {
+    background: #D8F1FA;
+    color: #17445F;
+    border-right: 1px solid #C8E7EF;
+    box-shadow: 8px 0 24px rgba(27,133,170,.06);
+}
+:root:has(.zazu-dash-grid) .zazu-brand,
+:root:has(.zazu-dash-grid) .zazu-sidebar-footer {
+    background: #D8F1FA;
+}
+:root:has(.zazu-dash-grid) .zazu-nav-link {
+    color: #286987;
+}
+:root:has(.zazu-dash-grid) .zazu-nav-link.active {
+    color: #FFFFFF;
+    background: #168FCB;
+    border-color: #168FCB;
+    box-shadow: none;
+}
+:root:has(.zazu-dash-grid) .zazu-content {
+    background: #F5FBFE;
+}
+.zazu-dash-hero {
+    display: grid !important;
+    grid-template-columns: minmax(0, 1fr) minmax(270px, 34%) !important;
+    min-height: 174px !important;
+    margin: 0 0 16px !important;
+    overflow: hidden;
+    border: 1px solid #C8E7EF;
+    border-radius: 14px;
+    background: linear-gradient(112deg, #DDF4FC 0%, #E7F8F8 72%, #F4FBFE 100%) !important;
+    box-shadow: 0 8px 24px rgba(22, 99, 130, .07);
+}
+.zazu-dash-hero-main {
+    padding: 24px 30px !important;
+}
+.zazu-dash-hero-side {
+    min-width: 0;
+    margin: 12px !important;
+    padding: 16px 18px !important;
+    border: 1px solid #C4E6F0 !important;
+    border-radius: 12px !important;
+    background: rgba(255,255,255,.72) !important;
+}
+.zazu-dash-hero-image,
+.zazu-dash-capability-art {
+    display: none !important;
+}
+.zazu-dash-grid {
+    display: grid !important;
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+    align-items: start !important;
+    gap: 14px !important;
+}
+.zazu-dash-metrics {
+    display: grid !important;
+    grid-column: 1 / -1 !important;
+    grid-row: auto !important;
+    grid-template-columns: repeat(4, minmax(0, 1fr)) !important;
+    justify-content: stretch !important;
+    gap: 10px !important;
+}
+.zazu-dash-metric {
+    min-width: 0;
+    min-height: 96px !important;
+    padding: 12px 30px 12px 13px !important;
+    border: 1px solid #C8E7EF !important;
+    border-radius: 11px !important;
+    background: #FFFFFF !important;
+    box-shadow: 0 3px 12px rgba(22, 99, 130, .05);
+}
+.zazu-dash-quick-actions {
+    display: block !important;
+    grid-column: 1 / -1 !important;
+    grid-row: auto !important;
+    min-width: 0;
+}
+.zazu-dash-quick-actions .zazu-dash-actions {
+    display: grid !important;
+    grid-template-columns: repeat(4, minmax(0, 1fr)) !important;
+    gap: 10px !important;
+    margin: 0 !important;
+    padding: 0 !important;
+}
+.zazu-dash-quick-actions .zazu-btn {
+    min-width: 0;
+    min-height: 64px !important;
+    padding: 10px 12px !important;
+    border-radius: 10px !important;
+}
+.zazu-dash-run,
+.zazu-dash-commercial,
+.zazu-dash-focus,
+.zazu-dash-resources {
+    grid-row: auto !important;
+    min-width: 0;
+    align-self: stretch;
+    border: 1px solid #C8E7EF !important;
+    border-radius: 12px !important;
+    background: #FFFFFF !important;
+    box-shadow: 0 5px 18px rgba(22, 66, 96, .05) !important;
+}
+.zazu-dash-run { grid-column: 1 !important; }
+.zazu-dash-commercial { grid-column: 2 !important; }
+.zazu-dash-focus { grid-column: 1 !important; }
+.zazu-dash-resources { grid-column: 2 !important; }
+@media (max-width: 980px) {
+    .zazu-dash-metrics { grid-template-columns: repeat(2, minmax(0, 1fr)) !important; }
+    .zazu-dash-quick-actions .zazu-dash-actions { grid-template-columns: repeat(2, minmax(0, 1fr)) !important; }
+}
+@media (max-width: 760px) {
+    .zazu-dash-grid { grid-template-columns: minmax(0, 1fr) !important; }
+    .zazu-dash-run,
+    .zazu-dash-commercial,
+    .zazu-dash-focus,
+    .zazu-dash-resources { grid-column: 1 !important; }
+}
+@media (max-width: 520px) {
+    .zazu-dash-hero { grid-template-columns: minmax(0, 1fr) !important; }
+    .zazu-dash-hero-main { padding: 18px !important; }
+    .zazu-dash-hero-side { margin: 0 10px 10px !important; }
+    .zazu-dash-metrics { gap: 8px !important; }
+    .zazu-dash-quick-actions .zazu-dash-actions { gap: 8px !important; }
+}
