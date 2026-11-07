@@ -482,3 +482,12 @@ The current Work upload requires a server-backed event ID. A job created offline
 ### Offline-created job attachment identity reconciliation — 2026-11-07
 
 The active attachment sync service also reconciles pending records carrying `event_local_id` against the synced `state.jobs` collection. Once the Work mutation receives its numeric server ID, the attachment record is updated to that ID in one IndexedDB transaction before its upload is attempted. This preserves the legacy phone queue's stable local-parent reference through the job-create sync boundary; the browser regression seeds that pre-sync shape and verifies the upload targets the resolved server job. The current Work detail upload form itself still attaches to an already persisted job; a complete offline-created job-to-attachment UI journey remains subject to rendered acceptance.
+
+
+## Backup archive integrity — format version 2 (2026-11-07)
+
+New installation backups now write a SHA-256 checksum for every payload file (database snapshot and each private-storage file) into `manifest.json`. Restore validates that the checksum map exactly matches the archive's payload entries and streams each entry through SHA-256 verification before extraction or any installation mutation. A missing, extra, malformed or mismatched checksum causes restore to stop before replacing the current database or private storage.
+
+The restore command remains backward-compatible with format-version-1 archives that predate checksum maps; new backups are format version 2 and require the integrity manifest. This checksum layer detects accidental corruption and archive-content drift. It is not a digital signature and does not prove who created the archive or prevent a malicious party from rebuilding both payload and manifest.
+
+Automated coverage now asserts database/private-file checksum generation in the backup round-trip and rejects a tampered private file while preserving the currently installed private probe. Source and tests are committed on `main`; exact-head Laravel/quality execution and the real operator backup/restore drill remain outstanding.
