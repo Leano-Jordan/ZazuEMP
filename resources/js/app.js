@@ -1851,6 +1851,157 @@ window.addEventListener('zazu:offline-ready', handleZazuPhonePairing);
 
 setupZazuOfflineForms();
 setupZazuOfflineCustomerOptions();
+setupZazuOfflineAttachments();
+
+
+function setupZazuOfflineAttachments() {
+    const form = document.querySelector('[data-zazu-offline-attachment-form]');
+    if (!form) return;
+
+    if (!window.ZazuOffline) {
+        window.addEventListener('zazu:offline-ready', setupZazuOfflineAttachments, { once: true });
+        return;
+    }
+    if (form.dataset.zazuOfflineAttachmentBound === '1') return;
+
+    const client = window.ZazuOffline;
+    const eventId = Number(form.dataset.zazuEventId || 0);
+    const input = form.querySelector('input[type="file"][name="files[]"]');
+    const submit = form.querySelector('button[type="submit"]');
+    const status = form.querySelector('[data-zazu-offline-attachment-status]');
+    const list = form.parentElement?.querySelector('[data-zazu-offline-attachment-list]');
+
+    if (!eventId || !input || !submit || !status || !list) return;
+    form.dataset.zazuOfflineAttachmentBound = '1';
+
+    const setStatus = (message, error = false) => {
+        status.textContent = message;
+        status.dataset.state = error ? 'error' : 'info';
+    };
+
+    const renderLocalFiles = async () => {
+        const records = await client.loadAttachments(eventId);
+        const visibleRecords = records.filter(record => record.status === 'pending' || !navigator.onLine);
+        list.replaceChildren();
+        list.hidden = visibleRecords.length === 0;
+
+        for (const record of visibleRecords) {
+            const row = document.createElement('div');
+            row.className = 'zazu-list-item';
+
+            const details = document.createElement('div');
+            details.className = 'zazu-list-main';
+
+            const name = document.createElement('div');
+            name.className = 'zazu-list-title';
+            name.textContent = record.original_name || 'Attachment';
+
+            const meta = document.createElement('div');
+            meta.className = 'zazu-list-meta';
+            meta.textContent = record.status === 'pending'
+                ? 'Saved on this phone · waiting to upload'
+                : 'Available on this phone';
+
+            if (record.last_error) {
+                const warning = document.createElement('div');
+                warning.className = 'zazu-list-meta';
+                warning.textContent = record.last_error;
+                details.append(name, meta, warning);
+            } else {
+                details.append(name, meta);
+            }
+
+            const open = document.createElement('button');
+            open.type = 'button';
+            open.className = 'zazu-btn zazu-btn-secondary';
+            open.textContent = 'Open';
+            open.addEventListener('click', async () => {
+                try {
+                    const file = await client.getAttachmentFile(record.idempotency_key);
+                    const url = URL.createObjectURL(file);
+                    const link = document.createElement('a');
+                    link.href = url;
+                    link.target = '_blank';
+                    link.rel = 'noopener';
+                    link.download = record.original_name || 'attachment';
+                    document.body.appendChild(link);
+                    link.click();
+                    link.remove();
+                    window.setTimeout(() => URL.revokeObjectURL(url), 60000);
+                } catch (error) {
+                    setStatus(error.message || 'This file is not available on the phone.', true);
+                }
+            });
+
+            row.append(details, open);
+            list.append(row);
+        }
+    };
+
+    form.addEventListener('submit', async event => {
+        event.preventDefault();
+        if (form.dataset.zazuOfflineAttachmentSubmitting === '1') return;
+
+        const files = [...(input.files || [])];
+        if (!files.length) {
+            setStatus('Choose at least one file.', true);
+            return;
+        }
+        if (files.length > 10) {
+            setStatus('Add up to 10 files per upload.', true);
+            return;
+        }
+
+        form.dataset.zazuOfflineAttachmentSubmitting = '1';
+        submit.disabled = true;
+        const originalLabel = submit.textContent;
+        submit.textContent = 'Saving…';
+
+        try {
+            await client.ready;
+
+            // Keep Laravel's existing authenticated upload path whenever the
+            // application origin is reachable. Queue only when the server is down.
+            if (navigator.onLine && await canReachZazuOrigin()) {
+                HTMLFormElement.prototype.submit.call(form);
+                return;
+            }
+
+            for (const file of files) {
+                await client.queueAttachment(eventId, file, '');
+            }
+
+            input.value = '';
+            setStatus(files.length === 1
+                ? 'File saved on this phone. It will upload when Zazu reconnects.'
+                : files.length + ' files saved on this phone. They will upload when Zazu reconnects.');
+
+            if (client.isPaired()) {
+                await client.syncAttachments();
+            }
+            await renderLocalFiles();
+        } catch (error) {
+            setStatus(error.message || 'The files could not be saved on this phone.', true);
+        } finally {
+            delete form.dataset.zazuOfflineAttachmentSubmitting;
+            submit.disabled = false;
+            submit.textContent = originalLabel;
+        }
+    });
+
+    const refresh = () => renderLocalFiles().catch(() => {
+        setStatus('The phone’s local attachment store could not be read.', true);
+    });
+
+    window.addEventListener('online', refresh);
+    window.addEventListener('zazu:offline-attachments-updated', event => {
+        if (!event.detail?.event_id || Number(event.detail.event_id) === eventId) refresh();
+    });
+
+    client.ready.then(refresh).catch(() => {
+        setStatus('The phone’s local attachment store is unavailable.', true);
+    });
+}
 
 function showZazuOfflineOriginNotice() {
     if (document.querySelector('[data-zazu-offline-origin-notice]')) return;
