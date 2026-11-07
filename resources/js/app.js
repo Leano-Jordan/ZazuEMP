@@ -1866,6 +1866,10 @@ function setupZazuOfflineAttachments() {
 
     const client = window.ZazuOffline;
     const eventId = Number(form.dataset.zazuEventId || 0);
+    const serverAttachmentIds = new Set(String(form.dataset.zazuServerAttachmentIds || '')
+        .split(',')
+        .map(value => Number(value))
+        .filter(value => Number.isSafeInteger(value) && value > 0));
     const input = form.querySelector('input[type="file"][name="files[]"]');
     const submit = form.querySelector('button[type="submit"]');
     const status = form.querySelector('[data-zazu-offline-attachment-status]');
@@ -1881,7 +1885,11 @@ function setupZazuOfflineAttachments() {
 
     const renderLocalFiles = async () => {
         const records = await client.loadAttachments(eventId);
-        const visibleRecords = records.filter(record => record.status === 'pending' || !navigator.onLine);
+        const visibleRecords = records.filter(record =>
+            record.status === 'pending'
+            || !navigator.onLine
+            || !serverAttachmentIds.has(Number(record.attachment?.id || 0))
+        );
         list.replaceChildren();
         list.hidden = visibleRecords.length === 0;
 
