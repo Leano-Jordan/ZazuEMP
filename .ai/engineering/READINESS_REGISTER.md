@@ -594,3 +594,16 @@ The server regression suite now covers the full phone-consumed API boundary: upl
 | Non-owner / foreign-business revocation | Existing negative authorization tests retained | Existing tests; exact-head execution pending |
 
 No score uplift is awarded. Expired-session, interrupted logout, stale in-flight response, physical-device acceptance and lost-device operating procedure remain open.
+
+
+### Backup archive integrity — 2026-11-07
+
+| Control | Evidence added | Status |
+|---|---|---|
+| Backup payload integrity | Version-2 manifest records SHA-256 for database and every private-storage file | Implemented; exact-head Laravel test pending |
+| Restore integrity gate | Restore checks exact archive payload/checksum membership and streams SHA-256 before extraction or installation mutation | Implemented; tamper regression added, execution pending |
+| Legacy backup compatibility | Version-1 archives remain accepted without checksums; new version-2 archives require them | Implemented; dedicated compatibility runtime case still pending |
+| Backup authenticity | No signature/key custody or provenance proof | Open; hashes alone are not authenticity |
+| Real recovery drill | Operator restore against representative installation data/media, followed by access and integrity checks | OPEN / release blocker |
+
+No readiness score uplift. Recovery remains 2/5 until exact-head tests and a real operator drill pass.
