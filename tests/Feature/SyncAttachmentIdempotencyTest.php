@@ -1,17 +1,17 @@
 <?php
 
-namespace Tests\\Feature;
+namespace Tests\Feature;
 
-use App\\Models\\Business;
-use App\\Models\\Customer;
-use App\\Models\\Event;
-use App\\Models\\EventAttachment;
-use App\\Models\\SyncDevice;
-use Illuminate\\Foundation\\Testing\\RefreshDatabase;
-use Illuminate\\Http\\UploadedFile;
-use Illuminate\\Support\\Facades\\Storage;
-use Illuminate\\Support\\Str;
-use Tests\\TestCase;
+use App\Models\Business;
+use App\Models\Customer;
+use App\Models\Event;
+use App\Models\EventAttachment;
+use App\Models\SyncDevice;
+use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Http\UploadedFile;
+use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Str;
+use Tests\TestCase;
 
 class SyncAttachmentIdempotencyTest extends TestCase
 {
@@ -21,7 +21,7 @@ class SyncAttachmentIdempotencyTest extends TestCase
     {
         Storage::fake('private');
 
-        [$business, $event, $token] = $this->pairedBusinessAndEvent();
+        [, $event, $token] = $this->pairedBusinessAndEvent();
 
         $payload = [
             'event_id' => $event->id,
@@ -54,7 +54,7 @@ class SyncAttachmentIdempotencyTest extends TestCase
     {
         Storage::fake('private');
 
-        [$business, $event, $token] = $this->pairedBusinessAndEvent();
+        [, $event, $token] = $this->pairedBusinessAndEvent();
 
         $idempotencyKey = (string) Str::uuid();
         $first = $this->withToken($token)->postJson('/api/sync/attachments', [
