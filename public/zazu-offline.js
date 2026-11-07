@@ -1167,6 +1167,7 @@
         isPaired: () => Boolean(state?.sync?.token),
         queueMutation,
         queueAttachment,
+        queueAttachments,
         loadAttachments,
         getAttachmentFile,
         syncAttachments,
