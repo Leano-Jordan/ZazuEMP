@@ -607,3 +607,8 @@ No score uplift is awarded. Expired-session, interrupted logout, stale in-flight
 | Real recovery drill | Operator restore against representative installation data/media, followed by access and integrity checks | OPEN / release blocker |
 
 No readiness score uplift. Recovery remains 2/5 until exact-head tests and a real operator drill pass.
+
+
+### Backup format compatibility regression — 2026-11-07
+
+The backup/restore feature suite now also exercises both format boundaries: a version-2 archive without its required checksum manifest is rejected before touching installed private data, and a real format-version-1 archive built from a valid database/private-media snapshot is restored successfully in the round-trip scenario. These tests are **ADDED / NOT YET EXECUTED**. This improves compatibility evidence but does not close the real operator recovery drill or prove backup authenticity.
