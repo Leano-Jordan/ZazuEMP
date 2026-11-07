@@ -477,3 +477,8 @@ When connected, a paired device uploads pending files through the existing beare
 The service-worker static cache is now `zazu-static-v30`; this invalidates the earlier cache-first `/zazu-offline.js` response. Regression coverage includes source-contract assertions, a browser integration test for local save/reconnect upload/remote file caching, and server idempotency tests. Current source is implemented on `main`; exact-head CI and browser execution are not yet observed. This must not be described as physically proven offline operation until the installed-device acceptance sequence is completed.
 
 The current Work upload requires a server-backed event ID. A job created offline must first receive its server identity before its attachment can be synchronized. This remains a specific dependency to verify in the broader offline Work recovery flow.
+
+
+### Offline-created job attachment identity reconciliation — 2026-11-07
+
+The active attachment sync service also reconciles pending records carrying `event_local_id` against the synced `state.jobs` collection. Once the Work mutation receives its numeric server ID, the attachment record is updated to that ID in one IndexedDB transaction before its upload is attempted. This preserves the legacy phone queue's stable local-parent reference through the job-create sync boundary; the browser regression seeds that pre-sync shape and verifies the upload targets the resolved server job. The current Work detail upload form itself still attaches to an already persisted job; a complete offline-created job-to-attachment UI journey remains subject to rendered acceptance.
