@@ -784,4 +784,29 @@ class UiProportionFoundationTest extends TestCase
         $this->assertStringContainsString('display: inline-flex;', $css);
         $this->assertStringContainsString('text-overflow: ellipsis;', $css);
     }
+
+    public function test_dashboard_workspace_health_only_renders_when_it_has_enabled_resource_metrics(): void
+    {
+        $dashboard = file_get_contents(resource_path('views/dashboard.blade.php'));
+
+        $this->assertIsString($dashboard);
+        $this->assertStringContainsString("$"."experienceLevel !== 'basic'", $dashboard);
+
+        foreach ([
+            "$"."workspaceTools['purchasing']",
+            "$"."workspaceTools['inventory']",
+            "$"."workspaceTools['assets']",
+            "$"."workspaceTools['finance']",
+        ] as $resourceTool) {
+            $this->assertStringContainsString($resourceTool, $dashboard);
+        }
+
+        $healthGate = strpos($dashboard, "$"."experienceLevel !== 'basic'");
+        $healthPanel = strpos($dashboard, '<section class="zazu-dash-resources zazu-dash-surface">');
+        $this->assertNotFalse($healthGate);
+        $this->assertNotFalse($healthPanel);
+        $this->assertLessThan($healthPanel, $healthGate);
+        $this->assertStringContainsString('Workspace health', substr($dashboard, $healthPanel, 700));
+    }
+
 }
