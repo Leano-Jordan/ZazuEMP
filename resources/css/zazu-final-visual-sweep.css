@@ -5396,48 +5396,6 @@ body.zazu-mobile-menu-open .zazu-helper {
     }
 }
 
-/* Mobile run-sheet: keep operational status visible without squeezing event details. */
-@media (max-width: 620px) {
-    .zazu-dash-event {
-        grid-template-columns: 54px 13px minmax(0, 1fr);
-        align-items: start;
-        row-gap: 5px;
-    }
-
-    .zazu-dash-event-time,
-    .zazu-dash-event-line {
-        grid-row: 1 / span 2;
-    }
-
-    .zazu-dash-event-line {
-        height: 100%;
-        min-height: 48px;
-    }
-
-    .zazu-dash-event-copy {
-        grid-column: 3;
-        grid-row: 1;
-        min-width: 0;
-    }
-
-    .zazu-dash-event-copy strong,
-    .zazu-dash-event-copy span {
-        overflow: visible;
-        white-space: normal;
-        overflow-wrap: anywhere;
-    }
-
-    .zazu-dash-status {
-        display: inline-flex;
-        grid-column: 3;
-        grid-row: 2;
-        justify-self: start;
-        align-self: start;
-        margin-top: 2px;
-    }
-/* Mobile dashboard shortcuts: make each destination a comfortable tap target. */
-
-}
 
 
 
