@@ -11,7 +11,7 @@ use ZipArchive;
 
 class ZazuBackupCommand extends Command
 {
-    private const FORMAT_VERSION = 1;
+    private const FORMAT_VERSION = 2;
     private const MAX_PRIVATE_FILES = 50000;
 
     protected $signature = 'zazu:backup {--output= : Destination directory for the backup archive}';
