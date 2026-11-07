@@ -5,14 +5,14 @@
    ========================================================================== */
 
 body.zazu-dashboard-page {
-    --dash-canvas: #F0F4F8;
-    --dash-surface: #FFFFFF;
-    --dash-surface-soft: #F6F8FA;
-    --dash-border: #DCE4EC;
-    --dash-ink: #263B50;
-    --dash-muted: #718096;
-    --dash-blue: #557FA6;
-    --dash-sidebar: #E7EDF3;
+    --dash-canvas: #DCE5ED;
+    --dash-surface: #F1F4F6;
+    --dash-surface-soft: #E8EEF3;
+    --dash-border: #B8C8D6;
+    --dash-ink: #24394D;
+    --dash-muted: #586F84;
+    --dash-blue: #426987;
+    --dash-sidebar: #CBD8E3;
     background: var(--dash-canvas) !important;
     color: var(--dash-ink);
 }
@@ -26,15 +26,15 @@ body.zazu-dashboard-page .zazu-content {
 
 body.zazu-dashboard-page .zazu-sidebar {
     background: var(--dash-sidebar) !important;
-    border-right: 1px solid #D5DFE8 !important;
-    color: #38536D !important;
+    border-right: 2px solid #B5C5D3 !important;
+    color: #304B63 !important;
     box-shadow: none !important;
 }
 
 body.zazu-dashboard-page .zazu-brand,
 body.zazu-dashboard-page .zazu-sidebar-footer {
     background: transparent !important;
-    border-color: #D8E1E9 !important;
+    border-color: #B5C5D3 !important;
 }
 
 body.zazu-dashboard-page .zazu-brand-lockup strong,
@@ -44,26 +44,26 @@ body.zazu-dashboard-page .zazu-sidebar .zazu-nav-area-trigger,
 body.zazu-dashboard-page .zazu-sidebar .zazu-footer-workspace,
 body.zazu-dashboard-page .zazu-sidebar .zazu-user-trigger,
 body.zazu-dashboard-page .zazu-sidebar .zazu-nav-area-chevron {
-    color: #526A82 !important;
+    color: #405D77 !important;
 }
 
 body.zazu-dashboard-page .zazu-sidebar .zazu-nav-link:hover,
 body.zazu-dashboard-page .zazu-sidebar .zazu-nav-area-trigger:hover,
 body.zazu-dashboard-page .zazu-sidebar .zazu-nav-link:focus-visible {
-    background: #DCE6EF !important;
-    color: #304B66 !important;
+    background: #B9CAD9 !important;
+    color: #263F57 !important;
 }
 
 body.zazu-dashboard-page .zazu-sidebar .zazu-nav-link.active,
 body.zazu-dashboard-page .zazu-sidebar .zazu-nav-area.is-active > .zazu-nav-area-trigger {
-    background: #557FA6 !important;
+    background: #426987 !important;
     color: #FFFFFF !important;
     box-shadow: none !important;
 }
 
 body.zazu-dashboard-page .zazu-topbar {
-    background: #F7F9FB !important;
-    border-bottom: 1px solid var(--dash-border) !important;
+    background: #E5EBF0 !important;
+    border-bottom: 2px solid var(--dash-border) !important;
     box-shadow: none !important;
 }
 
@@ -75,7 +75,7 @@ body.zazu-dashboard-page .zazu-section-tabs a {
 
 body.zazu-dashboard-page .zazu-command-trigger,
 body.zazu-dashboard-page .zazu-theme-toggle {
-    background: #FFFFFF !important;
+    background: #F1F4F6 !important;
     border-color: var(--dash-border) !important;
     color: #5F748A !important;
 }
@@ -84,10 +84,10 @@ body.zazu-dashboard-page .zazu-dash-hero {
     grid-template-columns: minmax(0, 1.45fr) minmax(240px, .75fr) !important;
     min-height: 116px !important;
     margin: 0 0 12px !important;
-    border: 1px solid #D8E3EC !important;
+    border: 2px solid #B9C9D7 !important;
     border-radius: 12px !important;
-    background: linear-gradient(105deg, #E9EFF5 0%, #F0F4F8 68%, #E8EEF4 100%) !important;
-    box-shadow: 0 4px 14px rgba(48, 100, 157, .07) !important;
+    background: linear-gradient(105deg, #CAD9E6 0%, #D9E3EC 68%, #C7D7E4 100%) !important;
+    box-shadow: 0 4px 14px rgba(35, 61, 84, .12) !important;
 }
 
 body.zazu-dashboard-page .zazu-dash-hero-main,
@@ -100,7 +100,7 @@ body.zazu-dashboard-page .zazu-dash-hero .zazu-dash-greeting,
 body.zazu-dashboard-page .zazu-dash-hero p,
 body.zazu-dashboard-page .zazu-dash-hero-side strong,
 body.zazu-dashboard-page .zazu-dash-hero-side span {
-    color: #304B66 !important;
+    color: #263F57 !important;
 }
 
 body.zazu-dashboard-page .zazu-dash-hero h2 {
@@ -116,8 +116,8 @@ body.zazu-dashboard-page .zazu-dash-hero p {
 
 body.zazu-dashboard-page .zazu-dash-hero-side {
     position: relative;
-    border-left: 1px solid #D7E1EA !important;
-    background: rgba(255,255,255,.62) !important;
+    border-left: 2px solid #B7C8D6 !important;
+    background: rgba(238,243,247,.72) !important;
     overflow: hidden;
 }
 
@@ -161,10 +161,10 @@ body.zazu-dashboard-page .zazu-dash-metric {
     column-gap: 10px;
     min-height: 76px !important;
     padding: 11px 13px !important;
-    border: 1px solid var(--dash-border) !important;
+    border: 1.5px solid var(--dash-border) !important;
     border-radius: 10px !important;
     background: var(--dash-surface) !important;
-    box-shadow: 0 2px 8px rgba(48, 100, 157, .045) !important;
+    box-shadow: 0 2px 8px rgba(35, 61, 84, .09) !important;
     color: var(--dash-ink) !important;
 }
 
@@ -176,13 +176,13 @@ body.zazu-dashboard-page .zazu-dash-metric-icon {
     display: grid;
     place-items: center;
     border-radius: 9px;
-    background: #EAF0F5;
+    background: #DCE6EE;
     color: var(--dash-blue);
 }
 
 body.zazu-dashboard-page .zazu-dash-metric > span:not(.zazu-dash-metric-icon) {
     grid-column: 2;
-    color: #718096 !important;
+    color: #586F84 !important;
     font-size: 10px;
     font-weight: 700;
 }
@@ -190,7 +190,7 @@ body.zazu-dashboard-page .zazu-dash-metric > span:not(.zazu-dash-metric-icon) {
 body.zazu-dashboard-page .zazu-dash-metric > strong {
     grid-column: 2;
     grid-row: 2;
-    color: #304B66 !important;
+    color: #263F57 !important;
     font-size: 23px !important;
     line-height: 1.05;
 }
@@ -218,16 +218,16 @@ body.zazu-dashboard-page .zazu-dash-quick-actions .zazu-btn {
     min-height: 62px;
     justify-content: flex-start;
     padding: 10px 12px !important;
-    border: 1px solid var(--dash-border) !important;
+    border: 1.5px solid var(--dash-border) !important;
     border-radius: 9px !important;
-    background: #FFFFFF !important;
-    color: #38536D !important;
+    background: #F1F4F6 !important;
+    color: #304B63 !important;
     box-shadow: none !important;
     text-align: left;
 }
 
 body.zazu-dashboard-page .zazu-dash-quick-actions .zazu-btn-cta {
-    background: #557FA6 !important;
+    background: #426987 !important;
     border-color: #557FA6 !important;
     color: #FFFFFF !important;
 }
@@ -247,10 +247,10 @@ body.zazu-dashboard-page .zazu-dash-action-copy small {
 
 body.zazu-dashboard-page .zazu-dash-surface {
     min-width: 0;
-    border: 1px solid var(--dash-border) !important;
+    border: 1.5px solid var(--dash-border) !important;
     border-radius: 10px !important;
     background: var(--dash-surface) !important;
-    box-shadow: 0 2px 9px rgba(48, 100, 157, .05) !important;
+    box-shadow: 0 2px 9px rgba(35, 61, 84, .10) !important;
     color: var(--dash-ink) !important;
 }
 
@@ -266,26 +266,26 @@ body.zazu-dashboard-page .zazu-dash-resources {
 body.zazu-dashboard-page .zazu-dash-surface-head {
     min-height: 48px;
     padding: 11px 13px !important;
-    border-bottom: 1px solid var(--dash-border) !important;
-    background: #F6F8FA !important;
+    border-bottom: 2px solid var(--dash-border) !important;
+    background: #E6ECF1 !important;
 }
 
 body.zazu-dashboard-page .zazu-dash-surface-head h3,
 body.zazu-dashboard-page .zazu-dash-panel-heading h3 {
-    color: #304B66 !important;
+    color: #263F57 !important;
     font-size: 13px !important;
 }
 
 body.zazu-dashboard-page .zazu-dash-surface-head p,
 body.zazu-dashboard-page .zazu-dash-panel-heading p {
-    color: #718096 !important;
+    color: #586F84 !important;
 }
 
 body.zazu-dashboard-page .zazu-dash-event,
 body.zazu-dashboard-page .zazu-dash-focus-item,
 body.zazu-dashboard-page .zazu-dash-resource-grid > *,
 body.zazu-dashboard-page .zazu-dash-quote-stage {
-    background: #FFFFFF !important;
+    background: #F1F4F6 !important;
     color: var(--dash-ink) !important;
     border-color: var(--dash-border) !important;
 }
@@ -294,14 +294,14 @@ body.zazu-dashboard-page .zazu-dash-event-copy strong,
 body.zazu-dashboard-page .zazu-dash-focus-item strong,
 body.zazu-dashboard-page .zazu-dash-health-label strong,
 body.zazu-dashboard-page .zazu-dash-health-value {
-    color: #304B66 !important;
+    color: #263F57 !important;
 }
 
 body.zazu-dashboard-page .zazu-dash-event-copy span,
 body.zazu-dashboard-page .zazu-dash-event-copy small,
 body.zazu-dashboard-page .zazu-dash-focus-item small,
 body.zazu-dashboard-page .zazu-dash-resource-grid small {
-    color: #718096 !important;
+    color: #586F84 !important;
 }
 
 body.zazu-dashboard-page .zazu-dash-quote-stages {
@@ -315,16 +315,16 @@ body.zazu-dashboard-page .zazu-dash-quote-stage {
     padding: 10px 9px;
     border: 1px solid var(--dash-border);
     border-radius: 8px;
-    background: #F4F7FA !important;
+    background: #E7EDF2 !important;
 }
 
 body.zazu-dashboard-page .zazu-dash-quote-stage span,
 body.zazu-dashboard-page .zazu-dash-quote-stage small {
-    color: #718096 !important;
+    color: #586F84 !important;
 }
 
 body.zazu-dashboard-page .zazu-dash-quote-stage strong {
-    color: #304B66 !important;
+    color: #263F57 !important;
 }
 
 body.zazu-dashboard-page .zazu-dash-focus-grid,
@@ -339,17 +339,17 @@ body.zazu-dashboard-page .zazu-dash-queue-state {
 }
 
 body.zazu-dashboard-page .zazu-dash-empty {
-    color: #718096 !important;
+    color: #586F84 !important;
 }
 
 body.zazu-dashboard-page .zazu-dash-empty strong {
-    color: #304B66 !important;
+    color: #263F57 !important;
 }
 
 body.zazu-dashboard-page .zazu-app-footer {
     background: transparent !important;
-    border-color: #DCE4EC !important;
-    color: #718096 !important;
+    border-color: #B8C8D6 !important;
+    color: #586F84 !important;
 }
 
 @media (max-width: 1050px) {
