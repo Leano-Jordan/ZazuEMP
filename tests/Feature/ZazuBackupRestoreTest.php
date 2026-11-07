@@ -76,7 +76,26 @@ class ZazuBackupRestoreTest extends TestCase
                 $this->assertStringNotContainsString('\\', (string) $zip->getNameIndex($index));
             }
 
+            $legacyDatabasePayload = (string) $zip->getFromName('database.sqlite');
+            $legacyPrivatePayload = (string) $zip->getFromName('storage/private/zazu-roundtrip/media-probe.txt');
             $zip->close();
+
+            // Build a genuine pre-v2 archive from the same valid backup payload.
+            // Version 1 did not contain a checksum map and must remain restorable.
+            $legacyArchive = $output.DIRECTORY_SEPARATOR.'zazu-legacy-v1.zip';
+            $legacyZip = new ZipArchive();
+            $this->assertSame(true, $legacyZip->open($legacyArchive, ZipArchive::CREATE | ZipArchive::OVERWRITE));
+            $legacyZip->addFromString('manifest.json', json_encode([
+                'application' => 'Zazu EMP',
+                'format_version' => 1,
+                'backup_id' => 'legacy-v1-test',
+                'created_at' => now()->toIso8601String(),
+                'database_driver' => 'sqlite',
+                'contents' => ['database', 'private_storage'],
+            ], JSON_THROW_ON_ERROR));
+            $legacyZip->addFromString('database.sqlite', $legacyDatabasePayload);
+            $legacyZip->addFromString('storage/private/zazu-roundtrip/media-probe.txt', $legacyPrivatePayload);
+            $legacyZip->close();
 
             DB::table('backup_probe')->update(['value' => 'changed after backup']);
             File::delete($privateProbe);
@@ -97,6 +116,21 @@ $this->assertSame(0, $exitCode, Artisan::output());
                 DB::connection('sqlite')->table('backup_probe')->value('value')
             );
             $this->assertFileExists($privateProbe);
+            $this->assertSame('private media before backup', File::get($privateProbe));
+
+            DB::table('backup_probe')->update(['value' => 'changed before legacy restore']);
+            File::delete($privateProbe);
+
+            $this->artisan('zazu:restore', [
+                'archive' => $legacyArchive,
+                '--force' => true,
+            ])->assertExitCode(0);
+
+            DB::purge('sqlite');
+            $this->assertSame(
+                'before backup',
+                DB::connection('sqlite')->table('backup_probe')->value('value')
+            );
             $this->assertSame('private media before backup', File::get($privateProbe));
         } finally {
             DB::purge('sqlite');
