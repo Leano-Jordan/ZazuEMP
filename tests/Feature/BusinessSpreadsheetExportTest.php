@@ -72,9 +72,18 @@ class BusinessSpreadsheetExportTest extends TestCase
             ->assertSee('Export business data')
             ->assertSee('Customers')
             ->assertSee('Events and jobs')
+            ->assertSee('Customer contacts')
+            ->assertSee('Products and services')
+            ->assertSee('Assets and equipment')
+            ->assertSee('Event requirements')
+            ->assertSee('Event preparation')
+            ->assertSee('Quote line items')
+            ->assertSee('Invoice line items')
             ->assertSee('Quotes')
             ->assertSee('Invoices')
             ->assertSee('Purchase order lines')
+            ->assertSee('Receiving records')
+            ->assertSee('Tax rates')
             ->assertSee('Stock movements')
             ->assertSee('Event costs')
             ->assertSee('Travel calculations');
@@ -87,17 +96,27 @@ class BusinessSpreadsheetExportTest extends TestCase
         $resources = [
             'customers',
             'events',
+            'customer_contacts',
+            'business_capabilities',
+            'assets',
+            'asset_allocations',
+            'event_requirements',
+            'event_preparation',
             'quotes',
+            'quote_items',
+            'invoice_items',
             'invoices',
             'payments',
             'expenses',
             'suppliers',
             'purchase_orders',
             'purchase_order_items',
+            'purchase_order_receipts',
             'inventory_items',
             'inventory_movements',
             'event_costs',
             'travel_costs',
+            'tax_rates',
         ];
 
         foreach ($resources as $resource) {

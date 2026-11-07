@@ -144,17 +144,27 @@ Route::middleware(['auth', 'auth.session', 'business.context'])->group(function 
             ->whereIn('resource', [
                 'customers',
                 'events',
+                'customer_contacts',
+                'business_capabilities',
+                'assets',
+                'asset_allocations',
+                'event_requirements',
+                'event_preparation',
                 'quotes',
+                'quote_items',
+                'invoice_items',
                 'invoices',
                 'payments',
                 'expenses',
                 'suppliers',
                 'purchase_orders',
                 'purchase_order_items',
+                'purchase_order_receipts',
                 'inventory_items',
                 'inventory_movements',
                 'event_costs',
                 'travel_costs',
+                'tax_rates',
             ])
             ->name('exports.download');
     });

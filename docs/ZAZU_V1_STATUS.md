@@ -33,7 +33,7 @@ Source/test commit: `dd3e1d4c0e03c63c565d12fabf744b93b75dae52`.
 - Populated upgrade/rollback: PASS.
 - Browser smoke: IN PROGRESS at reconciliation.
 - SonarCloud: SKIPPED, not counted as a pass.
-- Business export: 13 owner-only business-scoped CSV datasets; streamed, audit logged, Excel-compatible and formula-injection protected.
+- Business export: 23 owner-only business-scoped CSV datasets; streamed, audit logged, Excel-compatible and formula-injection protected.
 - Commercial profitability chain regression: PASS.
 - The active Work attachment path, device expiry and backup-v2 integrity changes are included in the executed Laravel suite.
 

@@ -3,6 +3,16 @@
 namespace App\Services;
 
 use App\Models\Business;
+use App\Models\TaxRate;
+use App\Models\QuoteItem;
+use App\Models\PurchaseOrderReceipt;
+use App\Models\InvoiceItem;
+use App\Models\EventRequirement;
+use App\Models\EventPreparationItem;
+use App\Models\CustomerContact;
+use App\Models\BusinessCapability;
+use App\Models\AssetAllocation;
+use App\Models\Asset;
 use App\Models\Customer;
 use App\Models\Event;
 use App\Models\EventCost;
@@ -81,8 +91,14 @@ final class BusinessSpreadsheetExportService
     {
         return array_merge(
             $this->peopleDefinitions($business),
+            $this->customerContactDefinitions($business),
             $this->commercialDefinitions($business),
-            $this->operationsDefinitions($business)
+            $this->operationsDefinitions($business),
+            $this->assetDefinitions($business),
+            $this->workDetailDefinitions($business),
+            $this->lineItemDefinitions($business),
+            $this->receivingDefinitions($business),
+            $this->taxDefinitions($business)
         );
     }
 
@@ -313,15 +329,24 @@ final class BusinessSpreadsheetExportService
             'inventory_items' => [
                 'label' => 'Inventory items',
                 'description' => 'Product identifiers, units, reorder thresholds and on-hand quantity.',
-                'query' => fn () => InventoryItem::query()->where('business_id', $business->id)
-                    ->with(['capability', 'movements'])->orderBy('id')->lazy(250),
+                'query' => fn () => InventoryItem::query()->where('inventory_items.business_id', $business->id)
+                    ->with('capability')
+                    ->select('inventory_items.*')
+                    ->selectSub(
+                        InventoryMovement::query()
+                            ->selectRaw("COALESCE(SUM(CASE WHEN type IN ('receipt', 'return', 'adjustment_in') THEN quantity ELSE -quantity END), 0)")
+                            ->whereColumn('inventory_item_id', 'inventory_items.id')
+                            ->where('business_id', $business->id),
+                        'export_on_hand'
+                    )
+                    ->orderBy('inventory_items.id')->lazy(250),
                 'columns' => [
                     $this->column('SKU', 'sku'),
                     $this->column('Item name', 'name'),
                     $this->column('Capability', 'capability.name'),
                     $this->column('Unit', 'unit'),
                     $this->column('Reorder level', 'reorder_level', true),
-                    $this->column('On hand', 'on_hand', true),
+                    $this->column('On hand', 'export_on_hand', true),
                 ],
             ],
             'inventory_movements' => [
@@ -361,6 +386,214 @@ final class BusinessSpreadsheetExportService
                     $this->column('Fuel cost', 'fuel_cost', true),
                     $this->column('Customer charge', 'customer_charge', true),
                     $this->column('Notes', 'notes'),
+                ],
+            ],
+        ];
+    }
+
+    private function customerContactDefinitions(Business $business): array
+    {
+        return [
+            'customer_contacts' => [
+                'label' => 'Customer contacts',
+                'description' => 'Every active contact record, not only the primary contact shown in the customer export.',
+                'query' => fn () => CustomerContact::query()
+                    ->whereHas('customer', fn ($query) => $query->where('business_id', $business->id))
+                    ->with('customer')->orderBy('id')->lazy(500),
+                'columns' => [
+                    $this->column('Customer', 'customer.name'),
+                    $this->column('Contact name', 'name'),
+                    $this->column('Label', 'label'),
+                    $this->column('Phone', 'phone'),
+                    $this->column('Email', 'email'),
+                    $this->column('Primary contact', 'is_primary'),
+                ],
+            ],
+        ];
+    }
+
+    private function assetDefinitions(Business $business): array
+    {
+        return [
+            'business_capabilities' => [
+                'label' => 'Products and services',
+                'description' => 'The business catalogue, pricing basis, default rates and service/product descriptions.',
+                'query' => fn () => BusinessCapability::query()
+                    ->where('business_id', $business->id)->orderBy('id')->lazy(500),
+                'columns' => [
+                    $this->column('Name', 'name'),
+                    $this->column('Category', 'category'),
+                    $this->column('Type', 'capability_type'),
+                    $this->column('Pricing basis', 'pricing_basis'),
+                    $this->column('Default price', 'default_price', true),
+                    $this->column('Currency', 'currency'),
+                    $this->column('Default unit', 'default_unit'),
+                    $this->column('Description', 'description'),
+                    $this->column('Active', 'is_active'),
+                ],
+            ],
+            'assets' => [
+                'label' => 'Assets and equipment',
+                'description' => 'Equipment tags, condition, location, acquisition cost and catalogue links.',
+                'query' => fn () => Asset::query()->where('business_id', $business->id)
+                    ->with('capability')->orderBy('id')->lazy(500),
+                'columns' => [
+                    $this->column('Asset tag', 'asset_tag'),
+                    $this->column('Asset name', 'name'),
+                    $this->column('Capability', 'capability.name'),
+                    $this->column('Status', 'status'),
+                    $this->column('Condition', 'condition'),
+                    $this->column('Location', 'location'),
+                    $this->column('Acquired at', 'acquired_at'),
+                    $this->column('Purchase cost', 'purchase_cost', true),
+                    $this->column('Currency', 'currency'),
+                    $this->column('Notes', 'notes'),
+                ],
+            ],
+            'asset_allocations' => [
+                'label' => 'Asset allocations',
+                'description' => 'Equipment bookings and event allocation history.',
+                'query' => fn () => AssetAllocation::query()->where('business_id', $business->id)
+                    ->with(['asset', 'event'])->orderBy('id')->lazy(500),
+                'columns' => [
+                    $this->column('Asset tag', 'asset.asset_tag'),
+                    $this->column('Asset name', 'asset.name'),
+                    $this->column('Event reference', 'event.reference'),
+                    $this->column('Event name', 'event.name'),
+                    $this->column('Allocated from', 'allocated_from'),
+                    $this->column('Allocated until', 'allocated_until'),
+                    $this->column('Status', 'status'),
+                    $this->column('Notes', 'notes'),
+                ],
+            ],
+        ];
+    }
+
+    private function workDetailDefinitions(Business $business): array
+    {
+        return [
+            'event_requirements' => [
+                'label' => 'Event requirements',
+                'description' => 'Event product/service requirements, quantities and fulfilment status.',
+                'query' => fn () => EventRequirement::query()
+                    ->whereHas('event', fn ($query) => $query->where('business_id', $business->id))
+                    ->with(['event', 'capability'])->orderBy('id')->lazy(500),
+                'columns' => [
+                    $this->column('Event reference', 'event.reference'),
+                    $this->column('Event name', 'event.name'),
+                    $this->column('Capability', 'capability.name'),
+                    $this->column('Description', 'description'),
+                    $this->column('Category', 'category'),
+                    $this->column('Quantity', 'quantity', true),
+                    $this->column('Unit', 'unit'),
+                    $this->column('Status', 'status'),
+                    $this->column('Notes', 'notes'),
+                ],
+            ],
+            'event_preparation' => [
+                'label' => 'Event preparation',
+                'description' => 'Run-sheet and preparation tasks with due dates, completion state and quantities.',
+                'query' => fn () => EventPreparationItem::query()->where('business_id', $business->id)
+                    ->with('event')->orderBy('id')->lazy(500),
+                'columns' => [
+                    $this->column('Event reference', 'event.reference'),
+                    $this->column('Event name', 'event.name'),
+                    $this->column('Title', 'title'),
+                    $this->column('Category', 'category'),
+                    $this->column('Quantity', 'quantity', true),
+                    $this->column('Unit', 'unit'),
+                    $this->column('Status', 'status'),
+                    $this->column('Due date', 'due_date'),
+                    $this->column('Completed at', 'completed_at'),
+                    $this->column('Notes', 'notes'),
+                ],
+            ],
+        ];
+    }
+
+    private function lineItemDefinitions(Business $business): array
+    {
+        return [
+            'quote_items' => [
+                'label' => 'Quote line items',
+                'description' => 'Versioned quote detail, source requirements and product/service pricing.',
+                'query' => fn () => QuoteItem::query()
+                    ->whereHas('version.quote.event', fn ($query) => $query->where('business_id', $business->id))
+                    ->with(['version.quote.event', 'requirement', 'capability'])
+                    ->orderBy('id')->lazy(500),
+                'columns' => [
+                    $this->column('Quote reference', 'version.quote.reference'),
+                    $this->column('Quote version', 'version.version', true),
+                    $this->column('Event reference', 'version.quote.event.reference'),
+                    $this->column('Event name', 'version.quote.event.name'),
+                    $this->column('Requirement', 'requirement.description'),
+                    $this->column('Capability', 'capability.name'),
+                    $this->column('Description', 'description'),
+                    $this->column('Quantity', 'quantity', true),
+                    $this->column('Unit', 'unit'),
+                    $this->column('Unit price', 'unit_price', true),
+                    $this->column('Line total', 'line_total', true),
+                    $this->column('Pricing basis', 'pricing_basis'),
+                ],
+            ],
+            'invoice_items' => [
+                'label' => 'Invoice line items',
+                'description' => 'Invoice detail retained with the invoice and quote-item references.',
+                'query' => fn () => InvoiceItem::query()
+                    ->whereHas('invoice', fn ($query) => $query->where('business_id', $business->id))
+                    ->with(['invoice.event', 'quoteItem'])
+                    ->orderBy('id')->lazy(500),
+                'columns' => [
+                    $this->column('Invoice number', 'invoice.number'),
+                    $this->column('Event reference', 'invoice.event.reference'),
+                    $this->column('Event name', 'invoice.event.name'),
+                    $this->column('Quote item ID', 'quote_item_id', true),
+                    $this->column('Description', 'description'),
+                    $this->column('Quantity', 'quantity', true),
+                    $this->column('Unit', 'unit'),
+                    $this->column('Unit price', 'unit_price', true),
+                    $this->column('Line total', 'line_total', true),
+                ],
+            ],
+        ];
+    }
+
+    private function receivingDefinitions(Business $business): array
+    {
+        return [
+            'purchase_order_receipts' => [
+                'label' => 'Receiving records',
+                'description' => 'Purchase-order receipt and idempotency records for receiving audit trails.',
+                'query' => fn () => PurchaseOrderReceipt::query()->where('business_id', $business->id)
+                    ->with('purchaseOrder')->orderBy('id')->lazy(500),
+                'columns' => [
+                    $this->column('Purchase order', 'purchaseOrder.reference'),
+                    $this->column('Idempotency key', 'idempotency_key'),
+                    $this->column('Received at', 'created_at'),
+                ],
+            ],
+        ];
+    }
+
+    private function taxDefinitions(Business $business): array
+    {
+        return [
+            'tax_rates' => [
+                'label' => 'Tax rates',
+                'description' => 'Business tax codes, treatments, effective dates and configured rates.',
+                'query' => fn () => TaxRate::query()->where('business_id', $business->id)
+                    ->orderBy('id')->lazy(500),
+                'columns' => [
+                    $this->column('Name', 'name'),
+                    $this->column('Code', 'code'),
+                    $this->column('Tax type', 'tax_type'),
+                    $this->column('Treatment', 'treatment'),
+                    $this->column('Rate', 'rate', true),
+                    $this->column('Effective from', 'effective_from'),
+                    $this->column('Effective to', 'effective_to'),
+                    $this->column('Default', 'is_default'),
+                    $this->column('Active', 'is_active'),
+                    $this->column('Source reference', 'source_reference'),
                 ],
             ],
         ];
