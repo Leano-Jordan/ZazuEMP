@@ -1092,3 +1092,12 @@ Latest source change: commit `29a38f55d3d3ff5979cf844ddbd624a9ea279515` consolid
 - Source write/re-read commits: `789820c`, `36acc45`, `c7cdd3d`, `3cf20a6`, `eedacf8`, `fd695f2`, `bc1de62`, `c94678a`, `6ceeec3`, `fd61e3d`, `65a88cc`, `c580099`, `1b06cce`, `1c05cb5`. Documentation follow-up is recorded in `docs/ZAZU_V1_STATUS.md` and `docs/ZAZU_OFFLINE_FIRST_ARCHITECTURE.md`.
 - Current `main` source changes are **IMPLEMENTED**. GitHub combined status returned no status contexts for `bc1de6224971803bdecee18dc8bcbed7781c5287`; the commit-workflow-runs connector returned no PR-triggered runs for `1c05cb5359695e0a5588593c1de0fdf3407b3c2e`. Exact-head Laravel, Vite, Playwright and quality execution therefore remain **UNVERIFIED**. No readiness uplift is claimed.
 - Physical installed-device acceptance remains open. The current upload endpoint requires a server-backed event ID; an offline-created job must first receive its server identity. Verify the cross-step flow after current source checks are available.
+
+
+### Attachment identity reconciliation — 2026-11-07
+
+- Added `reconcileAttachmentEventIds()` to the active sync client. Pending, business-scoped attachment records with `event_local_id` are matched against `state.jobs` and updated with the job's `server_id`/`id` in one IndexedDB transaction before upload.
+- This preserves the older phone queue's stable local-parent reference across offline Work creation and later identity assignment. The online API request still carries only the resolved server event ID.
+- Added a Playwright regression that seeds the previous queue record shape, assigns the synced job identity, and verifies the exact event ID and idempotency key sent by the client.
+- Added source-contract assertions and updated the V1 status/architecture notes. Latest implementation/test commit: `e3e2c1ed1fc8c55f4d74ff0b281ffc044e7cb806`; status-doc follow-up: `c30fd588f8dfa29a9e3a52ab87d2b281968b8dfc`.
+- Runtime test execution remains UNVERIFIED. The browser test covers the identity-remapping boundary, not a fully rendered offline-create → reconnect → attach journey.
