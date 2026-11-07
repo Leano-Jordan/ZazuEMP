@@ -206,10 +206,18 @@ class UiProportionFoundationTest extends TestCase
         $this->assertStringContainsString('class="zazu-dash-event-trailing"', $dashboard);
         $this->assertStringContainsString('.zazu-dash-event-trailing .zazu-dash-status {', $css);
         $this->assertStringContainsString('display: inline-flex;', $css);
-        $this->assertStringNotContainsString('.zazu-dash-event-time', $css);
-        $this->assertStringNotContainsString('.zazu-dash-event-line', $css);
-        $this->assertStringNotContainsString('grid-column: 3;', $css);
-        $this->assertStringNotContainsString('grid-row: 2;', $css);
+        $this->assertStringNotContainsString(
+            '/* Mobile run-sheet: keep operational status visible without squeezing event details. */',
+            $css
+        );
+        $this->assertStringNotContainsString(
+            '.zazu-dash-event-time,\n    .zazu-dash-event-line {\n        grid-row: 1 / span 2;',
+            $css
+        );
+        $this->assertStringNotContainsString(
+            '.zazu-dash-status {\n        display: inline-flex;\n        grid-column: 3;',
+            $css
+        );
     }
 
 
