@@ -6509,3 +6509,17 @@ body.zazu-mobile-menu-open .zazu-helper {
         font-size: 10px;
     }
 }
+
+
+/* Mobile event rows retain a compact status cue instead of hiding useful state. */
+@media (max-width: 620px) {
+    .zazu-dash-event-trailing .zazu-dash-status {
+        display: inline-flex;
+        max-width: 76px;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        font-size: 9px;
+        line-height: 1.25;
+    }
+}
