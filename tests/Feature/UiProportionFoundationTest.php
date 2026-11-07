@@ -881,4 +881,18 @@ class UiProportionFoundationTest extends TestCase
         }
     }
 
+
+    public function test_dashboard_lower_panels_use_compact_surfaces_and_responsive_resource_tiles(): void
+    {
+        $css = file_get_contents(resource_path('css/zazu-dashboard-authority.css'));
+
+        $this->assertIsString($css);
+        $this->assertStringContainsString('Director iteration 01 — lower dashboard panels.', $css);
+        $this->assertStringContainsString('grid-template-columns: repeat(2, minmax(0, 1fr)) !important;', $css);
+        $this->assertStringContainsString('min-height: 62px !important;', $css);
+        $this->assertStringContainsString('html[data-theme="dark"] body.zazu-dashboard-page .zazu-dash-focus-item', $css);
+        $this->assertStringContainsString('@media (max-width: 380px)', $css);
+        $this->assertStringContainsString('@media (prefers-reduced-motion: reduce)', $css);
+    }
+
 }
