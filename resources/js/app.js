@@ -2090,7 +2090,7 @@ async function canReachZazuLogoutServer() {
 
     try {
         const response = await fetch('/up', {
-            method: 'HEAD',
+            method: 'GET',
             credentials: 'same-origin',
             cache: 'no-store',
             signal: controller.signal,

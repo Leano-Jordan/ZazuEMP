@@ -85,14 +85,21 @@ test('registration flows through onboarding into the dashboard', async ({ page }
             await dialog.dismiss();
         }
     });
-    await page.locator('nav[aria-label="Public navigation"]').getByRole('button', { name: 'Sign out', exact: true }).click();
-    const confirmation = logoutDialogs.find(dialog => dialog.type === 'confirm');
-    if (confirmation) {
-        expect(confirmation.message).toContain('business-scoped offline workspace and any queued changes or attachments will remain on this device');
-    }
-    const logoutAlerts = logoutDialogs.filter(dialog => dialog.type === 'alert');
-    expect(logoutAlerts, 'logout must not raise a safety or connectivity alert').toEqual([]);
-    await expect(page).toHaveURL(/\/$/);
+    const signOutButton = page.locator('nav[aria-label="Public navigation"]').getByRole('button', { name: 'Sign out', exact: true });
+    const logoutNavigation = page.waitForNavigation({ waitUntil: 'domcontentloaded' });
+    await signOutButton.click();
+    await expect.poll(() => logoutDialogs.length, {
+        message: 'logout should display its confirmation after the server reachability probe',
+    }).toBe(1);
+
+    const confirmation = logoutDialogs[0];
+    expect(confirmation.type).toBe('confirm');
+    expect(confirmation.message).toContain('business-scoped offline workspace and any queued changes or attachments will remain on this device');
+
+    const navigationResponse = await logoutNavigation;
+    expect(navigationResponse?.status(), 'confirmed logout should return to the public landing page').toBe(200);
+    expect(logoutDialogs.filter(dialog => dialog.type === 'alert')).toEqual([]);
+    await expect.poll(() => new URL(page.url()).pathname).toBe('/');
     await expect(page.locator('.zazu-error-shell')).toHaveCount(0);
     await expect(
         page.locator('nav[aria-label="Public navigation"]').getByRole('button', { name: 'Log in', exact: true }),

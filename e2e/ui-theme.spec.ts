@@ -49,7 +49,7 @@ test.describe('Zazu UI theme and navigation', () => {
             return {
                 canvas: styles.getPropertyValue('--zazu-surface-canvas').trim(),
                 blue: styles.getPropertyValue('--zazu-blue-primary').trim(),
-                dashboardCanvas: getComputedStyle(document.body).backgroundColor,
+                dashboardCanvas: getComputedStyle(document.querySelector('.zazu-shell')).backgroundColor,
             };
         });
 

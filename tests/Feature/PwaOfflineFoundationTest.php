@@ -73,6 +73,7 @@ class PwaOfflineFoundationTest extends TestCase
         $this->assertLessThan($syncPosition, $readyPosition);
         $this->assertStringContainsString('async function canReachZazuLogoutServer()', $app);
         $this->assertStringContainsString("fetch('/up'", $app);
+        $this->assertStringContainsString("method: 'GET'", $app);
         $this->assertStringContainsString('Your business offline workspace, pending changes and device token were left untouched', $app);
         $this->assertStringContainsString('async function handleZazuLogout(form)', $app);
         $logoutHandler = substr($app, strpos($app, 'async function handleZazuLogout(form)'));
