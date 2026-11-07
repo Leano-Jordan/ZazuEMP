@@ -1072,3 +1072,9 @@ Latest source change: commit `29a38f55d3d3ff5979cf844ddbd624a9ea279515` consolid
 - Added `tests/Feature/SyncAttachmentIdempotencyTest.php` on `main` (commit `d7debb0d8378633174f74479f26258d469799ed6`, corrected namespace commit `b3f9eb360e6259868993814419c09e939a3d372d`). The tests cover exact-content retry idempotency and reject reuse of the same key for different file bytes with otherwise matching metadata.
 - PHP syntax check passed locally under PHP 8.4.24. Laravel execution and exact-head CI remain UNVERIFIED; the available combined-status query returned no status contexts. Do not mark the tests passed until the Laravel/quality workflow reports success for the exact current main SHA.
 - Next V1 implementation target: integrate phone-local attachment queue/upload/download into the active Work attachment flow using the current business-scoped `ZazuOffline` contract. The existing `public/offline-attachments.js` is legacy code and must not be loaded unchanged; it depends on globals absent from the active Laravel shell. Preserve private storage, business isolation, retry/idempotency, logout cleanup and device-recovery behavior.
+
+## Attachment idempotency coverage extension — 2026-11-07
+
+- Extended `SyncAttachmentIdempotencyTest` to cover three server contracts: identical retry returns the original attachment; same key with different bytes but matching metadata returns HTTP 409; same key cannot move an attachment to a different job in the same business.
+- Latest test commit: `a1d16620996479d461574c5317dfccc82c48d35d` on `main`.
+- Re-read current-main test source and ran PHP 8.4.24 syntax lint: PASS. Laravel feature execution remains UNVERIFIED pending exact-head CI evidence.
