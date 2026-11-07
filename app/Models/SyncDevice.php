@@ -10,6 +10,8 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class SyncDevice extends Model
 {
+    public const SYNC_TOKEN_IDLE_EXPIRY_DAYS = 180;
+
     use BelongsToBusiness, HasFactory;
 
     protected $attributes = [
@@ -23,6 +25,7 @@ class SyncDevice extends Model
         'device_type',
         'status',
         'last_seen_at',
+        'token_expires_at',
         'revoked_at',
         'metadata',
     ];
@@ -31,6 +34,7 @@ class SyncDevice extends Model
     {
         return [
             'last_seen_at' => 'datetime',
+            'token_expires_at' => 'datetime',
             'revoked_at' => 'datetime',
             'metadata' => 'array',
         ];
@@ -54,5 +58,15 @@ class SyncDevice extends Model
     public function isActive(): bool
     {
         return $this->status === 'active' && $this->revoked_at === null;
+    }
+
+    public function refreshTokenActivity(): void
+    {
+        $lastSeenAt = now();
+
+        $this->forceFill([
+            'last_seen_at' => $lastSeenAt,
+            'token_expires_at' => $lastSeenAt->copy()->addDays(self::SYNC_TOKEN_IDLE_EXPIRY_DAYS),
+        ])->save();
     }
 }

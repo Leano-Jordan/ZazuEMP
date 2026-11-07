@@ -1902,6 +1902,11 @@ class OfflineSyncFoundationTest extends TestCase
         $this->assertSame(200, $first->getStatusCode());
         $this->assertSame('active', $device->fresh()->status);
         $this->assertNull($device->fresh()->metadata['pairing_code_hash']);
+        $this->assertTrue($device->fresh()->token_expires_at->isFuture());
+        $this->assertSame(
+            now()->addDays(SyncDevice::SYNC_TOKEN_IDLE_EXPIRY_DAYS)->timestamp,
+            $device->fresh()->token_expires_at->timestamp,
+        );
 
         $this->expectException(\Illuminate\Validation\ValidationException::class);
         $controller->provision($makeRequest());
@@ -2285,6 +2290,7 @@ class OfflineSyncFoundationTest extends TestCase
                 'sync_token_hash' => hash('sha256', $plainToken),
                 'preserved_metadata' => 'kept',
             ],
+            'token_expires_at' => now()->addDays(SyncDevice::SYNC_TOKEN_IDLE_EXPIRY_DAYS),
         ]);
 
         $this->withToken($plainToken)

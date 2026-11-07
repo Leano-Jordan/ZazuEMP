@@ -51,6 +51,7 @@ class BusinessSettingsController extends Controller
             $device->forceFill([
                 'status' => 'revoked',
                 'revoked_at' => now(),
+                'token_expires_at' => null,
                 'metadata' => $metadata,
             ])->save();
 

@@ -30,6 +30,7 @@ class SyncDeviceManagementTest extends TestCase
             'device_name' => 'Kitchen phone',
             'device_type' => 'phone',
             'status' => 'active',
+            'token_expires_at' => now()->addDays(SyncDevice::SYNC_TOKEN_IDLE_EXPIRY_DAYS),
             'metadata' => ['sync_token_hash' => hash('sha256', 'secret-token')],
         ]);
 
@@ -57,6 +58,72 @@ class SyncDeviceManagementTest extends TestCase
         $this->withToken('secret-token')
             ->getJson('/api/sync/attachments')
             ->assertUnauthorized();
+    }
+
+    public function test_expired_sync_device_token_is_rejected_without_extending_its_lifetime(): void
+    {
+        $business = Business::create([
+            'name' => 'Expired Device Business',
+            'slug' => 'expired-device-'.Str::lower(Str::random(8)),
+            'status' => 'active',
+            'currency' => 'ZAR',
+        ]);
+        $token = Str::random(64);
+        $expiredAt = now()->subSecond();
+        $device = SyncDevice::create([
+            'business_id' => $business->id,
+            'installation_id' => (string) Str::uuid(),
+            'status' => 'active',
+            'last_seen_at' => now()->subDays(SyncDevice::SYNC_TOKEN_IDLE_EXPIRY_DAYS + 1),
+            'token_expires_at' => $expiredAt,
+            'metadata' => ['sync_token_hash' => hash('sha256', $token)],
+        ]);
+
+        $this->withToken($token)
+            ->getJson('/api/sync/attachments')
+            ->assertUnauthorized()
+            ->assertJsonPath('message', 'The Zazu sync device token has expired. Pair this device again.');
+
+        $this->assertSame($expiredAt->timestamp, $device->fresh()->token_expires_at->timestamp);
+    }
+
+    public function test_authenticated_sync_activity_slides_device_token_expiry_forward(): void
+    {
+        $business = Business::create([
+            'name' => 'Active Device Business',
+            'slug' => 'active-device-'.Str::lower(Str::random(8)),
+            'status' => 'active',
+            'currency' => 'ZAR',
+        ]);
+        $token = Str::random(64);
+        $now = now()->startOfSecond();
+        $initialExpiry = $now->copy()->addDays(30);
+        $device = SyncDevice::create([
+            'business_id' => $business->id,
+            'installation_id' => (string) Str::uuid(),
+            'status' => 'active',
+            'last_seen_at' => $now->copy()->subDays(10),
+            'token_expires_at' => $initialExpiry,
+            'metadata' => ['sync_token_hash' => hash('sha256', $token)],
+        ]);
+
+        $this->travelTo($now);
+        try {
+            $this->withToken($token)
+                ->getJson('/api/sync/attachments')
+                ->assertOk()
+                ->assertJsonCount(0, 'attachments');
+
+            $fresh = $device->fresh();
+            $this->assertSame(
+                $now->copy()->addDays(SyncDevice::SYNC_TOKEN_IDLE_EXPIRY_DAYS)->timestamp,
+                $fresh->token_expires_at->timestamp,
+            );
+            $this->assertSame($now->timestamp, $fresh->last_seen_at->timestamp);
+            $this->assertGreaterThan($initialExpiry->timestamp, $fresh->token_expires_at->timestamp);
+        } finally {
+            $this->travelBack();
+        }
     }
 
     public function test_non_owner_cannot_revoke_a_paired_phone(): void
@@ -106,6 +173,7 @@ class SyncDeviceManagementTest extends TestCase
             'business_id' => $second->id,
             'installation_id' => (string) Str::uuid(),
             'status' => 'active',
+            'token_expires_at' => now()->addDays(SyncDevice::SYNC_TOKEN_IDLE_EXPIRY_DAYS),
             'metadata' => ['sync_token_hash' => hash('sha256', 'foreign-token')],
         ]);
 

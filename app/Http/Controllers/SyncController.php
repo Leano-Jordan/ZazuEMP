@@ -122,6 +122,7 @@ class SyncController extends Controller
                     'device_type' => $validated['device_type'] ?? 'phone',
                     'status' => 'active',
                     'last_seen_at' => now(),
+                    'token_expires_at' => now()->addDays(SyncDevice::SYNC_TOKEN_IDLE_EXPIRY_DAYS),
                     'metadata' => array_merge($metadata, [
                         'sync_token_hash' => hash('sha256', $token),
                         'paired_at' => now()->toIso8601String(),
@@ -159,6 +160,7 @@ class SyncController extends Controller
         $device->forceFill([
             'status' => 'revoked',
             'revoked_at' => now(),
+            'token_expires_at' => null,
             'metadata' => $metadata,
         ])->save();
 

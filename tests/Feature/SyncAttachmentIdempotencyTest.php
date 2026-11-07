@@ -228,6 +228,7 @@ class SyncAttachmentIdempotencyTest extends TestCase
             'device_name' => 'Test phone',
             'device_type' => 'phone',
             'status' => 'active',
+            'token_expires_at' => now()->addDays(SyncDevice::SYNC_TOKEN_IDLE_EXPIRY_DAYS),
             'metadata' => ['sync_token_hash' => hash('sha256', $token)],
         ]);
 
