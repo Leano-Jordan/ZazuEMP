@@ -2,7 +2,7 @@
 
 **Assessment date:** 2026-11-07
 **Repository:** `Leano-Jordan/ZazuEMP`  
-**Current main HEAD observed by Director:** `1c05cb5359695e0a5588593c1de0fdf3407b3c2e` (source and test changes; exact-head runtime evidence pending)
+**Validated application/test source commit:** `2c9a03e5de80e5c0aceb47724fff6b8d3a8439f1` on canonical `main` (399 Laravel tests / 2,621 assertions pass; browser smoke still running at 2026-11-07 reconciliation). Resolve live main before later work.
 
 ## Current position
 
@@ -21,6 +21,22 @@ Zazu EMP has a substantial connected operational foundation across:
 - responsive/shared UI.
 
 The product is **not yet release-certified**. The current main line contains a broad offline operational foundation, while release certification remains gated by real recovery/rollback evidence, legal/privacy closure and Zazu brand clearance.
+
+## Exact-source CI snapshot — 2026-11-07
+
+Source/test commit: `2c9a03e5de80e5c0aceb47724fff6b8d3a8439f1`.
+
+- Laravel: **399 passed / 2,621 assertions**.
+- Zazu quality + secret scan: PASS.
+- Psalm security scan: PASS.
+- PHPMD: PASS.
+- Populated upgrade/rollback: PASS.
+- Browser smoke: IN PROGRESS at reconciliation.
+- SonarCloud: SKIPPED, not counted as a pass.
+- The active Work attachment path and format-v2 backup/restore changes are now included in the executed Laravel suite.
+- Paired-device sync credentials now expire after 180 days of inactivity and extend on authenticated sync; expired devices must re-pair.
+
+The complete run links and NO-GO gates are in `docs/V1_RELEASE_CHECKLIST.md`. PC/mobile installation and screen rotation do not establish disconnected installed-device acceptance. Real restore/rollback drills and legal/privacy/brand closure remain outstanding.
 
 ## Historical-chat reconciliation
 

@@ -243,7 +243,20 @@ Before claiming full offline operation:
 - conflicts are explainable and recoverable;
 - a failed sync never corrupts the local authoritative state.
 
-## 14. Current status
+## 14. Trusted-device credential lifecycle
+
+The active sync bearer credential is stored server-side only as a SHA-256 hash in the paired device metadata. The plaintext token is returned once during pairing/provisioning.
+
+- A newly paired device receives a 180-day inactivity expiry.
+- Every authenticated sync request checks expiry before entering the endpoint, then refreshes `last_seen_at` and moves `token_expires_at` forward by 180 days.
+- A missing or expired expiry is rejected with HTTP 401; the device must be paired again.
+- Owner revocation removes the token hash and clears its expiry immediately.
+- Migration backfills existing active paired devices from `last_seen_at`, falling back to `created_at`; already-idle devices do not receive a fresh 180-day period from migration date.
+- This is rolling inactivity expiry, not periodic token rotation. The token value remains unchanged while the device is active.
+
+The lifecycle has automated expiry, extension, pairing and revocation regression coverage. Physical-device acceptance remains separate.
+
+## 15. Current status
 
 **Implemented foundation**
 - local relational business data model;

@@ -28,7 +28,21 @@ IDENTITY → BASELINE → TARGET → ROUTE → INSPECT → CHANGE → VERIFY →
 The 2026-11-01 local Windows-host proposal was exploratory and is no longer the active deployment target. The owner has clarified that this PC is a development workstation; future production hosting will be a paid server when funding and release readiness permit. The 2026-11-03 host diagnostic is recorded below. Do not configure this PC as production infrastructure.
 
 ## Active target
-**Owner-directed V1 convergence:** close exact-main Laravel/quality/browser/security verification, finish the remaining offline trusted-device acceptance, verify installation backup/restore integrity, certify the populated commercial workflow, and reconcile the release/legal/deployment gates. The owner accepted the current dashboard; its refinement mission is closed. All implementation remains on canonical `main`.
+**Owner-directed V1 convergence:** repair source defects, keep exact-main CI green, complete the remaining offline/device and commercial evidence, and remove every operational task that can be safely verified or automated from code. The owner-accepted dashboard remains closed. All implementation stays on canonical `main`.
+
+## Current verified source — 2026-11-07
+
+- Application/test source: `2c9a03e5de80e5c0aceb47724fff6b8d3a8439f1`.
+- Laravel: **399 tests / 2,621 assertions — PASS**.
+- Zazu quality + secret scan: PASS.
+- Psalm security scan: PASS.
+- PHPMD: PASS.
+- Populated upgrade/rollback: PASS.
+- Browser smoke: still running at the latest reconciliation; do not claim complete.
+- Paired-device token security: 180-day rolling idle expiry; authenticated sync refreshes expiry; expired tokens require re-pairing; owner revocation clears token expiry/hash.
+- Current release position remains NO-GO pending browser smoke, physical installed-device/offline acceptance, representative operator backup/restore and deployment rollback drills, commercial operating walkthrough, and legal/privacy/brand closure.
+- Canonical ledger: `docs/V1_RELEASE_CHECKLIST.md`. Never repeat a CI status from an older SHA as current evidence.
+
 
 ## Index-only dashboard refinement — 2026-11-06
 
