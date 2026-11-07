@@ -1116,3 +1116,13 @@ Latest source change: commit `29a38f55d3d3ff5979cf844ddbd624a9ea279515` consolid
 - Extended `SyncDeviceManagementTest`: owner revocation must reject the old bearer token at bootstrap, pull, push and attachment-list endpoints. Existing non-owner and foreign-business revocation denial cases remain.
 - Exact source/test commits: `614c24131edc3023c05baad5e583614a8f4c7156` (browser test fixture), `4de9e8bf018404fe1b67e16a7d55b0ec09ef7109` (revocation matrix). Documentation updates: `0059793c55b8cd3abe13c6fea6bef636e9bcb9bc`, `252d0a4f79751280ea26113ad506ab5f846c6715`.
 - Tests are ADDED, not executed. Physical installed-device acceptance, expired-session, interrupted logout and stale async completion cases remain open. No V1 evidence score uplift.
+
+
+### Backup archive integrity hardening — 2026-11-07
+
+- New `zazu:backup` archives use manifest format version 2 with SHA-256 checksums for the SQLite/MySQL database payload and every private-storage file.
+- `zazu:restore` verifies the checksum map matches the exact payload file set and streams each file through SHA-256 before extraction or any target mutation. Missing/malformed/extra/mismatched checksums fail closed.
+- Restore retains compatibility with format-version-1 archives without checksum maps; version 2 requires them.
+- `ZazuBackupRestoreTest` asserts database/private-file checksum generation and rejects a tampered private payload while preserving the installed private probe.
+- Source/test commits: `2c79de9`, `e49dfc7`, `e684203`, `6d361c8`, `6350760`, `1ac0a7e`, `3138d4f`. Docs: `f0e2410`, `e1be645`.
+- Integrity hashes detect corruption/drift; they are not a signed authenticity mechanism. Real operator backup/restore verification remains open. Exact-head Laravel/quality execution not yet observed; no recovery score uplift.
