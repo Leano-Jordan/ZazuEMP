@@ -223,6 +223,7 @@ class PwaOfflineFoundationTest extends TestCase
         $this->assertStringContainsString('await clearAttachmentWorkspace();', $client);
         $this->assertStringContainsString('attachmentPendingCount', $client);
         $this->assertStringContainsString('async function queueAttachment(eventId, file, description', $client);
+        $this->assertStringContainsString('async function queueAttachments(eventId, files', $client);
         $this->assertStringContainsString('async function syncAttachments()', $client);
         $this->assertStringContainsString('async function loadAttachments(eventId)', $client);
         $this->assertStringContainsString('async function getAttachmentFile(idempotencyKey)', $client);
@@ -235,7 +236,7 @@ class PwaOfflineFoundationTest extends TestCase
         $this->assertStringContainsString('data-zazu-offline-attachment-status', $attachmentView);
         $this->assertStringContainsString('data-zazu-server-attachment-ids', $attachmentView);
         $this->assertStringContainsString('setupZazuOfflineAttachments();', $app);
-        $this->assertStringContainsString('client.queueAttachment(eventId, file,', $app);
+        $this->assertStringContainsString('client.queueAttachments(eventId, files,', $app);
         $this->assertStringContainsString('client.loadAttachments(eventId)', $app);
         $this->assertStringContainsString('client.getAttachmentFile(record.idempotency_key)', $app);
         $attachmentClient = File::get(public_path('offline-attachments.js'));
