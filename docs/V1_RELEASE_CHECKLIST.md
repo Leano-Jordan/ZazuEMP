@@ -4,8 +4,8 @@
 **Repository:** `Leano-Jordan/ZazuEMP`  
 **Branch:** `main`  
 **Main-ref rule:** query the live `main` ref; this ledger does not pin a moving HEAD.  
-**Last Director reconciliation:** 2026-11-01  
-**Latest application evidence SHA:** `6b16b74a7b773ac2797bf7135f85d38b8af0de8d` (documentation reconciliation subsequently committed on `main` as `18b60aeb3bbcaecaa1ab5b08baa8ec3d1f1e4afe`).
+**Last Director reconciliation:** 2026-11-07  
+**Latest application/test source SHA:** `45f3cfed9bee48153d939932ba4c495c85c0b26b` (latest observed `main` ref at this reconciliation: `d5608fd28256d72b9ddbcbce7e6826ade0c1ce55`).
 
 ## Evidence rule
 
@@ -13,7 +13,28 @@
 
 This ledger records the current release truth. Older Director audits remain historical evidence; they do not override this snapshot.
 
-## Current-head CI evidence
+
+## Current V1 reconciliation — 2026-11-07
+
+**Release position: NO-GO.** The 4 November scorecard remains a historical evidence baseline, not current certification.
+
+| Area | Current source/test position | Evidence state |
+|---|---|---|
+| Active Work attachments | Phone-local queue, atomic batch save, idempotent reconnect upload, private attachment list/download cache and offline job-ID reconciliation are integrated into the active Work page | IMPLEMENTED; Laravel/Playwright execution pending |
+| Trusted-device lifecycle | Browser regression covers unreachable logout preserving the signed-in session and queued business work, followed by same-account re-login; owner revocation regression covers bootstrap, pull, push and attachment-list APIs | TESTS ADDED; exact-head execution pending |
+| Backup / restore | New format-v2 archives contain SHA-256 hashes for the database and private files; restore checks the exact payload set before extraction; valid v1 archives remain supported | IMPLEMENTED; generation, tamper, missing-manifest and v1 compatibility tests added; execution pending |
+| Commercial workflow | Existing quote, deposit, invoice, payment, purchasing and receiving paths remain implemented; populated end-to-end reconciliation is still not evidenced on the current source head | IN PROGRESS |
+| Security | Business isolation and device revocation foundations remain; CSP still permits inline script/style, sync-token expiry/rotation policy remains open | IN PROGRESS |
+| Deployment / recovery | No current production HTTPS host or real operator recovery/rollback drill is recorded | OPEN / RELEASE BLOCKER |
+| Legal / privacy / brand | Operational privacy sign-off, retention/incident ownership and official Zazu name clearance remain outstanding | OPEN / RELEASE BLOCKER |
+
+**Current verification boundary:** GitHub combined-status lookup for the latest main head returned no status contexts. The available commit-workflow-run lookup did not expose push-triggered runs for that SHA. Do not reuse historical green Actions runs as current evidence. Laravel, Quality, Psalm, PHPMD, browser and populated upgrade/rollback checks remain UNVERIFIED for the latest application/test source.
+
+**Physical acceptance boundary:** the owner previously confirmed installation on PC/mobile and screen rotation. That is not proof of disconnected installed-device launch, offline attachment recovery, session-transition behaviour or secure-origin operation.
+
+No evidence-maturity score uplift is awarded for source changes or tests that have not executed. The 13-domain 60/100 score remains the last formally reconciled baseline until a fresh exact-head assessment is completed.
+
+## Historical CI evidence — 2026-11-01 (not current)
 
 | Check | Exact application SHA | Result |
 |---|---|---|
@@ -27,7 +48,7 @@ This ledger records the current release truth. Older Director audits remain hist
 
 These results apply only to the exact application SHA shown. The current `main` ref has since advanced through a documentation-only Director reconciliation commit. The current health workflow emits per-run artifacts and Actions summaries; it does not publish a persistent latest report.
 
-## V1 capability gates
+## Historical capability snapshot — 2026-11-01 (superseded by the 2026-11-07 reconciliation above)
 
 | Gate | State | Director position |
 |---|---|---|
@@ -51,8 +72,8 @@ These results apply only to the exact application SHA shown. The current `main` 
 
 ## Remaining V1 certification gates
 
-### 1. Physical device acceptance — 🟢 VERIFIED
-Owner verified on 2026-10-07 that Zazu was installed on PC and mobile, presentation was in order, and screen rotation worked. This remains physical acceptance for the reported devices only; it does not verify the post-2026-10-16 service-worker/logout changes or prove fully disconnected phone-local operation.
+### 1. Physical device acceptance — 🟡 PARTIAL
+Owner verified on 2026-10-07 that Zazu was installed on PC and mobile, presentation was in order, and screen rotation worked. This confirms installation/presentation only; disconnected app launch, offline Work, attachment recovery, session transitions and secure-origin operation remain unproven.
 
 ### 2. Legal / privacy operational closure — 🟡 OPEN
 Still requires real operator/deployment details, final privacy/terms decisions, retention/disposal ownership, incident escalation and any applicable processing agreements.
@@ -70,7 +91,7 @@ The rollback runbook and recovery mechanisms exist. A real release/deployment ro
 Exact locked Composer and npm manifests were reconciled on 2026-10-07. See `docs/RELEASE_DEPENDENCY_LICENCE_AUDIT.md`. Final legal/distribution review remains separate.
 
 ### 7. Offline operational depth — 🟡 IN PROGRESS
-Phone-local customer/job/quote/preparation and supporting inventory, operational cost, asset, supplier, purchasing and finance data are represented in the IndexedDB workspace and sync foundation. Offline form submissions use origin reachability rather than trusting `navigator.onLine`; local mutation, dirty marker and optimistic workspace copy are committed transactionally. Current-main Quality and Laravel workflows passed on application SHA `6b16b74a7b773ac2797bf7135f85d38b8af0de8d`, including the Node service-worker race suite. The browser smoke run was still in progress at reconciliation. This does not prove disconnected installed-device launch, full screen parity, attachment parity or real-world sync/conflict recovery.
+Phone-local customer/job/quote/preparation and supporting inventory, operational cost, asset, supplier, purchasing and finance data are represented in the IndexedDB workspace and sync foundation. The active Work attachment panel now has business-scoped local queueing, atomic multi-file save, idempotent reconnect upload, private-file caching and offline job-ID reconciliation. Trusted-device session-transition and revocation regressions have been added. Exact-head Laravel/Quality/Playwright execution remains unverified; installed-device disconnected launch, full screen parity and real-world sync/conflict recovery remain open.
 
 ### 8. Final Director certification — ⬜ NOT STARTED
 Certification waits for the remaining operational/legal/brand gates; no rushed release claim.
@@ -89,12 +110,14 @@ Certification waits for the remaining operational/legal/brand gates; no rushed r
 
 ## Next execution order
 
-1. Execute/record real recovery drill.
-2. Execute/record real rollback exercise.
-3. Close dependency/licence release review.
-4. Close legal/privacy operational controls.
-5. Resolve Zazu brand clearance.
-6. Run final Director V1 certification audit.
+1. Obtain and reconcile exact-main Laravel, Quality, Psalm, PHPMD, browser and populated upgrade/rollback results; repair confirmed failures.
+2. Complete a populated customer → event → Work → quote → acceptance → invoice → deposit/payment → purchasing → receiving → cost/profit traversal.
+3. Execute/record a real operator backup → restore drill with representative database records and private media.
+4. Execute/record a real deployment rollback exercise.
+5. Complete adversarial security/session/device acceptance and close the CSP/token-lifecycle review.
+6. Close operational privacy/POPIA controls, retention/incident ownership and dependency/licence release review.
+7. Resolve official Zazu brand/trade-mark clearance.
+8. Run final Director V1 certification audit.
 
 **Rule:** no broad feature expansion while a Critical release gate remains open.
 
