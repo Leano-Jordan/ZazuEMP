@@ -909,4 +909,34 @@ class UiProportionFoundationTest extends TestCase
         $this->assertStringContainsString('@media (prefers-reduced-motion: reduce)', $css);
     }
 
+
+
+    public function test_dashboard_top_half_uses_a_single_overview_composition_before_operational_panels(): void
+    {
+        $dashboard = file_get_contents(resource_path('views/dashboard.blade.php'));
+        $css = file_get_contents(resource_path('css/zazu-dashboard-authority.css'));
+
+        $this->assertIsString($dashboard);
+        $this->assertIsString($css);
+
+        $overview = strpos($dashboard, '<section class="zazu-dash-overview"');
+        $metrics = strpos($dashboard, '<aside class="zazu-dash-metrics">');
+        $actions = strpos($dashboard, '<section class="zazu-dash-quick-actions"');
+        $panels = strpos($dashboard, '<section class="zazu-dash-grid" aria-label="Operational dashboard panels">');
+
+        $this->assertNotFalse($overview);
+        $this->assertNotFalse($metrics);
+        $this->assertNotFalse($actions);
+        $this->assertNotFalse($panels);
+        $this->assertLessThan($metrics, $overview);
+        $this->assertLessThan($actions, $metrics);
+        $this->assertLessThan($panels, $actions);
+
+        $this->assertStringContainsString('.zazu-dash-overview {', $css);
+        $this->assertStringContainsString('.zazu-dash-overview .zazu-dash-metrics {', $css);
+        $this->assertStringContainsString('grid-template-columns: repeat(4, minmax(0, 1fr)) !important;', $css);
+        $this->assertStringContainsString('html[data-theme="dark"] body.zazu-dashboard-page .zazu-dash-hero', $css);
+        $this->assertStringContainsString('@media (max-width: 760px)', $css);
+    }
+
 }
