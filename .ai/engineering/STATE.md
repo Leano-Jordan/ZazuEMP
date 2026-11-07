@@ -1101,3 +1101,10 @@ Latest source change: commit `29a38f55d3d3ff5979cf844ddbd624a9ea279515` consolid
 - Added a Playwright regression that seeds the previous queue record shape, assigns the synced job identity, and verifies the exact event ID and idempotency key sent by the client.
 - Added source-contract assertions and updated the V1 status/architecture notes. Latest implementation/test commit: `e3e2c1ed1fc8c55f4d74ff0b281ffc044e7cb806`; status-doc follow-up: `c30fd588f8dfa29a9e3a52ab87d2b281968b8dfc`.
 - Runtime test execution remains UNVERIFIED. The browser test covers the identity-remapping boundary, not a fully rendered offline-create → reconnect → attach journey.
+
+
+### Attachment list/download API acceptance coverage — 2026-11-07
+
+- Extended `SyncAttachmentIdempotencyTest` through the paired-device API: upload returns the idempotency key/event identity consumed by the client; list returns the expected attachment identity, original name and size; private file download returns the named file.
+- Added foreign-business negative cases for event-filtered listing and private download. The fixture confirms the foreign private file actually exists, so the download denial exercises the business boundary rather than a missing-file response.
+- Current implementation/test source is on `main`; latest test commit: `bd47ec672ea0f4b609614ce24c3baa9d1ac4bd0a`. Laravel/CI execution remains UNVERIFIED.
