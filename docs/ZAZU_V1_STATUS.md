@@ -162,8 +162,9 @@ The sync client keeps the local Blob until it receives a verifiable server attac
 Regression coverage now includes:
 - Laravel source-contract assertions for the active offline attachment client and Work panel;
 - Playwright scenarios exercising a real Work page, offline local file persistence, reconnect upload with the original idempotency key, remote attachment caching, and `event_local_id` reconciliation after offline Work identity resolution;
-- existing server idempotency tests for duplicate retries and rejection of changed file content or event ownership.
+- existing server idempotency tests for duplicate retries and rejection of changed file content or event ownership;
+- paired-device API tests for attachment-list metadata, private download success, foreign-business list denial and foreign-business private download denial (with the foreign file confirmed present).
 
-The service-worker cache was advanced to `zazu-static-v30` because `/zazu-offline.js` is served cache-first. All source and test changes are on `main`; latest observed implementation/test SHA before the documentation update: `e3e2c1ed1fc8c55f4d74ff0b281ffc044e7cb806`.
+The service-worker cache was advanced to `zazu-static-v30` because `/zazu-offline.js` is served cache-first. All source and test changes are on `main`; latest observed implementation/test SHA before the documentation update: `bd47ec672ea0f4b609614ce24c3baa9d1ac4bd0a`.
 
 **Evidence boundary:** GitHub combined commit status returned no status contexts for the earlier `bc1de6224971803bdecee18dc8bcbed7781c5287` head; no Laravel, build or browser pass is claimed for the new source head. The added Playwright test and feature assertions remain unexecuted until exact-head CI is observed. Physical installed-device acceptance and disconnected Work-page availability remain unverified. The new browser regression covers attachment parent-ID reconciliation once the job has a server ID; the complete rendered create-offline-job → sync-job → attach-file user journey is still unverified.
