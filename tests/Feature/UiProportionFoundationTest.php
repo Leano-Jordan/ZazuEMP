@@ -479,7 +479,7 @@ class UiProportionFoundationTest extends TestCase
         $this->assertStringNotContainsString('Finance remains authoritative in its own workspace.', $dashboard);
         $this->assertStringContainsString('aria-label="Quick actions"', $dashboard);
         $this->assertStringContainsString('Quote pipeline', $dashboard);
-        $this->assertStringContainsString('Operational readiness', $dashboard);
+        $this->assertStringContainsString('Workspace health', $dashboard);
     }
 
 
