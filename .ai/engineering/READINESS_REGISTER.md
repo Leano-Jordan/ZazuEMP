@@ -575,3 +575,10 @@ The service-worker cache is `zazu-static-v30`. Browser regression: `e2e/offline-
 Pending phone attachment records that retain `event_local_id` are now reconciled against the synced business `state.jobs` record before upload. The corresponding Playwright regression verifies that the resolved server event ID and original idempotency key are sent. This closes the source-level orphaning gap for records created by the previous phone queue. The active Work detail upload form still requires a persisted job; the full rendered offline-create → reconnect → attachment journey remains unverified.
 
 **Evidence:** IMPLEMENTED at source; test added, not yet executed. No readiness score change.
+
+
+### Paired-device attachment API contract — 2026-11-07
+
+The server regression suite now covers the full phone-consumed API boundary: upload response idempotency/event identity, list metadata including idempotency key/name/size, private download success, foreign-business event-list denial, and foreign-business download denial using an existing private file fixture. Test commit: `bd47ec672ea0f4b609614ce24c3baa9d1ac4bd0a`.
+
+**Evidence:** tests added; Laravel execution and exact-head CI remain UNVERIFIED. No readiness score change.
