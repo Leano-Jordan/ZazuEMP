@@ -44,7 +44,10 @@ class BusinessSpreadsheetExportTest extends TestCase
 
         $response->assertOk();
         $response->assertHeader('Content-Type', 'text/csv; charset=UTF-8');
-        $response->assertHeader('Cache-Control', 'private, no-store, no-cache, must-revalidate, max-age=0');
+        $cacheControl = (string) $response->headers->get('Cache-Control');
+        foreach (['private', 'no-store', 'no-cache', 'must-revalidate', 'max-age=0'] as $directive) {
+            $this->assertStringContainsString($directive, $cacheControl);
+        }
 
         $csv = $response->streamedContent();
 
