@@ -9,6 +9,10 @@ on:
     workflows:
       - Laravel
       - Zazu browser smoke
+      - Zazu quality
+      - Psalm Security Scan
+      - PHPMD
+      - Zazu populated upgrade and rollback
     types: [completed]
   workflow_dispatch:
 
@@ -49,7 +53,7 @@ jobs:
           data = {"workflow_runs": []}
           for page in pages:
               data["workflow_runs"].extend(page.get("workflow_runs", []))
-          required = {"Laravel", "Zazu browser smoke"}
+          required = {"Laravel", "Zazu browser smoke", "Zazu quality", "Psalm Security Scan", "PHPMD", "Zazu populated upgrade and rollback"}
           latest = {}
           for run in data.get("workflow_runs", []):
               name = run.get("name", "")
