@@ -145,18 +145,18 @@
                         </div>
                         <div class="text-right">
                             <div class="zazu-detail-label">Recorded profit</div>
-                            <div class="zazu-command-meta-value mt-1">{{ $eventResult['currency'] }} {{ \\App\\Support\\Money::formatCents($eventResult['profit_cents']) }}</div>
+                            <div class="zazu-command-meta-value mt-1">{{ $eventResult['currency'] }} {{ \App\Support\Money::formatCents($eventResult['profit_cents']) }}</div>
                             <div class="zazu-field-help">{{ $eventResult['margin_percentage'] === null ? 'Margin unavailable' : number_format($eventResult['margin_percentage'], 2) . '%' }}</div>
                         </div>
                     </div>
                     <div class="mt-3 grid gap-2 sm:grid-cols-2">
                         <div class="zazu-detail-row">
                             <div class="zazu-detail-label">Invoiced value</div>
-                            <div class="zazu-detail-value">{{ $eventResult['currency'] }} {{ \\App\\Support\\Money::formatCents($eventResult['invoiced_cents']) }}</div>
+                            <div class="zazu-detail-value">{{ $eventResult['currency'] }} {{ \App\Support\Money::formatCents($eventResult['invoiced_cents']) }}</div>
                         </div>
                         <div class="zazu-detail-row">
                             <div class="zazu-detail-label">Actual costs</div>
-                            <div class="zazu-detail-value">{{ $eventResult['currency'] }} {{ \\App\\Support\\Money::formatCents($eventResult['actual_cost_cents']) }}</div>
+                            <div class="zazu-detail-value">{{ $eventResult['currency'] }} {{ \App\Support\Money::formatCents($eventResult['actual_cost_cents']) }}</div>
                         </div>
                     </div>
                 </div>

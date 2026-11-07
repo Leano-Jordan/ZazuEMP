@@ -47,6 +47,38 @@ class CommercialReconciliationTest extends TestCase
         $this->receivePurchaseOrderAndRecordActualCost($business, $event);
         $this->completeEvent($event);
 
+        Invoice::create([
+            'business_id' => $business->id,
+            'event_id' => $event->id,
+            'number' => 'INV-VOID-PROFIT-001',
+            'status' => 'void',
+            'currency' => 'ZAR',
+            'subtotal' => '500.00',
+            'tax_total' => '0.00',
+            'total' => '500.00',
+            'issued_at' => now()->toDateString(),
+        ]);
+        EventCost::create([
+            'business_id' => $business->id,
+            'event_id' => $event->id,
+            'category' => 'Food',
+            'description' => 'Unincurred planned purchase',
+            'currency' => 'ZAR',
+            'projected_amount' => '999.00',
+            'actual_amount' => null,
+            'status' => 'planned',
+        ]);
+        EventCost::create([
+            'business_id' => $business->id,
+            'event_id' => $event->id,
+            'category' => 'Food',
+            'description' => 'Cancelled purchase',
+            'currency' => 'ZAR',
+            'projected_amount' => '500.00',
+            'actual_amount' => '500.00',
+            'status' => 'cancelled',
+        ]);
+
         $profit = app(EventProfitabilityService::class)
             ->forBusiness($business)
             ->first(fn (array $row): bool => $row['event_id'] === $event->id && $row['currency'] === 'ZAR');
@@ -56,12 +88,20 @@ class CommercialReconciliationTest extends TestCase
         $this->assertSame(280000, $profit['actual_cost_cents']);
         $this->assertSame(870000, $profit['profit_cents']);
         $this->assertSame(75.65, $profit['margin_percentage']);
+        $this->assertCount(
+            1,
+            app(EventProfitabilityService::class)->forBusiness($business)
+                ->filter(fn (array $row): bool => $row['event_id'] === $event->id)
+        );
 
         $this->get(route('reports.index'))
             ->assertOk()
             ->assertSee('Event profitability')
             ->assertSee('ZAR 8,700.00')
-            ->assertSee('75.65%');
+            ->assertSee('75.65%')
+            ->assertViewHas('financeTotalsByCurrency', fn ($totals): bool =>
+                $totals->get('ZAR')['invoiced_cents'] === 1150000
+            );
     }
 
     private function prepareCommercialScenario(): array

@@ -75,6 +75,7 @@ class ReportController extends Controller
 
         $invoices = Invoice::query()
             ->where('business_id', $businessId)
+            ->whereIn('status', ['issued', 'paid'])
             ->with('payments')
             ->get();
 

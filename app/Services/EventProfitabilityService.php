@@ -31,6 +31,7 @@ final class EventProfitabilityService
         $invoiceTotals = Invoice::query()
             ->where('business_id', $business->id)
             ->whereNotNull('event_id')
+            ->whereIn('status', ['issued', 'paid'])
             ->selectRaw('event_id, currency, SUM(total) as aggregate_total')
             ->groupBy('event_id', 'currency')
             ->get();
