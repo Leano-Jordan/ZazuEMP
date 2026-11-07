@@ -81,6 +81,7 @@
             </div>
         </section>
 
+        @if($workspaceTools['work'] || $workspaceTools['calendar'])
         <section class="zazu-dash-run zazu-dash-surface">
             <header class="zazu-dash-surface-head zazu-dash-panel-head">
                 <span class="zazu-dash-panel-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none"><rect x="3.5" y="5" width="17" height="15.5" rx="2.5"/><path d="M7.5 3.5v3M16.5 3.5v3M3.5 9.5h17"/></svg></span>
@@ -110,7 +111,9 @@
                 @endforelse
             </div>
         </section>
+        @endif
 
+        @if($workspaceTools['quotes'])
         <section class="zazu-dash-commercial zazu-dash-surface">
             <header class="zazu-dash-surface-head zazu-dash-panel-head">
                 <span class="zazu-dash-panel-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none"><path d="M7 3.5h7l4.5 4.5v12A1.5 1.5 0 0 1 17 21.5H7A1.5 1.5 0 0 1 5.5 20V5A1.5 1.5 0 0 1 7 3.5Z"/><path d="M14 3.5V8h4.5M8.5 12h7M8.5 16h7"/></svg></span>
@@ -132,6 +135,7 @@
                 @if($workspaceTools['finance'])<a href="{{ route('finance.index') }}" class="zazu-btn zazu-btn-secondary">Open finance</a>@endif
             </div>
         </section>
+        @endif
 
         <section class="zazu-dash-focus zazu-dash-surface" aria-label="Priority actions">
             <header class="zazu-dash-surface-head zazu-dash-panel-head">
@@ -174,11 +178,9 @@
                 @if(
                     (!$isOwner || ($business?->catalogue_setup_completed_at && $business?->business_setup_completed_at))
                     && (!$workspaceTools['quotes'] || $metrics['draft_quotes'] === 0)
-                    && ($experienceLevel === 'basic' || (
-                        $metrics['open_purchase_orders'] === 0
-                        && $metrics['low_stock'] === 0
-                        && $metrics['unpaid_invoices'] === 0
-                    ))
+                    && (!$workspaceTools['purchasing'] || $experienceLevel === 'basic' || $metrics['open_purchase_orders'] === 0)
+                    && (!$workspaceTools['inventory'] || $experienceLevel === 'basic' || $metrics['low_stock'] === 0)
+                    && (!$workspaceTools['finance'] || $experienceLevel === 'basic' || $metrics['unpaid_invoices'] === 0)
                 )
                     <div class="zazu-dash-focus-item is-clear">
                         <span class="zazu-dash-focus-marker"></span>
