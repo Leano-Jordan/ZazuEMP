@@ -480,17 +480,54 @@
         const [record] = await queueAttachments(eventId, [file], description);
         return record;
     }
+    async function reconcileAttachmentEventIds() {
+        const jobs = Array.isArray(state?.jobs) ? state.jobs : [];
+        if (!jobs.length || sessionCleared || ACTIVE_BUSINESS_ID < 1) return 0;
+
+        const records = await readAttachmentRecords();
+        const updates = [];
+
+        for (const record of records) {
+            if (
+                record.status !== 'pending'
+                || Number(record.business_id) !== ACTIVE_BUSINESS_ID
+                || Number(record.event_id) > 0
+                || !record.event_local_id
+            ) {
+                continue;
+            }
+
+            const job = jobs.find(item => String(item.local_id || '') === String(record.event_local_id));
+            const serverEventId = Number(job?.server_id ?? job?.id);
+            if (!Number.isSafeInteger(serverEventId) || serverEventId < 1) continue;
+
+            updates.push({ ...record, event_id: serverEventId });
+        }
+
+        if (!updates.length) return 0;
+
+        const db = await openAttachmentDb();
+        try {
+            await new Promise((resolve, reject) => {
+                const tx = db.transaction(ATTACHMENT_STORE, 'readwrite');
+                const store = tx.objectStore(ATTACHMENT_STORE);
+                for (const record of updates) store.put(record);
+                tx.oncomplete = resolve;
+                tx.onerror = () => reject(tx.error || new Error('Offline attachment job links could not be updated.'));
+                tx.onabort = () => reject(tx.error || new Error('Offline attachment job-link update was aborted.'));
+            });
+        } finally {
+            db.close();
+        }
+
+        return updates.length;
+    }
+
     let attachmentSyncing = false;
 
     async function syncAttachments() {
         await ready;
-        if (
-            attachmentSyncing
-            || sessionCleared
-            || !navigator.onLine
-            || !state?.sync?.token
-            || ACTIVE_BUSINESS_ID < 1
-        ) {
+        if (attachmentSyncing || sessionCleared || ACTIVE_BUSINESS_ID < 1) {
             return { uploaded: 0, pending: await countPendingAttachments() };
         }
 
@@ -498,6 +535,11 @@
         let uploaded = 0;
 
         try {
+            await reconcileAttachmentEventIds();
+            if (!navigator.onLine || !state?.sync?.token || sessionCleared) {
+                return { uploaded: 0, pending: await countPendingAttachments() };
+            }
+
             const records = await readAttachmentRecords();
             for (const record of records) {
                 if (
