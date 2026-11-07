@@ -98,7 +98,7 @@ class PwaOfflineFoundationTest extends TestCase
         $this->assertStringContainsString("OFFLINE_SHELL,", $worker);
         $this->assertStringContainsString("'/offline-attachments.js'", $worker);
         $this->assertStringContainsString("'/zazu-offline.js'", $worker);
-        $this->assertStringContainsString("const CACHE_NAME = 'zazu-static-v29';", $worker);
+        $this->assertStringContainsString("const CACHE_NAME = 'zazu-static-v30';", $worker);
         $this->assertStringContainsString('await cache.put(request, response.clone());', $worker);
         $this->assertStringContainsString('const cached = await caches.match(request);', $worker);
         $this->assertStringContainsString('if (cached) return cached;', $worker);
@@ -222,6 +222,22 @@ class PwaOfflineFoundationTest extends TestCase
         $this->assertStringContainsString('async function clearAttachmentWorkspace()', $client);
         $this->assertStringContainsString('await clearAttachmentWorkspace();', $client);
         $this->assertStringContainsString('attachmentPendingCount', $client);
+        $this->assertStringContainsString('async function queueAttachment(eventId, file, description', $client);
+        $this->assertStringContainsString('async function syncAttachments()', $client);
+        $this->assertStringContainsString('async function loadAttachments(eventId)', $client);
+        $this->assertStringContainsString('async function getAttachmentFile(idempotencyKey)', $client);
+        $this->assertStringContainsString('await syncAttachments();', $client);
+        $this->assertStringContainsString("'/api/sync/attachments'", $client);
+
+        $attachmentView = File::get(resource_path('views/work/attachments.blade.php'));
+        $this->assertStringContainsString('data-zazu-offline-attachment-form', $attachmentView);
+        $this->assertStringContainsString('data-zazu-offline-attachment-list', $attachmentView);
+        $this->assertStringContainsString('data-zazu-offline-attachment-status', $attachmentView);
+        $this->assertStringContainsString('data-zazu-server-attachment-ids', $attachmentView);
+        $this->assertStringContainsString('setupZazuOfflineAttachments();', $app);
+        $this->assertStringContainsString('client.queueAttachment(eventId, file,', $app);
+        $this->assertStringContainsString('client.loadAttachments(eventId)', $app);
+        $this->assertStringContainsString('client.getAttachmentFile(record.idempotency_key)', $app);
         $attachmentClient = File::get(public_path('offline-attachments.js'));
         $this->assertStringContainsString("'zazu-phone-attachments-business-' + BUSINESS_ID", $attachmentClient);
         $this->assertStringContainsString('business_id: BUSINESS_ID', $attachmentClient);
