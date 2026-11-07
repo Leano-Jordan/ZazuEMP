@@ -28,9 +28,7 @@ IDENTITY → BASELINE → TARGET → ROUTE → INSPECT → CHANGE → VERIFY →
 The 2026-11-01 local Windows-host proposal was exploratory and is no longer the active deployment target. The owner has clarified that this PC is a development workstation; future production hosting will be a paid server when funding and release readiness permit. The 2026-11-03 host diagnostic is recorded below. Do not configure this PC as production infrastructure.
 
 ## Active target
-**Owner-directed UI/UX mission: align the Dashboard and shared shell to the supplied Designer (1) and Designer (2) references. Designer (2) is the primary composition; Designer (1) informs the cleaner card treatment. Preserve real Zazu data, permission gates, routes, responsive behaviour and the coastal-blue light/deep-water dark theme. Do not invent revenue, online status or system-health metrics.**
-
-The installed-device offline continuity mission below remains open and is the next program after the current owner-directed dashboard/UI mission; this visual work does not close or weaken it.
+**Owner-directed V1 convergence:** close exact-main Laravel/quality/browser/security verification, finish the remaining offline trusted-device acceptance, verify installation backup/restore integrity, certify the populated commercial workflow, and reconcile the release/legal/deployment gates. The owner accepted the current dashboard; its refinement mission is closed. All implementation remains on canonical `main`.
 
 ## Index-only dashboard refinement — 2026-11-06
 
@@ -170,7 +168,7 @@ Current state:
 - `npm run test:service-worker` is wired into `.github/workflows/quality.yml`. Repository files were re-read after writes; current-main runtime/CI result remains **UNVERIFIED** until the exact workflow run is observed.
 - Stale health report snapshots from an October 12 Dependabot branch were archived and misleading root-level `docs/health/latest.*` files removed. The current health workflow is artifact/summary-only with `contents: read`; use exact Actions run evidence, not a persistent latest file.
 
-Next hard gate: **close offline attachment integration as a bounded feature against the current business-scoped IndexedDB workspace and sync API; do not load the orphaned legacy script. In parallel, reconcile exact-main CI and preserve physical-device acceptance as unproven until tested on a secure origin.**
+Next hard gate: **obtain exact-main Laravel, quality, browser, Psalm/PHPMD and populated upgrade/rollback evidence for the current application head; then run the operator backup/restore drill against representative database and private media. Keep installed-device offline acceptance open until the secure-origin disconnect/restart/reconnect sequence passes.**
 
 Physical device acceptance is now owner-verified: Zazu installed on PC and mobile; screen rotation and presentation reported in order.
 
