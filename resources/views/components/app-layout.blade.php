@@ -36,7 +36,7 @@
         })();
     </script>
     <script src="/zazu-offline.js" defer></script>
-    @vite(['resources/css/app.css', 'resources/css/zazu-responsive-theme.css', 'resources/css/zazu-mobile-refinement.css', 'resources/css/zazu-final-visual-sweep.css', 'resources/js/app.js'])
+    @vite(['resources/css/app.css', 'resources/css/zazu-responsive-theme.css', 'resources/css/zazu-mobile-refinement.css', 'resources/css/zazu-final-visual-sweep.css', 'resources/css/zazu-dashboard-authority.css', 'resources/js/app.js'])
 </head>
 <body data-zazu-user-id="{{ auth()->id() }}" data-zazu-business-id="{{ $business?->id ?? '' }}" data-zazu-offline-enabled="1" data-zazu-route="{{ request()->route()?->getName() ?? '' }}" data-zazu-niche="{{ $primaryNiche }}" data-zazu-experience="{{ $experienceLevel }}" class="{{ trim(($business?->wallpaper_path ? 'zazu-has-wallpaper ' : '').(request()->routeIs('dashboard') ? 'zazu-dashboard-page' : '')) }}" data-business-currency="{{ $business?->currency ?? 'ZAR' }}" style="--zazu-dashboard-image: url('{{ e($business?->dashboard_image_path ? route('business.media', ['type' => 'dashboard']).'?v='.$brandingVersion : asset('images/Background-ZAZU.jpg')) }}'){{ $business?->wallpaper_path ? ';--zazu-wallpaper: url(\''.e(route('business.media', ['type' => 'wallpaper']).'?v='.$brandingVersion).'\')' : '' }}">
     <a class="zazu-skip-link" href="#main-content">Skip to main content</a>
