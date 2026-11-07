@@ -12,7 +12,7 @@ use ZipArchive;
 /** @SuppressWarnings(PHPMD.ExcessiveClassComplexity) */
 class ZazuRestoreCommand extends Command
 {
-    private const FORMAT_VERSION = 1;
+    private const FORMAT_VERSION = 2;
     private const MAX_ARCHIVE_ENTRIES = 50000;
     private const MAX_UNCOMPRESSED_BYTES = 2147483648;
 
@@ -93,9 +93,16 @@ class ZazuRestoreCommand extends Command
                 return self::FAILURE;
             }
 
-            if (isset($manifest['format_version']) && (int) $manifest['format_version'] !== self::FORMAT_VERSION) {
+            $formatVersion = (int) ($manifest['format_version'] ?? 1);
+            if (!in_array($formatVersion, [1, self::FORMAT_VERSION], true)) {
                 $zip->close();
                 $this->error('The backup format version is not supported by this Zazu installation.');
+                return self::FAILURE;
+            }
+
+            if ($formatVersion >= 2 && !array_key_exists('checksums', $manifest)) {
+                $zip->close();
+                $this->error('The backup integrity manifest is missing.');
                 return self::FAILURE;
             }
 
