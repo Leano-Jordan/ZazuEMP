@@ -1055,3 +1055,12 @@ Latest source change: commit `29a38f55d3d3ff5979cf844ddbd624a9ea279515` consolid
 - Added source regression coverage for the dashboard-only visual hierarchy.
 - The sidebar was intentionally left unchanged: it belongs to the shared application shell, and changing it would extend this dashboard-only approval scope to every page. Its deep-navy treatment remains a separate owner-approved shell objective.
 - GitHub source changes only. PHPUnit, Vite build and rendered desktop/tablet/mobile light/dark review remain unverified; visual approval is still pending.
+
+
+## UI acceptance contract reconciliation — 2026-11-07
+
+- Rechecked the current dashboard Blade, canonical app theme tokens and dashboard visual stylesheet on `main` before changing test expectations.
+- Updated stale source-level assertions to the implemented interface: coastal light tokens (`#F5FBFE`, `#159DD2`), current sidebar/text colours, current event date labels, approved/declined quote-stage labels, Workspace health naming and View all events action.
+- Updated the onboarding dashboard assertion to the current Quick actions / Open finance surface, and updated the Playwright theme test to the current coastal palette while retaining the existing dark-mode expectations.
+- No application CSS, Blade, business logic, routes or permissions changed in this correction pass.
+- Changes are committed on `main`; source re-fetch verification is being completed. GitHub Actions rerun and runtime PHPUnit/Playwright results are not yet available, so do not treat these expectation updates as a green CI result. Finance overflow and other non-dashboard browser failures remain outside this dashboard-only objective.
