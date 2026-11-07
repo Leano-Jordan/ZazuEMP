@@ -404,29 +404,36 @@
         }
     }
 
-    async function queueAttachment(eventId, file, description = '') {
+    async function queueAttachments(eventId, files, description = '') {
         await ready;
         if (sessionCleared) throw new Error('The local device session has ended. Reload Zazu before saving attachments.');
-        if (ACTIVE_BUSINESS_ID < 1) throw new Error('Choose a business workspace before saving attachments locally.');
+        if (ACTIVE_BUSINESS_ID < 1) throw new Error('Choose a business workspace before saving attachments.');
 
         const targetEventId = Number(eventId);
         if (!Number.isSafeInteger(targetEventId) || targetEventId < 1) {
             throw new Error('This job does not have a server identity yet. Reconnect and open the saved job before attaching files.');
         }
-        if (!(file instanceof Blob) || !file.name) {
-            throw new Error('Choose a file before saving the attachment.');
-        }
-        if (file.size < 1 || file.size > 20 * 1024 * 1024) {
-            throw new Error('Each attachment must be larger than 0 bytes and no bigger than 20 MB.');
+
+        const selectedFiles = Array.from(files || []);
+        if (selectedFiles.length < 1 || selectedFiles.length > 10) {
+            throw new Error('Choose between 1 and 10 files per upload.');
         }
 
-        const extension = String(file.name).split('.').pop().toLowerCase();
         const allowedExtensions = new Set(['pdf', 'doc', 'docx', 'xls', 'xlsx', 'csv', 'txt', 'jpg', 'jpeg', 'png', 'webp']);
-        if (!allowedExtensions.has(extension)) {
-            throw new Error('Use a PDF, Office document, CSV, text file, JPG, PNG or WebP attachment.');
+        for (const file of selectedFiles) {
+            if (!(file instanceof Blob) || !file.name) {
+                throw new Error('Choose valid files before saving attachments.');
+            }
+            if (file.size < 1 || file.size > 20 * 1024 * 1024) {
+                throw new Error('Each attachment must be larger than 0 bytes and no bigger than 20 MB.');
+            }
+            const extension = String(file.name).split('.').pop().toLowerCase();
+            if (!allowedExtensions.has(extension)) {
+                throw new Error('Use PDF, Office, CSV, text, JPG, PNG or WebP attachments.');
+            }
         }
 
-        const record = {
+        const records = selectedFiles.map(file => ({
             business_id: ACTIVE_BUSINESS_ID,
             event_id: targetEventId,
             idempotency_key: crypto.randomUUID(),
@@ -439,9 +446,22 @@
             created_at: new Date().toISOString(),
             attempts: 0,
             last_error: null,
-        };
+        }));
 
-        await writeAttachmentRecord(record);
+        const db = await openAttachmentDb();
+        try {
+            await new Promise((resolve, reject) => {
+                const tx = db.transaction(ATTACHMENT_STORE, 'readwrite');
+                const store = tx.objectStore(ATTACHMENT_STORE);
+                for (const record of records) store.put(record);
+                tx.oncomplete = resolve;
+                tx.onerror = () => reject(tx.error || new Error('The complete attachment batch could not be saved.'));
+                tx.onabort = () => reject(tx.error || new Error('The attachment batch save was aborted.'));
+            });
+        } finally {
+            db.close();
+        }
+
         window.dispatchEvent(new CustomEvent('zazu:offline-attachments-updated', {
             detail: { event_id: targetEventId },
         }));
@@ -450,9 +470,16 @@
             syncAttachments().catch(() => {});
         }
 
-        return { idempotency_key: record.idempotency_key, status: record.status };
+        return records.map(record => ({
+            idempotency_key: record.idempotency_key,
+            status: record.status,
+        }));
     }
 
+    async function queueAttachment(eventId, file, description = '') {
+        const [record] = await queueAttachments(eventId, [file], description);
+        return record;
+    }
     let attachmentSyncing = false;
 
     async function syncAttachments() {
