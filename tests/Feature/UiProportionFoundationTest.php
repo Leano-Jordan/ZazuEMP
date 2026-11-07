@@ -939,4 +939,33 @@ class UiProportionFoundationTest extends TestCase
         $this->assertStringContainsString('@media (max-width: 760px)', $css);
     }
 
+
+
+    public function test_dashboard_operational_panels_share_balanced_rows_and_internal_spacing(): void
+    {
+        $dashboard = file_get_contents(resource_path('views/dashboard.blade.php'));
+        $css = file_get_contents(resource_path('css/zazu-dashboard-authority.css'));
+
+        $this->assertIsString($dashboard);
+        $this->assertIsString($css);
+
+        foreach ([
+            'zazu-dash-run zazu-dash-surface',
+            'zazu-dash-commercial zazu-dash-surface',
+            'zazu-dash-focus zazu-dash-surface',
+            'zazu-dash-resources zazu-dash-surface',
+        ] as $panel) {
+            $this->assertStringContainsString($panel, $dashboard);
+        }
+
+        $this->assertStringContainsString('Director iteration 04 — balance the operational dashboard rows.', $css);
+        $this->assertStringContainsString('grid-template-columns: minmax(0, 1.08fr) minmax(0, .92fr) !important;', $css);
+        $this->assertStringContainsString('.zazu-dash-commercial .zazu-dash-quote-stages', $css);
+        $this->assertStringContainsString('.zazu-dash-focus .zazu-dash-focus-grid', $css);
+        $this->assertStringContainsString('.zazu-dash-resources .zazu-dash-resource-grid', $css);
+        $this->assertStringContainsString('html[data-theme="dark"] body.zazu-dashboard-page .zazu-dash-run .zazu-dash-event', $css);
+        $this->assertStringContainsString('@media (max-width: 760px)', $css);
+    }
+
+
 }
