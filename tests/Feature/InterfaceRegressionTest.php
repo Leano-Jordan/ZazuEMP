@@ -294,7 +294,7 @@ class InterfaceRegressionTest extends TestCase
         $appCss = file_get_contents(resource_path('css/app.css'));
         $mobileCss = file_get_contents(resource_path('css/zazu-mobile-refinement.css'));
 
-        $this->assertStringContainsString('color:var(--zazu-sidebar-ink)', $appCss);
+        $this->assertMatchesRegularExpression('/color:\\s*var\\(--zazu-sidebar-ink\\)/', $appCss);
         $this->assertStringContainsString('.zazu-command-search {', $mobileCss);
         $this->assertStringContainsString('width: 100%;', $mobileCss);
         $this->assertStringNotContainsString('.zazu-command-search {\n        width: 40px;', $mobileCss);

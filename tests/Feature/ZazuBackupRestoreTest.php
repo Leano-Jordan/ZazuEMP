@@ -52,50 +52,13 @@ class ZazuBackupRestoreTest extends TestCase
             $archive = $archives[0];
             $zip = new ZipArchive();
             $this->assertSame(true, $zip->open($archive));
-            $this->assertNotFalse($zip->locateName('manifest.json'));
-            $this->assertNotFalse($zip->locateName('database.sqlite'));
-            $this->assertNotFalse($zip->locateName('storage/private/zazu-roundtrip/media-probe.txt'));
-
-            $manifest = json_decode((string) $zip->getFromName('manifest.json'), true, 512, JSON_THROW_ON_ERROR);
-            $this->assertSame('Zazu EMP', $manifest['application'] ?? null);
-            $this->assertSame(2, $manifest['format_version'] ?? null);
-            $this->assertSame('sqlite', $manifest['database_driver'] ?? null);
-            $this->assertSame(['database', 'private_storage'], $manifest['contents'] ?? null);
-            $this->assertNotEmpty($manifest['backup_id'] ?? null);
-            $this->assertNotEmpty($manifest['created_at'] ?? null);
-            $this->assertSame(
-                hash('sha256', (string) $zip->getFromName('database.sqlite')),
-                $manifest['checksums']['database.sqlite'] ?? null
-            );
-            $this->assertSame(
-                hash('sha256', 'private media before backup'),
-                $manifest['checksums']['storage/private/zazu-roundtrip/media-probe.txt'] ?? null
-            );
-
-            for ($index = 0; $index < $zip->numFiles; $index++) {
-                $this->assertStringNotContainsString('\\', (string) $zip->getNameIndex($index));
-            }
+            $this->assertVersionTwoArchive($zip);
 
             $legacyDatabasePayload = (string) $zip->getFromName('database.sqlite');
             $legacyPrivatePayload = (string) $zip->getFromName('storage/private/zazu-roundtrip/media-probe.txt');
             $zip->close();
 
-            // Build a genuine pre-v2 archive from the same valid backup payload.
-            // Version 1 did not contain a checksum map and must remain restorable.
-            $legacyArchive = $output.DIRECTORY_SEPARATOR.'zazu-legacy-v1.zip';
-            $legacyZip = new ZipArchive();
-            $this->assertSame(true, $legacyZip->open($legacyArchive, ZipArchive::CREATE | ZipArchive::OVERWRITE));
-            $legacyZip->addFromString('manifest.json', json_encode([
-                'application' => 'Zazu EMP',
-                'format_version' => 1,
-                'backup_id' => 'legacy-v1-test',
-                'created_at' => now()->toIso8601String(),
-                'database_driver' => 'sqlite',
-                'contents' => ['database', 'private_storage'],
-            ], JSON_THROW_ON_ERROR));
-            $legacyZip->addFromString('database.sqlite', $legacyDatabasePayload);
-            $legacyZip->addFromString('storage/private/zazu-roundtrip/media-probe.txt', $legacyPrivatePayload);
-            $legacyZip->close();
+            $legacyArchive = $this->createLegacyV1Archive($output, $legacyDatabasePayload, $legacyPrivatePayload);
 
             DB::table('backup_probe')->update(['value' => 'changed after backup']);
             File::delete($privateProbe);
@@ -455,4 +418,51 @@ class ZazuBackupRestoreTest extends TestCase
     }
 
 
+
+    private function assertVersionTwoArchive(ZipArchive $zip): void
+    {
+        $this->assertNotFalse($zip->locateName('manifest.json'));
+        $this->assertNotFalse($zip->locateName('database.sqlite'));
+        $this->assertNotFalse($zip->locateName('storage/private/zazu-roundtrip/media-probe.txt'));
+
+        $manifest = json_decode((string) $zip->getFromName('manifest.json'), true, 512, JSON_THROW_ON_ERROR);
+        $this->assertSame('Zazu EMP', $manifest['application'] ?? null);
+        $this->assertSame(2, $manifest['format_version'] ?? null);
+        $this->assertSame('sqlite', $manifest['database_driver'] ?? null);
+        $this->assertSame(['database', 'private_storage'], $manifest['contents'] ?? null);
+        $this->assertNotEmpty($manifest['backup_id'] ?? null);
+        $this->assertNotEmpty($manifest['created_at'] ?? null);
+        $this->assertSame(
+            hash('sha256', (string) $zip->getFromName('database.sqlite')),
+            $manifest['checksums']['database.sqlite'] ?? null
+        );
+        $this->assertSame(
+            hash('sha256', 'private media before backup'),
+            $manifest['checksums']['storage/private/zazu-roundtrip/media-probe.txt'] ?? null
+        );
+
+        for ($index = 0; $index < $zip->numFiles; $index++) {
+            $this->assertStringNotContainsString('\\', (string) $zip->getNameIndex($index));
+        }
+    }
+
+    private function createLegacyV1Archive(string $output, string $databasePayload, string $privatePayload): string
+    {
+        $archive = $output.DIRECTORY_SEPARATOR.'zazu-legacy-v1.zip';
+        $zip = new ZipArchive();
+        $this->assertSame(true, $zip->open($archive, ZipArchive::CREATE | ZipArchive::OVERWRITE));
+        $zip->addFromString('manifest.json', json_encode([
+            'application' => 'Zazu EMP',
+            'format_version' => 1,
+            'backup_id' => 'legacy-v1-test',
+            'created_at' => now()->toIso8601String(),
+            'database_driver' => 'sqlite',
+            'contents' => ['database', 'private_storage'],
+        ], JSON_THROW_ON_ERROR));
+        $zip->addFromString('database.sqlite', $databasePayload);
+        $zip->addFromString('storage/private/zazu-roundtrip/media-probe.txt', $privatePayload);
+        $zip->close();
+
+        return $archive;
+    }
 }

@@ -90,20 +90,7 @@ class DashboardController extends Controller
             ->limit(5)
             ->get();
 
-        $permissionService = app(PermissionService::class);
-        $workspaceTools = [
-            'services' => $permissionService->allows('capabilities.view', $request->user(), $business),
-            'work' => $permissionService->allows('work.view', $request->user(), $business),
-            'calendar' => $permissionService->allows('calendar.view', $request->user(), $business),
-            'customers' => $permissionService->allows('customers.view', $request->user(), $business),
-            'quotes' => $permissionService->allows('quotes.view', $request->user(), $business),
-            'finance' => $permissionService->allows('finance.view', $request->user(), $business),
-            'purchasing' => $permissionService->allows('purchasing.view', $request->user(), $business),
-            'suppliers' => $permissionService->allows('suppliers.view', $request->user(), $business),
-            'inventory' => $permissionService->allows('inventory.view', $request->user(), $business),
-            'assets' => $permissionService->allows('assets.view', $request->user(), $business),
-            'reports' => $permissionService->allows('reports.view', $request->user(), $business),
-        ];
+        $workspaceTools = $this->workspaceToolsFor($request->user(), $business);
 
         $isOwner = app(CurrentBusiness::class)->hasRole('owner', $request->user(), $business);
 
@@ -119,5 +106,29 @@ class DashboardController extends Controller
             'nicheDefinition',
             'supportingNiches'
         ));
+    }
+
+    private function workspaceToolsFor(\Illuminate\Contracts\Auth\Authenticatable $user, \App\Models\Business $business): array
+    {
+        $permissions = [
+            'services' => 'capabilities.view',
+            'work' => 'work.view',
+            'calendar' => 'calendar.view',
+            'customers' => 'customers.view',
+            'quotes' => 'quotes.view',
+            'finance' => 'finance.view',
+            'purchasing' => 'purchasing.view',
+            'suppliers' => 'suppliers.view',
+            'inventory' => 'inventory.view',
+            'assets' => 'assets.view',
+            'reports' => 'reports.view',
+        ];
+
+        $permissionService = app(PermissionService::class);
+
+        return array_map(
+            fn (string $permission): bool => $permissionService->allows($permission, $user, $business),
+            $permissions
+        );
     }
 }
