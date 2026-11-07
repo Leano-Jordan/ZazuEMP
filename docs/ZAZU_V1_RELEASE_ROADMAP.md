@@ -1,10 +1,10 @@
 # Zazu EMP — V1 Commercial Release Roadmap
 
 **Status:** LIVE  
-**Last Director cycle:** 2026-10-01  
+**Last Director cycle:** 2026-11-07  
 **Repository:** `Leano-Jordan/ZazuEMP`  
 **Branch:** `main`  
-**Application HEAD assessed:** `52d9b26bc17ddee8d1427032ecaf2fb8fc0b6350`  
+**Latest application/test source SHA:** `89daa318f310b5cf873b50711e31eff73db12b92`  
 **Release-control docs commits:** documentation-only commits may follow and do not change the application assessment baseline.  
 **Evidence rule:** Implemented ≠ Verified ≠ Proven.
 
@@ -35,7 +35,7 @@ A requirement is **🟢 VERIFIED COMPLETE** only when it is implemented, verifie
 | CTRL-02 | Repository truth | Inspect branch and HEAD before every execution | 🟢 VERIFIED COMPLETE | Current branch main; current HEAD recorded in both roadmap and canonical checklist | Low | Repeat each cycle |
 | CTRL-03 | Evidence discipline | Separate implemented/tested/verified/proven claims | 🟢 VERIFIED COMPLETE | Existing readiness register + release documentation | Low | Preserve distinction |
 | CTRL-04 | Regression control | Stop improvement work when a regression is found | 🟢 VERIFIED COMPLETE | Director operating rule | Medium | Apply every batch |
-| CTRL-05 | Release evidence | Current-head CI/browser/runtime evidence | 🟢 VERIFIED COMPLETE | Laravel 202/1,174; browser 7 passed/8 skipped; Quality passed; PHPMD passed; Psalm passed with documented Laravel compatibility shim | High | Move to populated workflow, recovery and upgrade proof |
+| CTRL-05 | Release evidence | Current-head CI/browser/runtime evidence | 🟡 IN PROGRESS | Historical green runs exist, but exact current application/test SHA has no observed status contexts; latest Laravel/Quality/browser/security/upgrade checks are unverified | Critical | Obtain exact-head Actions evidence before certification |
 
 # Director execution cycle — 2026-10-01 — release evidence closure
 
@@ -140,7 +140,7 @@ Application assessment HEAD: 52d9b26bc17ddee8d1427032ecaf2fb8fc0b6350
 | UX-04 | Accessibility | Focus, touch targets, contrast, semantics and keyboard paths are usable | 🟡 IN PROGRESS | Static visual/accessibility refinement performed; runtime smoke missing | High | Accessibility smoke on critical pages |
 | UX-05 | Navigation | Navigation remains coherent without dead ends or excessive chrome | 🟡 IN PROGRESS | Mobile/navigation refinements and command palette exist; runtime verification outstanding | Medium | Traverse critical routes |
 | UX-06 | Error states | Validation, empty, loading and failure states are usable | 🟡 IN PROGRESS | Existing UI foundations; broad runtime verification outstanding | High | Targeted failure-state sweep |
-| UX-07 | Dashboard | Dashboard refinement preserves working metrics/workflows | 🟡 IN PROGRESS | Current dashboard source inspected; visual cycles completed, but rendered verification remains outstanding | Medium | Render current dashboard at desktop/mobile/tablet |
+| UX-07 | Dashboard | Dashboard refinement preserves working metrics/workflows | 🟡 OWNER ACCEPTED / QA PENDING | Owner accepted the current dashboard as sufficient for now; refinement mission is closed | Medium | Include in responsive critical-page QA; no active dashboard styling task |
 | UX-08 | Search | Search experience is usable across desktop/mobile | 🟡 IN PROGRESS | Database-backed permission-aware search implemented; rendered/runtime QA missing | Medium | Browser verify |
 
 # Phase 6 — Reliability, recovery and operations
@@ -653,3 +653,27 @@ Treat the old settings exposure as a security defect corrected at source. Do not
 # Director V1 scorecard — 2026-11-04
 
 The current specification scorecard is `docs/ZAZU_V1_SCORECARD_2026-11-04.md`: **3.0/5 (60/100)** evidence maturity across 13 V1 domains. This is not a percentage of features built. V1 remains NO-GO pending the blockers listed in the scorecard. Exact-head CI for `d1e2a4397b064d3fbfe7fc2cf1dc59236e00922f` was queued when assessed.
+
+
+# Director execution cycle — 2026-11-07 — V1 convergence
+
+## Source and evidence baseline
+- Canonical repository: `Leano-Jordan/ZazuEMP`, branch `main`.
+- Latest application/test source SHA: `89daa318f310b5cf873b50711e31eff73db12b92`.
+- Latest observed `main` after release-control documentation: `108108de113a78eb7c782986270169a507cdfbe0`.
+- Exact-head combined status lookup returned no status contexts. The available commit-workflow-run query did not expose push-triggered runs for this SHA. No current Laravel, Quality, Psalm, PHPMD, browser or upgrade/rollback pass is claimed.
+
+## Implemented and covered at source
+- Active Work attachment queue, atomic multi-file persistence, idempotent reconnect upload, private file cache, and pending attachment parent-ID reconciliation.
+- Trusted-device browser regression for unreachable logout, preservation of paired business work, successful same-account logout/re-login; server revocation regression across bootstrap, pull, push and attachment-list endpoints.
+- Backup format v2 with SHA-256 manifest for database/private payloads; restore validates exact payload membership and hashes before extraction. Format-v1 restore compatibility remains supported.
+- Regressions added for attachment idempotency/isolation, session transitions, backup checksum generation/tamper/missing manifest and v1 compatibility.
+
+## Remaining V1 gates
+1. Exact-head Laravel/Quality/Psalm/PHPMD/browser/populated upgrade-rollback evidence and repair of confirmed failures.
+2. Populated end-to-end customer → Work → quote → acceptance → invoice → deposit/payment → purchasing → receiving → costs/profit reconciliation.
+3. Real operator backup/restore drill with representative private media and post-restore access verification; real deployment rollback exercise.
+4. Installed secure-origin disconnected launch/restart/reconnect, session-transition and device-loss acceptance.
+5. CSP nonce/hash review, sync-token lifecycle policy, legal/privacy operational closure, dependency/licence release review and official Zazu brand clearance.
+
+Source/test additions are not runtime proof. No score uplift is awarded and V1 remains NO-GO until critical release gates close. The canonical gate ledger is `docs/V1_RELEASE_CHECKLIST.md`; this roadmap records the supporting cycle and history.
