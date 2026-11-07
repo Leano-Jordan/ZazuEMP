@@ -183,3 +183,107 @@ test('Work attachments persist offline, upload on reconnect and cache remote fil
     expect(cached.uploadedText).toBe('saved on phone for later');
     expect(cached.downloadedText).toBe('cached server-side file');
 });
+
+
+test('reconciles an offline-created Work attachment after its job receives a server ID', async ({ page }, testInfo) => {
+    test.setTimeout(30_000);
+    test.skip(testInfo.project.name !== 'chromium', 'Offline Work identity reconciliation runs once.');
+
+    await login(page);
+    await page.goto('/work', { waitUntil: 'domcontentloaded' });
+
+    const jobRow = page.locator('[data-zazu-job-row]').filter({ hasText: 'Mokoena Family Celebration' }).first();
+    await expect(jobRow).toBeVisible();
+    await jobRow.locator('[data-zazu-inspector-open]').first().click();
+    await page.getByRole('link', { name: 'Open job record' }).click();
+    await expect(page.locator('[data-zazu-offline-attachment-form]')).toBeVisible();
+
+    const eventId = Number(await page.locator('[data-zazu-offline-attachment-form]').getAttribute('data-zazu-event-id'));
+    const localEventId = 'offline-job-' + crypto.randomUUID();
+    const deviceToken = 'offline-job-attachment-e2e-token';
+
+    const fixture = await page.evaluate(async ({ eventId, localEventId, deviceToken }) => {
+        await window.ZazuOffline.ready;
+        const businessId = Number(document.body.dataset.zazuBusinessId);
+        const state = window.ZazuOffline.getState();
+        state.sync = { token: deviceToken, device: { id: 987655, business_id: businessId } };
+        state.jobs = [
+            ...(state.jobs || []),
+            { local_id: localEventId, id: eventId, server_id: eventId, name: 'Synced offline-created job' },
+        ];
+        state.local_dirty = false;
+        await window.ZazuOffline.persist();
+
+        const database = await new Promise((resolve, reject) => {
+            const request = indexedDB.open('zazu-phone-attachments-business-' + businessId);
+            request.onsuccess = () => resolve(request.result);
+            request.onerror = () => reject(request.error || new Error('Could not open phone attachment storage.'));
+        });
+
+        const key = crypto.randomUUID();
+        const file = new File(['saved before job sync completed'], 'offline-created-job.txt', { type: 'text/plain' });
+        const record = {
+            business_id: businessId,
+            event_id: null,
+            event_local_id: localEventId,
+            idempotency_key: key,
+            original_name: file.name,
+            mime_type: file.type,
+            size: file.size,
+            description: '',
+            status: 'pending',
+            file,
+            created_at: new Date().toISOString(),
+            attempts: 0,
+            last_error: null,
+        };
+
+        await new Promise((resolve, reject) => {
+            const tx = database.transaction('files', 'readwrite');
+            tx.objectStore('files').put(record);
+            tx.oncomplete = resolve;
+            tx.onerror = () => reject(tx.error || new Error('Could not seed the pending offline attachment.'));
+            tx.onabort = () => reject(tx.error || new Error('Offline attachment fixture transaction aborted.'));
+        });
+        database.close();
+        return { key, businessId };
+    }, { eventId, localEventId, deviceToken });
+
+    let uploadedEventId = null;
+    let uploadedKey = null;
+    await page.route('**/api/sync/attachments', async route => {
+        const request = route.request();
+        expect(request.method()).toBe('POST');
+        expect(request.headers()['authorization']).toBe('Bearer ' + deviceToken);
+        const body = request.postData() || '';
+        uploadedEventId = Number(body.match(/name="event_id"\r\n\r\n([^\r\n]+)/)?.[1] || 0);
+        uploadedKey = body.match(/name="idempotency_key"\r\n\r\n([^\r\n]+)/)?.[1] || null;
+        expect(body).toContain('offline-created-job.txt');
+
+        await route.fulfill({
+            status: 201,
+            contentType: 'application/json',
+            body: JSON.stringify({
+                duplicate: false,
+                attachment: {
+                    id: 901,
+                    event_id: eventId,
+                    idempotency_key: fixture.key,
+                    original_name: 'offline-created-job.txt',
+                    mime_type: 'text/plain',
+                    size: Buffer.byteLength('saved before job sync completed'),
+                    description: '',
+                    created_at: new Date().toISOString(),
+                },
+            }),
+        });
+    });
+
+    const result = await page.evaluate(async () => window.ZazuOffline.syncAttachments());
+    expect(result.uploaded).toBe(1);
+    expect(result.pending).toBe(0);
+    expect(uploadedEventId).toBe(eventId);
+    expect(uploadedKey).toBe(fixture.key);
+    const fileText = await page.evaluate(async key => (await window.ZazuOffline.getAttachmentFile(key)).text(), fixture.key);
+    expect(fileText).toBe('saved before job sync completed');
+});
