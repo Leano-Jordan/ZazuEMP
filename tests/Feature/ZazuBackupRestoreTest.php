@@ -58,7 +58,7 @@ class ZazuBackupRestoreTest extends TestCase
 
             $manifest = json_decode((string) $zip->getFromName('manifest.json'), true, 512, JSON_THROW_ON_ERROR);
             $this->assertSame('Zazu EMP', $manifest['application'] ?? null);
-            $this->assertSame(1, $manifest['format_version'] ?? null);
+            $this->assertSame(2, $manifest['format_version'] ?? null);
             $this->assertSame('sqlite', $manifest['database_driver'] ?? null);
             $this->assertSame(['database', 'private_storage'], $manifest['contents'] ?? null);
             $this->assertNotEmpty($manifest['backup_id'] ?? null);
@@ -130,7 +130,7 @@ $this->assertSame(0, $exitCode, Artisan::output());
 
         $manifest = [
             'application' => 'Zazu EMP',
-            'format_version' => 1,
+            'format_version' => 2,
             'database_driver' => 'sqlite',
             'checksums' => [
                 'database.sqlite' => hash('sha256', $databasePayload),
