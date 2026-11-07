@@ -582,3 +582,15 @@ Pending phone attachment records that retain `event_local_id` are now reconciled
 The server regression suite now covers the full phone-consumed API boundary: upload response idempotency/event identity, list metadata including idempotency key/name/size, private download success, foreign-business event-list denial, and foreign-business download denial using an existing private file fixture. Test commit: `bd47ec672ea0f4b609614ce24c3baa9d1ac4bd0a`.
 
 **Evidence:** tests added; Laravel execution and exact-head CI remain UNVERIFIED. No readiness score change.
+
+
+### Trusted-device session transition regression — 2026-11-07
+
+| Control | Evidence added | Status |
+|---|---|---|
+| Authentication host unreachable at logout | Browser test verifies authenticated session, paired business workspace and pending mutation remain intact when `/up` fails | Test added; exact-head Chromium execution pending |
+| Same-account logout/re-login | Browser test verifies business pairing and queued mutation persist through successful account logout and re-authentication | Test added; exact-head Chromium execution pending |
+| Owner device revocation | Laravel test checks old token rejection across bootstrap, pull, push and attachment-list endpoints | Test added; exact-head Laravel execution pending |
+| Non-owner / foreign-business revocation | Existing negative authorization tests retained | Existing tests; exact-head execution pending |
+
+No score uplift is awarded. Expired-session, interrupted logout, stale in-flight response, physical-device acceptance and lost-device operating procedure remain open.
