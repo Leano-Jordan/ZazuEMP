@@ -80,6 +80,49 @@ class SyncAttachmentIdempotencyTest extends TestCase
         $this->assertCount(1, Storage::disk('private')->allFiles('jobs/'.$event->id.'/attachments'));
     }
 
+    public function test_reused_attachment_key_cannot_move_an_attachment_to_another_job(): void
+    {
+        Storage::fake('private');
+
+        [$business, $event, $token] = $this->pairedBusinessAndEvent();
+        $otherCustomer = Customer::create([
+            'business_id' => $business->id,
+            'name' => 'Second Sync Attachment Customer',
+        ]);
+        $otherEvent = Event::create([
+            'business_id' => $business->id,
+            'customer_id' => $otherCustomer->id,
+            'reference' => 'ZAZ-SYNC-'.Str::upper(Str::random(8)),
+            'name' => 'Second Sync Attachment Work',
+            'event_type' => 'Catering order',
+            'event_date' => now()->addDays(4)->toDateString(),
+            'status' => 'draft',
+        ]);
+
+        $idempotencyKey = (string) Str::uuid();
+        $first = $this->withToken($token)->postJson('/api/sync/attachments', [
+            'event_id' => $event->id,
+            'idempotency_key' => $idempotencyKey,
+            'file' => UploadedFile::fake()->createWithContent('brief.txt', 'Accepted event brief'),
+        ]);
+
+        $first->assertCreated();
+
+        $reusedForOtherJob = $this->withToken($token)->postJson('/api/sync/attachments', [
+            'event_id' => $otherEvent->id,
+            'idempotency_key' => $idempotencyKey,
+            'file' => UploadedFile::fake()->createWithContent('brief.txt', 'Accepted event brief'),
+        ]);
+
+        $reusedForOtherJob->assertStatus(409);
+
+        $this->assertSame(1, EventAttachment::query()->count());
+        $this->assertDatabaseHas('event_attachments', [
+            'event_id' => $event->id,
+            'idempotency_key' => $idempotencyKey,
+        ]);
+    }
+
     /**
      * @return array{Business, Event, string}
      */
