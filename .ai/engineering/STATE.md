@@ -1018,3 +1018,12 @@ Latest source change: commit `29a38f55d3d3ff5979cf844ddbd624a9ea279515` consolid
 - Added a focused source-level regression test for the mobile status rule.
 - Dashboard visual CSS and its existing feature test only; no event data, status logic, routes, permissions, shared shell or non-dashboard pages changed.
 - Source re-fetch verification pending. PHPUnit, Vite build and rendered acceptance remain unverified.
+
+
+## Dashboard mobile event markup alignment — 2026-11-07
+
+- Responsive audit compared the current Blade event row (date, event copy, trailing status/arrow) with an older mobile CSS block that still targeted removed time/connector elements and treated the status as a direct grid child.
+- Removed the obsolete mobile layout block. The canonical mobile rules now own the actual three-child event row, with the status kept visible inside its trailing flex group and the existing narrow-screen two-row treatment preserved at 380px.
+- Replaced the stale regression assertions with checks against the current Blade structure and the actual status wrapper; added guards against reintroducing the removed selectors and invalid grid placement.
+- Dashboard CSS and the existing UI proportion feature test only. No business logic, data, routes, permissions, shared shell or non-dashboard pages changed.
+- Source-level verification only. PHPUnit, Vite build and rendered desktop/tablet/mobile light/dark acceptance remain outstanding.
