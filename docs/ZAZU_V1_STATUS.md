@@ -168,3 +168,13 @@ Regression coverage now includes:
 The service-worker cache was advanced to `zazu-static-v30` because `/zazu-offline.js` is served cache-first. All source and test changes are on `main`; latest observed implementation/test SHA before the documentation update: `bd47ec672ea0f4b609614ce24c3baa9d1ac4bd0a`.
 
 **Evidence boundary:** GitHub combined commit status returned no status contexts for the earlier `bc1de6224971803bdecee18dc8bcbed7781c5287` head; no Laravel, build or browser pass is claimed for the new source head. The added Playwright test and feature assertions remain unexecuted until exact-head CI is observed. Physical installed-device acceptance and disconnected Work-page availability remain unverified. The new browser regression covers attachment parent-ID reconciliation once the job has a server ID; the complete rendered create-offline-job → sync-job → attach-file user journey is still unverified.
+
+
+## Trusted-device session transition coverage — 2026-11-07
+
+The session-transition matrix now has additional source-level regression coverage:
+
+- A Playwright scenario preserves a paired business workspace and queued mutation when the `/up` authentication-host probe is unreachable; after connectivity returns it completes logout, re-authenticates the same account and checks that the trusted business device and pending mutation remain available.
+- Owner device revocation is tested against bootstrap, pull, push and attachment-list APIs using the formerly valid bearer token; cross-business owner revocation remains denied.
+
+**Implementation/test status:** tests added on `main`; **execution status: UNVERIFIED**. The exact current-main Laravel and browser workflows must pass before the security/offline evidence score can rise. Physical-device testing, expired web-session acceptance, interrupted logout, stale in-flight response handling and the owner lost-device runbook remain outstanding.
