@@ -118,7 +118,7 @@
         </form>
     </section>
 
-    <script>
+    <script nonce="{{ request()->attributes->get('cspNonce') }}">
         document.addEventListener('DOMContentLoaded', () => {
             const root = document.querySelector('[data-invoice-lines]');
             const list = root?.querySelector('[data-invoice-line-list]');
