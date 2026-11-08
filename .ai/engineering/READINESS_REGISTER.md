@@ -6,24 +6,24 @@ This is the live release-risk register.
 
 Readiness is tracked by domain and evidence maturity rather than by a single inflated percentage.
 
-## Current verified snapshot — 2026-11-07
+## Current verified snapshot — 2026-11-08
 
-**Validated source/test commit:** `dd3e1d4c0e03c63c565d12fabf744b93b75dae52` on canonical `main`.
+**Verified application/test source:** `d44ec33a57a4958380f2cfe4624f040859cbcf7a` on canonical `main`.  
+**CI workflow correction commit:** `7946a87e78cf4dd2305d12fb20d3f77ed5653c87` (workflow-only; no application source changes).
 
-- Laravel: **405 passed / 2,715 assertions**.
-- Zazu quality + secret scan: PASS.
-- Psalm security scan: PASS.
-- PHPMD: PASS.
-- Populated upgrade/rollback: PASS.
-- Browser smoke: IN PROGRESS at reconciliation.
-- SonarCloud: SKIPPED, not a pass.
-- Business data export: 13 tenant-scoped owner CSV exports; streamed, audited and formula-injection protected; export suite included in passing Laravel run.
-- Integrated commercial/profitability regression: PASS.
-- Device credentials use 180-day rolling inactivity expiry, refreshed by authenticated sync; expired credentials require re-pairing.
-- Backup-v2 checksum/tamper/legacy compatibility coverage executed within the passing Laravel suite.
-- No numerical score uplift is awarded until remaining physical/operational/legal gates and a fresh domain scorecard are reconciled.
+- Laravel: **407 passed / 2,758 assertions — PASS** ([run 42481998972](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/42481998972)).
+- Zazu quality + secret scan: **PASS** ([run 42481999066](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/42481999066)); the quality workflow now uses the same complete Laravel bootstrap as the dedicated workflow.
+- Browser smoke: **65 passed / 22 skipped / 0 failed — PASS** ([run 42481998954](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/42481998954)).
+- Psalm: **PASS** ([run 42481998947](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/42481998947)).
+- PHPMD: **PASS** ([run 42481998949](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/42481998949)).
+- Populated upgrade/rollback: **PASS** ([run 42481998959](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/42481998959)).
+- Director Contract Lint: **PASS** ([run 42481998956](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/42481998956)).
+- SonarCloud: **SKIPPED**, not a pass ([run 42481998971](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/42481998971)).
+- Offline Work attachment integration and trusted-device transition coverage are automated-tested in this batch; physical installed-device disconnected launch/restart/reconnect remains unverified.
+- Backup-v2 checksum and legacy-v1 compatibility tests passed in the Laravel suite; checksums do not establish archive authenticity, and the representative operator restore drill remains open.
+- No numeric score uplift is awarded from CI alone. Commercial release remains **NO-GO** pending physical-device acceptance, real operator recovery and deployment rollback drills, operational privacy/legal closure and official Zazu brand clearance.
 
-Exact Actions run URLs and remaining gates are maintained in `docs/V1_RELEASE_CHECKLIST.md`. Older snapshots below are historical.
+Exact run links and release gates are maintained in `docs/V1_RELEASE_CHECKLIST.md`. Older snapshots below are historical and must not override this verified state.
 
 ## Director audit snapshot — 2026-10-19
 
