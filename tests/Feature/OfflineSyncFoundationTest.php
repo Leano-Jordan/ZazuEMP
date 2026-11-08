@@ -23,9 +23,6 @@ use Tests\TestCase;
 
 /**
  * @SuppressWarnings(PHPMD.TooManyPublicMethods)
- */
-/**
- * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  * @SuppressWarnings(PHPMD.TooManyMethods)
  * @SuppressWarnings(PHPMD.ExcessiveClassLength)
  */
