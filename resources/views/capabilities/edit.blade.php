@@ -122,7 +122,7 @@
         </div>
     </form>
 
-    <script>
+    <script nonce="{{ request()->attributes->get('cspNonce') }}">
         document.querySelector('[data-image-preview]')?.addEventListener('change', (event) => {
             const file = event.target.files?.[0];
             const preview = document.querySelector('[data-image-preview-output]');
