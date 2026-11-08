@@ -14,8 +14,8 @@ class SecurityHeadersTest extends TestCase
         [$firstResponse, $firstNonce] = $this->runSecurityMiddleware();
         [$secondResponse, $secondNonce] = $this->runSecurityMiddleware();
 
-        $firstCsp = $firstResponse->headers->get('Content-Security-Policy');
-        $secondCsp = $secondResponse->headers->get('Content-Security-Policy');
+        $firstCsp = (string) $firstResponse->headers->get('Content-Security-Policy');
+        $secondCsp = (string) $secondResponse->headers->get('Content-Security-Policy');
 
         $this->assertNotEmpty($firstNonce);
         $this->assertNotEmpty($secondNonce);
