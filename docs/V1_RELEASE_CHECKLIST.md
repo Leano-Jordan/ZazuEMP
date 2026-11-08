@@ -59,6 +59,23 @@ All results below apply to application/test source commit `d44ec33a57a4958380f2c
 
 No release certification or score uplift is awarded from CI alone. The 13-domain 60/100 evidence-maturity score remains the last formally reconciled baseline pending a fresh full-domain audit and closure of operational blockers.
 
+## Latest CI workflow reconciliation — 2026-11-08
+
+The application/test source remains `d44ec33a57a4958380f2cfe4624f040859cbcf7a`. Commit `7946a87e78cf4dd2305d12fb20d3f77ed5653c87` changes the Quality workflow bootstrap only; it does not change application source. The following Actions batch completed successfully against that workflow commit:
+
+| Check | Result |
+|---|---|
+| Laravel | 🟢 PASS — 407 tests / 2,758 assertions — [run 42481998972](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/42481998972) |
+| Zazu quality + secret scan | 🟢 PASS — [run 42481999066](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/42481999066) |
+| Browser smoke | 🟢 PASS — 65 passed / 22 skipped / 0 failed — [run 42481998954](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/42481998954) |
+| Psalm | 🟢 PASS — [run 42481998947](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/42481998947) |
+| PHPMD | 🟢 PASS — [run 42481998949](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/42481998949) |
+| Populated upgrade + rollback | 🟢 PASS — [run 42481998959](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/42481998959) |
+| Director Contract Lint | 🟢 PASS — [run 42481998956](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/42481998956) |
+| SonarCloud | ⚪ SKIPPED; not a pass — [run 42481998971](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/42481998971) |
+
+The quality workflow bootstrap mismatch is corrected: it now prepares the same Laravel environment used by the dedicated Laravel workflow. This closes the automated CI reconciliation gap for the current application/test source. It does not close physical-device, real recovery, production rollback, privacy/legal or brand-clearance gates.
+
 ## Historical CI evidence — 2026-11-01 (not current)
 
 | Check | Exact application SHA | Result |
