@@ -350,7 +350,7 @@
         <p class="zazu-context-copy mt-1">Installation-wide backups and restores are managed by the system operator. Business self-service export and restore is not available in this build.</p>
     </section>
 
-<script>
+<script nonce="{{ request()->attributes->get('cspNonce') }}">
     document.addEventListener('DOMContentLoaded', () => {
         const pairingButton = document.querySelector('[data-zazu-generate-pairing]');
         const pairingResult = document.querySelector('[data-zazu-pairing-result]');
