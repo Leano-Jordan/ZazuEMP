@@ -21,7 +21,7 @@
         $brandingVersion = $business?->updated_at?->timestamp ?? 0;
     @endphp
     <title>{{ $title ?? 'Zazu' }} · {{ $business?->name ?? 'Zazu EMP' }}</title>
-    <script>
+    <script nonce="{{ request()->attributes->get('cspNonce') }}">
         (() => {
             let saved = null;
             try {
@@ -396,7 +396,7 @@
         </main>
     </div>
 
-<script>
+<script nonce="{{ request()->attributes->get('cspNonce') }}">
     document.addEventListener('DOMContentLoaded', () => {
         const command = document.querySelector('[data-zazu-command]');
         const commandInput = document.querySelector('[data-zazu-command-input]');
