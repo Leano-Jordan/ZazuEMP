@@ -223,7 +223,7 @@
             </div>
         </dialog>
 
-        <script>
+        <script nonce="{{ request()->attributes->get('cspNonce') }}">
             const customers = {{ Illuminate\Support\Js::from($customerOptions) }};
             const oldDayContactId = {{ Illuminate\Support\Js::from(old('event_day_contact_id')) }};
             const oldNightContactId = {{ Illuminate\Support\Js::from(old('event_night_contact_id')) }};
