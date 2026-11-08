@@ -25,8 +25,8 @@ The main offline security boundary is **owner-approved trusted-device access**, 
 | ZAZU-SEC-02 | Medium | CSV/XLSX parsing lacked bounded row, cell, column and expanded-archive limits during parsing. | Fixed in this audit; CI proof pending |
 | ZAZU-SEC-03 | Medium | Customer import controller expected a response shape the spreadsheet reader does not return. | Fixed in this audit; feature regression added |
 | ZAZU-SEC-04 | Low | API requests were outside the web-only request-ID and security-header middleware. | Fixed in this audit; feature regression added |
-| ZAZU-SEC-05 | Medium | Content Security Policy still allows inline scripts and styles. | Open — nonce/hash migration required |
-| ZAZU-SEC-06 | Medium | Sync device tokens have no automatic expiry; security depends on explicit revocation and device-loss procedures. | Open — define expiry/rotation policy |
+| ZAZU-SEC-05 | Medium | CSP script policy required inline nonces; inline styles remain permitted. | Partially fixed — nonce-based script policy in source; style policy and browser acceptance remain open |
+| ZAZU-SEC-06 | Medium | Trusted sync-device credentials use a rolling inactivity expiry; rotation is not automatic. | Implemented in source — 180-day rolling inactivity expiry and owner revocation; physical lost-device acceptance remains open |
 | ZAZU-SEC-07 | Medium | Incident logs retain exception messages, stack traces and SQL text. | Open — verify log access, retention and sensitive-field redaction |
 | ZAZU-SEC-08 | Medium | Main is protected but currently has no required status-check contexts. | Owner action — require quality and security checks |
 | ZAZU-SEC-09 | Not assessed | GitHub code-scanning, Dependabot and secret-scanning alert endpoints were not readable through the available connector. | Verify in GitHub Security tab; no clean result is claimed |
@@ -67,13 +67,13 @@ The reader returns a map of worksheet names to `headers` and `rows`; the control
 
 The `web` middleware group already received `AttachRequestId` and `ApplySecurityHeaders`; the `api` group did not. Both are now attached to `api`, with a feature test covering the sync provisioning validation response. This applies baseline headers and request correlation to API responses as well.
 
-### ZAZU-SEC-05 — Inline CSP allowance (Medium / open)
+### ZAZU-SEC-05 — Inline CSP allowance (Medium / partially fixed)
 
-Current CSP uses `script-src 'self' 'unsafe-inline'` and `style-src 'self' 'unsafe-inline'`. This is not a standalone exploit, but it weakens the browser's protection against injected inline script/style if a separate injection defect is found. Do not remove it blindly: the current UI includes inline code. Plan a nonce/hash migration and test every Blade entrypoint before tightening.
+The middleware now creates a fresh cryptographically random nonce per response, stores it on the request, and authorizes inline scripts only when they carry that nonce. The identified inline Blade script entrypoints have been annotated, and `script-src` no longer includes `'unsafe-inline'`. `style-src` still includes `'unsafe-inline'`; style attributes and inline style blocks require a separate inventory and migration. Do not mark this finding closed until the style policy is tightened and browser regression passes across every affected entrypoint.
 
-### ZAZU-SEC-06 — Sync token lifecycle (Medium / open)
+### ZAZU-SEC-06 — Sync token lifecycle (Medium / implemented with acceptance outstanding)
 
-The raw device token is generated with high entropy and only its SHA-256 hash is stored server-side. Device authentication checks active status and hash; revocation is present. However, there is no automatic token expiry. Lost-device response therefore depends on the owner revoking the device promptly. Decide whether device tokens should expire, rotate, or require periodic owner confirmation.
+The raw device token is generated with high entropy and only its SHA-256 hash is stored server-side. The current implementation adds a 180-day rolling inactivity expiry: authenticated sync refreshes the expiry, missing or expired expiry is rejected, and owner revocation clears the token hash and expiry. This is inactivity expiry, not periodic token rotation. Automated lifecycle coverage is recorded in the offline architecture evidence; physical lost-device and reassignment procedures remain release acceptance items.
 
 ### ZAZU-SEC-07 — Incident-log sensitivity (Medium / open)
 
@@ -114,7 +114,7 @@ The current `main` branch is protected, but GitHub reports empty required status
 2. Require quality, test and security checks on protected `main`.
 3. Review GitHub secret/dependency/code-scanning alerts and the Gitleaks history-scan result.
 4. Tighten CSP with nonces/hashes after removing inline script dependence.
-5. Set a sync-token expiry/rotation and lost-device response policy.
+5. Verify the 180-day inactivity expiry and revocation behaviour on the designated deployment; document the physical lost-device and reassignment response.
 6. Validate deployed HTTPS, trusted-proxy/HSTS behavior, persistent private storage, backup/restore and rate limits on the actual paid host.
 7. Run authenticated and unauthenticated black-box tests against a designated Zazu staging deployment before release.
 
