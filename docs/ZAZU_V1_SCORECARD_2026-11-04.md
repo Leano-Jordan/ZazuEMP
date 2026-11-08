@@ -6,6 +6,18 @@
 **Assessment HEAD:** `d1e2a4397b064d3fbfe7fc2cf1dc59236e00922f`  
 **Evidence status:** exact source-head CI mostly passed; browser smoke still running; not release certification.
 
+## Director evidence reconciliation — 2026-11-08
+
+The 2026-11-04 scorecard below is retained as the last formally calculated 13-domain baseline (**3.0/5, 60/100**); it has not been numerically recalculated. Several implementation statements in the original assessment are now superseded:
+
+- **Phone-local Work attachments:** the active authenticated Work panel now integrates business-scoped IndexedDB persistence, offline file queueing, idempotent reconnect upload, private attachment caching and offline-created job identity reconciliation. This is IMPLEMENTED and the new Laravel/Playwright coverage passed on the verified application/test source.
+- **Trusted-device transition:** unreachable-host logout preservation and owner revocation coverage have been added and passed automated verification.
+- **Backup integrity:** version-2 checksum validation and version-1 compatibility coverage passed in the current Laravel suite. Checksums do not prove archive authenticity.
+- **Exact-head CI:** application/test source `d44ec33a57a4958380f2cfe4624f040859cbcf7a` passed Laravel (407 / 2,758 assertions), Quality, browser smoke (65 passed / 22 skipped / 0 failed), Psalm, PHPMD and populated upgrade/rollback. The Quality workflow bootstrap correction is recorded in workflow-only commit `7946a87e78cf4dd2305d12fb20d3f77ed5653c87`. SonarCloud was skipped.
+- **Still not proven:** physical phone/tablet disconnected launch and restart, full create-offline-job → sync → attach journey on real devices, representative operator restore, deployment rollback, legal/privacy operational closure and official brand clearance.
+
+The original rows and blocker statements below describe the 2026-11-04 assessment date. Read this reconciliation and the current `docs/V1_RELEASE_CHECKLIST.md` first when determining today's status. No score uplift is claimed until a fresh full-domain evidence review is completed.
+
 ## Scoring method
 
 Each area is scored from 0–5 for evidence maturity, not lines of code or visual completeness:
