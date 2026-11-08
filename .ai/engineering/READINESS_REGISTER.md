@@ -532,8 +532,8 @@ Last updated: 2026-10-20
 | Customer import preview | Controller now extracts first worksheet rows using the reader's real response contract; read-only feature case added | Implemented; exact-head PHP/quality CI pending |
 | API response security baseline | Request-ID and security-header middleware now append to API group; regression case added | Implemented; exact-head PHP/quality CI pending |
 | Trusted-device security boundary | Owner-only pairing, bounded business bootstrap, explicit settings disclosure, local logout clearing and token revocation exist | V1 model is intentionally business-scoped; complete device inventory/revocation UI and lost-device/physical-lock acceptance |
-| CSP inline allowance | Inline script/style remain allowed | Open — nonce/hash migration |
-| Sync token lifecycle | Hashed bearer token and explicit revoke exist; no automatic expiry | Open — define expiry/rotation policy |
+| CSP inline allowance | Per-response nonce authorizes identified inline Blade scripts; inline styles still use unsafe-inline | Partially fixed — script policy source updated; style migration and browser acceptance remain |
+| Sync token lifecycle | Hashed bearer token, owner revoke and 180-day rolling inactivity expiry | Implemented in source/tests; physical lost-device and reassignment acceptance remains |
 | GitHub branch checks | Protected main reports no required status-check contexts | Owner action — require quality/security checks |
 | Live black-box verification | No Zazu runtime URL and authenticated test account were supplied for this repository-only audit | Open — run black-box tests against the owner-designated Zazu environment |
 
