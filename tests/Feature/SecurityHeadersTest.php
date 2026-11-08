@@ -9,18 +9,21 @@ use Tests\TestCase;
 
 class SecurityHeadersTest extends TestCase
 {
-    public function test_security_headers_include_csp(): void
+    public function test_security_headers_include_a_per_response_script_nonce(): void
     {
-        $request = Request::create('https://zazu.test/', 'GET');
-        $response = (new ApplySecurityHeaders())->handle(
-            $request,
-            fn () => new Response('ok'),
-        );
+        [$firstResponse, $firstNonce] = $this->runSecurityMiddleware();
+        [$secondResponse, $secondNonce] = $this->runSecurityMiddleware();
 
-        $this->assertSame(
-            "default-src 'self'; base-uri 'self'; frame-ancestors 'self'; object-src 'none'; form-action 'self'; img-src 'self' data: blob:; font-src 'self' data:; style-src 'self' 'unsafe-inline'; script-src 'self' 'unsafe-inline'; connect-src 'self'; media-src 'self' blob:; worker-src 'self' blob:",
-            $response->headers->get('Content-Security-Policy'),
-        );
+        $firstCsp = $firstResponse->headers->get('Content-Security-Policy');
+        $secondCsp = $secondResponse->headers->get('Content-Security-Policy');
+
+        $this->assertNotEmpty($firstNonce);
+        $this->assertNotEmpty($secondNonce);
+        $this->assertNotSame($firstNonce, $secondNonce);
+        $this->assertStringContainsString("'nonce-{$firstNonce}'", $firstCsp);
+        $this->assertStringContainsString("'nonce-{$secondNonce}'", $secondCsp);
+        $this->assertStringNotContainsString("script-src 'self' 'unsafe-inline'", $firstCsp);
+        $this->assertStringContainsString("style-src 'self' 'unsafe-inline'", $firstCsp);
     }
 
     public function test_secure_production_responses_include_hsts(): void
@@ -62,5 +65,25 @@ class SecurityHeadersTest extends TestCase
         } finally {
             $this->app->instance('env', $originalEnvironment);
         }
+    }
+
+    /**
+     * @return array{Response, string}
+     */
+    private function runSecurityMiddleware(): array
+    {
+        $request = Request::create('https://zazu.test/', 'GET');
+        $nonce = '';
+
+        $response = (new ApplySecurityHeaders())->handle(
+            $request,
+            function (Request $request) use (&$nonce): Response {
+                $nonce = (string) $request->attributes->get('cspNonce');
+
+                return new Response('ok');
+            },
+        );
+
+        return [$response, $nonce];
     }
 }
