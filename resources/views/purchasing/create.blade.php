@@ -180,7 +180,7 @@
         </div>
     </template>
 
-    <script>
+    <script nonce="{{ request()->attributes->get('cspNonce') }}">
         (() => {
             const list = document.querySelector('[data-purchase-line-list]');
             const add = document.querySelector('[data-add-purchase-line]');
