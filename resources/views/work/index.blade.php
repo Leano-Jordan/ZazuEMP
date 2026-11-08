@@ -233,7 +233,7 @@
         </div>
     </aside>
 
-    <script>
+    <script nonce="{{ request()->attributes->get('cspNonce') }}">
         (() => {
             const panel = document.querySelector('[data-zazu-inspector-panel]');
             const backdrop = document.querySelector('.zazu-inspector-backdrop');
