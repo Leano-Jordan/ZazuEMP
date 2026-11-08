@@ -1898,17 +1898,27 @@ class OfflineSyncFoundationTest extends TestCase
             'device_type' => 'phone',
         ]);
 
+        $pairedAt = now()->startOfSecond();
+        $this->travelTo($pairedAt);
+
         $first = $controller->provision($makeRequest());
+        $pairedDevice = $device->fresh();
+
         $this->assertSame(200, $first->getStatusCode());
-        $this->assertSame('active', $device->fresh()->status);
-        $this->assertNull($device->fresh()->metadata['pairing_code_hash']);
-        $this->assertTrue($device->fresh()->token_expires_at->isFuture());
+        $this->assertSame('active', $pairedDevice->status);
+        $this->assertNull($pairedDevice->metadata['pairing_code_hash']);
         $this->assertSame(
-            now()->addDays(SyncDevice::SYNC_TOKEN_IDLE_EXPIRY_DAYS)->timestamp,
-            $device->fresh()->token_expires_at->timestamp,
+            $pairedAt->copy()->addDays(SyncDevice::SYNC_TOKEN_IDLE_EXPIRY_DAYS)->timestamp,
+            $pairedDevice->token_expires_at->timestamp,
+        );
+        $this->assertSame(
+            $pairedAt->toIso8601String(),
+            $pairedDevice->metadata['paired_at'],
         );
 
-        $this->expectException(\Illuminate\Validation\ValidationException::class);
+        $this->travelBack();
+
+        $this->expectException(\\Illuminate\\Validation\\ValidationException::class);
         $controller->provision($makeRequest());
     }
 
