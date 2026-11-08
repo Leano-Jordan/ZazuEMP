@@ -13,7 +13,7 @@
     ]
   },
   "resources/css/zazu-dashboard-authority.css": {
-    "file": "assets/zazu-dashboard-authority-DggRp-l8.css",
+    "file": "assets/zazu-dashboard-authority-DVXZ3jbr.css",
     "name": "zazu-dashboard-authority",
     "names": [
       "zazu-dashboard-authority.css"
@@ -22,7 +22,7 @@
     "isEntry": true
   },
   "resources/css/zazu-final-visual-sweep.css": {
-    "file": "assets/zazu-final-visual-sweep-CXDWXTnD.css",
+    "file": "assets/zazu-final-visual-sweep-NenZRhmH.css",
     "name": "zazu-final-visual-sweep",
     "names": [
       "zazu-final-visual-sweep.css"
@@ -57,7 +57,7 @@
     "src": "resources/fonts/space-grotesk-latin-wght-normal.woff2"
   },
   "resources/js/app.js": {
-    "file": "assets/app-G7EIcvYP.js",
+    "file": "assets/app-Cb5rFEKJ.js",
     "name": "app",
     "src": "resources/js/app.js",
     "isEntry": true
