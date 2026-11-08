@@ -146,7 +146,7 @@
         </div>
     </form>
 
-    <script>
+    <script nonce="{{ request()->attributes->get('cspNonce') }}">
         const customers = {{ Illuminate\Support\Js::from($customerOptions) }};
 
         const selectedDayContact = {{ Illuminate\Support\Js::from(old('event_day_contact_id', $event->event_day_contact_id)) }};
