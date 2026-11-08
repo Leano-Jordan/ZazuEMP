@@ -32,7 +32,9 @@ The 2026-11-01 local Windows-host proposal was exploratory and is no longer the 
 
 ## Current verified source — 2026-11-08
 
-- Verified application/test source: `d44ec33a57a4958380f2cfe4624f040859cbcf7a` on canonical `main`.
+- Verified application/test source: `d44ec33a57a4958380f2cfe4624f040859cbcf7a` on canonical `main`; CI workflow correction commit: `7946a87e78cf4dd2305d12fb20d3f77ed5653c87` (workflow-only; no application source changes).
+- Exact-head workflow evidence on that workflow commit: Laravel run [42481998972](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/42481998972) PASS; Quality + secret scan [42481999066](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/42481999066) PASS; browser smoke [42481998954](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/42481998954) PASS; populated upgrade/rollback [42481998959](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/42481998959) PASS; Director Contract Lint [42481998956](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/42481998956) PASS; Psalm [42481998947](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/42481998947) PASS; PHPMD [42481998949](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/42481998949) PASS. SonarCloud [42481998971](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/42481998971) SKIPPED, not a pass.
+- The quality workflow now uses the same complete Laravel bootstrap as the dedicated Laravel workflow. The corrected run reports 407 passing tests / 2,758 assertions; browser smoke reports 65 passed / 22 skipped / 0 failed.
 - Laravel: **407 tests / 2,758 assertions — PASS**.
 - Zazu quality + secret scan: PASS.
 - Psalm security scan: PASS.
