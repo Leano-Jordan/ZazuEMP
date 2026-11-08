@@ -142,7 +142,7 @@
         </div>
     </form>
 
-    <script>
+    <script nonce="{{ request()->attributes->get('cspNonce') }}">
         const editPriceInputs = [...document.querySelectorAll('[data-quote-quantity]')];
         const editDepositInput = document.querySelector('input[name="deposit_percent"]');
         const editTaxSelect = document.querySelector('select[name="tax_rate_id"]');
