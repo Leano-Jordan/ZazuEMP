@@ -642,6 +642,11 @@ test.describe('Zazu installed PWA offline shell', () => {
             // Execute the worker in an inline script instead of Function/eval:
             // the app's CSP intentionally disallows unsafe-eval.
             const workerScript = document.createElement('script');
+            const trustedNonce = document.querySelector('script[nonce]')?.nonce;
+            if (!trustedNonce) {
+                throw new Error('CSP nonce was not available to initialize the service-worker test harness');
+            }
+            workerScript.nonce = trustedNonce;
             workerScript.textContent = `(function(self, caches, fetch, Request, Response, AbortController, setTimeout, clearTimeout, URL) {
                 ${workerSource}
             })(window.__zazuMockSelf, window.__zazuMockCaches, window.__zazuMockFetch, window.__zazuMockRequest, window.Response, window.AbortController, window.setTimeout.bind(window), window.clearTimeout.bind(window), window.URL);`;
