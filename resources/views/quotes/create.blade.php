@@ -149,7 +149,7 @@
         </div>
     </form>
 
-    <script>
+    <script nonce="{{ request()->attributes->get('cspNonce') }}">
         const currencySelect = document.getElementById('quote-currency');
         const depositInput = document.querySelector('input[name="deposit_percent"]');
         const taxSelect = document.querySelector('select[name="tax_rate_id"]');
