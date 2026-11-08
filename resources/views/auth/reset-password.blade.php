@@ -92,7 +92,7 @@
         </section>
     </main>
 
-    <script>
+    <script nonce="{{ request()->attributes->get('cspNonce') }}">
         document.addEventListener('DOMContentLoaded', () => {
             document.querySelectorAll('[data-password-toggle]').forEach((toggle) => {
                 const id = toggle.dataset.passwordToggle || toggle.getAttribute('aria-controls');
