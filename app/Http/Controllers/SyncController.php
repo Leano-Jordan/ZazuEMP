@@ -117,15 +117,17 @@ class SyncController extends Controller
                 }
 
                 $token = Str::random(64);
+                $pairedAt = now();
+
                 $candidate->update([
                     'device_name' => $validated['device_name'] ?? 'Zazu phone',
                     'device_type' => $validated['device_type'] ?? 'phone',
                     'status' => 'active',
-                    'last_seen_at' => now(),
-                    'token_expires_at' => now()->addDays(SyncDevice::SYNC_TOKEN_IDLE_EXPIRY_DAYS),
+                    'last_seen_at' => $pairedAt,
+                    'token_expires_at' => $pairedAt->copy()->addDays(SyncDevice::SYNC_TOKEN_IDLE_EXPIRY_DAYS),
                     'metadata' => array_merge($metadata, [
                         'sync_token_hash' => hash('sha256', $token),
-                        'paired_at' => now()->toIso8601String(),
+                        'paired_at' => $pairedAt->toIso8601String(),
                         'pairing_code_hash' => null,
                         'pairing_expires_at' => null,
                     ]),
