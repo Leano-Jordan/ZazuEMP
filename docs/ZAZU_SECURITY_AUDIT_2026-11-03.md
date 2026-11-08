@@ -113,7 +113,7 @@ The current `main` branch is protected, but GitHub reports empty required status
 1. Complete trusted-device lifecycle controls: visible device inventory/revocation, owner lost-device runbook and physical-device lock acceptance; keep business-scoped offline storage as the owner-approved V1 model.
 2. Require quality, test and security checks on protected `main`.
 3. Review GitHub secret/dependency/code-scanning alerts and the Gitleaks history-scan result.
-4. Tighten CSP with nonces/hashes after removing inline script dependence.
+4. Complete the remaining inline-style CSP migration, then verify every affected Blade entrypoint in browser regression.
 5. Verify the 180-day inactivity expiry and revocation behaviour on the designated deployment; document the physical lost-device and reassignment response.
 6. Validate deployed HTTPS, trusted-proxy/HSTS behavior, persistent private storage, backup/restore and rate limits on the actual paid host.
 7. Run authenticated and unauthenticated black-box tests against a designated Zazu staging deployment before release.
