@@ -118,7 +118,7 @@
         </div>
     </form>
 
-    <script>
+    <script nonce="{{ request()->attributes->get('cspNonce') }}">
         const description = document.getElementById('description');
         const capabilityId = document.getElementById('capability_id');
         const unitSelect = document.getElementById('unit-select');
