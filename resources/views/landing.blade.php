@@ -580,7 +580,7 @@
 <footer><span>ZAZU EMP · EVENT OPERATIONS PLATFORM</span><span class="footer-right">SOUTH AFRICAN BUSINESS · EVENTS / CATERING / HIRE</span></footer>
 </div>
 
-<script>
+<script nonce="{{ request()->attributes->get('cspNonce') }}">
 (() => {
     const nav = document.querySelector('.topnav');
     const toggle = document.querySelector('.mobile-nav-toggle');
@@ -609,7 +609,7 @@
     }
 })();
 </script>
-<script>
+<script nonce="{{ request()->attributes->get('cspNonce') }}">
 (() => {
     const modal = document.querySelector('[data-auth-modal]');
     if (!modal) return;
