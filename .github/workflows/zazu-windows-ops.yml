@@ -97,7 +97,7 @@ jobs:
           if ($cleanupCount -lt 3) {
             throw 'Caddy launch, early-exit and bind-timeout failures must stop the loopback Laravel process.'
           }
-          if ($launcher -notmatch '(?s)try\s*\{\s*\$caddyProcess\s*=\s*Start-Process.*?\}\s*catch\s*\{\s*& \$startServer -Stop -Port \$AppPort') {
+          if ($launcher -notmatch '(?s)try\s*\{\s*\$caddyProcess\s*=\s*Start-Process.*?\}\s*catch\s*\{\s*\$startupError\s*=\s*\$_.*?try\s*\{\s*& \$startServer -Stop -Port \$AppPort') {
             throw 'A Caddy process launch/PID-write failure must clean up the Laravel process.'
           }
           if ($launcher -notmatch '(?s)\$caddyProcess = \$null\s*try\s*\{\s*\$caddyProcess = Start-Process.*?\}\s*catch\s*\{\s*\$startupError = \$_.*?Stop-Process -Id \$caddyProcess\.Id -Force -ErrorAction SilentlyContinue') {
