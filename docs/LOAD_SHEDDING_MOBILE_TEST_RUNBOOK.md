@@ -40,11 +40,9 @@ For temporary phone testing, the PHP development server can be bound to the PC's
 
 ## Offline/PWA implementation boundary
 
-Zazu includes a user-scoped authenticated page cache, a phone-local IndexedDB workspace and durable mutation queue, owner-approved pairing/sync foundations, and domain-specific offline mutation handlers.
+Zazu includes a user-and-business-scoped authenticated page cache, a business-scoped phone-local IndexedDB workspace and durable mutation queue, owner-approved pairing/sync foundations, and domain-specific offline mutation handlers. The active Work attachment flow also supports business-scoped local file queueing for persisted jobs, local retrieval, reconnect upload with idempotency, and private download caching. The legacy standalone `public/offline-attachments.js` remains unused; the active integration is in `resources/js/app.js`, `resources/views/work/attachments.blade.php` and `public/zazu-offline.js`.
 
-The current phone workspace is not a complete disconnected replacement for every web-app screen and workflow. In particular, the standalone `public/offline-attachments.js` file is legacy/orphaned code: it is not loaded by the active app layout and expects globals that the current app does not provide. Offline attachment queue/upload/download is therefore **NOT IMPLEMENTED in the active app**. Do not load that legacy file directly.
-
-Offline reads, writes, attachments, conflict handling, restart persistence and reconnect reconciliation must be judged against their specific automated and physical-device acceptance tests. Do not infer complete parity from the presence of a PWA or service worker.
+The phone workspace is not a complete disconnected replacement for every web-app screen and workflow. A complete rendered offline-create-Work → attachment journey is not yet proven. Offline reads, writes, attachments, conflict handling, force-close/restart persistence and reconnect reconciliation must be judged against their specific automated and physical-device acceptance tests. Do not infer complete parity from the presence of a PWA or service worker.
 
 ## Future production deployment
 
