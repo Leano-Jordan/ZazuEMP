@@ -7626,8 +7626,7 @@ body.zazu-inspector-open { overflow:hidden; }
 }
 
 .zazu-nav-area-trigger:hover,
-.zazu-nav-area-trigger:focus-visible,
-.zazu-nav-area.is-open > .zazu-nav-area-trigger {
+.zazu-nav-area-trigger:focus-visible {
     border-color: color-mix(in srgb, var(--zazu-sidebar-muted) 18%, transparent);
     background: var(--zazu-sidebar-hover);
     color: var(--zazu-sidebar-ink);
