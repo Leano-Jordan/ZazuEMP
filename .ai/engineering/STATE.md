@@ -1324,3 +1324,14 @@ Owner expanded the visual refinement scope beyond the dashboard: apply the estab
 - Added regression assertions for editor spacing, form sections, action bars, safe-area handling and single-column mobile form grids.
 - Commits: `77d53b0` (editor/actionbar refinement), `e9855f6` (regression coverage).
 - PHPUnit, Vite build and rendered desktop/tablet/mobile visual review remain unverified.
+
+## LAN HTTPS launcher failure-cleanup hardening — 2026-11-10
+
+- Active target: make the private LAN HTTPS launcher fail closed without leaving an orphaned Laravel development server.
+- Finding: Caddy configuration validation occurred after Laravel startup; Caddy process launch, early exit, or listener timeout could leave the loopback Laravel process running after the HTTPS launcher failed.
+- Change on canonical `main`: Caddy configuration is now validated before Laravel starts. If Caddy process launch/PID persistence fails, Caddy exits during startup, or the HTTPS listener does not bind within the existing timeout, the launcher stops the Zazu Laravel process and removes the saved Caddy PID where applicable.
+- Added Windows workflow contract checks for validation-before-start ordering and cleanup on all three proxy failure paths. Existing PowerShell parser and wrapper checks remain.
+- Commits: `02868ed` launcher cleanup; `2e7c95a` Windows workflow regression guard.
+- Re-fetched both changed files from `main`; the expected ordering and cleanup calls are present. This is source reconciliation only. Windows PowerShell workflow execution and full exact-head Laravel/quality/browser/static CI have not yet been observed. No readiness-score uplift is awarded.
+- Physical acceptance remains owner-PC/device work: install/verify Caddy, run the HTTPS launcher on a trusted Private Wi-Fi network, install only the public root certificate on the phone, then test same-network access and the installed offline/restart/reconnect journey. Do not bypass certificate warnings or migrate browser origin with pending queues.
+- Next target: obtain exact-head Windows Ops workflow and full application CI evidence; repair only confirmed failures, then continue secure-origin PC/mobile offline acceptance.
