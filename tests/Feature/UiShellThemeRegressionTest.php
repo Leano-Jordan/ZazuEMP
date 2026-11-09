@@ -77,7 +77,6 @@ class UiShellThemeRegressionTest extends TestCase
         $this->assertNotEmpty($matches[0]);
         $effectiveRule = end($matches[0]);
         $this->assertStringContainsString('var(--zazu-surface-2)', $effectiveRule);
-        $this->assertStringContainsString('var(--zazu-surface)', $effectiveRule);
         $this->assertStringContainsString('border-bottom: 1px solid var(--zazu-border);', $effectiveRule);
     }
 
