@@ -567,8 +567,8 @@
     --zazu-sidebar-ink: #DCE7F5;
     --zazu-sidebar-muted: #AFC1D6;
     --zazu-sidebar-label: #8FA8C4;
-    --zazu-sidebar-hover: #1B354D;
-    --zazu-sidebar-active: #426987;
+    --zazu-sidebar-hover: #29445D;
+    --zazu-sidebar-active: #6487A2;
     --zazu-sidebar-surface: #1A3658;
 
     --zazu-surface: #FFFFFF;
@@ -646,7 +646,7 @@
     --zazu-sidebar-ink: #DCE7F5;
     --zazu-sidebar-muted: #A4B5C8;
     --zazu-sidebar-label: #8298B4;
-    --zazu-sidebar-hover: #1B354D;
+    --zazu-sidebar-hover: #29445D;
     --zazu-sidebar-active: #6487A2;
     --zazu-sidebar-surface: #122235;
 
@@ -751,9 +751,11 @@ body:not(.zazu-dashboard-page) .zazu-nav-area-trigger:focus-visible {
     color: #FFFFFF !important;
     background: var(--zazu-sidebar-hover) !important;
 }
-body:not(.zazu-dashboard-page) .zazu-nav-link.active {
+body:not(.zazu-dashboard-page) .zazu-nav-link.active,
+body:not(.zazu-dashboard-page) .zazu-nav-area.is-active > .zazu-nav-area-trigger {
     color: #FFFFFF !important;
-    background: var(--zazu-sidebar-active) !important;
+    background: #1B354D !important;
+    border-color: transparent !important;
 }
 
 
