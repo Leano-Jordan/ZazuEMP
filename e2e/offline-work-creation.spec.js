@@ -17,6 +17,13 @@ test('real Zazu job form can create a job locally while disconnected', async ({ 
     await page.goto('/dashboard', { waitUntil: 'domcontentloaded' });
     await expect(page.getByRole('heading', { name: 'Dashboard' })).toBeVisible();
 
+    // Prime the authenticated directory routes before disconnecting. The
+    // test then verifies their cached shells can render the IndexedDB records.
+    await page.goto('/customers', { waitUntil: 'domcontentloaded' });
+    await expect(page.getByRole('heading', { name: 'Customers' })).toBeVisible();
+    await page.goto('/work', { waitUntil: 'domcontentloaded' });
+    await expect(page.getByRole('heading', { name: 'Event Operations' })).toBeVisible();
+
     await page.goto('/work/create', { waitUntil: 'domcontentloaded' });
     await expect(page.locator('#new-job-form')).toBeVisible();
 
@@ -75,4 +82,13 @@ test('real Zazu job form can create a job locally while disconnected', async ({ 
     expect(persisted.some((job) => job.name === 'Offline catering job' && job.local_id)).toBe(true);
     const persistedQueue = await page.evaluate(async () => await window.ZazuOffline?.pending());
     expect(persistedQueue.some((mutation) => mutation.entity_type === 'job' && mutation.payload?.name === 'Offline catering job')).toBe(true);
+
+    // Offline records must be visible in the normal operating directories,
+    // not merely present in IndexedDB.
+    await page.goto('/work', { waitUntil: 'domcontentloaded' });
+    await expect(page.locator('[data-zazu-local-record="job"]').filter({ hasText: 'Offline catering job' })).toBeVisible();
+    await expect(page.locator('[data-zazu-local-record="job"]').filter({ hasText: 'Offline test customer' })).toBeVisible();
+
+    await page.goto('/customers', { waitUntil: 'domcontentloaded' });
+    await expect(page.locator('[data-zazu-local-record="customer"]').filter({ hasText: 'Offline test customer' })).toBeVisible();
 });
