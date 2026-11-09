@@ -200,3 +200,175 @@
     .zazu-card-header, .zazu-panel-head { padding: 12px 13px; }
     .zazu-form-section { padding: 14px; }
 }
+
+/* --------------------------------------------------------------------------
+   Cross-module visual contract
+   Shared content surfaces and interaction patterns for every authenticated
+   module. Dashboard composition remains separately scoped in its authority.
+   -------------------------------------------------------------------------- */
+
+/* Page-intro surfaces share one restrained treatment across Jobs, Quotes,
+   Customers, Inventory, Finance, Reports and the remaining modules. */
+.zazu-command-band,
+.zazu-ops-hero,
+.zazu-work-hero {
+    min-width: 0;
+    border: 1px solid var(--zazu-border);
+    border-radius: var(--zazu-radius-md);
+    background: var(--zazu-surface);
+    color: var(--zazu-ink);
+    box-shadow: 0 1px 2px color-mix(in srgb, var(--zazu-ink) 4%, transparent),
+                0 5px 16px color-mix(in srgb, var(--zazu-ink) 4%, transparent);
+}
+
+.zazu-command-band {
+    margin-bottom: 16px;
+}
+
+.zazu-ops-hero,
+.zazu-work-hero {
+    padding: 20px 22px;
+    margin-bottom: 16px;
+}
+
+.zazu-command-title,
+.zazu-ops-hero .zazu-command-title,
+.zazu-work-hero .zazu-command-title {
+    color: var(--zazu-ink);
+    letter-spacing: -.025em;
+}
+
+.zazu-command-copy,
+.zazu-ops-hero .zazu-command-copy,
+.zazu-work-hero .zazu-command-copy {
+    color: var(--zazu-muted);
+    line-height: 1.55;
+}
+
+.zazu-command-meta,
+.zazu-command-badge {
+    border-color: var(--zazu-border);
+    color: var(--zazu-ink-2);
+}
+
+/* One surface hierarchy: cards/panels are primary, section heads are quieter,
+   and form sections stay visually integrated rather than becoming nested boxes. */
+.zazu-card,
+.zazu-panel,
+.zazu-context-card,
+.zazu-contact-card,
+.zazu-document,
+.zazu-detail-value-box,
+.zazu-filter-card {
+    border-color: var(--zazu-border);
+    border-radius: var(--zazu-radius-md);
+}
+
+.zazu-card,
+.zazu-panel,
+.zazu-context-card,
+.zazu-contact-card {
+    background: var(--zazu-surface);
+}
+
+.zazu-card-header,
+.zazu-panel-head {
+    background: var(--zazu-surface-2);
+    border-bottom-color: var(--zazu-border);
+}
+
+.zazu-form-section {
+    border-color: var(--zazu-border);
+    border-radius: var(--zazu-radius-md);
+}
+
+.zazu-metric-card,
+.zazu-filter-card {
+    background: var(--zazu-surface);
+    border-color: var(--zazu-border);
+    box-shadow: 0 1px 3px color-mix(in srgb, var(--zazu-ink) 5%, transparent);
+}
+
+.zazu-metric-card:hover,
+.zazu-filter-card:hover,
+.zazu-filter-card:focus-visible {
+    border-color: var(--zazu-border-strong);
+    box-shadow: 0 4px 12px color-mix(in srgb, var(--zazu-ink) 7%, transparent);
+}
+
+/* Consistent record rhythm without forcing identical layouts on different data. */
+.zazu-list,
+.zazu-table-wrap,
+.zazu-document-table-wrap {
+    border-color: var(--zazu-border);
+    border-radius: var(--zazu-radius-md);
+    background: var(--zazu-surface);
+}
+
+.zazu-list-item {
+    border-color: var(--zazu-border);
+    color: var(--zazu-ink);
+}
+
+.zazu-list-item:hover {
+    background: var(--zazu-surface-2);
+}
+
+.zazu-list-title,
+.zazu-side-primary,
+.zazu-detail-value {
+    color: var(--zazu-ink);
+}
+
+.zazu-list-meta,
+.zazu-card-description,
+.zazu-panel-copy,
+.zazu-form-section-copy {
+    color: var(--zazu-muted);
+}
+
+/* Action groups and section controls use the same compact geometry everywhere. */
+.zazu-actionbar,
+.zazu-action-group,
+.zazu-header-slot-actions {
+    gap: 8px;
+}
+
+.zazu-btn,
+.zazu-input,
+.zazu-select,
+.zazu-textarea {
+    border-radius: var(--zazu-radius-sm);
+}
+
+.zazu-btn-secondary,
+.zazu-btn-ghost {
+    border-color: var(--zazu-border-strong);
+}
+
+.zazu-section-tabs a,
+.zazu-workload-pill,
+.zazu-chip,
+.zazu-badge,
+.zazu-pill {
+    border-radius: var(--zazu-radius-sm);
+}
+
+@media (max-width: 820px) {
+    .zazu-ops-hero,
+    .zazu-work-hero {
+        padding: 16px;
+    }
+}
+
+@media (max-width: 520px) {
+    .zazu-ops-hero,
+    .zazu-work-hero {
+        padding: 14px;
+        margin-bottom: 12px;
+    }
+
+    .zazu-command-band {
+        margin-bottom: 12px;
+    }
+}
