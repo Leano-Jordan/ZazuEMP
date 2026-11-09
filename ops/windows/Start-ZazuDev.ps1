@@ -145,7 +145,7 @@ if ($listeners.Count -gt 0) {
 
     if ($alreadyZazu) {
         Write-Host ("Zazu is already listening at http://{0}:{1}" -f $BindAddress, $Port)
-        exit 0
+        return
     }
 
     if ($wrongBinding.Count -gt 0 -and $listeners.Count -eq $wrongBinding.Count) {
