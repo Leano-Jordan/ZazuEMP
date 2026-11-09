@@ -1,5 +1,26 @@
 # Zazu EMP — V1 Release Gate Ledger
 
+## Director scorecard and exact-head evidence — 2026-11-09
+
+**Current V1 evidence-maturity score: 68/100 (3.38/5), up from the historical 60/100 baseline.**  
+**Verified application/test source:** `69040420caa49bf9c514699c97fb8f8c5148d03b`.  
+**Release decision: NO-GO** — score improvement does not waive operational blockers.
+
+- Laravel: PASS — 412 tests / 2,904 assertions ([run 42698440540](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/42698440540)).
+- Browser smoke: PASS — 65 passed / 22 skipped / 0 failed or flaky ([run 42698440241](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/42698440241)).
+- Zazu Quality + secret scan: PASS ([run 42698440553](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/42698440553)).
+- Psalm Security: PASS ([run 42698440534](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/42698440534)).
+- PHPMD: PASS ([run 42698440505](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/42698440505)).
+- Populated upgrade/rollback: PASS ([run 42698440537](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/42698440537)).
+- Director Contract Lint: PASS ([run 42698440506](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/42698440506)).
+- Push on main: PASS ([run 42698440294](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/42698440294)).
+- SonarCloud: SKIPPED; not counted as a pass.
+
+The score rose only in platform/onboarding, core lifecycle, security/tenant controls and active documents/attachments, where exact-head automated evidence now meets score-4 maturity. Offline continuity remains 3; UX remains 3; recovery remains 2; legal/privacy/brand remains 1. The full domain table and scoring method are in `docs/ZAZU_V1_SCORECARD_2026-11-04.md`.
+
+**Remaining release blockers:** secure-origin installed-device offline acceptance; representative populated database/private-media restore; real deployment rollback; trusted-device/lost-device acceptance; operational privacy/legal closure; official Zazu brand clearance.
+
+
 ## Director product audit — 2026-11-09
 
 Current comprehensive audit: `docs/DIRECTOR_PRODUCT_AUDIT_2026-11-09.md`.
