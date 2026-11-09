@@ -1033,6 +1033,40 @@ body.zazu-dashboard-page .zazu-dash-hero-side {
     border-bottom-color: color-mix(in srgb, var(--zazu-tone-ink-violet) 20%, transparent) !important;
 }
 
+/* Route-level card surfaces: each workspace gets a recognisable colour family. */
+body[data-zazu-route^="finance."] .zazu-card,
+body[data-zazu-route^="finance."] .zazu-panel {
+    background: linear-gradient(145deg, color-mix(in srgb, var(--zazu-tone-green) 38%, var(--zazu-surface)), var(--zazu-surface) 82%) !important;
+}
+body[data-zazu-route^="inventory."] .zazu-card,
+body[data-zazu-route^="inventory."] .zazu-panel,
+body[data-zazu-route^="purchasing."] .zazu-card,
+body[data-zazu-route^="purchasing."] .zazu-panel {
+    background: linear-gradient(145deg, color-mix(in srgb, var(--zazu-tone-amber) 38%, var(--zazu-surface)), var(--zazu-surface) 82%) !important;
+}
+body[data-zazu-route^="suppliers."] .zazu-card,
+body[data-zazu-route^="suppliers."] .zazu-panel,
+body[data-zazu-route^="assets."] .zazu-card,
+body[data-zazu-route^="assets."] .zazu-panel {
+    background: linear-gradient(145deg, color-mix(in srgb, var(--zazu-tone-teal) 38%, var(--zazu-surface)), var(--zazu-surface) 82%) !important;
+}
+body[data-zazu-route^="customers."] .zazu-card,
+body[data-zazu-route^="customers."] .zazu-panel,
+body[data-zazu-route^="quotes."] .zazu-card,
+body[data-zazu-route^="quotes."] .zazu-panel {
+    background: linear-gradient(145deg, color-mix(in srgb, var(--zazu-tone-violet) 34%, var(--zazu-surface)), var(--zazu-surface) 82%) !important;
+}
+body[data-zazu-route^="reports."] .zazu-card,
+body[data-zazu-route^="reports."] .zazu-panel,
+body[data-zazu-route^="calendar."] .zazu-card,
+body[data-zazu-route^="calendar."] .zazu-panel {
+    background: linear-gradient(145deg, color-mix(in srgb, var(--zazu-tone-blue) 36%, var(--zazu-surface)), var(--zazu-surface) 82%) !important;
+}
+body[data-zazu-route^="quotes."] .zazu-quote-register-command + .zazu-card .zazu-card-header {
+    background: linear-gradient(105deg, var(--zazu-tone-violet), var(--zazu-surface)) !important;
+    border-bottom-color: color-mix(in srgb, var(--zazu-tone-ink-violet) 20%, transparent) !important;
+}
+
 /* KPI tiles carry their own colour identity instead of repeating white cards. */
 .zazu-metric-card,
 .zazu-dash-metric {
