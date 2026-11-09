@@ -836,7 +836,7 @@ textarea:focus,
     min-height: 88px !important;
     padding: 12px !important;
 }
-body.zazu-dashboard-page .zazu-dash-surface-head {
+body.zazu-dashboard-page .zazu-dash-panel-head {
     border-bottom: 1px solid var(--zazu-border) !important;
 }
 body.zazu-dashboard-page .zazu-dash-hero-side {
@@ -942,8 +942,8 @@ body.zazu-dashboard-page .zazu-dash-hero-side {
 }
 .zazu-command-band .zazu-eyebrow {color:var(--zazu-tone-ink-blue)!important}
 .zazu-command-band .zazu-command-title {font-weight:760!important;color:var(--zazu-ink)!important}
-body.zazu-dashboard-page .zazu-dash-surface-head {background:linear-gradient(105deg,var(--zazu-tone-blue),var(--zazu-surface-2) 82%)!important}
-body.zazu-dashboard-page .zazu-dash-commercial .zazu-dash-surface-head {background:linear-gradient(105deg,var(--zazu-tone-green),var(--zazu-surface-2) 82%)!important}
+body.zazu-dashboard-page .zazu-dash-panel-head {background:linear-gradient(105deg,var(--zazu-tone-blue),var(--zazu-surface-2) 82%)!important}
+body.zazu-dashboard-page .zazu-dash-commercial .zazu-dash-panel-head {background:linear-gradient(105deg,var(--zazu-tone-green),var(--zazu-surface-2) 82%)!important}
 
 /* Helper dock: remove it from the working canvas; open the guide only on demand. */
 .zazu-helper {
