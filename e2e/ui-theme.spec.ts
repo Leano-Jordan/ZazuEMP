@@ -90,24 +90,34 @@ test.describe('Zazu UI theme and navigation', () => {
         await login(page);
         await page.goto('/settings');
         await page.locator('[data-theme-toggle]').first().click();
+        await expect(page.locator('html')).toHaveAttribute('data-theme', 'dark');
 
-        const result = await page.evaluate(() => {
-            const controls = Array.from(document.querySelectorAll('input:not([type="hidden"]):not([type="checkbox"]):not([type="radio"]):not([type="button"]):not([type="submit"]):not([type="reset"]):not([type="file"]):not([type="image"]):not([type="color"]):not([type="range"]), select, textarea'));
-            return controls.map((control) => {
-                const style = getComputedStyle(control);
-                return {
-                    tag: control.tagName,
-                    type: control.getAttribute('type') || '',
-                    background: style.backgroundColor,
-                    color: style.color,
-                };
-            }).filter((item) => item.background !== 'rgba(0, 0, 0, 0)');
-        });
+        const controlSelector = 'input:not([type="hidden"]):not([type="checkbox"]):not([type="radio"]):not([type="button"]):not([type="submit"]):not([type="reset"]):not([type="file"]):not([type="image"]):not([type="color"]):not([type="range"]), select, textarea';
+        await expect.poll(async () => page.locator(controlSelector).evaluateAll((controls) => {
+            const visibleBackgrounds = controls
+                .map((control) => getComputedStyle(control).backgroundColor)
+                .filter((background) => background !== 'rgba(0, 0, 0, 0)');
+
+            return visibleBackgrounds.length > 0 && visibleBackgrounds.every((background) =>
+                !/rgb\(255,\s*255,\s*255\)|rgba\(255,\s*255,\s*255,/.test(background) &&
+                !/rgb\(248,\s*250,\s*252\)|rgba\(248,\s*250,\s*252,/.test(background)
+            );
+        })).toBe(true);
+
+        const result = await page.locator(controlSelector).evaluateAll((controls) => controls.map((control) => {
+            const style = getComputedStyle(control);
+            return {
+                tag: control.tagName,
+                type: control.getAttribute('type') || '',
+                background: style.backgroundColor,
+                color: style.color,
+            };
+        }).filter((item) => item.background !== 'rgba(0, 0, 0, 0)'));
 
         expect(result.length).toBeGreaterThan(0);
         for (const control of result) {
-            expect(control.background).not.toMatch(/rgb\(255,\s*255,\s*255\)|rgba\(255,\s*255,\s*255,/);
-            expect(control.background).not.toMatch(/rgb\(248,\s*250,\s*252\)|rgba\(248,\s*250,\s*252,/);
+            expect(control.background, `${control.tag} type=${control.type}`).not.toMatch(/rgb\(255,\s*255,\s*255\)|rgba\(255,\s*255,\s*255,/);
+            expect(control.background, `${control.tag} type=${control.type}`).not.toMatch(/rgb\(248,\s*250,\s*252\)|rgba\(248,\s*250,\s*252,/);
         }
     });
 
