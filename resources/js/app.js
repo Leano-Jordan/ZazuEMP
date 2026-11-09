@@ -1947,6 +1947,7 @@ function setupZazuOfflineForms() {
             }
             state.local_dirty = true;
             await window.ZazuOffline.queueMutation(entity, operation, payload, state);
+            window.dispatchEvent(new CustomEvent('zazu:offline-state-updated'));
             form.dataset.zazuOfflineSaved = '1';
 
             const submit = form.querySelector('button[type="submit"], button:not([type]), input[type="submit"]');
