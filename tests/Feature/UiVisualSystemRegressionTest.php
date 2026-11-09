@@ -172,9 +172,13 @@ class UiVisualSystemRegressionTest extends TestCase
     {
         $css = file_get_contents(resource_path('css/zazu-product-authority.css'));
         $layout = file_get_contents(resource_path('views/components/app-layout.blade.php'));
+        $dashboardCss = file_get_contents(resource_path('css/zazu-dashboard-authority.css'));
+        $visualSweepCss = file_get_contents(resource_path('css/zazu-final-visual-sweep.css'));
 
         $this->assertIsString($css);
         $this->assertIsString($layout);
+        $this->assertIsString($dashboardCss);
+        $this->assertIsString($visualSweepCss);
         $this->assertStringContainsString('resources/css/zazu-product-authority.css', $layout);
         $this->assertStringContainsString('--zazu-page: #DCE5ED;', $css);
         $this->assertStringContainsString('--zazu-sidebar: #102541;', $css);
@@ -184,6 +188,10 @@ class UiVisualSystemRegressionTest extends TestCase
         $this->assertStringContainsString('background-image: none !important;', $css);
         $this->assertStringContainsString('.zazu-dash-commercial .zazu-dash-quote-stages', $css);
         $this->assertStringContainsString('padding: 12px 18px 14px !important;', $css);
+        $this->assertStringNotContainsString('border: 2px solid #B9C9D7 !important;', $dashboardCss);
+        $this->assertStringNotContainsString('border-right: 2px solid #B5C5D3 !important;', $dashboardCss);
+        $this->assertStringNotContainsString('border-bottom-width: 2px;', $visualSweepCss);
+        $this->assertStringContainsString('border-bottom-width: 1px;', $visualSweepCss);
 
              foreach ([
             '--zazu-tone-green: #E2F3E8;',
