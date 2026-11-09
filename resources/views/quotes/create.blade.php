@@ -71,7 +71,7 @@
                         <div class="zazu-form-section-copy">These values are copied into the quote snapshot when saved.</div>
                     </div>
 
-                    <div class="zazu-card zazu-list zazu-quote-line-editor">
+                    <div class="zazu-list zazu-quote-line-editor">
                         @foreach ($event->requirements as $requirement)
                             @php
                                 $capability = $requirement->capability;
