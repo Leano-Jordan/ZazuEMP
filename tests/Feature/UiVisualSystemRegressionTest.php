@@ -167,4 +167,24 @@ class UiVisualSystemRegressionTest extends TestCase
         $this->assertStringNotContainsString('.zazu-disclosure-body {\npadding:0 13px 13px', $css);
     }
 
+
+    public function test_authenticated_modules_share_the_dashboard_shell_and_surface_palette(): void
+    {
+        $css = file_get_contents(resource_path('css/zazu-product-authority.css'));
+        $layout = file_get_contents(resource_path('views/components/app-layout.blade.php'));
+
+        $this->assertIsString($css);
+        $this->assertIsString($layout);
+        $this->assertStringContainsString('resources/css/zazu-product-authority.css', $layout);
+        $this->assertStringContainsString('--zazu-page: #DCE5ED;', $css);
+        $this->assertStringContainsString('--zazu-sidebar: #102541;', $css);
+        $this->assertStringContainsString('--zazu-surface: #FFFFFF;', $css);
+        $this->assertStringContainsString('--zazu-page: #0B1726;', $css);
+        $this->assertStringContainsString('--zazu-sidebar: #091827;', $css);
+        $this->assertStringContainsString('background-image: none !important;', $css);
+        $this->assertStringContainsString('.zazu-dash-commercial .zazu-dash-quote-stages', $css);
+        $this->assertStringContainsString('padding: 12px 18px 14px !important;', $css);
+    }
+
+
 }
