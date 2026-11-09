@@ -115,7 +115,7 @@ jobs:
           if ($launcher -notmatch '(?s)if \(-not \$ready\)\s*\{.*?Stop-Process -Id \$caddyProcess\.Id -Force.*?Remove-Item \$pidPath -Force -ErrorAction SilentlyContinue\s*& \$startServer -Stop -Port \$AppPort\s*throw') {
             throw 'HTTPS listener timeout must stop Caddy, remove the PID and stop Laravel before reporting failure.'
           }
-          if ($launcher -notmatch '(?s)BindAddress = \'127\.0\.0\.1\'.*?reverse_proxy 127\.0\.0\.1:\$AppPort') {
+          if (-not $launcher.Contains("BindAddress = '127.0.0.1'") -or $launcher -notmatch 'reverse_proxy 127\.0\.0\.1:\$AppPort') {
             throw 'Laravel must remain loopback-only behind the Caddy HTTPS proxy.'
           }
           Write-Host 'PASS: HTTPS validation, loopback proxy boundary and all startup failure cleanup paths are present.'
