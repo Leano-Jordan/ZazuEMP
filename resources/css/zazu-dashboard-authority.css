@@ -1250,7 +1250,7 @@ body.zazu-dashboard-page .zazu-dash-quick-actions .zazu-btn {
     border: 1px solid #D7E2EB !important;
     border-radius: 10px !important;
     background: var(--zazu-surface) !important;
-    color: #29445D !important;
+    color: #34536D !important;
     box-shadow: 0 1px 3px rgba(30, 59, 82, .035) !important;
     transition: background .16s ease, border-color .16s ease, transform .16s ease, box-shadow .16s ease;
 }
