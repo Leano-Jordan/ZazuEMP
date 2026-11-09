@@ -959,6 +959,46 @@ body.zazu-dashboard-page .zazu-dash-hero-side {
     box-shadow: 0 2px 9px rgba(0, 0, 0, .2) !important;
 }
 
+/* Explicit dashboard authority overrides: these selectors previously retained 2px blue frames. */
+body.zazu-dashboard-page .zazu-sidebar {
+    border-right: 1px solid var(--zazu-line-soft) !important;
+}
+body.zazu-dashboard-page .zazu-topbar {
+    border-bottom: 1px solid var(--zazu-line-soft) !important;
+}
+body.zazu-dashboard-page .zazu-dash-hero {
+    border: 1px solid var(--zazu-line-soft) !important;
+}
+body.zazu-dashboard-page .zazu-dash-hero-side {
+    border: 1px solid var(--zazu-line-soft) !important;
+}
+body.zazu-dashboard-page .zazu-dash-surface-head {
+    border-bottom: 1px solid var(--zazu-line-soft) !important;
+}
+.zazu-compact-editor-card .zazu-card-header {
+    border-bottom-width: 1px !important;
+}
+/* Functional totals remain clear, but their separators are not decorative bars. */
+.zazu-document-total-grand,
+.zazu-total-row,
+.zazu-quote-total-panel {
+    border-top-width: 1px !important;
+}
+/* Calendar and inspector accents use a slim status cue, not a thick side rail. */
+.zazu-calendar-holiday,
+.zazu-calendar-agenda-holiday,
+.zazu-inspector-note,
+.zazu-inspector-empty,
+.zazu-offline-origin-notice {
+    border-left-width: 1px !important;
+}
+.zazu-nav-flyout {
+    border-left-width: 1px !important;
+}
+.zazu-inspector-tabs button {
+    border-bottom-width: 1px;
+}
+
 /* Shell and dashboard seams: 1px separators only, never 2px blue frames. */
 .zazu-sidebar,
 .zazu-topbar {
