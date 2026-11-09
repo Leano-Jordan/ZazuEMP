@@ -28,11 +28,11 @@ This is the persistent failure-history register for the Failure Case / Loop-Brea
 | CASE-ZAZU-0011 | Calendar runtime lockout/reachability | Calendar remains owner-reported inaccessible despite source safeguards | BLOCKED | Runtime causality remains unproven; owner-authenticated evidence required | Owner runtime forensics |
 | CASE-ZAZU-0012 | PHPUnit 12-failure stale/brittle contract batch | Historical PHPUnit batch exposed stale/brittle source and selector contracts | CORRECTED | Repository corrections exist; synchronized verification pending | Current-head CI/PHPUnit evidence |
 | CASE-ZAZU-0013 | PHPUnit 269-pass/7-fail stale-checkout batch | Historical failures traced to stale checkout against current main | CORRECTED | Repository corrections exist; synchronized verification pending | Current-head CI/PHPUnit evidence |
-| CASE-ZAZU-0014 | Dark-theme browser token assertions | E2E had stale palette literals and sampled active navigation before its theme transition settled | CORRECTED | Surface/primary literals aligned; active-colour assertion now waits for settled dark state | Exact-head browser CI |
+| CASE-ZAZU-0014 | Dark-theme browser token assertions | E2E had stale palette literals and sampled active navigation before its theme transition settled | VERIFIED | Exact-head browser smoke passed on `153c4d01bef4b5c3bd01a1db770902b0c7649bb0` | Closed |
 
 ### CASE-ZAZU-0014
 
-**Status:** CORRECTED — exact-head browser verification pending.
+**Status:** VERIFIED — exact-head browser smoke passed.
 
 **Target/workflow:** Dark theme token regression in `e2e/ui-theme.spec.ts`.
 
@@ -52,11 +52,11 @@ This is the persistent failure-history register for the Failure Case / Loop-Brea
 **Corrections on `main`:**
 - `80bf602b4fdb2531997aed86e9f8278958307ebf` — dark surface assertion aligned to `#122235`.
 - `c675eaf61166ced4aaee3f6ce6e6b59c71a53553` — dark primary assertion aligned to `#78a9e8`.
-- Pending commit — wait for the document's dark-theme state and settled active-navigation background before sampling computed styles.
+- `153c4d01bef4b5c3bd01a1db770902b0c7649bb0` — waits for the document's dark-theme state and settled active-navigation background before sampling computed styles.
 
 **Rejected approach:** Do not change the product palette to satisfy stale test literals. The rendered application and canonical stylesheet are the authority; tests must follow them.
 
-**Closure evidence required:** The browser smoke suite must pass on the exact current `main` SHA, including light/dark computed tokens and responsive navigation. Until then, the correction is committed but not verified.
+**Closure evidence:** Browser smoke workflow `42694636938` passed on exact `main` SHA `153c4d01bef4b5c3bd01a1db770902b0c7649bb0`. The workflow completed successfully, including the browser regression suite and diagnostic upload. Dark-theme token and responsive navigation assertions are verified at this SHA.
 
 
 ## Active case detail
