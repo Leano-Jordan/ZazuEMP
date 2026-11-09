@@ -50,7 +50,7 @@ The launcher supports the documented standalone PHP location `C:\\PHP84\\php.exe
 
 **Certificate trust**
 - The launcher prints the path to Caddy's public `root.crt`.
-- On the host PC, run `caddy trust` once under the Windows account that runs Zazu. Approve any Windows trust prompt.
+- On the host PC, run `caddy trust --address 127.0.0.1:2019` once under the Windows account that runs Zazu. This matches the loopback-only Caddy admin endpoint; approve any Windows trust prompt.
 - Transfer **only** `root.crt` to each test phone/tablet (for example by USB). Never copy the CA private key or the rest of Caddy's private PKI directory.
 - On Android, use Settings → Security / Encryption & credentials → Install a certificate → CA certificate (labels vary by device), then select the public root certificate. Android may require a screen lock and will display a user-CA warning.
 - Reopen the printed HTTPS URL. A certificate warning means trust has not been completed; do not bypass it and call the device accepted.
