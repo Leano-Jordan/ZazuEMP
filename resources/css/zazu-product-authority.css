@@ -1230,3 +1230,42 @@ html[data-theme="dark"] body.zazu-dashboard-page .zazu-dash-surface-head {
     color: var(--zazu-ink) !important;
     border-bottom-color: var(--zazu-border) !important;
 }
+
+
+/* DIRECTOR — workspace identity and account metadata must contrast with the actual sidebar surface. */
+html:not([data-theme="dark"]) .zazu-sidebar .zazu-footer-workspace {
+    background: #E7EEF3 !important;
+    border: 1px solid #C8D4DE !important;
+    border-radius: 7px !important;
+    padding: 10px 12px !important;
+    color: #23394D !important;
+}
+html:not([data-theme="dark"]) .zazu-sidebar .zazu-footer-workspace-label,
+html:not([data-theme="dark"]) .zazu-sidebar .zazu-user-kicker {
+    color: #536B7F !important;
+}
+html:not([data-theme="dark"]) .zazu-sidebar .zazu-footer-workspace strong,
+html:not([data-theme="dark"]) .zazu-sidebar .zazu-footer-workspace > span:last-child,
+html:not([data-theme="dark"]) .zazu-sidebar .zazu-user-identity strong,
+html:not([data-theme="dark"]) .zazu-sidebar .zazu-user-identity span {
+    color: #23394D !important;
+}
+html[data-theme="dark"] .zazu-sidebar .zazu-footer-workspace {
+    background: #293945 !important;
+    border: 1px solid #405665 !important;
+    border-radius: 7px !important;
+    padding: 10px 12px !important;
+    color: #E5EBF0 !important;
+}
+html[data-theme="dark"] .zazu-sidebar .zazu-footer-workspace-label,
+html[data-theme="dark"] .zazu-sidebar .zazu-user-kicker {
+    color: #B8C7D2 !important;
+}
+html[data-theme="dark"] .zazu-sidebar .zazu-footer-workspace strong,
+html[data-theme="dark"] .zazu-sidebar .zazu-footer-workspace > span:last-child,
+html[data-theme="dark"] .zazu-sidebar .zazu-user-identity strong {
+    color: #E5EBF0 !important;
+}
+html[data-theme="dark"] .zazu-sidebar .zazu-user-identity span {
+    color: #B8C7D2 !important;
+}
