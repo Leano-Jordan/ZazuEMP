@@ -78,9 +78,6 @@ if (-not [string]::IsNullOrWhiteSpace($PhpPath)) {
     $startArguments.PhpPath = $PhpPath
 }
 & $startServer @startArguments
-if ($LASTEXITCODE -and $LASTEXITCODE -ne 0) {
-    throw 'The loopback Zazu application server did not start.'
-}
 
 $config = @"
 {
