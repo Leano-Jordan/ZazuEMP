@@ -216,7 +216,7 @@ The service worker now supports the implemented device-local continuity model. I
 
 The service worker is not the business-data authority. Business records and pending mutations remain in the local IndexedDB client store; synchronized server data remains business-scoped on the Laravel backend. The cache must never be treated as a substitute for local business state or as a cross-user or cross-business shared cache.
 
-Do not broaden authenticated caching beyond this user-scoped shell/navigation role merely to claim "offline support".
+Do not broaden authenticated caching beyond this user-and-business-scoped shell/navigation role merely to claim "offline support".
 
 ## 12. Evolution path
 
