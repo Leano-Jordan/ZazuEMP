@@ -149,8 +149,8 @@ class UiProportionFoundationTest extends TestCase
         $this->assertStringContainsString('border-radius: 4px;', $appCss);
         $this->assertStringContainsString('color: var(--zazu-sidebar-ink);', $appCss);
         $this->assertStringContainsString('background: var(--zazu-sidebar-hover);', $appCss);
-        $this->assertStringContainsString('background: #34536D !important;', $dashboardCss);
-        $this->assertStringContainsString('color: #FFFFFF !important;', $dashboardCss);
+        $this->assertStringContainsString('background: #B9CCD9 !important;', $dashboardCss);
+        $this->assertStringContainsString('color: #20374A !important;', $dashboardCss);
         $this->assertStringContainsString('border-radius: 4px !important;', $dashboardCss);
         $this->assertStringContainsString('outline: 2px solid #8CCDE4 !important;', $dashboardCss);
         $this->assertStringNotContainsString('background: #B9CAD9 !important;', $dashboardCss);
