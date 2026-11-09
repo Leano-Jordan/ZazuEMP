@@ -108,12 +108,21 @@ if (-not [string]::IsNullOrWhiteSpace($PhpPath)) {
     }
     $php = (Resolve-Path $PhpPath).Path
 } else {
+    $phpCandidates = @()
     $phpCommand = Get-Command php.exe -ErrorAction SilentlyContinue | Select-Object -First 1
-    if ($phpCommand) {
-        $php = $phpCommand.Source
-    } elseif (Test-Path 'C:\PHP84\php.exe' -PathType Leaf) {
+    if ($phpCommand) { $phpCandidates += $phpCommand.Source }
+    if (Test-Path 'C:\PHP84\php.exe' -PathType Leaf) {
         # Known standalone PHP location used by the documented owner-PC setup.
-        $php = 'C:\PHP84\php.exe'
+        $phpCandidates += 'C:\PHP84\php.exe'
+    }
+
+    foreach ($candidate in ($phpCandidates | Select-Object -Unique)) {
+        $candidateVersion = (& $candidate -r 'echo PHP_VERSION;' 2>$null | Out-String).Trim()
+        try { $candidateParsedVersion = [version]$candidateVersion } catch { continue }
+        if ($candidateParsedVersion -ge [version]'8.4') {
+            $php = $candidate
+            break
+        }
     }
 }
 if (-not $php) {
