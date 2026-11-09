@@ -2,6 +2,7 @@
 param(
     [string]$ProjectPath = (Resolve-Path (Join-Path $PSScriptRoot '..\\..')).Path,
     [string]$BindAddress = '127.0.0.1',
+    [string]$PhpPath,
     [switch]$Lan,
     [ValidateRange(1024, 65535)]
     [int]$Port = 8000,
@@ -100,11 +101,24 @@ if (-not (Test-Path $environment -PathType Leaf)) {
     throw "The .env file is missing. Complete the existing local setup before starting Zazu."
 }
 
-$phpCommand = Get-Command php.exe -ErrorAction SilentlyContinue | Select-Object -First 1
-if (-not $phpCommand) {
-    throw 'PHP 8.4+ was not found on PATH. No runtime was installed or changed.'
+$php = $null
+if (-not [string]::IsNullOrWhiteSpace($PhpPath)) {
+    if (-not (Test-Path $PhpPath -PathType Leaf)) {
+        throw "The requested PHP executable does not exist: $PhpPath"
+    }
+    $php = (Resolve-Path $PhpPath).Path
+} else {
+    $phpCommand = Get-Command php.exe -ErrorAction SilentlyContinue | Select-Object -First 1
+    if ($phpCommand) {
+        $php = $phpCommand.Source
+    } elseif (Test-Path 'C:\PHP84\php.exe' -PathType Leaf) {
+        # Known standalone PHP location used by the documented owner-PC setup.
+        $php = 'C:\PHP84\php.exe'
+    }
 }
-$php = $phpCommand.Source
+if (-not $php) {
+    throw 'PHP 8.4+ was not found on PATH or at the documented C:\PHP84\php.exe location. Supply -PhpPath if installed elsewhere.'
+}
 $phpVersion = (& $php -r 'echo PHP_VERSION;' 2>$null | Out-String).Trim()
 try { $parsedVersion = [version]$phpVersion } catch { throw "Could not read PHP version from $php." }
 if ($parsedVersion -lt [version]'8.4') {
