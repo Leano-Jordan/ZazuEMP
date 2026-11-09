@@ -854,19 +854,26 @@ body.zazu-dashboard-page .zazu-dash-hero-side {
 }
 
 
-/* Sidebar inset cards must stay dark and readable against the shared navy rail. */
+/* Sidebar footer identity remains readable on the deep navy rail. */
 .zazu-sidebar-workspace,
 .zazu-footer-card {
     border: 1px solid rgba(220, 231, 245, .13) !important;
     background: #1A3658 !important;
     box-shadow: none !important;
 }
-.zazu-sidebar-workspace-label {
+.zazu-sidebar-workspace-label,
+.zazu-footer-workspace-label,
+.zazu-user-kicker {
     color: #A4B5C8 !important;
 }
-.zazu-sidebar-workspace-name {
+.zazu-sidebar-workspace-name,
+.zazu-footer-workspace strong {
     color: #F1F5F9 !important;
 }
-.zazu-sidebar-workspace-meta {
+.zazu-sidebar-workspace-meta,
+.zazu-footer-workspace > span:last-child {
     color: #AFC1D6 !important;
+}
+.zazu-footer-workspace {
+    border-bottom-color: rgba(220, 231, 245, .13) !important;
 }
