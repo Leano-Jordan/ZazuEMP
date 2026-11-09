@@ -24,6 +24,6 @@ class OfflineAssetCachePolicyTest extends TestCase
         $this->assertStringNotContainsString("['style', 'script', 'font', 'image'].includes(request.destination)", $source);
         $this->assertStringNotContainsString("path.startsWith('/media/')", $source);
         $this->assertStringNotContainsString("return cachedPage || caches.match(OFFLINE_SHELL);", $source);
-        $this->assertStringContainsString("async function clearActiveUser()", $source);
+        $this->assertStringContainsString("async function clearActiveContext()", $source);
     }
 }
