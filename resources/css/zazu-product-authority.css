@@ -372,3 +372,185 @@
         margin-bottom: 12px;
     }
 }
+
+
+/* --------------------------------------------------------------------------
+   DIRECTOR — application-wide palette authority
+   The dashboard's current slate / white / confident-blue language is the
+   reference palette for every authenticated module. Keep semantic status
+   colours distinct; neutralise the old cyan canvas and pale-blue sidebar.
+   -------------------------------------------------------------------------- */
+:root {
+    color-scheme: light;
+    --zazu-page: #F3F6FA;
+    --zazu-page-deep: #EAF0F7;
+    --zazu-sidebar: #102541;
+    --zazu-sidebar-ink: #DCE7F5;
+    --zazu-sidebar-muted: #AFC1D6;
+    --zazu-sidebar-label: #8FA8C4;
+    --zazu-sidebar-hover: #1B385B;
+    --zazu-sidebar-active: #1769E8;
+    --zazu-sidebar-surface: #1A3658;
+
+    --zazu-surface: #FFFFFF;
+    --zazu-surface-2: #F7F9FC;
+    --zazu-surface-3: #EEF3F8;
+    --zazu-field: #FFFFFF;
+
+    --zazu-ink: #14243B;
+    --zazu-ink-2: #33465F;
+    --zazu-muted: #64748B;
+    --zazu-faint: #8291A5;
+    --zazu-nav-label: #8FA8C4;
+
+    --zazu-border: #DCE4EE;
+    --zazu-border-strong: #C5D1E0;
+
+    --zazu-primary: #1769E8;
+    --zazu-primary-light: #4B8AF0;
+    --zazu-primary-pale: #DCE9FF;
+    --zazu-primary-shadow: #EAF2FE;
+    --zazu-primary-deep: #1558C0;
+    --zazu-primary-hover: #1256C4;
+    --zazu-primary-soft: #EAF2FE;
+    --zazu-primary-ink: #FFFFFF;
+
+    --zazu-link: #1558C0;
+    --zazu-link-hover: #10479F;
+    --zazu-nav-active: #4B8AF0;
+
+    --zazu-focus: #1769E8;
+    --zazu-info: #1769E8;
+    --zazu-info-ink: #1558C0;
+    --zazu-info-soft: #EAF2FE;
+
+    --zazu-shadow: 0 8px 24px rgba(20, 36, 59, .055);
+    --zazu-shadow-strong: 0 18px 42px rgba(20, 36, 59, .11);
+    --zazu-border-subtle: #E7ECF3;
+
+    --zazu-surface-canvas: #F3F6FA;
+    --zazu-surface-card: #FFFFFF;
+    --zazu-surface-border: #DCE4EE;
+    --zazu-text-main: #14243B;
+    --zazu-text-muted: #64748B;
+
+    --zazu-blue-primary: #1769E8;
+    --zazu-blue-accent: #4B8AF0;
+    --zazu-blue-hover: #1256C4;
+    --zazu-blue-light: #AFCBFF;
+    --zazu-blue-soft: #EAF2FE;
+    --zazu-blue-subtle: #DCE9FF;
+    --zazu-blue-canvas: #F3F6FA;
+    --zazu-blue-brand: #1769E8;
+    --zazu-blue-vivid: #4B8AF0;
+    --zazu-blue-glow: #DCE9FF;
+
+    --zazu-canvas-bg: #F3F6FA;
+    --zazu-card-bg: #FFFFFF;
+    --zazu-card-border: #DCE4EE;
+    --zazu-card-shadow: 0 8px 24px rgba(20, 36, 59, .055);
+    --zazu-text-ink: #14243B;
+    --zazu-text-body: #52647B;
+    --zazu-card-shadow-hover: 0 12px 30px rgba(20, 36, 59, .09);
+    --zazu-ui-focus: 0 0 0 3px rgba(23, 105, 232, .16);
+}
+
+:root[data-theme="dark"] {
+    color-scheme: dark;
+    --zazu-page: #0D1726;
+    --zazu-page-deep: #101E31;
+    --zazu-sidebar: #091525;
+    --zazu-sidebar-ink: #E5EDF8;
+    --zazu-sidebar-muted: #A9B9CD;
+    --zazu-sidebar-label: #8298B4;
+    --zazu-sidebar-hover: #182A43;
+    --zazu-sidebar-active: #4B8AF0;
+    --zazu-sidebar-surface: #1A2E49;
+
+    --zazu-surface: #17263A;
+    --zazu-surface-2: #1C2D43;
+    --zazu-surface-3: #243850;
+    --zazu-field: #122137;
+
+    --zazu-ink: #E8EFF8;
+    --zazu-ink-2: #D1DCEB;
+    --zazu-muted: #A9B9CD;
+    --zazu-faint: #8298B4;
+    --zazu-nav-label: #A9B9CD;
+
+    --zazu-border: #30445E;
+    --zazu-border-strong: #435B78;
+
+    --zazu-primary: #79A9FF;
+    --zazu-primary-light: #A2C2FF;
+    --zazu-primary-pale: #C4D9FF;
+    --zazu-primary-shadow: #203A5D;
+    --zazu-primary-deep: #C4D9FF;
+    --zazu-primary-hover: #A2C2FF;
+    --zazu-primary-soft: #203A5D;
+    --zazu-primary-ink: #0D1726;
+
+    --zazu-link: #A2C2FF;
+    --zazu-link-hover: #C4D9FF;
+    --zazu-nav-active: #79A9FF;
+
+    --zazu-focus: #A2C2FF;
+    --zazu-info: #79A9FF;
+    --zazu-info-ink: #C4D9FF;
+    --zazu-info-soft: #203A5D;
+
+    --zazu-shadow: 0 8px 24px rgba(0, 0, 0, .22);
+    --zazu-shadow-strong: 0 18px 42px rgba(0, 0, 0, .34);
+    --zazu-border-subtle: #263A52;
+
+    --zazu-surface-canvas: #0D1726;
+    --zazu-surface-card: #17263A;
+    --zazu-surface-border: #30445E;
+    --zazu-text-main: #E8EFF8;
+    --zazu-text-muted: #A9B9CD;
+
+    --zazu-blue-primary: #79A9FF;
+    --zazu-blue-accent: #A2C2FF;
+    --zazu-blue-hover: #C4D9FF;
+    --zazu-blue-light: #C4D9FF;
+    --zazu-blue-soft: #203A5D;
+    --zazu-blue-subtle: #243850;
+    --zazu-blue-canvas: #0D1726;
+    --zazu-blue-brand: #79A9FF;
+    --zazu-blue-vivid: #A2C2FF;
+    --zazu-blue-glow: #C4D9FF;
+
+    --zazu-canvas-bg: #0D1726;
+    --zazu-card-bg: #17263A;
+    --zazu-card-border: #30445E;
+    --zazu-card-shadow: 0 8px 24px rgba(0, 0, 0, .22);
+    --zazu-text-ink: #E8EFF8;
+    --zazu-text-body: #C1CDDC;
+    --zazu-card-shadow-hover: 0 12px 30px rgba(0, 0, 0, .3);
+    --zazu-ui-focus: 0 0 0 3px rgba(121, 169, 255, .2);
+}
+
+/* Sidebar interaction contrast is intentionally high in both themes. */
+.zazu-nav-link,
+.zazu-nav-area-trigger,
+.zazu-user-trigger {
+    color: var(--zazu-sidebar-ink);
+}
+.zazu-nav-link:hover,
+.zazu-nav-link:focus-visible,
+.zazu-nav-area-trigger:hover,
+.zazu-nav-area-trigger:focus-visible {
+    color: #FFFFFF !important;
+    background: var(--zazu-sidebar-hover) !important;
+}
+.zazu-nav-link.active {
+    color: #FFFFFF !important;
+    background: color-mix(in srgb, var(--zazu-sidebar-active) 24%, var(--zazu-sidebar)) !important;
+    border-color: color-mix(in srgb, var(--zazu-sidebar-active) 42%, transparent) !important;
+}
+:root[data-theme="dark"] .zazu-nav-link:hover,
+:root[data-theme="dark"] .zazu-nav-link:focus-visible,
+:root[data-theme="dark"] .zazu-nav-area-trigger:hover,
+:root[data-theme="dark"] .zazu-nav-area-trigger:focus-visible {
+    color: #FFFFFF !important;
+}
