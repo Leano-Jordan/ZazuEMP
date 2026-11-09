@@ -33,22 +33,36 @@ For access from a phone/tablet on the same trusted Wi-Fi network:
 
 This is HTTP development access. It is sufficient for same-network page/workflow testing, but a phone browser does not treat an arbitrary HTTP LAN IP as a secure context. Service-worker installation and full PWA offline acceptance therefore remain blocked until a trusted HTTPS origin is configured for the LAN. Do not interpret LAN reachability as proof of offline PWA behaviour.
 
-### Next step: private LAN HTTPS (selected design; not yet implemented)
+### 1B. Private LAN HTTPS (implemented in repository; physical trust still open)
 
-The next local acceptance origin will use **Caddy as a TLS reverse proxy with its internal CA**:
+The local acceptance origin now uses **Caddy as a TLS reverse proxy with its internal CA**.
 
-- Laravel's development server stays on loopback only: `127.0.0.1:8000`.
-- Caddy listens only on the active Private Wi-Fi IPv4 address, on a dedicated HTTPS port (planned: `8443`), and proxies to Laravel over loopback.
-- Caddy issues a certificate for the LAN IP using its internal CA. Caddy documents local HTTPS for IP addresses and local/internal hostnames; its root CA is stored in its persistent data directory and must remain available.
-- The PC trusts the local CA through Caddy's trust installation. The phone/tablet must separately receive and explicitly trust **only the public root certificate** (`root.crt`), never the CA private key.
-- Laravel must trust only the local reverse-proxy address (`127.0.0.1` / `::1`) for forwarded HTTPS headers. Do not use trust-all proxy configuration.
-- The HTTPS origin and generated asset/session URLs must consistently use the HTTPS LAN address. This needs a regression test before physical acceptance.
+**Host setup**
+1. Install the official Caddy Windows executable and make `caddy.exe` available on PATH. The launcher does not download binaries or alter PATH.
+2. Start `Start-Zazu-LAN-HTTPS.cmd` on the host PC.
+3. The launcher requires an active Wi-Fi network classified as **Private**. It starts Laravel on loopback (`127.0.0.1:8000`) and binds Caddy only to that Wi-Fi IPv4 address on HTTPS port `8443`.
+4. Open the printed HTTPS URL on the phone/tablet while both devices are on the same trusted Wi-Fi network.
+5. If blocked, allow inbound TCP `8443` on the Windows **Private** firewall profile only. Do not open port 8000 to the LAN.
+6. Stop the proxy and application with `Stop-Zazu-LAN-HTTPS.cmd`.
 
-This design requires no public domain, paid hosting, Tailscale account, public DNS, router port forwarding or public internet exposure. It does require a one-time local Caddy executable and an explicit certificate-trust step on each test device.
+The launcher supports the documented standalone PHP location `C:\\PHP84\\php.exe` when PHP is not on PATH. It does not change firewall, router, DNS, Windows network classification or certificate trust settings.
+
+**Certificate trust**
+- The launcher prints the path to Caddy's public `root.crt`.
+- On the host PC, run `caddy trust` once under the Windows account that runs Zazu. Approve any Windows trust prompt.
+- Transfer **only** `root.crt` to each test phone/tablet (for example by USB). Never copy the CA private key or the rest of Caddy's private PKI directory.
+- On Android, use Settings → Security / Encryption & credentials → Install a certificate → CA certificate (labels vary by device), then select the public root certificate. Android may require a screen lock and will display a user-CA warning.
+- Reopen the printed HTTPS URL. A certificate warning means trust has not been completed; do not bypass it and call the device accepted.
+
+**Security boundary**
+- Caddy listens only on the selected private Wi-Fi IPv4 address; Laravel remains loopback-only.
+- Laravel trusts forwarded HTTPS/host headers only from `127.0.0.1` and `::1`. Regression tests cover trusted proxy HTTPS and spoofing attempts from an untrusted LAN client.
+- Caddy's admin endpoint is loopback-only. No router port forwarding, public DNS, public server or Tailscale is required.
+- Do not use this on public/guest Wi-Fi or expose ports 8000/8443 to the internet. Wi-Fi client isolation can still block phone-to-PC access.
 
 **Origin migration warning:** HTTP and HTTPS are different browser storage origins. Before moving a phone to the HTTPS URL, reconcile pending mutations and attachments on the existing HTTP origin. Keep the old origin available until queues are empty and verified. Do not clear IndexedDB as a migration shortcut.
 
-**Implementation status:** design selected; launcher, proxy configuration, Laravel proxy trust and phone CA installation have not yet been implemented or physically verified.
+**Implementation status:** launcher, reverse-proxy configuration, loopback binding, trusted-proxy restriction and regression tests are committed. Caddy installation, firewall reachability, root-CA installation on the actual phone/tablet, and physical PWA/offline acceptance remain unverified.
 
 ## 2. Future production outcome
 
