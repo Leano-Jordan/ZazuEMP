@@ -294,7 +294,7 @@ The phone-local foundation is now implemented beyond static PWA caching:
 - Unsupported mutation types remain pending rather than being guessed into domain state.
 - Local dirty state prevents a bootstrap refresh from overwriting unsynchronised phone changes.
 
-The phone workspace is a **broad offline operational foundation**. Explicit conflict-resolution UX is implemented, with retry/discard behavior and browser regression coverage. The attachment API and a standalone `/offline-attachments.js` asset exist, but the current authenticated Laravel layout does not load that asset and the asset depends on legacy globals that are not provided by the active app shell. Therefore offline attachment queuing, upload and download are **not available in the current installed app**; treat them as NOT IMPLEMENTED until a supported UI is integrated and tested. Online job attachments remain available through the Work screen. The phone workspace is **not yet a complete disconnected replacement for the full web application**; full incremental bidirectional synchronization, attachment parity, broader capability parity and final realistic offline/recovery proof remain open.
+The phone workspace is a **bounded offline operational foundation**, not a complete disconnected replacement for the full web application. Explicit conflict-resolution UX is implemented, with retry/discard behavior and browser regression coverage. **Work attachment offline support is now integrated into the active authenticated app**: `resources/js/app.js` binds the attachment flow to the Work form in `resources/views/work/attachments.blade.php`, and the active `ZazuOffline` client stores selected files in business-scoped IndexedDB, shows pending/local files, caches private downloads and uploads queued files on reconnect using the existing idempotency key. This applies to an already persisted Work record with a server event ID. The client also reconciles queued records carrying `event_local_id` after a locally created Work record receives its server identity, but a complete rendered offline-create-Work → attach-file journey remains unverified. Automated Laravel/source-contract and Playwright coverage exists; installed-device force-close/reopen, durable file persistence, offline opening and real reconnect/conflict recovery remain subject to physical acceptance. Full workflow parity across every Laravel screen is not claimed.
 
 
 ## Director hardening update — 2026-10-06
@@ -310,16 +310,11 @@ The offline phone queue now reconciles server receipts deterministically:
 This preserves the rule that offline capability must expose only workflows that have a safe synchronization contract.
 
 
-## 2026-11-01 attachment integration audit — status correction
+## 2026-11-01 attachment integration audit — historical finding, superseded
 
-The earlier 2026-10-07 attachment transfer notes described a standalone client layer and API foundation, not a verified feature in the current authenticated Laravel application. A current-main source audit found:
+The audit correctly identified that the legacy standalone `public/offline-attachments.js` script was not integrated into the authenticated application. That finding described the source state on 2026-11-01 only; it is not the current implementation status. The active integration was subsequently implemented in `resources/js/app.js` and `resources/views/work/attachments.blade.php`, using the business-scoped `ZazuOffline` client in `public/zazu-offline.js`. The legacy standalone script remains unused and must not be loaded directly.
 
-- `resources/views/components/app-layout.blade.php` loads `/zazu-offline.js` but does not load `/offline-attachments.js`.
-- Repository-wide search finds no active view or runtime entrypoint for `offline-attachments.js`; its only references are the service-worker cache policy, tests and documentation.
-- The standalone file expects legacy globals and DOM structure (`data`, `syncFetch`, `render`, `#content`, `.hero-actions`) that the current app layout does not provide.
-- The active Work view has a server-backed `work.attachments` panel, but that does not implement phone-local offline file queueing or reconciliation.
-
-**Disposition:** online job attachments are implemented; offline attachment synchronization is **NOT IMPLEMENTED in the active app**. Do not load the orphaned script directly into the Laravel layout. Its interface and storage model must first be adapted to the current business-scoped `ZazuOffline` workspace, then exposed through a supported Work attachment flow with retry, download, logout, business-isolation and origin-migration coverage.
+**Current disposition (reconciled 2026-11-10):** offline Work attachment queueing, local-file retrieval, reconnect upload and private download caching are implemented in the active app and have dedicated Laravel/source-contract and Playwright coverage. Physical installed-device acceptance remains open. The full offline-created Work → attachment UI journey is not yet proven; do not claim that every new offline-created Work record can be opened and attached to before it receives a server identity.
 
 ## 2026-10-07 attachment sync historical implementation notes (not active integration)
 
