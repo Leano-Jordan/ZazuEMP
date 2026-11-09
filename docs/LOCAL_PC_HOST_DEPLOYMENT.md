@@ -18,6 +18,7 @@ Current observed development runtime:
 - AMPPS is installed but is not used to run Zazu. Its bundled PHP 7.4.33 does not satisfy the application's PHP `^8.4` requirement.
 - `Start-Zazu-Dev.cmd` starts loopback-only development mode independently of VS Code.
 - `Start-Zazu-LAN.cmd` selects the active Wi-Fi interface only when Windows classifies that network as Private, then binds the server to that interface's IPv4 address.
+- `Start-Zazu-LAN-HTTPS.cmd` keeps Laravel on loopback and uses Caddy with a local CA to expose a trusted HTTPS origin on the selected Private Wi-Fi IPv4 address; see section 1B.
 
 The LAN launcher does not change Windows Firewall, router settings or network classification. If Windows Firewall blocks inbound TCP 8000, allow it only on the Private profile. Do not expose the development server on public/guest Wi-Fi, enable router port forwarding, or publish port 8000 to the internet. Use the same non-guest Wi-Fi network on the phone/tablet; client isolation can prevent device-to-device access.
 
