@@ -58,7 +58,7 @@
                 $guestRequirement = $event->requirements->first(fn ($requirement) => in_array(strtolower((string) $requirement->unit), ['guest', 'guests'], true));
                 $formatMoney = static fn (string $amount): string => \App\Support\Money::formatCents(\App\Support\Money::toCents($amount));
             @endphp
-            <article class="zazu-ops-row" data-zazu-job-row>
+            <article class="zazu-ops-row" data-zazu-job-row data-zazu-server-job-id="{{ $event->id }}">
                 <button type="button" class="zazu-ops-row-main" data-zazu-inspector-open aria-label="Inspect {{ $event->name }}">
                     <span class="zazu-ops-ref">
                         <span class="zazu-ops-ref-label">Reference</span>
