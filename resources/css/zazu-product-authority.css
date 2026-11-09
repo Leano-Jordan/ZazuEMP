@@ -745,3 +745,95 @@ body:not(.zazu-dashboard-page) .zazu-nav-link.active {
     color: #FFFFFF !important;
     background: var(--zazu-sidebar-active) !important;
 }
+
+
+/* DIRECTOR refinement: remove the outlined-template look across all modules.
+   Surfaces separate through tone and restrained depth, not pale frames or
+   thick brand-colour strokes. Keep a clear keyboard focus indicator. */
+:root {
+    --zazu-border: #B9C6D2;
+    --zazu-border-strong: #9EAFBE;
+    --zazu-border-subtle: #D0D9E2;
+    --zazu-surface-border: #B9C6D2;
+}
+:root[data-theme="dark"] {
+    --zazu-border: #354B60;
+    --zazu-border-strong: #49647D;
+    --zazu-border-subtle: #2B4055;
+    --zazu-surface-border: #354B60;
+}
+
+/* Undo oversized shell dividers introduced by earlier theme overrides. */
+body:not(.zazu-dashboard-page) .zazu-sidebar {
+    border-right: 1px solid var(--zazu-border) !important;
+}
+body:not(.zazu-dashboard-page) .zazu-topbar {
+    border-bottom: 1px solid var(--zazu-border) !important;
+}
+
+/* Card and section containers: no bright outline; use a soft surface edge. */
+body:not(.zazu-dashboard-page) .zazu-card,
+body:not(.zazu-dashboard-page) .zazu-panel,
+body:not(.zazu-dashboard-page) .zazu-command-band,
+body:not(.zazu-dashboard-page) .zazu-ops-hero,
+body:not(.zazu-dashboard-page) .zazu-work-hero,
+body:not(.zazu-dashboard-page) .zazu-filter-card,
+body:not(.zazu-dashboard-page) .zazu-metric-card,
+body:not(.zazu-dashboard-page) .zazu-form-section,
+body:not(.zazu-dashboard-page) .zazu-table-wrap {
+    border: 1px solid var(--zazu-border) !important;
+    box-shadow: 0 2px 7px rgba(28, 49, 68, .055) !important;
+}
+:root[data-theme="dark"] body:not(.zazu-dashboard-page) .zazu-card,
+:root[data-theme="dark"] body:not(.zazu-dashboard-page) .zazu-panel,
+:root[data-theme="dark"] body:not(.zazu-dashboard-page) .zazu-command-band,
+:root[data-theme="dark"] body:not(.zazu-dashboard-page) .zazu-ops-hero,
+:root[data-theme="dark"] body:not(.zazu-dashboard-page) .zazu-work-hero,
+:root[data-theme="dark"] body:not(.zazu-dashboard-page) .zazu-filter-card,
+:root[data-theme="dark"] body:not(.zazu-dashboard-page) .zazu-metric-card,
+:root[data-theme="dark"] body:not(.zazu-dashboard-page) .zazu-form-section,
+:root[data-theme="dark"] body:not(.zazu-dashboard-page) .zazu-table-wrap {
+    box-shadow: 0 2px 8px rgba(0, 0, 0, .16) !important;
+}
+
+/* Controls should not look like every element is in a blue picture frame. */
+body:not(.zazu-dashboard-page) input:not([type="checkbox"]):not([type="radio"]),
+body:not(.zazu-dashboard-page) select,
+body:not(.zazu-dashboard-page) textarea,
+body:not(.zazu-dashboard-page) .form-control,
+body:not(.zazu-dashboard-page) .form-select {
+    border: 1px solid var(--zazu-border-strong) !important;
+    box-shadow: none !important;
+}
+body:not(.zazu-dashboard-page) input:focus,
+body:not(.zazu-dashboard-page) select:focus,
+body:not(.zazu-dashboard-page) textarea:focus,
+body:not(.zazu-dashboard-page) .form-control:focus,
+body:not(.zazu-dashboard-page) .form-select:focus {
+    border-color: var(--zazu-primary) !important;
+    outline: 0 !important;
+    box-shadow: 0 0 0 2px color-mix(in srgb, var(--zazu-primary) 18%, transparent) !important;
+}
+
+/* Strip heavy blue strokes from generic action, selected and hover states. */
+body:not(.zazu-dashboard-page) .zazu-btn,
+body:not(.zazu-dashboard-page) .btn,
+body:not(.zazu-dashboard-page) .zazu-action,
+body:not(.zazu-dashboard-page) .zazu-tab,
+body:not(.zazu-dashboard-page) .nav-link {
+    outline: 0;
+}
+body:not(.zazu-dashboard-page) .zazu-btn-secondary,
+body:not(.zazu-dashboard-page) .btn-outline-primary,
+body:not(.zazu-dashboard-page) .zazu-action {
+    border-color: var(--zazu-border-strong) !important;
+}
+body:not(.zazu-dashboard-page) .zazu-btn-primary,
+body:not(.zazu-dashboard-page) .btn-primary {
+    border: 1px solid var(--zazu-primary) !important;
+    box-shadow: 0 2px 5px rgba(35, 70, 100, .12) !important;
+}
+body:not(.zazu-dashboard-page) :focus-visible {
+    outline: 2px solid color-mix(in srgb, var(--zazu-primary) 72%, white) !important;
+    outline-offset: 2px;
+}
