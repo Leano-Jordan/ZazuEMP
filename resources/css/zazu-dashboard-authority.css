@@ -1717,3 +1717,94 @@ html[data-theme="dark"] body.zazu-dashboard-page .zazu-dash-grid[aria-label="Ope
         padding-left: 10px !important;
     }
 }
+
+
+/* Owner visual correction — stronger surface separation, borderless quick actions.
+   The workspace must read as composed panels, not floating content. */
+body.zazu-dashboard-page {
+    --dash-border: #BCCAD7;
+}
+
+body.zazu-dashboard-page .zazu-dash-hero,
+body.zazu-dashboard-page .zazu-dash-overview .zazu-dash-metric,
+body.zazu-dashboard-page .zazu-dash-grid[aria-label="Operational dashboard panels"] > .zazu-dash-surface {
+    border: 1px solid #B8C7D5 !important;
+    box-shadow: 0 2px 7px rgba(24, 48, 70, .07) !important;
+}
+
+body.zazu-dashboard-page .zazu-dash-surface-head {
+    border-bottom: 1px solid #B8C7D5 !important;
+    background: #EAF0F5 !important;
+}
+
+body.zazu-dashboard-page .zazu-dash-event,
+body.zazu-dashboard-page .zazu-dash-focus-item,
+body.zazu-dashboard-page .zazu-dash-resource-grid > *,
+body.zazu-dashboard-page .zazu-dash-quote-stage {
+    border: 1px solid #C3CFDA !important;
+    background: #F8FAFC !important;
+}
+
+body.zazu-dashboard-page .zazu-dash-quick-actions .zazu-btn,
+body.zazu-dashboard-page .zazu-dash-overview .zazu-dash-quick-actions .zazu-btn {
+    border: 0 !important;
+    outline: 0 !important;
+    box-shadow: none !important;
+    background: #E7EDF3 !important;
+    color: #203A52 !important;
+}
+
+body.zazu-dashboard-page .zazu-dash-quick-actions .zazu-btn-cta,
+body.zazu-dashboard-page .zazu-dash-overview .zazu-dash-quick-actions .zazu-btn-cta {
+    border: 0 !important;
+    background: #1769B2 !important;
+    color: #FFFFFF !important;
+    box-shadow: 0 2px 5px rgba(23, 70, 112, .16) !important;
+}
+
+body.zazu-dashboard-page .zazu-dash-quick-actions .zazu-btn:not(.zazu-btn-cta):hover {
+    background: #DCE6EF !important;
+    box-shadow: none !important;
+}
+
+body.zazu-dashboard-page .zazu-dash-quick-actions .zazu-btn-cta:hover {
+    background: #12558F !important;
+    box-shadow: 0 3px 8px rgba(23, 70, 112, .2) !important;
+}
+
+body.zazu-dashboard-page .zazu-dash-quick-actions .zazu-btn:focus-visible {
+    outline: 2px solid #163F67 !important;
+    outline-offset: 3px !important;
+}
+
+html[data-theme="dark"] body.zazu-dashboard-page .zazu-dash-hero,
+html[data-theme="dark"] body.zazu-dashboard-page .zazu-dash-overview .zazu-dash-metric,
+html[data-theme="dark"] body.zazu-dashboard-page .zazu-dash-grid[aria-label="Operational dashboard panels"] > .zazu-dash-surface {
+    border-color: #40566B !important;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, .2) !important;
+}
+
+html[data-theme="dark"] body.zazu-dashboard-page .zazu-dash-surface-head {
+    border-bottom-color: #40566B !important;
+    background: #1D344A !important;
+}
+
+html[data-theme="dark"] body.zazu-dashboard-page .zazu-dash-event,
+html[data-theme="dark"] body.zazu-dashboard-page .zazu-dash-focus-item,
+html[data-theme="dark"] body.zazu-dashboard-page .zazu-dash-resource-grid > *,
+html[data-theme="dark"] body.zazu-dashboard-page .zazu-dash-quote-stage {
+    border-color: #40566B !important;
+    background: #172B40 !important;
+}
+
+html[data-theme="dark"] body.zazu-dashboard-page .zazu-dash-quick-actions .zazu-btn:not(.zazu-btn-cta) {
+    border: 0 !important;
+    background: #263D53 !important;
+    color: #E5EEF7 !important;
+}
+
+html[data-theme="dark"] body.zazu-dashboard-page .zazu-dash-quick-actions .zazu-btn-cta {
+    border: 0 !important;
+    background: #1769B2 !important;
+    color: #FFFFFF !important;
+}
