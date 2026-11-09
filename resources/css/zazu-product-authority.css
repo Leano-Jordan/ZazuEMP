@@ -1084,3 +1084,43 @@ textarea:focus,
 .zazu-quote-review-action {
     background: var(--zazu-warning-soft) !important;
 }
+
+
+/* Command headers must not carry the legacy dark-blue banner treatment.
+   They are the same light surface language as the rest of the workspace. */
+.zazu-command-band {
+    background: var(--zazu-surface) !important;
+    background-image: none !important;
+    color: var(--zazu-ink) !important;
+    border-color: var(--zazu-border) !important;
+}
+.zazu-command-band .zazu-eyebrow,
+.zazu-command-band .zazu-command-meta-label {
+    color: var(--zazu-muted) !important;
+}
+.zazu-command-band .zazu-command-title {
+    color: var(--zazu-ink) !important;
+}
+.zazu-command-band .zazu-command-copy,
+.zazu-command-band .zazu-command-meta-value {
+    color: var(--zazu-muted) !important;
+}
+:root[data-theme="dark"] .zazu-command-band {
+    background: var(--zazu-surface) !important;
+    background-image: none !important;
+}
+
+/* Remove decorative 3px blue rails from selected and calendar elements. */
+.zazu-customer-directory .zazu-list-item:hover {
+    box-shadow: none !important;
+    background: var(--zazu-surface-2) !important;
+}
+.zazu-niche-card.is-selected {
+    box-shadow: none !important;
+    border-color: var(--zazu-primary) !important;
+}
+.zazu-calendar-holiday,
+.zazu-calendar-agenda-holiday {
+    border-left-width: 1px !important;
+    border-left-color: var(--zazu-border-strong) !important;
+}
