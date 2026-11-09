@@ -1831,3 +1831,37 @@ body.zazu-dashboard-page .zazu-sidebar .zazu-nav-link:hover,body.zazu-dashboard-
 body.zazu-dashboard-page .zazu-sidebar .zazu-nav-link.active,body.zazu-dashboard-page .zazu-sidebar .zazu-nav-area.is-active>.zazu-nav-area-trigger{background:#AFC5D4!important;color:#20374A!important;box-shadow:inset 3px 0 0 #426987!important;}
 body.zazu-dashboard-page .zazu-sidebar .zazu-nav-flyout{background:#E3EBF0!important;border-color:#A7BAC8!important;}
 body.zazu-dashboard-page .zazu-sidebar .zazu-nav-flyout .zazu-nav-link{color:#23394D!important;}
+
+
+/* Neutral dashboard title bars; category colour belongs to the cards beneath. */
+body.zazu-dashboard-page .zazu-dash-surface-head {
+    background: #E8EEF3 !important;
+    color: #14243B !important;
+    border-bottom: 1px solid #C6D0D9 !important;
+}
+body.zazu-dashboard-page .zazu-dash-surface-head * { color: #14243B !important; }
+body.zazu-dashboard-page .zazu-sidebar .zazu-nav-link.active,
+body.zazu-dashboard-page .zazu-sidebar .zazu-nav-area.is-active > .zazu-nav-area-trigger {
+    background: #B4C8D7 !important;
+    color: #23394D !important;
+    box-shadow: inset 3px 0 0 #426987 !important;
+}
+html[data-theme="dark"] body.zazu-dashboard-page .zazu-dash-surface-head {
+    background: #263744 !important;
+    color: #E5EBF0 !important;
+    border-bottom-color: #496174 !important;
+}
+html[data-theme="dark"] body.zazu-dashboard-page .zazu-dash-surface-head * { color: #E5EBF0 !important; }
+html[data-theme="dark"] body.zazu-dashboard-page .zazu-sidebar .zazu-nav-link.active,
+html[data-theme="dark"] body.zazu-dashboard-page .zazu-sidebar .zazu-nav-area.is-active > .zazu-nav-area-trigger {
+    background: #486174 !important;
+    color: #F3F6F8 !important;
+    box-shadow: inset 3px 0 0 #83BCD4 !important;
+}
+html[data-theme="dark"] body.zazu-dashboard-page .zazu-sidebar .zazu-nav-link:hover,
+html[data-theme="dark"] body.zazu-dashboard-page .zazu-sidebar .zazu-nav-area-trigger:hover,
+html[data-theme="dark"] body.zazu-dashboard-page .zazu-sidebar .zazu-nav-link:focus-visible,
+html[data-theme="dark"] body.zazu-dashboard-page .zazu-sidebar .zazu-nav-area-trigger:focus-visible {
+    background: #344653 !important;
+    color: #E5EBF0 !important;
+}
