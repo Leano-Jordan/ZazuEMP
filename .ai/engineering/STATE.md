@@ -1157,3 +1157,16 @@ Latest source change: commit `29a38f55d3d3ff5979cf844ddbd624a9ea279515` consolid
 - Added `UiProportionFoundationTest::test_navigation_uses_compact_geometry_and_explicit_first_paint_contrast` to guard the intended contrast, radius, focus state and removal of the obsolete pale-blue/white-text declarations.
 - Commits on `main`: `b623d33` (shared navigation), `d404b24` (dashboard navigation and obsolete rule removal), `7379a8b` (regression coverage).
 - Source changes are committed and re-fetch verification is pending. Runtime PHPUnit, Vite build and rendered first-load/hover acceptance are not yet verified. No claim of visual sign-off.
+
+## App-wide spacing refinement — 2026-11-09
+
+Owner expanded the visual refinement scope beyond the dashboard: apply the established spacing, surface, border and shape preferences consistently across Zazu EMP, without changing business behaviour or page structure.
+
+- Confirmed the dashboard quote-stage grid had only a 2px top inset below its panel header. Increased it to 12px while retaining the existing horizontal and bottom rhythm.
+- Confirmed the upcoming-events list had only a 3px top inset. Increased it to 12px so the first event no longer crowds the header divider.
+- Found the shared disclosure/accordion body used zero top padding beneath its divider on desktop and mobile. Increased the top inset to 12px desktop / 10px mobile.
+- Shared form sections retain deliberate 20px desktop and 14–16px responsive padding; shared panels retain 18px padding. These were not globally overridden.
+- Added source regression coverage for dashboard panel insets and disclosure spacing.
+- Commits: `9c21375` (dashboard spacing), `95bda8f` (disclosure spacing), `71987f0` (dashboard regression test), `6e8a06b` (disclosure regression test).
+- Scope is spacing-only. Existing status pills/chips remain intentionally rounded semantic labels; navigation and action controls retain the compact non-oval treatment already established.
+- Source verification and CI/runtime test execution remain pending; no rendered browser acceptance is claimed.
