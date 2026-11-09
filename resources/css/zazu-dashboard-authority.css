@@ -26,7 +26,7 @@ body.zazu-dashboard-page .zazu-content {
 
 body.zazu-dashboard-page .zazu-sidebar {
     background: var(--dash-sidebar) !important;
-    border-right: 2px solid #B5C5D3 !important;
+    border-right: 1px solid var(--zazu-line-soft) !important;
     color: #304B63 !important;
     box-shadow: none !important;
 }
@@ -41,7 +41,7 @@ body.zazu-dashboard-page .zazu-sidebar-footer {
 
 body.zazu-dashboard-page .zazu-topbar {
     background: #E5EBF0 !important;
-    border-bottom: 2px solid var(--dash-border) !important;
+    border-bottom: 1px solid var(--zazu-line-soft) !important;
     box-shadow: none !important;
 }
 
@@ -62,7 +62,7 @@ body.zazu-dashboard-page .zazu-dash-hero {
     grid-template-columns: minmax(0, 1.6fr) minmax(220px, .8fr) !important;
     min-height: 88px !important;
     margin: 0 0 10px !important;
-    border: 2px solid #B9C9D7 !important;
+    border: 1px solid var(--zazu-line-soft) !important;
     border-radius: 12px !important;
     background: linear-gradient(105deg, #CAD9E6 0%, #D9E3EC 68%, #C7D7E4 100%) !important;
     box-shadow: 0 3px 10px rgba(35, 61, 84, .10) !important;
@@ -115,7 +115,7 @@ body.zazu-dashboard-page .zazu-dash-hero .zazu-dash-hero-support {
 
 body.zazu-dashboard-page .zazu-dash-hero-side {
     position: relative;
-    border-left: 2px solid #B7C8D6 !important;
+    border-left: 1px solid var(--zazu-line-soft) !important;
     background: rgba(220,231,240,.82) !important;
     overflow: hidden;
 }
@@ -284,7 +284,7 @@ body.zazu-dashboard-page .zazu-dash-resources {
 body.zazu-dashboard-page .zazu-dash-surface-head {
     min-height: 48px;
     padding: 11px 13px !important;
-    border-bottom: 2px solid var(--dash-border) !important;
+    border-bottom: 1px solid var(--zazu-line-soft) !important;
     background: #E6ECF1 !important;
 }
 
@@ -1249,7 +1249,7 @@ body.zazu-dashboard-page .zazu-dash-quick-actions .zazu-btn {
     gap: 10px !important;
     border: 1px solid #D7E2EB !important;
     border-radius: 10px !important;
-    background: #F8FAFC !important;
+    background: var(--zazu-surface) !important;
     color: #29445D !important;
     box-shadow: 0 1px 3px rgba(30, 59, 82, .035) !important;
     transition: background .16s ease, border-color .16s ease, transform .16s ease, box-shadow .16s ease;
@@ -1690,7 +1690,7 @@ body.zazu-dashboard-page .zazu-dash-grid[aria-label="Operational dashboard panel
 
 body.zazu-dashboard-page .zazu-dash-surface-head {
     border-bottom: 1px solid #B8C7D5 !important;
-    background: #EAF0F5 !important;
+    background: var(--zazu-tone-blue) !important;
 }
 
 body.zazu-dashboard-page .zazu-dash-event,
@@ -1698,7 +1698,7 @@ body.zazu-dashboard-page .zazu-dash-focus-item,
 body.zazu-dashboard-page .zazu-dash-resource-grid > *,
 body.zazu-dashboard-page .zazu-dash-quote-stage {
     border: 1px solid #C3CFDA !important;
-    background: #F8FAFC !important;
+    background: var(--zazu-surface) !important;
 }
 
 body.zazu-dashboard-page .zazu-dash-quick-actions .zazu-btn,
