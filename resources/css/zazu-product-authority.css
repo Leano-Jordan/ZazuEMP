@@ -1067,6 +1067,59 @@ body[data-zazu-route^="quotes."] .zazu-quote-register-command + .zazu-card .zazu
     border-bottom-color: color-mix(in srgb, var(--zazu-tone-ink-violet) 20%, transparent) !important;
 }
 
+/* Actual dashboard markup uses zazu-dash-surface-head (not panel-head).
+   Match the rendered Blade structure and outrank the older dashboard authority. */
+body.zazu-dashboard-page .zazu-dash-surface-head {
+    border: 0 !important;
+    border-bottom: 1px solid var(--zazu-line-soft) !important;
+    background: linear-gradient(105deg, var(--zazu-tone-blue), color-mix(in srgb, var(--zazu-tone-blue) 28%, var(--zazu-surface))) !important;
+}
+body.zazu-dashboard-page .zazu-dash-commercial .zazu-dash-surface-head {
+    background: linear-gradient(105deg, var(--zazu-tone-green), color-mix(in srgb, var(--zazu-tone-green) 28%, var(--zazu-surface))) !important;
+}
+body.zazu-dashboard-page .zazu-dash-focus .zazu-dash-surface-head {
+    background: linear-gradient(105deg, var(--zazu-tone-amber), color-mix(in srgb, var(--zazu-tone-amber) 28%, var(--zazu-surface))) !important;
+}
+body.zazu-dashboard-page .zazu-dash-resources .zazu-dash-surface-head {
+    background: linear-gradient(105deg, var(--zazu-tone-teal), color-mix(in srgb, var(--zazu-tone-teal) 28%, var(--zazu-surface))) !important;
+}
+body.zazu-dashboard-page .zazu-dash-event,
+body.zazu-dashboard-page .zazu-dash-focus-item,
+body.zazu-dashboard-page .zazu-dash-resource-grid > *,
+body.zazu-dashboard-page .zazu-dash-quote-stage {
+    border: 1px solid var(--zazu-line-soft) !important;
+    box-shadow: none !important;
+}
+body.zazu-dashboard-page .zazu-dash-event {
+    background: color-mix(in srgb, var(--zazu-tone-blue) 36%, var(--zazu-surface)) !important;
+}
+body.zazu-dashboard-page .zazu-dash-focus-item {
+    background: color-mix(in srgb, var(--zazu-tone-amber) 52%, var(--zazu-surface)) !important;
+}
+body.zazu-dashboard-page .zazu-dash-resource-grid > :nth-child(4n + 1) {
+    background: color-mix(in srgb, var(--zazu-tone-blue) 55%, var(--zazu-surface)) !important;
+}
+body.zazu-dashboard-page .zazu-dash-resource-grid > :nth-child(4n + 2) {
+    background: color-mix(in srgb, var(--zazu-tone-green) 55%, var(--zazu-surface)) !important;
+}
+body.zazu-dashboard-page .zazu-dash-resource-grid > :nth-child(4n + 3) {
+    background: color-mix(in srgb, var(--zazu-tone-violet) 55%, var(--zazu-surface)) !important;
+}
+body.zazu-dashboard-page .zazu-dash-resource-grid > :nth-child(4n + 4) {
+    background: color-mix(in srgb, var(--zazu-tone-amber) 55%, var(--zazu-surface)) !important;
+}
+body.zazu-dashboard-page .zazu-dash-quote-stage:nth-child(1) { background: var(--zazu-tone-blue) !important; }
+body.zazu-dashboard-page .zazu-dash-quote-stage:nth-child(2) { background: var(--zazu-tone-violet) !important; }
+body.zazu-dashboard-page .zazu-dash-quote-stage:nth-child(3) { background: var(--zazu-tone-green) !important; }
+body.zazu-dashboard-page .zazu-dash-quote-stage:nth-child(4) { background: var(--zazu-tone-coral) !important; }
+
+html[data-theme="dark"] body.zazu-dashboard-page .zazu-dash-event,
+html[data-theme="dark"] body.zazu-dashboard-page .zazu-dash-focus-item,
+html[data-theme="dark"] body.zazu-dashboard-page .zazu-dash-resource-grid > *,
+html[data-theme="dark"] body.zazu-dashboard-page .zazu-dash-quote-stage {
+    border-color: var(--zazu-line-soft) !important;
+}
+
 /* KPI tiles carry their own colour identity instead of repeating white cards. */
 .zazu-metric-card,
 .zazu-dash-metric {
