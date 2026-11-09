@@ -1565,7 +1565,7 @@ body.zazu-dashboard-page .zazu-dash-grid[aria-label="Operational dashboard panel
 
 body.zazu-dashboard-page .zazu-dash-run .zazu-dash-timeline {
     flex: 1 1 auto !important;
-    padding: 3px 14px 12px !important;
+    padding: 12px 14px 12px !important;
 }
 
 body.zazu-dashboard-page .zazu-dash-run .zazu-dash-event {
@@ -1582,7 +1582,7 @@ body.zazu-dashboard-page .zazu-dash-commercial .zazu-dash-quote-stages {
     flex: 1 1 auto !important;
     align-content: start !important;
     gap: 8px !important;
-    padding: 2px 14px 11px !important;
+    padding: 12px 14px 11px !important;
 }
 
 body.zazu-dashboard-page .zazu-dash-commercial .zazu-dash-quote-stage {
