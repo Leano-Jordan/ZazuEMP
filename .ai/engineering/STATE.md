@@ -1180,3 +1180,15 @@ Owner expanded the visual refinement scope beyond the dashboard: apply the estab
 - Added `UiProportionFoundationTest::test_product_wide_visual_authority_is_loaded_after_module_styles_and_applies_shared_primitives`.
 - Commits: `25dfe61` (shared stylesheet), `1c3381b` (authenticated layout load), `32008a6` (Vite entry), `67e8eb4` (regression coverage).
 - Source is committed on `main`. PHPUnit, Vite build, full-page rendered comparison across modules/themes and mobile acceptance are not yet executed/verified. No claim of visual sign-off or CI pass.
+
+## Shared work-surface refinement — 2026-11-09
+
+- Continued product-wide visual pass using actual shared selectors found in the application CSS and Blade views.
+- Standardized command-band and metric-card radius/border/depth; removed metric-card hover lift.
+- Converted shared list rows from individually floating/translating cards to a coherent bordered list surface with consistent row separators and neutral hover state.
+- Reduced empty-state vertical padding from 56px to 36px to avoid oversized blank areas across modules.
+- Aligned document-table wrappers and table headers/cells with the shared surface and border tokens.
+- Unified form-contained native controls and actionbar geometry.
+- Added regression assertions for list, metric, document-table and empty-state styling.
+- Commit: `3c004fc` (shared surface refinement), `6ef6bd0` (regression coverage).
+- Runtime test/build and rendered cross-module light/dark/mobile review remain outstanding.
