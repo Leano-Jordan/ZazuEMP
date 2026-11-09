@@ -19,6 +19,8 @@ test('real Zazu job form can create a job locally while disconnected', async ({ 
 
     // Prime the authenticated directory routes before disconnecting. The
     // test then verifies their cached shells can render the IndexedDB records.
+    await page.goto('/customers/create', { waitUntil: 'domcontentloaded' });
+    await expect(page.locator('form[data-zazu-offline-entity="customer"]')).toBeVisible();
     await page.goto('/customers', { waitUntil: 'domcontentloaded' });
     await expect(page.getByRole('heading', { name: 'Customers' })).toBeVisible();
     await page.goto('/work', { waitUntil: 'domcontentloaded' });
@@ -27,30 +29,37 @@ test('real Zazu job form can create a job locally while disconnected', async ({ 
     await page.goto('/work/create', { waitUntil: 'domcontentloaded' });
     await expect(page.locator('#new-job-form')).toBeVisible();
 
-    // A job may only reference a customer already present in this device's
-    // offline workspace. Seed a realistic phone-local customer rather than
-    // relying on a server-rendered option that may not have been synced.
-    await page.evaluate(async () => {
-        await window.ZazuOffline.ready;
-        const state = structuredClone(window.ZazuOffline.getState());
-        const localId = crypto.randomUUID();
-        const customer = {
-            local_id: localId,
-            server_id: null,
-            id: null,
-            name: 'Offline test customer',
-            contact_name: 'Offline test contact',
-            phone: '0123456789',
-            email: 'offline@example.test',
-        };
-        state.customers = [...(state.customers || []), customer];
-        await window.ZazuOffline.queueMutation('customer', 'create', customer, state);
-        const select = document.querySelector('#customer_id');
-        const option = new Option(customer.name, 'local:' + localId);
-        option.dataset.zazuLocalId = localId;
-        select.add(option);
-        select.value = option.value;
+    // Create the customer through Zazu's real customer form while offline.
+    // This exercises the same form handler and durable queue used by operators.
+    await page.context().setOffline(true);
+    await page.goto('/customers/create', { waitUntil: 'domcontentloaded' });
+    const customerForm = page.locator('form[data-zazu-offline-entity="customer"]');
+    await expect(customerForm).toBeVisible();
+    await customerForm.locator('input[name="name"]').fill('Offline test customer');
+    await customerForm.locator('input[name="primary_contact_name"]').fill('Offline test contact');
+    await customerForm.locator('input[name="primary_contact_phone"]').fill('0123456789');
+    await customerForm.getByRole('button', { name: 'Save customer' }).click();
+
+    await expect(customerForm.getByText('Saved on this device. It will sync automatically when Zazu reconnects.')).toBeVisible();
+    await expect(customerForm.getByRole('button', { name: 'Saved locally' })).toBeDisabled();
+
+    const customerLocalId = await page.evaluate(() => {
+        const customer = window.ZazuOffline?.getState()?.customers?.find(item => item.name === 'Offline test customer');
+        return customer?.local_id || null;
     });
+    expect(customerLocalId).toBeTruthy();
+    const customerQueue = await page.evaluate(async () => await window.ZazuOffline?.pending());
+    expect(customerQueue.some((mutation) => mutation.entity_type === 'customer' && mutation.payload?.name === 'Offline test customer')).toBe(true);
+
+    await page.goto('/customers', { waitUntil: 'domcontentloaded' });
+    await expect(page.locator('[data-zazu-local-record="customer"]').filter({ hasText: 'Offline test customer' })).toBeVisible();
+
+    await page.goto('/work/create', { waitUntil: 'domcontentloaded' });
+    await expect(page.locator('#new-job-form')).toBeVisible();
+    const customerOption = page.locator('#customer_id option').filter({ hasText: 'Offline test customer' });
+    await expect(customerOption).toHaveCount(1);
+    await page.locator('#customer_id').selectOption('local:' + customerLocalId);
+
     // Use the visible choice cards exactly as an operator would.
     const eventTypeChoice = page.locator('#new-job-form label.zazu-choice-card:has(input[name="event_type"])').first();
     const cateringChoice = page.locator('#new-job-form label.zazu-service-choice:has(input[name="services[]"][value="Catering"])');
