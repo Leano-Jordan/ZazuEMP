@@ -1227,10 +1227,9 @@ function setupZazuOfflineDirectoryViews() {
             total.textContent = (Number(total.dataset.serverCount) + pendingJobs.length) + ' records';
         }
 
-        const allPill = document.querySelector('.zazu-workload-pill[href$="work"]');
         const allValue = [...document.querySelectorAll('.zazu-workload-pill')].find(item => item.textContent.includes('All Work'));
         const draftValue = [...document.querySelectorAll('.zazu-workload-pill')].find(item => item.textContent.includes('Drafts'));
-        for (const [pill, key] of [[allValue, 'all'], [draftValue, 'draft']]) {
+        for (const pill of [allValue, draftValue]) {
             const value = pill?.querySelector('strong');
             if (!value) continue;
             const serverCount = Number(value.dataset.serverCount ?? value.textContent.trim());
