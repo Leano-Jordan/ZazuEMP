@@ -372,18 +372,17 @@ Source assertions and cloud CI are necessary but are not physical-device proof. 
 
 
 
-## Device-local logout and queued-change safety
+## Device-local logout and queued-change safety — current contract
 
-A logout request must treat the service-worker page cache and IndexedDB workspace as separate data stores. Clearing only cached HTML is insufficient: the local client database contains workspace data, queued mutations and the device sync token.
+A web-account logout and trusted-device revocation are deliberately separate operations. The local business workspace is device-scoped, not tied to the currently signed-in web account.
 
-- Inspect the full local mutation queue before logout, including rejected/failed entries and unresolved conflicts.
-- If queued work or conflicts remain, explain that signing out clears the local offline copy and request explicit confirmation. Cancelling must keep the device data intact.
-- If IndexedDB cannot be inspected or cleared safely, do not silently sign out and leave the offline token/workspace behind. Explain the recovery action.
-- On confirmed logout, clear both the local state store and mutation queue, then clear the authenticated service-worker page cache.
-- Notify other same-origin tabs to discard in-memory offline credentials and prevent new offline writes from the signed-out session.
-- After local data has been cleared, the client attempts a bounded server-side token revocation through `POST /api/sync/revoke`. If offline or unreachable, logout continues but warns that the server token may still be active.
-- The endpoint invalidates the current bearer token immediately for subsequent sync requests. It does not provide a remote owner/admin device-management screen, and offline revocation cannot be proven. Treat manual device revocation/management and device-offline cleanup as a separate release risk.
-- Automated regression coverage must verify cancel-preserves-queue and confirm-clears-token, workspace and queue. Installed-device acceptance remains a separate verification layer.
+- Before logout, the client probes the same-origin health endpoint with a bounded `GET /up` request. If the host cannot be reached, logout is cancelled and the workspace, queue and paired-device token remain untouched; a disconnected browser cannot reliably end the Laravel web session.
+- When the host is reachable, the user receives an explicit confirmation that signing out ends only the web session. The business-scoped IndexedDB workspace, pending/failed mutations, attachments and sync token remain on that device.
+- On confirmation, the client asks the service worker to clear the user-scoped authenticated HTML cache, then submits the normal Laravel logout form.
+- The offline workspace is not erased and the device is not automatically unpaired. This allows the same trusted device to resume its business workspace after a later authorized sign-in.
+- To remove a device from the business, an owner must revoke it through Business Settings. Revocation invalidates its sync credential; local data cleanup on a lost/unavailable device is a separate device-management concern.
+- The offline client's `clearLocalSession()` API is a distinct destructive cleanup operation: it clears the attachment workspace, IndexedDB state and mutation queue, then attempts bounded remote token revocation. It is not called by ordinary web-account logout.
+- Regression coverage must verify unreachable-host preservation, confirmation cancellation, ordinary logout with workspace/token/queue preserved, same-business reauthentication, and explicit device revocation/cleanup separately. Installed-device acceptance remains a separate verification layer.
 
 
 ## Offline asset cache versioning
@@ -394,9 +393,9 @@ The service worker serves `/zazu-offline.js` and `/offline-attachments.js` cache
 
 ## Logout requires a reachable authentication host
 
-The Laravel web session cookie is server-managed. A disconnected browser cannot reliably complete the `POST /logout` action, and deleting IndexedDB first would create a false logout: local business data/token would be erased while the server session cookie remained valid. The client now probes the same-origin authentication route with a bounded, uncached `HEAD` request before local cleanup. If the host cannot be reached, the app keeps the local workspace and queue intact and asks the user to reconnect before trying again.
+The Laravel web session cookie is server-managed. A disconnected browser cannot reliably complete the `POST /logout` action. The active client probes the same-origin health endpoint with a bounded, uncached `GET /up` request before submitting logout. If the host cannot be reached, it keeps the local workspace, queue and device token intact and asks the user to reconnect before trying again.
 
-This is a safety guard, not a claim that every ambiguous network failure is impossible after the probe. The actual installed-device and disconnected-server acceptance remains required.
+A successful probe does not guarantee that the subsequent logout POST cannot fail; this remains a normal network race. The actual installed-device and disconnected-server acceptance remains required.
 
 
 ## Authenticated page-cache generation boundary
