@@ -6,7 +6,57 @@
 **Assessment HEAD:** `d1e2a4397b064d3fbfe7fc2cf1dc59236e00922f`  
 **Evidence status:** exact source-head CI mostly passed; browser smoke still running; not release certification.
 
-## Director evidence reconciliation — 2026-11-08
+## Director formal re-score — 2026-11-09
+
+**Current verified application/test HEAD:** `69040420caa49bf9c514699c97fb8f8c5148d03b`  
+**Evidence:** exact-head Laravel, browser, quality, security, static-analysis, populated upgrade/rollback and Director checks passed. This is an evidence-maturity re-score, not a commercial release approval.
+
+### Current 13-domain scorecard
+
+| V1 specification area | Score | Evidence and remaining boundary |
+|---|---:|---|
+| Platform, accounts, onboarding | **4/5** | Laravel and browser regression suites pass on the current head; real customer onboarding acceptance remains. |
+| Core lifecycle: client → event → work → completion | **4/5** | Populated lifecycle and commercial regression coverage passes in the current Laravel suite; realistic operator acceptance remains. |
+| Commercial workflow: quote → acceptance → invoice → deposit → payment | **4/5** | Populated quote, invoice, payment and reconciliation coverage remains green; real customer financial reconciliation/concurrency drill remains. |
+| Purchasing, receiving, inventory, costs | **4/5** | Purchasing, receiving, stock and event-cost regression coverage remains green; physical stock/GRN reconciliation remains. |
+| Data integrity and auditability | **4/5** | Transaction, idempotency, ownership, audit and hostile-input tests pass; broader real concurrency proof remains. |
+| Security and tenant isolation | **4/5** | Psalm, secret scan and Laravel security/tenant regression coverage pass; trusted-device physical acceptance and CSP style hardening remain. |
+| Offline continuity | **3/5** | Bounded IndexedDB workspace, queue, conflict and reconnect paths are implemented and tested; secure-origin installed-device disconnect/restart/reconnect proof remains. |
+| Documents and attachments | **4/5** | Active Work attachment queue, private retrieval, business scoping and reconnect/idempotency paths have automated Laravel/browser coverage on the current head; physical device persistence and real media restore remain. |
+| Search, reporting and Zazu Helper | **3/5** | Permission-aware search, attachment metadata search and reporting exist; full customer-data usability acceptance remains incomplete. |
+| UX, mobile, tablet and accessibility | **3/5** | Browser smoke passes across its configured viewport projects; physical device and complete accessibility acceptance remain. |
+| Recovery and data portability | **2/5** | Operator backup/restore commands, checksums and automated archive tests exist; representative populated database/private-media restore remains unproven. |
+| Deployment, upgrade and rollback | **4/5** | Populated upgrade/rollback automation passes on the current head; real target-environment deployment rollback remains. |
+| Legal, privacy and brand clearance | **1/5** | Engineering controls and registers exist; operational POPIA/privacy/legal sign-off and official Zazu name clearance remain open. |
+
+**Current evidence-maturity average: 3.38/5 — 67.7/100, reported as 68/100.**  
+**Change from prior formal baseline: +8 points (60 → 68).**
+
+The uplift is limited to four domains where the current exact-head automated evidence now meets the score-4 definition: platform/onboarding, core lifecycle, security/tenant controls and active documents/attachments. The other domains retain their prior scores because physical, customer, recovery or legal evidence is still missing. No domain receives a score of 5.
+
+### Exact-head CI evidence
+
+| Check | Result |
+|---|---|
+| Laravel | PASS — 412 tests, 2,904 assertions — [run 42698440540](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/42698440540) |
+| Browser smoke | PASS — 65 passed, 22 skipped, 0 failed/flaky — [run 42698440241](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/42698440241) |
+| Zazu Quality + secret scan | PASS — [run 42698440553](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/42698440553) |
+| Psalm Security | PASS — [run 42698440534](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/42698440534) |
+| PHPMD | PASS — [run 42698440505](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/42698440505) |
+| Populated upgrade/rollback | PASS — [run 42698440537](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/42698440537) |
+| Director Contract Lint | PASS — [run 42698440506](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/42698440506) |
+| Push on main | PASS — [run 42698440294](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/42698440294) |
+| SonarCloud | SKIPPED — not counted as a pass |
+
+### What the score does not certify
+
+V1 remains **NO-GO** until the installed-device offline journey is accepted on a stable secure origin; a representative database and private-media restore is demonstrated; a real deployment rollback is exercised; trusted-device/lost-device expectations are accepted; and privacy/legal plus brand clearance are closed. The local HTTP LAN launcher improves same-network access but does not satisfy the secure-origin PWA gate.
+
+The previous 60/100 score remains the historical 2026-11-04 baseline below. This new score is the current formal evidence-maturity assessment.
+
+---
+
+## Historical reconciliation — 2026-11-08
 
 The 2026-11-04 scorecard below is retained as the last formally calculated 13-domain baseline (**3.0/5, 60/100**); it has not been numerically recalculated. Several implementation statements in the original assessment are now superseded:
 
@@ -31,7 +81,7 @@ Each area is scored from 0–5 for evidence maturity, not lines of code or visua
 
 The overall score is an unweighted average. A high average cannot override a Critical release blocker.
 
-## V1 scorecard
+## Historical V1 scorecard baseline — 2026-11-04
 
 | V1 specification area | Score | Current assessment |
 |---|---:|---|
