@@ -184,16 +184,8 @@ class UiVisualSystemRegressionTest extends TestCase
         $this->assertStringContainsString('background-image: none !important;', $css);
         $this->assertStringContainsString('.zazu-dash-commercial .zazu-dash-quote-stages', $css);
         $this->assertStringContainsString('padding: 12px 18px 14px !important;', $css);
-    }
 
-
-
-    public function test_colour_hierarchy_and_helper_dock_keep_the_workspace_clear(): void
-    {
-        $css = file_get_contents(resource_path('css/zazu-product-authority.css'));
-
-        $this->assertIsString($css);
-        foreach ([
+             foreach ([
             '--zazu-tone-green: #E2F3E8;',
             '--zazu-tone-amber: #FFF0D2;',
             '--zazu-tone-teal: #DDF3EF;',
