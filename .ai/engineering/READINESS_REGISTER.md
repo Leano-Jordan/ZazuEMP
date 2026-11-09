@@ -1,5 +1,27 @@
 # ZAZU EMP — COMMERCIAL READINESS REGISTER
 
+## Current verified snapshot — 2026-11-09
+
+**Verified application/test source:** `69040420caa49bf9c514699c97fb8f8c5148d03b` on canonical `main`.  
+**V1 score:** **68/100 (3.38/5)**, up from 60/100 after four evidence-based domain uplifts. See `docs/ZAZU_V1_SCORECARD_2026-11-04.md`.
+
+- Laravel: **412 passed / 2,904 assertions — PASS** ([run 42698440540](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/42698440540)).
+- Browser smoke: **65 passed / 22 skipped / 0 failed or flaky — PASS** ([run 42698440241](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/42698440241)).
+- Zazu Quality + secret scan: **PASS** ([run 42698440553](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/42698440553)).
+- Psalm Security: **PASS** ([run 42698440534](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/42698440534)).
+- PHPMD: **PASS** ([run 42698440505](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/42698440505)).
+- Populated upgrade/rollback: **PASS** ([run 42698440537](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/42698440537)).
+- Director Contract Lint: **PASS** ([run 42698440506](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/42698440506)).
+- Push on main: **PASS** ([run 42698440294](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/42698440294)).
+- SonarCloud: **SKIPPED**, not a pass.
+
+**Why the score increased:** platform/onboarding, core lifecycle, security/tenant controls and active documents/attachments now have relevant automated evidence passing on the exact current head. No 5/5 scores were awarded.
+
+**Still blocks release:** physical secure-origin offline acceptance; representative populated database/private-media restore; real deployment rollback; trusted-device/lost-device acceptance; operational privacy/legal closure; official Zazu brand clearance. Commercial release remains **NO-GO**.
+
+---
+
+
 ## Purpose
 
 This is the live release-risk register.
