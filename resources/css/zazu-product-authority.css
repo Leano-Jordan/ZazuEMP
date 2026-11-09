@@ -192,6 +192,116 @@
 .zazu-calendar-agenda-status {
     border-radius: var(--zazu-radius-sm);
 }
+
+/* Editor rhythm: keep section spacing and save controls intentional. */
+.zazu-editor {
+    gap: 18px;
+}
+
+.zazu-form-main {
+    min-width: 0;
+}
+
+.zazu-form-section {
+    margin-bottom: 14px;
+    padding: 18px;
+    box-shadow: 0 1px 2px color-mix(in srgb, var(--zazu-ink) 3%, transparent);
+}
+
+.zazu-form-section + .zazu-form-section {
+    margin-top: 0;
+}
+
+.zazu-form-section-head {
+    margin-bottom: 14px;
+    padding-bottom: 10px;
+}
+
+.zazu-form-grid {
+    column-gap: 16px;
+    row-gap: 14px;
+}
+
+.zazu-field {
+    min-width: 0;
+}
+
+.zazu-actionbar,
+.zazu-actionbar-sticky {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-top: 18px;
+    padding: 8px;
+    border: 1px solid var(--zazu-border);
+    border-radius: var(--zazu-radius-md);
+    background: color-mix(in srgb, var(--zazu-surface) 97%, transparent);
+    box-shadow: 0 4px 12px color-mix(in srgb, var(--zazu-ink) 7%, transparent);
+    backdrop-filter: blur(8px);
+}
+
+.zazu-actionbar-sticky {
+    bottom: max(10px, env(safe-area-inset-bottom));
+    z-index: 30;
+}
+
+.zazu-actionbar > .zazu-btn,
+.zazu-actionbar-sticky > .zazu-btn {
+    flex: 0 0 auto;
+}
+
+.zazu-form-aside {
+    min-width: 0;
+}
+
+.zazu-context-card {
+    border-radius: var(--zazu-radius-md);
+    box-shadow: 0 1px 3px color-mix(in srgb, var(--zazu-ink) 4%, transparent);
+}
+
+@media (max-width: 820px) {
+    .zazu-editor {
+        gap: 14px;
+    }
+
+    .zazu-form-aside {
+        position: static;
+    }
+
+    .zazu-actionbar-sticky {
+        bottom: max(8px, env(safe-area-inset-bottom));
+    }
+}
+
+@media (max-width: 767px) {
+    .zazu-form-section {
+        padding: 15px;
+        margin-bottom: 12px;
+    }
+
+    .zazu-form-grid {
+        grid-template-columns: minmax(0, 1fr);
+        row-gap: 12px;
+    }
+
+    .zazu-actionbar,
+    .zazu-actionbar-sticky {
+        align-items: stretch;
+        gap: 7px;
+        margin-top: 14px;
+        padding: 8px;
+    }
+
+    .zazu-actionbar > .zazu-btn,
+    .zazu-actionbar-sticky > .zazu-btn,
+    .zazu-actionbar > form,
+    .zazu-actionbar-sticky > form {
+        width: 100%;
+    }
+}
+
 @media (max-width: 820px) {
     .zazu-card-header, .zazu-panel-head { padding: 13px 15px; }
     .zazu-form-section { padding: 16px; }
