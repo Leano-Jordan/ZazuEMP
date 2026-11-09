@@ -1147,3 +1147,13 @@ Latest source change: commit `29a38f55d3d3ff5979cf844ddbd624a9ea279515` consolid
 
 
 - Backup test follow-up: `ZazuBackupRestoreTest` now also rejects a format-v2 archive missing its required checksum map and restores a valid legacy format-v1 archive without a checksum map. Latest backup test commit: `45f3cfed9bee48153d939932ba4c495c85c0b26b`; assertion formatting follow-up: `89daa318f310b5cf873b50711e31eff73db12b92`. Execution remains pending.
+
+
+## Navigation contrast and geometry correction — 2026-11-09
+
+- Reworked the shared hierarchical navigation authority in `resources/css/app.css`: explicit sidebar foreground/background pairing for idle, hover, open and active states; 4px control radius; tighter 40px area triggers and 38px destination rows; reduced padding; removed hover translation; retained a visible 2px keyboard-focus indicator.
+- Reworked dashboard-specific navigation in `resources/css/zazu-dashboard-authority.css`: fixed dark-sidebar hover to a darker navy surface with white foreground (never white text on pale blue), removed permanent blue borders, used a restrained cyan active marker, compacted flyout geometry and retained keyboard focus.
+- Removed two superseded dashboard navigation palette blocks that contradicted the current dark-sidebar palette and caused the stylesheet to carry dead, competing state definitions.
+- Added `UiProportionFoundationTest::test_navigation_uses_compact_geometry_and_explicit_first_paint_contrast` to guard the intended contrast, radius, focus state and removal of the obsolete pale-blue/white-text declarations.
+- Commits on `main`: `b623d33` (shared navigation), `d404b24` (dashboard navigation and obsolete rule removal), `7379a8b` (regression coverage).
+- Source changes are committed and re-fetch verification is pending. Runtime PHPUnit, Vite build and rendered first-load/hover acceptance are not yet verified. No claim of visual sign-off.
