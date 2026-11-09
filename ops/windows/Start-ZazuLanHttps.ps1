@@ -81,7 +81,6 @@ $startArguments = @{
 if (-not [string]::IsNullOrWhiteSpace($PhpPath)) {
     $startArguments.PhpPath = $PhpPath
 }
-& $startServer @startArguments
 
 $config = @"
 {
@@ -101,16 +100,27 @@ if ($LASTEXITCODE -ne 0) {
     throw "Caddy rejected the generated LAN configuration: $($validation | Out-String)"
 }
 
+# Validate the proxy before starting Laravel so a bad Caddy configuration
+# cannot leave an otherwise-unreachable application process running.
+& $startServer @startArguments
+
 Remove-Item $pidPath -Force -ErrorAction SilentlyContinue
 $arguments = 'run --config "{0}" --adapter caddyfile' -f $configPath
-$caddyProcess = Start-Process -FilePath $caddy -ArgumentList $arguments -WorkingDirectory $ProjectPath -RedirectStandardOutput $stdoutPath -RedirectStandardError $stderrPath -WindowStyle Hidden -PassThru
-Set-Content -Path $pidPath -Value $caddyProcess.Id -Encoding ASCII
+try {
+    $caddyProcess = Start-Process -FilePath $caddy -ArgumentList $arguments -WorkingDirectory $ProjectPath -RedirectStandardOutput $stdoutPath -RedirectStandardError $stderrPath -WindowStyle Hidden -PassThru
+    Set-Content -Path $pidPath -Value $caddyProcess.Id -Encoding ASCII
+} catch {
+    & $startServer -Stop -Port $AppPort
+    throw
+}
 
 $ready = $false
 for ($attempt = 0; $attempt -lt 20; $attempt++) {
     Start-Sleep -Seconds 1
     if ($caddyProcess.HasExited) {
         $details = if (Test-Path $stderrPath) { Get-Content $stderrPath -Raw } else { '(no Caddy stderr log)' }
+        Remove-Item $pidPath -Force -ErrorAction SilentlyContinue
+        & $startServer -Stop -Port $AppPort
         throw "Caddy exited during startup. Review $stderrPath. $details"
     }
     $listener = Get-NetTCPConnection -LocalPort $HttpsPort -State Listen -ErrorAction SilentlyContinue |
@@ -124,6 +134,7 @@ for ($attempt = 0; $attempt -lt 20; $attempt++) {
 if (-not $ready) {
     Stop-Process -Id $caddyProcess.Id -Force -ErrorAction SilentlyContinue
     Remove-Item $pidPath -Force -ErrorAction SilentlyContinue
+    & $startServer -Stop -Port $AppPort
     throw "Caddy did not bind to $lanIp on TCP $HttpsPort within 20 seconds. Review $stderrPath."
 }
 
