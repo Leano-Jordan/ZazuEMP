@@ -137,4 +137,24 @@ class UiProportionFoundationTest extends TestCase
         $this->assertStringContainsString('.zazu-dash-capability-art,', $css);
         $this->assertStringContainsString('@media (max-width: 620px)', $css);
     }
+
+    public function test_navigation_uses_compact_geometry_and_explicit_first_paint_contrast(): void
+    {
+        $appCss = file_get_contents(resource_path('css/app.css'));
+        $dashboardCss = file_get_contents(resource_path('css/zazu-dashboard-authority.css'));
+
+        $this->assertIsString($appCss);
+        $this->assertIsString($dashboardCss);
+        $this->assertStringContainsString('.zazu-nav-area-trigger {', $appCss);
+        $this->assertStringContainsString('border-radius: 4px;', $appCss);
+        $this->assertStringContainsString('color: var(--zazu-sidebar-ink);', $appCss);
+        $this->assertStringContainsString('background: var(--zazu-sidebar-hover);', $appCss);
+        $this->assertStringContainsString('background: #29445D !important;', $dashboardCss);
+        $this->assertStringContainsString('color: #FFFFFF !important;', $dashboardCss);
+        $this->assertStringContainsString('border-radius: 4px !important;', $dashboardCss);
+        $this->assertStringContainsString('outline: 2px solid #8CCDE4 !important;', $dashboardCss);
+        $this->assertStringNotContainsString('background: #B9CAD9 !important;', $dashboardCss);
+        $this->assertStringNotContainsString('background: rgba(255,255,255,.09) !important;', $dashboardCss);
+    }
+
 }
