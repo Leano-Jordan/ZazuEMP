@@ -374,191 +374,12 @@
 }
 
 
-/* --------------------------------------------------------------------------
-   DIRECTOR — application-wide palette authority
-   The dashboard's current slate / white / confident-blue language is the
-   reference palette for every authenticated module. Keep semantic status
-   colours distinct; neutralise the old cyan canvas and pale-blue sidebar.
-   -------------------------------------------------------------------------- */
-:root {
-    color-scheme: light;
-    --zazu-page: #F3F6FA;
-    --zazu-page-deep: #EAF0F7;
-    --zazu-sidebar: #102541;
-    --zazu-sidebar-ink: #DCE7F5;
-    --zazu-sidebar-muted: #AFC1D6;
-    --zazu-sidebar-label: #8FA8C4;
-    --zazu-sidebar-hover: #1B385B;
-    --zazu-sidebar-active: #1769E8;
-    --zazu-sidebar-surface: #1A3658;
 
-    --zazu-surface: #FFFFFF;
-    --zazu-surface-2: #F7F9FC;
-    --zazu-surface-3: #EEF3F8;
-    --zazu-field: #FFFFFF;
-
-    --zazu-ink: #14243B;
-    --zazu-ink-2: #33465F;
-    --zazu-muted: #64748B;
-    --zazu-faint: #8291A5;
-    --zazu-nav-label: #8FA8C4;
-
-    --zazu-border: #DCE4EE;
-    --zazu-border-strong: #C5D1E0;
-
-    --zazu-primary: #1769E8;
-    --zazu-primary-light: #4B8AF0;
-    --zazu-primary-pale: #DCE9FF;
-    --zazu-primary-shadow: #EAF2FE;
-    --zazu-primary-deep: #1558C0;
-    --zazu-primary-hover: #1256C4;
-    --zazu-primary-soft: #EAF2FE;
-    --zazu-primary-ink: #FFFFFF;
-
-    --zazu-link: #1558C0;
-    --zazu-link-hover: #10479F;
-    --zazu-nav-active: #4B8AF0;
-
-    --zazu-focus: #1769E8;
-    --zazu-info: #1769E8;
-    --zazu-info-ink: #1558C0;
-    --zazu-info-soft: #EAF2FE;
-
-    --zazu-shadow: 0 8px 24px rgba(20, 36, 59, .055);
-    --zazu-shadow-strong: 0 18px 42px rgba(20, 36, 59, .11);
-    --zazu-border-subtle: #E7ECF3;
-
-    --zazu-surface-canvas: #F3F6FA;
-    --zazu-surface-card: #FFFFFF;
-    --zazu-surface-border: #DCE4EE;
-    --zazu-text-main: #14243B;
-    --zazu-text-muted: #64748B;
-
-    --zazu-blue-primary: #1769E8;
-    --zazu-blue-accent: #4B8AF0;
-    --zazu-blue-hover: #1256C4;
-    --zazu-blue-light: #AFCBFF;
-    --zazu-blue-soft: #EAF2FE;
-    --zazu-blue-subtle: #DCE9FF;
-    --zazu-blue-canvas: #F3F6FA;
-    --zazu-blue-brand: #1769E8;
-    --zazu-blue-vivid: #4B8AF0;
-    --zazu-blue-glow: #DCE9FF;
-
-    --zazu-canvas-bg: #F3F6FA;
-    --zazu-card-bg: #FFFFFF;
-    --zazu-card-border: #DCE4EE;
-    --zazu-card-shadow: 0 8px 24px rgba(20, 36, 59, .055);
-    --zazu-text-ink: #14243B;
-    --zazu-text-body: #52647B;
-    --zazu-card-shadow-hover: 0 12px 30px rgba(20, 36, 59, .09);
-    --zazu-ui-focus: 0 0 0 3px rgba(23, 105, 232, .16);
-}
-
-:root[data-theme="dark"] {
-    color-scheme: dark;
-    --zazu-page: #0D1726;
-    --zazu-page-deep: #101E31;
-    --zazu-sidebar: #091525;
-    --zazu-sidebar-ink: #E5EDF8;
-    --zazu-sidebar-muted: #A9B9CD;
-    --zazu-sidebar-label: #8298B4;
-    --zazu-sidebar-hover: #182A43;
-    --zazu-sidebar-active: #4B8AF0;
-    --zazu-sidebar-surface: #1A2E49;
-
-    --zazu-surface: #17263A;
-    --zazu-surface-2: #1C2D43;
-    --zazu-surface-3: #243850;
-    --zazu-field: #122137;
-
-    --zazu-ink: #E8EFF8;
-    --zazu-ink-2: #D1DCEB;
-    --zazu-muted: #A9B9CD;
-    --zazu-faint: #8298B4;
-    --zazu-nav-label: #A9B9CD;
-
-    --zazu-border: #30445E;
-    --zazu-border-strong: #435B78;
-
-    --zazu-primary: #79A9FF;
-    --zazu-primary-light: #A2C2FF;
-    --zazu-primary-pale: #C4D9FF;
-    --zazu-primary-shadow: #203A5D;
-    --zazu-primary-deep: #C4D9FF;
-    --zazu-primary-hover: #A2C2FF;
-    --zazu-primary-soft: #203A5D;
-    --zazu-primary-ink: #0D1726;
-
-    --zazu-link: #A2C2FF;
-    --zazu-link-hover: #C4D9FF;
-    --zazu-nav-active: #79A9FF;
-
-    --zazu-focus: #A2C2FF;
-    --zazu-info: #79A9FF;
-    --zazu-info-ink: #C4D9FF;
-    --zazu-info-soft: #203A5D;
-
-    --zazu-shadow: 0 8px 24px rgba(0, 0, 0, .22);
-    --zazu-shadow-strong: 0 18px 42px rgba(0, 0, 0, .34);
-    --zazu-border-subtle: #263A52;
-
-    --zazu-surface-canvas: #0D1726;
-    --zazu-surface-card: #17263A;
-    --zazu-surface-border: #30445E;
-    --zazu-text-main: #E8EFF8;
-    --zazu-text-muted: #A9B9CD;
-
-    --zazu-blue-primary: #79A9FF;
-    --zazu-blue-accent: #A2C2FF;
-    --zazu-blue-hover: #C4D9FF;
-    --zazu-blue-light: #C4D9FF;
-    --zazu-blue-soft: #203A5D;
-    --zazu-blue-subtle: #243850;
-    --zazu-blue-canvas: #0D1726;
-    --zazu-blue-brand: #79A9FF;
-    --zazu-blue-vivid: #A2C2FF;
-    --zazu-blue-glow: #C4D9FF;
-
-    --zazu-canvas-bg: #0D1726;
-    --zazu-card-bg: #17263A;
-    --zazu-card-border: #30445E;
-    --zazu-card-shadow: 0 8px 24px rgba(0, 0, 0, .22);
-    --zazu-text-ink: #E8EFF8;
-    --zazu-text-body: #C1CDDC;
-    --zazu-card-shadow-hover: 0 12px 30px rgba(0, 0, 0, .3);
-    --zazu-ui-focus: 0 0 0 3px rgba(121, 169, 255, .2);
-}
-
-/* Sidebar interaction contrast is intentionally high in both themes. */
-.zazu-nav-link,
-.zazu-nav-area-trigger,
-.zazu-user-trigger {
-    color: var(--zazu-sidebar-ink);
-}
-.zazu-nav-link:hover,
-.zazu-nav-link:focus-visible,
-.zazu-nav-area-trigger:hover,
-.zazu-nav-area-trigger:focus-visible {
-    color: #FFFFFF !important;
-    background: var(--zazu-sidebar-hover) !important;
-}
-.zazu-nav-link.active {
-    color: #FFFFFF !important;
-    background: color-mix(in srgb, var(--zazu-sidebar-active) 24%, var(--zazu-sidebar)) !important;
-    border-color: color-mix(in srgb, var(--zazu-sidebar-active) 42%, transparent) !important;
-}
-:root[data-theme="dark"] .zazu-nav-link:hover,
-:root[data-theme="dark"] .zazu-nav-link:focus-visible,
-:root[data-theme="dark"] .zazu-nav-area-trigger:hover,
-:root[data-theme="dark"] .zazu-nav-area-trigger:focus-visible {
-    color: #FFFFFF !important;
-}
-
-
-/* Dashboard parity correction:
-   Match the dashboard's final rendered palette, including its deep navy
-   navigation, cool slate canvas, white surfaces and restrained blue accent. */
+/* ==========================================================================
+   ZAZU PRODUCT VISUAL AUTHORITY
+   One shell and surface system for every authenticated route.
+   Dashboard and module layouts remain distinct; their visual language does not.
+   ========================================================================== */
 :root {
     color-scheme: light;
     --zazu-page: #DCE5ED;
@@ -585,6 +406,9 @@
     --zazu-border: #AEBBC7;
     --zazu-border-strong: #96A7B6;
     --zazu-border-subtle: #C6D0D9;
+    --zazu-surface-border: #AEBBC7;
+    --zazu-card-border: #AEBBC7;
+    --zazu-ui-border: #AEBBC7;
 
     --zazu-primary: #426987;
     --zazu-primary-light: #6487A2;
@@ -597,7 +421,7 @@
 
     --zazu-link: #365D7B;
     --zazu-link-hover: #243F56;
-    --zazu-nav-active: #426987;
+    --zazu-nav-active: #6487A2;
 
     --zazu-accent: #6487A2;
     --zazu-accent-ink: #304F69;
@@ -613,10 +437,8 @@
 
     --zazu-surface-canvas: #DCE5ED;
     --zazu-surface-card: #FFFFFF;
-    --zazu-surface-border: #AEBBC7;
     --zazu-text-main: #14243B;
     --zazu-text-muted: #64748B;
-
     --zazu-blue-primary: #426987;
     --zazu-blue-accent: #6487A2;
     --zazu-blue-hover: #304F69;
@@ -630,14 +452,12 @@
 
     --zazu-canvas-bg: #DCE5ED;
     --zazu-card-bg: #FFFFFF;
-    --zazu-card-border: #AEBBC7;
     --zazu-card-shadow: 0 3px 10px rgba(20, 36, 59, .055);
     --zazu-text-ink: #14243B;
     --zazu-text-body: #64748B;
     --zazu-card-shadow-hover: 0 7px 18px rgba(20, 36, 59, .09);
     --zazu-ui-focus: 0 0 0 2px rgba(100, 135, 162, .18);
 }
-
 :root[data-theme="dark"] {
     color-scheme: dark;
     --zazu-page: #0B1726;
@@ -664,6 +484,9 @@
     --zazu-border: #294057;
     --zazu-border-strong: #40566B;
     --zazu-border-subtle: #263A52;
+    --zazu-surface-border: #294057;
+    --zazu-card-border: #294057;
+    --zazu-ui-border: #294057;
 
     --zazu-primary: #78A9E8;
     --zazu-primary-light: #A2C2FF;
@@ -692,10 +515,8 @@
 
     --zazu-surface-canvas: #0B1726;
     --zazu-surface-card: #122235;
-    --zazu-surface-border: #294057;
     --zazu-text-main: #E6EEF7;
     --zazu-text-muted: #A4B5C8;
-
     --zazu-blue-primary: #78A9E8;
     --zazu-blue-accent: #A2C2FF;
     --zazu-blue-hover: #C4D9FF;
@@ -709,7 +530,6 @@
 
     --zazu-canvas-bg: #0B1726;
     --zazu-card-bg: #122235;
-    --zazu-card-border: #294057;
     --zazu-card-shadow: 0 3px 10px rgba(0, 0, 0, .24);
     --zazu-text-ink: #E6EEF7;
     --zazu-text-body: #C1CDDC;
@@ -717,7 +537,7 @@
     --zazu-ui-focus: 0 0 0 2px rgba(162, 194, 255, .2);
 }
 
-/* Match the dashboard's rendered shell and navigation on every route. */
+/* Shared application shell: same canvas, sidebar and topbar on every route. */
 body:not(.zazu-dashboard-page),
 body:not(.zazu-dashboard-page) .zazu-shell,
 body:not(.zazu-dashboard-page) .zazu-main,
@@ -725,18 +545,21 @@ body:not(.zazu-dashboard-page) .zazu-content {
     background: var(--zazu-page) !important;
     color: var(--zazu-ink);
 }
-body:not(.zazu-dashboard-page) .zazu-sidebar {
+body:not(.zazu-dashboard-page) .zazu-sidebar,
+body.zazu-dashboard-page .zazu-sidebar {
     background: var(--zazu-sidebar) !important;
     border-right: 1px solid var(--zazu-border) !important;
     color: var(--zazu-sidebar-ink) !important;
     box-shadow: none !important;
 }
-body:not(.zazu-dashboard-page) .zazu-topbar {
+body:not(.zazu-dashboard-page) .zazu-topbar,
+body.zazu-dashboard-page .zazu-topbar {
     background: #FFFFFF !important;
     border-bottom: 1px solid var(--zazu-border) !important;
     box-shadow: none !important;
 }
-:root[data-theme="dark"] body:not(.zazu-dashboard-page) .zazu-topbar {
+:root[data-theme="dark"] body:not(.zazu-dashboard-page) .zazu-topbar,
+:root[data-theme="dark"] body.zazu-dashboard-page .zazu-topbar {
     background: #122235 !important;
 }
 body:not(.zazu-dashboard-page) .zazu-nav-link,
@@ -750,6 +573,7 @@ body:not(.zazu-dashboard-page) .zazu-nav-area-trigger:hover,
 body:not(.zazu-dashboard-page) .zazu-nav-area-trigger:focus-visible {
     color: #FFFFFF !important;
     background: var(--zazu-sidebar-hover) !important;
+    border-color: transparent !important;
 }
 body:not(.zazu-dashboard-page) .zazu-nav-link.active,
 body:not(.zazu-dashboard-page) .zazu-nav-area.is-active > .zazu-nav-area-trigger {
@@ -757,121 +581,27 @@ body:not(.zazu-dashboard-page) .zazu-nav-area.is-active > .zazu-nav-area-trigger
     background: #1B354D !important;
     border-color: transparent !important;
 }
-
-
-/* DIRECTOR refinement: remove the outlined-template look across all modules.
-   Surfaces separate through tone and restrained depth, not pale frames or
-   thick brand-colour strokes. Keep a clear keyboard focus indicator. */
-:root {
-    --zazu-border: #B9C6D2;
-    --zazu-border-strong: #9EAFBE;
-    --zazu-border-subtle: #D0D9E2;
-    --zazu-surface-border: #B9C6D2;
+.zazu-nav-link.active,
+.zazu-nav-flyout .zazu-nav-link.active,
+.zazu-nav-area.is-active > .zazu-nav-area-trigger {
+    box-shadow: inset 2px 0 0 var(--zazu-sidebar-active) !important;
 }
-:root[data-theme="dark"] {
-    --zazu-border: #354B60;
-    --zazu-border-strong: #49647D;
-    --zazu-border-subtle: #2B4055;
-    --zazu-surface-border: #354B60;
+body.zazu-dashboard-page .zazu-sidebar .zazu-nav-link.active,
+body.zazu-dashboard-page .zazu-sidebar .zazu-nav-area.is-active > .zazu-nav-area-trigger {
+    background: #1B354D !important;
+    box-shadow: inset 2px 0 0 #6487A2 !important;
 }
-
-/* Undo oversized shell dividers introduced by earlier theme overrides. */
-body:not(.zazu-dashboard-page) .zazu-sidebar {
-    border-right: 1px solid var(--zazu-border) !important;
-}
-body:not(.zazu-dashboard-page) .zazu-topbar {
-    border-bottom: 1px solid var(--zazu-border) !important;
+body.zazu-dashboard-page .zazu-sidebar .zazu-nav-link:hover,
+body.zazu-dashboard-page .zazu-sidebar .zazu-nav-link:focus-visible,
+body.zazu-dashboard-page .zazu-sidebar .zazu-nav-area-trigger:hover,
+body.zazu-dashboard-page .zazu-sidebar .zazu-nav-area-trigger:focus-visible,
+body.zazu-dashboard-page .zazu-sidebar .zazu-nav-area.is-open > .zazu-nav-area-trigger {
+    background: #29445D !important;
+    color: #FFFFFF !important;
+    border-color: transparent !important;
 }
 
-/* Card and section containers: no bright outline; use a soft surface edge. */
-body:not(.zazu-dashboard-page) .zazu-card,
-body:not(.zazu-dashboard-page) .zazu-panel,
-body:not(.zazu-dashboard-page) .zazu-command-band,
-body:not(.zazu-dashboard-page) .zazu-ops-hero,
-body:not(.zazu-dashboard-page) .zazu-work-hero,
-body:not(.zazu-dashboard-page) .zazu-filter-card,
-body:not(.zazu-dashboard-page) .zazu-metric-card,
-body:not(.zazu-dashboard-page) .zazu-form-section,
-body:not(.zazu-dashboard-page) .zazu-table-wrap {
-    border: 1px solid var(--zazu-border) !important;
-    box-shadow: 0 2px 7px rgba(28, 49, 68, .055) !important;
-}
-:root[data-theme="dark"] body:not(.zazu-dashboard-page) .zazu-card,
-:root[data-theme="dark"] body:not(.zazu-dashboard-page) .zazu-panel,
-:root[data-theme="dark"] body:not(.zazu-dashboard-page) .zazu-command-band,
-:root[data-theme="dark"] body:not(.zazu-dashboard-page) .zazu-ops-hero,
-:root[data-theme="dark"] body:not(.zazu-dashboard-page) .zazu-work-hero,
-:root[data-theme="dark"] body:not(.zazu-dashboard-page) .zazu-filter-card,
-:root[data-theme="dark"] body:not(.zazu-dashboard-page) .zazu-metric-card,
-:root[data-theme="dark"] body:not(.zazu-dashboard-page) .zazu-form-section,
-:root[data-theme="dark"] body:not(.zazu-dashboard-page) .zazu-table-wrap {
-    box-shadow: 0 2px 8px rgba(0, 0, 0, .16) !important;
-}
-
-/* Controls should not look like every element is in a blue picture frame. */
-body:not(.zazu-dashboard-page) input:not([type="checkbox"]):not([type="radio"]),
-body:not(.zazu-dashboard-page) select,
-body:not(.zazu-dashboard-page) textarea,
-body:not(.zazu-dashboard-page) .form-control,
-body:not(.zazu-dashboard-page) .form-select {
-    border: 1px solid var(--zazu-border-strong) !important;
-    box-shadow: none !important;
-}
-body:not(.zazu-dashboard-page) input:focus,
-body:not(.zazu-dashboard-page) select:focus,
-body:not(.zazu-dashboard-page) textarea:focus,
-body:not(.zazu-dashboard-page) .form-control:focus,
-body:not(.zazu-dashboard-page) .form-select:focus {
-    border-color: var(--zazu-primary) !important;
-    outline: 0 !important;
-    box-shadow: 0 0 0 2px color-mix(in srgb, var(--zazu-primary) 18%, transparent) !important;
-}
-
-/* Strip heavy blue strokes from generic action, selected and hover states. */
-body:not(.zazu-dashboard-page) .zazu-btn,
-body:not(.zazu-dashboard-page) .btn,
-body:not(.zazu-dashboard-page) .zazu-action,
-body:not(.zazu-dashboard-page) .zazu-tab,
-body:not(.zazu-dashboard-page) .nav-link {
-    outline: 0;
-}
-body:not(.zazu-dashboard-page) .zazu-btn-secondary,
-body:not(.zazu-dashboard-page) .btn-outline-primary,
-body:not(.zazu-dashboard-page) .zazu-action {
-    border-color: var(--zazu-border-strong) !important;
-}
-body:not(.zazu-dashboard-page) .zazu-btn-primary,
-body:not(.zazu-dashboard-page) .btn-primary {
-    border: 1px solid var(--zazu-primary) !important;
-    box-shadow: 0 2px 5px rgba(35, 70, 100, .12) !important;
-}
-body:not(.zazu-dashboard-page) :focus-visible {
-    outline: 2px solid color-mix(in srgb, var(--zazu-primary) 72%, white) !important;
-    outline-offset: 2px;
-}
-
-
-/* FINAL SHARED SURFACE PASS — applies to dashboard and every module.
-   Remove legacy thick blue side rails and bright card frames. Distinction is
-   carried by surface tone, spacing and typography; status colours remain. */
-:root {
-    --zazu-border: #AEBBC7;
-    --zazu-border-strong: #96A7B6;
-    --zazu-border-subtle: #C6D0D9;
-    --zazu-surface-border: #AEBBC7;
-    --zazu-card-border: #AEBBC7;
-    --zazu-ui-border: #AEBBC7;
-}
-:root[data-theme="dark"] {
-    --zazu-border: #354A5E;
-    --zazu-border-strong: #496176;
-    --zazu-border-subtle: #2B3E51;
-    --zazu-surface-border: #354A5E;
-    --zazu-card-border: #354A5E;
-    --zazu-ui-border: #354A5E;
-}
-
-/* Neutral 1px perimeter on shared structural surfaces, including dashboard. */
+/* One restrained surface system; layout and semantic status remain page-owned. */
 .zazu-card,
 .zazu-panel,
 .zazu-command-band,
@@ -888,8 +618,7 @@ body:not(.zazu-dashboard-page) :focus-visible {
 .zazu-route-card,
 .zazu-calendar-shell,
 .zazu-calendar-command-shell {
-    border-width: 1px !important;
-    border-color: var(--zazu-border) !important;
+    border: 1px solid var(--zazu-border) !important;
     box-shadow: 0 2px 7px rgba(28, 49, 68, .045) !important;
 }
 :root[data-theme="dark"] .zazu-card,
@@ -910,78 +639,75 @@ body:not(.zazu-dashboard-page) :focus-visible {
 :root[data-theme="dark"] .zazu-calendar-command-shell {
     box-shadow: 0 2px 8px rgba(0, 0, 0, .15) !important;
 }
-
-/* Legacy command cards used 3–4px blue rails. Replace with clean surfaces. */
-.zazu-next-action-primary,
-.zazu-edit-command,
-.zazu-customer-hero,
-.zazu-customer-editor-command,
-.zazu-requirements-command,
-.zazu-requirement-editor-command,
-.zazu-quote-editor-command,
-.zazu-quote-hero {
-    border-left: 1px solid var(--zazu-border) !important;
-}
-.zazu-next-action-warning {
-    border-left-width: 1px !important;
-}
-.zazu-calendar-agenda-event {
-    border-left-width: 1px !important;
-}
-.zazu-inspector-note,
-.zazu-inspector-empty {
-    border-left: 1px solid var(--zazu-border) !important;
-}
-
-/* Dashboard had hard-coded 2px slate borders and older 3px focus rings.
-   Bring it under the same quiet surface system without changing its layout. */
-body.zazu-dashboard-page .zazu-sidebar {
-    border-right: 1px solid var(--zazu-border) !important;
-}
-body.zazu-dashboard-page .zazu-topbar {
-    border-bottom: 1px solid var(--zazu-border) !important;
-}
-body.zazu-dashboard-page .zazu-dash-hero,
-body.zazu-dashboard-page .zazu-dash-overview .zazu-dash-metric,
-body.zazu-dashboard-page .zazu-dash-grid[aria-label="Operational dashboard panels"] > .zazu-dash-surface {
-    border: 1px solid var(--zazu-border) !important;
-    box-shadow: 0 2px 7px rgba(28, 49, 68, .045) !important;
-}
-body.zazu-dashboard-page .zazu-dash-surface-head {
-    border-bottom: 1px solid var(--zazu-border) !important;
-}
-body.zazu-dashboard-page .zazu-dash-hero-side {
-    border-left: 1px solid var(--zazu-border) !important;
-}
-body.zazu-dashboard-page .zazu-dash-event,
-body.zazu-dashboard-page .zazu-dash-focus-item,
-body.zazu-dashboard-page .zazu-dash-resource-grid > *,
-body.zazu-dashboard-page .zazu-dash-quote-stage {
-    border: 1px solid var(--zazu-border-subtle) !important;
-}
-:root[data-theme="dark"] body.zazu-dashboard-page .zazu-dash-hero,
-:root[data-theme="dark"] body.zazu-dashboard-page .zazu-dash-overview .zazu-dash-metric,
-:root[data-theme="dark"] body.zazu-dashboard-page .zazu-dash-grid[aria-label="Operational dashboard panels"] > .zazu-dash-surface {
+.zazu-card,
+.zazu-panel,
+.zazu-form-section,
+.zazu-context-card,
+.zazu-contact-card,
+.zazu-detail-value-box,
+.zazu-table-wrap,
+.zazu-document-table-wrap,
+.zazu-list {
     border-color: var(--zazu-border) !important;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, .18) !important;
+    border-radius: var(--zazu-radius-md);
+    background: var(--zazu-surface);
 }
-:root[data-theme="dark"] body.zazu-dashboard-page .zazu-dash-surface-head,
-:root[data-theme="dark"] body.zazu-dashboard-page .zazu-dash-event,
-:root[data-theme="dark"] body.zazu-dashboard-page .zazu-dash-focus-item,
-:root[data-theme="dark"] body.zazu-dashboard-page .zazu-dash-resource-grid > *,
-:root[data-theme="dark"] body.zazu-dashboard-page .zazu-dash-quote-stage {
-    border-color: var(--zazu-border) !important;
+.zazu-card-header,
+.zazu-panel-head {
+    background: var(--zazu-surface-2);
+    border-bottom: 1px solid var(--zazu-border);
 }
-:root[data-theme="dark"] body.zazu-dashboard-page .zazu-dash-hero-side {
-    border-left-color: var(--zazu-border) !important;
+.zazu-form-section {
+    padding: 18px;
+    box-shadow: 0 1px 2px color-mix(in srgb, var(--zazu-ink) 3%, transparent);
+}
+.zazu-form-section-head {
+    border-bottom-color: var(--zazu-border);
+}
+.zazu-list-item {
+    border-bottom-color: var(--zazu-border);
+    color: var(--zazu-ink);
+}
+.zazu-list-item:hover {
+    background: var(--zazu-surface-2);
+    box-shadow: none;
+}
+.zazu-list-title,
+.zazu-side-primary,
+.zazu-detail-value {
+    color: var(--zazu-ink);
+}
+.zazu-list-meta,
+.zazu-card-description,
+.zazu-panel-copy,
+.zazu-form-section-copy {
+    color: var(--zazu-muted);
 }
 
-/* Standardise field outlines everywhere; keep keyboard focus visible. */
+/* Module command bands must not retain the old dark-blue gradient banner. */
+.zazu-command-band {
+    background: var(--zazu-surface) !important;
+    background-image: none !important;
+    color: var(--zazu-ink) !important;
+}
+.zazu-command-band .zazu-eyebrow,
+.zazu-command-band .zazu-command-meta-label,
+.zazu-command-band .zazu-command-copy,
+.zazu-command-band .zazu-command-meta-value {
+    color: var(--zazu-muted) !important;
+}
+.zazu-command-band .zazu-command-title {
+    color: var(--zazu-ink) !important;
+}
+
+/* Quiet control borders and a visible but restrained keyboard focus state. */
 input:not([type="checkbox"]):not([type="radio"]),
 select,
 textarea,
 .zazu-input,
-.zazu-select {
+.zazu-select,
+.form-control,
+.form-select {
     border-color: var(--zazu-border-strong) !important;
     box-shadow: none !important;
 }
@@ -989,39 +715,84 @@ input:focus,
 select:focus,
 textarea:focus,
 .zazu-input:focus,
-.zazu-select:focus {
+.zazu-select:focus,
+.form-control:focus,
+.form-select:focus {
     border-color: var(--zazu-primary) !important;
     outline: 0 !important;
     box-shadow: 0 0 0 2px color-mix(in srgb, var(--zazu-primary) 16%, transparent) !important;
 }
+:focus-visible {
+    outline: 2px solid color-mix(in srgb, var(--zazu-primary) 72%, white) !important;
+    outline-offset: 2px;
+}
 
-
-/* Quote register + quote editor: remove remaining legacy blue rails/insets. */
+/* Remove decorative blue rails; status meaning stays in text and soft fills. */
+.zazu-next-action,
+.zazu-dashboard-attention {
+    border: 1px solid var(--zazu-border) !important;
+    border-left: 1px solid var(--zazu-border) !important;
+    background: var(--zazu-surface) !important;
+    box-shadow: none !important;
+}
+.zazu-next-action-warning,
+.zazu-quote-review-action {
+    border-left: 1px solid var(--zazu-border) !important;
+}
+.zazu-quote-review-action {
+    background: var(--zazu-warning-soft) !important;
+}
+.zazu-next-action-primary,
+.zazu-edit-command,
+.zazu-customer-hero,
+.zazu-customer-editor-command,
+.zazu-requirements-command,
+.zazu-requirement-editor-command,
 .zazu-quote-register-command,
 .zazu-quote-history-command,
 .zazu-quote-editor-command,
-.zazu-quote-hero {
+.zazu-quote-hero,
+.zazu-inspector-note,
+.zazu-inspector-empty {
     border-left: 1px solid var(--zazu-border) !important;
+}
+.zazu-calendar-event,
+.zazu-calendar-agenda-event {
+    border-left: 1px solid var(--zazu-border-strong) !important;
+    box-shadow: none !important;
+}
+.zazu-calendar-holiday,
+.zazu-calendar-agenda-holiday {
+    border-left-width: 1px !important;
+    border-left-color: var(--zazu-border-strong) !important;
+}
+.zazu-customer-directory .zazu-list-item:hover {
+    box-shadow: none !important;
+    background: var(--zazu-surface-2) !important;
+}
+.zazu-niche-card.is-selected {
+    box-shadow: none !important;
+    border-color: var(--zazu-primary) !important;
 }
 .zazu-quote-register-row:hover {
     border-color: var(--zazu-border) !important;
     box-shadow: inset 2px 0 0 var(--zazu-border-strong) !important;
 }
-.zazu-quote-review-action {
-    border-left: 1px solid var(--zazu-border) !important;
-    background: var(--zazu-surface-2) !important;
-}
-.zazu-quote-total-panel {
-    border-top: 1px solid var(--zazu-border) !important;
-}
+.zazu-quote-total-panel,
 .zazu-total-row {
     border-top: 1px solid var(--zazu-border) !important;
 }
 .zazu-quote-lines .zazu-record-header {
     border-bottom: 1px solid var(--zazu-border) !important;
 }
+.zazu-nav-flyout {
+    border-left-width: 1px !important;
+}
+.zazu-document-total-grand {
+    border-top-width: 1px !important;
+}
 
-/* Quote register spacing: more breathing room at the top and between records. */
+/* Quote register: consistent header inset and comfortable record spacing. */
 .zazu-quote-register-command {
     padding: 22px 24px !important;
     margin-bottom: 22px !important;
@@ -1044,7 +815,7 @@ textarea:focus,
 }
 @media (max-width: 720px) {
     .zazu-quote-register-command {
-        padding: 18px 18px !important;
+        padding: 18px !important;
         margin-bottom: 16px !important;
     }
     .zazu-quote-register-command + .zazu-card .zazu-card-header {
@@ -1056,107 +827,7 @@ textarea:focus,
     }
 }
 
-
-/* Remaining legacy blue rails on action, attention and calendar components. */
-.zazu-next-action,
-.zazu-dashboard-attention,
-.zazu-calendar-event,
-.zazu-calendar-agenda-event {
-    border-left: 1px solid var(--zazu-border) !important;
-}
-.zazu-next-action {
-    border: 1px solid var(--zazu-border) !important;
-    border-radius: var(--zazu-radius-md) !important;
-    background: var(--zazu-surface) !important;
-    box-shadow: none !important;
-}
-.zazu-dashboard-attention {
-    border: 1px solid var(--zazu-border) !important;
-    background: var(--zazu-surface-2) !important;
-}
-.zazu-calendar-event {
-    border-left-color: var(--zazu-border-strong) !important;
-}
-.zazu-calendar-agenda-event {
-    border-left-color: var(--zazu-border-strong) !important;
-}
-.zazu-nav-flyout {
-    border-left-width: 1px !important;
-}
-.zazu-document-total-grand {
-    border-top-width: 1px !important;
-}
-
-
-/* Keep warning hierarchy in the fill and label, not a thick coloured rail. */
-.zazu-next-action-warning,
-.zazu-quote-review-action {
-    border-left: 1px solid var(--zazu-border) !important;
-}
-.zazu-quote-review-action {
-    background: var(--zazu-warning-soft) !important;
-}
-
-
-/* Command headers must not carry the legacy dark-blue banner treatment.
-   They are the same light surface language as the rest of the workspace. */
-.zazu-command-band {
-    background: var(--zazu-surface) !important;
-    background-image: none !important;
-    color: var(--zazu-ink) !important;
-    border-color: var(--zazu-border) !important;
-}
-.zazu-command-band .zazu-eyebrow,
-.zazu-command-band .zazu-command-meta-label {
-    color: var(--zazu-muted) !important;
-}
-.zazu-command-band .zazu-command-title {
-    color: var(--zazu-ink) !important;
-}
-.zazu-command-band .zazu-command-copy,
-.zazu-command-band .zazu-command-meta-value {
-    color: var(--zazu-muted) !important;
-}
-:root[data-theme="dark"] .zazu-command-band {
-    background: var(--zazu-surface) !important;
-    background-image: none !important;
-}
-
-/* Remove decorative 3px blue rails from selected and calendar elements. */
-.zazu-customer-directory .zazu-list-item:hover {
-    box-shadow: none !important;
-    background: var(--zazu-surface-2) !important;
-}
-.zazu-niche-card.is-selected {
-    box-shadow: none !important;
-    border-color: var(--zazu-primary) !important;
-}
-.zazu-calendar-holiday,
-.zazu-calendar-agenda-holiday {
-    border-left-width: 1px !important;
-    border-left-color: var(--zazu-border-strong) !important;
-}
-
-
-/* Active navigation uses a narrow slate marker, not a thick blue stripe. */
-.zazu-nav-link.active,
-.zazu-nav-flyout .zazu-nav-link.active,
-.zazu-nav-area.is-active > .zazu-nav-area-trigger {
-    box-shadow: inset 2px 0 0 var(--zazu-sidebar-active) !important;
-}
-body.zazu-dashboard-page .zazu-sidebar .zazu-nav-link.active,
-body.zazu-dashboard-page .zazu-sidebar .zazu-nav-area.is-active > .zazu-nav-area-trigger {
-    box-shadow: inset 2px 0 0 #6487A2 !important;
-}
-
-/* Calendar event chips rely on their semantic tint and label, not a blue rail. */
-.zazu-calendar-event {
-    box-shadow: none !important;
-}
-
-
-/* Dashboard quote pipeline: give the four stage tiles real breathing room
-   below the panel header and around their own content. */
+/* Dashboard quote pipeline: inset stage cards below the panel header. */
 .zazu-dash-commercial .zazu-dash-quote-stages {
     padding: 12px 18px 14px !important;
     gap: 10px !important;
@@ -1164,6 +835,12 @@ body.zazu-dashboard-page .zazu-sidebar .zazu-nav-area.is-active > .zazu-nav-area
 .zazu-dash-commercial .zazu-dash-quote-stage {
     min-height: 88px !important;
     padding: 12px !important;
+}
+body.zazu-dashboard-page .zazu-dash-surface-head {
+    border-bottom: 1px solid var(--zazu-border) !important;
+}
+body.zazu-dashboard-page .zazu-dash-hero-side {
+    border-left: 1px solid var(--zazu-border) !important;
 }
 @media (max-width: 620px) {
     .zazu-dash-commercial .zazu-dash-quote-stages {
