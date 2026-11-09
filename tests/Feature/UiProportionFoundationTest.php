@@ -157,4 +157,29 @@ class UiProportionFoundationTest extends TestCase
         $this->assertStringNotContainsString('background: rgba(255,255,255,.09) !important;', $dashboardCss);
     }
 
+
+    public function test_product_wide_visual_authority_is_loaded_after_module_styles_and_applies_shared_primitives(): void
+    {
+        $css = file_get_contents(resource_path('css/zazu-product-authority.css'));
+        $layout = file_get_contents(resource_path('views/components/app-layout.blade.php'));
+        $vite = file_get_contents(base_path('vite.config.js'));
+
+        $this->assertIsString($css);
+        $this->assertIsString($layout);
+        $this->assertIsString($vite);
+        $this->assertStringContainsString('zazu-product-authority.css', $layout);
+        $this->assertStringContainsString('zazu-product-authority.css', $vite);
+        $this->assertGreaterThan(
+            strpos($layout, 'zazu-dashboard-authority.css'),
+            strpos($layout, 'zazu-product-authority.css')
+        );
+        $this->assertStringContainsString('--zazu-border: #C4D0DB;', $css);
+        $this->assertStringContainsString('--zazu-border: #496174;', $css);
+        $this->assertStringContainsString('.zazu-card, .zazu-panel', $css);
+        $this->assertStringContainsString('.zazu-form-section', $css);
+        $this->assertStringContainsString('.zazu-table-wrap', $css);
+        $this->assertStringContainsString('.zazu-btn {', $css);
+        $this->assertStringContainsString('.zazu-input, .zazu-select, .zazu-textarea', $css);
+    }
+
 }
