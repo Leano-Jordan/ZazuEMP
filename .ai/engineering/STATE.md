@@ -1314,3 +1314,13 @@ Owner expanded the visual refinement scope beyond the dashboard: apply the estab
 - Rebuilt the page-cache identity as user + business; require both rendered body IDs; clear old context after a successful business switch; reject late old-context writes through the generation counter.
 - Advanced service-worker cache to v31 and added JS/PHP regression coverage.
 - PC and mobile offline parity remains the next active objective after exact-head CI. The stable development-origin decision is Tailscale MagicDNS + HTTPS Serve, pending owner device installation/approval.
+
+## Editor and save-action rhythm — 2026-11-09
+
+- Inspected shared editor layout and representative customer, job, quote and inventory forms before changing styles.
+- Standardized editor column gap, form-section spacing/padding, section-header rhythm and form-grid gaps.
+- Removed sticky side behaviour from form-aside guidance at tablet widths so it no longer competes with the form.
+- Unified normal and sticky action bars: neutral border, restrained shadow, consistent radius/gap, safe-area-aware sticky offset and predictable mobile full-width actions.
+- Added regression assertions for editor spacing, form sections, action bars, safe-area handling and single-column mobile form grids.
+- Commits: `77d53b0` (editor/actionbar refinement), `e9855f6` (regression coverage).
+- PHPUnit, Vite build and rendered desktop/tablet/mobile visual review remain unverified.
