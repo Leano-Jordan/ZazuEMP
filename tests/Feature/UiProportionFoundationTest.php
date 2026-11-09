@@ -152,7 +152,7 @@ class UiProportionFoundationTest extends TestCase
         $this->assertStringContainsString('background: #B9CCD9 !important;', $dashboardCss);
         $this->assertStringContainsString('color: #20374A !important;', $dashboardCss);
         $this->assertStringContainsString('border-radius: 4px !important;', $dashboardCss);
-        $this->assertStringContainsString('outline: 2px solid #8CCDE4 !important;', $dashboardCss);
+        $this->assertStringContainsString('outline: 2px solid #426987 !important;', $dashboardCss);
         $this->assertStringNotContainsString('background: #B9CAD9 !important;', $dashboardCss);
         $this->assertStringNotContainsString('background: rgba(255,255,255,.09) !important;', $dashboardCss);
         $productCss = file_get_contents(resource_path('css/zazu-product-authority.css'));
