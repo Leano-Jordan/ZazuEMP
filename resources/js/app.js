@@ -1085,9 +1085,12 @@ function setupZazuOfflineDirectoryViews() {
         if (!directory) return;
 
         directory.querySelectorAll('[data-zazu-local-record="customer"]').forEach(node => node.remove());
-        const customers = (state?.customers || []).filter(customer =>
-            customer?.local_id && customer.server_id == null && customer.id == null
-        );
+        const customers = (state?.customers || []).filter(customer => {
+            if (!customer?.local_id) return false;
+            const serverId = customer.server_id ?? customer.id;
+            return !serverId || !directory.querySelector('[data-zazu-server-customer-id="' + Number(serverId) + '"]');
+        });
+        const pendingCustomers = customers.filter(customer => customer.server_id == null && customer.id == null);
         const empty = directory.querySelector('.zazu-empty');
         const header = directory.querySelector('.zazu-record-header');
 
@@ -1126,7 +1129,7 @@ function setupZazuOfflineDirectoryViews() {
 
             const sync = document.createElement('div');
             sync.className = 'zazu-action-group';
-            sync.append(text('span', 'zazu-chip zazu-chip-neutral', 'Waiting to sync'));
+            sync.append(text('span', 'zazu-chip zazu-chip-neutral', (customer.server_id ?? customer.id) ? 'Synced' : 'Waiting to sync'));
 
             row.append(identity, work, sync);
             if (empty?.parentNode === directory) directory.insertBefore(row, empty);
@@ -1135,10 +1138,10 @@ function setupZazuOfflineDirectoryViews() {
 
         if (empty) empty.hidden = customers.length > 0;
         const count = directory.closest('main, [data-page-content]')?.querySelector('.zazu-command-meta-value');
-        if (count && customers.length) {
+        if (count && pendingCustomers.length) {
             const serverCount = Number(count.dataset.serverCount ?? count.textContent.trim());
             count.dataset.serverCount = String(Number.isFinite(serverCount) ? serverCount : 0);
-            count.textContent = String(Number(count.dataset.serverCount) + customers.length);
+            count.textContent = String(Number(count.dataset.serverCount) + pendingCustomers.length);
         }
     };
 
@@ -1148,12 +1151,12 @@ function setupZazuOfflineDirectoryViews() {
 
         register.querySelectorAll('[data-zazu-local-record="job"]').forEach(node => node.remove());
         const filter = new URLSearchParams(window.location.search).get('filter') || '';
-        const jobs = (state?.jobs || []).filter(job =>
-            job?.local_id
-            && job.server_id == null
-            && job.id == null
-            && (!filter || filter === 'draft')
-        );
+        const jobs = (state?.jobs || []).filter(job => {
+            if (!job?.local_id || (filter && filter !== 'draft')) return false;
+            const serverId = job.server_id ?? job.id;
+            return !serverId || !register.querySelector('[data-zazu-server-job-id="' + Number(serverId) + '"]');
+        });
+        const pendingJobs = jobs.filter(job => job.server_id == null && job.id == null);
         const empty = register.querySelector('.zazu-empty');
         const header = register.querySelector('.zazu-ops-table-head');
 
@@ -1202,14 +1205,14 @@ function setupZazuOfflineDirectoryViews() {
                 })(),
                 (() => {
                     const status = document.createElement('span');
-                    status.append(text('span', 'zazu-chip zazu-chip-neutral', 'Saved offline'));
+                    status.append(text('span', 'zazu-chip zazu-chip-neutral', (job.server_id ?? job.id) ? 'Synced' : 'Saved offline'));
                     return status;
                 })()
             );
 
             const actions = document.createElement('div');
             actions.className = 'zazu-ops-actions';
-            actions.append(text('span', 'zazu-chip zazu-chip-neutral', 'Waiting to sync'));
+            actions.append(text('span', 'zazu-chip zazu-chip-neutral', (job.server_id ?? job.id) ? 'On server' : 'Waiting to sync'));
             row.append(main, actions);
 
             if (empty?.parentNode === register) register.insertBefore(row, empty);
@@ -1221,7 +1224,7 @@ function setupZazuOfflineDirectoryViews() {
         if (total) {
             const serverCount = Number(total.dataset.serverCount ?? total.textContent.match(/[0-9]+/)?.[0] ?? 0);
             total.dataset.serverCount = String(Number.isFinite(serverCount) ? serverCount : 0);
-            total.textContent = (Number(total.dataset.serverCount) + jobs.length) + ' records';
+            total.textContent = (Number(total.dataset.serverCount) + pendingJobs.length) + ' records';
         }
 
         const allPill = document.querySelector('.zazu-workload-pill[href$="work"]');
@@ -1232,7 +1235,7 @@ function setupZazuOfflineDirectoryViews() {
             if (!value) continue;
             const serverCount = Number(value.dataset.serverCount ?? value.textContent.trim());
             value.dataset.serverCount = String(Number.isFinite(serverCount) ? serverCount : 0);
-            value.textContent = String(Number(value.dataset.serverCount) + jobs.length);
+            value.textContent = String(Number(value.dataset.serverCount) + pendingJobs.length);
         }
     };
 
