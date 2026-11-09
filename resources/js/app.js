@@ -2212,13 +2212,35 @@ function showZazuOfflineOriginNotice() {
     document.body.prepend(notice);
 }
 
+function showZazuOfflineRegistrationNotice() {
+    if (document.querySelector('[data-zazu-offline-registration-notice]')) return;
+
+    const notice = document.createElement('aside');
+    notice.dataset.zazuOfflineRegistrationNotice = '1';
+    notice.className = 'zazu-offline-origin-notice';
+    notice.setAttribute('role', 'status');
+    notice.setAttribute('aria-live', 'polite');
+
+    const title = document.createElement('strong');
+    title.textContent = 'Zazu could not enable offline app support.';
+
+    const description = document.createElement('p');
+    description.textContent = 'This browser could not register Zazu’s service worker. Confirm that the address uses trusted HTTPS, then reload Zazu. Until offline setup succeeds, this device may still need the server to open the app.';
+
+    notice.append(title, description);
+    document.body.prepend(notice);
+}
+
 function registerZazuServiceWorker() {
     if (window.isSecureContext === false) {
         showZazuOfflineOriginNotice();
         return;
     }
 
-    if (!('serviceWorker' in navigator)) return;
+    if (!('serviceWorker' in navigator)) {
+        showZazuOfflineRegistrationNotice();
+        return;
+    }
 
     const primeInstalledPages = (registration) => {
         const userId = document.body?.dataset.zazuUserId;
@@ -2255,7 +2277,8 @@ function registerZazuServiceWorker() {
                 primeInstalledPages(ready);
             })
             .catch(() => {
-                // Offline asset support is an enhancement; application behaviour must not depend on it.
+                // Keep normal online use available, but make failed offline setup visible.
+                showZazuOfflineRegistrationNotice();
             });
     });
 }
