@@ -74,7 +74,7 @@ test.describe('Zazu UI theme and navigation', () => {
         });
 
         expect(darkTokens.surface.toLowerCase()).toBe('#122235');
-        expect(darkTokens.primary.toLowerCase()).toBe('#6fa4ff');
+        expect(darkTokens.primary.toLowerCase()).toBe('#78a9e8');
         expect(darkTokens.activeBackground).toBe('rgb(72, 97, 116)');
         expect(darkTokens.activeColor).toBe('rgb(243, 246, 248)');
         expect(darkTokens.workspaceColor).toBe('rgb(229, 235, 240)');
