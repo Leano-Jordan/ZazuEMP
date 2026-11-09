@@ -106,12 +106,22 @@ if ($LASTEXITCODE -ne 0) {
 
 Remove-Item $pidPath -Force -ErrorAction SilentlyContinue
 $arguments = 'run --config "{0}" --adapter caddyfile' -f $configPath
+$caddyProcess = $null
 try {
     $caddyProcess = Start-Process -FilePath $caddy -ArgumentList $arguments -WorkingDirectory $ProjectPath -RedirectStandardOutput $stdoutPath -RedirectStandardError $stderrPath -WindowStyle Hidden -PassThru
     Set-Content -Path $pidPath -Value $caddyProcess.Id -Encoding ASCII
 } catch {
-    & $startServer -Stop -Port $AppPort
-    throw
+    $startupError = $_
+    if ($caddyProcess -and -not $caddyProcess.HasExited) {
+        Stop-Process -Id $caddyProcess.Id -Force -ErrorAction SilentlyContinue
+    }
+    Remove-Item $pidPath -Force -ErrorAction SilentlyContinue
+    try {
+        & $startServer -Stop -Port $AppPort
+    } catch {
+        Write-Warning "Laravel cleanup also failed after the Caddy startup error: $($_.Exception.Message)"
+    }
+    throw $startupError
 }
 
 $ready = $false
