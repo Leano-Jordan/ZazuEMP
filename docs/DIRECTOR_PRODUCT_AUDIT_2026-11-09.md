@@ -3,7 +3,7 @@
 **Date:** 2026-11-09  
 **Repository:** `Leano-Jordan/ZazuEMP`  
 **Branch:** `main`  
-**Audited source/test head:** `3746d08c7000d4eb5c3c36e026ca6cc8a718c61e`  
+**Audited source/test head:** `285fa18aa856539b0a1bbeef563aebd7138253f6`  
 **Audit type:** repository, architecture, test, workflow and release-evidence review. No live customer deployment or physical device was available to this audit.
 
 ## Executive decision
@@ -90,19 +90,13 @@ Do not add these ahead of correctness, offline acceptance and recovery.
 
 ## 4. Current-head automated verification
 
-The immediately preceding source/test head `59a5db5` exposed real verification drift:
+The preceding verification attempts exposed test-contract drift rather than a new business-logic regression:
 
-- Laravel: **409 passed, 3 failed**. The three failures were stale UI regression expectations for the focus colour, panel-header surface and removed route-specific coloured form-section selectors.
-- PHPMD: one test method exceeded the 100-line threshold by one line.
-- Psalm: passed.
-- Populated upgrade/rollback: passed.
-- Director Contract Lint and CodeQL: passed.
-- Browser smoke was still running when inspected.
-- SonarCloud was skipped.
+- At `59a5db5`, Laravel reported **409 passed, 3 failed**. The failures were stale UI expectations for the focus colour, title-bar surface and removed route-specific coloured form-section selectors. PHPMD also found one test method at 101 lines against a 100-line limit.
+- At `3746d08`, the corrected suite reported **411 passed, 1 failed**. The remaining failure expected an obsolete `.zazu-ops-actions .zazu-btn` selector that is no longer present in the product-authority stylesheet. PHPMD passed; populated upgrade/rollback passed; Psalm passed; browser smoke was still running; Quality failed on the same stale UI assertion. SonarCloud was skipped.
+- The obsolete assertion was replaced with selectors that actually exist in the current shared button authority. The test method is now 90 lines. This correction is on `main` at `285fa18`.
 
-The three stale UI expectations were aligned with the owner-approved card-only colour/title-bar system, and the oversized test method was reduced from 101 to 90 lines. These corrections are on `main` at `3746d08`.
-
-**Current exact-head status:** Laravel, PHPMD, Zazu Quality, Psalm, populated upgrade/rollback and browser smoke were queued/in progress when this audit snapshot was written. No pass is claimed until the runs complete on `3746d08`. SonarCloud remains skipped and is not counted as a pass.
+**Current exact-head status:** Laravel, PHPMD, Zazu Quality, Psalm, populated upgrade/rollback and browser smoke were queued/in progress when this audit snapshot was written. No pass is claimed until the runs complete on `285fa18`. SonarCloud remains skipped and is not counted as a pass.
 
 ## 5. Network address decision
 
@@ -123,7 +117,7 @@ A public production hostname remains a later paid-server decision. Device-local 
 
 ## 6. Prioritised execution order
 
-1. Close exact-head CI on `3746d08`; repair only confirmed remaining failures.
+1. Close exact-head CI on `285fa18`; repair only confirmed remaining failures.
 2. Establish a stable private HTTPS development origin for PC/mobile testing; migrate deliberately because browser storage is origin-scoped. Preserve and reconcile pending local queues before changing origins.
 3. Audit and implement the declared PC offline workflows.
 4. Audit and implement the declared mobile offline workflows, including attachment persistence.
@@ -134,7 +128,7 @@ A public production hostname remains a later paid-server decision. Device-local 
 
 ## 7. Scope and invariants
 
-- Keep all work in this repository on `main`; do not create branches.
+- Keep all work in this repository on `main`; do not create branches. A stale `director/v1-sync-ci-repairs` branch was found 124 commits behind main and 0 commits ahead; the available GitHub connection cannot delete refs, so it remains policy drift to remove with authorized branch administration.
 - Preserve the connected commercial workflow and business ownership model.
 - No new feature expansion during V1 convergence.
 - Never claim full offline support from caching or automated tests alone.
