@@ -1261,3 +1261,15 @@ Owner expanded the visual refinement scope beyond the dashboard: apply the estab
 
 - Follow-up cleanup: removed all 34 remaining gradient functions from app.css, including card/command surfaces, wallpaper overlays, dashboard visual overlays, auth/login backdrops and decorative section fills. Replaced them with solid theme/semantic surfaces; wallpaper image assets remain supported. Skeleton shimmer is now a quiet solid placeholder rather than a moving gradient.
 - Removed the last hard-coded dark-blue dashboard hover declaration from the product authority; dashboard hover now resolves to the light slate-blue palette.
+
+
+## Card-only colour and navigation contrast correction — 2026-11-09
+
+- Restricted semantic colour to actual card surfaces: route cards, KPI cards, dashboard event/focus/resource/quote-stage cards, customer detail cards and work-progress states.
+- Removed category-specific card-header fills and route-specific form-section fills. All module and dashboard title bars now use one restrained neutral slate surface; dark mode uses a coordinated charcoal-slate surface.
+- Fixed selected navigation contrast explicitly:
+  - Light: #B4C8D7 selected surface with #23394D text.
+  - Dark: #486174 selected surface with #F3F6F8 text.
+  - Dark hover: #344653 with #E5EBF0 text.
+- Added regression assertions for selected states and unified title bars.
+- Automated tests, build and rendered desktop/mobile acceptance remain pending.
