@@ -1170,3 +1170,13 @@ Owner expanded the visual refinement scope beyond the dashboard: apply the estab
 - Commits: `9c21375` (dashboard spacing), `95bda8f` (disclosure spacing), `71987f0` (dashboard regression test), `6e8a06b` (disclosure regression test).
 - Scope is spacing-only. Existing status pills/chips remain intentionally rounded semantic labels; navigation and action controls retain the compact non-oval treatment already established.
 - Source verification and CI/runtime test execution remain pending; no rendered browser acceptance is claimed.
+
+## Product-wide visual authority — 2026-11-09
+
+- Owner confirmed Zazu EMP must maintain one consistent quality level across all authenticated modules, not just the dashboard.
+- Added `resources/css/zazu-product-authority.css` as the final shared visual layer, loaded after dashboard/module styles in the authenticated application shell and registered as a Vite entry.
+- Shared authority aligns neutral border contrast in light/dark themes, compact 5/7/8px geometry, card/panel/form surfaces, header insets, form-section spacing, button and field geometry, table wrappers and responsive padding.
+- Semantic status chips remain compact labels; module-specific layouts and workflows remain intact.
+- Added `UiProportionFoundationTest::test_product_wide_visual_authority_is_loaded_after_module_styles_and_applies_shared_primitives`.
+- Commits: `25dfe61` (shared stylesheet), `1c3381b` (authenticated layout load), `32008a6` (Vite entry), `67e8eb4` (regression coverage).
+- Source is committed on `main`. PHPUnit, Vite build, full-page rendered comparison across modules/themes and mobile acceptance are not yet executed/verified. No claim of visual sign-off or CI pass.
