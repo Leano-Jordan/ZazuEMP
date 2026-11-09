@@ -201,6 +201,12 @@ class UiProportionFoundationTest extends TestCase
         $this->assertStringContainsString('.zazu-dashboard-quickbar nav a', $css);
         $this->assertStringContainsString('.zazu-workload-pill', $css);
         $this->assertStringContainsString('border-radius: var(--zazu-radius-md);', $css);
+        $this->assertStringContainsString('.zazu-editor {', $css);
+        $this->assertStringContainsString('.zazu-form-section + .zazu-form-section', $css);
+        $this->assertStringContainsString('.zazu-actionbar-sticky {', $css);
+        $this->assertStringContainsString('env(safe-area-inset-bottom)', $css);
+        $this->assertStringContainsString('.zazu-form-aside {', $css);
+        $this->assertStringContainsString('grid-template-columns: minmax(0, 1fr);', $css);
     }
 
 }
