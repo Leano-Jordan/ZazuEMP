@@ -897,7 +897,7 @@ body.zazu-dashboard-page .zazu-dash-hero-side {
  border-bottom:1px solid color-mix(in srgb,var(--zazu-tone-ink-blue) 22%,var(--zazu-border)) !important;
 }
 .zazu-card-header::before,.zazu-panel-head::before {
- content:"";position:absolute;inset:0 auto 0 0;width:3px;background:#5C8DB8;
+ content:none !important;
 }
 .zazu-card-header .zazu-eyebrow,.zazu-panel-head .zazu-eyebrow {color:var(--zazu-tone-ink-blue)!important}
 .zazu-card-title,.zazu-panel-title {font-weight:740!important;letter-spacing:-.02em}
