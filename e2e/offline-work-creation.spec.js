@@ -91,13 +91,17 @@ test('real Zazu job form can create a job locally while disconnected', async ({ 
     expect(persisted.some((job) => job.name === 'Offline catering job' && job.local_id)).toBe(true);
     const persistedQueue = await page.evaluate(async () => await window.ZazuOffline?.pending());
     expect(persistedQueue.some((mutation) => mutation.entity_type === 'job' && mutation.payload?.name === 'Offline catering job')).toBe(true);
+    const persistedCustomer = await page.evaluate(() => window.ZazuOffline?.getState()?.customers?.find(customer => customer.name === 'Offline test customer') || null);
+    expect(persistedCustomer).toBeTruthy();
 
     // Offline records must be visible in the normal operating directories,
     // not merely present in IndexedDB.
     await page.goto('/work', { waitUntil: 'domcontentloaded' });
+    await expect(page.locator('[data-zazu-local-record="job"]').filter({ hasText: 'Offline catering job' })).toHaveCount(1);
     await expect(page.locator('[data-zazu-local-record="job"]').filter({ hasText: 'Offline catering job' })).toBeVisible();
-    await expect(page.locator('[data-zazu-local-record="job"]').filter({ hasText: 'Offline test customer' })).toBeVisible();
+    await expect(page.locator('[data-zazu-local-record="job"]').filter({ hasText: 'Offline test customer' })).toHaveCount(1);
 
     await page.goto('/customers', { waitUntil: 'domcontentloaded' });
+    await expect(page.locator('[data-zazu-local-record="customer"]').filter({ hasText: 'Offline test customer' })).toHaveCount(1);
     await expect(page.locator('[data-zazu-local-record="customer"]').filter({ hasText: 'Offline test customer' })).toBeVisible();
 });
