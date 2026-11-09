@@ -1346,3 +1346,14 @@ Owner expanded the visual refinement scope beyond the dashboard: apply the estab
 - Commits: `d699c56` architecture reconciliation; `fecac6e` mobile runbook reconciliation; `9adbbe5` Windows Ops contract expansion; `55b3b8b` PowerShell quoting correction; `863b693` nested-cleanup assertion correction.
 - Current Windows Ops workflow and launcher source were re-fetched after the final correction. The GitHub combined-status endpoint returned no status contexts for the inspected baseline, and the available workflow-run lookup does not expose push-triggered runs. Windows-hosted execution therefore remains UNKNOWN / pending.
 - Next: obtain actual Windows Ops Actions result; then run the exact-head application CI batch. Continue with secure HTTPS installation and the company-standard physical offline acceptance sequence (internet and host unavailable, installed-icon launch, declared workflows, local file persistence, restart, reconnect, idempotency and conflict recovery). Do not claim full offline parity.
+
+
+## Mobile offline setup visibility — 2026-11-10
+
+- Target: make a failed mobile PWA/service-worker installation visible instead of silently leaving the user dependent on the development server.
+- Current-source finding: insecure LAN HTTP already displayed a warning, but secure-origin service-worker registration failures were swallowed and browsers without service-worker support received no explanation.
+- Change on canonical `main`: added a distinct accessible warning for unsupported service workers and registration/activation failures. Normal online use remains available; the warning explains that offline setup is incomplete and that the device may still require the server. Added a focused PWA source-contract assertion.
+- Commits: `8477f9f` application; `dfbad0f` regression test.
+- Re-fetched both changed files from `main`; the new notice, registration failure paths and test assertions are present.
+- Verification boundary: source reconciliation only. PHPUnit, Vite build, exact-head CI and real Android installation are not yet verified. This does not itself make the current HTTP LAN origin secure or remove the need for a reachable installation origin.
+- Next operational gate: use the existing `Start-Zazu-LAN-HTTPS.cmd` launcher, install only Caddy's public `root.crt` on the test phone, install Zazu from the trusted HTTPS URL, allow the service worker to prime the bounded page set, then test installed-icon launch with the PC host and internet unavailable. Do not migrate the browser origin while pending local mutations or attachments remain unsynchronized.
