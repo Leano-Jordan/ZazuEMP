@@ -47,10 +47,10 @@ test.describe('Zazu UI theme and navigation', () => {
 
         expect(lightTokens.surface.toLowerCase()).toMatch(/^#(?:fff|ffffff)$/);
         expect(lightTokens.primary.toLowerCase()).toBe('#426987');
-        expect(lightTokens.activeBackground).toBe('rgb(201, 240, 251)');
-        expect(lightTokens.activeColor).toBe('rgb(23, 68, 95)');
-        expect(lightTokens.workspaceColor).toBe('rgb(23, 68, 95)');
-        expect(lightTokens.workspaceLabelColor).toBe('rgb(53, 111, 140)');
+        expect(lightTokens.activeBackground).toBe('rgb(180, 200, 215)');
+        expect(lightTokens.activeColor).toBe('rgb(35, 57, 77)');
+        expect(lightTokens.workspaceColor).toBe('rgb(35, 57, 77)');
+        expect(lightTokens.workspaceLabelColor).toBe('rgb(83, 107, 127)');
 
         const toggle = page.locator('[data-theme-toggle]').first();
         await expect(toggle).toBeVisible();
@@ -75,10 +75,10 @@ test.describe('Zazu UI theme and navigation', () => {
 
         expect(darkTokens.surface.toLowerCase()).toBe('#243d52');
         expect(darkTokens.primary.toLowerCase()).toBe('#6fa4ff');
-        expect(darkTokens.activeBackground).toBe('rgb(22, 58, 88)');
-        expect(darkTokens.activeColor).toBe('rgb(213, 229, 255)');
-        expect(darkTokens.workspaceColor).toBe('rgb(243, 247, 251)');
-        expect(darkTokens.workspaceLabelColor).toBe('rgb(147, 175, 197)');
+        expect(darkTokens.activeBackground).toBe('rgb(72, 97, 116)');
+        expect(darkTokens.activeColor).toBe('rgb(243, 246, 248)');
+        expect(darkTokens.workspaceColor).toBe('rgb(229, 235, 240)');
+        expect(darkTokens.workspaceLabelColor).toBe('rgb(184, 199, 210)');
         expect(darkTokens.theme).toBe('dark');
 
         await context.close();
