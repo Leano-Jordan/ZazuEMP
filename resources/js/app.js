@@ -1194,7 +1194,7 @@ function setupZazuOfflineDirectoryViews() {
                 (() => {
                     const type = document.createElement('span');
                     type.className = 'zazu-ops-function';
-                    type.append(text('strong', '', job.event_type || 'Event'), text('small', '', (job.services || []).join(', ') || 'Services not recorded'));
+                    type.append(text('strong', '', job.event_type || 'Event'), text('small', '', (Array.isArray(job.services) ? job.services : []).join(', ') || 'Services not recorded'));
                     return type;
                 })(),
                 (() => {
