@@ -161,8 +161,8 @@ class UiVisualSystemRegressionTest extends TestCase
         $css = file_get_contents(resource_path('css/zazu-final-visual-sweep.css'));
 
         $this->assertIsString($css);
-        $this->assertStringContainsString('.zazu-disclosure-body {\npadding:12px 16px 16px;', $css);
-        $this->assertStringContainsString('.zazu-disclosure-body {\npadding:10px 13px 13px', $css);
+        $this->assertStringContainsString(".zazu-disclosure-body {\npadding:12px 16px 16px;", $css);
+        $this->assertStringContainsString(".zazu-disclosure-body {\npadding:10px 13px 13px", $css);
         $this->assertStringNotContainsString('.zazu-disclosure-body {\npadding:0 16px 16px;', $css);
         $this->assertStringNotContainsString('.zazu-disclosure-body {\npadding:0 13px 13px', $css);
     }
