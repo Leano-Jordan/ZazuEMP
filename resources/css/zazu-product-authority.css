@@ -1038,6 +1038,33 @@ body.zazu-dashboard-page .zazu-dash-surface-head {
 .zazu-dash-context-note {
     border-left-color: var(--zazu-line-soft) !important;
 }
+/* Quote-line editor: avoid a card nested inside a form-section card.
+   Keep service copy and its price field aligned as one clean row. */
+.zazu-quote-line-editor {
+    border: 0 !important;
+    border-radius: 0 !important;
+    background: transparent !important;
+    box-shadow: none !important;
+}
+.zazu-quote-line-editor .zazu-list-item {
+    display: grid !important;
+    grid-template-columns: minmax(0, 1fr) minmax(140px, 190px);
+    align-items: start !important;
+    gap: 16px !important;
+    padding: 12px 10px !important;
+}
+.zazu-quote-line-editor .zazu-list-item > label {
+    width: 100% !important;
+    min-width: 0;
+}
+@media (max-width: 620px) {
+    .zazu-quote-line-editor .zazu-list-item {
+        grid-template-columns: minmax(0, 1fr);
+        gap: 10px !important;
+        padding: 12px 8px !important;
+    }
+}
+
 /* Form-section headers are real hierarchy bands, not more grey dividers. */
 .zazu-form-section-head {
     margin: 0 0 14px !important;
