@@ -213,10 +213,10 @@ class UiVisualSystemRegressionTest extends TestCase
             '.zazu-inventory-directory .zazu-card-header',
             '.zazu-suppliers-page .zazu-card-header',
             '.zazu-customer-directory .zazu-card-header',
-            'top:50%!important',
-            'right:max(6px,env(safe-area-inset-right))!important',
-            'z-index:35!important',
-            'bottom:max(10px,env(safe-area-inset-bottom))!important',
+            'top: 50% !important;',
+            'right: max(6px, env(safe-area-inset-right)) !important;',
+            'z-index: 35 !important;',
+            'bottom: max(10px, env(safe-area-inset-bottom)) !important;',
         ] as $expected) {
             $this->assertStringContainsString($expected, $css);
         }
