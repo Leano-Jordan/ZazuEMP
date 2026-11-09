@@ -1251,3 +1251,10 @@ Owner expanded the visual refinement scope beyond the dashboard: apply the estab
 - Commits: 8d678d0 shared colour/control correction; 4a8ac27 dashboard border reduction; 3b67750 colour/control regression coverage; 210fb8a palette expectation correction; 931284d shared nav hover; 628aaac dashboard nav hover; fc34d6d navigation regression update.
 - Re-fetch verification: changed product CSS, dashboard CSS and both affected visual regression tests were re-read from main; new palette tokens and hover colour are present; obsolete #29445D references are absent from the two authoritative CSS files.
 - Verification boundary: source-only verification. PHPUnit, Vite build, exact-head CI and rendered desktop/mobile acceptance have not yet been observed for this batch. Do not mark the visual issue accepted until rendered review confirms the photographed Work action controls and dashboard quote pipeline.
+
+## Gradient removal and navigation redesign — 2026-11-09
+- Removed every gradient function from zazu-product-authority.css and zazu-dashboard-authority.css; semantic card, header, metric, form and dashboard hero surfaces now use solid fills.
+- Replaced light-theme dark navy sidebar with light slate blue (#D5E0E8), dark readable text (#23394D), lighter hover (#C2D2DE) and distinct active (#B4C8D7).
+- Dashboard navigation now follows the same light slate-blue hover/active/flyout palette with dark foreground text. No white-on-light hover.
+- Dark theme sidebar changed from midnight blue to neutral charcoal-slate (#202B35) with coordinated muted foreground and restrained hover/active.
+- Updated navigation regression expectations and visual-system palette expectations. Source and CI verification pending.
