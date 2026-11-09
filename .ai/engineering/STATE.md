@@ -1258,3 +1258,6 @@ Owner expanded the visual refinement scope beyond the dashboard: apply the estab
 - Dashboard navigation now follows the same light slate-blue hover/active/flyout palette with dark foreground text. No white-on-light hover.
 - Dark theme sidebar changed from midnight blue to neutral charcoal-slate (#202B35) with coordinated muted foreground and restrained hover/active.
 - Updated navigation regression expectations and visual-system palette expectations. Source and CI verification pending.
+
+- Follow-up cleanup: removed all 34 remaining gradient functions from app.css, including card/command surfaces, wallpaper overlays, dashboard visual overlays, auth/login backdrops and decorative section fills. Replaced them with solid theme/semantic surfaces; wallpaper image assets remain supported. Skeleton shimmer is now a quiet solid placeholder rather than a moving gradient.
+- Removed the last hard-coded dark-blue dashboard hover declaration from the product authority; dashboard hover now resolves to the light slate-blue palette.
