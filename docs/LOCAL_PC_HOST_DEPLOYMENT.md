@@ -33,6 +33,23 @@ For access from a phone/tablet on the same trusted Wi-Fi network:
 
 This is HTTP development access. It is sufficient for same-network page/workflow testing, but a phone browser does not treat an arbitrary HTTP LAN IP as a secure context. Service-worker installation and full PWA offline acceptance therefore remain blocked until a trusted HTTPS origin is configured for the LAN. Do not interpret LAN reachability as proof of offline PWA behaviour.
 
+### Next step: private LAN HTTPS (selected design; not yet implemented)
+
+The next local acceptance origin will use **Caddy as a TLS reverse proxy with its internal CA**:
+
+- Laravel's development server stays on loopback only: `127.0.0.1:8000`.
+- Caddy listens only on the active Private Wi-Fi IPv4 address, on a dedicated HTTPS port (planned: `8443`), and proxies to Laravel over loopback.
+- Caddy issues a certificate for the LAN IP using its internal CA. Caddy documents local HTTPS for IP addresses and local/internal hostnames; its root CA is stored in its persistent data directory and must remain available.
+- The PC trusts the local CA through Caddy's trust installation. The phone/tablet must separately receive and explicitly trust **only the public root certificate** (`root.crt`), never the CA private key.
+- Laravel must trust only the local reverse-proxy address (`127.0.0.1` / `::1`) for forwarded HTTPS headers. Do not use trust-all proxy configuration.
+- The HTTPS origin and generated asset/session URLs must consistently use the HTTPS LAN address. This needs a regression test before physical acceptance.
+
+This design requires no public domain, paid hosting, Tailscale account, public DNS, router port forwarding or public internet exposure. It does require a one-time local Caddy executable and an explicit certificate-trust step on each test device.
+
+**Origin migration warning:** HTTP and HTTPS are different browser storage origins. Before moving a phone to the HTTPS URL, reconcile pending mutations and attachments on the existing HTTP origin. Keep the old origin available until queues are empty and verified. Do not clear IndexedDB as a migration shortcut.
+
+**Implementation status:** design selected; launcher, proxy configuration, Laravel proxy trust and phone CA installation have not yet been implemented or physically verified.
+
 ## 2. Future production outcome
 
 When funding and release readiness permit, deploy Zazu to a paid persistent server with:
@@ -170,6 +187,6 @@ Do not expose development tools, debug endpoints, database ports, private storag
 
 ## 10. Current next engineering target
 
-**Production portability audit — repository-only first.**
+**Private LAN HTTPS origin — repository implementation and physical acceptance.**
 
-Inspect environment-specific assumptions, runtime dependencies, asset build requirements, storage paths, queue/scheduler needs, database compatibility and deployment automation. Fix verified portability defects and add regression checks where justified. Keep production provider selection and spending deferred until the software is ready and the owner authorizes infrastructure procurement.
+Implement the Caddy internal-CA reverse proxy, loopback-only Laravel upstream, restricted trusted-proxy handling and stable HTTPS URL generation. Add tests for secure request detection, secure session behaviour and service-worker registration. Then verify root-certificate trust and the offline journey on the actual phone. Keep public hosting/provider selection and spending deferred.
