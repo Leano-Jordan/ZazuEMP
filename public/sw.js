@@ -1,11 +1,12 @@
-const CACHE_NAME = 'zazu-static-v30';
+const CACHE_NAME = 'zazu-static-v31';
 const OFFLINE_SHELL = '/dashboard';
 let activeUserId = null;
+let activeBusinessId = null;
 let activeUserGeneration = 0;
 let activePrimeController = null;
 const MAX_PRIME_ROUTES = 100;
 const PRIME_CONCURRENCY = 6;
-const ACTIVE_USER_STATE = new Request('/__zazu-active-user__');
+const ACTIVE_CONTEXT_STATE = new Request('/__zazu-active-context__');
 
 const PRECACHE_ASSETS = [
     '/manifest.webmanifest',
@@ -55,63 +56,78 @@ self.addEventListener('activate', (event) => {
     );
 });
 
-function userCacheName() {
-    return activeUserId ? CACHE_NAME + '-user-' + activeUserId : null;
-}
-
-async function loadActiveUser(expectedGeneration = activeUserGeneration) {
-    if (expectedGeneration !== activeUserGeneration) return null;
-    if (activeUserId) return activeUserId;
-
-    const cache = await caches.open(CACHE_NAME);
-    if (expectedGeneration !== activeUserGeneration) return null;
-
-    const stored = await cache.match(ACTIVE_USER_STATE);
-    if (!stored || expectedGeneration !== activeUserGeneration) return null;
-
-    const storedUserId = sanitizeUserId(await stored.text());
-    if (expectedGeneration !== activeUserGeneration) return null;
-
-    activeUserId = storedUserId;
-    return activeUserId;
-}
-
-async function dynamicCache() {
-    const name = activeUserId
-        ? userCacheName()
-        : ((await loadActiveUser()) ? userCacheName() : null);
-
-    return name ? caches.open(name) : null;
+function contextCacheName() {
+    return activeUserId && activeBusinessId
+        ? CACHE_NAME + '-user-' + activeUserId + '-business-' + activeBusinessId
+        : null;
 }
 
 function sanitizeUserId(value) {
     const id = String(value || '');
-    return /^\d+$/.test(id) ? id : null;
+    return /^\\d+$/.test(id) ? id : null;
+}
+
+function sanitizeBusinessId(value) {
+    const id = String(value || '');
+    return /^\\d+$/.test(id) && Number(id) > 0 ? id : null;
+}
+
+async function loadActiveContext(expectedGeneration = activeUserGeneration) {
+    if (expectedGeneration !== activeUserGeneration) return null;
+    if (activeUserId && activeBusinessId) return { userId: activeUserId, businessId: activeBusinessId };
+
+    const cache = await caches.open(CACHE_NAME);
+    if (expectedGeneration !== activeUserGeneration) return null;
+    const stored = await cache.match(ACTIVE_CONTEXT_STATE);
+    if (!stored || expectedGeneration !== activeUserGeneration) return null;
+
+    let context;
+    try {
+        context = JSON.parse(await stored.text());
+    } catch {
+        return null;
+    }
+
+    const storedUserId = sanitizeUserId(context?.user_id);
+    const storedBusinessId = sanitizeBusinessId(context?.business_id);
+    if (!storedUserId || !storedBusinessId || expectedGeneration !== activeUserGeneration) return null;
+
+    activeUserId = storedUserId;
+    activeBusinessId = storedBusinessId;
+    return { userId: activeUserId, businessId: activeBusinessId };
+}
+
+async function dynamicCache() {
+    const name = activeUserId && activeBusinessId
+        ? contextCacheName()
+        : ((await loadActiveContext()) ? contextCacheName() : null);
+    return name ? caches.open(name) : null;
 }
 
 async function cacheRenderedPage(request, response, requestGeneration) {
-    const probe = response.clone();
-    const html = await probe.text();
+    const html = await response.clone().text();
     if (requestGeneration !== activeUserGeneration) return;
 
-    const match = html.match(/data-zazu-user-id="(\d+)"/);
-    const pageUserId = sanitizeUserId(match?.[1]);
-    if (!pageUserId) return;
+    const userMatch = html.match(/data-zazu-user-id="(\\d+)"/);
+    const businessMatch = html.match(/data-zazu-business-id="(\\d+)"/);
+    const pageUserId = sanitizeUserId(userMatch?.[1]);
+    const pageBusinessId = sanitizeBusinessId(businessMatch?.[1]);
+    if (!pageUserId || !pageBusinessId) return;
 
-    await loadActiveUser(requestGeneration);
+    await loadActiveContext(requestGeneration);
     if (requestGeneration !== activeUserGeneration) return;
 
-    const cacheGeneration = await setUser(pageUserId, requestGeneration);
+    const cacheGeneration = await setContext(pageUserId, pageBusinessId, requestGeneration);
     if (cacheGeneration === null || cacheGeneration !== activeUserGeneration) return;
 
-    const cacheName = userCacheName();
+    const cacheName = contextCacheName();
     const cache = cacheName ? await caches.open(cacheName) : null;
-    if (!cache || cacheGeneration !== activeUserGeneration || activeUserId !== pageUserId) return;
+    if (!cache || cacheGeneration !== activeUserGeneration
+        || activeUserId !== pageUserId || activeBusinessId !== pageBusinessId) return;
 
-    const requestKey = new Request(request.url);
-    await cache.put(requestKey, response.clone());
-
-    if (cacheGeneration !== activeUserGeneration || activeUserId !== pageUserId) {
+    await cache.put(new Request(request.url), response.clone());
+    if (cacheGeneration !== activeUserGeneration
+        || activeUserId !== pageUserId || activeBusinessId !== pageBusinessId) {
         await caches.delete(cacheName);
     }
 }
@@ -143,35 +159,47 @@ function serializeUserCacheMutation(mutation) {
     return result;
 }
 
-async function setUser(userId, expectedGeneration = null) {
+async function setContext(userId, businessId, expectedGeneration = null) {
     const nextUserId = sanitizeUserId(userId);
-    if (!nextUserId) return null;
+    const nextBusinessId = sanitizeBusinessId(businessId);
+    if (!nextUserId || !nextBusinessId) return null;
     if (expectedGeneration !== null && expectedGeneration !== activeUserGeneration) return null;
 
-    const previous = activeUserId;
-    if (previous && previous !== nextUserId) activeUserGeneration += 1;
+    if ((activeUserId && activeUserId !== nextUserId)
+        || (activeBusinessId && activeBusinessId !== nextBusinessId)) {
+        activeUserGeneration += 1;
+    }
     activeUserId = nextUserId;
+    activeBusinessId = nextBusinessId;
     const generation = activeUserGeneration;
+    const cacheName = contextCacheName();
 
     return serializeUserCacheMutation(async () => {
-        if (generation !== activeUserGeneration || activeUserId !== nextUserId) return null;
+        if (generation !== activeUserGeneration
+            || activeUserId !== nextUserId || activeBusinessId !== nextBusinessId) return null;
 
         const keys = await caches.keys();
         await Promise.all(
-            keys
-                .filter((key) => key.startsWith(CACHE_NAME + '-user-') && key !== userCacheName())
+            keys.filter((key) => key.startsWith(CACHE_NAME + '-user-') && key !== cacheName)
                 .map((key) => caches.delete(key))
         );
 
-        if (generation !== activeUserGeneration || activeUserId !== nextUserId) return null;
+        if (generation !== activeUserGeneration
+            || activeUserId !== nextUserId || activeBusinessId !== nextBusinessId) return null;
+
         const state = await caches.open(CACHE_NAME);
-        if (generation !== activeUserGeneration || activeUserId !== nextUserId) return null;
-        await state.put(ACTIVE_USER_STATE, new Response(activeUserId));
-        return generation === activeUserGeneration && activeUserId === nextUserId ? generation : null;
+        await state.put(ACTIVE_CONTEXT_STATE, new Response(JSON.stringify({
+            user_id: activeUserId,
+            business_id: activeBusinessId,
+        })));
+
+        return generation === activeUserGeneration
+            && activeUserId === nextUserId && activeBusinessId === nextBusinessId
+            ? generation : null;
     });
 }
 
-async function primePages(routes, primeGeneration = activeUserGeneration, primeUserId = activeUserId) {
+async function primePages(routes, primeGeneration = activeUserGeneration, primeUserId = activeUserId, primeBusinessId = activeBusinessId) {
     activePrimeController?.abort();
     const controller = new AbortController();
     activePrimeController = controller;
@@ -183,7 +211,6 @@ async function primePages(routes, primeGeneration = activeUserGeneration, primeU
     try {
         for (let offset = 0; offset < uniqueRoutes.length; offset += PRIME_CONCURRENCY) {
             const batch = uniqueRoutes.slice(offset, offset + PRIME_CONCURRENCY);
-
             await Promise.all(batch.map(async (path) => {
                 try {
                     const request = new Request(new URL(path, self.location.origin), {
@@ -192,71 +219,64 @@ async function primePages(routes, primeGeneration = activeUserGeneration, primeU
                     });
                     const response = await fetch(request, { signal: controller.signal });
                     if (!response.ok) return;
-
                     const contentType = response.headers.get('content-type') || '';
                     if (!contentType.includes('text/html')) return;
 
-                    const probe = response.clone();
-                    const html = await probe.text();
-                    const match = html.match(/data-zazu-user-id="(\d+)"/);
-                    const pageUserId = sanitizeUserId(match?.[1]);
-                    if (!pageUserId) return;
+                    const html = await response.clone().text();
+                    const userMatch = html.match(/data-zazu-user-id="(\\d+)"/);
+                    const businessMatch = html.match(/data-zazu-business-id="(\\d+)"/);
+                    const pageUserId = sanitizeUserId(userMatch?.[1]);
+                    const pageBusinessId = sanitizeBusinessId(businessMatch?.[1]);
+                    if (!pageUserId || !pageBusinessId) return;
 
-                    if (primeGeneration !== activeUserGeneration || pageUserId !== primeUserId || pageUserId !== activeUserId) return;
+                    if (primeGeneration !== activeUserGeneration
+                        || pageUserId !== primeUserId || pageBusinessId !== primeBusinessId
+                        || pageUserId !== activeUserId || pageBusinessId !== activeBusinessId) return;
 
                     const cache = await dynamicCache();
-                    if (!cache || primeGeneration !== activeUserGeneration || pageUserId !== activeUserId) return;
+                    if (!cache || primeGeneration !== activeUserGeneration
+                        || pageUserId !== activeUserId || pageBusinessId !== activeBusinessId) return;
 
                     await cache.put(new Request(new URL(path, self.location.origin)), response.clone());
-                    if (primeGeneration !== activeUserGeneration || pageUserId !== activeUserId) {
-                        await caches.delete(CACHE_NAME + '-user-' + pageUserId);
-                    }
                 } catch {
                     // A single page failing to prime must never block the installed Zazu shell.
                 }
             }));
         }
     } finally {
-        if (activePrimeController === controller) {
-            activePrimeController = null;
-        }
+        if (activePrimeController === controller) activePrimeController = null;
     }
 }
 
-async function clearActiveUser() {
+async function clearActiveContext() {
     activeUserGeneration += 1;
     activePrimeController?.abort();
     activePrimeController = null;
     activeUserId = null;
+    activeBusinessId = null;
 
     return serializeUserCacheMutation(async () => {
         const keys = await caches.keys();
-        await Promise.all(
-            keys
-                .filter((key) => key.startsWith(CACHE_NAME + '-user-'))
-                .map((key) => caches.delete(key))
-        );
-
+        await Promise.all(keys.filter((key) => key.startsWith(CACHE_NAME + '-user-')).map((key) => caches.delete(key)));
         const state = await caches.open(CACHE_NAME);
-        await state.delete(ACTIVE_USER_STATE);
+        await state.delete(ACTIVE_CONTEXT_STATE);
     });
 }
 
 self.addEventListener('message', (event) => {
     if (event.data?.type === 'clear-user') {
-        event.waitUntil(clearActiveUser());
+        event.waitUntil(clearActiveContext());
         return;
     }
-
     if (event.data?.type !== 'prime-pages') return;
 
     event.waitUntil((async () => {
         const generation = activeUserGeneration;
-        await loadActiveUser(generation);
+        await loadActiveContext(generation);
         if (generation !== activeUserGeneration) return;
-        const activeGeneration = await setUser(event.data.userId, generation);
+        const activeGeneration = await setContext(event.data.userId, event.data.businessId, generation);
         if (activeGeneration === null) return;
-        await primePages(event.data.routes, activeGeneration, activeUserId);
+        await primePages(event.data.routes, activeGeneration, activeUserId, activeBusinessId);
     })());
 });
 
@@ -276,7 +296,16 @@ self.addEventListener('fetch', (event) => {
     const url = new URL(request.url);
 
     if (request.method === 'POST' && url.origin === self.location.origin && url.pathname === '/logout') {
-        event.waitUntil(clearActiveUser());
+        event.waitUntil(clearActiveContext());
+        return;
+    }
+
+    if (request.method === 'POST' && url.origin === self.location.origin && url.pathname === '/business/switch') {
+        event.respondWith((async () => {
+            const response = await fetch(request);
+            if (response.ok || (response.status >= 300 && response.status < 400)) await clearActiveContext();
+            return response;
+        })());
         return;
     }
 

@@ -1306,3 +1306,11 @@ Owner expanded the visual refinement scope beyond the dashboard: apply the estab
 - Browser smoke completed but failed its theme-token assertion on all three viewports because it still queried removed legacy variables `--zazu-surface-canvas` and `--zazu-blue-primary`. The current product-authority tokens are `--zazu-surface` and `--zazu-primary`.
 - Replaced the stale browser assertion with the current light/dark tokens and explicit contrast checks for selected navigation and the Workspace footer. Browser rerun pending.
 - Offline review continues next: the service-worker HTML cache is user-scoped but not business-scoped; this is a confirmed cross-business stale-page risk and is the first offline boundary fix.
+
+
+## Offline business-context cache boundary — 2026-11-09
+
+- Confirmed the service-worker authenticated page cache was partitioned by user only, unlike the business-scoped IndexedDB workspace. Same-user business switching could leave previous-business HTML available offline.
+- Rebuilt the page-cache identity as user + business; require both rendered body IDs; clear old context after a successful business switch; reject late old-context writes through the generation counter.
+- Advanced service-worker cache to v31 and added JS/PHP regression coverage.
+- PC and mobile offline parity remains the next active objective after exact-head CI. The stable development-origin decision is Tailscale MagicDNS + HTTPS Serve, pending owner device installation/approval.

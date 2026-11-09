@@ -504,3 +504,12 @@ New installation backups now write a SHA-256 checksum for every payload file (da
 The restore command remains backward-compatible with format-version-1 archives that predate checksum maps; new backups are format version 2 and require the integrity manifest. This checksum layer detects accidental corruption and archive-content drift. It is not a digital signature and does not prove who created the archive or prevent a malicious party from rebuilding both payload and manifest.
 
 Automated coverage now asserts database/private-file checksum generation in the backup round-trip and rejects a tampered private file while preserving the currently installed private probe. Source and tests are committed on `main`; exact-head Laravel/quality execution and the real operator backup/restore drill remain outstanding.
+
+
+## Business-context page cache isolation — 2026-11-09
+
+- Authenticated HTML is now cached under both the authenticated user ID and active business ID. The worker refuses to cache a page without both identities.
+- A successful POST to the business-switch endpoint clears the old business page cache before the redirect's next page can be cached. Context-generation checks prevent a late response from the previous business repopulating it.
+- Static cache version advanced to v31 so existing user-only page caches are retired on activation.
+- This is a security/correctness prerequisite for reliable offline use with multi-business accounts. It does not alter the business-scoped IndexedDB workspace or claim full offline parity.
+- JS worker regression and PHP source-contract coverage added. Exact-head CI and physical PC/mobile acceptance remain pending.

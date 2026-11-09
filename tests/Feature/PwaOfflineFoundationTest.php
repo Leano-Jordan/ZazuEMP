@@ -56,7 +56,7 @@ class PwaOfflineFoundationTest extends TestCase
         $this->assertStringContainsString('Do not reject prematurely.', $attachmentOpen);
         $this->assertStringNotContainsString('request.onblocked = () => reject', $attachmentOpen);
         $this->assertStringContainsString("navigator.serviceWorker.register('/sw.js', { scope: '/' })", $app);
-        $this->assertStringContainsString("target?.postMessage({ type: 'prime-pages', userId, routes })", $app);
+        $this->assertStringContainsString("target?.postMessage({ type: 'prime-pages', userId, businessId, routes })", $app);
         $this->assertSame(1, substr_count($app, 'primeInstalledPages(ready)'));
         $this->assertStringNotContainsString('primeInstalledPages(registration)', $app);
         $this->assertStringContainsString('window.ZazuOffline.pair(code)', $app);
@@ -99,7 +99,7 @@ class PwaOfflineFoundationTest extends TestCase
         $this->assertStringContainsString("OFFLINE_SHELL,", $worker);
         $this->assertStringContainsString("'/offline-attachments.js'", $worker);
         $this->assertStringContainsString("'/zazu-offline.js'", $worker);
-        $this->assertStringContainsString("const CACHE_NAME = 'zazu-static-v30';", $worker);
+        $this->assertStringContainsString("const CACHE_NAME = 'zazu-static-v31';", $worker);
         $this->assertStringContainsString('await cache.put(request, response.clone());', $worker);
         $this->assertStringContainsString('const cached = await caches.match(request);', $worker);
         $this->assertStringContainsString('if (cached) return cached;', $worker);
@@ -112,14 +112,16 @@ class PwaOfflineFoundationTest extends TestCase
         $this->assertStringContainsString('caches.match(request)', $worker);
         $this->assertStringNotContainsString('cache.put(request, copy)', $worker);
         $this->assertStringContainsString("event.data?.type === 'clear-user'", $worker);
-        $this->assertStringContainsString("async function clearActiveUser()", $worker);
+        $this->assertStringContainsString("async function clearActiveContext()", $worker);
         $this->assertStringContainsString('let activeUserGeneration = 0;', $worker);
         $this->assertStringContainsString('requestGeneration !== activeUserGeneration', $worker);
         $this->assertStringContainsString("url.pathname === '/logout'", $worker);
+        $this->assertStringContainsString("url.pathname === '/business/switch'", $worker);
+        $this->assertStringContainsString('data-zazu-business-id', $worker);
         $this->assertStringContainsString('cacheRenderedPage(request, response.clone(), requestGeneration)', $worker);
-        $this->assertStringContainsString('async function setUser(userId, expectedGeneration = null)', $worker);
-        $this->assertStringContainsString('async function loadActiveUser(expectedGeneration = activeUserGeneration)', $worker);
-        $this->assertStringContainsString('await loadActiveUser(requestGeneration);', $worker);
+        $this->assertStringContainsString('async function setContext(userId, businessId, expectedGeneration = null)', $worker);
+        $this->assertStringContainsString('async function loadActiveContext(expectedGeneration = activeUserGeneration)', $worker);
+        $this->assertStringContainsString('await loadActiveContext(requestGeneration);', $worker);
         $this->assertStringContainsString('if (expectedGeneration !== activeUserGeneration) return null;', $worker);
         $this->assertStringContainsString("activePrimeController?.abort()", $worker);
         $this->assertStringContainsString("const offlineShell = cache ? await cache.match(new Request(new URL(OFFLINE_SHELL, self.location.origin))) : null;", $worker);
@@ -129,10 +131,10 @@ class PwaOfflineFoundationTest extends TestCase
         $this->assertStringContainsString('const PRIME_CONCURRENCY = 6;', $worker);
         $this->assertStringContainsString('.slice(0, MAX_PRIME_ROUTES)', $worker);
         $this->assertStringContainsString('for (let offset = 0; offset < uniqueRoutes.length; offset += PRIME_CONCURRENCY)', $worker);
-        $this->assertStringContainsString('function userCacheName()', $worker);
-        $this->assertStringContainsString("const ACTIVE_USER_STATE = new Request('/__zazu-active-user__');", $worker);
+        $this->assertStringContainsString('function contextCacheName()', $worker);
+        $this->assertStringContainsString("const ACTIVE_CONTEXT_STATE = new Request('/__zazu-active-context__');", $worker);
         $this->assertStringContainsString('data-zazu-user-id="(\\d+)"', $worker);
-        $this->assertStringContainsString("CACHE_NAME + '-user-' + activeUserId", $worker);
+        $this->assertStringContainsString("CACHE_NAME + '-user-' + activeUserId + '-business-' + activeBusinessId", $worker);
         $this->assertStringContainsString('await cache.put(new Request(new URL(path, self.location.origin)), response.clone())', $worker);
     }
 
