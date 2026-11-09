@@ -194,10 +194,18 @@ class UiVisualSystemRegressionTest extends TestCase
 
         $this->assertIsString($css);
         foreach ([
-            '--zazu-tone-green:#E5F3E9',
-            '--zazu-tone-amber:#FFF1D6',
-            '--zazu-tone-teal:#DDF2EF',
-            '--zazu-tone-violet:#EEE9FA',
+            '--zazu-tone-green: #E2F3E8;',
+            '--zazu-tone-amber: #FFF0D2;',
+            '--zazu-tone-teal: #DDF3EF;',
+            '--zazu-tone-violet: #EEE8FA;',
+            '--zazu-tone-coral: #FCE9E4;',
+            'border-width: 1px !important;',
+            '.zazu-metric-card:nth-child(4n + 2)',
+            '.zazu-metric-card:nth-child(4n + 3)',
+            '.zazu-metric-card:nth-child(4n + 4)',
+            '.zazu-dash-quote-stage:nth-child(4)',
+            'background: var(--zazu-tone-green) !important;',
+            ':root[data-theme="dark"] .zazu-dash-quote-stage:nth-child(4)',
             '.zazu-finance-directory .zazu-card-header',
             '.zazu-inventory-directory .zazu-card-header',
             '.zazu-suppliers-page .zazu-card-header',
