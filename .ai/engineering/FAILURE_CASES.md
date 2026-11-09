@@ -29,6 +29,7 @@ This is the persistent failure-history register for the Failure Case / Loop-Brea
 | CASE-ZAZU-0012 | PHPUnit 12-failure stale/brittle contract batch | Historical PHPUnit batch exposed stale/brittle source and selector contracts | CORRECTED | Repository corrections exist; synchronized verification pending | Current-head CI/PHPUnit evidence |
 | CASE-ZAZU-0013 | PHPUnit 269-pass/7-fail stale-checkout batch | Historical failures traced to stale checkout against current main | CORRECTED | Repository corrections exist; synchronized verification pending | Current-head CI/PHPUnit evidence |
 | CASE-ZAZU-0014 | Dark-theme browser token assertions | E2E had stale palette literals and sampled active navigation before its theme transition settled | VERIFIED | Exact-head browser smoke passed on `153c4d01bef4b5c3bd01a1db770902b0c7649bb0` | Closed |
+| CASE-ZAZU-0015 | Dark form-control theme timing | Browser test observed a transient light background immediately after switching theme; retry passed | CORRECTED | Test waits for dark theme and settled control backgrounds | Exact-head browser CI |
 
 ### CASE-ZAZU-0014
 
@@ -57,6 +58,19 @@ This is the persistent failure-history register for the Failure Case / Loop-Brea
 **Rejected approach:** Do not change the product palette to satisfy stale test literals. The rendered application and canonical stylesheet are the authority; tests must follow them.
 
 **Closure evidence:** Browser smoke workflow `42694636938` passed on exact `main` SHA `153c4d01bef4b5c3bd01a1db770902b0c7649bb0`. The workflow completed successfully, including the browser regression suite and diagnostic upload. Dark-theme token and responsive navigation assertions are verified at this SHA.
+
+
+### CASE-ZAZU-0015
+
+**Status:** CORRECTED — exact-head browser verification pending.
+
+**Target/workflow:** Dark-mode primary form-control regression in `e2e/ui-theme.spec.ts`.
+
+**Observed evidence:** Browser run `42697001542` completed successfully with 64 passed, 22 skipped and 1 flaky. The first attempt observed a light control background immediately after the theme toggle; the retry passed.
+
+**Correction:** Commit `6814d2a849f969e410dfb3537bd21d4f61d2bebb` waits for the dark theme and polls visible form-control backgrounds until the transition settles. Assertion messages now identify the control tag and type.
+
+**Closure evidence required:** Exact-head browser smoke must complete with zero flaky tests. Do not weaken the dark-mode assertion or change production colours to mask a timing issue.
 
 
 ## Active case detail
