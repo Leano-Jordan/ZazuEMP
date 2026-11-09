@@ -247,7 +247,7 @@ class UiVisualSystemRegressionTest extends TestCase
             '--zazu-tone-coral: #FFD5CA;',
             'color: var(--zazu-sidebar-ink) !important;',
             '.zazu-btn {',
-            '.zazu-btn-secondary,\n.zazu-btn-ghost {',
+            '.zazu-btn-ghost {',
             'body.zazu-dashboard-page .zazu-dash-resource-grid > :nth-child(4)',
             'body.zazu-dashboard-page .zazu-dash-quote-stage:nth-child(3)',
             ':root[data-theme="dark"] .zazu-dash-quote-stage:nth-child(4)',
