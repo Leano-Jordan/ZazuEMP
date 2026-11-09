@@ -1043,3 +1043,34 @@ textarea:focus,
         gap: 10px !important;
     }
 }
+
+
+/* Remaining legacy blue rails on action, attention and calendar components. */
+.zazu-next-action,
+.zazu-dashboard-attention,
+.zazu-calendar-event,
+.zazu-calendar-agenda-event {
+    border-left: 1px solid var(--zazu-border) !important;
+}
+.zazu-next-action {
+    border: 1px solid var(--zazu-border) !important;
+    border-radius: var(--zazu-radius-md) !important;
+    background: var(--zazu-surface) !important;
+    box-shadow: none !important;
+}
+.zazu-dashboard-attention {
+    border: 1px solid var(--zazu-border) !important;
+    background: var(--zazu-surface-2) !important;
+}
+.zazu-calendar-event {
+    border-left-color: var(--zazu-border-strong) !important;
+}
+.zazu-calendar-agenda-event {
+    border-left-color: var(--zazu-border-strong) !important;
+}
+.zazu-nav-flyout {
+    border-left-width: 1px !important;
+}
+.zazu-document-total-grand {
+    border-top-width: 1px !important;
+}
