@@ -959,6 +959,45 @@ body.zazu-dashboard-page .zazu-dash-hero-side {
     box-shadow: 0 2px 9px rgba(0, 0, 0, .2) !important;
 }
 
+/* Shell and dashboard seams: 1px separators only, never 2px blue frames. */
+.zazu-sidebar,
+.zazu-topbar {
+    border-right-width: 1px !important;
+    border-bottom-width: 1px !important;
+    border-color: var(--zazu-line-soft) !important;
+}
+.zazu-dash-hero,
+.zazu-dash-hero-side,
+.zazu-dash-surface-head {
+    border-width: 1px !important;
+    border-color: var(--zazu-line-soft) !important;
+}
+.zazu-dash-hero-side {
+    border-left-width: 1px !important;
+}
+.zazu-dash-surface-head {
+    border-bottom-width: 1px !important;
+}
+.zazu-compact-editor-card .zazu-card-header {
+    border-bottom-width: 1px !important;
+}
+
+/* Remove oversized decorative blue rails from shared attention/context cards. */
+.zazu-start-intent,
+.zazu-dash-context-note,
+.zazu-next-action,
+.zazu-next-action-primary,
+.zazu-next-action-warning,
+.zazu-dashboard-attention {
+    border-left-width: 1px !important;
+}
+.zazu-start-intent {
+    border-left-color: var(--zazu-line-soft) !important;
+    background: var(--zazu-tone-blue) !important;
+}
+.zazu-dash-context-note {
+    border-left-color: var(--zazu-line-soft) !important;
+}
 /* Header bars are coloured surfaces, not boxed blocks with heavy outlines. */
 .zazu-card-header,
 .zazu-panel-head {
