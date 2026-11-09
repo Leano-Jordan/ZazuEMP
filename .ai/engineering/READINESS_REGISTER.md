@@ -5,14 +5,14 @@
 **Verified application/test source:** `d55539ddfd52c7fa5140714288c5885dbcc99e3a` on canonical `main`.  
 **V1 score:** **69/100 (3.46/5)**, up from 60/100 after five evidence-based domain uplifts. See `docs/ZAZU_V1_SCORECARD_2026-11-04.md`.
 
-- Laravel: **414 passed / 2,938 assertions — PASS** ([run 42702419420](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/42698440540)).
-- Browser smoke: **65 passed / 22 skipped / 0 failed or flaky — PASS** ([run 42702419540](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/42698440241)).
-- Zazu Quality + secret scan: **PASS** ([run 42702419210](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/42698440553)).
-- Psalm Security: **PASS** ([run 42702419299](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/42698440534)).
-- PHPMD: **PASS** ([run 42702419074](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/42698440505)).
-- Populated upgrade/rollback: **PASS** ([run 42702419767](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/42698440537)).
+- Laravel: **414 passed / 2,938 assertions — PASS** ([run 42702419420](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/42702419420)).
+- Browser smoke: **65 passed / 22 skipped / 0 failed or flaky — PASS** ([run 42702419540](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/42702419540)).
+- Zazu Quality + secret scan: **PASS** ([run 42702419210](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/42702419210)).
+- Psalm Security: **PASS** ([run 42702419299](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/42702419299)).
+- PHPMD: **PASS** ([run 42702419074](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/42702419074)).
+- Populated upgrade/rollback: **PASS** ([run 42702419767](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/42702419767)).
 - Director Contract Lint: **PASS** ([run 42698440506](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/42698440506)).
-- Push on main: **PASS** ([run 42702420093](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/42698440294)).
+- Push on main: **PASS** ([run 42702420093](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/42702420093)).
 - SonarCloud: **SKIPPED**, not a pass.
 
 **Why the score increased:** platform/onboarding, core lifecycle, security/tenant controls and active documents/attachments now have relevant automated evidence passing on the exact current head. No 5/5 scores were awarded.

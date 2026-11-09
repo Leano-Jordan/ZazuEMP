@@ -14,7 +14,8 @@
 
 - Laravel: 414 passed / 2,938 assertions.
 - Browser smoke: 65 passed / 22 skipped / 0 failed or flaky.
-- Zazu Quality + secret scan, Psalm, PHPMD, populated upgrade/rollback, Director Contract Lint and push-on-main: all passed.
+- Zazu Quality + secret scan, Psalm, PHPMD, populated upgrade/rollback and push-on-main: all passed.
+- Director Contract Lint passed on the preceding control-plane documentation commit; it was not triggered by this test-only source commit.
 - SonarCloud: skipped, not a pass.
 
 The uplift now also covers recovery/data portability: CI restores the seeded populated business database and private media, verifying key records and 14 operational table counts. This moves recovery from 2/5 to 3/5. The real installed-environment restore remains open.

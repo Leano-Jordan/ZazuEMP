@@ -10,7 +10,7 @@
 ## Director formal re-score — 2026-11-09
 
 **Current verified application/test HEAD:** `d55539ddfd52c7fa5140714288c5885dbcc99e3a`  
-**Evidence:** exact-head Laravel, browser, quality, security, static-analysis, populated upgrade/rollback and Director checks passed. This is an evidence-maturity re-score, not a commercial release approval.
+**Evidence:** exact-head Laravel, browser, quality, security, static-analysis and populated upgrade/rollback checks passed. Director Contract Lint passed on the preceding control-plane documentation commit and was not triggered by this test-only source commit. This is an evidence-maturity re-score, not a commercial release approval.
 
 ### Current 13-domain scorecard
 
@@ -45,13 +45,13 @@ Five domains have now improved against the historical baseline: platform/onboard
 | Psalm Security | PASS — [run 42702419299](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/42702419299) |
 | PHPMD | PASS — [run 42702419074](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/42702419074) |
 | Populated upgrade/rollback | PASS — [run 42702419767](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/42702419767) |
-| Director Contract Lint | PASS — [run 42698440506](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/42698440506) |
+| Director Contract Lint | PASS on preceding control-plane docs commit; not triggered by this test-only commit — [run 42700325807](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/42700325807) |
 | Push on main | PASS — [run 42702420093](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/42702420093) |
 | SonarCloud | SKIPPED — not counted as a pass |
 
 ### What the score does not certify
 
-V1 remains **NO-GO** until the installed-device offline journey is accepted on a stable secure origin; a representative database and private-media restore is demonstrated; a real deployment rollback is exercised; trusted-device/lost-device expectations are accepted; and privacy/legal plus brand clearance are closed. The local HTTP LAN launcher improves same-network access but does not satisfy the secure-origin PWA gate.
+V1 remains **NO-GO** until the installed-device offline journey is accepted on a stable secure origin; a representative database and private-media restore is demonstrated on the actual target installation; a real deployment rollback is exercised; trusted-device/lost-device expectations are accepted; and privacy/legal plus brand clearance are closed. The local HTTP LAN launcher improves same-network access but does not satisfy the secure-origin PWA gate.
 
 The previous 60/100 score remains the historical 2026-11-04 baseline below. This new score is the current formal evidence-maturity assessment.
 
@@ -67,7 +67,7 @@ The 2026-11-04 scorecard below is retained as the last formally calculated 13-do
 - **Exact-head CI:** application/test source `d44ec33a57a4958380f2cfe4624f040859cbcf7a` passed Laravel (407 / 2,758 assertions), Quality, browser smoke (65 passed / 22 skipped / 0 failed), Psalm, PHPMD and populated upgrade/rollback. The Quality workflow bootstrap correction is recorded in workflow-only commit `7946a87e78cf4dd2305d12fb20d3f77ed5653c87`. SonarCloud was skipped.
 - **Still not proven:** physical phone/tablet disconnected launch and restart, full create-offline-job → sync → attach journey on real devices, representative operator restore, deployment rollback, legal/privacy operational closure and official brand clearance.
 
-The original rows and blocker statements below describe the 2026-11-04 assessment date. Read this reconciliation and the current `docs/V1_RELEASE_CHECKLIST.md` first when determining today's status. No score uplift is claimed until a fresh full-domain evidence review is completed.
+The original rows and blocker statements below describe the 2026-11-04 assessment date. Read this reconciliation and the current `docs/V1_RELEASE_CHECKLIST.md` first when determining today's status. The current 2026-11-09 formal re-score above supersedes this historical note.
 
 ## Scoring method
 

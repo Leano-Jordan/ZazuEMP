@@ -42,7 +42,7 @@ The private-Wi-Fi launcher is implemented in the repository. It binds to the act
 | Helper and feedback | Contextual Zazu Helper foundation, status feedback, toasts and confirmations exist | V1 foundation; no need to expand autonomous AI scope |
 | UX and accessibility | Responsive shell, desktop/mobile navigation, themes, shared component authority and browser regressions exist | Latest visual changes require current-head CI and rendered owner acceptance |
 | Offline continuity | Service worker, IndexedDB business workspace, mutation queue, pairing/sync, conflict handling and attachment queueing exist | Bounded offline workflows only; not full application parity |
-| Recovery and deployment | Installation-level backup/restore, checksum validation and populated upgrade/rollback automation exist | Automated foundation; real operator restore and deployment rollback remain open |
+| Recovery and deployment | Installation-level backup/restore, checksum validation, populated database/private-media restore regression and populated upgrade/rollback automation exist | Automated restore foundation verified; real operator restore and deployment rollback remain open |
 
 ## 2. Confirmed release blockers and high risks
 
