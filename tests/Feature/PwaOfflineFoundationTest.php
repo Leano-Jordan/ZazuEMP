@@ -146,6 +146,9 @@ class PwaOfflineFoundationTest extends TestCase
 
         $this->assertStringContainsString('if (window.isSecureContext === false)', $app);
         $this->assertStringContainsString('showZazuOfflineOriginNotice();', $app);
+        $this->assertStringContainsString('showZazuOfflineRegistrationNotice();', $app);
+        $this->assertStringContainsString('Zazu could not enable offline app support.', $app);
+        $this->assertStringContainsString('Until offline setup succeeds, this device may still need the server to open the app.', $app);
         $this->assertStringContainsString('This plain-HTTP network address depends on a reachable PC/server', $app);
         $this->assertStringContainsString('Use a secure HTTPS install address or a self-contained app build', $app);
         $this->assertStringContainsString('.zazu-offline-origin-notice', $styles);
