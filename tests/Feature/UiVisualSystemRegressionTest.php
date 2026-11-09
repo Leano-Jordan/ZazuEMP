@@ -155,4 +155,16 @@ class UiVisualSystemRegressionTest extends TestCase
         $this->assertStringContainsString('display: inline-flex;', $css);
         $this->assertStringContainsString('text-overflow: ellipsis;', $css);
     }
+
+    public function test_disclosure_content_is_inset_below_its_divider_on_desktop_and_mobile(): void
+    {
+        $css = file_get_contents(resource_path('css/zazu-final-visual-sweep.css'));
+
+        $this->assertIsString($css);
+        $this->assertStringContainsString('.zazu-disclosure-body {\npadding:12px 16px 16px;', $css);
+        $this->assertStringContainsString('.zazu-disclosure-body {\npadding:10px 13px 13px', $css);
+        $this->assertStringNotContainsString('.zazu-disclosure-body {\npadding:0 16px 16px;', $css);
+        $this->assertStringNotContainsString('.zazu-disclosure-body {\npadding:0 13px 13px', $css);
+    }
+
 }
