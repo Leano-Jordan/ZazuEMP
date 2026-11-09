@@ -96,7 +96,7 @@ overflow: hidden;
 }
 
 .zazu-compact-editor-card .zazu-card-header {
-border-bottom-width: 2px;
+border-bottom-width: 1px;
     border-bottom-color: var(--zazu-border-strong);
 }
 
