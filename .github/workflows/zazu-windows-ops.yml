@@ -100,5 +100,14 @@ jobs:
           if ($launcher -notmatch '(?s)try\s*\{\s*\$caddyProcess\s*=\s*Start-Process.*?\}\s*catch\s*\{\s*& \$startServer -Stop -Port \$AppPort') {
             throw 'A Caddy process launch/PID-write failure must clean up the Laravel process.'
           }
+          if ($launcher -notmatch '(?s)\$caddyProcess = \$null\s*try\s*\{\s*\$caddyProcess = Start-Process.*?\}\s*catch\s*\{\s*\$startupError = \$_.*?Stop-Process -Id \$caddyProcess\.Id -Force -ErrorAction SilentlyContinue') {
+            throw 'A Caddy process started before PID persistence fails must be stopped.'
+          }
+          if ($launcher -notmatch '(?s)catch\s*\{\s*\$startupError = \$_.*?Remove-Item \$pidPath -Force -ErrorAction SilentlyContinue') {
+            throw 'A failed Caddy startup must remove any partial PID file.'
+          }
+          if ($launcher -notmatch '(?s)catch\s*\{\s*\$startupError = \$_.*?throw \$startupError') {
+            throw 'Cleanup must preserve and rethrow the original Caddy startup error.'
+          }
           Write-Host 'PASS: proxy validation precedes Laravel startup and proxy failures clean up Laravel.'
 
