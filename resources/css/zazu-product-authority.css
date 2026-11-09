@@ -554,3 +554,194 @@
 :root[data-theme="dark"] .zazu-nav-area-trigger:focus-visible {
     color: #FFFFFF !important;
 }
+
+
+/* Dashboard parity correction:
+   The dashboard authority uses this muted slate palette. Mirror its actual
+   rendered values globally instead of introducing a second blue/navy theme. */
+:root {
+    --zazu-page: #DCE5ED;
+    --zazu-page-deep: #E8EEF3;
+    --zazu-sidebar: #CBD8E3;
+    --zazu-sidebar-ink: #304B63;
+    --zazu-sidebar-muted: #586F84;
+    --zazu-sidebar-label: #586F84;
+    --zazu-sidebar-hover: #B8C8D6;
+    --zazu-sidebar-active: #426987;
+    --zazu-sidebar-surface: #D9E3EC;
+
+    --zazu-surface: #F1F4F6;
+    --zazu-surface-2: #E8EEF3;
+    --zazu-surface-3: #DCE5ED;
+    --zazu-field: #FFFFFF;
+
+    --zazu-ink: #24394D;
+    --zazu-ink-2: #304B63;
+    --zazu-muted: #586F84;
+    --zazu-faint: #71869A;
+    --zazu-nav-label: #586F84;
+
+    --zazu-border: #B8C8D6;
+    --zazu-border-strong: #AABBCB;
+
+    --zazu-primary: #426987;
+    --zazu-primary-light: #6487A2;
+    --zazu-primary-pale: #D9E3EC;
+    --zazu-primary-shadow: #DCE5ED;
+    --zazu-primary-deep: #304F69;
+    --zazu-primary-hover: #304F69;
+    --zazu-primary-soft: #E1E9F0;
+    --zazu-primary-ink: #FFFFFF;
+
+    --zazu-link: #365D7B;
+    --zazu-link-hover: #243F56;
+    --zazu-nav-active: #426987;
+
+    --zazu-focus: #6487A2;
+    --zazu-info: #426987;
+    --zazu-info-ink: #304F69;
+    --zazu-info-soft: #D9E3EC;
+
+    --zazu-shadow: 0 3px 10px rgba(35, 61, 84, .10);
+    --zazu-shadow-strong: 0 10px 24px rgba(35, 61, 84, .14);
+    --zazu-border-subtle: #C9D5DF;
+
+    --zazu-surface-canvas: #DCE5ED;
+    --zazu-surface-card: #F1F4F6;
+    --zazu-surface-border: #B8C8D6;
+    --zazu-text-main: #24394D;
+    --zazu-text-muted: #586F84;
+
+    --zazu-blue-primary: #426987;
+    --zazu-blue-accent: #6487A2;
+    --zazu-blue-hover: #304F69;
+    --zazu-blue-light: #AFC1D0;
+    --zazu-blue-soft: #E1E9F0;
+    --zazu-blue-subtle: #D9E3EC;
+    --zazu-blue-canvas: #DCE5ED;
+    --zazu-blue-brand: #426987;
+    --zazu-blue-vivid: #6487A2;
+    --zazu-blue-glow: #D9E3EC;
+
+    --zazu-canvas-bg: #DCE5ED;
+    --zazu-card-bg: #F1F4F6;
+    --zazu-card-border: #B8C8D6;
+    --zazu-card-shadow: 0 3px 10px rgba(35, 61, 84, .10);
+    --zazu-text-ink: #24394D;
+    --zazu-text-body: #586F84;
+    --zazu-card-shadow-hover: 0 7px 18px rgba(35, 61, 84, .13);
+    --zazu-ui-focus: 0 0 0 3px rgba(66, 105, 135, .20);
+}
+
+:root[data-theme="dark"] {
+    --zazu-page: #142333;
+    --zazu-page-deep: #1B2D40;
+    --zazu-sidebar: #172A3D;
+    --zazu-sidebar-ink: #E3ECF4;
+    --zazu-sidebar-muted: #B5C5D3;
+    --zazu-sidebar-label: #9FB3C5;
+    --zazu-sidebar-hover: #29435B;
+    --zazu-sidebar-active: #6487A2;
+    --zazu-sidebar-surface: #20384F;
+
+    --zazu-surface: #22384D;
+    --zazu-surface-2: #1D3145;
+    --zazu-surface-3: #29435B;
+    --zazu-field: #172B3F;
+
+    --zazu-ink: #E3ECF4;
+    --zazu-ink-2: #D2DFEA;
+    --zazu-muted: #B5C5D3;
+    --zazu-faint: #9FB3C5;
+    --zazu-nav-label: #B5C5D3;
+
+    --zazu-border: #405B73;
+    --zazu-border-strong: #58758E;
+
+    --zazu-primary: #91B3CC;
+    --zazu-primary-light: #B1C9DA;
+    --zazu-primary-pale: #D2E0EA;
+    --zazu-primary-shadow: #29435B;
+    --zazu-primary-deep: #D2E0EA;
+    --zazu-primary-hover: #B1C9DA;
+    --zazu-primary-soft: #29435B;
+    --zazu-primary-ink: #142333;
+
+    --zazu-link: #B1C9DA;
+    --zazu-link-hover: #D2E0EA;
+    --zazu-nav-active: #91B3CC;
+
+    --zazu-focus: #B1C9DA;
+    --zazu-info: #91B3CC;
+    --zazu-info-ink: #D2E0EA;
+    --zazu-info-soft: #29435B;
+
+    --zazu-shadow: 0 3px 10px rgba(0, 0, 0, .24);
+    --zazu-shadow-strong: 0 10px 24px rgba(0, 0, 0, .34);
+    --zazu-border-subtle: #30485E;
+
+    --zazu-surface-canvas: #142333;
+    --zazu-surface-card: #22384D;
+    --zazu-surface-border: #405B73;
+    --zazu-text-main: #E3ECF4;
+    --zazu-text-muted: #B5C5D3;
+
+    --zazu-blue-primary: #91B3CC;
+    --zazu-blue-accent: #B1C9DA;
+    --zazu-blue-hover: #D2E0EA;
+    --zazu-blue-light: #D2E0EA;
+    --zazu-blue-soft: #29435B;
+    --zazu-blue-subtle: #29435B;
+    --zazu-blue-canvas: #142333;
+    --zazu-blue-brand: #91B3CC;
+    --zazu-blue-vivid: #B1C9DA;
+    --zazu-blue-glow: #D2E0EA;
+
+    --zazu-canvas-bg: #142333;
+    --zazu-card-bg: #22384D;
+    --zazu-card-border: #405B73;
+    --zazu-card-shadow: 0 3px 10px rgba(0, 0, 0, .24);
+    --zazu-text-ink: #E3ECF4;
+    --zazu-text-body: #C1D0DC;
+    --zazu-card-shadow-hover: 0 7px 18px rgba(0, 0, 0, .3);
+    --zazu-ui-focus: 0 0 0 3px rgba(145, 179, 204, .22);
+}
+
+/* Match the dashboard's rendered shell and navigation on every route. */
+body:not(.zazu-dashboard-page),
+body:not(.zazu-dashboard-page) .zazu-shell,
+body:not(.zazu-dashboard-page) .zazu-main,
+body:not(.zazu-dashboard-page) .zazu-content {
+    background: var(--zazu-page) !important;
+    color: var(--zazu-ink);
+}
+body:not(.zazu-dashboard-page) .zazu-sidebar {
+    background: var(--zazu-sidebar) !important;
+    border-right: 2px solid var(--zazu-border) !important;
+    color: var(--zazu-sidebar-ink) !important;
+    box-shadow: none !important;
+}
+body:not(.zazu-dashboard-page) .zazu-topbar {
+    background: #E5EBF0 !important;
+    border-bottom: 2px solid var(--zazu-border) !important;
+    box-shadow: none !important;
+}
+:root[data-theme="dark"] body:not(.zazu-dashboard-page) .zazu-topbar {
+    background: #1B2D40 !important;
+}
+body:not(.zazu-dashboard-page) .zazu-nav-link,
+body:not(.zazu-dashboard-page) .zazu-nav-area-trigger,
+body:not(.zazu-dashboard-page) .zazu-user-trigger {
+    color: var(--zazu-sidebar-ink) !important;
+}
+body:not(.zazu-dashboard-page) .zazu-nav-link:hover,
+body:not(.zazu-dashboard-page) .zazu-nav-link:focus-visible,
+body:not(.zazu-dashboard-page) .zazu-nav-area-trigger:hover,
+body:not(.zazu-dashboard-page) .zazu-nav-area-trigger:focus-visible {
+    color: var(--zazu-ink) !important;
+    background: var(--zazu-sidebar-hover) !important;
+}
+body:not(.zazu-dashboard-page) .zazu-nav-link.active {
+    color: #FFFFFF !important;
+    background: var(--zazu-sidebar-active) !important;
+}
