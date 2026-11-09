@@ -55,6 +55,8 @@ test.describe('Zazu UI theme and navigation', () => {
         const toggle = page.locator('[data-theme-toggle]').first();
         await expect(toggle).toBeVisible();
         await toggle.click();
+        await expect(page.locator('html')).toHaveAttribute('data-theme', 'dark');
+        await expect.poll(async () => page.locator('.zazu-sidebar .zazu-nav-link.active').evaluate((element) => getComputedStyle(element).backgroundColor)).toBe('rgb(72, 97, 116)');
 
         const darkTokens = await page.evaluate(() => {
             const styles = getComputedStyle(document.documentElement);
