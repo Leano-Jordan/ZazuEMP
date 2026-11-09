@@ -7632,17 +7632,6 @@ body.zazu-inspector-open { overflow:hidden; }
     color: var(--zazu-sidebar-ink);
 }
 
-.zazu-nav-area.is-active > .zazu-nav-area-trigger {
-    border-color: color-mix(in srgb, var(--zazu-primary) 38%, var(--zazu-sidebar));
-    background: linear-gradient(
-        105deg,
-        color-mix(in srgb, var(--zazu-primary) 24%, var(--zazu-sidebar)),
-        color-mix(in srgb, var(--zazu-accent) 12%, var(--zazu-sidebar))
-    );
-    color: var(--zazu-sidebar-ink);
-    box-shadow: inset 3px 0 0 var(--zazu-primary), 0 4px 12px color-mix(in srgb, var(--zazu-primary) 10%, transparent);
-}
-
 .zazu-nav-area-title {
     min-width: 0;
 }
