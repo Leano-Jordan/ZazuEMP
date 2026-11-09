@@ -1038,6 +1038,49 @@ body.zazu-dashboard-page .zazu-dash-surface-head {
 .zazu-dash-context-note {
     border-left-color: var(--zazu-line-soft) !important;
 }
+/* Form-section headers are real hierarchy bands, not more grey dividers. */
+.zazu-form-section-head {
+    margin: 0 0 14px !important;
+    padding: 10px 12px !important;
+    border: 0 !important;
+    border-radius: 7px !important;
+    background: linear-gradient(105deg, var(--zazu-tone-blue), color-mix(in srgb, var(--zazu-tone-blue) 30%, var(--zazu-surface))) !important;
+}
+.zazu-form-section-title {
+    color: var(--zazu-tone-ink-blue) !important;
+    font-weight: 760 !important;
+}
+body[data-zazu-route^="finance."] .zazu-form-section {
+    background: linear-gradient(145deg, color-mix(in srgb, var(--zazu-tone-green) 20%, var(--zazu-surface)), var(--zazu-surface) 72%) !important;
+}
+body[data-zazu-route^="finance."] .zazu-form-section-head {
+    background: linear-gradient(105deg, var(--zazu-tone-green), color-mix(in srgb, var(--zazu-tone-green) 30%, var(--zazu-surface))) !important;
+}
+body[data-zazu-route^="inventory."] .zazu-form-section,
+body[data-zazu-route^="purchasing."] .zazu-form-section {
+    background: linear-gradient(145deg, color-mix(in srgb, var(--zazu-tone-amber) 20%, var(--zazu-surface)), var(--zazu-surface) 72%) !important;
+}
+body[data-zazu-route^="inventory."] .zazu-form-section-head,
+body[data-zazu-route^="purchasing."] .zazu-form-section-head {
+    background: linear-gradient(105deg, var(--zazu-tone-amber), color-mix(in srgb, var(--zazu-tone-amber) 30%, var(--zazu-surface))) !important;
+}
+body[data-zazu-route^="work.quotes."] .zazu-form-section,
+body[data-zazu-route^="quotes."] .zazu-form-section,
+body[data-zazu-route^="customers."] .zazu-form-section {
+    background: linear-gradient(145deg, color-mix(in srgb, var(--zazu-tone-violet) 18%, var(--zazu-surface)), var(--zazu-surface) 72%) !important;
+}
+body[data-zazu-route^="work.quotes."] .zazu-form-section-head,
+body[data-zazu-route^="quotes."] .zazu-form-section-head,
+body[data-zazu-route^="customers."] .zazu-form-section-head {
+    background: linear-gradient(105deg, var(--zazu-tone-violet), color-mix(in srgb, var(--zazu-tone-violet) 30%, var(--zazu-surface))) !important;
+}
+body[data-zazu-route^="work."] .zazu-form-section:not(body[data-zazu-route^="work.quotes."] .zazu-form-section) {
+    background: linear-gradient(145deg, color-mix(in srgb, var(--zazu-tone-teal) 16%, var(--zazu-surface)), var(--zazu-surface) 72%) !important;
+}
+body[data-zazu-route^="work."] .zazu-form-section-head:not(body[data-zazu-route^="work.quotes."] .zazu-form-section-head) {
+    background: linear-gradient(105deg, var(--zazu-tone-teal), color-mix(in srgb, var(--zazu-tone-teal) 30%, var(--zazu-surface))) !important;
+}
+
 /* Header bars are coloured surfaces, not boxed blocks with heavy outlines. */
 .zazu-card-header,
 .zazu-panel-head {
