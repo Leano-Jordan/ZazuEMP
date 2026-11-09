@@ -104,8 +104,11 @@ class UiDashboardInteractionTest extends TestCase
 
         $this->assertIsString($css);
         $this->assertStringContainsString('Director iteration 02 — quiet the primary action row.', $css);
-        $this->assertStringContainsString('border: 1px solid #D7E2EB !important;', $css);
-        $this->assertStringContainsString('background: #F8FAFC !important;', $css);
+        $this->assertStringContainsString('Owner visual correction — stronger surface separation, borderless quick actions.', $css);
+        $this->assertStringContainsString('border: 0 !important;', $css);
+        $this->assertStringContainsString('background: #E7EDF3 !important;', $css);
+        $this->assertStringContainsString('border: 1px solid #B8C7D5 !important;', $css);
+        $this->assertStringContainsString('outline: 2px solid #163F67 !important;', $css);
         $this->assertStringContainsString('html[data-theme="dark"] body.zazu-dashboard-page .zazu-dash-quick-actions .zazu-btn:not(.zazu-btn-cta)', $css);
         $this->assertStringContainsString('@media (max-width: 420px)', $css);
         $this->assertStringContainsString('@media (prefers-reduced-motion: reduce)', $css);
