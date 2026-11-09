@@ -1209,6 +1209,7 @@ body.zazu-dashboard-page .zazu-dash-commercial .zazu-dash-panel-head {
 }
 
 /* Remove decorative rails and oversized left accents throughout the workspace. */
+.zazu-dash-context-note,
 .zazu-next-action,
 .zazu-dashboard-attention,
 .zazu-next-action-primary,
