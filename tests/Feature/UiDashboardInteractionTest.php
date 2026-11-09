@@ -167,4 +167,16 @@ class UiDashboardInteractionTest extends TestCase
         $this->assertStringContainsString('html[data-theme="dark"] body.zazu-dashboard-page .zazu-dash-run .zazu-dash-event', $css);
         $this->assertStringContainsString('@media (max-width: 760px)', $css);
     }
+
+    public function test_dashboard_panel_contents_have_a_clear_inset_from_the_panel_header(): void
+    {
+        $css = file_get_contents(resource_path('css/zazu-dashboard-authority.css'));
+
+        $this->assertIsString($css);
+        $this->assertStringContainsString('padding: 12px 14px 12px !important;', $css);
+        $this->assertStringContainsString('padding: 12px 14px 11px !important;', $css);
+        $this->assertStringNotContainsString('padding: 3px 14px 12px !important;', $css);
+        $this->assertStringNotContainsString('padding: 2px 14px 11px !important;', $css);
+    }
+
 }
