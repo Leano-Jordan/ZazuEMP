@@ -19,7 +19,7 @@ Offline support is workflow-specific. It does not mean the complete Laravel appl
 The current repository is a Laravel modular monolith with a relational database and private file storage. During development it runs locally; the future customer deployment target is a paid persistent server, not the development workstation.
 
 The browser/PWA client has:
-- a service worker for the application shell and user-scoped authenticated page cache;
+- a service worker for the application shell and user-and-business-scoped authenticated page cache;
 - a business-scoped IndexedDB workspace containing the bounded working set copied to the device;
 - a durable local mutation queue;
 - an owner-approved device pairing and sync token;
@@ -212,9 +212,9 @@ Online mode should enrich the experience without making offline users feel like 
 
 ## 11. What the current service worker should do
 
-The service worker now supports the implemented device-local continuity model. It precaches the shared Zazu client assets and the real application shell, then caches successful authenticated HTML responses only inside a user-scoped cache derived from the authenticated Zazu user identity. It also retires older cache generations during activation.
+The service worker now supports the implemented device-local continuity model. It precaches the shared Zazu client assets and the real application shell, then caches successful authenticated HTML responses only inside a cache partitioned by both the authenticated Zazu user identity and active business identity. It also retires older cache generations during activation.
 
-The service worker is not the business-data authority. Business records and pending mutations remain in the local IndexedDB client store; synchronized server data remains business-scoped on the Laravel backend. The cache must never be treated as a substitute for local business state or as a cross-user shared cache.
+The service worker is not the business-data authority. Business records and pending mutations remain in the local IndexedDB client store; synchronized server data remains business-scoped on the Laravel backend. The cache must never be treated as a substitute for local business state or as a cross-user or cross-business shared cache.
 
 Do not broaden authenticated caching beyond this user-scoped shell/navigation role merely to claim "offline support".
 
