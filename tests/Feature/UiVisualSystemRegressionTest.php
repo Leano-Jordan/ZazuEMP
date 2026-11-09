@@ -200,11 +200,11 @@ class UiVisualSystemRegressionTest extends TestCase
         $this->assertStringContainsString('border-bottom-width: 1px;', $visualSweepCss);
 
              foreach ([
-            '--zazu-tone-green: #E2F3E8;',
-            '--zazu-tone-amber: #FFF0D2;',
-            '--zazu-tone-teal: #DDF3EF;',
-            '--zazu-tone-violet: #EEE8FA;',
-            '--zazu-tone-coral: #FCE9E4;',
+            '--zazu-tone-green: #D1F2D9;',
+            '--zazu-tone-amber: #FFE4A3;',
+            '--zazu-tone-teal: #C4F0E6;',
+            '--zazu-tone-violet: #E2D5FF;',
+            '--zazu-tone-coral: #FFD5CA;',
             'border-width: 1px !important;',
             'body[data-zazu-route^="customers."] .zazu-contact-card',
             'body[data-zazu-route^="customers."] .zazu-detail-value-box',
