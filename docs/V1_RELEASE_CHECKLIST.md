@@ -4,17 +4,40 @@
 
 Current comprehensive audit: `docs/DIRECTOR_PRODUCT_AUDIT_2026-11-09.md`.
 
-- V1 remains **NO-GO**. The last formal 60/100 baseline is historical and has not been re-scored.
-- Current app/test candidate: `285fa18aa856539b0a1bbeef563aebd7138253f6`; exact-head Laravel, Quality, PHPMD, Psalm, browser and populated upgrade/rollback workflows are pending/in progress. Do not carry forward older green results as current.
-- Current PC/phone development access uses a temporary LAN address and plain HTTP. Establish a stable private HTTPS origin before physical PWA offline acceptance; preserve/reconcile origin-scoped IndexedDB queues before migration.
+- V1 remains **NO-GO**. The last formal evidence-maturity score is 60/100; no new score is awarded by this CI cycle.
+- Latest verified application/test source: `153c4d01bef4b5c3bd01a1db770902b0c7649bb0`. Laravel, Quality, PHPMD, Psalm, browser smoke, populated upgrade/rollback, Director Contract Lint and Director Health all passed on this source SHA. Browser smoke: 65 passed, 22 skipped, 0 failed. SonarCloud was skipped.
+- Current `main` HEAD is `dff2b457e32096e4bb97cb46c3a5faa7ba67eda7`, a Director failure-registry documentation update; its CI batch is queued/in progress. No application/test source changed after the verified source SHA.
+- The dark-theme regression case CASE-ZAZU-0014 is now verified on the exact application/test SHA above.
+- PC/phone access still uses a temporary LAN address and plain HTTP. Establish a stable private HTTPS origin before physical PWA offline acceptance; preserve/reconcile origin-scoped IndexedDB queues before migration.
 - Physical PC/mobile offline acceptance, real restore/rollback drills, trusted-device security, operational privacy/legal closure and official Zazu brand clearance remain open.
 
 **Status:** ACTIVE / CANONICAL  
 **Repository:** `Leano-Jordan/ZazuEMP`  
 **Branch:** `main`  
 **Main-ref rule:** query the live `main` ref; this ledger does not pin a moving HEAD.  
-**Last Director reconciliation:** 2026-11-08  
-**Latest verified application/test source SHA:** `d44ec33a57a4958380f2cfe4624f040859cbcf7a`. A documentation-only reconciliation may follow; the application/test source remains this exact verified SHA.
+**Last Director reconciliation:** 2026-11-09  
+**Latest verified application/test source SHA:** `153c4d01bef4b5c3bd01a1db770902b0c7649bb0`. Current `main` is a documentation-only descendant; the application/test source remains this exact verified SHA.
+
+## Latest Director CI reconciliation — 2026-11-09
+
+The application/test source `153c4d01bef4b5c3bd01a1db770902b0c7649bb0` passed the following exact-source checks:
+
+| Check | Result |
+|---|---|
+| Laravel | PASS — [run 42694636423](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/42694636423) |
+| Zazu Quality + secret scan | PASS — [run 42694636578](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/42694636578) |
+| Psalm Security | PASS — [run 42694636966](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/42694636966) |
+| PHPMD | PASS — [run 42694636477](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/42694636477) |
+| Populated upgrade / rollback | PASS — [run 42694636774](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/42694636774) |
+| Browser smoke | PASS — 65 passed, 22 skipped, 0 failed — [run 42694636938](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/42694636938) |
+| Director Contract Lint | PASS — [run 42694637003](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/42694637003) |
+| Director Health Report | PASS — [run 42695508475](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/42695508475) |
+| Push on main | PASS — [run 42694636394](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/42694636394) |
+| SonarCloud | SKIPPED; not a pass |
+
+The verified source was then followed by documentation-only commit `dff2b457e32096e4bb97cb46c3a5faa7ba67eda7` to close CASE-ZAZU-0014 and reconcile this ledger. A fresh workflow batch was triggered for that documentation commit; it is not yet complete at the time of this entry. The application/test source has not changed.
+
+**Release position remains NO-GO.** CI verifies repository-level source and browser regressions. It does not certify real installed-device offline operation, operator restore/rollback, deployment readiness, legal/privacy operations or brand clearance.
 
 ## Evidence rule
 
