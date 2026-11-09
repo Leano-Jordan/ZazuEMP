@@ -63,8 +63,12 @@ if ($existing.Count -gt 0) {
     }
     $knownProcess = if ($knownPid -gt 0) { Get-CimInstance Win32_Process -Filter "ProcessId = $knownPid" -ErrorAction SilentlyContinue } else { $null }
     if ($knownProcess -and $knownProcess.Name -eq 'caddy.exe' -and $knownProcess.CommandLine -like "*$configPath*") {
-        Write-Host "Zazu LAN HTTPS is already running at https://$($existing[0].LocalAddress):$HttpsPort"
-        exit 0
+        $currentAddressListener = $existing | Where-Object { $_.LocalAddress -eq $lanIp } | Select-Object -First 1
+        if ($currentAddressListener) {
+            Write-Host "Zazu LAN HTTPS is already running at https://$($lanIp):$HttpsPort"
+            exit 0
+        }
+        throw "Caddy is still running for a previous Wi-Fi address. Stop it with Stop-Zazu-LAN-HTTPS.cmd, then start it again for $lanIp."
     }
     throw "TCP $HttpsPort is already occupied by an unverified listener. Nothing was stopped."
 }
