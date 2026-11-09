@@ -180,6 +180,12 @@ class UiVisualSystemRegressionTest extends TestCase
         $this->assertIsString($dashboardCss);
         $this->assertIsString($visualSweepCss);
         $this->assertStringContainsString('resources/css/zazu-product-authority.css', $layout);
+        $quoteCreate = file_get_contents(resource_path('views/quotes/create.blade.php'));
+        $this->assertIsString($quoteCreate);
+        $this->assertStringContainsString('class="zazu-list zazu-quote-line-editor"', $quoteCreate);
+        $this->assertStringNotContainsString('class="zazu-card zazu-list zazu-quote-line-editor"', $quoteCreate);
+        $this->assertStringContainsString('.zazu-quote-line-editor .zazu-list-item', $css);
+        $this->assertStringContainsString('grid-template-columns: minmax(0, 1fr) minmax(140px, 190px);', $css);
         $this->assertStringContainsString('--zazu-page: #DCE5ED;', $css);
         $this->assertStringContainsString('--zazu-sidebar: #102541;', $css);
         $this->assertStringContainsString('--zazu-surface: #FFFFFF;', $css);
