@@ -2,6 +2,7 @@
 param(
     [string]$ProjectPath = (Resolve-Path (Join-Path $PSScriptRoot '..\\..')).Path,
     [string]$BindAddress = '127.0.0.1',
+    [switch]$Lan,
     [ValidateRange(1024, 65535)]
     [int]$Port = 8000,
     [switch]$Stop
@@ -9,6 +10,34 @@ param(
 
 $ErrorActionPreference = 'Stop'
 $ProjectPath = [System.IO.Path]::GetFullPath($ProjectPath).TrimEnd('\\')
+
+if ($Lan -and -not $Stop) {
+    $wifiProfile = Get-NetConnectionProfile -ErrorAction Stop |
+        Where-Object {
+            $_.NetworkCategory -eq 'Private' -and
+            $_.IPv4Connectivity -ne 'Disconnected' -and
+            $_.InterfaceAlias -match '(?i)wi-?fi|wireless|wlan'
+        } |
+        Select-Object -First 1
+
+    if (-not $wifiProfile) {
+        throw 'LAN mode requires an active Wi-Fi connection classified as a Private network. No firewall or network settings were changed.'
+    }
+
+    $wifiAddress = Get-NetIPAddress -InterfaceIndex $wifiProfile.InterfaceIndex -AddressFamily IPv4 -ErrorAction Stop |
+        Where-Object {
+            $_.AddressState -eq 'Preferred' -and
+            $_.IPAddress -notmatch '^(127\\.|169\\.254\\.)'
+        } |
+        Select-Object -First 1
+
+    if (-not $wifiAddress) {
+        throw "No usable IPv4 address was found on the private Wi-Fi interface '$($wifiProfile.InterfaceAlias)'."
+    }
+
+    $BindAddress = $wifiAddress.IPAddress
+}
+
 $parsedAddress = $null
 if (-not [System.Net.IPAddress]::TryParse($BindAddress, [ref]$parsedAddress)) {
     throw 'BindAddress must be an IP address such as 127.0.0.1 or 0.0.0.0.'
@@ -127,4 +156,11 @@ Write-Host ("URL: http://{0}:{1}" -f $BindAddress, $Port)
 Write-Host "PHP: $phpVersion ($php)"
 Write-Host "Logs: $logDirectory"
 Write-Host "Stop it by double-clicking Stop-Zazu-Dev.cmd."
-Write-Host "Development only: this HTTP server is not a production host and does not provide a secure PWA origin to other devices."
+if ($Lan) {
+    Write-Host "LAN mode: bound only to the active private Wi-Fi address."
+    Write-Host "Use this URL only from devices on the same trusted Wi-Fi network."
+    Write-Host "The server is HTTP-only; installed PWA service-worker/offline acceptance requires a secure HTTPS origin."
+    Write-Host "No Windows Firewall or router settings were changed."
+} else {
+    Write-Host "Loopback development only: this HTTP server is not a production host and does not provide a secure PWA origin to other devices."
+}
