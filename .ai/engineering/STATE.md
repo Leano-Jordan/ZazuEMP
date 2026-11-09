@@ -1273,3 +1273,13 @@ Owner expanded the visual refinement scope beyond the dashboard: apply the estab
   - Dark hover: #344653 with #E5EBF0 text.
 - Added regression assertions for selected states and unified title bars.
 - Automated tests, build and rendered desktop/mobile acceptance remain pending.
+
+
+## Sidebar workspace footer contrast correction — 2026-11-09
+
+- Found stale product-authority declarations left the footer workspace label and account kicker in pale blue while their actual .zazu-footer-workspace surface was transparent on the new light slate sidebar. The old deep-navy-rail rules were not scoped to the actual rendered footer container.
+- Added explicit theme-paired surface/foreground rules for the Workspace identity card and Signed in/account metadata:
+  - Light: #E7EEF3 surface, #23394D primary text, #536B7F secondary labels.
+  - Dark: #293945 surface, #E5EBF0 primary text, #B8C7D2 secondary labels.
+- Kept the account popover and navigation behavior unchanged. Added regression assertions for both themes.
+- Current repo source baseline is being re-audited after the owner-directed V1 request; no offline implementation change is included in this footer correction.
