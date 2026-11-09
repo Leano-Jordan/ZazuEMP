@@ -384,13 +384,13 @@
     color-scheme: light;
     --zazu-page: #DCE5ED;
     --zazu-page-deep: #E8EEF3;
-    --zazu-sidebar: #102541;
-    --zazu-sidebar-ink: #DCE7F5;
-    --zazu-sidebar-muted: #AFC1D6;
-    --zazu-sidebar-label: #8FA8C4;
-    --zazu-sidebar-hover: #34536D;
-    --zazu-sidebar-active: #6487A2;
-    --zazu-sidebar-surface: #1A3658;
+    --zazu-sidebar: #D5E0E8;
+    --zazu-sidebar-ink: #23394D;
+    --zazu-sidebar-muted: #536B7F;
+    --zazu-sidebar-label: #617B91;
+    --zazu-sidebar-hover: #C2D2DE;
+    --zazu-sidebar-active: #B4C8D7;
+    --zazu-sidebar-surface: #E6EDF2;
 
     --zazu-surface: #FFFFFF;
     --zazu-surface-2: #F7F9FC;
@@ -462,13 +462,13 @@
     color-scheme: dark;
     --zazu-page: #0B1726;
     --zazu-page-deep: #101E31;
-    --zazu-sidebar: #091827;
-    --zazu-sidebar-ink: #DCE7F5;
-    --zazu-sidebar-muted: #A4B5C8;
-    --zazu-sidebar-label: #8298B4;
-    --zazu-sidebar-hover: #34536D;
-    --zazu-sidebar-active: #6487A2;
-    --zazu-sidebar-surface: #122235;
+    --zazu-sidebar: #202B35;
+    --zazu-sidebar-ink: #E5EBF0;
+    --zazu-sidebar-muted: #BAC6D0;
+    --zazu-sidebar-label: #9EAFBD;
+    --zazu-sidebar-hover: #344653;
+    --zazu-sidebar-active: #405A6B;
+    --zazu-sidebar-surface: #293945;
 
     --zazu-surface: #122235;
     --zazu-surface-2: #172B40;
@@ -1068,7 +1068,7 @@ body.zazu-dashboard-page .zazu-dash-surface-head {
 /* Customer relationship details: distinguish contact cards from the parent panel. */
 body[data-zazu-route^="customers."] .zazu-contact-card,
 body[data-zazu-route^="customers."] .zazu-detail-value-box {
-    background: linear-gradient(145deg, color-mix(in srgb, var(--zazu-tone-violet) 44%, var(--zazu-surface)), var(--zazu-surface) 88%) !important;
+    background: var(--zazu-tone-violet) !important;
     border: 1px solid color-mix(in srgb, var(--zazu-tone-ink-violet) 13%, var(--zazu-line-soft)) !important;
 }
 /* Work progression uses completion semantics, not the same blue outline for every step. */
@@ -1079,7 +1079,7 @@ body[data-zazu-route^="customers."] .zazu-detail-value-box {
 }
 .zazu-work-progress-step.current {
     border-color: color-mix(in srgb, var(--zazu-tone-ink-blue) 30%, var(--zazu-line-soft)) !important;
-    background: linear-gradient(145deg, var(--zazu-tone-blue), var(--zazu-surface)) !important;
+    background: var(--zazu-tone-blue) !important;
 }
 .zazu-work-progress-step.current span {
     background: var(--zazu-tone-ink-blue) !important;
@@ -1087,7 +1087,7 @@ body[data-zazu-route^="customers."] .zazu-detail-value-box {
 }
 .zazu-work-progress-step.complete {
     border-color: color-mix(in srgb, var(--zazu-tone-ink-green) 25%, var(--zazu-line-soft)) !important;
-    background: linear-gradient(145deg, var(--zazu-tone-green), var(--zazu-surface)) !important;
+    background: var(--zazu-tone-green) !important;
 }
 .zazu-work-progress-step.complete span {
     background: var(--zazu-tone-ink-green) !important;
@@ -1107,47 +1107,47 @@ body[data-zazu-route^="customers."] .zazu-detail-value-box {
     padding: 10px 12px !important;
     border: 0 !important;
     border-radius: 7px !important;
-    background: linear-gradient(105deg, var(--zazu-tone-blue), color-mix(in srgb, var(--zazu-tone-blue) 30%, var(--zazu-surface))) !important;
+    background: var(--zazu-tone-blue) !important;
 }
 .zazu-form-section-title {
     color: var(--zazu-tone-ink-blue) !important;
     font-weight: 760 !important;
 }
 body[data-zazu-route^="finance."] .zazu-form-section {
-    background: linear-gradient(145deg, color-mix(in srgb, var(--zazu-tone-green) 20%, var(--zazu-surface)), var(--zazu-surface) 72%) !important;
+    background: var(--zazu-tone-green) !important;
 }
 body[data-zazu-route^="finance."] .zazu-form-section-head {
-    background: linear-gradient(105deg, var(--zazu-tone-green), color-mix(in srgb, var(--zazu-tone-green) 30%, var(--zazu-surface))) !important;
+    background: var(--zazu-tone-green) !important;
 }
 body[data-zazu-route^="inventory."] .zazu-form-section,
 body[data-zazu-route^="purchasing."] .zazu-form-section {
-    background: linear-gradient(145deg, color-mix(in srgb, var(--zazu-tone-amber) 20%, var(--zazu-surface)), var(--zazu-surface) 72%) !important;
+    background: var(--zazu-tone-amber) !important;
 }
 body[data-zazu-route^="inventory."] .zazu-form-section-head,
 body[data-zazu-route^="purchasing."] .zazu-form-section-head {
-    background: linear-gradient(105deg, var(--zazu-tone-amber), color-mix(in srgb, var(--zazu-tone-amber) 30%, var(--zazu-surface))) !important;
+    background: var(--zazu-tone-amber) !important;
 }
 body[data-zazu-route^="work.quotes."] .zazu-form-section,
 body[data-zazu-route^="quotes."] .zazu-form-section,
 body[data-zazu-route^="customers."] .zazu-form-section {
-    background: linear-gradient(145deg, color-mix(in srgb, var(--zazu-tone-violet) 18%, var(--zazu-surface)), var(--zazu-surface) 72%) !important;
+    background: var(--zazu-tone-violet) !important;
 }
 body[data-zazu-route^="work.quotes."] .zazu-form-section-head,
 body[data-zazu-route^="quotes."] .zazu-form-section-head,
 body[data-zazu-route^="customers."] .zazu-form-section-head {
-    background: linear-gradient(105deg, var(--zazu-tone-violet), color-mix(in srgb, var(--zazu-tone-violet) 30%, var(--zazu-surface))) !important;
+    background: var(--zazu-tone-violet) !important;
 }
 body[data-zazu-route^="work."]:not([data-zazu-route^="work.quotes."]) .zazu-form-section {
-    background: linear-gradient(145deg, color-mix(in srgb, var(--zazu-tone-teal) 16%, var(--zazu-surface)), var(--zazu-surface) 72%) !important;
+    background: var(--zazu-tone-teal) !important;
 }
 body[data-zazu-route^="work."]:not([data-zazu-route^="work.quotes."]) .zazu-form-section-head {
-    background: linear-gradient(105deg, var(--zazu-tone-teal), color-mix(in srgb, var(--zazu-tone-teal) 30%, var(--zazu-surface))) !important;
+    background: var(--zazu-tone-teal) !important;
 }
 
 /* Header bars are coloured surfaces, not boxed blocks with heavy outlines. */
 .zazu-card-header,
 .zazu-panel-head {
-    background: linear-gradient(105deg, var(--zazu-tone-blue) 0%, color-mix(in srgb, var(--zazu-tone-blue) 48%, var(--zazu-surface)) 100%) !important;
+    background: var(--zazu-tone-blue) !important;
     border: 0 !important;
     border-bottom: 1px solid color-mix(in srgb, var(--zazu-tone-ink-blue) 18%, transparent) !important;
 }
@@ -1159,57 +1159,57 @@ body[data-zazu-route^="work."]:not([data-zazu-route^="work.quotes."]) .zazu-form
 /* Distinct operational categories: colour helps the eye find the right work. */
 .zazu-finance-directory .zazu-card-header,
 .zazu-card.zazu-finance-card .zazu-card-header {
-    background: linear-gradient(105deg, var(--zazu-tone-green), color-mix(in srgb, var(--zazu-tone-green) 45%, var(--zazu-surface))) !important;
+    background: var(--zazu-tone-green) !important;
     border-bottom-color: color-mix(in srgb, var(--zazu-tone-ink-green) 20%, transparent) !important;
 }
 .zazu-inventory-directory .zazu-card-header,
 .zazu-purchasing-page .zazu-card-header {
-    background: linear-gradient(105deg, var(--zazu-tone-amber), color-mix(in srgb, var(--zazu-tone-amber) 45%, var(--zazu-surface))) !important;
+    background: var(--zazu-tone-amber) !important;
     border-bottom-color: color-mix(in srgb, var(--zazu-tone-ink-amber) 20%, transparent) !important;
 }
 .zazu-suppliers-page .zazu-card-header,
 .zazu-assets-directory .zazu-card-header {
-    background: linear-gradient(105deg, var(--zazu-tone-teal), color-mix(in srgb, var(--zazu-tone-teal) 45%, var(--zazu-surface))) !important;
+    background: var(--zazu-tone-teal) !important;
     border-bottom-color: color-mix(in srgb, var(--zazu-tone-ink-teal) 20%, transparent) !important;
 }
 .zazu-customer-directory .zazu-card-header,
 .zazu-quote-lines .zazu-card-header,
 .zazu-quote-history-register .zazu-card-header {
-    background: linear-gradient(105deg, var(--zazu-tone-violet), color-mix(in srgb, var(--zazu-tone-violet) 45%, var(--zazu-surface))) !important;
+    background: var(--zazu-tone-violet) !important;
     border-bottom-color: color-mix(in srgb, var(--zazu-tone-ink-violet) 20%, transparent) !important;
 }
 
 /* Route-level card surfaces: each workspace gets a recognisable colour family. */
 body[data-zazu-route^="finance."] .zazu-card,
 body[data-zazu-route^="finance."] .zazu-panel {
-    background: linear-gradient(145deg, color-mix(in srgb, var(--zazu-tone-green) 68%, var(--zazu-surface)), var(--zazu-surface) 82%) !important;
+    background: var(--zazu-tone-green) !important;
 }
 body[data-zazu-route^="inventory."] .zazu-card,
 body[data-zazu-route^="inventory."] .zazu-panel,
 body[data-zazu-route^="purchasing."] .zazu-card,
 body[data-zazu-route^="purchasing."] .zazu-panel {
-    background: linear-gradient(145deg, color-mix(in srgb, var(--zazu-tone-amber) 68%, var(--zazu-surface)), var(--zazu-surface) 82%) !important;
+    background: var(--zazu-tone-amber) !important;
 }
 body[data-zazu-route^="suppliers."] .zazu-card,
 body[data-zazu-route^="suppliers."] .zazu-panel,
 body[data-zazu-route^="assets."] .zazu-card,
 body[data-zazu-route^="assets."] .zazu-panel {
-    background: linear-gradient(145deg, color-mix(in srgb, var(--zazu-tone-teal) 68%, var(--zazu-surface)), var(--zazu-surface) 82%) !important;
+    background: var(--zazu-tone-teal) !important;
 }
 body[data-zazu-route^="customers."] .zazu-card,
 body[data-zazu-route^="customers."] .zazu-panel,
 body[data-zazu-route^="quotes."] .zazu-card,
 body[data-zazu-route^="quotes."] .zazu-panel {
-    background: linear-gradient(145deg, color-mix(in srgb, var(--zazu-tone-violet) 68%, var(--zazu-surface)), var(--zazu-surface) 82%) !important;
+    background: var(--zazu-tone-violet) !important;
 }
 body[data-zazu-route^="reports."] .zazu-card,
 body[data-zazu-route^="reports."] .zazu-panel,
 body[data-zazu-route^="calendar."] .zazu-card,
 body[data-zazu-route^="calendar."] .zazu-panel {
-    background: linear-gradient(145deg, color-mix(in srgb, var(--zazu-tone-blue) 68%, var(--zazu-surface)), var(--zazu-surface) 82%) !important;
+    background: var(--zazu-tone-blue) !important;
 }
 body[data-zazu-route^="quotes."] .zazu-quote-register-command + .zazu-card .zazu-card-header {
-    background: linear-gradient(105deg, var(--zazu-tone-violet), var(--zazu-surface)) !important;
+    background: var(--zazu-tone-violet) !important;
     border-bottom-color: color-mix(in srgb, var(--zazu-tone-ink-violet) 20%, transparent) !important;
 }
 
@@ -1218,16 +1218,16 @@ body[data-zazu-route^="quotes."] .zazu-quote-register-command + .zazu-card .zazu
 body.zazu-dashboard-page .zazu-dash-surface-head {
     border: 0 !important;
     border-bottom: 1px solid var(--zazu-line-soft) !important;
-    background: linear-gradient(105deg, var(--zazu-tone-blue), color-mix(in srgb, var(--zazu-tone-blue) 28%, var(--zazu-surface))) !important;
+    background: var(--zazu-tone-blue) !important;
 }
 body.zazu-dashboard-page .zazu-dash-commercial .zazu-dash-surface-head {
-    background: linear-gradient(105deg, var(--zazu-tone-green), color-mix(in srgb, var(--zazu-tone-green) 28%, var(--zazu-surface))) !important;
+    background: var(--zazu-tone-green) !important;
 }
 body.zazu-dashboard-page .zazu-dash-focus .zazu-dash-surface-head {
-    background: linear-gradient(105deg, var(--zazu-tone-amber), color-mix(in srgb, var(--zazu-tone-amber) 28%, var(--zazu-surface))) !important;
+    background: var(--zazu-tone-amber) !important;
 }
 body.zazu-dashboard-page .zazu-dash-resources .zazu-dash-surface-head {
-    background: linear-gradient(105deg, var(--zazu-tone-teal), color-mix(in srgb, var(--zazu-tone-teal) 28%, var(--zazu-surface))) !important;
+    background: var(--zazu-tone-teal) !important;
 }
 body.zazu-dashboard-page .zazu-dash-event,
 body.zazu-dashboard-page .zazu-dash-focus-item,
@@ -1271,22 +1271,22 @@ html[data-theme="dark"] body.zazu-dashboard-page .zazu-dash-quote-stage {
 .zazu-dash-metric {
     border: 1px solid transparent !important;
     border-top: 1px solid transparent !important;
-    background: linear-gradient(145deg, var(--zazu-tone-blue), color-mix(in srgb, var(--zazu-tone-blue) 28%, var(--zazu-surface))) !important;
+    background: var(--zazu-tone-blue) !important;
 }
 .zazu-metric-card:nth-child(4n + 2),
 .zazu-dash-metrics > :nth-child(4n + 2) {
-    background: linear-gradient(145deg, var(--zazu-tone-green), color-mix(in srgb, var(--zazu-tone-green) 28%, var(--zazu-surface))) !important;
+    background: var(--zazu-tone-green) !important;
 }
 .zazu-metric-card:nth-child(4n + 3),
 .zazu-dash-metrics > :nth-child(4n + 3) {
-    background: linear-gradient(145deg, var(--zazu-tone-violet), color-mix(in srgb, var(--zazu-tone-violet) 28%, var(--zazu-surface))) !important;
+    background: var(--zazu-tone-violet) !important;
 }
 .zazu-metric-card:nth-child(4n + 4),
 .zazu-dash-metrics > :nth-child(4n + 4) {
-    background: linear-gradient(145deg, var(--zazu-tone-amber), color-mix(in srgb, var(--zazu-tone-amber) 28%, var(--zazu-surface))) !important;
+    background: var(--zazu-tone-amber) !important;
 }
 .zazu-metric-card.zazu-metric-alert {
-    background: linear-gradient(145deg, var(--zazu-tone-amber), color-mix(in srgb, var(--zazu-tone-amber) 28%, var(--zazu-surface))) !important;
+    background: var(--zazu-tone-amber) !important;
 }
 .zazu-metric-label { color: var(--zazu-tone-ink-blue) !important; }
 .zazu-metric-alert .zazu-metric-label { color: var(--zazu-tone-ink-amber) !important; }
@@ -1302,16 +1302,16 @@ html[data-theme="dark"] body.zazu-dashboard-page .zazu-dash-quote-stage {
 :root[data-theme="dark"] .zazu-dash-quote-stage:nth-child(4) { background: var(--zazu-tone-coral) !important; }
 
 .zazu-command-band {
-    background: linear-gradient(108deg, var(--zazu-tone-blue), color-mix(in srgb, var(--zazu-tone-blue) 22%, var(--zazu-surface)) 78%) !important;
+    background: var(--zazu-tone-blue) !important;
     border: 1px solid var(--zazu-line-soft) !important;
 }
 .zazu-command-band .zazu-eyebrow { color: var(--zazu-tone-ink-blue) !important; }
 .zazu-command-band .zazu-command-title { font-weight: 760 !important; color: var(--zazu-ink) !important; }
 body.zazu-dashboard-page .zazu-dash-panel-head {
-    background: linear-gradient(105deg, var(--zazu-tone-blue), var(--zazu-surface)) !important;
+    background: var(--zazu-tone-blue) !important;
 }
 body.zazu-dashboard-page .zazu-dash-commercial .zazu-dash-panel-head {
-    background: linear-gradient(105deg, var(--zazu-tone-green), var(--zazu-surface)) !important;
+    background: var(--zazu-tone-green) !important;
 }
 
 /* Remove decorative rails and oversized left accents throughout the workspace. */
@@ -1457,3 +1457,9 @@ body.zazu-dashboard-page .zazu-dash-quote-stage > span { color: var(--zazu-tone-
 :root[data-theme="dark"] body.zazu-dashboard-page .zazu-dash-quote-stage {
     border: 1px solid var(--zazu-line-soft) !important;
 }
+
+/* DIRECTOR — solid surfaces only; gradients obscured the semantic colour system. */
+.zazu-card-header,.zazu-panel-head,.zazu-form-section-head,.zazu-command-band,.zazu-metric-card,.zazu-dash-metric,body.zazu-dashboard-page .zazu-dash-hero,body.zazu-dashboard-page .zazu-dash-surface-head{background-image:none!important;}
+body:not(.zazu-dashboard-page) .zazu-nav-link,body:not(.zazu-dashboard-page) .zazu-nav-area-trigger,body:not(.zazu-dashboard-page) .zazu-user-trigger{color:var(--zazu-sidebar-ink)!important;}
+body:not(.zazu-dashboard-page) .zazu-nav-link:hover,body:not(.zazu-dashboard-page) .zazu-nav-link:focus-visible,body:not(.zazu-dashboard-page) .zazu-nav-area-trigger:hover,body:not(.zazu-dashboard-page) .zazu-nav-area-trigger:focus-visible{color:var(--zazu-sidebar-ink)!important;background:var(--zazu-sidebar-hover)!important;}
+body:not(.zazu-dashboard-page) .zazu-nav-link.active,body:not(.zazu-dashboard-page) .zazu-nav-area.is-active>.zazu-nav-area-trigger{color:var(--zazu-sidebar-ink)!important;background:var(--zazu-sidebar-active)!important;}
