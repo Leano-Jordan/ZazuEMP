@@ -155,6 +155,14 @@ class UiProportionFoundationTest extends TestCase
         $this->assertStringContainsString('outline: 2px solid #8CCDE4 !important;', $dashboardCss);
         $this->assertStringNotContainsString('background: #B9CAD9 !important;', $dashboardCss);
         $this->assertStringNotContainsString('background: rgba(255,255,255,.09) !important;', $dashboardCss);
+        $productCss = file_get_contents(resource_path('css/zazu-product-authority.css'));
+        $this->assertIsString($productCss);
+        $this->assertStringContainsString('background: #B4C8D7 !important;', $productCss);
+        $this->assertStringContainsString('background: #486174 !important;', $productCss);
+        $this->assertStringContainsString('color: #F3F6F8 !important;', $productCss);
+        $this->assertStringContainsString('background: var(--zazu-surface-3) !important;', $productCss);
+        $this->assertStringNotContainsString('body[data-zazu-route^="finance."] .zazu-form-section {', $productCss);
+
     }
 
 
