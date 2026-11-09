@@ -174,6 +174,24 @@
     border-radius: var(--zazu-radius-md);
 }
 
+
+/* Remove pill geometry from interactive controls and repeated dashboard surfaces. */
+.zazu-workload-pill,
+.zazu-dashboard-quickbar,
+.zazu-dashboard-quickbar nav a,
+.zazu-dashboard-kpi {
+    border-radius: var(--zazu-radius-md);
+}
+
+.zazu-run-status,
+.zazu-tab-count,
+.zazu-dietary-tag,
+.zazu-dash-status,
+.zazu-dash-queue-state,
+.zazu-calendar-status,
+.zazu-calendar-agenda-status {
+    border-radius: var(--zazu-radius-sm);
+}
 @media (max-width: 820px) {
     .zazu-card-header, .zazu-panel-head { padding: 13px 15px; }
     .zazu-form-section { padding: 16px; }
