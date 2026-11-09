@@ -1,0 +1,85 @@
+name: Zazu Windows Ops Scripts
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'ops/windows/*.ps1'
+      - 'Start-Zazu-Dev.cmd'
+      - 'Start-Zazu-LAN.cmd'
+      - 'Stop-Zazu-Dev.cmd'
+      - 'Start-Zazu-LAN-HTTPS.cmd'
+      - 'Stop-Zazu-LAN-HTTPS.cmd'
+      - '.github/workflows/zazu-windows-ops.yml'
+  pull_request:
+    paths:
+      - 'ops/windows/*.ps1'
+      - 'Start-Zazu-Dev.cmd'
+      - 'Start-Zazu-LAN.cmd'
+      - 'Stop-Zazu-Dev.cmd'
+      - 'Start-Zazu-LAN-HTTPS.cmd'
+      - 'Stop-Zazu-LAN-HTTPS.cmd'
+      - '.github/workflows/zazu-windows-ops.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  powershell-parse:
+    name: Parse Windows host scripts
+    runs-on: windows-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+
+      - name: Parse PowerShell scripts
+        shell: pwsh
+        run: |
+          $scripts = Get-ChildItem -Path 'ops/windows' -Filter '*.ps1' -File
+          if (-not $scripts) {
+            throw 'No Windows operations scripts were found.'
+          }
+
+          foreach ($script in $scripts) {
+            $tokens = $null
+            $errors = $null
+            [System.Management.Automation.Language.Parser]::ParseFile(
+              $script.FullName,
+              [ref]$tokens,
+              [ref]$errors
+            ) | Out-Null
+
+            if ($errors.Count -gt 0) {
+              Write-Error "PowerShell parse errors in $($script.Name):"
+              $errors | Format-List | Out-String | Write-Host
+              throw "PowerShell syntax validation failed for $($script.Name)."
+            }
+
+            Write-Host "PASS: $($script.Name)"
+          }
+
+      - name: Verify LAN HTTPS command wrappers
+        shell: pwsh
+        run: |
+          $required = @(
+            'Start-Zazu-LAN-HTTPS.cmd',
+            'Stop-Zazu-LAN-HTTPS.cmd',
+            'ops/windows/Start-ZazuLanHttps.ps1',
+            'ops/windows/Stop-ZazuLanHttps.ps1'
+          )
+
+          foreach ($path in $required) {
+            if (-not (Test-Path $path -PathType Leaf)) {
+              throw "Required LAN HTTPS launcher file is missing: $path"
+            }
+          }
+
+          $startWrapper = Get-Content 'Start-Zazu-LAN-HTTPS.cmd' -Raw
+          $stopWrapper = Get-Content 'Stop-Zazu-LAN-HTTPS.cmd' -Raw
+          if ($startWrapper -notmatch 'Start-ZazuLanHttps\.ps1') {
+            throw 'Start wrapper does not invoke Start-ZazuLanHttps.ps1.'
+          }
+          if ($stopWrapper -notmatch 'Stop-ZazuLanHttps\.ps1') {
+            throw 'Stop wrapper does not invoke Stop-ZazuLanHttps.ps1.'
+          }
+          Write-Host 'PASS: LAN HTTPS wrappers reference their matching scripts.'
