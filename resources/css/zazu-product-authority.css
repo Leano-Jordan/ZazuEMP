@@ -982,3 +982,64 @@ textarea:focus,
     outline: 0 !important;
     box-shadow: 0 0 0 2px color-mix(in srgb, var(--zazu-primary) 16%, transparent) !important;
 }
+
+
+/* Quote register + quote editor: remove remaining legacy blue rails/insets. */
+.zazu-quote-register-command,
+.zazu-quote-history-command,
+.zazu-quote-editor-command,
+.zazu-quote-hero {
+    border-left: 1px solid var(--zazu-border) !important;
+}
+.zazu-quote-register-row:hover {
+    border-color: var(--zazu-border) !important;
+    box-shadow: inset 2px 0 0 var(--zazu-border-strong) !important;
+}
+.zazu-quote-review-action {
+    border-left: 1px solid var(--zazu-border) !important;
+    background: var(--zazu-surface-2) !important;
+}
+.zazu-quote-total-panel {
+    border-top: 1px solid var(--zazu-border) !important;
+}
+.zazu-total-row {
+    border-top: 1px solid var(--zazu-border) !important;
+}
+.zazu-quote-lines .zazu-record-header {
+    border-bottom: 1px solid var(--zazu-border) !important;
+}
+
+/* Quote register spacing: more breathing room at the top and between records. */
+.zazu-quote-register-command {
+    padding: 22px 24px !important;
+    margin-bottom: 22px !important;
+}
+.zazu-quote-register-command .zazu-command-meta {
+    padding-left: 20px !important;
+}
+.zazu-quote-register-command + .zazu-card .zazu-card-header {
+    padding: 20px 22px !important;
+}
+.zazu-quote-register-command + .zazu-card .zazu-record-header {
+    min-height: 42px;
+    padding-top: 10px !important;
+    padding-bottom: 10px !important;
+}
+.zazu-quote-register-command + .zazu-card .zazu-quote-register-row {
+    min-height: 76px;
+    padding: 17px 22px !important;
+    gap: 20px !important;
+}
+@media (max-width: 720px) {
+    .zazu-quote-register-command {
+        padding: 18px 18px !important;
+        margin-bottom: 16px !important;
+    }
+    .zazu-quote-register-command + .zazu-card .zazu-card-header {
+        padding: 17px 16px !important;
+    }
+    .zazu-quote-register-command + .zazu-card .zazu-quote-register-row {
+        padding: 14px 16px !important;
+        gap: 10px !important;
+    }
+}
