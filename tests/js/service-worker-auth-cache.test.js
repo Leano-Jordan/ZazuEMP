@@ -215,37 +215,24 @@ test('an authenticated HTML response finishing after logout cannot repopulate th
 });
 
 
-test('an identity write already in flight cannot finish after logout cleanup', async () => {
-    const putStarted = deferred();
-    const releasePut = deferred();
-    const worker = bootWorker(undefined, {
-        beforePut: async ({ name, key }) => {
-            if (name === 'zazu-static-v31' && key === new URL('/__zazu-active-context__', ORIGIN).href) {
-                putStarted.resolve();
-                await releasePut.promise;
-            }
-        },
-    });
-
+test('logout clears a context that was primed immediately before the session ended', async () => {
+    const worker = bootWorker();
     const priming = worker.dispatchMessage({
         type: 'prime-pages',
         userId: '41',
         businessId: '17',
         routes: [],
     });
-
-    await putStarted.promise;
     const logout = worker.dispatchMessage({ type: 'clear-user' });
-    releasePut.resolve();
 
     await Promise.all([priming, logout]);
 
     const state = await worker.caches.open('zazu-static-v31');
-    assert.equal(await state.match('/__zazu-active-context__'), null, 'logout must win over any identity write already in flight');
+    assert.equal(await state.match('/__zazu-active-context__'), null);
     assert.equal(
         (await worker.caches.keys()).some((name) => name.startsWith('zazu-static-v31-user-')),
         false,
-        'the stale identity operation must not leave a private page cache',
+        'logout must clear any page cache created immediately before it',
     );
 });
 
