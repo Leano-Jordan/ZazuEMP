@@ -1,23 +1,37 @@
 # Zazu EMP — Production Deployment Readiness
 
 **Status:** FUTURE PRODUCTION TARGET — no production host selected or purchased  
-**Current environment:** Owner development workstation; temporary development runtime only  
-**Production direction:** Paid, persistent server when the owner is ready  
+**Current environment:** Owner PC can run a temporary, trusted-Wi-Fi LAN instance for same-network access and acceptance  
+**Production direction:** Paid, persistent public server only when the owner is ready  
 **Repository policy:** `main` only; no feature branches
 
 ## 1. Deployment boundary
 
-The owner's Windows PC is a development machine. It is not the planned permanent Zazu host and must not be configured, budgeted or documented as the customer production server.
+The owner's Windows PC is not the planned permanent public production server. It can, however, host Zazu temporarily on a trusted private Wi-Fi network so phones/tablets on that same network can reach it. This LAN mode is for controlled development and acceptance, not internet-facing production. No domain or paid hosting is required for same-network HTTP access.
 
 Current observed development runtime:
 - Project: `C:\Projects\ZazuEMP`
 - PHP CLI: standalone PHP 8.4.26 at `C:\PHP84\php.exe`
-- Web process: Laravel's built-in PHP development server on port 8000, launched from the VS Code integrated terminal
+- Web process: Laravel's built-in PHP development server on port 8000
 - Active database: SQLite at `database/database.sqlite`
 - Private business files: `storage/app/private`
 - AMPPS is installed but is not used to run Zazu. Its bundled PHP 7.4.33 does not satisfy the application's PHP `^8.4` requirement.
+- `Start-Zazu-Dev.cmd` starts loopback-only development mode independently of VS Code.
+- `Start-Zazu-LAN.cmd` selects the active Wi-Fi interface only when Windows classifies that network as Private, then binds the server to that interface's IPv4 address.
 
-The development server is temporary. Its process lifetime is tied to the terminal/process chain. The purpose of local development is implementation and testing, not production hosting.
+The LAN launcher does not change Windows Firewall, router settings or network classification. If Windows Firewall blocks inbound TCP 8000, allow it only on the Private profile. Do not expose the development server on public/guest Wi-Fi, enable router port forwarding, or publish port 8000 to the internet. Use the same non-guest Wi-Fi network on the phone/tablet; client isolation can prevent device-to-device access.
+
+## 1A. Temporary same-Wi-Fi access (current near-term target)
+
+For access from a phone/tablet on the same trusted Wi-Fi network:
+
+1. Start `Start-Zazu-LAN.cmd` on the host PC.
+2. The launcher requires an active Wi-Fi connection classified as **Private** in Windows and binds only to that Wi-Fi IPv4 address; it does not bind to every network interface.
+3. Read the LAN URL printed by the launcher and open it on the phone/tablet while both devices remain on the same Wi-Fi network.
+4. If the page cannot be reached, check that the Windows firewall permits inbound TCP 8000 on the **Private** profile only, and that the Wi-Fi/router does not enable client isolation.
+5. Stop the server with `Stop-Zazu-Dev.cmd`.
+
+This is HTTP development access. It is sufficient for same-network page/workflow testing, but a phone browser does not treat an arbitrary HTTP LAN IP as a secure context. Service-worker installation and full PWA offline acceptance therefore remain blocked until a trusted HTTPS origin is configured for the LAN. Do not interpret LAN reachability as proof of offline PWA behaviour.
 
 ## 2. Future production outcome
 
@@ -145,6 +159,7 @@ Do not expose development tools, debug endpoints, database ports, private storag
 | Local PHP 8.4 development runtime | OBSERVED |
 | Current local SQLite database | OBSERVED |
 | VS Code-independent local runtime launcher | IMPLEMENTED; owner-PC execution not yet verified |
+| Trusted private-Wi-Fi LAN launcher | IMPLEMENTED in repository; owner-PC/firewall/phone reachability not yet verified |
 | Production provider/server selected | NOT SELECTED — intentionally deferred |
 | Production release artifact/deployment pipeline | NOT ESTABLISHED |
 | Production database engine certified | NOT ESTABLISHED |
