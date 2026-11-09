@@ -1,0 +1,95 @@
+/*
+ * Zazu EMP — product-wide visual authority
+ * Shared across authenticated modules; page layouts remain task-specific.
+ */
+:root {
+    --zazu-border: #C4D0DB;
+    --zazu-border-strong: #AAB9C8;
+    --zazu-radius-sm: 5px;
+    --zazu-radius-md: 7px;
+    --zazu-radius-lg: 8px;
+}
+:root[data-theme="dark"] {
+    --zazu-border: #496174;
+    --zazu-border-strong: #6F879B;
+}
+.zazu-card, .zazu-panel, .zazu-form-section, .zazu-context-card,
+.zazu-contact-card, .zazu-detail-value-box, .zazu-table-wrap {
+    border-color: var(--zazu-border);
+    border-radius: var(--zazu-radius-md);
+}
+.zazu-card, .zazu-panel {
+    background: var(--zazu-surface);
+    box-shadow: 0 1px 2px color-mix(in srgb, var(--zazu-ink) 4%, transparent),
+                0 8px 22px color-mix(in srgb, var(--zazu-ink) 5%, transparent);
+}
+.zazu-card-header, .zazu-panel-head {
+    padding: 15px 18px;
+    border-bottom: 1px solid var(--zazu-border);
+}
+.zazu-panel-head {
+    min-height: 50px;
+    background: var(--zazu-surface-2);
+}
+.zazu-form-section {
+    padding: 18px;
+    background: var(--zazu-surface);
+    box-shadow: 0 1px 2px color-mix(in srgb, var(--zazu-ink) 3%, transparent);
+}
+.zazu-form-section-head {
+    margin-bottom: 16px;
+    padding-bottom: 12px;
+    border-bottom-color: var(--zazu-border);
+}
+.zazu-btn {
+    min-height: 38px;
+    padding-inline: 13px;
+    border-radius: var(--zazu-radius-sm);
+    box-shadow: none;
+}
+.zazu-btn-secondary { border-color: var(--zazu-border-strong); }
+.zazu-input, .zazu-select, .zazu-textarea {
+    border-color: var(--zazu-border-strong);
+    border-radius: var(--zazu-radius-sm);
+    background: var(--zazu-field);
+}
+.zazu-input, .zazu-select { min-height: 42px; }
+.zazu-input:hover, .zazu-select:hover, .zazu-textarea:hover {
+    border-color: color-mix(in srgb, var(--zazu-primary) 58%, var(--zazu-border-strong));
+}
+.zazu-input:focus, .zazu-select:focus, .zazu-textarea:focus {
+    border-color: var(--zazu-primary);
+    box-shadow: 0 0 0 2px color-mix(in srgb, var(--zazu-primary) 16%, transparent);
+}
+.zazu-table-wrap {
+    overflow: auto;
+    border: 1px solid var(--zazu-border);
+    background: var(--zazu-surface);
+}
+.zazu-table-wrap table {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0;
+}
+.zazu-table-wrap th {
+    background: var(--zazu-surface-2);
+    color: var(--zazu-ink-2);
+    border-bottom: 1px solid var(--zazu-border-strong);
+}
+.zazu-table-wrap td { border-bottom: 1px solid var(--zazu-border); }
+.zazu-table-wrap tr:last-child td { border-bottom: 0; }
+.zazu-section-tabs a, .zazu-header-slot-actions > .zazu-btn,
+.zazu-actionbar, .zazu-detail-value-box {
+    border-radius: var(--zazu-radius-sm);
+}
+.zazu-chip, .zazu-badge, .zazu-pill {
+    border-radius: var(--zazu-radius-sm);
+}
+@media (max-width: 820px) {
+    .zazu-card-header, .zazu-panel-head { padding: 13px 15px; }
+    .zazu-form-section { padding: 16px; }
+}
+@media (max-width: 520px) {
+    .zazu-card-header, .zazu-panel-head { padding: 12px 13px; }
+    .zazu-form-section { padding: 14px; }
+}
