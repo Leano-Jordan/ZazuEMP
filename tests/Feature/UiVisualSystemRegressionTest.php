@@ -187,10 +187,10 @@ class UiVisualSystemRegressionTest extends TestCase
         $this->assertStringContainsString('.zazu-quote-line-editor .zazu-list-item', $css);
         $this->assertStringContainsString('grid-template-columns: minmax(0, 1fr) minmax(140px, 190px);', $css);
         $this->assertStringContainsString('--zazu-page: #DCE5ED;', $css);
-        $this->assertStringContainsString('--zazu-sidebar: #102541;', $css);
+        $this->assertStringContainsString('--zazu-sidebar: #D5E0E8;', $css);
         $this->assertStringContainsString('--zazu-surface: #FFFFFF;', $css);
         $this->assertStringContainsString('--zazu-page: #0B1726;', $css);
-        $this->assertStringContainsString('--zazu-sidebar: #091827;', $css);
+        $this->assertStringContainsString('--zazu-sidebar: #202B35;', $css);
         $this->assertStringContainsString('background-image: none !important;', $css);
         $this->assertStringContainsString('.zazu-dash-commercial .zazu-dash-quote-stages', $css);
         $this->assertStringContainsString('padding: 12px 18px 14px !important;', $css);
