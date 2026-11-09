@@ -837,3 +837,148 @@ body:not(.zazu-dashboard-page) :focus-visible {
     outline: 2px solid color-mix(in srgb, var(--zazu-primary) 72%, white) !important;
     outline-offset: 2px;
 }
+
+
+/* FINAL SHARED SURFACE PASS — applies to dashboard and every module.
+   Remove legacy thick blue side rails and bright card frames. Distinction is
+   carried by surface tone, spacing and typography; status colours remain. */
+:root {
+    --zazu-border: #AEBBC7;
+    --zazu-border-strong: #96A7B6;
+    --zazu-border-subtle: #C6D0D9;
+    --zazu-surface-border: #AEBBC7;
+    --zazu-card-border: #AEBBC7;
+    --zazu-ui-border: #AEBBC7;
+}
+:root[data-theme="dark"] {
+    --zazu-border: #354A5E;
+    --zazu-border-strong: #496176;
+    --zazu-border-subtle: #2B3E51;
+    --zazu-surface-border: #354A5E;
+    --zazu-card-border: #354A5E;
+    --zazu-ui-border: #354A5E;
+}
+
+/* Neutral 1px perimeter on shared structural surfaces, including dashboard. */
+.zazu-card,
+.zazu-panel,
+.zazu-command-band,
+.zazu-ops-hero,
+.zazu-work-hero,
+.zazu-filter-card,
+.zazu-metric-card,
+.zazu-form-section,
+.zazu-table-wrap,
+.zazu-dash-hero,
+.zazu-dash-surface,
+.zazu-dash-overview .zazu-dash-metric,
+.zazu-context-card,
+.zazu-route-card,
+.zazu-calendar-shell,
+.zazu-calendar-command-shell {
+    border-width: 1px !important;
+    border-color: var(--zazu-border) !important;
+    box-shadow: 0 2px 7px rgba(28, 49, 68, .045) !important;
+}
+:root[data-theme="dark"] .zazu-card,
+:root[data-theme="dark"] .zazu-panel,
+:root[data-theme="dark"] .zazu-command-band,
+:root[data-theme="dark"] .zazu-ops-hero,
+:root[data-theme="dark"] .zazu-work-hero,
+:root[data-theme="dark"] .zazu-filter-card,
+:root[data-theme="dark"] .zazu-metric-card,
+:root[data-theme="dark"] .zazu-form-section,
+:root[data-theme="dark"] .zazu-table-wrap,
+:root[data-theme="dark"] .zazu-dash-hero,
+:root[data-theme="dark"] .zazu-dash-surface,
+:root[data-theme="dark"] .zazu-dash-overview .zazu-dash-metric,
+:root[data-theme="dark"] .zazu-context-card,
+:root[data-theme="dark"] .zazu-route-card,
+:root[data-theme="dark"] .zazu-calendar-shell,
+:root[data-theme="dark"] .zazu-calendar-command-shell {
+    box-shadow: 0 2px 8px rgba(0, 0, 0, .15) !important;
+}
+
+/* Legacy command cards used 3–4px blue rails. Replace with clean surfaces. */
+.zazu-next-action-primary,
+.zazu-edit-command,
+.zazu-customer-hero,
+.zazu-customer-editor-command,
+.zazu-requirements-command,
+.zazu-requirement-editor-command,
+.zazu-quote-editor-command,
+.zazu-quote-hero {
+    border-left: 1px solid var(--zazu-border) !important;
+}
+.zazu-next-action-warning {
+    border-left-width: 1px !important;
+}
+.zazu-calendar-agenda-event {
+    border-left-width: 1px !important;
+}
+.zazu-inspector-note,
+.zazu-inspector-empty {
+    border-left: 1px solid var(--zazu-border) !important;
+}
+
+/* Dashboard had hard-coded 2px slate borders and older 3px focus rings.
+   Bring it under the same quiet surface system without changing its layout. */
+body.zazu-dashboard-page .zazu-sidebar {
+    border-right: 1px solid var(--zazu-border) !important;
+}
+body.zazu-dashboard-page .zazu-topbar {
+    border-bottom: 1px solid var(--zazu-border) !important;
+}
+body.zazu-dashboard-page .zazu-dash-hero,
+body.zazu-dashboard-page .zazu-dash-overview .zazu-dash-metric,
+body.zazu-dashboard-page .zazu-dash-grid[aria-label="Operational dashboard panels"] > .zazu-dash-surface {
+    border: 1px solid var(--zazu-border) !important;
+    box-shadow: 0 2px 7px rgba(28, 49, 68, .045) !important;
+}
+body.zazu-dashboard-page .zazu-dash-surface-head {
+    border-bottom: 1px solid var(--zazu-border) !important;
+}
+body.zazu-dashboard-page .zazu-dash-hero-side {
+    border-left: 1px solid var(--zazu-border) !important;
+}
+body.zazu-dashboard-page .zazu-dash-event,
+body.zazu-dashboard-page .zazu-dash-focus-item,
+body.zazu-dashboard-page .zazu-dash-resource-grid > *,
+body.zazu-dashboard-page .zazu-dash-quote-stage {
+    border: 1px solid var(--zazu-border-subtle) !important;
+}
+:root[data-theme="dark"] body.zazu-dashboard-page .zazu-dash-hero,
+:root[data-theme="dark"] body.zazu-dashboard-page .zazu-dash-overview .zazu-dash-metric,
+:root[data-theme="dark"] body.zazu-dashboard-page .zazu-dash-grid[aria-label="Operational dashboard panels"] > .zazu-dash-surface {
+    border-color: var(--zazu-border) !important;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, .18) !important;
+}
+:root[data-theme="dark"] body.zazu-dashboard-page .zazu-dash-surface-head,
+:root[data-theme="dark"] body.zazu-dashboard-page .zazu-dash-event,
+:root[data-theme="dark"] body.zazu-dashboard-page .zazu-dash-focus-item,
+:root[data-theme="dark"] body.zazu-dashboard-page .zazu-dash-resource-grid > *,
+:root[data-theme="dark"] body.zazu-dashboard-page .zazu-dash-quote-stage {
+    border-color: var(--zazu-border) !important;
+}
+:root[data-theme="dark"] body.zazu-dashboard-page .zazu-dash-hero-side {
+    border-left-color: var(--zazu-border) !important;
+}
+
+/* Standardise field outlines everywhere; keep keyboard focus visible. */
+input:not([type="checkbox"]):not([type="radio"]),
+select,
+textarea,
+.zazu-input,
+.zazu-select {
+    border-color: var(--zazu-border-strong) !important;
+    box-shadow: none !important;
+}
+input:focus,
+select:focus,
+textarea:focus,
+.zazu-input:focus,
+.zazu-select:focus {
+    border-color: var(--zazu-primary) !important;
+    outline: 0 !important;
+    box-shadow: 0 0 0 2px color-mix(in srgb, var(--zazu-primary) 16%, transparent) !important;
+}
