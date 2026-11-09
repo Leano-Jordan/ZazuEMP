@@ -185,6 +185,9 @@ class UiProportionFoundationTest extends TestCase
         $this->assertStringContainsString('.zazu-metric-card:hover {', $css);
         $this->assertStringContainsString('.zazu-document-table-wrap', $css);
         $this->assertStringContainsString('.zazu-empty {', $css);
+        $this->assertStringContainsString('.zazu-dashboard-quickbar nav a', $css);
+        $this->assertStringContainsString('.zazu-workload-pill', $css);
+        $this->assertStringContainsString('border-radius: var(--zazu-radius-md);', $css);
     }
 
 }
