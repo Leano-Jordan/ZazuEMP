@@ -877,3 +877,92 @@ body.zazu-dashboard-page .zazu-dash-hero-side {
 .zazu-footer-workspace {
     border-bottom-color: rgba(220, 231, 245, .13) !important;
 }
+
+/* DIRECTOR — colour-led hierarchy across authenticated modules */
+:root {
+ --zazu-tone-blue:#E6F0FA; --zazu-tone-green:#E5F3E9; --zazu-tone-amber:#FFF1D6;
+ --zazu-tone-teal:#DDF2EF; --zazu-tone-violet:#EEE9FA;
+ --zazu-tone-ink-blue:#244F78; --zazu-tone-ink-green:#276342; --zazu-tone-ink-amber:#80551A;
+ --zazu-tone-ink-teal:#17665F; --zazu-tone-ink-violet:#59458A;
+}
+:root[data-theme="dark"] {
+ --zazu-tone-blue:#1B3550; --zazu-tone-green:#1D3D30; --zazu-tone-amber:#49371E;
+ --zazu-tone-teal:#193D3B; --zazu-tone-violet:#332B4C;
+ --zazu-tone-ink-blue:#B8D7F4; --zazu-tone-ink-green:#A8DDBB; --zazu-tone-ink-amber:#F1D09A;
+ --zazu-tone-ink-teal:#A4DDD5; --zazu-tone-ink-violet:#D0C1F3;
+}
+.zazu-card-header,.zazu-panel-head {
+ position:relative;
+ background:linear-gradient(105deg,var(--zazu-tone-blue),var(--zazu-surface-2) 82%) !important;
+ border-bottom:1px solid color-mix(in srgb,var(--zazu-tone-ink-blue) 22%,var(--zazu-border)) !important;
+}
+.zazu-card-header::before,.zazu-panel-head::before {
+ content:"";position:absolute;inset:0 auto 0 0;width:3px;background:#5C8DB8;
+}
+.zazu-card-header .zazu-eyebrow,.zazu-panel-head .zazu-eyebrow {color:var(--zazu-tone-ink-blue)!important}
+.zazu-card-title,.zazu-panel-title {font-weight:740!important;letter-spacing:-.02em}
+.zazu-finance-directory .zazu-card-header,.zazu-card.zazu-finance-card .zazu-card-header {
+ background:linear-gradient(105deg,var(--zazu-tone-green),var(--zazu-surface-2) 82%)!important;
+ border-bottom-color:color-mix(in srgb,var(--zazu-tone-ink-green) 22%,var(--zazu-border))!important;
+}
+.zazu-finance-directory .zazu-card-header::before,.zazu-card.zazu-finance-card .zazu-card-header::before {background:#4C9A6B}
+.zazu-finance-directory .zazu-card-header .zazu-eyebrow {color:var(--zazu-tone-ink-green)!important}
+.zazu-inventory-directory .zazu-card-header,.zazu-purchasing-page .zazu-card-header {
+ background:linear-gradient(105deg,var(--zazu-tone-amber),var(--zazu-surface-2) 82%)!important;
+ border-bottom-color:color-mix(in srgb,var(--zazu-tone-ink-amber) 22%,var(--zazu-border))!important;
+}
+.zazu-inventory-directory .zazu-card-header::before,.zazu-purchasing-page .zazu-card-header::before {background:#D49A37}
+.zazu-inventory-directory .zazu-card-header .zazu-eyebrow,.zazu-purchasing-page .zazu-card-header .zazu-eyebrow {color:var(--zazu-tone-ink-amber)!important}
+.zazu-suppliers-page .zazu-card-header,.zazu-assets-directory .zazu-card-header {
+ background:linear-gradient(105deg,var(--zazu-tone-teal),var(--zazu-surface-2) 82%)!important;
+ border-bottom-color:color-mix(in srgb,var(--zazu-tone-ink-teal) 22%,var(--zazu-border))!important;
+}
+.zazu-suppliers-page .zazu-card-header::before,.zazu-assets-directory .zazu-card-header::before {background:#32958C}
+.zazu-suppliers-page .zazu-card-header .zazu-eyebrow,.zazu-assets-directory .zazu-card-header .zazu-eyebrow {color:var(--zazu-tone-ink-teal)!important}
+.zazu-customer-directory .zazu-card-header,.zazu-quote-lines .zazu-card-header,.zazu-quote-history-register .zazu-card-header {
+ background:linear-gradient(105deg,var(--zazu-tone-violet),var(--zazu-surface-2) 82%)!important;
+ border-bottom-color:color-mix(in srgb,var(--zazu-tone-ink-violet) 22%,var(--zazu-border))!important;
+}
+.zazu-customer-directory .zazu-card-header::before,.zazu-quote-lines .zazu-card-header::before,.zazu-quote-history-register .zazu-card-header::before {background:#8069B6}
+.zazu-metric-card {
+ position:relative;overflow:hidden;border-top:3px solid #6D94B7!important;
+ background:linear-gradient(155deg,var(--zazu-tone-blue),var(--zazu-surface) 65%)!important;
+}
+.zazu-metric-card.zazu-metric-alert {
+ border-top-color:#D49A37!important;
+ background:linear-gradient(155deg,var(--zazu-tone-amber),var(--zazu-surface) 65%)!important;
+}
+.zazu-finance-directory .zazu-metric-card:nth-child(2) {border-top-color:#4C9A6B!important;background:linear-gradient(155deg,var(--zazu-tone-green),var(--zazu-surface) 65%)!important}
+.zazu-finance-directory .zazu-metric-card:nth-child(3) {border-top-color:#32958C!important;background:linear-gradient(155deg,var(--zazu-tone-teal),var(--zazu-surface) 65%)!important}
+.zazu-metric-label {color:var(--zazu-tone-ink-blue)!important}
+.zazu-metric-alert .zazu-metric-label {color:var(--zazu-tone-ink-amber)!important}
+.zazu-command-band {
+ background:linear-gradient(108deg,var(--zazu-tone-blue),var(--zazu-surface) 74%)!important;
+ border-color:color-mix(in srgb,var(--zazu-tone-ink-blue) 20%,var(--zazu-border))!important;
+}
+.zazu-command-band .zazu-eyebrow {color:var(--zazu-tone-ink-blue)!important}
+.zazu-command-band .zazu-command-title {font-weight:760!important;color:var(--zazu-ink)!important}
+body.zazu-dashboard-page .zazu-dash-surface-head {background:linear-gradient(105deg,var(--zazu-tone-blue),var(--zazu-surface-2) 82%)!important}
+body.zazu-dashboard-page .zazu-dash-commercial .zazu-dash-surface-head {background:linear-gradient(105deg,var(--zazu-tone-green),var(--zazu-surface-2) 82%)!important}
+
+/* Helper dock: remove it from the working canvas; open the guide only on demand. */
+.zazu-helper {
+ position:fixed!important;top:50%!important;right:max(6px,env(safe-area-inset-right))!important;
+ bottom:auto!important;left:auto!important;z-index:35!important;transform:translateY(-50%)!important;
+ transition:opacity 180ms ease!important;
+}
+.zazu-helper.is-nav-avoiding {right:max(6px,env(safe-area-inset-right))!important}
+.zazu-helper-toggle {
+ width:38px!important;height:42px!important;min-width:38px!important;min-height:42px!important;
+ border-radius:12px 0 0 12px!important;box-shadow:0 3px 12px rgba(12,31,49,.18)!important;
+}
+.zazu-helper-panel {
+ top:50%!important;right:46px!important;bottom:auto!important;transform:translateY(-50%)!important;
+ max-height:min(72vh,560px)!important;overflow-y:auto!important;
+}
+body.zazu-mobile-menu-open .zazu-helper {opacity:0!important;visibility:hidden!important}
+@media(max-width:850px) {
+ .zazu-helper {top:auto!important;right:max(10px,env(safe-area-inset-right))!important;bottom:max(10px,env(safe-area-inset-bottom))!important;transform:none!important}
+ .zazu-helper-toggle {width:42px!important;height:42px!important;min-width:42px!important;min-height:42px!important;border-radius:12px!important}
+ .zazu-helper-panel {top:auto!important;right:0!important;bottom:50px!important;transform:none!important;width:min(340px,calc(100vw - 20px))!important;max-height:min(68vh,500px)!important}
+}
