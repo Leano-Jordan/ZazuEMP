@@ -1283,3 +1283,18 @@ Owner expanded the visual refinement scope beyond the dashboard: apply the estab
   - Dark: #293945 surface, #E5EBF0 primary text, #B8C7D2 secondary labels.
 - Kept the account popover and navigation behavior unchanged. Added regression assertions for both themes.
 - Current repo source baseline is being re-audited after the owner-directed V1 request; no offline implementation change is included in this footer correction.
+
+
+## Director product-wide V1 audit — 2026-11-09
+
+- Read the canonical Director contract, Director reconnaissance/release-readiness skills, current state, failure/readiness registers, product status, V1 checklist/scorecard, offline architecture and company-wide offline standard.
+- Audited current application architecture/source and test contracts across account/business context, customer/event lifecycle, quotes, finance, purchasing/receiving, inventory/assets, reporting/search, attachments, offline workspace, security, recovery, deployment, UX and legal/brand gates.
+- Added `docs/DIRECTOR_PRODUCT_AUDIT_2026-11-09.md` as the comprehensive current product audit. V1 remains NO-GO; the 60/100 score remains the last formal historical baseline and was not re-scored without current exact-head and operational evidence.
+- Confirmed the current PC/phone address problem: local PC development origin is a temporary LAN IP + port 8000, served by Laravel's development server. It changes across networks and plain HTTP on a LAN IP is not a secure PWA origin. This is not a production topology.
+- Recommended a private Tailscale MagicDNS + HTTPS Serve origin as the development bridge for cross-Wi-Fi access; it does not replace PC availability or device-local offline operation. Public production hosting remains deferred.
+- CI reconciliation:
+  - `59a5db5`: Laravel 409 pass / 3 stale UI assertion failures; PHPMD one method at 101 lines; Psalm and populated upgrade/rollback passed.
+  - `3746d08`: Laravel 411 pass / 1 stale selector assertion; PHPMD passed; populated upgrade/rollback passed; Psalm passed; browser smoke was running; Quality failed on the same stale selector.
+  - `285fa18`: obsolete selector assertions corrected; exact-head Laravel, Quality, PHPMD, Psalm, browser and populated upgrade/rollback workflows are now running. No current-head pass is claimed yet.
+- Found branch-policy drift: `director/v1-sync-ci-repairs` is 124 commits behind main and 0 commits ahead. No unique work needs porting. Available GitHub tools do not expose branch deletion; do not create another branch or force-update it to work around this.
+- Next active target: exact-head CI closure, then establish the private HTTPS development origin, then PC/mobile offline parity and physical acceptance. Do not expand features.
