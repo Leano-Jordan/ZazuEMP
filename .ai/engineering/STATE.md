@@ -1211,3 +1211,16 @@ Owner expanded the visual refinement scope beyond the dashboard: apply the estab
 - Source re-read confirms current CSS and test changes are on main. Exact-head CI is still running; no green result is claimed yet.
 - Rendered desktop/mobile visual acceptance remains UNVERIFIED because no connected browser session for the local Zazu instance was available during this pass. The owner should see updated CSS after the Vite dev server refreshes/rebuilds the imported stylesheet.
 - Continue the UI defect audit across authenticated views; source-level border search identified remaining 2px dashboard shell seams and compact editor header declarations, now overridden by the final shared authority. Preserve functional/semantic borders such as focus rings, error summaries and loading indicators.
+
+
+## Follow-up UI defect sweep — 2026-11-09
+
+- Re-entered through the Director control plane and UI Recovery skill. Target remains Leano-Jordan/ZazuEMP on main; scope remains visual defects only, with routes, permissions, data and business behaviour protected.
+- Confirmed the authenticated shell exposes `data-zazu-route` and the dashboard body class, so route-specific module selectors are grounded in actual markup.
+- Corrected the dashboard selector mismatch: the rendered Blade panels use `.zazu-dash-surface-head`, not only `.zazu-dash-panel-head`. Added actual dashboard-specific header, event, priority, resource and quote-stage colour treatments with explicit specificity over older dashboard declarations.
+- Found and removed the source-level 2px dashboard sidebar, topbar, hero, hero-side and panel-header borders in `zazu-dashboard-authority.css`; reduced the compact editor header divider from 2px to 1px in `zazu-final-visual-sweep.css`.
+- Reduced remaining shared document/quote total separators, calendar holiday accents, inspector notes, offline-origin notice and nav flyout accent to thin separators. Added `.zazu-dash-context-note` to the shared thin-rail rule. Preserved intentional focus/error indicators, spinner rings and circular stage markers.
+- Regression suite now has 10 public test methods (PHPMD class-method limit respected). The prior Laravel run had 412 passing tests and one visual assertion failure caused by an incorrect minified CSS expectation; that assertion was corrected. The prior PHPMD failure was only the added 11th public test method; assertions were folded into an existing test. Added checks for the source-level dashboard/editor border rules.
+- Source re-read confirms actual dashboard markup selectors, route attribute, colour treatment and border declarations on `main`. Latest CI for current HEAD `c8f20d4` is queued/in progress; no pass is claimed yet.
+- Browser connector could not read the user's local Edge session because this chat lacks the originating browser context. GitHub browser-smoke workflow is pending; rendered acceptance remains unverified until that workflow completes or a connected browser session is available.
+- Continue the UI recovery pass across page-level form spacing, dense registers, dialogs, responsive overflow and module-specific header hierarchy. Do not infer visual acceptance from source or CSS tests alone.
