@@ -14,7 +14,34 @@ function deferred() {
     return { promise, resolve };
 }
 
-function bootWorker(fetchImplementation = async () => new worker.Response('online'), cacheHooks = {}) {
+class MockResponse {
+    static error() {
+        return new MockResponse('', { ok: false, status: 0 });
+    }
+
+    constructor(body = '', options = {}) {
+        this.body = body;
+        this.ok = options.ok ?? true;
+        this.status = options.status ?? (this.ok ? 200 : 500);
+        this.headerValues = options.headers || {};
+        this.headers = { get: (name) => this.headerValues[name.toLowerCase()] ?? null };
+    }
+
+    clone() {
+        return new MockResponse(this.body, {
+            ok: this.ok,
+            status: this.status,
+            headers: this.headerValues,
+        });
+    }
+
+    async text() {
+        return typeof this.body === 'function' ? this.body() : String(this.body);
+    }
+}
+
+
+function bootWorker(fetchImplementation = async () => new MockResponse('online'), cacheHooks = {}) {
     const listeners = new Map();
     const cacheStore = new Map();
     const fetchCalls = [];
@@ -41,31 +68,6 @@ function bootWorker(fetchImplementation = async () => new worker.Response('onlin
         }
     }
 
-    class MockResponse {
-        static error() {
-            return new worker.Response('', { ok: false, status: 0 });
-        }
-
-        constructor(body = '', options = {}) {
-            this.body = body;
-            this.ok = options.ok ?? true;
-            this.status = options.status ?? (this.ok ? 200 : 500);
-            this.headerValues = options.headers || {};
-            this.headers = { get: (name) => this.headerValues[name.toLowerCase()] ?? null };
-        }
-
-        clone() {
-            return new worker.Response(this.body, {
-                ok: this.ok,
-                status: this.status,
-                headers: this.headerValues,
-            });
-        }
-
-        async text() {
-            return typeof this.body === 'function' ? this.body() : String(this.body);
-        }
-    }
 
     function cacheFor(name) {
         if (!cacheStore.has(name)) cacheStore.set(name, new Map());
@@ -77,7 +79,7 @@ function bootWorker(fetchImplementation = async () => new worker.Response('onlin
                 if (cacheHooks.beforePut) await cacheHooks.beforePut({ name, key: normalizedKey, response });
                 entries.set(normalizedKey, response);
             },
-            add: async (key) => { entries.set(requestUrl(key), new worker.Response('asset')); },
+            add: async (key) => { entries.set(requestUrl(key), new MockResponse('asset')); },
             delete: async (key) => entries.delete(requestUrl(key)),
         };
     }
@@ -153,12 +155,12 @@ test('a persisted identity read finishing after logout cannot restore the identi
     const readStarted = deferred();
     const releaseRead = deferred();
 
-    await cache.put('/__zazu-active-context__', new worker.Response(() => {
+    await cache.put('/__zazu-active-context__', new MockResponse(() => {
         readStarted.resolve();
         return releaseRead.promise;
     }));
     const privateCache = await worker.caches.open('zazu-static-v31-user-41-business-17');
-    await privateCache.put('/dashboard', new worker.Response('private dashboard'));
+    await privateCache.put('/dashboard', new MockResponse('private dashboard'));
 
     const priming = worker.dispatchMessage({
         type: 'prime-pages',
@@ -190,9 +192,9 @@ test('an authenticated HTML response finishing after logout cannot repopulate th
     });
 
     const staticCache = await worker.caches.open('zazu-static-v31');
-    await staticCache.put('/__zazu-active-context__', new worker.Response(JSON.stringify({ user_id: '41', business_id: '17' })));
+    await staticCache.put('/__zazu-active-context__', new MockResponse(JSON.stringify({ user_id: '41', business_id: '17' })));
     const privateCache = await worker.caches.open('zazu-static-v31-user-41-business-17');
-    await privateCache.put('/dashboard', new worker.Response('<main>private dashboard</main>'));
+    await privateCache.put('/dashboard', new MockResponse('<main>private dashboard</main>'));
 
     const navigation = worker.dispatchFetch(new worker.Request('/dashboard', {
         method: 'GET',
@@ -202,7 +204,7 @@ test('an authenticated HTML response finishing after logout cannot repopulate th
 
     await networkStarted.promise;
     await worker.dispatchFetch(new worker.Request('/logout', { method: 'POST' })).finished();
-    networkResponse.resolve(new worker.Response('<main data-zazu-user-id="41" data-zazu-business-id="17">late response</main>', {
+    networkResponse.resolve(new MockResponse('<main data-zazu-user-id="41" data-zazu-business-id="17">late response</main>', {
         headers: { 'content-type': 'text/html' },
     }));
 
@@ -244,7 +246,7 @@ test('a cached authenticated dashboard opens locally when the host server is una
     let hostAvailable = true;
     const worker = bootWorker(async () => {
         if (!hostAvailable) throw new Error('Host server unavailable');
-        return new worker.Response(
+        return new MockResponse(
             '<!doctype html><html><body data-zazu-user-id="41" data-zazu-business-id="17"><main>Saved local dashboard</main></body></html>',
             { headers: { 'content-type': 'text/html; charset=utf-8' } },
         );
@@ -277,15 +279,15 @@ test('a successful business switch clears the previous business page cache befor
         const url = new URL(request.url);
         if (url.pathname === '/business/switch') {
             activeBusiness = '29';
-            return new worker.Response('redirect', { ok: false, status: 302 });
+            return new MockResponse('redirect', { ok: false, status: 302 });
         }
         if (url.pathname === '/dashboard') {
-            return new worker.Response(
+            return new MockResponse(
                 '<!doctype html><html><body data-zazu-user-id="41" data-zazu-business-id="' + activeBusiness + '"><main>Business ' + activeBusiness + '</main></body></html>',
                 { headers: { 'content-type': 'text/html; charset=utf-8' } },
             );
         }
-        return new worker.Response('online');
+        return new MockResponse('online');
     });
 
     await worker.dispatchMessage({ type: 'prime-pages', userId: '41', businessId: '17', routes: ['/dashboard'] });
