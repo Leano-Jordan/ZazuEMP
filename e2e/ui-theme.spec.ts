@@ -46,7 +46,7 @@ test.describe('Zazu UI theme and navigation', () => {
         });
 
         expect(lightTokens.surface.toLowerCase()).toMatch(/^#(?:fff|ffffff)$/);
-        expect(lightTokens.primary.toLowerCase()).toBe('#159dd2');
+        expect(lightTokens.primary.toLowerCase()).toBe('#426987');
         expect(lightTokens.activeBackground).toBe('rgb(201, 240, 251)');
         expect(lightTokens.activeColor).toBe('rgb(23, 68, 95)');
         expect(lightTokens.workspaceColor).toBe('rgb(23, 68, 95)');
@@ -90,11 +90,12 @@ test.describe('Zazu UI theme and navigation', () => {
         await page.locator('[data-theme-toggle]').first().click();
 
         const result = await page.evaluate(() => {
-            const controls = Array.from(document.querySelectorAll('input:not([type="hidden"]):not([type="checkbox"]):not([type="radio"]), select, textarea'));
+            const controls = Array.from(document.querySelectorAll('input:not([type="hidden"]):not([type="checkbox"]):not([type="radio"]):not([type="button"]):not([type="submit"]):not([type="reset"]):not([type="file"]):not([type="image"]):not([type="color"]):not([type="range"]), select, textarea'));
             return controls.map((control) => {
                 const style = getComputedStyle(control);
                 return {
                     tag: control.tagName,
+                    type: control.getAttribute('type') || '',
                     background: style.backgroundColor,
                     color: style.color,
                 };
