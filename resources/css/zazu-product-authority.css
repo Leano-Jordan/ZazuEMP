@@ -1101,325 +1101,38 @@ body[data-zazu-route^="customers."] .zazu-detail-value-box {
     box-shadow: 0 3px 9px rgba(26, 48, 68, .08) !important;
 }
 
-/* Form-section headers are real hierarchy bands, not more grey dividers. */
+/* Colour is reserved for cards. Form sections and title bars stay unified. */
+.zazu-form-section { background: var(--zazu-surface) !important; }
 .zazu-form-section-head {
     margin: 0 0 14px !important;
     padding: 10px 12px !important;
     border: 0 !important;
     border-radius: 7px !important;
-    background: var(--zazu-tone-blue) !important;
+    background: var(--zazu-surface-3) !important;
+    color: var(--zazu-ink) !important;
 }
-.zazu-form-section-title {
-    color: var(--zazu-tone-ink-blue) !important;
-    font-weight: 760 !important;
-}
-body[data-zazu-route^="finance."] .zazu-form-section {
-    background: var(--zazu-tone-green) !important;
-}
-body[data-zazu-route^="finance."] .zazu-form-section-head {
-    background: var(--zazu-tone-green) !important;
-}
-body[data-zazu-route^="inventory."] .zazu-form-section,
-body[data-zazu-route^="purchasing."] .zazu-form-section {
-    background: var(--zazu-tone-amber) !important;
-}
-body[data-zazu-route^="inventory."] .zazu-form-section-head,
-body[data-zazu-route^="purchasing."] .zazu-form-section-head {
-    background: var(--zazu-tone-amber) !important;
-}
-body[data-zazu-route^="work.quotes."] .zazu-form-section,
-body[data-zazu-route^="quotes."] .zazu-form-section,
-body[data-zazu-route^="customers."] .zazu-form-section {
-    background: var(--zazu-tone-violet) !important;
-}
-body[data-zazu-route^="work.quotes."] .zazu-form-section-head,
-body[data-zazu-route^="quotes."] .zazu-form-section-head,
-body[data-zazu-route^="customers."] .zazu-form-section-head {
-    background: var(--zazu-tone-violet) !important;
-}
-body[data-zazu-route^="work."]:not([data-zazu-route^="work.quotes."]) .zazu-form-section {
-    background: var(--zazu-tone-teal) !important;
-}
-body[data-zazu-route^="work."]:not([data-zazu-route^="work.quotes."]) .zazu-form-section-head {
-    background: var(--zazu-tone-teal) !important;
-}
+.zazu-form-section-title { color: var(--zazu-ink) !important; font-weight: 740 !important; }
 
-/* Header bars are coloured surfaces, not boxed blocks with heavy outlines. */
 .zazu-card-header,
-.zazu-panel-head {
-    background: var(--zazu-tone-blue) !important;
+.zazu-panel-head,
+.zazu-form-section-head,
+body.zazu-dashboard-page .zazu-dash-surface-head {
+    background: var(--zazu-surface-3) !important;
+    background-image: none !important;
+    color: var(--zazu-ink) !important;
     border: 0 !important;
-    border-bottom: 1px solid color-mix(in srgb, var(--zazu-tone-ink-blue) 18%, transparent) !important;
+    border-bottom: 1px solid var(--zazu-border-subtle) !important;
 }
 .zazu-card-header .zazu-eyebrow,
-.zazu-panel-head .zazu-eyebrow { color: var(--zazu-tone-ink-blue) !important; }
+.zazu-panel-head .zazu-eyebrow,
 .zazu-card-title,
-.zazu-panel-title { font-weight: 740 !important; letter-spacing: -.02em; }
+.zazu-panel-title,
+.zazu-form-section-title,
+body.zazu-dashboard-page .zazu-dash-surface-head,
+body.zazu-dashboard-page .zazu-dash-surface-head * { color: var(--zazu-ink) !important; }
+.zazu-card-title,.zazu-panel-title { font-weight: 740 !important; letter-spacing: -.02em; }
 
-/* Distinct operational categories: colour helps the eye find the right work. */
-.zazu-finance-directory .zazu-card-header,
-.zazu-card.zazu-finance-card .zazu-card-header {
-    background: var(--zazu-tone-green) !important;
-    border-bottom-color: color-mix(in srgb, var(--zazu-tone-ink-green) 20%, transparent) !important;
-}
-.zazu-inventory-directory .zazu-card-header,
-.zazu-purchasing-page .zazu-card-header {
-    background: var(--zazu-tone-amber) !important;
-    border-bottom-color: color-mix(in srgb, var(--zazu-tone-ink-amber) 20%, transparent) !important;
-}
-.zazu-suppliers-page .zazu-card-header,
-.zazu-assets-directory .zazu-card-header {
-    background: var(--zazu-tone-teal) !important;
-    border-bottom-color: color-mix(in srgb, var(--zazu-tone-ink-teal) 20%, transparent) !important;
-}
-.zazu-customer-directory .zazu-card-header,
-.zazu-quote-lines .zazu-card-header,
-.zazu-quote-history-register .zazu-card-header {
-    background: var(--zazu-tone-violet) !important;
-    border-bottom-color: color-mix(in srgb, var(--zazu-tone-ink-violet) 20%, transparent) !important;
-}
-
-/* Route-level card surfaces: each workspace gets a recognisable colour family. */
-body[data-zazu-route^="finance."] .zazu-card,
-body[data-zazu-route^="finance."] .zazu-panel {
-    background: var(--zazu-tone-green) !important;
-}
-body[data-zazu-route^="inventory."] .zazu-card,
-body[data-zazu-route^="inventory."] .zazu-panel,
-body[data-zazu-route^="purchasing."] .zazu-card,
-body[data-zazu-route^="purchasing."] .zazu-panel {
-    background: var(--zazu-tone-amber) !important;
-}
-body[data-zazu-route^="suppliers."] .zazu-card,
-body[data-zazu-route^="suppliers."] .zazu-panel,
-body[data-zazu-route^="assets."] .zazu-card,
-body[data-zazu-route^="assets."] .zazu-panel {
-    background: var(--zazu-tone-teal) !important;
-}
-body[data-zazu-route^="customers."] .zazu-card,
-body[data-zazu-route^="customers."] .zazu-panel,
-body[data-zazu-route^="quotes."] .zazu-card,
-body[data-zazu-route^="quotes."] .zazu-panel {
-    background: var(--zazu-tone-violet) !important;
-}
-body[data-zazu-route^="reports."] .zazu-card,
-body[data-zazu-route^="reports."] .zazu-panel,
-body[data-zazu-route^="calendar."] .zazu-card,
-body[data-zazu-route^="calendar."] .zazu-panel {
-    background: var(--zazu-tone-blue) !important;
-}
-body[data-zazu-route^="quotes."] .zazu-quote-register-command + .zazu-card .zazu-card-header {
-    background: var(--zazu-tone-violet) !important;
-    border-bottom-color: color-mix(in srgb, var(--zazu-tone-ink-violet) 20%, transparent) !important;
-}
-
-/* Actual dashboard markup uses zazu-dash-surface-head (not panel-head).
-   Match the rendered Blade structure and outrank the older dashboard authority. */
-body.zazu-dashboard-page .zazu-dash-surface-head {
-    border: 0 !important;
-    border-bottom: 1px solid var(--zazu-line-soft) !important;
-    background: var(--zazu-tone-blue) !important;
-}
-body.zazu-dashboard-page .zazu-dash-commercial .zazu-dash-surface-head {
-    background: var(--zazu-tone-green) !important;
-}
-body.zazu-dashboard-page .zazu-dash-focus .zazu-dash-surface-head {
-    background: var(--zazu-tone-amber) !important;
-}
-body.zazu-dashboard-page .zazu-dash-resources .zazu-dash-surface-head {
-    background: var(--zazu-tone-teal) !important;
-}
-body.zazu-dashboard-page .zazu-dash-event,
-body.zazu-dashboard-page .zazu-dash-focus-item,
-body.zazu-dashboard-page .zazu-dash-resource-grid > *,
-body.zazu-dashboard-page .zazu-dash-quote-stage {
-    border: 1px solid var(--zazu-line-soft) !important;
-    box-shadow: none !important;
-}
-body.zazu-dashboard-page .zazu-dash-event {
-    background: color-mix(in srgb, var(--zazu-tone-blue) 36%, var(--zazu-surface)) !important;
-}
-body.zazu-dashboard-page .zazu-dash-focus-item {
-    background: color-mix(in srgb, var(--zazu-tone-amber) 52%, var(--zazu-surface)) !important;
-}
-body.zazu-dashboard-page .zazu-dash-resource-grid > :nth-child(4n + 1) {
-    background: color-mix(in srgb, var(--zazu-tone-blue) 55%, var(--zazu-surface)) !important;
-}
-body.zazu-dashboard-page .zazu-dash-resource-grid > :nth-child(4n + 2) {
-    background: color-mix(in srgb, var(--zazu-tone-green) 55%, var(--zazu-surface)) !important;
-}
-body.zazu-dashboard-page .zazu-dash-resource-grid > :nth-child(4n + 3) {
-    background: color-mix(in srgb, var(--zazu-tone-violet) 55%, var(--zazu-surface)) !important;
-}
-body.zazu-dashboard-page .zazu-dash-resource-grid > :nth-child(4n + 4) {
-    background: color-mix(in srgb, var(--zazu-tone-amber) 55%, var(--zazu-surface)) !important;
-}
-body.zazu-dashboard-page .zazu-dash-quote-stage:nth-child(1) { background: var(--zazu-tone-blue) !important; }
-body.zazu-dashboard-page .zazu-dash-quote-stage:nth-child(2) { background: var(--zazu-tone-violet) !important; }
-body.zazu-dashboard-page .zazu-dash-quote-stage:nth-child(3) { background: var(--zazu-tone-green) !important; }
-body.zazu-dashboard-page .zazu-dash-quote-stage:nth-child(4) { background: var(--zazu-tone-coral) !important; }
-
-html[data-theme="dark"] body.zazu-dashboard-page .zazu-dash-event,
-html[data-theme="dark"] body.zazu-dashboard-page .zazu-dash-focus-item,
-html[data-theme="dark"] body.zazu-dashboard-page .zazu-dash-resource-grid > *,
-html[data-theme="dark"] body.zazu-dashboard-page .zazu-dash-quote-stage {
-    border-color: var(--zazu-line-soft) !important;
-}
-
-/* KPI tiles carry their own colour identity instead of repeating white cards. */
-.zazu-metric-card,
-.zazu-dash-metric {
-    border: 1px solid transparent !important;
-    border-top: 1px solid transparent !important;
-    background: var(--zazu-tone-blue) !important;
-}
-.zazu-metric-card:nth-child(4n + 2),
-.zazu-dash-metrics > :nth-child(4n + 2) {
-    background: var(--zazu-tone-green) !important;
-}
-.zazu-metric-card:nth-child(4n + 3),
-.zazu-dash-metrics > :nth-child(4n + 3) {
-    background: var(--zazu-tone-violet) !important;
-}
-.zazu-metric-card:nth-child(4n + 4),
-.zazu-dash-metrics > :nth-child(4n + 4) {
-    background: var(--zazu-tone-amber) !important;
-}
-.zazu-metric-card.zazu-metric-alert {
-    background: var(--zazu-tone-amber) !important;
-}
-.zazu-metric-label { color: var(--zazu-tone-ink-blue) !important; }
-.zazu-metric-alert .zazu-metric-label { color: var(--zazu-tone-ink-amber) !important; }
-
-/* Quote pipeline stages retain workflow meaning through green, blue, amber and coral. */
-.zazu-dash-quote-stage:nth-child(1) { background: var(--zazu-tone-blue) !important; }
-.zazu-dash-quote-stage:nth-child(2) { background: var(--zazu-tone-violet) !important; }
-.zazu-dash-quote-stage:nth-child(3) { background: var(--zazu-tone-green) !important; }
-.zazu-dash-quote-stage:nth-child(4) { background: var(--zazu-tone-coral) !important; }
-:root[data-theme="dark"] .zazu-dash-quote-stage:nth-child(1) { background: var(--zazu-tone-blue) !important; }
-:root[data-theme="dark"] .zazu-dash-quote-stage:nth-child(2) { background: var(--zazu-tone-violet) !important; }
-:root[data-theme="dark"] .zazu-dash-quote-stage:nth-child(3) { background: var(--zazu-tone-green) !important; }
-:root[data-theme="dark"] .zazu-dash-quote-stage:nth-child(4) { background: var(--zazu-tone-coral) !important; }
-
-.zazu-command-band {
-    background: var(--zazu-tone-blue) !important;
-    border: 1px solid var(--zazu-line-soft) !important;
-}
-.zazu-command-band .zazu-eyebrow { color: var(--zazu-tone-ink-blue) !important; }
-.zazu-command-band .zazu-command-title { font-weight: 760 !important; color: var(--zazu-ink) !important; }
-body.zazu-dashboard-page .zazu-dash-panel-head {
-    background: var(--zazu-tone-blue) !important;
-}
-body.zazu-dashboard-page .zazu-dash-commercial .zazu-dash-panel-head {
-    background: var(--zazu-tone-green) !important;
-}
-
-/* Remove decorative rails and oversized left accents throughout the workspace. */
-.zazu-dash-context-note,
-.zazu-next-action,
-.zazu-dashboard-attention,
-.zazu-next-action-primary,
-.zazu-next-action-warning,
-.zazu-quote-review-action,
-.zazu-edit-command,
-.zazu-customer-hero,
-.zazu-customer-editor-command,
-.zazu-requirements-command,
-.zazu-requirement-editor-command,
-.zazu-quote-register-command,
-.zazu-quote-history-command,
-.zazu-quote-editor-command,
-.zazu-quote-hero,
-.zazu-inspector-note,
-.zazu-inspector-empty,
-.zazu-calendar-event,
-.zazu-calendar-agenda-event {
-    border-left-width: 1px !important;
-}
-.zazu-next-action,
-.zazu-dashboard-attention {
-    background: var(--zazu-tone-blue) !important;
-    border-color: var(--zazu-line-soft) !important;
-    box-shadow: none !important;
-}
-.zazu-next-action-warning,
-.zazu-quote-review-action {
-    background: var(--zazu-tone-amber) !important;
-}
-.zazu-quote-register-row:hover {
-    border-color: var(--zazu-line-soft) !important;
-    box-shadow: inset 2px 0 0 var(--zazu-tone-blue) !important;
-}
-
-/* Helper stays out of the work area and remains available on demand. */
-.zazu-helper {
-    position: fixed !important;
-    top: 50% !important;
-    right: max(6px, env(safe-area-inset-right)) !important;
-    bottom: auto !important;
-    left: auto !important;
-    z-index: 35 !important;
-    transform: translateY(-50%) !important;
-}
-.zazu-helper-toggle {
-    width: 38px !important;
-    height: 42px !important;
-    min-width: 38px !important;
-    min-height: 42px !important;
-    border-radius: 12px 0 0 12px !important;
-}
-.zazu-helper-panel {
-    top: 50% !important;
-    right: 46px !important;
-    bottom: auto !important;
-    transform: translateY(-50%) !important;
-    max-height: min(72vh, 560px) !important;
-    overflow-y: auto !important;
-}
-body.zazu-mobile-menu-open .zazu-helper { opacity: 0 !important; visibility: hidden !important; }
-@media (max-width: 850px) {
-    .zazu-helper { top: auto !important; right: max(10px, env(safe-area-inset-right)) !important; bottom: max(10px, env(safe-area-inset-bottom)) !important; transform: none !important; }
-    .zazu-helper-toggle { width: 42px !important; height: 42px !important; min-width: 42px !important; min-height: 42px !important; border-radius: 12px !important; }
-    .zazu-helper-panel { top: auto !important; right: 0 !important; bottom: 50px !important; transform: none !important; width: min(340px, calc(100vw - 20px)) !important; max-height: min(68vh, 500px) !important; }
-}
-
-
-/* DIRECTOR OVERRIDE — owner-approved strong colour and clean control edges.
-   Semantic colours must be visible at a glance, not diluted into near-white.
-   Shared controls stay thin; keyboard focus remains clearly visible. */
-.zazu-btn,
-.zazu-action-group .zazu-btn,
-.zazu-ops-actions .zazu-btn {
-    border-width: 1px !important;
-    outline: 0;
-}
-.zazu-btn:not(:focus-visible),
-.zazu-action-group .zazu-btn:not(:focus-visible),
-.zazu-ops-actions .zazu-btn:not(:focus-visible) {
-    box-shadow: none !important;
-}
-.zazu-btn:focus-visible,
-.zazu-action-group .zazu-btn:focus-visible,
-.zazu-ops-actions .zazu-btn:focus-visible {
-    outline: 2px solid #4A91B8 !important;
-    outline-offset: 2px !important;
-}
-.zazu-card,
-.zazu-panel,
-.zazu-form-section,
-.zazu-route-card,
-.zazu-calendar-shell,
-.zazu-calendar-command-shell,
-.zazu-table-wrap,
-.zazu-list,
-.zazu-context-card,
-.zazu-detail-value-box {
-    border-width: 1px !important;
-    border-style: solid !important;
-    border-color: var(--zazu-line-soft) !important;
-}
-
-/* Stronger route identity: the card itself carries the colour, not just its title. */
+/* Route card surfaces retain semantic colour; their title bars remain neutral. */
 body[data-zazu-route^="finance."] .zazu-card,
 body[data-zazu-route^="finance."] .zazu-panel { background: var(--zazu-tone-green) !important; }
 body[data-zazu-route^="inventory."] .zazu-card,
@@ -1439,24 +1152,37 @@ body[data-zazu-route^="reports."] .zazu-panel,
 body[data-zazu-route^="calendar."] .zazu-card,
 body[data-zazu-route^="calendar."] .zazu-panel { background: var(--zazu-tone-blue) !important; }
 
+/* Dashboard card surfaces only: section title bars remain neutral. */
+body.zazu-dashboard-page .zazu-dash-event,
+body.zazu-dashboard-page .zazu-dash-focus-item,
+body.zazu-dashboard-page .zazu-dash-resource-grid > *,
+body.zazu-dashboard-page .zazu-dash-quote-stage {
+    border: 1px solid var(--zazu-line-soft) !important;
+    box-shadow: none !important;
+}
 body.zazu-dashboard-page .zazu-dash-event { background: var(--zazu-tone-blue) !important; }
 body.zazu-dashboard-page .zazu-dash-focus-item { background: var(--zazu-tone-amber) !important; }
-body.zazu-dashboard-page .zazu-dash-resource-grid > :nth-child(1) { background: var(--zazu-tone-blue) !important; }
-body.zazu-dashboard-page .zazu-dash-resource-grid > :nth-child(2) { background: var(--zazu-tone-green) !important; }
-body.zazu-dashboard-page .zazu-dash-resource-grid > :nth-child(3) { background: var(--zazu-tone-violet) !important; }
-body.zazu-dashboard-page .zazu-dash-resource-grid > :nth-child(4) { background: var(--zazu-tone-amber) !important; }
-body.zazu-dashboard-page .zazu-dash-quote-stage:nth-child(1) { background: var(--zazu-tone-amber) !important; }
-body.zazu-dashboard-page .zazu-dash-quote-stage:nth-child(2) { background: var(--zazu-tone-blue) !important; }
+body.zazu-dashboard-page .zazu-dash-resource-grid > :nth-child(4n + 1) { background: var(--zazu-tone-blue) !important; }
+body.zazu-dashboard-page .zazu-dash-resource-grid > :nth-child(4n + 2) { background: var(--zazu-tone-green) !important; }
+body.zazu-dashboard-page .zazu-dash-resource-grid > :nth-child(4n + 3) { background: var(--zazu-tone-violet) !important; }
+body.zazu-dashboard-page .zazu-dash-resource-grid > :nth-child(4n + 4) { background: var(--zazu-tone-amber) !important; }
+body.zazu-dashboard-page .zazu-dash-quote-stage:nth-child(1) { background: var(--zazu-tone-blue) !important; }
+body.zazu-dashboard-page .zazu-dash-quote-stage:nth-child(2) { background: var(--zazu-tone-violet) !important; }
 body.zazu-dashboard-page .zazu-dash-quote-stage:nth-child(3) { background: var(--zazu-tone-green) !important; }
 body.zazu-dashboard-page .zazu-dash-quote-stage:nth-child(4) { background: var(--zazu-tone-coral) !important; }
-body.zazu-dashboard-page .zazu-dash-quote-stage > span { color: var(--zazu-tone-ink-blue) !important; }
 
-:root[data-theme="dark"] body.zazu-dashboard-page .zazu-dash-event,
-:root[data-theme="dark"] body.zazu-dashboard-page .zazu-dash-focus-item,
-:root[data-theme="dark"] body.zazu-dashboard-page .zazu-dash-resource-grid > *,
-:root[data-theme="dark"] body.zazu-dashboard-page .zazu-dash-quote-stage {
-    border: 1px solid var(--zazu-line-soft) !important;
+/* KPI cards are the other deliberate use of colour. */
+.zazu-metric-card,.zazu-dash-metric {
+    border: 1px solid transparent !important;
+    border-top: 1px solid transparent !important;
+    background: var(--zazu-tone-blue) !important;
 }
+.zazu-metric-card:nth-child(4n + 2),.zazu-dash-metrics > :nth-child(4n + 2) { background: var(--zazu-tone-green) !important; }
+.zazu-metric-card:nth-child(4n + 3),.zazu-dash-metrics > :nth-child(4n + 3) { background: var(--zazu-tone-violet) !important; }
+.zazu-metric-card:nth-child(4n + 4),.zazu-dash-metrics > :nth-child(4n + 4) { background: var(--zazu-tone-amber) !important; }
+.zazu-metric-card.zazu-metric-alert { background: var(--zazu-tone-amber) !important; }
+.zazu-metric-label { color: var(--zazu-tone-ink-blue) !important; }
+.zazu-metric-alert .zazu-metric-label { color: var(--zazu-tone-ink-amber) !important; }
 
 /* DIRECTOR — solid surfaces only; gradients obscured the semantic colour system. */
 .zazu-card-header,.zazu-panel-head,.zazu-form-section-head,.zazu-command-band,.zazu-metric-card,.zazu-dash-metric,body.zazu-dashboard-page .zazu-dash-hero,body.zazu-dashboard-page .zazu-dash-surface-head{background-image:none!important;}
@@ -1471,4 +1197,36 @@ body.zazu-dashboard-page .zazu-sidebar .zazu-nav-area-trigger:hover,
 body.zazu-dashboard-page .zazu-sidebar .zazu-nav-area-trigger:focus-visible,
 body.zazu-dashboard-page .zazu-sidebar .zazu-nav-area.is-open > .zazu-nav-area-trigger {
  background:#B9CCD9!important;color:#23394D!important;
+}
+
+
+/* DIRECTOR — selected navigation always pairs a readable foreground/background. */
+html:not([data-theme="dark"]) .zazu-sidebar .zazu-nav-link.active,
+html:not([data-theme="dark"]) .zazu-sidebar .zazu-nav-area.is-active > .zazu-nav-area-trigger {
+    background: #B4C8D7 !important;
+    color: #23394D !important;
+    border-color: transparent !important;
+    box-shadow: inset 3px 0 0 #426987 !important;
+}
+html[data-theme="dark"] .zazu-sidebar .zazu-nav-link.active,
+html[data-theme="dark"] .zazu-sidebar .zazu-nav-area.is-active > .zazu-nav-area-trigger {
+    background: #486174 !important;
+    color: #F3F6F8 !important;
+    border-color: transparent !important;
+    box-shadow: inset 3px 0 0 #83BCD4 !important;
+}
+html[data-theme="dark"] .zazu-sidebar .zazu-nav-link:hover,
+html[data-theme="dark"] .zazu-sidebar .zazu-nav-area-trigger:hover,
+html[data-theme="dark"] .zazu-sidebar .zazu-nav-link:focus-visible,
+html[data-theme="dark"] .zazu-sidebar .zazu-nav-area-trigger:focus-visible {
+    background: #344653 !important;
+    color: #E5EBF0 !important;
+}
+html[data-theme="dark"] .zazu-card-header,
+html[data-theme="dark"] .zazu-panel-head,
+html[data-theme="dark"] .zazu-form-section-head,
+html[data-theme="dark"] body.zazu-dashboard-page .zazu-dash-surface-head {
+    background: var(--zazu-surface-2) !important;
+    color: var(--zazu-ink) !important;
+    border-bottom-color: var(--zazu-border) !important;
 }
