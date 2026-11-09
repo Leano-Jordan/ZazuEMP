@@ -1147,3 +1147,25 @@ body.zazu-dashboard-page .zazu-sidebar .zazu-nav-area.is-active > .zazu-nav-area
 .zazu-calendar-event {
     box-shadow: none !important;
 }
+
+
+/* Dashboard quote pipeline: give the four stage tiles real breathing room
+   below the panel header and around their own content. */
+.zazu-dash-commercial .zazu-dash-quote-stages {
+    padding: 12px 18px 14px !important;
+    gap: 10px !important;
+}
+.zazu-dash-commercial .zazu-dash-quote-stage {
+    min-height: 88px !important;
+    padding: 12px !important;
+}
+@media (max-width: 620px) {
+    .zazu-dash-commercial .zazu-dash-quote-stages {
+        padding: 11px 14px 12px !important;
+        gap: 8px !important;
+    }
+    .zazu-dash-commercial .zazu-dash-quote-stage {
+        min-height: 84px !important;
+        padding: 10px !important;
+    }
+}
