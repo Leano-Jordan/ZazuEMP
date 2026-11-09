@@ -3,7 +3,7 @@
 **Date:** 2026-11-09  
 **Repository:** `Leano-Jordan/ZazuEMP`  
 **Branch:** `main`  
-**Audited source/test head:** `c1ed1a451d58fb3fe77a312ffd4fa3153d44553a`  
+**Audited source/test head:** `69040420caa49bf9c514699c97fb8f8c5148d03b`  
 **Audit type:** repository, architecture, test, workflow and release-evidence review. No live customer deployment or physical device was available to this audit.
 
 ## Executive decision
@@ -14,7 +14,17 @@ The core product is coherent: customer → event/job → requirements/preparatio
 
 The main risks are no longer a lack of CRUD screens. They are proving that the operational chain survives real conditions: disconnected use, changing network origins, device loss, recovery, deployment failure and legal/privacy obligations.
 
-The last formally scored V1 baseline remains **60/100 (3.0/5, 2026-11-04)**. This audit does not invent a new numerical score while exact-head verification and physical acceptance remain incomplete.
+The current formally scored V1 evidence-maturity result is **68/100 (3.38/5, 2026-11-09)**, up from the historical 60/100 baseline. This score reflects four domain uplifts supported by exact-head automated evidence; it does not certify physical acceptance or commercial release.
+
+## Latest Director reconciliation — 2026-11-09
+
+The previous browser-theme CI failures are closed. The latest exact source/test head `69040420caa49bf9c514699c97fb8f8c5148d03b` has a fully green required automated batch: Laravel 412/2,904; browser 65 passed, 22 skipped, zero failed/flaky; Quality + secret scan; Psalm; PHPMD; populated upgrade/rollback; Director Contract Lint; and push-on-main. SonarCloud remains skipped.
+
+The formal 13-domain V1 score is now **68/100 (3.38/5)**. Four domains moved from 3→4 or 2→4 based on exact-head automated evidence: platform/onboarding, core lifecycle, security/tenant controls, and active Work documents/attachments. No domain is rated 5. The full table is in `docs/ZAZU_V1_SCORECARD_2026-11-04.md`.
+
+The private-Wi-Fi launcher is implemented in the repository. It binds to the active Wi-Fi IPv4 address only when Windows classifies that network as Private, and it does not alter firewall/router configuration. Plain HTTP LAN access is not a secure PWA origin; full installed-PWA acceptance still needs a stable private HTTPS origin. The launcher has not yet been executed on the owner's PC, and actual phone reachability remains unverified.
+
+**V1 remains NO-GO.** Outstanding release gates: physical PC/mobile offline acceptance on a secure origin; representative populated database/private-media restore; real deployment rollback; trusted-device/lost-device acceptance; operational privacy/legal closure; official Zazu brand clearance.
 
 ## 1. Product capability map
 
@@ -96,7 +106,7 @@ The preceding verification attempts exposed test-contract drift rather than a ne
 - At `3746d08`, the corrected suite reported **411 passed, 1 failed**. The remaining failure expected an obsolete `.zazu-ops-actions .zazu-btn` selector that is no longer present in the product-authority stylesheet. PHPMD passed; populated upgrade/rollback passed; Psalm passed; browser smoke was still running; Quality failed on the same stale UI assertion. SonarCloud was skipped.
 - The obsolete assertion was replaced with selectors that actually exist in the current shared button authority. The test method is now 90 lines. This correction is on `main` at `285fa18`.
 
-**Current exact-head status at `c1ed1a4`:** Laravel, PHPMD, Zazu Quality, Psalm, populated upgrade/rollback and push checks passed. Browser smoke ran all three viewport projects but failed the theme-token test because it still queried obsolete `--zazu-surface-canvas` and `--zazu-blue-primary` aliases rather than the current canonical `--zazu-surface` and `--zazu-primary` tokens. The test is being updated to assert the current palette and the light/dark selected-navigation and Workspace-footer contrast. SonarCloud was skipped and is not counted as a pass.
+**Historical failure, now closed:** the `c1ed1a4` browser run failed on obsolete theme-token assertions. Those assertions were corrected, then a transient form-control theme-transition race was fixed by waiting for the dark theme and polling settled control backgrounds. On exact source/test head `69040420caa49bf9c514699c97fb8f8c5148d03b`, Laravel passed (412 tests / 2,904 assertions), browser smoke passed (65 passed / 22 skipped / 0 failed or flaky), Zazu Quality, Psalm, PHPMD, populated upgrade/rollback, Director Contract Lint and push-on-main all passed. SonarCloud was skipped and is not counted as a pass. Run links are recorded in `docs/V1_RELEASE_CHECKLIST.md`.
 
 ## 5. Network address decision
 
