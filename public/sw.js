@@ -64,12 +64,12 @@ function contextCacheName() {
 
 function sanitizeUserId(value) {
     const id = String(value || '');
-    return /^\\d+$/.test(id) ? id : null;
+    return /^\d+$/.test(id) ? id : null;
 }
 
 function sanitizeBusinessId(value) {
     const id = String(value || '');
-    return /^\\d+$/.test(id) && Number(id) > 0 ? id : null;
+    return /^\d+$/.test(id) && Number(id) > 0 ? id : null;
 }
 
 async function loadActiveContext(expectedGeneration = activeUserGeneration) {
@@ -108,8 +108,8 @@ async function cacheRenderedPage(request, response, requestGeneration) {
     const html = await response.clone().text();
     if (requestGeneration !== activeUserGeneration) return;
 
-    const userMatch = html.match(/data-zazu-user-id="(\\d+)"/);
-    const businessMatch = html.match(/data-zazu-business-id="(\\d+)"/);
+    const userMatch = html.match(/data-zazu-user-id="(\d+)"/);
+    const businessMatch = html.match(/data-zazu-business-id="(\d+)"/);
     const pageUserId = sanitizeUserId(userMatch?.[1]);
     const pageBusinessId = sanitizeBusinessId(businessMatch?.[1]);
     if (!pageUserId || !pageBusinessId) return;
@@ -223,8 +223,8 @@ async function primePages(routes, primeGeneration = activeUserGeneration, primeU
                     if (!contentType.includes('text/html')) return;
 
                     const html = await response.clone().text();
-                    const userMatch = html.match(/data-zazu-user-id="(\\d+)"/);
-                    const businessMatch = html.match(/data-zazu-business-id="(\\d+)"/);
+                    const userMatch = html.match(/data-zazu-user-id="(\d+)"/);
+                    const businessMatch = html.match(/data-zazu-business-id="(\d+)"/);
                     const pageUserId = sanitizeUserId(userMatch?.[1]);
                     const pageBusinessId = sanitizeBusinessId(businessMatch?.[1]);
                     if (!pageUserId || !pageBusinessId) return;

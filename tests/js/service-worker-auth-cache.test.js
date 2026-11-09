@@ -42,6 +42,10 @@ function bootWorker(fetchImplementation = async () => new MockResponse('online')
     }
 
     class MockResponse {
+        static error() {
+            return new MockResponse('', { ok: false, status: 0 });
+        }
+
         constructor(body = '', options = {}) {
             this.body = body;
             this.ok = options.ok ?? true;
