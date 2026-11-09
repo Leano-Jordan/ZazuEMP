@@ -1232,3 +1232,22 @@ Owner expanded the visual refinement scope beyond the dashboard: apply the estab
 - Latest CI for HEAD `38167e7` is queued/pending; rendered browser acceptance is still not available in the connected browser context. Continue to verify exact-head CI and browser smoke before calling this pass accepted.
 
 - Continued into customer and Work detail views: customer contact/value cards now use the customer violet surface family rather than the default grey inset; the five-step Work progress strip now distinguishes current (blue), completed (green), and upcoming (teal-neutral) states instead of outlining current and completed steps identically. Regression assertions added without increasing the test class's public-method count.
+
+
+## Owner-directed border, colour and navigation correction — 2026-11-09
+
+- Target: remove heavy repeated control/card framing across authenticated pages; make semantic card colour unmistakable; soften the dark navigation hover without creating foreground/background contrast failures.
+- Source findings:
+  - The shared product authority assigned white hover text while using the shared sidebar-hover token. In the light shell palette that token is pale blue, creating the reported white-on-light hover defect.
+  - The dashboard authority still contained multiple 1.5px card/control borders and late neutral important fills on event, focus, resource and quote-stage cards. Those later declarations overruled the earlier semantic colour treatments, which explains why the quote pipeline looked nearly monochrome.
+  - Shared action controls could retain browser focus outlines in addition to their own borders; the final product layer now normalises action-control borders and keeps a deliberate 2px keyboard-only focus indicator.
+- Changes on canonical main:
+  - Strengthened all six light-theme semantic surface tokens (blue, green, amber, teal, violet, coral) while retaining coordinated dark-theme values.
+  - Increased route-card colour coverage from weak 34–38% mixes to 68%, and assigned visible full-tint surfaces to the dashboard event, priority, resource and quote-stage cards.
+  - Normalised shared action controls and common card/list/table surfaces to 1px neutral borders; removed default action-button shadow framing while preserving keyboard focus visibility.
+  - Replaced the shared hover foreground with the sidebar foreground token so it remains readable on both light and dark sidebar surfaces.
+  - Softened the dark navigation hover from #29445D to #34536D, with a matching light foreground #EAF2F9; active state remains distinct.
+  - Reduced every 1.5px declaration in zazu-dashboard-authority.css to 1px and updated navigation regression expectations.
+- Commits: 8d678d0 shared colour/control correction; 4a8ac27 dashboard border reduction; 3b67750 colour/control regression coverage; 210fb8a palette expectation correction; 931284d shared nav hover; 628aaac dashboard nav hover; fc34d6d navigation regression update.
+- Re-fetch verification: changed product CSS, dashboard CSS and both affected visual regression tests were re-read from main; new palette tokens and hover colour are present; obsolete #29445D references are absent from the two authoritative CSS files.
+- Verification boundary: source-only verification. PHPUnit, Vite build, exact-head CI and rendered desktop/mobile acceptance have not yet been observed for this batch. Do not mark the visual issue accepted until rendered review confirms the photographed Work action controls and dashboard quote pipeline.
