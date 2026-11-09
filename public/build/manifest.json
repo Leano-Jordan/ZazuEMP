@@ -13,7 +13,7 @@
     ]
   },
   "resources/css/zazu-dashboard-authority.css": {
-    "file": "assets/zazu-dashboard-authority-1TTrrxoC.css",
+    "file": "assets/zazu-dashboard-authority-DCtp9MKI.css",
     "name": "zazu-dashboard-authority",
     "names": [
       "zazu-dashboard-authority.css"
@@ -22,7 +22,7 @@
     "isEntry": true
   },
   "resources/css/zazu-final-visual-sweep.css": {
-    "file": "assets/zazu-final-visual-sweep-NenZRhmH.css",
+    "file": "assets/zazu-final-visual-sweep-SxBS5m5_.css",
     "name": "zazu-final-visual-sweep",
     "names": [
       "zazu-final-visual-sweep.css"
@@ -37,6 +37,15 @@
       "zazu-mobile-refinement.css"
     ],
     "src": "resources/css/zazu-mobile-refinement.css",
+    "isEntry": true
+  },
+  "resources/css/zazu-product-authority.css": {
+    "file": "assets/zazu-product-authority-CwJckfnY.css",
+    "name": "zazu-product-authority",
+    "names": [
+      "zazu-product-authority.css"
+    ],
+    "src": "resources/css/zazu-product-authority.css",
     "isEntry": true
   },
   "resources/css/zazu-responsive-theme.css": {
