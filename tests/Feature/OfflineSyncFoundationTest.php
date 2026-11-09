@@ -1915,7 +1915,7 @@ class OfflineSyncFoundationTest extends TestCase
 
         $this->travelBack();
 
-        $this->expectException(\\Illuminate\\Validation\\ValidationException::class);
+        $this->expectException(\Illuminate\Validation\ValidationException::class);
         $controller->provision($makeRequest());
     }
 
