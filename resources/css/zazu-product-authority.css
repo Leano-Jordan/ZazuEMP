@@ -1074,10 +1074,10 @@ body[data-zazu-route^="quotes."] .zazu-form-section-head,
 body[data-zazu-route^="customers."] .zazu-form-section-head {
     background: linear-gradient(105deg, var(--zazu-tone-violet), color-mix(in srgb, var(--zazu-tone-violet) 30%, var(--zazu-surface))) !important;
 }
-body[data-zazu-route^="work."] .zazu-form-section:not(body[data-zazu-route^="work.quotes."] .zazu-form-section) {
+body[data-zazu-route^="work."]:not([data-zazu-route^="work.quotes."]) .zazu-form-section {
     background: linear-gradient(145deg, color-mix(in srgb, var(--zazu-tone-teal) 16%, var(--zazu-surface)), var(--zazu-surface) 72%) !important;
 }
-body[data-zazu-route^="work."] .zazu-form-section-head:not(body[data-zazu-route^="work.quotes."] .zazu-form-section-head) {
+body[data-zazu-route^="work."]:not([data-zazu-route^="work.quotes."]) .zazu-form-section-head {
     background: linear-gradient(105deg, var(--zazu-tone-teal), color-mix(in srgb, var(--zazu-tone-teal) 30%, var(--zazu-surface))) !important;
 }
 
