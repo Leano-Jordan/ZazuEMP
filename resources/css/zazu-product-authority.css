@@ -1074,3 +1074,13 @@ textarea:focus,
 .zazu-document-total-grand {
     border-top-width: 1px !important;
 }
+
+
+/* Keep warning hierarchy in the fill and label, not a thick coloured rail. */
+.zazu-next-action-warning,
+.zazu-quote-review-action {
+    border-left: 1px solid var(--zazu-border) !important;
+}
+.zazu-quote-review-action {
+    background: var(--zazu-warning-soft) !important;
+}
