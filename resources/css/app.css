@@ -393,10 +393,10 @@ body {
     align-items: center;
     gap: 10px;
     margin: 1px 0;
-    padding: 0 10px;
+    padding: 0 11px;
     border: 1px solid transparent;
-    border-radius: var(--zazu-radius-md);
-    color: var(--zazu-muted);
+    border-radius: 4px;
+    color: var(--zazu-sidebar-muted);
     font-size: var(--zazu-font-size-nav);
     font-weight: var(--zazu-weight-semibold);
     text-decoration: none;
@@ -8229,15 +8229,6 @@ body.zazu-has-wallpaper .zazu-content {
     background: color-mix(in srgb, var(--zazu-sidebar-active) 13%, var(--zazu-sidebar));
     color: var(--zazu-sidebar-ink);
     box-shadow: inset 3px 0 0 var(--zazu-sidebar-active);
-}
-
-.zazu-nav-link {
-    min-height: 38px;
-    margin: 1px 0;
-    padding: 0 11px;
-    border: 1px solid transparent;
-    border-radius: 4px;
-    color: var(--zazu-sidebar-muted);
 }
 
 .zazu-nav-link:hover,
