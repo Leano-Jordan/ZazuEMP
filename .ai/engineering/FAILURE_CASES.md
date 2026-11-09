@@ -28,6 +28,33 @@ This is the persistent failure-history register for the Failure Case / Loop-Brea
 | CASE-ZAZU-0011 | Calendar runtime lockout/reachability | Calendar remains owner-reported inaccessible despite source safeguards | BLOCKED | Runtime causality remains unproven; owner-authenticated evidence required | Owner runtime forensics |
 | CASE-ZAZU-0012 | PHPUnit 12-failure stale/brittle contract batch | Historical PHPUnit batch exposed stale/brittle source and selector contracts | CORRECTED | Repository corrections exist; synchronized verification pending | Current-head CI/PHPUnit evidence |
 | CASE-ZAZU-0013 | PHPUnit 269-pass/7-fail stale-checkout batch | Historical failures traced to stale checkout against current main | CORRECTED | Repository corrections exist; synchronized verification pending | Current-head CI/PHPUnit evidence |
+| CASE-ZAZU-0014 | Dark-theme browser token assertions | E2E expected outdated dark surface/primary hex values | CORRECTED | Product-authority tokens are canonical; assertions now match them | Exact-head browser CI |
+
+### CASE-ZAZU-0014
+
+**Status:** CORRECTED — exact-head browser verification pending.
+
+**Target/workflow:** Dark theme token regression in `e2e/ui-theme.spec.ts`.
+
+**Classification:** F2 — stale test/contract expectation; no application theme defect was observed.
+
+**Failure fingerprint:** The browser test authenticated and read the live computed dark theme, then failed on literal expectations that no longer matched the canonical product-authority stylesheet.
+
+**Observed evidence:**
+- At `80bf602b4fdb2531997aed86e9f8278958307ebf`, the stale surface expectation `#243d52` failed; browser output established the rendered canonical surface as `#122235`.
+- After correcting surface, the same test exposed a second stale primary expectation: expected `#6fa4ff`, received `#78a9e8`.
+- The canonical dark token in `resources/css/zazu-product-authority.css` is `--zazu-primary: #78A9E8`.
+
+**Root cause:** UI token evolution was not reflected in hard-coded browser regression expectations. The test was asserting historical palette values rather than the current shared design authority.
+
+**Corrections on `main`:**
+- `80bf602b4fdb2531997aed86e9f8278958307ebf` — dark surface assertion aligned to `#122235`.
+- `c675eaf61166ced4aaee3f6ce6e6b59c71a53553` — dark primary assertion aligned to `#78a9e8`.
+
+**Rejected approach:** Do not change the product palette to satisfy stale test literals. The rendered application and canonical stylesheet are the authority; tests must follow them.
+
+**Closure evidence required:** The browser smoke suite must pass on the exact current `main` SHA, including light/dark computed tokens and responsive navigation. Until then, the correction is committed but not verified.
+
 
 ## Active case detail
 
