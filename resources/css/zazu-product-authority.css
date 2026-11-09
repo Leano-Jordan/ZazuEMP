@@ -1065,6 +1065,42 @@ body.zazu-dashboard-page .zazu-dash-surface-head {
     }
 }
 
+/* Customer relationship details: distinguish contact cards from the parent panel. */
+body[data-zazu-route^="customers."] .zazu-contact-card,
+body[data-zazu-route^="customers."] .zazu-detail-value-box {
+    background: linear-gradient(145deg, color-mix(in srgb, var(--zazu-tone-violet) 44%, var(--zazu-surface)), var(--zazu-surface) 88%) !important;
+    border: 1px solid color-mix(in srgb, var(--zazu-tone-ink-violet) 13%, var(--zazu-line-soft)) !important;
+}
+/* Work progression uses completion semantics, not the same blue outline for every step. */
+.zazu-work-progress-step {
+    border-width: 1px !important;
+    border-color: var(--zazu-line-soft) !important;
+    background: var(--zazu-surface) !important;
+}
+.zazu-work-progress-step.current {
+    border-color: color-mix(in srgb, var(--zazu-tone-ink-blue) 30%, var(--zazu-line-soft)) !important;
+    background: linear-gradient(145deg, var(--zazu-tone-blue), var(--zazu-surface)) !important;
+}
+.zazu-work-progress-step.current span {
+    background: var(--zazu-tone-ink-blue) !important;
+    color: #FFFFFF !important;
+}
+.zazu-work-progress-step.complete {
+    border-color: color-mix(in srgb, var(--zazu-tone-ink-green) 25%, var(--zazu-line-soft)) !important;
+    background: linear-gradient(145deg, var(--zazu-tone-green), var(--zazu-surface)) !important;
+}
+.zazu-work-progress-step.complete span {
+    background: var(--zazu-tone-ink-green) !important;
+    color: #FFFFFF !important;
+}
+.zazu-work-progress-step:not(.current):not(.complete) {
+    background: color-mix(in srgb, var(--zazu-tone-teal) 18%, var(--zazu-surface)) !important;
+}
+.zazu-work-progress-step:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 3px 9px rgba(26, 48, 68, .08) !important;
+}
+
 /* Form-section headers are real hierarchy bands, not more grey dividers. */
 .zazu-form-section-head {
     margin: 0 0 14px !important;
