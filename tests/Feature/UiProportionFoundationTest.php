@@ -180,6 +180,11 @@ class UiProportionFoundationTest extends TestCase
         $this->assertStringContainsString('.zazu-table-wrap', $css);
         $this->assertStringContainsString('.zazu-btn {', $css);
         $this->assertStringContainsString('.zazu-input, .zazu-select, .zazu-textarea', $css);
+        $this->assertStringContainsString('.zazu-list-item:hover {', $css);
+        $this->assertStringContainsString('transform: none;', $css);
+        $this->assertStringContainsString('.zazu-metric-card:hover {', $css);
+        $this->assertStringContainsString('.zazu-document-table-wrap', $css);
+        $this->assertStringContainsString('.zazu-empty {', $css);
     }
 
 }
