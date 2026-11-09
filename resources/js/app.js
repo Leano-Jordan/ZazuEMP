@@ -1070,6 +1070,183 @@ async function canReachZazuOrigin() {
     }
 }
 
+function setupZazuOfflineDirectoryViews() {
+    if (!window.ZazuOffline) return;
+
+    const text = (tag, className, value) => {
+        const node = document.createElement(tag);
+        if (className) node.className = className;
+        node.textContent = value == null || value === '' ? '—' : String(value);
+        return node;
+    };
+
+    const renderCustomers = (state) => {
+        const directory = document.querySelector('.zazu-customer-directory');
+        if (!directory) return;
+
+        directory.querySelectorAll('[data-zazu-local-record="customer"]').forEach(node => node.remove());
+        const customers = (state?.customers || []).filter(customer =>
+            customer?.local_id && customer.server_id == null && customer.id == null
+        );
+        const empty = directory.querySelector('.zazu-empty');
+        const header = directory.querySelector('.zazu-record-header');
+
+        if (customers.length && !header) {
+            const recordHeader = document.createElement('div');
+            recordHeader.className = 'zazu-record-header';
+            recordHeader.dataset.recordCols = '2';
+            recordHeader.append(
+                text('div', 'zazu-record-header-note', 'Customer'),
+                text('div', 'zazu-record-header-cell', 'Work'),
+                text('div', 'zazu-record-header-cell', 'Sync')
+            );
+            directory.insertBefore(recordHeader, empty || null);
+        }
+
+        for (const customer of customers) {
+            const row = document.createElement('div');
+            row.className = 'zazu-list-item';
+            row.dataset.zazuLocalRecord = 'customer';
+
+            const identity = document.createElement('div');
+            identity.className = 'zazu-row-with-avatar min-w-0 flex-1';
+            const initials = text('span', 'zazu-avatar', String(customer.name || 'C').trim().charAt(0).toUpperCase());
+            initials.setAttribute('aria-hidden', 'true');
+            const main = document.createElement('div');
+            main.className = 'zazu-list-main';
+            main.append(
+                text('div', 'zazu-list-title', customer.name || 'Saved customer'),
+                text('div', 'zazu-list-meta', [customer.contact_name, customer.phone, customer.email].filter(Boolean).join(' · ') || 'Contact not recorded')
+            );
+            identity.append(initials, main);
+
+            const work = document.createElement('div');
+            work.className = 'zazu-list-side';
+            work.append(text('div', 'zazu-side-primary', 'Available offline'));
+
+            const sync = document.createElement('div');
+            sync.className = 'zazu-action-group';
+            sync.append(text('span', 'zazu-chip zazu-chip-neutral', 'Waiting to sync'));
+
+            row.append(identity, work, sync);
+            if (empty?.parentNode === directory) directory.insertBefore(row, empty);
+            else directory.append(row);
+        }
+
+        if (empty) empty.hidden = customers.length > 0;
+        const count = directory.closest('main, [data-page-content]')?.querySelector('.zazu-command-meta-value');
+        if (count && customers.length) {
+            const serverCount = Number(count.dataset.serverCount ?? count.textContent.trim());
+            count.dataset.serverCount = String(Number.isFinite(serverCount) ? serverCount : 0);
+            count.textContent = String(Number(count.dataset.serverCount) + customers.length);
+        }
+    };
+
+    const renderJobs = (state) => {
+        const register = document.querySelector('.zazu-ops-register');
+        if (!register) return;
+
+        register.querySelectorAll('[data-zazu-local-record="job"]').forEach(node => node.remove());
+        const filter = new URLSearchParams(window.location.search).get('filter') || '';
+        const jobs = (state?.jobs || []).filter(job =>
+            job?.local_id
+            && job.server_id == null
+            && job.id == null
+            && (!filter || filter === 'draft')
+        );
+        const empty = register.querySelector('.zazu-empty');
+        const header = register.querySelector('.zazu-ops-table-head');
+
+        if (jobs.length && !header) {
+            const tableHeader = document.createElement('div');
+            tableHeader.className = 'zazu-ops-table-head';
+            tableHeader.setAttribute('aria-hidden', 'true');
+            ['Job reference', 'Client', 'Function', 'Execution', 'Status', 'Sync'].forEach(label => {
+                tableHeader.append(text('span', '', label));
+            });
+            register.insertBefore(tableHeader, register.querySelector('[data-zazu-job-row]') || empty || null);
+        }
+
+        for (const job of jobs) {
+            const customer = (state?.customers || []).find(item => item.local_id === job.customer_local_id);
+            const row = document.createElement('article');
+            row.className = 'zazu-ops-row';
+            row.dataset.zazuLocalRecord = 'job';
+
+            const main = document.createElement('div');
+            main.className = 'zazu-ops-row-main';
+            main.append(
+                (() => {
+                    const ref = document.createElement('span');
+                    ref.className = 'zazu-ops-ref';
+                    ref.append(text('span', 'zazu-ops-ref-label', 'Local reference'), text('strong', '', 'Pending sync'));
+                    return ref;
+                })(),
+                (() => {
+                    const client = document.createElement('span');
+                    client.className = 'zazu-ops-client';
+                    client.append(text('strong', '', job.customer_name || customer?.name || 'Customer not set'), text('small', '', customer?.phone || customer?.email || 'Saved on this device'));
+                    return client;
+                })(),
+                (() => {
+                    const type = document.createElement('span');
+                    type.className = 'zazu-ops-function';
+                    type.append(text('strong', '', job.event_type || 'Event'), text('small', '', (job.services || []).join(', ') || 'Services not recorded'));
+                    return type;
+                })(),
+                (() => {
+                    const date = document.createElement('span');
+                    date.className = 'zazu-ops-date';
+                    date.append(text('strong', '', job.event_date || 'Date not set'), text('small', '', job.name || 'Untitled job'));
+                    return date;
+                })(),
+                (() => {
+                    const status = document.createElement('span');
+                    status.append(text('span', 'zazu-chip zazu-chip-neutral', 'Saved offline'));
+                    return status;
+                })()
+            );
+
+            const actions = document.createElement('div');
+            actions.className = 'zazu-ops-actions';
+            actions.append(text('span', 'zazu-chip zazu-chip-neutral', 'Waiting to sync'));
+            row.append(main, actions);
+
+            if (empty?.parentNode === register) register.insertBefore(row, empty);
+            else register.append(row);
+        }
+
+        if (empty) empty.hidden = jobs.length > 0;
+        const total = document.querySelector('.zazu-ops-total');
+        if (total) {
+            const serverCount = Number(total.dataset.serverCount ?? total.textContent.match(/[0-9]+/)?.[0] ?? 0);
+            total.dataset.serverCount = String(Number.isFinite(serverCount) ? serverCount : 0);
+            total.textContent = (Number(total.dataset.serverCount) + jobs.length) + ' records';
+        }
+
+        const allPill = document.querySelector('.zazu-workload-pill[href$="work"]');
+        const allValue = [...document.querySelectorAll('.zazu-workload-pill')].find(item => item.textContent.includes('All Work'));
+        const draftValue = [...document.querySelectorAll('.zazu-workload-pill')].find(item => item.textContent.includes('Drafts'));
+        for (const [pill, key] of [[allValue, 'all'], [draftValue, 'draft']]) {
+            const value = pill?.querySelector('strong');
+            if (!value) continue;
+            const serverCount = Number(value.dataset.serverCount ?? value.textContent.trim());
+            value.dataset.serverCount = String(Number.isFinite(serverCount) ? serverCount : 0);
+            value.textContent = String(Number(value.dataset.serverCount) + jobs.length);
+        }
+    };
+
+    const render = () => {
+        const state = window.ZazuOffline.getState();
+        renderCustomers(state);
+        renderJobs(state);
+    };
+
+    window.ZazuOffline.ready.then(render).catch(() => {});
+    window.addEventListener('zazu:offline-ready', render);
+    window.addEventListener('zazu:offline-state-updated', render);
+}
+
 function setupZazuOfflineCustomerOptions() {
     const select = document.querySelector('select[name="customer_id"]');
     if (!select || !window.ZazuOffline) return;
@@ -1849,6 +2026,7 @@ function handleZazuPhonePairing() {
 
 window.addEventListener('zazu:offline-ready', handleZazuPhonePairing);
 
+setupZazuOfflineDirectoryViews();
 setupZazuOfflineForms();
 setupZazuOfflineCustomerOptions();
 setupZazuOfflineAttachments();
