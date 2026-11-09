@@ -1,6 +1,6 @@
 {
   "resources/css/app.css": {
-    "file": "assets/app-CLy_BRsv.css",
+    "file": "assets/app-BwrP_bjU.css",
     "name": "app",
     "names": [
       "app.css"
@@ -13,7 +13,7 @@
     ]
   },
   "resources/css/zazu-dashboard-authority.css": {
-    "file": "assets/zazu-dashboard-authority-D3le7nMq.css",
+    "file": "assets/zazu-dashboard-authority-Cm3DzY-9.css",
     "name": "zazu-dashboard-authority",
     "names": [
       "zazu-dashboard-authority.css"
@@ -40,7 +40,7 @@
     "isEntry": true
   },
   "resources/css/zazu-product-authority.css": {
-    "file": "assets/zazu-product-authority-VyYKv5sj.css",
+    "file": "assets/zazu-product-authority-BX7a43ZC.css",
     "name": "zazu-product-authority",
     "names": [
       "zazu-product-authority.css"
