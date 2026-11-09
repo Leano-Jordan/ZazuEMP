@@ -585,6 +585,9 @@
     --zazu-border-strong: #AABBCB;
 
     --zazu-primary: #426987;
+    --zazu-accent: #6487A2;
+    --zazu-accent-ink: #304F69;
+    --zazu-accent-soft: #D9E3EC;
     --zazu-primary-light: #6487A2;
     --zazu-primary-pale: #D9E3EC;
     --zazu-primary-shadow: #DCE5ED;
@@ -659,6 +662,9 @@
     --zazu-border-strong: #58758E;
 
     --zazu-primary: #91B3CC;
+    --zazu-accent: #91B3CC;
+    --zazu-accent-ink: #D2E0EA;
+    --zazu-accent-soft: #29435B;
     --zazu-primary-light: #B1C9DA;
     --zazu-primary-pale: #D2E0EA;
     --zazu-primary-shadow: #29435B;
