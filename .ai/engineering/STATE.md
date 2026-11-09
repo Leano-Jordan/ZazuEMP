@@ -1196,3 +1196,18 @@ Owner expanded the visual refinement scope beyond the dashboard: apply the estab
 - Follow-up geometry scan found remaining pill-shaped interactive controls and repeated surfaces in workload filters and dashboard quick actions/KPIs. Their geometry now follows the shared compact 5/7px radius system; semantic status/count tags also use restrained corners. Circular progress markers and decorative dots remain circular by design.
 - Regression coverage extended for workload filters and dashboard quick-action geometry.
 - Commits: `40168a1` (compact control geometry), `f03a8b9` (regression coverage).
+
+
+## Cross-module visual defect correction — 2026-11-09
+
+- Owner reiterated that thick blue borders and dull, repetitive card surfaces remain unacceptable across the application.
+- Replaced the prior weak colour treatment at the end of the canonical resources/css/zazu-product-authority.css rather than layering another competing stylesheet.
+- Added coordinated semantic colour families for blue, green, amber, teal, violet and coral in both light and dark themes.
+- KPI tiles now rotate through distinct colour surfaces; quote pipeline stages use separate workflow colours; Finance, Inventory/Purchasing, Suppliers/Assets, Customers/Quotes, Reports and Calendar receive route-specific card surface families and matching section headers.
+- Normalised shared card, panel, dashboard hero, shell separator and compact editor header borders to 1px neutral separators. Removed oversized blue rails from shared attention/context surfaces while retaining semantic status fills.
+- Kept helper dock at the screen edge, compact and hidden while mobile navigation is open.
+- Added/updated UiVisualSystemRegressionTest assertions for route-specific card colour families, light/dark semantic colours and thin-border rules.
+- Commits: 3b0b902 (colour authority), 4295ca8 (border normalisation), ee61e4f (module card colours), 048ba78 (regression assertions).
+- Source re-read confirms current CSS and test changes are on main. Exact-head CI is still running; no green result is claimed yet.
+- Rendered desktop/mobile visual acceptance remains UNVERIFIED because no connected browser session for the local Zazu instance was available during this pass. The owner should see updated CSS after the Vite dev server refreshes/rebuilds the imported stylesheet.
+- Continue the UI defect audit across authenticated views; source-level border search identified remaining 2px dashboard shell seams and compact editor header declarations, now overridden by the final shared authority. Preserve functional/semantic borders such as focus rings, error summaries and loading indicators.
