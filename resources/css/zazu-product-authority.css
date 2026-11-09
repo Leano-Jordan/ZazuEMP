@@ -1124,3 +1124,20 @@ textarea:focus,
     border-left-width: 1px !important;
     border-left-color: var(--zazu-border-strong) !important;
 }
+
+
+/* Active navigation uses a narrow slate marker, not a thick blue stripe. */
+.zazu-nav-link.active,
+.zazu-nav-flyout .zazu-nav-link.active,
+.zazu-nav-area.is-active > .zazu-nav-area-trigger {
+    box-shadow: inset 2px 0 0 var(--zazu-sidebar-active) !important;
+}
+body.zazu-dashboard-page .zazu-sidebar .zazu-nav-link.active,
+body.zazu-dashboard-page .zazu-sidebar .zazu-nav-area.is-active > .zazu-nav-area-trigger {
+    box-shadow: inset 2px 0 0 #6487A2 !important;
+}
+
+/* Calendar event chips rely on their semantic tint and label, not a blue rail. */
+.zazu-calendar-event {
+    box-shadow: none !important;
+}
