@@ -83,3 +83,22 @@ jobs:
             throw 'Stop wrapper does not invoke Stop-ZazuLanHttps.ps1.'
           }
           Write-Host 'PASS: LAN HTTPS wrappers reference their matching scripts.'
+      - name: Verify LAN HTTPS startup failure cleanup
+        shell: pwsh
+        run: |
+          $launcher = Get-Content 'ops/windows/Start-ZazuLanHttps.ps1' -Raw
+          $validationIndex = $launcher.IndexOf('$validation = & $caddy validate')
+          $startIndex = $launcher.IndexOf('& $startServer @startArguments')
+          if ($validationIndex -lt 0 -or $startIndex -lt 0 -or $startIndex -lt $validationIndex) {
+            throw 'Laravel must start only after the generated Caddy configuration validates.'
+          }
+
+          $cleanupCount = ([regex]::Matches($launcher, [regex]::Escape('& $startServer -Stop -Port $AppPort'))).Count
+          if ($cleanupCount -lt 3) {
+            throw 'Caddy launch, early-exit and bind-timeout failures must stop the loopback Laravel process.'
+          }
+          if ($launcher -notmatch '(?s)try\s*\{\s*\$caddyProcess\s*=\s*Start-Process.*?\}\s*catch\s*\{\s*& \$startServer -Stop -Port \$AppPort') {
+            throw 'A Caddy process launch/PID-write failure must clean up the Laravel process.'
+          }
+          Write-Host 'PASS: proxy validation precedes Laravel startup and proxy failures clean up Laravel.'
+
