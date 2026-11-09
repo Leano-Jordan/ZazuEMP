@@ -14,7 +14,7 @@ function deferred() {
     return { promise, resolve };
 }
 
-function bootWorker(fetchImplementation = async () => new MockResponse('online'), cacheHooks = {}) {
+function bootWorker(fetchImplementation = async () => new worker.Response('online'), cacheHooks = {}) {
     const listeners = new Map();
     const cacheStore = new Map();
     const fetchCalls = [];
@@ -43,7 +43,7 @@ function bootWorker(fetchImplementation = async () => new MockResponse('online')
 
     class MockResponse {
         static error() {
-            return new MockResponse('', { ok: false, status: 0 });
+            return new worker.Response('', { ok: false, status: 0 });
         }
 
         constructor(body = '', options = {}) {
@@ -55,7 +55,7 @@ function bootWorker(fetchImplementation = async () => new MockResponse('online')
         }
 
         clone() {
-            return new MockResponse(this.body, {
+            return new worker.Response(this.body, {
                 ok: this.ok,
                 status: this.status,
                 headers: this.headerValues,
@@ -77,7 +77,7 @@ function bootWorker(fetchImplementation = async () => new MockResponse('online')
                 if (cacheHooks.beforePut) await cacheHooks.beforePut({ name, key: normalizedKey, response });
                 entries.set(normalizedKey, response);
             },
-            add: async (key) => { entries.set(requestUrl(key), new MockResponse('asset')); },
+            add: async (key) => { entries.set(requestUrl(key), new worker.Response('asset')); },
             delete: async (key) => entries.delete(requestUrl(key)),
         };
     }
@@ -277,15 +277,15 @@ test('a successful business switch clears the previous business page cache befor
         const url = new URL(request.url);
         if (url.pathname === '/business/switch') {
             activeBusiness = '29';
-            return new MockResponse('redirect', { ok: false, status: 302 });
+            return new worker.Response('redirect', { ok: false, status: 302 });
         }
         if (url.pathname === '/dashboard') {
-            return new MockResponse(
+            return new worker.Response(
                 '<!doctype html><html><body data-zazu-user-id="41" data-zazu-business-id="' + activeBusiness + '"><main>Business ' + activeBusiness + '</main></body></html>',
                 { headers: { 'content-type': 'text/html; charset=utf-8' } },
             );
         }
-        return new MockResponse('online');
+        return new worker.Response('online');
     });
 
     await worker.dispatchMessage({ type: 'prime-pages', userId: '41', businessId: '17', routes: ['/dashboard'] });
