@@ -187,4 +187,29 @@ class UiVisualSystemRegressionTest extends TestCase
     }
 
 
+
+    public function test_colour_hierarchy_and_helper_dock_keep_the_workspace_clear(): void
+    {
+        $css = file_get_contents(resource_path('css/zazu-product-authority.css'));
+
+        $this->assertIsString($css);
+        foreach ([
+            '--zazu-tone-green:#E5F3E9',
+            '--zazu-tone-amber:#FFF1D6',
+            '--zazu-tone-teal:#DDF2EF',
+            '--zazu-tone-violet:#EEE9FA',
+            '.zazu-finance-directory .zazu-card-header',
+            '.zazu-inventory-directory .zazu-card-header',
+            '.zazu-suppliers-page .zazu-card-header',
+            '.zazu-customer-directory .zazu-card-header',
+            'top:50%!important',
+            'right:max(6px,env(safe-area-inset-right))!important',
+            'z-index:35!important',
+            'bottom:max(10px,env(safe-area-inset-bottom))!important',
+        ] as $expected) {
+            $this->assertStringContainsString($expected, $css);
+        }
+    }
+
+
 }
