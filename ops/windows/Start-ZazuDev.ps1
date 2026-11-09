@@ -114,17 +114,32 @@ if ($parsedVersion -lt [version]'8.4') {
 $listeners = Get-ZazuListener
 if ($listeners.Count -gt 0) {
     $alreadyZazu = $true
+    $wrongBinding = @()
+
     foreach ($listener in $listeners) {
         $process = Get-ProcessDetails ([int]$listener.OwningProcess)
         if (-not $process -or $process.Name -ne 'php.exe' -or $process.CommandLine -notlike "*$ProjectPath*") {
             $alreadyZazu = $false
+            continue
+        }
+
+        if ($listener.LocalAddress -ne $BindAddress) {
+            $wrongBinding += [string]$listener.LocalAddress
+            $alreadyZazu = $false
         }
     }
+
     if ($alreadyZazu) {
         Write-Host ("Zazu is already listening at http://{0}:{1}" -f $BindAddress, $Port)
         exit 0
     }
-    throw "Port $Port is already in use by another process. Nothing was changed."
+
+    if ($wrongBinding.Count -gt 0 -and $listeners.Count -eq $wrongBinding.Count) {
+        $existingAddresses = ($wrongBinding | Sort-Object -Unique) -join ', '
+        throw "Zazu is already running on port $Port but is bound to '$existingAddresses', not '$BindAddress'. Stop it with Stop-Zazu-Dev.cmd, then start the requested mode. Nothing was changed."
+    }
+
+    throw "Port $Port is already in use by another process or an incompatible listener. Nothing was changed."
 }
 
 New-Item -ItemType Directory -Path $logDirectory -Force | Out-Null
