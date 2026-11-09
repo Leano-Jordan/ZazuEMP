@@ -9,6 +9,17 @@
 
 Provide the controlled acceptance test for a real phone and real tablet before V1 release.
 
+## Secure-origin preconditions
+
+- [ ] Host PC and test device are on the same trusted Private Wi-Fi network.
+- [ ] Zazu is opened using the HTTPS URL printed by `Start-Zazu-LAN-HTTPS.cmd`, not the HTTP port 8000 URL.
+- [ ] The public Caddy `root.crt` has been installed as a user CA on the test device; the browser shows no certificate warning.
+- [ ] The HTTPS origin is stable for the duration of the test. If the Wi-Fi IP changes, stop and restart the proxy, then use the newly printed URL.
+- [ ] Before changing from an earlier HTTP origin, pending mutations and attachment uploads on that origin have been reconciled. Browser storage must not be cleared to force migration.
+- [ ] The service worker registers and activates on the HTTPS origin before disconnected-mode testing.
+
+A device that bypasses the certificate warning or is tested only on HTTP has not passed secure-origin/PWA acceptance.
+
 ## Record the actual test environment
 
 | Field | Phone | Tablet |
