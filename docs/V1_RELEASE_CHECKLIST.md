@@ -2,23 +2,25 @@
 
 ## Director scorecard and exact-head evidence — 2026-11-09
 
-**Current V1 evidence-maturity score: 68/100 (3.38/5), up from the historical 60/100 baseline.**  
-**Verified application/test source:** `69040420caa49bf9c514699c97fb8f8c5148d03b`.  
-**Release decision: NO-GO** — score improvement does not waive operational blockers.
+**Current V1 evidence-maturity score: 69/100 (3.46/5), up from the historical 60/100 baseline.**  
+**Verified application/test source:** `d55539ddfd52c7fa5140714288c5885dbcc99e3a`.  
+**Release decision: NO-GO** — the score does not waive physical or operational release gates.
 
-- Laravel: PASS — 412 tests / 2,904 assertions ([run 42698440540](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/42698440540)).
-- Browser smoke: PASS — 65 passed / 22 skipped / 0 failed or flaky ([run 42698440241](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/42698440241)).
-- Zazu Quality + secret scan: PASS ([run 42698440553](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/42698440553)).
-- Psalm Security: PASS ([run 42698440534](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/42698440534)).
-- PHPMD: PASS ([run 42698440505](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/42698440505)).
-- Populated upgrade/rollback: PASS ([run 42698440537](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/42698440537)).
-- Director Contract Lint: PASS ([run 42698440506](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/42698440506)).
-- Push on main: PASS ([run 42698440294](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/42698440294)).
+- Laravel: PASS — 414 tests / 2,938 assertions ([run 42702419420](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/42702419420)).
+- Browser smoke: PASS — 65 passed / 22 skipped / 0 failed or flaky ([run 42702419540](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/42702419540)).
+- Zazu Quality + secret scan: PASS ([run 42702419210](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/42702419210)).
+- Psalm Security: PASS ([run 42702419299](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/42702419299)).
+- PHPMD: PASS ([run 42702419074](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/42702419074)).
+- Populated upgrade/rollback: PASS ([run 42702419767](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/42702419767)).
+- Push on main: PASS ([run 42702420093](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/42702420093)).
 - SonarCloud: SKIPPED; not counted as a pass.
+- Director Contract Lint: not triggered by this test-only commit; its previous control-plane run passed on the immediately preceding Director documentation commit.
 
-The score rose only in platform/onboarding, core lifecycle, security/tenant controls and active documents/attachments, where exact-head automated evidence now meets score-4 maturity. Offline continuity remains 3; UX remains 3; recovery remains 2; legal/privacy/brand remains 1. The full domain table and scoring method are in `docs/ZAZU_V1_SCORECARD_2026-11-04.md`.
+The score increased to 69 because recovery/data portability moved from 2/5 to 3/5: CI now restores a populated seeded business database and its private media, then verifies representative values and 14 operational table counts. Platform/onboarding, core lifecycle, security/tenant controls and active documents/attachments retain their evidence-based improvements. Offline continuity remains 3; UX remains 3; legal/privacy/brand remains 1.
 
-**Remaining release blockers:** secure-origin installed-device offline acceptance; representative populated database/private-media restore; real deployment rollback; trusted-device/lost-device acceptance; operational privacy/legal closure; official Zazu brand clearance.
+**Remaining release blockers:** secure-origin installed-device offline acceptance; representative restore on the actual target installation; real deployment rollback; trusted-device/lost-device acceptance; operational privacy/legal closure; official Zazu brand clearance.
+
+The full 13-domain table and scoring method are in `docs/ZAZU_V1_SCORECARD_2026-11-04.md`.
 
 
 ## Director product audit — 2026-11-09

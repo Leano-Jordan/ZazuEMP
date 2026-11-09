@@ -3,29 +3,29 @@
 **Assessment date:** 2026-11-09  
 **Repository:** `Leano-Jordan/ZazuEMP`  
 **Canonical branch:** `main`  
-**Verified application/test source commit:** `69040420caa49bf9c514699c97fb8f8c5148d03b`.
+**Verified application/test source commit:** `d55539ddfd52c7fa5140714288c5885dbcc99e3a`.
 
 ## Current position
 
 ## Latest Director scorecard — 2026-11-09
 
-**V1 evidence-maturity score: 68/100 (3.38/5), up from 60/100.**  
-**Verified application/test source:** `69040420caa49bf9c514699c97fb8f8c5148d03b`.
+**V1 evidence-maturity score: 69/100 (3.46/5), up from 60/100.**  
+**Verified application/test source:** `d55539ddfd52c7fa5140714288c5885dbcc99e3a`.
 
-- Laravel: 412 passed / 2,904 assertions.
+- Laravel: 414 passed / 2,938 assertions.
 - Browser smoke: 65 passed / 22 skipped / 0 failed or flaky.
 - Zazu Quality + secret scan, Psalm, PHPMD, populated upgrade/rollback, Director Contract Lint and push-on-main: all passed.
 - SonarCloud: skipped, not a pass.
 
-The uplift covers platform/onboarding, core lifecycle, security/tenant controls and active Work attachments. It does not change the release decision.
+The uplift now also covers recovery/data portability: CI restores the seeded populated business database and private media, verifying key records and 14 operational table counts. This moves recovery from 2/5 to 3/5. The real installed-environment restore remains open.
 
-**Release position: NO-GO.** Remaining gates: secure-origin installed-device offline acceptance, representative populated database/private-media restore, real deployment rollback, trusted-device acceptance, operational privacy/legal closure and official brand clearance. LAN launcher implementation is committed but has not yet been verified on the owner's PC.
+**Release position: NO-GO.** Remaining gates: secure-origin installed-device offline acceptance, real installed-environment database/private-media restore, real deployment rollback, trusted-device acceptance, operational privacy/legal closure and official brand clearance. LAN launcher implementation is committed but has not yet been verified on the owner's PC.
 
 See `docs/ZAZU_V1_SCORECARD_2026-11-04.md` for the full 13-domain scorecard and `docs/V1_RELEASE_CHECKLIST.md` for exact CI run links.
 
 Zazu EMP has a substantial connected operational foundation across authentication/business context, customers and jobs, requirements/services, quotes and revisions, preparation, purchasing, inventory/assets, costs, finance, reporting, search, attachments and responsive UI.
 
-The latest exact-head automated verification batch is green:
+Historical automated verification snapshot (superseded by the Director scorecard above):
 - Laravel: **407 passed / 2,758 assertions**
 - Zazu Quality + secret scan: **PASS**
 - Psalm: **PASS**

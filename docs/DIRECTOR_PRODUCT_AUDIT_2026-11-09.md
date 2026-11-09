@@ -3,7 +3,7 @@
 **Date:** 2026-11-09  
 **Repository:** `Leano-Jordan/ZazuEMP`  
 **Branch:** `main`  
-**Audited source/test head:** `69040420caa49bf9c514699c97fb8f8c5148d03b`  
+**Audited source/test head:** `d55539ddfd52c7fa5140714288c5885dbcc99e3a`  
 **Audit type:** repository, architecture, test, workflow and release-evidence review. No live customer deployment or physical device was available to this audit.
 
 ## Executive decision
@@ -14,17 +14,17 @@ The core product is coherent: customer → event/job → requirements/preparatio
 
 The main risks are no longer a lack of CRUD screens. They are proving that the operational chain survives real conditions: disconnected use, changing network origins, device loss, recovery, deployment failure and legal/privacy obligations.
 
-The current formally scored V1 evidence-maturity result is **68/100 (3.38/5, 2026-11-09)**, up from the historical 60/100 baseline. This score reflects four domain uplifts supported by exact-head automated evidence; it does not certify physical acceptance or commercial release.
+The current formally scored V1 evidence-maturity result is **69/100 (3.46/5, 2026-11-09)**, up from the historical 60/100 baseline. Five domains now show evidence-based improvement, including recovery/data portability after a populated database-and-private-media restore passed CI. This does not certify a real installed-environment restore or commercial release.
 
 ## Latest Director reconciliation — 2026-11-09
 
 The previous browser-theme CI failures are closed. The latest exact source/test head `69040420caa49bf9c514699c97fb8f8c5148d03b` has a fully green required automated batch: Laravel 412/2,904; browser 65 passed, 22 skipped, zero failed/flaky; Quality + secret scan; Psalm; PHPMD; populated upgrade/rollback; Director Contract Lint; and push-on-main. SonarCloud remains skipped.
 
-The formal 13-domain V1 score is now **68/100 (3.38/5)**. Four domains moved from 3→4 or 2→4 based on exact-head automated evidence: platform/onboarding, core lifecycle, security/tenant controls, and active Work documents/attachments. No domain is rated 5. The full table is in `docs/ZAZU_V1_SCORECARD_2026-11-04.md`.
+The formal 13-domain V1 score is now **69/100 (3.46/5)**. Recovery/data portability moved from 2→3 after the new populated restore test verified seeded operational records and private media. Four other domains retain their improved scores: platform/onboarding, core lifecycle, security/tenant controls, and active Work documents/attachments. No domain is rated 5. The full table is in `docs/ZAZU_V1_SCORECARD_2026-11-04.md`.
 
 The private-Wi-Fi launcher is implemented in the repository. It binds to the active Wi-Fi IPv4 address only when Windows classifies that network as Private, and it does not alter firewall/router configuration. Plain HTTP LAN access is not a secure PWA origin; full installed-PWA acceptance still needs a stable private HTTPS origin. The launcher has not yet been executed on the owner's PC, and actual phone reachability remains unverified.
 
-**V1 remains NO-GO.** Outstanding release gates: physical PC/mobile offline acceptance on a secure origin; representative populated database/private-media restore; real deployment rollback; trusted-device/lost-device acceptance; operational privacy/legal closure; official Zazu brand clearance.
+**V1 remains NO-GO.** Outstanding release gates: physical PC/mobile offline acceptance on a secure origin; real installed-environment database/private-media restore; real deployment rollback; trusted-device/lost-device acceptance; operational privacy/legal closure; official Zazu brand clearance.
 
 ## 1. Product capability map
 

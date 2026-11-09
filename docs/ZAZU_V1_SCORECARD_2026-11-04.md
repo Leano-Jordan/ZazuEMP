@@ -1,14 +1,15 @@
 # Zazu EMP — V1 Specification Scorecard
 
-**Assessment date:** 2026-11-04  
+**Original baseline assessment:** 2026-11-04  
+**Current re-score:** 2026-11-09  
 **Repository:** `Leano-Jordan/ZazuEMP`  
 **Branch:** `main`  
-**Assessment HEAD:** `d1e2a4397b064d3fbfe7fc2cf1dc59236e00922f`  
-**Evidence status:** exact source-head CI mostly passed; browser smoke still running; not release certification.
+**Current verified source/test HEAD:** `d55539ddfd52c7fa5140714288c5885dbcc99e3a`  
+**Evidence status:** required current-head automated CI passed; physical acceptance remains open; not release certification.
 
 ## Director formal re-score — 2026-11-09
 
-**Current verified application/test HEAD:** `69040420caa49bf9c514699c97fb8f8c5148d03b`  
+**Current verified application/test HEAD:** `d55539ddfd52c7fa5140714288c5885dbcc99e3a`  
 **Evidence:** exact-head Laravel, browser, quality, security, static-analysis, populated upgrade/rollback and Director checks passed. This is an evidence-maturity re-score, not a commercial release approval.
 
 ### Current 13-domain scorecard
@@ -22,30 +23,30 @@
 | Data integrity and auditability | **4/5** | Transaction, idempotency, ownership, audit and hostile-input tests pass; broader real concurrency proof remains. |
 | Security and tenant isolation | **4/5** | Psalm, secret scan and Laravel security/tenant regression coverage pass; trusted-device physical acceptance and CSP style hardening remain. |
 | Offline continuity | **3/5** | Bounded IndexedDB workspace, queue, conflict and reconnect paths are implemented and tested; secure-origin installed-device disconnect/restart/reconnect proof remains. |
-| Documents and attachments | **4/5** | Active Work attachment queue, private retrieval, business scoping and reconnect/idempotency paths have automated Laravel/browser coverage on the current head; physical device persistence and real media restore remain. |
+| Documents and attachments | **4/5** | Active Work attachment queue, private retrieval, business scoping, reconnect/idempotency and private-media backup/restore have automated coverage; physical device persistence remains unverified. |
 | Search, reporting and Zazu Helper | **3/5** | Permission-aware search, attachment metadata search and reporting exist; full customer-data usability acceptance remains incomplete. |
 | UX, mobile, tablet and accessibility | **3/5** | Browser smoke passes across its configured viewport projects; physical device and complete accessibility acceptance remain. |
-| Recovery and data portability | **2/5** | Operator backup/restore commands, checksums and automated archive tests exist; representative populated database/private-media restore remains unproven. |
+| Recovery and data portability | **3/5** | A populated seeded installation restore now verifies core workflow record counts, business/event/invoice values and private media in CI; a real operator restore on the installed target remains open. |
 | Deployment, upgrade and rollback | **4/5** | Populated upgrade/rollback automation passes on the current head; real target-environment deployment rollback remains. |
 | Legal, privacy and brand clearance | **1/5** | Engineering controls and registers exist; operational POPIA/privacy/legal sign-off and official Zazu name clearance remain open. |
 
-**Current evidence-maturity average: 3.38/5 — 67.7/100, reported as 68/100.**  
-**Change from prior formal baseline: +8 points (60 → 68).**
+**Current evidence-maturity average: 3.46/5 — 69.2/100, reported as 69/100.**  
+**Change from prior formal baseline: +9 points (60 → 69).**
 
-The uplift is limited to four domains where the current exact-head automated evidence now meets the score-4 definition: platform/onboarding, core lifecycle, security/tenant controls and active documents/attachments. The other domains retain their prior scores because physical, customer, recovery or legal evidence is still missing. No domain receives a score of 5.
+Five domains have now improved against the historical baseline: platform/onboarding, core lifecycle, security/tenant controls and active documents/attachments have stronger exact-head regression evidence; recovery/data portability has moved from 2/5 to 3/5 after the populated database-and-private-media restore drill passed in CI. Real installed-environment restore and physical acceptance remain open. No domain receives a score of 5.
 
 ### Exact-head CI evidence
 
 | Check | Result |
 |---|---|
-| Laravel | PASS — 412 tests, 2,904 assertions — [run 42698440540](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/42698440540) |
-| Browser smoke | PASS — 65 passed, 22 skipped, 0 failed/flaky — [run 42698440241](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/42698440241) |
-| Zazu Quality + secret scan | PASS — [run 42698440553](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/42698440553) |
-| Psalm Security | PASS — [run 42698440534](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/42698440534) |
-| PHPMD | PASS — [run 42698440505](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/42698440505) |
-| Populated upgrade/rollback | PASS — [run 42698440537](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/42698440537) |
+| Laravel | PASS — 414 tests, 2,938 assertions — [run 42702419420](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/42702419420) |
+| Browser smoke | PASS — 65 passed, 22 skipped, 0 failed/flaky — [run 42702419540](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/42702419540) |
+| Zazu Quality + secret scan | PASS — [run 42702419210](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/42702419210) |
+| Psalm Security | PASS — [run 42702419299](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/42702419299) |
+| PHPMD | PASS — [run 42702419074](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/42702419074) |
+| Populated upgrade/rollback | PASS — [run 42702419767](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/42702419767) |
 | Director Contract Lint | PASS — [run 42698440506](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/42698440506) |
-| Push on main | PASS — [run 42698440294](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/42698440294) |
+| Push on main | PASS — [run 42702420093](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/42702420093) |
 | SonarCloud | SKIPPED — not counted as a pass |
 
 ### What the score does not certify
