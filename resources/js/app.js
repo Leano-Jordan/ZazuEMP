@@ -1139,7 +1139,7 @@ function setupZazuOfflineDirectoryViews() {
         if (empty) empty.hidden = customers.length > 0;
         const count = directory.closest('main, [data-page-content]')?.querySelector('.zazu-command-meta-value');
         if (count && pendingCustomers.length) {
-            const serverCount = Number(count.dataset.serverCount ?? count.textContent.trim());
+            const serverCount = Number(count.dataset.serverCount ?? count.textContent.match(/[0-9]+/)?.[0] ?? 0);
             count.dataset.serverCount = String(Number.isFinite(serverCount) ? serverCount : 0);
             count.textContent = String(Number(count.dataset.serverCount) + pendingCustomers.length);
         }
