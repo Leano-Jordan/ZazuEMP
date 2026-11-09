@@ -1,5 +1,14 @@
 # Zazu EMP — V1 Release Gate Ledger
 
+## Director product audit — 2026-11-09
+
+Current comprehensive audit: `docs/DIRECTOR_PRODUCT_AUDIT_2026-11-09.md`.
+
+- V1 remains **NO-GO**. The last formal 60/100 baseline is historical and has not been re-scored.
+- Current app/test candidate: `285fa18aa856539b0a1bbeef563aebd7138253f6`; exact-head Laravel, Quality, PHPMD, Psalm, browser and populated upgrade/rollback workflows are pending/in progress. Do not carry forward older green results as current.
+- Current PC/phone development access uses a temporary LAN address and plain HTTP. Establish a stable private HTTPS origin before physical PWA offline acceptance; preserve/reconcile origin-scoped IndexedDB queues before migration.
+- Physical PC/mobile offline acceptance, real restore/rollback drills, trusted-device security, operational privacy/legal closure and official Zazu brand clearance remain open.
+
 **Status:** ACTIVE / CANONICAL  
 **Repository:** `Leano-Jordan/ZazuEMP`  
 **Branch:** `main`  
