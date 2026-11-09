@@ -852,3 +852,21 @@ body.zazu-dashboard-page .zazu-dash-hero-side {
         padding: 10px !important;
     }
 }
+
+
+/* Sidebar inset cards must stay dark and readable against the shared navy rail. */
+.zazu-sidebar-workspace,
+.zazu-footer-card {
+    border: 1px solid rgba(220, 231, 245, .13) !important;
+    background: #1A3658 !important;
+    box-shadow: none !important;
+}
+.zazu-sidebar-workspace-label {
+    color: #A4B5C8 !important;
+}
+.zazu-sidebar-workspace-name {
+    color: #F1F5F9 !important;
+}
+.zazu-sidebar-workspace-meta {
+    color: #AFC1D6 !important;
+}
