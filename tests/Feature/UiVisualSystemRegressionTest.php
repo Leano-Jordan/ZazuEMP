@@ -198,6 +198,12 @@ class UiVisualSystemRegressionTest extends TestCase
         $this->assertStringNotContainsString('border-right: 2px solid #B5C5D3 !important;', $dashboardCss);
         $this->assertStringNotContainsString('border-bottom-width: 2px;', $visualSweepCss);
         $this->assertStringContainsString('border-bottom-width: 1px;', $visualSweepCss);
+        $this->assertStringContainsString('.zazu-helper {', $visualSweepCss);
+        $this->assertStringContainsString('.zazu-helper.is-nav-avoiding {', $visualSweepCss);
+        $this->assertStringContainsString('right: max(12px, env(safe-area-inset-right));', $visualSweepCss);
+        $this->assertStringContainsString('bottom: max(12px, env(safe-area-inset-bottom));', $visualSweepCss);
+        $this->assertStringContainsString('z-index: 50;', $visualSweepCss);
+
 
         foreach ([
             '--zazu-tone-green: #D1F2D9;',
@@ -248,13 +254,8 @@ class UiVisualSystemRegressionTest extends TestCase
             'color: var(--zazu-sidebar-ink) !important;',
             '.zazu-btn {',
             '.zazu-btn-ghost {',
-            'body.zazu-dashboard-page .zazu-dash-resource-grid > :nth-child(4)',
+            'body.zazu-dashboard-page .zazu-dash-resource-grid > :nth-child(4n + 4)',
             'body.zazu-dashboard-page .zazu-dash-quote-stage:nth-child(3)',
-            ':root[data-theme="dark"] .zazu-dash-quote-stage:nth-child(4)',
-            'top: 50% !important;',
-            'right: max(6px, env(safe-area-inset-right)) !important;',
-            'z-index: 35 !important;',
-            'bottom: max(10px, env(safe-area-inset-bottom)) !important;',
         ] as $expected) {
             $this->assertStringContainsString($expected, $css);
         }
