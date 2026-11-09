@@ -8200,3 +8200,75 @@ body.zazu-has-wallpaper .zazu-content {
     margin: 0;
     color: inherit;
 }
+
+
+/* Navigation authority — deterministic contrast and compact geometry. */
+.zazu-nav-hierarchy {
+    gap: 5px;
+}
+
+.zazu-nav-area-trigger {
+    min-height: 40px;
+    padding: 0 12px;
+    border: 1px solid transparent;
+    border-radius: 4px;
+    background: transparent;
+    color: var(--zazu-sidebar-ink);
+}
+
+.zazu-nav-area-trigger:hover,
+.zazu-nav-area-trigger:focus-visible,
+.zazu-nav-area.is-open > .zazu-nav-area-trigger {
+    border-color: transparent;
+    background: var(--zazu-sidebar-hover);
+    color: var(--zazu-sidebar-ink);
+}
+
+.zazu-nav-area.is-active > .zazu-nav-area-trigger {
+    border-color: transparent;
+    background: color-mix(in srgb, var(--zazu-sidebar-active) 13%, var(--zazu-sidebar));
+    color: var(--zazu-sidebar-ink);
+    box-shadow: inset 3px 0 0 var(--zazu-sidebar-active);
+}
+
+.zazu-nav-link {
+    min-height: 38px;
+    margin: 1px 0;
+    padding: 0 11px;
+    border: 1px solid transparent;
+    border-radius: 4px;
+    color: var(--zazu-sidebar-muted);
+}
+
+.zazu-nav-link:hover,
+.zazu-nav-link:focus-visible {
+    border-color: transparent;
+    background: var(--zazu-sidebar-hover);
+    color: var(--zazu-sidebar-ink);
+    transform: none;
+}
+
+.zazu-nav-link.active,
+:root:not([data-theme="dark"]) .zazu-nav-link.active {
+    border-color: transparent;
+    background: var(--zazu-sidebar-surface);
+    color: var(--zazu-sidebar-ink);
+    box-shadow: inset 3px 0 0 var(--zazu-sidebar-active);
+}
+
+.zazu-nav-flyout {
+    border-radius: 4px;
+    padding: 7px;
+}
+
+.zazu-nav-flyout .zazu-nav-link {
+    min-height: 38px;
+    padding-inline: 10px;
+    border-radius: 3px;
+}
+
+.zazu-nav-link:focus-visible,
+.zazu-nav-area-trigger:focus-visible {
+    outline: 2px solid color-mix(in srgb, var(--zazu-sidebar-ink) 72%, white);
+    outline-offset: 2px;
+}
