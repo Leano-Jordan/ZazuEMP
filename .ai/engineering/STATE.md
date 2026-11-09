@@ -1192,3 +1192,7 @@ Owner expanded the visual refinement scope beyond the dashboard: apply the estab
 - Added regression assertions for list, metric, document-table and empty-state styling.
 - Commit: `3c004fc` (shared surface refinement), `6ef6bd0` (regression coverage).
 - Runtime test/build and rendered cross-module light/dark/mobile review remain outstanding.
+
+- Follow-up geometry scan found remaining pill-shaped interactive controls and repeated surfaces in workload filters and dashboard quick actions/KPIs. Their geometry now follows the shared compact 5/7px radius system; semantic status/count tags also use restrained corners. Circular progress markers and decorative dots remain circular by design.
+- Regression coverage extended for workload filters and dashboard quick-action geometry.
+- Commits: `40168a1` (compact control geometry), `f03a8b9` (regression coverage).
