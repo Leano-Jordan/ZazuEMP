@@ -596,8 +596,8 @@ body.zazu-dashboard-page .zazu-sidebar .zazu-nav-link:focus-visible,
 body.zazu-dashboard-page .zazu-sidebar .zazu-nav-area-trigger:hover,
 body.zazu-dashboard-page .zazu-sidebar .zazu-nav-area-trigger:focus-visible,
 body.zazu-dashboard-page .zazu-sidebar .zazu-nav-area.is-open > .zazu-nav-area-trigger {
-    background: #34536D !important;
-    color: #EAF2F9 !important;
+    background: #344653 !important;
+    color: #E5EBF0 !important;
     border-color: transparent !important;
 }
 
@@ -1463,3 +1463,12 @@ body.zazu-dashboard-page .zazu-dash-quote-stage > span { color: var(--zazu-tone-
 body:not(.zazu-dashboard-page) .zazu-nav-link,body:not(.zazu-dashboard-page) .zazu-nav-area-trigger,body:not(.zazu-dashboard-page) .zazu-user-trigger{color:var(--zazu-sidebar-ink)!important;}
 body:not(.zazu-dashboard-page) .zazu-nav-link:hover,body:not(.zazu-dashboard-page) .zazu-nav-link:focus-visible,body:not(.zazu-dashboard-page) .zazu-nav-area-trigger:hover,body:not(.zazu-dashboard-page) .zazu-nav-area-trigger:focus-visible{color:var(--zazu-sidebar-ink)!important;background:var(--zazu-sidebar-hover)!important;}
 body:not(.zazu-dashboard-page) .zazu-nav-link.active,body:not(.zazu-dashboard-page) .zazu-nav-area.is-active>.zazu-nav-area-trigger{color:var(--zazu-sidebar-ink)!important;background:var(--zazu-sidebar-active)!important;}
+
+/* Retire the former dark-blue dashboard hover declaration at source level. */
+body.zazu-dashboard-page .zazu-sidebar .zazu-nav-link:hover,
+body.zazu-dashboard-page .zazu-sidebar .zazu-nav-link:focus-visible,
+body.zazu-dashboard-page .zazu-sidebar .zazu-nav-area-trigger:hover,
+body.zazu-dashboard-page .zazu-sidebar .zazu-nav-area-trigger:focus-visible,
+body.zazu-dashboard-page .zazu-sidebar .zazu-nav-area.is-open > .zazu-nav-area-trigger {
+ background:#B9CCD9!important;color:#23394D!important;
+}
