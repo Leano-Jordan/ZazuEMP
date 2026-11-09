@@ -3,7 +3,7 @@
 **Date:** 2026-11-09  
 **Repository:** `Leano-Jordan/ZazuEMP`  
 **Branch:** `main`  
-**Audited source/test head:** `285fa18aa856539b0a1bbeef563aebd7138253f6`  
+**Audited source/test head:** `c1ed1a451d58fb3fe77a312ffd4fa3153d44553a`  
 **Audit type:** repository, architecture, test, workflow and release-evidence review. No live customer deployment or physical device was available to this audit.
 
 ## Executive decision
@@ -96,7 +96,7 @@ The preceding verification attempts exposed test-contract drift rather than a ne
 - At `3746d08`, the corrected suite reported **411 passed, 1 failed**. The remaining failure expected an obsolete `.zazu-ops-actions .zazu-btn` selector that is no longer present in the product-authority stylesheet. PHPMD passed; populated upgrade/rollback passed; Psalm passed; browser smoke was still running; Quality failed on the same stale UI assertion. SonarCloud was skipped.
 - The obsolete assertion was replaced with selectors that actually exist in the current shared button authority. The test method is now 90 lines. This correction is on `main` at `285fa18`.
 
-**Current exact-head status:** Laravel, PHPMD, Zazu Quality, Psalm, populated upgrade/rollback and browser smoke were queued/in progress when this audit snapshot was written. No pass is claimed until the runs complete on `285fa18`. SonarCloud remains skipped and is not counted as a pass.
+**Current exact-head status at `c1ed1a4`:** Laravel, PHPMD, Zazu Quality, Psalm, populated upgrade/rollback and push checks passed. Browser smoke ran all three viewport projects but failed the theme-token test because it still queried obsolete `--zazu-surface-canvas` and `--zazu-blue-primary` aliases rather than the current canonical `--zazu-surface` and `--zazu-primary` tokens. The test is being updated to assert the current palette and the light/dark selected-navigation and Workspace-footer contrast. SonarCloud was skipped and is not counted as a pass.
 
 ## 5. Network address decision
 
@@ -117,7 +117,7 @@ A public production hostname remains a later paid-server decision. Device-local 
 
 ## 6. Prioritised execution order
 
-1. Close exact-head CI on `285fa18`; repair only confirmed remaining failures.
+1. Close exact-head browser CI after updating the stale theme-token assertions; repair only confirmed remaining failures.
 2. Establish a stable private HTTPS development origin for PC/mobile testing; migrate deliberately because browser storage is origin-scoped. Preserve and reconcile pending local queues before changing origins.
 3. Audit and implement the declared PC offline workflows.
 4. Audit and implement the declared mobile offline workflows, including attachment persistence.

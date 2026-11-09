@@ -1298,3 +1298,11 @@ Owner expanded the visual refinement scope beyond the dashboard: apply the estab
   - `285fa18`: obsolete selector assertions corrected; exact-head Laravel, Quality, PHPMD, Psalm, browser and populated upgrade/rollback workflows are now running. No current-head pass is claimed yet.
 - Found branch-policy drift: `director/v1-sync-ci-repairs` is 124 commits behind main and 0 commits ahead. No unique work needs porting. Available GitHub tools do not expose branch deletion; do not create another branch or force-update it to work around this.
 - Next active target: exact-head CI closure, then establish the private HTTPS development origin, then PC/mobile offline parity and physical acceptance. Do not expand features.
+
+
+## Browser theme regression correction — 2026-11-09
+
+- Exact-head `c1ed1a4` passed Laravel, Zazu Quality, PHPMD, Psalm, populated upgrade/rollback and push checks.
+- Browser smoke completed but failed its theme-token assertion on all three viewports because it still queried removed legacy variables `--zazu-surface-canvas` and `--zazu-blue-primary`. The current product-authority tokens are `--zazu-surface` and `--zazu-primary`.
+- Replaced the stale browser assertion with the current light/dark tokens and explicit contrast checks for selected navigation and the Workspace footer. Browser rerun pending.
+- Offline review continues next: the service-worker HTML cache is user-scoped but not business-scoped; this is a confirmed cross-business stale-page risk and is the first offline boundary fix.

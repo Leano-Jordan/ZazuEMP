@@ -21,7 +21,7 @@ async function expectNoViewportOverflow(page) {
 }
 
 test.describe('Zazu UI theme and navigation', () => {
-    test('asserts coastal-blue tokens in light and dark mode', async ({ browser }) => {
+    test('asserts current theme tokens and readable navigation in light and dark mode', async ({ browser }) => {
         const context = await browser.newContext();
         const page = await context.newPage();
 
@@ -31,14 +31,27 @@ test.describe('Zazu UI theme and navigation', () => {
 
         const lightTokens = await page.evaluate(() => {
             const styles = getComputedStyle(document.documentElement);
+            const active = document.querySelector('.zazu-sidebar .zazu-nav-link.active');
+            const workspace = document.querySelector('.zazu-sidebar .zazu-footer-workspace');
+            const workspaceLabel = document.querySelector('.zazu-sidebar .zazu-footer-workspace-label');
             return {
-                canvas: styles.getPropertyValue('--zazu-surface-canvas').trim(),
-                blue: styles.getPropertyValue('--zazu-blue-primary').trim(),
+                surface: styles.getPropertyValue('--zazu-surface').trim(),
+                primary: styles.getPropertyValue('--zazu-primary').trim(),
+                activeBackground: active ? getComputedStyle(active).backgroundColor : '',
+                activeColor: active ? getComputedStyle(active).color : '',
+                workspaceBackground: workspace ? getComputedStyle(workspace).backgroundColor : '',
+                workspaceColor: workspace ? getComputedStyle(workspace).color : '',
+                workspaceLabelColor: workspaceLabel ? getComputedStyle(workspaceLabel).color : '',
             };
         });
 
-        expect(lightTokens.canvas.toLowerCase()).toBe('#f5fbfe');
-        expect(lightTokens.blue.toLowerCase()).toBe('#159dd2');
+        expect(lightTokens.surface.toLowerCase()).toBe('#ffffff');
+        expect(lightTokens.primary.toLowerCase()).toBe('#426987');
+        expect(lightTokens.activeBackground).toBe('rgb(180, 200, 215)');
+        expect(lightTokens.activeColor).toBe('rgb(35, 57, 77)');
+        expect(lightTokens.workspaceBackground).toBe('rgb(231, 238, 243)');
+        expect(lightTokens.workspaceColor).toBe('rgb(35, 57, 77)');
+        expect(lightTokens.workspaceLabelColor).toBe('rgb(83, 107, 127)');
 
         const toggle = page.locator('[data-theme-toggle]').first();
         await expect(toggle).toBeVisible();
@@ -46,15 +59,28 @@ test.describe('Zazu UI theme and navigation', () => {
 
         const darkTokens = await page.evaluate(() => {
             const styles = getComputedStyle(document.documentElement);
+            const active = document.querySelector('.zazu-sidebar .zazu-nav-link.active');
+            const workspace = document.querySelector('.zazu-sidebar .zazu-footer-workspace');
+            const workspaceLabel = document.querySelector('.zazu-sidebar .zazu-footer-workspace-label');
             return {
-                canvas: styles.getPropertyValue('--zazu-surface-canvas').trim(),
-                blue: styles.getPropertyValue('--zazu-blue-primary').trim(),
+                surface: styles.getPropertyValue('--zazu-surface').trim(),
+                primary: styles.getPropertyValue('--zazu-primary').trim(),
+                activeBackground: active ? getComputedStyle(active).backgroundColor : '',
+                activeColor: active ? getComputedStyle(active).color : '',
+                workspaceBackground: workspace ? getComputedStyle(workspace).backgroundColor : '',
+                workspaceColor: workspace ? getComputedStyle(workspace).color : '',
+                workspaceLabelColor: workspaceLabel ? getComputedStyle(workspaceLabel).color : '',
                 theme: document.documentElement.dataset.theme,
             };
         });
 
-        expect(darkTokens.canvas.toLowerCase()).toBe('#081f2f');
-        expect(darkTokens.blue.toLowerCase()).toBe('#6fa4ff');
+        expect(darkTokens.surface.toLowerCase()).toBe('#122235');
+        expect(darkTokens.primary.toLowerCase()).toBe('#78a9e8');
+        expect(darkTokens.activeBackground).toBe('rgb(72, 97, 116)');
+        expect(darkTokens.activeColor).toBe('rgb(243, 246, 248)');
+        expect(darkTokens.workspaceBackground).toBe('rgb(41, 57, 69)');
+        expect(darkTokens.workspaceColor).toBe('rgb(229, 235, 240)');
+        expect(darkTokens.workspaceLabelColor).toBe('rgb(184, 199, 210)');
         expect(darkTokens.theme).toBe('dark');
 
         await context.close();
