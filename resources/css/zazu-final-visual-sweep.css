@@ -3658,7 +3658,7 @@ background:var(--zazu-primary-soft);color:var(--zazu-primary)
 }
 
 .zazu-disclosure-body {
-padding:0 16px 16px;border-top:1px solid var(--zazu-card-border)
+padding:12px 16px 16px;border-top:1px solid var(--zazu-card-border)
 }
 
 .zazu-fieldset {
@@ -3725,7 +3725,7 @@ padding:12px 13px
 }
 
 .zazu-disclosure-body {
-padding:0 13px 13px
+padding:10px 13px 13px
 }
 
 .zazu-niche-card {
