@@ -1,11 +1,27 @@
 # Zazu EMP — V1 Software / Commercial Status
 
-**Assessment date:** 2026-11-08  
+**Assessment date:** 2026-11-09  
 **Repository:** `Leano-Jordan/ZazuEMP`  
 **Canonical branch:** `main`  
-**Verified application/test source commit:** `d44ec33a57a4958380f2cfe4624f040859cbcf7a`.
+**Verified application/test source commit:** `69040420caa49bf9c514699c97fb8f8c5148d03b`.
 
 ## Current position
+
+## Latest Director scorecard — 2026-11-09
+
+**V1 evidence-maturity score: 68/100 (3.38/5), up from 60/100.**  
+**Verified application/test source:** `69040420caa49bf9c514699c97fb8f8c5148d03b`.
+
+- Laravel: 412 passed / 2,904 assertions.
+- Browser smoke: 65 passed / 22 skipped / 0 failed or flaky.
+- Zazu Quality + secret scan, Psalm, PHPMD, populated upgrade/rollback, Director Contract Lint and push-on-main: all passed.
+- SonarCloud: skipped, not a pass.
+
+The uplift covers platform/onboarding, core lifecycle, security/tenant controls and active Work attachments. It does not change the release decision.
+
+**Release position: NO-GO.** Remaining gates: secure-origin installed-device offline acceptance, representative populated database/private-media restore, real deployment rollback, trusted-device acceptance, operational privacy/legal closure and official brand clearance. LAN launcher implementation is committed but has not yet been verified on the owner's PC.
+
+See `docs/ZAZU_V1_SCORECARD_2026-11-04.md` for the full 13-domain scorecard and `docs/V1_RELEASE_CHECKLIST.md` for exact CI run links.
 
 Zazu EMP has a substantial connected operational foundation across authentication/business context, customers and jobs, requirements/services, quotes and revisions, preparation, purchasing, inventory/assets, costs, finance, reporting, search, attachments and responsive UI.
 
