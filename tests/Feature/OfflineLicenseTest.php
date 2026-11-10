@@ -122,7 +122,7 @@ class OfflineLicenseTest extends TestCase
     {
         $owner = $this->signInAsOwner();
         $business = $owner->businesses()->firstOrFail();
-        $staff = \\App\\Models\\User::factory()->create();
+        $staff = \App\Models\User::factory()->create();
         $business->users()->attach($staff->id, ['role' => 'staff']);
 
         $this->actingAs($staff)
