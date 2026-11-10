@@ -243,6 +243,9 @@ class PwaOfflineFoundationTest extends TestCase
         $this->assertStringContainsString('async function loadAttachments(eventId, localEventId = null)', $client);
         $this->assertStringContainsString('async function getAttachmentFile(idempotencyKey)', $client);
         $this->assertStringContainsString('await syncAttachments();', $client);
+        $this->assertStringContainsString('confirmedEventId !== Number(record.event_id)', $client);
+        $this->assertStringContainsString('confirmedKey !== record.idempotency_key', $client);
+        $this->assertStringContainsString('attachmentEventId !== targetEventId', $client);
         $this->assertStringContainsString("'/api/sync/attachments'", $client);
 
         $attachmentView = File::get(resource_path('views/work/attachments.blade.php'));
