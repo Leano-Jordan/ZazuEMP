@@ -6,6 +6,8 @@ use App\Models\Business;
 use App\Models\SyncDevice;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Str;
 use Tests\TestCase;
 
@@ -184,4 +186,54 @@ class SyncDeviceManagementTest extends TestCase
         $this->assertSame('active', $foreignDevice->fresh()->status);
         $this->assertArrayHasKey('sync_token_hash', $foreignDevice->fresh()->metadata ?? []);
     }
+    public function test_sync_request_is_rejected_when_device_is_revoked_after_lookup_but_before_activity_refresh(): void
+    {
+        $business = Business::create([
+            'name' => 'Concurrent Revocation Business',
+            'slug' => 'concurrent-revoke-'.Str::lower(Str::random(8)),
+            'status' => 'active',
+            'currency' => 'ZAR',
+        ]);
+        $token = Str::random(64);
+        $device = SyncDevice::create([
+            'business_id' => $business->id,
+            'installation_id' => (string) Str::uuid(),
+            'status' => 'active',
+            'token_expires_at' => now()->addDays(SyncDevice::SYNC_TOKEN_IDLE_EXPIRY_DAYS),
+            'metadata' => ['sync_token_hash' => hash('sha256', $token)],
+        ]);
+
+        $revokedDuringLookup = false;
+        $retrievedEvent = 'eloquent.retrieved: '.SyncDevice::class;
+        Event::listen(
+            $retrievedEvent,
+            function (SyncDevice $retrieved) use ($device, &$revokedDuringLookup): void {
+                if ($retrieved->id !== $device->id || $revokedDuringLookup) {
+                    return;
+                }
+
+                DB::table('sync_devices')
+                    ->where('id', $device->id)
+                    ->update([
+                        'status' => 'revoked',
+                        'revoked_at' => now(),
+                        'token_expires_at' => null,
+                    ]);
+                $revokedDuringLookup = true;
+            },
+        );
+
+        try {
+            $this->withToken($token)
+                ->getJson('/api/sync/attachments')
+                ->assertUnauthorized();
+        } finally {
+            Event::forget($retrievedEvent);
+        }
+
+        $this->assertTrue($revokedDuringLookup);
+        $this->assertSame('revoked', $device->fresh()->status);
+        $this->assertNull($device->fresh()->token_expires_at);
+    }
+
 }
