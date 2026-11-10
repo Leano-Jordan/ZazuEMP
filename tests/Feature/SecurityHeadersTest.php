@@ -23,7 +23,29 @@ class SecurityHeadersTest extends TestCase
         $this->assertStringContainsString("'nonce-{$firstNonce}'", $firstCsp);
         $this->assertStringContainsString("'nonce-{$secondNonce}'", $secondCsp);
         $this->assertStringNotContainsString("script-src 'self' 'unsafe-inline'", $firstCsp);
+        $this->assertStringContainsString("style-src-elem 'self' 'nonce-{$firstNonce}'", $firstCsp);
+        $this->assertStringContainsString("style-src-attr 'unsafe-inline'", $firstCsp);
         $this->assertStringContainsString("style-src 'self' 'unsafe-inline'", $firstCsp);
+    }
+
+    public function test_inline_style_elements_are_nonce_authorized_in_all_standalone_blade_views(): void
+    {
+        $views = [
+            'errors/layout.blade.php',
+            'landing.blade.php',
+            'purchasing/create.blade.php',
+        ];
+
+        foreach ($views as $view) {
+            $source = file_get_contents(resource_path('views/'.$view));
+
+            $this->assertIsString($source);
+            $this->assertStringContainsString(
+                '<style nonce="{{ request()->attributes->get(\'cspNonce\') }}">',
+                $source,
+                "Inline style block in {$view} must use the response CSP nonce.",
+            );
+        }
     }
 
     public function test_secure_production_responses_include_hsts(): void
