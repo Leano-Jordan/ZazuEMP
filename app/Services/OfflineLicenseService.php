@@ -92,6 +92,7 @@ class OfflineLicenseService
 
         try {
             $startsAt = \Illuminate\Support\Carbon::parse($payload['starts_at']);
+            $issuedAt = \Illuminate\Support\Carbon::parse($payload['issued_at']);
             $expiresAt = $payload['expires_at'] === null
                 ? null
                 : \Illuminate\Support\Carbon::parse($payload['expires_at']);
