@@ -516,3 +516,97 @@ test('operator creates an offline Work job, attaches a file from its directory r
     }, uploaded.key);
     expect(finalRecord).toEqual({ status: 'synced', name: 'operator-job-brief.txt' });
 });
+
+test('late attachment upload response cannot recreate local files after logout', async ({ page }, testInfo) => {
+    test.setTimeout(45_000);
+    test.skip(testInfo.project.name !== 'chromium', 'Attachment/logout race runs once in Chromium.');
+
+    await login(page);
+    await page.goto('/work', { waitUntil: 'domcontentloaded' });
+
+    const jobRow = page.locator('[data-zazu-job-row]').filter({ hasText: 'Mokoena Family Celebration' }).first();
+    await expect(jobRow).toBeVisible();
+    await jobRow.locator('[data-zazu-inspector-open]').first().click();
+    await page.getByRole('tab', { name: 'Financial Ledger' }).click();
+    await expect(page.locator('[data-zazu-tab-panel="finance"]')).toBeVisible();
+    await page.getByRole('link', { name: 'Open job record' }).click();
+    const eventId = Number(await page.locator('[data-zazu-offline-attachment-form]').getAttribute('data-zazu-event-id'));
+    expect(eventId).toBeGreaterThan(0);
+
+    const deviceToken = 'attachment-logout-race-token';
+    await page.evaluate(async token => {
+        await window.ZazuOffline.ready;
+        const state = window.ZazuOffline.getState();
+        state.sync = { token, device: { id: 987657, business_id: Number(document.body.dataset.zazuBusinessId) } };
+        await window.ZazuOffline.persist();
+    }, deviceToken);
+
+    let releaseUpload;
+    const uploadGate = new Promise(resolve => { releaseUpload = resolve; });
+    let uploadStarted;
+    const started = new Promise(resolve => { uploadStarted = resolve; });
+
+    await page.route('**/api/sync/attachments**', async route => {
+        const request = route.request();
+        const url = new URL(request.url());
+        if (url.pathname === '/api/sync/attachments' && request.method() === 'POST') {
+            const body = request.postData() || '';
+            const key = body.match(/name="idempotency_key"\\r\\n\\r\\n([^\\r\\n]+)/)?.[1] || null;
+            expect(key).toBeTruthy();
+            uploadStarted();
+            await uploadGate;
+            await route.fulfill({
+                status: 201,
+                contentType: 'application/json',
+                body: JSON.stringify({
+                    attachment: {
+                        id: 9901,
+                        event_id: eventId,
+                        idempotency_key: key,
+                        original_name: 'late-upload.txt',
+                        mime_type: 'text/plain',
+                        size: Buffer.byteLength('late response'),
+                        created_at: new Date().toISOString(),
+                    },
+                }),
+            });
+            return;
+        }
+        if (url.pathname === '/api/sync/attachments' && request.method() === 'GET') {
+            await route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify({ attachments: [] }) });
+            return;
+        }
+        await route.fulfill({ status: 404, contentType: 'application/json', body: JSON.stringify({ message: 'Unexpected attachment request' }) });
+    });
+
+    await page.route('**/api/sync/revoke', async route => {
+        await route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify({ revoked: true }) });
+    });
+
+    await page.evaluate(async id => {
+        await window.ZazuOffline.queueAttachment(
+            id,
+            new File(['late response'], 'late-upload.txt', { type: 'text/plain' })
+        );
+    }, eventId);
+    await started;
+
+    await page.evaluate(() => window.ZazuOffline.clearLocalSession());
+    releaseUpload();
+
+    await expect.poll(async () => page.evaluate(async () => {
+        const businessId = Number(document.body.dataset.zazuBusinessId);
+        const database = await new Promise((resolve, reject) => {
+            const request = indexedDB.open('zazu-phone-attachments-business-' + businessId);
+            request.onsuccess = () => resolve(request.result);
+            request.onerror = () => reject(request.error || new Error('Could not inspect attachment storage.'));
+        });
+        const records = await new Promise((resolve, reject) => {
+            const request = database.transaction('files', 'readonly').objectStore('files').getAll();
+            request.onsuccess = () => resolve(request.result || []);
+            request.onerror = () => reject(request.error || new Error('Could not read attachment storage.'));
+        });
+        database.close();
+        return records.length;
+    })).toBe(0);
+});
