@@ -194,6 +194,16 @@
         return response;
     }
 
+    async function recordSyncAuthorizationFailure(response) {
+        if (![401, 403].includes(response?.status) || sessionCleared || !state?.sync?.token) return;
+        state.last_sync_error = 'This device is no longer authorised to sync. Your saved offline changes remain on this device. Ask the business owner to pair the device again.';
+        try {
+            await writeState();
+        } finally {
+            window.dispatchEvent(new CustomEvent('zazu:offline-state-updated'));
+        }
+    }
+
     function applyBootstrap(bootstrap) {
         if (!bootstrap) return;
 
@@ -580,6 +590,7 @@
                 }
 
                 if (!response.ok) {
+                    await recordSyncAuthorizationFailure(response);
                     const result = await response.json().catch(() => ({}));
                     await writeAttachmentRecord({
                         ...record,
@@ -1000,7 +1011,10 @@
             }),
         });
 
-        if (!response.ok) return;
+        if (!response.ok) {
+            await recordSyncAuthorizationFailure(response);
+            return;
+        }
 
         const result = await response.json();
         if (sessionCleared || !state?.sync?.token) return;
@@ -1180,7 +1194,11 @@
         for (let batch = 0; batch < 20; batch++) {
             if (sessionCleared || !state?.sync?.token) return;
             const response = await api('/api/sync/pull?stream=business&limit=100');
-            if (!response.ok || sessionCleared || !state?.sync?.token) return;
+            if (!response.ok) {
+                await recordSyncAuthorizationFailure(response);
+                return;
+            }
+            if (sessionCleared || !state?.sync?.token) return;
 
             const result = await response.json();
             if (sessionCleared || !state?.sync?.token) return;
@@ -1239,7 +1257,11 @@
     async function refreshBootstrap() {
         if (sessionCleared || !navigator.onLine || !state?.sync?.token || state.local_dirty) return;
         const response = await api('/api/sync/bootstrap');
-        if (!response.ok || sessionCleared || !state?.sync?.token) return;
+        if (!response.ok) {
+            await recordSyncAuthorizationFailure(response);
+            return;
+        }
+        if (sessionCleared || !state?.sync?.token) return;
         const bootstrap = await response.json();
         if (sessionCleared || !state?.sync?.token) return;
         const expectedToken = state.sync.token;
