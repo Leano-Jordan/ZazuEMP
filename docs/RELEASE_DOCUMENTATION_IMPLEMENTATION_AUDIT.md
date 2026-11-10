@@ -84,3 +84,40 @@ Previous audit correctly identified normal customer creation as implemented but 
 
 **Corrective status:** the new-job flow now provides an inline/secondary customer creation dialog. The existing job form remains authoritative; the new customer is returned into the existing selector and selected automatically.
 
+
+
+## Director commercial/legal refresh — 2026-11-10
+
+### Owner-confirmed commercial baseline
+
+The owner confirmed solo operation by Isaac Junior Lehlogonolo Maluleka, target pricing of R99 per business/workspace/month, a proposed 14-day advanced-feature trial, downgrade to Basic after expiry without account lockout or automatic data deletion, and intended hosted plus local/offline deployments. Customer content remains customer-owned. The owner handles support, privacy requests and incidents initially.
+
+The owner supplied direct contact details and a residential street address. Those values are intentionally not copied into this public repository. Final public documents must use only contact fields and a service address expressly approved for publication.
+
+### Documentation changes
+
+- Added ZAZU_COMMERCIAL_OPERATING_PROFILE.md to record the operating model, pricing baseline, privacy role allocation, hosting shortlist and unresolved launch decisions.
+- Updated customer terms to describe the R99 target, proposed 14-day trial, Basic downgrade, no lockout, customer content ownership, hosted/local privacy boundaries and support limitations.
+- Updated privacy notice draft to distinguish hosted operator processing from local customer-controlled deployments.
+- Replaced blank retention placeholders with a provisional schedule separating tax and company statutory recordkeeping from ordinary personal-information retention.
+- Updated release documentation index and Director state/readiness records.
+
+### Hosting recommendation
+
+xneelo Cloud in Johannesburg is the current low-cost hosted-pilot shortlist. Published indicative pricing for 2 vCPU / 4 GB RAM, a 10 GB premium boot volume and 50 GB premium NVMe data volume totals approximately R306/month. It is self-managed and currently offers one Johannesburg availability zone. It is not yet procured, and it does not by itself provide an offsite backup strategy or high availability. Confirm live pricing, terms, processing locations and backup arrangements before production use.
+
+### Retention interpretation
+
+SARS guidance describes a common five-year tax-record period with exceptions. Companies Act section 24 generally requires seven-year retention for company records covered by that section. Neither period should be applied indiscriminately to all customer personal information. Proposed operational defaults (30-day export window, deletion/de-identification within 90 days after closure where lawful, 24-month support/security logs and 30-day rolling backups) require legal/accounting approval and actual technical enforcement.
+
+### Open release gates
+
+- Approve 14-day trial and final Basic/Advanced feature matrix.
+- Confirm VAT treatment, payment channel, storage quota and fair-use limits.
+- Approve public service address and final public contact fields.
+- Procure and configure hosted infrastructure and independent encrypted offsite backups.
+- Complete actual sub-operator inventory and written agreements where applicable.
+- Implement/test export, account closure, retention and disposal workflows.
+- Complete legal review and final trademark clearance.
+
+**Disposition:** Documentation design has advanced; legal/commercial release clearance remains OPEN. V1 remains **NO-GO**.
