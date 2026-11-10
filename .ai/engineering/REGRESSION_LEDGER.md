@@ -169,7 +169,7 @@ The 2026-10-05 UI recovery exposed a cluster of regressions caused by later CSS/
 - The light application palette remains blue-slate and must not drift back to white/near-white as the default shell direction.
 - The canonical card/panel primitive owns the restrained 10px/110% glass treatment; later visual sweeps must not remove or duplicate that authority.
 - Global desktop search is bounded utility chrome and must not expand the application shell. Mobile search stays a full-width utility row.
-- The Zazu Helper remains the established mascot size. It yields specifically to Work and Sales navigation popovers by moving to the right edge of the active popover; generic collision engines must not be reintroduced.
+- The Zazu Helper remains the established compact mascot size and stays docked to the far-right viewport safe area on desktop, tablet and mobile. It must not follow or move beside Work/Sales navigation popovers. When the mobile drawer is open, it remains non-interactive and slides outside the viewport until the drawer closes; do not reintroduce popover-positioning or generic collision engines.
 - Customer quick-create must expose a permissioned path to the full customer editor after creation.
 - Customer forms present identity and primary contact information before business, billing and tax details.
 - Native customer dialogs must have an explicit viewport-centering contract.
