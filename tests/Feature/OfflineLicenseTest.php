@@ -145,12 +145,12 @@ class OfflineLicenseTest extends TestCase
         $user = $this->signInAsOwner();
         $business = $user->businesses()->firstOrFail();
         $service = app(OfflineLicenseService::class);
-        $newer = $service->importSignedLicense(
+        $service->importSignedLicense(
             $business,
             $this->signedToken($business, ['issued_at' => '2026-10-10T00:00:00+00:00']),
         );
 
-        $this->expectException(\\InvalidArgumentException::class);
+        $this->expectException(\InvalidArgumentException::class);
         $this->expectExceptionMessage('This licence is older than the entitlement already installed.');
 
         $service->importSignedLicense(
