@@ -1646,3 +1646,16 @@ Source review found that authenticated sync pull/acknowledgement accepted arbitr
 - The available commit-workflow lookup only returns pull-request runs, and no workflow-dispatch action is exposed by the connected GitHub integration. Use the push-triggered Actions run and exact commit status as the acceptance evidence.
 - Runtime PHPUnit/Playwright execution remains **UNVERIFIED** until the new exact-head GitHub Actions run completes. No readiness uplift. V1 remains **NO-GO**.
 
+
+
+## Sync delivery and offline acceptance — verified 2026-11-10
+
+- Verified source head: `31fd732952a36ae99638ec8975706e95aa180c99` on `main`.
+- The sync delivery hardening introduced earlier in this cycle is now covered by the passing full Laravel feature suite: unsupported producer streams are rejected before mutation/sequence allocation; revoked destinations are rechecked under lock before delivery publication; acknowledgements cannot advance across non-pending deliveries.
+- Exact-head Laravel Actions run `42824939605`: Laravel suite passed **438 tests / 3,046 assertions**. Dedicated `offline-browser-acceptance` job `129859701759` passed **18 Chromium tests in 56.5 seconds**.
+- The run also passed PHPMD (`42824939822`), Zazu quality including secret scan (`42824939746`), Psalm security analysis (`42824939755`), and populated upgrade/rollback (`42824939920`).
+- E2E harness corrections only: the offline job now uses `CACHE_STORE=array` to isolate rate-limit state between test requests (matching the existing browser-smoke workflow; production login throttling is unchanged); the re-pair assertion matches the existing recovery message; the conflict-persistence fixture reads its business ID inside browser context and passes that value into the Node-side route handler.
+- Reconciliation: source/test changes re-fetched from current `main`; the three sync regressions are included in the passing Laravel suite; the dedicated true-offline and recovery browser suite passed on exact source head. No application feature scope was added.
+- Separate general browser-smoke run `42824939664` was still executing when this record was written; it is not substituted for the dedicated offline acceptance result.
+- Readiness score unchanged. **V1 remains NO-GO**: the automated offline acceptance gate is now passed, but the real operator backup/restore drill and physical installed-device/business recovery acceptance remain open.
+
