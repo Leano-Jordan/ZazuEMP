@@ -8239,3 +8239,8 @@ body.zazu-has-wallpaper .zazu-content {
 
 /* DIRECTOR — solid UI surfaces; retain wallpaper assets, not gradient overlays. */
 .zazu-skeleton{background:var(--zazu-surface-3)!important;animation:none!important;background-size:auto!important;}
+
+
+.zazu-auth-inline-form {
+    display: inline;
+}
