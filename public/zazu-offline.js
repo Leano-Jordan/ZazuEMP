@@ -404,14 +404,16 @@
         }
     }
 
-    async function queueAttachments(eventId, files, description = '') {
+    async function queueAttachments(eventId, files, description = '', localEventId = null) {
         await ready;
         if (sessionCleared) throw new Error('The local device session has ended. Reload Zazu before saving attachments.');
         if (ACTIVE_BUSINESS_ID < 1) throw new Error('Choose a business workspace before saving attachments.');
 
         const targetEventId = Number(eventId);
-        if (!Number.isSafeInteger(targetEventId) || targetEventId < 1) {
-            throw new Error('This job does not have a server identity yet. Reconnect and open the saved job before attaching files.');
+        const targetLocalEventId = String(localEventId || '').trim();
+        const hasServerIdentity = Number.isSafeInteger(targetEventId) && targetEventId > 0;
+        if (!hasServerIdentity && !/^[a-zA-Z0-9_-]{1,120}$/.test(targetLocalEventId)) {
+            throw new Error('Choose a saved local job before attaching files.');
         }
 
         const selectedFiles = Array.from(files || []);
@@ -435,7 +437,8 @@
 
         const records = selectedFiles.map(file => ({
             business_id: ACTIVE_BUSINESS_ID,
-            event_id: targetEventId,
+            event_id: hasServerIdentity ? targetEventId : null,
+            ...(hasServerIdentity ? {} : { event_local_id: targetLocalEventId }),
             idempotency_key: crypto.randomUUID(),
             original_name: file.name,
             mime_type: file.type || 'application/octet-stream',
@@ -463,7 +466,7 @@
         }
 
         window.dispatchEvent(new CustomEvent('zazu:offline-attachments-updated', {
-            detail: { event_id: targetEventId },
+            detail: { event_id: hasServerIdentity ? targetEventId : null, event_local_id: targetLocalEventId || null },
         }));
 
         if (navigator.onLine && state?.sync?.token) {
@@ -617,12 +620,14 @@
         return { uploaded, pending: await countPendingAttachments() };
     }
 
-    async function loadAttachments(eventId) {
+    async function loadAttachments(eventId, localEventId = null) {
         await ready;
         const targetEventId = Number(eventId);
-        if (!Number.isSafeInteger(targetEventId) || targetEventId < 1) return [];
+        const targetLocalEventId = String(localEventId || '').trim();
+        const hasServerIdentity = Number.isSafeInteger(targetEventId) && targetEventId > 0;
+        if (!hasServerIdentity && !/^[a-zA-Z0-9_-]{1,120}$/.test(targetLocalEventId)) return [];
 
-        if (navigator.onLine && state?.sync?.token && !sessionCleared) {
+        if (hasServerIdentity && navigator.onLine && state?.sync?.token && !sessionCleared) {
             try {
                 await syncAttachments();
                 const response = await api('/api/sync/attachments?event_id=' + encodeURIComponent(targetEventId));
@@ -679,7 +684,9 @@
 
         return (await readAttachmentRecords()).filter(record =>
             Number(record.business_id) === ACTIVE_BUSINESS_ID
-            && Number(record.event_id) === targetEventId
+            && (hasServerIdentity
+                ? Number(record.event_id) === targetEventId
+                : String(record.event_local_id || '') === targetLocalEventId)
         ).sort((a, b) => String(a.created_at || '').localeCompare(String(b.created_at || '')));
     }
 
