@@ -300,6 +300,59 @@
         </aside>
     </form>
 
+    @php($license = $business->license)
+
+    <section class="zazu-context-card mt-4" aria-labelledby="zazu-license-title">
+        <div class="zazu-context-title" id="zazu-license-title">Zazu licence</div>
+        <p class="zazu-context-copy mt-1">Install a signed licence issued for this business. Verification happens locally; activation and renewal do not require an internet connection. Never share your licence token with anyone who is not authorised to manage this business.</p>
+
+        @if ($license)
+            <div class="zazu-list-item mt-4">
+                <div class="min-w-0 flex-1">
+                    <strong class="block">{{ strtoupper($license->plan) }} plan · {{ $license->isActive() ? 'Active' : ucfirst($license->status) }}</strong>
+                    <p class="zazu-context-copy mt-1">
+                        @if ($license->starts_at)
+                            Starts {{ $license->starts_at->format('d M Y') }}
+                        @endif
+                        @if ($license->expires_at)
+                            · Expires {{ $license->expires_at->format('d M Y H:i') }}
+                        @else
+                            · No expiry date
+                        @endif
+                    </p>
+                    <p class="zazu-field-help mt-1">Licence reference: {{ $license->license_id }}</p>
+                </div>
+            </div>
+        @else
+            <p class="zazu-field-help mt-3">No signed licence is installed for this business.</p>
+        @endif
+
+        <form method="POST" action="{{ route('settings.license.store') }}" class="mt-4">
+            @csrf
+            <label class="zazu-field">
+                <span class="zazu-label">Signed licence token</span>
+                <textarea
+                    name="license_token"
+                    class="zazu-textarea w-full"
+                    rows="4"
+                    maxlength="16384"
+                    autocomplete="off"
+                    autocapitalize="off"
+                    spellcheck="false"
+                    placeholder="Paste the signed licence supplied by Rosscore"
+                    required
+                ></textarea>
+                @error('license_token')
+                    <span class="zazu-field-error">{{ $message }}</span>
+                @enderror
+            </label>
+            <div class="flex flex-wrap items-center gap-3 mt-3">
+                <button type="submit" class="zazu-btn zazu-btn-secondary">Verify & install licence</button>
+                <span class="zazu-field-help">A renewal replaces the current licence only after signature, business and issue-date checks pass.</span>
+            </div>
+        </form>
+    </section>
+
     <section class="zazu-context-card mt-4" data-zazu-phone-sync>
         <div class="zazu-context-title">Phone sync</div>
         <div class="zazu-context-copy">Pair a trusted Zazu phone. The initial offline working set includes up to 25 recent customers, Work records, quotes and preparation records, plus the business catalogue, suppliers, purchasing, inventory, assets, costs, invoices and expenses. Business data is stored on the paired device.</div>
