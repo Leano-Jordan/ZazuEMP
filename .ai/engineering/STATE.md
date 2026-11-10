@@ -1631,3 +1631,18 @@ Source review found that authenticated sync pull/acknowledgement accepted arbitr
 - Commits: `4f4f9f6` protocol guard; `a281567` regression test.
 
 **Verification:** source re-fetched and structurally checked. PHPUnit and GitHub Actions execution remain **UNVERIFIED**. No readiness uplift; V1 remains NO-GO.
+
+
+## Sync delivery and recovery hardening — 2026-11-10
+
+- Repository: `Leano-Jordan/ZazuEMP`, canonical branch `main`.
+- Source/test change series: `9334fc3` (producer/publisher stream enforcement, locked active-device recheck), `2670fee` (acknowledgement pending-state guard), `d138701` (three focused regressions).
+- Mutation recording and publishing now reject any stream outside `SyncMutationProtocol::SUPPORTED_STREAMS`; unsupported streams cannot allocate mutation or sequence-counter rows and cannot be published.
+- Delivery publication re-checks business ownership and active/revoked state in the same locked query used before assigning a destination sequence. This closes the stale-active-snapshot race when a device is revoked during publication.
+- Acknowledgement now selects only pending deliveries in its requested contiguous range. The cursor and delivery-state update remain within one transaction; an invalid range rolls back without creating or advancing a cursor.
+- Added focused regression source for unsupported producer streams, revocation between destination selection and locked re-check, and acknowledgement across a non-pending delivery.
+- Re-fetched source and test files after the writes; the expected guards and regression methods are present.
+- The Laravel workflow is push-triggered on `main`, includes `workflow_dispatch`, and has a dedicated Chromium job for `e2e/pwa-offline.spec.js`. The current-head run has not yet been observed; source presence is not runtime proof.
+- The available commit-workflow lookup only returns pull-request runs, and no workflow-dispatch action is exposed by the connected GitHub integration. Use the push-triggered Actions run and exact commit status as the acceptance evidence.
+- Runtime PHPUnit/Playwright execution remains **UNVERIFIED** until the new exact-head GitHub Actions run completes. No readiness uplift. V1 remains **NO-GO**.
+
