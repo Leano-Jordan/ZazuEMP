@@ -5,6 +5,7 @@ namespace App\Services;
 use App\Models\Business;
 use App\Models\BusinessLicense;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\DB;
 
 class OfflineLicenseService
 {
@@ -72,7 +73,7 @@ class OfflineLicenseService
 
         $existingIssuedAt = $existing->metadata['issued_at'] ?? null;
         if (! is_string($existingIssuedAt)) {
-            throw new \\InvalidArgumentException('The installed signed licence metadata is incomplete; a newer licence cannot safely replace it.');
+            throw new \InvalidArgumentException('The installed signed licence metadata is incomplete; a newer licence cannot safely replace it.');
         }
 
         $installedAt = Carbon::parse($existingIssuedAt);
