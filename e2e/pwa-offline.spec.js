@@ -1095,7 +1095,7 @@ test.describe('Zazu installed PWA offline shell', () => {
         }));
 
         expect(outcome.error).toContain('no longer authorised to sync');
-        expect(outcome.error).toContain('re-pair');
+        expect(outcome.error).toContain('pair the device again');
         expect(outcome.recoveryRequired).toBe(true);
         expect(outcome.pending).toContain(mutationId);
         expect(outcome.tokenPresent).toBe(true);
