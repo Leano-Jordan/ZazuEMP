@@ -1719,3 +1719,9 @@ Source review found that authenticated sync pull/acknowledgement accepted arbitr
 - Added a Chromium regression that delays an old-token push, re-pairs, then verifies queued work is retried using the new token and is drained.
 - Commits: `2b3828c` source; `7fbf4ed` regression; `d3e44ec` fixture abort handling.
 - JavaScript and Playwright spec syntax parsing pass after re-fetching current `main`. Browser runtime, Laravel, quality and exact-head CI are **UNVERIFIED**. No readiness uplift; V1 remains **NO-GO**.
+
+## Private attachment download/logout regression — 2026-11-10
+- Added the missing Chromium runtime regression fixture for a private attachment download held in flight across local logout.
+- The scenario verifies the local attachment database remains empty after logout completes and the held private-file response is released.
+- Commit: `9c8dd61`.
+- Test source syntax passes after re-fetch. Browser execution and exact-head CI remain **UNVERIFIED**; no readiness uplift; V1 remains **NO-GO**.
