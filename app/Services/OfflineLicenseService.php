@@ -73,7 +73,7 @@ class OfflineLicenseService
         $installedAt = Carbon::parse($existingIssuedAt);
 
         if ($issuedAt->lt($installedAt)) {
-            throw new \\InvalidArgumentException('This licence is older than the entitlement already installed.');
+            throw new \InvalidArgumentException('This licence is older than the entitlement already installed.');
         }
 
         if ($issuedAt->equalTo($installedAt)) {
@@ -83,7 +83,7 @@ class OfflineLicenseService
                 return;
             }
 
-            throw new \\InvalidArgumentException('A different licence payload cannot reuse an installed issue timestamp.');
+            throw new \InvalidArgumentException('A different licence payload cannot reuse an installed issue timestamp.');
         }
     }
 
