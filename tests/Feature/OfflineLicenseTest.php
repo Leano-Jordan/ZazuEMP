@@ -12,42 +12,18 @@ class OfflineLicenseTest extends TestCase
 {
     use RefreshDatabase;
 
-    public function test_a_business_can_have_a_local_license_without_any_online_service(): void
-    {
-        // Keep the entitlement validity assertion deterministic as the calendar advances.
-        $this->travelTo(Carbon::parse('2026-10-15 12:00:00'));
-
-        $user = $this->signInAsOwner();
-        $business = $user->businesses()->firstOrFail();
-
-        $license = app(OfflineLicenseService::class)->issueLocalEntitlement(
-            $business,
-            'solo',
-            Carbon::parse('2026-10-01 00:00:00'),
-            Carbon::parse('2026-10-31 23:59:59'),
-            ['offline_core' => true],
-        );
-
-        $this->assertInstanceOf(BusinessLicense::class, $license);
-        $this->assertTrue($license->isActive(Carbon::parse('2026-10-15 12:00:00')));
-        $this->assertTrue(app(OfflineLicenseService::class)->isValid($business));
-        $this->assertSame('solo', $license->plan);
-        $this->assertTrue($license->features['offline_core']);
-    }
-
     public function test_an_expired_local_license_is_not_valid(): void
     {
         $user = $this->signInAsOwner();
         $business = $user->businesses()->firstOrFail();
 
-        app(OfflineLicenseService::class)->issueLocalEntitlement(
+        $license = app(OfflineLicenseService::class)->importSignedLicense(
             $business,
-            'solo',
-            Carbon::parse('2026-09-01 00:00:00'),
-            Carbon::parse('2026-09-30 23:59:59'),
+            $this->signedToken($business, [
+                'starts_at' => '2026-09-01T00:00:00+00:00',
+                'expires_at' => '2026-09-30T23:59:59+00:00',
+            ]),
         );
-
-        $license = $business->fresh()->license;
 
         $this->assertFalse($license->isActive(Carbon::parse('2026-10-01 00:00:00')));
     }
@@ -71,7 +47,7 @@ class OfflineLicenseTest extends TestCase
         $user = $this->signInAsOwner();
         $business = $user->businesses()->firstOrFail();
         $service = app(OfflineLicenseService::class);
-        $existing = $service->issueLocalEntitlement($business, 'solo', Carbon::parse('2026-10-01'));
+        $existing = $service->importSignedLicense($business, $this->signedToken($business));
         $token = $this->signedToken($business);
         [$payload, $signature] = explode('.', $token, 2);
         $tampered = $this->base64UrlEncode('{"version":1,"business_id":'.$business->id.',"status":"active"}').'.'.$signature;
