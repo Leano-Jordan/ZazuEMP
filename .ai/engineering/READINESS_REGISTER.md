@@ -780,3 +780,10 @@ Commits: `5b15209`, `78917ad`, `d0377f8`.
 - Client now persists an explicit re-pair instruction after HTTP 401/403 from push, pull, bootstrap or attachment upload. Existing pending mutations and local credentials are preserved until the owner-authorised pairing transition; no silent queue deletion occurs.
 - Chromium regression source verifies a 401 push response leaves the queued mutation and token intact while recording the recovery message.
 - Source/E2E structural review only; Playwright and exact-head CI remain **UNVERIFIED**. Device lifecycle acceptance remains open. No score uplift; V1 remains **NO-GO**.
+
+
+### Device re-pair recovery and operator warning — 2026-11-10
+
+- Settings now exposes the persisted re-pair-required state and explicitly warns against clearing browser storage while local work may be pending.
+- Re-pairing preserves the business-scoped local workspace when mutation records or dirty state exist, retains the queue, binds only a token issued for the active business, and defers bootstrap replacement until queue reconciliation is safe.
+- Regression source covers the visible warning, HTTP 401 queue preservation and a re-pair with temporary push outage. Execution remains **UNVERIFIED**; full device/browser acceptance remains open. No score uplift; V1 remains **NO-GO**.
