@@ -1440,3 +1440,12 @@ Owner expanded the visual refinement scope beyond the dashboard: apply the estab
 - Added feature-test source for valid import, tamper rejection without overwriting an existing entitlement, cross-business rejection and signed revocation.
 - Commits: `79f41fc` verifier; `ca9aefa` config; `90f971e` environment example; `cd9edfd` tests; `a99308f` required-field hardening.
 - Verification boundary: files re-fetched after writes; PHPUnit, sodium runtime compatibility, Blade/browser flows and exact-head CI have not been run. No owner activation UI, issuer, installation identity, renewal workflow or enforcement middleware exists yet. This is a service-level security foundation, not completed commercial licensing. No readiness score uplift; V1 remains NO-GO.
+
+
+## Signed licence import hardening — 2026-11-10
+
+- Removed the unsigned `issueLocalEntitlement` service method. Entitlement creation through the service now requires a valid Ed25519 signature; no application call sites depended on the removed method.
+- Added a 16 KiB token size bound and signed `issued_at` requirement. The verifier stores the issue timestamp and rejects a different signed licence whose issue time is not newer than the currently installed signed entitlement, preventing a previously issued renewal token from rolling the local entitlement backwards.
+- Added regression coverage for missing public-key configuration and stale renewal replay. Test fixtures generate ephemeral deterministic keys in the test process only; no private key is committed or configured for production.
+- Follow-up commits: `f01371a` remove unsigned issuer; `742cb16` migrate tests; `6fa0299` import/config test hardening; `7b7d473` PHP namespace correction; `6dd4d58` test import correction; `39194b5` size and rollback guard; `27f2f6f` rollback guard namespace correction; `74a5c7f` rollback regression.
+- Verification boundary: source re-fetch and structural inspection only. PHPUnit / PHP syntax checks and exact-head CI remain unrun. Activation UI, production issuer/key custody, installation identity, owner reactivation, renewal UX and enforcement remain open. No readiness score uplift; V1 remains NO-GO.
