@@ -260,6 +260,38 @@ class OfflineSyncFoundationTest extends TestCase
     }
 
 
+    public function test_mutation_recorder_rejects_unsupported_streams_without_allocating_sequences(): void
+    {
+        $business = Business::create([
+            'name' => 'Unsupported Stream Business',
+            'slug' => 'unsupported-stream-'.Str::lower(Str::random(8)),
+            'status' => 'active',
+            'currency' => 'ZAR',
+        ]);
+        $device = SyncDevice::create([
+            'business_id' => $business->id,
+            'installation_id' => (string) Str::uuid(),
+        ]);
+
+        try {
+            app(SyncMutationRecorder::class)->record(
+                $device,
+                'event',
+                'unsupported-stream-event',
+                'upsert',
+                ['name' => 'Must not be recorded'],
+                (string) Str::uuid(),
+                'future-stream',
+            );
+            $this->fail('The recorder must reject streams the client protocol cannot consume.');
+        } catch (\\Illuminate\\Validation\\ValidationException $exception) {
+            $this->assertArrayHasKey('stream', $exception->errors());
+        }
+
+        $this->assertDatabaseCount('sync_mutations', 0);
+        $this->assertDatabaseCount('sync_streams', 0);
+    }
+
     public function test_mutation_recorder_assigns_ordered_stream_sequences(): void
     {
         $business = Business::create([
@@ -328,6 +360,101 @@ class OfflineSyncFoundationTest extends TestCase
         $protocol->acknowledgeThrough($destinationDevice, 3);
     }
 
+
+    public function test_delivery_publication_skips_a_device_revoked_after_destination_scan(): void
+    {
+        $business = Business::create([
+            'name' => 'Revoked Delivery Business',
+            'slug' => 'revoked-delivery-'.Str::lower(Str::random(8)),
+            'status' => 'active',
+            'currency' => 'ZAR',
+        ]);
+        $sourceDevice = SyncDevice::create([
+            'business_id' => $business->id,
+            'installation_id' => (string) Str::uuid(),
+        ]);
+        $destinationDevice = SyncDevice::create([
+            'business_id' => $business->id,
+            'installation_id' => (string) Str::uuid(),
+        ]);
+
+        $recorder = app(SyncMutationRecorder::class);
+        $mutation = $recorder->record(
+            $sourceDevice,
+            'event',
+            'revoked-destination-event',
+            'upsert',
+            ['name' => 'Do not deliver to a revoked device'],
+        );
+        $mutation->update(['status' => 'applied', 'applied_at' => now()]);
+
+        $revokedDuringScan = false;
+        $retrievedEvent = 'eloquent.retrieved: '.SyncDevice::class;
+        \\Illuminate\\Support\\Facades\\Event::listen(
+            $retrievedEvent,
+            function (SyncDevice $retrieved) use ($destinationDevice, &$revokedDuringScan): void {
+                if ($retrieved->id !== $destinationDevice->id || $revokedDuringScan) {
+                    return;
+                }
+
+                \\Illuminate\\Support\\Facades\\DB::table('sync_devices')
+                    ->where('id', $destinationDevice->id)
+                    ->update(['status' => 'revoked', 'revoked_at' => now()]);
+                $revokedDuringScan = true;
+            },
+        );
+
+        try {
+            $recorder->publish($mutation);
+        } finally {
+            \\Illuminate\\Support\\Facades\\Event::forget($retrievedEvent);
+        }
+
+        $this->assertTrue($revokedDuringScan);
+        $this->assertDatabaseHas('sync_devices', [
+            'id' => $destinationDevice->id,
+            'status' => 'revoked',
+        ]);
+        $this->assertDatabaseCount('sync_deliveries', 0);
+    }
+
+    public function test_sync_acknowledgement_cannot_advance_across_non_pending_deliveries(): void
+    {
+        $business = Business::create([
+            'name' => 'Acknowledgement Recovery Business',
+            'slug' => 'ack-recovery-'.Str::lower(Str::random(8)),
+            'status' => 'active',
+            'currency' => 'ZAR',
+        ]);
+        $sourceDevice = SyncDevice::create([
+            'business_id' => $business->id,
+            'installation_id' => (string) Str::uuid(),
+        ]);
+        $destinationDevice = SyncDevice::create([
+            'business_id' => $business->id,
+            'installation_id' => (string) Str::uuid(),
+        ]);
+
+        $recorder = app(SyncMutationRecorder::class);
+        $mutation = $recorder->record($sourceDevice, 'event', 'failed-delivery-event', 'upsert', ['name' => 'Failed delivery']);
+        $mutation->update(['status' => 'applied', 'applied_at' => now()]);
+        $recorder->publish($mutation);
+
+        $delivery = SyncDelivery::query()
+            ->where('destination_device_id', $destinationDevice->id)
+            ->firstOrFail();
+        $delivery->update(['status' => 'failed']);
+
+        try {
+            app(SyncMutationProtocol::class)->acknowledgeThrough($destinationDevice, 1);
+            $this->fail('An acknowledgement must not advance over a non-pending delivery.');
+        } catch (\\Illuminate\\Validation\\ValidationException $exception) {
+            $this->assertArrayHasKey('sequence', $exception->errors());
+        }
+
+        $this->assertSame(0, SyncCursor::query()->where('sync_device_id', $destinationDevice->id)->count());
+        $this->assertSame('failed', $delivery->fresh()->status);
+    }
 
     public function test_sync_protocol_rejects_unknown_streams_without_creating_cursors(): void
     {
