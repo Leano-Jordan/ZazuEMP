@@ -1560,3 +1560,13 @@ A confirmed failure-path gap was found in the offline push contract: unexpected 
 - Added a feature regression that forces a temporary persistence exception and asserts pending status, retryable disposition, retained error and absence of an orphan conflict.
 - Commits: `3d22994` controller response contract; `8df076c` client queue handling; `3eba5cf` regression test.
 - Changed files re-fetched and structurally inspected. PHPUnit, browser execution and exact-head CI remain **UNVERIFIED**. No readiness score uplift. V1 remains **NO-GO**.
+
+
+## Idempotent offline conflict recording — 2026-11-10
+
+- Found a duplicate-delivery race: repeated changed-payload replays could each observe no open conflict and create duplicate operator-visible conflict rows. Concurrent domain-rejection retries had the same check-then-create shape.
+- Added `SyncConflictRecorder::recordOnce`, which serializes conflict creation on the owning device row, validates active device/business ownership, and reuses/refreshes the existing open conflict for the same device, mutation ID and conflict type.
+- Both domain-rejection and mutation-identity-mismatch push paths now use the idempotent recorder.
+- Added a feature regression that replays the same changed-payload mutation twice and asserts the same conflict ID and exactly one open conflict.
+- Commits: `20b7724` recorder; `827188e` controller integration; `f886a98` regression.
+- Source re-fetched and structurally inspected. PHP/PHPUnit, concurrent DB runtime behaviour, Playwright and exact-head CI remain **UNVERIFIED**. No readiness score uplift; V1 remains **NO-GO**.
