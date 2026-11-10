@@ -666,3 +666,12 @@ The backup/restore feature suite now also exercises both format boundaries: a ve
 | Identity handoff and upload | Test assigns the server identity to the locally queued job and checks normal reconciliation uploads the original file/key against that ID | State-boundary simulation added; live job sync round-trip remains open |
 
 Regression: e2e/offline-attachment-sync.spec.js; commit 876f0828adba101221f89df10cbbced0890a2a89. Source was re-fetched and inspected. Playwright, Laravel, frontend build and exact-head CI were not executed. No readiness score uplift. V1 remains NO-GO.
+
+### Local Work attachment visibility and retrieval — 2026-11-10
+
+- Local Work rows now list locally stored attachment filenames and sync state.
+- Each file entry can retrieve the business-scoped Blob and trigger a download using its original filename.
+- The UI refresh is isolated from the row render so it does not reset the attachment input or save feedback.
+- Playwright coverage asserts file visibility and download initiation through the actual operator row.
+- Implementation commits: 0c202680, 5a653874, d4c574e3, cd677995, 22ea45fe.
+- Source re-fetch confirms implementation anchors. Browser runtime, storage persistence, exact-head CI and real server sync remain unverified. No readiness score uplift; V1 remains NO-GO.
