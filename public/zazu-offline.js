@@ -15,6 +15,7 @@
     const QUEUE = 'mutations';
     let state = null;
     let syncing = false;
+    let syncRequested = false;
     let activeSyncController = null;
     let storageAvailable = true;
     let resolveReady;
@@ -1275,7 +1276,13 @@
     }
 
     async function sync() {
-        if (syncing || sessionCleared || !navigator.onLine || !state?.sync?.token) return;
+        if (syncing) {
+            // A token replacement can request a fresh pass while the previous
+            // session is still unwinding. Do not lose that request.
+            syncRequested = true;
+            return;
+        }
+        if (sessionCleared || !navigator.onLine || !state?.sync?.token) return;
         syncing = true;
         const controller = new AbortController();
         activeSyncController = controller;
@@ -1299,6 +1306,14 @@
         } finally {
             if (activeSyncController === controller) activeSyncController = null;
             syncing = false;
+            if (syncRequested) {
+                syncRequested = false;
+                Promise.resolve().then(() => sync()).catch(() => {
+                    if (!state || sessionCleared || !state.sync?.token) return;
+                    state.last_sync_error = 'Synchronization failed; queued work will retry.';
+                    writeState().catch(() => {});
+                });
+            }
         }
     }
 
@@ -1356,9 +1371,14 @@
             throw new Error('This pairing code belongs to a different business workspace. The issued device token was revoked and your saved local data has not been changed.');
         }
 
-        const previousState = state || blank();
         const existingMutations = await allMutations();
+        const previousState = state || blank();
         const preserveLocalWorkspace = existingMutations.length > 0 || previousState.local_dirty === true;
+
+        // Pairing replaces the credential boundary. Invalidate attachment
+        // reads/writes and stop any request issued with the previous token.
+        sessionGeneration++;
+        activeSyncController?.abort();
         sessionCleared = false;
         state = {
             ...(preserveLocalWorkspace ? previousState : blank()),
