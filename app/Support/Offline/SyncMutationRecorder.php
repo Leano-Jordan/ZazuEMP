@@ -49,10 +49,12 @@ class SyncMutationRecorder
             $expectedTokenHash = (string) (($device->metadata ?? [])['sync_token_hash'] ?? '');
             $currentTokenHash = (string) (($lockedDevice?->metadata ?? [])['sync_token_hash'] ?? '');
 
+            $sameCredential = $expectedTokenHash === ''
+                ? $currentTokenHash === ''
+                : hash_equals($expectedTokenHash, $currentTokenHash);
+
             abort_unless(
-                $lockedDevice
-                    && $expectedTokenHash !== ''
-                    && hash_equals($expectedTokenHash, $currentTokenHash),
+                $lockedDevice && $sameCredential,
                 401,
                 'This sync device was revoked or replaced before the offline change was recorded.'
             );
