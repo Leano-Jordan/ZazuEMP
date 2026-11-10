@@ -40,7 +40,7 @@ test('Work attachments persist offline, upload on reconnect and cache remote fil
         await window.ZazuOffline.persist();
     }, DEVICE_TOKEN);
 
-    const requests = { uploads: 0, key: null, eventId: null };
+    const requests = { uploads: 0, key: null, eventId: null, wrongJobDownloads: 0 };
     const remoteKey = '00000000-0000-4000-8000-000000000099';
 
     await page.route('**/api/sync/**', async route => {
@@ -121,9 +121,25 @@ test('Work attachments persist offline, upload on reconnect and cache remote fil
                             description: 'Server copy',
                             created_at: new Date().toISOString(),
                         },
+                        {
+                            id: 803,
+                            event_id: eventId + 1,
+                            idempotency_key: '00000000-0000-4000-8000-000000000098',
+                            original_name: 'wrong-job.txt',
+                            mime_type: 'text/plain',
+                            size: Buffer.byteLength('belongs to another Work record'),
+                            description: 'Mismatched parent',
+                            created_at: new Date().toISOString(),
+                        },
                     ],
                 }),
             });
+            return;
+        }
+
+        if (url.pathname === '/api/sync/attachments/803' && request.method() === 'GET') {
+            requests.wrongJobDownloads++;
+            await route.fulfill({ status: 200, contentType: 'text/plain', body: 'belongs to another Work record' });
             return;
         }
 
@@ -200,6 +216,8 @@ test('Work attachments persist offline, upload on reconnect and cache remote fil
 
     expect(cached.records).toContainEqual({ name: 'offline-evidence.txt', status: 'synced' });
     expect(cached.records).toContainEqual({ name: 'server-brief.txt', status: 'synced' });
+    expect(cached.records.some(record => record.name === 'wrong-job.txt')).toBe(false);
+    expect(requests.wrongJobDownloads).toBe(0);
     expect(cached.uploadedText).toBe('saved on phone for later');
     expect(cached.downloadedText).toBe('cached server-side file');
 });
