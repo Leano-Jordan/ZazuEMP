@@ -26,6 +26,7 @@ use Tests\TestCase;
  * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  * @SuppressWarnings(PHPMD.TooManyMethods)
  * @SuppressWarnings(PHPMD.ExcessiveClassLength)
+ * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
  */
 class OfflineSyncFoundationTest extends TestCase
 {
@@ -2362,6 +2363,12 @@ class OfflineSyncFoundationTest extends TestCase
         ]);
     }
 
+    /**
+     * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
+     *
+     * This integration test intentionally exercises the full replay/conflict/retry
+     * cycle against the controller and persistent conflict records.
+     */
     public function test_changed_mutation_replay_becomes_a_conflict_and_retries_with_a_new_identity(): void
     {
         $business = Business::create([
