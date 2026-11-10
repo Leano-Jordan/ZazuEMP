@@ -101,8 +101,10 @@ class OfflineLicenseService
             || ! preg_match('/^[a-z][a-z0-9_-]{1,39}$/', $payload['plan'])
             || ! in_array($payload['status'] ?? null, ['active', 'revoked'], true)
             || ! is_string($payload['starts_at'] ?? null)
-            || ! (is_string($payload['expires_at'] ?? null) || ($payload['expires_at'] ?? null) === null)
-            || ! is_array($payload['features'] ?? [])) {
+            || ! array_key_exists('expires_at', $payload)
+            || ! (is_string($payload['expires_at']) || $payload['expires_at'] === null)
+            || ! array_key_exists('features', $payload)
+            || ! is_array($payload['features'])) {
             throw new \\InvalidArgumentException('The signed licence payload has invalid fields or belongs to another business.');
         }
 
