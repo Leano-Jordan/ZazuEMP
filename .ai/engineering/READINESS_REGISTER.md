@@ -1,3 +1,13 @@
+
+
+## CSP style migration — workspace background variables — 2026-11-10
+
+- Moved the business-specific dashboard and wallpaper CSS custom properties off the authenticated document's `body style=` attribute and into a response-nonce-authorized `<style>` element in the document head.
+- Preserved the existing media routes, cache-busting version, conditional wallpaper behaviour and CSS variable names; no visual or route behaviour was intentionally changed.
+- Added a focused `SecurityHeadersTest` source regression asserting the nonce block and absence of a body inline-style attribute.
+- Commits: `3a77c92` (layout), `c31347b` (initial regression), `8e17a61` (precise body-tag assertion), `ccb6239` (move style block into head).
+- Verification boundary: changed source re-fetched and inspected. PHPUnit, Blade compilation, browser regression and exact-head CI have **not** been run for this change. Other inline style attributes remain; CSP unsafe-style allowances are intentionally unchanged. No score uplift; V1 remains **NO-GO**.
+
 # ZAZU EMP — COMMERCIAL READINESS REGISTER
 
 ## Current verified snapshot — 2026-11-09
