@@ -7,7 +7,7 @@
     <meta name="description" content="Zazu EMP helps South African event, catering and equipment-hire businesses keep customers, jobs, quotes, suppliers, costs and finance connected.">
     <title>Zazu EMP · Run the work. Know the numbers.</title>
     @vite(['resources/js/app.js'])
-    <style>
+    <style nonce="{{ request()->attributes->get('cspNonce') }}">
         :root{--ink:#F1F7FC;--body:#C7D9E8;--muted:#9DB7CC;--blue:#0B63CE;--sapphire:#1D78E5;--glow:#63AEFF;--soft:#123C5F;--canvas:#0B3A66;--line:#365A75;--card:#102C44}
         *{box-sizing:border-box}html{scroll-behavior:smooth}body{margin:0;color:var(--ink);background:var(--canvas);font-family:ui-sans-serif,system-ui,-apple-system,"Segoe UI",sans-serif}
         body:before{content:"";position:fixed;inset:0;z-index:-2;background:linear-gradient(160deg,#0B3A66 0%,#082D4F 58%,#061F37 100%)}
