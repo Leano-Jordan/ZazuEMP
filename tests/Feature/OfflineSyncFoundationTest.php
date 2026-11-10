@@ -2702,4 +2702,40 @@ class OfflineSyncFoundationTest extends TestCase
             ->assertUnauthorized();
     }
 
+    public function test_expired_sync_pairing_code_is_not_provisioned(): void
+    {
+        $business = Business::create([
+            'name' => 'Expired Pairing Business',
+            'slug' => 'expired-pairing-'.Str::lower(Str::random(8)),
+            'status' => 'active',
+            'currency' => 'ZAR',
+        ]);
+        $code = '391842';
+        $device = SyncDevice::create([
+            'business_id' => $business->id,
+            'installation_id' => (string) Str::uuid(),
+            'status' => 'pending',
+            'metadata' => [
+                'pairing_code_hash' => \Illuminate\Support\Facades\Hash::make($code),
+                'pairing_expires_at' => now()->subSecond()->toIso8601String(),
+            ],
+        ]);
+
+        $request = Request::create('/api/sync/provision', 'POST', [
+            'pairing_code' => $code,
+            'device_name' => 'Expired phone',
+            'device_type' => 'phone',
+        ]);
+
+        try {
+            app(SyncController::class)->provision($request);
+            $this->fail('An expired pairing code must not provision a device.');
+        } catch (\Illuminate\Validation\ValidationException $exception) {
+            $this->assertArrayHasKey('pairing_code', $exception->errors());
+        }
+
+        $this->assertSame('pending', $device->fresh()->status);
+        $this->assertNull($device->fresh()->metadata['sync_token_hash'] ?? null);
+    }
+
 }
