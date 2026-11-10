@@ -750,7 +750,7 @@ Regression: `e2e/pwa-offline.spec.js` holds the bootstrap response, queues a cus
 
 A server-rejected offline mutation was previously persisted as `failed` in IndexedDB, while its operator-visible conflict was added to in-memory state and written later. A tab close or state-write failure in between could strand the failed mutation without its recovery UI.
 
-The push acknowledgement now uses one IndexedDB read/write transaction across `mutations` and `state`. The failed record and open conflict are committed together. Added a Chromium Playwright regression using an actual queued mutation and mocked server rejection, then checking both persisted records and `local_dirty=false`.
+The push acknowledgement now uses one IndexedDB read/write transaction across `mutations` and `state`. The failed record and open conflict are committed together. Added a Chromium Playwright regression using an actual queued mutation and the real API response shape (pending status plus error and conflict ID), then checking both persisted records and `local_dirty=false`.
 
 Commits: `5b15209`, `78917ad`, `d0377f8`.
 
