@@ -55,4 +55,23 @@ class BusinessLicense extends Model
 
         return ! $this->expires_at || $at <= $this->expires_at;
     }
+
+    public function statusLabel(?\\DateTimeInterface $at = null): string
+    {
+        $at ??= now();
+
+        if ($this->status === 'revoked') {
+            return 'Revoked';
+        }
+
+        if ($this->isActive($at)) {
+            return 'Active';
+        }
+
+        if ($this->starts_at && $at < $this->starts_at) {
+            return 'Not yet active';
+        }
+
+        return 'Expired';
+    }
 }
