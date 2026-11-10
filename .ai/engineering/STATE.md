@@ -1620,3 +1620,14 @@ A confirmed failure-path gap was found in the offline push contract: unexpected 
 Added a dedicated GitHub Actions job to the existing Laravel workflow. It builds the frontend, creates a clean SQLite database, seeds the local-only demo scenario, installs Chromium, and runs `e2e/pwa-offline.spec.js` once in the Chromium project. This makes the bounded PWA/offline browser acceptance suite an automated push/PR gate rather than source-only evidence.
 
 Workflow change: `.github/workflows/laravel.yml`, commit `3944745`. The new job has not yet executed on this commit; browser runtime and exact-head CI are **UNVERIFIED** until GitHub reports a completed run. No readiness score uplift; V1 remains NO-GO.
+
+
+## Sync stream boundary hardening — 2026-11-10
+
+Source review found that authenticated sync pull/acknowledgement accepted arbitrary non-empty stream names. The recorder currently emits only the `business` stream, but pull could create one cursor per arbitrary requested name and acknowledgement could also persist arbitrary cursor rows. This exposed an avoidable authenticated database-growth path and an undefined protocol surface.
+
+- `SyncMutationProtocol` now accepts only its declared supported stream list (currently `business`) before any cursor lookup/creation.
+- `OfflineSyncFoundationTest` adds regression coverage for both pull and acknowledgement rejecting unsupported stream names and verifies no cursor rows are created.
+- Commits: `4f4f9f6` protocol guard; `a281567` regression test.
+
+**Verification:** source re-fetched and structurally checked. PHPUnit and GitHub Actions execution remain **UNVERIFIED**. No readiness uplift; V1 remains NO-GO.
