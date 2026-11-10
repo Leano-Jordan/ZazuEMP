@@ -12,6 +12,9 @@ use LogicException;
 
 class SyncMutationProtocol
 {
+    /** @var array<int, string> */
+    public const SUPPORTED_STREAMS = ['business'];
+
     public function pull(SyncDevice $device, string $stream = 'business', int $limit = 100): Collection
     {
         $this->assertDeviceContext($device, $stream);
@@ -116,9 +119,9 @@ class SyncMutationProtocol
             throw new LogicException('Cannot synchronize an inactive sync device.');
         }
 
-        if ($stream === '') {
+        if (! in_array($stream, self::SUPPORTED_STREAMS, true)) {
             throw ValidationException::withMessages([
-                'stream' => 'A sync stream is required.',
+                'stream' => 'The requested sync stream is not supported.',
             ]);
         }
     }
