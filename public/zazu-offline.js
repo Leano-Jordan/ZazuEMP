@@ -40,6 +40,7 @@
 
     let dbPromise = null;
     let sessionCleared = false;
+    let sessionGeneration = 0;
     let sessionChannel = null;
 
     try {
@@ -400,9 +401,14 @@
         }
     }
 
-    async function writeAttachmentRecord(record) {
+    async function writeAttachmentRecord(record, expectedSessionGeneration = null) {
         const db = await openAttachmentDb();
         try {
+            // Prevent a late upload response from recreating local data after logout.
+            if (expectedSessionGeneration !== null
+                && (sessionCleared || sessionGeneration !== expectedSessionGeneration)) {
+                return false;
+            }
             await new Promise((resolve, reject) => {
                 const tx = db.transaction(ATTACHMENT_STORE, 'readwrite');
                 tx.objectStore(ATTACHMENT_STORE).put(record);
@@ -410,6 +416,7 @@
                 tx.onerror = () => reject(tx.error || new Error('The local attachment could not be saved.'));
                 tx.onabort = () => reject(tx.error || new Error('The local attachment save was aborted.'));
             });
+            return true;
         } finally {
             db.close();
         }
@@ -574,6 +581,8 @@
                 if (record.description) form.append('description', record.description);
                 form.append('file', record.file, record.original_name);
 
+                const uploadSessionGeneration = sessionGeneration;
+                const uploadToken = state.sync.token;
                 let response;
                 try {
                     response = await api('/api/sync/attachments', {
@@ -586,9 +595,12 @@
                         ...record,
                         attempts: Number(record.attempts || 0) + 1,
                         last_error: 'Upload paused. Zazu will retry when the connection is available.',
-                    });
+                    }, uploadSessionGeneration);
                     break;
                 }
+
+                if (sessionCleared || sessionGeneration !== uploadSessionGeneration
+                    || state?.sync?.token !== uploadToken) break;
 
                 if (!response.ok) {
                     await recordSyncAuthorizationFailure(response);
@@ -597,12 +609,14 @@
                         ...record,
                         attempts: Number(record.attempts || 0) + 1,
                         last_error: result.message || 'The server did not accept this attachment. It remains saved on this phone.',
-                    });
+                    }, uploadSessionGeneration);
                     if ([401, 403, 429].includes(response.status)) break;
                     continue;
                 }
 
                 const result = await response.json();
+                if (sessionCleared || sessionGeneration !== uploadSessionGeneration
+                    || state?.sync?.token !== uploadToken) break;
                 const confirmedAttachment = result.attachment;
                 const confirmedId = Number(confirmedAttachment?.id);
                 const confirmedEventId = Number(confirmedAttachment?.event_id);
@@ -617,18 +631,19 @@
                         ...record,
                         attempts: Number(record.attempts || 0) + 1,
                         last_error: 'The server response did not match this file and Work record. The original file remains queued for a safe retry.',
-                    });
+                    }, uploadSessionGeneration);
                     continue;
                 }
 
-                await writeAttachmentRecord({
+                const persisted = await writeAttachmentRecord({
                     ...record,
                     status: 'synced',
                     attachment: result.attachment,
                     attempts: Number(record.attempts || 0) + 1,
                     last_error: null,
                     synced_at: new Date().toISOString(),
-                });
+                }, uploadSessionGeneration);
+                if (!persisted) break;
                 uploaded++;
                 window.dispatchEvent(new CustomEvent('zazu:offline-attachments-updated', {
                     detail: { event_id: Number(record.event_id) },
@@ -758,6 +773,7 @@
 
     async function clearStoredWorkspace(broadcast = true) {
         const wasCleared = sessionCleared;
+        sessionGeneration++;
         sessionCleared = true;
         activeSyncController?.abort();
 
