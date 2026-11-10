@@ -49,7 +49,16 @@ class SyncMutationProtocol
                 break;
             }
 
-            $mutations->push($delivery->mutation);
+            $mutation = $delivery->mutation;
+
+            if (! $mutation) {
+                break;
+            }
+
+            // Mutation sequence is business-wide; delivery sequence is
+            // receiver-specific. The client must acknowledge the latter.
+            $mutation->setAttribute('delivery_sequence', (int) $delivery->delivery_sequence);
+            $mutations->push($mutation);
             $expectedSequence++;
         }
 
