@@ -791,3 +791,10 @@ Commits: `5b15209`, `78917ad`, `d0377f8`.
 - Cross-business re-pair rejection now has regression coverage asserting the wrong-business token is revoked and local queued data remains intact; test execution is **UNVERIFIED**.
 
 - Cross-business token cleanup only reports automatic revocation when the revoke endpoint confirms success; failed cleanup directs the owner to revoke through Trusted phone access. Source verified; runtime remains unverified.
+
+
+## Backup private-storage copy failure guard — 2026-11-10
+
+A concrete backup integrity defect was fixed: the backup command previously ignored a false return from `File::copyDirectory()`, allowing archive creation to continue after private media failed to copy. It now aborts before checksum/archive publication and reports the failure. Added a regression that simulates copy failure and asserts no archive is published.
+
+Commits: `3e5b9c7` (guard), `cf332c2` (regression). Source re-fetch/structural review: PASS. PHPUnit and exact-head CI: **UNVERIFIED** (no status contexts or workflow runs returned for exact SHA `cf332c246b001fcb5547e28b5b5d904088471368`). No evidence-maturity uplift; actual operator restore drill remains a release gate.
