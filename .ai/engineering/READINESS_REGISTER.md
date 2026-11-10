@@ -906,3 +906,10 @@ Commits: `4f4f9f63e617b201fb68ab612ef902805c8e1727`, `a281567ab1c9b384dffe47405d
 - The fixture holds the private file response, completes local logout, releases the response, and asserts the business attachment store remains empty.
 - Commit: `9c8dd6147112814773d551ae5b959d4e2af48dad`.
 - Syntax/source checks only. Playwright runtime and exact-head CI remain **UNVERIFIED**. V1 remains **NO-GO**.
+
+## Cross-tab device session replacement — 2026-11-10
+- Closed a multi-tab session consistency gap. A successful pairing now broadcasts a non-secret session-replaced signal after persistence; peer tabs abort old sync work, reload the durable business-scoped token and resume with the current credential.
+- Cross-tab logout also invalidates the receiving tab's session generation and active sync controller before cleanup.
+- Added a two-tab Chromium regression proving a tab that loaded the old token adopts the new token and authenticates its next sync request with the replacement token.
+- Commits: `a0ef99a40769b758582fd07da7f53804ee08cada` (source), `e5e9f5befe694e85cbdff3299ca393c4494ff5d1` (test), `192edbe6529203aab7d07fc86cd595ce2e46df80` (fixture).
+- Syntax/source checks only; browser runtime and exact-head CI remain **UNVERIFIED**. No readiness uplift; V1 remains **NO-GO**.
