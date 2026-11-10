@@ -1764,3 +1764,14 @@ Source review found that authenticated sync pull/acknowledgement accepted arbitr
 - Commits: 378b342 activity fence; ecad682 middleware rejection; bb7dd76 race regression; 072d0a1 owner revoke transaction; 9afeb98 one-audit regression; fe4ad7a self-revoke transaction; 5fdb467 pairing lock filtering; 16ab465/bcc3e17 revocation and expiry regressions; 504ee44 clean model state.
 - Current source and test files were re-fetched and inspected. PHPUnit, PHP lint against a complete checkout, rendered browser/device acceptance and exact-head CI are UNVERIFIED. Combined commit status exposes no status contexts. No readiness uplift; V1 remains NO-GO.
 - Continue with exact-main verification and the remaining server-side device lifecycle cases; do not treat source-only hardening as release acceptance.
+
+
+## Revocation fencing at offline mutation write boundaries — 2026-11-10
+
+- Adversarial follow-through on the middleware revocation race found a second boundary: a request can pass middleware, then lose its device authorization before the mutation recorder or applier reaches its transaction. Middleware-only checks do not protect these later writes.
+- `SyncMutationRecorder` now follows the established business → device lock order, locks the durable device row, rechecks active/revoked state and compares the persisted token hash with the middleware snapshot before allocating a sequence or inserting a mutation. A stale/replaced credential receives HTTP 401.
+- `SyncMutationApplier` now uses the same business → device → mutation lock order and rechecks the durable device row before invoking the domain handler. If revocation wins the device lock, the queued mutation remains pending and the domain handler is not invoked; if application wins, its transaction completes before revocation can commit.
+- The push controller now lets this 401 escape its generic per-mutation error handler rather than converting a revoked-device request into a successful partial batch response.
+- Added `OfflineOperationalDepthTest` regressions for stale authenticated snapshots at record time and revocation between record/apply. Existing tokenless internal fixtures remain supported only when both their snapshot and durable device have no token hash; real middleware-authenticated devices carry and compare their hash.
+- Commits: `5cb9526` recorder transaction fence; `66094f9` applier transaction fence; `c6d6060` preserve 401; `8d7c4c1` fixture compatibility; `6e80ff0` record/apply regressions.
+- Re-fetched source and test assertions are present on `main`. GitHub combined status has no status contexts; the workflow-run wrapper returned no runs for the commit. PHPUnit, PHP lint, browser/runtime and full CI remain **UNVERIFIED**. No readiness uplift; V1 remains **NO-GO**.
