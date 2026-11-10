@@ -948,3 +948,13 @@ Commits: `4f4f9f63e617b201fb68ab612ef902805c8e1727`, `a281567ab1c9b384dffe47405d
 - Corrected eight E2E fixture paths that seeded a replacement sync token using ordinary persistence; they now use the explicit session-replacement path and preserve the production compare-before-write guard. The conflict retry/discard fixture persists its new session before queueing mutations.
 - Exact-head `c021eb2` evidence: Laravel **446 passed / 3,083 assertions**; offline browser acceptance **18 passed**; PHPMD, quality/secret scan, Psalm, populated upgrade/rollback and Director contract lint **success**. The separate browser smoke suite was still running at the time of this record.
 - This is verification progress, not release acceptance. V1 remains **NO-GO** pending final browser smoke and full current-head verification.
+
+
+## Commercial/legal baseline — 2026-11-10
+
+- Owner supplied current solo-operator identity and private contact channels. Public repository intentionally excludes the supplied residential address and direct contact details pending approval of the exact public-facing service address/contact fields.
+- R99 per business/workspace/month is the initial target; 14-day advanced-feature trial is a proposed default. Expiry downgrades to Basic without lockout or data deletion. Basic/Advanced feature matrix, VAT, storage quota and payment disclosures are still open.
+- Hosted and local/offline models are both intended. Customer content remains customer-owned. Hosted processing requires appropriate POPIA operator terms where applicable; local installations require a distinct responsibility/support boundary.
+- xneelo Cloud Johannesburg is the preferred low-cost hosted pilot shortlist, not yet contracted or provisioned. Indicative 2 vCPU / 4 GB + 10 GB boot + 50 GB NVMe data volume is approximately R306/month at currently published prices. Single availability zone; external/offsite backup and owner-operated server management remain necessary.
+- Retention draft now separates tax records (SARS commonly five years, subject to exceptions) from Companies Act s24 company records (generally seven years for records covered by that section). No blanket five/seven-year retention is imposed on all personal information. Proposed account closure/export, log and backup periods are documented but require legal/accounting review and implementation.
+- Documentation progress only. No compliance certification or launch clearance is claimed. V1 remains **NO-GO**.
