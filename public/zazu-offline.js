@@ -165,14 +165,31 @@
         }
     }
 
-    async function writeState() {
+    async function writeState({ allowSessionChange = false } = {}) {
+        const stateToWrite = state;
+        const expectedToken = stateToWrite?.sync?.token || null;
         const db = await openDb();
         return new Promise((resolve, reject) => {
             const tx = db.transaction(STATE, 'readwrite');
-            tx.objectStore(STATE).put(state, 'current');
+            const store = tx.objectStore(STATE);
+            const current = store.get('current');
+            let sessionMismatch = false;
+
+            current.onsuccess = () => {
+                const persistedToken = current.result?.sync?.token || null;
+                if (!allowSessionChange && persistedToken !== expectedToken) {
+                    sessionMismatch = true;
+                    tx.abort();
+                    return;
+                }
+                store.put(stateToWrite, 'current');
+            };
+            current.onerror = () => tx.abort();
             tx.oncomplete = resolve;
             tx.onerror = () => reject(tx.error || new Error('Local offline state write failed.'));
-            tx.onabort = () => reject(tx.error || new Error('Local offline state write was aborted.'));
+            tx.onabort = () => reject(sessionMismatch
+                ? new Error('The offline device session changed before local state could be saved.')
+                : (tx.error || new Error('Local offline state write was aborted.')));
         });
     }
 
@@ -1032,6 +1049,7 @@
         if (!storageAvailable) {
             throw new Error('Local offline storage is unavailable; this change was not saved.');
         }
+        const expectedToken = (nextState || state)?.sync?.token || null;
         const mutation = {
             id: crypto.randomUUID(),
             entity_type: entityType,
@@ -1057,17 +1075,35 @@
         return new Promise((resolve, reject) => {
             const stateToPersist = { ...(nextState || state), local_dirty: true };
             const tx = db.transaction([STATE, QUEUE], 'readwrite');
-            tx.objectStore(QUEUE).put(mutation);
-            tx.objectStore(STATE).put(stateToPersist, 'current');
+            const stateStore = tx.objectStore(STATE);
+            const currentState = stateStore.get('current');
+            let sessionMismatch = false;
+
+            currentState.onsuccess = () => {
+                const persistedToken = currentState.result?.sync?.token || null;
+                if (sessionCleared || persistedToken !== expectedToken) {
+                    sessionMismatch = true;
+                    tx.abort();
+                    return;
+                }
+                tx.objectStore(QUEUE).put(mutation);
+                stateStore.put(stateToPersist, 'current');
+            };
+            currentState.onerror = () => tx.abort();
             tx.oncomplete = () => {
                 state = stateToPersist;
                 resolve(mutation);
             };
             tx.onerror = () => {
+                if (sessionMismatch) return;
                 storageAvailable = false;
                 reject(tx.error || new Error('Local offline queue transaction failed.'));
             };
             tx.onabort = () => {
+                if (sessionMismatch) {
+                    reject(new Error('The device session changed before this offline change could be saved. Refresh the workspace and retry.'));
+                    return;
+                }
                 storageAvailable = false;
                 reject(tx.error || new Error('Local offline queue transaction was aborted.'));
             };
@@ -1083,6 +1119,7 @@
         // client durable queue larger than that and drain it in ordered batches.
         const mutations = allMutations.slice(0, 100);
 
+        const pushSessionToken = state.sync.token;
         const response = await api('/api/sync/push', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
@@ -1114,8 +1151,14 @@
             const currentStateRequest = stateStore.get('current');
             let nextState = null;
 
+            let sessionMismatch = false;
             currentStateRequest.onsuccess = () => {
                 const persistedState = currentStateRequest.result || state || blank();
+                if (sessionCleared || (persistedState.sync?.token || null) !== pushSessionToken) {
+                    sessionMismatch = true;
+                    tx.abort();
+                    return;
+                }
                 nextState = {
                     ...persistedState,
                     conflicts: [...(persistedState.conflicts || [])],
@@ -1191,7 +1234,9 @@
                 resolve();
             };
             tx.onerror = () => reject(tx.error || new Error('Offline queue acknowledgement failed.'));
-            tx.onabort = () => reject(tx.error || new Error('Offline queue acknowledgement was aborted.'));
+            tx.onabort = () => reject(sessionMismatch
+                ? new Error('The device session changed before sync acknowledgement could be applied.')
+                : (tx.error || new Error('Offline queue acknowledgement was aborted.')));
         });
 
         const identityTargets = {
@@ -1429,7 +1474,7 @@
         // Keep that workspace intact; the normal push/pull/bootstrap cycle will
         // reconcile it after the queue has been safely processed.
         if (!preserveLocalWorkspace) applyBootstrap(result.bootstrap);
-        await writeState();
+        await writeState({ allowSessionChange: true });
         window.dispatchEvent(new CustomEvent('zazu:offline-state-updated'));
         sessionChannel?.postMessage({ type: 'session-replaced' });
         syncAttachments().catch(() => {});
