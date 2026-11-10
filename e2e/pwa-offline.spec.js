@@ -1159,6 +1159,63 @@ test.describe('Zazu installed PWA offline shell', () => {
         expect(outcome.pending).toContain(mutationId);
     });
 
+    test('a cross-business pairing response is revoked without changing local workspace data', async ({ page }) => {
+        test.setTimeout(30_000);
+        await login(page);
+        await page.goto('/settings', { waitUntil: 'domcontentloaded' });
+        await page.evaluate(() => window.ZazuOffline.ready);
+
+        const businessId = await page.evaluate(() => Number(document.body.dataset.zazuBusinessId));
+        const mutationId = await page.evaluate(async () => {
+            const state = window.ZazuOffline.getState();
+            state.business = { id: Number(document.body.dataset.zazuBusinessId), name: 'Original business workspace' };
+            state.customers = [{ id: null, local_id: 'cross-business-guard-customer', name: 'Do not lose this' }];
+            await window.ZazuOffline.persist();
+            return (await window.ZazuOffline.queueMutation('customer', 'create', {
+                local_id: 'cross-business-guard-customer',
+                record: { name: 'Do not lose this' },
+            })).id;
+        });
+
+        await page.route('**/api/sync/provision', route => route.fulfill({
+            status: 200,
+            contentType: 'application/json',
+            body: JSON.stringify({
+                token: 'wrong-business-token',
+                device: { id: 987701, business_id: businessId + 1 },
+                bootstrap: { business: { id: businessId + 1, name: 'Wrong business' }, selected: [] },
+            }),
+        }));
+
+        let revokedAuthorization = null;
+        await page.route('**/api/sync/revoke', async route => {
+            revokedAuthorization = route.request().headers()['authorization'] || null;
+            await route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify({ revoked: true }) });
+        });
+
+        const error = await page.evaluate(async () => {
+            try {
+                await window.ZazuOffline.pair('654321');
+                return null;
+            } catch (failure) {
+                return failure.message;
+            }
+        });
+        const outcome = await page.evaluate(async () => ({
+            businessName: window.ZazuOffline.getState().business?.name,
+            customerName: window.ZazuOffline.getState().customers?.[0]?.name,
+            token: window.ZazuOffline.getState().sync?.token || null,
+            pending: (await window.ZazuOffline.pending()).map(item => item.id),
+        }));
+
+        expect(error).toContain('different business workspace');
+        expect(revokedAuthorization).toBe('Bearer wrong-business-token');
+        expect(outcome.businessName).toBe('Original business workspace');
+        expect(outcome.customerName).toBe('Do not lose this');
+        expect(outcome.token).toBeNull();
+        expect(outcome.pending).toContain(mutationId);
+    });
+
     test('authenticated dashboard survives a real offline navigation', async ({ page, context }) => {
         test.setTimeout(60_000);
 
