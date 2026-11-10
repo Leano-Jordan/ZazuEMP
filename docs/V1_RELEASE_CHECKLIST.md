@@ -343,3 +343,16 @@ Run links and exact IDs are recorded in `docs/ZAZU_V1_SCORECARD_2026-11-04.md`. 
 - Current-head checks: PHPMD **PASS**; Psalm security scan **PASS**; Zazu quality workflow **PASS**; populated upgrade/rollback workflow **PASS**; Laravel **PASS**. Browser smoke is still running and is not yet accepted as passed.
 - Relevant commits: `79f41fc` initial verifier; `f01371a` remove unsigned issuer; `39194b5` input bound/anti-rollback; `5544e07` verifier refactor; `632e148` dedicated verifier; `9e82b7c` DI; `5a54a21` attachment DOM regression correction; `b9fc97d` local attachment method-signature regression correction.
 - Remaining licensing blockers: owner activation/status UI, production issuer and private-key custody, installation identity/reactivation, renewal UX, and enforcement at the correct business boundary. No readiness score uplift yet; V1 remains **NO-GO** pending browser smoke and remaining release gates.
+
+
+## Director correction — offline licensing status (2026-11-10)
+
+The earlier licensing note saying owner activation/status UI remained outstanding is superseded by current-main implementation:
+- Owner Business Settings now displays the installed licence status, plan, start/expiry and reference.
+- Owner can import/renew using a signed Ed25519 token while offline.
+- The route is authenticated, business-context and owner protected, rate-limited, and audit logged.
+- Feature tests cover activation, audit persistence, invalid-token handling, expiry, tampering, cross-business rejection and signed revocation.
+
+**Still open:** production issuer and private-key custody; installation identity/reactivation; application-wide plan/feature enforcement; exact-current-HEAD CI confirmation. This is an activation/import flow, not yet a complete commercial licensing system.
+
+The recorded 422 passing Laravel tests / 2,985 assertions are tied to commit `b9fc97d`; do not report them as current-HEAD results without a matching run. No physical-device, deployment, recovery, privacy or brand gate is closed by this correction.
