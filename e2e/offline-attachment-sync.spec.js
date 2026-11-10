@@ -868,5 +868,33 @@ test('re-pair in one tab replaces the stale device session in other open tabs', 
     await expect.poll(() => secondTab.evaluate(() => window.ZazuOffline.getState().sync?.token))
         .toBe('cross-tab-new-token');
     await expect.poll(() => secondTab.evaluate(() => window.ZazuOffline.isPaired())).toBe(true);
+
+    const staleWriteError = await secondTab.evaluate(async () => {
+        window.ZazuOffline.getState().sync.token = 'cross-tab-old-token';
+        try {
+            await window.ZazuOffline.persist();
+            return null;
+        } catch (error) {
+            return error.message;
+        }
+    });
+    expect(staleWriteError).toContain('device session changed');
+
+    const durableToken = await secondTab.evaluate(async () => {
+        const businessId = Number(document.body.dataset.zazuBusinessId);
+        const database = await new Promise((resolve, reject) => {
+            const request = indexedDB.open('zazu-client-business-' + businessId);
+            request.onsuccess = () => resolve(request.result);
+            request.onerror = () => reject(request.error || new Error('Could not inspect durable device state.'));
+        });
+        const stored = await new Promise((resolve, reject) => {
+            const request = database.transaction('state', 'readonly').objectStore('state').get('current');
+            request.onsuccess = () => resolve(request.result || null);
+            request.onerror = () => reject(request.error || new Error('Could not read durable device state.'));
+        });
+        database.close();
+        return stored?.sync?.token || null;
+    });
+    expect(durableToken).toBe('cross-tab-new-token');
     await secondTab.close();
 });
