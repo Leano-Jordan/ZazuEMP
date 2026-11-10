@@ -1,5 +1,16 @@
 
 
+## Signed offline licence verification foundation — 2026-11-10
+
+- Added local Ed25519 detached-signature verification and import to `OfflineLicenseService`; the exact signed payload bytes are verified before JSON parsing and entitlement persistence.
+- Added fail-closed checks for missing/invalid public-key configuration, malformed/tampered tokens, required payload fields, unsupported version/status, invalid UUID/plan, wrong business binding, malformed dates and expiry-before-start.
+- Supports signed `active` and `revoked` states. A revoked entitlement imports inactive; all validity checks remain local and require no network request.
+- Configures only `ZAZU_LICENSE_PUBLIC_KEY` (base64 public key). No signing private key is included or permitted in the app repository.
+- Added feature-test source for valid import, tamper rejection without overwriting an existing entitlement, cross-business rejection and signed revocation.
+- Commits: `79f41fc` verifier; `ca9aefa` config; `90f971e` environment example; `cd9edfd` tests; `a99308f` required-field hardening.
+- Verification boundary: files re-fetched after writes; PHPUnit, sodium runtime compatibility, Blade/browser flows and exact-head CI have not been run. No owner activation UI, issuer, installation identity, renewal workflow or enforcement middleware exists yet. This is a service-level security foundation, not completed commercial licensing. No readiness score uplift; V1 remains NO-GO.
+
+
 ## CSP inline-style attribute reduction — 2026-11-10
 
 - Removed the six dynamic image `style=` attributes from the public landing page. Their image URLs now flow through response-nonce-authorized CSS custom properties and class selectors in the landing document head.
