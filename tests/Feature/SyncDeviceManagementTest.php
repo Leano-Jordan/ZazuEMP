@@ -2,6 +2,7 @@
 
 namespace Tests\Feature;
 
+use App\Models\AuditLog;
 use App\Models\Business;
 use App\Models\SyncDevice;
 use App\Models\User;
@@ -39,6 +40,19 @@ class SyncDeviceManagementTest extends TestCase
         $this->actingAs($owner)
             ->post(route('settings.sync.devices.revoke', $device))
             ->assertRedirect(route('settings.index'));
+
+        $this->actingAs($owner)
+            ->post(route('settings.sync.devices.revoke', $device))
+            ->assertRedirect(route('settings.index'));
+
+        $this->assertSame(
+            1,
+            AuditLog::query()
+                ->where('business_id', $business->id)
+                ->where('action', 'sync.device.revoked')
+                ->where('metadata->device_id', $device->id)
+                ->count(),
+        );
 
         $device->refresh();
         $this->assertSame('revoked', $device->status);
