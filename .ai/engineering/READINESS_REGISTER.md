@@ -847,3 +847,12 @@ Commits: `4f4f9f63e617b201fb68ab612ef902805c8e1727`, `a281567ab1c9b384dffe47405d
 - Test-fixture-only corrections: E2E job uses isolated array cache to prevent repeated sign-ins sharing a rate-limit bucket; recovery assertion matches current operator copy; browser business ID is passed explicitly from page context into the Node route stub. Production authentication throttling and user-facing recovery copy were not changed.
 - Evidence status: **AUTOMATED OFFLINE ACCEPTANCE = PASS**. Physical phone/browser installation and operator restore drill remain **OPEN**. No score uplift; commercial V1 remains **NO-GO**.
 
+
+
+## Sync delivery and recovery boundary — 2026-11-10
+
+- Closed source-level gaps in recorder-side stream validation and destination-device revocation during delivery publication.
+- Acknowledgement now counts only pending delivery rows in its contiguous sequence range; cursor/delivery updates remain transactional.
+- Regression source covers unsupported stream rejection before sequence allocation and a device revoked after initial destination selection.
+- Exact-head GitHub Actions execution is pending. The offline-browser acceptance job exists in `.github/workflows/laravel.yml`; status must be read from the run for the resulting head.
+- No readiness score uplift. V1 remains **NO-GO** until automated offline acceptance and remaining installed-device / operator recovery gates pass.
