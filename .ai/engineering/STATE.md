@@ -1477,3 +1477,11 @@ Owner expanded the visual refinement scope beyond the dashboard: apply the estab
 - Extended `e2e/offline-attachment-sync.spec.js` with a simulated successful HTTP response that deliberately returns the wrong event ID; the regression asserts that the local attachment remains pending instead of being marked synced.
 - Commits: `9af8dc8` client guard; `0d82a12` response-mismatch regression; `fee725d` fixture key correction.
 - Verification boundary: changed client and E2E files were re-fetched and inspected. Playwright/PHPUnit/build and exact-head CI have not been run here. No score uplift; V1 remains **NO-GO**.
+
+## Remote attachment parent-identity validation — 2026-11-10
+
+- Extended the attachment trust boundary in `loadAttachments()`: metadata returned for a job is ignored unless it contains a positive safe-integer attachment ID and its event ID exactly matches the requested Work record.
+- This prevents a malformed or incorrectly scoped attachment-list response from causing the client to download and cache another job's file.
+- Extended the browser regression with a remote attachment-list item deliberately assigned to a different event; the test asserts that no file download is attempted and no foreign attachment is added to the local list.
+- Commits: `af99f69` client validation; `dbb2e3d` regression.
+- Verification boundary: source and E2E changes re-fetched and inspected. Automated execution remains pending; no readiness score uplift. V1 remains **NO-GO**.
