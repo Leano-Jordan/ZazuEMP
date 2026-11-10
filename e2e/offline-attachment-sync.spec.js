@@ -610,3 +610,105 @@ test('late attachment upload response cannot recreate local files after logout',
         return records.length;
     })).toBe(0);
 });
+
+test('re-pair invalidates the old sync session and retries queued work with the new token', async ({ page }, testInfo) => {
+    test.setTimeout(45_000);
+    test.skip(testInfo.project.name !== 'chromium', 'Re-pair session transition runs once in Chromium.');
+
+    await login(page);
+    await page.goto('/dashboard', { waitUntil: 'domcontentloaded' });
+
+    const businessId = await page.evaluate(() => Number(document.body.dataset.zazuBusinessId));
+    await page.evaluate(async businessId => {
+        await window.ZazuOffline.ready;
+        const state = window.ZazuOffline.getState();
+        state.sync = { token: 'old-pair-session-token', device: { id: 987658, business_id: businessId } };
+        await window.ZazuOffline.persist();
+        await window.ZazuOffline.queueMutation('customer', 'create', {
+            local_id: 're-pair-race-customer',
+            name: 'Re-pair race customer',
+        });
+    }, businessId);
+
+    let releaseOldPush;
+    const oldPushGate = new Promise(resolve => { releaseOldPush = resolve; });
+    let oldPushStarted;
+    const oldPushSeen = new Promise(resolve => { oldPushStarted = resolve; });
+    let newPushSeen;
+    const newPush = new Promise(resolve => { newPushSeen = resolve; });
+    let mutationId = null;
+    let newPushCount = 0;
+
+    await page.route('**/api/sync/**', async route => {
+        const request = route.request();
+        const url = new URL(request.url());
+        const token = request.headers()['authorization'];
+
+        if (url.pathname === '/api/sync/push' && request.method() === 'POST') {
+            const body = request.postDataJSON();
+            mutationId = body.mutations?.[0]?.id || mutationId;
+            if (token === 'Bearer old-pair-session-token') {
+                oldPushStarted();
+                await oldPushGate;
+                await route.fulfill({
+                    status: 200,
+                    contentType: 'application/json',
+                    body: JSON.stringify({ recorded: [{ id: mutationId, status: 'applied', applied: true, identity: null }] }),
+                });
+                return;
+            }
+
+            expect(token).toBe('Bearer new-pair-session-token');
+            newPushCount++;
+            newPushSeen();
+            await route.fulfill({
+                status: 200,
+                contentType: 'application/json',
+                body: JSON.stringify({ recorded: [{ id: mutationId, status: 'applied', applied: true, identity: null }] }),
+            });
+            return;
+        }
+
+        expect(token).toBe('Bearer new-pair-session-token');
+        if (url.pathname === '/api/sync/pull') {
+            await route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify({ mutations: [] }) });
+            return;
+        }
+        if (url.pathname === '/api/sync/bootstrap') {
+            await route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify({}) });
+            return;
+        }
+        if (url.pathname === '/api/sync/acknowledge') {
+            await route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify({ acknowledged: true }) });
+            return;
+        }
+        await route.fulfill({ status: 404, contentType: 'application/json', body: JSON.stringify({ message: 'Unexpected sync request' }) });
+    });
+
+    await page.route('**/api/sync/provision', async route => {
+        await route.fulfill({
+            status: 200,
+            contentType: 'application/json',
+            body: JSON.stringify({
+                token: 'new-pair-session-token',
+                device: { id: 987659, business_id: businessId },
+                bootstrap: {},
+            }),
+        });
+    });
+
+    const oldSync = page.evaluate(() => window.ZazuOffline.sync().catch(() => null));
+    await oldPushSeen;
+    await page.evaluate(() => window.ZazuOffline.pair('123456'));
+    releaseOldPush();
+    await oldSync;
+    await newPush;
+
+    await expect.poll(() => newPushCount).toBe(1);
+    await expect.poll(async () => page.evaluate(() => window.ZazuOffline.pending())).toHaveLength(0);
+    const finalState = await page.evaluate(() => ({
+        token: window.ZazuOffline.getState().sync?.token,
+        dirty: window.ZazuOffline.getState().local_dirty,
+    }));
+    expect(finalState).toEqual({ token: 'new-pair-session-token', dirty: false });
+});
