@@ -1469,3 +1469,11 @@ Owner expanded the visual refinement scope beyond the dashboard: apply the estab
 - This closes a gap in the previous regression, which simulated the server identity transition by directly mutating client state and calling `syncAttachments()`.
 - Commits: `918fb93` initial protocol-level regression; `fc715ba` removes the previous direct identity simulation.
 - Verification boundary: updated E2E source was re-fetched and inspected. Playwright has not been executed in this environment; exact-head CI is not verified. No score uplift. V1 remains **NO-GO** pending CI and real installed-device acceptance.
+
+## Attachment sync acknowledgement integrity — 2026-11-10
+
+- Hardened `public/zazu-offline.js::syncAttachments()`: an HTTP-success response is no longer sufficient to mark a local attachment synced.
+- The client now requires a positive safe-integer attachment ID, the exact expected server event ID, and the exact original idempotency key. Any mismatch leaves the original Blob and record pending, increments retry attempts, and records a clear error.
+- Extended `e2e/offline-attachment-sync.spec.js` with a simulated successful HTTP response that deliberately returns the wrong event ID; the regression asserts that the local attachment remains pending instead of being marked synced.
+- Commits: `9af8dc8` client guard; `0d82a12` response-mismatch regression; `fee725d` fixture key correction.
+- Verification boundary: changed client and E2E files were re-fetched and inspected. Playwright/PHPUnit/build and exact-head CI have not been run here. No score uplift; V1 remains **NO-GO**.
