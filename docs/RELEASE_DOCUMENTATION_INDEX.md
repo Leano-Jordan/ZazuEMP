@@ -31,14 +31,14 @@ This directory contains the operational documentation set for a commercial Zazu 
 
 - Current provider/operator: Isaac Junior Lehlogonolo Maluleka, operating independently.
 - Future brand/company identity: Rosscore Labs; do not represent it as incorporated before registration.
-- Target price: R99 per business/workspace per month.
-- Proposed free trial: 14 days, subject to owner confirmation.
-- Trial/subscription expiry: downgrade to Basic; no lockout or data deletion solely for non-payment.
+- Target paid price: R99 per business/workspace per month for Advanced; Basic Free remains available.
+- Owner-confirmed free trial: 30 days, followed by Basic Free unless the customer subscribes.
+- 30-day trial/subscription expiry: downgrade to Basic Free; no lockout or data deletion solely for non-payment.
 - Deployment direction: hosted and local/offline.
 - Support, privacy requests and incidents are initially owner-handled.
 - Customer content remains customer-owned.
 - Hosted customer data is expected to be processed under an operator arrangement where POPIA applies; local deployments have a different access/responsibility boundary.
-- Recommended hosting shortlist: xneelo Cloud, Johannesburg; not yet provisioned or contracted.
+- Recommended hosting shortlist: xneelo Cloud, Johannesburg; not yet provisioned or contracted. Planning budget: R450–R500/month including a provisional backup/overhead allowance.
 
 ## Non-negotiable publication controls
 
@@ -63,3 +63,13 @@ A document is not release-complete merely because this repository contains the f
 4. technical controls and manual procedures verified;
 5. legal/accounting review where material;
 6. final published copies and evidence retained with the release record.
+
+
+## Owner decisions — 2026-11-10 follow-up
+
+- Trial duration confirmed at **30 days**.
+- Trial expiry moves the workspace to **Basic Free**; no silent paid conversion, lockout or data deletion solely for expiry.
+- Recommended paid tier: **Advanced R99/workspace/month**.
+- Proposed limits for verification: Basic 5 active events / 250 MB / one owner; Advanced up to 3 users / 2 GB hosted storage, with expanded operational modules. These are proposals, not verified entitlements.
+- Public service area approved as **Pretoria North, Gauteng, South Africa**. Do not publish the residential street address or represent the area as a registered office.
+- Initial hosted operating budget recommendation: **R450–R500/month**, based on current xneelo server estimate plus a provisional independent-backup/overhead allowance. Actual backup vendor pricing remains unconfirmed.
