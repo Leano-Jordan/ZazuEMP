@@ -643,7 +643,17 @@
                 if (response.ok) {
                     const result = await response.json();
                     for (const attachment of result.attachments || []) {
-                        const key = attachment.idempotency_key || ('server-' + attachment.id);
+                        const attachmentId = Number(attachment.id);
+                        const attachmentEventId = Number(attachment.event_id);
+                        if (
+                            !Number.isSafeInteger(attachmentId)
+                            || attachmentId < 1
+                            || attachmentEventId !== targetEventId
+                        ) {
+                            continue;
+                        }
+
+                        const key = attachment.idempotency_key || ('server-' + attachmentId);
                         const existing = await readAttachmentRecord(key);
 
                         // Keep an unconfirmed local upload intact. Retrying its
