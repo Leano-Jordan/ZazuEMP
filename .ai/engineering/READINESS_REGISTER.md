@@ -941,3 +941,10 @@ Commits: `4f4f9f63e617b201fb68ab612ef902805c8e1727`, `a281567ab1c9b384dffe47405d
 
 - PHPMD found a push-method length regression and two oversized test classes. The controller guard was extracted into a private method; tests were moved into focused classes without removing assertions or disabling rules. A PHPMD parser error caused by escaped namespace separators was corrected.
 - Latest exact-head workflow verification is still queued/pending; no green claim until PHPMD, Laravel, quality, Psalm and browser results are observed. V1 remains **NO-GO**.
+
+
+## Offline session fixture reconciliation and CI evidence — 2026-11-10
+
+- Corrected eight E2E fixture paths that seeded a replacement sync token using ordinary persistence; they now use the explicit session-replacement path and preserve the production compare-before-write guard. The conflict retry/discard fixture persists its new session before queueing mutations.
+- Exact-head `c021eb2` evidence: Laravel **446 passed / 3,083 assertions**; offline browser acceptance **18 passed**; PHPMD, quality/secret scan, Psalm, populated upgrade/rollback and Director contract lint **success**. The separate browser smoke suite was still running at the time of this record.
+- This is verification progress, not release acceptance. V1 remains **NO-GO** pending final browser smoke and full current-head verification.
