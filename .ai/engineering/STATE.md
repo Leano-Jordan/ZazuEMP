@@ -1410,3 +1410,11 @@ Owner expanded the visual refinement scope beyond the dashboard: apply the estab
 - The full browser regression now asserts the file appears in the Work row and that clicking it triggers a download with the original filename.
 - Commits: 0c20268 directory list/open action; 5a65387 list refresh; d4c574e non-destructive refresh; cd67799 visible-file assertion; 22ea45f download assertion.
 - Source files re-fetched and key integration anchors confirmed. No Playwright execution or exact-head CI evidence is available. V1 remains NO-GO; no score uplift.
+
+## CSP style migration — workspace background variables — 2026-11-10
+
+- Moved the business-specific dashboard and wallpaper CSS custom properties off the authenticated document's `body style=` attribute and into a response-nonce-authorized `<style>` element in the document head.
+- Preserved the existing media routes, cache-busting version, conditional wallpaper behaviour and CSS variable names; no visual or route behaviour was intentionally changed.
+- Added a focused `SecurityHeadersTest` source regression asserting the nonce block and absence of a body inline-style attribute.
+- Commits: `3a77c92` (layout), `c31347b` (initial regression), `8e17a61` (precise body-tag assertion), `ccb6239` (move style block into head).
+- Verification boundary: changed source re-fetched and inspected. PHPUnit, Blade compilation, browser regression and exact-head CI have **not** been run for this change. Other inline style attributes remain; CSP unsafe-style allowances are intentionally unchanged. No score uplift; V1 remains **NO-GO**.
