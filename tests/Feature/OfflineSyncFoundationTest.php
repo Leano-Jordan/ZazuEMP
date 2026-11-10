@@ -2259,6 +2259,36 @@ class OfflineSyncFoundationTest extends TestCase
         $this->assertSame('Edited customer', $conflict->local_payload['payload']['record']['name']);
         $this->assertSame('Original customer', $conflict->remote_payload['payload']['record']['name']);
 
+        // Concurrent/duplicate delivery of the same changed-payload replay must
+        // reuse its one open conflict instead of creating another operator item.
+        $duplicateRequest = Request::create('/api/sync/push', 'POST', [
+            'mutations' => [[
+                'id' => $mutationId,
+                'entity_type' => 'customer',
+                'entity_id' => $entityId,
+                'operation' => 'create',
+                'payload' => [
+                    'local_id' => $entityId,
+                    'record' => ['name' => 'Edited customer'],
+                ],
+            ]],
+        ]);
+        $duplicateRequest->attributes->set('sync_device', $device);
+        $duplicateResponse = $controller->push(
+            $duplicateRequest,
+            $recorder,
+            app(SyncMutationApplier::class),
+            app(OfflineDomainMutationHandler::class),
+            app(SyncConflictRecorder::class),
+        );
+        $this->assertSame($conflict->id, $duplicateResponse->getData(true)['recorded'][0]['conflict_id']);
+        $this->assertSame(1, \\App\\Models\\SyncConflict::query()
+            ->where('business_id', $business->id)
+            ->where('mutation_id', $mutationId)
+            ->where('conflict_type', 'mutation_identity_mismatch')
+            ->where('status', 'open')
+            ->count());
+
         $resolveRequest = Request::create('/api/sync/conflicts/'.$conflict->id.'/resolve', 'POST', [
             'action' => 'retry',
         ]);
