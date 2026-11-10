@@ -1368,3 +1368,15 @@ Owner expanded the visual refinement scope beyond the dashboard: apply the estab
 - V1 remains NO-GO. Outstanding: physical phone/tablet secure-origin offline acceptance; selected persistent production host and deployment smoke; actual operator restore and deployment rollback; trusted-device/lost-device acceptance; privacy/legal/incident process; Zazu brand clearance; paid offline licensing decision/implementation; remaining CSP attribute migration and log redaction/access policy.
 - Next Director sequence: preserve the green exact source; complete physical acceptance on secure HTTPS; choose and validate the actual production deployment; run operator recovery/rollback; close legal/brand/licensing and security operations; then re-score.
 - Evidence limits: no customer/staging URL, Windows runtime, physical phone/tablet or production database was accessible during this repository-only audit. Those gates remain OPEN/UNVERIFIED, not assumed passed.
+
+## Offline Work attachment journey gap — 2026-11-10
+
+- Exact current documentation/control-plane head `1852f955f9ee56b60a7bac232bd5a47665f1a6c0` triggered the full push CI batch. Laravel: 417 passed / 2,954 assertions; browser smoke: 65 passed / 22 skipped / 0 failed; Quality + secret scan, Psalm, PHPMD, populated upgrade/rollback, Director Contract Lint and Director Health passed. SonarCloud skipped.
+- Source inspection found a concrete gap between the implemented offline attachment identity-reconciliation helper and the operator workflow:
+  - `public/zazu-offline.js::queueAttachments()` rejects any job without a positive server ID.
+  - `reconcileAttachmentEventIds()` can resolve `event_local_id`, but the normal queue path never creates a local-ID attachment record.
+  - The E2E reconciliation test manually seeds an IndexedDB record with `event_local_id`, so it proves the reconciliation helper, not the real operator journey.
+  - `resources/js/app.js::setupZazuOfflineDirectoryViews()` renders local Work rows as non-interactive articles without an attachment/detail action; the server-rendered Work detail/attachment form is unavailable until a server record exists.
+- Classification: **V1 offline workflow gap / P1**. Do not claim a complete offline-created Work → attach file → reconnect journey.
+- Next implementation target: add a safe, explicit local Work attachment path that accepts a local job identity, persists the Blob with business ID + `event_local_id` + idempotency UUID, presents the pending file in the local Work row/detail surface, and only uploads after the job mutation has been acknowledged with a verified server event ID. Preserve atomic writes, 10-file/20 MB limits, business isolation, retry state and no premature deletion. Add a real UI Playwright journey; do not rely on hand-seeded IndexedDB fixtures.
+- Current application/test baseline remains `90b3d1b7ad1c888a69f728df0add75d834884bbf`; current control-plane documentation head is `1852f955f9ee56b60a7bac232bd5a47665f1a6c0`. No code change or readiness-score uplift was made in this investigation.
