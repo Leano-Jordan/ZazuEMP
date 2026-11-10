@@ -1394,3 +1394,11 @@ Owner expanded the visual refinement scope beyond the dashboard: apply the estab
 - Verification boundary: GitHub combined-status lookup for 352f9d1 returned no status contexts. No PHPUnit, Vite, Playwright or exact-head CI pass is claimed. The test currently guards the source contract; the existing hand-seeded E2E identity test still needs replacement/extension with a real local Work-row click → file selection → queued Blob → job sync → attachment upload journey.
 - Readiness: no score uplift. Offline-created Work attachment path is IMPLEMENTED AT SOURCE / AUTOMATED VERIFICATION PENDING. V1 remains NO-GO.
 - Next target: add the real Playwright journey and verify that attachment rows are visible/openable from the local Work row; then reconcile exact-head CI and Guardian regression review.
+
+## Real offline Work attachment journey regression — 2026-11-10
+
+- Extended e2e/offline-attachment-sync.spec.js with a real Chromium operator journey: create a customer using the offline customer form, create a job using the offline Work form, open the Work directory, select a file through the rendered Attach files control, and verify the Blob can be read back against the local job ID.
+- The test then reconnects while the job still has no server identity and asserts the attachment remains pending with zero uploads. It assigns the simulated server identity through the synced local state, invokes the normal attachment reconciliation/upload path, and asserts the original file and idempotency key are uploaded against the resolved event ID.
+- This removes the previous hand-seeded IndexedDB attachment fixture as the only evidence for the offline-created job path. Existing lower-level identity reconciliation test remains as a focused regression.
+- Commit: 876f0828adba101221f89df10cbbced0890a2a89.
+- Verification boundary: test source was re-fetched and inspected; Playwright has not been executed in this environment. The server ID transition is simulated at the local state boundary, not produced by a live Laravel mutation push/pull round-trip. Full sync integration and exact-head CI remain open. No readiness score uplift; V1 remains NO-GO.
