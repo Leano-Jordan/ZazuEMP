@@ -8,6 +8,10 @@ use Illuminate\Support\Carbon;
 
 class OfflineLicenseService
 {
+    public function __construct(private readonly SignedOfflineLicenseVerifier $verifier)
+    {
+    }
+
     public function current(Business $business): ?BusinessLicense
     {
         return $business->license;
@@ -21,9 +25,8 @@ class OfflineLicenseService
     public function importSignedLicense(
         Business $business,
         string $token,
-        SignedOfflineLicenseVerifier $verifier,
     ): BusinessLicense {
-        $verified = $verifier->verifyForBusiness($token, (int) $business->id);
+        $verified = $this->verifier->verifyForBusiness($token, (int) $business->id);
         $payload = $verified['payload'];
         $dates = $verified['dates'];
 
