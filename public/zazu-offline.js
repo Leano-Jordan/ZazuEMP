@@ -196,6 +196,7 @@
 
     async function recordSyncAuthorizationFailure(response) {
         if (![401, 403].includes(response?.status) || sessionCleared || !state?.sync?.token) return;
+        state.sync_authorization_required = true;
         state.last_sync_error = 'This device is no longer authorised to sync. Your saved offline changes remain on this device. Ask the business owner to pair the device again.';
         try {
             await writeState();
