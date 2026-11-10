@@ -1402,3 +1402,11 @@ Owner expanded the visual refinement scope beyond the dashboard: apply the estab
 - This removes the previous hand-seeded IndexedDB attachment fixture as the only evidence for the offline-created job path. Existing lower-level identity reconciliation test remains as a focused regression.
 - Commit: 876f0828adba101221f89df10cbbced0890a2a89.
 - Verification boundary: test source was re-fetched and inspected; Playwright has not been executed in this environment. The server ID transition is simulated at the local state boundary, not produced by a live Laravel mutation push/pull round-trip. Full sync integration and exact-head CI remain open. No readiness score uplift; V1 remains NO-GO.
+## Local Work attachment visibility and retrieval — 2026-11-10
+
+- The local Work directory now loads attachment metadata for each offline-created job and displays each filename with its pending/synced state.
+- Operators can open/download a locally stored file directly from the Work row; retrieval uses the existing business-scoped getAttachmentFile() path and does not require a network request.
+- Attachment-list refresh listens to zazu:offline-attachments-updated without rebuilding the Work row, preserving the active file-input action and its save feedback.
+- The full browser regression now asserts the file appears in the Work row and that clicking it triggers a download with the original filename.
+- Commits: 0c20268 directory list/open action; 5a65387 list refresh; d4c574e non-destructive refresh; cd67799 visible-file assertion; 22ea45f download assertion.
+- Source files re-fetched and key integration anchors confirmed. No Playwright execution or exact-head CI evidence is available. V1 remains NO-GO; no score uplift.
