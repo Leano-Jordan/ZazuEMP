@@ -30,20 +30,19 @@ class ZazuHelperTest extends TestCase
             ->assertDontSee('data-zazu-helper', false);
     }
 
-    public function test_helper_moves_only_for_work_and_sales_navigation_popovers(): void
+    public function test_helper_stays_docked_to_the_far_right_instead_of_following_navigation_popovers(): void
     {
         $script = file_get_contents(resource_path('js/app.js'));
         $css = file_get_contents(resource_path('css/zazu-final-visual-sweep.css'));
 
-        $this->assertStringContainsString('zazu-nav-workspace', $script);
-        $this->assertStringContainsString('zazu-nav-sales', $script);
-        $this->assertStringContainsString('moveHelperForNav', $script);
-        $this->assertStringContainsString('getBoundingClientRect()', $script);
-        $this->assertStringContainsString('mouseenter', $script);
-        $this->assertStringContainsString('focusin', $script);
-        $this->assertStringContainsString('is-nav-avoiding', $css);
-        $this->assertStringContainsString('--zazu-helper-nav-right', $css);
+        $this->assertStringContainsString('position: fixed;', $css);
+        $this->assertStringContainsString('right: max(16px, env(safe-area-inset-right));', $css);
+        $this->assertStringContainsString('right: max(12px, env(safe-area-inset-right));', $css);
         $this->assertStringContainsString('width: 46px;', $css);
+        $this->assertStringContainsString('body.zazu-mobile-menu-open .zazu-helper', $css);
+        $this->assertStringNotContainsString('moveHelperForNav', $script);
+        $this->assertStringNotContainsString('is-nav-avoiding', $script.$css);
+        $this->assertStringNotContainsString('--zazu-helper-nav-right', $script.$css);
     }
 
 }
