@@ -94,11 +94,6 @@ class SyncDevice extends Model
             return false;
         }
 
-        $this->forceFill([
-            'last_seen_at' => $lastSeenAt,
-            'token_expires_at' => $tokenExpiresAt,
-        ]);
-
         return true;
     }
 }
