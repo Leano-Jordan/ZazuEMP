@@ -812,3 +812,12 @@ Commits: `c88ace2`, `236d4f6`. Source/test structural review only; Playwright ex
 The Laravel GitHub Actions workflow now includes a separate `offline-browser-acceptance` job. It provisions PHP/Node dependencies, builds assets, seeds the demo business in a clean SQLite database, installs Chromium and runs the full `e2e/pwa-offline.spec.js` suite in the Chromium project. This closes the automation-configuration gap; it does not constitute a test pass.
 
 **Status:** workflow committed as `3944745847842d94d55337327fe38cf154791316`; first execution pending. Exact-head browser runtime remains **UNVERIFIED**. No evidence-maturity uplift until the workflow completes successfully. V1 remains **NO-GO**.
+
+
+### Sync stream input boundary — 2026-11-10
+
+A sync device bearer token could request arbitrary stream names. Because pull/acknowledgement create per-device cursors, this permitted unbounded cursor-row creation despite the mutation recorder currently publishing only the `business` stream. The protocol now rejects names outside the declared supported list before database cursor operations. A feature regression covers both pull and acknowledgement and asserts no cursor is created.
+
+Commits: `4f4f9f63e617b201fb68ab612ef902805c8e1727`, `a281567ab1c9b384dffe47405d6632fa8c16595f`.
+
+**Status:** implemented and source re-fetched; runtime tests/CI are **UNVERIFIED**. No readiness score uplift. V1 remains **NO-GO**.
