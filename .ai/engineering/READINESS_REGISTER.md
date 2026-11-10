@@ -920,3 +920,11 @@ Commits: `4f4f9f63e617b201fb68ab612ef902805c8e1727`, `a281567ab1c9b384dffe47405d
 - Added regression assertions that a tab forced back to an old in-memory token cannot persist stale state or enqueue a mutation, and that the durable replacement token remains unchanged.
 - Commits: `74871c891a4e012affc88c50485e4542057062da`, `aea04e1e9929bc6fc465cc22b8319adecaf001ba`, `d6a897370d592e2bafed8888ee064e55c1887361`, `dea69a2237200ad1393389bf521d8f6f9fd6b46a`.
 - Syntax/source checks only; browser runtime and exact-head CI remain **UNVERIFIED**. No readiness uplift; V1 remains **NO-GO**.
+
+
+## Trusted-device lifecycle concurrency hardening — 2026-11-10
+
+- Added a conditional active-token/expiry check to the middleware activity refresh, so a revoke that lands between initial lookup and refresh blocks the request instead of extending a stale credential.
+- Owner revocation now serializes on the device row and writes its audit transition once. Device-originated revocation is transactional and clears all sync/pairing credential metadata.
+- Provisioning now filters expired pairing codes before taking row locks; regressions cover the lookup/revoke race, idempotent owner audit, self-revoke credential cleanup and expired code rejection.
+- Source and regression assertions are committed on main; exact-head Laravel/quality/browser execution remains PENDING. Do not raise readiness from source coverage alone. V1 remains NO-GO.
