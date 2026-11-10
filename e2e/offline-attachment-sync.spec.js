@@ -71,7 +71,8 @@ test('Work attachments persist offline, upload on reconnect and cache remote fil
             requests.eventId = Number(body.match(/name="event_id"\r\n\r\n([^\r\n]+)/)?.[1] || 0);
             expect(requests.key).toMatch(/^[0-9a-f-]{36}$/i);
             expect(requests.eventId).toBe(eventId);
-            expect(body).toContain('offline-evidence.txt');
+            const mismatchedResponse = body.includes('mismatched-response.txt');
+            expect(body).toContain(mismatchedResponse ? 'mismatched-response.txt' : 'offline-evidence.txt');
 
             await route.fulfill({
                 status: 201,
@@ -79,12 +80,12 @@ test('Work attachments persist offline, upload on reconnect and cache remote fil
                 body: JSON.stringify({
                     duplicate: false,
                     attachment: {
-                        id: 801,
-                        event_id: eventId,
+                        id: mismatchedResponse ? 803 : 801,
+                        event_id: mismatchedResponse ? eventId + 1 : eventId,
                         idempotency_key: requests.key,
-                        original_name: 'offline-evidence.txt',
+                        original_name: mismatchedResponse ? 'mismatched-response.txt' : 'offline-evidence.txt',
                         mime_type: 'text/plain',
-                        size: Buffer.byteLength('saved on phone for later'),
+                        size: mismatchedResponse ? Buffer.byteLength('must remain pending') : Buffer.byteLength('saved on phone for later'),
                         description: '',
                         created_at: new Date().toISOString(),
                     },
@@ -167,6 +168,22 @@ test('Work attachments persist offline, upload on reconnect and cache remote fil
     }, eventId)).toBe('synced');
     expect(requests.key).toBe(pending[0].idempotency_key);
     expect(requests.eventId).toBe(eventId);
+
+    await page.evaluate(async id => {
+        await window.ZazuOffline.queueAttachment(
+            id,
+            new File(['must remain pending'], 'mismatched-response.txt', { type: 'text/plain' })
+        );
+        await window.ZazuOffline.syncAttachments();
+    }, eventId);
+    await expect.poll(() => requests.uploads).toBe(2);
+    const rejectedConfirmation = await page.evaluate(async id => {
+        const records = await window.ZazuOffline.loadAttachments(id);
+        const record = records.find(item => item.original_name === 'mismatched-response.txt');
+        return record ? { status: record.status, last_error: record.last_error } : null;
+    }, eventId);
+    expect(rejectedConfirmation.status).toBe('pending');
+    expect(rejectedConfirmation.last_error).toContain('did not match');
 
     const cached = await page.evaluate(async id => {
         const records = await window.ZazuOffline.loadAttachments(id);
