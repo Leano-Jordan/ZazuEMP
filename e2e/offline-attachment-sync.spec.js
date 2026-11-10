@@ -37,7 +37,7 @@ test('Work attachments persist offline, upload on reconnect and cache remote fil
         const state = window.ZazuOffline.getState();
         state.sync = { token, device: { id: 987654, business_id: Number(document.body.dataset.zazuBusinessId) } };
         state.local_dirty = false;
-        await window.ZazuOffline.persist();
+        await window.ZazuOffline.persist({ allowSessionChange: true });
     }, DEVICE_TOKEN);
 
     const requests = { uploads: 0, key: null, eventId: null, wrongJobDownloads: 0 };
@@ -252,7 +252,7 @@ test('reconciles an offline-created Work attachment after its job receives a ser
             { local_id: localEventId, id: eventId, server_id: eventId, name: 'Synced offline-created job' },
         ];
         state.local_dirty = false;
-        await window.ZazuOffline.persist();
+        await window.ZazuOffline.persist({ allowSessionChange: true });
 
         const database = await new Promise((resolve, reject) => {
             const request = indexedDB.open('zazu-phone-attachments-business-' + businessId);
@@ -415,7 +415,7 @@ test('operator creates an offline Work job, attaches a file from its directory r
         const state = window.ZazuOffline.getState();
         state.sync = { token, device: { id: 987656, business_id: Number(document.body.dataset.zazuBusinessId) } };
         state.local_dirty = false;
-        await window.ZazuOffline.persist();
+        await window.ZazuOffline.persist({ allowSessionChange: true });
     }, deviceToken);
 
     const uploaded = { count: 0, eventId: null, key: null };
@@ -538,7 +538,7 @@ test('late attachment upload response cannot recreate local files after logout',
         await window.ZazuOffline.ready;
         const state = window.ZazuOffline.getState();
         state.sync = { token, device: { id: 987657, business_id: Number(document.body.dataset.zazuBusinessId) } };
-        await window.ZazuOffline.persist();
+        await window.ZazuOffline.persist({ allowSessionChange: true });
     }, deviceToken);
 
     let releaseUpload;
@@ -623,7 +623,7 @@ test('re-pair invalidates the old sync session and retries queued work with the 
         await window.ZazuOffline.ready;
         const state = window.ZazuOffline.getState();
         state.sync = { token: 'old-pair-session-token', device: { id: 987658, business_id: businessId } };
-        await window.ZazuOffline.persist();
+        await window.ZazuOffline.persist({ allowSessionChange: true });
         await window.ZazuOffline.queueMutation('customer', 'create', {
             local_id: 're-pair-race-customer',
             name: 'Re-pair race customer',
@@ -735,7 +735,7 @@ test('late private attachment download cannot repopulate local files after logou
         await window.ZazuOffline.ready;
         const state = window.ZazuOffline.getState();
         state.sync = { token, device: { id: 987660, business_id: Number(document.body.dataset.zazuBusinessId) } };
-        await window.ZazuOffline.persist();
+        await window.ZazuOffline.persist({ allowSessionChange: true });
     }, deviceToken);
 
     let releaseDownload;
@@ -817,7 +817,7 @@ test('re-pair in one tab replaces the stale device session in other open tabs', 
         await window.ZazuOffline.ready;
         const state = window.ZazuOffline.getState();
         state.sync = { token: 'cross-tab-old-token', device: { id: 987661, business_id: businessId } };
-        await window.ZazuOffline.persist();
+        await window.ZazuOffline.persist({ allowSessionChange: true });
     }, businessId);
 
     const secondTab = await context.newPage();
