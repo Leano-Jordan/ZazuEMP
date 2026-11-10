@@ -765,3 +765,11 @@ Commits: `5b15209`, `78917ad`, `d0377f8`.
 - Regression source added for a simulated persistence exception and no-orphan-conflict invariant.
 - Commits: `3d22994`, `8df076c`, `3eba5cf`.
 - Source re-fetch/structural review only. PHPUnit, Playwright and exact-head CI are **UNVERIFIED**. No readiness score uplift; V1 remains **NO-GO**.
+
+
+### Idempotent offline conflict recording — 2026-11-10
+
+- Conflict creation now serializes on the owning active sync-device row and reuses an existing open conflict for the same device/mutation/type.
+- Applied to both deterministic domain rejection and changed-payload identity mismatch paths.
+- Regression added for duplicate changed-payload delivery: same conflict ID returned and one open row remains.
+- Source re-fetch/structural inspection only. Runtime concurrency, PHPUnit and exact-head CI are **UNVERIFIED**. No readiness uplift; V1 remains **NO-GO**.
