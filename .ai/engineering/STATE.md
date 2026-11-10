@@ -1603,3 +1603,13 @@ A confirmed failure-path gap was found in the offline push contract: unexpected 
 - Commits: `3e5b9c7` implementation; `cf332c2` regression.
 - Source re-fetched and structural assertions confirmed. PHPUnit and exact-head CI are **UNVERIFIED**; GitHub combined status and workflow-run lookup returned no records for `cf332c246b001fcb5547e28b5b5d904088471368`.
 - No recovery/readiness score uplift. The representative installation restore drill remains open.
+
+
+## True disconnected customer acceptance — 2026-11-10
+
+- Added a Chromium-only Playwright acceptance path that logs in while connected, warms and confirms service-worker control of the customer-create route, then disables the browser network.
+- While genuinely offline, the test reloads the cached customer form, creates a customer through the normal UI, verifies the mutation is queued, reloads again while still disconnected, and verifies both the queued mutation and local customer remain.
+- This complements the existing origin-unreachable/browser-online fallback test and the real offline dashboard-navigation test; it exercises a true browser-offline mutation rather than only request interception.
+- Commits: `c88ace2` initial acceptance test; `236d4f6` payload/selector assertion alignment.
+- Source and test structure re-fetched. Playwright execution and installed-device acceptance remain **UNVERIFIED**. This is added acceptance coverage, not a passing acceptance result; no readiness score uplift.
+- Next: inspect whether the active offline customer/work journey is adequately covered by this true-disconnect test and then run exact-head browser CI when available.
