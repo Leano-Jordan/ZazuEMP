@@ -513,12 +513,7 @@ class SyncController extends Controller
                     ->first();
 
             } catch (\Throwable $exception) {
-                if (
-                    $exception instanceof \Symfony\Component\HttpKernel\Exception\HttpException
-                    && $exception->getStatusCode() === 401
-                ) {
-                    throw $exception;
-                }
+                $this->rethrowUnauthorizedSyncException($exception);
 
                 $error = mb_substr($exception->getMessage(), 0, 1000);
                 $retryable = ! ($exception instanceof ValidationException);
@@ -748,6 +743,17 @@ class SyncController extends Controller
     private function bootstrapPayload(SyncDevice $device): array
     {
         return app(SyncBootstrapPayloadBuilder::class)->build($device);
+    }
+
+
+    private function rethrowUnauthorizedSyncException(\\Throwable $exception): void
+    {
+        if (
+            $exception instanceof \\Symfony\\Component\\HttpKernel\\Exception\\HttpException
+            && $exception->getStatusCode() === 401
+        ) {
+            throw $exception;
+        }
     }
 
 }
