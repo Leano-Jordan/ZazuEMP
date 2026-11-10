@@ -1592,3 +1592,14 @@ A confirmed failure-path gap was found in the offline push contract: unexpected 
 - Verification boundary: source and test files re-fetched and structurally reviewed. Browser/PHP tests, production build, business-switch acceptance and exact-head CI remain **UNVERIFIED**. No readiness score uplift; V1 remains **NO-GO**.
 
 - Cross-business token cleanup is fail-visible: the client confirms the revocation response before claiming success. If automatic revocation fails, it explicitly instructs the owner to revoke the newly paired device in Trusted phone access; local data remains untouched.
+
+
+## Backup failure-path hardening — 2026-11-10
+
+- Director inspected the current installation backup/restore implementation and found that `ZazuBackupCommand::backupPrivateStorage()` ignored the boolean result of `File::copyDirectory()`.
+- A failed or partial private-storage copy could therefore proceed to checksum generation and publish an archive that omitted private attachments while reporting success.
+- Backup now fails closed with an explicit operator error when the private-storage copy fails; no archive is published.
+- Added `test_backup_fails_without_publishing_an_archive_when_private_storage_copy_fails`, which simulates the copy failure and asserts command failure plus zero published archives.
+- Commits: `3e5b9c7` implementation; `cf332c2` regression.
+- Source re-fetched and structural assertions confirmed. PHPUnit and exact-head CI are **UNVERIFIED**; GitHub combined status and workflow-run lookup returned no records for `cf332c246b001fcb5547e28b5b5d904088471368`.
+- No recovery/readiness score uplift. The representative installation restore drill remains open.
