@@ -805,3 +805,10 @@ Commits: `3e5b9c7` (guard), `cf332c2` (regression). Source re-fetch/structural r
 Added a Chromium Playwright scenario that establishes service-worker control and warms the customer-create route while online, switches the browser genuinely offline, reloads the cached form, creates a customer through the normal UI, then reloads again offline and checks that both the queued mutation and local customer survive. This closes a gap between origin-unreachable fallback coverage and a real browser-offline mutation scenario.
 
 Commits: `c88ace2`, `236d4f6`. Source/test structural review only; Playwright execution and physical installed-device acceptance remain **UNVERIFIED**. No evidence-maturity uplift; V1 remains NO-GO.
+
+
+### Offline browser acceptance CI gate — 2026-11-10
+
+The Laravel GitHub Actions workflow now includes a separate `offline-browser-acceptance` job. It provisions PHP/Node dependencies, builds assets, seeds the demo business in a clean SQLite database, installs Chromium and runs the full `e2e/pwa-offline.spec.js` suite in the Chromium project. This closes the automation-configuration gap; it does not constitute a test pass.
+
+**Status:** workflow committed as `3944745847842d94d55337327fe38cf154791316`; first execution pending. Exact-head browser runtime remains **UNVERIFIED**. No evidence-maturity uplift until the workflow completes successfully. V1 remains **NO-GO**.
