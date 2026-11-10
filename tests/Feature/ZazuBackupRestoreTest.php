@@ -106,6 +106,62 @@ class ZazuBackupRestoreTest extends TestCase
 
 
 
+
+    public function test_backup_fails_without_publishing_an_archive_when_private_storage_copy_fails(): void
+    {
+        if (!class_exists(ZipArchive::class)) {
+            $this->markTestSkipped('PHP Zip extension is required for backup/restore tests.');
+        }
+
+        $database = storage_path('app/zazu-copy-failure.sqlite');
+        $output = storage_path('app/zazu-copy-failure-backups');
+        $privateProbe = storage_path('app/private/zazu-copy-failure/probe.txt');
+        $originalDefault = config('database.default');
+        $originalDatabase = config('database.connections.sqlite.database');
+
+        File::ensureDirectoryExists(dirname($database));
+        File::delete($database);
+        File::put($database, '');
+        File::deleteDirectory($output);
+        File::ensureDirectoryExists(dirname($privateProbe));
+        File::put($privateProbe, 'private media must not be silently omitted');
+
+        config([
+            'database.default' => 'sqlite',
+            'database.connections.sqlite.database' => $database,
+        ]);
+
+        try {
+            DB::purge('sqlite');
+            DB::connection('sqlite')->getSchemaBuilder()->create('backup_failure_probe', function ($table) {
+                $table->id();
+                $table->string('value');
+            });
+            DB::table('backup_failure_probe')->insert(['value' => 'backup candidate']);
+
+            File::partialMock()
+                ->shouldReceive('copyDirectory')
+                ->once()
+                ->andReturn(false);
+
+            $this->artisan('zazu:backup', ['--output' => $output])
+                ->assertExitCode(1);
+
+            $archives = File::glob($output.DIRECTORY_SEPARATOR.'zazu-backup-*.zip');
+            $this->assertCount(0, $archives);
+        } finally {
+            DB::purge('sqlite');
+            File::delete($database);
+            File::deleteDirectory($output);
+            File::delete($privateProbe);
+            config([
+                'database.default' => $originalDefault,
+                'database.connections.sqlite.database' => $originalDatabase,
+            ]);
+            DB::purge('sqlite');
+        }
+    }
+
     public function test_restore_rejects_a_version_two_backup_without_its_integrity_manifest(): void
     {
         if (!class_exists(ZipArchive::class)) {
