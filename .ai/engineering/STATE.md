@@ -1815,3 +1815,12 @@ Source review found that authenticated sync pull/acknowledgement accepted arbitr
 - Current xneelo Cloud indicative resources total approximately R306/month including VAT (2 vCPU/4 GB, 10 GB boot, 50 GB NVMe). Budget R450–R500/month to allow provisionally for independent backups and small overhead. The extra allowance is not a vendor quote.
 - PayFast official card pricing is 3.2% + R2 excl. VAT and payout R8.70 excl. VAT. Estimated card fee on R99 is ~R5.95 incl. VAT. Six R99 subscribers would cover the R450–R500 infrastructure planning budget on a rough cash basis after payment fees and one monthly payout, before tax and other operating costs.
 - Commercial implementation gates: verify tier entitlements and downgrade boundaries in code; enforce storage quotas; select payment provider and recurring billing flow; procure independent offsite backups and complete restore drill; complete legal/accounting review.
+
+
+## Director reconciliation — current-main licensing correction — 2026-11-10
+
+- Corrected the 10 November full audit and V1 release checklist: the earlier licensing finding was stale. Current `main` already contains owner-only signed Ed25519 token import/renewal in Business Settings, status display, audit logging, business binding, anti-rollback and feature coverage.
+- Remaining licensing work is production issuer/private-key custody, installation identity/reactivation and application-wide plan/feature enforcement. The import interface is not a complete commercial enforcement system.
+- Evidence was re-fetched from current `main`: `OfflineLicenseController`, `OfflineLicenseService`, `SignedOfflineLicenseVerifier`, `resources/views/settings/index.blade.php`, `routes/web.php`, and `tests/Feature/OfflineLicenseTest.php`.
+- Historical 422-test evidence belongs to `b9fc97d`; latest docs commit `8d3c1af` has no combined status contexts. No current-head test pass or release score uplift is claimed.
+- Active next target: reconcile exact-main CI for the current source head, then close the production licensing issuer/enforcement boundary without weakening offline operation. P0 physical-device, deployment, operator recovery, privacy and brand gates remain external/operational.
