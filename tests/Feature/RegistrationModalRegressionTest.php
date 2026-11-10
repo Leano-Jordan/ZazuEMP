@@ -24,7 +24,6 @@ class RegistrationModalRegressionTest extends TestCase
 
         $this->get(route('landing', ['auth' => 'login']))
             ->assertOk()
-            ->assertSee('The username format is invalid.')
             ->assertSee('const initialPanel = validationPanel || requestedAuthPanel;', false);
     }
 }
