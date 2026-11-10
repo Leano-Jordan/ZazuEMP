@@ -1222,7 +1222,7 @@ test.describe('Zazu installed PWA offline shell', () => {
 
         await login(page);
         await page.goto('/customers/create', { waitUntil: 'domcontentloaded' });
-        await expect(page.getByRole('heading', { name: /new customer|create customer/i })).toBeVisible();
+        await expect(page.locator('input[name="name"]')).toBeVisible();
 
         await page.evaluate(async () => {
             if (!('serviceWorker' in navigator)) throw new Error('Service workers are unavailable');
@@ -1245,7 +1245,7 @@ test.describe('Zazu installed PWA offline shell', () => {
         const queued = await page.evaluate(async () => window.ZazuOffline.pending());
         expect(queued).toHaveLength(1);
         expect(queued[0].entity_type).toBe('customer');
-        expect(queued[0].payload.record?.name || queued[0].payload.name).toBe('True offline acceptance customer');
+        expect(queued[0].payload.name).toBe('True offline acceptance customer');
 
         await page.reload({ waitUntil: 'domcontentloaded' });
         await page.evaluate(() => window.ZazuOffline.ready);
