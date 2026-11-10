@@ -1570,3 +1570,13 @@ A confirmed failure-path gap was found in the offline push contract: unexpected 
 - Added a feature regression that replays the same changed-payload mutation twice and asserts the same conflict ID and exactly one open conflict.
 - Commits: `20b7724` recorder; `827188e` controller integration; `f886a98` regression.
 - Source re-fetched and structurally inspected. PHP/PHPUnit, concurrent DB runtime behaviour, Playwright and exact-head CI remain **UNVERIFIED**. No readiness score uplift; V1 remains **NO-GO**.
+
+
+## Expired/revoked sync credential recovery — 2026-11-10
+
+- Found a silent recovery failure: push, pull, bootstrap and attachment endpoints could return HTTP 401/403, but the phone client treated those responses as ordinary no-op sync results. Local queued work remained durable, but the operator received no persisted indication that the device needed owner-authorised re-pairing.
+- Added a shared client handler for 401/403 responses. It records an actionable re-pair message in the business-scoped local workspace, persists it, and dispatches the existing offline-state update event. It does not clear credentials, discard queue entries, or mutate local business records.
+- Applied the handler to mutation push, business pull, bootstrap refresh and attachment upload rejection paths.
+- Added a Chromium regression that returns 401 from push and asserts the recovery message is persisted while the original pending mutation and token remain intact.
+- Commits: `9e50522` client recovery handling; `e546e21` regression.
+- Verification boundary: current `main` source and E2E regression were re-fetched; structural checks confirm all four response paths use the handler and the test asserts queue preservation. Playwright, PHP, build and exact-head CI execution remain **UNVERIFIED**. No readiness score uplift; V1 remains **NO-GO**.
