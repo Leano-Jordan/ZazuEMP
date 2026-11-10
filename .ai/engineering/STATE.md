@@ -1850,6 +1850,6 @@ Source review found that authenticated sync pull/acknowledgement accepted arbitr
 
 ## Browser smoke regression correction — 2026-11-10
 - Exact-head `b12eac50` browser workflow failed: 81 passed, 1 failed, 38 skipped. Failure was isolated to `e2e/offline-attachment-sync.spec.js` test `late attachment upload response cannot recreate local files after logout`.
-- Root cause: the test's multipart `idempotency_key` matcher was double-escaped (`\\r\\n`) and therefore searched for literal backslash sequences instead of CRLF delimiters in the multipart body. The uploader correctly submits the field via `FormData.append('idempotency_key', ...)`; this failure was in the assertion parser, not evidence of a production upload defect.
+- Root cause: the test's multipart `idempotency_key` matcher contained doubled escape characters and therefore searched for literal backslash sequences instead of CRLF delimiters in the multipart body. The uploader correctly submits the field via `FormData.append('idempotency_key', ...)`; this failure was in the assertion parser, not evidence of a production upload defect.
 - Corrected matcher to use actual CRLF/newline regex escapes while retaining the assertion that the request carries an idempotency key and the late response cannot recreate local files after logout.
 - Commit: `9bb30a06357ae61e2f2fbdd0f2a6cc639e20acf8` (`test: correct multipart idempotency matcher`). Awaiting exact-head CI. No readiness uplift until browser suite passes.
