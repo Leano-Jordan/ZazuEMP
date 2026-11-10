@@ -28,17 +28,32 @@ class SyncMutationProtocol
             ['last_acknowledged_sequence' => 0],
         );
 
-        return SyncDelivery::query()
+        $deliveries = SyncDelivery::query()
             ->where('business_id', $device->business_id)
             ->where('destination_device_id', $device->id)
             ->where('stream', $stream)
             ->where('delivery_sequence', '>', $cursor->last_acknowledged_sequence)
-            ->where('status', 'pending')
             ->with('mutation')
             ->orderBy('delivery_sequence')
             ->limit(max(1, min($limit, 500)))
-            ->get()
-            ->map(fn (SyncDelivery $delivery) => $delivery->mutation);
+            ->get();
+
+        // Never expose mutations beyond a failed, applied, or missing delivery.
+        // The client acknowledges a contiguous prefix; returning later rows
+        // would make the whole batch impossible to acknowledge safely.
+        $expectedSequence = $cursor->last_acknowledged_sequence + 1;
+        $mutations = collect();
+
+        foreach ($deliveries as $delivery) {
+            if ($delivery->delivery_sequence !== $expectedSequence || $delivery->status !== 'pending') {
+                break;
+            }
+
+            $mutations->push($delivery->mutation);
+            $expectedSequence++;
+        }
+
+        return $mutations;
     }
 
     public function acknowledgeThrough(
