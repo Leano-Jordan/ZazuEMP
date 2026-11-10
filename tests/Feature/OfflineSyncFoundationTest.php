@@ -457,6 +457,52 @@ class OfflineSyncFoundationTest extends TestCase
         $this->assertSame('failed', $delivery->fresh()->status);
     }
 
+    public function test_sync_pull_exposes_receiver_delivery_sequence_for_acknowledgement(): void
+    {
+        $business = Business::create([
+            'name' => 'Independent Delivery Sequence Business',
+            'slug' => 'independent-delivery-'.Str::lower(Str::random(8)),
+            'status' => 'active',
+            'currency' => 'ZAR',
+        ]);
+        $destinationDevice = SyncDevice::create([
+            'business_id' => $business->id,
+            'installation_id' => (string) Str::uuid(),
+        ]);
+        $sourceDevice = SyncDevice::create([
+            'business_id' => $business->id,
+            'installation_id' => (string) Str::uuid(),
+        ]);
+
+        $recorder = app(SyncMutationRecorder::class);
+
+        // The destination's own mutation consumes business sequence 1 but
+        // does not create a delivery back to itself.
+        $localMutation = $recorder->record($destinationDevice, 'event', 'local-sequence-one', 'upsert', ['name' => 'Local']);
+        $localMutation->update(['status' => 'applied', 'applied_at' => now()]);
+        $recorder->publish($localMutation);
+
+        $remoteMutation = $recorder->record($sourceDevice, 'event', 'remote-sequence-two', 'upsert', ['name' => 'Remote']);
+        $remoteMutation->update(['status' => 'applied', 'applied_at' => now()]);
+        $recorder->publish($remoteMutation);
+
+        $batch = app(SyncMutationProtocol::class)->pull($destinationDevice);
+
+        $this->assertCount(1, $batch);
+        $this->assertSame(2, (int) $batch->first()->sequence);
+        $this->assertSame(1, (int) $batch->first()->delivery_sequence);
+
+        $cursor = app(SyncMutationProtocol::class)->acknowledgeThrough(
+            $destinationDevice,
+            (int) $batch->first()->delivery_sequence,
+        );
+
+        $this->assertSame(1, (int) $cursor->last_acknowledged_sequence);
+        $this->assertSame('applied', SyncDelivery::query()
+            ->where('destination_device_id', $destinationDevice->id)
+            ->value('status'));
+    }
+
     public function test_sync_pull_does_not_return_later_mutations_past_a_non_pending_delivery(): void
     {
         $business = Business::create([
