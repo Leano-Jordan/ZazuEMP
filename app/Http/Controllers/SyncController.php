@@ -98,6 +98,8 @@ class SyncController extends Controller
             $candidates = SyncDevice::query()
                 ->where('status', 'pending')
                 ->whereNull('revoked_at')
+                ->whereNotNull('metadata->pairing_code_hash')
+                ->where('metadata->pairing_expires_at', '>', now()->toIso8601String())
                 ->orderBy('id')
                 ->lockForUpdate()
                 ->get();
