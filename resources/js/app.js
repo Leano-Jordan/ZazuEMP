@@ -1213,6 +1213,42 @@ function setupZazuOfflineDirectoryViews() {
             const actions = document.createElement('div');
             actions.className = 'zazu-ops-actions';
             actions.append(text('span', 'zazu-chip zazu-chip-neutral', (job.server_id ?? job.id) ? 'On server' : 'Waiting to sync'));
+
+            if (!(job.server_id ?? job.id)) {
+                const attachmentInput = document.createElement('input');
+                attachmentInput.type = 'file';
+                attachmentInput.multiple = true;
+                attachmentInput.accept = '.pdf,.doc,.docx,.xls,.xlsx,.csv,.txt,.jpg,.jpeg,.png,.webp';
+                attachmentInput.hidden = true;
+                attachmentInput.dataset.zazuLocalJobAttachments = job.local_id;
+
+                const attach = document.createElement('button');
+                attach.type = 'button';
+                attach.className = 'zazu-btn zazu-btn-secondary';
+                attach.textContent = 'Attach files';
+                attach.addEventListener('click', () => attachmentInput.click());
+                attachmentInput.addEventListener('change', async () => {
+                    const files = [...(attachmentInput.files || [])];
+                    if (!files.length) return;
+                    attach.disabled = true;
+                    const originalLabel = attach.textContent;
+                    attach.textContent = 'Saving…';
+                    try {
+                        await window.ZazuOffline.queueAttachments(null, files, '', job.local_id);
+                        attachmentInput.value = '';
+                        attach.textContent = 'Files saved';
+                        attach.setAttribute('aria-label', files.length + ' files saved locally for ' + (job.name || 'this job'));
+                    } catch (error) {
+                        attach.textContent = 'Try again';
+                        attach.title = error.message || 'Files could not be saved locally.';
+                    } finally {
+                        attach.disabled = false;
+                        if (attach.textContent === 'Saving…') attach.textContent = originalLabel;
+                    }
+                });
+                actions.append(attachmentInput, attach);
+            }
+
             row.append(main, actions);
 
             if (empty?.parentNode === register) register.insertBefore(row, empty);
