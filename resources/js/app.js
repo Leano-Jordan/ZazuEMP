@@ -1247,6 +1247,49 @@ function setupZazuOfflineDirectoryViews() {
                     }
                 });
                 actions.append(attachmentInput, attach);
+
+                const attachmentList = document.createElement('div');
+                attachmentList.className = 'zazu-local-attachment-list';
+                attachmentList.setAttribute('aria-live', 'polite');
+                actions.append(attachmentList);
+
+                window.ZazuOffline.loadAttachments(null, job.local_id).then(records => {
+                    if (!row.isConnected) return;
+                    attachmentList.replaceChildren();
+                    for (const record of records) {
+                        const item = document.createElement('div');
+                        item.className = 'zazu-local-attachment-item';
+
+                        const open = document.createElement('button');
+                        open.type = 'button';
+                        open.className = 'zazu-btn zazu-btn-ghost';
+                        open.textContent = record.original_name || 'Attached file';
+                        open.addEventListener('click', async () => {
+                            open.disabled = true;
+                            try {
+                                const file = await window.ZazuOffline.getAttachmentFile(record.idempotency_key);
+                                const url = URL.createObjectURL(file);
+                                const link = document.createElement('a');
+                                link.href = url;
+                                link.download = record.original_name || 'zazu-attachment';
+                                link.click();
+                                URL.revokeObjectURL(url);
+                            } catch (error) {
+                                open.title = error.message || 'This file is not available on this device.';
+                            } finally {
+                                open.disabled = false;
+                            }
+                        });
+
+                        const status = document.createElement('span');
+                        status.className = 'zazu-chip zazu-chip-neutral';
+                        status.textContent = record.status === 'synced' ? 'Synced' : 'Saved offline';
+                        item.append(open, status);
+                        attachmentList.append(item);
+                    }
+                }).catch(() => {
+                    attachmentList.textContent = 'Attachments could not be loaded from this device.';
+                });
             }
 
             row.append(main, actions);
@@ -1283,6 +1326,7 @@ function setupZazuOfflineDirectoryViews() {
     window.ZazuOffline.ready.then(render).catch(() => {});
     window.addEventListener('zazu:offline-ready', render);
     window.addEventListener('zazu:offline-state-updated', render);
+    window.addEventListener('zazu:offline-attachments-updated', render);
 }
 
 function setupZazuOfflineCustomerOptions() {
