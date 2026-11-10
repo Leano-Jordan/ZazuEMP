@@ -309,7 +309,7 @@
         @if ($license)
             <div class="zazu-list-item mt-4">
                 <div class="min-w-0 flex-1">
-                    <strong class="block">{{ strtoupper($license->plan) }} plan · {{ $license->status === 'revoked' ? 'Revoked' : ($license->isActive() ? 'Active' : (($license->starts_at && now()->lt($license->starts_at)) ? 'Not yet active' : 'Expired')) }}</strong>
+                    <strong class="block">{{ strtoupper($license->plan) }} plan · {{ $license->statusLabel() }}</strong>
                     <p class="zazu-context-copy mt-1">
                         @if ($license->starts_at)
                             Starts {{ $license->starts_at->format('d M Y') }}
