@@ -1751,3 +1751,16 @@ Source review found that authenticated sync pull/acknowledgement accepted arbitr
 - Updated Helper, navigation and dashboard regression assertions. The previous REG-019 popover-adjacent rule is superseded by the owner-directed far-right placement.
 - Source files and tests were re-fetched after writes. Rendered desktop/tablet/mobile and light/dark visual acceptance, PHPUnit execution and exact-head CI remain **UNVERIFIED** from this session. No V1 readiness uplift; release remains **NO-GO**.
 - Next active engineering target remains server-side sync-device lifecycle and revocation consistency; the UI refinement does not replace the V1 convergence mission.
+
+
+## Server-side sync-device lifecycle and revocation hardening — 2026-11-10
+
+- The sync middleware's initial token lookup could race with owner revocation. A stale device model could refresh its idle expiry after the database row had already been revoked, then continue through the middleware.
+- Sync token activity refresh is now a conditional database write fenced by device ID, active status, null revocation timestamp, the exact SHA-256 token hash and a still-future token expiry. Middleware re-checks the persisted credential guard before dispatch and returns 401 if that boundary changed. The model is left clean after the write so later controller updates cannot accidentally re-save a stale expiry.
+- Added an adversarial feature regression that revokes the row on Eloquent retrieval, between middleware lookup and activity refresh; the request must be rejected and the expiry remain null.
+- Owner-initiated revocation now locks and rechecks the device/business row inside a transaction, clears token and pairing credentials, and records the audit transition only once. The owner regression repeats revocation and asserts one audit record.
+- Device-initiated revocation now locks the device row in a transaction, is idempotent and clears sync-token plus pairing-code metadata while preserving unrelated metadata.
+- Provisioning filters out expired/missing pairing credentials before taking row locks. Added an expired-pairing regression; expired pending rows no longer enter the provisioning lock set.
+- Commits: 378b342 activity fence; ecad682 middleware rejection; bb7dd76 race regression; 072d0a1 owner revoke transaction; 9afeb98 one-audit regression; fe4ad7a self-revoke transaction; 5fdb467 pairing lock filtering; 16ab465/bcc3e17 revocation and expiry regressions; 504ee44 clean model state.
+- Current source and test files were re-fetched and inspected. PHPUnit, PHP lint against a complete checkout, rendered browser/device acceptance and exact-head CI are UNVERIFIED. Combined commit status exposes no status contexts. No readiness uplift; V1 remains NO-GO.
+- Continue with exact-main verification and the remaining server-side device lifecycle cases; do not treat source-only hardening as release acceptance.
