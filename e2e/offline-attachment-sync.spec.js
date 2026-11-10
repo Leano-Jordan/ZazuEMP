@@ -348,6 +348,7 @@ test('operator creates an offline Work job, attaches a file from its directory r
         buffer: Buffer.from('captured through the actual Work directory action'),
     });
     await expect(localRow.getByRole('button', { name: '1 files saved locally for Attachment journey offline job' })).toBeVisible();
+    await expect(localRow.getByRole('button', { name: 'operator-job-brief.txt' })).toBeVisible();
 
     const locallySaved = await page.evaluate(async localId => {
         const records = await window.ZazuOffline.loadAttachments(null, localId);
