@@ -1380,3 +1380,17 @@ Owner expanded the visual refinement scope beyond the dashboard: apply the estab
 - Classification: **V1 offline workflow gap / P1**. Do not claim a complete offline-created Work → attach file → reconnect journey.
 - Next implementation target: add a safe, explicit local Work attachment path that accepts a local job identity, persists the Blob with business ID + `event_local_id` + idempotency UUID, presents the pending file in the local Work row/detail surface, and only uploads after the job mutation has been acknowledged with a verified server event ID. Preserve atomic writes, 10-file/20 MB limits, business isolation, retry state and no premature deletion. Add a real UI Playwright journey; do not rely on hand-seeded IndexedDB fixtures.
 - Current application/test baseline remains `90b3d1b7ad1c888a69f728df0add75d834884bbf`; current control-plane documentation head is `1852f955f9ee56b60a7bac232bd5a47665f1a6c0`. No code change or readiness-score uplift was made in this investigation.
+
+## Offline-created Work attachment implementation — 2026-11-10
+
+- Target: close the P1 gap where a job created in the phone-local Work queue could not receive attachments until it had a server ID.
+- Current source finding: queueAttachments() required a positive server event ID; the local Work directory rendered queued jobs without an attachment action; the existing identity-reconciliation helper therefore had no real operator entry point.
+- Implemented directly on canonical main:
+  - public/zazu-offline.js: attachment queue accepts either a validated server event ID or a validated local job ID; local records persist event_local_id, business ID, Blob and stable idempotency UUID. Local-ID retrieval is supported. Reconnect upload remains gated on successful reconciliation to a positive server event ID.
+  - resources/js/app.js: pending local Work rows expose an Attach files action; files are stored locally through the shared offline client and the UI reports the local save result.
+  - tests/Feature/PwaOfflineFoundationTest.php: added source-contract guards for the local identity queue/retrieval path and Work-row entry point.
+- Commits: 0a12688 offline queue; 48e991b local Work UI; 352f9d1 regression guards.
+- Re-fetched all three changed files from main; blob SHA reconciliation confirms the expected edits are present.
+- Verification boundary: GitHub combined-status lookup for 352f9d1 returned no status contexts. No PHPUnit, Vite, Playwright or exact-head CI pass is claimed. The test currently guards the source contract; the existing hand-seeded E2E identity test still needs replacement/extension with a real local Work-row click → file selection → queued Blob → job sync → attachment upload journey.
+- Readiness: no score uplift. Offline-created Work attachment path is IMPLEMENTED AT SOURCE / AUTOMATED VERIFICATION PENDING. V1 remains NO-GO.
+- Next target: add the real Playwright journey and verify that attachment rows are visible/openable from the local Work row; then reconcile exact-head CI and Guardian regression review.
