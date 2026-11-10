@@ -900,3 +900,9 @@ Commits: `4f4f9f63e617b201fb68ab612ef902805c8e1727`, `a281567ab1c9b384dffe47405d
 - Added delayed old-token push regression proving the intended sequence at test-source level: old request in flight → new pairing → old session aborted → queued mutation retried with new token.
 - Commits: `2b3828c4a49b03e7e2823559e60a3453781f7d47` (source), `7fbf4ed933c28872b5a4cd8cb12c81eced2e25b6` (test), `d3e44ec438cb59de4da95a74895c02ee9e3d4435` (test fixture).
 - Source/test syntax checks pass. Runtime Playwright, Laravel, quality and exact-head CI remain **UNVERIFIED**. This is not release acceptance and does not change the V1 **NO-GO** disposition.
+
+## Private attachment download/logout regression — 2026-11-10
+- Added a delayed private-file response regression to cover the download/cache path that previously had source-level guards but no dedicated browser test.
+- The fixture holds the private file response, completes local logout, releases the response, and asserts the business attachment store remains empty.
+- Commit: `9c8dd6147112814773d551ae5b959d4e2af48dad`.
+- Syntax/source checks only. Playwright runtime and exact-head CI remain **UNVERIFIED**. V1 remains **NO-GO**.
