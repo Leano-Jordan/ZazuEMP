@@ -1741,3 +1741,13 @@ Source review found that authenticated sync pull/acknowledgement accepted arbitr
 - Extended the cross-tab Chromium regression to force a stale in-memory token and verify both state persistence and mutation enqueue are rejected while the durable replacement token remains intact.
 - Commits: `74871c8` write fencing; `aea04e1` conflict-resolution fencing; `d6a8973` stale-write regression; `dea69a2` stale-queue regression.
 - JavaScript and Playwright spec syntax checks pass after current-main re-fetch. Browser runtime and exact-head CI remain **UNVERIFIED**. No readiness uplift; V1 remains **NO-GO**.
+
+
+## Owner-directed dashboard and Helper placement refinement — 2026-11-10
+
+- Replaced Work/Sales popover-adjacent Helper displacement with a fixed far-right viewport dock. Desktop and tablet use a 16px safe-area-aware inset; compact mobile uses a 12px safe-area-aware inset. Opening the mobile navigation drawer continues to move the Helper out of its interaction area.
+- Create Event now uses the shared Coastal Blue primary token with a dark, high-contrast foreground; hover uses the lighter primary token. Dark mode uses its theme-specific primary/ink mapping.
+- Upcoming event cards now inherit the neutral surface token instead of the blue semantic card tint. Date and status elements remain the semantic visual cues.
+- Updated Helper, navigation and dashboard regression assertions. The previous REG-019 popover-adjacent rule is superseded by the owner-directed far-right placement.
+- Source files and tests were re-fetched after writes. Rendered desktop/tablet/mobile and light/dark visual acceptance, PHPUnit execution and exact-head CI remain **UNVERIFIED** from this session. No V1 readiness uplift; release remains **NO-GO**.
+- Next active engineering target remains server-side sync-device lifecycle and revocation consistency; the UI refinement does not replace the V1 convergence mission.
