@@ -407,7 +407,7 @@ test.describe('Zazu installed PWA offline shell', () => {
             body: JSON.stringify({
                 recorded: [{
                     id: mutation.id,
-                    status: 'conflict',
+                    status: 'pending',
                     sequence: 42,
                     conflict_id: 987661,
                     conflict_type: 'related_record_missing',
