@@ -386,15 +386,18 @@ test.describe('Zazu installed PWA offline shell', () => {
         await login(page);
         await page.goto('/settings', { waitUntil: 'domcontentloaded' });
         await page.evaluate(() => window.ZazuOffline.ready);
-        await page.evaluate(async () => {
+        const businessId = await page.evaluate(() => Number(document.body.dataset.zazuBusinessId));
+        expect(businessId).toBeGreaterThan(0);
+
+        await page.evaluate(async (activeBusinessId) => {
             const state = window.ZazuOffline.getState();
             state.sync = {
                 token: 'atomic-failed-mutation-token',
-                device: { id: 987660, business_id: Number(document.body.dataset.zazuBusinessId) },
+                device: { id: 987660, business_id: activeBusinessId },
             };
             state.local_dirty = false;
             await window.ZazuOffline.persist();
-        });
+        }, businessId);
 
         const mutation = await page.evaluate(() => window.ZazuOffline.queueMutation('customer', 'create', {
             local_id: 'atomic-failed-customer',
@@ -424,7 +427,7 @@ test.describe('Zazu installed PWA offline shell', () => {
             status: 200,
             contentType: 'application/json',
             body: JSON.stringify({
-                business: { id: Number(document.body.dataset.zazuBusinessId), name: 'Test business' },
+                business: { id: businessId, name: 'Test business' },
                 catalogue: [], suppliers: [], purchase_orders: [], invoices: [],
                 expenses: [], inventory_items: [], assets: [], costs: [], selected: [],
             }),
