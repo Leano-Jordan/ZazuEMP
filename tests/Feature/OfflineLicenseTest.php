@@ -27,6 +27,7 @@ class OfflineLicenseTest extends TestCase
 
         $this->assertFalse($license->isActive(Carbon::parse('2026-10-01 00:00:00')));
     }
+
     public function test_a_valid_signed_license_can_be_imported_without_network_access(): void
     {
         $user = $this->signInAsOwner();
@@ -49,7 +50,7 @@ class OfflineLicenseTest extends TestCase
         $service = app(OfflineLicenseService::class);
         $existing = $service->importSignedLicense($business, $this->signedToken($business));
         $token = $this->signedToken($business);
-        [$payload, $signature] = explode('.', $token, 2);
+        [, $signature] = explode('.', $token, 2);
         $tampered = $this->base64UrlEncode('{"version":1,"business_id":'.$business->id.',"status":"active"}').'.'.$signature;
 
         try {
@@ -124,6 +125,18 @@ class OfflineLicenseTest extends TestCase
     private function base64UrlEncode(string $value): string
     {
         return rtrim(strtr(base64_encode($value), '+/', '-_'), '=');
+    }
+
+    public function test_signed_license_import_fails_closed_when_public_key_is_not_configured(): void
+    {
+        $user = $this->signInAsOwner();
+        $business = $user->businesses()->firstOrFail();
+        config(['zazu.licensing.public_key' => '']);
+
+        $this->expectException(\\InvalidArgumentException::class);
+        $this->expectExceptionMessage('Signed licence verification is not configured.');
+
+        app(OfflineLicenseService::class)->importSignedLicense($business, 'not-a-valid-token');
     }
 
 }
