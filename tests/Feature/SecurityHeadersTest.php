@@ -36,6 +36,13 @@ class SecurityHeadersTest extends TestCase
             'purchasing/create.blade.php',
         ];
 
+        $layout = file_get_contents(resource_path('views/components/app-layout.blade.php'));
+        $this->assertIsString($layout);
+        $this->assertStringContainsString('<style nonce="{{ request()->attributes->get(\'cspNonce\') }}">', $layout);
+        $this->assertStringContainsString('--zazu-dashboard-image: url(', $layout);
+        $this->assertStringContainsString('--zazu-wallpaper: url(', $layout);
+        $this->assertDoesNotMatchRegularExpression('/<body\\b[^>]*\\sstyle=/s', $layout);
+
         foreach ($views as $view) {
             $source = file_get_contents(resource_path('views/'.$view));
 
