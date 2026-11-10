@@ -479,6 +479,7 @@ test.describe('Zazu installed PWA offline shell', () => {
             const offline = window.ZazuOffline;
             const initialState = offline.getState();
             initialState.sync = { token: 'sync-conflict-e2e-token', device: { id: 987650 } };
+            await offline.persist({ allowSessionChange: true });
 
             const first = await offline.queueMutation('job', 'create', {
                 local_id: crypto.randomUUID(),
