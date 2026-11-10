@@ -227,7 +227,7 @@ class OfflineLicenseTest extends TestCase
             'issued_at' => '2026-10-10T00:00:00+00:00',
         ]));
 
-        $this->expectException(\\InvalidArgumentException::class);
+        $this->expectException(\InvalidArgumentException::class);
         $this->expectExceptionMessage('This licence is older than the entitlement already installed.');
 
         $service->importSignedLicense($business, $this->signedToken($business, [
@@ -269,7 +269,7 @@ class OfflineLicenseTest extends TestCase
             'features' => ['offline_core' => true],
         ]));
 
-        $this->expectException(\\InvalidArgumentException::class);
+        $this->expectException(\InvalidArgumentException::class);
         $this->expectExceptionMessage('A different licence payload cannot reuse an installed issue timestamp.');
 
         $service->importSignedLicense($business, $this->signedToken($business, [
