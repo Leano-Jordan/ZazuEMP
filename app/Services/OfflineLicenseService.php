@@ -172,7 +172,7 @@ class OfflineLicenseService
         array $payload,
         Carbon $issuedAt,
     ): void {
-        $existing = $business->license;
+        $existing = $business->license()->first();
         $existingIssuedAt = $existing?->metadata['issued_at'] ?? null;
 
         if ($existing?->metadata['signed'] === true
