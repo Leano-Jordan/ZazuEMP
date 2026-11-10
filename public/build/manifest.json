@@ -13,7 +13,7 @@
     ]
   },
   "resources/css/zazu-dashboard-authority.css": {
-    "file": "assets/zazu-dashboard-authority-ARw4EeeR.css",
+    "file": "assets/zazu-dashboard-authority-BivlvGpB.css",
     "name": "zazu-dashboard-authority",
     "names": [
       "zazu-dashboard-authority.css"
@@ -22,7 +22,7 @@
     "isEntry": true
   },
   "resources/css/zazu-final-visual-sweep.css": {
-    "file": "assets/zazu-final-visual-sweep-Lc0OMw48.css",
+    "file": "assets/zazu-final-visual-sweep-DFBLIoAR.css",
     "name": "zazu-final-visual-sweep",
     "names": [
       "zazu-final-visual-sweep.css"
@@ -40,7 +40,7 @@
     "isEntry": true
   },
   "resources/css/zazu-product-authority.css": {
-    "file": "assets/zazu-product-authority-DSKewkup.css",
+    "file": "assets/zazu-product-authority-CZm19luA.css",
     "name": "zazu-product-authority",
     "names": [
       "zazu-product-authority.css"
@@ -66,7 +66,7 @@
     "src": "resources/fonts/space-grotesk-latin-wght-normal.woff2"
   },
   "resources/js/app.js": {
-    "file": "assets/app-BzeBEzeT.js",
+    "file": "assets/app-Dh1B2ZD-.js",
     "name": "app",
     "src": "resources/js/app.js",
     "isEntry": true
