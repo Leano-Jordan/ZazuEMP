@@ -824,7 +824,6 @@ test('re-pair in one tab replaces the stale device session in other open tabs', 
     await secondTab.addInitScript(() => {
         window.__ZAZU_OFFLINE_DEFER_INITIAL_SYNC = true;
     });
-    await login(secondTab);
     await secondTab.goto('/dashboard', { waitUntil: 'domcontentloaded' });
     await expect.poll(() => secondTab.evaluate(() => window.ZazuOffline.getState().sync?.token))
         .toBe('cross-tab-old-token');
