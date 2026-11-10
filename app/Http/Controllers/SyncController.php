@@ -749,7 +749,7 @@ class SyncController extends Controller
     private function rethrowUnauthorizedSyncException(\Throwable $exception): void
     {
         if (
-            $exception instanceof \\Symfony\\Component\\HttpKernel\\Exception\\HttpException
+            $exception instanceof \Symfony\Component\HttpKernel\Exception\HttpException
             && $exception->getStatusCode() === 401
         ) {
             throw $exception;
