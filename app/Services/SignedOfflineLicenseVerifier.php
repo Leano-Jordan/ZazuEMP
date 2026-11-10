@@ -143,7 +143,7 @@ class SignedOfflineLicenseVerifier
     private function parseExplicitTimezoneDate(string $value): Carbon
     {
         if (! preg_match('/^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}(?:Z|[+-]\\d{2}:\\d{2})$/D', $value)) {
-            throw new \\InvalidArgumentException('A signed licence timestamp must include seconds and an explicit timezone.');
+            throw new \InvalidArgumentException('A signed licence timestamp must include seconds and an explicit timezone.');
         }
 
         $date = Carbon::parse($value);
@@ -152,7 +152,7 @@ class SignedOfflineLicenseVerifier
             : $value;
 
         if ($date->format('Y-m-d\\TH:i:sP') !== $normalizedValue) {
-            throw new \\InvalidArgumentException('A signed licence timestamp is not a valid calendar date.');
+            throw new \InvalidArgumentException('A signed licence timestamp is not a valid calendar date.');
         }
 
         return $date;
@@ -166,8 +166,8 @@ class SignedOfflineLicenseVerifier
             $expiresAt = $payload['expires_at'] === null
                 ? null
                 : $this->parseExplicitTimezoneDate($payload['expires_at']);
-        } catch (\\Throwable) {
-            throw new \\InvalidArgumentException('The signed licence dates are invalid.');
+        } catch (\Throwable) {
+            throw new \InvalidArgumentException('The signed licence dates are invalid.');
         }
 
         if ($expiresAt !== null && $expiresAt->lt($startsAt)) {
