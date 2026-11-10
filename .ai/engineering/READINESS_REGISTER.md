@@ -913,3 +913,10 @@ Commits: `4f4f9f63e617b201fb68ab612ef902805c8e1727`, `a281567ab1c9b384dffe47405d
 - Added a two-tab Chromium regression proving a tab that loaded the old token adopts the new token and authenticates its next sync request with the replacement token.
 - Commits: `a0ef99a40769b758582fd07da7f53804ee08cada` (source), `e5e9f5befe694e85cbdff3299ca393c4494ff5d1` (test), `192edbe6529203aab7d07fc86cd595ce2e46df80` (fixture).
 - Syntax/source checks only; browser runtime and exact-head CI remain **UNVERIFIED**. No readiness uplift; V1 remains **NO-GO**.
+
+## Cross-tab stale-write fencing — 2026-11-10
+- Hardened the cross-tab replacement boundary against late IndexedDB writes from a stale tab. State persistence, offline mutation enqueue, sync acknowledgement application and conflict resolution now compare the durable token before committing changes.
+- Only the pairing path may intentionally replace the durable token; it does so before broadcasting the non-secret session-replaced signal.
+- Added regression assertions that a tab forced back to an old in-memory token cannot persist stale state or enqueue a mutation, and that the durable replacement token remains unchanged.
+- Commits: `74871c891a4e012affc88c50485e4542057062da`, `aea04e1e9929bc6fc465cc22b8319adecaf001ba`, `d6a897370d592e2bafed8888ee064e55c1887361`, `dea69a2237200ad1393389bf521d8f6f9fd6b46a`.
+- Syntax/source checks only; browser runtime and exact-head CI remain **UNVERIFIED**. No readiness uplift; V1 remains **NO-GO**.
