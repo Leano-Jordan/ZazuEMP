@@ -714,3 +714,94 @@ test('re-pair invalidates the old sync session and retries queued work with the 
     }));
     expect(finalState).toEqual({ token: 'new-pair-session-token', dirty: false });
 });
+
+test('late private attachment download cannot repopulate local files after logout', async ({ page }, testInfo) => {
+    test.setTimeout(45_000);
+    test.skip(testInfo.project.name !== 'chromium', 'Attachment download/logout race runs once in Chromium.');
+
+    await login(page);
+    await page.goto('/work', { waitUntil: 'domcontentloaded' });
+
+    const jobRow = page.locator('[data-zazu-job-row]').filter({ hasText: 'Mokoena Family Celebration' }).first();
+    await expect(jobRow).toBeVisible();
+    await jobRow.locator('[data-zazu-inspector-open]').first().click();
+    await page.getByRole('tab', { name: 'Financial Ledger' }).click();
+    await expect(page.locator('[data-zazu-tab-panel="finance"]')).toBeVisible();
+    await page.getByRole('link', { name: 'Open job record' }).click();
+    const eventId = Number(await page.locator('[data-zazu-offline-attachment-form]').getAttribute('data-zazu-event-id'));
+
+    const deviceToken = 'attachment-download-logout-race-token';
+    await page.evaluate(async token => {
+        await window.ZazuOffline.ready;
+        const state = window.ZazuOffline.getState();
+        state.sync = { token, device: { id: 987660, business_id: Number(document.body.dataset.zazuBusinessId) } };
+        await window.ZazuOffline.persist();
+    }, deviceToken);
+
+    let releaseDownload;
+    const downloadGate = new Promise(resolve => { releaseDownload = resolve; });
+    let downloadStarted;
+    const started = new Promise(resolve => { downloadStarted = resolve; });
+
+    await page.route('**/api/sync/attachments**', async route => {
+        const request = route.request();
+        const url = new URL(request.url());
+        expect(request.headers()['authorization']).toBe('Bearer ' + deviceToken);
+        if (url.pathname === '/api/sync/attachments' && request.method() === 'GET') {
+            await route.fulfill({
+                status: 200,
+                contentType: 'application/json',
+                body: JSON.stringify({ attachments: [{
+                    id: 9910,
+                    event_id: eventId,
+                    idempotency_key: 'server-private-download-9910',
+                    original_name: 'private-brief.txt',
+                    mime_type: 'text/plain',
+                    size: Buffer.byteLength('private file response'),
+                    description: '',
+                    created_at: new Date().toISOString(),
+                }] }),
+            });
+            return;
+        }
+        if (url.pathname === '/api/sync/attachments/9910' && request.method() === 'GET') {
+            downloadStarted();
+            await downloadGate;
+            await route.fulfill({
+                status: 200,
+                contentType: 'text/plain',
+                body: 'private file response',
+            }).catch(() => {
+                // Logout may end the page request before the held response is released.
+            });
+            return;
+        }
+        await route.fulfill({ status: 404, contentType: 'application/json', body: JSON.stringify({ message: 'Unexpected attachment request' }) });
+    });
+
+    await page.route('**/api/sync/revoke', async route => {
+        await route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify({ revoked: true }) });
+    });
+
+    const pendingRead = page.evaluate(id => window.ZazuOffline.loadAttachments(id), eventId);
+    await started;
+    await page.evaluate(() => window.ZazuOffline.clearLocalSession());
+    releaseDownload();
+    await pendingRead;
+
+    await expect.poll(async () => page.evaluate(async () => {
+        const businessId = Number(document.body.dataset.zazuBusinessId);
+        const database = await new Promise((resolve, reject) => {
+            const request = indexedDB.open('zazu-phone-attachments-business-' + businessId);
+            request.onsuccess = () => resolve(request.result);
+            request.onerror = () => reject(request.error || new Error('Could not inspect attachment storage.'));
+        });
+        const records = await new Promise((resolve, reject) => {
+            const request = database.transaction('files', 'readonly').objectStore('files').getAll();
+            request.onsuccess = () => resolve(request.result || []);
+            request.onerror = () => reject(request.error || new Error('Could not read attachment storage.'));
+        });
+        database.close();
+        return records.length;
+    })).toBe(0);
+});
