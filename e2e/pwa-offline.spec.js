@@ -904,6 +904,79 @@ test.describe('Zazu installed PWA offline shell', () => {
         expect(state.business.name).toBe('Current trusted workspace');
     });
 
+    test('a bootstrap response cannot overwrite an offline mutation queued while it is in flight', async ({ page }, testInfo) => {
+        test.setTimeout(30_000);
+        test.skip(testInfo.project.name !== 'chromium', 'The IndexedDB bootstrap race runs once in Chromium.');
+
+        await login(page);
+        await page.goto('/settings', { waitUntil: 'domcontentloaded' });
+        await page.evaluate(async () => {
+            await window.ZazuOffline.ready;
+            const state = window.ZazuOffline.getState();
+            state.business = {
+                id: Number(document.body.dataset.zazuBusinessId),
+                name: 'Current local workspace',
+            };
+            state.sync = {
+                token: 'bootstrap-race-device-token',
+                device: { id: 987659, business_id: Number(document.body.dataset.zazuBusinessId) },
+            };
+            state.local_dirty = false;
+            await window.ZazuOffline.persist();
+        });
+
+        let markRequestStarted;
+        let releaseResponse;
+        const requestStarted = new Promise(resolve => { markRequestStarted = resolve; });
+        const heldResponse = new Promise(resolve => { releaseResponse = resolve; });
+
+        await page.route('**/api/sync/bootstrap', async route => {
+            markRequestStarted();
+            await heldResponse;
+            await route.fulfill({
+                status: 200,
+                contentType: 'application/json',
+                body: JSON.stringify({
+                    business: {
+                        id: Number(await page.locator('body').getAttribute('data-zazu-business-id')),
+                        name: 'Stale remote workspace snapshot',
+                    },
+                    catalogue: [],
+                    suppliers: [],
+                    purchase_orders: [],
+                    invoices: [],
+                    expenses: [],
+                    inventory_items: [],
+                    assets: [],
+                    costs: [],
+                    selected: [],
+                }),
+            });
+        });
+
+        await page.evaluate(() => {
+            window.__zazuQueuedBootstrapRace = window.ZazuOffline.refreshBootstrap();
+        });
+        await requestStarted;
+
+        const mutation = await page.evaluate(() => window.ZazuOffline.queueMutation('customer', 'create', {
+            local_id: 'bootstrap-race-local-customer',
+            record: { name: 'Must survive bootstrap' },
+        }));
+        releaseResponse();
+        await page.evaluate(() => window.__zazuQueuedBootstrapRace);
+
+        const outcome = await page.evaluate(async mutationId => ({
+            businessName: window.ZazuOffline.getState().business.name,
+            localDirty: window.ZazuOffline.getState().local_dirty,
+            pending: (await window.ZazuOffline.pending()).map(item => item.id),
+        }), mutation.id);
+
+        expect(outcome.businessName).toBe('Current local workspace');
+        expect(outcome.localDirty).toBe(true);
+        expect(outcome.pending).toContain(mutation.id);
+    });
+
     test('authenticated dashboard survives a real offline navigation', async ({ page, context }) => {
         test.setTimeout(60_000);
 
