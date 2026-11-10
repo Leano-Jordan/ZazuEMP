@@ -1099,6 +1099,8 @@ test.describe('Zazu installed PWA offline shell', () => {
         expect(outcome.recoveryRequired).toBe(true);
         expect(outcome.pending).toContain(mutationId);
         expect(outcome.tokenPresent).toBe(true);
+        await expect(page.locator('[data-zazu-sync-recovery]')).toBeVisible();
+        await expect(page.locator('[data-zazu-sync-recovery-message]')).toContainText('saved offline changes remain');
     });
 
     test('re-pairing preserves queued work and its local workspace until sync can reconcile it', async ({ page }) => {
