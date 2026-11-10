@@ -44,23 +44,42 @@ class BusinessSettingsController extends Controller
         $business = app(CurrentBusiness::class)->model($request->user());
         abort_unless((int) $device->business_id === (int) $business->id, 404);
 
-        if ($device->status !== 'revoked' && $device->revoked_at === null) {
-            $metadata = $device->metadata ?? [];
+        DB::transaction(function () use ($device, $business): void {
+            $lockedDevice = SyncDevice::query()
+                ->whereKey($device->getKey())
+                ->lockForUpdate()
+                ->firstOrFail();
+
+            abort_unless((int) $lockedDevice->business_id === (int) $business->id, 404);
+
+            $metadata = $lockedDevice->metadata ?? [];
+            $needsAudit = $lockedDevice->status !== 'revoked' || $lockedDevice->revoked_at === null;
+            $needsCleanup = $lockedDevice->token_expires_at !== null
+                || array_key_exists('sync_token_hash', $metadata)
+                || array_key_exists('pairing_code_hash', $metadata)
+                || array_key_exists('pairing_expires_at', $metadata);
+
+            if (! $needsAudit && ! $needsCleanup) {
+                return;
+            }
+
             unset($metadata['sync_token_hash'], $metadata['pairing_code_hash'], $metadata['pairing_expires_at']);
 
-            $device->forceFill([
+            $lockedDevice->forceFill([
                 'status' => 'revoked',
-                'revoked_at' => now(),
+                'revoked_at' => $lockedDevice->revoked_at ?? now(),
                 'token_expires_at' => null,
                 'metadata' => $metadata,
             ])->save();
 
-            Audit::record('sync.device.revoked', $business, [
-                'device_id' => (int) $device->id,
-                'device_name' => $device->device_name,
-                'device_type' => $device->device_type,
-            ], $business->id);
-        }
+            if ($needsAudit) {
+                Audit::record('sync.device.revoked', $business, [
+                    'device_id' => (int) $lockedDevice->id,
+                    'device_name' => $lockedDevice->device_name,
+                    'device_type' => $lockedDevice->device_type,
+                ], $business->id);
+            }
+        });
 
         return redirect()->route('settings.index')->with('success', 'Phone access revoked. The device must be paired again before it can sync.');
     }
