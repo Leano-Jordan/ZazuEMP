@@ -25,7 +25,7 @@ class SyncConflictRecorder
         ?array $localPayload = null,
         ?array $remotePayload = null,
     ): SyncConflict {
-        return \\Illuminate\\Support\\Facades\\DB::transaction(function () use (
+        return \Illuminate\Support\Facades\DB::transaction(function () use (
             $device,
             $entityType,
             $entityId,
@@ -40,7 +40,7 @@ class SyncConflictRecorder
                 ->firstOrFail();
 
             if ((int) $lockedDevice->business_id !== (int) $device->business_id || ! $lockedDevice->isActive()) {
-                throw new \\LogicException('Cannot record a conflict for an inactive or mismatched sync device.');
+                throw new \LogicException('Cannot record a conflict for an inactive or mismatched sync device.');
             }
 
             $existing = SyncConflict::query()
