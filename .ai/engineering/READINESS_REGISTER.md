@@ -653,3 +653,16 @@ No readiness score uplift. Recovery remains 2/5 until exact-head tests and a rea
 ### Backup format compatibility regression — 2026-11-07
 
 The backup/restore feature suite now also exercises both format boundaries: a version-2 archive without its required checksum manifest is rejected before touching installed private data, and a real format-version-1 archive built from a valid database/private-media snapshot is restored successfully in the round-trip scenario. These tests are **ADDED / NOT YET EXECUTED**. This improves compatibility evidence but does not close the real operator recovery drill or prove backup authenticity.
+
+
+### Offline-created Work attachment UI journey — 2026-11-10
+
+| Control | Evidence added | Status |
+|---|---|---|
+| Actual offline job creation | Browser test uses the real customer and Work forms while disconnected | Test added; runtime execution pending |
+| Operator attachment entry point | Browser test selects a file through the rendered local Work row Attach files action | Test added; runtime execution pending |
+| Local Blob persistence | Test reloads attachment by local job ID and reads the original file content | Test added; runtime execution pending |
+| No premature upload | Test reconnects before the job has a server ID and asserts zero uploads / one pending attachment | Test added; runtime execution pending |
+| Identity handoff and upload | Test assigns the server identity to the locally queued job and checks normal reconciliation uploads the original file/key against that ID | State-boundary simulation added; live job sync round-trip remains open |
+
+Regression: e2e/offline-attachment-sync.spec.js; commit 876f0828adba101221f89df10cbbced0890a2a89. Source was re-fetched and inspected. Playwright, Laravel, frontend build and exact-head CI were not executed. No readiness score uplift. V1 remains NO-GO.
