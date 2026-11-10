@@ -1731,6 +1731,61 @@ class OfflineSyncFoundationTest extends TestCase
         ]);
     }
 
+    public function test_sync_push_keeps_unexpected_server_failures_retryable_without_orphaning_the_mutation(): void
+    {
+        $business = Business::create([
+            'name' => 'Retryable Sync Business',
+            'slug' => 'retryable-sync-' . Str::lower(Str::random(8)),
+            'status' => 'active',
+            'currency' => 'ZAR',
+        ]);
+        $device = SyncDevice::create([
+            'business_id' => $business->id,
+            'installation_id' => (string) Str::uuid(),
+        ]);
+
+        $mutationId = (string) Str::uuid();
+        $localId = (string) Str::uuid();
+        $request = Request::create('/api/sync/push', 'POST', [
+            'mutations' => [[
+                'id' => $mutationId,
+                'entity_type' => 'customer',
+                'entity_id' => $localId,
+                'operation' => 'create',
+                'payload' => ['local_id' => $localId, 'record' => ['name' => 'Retry me']],
+            ]],
+        ]);
+        $request->attributes->set('sync_device', $device);
+
+        $recorder = app(SyncMutationRecorder::class);
+        $applier = \\Mockery::mock(SyncMutationApplier::class, [$recorder])->makePartial();
+        $applier->shouldReceive('apply')->once()->andThrow(new \\RuntimeException('Temporary persistence failure'));
+
+        $response = app(SyncController::class)->push(
+            $request,
+            $recorder,
+            $applier,
+            app(OfflineDomainMutationHandler::class),
+            app(SyncConflictRecorder::class),
+        );
+        $recorded = $response->getData(true)['recorded'][0];
+        $mutation = SyncMutation::query()
+            ->where('business_id', $business->id)
+            ->where('mutation_id', $mutationId)
+            ->firstOrFail();
+
+        $this->assertSame('pending', $recorded['status']);
+        $this->assertSame('Temporary persistence failure', $recorded['error']);
+        $this->assertTrue($recorded['retryable']);
+        $this->assertNull($recorded['conflict_id']);
+        $this->assertSame('pending', $mutation->status);
+        $this->assertSame('Temporary persistence failure', $mutation->last_error);
+        $this->assertDatabaseMissing('sync_conflicts', [
+            'business_id' => $business->id,
+            'mutation_id' => $mutationId,
+        ]);
+    }
+
     public function test_sync_push_records_rejected_mutations_as_open_conflicts_without_duplicates(): void
     {
         $business = Business::create([
