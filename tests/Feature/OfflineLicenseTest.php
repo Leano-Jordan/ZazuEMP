@@ -279,6 +279,23 @@ class OfflineLicenseTest extends TestCase
         ]));
     }
 
+    public function test_incomplete_installed_signed_metadata_blocks_replacement(): void
+    {
+        $user = $this->signInAsOwner();
+        $business = $user->businesses()->firstOrFail();
+        $service = app(OfflineLicenseService::class);
+
+        $service->importSignedLicense($business, $this->signedToken($business));
+        $business->fresh()->license->forceFill(['metadata' => ['signed' => true]])->save();
+
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('The installed signed licence metadata is incomplete; a newer licence cannot safely replace it.');
+
+        $service->importSignedLicense($business, $this->signedToken($business, [
+            'issued_at' => '2026-10-02T00:00:00+00:00',
+        ]));
+    }
+
     public function test_signed_license_rejects_timestamps_without_an_explicit_timezone(): void
     {
         $user = $this->signInAsOwner();
