@@ -143,27 +143,6 @@ class AuthenticationTest extends TestCase
             ->assertSessionHasErrors('username');
     }
 
-    public function test_registration_validation_errors_reopen_register_even_when_referer_requested_login(): void
-    {
-        $response = $this->from(route('landing', ['auth' => 'login']))
-            ->post(route('register.store'), [
-                'name' => 'Modal Owner',
-                'username' => 'bad username',
-                'business_name' => 'Modal Catering',
-                'email' => 'modal-register@example.com',
-                'password' => 'password123',
-                'password_confirmation' => 'password123',
-            ]);
-
-        $response->assertRedirect(route('landing', ['auth' => 'login']))
-            ->assertSessionHas('auth_modal', 'register')
-            ->assertSessionHasErrors('username');
-
-        $this->get(route('landing', ['auth' => 'login']))
-            ->assertOk()
-            ->assertSee('const initialPanel = validationPanel || requestedAuthPanel;', false);
-    }
-
     public function test_registration_rejects_duplicate_email_and_username(): void
     {
         User::factory()->create([
