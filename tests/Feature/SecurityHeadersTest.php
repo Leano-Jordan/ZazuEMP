@@ -41,7 +41,9 @@ class SecurityHeadersTest extends TestCase
         $this->assertStringContainsString('<style nonce="{{ request()->attributes->get(\'cspNonce\') }}">', $layout);
         $this->assertStringContainsString('--zazu-dashboard-image: url(', $layout);
         $this->assertStringContainsString('--zazu-wallpaper: url(', $layout);
-        $this->assertDoesNotMatchRegularExpression('/<body\\b[^>]*\\sstyle=/s', $layout);
+        preg_match('/<body[^\\n]*/', $layout, $bodyTag);
+        $this->assertNotEmpty($bodyTag);
+        $this->assertStringNotContainsString(' style=', $bodyTag[0]);
 
         foreach ($views as $view) {
             $source = file_get_contents(resource_path('views/'.$view));
