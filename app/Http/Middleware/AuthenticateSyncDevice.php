@@ -33,7 +33,10 @@ class AuthenticateSyncDevice
             ], 401);
         }
 
-        $device->refreshTokenActivity();
+        if (! $device->refreshTokenActivity($hash)) {
+            return response()->json(['message' => 'The Zazu sync device token is invalid or revoked.'], 401);
+        }
+
         $request->attributes->set('sync_device', $device);
 
         return $next($request);
