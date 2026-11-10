@@ -1669,3 +1669,12 @@ Source review found that authenticated sync pull/acknowledgement accepted arbitr
 - Regression source covers unsupported recorder streams and revocation between destination scan and row-lock recheck. Existing protocol tests cover contiguous acknowledgement and invalid sequence rejection.
 - Source changes are committed on `main`; source inspection confirms the guards and regression source are present.
 - Exact-head automated offline acceptance, PHPUnit and browser runtime results are not yet verified. No readiness uplift is claimed.
+
+
+## Sync pull contiguous-delivery guard — 2026-11-10
+
+- Source review found pull filtered out non-pending deliveries before selecting the batch. If an earlier delivery was failed while a later one remained pending, the client could receive the later mutation even though acknowledgement correctly refused to cross the failed sequence.
+- SyncMutationProtocol::pull() now returns only a contiguous pending prefix beginning at the device cursor. A missing, failed or already-transitioned delivery stops the batch; later mutations are not exposed as an unacknowledgeable batch.
+- Added a feature regression with delivery 1 failed and delivery 2 pending; expected pull result is empty and the cursor remains unchanged.
+- Source commits: pending in current engineering cycle.
+- PHPUnit and exact-head CI are not yet executed for this change. No readiness uplift; V1 remains **NO-GO**.
