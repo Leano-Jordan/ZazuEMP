@@ -744,3 +744,14 @@ A verified source-level race allowed an in-flight bootstrap snapshot to overwrit
 Regression: `e2e/pwa-offline.spec.js` holds the bootstrap response, queues a customer mutation through the actual offline queue, then verifies the old snapshot cannot replace local state or erase the pending mutation. Commits: `a75f6d6`, `e63f97a`.
 
 **Status:** IMPLEMENTED at source; Playwright and exact-head CI execution UNVERIFIED. No score uplift. V1 remains NO-GO.
+
+
+## Failed mutation and conflict atomic persistence — 2026-11-10
+
+A server-rejected offline mutation was previously persisted as `failed` in IndexedDB, while its operator-visible conflict was added to in-memory state and written later. A tab close or state-write failure in between could strand the failed mutation without its recovery UI.
+
+The push acknowledgement now uses one IndexedDB read/write transaction across `mutations` and `state`. The failed record and open conflict are committed together. Added a Chromium Playwright regression using an actual queued mutation and mocked server rejection, then checking both persisted records and `local_dirty=false`.
+
+Commits: `5b15209`, `78917ad`, `d0377f8`.
+
+**Status:** IMPLEMENTED at source; exact-head Playwright/CI execution UNVERIFIED. No score uplift. V1 remains NO-GO.
