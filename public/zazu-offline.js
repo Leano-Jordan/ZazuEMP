@@ -1027,33 +1027,51 @@
 
                     if (remote.status === 'applied' || remote.status === 'discarded') {
                         store.delete(mutation.id);
-                    } else if (remote.error) {
-                        // Persist the failed queue record and its operator-visible
-                        // conflict in the same transaction. A tab close or storage
-                        // failure cannot leave one committed without the other.
+                    } else if (remote.error && remote.conflict_id) {
+                        // A deterministic domain/identity rejection is terminal
+                        // until the operator resolves its explicit conflict record.
+                        // Persist the failed queue record and conflict together.
                         store.put({
                             ...mutation,
                             status: 'failed',
                             server_sequence: remote.sequence,
                             server_status: remote.status,
-                            conflict_id: remote.conflict_id || null,
+                            conflict_id: remote.conflict_id,
                             last_error: remote.error,
                         });
 
-                        if (remote.conflict_id) {
-                            nextState.conflicts = [
-                                ...nextState.conflicts.filter(item => Number(item.id) !== Number(remote.conflict_id)),
-                                {
-                                    id: remote.conflict_id,
-                                    mutation_id: mutation.id,
-                                    entity_type: mutation.entity_type,
-                                    entity_id: mutation.entity_id,
-                                    conflict_type: remote.conflict_type || 'domain_rejection',
-                                    message: remote.error,
-                                    status: 'open',
-                                },
-                            ];
-                        }
+                        nextState.conflicts = [
+                            ...nextState.conflicts.filter(item => Number(item.id) !== Number(remote.conflict_id)),
+                            {
+                                id: remote.conflict_id,
+                                mutation_id: mutation.id,
+                                entity_type: mutation.entity_type,
+                                entity_id: mutation.entity_id,
+                                conflict_type: remote.conflict_type || 'domain_rejection',
+                                message: remote.error,
+                                status: 'open',
+                            },
+                        ];
+                    } else if (remote.error && remote.retryable) {
+                        // Infrastructure/unexpected failures must remain retryable.
+                        // Do not strand them as failed records without a resolvable conflict.
+                        store.put({
+                            ...mutation,
+                            status: 'pending',
+                            server_sequence: remote.sequence,
+                            server_status: remote.status,
+                            last_error: remote.error,
+                        });
+                    } else if (remote.error) {
+                        // Fail closed if a future server response adds an error
+                        // without either a conflict record or retryable disposition.
+                        store.put({
+                            ...mutation,
+                            status: 'failed',
+                            server_sequence: remote.sequence,
+                            server_status: remote.status,
+                            last_error: remote.error,
+                        });
                     } else {
                         store.put({
                             ...mutation,
