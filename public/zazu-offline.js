@@ -1008,54 +1008,70 @@
         const db = await openDb();
 
         await new Promise((resolve, reject) => {
-            const tx = db.transaction(QUEUE, 'readwrite');
+            const tx = db.transaction([QUEUE, STATE], 'readwrite');
             const store = tx.objectStore(QUEUE);
+            const stateStore = tx.objectStore(STATE);
+            const currentStateRequest = stateStore.get('current');
+            let nextState = null;
 
-            for (const mutation of mutations) {
-                const remote = recorded.get(mutation.id);
-                if (!remote) continue;
+            currentStateRequest.onsuccess = () => {
+                const persistedState = currentStateRequest.result || state || blank();
+                nextState = {
+                    ...persistedState,
+                    conflicts: [...(persistedState.conflicts || [])],
+                };
 
-                if (remote.status === 'applied' || remote.status === 'discarded') {
-                    store.delete(mutation.id);
-                } else if (remote.error) {
-                    // A domain rejection is not a transient network failure.
-                    // Keep the failed mutation for inspection/reconciliation, but
-                    // stop treating it as dirty work or it will block pulls forever.
-                    store.put({
-                        ...mutation,
-                        status: 'failed',
-                        server_sequence: remote.sequence,
-                        server_status: remote.status,
-                        conflict_id: remote.conflict_id || null,
-                        last_error: remote.error,
-                    });
+                for (const mutation of mutations) {
+                    const remote = recorded.get(mutation.id);
+                    if (!remote) continue;
 
-                    if (remote.conflict_id) {
-                        state.conflicts = state.conflicts || [];
-                        state.conflicts = [
-                            ...state.conflicts.filter(item => item.id !== remote.conflict_id),
-                            {
-                                id: remote.conflict_id,
-                                mutation_id: mutation.id,
-                                entity_type: mutation.entity_type,
-                                entity_id: mutation.entity_id,
-                                conflict_type: remote.conflict_type || 'domain_rejection',
-                                message: remote.error,
-                                status: 'open',
-                            },
-                        ];
+                    if (remote.status === 'applied' || remote.status === 'discarded') {
+                        store.delete(mutation.id);
+                    } else if (remote.error) {
+                        // Persist the failed queue record and its operator-visible
+                        // conflict in the same transaction. A tab close or storage
+                        // failure cannot leave one committed without the other.
+                        store.put({
+                            ...mutation,
+                            status: 'failed',
+                            server_sequence: remote.sequence,
+                            server_status: remote.status,
+                            conflict_id: remote.conflict_id || null,
+                            last_error: remote.error,
+                        });
+
+                        if (remote.conflict_id) {
+                            nextState.conflicts = [
+                                ...nextState.conflicts.filter(item => Number(item.id) !== Number(remote.conflict_id)),
+                                {
+                                    id: remote.conflict_id,
+                                    mutation_id: mutation.id,
+                                    entity_type: mutation.entity_type,
+                                    entity_id: mutation.entity_id,
+                                    conflict_type: remote.conflict_type || 'domain_rejection',
+                                    message: remote.error,
+                                    status: 'open',
+                                },
+                            ];
+                        }
+                    } else {
+                        store.put({
+                            ...mutation,
+                            server_sequence: remote.sequence,
+                            server_status: remote.status,
+                            last_error: remote.error || 'The server did not confirm this offline change',
+                        });
                     }
-                } else {
-                    store.put({
-                        ...mutation,
-                        server_sequence: remote.sequence,
-                        server_status: remote.status,
-                        last_error: remote.error || 'The server did not confirm this offline change',
-                    });
                 }
-            }
 
-            tx.oncomplete = resolve;
+                stateStore.put(nextState, 'current');
+            };
+
+            currentStateRequest.onerror = () => tx.abort();
+            tx.oncomplete = () => {
+                state = nextState || state;
+                resolve();
+            };
             tx.onerror = () => reject(tx.error || new Error('Offline queue acknowledgement failed.'));
             tx.onabort = () => reject(tx.error || new Error('Offline queue acknowledgement was aborted.'));
         });
