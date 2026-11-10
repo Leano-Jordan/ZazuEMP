@@ -664,12 +664,37 @@
         if (!hasServerIdentity && !/^[a-zA-Z0-9_-]{1,120}$/.test(targetLocalEventId)) return [];
 
         if (hasServerIdentity && navigator.onLine && state?.sync?.token && !sessionCleared) {
+            const readSessionGeneration = sessionGeneration;
+            const readSessionToken = state.sync.token;
             try {
                 await syncAttachments();
+                if (sessionCleared || sessionGeneration !== readSessionGeneration
+                    || state?.sync?.token !== readSessionToken) {
+                    return (await readAttachmentRecords()).filter(record =>
+                        Number(record.business_id) === ACTIVE_BUSINESS_ID
+                        && Number(record.event_id) === targetEventId
+                    );
+                }
                 const response = await api('/api/sync/attachments?event_id=' + encodeURIComponent(targetEventId));
+                if (sessionCleared || sessionGeneration !== readSessionGeneration
+                    || state?.sync?.token !== readSessionToken) {
+                    return (await readAttachmentRecords()).filter(record =>
+                        Number(record.business_id) === ACTIVE_BUSINESS_ID
+                        && Number(record.event_id) === targetEventId
+                    );
+                }
                 if (response.ok) {
                     const result = await response.json();
+                    if (sessionCleared || sessionGeneration !== readSessionGeneration
+                        || state?.sync?.token !== readSessionToken) {
+                        return (await readAttachmentRecords()).filter(record =>
+                            Number(record.business_id) === ACTIVE_BUSINESS_ID
+                            && Number(record.event_id) === targetEventId
+                        );
+                    }
                     for (const attachment of result.attachments || []) {
+                        if (sessionCleared || sessionGeneration !== readSessionGeneration
+                            || state?.sync?.token !== readSessionToken) break;
                         const attachmentId = Number(attachment.id);
                         const attachmentEventId = Number(attachment.event_id);
                         if (
@@ -682,6 +707,8 @@
 
                         const key = attachment.idempotency_key || ('server-' + attachmentId);
                         const existing = await readAttachmentRecord(key);
+                        if (sessionCleared || sessionGeneration !== readSessionGeneration
+                            || state?.sync?.token !== readSessionToken) break;
 
                         // Keep an unconfirmed local upload intact. Retrying its
                         // idempotency key is the only safe way to establish whether
@@ -693,14 +720,18 @@
                                 status: 'synced',
                                 attachment,
                                 last_error: null,
-                            });
+                            }, readSessionGeneration);
                             continue;
                         }
 
                         try {
                             const fileResponse = await api('/api/sync/attachments/' + encodeURIComponent(attachment.id));
+                            if (sessionCleared || sessionGeneration !== readSessionGeneration
+                                || state?.sync?.token !== readSessionToken) break;
                             if (!fileResponse.ok) continue;
                             const file = await fileResponse.blob();
+                            if (sessionCleared || sessionGeneration !== readSessionGeneration
+                                || state?.sync?.token !== readSessionToken) break;
                             if (!file.size && Number(attachment.size || 0) > 0) continue;
 
                             await writeAttachmentRecord({
@@ -717,7 +748,7 @@
                                 created_at: attachment.created_at || new Date().toISOString(),
                                 attempts: 0,
                                 last_error: null,
-                            });
+                            }, readSessionGeneration);
                         } catch {
                             // A failed download leaves the rest of the job files usable.
                         }
