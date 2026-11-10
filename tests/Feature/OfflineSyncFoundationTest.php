@@ -457,6 +457,44 @@ class OfflineSyncFoundationTest extends TestCase
         $this->assertSame('failed', $delivery->fresh()->status);
     }
 
+    public function test_sync_pull_does_not_return_later_mutations_past_a_non_pending_delivery(): void
+    {
+        $business = Business::create([
+            'name' => 'Delivery Gap Business',
+            'slug' => 'delivery-gap-'.Str::lower(Str::random(8)),
+            'status' => 'active',
+            'currency' => 'ZAR',
+        ]);
+        $sourceDevice = SyncDevice::create([
+            'business_id' => $business->id,
+            'installation_id' => (string) Str::uuid(),
+        ]);
+        $destinationDevice = SyncDevice::create([
+            'business_id' => $business->id,
+            'installation_id' => (string) Str::uuid(),
+        ]);
+
+        $recorder = app(SyncMutationRecorder::class);
+        $first = $recorder->record($sourceDevice, 'event', 'delivery-gap-first', 'upsert', ['name' => 'First']);
+        $first->update(['status' => 'applied', 'applied_at' => now()]);
+        $recorder->publish($first);
+
+        $second = $recorder->record($sourceDevice, 'event', 'delivery-gap-second', 'upsert', ['name' => 'Second']);
+        $second->update(['status' => 'applied', 'applied_at' => now()]);
+        $recorder->publish($second);
+
+        SyncDelivery::query()
+            ->where('destination_device_id', $destinationDevice->id)
+            ->where('delivery_sequence', 1)
+            ->firstOrFail()
+            ->update(['status' => 'failed']);
+
+        $batch = app(SyncMutationProtocol::class)->pull($destinationDevice);
+
+        $this->assertCount(0, $batch);
+        $this->assertSame(0, SyncCursor::query()->where('sync_device_id', $destinationDevice->id)->value('last_acknowledged_sequence') ?? 0);
+    }
+
     public function test_sync_protocol_rejects_unknown_streams_without_creating_cursors(): void
     {
         $business = Business::create([
