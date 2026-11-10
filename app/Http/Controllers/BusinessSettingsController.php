@@ -22,7 +22,7 @@ class BusinessSettingsController extends Controller
     {
         $business = app(CurrentBusiness::class)->model($request->user());
 
-        $business->loadMissing(['taxProfile', 'taxRates' => fn ($query) => $query->orderByDesc('effective_from')]);
+        $business->loadMissing(['license', 'taxProfile', 'taxRates' => fn ($query) => $query->orderByDesc('effective_from')]);
 
         return view('settings.index', [
             'business' => $business,
