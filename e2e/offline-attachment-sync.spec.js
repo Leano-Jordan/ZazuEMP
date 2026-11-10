@@ -880,6 +880,20 @@ test('re-pair in one tab replaces the stale device session in other open tabs', 
     });
     expect(staleWriteError).toContain('device session changed');
 
+    const staleQueueError = await secondTab.evaluate(async () => {
+        try {
+            await window.ZazuOffline.queueMutation('customer', 'create', {
+                local_id: 'must-not-cross-session-boundary',
+                name: 'Stale tab mutation',
+            });
+            return null;
+        } catch (error) {
+            return error.message;
+        }
+    });
+    expect(staleQueueError).toContain('device session changed');
+    await expect.poll(() => secondTab.evaluate(() => window.ZazuOffline.pending())).toHaveLength(0);
+
     const durableToken = await secondTab.evaluate(async () => {
         const businessId = Number(document.body.dataset.zazuBusinessId);
         const database = await new Promise((resolve, reject) => {
