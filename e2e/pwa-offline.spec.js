@@ -25,7 +25,7 @@ test.describe('Zazu installed PWA offline shell', () => {
             const state = window.ZazuOffline.getState();
             state.sync = { token: 'startup-readiness-test-token', device: { id: 999999 } };
             state.local_dirty = false;
-            await window.ZazuOffline.persist();
+            await window.ZazuOffline.persist({ allowSessionChange: true });
         });
 
         // Simulate a network request which never resolves instead of a fast 401/500.
