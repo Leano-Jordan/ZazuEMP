@@ -36,6 +36,27 @@ class SyncMutationRecorder
             // mutation concurrently and turn an idempotent retry into a 500.
             DB::table('businesses')->where('id', $device->business_id)->lockForUpdate()->first();
 
+            // The middleware's model is only an authentication snapshot. Re-check
+            // the durable device row under the same transaction as mutation creation
+            // so a concurrent revocation and this write have a deterministic order.
+            $lockedDevice = SyncDevice::query()
+                ->where('business_id', $device->business_id)
+                ->whereKey($device->getKey())
+                ->active()
+                ->lockForUpdate()
+                ->first();
+
+            $expectedTokenHash = (string) (($device->metadata ?? [])['sync_token_hash'] ?? '');
+            $currentTokenHash = (string) (($lockedDevice?->metadata ?? [])['sync_token_hash'] ?? '');
+
+            abort_unless(
+                $lockedDevice
+                    && $expectedTokenHash !== ''
+                    && hash_equals($expectedTokenHash, $currentTokenHash),
+                401,
+                'This sync device was revoked or replaced before the offline change was recorded.'
+            );
+
             $existing = SyncMutation::query()
                 ->where('mutation_id', $mutationId)
                 ->first();
