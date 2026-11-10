@@ -391,6 +391,12 @@
         @endif
     </section>
 
+    <section class="zazu-context-card mt-4" data-zazu-sync-recovery hidden role="alert" aria-live="assertive">
+        <div class="zazu-context-title">Phone needs re-pairing</div>
+        <p class="zazu-context-copy mt-1" data-zazu-sync-recovery-message></p>
+        <p class="zazu-field-help mt-2">Do not clear this phone's browser data. Its saved offline changes must be preserved and reconciled during re-pairing.</p>
+    </section>
+
     <section class="zazu-context-card mt-4" data-zazu-offline-conflicts hidden>
         <div class="zazu-context-title">Offline sync exceptions</div>
         <p class="zazu-context-copy mt-1">These changes were saved on this device but need attention before they can sync. Fix the underlying issue before retrying, or discard a change you no longer need.</p>
@@ -408,6 +414,8 @@
         const pairingButton = document.querySelector('[data-zazu-generate-pairing]');
         const pairingResult = document.querySelector('[data-zazu-pairing-result]');
 
+        const recoverySection = document.querySelector('[data-zazu-sync-recovery]');
+        const recoveryMessage = document.querySelector('[data-zazu-sync-recovery-message]');
         const conflictSection = document.querySelector('[data-zazu-offline-conflicts]');
         const conflictList = document.querySelector('[data-zazu-offline-conflict-list]');
         const conflictStatus = document.querySelector('[data-zazu-offline-conflict-status]');
@@ -417,8 +425,17 @@
             if (!conflictSection || !conflictList || !offline) return;
 
             await offline.ready;
-            const conflicts = (offline.getState()?.conflicts || [])
+            const offlineState = offline.getState() || {};
+            const conflicts = (offlineState.conflicts || [])
                 .filter(conflict => conflict.status === 'open');
+
+            if (recoverySection && recoveryMessage) {
+                const needsRepair = offlineState.sync_authorization_required === true;
+                recoverySection.hidden = !needsRepair;
+                recoveryMessage.textContent = needsRepair
+                    ? (offlineState.last_sync_error || 'This phone needs to be paired again before it can sync. Saved offline changes remain on this device.')
+                    : '';
+            }
 
             conflictList.replaceChildren();
             conflictSection.hidden = !offline.isPaired() || conflicts.length === 0;
