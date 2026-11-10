@@ -1483,5 +1483,5 @@ Owner expanded the visual refinement scope beyond the dashboard: apply the estab
 - Extended the attachment trust boundary in `loadAttachments()`: metadata returned for a job is ignored unless it contains a positive safe-integer attachment ID and its event ID exactly matches the requested Work record.
 - This prevents a malformed or incorrectly scoped attachment-list response from causing the client to download and cache another job's file.
 - Extended the browser regression with a remote attachment-list item deliberately assigned to a different event; the test asserts that no file download is attempted and no foreign attachment is added to the local list.
-- Commits: `af99f69` client validation; `dbb2e3d` regression.
-- Verification boundary: source and E2E changes re-fetched and inspected. Automated execution remains pending; no readiness score uplift. V1 remains **NO-GO**.
+- Commits: `af99f69` client validation; `dbb2e3d` browser regression; `12600f4` Laravel source-contract assertions.
+- Verification boundary: source, E2E and Laravel test changes re-fetched and inspected. Combined commit status for current main head `12600f4c0140f255d647f1f91760bcc97346d898` returned no status contexts; the commit-workflow-runs connector exposed no PR-triggered runs. Exact-head Laravel, Playwright, build and quality execution therefore remain unverified. No readiness score uplift. V1 remains **NO-GO**.
