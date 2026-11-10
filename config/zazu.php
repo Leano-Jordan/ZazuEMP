@@ -2,6 +2,10 @@
 
 return [
     'platform_admin_emails' => array_values(array_filter(array_map('trim', explode(',', (string) env('ZAZU_PLATFORM_ADMIN_EMAILS', ''))))),
+    'licensing' => [
+        // Ed25519 public key only (base64-encoded 32-byte key). Never configure a private key here.
+        'public_key' => env('ZAZU_LICENSE_PUBLIC_KEY', ''),
+    ],
     'landing_image_library' => [
         // Bundled landing visuals. Keeping these under public/images/landing avoids
         // runtime dependency on third-party image hosts and keeps the first render self-contained.
