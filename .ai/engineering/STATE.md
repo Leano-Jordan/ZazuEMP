@@ -1710,3 +1710,12 @@ Source review found that authenticated sync pull/acknowledgement accepted arbitr
 - A list response, file response or Blob read that completes after logout/token replacement cannot repopulate the cleared local attachment store.
 - Upload/logout has a dedicated delayed-response Chromium regression. Download/logout has source-level protection; its dedicated runtime regression is still outstanding.
 - Exact-head CI has not yet been observed. Do not claim runtime verification or readiness uplift.
+
+## Re-pair token-boundary hardening — 2026-11-10
+- Source audit found that pairing could replace a device token while a prior sync pass was still active. The old request was not aborted at the credential boundary; its later phases could continue under the newly installed token. A sync request made during the old pass could also be silently dropped by the existing single-flight guard.
+- Pairing now increments the session generation and aborts the active sync controller before installing the new token. Attachment operations captured under the previous generation are invalidated.
+- The sync single-flight guard now records a pending rerun. If re-pair requests synchronization while the old pass unwinds, the new-token pass is automatically started after the old controller releases.
+- Pairing now snapshots the local workspace after reading the mutation queue, avoiding a stale pre-await state snapshot.
+- Added a Chromium regression that delays an old-token push, re-pairs, then verifies queued work is retried using the new token and is drained.
+- Commits: `2b3828c` source; `7fbf4ed` regression; `d3e44ec` fixture abort handling.
+- JavaScript and Playwright spec syntax parsing pass after re-fetching current `main`. Browser runtime, Laravel, quality and exact-head CI are **UNVERIFIED**. No readiness uplift; V1 remains **NO-GO**.
