@@ -2674,6 +2674,8 @@ class OfflineSyncFoundationTest extends TestCase
             'status' => 'active',
             'metadata' => [
                 'sync_token_hash' => hash('sha256', $plainToken),
+                'pairing_code_hash' => 'obsolete-pairing-hash',
+                'pairing_expires_at' => now()->addMinutes(10)->toIso8601String(),
                 'preserved_metadata' => 'kept',
             ],
             'token_expires_at' => now()->addDays(SyncDevice::SYNC_TOKEN_IDLE_EXPIRY_DAYS),
@@ -2691,6 +2693,8 @@ class OfflineSyncFoundationTest extends TestCase
         $this->assertSame('revoked', $device->status);
         $this->assertNotNull($device->revoked_at);
         $this->assertArrayNotHasKey('sync_token_hash', $device->metadata ?? []);
+        $this->assertArrayNotHasKey('pairing_code_hash', $device->metadata ?? []);
+        $this->assertArrayNotHasKey('pairing_expires_at', $device->metadata ?? []);
         $this->assertSame('kept', $device->metadata['preserved_metadata']);
 
         $this->withToken($plainToken)
