@@ -1725,3 +1725,11 @@ Source review found that authenticated sync pull/acknowledgement accepted arbitr
 - The scenario verifies the local attachment database remains empty after logout completes and the held private-file response is released.
 - Commit: `9c8dd61`.
 - Test source syntax passes after re-fetch. Browser execution and exact-head CI remain **UNVERIFIED**; no readiness uplift; V1 remains **NO-GO**.
+
+## Cross-tab device session replacement — 2026-11-10
+- The session BroadcastChannel was already used for logout, but successful pairing did not notify other open tabs. A second tab could retain the previous token in memory and continue issuing sync requests after the shared IndexedDB state had been replaced.
+- Pairing now broadcasts a credential-free `session-replaced` event only after the new session is durably written. Other tabs invalidate their session generation, abort old sync requests, reload the authoritative business-scoped state from IndexedDB and resume sync with the current token.
+- Logout broadcasts now also invalidate the receiving tab's generation and abort its active sync before clearing local state.
+- Added a Chromium multi-tab regression: tab B loads the old token, tab A pairs a new device, and tab B must adopt the new token and make its next sync request with that token.
+- Commits: `a0ef99a` cross-tab source; `e5e9f5b` test; `192edbe` shared-auth fixture correction.
+- JavaScript and Playwright spec syntax checks are pending final re-fetch. Browser runtime, Laravel and exact-head CI remain **UNVERIFIED**. No readiness uplift; V1 remains **NO-GO**.
