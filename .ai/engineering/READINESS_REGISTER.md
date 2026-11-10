@@ -872,3 +872,11 @@ Commits: `4f4f9f63e617b201fb68ab612ef902805c8e1727`, `a281567ab1c9b384dffe47405d
 - Server pull payload now exposes `delivery_sequence`; phone acknowledgement uses that value instead of `mutation.sequence`.
 - Regression models a destination's own mutation consuming business sequence 1, followed by a remote mutation at business sequence 2 delivered as receiver sequence 1. It verifies pull metadata and successful cursor acknowledgement.
 - Source re-fetch/structural checks only. PHPUnit, browser runtime and exact-head CI remain **UNVERIFIED**. No score uplift; V1 remains **NO-GO**.
+
+
+## Lost acknowledgement response retry — 2026-11-10
+
+- Confirmed the acknowledgement endpoint is idempotent for a retry at or below the persisted device cursor.
+- Added a regression simulating the client retry after an acknowledgement response is lost; it checks the cursor remains stable and the delivery is applied once.
+- This is server-side retry-safety coverage. It does not replace the phone-level interrupted-network acceptance test.
+- Exact-head PHPUnit/CI remains **UNVERIFIED** until GitHub reports the run. No score uplift; V1 remains **NO-GO**.
