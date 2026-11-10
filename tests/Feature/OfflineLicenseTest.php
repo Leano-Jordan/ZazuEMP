@@ -41,6 +41,7 @@ class OfflineLicenseTest extends TestCase
         $this->assertTrue($license->features['offline_core']);
         $this->assertTrue($license->metadata['signed']);
         $this->assertTrue($license->isActive(Carbon::parse('2026-10-15 12:00:00')));
+        $this->assertSame('Active', $license->statusLabel(Carbon::parse('2026-10-15 12:00:00')));
     }
 
     public function test_a_tampered_signed_license_is_rejected_without_changing_the_existing_license(): void
@@ -90,6 +91,7 @@ class OfflineLicenseTest extends TestCase
 
         $this->assertSame('revoked', $license->status);
         $this->assertFalse($license->isActive());
+        $this->assertSame('Revoked', $license->statusLabel());
     }
 
     public function test_business_owner_can_install_a_signed_offline_license_from_settings(): void
@@ -148,6 +150,9 @@ class OfflineLicenseTest extends TestCase
                 'expires_at' => '2026-09-30T23:59:59+00:00',
             ]),
         );
+
+        $this->assertSame('Expired', $business->fresh()->license->statusLabel(Carbon::parse('2026-11-10 12:00:00')));
+        $this->assertSame('Not yet active', $business->fresh()->license->statusLabel(Carbon::parse('2026-08-01 12:00:00')));
 
         $this->get(route('settings.index'))
             ->assertOk()
