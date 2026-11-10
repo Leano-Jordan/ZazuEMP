@@ -551,7 +551,7 @@ test('late attachment upload response cannot recreate local files after logout',
         const url = new URL(request.url());
         if (url.pathname === '/api/sync/attachments' && request.method() === 'POST') {
             const body = request.postData() || '';
-            const key = body.match(/name="idempotency_key"\\r\\n\\r\\n([^\\r\\n]+)/)?.[1] || null;
+            const key = body.match(/name="idempotency_key"\r\n\r\n([^\r\n]+)/)?.[1] || null;
             expect(key).toBeTruthy();
             uploadStarted();
             await uploadGate;
