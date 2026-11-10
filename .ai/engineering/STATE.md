@@ -1590,3 +1590,5 @@ A confirmed failure-path gap was found in the offline push contract: unexpected 
 - Added/extended Chromium regression coverage for the visible recovery warning, queue/token preservation on 401, re-pairing while the server push path is temporarily unavailable, and a cross-business pairing response being revoked without altering the original workspace.
 - Commits: `f1cc5aa` recovery flag; `13c4ab3` Settings warning; `abebc63` regression update; `b329649` safe re-pair transition; `41af9a6` re-pair regression; `4355d22` fixture cleanup; `3c9b08b` visible-warning assertion.
 - Verification boundary: source and test files re-fetched and structurally reviewed. Browser/PHP tests, production build, business-switch acceptance and exact-head CI remain **UNVERIFIED**. No readiness score uplift; V1 remains **NO-GO**.
+
+- Cross-business token cleanup is fail-visible: the client confirms the revocation response before claiming success. If automatic revocation fails, it explicitly instructs the owner to revoke the newly paired device in Trusted phone access; local data remains untouched.
