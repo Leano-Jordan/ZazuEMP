@@ -67,9 +67,10 @@ test('Work attachments persist offline, upload on reconnect and cache remote fil
         if (url.pathname === '/api/sync/attachments' && request.method() === 'POST') {
             requests.uploads++;
             const body = request.postData() || '';
-            requests.key = body.match(/name="idempotency_key"\r\n\r\n([^\r\n]+)/)?.[1] || null;
+            const requestKey = body.match(/name="idempotency_key"\r\n\r\n([^\r\n]+)/)?.[1] || null;
+            if (!requests.key) requests.key = requestKey;
             requests.eventId = Number(body.match(/name="event_id"\r\n\r\n([^\r\n]+)/)?.[1] || 0);
-            expect(requests.key).toMatch(/^[0-9a-f-]{36}$/i);
+            expect(requestKey).toMatch(/^[0-9a-f-]{36}$/i);
             expect(requests.eventId).toBe(eventId);
             const mismatchedResponse = body.includes('mismatched-response.txt');
             expect(body).toContain(mismatchedResponse ? 'mismatched-response.txt' : 'offline-evidence.txt');
@@ -82,7 +83,7 @@ test('Work attachments persist offline, upload on reconnect and cache remote fil
                     attachment: {
                         id: mismatchedResponse ? 803 : 801,
                         event_id: mismatchedResponse ? eventId + 1 : eventId,
-                        idempotency_key: requests.key,
+                        idempotency_key: requestKey,
                         original_name: mismatchedResponse ? 'mismatched-response.txt' : 'offline-evidence.txt',
                         mime_type: 'text/plain',
                         size: mismatchedResponse ? Buffer.byteLength('must remain pending') : Buffer.byteLength('saved on phone for later'),
