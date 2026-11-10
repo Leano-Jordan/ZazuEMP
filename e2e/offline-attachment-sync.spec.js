@@ -805,3 +805,69 @@ test('late private attachment download cannot repopulate local files after logou
         return records.length;
     })).toBe(0);
 });
+
+test('re-pair in one tab replaces the stale device session in other open tabs', async ({ page, context }, testInfo) => {
+    test.setTimeout(45_000);
+    test.skip(testInfo.project.name !== 'chromium', 'Cross-tab device session contract runs once in Chromium.');
+
+    await login(page);
+    await page.goto('/dashboard', { waitUntil: 'domcontentloaded' });
+    const businessId = await page.evaluate(() => Number(document.body.dataset.zazuBusinessId));
+    await page.evaluate(async businessId => {
+        await window.ZazuOffline.ready;
+        const state = window.ZazuOffline.getState();
+        state.sync = { token: 'cross-tab-old-token', device: { id: 987661, business_id: businessId } };
+        await window.ZazuOffline.persist();
+    }, businessId);
+
+    const secondTab = await context.newPage();
+    await secondTab.addInitScript(() => {
+        window.__ZAZU_OFFLINE_DEFER_INITIAL_SYNC = true;
+    });
+    await login(secondTab);
+    await secondTab.goto('/dashboard', { waitUntil: 'domcontentloaded' });
+    await expect.poll(() => secondTab.evaluate(() => window.ZazuOffline.getState().sync?.token))
+        .toBe('cross-tab-old-token');
+
+    let newTokenSyncStarted;
+    const newTokenSync = new Promise(resolve => { newTokenSyncStarted = resolve; });
+    await secondTab.route('**/api/sync/**', async route => {
+        const request = route.request();
+        const url = new URL(request.url());
+        expect(request.headers()['authorization']).toBe('Bearer cross-tab-new-token');
+
+        if (url.pathname === '/api/sync/pull') {
+            newTokenSyncStarted();
+            await route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify({ mutations: [] }) });
+            return;
+        }
+        if (url.pathname === '/api/sync/bootstrap') {
+            await route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify({}) });
+            return;
+        }
+        if (url.pathname === '/api/sync/attachments') {
+            await route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify({ attachments: [] }) });
+            return;
+        }
+        await route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify({ acknowledged: true }) });
+    });
+
+    await page.route('**/api/sync/provision', async route => {
+        await route.fulfill({
+            status: 200,
+            contentType: 'application/json',
+            body: JSON.stringify({
+                token: 'cross-tab-new-token',
+                device: { id: 987662, business_id: businessId },
+                bootstrap: {},
+            }),
+        });
+    });
+
+    await page.evaluate(() => window.ZazuOffline.pair('654321'));
+    await newTokenSync;
+    await expect.poll(() => secondTab.evaluate(() => window.ZazuOffline.getState().sync?.token))
+        .toBe('cross-tab-new-token');
+    await expect.poll(() => secondTab.evaluate(() => window.ZazuOffline.isPaired())).toBe(true);
+    await secondTab.close();
+});
