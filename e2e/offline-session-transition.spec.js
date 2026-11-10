@@ -35,7 +35,7 @@ test('unreachable logout host preserves the signed-in session and queued busines
             },
         };
         state.local_dirty = false;
-        await window.ZazuOffline.persist();
+        await window.ZazuOffline.persist({ allowSessionChange: true });
 
         const mutation = await window.ZazuOffline.queueMutation('customer', 'create', {
             local_id: 'offline-session-' + crypto.randomUUID(),
