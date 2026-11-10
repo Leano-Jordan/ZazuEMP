@@ -1733,3 +1733,11 @@ Source review found that authenticated sync pull/acknowledgement accepted arbitr
 - Added a Chromium multi-tab regression: tab B loads the old token, tab A pairs a new device, and tab B must adopt the new token and make its next sync request with that token.
 - Commits: `a0ef99a` cross-tab source; `e5e9f5b` test; `192edbe` shared-auth fixture correction.
 - JavaScript and Playwright spec syntax checks are pending final re-fetch. Browser runtime, Laravel and exact-head CI remain **UNVERIFIED**. No readiness uplift; V1 remains **NO-GO**.
+
+## Cross-tab stale-write fencing — 2026-11-10
+- Adversarial review found that broadcasting session replacement and reloading IndexedDB was not sufficient by itself: a stale tab could have a late state/queue transaction race with the replacement write and overwrite the new credential or enqueue work under the old session.
+- Added persisted-token compare-before-write checks to general state persistence, offline mutation enqueue, sync push acknowledgement application and conflict resolution. A transaction aborts when its in-memory credential no longer matches the durable business workspace token.
+- Pairing is the only normal state-write path explicitly allowed to replace the persisted token. The replacement is persisted before the cross-tab notification is sent.
+- Extended the cross-tab Chromium regression to force a stale in-memory token and verify both state persistence and mutation enqueue are rejected while the durable replacement token remains intact.
+- Commits: `74871c8` write fencing; `aea04e1` conflict-resolution fencing; `d6a8973` stale-write regression; `dea69a2` stale-queue regression.
+- JavaScript and Playwright spec syntax checks pass after current-main re-fetch. Browser runtime and exact-head CI remain **UNVERIFIED**. No readiness uplift; V1 remains **NO-GO**.
