@@ -118,6 +118,26 @@ class OfflineLicenseTest extends TestCase
         ]);
     }
 
+    public function test_settings_displays_an_expired_license_as_expired(): void
+    {
+        $user = $this->signInAsOwner();
+        $business = $user->businesses()->firstOrFail();
+
+        app(OfflineLicenseService::class)->importSignedLicense(
+            $business,
+            $this->signedToken($business, [
+                'issued_at' => '2026-09-01T00:00:00+00:00',
+                'starts_at' => '2026-09-01T00:00:00+00:00',
+                'expires_at' => '2026-09-30T23:59:59+00:00',
+            ]),
+        );
+
+        $this->get(route('settings.index'))
+            ->assertOk()
+            ->assertSee('SOLO plan · Expired')
+            ->assertDontSee('SOLO plan · Active');
+    }
+
     public function test_non_owner_cannot_install_a_business_license(): void
     {
         $owner = $this->signInAsOwner();
