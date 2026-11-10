@@ -1530,3 +1530,13 @@ Owner expanded the visual refinement scope beyond the dashboard: apply the estab
 - Updated docs/ZAZU_OFFLINE_LICENSING_SPEC.md with the stronger replay and concurrency rules.
 - Commits: 620a644 verifier fingerprint; cca0e4b initial service guard; 7811316 replay tests; f590bac namespace correction; b449eb2 test namespace correction; eba7ec8 transaction/metadata guard; 8ed4323 transaction import and namespace correction; 32e7260 spec; 7636e4c incomplete-metadata regression.
 - Verification boundary: source and tests were re-fetched and structurally inspected. PHPUnit, PHPMD, Psalm and exact-head CI have not been executed in this session. No score uplift; V1 remains **NO-GO**.
+
+
+## Offline bootstrap / local-mutation race — 2026-11-10
+
+- Confirmed a data-integrity race: an online bootstrap request could begin while the local queue was clean, then a user could save an offline mutation before the response returned. The old response path applied the remote snapshot and overwrote the newer local workspace state.
+- Added an IndexedDB read/write reconciliation boundary across the workspace state and mutation queue. A bootstrap is applied only if the persisted device token still matches and the pending mutation queue is still empty inside that same transaction.
+- Both incremental pull bootstrap and explicit bootstrap refresh use the guarded path. If local work arrived while the request was in flight, the snapshot is discarded and the pull cursor is not acknowledged; the next sync can safely retry.
+- Added a Chromium Playwright regression that holds the bootstrap response, queues a real local mutation, releases the response, and asserts the local workspace and pending mutation survive.
+- Implementation commits: `a75f6d6` source guard; `e63f97a` race regression.
+- Source/test execution and exact-head CI remain UNVERIFIED until Actions runs on the resulting main SHA. No readiness score uplift; V1 remains **NO-GO**.
