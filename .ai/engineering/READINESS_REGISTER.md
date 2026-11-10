@@ -798,3 +798,10 @@ Commits: `5b15209`, `78917ad`, `d0377f8`.
 A concrete backup integrity defect was fixed: the backup command previously ignored a false return from `File::copyDirectory()`, allowing archive creation to continue after private media failed to copy. It now aborts before checksum/archive publication and reports the failure. Added a regression that simulates copy failure and asserts no archive is published.
 
 Commits: `3e5b9c7` (guard), `cf332c2` (regression). Source re-fetch/structural review: PASS. PHPUnit and exact-head CI: **UNVERIFIED** (no status contexts or workflow runs returned for exact SHA `cf332c246b001fcb5547e28b5b5d904088471368`). No evidence-maturity uplift; actual operator restore drill remains a release gate.
+
+
+## True browser-disconnected customer acceptance coverage — 2026-11-10
+
+Added a Chromium Playwright scenario that establishes service-worker control and warms the customer-create route while online, switches the browser genuinely offline, reloads the cached form, creates a customer through the normal UI, then reloads again offline and checks that both the queued mutation and local customer survive. This closes a gap between origin-unreachable fallback coverage and a real browser-offline mutation scenario.
+
+Commits: `c88ace2`, `236d4f6`. Source/test structural review only; Playwright execution and physical installed-device acceptance remain **UNVERIFIED**. No evidence-maturity uplift; V1 remains NO-GO.
