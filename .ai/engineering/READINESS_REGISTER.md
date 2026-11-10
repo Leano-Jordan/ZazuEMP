@@ -787,3 +787,5 @@ Commits: `5b15209`, `78917ad`, `d0377f8`.
 - Settings now exposes the persisted re-pair-required state and explicitly warns against clearing browser storage while local work may be pending.
 - Re-pairing preserves the business-scoped local workspace when mutation records or dirty state exist, retains the queue, binds only a token issued for the active business, and defers bootstrap replacement until queue reconciliation is safe.
 - Regression source covers the visible warning, HTTP 401 queue preservation and a re-pair with temporary push outage. Execution remains **UNVERIFIED**; full device/browser acceptance remains open. No score uplift; V1 remains **NO-GO**.
+
+- Cross-business re-pair rejection now has regression coverage asserting the wrong-business token is revoked and local queued data remains intact; test execution is **UNVERIFIED**.
