@@ -1703,3 +1703,10 @@ Source review found that authenticated sync pull/acknowledgement accepted arbitr
 - Added a Chromium regression that deliberately delays the upload response until after logout and verifies the attachment store remains empty.
 - Commits: `20dd2d7` application fix; `5fc5548` regression test; `51ece68` readiness record.
 - Exact-head CI/runtime execution remains pending. No readiness uplift until the browser and full Laravel workflows pass.
+
+## Private attachment cache session guard — 2026-11-10
+
+- Applied the session-generation/token check to attachment metadata listing and private-file download caching as well as uploads.
+- A list response, file response or Blob read that completes after logout/token replacement cannot repopulate the cleared local attachment store.
+- Upload/logout has a dedicated delayed-response Chromium regression. Download/logout has source-level protection; its dedicated runtime regression is still outstanding.
+- Exact-head CI has not yet been observed. Do not claim runtime verification or readiness uplift.
