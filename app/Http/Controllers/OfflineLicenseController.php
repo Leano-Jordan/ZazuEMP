@@ -1,14 +1,14 @@
 <?php
 
-namespace App\\Http\\Controllers;
+namespace App\Http\Controllers;
 
-use App\\Services\\OfflineLicenseService;
-use App\\Support\\Audit;
-use App\\Support\\CurrentBusiness;
-use Illuminate\\Http\\RedirectResponse;
-use Illuminate\\Http\\Request;
-use Illuminate\\Support\\Facades\\DB;
-use Illuminate\\Support\\Facades\\Validator;
+use App\Services\OfflineLicenseService;
+use App\Support\Audit;
+use App\Support\CurrentBusiness;
+use Illuminate\Http\RedirectResponse;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Validator;
 
 class OfflineLicenseController extends Controller
 {
@@ -41,7 +41,7 @@ class OfflineLicenseController extends Controller
                     'expires_at' => $license->expires_at?->toIso8601String(),
                 ], (int) $business->id);
             });
-        } catch (\\InvalidArgumentException $exception) {
+        } catch (\InvalidArgumentException $exception) {
             return redirect()
                 ->route('settings.index')
                 ->withErrors(['license_token' => $exception->getMessage()]);
