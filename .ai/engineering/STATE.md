@@ -1834,3 +1834,15 @@ Source review found that authenticated sync pull/acknowledgement accepted arbitr
 - Commits: `2948dee` attachment fixture corrections; `4feb0e2` session-transition fixture correction. Both target canonical `main`.
 - Re-fetched both changed test files and verified the explicit replacement option is present in seven setup points plus the session-transition setup; the stale-write negative assertion remains unchanged.
 - Exact-head CI for `4feb0e2` is queued/in progress. No pass is claimed until the new browser run completes. V1 remains **NO-GO**; no score uplift.
+
+
+## Licensing boundary reconciliation — 2026-11-10
+- Re-read current-main OfflineLicenseService, SignedOfflineLicenseVerifier, OfflineLicenseController, BusinessLicense, config/zazu.php, routes/web.php, Business Settings view, licensing spec and feature tests.
+- Correct current status: signed local import/renewal UI and owner-protected audited route are already implemented. The earlier note that activation UI remained open is stale.
+- Confirmed verifier covers Ed25519 signature, business binding, bounded token size, explicit-timezone/calendar-valid dates, expiry/revocation, anti-rollback, idempotency and fail-closed missing-public-key handling.
+- No application-wide plan/feature enforcement boundary was evidenced in the inspected route group. This is a genuine commercial gap, not a reason to add a blanket licence lockout.
+- Basic Free and the 30-day trial → Basic Free fallback are owner-directed; exact feature/usage limits remain proposed, not approved. Do not invent enforcement rules or block access to customer data/core offline workflows.
+- Production issuer/private-key custody and installation identity/reactivation remain external engineering/security gates. Never put a production private key in this repo.
+- Updated docs/ZAZU_OFFLINE_LICENSING_SPEC.md with the authoritative implementation status, enforcement boundary and safe sequence.
+- Exact-head 960b39e9 Laravel, quality, Psalm, PHPMD, populated upgrade/rollback, Director contract lint and push-on-main workflows are PASS. Zazu browser smoke run 42904398545 / job 130138486515 remains IN_PROGRESS at time of record. SonarCloud is SKIPPED, not a pass.
+- No source-code change or V1 readiness uplift in this documentation-only reconciliation. V1 remains **NO-GO**.
