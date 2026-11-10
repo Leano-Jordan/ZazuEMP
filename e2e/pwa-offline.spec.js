@@ -379,6 +379,91 @@ test.describe('Zazu installed PWA offline shell', () => {
         expect(legacyStillExists).toBe(true);
     });
 
+    test('a rejected sync mutation and its recovery conflict persist together', async ({ page }, testInfo) => {
+        test.setTimeout(30_000);
+        test.skip(testInfo.project.name !== 'chromium', 'The failed-mutation persistence contract runs once in Chromium.');
+
+        await login(page);
+        await page.goto('/settings', { waitUntil: 'domcontentloaded' });
+        await page.evaluate(() => window.ZazuOffline.ready);
+        await page.evaluate(async () => {
+            const state = window.ZazuOffline.getState();
+            state.sync = {
+                token: 'atomic-failed-mutation-token',
+                device: { id: 987660, business_id: Number(document.body.dataset.zazuBusinessId) },
+            };
+            state.local_dirty = false;
+            await window.ZazuOffline.persist();
+        });
+
+        const mutation = await page.evaluate(() => window.ZazuOffline.queueMutation('customer', 'create', {
+            local_id: 'atomic-failed-customer',
+            record: { name: 'Customer requiring operator review' },
+        }));
+
+        await page.route('**/api/sync/push', route => route.fulfill({
+            status: 200,
+            contentType: 'application/json',
+            body: JSON.stringify({
+                recorded: [{
+                    id: mutation.id,
+                    status: 'conflict',
+                    sequence: 42,
+                    conflict_id: 987661,
+                    conflict_type: 'related_record_missing',
+                    error: 'The related event is not available on the server.',
+                }],
+            }),
+        }));
+        await page.route('**/api/sync/pull?*', route => route.fulfill({
+            status: 200,
+            contentType: 'application/json',
+            body: JSON.stringify({ mutations: [] }),
+        }));
+        await page.route('**/api/sync/bootstrap', route => route.fulfill({
+            status: 200,
+            contentType: 'application/json',
+            body: JSON.stringify({
+                business: { id: Number(document.body.dataset.zazuBusinessId), name: 'Test business' },
+                catalogue: [], suppliers: [], purchase_orders: [], invoices: [],
+                expenses: [], inventory_items: [], assets: [], costs: [], selected: [],
+            }),
+        }));
+
+        await page.evaluate(() => window.ZazuOffline.sync());
+
+        const persisted = await page.evaluate(async () => {
+            const db = await new Promise((resolve, reject) => {
+                const request = indexedDB.open('zazu-client-business-' + document.body.dataset.zazuBusinessId, 1);
+                request.onsuccess = () => resolve(request.result);
+                request.onerror = () => reject(request.error || new Error('Could not open offline workspace'));
+            });
+            const result = await new Promise((resolve, reject) => {
+                const tx = db.transaction(['mutations', 'state'], 'readonly');
+                const queueRequest = tx.objectStore('mutations').getAll();
+                const stateRequest = tx.objectStore('state').get('current');
+                tx.oncomplete = () => resolve({ queue: queueRequest.result || [], state: stateRequest.result });
+                tx.onerror = () => reject(tx.error || new Error('Could not inspect failed mutation persistence'));
+            });
+            db.close();
+            return result;
+        });
+
+        const failed = persisted.queue.find(item => item.id === mutation.id);
+        expect(failed?.status).toBe('failed');
+        expect(failed?.conflict_id).toBe(987661);
+        expect(failed?.last_error).toContain('related event');
+        expect(persisted.state.conflicts).toEqual(expect.arrayContaining([
+            expect.objectContaining({
+                id: 987661,
+                mutation_id: mutation.id,
+                status: 'open',
+                message: 'The related event is not available on the server.',
+            }),
+        ]));
+        expect(persisted.state.local_dirty).toBe(false);
+    });
+
     test('paired device can retry or discard a failed offline sync change', async ({ page }, testInfo) => {
         test.setTimeout(30_000);
         test.skip(testInfo.project.name !== 'chromium', 'Sync conflict controls run once; responsive layouts are covered by the settings suite.');
