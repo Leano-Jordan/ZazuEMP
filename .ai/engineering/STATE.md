@@ -1784,3 +1784,12 @@ Source review found that authenticated sync pull/acknowledgement accepted arbitr
 - Moved three mutation-identity tests into `SyncMutationIdentityTest` (reducing `OfflineSyncFoundationTest` from 47 to 44 public tests) and moved the dashboard colour regression into `DashboardVisualRefinementTest` (reducing `UiProportionFoundationTest` from 11 to 10 methods). Assertions and coverage were preserved, not suppressed.
 - Commits: `1f55289` helper extraction; `d3f54c4` original test split; `90bf475` mutation identity class; `13874ed` UI test split; `5255b40` dashboard test class; `82f0f85` and `177a368` PHP namespace correction.
 - Exact-head PHPMD/Laravel/quality/Playwright/Psalm runs were queued at the time of this update. Do not treat the earlier PHPMD failure as resolved until a successful run is observed. V1 remains **NO-GO**.
+
+
+## Offline session-fixture regression and exact-head CI — 2026-11-10
+
+- GitHub's Chromium offline acceptance exposed eight failures in `e2e/pwa-offline.spec.js`, all at the new IndexedDB session compare-before-write guard. Root cause was test setup manually injecting a new sync token into in-memory state and then using ordinary `persist()`, which correctly refuses an unapproved session replacement.
+- Updated the eight session-seeding/replacement fixture paths to call `persist({ allowSessionChange: true })`, matching the production pairing transition. The conflict retry/discard fixture now persists its session before it queues mutations, so queue writes use the established token. Ordinary persistence assertions and the production guard remain unchanged.
+- Latest code/test commit under verification: `c021eb2`. Exact-head GitHub results observed: Laravel unit/feature suite **446 passed, 3,083 assertions**; offline browser acceptance **18 passed**; PHPMD **success**; Zazu quality and secret scan **success**; Psalm **success**; populated upgrade/rollback **success**; Director contract lint **success**. The separate Zazu browser smoke run remained in progress when recorded.
+- The previous offline-browser failure is classified as a stale E2E fixture contract, not an application regression. The fixture correction is committed in `e03ee2b` and `c021eb2`.
+- No release readiness uplift until the browser smoke run and exact-head post-documentation checks complete. V1 remains **NO-GO**.
