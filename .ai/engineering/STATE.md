@@ -1613,3 +1613,10 @@ A confirmed failure-path gap was found in the offline push contract: unexpected 
 - Commits: `c88ace2` initial acceptance test; `236d4f6` payload/selector assertion alignment.
 - Source and test structure re-fetched. Playwright execution and installed-device acceptance remain **UNVERIFIED**. This is added acceptance coverage, not a passing acceptance result; no readiness score uplift.
 - Next: inspect whether the active offline customer/work journey is adequately covered by this true-disconnect test and then run exact-head browser CI when available.
+
+
+## Offline browser acceptance CI — 2026-11-10
+
+Added a dedicated GitHub Actions job to the existing Laravel workflow. It builds the frontend, creates a clean SQLite database, seeds the local-only demo scenario, installs Chromium, and runs `e2e/pwa-offline.spec.js` once in the Chromium project. This makes the bounded PWA/offline browser acceptance suite an automated push/PR gate rather than source-only evidence.
+
+Workflow change: `.github/workflows/laravel.yml`, commit `3944745`. The new job has not yet executed on this commit; browser runtime and exact-head CI are **UNVERIFIED** until GitHub reports a completed run. No readiness score uplift; V1 remains NO-GO.
