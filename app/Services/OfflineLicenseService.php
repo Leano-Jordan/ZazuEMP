@@ -38,7 +38,12 @@ class OfflineLicenseService
             throw new \InvalidArgumentException('Signed licence verification is not configured.');
         }
 
-        $parts = explode('.', trim($token));
+        $token = trim($token);
+        if ($token === '' || strlen($token) > 16384) {
+            throw new \\InvalidArgumentException('The licence token is malformed.');
+        }
+
+        $parts = explode('.', $token);
         if (count($parts) !== 2) {
             throw new \InvalidArgumentException('The licence token is malformed.');
         }
@@ -74,9 +79,10 @@ class OfflineLicenseService
             || ! is_string($payload['license_id'] ?? null)
             || ! Str::isUuid($payload['license_id'])
             || ! is_string($payload['plan'] ?? null)
-            || ! preg_match('/^[a-z][a-z0-9_-]{1,39}$/', $payload['plan'])
+            || ! preg_match('/^[a-z][a-z0-9_-]{0,39}$/', $payload['plan'])
             || ! in_array($payload['status'] ?? null, ['active', 'revoked'], true)
             || ! is_string($payload['starts_at'] ?? null)
+            || ! is_string($payload['issued_at'] ?? null)
             || ! array_key_exists('expires_at', $payload)
             || ! (is_string($payload['expires_at']) || $payload['expires_at'] === null)
             || ! array_key_exists('features', $payload)
@@ -97,6 +103,15 @@ class OfflineLicenseService
             throw new \InvalidArgumentException('The signed licence expiry precedes its start date.');
         }
 
+        $existing = $business->license;
+        $existingIssuedAt = $existing?->metadata['issued_at'] ?? null;
+        if ($existing?->metadata['signed'] === true
+            && is_string($existingIssuedAt)
+            && $existing->license_id !== $payload['license_id']
+            && $issuedAt->lte(\\Illuminate\\Support\\Carbon::parse($existingIssuedAt))) {
+            throw new \\InvalidArgumentException('This licence is older than the entitlement already installed.');
+        }
+
         return BusinessLicense::updateOrCreate(
             ['business_id' => $business->id],
             [
@@ -106,7 +121,7 @@ class OfflineLicenseService
                 'starts_at' => $startsAt,
                 'expires_at' => $expiresAt,
                 'features' => $payload['features'] ?: null,
-                'metadata' => ['signed' => true, 'format_version' => 1],
+                'metadata' => ['signed' => true, 'format_version' => 1, 'issued_at' => $issuedAt->toIso8601String()],
                 'activated_at' => now(),
                 'last_local_check_at' => now(),
             ],
