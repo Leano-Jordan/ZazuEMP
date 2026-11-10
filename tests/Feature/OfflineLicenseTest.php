@@ -92,6 +92,50 @@ class OfflineLicenseTest extends TestCase
         $this->assertFalse($license->isActive());
     }
 
+    public function test_business_owner_can_install_a_signed_offline_license_from_settings(): void
+    {
+        $user = $this->signInAsOwner();
+        $business = $user->businesses()->firstOrFail();
+
+        $response = $this->post(route('settings.license.store'), [
+            'license_token' => $this->signedToken($business, [
+                'issued_at' => '2026-11-10T00:00:00+00:00',
+                'starts_at' => '2026-11-01T00:00:00+00:00',
+                'expires_at' => '2027-11-09T23:59:59+00:00',
+            ]),
+        ]);
+
+        $response->assertRedirect(route('settings.index'));
+        $response->assertSessionHas('success');
+        $this->assertDatabaseHas('business_licenses', [
+            'business_id' => $business->id,
+            'status' => 'active',
+            'plan' => 'solo',
+        ]);
+        $this->assertDatabaseHas('audit_logs', [
+            'business_id' => $business->id,
+            'action' => 'business.license.imported',
+        ]);
+    }
+
+    public function test_non_owner_cannot_install_a_business_license(): void
+    {
+        $owner = $this->signInAsOwner();
+        $business = $owner->businesses()->firstOrFail();
+        $staff = \\App\\Models\\User::factory()->create();
+        $business->users()->attach($staff->id, ['role' => 'staff']);
+
+        $this->actingAs($staff)
+            ->post(route('settings.license.store'), [
+                'license_token' => 'not-a-valid-token',
+            ])
+            ->assertForbidden();
+
+        $this->assertDatabaseMissing('business_licenses', [
+            'business_id' => $business->id,
+        ]);
+    }
+
     /** @return array{0: string, 1: string} */
     private function signingKeys(): array
     {
