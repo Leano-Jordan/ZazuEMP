@@ -735,3 +735,12 @@ Regression: e2e/offline-attachment-sync.spec.js; commit 876f0828adba101221f89df1
 - Per-business row locking serializes imports; malformed/incomplete installed signed metadata fails closed.
 - Added feature regression source for same-ID replay after revocation, exact-token re-import, same-timestamp payload substitution and incomplete metadata.
 - Source re-fetch/structural review only. Automated execution remains unverified; no readiness uplift and V1 remains NO-GO.
+
+
+## Offline bootstrap race protection — 2026-11-10
+
+A verified source-level race allowed an in-flight bootstrap snapshot to overwrite a local mutation queued after the request began. The client now reconciles bootstrap application inside one IndexedDB read/write transaction spanning persisted workspace state and the mutation queue. It applies only when the device token is unchanged and no pending mutation exists; otherwise it discards the snapshot and leaves the pull cursor unacknowledged. Both pull and refresh paths use the guard.
+
+Regression: `e2e/pwa-offline.spec.js` holds the bootstrap response, queues a customer mutation through the actual offline queue, then verifies the old snapshot cannot replace local state or erase the pending mutation. Commits: `a75f6d6`, `e63f97a`.
+
+**Status:** IMPLEMENTED at source; Playwright and exact-head CI execution UNVERIFIED. No score uplift. V1 remains NO-GO.
