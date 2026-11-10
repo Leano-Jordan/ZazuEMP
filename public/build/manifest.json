@@ -1,6 +1,6 @@
 {
   "resources/css/app.css": {
-    "file": "assets/app-BwrP_bjU.css",
+    "file": "assets/app-jCUojkm8.css",
     "name": "app",
     "names": [
       "app.css"
@@ -66,7 +66,7 @@
     "src": "resources/fonts/space-grotesk-latin-wght-normal.woff2"
   },
   "resources/js/app.js": {
-    "file": "assets/app-BWOC9CjE.js",
+    "file": "assets/app-BzeBEzeT.js",
     "name": "app",
     "src": "resources/js/app.js",
     "isEntry": true
