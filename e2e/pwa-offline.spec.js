@@ -1099,7 +1099,77 @@ test.describe('Zazu installed PWA offline shell', () => {
         expect(outcome.recoveryRequired).toBe(true);
         expect(outcome.pending).toContain(mutationId);
         expect(outcome.tokenPresent).toBe(true);
-        expect(outcome.tokenPresent).toBe(true);
+    });
+
+    test('re-pairing preserves queued work and its local workspace until sync can reconcile it', async ({ page }) => {
+        test.setTimeout(30_000);
+        await login(page);
+        await page.goto('/settings', { waitUntil: 'domcontentloaded' });
+        await page.evaluate(() => window.ZazuOffline.ready);
+
+        const mutationId = await page.evaluate(async () => {
+            const state = window.ZazuOffline.getState();
+            state.business = { id: Number(document.body.dataset.zazuBusinessId), name: 'Locally preserved workspace' };
+            state.customers = [{ id: null, local_id: 're-pair-local-customer', name: 'Keep this customer' }];
+            state.sync = { token: 'revoked-old-token', device: { id: 987698 } };
+            state.sync_authorization_required = true;
+            await window.ZazuOffline.persist();
+            const mutation = await window.ZazuOffline.queueMutation('customer', 'create', {
+                local_id: 're-pair-local-customer',
+                record: { name: 'Keep this customer' },
+            });
+            return mutation.id;
+        });
+
+        await page.route('**/api/sync/provision', route => route.fulfill({
+            status: 200,
+            contentType: 'application/json',
+            body: JSON.stringify({
+                token: 'new-repair-token',
+                device: { id: 987700, business_id: Number(page.context()._options?.baseURL ? 0 : 0) },
+                bootstrap: {
+                    business: { id: 0, name: 'Remote replacement snapshot' },
+                    catalogue: [], suppliers: [], purchase_orders: [], invoices: [], expenses: [],
+                    inventory_items: [], assets: [], costs: [], selected: [],
+                },
+            }),
+        }));
+
+        const businessId = await page.evaluate(() => Number(document.body.dataset.zazuBusinessId));
+        await page.unroute('**/api/sync/provision');
+        await page.route('**/api/sync/provision', route => route.fulfill({
+            status: 200,
+            contentType: 'application/json',
+            body: JSON.stringify({
+                token: 'new-repair-token',
+                device: { id: 987700, business_id: businessId },
+                bootstrap: {
+                    business: { id: businessId, name: 'Remote replacement snapshot' },
+                    catalogue: [], suppliers: [], purchase_orders: [], invoices: [], expenses: [],
+                    inventory_items: [], assets: [], costs: [], selected: [],
+                },
+            }),
+        }));
+        await page.route('**/api/sync/push', route => route.fulfill({
+            status: 503,
+            contentType: 'application/json',
+            body: JSON.stringify({ message: 'Temporary sync outage.' }),
+        }));
+
+        await page.evaluate(() => window.ZazuOffline.pair('123456'));
+        const outcome = await page.evaluate(async () => ({
+            businessName: window.ZazuOffline.getState().business?.name,
+            customerName: window.ZazuOffline.getState().customers?.[0]?.name,
+            token: window.ZazuOffline.getState().sync?.token,
+            recoveryRequired: window.ZazuOffline.getState().sync_authorization_required === true,
+            pending: (await window.ZazuOffline.pending()).map(item => item.id),
+        }));
+
+        expect(outcome.businessName).toBe('Locally preserved workspace');
+        expect(outcome.customerName).toBe('Keep this customer');
+        expect(outcome.token).toBe('new-repair-token');
+        expect(outcome.recoveryRequired).toBe(false);
+        expect(outcome.pending).toContain(mutationId);
     });
 
     test('authenticated dashboard survives a real offline navigation', async ({ page, context }) => {
