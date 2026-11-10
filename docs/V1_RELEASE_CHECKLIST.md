@@ -1,5 +1,30 @@
 # Zazu EMP — V1 Release Gate Ledger
 
+## Director full audit and exact-head CI — 2026-11-10
+
+**Verified application/test source:** `90b3d1b7ad1c888a69f728df0add75d834884bbf`.  
+**Audit record:** [`docs/DIRECTOR_FULL_AUDIT_2026-11-10.md`](DIRECTOR_FULL_AUDIT_2026-11-10.md).  
+**V1 evidence-maturity score:** **69/100 (3.46/5)** — retained from the last formally calculated 13-domain scorecard. No numerical uplift is awarded in this cycle.  
+**Commercial offline licensing maturity:** **1/5 (additional, not included in the 13-domain score)**; activation/signing/enforcement are not integrated into the application.  
+**Release decision: NO-GO.**
+
+Exact-head verification for `90b3d1b`:
+- Laravel: **PASS — 417 tests / 2,954 assertions** ([run 42792043006](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/42792043006)).
+- Browser smoke: **PASS — 65 passed / 22 skipped / 0 failed** ([run 42792043223](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/42792043223)).
+- Zazu Quality + secret scan: **PASS** ([run 42792042787](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/42792042787)).
+- Psalm Security: **PASS** ([run 42792043008](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/42792043008)).
+- PHPMD: **PASS** ([run 42792042981](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/42792042981)).
+- Populated upgrade/restore/rollback: **PASS** ([run 42792043233](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/42792043233)).
+- Director health: **PASS** ([run 42792042897](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/42792042897)).
+- Push on main / CodeQL: **PASS** ([run 42792044052](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/42792044052)).
+- SonarCloud: **SKIPPED**, not counted as a pass ([run 42792042834](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/42792042834)).
+
+The code change on this source baseline adds per-response CSP nonces to the three standalone inline style blocks and applies `style-src-elem` nonce enforcement. Inline style attributes and a legacy fallback remain; CSP hardening is improved, not complete. The updated source/test batch passed on the exact SHA above.
+
+**Open release gates remain:** physical phone/tablet offline acceptance on secure HTTPS; selected persistent production hosting and deployment smoke; real operator backup/restore and deployment rollback; trusted-device/lost-device acceptance; operational privacy/legal and incident-response closure; Zazu trade-mark clearance; and a commercial decision/implementation for signed offline licensing where the paid entitlement model requires it.
+
+This checklist update and the audit record are documentation-only descendants of the verified application/test SHA. They do not change the code assessment baseline.
+
 ## Director scorecard and exact-head evidence — 2026-11-09
 
 **Current V1 evidence-maturity score: 69/100 (3.46/5), up from the historical 60/100 baseline.**  
