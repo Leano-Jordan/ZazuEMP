@@ -1096,6 +1096,50 @@
         window.dispatchEvent(new CustomEvent('zazu:offline-state-updated'));
     }
 
+    async function applyBootstrapIfQueueClean(bootstrap, expectedToken) {
+        const db = await openDb();
+
+        return new Promise((resolve, reject) => {
+            const tx = db.transaction([STATE, QUEUE], 'readwrite');
+            const queueRequest = tx.objectStore(QUEUE).index('status').getAll('pending');
+            const stateRequest = tx.objectStore(STATE).get('current');
+            let queueReady = false;
+            let stateReady = false;
+            let applied = false;
+
+            const reconcile = () => {
+                if (!queueReady || !stateReady || applied) return;
+
+                // A local mutation may have been saved while the network
+                // bootstrap was in flight. Never let a remote snapshot replace
+                // that newer local workspace or acknowledge past its queue.
+                if (queueRequest.result?.length || sessionCleared) return;
+
+                const persistedState = stateRequest.result;
+                if (!persistedState || persistedState.sync?.token !== expectedToken) return;
+
+                state = persistedState;
+                applyBootstrap(bootstrap);
+                tx.objectStore(STATE).put(state, 'current');
+                applied = true;
+            };
+
+            queueRequest.onsuccess = () => {
+                queueReady = true;
+                reconcile();
+            };
+            stateRequest.onsuccess = () => {
+                stateReady = true;
+                reconcile();
+            };
+            queueRequest.onerror = () => tx.abort();
+            stateRequest.onerror = () => tx.abort();
+            tx.oncomplete = () => resolve(applied);
+            tx.onerror = () => reject(tx.error || new Error('Offline bootstrap reconciliation failed.'));
+            tx.onabort = () => reject(tx.error || new Error('Offline bootstrap reconciliation was aborted.'));
+        });
+    }
+
     async function pull() {
         if (sessionCleared || !navigator.onLine || !state?.sync?.token || state.local_dirty) return;
 
@@ -1114,8 +1158,9 @@
 
             const snapshot = await bootstrap.json();
             if (sessionCleared || !state?.sync?.token) return;
-            applyBootstrap(snapshot);
-            await writeState();
+            const expectedToken = state.sync.token;
+            const applied = await applyBootstrapIfQueueClean(snapshot, expectedToken);
+            if (!applied) return;
 
             const highest = Math.max(...mutations.map(m => Number(m.sequence || 0)));
             if (sessionCleared || !state?.sync?.token) return;
@@ -1163,8 +1208,8 @@
         if (!response.ok || sessionCleared || !state?.sync?.token) return;
         const bootstrap = await response.json();
         if (sessionCleared || !state?.sync?.token) return;
-        applyBootstrap(bootstrap);
-        await writeState();
+        const expectedToken = state.sync.token;
+        await applyBootstrapIfQueueClean(bootstrap, expectedToken);
     }
 
     async function pair(pairingCode) {
