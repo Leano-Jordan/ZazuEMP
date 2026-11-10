@@ -29,8 +29,9 @@ class OfflineLicenseService
         $verified = $this->verifier->verifyForBusiness($token, (int) $business->id);
         $payload = $verified['payload'];
         $dates = $verified['dates'];
+        $fingerprint = $verified['fingerprint'];
 
-        $this->assertNotOlderThanInstalledLicense($business, $payload, $dates['issued_at']);
+        $this->assertNotOlderThanInstalledLicense($business, $dates['issued_at'], $fingerprint);
 
         return BusinessLicense::updateOrCreate(
             ['business_id' => $business->id],
@@ -45,6 +46,7 @@ class OfflineLicenseService
                     'signed' => true,
                     'format_version' => 1,
                     'issued_at' => $dates['issued_at']->toIso8601String(),
+                    'payload_sha256' => $fingerprint,
                 ],
                 'activated_at' => now(),
                 'last_local_check_at' => now(),
@@ -52,22 +54,36 @@ class OfflineLicenseService
         );
     }
 
-    /**
-     * @param array<string, mixed> $payload
-     */
     private function assertNotOlderThanInstalledLicense(
         Business $business,
-        array $payload,
         Carbon $issuedAt,
+        string $fingerprint,
     ): void {
         $existing = $business->license()->first();
-        $existingIssuedAt = $existing?->metadata['issued_at'] ?? null;
 
-        if ($existing?->metadata['signed'] === true
-            && is_string($existingIssuedAt)
-            && $existing->license_id !== $payload['license_id']
-            && $issuedAt->lte(Carbon::parse($existingIssuedAt))) {
-            throw new \InvalidArgumentException('This licence is older than the entitlement already installed.');
+        if ($existing?->metadata['signed'] !== true) {
+            return;
+        }
+
+        $existingIssuedAt = $existing->metadata['issued_at'] ?? null;
+        if (! is_string($existingIssuedAt)) {
+            return;
+        }
+
+        $installedAt = Carbon::parse($existingIssuedAt);
+
+        if ($issuedAt->lt($installedAt)) {
+            throw new \\InvalidArgumentException('This licence is older than the entitlement already installed.');
+        }
+
+        if ($issuedAt->equalTo($installedAt)) {
+            $installedFingerprint = $existing->metadata['payload_sha256'] ?? null;
+
+            if (is_string($installedFingerprint) && hash_equals($installedFingerprint, $fingerprint)) {
+                return;
+            }
+
+            throw new \\InvalidArgumentException('A different licence payload cannot reuse an installed issue timestamp.');
         }
     }
 
