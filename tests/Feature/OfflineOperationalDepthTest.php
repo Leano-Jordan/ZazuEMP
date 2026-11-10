@@ -9,8 +9,11 @@ use App\Models\EventCost;
 use App\Models\InventoryItem;
 use App\Models\InventoryMovement;
 use App\Models\SyncDevice;
+use App\Models\SyncMutation;
 use App\Support\Offline\SyncMutationApplier;
 use App\Support\Offline\SyncMutationRecorder;
+use App\Support\Offline\SyncMutationHandler;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Str;
 use Illuminate\Validation\ValidationException;
@@ -37,6 +40,8 @@ class OfflineOperationalDepthTest extends TestCase
             'installation_id' => (string) Str::uuid(),
             'device_name' => 'Offline test phone',
             'device_type' => 'phone',
+            'metadata' => ['sync_token_hash' => hash('sha256', 'offline-test-token')],
+            'token_expires_at' => now()->addDays(SyncDevice::SYNC_TOKEN_IDLE_EXPIRY_DAYS),
         ]);
     }
 
@@ -292,4 +297,67 @@ class OfflineOperationalDepthTest extends TestCase
             $this->assertSame('OFF-ASSET-OTHER', $otherAsset->fresh()->asset_tag);
         }
     }
+    public function test_recorder_rechecks_durable_device_state_after_middleware_snapshot(): void
+    {
+        $business = $this->business();
+        $device = $this->device($business);
+
+        DB::table('sync_devices')->where('id', $device->id)->update([
+            'status' => 'revoked',
+            'revoked_at' => now(),
+            'token_expires_at' => null,
+        ]);
+
+        try {
+            app(SyncMutationRecorder::class)->record(
+                $device,
+                'job',
+                (string) Str::uuid(),
+                'create',
+                ['record' => ['name' => 'Must not be recorded']],
+            );
+            $this->fail('A stale authenticated device snapshot must not record after revocation.');
+        } catch (\Symfony\Component\HttpKernel\Exception\HttpException $exception) {
+            $this->assertSame(401, $exception->getStatusCode());
+        }
+
+        $this->assertDatabaseCount('sync_mutations', 0);
+        $this->assertSame('revoked', $device->fresh()->status);
+    }
+
+    public function test_applier_rechecks_durable_device_state_before_domain_write(): void
+    {
+        $business = $this->business();
+        $device = $this->device($business);
+        $mutation = app(SyncMutationRecorder::class)->record(
+            $device,
+            'job',
+            (string) Str::uuid(),
+            'create',
+            ['record' => ['name' => 'Must remain unapplied']],
+        );
+
+        DB::table('sync_devices')->where('id', $device->id)->update([
+            'status' => 'revoked',
+            'revoked_at' => now(),
+            'token_expires_at' => null,
+        ]);
+
+        $handler = new class implements SyncMutationHandler {
+            public function apply(SyncMutation $mutation): void
+            {
+                throw new \RuntimeException('The domain handler must not run for a revoked device.');
+            }
+        };
+
+        try {
+            app(SyncMutationApplier::class)->apply($mutation, ['job' => $handler]);
+            $this->fail('A queued mutation from a revoked device must not be applied.');
+        } catch (\Symfony\Component\HttpKernel\Exception\HttpException $exception) {
+            $this->assertSame(401, $exception->getStatusCode());
+        }
+
+        $this->assertSame('pending', $mutation->fresh()->status);
+    }
+
 }
