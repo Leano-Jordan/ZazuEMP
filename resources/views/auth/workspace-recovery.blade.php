@@ -34,7 +34,7 @@
 
             <div class="zazu-auth-switch">
                 This creates an owner workspace for the account you are already signed into.
-                <form method="POST" action="{{ route('logout') }}" style="display:inline">
+                <form method="POST" action="{{ route('logout') }}" class="zazu-auth-inline-form">
                     @csrf
                     <button type="submit" class="zazu-auth-inline-button">Sign out</button>
                 </form>
