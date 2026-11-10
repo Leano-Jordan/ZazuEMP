@@ -977,11 +977,48 @@
     }
 
     sessionChannel?.addEventListener('message', event => {
-        if (event.data?.type !== 'clear-session') return;
+        if (event.data?.type === 'clear-session') {
+            sessionCleared = true;
+            sessionGeneration++;
+            activeSyncController?.abort();
+            state = blank();
+            clearStoredWorkspace(false).catch(() => {
+                storageAvailable = false;
+            });
+            return;
+        }
 
+        if (event.data?.type !== 'session-replaced') return;
+
+        // Another tab paired this business workspace with a new device token.
+        // Stop old-session work before adopting the durable state written by
+        // that tab; never keep a stale in-memory credential alive.
+        sessionGeneration++;
         sessionCleared = true;
-        state = blank();
-        clearStoredWorkspace(false).catch(() => {
+        activeSyncController?.abort();
+        Promise.resolve().then(async () => {
+            await ready;
+            const nextState = await readState();
+            if (!nextState?.sync?.token) {
+                state = blank();
+                return;
+            }
+
+            state = nextState;
+            sessionCleared = false;
+            window.dispatchEvent(new CustomEvent('zazu:offline-state-updated'));
+            if (!navigator.onLine) return;
+            if (syncing) {
+                syncRequested = true;
+                return;
+            }
+            sync().catch(() => {
+                if (!state || sessionCleared || !state.sync?.token) return;
+                state.last_sync_error = 'Synchronization failed; queued work will retry.';
+                writeState().catch(() => {});
+            });
+        }).catch(() => {
+            sessionCleared = true;
             storageAvailable = false;
         });
     });
@@ -1394,6 +1431,7 @@
         if (!preserveLocalWorkspace) applyBootstrap(result.bootstrap);
         await writeState();
         window.dispatchEvent(new CustomEvent('zazu:offline-state-updated'));
+        sessionChannel?.postMessage({ type: 'session-replaced' });
         syncAttachments().catch(() => {});
         if (preserveLocalWorkspace) {
             sync().catch(() => {
