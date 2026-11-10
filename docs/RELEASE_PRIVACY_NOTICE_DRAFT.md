@@ -7,7 +7,7 @@
 **Effective date:** [TO BE PUBLISHED]
 **Privacy contact:** [OWNER-CONFIRMED BUSINESS EMAIL — INSERT AT PUBLICATION]
 **Telephone:** [OWNER-CONFIRMED BUSINESS NUMBER — INSERT AT PUBLICATION]
-**Service address:** [APPROVED PUBLIC BUSINESS/SERVICE ADDRESS — DO NOT SUBSTITUTE A RESIDENTIAL ADDRESS WITHOUT APPROVAL]
+**Service address:** Pretoria North, Gauteng, South Africa (public service area only; not a registered-office claim)
 
 > This draft must be completed against the actual production deployment and reviewed before publication. Do not publish placeholders or claim that a company exists before registration.
 
