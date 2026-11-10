@@ -134,3 +134,21 @@ Next execution order:
 - Commits: `4c80e28` landing page; `40711e5` admin preview; `b51f15a` recovery form; `e6735d0` stylesheet; `f8a236a` regression assertions.
 - Guardian review: source-level inspection confirms the three changed views have zero `style=` attributes. The legacy `public/offline-attachments.js` contains inline attributes but is not imported by the active authenticated layout; it remains a dormant legacy asset and was not reactivated or modified. `resources/js/app.js` also uses CSSOM `style.setProperty/removeProperty` for the floating helper's measured nav-avoidance position, so the policy's `style-src-attr 'unsafe-inline'` allowance is deliberately retained until that runtime behaviour is redesigned and tested.
 - Verification boundary: changed files re-fetched; no PHPUnit, Blade compilation, browser run or exact-head CI execution is available here. No CSP relaxation was made, no readiness score uplift is claimed, and V1 remains **NO-GO**.
+
+
+## Director correction — licensing implementation reconciliation (2026-11-10)
+
+The licensing subsection above reflects an earlier inspection point and is superseded by the implementation now present on canonical `main`. The earlier statement that no application activation/import flow existed is no longer accurate.
+
+**Re-read current-main evidence:**
+- `OfflineLicenseController` accepts a bounded signed token and imports it for the currently selected business.
+- `POST /settings/licence` is inside authenticated session, active business context and owner middleware, with a 10-per-minute throttle.
+- `settings/index.blade.php` displays the installed plan, status, start/expiry and reference, and provides signed-token activation/renewal.
+- `OfflineLicenseService` delegates to `SignedOfflineLicenseVerifier`; Ed25519 signature verification is performed before payload parsing, with business binding, strict timestamp validation, anti-rollback and per-business locking.
+- `OfflineLicenseTest` covers owner activation, audit persistence, invalid-token non-retention, expiry, tampering, cross-business rejection, revocation and offline import.
+
+**Corrected disposition:** activation/import interface and local signed-token verification are IMPLEMENTED with feature-test coverage. This is materially beyond a foundation-only state. It is still **not commercially license-enforced**: no production issuer/key-management workflow, installation identity/reactivation, or application-wide plan/feature enforcement boundary is evidenced. Do not ship a paid subscription claim until those boundaries are implemented or the first pilot's manual entitlement process is explicitly documented and operated.
+
+This correction does not change the historical 69/100 13-domain score: that rubric excludes licensing, and no physical/operational release gate has closed. The separate 1/5 licensing rating above is superseded by this implementation reconciliation and must not be reused as current status.
+
+Verification boundary: source and test files were re-fetched from current `main`; no test command was executed in this session. The latest documentation commit `8d3c1af` has no reported combined status contexts. The recorded 422-test licensing baseline belongs to source commit `b9fc97d`, not automatically to current HEAD.
