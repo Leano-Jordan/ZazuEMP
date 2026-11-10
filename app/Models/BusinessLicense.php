@@ -56,7 +56,7 @@ class BusinessLicense extends Model
         return ! $this->expires_at || $at <= $this->expires_at;
     }
 
-    public function statusLabel(?\\DateTimeInterface $at = null): string
+    public function statusLabel(?\DateTimeInterface $at = null): string
     {
         $at ??= now();
 
