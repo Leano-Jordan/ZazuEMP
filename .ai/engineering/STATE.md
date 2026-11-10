@@ -1686,3 +1686,12 @@ Source review found that authenticated sync pull/acknowledgement accepted arbitr
 - Pull responses now include a transient `delivery_sequence` attribute on each returned mutation. The phone calculates its acknowledgement from that receiver-specific value.
 - Added regression: destination's own mutation consumes business sequence 1; a remote mutation has business sequence 2 but destination delivery sequence 1; pull exposes both and acknowledgement succeeds at 1.
 - Source/test changes committed separately; runtime verification remains pending until exact-head CI. No readiness uplift; V1 remains **NO-GO**.
+
+
+## Lost acknowledgement response retry — 2026-11-10
+
+- Reviewed the phone pull flow: it applies a clean bootstrap snapshot before acknowledging the receiver-specific contiguous delivery sequence.
+- If the server commits the acknowledgement but the response is lost, the next acknowledgement retry is idempotent: `acknowledgeThrough()` returns the existing cursor when the requested sequence is already acknowledged.
+- Added a feature regression that acknowledges the same delivery twice and verifies the cursor remains at sequence 1 and the delivery remains applied exactly once.
+- This adds regression coverage; it does not change sync protocol behaviour.
+- Source inspection only until exact-head Laravel CI completes. No readiness uplift; V1 remains **NO-GO**.
