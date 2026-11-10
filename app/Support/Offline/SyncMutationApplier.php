@@ -2,6 +2,7 @@
 
 namespace App\Support\Offline;
 
+use App\Models\SyncDevice;
 use App\Models\SyncMutation;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Support\Facades\DB;
@@ -36,6 +37,25 @@ class SyncMutationApplier
         }
 
         return DB::transaction(function () use ($mutation, $handler): SyncMutation {
+            // Keep lock order consistent with SyncMutationRecorder: business,
+            // device, then mutation. A revoke that wins this lock prevents the
+            // queued mutation from being applied; an apply that wins completes
+            // before the revoke can commit.
+            DB::table('businesses')->where('id', $mutation->business_id)->lockForUpdate()->first();
+
+            $lockedDevice = SyncDevice::query()
+                ->where('business_id', $mutation->business_id)
+                ->whereKey($mutation->sync_device_id)
+                ->active()
+                ->lockForUpdate()
+                ->first();
+
+            abort_unless(
+                $lockedDevice,
+                401,
+                'This sync device was revoked before the offline change could be applied.'
+            );
+
             $locked = SyncMutation::query()
                 ->whereKey($mutation->id)
                 ->lockForUpdate()
