@@ -1775,3 +1775,12 @@ Source review found that authenticated sync pull/acknowledgement accepted arbitr
 - Added `OfflineOperationalDepthTest` regressions for stale authenticated snapshots at record time and revocation between record/apply. Existing tokenless internal fixtures remain supported only when both their snapshot and durable device have no token hash; real middleware-authenticated devices carry and compare their hash.
 - Commits: `5cb9526` recorder transaction fence; `66094f9` applier transaction fence; `c6d6060` preserve 401; `8d7c4c1` fixture compatibility; `6e80ff0` record/apply regressions.
 - Re-fetched source and test assertions are present on `main`. GitHub combined status has no status contexts; the workflow-run wrapper returned no runs for the commit. PHPUnit, PHP lint, browser/runtime and full CI remain **UNVERIFIED**. No readiness uplift; V1 remains **NO-GO**.
+
+
+## PHPMD correction and test-boundary cleanup — 2026-11-10
+
+- The first CI run after the mutation-boundary change exposed three PHPMD findings: `SyncController::push()` crossed the 100-line method limit; `OfflineSyncFoundationTest` exceeded the public-test count threshold; and `UiProportionFoundationTest` exceeded its public-method threshold.
+- Corrected the controller finding by extracting the 401 rethrow into a private helper. The first extraction commit contained escaped namespace separators that PHPMD's parser rejected; the fully qualified PHP names have now been corrected and re-fetched.
+- Moved three mutation-identity tests into `SyncMutationIdentityTest` (reducing `OfflineSyncFoundationTest` from 47 to 44 public tests) and moved the dashboard colour regression into `DashboardVisualRefinementTest` (reducing `UiProportionFoundationTest` from 11 to 10 methods). Assertions and coverage were preserved, not suppressed.
+- Commits: `1f55289` helper extraction; `d3f54c4` original test split; `90bf475` mutation identity class; `13874ed` UI test split; `5255b40` dashboard test class; `82f0f85` and `177a368` PHP namespace correction.
+- Exact-head PHPMD/Laravel/quality/Playwright/Psalm runs were queued at the time of this update. Do not treat the earlier PHPMD failure as resolved until a successful run is observed. V1 remains **NO-GO**.
