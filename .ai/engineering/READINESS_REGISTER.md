@@ -864,3 +864,11 @@ Commits: `4f4f9f63e617b201fb68ab612ef902805c8e1727`, `a281567ab1c9b384dffe47405d
 - Pull now returns only a contiguous pending prefix from the current cursor; a gap or non-pending row blocks later delivery exposure until recovery is resolved.
 - Regression source covers failed sequence 1 followed by pending sequence 2 and asserts no later mutation is returned and the cursor does not advance.
 - Source inspection only. PHPUnit, concurrency runtime and exact-head CI remain **UNVERIFIED**. No score uplift. V1 remains **NO-GO**.
+
+
+## Receiver-specific sync acknowledgement — 2026-11-10
+
+- Fixed the sequence-domain mismatch between business mutation ordering and per-device delivery acknowledgement.
+- Server pull payload now exposes `delivery_sequence`; phone acknowledgement uses that value instead of `mutation.sequence`.
+- Regression models a destination's own mutation consuming business sequence 1, followed by a remote mutation at business sequence 2 delivered as receiver sequence 1. It verifies pull metadata and successful cursor acknowledgement.
+- Source re-fetch/structural checks only. PHPUnit, browser runtime and exact-head CI remain **UNVERIFIED**. No score uplift; V1 remains **NO-GO**.
