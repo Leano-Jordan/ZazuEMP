@@ -8,7 +8,7 @@ RUN npm run build
 
 FROM composer:2 AS composerbin
 FROM php:8.4-cli-bookworm AS vendor
-RUN apt-get update && apt-get install -y --no-install-recommends libonig-dev libxml2-dev libzip-dev unzip \
+RUN apt-get update && apt-get install -y --no-install-recommends libonig-dev libxml2-dev libzip-dev libsqlite3-dev pkg-config unzip \
     && docker-php-ext-install -j"$(nproc)" mbstring pdo_sqlite xml zip \
     && rm -rf /var/lib/apt/lists/*
 COPY --from=composerbin /usr/bin/composer /usr/bin/composer
@@ -17,7 +17,7 @@ COPY composer.json composer.lock ./
 RUN composer install --no-dev --prefer-dist --no-interaction --no-progress --optimize-autoloader --no-scripts
 
 FROM php:8.4-apache-bookworm
-RUN apt-get update && apt-get install -y --no-install-recommends libonig-dev libxml2-dev libzip-dev \
+RUN apt-get update && apt-get install -y --no-install-recommends libonig-dev libxml2-dev libzip-dev libsqlite3-dev pkg-config \
     && docker-php-ext-install -j"$(nproc)" mbstring pdo_sqlite xml zip opcache \
     && a2enmod rewrite headers expires \
     && sed -ri 's!/var/www/html!/var/www/html/public!g' /etc/apache2/sites-available/*.conf \
