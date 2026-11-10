@@ -81,6 +81,7 @@ class SyncMutationProtocol
                 ->where('destination_device_id', $device->id)
                 ->where('stream', $stream)
                 ->whereBetween('delivery_sequence', [$expected, $sequence])
+                ->where('status', 'pending')
                 ->orderBy('delivery_sequence')
                 ->lockForUpdate()
                 ->get();
