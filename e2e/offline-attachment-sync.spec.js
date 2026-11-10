@@ -383,6 +383,49 @@ test('operator creates an offline Work job, attaches a file from its directory r
     }, deviceToken);
 
     const uploaded = { count: 0, eventId: null, key: null };
+    const pushed = { customer: null, job: null };
+
+    await page.route('**/api/sync/push', async route => {
+        const request = route.request();
+        expect(request.method()).toBe('POST');
+        expect(request.headers()['authorization']).toBe('Bearer ' + deviceToken);
+        const body = request.postDataJSON();
+        const recorded = (body.mutations || []).map((mutation, index) => {
+            const serverId = mutation.entity_type === 'job' ? 9901
+                : mutation.entity_type === 'customer' ? 9900
+                    : 9910 + index;
+            const identity = {
+                entity_type: mutation.entity_type,
+                local_id: mutation.payload?.local_id || mutation.entity_id,
+                server_id: serverId,
+            };
+            if (mutation.entity_type === 'job') pushed.job = identity;
+            if (mutation.entity_type === 'customer') pushed.customer = identity;
+            return {
+                id: mutation.id,
+                sequence: index + 1,
+                status: 'applied',
+                applied: true,
+                error: null,
+                identity,
+            };
+        });
+
+        await route.fulfill({
+            status: 200,
+            contentType: 'application/json',
+            body: JSON.stringify({ recorded, applied: recorded.map(item => item.id) }),
+        });
+    });
+
+    await page.route('**/api/sync/pull**', async route => {
+        await route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify({ mutations: [] }) });
+    });
+
+    await page.route('**/api/sync/bootstrap', async route => {
+        await route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify({}) });
+    });
+
     await page.route('**/api/sync/attachments', async route => {
         const request = route.request();
         expect(request.method()).toBe('POST');
@@ -425,12 +468,26 @@ test('operator creates an offline Work job, attaches a file from its directory r
         await window.ZazuOffline.persist();
     }, localJob.local_id);
 
-    const syncResult = await page.evaluate(() => window.ZazuOffline.syncAttachments());
-    expect(syncResult.uploaded).toBe(1);
-    expect(syncResult.pending).toBe(0);
-    expect(uploaded.count).toBe(1);
+    // A reconnect alone must not upload a file whose local Work has no
+    // server identity. The normal sync protocol must acknowledge the Work
+    // mutation and return its identity before attachment upload can begin.
+    const unresolvedSync = await page.evaluate(() => window.ZazuOffline.syncAttachments());
+    expect(unresolvedSync.uploaded).toBe(0);
+    expect(unresolvedSync.pending).toBe(1);
+    expect(uploaded.count).toBe(0);
+
+    await page.evaluate(() => window.ZazuOffline.sync());
+    await expect.poll(() => uploaded.count).toBe(1);
+    expect(pushed.customer?.server_id).toBe(9900);
+    expect(pushed.job?.server_id).toBe(9901);
     expect(uploaded.eventId).toBe(9901);
     expect(uploaded.key).toBeTruthy();
+
+    const syncedJob = await page.evaluate(localId => {
+        const job = window.ZazuOffline.getState().jobs.find(item => item.local_id === localId);
+        return { id: job?.id, server_id: job?.server_id };
+    }, localJob.local_id);
+    expect(syncedJob).toEqual({ id: 9901, server_id: 9901 });
 
     const finalRecord = await page.evaluate(async key => {
         const records = await window.ZazuOffline.loadAttachments(9901);
