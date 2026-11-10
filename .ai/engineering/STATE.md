@@ -1511,3 +1511,11 @@ Owner expanded the visual refinement scope beyond the dashboard: apply the estab
 - Expanded feature assertions across all four states and retained the owner settings expired-label regression.
 - Commits: `a4a4caf` initial helper; `b52bec6` type correction; `36f7c97` settings integration; `36a529a` state regression coverage.
 - Verification boundary: model, view and feature test source were re-fetched and inspected. Current main head is `36a529ae77e1f1b15c275accded39711b30b02bb`; GitHub combined status returned no status contexts. PHP/Blade/CI execution is still unverified. No readiness score uplift; V1 remains **NO-GO**.
+
+## Signed licence timestamp canonicalisation — 2026-11-10
+
+- Hardened `SignedOfflineLicenseVerifier` to require full ISO-style timestamps with seconds and an explicit timezone for `starts_at`, `issued_at` and `expires_at`.
+- Parsed timestamps are round-tripped against their canonical representation so impossible calendar dates that a date parser might otherwise normalize are rejected.
+- Added feature regressions for timezone-less timestamps and normalized invalid calendar dates.
+- Commits: `30eeb13` parser; `32d485a` exception namespace correction; `69f9756` test cases; `c07b417` test namespace correction.
+- Verification boundary: parser and test source were re-fetched and inspected. PHP/PHPUnit, PHPMD, Psalm and exact-head CI remain unexecuted/unverified. No readiness score uplift; V1 remains **NO-GO**.
