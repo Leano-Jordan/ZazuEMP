@@ -591,11 +591,20 @@
                 }
 
                 const result = await response.json();
-                if (!result.attachment?.id) {
+                const confirmedAttachment = result.attachment;
+                const confirmedId = Number(confirmedAttachment?.id);
+                const confirmedEventId = Number(confirmedAttachment?.event_id);
+                const confirmedKey = String(confirmedAttachment?.idempotency_key || '');
+                if (
+                    !Number.isSafeInteger(confirmedId)
+                    || confirmedId < 1
+                    || confirmedEventId !== Number(record.event_id)
+                    || confirmedKey !== record.idempotency_key
+                ) {
                     await writeAttachmentRecord({
                         ...record,
                         attempts: Number(record.attempts || 0) + 1,
-                        last_error: 'The server response could not be verified. This file remains queued.',
+                        last_error: 'The server response did not match this file and Work record. The original file remains queued for a safe retry.',
                     });
                     continue;
                 }
