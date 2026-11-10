@@ -746,7 +746,7 @@ class SyncController extends Controller
     }
 
 
-    private function rethrowUnauthorizedSyncException(\\Throwable $exception): void
+    private function rethrowUnauthorizedSyncException(\Throwable $exception): void
     {
         if (
             $exception instanceof \\Symfony\\Component\\HttpKernel\\Exception\\HttpException
