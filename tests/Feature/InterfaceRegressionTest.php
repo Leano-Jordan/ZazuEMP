@@ -263,16 +263,16 @@ class InterfaceRegressionTest extends TestCase
         $this->assertStringNotContainsString('body.zazu-mobile-menu-open .zazu-helper {\n    opacity: 0;', $css);
     }
 
-    public function test_helper_moves_for_work_and_sales_popovers(): void
+    public function test_helper_stays_at_the_far_right_when_work_and_sales_popovers_open(): void
     {
         $css = file_get_contents(resource_path('css/zazu-final-visual-sweep.css'));
         $js = file_get_contents(resource_path('js/app.js'));
 
-        $this->assertStringContainsString('.zazu-helper.is-nav-avoiding', $css);
-        $this->assertStringContainsString('--zazu-helper-nav-right', $css);
-        $this->assertStringContainsString("new Set(['zazu-nav-workspace', 'zazu-nav-sales'])", $js);
-        $this->assertStringContainsString('getBoundingClientRect()', $js);
-        $this->assertStringContainsString('helper.style.setProperty', $js);
+        $this->assertStringContainsString('right: max(16px, env(safe-area-inset-right));', $css);
+        $this->assertStringContainsString('position: fixed;', $css);
+        $this->assertStringNotContainsString('is-nav-avoiding', $css.$js);
+        $this->assertStringNotContainsString('zazu-helper-nav-right', $css.$js);
+        $this->assertStringNotContainsString('moveHelperForNav', $js);
     }
 
     public function test_helper_is_docked_without_runtime_collision_repositioning(): void
@@ -285,7 +285,8 @@ class InterfaceRegressionTest extends TestCase
         $this->assertStringContainsString('width: 46px;', $css);
         $this->assertStringContainsString('body.zazu-mobile-menu-open .zazu-helper', $css);
         $this->assertStringNotContainsString('syncHelperCollision', $js);
-        $this->assertStringContainsString('is-nav-avoiding', $css);
+        $this->assertStringContainsString('right: max(16px, env(safe-area-inset-right));', $css);
+        $this->assertStringNotContainsString('is-nav-avoiding', $css);
         $this->assertStringNotContainsString('scheduleHelperCollisionSync', $js);
     }
 
