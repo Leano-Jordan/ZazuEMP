@@ -1695,3 +1695,11 @@ Source review found that authenticated sync pull/acknowledgement accepted arbitr
 - Added a feature regression that acknowledges the same delivery twice and verifies the cursor remains at sequence 1 and the delivery remains applied exactly once.
 - This adds regression coverage; it does not change sync protocol behaviour.
 - Source inspection only until exact-head Laravel CI completes. No readiness uplift; V1 remains **NO-GO**.
+
+## Attachment upload/logout race hardening — 2026-11-10
+
+- Identified that an in-flight attachment upload could receive a successful server response after logout had cleared local IndexedDB, then recreate a local attachment record.
+- Added a session-generation guard captured per upload. Logout increments the generation before cleanup; stale upload responses cannot update or recreate local attachment records. The guard is also applied to retry/error persistence.
+- Added a Chromium regression that deliberately delays the upload response until after logout and verifies the attachment store remains empty.
+- Commits: `20dd2d7` application fix; `5fc5548` regression test; `51ece68` readiness record.
+- Exact-head CI/runtime execution remains pending. No readiness uplift until the browser and full Laravel workflows pass.
