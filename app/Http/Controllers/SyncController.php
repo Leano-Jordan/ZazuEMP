@@ -513,6 +513,13 @@ class SyncController extends Controller
                     ->first();
 
             } catch (\Throwable $exception) {
+                if (
+                    $exception instanceof \Symfony\Component\HttpKernel\Exception\HttpException
+                    && $exception->getStatusCode() === 401
+                ) {
+                    throw $exception;
+                }
+
                 $error = mb_substr($exception->getMessage(), 0, 1000);
                 $retryable = ! ($exception instanceof ValidationException);
 
