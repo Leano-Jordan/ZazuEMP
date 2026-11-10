@@ -284,7 +284,7 @@ class OfflineSyncFoundationTest extends TestCase
                 'future-stream',
             );
             $this->fail('The recorder must reject streams the client protocol cannot consume.');
-        } catch (\\Illuminate\\Validation\\ValidationException $exception) {
+        } catch (\Illuminate\Validation\ValidationException $exception) {
             $this->assertArrayHasKey('stream', $exception->errors());
         }
 
@@ -390,14 +390,14 @@ class OfflineSyncFoundationTest extends TestCase
 
         $revokedDuringScan = false;
         $retrievedEvent = 'eloquent.retrieved: '.SyncDevice::class;
-        \\Illuminate\\Support\\Facades\\Event::listen(
+        \Illuminate\Support\Facades\Event::listen(
             $retrievedEvent,
             function (SyncDevice $retrieved) use ($destinationDevice, &$revokedDuringScan): void {
                 if ($retrieved->id !== $destinationDevice->id || $revokedDuringScan) {
                     return;
                 }
 
-                \\Illuminate\\Support\\Facades\\DB::table('sync_devices')
+                \Illuminate\Support\Facades\DB::table('sync_devices')
                     ->where('id', $destinationDevice->id)
                     ->update(['status' => 'revoked', 'revoked_at' => now()]);
                 $revokedDuringScan = true;
@@ -407,7 +407,7 @@ class OfflineSyncFoundationTest extends TestCase
         try {
             $recorder->publish($mutation);
         } finally {
-            \\Illuminate\\Support\\Facades\\Event::forget($retrievedEvent);
+            \Illuminate\Support\Facades\Event::forget($retrievedEvent);
         }
 
         $this->assertTrue($revokedDuringScan);
@@ -448,7 +448,7 @@ class OfflineSyncFoundationTest extends TestCase
         try {
             app(SyncMutationProtocol::class)->acknowledgeThrough($destinationDevice, 1);
             $this->fail('An acknowledgement must not advance over a non-pending delivery.');
-        } catch (\\Illuminate\\Validation\\ValidationException $exception) {
+        } catch (\Illuminate\Validation\ValidationException $exception) {
             $this->assertArrayHasKey('sequence', $exception->errors());
         }
 
@@ -473,14 +473,14 @@ class OfflineSyncFoundationTest extends TestCase
         try {
             $protocol->pull($device, 'unbounded-client-stream');
             $this->fail('Unknown sync streams must be rejected.');
-        } catch (\\Illuminate\\Validation\\ValidationException $exception) {
+        } catch (\Illuminate\Validation\ValidationException $exception) {
             $this->assertArrayHasKey('stream', $exception->errors());
         }
 
         try {
             $protocol->acknowledgeThrough($device, 0, 'another-unbounded-stream');
             $this->fail('Unknown sync streams must be rejected.');
-        } catch (\\Illuminate\\Validation\\ValidationException $exception) {
+        } catch (\Illuminate\Validation\ValidationException $exception) {
             $this->assertArrayHasKey('stream', $exception->errors());
         }
 
@@ -1918,8 +1918,8 @@ class OfflineSyncFoundationTest extends TestCase
         $request->attributes->set('sync_device', $device);
 
         $recorder = app(SyncMutationRecorder::class);
-        $applier = \\Mockery::mock(SyncMutationApplier::class, [$recorder])->makePartial();
-        $applier->shouldReceive('apply')->once()->andThrow(new \\RuntimeException('Temporary persistence failure'));
+        $applier = \Mockery::mock(SyncMutationApplier::class, [$recorder])->makePartial();
+        $applier->shouldReceive('apply')->once()->andThrow(new \RuntimeException('Temporary persistence failure'));
 
         $response = app(SyncController::class)->push(
             $request,
@@ -2442,7 +2442,7 @@ class OfflineSyncFoundationTest extends TestCase
             app(SyncConflictRecorder::class),
         );
         $this->assertSame($conflict->id, $duplicateResponse->getData(true)['recorded'][0]['conflict_id']);
-        $this->assertSame(1, \\App\\Models\\SyncConflict::query()
+        $this->assertSame(1, \App\Models\SyncConflict::query()
             ->where('business_id', $business->id)
             ->where('mutation_id', $mutationId)
             ->where('conflict_type', 'mutation_identity_mismatch')
