@@ -1216,6 +1216,49 @@ test.describe('Zazu installed PWA offline shell', () => {
         expect(outcome.pending).toContain(mutationId);
     });
 
+    test('creates and retains a customer during a true browser-offline session', async ({ page, context }, testInfo) => {
+        test.setTimeout(45_000);
+        test.skip(testInfo.project.name !== 'chromium', 'True offline mutation acceptance runs once on desktop Chromium.');
+
+        await login(page);
+        await page.goto('/customers/create', { waitUntil: 'domcontentloaded' });
+        await expect(page.getByRole('heading', { name: /new customer|create customer/i })).toBeVisible();
+
+        await page.evaluate(async () => {
+            if (!('serviceWorker' in navigator)) throw new Error('Service workers are unavailable');
+            await navigator.serviceWorker.ready;
+        });
+        await page.reload({ waitUntil: 'domcontentloaded' });
+        await expect.poll(() => page.evaluate(() => Boolean(navigator.serviceWorker.controller))).toBe(true);
+
+        await context.setOffline(true);
+        const offlineResponse = await page.reload({ waitUntil: 'domcontentloaded' });
+        expect(offlineResponse?.ok()).toBe(true);
+        await expect(page.locator('input[name="name"]')).toBeVisible();
+
+        await page.locator('input[name="name"]').fill('True offline acceptance customer');
+        await page.locator('input[name="primary_contact_name"]').fill('Offline Contact');
+        await page.locator('input[name="primary_contact_phone"]').fill('0123456789');
+        await page.getByRole('button', { name: 'Save customer' }).click();
+        await expect(page.getByText('Saved on this device. It will sync automatically when Zazu reconnects.')).toBeVisible();
+
+        const queued = await page.evaluate(async () => window.ZazuOffline.pending());
+        expect(queued).toHaveLength(1);
+        expect(queued[0].entity_type).toBe('customer');
+        expect(queued[0].payload.record?.name || queued[0].payload.name).toBe('True offline acceptance customer');
+
+        await page.reload({ waitUntil: 'domcontentloaded' });
+        await page.evaluate(() => window.ZazuOffline.ready);
+        const recovered = await page.evaluate(async () => ({
+            pending: await window.ZazuOffline.pending(),
+            customer: window.ZazuOffline.getState().customers.find(item =>
+                item.name === 'True offline acceptance customer'
+            ) || null,
+        }));
+        expect(recovered.pending.map(item => item.id)).toContain(queued[0].id);
+        expect(recovered.customer).toBeTruthy();
+    });
+
     test('authenticated dashboard survives a real offline navigation', async ({ page, context }) => {
         test.setTimeout(60_000);
 
