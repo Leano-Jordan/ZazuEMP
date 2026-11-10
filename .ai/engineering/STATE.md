@@ -1460,3 +1460,12 @@ Owner expanded the visual refinement scope beyond the dashboard: apply the estab
 - Current-head checks: PHPMD **PASS**; Psalm security scan **PASS**; Zazu quality workflow **PASS**; populated upgrade/rollback workflow **PASS**; Laravel **PASS**. Browser smoke is still running and is not yet accepted as passed.
 - Relevant commits: `79f41fc` initial verifier; `f01371a` remove unsigned issuer; `39194b5` input bound/anti-rollback; `5544e07` verifier refactor; `632e148` dedicated verifier; `9e82b7c` DI; `5a54a21` attachment DOM regression correction; `b9fc97d` local attachment method-signature regression correction.
 - Remaining licensing blockers: owner activation/status UI, production issuer and private-key custody, installation identity/reactivation, renewal UX, and enforcement at the correct business boundary. No readiness score uplift yet; V1 remains **NO-GO** pending browser smoke and remaining release gates.
+
+## Offline Work attachment sync regression strengthened — 2026-11-10
+
+- Reworked the real operator journey in `e2e/offline-attachment-sync.spec.js` so it no longer assigns a server ID directly into IndexedDB-backed job state.
+- The test now intercepts the normal `/api/sync/push` protocol, returns server mutation acknowledgements with customer/job identity records in the same shape as `SyncController::push`, and then lets the real client `sync()` sequence perform push → pull → bootstrap refresh → attachment upload.
+- It asserts the attachment remains pending and is not uploaded while the local Work has no server identity; after the server acknowledges the job mutation, the client maps the returned identity to the local Work and uploads the original file with its original idempotency key against the returned server event ID.
+- This closes a gap in the previous regression, which simulated the server identity transition by directly mutating client state and calling `syncAttachments()`.
+- Commits: `918fb93` initial protocol-level regression; `fc715ba` removes the previous direct identity simulation.
+- Verification boundary: updated E2E source was re-fetched and inspected. Playwright has not been executed in this environment; exact-head CI is not verified. No score uplift. V1 remains **NO-GO** pending CI and real installed-device acceptance.
