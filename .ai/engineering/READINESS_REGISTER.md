@@ -880,3 +880,11 @@ Commits: `4f4f9f63e617b201fb68ab612ef902805c8e1727`, `a281567ab1c9b384dffe47405d
 - Added a regression simulating the client retry after an acknowledgement response is lost; it checks the cursor remains stable and the delivery is applied once.
 - This is server-side retry-safety coverage. It does not replace the phone-level interrupted-network acceptance test.
 - Exact-head PHPUnit/CI remains **UNVERIFIED** until GitHub reports the run. No score uplift; V1 remains **NO-GO**.
+
+## Attachment upload/logout race — 2026-11-10
+
+- Found a late-response race: an attachment POST could complete after local logout cleanup and persist its response into the cleared business attachment database.
+- Added a monotonically increasing local session generation. Uploads capture the generation and paired token; response handling and attachment-record writes refuse to persist when logout/session transition has invalidated that generation.
+- Added Chromium regression: hold the attachment upload response, complete local logout and remote token revocation, release the response, then assert the business attachment store remains empty.
+- Commits: `20dd2d7d0fb2df7028675ed321c4ee0ea0b1c2cc` (fix), `5fc554809c0ae51ab5b998a6e6710a271423955c` (browser regression).
+- Source and test are committed on `main`. Exact-head Playwright/Laravel/quality execution is **PENDING**; this is not yet a verified runtime pass. No readiness score uplift. V1 remains **NO-GO**.
