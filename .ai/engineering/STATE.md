@@ -1846,3 +1846,10 @@ Source review found that authenticated sync pull/acknowledgement accepted arbitr
 - Updated docs/ZAZU_OFFLINE_LICENSING_SPEC.md with the authoritative implementation status, enforcement boundary and safe sequence.
 - Exact-head 960b39e9 Laravel, quality, Psalm, PHPMD, populated upgrade/rollback, Director contract lint and push-on-main workflows are PASS. Zazu browser smoke run 42904398545 / job 130138486515 remains IN_PROGRESS at time of record. SonarCloud is SKIPPED, not a pass.
 - No source-code change or V1 readiness uplift in this documentation-only reconciliation. V1 remains **NO-GO**.
+
+
+## Browser smoke regression correction — 2026-11-10
+- Exact-head `b12eac50` browser workflow failed: 81 passed, 1 failed, 38 skipped. Failure was isolated to `e2e/offline-attachment-sync.spec.js` test `late attachment upload response cannot recreate local files after logout`.
+- Root cause: the test's multipart `idempotency_key` matcher was double-escaped (`\\r\\n`) and therefore searched for literal backslash sequences instead of CRLF delimiters in the multipart body. The uploader correctly submits the field via `FormData.append('idempotency_key', ...)`; this failure was in the assertion parser, not evidence of a production upload defect.
+- Corrected matcher to use actual CRLF/newline regex escapes while retaining the assertion that the request carries an idempotency key and the late response cannot recreate local files after logout.
+- Commit: `9bb30a06357ae61e2f2fbdd0f2a6cc639e20acf8` (`test: correct multipart idempotency matcher`). Awaiting exact-head CI. No readiness uplift until browser suite passes.
