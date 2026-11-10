@@ -727,3 +727,11 @@ Regression: e2e/offline-attachment-sync.spec.js; commit 876f0828adba101221f89df1
 - Playwright coverage asserts file visibility and download initiation through the actual operator row.
 - Implementation commits: 0c202680, 5a653874, d4c574e3, cd677995, 22ea45fe.
 - Source re-fetch confirms implementation anchors. Browser runtime, storage persistence, exact-head CI and real server sync remain unverified. No readiness score uplift; V1 remains NO-GO.
+
+## Same-ID signed licence replay protection — 2026-11-10
+
+- Anti-rollback now applies regardless of whether a renewal/revocation reuses the same license_id.
+- Exact signed payload bytes are SHA-256 fingerprinted after signature verification. Exact-token re-import is idempotent; a different payload cannot reuse the same issue timestamp.
+- Per-business row locking serializes imports; malformed/incomplete installed signed metadata fails closed.
+- Added feature regression source for same-ID replay after revocation, exact-token re-import, same-timestamp payload substitution and incomplete metadata.
+- Source re-fetch/structural review only. Automated execution remains unverified; no readiness uplift and V1 remains NO-GO.
