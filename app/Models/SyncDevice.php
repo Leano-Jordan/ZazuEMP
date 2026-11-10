@@ -60,13 +60,45 @@ class SyncDevice extends Model
         return $this->status === 'active' && $this->revoked_at === null;
     }
 
-    public function refreshTokenActivity(): void
+    public function refreshTokenActivity(string $tokenHash): bool
     {
         $lastSeenAt = now();
+        $tokenExpiresAt = $lastSeenAt->copy()->addDays(self::SYNC_TOKEN_IDLE_EXPIRY_DAYS);
+
+        // A token can be revoked after the middleware's initial lookup. Fence the
+        // activity write against the persisted credential state so a stale model
+        // cannot extend the lifetime of a device that has already been revoked.
+        static::query()
+            ->whereKey($this->getKey())
+            ->active()
+            ->where('metadata->sync_token_hash', $tokenHash)
+            ->whereNotNull('token_expires_at')
+            ->where('token_expires_at', '>', $lastSeenAt)
+            ->update([
+                'last_seen_at' => $lastSeenAt,
+                'token_expires_at' => $tokenExpiresAt,
+            ]);
+
+        // A zero-row update can also mean the timestamp values were unchanged
+        // within the database's precision. Re-read the complete credential guard
+        // before allowing the request through.
+        $stillAuthorized = static::query()
+            ->whereKey($this->getKey())
+            ->active()
+            ->where('metadata->sync_token_hash', $tokenHash)
+            ->whereNotNull('token_expires_at')
+            ->where('token_expires_at', '>', $lastSeenAt)
+            ->exists();
+
+        if (! $stillAuthorized) {
+            return false;
+        }
 
         $this->forceFill([
             'last_seen_at' => $lastSeenAt,
-            'token_expires_at' => $lastSeenAt->copy()->addDays(self::SYNC_TOKEN_IDLE_EXPIRY_DAYS),
-        ])->save();
+            'token_expires_at' => $tokenExpiresAt,
+        ]);
+
+        return true;
     }
 }
