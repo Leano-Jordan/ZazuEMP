@@ -1270,7 +1270,7 @@ body.zazu-dashboard-page .zazu-dash-quote-stage {
     border: 1px solid var(--zazu-line-soft) !important;
     box-shadow: none !important;
 }
-body.zazu-dashboard-page .zazu-dash-event { background: var(--zazu-tone-blue) !important; }
+body.zazu-dashboard-page .zazu-dash-event { background: var(--zazu-surface) !important; }
 body.zazu-dashboard-page .zazu-dash-focus-item { background: var(--zazu-tone-amber) !important; }
 body.zazu-dashboard-page .zazu-dash-resource-grid > :nth-child(4n + 1) { background: var(--zazu-tone-blue) !important; }
 body.zazu-dashboard-page .zazu-dash-resource-grid > :nth-child(4n + 2) { background: var(--zazu-tone-green) !important; }
