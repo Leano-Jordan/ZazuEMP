@@ -229,8 +229,13 @@ class PwaOfflineFoundationTest extends TestCase
         $this->assertStringContainsString('await clearAttachmentWorkspace();', $client);
         $this->assertStringContainsString('attachmentPendingCount', $client);
         $this->assertStringContainsString('async function queueAttachment(eventId, file, description', $client);
-        $this->assertStringContainsString('async function queueAttachments(eventId, files', $client);
+        $this->assertStringContainsString('async function queueAttachments(eventId, files, description = \'\', localEventId = null)', $client);
+        $this->assertStringContainsString('event_local_id: targetLocalEventId', $client);
+        $this->assertStringContainsString('async function loadAttachments(eventId, localEventId = null)', $client);
         $this->assertStringContainsString('        queueAttachments,', $client);
+        $this->assertStringContainsString('window.ZazuOffline.queueAttachments(null, files, \'\', job.local_id)', $app);
+        $this->assertStringContainsString('data-zazu-local-job-attachments', $app);
+        $this->assertStringContainsString("attach.textContent = 'Attach files';", $app);
         $this->assertStringContainsString('async function syncAttachments()', $client);
         $this->assertStringContainsString('async function reconcileAttachmentEventIds()', $client);
         $this->assertStringContainsString('record.event_local_id', $client);
