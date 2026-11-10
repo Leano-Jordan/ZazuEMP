@@ -480,6 +480,7 @@ class SyncController extends Controller
             $conflictId = null;
             $conflictType = null;
             $identity = null;
+            $retryable = false;
 
             try {
                 $mutation = $applier->apply($mutation, [$mutation->entity_type => $handler]);
@@ -493,6 +494,7 @@ class SyncController extends Controller
 
             } catch (\Throwable $exception) {
                 $error = mb_substr($exception->getMessage(), 0, 1000);
+                $retryable = ! ($exception instanceof ValidationException);
 
                 $mutation->update([
                     'attempts' => $mutation->attempts + 1,
@@ -532,6 +534,7 @@ class SyncController extends Controller
                 'error' => $mutation->status === 'pending' ? $mutation->last_error : null,
                 'conflict_id' => $conflictId,
                 'conflict_type' => $conflictType,
+                'retryable' => $retryable,
                 'identity' => $identity ? [
                     'entity_type' => $identity->entity_type,
                     'local_id' => $identity->entity_uuid,
@@ -617,6 +620,7 @@ class SyncController extends Controller
             'error' => mb_substr($message, 0, 1000),
             'conflict_id' => $conflict->id,
             'conflict_type' => 'mutation_identity_mismatch',
+            'retryable' => false,
             'identity' => null,
         ];
     }
