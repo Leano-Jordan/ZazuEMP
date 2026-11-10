@@ -1503,3 +1503,11 @@ Owner expanded the visual refinement scope beyond the dashboard: apply the estab
 - Added a feature regression for the expired-state label and a route regression proving rejected raw licence tokens are not flashed into session old input and do not create an entitlement.
 - Commits: `25e3183` status rendering; `6e4261a` expired-state regression; `b3d6b59` token session-safety regression.
 - Verification boundary: current `main` source was re-fetched and checked for route ownership, throttle, view state handling, token non-repopulation, owner/non-owner tests and audit assertions. Combined commit status and PR-run lookup exposed no checks for this push; PHPUnit/Blade/browser execution remains unverified. No readiness score uplift. V1 remains **NO-GO**.
+
+## Licence status domain logic centralised — 2026-11-10
+
+- Moved entitlement status presentation out of the Blade ternary into `BusinessLicense::statusLabel()`, keeping the rules alongside `isActive()`.
+- The status helper distinguishes Active, Revoked, Not yet active and Expired using the supplied comparison time or the local clock. Settings now consumes this single domain method.
+- Expanded feature assertions across all four states and retained the owner settings expired-label regression.
+- Commits: `a4a4caf` initial helper; `b52bec6` type correction; `36f7c97` settings integration; `36a529a` state regression coverage.
+- Verification boundary: model, view and feature test source were re-fetched and inspected. Current main head is `36a529ae77e1f1b15c275accded39711b30b02bb`; GitHub combined status returned no status contexts. PHP/Blade/CI execution is still unverified. No readiness score uplift; V1 remains **NO-GO**.
