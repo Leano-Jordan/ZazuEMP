@@ -1215,7 +1215,7 @@
             const applied = await applyBootstrapIfQueueClean(snapshot, expectedToken);
             if (!applied) return;
 
-            const highest = Math.max(...mutations.map(m => Number(m.sequence || 0)));
+            const highest = Math.max(...mutations.map(m => Number(m.delivery_sequence || 0)));
             if (sessionCleared || !state?.sync?.token) return;
             const ack = await api('/api/sync/acknowledge', {
                 method: 'POST',
