@@ -888,3 +888,9 @@ Commits: `4f4f9f63e617b201fb68ab612ef902805c8e1727`, `a281567ab1c9b384dffe47405d
 - Added Chromium regression: hold the attachment upload response, complete local logout and remote token revocation, release the response, then assert the business attachment store remains empty.
 - Commits: `20dd2d7d0fb2df7028675ed321c4ee0ea0b1c2cc` (fix), `5fc554809c0ae51ab5b998a6e6710a271423955c` (browser regression).
 - Source and test are committed on `main`. Exact-head Playwright/Laravel/quality execution is **PENDING**; this is not yet a verified runtime pass. No readiness score uplift. V1 remains **NO-GO**.
+
+## Private attachment cache/logout race — 2026-11-10
+
+- Extended the session-generation boundary to remote attachment listing and private-file downloads. A stale list/download response is now discarded after logout or token replacement, and private attachment cache writes use the captured session generation.
+- The upload-completion/logout race has a dedicated Chromium regression. The download-completion/logout guard is implemented but does not yet have its own runtime regression.
+- Source committed on `main`; exact-head Laravel/Playwright/quality execution remains **PENDING**. No readiness score uplift. V1 remains **NO-GO**.
