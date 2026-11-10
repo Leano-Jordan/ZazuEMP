@@ -91,7 +91,7 @@ The app is configured with `ZAZU_LICENSE_PUBLIC_KEY` only: base64-encoded Ed2551
 
 ## Current implementation stage
 
-The repository contains the local entitlement data foundation, local validity service and an Ed25519 signed-token import/verification method. The former unsigned `issueLocalEntitlement` helper has been removed so application code cannot use that service API to mint an entitlement without a valid issuer signature. Feature tests cover valid import, signature tampering, cross-business rejection, signed revocation, expiry, missing public-key configuration and renewal rollback protection.
+The repository contains the local entitlement data foundation, local validity service and an Ed25519 signed-token import/verification method. The former unsigned `issueLocalEntitlement` helper has been removed so application code cannot use that service API to mint an entitlement without a valid issuer signature. Feature tests cover valid import, signature tampering, cross-business rejection, signed revocation, expiry, missing public-key configuration, strict timestamp parsing, same-ID rollback after revocation, exact-token idempotency, same-timestamp payload substitution and incomplete-metadata rejection.
 
 The owner Business Settings page now displays the installed entitlement's plan, status, start and expiry dates and provides a signed-token import form. The POST endpoint is inside the authenticated business-context and owner middleware boundary, is rate-limited, rejects oversized/missing tokens, verifies the signed token against the active business, and records a business-scoped audit entry without storing the raw token in the audit log or old form input. A successful import/renewal is available offline once the token has been supplied.
 
