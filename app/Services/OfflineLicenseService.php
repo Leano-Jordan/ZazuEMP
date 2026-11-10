@@ -18,30 +18,6 @@ class OfflineLicenseService
         return $this->current($business)?->isActive() ?? false;
     }
 
-    public function issueLocalEntitlement(
-        Business $business,
-        string $plan,
-        \DateTimeInterface $startsAt,
-        ?\DateTimeInterface $expiresAt = null,
-        array $features = [],
-        array $metadata = [],
-    ): BusinessLicense {
-        return BusinessLicense::updateOrCreate(
-            ['business_id' => $business->id],
-            [
-                'license_id' => (string) Str::uuid(),
-                'plan' => $plan,
-                'status' => 'active',
-                'starts_at' => $startsAt,
-                'expires_at' => $expiresAt,
-                'features' => $features ?: null,
-                'metadata' => $metadata ?: null,
-                'activated_at' => now(),
-                'last_local_check_at' => now(),
-            ],
-        );
-    }
-
     /**
      * Import a Rosscore-issued Ed25519 licence token without a network request.
      * Token format: base64url(payload JSON).base64url(detached signature).
