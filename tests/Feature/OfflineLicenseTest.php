@@ -219,7 +219,7 @@ class OfflineLicenseTest extends TestCase
         $user = $this->signInAsOwner();
         $business = $user->businesses()->firstOrFail();
 
-        $this->expectException(\\InvalidArgumentException::class);
+        $this->expectException(\InvalidArgumentException::class);
         $this->expectExceptionMessage('The signed licence dates are invalid.');
 
         app(OfflineLicenseService::class)->importSignedLicense(
@@ -233,7 +233,7 @@ class OfflineLicenseTest extends TestCase
         $user = $this->signInAsOwner();
         $business = $user->businesses()->firstOrFail();
 
-        $this->expectException(\\InvalidArgumentException::class);
+        $this->expectException(\InvalidArgumentException::class);
         $this->expectExceptionMessage('The signed licence dates are invalid.');
 
         app(OfflineLicenseService::class)->importSignedLicense(
