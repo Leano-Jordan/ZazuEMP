@@ -385,8 +385,8 @@ test('operator creates an offline Work job, attaches a file from its directory r
         expect(request.headers()['authorization']).toBe('Bearer ' + deviceToken);
         const body = request.postData() || '';
         uploaded.count++;
-        uploaded.eventId = Number(body.match(/name="event_id"\\r\\n\\r\\n([^\\r\\n]+)/)?.[1] || 0);
-        uploaded.key = body.match(/name="idempotency_key"\\r\\n\\r\\n([^\\r\\n]+)/)?.[1] || null;
+        uploaded.eventId = Number(body.match(/name="event_id"\r\n\r\n([^\r\n]+)/)?.[1] || 0);
+        uploaded.key = body.match(/name="idempotency_key"\r\n\r\n([^\r\n]+)/)?.[1] || null;
         expect(body).toContain('operator-job-brief.txt');
         await route.fulfill({
             status: 201,
@@ -408,6 +408,11 @@ test('operator creates an offline Work job, attaches a file from its directory r
     });
 
     await page.context().setOffline(false);
+    const unresolvedSync = await page.evaluate(() => window.ZazuOffline.syncAttachments());
+    expect(unresolvedSync.uploaded).toBe(0);
+    expect(unresolvedSync.pending).toBe(1);
+    expect(uploaded.count).toBe(0);
+
     await page.evaluate(async localId => {
         const state = window.ZazuOffline.getState();
         const job = state.jobs.find(item => item.local_id === localId);
