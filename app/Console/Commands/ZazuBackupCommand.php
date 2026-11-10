@@ -194,7 +194,11 @@ class ZazuBackupCommand extends Command
             }
         }
 
-        File::copyDirectory($privateRoot, $work.'/storage/private');
+        if (!File::copyDirectory($privateRoot, $work.'/storage/private')) {
+            $this->error('Could not copy private storage into the backup; no archive was published.');
+            return false;
+        }
+
         return true;
     }
 
