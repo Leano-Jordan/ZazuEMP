@@ -1089,13 +1089,16 @@ test.describe('Zazu installed PWA offline shell', () => {
 
         const outcome = await page.evaluate(async () => ({
             error: window.ZazuOffline.getState().last_sync_error,
+            recoveryRequired: window.ZazuOffline.getState().sync_authorization_required === true,
             pending: (await window.ZazuOffline.pending()).map(item => item.id),
             tokenPresent: Boolean(window.ZazuOffline.getState().sync?.token),
         }));
 
         expect(outcome.error).toContain('no longer authorised to sync');
         expect(outcome.error).toContain('re-pair');
+        expect(outcome.recoveryRequired).toBe(true);
         expect(outcome.pending).toContain(mutationId);
+        expect(outcome.tokenPresent).toBe(true);
         expect(outcome.tokenPresent).toBe(true);
     });
 
