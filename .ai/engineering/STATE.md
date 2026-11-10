@@ -1824,3 +1824,13 @@ Source review found that authenticated sync pull/acknowledgement accepted arbitr
 - Evidence was re-fetched from current `main`: `OfflineLicenseController`, `OfflineLicenseService`, `SignedOfflineLicenseVerifier`, `resources/views/settings/index.blade.php`, `routes/web.php`, and `tests/Feature/OfflineLicenseTest.php`.
 - Historical 422-test evidence belongs to `b9fc97d`; latest docs commit `8d3c1af` has no combined status contexts. No current-head test pass or release score uplift is claimed.
 - Active next target: reconcile exact-main CI for the current source head, then close the production licensing issuer/enforcement boundary without weakening offline operation. P0 physical-device, deployment, operator recovery, privacy and brand gates remain external/operational.
+
+
+## Offline browser fixture reconciliation — 2026-11-10
+
+- Exact-head browser smoke on `f6104a1` failed eight Chromium cases across `offline-attachment-sync.spec.js` and `offline-session-transition.spec.js` with `The offline device session changed before local state could be saved.`
+- Retrieved the failed GitHub Actions job log (job `130132374579`) and traced all failures to test setup replacing the seeded device token through ordinary `persist()`. The production compare-before-write guard correctly rejects an unapproved session replacement; the tests were not modelling the explicit pairing/session-replacement boundary.
+- Classified **F2 — test/verification fixture contract drift**, not an application defect. Corrected only the fixture setup calls to `persist({ allowSessionChange: true })`; preserved the deliberate stale-token rejection assertion at `offline-attachment-sync.spec.js:875` using ordinary `persist()`.
+- Commits: `2948dee` attachment fixture corrections; `4feb0e2` session-transition fixture correction. Both target canonical `main`.
+- Re-fetched both changed test files and verified the explicit replacement option is present in seven setup points plus the session-transition setup; the stale-write negative assertion remains unchanged.
+- Exact-head CI for `4feb0e2` is queued/in progress. No pass is claimed until the new browser run completes. V1 remains **NO-GO**; no score uplift.
