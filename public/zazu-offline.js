@@ -909,6 +909,7 @@
             throw new Error('Pair this device with Zazu before resolving its sync conflicts.');
         }
 
+        const conflictSessionToken = state.sync.token;
         const queued = await allMutations();
         if (!queued.some(item => Number(item.conflict_id) === id)) {
             throw new Error('The saved offline change could not be found on this device. Refresh the sync state before resolving it.');
@@ -920,6 +921,9 @@
             body: JSON.stringify({ action, note }),
         });
         const result = await response.json().catch(() => ({}));
+        if (sessionCleared || state?.sync?.token !== conflictSessionToken) {
+            throw new Error('The device session changed while this conflict was being resolved. Refresh the workspace before retrying.');
+        }
         if (!response.ok) {
             throw new Error(result.message || 'Zazu could not resolve this offline sync conflict.');
         }
@@ -936,13 +940,27 @@
         await new Promise((resolve, reject) => {
             const tx = db.transaction([STATE, QUEUE], 'readwrite');
             const store = tx.objectStore(QUEUE);
+            const stateStore = tx.objectStore(STATE);
             const all = store.getAll();
+            const currentState = stateStore.get('current');
+            let sessionMismatch = false;
+
+            currentState.onsuccess = () => {
+                if (sessionCleared || (currentState.result?.sync?.token || null) !== conflictSessionToken) {
+                    sessionMismatch = true;
+                    tx.abort();
+                }
+            };
+            currentState.onerror = () => tx.abort();
 
             tx.oncomplete = resolve;
             tx.onerror = () => reject(tx.error || new Error('Offline conflict resolution could not be saved locally.'));
-            tx.onabort = () => reject(tx.error || new Error('Offline conflict resolution transaction was aborted.'));
+            tx.onabort = () => reject(sessionMismatch
+                ? new Error('The device session changed before conflict resolution could be saved.')
+                : (tx.error || new Error('Offline conflict resolution transaction was aborted.')));
 
             all.onsuccess = () => {
+                if (sessionMismatch) return;
                 const mutation = (all.result || []).find(item => Number(item.conflict_id) === id);
                 if (mutation && shouldRetry) {
                     const retry = { ...mutation, status: 'pending' };
