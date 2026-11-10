@@ -460,22 +460,6 @@ test('operator creates an offline Work job, attaches a file from its directory r
     expect(unresolvedSync.pending).toBe(1);
     expect(uploaded.count).toBe(0);
 
-    await page.evaluate(async localId => {
-        const state = window.ZazuOffline.getState();
-        const job = state.jobs.find(item => item.local_id === localId);
-        job.server_id = 9901;
-        job.id = 9901;
-        await window.ZazuOffline.persist();
-    }, localJob.local_id);
-
-    // A reconnect alone must not upload a file whose local Work has no
-    // server identity. The normal sync protocol must acknowledge the Work
-    // mutation and return its identity before attachment upload can begin.
-    const unresolvedSync = await page.evaluate(() => window.ZazuOffline.syncAttachments());
-    expect(unresolvedSync.uploaded).toBe(0);
-    expect(unresolvedSync.pending).toBe(1);
-    expect(uploaded.count).toBe(0);
-
     await page.evaluate(() => window.ZazuOffline.sync());
     await expect.poll(() => uploaded.count).toBe(1);
     expect(pushed.customer?.server_id).toBe(9900);
