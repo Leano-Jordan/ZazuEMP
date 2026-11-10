@@ -1496,3 +1496,10 @@ Owner expanded the visual refinement scope beyond the dashboard: apply the estab
 - Updated `docs/ZAZU_OFFLINE_LICENSING_SPEC.md` to distinguish the new owner import interface from the still-missing production issuer and enforcement boundary.
 - Commits: `b7897d7` controller; `c77dc2c` namespace correction; `6715fada` route; `fe860b7` settings data; `a7b4f12` activation UI; `43115b8` route tests; `200fda4` test namespace correction; `5a13985` specification.
 - Verification boundary: changed source files have been re-fetched and inspected. PHPUnit, Blade rendering, PHPMD, Psalm, browser flows and exact-head CI have not yet been executed. Production signing key custody/issuer, installation identity, renewal issuance and application enforcement remain open. No score uplift; V1 remains **NO-GO**.
+
+## Licence activation UI state accuracy and secret-handling regression — 2026-11-10
+
+- Corrected owner settings status rendering so an active-but-expired entitlement is shown as **Expired**, a future-start entitlement as **Not yet active**, and a signed revocation as **Revoked**. Previously, an expired record with database status `active` could be displayed misleadingly as Active.
+- Added a feature regression for the expired-state label and a route regression proving rejected raw licence tokens are not flashed into session old input and do not create an entitlement.
+- Commits: `25e3183` status rendering; `6e4261a` expired-state regression; `b3d6b59` token session-safety regression.
+- Verification boundary: current `main` source was re-fetched and checked for route ownership, throttle, view state handling, token non-repopulation, owner/non-owner tests and audit assertions. Combined commit status and PR-run lookup exposed no checks for this push; PHPUnit/Blade/browser execution remains unverified. No readiness score uplift. V1 remains **NO-GO**.
