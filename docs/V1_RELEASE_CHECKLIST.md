@@ -1,3 +1,18 @@
+
+## Jarvis implementation update — offline Work attachments — 2026-11-10
+
+**Application/test source has changed after the 90b3d1b verified baseline.** The 69/100 evidence score and the 90b3d1b CI results above remain historical baseline evidence only; they do not verify the following commits.
+
+- `0a126881`: queue attachments against a validated local Work ID before server identity exists; preserve business scope, Blob and idempotency key.
+- `48e991ba`: expose the attachment action on locally queued Work rows.
+- `352f9d14`: add Laravel source-contract regression guards.
+- `876f0828`: add a real Playwright journey for offline customer/job creation, attachment selection through the Work row, local Blob retrieval, no upload before identity resolution, then upload after the server ID is assigned.
+- `0c202680` / `5a653874` / `d4c574e3`: show local attachment names/status and provide local download without rebuilding the Work row.
+- `cd677995` / `22ea45fe`: assert visible file entry and download initiation in the browser regression.
+
+All implementation changes target canonical `main`. Changed files were re-fetched and key source/test anchors inspected. GitHub combined-status lookups returned no status contexts for the checked commits. **Playwright, Laravel, Vite build and exact-head CI have not been executed for this batch.** The test simulates the job's server-ID assignment at the local-state boundary; a live Laravel sync round-trip and physical device test remain open.
+
+**Disposition:** source implementation and regression coverage added; automated verification pending. No score uplift. V1 remains **NO-GO**.
 # Zazu EMP — V1 Release Gate Ledger
 
 ## Director full audit and exact-head CI — 2026-11-10
