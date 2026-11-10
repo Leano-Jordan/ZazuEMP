@@ -1549,3 +1549,14 @@ Owner expanded the visual refinement scope beyond the dashboard: apply the estab
 - Added a Chromium Playwright regression that queues a real customer mutation, returns the actual API contract shape for a rejected mutation (pending status plus error and conflict ID), runs sync, then inspects IndexedDB to assert the failed mutation and matching open conflict are both present and the workspace is no longer marked dirty.
 - Implementation commits: `5b15209` atomic source persistence; `78917ad` regression; `d0377f8` route interception correction.
 - Source and test were re-fetched and structurally checked. Playwright/Laravel execution and exact-head CI remain UNVERIFIED. No readiness uplift; V1 remains **NO-GO**.
+
+
+## Retryable offline mutation failure handling — 2026-11-10
+
+A confirmed failure-path gap was found in the offline push contract: unexpected non-validation server exceptions were returned with an error while leaving the server mutation pending, but the client treated every error as a terminal failed mutation. Because no conflict record existed for these exceptions, the client could strand the mutation outside the pending queue with no conflict-resolution path.
+
+- Server now distinguishes deterministic validation conflicts from unexpected/retryable failures in each recorded mutation response.
+- Client moves an error-bearing mutation to `failed` only when the server supplies an explicit conflict ID. Unexpected failures remain `pending`, retain the last error, and can retry on a later sync without creating a false domain conflict.
+- Added a feature regression that forces a temporary persistence exception and asserts pending status, retryable disposition, retained error and absence of an orphan conflict.
+- Commits: `3d22994` controller response contract; `8df076c` client queue handling; `3eba5cf` regression test.
+- Changed files re-fetched and structurally inspected. PHPUnit, browser execution and exact-head CI remain **UNVERIFIED**. No readiness score uplift. V1 remains **NO-GO**.
