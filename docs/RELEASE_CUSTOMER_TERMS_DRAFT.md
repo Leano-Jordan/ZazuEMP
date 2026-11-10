@@ -3,9 +3,10 @@
 **Status:** PRE-LAUNCH COMMERCIAL DRAFT — LEGAL REVIEW REQUIRED
 **Provider:** Isaac Junior Lehlogonolo Maluleka, operating as an individual/solo provider
 **Future business identity:** Rosscore Labs; not an incorporated contracting party until registration and any required transfer/contract transition are completed
+**Public service area:** Pretoria North, Gauteng, South Africa
 **Customer:** The business/customer accepting the final terms
 **Effective date:** [DATE OF FINAL PUBLICATION]
-**Contact:** [APPROVED BUSINESS EMAIL / TELEPHONE / SERVICE ADDRESS TO BE INSERTED AT PUBLICATION]
+**Contact:** [APPROVED BUSINESS EMAIL / TELEPHONE TO BE INSERTED AT PUBLICATION]
 
 > This draft records the intended commercial model. It is not a signed contract or legal opinion. The final terms must match the actual release, checkout flow, payment method and South African legal requirements.
 
@@ -19,26 +20,37 @@ Zazu is intended to support:
 
 The provider must not promise uninterrupted availability for local installations or full disconnected multi-device synchronisation unless the capability is implemented and verified for the relevant release.
 
-## 2. Subscription and trial
+## 2. Subscription, free tier and trial
 
-The initial target subscription is **R99 per business/workspace per month**.
+The proposed paid subscription is **Advanced at R99 per business/workspace per month**. A permanent **Basic Free** tier is intended to remain available after trial expiry.
 
-The proposed initial trial is **14 days**. During the trial, the customer may use the trial-enabled advanced feature set. At the end of the trial, the workspace moves to the Basic tier unless a paid subscription is active.
+Every new eligible workspace receives a **30-day free trial** of the trial-enabled Advanced feature set. No payment method should be required for the trial unless the checkout flow clearly explains the billing transition and obtains valid consent. Trial expiry does not silently initiate paid billing: the workspace moves to Basic Free unless the customer actively subscribes.
 
-The R99 price, trial length, VAT treatment where applicable, payment method, included users, storage quota and any add-ons must be displayed clearly before the customer accepts the offer. No unlimited storage, unlimited usage or unlisted service is included by implication.
+The R99 price, VAT treatment where applicable, payment method, included users, storage quota and add-ons must be displayed clearly before the customer accepts the offer.
 
-## 3. Expiry, downgrade and customer access
+## 3. Suggested tier boundaries — must be verified before sale
+
+The following is a packaging proposal, not a representation that all limits or entitlements are already enforced:
+
+- **Basic Free:** one workspace, one owner account, core customer and event/job records, basic calendar/status tracking, limited active events (proposed cap: five), and basic quote/document access where supported.
+- **Advanced R99/month:** Basic plus the broader implemented operational modules (such as purchasing, inventory/assets, invoices, documents and reporting), up to three users total, and a proposed 2 GB hosted storage allowance.
+- **Basic Free storage:** proposed 250 MB per workspace.
+- Final module access, user counts, active-event caps, storage limits and downgrade behaviour must be tested against the deployed release and stated at checkout.
+
+Basic must remain useful and must not become a dead-end viewer. A downgrade must not destroy or unlawfully block access to customer-owned records. Do not advertise unimplemented or unenforced entitlements.
+
+## 4. Expiry, downgrade and customer access
 
 If a trial ends or a paid subscription expires, is cancelled or is not renewed:
 - the workspace is not locked out solely because of expiry;
-- the workspace moves to the Basic tier;
-- advanced features are restricted until the subscription is active again;
+- the workspace moves to Basic Free;
+- Advanced-only features are restricted until the subscription is active again;
 - customer content is not deleted solely because payment stops;
-- the customer retains access to the Basic functionality and data made available by that tier, subject to lawful security restrictions and the actual feature matrix.
+- the customer retains access to Basic functionality and customer data, subject to lawful security restrictions and the verified feature matrix.
 
-The exact Basic/Advanced feature matrix must be published before sale and must match the deployed release. The provider must not use downgrade as a pretext to destroy, withhold or unlawfully block customer data.
+The provider must not use downgrade as a pretext to destroy, withhold or unlawfully block customer data.
 
-## 4. Account and access
+## 5. Account and access
 
 The customer is responsible for:
 - maintaining accurate account information;
@@ -50,7 +62,7 @@ The customer is responsible for:
 
 The provider may suspend access where reasonably necessary to contain a security incident, prevent unlawful access, comply with law or protect service integrity. Where practical, the provider will notify the customer and restore access when the reason for restriction has been resolved.
 
-## 5. Customer data and content
+## 6. Customer data and content
 
 The customer retains ownership of its business records and content, including customer details, event information, documents, receipts, photographs and other uploaded material.
 
@@ -58,22 +70,13 @@ The customer is responsible for determining what information it enters into Zazu
 
 The customer grants the provider only the limited permission needed to host, store, transmit, secure, back up and support that content for the contracted service. This does not transfer ownership to the provider.
 
-## 6. Privacy and data processing
+## 7. Privacy and data processing
 
 For customer personal information processed in a hosted workspace, the customer will ordinarily determine the purposes and means of processing and the provider will ordinarily act as an operator where POPIA applies. Appropriate written operator terms must govern that processing.
 
 For local installations, the customer ordinarily controls the local environment. If support requires the provider to access personal information, that access must be authorised and limited to the support purpose.
 
 The provider may separately process limited account, subscription, security and billing information for service administration and its own legal obligations. The applicable Privacy Notice must explain the actual processing and third-party providers.
-
-## 7. Acceptable use
-
-The customer must not intentionally use Zazu to:
-- gain unauthorised access to another business's records;
-- upload unlawful or malicious material;
-- bypass authentication or authorisation controls;
-- interfere with service integrity or availability;
-- misuse personal information or infringe another person's rights.
 
 ## 8. Hosting, storage and availability
 
@@ -107,7 +110,7 @@ The customer retains rights in its own content. Third-party components, fonts, p
 
 Support is currently handled directly by the solo provider through the published business contact channels. Support is provided on a reasonable-efforts basis; no 24/7 service or guaranteed response-time SLA is promised at the initial R99 price.
 
-Any paid support plan or response commitment must be stated separately.
+The public service area is Pretoria North, Gauteng, South Africa. This is an area description, not a registered-office claim.
 
 ## 13. Cancellation, termination and data export
 
@@ -122,13 +125,14 @@ The final contract must include legally reviewed provisions for service changes,
 ## 15. Publication checklist
 
 - [ ] provider identity and contracting party confirmed;
-- [ ] R99 price, VAT treatment and payment method confirmed;
-- [ ] 14-day trial approved or replaced with final duration;
+- [ ] R99 Advanced price and VAT treatment confirmed;
+- [ ] 30-day trial and Basic Free downgrade verified;
 - [ ] Basic/Advanced feature matrix verified against release;
-- [ ] storage quota and fair-use limits disclosed;
+- [ ] user allowance and storage quotas enforced and disclosed;
 - [ ] hosted and local deployment language verified;
 - [ ] privacy notice and operator terms aligned;
 - [ ] backup and recovery commitments verified;
+- [ ] Pretoria North service-area wording used without implying registered office;
 - [ ] support channels and hours published;
 - [ ] cancellation/export/deletion process tested;
 - [ ] legal review completed.
