@@ -1,4 +1,4 @@
-# Zazu EMP — temporary Render staging image
+# Zazu EMP — disposable Render preview (SQLite data is ephemeral)
 FROM node:22-bookworm-slim AS assets
 WORKDIR /app
 COPY package*.json ./
@@ -6,21 +6,24 @@ RUN npm ci
 COPY . .
 RUN npm run build
 
-FROM composer:2 AS vendor
+FROM composer:2 AS composerbin
+FROM php:8.4-cli-bookworm AS vendor
+RUN apt-get update && apt-get install -y --no-install-recommends libonig-dev libxml2-dev libzip-dev unzip \
+    && docker-php-ext-install -j"$(nproc)" mbstring pdo_sqlite xml zip \
+    && rm -rf /var/lib/apt/lists/*
+COPY --from=composerbin /usr/bin/composer /usr/bin/composer
 WORKDIR /app
 COPY composer.json composer.lock ./
 RUN composer install --no-dev --prefer-dist --no-interaction --no-progress --optimize-autoloader --no-scripts
 
 FROM php:8.4-apache-bookworm
-ENV APACHE_DOCUMENT_ROOT=/var/www/html/public
-RUN apt-get update && apt-get install -y --no-install-recommends \
-    libicu-dev libzip-dev libpng-dev libjpeg62-turbo-dev libfreetype6-dev \
-    libonig-dev libxml2-dev libpq-dev unzip \
-    && docker-php-ext-configure gd --with-freetype --with-jpeg \
-    && docker-php-ext-install -j"$(nproc)" bcmath exif gd intl mbstring opcache pcntl pdo_pgsql zip \
+RUN apt-get update && apt-get install -y --no-install-recommends libonig-dev libxml2-dev libzip-dev \
+    && docker-php-ext-install -j"$(nproc)" mbstring pdo_sqlite xml zip opcache \
     && a2enmod rewrite headers expires \
-    && sed -ri -e 's!/var/www/html!\${APACHE_DOCUMENT_ROOT}!g' /etc/apache2/sites-available/*.conf \
-    && sed -ri -e 's!/var/www/!\${APACHE_DOCUMENT_ROOT}!g' /etc/apache2/apache2.conf /etc/apache2/conf-available/*.conf \
+    && sed -ri 's!/var/www/html!/var/www/html/public!g' /etc/apache2/sites-available/*.conf \
+    && sed -ri 's!/var/www/!/var/www/html/public!g' /etc/apache2/apache2.conf /etc/apache2/conf-available/*.conf \
+    && sed -ri 's/Listen 80/Listen 10000/' /etc/apache2/ports.conf \
+    && sed -ri 's/:80>/:10000>/' /etc/apache2/sites-available/000-default.conf \
     && rm -rf /var/lib/apt/lists/*
 WORKDIR /var/www/html
 COPY . .
