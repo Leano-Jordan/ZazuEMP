@@ -1659,3 +1659,13 @@ Source review found that authenticated sync pull/acknowledgement accepted arbitr
 - Separate general browser-smoke run `42824939664` was still executing when this record was written; it is not substituted for the dedicated offline acceptance result.
 - Readiness score unchanged. **V1 remains NO-GO**: the automated offline acceptance gate is now passed, but the real operator backup/restore drill and physical installed-device/business recovery acceptance remain open.
 
+
+
+## Sync delivery and stream recovery hardening — 2026-11-10
+
+- `SyncMutationRecorder` rejects unsupported streams before mutation or sequence allocation and before publication, using the protocol's declared stream allow-list.
+- Delivery publication re-checks destination device business ownership, active status and revocation state after locking the device row, avoiding delivery creation for a device revoked after the initial destination scan.
+- Acknowledgement selects only pending deliveries in the requested contiguous sequence window; cursor and delivery updates remain transactional.
+- Regression source covers unsupported recorder streams and revocation between destination scan and row-lock recheck. Existing protocol tests cover contiguous acknowledgement and invalid sequence rejection.
+- Source changes are committed on `main`; source inspection confirms the guards and regression source are present.
+- Exact-head automated offline acceptance, PHPUnit and browser runtime results are not yet verified. No readiness uplift is claimed.
