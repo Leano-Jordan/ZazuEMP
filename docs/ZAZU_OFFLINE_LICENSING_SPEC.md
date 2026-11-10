@@ -122,3 +122,25 @@ Full offline operation follows the separate contract in `docs/ZAZU_OFFLINE_FIRST
 - Current-head checks: PHPMD **PASS**; Psalm security scan **PASS**; Zazu quality workflow **PASS**; populated upgrade/rollback workflow **PASS**; Laravel **PASS**. Browser smoke is still running and is not yet accepted as passed.
 - Relevant commits: `79f41fc` initial verifier; `f01371a` remove unsigned issuer; `39194b5` input bound/anti-rollback; `5544e07` verifier refactor; `632e148` dedicated verifier; `9e82b7c` DI; `5a54a21` attachment DOM regression correction; `b9fc97d` local attachment method-signature regression correction.
 - Remaining licensing blockers: owner activation/status UI, production issuer and private-key custody, installation identity/reactivation, renewal UX, and enforcement at the correct business boundary. No readiness score uplift yet; V1 remains **NO-GO** pending browser smoke and remaining release gates.
+
+
+## Director reconciliation — activation implementation and enforcement boundary (2026-11-10)
+
+The current implementation has advanced beyond the original stage list above. Treat the following as the authoritative current status; the historical stage list is retained for audit history.
+
+- **Implemented in source:** owner Business Settings status display and signed-token import/renewal; Ed25519 detached-signature verification; local business binding; explicit-timezone date validation; expiry/revocation status; anti-rollback and idempotent re-import; per-business import serialization; owner-only authenticated/rate-limited route; business-scoped audit record; no raw token in audit data or flashed old input.
+- **Automated regression coverage present:** valid offline import, expired and revoked states, signature tampering, cross-business rejection, missing-key fail-closed behaviour, strict timestamps/calendar dates, rollback prevention and owner authorization.
+- **Not implemented / not certified:** production issuer and private-key custody; installation identity and reactivation; application-wide plan/feature enforcement; storage/user limits; and end-to-end production licence lifecycle.
+- **Important boundary:** the presence of a signed entitlement record and BusinessLicense::isActive() does not itself enforce commercial access. Current route declarations continue to use role/permission middleware; no global entitlement gate was evidenced in the inspected route group. Do not add a blanket “no licence = blocked” middleware: that would risk locking existing workspaces and conflicts with the agreed Basic Free fallback and 30-day trial model.
+- **Commercial dependency:** enforceable entitlements require an owner-approved Basic/Advanced feature matrix and exact downgrade behaviour. The current commercial profile describes limits as proposed, not final. Until those rules are approved, implementation must not invent limits or silently disable customer data/workflows.
+- **Production key custody:** never generate or commit a real issuer private key in this repository. Production signing must be performed in a separate controlled issuer environment with protected backup and documented recovery/rotation. The app receives only the public key.
+
+### Next safe engineering sequence
+
+1. Keep exact-head CI green and finish the current browser smoke workflow.
+2. Reconcile and approve the Basic/Advanced entitlement matrix, including the existing 30-day trial → Basic Free downgrade and data-preservation rules.
+3. Implement a central, testable entitlement evaluator and apply it only to explicitly premium capabilities after the matrix is approved. Core local business data access must remain available in Basic Free and offline.
+4. Add adversarial tests for downgrade, expired/revoked tokens, direct-route bypass, queued offline mutations and preservation/export of customer data.
+5. Build the issuer separately from the customer app; complete installation identity/reactivation and key-custody controls before claiming commercial enforcement.
+
+No V1 readiness uplift is claimed by this documentation reconciliation. Release remains **NO-GO**.
