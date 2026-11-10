@@ -928,3 +928,10 @@ Commits: `4f4f9f63e617b201fb68ab612ef902805c8e1727`, `a281567ab1c9b384dffe47405d
 - Owner revocation now serializes on the device row and writes its audit transition once. Device-originated revocation is transactional and clears all sync/pairing credential metadata.
 - Provisioning now filters expired pairing codes before taking row locks; regressions cover the lookup/revoke race, idempotent owner audit, self-revoke credential cleanup and expired code rejection.
 - Source and regression assertions are committed on main; exact-head Laravel/quality/browser execution remains PENDING. Do not raise readiness from source coverage alone. V1 remains NO-GO.
+
+
+## Revocation fencing at mutation record/apply boundaries — 2026-11-10
+
+- The recorder now rechecks and locks the durable active device and matching credential inside the mutation-creation transaction, before sequence allocation.
+- The applier rechecks and locks the durable active device before the domain handler runs. Push preserves 401 rather than swallowing it as a per-mutation failure.
+- Regression cases cover revocation after middleware snapshot but before record, and revocation after record but before apply. Source-level reconciliation completed; runtime/PHPUnit/exact-head CI are still **PENDING**. V1 remains **NO-GO**.
