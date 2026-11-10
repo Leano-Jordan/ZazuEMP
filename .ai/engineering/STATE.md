@@ -1805,3 +1805,13 @@ Source review found that authenticated sync pull/acknowledgement accepted arbitr
 - Retention policy now distinguishes SARS tax-record guidance (commonly five years, subject to exceptions) from Companies Act s24 company-record retention (generally seven years for covered records). General personal information is not assigned a blanket five/seven-year period. Proposed operational defaults: 30-day export window, deletion/de-identification within 90 days after account closure where lawful, 24-month security/support log baseline, and 30-day rolling backups. Legal/accounting review and technical enforcement remain open.
 - Updated/created: docs/ZAZU_COMMERCIAL_OPERATING_PROFILE.md; RELEASE_CUSTOMER_TERMS_DRAFT.md; RELEASE_PRIVACY_NOTICE_DRAFT.md; RELEASE_RETENTION_DISPOSAL_SCHEDULE.md; RELEASE_DOCUMENTATION_INDEX.md.
 - No legal or commercial launch clearance is claimed. V1 remains NO-GO until engineering acceptance, production deployment, actual provider procurement, final feature/pricing disclosures, operational privacy controls and legal review are complete.
+
+
+## Commercial decisions — 2026-11-10 follow-up
+
+- Owner confirmed a 30-day free trial. Trial expiry moves the workspace to Basic Free; no silent paid conversion, lockout or data deletion solely due to expiry.
+- Director recommends Advanced at R99/workspace/month and a useful permanent Basic Free tier. Proposed (not yet verified) limits: Basic one owner, five active events, 250 MB; Advanced up to three users and 2 GB hosted storage, plus expanded implemented operational modules.
+- Owner approved public service-area wording: Pretoria North, Gauteng, South Africa. This is not a registered-office claim; residential street address remains excluded from public repository.
+- Current xneelo Cloud indicative resources total approximately R306/month including VAT (2 vCPU/4 GB, 10 GB boot, 50 GB NVMe). Budget R450–R500/month to allow provisionally for independent backups and small overhead. The extra allowance is not a vendor quote.
+- PayFast official card pricing is 3.2% + R2 excl. VAT and payout R8.70 excl. VAT. Estimated card fee on R99 is ~R5.95 incl. VAT. Six R99 subscribers would cover the R450–R500 infrastructure planning budget on a rough cash basis after payment fees and one monthly payout, before tax and other operating costs.
+- Commercial implementation gates: verify tier entitlements and downgrade boundaries in code; enforce storage quotas; select payment provider and recurring billing flow; procure independent offsite backups and complete restore drill; complete legal/accounting review.
