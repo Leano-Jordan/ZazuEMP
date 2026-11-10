@@ -835,3 +835,15 @@ Commits: `4f4f9f63e617b201fb68ab612ef902805c8e1727`, `a281567ab1c9b384dffe47405d
 - Commit status lookup currently returns no status records. The connected commit-run lookup is pull-request-only; no workflow-dispatch action is exposed. Do not mark PHPUnit or Playwright as passed until exact-head run evidence exists.
 - No score uplift. Commercial release remains **NO-GO** pending completed automated and operator/device recovery evidence.
 
+
+
+## Automated sync/offline acceptance — PASS — 2026-11-10
+
+- Tested source: `31fd732952a36ae99638ec8975706e95aa180c99` on `main`.
+- Laravel feature suite: **438 passed / 3,046 assertions** (Actions run `42824939605`).
+- Dedicated Chromium offline acceptance: **18 passed / 0 failed**, 56.5 seconds (job `129859701759`). Coverage includes a true browser-disconnected customer save and reload persistence, sync credential rejection/re-pair recovery, conflict persistence/recovery, logout/session transitions, offline navigation and workspace preservation.
+- Sync delivery hardening regressions executed as part of Laravel suite: unsupported producer stream rejection/no sequence allocation; destination revocation recheck before delivery creation; acknowledgement blocked across a non-pending sequence.
+- Supporting exact-head gates passed: PHPMD (`42824939822`), quality + secret scan (`42824939746`), Psalm (`42824939755`), populated upgrade and rollback (`42824939920`).
+- Test-fixture-only corrections: E2E job uses isolated array cache to prevent repeated sign-ins sharing a rate-limit bucket; recovery assertion matches current operator copy; browser business ID is passed explicitly from page context into the Node route stub. Production authentication throttling and user-facing recovery copy were not changed.
+- Evidence status: **AUTOMATED OFFLINE ACCEPTANCE = PASS**. Physical phone/browser installation and operator restore drill remain **OPEN**. No score uplift; commercial V1 remains **NO-GO**.
+
