@@ -1062,6 +1062,43 @@ test.describe('Zazu installed PWA offline shell', () => {
         expect(outcome.pending).toContain(mutation.id);
     });
 
+    test('expired or revoked sync credentials are surfaced without dropping queued work', async ({ page }) => {
+        test.setTimeout(30_000);
+        await login(page);
+        await page.goto('/settings', { waitUntil: 'domcontentloaded' });
+        await page.evaluate(() => window.ZazuOffline.ready);
+
+        const mutationId = await page.evaluate(async () => {
+            const state = window.ZazuOffline.getState();
+            state.sync = { token: 'expired-device-token-fixture', device: { id: 987699 } };
+            await window.ZazuOffline.persist();
+            const mutation = await window.ZazuOffline.queueMutation('customer', 'create', {
+                local_id: 'expired-device-local-customer',
+                record: { name: 'Preserve while re-pairing' },
+            });
+            return mutation.id;
+        });
+
+        await page.route('**/api/sync/push', route => route.fulfill({
+            status: 401,
+            contentType: 'application/json',
+            body: JSON.stringify({ message: 'The Zazu sync device token has expired.' }),
+        }));
+
+        await page.evaluate(() => window.ZazuOffline.sync());
+
+        const outcome = await page.evaluate(async () => ({
+            error: window.ZazuOffline.getState().last_sync_error,
+            pending: (await window.ZazuOffline.pending()).map(item => item.id),
+            tokenPresent: Boolean(window.ZazuOffline.getState().sync?.token),
+        }));
+
+        expect(outcome.error).toContain('no longer authorised to sync');
+        expect(outcome.error).toContain('re-pair');
+        expect(outcome.pending).toContain(mutationId);
+        expect(outcome.tokenPresent).toBe(true);
+    });
+
     test('authenticated dashboard survives a real offline navigation', async ({ page, context }) => {
         test.setTimeout(60_000);
 
