@@ -1292,12 +1292,21 @@
         if (Number(result.device?.business_id || 0) !== expectedBusinessId) {
             // Do not bind a token for a different workspace to this business-scoped
             // IndexedDB database. Revoke the newly issued token before rejecting.
-            await fetch('/api/sync/revoke', {
-                method: 'POST',
-                headers: { 'Accept': 'application/json', 'Authorization': 'Bearer ' + result.token },
-                cache: 'no-store',
-            }).catch(() => {});
-            throw new Error('This pairing code belongs to a different business workspace. Your saved local data has not been changed.');
+            let tokenRevoked = false;
+            try {
+                const revokeResponse = await fetch('/api/sync/revoke', {
+                    method: 'POST',
+                    headers: { 'Accept': 'application/json', 'Authorization': 'Bearer ' + result.token },
+                    cache: 'no-store',
+                });
+                tokenRevoked = revokeResponse.ok;
+            } catch {
+                // Keep the local workspace untouched even when cleanup is unavailable.
+            }
+            if (!tokenRevoked) {
+                throw new Error('This pairing code belongs to a different business workspace. Your saved local data has not been changed, but the business owner must revoke the newly paired device from Trusted phone access.');
+            }
+            throw new Error('This pairing code belongs to a different business workspace. The issued device token was revoked and your saved local data has not been changed.');
         }
 
         const previousState = state || blank();
