@@ -31,27 +31,32 @@ class OfflineLicenseService
         $dates = $verified['dates'];
         $fingerprint = $verified['fingerprint'];
 
-        $this->assertNotOlderThanInstalledLicense($business, $dates['issued_at'], $fingerprint);
+        return DB::transaction(function () use ($business, $payload, $dates, $fingerprint): BusinessLicense {
+            // Serialize imports per business so concurrent older/newer tokens cannot race.
+            Business::query()->whereKey($business->id)->lockForUpdate()->firstOrFail();
 
-        return BusinessLicense::updateOrCreate(
-            ['business_id' => $business->id],
-            [
-                'license_id' => $payload['license_id'],
-                'plan' => $payload['plan'],
-                'status' => $payload['status'],
-                'starts_at' => $dates['starts_at'],
-                'expires_at' => $dates['expires_at'],
-                'features' => $payload['features'] ?: null,
-                'metadata' => [
-                    'signed' => true,
-                    'format_version' => 1,
-                    'issued_at' => $dates['issued_at']->toIso8601String(),
-                    'payload_sha256' => $fingerprint,
+            $this->assertNotOlderThanInstalledLicense($business, $dates['issued_at'], $fingerprint);
+
+            return BusinessLicense::updateOrCreate(
+                ['business_id' => $business->id],
+                [
+                    'license_id' => $payload['license_id'],
+                    'plan' => $payload['plan'],
+                    'status' => $payload['status'],
+                    'starts_at' => $dates['starts_at'],
+                    'expires_at' => $dates['expires_at'],
+                    'features' => $payload['features'] ?: null,
+                    'metadata' => [
+                        'signed' => true,
+                        'format_version' => 1,
+                        'issued_at' => $dates['issued_at']->toIso8601String(),
+                        'payload_sha256' => $fingerprint,
+                    ],
+                    'activated_at' => now(),
+                    'last_local_check_at' => now(),
                 ],
-                'activated_at' => now(),
-                'last_local_check_at' => now(),
-            ],
-        );
+            );
+        });
     }
 
     private function assertNotOlderThanInstalledLicense(
@@ -67,7 +72,7 @@ class OfflineLicenseService
 
         $existingIssuedAt = $existing->metadata['issued_at'] ?? null;
         if (! is_string($existingIssuedAt)) {
-            return;
+            throw new \\InvalidArgumentException('The installed signed licence metadata is incomplete; a newer licence cannot safely replace it.');
         }
 
         $installedAt = Carbon::parse($existingIssuedAt);
