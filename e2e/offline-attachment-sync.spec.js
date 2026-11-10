@@ -291,3 +291,142 @@ test('reconciles an offline-created Work attachment after its job receives a ser
     const fileText = await page.evaluate(async key => (await window.ZazuOffline.getAttachmentFile(key)).text(), fixture.key);
     expect(fileText).toBe('saved before job sync completed');
 });
+
+
+test('operator creates an offline Work job, attaches a file from its directory row, then syncs it', async ({ page }, testInfo) => {
+    test.setTimeout(60_000);
+    test.skip(testInfo.project.name !== 'chromium', 'The full offline attachment journey runs once in Chromium.');
+
+    await login(page);
+    await page.goto('/dashboard', { waitUntil: 'domcontentloaded' });
+    await page.goto('/customers/create', { waitUntil: 'domcontentloaded' });
+    await expect(page.locator('form[data-zazu-offline-entity="customer"]')).toBeVisible();
+    await page.goto('/customers', { waitUntil: 'domcontentloaded' });
+    await page.goto('/work', { waitUntil: 'domcontentloaded' });
+    await page.goto('/work/create', { waitUntil: 'domcontentloaded' });
+    await expect(page.locator('#new-job-form')).toBeVisible();
+
+    await page.context().setOffline(true);
+    await page.goto('/customers/create', { waitUntil: 'domcontentloaded' });
+    const customerForm = page.locator('form[data-zazu-offline-entity="customer"]');
+    await customerForm.locator('input[name="name"]').fill('Attachment journey customer');
+    await customerForm.locator('input[name="primary_contact_name"]').fill('Test contact');
+    await customerForm.locator('input[name="primary_contact_phone"]').fill('0123456789');
+    await customerForm.getByRole('button', { name: 'Save customer' }).click();
+    await expect(customerForm.getByText('Saved on this device. It will sync automatically when Zazu reconnects.')).toBeVisible();
+
+    const customerLocalId = await page.evaluate(() =>
+        window.ZazuOffline.getState().customers.find(item => item.name === 'Attachment journey customer')?.local_id || null
+    );
+    expect(customerLocalId).toBeTruthy();
+
+    await page.goto('/work/create', { waitUntil: 'domcontentloaded' });
+    const customerSelect = page.locator('#customer_id');
+    await expect(customerSelect.locator('option[value="local:' + customerLocalId + '"]')).toHaveCount(1);
+    await customerSelect.selectOption('local:' + customerLocalId);
+    await page.locator('#new-job-form label.zazu-choice-card:has(input[name="event_type"])').first().click();
+    await page.locator('#new-job-form label.zazu-service-choice:has(input[name="services[]"])').first().click();
+    await page.locator('#new-job-form input[name="name"]').fill('Attachment journey offline job');
+    await page.locator('#new-job-form input[name="event_date"]').fill('2026-11-20');
+    await page.locator('#new-job-form').getByRole('button', { name: /Create job/ }).click();
+    await expect(page.getByText('Saved on this device. It will sync automatically when Zazu reconnects.')).toBeVisible();
+
+    const localJob = await page.evaluate(() =>
+        window.ZazuOffline.getState().jobs.find(item => item.name === 'Attachment journey offline job') || null
+    );
+    expect(localJob?.local_id).toBeTruthy();
+    expect(localJob?.server_id).toBeNull();
+
+    await page.goto('/work', { waitUntil: 'domcontentloaded' });
+    const localRow = page.locator('[data-zazu-local-record="job"]').filter({ hasText: 'Attachment journey offline job' });
+    await expect(localRow).toBeVisible();
+    const fileInput = localRow.locator('input[type="file"][data-zazu-local-job-attachments]');
+    await expect(fileInput).toHaveAttribute('data-zazu-local-job-attachments', localJob.local_id);
+    await fileInput.setInputFiles({
+        name: 'operator-job-brief.txt',
+        mimeType: 'text/plain',
+        buffer: Buffer.from('captured through the actual Work directory action'),
+    });
+    await expect(localRow.getByRole('button', { name: '1 files saved locally for Attachment journey offline job' })).toBeVisible();
+
+    const locallySaved = await page.evaluate(async localId => {
+        const records = await window.ZazuOffline.loadAttachments(null, localId);
+        const file = records[0] ? await window.ZazuOffline.getAttachmentFile(records[0].idempotency_key) : null;
+        return {
+            records: records.map(record => ({
+                event_id: record.event_id,
+                event_local_id: record.event_local_id,
+                status: record.status,
+                name: record.original_name,
+            })),
+            fileText: file ? await file.text() : null,
+        };
+    }, localJob.local_id);
+    expect(locallySaved.records).toEqual([{
+        event_id: null,
+        event_local_id: localJob.local_id,
+        status: 'pending',
+        name: 'operator-job-brief.txt',
+    }]);
+    expect(locallySaved.fileText).toBe('captured through the actual Work directory action');
+
+    const deviceToken = 'offline-work-attachment-journey-token';
+    await page.evaluate(async token => {
+        const state = window.ZazuOffline.getState();
+        state.sync = { token, device: { id: 987656, business_id: Number(document.body.dataset.zazuBusinessId) } };
+        state.local_dirty = false;
+        await window.ZazuOffline.persist();
+    }, deviceToken);
+
+    const uploaded = { count: 0, eventId: null, key: null };
+    await page.route('**/api/sync/attachments', async route => {
+        const request = route.request();
+        expect(request.method()).toBe('POST');
+        expect(request.headers()['authorization']).toBe('Bearer ' + deviceToken);
+        const body = request.postData() || '';
+        uploaded.count++;
+        uploaded.eventId = Number(body.match(/name="event_id"\\r\\n\\r\\n([^\\r\\n]+)/)?.[1] || 0);
+        uploaded.key = body.match(/name="idempotency_key"\\r\\n\\r\\n([^\\r\\n]+)/)?.[1] || null;
+        expect(body).toContain('operator-job-brief.txt');
+        await route.fulfill({
+            status: 201,
+            contentType: 'application/json',
+            body: JSON.stringify({
+                duplicate: false,
+                attachment: {
+                    id: 990,
+                    event_id: uploaded.eventId,
+                    idempotency_key: uploaded.key,
+                    original_name: 'operator-job-brief.txt',
+                    mime_type: 'text/plain',
+                    size: Buffer.byteLength('captured through the actual Work directory action'),
+                    description: '',
+                    created_at: new Date().toISOString(),
+                },
+            }),
+        });
+    });
+
+    await page.context().setOffline(false);
+    await page.evaluate(async localId => {
+        const state = window.ZazuOffline.getState();
+        const job = state.jobs.find(item => item.local_id === localId);
+        job.server_id = 9901;
+        job.id = 9901;
+        await window.ZazuOffline.persist();
+    }, localJob.local_id);
+
+    const syncResult = await page.evaluate(() => window.ZazuOffline.syncAttachments());
+    expect(syncResult.uploaded).toBe(1);
+    expect(syncResult.pending).toBe(0);
+    expect(uploaded.count).toBe(1);
+    expect(uploaded.eventId).toBe(9901);
+    expect(uploaded.key).toBeTruthy();
+
+    const finalRecord = await page.evaluate(async key => {
+        const records = await window.ZazuOffline.loadAttachments(9901);
+        const record = records.find(item => item.idempotency_key === key);
+        return record ? { status: record.status, name: record.original_name } : null;
+    }, uploaded.key);
+    expect(finalRecord).toEqual({ status: 'synced', name: 'operator-job-brief.txt' });
+});
