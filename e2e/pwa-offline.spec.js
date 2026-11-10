@@ -396,7 +396,7 @@ test.describe('Zazu installed PWA offline shell', () => {
                 device: { id: 987660, business_id: activeBusinessId },
             };
             state.local_dirty = false;
-            await window.ZazuOffline.persist();
+            await window.ZazuOffline.persist({ allowSessionChange: true });
         }, businessId);
 
         const mutation = await page.evaluate(() => window.ZazuOffline.queueMutation('customer', 'create', {
@@ -806,7 +806,7 @@ test.describe('Zazu installed PWA offline shell', () => {
                 token: 'business-device-token-fixture',
                 device: { id: 987650, business_id: Number(document.body.dataset.zazuBusinessId) },
             };
-            await window.ZazuOffline.persist();
+            await window.ZazuOffline.persist({ allowSessionChange: true });
             await window.ZazuOffline.queueMutation('customer', 'create', {
                 local_id: crypto.randomUUID(),
                 name: 'Keep this queued across account logout',
@@ -937,7 +937,7 @@ test.describe('Zazu installed PWA offline shell', () => {
                 device: { id: 987651, business_id: Number(document.body.dataset.zazuBusinessId) },
             };
             state.local_dirty = false;
-            await window.ZazuOffline.persist();
+            await window.ZazuOffline.persist({ allowSessionChange: true });
         });
 
         let markRequestStarted;
@@ -979,7 +979,7 @@ test.describe('Zazu installed PWA offline shell', () => {
         await page.evaluate(async () => {
             const state = window.ZazuOffline.getState();
             state.sync.token = 'replacement-device-session-token';
-            await window.ZazuOffline.persist();
+            await window.ZazuOffline.persist({ allowSessionChange: true });
         });
         releaseResponse();
 
@@ -1010,7 +1010,7 @@ test.describe('Zazu installed PWA offline shell', () => {
                 device: { id: 987659, business_id: Number(document.body.dataset.zazuBusinessId) },
             };
             state.local_dirty = false;
-            await window.ZazuOffline.persist();
+            await window.ZazuOffline.persist({ allowSessionChange: true });
         });
 
         let markRequestStarted;
@@ -1074,7 +1074,7 @@ test.describe('Zazu installed PWA offline shell', () => {
         const mutationId = await page.evaluate(async () => {
             const state = window.ZazuOffline.getState();
             state.sync = { token: 'expired-device-token-fixture', device: { id: 987699 } };
-            await window.ZazuOffline.persist();
+            await window.ZazuOffline.persist({ allowSessionChange: true });
             const mutation = await window.ZazuOffline.queueMutation('customer', 'create', {
                 local_id: 'expired-device-local-customer',
                 record: { name: 'Preserve while re-pairing' },
@@ -1118,7 +1118,7 @@ test.describe('Zazu installed PWA offline shell', () => {
             state.customers = [{ id: null, local_id: 're-pair-local-customer', name: 'Keep this customer' }];
             state.sync = { token: 'revoked-old-token', device: { id: 987698 } };
             state.sync_authorization_required = true;
-            await window.ZazuOffline.persist();
+            await window.ZazuOffline.persist({ allowSessionChange: true });
             const mutation = await window.ZazuOffline.queueMutation('customer', 'create', {
                 local_id: 're-pair-local-customer',
                 record: { name: 'Keep this customer' },
