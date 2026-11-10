@@ -415,7 +415,7 @@ test.describe('Zazu installed PWA offline shell', () => {
                 }],
             }),
         }));
-        await page.route('**/api/sync/pull?*', route => route.fulfill({
+        await page.route('**/api/sync/pull**', route => route.fulfill({
             status: 200,
             contentType: 'application/json',
             body: JSON.stringify({ mutations: [] }),
