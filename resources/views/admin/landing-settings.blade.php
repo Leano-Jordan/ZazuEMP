@@ -53,7 +53,12 @@
                                     <option value="{{ $key }}" @selected($current[$field] === $image['url'])>{{ $image['label'] }}</option>
                                 @endforeach
                             </select>
-                            <div class="zazu-admin-image-preview" style="background-image:url('{{ $current[$field] ?: array_values($library)[0]['url'] }}')" aria-label="Current landing image preview"></div>
+                            <div id="zazu-admin-image-preview-{{ $field }}" class="zazu-admin-image-preview" aria-label="Current landing image preview"></div>
+                            <style nonce="{{ request()->attributes->get('cspNonce') }}">
+                                #zazu-admin-image-preview-{{ $field }} {
+                                    background-image: url('{{ e($current[$field] ?: array_values($library)[0]['url']) }}');
+                                }
+                            </style>
                             @error($field)<span class="zazu-field-error">{{ $message }}</span>@enderror
                         </div>
                     @endforeach
