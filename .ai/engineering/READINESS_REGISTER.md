@@ -821,3 +821,17 @@ A sync device bearer token could request arbitrary stream names. Because pull/ac
 Commits: `4f4f9f63e617b201fb68ab612ef902805c8e1727`, `a281567ab1c9b384dffe47405d6632fa8c16595f`.
 
 **Status:** implemented and source re-fetched; runtime tests/CI are **UNVERIFIED**. No readiness score uplift. V1 remains **NO-GO**.
+
+
+## Offline sync delivery/recovery hardening — 2026-11-10
+
+- Implemented producer-side and publisher-side enforcement of the declared `business` sync stream. Unsupported stream names fail before mutation/counter creation and cannot be published.
+- Closed the revoked-destination publication race by rechecking the destination's business and active state while holding its row lock.
+- Tightened acknowledgement to advance only across pending deliveries. Sequence validation and cursor/delivery changes remain atomic.
+- Added three regressions: unsupported recorder stream does not allocate rows; a destination revoked between the initial scan and lock is skipped; a non-pending delivery cannot advance the cursor.
+- Source changes: `9334fc3`, `2670fee`; regression commit: `d138701`.
+- Re-fetched current-main source/test blobs and confirmed all guards and regression methods are present.
+- Exact-head automated offline acceptance is **PENDING**. The workflow has a `push: main` trigger and the dedicated Chromium job targets `e2e/pwa-offline.spec.js`; source configuration is not a passing run.
+- Commit status lookup currently returns no status records. The connected commit-run lookup is pull-request-only; no workflow-dispatch action is exposed. Do not mark PHPUnit or Playwright as passed until exact-head run evidence exists.
+- No score uplift. Commercial release remains **NO-GO** pending completed automated and operator/device recovery evidence.
+
