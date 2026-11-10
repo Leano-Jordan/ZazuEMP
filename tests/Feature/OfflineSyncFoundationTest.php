@@ -5,6 +5,7 @@ namespace Tests\Feature;
 use App\Models\Business;
 use App\Http\Controllers\SyncController;
 use App\Models\SyncDelivery;
+use App\Models\SyncCursor;
 use App\Models\SyncDevice;
 use App\Models\SyncMutation;
 use App\Models\SyncEntityIdentity;
@@ -325,6 +326,38 @@ class OfflineSyncFoundationTest extends TestCase
         $this->expectException(\Illuminate\Validation\ValidationException::class);
 
         $protocol->acknowledgeThrough($destinationDevice, 3);
+    }
+
+
+    public function test_sync_protocol_rejects_unknown_streams_without_creating_cursors(): void
+    {
+        $business = Business::create([
+            'name' => 'Stream Boundary Business',
+            'slug' => 'stream-boundary-'.Str::lower(Str::random(8)),
+            'status' => 'active',
+            'currency' => 'ZAR',
+        ]);
+        $device = SyncDevice::create([
+            'business_id' => $business->id,
+            'installation_id' => (string) Str::uuid(),
+        ]);
+        $protocol = app(SyncMutationProtocol::class);
+
+        try {
+            $protocol->pull($device, 'unbounded-client-stream');
+            $this->fail('Unknown sync streams must be rejected.');
+        } catch (\\Illuminate\\Validation\\ValidationException $exception) {
+            $this->assertArrayHasKey('stream', $exception->errors());
+        }
+
+        try {
+            $protocol->acknowledgeThrough($device, 0, 'another-unbounded-stream');
+            $this->fail('Unknown sync streams must be rejected.');
+        } catch (\\Illuminate\\Validation\\ValidationException $exception) {
+            $this->assertArrayHasKey('stream', $exception->errors());
+        }
+
+        $this->assertSame(0, SyncCursor::query()->where('sync_device_id', $device->id)->count());
     }
 
 
