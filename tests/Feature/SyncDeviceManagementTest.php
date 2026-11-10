@@ -200,6 +200,7 @@ class SyncDeviceManagementTest extends TestCase
         $this->assertSame('active', $foreignDevice->fresh()->status);
         $this->assertArrayHasKey('sync_token_hash', $foreignDevice->fresh()->metadata ?? []);
     }
+
     public function test_sync_request_is_rejected_when_device_is_revoked_after_lookup_but_before_activity_refresh(): void
     {
         $business = Business::create([
