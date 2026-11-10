@@ -214,6 +214,71 @@ class OfflineLicenseTest extends TestCase
         return rtrim(strtr(base64_encode($value), '+/', '-_'), '=');
     }
 
+    public function test_an_older_active_token_cannot_reverse_a_newer_revocation_with_the_same_license_id(): void
+    {
+        $user = $this->signInAsOwner();
+        $business = $user->businesses()->firstOrFail();
+        $licenseId = 'b9c7d5f1-2a34-4c56-8d90-1234567890ab';
+        $service = app(OfflineLicenseService::class);
+
+        $service->importSignedLicense($business, $this->signedToken($business, [
+            'license_id' => $licenseId,
+            'status' => 'revoked',
+            'issued_at' => '2026-10-10T00:00:00+00:00',
+        ]));
+
+        $this->expectException(\\InvalidArgumentException::class);
+        $this->expectExceptionMessage('This licence is older than the entitlement already installed.');
+
+        $service->importSignedLicense($business, $this->signedToken($business, [
+            'license_id' => $licenseId,
+            'status' => 'active',
+            'issued_at' => '2026-10-09T00:00:00+00:00',
+        ]));
+    }
+
+    public function test_same_signed_license_can_be_imported_idempotently(): void
+    {
+        $user = $this->signInAsOwner();
+        $business = $user->businesses()->firstOrFail();
+        $service = app(OfflineLicenseService::class);
+        $token = $this->signedToken($business, [
+            'license_id' => 'b9c7d5f1-2a34-4c56-8d90-1234567890ab',
+            'issued_at' => '2026-10-10T00:00:00+00:00',
+        ]);
+
+        $first = $service->importSignedLicense($business, $token);
+        $second = $service->importSignedLicense($business, $token);
+
+        $this->assertSame($first->license_id, $second->license_id);
+        $this->assertSame($first->metadata['payload_sha256'], $second->metadata['payload_sha256']);
+        $this->assertSame(1, $business->license()->count());
+    }
+
+    public function test_different_signed_payload_cannot_reuse_the_installed_issue_timestamp(): void
+    {
+        $user = $this->signInAsOwner();
+        $business = $user->businesses()->firstOrFail();
+        $service = app(OfflineLicenseService::class);
+        $licenseId = 'b9c7d5f1-2a34-4c56-8d90-1234567890ab';
+        $issuedAt = '2026-10-10T00:00:00+00:00';
+
+        $service->importSignedLicense($business, $this->signedToken($business, [
+            'license_id' => $licenseId,
+            'issued_at' => $issuedAt,
+            'features' => ['offline_core' => true],
+        ]));
+
+        $this->expectException(\\InvalidArgumentException::class);
+        $this->expectExceptionMessage('A different licence payload cannot reuse an installed issue timestamp.');
+
+        $service->importSignedLicense($business, $this->signedToken($business, [
+            'license_id' => $licenseId,
+            'issued_at' => $issuedAt,
+            'features' => ['offline_core' => false],
+        ]));
+    }
+
     public function test_signed_license_rejects_timestamps_without_an_explicit_timezone(): void
     {
         $user = $this->signInAsOwner();
