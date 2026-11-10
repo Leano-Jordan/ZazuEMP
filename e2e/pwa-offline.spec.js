@@ -1121,22 +1121,7 @@ test.describe('Zazu installed PWA offline shell', () => {
             return mutation.id;
         });
 
-        await page.route('**/api/sync/provision', route => route.fulfill({
-            status: 200,
-            contentType: 'application/json',
-            body: JSON.stringify({
-                token: 'new-repair-token',
-                device: { id: 987700, business_id: Number(page.context()._options?.baseURL ? 0 : 0) },
-                bootstrap: {
-                    business: { id: 0, name: 'Remote replacement snapshot' },
-                    catalogue: [], suppliers: [], purchase_orders: [], invoices: [], expenses: [],
-                    inventory_items: [], assets: [], costs: [], selected: [],
-                },
-            }),
-        }));
-
         const businessId = await page.evaluate(() => Number(document.body.dataset.zazuBusinessId));
-        await page.unroute('**/api/sync/provision');
         await page.route('**/api/sync/provision', route => route.fulfill({
             status: 200,
             contentType: 'application/json',
