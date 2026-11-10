@@ -654,6 +654,8 @@ test('re-pair invalidates the old sync session and retries queued work with the 
                     status: 200,
                     contentType: 'application/json',
                     body: JSON.stringify({ recorded: [{ id: mutationId, status: 'applied', applied: true, identity: null }] }),
+                }).catch(() => {
+                    // The client intentionally aborts this old-session request during re-pair.
                 });
                 return;
             }
