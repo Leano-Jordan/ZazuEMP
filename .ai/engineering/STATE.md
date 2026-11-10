@@ -1540,3 +1540,12 @@ Owner expanded the visual refinement scope beyond the dashboard: apply the estab
 - Added a Chromium Playwright regression that holds the bootstrap response, queues a real local mutation, releases the response, and asserts the local workspace and pending mutation survive.
 - Implementation commits: `a75f6d6` source guard; `e63f97a` race regression.
 - Source/test execution and exact-head CI remain UNVERIFIED until Actions runs on the resulting main SHA. No readiness score uplift; V1 remains **NO-GO**.
+
+
+## Failed offline mutation / conflict atomicity — 2026-11-10
+
+- Found a persistence gap in the rejection path: the failed mutation was written to IndexedDB in one transaction, while its operator-visible conflict was only added to in-memory state and persisted later. A tab close or subsequent storage failure between those writes could leave a failed queue item with no recoverable conflict UI.
+- Changed the acknowledgement transaction to cover both the mutation queue and persisted workspace state. Failed mutation details and the corresponding open conflict are now committed together; the in-memory state is refreshed only after the transaction completes.
+- Added a Chromium Playwright regression that queues a real customer mutation, returns a server rejection with a conflict ID, runs sync, then inspects IndexedDB to assert the failed mutation and matching open conflict are both present and the workspace is no longer marked dirty.
+- Implementation commits: `5b15209` atomic source persistence; `78917ad` regression; `d0377f8` route interception correction.
+- Source and test were re-fetched and structurally checked. Playwright/Laravel execution and exact-head CI remain UNVERIFIED. No readiness uplift; V1 remains **NO-GO**.
