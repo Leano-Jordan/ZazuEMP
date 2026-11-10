@@ -242,7 +242,7 @@
         })();
     </script>
 
-    <style>
+    <style nonce="{{ request()->attributes->get('cspNonce') }}">
         .zazu-purchase-line {
             padding: 14px;
             border: 1px solid var(--zazu-border);
