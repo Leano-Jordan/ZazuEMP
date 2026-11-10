@@ -1285,8 +1285,8 @@ body.zazu-dashboard-page .zazu-dash-action-icon {
 }
 
 body.zazu-dashboard-page .zazu-dash-quick-actions .zazu-btn-cta .zazu-dash-action-icon {
-    background: rgba(255, 255, 255, .16) !important;
-    color: #23394D !important;
+    background: rgba(255, 255, 255, .22) !important;
+    color: #0B253B !important;
 }
 
 body.zazu-dashboard-page .zazu-dash-action-copy strong {
@@ -1319,8 +1319,8 @@ html[data-theme="dark"] body.zazu-dashboard-page .zazu-dash-action-icon {
 }
 
 html[data-theme="dark"] body.zazu-dashboard-page .zazu-dash-quick-actions .zazu-btn-cta .zazu-dash-action-icon {
-    background: rgba(255, 255, 255, .16) !important;
-    color: #23394D !important;
+    background: rgba(255, 255, 255, .22) !important;
+    color: #0B253B !important;
 }
 
 @media (max-width: 900px) {
@@ -1713,9 +1713,9 @@ body.zazu-dashboard-page .zazu-dash-overview .zazu-dash-quick-actions .zazu-btn 
 body.zazu-dashboard-page .zazu-dash-quick-actions .zazu-btn-cta,
 body.zazu-dashboard-page .zazu-dash-overview .zazu-dash-quick-actions .zazu-btn-cta {
     border: 0 !important;
-    background: #426987 !important;
-    color: #20374A !important;
-    box-shadow: 0 2px 5px rgba(23, 70, 112, .16) !important;
+    background: var(--zazu-primary) !important;
+    color: #0B253B !important;
+    box-shadow: 0 3px 9px rgba(21, 157, 210, .20) !important;
 }
 
 body.zazu-dashboard-page .zazu-dash-quick-actions .zazu-btn:not(.zazu-btn-cta):hover {
@@ -1724,8 +1724,9 @@ body.zazu-dashboard-page .zazu-dash-quick-actions .zazu-btn:not(.zazu-btn-cta):h
 }
 
 body.zazu-dashboard-page .zazu-dash-quick-actions .zazu-btn-cta:hover {
-    background: #12558F !important;
-    box-shadow: 0 3px 8px rgba(23, 70, 112, .2) !important;
+    background: var(--zazu-primary-light) !important;
+    color: #0B253B !important;
+    box-shadow: 0 4px 10px rgba(21, 157, 210, .22) !important;
 }
 
 body.zazu-dashboard-page .zazu-dash-quick-actions .zazu-btn:focus-visible {
@@ -1761,8 +1762,8 @@ html[data-theme="dark"] body.zazu-dashboard-page .zazu-dash-quick-actions .zazu-
 
 html[data-theme="dark"] body.zazu-dashboard-page .zazu-dash-quick-actions .zazu-btn-cta {
     border: 0 !important;
-    background: #426987 !important;
-    color: #23394D !important;
+    background: var(--zazu-primary) !important;
+    color: var(--zazu-primary-ink) !important;
 }
 
 
