@@ -1485,3 +1485,14 @@ Owner expanded the visual refinement scope beyond the dashboard: apply the estab
 - Extended the browser regression with a remote attachment-list item deliberately assigned to a different event; the test asserts that no file download is attempted and no foreign attachment is added to the local list.
 - Commits: `af99f69` client validation; `dbb2e3d` browser regression; `12600f4` Laravel source-contract assertions.
 - Verification boundary: source, E2E and Laravel test changes re-fetched and inspected. Combined commit status for current main head `12600f4c0140f255d647f1f91760bcc97346d898` returned no status contexts; the commit-workflow-runs connector exposed no PR-triggered runs. Exact-head Laravel, Playwright, build and quality execution therefore remain unverified. No readiness score uplift. V1 remains **NO-GO**.
+
+## Owner-side signed offline licence activation — 2026-11-10
+
+- Added `OfflineLicenseController` to import a bounded signed token for the currently selected business. The endpoint is nested under authenticated session + business context + owner middleware, with a 10-per-minute throttle.
+- Import delegates to the existing Ed25519 verifier/service; invalid tokens return a field error, and no raw token is flashed back into the session or written to audit metadata.
+- Successful imports and renewals are wrapped with a business-scoped audit record containing only licence ID, plan, status and expiry.
+- Business Settings now displays current plan/status/start/expiry and accepts a signed token for activation or offline renewal.
+- Added feature coverage for owner activation, persisted entitlement + audit record, and rejection for non-owner users.
+- Updated `docs/ZAZU_OFFLINE_LICENSING_SPEC.md` to distinguish the new owner import interface from the still-missing production issuer and enforcement boundary.
+- Commits: `b7897d7` controller; `c77dc2c` namespace correction; `6715fada` route; `fe860b7` settings data; `a7b4f12` activation UI; `43115b8` route tests; `200fda4` test namespace correction; `5a13985` specification.
+- Verification boundary: changed source files have been re-fetched and inspected. PHPUnit, Blade rendering, PHPMD, Psalm, browser flows and exact-head CI have not yet been executed. Production signing key custody/issuer, installation identity, renewal issuance and application enforcement remain open. No score uplift; V1 remains **NO-GO**.
