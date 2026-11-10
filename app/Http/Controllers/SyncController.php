@@ -154,22 +154,40 @@ class SyncController extends Controller
 
     public function revoke(Request $request): JsonResponse
     {
-        /** @var SyncDevice $device */
-        $device = $request->attributes->get('sync_device');
-        $metadata = $device->metadata ?? [];
-        unset($metadata['sync_token_hash']);
+        /** @var SyncDevice $authenticatedDevice */
+        $authenticatedDevice = $request->attributes->get('sync_device');
+        $deviceId = (int) $authenticatedDevice->getKey();
 
-        $device->forceFill([
-            'status' => 'revoked',
-            'revoked_at' => now(),
-            'token_expires_at' => null,
-            'metadata' => $metadata,
-        ])->save();
+        return DB::transaction(function () use ($deviceId): JsonResponse {
+            $device = SyncDevice::query()
+                ->whereKey($deviceId)
+                ->lockForUpdate()
+                ->firstOrFail();
 
-        return response()->json([
-            'revoked' => true,
-            'device_id' => (int) $device->id,
-        ]);
+            $metadata = $device->metadata ?? [];
+            $alreadyRevoked = $device->status === 'revoked'
+                && $device->revoked_at !== null
+                && $device->token_expires_at === null
+                && ! array_key_exists('sync_token_hash', $metadata)
+                && ! array_key_exists('pairing_code_hash', $metadata)
+                && ! array_key_exists('pairing_expires_at', $metadata);
+
+            if (! $alreadyRevoked) {
+                unset($metadata['sync_token_hash'], $metadata['pairing_code_hash'], $metadata['pairing_expires_at']);
+
+                $device->forceFill([
+                    'status' => 'revoked',
+                    'revoked_at' => $device->revoked_at ?? now(),
+                    'token_expires_at' => null,
+                    'metadata' => $metadata,
+                ])->save();
+            }
+
+            return response()->json([
+                'revoked' => true,
+                'device_id' => (int) $device->id,
+            ]);
+        });
     }
 
     public function bootstrap(Request $request): JsonResponse
