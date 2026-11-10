@@ -214,6 +214,34 @@ class OfflineLicenseTest extends TestCase
         return rtrim(strtr(base64_encode($value), '+/', '-_'), '=');
     }
 
+    public function test_signed_license_rejects_timestamps_without_an_explicit_timezone(): void
+    {
+        $user = $this->signInAsOwner();
+        $business = $user->businesses()->firstOrFail();
+
+        $this->expectException(\\InvalidArgumentException::class);
+        $this->expectExceptionMessage('The signed licence dates are invalid.');
+
+        app(OfflineLicenseService::class)->importSignedLicense(
+            $business,
+            $this->signedToken($business, ['starts_at' => '2026-10-01T00:00:00']),
+        );
+    }
+
+    public function test_signed_license_rejects_normalized_invalid_calendar_dates(): void
+    {
+        $user = $this->signInAsOwner();
+        $business = $user->businesses()->firstOrFail();
+
+        $this->expectException(\\InvalidArgumentException::class);
+        $this->expectExceptionMessage('The signed licence dates are invalid.');
+
+        app(OfflineLicenseService::class)->importSignedLicense(
+            $business,
+            $this->signedToken($business, ['expires_at' => '2026-02-30T23:59:59+00:00']),
+        );
+    }
+
     public function test_signed_license_import_fails_closed_when_public_key_is_not_configured(): void
     {
         $user = $this->signInAsOwner();
