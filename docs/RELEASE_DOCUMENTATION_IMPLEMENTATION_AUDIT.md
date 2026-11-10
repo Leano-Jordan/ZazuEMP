@@ -121,3 +121,16 @@ SARS guidance describes a common five-year tax-record period with exceptions. Co
 - Complete legal review and final trademark clearance.
 
 **Disposition:** Documentation design has advanced; legal/commercial release clearance remains OPEN. V1 remains **NO-GO**.
+
+
+## Commercial decision refresh — 2026-11-10
+
+Owner-confirmed: 30-day free trial; trial expiry downgrades to Basic Free; no silent paid conversion, lockout or data deletion solely due to expiry. Public service-area wording is Pretoria North, Gauteng, South Africa, not a registered-office claim.
+
+Director recommendation: Advanced at R99 per workspace/month; Basic Free remains useful for core customer/event records and basic workflow. Proposed verification limits are Basic: one owner, five active events and 250 MB; Advanced: up to three users and 2 GB hosted storage, with broader implemented operational modules. These are packaging proposals, not verified application entitlements. Do not publish or charge against them until licence enforcement, downgrade behaviour, quota enforcement and checkout disclosures are verified.
+
+Current xneelo Cloud published estimate: R198 compute + R18 boot volume + R90 50 GB NVMe volume = approximately R306/month including VAT. Recommended planning cash budget is R450–R500/month, adding a provisional R100–R150 for independent backup and small overhead; this allowance is not a vendor quote. xneelo is self-managed and single-AZ in Johannesburg. Procurement and restore drill remain open.
+
+PayFast publishes card fees of 3.2% + R2.00 per transaction, excluding VAT, plus R8.70 payout fee excluding VAT. At R99, the card transaction fee is approximately R5.95 including VAT. Six R99 subscribers would generate R594 gross; after six estimated card fees and one monthly payout fee, approximately R548 remains before infrastructure, tax and other operating costs. This is only a cash-planning illustration; payment provider, VAT treatment and recurring billing have not been selected.
+
+**Disposition:** commercial documentation updated; pricing and trial decisions recorded. Basic/Advanced entitlement enforcement, hosted quota enforcement, payment integration, actual backup procurement and legal review remain OPEN. V1 remains NO-GO.
