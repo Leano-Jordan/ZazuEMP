@@ -789,3 +789,5 @@ Commits: `5b15209`, `78917ad`, `d0377f8`.
 - Regression source covers the visible warning, HTTP 401 queue preservation and a re-pair with temporary push outage. Execution remains **UNVERIFIED**; full device/browser acceptance remains open. No score uplift; V1 remains **NO-GO**.
 
 - Cross-business re-pair rejection now has regression coverage asserting the wrong-business token is revoked and local queued data remains intact; test execution is **UNVERIFIED**.
+
+- Cross-business token cleanup only reports automatic revocation when the revoke endpoint confirms success; failed cleanup directs the owner to revoke through Trusted phone access. Source verified; runtime remains unverified.
