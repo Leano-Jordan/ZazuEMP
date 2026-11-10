@@ -503,6 +503,49 @@ class OfflineSyncFoundationTest extends TestCase
             ->value('status'));
     }
 
+    public function test_repeated_sync_acknowledgement_is_safe_after_a_lost_response(): void
+    {
+        $business = Business::create([
+            'name' => 'Idempotent Acknowledgement Business',
+            'slug' => 'idempotent-ack-'.Str::lower(Str::random(8)),
+            'status' => 'active',
+            'currency' => 'ZAR',
+        ]);
+        $sourceDevice = SyncDevice::create([
+            'business_id' => $business->id,
+            'installation_id' => (string) Str::uuid(),
+        ]);
+        $destinationDevice = SyncDevice::create([
+            'business_id' => $business->id,
+            'installation_id' => (string) Str::uuid(),
+        ]);
+
+        $recorder = app(SyncMutationRecorder::class);
+        $mutation = $recorder->record(
+            $sourceDevice,
+            'event',
+            'lost-ack-response-event',
+            'upsert',
+            ['name' => 'Acknowledgement retry'],
+        );
+        $mutation->update(['status' => 'applied', 'applied_at' => now()]);
+        $recorder->publish($mutation);
+
+        $protocol = app(SyncMutationProtocol::class);
+        $first = $protocol->acknowledgeThrough($destinationDevice, 1);
+        $retry = $protocol->acknowledgeThrough($destinationDevice, 1);
+
+        $this->assertSame(1, (int) $first->last_acknowledged_sequence);
+        $this->assertSame(1, (int) $retry->last_acknowledged_sequence);
+        $this->assertSame(1, SyncDelivery::query()
+            ->where('destination_device_id', $destinationDevice->id)
+            ->where('status', 'applied')
+            ->count());
+        $this->assertSame(1, SyncCursor::query()
+            ->where('sync_device_id', $destinationDevice->id)
+            ->value('last_acknowledged_sequence'));
+    }
+
     public function test_sync_pull_does_not_return_later_mutations_past_a_non_pending_delivery(): void
     {
         $business = Business::create([
