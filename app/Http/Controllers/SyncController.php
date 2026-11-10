@@ -502,24 +502,15 @@ class SyncController extends Controller
                 ]);
 
                 if ($exception instanceof ValidationException) {
-                    $conflict = SyncConflict::query()
-                        ->where('business_id', $mutation->business_id)
-                        ->where('mutation_id', $mutation->mutation_id)
-                        ->where('status', 'open')
-                        ->first();
-
-                    if (! $conflict) {
-                        $conflict = $conflictRecorder->record(
-                            $mutation->business_id,
-                            $mutation->entity_type,
-                            $mutation->entity_id,
-                            'domain_rejection',
-                            $device,
-                            $mutation->mutation_id,
-                            $mutation->payload,
-                            ['message' => $error],
-                        );
-                    }
+                    $conflict = $conflictRecorder->recordOnce(
+                        $device,
+                        $mutation->entity_type,
+                        $mutation->entity_id,
+                        'domain_rejection',
+                        $mutation->mutation_id,
+                        $mutation->payload,
+                        ['message' => $error],
+                    );
 
                     $conflictId = $conflict->id;
                     $conflictType = 'domain_rejection';
@@ -584,33 +575,15 @@ class SyncController extends Controller
             'payload' => $existing->payload ?? [],
         ];
 
-        $conflict = SyncConflict::query()
-            ->where('business_id', $device->business_id)
-            ->where('sync_device_id', $device->id)
-            ->where('mutation_id', $existing->mutation_id)
-            ->where('conflict_type', 'mutation_identity_mismatch')
-            ->where('status', 'open')
-            ->first();
-
-        if ($conflict) {
-            $conflict->update([
-                'entity_type' => $item['entity_type'],
-                'entity_id' => $item['entity_id'],
-                'local_payload' => $localPayload,
-                'remote_payload' => $remotePayload,
-            ]);
-        } else {
-            $conflict = $conflictRecorder->record(
-                (int) $device->business_id,
-                $item['entity_type'],
-                $item['entity_id'],
-                'mutation_identity_mismatch',
-                $device,
-                $existing->mutation_id,
-                $localPayload,
-                $remotePayload,
-            );
-        }
+        $conflict = $conflictRecorder->recordOnce(
+            $device,
+            $item['entity_type'],
+            $item['entity_id'],
+            'mutation_identity_mismatch',
+            $existing->mutation_id,
+            $localPayload,
+            $remotePayload,
+        );
 
         return [
             'id' => $existing->mutation_id,
