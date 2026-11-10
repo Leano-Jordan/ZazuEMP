@@ -894,3 +894,9 @@ Commits: `4f4f9f63e617b201fb68ab612ef902805c8e1727`, `a281567ab1c9b384dffe47405d
 - Extended the session-generation boundary to remote attachment listing and private-file downloads. A stale list/download response is now discarded after logout or token replacement, and private attachment cache writes use the captured session generation.
 - The upload-completion/logout race has a dedicated Chromium regression. The download-completion/logout guard is implemented but does not yet have its own runtime regression.
 - Source committed on `main`; exact-head Laravel/Playwright/quality execution remains **PENDING**. No readiness score uplift. V1 remains **NO-GO**.
+
+## Re-pair session transition — 2026-11-10
+- Closed a credential-boundary gap in the phone sync lifecycle: successful re-pair now invalidates old attachment operations, aborts the old sync request, and guarantees a fresh sync pass is not lost behind the single-flight lock.
+- Added delayed old-token push regression proving the intended sequence at test-source level: old request in flight → new pairing → old session aborted → queued mutation retried with new token.
+- Commits: `2b3828c4a49b03e7e2823559e60a3453781f7d47` (source), `7fbf4ed933c28872b5a4cd8cb12c81eced2e25b6` (test), `d3e44ec438cb59de4da95a74895c02ee9e3d4435` (test fixture).
+- Source/test syntax checks pass. Runtime Playwright, Laravel, quality and exact-head CI remain **UNVERIFIED**. This is not release acceptance and does not change the V1 **NO-GO** disposition.
