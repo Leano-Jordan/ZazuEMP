@@ -118,6 +118,23 @@ class OfflineLicenseTest extends TestCase
         ]);
     }
 
+    public function test_invalid_license_token_is_not_preserved_in_session_input(): void
+    {
+        $user = $this->signInAsOwner();
+        $business = $user->businesses()->firstOrFail();
+        $token = 'private-invalid-token-value';
+
+        $this->from(route('settings.index'))
+            ->post(route('settings.license.store'), ['license_token' => $token])
+            ->assertRedirect(route('settings.index'))
+            ->assertSessionHasErrors('license_token');
+
+        $this->assertArrayNotHasKey('license_token', session('_old_input', []));
+        $this->assertDatabaseMissing('business_licenses', [
+            'business_id' => $business->id,
+        ]);
+    }
+
     public function test_settings_displays_an_expired_license_as_expired(): void
     {
         $user = $this->signInAsOwner();
