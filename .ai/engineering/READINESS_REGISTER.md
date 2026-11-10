@@ -755,3 +755,13 @@ The push acknowledgement now uses one IndexedDB read/write transaction across `m
 Commits: `5b15209`, `78917ad`, `d0377f8`.
 
 **Status:** IMPLEMENTED at source; exact-head Playwright/CI execution UNVERIFIED. No score uplift. V1 remains NO-GO.
+
+
+## Retryable offline mutation failure handling — 2026-11-10
+
+- Corrected a sync failure-path gap where unexpected non-validation exceptions could leave a server mutation pending while the client incorrectly marked it terminally failed without a conflict record.
+- Server response now explicitly marks unexpected exceptions retryable; deterministic validation/identity failures retain explicit conflict IDs.
+- Client preserves retryable failures in the pending queue with their last error and reserves the failed/conflict state for responses carrying an operator-resolvable conflict ID.
+- Regression source added for a simulated persistence exception and no-orphan-conflict invariant.
+- Commits: `3d22994`, `8df076c`, `3eba5cf`.
+- Source re-fetch/structural review only. PHPUnit, Playwright and exact-head CI are **UNVERIFIED**. No readiness score uplift; V1 remains **NO-GO**.
