@@ -1288,11 +1288,44 @@
         if (!response.ok) throw new Error('The Zazu phone pairing code is invalid or expired.');
 
         const result = await response.json();
+        const expectedBusinessId = ACTIVE_BUSINESS_ID;
+        if (Number(result.device?.business_id || 0) !== expectedBusinessId) {
+            // Do not bind a token for a different workspace to this business-scoped
+            // IndexedDB database. Revoke the newly issued token before rejecting.
+            await fetch('/api/sync/revoke', {
+                method: 'POST',
+                headers: { 'Accept': 'application/json', 'Authorization': 'Bearer ' + result.token },
+                cache: 'no-store',
+            }).catch(() => {});
+            throw new Error('This pairing code belongs to a different business workspace. Your saved local data has not been changed.');
+        }
+
+        const previousState = state || blank();
+        const existingMutations = await allMutations();
+        const preserveLocalWorkspace = existingMutations.length > 0 || previousState.local_dirty === true;
         sessionCleared = false;
-        state = { ...blank(), sync: { token: result.token, device: result.device }, local_dirty: false };
-        applyBootstrap(result.bootstrap);
+        state = {
+            ...(preserveLocalWorkspace ? previousState : blank()),
+            sync: { token: result.token, device: result.device },
+            local_dirty: preserveLocalWorkspace,
+            sync_authorization_required: false,
+            last_sync_error: null,
+        };
+
+        // A pending or failed local mutation may depend on locally cached records.
+        // Keep that workspace intact; the normal push/pull/bootstrap cycle will
+        // reconcile it after the queue has been safely processed.
+        if (!preserveLocalWorkspace) applyBootstrap(result.bootstrap);
         await writeState();
+        window.dispatchEvent(new CustomEvent('zazu:offline-state-updated'));
         syncAttachments().catch(() => {});
+        if (preserveLocalWorkspace) {
+            sync().catch(() => {
+                if (!state || sessionCleared || !state.sync?.token) return;
+                state.last_sync_error = 'Re-pairing succeeded. Saved changes remain queued and will retry when sync is available.';
+                writeState().catch(() => {});
+            });
+        }
         return result.device;
     }
 
