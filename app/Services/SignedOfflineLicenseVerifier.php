@@ -10,7 +10,8 @@ class SignedOfflineLicenseVerifier
     /**
      * @return array{
      *   payload: array<string, mixed>,
-     *   dates: array{starts_at: Carbon, issued_at: Carbon, expires_at: ?Carbon}
+     *   dates: array{starts_at: Carbon, issued_at: Carbon, expires_at: ?Carbon},
+     *   fingerprint: string
      * }
      */
     public function verifyForBusiness(string $token, int $businessId): array
@@ -22,6 +23,7 @@ class SignedOfflineLicenseVerifier
         return [
             'payload' => $payload,
             'dates' => $this->parsePayloadDates($payload),
+            'fingerprint' => hash('sha256', $payloadBytes),
         ];
     }
 
