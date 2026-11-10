@@ -12,7 +12,6 @@ permissions:
 
 jobs:
   laravel-tests:
-
     runs-on: ubuntu-latest
 
     steps:
@@ -49,8 +48,53 @@ jobs:
         mkdir -p database
         touch database/database.sqlite
         php artisan migrate --force
+      env:
+        DB_CONNECTION: sqlite
+        DB_DATABASE: database/database.sqlite
     - name: Execute tests (Unit and Feature tests) via PHPUnit/Pest
       env:
         DB_CONNECTION: sqlite
         DB_DATABASE: database/database.sqlite
       run: php artisan test
+
+  offline-browser-acceptance:
+    runs-on: ubuntu-latest
+    env:
+      APP_ENV: local
+      DB_CONNECTION: sqlite
+      DB_DATABASE: database/database.sqlite
+      ZAZU_SEED_DEMO: 'true'
+      ZAZU_DEMO_EMAIL: demo@zazu.local
+      ZAZU_DEMO_PASSWORD: password
+      ZAZU_DEMO_OPERATIONS_PASSWORD: password
+      ZAZU_DEMO_FINANCE_PASSWORD: password
+
+    steps:
+    - uses: shivammathur/setup-php@f3e473d116dcccaddc5834248c87452386958240 # v2.37.2
+      with:
+        php-version: '8.4'
+    - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+    - name: Copy .env
+      run: php -r "file_exists('.env') || copy('.env.example', '.env');"
+    - name: Install PHP dependencies
+      run: composer install -q --no-ansi --no-interaction --no-scripts --no-progress --prefer-dist
+    - name: Set up Node
+      uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+      with:
+        node-version: '22'
+        cache: npm
+    - name: Install frontend dependencies
+      run: npm ci
+    - name: Build frontend assets
+      run: npm run build
+    - name: Generate application key
+      run: php artisan key:generate
+    - name: Prepare demo database
+      run: |
+        mkdir -p database storage/logs
+        touch database/database.sqlite
+        php artisan migrate:fresh --seed --force
+    - name: Install Chromium for Playwright
+      run: npx playwright install --with-deps chromium
+    - name: Run offline browser acceptance suite
+      run: npm run test:e2e -- --project=chromium e2e/pwa-offline.spec.js
