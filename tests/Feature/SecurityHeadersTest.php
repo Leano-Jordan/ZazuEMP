@@ -45,6 +45,18 @@ class SecurityHeadersTest extends TestCase
         $this->assertNotEmpty($bodyTag);
         $this->assertStringNotContainsString(' style=', $bodyTag[0]);
 
+        $landing = file_get_contents(resource_path('views/landing.blade.php'));
+        $adminLanding = file_get_contents(resource_path('views/admin/landing-settings.blade.php'));
+        $recovery = file_get_contents(resource_path('views/auth/workspace-recovery.blade.php'));
+        foreach ([$landing, $adminLanding, $recovery] as $source) {
+            $this->assertIsString($source);
+            $this->assertDoesNotMatchRegularExpression('/\\sstyle\\s*=/i', $source);
+        }
+        $this->assertStringContainsString('landing-image--hero', $landing);
+        $this->assertStringContainsString('--landing-image-hero: url(', $landing);
+        $this->assertStringContainsString('zazu-admin-image-preview-{{ $field }}', $adminLanding);
+        $this->assertStringContainsString('class="zazu-auth-inline-form"', $recovery);
+
         foreach ($views as $view) {
             $source = file_get_contents(resource_path('views/'.$view));
 
