@@ -935,3 +935,9 @@ Commits: `4f4f9f63e617b201fb68ab612ef902805c8e1727`, `a281567ab1c9b384dffe47405d
 - The recorder now rechecks and locks the durable active device and matching credential inside the mutation-creation transaction, before sequence allocation.
 - The applier rechecks and locks the durable active device before the domain handler runs. Push preserves 401 rather than swallowing it as a per-mutation failure.
 - Regression cases cover revocation after middleware snapshot but before record, and revocation after record but before apply. Source-level reconciliation completed; runtime/PHPUnit/exact-head CI are still **PENDING**. V1 remains **NO-GO**.
+
+
+## Quality-gate follow-up — 2026-11-10
+
+- PHPMD found a push-method length regression and two oversized test classes. The controller guard was extracted into a private method; tests were moved into focused classes without removing assertions or disabling rules. A PHPMD parser error caused by escaped namespace separators was corrected.
+- Latest exact-head workflow verification is still queued/pending; no green claim until PHPMD, Laravel, quality, Psalm and browser results are observed. V1 remains **NO-GO**.
