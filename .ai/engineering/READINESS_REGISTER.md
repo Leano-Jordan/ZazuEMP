@@ -856,3 +856,11 @@ Commits: `4f4f9f63e617b201fb68ab612ef902805c8e1727`, `a281567ab1c9b384dffe47405d
 - Regression source covers unsupported stream rejection before sequence allocation and a device revoked after initial destination selection.
 - Exact-head GitHub Actions execution is pending. The offline-browser acceptance job exists in `.github/workflows/laravel.yml`; status must be read from the run for the resulting head.
 - No readiness score uplift. V1 remains **NO-GO** until automated offline acceptance and remaining installed-device / operator recovery gates pass.
+
+
+## Sync pull sequence-gap integrity — 2026-11-10
+
+- Fixed a pull/acknowledgement contract mismatch: pull previously omitted non-pending rows and could return later pending deliveries across a failed sequence, while acknowledgement correctly rejected the gap.
+- Pull now returns only a contiguous pending prefix from the current cursor; a gap or non-pending row blocks later delivery exposure until recovery is resolved.
+- Regression source covers failed sequence 1 followed by pending sequence 2 and asserts no later mutation is returned and the cursor does not advance.
+- Source inspection only. PHPUnit, concurrency runtime and exact-head CI remain **UNVERIFIED**. No score uplift. V1 remains **NO-GO**.
