@@ -51,4 +51,103 @@ class OfflineLicenseTest extends TestCase
 
         $this->assertFalse($license->isActive(Carbon::parse('2026-10-01 00:00:00')));
     }
+    public function test_a_valid_signed_license_can_be_imported_without_network_access(): void
+    {
+        $user = $this->signInAsOwner();
+        $business = $user->businesses()->firstOrFail();
+        $token = $this->signedToken($business);
+
+        $license = app(OfflineLicenseService::class)->importSignedLicense($business, $token);
+
+        $this->assertSame('active', $license->status);
+        $this->assertSame('solo', $license->plan);
+        $this->assertTrue($license->features['offline_core']);
+        $this->assertTrue($license->metadata['signed']);
+        $this->assertTrue($license->isActive(Carbon::parse('2026-10-15 12:00:00')));
+    }
+
+    public function test_a_tampered_signed_license_is_rejected_without_changing_the_existing_license(): void
+    {
+        $user = $this->signInAsOwner();
+        $business = $user->businesses()->firstOrFail();
+        $service = app(OfflineLicenseService::class);
+        $existing = $service->issueLocalEntitlement($business, 'solo', Carbon::parse('2026-10-01'));
+        $token = $this->signedToken($business);
+        [$payload, $signature] = explode('.', $token, 2);
+        $tampered = $this->base64UrlEncode('{"version":1,"business_id":'.$business->id.',"status":"active"}').'.'.$signature;
+
+        try {
+            $service->importSignedLicense($business, $tampered);
+            $this->fail('A tampered licence must not be imported.');
+        } catch (\\InvalidArgumentException $exception) {
+            $this->assertSame('The licence signature is invalid.', $exception->getMessage());
+        }
+
+        $this->assertSame($existing->license_id, $business->fresh()->license->license_id);
+    }
+
+    public function test_a_signed_license_for_another_business_is_rejected(): void
+    {
+        $user = $this->signInAsOwner();
+        $business = $user->businesses()->firstOrFail();
+        $otherBusinessId = $business->id + 1000;
+
+        $this->expectException(\\InvalidArgumentException::class);
+        $this->expectExceptionMessage('The signed licence payload has invalid fields or belongs to another business.');
+
+        app(OfflineLicenseService::class)->importSignedLicense(
+            $business,
+            $this->signedToken($business, ['business_id' => $otherBusinessId]),
+        );
+    }
+
+    public function test_a_signed_revocation_is_imported_as_inactive(): void
+    {
+        $user = $this->signInAsOwner();
+        $business = $user->businesses()->firstOrFail();
+
+        $license = app(OfflineLicenseService::class)->importSignedLicense(
+            $business,
+            $this->signedToken($business, ['status' => 'revoked']),
+        );
+
+        $this->assertSame('revoked', $license->status);
+        $this->assertFalse($license->isActive());
+    }
+
+    /** @return array{0: string, 1: string} */
+    private function signingKeys(): array
+    {
+        $keypair = sodium_crypto_sign_seed_keypair(str_repeat('z', SODIUM_CRYPTO_SIGN_SEEDBYTES));
+        $secretKey = sodium_crypto_sign_secretkey($keypair);
+        $publicKey = sodium_crypto_sign_publickey($keypair);
+        config(['zazu.licensing.public_key' => base64_encode($publicKey)]);
+
+        return [$secretKey, $publicKey];
+    }
+
+    private function signedToken(\\App\\Models\\Business $business, array $overrides = []): string
+    {
+        [$secretKey] = $this->signingKeys();
+        $payload = array_merge([
+            'version' => 1,
+            'business_id' => (int) $business->id,
+            'license_id' => (string) Str::uuid(),
+            'plan' => 'solo',
+            'status' => 'active',
+            'starts_at' => '2026-10-01T00:00:00+00:00',
+            'expires_at' => '2026-10-31T23:59:59+00:00',
+            'features' => ['offline_core' => true],
+        ], $overrides);
+        $bytes = json_encode($payload, JSON_THROW_ON_ERROR);
+        $signature = sodium_crypto_sign_detached($bytes, $secretKey);
+
+        return $this->base64UrlEncode($bytes).'.'.$this->base64UrlEncode($signature);
+    }
+
+    private function base64UrlEncode(string $value): string
+    {
+        return rtrim(strtr(base64_encode($value), '+/', '-_'), '=');
+    }
+
 }
