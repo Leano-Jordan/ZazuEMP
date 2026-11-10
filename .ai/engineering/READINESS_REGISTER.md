@@ -773,3 +773,10 @@ Commits: `5b15209`, `78917ad`, `d0377f8`.
 - Applied to both deterministic domain rejection and changed-payload identity mismatch paths.
 - Regression added for duplicate changed-payload delivery: same conflict ID returned and one open row remains.
 - Source re-fetch/structural inspection only. Runtime concurrency, PHPUnit and exact-head CI are **UNVERIFIED**. No readiness uplift; V1 remains **NO-GO**.
+
+
+### Sync credential rejection recovery — 2026-11-10
+
+- Client now persists an explicit re-pair instruction after HTTP 401/403 from push, pull, bootstrap or attachment upload. Existing pending mutations and local credentials are preserved until the owner-authorised pairing transition; no silent queue deletion occurs.
+- Chromium regression source verifies a 401 push response leaves the queued mutation and token intact while recording the recovery message.
+- Source/E2E structural review only; Playwright and exact-head CI remain **UNVERIFIED**. Device lifecycle acceptance remains open. No score uplift; V1 remains **NO-GO**.
