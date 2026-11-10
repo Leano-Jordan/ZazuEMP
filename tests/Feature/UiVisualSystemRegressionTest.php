@@ -199,7 +199,8 @@ class UiVisualSystemRegressionTest extends TestCase
         $this->assertStringNotContainsString('border-bottom-width: 2px;', $visualSweepCss);
         $this->assertStringContainsString('border-bottom-width: 1px;', $visualSweepCss);
         $this->assertStringContainsString('.zazu-helper {', $visualSweepCss);
-        $this->assertStringContainsString('.zazu-helper.is-nav-avoiding {', $visualSweepCss);
+        $this->assertStringNotContainsString('.zazu-helper.is-nav-avoiding {', $visualSweepCss);
+        $this->assertStringContainsString('right: max(16px, env(safe-area-inset-right));', $visualSweepCss);
         $this->assertStringContainsString('right: max(12px, env(safe-area-inset-right));', $visualSweepCss);
         $this->assertStringContainsString('bottom: max(12px, env(safe-area-inset-bottom));', $visualSweepCss);
         $this->assertStringContainsString('z-index: 50;', $visualSweepCss);
