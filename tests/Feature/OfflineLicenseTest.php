@@ -2,10 +2,10 @@
 
 namespace Tests\Feature;
 
-use App\Models\BusinessLicense;
 use App\Services\OfflineLicenseService;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Str;
 use Tests\TestCase;
 
 class OfflineLicenseTest extends TestCase
@@ -56,7 +56,7 @@ class OfflineLicenseTest extends TestCase
         try {
             $service->importSignedLicense($business, $tampered);
             $this->fail('A tampered licence must not be imported.');
-        } catch (\\InvalidArgumentException $exception) {
+        } catch (\InvalidArgumentException $exception) {
             $this->assertSame('The licence signature is invalid.', $exception->getMessage());
         }
 
@@ -69,7 +69,7 @@ class OfflineLicenseTest extends TestCase
         $business = $user->businesses()->firstOrFail();
         $otherBusinessId = $business->id + 1000;
 
-        $this->expectException(\\InvalidArgumentException::class);
+        $this->expectException(\InvalidArgumentException::class);
         $this->expectExceptionMessage('The signed licence payload has invalid fields or belongs to another business.');
 
         app(OfflineLicenseService::class)->importSignedLicense(
@@ -103,7 +103,7 @@ class OfflineLicenseTest extends TestCase
         return [$secretKey, $publicKey];
     }
 
-    private function signedToken(\\App\\Models\\Business $business, array $overrides = []): string
+    private function signedToken(\App\Models\Business $business, array $overrides = []): string
     {
         [$secretKey] = $this->signingKeys();
         $payload = array_merge([
@@ -133,7 +133,7 @@ class OfflineLicenseTest extends TestCase
         $business = $user->businesses()->firstOrFail();
         config(['zazu.licensing.public_key' => '']);
 
-        $this->expectException(\\InvalidArgumentException::class);
+        $this->expectException(\InvalidArgumentException::class);
         $this->expectExceptionMessage('Signed licence verification is not configured.');
 
         app(OfflineLicenseService::class)->importSignedLicense($business, 'not-a-valid-token');
