@@ -20,6 +20,7 @@ use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\FinanceController;
 use App\Http\Controllers\InventoryController;
 use App\Http\Controllers\OnboardingController;
+use App\Http\Controllers\OfflineLicenseController;
 use App\Http\Controllers\OfflineWorkspaceController;
 use App\Http\Controllers\PasswordResetController;
 use App\Http\Controllers\PurchaseOrderController;
@@ -216,6 +217,7 @@ Route::middleware(['auth', 'auth.session', 'business.context'])->group(function 
 
     Route::middleware('owner')->group(function () {
         Route::get('/settings', [BusinessSettingsController::class, 'edit'])->name('settings.index');
+        Route::post('/settings/licence', [OfflineLicenseController::class, 'store'])->middleware('throttle:10,1')->name('settings.license.store');
         Route::post('/settings/sync/pairing', [SyncController::class, 'createPairing'])->middleware('throttle:20,1')->name('settings.sync.pairing');
         Route::post('/settings/sync/devices/{device}/revoke', [BusinessSettingsController::class, 'revokeSyncDevice'])->name('settings.sync.devices.revoke');
         Route::get('/settings/audit', [AuditLogController::class, 'index'])->name('settings.audit');
