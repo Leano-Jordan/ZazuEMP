@@ -1519,3 +1519,14 @@ Owner expanded the visual refinement scope beyond the dashboard: apply the estab
 - Added feature regressions for timezone-less timestamps and normalized invalid calendar dates.
 - Commits: `30eeb13` parser; `32d485a` exception namespace correction; `69f9756` test cases; `c07b417` test namespace correction.
 - Verification boundary: parser and test source were re-fetched and inspected. PHP/PHPUnit, PHPMD, Psalm and exact-head CI remain unexecuted/unverified. No readiness score uplift; V1 remains **NO-GO**.
+
+## Same-ID signed licence replay and concurrency hardening — 2026-11-10
+
+- Found a rollback bypass in the earlier anti-replay rule: it rejected older tokens only when the incoming license_id differed. An issuer reusing one licence ID could therefore allow an older active token to replace a newer signed revocation or renewal.
+- The verifier now returns a SHA-256 fingerprint of the exact payload bytes only after detached-signature verification succeeds.
+- The service persists that fingerprint in signed entitlement metadata. A distinct payload must have a strictly newer issue timestamp regardless of licence ID; a byte-identical signed payload may be re-imported idempotently. Different payloads cannot reuse the same issue timestamp.
+- Signed entitlement imports are serialized by locking the owning business row inside a database transaction, preventing concurrent import races. Signed records with incomplete issue metadata now fail closed rather than allowing replacement.
+- Added regressions for same-ID older active-token replay after revocation, exact-token idempotency, same-timestamp payload substitution, and incomplete installed metadata.
+- Updated docs/ZAZU_OFFLINE_LICENSING_SPEC.md with the stronger replay and concurrency rules.
+- Commits: 620a644 verifier fingerprint; cca0e4b initial service guard; 7811316 replay tests; f590bac namespace correction; b449eb2 test namespace correction; eba7ec8 transaction/metadata guard; 8ed4323 transaction import and namespace correction; 32e7260 spec; 7636e4c incomplete-metadata regression.
+- Verification boundary: source and tests were re-fetched and structurally inspected. PHPUnit, PHPMD, Psalm and exact-head CI have not been executed in this session. No score uplift; V1 remains **NO-GO**.
