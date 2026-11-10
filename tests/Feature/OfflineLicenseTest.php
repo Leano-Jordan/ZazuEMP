@@ -112,6 +112,7 @@ class OfflineLicenseTest extends TestCase
             'license_id' => (string) Str::uuid(),
             'plan' => 'solo',
             'status' => 'active',
+            'issued_at' => '2026-10-01T00:00:00+00:00',
             'starts_at' => '2026-10-01T00:00:00+00:00',
             'expires_at' => '2026-10-31T23:59:59+00:00',
             'features' => ['offline_core' => true],
@@ -137,6 +138,25 @@ class OfflineLicenseTest extends TestCase
         $this->expectExceptionMessage('Signed licence verification is not configured.');
 
         app(OfflineLicenseService::class)->importSignedLicense($business, 'not-a-valid-token');
+    }
+
+    public function test_an_older_signed_license_cannot_replace_a_newer_renewal(): void
+    {
+        $user = $this->signInAsOwner();
+        $business = $user->businesses()->firstOrFail();
+        $service = app(OfflineLicenseService::class);
+        $newer = $service->importSignedLicense(
+            $business,
+            $this->signedToken($business, ['issued_at' => '2026-10-10T00:00:00+00:00']),
+        );
+
+        $this->expectException(\\InvalidArgumentException::class);
+        $this->expectExceptionMessage('This licence is older than the entitlement already installed.');
+
+        $service->importSignedLicense(
+            $business,
+            $this->signedToken($business, ['issued_at' => '2026-10-01T00:00:00+00:00']),
+        );
     }
 
 }
