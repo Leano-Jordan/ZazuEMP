@@ -26,6 +26,8 @@ class SyncMutationRecorder
             throw new LogicException('Cannot record a mutation for an inactive sync device.');
         }
 
+        $this->assertSupportedStream($stream);
+
         $mutationId ??= (string) Str::uuid();
 
         return DB::transaction(function () use ($device, $stream, $mutationId, $entityType, $entityId, $operation, $payload): SyncMutation {
@@ -141,6 +143,8 @@ class SyncMutationRecorder
             throw new LogicException('Only an applied sync mutation can be published.');
         }
 
+        $this->assertSupportedStream($mutation->stream);
+
         DB::transaction(function () use ($mutation): void {
             $this->queueDeliveries($mutation);
         });
@@ -156,7 +160,18 @@ class SyncMutationRecorder
             ->orderBy('id')
             ->get()
             ->each(function (SyncDevice $destination) use ($mutation): void {
-                SyncDevice::query()->whereKey($destination->id)->lockForUpdate()->firstOrFail();
+                // Re-check active state after acquiring the row lock. A device
+                // may have been revoked after the initial destination scan.
+                $lockedDestination = SyncDevice::query()
+                    ->where('business_id', $mutation->business_id)
+                    ->whereKey($destination->id)
+                    ->active()
+                    ->lockForUpdate()
+                    ->first();
+
+                if (! $lockedDestination) {
+                    return;
+                }
 
                 $existing = SyncDelivery::query()
                     ->where('sync_mutation_id', $mutation->id)
@@ -183,5 +198,14 @@ class SyncMutationRecorder
                 ]);
             });
     }
+    private function assertSupportedStream(string $stream): void
+    {
+        if (! in_array($stream, SyncMutationProtocol::SUPPORTED_STREAMS, true)) {
+            throw ValidationException::withMessages([
+                'stream' => 'The requested sync stream is not supported.',
+            ]);
+        }
+    }
+
 }
 
