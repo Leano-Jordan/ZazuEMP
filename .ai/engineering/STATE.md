@@ -1678,3 +1678,11 @@ Source review found that authenticated sync pull/acknowledgement accepted arbitr
 - Added a feature regression with delivery 1 failed and delivery 2 pending; expected pull result is empty and the cursor remains unchanged.
 - Source commits: pending in current engineering cycle.
 - PHPUnit and exact-head CI are not yet executed for this change. No readiness uplift; V1 remains **NO-GO**.
+
+
+## Receiver-specific acknowledgement sequence — 2026-11-10
+
+- Found a protocol mismatch: the phone acknowledged the business-wide mutation sequence, while the server validates the receiver-specific delivery sequence. A device's own mutations consume business sequence numbers but do not create deliveries back to that same device, so the two values legitimately diverge.
+- Pull responses now include a transient `delivery_sequence` attribute on each returned mutation. The phone calculates its acknowledgement from that receiver-specific value.
+- Added regression: destination's own mutation consumes business sequence 1; a remote mutation has business sequence 2 but destination delivery sequence 1; pull exposes both and acknowledgement succeeds at 1.
+- Source/test changes committed separately; runtime verification remains pending until exact-head CI. No readiness uplift; V1 remains **NO-GO**.
