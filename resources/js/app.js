@@ -1337,7 +1337,7 @@ function setupZazuOfflineDirectoryViews() {
     window.ZazuOffline.ready.then(render).catch(() => {});
     window.addEventListener('zazu:offline-ready', render);
     window.addEventListener('zazu:offline-state-updated', render);
-    window.addEventListener('zazu:offline-attachments-updated', render);
+    window.addEventListener('zazu:offline-attachments-updated', refreshLocalAttachmentLists);
 }
 
 function setupZazuOfflineCustomerOptions() {
