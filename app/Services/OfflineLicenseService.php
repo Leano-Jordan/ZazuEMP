@@ -40,7 +40,7 @@ class OfflineLicenseService
 
         $token = trim($token);
         if ($token === '' || strlen($token) > 16384) {
-            throw new \\InvalidArgumentException('The licence token is malformed.');
+            throw new \InvalidArgumentException('The licence token is malformed.');
         }
 
         $parts = explode('.', $token);
@@ -108,8 +108,8 @@ class OfflineLicenseService
         if ($existing?->metadata['signed'] === true
             && is_string($existingIssuedAt)
             && $existing->license_id !== $payload['license_id']
-            && $issuedAt->lte(\\Illuminate\\Support\\Carbon::parse($existingIssuedAt))) {
-            throw new \\InvalidArgumentException('This licence is older than the entitlement already installed.');
+            && $issuedAt->lte(\Illuminate\Support\Carbon::parse($existingIssuedAt))) {
+            throw new \InvalidArgumentException('This licence is older than the entitlement already installed.');
         }
 
         return BusinessLicense::updateOrCreate(
