@@ -1,6 +1,6 @@
 # Zazu Offline Licensing Specification
 
-**Status:** Active architecture direction  
+**Status:** Active architecture direction; signed-token verification implemented at service level, activation UI/enforcement pending  
 **Date:** 2026-10-02
 
 ## Purpose
@@ -81,9 +81,17 @@ The production activation flow should also distinguish:
 
 Do not use a shared secret embedded in the application as the final production licensing mechanism.
 
+## Signed offline token format — version 1
+
+The local verifier accepts a two-part token: `base64url(payload JSON).base64url(Ed25519 detached signature)`. The exact UTF-8 payload bytes are signed; the verifier checks the detached signature before parsing or trusting any fields.
+
+Required payload fields: `version=1`, local `business_id`, UUID `license_id`, `plan`, `status` (`active` or `revoked`), `starts_at`, nullable `expires_at`, and a `features` object. Expiry must not precede the start date. A token for another business is rejected. A signed revoked token imports as inactive. Invalid signatures, malformed payloads, missing key configuration and unavailable sodium verification fail closed.
+
+The app is configured with `ZAZU_LICENSE_PUBLIC_KEY` only: base64-encoded Ed25519 public key. The issuer's private signing key must remain outside this repository and outside customer installations. Never commit a real private key or use a development test key in production.
+
 ## Current implementation stage
 
-The repository contains a local entitlement data foundation and local validity service.
+The repository contains the local entitlement data foundation, local validity service and an Ed25519 signed-token import/verification method. Feature tests have been added for valid import, signature tampering, cross-business rejection and signed revocation. The service method is not yet connected to an owner activation screen or route, and there is no production issuer/key-management workflow or application-wide enforcement boundary.
 
 Licensing is intentionally separate from full offline application operation. A valid license permits entitled local use; it does not by itself provide phone-local data storage, offline mutation queues or synchronization.
 
