@@ -1,4 +1,4 @@
-const CACHE_NAME = 'zazu-static-v32';
+const CACHE_NAME = 'zazu-static-v33';
 const OFFLINE_SHELL = '/dashboard';
 let activeUserId = null;
 let activeBusinessId = null;
@@ -386,7 +386,8 @@ self.addEventListener('fetch', (event) => {
     if (
         request.method === 'GET'
         && url.origin === self.location.origin
-        && request.destination === 'image'
+        // Match the private media route, not request.destination: CSS background
+        // images can have an empty destination in some browser fetch paths.
         && /^\/media\/(profile|business)\//.test(url.pathname)
     ) {
         event.respondWith((async () => {
