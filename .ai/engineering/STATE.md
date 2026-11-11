@@ -1967,3 +1967,12 @@ Source review found that authenticated sync pull/acknowledgement accepted arbitr
 - Commits: d25f0a6 (helper placement), 627d7e5 (helper regression), a91a6ea (restore rollback preservation regression).
 - GitHub source re-fetch and structural assertions: PASS. Exact-head PHPUnit, browser rendering, CSS/device acceptance and CI status: UNVERIFIED (no status checks reported for the latest test commit at reconciliation).
 - The owner should only need to visually confirm helper placement on desktop and mobile after the next deployed build. No deployment was triggered; deploy/render-staging remains untouched.
+
+
+## SQLite in-memory restore isolation — 2026-11-11
+
+- Restore preflight temporarily redirects a SQLite `:memory:` connection to a file so the normal safe replacement path can run. The previous implementation left that temporary database path in Laravel config after the command and could leave its temporary database file behind.
+- Captured the original SQLite database setting, restored it in `finally`, purged the temporary connection and removed its temporary database/WAL/SHM files. Rollback snapshots remain separately preserved when recovery fails.
+- Added a regression test using a valid legacy archive and an in-memory SQLite configuration; it asserts the connection setting is restored and no temporary target remains.
+- Commits: daa0a8a (config restoration), 5221165 (regression), 5fc4ae3 (temporary file cleanup), 6d6a361 (PDO namespace correction).
+- GitHub source re-fetch: PASS. PHPUnit/runtime verification and CI: UNVERIFIED; no local execution environment or status contexts available. V1 remains NO-GO.
