@@ -1944,3 +1944,14 @@ Source review found that authenticated sync pull/acknowledgement accepted arbitr
 - Added a service-worker regression proving that priming a dashboard caches referenced profile and CSS-background images in the correct business cache, excludes them from the shared cache, and serves both after the host becomes unavailable. Laravel source-contract assertion updated to v34.
 - Commits: `ad81391`, `87cb501`, `19ca15d`, `799da2f`, `c9b347e`, `3b0ac8e`, `a041e07`, `a50e5f1`.
 - Source re-fetch is complete. Node service-worker tests, Laravel suite, exact-head CI and physical installed-phone acceptance remain **UNVERIFIED** in this environment. The 60-image prefetch cap is a bounded safeguard, not proof that every image on every page is available offline. V1 remains **NO-GO**.
+
+
+## Jarvis execution — MySQL backup payload correction — 2026-11-11
+
+- Target: installation-level backup reliability, independent of the offline-media work.
+- Finding: `ZazuBackupCommand::snapshotMysql()` assigned the return value of Symfony Process `run()` to the SQL payload. `run()` returns the process exit code; stdout is available through `getOutput()`. The command could therefore publish a format-v2 ZIP whose `database.sql` contained only the exit code rather than the database dump.
+- Classification: **P0 RELEASE BLOCKER / DATA RECOVERY INTEGRITY** for MySQL installations. SQLite path is unaffected.
+- Correction: execute the dump, check process success, read stdout using `getOutput()`, reject empty output, and verify the SQL file was actually written and is non-empty before continuing to private storage/checksum/archive creation.
+- Regression: added a POSIX fake-`mysqldump` integration fixture that runs the real backup command under a MySQL config and inspects the generated ZIP, asserting that the exact multiline SQL stdout is stored in `database.sql` rather than the process exit code. Test skips on Windows because the fake executable uses a POSIX shell.
+- Commits: `19de1d4` source fix; `f2598d9` regression; `7459d1c` fixture formatting correction.
+- GitHub source/test files re-fetched after writes; structural assertions confirm stdout capture, empty-output/write failure guards, and exact archive payload assertion. PHPUnit, PHP syntax, full CI, a real MySQL dump/restore and operator recovery drill are **UNVERIFIED**. Do not count this as a runtime pass or raise recovery maturity. V1 remains **NO-GO**.
