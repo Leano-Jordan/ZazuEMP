@@ -582,6 +582,64 @@ class ZazuBackupRestoreTest extends TestCase
 
 
 
+    public function test_restore_restores_original_sqlite_memory_configuration_after_completion(): void
+    {
+        if (!class_exists(ZipArchive::class) || !in_array('sqlite', \\PDO::getAvailableDrivers(), true)) {
+            $this->markTestSkipped('PHP Zip and SQLite extensions are required for restore tests.');
+        }
+
+        $root = storage_path('app/zazu-memory-restore-test');
+        $database = $root.'/source.sqlite';
+        $archive = $root.'/memory-restore.zip';
+        $originalDefault = config('database.default');
+        $originalDatabase = config('database.connections.sqlite.database');
+
+        File::deleteDirectory($root);
+        File::ensureDirectoryExists($root);
+        $pdo = new \\PDO('sqlite:'.$database);
+        $pdo->exec('CREATE TABLE memory_restore_probe (id INTEGER PRIMARY KEY, value TEXT)');
+        $pdo->exec("INSERT INTO memory_restore_probe (value) VALUES ('restored')");
+        $pdo = null;
+
+        $zip = new ZipArchive();
+        $this->assertSame(true, $zip->open($archive, ZipArchive::CREATE | ZipArchive::OVERWRITE));
+        $zip->addFromString('manifest.json', json_encode([
+            'application' => 'Zazu EMP',
+            'format_version' => 1,
+            'database_driver' => 'sqlite',
+            'contents' => ['database'],
+        ], JSON_THROW_ON_ERROR));
+        $zip->addFile($database, 'database.sqlite');
+        $zip->close();
+
+        config([
+            'database.default' => 'sqlite',
+            'database.connections.sqlite.database' => ':memory:',
+        ]);
+        DB::purge('sqlite');
+
+        try {
+            $this->artisan('zazu:restore', [
+                'archive' => $archive,
+                '--force' => true,
+            ])->assertExitCode(0);
+
+            $this->assertSame(':memory:', config('database.connections.sqlite.database'));
+            $this->assertSame([], File::glob(storage_path('app/.zazu-test-restore-*.sqlite')), 'Temporary file-backed targets used for in-memory restore must not leak into later commands or tests.');
+        } finally {
+            DB::purge('sqlite');
+            config([
+                'database.default' => $originalDefault,
+                'database.connections.sqlite.database' => $originalDatabase,
+            ]);
+            DB::purge('sqlite');
+            File::deleteDirectory($root);
+            foreach (File::glob(storage_path('app/.zazu-test-restore-*.sqlite')) as $temporaryDatabase) {
+                File::delete($temporaryDatabase);
+            }
+        }
+    }
+
     private function cleanupSqliteArtifacts(string $database): void
     {
         foreach ([$database, $database.'-wal', $database.'-shm'] as $path) {
