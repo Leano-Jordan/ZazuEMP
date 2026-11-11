@@ -96,6 +96,16 @@ jobs:
           DB_USERNAME: zazu
           DB_PASSWORD: zazu
         run: php artisan migrate --force
+      - name: Exercise real account and workspace registration on PostgreSQL
+        env:
+          APP_ENV: testing
+          DB_CONNECTION: pgsql
+          DB_HOST: 127.0.0.1
+          DB_PORT: 5432
+          DB_DATABASE: zazu_test
+          DB_USERNAME: zazu
+          DB_PASSWORD: zazu
+        run: php artisan test --filter=test_registration_creates_user_business_owner_membership_and_session
 
   offline-browser-acceptance:
     runs-on: ubuntu-latest
