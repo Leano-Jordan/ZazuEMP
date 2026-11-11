@@ -1,3 +1,12 @@
+## Latest execution evidence — 2026-11-11
+
+- Current canonical source head at this checkpoint: `1519a3219572db48eedc2cc3bedd83a3bbab8b33` on `main`.
+- Render Docker build run `43092418612`: **PASS** — Docker image built successfully; no deployment.
+- PostgreSQL CI now includes the real registration acceptance test after migrations. Exact-head Laravel workflow run `43092828074` was still processing when checked; PostgreSQL registration remains **PENDING / UNVERIFIED**.
+- Exact-head Director Contract Lint, PHPMD, Zazu quality, populated upgrade/rollback and Director Health reported **PASS**. Browser smoke and Psalm were still in progress. SonarCloud was skipped and is not counted as a pass.
+- Live Render workspace and runtime logs remain uninspected because workspace selection has not been confirmed. Workspace discovery returned `My Workspace`; no Render resource was changed.
+- No readiness score uplift. Persistent Render registration, backup/restore, rollback, and physical installed-device offline acceptance remain open. V1 remains **NO-GO**.
+
 ## Director execution — persistent Render database support — 2026-11-11
 
 - Current source/control head at implementation: `acad170dc80d5cc35bea974cd393be3520a320ea` on canonical `main`.
