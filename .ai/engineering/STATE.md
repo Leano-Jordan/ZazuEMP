@@ -1957,3 +1957,13 @@ Source review found that authenticated sync pull/acknowledgement accepted arbitr
 - GitHub source/test files re-fetched after writes; structural assertions confirm stdout capture, empty-output/write failure guards, and exact archive payload assertion. PHPUnit, PHP syntax, full CI, a real MySQL dump/restore and operator recovery drill are **UNVERIFIED**. Do not count this as a runtime pass or raise recovery maturity. V1 remains **NO-GO**.
 
 - Regression follow-up: the same MySQL backup integration test now also replaces the fake dump utility with a successful zero-output process and asserts the backup command fails without publishing an archive. Commit: `604475e`. Runtime execution remains unverified.
+
+
+## Helper navigation clearance and restore rollback preservation — 2026-11-11
+
+- Moved the floating Zazu Helper out of the authenticated content/main shell and placed it as a viewport-level sibling after the application shell. This prevents content-column positioning/stacking contexts from making the helper drift over navigation controls; its existing right-edge docking and mobile menu avoidance rules remain intact.
+- Added InterfaceRegressionTest::test_helper_is_portaled_outside_the_application_shell to lock the DOM placement.
+- Extended the fake-MySQL restore integration test to simulate both candidate-import failure and pre-restore rollback failure. It asserts the original private storage is restored and the only pre-restore SQL snapshot is retained and reported for operator recovery rather than deleted with the temporary workspace.
+- Commits: d25f0a6 (helper placement), 627d7e5 (helper regression), a91a6ea (restore rollback preservation regression).
+- GitHub source re-fetch and structural assertions: PASS. Exact-head PHPUnit, browser rendering, CSS/device acceptance and CI status: UNVERIFIED (no status checks reported for the latest test commit at reconciliation).
+- The owner should only need to visually confirm helper placement on desktop and mobile after the next deployed build. No deployment was triggered; deploy/render-staging remains untouched.
