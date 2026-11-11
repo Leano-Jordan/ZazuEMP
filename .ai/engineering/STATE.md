@@ -1955,3 +1955,5 @@ Source review found that authenticated sync pull/acknowledgement accepted arbitr
 - Regression: added a POSIX fake-`mysqldump` integration fixture that runs the real backup command under a MySQL config and inspects the generated ZIP, asserting that the exact multiline SQL stdout is stored in `database.sql` rather than the process exit code. Test skips on Windows because the fake executable uses a POSIX shell.
 - Commits: `19de1d4` source fix; `f2598d9` regression; `7459d1c` fixture formatting correction.
 - GitHub source/test files re-fetched after writes; structural assertions confirm stdout capture, empty-output/write failure guards, and exact archive payload assertion. PHPUnit, PHP syntax, full CI, a real MySQL dump/restore and operator recovery drill are **UNVERIFIED**. Do not count this as a runtime pass or raise recovery maturity. V1 remains **NO-GO**.
+
+- Regression follow-up: the same MySQL backup integration test now also replaces the fake dump utility with a successful zero-output process and asserts the backup command fails without publishing an archive. Commit: `604475e`. Runtime execution remains unverified.
