@@ -1,3 +1,16 @@
+## Director execution — registration on persistent database — 2026-11-11
+
+- Canonical repository/branch: `Leano-Jordan/ZazuEMP` / `main`.
+- Current source head: `1519a3219572db48eedc2cc3bedd83a3bbab8b33`.
+- Corrected Dockerfile build verified by GitHub Actions: Render Docker build run `43092418612` — **PASS** (image build only; no deployment).
+- Added a PostgreSQL CI acceptance step that executes the existing end-to-end account registration test against PostgreSQL after the complete migration set. This exercises user creation, business creation, owner membership, authentication session and dashboard access on the persistent database engine.
+- Workflow commit: `1519a3219572db48eedc2cc3bedd83a3bbab8b33`. Changed workflow re-read from `main`; source reconciliation PASS.
+- Exact-head Laravel workflow run `43092828074`: **IN PROGRESS / PENDING** at this record. PostgreSQL registration result not yet observed. Other exact-head checks are being processed; Director Contract Lint and PHPMD, Zazu quality, populated upgrade/rollback and Director Health have reported PASS. Browser smoke and Psalm remain in progress. SonarCloud is SKIPPED and is not counted as a pass.
+- Render workspace discovery returned one workspace, `My Workspace`. It has not been selected; no Render service, environment, database, disk, branch or deployment was changed. Owner confirmation is required before using that workspace.
+- The live Render workspace registration failure is not yet root-caused. `AuthController::storeRegistration` reports the underlying exception to the application log but returns a generic validation message. A real Render log and persistent-database registration result are still required before changing application behavior.
+- `deploy/render-staging` remains preserved. No new branches were created.
+- Release position remains **NO-GO** until PostgreSQL registration succeeds, persistent hosting is configured and verified, and backup/restore plus installed-device offline acceptance are completed.
+
 ## Director execution — persistent Render database support — 2026-11-11
 
 - Current source/control head at implementation: `acad170dc80d5cc35bea974cd393be3520a320ea` on canonical `main`.
