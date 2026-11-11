@@ -62,10 +62,7 @@ class ZazuBackupRestoreTest extends TestCase
 
             DB::table('backup_probe')->update(['value' => 'changed after backup']);
             File::delete($privateProbe);
-            DB::disconnect('sqlite');
-            DB::purge('sqlite');
-            File::put($database.'-wal', 'pre-restore WAL sidecar');
-            File::put($database.'-shm', 'pre-restore shared-memory sidecar');
+            $this->createSqliteSidecarFixtures($database);
 
             $this->artisan('zazu:restore', [
                 'archive' => $archive,
@@ -74,7 +71,7 @@ class ZazuBackupRestoreTest extends TestCase
 
             DB::purge('sqlite');
 
-            $this->assertSame([], File::glob(storage_path('app/.zazu-database-rollback-*')), 'Successful restore must clean the old database and WAL/SHM rollback artifacts.');
+            $this->assertNoSqliteRollbackArtifacts();
 
             $this->assertSame(
                 'before backup',
@@ -485,6 +482,19 @@ class ZazuBackupRestoreTest extends TestCase
     }
 
 
+
+    private function createSqliteSidecarFixtures(string $database): void
+    {
+        DB::disconnect('sqlite');
+        DB::purge('sqlite');
+        File::put($database.'-wal', 'pre-restore WAL sidecar');
+        File::put($database.'-shm', 'pre-restore shared-memory sidecar');
+    }
+
+    private function assertNoSqliteRollbackArtifacts(): void
+    {
+        $this->assertSame([], File::glob(storage_path('app/.zazu-database-rollback-*')), 'Successful restore must clean the old database and WAL/SHM rollback artifacts.');
+    }
 
     private function assertVersionTwoArchive(ZipArchive $zip): void
     {
