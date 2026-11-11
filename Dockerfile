@@ -1,6 +1,6 @@
-# Zazu EMP — disposable Render preview only.
-# SQLite, sessions, cache and private uploads are stored on the container filesystem.
-# Render free instances have ephemeral storage: never use this image for customer data.
+# Zazu EMP — Docker deployment image.
+# Defaults to a disposable SQLite preview; persistent deployments must configure
+# PostgreSQL and mount durable storage for private uploads/session files.
 FROM node:22-bookworm-slim AS assets
 WORKDIR /app
 COPY package*.json ./
@@ -21,8 +21,8 @@ RUN composer install --no-dev --prefer-dist --no-interaction --no-progress --opt
 
 FROM php:8.4-apache-bookworm
 RUN apt-get update && apt-get install -y --no-install-recommends \
-    libonig-dev libxml2-dev libzip-dev libsqlite3-dev pkg-config \
-    && docker-php-ext-install -j"$(nproc)" mbstring pdo_sqlite xml zip opcache \
+    libonig-dev libxml2-dev libzip-dev libsqlite3-dev libpq-dev pkg-config \
+    && docker-php-ext-install -j"$(nproc)" mbstring pdo_sqlite pdo_pgsql xml zip opcache \
     && a2enmod rewrite headers expires \
     && sed -ri 's!/var/www/html!/var/www/html/public!g' /etc/apache2/sites-available/*.conf \
     && sed -ri 's!/var/www/!/var/www/html/public!g' /etc/apache2/apache2.conf /etc/apache2/conf-available/*.conf \
