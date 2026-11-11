@@ -607,6 +607,7 @@ test.describe('Zazu installed PWA offline shell', () => {
         test.skip(testInfo.project.name !== 'chromium', 'Disconnected logout contract runs once; viewport behaviour is covered elsewhere.');
 
         await login(page);
+        await page.waitForFunction(() => Boolean(window.ZazuOffline?.ready));
         await page.evaluate(async () => {
             await window.ZazuOffline.ready;
             const state = window.ZazuOffline.getState();
