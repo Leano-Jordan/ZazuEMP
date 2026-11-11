@@ -58,6 +58,8 @@ class ZazuRestoreCommand extends Command
         $mysqlRollbackPath = null;
         $mysqlRestoreStarted = false;
         $preserveWork = false;
+        $originalSqliteDatabase = config('database.connections.sqlite.database');
+        $temporaryMemoryTarget = false;
 
         try {
             $zip = new ZipArchive();
@@ -299,6 +301,7 @@ class ZazuRestoreCommand extends Command
                 if ($target === ':memory:') {
                     $target = storage_path('app/.zazu-test-restore-'.Str::ulid().'.sqlite');
                     config(['database.connections.sqlite.database' => $target]);
+                    $temporaryMemoryTarget = true;
                 }
 
                 if (!$target) {
@@ -505,6 +508,10 @@ class ZazuRestoreCommand extends Command
 
             return self::FAILURE;
         } finally {
+            if ($temporaryMemoryTarget) {
+                DB::purge('sqlite');
+                config(['database.connections.sqlite.database' => $originalSqliteDatabase]);
+            }
             if (!$preserveWork) {
                 File::deleteDirectory($work);
             }
