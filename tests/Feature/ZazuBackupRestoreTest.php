@@ -535,6 +535,29 @@ class ZazuBackupRestoreTest extends TestCase
             $this->assertStringContainsString('-- pre-restore snapshot marker', File::get($logDirectory.'/import-2.sql'));
             $this->assertSame('original private data', File::get($privateProbe), 'Private storage must roll back when the database import fails.');
             $this->assertFileDoesNotExist(storage_path('app/private/restored-probe.txt'));
+
+            // A failed rollback must retain the only pre-restore SQL snapshot for
+            // operator recovery instead of deleting the temporary restore workspace.
+            File::delete($countFile);
+            File::put($bin.'/mysql', "#!/bin/sh\\ncat >/dev/null\\necho 'simulated rollback failure' >&2\\nexit 1\\n");
+            chmod($bin.'/mysql', 0755);
+
+            $exitCode = Artisan::call('zazu:restore', [
+                'archive' => $archive,
+                '--force' => true,
+            ]);
+            $rollbackFailureOutput = Artisan::output();
+
+            $this->assertSame(1, $exitCode, $rollbackFailureOutput);
+            $this->assertStringContainsString('automatic rollback was incomplete', $rollbackFailureOutput);
+            $this->assertStringContainsString('Pre-restore MySQL snapshot preserved at:', $rollbackFailureOutput);
+            $this->assertMatchesRegularExpression('/Pre-restore MySQL snapshot preserved at: (.+)/', $rollbackFailureOutput);
+            preg_match('/Pre-restore MySQL snapshot preserved at: (.+)/', $rollbackFailureOutput, $snapshotMatch);
+            $snapshotPath = trim($snapshotMatch[1] ?? '');
+            $this->assertFileExists($snapshotPath);
+            $this->assertSame('-- pre-restore snapshot marker', File::get($snapshotPath));
+            $this->assertSame('original private data', File::get($privateProbe), 'Private storage must still roll back when the database rollback fails.');
+            File::deleteDirectory(dirname($snapshotPath));
         } finally {
             putenv('PATH='.$originalPath);
             if ($originalEnvPath === null) {
