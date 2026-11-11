@@ -312,8 +312,8 @@ class ZazuRestoreCommand extends Command
                 }
 
                 $targetParent = dirname($target);
-                if (is_dir($target) || (file_exists($target) && !is_file($target))) {
-                    $this->error('SQLite restore target must be a regular database file, not a directory or special file.');
+                if (is_link($target) || is_dir($target) || (file_exists($target) && !is_file($target))) {
+                    $this->error('SQLite restore target must be a regular database file, not a symbolic link, directory or special file.');
                     return self::FAILURE;
                 }
 
