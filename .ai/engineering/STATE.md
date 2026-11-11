@@ -1922,3 +1922,25 @@ Source review found that authenticated sync pull/acknowledgement accepted arbitr
 - Re-fetched the committed test and confirmed the new regression is present. The existing suite also covers successful offline image retrieval, private-cache isolation from the shared static cache, and no authenticated cache without a business context.
 - GitHub's available commit-status and PR-workflow endpoints returned no status contexts or workflow runs for this push. Automated execution is therefore **UNVERIFIED**; do not report the new regression as passed until the quality workflow result is observed.
 - No release readiness uplift. V1 remains **NO-GO**. The Render deployment branch was not modified, and no deployment was performed.
+
+
+## Private uploaded-image offline cache correction — 2026-11-11
+
+- Reconciled the active service-worker private-media path against the reported broken uploaded-image behaviour.
+- Root cause: private media interception was gated on `Request.destination === 'image'`. That browser metadata is not reliable for every image-loading path, including CSS background-image requests, so an otherwise valid business-scoped cache could be bypassed and the image request would fail offline.
+- Changed the private-media route matcher to use the authenticated `/media/profile/*` and `/media/business/*` URL boundary, independent of request destination. Private media remains isolated in the active user + business cache; it is not added to the shared static cache.
+- Advanced the service-worker cache generation from `zazu-static-v32` to `zazu-static-v33` so installed clients replace the previous worker generation.
+- Updated the service-worker regression to request a private business image with an empty destination, verify it is cached in the business cache, and verify it remains absent from the shared cache. Updated the Laravel source-contract assertion to v33.
+- Commits: `ad81391` worker; `87cb501` browser-worker regression; `19ca15d` Laravel cache-generation assertion.
+- Source re-fetch and commit integrity: pending final reconciliation. Node service-worker tests, Laravel suite, exact-head CI and installed-phone offline image acceptance have not been run in this environment. Do not claim the user-visible issue is fully verified until the exact-head workflow and physical device sequence pass. V1 remains **NO-GO**.
+
+
+## Private uploaded-image offline cache completion — 2026-11-11
+
+- Extended the private-media correction beyond request interception: installed-page priming now extracts same-origin `/media/profile/*` and `/media/business/*` references from authenticated HTML and fetches them into the active user/business cache before disconnected use.
+- URL extraction covers normal image references and CSS `url(...)` references, deduplicates requests across the priming run, normalizes HTML-escaped query separators, rejects non-local origins and caps prefetch at 60 unique private images per run. Failed image fetches do not block page priming.
+- Private-media fetch interception is route-based rather than dependent on `Request.destination`, so CSS backgrounds and other browser image-loading paths use the same private cache. No private media is placed in the shared static cache.
+- Advanced service-worker generation to `zazu-static-v34` to retire the previous installed worker/cache generation.
+- Added a service-worker regression proving that priming a dashboard caches referenced profile and CSS-background images in the correct business cache, excludes them from the shared cache, and serves both after the host becomes unavailable. Laravel source-contract assertion updated to v34.
+- Commits: `ad81391`, `87cb501`, `19ca15d`, `799da2f`, `c9b347e`, `3b0ac8e`, `a041e07`, `a50e5f1`.
+- Source re-fetch is complete. Node service-worker tests, Laravel suite, exact-head CI and physical installed-phone acceptance remain **UNVERIFIED** in this environment. The 60-image prefetch cap is a bounded safeguard, not proof that every image on every page is available offline. V1 remains **NO-GO**.
