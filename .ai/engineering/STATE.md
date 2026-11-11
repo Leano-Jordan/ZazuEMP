@@ -2,7 +2,7 @@
 
 - Current canonical engineering head: `7609049d8a520a4abb3b0d8d7d0cd2d8b140e49e` on `main`.
 - This head includes the verified offline sync identity correction at `56bb804` and a test-fixture cleanup at `7609049`; no application runtime source changed after the verified sync correction.
-- Exact-head GitHub Actions: Laravel PASS; offline browser acceptance PASS; Zazu quality PASS; Psalm security PASS; PHPMD PASS; populated upgrade/rollback PASS; browser smoke PASS; Director health PASS; push workflow PASS. SonarCloud was SKIPPED and is not counted as a pass.
+- Exact-head GitHub Actions: Laravel PASS — 448 tests / 3,258 assertions; offline browser acceptance PASS — 18 passed; Zazu quality PASS; Psalm security PASS; PHPMD PASS; populated upgrade/rollback PASS; browser smoke PASS; Director health PASS; push workflow PASS. SonarCloud was SKIPPED and is not counted as a pass.
 - Browser smoke run: `43019394866`; Laravel + offline browser acceptance: `43019394816`; quality: `43019394988`; Psalm: `43019394910`; PHPMD: `43019394850`; populated upgrade/rollback: `43019394959`.
 - Render Docker workflow did not run for this test-only head. The latest verified Docker build is run `43015390179` on the preceding application source; it built an image only and did not deploy.
 - No physical installed-device test, customer-environment recovery drill or production deployment is evidenced. V1 remains **NO-GO**. The intentional `deploy/render-staging` branch remains untouched.
