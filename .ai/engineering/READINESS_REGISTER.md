@@ -982,3 +982,8 @@ Commits: `4f4f9f63e617b201fb68ab612ef902805c8e1727`, `a281567ab1c9b384dffe47405d
 - xneelo Cloud Johannesburg is the preferred low-cost hosted pilot shortlist, not yet contracted or provisioned. Indicative 2 vCPU / 4 GB + 10 GB boot + 50 GB NVMe data volume is approximately R306/month at currently published prices. Single availability zone; external/offsite backup and owner-operated server management remain necessary.
 - Retention draft now separates tax records (SARS commonly five years, subject to exceptions) from Companies Act s24 company records (generally seven years for records covered by that section). No blanket five/seven-year retention is imposed on all personal information. Proposed account closure/export, log and backup periods are documented but require legal/accounting review and implementation.
 - Documentation progress only. No compliance certification or launch clearance is claimed. V1 remains **NO-GO**.
+
+
+## Private uploaded-image offline cache correction — 2026-11-11
+
+The service worker previously required `Request.destination === 'image'` before caching private profile/business media. This metadata is not dependable across every image-loading path, notably CSS background images. The private-media route matcher now keys off the authenticated `/media/profile/*` and `/media/business/*` routes instead. Media remains in the active user-and-business cache, never the shared static cache. Cache generation advanced to v33; a worker regression now covers an empty request destination. Commits: `ad81391`, `87cb501`, `19ca15d`. Source committed; automated runtime and physical-device verification remain pending. No readiness uplift; V1 remains **NO-GO**.
