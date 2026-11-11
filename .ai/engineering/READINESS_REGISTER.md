@@ -2,8 +2,8 @@
 
 - Current canonical source head at this checkpoint: `1519a3219572db48eedc2cc3bedd83a3bbab8b33` on `main`.
 - Render Docker build run `43092418612`: **PASS** — Docker image built successfully; no deployment.
-- PostgreSQL CI now includes the real registration acceptance test after migrations. Exact-head Laravel workflow run `43092828074`: **455 tests / 3,299 assertions — PASS**. PostgreSQL full migrations plus real account/workspace registration: **PASS — 1 test / 13 assertions**. Offline-browser acceptance remained in progress at this checkpoint; separate browser-smoke run `43092827911` was cancelled and is not counted as a pass.
-- Exact-head Director Contract Lint, PHPMD, Zazu quality, populated upgrade/rollback and Director Health reported **PASS**. Browser smoke and Psalm were still in progress. SonarCloud was skipped and is not counted as a pass.
+- PostgreSQL CI now includes the real registration acceptance test after migrations. Exact-head Laravel workflow run `43092828074`: **455 tests / 3,299 assertions — PASS**. PostgreSQL full migrations plus real account/workspace registration: **PASS — 1 test / 13 assertions**. Offline-browser acceptance: **PASS — 18 passed**. Separate browser-smoke run `43092827911` was cancelled and is not counted as a pass.
+- Exact-head Director Contract Lint, PHPMD, Zazu quality, populated upgrade/rollback and Director Health reported **PASS**. Psalm: **PASS**. Separate browser smoke was cancelled and is not counted as a pass. SonarCloud was skipped and is not counted as a pass.
 - Live Render workspace and runtime logs remain uninspected because workspace selection has not been confirmed. Workspace discovery returned `My Workspace`; no Render resource was changed.
 - No readiness score uplift. Persistent Render registration, backup/restore, rollback, and physical installed-device offline acceptance remain open. V1 remains **NO-GO**.
 
