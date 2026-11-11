@@ -999,3 +999,12 @@ Private media was previously cached only when its image request naturally passed
 Found and corrected a data-recovery blocker in `ZazuBackupCommand::snapshotMysql()`: Symfony Process `run()` returns an exit code, not stdout. The prior implementation wrote that exit code into `database.sql`, potentially producing a successful-looking but unusable MySQL backup. It now reads `getOutput()`, rejects empty dump output, and verifies the SQL payload was written before archive creation. Added a fake-`mysqldump` integration regression that inspects the resulting ZIP and asserts exact SQL output; fixture uses POSIX shell and skips on Windows. Commits: `19de1d4`, `f2598d9`, `7459d1c`. Source/test re-fetch and structural reconciliation: PASS. PHPUnit, PHP syntax, exact-head CI and real MySQL restore remain **UNVERIFIED**. Recovery maturity unchanged; V1 remains **NO-GO**.
 
 - Regression follow-up commit `604475e` extends the MySQL backup test to prove a zero-exit, empty-stdout dump is rejected and no archive is published. This is test source only; it has not yet been executed.
+
+
+## Helper navigation clearance and MySQL restore rollback failure coverage — 2026-11-11
+
+- Helper placement now sits outside the authenticated application shell, so the floating control is anchored to the viewport instead of being nested in the main content column. Existing far-right docking and mobile navigation avoidance remain unchanged.
+- Added a layout regression for the helper's portal placement.
+- Expanded MySQL restore failure-path coverage: after candidate import fails, the test now forces rollback import failure and verifies that the pre-restore dump survives in the preserved work directory, its path is reported, and original private storage is restored.
+- Commits: d25f0a6, 627d7e5, a91a6ea.
+- Source re-fetch/structural reconciliation: PASS. Exact-head PHPUnit/CI and rendered desktop/mobile acceptance: UNVERIFIED. No readiness score uplift. V1 remains NO-GO.
