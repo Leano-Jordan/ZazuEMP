@@ -56,6 +56,7 @@ class SecurityHeadersTest extends TestCase
             $this->assertDoesNotMatchRegularExpression('/\\sstyle\\s*=/i', $source);
         }
         $this->assertStringContainsString('landing-image--hero', $landing);
+        $this->assertDoesNotMatchRegularExpression('/class="[^"]*"\s+class="/i', $landing);
         $this->assertStringContainsString('--landing-image-hero: url(', $landing);
         $this->assertStringContainsString('zazu-admin-image-preview-{{ $field }}', $adminLanding);
         $this->assertStringContainsString('class="zazu-auth-inline-form"', $recovery);
