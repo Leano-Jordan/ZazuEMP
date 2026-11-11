@@ -10,10 +10,6 @@ use ZipArchive;
 
 class ZazuBackupRecoveryTest extends TestCase
 {
-
-
-
-
     public function test_sqlite_backup_includes_committed_wal_records(): void
     {
         if (!class_exists(ZipArchive::class) || !in_array('sqlite', \PDO::getAvailableDrivers(), true)) {
@@ -83,8 +79,6 @@ class ZazuBackupRecoveryTest extends TestCase
     }
 
     /** @SuppressWarnings(PHPMD.ExcessiveMethodLength) */
-
-
     public function test_mysql_restore_attempts_pre_restore_rollback_after_partial_import_failure(): void
     {
         if (!class_exists(ZipArchive::class)) {
