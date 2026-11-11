@@ -4,6 +4,7 @@ namespace Tests\Feature;
 
 use App\Http\Middleware\ApplySecurityHeaders;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\File;
 use Symfony\Component\HttpFoundation\Response;
 use Tests\TestCase;
 
@@ -23,9 +24,11 @@ class SecurityHeadersTest extends TestCase
         $this->assertStringContainsString("'nonce-{$firstNonce}'", $firstCsp);
         $this->assertStringContainsString("'nonce-{$secondNonce}'", $secondCsp);
         $this->assertStringNotContainsString("script-src 'self' 'unsafe-inline'", $firstCsp);
+        $this->assertStringContainsString("style-src 'self' 'nonce-{$firstNonce}'", $firstCsp);
         $this->assertStringContainsString("style-src-elem 'self' 'nonce-{$firstNonce}'", $firstCsp);
-        $this->assertStringContainsString("style-src-attr 'unsafe-inline'", $firstCsp);
-        $this->assertStringContainsString("style-src 'self' 'unsafe-inline'", $firstCsp);
+        $this->assertStringContainsString("style-src-attr 'none'", $firstCsp);
+        $this->assertStringNotContainsString("style-src-attr 'unsafe-inline'", $firstCsp);
+        $this->assertStringNotContainsString("'unsafe-inline'", $firstCsp);
     }
 
     public function test_inline_style_elements_are_nonce_authorized_in_all_standalone_blade_views(): void
@@ -67,6 +70,37 @@ class SecurityHeadersTest extends TestCase
                 "Inline style block in {$view} must use the response CSP nonce.",
             );
         }
+    }
+
+    public function test_active_blade_views_and_javascript_do_not_require_inline_style_attributes(): void
+    {
+        foreach (File::allFiles(resource_path('views')) as $view) {
+            if (! str_ends_with($view->getFilename(), '.blade.php')) {
+                continue;
+            }
+
+            $source = file_get_contents($view->getPathname());
+            $this->assertIsString($source);
+            $this->assertDoesNotMatchRegularExpression(
+                '/\\sstyle\\s*=/i',
+                $source,
+                "Inline style attribute found in {$view->getRelativePathname()}.",
+            );
+
+            preg_match_all('/<style\\b([^>]*)>/i', $source, $styleBlocks);
+            foreach ($styleBlocks[1] as $attributes) {
+                $this->assertMatchesRegularExpression(
+                    '/\\bnonce\\s*=\\s*["\\']/',
+                    $attributes,
+                    "Inline style block in {$view->getRelativePathname()} must carry a CSP nonce.",
+                );
+            }
+        }
+
+        $appJs = file_get_contents(resource_path('js/app.js'));
+        $this->assertIsString($appJs);
+        $this->assertDoesNotMatchRegularExpression('/\\btoast\\.style\\./', $appJs);
+        $this->assertStringContainsString("toast.classList.add('is-closing')", $appJs);
     }
 
     public function test_secure_production_responses_include_hsts(): void
