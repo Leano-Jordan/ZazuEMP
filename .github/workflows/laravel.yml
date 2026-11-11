@@ -57,6 +57,44 @@ jobs:
         DB_DATABASE: database/database.sqlite
       run: php artisan test
 
+
+  postgres-migration-smoke:
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_DB: zazu_test
+          POSTGRES_USER: zazu
+          POSTGRES_PASSWORD: zazu
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U zazu -d zazu_test"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+    steps:
+      - uses: shivammathur/setup-php@f3e473d116dcccaddc5834248c87452386958240 # v2.37.2
+        with:
+          php-version: '8.4'
+          extensions: pdo_pgsql, mbstring, xml, zip
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - name: Install PHP dependencies
+        run: composer install -q --no-ansi --no-interaction --no-scripts --no-progress --prefer-dist
+      - name: Generate application key
+        run: php artisan key:generate
+      - name: Run complete migration set on PostgreSQL
+        env:
+          DB_CONNECTION: pgsql
+          DB_HOST: 127.0.0.1
+          DB_PORT: 5432
+          DB_DATABASE: zazu_test
+          DB_USERNAME: zazu
+          DB_PASSWORD: zazu
+        run: php artisan migrate --force
+
   offline-browser-acceptance:
     runs-on: ubuntu-latest
     env:
