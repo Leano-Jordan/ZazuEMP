@@ -443,7 +443,7 @@
 <div><div class="eyebrow">Built for event-service businesses</div><h1>Run every event. <em>Stay ahead of the business.</em></h1><p class="hero-copy">From the first enquiry to the final payment, Zazu keeps customers, bookings, quotes, suppliers, equipment, preparation, costs and finance connected to the work—so your team can spend less time chasing details and more time delivering great events.</p><div class="actions">@if(!$isAuthenticated)<button type="button" class="btn primary" data-auth-modal-open="register">Create your workspace <span>→</span></button><button type="button" class="btn" data-auth-modal-open="login">Log in</button>@elseif($hasActiveWorkspace)<span class="account-state">You’re signed in · {{ $business->name }}</span><a class="btn primary" href="{{ route('dashboard') }}">Open workspace <span>→</span></a><form method="POST" action="{{ route('logout') }}" class="topnav-form">@csrf<button type="submit" class="btn">Sign out</button></form>@else<span class="account-state">You’re signed in</span><a class="btn primary" href="{{ route('workspace.recovery') }}">Set up workspace <span>→</span></a><form method="POST" action="{{ route('logout') }}" class="topnav-form">@csrf<button type="submit" class="btn">Sign out</button></form>@endif
 <a class="btn" href="#capabilities">See how it works</a></div><div class="hero-note">SOUTH AFRICAN BUSINESS · EVENTS · CATERING · HIRE · COMMERCIAL · CONTROL</div></div>
 <div class="control-card" aria-label="Live workspace preview">
-<div class="hero-photo hero-photo--hero" role="img" aria-label="South African outdoor catered event with guests and service team" class="landing-image--hero"><span>Real event operations</span></div>
+<div class="hero-photo hero-photo--hero landing-image--hero" role="img" aria-label="South African outdoor catered event with guests and service team"><span>Real event operations</span></div>
 <div class="control-head"><span>ZAZU EMP / WORKSPACE VIEW</span><span class="online"><i></i>WORKSPACE</span></div>
 <div class="telemetry">
 <div><small>All work</small><strong>{{ str_pad((string)$telemetry['all_work'],2,'0',STR_PAD_LEFT) }}</strong></div><div><small>Today</small><strong>{{ str_pad((string)$telemetry['today'],2,'0',STR_PAD_LEFT) }}</strong></div><div><small>Next 7d</small><strong>{{ str_pad((string)$telemetry['next_7_days'],2,'0',STR_PAD_LEFT) }}</strong></div><div><small>In progress</small><strong>{{ str_pad((string)$telemetry['in_progress'],2,'0',STR_PAD_LEFT) }}</strong></div><div><small>Drafts</small><strong>{{ str_pad((string)$telemetry['drafts'],2,'0',STR_PAD_LEFT) }}</strong></div>
@@ -472,31 +472,31 @@
 <section class="section" id="capabilities"><div class="section-head"><div><div class="eyebrow">Made for the work</div><h2>One event. A clear view from enquiry to payment.</h2></div><p class="intro">Keep the moving parts together as the business grows—from customer and quote through preparation, purchasing, costs and finance. Everyone works from the same operational record.</p></div>
 <div class="bento">
 <article class="feature large">
-    <div class="feature-image feature-image--operations" class="landing-image--operations"><span>Catering &amp; service</span></div>
+    <div class="feature-image feature-image--operations landing-image--operations"><span>Catering &amp; service</span></div>
     <span class="num">01 / OPERATIONS</span>
     <h3>Keep the whole booking together.</h3>
     <p>Customer details, event dates, requirements, quotes, preparation and costs stay connected to the job from the first conversation through delivery.</p>
 </article>
 <article class="feature mini">
-    <div class="feature-image feature-image--resources compact" class="landing-image--resources"><span>Sound &amp; event setup</span></div>
+    <div class="feature-image feature-image--resources compact landing-image--resources"><span>Sound &amp; event setup</span></div>
     <span class="num">02 / RESOURCES</span>
     <h3>Know what the event needs.</h3>
     <p>Keep services, equipment, suppliers and purchasing tied to the event, whether you are arranging catering, sound, staging or hire.</p>
 </article>
 <article class="feature mini">
-    <div class="feature-image feature-image--control compact" class="landing-image--control"><span>Event venue</span></div>
+    <div class="feature-image feature-image--control compact landing-image--control"><span>Event venue</span></div>
     <span class="num">03 / CONTROL</span>
     <h3>Keep the commercial picture clear.</h3>
     <p>See invoices, payments, expenses and costs with a direct line back to the event decisions that created them.</p>
 </article>
 <article class="feature mini">
-    <div class="feature-image feature-image--venue compact" class="landing-image--venue"><span>Outdoor event setup</span></div>
+    <div class="feature-image feature-image--venue compact landing-image--venue"><span>Outdoor event setup</span></div>
     <span class="num">04 / PLAN</span>
     <h3>Give every event a visible plan.</h3>
     <p>Keep dates, spaces, setup needs and the next actions visible without making the operator hunt across separate admin tools.</p>
 </article>
 <article class="feature mini">
-    <div class="feature-image feature-image--decor compact" class="landing-image--decor"><span>Decor &amp; presentation</span></div>
+    <div class="feature-image feature-image--decor compact landing-image--decor"><span>Decor &amp; presentation</span></div>
     <span class="num">05 / DELIVERY</span>
     <h3>Make the final setup part of the record.</h3>
     <p>Keep presentation, setup details and service decisions close to the same job instead of splitting them across disconnected notes.</p>
