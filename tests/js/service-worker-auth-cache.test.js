@@ -485,3 +485,59 @@ test('a private image response arriving after a business switch is not cached in
         'switching businesses must remove the previous private cache',
     );
 });
+
+
+test('an active user navigation cancels low-priority page priming', async () => {
+    const primeStarted = deferred();
+    let primeSignal = null;
+    const worker = bootWorker(async (request, init = {}) => {
+        const path = new URL(request.url).pathname;
+
+        if (path === '/reports') {
+            primeSignal = init.signal;
+            primeStarted.resolve();
+
+            return new Promise((resolve, reject) => {
+                const abort = () => reject(new Error('Background page priming was cancelled by a navigation.'));
+                if (init.signal.aborted) {
+                    abort();
+                    return;
+                }
+                init.signal.addEventListener('abort', abort, { once: true });
+            });
+        }
+
+        if (path === '/setup/experience') {
+            return new MockResponse(
+                '<!doctype html><html><body data-zazu-user-id="41" data-zazu-business-id="17"><main>Experience setup</main></body></html>',
+                { headers: { 'content-type': 'text/html; charset=utf-8' } },
+            );
+        }
+
+        return new MockResponse('online');
+    });
+
+    const priming = worker.dispatchMessage({
+        type: 'prime-pages',
+        userId: '41',
+        businessId: '17',
+        routes: ['/reports'],
+    });
+
+    await primeStarted.promise;
+    assert.ok(primeSignal);
+    assert.equal(primeSignal.aborted, false);
+
+    const navigation = worker.dispatchFetch(new worker.Request('/setup/experience', {
+        method: 'GET',
+        mode: 'navigate',
+        headers: { accept: 'text/html' },
+    }));
+
+    const response = await navigation.response;
+    assert.equal(response.ok, true, 'the requested page must win over background cache warming');
+    assert.match(await response.text(), /Experience setup/);
+
+    await Promise.all([priming, navigation.finished()]);
+    assert.equal(primeSignal.aborted, true, 'navigation must cancel the in-flight page-prime request');
+});

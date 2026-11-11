@@ -272,6 +272,7 @@ async function primePages(routes, primeGeneration = activeUserGeneration, primeU
 
     try {
         for (let offset = 0; offset < uniqueRoutes.length; offset += PRIME_CONCURRENCY) {
+            if (controller.signal.aborted) break;
             const batch = uniqueRoutes.slice(offset, offset + PRIME_CONCURRENCY);
             await Promise.all(batch.map(async (path) => {
                 try {
@@ -387,6 +388,11 @@ self.addEventListener('fetch', (event) => {
         && (request.mode === 'navigate' || acceptsHtml);
 
     if (isAppPage) {
+        if (request.mode === 'navigate') {
+            // Real navigation takes priority over background cache warming on constrained hosts.
+            activePrimeController?.abort();
+        }
+
         event.respondWith(
             fetchWithTimeout(request)
                 .then((response) => {
