@@ -1,0 +1,44 @@
+name: Render Docker build
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'Dockerfile'
+      - 'docker/**'
+      - 'composer.json'
+      - 'composer.lock'
+      - 'package.json'
+      - 'package-lock.json'
+      - 'resources/**'
+      - 'public/**'
+      - '.github/workflows/render-docker-build.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: render-docker-build-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build:
+    name: Build preview image (no deployment)
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out main source
+        uses: actions/checkout@v4
+        with:
+          ref: main
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+      - name: Build Docker image
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          file: ./Dockerfile
+          push: false
+          tags: zazu-emp:render-preview-check
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
