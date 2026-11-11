@@ -1,0 +1,44 @@
+# Keep secrets and developer-local state out of Docker build contexts.
+.env
+.env.*
+!.env.example
+.auth.json
+auth.json
+
+# Git metadata and agent/editor state.
+.git
+.github
+.agents
+.ai
+.vscode
+.idea
+.cursor
+.codex
+
+# Dependencies are installed in dedicated build stages.
+node_modules
+vendor
+
+# Local databases, runtime files and customer uploads.
+database/*.sqlite
+database/*.sqlite-*
+storage
+public/storage
+public/hot
+
+# Generated reports, tests and local browser state.
+tests
+test-results
+playwright-report
+blob-report
+playwright/.auth
+playwright/.cache
+.phpunit.cache
+.phpunit.result.cache
+coverage
+build
+dist
+
+# Documentation is not required to build the runtime image.
+docs
+*.md
