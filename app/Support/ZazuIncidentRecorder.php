@@ -1,10 +1,10 @@
 <?php
 
-namespace App\\Support;
+namespace App\Support;
 
-use Illuminate\\Http\\Request;
-use Illuminate\\Support\\Facades\\Log;
-use Illuminate\\Support\\Str;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Str;
 use Throwable;
 
 final class ZazuIncidentRecorder
