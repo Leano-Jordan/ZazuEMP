@@ -384,6 +384,12 @@ test('a private image response arriving after a business switch is not cached in
             imageFetchStarted.resolve();
             return imageResponse.promise;
         }
+        if (url.pathname === '/dashboard') {
+            return new MockResponse(
+                '<!doctype html><html><body data-zazu-user-id="41" data-zazu-business-id="29"><main>Business 29</main></body></html>',
+                { headers: { 'content-type': 'text/html; charset=utf-8' } },
+            );
+        }
         return new MockResponse('online');
     });
 
@@ -404,7 +410,7 @@ test('a private image response arriving after a business switch is not cached in
         type: 'prime-pages',
         userId: '41',
         businessId: '29',
-        routes: [],
+        routes: ['/dashboard'],
     });
 
     imageResponse.resolve(new MockResponse('business-17-image', {
