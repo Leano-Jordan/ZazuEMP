@@ -1976,3 +1976,12 @@ Source review found that authenticated sync pull/acknowledgement accepted arbitr
 - Added a regression test using a valid legacy archive and an in-memory SQLite configuration; it asserts the connection setting is restored and no temporary target remains.
 - Commits: daa0a8a (config restoration), 5221165 (regression), 5fc4ae3 (temporary file cleanup), 6d6a361 (PDO namespace correction).
 - GitHub source re-fetch: PASS. PHPUnit/runtime verification and CI: UNVERIFIED; no local execution environment or status contexts available. V1 remains NO-GO.
+
+
+## Jarvis execution — SQLite WAL backup consistency — 2026-11-11
+
+- Audited the SQLite backup path. It uses SQLite `VACUUM INTO` on the live connection, which is intended to create a consistent standalone snapshot and include committed WAL content.
+- Added `test_sqlite_backup_includes_committed_wal_records` to prove the backup contains a committed row while the source database is in WAL mode and the committed WAL frames have not been checkpointed into the main database file. The test then restores the archive and asserts the row survives.
+- Commits: `574e913` (test), `6957104` (correct PDO namespace in test).
+- Test source re-fetched and reconciled. PHPUnit/runtime and exact-head CI are **UNVERIFIED**; no pass is claimed. No production backup implementation change was necessary because the existing snapshot uses SQLite's online snapshot mechanism rather than copying the live database file.
+- Release remains **NO-GO**. No deployment; `deploy/render-staging` untouched.
