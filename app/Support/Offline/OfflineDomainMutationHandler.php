@@ -1625,7 +1625,17 @@ class OfflineDomainMutationHandler implements SyncMutationHandler
     {
         $record = $mutation->payload['record'] ?? null;
 
-        if (! is_array($record)) {
+        if (is_array($record)) {
+            return $record;
+        }
+
+        // The active browser form queue sends domain fields at the payload
+        // root alongside local_id/server_id. Accept that wire shape as well
+        // as the wrapped record shape used by older sync clients and tests.
+        $record = $mutation->payload;
+        unset($record['local_id'], $record['server_id']);
+
+        if ($record === []) {
             throw ValidationException::withMessages(['payload' => 'A record payload is required for offline application.']);
         }
 
