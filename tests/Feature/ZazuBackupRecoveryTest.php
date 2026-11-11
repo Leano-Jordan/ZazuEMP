@@ -161,7 +161,11 @@ class ZazuBackupRecoveryTest extends TestCase
             // A failed rollback must retain the only pre-restore SQL snapshot for
             // operator recovery instead of deleting the temporary restore workspace.
             File::delete($countFile);
-            File::put($bin.'/mysql', "#!/bin/sh\\ncat >/dev/null\\necho 'simulated rollback failure' >&2\\nexit 1\\n");
+            File::put($bin.'/mysql', "#!/bin/sh\n".
+                'printf "%s\\n" called >> '.escapeshellarg($countFile)."\n".
+                "cat >/dev/null\n".
+                "echo 'simulated rollback failure' >&2\n".
+                "exit 1\n");
             chmod($bin.'/mysql', 0755);
 
             $exitCode = Artisan::call('zazu:restore', [
@@ -172,6 +176,8 @@ class ZazuBackupRecoveryTest extends TestCase
 
             $this->assertSame(1, $exitCode, $rollbackFailureOutput);
             $this->assertStringContainsString('automatic rollback was incomplete', $rollbackFailureOutput);
+            $this->assertSame(2, substr_count(File::get($countFile), 'called'), 'The fake MySQL executable must run for both the failed candidate import and rollback attempt.');
+            $this->assertStringContainsString('simulated rollback failure', $rollbackFailureOutput);
             $this->assertStringContainsString('Pre-restore MySQL snapshot preserved at:', $rollbackFailureOutput);
             $this->assertMatchesRegularExpression('/Pre-restore MySQL snapshot preserved at: (.+)/', $rollbackFailureOutput);
             preg_match('/Pre-restore MySQL snapshot preserved at: (.+)/', $rollbackFailureOutput, $snapshotMatch);
