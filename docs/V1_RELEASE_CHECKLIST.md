@@ -442,3 +442,31 @@ For `6dc7e3c57a4ad770444ce337c128985d0074d02f`:
 - **Not yet proven:** a fresh registration/workspace-creation request after that deployment. No successful registration is claimed.
 - **Data warning:** the image deliberately uses `/tmp/zazu-preview.sqlite` and ephemeral container storage. It is a disposable preview, not a durable staging or production database. Never use it for customer data. A persistent database and durable private-media storage are required before any real pilot.
 - Documentation commits in this cycle did trigger Render auto-deploys because the service is configured for auto-deploy. These were preview rebuilds only; no production service was deployed.
+
+## Exact-head verification update — 2026-11-11 19:11Z
+
+For commit `5719f5254c87cad43f6b74dc6be3af94a3adaf12`, all required automated checks below completed successfully:
+
+- Laravel tests: **PASS**.
+- Offline browser acceptance: **PASS**.
+- Zazu browser smoke: **PASS** (run `43083900984`, browser job `130743341689`).
+- Psalm security: **PASS**.
+- Zazu quality and secret scan: **PASS**.
+- Populated database upgrade: **PASS**.
+- PHPMD: **PASS**.
+- Director Contract Lint: **PASS**.
+- Push workflow: **PASS**.
+
+The Render preview deployment for this commit is **LIVE**. This is a deployment state, not a successful registration/workspace acceptance. The preview remains disposable and non-durable as documented above.
+
+### Remaining release gates (not waived by CI)
+
+- Confirm a real registration and workspace creation after the SQLite permission correction.
+- Replace disposable preview persistence with a supported persistent database and durable private-media storage before any real pilot.
+- Complete backup/restore and deployment rollback drills against that persistent target.
+- Complete physical phone and tablet acceptance.
+- Complete trusted-device/lost-device operational procedure and verify owner revocation on physical devices.
+- Establish production licence issuer/private-key custody and approve the entitlement matrix before feature enforcement.
+- Complete hosting privacy/log retention controls and legal/brand release review.
+
+**Release decision: NO-GO.** Automated source verification is now green; the remaining blockers are deployment/data durability and human operational acceptance, not a reason to expand feature scope.
