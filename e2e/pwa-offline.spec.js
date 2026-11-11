@@ -96,28 +96,28 @@ test.describe('Zazu installed PWA offline shell', () => {
         const queued = await page.evaluate(async () => window.ZazuOffline.pending());
         expect(queued).toHaveLength(1);
         expect(queued[0].entity_type).toBe('customer');
-        expect(queued[0].payload.contact_name).toBe('Mandla Dlamini');
-        expect(queued[0].payload.phone).toBe('0123456789');
-        expect(queued[0].payload.email).toBe('mandla@example.test');
-        expect(queued[0].payload.legal_name).toBe('Mandla Events');
-        expect(queued[0].payload.registration_number).toBe('2026/12345');
-        expect(queued[0].payload.tax_number).toBe('TAX-7788');
-        expect(queued[0].payload.vat_number).toBe('VAT-1122');
-        expect(queued[0].payload.billing_address).toBe('12 Market Street, Pretoria');
-        expect(queued[0].payload.day_contact_name).toBe('Day Coordinator');
-        expect(queued[0].payload.day_contact_phone).toBe('0123456788');
-        expect(queued[0].payload.day_contact_email).toBe('day@example.test');
-        expect(queued[0].payload.night_contact_name).toBe('Night Coordinator');
-        expect(queued[0].payload.night_contact_phone).toBe('0123456787');
-        expect(queued[0].payload.night_contact_email).toBe('night@example.test');
+        expect(queued[0].payload.record.contact_name).toBe('Mandla Dlamini');
+        expect(queued[0].payload.record.phone).toBe('0123456789');
+        expect(queued[0].payload.record.email).toBe('mandla@example.test');
+        expect(queued[0].payload.record.legal_name).toBe('Mandla Events');
+        expect(queued[0].payload.record.registration_number).toBe('2026/12345');
+        expect(queued[0].payload.record.tax_number).toBe('TAX-7788');
+        expect(queued[0].payload.record.vat_number).toBe('VAT-1122');
+        expect(queued[0].payload.record.billing_address).toBe('12 Market Street, Pretoria');
+        expect(queued[0].payload.record.day_contact_name).toBe('Day Coordinator');
+        expect(queued[0].payload.record.day_contact_phone).toBe('0123456788');
+        expect(queued[0].payload.record.day_contact_email).toBe('day@example.test');
+        expect(queued[0].payload.record.night_contact_name).toBe('Night Coordinator');
+        expect(queued[0].payload.record.night_contact_phone).toBe('0123456787');
+        expect(queued[0].payload.record.night_contact_email).toBe('night@example.test');
 
         await page.reload({ waitUntil: 'domcontentloaded' });
         await page.evaluate(() => window.ZazuOffline.ready);
         const restoredQueue = await page.evaluate(async () => window.ZazuOffline.pending());
         expect(restoredQueue).toHaveLength(1);
         expect(restoredQueue[0].id).toBe(queued[0].id);
-        expect(restoredQueue[0].payload.day_contact_name).toBe('Day Coordinator');
-        expect(restoredQueue[0].payload.night_contact_name).toBe('Night Coordinator');
+        expect(restoredQueue[0].payload.record.day_contact_name).toBe('Day Coordinator');
+        expect(restoredQueue[0].payload.record.night_contact_name).toBe('Night Coordinator');
 
         const restoredState = await page.evaluate(() => window.ZazuOffline.getState());
         expect(restoredState.customers.some(customer =>
@@ -208,12 +208,12 @@ test.describe('Zazu installed PWA offline shell', () => {
         const jobMutation = queued.find(item => item.entity_type === 'job');
         expect(customerMutation).toBeTruthy();
         expect(jobMutation).toBeTruthy();
-        expect(jobMutation.payload.customer_local_id).toBe(customerMutation.payload.local_id);
+        expect(jobMutation.payload.record.customer_local_id).toBe(customerMutation.payload.local_id);
         expect(normalWorkPostAttempted).toBe(false);
-        expect(jobMutation.payload.event_type).toBe('Wedding');
-        expect(jobMutation.payload.event_date).toBe('2026-11-15');
-        expect(jobMutation.payload.event_address).toBe('Pretoria');
-        expect(jobMutation.payload.services).toEqual(['Catering']);
+        expect(jobMutation.payload.record.event_type).toBe('Wedding');
+        expect(jobMutation.payload.record.event_date).toBe('2026-11-15');
+        expect(jobMutation.payload.record.event_address).toBe('Pretoria');
+        expect(jobMutation.payload.record.services).toEqual(['Catering']);
     });
 
     test('migrates legacy offline data only into its matching business workspace', async ({ page }) => {
@@ -1249,7 +1249,7 @@ test.describe('Zazu installed PWA offline shell', () => {
         const queued = await page.evaluate(async () => window.ZazuOffline.pending());
         expect(queued).toHaveLength(1);
         expect(queued[0].entity_type).toBe('customer');
-        expect(queued[0].payload.name).toBe('True offline acceptance customer');
+        expect(queued[0].payload.record.name).toBe('True offline acceptance customer');
 
         await page.reload({ waitUntil: 'domcontentloaded' });
         await page.evaluate(() => window.ZazuOffline.ready);
