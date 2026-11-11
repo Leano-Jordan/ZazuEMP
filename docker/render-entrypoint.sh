@@ -25,6 +25,7 @@ mkdir -p storage/framework/cache/data storage/framework/sessions storage/framewo
 touch "$DB_DATABASE"
 chown -R www-data:www-data storage bootstrap/cache
 php artisan config:clear
+php artisan package:discover --ansi
 php artisan migrate --force
 php artisan storage:link || true
 php artisan config:cache
