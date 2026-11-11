@@ -420,7 +420,7 @@ class ZazuBackupRestoreTest extends TestCase
         if (PHP_OS_FAMILY === 'Windows' || !function_exists('symlink')) {
             $this->markTestSkipped('This regression requires POSIX symbolic-link support.');
         }
-        if (!class_exists(ZipArchive::class) || !in_array('sqlite', \\PDO::getAvailableDrivers(), true)) {
+        if (!class_exists(ZipArchive::class) || !in_array('sqlite', \PDO::getAvailableDrivers(), true)) {
             $this->markTestSkipped('PHP Zip and SQLite extensions are required for restore tests.');
         }
 
@@ -437,12 +437,12 @@ class ZazuBackupRestoreTest extends TestCase
         File::ensureDirectoryExists($root);
         File::ensureDirectoryExists(dirname($privateProbe));
 
-        $protectedPdo = new \\PDO('sqlite:'.$protected);
+        $protectedPdo = new \PDO('sqlite:'.$protected);
         $protectedPdo->exec('CREATE TABLE protected_probe (id INTEGER PRIMARY KEY, value TEXT)');
         $protectedPdo->exec("INSERT INTO protected_probe (value) VALUES ('must remain untouched')");
         $protectedPdo = null;
 
-        $candidatePdo = new \\PDO('sqlite:'.$candidate);
+        $candidatePdo = new \PDO('sqlite:'.$candidate);
         $candidatePdo->exec('CREATE TABLE candidate_probe (id INTEGER PRIMARY KEY, value TEXT)');
         $candidatePdo->exec("INSERT INTO candidate_probe (value) VALUES ('candidate restore')");
         $candidatePdo = null;
@@ -476,7 +476,7 @@ class ZazuBackupRestoreTest extends TestCase
             $this->assertTrue(is_link($targetLink), 'Restore must not replace or follow the configured symbolic link.');
             $this->assertSame(
                 'must remain untouched',
-                (new \\PDO('sqlite:'.$protected))->query('SELECT value FROM protected_probe')->fetchColumn(),
+                (new \PDO('sqlite:'.$protected))->query('SELECT value FROM protected_probe')->fetchColumn(),
             );
             $this->assertSame('original private data must survive', File::get($privateProbe));
         } finally {
