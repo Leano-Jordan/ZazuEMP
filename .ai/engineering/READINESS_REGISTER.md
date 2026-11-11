@@ -1016,3 +1016,12 @@ Found and corrected a data-recovery blocker in `ZazuBackupCommand::snapshotMysql
 - Added regression coverage for a successful restore from a valid legacy archive under an in-memory connection; asserts config restoration and no temporary database artifact remains.
 - Commits: daa0a8a, 5221165, 5fc4ae3, 6d6a361.
 - Source reconciliation: PASS. Automated execution and CI: UNVERIFIED. No readiness uplift; V1 remains NO-GO.
+
+
+## SQLite WAL backup consistency regression — 2026-11-11
+
+- Added a regression that creates committed SQLite data in WAL mode, confirms WAL frames remain pending, creates a Zazu backup, changes the source record, restores the backup and verifies the original committed value returns.
+- This specifically exercises the existing `VACUUM INTO` snapshot path against committed-but-not-checkpointed WAL data; it does not alter the backup implementation.
+- Commits: `574e913`, `6957104`.
+- Source re-read: PASS. PHPUnit and exact-head CI: **UNVERIFIED**. Do not count as runtime proof or increase release maturity until the test executes.
+- V1 remains **NO-GO**; physical device, real operator recovery, deployment rollback, privacy/legal, brand and production licensing gates remain open.
