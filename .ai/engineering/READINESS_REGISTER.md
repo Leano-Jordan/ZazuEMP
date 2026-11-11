@@ -1025,3 +1025,12 @@ Found and corrected a data-recovery blocker in `ZazuBackupCommand::snapshotMysql
 - Commits: `574e913`, `6957104`.
 - Source re-read: PASS. PHPUnit and exact-head CI: **UNVERIFIED**. Do not count as runtime proof or increase release maturity until the test executes.
 - V1 remains **NO-GO**; physical device, real operator recovery, deployment rollback, privacy/legal, brand and production licensing gates remain open.
+
+
+## SQLite restore destination preflight — 2026-11-11
+
+- Added a pre-mutation guard that rejects a directory/special-file SQLite destination and requires its parent directory to exist and be writable.
+- Added regression coverage proving a directory configured as the database target is rejected without moving a candidate database into it or changing existing private storage.
+- Commits: `af84b59`, `968f5a6`, `59e1e73`.
+- Source reconciliation: PASS. PHPUnit and exact-head CI: **UNVERIFIED**; readiness is not increased.
+- V1 remains **NO-GO**.
