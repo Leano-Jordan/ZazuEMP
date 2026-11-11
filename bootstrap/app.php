@@ -1,14 +1,14 @@
 <?php
 
-use App\Support\ZazuErrorCatalog;
-use App\Support\ZazuIncidentRecorder;
-use Illuminate\Foundation\Application;
-use Illuminate\Foundation\Configuration\Exceptions;
-use Illuminate\Foundation\Configuration\Middleware;
-use Illuminate\Http\Request;
-use Illuminate\Http\Exceptions\ThrottleRequestsException;
-use Illuminate\Support\Str;
-use Symfony\Component\HttpFoundation\Response;
+use App\\Support\\ZazuErrorCatalog;
+use App\\Support\\ZazuIncidentRecorder;
+use Illuminate\\Foundation\\Application;
+use Illuminate\\Foundation\\Configuration\\Exceptions;
+use Illuminate\\Foundation\\Configuration\\Middleware;
+use Illuminate\\Http\\Request;
+use Illuminate\\Http\\Exceptions\\ThrottleRequestsException;
+use Illuminate\\Support\\Str;
+use Symfony\\Component\\HttpFoundation\\Response;
 
 return Application::configure(basePath: dirname(__DIR__))
     ->withRouting(
@@ -24,15 +24,15 @@ return Application::configure(basePath: dirname(__DIR__))
         // The local Caddy HTTPS proxy is the only trusted development proxy.
         // Never trust forwarded scheme/host headers from LAN clients directly.
         $middleware->trustProxies(at: ['127.0.0.1', '::1']);
-        $middleware->appendToGroup('web', \App\Http\Middleware\AttachRequestId::class);
-        $middleware->appendToGroup('web', \App\Http\Middleware\ApplySecurityHeaders::class);
-        $middleware->appendToGroup('api', \App\Http\Middleware\AttachRequestId::class);
-        $middleware->appendToGroup('api', \App\Http\Middleware\ApplySecurityHeaders::class);
+        $middleware->appendToGroup('web', \\App\\Http\\Middleware\\AttachRequestId::class);
+        $middleware->appendToGroup('web', \\App\\Http\\Middleware\\ApplySecurityHeaders::class);
+        $middleware->appendToGroup('api', \\App\\Http\\Middleware\\AttachRequestId::class);
+        $middleware->appendToGroup('api', \\App\\Http\\Middleware\\ApplySecurityHeaders::class);
         $middleware->alias([
-            'owner' => \App\Http\Middleware\EnsureBusinessOwner::class,
-            'platform.admin' => \App\Http\Middleware\EnsurePlatformAdmin::class,
-            'business.context' => \App\Http\Middleware\EnsureActiveBusinessContext::class,
-            'permission' => \App\Http\Middleware\EnsureBusinessPermission::class,
+            'owner' => \\App\\Http\\Middleware\\EnsureBusinessOwner::class,
+            'platform.admin' => \\App\\Http\\Middleware\\EnsurePlatformAdmin::class,
+            'business.context' => \\App\\Http\\Middleware\\EnsureActiveBusinessContext::class,
+            'permission' => \\App\\Http\\Middleware\\EnsureBusinessPermission::class,
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {
@@ -40,8 +40,13 @@ return Application::configure(basePath: dirname(__DIR__))
             fn (Request $request) => $request->is('api/*') || $request->expectsJson(),
         );
 
-        $exceptions->reportable(function (Throwable $exception): void {
+        // ZazuIncidentRecorder is the authoritative application incident logger.
+        // Returning false prevents Laravel's default exception logger from also
+        // writing raw exception messages, SQL and bindings to the same log stream.
+        $exceptions->reportable(function (Throwable $exception): bool {
             ZazuIncidentRecorder::record($exception);
+
+            return false;
         });
 
         $exceptions->render(function (ThrottleRequestsException $exception, Request $request) {
