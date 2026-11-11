@@ -123,7 +123,7 @@ class ZazuBackupRestoreTest extends TestCase
         $bin = $root.'/bin';
         $output = $root.'/backups';
         $dumpScript = $bin.'/mysqldump';
-        $expectedDump = "-- Zazu MySQL dump fixture\nCREATE TABLE backup_probe (id INT);\n";
+        $expectedDump = "-- Zazu MySQL dump fixture\nCREATE TABLE backup_probe (id INT);";
         $originalDefault = config('database.default');
         $originalMysql = config('database.connections.mysql');
         $originalPath = getenv('PATH') ?: '';
@@ -132,7 +132,7 @@ class ZazuBackupRestoreTest extends TestCase
 
         File::deleteDirectory($root);
         File::ensureDirectoryExists($bin);
-        File::put($dumpScript, "#!/bin/sh\nprintf '%s' '".str_replace("\n", "\\n", trim($expectedDump))."'\n");
+        File::put($dumpScript, "#!/bin/sh\nprintf '%b' '".str_replace("\n", "\\n", $expectedDump)."'\n");
         chmod($dumpScript, 0755);
 
         putenv('PATH='.$bin.PATH_SEPARATOR.$originalPath);
