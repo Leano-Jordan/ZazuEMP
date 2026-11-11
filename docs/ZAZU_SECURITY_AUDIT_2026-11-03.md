@@ -27,7 +27,7 @@ The main offline security boundary is **owner-approved trusted-device access**, 
 | ZAZU-SEC-04 | Low | API requests were outside the web-only request-ID and security-header middleware. | Fixed in this audit; feature regression added |
 | ZAZU-SEC-05 | Medium | CSP script policy required inline nonces; inline styles remain permitted. | Partially fixed — nonce-based script policy in source; style policy and browser acceptance remain open |
 | ZAZU-SEC-06 | Medium | Trusted sync-device credentials use a rolling inactivity expiry; rotation is not automatic. | Implemented in source — 180-day rolling inactivity expiry and owner revocation; physical lost-device acceptance remains open |
-| ZAZU-SEC-07 | Medium | Incident logs retain exception messages, stack traces and SQL text. | Open — verify log access, retention and sensitive-field redaction |
+| ZAZU-SEC-07 | Medium | Incident logs retained exception messages, stack traces and SQL text. | FIXED IN SOURCE — redacted incident logger is authoritative; hosting log access/retention review remains operational |
 | ZAZU-SEC-08 | Medium | Main is protected but currently has no required status-check contexts. | Owner action — require quality and security checks |
 | ZAZU-SEC-09 | Not assessed | GitHub code-scanning, Dependabot and secret-scanning alert endpoints were not readable through the available connector. | Verify in GitHub Security tab; no clean result is claimed |
 
@@ -78,6 +78,18 @@ The raw device token is generated with high entropy and only its SHA-256 hash is
 ### ZAZU-SEC-07 — Incident-log sensitivity (Medium / open)
 
 The incident recorder logs exception text, stack trace, file/line and SQL text for database exceptions. These are useful diagnostics but may carry business or personal data. Restrict log access, confirm vendor retention and export controls, and redact credentials, bearer tokens and sensitive SQL bindings before production use.
+
+### ZAZU-SEC-07 — Incident-log sensitivity (fixed in source; operational controls remain open)
+
+The application incident logger now records only bounded diagnostic metadata: error code/category/severity, HTTP status, request ID, route/method/path, exception class and source file/line. It no longer persists raw exception messages, SQL statements, bindings or stack traces, which can contain customer data or credentials. The fallback logger also omits exception messages.
+
+The exception report callback returns `false` after invoking `ZazuIncidentRecorder`, preventing Laravel's default exception logger from duplicating raw exception details into the same application log stream. The redacted Zazu incident logger is therefore the authoritative application exception log path.
+
+A regression test injects a unique customer-data marker into a `QueryException` and asserts that the incident context excludes the marker, SQL text, query payload and trace.
+
+**Exact-head verification:** commit `4ba9446a97744b95795a45614f53cff2fdc148c6`. Laravel test job: **455 passed / 3,299 assertions**; Zazu quality + secret scan: PASS; Psalm Security: PASS; PHPMD: PASS; populated upgrade/rollback: PASS. Full browser smoke and the Laravel workflow's offline-browser acceptance job were still running at the time of this update. Do not infer a full workflow pass from the completed test job alone.
+
+**Still open:** hosting-provider log access permissions, retention period, export controls and incident evidence handling require an operational review on the selected paid production host. This source change does not close those provider/organisational controls.
 
 ### ZAZU-SEC-08 — Branch protection (Medium / owner action)
 
