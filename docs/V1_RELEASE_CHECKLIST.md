@@ -356,3 +356,14 @@ The earlier licensing note saying owner activation/status UI remained outstandin
 **Still open:** production issuer and private-key custody; installation identity/reactivation; application-wide plan/feature enforcement; exact-current-HEAD CI confirmation. This is an activation/import flow, not yet a complete commercial licensing system.
 
 The recorded 422 passing Laravel tests / 2,985 assertions are tied to commit `b9fc97d`; do not report them as current-HEAD results without a matching run. No physical-device, deployment, recovery, privacy or brand gate is closed by this correction.
+
+
+## Jarvis implementation update — Docker preview context hardening — 2026-11-11
+
+- Added `.dockerignore` to keep local environment files, developer state, SQLite files, runtime storage/private uploads, dependencies and test artifacts out of Docker build contexts.
+- Added `.dockerignore` to the Render preview image workflow path filter so changes to build-context rules are validated by a fresh image build.
+- Commits: `74196d7` and `934ada1`.
+- Both changed files were re-fetched from `main` and checked.
+- Exact-head CI and Docker build for the hardened context are pending. The previous Docker build was still running against `566ace3` and does not verify this change.
+- Application source is unchanged. No evidence score uplift; V1 remains **NO-GO**.
+
