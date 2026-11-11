@@ -110,6 +110,76 @@ class ZazuBackupRestoreTest extends TestCase
 
 
 
+    public function test_mysql_backup_archives_the_dump_output_not_the_process_exit_code(): void
+    {
+        if (!class_exists(ZipArchive::class)) {
+            $this->markTestSkipped('PHP Zip extension is required for backup tests.');
+        }
+        if (PHP_OS_FAMILY === 'Windows') {
+            $this->markTestSkipped('The fake mysqldump executable fixture requires a POSIX shell.');
+        }
+
+        $root = storage_path('app/zazu-mysql-backup-test');
+        $bin = $root.'/bin';
+        $output = $root.'/backups';
+        $dumpScript = $bin.'/mysqldump';
+        $expectedDump = "-- Zazu MySQL dump fixture\nCREATE TABLE backup_probe (id INT);\n";
+        $originalDefault = config('database.default');
+        $originalMysql = config('database.connections.mysql');
+        $originalPath = getenv('PATH') ?: '';
+        $originalServerPath = $_SERVER['PATH'] ?? null;
+        $originalEnvPath = $_ENV['PATH'] ?? null;
+
+        File::deleteDirectory($root);
+        File::ensureDirectoryExists($bin);
+        File::put($dumpScript, "#!/bin/sh\nprintf '%s' '".str_replace("\n", "\\n", trim($expectedDump))."'\n");
+        chmod($dumpScript, 0755);
+
+        putenv('PATH='.$bin.PATH_SEPARATOR.$originalPath);
+        $_SERVER['PATH'] = $bin.PATH_SEPARATOR.$originalPath;
+        $_ENV['PATH'] = $bin.PATH_SEPARATOR.$originalPath;
+
+        config([
+            'database.default' => 'mysql',
+            'database.connections.mysql.host' => '127.0.0.1',
+            'database.connections.mysql.port' => '3306',
+            'database.connections.mysql.username' => 'zazu-test',
+            'database.connections.mysql.password' => 'test-password',
+            'database.connections.mysql.database' => 'zazu_test',
+        ]);
+
+        try {
+            $this->artisan('zazu:backup', ['--output' => $output])
+                ->assertExitCode(0);
+
+            $archives = File::glob($output.DIRECTORY_SEPARATOR.'zazu-backup-*.zip');
+            $this->assertCount(1, $archives);
+
+            $zip = new ZipArchive();
+            $this->assertSame(true, $zip->open($archives[0]));
+            $this->assertSame($expectedDump, $zip->getFromName('database.sql'));
+            $this->assertNotSame('0', trim((string) $zip->getFromName('database.sql')));
+            $zip->close();
+        } finally {
+            config([
+                'database.default' => $originalDefault,
+                'database.connections.mysql' => $originalMysql,
+            ]);
+            putenv('PATH='.$originalPath);
+            if ($originalServerPath === null) {
+                unset($_SERVER['PATH']);
+            } else {
+                $_SERVER['PATH'] = $originalServerPath;
+            }
+            if ($originalEnvPath === null) {
+                unset($_ENV['PATH']);
+            } else {
+                $_ENV['PATH'] = $originalEnvPath;
+            }
+            File::deleteDirectory($root);
+        }
+    }
+
     public function test_backup_fails_without_publishing_an_archive_when_private_storage_copy_fails(): void
     {
         if (!class_exists(ZipArchive::class)) {
