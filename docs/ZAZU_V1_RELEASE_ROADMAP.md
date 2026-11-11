@@ -702,3 +702,13 @@ Source/test additions are not runtime proof. No score uplift is awarded and V1 r
 
 ### Director disposition
 **Implemented; verification pending.** No score uplift. Keep V1 **NO-GO**. Next: confirm the exact-head Docker build and full CI batch, then continue with the highest-risk remaining release gate.
+
+## Jarvis execution — 2026-11-11 — Director CI noise reduction
+
+- Finding: Director health reporting was triggered on every main push (except `docs/health/**`) and separately after completion of six CI workflows. One source commit could therefore queue many duplicate health-report runs.
+- Changed `.github/workflows/roscore-director-health.yml`: push reporting is now limited to engineering/source/configuration/CI control paths; the completion trigger now listens only to the Zazu browser smoke workflow, which is the final/slow acceptance signal in the required batch.
+- This preserves an early push snapshot and a post-browser final evidence snapshot while avoiding six near-identical post-check reports.
+- Commit: `224ddadf3cb6a711fe8475e8f46d57d7fae54541`.
+- Docker image build with the new `.dockerignore` passed on the prior preview-build run. It builds only; no deployment occurred.
+- A fresh exact-head CI batch has been queued for the workflow change. Browser smoke on the previous documentation head was still running at last inspection; do not claim it passed.
+- No application source changed and no score uplift is claimed. V1 remains **NO-GO**.
