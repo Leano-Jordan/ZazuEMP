@@ -1,4 +1,5 @@
 import { test, expect } from '@playwright/test';
+import { randomUUID } from 'node:crypto';
 
 const DEMO_EMAIL = process.env.ZAZU_DEMO_EMAIL || 'demo@zazu.local';
 const DEMO_PASSWORD = process.env.ZAZU_DEMO_PASSWORD || 'password';
@@ -13,6 +14,9 @@ async function login(page) {
 }
 
 test('real Zazu job form can create a job locally while disconnected', async ({ page }) => {
+    const runId = randomUUID().slice(0, 8);
+    const customerName = `Offline test customer ${runId}`;
+    const jobName = `Offline catering job ${runId}`;
     await login(page);
     await page.goto('/dashboard', { waitUntil: 'domcontentloaded' });
     await expect(page.getByRole('heading', { name: 'Dashboard' })).toBeVisible();
@@ -35,7 +39,7 @@ test('real Zazu job form can create a job locally while disconnected', async ({ 
     await page.goto('/customers/create', { waitUntil: 'domcontentloaded' });
     const customerForm = page.locator('form[data-zazu-offline-entity="customer"]');
     await expect(customerForm).toBeVisible();
-    await customerForm.locator('input[name="name"]').fill('Offline test customer');
+    await customerForm.locator('input[name="name"]').fill(customerName);
     await customerForm.locator('input[name="primary_contact_name"]').fill('Offline test contact');
     await customerForm.locator('input[name="primary_contact_phone"]').fill('0123456789');
     await customerForm.getByRole('button', { name: 'Save customer' }).click();
@@ -44,19 +48,19 @@ test('real Zazu job form can create a job locally while disconnected', async ({ 
     await expect(customerForm.getByRole('button', { name: 'Saved locally' })).toBeDisabled();
 
     const customerLocalId = await page.evaluate(() => {
-        const customer = window.ZazuOffline?.getState()?.customers?.find(item => item.name === 'Offline test customer');
+        const customer = window.ZazuOffline?.getState()?.customers?.find(item => item.name === customerName);
         return customer?.local_id || null;
     });
     expect(customerLocalId).toBeTruthy();
     const customerQueue = await page.evaluate(async () => await window.ZazuOffline?.pending());
-    expect(customerQueue.some((mutation) => mutation.entity_type === 'customer' && mutation.payload?.record?.name === 'Offline test customer')).toBe(true);
+    expect(customerQueue.some((mutation) => mutation.entity_type === 'customer' && mutation.payload?.record?.name === customerName)).toBe(true);
 
     await page.goto('/customers', { waitUntil: 'domcontentloaded' });
-    await expect(page.locator('[data-zazu-local-record="customer"]').filter({ hasText: 'Offline test customer' })).toBeVisible();
+    await expect(page.locator('[data-zazu-local-record="customer"]').filter({ hasText: customerName })).toBeVisible();
 
     await page.goto('/work/create', { waitUntil: 'domcontentloaded' });
     await expect(page.locator('#new-job-form')).toBeVisible();
-    const customerOption = page.locator('#customer_id option').filter({ hasText: 'Offline test customer' });
+    const customerOption = page.locator('#customer_id option').filter({ hasText: customerName });
     await expect(customerOption).toHaveCount(1);
     await page.locator('#customer_id').selectOption('local:' + customerLocalId);
 
@@ -67,7 +71,7 @@ test('real Zazu job form can create a job locally while disconnected', async ({ 
     await cateringChoice.click();
     await expect(eventTypeChoice.locator('input[name="event_type"]')).toBeChecked();
     await expect(cateringChoice.locator('input[name="services[]"]')).toBeChecked();
-    await page.locator('#new-job-form input[name="name"]').fill('Offline catering job');
+    await page.locator('#new-job-form input[name="name"]').fill(jobName);
     // The production form requires a job date; without it the browser blocks
     // submission before the offline handler can run.
     await page.locator('#new-job-form input[name="event_date"]').fill('2026-11-15');
@@ -79,31 +83,31 @@ test('real Zazu job form can create a job locally while disconnected', async ({ 
     await expect(page.locator('#new-job-form button[type="submit"]')).toHaveText('Saved locally');
 
     const state = await page.evaluate(() => window.ZazuOffline?.getState()?.jobs || []);
-    expect(state.some((job) => job.name === 'Offline catering job' && job.local_id)).toBe(true);
+    expect(state.some((job) => job.name === jobName && job.local_id)).toBe(true);
     const queued = await page.evaluate(async () => await window.ZazuOffline?.pending());
-    expect(queued.some((mutation) => mutation.entity_type === 'job' && mutation.payload?.record?.name === 'Offline catering job')).toBe(true);
+    expect(queued.some((mutation) => mutation.entity_type === 'job' && mutation.payload?.record?.name === jobName)).toBe(true);
 
     // A reload while disconnected must recover the same locally persisted job.
     await page.reload({ waitUntil: 'domcontentloaded' });
     await page.waitForFunction(() => Boolean(window.ZazuOffline?.ready));
     await page.evaluate(() => window.ZazuOffline.ready);
     const persisted = await page.evaluate(() => window.ZazuOffline?.getState()?.jobs || []);
-    expect(persisted.some((job) => job.name === 'Offline catering job' && job.local_id)).toBe(true);
+    expect(persisted.some((job) => job.name === jobName && job.local_id)).toBe(true);
     const persistedQueue = await page.evaluate(async () => await window.ZazuOffline?.pending());
-    expect(persistedQueue.some((mutation) => mutation.entity_type === 'job' && mutation.payload?.record?.name === 'Offline catering job')).toBe(true);
-    const persistedCustomer = await page.evaluate(() => window.ZazuOffline?.getState()?.customers?.find(customer => customer.name === 'Offline test customer') || null);
+    expect(persistedQueue.some((mutation) => mutation.entity_type === 'job' && mutation.payload?.record?.name === jobName)).toBe(true);
+    const persistedCustomer = await page.evaluate(() => window.ZazuOffline?.getState()?.customers?.find(customer => customer.name === customerName) || null);
     expect(persistedCustomer).toBeTruthy();
 
     // Offline records must be visible in the normal operating directories,
     // not merely present in IndexedDB.
     await page.goto('/work', { waitUntil: 'domcontentloaded' });
-    await expect(page.locator('[data-zazu-local-record="job"]').filter({ hasText: 'Offline catering job' })).toHaveCount(1);
-    await expect(page.locator('[data-zazu-local-record="job"]').filter({ hasText: 'Offline catering job' })).toBeVisible();
-    await expect(page.locator('[data-zazu-local-record="job"]').filter({ hasText: 'Offline test customer' })).toHaveCount(1);
+    await expect(page.locator('[data-zazu-local-record="job"]').filter({ hasText: jobName })).toHaveCount(1);
+    await expect(page.locator('[data-zazu-local-record="job"]').filter({ hasText: jobName })).toBeVisible();
+    await expect(page.locator('[data-zazu-local-record="job"]').filter({ hasText: customerName })).toHaveCount(1);
 
     await page.goto('/customers', { waitUntil: 'domcontentloaded' });
-    await expect(page.locator('[data-zazu-local-record="customer"]').filter({ hasText: 'Offline test customer' })).toHaveCount(1);
-    await expect(page.locator('[data-zazu-local-record="customer"]').filter({ hasText: 'Offline test customer' })).toBeVisible();
+    await expect(page.locator('[data-zazu-local-record="customer"]').filter({ hasText: customerName })).toHaveCount(1);
+    await expect(page.locator('[data-zazu-local-record="customer"]').filter({ hasText: customerName })).toBeVisible();
 
     // Prove the queued customer and job reach the real Laravel database after
     // reconnect, not merely that the browser can retain them in IndexedDB.
@@ -129,10 +133,12 @@ test('real Zazu job form can create a job locally while disconnected', async ({ 
             job: state?.jobs?.find(item => item.name === jobName) || null,
             conflicts: state?.conflicts || [],
         };
-    }, { customerLocalId, jobName: 'Offline catering job' });
+    }, { customerLocalId, jobName: jobName });
 
     expect(syncedState.customer?.server_id).toBeGreaterThan(0);
+    expect(syncedState.customer?.id).toBe(syncedState.customer?.server_id);
     expect(syncedState.job?.server_id).toBeGreaterThan(0);
+    expect(syncedState.job?.id).toBe(syncedState.job?.server_id);
     expect(syncedState.conflicts.some(conflict =>
         conflict.entity_id === customerLocalId
         || conflict.entity_id === syncedState.job?.local_id
@@ -140,9 +146,9 @@ test('real Zazu job form can create a job locally while disconnected', async ({ 
 
     const serverWork = await page.request.get('/work/' + syncedState.job.server_id);
     expect(serverWork.ok()).toBe(true);
-    expect(await serverWork.text()).toContain('Offline catering job');
+    expect(await serverWork.text()).toContain(jobName);
 
     const serverCustomers = await page.request.get('/customers');
     expect(serverCustomers.ok()).toBe(true);
-    expect(await serverCustomers.text()).toContain('Offline test customer');
+    expect(await serverCustomers.text()).toContain(customerName);
 });
