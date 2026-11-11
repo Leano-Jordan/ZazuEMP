@@ -310,6 +310,17 @@ class ZazuRestoreCommand extends Command
                     $this->error('SQLite restore target is unavailable.');
                     return self::FAILURE;
                 }
+
+                $targetParent = dirname($target);
+                if (is_dir($target) || (file_exists($target) && !is_file($target))) {
+                    $this->error('SQLite restore target must be a regular database file, not a directory or special file.');
+                    return self::FAILURE;
+                }
+
+                if (!is_dir($targetParent) || !is_writable($targetParent)) {
+                    $this->error('SQLite restore target directory must exist and be writable before restore can begin.');
+                    return self::FAILURE;
+                }
             } elseif ($driver === 'mysql') {
                 $sql = $work.'/database.sql';
 
