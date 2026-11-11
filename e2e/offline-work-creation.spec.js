@@ -47,10 +47,10 @@ test('real Zazu job form can create a job locally while disconnected', async ({ 
     await expect(customerForm.getByText('Saved on this device. It will sync automatically when Zazu reconnects.')).toBeVisible();
     await expect(customerForm.getByRole('button', { name: 'Saved locally' })).toBeDisabled();
 
-    const customerLocalId = await page.evaluate(() => {
-        const customer = window.ZazuOffline?.getState()?.customers?.find(item => item.name === customerName);
+    const customerLocalId = await page.evaluate((name) => {
+        const customer = window.ZazuOffline?.getState()?.customers?.find(item => item.name === name);
         return customer?.local_id || null;
-    });
+    }, customerName);
     expect(customerLocalId).toBeTruthy();
     const customerQueue = await page.evaluate(async () => await window.ZazuOffline?.pending());
     expect(customerQueue.some((mutation) => mutation.entity_type === 'customer' && mutation.payload?.record?.name === customerName)).toBe(true);
@@ -95,7 +95,7 @@ test('real Zazu job form can create a job locally while disconnected', async ({ 
     expect(persisted.some((job) => job.name === jobName && job.local_id)).toBe(true);
     const persistedQueue = await page.evaluate(async () => await window.ZazuOffline?.pending());
     expect(persistedQueue.some((mutation) => mutation.entity_type === 'job' && mutation.payload?.record?.name === jobName)).toBe(true);
-    const persistedCustomer = await page.evaluate(() => window.ZazuOffline?.getState()?.customers?.find(customer => customer.name === customerName) || null);
+    const persistedCustomer = await page.evaluate((name) => window.ZazuOffline?.getState()?.customers?.find(customer => customer.name === name) || null, customerName);
     expect(persistedCustomer).toBeTruthy();
 
     // Offline records must be visible in the normal operating directories,
