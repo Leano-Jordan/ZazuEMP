@@ -104,4 +104,29 @@ test('real Zazu job form can create a job locally while disconnected', async ({ 
     await page.goto('/customers', { waitUntil: 'domcontentloaded' });
     await expect(page.locator('[data-zazu-local-record="customer"]').filter({ hasText: 'Offline test customer' })).toHaveCount(1);
     await expect(page.locator('[data-zazu-local-record="customer"]').filter({ hasText: 'Offline test customer' })).toBeVisible();
+
+    // Prove the queued customer and job reach the real Laravel database after
+    // reconnect, not merely that the browser can retain them in IndexedDB.
+    await page.context().setOffline(false);
+    await page.goto('/settings', { waitUntil: 'domcontentloaded' });
+    const pairingButton = page.getByRole('button', { name: 'Generate phone pairing code' });
+    await pairingButton.click();
+    const pairingResult = page.locator('[data-zazu-pairing-result]');
+    await expect(pairingResult).toContainText(/Code: \\d{6}/);
+    const pairingCode = (await pairingResult.textContent()).match(/\\d{6}/)?.[0];
+    expect(pairingCode).toMatch(/^\\d{6}$/);
+
+    await page.evaluate(code => window.ZazuOffline.pair(code), pairingCode);
+    await expect.poll(async () => page.evaluate(async () => (await window.ZazuOffline.pending()).length), {
+        timeout: 20_000,
+        message: 'The real sync endpoint should apply the locally queued customer and job after pairing.',
+    }).toBe(0);
+
+    const serverWork = await page.request.get('/work');
+    expect(serverWork.ok()).toBe(true);
+    expect(await serverWork.text()).toContain('Offline catering job');
+
+    const serverCustomers = await page.request.get('/customers');
+    expect(serverCustomers.ok()).toBe(true);
+    expect(await serverCustomers.text()).toContain('Offline test customer');
 });
