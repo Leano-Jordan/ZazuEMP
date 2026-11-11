@@ -96,12 +96,7 @@ class ZazuBackupRestoreTest extends TestCase
             $this->assertSame('private media before backup', File::get($privateProbe));
         } finally {
             DB::purge('sqlite');
-            File::delete($database);
-            File::delete($database.'-wal');
-            File::delete($database.'-shm');
-            foreach (File::glob(storage_path('app/.zazu-database-rollback-*')) as $rollbackFile) {
-                File::delete($rollbackFile);
-            }
+            $this->cleanupSqliteArtifacts($database);
             File::deleteDirectory($output);
             File::delete($privateProbe);
             config([
@@ -482,6 +477,16 @@ class ZazuBackupRestoreTest extends TestCase
     }
 
 
+
+    private function cleanupSqliteArtifacts(string $database): void
+    {
+        foreach ([$database, $database.'-wal', $database.'-shm'] as $path) {
+            File::delete($path);
+        }
+        foreach (File::glob(storage_path('app/.zazu-database-rollback-*')) as $rollbackFile) {
+            File::delete($rollbackFile);
+        }
+    }
 
     private function createSqliteSidecarFixtures(string $database): void
     {
