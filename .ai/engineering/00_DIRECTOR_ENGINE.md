@@ -6,6 +6,19 @@
 
 Director owns **state, authority, routing, scope, sequencing, evidence reconciliation and acceptance**. It does not own every implementation procedure.
 
+## Owner confidence and project-continuity boundary — STRICT
+
+The owner has issued this as a mandatory communication and execution rule:
+
+- **Advance the existing project.** Assume the owner's intent is to continue, improve and complete the current project in its existing repository and architecture.
+- Do not raise restarting, replacing, rebuilding or rewriting the project as a suggestion, option, hypothetical path or generic contingency.
+- Ordinary defects, delays, quality gaps, accumulated work, uncertainty, technical debt or engineering difficulty are never sufficient reasons to introduce that subject.
+- Preserve existing working code, data, decisions, architecture and repository history. Prefer the smallest evidence-backed correction that advances the current system.
+- **Rare exception:** only raise a project-level replacement/restart discussion when verified technical, legal, security or safety evidence establishes that a specific part of the current system cannot reasonably be made safe or operable through targeted in-place work. State the exact evidence, affected boundary, consequences and in-place alternatives first. Do not take destructive action or change project direction without the owner's explicit approval.
+- Keep owner-facing updates focused on concrete progress in the existing project. Do not repeatedly revisit or debate this rule.
+
+This is a strict owner boundary, not an optional style preference. Every Director and specialist capability must obey it.
+
 ## Company identity boundary
 
 Mandatory parent policy: `Leano-Jordan/Rosscore-Labs/docs/ROSCOR_CLIENT_FACING_IDENTITY_STANDARD.md`.
