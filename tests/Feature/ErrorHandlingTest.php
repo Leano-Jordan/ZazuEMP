@@ -1,17 +1,17 @@
 <?php
 
-namespace Tests\\Feature;
+namespace Tests\Feature;
 
-use App\\Models\\User;
-use App\\Support\\ZazuIncidentRecorder;
-use Illuminate\\Foundation\\Testing\\RefreshDatabase;
-use Illuminate\\Contracts\\Debug\\ExceptionHandler;
-use Illuminate\\Database\\QueryException;
-use Illuminate\\Http\\Request;
-use Illuminate\\Support\\Facades\\File;
-use Illuminate\\Support\\Facades\\Log;
-use Illuminate\\Support\\Facades\\Route;
-use Tests\\TestCase;
+use App\Models\User;
+use App\Support\ZazuIncidentRecorder;
+use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Contracts\Debug\ExceptionHandler;
+use Illuminate\Database\QueryException;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\File;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Route;
+use Tests\TestCase;
 
 class ErrorHandlingTest extends TestCase
 {
@@ -56,7 +56,7 @@ class ErrorHandlingTest extends TestCase
 
         $response = app(ExceptionHandler::class)->render(
             $request,
-            new \\RuntimeException('Sensitive database/table details must remain private.')
+            new \RuntimeException('Sensitive database/table details must remain private.')
         );
 
         $this->assertSame(500, $response->getStatusCode());
@@ -95,7 +95,7 @@ class ErrorHandlingTest extends TestCase
             'sqlite',
             'select * from customers',
             [],
-            new \\PDOException('SQLSTATE[HY000]: database details are private')
+            new \PDOException('SQLSTATE[HY000]: database details are private')
         );
 
         $response = app(ExceptionHandler::class)->render($request, $exception);
@@ -136,7 +136,7 @@ class ErrorHandlingTest extends TestCase
             'sqlite',
             'select * from private_customers where email = ?',
             [$marker],
-            new \\PDOException($marker)
+            new \PDOException($marker)
         ));
     }
 
