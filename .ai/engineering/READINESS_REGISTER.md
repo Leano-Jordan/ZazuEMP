@@ -1008,3 +1008,11 @@ Found and corrected a data-recovery blocker in `ZazuBackupCommand::snapshotMysql
 - Expanded MySQL restore failure-path coverage: after candidate import fails, the test now forces rollback import failure and verifies that the pre-restore dump survives in the preserved work directory, its path is reported, and original private storage is restored.
 - Commits: d25f0a6, 627d7e5, a91a6ea.
 - Source re-fetch/structural reconciliation: PASS. Exact-head PHPUnit/CI and rendered desktop/mobile acceptance: UNVERIFIED. No readiness score uplift. V1 remains NO-GO.
+
+
+## SQLite in-memory restore isolation — 2026-11-11
+
+- Fixed restore command state leakage for SQLite `:memory:` configurations: restore now returns the configured database target to its original value and cleans the temporary file-backed target plus WAL/SHM sidecars in `finally`.
+- Added regression coverage for a successful restore from a valid legacy archive under an in-memory connection; asserts config restoration and no temporary database artifact remains.
+- Commits: daa0a8a, 5221165, 5fc4ae3, 6d6a361.
+- Source reconciliation: PASS. Automated execution and CI: UNVERIFIED. No readiness uplift; V1 remains NO-GO.
