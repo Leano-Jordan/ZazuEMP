@@ -997,3 +997,5 @@ Private media was previously cached only when its image request naturally passed
 ## MySQL backup payload integrity — 2026-11-11
 
 Found and corrected a data-recovery blocker in `ZazuBackupCommand::snapshotMysql()`: Symfony Process `run()` returns an exit code, not stdout. The prior implementation wrote that exit code into `database.sql`, potentially producing a successful-looking but unusable MySQL backup. It now reads `getOutput()`, rejects empty dump output, and verifies the SQL payload was written before archive creation. Added a fake-`mysqldump` integration regression that inspects the resulting ZIP and asserts exact SQL output; fixture uses POSIX shell and skips on Windows. Commits: `19de1d4`, `f2598d9`, `7459d1c`. Source/test re-fetch and structural reconciliation: PASS. PHPUnit, PHP syntax, exact-head CI and real MySQL restore remain **UNVERIFIED**. Recovery maturity unchanged; V1 remains **NO-GO**.
+
+- Regression follow-up commit `604475e` extends the MySQL backup test to prove a zero-exit, empty-stdout dump is rejected and no archive is published. This is test source only; it has not yet been executed.
