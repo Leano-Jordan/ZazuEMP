@@ -1853,3 +1853,15 @@ Source review found that authenticated sync pull/acknowledgement accepted arbitr
 - Root cause: the test's multipart `idempotency_key` matcher contained doubled escape characters and therefore searched for literal backslash sequences instead of CRLF delimiters in the multipart body. The uploader correctly submits the field via `FormData.append('idempotency_key', ...)`; this failure was in the assertion parser, not evidence of a production upload defect.
 - Corrected matcher to use actual CRLF/newline regex escapes while retaining the assertion that the request carries an idempotency key and the late response cannot recreate local files after logout.
 - Commit: `9bb30a06357ae61e2f2fbdd0f2a6cc639e20acf8` (`test: correct multipart idempotency matcher`). Awaiting exact-head CI. No readiness uplift until browser suite passes.
+
+
+## Director reconciliation — 2026-11-11
+
+- Current repository: `Leano-Jordan/ZazuEMP`; canonical branch: `main`.
+- Current control/docs head after this cycle: `b749cd5bce9f3e0e12418e4f7105355f0b61d1a7`.
+- Current application source has not changed in this cycle. The last application source/test assessment must remain tied to its previously recorded exact SHA; this cycle does not create a new application verification baseline.
+- Active bounded target: harden and validate the disposable Render preview build path. Preview persistence is intentionally ephemeral and must not receive real customer data.
+- Implemented: Docker build-context exclusions and workflow path coverage for `.dockerignore`; roadmap and canonical release checklist updated.
+- Verification: changed files re-read. Exact-head CI and Docker build for the hardened context are pending.
+- Release decision remains **NO-GO**. Do not award a score uplift from documentation or unverified build changes.
+- Next control action: reconcile the exact-head CI/Docker build, then resume the highest-risk remaining operational release gate. Physical installed-device offline acceptance and operator recovery/legal/brand gates remain external acceptance work; do not imply they are closed by CI.
