@@ -7,7 +7,17 @@
 **Repository:** Leano-Jordan/ZazuEMP
 **Default branch:** main
 **Active development branch:** main
-**Context updated:** 2026-10-06
+**Context updated:** 2026-11-11
+
+## Financial communication and currency standard — mandatory
+
+- Primary currency for Zazu EMP and Rosscore Labs financial work is **South African rand (ZAR / R)**.
+- Present all prices, budgets, valuations, revenue models, forecasts, cost estimates and commercial comparisons in rand first.
+- Never show foreign-currency prices alone. If USD, EUR or another currency is relevant, show its rand equivalent alongside it.
+- Use a dated, cited exchange rate for conversions and label the result indicative; never silently reuse stale exchange rates.
+- The owner has explicitly stated that rand is the currency they understand. This is a persistent communication and documentation requirement.
+- Current commercial assessment: `docs/COMMERCIAL_VALUATION_AND_MARKET_ASSESSMENT_2026-11-11.md`.
+
 
 Repository state outranks stale conversation memory. Inspect the current repository before acting.
 
