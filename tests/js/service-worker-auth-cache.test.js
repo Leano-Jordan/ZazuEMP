@@ -373,3 +373,58 @@ test('a successful business switch clears the previous business page cache befor
     assert.ok(names.includes('zazu-static-v32-user-41-business-29'));
     assert.equal(names.includes('zazu-static-v32-user-41-business-17'), false);
 });
+
+
+test('a private image response arriving after a business switch is not cached in the new workspace', async () => {
+    const imageResponse = deferred();
+    const imageFetchStarted = deferred();
+    const worker = bootWorker(async (request) => {
+        const url = new URL(request.url);
+        if (url.pathname === '/media/business/logo') {
+            imageFetchStarted.resolve();
+            return imageResponse.promise;
+        }
+        return new MockResponse('online');
+    });
+
+    await worker.dispatchMessage({
+        type: 'prime-pages',
+        userId: '41',
+        businessId: '17',
+        routes: [],
+    });
+
+    const imageRequest = worker.dispatchFetch(new worker.Request('/media/business/logo', {
+        method: 'GET',
+        destination: 'image',
+    }));
+    await imageFetchStarted.promise;
+
+    await worker.dispatchMessage({
+        type: 'prime-pages',
+        userId: '41',
+        businessId: '29',
+        routes: [],
+    });
+
+    imageResponse.resolve(new MockResponse('business-17-image', {
+        headers: { 'content-type': 'image/png', 'cache-control': 'private, no-store' },
+    }));
+
+    assert.equal((await imageRequest.response).ok, true);
+    await imageRequest.finished();
+
+    const names = await worker.caches.keys();
+    assert.ok(names.includes('zazu-static-v32-user-41-business-29'));
+    const newBusinessCache = await worker.caches.open('zazu-static-v32-user-41-business-29');
+    assert.equal(
+        await newBusinessCache.match('/media/business/logo'),
+        null,
+        'a late response from the previous business must never enter the new business cache',
+    );
+    assert.equal(
+        names.includes('zazu-static-v32-user-41-business-17'),
+        false,
+        'switching businesses must remove the previous private cache',
+    );
+});
