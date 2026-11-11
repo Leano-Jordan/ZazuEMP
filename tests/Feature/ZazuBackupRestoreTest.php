@@ -584,7 +584,7 @@ class ZazuBackupRestoreTest extends TestCase
 
     public function test_restore_restores_original_sqlite_memory_configuration_after_completion(): void
     {
-        if (!class_exists(ZipArchive::class) || !in_array('sqlite', \\PDO::getAvailableDrivers(), true)) {
+        if (!class_exists(ZipArchive::class) || !in_array('sqlite', \PDO::getAvailableDrivers(), true)) {
             $this->markTestSkipped('PHP Zip and SQLite extensions are required for restore tests.');
         }
 
@@ -596,7 +596,7 @@ class ZazuBackupRestoreTest extends TestCase
 
         File::deleteDirectory($root);
         File::ensureDirectoryExists($root);
-        $pdo = new \\PDO('sqlite:'.$database);
+        $pdo = new \PDO('sqlite:'.$database);
         $pdo->exec('CREATE TABLE memory_restore_probe (id INTEGER PRIMARY KEY, value TEXT)');
         $pdo->exec("INSERT INTO memory_restore_probe (value) VALUES ('restored')");
         $pdo = null;
