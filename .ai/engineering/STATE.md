@@ -1985,3 +1985,13 @@ Source review found that authenticated sync pull/acknowledgement accepted arbitr
 - Commits: `574e913` (test), `6957104` (correct PDO namespace in test).
 - Test source re-fetched and reconciled. PHPUnit/runtime and exact-head CI are **UNVERIFIED**; no pass is claimed. No production backup implementation change was necessary because the existing snapshot uses SQLite's online snapshot mechanism rather than copying the live database file.
 - Release remains **NO-GO**. No deployment; `deploy/render-staging` untouched.
+
+
+## Jarvis execution — SQLite restore target preflight — 2026-11-11
+
+- Finding: restore validated the archive and candidate SQLite database, but did not validate that the configured destination was a regular database-file path with an existing writable parent directory before mutation. A directory used as the configured SQLite filename could be mistaken for a usable destination during file activation.
+- Change: reject directory/special-file targets and missing/non-writable target parent directories during preflight, before private storage or database replacement begins.
+- Regression: added a valid SQLite backup fixture with the configured target deliberately set to a directory; asserts restore fails, the directory remains empty, and existing private data remains unchanged.
+- Commits: `af84b59` (preflight), `968f5a6` (regression), `59e1e73` (PDO namespace correction).
+- Source re-read: PASS. PHPUnit/runtime and exact-head CI: **UNVERIFIED**. No execution pass is claimed.
+- No deployment. `deploy/render-staging` untouched. V1 remains **NO-GO**.
