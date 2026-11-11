@@ -1877,3 +1877,13 @@ Source review found that authenticated sync pull/acknowledgement accepted arbitr
 - A fresh exact-head CI batch has been queued for the workflow change. Browser smoke on the previous documentation head was still running at last inspection; do not claim it passed.
 - No application source changed and no score uplift is claimed. V1 remains **NO-GO**.
 
+
+
+## Jarvis execution — 2026-11-11 — private offline media race coverage
+
+- Continued the offline uploaded-media correction on canonical `main`.
+- Added a service-worker regression proving that an image request started under business 17 but completed after switching to business 29 is not written into the new workspace cache; the old business cache must also be absent.
+- Commit: `f86b9432f8e7eea8e0ae1999ec17e000a36b4951`.
+- Re-fetched the committed test and confirmed the new regression is present. The existing suite also covers successful offline image retrieval, private-cache isolation from the shared static cache, and no authenticated cache without a business context.
+- GitHub's available commit-status and PR-workflow endpoints returned no status contexts or workflow runs for this push. Automated execution is therefore **UNVERIFIED**; do not report the new regression as passed until the quality workflow result is observed.
+- No release readiness uplift. V1 remains **NO-GO**. The Render deployment branch was not modified, and no deployment was performed.
