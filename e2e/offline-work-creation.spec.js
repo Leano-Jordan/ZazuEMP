@@ -122,6 +122,22 @@ test('real Zazu job form can create a job locally while disconnected', async ({ 
         message: 'The real sync endpoint should apply the locally queued customer and job after pairing.',
     }).toBe(0);
 
+    const syncedState = await page.evaluate(({ customerLocalId, jobName }) => {
+        const state = window.ZazuOffline?.getState();
+        return {
+            customer: state?.customers?.find(item => item.local_id === customerLocalId) || null,
+            job: state?.jobs?.find(item => item.name === jobName) || null,
+            conflicts: state?.conflicts || [],
+        };
+    }, { customerLocalId, jobName: 'Offline catering job' });
+
+    expect(syncedState.customer?.server_id).toBeGreaterThan(0);
+    expect(syncedState.job?.server_id).toBeGreaterThan(0);
+    expect(syncedState.conflicts.some(conflict =>
+        conflict.entity_id === customerLocalId
+        || conflict.entity_id === syncedState.job?.local_id
+    )).toBe(false);
+
     const serverWork = await page.request.get('/work');
     expect(serverWork.ok()).toBe(true);
     expect(await serverWork.text()).toContain('Offline catering job');
