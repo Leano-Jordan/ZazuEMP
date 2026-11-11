@@ -1034,3 +1034,12 @@ Found and corrected a data-recovery blocker in `ZazuBackupCommand::snapshotMysql
 - Commits: `af84b59`, `968f5a6`, `59e1e73`.
 - Source reconciliation: PASS. PHPUnit and exact-head CI: **UNVERIFIED**; readiness is not increased.
 - V1 remains **NO-GO**.
+
+
+## SQLite symbolic-link restore target rejection — 2026-11-11
+
+- SQLite restore preflight now rejects a configured database target that is a symbolic link, in addition to directories and special files.
+- Added POSIX-only regression coverage proving a symlink to a protected SQLite database is not followed or replaced and private storage remains unchanged. Windows skips the symlink fixture.
+- Commits: `3d848c0`, `ac45f6f`, `b11e779`.
+- Source reconciliation: PASS. PHPUnit and exact-head CI: **UNVERIFIED**. No release-readiness increase until runtime execution.
+- V1 remains **NO-GO**.
