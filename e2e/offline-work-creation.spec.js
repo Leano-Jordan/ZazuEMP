@@ -138,7 +138,7 @@ test('real Zazu job form can create a job locally while disconnected', async ({ 
         || conflict.entity_id === syncedState.job?.local_id
     )).toBe(false);
 
-    const serverWork = await page.request.get('/work');
+    const serverWork = await page.request.get('/work/' + syncedState.job.server_id);
     expect(serverWork.ok()).toBe(true);
     expect(await serverWork.text()).toContain('Offline catering job');
 
