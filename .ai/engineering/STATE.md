@@ -1,3 +1,23 @@
+## Exact-head reconciliation — 2026-11-11 17:18 UTC
+
+- Current canonical repository: `Leano-Jordan/ZazuEMP`, branch `main`.
+- Current exact HEAD: `6c486389ff4c4a9d8ee6f5ecff241ce391b30a8c` — documentation-only Director rule update. No application runtime source changed in this commit.
+- Owner's strict project-continuity rule is recorded and re-read in `.ai/engineering/00_DIRECTOR_ENGINE.md`; Director Contract Lint passed on this exact head.
+- Exact-head Laravel workflow: **PASS — 454 tests / 3,296 assertions** ([run 43066228702](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/43066228702)).
+- Offline browser acceptance sub-job: **PASS — 18 passed** on the same exact head (same run). It covers the current PWA/local workspace browser acceptance suite.
+- Zazu quality + secret scan: **PASS** ([run 43066228679](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/43066228679)).
+- Psalm Security: **PASS** ([run 43066228744](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/43066228744)).
+- PHPMD: **PASS** ([run 43066228711](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/43066228711)).
+- Populated upgrade/rollback: **PASS** ([run 43066228670](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/43066228670)).
+- Director Health: **PASS** ([run 43066228700](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/43066228700)).
+- Push-on-main: **PASS** ([run 43066228774](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/43066228774)).
+- Director Contract Lint: **PASS** ([run 43066228713](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/43066228713)).
+- SonarCloud: **SKIPPED**, not counted as a pass.
+- Full Zazu browser smoke: **IN PROGRESS** at reconciliation ([run 43066228703](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/43066228703)); do not count it as passed until completion.
+- The offline phone/PC installed-app test remains **UNVERIFIED**. CI uses Chromium and cannot prove actual Android certificate trust, installed-app cold launch, airplane-mode relaunch, physical storage persistence, or same-device reconnect.
+- The 69/100 evidence-maturity baseline remains unchanged; this documentation-only commit and CI do not close a physical or operational release gate. V1 remains **NO-GO**.
+- `deploy/render-staging` remains a protected intentional deployment branch; no deployment was triggered.
+
 ## Exact-head reconciliation — 2026-11-11 12:20 UTC
 
 - Current canonical engineering head: `7609049d8a520a4abb3b0d8d7d0cd2d8b140e49e` on `main`.
