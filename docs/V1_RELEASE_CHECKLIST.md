@@ -403,3 +403,33 @@ The recorded 422 passing Laravel tests / 2,985 assertions are tied to commit `b9
 - A fresh exact-head CI batch has been queued for the workflow change. Browser smoke on the previous documentation head was still running at last inspection; do not claim it passed.
 - No application source changed and no score uplift is claimed. V1 remains **NO-GO**.
 
+## Director reconciliation — 2026-11-11 — CSP and incident logging
+
+**Current documentation/source head:** `6dc7e3c57a4ad770444ce337c128985d0074d02f` on `main`. This entry supersedes earlier CSP notes in this checklist and the stale ZAZU-SEC-05 description in the 3 November security audit.
+
+### CSP source status
+
+- `ApplySecurityHeaders` now sets `style-src 'self' 'nonce-{response nonce}'`, `style-src-elem` with the same nonce, and `style-src-attr 'none'`. No `unsafe-inline` remains in the emitted CSP.
+- `SecurityHeadersTest` scans every active Blade view and rejects inline style attributes; every inline style element must carry a response nonce.
+- The test also guards the shared layout, standalone views and app.js against the previously identified dynamic inline-style usage.
+- This closes the source-level inline-style migration finding (ZAZU-SEC-05) on the current source. Browser smoke remains a separate runtime gate.
+
+### Incident logging status
+
+- ZAZU-SEC-07 redaction is implemented and regression-tested. The application incident recorder excludes exception messages, SQL, bindings and stack traces; Laravel's duplicate raw exception report path is suppressed.
+
+### Exact-head automated evidence
+
+For `6dc7e3c57a4ad770444ce337c128985d0074d02f`:
+- Laravel: **PASS — 455 tests / 3,299 assertions**.
+- Offline browser acceptance: **PASS**.
+- Zazu quality + secret scan: **PASS**.
+- Psalm security: **PASS**.
+- PHPMD: **PASS**.
+- Populated upgrade/rollback: **PASS**.
+- Director Contract Lint: **PASS**.
+- Zazu browser smoke: **IN PROGRESS / NOT YET VERIFIED** (run 43082852341). Do not treat this as a pass until the run concludes.
+
+### Release decision
+
+**V1 remains NO-GO.** Remaining proof is not another round of speculative code expansion: complete browser smoke; prove the real installation's workspace registration/creation path; run representative operator backup/restore and deployment rollback drills; complete trusted-device/lost-device acceptance; and close production privacy, provider-log, legal/brand and licence issuer/enforcement controls. No Render deployment was triggered by this cycle.
