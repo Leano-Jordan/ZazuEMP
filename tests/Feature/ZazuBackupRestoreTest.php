@@ -160,6 +160,17 @@ class ZazuBackupRestoreTest extends TestCase
             $this->assertSame($expectedDump, $zip->getFromName('database.sql'));
             $this->assertNotSame('0', trim((string) $zip->getFromName('database.sql')));
             $zip->close();
+
+            File::delete($archives[0]);
+            File::put($dumpScript, "#!/bin/sh\nexit 0\n");
+
+            $this->artisan('zazu:backup', ['--output' => $output])
+                ->assertExitCode(1);
+            $this->assertCount(
+                0,
+                File::glob($output.DIRECTORY_SEPARATOR.'zazu-backup-*.zip'),
+                'A successful mysqldump process with empty stdout must not publish a backup.',
+            );
         } finally {
             config([
                 'database.default' => $originalDefault,
