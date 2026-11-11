@@ -112,9 +112,9 @@ test('real Zazu job form can create a job locally while disconnected', async ({ 
     const pairingButton = page.getByRole('button', { name: 'Generate phone pairing code' });
     await pairingButton.click();
     const pairingResult = page.locator('[data-zazu-pairing-result]');
-    await expect(pairingResult).toContainText(/Code: \\d{6}/);
-    const pairingCode = (await pairingResult.textContent()).match(/\\d{6}/)?.[0];
-    expect(pairingCode).toMatch(/^\\d{6}$/);
+    await expect(pairingResult).toContainText(/Code: \d{6}/);
+    const pairingCode = (await pairingResult.textContent()).match(/\d{6}/)?.[0];
+    expect(pairingCode).toMatch(/^\d{6}$/);
 
     await page.evaluate(code => window.ZazuOffline.pair(code), pairingCode);
     await expect.poll(async () => page.evaluate(async () => (await window.ZazuOffline.pending()).length), {
