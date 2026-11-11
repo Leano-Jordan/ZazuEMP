@@ -1858,7 +1858,7 @@ Source review found that authenticated sync pull/acknowledgement accepted arbitr
 ## Director reconciliation — 2026-11-11
 
 - Current repository: `Leano-Jordan/ZazuEMP`; canonical branch: `main`.
-- Current control/docs head after this cycle: `b749cd5bce9f3e0e12418e4f7105355f0b61d1a7`.
+- Documentation baseline before this state reconciliation: `b749cd5bce9f3e0e12418e4f7105355f0b61d1a7`; this state-file update is a documentation-only descendant.
 - Current application source has not changed in this cycle. The last application source/test assessment must remain tied to its previously recorded exact SHA; this cycle does not create a new application verification baseline.
 - Active bounded target: harden and validate the disposable Render preview build path. Preview persistence is intentionally ephemeral and must not receive real customer data.
 - Implemented: Docker build-context exclusions and workflow path coverage for `.dockerignore`; roadmap and canonical release checklist updated.
