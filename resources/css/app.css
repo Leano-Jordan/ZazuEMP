@@ -4228,6 +4228,12 @@ body.zazu-has-wallpaper .zazu-content > * {
 .zazu-toast-error { border-color: color-mix(in srgb, var(--zazu-danger) 38%, var(--zazu-border)); }
 .zazu-toast-info { border-color: color-mix(in srgb, var(--zazu-info) 34%, var(--zazu-border)); }
 
+.zazu-toast.is-closing {
+    opacity: 0;
+    transform: translateY(8px);
+    transition: opacity 140ms ease, transform 140ms ease;
+}
+
  .zazu-toast-icon {
     width: 28px;
     height: 28px;

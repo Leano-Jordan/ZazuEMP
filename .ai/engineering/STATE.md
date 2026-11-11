@@ -1,3 +1,32 @@
+## Exact-head reconciliation — 2026-11-11 17:18 UTC
+
+- Current canonical repository: `Leano-Jordan/ZazuEMP`, branch `main`.
+- Current exact HEAD: `6c486389ff4c4a9d8ee6f5ecff241ce391b30a8c` — documentation-only Director rule update. No application runtime source changed in this commit.
+- Owner's strict project-continuity rule is recorded and re-read in `.ai/engineering/00_DIRECTOR_ENGINE.md`; Director Contract Lint passed on this exact head.
+- Exact-head Laravel workflow: **PASS — 454 tests / 3,296 assertions** ([run 43066228702](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/43066228702)).
+- Offline browser acceptance sub-job: **PASS — 18 passed** on the same exact head (same run). It covers the current PWA/local workspace browser acceptance suite.
+- Zazu quality + secret scan: **PASS** ([run 43066228679](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/43066228679)).
+- Psalm Security: **PASS** ([run 43066228744](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/43066228744)).
+- PHPMD: **PASS** ([run 43066228711](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/43066228711)).
+- Populated upgrade/rollback: **PASS** ([run 43066228670](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/43066228670)).
+- Director Health: **PASS** ([run 43066228700](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/43066228700)).
+- Push-on-main: **PASS** ([run 43066228774](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/43066228774)).
+- Director Contract Lint: **PASS** ([run 43066228713](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/43066228713)).
+- SonarCloud: **SKIPPED**, not counted as a pass.
+- Full Zazu browser smoke: **IN PROGRESS** at reconciliation ([run 43066228703](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/43066228703)); do not count it as passed until completion.
+- The offline phone/PC installed-app test remains **UNVERIFIED**. CI uses Chromium and cannot prove actual Android certificate trust, installed-app cold launch, airplane-mode relaunch, physical storage persistence, or same-device reconnect.
+- The 69/100 evidence-maturity baseline remains unchanged; this documentation-only commit and CI do not close a physical or operational release gate. V1 remains **NO-GO**.
+- `deploy/render-staging` remains a protected intentional deployment branch; no deployment was triggered.
+
+## Exact-head reconciliation — 2026-11-11 12:20 UTC
+
+- Current canonical engineering head: `7609049d8a520a4abb3b0d8d7d0cd2d8b140e49e` on `main`.
+- This head includes the verified offline sync identity correction at `56bb804` and a test-fixture cleanup at `7609049`; no application runtime source changed after the verified sync correction.
+- Exact-head GitHub Actions: Laravel PASS — 448 tests / 3,258 assertions; offline browser acceptance PASS — 18 passed; Zazu quality PASS; Psalm security PASS; PHPMD PASS; populated upgrade/rollback PASS; browser smoke PASS; Director health PASS; push workflow PASS. SonarCloud was SKIPPED and is not counted as a pass.
+- Browser smoke run: `43019394866`; Laravel + offline browser acceptance: `43019394816`; quality: `43019394988`; Psalm: `43019394910`; PHPMD: `43019394850`; populated upgrade/rollback: `43019394959`.
+- Render Docker workflow did not run for this test-only head. The latest verified Docker build is run `43015390179` on the preceding application source; it built an image only and did not deploy.
+- No physical installed-device test, customer-environment recovery drill or production deployment is evidenced. V1 remains **NO-GO**. The intentional `deploy/render-staging` branch remains untouched.
+
 # ZAZU EMP — ENGINEERING CONTROL STATE
 
 ## Identity
@@ -28,9 +57,35 @@ IDENTITY → BASELINE → TARGET → ROUTE → INSPECT → CHANGE → VERIFY →
 The 2026-11-01 local Windows-host proposal was exploratory and is no longer the active deployment target. The owner has clarified that this PC is a development workstation; future production hosting will be a paid server when funding and release readiness permit. The 2026-11-03 host diagnostic is recorded below. Do not configure this PC as production infrastructure.
 
 ## Active target
-**Owner-directed V1 convergence:** repair source defects, keep exact-main CI green, complete the remaining offline/device and commercial evidence, and remove every operational task that can be safely verified or automated from code. The owner-accepted dashboard remains closed. All implementation stays on canonical `main`.
+**Active target**: Owner-directed V1 convergence — offline sync identity and automated browser acceptance are closed on source head `56bb804`; next gate is the representative operator backup/restore drill.
+**Owner-directed V1 convergence:** repair source defects, keep exact-main CI green, complete the remaining offline/device and commercial evidence, and remove every operational task that can be safely verified or automated from code. The owner-accepted dashboard remains closed. All engineering implementation stays on canonical `main`; `deploy/render-staging` remains deployment-only.
+Next hard gate: Run a representative database + private-media backup/restore drill against the intended hosting target. Keep installed-device offline acceptance open until the secure-origin disconnect, full close/reopen, local-work recovery and reconnect sequence passes.
 
-## Current verified source — 2026-11-08
+## Current verified source — 2026-11-11
+
+- **Verified application/test head:** `56bb804b2b71f9d709b0846be8d7c76139b9db60` on canonical `main`.
+- **Offline sync correction:** `public/zazu-offline.js` now preserves `server_id` as well as the legacy `id` alias when applying bootstrap records. This covers catalogue, suppliers, purchase orders and lines, invoices and payments, expenses, inventory and movements, assets and allocations, costs, and selected customers/jobs/quotes/preparations.
+- **Root cause proved by the real browser journey:** the server had created the offline customer and job and returned their identities, but the subsequent bootstrap refresh replaced the local records without retaining `server_id`. The client then lost the stable server identity after reconnect.
+- **Regression coverage:** the real offline Work-creation journey now verifies that customer/job IDs survive bootstrap refresh, that the IDs match, and that both records are available from their server-rendered pages. Each retry uses unique test records; browser-context values are passed explicitly into `page.evaluate`.
+- **Flake correction:** the late-device-session browser test now waits for the offline runtime to load before using it.
+
+Exact-head CI for `56bb804b2b71f9d709b0846be8d7c76139b9db60`:
+- Laravel: **PASS — 448 tests / 3,257 assertions** ([run 43016394823](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/43016394823)).
+- Offline browser acceptance: **PASS — 18 passed** (same Laravel workflow).
+- Browser smoke: **PASS — 82 passed / 38 skipped / 0 flaky** ([run 43016394826](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/43016394826)).
+- Zazu quality: **PASS** ([run 43016394710](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/43016394710)).
+- Psalm security: **PASS** ([run 43016394752](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/43016394752)).
+- PHPMD: **PASS** ([run 43016394775](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/43016394775)).
+- Populated upgrade/rollback: **PASS** ([run 43016394715](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/43016394715)).
+- Push on main: **PASS** ([run 43016394702](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/43016394702)).
+- Director health: **PASS** ([run 43017153387](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/43017153387)).
+- PHP security, secret scan, application build and static analysis checks: **PASS**.
+- SonarCloud: **SKIPPED**, not counted as a pass.
+- Render preview Docker image: **PASS — build only, no push/deploy** ([run 43015390179](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/43015390179)); workflow checked out current `main` source. Subsequent commits were test-only.
+
+**Release position remains NO-GO.** No score uplift is claimed; the last formally reconciled evidence-maturity score remains 69/100. Physical installed-device offline acceptance on secure HTTPS, representative operator backup/restore, deployment rollback, trusted-device/lost-device acceptance, operational privacy/legal closure, official Zazu brand clearance, and production licence issuer/key custody plus application-wide enforcement remain open. The `deploy/render-staging` branch is preserved; no deployment was triggered.
+
+## Historical verified source — 2026-11-08
 
 - Verified application/test source: `d44ec33a57a4958380f2cfe4624f040859cbcf7a` on canonical `main`; CI workflow correction commit: `7946a87e78cf4dd2305d12fb20d3f77ed5653c87` (workflow-only; no application source changes).
 - Exact-head workflow evidence on that workflow commit: Laravel run [42481998972](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/42481998972) PASS; Quality + secret scan [42481999066](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/42481999066) PASS; browser smoke [42481998954](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/42481998954) PASS; populated upgrade/rollback [42481998959](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/42481998959) PASS; Director Contract Lint [42481998956](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/42481998956) PASS; Psalm [42481998947](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/42481998947) PASS; PHPMD [42481998949](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/42481998949) PASS. SonarCloud [42481998971](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/42481998971) SKIPPED, not a pass.
@@ -1853,3 +1908,120 @@ Source review found that authenticated sync pull/acknowledgement accepted arbitr
 - Root cause: the test's multipart `idempotency_key` matcher contained doubled escape characters and therefore searched for literal backslash sequences instead of CRLF delimiters in the multipart body. The uploader correctly submits the field via `FormData.append('idempotency_key', ...)`; this failure was in the assertion parser, not evidence of a production upload defect.
 - Corrected matcher to use actual CRLF/newline regex escapes while retaining the assertion that the request carries an idempotency key and the late response cannot recreate local files after logout.
 - Commit: `9bb30a06357ae61e2f2fbdd0f2a6cc639e20acf8` (`test: correct multipart idempotency matcher`). Awaiting exact-head CI. No readiness uplift until browser suite passes.
+
+
+## Director reconciliation — 2026-11-11
+
+- Current repository: `Leano-Jordan/ZazuEMP`; canonical branch: `main`.
+- Documentation baseline before this state reconciliation: `b749cd5bce9f3e0e12418e4f7105355f0b61d1a7`; this state-file update is a documentation-only descendant.
+- Current application source has not changed in this cycle. The last application source/test assessment must remain tied to its previously recorded exact SHA; this cycle does not create a new application verification baseline.
+- Active bounded target: harden and validate the disposable Render preview build path. Preview persistence is intentionally ephemeral and must not receive real customer data.
+- Implemented: Docker build-context exclusions and workflow path coverage for `.dockerignore`; roadmap and canonical release checklist updated.
+- Verification: changed files re-read. Exact-head CI and Docker build for the hardened context are pending.
+- Release decision remains **NO-GO**. Do not award a score uplift from documentation or unverified build changes.
+- Next control action: reconcile the exact-head CI/Docker build, then resume the highest-risk remaining operational release gate. Physical installed-device offline acceptance and operator recovery/legal/brand gates remain external acceptance work; do not imply they are closed by CI.
+
+
+## Jarvis execution — 2026-11-11 — Director CI noise reduction
+
+- Finding: Director health reporting was triggered on every main push (except `docs/health/**`) and separately after completion of six CI workflows. One source commit could therefore queue many duplicate health-report runs.
+- Changed `.github/workflows/roscore-director-health.yml`: push reporting is now limited to engineering/source/configuration/CI control paths; the completion trigger now listens only to the Zazu browser smoke workflow, which is the final/slow acceptance signal in the required batch.
+- This preserves an early push snapshot and a post-browser final evidence snapshot while avoiding six near-identical post-check reports.
+- Commit: `224ddadf3cb6a711fe8475e8f46d57d7fae54541`.
+- Docker image build with the new `.dockerignore` passed on the prior preview-build run. It builds only; no deployment occurred.
+- A fresh exact-head CI batch has been queued for the workflow change. Browser smoke on the previous documentation head was still running at last inspection; do not claim it passed.
+- No application source changed and no score uplift is claimed. V1 remains **NO-GO**.
+
+
+
+## Jarvis execution — 2026-11-11 — private offline media race coverage
+
+- Continued the offline uploaded-media correction on canonical `main`.
+- Added a service-worker regression proving that an image request started under business 17 but completed after switching to business 29 is not written into the new workspace cache; the old business cache must also be absent.
+- Commit: `f86b9432f8e7eea8e0ae1999ec17e000a36b4951`.
+- Re-fetched the committed test and confirmed the new regression is present. The existing suite also covers successful offline image retrieval, private-cache isolation from the shared static cache, and no authenticated cache without a business context.
+- GitHub's available commit-status and PR-workflow endpoints returned no status contexts or workflow runs for this push. Automated execution is therefore **UNVERIFIED**; do not report the new regression as passed until the quality workflow result is observed.
+- No release readiness uplift. V1 remains **NO-GO**. The Render deployment branch was not modified, and no deployment was performed.
+
+
+## Private uploaded-image offline cache correction — 2026-11-11
+
+- Reconciled the active service-worker private-media path against the reported broken uploaded-image behaviour.
+- Root cause: private media interception was gated on `Request.destination === 'image'`. That browser metadata is not reliable for every image-loading path, including CSS background-image requests, so an otherwise valid business-scoped cache could be bypassed and the image request would fail offline.
+- Changed the private-media route matcher to use the authenticated `/media/profile/*` and `/media/business/*` URL boundary, independent of request destination. Private media remains isolated in the active user + business cache; it is not added to the shared static cache.
+- Advanced the service-worker cache generation from `zazu-static-v32` to `zazu-static-v33` so installed clients replace the previous worker generation.
+- Updated the service-worker regression to request a private business image with an empty destination, verify it is cached in the business cache, and verify it remains absent from the shared cache. Updated the Laravel source-contract assertion to v33.
+- Commits: `ad81391` worker; `87cb501` browser-worker regression; `19ca15d` Laravel cache-generation assertion.
+- Source re-fetch and commit integrity: pending final reconciliation. Node service-worker tests, Laravel suite, exact-head CI and installed-phone offline image acceptance have not been run in this environment. Do not claim the user-visible issue is fully verified until the exact-head workflow and physical device sequence pass. V1 remains **NO-GO**.
+
+
+## Private uploaded-image offline cache completion — 2026-11-11
+
+- Extended the private-media correction beyond request interception: installed-page priming now extracts same-origin `/media/profile/*` and `/media/business/*` references from authenticated HTML and fetches them into the active user/business cache before disconnected use.
+- URL extraction covers normal image references and CSS `url(...)` references, deduplicates requests across the priming run, normalizes HTML-escaped query separators, rejects non-local origins and caps prefetch at 60 unique private images per run. Failed image fetches do not block page priming.
+- Private-media fetch interception is route-based rather than dependent on `Request.destination`, so CSS backgrounds and other browser image-loading paths use the same private cache. No private media is placed in the shared static cache.
+- Advanced service-worker generation to `zazu-static-v34` to retire the previous installed worker/cache generation.
+- Added a service-worker regression proving that priming a dashboard caches referenced profile and CSS-background images in the correct business cache, excludes them from the shared cache, and serves both after the host becomes unavailable. Laravel source-contract assertion updated to v34.
+- Commits: `ad81391`, `87cb501`, `19ca15d`, `799da2f`, `c9b347e`, `3b0ac8e`, `a041e07`, `a50e5f1`.
+- Source re-fetch is complete. Node service-worker tests, Laravel suite, exact-head CI and physical installed-phone acceptance remain **UNVERIFIED** in this environment. The 60-image prefetch cap is a bounded safeguard, not proof that every image on every page is available offline. V1 remains **NO-GO**.
+
+
+## Jarvis execution — MySQL backup payload correction — 2026-11-11
+
+- Target: installation-level backup reliability, independent of the offline-media work.
+- Finding: `ZazuBackupCommand::snapshotMysql()` assigned the return value of Symfony Process `run()` to the SQL payload. `run()` returns the process exit code; stdout is available through `getOutput()`. The command could therefore publish a format-v2 ZIP whose `database.sql` contained only the exit code rather than the database dump.
+- Classification: **P0 RELEASE BLOCKER / DATA RECOVERY INTEGRITY** for MySQL installations. SQLite path is unaffected.
+- Correction: execute the dump, check process success, read stdout using `getOutput()`, reject empty output, and verify the SQL file was actually written and is non-empty before continuing to private storage/checksum/archive creation.
+- Regression: added a POSIX fake-`mysqldump` integration fixture that runs the real backup command under a MySQL config and inspects the generated ZIP, asserting that the exact multiline SQL stdout is stored in `database.sql` rather than the process exit code. Test skips on Windows because the fake executable uses a POSIX shell.
+- Commits: `19de1d4` source fix; `f2598d9` regression; `7459d1c` fixture formatting correction.
+- GitHub source/test files re-fetched after writes; structural assertions confirm stdout capture, empty-output/write failure guards, and exact archive payload assertion. PHPUnit, PHP syntax, full CI, a real MySQL dump/restore and operator recovery drill are **UNVERIFIED**. Do not count this as a runtime pass or raise recovery maturity. V1 remains **NO-GO**.
+
+- Regression follow-up: the same MySQL backup integration test now also replaces the fake dump utility with a successful zero-output process and asserts the backup command fails without publishing an archive. Commit: `604475e`. Runtime execution remains unverified.
+
+
+## Helper navigation clearance and restore rollback preservation — 2026-11-11
+
+- Moved the floating Zazu Helper out of the authenticated content/main shell and placed it as a viewport-level sibling after the application shell. This prevents content-column positioning/stacking contexts from making the helper drift over navigation controls; its existing right-edge docking and mobile menu avoidance rules remain intact.
+- Added InterfaceRegressionTest::test_helper_is_portaled_outside_the_application_shell to lock the DOM placement.
+- Extended the fake-MySQL restore integration test to simulate both candidate-import failure and pre-restore rollback failure. It asserts the original private storage is restored and the only pre-restore SQL snapshot is retained and reported for operator recovery rather than deleted with the temporary workspace.
+- Commits: d25f0a6 (helper placement), 627d7e5 (helper regression), a91a6ea (restore rollback preservation regression).
+- GitHub source re-fetch and structural assertions: PASS. Exact-head PHPUnit, browser rendering, CSS/device acceptance and CI status: UNVERIFIED (no status checks reported for the latest test commit at reconciliation).
+- The owner should only need to visually confirm helper placement on desktop and mobile after the next deployed build. No deployment was triggered; deploy/render-staging remains untouched.
+
+
+## SQLite in-memory restore isolation — 2026-11-11
+
+- Restore preflight temporarily redirects a SQLite `:memory:` connection to a file so the normal safe replacement path can run. The previous implementation left that temporary database path in Laravel config after the command and could leave its temporary database file behind.
+- Captured the original SQLite database setting, restored it in `finally`, purged the temporary connection and removed its temporary database/WAL/SHM files. Rollback snapshots remain separately preserved when recovery fails.
+- Added a regression test using a valid legacy archive and an in-memory SQLite configuration; it asserts the connection setting is restored and no temporary target remains.
+- Commits: daa0a8a (config restoration), 5221165 (regression), 5fc4ae3 (temporary file cleanup), 6d6a361 (PDO namespace correction).
+- GitHub source re-fetch: PASS. PHPUnit/runtime verification and CI: UNVERIFIED; no local execution environment or status contexts available. V1 remains NO-GO.
+
+
+## Jarvis execution — SQLite WAL backup consistency — 2026-11-11
+
+- Audited the SQLite backup path. It uses SQLite `VACUUM INTO` on the live connection, which is intended to create a consistent standalone snapshot and include committed WAL content.
+- Added `test_sqlite_backup_includes_committed_wal_records` to prove the backup contains a committed row while the source database is in WAL mode and the committed WAL frames have not been checkpointed into the main database file. The test then restores the archive and asserts the row survives.
+- Commits: `574e913` (test), `6957104` (correct PDO namespace in test).
+- Test source re-fetched and reconciled. PHPUnit/runtime and exact-head CI are **UNVERIFIED**; no pass is claimed. No production backup implementation change was necessary because the existing snapshot uses SQLite's online snapshot mechanism rather than copying the live database file.
+- Release remains **NO-GO**. No deployment; `deploy/render-staging` untouched.
+
+
+## Jarvis execution — SQLite restore target preflight — 2026-11-11
+
+- Finding: restore validated the archive and candidate SQLite database, but did not validate that the configured destination was a regular database-file path with an existing writable parent directory before mutation. A directory used as the configured SQLite filename could be mistaken for a usable destination during file activation.
+- Change: reject directory/special-file targets and missing/non-writable target parent directories during preflight, before private storage or database replacement begins.
+- Regression: added a valid SQLite backup fixture with the configured target deliberately set to a directory; asserts restore fails, the directory remains empty, and existing private data remains unchanged.
+- Commits: `af84b59` (preflight), `968f5a6` (regression), `59e1e73` (PDO namespace correction).
+- Source re-read: PASS. PHPUnit/runtime and exact-head CI: **UNVERIFIED**. No execution pass is claimed.
+- No deployment. `deploy/render-staging` untouched. V1 remains **NO-GO**.
+
+
+## Jarvis execution — reject symbolic-link SQLite restore targets — 2026-11-11
+
+- Finding: the SQLite restore preflight rejected directories and special files but accepted a symbolic link. Moving/replacing a symlink path can produce ambiguous behaviour around the linked database and its WAL/SHM sidecars.
+- Change: explicitly reject a symlink as the configured SQLite database target before any restore mutation.
+- Regression: added POSIX-only coverage with a valid candidate archive and a configured target symlink to a protected SQLite database; asserts restore fails, the link remains, the protected record is unchanged, and private business data survives. Windows skips this test because the fixture requires POSIX symlink support.
+- Commits: `3d848c0` (guard), `ac45f6f` (regression), `b11e779` (PDO namespace correction).
+- Source re-read: PASS. PHPUnit/runtime and exact-head CI: **UNVERIFIED**; no test pass is claimed.
+- No deployment. `deploy/render-staging` untouched. V1 remains **NO-GO**.

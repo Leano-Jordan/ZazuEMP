@@ -162,14 +162,26 @@ class ZazuBackupCommand extends Command
         ], null, array_filter(['MYSQL_PWD' => $connection['password'] ?? null]));
 
         $process->setTimeout(300);
-        $result = $process->run();
+        $process->run();
 
         if (!$process->isSuccessful()) {
             $this->error('Database dump failed: '.$process->getErrorOutput());
             return false;
         }
 
-        File::put($work.'/database.sql', $result);
+        $dump = $process->getOutput();
+        if (trim($dump) === '') {
+            $this->error('Database dump completed without producing SQL output.');
+            return false;
+        }
+
+        if (File::put($work.'/database.sql', $dump) === false
+            || !is_file($work.'/database.sql')
+            || filesize($work.'/database.sql') === 0) {
+            $this->error('Could not write the MySQL database snapshot.');
+            return false;
+        }
+
         return true;
     }
 

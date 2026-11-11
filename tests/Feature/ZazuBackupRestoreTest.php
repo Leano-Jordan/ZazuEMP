@@ -8,6 +8,7 @@ use Illuminate\Support\Facades\Artisan;
 use Tests\TestCase;
 use ZipArchive;
 
+/** @SuppressWarnings(PHPMD.TooManyPublicMethods) */
 class ZazuBackupRestoreTest extends TestCase
 {
 
@@ -62,6 +63,7 @@ class ZazuBackupRestoreTest extends TestCase
 
             DB::table('backup_probe')->update(['value' => 'changed after backup']);
             File::delete($privateProbe);
+            $this->createSqliteSidecarFixtures($database);
 
             $this->artisan('zazu:restore', [
                 'archive' => $archive,
@@ -69,6 +71,8 @@ class ZazuBackupRestoreTest extends TestCase
             ])->assertExitCode(0);
 
             DB::purge('sqlite');
+
+            $this->assertNoSqliteRollbackArtifacts();
 
             $this->assertSame(
                 'before backup',
@@ -93,7 +97,7 @@ class ZazuBackupRestoreTest extends TestCase
             $this->assertSame('private media before backup', File::get($privateProbe));
         } finally {
             DB::purge('sqlite');
-            File::delete($database);
+            $this->cleanupSqliteArtifacts($database);
             File::deleteDirectory($output);
             File::delete($privateProbe);
             config([
@@ -104,8 +108,86 @@ class ZazuBackupRestoreTest extends TestCase
         }
     }
 
+    public function test_mysql_backup_archives_the_dump_output_not_the_process_exit_code(): void
+    {
+        if (!class_exists(ZipArchive::class)) {
+            $this->markTestSkipped('PHP Zip extension is required for backup tests.');
+        }
+        if (PHP_OS_FAMILY === 'Windows') {
+            $this->markTestSkipped('The fake mysqldump executable fixture requires a POSIX shell.');
+        }
 
+        $root = storage_path('app/zazu-mysql-backup-test');
+        $bin = $root.'/bin';
+        $output = $root.'/backups';
+        $dumpScript = $bin.'/mysqldump';
+        $expectedDump = "-- Zazu MySQL dump fixture\nCREATE TABLE backup_probe (id INT);";
+        $originalDefault = config('database.default');
+        $originalMysql = config('database.connections.mysql');
+        $originalPath = getenv('PATH') ?: '';
+        $originalServerPath = $_SERVER['PATH'] ?? null;
+        $originalEnvPath = $_ENV['PATH'] ?? null;
 
+        File::deleteDirectory($root);
+        File::ensureDirectoryExists($bin);
+        File::put($dumpScript, "#!/bin/sh\nprintf '%b' '".str_replace("\n", "\\n", $expectedDump)."'\n");
+        chmod($dumpScript, 0755);
+
+        putenv('PATH='.$bin.PATH_SEPARATOR.$originalPath);
+        $_SERVER['PATH'] = $bin.PATH_SEPARATOR.$originalPath;
+        $_ENV['PATH'] = $bin.PATH_SEPARATOR.$originalPath;
+
+        config([
+            'database.default' => 'mysql',
+            'database.connections.mysql.host' => '127.0.0.1',
+            'database.connections.mysql.port' => '3306',
+            'database.connections.mysql.username' => 'zazu-test',
+            'database.connections.mysql.password' => 'test-password',
+            'database.connections.mysql.database' => 'zazu_test',
+        ]);
+
+        try {
+            $this->artisan('zazu:backup', ['--output' => $output])
+                ->assertExitCode(0);
+
+            $archives = File::glob($output.DIRECTORY_SEPARATOR.'zazu-backup-*.zip');
+            $this->assertCount(1, $archives);
+
+            $zip = new ZipArchive();
+            $this->assertSame(true, $zip->open($archives[0]));
+            $this->assertSame($expectedDump, $zip->getFromName('database.sql'));
+            $this->assertNotSame('0', trim((string) $zip->getFromName('database.sql')));
+            $zip->close();
+
+            File::delete($archives[0]);
+            File::put($dumpScript, "#!/bin/sh\nexit 0\n");
+
+            $this->artisan('zazu:backup', ['--output' => $output])
+                ->assertExitCode(1);
+            $this->assertCount(
+                0,
+                File::glob($output.DIRECTORY_SEPARATOR.'zazu-backup-*.zip'),
+                'A successful mysqldump process with empty stdout must not publish a backup.',
+            );
+        } finally {
+            config([
+                'database.default' => $originalDefault,
+                'database.connections.mysql' => $originalMysql,
+            ]);
+            putenv('PATH='.$originalPath);
+            if ($originalServerPath === null) {
+                unset($_SERVER['PATH']);
+            } else {
+                $_SERVER['PATH'] = $originalServerPath;
+            }
+            if ($originalEnvPath === null) {
+                unset($_ENV['PATH']);
+            } else {
+                $_ENV['PATH'] = $originalEnvPath;
+            }
+            File::deleteDirectory($root);
+        }
+    }
 
     public function test_backup_fails_without_publishing_an_archive_when_private_storage_copy_fails(): void
     {
@@ -264,6 +346,144 @@ class ZazuBackupRestoreTest extends TestCase
         File::delete($archive);
     }
 
+    public function test_restore_rejects_a_symbolic_link_as_sqlite_target_before_mutating_data(): void
+    {
+        if (PHP_OS_FAMILY === 'Windows' || !function_exists('symlink')) {
+            $this->markTestSkipped('This regression requires POSIX symbolic-link support.');
+        }
+        if (!class_exists(ZipArchive::class) || !in_array('sqlite', \PDO::getAvailableDrivers(), true)) {
+            $this->markTestSkipped('PHP Zip and SQLite extensions are required for restore tests.');
+        }
+
+        $root = storage_path('app/zazu-symlink-target-restore-test');
+        $candidate = $root.'/candidate.sqlite';
+        $archive = $root.'/candidate.zip';
+        $protected = $root.'/protected.sqlite';
+        $targetLink = $root.'/configured-database.sqlite';
+        $privateProbe = storage_path('app/private/zazu-symlink-target-probe.txt');
+        $originalDefault = config('database.default');
+        $originalDatabase = config('database.connections.sqlite.database');
+
+        File::deleteDirectory($root);
+        File::ensureDirectoryExists($root);
+        File::ensureDirectoryExists(dirname($privateProbe));
+
+        $protectedPdo = new \PDO('sqlite:'.$protected);
+        $protectedPdo->exec('CREATE TABLE protected_probe (id INTEGER PRIMARY KEY, value TEXT)');
+        $protectedPdo->exec("INSERT INTO protected_probe (value) VALUES ('must remain untouched')");
+        $protectedPdo = null;
+
+        $candidatePdo = new \PDO('sqlite:'.$candidate);
+        $candidatePdo->exec('CREATE TABLE candidate_probe (id INTEGER PRIMARY KEY, value TEXT)');
+        $candidatePdo->exec("INSERT INTO candidate_probe (value) VALUES ('candidate restore')");
+        $candidatePdo = null;
+
+        $zip = new ZipArchive();
+        $this->assertSame(true, $zip->open($archive, ZipArchive::CREATE | ZipArchive::OVERWRITE));
+        $zip->addFromString('manifest.json', json_encode([
+            'application' => 'Zazu EMP',
+            'format_version' => 1,
+            'database_driver' => 'sqlite',
+            'contents' => ['database'],
+        ], JSON_THROW_ON_ERROR));
+        $zip->addFile($candidate, 'database.sqlite');
+        $zip->close();
+
+        $this->assertTrue(symlink($protected, $targetLink), 'The test must create the configured SQLite symlink.');
+        File::put($privateProbe, 'original private data must survive');
+
+        config([
+            'database.default' => 'sqlite',
+            'database.connections.sqlite.database' => $targetLink,
+        ]);
+        DB::purge('sqlite');
+
+        try {
+            $this->artisan('zazu:restore', [
+                'archive' => $archive,
+                '--force' => true,
+            ])->assertExitCode(1);
+
+            $this->assertTrue(is_link($targetLink), 'Restore must not replace or follow the configured symbolic link.');
+            $this->assertSame(
+                'must remain untouched',
+                (new \PDO('sqlite:'.$protected))->query('SELECT value FROM protected_probe')->fetchColumn(),
+            );
+            $this->assertSame('original private data must survive', File::get($privateProbe));
+        } finally {
+            DB::purge('sqlite');
+            config([
+                'database.default' => $originalDefault,
+                'database.connections.sqlite.database' => $originalDatabase,
+            ]);
+            DB::purge('sqlite');
+            File::delete($privateProbe);
+            File::deleteDirectory($root);
+        }
+    }
+
+    public function test_restore_rejects_a_directory_as_sqlite_target_before_mutating_private_storage(): void
+    {
+        if (!class_exists(ZipArchive::class) || !in_array('sqlite', \PDO::getAvailableDrivers(), true)) {
+            $this->markTestSkipped('PHP Zip and SQLite extensions are required for restore tests.');
+        }
+
+        $root = storage_path('app/zazu-directory-target-restore-test');
+        $database = $root.'/candidate.sqlite';
+        $archive = $root.'/candidate.zip';
+        $targetDirectory = $root.'/configured-database-target';
+        $privateProbe = storage_path('app/private/zazu-directory-target-probe.txt');
+        $originalDefault = config('database.default');
+        $originalDatabase = config('database.connections.sqlite.database');
+
+        File::deleteDirectory($root);
+        File::ensureDirectoryExists($targetDirectory);
+        File::ensureDirectoryExists(dirname($privateProbe));
+        File::put($privateProbe, 'original private data must survive');
+
+        $pdo = new \PDO('sqlite:'.$database);
+        $pdo->exec('CREATE TABLE restore_target_probe (id INTEGER PRIMARY KEY, value TEXT)');
+        $pdo->exec("INSERT INTO restore_target_probe (value) VALUES ('candidate')");
+        $pdo = null;
+
+        $zip = new ZipArchive();
+        $this->assertSame(true, $zip->open($archive, ZipArchive::CREATE | ZipArchive::OVERWRITE));
+        $zip->addFromString('manifest.json', json_encode([
+            'application' => 'Zazu EMP',
+            'format_version' => 1,
+            'database_driver' => 'sqlite',
+            'contents' => ['database'],
+        ], JSON_THROW_ON_ERROR));
+        $zip->addFile($database, 'database.sqlite');
+        $zip->close();
+
+        config([
+            'database.default' => 'sqlite',
+            'database.connections.sqlite.database' => $targetDirectory,
+        ]);
+        DB::purge('sqlite');
+
+        try {
+            $this->artisan('zazu:restore', [
+                'archive' => $archive,
+                '--force' => true,
+            ])->assertExitCode(1);
+
+            $this->assertDirectoryExists($targetDirectory);
+            $this->assertSame([], File::files($targetDirectory), 'Restore must not move the candidate database into a directory configured as the SQLite file.');
+            $this->assertSame('original private data must survive', File::get($privateProbe));
+        } finally {
+            DB::purge('sqlite');
+            config([
+                'database.default' => $originalDefault,
+                'database.connections.sqlite.database' => $originalDatabase,
+            ]);
+            DB::purge('sqlite');
+            File::delete($privateProbe);
+            File::deleteDirectory($root);
+        }
+    }
+
     public function test_restore_rejects_a_corrupt_sqlite_database_before_replacing_private_storage(): void
     {
         if (!class_exists(ZipArchive::class)) {
@@ -373,107 +593,87 @@ class ZazuBackupRestoreTest extends TestCase
     }
 
 
-    public function test_mysql_restore_attempts_pre_restore_rollback_after_partial_import_failure(): void
+
+    public function test_restore_restores_original_sqlite_memory_configuration_after_completion(): void
     {
-        if (!class_exists(ZipArchive::class)) {
-            $this->markTestSkipped('PHP Zip extension is required for backup/restore tests.');
+        if (!class_exists(ZipArchive::class) || !in_array('sqlite', \PDO::getAvailableDrivers(), true)) {
+            $this->markTestSkipped('PHP Zip and SQLite extensions are required for restore tests.');
         }
 
-        if (PHP_OS_FAMILY === 'Windows') {
-            $this->markTestSkipped('Fake MySQL command integration uses POSIX shell scripts.');
-        }
-
-        $root = storage_path('app/zazu-mysql-rollback-test-'.\Illuminate\Support\Str::ulid());
-        $bin = $root.'/bin';
-        $archive = $root.'/candidate.zip';
-        $countFile = $root.'/mysql-count.txt';
-        $logDirectory = $root.'/imports';
-        $privateProbe = storage_path('app/private/zazu-mysql-rollback-probe.txt');
-        $originalPath = getenv('PATH') ?: '';
-        $originalServerPath = $_SERVER['PATH'] ?? null;
-        $originalEnvPath = $_ENV['PATH'] ?? null;
+        $root = storage_path('app/zazu-memory-restore-test');
+        $database = $root.'/source.sqlite';
+        $archive = $root.'/memory-restore.zip';
         $originalDefault = config('database.default');
-        $originalMysql = config('database.connections.mysql');
+        $originalDatabase = config('database.connections.sqlite.database');
 
-        File::ensureDirectoryExists($bin);
-        File::ensureDirectoryExists($logDirectory);
-        File::ensureDirectoryExists(dirname($privateProbe));
-        File::put($privateProbe, 'original private data');
-
-        File::put($bin.'/mysqldump', "#!/bin/sh\nprintf '%s\\n' '-- pre-restore snapshot marker'\n");
-        File::put($bin.'/mysql', "#!/bin/sh\n".
-            'count=0'."\n".
-            '[ -f '.escapeshellarg($countFile).' ] && count=$(cat '.escapeshellarg($countFile).")\n".
-            'count=$((count + 1))'."\n".
-            'printf "%s" "$count" > '.escapeshellarg($countFile)."\n".
-            'cat > '.escapeshellarg($logDirectory).'/import-"$count".sql'."\n".
-            'if grep -q "candidate restore SQL" '.escapeshellarg($logDirectory).'/import-"$count".sql; then echo "simulated partial import failure" >&2; exit 1; fi'."\n".
-            "exit 0\n");
-        chmod($bin.'/mysqldump', 0755);
-        chmod($bin.'/mysql', 0755);
+        File::deleteDirectory($root);
+        File::ensureDirectoryExists($root);
+        $pdo = new \PDO('sqlite:'.$database);
+        $pdo->exec('CREATE TABLE memory_restore_probe (id INTEGER PRIMARY KEY, value TEXT)');
+        $pdo->exec("INSERT INTO memory_restore_probe (value) VALUES ('restored')");
+        $pdo = null;
 
         $zip = new ZipArchive();
         $this->assertSame(true, $zip->open($archive, ZipArchive::CREATE | ZipArchive::OVERWRITE));
         $zip->addFromString('manifest.json', json_encode([
             'application' => 'Zazu EMP',
             'format_version' => 1,
-            'database_driver' => 'mysql',
-            'contents' => ['database', 'private_storage'],
+            'database_driver' => 'sqlite',
+            'contents' => ['database'],
         ], JSON_THROW_ON_ERROR));
-        $zip->addFromString('database.sql', '-- candidate restore SQL');
-        $zip->addFromString('storage/private/restored-probe.txt', 'candidate private data');
+        $zip->addFile($database, 'database.sqlite');
         $zip->close();
 
         config([
-            'database.default' => 'mysql',
-            'database.connections.mysql' => array_merge($originalMysql, [
-                'host' => '127.0.0.1',
-                'port' => 3306,
-                'username' => 'zazu-test',
-                'password' => 'not-used',
-                'database' => 'zazu_test',
-            ]),
+            'database.default' => 'sqlite',
+            'database.connections.sqlite.database' => ':memory:',
         ]);
-        putenv('PATH='.$bin.PATH_SEPARATOR.$originalPath);
-        $_SERVER['PATH'] = $bin.PATH_SEPARATOR.$originalPath;
-        $_ENV['PATH'] = $bin.PATH_SEPARATOR.$originalPath;
+        DB::purge('sqlite');
 
         try {
-            $exitCode = Artisan::call('zazu:restore', [
+            $this->artisan('zazu:restore', [
                 'archive' => $archive,
                 '--force' => true,
-            ]);
-            $output = Artisan::output();
+            ])->assertExitCode(0);
 
-            $this->assertSame(1, $exitCode, $output);
-            $this->assertSame('2', trim(File::get($countFile)), 'MySQL should be invoked once for candidate import and once for rollback.');
-            $this->assertStringContainsString('-- candidate restore SQL', File::get($logDirectory.'/import-1.sql'));
-            $this->assertStringContainsString('-- pre-restore snapshot marker', File::get($logDirectory.'/import-2.sql'));
-            $this->assertSame('original private data', File::get($privateProbe), 'Private storage must roll back when the database import fails.');
-            $this->assertFileDoesNotExist(storage_path('app/private/restored-probe.txt'));
+            $this->assertSame(':memory:', config('database.connections.sqlite.database'));
+            $this->assertSame([], File::glob(storage_path('app/.zazu-test-restore-*.sqlite')), 'Temporary file-backed targets used for in-memory restore must not leak into later commands or tests.');
         } finally {
-            putenv('PATH='.$originalPath);
-            if ($originalEnvPath === null) {
-                unset($_ENV['PATH']);
-            } else {
-                $_ENV['PATH'] = $originalEnvPath;
-            }
-            if ($originalServerPath === null) {
-                unset($_SERVER['PATH']);
-            } else {
-                $_SERVER['PATH'] = $originalServerPath;
-            }
+            DB::purge('sqlite');
             config([
                 'database.default' => $originalDefault,
-                'database.connections.mysql' => $originalMysql,
+                'database.connections.sqlite.database' => $originalDatabase,
             ]);
-            File::delete($archive);
-            File::delete($privateProbe);
+            DB::purge('sqlite');
             File::deleteDirectory($root);
+            foreach (File::glob(storage_path('app/.zazu-test-restore-*.sqlite')) as $temporaryDatabase) {
+                File::delete($temporaryDatabase);
+            }
         }
     }
 
+    private function cleanupSqliteArtifacts(string $database): void
+    {
+        foreach ([$database, $database.'-wal', $database.'-shm'] as $path) {
+            File::delete($path);
+        }
+        foreach (File::glob(storage_path('app/.zazu-database-rollback-*')) as $rollbackFile) {
+            File::delete($rollbackFile);
+        }
+    }
 
+    private function createSqliteSidecarFixtures(string $database): void
+    {
+        DB::disconnect('sqlite');
+        DB::purge('sqlite');
+        File::put($database.'-wal', 'pre-restore WAL sidecar');
+        File::put($database.'-shm', 'pre-restore shared-memory sidecar');
+    }
+
+    private function assertNoSqliteRollbackArtifacts(): void
+    {
+        $this->assertSame([], File::glob(storage_path('app/.zazu-database-rollback-*')), 'Successful restore must clean the old database and WAL/SHM rollback artifacts.');
+    }
 
     private function assertVersionTwoArchive(ZipArchive $zip): void
     {

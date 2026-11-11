@@ -47,10 +47,20 @@ class ZazuRestoreCommand extends Command
 
         $privateRollback = null;
         $privateActivated = false;
+        $preservePrivateRollback = false;
         $databaseRollback = null;
+        $preserveDatabaseRollback = false;
+        $sqliteTarget = null;
+        $sqliteDatabaseStaged = false;
+        $sqliteWalStaged = false;
+        $sqliteShmStaged = false;
+        $sqliteDatabaseActivated = false;
         $mysqlRollbackPath = null;
         $mysqlRestoreStarted = false;
         $preserveWork = false;
+        $originalSqliteDatabase = config('database.connections.sqlite.database');
+        $temporaryMemoryTarget = false;
+        $temporaryMemoryDatabasePath = null;
 
         try {
             $zip = new ZipArchive();
@@ -292,10 +302,23 @@ class ZazuRestoreCommand extends Command
                 if ($target === ':memory:') {
                     $target = storage_path('app/.zazu-test-restore-'.Str::ulid().'.sqlite');
                     config(['database.connections.sqlite.database' => $target]);
+                    $temporaryMemoryTarget = true;
+                    $temporaryMemoryDatabasePath = $target;
                 }
 
                 if (!$target) {
                     $this->error('SQLite restore target is unavailable.');
+                    return self::FAILURE;
+                }
+
+                $targetParent = dirname($target);
+                if (is_link($target) || is_dir($target) || (file_exists($target) && !is_file($target))) {
+                    $this->error('SQLite restore target must be a regular database file, not a symbolic link, directory or special file.');
+                    return self::FAILURE;
+                }
+
+                if (!is_dir($targetParent) || !is_writable($targetParent)) {
+                    $this->error('SQLite restore target directory must exist and be writable before restore can begin.');
                     return self::FAILURE;
                 }
             } elseif ($driver === 'mysql') {
@@ -331,9 +354,9 @@ class ZazuRestoreCommand extends Command
                 }
 
                 if (!rename($storedPrivate, $privateTarget)) {
-                    if (is_dir($privateRollback)) {
-                        rename($privateRollback, $privateTarget);
-                    }
+                    // Leave the original private directory staged. The catch path
+                    // performs and verifies rollback; finally must never delete it
+                    // if reactivation fails.
                     throw new \RuntimeException('Could not activate the restored private storage.');
                 }
 
@@ -358,50 +381,46 @@ class ZazuRestoreCommand extends Command
                     throw new \RuntimeException('Could not stage the SQLite database for restore.');
                 }
 
+                $sqliteTarget = $target;
                 $databaseRollback = storage_path('app/.zazu-database-rollback-'.Str::ulid().'.sqlite');
                 $wal = $target.'-wal';
                 $shm = $target.'-shm';
                 $rollbackWal = $databaseRollback.'-wal';
                 $rollbackShm = $databaseRollback.'-shm';
 
-                if (is_file($target) && ! $this->renameWithRetry($target, $databaseRollback)) {
-                    File::delete($databaseStage);
-                    throw new \RuntimeException('Could not stage the current SQLite database for safe replacement.');
+                if (is_file($target)) {
+                    if (! $this->renameWithRetry($target, $databaseRollback)) {
+                        File::delete($databaseStage);
+                        throw new \RuntimeException('Could not stage the current SQLite database for safe replacement.');
+                    }
+                    $sqliteDatabaseStaged = true;
                 }
 
-                if (is_file($wal) && ! $this->renameWithRetry($wal, $rollbackWal)) {
-                    $this->renameWithRetry($databaseRollback, $target);
-                    File::delete($databaseStage);
-                    throw new \RuntimeException('Could not stage the current SQLite WAL file for safe replacement.');
+                if (is_file($wal)) {
+                    if (! $this->renameWithRetry($wal, $rollbackWal)) {
+                        File::delete($databaseStage);
+                        throw new \RuntimeException('Could not stage the current SQLite WAL file for safe replacement.');
+                    }
+                    $sqliteWalStaged = true;
                 }
 
-                if (is_file($shm) && ! $this->renameWithRetry($shm, $rollbackShm)) {
-                    $this->renameWithRetry($rollbackWal, $wal);
-                    $this->renameWithRetry($databaseRollback, $target);
-                    File::delete($databaseStage);
-                    throw new \RuntimeException('Could not stage the current SQLite shared-memory file for safe replacement.');
+                if (is_file($shm)) {
+                    if (! $this->renameWithRetry($shm, $rollbackShm)) {
+                        File::delete($databaseStage);
+                        throw new \RuntimeException('Could not stage the current SQLite shared-memory file for safe replacement.');
+                    }
+                    $sqliteShmStaged = true;
                 }
 
                 if (! $this->renameWithRetry($databaseStage, $target)) {
                     File::delete($databaseStage);
-                    $this->renameWithRetry($rollbackShm, $shm);
-                    $this->renameWithRetry($rollbackWal, $wal);
-                    $this->renameWithRetry($databaseRollback, $target);
                     throw new \RuntimeException('Could not activate the restored SQLite database.');
                 }
+
+                $sqliteDatabaseActivated = true;
             } elseif ($driver === 'mysql') {
                 $mysqlRestoreStarted = true;
                 $this->importMysqlDump($work.'/database.sql');
-            }
-
-            if ($databaseRollback !== null) {
-                File::delete($databaseRollback);
-                $databaseRollback = null;
-            }
-
-            if ($privateRollback !== null) {
-                File::deleteDirectory($privateRollback);
-                $privateRollback = null;
             }
 
             $this->info('Zazu restore completed from '.$archive);
@@ -419,43 +438,110 @@ class ZazuRestoreCommand extends Command
                 }
             }
 
-            if ($databaseRollback !== null && is_file($databaseRollback)) {
-                $target = config('database.connections.sqlite.database');
+            if ($sqliteTarget !== null && ($sqliteDatabaseStaged || $sqliteWalStaged || $sqliteShmStaged || $sqliteDatabaseActivated)) {
                 DB::purge('sqlite');
                 gc_collect_cycles();
-                File::delete($target);
-                File::delete($target.'-wal');
-                File::delete($target.'-shm');
-                $this->renameWithRetry($databaseRollback.'-shm', $target.'-shm');
-                $this->renameWithRetry($databaseRollback.'-wal', $target.'-wal');
-                $this->renameWithRetry($databaseRollback, $target);
+                $sqliteRollbackErrors = [];
+
+                if ($sqliteDatabaseActivated && is_file($sqliteTarget) && !File::delete($sqliteTarget)) {
+                    $sqliteRollbackErrors[] = 'Could not remove the candidate SQLite database before rollback.';
+                }
+
+                if (($sqliteDatabaseActivated || $sqliteWalStaged) && is_file($sqliteTarget.'-wal') && !File::delete($sqliteTarget.'-wal')) {
+                    $sqliteRollbackErrors[] = 'Could not remove the candidate SQLite WAL file before rollback.';
+                }
+
+                if (($sqliteDatabaseActivated || $sqliteShmStaged) && is_file($sqliteTarget.'-shm') && !File::delete($sqliteTarget.'-shm')) {
+                    $sqliteRollbackErrors[] = 'Could not remove the candidate SQLite shared-memory file before rollback.';
+                }
+
+                if ($sqliteRollbackErrors === []) {
+                    foreach ([
+                        [$sqliteShmStaged, $databaseRollback.'-shm', $sqliteTarget.'-shm', 'SQLite shared-memory rollback file'],
+                        [$sqliteWalStaged, $databaseRollback.'-wal', $sqliteTarget.'-wal', 'SQLite WAL rollback file'],
+                        [$sqliteDatabaseStaged, $databaseRollback, $sqliteTarget, 'SQLite database rollback file'],
+                    ] as [$wasStaged, $source, $destination, $label]) {
+                        if ($wasStaged && (!is_file($source) || !$this->renameWithRetry($source, $destination))) {
+                            $sqliteRollbackErrors[] = 'Could not restore the '.$label.'.';
+                        }
+                    }
+                }
+
+                if ($sqliteRollbackErrors !== []) {
+                    $preserveDatabaseRollback = true;
+                    $sqliteFailure = implode(' ', $sqliteRollbackErrors);
+                    $rollbackFailure = trim(($rollbackFailure ? $rollbackFailure.' ' : '').$sqliteFailure);
+                } else {
+                    $databaseRollback = null;
+                    $sqliteDatabaseStaged = false;
+                    $sqliteWalStaged = false;
+                    $sqliteShmStaged = false;
+                    $sqliteDatabaseActivated = false;
+                }
             }
 
-            if ($privateActivated) {
-                File::deleteDirectory(storage_path('app/private'));
+            $privateTarget = storage_path('app/private');
+            $privateRollbackErrors = [];
+
+            if ($privateActivated && is_dir($privateTarget) && !File::deleteDirectory($privateTarget)) {
+                $privateRollbackErrors[] = 'Could not remove the candidate private storage before rollback.';
             }
-            if ($privateRollback !== null && is_dir($privateRollback)) {
-                rename($privateRollback, storage_path('app/private'));
+
+            if ($privateRollbackErrors === [] && $privateRollback !== null && is_dir($privateRollback)) {
+                if (file_exists($privateTarget) || !rename($privateRollback, $privateTarget)) {
+                    $privateRollbackErrors[] = 'Could not reactivate the original private storage.';
+                } else {
+                    $privateRollback = null;
+                }
+            }
+
+            if ($privateRollbackErrors !== []) {
+                $preservePrivateRollback = true;
+                $privateFailure = implode(' ', $privateRollbackErrors);
+                $rollbackFailure = trim(($rollbackFailure ? $rollbackFailure.' ' : '').$privateFailure);
+            } else {
+                $privateActivated = false;
             }
 
             if ($rollbackFailure !== null) {
-                $this->error('Zazu restore failed and automatic MySQL rollback also failed: '.$rollbackFailure);
-                $this->error('Pre-restore database snapshot preserved at: '.$mysqlRollbackPath);
-                $this->error('The database may require operator recovery; do not retry against this installation.');
+                $this->error('Zazu restore failed and automatic rollback was incomplete: '.$rollbackFailure);
+                if ($mysqlRestoreStarted && $mysqlRollbackPath !== null && $preserveWork) {
+                    $this->error('Pre-restore MySQL snapshot preserved at: '.$mysqlRollbackPath);
+                }
+                if ($preserveDatabaseRollback && $databaseRollback !== null) {
+                    $this->error('Pre-restore SQLite snapshot preserved at: '.$databaseRollback);
+                }
+                if ($preservePrivateRollback && $privateRollback !== null) {
+                    $this->error('Original private storage preserved at: '.$privateRollback);
+                }
+                $this->error('The installation may require operator recovery; do not retry against it.');
             } else {
                 $this->error('Zazu restore failed; rollback was attempted where required: '.$exception->getMessage());
             }
 
             return self::FAILURE;
         } finally {
+            if ($temporaryMemoryTarget) {
+                DB::purge('sqlite');
+                config(['database.connections.sqlite.database' => $originalSqliteDatabase]);
+                foreach ([$temporaryMemoryDatabasePath, $temporaryMemoryDatabasePath.'-wal', $temporaryMemoryDatabasePath.'-shm'] as $temporaryFile) {
+                    if (is_string($temporaryFile) && is_file($temporaryFile) && !File::delete($temporaryFile)) {
+                        $this->warn('Could not remove temporary SQLite restore file: '.$temporaryFile);
+                    }
+                }
+            }
             if (!$preserveWork) {
                 File::deleteDirectory($work);
             }
-            if ($databaseRollback !== null) {
-                File::delete($databaseRollback);
+            if (!$preserveDatabaseRollback && $databaseRollback !== null) {
+                foreach ([$databaseRollback.'-shm', $databaseRollback.'-wal', $databaseRollback] as $rollbackFile) {
+                    if (is_file($rollbackFile) && !File::delete($rollbackFile)) {
+                        $this->warn('Could not remove a temporary SQLite rollback artifact: '.$rollbackFile);
+                    }
+                }
             }
-            if ($privateRollback !== null) {
-                File::deleteDirectory($privateRollback);
+            if (!$preservePrivateRollback && $privateRollback !== null && is_dir($privateRollback) && !File::deleteDirectory($privateRollback)) {
+                $this->warn('Could not remove the temporary private-storage rollback directory: '.$privateRollback);
             }
         }
     }

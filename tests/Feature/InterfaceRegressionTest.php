@@ -263,6 +263,18 @@ class InterfaceRegressionTest extends TestCase
         $this->assertStringNotContainsString('body.zazu-mobile-menu-open .zazu-helper {\n    opacity: 0;', $css);
     }
 
+    public function test_helper_is_portaled_outside_the_application_shell(): void
+    {
+        $layout = file_get_contents(resource_path('views/components/app-layout.blade.php'));
+
+        $shellClose = strpos($layout, "        </main>\n    </div>");
+        $helper = strpos($layout, '<x-zazu-helper />');
+
+        $this->assertNotFalse($shellClose);
+        $this->assertNotFalse($helper);
+        $this->assertGreaterThan($shellClose, $helper, 'The fixed helper must live outside the application shell so transformed content cannot reposition it over navigation.');
+    }
+
     public function test_helper_stays_at_the_far_right_when_work_and_sales_popovers_open(): void
     {
         $css = file_get_contents(resource_path('css/zazu-final-visual-sweep.css'));

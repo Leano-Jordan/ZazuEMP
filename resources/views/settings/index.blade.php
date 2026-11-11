@@ -364,7 +364,7 @@
 
     <section class="zazu-context-card mt-4" aria-labelledby="zazu-trusted-devices-title">
         <div class="zazu-context-title" id="zazu-trusted-devices-title">Trusted phone access</div>
-        <p class="zazu-context-copy mt-1">Review phones paired with this business. Revoking a phone blocks its sync token immediately; queued changes remaining only on that phone will not be uploaded unless it is paired again.</p>
+        <p class="zazu-context-copy mt-1">Review phones paired with this business. Revoking a phone blocks its sync token immediately, but does not remotely erase business data already stored on that phone. Changes remaining only on that phone will not upload unless it is paired again.</p>
         @if ($syncDevices->isEmpty())
             <p class="zazu-field-help mt-3">No phones have been paired with this business.</p>
         @else

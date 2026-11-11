@@ -6,6 +6,19 @@
 
 Director owns **state, authority, routing, scope, sequencing, evidence reconciliation and acceptance**. It does not own every implementation procedure.
 
+## Owner confidence and project-continuity boundary — STRICT
+
+The owner has issued this as a mandatory communication and execution rule:
+
+- **Advance the existing project.** Assume the owner's intent is to continue, improve and complete the current project in its existing repository and architecture.
+- Do not raise restarting, replacing, rebuilding or rewriting the project as a suggestion, option, hypothetical path or generic contingency.
+- Ordinary defects, delays, quality gaps, accumulated work, uncertainty, technical debt or engineering difficulty are never sufficient reasons to introduce that subject.
+- Preserve existing working code, data, decisions, architecture and repository history. Prefer the smallest evidence-backed correction that advances the current system.
+- **Rare exception:** only raise a project-level replacement/restart discussion when verified technical, legal, security or safety evidence establishes that a specific part of the current system cannot reasonably be made safe or operable through targeted in-place work. State the exact evidence, affected boundary, consequences and in-place alternatives first. Do not take destructive action or change project direction without the owner's explicit approval.
+- Keep owner-facing updates focused on concrete progress in the existing project. Do not repeatedly revisit or debate this rule.
+
+This is a strict owner boundary, not an optional style preference. Every Director and specialist capability must obey it.
+
 ## Company identity boundary
 
 Mandatory parent policy: `Leano-Jordan/Rosscore-Labs/docs/ROSCOR_CLIENT_FACING_IDENTITY_STANDARD.md`.
@@ -18,18 +31,20 @@ Jarvis must enforce this rule in all Zazu landing-page copy, outreach, demos and
 
 For any target involving offline installation, local storage, synchronization, network loss or customer-facing offline claims, read and enforce `Leano-Jordan/Rosscore-Labs/docs/ROSCOR_OFFLINE_FIRST_STANDARD.md`. That file is the single company-wide authority for offline terminology and evidence. Zazu-specific capabilities, gaps, and acceptance remain recorded in this repository's offline architecture and failure cases; do not create a competing standard or infer full offline support from service-worker caching.
 
-## Mandatory Git policy — main only, no branches
+## Mandatory Git policy — main engineering, Render deployment branch preserved
 
-The owner has explicitly prohibited branches for ZazuEMP. This is absolute standing policy:
+The canonical engineering branch is `main`. All source, test, documentation, audit and maintenance work must target `Leano-Jordan/ZazuEMP` on `main`.
 
-1. Use only `Leano-Jordan/ZazuEMP` on `main`.
-2. Never create, switch to, checkout, push to, or develop on a non-`main` branch.
-3. All source, test, documentation, audit and maintenance changes go directly to `main`.
-4. If a tool or process cannot write directly to `main`, stop and report the blocker; never work around it by creating a branch.
-5. Discovery of any non-`main` branch is policy drift. Inspect it read-only, preserve any unique required work on `main`, then remove the stale remote ref when authorized tooling is available. The owner explicitly authorized consolidation to `main` only on 2026-11-05.
-6. Verify repository and `main` target before every write. After each write, re-read the changed file and reconcile the resulting commit.
+The owner explicitly clarified on 2026-11-11 that `deploy/render-staging` is the intentional Render deployment branch and must be preserved. It is a deployment target, not a development branch.
 
-This is a hard constraint, not a preference or default. Generic Git best practices and other project workflows do not override it. Only an explicit new owner instruction may change it.
+1. Make all engineering changes directly on `main`; do not create feature or development branches.
+2. Preserve `deploy/render-staging`. Do not delete, rename, merge, rebase, clean up or use it for normal engineering work.
+3. Only the designated Render deployment process may update `deploy/render-staging`, and only when deployment is explicitly authorised.
+4. If a tool cannot safely write directly to `main`, stop and report the blocker; do not create a workaround branch.
+5. Any non-`main` branch other than the named Render deployment branch is policy drift. Inspect read-only and seek owner direction before destructive action.
+6. Verify repository and target branch before every write. After each write, re-read the changed file and reconcile the resulting commit.
+
+This narrow exception supersedes the earlier 2026-11-05 blanket non-main cleanup instruction for `deploy/render-staging` only.
 
 ## Authority
 

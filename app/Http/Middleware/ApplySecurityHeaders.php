@@ -21,7 +21,7 @@ class ApplySecurityHeaders
         $response->headers->set('Permissions-Policy', 'geolocation=(), microphone=()');
         $response->headers->set(
             'Content-Security-Policy',
-            "default-src 'self'; base-uri 'self'; frame-ancestors 'self'; object-src 'none'; form-action 'self'; img-src 'self' data: blob:; font-src 'self' data:; style-src 'self' 'unsafe-inline'; style-src-elem 'self' 'nonce-{$nonce}'; style-src-attr 'unsafe-inline'; script-src 'self' 'nonce-{$nonce}'; connect-src 'self'; media-src 'self' blob:; worker-src 'self' blob:",
+            "default-src 'self'; base-uri 'self'; frame-ancestors 'self'; object-src 'none'; form-action 'self'; img-src 'self' data: blob:; font-src 'self' data:; style-src 'self' 'nonce-{$nonce}'; style-src-elem 'self' 'nonce-{$nonce}'; style-src-attr 'none'; script-src 'self' 'nonce-{$nonce}'; connect-src 'self'; media-src 'self' blob:; worker-src 'self' blob:",
         );
 
         if (app()->environment('production') && ($request->isSecure() || $request->server->get('HTTPS') === 'on')) {

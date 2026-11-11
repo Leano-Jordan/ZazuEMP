@@ -113,9 +113,7 @@ function setupZazuToasts() {
                 return;
             }
 
-            toast.style.opacity = '0';
-            toast.style.transform = 'translateY(8px)';
-            toast.style.transition = 'opacity 140ms ease, transform 140ms ease';
+            toast.classList.add('is-closing');
             window.setTimeout(() => toast.remove(), 150);
         };
 

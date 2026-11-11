@@ -3,16 +3,29 @@ name: Rosscore Director Health Report
 on:
   push:
     branches: [main]
-    paths-ignore:
-      - 'docs/health/**'
+    paths:
+      - '.ai/engineering/**'
+      - 'app/**'
+      - 'bootstrap/**'
+      - 'config/**'
+      - 'database/**'
+      - 'docker/**'
+      - 'public/**'
+      - 'resources/**'
+      - 'routes/**'
+      - 'tests/**'
+      - '.github/workflows/**'
+      - 'AGENTS.md'
+      - 'ROSCORE_PROJECT_MANIFEST.md'
+      - 'composer.json'
+      - 'composer.lock'
+      - 'package.json'
+      - 'package-lock.json'
+      - 'vite.config.*'
+      - 'Dockerfile'
   workflow_run:
     workflows:
-      - Laravel
       - Zazu browser smoke
-      - Zazu quality
-      - Psalm Security Scan
-      - PHPMD
-      - Zazu populated upgrade and rollback
     types: [completed]
   workflow_dispatch:
 

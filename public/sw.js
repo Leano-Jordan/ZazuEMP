@@ -1,4 +1,4 @@
-const CACHE_NAME = 'zazu-static-v31';
+const CACHE_NAME = 'zazu-static-v34';
 const OFFLINE_SHELL = '/dashboard';
 let activeUserId = null;
 let activeBusinessId = null;
@@ -6,6 +6,7 @@ let activeUserGeneration = 0;
 let activePrimeController = null;
 const MAX_PRIME_ROUTES = 100;
 const PRIME_CONCURRENCY = 6;
+const MAX_PRIVATE_MEDIA_PRIME = 60;
 const ACTIVE_CONTEXT_STATE = new Request('/__zazu-active-context__');
 
 const PRECACHE_ASSETS = [
@@ -132,6 +133,65 @@ async function cacheRenderedPage(request, response, requestGeneration) {
     }
 }
 
+async function primePrivateMediaFromHtml(html, generation, userId, businessId, seenUrls, signal) {
+    if (generation !== activeUserGeneration
+        || activeUserId !== userId || activeBusinessId !== businessId) return;
+
+    const matches = html.matchAll(/\/media\/(?:profile|business)\/[A-Za-z0-9/_-]+(?:\?[^"'()\s<>]*)?/g);
+    const urls = [];
+
+    for (const match of matches) {
+        if (seenUrls.size >= MAX_PRIVATE_MEDIA_PRIME) break;
+
+        let url;
+        try {
+            url = new URL(match[0].replace(/&amp;/g, '&'), self.location.origin);
+        } catch {
+            continue;
+        }
+
+        if (url.origin !== self.location.origin
+            || !/^\/media\/(profile|business)\//.test(url.pathname)
+            || seenUrls.has(url.href)) continue;
+
+        seenUrls.add(url.href);
+        urls.push(url);
+    }
+
+    await Promise.all(urls.map(async (url) => {
+        if (generation !== activeUserGeneration
+            || activeUserId !== userId || activeBusinessId !== businessId) return;
+
+        try {
+            const request = new Request(url.href, {
+                credentials: 'include',
+                cache: 'no-store',
+            });
+            const response = await fetch(request, { signal });
+            await cachePrivateMediaResponse(request, response, generation, userId, businessId);
+        } catch {
+            // An unavailable image must not prevent the rest of the offline pages from being primed.
+        }
+    }));
+}
+
+async function cachePrivateMediaResponse(request, response, requestGeneration, userId, businessId) {
+    const contentType = response.headers.get('content-type') || '';
+    if (!response.ok || !contentType.toLowerCase().startsWith('image/')) return;
+
+    await loadActiveContext(requestGeneration);
+    if (requestGeneration !== activeUserGeneration
+        || activeUserId !== userId || activeBusinessId !== businessId) return;
+
+    const cacheName = contextCacheName();
+    if (!cacheName) return;
+    const cache = await caches.open(cacheName);
+    if (requestGeneration !== activeUserGeneration
+        || activeUserId !== userId || activeBusinessId !== businessId) return;
+
+    await cache.put(new Request(request.url), response.clone());
+}
+
 function isCacheableStaticAsset(url, request) {
     if (request.method !== 'GET' || url.origin !== self.location.origin) return false;
 
@@ -208,8 +268,11 @@ async function primePages(routes, primeGeneration = activeUserGeneration, primeU
         .filter((path) => typeof path === 'string' && path.startsWith('/') && !path.startsWith('/api/'))
         .slice(0, MAX_PRIME_ROUTES);
 
+    const primedPrivateMediaUrls = new Set();
+
     try {
         for (let offset = 0; offset < uniqueRoutes.length; offset += PRIME_CONCURRENCY) {
+            if (controller.signal.aborted) break;
             const batch = uniqueRoutes.slice(offset, offset + PRIME_CONCURRENCY);
             await Promise.all(batch.map(async (path) => {
                 try {
@@ -238,6 +301,14 @@ async function primePages(routes, primeGeneration = activeUserGeneration, primeU
                         || pageUserId !== activeUserId || pageBusinessId !== activeBusinessId) return;
 
                     await cache.put(new Request(new URL(path, self.location.origin)), response.clone());
+                    await primePrivateMediaFromHtml(
+                        html,
+                        primeGeneration,
+                        primeUserId,
+                        primeBusinessId,
+                        primedPrivateMediaUrls,
+                        controller.signal,
+                    );
                 } catch {
                     // A single page failing to prime must never block the installed Zazu shell.
                 }
@@ -317,6 +388,11 @@ self.addEventListener('fetch', (event) => {
         && (request.mode === 'navigate' || acceptsHtml);
 
     if (isAppPage) {
+        if (request.mode === 'navigate') {
+            // Real navigation takes priority over background cache warming on constrained hosts.
+            activePrimeController?.abort();
+        }
+
         event.respondWith(
             fetchWithTimeout(request)
                 .then((response) => {
@@ -359,6 +435,39 @@ self.addEventListener('fetch', (event) => {
 
             const response = await fetch(request);
             if (response.ok) await cache.put(cacheKey, response.clone());
+            return response;
+        })());
+        return;
+    }
+
+    // Uploaded business branding and profile photos are private media.
+    // Keep them in the authenticated workspace cache, never the shared static cache.
+    if (
+        request.method === 'GET'
+        && url.origin === self.location.origin
+        // Match the private media route, not request.destination: CSS background
+        // images can have an empty destination in some browser fetch paths.
+        && /^\/media\/(profile|business)\//.test(url.pathname)
+    ) {
+        event.respondWith((async () => {
+            const context = await loadActiveContext(requestGeneration);
+            if (!context || requestGeneration !== activeUserGeneration) return fetch(request);
+
+            const cacheName = contextCacheName();
+            const cache = cacheName ? await caches.open(cacheName) : null;
+            if (!cache || requestGeneration !== activeUserGeneration) return fetch(request);
+
+            const cached = await cache.match(new Request(request.url));
+            if (cached) return cached;
+
+            const response = await fetch(request);
+            await cachePrivateMediaResponse(
+                request,
+                response,
+                requestGeneration,
+                context.userId,
+                context.businessId,
+            );
             return response;
         })());
         return;

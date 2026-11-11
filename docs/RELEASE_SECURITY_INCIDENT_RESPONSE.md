@@ -47,6 +47,29 @@ Relevant implementation areas include:
 - business-context and authorization middleware;
 - private media controllers/routes.
 
+## Lost or stolen trusted phone
+
+A paired phone contains a business-scoped offline workspace. Treat loss, theft or reassignment of that phone as a potential business-data exposure, even if the owner can still sign in to Zazu elsewhere.
+
+### Immediate owner containment
+
+1. From another trusted device, sign in to the affected business as its owner.
+2. Open **Settings → Trusted phone access**.
+3. Identify the missing phone using its device name, type and last-seen time. If identity is uncertain, stop and confirm the correct device before revoking.
+4. Select **Revoke access** and confirm.
+5. Verify the device is shown as revoked. The action invalidates its sync credential and pairing metadata; the server audit log records the action 'sync.device.revoked'.
+6. Record the incident time, affected business, device details, last-seen time and revocation result in the incident record. Assess whether personal information may have been exposed and follow the notification-assessment process below.
+
+If the owner cannot access another trusted session, use the organisation's approved hosting/operator escalation channel. Do not invent or rely on an unapproved contact route.
+
+### Important limitation
+
+**Revocation is not remote wipe.** It blocks the phone from making further authenticated sync requests, but it does not erase business records, attachments, cached pages or other data already downloaded to the phone. Zazu currently has no verified remote-wipe capability. Device-level screen lock, encryption and physical custody remain part of the trust boundary.
+
+Queued changes that exist only on the missing phone will not be uploaded after revocation unless that device is authorised and paired again. Do not promise that those changes can be recovered from the server.
+
+If the phone is recovered, preserve its browser storage until the owner decides whether locally queued work must be reconciled. Do not clear site data or uninstall the PWA before that decision. Re-pair only after the device is back under business control and the owner has authorised its return to service.
+
 ## Investigation
 
 Determine:

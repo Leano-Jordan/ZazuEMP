@@ -342,8 +342,6 @@
                     </div>
                 @endif
 
-                <x-zazu-helper />
-
                 {{ $slot }}
             </div>
 
@@ -403,6 +401,9 @@
             </footer>
         </main>
     </div>
+
+    {{-- Keep the floating helper outside the transformed application shell so it docks to the viewport, not the content column. --}}
+    <x-zazu-helper />
 
 <script nonce="{{ request()->attributes->get('cspNonce') }}">
     document.addEventListener('DOMContentLoaded', () => {

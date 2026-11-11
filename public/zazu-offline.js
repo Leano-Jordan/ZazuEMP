@@ -232,42 +232,50 @@
             ...x.record,
             local_id: x.local_id,
             id: x.server_id,
+            server_id: x.server_id,
         }));
 
         state.suppliers = (bootstrap.suppliers || []).map(x => ({
             ...x.record,
             local_id: x.local_id,
             id: x.server_id,
+            server_id: x.server_id,
         }));
         state.purchase_orders = (bootstrap.purchase_orders || []).map(x => ({
             ...x.record,
             local_id: x.local_id,
             id: x.server_id,
+            server_id: x.server_id,
             items: (x.items || []).map(item => ({
                 ...item.record,
                 local_id: item.local_id,
                 id: item.server_id,
+                server_id: item.server_id,
             })),
         }));
         state.invoices = (bootstrap.invoices || []).map(x => ({
             ...x.record,
             local_id: x.local_id,
             id: x.server_id,
+            server_id: x.server_id,
             payments: (x.payments || []).map(payment => ({
                 ...payment.record,
                 local_id: payment.local_id,
                 id: payment.server_id,
+                server_id: payment.server_id,
             })),
         }));
         state.expenses = (bootstrap.expenses || []).map(x => ({
             ...x.record,
             local_id: x.local_id,
             id: x.server_id,
+            server_id: x.server_id,
         }));
         state.inventory_items = (bootstrap.inventory_items || []).map(x => ({
             ...x.record,
             local_id: x.local_id,
             id: x.server_id,
+            server_id: x.server_id,
             movements: (x.record?.movements || []).map(movement => ({
                 ...(movement.record || {}),
                 local_id: movement.local_id,
@@ -279,6 +287,7 @@
             ...x.record,
             local_id: x.local_id,
             id: x.server_id,
+            server_id: x.server_id,
             allocations: (x.record?.allocations || []).map(allocation => ({
                 ...(allocation.record || {}),
                 local_id: allocation.local_id,
@@ -290,6 +299,7 @@
             ...x.record,
             local_id: x.local_id,
             id: x.server_id,
+            server_id: x.server_id,
         }));
 
         const selected = bootstrap.selected || [];
@@ -308,6 +318,7 @@
                 ...item.record,
                 local_id: item.local_id,
                 id: item.server_id,
+                server_id: item.server_id,
             };
             const list = state[target];
             const index = list.findIndex(x => x.local_id === item.local_id || Number(x.id) === Number(item.server_id));
@@ -1068,12 +1079,20 @@
             throw new Error('Local offline storage is unavailable; this change was not saved.');
         }
         const expectedToken = (nextState || state)?.sync?.token || null;
+        const record = payload?.record && typeof payload.record === 'object' && !Array.isArray(payload.record)
+            ? payload.record
+            : (payload || {});
+        const mutationPayload = {
+            local_id: payload?.local_id || null,
+            server_id: payload?.server_id ?? null,
+            record,
+        };
         const mutation = {
             id: crypto.randomUUID(),
             entity_type: entityType,
-            entity_id: payload?.local_id || payload?.server_id || crypto.randomUUID(),
+            entity_id: mutationPayload.local_id || mutationPayload.server_id || crypto.randomUUID(),
             operation,
-            payload: payload || {},
+            payload: mutationPayload,
             created_at: new Date().toISOString(),
             status: 'pending',
         };

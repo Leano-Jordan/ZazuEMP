@@ -679,3 +679,36 @@ The current specification scorecard is `docs/ZAZU_V1_SCORECARD_2026-11-04.md`: *
 5. CSP nonce/hash review, sync-token lifecycle policy, legal/privacy operational closure, dependency/licence release review and official Zazu brand clearance.
 
 Source/test additions are not runtime proof. No score uplift is awarded and V1 remains NO-GO until critical release gates close. The canonical gate ledger is `docs/V1_RELEASE_CHECKLIST.md`; this roadmap records the supporting cycle and history.
+
+
+## Jarvis execution — 2026-11-11 — preview build-context hardening
+
+**Repository:** `Leano-Jordan/ZazuEMP`  
+**Branch:** `main`  
+**Application source:** unchanged by this batch.  
+**Commits:** `74196d7` (add Docker build-context exclusions), `934ada1` (trigger preview image validation when `.dockerignore` changes).
+
+### Finding and correction
+- The new multi-stage Docker build used `COPY . .` without a repository `.dockerignore`.
+- Git ignore rules do not protect local-only files from Docker build contexts. A developer building from a populated checkout could therefore send local environment files, database files, private uploads, editor state or Git metadata to the Docker builder.
+- Added `.dockerignore` exclusions for environment secrets, Git/agent/editor state, dependency folders, local SQLite databases, runtime storage/private uploads, browser artifacts, tests and documentation. The committed `.env.example` remains available.
+- Corrected the preview-build workflow path filter so changes to `.dockerignore` trigger a fresh Docker image build.
+- Re-fetched both changed files from current `main`; content matches the intended changes.
+
+### Verification boundary
+- The prior Docker image build was still in progress on `566ace3` when inspected; it predates the new ignore file and cannot verify this correction.
+- The current source commit at the time of this record is `934ada1`. Exact-head CI and a Docker build using the hardened context are pending; no test pass is claimed.
+- No production deployment, persistence, offline or release-readiness claim is made.
+
+### Director disposition
+**Implemented; verification pending.** No score uplift. Keep V1 **NO-GO**. Next: confirm the exact-head Docker build and full CI batch, then continue with the highest-risk remaining release gate.
+
+## Jarvis execution — 2026-11-11 — Director CI noise reduction
+
+- Finding: Director health reporting was triggered on every main push (except `docs/health/**`) and separately after completion of six CI workflows. One source commit could therefore queue many duplicate health-report runs.
+- Changed `.github/workflows/roscore-director-health.yml`: push reporting is now limited to engineering/source/configuration/CI control paths; the completion trigger now listens only to the Zazu browser smoke workflow, which is the final/slow acceptance signal in the required batch.
+- This preserves an early push snapshot and a post-browser final evidence snapshot while avoiding six near-identical post-check reports.
+- Commit: `224ddadf3cb6a711fe8475e8f46d57d7fae54541`.
+- Docker image build with the new `.dockerignore` passed on the prior preview-build run. It builds only; no deployment occurred.
+- A fresh exact-head CI batch has been queued for the workflow change. Browser smoke on the previous documentation head was still running at last inspection; do not claim it passed.
+- No application source changed and no score uplift is claimed. V1 remains **NO-GO**.

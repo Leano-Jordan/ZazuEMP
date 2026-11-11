@@ -38,6 +38,11 @@ class SyncDeviceManagementTest extends TestCase
         ]);
 
         $this->actingAs($owner)
+            ->get(route('settings.index'))
+            ->assertOk()
+            ->assertSee('does not remotely erase business data already stored on that phone');
+
+        $this->actingAs($owner)
             ->post(route('settings.sync.devices.revoke', $device))
             ->assertRedirect(route('settings.index'));
 

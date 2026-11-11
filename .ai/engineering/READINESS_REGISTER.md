@@ -1,3 +1,27 @@
+## Current verified source — 2026-11-11
+
+- **Verified application/test head:** `56bb804b2b71f9d709b0846be8d7c76139b9db60` on canonical `main`.
+- **Offline sync correction:** `public/zazu-offline.js` now preserves `server_id` as well as the legacy `id` alias when applying bootstrap records. This covers catalogue, suppliers, purchase orders and lines, invoices and payments, expenses, inventory and movements, assets and allocations, costs, and selected customers/jobs/quotes/preparations.
+- **Root cause proved by the real browser journey:** the server had created the offline customer and job and returned their identities, but the subsequent bootstrap refresh replaced the local records without retaining `server_id`. The client then lost the stable server identity after reconnect.
+- **Regression coverage:** the real offline Work-creation journey now verifies that customer/job IDs survive bootstrap refresh, that the IDs match, and that both records are available from their server-rendered pages. Each retry uses unique test records; browser-context values are passed explicitly into `page.evaluate`.
+- **Flake correction:** the late-device-session browser test now waits for the offline runtime to load before using it.
+
+Exact-head CI for `56bb804b2b71f9d709b0846be8d7c76139b9db60`:
+- Laravel: **PASS — 448 tests / 3,257 assertions** ([run 43016394823](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/43016394823)).
+- Offline browser acceptance: **PASS — 18 passed** (same Laravel workflow).
+- Browser smoke: **PASS — 82 passed / 38 skipped / 0 flaky** ([run 43016394826](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/43016394826)).
+- Zazu quality: **PASS** ([run 43016394710](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/43016394710)).
+- Psalm security: **PASS** ([run 43016394752](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/43016394752)).
+- PHPMD: **PASS** ([run 43016394775](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/43016394775)).
+- Populated upgrade/rollback: **PASS** ([run 43016394715](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/43016394715)).
+- Push on main: **PASS** ([run 43016394702](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/43016394702)).
+- Director health: **PASS** ([run 43017153387](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/43017153387)).
+- PHP security, secret scan, application build and static analysis checks: **PASS**.
+- SonarCloud: **SKIPPED**, not counted as a pass.
+- Render preview Docker image: **PASS — build only, no push/deploy** ([run 43015390179](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/43015390179)); workflow checked out current `main` source. Subsequent commits were test-only.
+
+**Release position remains NO-GO.** No score uplift is claimed; the last formally reconciled evidence-maturity score remains 69/100. Physical installed-device offline acceptance on secure HTTPS, representative operator backup/restore, deployment rollback, trusted-device/lost-device acceptance, operational privacy/legal closure, official Zazu brand clearance, and production licence issuer/key custody plus application-wide enforcement remain open. The `deploy/render-staging` branch is preserved; no deployment was triggered.
+
 
 
 ## Signed offline licence verifier — current-head verification — 2026-11-10
@@ -958,3 +982,64 @@ Commits: `4f4f9f63e617b201fb68ab612ef902805c8e1727`, `a281567ab1c9b384dffe47405d
 - xneelo Cloud Johannesburg is the preferred low-cost hosted pilot shortlist, not yet contracted or provisioned. Indicative 2 vCPU / 4 GB + 10 GB boot + 50 GB NVMe data volume is approximately R306/month at currently published prices. Single availability zone; external/offsite backup and owner-operated server management remain necessary.
 - Retention draft now separates tax records (SARS commonly five years, subject to exceptions) from Companies Act s24 company records (generally seven years for records covered by that section). No blanket five/seven-year retention is imposed on all personal information. Proposed account closure/export, log and backup periods are documented but require legal/accounting review and implementation.
 - Documentation progress only. No compliance certification or launch clearance is claimed. V1 remains **NO-GO**.
+
+
+## Private uploaded-image offline cache correction — 2026-11-11
+
+The service worker previously required `Request.destination === 'image'` before caching private profile/business media. This metadata is not dependable across every image-loading path, notably CSS background images. The private-media route matcher now keys off the authenticated `/media/profile/*` and `/media/business/*` routes instead. Media remains in the active user-and-business cache, never the shared static cache. Cache generation advanced to v33; a worker regression now covers an empty request destination. Commits: `ad81391`, `87cb501`, `19ca15d`. Source committed; automated runtime and physical-device verification remain pending. No readiness uplift; V1 remains **NO-GO**.
+
+
+## Private uploaded-image offline cache completion — 2026-11-11
+
+Private media was previously cached only when its image request naturally passed through the service worker; HTML page priming did not itself fetch referenced uploaded images. The worker now extracts same-origin profile/business media URLs from authenticated HTML (including CSS `url(...)` references) and primes up to 60 unique files per run into the active user/business cache. Runtime interception is route-based, not dependent on `Request.destination`. The shared static cache remains free of private media. Cache generation advanced to v34. Regression covers primed profile and CSS-background images after host loss. Commits: `ad81391`, `87cb501`, `19ca15d`, `799da2f`, `c9b347e`, `3b0ac8e`, `a041e07`, `a50e5f1`. Source reconciled; Node/Laravel/CI and installed-device verification remain pending. No readiness uplift; V1 remains **NO-GO**.
+
+
+## MySQL backup payload integrity — 2026-11-11
+
+Found and corrected a data-recovery blocker in `ZazuBackupCommand::snapshotMysql()`: Symfony Process `run()` returns an exit code, not stdout. The prior implementation wrote that exit code into `database.sql`, potentially producing a successful-looking but unusable MySQL backup. It now reads `getOutput()`, rejects empty dump output, and verifies the SQL payload was written before archive creation. Added a fake-`mysqldump` integration regression that inspects the resulting ZIP and asserts exact SQL output; fixture uses POSIX shell and skips on Windows. Commits: `19de1d4`, `f2598d9`, `7459d1c`. Source/test re-fetch and structural reconciliation: PASS. PHPUnit, PHP syntax, exact-head CI and real MySQL restore remain **UNVERIFIED**. Recovery maturity unchanged; V1 remains **NO-GO**.
+
+- Regression follow-up commit `604475e` extends the MySQL backup test to prove a zero-exit, empty-stdout dump is rejected and no archive is published. This is test source only; it has not yet been executed.
+
+
+## Helper navigation clearance and MySQL restore rollback failure coverage — 2026-11-11
+
+- Helper placement now sits outside the authenticated application shell, so the floating control is anchored to the viewport instead of being nested in the main content column. Existing far-right docking and mobile navigation avoidance remain unchanged.
+- Added a layout regression for the helper's portal placement.
+- Expanded MySQL restore failure-path coverage: after candidate import fails, the test now forces rollback import failure and verifies that the pre-restore dump survives in the preserved work directory, its path is reported, and original private storage is restored.
+- Commits: d25f0a6, 627d7e5, a91a6ea.
+- Source re-fetch/structural reconciliation: PASS. Exact-head PHPUnit/CI and rendered desktop/mobile acceptance: UNVERIFIED. No readiness score uplift. V1 remains NO-GO.
+
+
+## SQLite in-memory restore isolation — 2026-11-11
+
+- Fixed restore command state leakage for SQLite `:memory:` configurations: restore now returns the configured database target to its original value and cleans the temporary file-backed target plus WAL/SHM sidecars in `finally`.
+- Added regression coverage for a successful restore from a valid legacy archive under an in-memory connection; asserts config restoration and no temporary database artifact remains.
+- Commits: daa0a8a, 5221165, 5fc4ae3, 6d6a361.
+- Source reconciliation: PASS. Automated execution and CI: UNVERIFIED. No readiness uplift; V1 remains NO-GO.
+
+
+## SQLite WAL backup consistency regression — 2026-11-11
+
+- Added a regression that creates committed SQLite data in WAL mode, confirms WAL frames remain pending, creates a Zazu backup, changes the source record, restores the backup and verifies the original committed value returns.
+- This specifically exercises the existing `VACUUM INTO` snapshot path against committed-but-not-checkpointed WAL data; it does not alter the backup implementation.
+- Commits: `574e913`, `6957104`.
+- Source re-read: PASS. PHPUnit and exact-head CI: **UNVERIFIED**. Do not count as runtime proof or increase release maturity until the test executes.
+- V1 remains **NO-GO**; physical device, real operator recovery, deployment rollback, privacy/legal, brand and production licensing gates remain open.
+
+
+## SQLite restore destination preflight — 2026-11-11
+
+- Added a pre-mutation guard that rejects a directory/special-file SQLite destination and requires its parent directory to exist and be writable.
+- Added regression coverage proving a directory configured as the database target is rejected without moving a candidate database into it or changing existing private storage.
+- Commits: `af84b59`, `968f5a6`, `59e1e73`.
+- Source reconciliation: PASS. PHPUnit and exact-head CI: **UNVERIFIED**; readiness is not increased.
+- V1 remains **NO-GO**.
+
+
+## SQLite symbolic-link restore target rejection — 2026-11-11
+
+- SQLite restore preflight now rejects a configured database target that is a symbolic link, in addition to directories and special files.
+- Added POSIX-only regression coverage proving a symlink to a protected SQLite database is not followed or replaced and private storage remains unchanged. Windows skips the symlink fixture.
+- Commits: `3d848c0`, `ac45f6f`, `b11e779`.
+- Source reconciliation: PASS. PHPUnit and exact-head CI: **UNVERIFIED**. No release-readiness increase until runtime execution.
+- V1 remains **NO-GO**.

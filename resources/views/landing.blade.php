@@ -636,7 +636,7 @@
     const requestedPanel = @json(request()->query('auth'));
     const requestedAuthPanel = ['login', 'register', 'owner'].includes(requestedPanel) ? requestedPanel : null;
     const validationPanel = @json(session('auth_modal', $errors->any() ? 'login' : null));
-    const initialPanel = requestedAuthPanel || validationPanel;
+    const initialPanel = validationPanel || requestedAuthPanel;
     const accessTabs = modal.querySelectorAll('[data-auth-access-switch]');
     const ownerAccess = modal.querySelector('[data-auth-owner-access]');
     const loginTitle = modal.querySelector('[data-auth-title]');

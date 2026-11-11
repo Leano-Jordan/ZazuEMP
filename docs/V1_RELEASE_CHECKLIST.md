@@ -1,3 +1,27 @@
+## Current verified source — 2026-11-11
+
+- **Verified application/test head:** `56bb804b2b71f9d709b0846be8d7c76139b9db60` on canonical `main`.
+- **Offline sync correction:** `public/zazu-offline.js` now preserves `server_id` as well as the legacy `id` alias when applying bootstrap records. This covers catalogue, suppliers, purchase orders and lines, invoices and payments, expenses, inventory and movements, assets and allocations, costs, and selected customers/jobs/quotes/preparations.
+- **Root cause proved by the real browser journey:** the server had created the offline customer and job and returned their identities, but the subsequent bootstrap refresh replaced the local records without retaining `server_id`. The client then lost the stable server identity after reconnect.
+- **Regression coverage:** the real offline Work-creation journey now verifies that customer/job IDs survive bootstrap refresh, that the IDs match, and that both records are available from their server-rendered pages. Each retry uses unique test records; browser-context values are passed explicitly into `page.evaluate`.
+- **Flake correction:** the late-device-session browser test now waits for the offline runtime to load before using it.
+
+Exact-head CI for `56bb804b2b71f9d709b0846be8d7c76139b9db60`:
+- Laravel: **PASS — 448 tests / 3,257 assertions** ([run 43016394823](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/43016394823)).
+- Offline browser acceptance: **PASS — 18 passed** (same Laravel workflow).
+- Browser smoke: **PASS — 82 passed / 38 skipped / 0 flaky** ([run 43016394826](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/43016394826)).
+- Zazu quality: **PASS** ([run 43016394710](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/43016394710)).
+- Psalm security: **PASS** ([run 43016394752](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/43016394752)).
+- PHPMD: **PASS** ([run 43016394775](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/43016394775)).
+- Populated upgrade/rollback: **PASS** ([run 43016394715](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/43016394715)).
+- Push on main: **PASS** ([run 43016394702](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/43016394702)).
+- Director health: **PASS** ([run 43017153387](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/43017153387)).
+- PHP security, secret scan, application build and static analysis checks: **PASS**.
+- SonarCloud: **SKIPPED**, not counted as a pass.
+- Render preview Docker image: **PASS — build only, no push/deploy** ([run 43015390179](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/43015390179)); workflow checked out current `main` source. Subsequent commits were test-only.
+
+**Release position remains NO-GO.** No score uplift is claimed; the last formally reconciled evidence-maturity score remains 69/100. Physical installed-device offline acceptance on secure HTTPS, representative operator backup/restore, deployment rollback, trusted-device/lost-device acceptance, operational privacy/legal closure, official Zazu brand clearance, and production licence issuer/key custody plus application-wide enforcement remain open. The `deploy/render-staging` branch is preserved; no deployment was triggered.
+
 
 
 ## CSP style migration — workspace background variables — 2026-11-10
@@ -356,3 +380,26 @@ The earlier licensing note saying owner activation/status UI remained outstandin
 **Still open:** production issuer and private-key custody; installation identity/reactivation; application-wide plan/feature enforcement; exact-current-HEAD CI confirmation. This is an activation/import flow, not yet a complete commercial licensing system.
 
 The recorded 422 passing Laravel tests / 2,985 assertions are tied to commit `b9fc97d`; do not report them as current-HEAD results without a matching run. No physical-device, deployment, recovery, privacy or brand gate is closed by this correction.
+
+
+## Jarvis implementation update — Docker preview context hardening — 2026-11-11
+
+- Added `.dockerignore` to keep local environment files, developer state, SQLite files, runtime storage/private uploads, dependencies and test artifacts out of Docker build contexts.
+- Added `.dockerignore` to the Render preview image workflow path filter so changes to build-context rules are validated by a fresh image build.
+- Commits: `74196d7` and `934ada1`.
+- Both changed files were re-fetched from `main` and checked.
+- Exact-head CI and Docker build for the hardened context are pending. The previous Docker build was still running against `566ace3` and does not verify this change.
+- Application source is unchanged. No evidence score uplift; V1 remains **NO-GO**.
+
+
+
+## Jarvis execution — 2026-11-11 — Director CI noise reduction
+
+- Finding: Director health reporting was triggered on every main push (except `docs/health/**`) and separately after completion of six CI workflows. One source commit could therefore queue many duplicate health-report runs.
+- Changed `.github/workflows/roscore-director-health.yml`: push reporting is now limited to engineering/source/configuration/CI control paths; the completion trigger now listens only to the Zazu browser smoke workflow, which is the final/slow acceptance signal in the required batch.
+- This preserves an early push snapshot and a post-browser final evidence snapshot while avoiding six near-identical post-check reports.
+- Commit: `224ddadf3cb6a711fe8475e8f46d57d7fae54541`.
+- Docker image build with the new `.dockerignore` passed on the prior preview-build run. It builds only; no deployment occurred.
+- A fresh exact-head CI batch has been queued for the workflow change. Browser smoke on the previous documentation head was still running at last inspection; do not claim it passed.
+- No application source changed and no score uplift is claimed. V1 remains **NO-GO**.
+

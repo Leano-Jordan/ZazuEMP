@@ -21,7 +21,7 @@ The main offline security boundary is **owner-approved trusted-device access**, 
 
 | ID | Severity | Finding | Disposition |
 |---|---|---|---|
-| ZAZU-SEC-01 | Medium / accepted architecture constraint | Owner-approved phone workspace is business-scoped; normal staff web permissions are not a per-record security boundary inside that explicitly trusted device workspace. | Owner pairing and data disclosure exist; physical device trust, device inventory and lost-device/revocation procedure remain release controls |
+| ZAZU-SEC-01 | Medium / accepted architecture constraint | Owner-approved phone workspace is business-scoped; normal staff web permissions are not a per-record security boundary inside that explicitly trusted device workspace. Revocation blocks future sync but cannot remotely erase downloaded data. | Owner pairing, device inventory, immediate revocation UI, explicit no-remote-wipe disclosure and lost-device runbook are documented; physical device custody/screen-lock acceptance remains a release control |
 | ZAZU-SEC-02 | Medium | CSV/XLSX parsing lacked bounded row, cell, column and expanded-archive limits during parsing. | Fixed in this audit; CI proof pending |
 | ZAZU-SEC-03 | Medium | Customer import controller expected a response shape the spreadsheet reader does not return. | Fixed in this audit; feature regression added |
 | ZAZU-SEC-04 | Low | API requests were outside the web-only request-ID and security-header middleware. | Fixed in this audit; feature regression added |
