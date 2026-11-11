@@ -1995,3 +1995,13 @@ Source review found that authenticated sync pull/acknowledgement accepted arbitr
 - Commits: `af84b59` (preflight), `968f5a6` (regression), `59e1e73` (PDO namespace correction).
 - Source re-read: PASS. PHPUnit/runtime and exact-head CI: **UNVERIFIED**. No execution pass is claimed.
 - No deployment. `deploy/render-staging` untouched. V1 remains **NO-GO**.
+
+
+## Jarvis execution — reject symbolic-link SQLite restore targets — 2026-11-11
+
+- Finding: the SQLite restore preflight rejected directories and special files but accepted a symbolic link. Moving/replacing a symlink path can produce ambiguous behaviour around the linked database and its WAL/SHM sidecars.
+- Change: explicitly reject a symlink as the configured SQLite database target before any restore mutation.
+- Regression: added POSIX-only coverage with a valid candidate archive and a configured target symlink to a protected SQLite database; asserts restore fails, the link remains, the protected record is unchanged, and private business data survives. Windows skips this test because the fixture requires POSIX symlink support.
+- Commits: `3d848c0` (guard), `ac45f6f` (regression), `b11e779` (PDO namespace correction).
+- Source re-read: PASS. PHPUnit/runtime and exact-head CI: **UNVERIFIED**; no test pass is claimed.
+- No deployment. `deploy/render-staging` untouched. V1 remains **NO-GO**.
