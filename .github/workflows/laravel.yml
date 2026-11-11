@@ -83,6 +83,8 @@ jobs:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
       - name: Install PHP dependencies
         run: composer install -q --no-ansi --no-interaction --no-scripts --no-progress --prefer-dist
+      - name: Prepare environment
+        run: php -r "file_exists('.env') || copy('.env.example', '.env');"
       - name: Generate application key
         run: php artisan key:generate
       - name: Run complete migration set on PostgreSQL
