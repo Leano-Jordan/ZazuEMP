@@ -126,6 +126,7 @@ class ZazuBackupRestoreTest extends TestCase
         File::delete($database.'-shm');
         File::deleteDirectory($output);
         File::ensureDirectoryExists(dirname($database));
+        File::put($database, '');
 
         config([
             'database.default' => 'sqlite',
@@ -622,7 +623,7 @@ class ZazuBackupRestoreTest extends TestCase
             preg_match('/Pre-restore MySQL snapshot preserved at: (.+)/', $rollbackFailureOutput, $snapshotMatch);
             $snapshotPath = trim($snapshotMatch[1] ?? '');
             $this->assertFileExists($snapshotPath);
-            $this->assertSame('-- pre-restore snapshot marker', File::get($snapshotPath));
+            $this->assertSame('-- pre-restore snapshot marker', rtrim(File::get($snapshotPath), "\r\n"));
             $this->assertSame('original private data', File::get($privateProbe), 'Private storage must still roll back when the database rollback fails.');
             File::deleteDirectory(dirname($snapshotPath));
         } finally {
