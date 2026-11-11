@@ -27,6 +27,9 @@ chown -R www-data:www-data storage bootstrap/cache
 php artisan config:clear
 php artisan package:discover --ansi
 php artisan migrate --force
+# Apache serves requests as www-data; SQLite must be writable by that process.
+chown www-data:www-data "$DB_DATABASE"
+chmod 660 "$DB_DATABASE"
 php artisan storage:link || true
 php artisan config:cache
 php artisan route:cache
