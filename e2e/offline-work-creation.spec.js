@@ -49,7 +49,7 @@ test('real Zazu job form can create a job locally while disconnected', async ({ 
     });
     expect(customerLocalId).toBeTruthy();
     const customerQueue = await page.evaluate(async () => await window.ZazuOffline?.pending());
-    expect(customerQueue.some((mutation) => mutation.entity_type === 'customer' && mutation.payload?.name === 'Offline test customer')).toBe(true);
+    expect(customerQueue.some((mutation) => mutation.entity_type === 'customer' && mutation.payload?.record?.name === 'Offline test customer')).toBe(true);
 
     await page.goto('/customers', { waitUntil: 'domcontentloaded' });
     await expect(page.locator('[data-zazu-local-record="customer"]').filter({ hasText: 'Offline test customer' })).toBeVisible();
@@ -81,7 +81,7 @@ test('real Zazu job form can create a job locally while disconnected', async ({ 
     const state = await page.evaluate(() => window.ZazuOffline?.getState()?.jobs || []);
     expect(state.some((job) => job.name === 'Offline catering job' && job.local_id)).toBe(true);
     const queued = await page.evaluate(async () => await window.ZazuOffline?.pending());
-    expect(queued.some((mutation) => mutation.entity_type === 'job' && mutation.payload?.name === 'Offline catering job')).toBe(true);
+    expect(queued.some((mutation) => mutation.entity_type === 'job' && mutation.payload?.record?.name === 'Offline catering job')).toBe(true);
 
     // A reload while disconnected must recover the same locally persisted job.
     await page.reload({ waitUntil: 'domcontentloaded' });
@@ -90,7 +90,7 @@ test('real Zazu job form can create a job locally while disconnected', async ({ 
     const persisted = await page.evaluate(() => window.ZazuOffline?.getState()?.jobs || []);
     expect(persisted.some((job) => job.name === 'Offline catering job' && job.local_id)).toBe(true);
     const persistedQueue = await page.evaluate(async () => await window.ZazuOffline?.pending());
-    expect(persistedQueue.some((mutation) => mutation.entity_type === 'job' && mutation.payload?.name === 'Offline catering job')).toBe(true);
+    expect(persistedQueue.some((mutation) => mutation.entity_type === 'job' && mutation.payload?.record?.name === 'Offline catering job')).toBe(true);
     const persistedCustomer = await page.evaluate(() => window.ZazuOffline?.getState()?.customers?.find(customer => customer.name === 'Offline test customer') || null);
     expect(persistedCustomer).toBeTruthy();
 
