@@ -8,25 +8,28 @@ This repository is **Zazu EMP only**.
 - Product: Zazu – Event Management Platform
 - Local root when locally available: `C:\Projects\ZazuEMP`
 
-## ABSOLUTE SINGLE-BRANCH POLICY — OWNER MANDATE
+## ENGINEERING / DEPLOYMENT BRANCH POLICY — OWNER CLARIFICATION
 
-**ZazuEMP is a `main`-only repository. Branches are prohibited.** This is a standing owner constraint, not a default preference.
+**`main` is the canonical engineering branch.** All application source, tests, documentation, audits and maintenance work must be written directly to `main`.
 
-- Never create, checkout, switch to, push to, or base work on any non-`main` branch.
-- Every code, test, documentation, audit, and maintenance write must target `main` directly.
-- Do not propose a feature branch or silently use a branch because a tool/workflow suggests it.
-- If a write cannot be safely completed directly on `main`, stop and report the specific tooling blocker; do not create a branch as a workaround.
-- If an existing non-`main` branch is discovered, treat it as policy drift. Do not work on it. Inspect unique work read-only, migrate only reviewed required changes directly to `main`, then delete the remote ref. Owner explicitly authorized cleanup of all non-`main` refs on 2026-11-05.
-- Before each write, explicitly confirm the target is `Leano-Jordan/ZazuEMP` on `main`.
+**`deploy/render-staging` is an intentional deployment-only branch for Render.** The owner clarified on 2026-11-11 that this second branch is required and must be preserved. It is not a development branch.
 
-This rule overrides any generic Git workflow, assistant convention, tool default, historical branch, or other repository's instructions. Only a new explicit owner instruction in the current task may change it.
+- Never create feature or development branches.
+- Never use `deploy/render-staging` for ordinary engineering work.
+- Do not delete, rename, merge, rebase or otherwise clean up `deploy/render-staging` as part of routine repository maintenance.
+- Only the designated Render deployment process may update `deploy/render-staging`, and only when deployment is explicitly authorised.
+- All engineering writes target `Leano-Jordan/ZazuEMP` on `main`.
+- Any other non-`main` branch is policy drift; inspect it read-only and seek owner direction before destructive action.
+- Before every write, explicitly confirm the repository and `main` target.
+
+This narrow deployment-branch exception supersedes the earlier 2026-11-05 blanket non-main cleanup instruction for `deploy/render-staging` only.
 
 ## WRITE GATE
 
 Before any state-changing operation, establish:
 1. requested target = Zazu EMP;
 2. repository target = `Leano-Jordan/ZazuEMP`;
-3. branch = `main` unless explicitly overridden by the owner;
+3. engineering branch = `main`; `deploy/render-staging` is reserved for the explicitly authorised Render deployment process;
 4. target path is inside this repository;
 5. the intended change is derived from current Zazu evidence, not from another project's remembered context.
 

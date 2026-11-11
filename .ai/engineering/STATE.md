@@ -28,7 +28,9 @@ IDENTITY → BASELINE → TARGET → ROUTE → INSPECT → CHANGE → VERIFY →
 The 2026-11-01 local Windows-host proposal was exploratory and is no longer the active deployment target. The owner has clarified that this PC is a development workstation; future production hosting will be a paid server when funding and release readiness permit. The 2026-11-03 host diagnostic is recorded below. Do not configure this PC as production infrastructure.
 
 ## Active target
-**Owner-directed V1 convergence:** repair source defects, keep exact-main CI green, complete the remaining offline/device and commercial evidence, and remove every operational task that can be safely verified or automated from code. The owner-accepted dashboard remains closed. All implementation stays on canonical `main`.
+**Active target**: Owner-directed V1 convergence — offline sync identity and automated browser acceptance are closed on source head `56bb804`; next gate is the representative operator backup/restore drill.
+**Owner-directed V1 convergence:** repair source defects, keep exact-main CI green, complete the remaining offline/device and commercial evidence, and remove every operational task that can be safely verified or automated from code. The owner-accepted dashboard remains closed. All engineering implementation stays on canonical `main`; `deploy/render-staging` remains deployment-only.
+Next hard gate: Run a representative database + private-media backup/restore drill against the intended hosting target. Keep installed-device offline acceptance open until the secure-origin disconnect, full close/reopen, local-work recovery and reconnect sequence passes.
 
 ## Current verified source — 2026-11-11
 
