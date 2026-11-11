@@ -135,3 +135,12 @@ The current `main` branch is protected, but GitHub reports empty required status
 - OWASP File Upload Cheat Sheet: https://cheatsheetseries.owasp.org/cheatsheets/File_Upload_Cheat_Sheet.html
 - PHP `ZipArchive::statIndex`: https://www.php.net/manual/en/ziparchive.statindex.php
 - Laravel 13 middleware groups: https://laravel.com/docs/13.x/middleware
+
+## Director reconciliation — 2026-11-11
+
+This reconciliation supersedes the earlier ZAZU-SEC-05 disposition and the obsolete first ZAZU-SEC-07 paragraph above.
+
+- **ZAZU-SEC-05 — FIXED IN SOURCE:** current `ApplySecurityHeaders` enforces nonce-authorized `style-src` and `style-src-elem`, with `style-src-attr 'none'`; the emitted policy contains no `unsafe-inline`. `SecurityHeadersTest` checks every active Blade view for inline style attributes and requires nonces on inline style elements. Exact-head Laravel CI passed 455 tests / 3,299 assertions and offline browser acceptance passed on `6dc7e3c57a4ad770444ce337c128985d0074d02f`. Full browser smoke was still in progress at the time of reconciliation.
+- **ZAZU-SEC-07 — FIXED IN SOURCE:** incident logging excludes raw exception messages, SQL, bindings and stack traces, and suppresses Laravel's duplicate raw exception-report path. Regression coverage passed in the exact-head Laravel suite.
+- **Operational controls remain open:** hosting log access/retention/export controls, trusted-device custody and revocation procedure, and physical installed-device acceptance are not proven by source tests.
+- **Release decision remains NO-GO.** No production readiness or clean GitHub Security-tab status is inferred from these results.
