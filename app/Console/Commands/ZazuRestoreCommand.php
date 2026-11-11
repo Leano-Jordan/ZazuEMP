@@ -60,6 +60,7 @@ class ZazuRestoreCommand extends Command
         $preserveWork = false;
         $originalSqliteDatabase = config('database.connections.sqlite.database');
         $temporaryMemoryTarget = false;
+        $temporaryMemoryDatabasePath = null;
 
         try {
             $zip = new ZipArchive();
@@ -302,6 +303,7 @@ class ZazuRestoreCommand extends Command
                     $target = storage_path('app/.zazu-test-restore-'.Str::ulid().'.sqlite');
                     config(['database.connections.sqlite.database' => $target]);
                     $temporaryMemoryTarget = true;
+                    $temporaryMemoryDatabasePath = $target;
                 }
 
                 if (!$target) {
@@ -511,6 +513,11 @@ class ZazuRestoreCommand extends Command
             if ($temporaryMemoryTarget) {
                 DB::purge('sqlite');
                 config(['database.connections.sqlite.database' => $originalSqliteDatabase]);
+                foreach ([$temporaryMemoryDatabasePath, $temporaryMemoryDatabasePath.'-wal', $temporaryMemoryDatabasePath.'-shm'] as $temporaryFile) {
+                    if (is_string($temporaryFile) && is_file($temporaryFile) && !File::delete($temporaryFile)) {
+                        $this->warn('Could not remove temporary SQLite restore file: '.$temporaryFile);
+                    }
+                }
             }
             if (!$preserveWork) {
                 File::deleteDirectory($work);
