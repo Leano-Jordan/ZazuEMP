@@ -137,7 +137,7 @@ async function primePrivateMediaFromHtml(html, generation, userId, businessId, s
     if (generation !== activeUserGeneration
         || activeUserId !== userId || activeBusinessId !== businessId) return;
 
-    const matches = html.matchAll(/\/media\/(?:profile|business)\/[A-Za-z0-9/_-]+(?:\?[^"'()\\s<>]*)?/g);
+    const matches = html.matchAll(/\/media\/(?:profile|business)\/[A-Za-z0-9/_-]+(?:\?[^"'()\s<>]*)?/g);
     const urls = [];
 
     for (const match of matches) {
