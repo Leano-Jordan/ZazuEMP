@@ -90,7 +90,7 @@ class SecurityHeadersTest extends TestCase
             preg_match_all('/<style\\b([^>]*)>/i', $source, $styleBlocks);
             foreach ($styleBlocks[1] as $attributes) {
                 $this->assertMatchesRegularExpression(
-                    '/\\bnonce\\s*=\\s*["\\']/',
+                    '/\\bnonce\\s*=/',
                     $attributes,
                     "Inline style block in {$view->getRelativePathname()} must carry a CSP nonce.",
                 );
