@@ -987,3 +987,8 @@ Commits: `4f4f9f63e617b201fb68ab612ef902805c8e1727`, `a281567ab1c9b384dffe47405d
 ## Private uploaded-image offline cache correction — 2026-11-11
 
 The service worker previously required `Request.destination === 'image'` before caching private profile/business media. This metadata is not dependable across every image-loading path, notably CSS background images. The private-media route matcher now keys off the authenticated `/media/profile/*` and `/media/business/*` routes instead. Media remains in the active user-and-business cache, never the shared static cache. Cache generation advanced to v33; a worker regression now covers an empty request destination. Commits: `ad81391`, `87cb501`, `19ca15d`. Source committed; automated runtime and physical-device verification remain pending. No readiness uplift; V1 remains **NO-GO**.
+
+
+## Private uploaded-image offline cache completion — 2026-11-11
+
+Private media was previously cached only when its image request naturally passed through the service worker; HTML page priming did not itself fetch referenced uploaded images. The worker now extracts same-origin profile/business media URLs from authenticated HTML (including CSS `url(...)` references) and primes up to 60 unique files per run into the active user/business cache. Runtime interception is route-based, not dependent on `Request.destination`. The shared static cache remains free of private media. Cache generation advanced to v34. Regression covers primed profile and CSS-background images after host loss. Commits: `ad81391`, `87cb501`, `19ca15d`, `799da2f`, `c9b347e`, `3b0ac8e`, `a041e07`, `a50e5f1`. Source reconciled; Node/Laravel/CI and installed-device verification remain pending. No readiness uplift; V1 remains **NO-GO**.
