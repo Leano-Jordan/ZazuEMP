@@ -1,4 +1,4 @@
-const CACHE_NAME = 'zazu-static-v31';
+const CACHE_NAME = 'zazu-static-v32';
 const OFFLINE_SHELL = '/dashboard';
 let activeUserId = null;
 let activeBusinessId = null;
@@ -130,6 +130,23 @@ async function cacheRenderedPage(request, response, requestGeneration) {
         || activeUserId !== pageUserId || activeBusinessId !== pageBusinessId) {
         await caches.delete(cacheName);
     }
+}
+
+async function cachePrivateMediaResponse(request, response, requestGeneration, userId, businessId) {
+    const contentType = response.headers.get('content-type') || '';
+    if (!response.ok || !contentType.toLowerCase().startsWith('image/')) return;
+
+    await loadActiveContext(requestGeneration);
+    if (requestGeneration !== activeUserGeneration
+        || activeUserId !== userId || activeBusinessId !== businessId) return;
+
+    const cacheName = contextCacheName();
+    if (!cacheName) return;
+    const cache = await caches.open(cacheName);
+    if (requestGeneration !== activeUserGeneration
+        || activeUserId !== userId || activeBusinessId !== businessId) return;
+
+    await cache.put(new Request(request.url), response.clone());
 }
 
 function isCacheableStaticAsset(url, request) {
@@ -359,6 +376,38 @@ self.addEventListener('fetch', (event) => {
 
             const response = await fetch(request);
             if (response.ok) await cache.put(cacheKey, response.clone());
+            return response;
+        })());
+        return;
+    }
+
+    // Uploaded business branding and profile photos are private media.
+    // Keep them in the authenticated workspace cache, never the shared static cache.
+    if (
+        request.method === 'GET'
+        && url.origin === self.location.origin
+        && request.destination === 'image'
+        && /^\/media\/(profile|business)\//.test(url.pathname)
+    ) {
+        event.respondWith((async () => {
+            const context = await loadActiveContext(requestGeneration);
+            if (!context || requestGeneration !== activeUserGeneration) return fetch(request);
+
+            const cacheName = contextCacheName();
+            const cache = cacheName ? await caches.open(cacheName) : null;
+            if (!cache || requestGeneration !== activeUserGeneration) return fetch(request);
+
+            const cached = await cache.match(new Request(request.url));
+            if (cached) return cached;
+
+            const response = await fetch(request);
+            await cachePrivateMediaResponse(
+                request,
+                response,
+                requestGeneration,
+                context.userId,
+                context.businessId,
+            );
             return response;
         })());
         return;
