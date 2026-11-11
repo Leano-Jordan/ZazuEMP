@@ -112,7 +112,7 @@ class ZazuBackupRestoreTest extends TestCase
 
     public function test_sqlite_backup_includes_committed_wal_records(): void
     {
-        if (!class_exists(ZipArchive::class) || !in_array('sqlite', \\PDO::getAvailableDrivers(), true)) {
+        if (!class_exists(ZipArchive::class) || !in_array('sqlite', \PDO::getAvailableDrivers(), true)) {
             $this->markTestSkipped('PHP Zip and SQLite extensions are required for backup tests.');
         }
 
