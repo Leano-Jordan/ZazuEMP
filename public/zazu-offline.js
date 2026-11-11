@@ -262,6 +262,7 @@
                 ...payment.record,
                 local_id: payment.local_id,
                 id: payment.server_id,
+                server_id: payment.server_id,
             })),
         }));
         state.expenses = (bootstrap.expenses || []).map(x => ({
