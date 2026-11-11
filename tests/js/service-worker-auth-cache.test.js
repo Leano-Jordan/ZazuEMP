@@ -149,6 +149,64 @@ function bootWorker(fetchImplementation = async () => new MockResponse('online')
     return { caches, dispatchFetch, dispatchMessage, fetchCalls, Request: MockRequest, Response: MockResponse };
 }
 
+test('authenticated uploaded images are cached only in the active business cache and remain available offline', async () => {
+    let hostAvailable = true;
+    const worker = bootWorker(async (request) => {
+        if (!hostAvailable) throw new Error('Host server unavailable');
+        return new MockResponse('image-bytes', {
+            headers: { 'content-type': 'image/png', 'cache-control': 'private, no-store' },
+        });
+    });
+
+    await worker.dispatchMessage({
+        type: 'prime-pages',
+        userId: '41',
+        businessId: '17',
+        routes: [],
+    });
+
+    const imageRequest = () => new worker.Request('/media/business/logo', {
+        method: 'GET',
+        destination: 'image',
+    });
+    const online = worker.dispatchFetch(imageRequest());
+    const onlineResponse = await online.response;
+    assert.equal(onlineResponse.ok, true);
+    await online.finished();
+
+    const names = await worker.caches.keys();
+    assert.ok(names.includes('zazu-static-v32-user-41-business-17'));
+    assert.equal(names.includes('zazu-static-v32'), true);
+    const privateCache = await worker.caches.open('zazu-static-v32-user-41-business-17');
+    assert.ok(await privateCache.match('/media/business/logo'));
+    const staticCache = await worker.caches.open('zazu-static-v32');
+    assert.equal(await staticCache.match('/media/business/logo'), null, 'private media must not enter the shared cache');
+
+    hostAvailable = false;
+    const offline = worker.dispatchFetch(imageRequest());
+    const offlineResponse = await offline.response;
+    assert.equal(offlineResponse.ok, true);
+    assert.equal(await offlineResponse.text(), 'image-bytes');
+    await offline.finished();
+});
+
+test('uploaded images are not cached without an authenticated business context', async () => {
+    const worker = bootWorker(async () => new MockResponse('image-bytes', {
+        headers: { 'content-type': 'image/png' },
+    }));
+
+    const request = new worker.Request('/media/profile/customer/12', {
+        method: 'GET',
+        destination: 'image',
+    });
+    const result = worker.dispatchFetch(request);
+    assert.equal((await result.response).ok, true);
+    await result.finished();
+
+    const names = await worker.caches.keys();
+    assert.equal(names.some(name => name.includes('-user-')), false);
+});
+
 test('a persisted identity read finishing after logout cannot restore the identity or prime private pages', async () => {
     const worker = bootWorker();
     const cache = await worker.caches.open('zazu-static-v31');
