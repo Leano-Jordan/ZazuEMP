@@ -11,8 +11,18 @@ on:
       - 'composer.lock'
       - 'package.json'
       - 'package-lock.json'
+      - 'app/**'
+      - 'bootstrap/**'
+      - 'config/**'
+      - 'database/**'
+      - 'lang/**'
+      - 'routes/**'
       - 'resources/**'
       - 'public/**'
+      - 'artisan'
+      - 'vite.config.*'
+      - 'postcss.config.*'
+      - 'tailwind.config.*'
       - '.github/workflows/render-docker-build.yml'
   workflow_dispatch:
 
