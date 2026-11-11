@@ -1068,12 +1068,20 @@
             throw new Error('Local offline storage is unavailable; this change was not saved.');
         }
         const expectedToken = (nextState || state)?.sync?.token || null;
+        const record = payload?.record && typeof payload.record === 'object' && !Array.isArray(payload.record)
+            ? payload.record
+            : (payload || {});
+        const mutationPayload = {
+            local_id: payload?.local_id || null,
+            server_id: payload?.server_id ?? null,
+            record,
+        };
         const mutation = {
             id: crypto.randomUUID(),
             entity_type: entityType,
-            entity_id: payload?.local_id || payload?.server_id || crypto.randomUUID(),
+            entity_id: mutationPayload.local_id || mutationPayload.server_id || crypto.randomUUID(),
             operation,
-            payload: payload || {},
+            payload: mutationPayload,
             created_at: new Date().toISOString(),
             status: 'pending',
         };
