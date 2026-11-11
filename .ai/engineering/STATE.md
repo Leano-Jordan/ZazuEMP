@@ -1,7 +1,7 @@
 ## Director execution — registration on persistent database — 2026-11-11
 
 - Canonical repository/branch: `Leano-Jordan/ZazuEMP` / `main`.
-- Current source head: `1519a3219572db48eedc2cc3bedd83a3bbab8b33`.
+- Application/workflow source head verified by CI: `1519a3219572db48eedc2cc3bedd83a3bbab8b33`; subsequent commits in this record are documentation-only.
 - Corrected Dockerfile build verified by GitHub Actions: Render Docker build run `43092418612` — **PASS** (image build only; no deployment).
 - Added a PostgreSQL CI acceptance step that executes the existing end-to-end account registration test against PostgreSQL after the complete migration set. This exercises user creation, business creation, owner membership, authentication session and dashboard access on the persistent database engine.
 - Workflow commit: `1519a3219572db48eedc2cc3bedd83a3bbab8b33`. Changed workflow re-read from `main`; source reconciliation PASS.
