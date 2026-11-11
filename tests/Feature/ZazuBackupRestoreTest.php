@@ -417,7 +417,7 @@ class ZazuBackupRestoreTest extends TestCase
 
     public function test_restore_rejects_a_directory_as_sqlite_target_before_mutating_private_storage(): void
     {
-        if (!class_exists(ZipArchive::class) || !in_array('sqlite', \\PDO::getAvailableDrivers(), true)) {
+        if (!class_exists(ZipArchive::class) || !in_array('sqlite', \PDO::getAvailableDrivers(), true)) {
             $this->markTestSkipped('PHP Zip and SQLite extensions are required for restore tests.');
         }
 
@@ -434,7 +434,7 @@ class ZazuBackupRestoreTest extends TestCase
         File::ensureDirectoryExists(dirname($privateProbe));
         File::put($privateProbe, 'original private data must survive');
 
-        $pdo = new \\PDO('sqlite:'.$database);
+        $pdo = new \PDO('sqlite:'.$database);
         $pdo->exec('CREATE TABLE restore_target_probe (id INTEGER PRIMARY KEY, value TEXT)');
         $pdo->exec("INSERT INTO restore_target_probe (value) VALUES ('candidate')");
         $pdo = null;
