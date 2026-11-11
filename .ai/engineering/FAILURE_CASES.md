@@ -440,3 +440,15 @@ Archive pointer: closed historical cases CASE-ZAZU-0001 through CASE-ZAZU-0009 a
 **Regression coverage:** Playwright tests cover successful matching migration with queued work, logout non-reimport and foreign-business refusal.  
 **Verification:** [Laravel](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/41299518930) and [Zazu quality](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/41299518886) passed; [browser smoke](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/41299519019) pending.  
 **Classification:** F4/F7 — tenant isolation / local data boundary.
+
+
+### CASE-ZAZU-0028
+
+**Status:** VERIFIED — corrected fixture passed in the exact-head Laravel workflow.  
+**First observed:** 2026-11-11.  
+**Target:** MySQL restore partial-import / rollback-failure integration regression.  
+**Failure fingerprint:** The fake `mysql` executable for the second (rollback-failure) phase was written with doubled backslashes before newline markers. PHP therefore emitted literal `\\n` sequences rather than shell line breaks. The expected failure assertion could pass because the fake executable itself was invalid, not because the rollback import ran and failed.  
+**Classification:** F2 — test/verification fixture defect. Engineering code: `ENG-FIXTURE-003`.  
+**Correction:** Generate an executable shell script with actual line breaks, record every invocation, and assert exactly two `mysql` calls plus the deliberate `simulated rollback failure` output. The production restore implementation was not changed.  
+**Verification:** Commit [`7544c11`](https://github.com/Leano-Jordan/ZazuEMP/commit/7544c11edbf3bb47094f2eb30b52825665b42f19); exact-head Laravel [run 43070247812](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/43070247812) passed **454 tests / 3,298 assertions**.  
+**Regression control:** The invocation-count and explicit stderr assertions remain in `tests/Feature/ZazuBackupRecoveryTest.php` so a non-executing fake client cannot satisfy the rollback-failure scenario.
