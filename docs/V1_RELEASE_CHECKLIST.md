@@ -433,3 +433,12 @@ For `6dc7e3c57a4ad770444ce337c128985d0074d02f`:
 ### Release decision
 
 **V1 remains NO-GO.** Remaining proof is not another round of speculative code expansion: complete browser smoke; prove the real installation's workspace registration/creation path; run representative operator backup/restore and deployment rollback drills; complete trusted-device/lost-device acceptance; and close production privacy, provider-log, legal/brand and licence issuer/enforcement controls. No Render deployment was triggered by this cycle.
+
+## Render preview registration incident — 2026-11-11
+
+- Render request-correlated application logs confirm the previous registration failures were **SQLite read-only write failures**, not missing migration columns. The failing write occurred while inserting the new user row into `/tmp/zazu-preview.sqlite`.
+- The current `docker/render-entrypoint.sh` now changes the SQLite file owner to `www-data` and applies mode `660` after migrations, before Apache starts. This is the intended runtime write-permission correction.
+- Render service `zazu-emp-staging` is configured to deploy `main`, uses the preview-only Docker image, and has auto-deploy enabled. The deployment for `ac2df59` reached **LIVE** at 19:04:54Z; its startup logs show the fresh preview database migrations completing and Apache starting.
+- **Not yet proven:** a fresh registration/workspace-creation request after that deployment. No successful registration is claimed.
+- **Data warning:** the image deliberately uses `/tmp/zazu-preview.sqlite` and ephemeral container storage. It is a disposable preview, not a durable staging or production database. Never use it for customer data. A persistent database and durable private-media storage are required before any real pilot.
+- Documentation commits in this cycle did trigger Render auto-deploys because the service is configured for auto-deploy. These were preview rebuilds only; no production service was deployed.
