@@ -8,6 +8,7 @@ use Illuminate\Support\Facades\Artisan;
 use Tests\TestCase;
 use ZipArchive;
 
+/** @SuppressWarnings(PHPMD.TooManyPublicMethods) */
 class ZazuBackupRestoreTest extends TestCase
 {
 
