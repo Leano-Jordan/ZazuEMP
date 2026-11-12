@@ -16,7 +16,7 @@
 - SonarCloud [43298536001](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/43298536001): **SKIPPED**, not counted as a pass.
 - Exact-head automated source verification is reconciled. No deployment or deployment-branch change occurred; `deploy/render-staging` remains untouched.
 - Evidence-backed limitations are recorded in [`docs/V1_KNOWN_LIMITATIONS.md`](V1_KNOWN_LIMITATIONS.md): bounded offline scope, connection-required customer profile photos, non-autonomous Helper, deliberately deferred higher-tier capabilities, and the still-open physical-device acceptance boundary.
-- Bounded next acceptance: physical installed-device workflow on the owner's secure HTTPS origin, then record known limitations and issue the V1 decision. Do not expand scope or invent extra gates.
+- Known limitations are now recorded in `docs/V1_KNOWN_LIMITATIONS.md` and linked from the release checklist. Bounded next acceptance: physical installed-device workflow on the owner's secure HTTPS origin, then issue the V1 decision. Do not expand scope or invent extra gates.
 
 ## Exact-head CI update — 2026-11-12 (offline customer-to-Work regression)
 
