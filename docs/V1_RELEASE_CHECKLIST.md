@@ -1,3 +1,20 @@
+## Exact-head CI update — 2026-11-12 (offline customer-to-Work regression)
+
+Exact source/test HEAD: `2b171f3fda4ae1ddeaf30700dc3f9c414866be92` on `main`.
+
+- Browser smoke: **PASS — 83 passed / 40 skipped / 0 failed** ([run 43295881449](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/43295881449)). Job log inspected; the 123-test run completed without reported retries. The customer-to-Work offline-save regression now intercepts the actual connectivity probe and verifies interception before the offline-save confirmation.
+- Laravel, PostgreSQL migration/registration/recovery, and offline-browser-acceptance jobs: **PASS** ([run 43295881102](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/43295881102)).
+- Zazu quality/secret scan: **PASS** ([run 43295881101](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/43295881101)).
+- Psalm security: **PASS** ([run 43295881418](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/43295881418)).
+- PHPMD: **PASS** ([run 43295881090](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/43295881090)).
+- Populated database upgrade/rollback: **PASS** ([run 43295881378](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/43295881378)).
+- Push-on-main / CodeQL: **PASS** ([run 43295879914](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/43295879914)).
+- SonarCloud: **SKIPPED**, not counted as a pass.
+
+This is automated source verification only. It does not close physical installed-device acceptance or the other operational release gates already recorded below. No deployment was performed; `deploy/render-staging` remains untouched.
+
+---
+
 ## Director exact-head CI reconciliation — 2026-11-12 (resume-sync/cache v35)
 
 - Exact application/test-source SHA: `5924fd6d294187ec482295193c4add865e64137b`.
