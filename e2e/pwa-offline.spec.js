@@ -50,6 +50,64 @@ test.describe('Zazu installed PWA offline shell', () => {
         expect(readiness).toBe('ready');
     });
 
+    test('retries queued mutations when an installed app resumes after reconnect', async ({ page }, testInfo) => {
+        test.setTimeout(25_000);
+        test.skip(testInfo.project.name !== 'chromium', 'Installed-app resume reconnect contract runs once.');
+
+        await login(page);
+        await page.evaluate(async () => {
+            await window.ZazuOffline.ready;
+            const state = window.ZazuOffline.getState();
+            state.sync = {
+                token: 'resume-reconnect-test-token',
+                device: { id: 999998, business_id: Number(document.body.dataset.zazuBusinessId) },
+            };
+            state.local_dirty = false;
+            await window.ZazuOffline.persist({ allowSessionChange: true });
+            await window.ZazuOffline.queueMutation('customer', 'create', {
+                local_id: 'local:resume-reconnect-customer',
+                record: { name: 'Resume reconnect customer' },
+            });
+        });
+
+        let pushed = 0;
+        await page.route('**/api/sync/**', async route => {
+            const url = new URL(route.request().url());
+            if (url.pathname === '/api/sync/push') {
+                const body = route.request().postDataJSON();
+                pushed += body.mutations.length;
+                await route.fulfill({
+                    status: 200,
+                    contentType: 'application/json',
+                    body: JSON.stringify({
+                        recorded: body.mutations.map(mutation => ({ id: mutation.id, status: 'applied' })),
+                    }),
+                });
+                return;
+            }
+            if (url.pathname === '/api/sync/pull') {
+                await route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify({ mutations: [] }) });
+                return;
+            }
+            if (url.pathname === '/api/sync/bootstrap') {
+                await route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify({}) });
+                return;
+            }
+            if (url.pathname === '/api/sync/attachments') {
+                await route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify({ attachments: [] }) });
+                return;
+            }
+            await route.fulfill({ status: 404, contentType: 'application/json', body: JSON.stringify({ message: 'Unexpected sync request' }) });
+        });
+
+        // Simulate Android restoring the installed app after the network has
+        // returned, without relying on the browser to replay its missed online event.
+        await page.evaluate(() => window.dispatchEvent(new Event('pageshow')));
+
+        await expect.poll(() => pushed).toBe(1);
+        await expect.poll(async () => page.evaluate(async () => (await window.ZazuOffline.pending()).length)).toBe(0);
+    });
+
     test('queues supported changes when the Zazu origin is unreachable but the browser reports online', async ({ page }, testInfo) => {
         test.setTimeout(20_000);
         test.skip(testInfo.project.name !== 'chromium', 'Origin-reachability fallback contract runs once.');
