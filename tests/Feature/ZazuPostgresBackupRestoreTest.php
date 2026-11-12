@@ -2,7 +2,9 @@
 
 namespace Tests\Feature;
 
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\File;
+use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Str;
 use Tests\TestCase;
 use ZipArchive;
@@ -181,4 +183,53 @@ class ZazuPostgresBackupRestoreTest extends TestCase
             File::deleteDirectory($root);
         }
     }
+    /** @SuppressWarnings(PHPMD.ExcessiveMethodLength) */
+    public function test_postgres_backup_and_restore_round_trip_real_database_and_private_files(): void
+    {
+        if (config('database.default') !== 'pgsql') {
+            $this->markTestSkipped('This recovery drill runs only against the PostgreSQL CI service.');
+        }
+
+        if (!class_exists(ZipArchive::class)) {
+            $this->markTestSkipped('PHP Zip extension is required for PostgreSQL recovery tests.');
+        }
+
+        $root = storage_path('app/zazu-pg-roundtrip-'.Str::ulid());
+        $output = $root.'/backups';
+        $table = 'zazu_backup_roundtrip_probe';
+        $privateProbe = storage_path('app/private/zazu-postgres-roundtrip-probe.txt');
+
+        File::ensureDirectoryExists(dirname($privateProbe));
+        Schema::dropIfExists($table);
+        Schema::create($table, function ($schema) {
+            $schema->id();
+            $schema->string('value');
+        });
+        DB::table($table)->insert(['value' => 'before backup']);
+        File::put($privateProbe, 'private file before backup');
+
+        try {
+            $this->artisan('zazu:backup', ['--output' => $output])->assertExitCode(0);
+            $archives = File::glob($output.DIRECTORY_SEPARATOR.'zazu-backup-*.zip');
+            $this->assertCount(1, $archives);
+
+            DB::table($table)->update(['value' => 'changed after backup']);
+            File::put($privateProbe, 'changed after backup');
+
+            $this->artisan('zazu:restore', [
+                'archive' => $archives[0],
+                '--force' => true,
+            ])->assertExitCode(0);
+
+            DB::purge('pgsql');
+            $this->assertSame('before backup', DB::table($table)->value('value'));
+            $this->assertSame('private file before backup', File::get($privateProbe));
+        } finally {
+            DB::purge('pgsql');
+            Schema::dropIfExists($table);
+            File::delete($privateProbe);
+            File::deleteDirectory($root);
+        }
+    }
+
 }
