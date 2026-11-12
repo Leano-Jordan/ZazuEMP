@@ -1,17 +1,16 @@
-## Director runtime reconciliation — Render Zazu workbench — 2026-11-12
+## Director runtime reconciliation — Render database provisioning — 2026-11-12
 
-- Repository: `Leano-Jordan/ZazuEMP`; engineering branch: `main`; Render deployment branch remains `deploy/render-staging`.
-- Confirmed Render workspace: `tea-dbqp6ton74is73cs12tg` (Isaac Junior Lehlogonolo's Zazu workspace). Service: `ZazuEMP`, free web service in Oregon, URL `https://zazuemp.onrender.com`.
-- Render service is configured to deploy from `deploy/render-staging`; latest live deploy commit: `1d7af048bb8fc02051ce873fc6e9bc578e3c2f06`. Current `main` is merge commit `81b0129a101849b29ffdb036a5dd6c9e92ddfe86`, one commit ahead with no tree changes relative to the deployed commit.
-- Render workspace inventory contains no managed PostgreSQL instance. Service details returned no attached persistent disk.
-- Source inspection: `docker/render-entrypoint.sh` defaults to `DB_CONNECTION=sqlite` and `DB_DATABASE=/tmp/zazu-preview.sqlite` when no database URL/connection override is supplied. `docs/RENDER_PREVIEW.md` explicitly classifies this as disposable preview storage.
-- Runtime logs show the full migration set executing again at 2026-11-12 16:39 UTC. This is consistent with a fresh/empty database after a container restart. Render environment-variable values are not exposed by the available read integration, so whether an external DB override is configured remains **UNKNOWN**.
-- Impact hypothesis: if the service is using the documented default, account/workspace records can disappear after restart/redeploy, explaining credentials that previously worked becoming invalid. This is not yet confirmed until the service's effective DB connection is inspected.
-- Offline device auto-registration and reconnect queue sync are present in the deployed source; no `/offline/device/register` or `/api/sync` requests were found in the inspected Render application logs. Live end-to-end sync therefore remains **UNVERIFIED**.
-- No Render resources, environment variables, database settings, source code or deployment branch were changed during this inspection. Do not create a database or change billing resources without owner approval.
+- Owner approved creation of a free PostgreSQL database for the Zazu EMP Render workbench.
+- Created `zazuemp-preview-db`: PostgreSQL 18, free plan, Oregon, resource `dpg-dbqupp95efls73fto6u0-a`; Render reports status `available`. Free instance expiry is 2026-12-12.
+- Render web service remains `ZazuEMP`, resource `srv-dbqpa1tbedkc73ebgeo0`, region Oregon, deployment branch `deploy/render-staging`. No service environment variables have been changed and no deployment has been triggered.
+- Source check on canonical `main`: `docker/render-entrypoint.sh` accepts `DATABASE_URL` as an alias for `DB_URL` and selects PostgreSQL from a postgres URL when `DB_CONNECTION` is unset. Existing source is ready for this connection.
+- The Render database query integration cannot connect because the database IP allowlist is empty and the hosted MCP connection has no allowlistable egress IP. This does not indicate a database failure. The correct application path is the private/internal database connection from the same-region Render service.
+- Render integration responses expose database name/user/status but not the connection URL/password. Therefore the database is provisioned but **not yet linked to the web service**. Do not guess credentials or place secrets in source.
+- Next action: use Render Dashboard's service Environment page to add `DATABASE_URL` from the `zazuemp-preview-db` resource (select its internal connection string / from-database reference), preserving all existing variables. Then deploy and verify migrations + registration. No app-side source change is required for this link.
+- No persistent disk was created. Render remains an interim workbench; do not treat it as production hosting or use real customer data.
+- The Render service is still using whichever DB configuration its current environment selects; effective active connection remains **UNKNOWN** until the service is linked and runtime evidence is checked.
 
-
-
+ 
 ## Owner-directed finish rule — 2026-11-12 (binding)
 
 - Owner has explicitly directed that Zazu V1 work must stop expanding into endless edge cases. This instruction was repeated after the same scope discussion occurred on 2026-11-11; preserve it as a permanent engineering constraint.
