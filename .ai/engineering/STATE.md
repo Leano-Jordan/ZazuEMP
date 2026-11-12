@@ -1,3 +1,14 @@
+## Director current checkpoint — 2026-11-12
+
+- Canonical repository/branch: `Leano-Jordan/ZazuEMP` / `main`.
+- Current exact HEAD: `9fd5dd20edfe8eaad5a80681a895ac9a3f459283`.
+- Exact-head Laravel: **456 tests / 3,305 assertions — PASS**; PostgreSQL migrations plus registration/workspace acceptance: **PASS**; offline browser acceptance: **18 passed**.
+- Full browser smoke: **82 passed / 38 skipped / 0 failed — PASS**.
+- PHPMD, Psalm, Zazu quality/secret scan, populated upgrade/rollback, Docker image build and Director Health: **PASS**. SonarCloud skipped; not counted.
+- Previous browser run `43169885907` on `0b14c00` was cancelled; later exact-head run `43170382911` passed and supersedes it.
+- No live Render service settings or deployment were changed. The deployment-only `deploy/render-staging` branch remains preserved.
+- Next hard gate: real database + private-media backup/restore and deployment rollback against the chosen persistent target. Installed secure-origin offline acceptance and operational/legal/brand/licensing closure remain open. V1 remains **NO-GO**.
+
 ## Director execution — registration on persistent database — 2026-11-11
 
 - Canonical repository/branch: `Leano-Jordan/ZazuEMP` / `main`.
@@ -83,7 +94,7 @@ IDENTITY → BASELINE → TARGET → ROUTE → INSPECT → CHANGE → VERIFY →
 The 2026-11-01 local Windows-host proposal was exploratory and is no longer the active deployment target. The owner has clarified that this PC is a development workstation; future production hosting will be a paid server when funding and release readiness permit. The 2026-11-03 host diagnostic is recorded below. Do not configure this PC as production infrastructure.
 
 ## Active target
-**Active target**: Owner-directed V1 convergence — offline sync identity and automated browser acceptance are closed on source head `56bb804`; next gate is the representative operator backup/restore drill.
+**Active target**: Owner-directed V1 convergence — latest exact-main automated verification is green on `9fd5dd20edfe8eaad5a80681a895ac9a3f459283`; next gate is representative operator backup/restore on the intended persistent hosting target. Live hosting selection and physical device acceptance remain operational gates.
 **Owner-directed V1 convergence:** repair source defects, keep exact-main CI green, complete the remaining offline/device and commercial evidence, and remove every operational task that can be safely verified or automated from code. The owner-accepted dashboard remains closed. All engineering implementation stays on canonical `main`; `deploy/render-staging` remains deployment-only.
 Next hard gate: Run a representative database + private-media backup/restore drill against the intended hosting target. Keep installed-device offline acceptance open until the secure-origin disconnect, full close/reopen, local-work recovery and reconnect sequence passes.
 
