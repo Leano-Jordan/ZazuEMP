@@ -1,3 +1,13 @@
+## Director exact-head reconciliation — 2026-11-12 21:38 SAST
+
+- Canonical engineering repository/branch: `Leano-Jordan/ZazuEMP` / `main`. Latest commit confirmed by repository commit search: `5924fd6d294187ec482295193c4add865e64137b`.
+- The prior Android resume-sync checkpoint `fbd57dd` is no longer HEAD. Twelve commits follow it. Relevant changes include: resume/reconnect sync handling (`f864fb3`); BFCache-only `pageshow` resume handling and regression (`2af1298`, `71ad943`); primary-device registration session-race guard (`6aa68e8`); offline client cache refresh and service-worker cache generation v35 (`8e348d5`); and matching service-worker test fixtures (`ea1fbe3`, `5924fd6`). Render configuration and its diagnostic records were also added, but no Render deployment was performed by these commits.
+- Current source inspection confirms: local IndexedDB readiness resolves before network work; reconnect/resume triggers share one in-flight attempt; initial-load `pageshow` is not treated as resume; the resume browser regression models a BFCache-restored page; primary-device registration checks the captured session generation and installation identity before accepting its response; private media remains in user/business-scoped cache generation v35.
+- Latest commit `5924fd6` is test-fixture-only and updates service-worker cache assertions from v34 to v35.
+- Exact-HEAD CI evidence for `5924fd6` is **NOT RECONCILED**. The GitHub combined-status lookup returned no status contexts; this is not evidence of a pass or failure. Do not attribute earlier green runs to this HEAD. The new resume/registration/cache changes remain **SOURCE-INSPECTED / AUTOMATED EXECUTION UNVERIFIED** until exact-head Actions results are observed.
+- V1 scope remains frozen under `.ai/engineering/V1_SCOPE_FREEZE.md`. Do not expand into additional offline edge cases. Next bounded target: reconcile exact-head CI for the already-implemented resume/registration/cache changes, then continue the agreed core-workflow acceptance and final regression sequence.
+- `deploy/render-staging` remains the deployment-only branch. No deployment or service configuration change is authorised by this engineering checkpoint.
+
 ## Director engineering update — Android resume sync — 2026-11-12
 
 - Latest canonical `main` HEAD: `fbd57dd3985521a0890eadd8e98ea76438d9f0b8`.
