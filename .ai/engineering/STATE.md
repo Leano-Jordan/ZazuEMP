@@ -1,3 +1,14 @@
+
+
+## Owner-directed finish rule — 2026-11-12 (binding)
+
+- Owner has explicitly directed that Zazu V1 work must stop expanding into endless edge cases. This instruction was repeated after the same scope discussion occurred on 2026-11-11; preserve it as a permanent engineering constraint.
+- Binding policy: `.ai/engineering/V1_SCOPE_FREEZE.md`. Director and every specialist must read it before each cycle.
+- Objective: finish a dependable, usable V1—not theoretical perfection. Only reproducible defects in agreed V1 workflows, demonstrated security/privacy/data-integrity failures, or explicit owner-approved additions may enter scope. Speculative risks, optional polish, new features and future infrastructure are deferred.
+- Finish sequence: close the known checklist blockers → verify the agreed core workflows → one final regression pass → fix only material failures → document limitations → issue release decision. Do not reopen closed gates without new evidence.
+- Render is an interim remote-development workbench for access away from the home PC. It is not the final production destination and production hosting/persistence must not be treated as a current development gate.
+- Decision rule: if it is not necessary for a customer to use the agreed V1 workflows reliably, it does not block V1.
+- Latest verified code change at this record: `bed3941739cf02fc1a8152932292bc7d7ec68a21` (sync responses marked no-store; regression assertions added). The CI result for that commit was not available in the inspected workflow response; do not claim it passed until checked.
 ## Director current checkpoint — 2026-11-12 (PostgreSQL recovery)
 
 - Canonical repository/engineering branch: `Leano-Jordan/ZazuEMP` / `main`; deployment-only `deploy/render-staging` remains preserved.
