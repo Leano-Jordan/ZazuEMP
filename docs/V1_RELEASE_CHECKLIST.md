@@ -1,3 +1,21 @@
+## Exact-head CI update — 2026-11-12 (Work completion guards + offline customer-to-Work)
+
+- Exact `main` HEAD: `7193038a2b2d14ea71278050a0d7c26ce246bf86` (merge commit; includes the test-only commits `e3855998`, `b2e548be`, and offline acceptance correction `9bd1cc0d`).
+- Laravel workflow [43298535995](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/43298535995): **PASS — 462 passed / 3,339 assertions / 1 skipped**. The three focused Work completion-guard tests pass: completion is rejected while preparation is open or blocked, costs remain planned, or a linked purchase order is active. No application runtime change was needed; existing guards were locked with regressions.
+- Offline browser acceptance: **PASS — 19 passed** (same Laravel workflow).
+- PostgreSQL migration/recovery smoke: **PASS** (same workflow; both PostgreSQL-focused test steps passed).
+- Full browser smoke [43298535961](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/43298535961): **PASS — 83 passed / 40 skipped / 0 failed**. Inspected job log: 123 tests, no retry/failure lines. Offline customer-to-Work journey now explicitly disconnects the browser before local writes and checks the queued customer ID is the one linked by the Work record.
+- Zazu quality/secret scan [43298535431](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/43298535431): **PASS**.
+- Psalm security [43298535526](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/43298535526): **PASS**.
+- PHPMD [43298536000](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/43298536000): **PASS**.
+- Populated upgrade/rollback [43298535460](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/43298535460): **PASS**.
+- Render Docker image build [43298535911](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/43298535911): **PASS — build only; no deployment**.
+- Push-on-main [43298535997](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/43298535997): **PASS**.
+- Director Health [43299843826](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/43299843826): **PASS**.
+- SonarCloud [43298536001](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/43298536001): **SKIPPED**, not counted as a pass.
+- Exact-head automated source verification is reconciled. No deployment or deployment-branch change occurred; `deploy/render-staging` remains untouched.
+- Bounded next acceptance: physical installed-device workflow on the owner's secure HTTPS origin, then record known limitations and issue the V1 decision. Do not expand scope or invent extra gates.
+
 ## Exact-head CI update — 2026-11-12 (offline customer-to-Work regression)
 
 Exact source/test HEAD: `2b171f3fda4ae1ddeaf30700dc3f9c414866be92` on `main`.
