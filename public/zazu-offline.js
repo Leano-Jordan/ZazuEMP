@@ -1648,22 +1648,50 @@
         ready,
     };
 
-    window.addEventListener('online', async () => {
-        // The browser can reconnect while IndexedDB is still opening. Wait for
-        // boot to finish so the first reconnect cannot be silently ignored.
-        await ready;
-        if (!state?.sync?.token) {
-            try {
-                await registerPrimaryDevice();
-            } catch {
-                // Keep local work queued; a later reconnect/focus can retry.
+    let reconnectAttempt = null;
+
+    async function resumeSync() {
+        if (reconnectAttempt) return reconnectAttempt;
+
+        reconnectAttempt = (async () => {
+            // Android may suspend an installed PWA while offline. In that case
+            // the browser's one-time "online" event can be missed; retry when
+            // the app is shown or focused again.
+            await ready;
+            if (sessionCleared || !navigator.onLine) return;
+
+            if (!state?.sync?.token) {
+                try {
+                    await registerPrimaryDevice();
+                } catch {
+                    // Keep local work queued; another resume/reconnect can retry.
+                }
             }
+
+            if (state?.sync?.token) await sync();
+        })();
+
+        try {
+            await reconnectAttempt;
+        } finally {
+            reconnectAttempt = null;
         }
-        sync().catch(() => {
-            // Reconnection failures are recoverable; keep the local workspace
-            // available and avoid an unhandled promise rejection.
-            if (state) state.last_sync_error = 'Synchronization failed; queued work will retry.';
+    }
+
+    function handleResume() {
+        resumeSync().catch(() => {
+            if (state && !sessionCleared) {
+                state.last_sync_error = 'Synchronization failed; queued work will retry.';
+                writeState().catch(() => {});
+            }
         });
+    }
+
+    window.addEventListener('online', handleResume);
+    window.addEventListener('pageshow', handleResume);
+    window.addEventListener('focus', handleResume);
+    document.addEventListener('visibilitychange', () => {
+        if (document.visibilityState === 'visible') handleResume();
     });
     boot().catch(() => {
         // Never leave callers waiting forever if an unexpected boot error escapes.
