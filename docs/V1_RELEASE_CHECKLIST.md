@@ -520,3 +520,14 @@ The Render preview deployment for this commit is **LIVE**. This is a deployment 
 - Complete hosting privacy/log retention controls and legal/brand release review.
 
 **Release decision: NO-GO.** Automated source verification is now green; the remaining blockers are deployment/data durability and human operational acceptance, not a reason to expand feature scope.
+
+
+## Exact-head security and workbench verification — 2026-11-12
+
+- Runtime/test source commit: `bed3941739cf02fc1a8152932292bc7d7ec68a21`.
+- Exact-head Laravel workflow `43181669792`: **PASS** — Laravel tests, PostgreSQL migration/registration/backup-restore smoke, and offline browser acceptance jobs all succeeded.
+- Exact-head browser smoke `43181669581`: **PASS**.
+- Exact-head Zazu quality/secret scan `43181669747`, populated upgrade/rollback `43181669678`, Psalm security `43181669617`, and PHPMD `43181669720`: **PASS**.
+- SonarCloud: **SKIPPED**, not counted as a pass. No Docker build result is attributed to `bed394`.
+- Render workbench deployed documentation descendant `c450ed9` successfully; startup migrations completed and internal HEAD / plus GET / returned HTTP 200. This is preview-workbench verification only, not persistent production verification.
+- Remaining bounded acceptance: physical installed-device offline workflow, then one final regression pass, known-limitations record and V1 release decision. No speculative gates are added.
