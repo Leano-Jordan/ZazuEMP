@@ -8,7 +8,7 @@ export APP_DEBUG="${APP_DEBUG:-false}"
 export LOG_CHANNEL="${LOG_CHANNEL:-stderr}"
 
 # Accept Laravel's DB_URL and Render's conventional DATABASE_URL. An explicit
-# DB_CONNECTION always wins; otherwise infer PostgreSQL/MySQL from the URL scheme.
+# DB_CONNECTION always wins; otherwise infer PostgreSQL from the URL scheme.
 if [ -z "${DB_URL:-}" ] && [ -n "${DATABASE_URL:-}" ]; then
     export DB_URL="$DATABASE_URL"
 fi
