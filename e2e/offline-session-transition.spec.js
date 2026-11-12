@@ -13,6 +13,13 @@ async function login(page) {
     await expect(page.getByRole('heading', { name: 'Dashboard' })).toBeVisible();
 }
 
+async function waitForOfflineRuntime(page) {
+    await expect.poll(
+        () => page.evaluate(() => Boolean(window.ZazuOffline?.ready)),
+        { message: 'offline runtime must be exposed before the session-preservation journey continues' },
+    ).toBe(true);
+}
+
 async function openPublicNavigation(page) {
     const toggle = page.getByRole('button', { name: 'Open navigation' });
     if (await toggle.isVisible()) await toggle.click();
@@ -23,10 +30,7 @@ test('unreachable logout host preserves the signed-in session and queued busines
     test.skip(testInfo.project.name !== 'chromium', 'Session transition acceptance runs once; responsive navigation is covered separately.');
 
     await login(page);
-    await expect.poll(
-        () => page.evaluate(() => Boolean(window.ZazuOffline?.ready)),
-        { message: 'offline runtime must be exposed before the session-preservation journey starts' },
-    ).toBe(true);
+    await waitForOfflineRuntime(page);
 
     const mutationId = await page.evaluate(async () => {
         await window.ZazuOffline.ready;
@@ -71,6 +75,7 @@ test('unreachable logout host preserves the signed-in session and queued busines
     await page.unroute('**/up');
     await page.goto('/dashboard', { waitUntil: 'domcontentloaded' });
     await expect(page.getByRole('heading', { name: 'Dashboard' })).toBeVisible();
+    await waitForOfflineRuntime(page);
 
     const preservedBeforeLogout = await page.evaluate(async id => {
         await window.ZazuOffline.ready;
@@ -92,6 +97,7 @@ test('unreachable logout host preserves the signed-in session and queued busines
     await expect(page.locator('nav[aria-label="Public navigation"]').getByRole('button', { name: 'Log in', exact: true })).toBeVisible();
 
     await login(page);
+    await waitForOfflineRuntime(page);
     const preservedAfterRelogin = await page.evaluate(async id => {
         await window.ZazuOffline.ready;
         const queue = await window.ZazuOffline.pending();
