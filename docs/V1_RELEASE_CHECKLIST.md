@@ -1,3 +1,16 @@
+## Director exact-head CI reconciliation — 2026-11-12 (PostgreSQL recovery)
+
+- Canonical engineering branch: `main`; exact application/test HEAD: `1cac0e51d72b506f7c58a1c06b9d204a521f81fa`.
+- PostgreSQL backup/restore support is now included for the Render PostgreSQL deployment path. The Docker runtime installs PostgreSQL client tools; backup reads Laravel's resolved PostgreSQL connection including `DB_URL`; restore uses `psql` with stop-on-error and a single transaction, and captures a pre-restore PostgreSQL dump for rollback.
+- Laravel: **PASS — 458 passed / 3,319 assertions / 1 skipped** (workflow run [43172547296](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/43172547296)).
+- PostgreSQL 16 migration + registration/workspace smoke: **PASS** (same workflow).
+- Real PostgreSQL database + private-file backup/restore round-trip: **PASS — 1 test / 5 assertions** (same workflow; job `postgres-migration-smoke`). This verifies the test PostgreSQL service, not the live Render database.
+- Offline browser acceptance: **PASS — 18 passed** (same workflow).
+- Full browser smoke: **PASS** (run [43172547165](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/43172547165)).
+- PHPMD: **PASS** (run [43172547174](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/43172547174)); Psalm security: **PASS** (run [43172547105](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/43172547105)); Zazu quality + secret scan: **PASS** (run [43172547188](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/43172547188)); populated upgrade/rollback: **PASS** (run [43172547074](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/43172547074)); Render Docker image build: **PASS — build only, no deployment** (run [43172547119](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/43172547119)); Director Health: **PASS** (run [43172584653](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/43172584653)).
+- SonarCloud: **SKIPPED**, not counted as a pass.
+- **Release remains NO-GO.** The CI PostgreSQL round-trip does not prove recovery against the actual Render persistent database/disk. A controlled target-environment restore, data/private-media/access verification, and deployment rollback remain open, alongside physical installed-device offline acceptance and legal/brand/licensing closure. No Render service, database, disk, branch or deployment setting was changed. `deploy/render-staging` remains preserved.
+
 ## Director exact-head CI reconciliation — 2026-11-12
 
 - Canonical engineering branch: `main`; exact HEAD: `9fd5dd20edfe8eaad5a80681a895ac9a3f459283`.
