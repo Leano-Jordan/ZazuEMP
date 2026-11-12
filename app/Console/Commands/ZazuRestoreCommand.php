@@ -2,6 +2,8 @@
 
 namespace App\Console\Commands;
 
+use App\Support\PostgresBackupSupport;
+
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\File;
@@ -346,7 +348,7 @@ class ZazuRestoreCommand extends Command
                 $this->snapshotMysqlForRollback($mysqlRollbackPath);
             } elseif ($driver === 'pgsql') {
                 $postgresRollbackPath = $work.'/pre-restore-database.sql';
-                $this->snapshotPostgresForRollback($postgresRollbackPath);
+                (new PostgresBackupSupport())->dumpToFile($postgresRollbackPath);
             }
 
             // Stage private storage only after every required database rollback point exists.
@@ -428,7 +430,7 @@ class ZazuRestoreCommand extends Command
                 $this->importMysqlDump($work.'/database.sql');
             } elseif ($driver === 'pgsql') {
                 $postgresRestoreStarted = true;
-                $this->importPostgresDump($work.'/database.sql');
+                (new PostgresBackupSupport())->restoreFromFile($work.'/database.sql');
             }
 
             $this->info('Zazu restore completed from '.$archive);
@@ -448,7 +450,7 @@ class ZazuRestoreCommand extends Command
 
             if ($postgresRestoreStarted && $postgresRollbackPath !== null && is_file($postgresRollbackPath)) {
                 try {
-                    $this->importPostgresDump($postgresRollbackPath);
+                    (new PostgresBackupSupport())->restoreFromFile($postgresRollbackPath);
                 } catch (\\Throwable $rollbackException) {
                     $rollbackFailure = $rollbackException->getMessage();
                     // Keep the only pre-restore PostgreSQL snapshot available for manual recovery.
@@ -617,105 +619,6 @@ class ZazuRestoreCommand extends Command
         if (!$process->isSuccessful()) {
             throw new \RuntimeException('MySQL import failed: '.$process->getErrorOutput());
         }
-    }
-
-    private function snapshotPostgresForRollback(string $path): void
-    {
-        $connection = $this->postgresConnection();
-        $process = new Process([
-            'pg_dump',
-            '--no-owner',
-            '--no-privileges',
-            '--clean',
-            '--if-exists',
-            '--format=plain',
-            '--host='.$connection['host'],
-            '--port='.$connection['port'],
-            '--username='.$connection['username'],
-            '--dbname='.$connection['database'],
-        ], null, $connection['environment']);
-
-        $process->setTimeout(600);
-        $process->run();
-
-        if (!$process->isSuccessful() || trim($process->getOutput()) === '') {
-            throw new \\RuntimeException('Could not create the pre-restore PostgreSQL rollback snapshot: '.$process->getErrorOutput());
-        }
-
-        File::put($path, $process->getOutput());
-
-        if (!is_file($path) || filesize($path) === 0) {
-            throw new \\RuntimeException('The pre-restore PostgreSQL snapshot is empty.');
-        }
-    }
-
-    private function importPostgresDump(string $path): void
-    {
-        if (!is_file($path) || filesize($path) === 0) {
-            throw new \\RuntimeException('PostgreSQL import dump is empty or unavailable.');
-        }
-
-        $connection = $this->postgresConnection();
-        $process = new Process([
-            'psql',
-            '--set=ON_ERROR_STOP=1',
-            '--single-transaction',
-            '--host='.$connection['host'],
-            '--port='.$connection['port'],
-            '--username='.$connection['username'],
-            '--dbname='.$connection['database'],
-        ], null, $connection['environment']);
-
-        $process->setTimeout(600);
-        $process->setInput(File::get($path));
-        $process->run();
-
-        if (!$process->isSuccessful()) {
-            throw new \\RuntimeException('PostgreSQL import failed: '.$process->getErrorOutput());
-        }
-    }
-
-    /**
-     * @return array{host:string,port:string,username:string,database:string,environment:array<string,string>}
-     */
-    private function postgresConnection(): array
-    {
-        $config = config('database.connections.pgsql');
-        $url = $config['url'] ?? null;
-
-        if (is_string($url) && $url !== '') {
-            $parts = parse_url($url);
-            if (!is_array($parts) || !isset($parts['host'], $parts['path'])) {
-                throw new \\RuntimeException('The PostgreSQL DB_URL is invalid for backup or restore.');
-            }
-
-            parse_str($parts['query'] ?? '', $query);
-            $config = array_merge($config, [
-                'host' => $parts['host'],
-                'port' => $parts['port'] ?? 5432,
-                'username' => isset($parts['user']) ? rawurldecode($parts['user']) : '',
-                'password' => isset($parts['pass']) ? rawurldecode($parts['pass']) : '',
-                'database' => ltrim($parts['path'], '/'),
-                'sslmode' => $query['sslmode'] ?? ($config['sslmode'] ?? 'prefer'),
-            ]);
-        }
-
-        foreach (['host', 'port', 'username', 'database'] as $key) {
-            if (!isset($config[$key]) || (string) $config[$key] === '') {
-                throw new \\RuntimeException('PostgreSQL connection configuration is missing '.$key.'.');
-            }
-        }
-
-        return [
-            'host' => (string) $config['host'],
-            'port' => (string) $config['port'],
-            'username' => (string) $config['username'],
-            'database' => (string) $config['database'],
-            'environment' => array_filter([
-                'PGPASSWORD' => $config['password'] ?? null,
-                'PGSSLMODE' => $config['sslmode'] ?? null,
-            ], static fn ($value) => $value !== null && $value !== ''),
-        ];
     }
 
     private function validateStagedDatabase(string $driver, string $work): bool
