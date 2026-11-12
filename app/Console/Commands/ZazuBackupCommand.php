@@ -191,74 +191,13 @@ class ZazuBackupCommand extends Command
 
     private function snapshotPostgres(string $work): bool
     {
-        $connection = config('database.connections.pgsql');
-        $url = $connection['url'] ?? null;
-
-        if (is_string($url) && $url !== '') {
-            $parts = parse_url($url);
-            if (!is_array($parts) || !isset($parts['host'], $parts['path'])) {
-                $this->error('The PostgreSQL DB_URL is invalid for backup.');
-                return false;
-            }
-
-            parse_str($parts['query'] ?? '', $query);
-            $connection = array_merge($connection, [
-                'host' => $parts['host'],
-                'port' => $parts['port'] ?? 5432,
-                'username' => isset($parts['user']) ? rawurldecode($parts['user']) : '',
-                'password' => isset($parts['pass']) ? rawurldecode($parts['pass']) : '',
-                'database' => ltrim($parts['path'], '/'),
-                'sslmode' => $query['sslmode'] ?? ($connection['sslmode'] ?? 'prefer'),
-            ]);
-        }
-
-        foreach (['host', 'port', 'username', 'database'] as $key) {
-            if (!isset($connection[$key]) || (string) $connection[$key] === '') {
-                $this->error('PostgreSQL connection configuration is missing '.$key.'.');
-                return false;
-            }
-        }
-
-        $environment = array_filter([
-            'PGPASSWORD' => $connection['password'] ?? null,
-            'PGSSLMODE' => $connection['sslmode'] ?? null,
-        ], static fn ($value) => $value !== null && $value !== '');
-
-        $process = new Process([
-            'pg_dump',
-            '--no-owner',
-            '--no-privileges',
-            '--clean',
-            '--if-exists',
-            '--format=plain',
-            '--host='.$connection['host'],
-            '--port='.$connection['port'],
-            '--username='.$connection['username'],
-            '--dbname='.$connection['database'],
-        ], null, $environment);
-
-        $process->setTimeout(600);
-        $process->run();
-
-        if (!$process->isSuccessful()) {
-            $this->error('PostgreSQL dump failed: '.$process->getErrorOutput());
+        try {
+            (new PostgresBackupSupport())->dumpToFile($work.'/database.sql');
+            return true;
+        } catch (\\Throwable $exception) {
+            $this->error('PostgreSQL backup failed: '.$exception->getMessage());
             return false;
         }
-
-        $dump = $process->getOutput();
-        if (trim($dump) === '') {
-            $this->error('PostgreSQL dump completed without producing SQL output.');
-            return false;
-        }
-
-        if (File::put($work.'/database.sql', $dump) === false
-            || !is_file($work.'/database.sql')
-            || filesize($work.'/database.sql') === 0) {
-            $this->error('Could not write the PostgreSQL database snapshot.');
-            return false;
-        }
-
-        return true;
     }
 
     private function backupPrivateStorage(string $work): bool
