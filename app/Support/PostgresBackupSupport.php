@@ -1,9 +1,9 @@
 <?php
 
-namespace App\\Support;
+namespace App\Support;
 
-use Illuminate\\Support\\Facades\\File;
-use Symfony\\Component\\Process\\Process;
+use Illuminate\Support\Facades\File;
+use Symfony\Component\Process\Process;
 
 class PostgresBackupSupport
 {
@@ -27,18 +27,18 @@ class PostgresBackupSupport
         $process->run();
 
         if (!$process->isSuccessful() || trim($process->getOutput()) === '') {
-            throw new \\RuntimeException('PostgreSQL dump failed or returned empty SQL: '.$process->getErrorOutput());
+            throw new \RuntimeException('PostgreSQL dump failed or returned empty SQL: '.$process->getErrorOutput());
         }
 
         if (File::put($path, $process->getOutput()) === false || !is_file($path) || filesize($path) === 0) {
-            throw new \\RuntimeException('Could not write the PostgreSQL database snapshot.');
+            throw new \RuntimeException('Could not write the PostgreSQL database snapshot.');
         }
     }
 
     public function restoreFromFile(string $path): void
     {
         if (!is_file($path) || filesize($path) === 0) {
-            throw new \\RuntimeException('PostgreSQL import dump is empty or unavailable.');
+            throw new \RuntimeException('PostgreSQL import dump is empty or unavailable.');
         }
 
         $connection = $this->connection();
@@ -57,7 +57,7 @@ class PostgresBackupSupport
         $process->run();
 
         if (!$process->isSuccessful()) {
-            throw new \\RuntimeException('PostgreSQL import failed: '.$process->getErrorOutput());
+            throw new \RuntimeException('PostgreSQL import failed: '.$process->getErrorOutput());
         }
     }
 
@@ -72,7 +72,7 @@ class PostgresBackupSupport
         if (is_string($url) && $url !== '') {
             $parts = parse_url($url);
             if (!is_array($parts) || !isset($parts['host'], $parts['path'])) {
-                throw new \\RuntimeException('The PostgreSQL DB_URL is invalid for backup or restore.');
+                throw new \RuntimeException('The PostgreSQL DB_URL is invalid for backup or restore.');
             }
 
             parse_str($parts['query'] ?? '', $query);
@@ -88,7 +88,7 @@ class PostgresBackupSupport
 
         foreach (['host', 'port', 'username', 'database'] as $key) {
             if (!isset($config[$key]) || (string) $config[$key] === '') {
-                throw new \\RuntimeException('PostgreSQL connection configuration is missing '.$key.'.');
+                throw new \RuntimeException('PostgreSQL connection configuration is missing '.$key.'.');
             }
         }
 
