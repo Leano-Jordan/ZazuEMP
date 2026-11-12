@@ -1,3 +1,15 @@
+## Director current checkpoint — 2026-11-12 (PostgreSQL recovery)
+
+- Canonical repository/engineering branch: `Leano-Jordan/ZazuEMP` / `main`; deployment-only `deploy/render-staging` remains preserved.
+- Latest verified application/test source: `1cac0e51d72b506f7c58a1c06b9d204a521f81fa`. Documentation reconciliation descendants: `c5a1f3f` and `59ab428`; no application runtime source changed in those commits.
+- Laravel: **458 passed / 3,319 assertions / 1 skipped — PASS**. PostgreSQL 16 migrations and registration/workspace acceptance: **PASS**. Real PostgreSQL database + private-storage backup/restore round-trip: **PASS — 1 test / 5 assertions**. Offline browser acceptance: **18 passed**.
+- PHPMD, Psalm, Zazu quality/secret scan, populated upgrade/rollback, Render Docker image build, Director Contract Lint and Director Health: **PASS**. SonarCloud: **SKIPPED**, not counted.
+- Full browser smoke for the documentation-only descendant `59ab428` is still running at this checkpoint; do not claim that run passed until its job completes. The prior exact application/test source browser run `43172547165` passed.
+- Added PostgreSQL operator instructions and reconciled exact CI evidence in `docs/RELEASE_BACKUP_RESTORE_RUNBOOK.md` and `docs/V1_RELEASE_CHECKLIST.md`.
+- PostgreSQL CI proves the automated test service only. Live Render DB credentials/privileges, persistent disk, independent off-host backup retention, real operator restore and deployment rollback remain UNVERIFIED. No Render service, database, disk or deployment branch was changed.
+- `deploy/render-staging` currently diverges from `main` (68 commits ahead on main and 3 commits unique to staging at inspection). It is deployment-only and remains untouched; do not merge or rewrite it as routine engineering cleanup.
+- Next highest-risk gate: controlled backup → restore → representative record/private-media/authorization verification → deployment rollback on the selected persistent hosting target. Secure-origin installed-device offline acceptance, trusted-device operations, legal/privacy, brand clearance and production licensing controls remain open. V1 remains **NO-GO**.
+
 ## Director current checkpoint — 2026-11-12
 
 - Canonical repository/branch: `Leano-Jordan/ZazuEMP` / `main`.
