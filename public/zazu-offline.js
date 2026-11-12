@@ -1688,7 +1688,11 @@
     }
 
     window.addEventListener('online', handleResume);
-    window.addEventListener('pageshow', handleResume);
+    // A normal first-load pageshow is startup, not a resume. Only retry here
+    // when the browser restores this document from the back-forward cache.
+    window.addEventListener('pageshow', event => {
+        if (event.persisted) handleResume();
+    });
     window.addEventListener('focus', handleResume);
     document.addEventListener('visibilitychange', () => {
         if (document.visibilityState === 'visible') handleResume();
