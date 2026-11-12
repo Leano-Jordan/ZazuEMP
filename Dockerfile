@@ -21,7 +21,7 @@ RUN composer install --no-dev --prefer-dist --no-interaction --no-progress --opt
 
 FROM php:8.4-apache-bookworm
 RUN apt-get update && apt-get install -y --no-install-recommends \
-    libonig-dev libxml2-dev libzip-dev libsqlite3-dev libpq-dev pkg-config \
+    libonig-dev libxml2-dev libzip-dev libsqlite3-dev libpq-dev pkg-config postgresql-client \
     && docker-php-ext-install -j"$(nproc)" mbstring pdo_sqlite pdo_pgsql xml zip opcache \
     && php -m | grep -qi '^pdo_pgsql$' \
     && php -m | grep -qi '^pdo_sqlite$' \
