@@ -86,6 +86,69 @@ class SyncController extends Controller
         ]);
     }
 
+    public function registerPrimaryDevice(Request $request, CurrentBusiness $currentBusiness): JsonResponse
+    {
+        $validated = $request->validate([
+            'installation_id' => ['required', 'uuid'],
+            'device_name' => ['nullable', 'string', 'max:120'],
+            'device_type' => ['nullable', 'string', 'in:phone,tablet,desktop'],
+        ]);
+
+        $business = $currentBusiness->resolve($request->user());
+        abort_unless($business, 404);
+
+        [$device, $token] = DB::transaction(function () use ($validated, $business): array {
+            $device = SyncDevice::query()
+                ->where('installation_id', $validated['installation_id'])
+                ->lockForUpdate()
+                ->first();
+
+            if ($device && (int) $device->business_id !== (int) $business->id) {
+                abort(409, 'This installation is already registered to another business workspace.');
+            }
+
+            $token = Str::random(64);
+            $now = now();
+            $metadata = $device?->metadata ?? [];
+            unset($metadata['pairing_code_hash'], $metadata['pairing_expires_at']);
+
+            if (! $device) {
+                $device = SyncDevice::create([
+                    'business_id' => $business->id,
+                    'installation_id' => $validated['installation_id'],
+                    'device_name' => $validated['device_name'] ?? 'Zazu device',
+                    'device_type' => $validated['device_type'] ?? 'phone',
+                    'status' => 'active',
+                    'last_seen_at' => $now,
+                    'token_expires_at' => $now->copy()->addDays(SyncDevice::SYNC_TOKEN_IDLE_EXPIRY_DAYS),
+                    'metadata' => array_merge($metadata, ['sync_token_hash' => hash('sha256', $token), 'registered_at' => $now->toIso8601String()]),
+                ]);
+            } else {
+                $device->forceFill([
+                    'device_name' => $validated['device_name'] ?? $device->device_name ?? 'Zazu device',
+                    'device_type' => $validated['device_type'] ?? $device->device_type ?? 'phone',
+                    'status' => 'active',
+                    'revoked_at' => null,
+                    'last_seen_at' => $now,
+                    'token_expires_at' => $now->copy()->addDays(SyncDevice::SYNC_TOKEN_IDLE_EXPIRY_DAYS),
+                    'metadata' => array_merge($metadata, ['sync_token_hash' => hash('sha256', $token), 'registered_at' => $now->toIso8601String()]),
+                ])->save();
+            }
+
+            return [$device->fresh(), $token];
+        });
+
+        return response()->json([
+            'device' => [
+                'id' => $device->id,
+                'installation_id' => $device->installation_id,
+                'business_id' => $device->business_id,
+            ],
+            'token' => $token,
+            'bootstrap' => $this->bootstrapPayload($device),
+        ]);
+    }
+
     public function provision(Request $request): JsonResponse
     {
         $validated = $request->validate([
