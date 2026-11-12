@@ -446,6 +446,16 @@ class ZazuRestoreCommand extends Command
                 }
             }
 
+            if ($postgresRestoreStarted && $postgresRollbackPath !== null && is_file($postgresRollbackPath)) {
+                try {
+                    $this->importPostgresDump($postgresRollbackPath);
+                } catch (\\Throwable $rollbackException) {
+                    $rollbackFailure = $rollbackException->getMessage();
+                    // Keep the only pre-restore PostgreSQL snapshot available for manual recovery.
+                    $preserveWork = true;
+                }
+            }
+
             if ($sqliteTarget !== null && ($sqliteDatabaseStaged || $sqliteWalStaged || $sqliteShmStaged || $sqliteDatabaseActivated)) {
                 DB::purge('sqlite');
                 gc_collect_cycles();
