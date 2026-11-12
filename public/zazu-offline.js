@@ -1501,6 +1501,7 @@
         sessionCleared = false;
         state = {
             ...(preserveLocalWorkspace ? previousState : blank()),
+            installation_id: result.device.installation_id,
             sync: { token: result.token, device: result.device },
             local_dirty: preserveLocalWorkspace,
             sync_authorization_required: false,
