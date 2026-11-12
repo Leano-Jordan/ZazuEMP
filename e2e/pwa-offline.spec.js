@@ -14,6 +14,14 @@ async function login(page, email = DEMO_EMAIL, password = DEMO_PASSWORD) {
     await expect(page).toHaveURL(/\/dashboard$/);
 }
 
+async function waitForOfflineRuntime(page) {
+    await expect.poll(
+        () => page.evaluate(() => Boolean(window.ZazuOffline?.ready)),
+        { message: 'offline runtime must be exposed before device-pairing assertions' },
+    ).toBe(true);
+    await page.evaluate(() => window.ZazuOffline.ready);
+}
+
 test.describe('Zazu installed PWA offline shell', () => {
     test('local client becomes ready before an unresponsive initial sync', async ({ page }, testInfo) => {
         test.setTimeout(20_000);
@@ -877,6 +885,7 @@ test.describe('Zazu installed PWA offline shell', () => {
         test.setTimeout(60_000);
 
         await login(page);
+        await waitForOfflineRuntime(page);
         // Wait for the best-effort first-load device registration before replacing
         // its token with a deterministic fixture for the logout preservation test.
         await expect.poll(() => page.evaluate(() => window.ZazuOffline.isPaired())).toBe(true);
