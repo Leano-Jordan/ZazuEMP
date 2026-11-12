@@ -283,3 +283,7 @@ Detailed specialist procedures belong in skills and specialist engine references
 **Failure index = institutional memory.**
 
 This file intentionally stays small. Its job is to control the system, not contain the entire system.
+
+## Owner V1 scope-freeze rule — mandatory
+
+At the start of every engineering cycle, load `.ai/engineering/V1_SCOPE_FREEZE.md`. It is binding on Director and all specialist engines. Finish the agreed customer workflows; do not expand scope through hypothetical edge cases, optional polish, speculative compliance or future infrastructure. Only reproducible V1 workflow defects, demonstrated security/privacy/data-integrity failures, or explicit owner-authorised additions may enter scope. Close the known checklist blockers, verify the core workflows, run one final regression pass, fix only material failures from that pass, record known limitations and issue the release decision. Do not reopen closed gates without new evidence. Render is an interim remote-development workbench, not the final production destination and not a production-hosting gate. If a matter is not necessary for reliable use of the agreed V1 workflows, it does not block V1. See the scope-freeze document for stop conditions and finish sequence.
