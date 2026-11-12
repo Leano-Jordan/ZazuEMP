@@ -43,6 +43,7 @@
     let sessionCleared = false;
     let sessionGeneration = 0;
     let sessionChannel = null;
+    let primaryRegistrationAttempt = null;
 
     try {
         if ('BroadcastChannel' in window) {
@@ -1527,6 +1528,18 @@
     }
 
     async function registerPrimaryDevice() {
+        if (primaryRegistrationAttempt) return primaryRegistrationAttempt;
+
+        const attempt = registerPrimaryDeviceOnce();
+        primaryRegistrationAttempt = attempt;
+        try {
+            return await attempt;
+        } finally {
+            if (primaryRegistrationAttempt === attempt) primaryRegistrationAttempt = null;
+        }
+    }
+
+    async function registerPrimaryDeviceOnce() {
         if (sessionCleared || !navigator.onLine || !storageAvailable || !ACTIVE_BUSINESS_ID || state?.sync?.token) return false;
 
         const csrfToken = document.querySelector('meta[name="csrf-token"]')?.content;
@@ -1541,6 +1554,8 @@
             await writeState({ allowSessionChange: true });
         }
 
+        const registrationGeneration = sessionGeneration;
+        const registrationInstallationId = state.installation_id;
         const response = await fetch('/offline/device/register', {
             method: 'POST',
             credentials: 'same-origin',
@@ -1556,6 +1571,9 @@
             }),
         });
 
+        if (sessionCleared || sessionGeneration !== registrationGeneration
+            || state?.sync?.token || state?.installation_id !== registrationInstallationId) return false;
+
         if (!response.ok) {
             state.last_sync_error = response.status === 409
                 ? 'This installation is registered to a different business workspace.'
@@ -1570,6 +1588,8 @@
         }
 
         const queued = await allMutations();
+        if (sessionCleared || sessionGeneration !== registrationGeneration
+            || state?.sync?.token || state?.installation_id !== registrationInstallationId) return false;
         const preserveLocalWorkspace = queued.length > 0 || state.local_dirty === true;
         state.sync = { token: result.token, device: result.device };
         state.sync_authorization_required = false;
