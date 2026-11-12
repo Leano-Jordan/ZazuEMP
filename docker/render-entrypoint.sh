@@ -18,9 +18,6 @@ if [ -z "${DB_CONNECTION:-}" ]; then
         postgres://*|postgresql://*)
             export DB_CONNECTION="pgsql"
             ;;
-        mysql://*)
-            export DB_CONNECTION="mysql"
-            ;;
         sqlite:*)
             export DB_CONNECTION="sqlite"
             ;;
