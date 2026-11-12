@@ -1,3 +1,23 @@
+## Director exact-head CI reconciliation — 2026-11-12 21:45 SAST
+
+- Exact application/test-source SHA: `5924fd6d294187ec482295193c4add865e64137b`.
+- GitHub Actions query by exact `head_sha`: 11 workflow runs returned. All required workflows completed successfully:
+  - Laravel: **459 passed / 3,331 assertions / 1 skipped** (run [43290913503](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/43290913503)).
+  - PostgreSQL migration, account/workspace registration and PostgreSQL backup/restore/private-file recovery job: **PASS** (same Laravel workflow).
+  - Offline browser acceptance: **19 passed** (same Laravel workflow).
+  - Full browser smoke: **82 passed / 40 skipped / 0 failed** (run [43290913416](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/43290913416)).
+  - Populated database upgrade and rollback: **PASS** (run [43290913571](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/43290913571)).
+  - Zazu quality + secret scan: **PASS** (run [43290913644](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/43290913644)).
+  - Psalm security: **PASS** (run [43290913547](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/43290913547)).
+  - PHPMD: **PASS** (run [43290913940](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/43290913940)).
+  - Director Health: **PASS** (run [43290913608](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/43290913608)).
+  - SonarCloud: **SKIPPED**, not counted as a pass.
+- Job logs were inspected, not merely inferred from workflow summaries. The Laravel summary confirms 459 passed; offline browser job confirms 19 passed; full browser job confirms 82 passed / 40 skipped.
+- The Android resume reconnect regression is included in the offline-browser acceptance suite and passed with the suite.
+- The earlier CI uncertainty for this application/test SHA is closed. The documentation-only commits in this reconciliation cycle do not alter application or test source.
+- Next bounded acceptance: inspect and record the agreed seeded core workflow coverage, then the remaining physical installed-device offline acceptance on the owner's secure HTTPS origin. Do not create additional speculative gates.
+- No Render deployment or deployment-branch change was performed.
+
 ## Director exact-head reconciliation — 2026-11-12 21:38 SAST
 
 - Canonical engineering repository/branch: `Leano-Jordan/ZazuEMP` / `main`. Latest application/test-source commit in this checkpoint: `5924fd6d294187ec482295193c4add865e64137b`. Subsequent commits in this reconciliation cycle are documentation-only and do not alter application or test source.
