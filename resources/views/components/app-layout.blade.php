@@ -4,6 +4,7 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
     <meta name="theme-color" content="#DDF4FA">
+    <meta name="csrf-token" content="{{ csrf_token() }}">
     <link rel="manifest" href="{{ asset('manifest.webmanifest') }}">
     @php
         $business = app(\App\Support\CurrentBusiness::class)->resolve(auth()->user());

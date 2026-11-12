@@ -1501,6 +1501,7 @@
         sessionCleared = false;
         state = {
             ...(preserveLocalWorkspace ? previousState : blank()),
+            installation_id: result.device.installation_id,
             sync: { token: result.token, device: result.device },
             local_dirty: preserveLocalWorkspace,
             sync_authorization_required: false,
@@ -1523,6 +1524,63 @@
             });
         }
         return result.device;
+    }
+
+    async function registerPrimaryDevice() {
+        if (sessionCleared || !navigator.onLine || !storageAvailable || !ACTIVE_BUSINESS_ID || state?.sync?.token) return false;
+
+        const csrfToken = document.querySelector('meta[name="csrf-token"]')?.content;
+        if (!csrfToken) return false;
+
+        if (!state.installation_id) {
+            if (!window.crypto?.randomUUID) {
+                state.last_sync_error = 'This browser cannot create a secure device identity.';
+                return false;
+            }
+            state.installation_id = window.crypto.randomUUID();
+            await writeState({ allowSessionChange: true });
+        }
+
+        const response = await fetch('/offline/device/register', {
+            method: 'POST',
+            credentials: 'same-origin',
+            headers: {
+                'Content-Type': 'application/json',
+                'Accept': 'application/json',
+                'X-CSRF-TOKEN': csrfToken,
+            },
+            body: JSON.stringify({
+                installation_id: state.installation_id,
+                device_name: /Android|iPhone|iPad/i.test(navigator.userAgent) ? 'Zazu phone' : 'Zazu device',
+                device_type: /Android|iPhone|iPad/i.test(navigator.userAgent) ? 'phone' : 'desktop',
+            }),
+        });
+
+        if (!response.ok) {
+            state.last_sync_error = response.status === 409
+                ? 'This installation is registered to a different business workspace.'
+                : 'Zazu could not register this device. Your local work remains saved.';
+            return false;
+        }
+
+        const result = await response.json();
+        if (Number(result.device?.business_id || 0) !== ACTIVE_BUSINESS_ID) {
+            state.last_sync_error = 'The registered device belongs to a different business workspace.';
+            return false;
+        }
+
+        const queued = await allMutations();
+        const preserveLocalWorkspace = queued.length > 0 || state.local_dirty === true;
+        state.sync = { token: result.token, device: result.device };
+        state.sync_authorization_required = false;
+        state.last_sync_error = null;
+        if (!preserveLocalWorkspace) applyBootstrap(result.bootstrap);
+        await writeState({ allowSessionChange: true });
+        window.dispatchEvent(new CustomEvent('zazu:offline-state-updated'));
+        if (preserveLocalWorkspace) {
+            await sync();
+        }
+        return true;
     }
 
     async function boot() {
@@ -1550,6 +1608,14 @@
         resolveReady(state);
         window.dispatchEvent(new CustomEvent('zazu:offline-ready', { detail: api }));
 
+        if (storageAvailable && !state.sync?.token && navigator.onLine && window.__ZAZU_OFFLINE_DEFER_INITIAL_SYNC !== true) {
+            registerPrimaryDevice().then(registered => {
+                if (registered && state?.sync?.token) sync().catch(() => {});
+            }).catch(() => {
+                // Device registration is best-effort; local work remains available.
+            });
+        }
+
         if (shouldSync) {
             sync().catch(() => {
                 // A failed background sync must not undo local readiness. Record
@@ -1571,6 +1637,7 @@
         getAttachmentFile,
         syncAttachments,
         pair,
+        registerPrimaryDevice,
         sync,
         assessLogout,
         clearLocalSession,
@@ -1585,6 +1652,13 @@
         // The browser can reconnect while IndexedDB is still opening. Wait for
         // boot to finish so the first reconnect cannot be silently ignored.
         await ready;
+        if (!state?.sync?.token) {
+            try {
+                await registerPrimaryDevice();
+            } catch {
+                // Keep local work queued; a later reconnect/focus can retry.
+            }
+        }
         sync().catch(() => {
             // Reconnection failures are recoverable; keep the local workspace
             // available and avoid an unhandled promise rejection.
