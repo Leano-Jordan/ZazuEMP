@@ -1,3 +1,14 @@
+## Owner-directed V1 finish decision — 2026-11-12
+
+This section supersedes older open-gate wording below where it conflicts with the owner's current scope direction.
+
+- V1 scope is frozen by `.ai/engineering/V1_SCOPE_FREEZE.md`.
+- Render is an interim remote-development workbench, not the final production destination. Production hosting, persistent production storage, production restore and production rollback are deferred until the actual production target is selected; they are not current Render-workbench gates.
+- Do not treat speculative or future-facing items as V1 blockers. Only a reproducible defect in an agreed V1 workflow, a demonstrated security/privacy/data-integrity failure in that workflow, or an explicit owner-approved requirement can block V1.
+- The remaining acceptance work is limited to the agreed customer workflows and concrete release obligations: final core workflow/offline-sync acceptance, one final regression pass, and recording known limitations. Physical installed-device checks are a bounded acceptance task, not an invitation to expand offline scope.
+- Existing automated Laravel, PostgreSQL migration/registration/backup-restore CI and offline-browser results remain valid at the exact SHAs and run IDs recorded below. Do not claim later commits are covered without exact-head CI evidence.
+- Stop once the agreed acceptance criteria pass; issue the V1 release decision rather than creating another checklist.
+
 ## Director exact-head CI reconciliation — 2026-11-12 (PostgreSQL recovery)
 
 - Canonical engineering branch: `main`; exact application/test HEAD: `1cac0e51d72b506f7c58a1c06b9d204a521f81fa`.
