@@ -1,0 +1,30 @@
+# Exported from Render on 2026-11-12T18:14:18Z
+version: "1"
+projects:
+- name: My Zazu EMP Project
+  environments:
+  - name: Production
+    services:
+    - type: web
+      name: ZazuEMP
+      runtime: docker
+      repo: https://github.com/Leano-Jordan/ZazuEMP
+      branch: deploy/render-staging
+      plan: free
+      envVars:
+      - key: DATABASE_URL
+        sync: false
+      - key: SESSION_DRIVER
+        sync: false
+      - key: DB_URL
+        sync: false
+      - key: DB_CONNECTION
+        sync: false
+      - key: APP_KEY
+        sync: false
+      region: oregon
+      dockerContext: .
+      dockerfilePath: ./Dockerfile
+      autoDeployTrigger: commit
+      previews:
+        generation: automatic
