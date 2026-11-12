@@ -1,6 +1,6 @@
 ## Director exact-head verification — 2026-11-12 (Work completion guards + offline customer-to-Work)
 
-- Exact `main` HEAD: `7193038a2b2d14ea71278050a0d7c26ce246bf86` (merge commit; includes the test-only commits `e3855998`, `b2e548be`, and offline acceptance correction `9bd1cc0d`).
+- Exact application/test-source HEAD: `7193038a2b2d14ea71278050a0d7c26ce246bf86` (merge commit; the later `main` descendants `453c80d` and `78fb793` change only these two evidence documents; includes the test-only commits `e3855998`, `b2e548be`, and offline acceptance correction `9bd1cc0d`).
 - Laravel workflow [43298535995](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/43298535995): **PASS — 462 passed / 3,339 assertions / 1 skipped**. The three focused Work completion-guard tests pass: completion is rejected while preparation is open or blocked, costs remain planned, or a linked purchase order is active. No application runtime change was needed; existing guards were locked with regressions.
 - Offline browser acceptance: **PASS — 19 passed** (same Laravel workflow).
 - PostgreSQL migration/recovery smoke: **PASS** (same workflow; both PostgreSQL-focused test steps passed).
