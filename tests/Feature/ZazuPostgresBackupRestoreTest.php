@@ -29,7 +29,7 @@ class ZazuPostgresBackupRestoreTest extends TestCase
         File::ensureDirectoryExists($bin);
         File::ensureDirectoryExists(dirname($privateProbe));
         File::put($privateProbe, 'private PostgreSQL backup payload');
-        File::put($bin.'/pg_dump', "#!/bin/sh\nprintf '%s\n' '-- Zazu PostgreSQL dump fixture' 'CREATE TABLE backup_probe (id bigint);'\nprintf '%s|%s' \"$PGPASSWORD\" \"$PGSSLMODE\" > ".escapeshellarg($envFile)."\n");
+        File::put($bin.'/pg_dump', "#!/bin/sh\nprintf '%s\n' '-- Zazu PostgreSQL dump fixture' 'CREATE TABLE backup_probe (id bigint);'\nprintf '%s|%s' \"\$PGPASSWORD\" \"\$PGSSLMODE\" > ".escapeshellarg($envFile)."\n");
         chmod($bin.'/pg_dump', 0755);
 
         putenv('PATH='.$bin.PATH_SEPARATOR.$originalPath);
