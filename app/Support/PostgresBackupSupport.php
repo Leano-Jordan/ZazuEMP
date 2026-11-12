@@ -64,26 +64,32 @@ class PostgresBackupSupport
     /**
      * @return array{host:string,port:string,username:string,database:string,environment:array<string,string>}
      */
+    private function applyConnectionUrl(array $config, string $url): array
+    {
+        $parts = parse_url($url);
+        if (!is_array($parts) || !isset($parts['host'], $parts['path'])) {
+            throw new \\RuntimeException('The PostgreSQL DB_URL is invalid for backup or restore.');
+        }
+
+        parse_str($parts['query'] ?? '', $query);
+
+        return array_merge($config, [
+            'host' => $parts['host'],
+            'port' => $parts['port'] ?? 5432,
+            'username' => isset($parts['user']) ? rawurldecode($parts['user']) : '',
+            'password' => isset($parts['pass']) ? rawurldecode($parts['pass']) : '',
+            'database' => ltrim($parts['path'], '/'),
+            'sslmode' => $query['sslmode'] ?? ($config['sslmode'] ?? 'prefer'),
+        ]);
+    }
+
     private function connection(): array
     {
         $config = config('database.connections.pgsql');
         $url = $config['url'] ?? null;
 
         if (is_string($url) && $url !== '') {
-            $parts = parse_url($url);
-            if (!is_array($parts) || !isset($parts['host'], $parts['path'])) {
-                throw new \RuntimeException('The PostgreSQL DB_URL is invalid for backup or restore.');
-            }
-
-            parse_str($parts['query'] ?? '', $query);
-            $config = array_merge($config, [
-                'host' => $parts['host'],
-                'port' => $parts['port'] ?? 5432,
-                'username' => isset($parts['user']) ? rawurldecode($parts['user']) : '',
-                'password' => isset($parts['pass']) ? rawurldecode($parts['pass']) : '',
-                'database' => ltrim($parts['path'], '/'),
-                'sslmode' => $query['sslmode'] ?? ($config['sslmode'] ?? 'prefer'),
-            ]);
+            $config = $this->applyConnectionUrl($config, $url);
         }
 
         foreach (['host', 'port', 'username', 'database'] as $key) {
