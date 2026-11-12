@@ -1,10 +1,10 @@
 <?php
 
-namespace Tests\\Feature;
+namespace Tests\Feature;
 
-use Illuminate\\Support\\Facades\\File;
-use Illuminate\\Support\\Str;
-use Tests\\TestCase;
+use Illuminate\Support\Facades\File;
+use Illuminate\Support\Str;
+use Tests\TestCase;
 use ZipArchive;
 
 class ZazuPostgresBackupRestoreTest extends TestCase
@@ -29,7 +29,7 @@ class ZazuPostgresBackupRestoreTest extends TestCase
         File::ensureDirectoryExists($bin);
         File::ensureDirectoryExists(dirname($privateProbe));
         File::put($privateProbe, 'private PostgreSQL backup payload');
-        File::put($bin.'/pg_dump', "#!/bin/sh\nprintf '%s\\n' '-- Zazu PostgreSQL dump fixture' 'CREATE TABLE backup_probe (id bigint);'\nprintf '%s|%s' \"$PGPASSWORD\" \"$PGSSLMODE\" > ".escapeshellarg($envFile)."\n");
+        File::put($bin.'/pg_dump', "#!/bin/sh\nprintf '%s\n' '-- Zazu PostgreSQL dump fixture' 'CREATE TABLE backup_probe (id bigint);'\nprintf '%s|%s' \"$PGPASSWORD\" \"$PGSSLMODE\" > ".escapeshellarg($envFile)."\n");
         chmod($bin.'/pg_dump', 0755);
 
         putenv('PATH='.$bin.PATH_SEPARATOR.$originalPath);
@@ -103,7 +103,7 @@ class ZazuPostgresBackupRestoreTest extends TestCase
         File::ensureDirectoryExists($logDirectory);
         File::ensureDirectoryExists($privateRoot);
         File::put($privateProbe, 'original private data');
-        File::put($bin.'/pg_dump', "#!/bin/sh\nprintf '%s\\n' '-- pre-restore PostgreSQL snapshot marker'\n");
+        File::put($bin.'/pg_dump', "#!/bin/sh\nprintf '%s\n' '-- pre-restore PostgreSQL snapshot marker'\n");
         File::put($bin.'/psql', "#!/bin/sh\n".
             'count=0'."\n".
             '[ -f '.escapeshellarg($countFile).' ] && count=$(cat '.escapeshellarg($countFile).")\n".
