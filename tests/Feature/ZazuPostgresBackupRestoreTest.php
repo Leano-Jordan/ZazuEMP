@@ -82,6 +82,7 @@ class ZazuPostgresBackupRestoreTest extends TestCase
         }
     }
 
+    /** @SuppressWarnings(PHPMD.ExcessiveMethodLength) */
     public function test_postgres_restore_rolls_back_database_and_private_files_after_import_failure(): void
     {
         if (!class_exists(ZipArchive::class) || PHP_OS_FAMILY === 'Windows') {
