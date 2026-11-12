@@ -68,7 +68,7 @@ class PostgresBackupSupport
     {
         $parts = parse_url($url);
         if (!is_array($parts) || !isset($parts['host'], $parts['path'])) {
-            throw new \\RuntimeException('The PostgreSQL DB_URL is invalid for backup or restore.');
+            throw new \RuntimeException('The PostgreSQL DB_URL is invalid for backup or restore.');
         }
 
         parse_str($parts['query'] ?? '', $query);
