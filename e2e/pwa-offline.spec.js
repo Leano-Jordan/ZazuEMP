@@ -225,13 +225,20 @@ test.describe('Zazu installed PWA offline shell', () => {
         await login(page);
         await page.goto('/customers/create', { waitUntil: 'domcontentloaded' });
         await page.evaluate(() => window.ZazuOffline.ready);
-        await page.route('**/customers/create*', async route => {
-            if (route.request().method() === 'HEAD') await route.abort('failed');
-            else await route.continue();
+        let connectivityProbeBlocked = false;
+        await page.route('**/*', async route => {
+            const request = route.request();
+            if (request.method() === 'HEAD' && request.headers()['x-zazu-connectivity-probe'] === '1') {
+                connectivityProbeBlocked = true;
+                await route.abort('failed');
+                return;
+            }
+            await route.continue();
         });
         await page.locator('input[name="name"]').fill('Local only linked customer');
         await page.locator('input[name="primary_contact_name"]').fill('Local Customer Contact');
         await page.getByRole('button', { name: 'Save customer' }).click();
+        await expect.poll(() => connectivityProbeBlocked).toBe(true);
         await expect(page.getByText('Saved on this device. It will sync automatically when Zazu reconnects.')).toBeVisible();
 
         await page.goto('/work/create', { waitUntil: 'domcontentloaded' });
