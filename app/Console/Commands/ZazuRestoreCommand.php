@@ -57,6 +57,8 @@ class ZazuRestoreCommand extends Command
         $sqliteDatabaseActivated = false;
         $mysqlRollbackPath = null;
         $mysqlRestoreStarted = false;
+        $postgresRollbackPath = null;
+        $postgresRestoreStarted = false;
         $preserveWork = false;
         $originalSqliteDatabase = config('database.connections.sqlite.database');
         $temporaryMemoryTarget = false;
@@ -321,15 +323,15 @@ class ZazuRestoreCommand extends Command
                     $this->error('SQLite restore target directory must exist and be writable before restore can begin.');
                     return self::FAILURE;
                 }
-            } elseif ($driver === 'mysql') {
+            } elseif ($driver === 'mysql' || $driver === 'pgsql') {
                 $sql = $work.'/database.sql';
 
                 if (!is_file($sql)) {
-                    $this->error('MySQL dump is missing from the backup.');
+                    $this->error(ucfirst($driver).' dump is missing from the backup.');
                     return self::FAILURE;
                 }
             } else {
-                $this->error('Restore currently supports SQLite and MySQL installations.');
+                $this->error('Restore currently supports SQLite, MySQL and PostgreSQL installations.');
                 return self::FAILURE;
             }
 
@@ -342,6 +344,9 @@ class ZazuRestoreCommand extends Command
             if ($driver === 'mysql') {
                 $mysqlRollbackPath = $work.'/pre-restore-database.sql';
                 $this->snapshotMysqlForRollback($mysqlRollbackPath);
+            } elseif ($driver === 'pgsql') {
+                $postgresRollbackPath = $work.'/pre-restore-database.sql';
+                $this->snapshotPostgresForRollback($postgresRollbackPath);
             }
 
             // Stage private storage only after every required database rollback point exists.
@@ -421,6 +426,9 @@ class ZazuRestoreCommand extends Command
             } elseif ($driver === 'mysql') {
                 $mysqlRestoreStarted = true;
                 $this->importMysqlDump($work.'/database.sql');
+            } elseif ($driver === 'pgsql') {
+                $postgresRestoreStarted = true;
+                $this->importPostgresDump($work.'/database.sql');
             }
 
             $this->info('Zazu restore completed from '.$archive);
@@ -507,6 +515,9 @@ class ZazuRestoreCommand extends Command
                 $this->error('Zazu restore failed and automatic rollback was incomplete: '.$rollbackFailure);
                 if ($mysqlRestoreStarted && $mysqlRollbackPath !== null && $preserveWork) {
                     $this->error('Pre-restore MySQL snapshot preserved at: '.$mysqlRollbackPath);
+                }
+                if ($postgresRestoreStarted && $postgresRollbackPath !== null && $preserveWork) {
+                    $this->error('Pre-restore PostgreSQL snapshot preserved at: '.$postgresRollbackPath);
                 }
                 if ($preserveDatabaseRollback && $databaseRollback !== null) {
                     $this->error('Pre-restore SQLite snapshot preserved at: '.$databaseRollback);
@@ -598,6 +609,102 @@ class ZazuRestoreCommand extends Command
         }
     }
 
+    private function snapshotPostgresForRollback(string $path): void
+    {
+        $connection = $this->postgresConnection();
+        $process = new Process([
+            'pg_dump',
+            '--no-owner',
+            '--no-privileges',
+            '--format=plain',
+            '--host='.$connection['host'],
+            '--port='.$connection['port'],
+            '--username='.$connection['username'],
+            '--dbname='.$connection['database'],
+        ], null, $connection['environment']);
+
+        $process->setTimeout(600);
+        $process->run();
+
+        if (!$process->isSuccessful() || trim($process->getOutput()) === '') {
+            throw new \\RuntimeException('Could not create the pre-restore PostgreSQL rollback snapshot: '.$process->getErrorOutput());
+        }
+
+        File::put($path, $process->getOutput());
+
+        if (!is_file($path) || filesize($path) === 0) {
+            throw new \\RuntimeException('The pre-restore PostgreSQL snapshot is empty.');
+        }
+    }
+
+    private function importPostgresDump(string $path): void
+    {
+        if (!is_file($path) || filesize($path) === 0) {
+            throw new \\RuntimeException('PostgreSQL import dump is empty or unavailable.');
+        }
+
+        $connection = $this->postgresConnection();
+        $process = new Process([
+            'psql',
+            '--set=ON_ERROR_STOP=1',
+            '--host='.$connection['host'],
+            '--port='.$connection['port'],
+            '--username='.$connection['username'],
+            '--dbname='.$connection['database'],
+        ], null, $connection['environment']);
+
+        $process->setTimeout(600);
+        $process->setInput(File::get($path));
+        $process->run();
+
+        if (!$process->isSuccessful()) {
+            throw new \\RuntimeException('PostgreSQL import failed: '.$process->getErrorOutput());
+        }
+    }
+
+    /**
+     * @return array{host:string,port:string,username:string,database:string,environment:array<string,string>}
+     */
+    private function postgresConnection(): array
+    {
+        $config = config('database.connections.pgsql');
+        $url = $config['url'] ?? null;
+
+        if (is_string($url) && $url !== '') {
+            $parts = parse_url($url);
+            if (!is_array($parts) || !isset($parts['host'], $parts['path'])) {
+                throw new \\RuntimeException('The PostgreSQL DB_URL is invalid for backup or restore.');
+            }
+
+            parse_str($parts['query'] ?? '', $query);
+            $config = array_merge($config, [
+                'host' => $parts['host'],
+                'port' => $parts['port'] ?? 5432,
+                'username' => isset($parts['user']) ? rawurldecode($parts['user']) : '',
+                'password' => isset($parts['pass']) ? rawurldecode($parts['pass']) : '',
+                'database' => ltrim($parts['path'], '/'),
+                'sslmode' => $query['sslmode'] ?? ($config['sslmode'] ?? 'prefer'),
+            ]);
+        }
+
+        foreach (['host', 'port', 'username', 'database'] as $key) {
+            if (!isset($config[$key]) || (string) $config[$key] === '') {
+                throw new \\RuntimeException('PostgreSQL connection configuration is missing '.$key.'.');
+            }
+        }
+
+        return [
+            'host' => (string) $config['host'],
+            'port' => (string) $config['port'],
+            'username' => (string) $config['username'],
+            'database' => (string) $config['database'],
+            'environment' => array_filter([
+                'PGPASSWORD' => $config['password'] ?? null,
+                'PGSSLMODE' => $config['sslmode'] ?? null,
+            ], static fn ($value) => $value !== null && $value !== ''),
+        ];
+    }
+
     private function validateStagedDatabase(string $driver, string $work): bool
     {
         if ($driver === 'sqlite') {
@@ -620,11 +727,11 @@ class ZazuRestoreCommand extends Command
             }
         }
 
-        if ($driver === 'mysql') {
+        if ($driver === 'mysql' || $driver === 'pgsql') {
             $path = $work.'/database.sql';
 
             if (!is_file($path) || filesize($path) === 0) {
-                $this->error('The MySQL backup dump is empty or unavailable.');
+                $this->error('The '.ucfirst($driver).' backup dump is empty or unavailable.');
                 return false;
             }
 
