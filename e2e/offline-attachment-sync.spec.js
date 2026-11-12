@@ -812,6 +812,7 @@ test('re-pair in one tab replaces the stale device session in other open tabs', 
 
     await login(page);
     await page.goto('/dashboard', { waitUntil: 'domcontentloaded' });
+    await expect.poll(() => page.evaluate(() => window.ZazuOffline.isPaired())).toBe(true);
     const businessId = await page.evaluate(() => Number(document.body.dataset.zazuBusinessId));
     await page.evaluate(async businessId => {
         await window.ZazuOffline.ready;
