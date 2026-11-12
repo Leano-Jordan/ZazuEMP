@@ -228,6 +228,8 @@ class ZazuBackupCommand extends Command
             'pg_dump',
             '--no-owner',
             '--no-privileges',
+            '--clean',
+            '--if-exists',
             '--format=plain',
             '--host='.$connection['host'],
             '--port='.$connection['port'],
