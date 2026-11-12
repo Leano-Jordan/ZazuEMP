@@ -1,3 +1,19 @@
+## Director exact-head CI reconciliation — 2026-11-12 (resume-sync/cache v35)
+
+- Exact application/test-source SHA: `5924fd6d294187ec482295193c4add865e64137b`.
+- Laravel: **PASS — 459 passed / 3,331 assertions / 1 skipped** ([run 43290913503](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/43290913503)).
+- PostgreSQL migration, account/workspace registration, backup/restore and private-file recovery: **PASS** (Laravel workflow job `postgres-migration-smoke`).
+- Offline browser acceptance: **PASS — 19 passed** (same Laravel workflow).
+- Full browser smoke: **PASS — 82 passed / 40 skipped / 0 failed** ([run 43290913416](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/43290913416)).
+- Populated database upgrade/rollback: **PASS** ([run 43290913571](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/43290913571)).
+- Zazu quality + secret scan: **PASS** ([run 43290913644](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/43290913644)).
+- Psalm security: **PASS** ([run 43290913547](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/43290913547)).
+- PHPMD: **PASS** ([run 43290913940](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/43290913940)).
+- Director Health: **PASS** ([run 43290913608](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/43290913608)).
+- SonarCloud: **SKIPPED**, not counted as a pass.
+- The Android installed-app resume/reconnect regression is included in the offline-browser suite and passed. This closes the previous exact-head CI uncertainty for this source/test SHA.
+- Remaining V1 acceptance is the agreed physical installed-device offline check on the owner's secure HTTPS origin, followed by the release decision. Render production hosting/restore/rollback remain deferred under the owner-directed finish rule.
+
 ## Owner-directed V1 finish decision — 2026-11-12
 
 This section supersedes older open-gate wording below where it conflicts with the owner's current scope direction.
