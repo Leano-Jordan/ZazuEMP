@@ -1,3 +1,17 @@
+## Director exact-head CI reconciliation — 2026-11-12 (offline customer-to-Work regression)
+
+- Exact application/test-source HEAD: `2b171f3fda4ae1ddeaf30700dc3f9c414866be92` on `main`.
+- Browser smoke: **PASS — 83 passed / 40 skipped / 0 failed**, run [43295881449](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/43295881449). Inspected job log confirms 123 tests, no retries reported, and successful completion. The offline customer-to-Work regression now blocks the actual `X-Zazu-Connectivity-Probe` HEAD request and asserts the probe was intercepted before accepting the local-save confirmation.
+- Laravel workflow [43295881102](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/43295881102): **PASS** — Laravel tests, PostgreSQL migration/registration/recovery and offline-browser-acceptance jobs all completed successfully.
+- Zazu quality/secret scan [43295881101](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/43295881101): **PASS**.
+- Psalm security [43295881418](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/43295881418): **PASS**.
+- PHPMD [43295881090](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/43295881090): **PASS**.
+- Populated upgrade/rollback [43295881378](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/43295881378): **PASS**.
+- Push-on-main / CodeQL [43295879914](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/43295879914): **PASS**.
+- SonarCloud [43295881289](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/43295881289): **SKIPPED**, not counted as a pass.
+- No application runtime code changed in this regression correction; the change is confined to Playwright test determinism. No deployment branch or service was changed.
+- Automated source verification for this exact HEAD is reconciled. Remaining bounded V1 acceptance is physical installed-device offline workflow on the owner's secure HTTPS origin, followed by final regression, limitations record and release decision. Do not expand scope or reopen unrelated gates without new evidence.
+
 ## Director regression correction — 2026-11-12
 
 - Review of the exact-head browser job logs found one **flaky retry**, despite the suite ending with 82 passed / 40 skipped. The first attempt of `e2e/offline-session-transition.spec.js` failed because the test accessed `window.ZazuOffline.ready` immediately after the dashboard heading appeared, before the offline script had exposed its API. The retry passed.
