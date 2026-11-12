@@ -451,7 +451,7 @@ class ZazuRestoreCommand extends Command
             if ($postgresRestoreStarted && $postgresRollbackPath !== null && is_file($postgresRollbackPath)) {
                 try {
                     (new PostgresBackupSupport())->restoreFromFile($postgresRollbackPath);
-                } catch (\\Throwable $rollbackException) {
+                } catch (\Throwable $rollbackException) {
                     $rollbackFailure = $rollbackException->getMessage();
                     // Keep the only pre-restore PostgreSQL snapshot available for manual recovery.
                     $preserveWork = true;
