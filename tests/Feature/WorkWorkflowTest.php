@@ -207,18 +207,20 @@ class WorkWorkflowTest extends TestCase
 
     public function test_work_cannot_be_completed_while_preparation_is_open_or_blocked(): void
     {
-        $event = $this->eventForCompletion('Preparation Guard Work');
-        EventPreparationItem::create([
-            'business_id' => $event->business_id,
-            'event_id' => $event->id,
-            'title' => 'Confirm final guest count',
-            'status' => 'open',
-        ]);
+        foreach (['open', 'blocked'] as $status) {
+            $event = $this->eventForCompletion('Preparation Guard Work '.$status);
+            EventPreparationItem::create([
+                'business_id' => $event->business_id,
+                'event_id' => $event->id,
+                'title' => 'Confirm final guest count',
+                'status' => $status,
+            ]);
 
-        $this->put(route('work.update', $event), $this->completionPayload($event))
-            ->assertStatus(422);
+            $this->put(route('work.update', $event), $this->completionPayload($event))
+                ->assertStatus(422);
 
-        $this->assertSame('in_progress', $event->fresh()->status);
+            $this->assertSame('in_progress', $event->fresh()->status);
+        }
     }
 
     public function test_work_cannot_be_completed_while_a_cost_remains_planned(): void
