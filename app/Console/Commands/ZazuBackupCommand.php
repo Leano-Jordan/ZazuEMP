@@ -196,7 +196,7 @@ class ZazuBackupCommand extends Command
         try {
             (new PostgresBackupSupport())->dumpToFile($work.'/database.sql');
             return true;
-        } catch (\\Throwable $exception) {
+        } catch (\Throwable $exception) {
             $this->error('PostgreSQL backup failed: '.$exception->getMessage());
             return false;
         }
