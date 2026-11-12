@@ -23,6 +23,10 @@ test('unreachable logout host preserves the signed-in session and queued busines
     test.skip(testInfo.project.name !== 'chromium', 'Session transition acceptance runs once; responsive navigation is covered separately.');
 
     await login(page);
+    await expect.poll(
+        () => page.evaluate(() => Boolean(window.ZazuOffline?.ready)),
+        { message: 'offline runtime must be exposed before the session-preservation journey starts' },
+    ).toBe(true);
 
     const mutationId = await page.evaluate(async () => {
         await window.ZazuOffline.ready;
