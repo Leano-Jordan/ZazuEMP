@@ -36,7 +36,7 @@ For a persistent Render deployment:
 4. Keep `APP_KEY` stable and secret. Set `APP_ENV=production`, `APP_DEBUG=false` and the correct HTTPS `APP_URL`.
 5. Run the deployment smoke, representative backup/restore and rollback drills before allowing customer data.
 
-The entrypoint honours explicit database/session/cache/queue environment variables, accepts `DATABASE_URL` as an alias for `DB_URL`, and infers PostgreSQL/MySQL from a supported URL scheme only when `DB_CONNECTION` is unset. It runs migrations against the selected database at startup and fails closed when a non-SQLite connection has no database endpoint.
+The entrypoint honours explicit database/session/cache/queue environment variables, accepts `DATABASE_URL` as an alias for `DB_URL`, and infers PostgreSQL from a supported URL scheme only when `DB_CONNECTION` is unset. It runs migrations against the selected database at startup and fails closed when a non-SQLite connection has no database endpoint.
 
 **This change makes the container capable of using persistent PostgreSQL and mounted storage; it does not create or attach Render resources, change service settings, or prove that a live deployment is durable.** Infrastructure configuration and real recovery acceptance remain separate release gates.
 
