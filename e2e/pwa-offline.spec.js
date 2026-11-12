@@ -223,23 +223,24 @@ test.describe('Zazu installed PWA offline shell', () => {
         test.skip(testInfo.project.name !== 'chromium', 'Offline customer-to-Work contract runs once.');
 
         await login(page);
+        // Prime both authenticated form shells before disconnecting. The
+        // remainder of the journey must not allow a background sync to race
+        // the local customer → local Work relationship.
+        await page.goto('/work/create', { waitUntil: 'domcontentloaded' });
+        await expect(page.locator('#new-job-form')).toBeVisible();
         await page.goto('/customers/create', { waitUntil: 'domcontentloaded' });
         await page.evaluate(() => window.ZazuOffline.ready);
-        let connectivityProbeBlocked = false;
-        await page.route('**/*', async route => {
-            const request = route.request();
-            if (request.method() === 'HEAD' && request.headers()['x-zazu-connectivity-probe'] === '1') {
-                connectivityProbeBlocked = true;
-                await route.abort('failed');
-                return;
-            }
-            await route.continue();
-        });
         await page.locator('input[name="name"]').fill('Local only linked customer');
         await page.locator('input[name="primary_contact_name"]').fill('Local Customer Contact');
+        await page.context().setOffline(true);
+        await expect(page).toHaveURL(/\/customers\/create$/);
         await page.getByRole('button', { name: 'Save customer' }).click();
-        await expect.poll(() => connectivityProbeBlocked).toBe(true);
         await expect(page.getByText('Saved on this device. It will sync automatically when Zazu reconnects.')).toBeVisible();
+
+        const customerLocalId = await page.evaluate(() =>
+            window.ZazuOffline.getState().customers.find(item => item.name === 'Local only linked customer')?.local_id || null
+        );
+        expect(customerLocalId).toBeTruthy();
 
         await page.goto('/work/create', { waitUntil: 'domcontentloaded' });
         await page.evaluate(() => window.ZazuOffline.ready);
@@ -269,11 +270,13 @@ test.describe('Zazu installed PWA offline shell', () => {
 
         await expect(page.getByText('Saved on this device. It will sync automatically when Zazu reconnects.')).toBeVisible();
         const queued = await page.evaluate(async () => window.ZazuOffline.pending());
-        const customerMutation = queued.find(item => item.entity_type === 'customer');
+        const customerMutation = queued.find(item =>
+            item.entity_type === 'customer' && item.payload?.local_id === customerLocalId
+        );
         const jobMutation = queued.find(item => item.entity_type === 'job');
         expect(customerMutation).toBeTruthy();
         expect(jobMutation).toBeTruthy();
-        expect(jobMutation.payload.record.customer_local_id).toBe(customerMutation.payload.local_id);
+        expect(jobMutation.payload.record.customer_local_id).toBe(customerLocalId);
         expect(normalWorkPostAttempted).toBe(false);
         expect(jobMutation.payload.record.event_type).toBe('Wedding');
         expect(jobMutation.payload.record.event_date).toBe('2026-11-15');
