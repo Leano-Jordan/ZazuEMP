@@ -81,6 +81,10 @@ jobs:
           php-version: '8.4'
           extensions: pdo_pgsql, mbstring, xml, zip
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - name: Install PostgreSQL backup and restore client
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y postgresql-client
       - name: Install PHP dependencies
         run: composer install -q --no-ansi --no-interaction --no-scripts --no-progress --prefer-dist
       - name: Prepare environment
@@ -106,6 +110,16 @@ jobs:
           DB_USERNAME: zazu
           DB_PASSWORD: zazu
         run: php artisan test --filter=test_registration_creates_user_business_owner_membership_and_session
+      - name: Exercise PostgreSQL backup, restore and private-file recovery
+        env:
+          APP_ENV: testing
+          DB_CONNECTION: pgsql
+          DB_HOST: 127.0.0.1
+          DB_PORT: 5432
+          DB_DATABASE: zazu_test
+          DB_USERNAME: zazu
+          DB_PASSWORD: zazu
+        run: php artisan test --filter=test_postgres_backup_and_restore_round_trip_real_database_and_private_files
 
   offline-browser-acceptance:
     runs-on: ubuntu-latest
