@@ -276,8 +276,28 @@ test.describe('Zazu installed PWA offline shell', () => {
 
     test('migrates legacy offline data only into its matching business workspace', async ({ page }) => {
         await login(page);
+        await expect.poll(() => page.evaluate(() => window.ZazuOffline.isPaired())).toBe(true);
         const businessId = await page.evaluate(() => Number(document.body.dataset.zazuBusinessId));
         expect(businessId).toBeGreaterThan(0);
+
+        // The authenticated first load auto-registers this installation. Clear
+        // that current workspace so this test represents a genuine legacy-only upgrade.
+        await page.evaluate(async activeBusinessId => {
+            const db = await new Promise((resolve, reject) => {
+                const request = indexedDB.open('zazu-client-business-' + activeBusinessId, 1);
+                request.onsuccess = () => resolve(request.result);
+                request.onerror = () => reject(request.error || new Error('Could not open current offline workspace'));
+            });
+            await new Promise((resolve, reject) => {
+                const tx = db.transaction(['state', 'mutations'], 'readwrite');
+                tx.objectStore('state').clear();
+                tx.objectStore('mutations').clear();
+                tx.oncomplete = resolve;
+                tx.onerror = () => reject(tx.error || new Error('Could not clear current offline workspace'));
+                tx.onabort = () => reject(tx.error || new Error('Current offline workspace cleanup aborted'));
+            });
+            db.close();
+        }, businessId);
 
         const fixture = await page.evaluate(async (activeBusinessId) => {
             const localId = crypto.randomUUID();
@@ -847,6 +867,9 @@ test.describe('Zazu installed PWA offline shell', () => {
         test.setTimeout(60_000);
 
         await login(page);
+        // Wait for the best-effort first-load device registration before replacing
+        // its token with a deterministic fixture for the logout preservation test.
+        await expect.poll(() => page.evaluate(() => window.ZazuOffline.isPaired())).toBe(true);
         const databaseName = await page.evaluate(() => {
             const businessId = Number(document.body.dataset.zazuBusinessId);
             if (!Number.isSafeInteger(businessId) || businessId < 1) {
