@@ -5,6 +5,7 @@
 - Offline browser acceptance: **PASS — 19 passed** (same Laravel workflow).
 - PostgreSQL migration/recovery smoke: **PASS** (same workflow; both PostgreSQL-focused test steps passed).
 - Full browser smoke [43298535961](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/43298535961): **PASS — 83 passed / 40 skipped / 0 failed**. Inspected job log: 123 tests, no retry/failure lines. Offline customer-to-Work journey now explicitly disconnects the browser before local writes and checks the queued customer ID is the one linked by the Work record.
+  - Skip audit: the offline/session/registration contracts marked `test.skip` for non-Chromium projects account for the 40 skips; those stateful contracts run once on Chromium, while the responsive suite still runs on desktop, Pixel 7 and tablet projects.
 - Zazu quality/secret scan [43298535431](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/43298535431): **PASS**.
 - Psalm security [43298535526](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/43298535526): **PASS**.
 - PHPMD [43298536000](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/43298536000): **PASS**.
