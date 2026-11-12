@@ -1,3 +1,13 @@
+## Director engineering update — Android resume sync — 2026-11-12
+
+- Latest canonical `main` HEAD: `fbd57dd3985521a0890eadd8e98ea76438d9f0b8`.
+- Updated `public/zazu-offline.js`: added a shared reconnect/resume handler invoked by `online`, `pageshow`, `focus`, and visible `visibilitychange`. It waits for local readiness, attempts primary-device registration when no token exists, then drains queued sync when a token is available. Concurrent resume triggers share one in-flight attempt.
+- Added Playwright regression test in `e2e/pwa-offline.spec.js`: queued customer mutation must push and clear when the installed app resumes after the browser missed the original online event.
+- CI on exact HEAD `fbd57dd`: Laravel tests **PASS**; PHPMD **PASS**; Psalm **PASS**; Zazu quality/secret scan **PASS**; populated PostgreSQL upgrade/rollback **PASS**; Director Health **PASS**. PostgreSQL migration, registration/workspace, backup/restore/private-file steps completed successfully within the running workflow. Browser regression job is still **IN PROGRESS**; do not mark the new resume test passed until the job completes successfully.
+- Render service remains on `deploy/render-staging`, not `main`. Do not promote this change until the database connection is configured and browser CI is green. No deployment was triggered by these commits.
+- Free Render Postgres `zazuemp-preview-db` (`dpg-dbqupp95efls73fto6u0-a`) is available, PostgreSQL 18, Oregon, expires 2026-12-12. The Render integration's service update tool can merge environment variables but cannot retrieve the database secret. Link the database using the internal connection URL through Render Dashboard → database Connect → Internal URL, then service Environment → `DATABASE_URL`; save and deploy only when ready. The service and database share the Oregon region, so use the internal URL. Do not expose the credential or commit it.
+- No additional scope expansion. This is a targeted reliability fix for the owner's reported offline reconnect behavior.
+
 ## Director runtime reconciliation — Render database provisioning — 2026-11-12
 
 - Owner approved creation of a free PostgreSQL database for the Zazu EMP Render workbench.
