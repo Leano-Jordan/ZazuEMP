@@ -1,3 +1,15 @@
+## Director runtime reconciliation — Render Zazu workbench — 2026-11-12
+
+- Repository: `Leano-Jordan/ZazuEMP`; engineering branch: `main`; Render deployment branch remains `deploy/render-staging`.
+- Confirmed Render workspace: `tea-dbqp6ton74is73cs12tg` (Isaac Junior Lehlogonolo's Zazu workspace). Service: `ZazuEMP`, free web service in Oregon, URL `https://zazuemp.onrender.com`.
+- Render service is configured to deploy from `deploy/render-staging`; latest live deploy commit: `1d7af048bb8fc02051ce873fc6e9bc578e3c2f06`. Current `main` is merge commit `81b0129a101849b29ffdb036a5dd6c9e92ddfe86`, one commit ahead with no tree changes relative to the deployed commit.
+- Render workspace inventory contains no managed PostgreSQL instance. Service details returned no attached persistent disk.
+- Source inspection: `docker/render-entrypoint.sh` defaults to `DB_CONNECTION=sqlite` and `DB_DATABASE=/tmp/zazu-preview.sqlite` when no database URL/connection override is supplied. `docs/RENDER_PREVIEW.md` explicitly classifies this as disposable preview storage.
+- Runtime logs show the full migration set executing again at 2026-11-12 16:39 UTC. This is consistent with a fresh/empty database after a container restart. Render environment-variable values are not exposed by the available read integration, so whether an external DB override is configured remains **UNKNOWN**.
+- Impact hypothesis: if the service is using the documented default, account/workspace records can disappear after restart/redeploy, explaining credentials that previously worked becoming invalid. This is not yet confirmed until the service's effective DB connection is inspected.
+- Offline device auto-registration and reconnect queue sync are present in the deployed source; no `/offline/device/register` or `/api/sync` requests were found in the inspected Render application logs. Live end-to-end sync therefore remains **UNVERIFIED**.
+- No Render resources, environment variables, database settings, source code or deployment branch were changed during this inspection. Do not create a database or change billing resources without owner approval.
+
 
 
 ## Owner-directed finish rule — 2026-11-12 (binding)
