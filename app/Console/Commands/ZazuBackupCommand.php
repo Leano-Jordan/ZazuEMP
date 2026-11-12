@@ -116,7 +116,11 @@ class ZazuBackupCommand extends Command
             return $this->snapshotMysql($work);
         }
 
-        $this->error('Backup currently supports SQLite and MySQL installations.');
+        if ($driver === 'pgsql') {
+            return $this->snapshotPostgres($work);
+        }
+
+        $this->error('Backup currently supports SQLite, MySQL and PostgreSQL installations.');
         return false;
     }
 
@@ -179,6 +183,49 @@ class ZazuBackupCommand extends Command
             || !is_file($work.'/database.sql')
             || filesize($work.'/database.sql') === 0) {
             $this->error('Could not write the MySQL database snapshot.');
+            return false;
+        }
+
+        return true;
+    }
+
+    private function snapshotPostgres(string $work): bool
+    {
+        $connection = config('database.connections.pgsql');
+        $environment = array_filter([
+            'PGPASSWORD' => $connection['password'] ?? null,
+            'PGSSLMODE' => $connection['sslmode'] ?? null,
+        ], static fn ($value) => $value !== null && $value !== '');
+
+        $process = new Process([
+            'pg_dump',
+            '--no-owner',
+            '--no-privileges',
+            '--format=plain',
+            '--host='.$connection['host'],
+            '--port='.$connection['port'],
+            '--username='.$connection['username'],
+            '--dbname='.$connection['database'],
+        ], null, $environment);
+
+        $process->setTimeout(600);
+        $process->run();
+
+        if (!$process->isSuccessful()) {
+            $this->error('PostgreSQL dump failed: '.$process->getErrorOutput());
+            return false;
+        }
+
+        $dump = $process->getOutput();
+        if (trim($dump) === '') {
+            $this->error('PostgreSQL dump completed without producing SQL output.');
+            return false;
+        }
+
+        if (File::put($work.'/database.sql', $dump) === false
+            || !is_file($work.'/database.sql')
+            || filesize($work.'/database.sql') === 0) {
+            $this->error('Could not write the PostgreSQL database snapshot.');
             return false;
         }
 
