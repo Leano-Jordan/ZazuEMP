@@ -192,6 +192,33 @@ class ZazuBackupCommand extends Command
     private function snapshotPostgres(string $work): bool
     {
         $connection = config('database.connections.pgsql');
+        $url = $connection['url'] ?? null;
+
+        if (is_string($url) && $url !== '') {
+            $parts = parse_url($url);
+            if (!is_array($parts) || !isset($parts['host'], $parts['path'])) {
+                $this->error('The PostgreSQL DB_URL is invalid for backup.');
+                return false;
+            }
+
+            parse_str($parts['query'] ?? '', $query);
+            $connection = array_merge($connection, [
+                'host' => $parts['host'],
+                'port' => $parts['port'] ?? 5432,
+                'username' => isset($parts['user']) ? rawurldecode($parts['user']) : '',
+                'password' => isset($parts['pass']) ? rawurldecode($parts['pass']) : '',
+                'database' => ltrim($parts['path'], '/'),
+                'sslmode' => $query['sslmode'] ?? ($connection['sslmode'] ?? 'prefer'),
+            ]);
+        }
+
+        foreach (['host', 'port', 'username', 'database'] as $key) {
+            if (!isset($connection[$key]) || (string) $connection[$key] === '') {
+                $this->error('PostgreSQL connection configuration is missing '.$key.'.');
+                return false;
+            }
+        }
+
         $environment = array_filter([
             'PGPASSWORD' => $connection['password'] ?? null,
             'PGSSLMODE' => $connection['sslmode'] ?? null,
