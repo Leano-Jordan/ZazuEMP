@@ -2085,3 +2085,13 @@ Source review found that authenticated sync pull/acknowledgement accepted arbitr
 - Commits: `3d848c0` (guard), `ac45f6f` (regression), `b11e779` (PDO namespace correction).
 - Source re-read: PASS. PHPUnit/runtime and exact-head CI: **UNVERIFIED**; no test pass is claimed.
 - No deployment. `deploy/render-staging` untouched. V1 remains **NO-GO**.
+
+
+## Director verification — sync credential cache protection — 2026-11-12
+
+- Application/test commit: `bed3941739cf02fc1a8152932292bc7d7ec68a21` (latest runtime change in the current main history).
+- The sync and trusted-device no-store response change and its regression test are verified by exact-head GitHub Actions: Laravel workflow run `43181669792` — all jobs PASS, including Laravel tests, PostgreSQL migration/registration/backup-restore smoke, and offline browser acceptance; browser smoke `43181669581` PASS; Zazu quality/secret scan `43181669747` PASS; populated upgrade/rollback `43181669678` PASS; Psalm `43181669617` PASS; PHPMD `43181669720` PASS. SonarCloud was SKIPPED and is not counted.
+- Render workbench: documentation descendant `c450ed90fe32a1abbe621e2d177d81590d20365c` deployed successfully as `dep-dbqns3bsuf0c7389gt6g` at 2026-11-12 08:52:58 UTC. Migration output reached the final migration successfully; internal HEAD / and GET / returned HTTP 200. No current-deployment application error was present in the inspected startup logs.
+- Render remains a disposable SQLite preview workbench. This deployment evidence does not establish persistent customer data or production readiness and is not treated as such.
+- Next bounded acceptance item: physical installed-device offline workflow on the owner's target phone. CI browser tests cannot certify the installed app's real device storage and reconnect behaviour. Do not invent additional gates while awaiting that acceptance.
+- V1 release decision remains pending that agreed core workflow acceptance and the single final regression/release review. No new feature or speculative hardening scope is admitted.
