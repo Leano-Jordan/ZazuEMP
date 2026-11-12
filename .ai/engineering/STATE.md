@@ -2116,3 +2116,12 @@ Source review found that authenticated sync pull/acknowledgement accepted arbitr
 - Render remains a disposable SQLite preview workbench. This deployment evidence does not establish persistent customer data or production readiness and is not treated as such.
 - Next bounded acceptance item: physical installed-device offline workflow on the owner's target phone. CI browser tests cannot certify the installed app's real device storage and reconnect behaviour. Do not invent additional gates while awaiting that acceptance.
 - V1 release decision remains pending that agreed core workflow acceptance and the single final regression/release review. No new feature or speculative hardening scope is admitted.
+
+
+## Render remote workbench reconciliation — 2026-11-12
+
+- Confirmed the intended Render workspace and the ZazuEMP web service in that workspace. Service `srv-dbqpa1tbedkc73ebgeo0` is live at `https://zazuemp.onrender.com`, on the preserved `deploy/render-staging` branch, Free plan, with automatic deploys from commits.
+- Confirmed a separate Render PostgreSQL 18 instance `zazuemp-preview-db` (`dpg-dbqupp95efls73fto6u0-a`) exists and is available on the Free plan. Its recorded expiry is 2026-12-12 16:44:21 UTC (18:44:21 South Africa time).
+- Latest observed service deploy `dep-dbqvjuutlv9c73d963l0` is LIVE for commit `1d7af048bb8fc02051ce873fc6e9bc578e3c2f06`; startup migrations completed and HTTP health checks returned 200.
+- **Database attachment is not yet verified.** The deployment entrypoint accepts `DATABASE_URL` / `DB_URL` and infers PostgreSQL, but defaults to disposable SQLite when neither is configured. Render's service API does not expose current environment-variable values through the available connector, and the hosted Render query connection is blocked because the database IP allowlist is empty. Do not claim that the running service uses this PostgreSQL instance or that existing accounts are stored there until the connection is verified from the service or an authorized database client.
+- No database, service, deployment, environment variable or deployment-branch mutation was made during this inspection. Preserve the existing service and database; the owner will handle the expiry decision before the recorded date.
