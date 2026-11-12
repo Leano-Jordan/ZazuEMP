@@ -40,8 +40,13 @@ return Application::configure(basePath: dirname(__DIR__))
             fn (Request $request) => $request->is('api/*') || $request->expectsJson(),
         );
 
-        $exceptions->reportable(function (Throwable $exception): void {
+        // ZazuIncidentRecorder is the authoritative application incident logger.
+        // Returning false prevents Laravel's default exception logger from also
+        // writing raw exception messages, SQL and bindings to the same log stream.
+        $exceptions->reportable(function (Throwable $exception): bool {
             ZazuIncidentRecorder::record($exception);
+
+            return false;
         });
 
         $exceptions->render(function (ThrottleRequestsException $exception, Request $request) {

@@ -104,6 +104,28 @@ class SecurityHeadersTest extends TestCase
         $this->assertStringContainsString("toast.classList.add('is-closing')", $appJs);
     }
 
+    public function test_sync_credentials_and_business_responses_are_never_http_cached(): void
+    {
+        $sensitiveRoutes = [
+            ['/api/sync/provision', 'POST'],
+            ['/api/sync/bootstrap', 'GET'],
+            ['/api/sync/attachments', 'GET'],
+            ['/settings/sync/pairing', 'POST'],
+        ];
+
+        foreach ($sensitiveRoutes as [$path, $method]) {
+            $request = Request::create('https://zazu.test'.$path, $method);
+            $response = (new ApplySecurityHeaders())->handle(
+                $request,
+                fn () => new Response('sensitive response'),
+            );
+
+            $this->assertSame('no-store, private', $response->headers->get('Cache-Control'), $path);
+            $this->assertSame('no-cache', $response->headers->get('Pragma'), $path);
+            $this->assertSame('0', $response->headers->get('Expires'), $path);
+        }
+    }
+
     public function test_secure_production_responses_include_hsts(): void
     {
         $originalEnvironment = $this->app->environment();

@@ -1,3 +1,36 @@
+## Owner-directed V1 finish decision — 2026-11-12
+
+This section supersedes older open-gate wording below where it conflicts with the owner's current scope direction.
+
+- V1 scope is frozen by `.ai/engineering/V1_SCOPE_FREEZE.md`.
+- Render is an interim remote-development workbench, not the final production destination. Production hosting, persistent production storage, production restore and production rollback are deferred until the actual production target is selected; they are not current Render-workbench gates.
+- Do not treat speculative or future-facing items as V1 blockers. Only a reproducible defect in an agreed V1 workflow, a demonstrated security/privacy/data-integrity failure in that workflow, or an explicit owner-approved requirement can block V1.
+- The remaining acceptance work is limited to the agreed customer workflows and concrete release obligations: final core workflow/offline-sync acceptance, one final regression pass, and recording known limitations. Physical installed-device checks are a bounded acceptance task, not an invitation to expand offline scope.
+- Existing automated Laravel, PostgreSQL migration/registration/backup-restore CI and offline-browser results remain valid at the exact SHAs and run IDs recorded below. Do not claim later commits are covered without exact-head CI evidence.
+- Stop once the agreed acceptance criteria pass; issue the V1 release decision rather than creating another checklist.
+
+## Latest execution evidence — 2026-11-11
+
+- Current canonical source head at this checkpoint: `1519a3219572db48eedc2cc3bedd83a3bbab8b33` on `main`.
+- Render Docker build run `43092418612`: **PASS** — Docker image built successfully; no deployment.
+- PostgreSQL CI now includes the real registration acceptance test after migrations. Exact-head Laravel workflow run `43092828074`: **455 tests / 3,299 assertions — PASS**. PostgreSQL full migrations plus real account/workspace registration: **PASS — 1 test / 13 assertions**. Offline-browser acceptance: **PASS — 18 passed**. Separate browser-smoke run `43092827911` was cancelled and is not counted as a pass.
+- Exact-head Director Contract Lint, PHPMD, Zazu quality, populated upgrade/rollback and Director Health reported **PASS**. Psalm: **PASS**. Separate browser smoke was cancelled and is not counted as a pass. SonarCloud was skipped and is not counted as a pass.
+- Live Render workspace and runtime logs remain uninspected because workspace selection has not been confirmed. Workspace discovery returned `My Workspace`; no Render resource was changed.
+- No readiness score uplift. Persistent Render registration, backup/restore, rollback, and physical installed-device offline acceptance remain open. V1 remains **NO-GO**.
+
+## Director execution — persistent Render database support — 2026-11-11
+
+- Current source/control head at implementation: `acad170dc80d5cc35bea974cd393be3520a320ea` on canonical `main`.
+- **Target:** remove the verified container-level blocker preventing Render from using durable PostgreSQL and make the full migration set exercise PostgreSQL in CI.
+- `docker/render-entrypoint.sh` now honours explicit `DB_CONNECTION`, `DB_URL` / `DB_HOST`, session, cache and queue settings. It retains the existing disposable SQLite preview defaults when no persistent database is configured and fails closed for a non-SQLite connection without a database endpoint.
+- `Dockerfile` now installs PostgreSQL PDO support alongside SQLite and asserts both drivers are present during the image build.
+- `.github/workflows/laravel.yml` now runs the complete migration set against a PostgreSQL 16 service as a separate CI job.
+- `docs/RENDER_PREVIEW.md` now documents the persistent Render configuration, including a managed PostgreSQL database and durable `/var/www/html/storage` mount.
+- Changed commits: `b7d6782` (entrypoint), `5cb8865` / `109d9e9` / `1d88214` (Docker image and driver assertions), `94136a0` (deployment documentation), `be4a639` / `acad170` (PostgreSQL migration CI).
+- Changed files were re-fetched from `main`. Source reconciliation: PASS. GitHub combined status lookup returned no status contexts; the new Docker build and PostgreSQL migration job are therefore **PENDING / UNVERIFIED** until their Actions runs are inspected.
+- Render account resources were not inspected or changed because no workspace was selected in this session. No database, persistent disk, deployment setting, or service branch was changed. `deploy/render-staging` remains preserved.
+- This is source capability, not proof of persistent hosting or recovery. No evidence-maturity uplift. V1 remains **NO-GO** until the Docker build and PostgreSQL migration job pass, a persistent target is configured, registration/workspace creation succeeds there, and restore/rollback are exercised against it.
+
 ## Current verified source — 2026-11-11
 
 - **Verified application/test head:** `56bb804b2b71f9d709b0846be8d7c76139b9db60` on canonical `main`.

@@ -2,6 +2,8 @@
 
 namespace App\Console\Commands;
 
+use App\Support\PostgresBackupSupport;
+
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\File;
@@ -9,6 +11,7 @@ use Illuminate\Support\Str;
 use Symfony\Component\Process\Process;
 use ZipArchive;
 
+/** @SuppressWarnings(PHPMD.ExcessiveClassComplexity) */
 class ZazuBackupCommand extends Command
 {
     private const FORMAT_VERSION = 2;
@@ -116,7 +119,11 @@ class ZazuBackupCommand extends Command
             return $this->snapshotMysql($work);
         }
 
-        $this->error('Backup currently supports SQLite and MySQL installations.');
+        if ($driver === 'pgsql') {
+            return $this->snapshotPostgres($work);
+        }
+
+        $this->error('Backup currently supports SQLite, MySQL and PostgreSQL installations.');
         return false;
     }
 
@@ -183,6 +190,17 @@ class ZazuBackupCommand extends Command
         }
 
         return true;
+    }
+
+    private function snapshotPostgres(string $work): bool
+    {
+        try {
+            (new PostgresBackupSupport())->dumpToFile($work.'/database.sql');
+            return true;
+        } catch (\Throwable $exception) {
+            $this->error('PostgreSQL backup failed: '.$exception->getMessage());
+            return false;
+        }
     }
 
     private function backupPrivateStorage(string $work): bool

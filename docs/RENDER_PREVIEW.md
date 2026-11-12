@@ -1,32 +1,44 @@
-# Zazu EMP — Render preview deployment
+# Zazu EMP — Render deployment image
 
-**Purpose:** disposable preview of the canonical `main` codebase only.  
-**Not production-ready. Do not enter real customer or business data.**
+## Purpose
 
-## Repository and source
+The repository Docker image supports the disposable preview and a persistent Render staging/pilot configuration. The default remains a disposable SQLite preview. **Do not enter real customer or business data until persistent database and private-file storage are configured and recovery has been proven.**
+
+## Repository and runtime
 
 - Repository: `Leano-Jordan/ZazuEMP`
-- Deployment source: `main`
+- Engineering source: `main`
 - Runtime: Docker / PHP 8.4 / Apache
 - Web root: Laravel `public/`
+- Port: `10000`
 - Health endpoint: `/up`
 
-The root Dockerfile builds locked Composer dependencies and Vite assets, then serves Laravel through Apache on Render's expected port 10000. Apache rewrite support and `AllowOverride` are enabled for Laravel's public `.htaccess`.
+The image builds locked Composer dependencies and Vite assets. Runtime PHP includes both SQLite and PostgreSQL PDO drivers.
 
-## Deliberate preview-only data model
+## Disposable preview defaults
 
-The entrypoint forces SQLite at `/tmp/zazu-preview.sqlite`, file-backed sessions/cache, and synchronous queues. The database, sessions, cache and private uploads are on the container filesystem. Render free instances have ephemeral storage and may restart or redeploy; data can be lost.
+When no database connection is supplied, the entrypoint defaults to:
 
-This deployment is suitable only for temporary UI and workflow preview. It is not suitable for pilots, customer onboarding, business records, or any production use. A persistent database and durable private-file storage must be selected and tested before real data is accepted.
+- `DB_CONNECTION=sqlite`
+- `DB_DATABASE=/tmp/zazu-preview.sqlite`
+- file-backed sessions and cache
+- synchronous queue
 
-## Required Render environment
+This preview data is ephemeral and can be lost when the service restarts or redeploys. It is for temporary UI/workflow checks only.
 
-- `APP_KEY`: a unique generated Laravel key; keep it in Render environment variables, never Git.
-- `APP_ENV=production`
-- `APP_DEBUG=false`
-- `APP_URL=https://zazu-emp-staging.onrender.com`
+## Persistent staging/pilot configuration
 
-The entrypoint fails closed if `APP_KEY` is missing. Migrations run at container startup against the disposable preview database.
+For a persistent Render deployment:
+
+1. Attach a managed Render PostgreSQL database in the same region as the web service.
+2. Provide the database connection URL as `DB_URL` or `DATABASE_URL`, or provide the standard `DB_HOST`, `DB_PORT`, `DB_DATABASE`, `DB_USERNAME` and `DB_PASSWORD` values. Set `DB_CONNECTION=pgsql` explicitly for host-based settings. When a PostgreSQL URL is supplied without `DB_CONNECTION`, the entrypoint detects its `postgres://` / `postgresql://` scheme and selects `pgsql`. An explicit `DB_CONNECTION` always takes precedence. Do not commit credentials.
+3. Attach a persistent disk mounted at `/var/www/html/storage`. This retains Laravel's private uploaded files and file-backed sessions across container replacement. Confirm the mount is writable by the service; the entrypoint prepares ownership for `www-data`.
+4. Keep `APP_KEY` stable and secret. Set `APP_ENV=production`, `APP_DEBUG=false` and the correct HTTPS `APP_URL`.
+5. Run the deployment smoke, representative backup/restore and rollback drills before allowing customer data.
+
+The entrypoint honours explicit database/session/cache/queue environment variables, accepts `DATABASE_URL` as an alias for `DB_URL`, and infers PostgreSQL from a supported URL scheme only when `DB_CONNECTION` is unset. It runs migrations against the selected database at startup and fails closed when a non-SQLite connection has no database endpoint.
+
+**This change makes the container capable of using persistent PostgreSQL and mounted storage; it does not create or attach Render resources, change service settings, or prove that a live deployment is durable.** Infrastructure configuration and real recovery acceptance remain separate release gates.
 
 ## Verification boundary
 

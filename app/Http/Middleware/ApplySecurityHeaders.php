@@ -24,6 +24,15 @@ class ApplySecurityHeaders
             "default-src 'self'; base-uri 'self'; frame-ancestors 'self'; object-src 'none'; form-action 'self'; img-src 'self' data: blob:; font-src 'self' data:; style-src 'self' 'nonce-{$nonce}'; style-src-elem 'self' 'nonce-{$nonce}'; style-src-attr 'none'; script-src 'self' 'nonce-{$nonce}'; connect-src 'self'; media-src 'self' blob:; worker-src 'self' blob:",
         );
 
+        // Sync endpoints return bearer credentials and business-scoped records.
+        // The owner pairing endpoint also returns a one-time pairing code.
+        // These responses must not survive in browser or intermediary HTTP caches.
+        if ($request->is('api/*') || $request->is('settings/sync/*')) {
+            $response->headers->set('Cache-Control', 'no-store, private');
+            $response->headers->set('Pragma', 'no-cache');
+            $response->headers->set('Expires', '0');
+        }
+
         if (app()->environment('production') && ($request->isSecure() || $request->server->get('HTTPS') === 'on')) {
             $response->headers->set(
                 'Strict-Transport-Security',

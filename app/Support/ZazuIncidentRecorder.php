@@ -2,7 +2,6 @@
 
 namespace App\Support;
 
-use Illuminate\Database\QueryException;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
@@ -10,10 +9,6 @@ use Throwable;
 
 final class ZazuIncidentRecorder
 {
-    /**
-    * @SuppressWarnings(PHPMD.CyclomaticComplexity)
-    * @SuppressWarnings(PHPMD.NPathComplexity)
-     */
     public static function record(Throwable $exception): void
     {
         try {
@@ -25,6 +20,9 @@ final class ZazuIncidentRecorder
             $routeName = is_object($route) ? $route->getName() : null;
             $routeAction = is_object($route) ? $route->getActionName() : null;
 
+            // Keep operational correlation, but never persist exception messages,
+            // SQL text, bindings or stack traces in the application incident log.
+            // Those values can contain customer data or credentials.
             $context = [
                 'event_type' => 'application_error',
                 'error_code' => $definition['code'],
@@ -32,7 +30,6 @@ final class ZazuIncidentRecorder
                 'severity' => $definition['severity'],
                 'http_status' => $definition['status'],
                 'user_message' => $definition['message'],
-                'technical_message' => $exception->getMessage(),
                 'exception_class' => $exception::class,
                 'originating_component' => $routeAction,
                 'route_name' => $routeName,
@@ -42,22 +39,16 @@ final class ZazuIncidentRecorder
                 'timestamp' => now()->toIso8601String(),
                 'file' => $exception->getFile(),
                 'line' => $exception->getLine(),
-                'trace' => $exception->getTraceAsString(),
             ];
-
-            if ($exception instanceof QueryException) {
-                $context['query'] = [
-                    'sql' => $exception->getSql(),
-                ];
-            }
 
             $level = $definition['status'] >= 500 ? 'error' : 'warning';
 
             Log::log($level, 'Zazu error incident', $context);
         } catch (Throwable $loggingFailure) {
+            // The fallback must not reintroduce an exception message that may
+            // contain SQL, customer data or secrets.
             Log::error('Zazu error incident recorder failed', [
                 'exception_class' => $loggingFailure::class,
-                'technical_message' => $loggingFailure->getMessage(),
             ]);
         }
     }

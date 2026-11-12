@@ -1,3 +1,63 @@
+
+
+## Owner-directed finish rule — 2026-11-12 (binding)
+
+- Owner has explicitly directed that Zazu V1 work must stop expanding into endless edge cases. This instruction was repeated after the same scope discussion occurred on 2026-11-11; preserve it as a permanent engineering constraint.
+- Binding policy: `.ai/engineering/V1_SCOPE_FREEZE.md`. Director and every specialist must read it before each cycle.
+- Objective: finish a dependable, usable V1—not theoretical perfection. Only reproducible defects in agreed V1 workflows, demonstrated security/privacy/data-integrity failures, or explicit owner-approved additions may enter scope. Speculative risks, optional polish, new features and future infrastructure are deferred.
+- Finish sequence: close the known checklist blockers → verify the agreed core workflows → one final regression pass → fix only material failures → document limitations → issue release decision. Do not reopen closed gates without new evidence.
+- Render is an interim remote-development workbench for access away from the home PC. It is not the final production destination and production hosting/persistence must not be treated as a current development gate.
+- Decision rule: if it is not necessary for a customer to use the agreed V1 workflows reliably, it does not block V1.
+- Latest verified code change at this record: `bed3941739cf02fc1a8152932292bc7d7ec68a21` (sync responses marked no-store; regression assertions added). The CI result for that commit was not available in the inspected workflow response; do not claim it passed until checked.
+## Director current checkpoint — 2026-11-12 (PostgreSQL recovery)
+
+- Canonical repository/engineering branch: `Leano-Jordan/ZazuEMP` / `main`; deployment-only `deploy/render-staging` remains preserved.
+- Latest verified application/test source: `1cac0e51d72b506f7c58a1c06b9d204a521f81fa`. Documentation reconciliation descendants: `c5a1f3f` and `59ab428`; no application runtime source changed in those commits.
+- Laravel: **458 passed / 3,319 assertions / 1 skipped — PASS**. PostgreSQL 16 migrations and registration/workspace acceptance: **PASS**. Real PostgreSQL database + private-storage backup/restore round-trip: **PASS — 1 test / 5 assertions**. Offline browser acceptance: **18 passed**.
+- PHPMD, Psalm, Zazu quality/secret scan, populated upgrade/rollback, Render Docker image build, Director Contract Lint and Director Health: **PASS**. SonarCloud: **SKIPPED**, not counted.
+- Full browser smoke for the documentation-only descendant `59ab428` is still running at this checkpoint; do not claim that run passed until its job completes. The prior exact application/test source browser run `43172547165` passed.
+- Added PostgreSQL operator instructions and reconciled exact CI evidence in `docs/RELEASE_BACKUP_RESTORE_RUNBOOK.md` and `docs/V1_RELEASE_CHECKLIST.md`.
+- PostgreSQL CI proves the automated test service only. Live Render DB credentials/privileges, persistent disk, independent off-host backup retention, real operator restore and deployment rollback remain UNVERIFIED. No Render service, database, disk or deployment branch was changed.
+- `deploy/render-staging` currently diverges from `main` (68 commits ahead on main and 3 commits unique to staging at inspection). It is deployment-only and remains untouched; do not merge or rewrite it as routine engineering cleanup.
+- Next highest-risk gate: controlled backup → restore → representative record/private-media/authorization verification → deployment rollback on the selected persistent hosting target. Secure-origin installed-device offline acceptance, trusted-device operations, legal/privacy, brand clearance and production licensing controls remain open. V1 remains **NO-GO**.
+
+## Director current checkpoint — 2026-11-12
+
+- Canonical repository/branch: `Leano-Jordan/ZazuEMP` / `main`.
+- Current exact HEAD: `9fd5dd20edfe8eaad5a80681a895ac9a3f459283`.
+- Exact-head Laravel: **456 tests / 3,305 assertions — PASS**; PostgreSQL migrations plus registration/workspace acceptance: **PASS**; offline browser acceptance: **18 passed**.
+- Full browser smoke: **82 passed / 38 skipped / 0 failed — PASS**.
+- PHPMD, Psalm, Zazu quality/secret scan, populated upgrade/rollback, Docker image build and Director Health: **PASS**. SonarCloud skipped; not counted.
+- Previous browser run `43169885907` on `0b14c00` was cancelled; later exact-head run `43170382911` passed and supersedes it.
+- No live Render service settings or deployment were changed. The deployment-only `deploy/render-staging` branch remains preserved.
+- Next hard gate: real database + private-media backup/restore and deployment rollback against the chosen persistent target. Installed secure-origin offline acceptance and operational/legal/brand/licensing closure remain open. V1 remains **NO-GO**.
+
+## Director execution — registration on persistent database — 2026-11-11
+
+- Canonical repository/branch: `Leano-Jordan/ZazuEMP` / `main`.
+- Application/workflow source head verified by CI: `1519a3219572db48eedc2cc3bedd83a3bbab8b33`; subsequent commits in this record are documentation-only.
+- Corrected Dockerfile build verified by GitHub Actions: Render Docker build run `43092418612` — **PASS** (image build only; no deployment).
+- Added a PostgreSQL CI acceptance step that executes the existing end-to-end account registration test against PostgreSQL after the complete migration set. This exercises user creation, business creation, owner membership, authentication session and dashboard access on the persistent database engine.
+- Workflow commit: `1519a3219572db48eedc2cc3bedd83a3bbab8b33`. Changed workflow re-read from `main`; source reconciliation PASS.
+- Exact-head Laravel workflow run `43092828074`: **PASS** — 455 tests / 3,299 assertions; PostgreSQL 16 complete migration set: **PASS**; real account/workspace registration on PostgreSQL: **PASS** — 1 test / 13 assertions; offline browser acceptance: **PASS** — 18 passed. Exact-head Director Contract Lint, PHPMD, Zazu quality, populated upgrade/rollback, Psalm and Director Health also reported PASS. SonarCloud was SKIPPED and is not counted as a pass. Separate browser-smoke run `43092827911` was cancelled and is not counted as a pass.
+- Render workspace discovery returned one workspace, `My Workspace`. It has not been selected; no Render service, environment, database, disk, branch or deployment was changed. Owner confirmation is required before using that workspace.
+- The live Render workspace registration failure is not yet root-caused. `AuthController::storeRegistration` reports the underlying exception to the application log but returns a generic validation message. A real Render log and persistent-database registration result are still required before changing application behavior.
+- `deploy/render-staging` remains preserved. No new branches were created.
+- Release position remains **NO-GO** until PostgreSQL registration succeeds, persistent hosting is configured and verified, and backup/restore plus installed-device offline acceptance are completed.
+
+## Director execution — persistent Render database support — 2026-11-11
+
+- Current source/control head at implementation: `acad170dc80d5cc35bea974cd393be3520a320ea` on canonical `main`.
+- **Target:** remove the verified container-level blocker preventing Render from using durable PostgreSQL and make the full migration set exercise PostgreSQL in CI.
+- `docker/render-entrypoint.sh` now honours explicit `DB_CONNECTION`, `DB_URL` / `DB_HOST`, session, cache and queue settings. It retains the existing disposable SQLite preview defaults when no persistent database is configured and fails closed for a non-SQLite connection without a database endpoint.
+- `Dockerfile` now installs PostgreSQL PDO support alongside SQLite and asserts both drivers are present during the image build.
+- `.github/workflows/laravel.yml` now runs the complete migration set against a PostgreSQL 16 service as a separate CI job.
+- `docs/RENDER_PREVIEW.md` now documents the persistent Render configuration, including a managed PostgreSQL database and durable `/var/www/html/storage` mount.
+- Changed commits: `b7d6782` (entrypoint), `5cb8865` / `109d9e9` / `1d88214` (Docker image and driver assertions), `94136a0` (deployment documentation), `be4a639` / `acad170` (PostgreSQL migration CI).
+- Changed files were re-fetched from `main`. Source reconciliation: PASS. GitHub combined status lookup returned no status contexts; the new Docker build and PostgreSQL migration job are therefore **PENDING / UNVERIFIED** until their Actions runs are inspected.
+- Render account resources were not inspected or changed because no workspace was selected in this session. No database, persistent disk, deployment setting, or service branch was changed. `deploy/render-staging` remains preserved.
+- This is source capability, not proof of persistent hosting or recovery. No evidence-maturity uplift. V1 remains **NO-GO** until the Docker build and PostgreSQL migration job pass, a persistent target is configured, registration/workspace creation succeeds there, and restore/rollback are exercised against it.
+
 ## Exact-head reconciliation — 2026-11-11 17:18 UTC
 
 - Current canonical repository: `Leano-Jordan/ZazuEMP`, branch `main`.
@@ -57,7 +117,7 @@ IDENTITY → BASELINE → TARGET → ROUTE → INSPECT → CHANGE → VERIFY →
 The 2026-11-01 local Windows-host proposal was exploratory and is no longer the active deployment target. The owner has clarified that this PC is a development workstation; future production hosting will be a paid server when funding and release readiness permit. The 2026-11-03 host diagnostic is recorded below. Do not configure this PC as production infrastructure.
 
 ## Active target
-**Active target**: Owner-directed V1 convergence — offline sync identity and automated browser acceptance are closed on source head `56bb804`; next gate is the representative operator backup/restore drill.
+**Active target**: Owner-directed V1 convergence — latest exact-main automated verification is green on `9fd5dd20edfe8eaad5a80681a895ac9a3f459283`; next gate is representative operator backup/restore on the intended persistent hosting target. Live hosting selection and physical device acceptance remain operational gates.
 **Owner-directed V1 convergence:** repair source defects, keep exact-main CI green, complete the remaining offline/device and commercial evidence, and remove every operational task that can be safely verified or automated from code. The owner-accepted dashboard remains closed. All engineering implementation stays on canonical `main`; `deploy/render-staging` remains deployment-only.
 Next hard gate: Run a representative database + private-media backup/restore drill against the intended hosting target. Keep installed-device offline acceptance open until the secure-origin disconnect, full close/reopen, local-work recovery and reconnect sequence passes.
 
@@ -2025,3 +2085,13 @@ Source review found that authenticated sync pull/acknowledgement accepted arbitr
 - Commits: `3d848c0` (guard), `ac45f6f` (regression), `b11e779` (PDO namespace correction).
 - Source re-read: PASS. PHPUnit/runtime and exact-head CI: **UNVERIFIED**; no test pass is claimed.
 - No deployment. `deploy/render-staging` untouched. V1 remains **NO-GO**.
+
+
+## Director verification — sync credential cache protection — 2026-11-12
+
+- Application/test commit: `bed3941739cf02fc1a8152932292bc7d7ec68a21` (latest runtime change in the current main history).
+- The sync and trusted-device no-store response change and its regression test are verified by exact-head GitHub Actions: Laravel workflow run `43181669792` — all jobs PASS, including Laravel tests, PostgreSQL migration/registration/backup-restore smoke, and offline browser acceptance; browser smoke `43181669581` PASS; Zazu quality/secret scan `43181669747` PASS; populated upgrade/rollback `43181669678` PASS; Psalm `43181669617` PASS; PHPMD `43181669720` PASS. SonarCloud was SKIPPED and is not counted.
+- Render workbench: documentation descendant `c450ed90fe32a1abbe621e2d177d81590d20365c` deployed successfully as `dep-dbqns3bsuf0c7389gt6g` at 2026-11-12 08:52:58 UTC. Migration output reached the final migration successfully; internal HEAD / and GET / returned HTTP 200. No current-deployment application error was present in the inspected startup logs.
+- Render remains a disposable SQLite preview workbench. This deployment evidence does not establish persistent customer data or production readiness and is not treated as such.
+- Next bounded acceptance item: physical installed-device offline workflow on the owner's target phone. CI browser tests cannot certify the installed app's real device storage and reconnect behaviour. Do not invent additional gates while awaiting that acceptance.
+- V1 release decision remains pending that agreed core workflow acceptance and the single final regression/release review. No new feature or speculative hardening scope is admitted.

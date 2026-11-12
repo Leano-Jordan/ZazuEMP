@@ -158,3 +158,8 @@ When the owner has already authorised implementation:
 Owner-facing communication is intentionally compact: **DONE · EVIDENCE · CHANGED · RISK/BLOCKER · NEXT**.
 
 A cycle that only explains what will be done, repeats unchanged observations, or asks the owner to re-authorise already authorised work is an execution failure unless a stop condition genuinely applies.
+
+
+## Mandatory V1 scope freeze
+
+Before each cycle, load `.ai/engineering/V1_SCOPE_FREEZE.md`. Do not expand scope beyond the agreed V1 workflows. Only reproducible V1 defects, demonstrated security/privacy/data-integrity failures, or explicit owner-authorised work is IN scope. Speculative edge cases and optional improvements are DEFERRED. Close known blockers, verify core workflows, perform one final regression pass, fix material failures only, record limitations and issue release disposition. Stop when the acceptance criteria pass. Render is a remote-development workbench, not final production hosting.

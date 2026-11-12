@@ -2,6 +2,8 @@
 
 namespace App\Console\Commands;
 
+use App\Support\PostgresBackupSupport;
+
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\File;
@@ -57,6 +59,8 @@ class ZazuRestoreCommand extends Command
         $sqliteDatabaseActivated = false;
         $mysqlRollbackPath = null;
         $mysqlRestoreStarted = false;
+        $postgresRollbackPath = null;
+        $postgresRestoreStarted = false;
         $preserveWork = false;
         $originalSqliteDatabase = config('database.connections.sqlite.database');
         $temporaryMemoryTarget = false;
@@ -321,15 +325,15 @@ class ZazuRestoreCommand extends Command
                     $this->error('SQLite restore target directory must exist and be writable before restore can begin.');
                     return self::FAILURE;
                 }
-            } elseif ($driver === 'mysql') {
+            } elseif ($driver === 'mysql' || $driver === 'pgsql') {
                 $sql = $work.'/database.sql';
 
                 if (!is_file($sql)) {
-                    $this->error('MySQL dump is missing from the backup.');
+                    $this->error(ucfirst($driver).' dump is missing from the backup.');
                     return self::FAILURE;
                 }
             } else {
-                $this->error('Restore currently supports SQLite and MySQL installations.');
+                $this->error('Restore currently supports SQLite, MySQL and PostgreSQL installations.');
                 return self::FAILURE;
             }
 
@@ -342,6 +346,9 @@ class ZazuRestoreCommand extends Command
             if ($driver === 'mysql') {
                 $mysqlRollbackPath = $work.'/pre-restore-database.sql';
                 $this->snapshotMysqlForRollback($mysqlRollbackPath);
+            } elseif ($driver === 'pgsql') {
+                $postgresRollbackPath = $work.'/pre-restore-database.sql';
+                (new PostgresBackupSupport())->dumpToFile($postgresRollbackPath);
             }
 
             // Stage private storage only after every required database rollback point exists.
@@ -421,6 +428,9 @@ class ZazuRestoreCommand extends Command
             } elseif ($driver === 'mysql') {
                 $mysqlRestoreStarted = true;
                 $this->importMysqlDump($work.'/database.sql');
+            } elseif ($driver === 'pgsql') {
+                $postgresRestoreStarted = true;
+                (new PostgresBackupSupport())->restoreFromFile($work.'/database.sql');
             }
 
             $this->info('Zazu restore completed from '.$archive);
@@ -434,6 +444,16 @@ class ZazuRestoreCommand extends Command
                 } catch (\Throwable $rollbackException) {
                     $rollbackFailure = $rollbackException->getMessage();
                     // Keep the only pre-restore database snapshot available for manual recovery.
+                    $preserveWork = true;
+                }
+            }
+
+            if ($postgresRestoreStarted && $postgresRollbackPath !== null && is_file($postgresRollbackPath)) {
+                try {
+                    (new PostgresBackupSupport())->restoreFromFile($postgresRollbackPath);
+                } catch (\Throwable $rollbackException) {
+                    $rollbackFailure = $rollbackException->getMessage();
+                    // Keep the only pre-restore PostgreSQL snapshot available for manual recovery.
                     $preserveWork = true;
                 }
             }
@@ -507,6 +527,9 @@ class ZazuRestoreCommand extends Command
                 $this->error('Zazu restore failed and automatic rollback was incomplete: '.$rollbackFailure);
                 if ($mysqlRestoreStarted && $mysqlRollbackPath !== null && $preserveWork) {
                     $this->error('Pre-restore MySQL snapshot preserved at: '.$mysqlRollbackPath);
+                }
+                if ($postgresRestoreStarted && $postgresRollbackPath !== null && $preserveWork) {
+                    $this->error('Pre-restore PostgreSQL snapshot preserved at: '.$postgresRollbackPath);
                 }
                 if ($preserveDatabaseRollback && $databaseRollback !== null) {
                     $this->error('Pre-restore SQLite snapshot preserved at: '.$databaseRollback);
@@ -620,11 +643,11 @@ class ZazuRestoreCommand extends Command
             }
         }
 
-        if ($driver === 'mysql') {
+        if ($driver === 'mysql' || $driver === 'pgsql') {
             $path = $work.'/database.sql';
 
             if (!is_file($path) || filesize($path) === 0) {
-                $this->error('The MySQL backup dump is empty or unavailable.');
+                $this->error('The '.ucfirst($driver).' backup dump is empty or unavailable.');
                 return false;
             }
 

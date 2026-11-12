@@ -3,10 +3,13 @@
 namespace Tests\Feature;
 
 use App\Models\User;
+use App\Support\ZazuIncidentRecorder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Contracts\Debug\ExceptionHandler;
+use Illuminate\Database\QueryException;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\File;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Route;
 use Tests\TestCase;
 
@@ -21,6 +24,7 @@ class ErrorHandlingTest extends TestCase
         // Test the same non-debug HTML error contract used in production.
         config()->set('app.debug', false);
     }
+
     public function test_missing_route_uses_branded_error_surface_and_request_reference(): void
     {
         $response = $this->get('/this-page-does-not-exist');
@@ -44,7 +48,7 @@ class ErrorHandlingTest extends TestCase
         $this->assertSame('AUTHZ-002', $response->headers->get('X-Zazu-Error-Code'));
     }
 
-        public function test_exception_handler_renders_the_branded_500_surface_without_leaking_details(): void
+    public function test_exception_handler_renders_the_branded_500_surface_without_leaking_details(): void
     {
         $request = Request::create('/__zazu-test-handler-500', 'GET');
         $request->attributes->set('zazu_request_id', 'test-request-id');
@@ -80,13 +84,14 @@ class ErrorHandlingTest extends TestCase
         $response->assertRedirect('/dashboard');
         $response->assertSessionHasErrors('name');
     }
+
     public function test_database_exception_is_classified_without_exposing_technical_details(): void
     {
         $request = Request::create('/customers', 'GET');
         $request->attributes->set('zazu_request_id', 'db-request-id');
         $this->app->instance('request', $request);
 
-        $exception = new \Illuminate\Database\QueryException(
+        $exception = new QueryException(
             'sqlite',
             'select * from customers',
             [],
@@ -104,6 +109,37 @@ class ErrorHandlingTest extends TestCase
         $this->assertSame('DB-001', $response->headers->get('X-Zazu-Error-Code'));
     }
 
+    public function test_incident_log_omits_exception_messages_sql_and_stack_traces(): void
+    {
+        $marker = 'private-customer-secret-'.bin2hex(random_bytes(8));
+        $request = Request::create('/customers', 'GET');
+        $request->attributes->set('zazu_request_id', 'redaction-request-id');
+        $this->app->instance('request', $request);
+
+        Log::shouldReceive('log')
+            ->once()
+            ->withArgs(function (string $level, string $message, array $context) use ($marker): bool {
+                $serialized = json_encode($context);
+
+                return $level === 'error'
+                    && $message === 'Zazu error incident'
+                    && $context['request_id'] === 'redaction-request-id'
+                    && $context['exception_class'] === QueryException::class
+                    && ! array_key_exists('technical_message', $context)
+                    && ! array_key_exists('query', $context)
+                    && ! array_key_exists('trace', $context)
+                    && ! str_contains((string) $serialized, $marker)
+                    && ! str_contains((string) $serialized, 'select * from private_customers');
+            });
+
+        ZazuIncidentRecorder::record(new QueryException(
+            'sqlite',
+            'select * from private_customers where email = ?',
+            [$marker],
+            new \PDOException($marker)
+        ));
+    }
+
     public function test_http_500_exception_gets_an_application_error_code(): void
     {
         Route::get('/__zazu-test-response-500', fn () => abort(500))->middleware('web');
@@ -116,5 +152,4 @@ class ErrorHandlingTest extends TestCase
         $this->assertNotEmpty($response->headers->get('X-Zazu-Request-Id'));
         $this->assertSame('APP-001', $response->headers->get('X-Zazu-Error-Code'));
     }
-
 }
