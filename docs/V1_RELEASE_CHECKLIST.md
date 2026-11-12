@@ -1,3 +1,16 @@
+## Director exact-head CI reconciliation — 2026-11-12
+
+- Canonical engineering branch: `main`; exact HEAD: `9fd5dd20edfe8eaad5a80681a895ac9a3f459283`.
+- The prior browser run on `0b14c00` was cancelled; it is superseded by the complete successful run on this newer exact HEAD.
+- Laravel: **PASS — 456 tests / 3,305 assertions** (run `43170382971`).
+- PostgreSQL 16 migration + registration/workspace acceptance job: **PASS** (same Laravel workflow).
+- Offline browser acceptance: **PASS — 18 passed** (same Laravel workflow).
+- Full browser smoke: **PASS — 82 passed / 38 skipped / 0 failed** (run `43170382911`).
+- PHPMD: **PASS** (run `43170382965`); Psalm security: **PASS** (run `43170382864`); Zazu quality + secret scan: **PASS** (run `43170382928`); populated upgrade/rollback: **PASS** (run `43170382954`); Render Docker image build: **PASS — build only, no deployment** (run `43170382904`); Director Health: **PASS** (run `43171198770`).
+- SonarCloud: **SKIPPED**, not counted as a pass.
+- The 2026-11-12 manifest correction updates the app.css asset reference; this is not a UI/runtime redesign.
+- **Release remains NO-GO.** CI does not prove live Render persistence, operator restore/rollback on the target, physical installed-device offline acceptance, or legal/brand/licensing closure. No Render service or deployment settings were changed in this cycle. `deploy/render-staging` remains preserved.
+
 ## Director execution — persistent Render database support — 2026-11-11
 
 - Current source/control head at implementation: `acad170dc80d5cc35bea974cd393be3520a320ea` on canonical `main`.
