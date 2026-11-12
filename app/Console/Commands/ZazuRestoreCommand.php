@@ -626,6 +626,8 @@ class ZazuRestoreCommand extends Command
             'pg_dump',
             '--no-owner',
             '--no-privileges',
+            '--clean',
+            '--if-exists',
             '--format=plain',
             '--host='.$connection['host'],
             '--port='.$connection['port'],
@@ -657,6 +659,7 @@ class ZazuRestoreCommand extends Command
         $process = new Process([
             'psql',
             '--set=ON_ERROR_STOP=1',
+            '--single-transaction',
             '--host='.$connection['host'],
             '--port='.$connection['port'],
             '--username='.$connection['username'],
