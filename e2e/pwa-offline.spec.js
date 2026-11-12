@@ -102,7 +102,7 @@ test.describe('Zazu installed PWA offline shell', () => {
 
         // Simulate Android restoring the installed app after the network has
         // returned, without relying on the browser to replay its missed online event.
-        await page.evaluate(() => window.dispatchEvent(new Event('pageshow')));
+        await page.evaluate(() => window.dispatchEvent(new PageTransitionEvent('pageshow', { persisted: true })));
 
         await expect.poll(() => pushed).toBe(1);
         await expect.poll(async () => page.evaluate(async () => (await window.ZazuOffline.pending()).length)).toBe(0);
