@@ -1,3 +1,11 @@
+## Director regression correction — 2026-11-12
+
+- Review of the exact-head browser job logs found one **flaky retry**, despite the suite ending with 82 passed / 40 skipped. The first attempt of `e2e/offline-session-transition.spec.js` failed because the test accessed `window.ZazuOffline.ready` immediately after the dashboard heading appeared, before the offline script had exposed its API. The retry passed.
+- Corrected the test setup to explicitly poll for `window.ZazuOffline?.ready` before beginning the session-preservation journey. No application runtime code changed.
+- Fix commit: `185628d9c7974cb25dbd81798303593a75f7c998`.
+- Exact-head CI is running: Laravel `43294074147`; browser smoke `43294074265`; quality `43294074168`; Psalm `43294074314`; PHPMD `43294074198`; populated upgrade/rollback `43294074269`. Do not mark the correction verified until these finish, especially the browser smoke run.
+- This is correction attempt 1 for the observed test race. Do not broaden the change unless the rerun supplies new evidence.
+
 ## Director exact-head CI reconciliation — 2026-11-12 21:45 SAST
 
 - Exact application/test-source SHA: `5924fd6d294187ec482295193c4add865e64137b`.
