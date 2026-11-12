@@ -1,3 +1,23 @@
+## Exact-head CI reconciliation — 2026-11-12 (offline runtime readiness regression)
+
+- Exact current `main` HEAD: `918b011766931919485ad4b60d3f2b0494603b0a`.
+- Runtime application source remains at `7193038a2b2d14ea71278050a0d7c26ce246bf86`; this latest commit changes only `e2e/pwa-offline.spec.js`, adding an explicit wait for the offline runtime API before device-pairing assertions. No application runtime code or deployment configuration changed.
+- Laravel [run 43302174502](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/43302174502): **PASS — 462 passed / 3,339 assertions / 1 skipped**. Inspected the job log: `CommercialReconciliationTest`, `QuoteCommercialHandoffTest`, `WorkCompletionGuardTest`, `PwaOfflineFoundationTest`, populated backup/restore, tenant isolation, and the broader feature suite passed.
+- Offline browser acceptance: **PASS — 19 passed** (same Laravel workflow).
+- PostgreSQL migration/recovery smoke: **PASS** (same workflow; PostgreSQL migration and backup/restore job succeeded).
+- Full browser smoke [run 43302174393](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/43302174393): **PASS — 82 passed / 40 skipped / 0 failed**. The 40 skips are the existing deliberate cross-project exclusions for stateful offline/session/registration journeys.
+- Populated database upgrade/rollback [run 43302174523](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/43302174523): **PASS**.
+- Zazu quality + secret scan [run 43302174588](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/43302174588): **PASS**.
+- Psalm security [run 43302174606](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/43302174606): **PASS**.
+- PHPMD [run 43302174546](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/43302174546): **PASS**.
+- Push-on-main / CodeQL [run 43302175129](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/43302175129): **PASS**.
+- Director Health [run 43303097204](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/43303097204): **PASS**.
+- SonarCloud [run 43302174514](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/43302174514): **SKIPPED**, not counted as a pass.
+- No deployment was performed; `deploy/render-staging` remains untouched.
+- **Engineering conclusion:** the test-readiness race is corrected and exact-head automated verification is green. No further code patch is justified by this evidence. Continue the bounded V1 finish sequence; physical installed-device offline acceptance remains a human-device task and must not be represented as passed by browser emulation.
+
+---
+
 ## Exact-head CI update — 2026-11-12 (Work completion guards + offline customer-to-Work)
 
 - Exact application/test-source HEAD: `7193038a2b2d14ea71278050a0d7c26ce246bf86` (merge commit; the later `main` descendants `453c80d` and `78fb793` change only these two evidence documents; includes the test-only commits `e3855998`, `b2e548be`, and offline acceptance correction `9bd1cc0d`).
