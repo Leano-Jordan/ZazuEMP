@@ -4,9 +4,13 @@ namespace App\Support;
 
 use App\Models\Business;
 use App\Models\User;
+use DateTimeInterface;
 
 class ExperienceLevel
 {
+    public function __construct(private readonly BusinessEntitlement $entitlements)
+    {
+    }
     public const BASIC = 'basic';
     public const INTERMEDIATE = 'intermediate';
     public const ADVANCED = 'advanced';
@@ -62,7 +66,7 @@ class ExperienceLevel
         return $this->entitlements->isTrial($business, $at);
     }
 
-    public function trialEndsAt(Business $business): ?\\Illuminate\\Support\\Carbon
+    public function trialEndsAt(Business $business): ?\Illuminate\Support\Carbon
     {
         return $this->entitlements->trialEndsAt($business);
     }
