@@ -1091,3 +1091,13 @@ Found and corrected a data-recovery blocker in `ZazuBackupCommand::snapshotMysql
 - Commits: `3d848c0`, `ac45f6f`, `b11e779`.
 - Source reconciliation: PASS. PHPUnit and exact-head CI: **UNVERIFIED**. No release-readiness increase until runtime execution.
 - V1 remains **NO-GO**.
+
+
+## Security hardening checkpoint — 2026-11-13
+
+- **Closed:** customer profile-media authorization now enforces `customers.view` in addition to active business membership. Regression: a member without that permission receives 403. Verified in [run 43508450343](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/43508450343) — 487 passed, 3,476 assertions, 1 skipped.
+- **Closed:** vulnerable framework dependency versions were replaced and merged through [PR #54](https://github.com/Leano-Jordan/ZazuEMP/pull/54), merge `637561c53dedbe31d3de0e38e205200e3d5e3301`. Laravel `v13.42.0`; Symfony HttpFoundation/HttpKernel/Routing `v8.1.11`; Symfony Mime `v8.1.10`.
+- **Closed:** Composer and npm dependency audits are part of CI; Composer/npm audit, secret scan, Psalm, PHPMD, Laravel tests, PostgreSQL migration/recovery and populated upgrade/rollback passed on the dependency PR head. See runs [43508848964](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/43508848964), [43508848909](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/43508848909), [43508848991](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/43508848991), [43508848942](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/43508848942), [43508848911](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/43508848911).
+- **Ongoing:** review direct-route authorization for remaining private/customer/business records and continue authentication/session threat review. Do not duplicate existing cross-business tests.
+- **Ongoing:** independent external penetration testing and operational privacy/incident controls have not been completed. Do not describe Zazu as attack-proof.
+- Offline acceptance remains frozen; no offline implementation work is authorized by this checkpoint.
