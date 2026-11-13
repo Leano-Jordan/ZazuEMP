@@ -129,7 +129,7 @@ A CI round-trip is supporting evidence, not a substitute for this release-enviro
 
 ## Multi-business safety restriction — 2026-11-04
 
-The business settings UI no longer exposes the installation-wide backup or restore commands. The previous controls implied that an owner was exporting/restoring only their business, while the commands snapshot or replace the entire installation database and private storage. This was an unsafe scope mismatch. The CLI commands remain available to the installation operator; business-level self-service export/restore remains a V1 gap until a tenant-scoped format and safe import strategy are implemented and tested.
+The business settings UI no longer exposes the installation-wide backup or restore commands. The previous controls implied that an owner was exporting/restoring only their business, while the commands snapshot or replace the entire installation database and private storage. This was an unsafe scope mismatch. The CLI commands remain available to the installation operator. Separately, tenant-scoped business archive export/restore is implemented through the owner's Export business data screen (`/exports`): the `.zazu` archive contains the explicit allowlisted linked records and referenced business files, excludes credentials, sessions, device pairing tokens, licence entitlements and the SARS TCS PIN, and restores only into an empty, unpaired workspace with record IDs remapped. Its round-trip and tenant-isolation regression is automated-verified in CI. This business archive is not a substitute for the installation-wide operator recovery drill.
 
 
 ## PostgreSQL / Render recovery notes — 2026-11-12
