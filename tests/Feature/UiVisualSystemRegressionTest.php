@@ -220,6 +220,12 @@ class UiVisualSystemRegressionTest extends TestCase
         $this->assertStringContainsString('z-index: 50;', $visualSweepCss);
 
 
+    }
+
+    public function test_authenticated_modules_keep_shared_component_authority_and_workspace_primitives(): void
+    {
+        $css = file_get_contents(resource_path('css/zazu-product-authority.css'));
+        $this->assertIsString($css);
         foreach ([
             'border-width: 1px !important;',
             'body[data-zazu-route^="customers."] .zazu-contact-card',
