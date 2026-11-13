@@ -172,3 +172,14 @@ This addendum supersedes the security/dependency statements above where they con
 - Exact main `fd63ac5717a3afd656da7860530812d6a81a0016`: [Laravel 488 passed / 3,478 assertions / 1 skipped](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/43509943704); PostgreSQL migration/recovery PASS; [Composer/npm audit and secret scan PASS](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/43509943486); [Psalm PASS](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/43509931780); [PHPMD PASS](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/43509937057).
 - This change did not alter sync mutation semantics or local queue architecture. Offline browser acceptance remained in progress and is not counted.
 - Security remains 4/5 pending independent penetration testing and operational/privacy review; evidence maturity remains 71/100.
+
+
+## Authorization boundary follow-up — 2026-11-13
+
+## 2026-11-13 — Authorization boundary follow-up review
+
+- Re-fetched current `main` source for `routes/web.php`, `routes/api.php`, `OfflineWorkspaceController`, `WorkspaceSearchService`, `PermissionService`, `ProfileMediaController`, `BusinessMediaController`, `ExperiencePreferenceController`, `BusinessContextController`, `CustomerContactController` and `CustomerImportController`.
+- Checked the apparent absence of route middleware on `/offline/bootstrap`. The controller returns a broad offline workspace snapshot, but the current configured staff and manager roles have the matching read permissions for the included customer, work, quote, finance, supplier, purchasing, inventory, asset and capability datasets. The search service independently filters each result family by those same permissions. This is not recorded as a confirmed current privilege escalation. Offline implementation remains paused; no changes were made to bootstrap, sync, service worker, IndexedDB or device pairing.
+- Confirmed customer profile media requires `customers.view` and business membership; user profile media requires active membership in the current business; business branding media is scoped to the resolved current business and served privately/no-store. Customer-contact endpoints combine route permission middleware with customer/business and contact/customer ownership checks. Customer import endpoints are permission-gated and bind the preview session to its originating business.
+- Workspace switching delegates to `CurrentBusiness::switchTo`; search delegates authorization filtering to `WorkspaceSearchService`. Experience preferences are stored on the individual user/business membership rather than changing another member's preferences.
+- No new confirmed authorization defect was established in this bounded source review. No application code or test was changed, and no runtime/CI pass is claimed. Existing security score remains 4/5 and evidence maturity remains 71/100; independent penetration testing and operational acceptance are still outstanding.
