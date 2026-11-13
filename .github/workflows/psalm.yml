@@ -3,8 +3,28 @@ name: Psalm Security Scan
 on:
   push:
     branches: [ "main" ]
+    paths:
+      - 'app/**'
+      - 'bootstrap/**'
+      - 'config/**'
+      - 'database/**'
+      - 'routes/**'
+      - 'composer.json'
+      - 'composer.lock'
+      - 'psalm.xml'
+      - '.github/workflows/psalm.yml'
   pull_request:
     branches: [ "main" ]
+    paths:
+      - 'app/**'
+      - 'bootstrap/**'
+      - 'config/**'
+      - 'database/**'
+      - 'routes/**'
+      - 'composer.json'
+      - 'composer.lock'
+      - 'psalm.xml'
+      - '.github/workflows/psalm.yml'
   schedule:
     - cron: '25 14 * * 6'
 
