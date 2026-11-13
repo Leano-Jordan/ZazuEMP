@@ -58,15 +58,41 @@ class ApplySecurityHeaders
             return null;
         }
 
+        $url = $this->readLocalViteUrl();
+
+        if ($url === null) {
+            return null;
+        }
+
+        $parts = parse_url($url);
+
+        if (! $this->isAllowedViteUrl($parts)) {
+            return null;
+        }
+
+        return $parts['scheme'].'://'.$parts['host'].':'.$parts['port'];
+    }
+
+    private function readLocalViteUrl(): ?string
+    {
         $hotFile = public_path('hot');
+
         if (! is_file($hotFile)) {
             return null;
         }
 
-        $url = trim((string) @file_get_contents($hotFile));
-        $parts = parse_url($url);
-        if (! is_array($parts)
-            || ! in_array($parts['scheme'] ?? '', ['http', 'https'], true)
+        $url = @file_get_contents($hotFile);
+
+        return is_string($url) ? trim($url) : null;
+    }
+
+    private function isAllowedViteUrl(array|false $parts): bool
+    {
+        if (! is_array($parts)) {
+            return false;
+        }
+
+        if (! in_array($parts['scheme'] ?? '', ['http', 'https'], true)
             || empty($parts['host'])
             || empty($parts['port'])
             || isset($parts['user'])
@@ -75,19 +101,26 @@ class ApplySecurityHeaders
             || isset($parts['fragment'])
             || ! in_array($parts['path'] ?? '', ['', '/'], true)
         ) {
-            return null;
+            return false;
         }
 
-        $host = strtolower(trim($parts['host'], '[]'));
-        $isLocalhost = $host === 'localhost';
-        $ip = filter_var($host, FILTER_VALIDATE_IP);
-        $isPrivateIp = $ip !== false
-            && filter_var($host, FILTER_VALIDATE_IP, FILTER_FLAG_NO_PRIV_RANGE | FILTER_FLAG_NO_RES_RANGE) === false;
+        return $this->isPrivateNetworkHost(strtolower(trim($parts['host'], '[]')));
+    }
 
-        if (! $isLocalhost && ! $isPrivateIp) {
-            return null;
+    private function isPrivateNetworkHost(string $host): bool
+    {
+        if ($host === 'localhost') {
+            return true;
         }
 
-        return $parts['scheme'].'://'.$parts['host'].':'.$parts['port'];
+        if (filter_var($host, FILTER_VALIDATE_IP) === false) {
+            return false;
+        }
+
+        return filter_var(
+            $host,
+            FILTER_VALIDATE_IP,
+            FILTER_FLAG_NO_PRIV_RANGE | FILTER_FLAG_NO_RES_RANGE,
+        ) === false;
     }
 }
