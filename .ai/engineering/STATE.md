@@ -2301,3 +2301,27 @@ Verification boundary: source was re-fetched from `main` and the retry implement
   - `49e4bc703ce7c9a19d902979eb57f0d2c07dd83d` — isolate all sync endpoints in the test.
 - Re-fetched and inspected the changed source and test from `main`. GitHub combined status returned no status contexts for the latest commit; Playwright execution and exact-head CI are **UNVERIFIED**. No local browser execution was available in this cycle.
 - No Render, deployment branch, database or feature-scope changes.
+
+
+## 2026-11-13 — Retry primary-device registration for queued offline work
+
+- Owner reports two locally created customers still have not reached the server. This is a live acceptance failure; the earlier reconnect retry and status-label changes did not establish successful synchronization on the owner's installation.
+- Further source inspection found a second concrete gap: the retry scheduler required an existing sync token. If initial `/offline/device/register` failed while the host was unavailable, queued changes had no token and no scheduled path to retry device registration. A browser can remain `navigator.onLine === true` while the local host is still starting, so no new browser `online` event is guaranteed.
+- Changed `public/zazu-offline.js`:
+  - Retry scheduler now covers both missing-token device registration and queued mutation synchronization.
+  - Creating a durable local queue entry while the browser reports online starts the recovery scheduler.
+  - Transient registration HTTP failures are persisted and surfaced to the UI.
+  - HTTP 409 and cross-business registration mismatches are marked as blocked rather than retried indefinitely.
+  - Successful registration clears the blocked state and continues normal queue reconciliation.
+- Changed `resources/js/app.js`: a blocked cross-workspace registration displays **Needs attention**, not a misleading retry status.
+- Added Playwright regression in `e2e/pwa-offline.spec.js`: queue a customer without a device token, simulate first registration HTTP 503, allow a later registration to succeed, then assert the queued customer is pushed and the queue drains.
+- Commits on canonical `main`:
+  - `1208a332941c322ae34baef50c0f2509549d80d9` — registration retry and queue-triggered recovery.
+  - `5db2b7b002749fbe3acdcfee331aba37d9f9d264` — registration outage regression test.
+  - `026de5835a8601918dfab1ef68eb69078df2a371` — deterministic test fixture.
+  - `c9648e03ef820dd9cd7d356f4c0c364b27966be4` — stop retrying permanent HTTP 409 registration conflict.
+  - `0bccdd1edfb2457b7e7dab4f7214136a3cb7510e` — surface blocked registration in local record status.
+  - `55f1211a95b481644c957f798dc605fce6fe38de` — block cross-business registration mismatch.
+- Source, UI and test were re-fetched from GitHub after writes. Workflow-run lookup for the test commit returned no runs; latest commit status contexts are unavailable. Playwright and local installation behaviour remain **UNVERIFIED**.
+- The exact state of the owner's two queued customers cannot be read from GitHub; their IndexedDB queue, device token and server records have not been inspected. Do not claim these two records have synced. The owner should not recreate them.
+- No Render, deployment, database or customer-data mutation was performed.
