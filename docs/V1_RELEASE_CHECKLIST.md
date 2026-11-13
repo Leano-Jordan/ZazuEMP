@@ -1,3 +1,13 @@
+## Multi-customer sync identity acceptance — 2026-11-13 (a6cd9b87)
+
+- Server-side regression test now pushes two offline customer creates in one batch, asserts each local UUID receives its own distinct persisted server ID, then replays the identical batch and verifies there are still exactly two customer rows and two customer identity rows.
+- Browser-side registration recovery regression also covers two separate queued customers and asserts distinct server IDs after registration retry.
+- Exact-main CI for `a6cd9b8776f5917c942a44f55daac7b2db793ada`: Laravel `43471194715`, browser smoke `43471194418`, quality `43471194594`, Psalm `43471194578`, PHPMD `43471194532`, populated upgrade/rollback `43471194613`, Director health `43471194860`, and SonarCloud `43471194797` were running at last inspection. Do not count these as passed until complete.
+- Earlier exact-head `72dded07` Laravel/offline-browser/PostgreSQL and quality/security checks passed; its browser smoke `43470319049` remained abnormally long-running and is not counted as a pass.
+- The user's two real queued customers remain a physical-device acceptance check; do not recreate them.
+
+---
+
 ## Exact-main release evidence — 2026-11-13 (f0598324)
 
 - Exact current `main` HEAD: `f05983240ba61cfba4b545c85369e4c4ccc0ad99`.
