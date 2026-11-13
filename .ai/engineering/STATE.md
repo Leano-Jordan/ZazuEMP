@@ -1,3 +1,14 @@
+## 2026-11-13 — Business archive duplicate-FK remapping correction
+
+- Current application/test commits on `main`: service fix `51bba91ddfe4f438b4b979c14f5e67e6864ac048`; focused regression test `e4daa4d1b12378479b2990360877f964719d0a5a`.
+- Root cause identified by schema inspection: some tenant-owned columns participate in both a simple foreign key and a composite `(business_id, foreign_id)` tenant constraint. The restore loop previously read the already-mutated row value on each pass. After the first constraint remapped the source ID, a second constraint tried to look up the new target ID in the source ID map and raised a false unresolved-FK error.
+- Correction: FK resolution now always reads the original archived `$sourceRow[$column]` value. Repeated constraints therefore resolve to the same target ID; explicit `business_id` rebinding remains separate and unchanged.
+- Regression coverage: the archive round-trip fixture now includes a supplier, event-linked purchase order, and purchase-order item. It asserts target event, supplier and purchase-order references are correctly remapped, exercising the simple + composite purchase-order FK overlap. Expected restored record count is now 11.
+- Source and test files were re-fetched from GitHub and the exact snippets verified. Combined status returned no contexts and the available commit-workflow lookup returned no runs. The Laravel workflow is configured for pushes to `main`, but this tool view does not expose a run for the new commit yet. PHPUnit execution remains **PENDING / UNVERIFIED**; do not mark archive restore accepted until the focused test and safety tests pass.
+- No business records, live database, deployment configuration or customer data were changed.
+
+---
+
 ## 2026-11-13 — Director source-lineage reconciliation
 
 - Canonical branch: `main`; latest repository documentation commit observed: `193b4584f894bacd3107df926135049197bbcad1`.
