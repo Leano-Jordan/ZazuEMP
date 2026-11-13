@@ -1,3 +1,16 @@
+## 2026-11-13 — Android offline installation path and exact-head CI reconciliation
+
+- Application/test source head: `805f210c96565899d8d7d5347b80d5461e401756`.
+- Exact-head Laravel workflow [43499203157](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/43499203157): **PASS**. Laravel tests, PostgreSQL migration/registration/backup-recovery and the dedicated offline-browser acceptance job all completed successfully.
+- The offline-browser job executed the workflow step `Run offline browser acceptance suite` successfully after the workflow was updated to run both `e2e/pwa-offline.spec.js` and `e2e/offline-attachment-sync.spec.js`.
+- Zazu quality [43499203207](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/43499203207), CodeQL/push-on-main [43499203169](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/43499203169), Director Contract Lint [43499203248](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/43499203248), and Director Health [43499203355](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/43499203355): **PASS**. SonarCloud was not triggered by the docs-only changes; no SonarCloud pass is claimed.
+- Added `docs/ZAZU_ANDROID_OFFLINE_INSTALL_ACCEPTANCE.md` with the existing Windows Caddy HTTPS launcher flow, Android CA trust, install-from-HTTPS requirements, and a bounded physical disconnected/restart/reconnect acceptance sequence. Commit: `10c40e35ca174c7659bdd973126c8036eb714ca8`.
+- Confirmed existing launcher scripts start Laravel on loopback behind Caddy's internal HTTPS CA; the old plain-HTTP LAN IP cannot register the service worker. HTTP and HTTPS are separate browser origins and do not share service-worker or PWA installation state.
+- **Physical Android acceptance remains OPEN.** CI success does not prove the CA is installed/trusted on the actual phone, the app is installed from the HTTPS origin, or that it cold-launches and supports offline workflows after the PC server stops. Follow the new runbook; record the physical results before closing this gate.
+- No production code, live database, customer data, deployment or non-main branch was changed in this Android setup documentation cycle.
+
+---
+
 ## 2026-11-13 — exact-head CI closure and V1 gate reconciliation
 
 - Verified current `main` head: `5888123f1941beb478b31870a6e782e0f8ef8053`.
