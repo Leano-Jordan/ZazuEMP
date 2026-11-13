@@ -22,7 +22,7 @@ class UiProportionFoundationTest extends TestCase
         $this->assertStringContainsString('--zazu-ui-control-height: 44px;', $css);
         $this->assertStringContainsString('--zazu-content-max: 1320px;', $css);
         $this->assertStringContainsString('--zazu-ui-radius: var(--zazu-radius-lg);', $css);
-        $this->assertStringContainsString('--zazu-radius-lg: 10px;', $css);
+        $this->assertStringContainsString('--zazu-radius-lg: 8px;', $css);
     }
 
     public function test_topbar_uses_a_light_workspace_surface_instead_of_repeating_the_sidebar_colour(): void
