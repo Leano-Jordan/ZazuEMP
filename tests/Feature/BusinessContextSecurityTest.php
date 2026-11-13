@@ -2,6 +2,7 @@
 
 namespace Tests\Feature;
 
+use App\Models\Business;
 use App\Models\SyncDevice;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -73,13 +74,13 @@ class BusinessContextSecurityTest extends TestCase
 
     public function test_switching_business_cannot_rebind_a_trusted_device_to_another_business(): void
     {
-        $first = \\App\\Models\\Business::create([
+        $first = Business::create([
             'name' => 'Trusted Device First',
             'slug' => 'trusted-device-first-'.Str::lower(Str::random(8)),
             'status' => 'active',
             'currency' => 'ZAR',
         ]);
-        $second = \\App\\Models\\Business::create([
+        $second = Business::create([
             'name' => 'Trusted Device Second',
             'slug' => 'trusted-device-second-'.Str::lower(Str::random(8)),
             'status' => 'active',
