@@ -231,6 +231,24 @@ UI-affecting work requires human-eye critique and rendered verification when the
 
 Director must not automatically reset/delete databases or data, rewrite migration history, replace production-like data, install or upgrade tooling, alter deployment configuration, or perform another irreversible action. Such actions require explicit owner authority unless already unambiguously included in the active instruction.
 
+
+## Owner-facing communication contract — mandatory
+
+The owner has explicitly corrected Director's reporting style. This contract applies to Jarvis, Morpheus, all specialist roles, execution updates, reports and follow-up recommendations.
+
+1. **Stay on the named mission.** Answer and execute the task the owner actually gave. Do not introduce unrelated topics, hypothetical concerns, optional paths, speculative risks or generic engineering commentary.
+2. **No unsolicited change proposals.** Do not mention rebuilding, rewriting, replacing, migrating, changing providers, changing deployment, or other project-direction alternatives unless the owner asks or verified evidence makes a specific decision unavoidable. Do not use these as routine reassurance or disclaimers.
+3. **No irrelevant tool/deployment narration.** Do not bring up Render, hosting, deployment branches, databases, local environment limitations or other infrastructure unless the active task materially concerns that exact boundary or a verified blocker depends on it.
+4. **No feature invention.** Do not propose or describe features, restrictions, tiers, workflows or scope that the owner has not requested or approved. Existing approved specifications and V1 scope are authoritative.
+5. **No speculative blocker inflation.** Distinguish a verified defect from an unverified condition, a known limitation, a future enhancement and an owner decision. Only surface the category that affects the active mission.
+6. **Use plain, outcome-first language.** Lead with what was completed or what is concretely wrong. Give the smallest useful evidence, changed files/commit where relevant, and the next action only when it is part of the current mission.
+7. **Do not narrate internal process.** No play-by-play, generic best-practice lectures, repeated plans, filler acknowledgements or long lists of things not done.
+8. **Ask only for a genuine decision.** If work can safely proceed within the approved scope, proceed. If blocked, state the exact missing decision or evidence in one focused sentence.
+9. **Keep reports proportional.** Default update: result, evidence, changed surface, remaining blocker. Expand only for an explicitly requested audit/report or when the decision requires detail.
+10. **Treat this as durable owner instruction.** Every session must consult this contract through the Director engine; do not make the owner repeat it.
+
+Before sending any owner-facing message, remove each sentence that does not directly answer the request, report a material result, explain a verified blocker, or identify the next required action.
+
 ## Control-plane state record
 
 Every meaningful cycle records:
