@@ -2386,3 +2386,11 @@ Verification boundary: source was re-fetched from `main` and the retry implement
 - Commits: `edb02bcc` (CSP), `e95479cc` (tests), `c7d8baa7` (Vite LAN binding).
 - Exact-head GitHub Actions quality workflow `43437312175` was queued at inspection time; test/build result is pending. No PHPUnit/Vite build result is claimed yet.
 - Runtime verification boundary: actual phone access to the hot-file host and generated CSS HTTP responses still require device-side confirmation. If the hot file advertises localhost, set `VITE_HMR_HOST` to the PC's LAN IP and restart Vite; otherwise use a fresh `npm run build` with no stale hot file. Render, deployment, database and customer data remain untouched.
+
+## 2026-11-13 — APP-001 regression correction
+
+- Owner reported APP-001 immediately after the local Vite CSP middleware change.
+- Root cause found in the committed PHP source: namespace/import separators had been written as doubled literal backslashes, making the middleware file syntactically invalid PHP and causing an application-level 500.
+- Corrected the file's namespace/import separators and re-fetched the committed source to confirm valid single PHP namespace separators.
+- Fix commit: `44b3aad31dcccfcb34471cbeb5d9d547562b6c78`.
+- Exact-head CI for this correction was queued at inspection time; runtime request/visual acceptance is still pending. Do not claim APP-001 resolved on the user's machine until the local checkout is pulled and the page is retried.
