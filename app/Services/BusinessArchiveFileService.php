@@ -2,8 +2,6 @@
 
 namespace App\Services;
 
-use App\Models\Business;
-use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 use RuntimeException;
 use ZipArchive;
@@ -161,67 +159,6 @@ final class BusinessArchiveFileService
         return collect($data[$table] ?? [])->firstWhere('id', (int) ($file['id'] ?? 0))[$column] ?? null;
     }
 
-    public function collectFiles(Business $business, array &$data): array
-    {
-        $references = [];
-        $add = function (string $table, int $id, string $column, ?string $path, ?string $disk = null) use (&$references): void {
-            if (! $path) {
-                return;
-            }
-            if (Str::contains($path, ['..', '\\'])) {
-                throw new RuntimeException("A referenced business file path is unsafe: {$table}#{$id}.");
-            }
-            $diskName = $disk ?: 'private';
-            if ($disk !== null && ! in_array($diskName, ['private', 'local'], true)) {
-                throw new RuntimeException("An attachment uses an unsupported storage disk: {$table}#{$id}.");
-            }
-            $candidates = $disk !== null ? [$diskName] : ['private', 'local', 'public'];
-            $sourceDisk = null;
-            foreach ($candidates as $candidate) {
-                if (Storage::disk($candidate)->exists($path)) {
-                    $sourceDisk = $candidate;
-                    break;
-                }
-            }
-            if ($sourceDisk === null) {
-                throw new RuntimeException("A referenced business file is missing: {$table}#{$id}.");
-            }
-            $entry = 'payload/files/'.Str::uuid().'.bin';
-            $references[] = [
-                'table' => $table,
-                'id' => $id,
-                'column' => $column,
-                'disk_column' => $disk !== null ? 'disk' : null,
-                'source_disk' => $sourceDisk,
-                'entry' => $entry,
-                'original_name' => basename($path),
-            ];
-        };
-
-        foreach (['logo_path', 'dashboard_image_path', 'wallpaper_path'] as $column) {
-            $add('businesses', (int) $business->id, $column, $business->{$column});
-        }
-        foreach (['business_capabilities' => 'image_path', 'customers' => 'profile_photo_path', 'compliance_documents' => 'storage_path'] as $table => $column) {
-            foreach ($data[$table] as $row) {
-                $add($table, (int) $row['id'], $column, $row[$column] ?? null);
-            }
-        }
-        foreach ($data['event_attachments'] as $row) {
-            $add('event_attachments', (int) $row['id'], 'path', $row['path'] ?? null, $row['disk'] ?? 'private');
-        }
-
-        $contents = [];
-        foreach ($references as &$reference) {
-            $sourcePath = match ($reference['table']) {
-                'businesses' => $business->{$reference['column']},
-                default => collect($data[$reference['table']])->firstWhere('id', $reference['id'])[$reference['column']],
-            };
-            $contents[$reference['entry']] = Storage::disk($reference['source_disk'])->get($sourcePath);
-        }
-        unset($reference);
-
-        return ['manifest' => $references, 'contents' => $contents];
-    }
 
 
 }
