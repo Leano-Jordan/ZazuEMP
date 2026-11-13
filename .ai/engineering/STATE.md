@@ -1,3 +1,13 @@
+## 2026-11-13 — V1 scorecard re-score pushed
+
+- Re-scored the 13 V1 domains against verified application/test source `30e259d445c614df6d1b2495c5a5e505a6d36443` and completed Laravel workflow [43504654649](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/43504654649).
+- **Evidence maturity: 71/100**, up from 69/100. Recovery/data portability advances 3/5 → 4/5 because tenant-scoped business archive round-trip/tenant isolation and PostgreSQL database/private-file recovery passed automation. Other domain scores held.
+- Offline continuity remains 3/5. The disconnected attachment reload test passed in browser automation, but physical Android secure-origin install, cold-launch, local workflow and force-close/reopen persistence remain unverified. No claim of full offline parity.
+- Release remains **NOT READY** pending bounded physical-device acceptance, installed-target operator recovery, live commercial record reconciliation, and POPIA/privacy/brand closure.
+- Scorecard commit: `81d811df8c2edf1f0b0a48c2f8cb60c2748032b6`. No application code, production data, deployment or non-main branch changed.
+
+---
+
 ## 2026-11-13 — Disconnected attachment persistence regression
 
 - Extended `e2e/offline-attachment-sync.spec.js` so the active Work attachment test now reloads the job page while browser connectivity is disabled, then reopens the attachment queue through `window.ZazuOffline` and verifies the original file is still present before reconnect/upload.
