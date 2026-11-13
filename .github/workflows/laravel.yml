@@ -3,8 +3,48 @@ name: Laravel
 on:
   push:
     branches: [ "main" ]
+    paths:
+      - 'app/**'
+      - 'bootstrap/**'
+      - 'config/**'
+      - 'database/**'
+      - 'e2e/**'
+      - 'public/**'
+      - 'resources/**'
+      - 'routes/**'
+      - 'tests/**'
+      - 'artisan'
+      - '.env.example'
+      - 'composer.json'
+      - 'composer.lock'
+      - 'package.json'
+      - 'package-lock.json'
+      - 'phpunit.xml'
+      - 'playwright.config.js'
+      - 'vite.config.*'
+      - '.github/workflows/laravel.yml'
   pull_request:
     branches: [ "main" ]
+    paths:
+      - 'app/**'
+      - 'bootstrap/**'
+      - 'config/**'
+      - 'database/**'
+      - 'e2e/**'
+      - 'public/**'
+      - 'resources/**'
+      - 'routes/**'
+      - 'tests/**'
+      - 'artisan'
+      - '.env.example'
+      - 'composer.json'
+      - 'composer.lock'
+      - 'package.json'
+      - 'package-lock.json'
+      - 'phpunit.xml'
+      - 'playwright.config.js'
+      - 'vite.config.*'
+      - '.github/workflows/laravel.yml'
   workflow_dispatch:
 
 permissions:
