@@ -1,3 +1,5 @@
+<!-- Historical assessments below are retained as an audit trail. The newest dated Director reconciliation at the top is authoritative; older snapshots may contain statuses that were true at their assessment date and have since been superseded. -->
+
 ## Director reconciliation — 2026-11-13 (exact-head CI and archive gate closure)
 
 **Canonical repository:** `Leano-Jordan/ZazuEMP` · **branch:** `main` · **verified head:** `5888123f1941beb478b31870a6e782e0f8ef8053`.
@@ -42,7 +44,7 @@
 
 The exact-head automated test batch now passes for offline session transitions, active Work attachments, tenant/device isolation, multi-customer sync identity reconciliation, commercial reconciliation, PostgreSQL migration/backup/restore, static quality and populated upgrade/rollback.
 
-**Technical V1 is still NO-GO for owner acceptance**, not because these automated suites are failing, but because the installed-device and operational recovery checks have not been completed. The business-level restorable archive is also not implemented.
+**Technical V1 is still NO-GO for owner acceptance**, not because these automated suites are failing, but because the installed-device and operational recovery checks have not been completed. The business-level restorable archive is implemented and automated-verified as recorded in the newer archive-gate reconciliation above; the actual installed-environment operator recovery drill remains open.
 
 ## Current V1 reconciliation
 
@@ -50,7 +52,7 @@ The exact-head automated test batch now passes for offline session transitions, 
 - **Offline Work attachments — AUTOMATED PASS.** The active Work attachment workflow passes browser acceptance for local queueing, reconnect upload, server-ID reconciliation, duplicate retry, offline file reuse, cross-tab re-pair and stale asynchronous response protection. Do not count the dormant `public/offline-attachments.js` as the active implementation.
 - **Multi-customer sync — AUTOMATED PASS.** Two queued customer creates reconcile to distinct server IDs and replay without duplicates. The owner's actual existing IndexedDB customers remain unobserved by CI and must not be recreated.
 - **Commercial reconciliation — AUTOMATED PASS.** A seeded scenario validates the complete accepted quote → invoice → deposit → final payment → actual cost → event profit path. Values: R11,500 invoiced; R3,450 deposit; R8,050 final payment; R2,800 actual cost; R8,700 profit; 75.65% margin. This is not a claim that live customer records have been manually checked.
-- **Business data portability — PARTIAL.** Twenty-three business-scoped CSV datasets are exportable and customer CSV/XLSX import preview exists. These do not provide a relationship-complete business backup/import or restore uploaded files. A tenant-scoped archive/import remains open.
+- **Business data portability — IMPLEMENTED / AUTOMATED-VERIFIED.** Twenty-three business-scoped CSV datasets and the relationship-complete tenant-scoped `.zazu` archive/restore are available; customer CSV/XLSX import preview remains available separately. Real installed-environment recovery is a distinct open gate.
 - **Installation recovery — CI VERIFIED, OPERATOR DRILL OPEN.** The CLI backup/restore supports SQLite, MySQL and PostgreSQL; PostgreSQL database and private-file round-trip passes in CI. The controlled installed-environment recovery drill remains required.
 - **Physical acceptance — OWNER VERIFICATION REQUIRED.** Real secure-origin phone/tablet installation, disconnected workflow, local record and attachment persistence, force-close/reopen and reconnect sync remain unverified.
 - **POPIA / legal / brand — OPEN.** Operational controls, retention/disposal ownership, incident handling, and professional Zazu name/trade-mark clearance remain to be completed.
@@ -239,7 +241,7 @@ The earlier phone-local attachment transfer note is not a verified active featur
 
 A security review found that the former business settings backup/restore endpoints invoked installation-wide commands. The commands snapshot or replace the entire configured database and private storage, so exposing them to an individual business owner created cross-business disclosure and destructive-restore risk. The HTTP endpoints and UI controls have been removed. The settings page now states that installation recovery is operator-managed and business self-service export/restore is not available in this build.
 
-The CLI backup/restore commands remain available for controlled installation-operator use. Automated command-level round-trip and hostile-archive tests remain supporting evidence, not proof of a real recovery drill. Tenant-scoped export/restore remains an explicit V1 gap.
+The CLI backup/restore commands remain available for controlled installation-operator use. Automated command-level round-trip and hostile-archive tests remain supporting evidence, not proof of a real recovery drill. Tenant-scoped export/restore is implemented and automated-verified in the newer reconciliation above; the installation-wide operator recovery drill remains open.
 
 
 ## Offline transition and attachment hardening — 2026-11-04
@@ -253,7 +255,7 @@ The CLI backup/restore commands remain available for controlled installation-ope
 
 The current evidence-maturity assessment is **3.0/5 (60/100)** across 13 V1 capability areas. This is an evidence score, not a percentage of features built. The detailed area-by-area score, method, blockers and execution order are recorded in `docs/ZAZU_V1_SCORECARD_2026-11-04.md`.
 
-The product has a substantial connected commercial and operational core. It remains **NO-GO for commercial release** while real recovery/rollback, bounded offline acceptance, the offline account/session security challenge, tenant-scoped export/restore decision, legal/privacy operations and Zazu brand clearance remain open. Latest-head CI for `d1e2a4397b064d3fbfe7fc2cf1dc59236e00922f` was queued at assessment time.
+The product has a substantial connected commercial and operational core. It remains **NO-GO for commercial release** while real recovery/rollback, bounded offline acceptance, the offline account/session security challenge, legal/privacy operations and Zazu brand clearance remain open. Latest-head CI for `d1e2a4397b064d3fbfe7fc2cf1dc59236e00922f` was queued at assessment time.
 
 
 ## Exact source-head verification — 2026-11-04
