@@ -187,7 +187,13 @@ class UiVisualSystemRegressionTest extends TestCase
             '--zazu-surface: #FFFFFF;',
             '--zazu-page: #0B1726;',
             '--zazu-sidebar: #202B35;',
-        ] as $token) {
+                    '--zazu-tone-green: #D1F2D9;',
+            '--zazu-tone-amber: #FFE4A3;',
+            '--zazu-tone-teal: #C4F0E6;',
+            '--zazu-tone-violet: #E2D5FF;',
+            '--zazu-tone-coral: #FFD5CA;',
+            '--zazu-tone-blue: #D3ECFF;',
+] as $token) {
             $this->assertStringContainsString($token, $tokens);
         }
         $this->assertIsString($dashboardCss);
@@ -215,11 +221,6 @@ class UiVisualSystemRegressionTest extends TestCase
 
 
         foreach ([
-            '--zazu-tone-green: #D1F2D9;',
-            '--zazu-tone-amber: #FFE4A3;',
-            '--zazu-tone-teal: #C4F0E6;',
-            '--zazu-tone-violet: #E2D5FF;',
-            '--zazu-tone-coral: #FFD5CA;',
             'border-width: 1px !important;',
             'body[data-zazu-route^="customers."] .zazu-contact-card',
             'body[data-zazu-route^="customers."] .zazu-detail-value-box',
@@ -254,7 +255,6 @@ class UiVisualSystemRegressionTest extends TestCase
             '.zazu-metric-card:nth-child(4n + 4)',
             '.zazu-dash-quote-stage:nth-child(4)',
             'background: var(--zazu-tone-green) !important;',
-            '--zazu-tone-blue: #D3ECFF;',
             '--zazu-tone-green: #D1F2D9;',
             '--zazu-tone-amber: #FFE4A3;',
             '--zazu-tone-teal: #C4F0E6;',
