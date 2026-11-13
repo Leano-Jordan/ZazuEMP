@@ -171,12 +171,25 @@ class UiVisualSystemRegressionTest extends TestCase
     public function test_authenticated_modules_share_the_dashboard_shell_and_surface_palette(): void
     {
         $css = file_get_contents(resource_path('css/zazu-product-authority.css'));
+        $tokens = file_get_contents(resource_path('css/app.css'));
         $layout = file_get_contents(resource_path('views/components/app-layout.blade.php'));
         $dashboardCss = file_get_contents(resource_path('css/zazu-dashboard-authority.css'));
         $visualSweepCss = file_get_contents(resource_path('css/zazu-final-visual-sweep.css'));
 
         $this->assertIsString($css);
+        $this->assertIsString($tokens);
         $this->assertIsString($layout);
+        $this->assertStringNotContainsString(':root {', $css);
+        $this->assertStringNotContainsString(':root[data-theme="dark"] {', $css);
+        foreach ([
+            '--zazu-page: #DCE5ED;',
+            '--zazu-sidebar: #D5E0E8;',
+            '--zazu-surface: #FFFFFF;',
+            '--zazu-page: #0B1726;',
+            '--zazu-sidebar: #202B35;',
+        ] as $token) {
+            $this->assertStringContainsString($token, $tokens);
+        }
         $this->assertIsString($dashboardCss);
         $this->assertIsString($visualSweepCss);
         $this->assertStringContainsString('resources/css/zazu-product-authority.css', $layout);
@@ -186,11 +199,6 @@ class UiVisualSystemRegressionTest extends TestCase
         $this->assertStringNotContainsString('class="zazu-card zazu-list zazu-quote-line-editor"', $quoteCreate);
         $this->assertStringContainsString('.zazu-quote-line-editor .zazu-list-item', $css);
         $this->assertStringContainsString('grid-template-columns: minmax(0, 1fr) minmax(140px, 190px);', $css);
-        $this->assertStringContainsString('--zazu-page: #DCE5ED;', $css);
-        $this->assertStringContainsString('--zazu-sidebar: #D5E0E8;', $css);
-        $this->assertStringContainsString('--zazu-surface: #FFFFFF;', $css);
-        $this->assertStringContainsString('--zazu-page: #0B1726;', $css);
-        $this->assertStringContainsString('--zazu-sidebar: #202B35;', $css);
         $this->assertStringContainsString('background-image: none !important;', $css);
         $this->assertStringContainsString('.zazu-dash-commercial .zazu-dash-quote-stages', $css);
         $this->assertStringContainsString('padding: 12px 18px 14px !important;', $css);
