@@ -562,85 +562,102 @@ final class BusinessArchiveService
             DB::transaction(function () use ($target, $definitions, $data, $filePayloads, $sourceProfile, &$idMaps, &$createdFiles, &$records): void {
                 DB::table('businesses')->where('id', $target->id)->lockForUpdate()->first();
                 $this->assertTargetIsEmpty($target, $definitions);
-
-                foreach ($definitions as $table => $definition) {
-                    $foreignKeys = Schema::getForeignKeys($table);
-                    foreach ($data[$table] as $sourceRow) {
-                        $oldId = (int) ($sourceRow['id'] ?? 0);
-                        if ($oldId < 1 || array_diff(array_keys($sourceRow), Schema::getColumnListing($table)) !== []) {
-                            throw new RuntimeException("Restore stopped: invalid row structure in {$table}.");
-                        }
-                        $row = $sourceRow;
-                        unset($row['id']);
-
-                        if (array_key_exists('business_id', $row)) {
-                            $row['business_id'] = $target->id;
-                        }
-
-                        if ($table === 'audit_logs') {
-                            // Archives are untrusted input: never autoload or instantiate a
-                            // class named by an archived polymorphic subject_type. Keep the
-                            // historical audit entry, but detach its source-workspace subject.
-                            $row['subject_type'] = null;
-                            $row['subject_id'] = null;
-                        }
-
-                        foreach ($foreignKeys as $foreignKey) {
-                            foreach ($foreignKey['columns'] as $column) {
-                                if ($column === 'business_id') {
-                                    continue;
-                                }
-
-                                // A column may participate in both a simple FK and a
-                                // composite tenant FK. Always resolve from the archived
-                                // value so processing the second constraint is idempotent.
-                                $row[$column] = $this->remapArchiveForeignKey(
-                                    $table,
-                                    $column,
-                                    $foreignKey['foreign_table'],
-                                    $sourceRow[$column] ?? null,
-                                    $target,
-                                    $idMaps
-                                );
-                            }
-                        }
-
-                        $newId = DB::table($table)->insertGetId($row);
-                        $idMaps[$table][(string) $oldId] = $newId;
-                        $records++;
-                    }
-                }
-
-                foreach ($filePayloads as $file) {
-                    $newId = $file['table'] === 'businesses'
-                        ? (int) $target->id
-                        : (int) $idMaps[$file['table']][(string) $file['id']];
-                    $path = 'business-archives/'.$target->id.'/'.Str::uuid().'.bin';
-                    $restoreDisk = $file['table'] === 'event_attachments' ? 'private' : ($file['source_disk'] ?? 'private');
-                    if (! in_array($restoreDisk, ['private', 'local', 'public'], true)
-                        || ! Storage::disk($restoreDisk)->put($path, $file['bytes'])) {
-                        throw new RuntimeException('Restore stopped: a business file could not be written to its storage disk.');
-                    }
-                    $createdFiles[] = ['disk' => $restoreDisk, 'path' => $path];
-
-                    DB::table($file['table'])->where('id', $newId)->update([
-                        $file['column'] => $path,
-                        ...($file['disk_column'] ? [$file['disk_column'] => 'private'] : []),
-                    ]);
-                }
-
-                $safeProfile = array_intersect_key($sourceProfile, array_flip(['name', 'currency', 'email', 'phone', 'address', 'website', 'tax_number']));
-                if ($safeProfile !== []) {
-                    DB::table('businesses')->where('id', $target->id)->update($safeProfile);
-                }
+                $this->restoreArchiveTables($target, $definitions, $data, $idMaps, $records);
+                $this->restoreArchiveFiles($target, $filePayloads, $idMaps, $createdFiles);
+                $this->restoreBusinessProfile($target, $sourceProfile);
             });
 
             return ['tables' => count($definitions), 'records' => $records, 'files' => count($filePayloads)];
-        } catch (\Throwable $exception) {
+        } catch (\\Throwable $exception) {
             foreach ($createdFiles as $file) {
                 Storage::disk($file['disk'])->delete($file['path']);
             }
             throw $exception;
+        }
+    }
+
+    private function restoreArchiveTables(Business $target, array $definitions, array $data, array &$idMaps, int &$records): void
+    {
+        foreach ($definitions as $table => $_definition) {
+            $foreignKeys = Schema::getForeignKeys($table);
+            foreach ($data[$table] as $sourceRow) {
+                $newId = $this->restoreArchiveRow($target, $table, $sourceRow, $foreignKeys, $idMaps);
+                $idMaps[$table][(string) $sourceRow['id']] = $newId;
+                $records++;
+            }
+        }
+    }
+
+    private function restoreArchiveRow(Business $target, string $table, array $sourceRow, array $foreignKeys, array $idMaps): int
+    {
+        $oldId = (int) ($sourceRow['id'] ?? 0);
+        if ($oldId < 1 || array_diff(array_keys($sourceRow), Schema::getColumnListing($table)) !== []) {
+            throw new RuntimeException("Restore stopped: invalid row structure in {$table}.");
+        }
+
+        $row = $sourceRow;
+        unset($row['id']);
+        if (array_key_exists('business_id', $row)) {
+            $row['business_id'] = $target->id;
+        }
+        if ($table === 'audit_logs') {
+            // Archives are untrusted input: preserve the audit event, but detach
+            // polymorphic subjects so imported class names are never autoloaded.
+            $row['subject_type'] = null;
+            $row['subject_id'] = null;
+        }
+
+        $this->remapArchiveRowForeignKeys($target, $table, $sourceRow, $row, $foreignKeys, $idMaps);
+
+        return (int) DB::table($table)->insertGetId($row);
+    }
+
+    private function remapArchiveRowForeignKeys(Business $target, string $table, array $sourceRow, array &$row, array $foreignKeys, array $idMaps): void
+    {
+        foreach ($foreignKeys as $foreignKey) {
+            foreach ($foreignKey['columns'] as $column) {
+                if ($column === 'business_id') {
+                    continue;
+                }
+                // Resolve from the original archive row so overlapping simple and
+                // composite tenant constraints remain deterministic.
+                $row[$column] = $this->remapArchiveForeignKey(
+                    $table,
+                    $column,
+                    $foreignKey['foreign_table'],
+                    $sourceRow[$column] ?? null,
+                    $target,
+                    $idMaps
+                );
+            }
+        }
+    }
+
+    private function restoreArchiveFiles(Business $target, array $filePayloads, array $idMaps, array &$createdFiles): void
+    {
+        foreach ($filePayloads as $file) {
+            $newId = $file['table'] === 'businesses'
+                ? (int) $target->id
+                : (int) $idMaps[$file['table']][(string) $file['id']];
+            $path = 'business-archives/'.$target->id.'/'.Str::uuid().'.bin';
+            $restoreDisk = $file['table'] === 'event_attachments' ? 'private' : ($file['source_disk'] ?? 'private');
+            if (! in_array($restoreDisk, ['private', 'local', 'public'], true)
+                || ! Storage::disk($restoreDisk)->put($path, $file['bytes'])) {
+                throw new RuntimeException('Restore stopped: a business file could not be written to its storage disk.');
+            }
+            $createdFiles[] = ['disk' => $restoreDisk, 'path' => $path];
+            DB::table($file['table'])->where('id', $newId)->update([
+                $file['column'] => $path,
+                ...($file['disk_column'] ? [$file['disk_column'] => 'private'] : []),
+            ]);
+        }
+    }
+
+    private function restoreBusinessProfile(Business $target, array $sourceProfile): void
+    {
+        $safeProfile = array_intersect_key($sourceProfile, array_flip(['name', 'currency', 'email', 'phone', 'address', 'website', 'tax_number']));
+        if ($safeProfile !== []) {
+            DB::table('businesses')->where('id', $target->id)->update($safeProfile);
         }
     }
 
