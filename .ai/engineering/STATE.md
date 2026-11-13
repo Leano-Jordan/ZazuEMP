@@ -2325,3 +2325,15 @@ Verification boundary: source was re-fetched from `main` and the retry implement
 - Source, UI and test were re-fetched from GitHub after writes. Workflow-run lookup for the test commit returned no runs; latest commit status contexts are unavailable. Playwright and local installation behaviour remain **UNVERIFIED**.
 - The exact state of the owner's two queued customers cannot be read from GitHub; their IndexedDB queue, device token and server records have not been inspected. Do not claim these two records have synced. The owner should not recreate them.
 - No Render, deployment, database or customer-data mutation was performed.
+
+
+## 2026-11-13 — Offline sync recovery browser verification correction
+
+- Current canonical repository/ref at start: `Leano-Jordan/ZazuEMP` / `main`; application/test candidate `55f1211a95b481644c957f798dc605fce6fe38de`.
+- Exact-head Laravel job passed. The offline-browser-acceptance job failed: 20 passed, 2 failed. The first failure observed zero intercepted primary-device registration attempts because the test installed its route after dashboard boot could already initiate registration. The second status test's route setup occurred after queue creation, permitting scheduled retry timing to interfere with the assertion.
+- Classified as test/fixture setup (F2/F3), not a confirmed production sync defect. Added `CASE-ZAZU-0029` / `ENG-FIXTURE-004`.
+- Changed only `e2e/pwa-offline.spec.js`: defer automatic boot sync/registration in both affected tests; install status-test network routes before queuing the mutation; explicitly trigger sync after setup.
+- Commit: `8ecd3894f30cf8c8218ce852aebbf3017d0eef4c`.
+- Re-fetched changed test source from `main`; structural checks confirm both deferral guards and the revised status-test ordering.
+- Exact-head CI for the correction is not yet visible through GitHub Actions. Browser acceptance remains **UNVERIFIED**; no application code, customer data, database, Render service, deployment branch or deployment setting was changed.
+- Next: obtain exact-head offline browser acceptance. If green, reconcile the new registration-retry behaviour against the owner's two queued customer records without recreating or discarding them. If red, inspect the new job logs and follow CASE-ZAZU-0029's attempt budget.
