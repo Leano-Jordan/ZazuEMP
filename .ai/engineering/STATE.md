@@ -1,3 +1,13 @@
+## 2026-11-13 — Browser-smoke fixture correction (verification pending)
+
+- Canonical baseline: Leano-Jordan/ZazuEMP / main at 234dc9d1366e5ac85bf756ff440ebabe3f5541ae.
+- Exact-head browser run 43419239273: 84 passed, 1 failed, 1 flaky, 46 skipped. Failures were isolated to two assertions in e2e/pwa-offline.spec.js.
+- Retry-status test was on /dashboard, but the chip is rendered only in the Customer directory. Cross-business pairing test allowed automatic primary registration to create a valid current-business token, then incorrectly expected that pre-existing token to be absent after a foreign pairing was rejected.
+- Test-only correction: status test now opens /customers; cross-business test defers automatic registration and sets an explicit no-token baseline before pairing. Production runtime source is unchanged.
+- Failure record: CASE-ZAZU-0029 / ENG-FIXTURE-004, including exact-head run and root causes.
+- Verification status: CHANGED, NOT VERIFIED until the post-correction browser workflow completes. No score uplift. No deployment or change to deploy/render-staging.
+
+---
 ## Director overdrive verification — 2026-11-13
 
 - Exact test/application baseline: `785b544e3cf49a10f19c510b5e5e7ef8c5e4d9a6`.

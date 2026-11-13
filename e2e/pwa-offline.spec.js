@@ -223,8 +223,10 @@ test.describe('Zazu installed PWA offline shell', () => {
             window.__ZAZU_OFFLINE_DEFER_INITIAL_SYNC = true;
         });
         await login(page);
+        // The status chip is rendered on the Customer directory, not the dashboard.
+        await page.goto('/customers', { waitUntil: 'domcontentloaded' });
+        await page.evaluate(() => window.ZazuOffline.ready);
         await page.evaluate(async () => {
-            await window.ZazuOffline.ready;
             const state = window.ZazuOffline.getState();
             state.sync = {
                 token: 'visible-sync-retry-token',
@@ -1485,6 +1487,8 @@ test.describe('Zazu installed PWA offline shell', () => {
 
     test('a cross-business pairing response is revoked without changing local workspace data', async ({ page }) => {
         test.setTimeout(30_000);
+        // Keep automatic primary-device registration out of this credential-boundary test.
+        await page.addInitScript(() => { window.__ZAZU_OFFLINE_DEFER_INITIAL_SYNC = true; });
         await login(page);
         await page.goto('/settings', { waitUntil: 'domcontentloaded' });
         await page.evaluate(() => window.ZazuOffline.ready);
@@ -1492,6 +1496,11 @@ test.describe('Zazu installed PWA offline shell', () => {
         const businessId = await page.evaluate(() => Number(document.body.dataset.zazuBusinessId));
         const mutationId = await page.evaluate(async () => {
             const state = window.ZazuOffline.getState();
+            state.sync = null;
+            state.sync_authorization_required = false;
+            state.sync_registration_blocked = false;
+            state.last_sync_error = null;
+            await window.ZazuOffline.persist({ allowSessionChange: true });
             state.business = { id: Number(document.body.dataset.zazuBusinessId), name: 'Original business workspace' };
             state.customers = [{ id: null, local_id: 'cross-business-guard-customer', name: 'Do not lose this' }];
             await window.ZazuOffline.persist();

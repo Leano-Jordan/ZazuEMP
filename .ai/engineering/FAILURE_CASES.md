@@ -470,3 +470,12 @@ Archive pointer: closed historical cases CASE-ZAZU-0001 through CASE-ZAZU-0009 a
 **Verification:** Changed file re-fetched from `main`; required setup markers and revised ordering confirmed. Exact-head workflow results for the correction are not yet available. Do not claim the fixture correction passed or the customer sync issue is resolved until browser acceptance reruns green.
 
 **Loop prevention:** Do not patch production sync code to satisfy these assertions unless a corrected, deterministic browser test or owner installation evidence demonstrates an application defect.
+
+**Exact-head browser-smoke follow-up — 2026-11-13**
+
+- Browser run 43419239273 at 234dc9d1366e5ac85bf756ff440ebabe3f5541ae: 84 passed, 1 failed, 1 flaky, 46 skipped.
+- The retry-status assertion ran on /dashboard, while the Customer sync chip is rendered only in the Customer directory. The test had not opened /customers; this is an F2 test-location/precondition defect.
+- The cross-business pairing test allowed boot-time primary-device registration to establish a valid local token, then incorrectly expected that pre-existing token to be absent after a foreign pairing was rejected. The existing credential remained unchanged; this is an F2/F3 fixture precondition defect.
+- Corrected only e2e/pwa-offline.spec.js: open /customers for the status assertion; defer initial registration and establish a no-token baseline for the cross-business pairing test.
+- Production public/zazu-offline.js and resources/js/app.js are unchanged. No customer data, business record, or deployed resource was changed.
+- Exact-head re-run is pending. Keep this case OPEN until the browser workflow confirms both assertions and the full suite is green.
