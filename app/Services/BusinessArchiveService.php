@@ -132,6 +132,10 @@ final class BusinessArchiveService
         }
 
         try {
+            if ($zip->numFiles > 5000) {
+                throw new RuntimeException('The business archive contains too many entries.');
+            }
+
             $totalBytes = 0;
             for ($index = 0; $index < $zip->numFiles; $index++) {
                 $stat = $zip->statIndex($index);
@@ -168,6 +172,10 @@ final class BusinessArchiveService
             }
 
             $this->assertTargetIsEmpty($target, $definitions);
+            if (! is_array($manifest['files'] ?? null)) {
+                throw new RuntimeException('The business archive file manifest is invalid.');
+            }
+
             $filePayloads = [];
             $allowedFileColumns = [
                 'businesses' => ['logo_path', 'dashboard_image_path', 'wallpaper_path'],
@@ -395,7 +403,7 @@ final class BusinessArchiveService
                     $newId = $file['table'] === 'businesses'
                         ? (int) $target->id
                         : (int) $idMaps[$file['table']][(string) $file['id']];
-                    $path = 'business-archives/'.$target->id.'/'.Str::uuid().'/'.basename($file['original_name']);
+                    $path = 'business-archives/'.$target->id.'/'.Str::uuid().'.bin';
                     $restoreDisk = $file['table'] === 'event_attachments' ? 'private' : ($file['source_disk'] ?? 'private');
                     if (! in_array($restoreDisk, ['private', 'local', 'public'], true)
                         || ! Storage::disk($restoreDisk)->put($path, $file['bytes'])) {
