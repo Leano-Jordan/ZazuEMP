@@ -120,11 +120,7 @@ test('expired web session requires sign-in without erasing the trusted offline w
 
     // A real expired session must not make the already trusted business
     // workspace or its pending mutations disappear from device storage.
-    await page.route('**/api/sync/**', route => route.fulfill({
-        status: 401,
-        contentType: 'application/json',
-        body: JSON.stringify({ message: 'Authentication required for this test.' }),
-    }));
+    await page.route('**/api/sync/**', route => route.abort());
 
     const mutationId = await page.evaluate(async () => {
         await window.ZazuOffline.ready;
