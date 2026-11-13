@@ -141,3 +141,10 @@ These are operational defaults for legal/accounting review. They must be impleme
 - Companies Act 71 of 2008, official text: https://www.justice.gov.za/legislation/acts/2008-071.pdf
 
 Last updated: 2026-11-10.
+
+
+## Three-tier owner direction — 2026-11-13
+
+The commercial experience has three canonical tiers: **Basic**, **Intermediate** and **Advanced**. These map directly to the existing `basic`, `intermediate` and `advanced` experience-level identifiers. Basic is the permanent free continuity tier. The 30-day trial exposes Advanced and falls back to Basic Free at expiry. Intermediate is a genuine middle commercial tier, not merely a cosmetic preference.
+
+The exact Intermediate/Advanced feature allocation, quotas and public prices are not yet approved. The earlier two-tier packaging and suggestion to add a separate Team tier are superseded by this three-tier direction. Do not publish or enforce guessed feature limits. The confirmed R99/month figure remains an initial paid-subscription target only; it is not assigned to a specific tier by this note. Existing customer data and data export remain available regardless of tier or expiry.
