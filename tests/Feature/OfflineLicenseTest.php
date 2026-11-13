@@ -221,6 +221,14 @@ class OfflineLicenseTest extends TestCase
         ]);
     }
 
+    public function test_workspace_without_a_license_resolves_to_basic_free(): void
+    {
+        $user = $this->signInAsOwner();
+        $business = $user->businesses()->firstOrFail();
+
+        $this->assertSame('basic', app(OfflineLicenseService::class)->effectiveTier($business));
+    }
+
     public function test_effective_tier_falls_back_to_basic_when_a_paid_entitlement_expires(): void
     {
         $user = $this->signInAsOwner();
