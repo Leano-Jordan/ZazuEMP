@@ -1,5 +1,9 @@
 # Offline session transition and attachment hardening — 2026-11-04
 
+> **Superseding status — 2026-11-13, exact main `245aa47f7ef74e6e133fff867670ecafabb603b8`.** The open items below describe the original 2026-11-04/07 state and are historical. Current source has an active Work attachment workflow; full Playwright browser run [43473670319](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/43473670319) passed, including the active attachment suite and current session-transition tests. Laravel, dedicated offline browser acceptance and PostgreSQL recovery passed in [43473670275](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/43473670275). Same-business owner→manager hand-off, expired web-session recovery, and business-switch device installation isolation are now covered. **Physical phone/tablet acceptance remains open.** Do not use the historical “dormant client” or “not integrated into Work” statements below as current status.
+
+---
+
 ## Scope
 
 This cycle addresses the first two Director priorities in order:

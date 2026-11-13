@@ -1,3 +1,22 @@
+## 2026-11-13 — Exact-main offline session, attachment and commercial acceptance
+
+- Canonical application/test HEAD: `245aa47f7ef74e6e133fff867670ecafabb603b8`.
+- Offline session/browser matrix: **PASS** at exact head. Full Playwright browser smoke [43473670319](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/43473670319) completed successfully. Current `e2e/offline-session-transition.spec.js` covers unreachable logout host preservation, same-business account hand-off from owner to manager, and expired web-session re-authentication while preserving trusted device pairing and queued work.
+- Business-switch trust boundary: **PASS**. `BusinessContextSecurityTest::test_switching_business_cannot_rebind_a_trusted_device_to_another_business` verifies reusing an installation ID in another business returns HTTP 409, leaves the original business device/token unchanged, and requires a separate registration for the second business. Laravel suite passed.
+- Active Work attachment E2E suite: **PASS** as part of the full browser smoke. Existing tests cover offline queue, reconnect upload, server-id reconciliation, duplicate retry, private-file caching, stale-response fences after logout, and cross-tab re-pair. The active Work screen is the tested path; `public/offline-attachments.js` remains a dormant legacy file.
+- Multi-customer sync identity hand-off: **PASS** in current Laravel/offline-browser CI. Two queued customer creates receive distinct server IDs, with idempotent replay creating no duplicate customers or identity rows.
+- Laravel [43473670275](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/43473670275), PostgreSQL migration/registration/database+private-file backup restore and dedicated offline-browser-acceptance jobs: **PASS**.
+- Zazu quality [43473670378](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/43473670378), Psalm [43473670232](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/43473670232), PHPMD [43473670420](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/43473670420), populated upgrade/rollback [43473670272](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/43473670272), push-on-main [43473671064](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/43473671064), and Director Health [43475031359](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/43475031359): **PASS**.
+- SonarCloud [43473670372](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/43473670372): **SKIPPED**, not counted as a pass.
+- Commercial reconciliation: **AUTOMATED PASS** through `CommercialReconciliationTest` on this Laravel run. The populated scenario accepts a ZAR 11,500 quote/invoice, reconciles a R3,450 deposit and R8,050 final payment, records R2,800 actual event cost, and asserts R8,700 profit with 75.65% margin. This is a seeded automated scenario, not proof against the owner's live business records.
+- Recovery remains **PARTIAL**: installation-level CLI backup/restore and PostgreSQL database/private-file round-trip are implemented and CI-tested. Tenant-level restorable business archive/import is **NOT IMPLEMENTED**; 23 CSV datasets and customer import do not satisfy that requirement. The controlled installed-environment restore drill remains **OWNER VERIFICATION REQUIRED**.
+- Physical-device acceptance remains **UNVERIFIED**: real phone/tablet install on the selected secure origin, disconnected use, force-close/reopen, attachment persistence and reconnect reconciliation. Browser automation does not close this.
+- Existing two customer records in the owner's IndexedDB remain a device-side reconciliation check; do not recreate them.
+- POPIA operational controls and Zazu name/trade-mark clearance remain open. No numeric evidence score uplift is claimed; retain **71/100** pending formal re-score.
+- No production/customer data was modified by this test cycle.
+
+---
+
 ## 2026-11-13 — Multi-customer identity reconciliation guard (a6cd9b87)
 
 - Main HEAD: `a6cd9b8776f5917c942a44f55daac7b2db793ada`.

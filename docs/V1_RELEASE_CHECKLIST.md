@@ -1,3 +1,29 @@
+# Exact-main gate reconciliation — 2026-11-13
+
+**Verified application/test HEAD:** `245aa47f7ef74e6e133fff867670ecafabb603b8`.
+
+| V1 gate | Current disposition | Evidence / remaining proof |
+|---|---|---|
+| Offline account/session security | **AUTOMATED PASS** | Browser run [43473670319](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/43473670319): unreachable logout preservation, owner→manager account hand-off, expired web-session recovery. Business-switch device-ID isolation passed in Laravel run [43473670275](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/43473670275). |
+| Offline Work attachments | **AUTOMATED PASS** | Active Work attachment E2E scenarios passed in [43473670319](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/43473670319). Real phone offline attachment, restart and reconnect remain part of physical acceptance. |
+| Multi-customer offline sync identity | **AUTOMATED PASS** | Laravel + dedicated offline-browser job passed in [43473670275](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/43473670275); two local customer IDs map independently to server IDs and replay is idempotent. The owner's two existing IndexedDB records still require device-side observation; never recreate them. |
+| Business-level export/import | **NOT IMPLEMENTED** | The current 23 tenant-scoped CSV exports and customer-only import are not a restorable business archive. A tenant-scoped, relationship-complete archive including uploaded files is still required. |
+| Installation recovery | **CI PASS / OWNER DRILL OPEN** | PostgreSQL migration, registration, database+private-file backup/restore passed in [43473670275](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/43473670275). Follow `docs/RELEASE_BACKUP_RESTORE_RUNBOOK.md` on an isolated installed target; CI is not the real installation drill. |
+| Quote → payment → profit | **AUTOMATED PASS** | `CommercialReconciliationTest` passed within [43473670275](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/43473670275): accepted R11,500 quote/invoice, R3,450 deposit, R8,050 final payment, R2,800 actual cost, R8,700 profit, 75.65% margin. This is seeded test evidence, not a live customer-record walkthrough. |
+| Physical disconnected-phone acceptance | **OWNER VERIFICATION REQUIRED** | Install on selected secure origin; disconnect; create/update records and attachments; force-close/reopen; reconnect; confirm exactly-once sync and preserved files. |
+| POPIA operational controls and brand clearance | **OPEN** | Operational privacy/retention/incident handling must be verified; Zazu name/trade-mark search and professional clearance remain outstanding. |
+
+## Exact-head automation
+
+- Laravel [43473670275](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/43473670275): **PASS**, including PostgreSQL migration/registration/recovery and dedicated offline-browser acceptance.
+- Full Playwright browser smoke [43473670319](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/43473670319): **PASS**.
+- Zazu quality [43473670378](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/43473670378), Psalm [43473670232](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/43473670232), PHPMD [43473670420](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/43473670420), populated upgrade/rollback [43473670272](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/43473670272), push-on-main [43473671064](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/43473671064), Director Health [43475031359](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/43475031359): **PASS**.
+- SonarCloud [43473670372](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/43473670372): **SKIPPED**, not a pass.
+
+**Release disposition: NOT YET READY.** Automated offline session/attachment and commercial reconciliation coverage is green. Tenant archive/import, real installation recovery drill, physical phone acceptance, POPIA operations and name clearance remain open. Evidence score remains 71/100; no uplift claimed.
+
+---
+
 ## Multi-customer sync identity acceptance — 2026-11-13 (a6cd9b87)
 
 - Server-side regression test now pushes two offline customer creates in one batch, asserts each local UUID receives its own distinct persisted server ID, then replays the identical batch and verifies there are still exactly two customer rows and two customer identity rows.

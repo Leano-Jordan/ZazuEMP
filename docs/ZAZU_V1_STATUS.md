@@ -1,3 +1,42 @@
+# Zazu EMP — current V1 gate status (2026-11-13)
+
+**Canonical repository:** `Leano-Jordan/ZazuEMP`  
+**Canonical branch:** `main`  
+**Verified application/test HEAD:** `245aa47f7ef74e6e133fff867670ecafabb603b8`.
+
+## Current release position
+
+The exact-head automated test batch now passes for offline session transitions, active Work attachments, tenant/device isolation, multi-customer sync identity reconciliation, commercial reconciliation, PostgreSQL migration/backup/restore, static quality and populated upgrade/rollback.
+
+**Technical V1 is still NO-GO for owner acceptance**, not because these automated suites are failing, but because the installed-device and operational recovery checks have not been completed. The business-level restorable archive is also not implemented.
+
+## Current V1 reconciliation
+
+- **Offline account/session security — AUTOMATED PASS.** Chromium browser acceptance verifies interrupted logout preserves the signed-in session and queued work; switching from owner to manager in the same business preserves the trusted business workspace; expired web-session re-authentication preserves the pending offline mutation and device pairing. Business-switch installation-ID reuse is rejected with HTTP 409 without changing the original business's trusted device.
+- **Offline Work attachments — AUTOMATED PASS.** The active Work attachment workflow passes browser acceptance for local queueing, reconnect upload, server-ID reconciliation, duplicate retry, offline file reuse, cross-tab re-pair and stale asynchronous response protection. Do not count the dormant `public/offline-attachments.js` as the active implementation.
+- **Multi-customer sync — AUTOMATED PASS.** Two queued customer creates reconcile to distinct server IDs and replay without duplicates. The owner's actual existing IndexedDB customers remain unobserved by CI and must not be recreated.
+- **Commercial reconciliation — AUTOMATED PASS.** A seeded scenario validates the complete accepted quote → invoice → deposit → final payment → actual cost → event profit path. Values: R11,500 invoiced; R3,450 deposit; R8,050 final payment; R2,800 actual cost; R8,700 profit; 75.65% margin. This is not a claim that live customer records have been manually checked.
+- **Business data portability — PARTIAL.** Twenty-three business-scoped CSV datasets are exportable and customer CSV/XLSX import preview exists. These do not provide a relationship-complete business backup/import or restore uploaded files. A tenant-scoped archive/import remains open.
+- **Installation recovery — CI VERIFIED, OPERATOR DRILL OPEN.** The CLI backup/restore supports SQLite, MySQL and PostgreSQL; PostgreSQL database and private-file round-trip passes in CI. The controlled installed-environment recovery drill remains required.
+- **Physical acceptance — OWNER VERIFICATION REQUIRED.** Real secure-origin phone/tablet installation, disconnected workflow, local record and attachment persistence, force-close/reopen and reconnect sync remain unverified.
+- **POPIA / legal / brand — OPEN.** Operational controls, retention/disposal ownership, incident handling, and professional Zazu name/trade-mark clearance remain to be completed.
+
+## Exact-head CI evidence
+
+- Laravel + PostgreSQL + dedicated offline browser acceptance: [43473670275](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/43473670275) — **PASS**.
+- Full Playwright browser regression: [43473670319](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/43473670319) — **PASS**.
+- Zazu quality: [43473670378](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/43473670378) — **PASS**.
+- Psalm: [43473670232](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/43473670232) — **PASS**.
+- PHPMD: [43473670420](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/43473670420) — **PASS**.
+- Populated upgrade/rollback: [43473670272](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/43473670272) — **PASS**.
+- Push-on-main: [43473671064](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/43473671064) — **PASS**.
+- Director Health: [43475031359](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/43475031359) — **PASS**.
+- SonarCloud: [43473670372](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/43473670372) — **SKIPPED**, not counted as a pass.
+
+**Evidence-maturity score remains 71/100** pending a formal re-score. Passing test corrections do not automatically justify a score increase.
+
+---
+
 # Zazu EMP — V1 Software / Commercial Status
 
 **Assessment date:** 2026-11-09  
