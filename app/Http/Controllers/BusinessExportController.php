@@ -12,6 +12,7 @@ use App\Support\CurrentBusiness;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
 use Symfony\Component\HttpFoundation\StreamedResponse;
+use Symfony\Component\HttpFoundation\BinaryFileResponse;
 
 class BusinessExportController extends Controller
 {
@@ -33,7 +34,7 @@ class BusinessExportController extends Controller
         Request $request,
         BusinessArchiveService $archives,
         CurrentBusiness $currentBusiness,
-    ) {
+    ): BinaryFileResponse {
         $business = $currentBusiness->model($request->user());
         $path = $archives->download($business);
 
