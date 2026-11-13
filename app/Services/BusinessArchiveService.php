@@ -150,10 +150,29 @@ final class BusinessArchiveService
 
             $this->assertTargetIsEmpty($target, $definitions);
             $filePayloads = [];
+            $allowedFileColumns = [
+                'businesses' => ['logo_path', 'dashboard_image_path', 'wallpaper_path'],
+                'business_capabilities' => ['image_path'],
+                'customers' => ['profile_photo_path'],
+                'compliance_documents' => ['storage_path'],
+                'event_attachments' => ['path'],
+            ];
             foreach (($manifest['files'] ?? []) as $file) {
                 $entry = (string) ($file['entry'] ?? '');
-                if (! Str::startsWith($entry, 'payload/files/') || str_contains($entry, '..')) {
-                    throw new RuntimeException('The archive contains an unsafe file path.');
+                $table = (string) ($file['table'] ?? '');
+                $column = (string) ($file['column'] ?? '');
+                if (! Str::startsWith($entry, 'payload/files/')
+                    || str_contains($entry, '..')
+                    || ! in_array($column, $allowedFileColumns[$table] ?? [], true)
+                    || ($table === 'event_attachments' && ($file['disk_column'] ?? null) !== 'disk')
+                    || ($table !== 'event_attachments' && ($file['disk_column'] ?? null) !== null)) {
+                    throw new RuntimeException('The archive contains an unsafe file reference.');
+                }
+                $validIds = $table === 'businesses'
+                    ? [(int) $target->id]
+                    : array_map('intval', array_column($data[$table] ?? [], 'id'));
+                if (! in_array((int) ($file['id'] ?? 0), $validIds, true)) {
+                    throw new RuntimeException('The archive contains a file reference outside its business dataset.');
                 }
                 $bytes = $zip->getFromName($entry);
                 if ($bytes === false) {
@@ -193,8 +212,16 @@ final class BusinessArchiveService
                 return;
             }
             $diskName = $disk ?: 'private';
-            if ($diskName !== 'private' || ! Storage::disk('private')->exists($path)) {
-                throw new RuntimeException("A referenced private business file is missing: {$table}#{$id}.");
+            $candidates = $disk !== null ? [$diskName] : ['private', 'local', 'public'];
+            $sourceDisk = null;
+            foreach ($candidates as $candidate) {
+                if (Storage::disk($candidate)->exists($path)) {
+                    $sourceDisk = $candidate;
+                    break;
+                }
+            }
+            if ($sourceDisk === null) {
+                throw new RuntimeException("A referenced business file is missing: {$table}#{$id}.");
             }
             $entry = 'payload/files/'.Str::uuid().'.bin';
             $references[] = [
@@ -202,6 +229,7 @@ final class BusinessArchiveService
                 'id' => $id,
                 'column' => $column,
                 'disk_column' => $disk !== null ? 'disk' : null,
+                'source_disk' => $sourceDisk,
                 'entry' => $entry,
                 'original_name' => basename($path),
             ];
@@ -225,7 +253,7 @@ final class BusinessArchiveService
                 'businesses' => $business->{$reference['column']},
                 default => collect($data[$reference['table']])->firstWhere('id', $reference['id'])[$reference['column']],
             };
-            $contents[$reference['entry']] = Storage::disk('private')->get($sourcePath);
+            $contents[$reference['entry']] = Storage::disk($reference['source_disk'])->get($sourcePath);
         }
         unset($reference);
 
@@ -266,7 +294,10 @@ final class BusinessArchiveService
                 foreach ($definitions as $table => $definition) {
                     $foreignKeys = Schema::getForeignKeys($table);
                     foreach ($data[$table] as $sourceRow) {
-                        $oldId = (int) $sourceRow['id'];
+                        $oldId = (int) ($sourceRow['id'] ?? 0);
+                        if ($oldId < 1 || array_diff(array_keys($sourceRow), Schema::getColumnListing($table)) !== []) {
+                            throw new RuntimeException("Restore stopped: invalid row structure in {$table}.");
+                        }
                         $row = $sourceRow;
                         unset($row['id']);
 
