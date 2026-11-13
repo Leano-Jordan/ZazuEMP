@@ -2465,5 +2465,5 @@ Verification boundary: source was re-fetched from `main` and the retry implement
 - Reconciled two engineering-record defects: CASE-ZAZU-0029 / ENG-FIXTURE-004 now CLOSED in ERROR_INDEX, matching FAILURE_CASES; duplicate REG-015 was corrected by assigning the offline business-context cache control REG-023.
 - Reviewed active business context, business-owned model writes, signed offline licensing/entitlement, finance transaction integrity and purchase-order receiving. No additional reproducible application defect was confirmed in those inspected paths.
 - Audit report: `docs/DIRECTOR_DEEP_AUDIT_2026-11-13.md`.
-- Latest branch checkpoint after audit documentation: `974bd033b35b863062b291d5454fa86ab40c0d18`. Fresh exact-head workflows are queued/running; do not promote the prior source-checkpoint results to the new SHA until reruns complete.
+- Latest branch checkpoint after audit documentation: `c750279c5ebc069cec15b921473e866ef62e8766`. Fresh exact-head workflows are queued/running; do not promote the prior source-checkpoint results to the new SHA until reruns complete.
 - Remaining V1 acceptance: exact-head browser smoke and real installed phone/tablet acceptance against the release candidate. Scope remains frozen; no speculative gates were added.
