@@ -1,3 +1,18 @@
+## Director reconciliation — 2026-11-13 (offline scope frozen)
+
+This entry supersedes the older 2026-11-11 execution snapshot below where it conflicts with newer verified evidence. The owner-directed V1 scope freeze remains binding.
+
+- **Verified application/test source:** `30e259d445c614df6d1b2495c5a5e505a6d36443` on `main`.
+- **Exact-source workflow:** [43504654649](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/43504654649) passed Laravel, PostgreSQL migration/database/private-file backup-restore, and dedicated offline-browser acceptance. The disconnected Work-attachment reload regression is included.
+- **Service-worker navigation regressions:** [43504020001](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/43504020001) passed transient-503 cached navigation fallback and 401/403 non-fallback coverage.
+- **Evidence maturity:** 71/100, formally recorded in [the V1 scorecard](../docs/ZAZU_V1_SCORECARD_2026-11-04.md). Recovery/data portability is 4/5 based on automated business archive and installation backup/restore evidence. Offline continuity remains 3/5; physical Android installed-device acceptance is not claimed.
+- **Current release disposition:** NOT READY. Remaining acceptance obligations are the bounded physical-device check, installed-target operator recovery drill, live commercial-record reconciliation, and POPIA/privacy/brand closure. Seeded commercial workflow automation is already verified; do not reopen it without a reproducible defect.
+- **Current Director focus:** offline engineering is paused by owner direction. Do not modify the service worker, IndexedDB, attachment queue, offline sync, or PWA installation path unless the owner resumes that work or a separate critical regression is demonstrated.
+- **No scope expansion:** do not turn speculative concurrency, accessibility, deployment-target, or future-hosting concerns into new V1 gates. Work only on a reproducible defect in an agreed V1 workflow or an explicitly approved requirement.
+- No deployment, production data, customer data, database, or non-main branch was changed in this reconciliation.
+
+---
+
 ## Owner-directed V1 finish decision — 2026-11-12
 
 This section supersedes older open-gate wording below where it conflicts with the owner's current scope direction.
