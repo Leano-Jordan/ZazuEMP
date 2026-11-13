@@ -1866,3 +1866,112 @@ html[data-theme="dark"] body.zazu-dashboard-page .zazu-sidebar .zazu-nav-area-tr
     background: #344653 !important;
     color: #E5EBF0 !important;
 }
+
+
+/* --------------------------------------------------------------------------
+   DIRECTOR FIX — restore dashboard layout rhythm after accumulated overrides.
+   Keep the reference-led navy navigation and give the dashboard a real layout
+   system: page gutters, separated overview/actions, and responsive panels.
+   -------------------------------------------------------------------------- */
+body.zazu-dashboard-page .zazu-content {
+    width: 100% !important;
+    min-width: 0 !important;
+    padding: 28px clamp(18px, 2.2vw, 34px) 42px !important;
+}
+
+body.zazu-dashboard-page .zazu-dash-hero {
+    display: grid !important;
+    grid-template-columns: minmax(0, 1fr) minmax(260px, .72fr) !important;
+    min-height: 138px !important;
+    margin: 0 0 20px !important;
+}
+
+body.zazu-dashboard-page .zazu-dash-overview {
+    display: grid !important;
+    grid-template-columns: minmax(0, 1fr) !important;
+    gap: 16px !important;
+    margin: 0 0 20px !important;
+}
+
+body.zazu-dashboard-page .zazu-dash-metrics {
+    display: grid !important;
+    grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)) !important;
+    gap: 14px !important;
+    margin: 0 !important;
+}
+
+body.zazu-dashboard-page .zazu-dash-quick-actions {
+    min-width: 0 !important;
+    margin: 0 !important;
+}
+
+body.zazu-dashboard-page .zazu-dash-quick-actions .zazu-dash-actions {
+    display: grid !important;
+    grid-template-columns: repeat(auto-fit, minmax(205px, 1fr)) !important;
+    gap: 12px !important;
+}
+
+body.zazu-dashboard-page .zazu-dash-grid[aria-label="Operational dashboard panels"] {
+    display: grid !important;
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+    align-items: start !important;
+    gap: 16px !important;
+    margin: 0 !important;
+}
+
+body.zazu-dashboard-page .zazu-dash-grid[aria-label="Operational dashboard panels"] > .zazu-dash-surface {
+    min-width: 0 !important;
+    min-height: 100% !important;
+    margin: 0 !important;
+}
+
+body.zazu-dashboard-page .zazu-dash-surface-head {
+    min-height: 54px !important;
+    padding: 13px 16px !important;
+}
+
+body.zazu-dashboard-page .zazu-dash-timeline,
+body.zazu-dashboard-page .zazu-dash-focus-grid,
+body.zazu-dashboard-page .zazu-dash-resource-grid,
+body.zazu-dashboard-page .zazu-dash-quote-stages {
+    min-width: 0 !important;
+}
+
+@media (max-width: 980px) {
+    body.zazu-dashboard-page .zazu-content {
+        padding: 22px 18px 34px !important;
+    }
+
+    body.zazu-dashboard-page .zazu-dash-hero {
+        grid-template-columns: minmax(0, 1fr) !important;
+    }
+
+    body.zazu-dashboard-page .zazu-dash-hero-side {
+        border-left: 0 !important;
+        border-top: 1px solid var(--dash-border) !important;
+    }
+
+    body.zazu-dashboard-page .zazu-dash-grid[aria-label="Operational dashboard panels"] {
+        grid-template-columns: minmax(0, 1fr) !important;
+    }
+}
+
+@media (max-width: 600px) {
+    body.zazu-dashboard-page .zazu-content {
+        padding: 16px 12px 28px !important;
+    }
+
+    body.zazu-dashboard-page .zazu-dash-metrics {
+        grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+        gap: 10px !important;
+    }
+
+    body.zazu-dashboard-page .zazu-dash-metric {
+        min-height: 88px !important;
+        padding: 12px !important;
+    }
+
+    body.zazu-dashboard-page .zazu-dash-quick-actions .zazu-dash-actions {
+        grid-template-columns: minmax(0, 1fr) !important;
+    }
+}
