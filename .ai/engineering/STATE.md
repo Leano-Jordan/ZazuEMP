@@ -2428,3 +2428,19 @@ Verification boundary: source was re-fetched from `main` and the retry implement
 - Required reporting is outcome-first and proportional: material result, evidence, changed surface, genuine blocker and next in-scope action only.
 - This instruction applies across future sessions and must not require the owner to repeat it.
 - Commits: Director contract `5251da2c45a91912f805a71c880ca8c89b254d99`; communication reference `e8ed91954946ddcd2b4d86d06cf6a55d95c2fd26`.
+
+
+## 2026-11-13 — V1 visual test contract reconciliation
+
+- Active target: restore consistency between visual regression tests and the current canonical theme tokens in `resources/css/app.css`; application CSS and rendered UI were not changed.
+- Corrected stale test expectations in:
+  - `tests/Feature/InterfaceRegressionTest.php`
+  - `tests/Feature/UiDashboardResponsiveTest.php`
+  - `tests/Feature/UiShellThemeRegressionTest.php`
+  - `tests/Feature/UiAccessibilityTest.php`
+  - `tests/Feature/UiProportionFoundationTest.php`
+- The assertions now match the actual light/dark palette and token ownership: `app.css` owns theme tokens; `zazu-product-authority.css` is a component extension and must not own root token blocks.
+- Each changed test file was re-fetched from `main`; the updated representative assertions were confirmed present.
+- Commits: `37f104a5a57b12e25dc8f8b301474cd4e022e8a6`, `025be00a81eabeb6f4e4a1395813a184f470f385`, `e4cd447a44aee7856bed92fc314b9314491a6b86`, `f72e9447766fbbe2646196f92b68c12db8921a59`, `79c86865c82ead240d09662022937a1e02b76d7b`.
+- Verification boundary: GitHub combined status currently returns no status contexts for the latest commit. PHPUnit, PHPMD and exact-head workflow results are **PENDING / UNVERIFIED**. No application CSS, UI, business data or database was changed.
+- Next active target: inspect the resulting exact-head Laravel and PHPMD output; address only failures still present after this test-contract correction.
