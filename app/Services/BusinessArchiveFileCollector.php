@@ -69,25 +69,9 @@ final class BusinessArchiveFileCollector
         if (! $path) {
             return;
         }
-        if (Str::contains($path, ['..', '\\'])) {
-            throw new RuntimeException("A referenced business file path is unsafe: {$table}#{$id}.");
-        }
 
-        $diskName = $disk ?: 'private';
-        if ($disk !== null && ! in_array($diskName, ['private', 'local'], true)) {
-            throw new RuntimeException("An attachment uses an unsupported storage disk: {$table}#{$id}.");
-        }
-        $candidates = $disk !== null ? [$diskName] : ['private', 'local', 'public'];
-        $sourceDisk = null;
-        foreach ($candidates as $candidate) {
-            if (Storage::disk($candidate)->exists($path)) {
-                $sourceDisk = $candidate;
-                break;
-            }
-        }
-        if ($sourceDisk === null) {
-            throw new RuntimeException("A referenced business file is missing: {$table}#{$id}.");
-        }
+        $this->assertSafePath($path, $table, $id);
+        $sourceDisk = $this->resolveSourceDisk($path, $disk, $table, $id);
 
         $references[] = [
             'table' => $table,
@@ -98,6 +82,30 @@ final class BusinessArchiveFileCollector
             'entry' => 'payload/files/'.Str::uuid().'.bin',
             'original_name' => basename($path),
         ];
+    }
+
+    private function assertSafePath(string $path, string $table, int $id): void
+    {
+        if (Str::contains($path, ['..', '\\\\'])) {
+            throw new RuntimeException("A referenced business file path is unsafe: {$table}#{$id}.");
+        }
+    }
+
+    private function resolveSourceDisk(string $path, ?string $disk, string $table, int $id): string
+    {
+        $diskName = $disk ?: 'private';
+        if ($disk !== null && ! in_array($diskName, ['private', 'local'], true)) {
+            throw new RuntimeException("An attachment uses an unsupported storage disk: {$table}#{$id}.");
+        }
+
+        $candidates = $disk !== null ? [$diskName] : ['private', 'local', 'public'];
+        foreach ($candidates as $candidate) {
+            if (Storage::disk($candidate)->exists($path)) {
+                return $candidate;
+            }
+        }
+
+        throw new RuntimeException("A referenced business file is missing: {$table}#{$id}.");
     }
 
     private function readFileContents(Business $business, array $data, array $references): array
