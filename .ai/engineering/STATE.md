@@ -2258,3 +2258,12 @@ Source review found that authenticated sync pull/acknowledgement accepted arbitr
 - No module-level feature gates, event/user/storage quotas, customer-data route middleware, data mutation/deletion, deployment or Render configuration changes were made.
 - Commercial matrix: Basic Free; Intermediate paid (price/features unapproved); Advanced paid (R99/workspace/month remains a working target, not a published offer). Proposed 5-event, 3-user, 250 MB and 2 GB restrictions remain unapproved and unenforced.
 - CI/runtime verification must be read against the latest commit before claiming acceptance. Render and deployment configuration remain untouched.
+
+## Setup tier display consistency — 2026-11-13
+
+- The Setup Centre previously displayed the member's raw saved experience preference. After trial expiry or licence downgrade, that could show Advanced even though the effective workspace experience had correctly been clamped to Basic.
+- Updated the Setup Centre controller to display the effective entitlement-clamped level while using the stored preference only to determine whether the member has completed the choice. The saved preference remains unchanged and can be restored by a later valid upgrade.
+- Added a regression test covering expired-trial Setup Centre display and preservation of the saved Advanced preference.
+- Commits: `dbddbc9907be76ddf286c2685deea8deb604806d` (controller), `c9cc78850829a6392c2dd4f7323137763f46cdbc` (regression test).
+- Updated the commercial operating profile to state explicitly that the earlier 250 MB / 2 GB storage figures and all tier quotas remain proposals, not approved policy. The complete Basic / Intermediate / Advanced matrix must be approved before restrictions are implemented or published (`9f6f627457009eb003f2aa4839232910d32ec164`).
+- Latest CI for these commits: pending verification. Previous exact-head baseline CI passed Laravel tests, PostgreSQL migration/registration/backup-restore smoke, offline browser acceptance, browser smoke, quality, Psalm, PHPMD, populated upgrade/rollback and Director Contract Lint. No deployment or Render changes were made.
