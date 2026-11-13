@@ -18,6 +18,14 @@ class OfflineLicenseService
         return $business->license;
     }
 
+    /**
+     * Resolve the workspace tier without ever locking out an unlicensed workspace.
+     */
+    public function effectiveTier(Business $business): string
+    {
+        return $this->current($business)?->effectiveTier() ?? 'basic';
+    }
+
     public function isValid(Business $business): bool
     {
         return $this->current($business)?->isActive() ?? false;
