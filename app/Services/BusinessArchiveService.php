@@ -380,7 +380,10 @@ final class BusinessArchiveService
                                     continue;
                                 }
 
-                                $oldForeignId = $row[$column] ?? null;
+                                // A column may participate in both a simple FK and a
+                                // composite tenant FK. Always resolve from the archived
+                                // value so processing the second constraint is idempotent.
+                                $oldForeignId = $sourceRow[$column] ?? null;
                                 if ($oldForeignId === null) {
                                     continue;
                                 }
