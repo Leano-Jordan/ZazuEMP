@@ -1000,6 +1000,10 @@ function setupZazuOfflineDirectoryViews() {
             label: 'Re-pair required',
             title: state.last_sync_error || 'This device must be paired again before queued changes can sync.',
         };
+        if (state?.sync_registration_blocked) return {
+            label: 'Needs attention',
+            title: state.last_sync_error || 'The owner must resolve this device registration before queued changes can sync.',
+        };
         if (state?.last_sync_error) return {
             label: 'Retrying sync',
             title: state.last_sync_error,
