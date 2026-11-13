@@ -984,6 +984,36 @@ function setupZazuOfflineDirectoryViews() {
         return node;
     };
 
+    const localSyncStatus = (state, entityType, localId, serverId) => {
+        if (serverId) return { label: 'Synced', title: 'This record has a server identity.' };
+
+        const conflict = (state?.conflicts || []).find(item =>
+            item.status === 'open'
+            && item.entity_type === entityType
+            && String(item.entity_id || '') === String(localId || '')
+        );
+        if (conflict) return {
+            label: 'Needs attention',
+            title: conflict.message || 'This saved change needs review before it can sync.',
+        };
+        if (state?.sync_authorization_required) return {
+            label: 'Re-pair required',
+            title: state.last_sync_error || 'This device must be paired again before queued changes can sync.',
+        };
+        if (state?.last_sync_error) return {
+            label: 'Retrying sync',
+            title: state.last_sync_error,
+        };
+        if (!navigator.onLine) return {
+            label: 'Waiting for connection',
+            title: 'Saved on this device. It will sync when Zazu reconnects.',
+        };
+        return {
+            label: 'Waiting to sync',
+            title: 'Saved on this device and queued for synchronisation.',
+        };
+    };
+
     const renderCustomers = (state) => {
         const directory = document.querySelector('.zazu-customer-directory');
         if (!directory) return;
@@ -1033,7 +1063,11 @@ function setupZazuOfflineDirectoryViews() {
 
             const sync = document.createElement('div');
             sync.className = 'zazu-action-group';
-            sync.append(text('span', 'zazu-chip zazu-chip-neutral', (customer.server_id ?? customer.id) ? 'Synced' : 'Waiting to sync'));
+            const syncStatus = localSyncStatus(state, 'customer', customer.local_id, customer.server_id ?? customer.id);
+            const syncChip = text('span', 'zazu-chip zazu-chip-neutral', syncStatus.label);
+            syncChip.title = syncStatus.title;
+            syncChip.setAttribute('aria-label', syncStatus.label + '. ' + syncStatus.title);
+            sync.append(syncChip);
 
             row.append(identity, work, sync);
             if (empty?.parentNode === directory) directory.insertBefore(row, empty);
@@ -1110,14 +1144,22 @@ function setupZazuOfflineDirectoryViews() {
                 })(),
                 (() => {
                     const status = document.createElement('span');
-                    status.append(text('span', 'zazu-chip zazu-chip-neutral', (job.server_id ?? job.id) ? 'Synced' : 'Saved offline'));
+                    const syncStatus = localSyncStatus(state, 'job', job.local_id, job.server_id ?? job.id);
+                    const chip = text('span', 'zazu-chip zazu-chip-neutral', syncStatus.label);
+                    chip.title = syncStatus.title;
+                    chip.setAttribute('aria-label', syncStatus.label + '. ' + syncStatus.title);
+                    status.append(chip);
                     return status;
                 })()
             );
 
             const actions = document.createElement('div');
             actions.className = 'zazu-ops-actions';
-            actions.append(text('span', 'zazu-chip zazu-chip-neutral', (job.server_id ?? job.id) ? 'On server' : 'Waiting to sync'));
+            const syncStatus = localSyncStatus(state, 'job', job.local_id, job.server_id ?? job.id);
+            const syncChip = text('span', 'zazu-chip zazu-chip-neutral', syncStatus.label);
+            syncChip.title = syncStatus.title;
+            syncChip.setAttribute('aria-label', syncStatus.label + '. ' + syncStatus.title);
+            actions.append(syncChip);
 
             if (!(job.server_id ?? job.id)) {
                 const attachmentInput = document.createElement('input');
