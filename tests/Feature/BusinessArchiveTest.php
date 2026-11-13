@@ -3,6 +3,7 @@
 namespace Tests\Feature;
 
 use App\Models\Business;
+use App\Models\BusinessCapability;
 use App\Models\Customer;
 use App\Models\CustomerContact;
 use App\Models\Event;
