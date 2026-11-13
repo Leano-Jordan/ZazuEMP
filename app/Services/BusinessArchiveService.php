@@ -151,6 +151,11 @@ final class BusinessArchiveService
                 throw new RuntimeException('This business archive version is not supported by this Zazu installation.');
             }
 
+            if (! is_array($manifest['source_business'] ?? null)
+                || (int) ($manifest['source_business']['id'] ?? 0) < 1) {
+                throw new RuntimeException('The business archive source profile is invalid.');
+            }
+
             $data = json_decode((string) $zip->getFromName('data.json'), true, 512, JSON_THROW_ON_ERROR);
             if (! is_array($data)) {
                 throw new RuntimeException('The business archive data is missing or invalid.');
