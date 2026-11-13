@@ -1,3 +1,37 @@
+## Director formal re-score — 2026-11-13
+
+**Verified application/test source:** `30e259d445c614df6d1b2495c5a5e505a6d36443` on `main`. Documentation-only reconciliation followed; no application/test source changed after this verified source head.
+
+**Evidence:** Laravel workflow [43504654649](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/43504654649) completed successfully. Laravel feature/unit suite, PostgreSQL migration plus database/private-file backup/restore smoke, and dedicated offline-browser acceptance all passed. The offline-browser run includes the new disconnected Work-attachment page-reload persistence assertion. The earlier service-worker navigation regression run [43504020001](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/43504020001) also passed the 503 cached-page fallback and 401/403 non-fallback cases.
+
+### Current 13-domain scorecard
+
+| V1 specification area | Score | Evidence and remaining boundary |
+|---|---:|---|
+| Platform, accounts, onboarding | **4/5** | Laravel and browser regression suites pass; real customer onboarding acceptance remains. |
+| Core lifecycle: client → event → work → completion | **4/5** | Populated lifecycle regression coverage passes; realistic operator acceptance remains. |
+| Commercial workflow: quote → acceptance → invoice → deposit → payment | **4/5** | Seeded quote/payment/cost/profit reconciliation passes; real business-record reconciliation remains. |
+| Purchasing, receiving, inventory, costs | **4/5** | Purchasing, receiving, stock and event-cost regression coverage passes; physical stock/GRN reconciliation remains. |
+| Data integrity and auditability | **4/5** | Transaction, idempotency, ownership, archive relationship-remapping and tenant-isolation tests pass; real concurrency proof remains. |
+| Security and tenant isolation | **4/5** | Psalm, secret scan and Laravel tenant/session regressions pass; physical trusted-device/lost-device acceptance remains. |
+| Offline continuity | **3/5** | Business-scoped IndexedDB workspace, durable queue, reconnect, cached navigation and disconnected document-reload recovery are automated-verified; real Android cold-launch and supported workflow acceptance remain. This is not full offline parity. |
+| Documents and attachments | **4/5** | Active Work attachment queue, IndexedDB file persistence across page reload, reconnect upload, idempotency and tenant/job scoping pass browser acceptance; physical force-close/reopen persistence remains. |
+| Search, reporting and Zazu Helper | **3/5** | Permission-aware search and reporting foundations exist; complete customer-data usability acceptance remains. |
+| UX, mobile, tablet and accessibility | **3/5** | Responsive browser coverage exists; physical device and complete accessibility acceptance remain. |
+| Recovery and data portability | **4/5** | Tenant-scoped `.zazu` business archive round-trip, linked-record remapping, tenant exclusion and private/public file payloads pass CI; PostgreSQL installation backup/private-file restore passes CI. Actual installed-target operator recovery drill remains. |
+| Deployment, upgrade and rollback | **4/5** | Populated upgrade/rollback automation passes; real target-environment deployment rollback remains. |
+| Legal, privacy and brand clearance | **1/5** | Operational POPIA/privacy controls, retention and incident procedures, and official Zazu name clearance remain open. |
+
+**Evidence-maturity average: 46/65 = 3.54/5 — 70.8/100, reported as 71/100.**
+
+**Change from prior formal score: +2 points (69 → 71).** The sole numerical uplift is Recovery and data portability, from 3/5 to 4/5, based on passing tenant-scoped archive round-trip/tenant-isolation and installation backup/private-file recovery automation. Offline continuity remains 3/5: browser evidence improved, but the Android installed-device gap has not been physically verified.
+
+### Release disposition
+
+**V1 remains NOT READY.** Remaining owner/operational gates are secure-origin Android install and disconnected cold-launch/workflow acceptance; actual installed-target recovery drill; live commercial record reconciliation; and POPIA/privacy/brand closure. CI evidence does not substitute for those checks. No production deployment or live customer data was changed.
+
+---
+
 # Zazu EMP — V1 Specification Scorecard
 
 **Original baseline assessment:** 2026-11-04  
@@ -7,7 +41,7 @@
 **Current verified source/test HEAD:** `d55539ddfd52c7fa5140714288c5885dbcc99e3a`  
 **Evidence status:** required current-head automated CI passed; physical acceptance remains open; not release certification.
 
-## Director formal re-score — 2026-11-09
+## Historical formal re-score — 2026-11-09
 
 **Current verified application/test HEAD:** `d55539ddfd52c7fa5140714288c5885dbcc99e3a`  
 **Evidence:** exact-head Laravel, browser, quality, security, static-analysis and populated upgrade/rollback checks passed. Director Contract Lint passed on the preceding control-plane documentation commit and was not triggered by this test-only source commit. This is an evidence-maturity re-score, not a commercial release approval.
