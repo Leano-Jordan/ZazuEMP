@@ -2,7 +2,7 @@
 
 - Extended `e2e/offline-attachment-sync.spec.js` so the active Work attachment test now reloads the job page while browser connectivity is disabled, then reopens the attachment queue through `window.ZazuOffline` and verifies the original file is still present before reconnect/upload.
 - This closes a test-coverage gap: the prior scenario proved IndexedDB queueing and reconnect within one live document, but did not prove recovery after the document's JavaScript heap is discarded.
-- Test commit: `30e259d445c614df6d1b2495c5a5e505a6d36443`. Exact-head offline-browser CI result is pending; no physical Android force-stop claim is made.
+- Test commit: `30e259d445c614df6d1b2495c5a5e505a6d36443`. Exact-head Laravel workflow [43504654649](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/43504654649) completed successfully: Laravel tests, PostgreSQL migration/backup/restore smoke, and offline-browser acceptance all passed, including the disconnected reload attachment test. This is browser automation evidence, not a physical Android force-stop claim.
 - The preceding service-worker 5xx fallback and 401/403 non-fallback regressions passed in Laravel workflow [43504020001](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/43504020001) on source commit `73734e7d5553eb9bb7b13cc519ac46f0b5266f35`; the workflow completed Laravel, PostgreSQL and offline-browser jobs successfully.
 - No production data, deployment, local database or non-main branch changed.
 
