@@ -168,6 +168,52 @@ class BusinessArchiveTest extends TestCase
         $this->assertSame(['source' => 'archive'], $restoredLog->metadata);
     }
 
+    public function test_restore_rejects_duplicate_source_record_ids_before_writing(): void
+    {
+        Storage::fake('private');
+        $this->signInAsOwner();
+        $source = auth()->user()->businesses()->firstOrFail();
+        Customer::create(['business_id' => $source->id, 'name' => 'Duplicate ID Customer']);
+        $archive = app(BusinessArchiveService::class)->download($source);
+
+        $zip = new \\ZipArchive();
+        $this->assertTrue($zip->open($archive) === true);
+        $data = json_decode((string) $zip->getFromName('data.json'), true, 512, JSON_THROW_ON_ERROR);
+        $duplicate = $data['customers'][0];
+        $duplicate['name'] = 'Injected Duplicate Customer';
+        $data['customers'][] = $duplicate;
+        $zip->deleteName('data.json');
+        $zip->addFromString('data.json', json_encode($data, JSON_THROW_ON_ERROR));
+        $zip->close();
+
+        $target = Business::create([
+            'name' => 'Duplicate ID Target',
+            'slug' => 'duplicate-id-target',
+            'status' => 'active',
+            'currency' => 'ZAR',
+        ]);
+
+        try {
+            try {
+                app(BusinessArchiveService::class)->restore($archive, $target);
+                $this->fail('Duplicate source record identifiers must be rejected.');
+            } catch (\\RuntimeException $exception) {
+                $this->assertStringContainsString('duplicate record identifier', $exception->getMessage());
+            }
+        } finally {
+            @unlink($archive);
+        }
+
+        $this->assertDatabaseMissing('customers', [
+            'business_id' => $target->id,
+            'name' => 'Duplicate ID Customer',
+        ]);
+        $this->assertDatabaseMissing('customers', [
+            'business_id' => $target->id,
+            'name' => 'Injected Duplicate Customer',
+        ]);
+    }
+
     public function test_restore_rejects_file_payloads_without_matching_record_paths(): void
     {
         Storage::fake('private');
