@@ -58,6 +58,97 @@ test.describe('Zazu installed PWA offline shell', () => {
         expect(readiness).toBe('ready');
     });
 
+    test('retries primary device registration and drains queued customers after the host returns', async ({ page }, testInfo) => {
+        test.setTimeout(25_000);
+        test.skip(testInfo.project.name !== 'chromium', 'Primary device registration recovery contract runs once.');
+
+        await login(page);
+        await page.evaluate(async () => {
+            await window.ZazuOffline.ready;
+            const state = window.ZazuOffline.getState();
+            state.sync = null;
+            state.sync_authorization_required = false;
+            state.last_sync_error = null;
+            await window.ZazuOffline.persist({ allowSessionChange: true });
+        });
+
+        let registrationAttempts = 0;
+        let pushed = 0;
+        await page.route('**/offline/device/register', async route => {
+            registrationAttempts += 1;
+            if (registrationAttempts === 1) {
+                await route.fulfill({
+                    status: 503,
+                    contentType: 'application/json',
+                    body: JSON.stringify({ message: 'Local host is still starting.' }),
+                });
+                return;
+            }
+            const body = route.request().postDataJSON();
+            await route.fulfill({
+                status: 200,
+                contentType: 'application/json',
+                body: JSON.stringify({
+                    device: {
+                        id: 999995,
+                        installation_id: body.installation_id,
+                        business_id: Number(await route.request().frame().locator('body').getAttribute('data-zazu-business-id').catch(() => '0')) || 1,
+                    },
+                    token: 'registration-retry-test-token',
+                    bootstrap: {},
+                }),
+            });
+        });
+        await page.route('**/api/sync/**', async route => {
+            const url = new URL(route.request().url());
+            if (url.pathname === '/api/sync/push') {
+                const body = route.request().postDataJSON();
+                pushed += body.mutations.length;
+                await route.fulfill({
+                    status: 200,
+                    contentType: 'application/json',
+                    body: JSON.stringify({
+                        recorded: body.mutations.map(mutation => ({
+                            id: mutation.id,
+                            status: 'applied',
+                            identity: {
+                                entity_type: mutation.entity_type,
+                                local_id: mutation.payload.local_id,
+                                server_id: 880001,
+                            },
+                        })),
+                    }),
+                });
+                return;
+            }
+            if (url.pathname === '/api/sync/pull') {
+                await route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify({ mutations: [] }) });
+                return;
+            }
+            if (url.pathname === '/api/sync/bootstrap') {
+                await route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify({}) });
+                return;
+            }
+            if (url.pathname === '/api/sync/attachments') {
+                await route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify({ attachments: [] }) });
+                return;
+            }
+            await route.fulfill({ status: 404, contentType: 'application/json', body: JSON.stringify({ message: 'Unexpected sync request' }) });
+        });
+
+        await page.evaluate(async () => {
+            await window.ZazuOffline.queueMutation('customer', 'create', {
+                local_id: crypto.randomUUID(),
+                name: 'Customer saved before device registration recovered',
+            });
+        });
+
+        await expect.poll(() => registrationAttempts, { timeout: 12_000 }).toBeGreaterThanOrEqual(2);
+        await expect.poll(() => pushed, { timeout: 12_000 }).toBe(1);
+        await expect.poll(async () => page.evaluate(async () => (await window.ZazuOffline.pending()).length)).toBe(0);
+        expect(await page.evaluate(() => window.ZazuOffline.getState().sync?.token)).toBe('registration-retry-test-token');
+    });
+
     test('retries queued mutations when an installed app resumes after reconnect', async ({ page }, testInfo) => {
         test.setTimeout(25_000);
         test.skip(testInfo.project.name !== 'chromium', 'Installed-app resume reconnect contract runs once.');
