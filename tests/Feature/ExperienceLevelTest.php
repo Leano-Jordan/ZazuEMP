@@ -7,8 +7,10 @@ use App\Models\BusinessCapability;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Str;
+use Illuminate\Support\Carbon;
 use Tests\TestCase;
 use App\Support\NicheFocus;
+use App\Support\ExperienceLevel;
 
 class ExperienceLevelTest extends TestCase
 {
@@ -165,4 +167,92 @@ class ExperienceLevelTest extends TestCase
             app(NicheFocus::class)->supporting($business, NicheFocus::SOUND_DJ)
         );
     }
+
+    public function test_new_workspace_receives_an_advanced_trial_for_exactly_thirty_days(): void
+    {
+        $business = Business::create([
+            'name' => 'Trial Business',
+            'slug' => 'trial-'.Str::lower(Str::random(8)),
+            'status' => 'active',
+            'currency' => 'ZAR',
+        ]);
+        $createdAt = Carbon::parse('2026-11-01T09:00:00+02:00');
+        $business->forceFill(['created_at' => $createdAt])->saveQuietly();
+
+        $levels = app(ExperienceLevel::class);
+        $this->assertSame('advanced', $levels->maximumFor($business, $createdAt->copy()->addDays(29)->endOfDay()));
+        $this->assertTrue($levels->isTrial($business, $createdAt->copy()->addDays(29)));
+        $this->assertSame('2026-12-01 09:00:00', $levels->trialEndsAt($business)?->format('Y-m-d H:i:s'));
+        $this->assertSame('basic', $levels->maximumFor($business, $createdAt->copy()->addDays(30)));
+        $this->assertFalse($levels->isTrial($business, $createdAt->copy()->addDays(30)));
+    }
+
+    public function test_expired_trial_clamps_presentation_without_overwriting_saved_preference(): void
+    {
+        $business = Business::create([
+            'name' => 'Expired Trial Business',
+            'slug' => 'expired-trial-'.Str::lower(Str::random(8)),
+            'status' => 'active',
+            'currency' => 'ZAR',
+        ]);
+        $business->forceFill(['created_at' => Carbon::parse('2026-10-01T09:00:00+02:00')])->saveQuietly();
+
+        $user = User::factory()->create();
+        $business->users()->attach($user->id, [
+            'role' => 'owner',
+            'experience_level' => 'advanced',
+            'primary_niche' => NicheFocus::DEFAULT,
+        ]);
+
+        $levels = app(ExperienceLevel::class);
+        $this->assertSame('advanced', $levels->selected($user, $business));
+        $this->assertSame('basic', $levels->for($user, $business));
+        $this->assertSame('advanced', $levels->selected($user, $business));
+        $this->assertSame(['basic'], $levels->availableLevels($business));
+    }
+
+    public function test_intermediate_signed_entitlement_allows_only_basic_and_intermediate_experience(): void
+    {
+        $business = Business::create([
+            'name' => 'Intermediate Business',
+            'slug' => 'intermediate-'.Str::lower(Str::random(8)),
+            'status' => 'active',
+            'currency' => 'ZAR',
+        ]);
+        $business->license()->create([
+            'license_id' => (string) Str::uuid(),
+            'plan' => 'intermediate',
+            'status' => 'active',
+            'starts_at' => now()->subDay(),
+            'expires_at' => now()->addDays(30),
+            'features' => [],
+        ]);
+
+        $levels = app(ExperienceLevel::class);
+        $this->assertSame('intermediate', $levels->maximumFor($business));
+        $this->assertSame(['basic', 'intermediate'], $levels->availableLevels($business));
+        $this->assertTrue($levels->canSelect($business, 'intermediate'));
+        $this->assertFalse($levels->canSelect($business, 'advanced'));
+    }
+
+    public function test_legacy_solo_signed_entitlement_remains_an_advanced_compatibility_alias(): void
+    {
+        $business = Business::create([
+            'name' => 'Legacy Licence Business',
+            'slug' => 'legacy-'.Str::lower(Str::random(8)),
+            'status' => 'active',
+            'currency' => 'ZAR',
+        ]);
+        $business->license()->create([
+            'license_id' => (string) Str::uuid(),
+            'plan' => 'solo',
+            'status' => 'active',
+            'starts_at' => now()->subDay(),
+            'expires_at' => now()->addDays(30),
+            'features' => [],
+        ]);
+
+        $this->assertSame('advanced', app(ExperienceLevel::class)->maximumFor($business));
+    }
+
 }
