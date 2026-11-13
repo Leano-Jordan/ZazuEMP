@@ -29,13 +29,13 @@ class UiShellThemeRegressionTest extends TestCase
         $css = file_get_contents(resource_path('css/app.css'));
 
         $this->assertIsString($css);
-        $this->assertStringContainsString('--zazu-sidebar: #8ED8F8;', $css);
-        $this->assertStringContainsString('--zazu-sidebar-ink: #17445F;', $css);
-        $this->assertStringContainsString('--zazu-sidebar-active: #168FCB;', $css);
+        $this->assertStringContainsString('--zazu-sidebar: #D5E0E8;', $css);
+        $this->assertStringContainsString('--zazu-sidebar-ink: #23394D;', $css);
+        $this->assertStringContainsString('--zazu-sidebar-active: #B4C8D7;', $css);
         $this->assertStringContainsString('background: color-mix(in srgb, var(--zazu-surface) 94%, var(--zazu-page));', $css);
         $this->assertStringContainsString('color: var(--zazu-ink);', $css);
         $this->assertStringContainsString(':root[data-theme="dark"] {', $css);
-        $this->assertStringContainsString('--zazu-sidebar: #061826;', $css);
+        $this->assertStringContainsString('--zazu-sidebar: #202B35;', $css);
     }
 
     public function test_light_sidebar_navigation_states_use_the_blue_shell_palette(): void
