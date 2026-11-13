@@ -144,7 +144,26 @@ final class BusinessArchiveService
     /**
      * @return array{0:array,1:array,2:array}
      */
+
     private function readArchiveEnvelope(ZipArchive $zip): array
+    {
+        $this->assertArchiveZipEntries($zip);
+        $manifest = $this->decodeArchiveManifest($zip);
+        $data = json_decode((string) $zip->getFromName('data.json'), true, 512, JSON_THROW_ON_ERROR);
+        $definitions = $this->definitions();
+
+        if (! is_array($data) || array_keys($data) !== array_keys($definitions)) {
+            throw new RuntimeException('The archive does not contain the complete supported business dataset.');
+        }
+
+        foreach ($definitions as $table => $_definition) {
+            $this->validateArchiveTableRows($table, $data[$table], (int) $manifest['source_business']['id']);
+        }
+
+        return [$manifest, $data, $definitions];
+    }
+
+    private function assertArchiveZipEntries(ZipArchive $zip): void
     {
         if ($zip->numFiles > 5000) {
             throw new RuntimeException('The business archive contains too many entries.');
@@ -166,7 +185,10 @@ final class BusinessArchiveService
                 throw new RuntimeException('The business archive exceeds the 250 MB restore limit.');
             }
         }
+    }
 
+    private function decodeArchiveManifest(ZipArchive $zip): array
+    {
         $manifest = json_decode((string) $zip->getFromName('manifest.json'), true, 512, JSON_THROW_ON_ERROR);
         if (! is_array($manifest)
             || ($manifest['format'] ?? null) !== 'zazu-business-archive'
@@ -178,17 +200,7 @@ final class BusinessArchiveService
             throw new RuntimeException('The business archive source profile is invalid.');
         }
 
-        $data = json_decode((string) $zip->getFromName('data.json'), true, 512, JSON_THROW_ON_ERROR);
-        $definitions = $this->definitions();
-        if (! is_array($data) || array_keys($data) !== array_keys($definitions)) {
-            throw new RuntimeException('The archive does not contain the complete supported business dataset.');
-        }
-
-        foreach ($definitions as $table => $_definition) {
-            $this->validateArchiveTableRows($table, $data[$table], (int) $manifest['source_business']['id']);
-        }
-
-        return [$manifest, $data, $definitions];
+        return $manifest;
     }
 
     private function validateArchiveTableRows(string $table, mixed $rows, int $sourceBusinessId): void
@@ -199,118 +211,178 @@ final class BusinessArchiveService
 
         $seenRecordIds = [];
         foreach ($rows as $row) {
-            if (! is_array($row)) {
-                throw new RuntimeException('The archive contains an invalid record in '.$table.'.');
-            }
-            if (array_key_exists('business_id', $row)
-                && ((! is_int($row['business_id']) && !(is_string($row['business_id']) && ctype_digit($row['business_id'])))
-                    || (int) $row['business_id'] !== $sourceBusinessId)) {
-                throw new RuntimeException('The archive contains a record outside its declared source business in '.$table.'.');
-            }
-
-            $rawId = $row['id'] ?? null;
-            if (! is_int($rawId) && !(is_string($rawId) && ctype_digit($rawId))) {
-                throw new RuntimeException('The archive contains an invalid record identifier in '.$table.'.');
-            }
-            $recordId = (int) $rawId;
-            if ($recordId < 1 || isset($seenRecordIds[$recordId])) {
+            $recordId = $this->validateArchiveRecord($table, $row, $sourceBusinessId);
+            if (isset($seenRecordIds[$recordId])) {
                 throw new RuntimeException('The archive contains a missing, invalid, or duplicate record identifier in '.$table.'.');
             }
             $seenRecordIds[$recordId] = true;
         }
     }
 
-    private function readArchiveFilePayloads(ZipArchive $zip, array $manifest, array $data): array
+    private function validateArchiveRecord(string $table, mixed $row, int $sourceBusinessId): int
     {
-        if (! is_array($manifest['files'] ?? null)) {
-            throw new RuntimeException('The business archive file manifest is invalid.');
+        if (! is_array($row)) {
+            throw new RuntimeException('The archive contains an invalid record in '.$table.'.');
+        }
+        $this->assertArchiveRecordBusiness($table, $row, $sourceBusinessId);
+        $rawId = $row['id'] ?? null;
+        if (! is_int($rawId) && !(is_string($rawId) && ctype_digit($rawId))) {
+            throw new RuntimeException('The archive contains an invalid record identifier in '.$table.'.');
+        }
+        $recordId = (int) $rawId;
+        if ($recordId < 1) {
+            throw new RuntimeException('The archive contains a missing, invalid, or duplicate record identifier in '.$table.'.');
         }
 
-        $allowedFileColumns = [
+        return $recordId;
+    }
+
+    private function assertArchiveRecordBusiness(string $table, array $row, int $sourceBusinessId): void
+    {
+        if (! array_key_exists('business_id', $row)) {
+            return;
+        }
+        $businessId = $row['business_id'];
+        if ((! is_int($businessId) && !(is_string($businessId) && ctype_digit($businessId)))
+            || (int) $businessId !== $sourceBusinessId) {
+            throw new RuntimeException('The archive contains a record outside its declared source business in '.$table.'.');
+        }
+    }
+
+    private function readArchiveFilePayloads(ZipArchive $zip, array $manifest, array $data): array
+    {
+        $allowedFileColumns = $this->allowedArchiveFileColumns();
+        $references = $this->validateArchiveFileManifest($manifest);
+        $this->assertArchivePathsHavePayloads($manifest, $data, $allowedFileColumns, $references);
+
+        $filePayloads = [];
+        foreach ($manifest['files'] as $file) {
+            $filePayloads[] = $this->readArchiveFilePayload($zip, $file, $manifest, $data, $allowedFileColumns);
+        }
+
+        return $filePayloads;
+    }
+
+    private function allowedArchiveFileColumns(): array
+    {
+        return [
             'businesses' => ['logo_path', 'dashboard_image_path', 'wallpaper_path'],
             'business_capabilities' => ['image_path'],
             'customers' => ['profile_photo_path'],
             'compliance_documents' => ['storage_path'],
             'event_attachments' => ['path'],
         ];
-        $seenFileReferences = [];
-        $seenPayloadEntries = [];
+    }
+
+    private function validateArchiveFileManifest(array $manifest): array
+    {
+        if (! is_array($manifest['files'] ?? null)) {
+            throw new RuntimeException('The business archive file manifest is invalid.');
+        }
+
+        $references = [];
+        $entries = [];
         foreach ($manifest['files'] as $file) {
             if (! is_array($file)) {
                 throw new RuntimeException('The archive contains an invalid business file reference.');
             }
-            $referenceKey = implode(':', [
-                (string) ($file['table'] ?? ''),
-                (string) ($file['id'] ?? ''),
-                (string) ($file['column'] ?? ''),
-            ]);
+            $key = implode(':', [(string) ($file['table'] ?? ''), (string) ($file['id'] ?? ''), (string) ($file['column'] ?? '')]);
             $entry = (string) ($file['entry'] ?? '');
-            if (isset($seenFileReferences[$referenceKey])) {
+            if (isset($references[$key])) {
                 throw new RuntimeException('The archive contains a duplicate business file reference.');
             }
-            if ($entry === '' || isset($seenPayloadEntries[$entry])) {
+            if ($entry === '' || isset($entries[$entry])) {
                 throw new RuntimeException('The archive contains a duplicate or invalid file payload entry.');
             }
-            $seenFileReferences[$referenceKey] = true;
-            $seenPayloadEntries[$entry] = true;
+            $references[$key] = true;
+            $entries[$entry] = true;
         }
 
-        foreach ($allowedFileColumns as $table => $columns) {
-            $rows = $table === 'businesses'
-                ? [['id' => (int) $manifest['source_business']['id'], ...array_intersect_key($manifest['source_business'], array_flip($columns))]]
-                : ($data[$table] ?? []);
+        return $references;
+    }
+
+    private function assertArchivePathsHavePayloads(array $manifest, array $data, array $allowedColumns, array $references): void
+    {
+        foreach ($allowedColumns as $table => $columns) {
+            $rows = $this->archiveFileRows($table, $manifest, $data, $columns);
             foreach ($rows as $row) {
                 foreach ($columns as $column) {
                     if (! empty($row[$column])) {
-                        $referenceKey = $table.':'.(string) ($row['id'] ?? '').':'.$column;
-                        if (! isset($seenFileReferences[$referenceKey])) {
+                        $key = $table.':'.(string) ($row['id'] ?? '').':'.$column;
+                        if (! isset($references[$key])) {
                             throw new RuntimeException('The archive contains a file path without its matching file payload.');
                         }
                     }
                 }
             }
         }
-
-        $filePayloads = [];
-        foreach ($manifest['files'] as $file) {
-            $entry = (string) ($file['entry'] ?? '');
-            $table = (string) ($file['table'] ?? '');
-            $column = (string) ($file['column'] ?? '');
-            if (! Str::startsWith($entry, 'payload/files/')
-                || str_contains($entry, '..')
-                || ! in_array($column, $allowedFileColumns[$table] ?? [], true)
-                || ($table === 'event_attachments' && ($file['disk_column'] ?? null) !== 'disk')
-                || ($table !== 'event_attachments' && ($file['disk_column'] ?? null) !== null)) {
-                throw new RuntimeException('The archive contains an unsafe file reference.');
-            }
-
-            $validIds = $table === 'businesses'
-                ? [(int) $manifest['source_business']['id']]
-                : array_map('intval', array_column($data[$table] ?? [], 'id'));
-            if (! in_array((int) ($file['id'] ?? 0), $validIds, true)) {
-                throw new RuntimeException('The archive contains a file reference outside its business dataset.');
-            }
-
-            $sourcePath = $table === 'businesses'
-                ? ($manifest['source_business'][$column] ?? null)
-                : collect($data[$table] ?? [])->firstWhere('id', (int) ($file['id'] ?? 0))[$column] ?? null;
-            if (! is_string($sourcePath) || $sourcePath === '') {
-                throw new RuntimeException('The archive contains a file payload without a matching record path.');
-            }
-            if (! in_array(($file['source_disk'] ?? null), ['private', 'local', 'public'], true)) {
-                throw new RuntimeException('The archive contains an unsupported source storage disk.');
-            }
-
-            $bytes = $zip->getFromName($entry);
-            if ($bytes === false) {
-                throw new RuntimeException('A referenced business file is missing from the archive.');
-            }
-            $filePayloads[] = $file + ['bytes' => $bytes];
-        }
-
-        return $filePayloads;
     }
 
+    private function archiveFileRows(string $table, array $manifest, array $data, array $columns): array
+    {
+        if ($table !== 'businesses') {
+            return $data[$table] ?? [];
+        }
+
+        return [[
+            'id' => (int) $manifest['source_business']['id'],
+            ...array_intersect_key($manifest['source_business'], array_flip($columns)),
+        ]];
+    }
+
+    private function readArchiveFilePayload(ZipArchive $zip, array $file, array $manifest, array $data, array $allowedColumns): array
+    {
+        $table = (string) ($file['table'] ?? '');
+        $column = (string) ($file['column'] ?? '');
+        $entry = (string) ($file['entry'] ?? '');
+        $this->assertSafeArchiveFileReference($file, $table, $column, $entry, $allowedColumns);
+        $this->assertArchiveFileRecordExists($file, $table, $manifest, $data);
+
+        $sourcePath = $this->archiveFileSourcePath($file, $table, $column, $manifest, $data);
+        if (! is_string($sourcePath) || $sourcePath === '') {
+            throw new RuntimeException('The archive contains a file payload without a matching record path.');
+        }
+        if (! in_array(($file['source_disk'] ?? null), ['private', 'local', 'public'], true)) {
+            throw new RuntimeException('The archive contains an unsupported source storage disk.');
+        }
+
+        $bytes = $zip->getFromName($entry);
+        if ($bytes === false) {
+            throw new RuntimeException('A referenced business file is missing from the archive.');
+        }
+
+        return $file + ['bytes' => $bytes];
+    }
+
+    private function assertSafeArchiveFileReference(array $file, string $table, string $column, string $entry, array $allowedColumns): void
+    {
+        if (! Str::startsWith($entry, 'payload/files/')
+            || str_contains($entry, '..')
+            || ! in_array($column, $allowedColumns[$table] ?? [], true)
+            || ($table === 'event_attachments' && ($file['disk_column'] ?? null) !== 'disk')
+            || ($table !== 'event_attachments' && ($file['disk_column'] ?? null) !== null)) {
+            throw new RuntimeException('The archive contains an unsafe file reference.');
+        }
+    }
+
+    private function assertArchiveFileRecordExists(array $file, string $table, array $manifest, array $data): void
+    {
+        $validIds = $table === 'businesses'
+            ? [(int) $manifest['source_business']['id']]
+            : array_map('intval', array_column($data[$table] ?? [], 'id'));
+        if (! in_array((int) ($file['id'] ?? 0), $validIds, true)) {
+            throw new RuntimeException('The archive contains a file reference outside its business dataset.');
+        }
+    }
+
+    private function archiveFileSourcePath(array $file, string $table, string $column, array $manifest, array $data): mixed
+    {
+        if ($table === 'businesses') {
+            return $manifest['source_business'][$column] ?? null;
+        }
+
+        return collect($data[$table] ?? [])->firstWhere('id', (int) ($file['id'] ?? 0))[$column] ?? null;
+    }
     private function rowsForBusiness(string $table, array $definition, int $businessId, array $loaded): array
     {
         $query = DB::table($table)->orderBy('id');
