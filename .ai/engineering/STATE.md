@@ -2761,3 +2761,12 @@ Verification boundary: source was re-fetched from `main` and the retry implement
 - Public quote viewing/acceptance requires valid signed URLs, permits only sent/accepted quote states as appropriate, locks the business/event/quote/version during acceptance, and rechecks the pending state before mutation.
 - Login, registration, password-reset email, password-reset submission, public quote and sync API throttles are configured. No new confirmed defect was established in this source review. No application source or tests changed; no runtime/CI pass is claimed.
 - Security remains 4/5 and evidence maturity 71/100. Independent penetration testing, physical acceptance and legal/privacy obligations remain open.
+
+
+## 2026-11-13 — Main-only dependency security and commercial mutation review
+
+- **Branch discipline:** all work remains on the existing `main` branch. No branch was created. Reconfirmed GitHub branch listing after owner cleanup: `main` plus the pre-existing `deploy/render-staging` ref.
+- **Closed automation defect:** `.github/workflows/security-dependency-refresh.yml` previously ran `composer update`, pushed a run-specific `security/dependency-refresh-*` branch and opened a PR. Replaced that behaviour with a read-only scheduled/manual dependency audit: locked Composer audit, locked npm audit, frontend build and Laravel suite. Permissions are now `contents: read`; checkout credentials are not persisted; no branch/commit/PR creation commands remain. Commit: `7375cc198d6ef16930b764260c4a7e5fb0cb7aa2`.
+- **Commercial mutation review:** re-read current-main `FinanceController`, `FinanceTransactionService`, `FinanceIdempotencyMatcher`, `PurchaseOrderController`, `PurchaseOrderReceivingService` and `InventoryController`. Confirmed route permission gates, active-business record scoping, business/event/order locks, idempotency checks, invoice balance/deposit guards, purchase-order line ownership, over-receipt prevention, negative-stock prevention and audit events in the reviewed paths. No new confirmed defect was established; no application mutation code or tests were changed.
+- **Verification boundary:** the workflow change was source-verified after commit. No workflow run or CI pass is claimed for commit `7375cc1`; the combined status endpoint returned no status records at inspection time. The commercial review is source-level only, not runtime certification.
+- Offline acceptance remains frozen. No browser smoke was repeated. No production deployment or customer data was touched.
