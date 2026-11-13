@@ -55,6 +55,13 @@ class BusinessArchiveTest extends TestCase
         $service = app(BusinessArchiveService::class);
         $archive = $service->download($source);
 
+        $zip = new \ZipArchive();
+        $this->assertTrue($zip->open($archive) === true);
+        $archiveData = json_decode((string) $zip->getFromName('data.json'), true, 512, JSON_THROW_ON_ERROR);
+        $this->assertSame($source->id, (int) $archiveData['events'][0]['business_id']);
+        $this->assertContains($sourceEvent->id, array_map('intval', array_column($archiveData['events'], 'id')));
+        $zip->close();
+
         $target = Business::create([
             'name' => 'Restore Target',
             'slug' => 'restore-target',
