@@ -221,6 +221,41 @@ class OfflineLicenseTest extends TestCase
         ]);
     }
 
+    public function test_effective_tier_falls_back_to_basic_when_a_paid_entitlement_expires(): void
+    {
+        $user = $this->signInAsOwner();
+        $business = $user->businesses()->firstOrFail();
+
+        $license = app(OfflineLicenseService::class)->importSignedLicense($business, $this->signedToken($business, [
+            'plan' => 'advanced',
+            'issued_at' => '2026-10-01T00:00:00+00:00',
+            'starts_at' => '2026-10-01T00:00:00+00:00',
+            'expires_at' => '2026-10-31T23:59:59+00:00',
+        ]));
+
+        $this->assertSame('advanced', $license->effectiveTier(Carbon::parse('2026-10-15 12:00:00')));
+        $this->assertSame('basic', $license->effectiveTier(Carbon::parse('2026-11-01 00:00:00')));
+    }
+
+    public function test_revoked_and_unknown_tiers_resolve_to_basic(): void
+    {
+        $user = $this->signInAsOwner();
+        $business = $user->businesses()->firstOrFail();
+        $service = app(OfflineLicenseService::class);
+
+        $revoked = $service->importSignedLicense($business, $this->signedToken($business, [
+            'plan' => 'advanced',
+            'status' => 'revoked',
+        ]));
+        $this->assertSame('basic', $revoked->effectiveTier());
+
+        $unknown = $service->importSignedLicense($business, $this->signedToken($business, [
+            'plan' => 'legacy_solo',
+            'issued_at' => '2026-10-02T00:00:00+00:00',
+        ]));
+        $this->assertSame('basic', $unknown->effectiveTier());
+    }
+
     /** @return array{0: string, 1: string} */
     private function signingKeys(): array
     {
