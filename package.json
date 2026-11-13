@@ -7,7 +7,8 @@
     "build": "vite build",
     "dev": "vite",
     "test:e2e": "playwright test",
-    "test:service-worker": "node --test tests/js/service-worker-auth-cache.test.js"
+    "test:service-worker": "node --test tests/js/service-worker-auth-cache.test.js",
+    "test:vite-config": "node --test tests/js/vite-config.test.js"
   },
   "devDependencies": {
     "@playwright/test": "^1.63.0",
