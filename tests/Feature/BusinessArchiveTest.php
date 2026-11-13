@@ -11,6 +11,7 @@ use App\Models\EventAttachment;
 use App\Models\Quote;
 use App\Models\QuoteItem;
 use App\Models\QuoteVersion;
+use App\Models\SyncDevice;
 use App\Models\User;
 use App\Services\BusinessArchiveService;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -127,6 +128,50 @@ class BusinessArchiveTest extends TestCase
             'name' => 'Keep Existing',
         ]);
         $this->assertDatabaseCount('customers', 2);
+    }
+
+
+    public function test_restore_refuses_a_workspace_with_an_already_paired_device(): void
+    {
+        Storage::fake('private');
+        $this->signInAsOwner();
+        $source = auth()->user()->businesses()->firstOrFail();
+        Customer::create(['business_id' => $source->id, 'name' => 'Archive Source Customer']);
+        $archive = app(BusinessArchiveService::class)->download($source);
+
+        $target = Business::create([
+            'name' => 'Already Paired Target',
+            'slug' => 'already-paired-target',
+            'status' => 'active',
+            'currency' => 'ZAR',
+        ]);
+        SyncDevice::create([
+            'business_id' => $target->id,
+            'installation_id' => (string) \Illuminate\Support\Str::uuid(),
+            'device_name' => 'Existing phone',
+            'device_type' => 'mobile',
+            'status' => 'active',
+        ]);
+
+        try {
+            try {
+                app(BusinessArchiveService::class)->restore($archive, $target);
+                $this->fail('A paired target must not accept a business archive restore.');
+            } catch (\RuntimeException $exception) {
+                $this->assertStringContainsString('offline sync state', $exception->getMessage());
+            }
+        } finally {
+            @unlink($archive);
+        }
+
+        $this->assertDatabaseHas('sync_devices', [
+            'business_id' => $target->id,
+            'device_name' => 'Existing phone',
+        ]);
+        $this->assertDatabaseMissing('customers', [
+            'business_id' => $target->id,
+            'name' => 'Archive Source Customer',
+        ]);
     }
 
     private function seedArchiveRecords(Business $source): void
