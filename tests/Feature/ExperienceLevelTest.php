@@ -285,4 +285,39 @@ class ExperienceLevelTest extends TestCase
         $this->assertSame('advanced', app(ExperienceLevel::class)->maximumFor($business));
     }
 
+
+    public function test_expired_paid_entitlement_falls_back_to_basic_without_overwriting_member_preference(): void
+    {
+        $at = Carbon::parse('2026-11-13 12:00:00', 'UTC');
+        $business = Business::create([
+            'name' => 'Expired Paid Tier Business',
+            'slug' => 'expired-paid-tier-'.Str::lower(Str::random(8)),
+            'status' => 'active',
+            'currency' => 'ZAR',
+        ]);
+        $business->forceFill(['created_at' => $at->copy()->subDays(60)])->saveQuietly();
+        $business->license()->create([
+            'license_id' => (string) Str::uuid(),
+            'plan' => 'advanced',
+            'status' => 'active',
+            'starts_at' => $at->copy()->subDays(31),
+            'expires_at' => $at->copy()->subSecond(),
+            'features' => [],
+        ]);
+
+        $user = User::factory()->create();
+        $business->users()->attach($user->id, [
+            'role' => 'owner',
+            'experience_level' => 'advanced',
+            'primary_niche' => NicheFocus::DEFAULT,
+        ]);
+
+        $levels = app(ExperienceLevel::class);
+
+        $this->assertSame('advanced', $levels->selected($user, $business));
+        $this->assertSame('basic', $levels->for($user, $business, $at));
+        $this->assertSame(['basic'], $levels->availableLevels($business, $at));
+        $this->assertSame('advanced', $levels->selected($user, $business));
+    }
+
 }
