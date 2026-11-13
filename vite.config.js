@@ -2,6 +2,10 @@ import { defineConfig } from 'vite';
 import laravel from 'laravel-vite-plugin';
 import tailwindcss from '@tailwindcss/vite';
 
+const hmrHost = process.env.VITE_HMR_HOST || undefined;
+const devServerOrigin = process.env.VITE_DEV_SERVER_ORIGIN
+    || (hmrHost ? `http://${hmrHost}:5173` : undefined);
+
 export default defineConfig({
     plugins: [
         laravel({
@@ -11,10 +15,13 @@ export default defineConfig({
         tailwindcss(),
     ],
     server: {
-        // Allow a phone/tablet on the same LAN to fetch Vite assets during local QA.
+        // Bind locally while allowing same-LAN devices to fetch development assets.
         host: '0.0.0.0',
+        // HMR host alone changes the websocket endpoint, not the CSS/JS asset URLs.
+        // Point generated asset URLs at the same reachable PC address.
+        origin: devServerOrigin,
         hmr: {
-            host: process.env.VITE_HMR_HOST || undefined,
+            host: hmrHost,
         },
         watch: {
             ignored: ['**/storage/framework/views/**'],
