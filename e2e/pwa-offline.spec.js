@@ -28,8 +28,8 @@ test.describe('Zazu installed PWA offline shell', () => {
         test.skip(testInfo.project.name !== 'chromium', 'Network-stall startup contract runs once; responsive viewports are covered separately.');
 
         await login(page);
+        await waitForOfflineRuntime(page);
         await page.evaluate(async () => {
-            await window.ZazuOffline.ready;
             const state = window.ZazuOffline.getState();
             state.sync = { token: 'startup-readiness-test-token', device: { id: 999999 } };
             state.local_dirty = false;
