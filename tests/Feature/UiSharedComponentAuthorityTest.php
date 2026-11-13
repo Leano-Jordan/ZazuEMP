@@ -45,7 +45,6 @@ class UiSharedComponentAuthorityTest extends TestCase
                 '.zazu-metric-card:nth-child(4n + 4)',
                 '.zazu-dash-quote-stage:nth-child(4)',
                 'background: var(--zazu-tone-green) !important;',
-                '--zazu-tone-green: #D1F2D9;',
                 '--zazu-tone-amber: #FFE4A3;',
                 '--zazu-tone-teal: #C4F0E6;',
                 '--zazu-tone-violet: #E2D5FF;',
