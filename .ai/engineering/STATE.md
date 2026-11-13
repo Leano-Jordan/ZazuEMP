@@ -1,3 +1,15 @@
+## 2026-11-13 — Current Director checkpoint: business archive restore mapping
+
+- Canonical repository/ref: `Leano-Jordan/ZazuEMP` / `main`.
+- Current observed source HEAD: `35ad01270a3ebd9de44bfcb37d28ae1e0f9096eb`.
+- The owner-only business archive export/import path is present in current source. The implementation includes tenant-scoped table selection, business-ID rebinding, linked-record ID remapping, attachment/media payload restoration, bounded archive entry/size checks, opaque restored paths, and refusal to restore into a non-empty or already-paired workspace.
+- The focused `BusinessArchiveTest::test_business_archive_restores_linked_records_and_private_attachments_into_an_empty_workspace` is the acceptance target. Its latest restore attempt exposed an unresolved foreign-key mapping. Commits `46e46a6` and `35ad012` respectively preserve explicit tenant-key rebinding and expose the exact unresolved table/column/target plus available ID maps in the exception.
+- This is a real unresolved acceptance defect, not a verified pass. The current combined-status lookup for HEAD returned no status contexts; exact-HEAD Actions results are therefore **UNVERIFIED**. Do not infer a pass from earlier CI.
+- Next bounded action: obtain the exact failing relationship from the focused test/CI output, correct the owning FK dependency/remapping rule, then rerun the archive round-trip and safety cases. Keep the target empty-workspace and unpaired-device guards intact.
+- No physical customer data, database, deployment setting or `deploy/render-staging` branch was changed during this inspection.
+
+---
+
 ## 2026-11-13 — Exact-main offline session, attachment and commercial acceptance
 
 - Canonical application/test HEAD: `245aa47f7ef74e6e133fff867670ecafabb603b8`.
@@ -9,7 +21,7 @@
 - Zazu quality [43473670378](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/43473670378), Psalm [43473670232](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/43473670232), PHPMD [43473670420](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/43473670420), populated upgrade/rollback [43473670272](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/43473670272), push-on-main [43473671064](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/43473671064), and Director Health [43475031359](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/43475031359): **PASS**.
 - SonarCloud [43473670372](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/43473670372): **SKIPPED**, not counted as a pass.
 - Commercial reconciliation: **AUTOMATED PASS** through `CommercialReconciliationTest` on this Laravel run. The populated scenario accepts a ZAR 11,500 quote/invoice, reconciles a R3,450 deposit and R8,050 final payment, records R2,800 actual event cost, and asserts R8,700 profit with 75.65% margin. This is a seeded automated scenario, not proof against the owner's live business records.
-- Recovery remains **PARTIAL**: installation-level CLI backup/restore and PostgreSQL database/private-file round-trip are implemented and CI-tested. Tenant-level restorable business archive/import is **NOT IMPLEMENTED**; 23 CSV datasets and customer import do not satisfy that requirement. The controlled installed-environment restore drill remains **OWNER VERIFICATION REQUIRED**.
+- Recovery remains **PARTIAL**: installation-level CLI backup/restore and PostgreSQL database/private-file round-trip are implemented and CI-tested. Tenant-level business archive export/import is now implemented in source with owner-only controls, tenant-scoped datasets, ID remapping, file payload handling and empty/unpaired-target safeguards. Its linked-record + attachment round-trip acceptance is **NOT YET PASSING**; the current `main` diagnostic commit identifies an unresolved foreign-key mapping during restore. Do not count tenant archive recovery as accepted until the focused round-trip passes on exact HEAD. The controlled installed-environment restore drill remains **OWNER VERIFICATION REQUIRED**.
 - Physical-device acceptance remains **UNVERIFIED**: real phone/tablet install on the selected secure origin, disconnected use, force-close/reopen, attachment persistence and reconnect reconciliation. Browser automation does not close this.
 - Existing two customer records in the owner's IndexedDB remain a device-side reconciliation check; do not recreate them.
 - POPIA operational controls and Zazu name/trade-mark clearance remain open. No numeric evidence score uplift is claimed; retain **71/100** pending formal re-score.
