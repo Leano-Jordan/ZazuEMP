@@ -392,7 +392,7 @@ final class BusinessArchiveService
                                 } elseif (isset($idMaps[$foreignTable][(string) $oldForeignId])) {
                                     $row[$column] = $idMaps[$foreignTable][(string) $oldForeignId];
                                 } else {
-                                    throw new RuntimeException("Restore stopped: unresolved {$table}.{$column} relationship.");
+                                    throw new RuntimeException("Restore stopped: unresolved {$table}.{$column} -> {$foreignTable}#{$oldForeignId}; available maps: ".implode(',', array_keys($idMaps)).".");
                                 }
                             }
                         }
