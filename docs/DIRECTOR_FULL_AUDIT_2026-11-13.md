@@ -149,3 +149,16 @@ This audit reconciles the current V1 specification, capability map, scope freeze
 
 **Director audit baseline:** `3dfbeb3d54cf6939e1351b42189807dbda9a4f00`  
 **Audit report:** this document.
+
+
+## Security follow-up addendum — 2026-11-13
+
+This addendum supersedes the security/dependency statements above where they conflict with newer evidence.
+
+- Customer profile-media authorization gap fixed: customer photos now require `customers.view` as well as active business membership. Regression test confirms a member without the permission receives 403. [Exact main Laravel run 43508450343](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/43508450343): 487 passed, 3,476 assertions, 1 skipped.
+- Composer and npm dependency audits are now automated. The lockfile's vulnerable framework versions were updated and merged through [PR #54](https://github.com/Leano-Jordan/ZazuEMP/pull/54), merge commit `637561c53dedbe31d3de0e38e205200e3d5e3301`.
+- Locked versions now include Laravel `v13.42.0`, Symfony HttpFoundation/HttpKernel/Routing `v8.1.11`, and Symfony Mime `v8.1.10`.
+- Post-upgrade PR-head checks: Composer/npm quality and secret scan PASS [43508848964](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/43508848964); Psalm PASS [43508848909](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/43508848909); PHPMD PASS [43508848991](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/43508848991); Laravel 487 passed [43508848942](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/43508848942); PostgreSQL migration/recovery PASS [43508848942](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/43508848942); populated upgrade/rollback PASS [43508848911](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/43508848911).
+- A weekly/manual dependency refresh now creates a PR only after audit, build and test gates pass. Main branch protection remains active and direct pushes are not used.
+- Offline browser acceptance remained pending at this checkpoint and is not counted as a security pass. Offline engineering remains paused.
+- This is source review plus automated regression evidence, not an independent penetration test or proof that attacks are impossible. Security remains 4/5; evidence maturity remains 71/100 until remaining operational/privacy and independent review obligations are addressed.
