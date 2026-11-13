@@ -1,3 +1,14 @@
+## 2026-11-13 — Offline styled-shell asset priming
+
+- Root cause: authenticated page priming cached HTML and private media, but did not guarantee that Vite CSS/JavaScript and CSS-referenced fonts/images were present in the shared static cache. A disconnected dashboard could therefore reopen with missing presentation assets even when its HTML was cached.
+- Implemented on `main`: service worker cache generation advanced to `zazu-static-v36`; page priming now extracts same-origin `/build/` and `/images/` references, caches them in the shared static cache, and follows CSS `url(...)` dependencies one level deep. Asset work is deduplicated and bounded to 150 URLs; private business media remains in its authenticated business cache.
+- Added a focused Node regression in `tests/js/service-worker-auth-cache.test.js` covering cached HTML, Vite CSS/JS, CSS background images and fonts, followed by disconnected fetches.
+- Commits: service-worker implementation `1cd8129cae6d46696d4415b011d02f54dbe4486f`; CSS URL parser correction `f51cbb942af228e56789e07c6080371b316fab03`; regression test `6ef56747d27c2989d3b7caba04367354d3824ae0`.
+- Source re-fetched from GitHub and reconciled. Automated test execution and exact-head Actions result are **PENDING / NOT CLAIMED**. The Android plain-HTTP origin still cannot register a service worker; physical installed-device acceptance remains open.
+- No production data, deployment, local database or non-main branch changed.
+
+---
+
 ## 2026-11-13 — Android offline installation path and exact-head CI reconciliation
 
 - Application/test source head: `805f210c96565899d8d7d5347b80d5461e401756`.
