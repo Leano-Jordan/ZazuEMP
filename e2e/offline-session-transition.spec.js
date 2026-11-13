@@ -107,6 +107,7 @@ test('unreachable logout host preserves the signed-in session and queued busines
         };
     }, mutationId);
     expect(preservedAfterRelogin).toEqual({ paired: true, mutationPresent: true });
+});
 
 test('expired web session requires sign-in without erasing the trusted offline workspace', async ({ page }, testInfo) => {
     test.setTimeout(45_000);
@@ -167,6 +168,4 @@ test('expired web session requires sign-in without erasing the trusted offline w
         paired: true,
         mutationPresent: true,
     });
-});
-
 });
