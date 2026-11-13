@@ -1,3 +1,15 @@
+## 2026-11-13 — Director verification efficiency audit and CI noise reduction
+
+- Audited the live main workflows and test matrix after the owner identified repeated browser smoke as wasted effort.
+- Confirmed the Zazu quality application job duplicated the Laravel workflow's PHP dependency install, frontend build, Blade/config checks, SQLite migration and complete PHPUnit run. Reduced Quality to the unique service-worker Node regression plus secret scanning; no unique test coverage was removed.
+- Confirmed full Playwright browser regression was triggered on every main push even though the dedicated offline-browser acceptance job already runs on main. Changed full browser smoke to run only for browser-relevant pull requests or an explicit manual release/diagnostic dispatch.
+- Kept the main-push Laravel suite, PostgreSQL migration/backup-recovery checks and focused PWA offline-browser acceptance.
+- Verification policy: target the changed surface first; no repeat green suite without changed inputs; no browser smoke for routine backend/docs changes; classify the first failure before retry; never count a retry as a pass.
+- Exact repository HEAD before these efficiency edits: 45361e3acd876550051078fb77df3ab9f9dedc9c. These workflow/documentation edits require their own GitHub Actions result; no CI pass is claimed here.
+- No application runtime code, business data, database, deployment configuration or customer records were changed.
+
+---
+
 ## 2026-11-13 — Business archive duplicate-FK remapping correction
 
 - Current application/test commits on `main`: service fix `51bba91ddfe4f438b4b979c14f5e67e6864ac048`; focused regression test `e4daa4d1b12378479b2990360877f964719d0a5a`.
