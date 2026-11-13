@@ -624,3 +624,22 @@ The Render preview deployment for this commit is **LIVE**. This is a deployment 
 - SonarCloud: **SKIPPED**, not counted as a pass. No Docker build result is attributed to `bed394`.
 - Render workbench deployed documentation descendant `c450ed9` successfully; startup migrations completed and internal HEAD / plus GET / returned HTTP 200. This is preview-workbench verification only, not persistent production verification.
 - Remaining bounded acceptance: physical installed-device offline workflow, then one final regression pass, known-limitations record and V1 release decision. No speculative gates are added.
+
+## Exact-head CI reconciliation — 2026-11-13 (licensing continuity regression)
+
+- Exact current `main` HEAD: `4086428e9baba002134645c7f13e1b215bb7266c`.
+- Runtime/test change: added a licensing continuity regression proving that expiry and signed revocation preserve customer-record access; corrected the test's explicit Customer model import. No production runtime code or deployment configuration changed in this commit.
+- Laravel workflow [run 43382234882](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/43382234882): **PASS — 467 passed / 3,359 assertions / 1 skipped**.
+- PostgreSQL 16 migration/registration and database/private-file backup-restore smoke: **PASS** (jobs `postgres-migration-smoke`; authentication smoke 1 passed / 13 assertions; PostgreSQL backup/restore 1 passed / 5 assertions).
+- Offline browser acceptance [run 43382234882](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/43382234882): **PASS — 19 passed**.
+- Full browser smoke [run 43382234787](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/43382234787): **PASS**.
+- Populated database upgrade/rollback [run 43382234747](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/43382234747): **PASS**.
+- Psalm security [run 43382234744](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/43382234744): **PASS**.
+- PHPMD [run 43382234722](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/43382234722): **PASS**.
+- Zazu quality + secret scan [run 43382234666](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/43382234666): **PASS**.
+- Push-on-main [run 43382233637](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/43382233637): **PASS**. SonarCloud [run 43382234690](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/43382234690): **SKIPPED**, not counted as a pass.
+- The continuity regression confirms expired/revoked licence state does not remove the customer's ability to view existing customer records. It does not establish the complete three-tier commercial matrix or premium-feature enforcement.
+- No Render service, database, deployment branch or environment setting was changed. `deploy/render-staging` remains untouched.
+- Remaining bounded work: owner approval of the three-tier entitlement matrix and final real-device acceptance. No global licence gate is to be added before the entitlement boundaries are defined and tested.
+
+**Automated exact-head verification: GREEN. Commercial entitlement enforcement and physical installed-device acceptance remain OPEN.**
