@@ -72,6 +72,7 @@ test.describe('Zazu installed PWA offline shell', () => {
             await window.ZazuOffline.persist({ allowSessionChange: true });
         });
 
+        const businessId = Number(await page.locator('body').getAttribute('data-zazu-business-id'));
         let registrationAttempts = 0;
         let pushed = 0;
         await page.route('**/offline/device/register', async route => {
@@ -92,7 +93,7 @@ test.describe('Zazu installed PWA offline shell', () => {
                     device: {
                         id: 999995,
                         installation_id: body.installation_id,
-                        business_id: Number(await route.request().frame().locator('body').getAttribute('data-zazu-business-id').catch(() => '0')) || 1,
+                        business_id: businessId,
                     },
                     token: 'registration-retry-test-token',
                     bootstrap: {},
