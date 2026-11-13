@@ -169,10 +169,20 @@ final class BusinessArchiveService
                 if (! is_array($data[$table])) {
                     throw new RuntimeException('The archive contains an invalid dataset: '.$table.'.');
                 }
+                $seenRecordIds = [];
                 foreach ($data[$table] as $row) {
                     if (! is_array($row)) {
                         throw new RuntimeException('The archive contains an invalid record in '.$table.'.');
                     }
+                    $rawId = $row['id'] ?? null;
+                    if (! is_int($rawId) && !(is_string($rawId) && ctype_digit($rawId))) {
+                        throw new RuntimeException('The archive contains an invalid record identifier in '.$table.'.');
+                    }
+                    $recordId = (int) $rawId;
+                    if ($recordId < 1 || isset($seenRecordIds[$recordId])) {
+                        throw new RuntimeException('The archive contains a missing, invalid, or duplicate record identifier in '.$table.'.');
+                    }
+                    $seenRecordIds[$recordId] = true;
                 }
             }
 
