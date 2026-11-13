@@ -157,3 +157,22 @@ The owner has confirmed that the three experience levels are also the three comm
 - The existing per-membership experience preference remains a presentation choice; it must not mint, upgrade or replace the signed business entitlement. The business entitlement is the commercial source of truth.
 - Intermediate and Advanced capability allocations and public prices remain unapproved. No limits or feature gates are inferred from the labels alone.
 
+
+
+## Three-tier workspace entitlement lifecycle — 2026-11-13
+
+The owner has confirmed that Basic, Intermediate and Advanced are the three commercial tiers and the matching experience levels. The workspace entitlement is business-wide; individual members retain their own experience preference within the workspace's maximum tier.
+
+- Basic is the permanent Free fallback.
+- An eligible new workspace receives an Advanced trial for 30 days from its business creation timestamp. The trial ends at the exact creation timestamp plus 30 days.
+- At trial expiry, the effective tier becomes Basic Free.
+- An active signed Intermediate entitlement permits Basic and Intermediate experience levels. An active signed Advanced entitlement permits all three.
+- The former signed plan identifier `solo` remains an Advanced compatibility alias. New issuer output should use `basic`, `intermediate` or `advanced`.
+- Any recorded licence takes precedence over trial calculation. Expired, revoked, not-yet-active or unrecognized entitlement state resolves to Basic; it does not restart the trial.
+- A saved member preference above the current entitlement is presentation-clamped without overwriting the stored preference. A later valid upgrade can restore the prior choice.
+- The experience-level ceiling is enforced in onboarding and self-service preference updates. This is not module-level feature enforcement.
+- No module-level premium feature gates, event-count, team-size, storage or other numerical restrictions are implemented by this lifecycle change. Those require an owner-approved three-tier matrix and explicit data-safe downgrade rules.
+- Existing role/permission and business-isolation boundaries remain authoritative. No blanket entitlement middleware is added to customer-data routes. Expiry/revocation must never delete, lock or withhold customer-owned records.
+- Production issuer/private-key custody, installation identity/reactivation and final module-level entitlement matrix remain outstanding. Do not claim a complete paid subscription system until those controls are implemented and verified.
+
+The central `BusinessEntitlement` resolver determines the business-wide ceiling. `ExperienceLevel` applies that ceiling to each member's saved presentation choice. `OfflineLicenseService` uses the same resolver so the trial, installed licence and preference UI cannot report conflicting effective tiers.

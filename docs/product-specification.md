@@ -42,43 +42,39 @@ Zazu primarily serves:
 - Food/event production businesses
 - Small and growing event businesses
 
-## 4. Experience Levels
+## 4. Three Workspace Tiers and Experience Levels
 
-### Basic
-Essential operational experience:
-- Clients
-- Events
-- Basic products/services
-- Basic planning
-- Basic work/tasks
-- Essential financial information
-- Essential documents
-- Essential reporting
+The three experience levels are also the three commercial workspace tiers:
 
-### Intermediate
-Broader operational control:
-- Expanded event planning
-- Resources
-- Purchasing
-- Cost tracking
-- Supplier management
-- More detailed financial workflows
-- Expanded reporting
+- **Basic — Free, ongoing:** essential business continuity.
+- **Intermediate — paid:** connected operational control across the business.
+- **Advanced — paid:** the fullest operational picture, controls and guidance.
 
-### Advanced
-Full operational experience:
-- Complete operational lifecycle
-- Detailed purchasing and costs
-- Financial controls
-- Advanced reporting
-- Complex workflows
-- Deeper configuration
-- Advanced search
-- Operational analysis
-- Expanded assistance and automation
+The workspace's active entitlement determines the highest experience level available. Each member retains an individual presentation preference within that ceiling. The preference changes the detail and guidance Zazu surfaces; it does not grant a paid entitlement or change the member's role.
 
-**Critical distinction:** Experience level is not permission. Roles/permissions determine what a user can do; experience level determines what functionality Zazu presents.
+### Basic — essential business continuity
+Keep the day-to-day workspace clear and focused on customers, jobs, essential commercial work and the next action. This remains useful after a trial or paid entitlement expires.
 
+### Intermediate — connected operational control
+Surface the operational flow across jobs, resources, purchasing, costs, suppliers and finance with more connected context and detail.
+
+### Advanced — full operational picture
+Surface the fullest operational picture, detailed controls, deeper search and more sophisticated guidance.
+
+These descriptions establish a coherent progression in operational sophistication. They do **not** define a final module-by-module feature matrix, user/storage quotas or numerical restrictions. Those commercial boundaries require explicit owner approval before any application feature or customer-data workflow is gated.
+
+### Trial and entitlement rules
+
+- An eligible new workspace receives a **30-day Advanced trial**, measured from the workspace creation timestamp.
+- At the exact trial-expiry timestamp, the effective tier becomes **Basic Free**, unless an active signed Intermediate or Advanced entitlement is installed.
+- An active Intermediate entitlement permits Basic and Intermediate experience levels. An active Advanced entitlement permits all three.
+- Expired, revoked, not-yet-active or unsupported entitlements resolve to Basic. A recorded licence prevents a second trial from starting.
+- Trial expiry never silently starts paid billing.
+- Expiry or revocation never locks the workspace, deletes data or withholds customer-owned records solely because payment ended.
+- The legacy signed plan identifier `solo` remains an Advanced compatibility alias; new tokens use `basic`, `intermediate` or `advanced`.
+
+**Critical distinction:** commercial tier determines the maximum selectable experience and, once approved, the paid entitlement boundary. The experience preference controls presentation within that tier. Roles and permissions continue to determine which actions and records a person may access. The tier ceiling is not a substitute for authorization.
+ 
 ## 5. Onboarding
 
 Onboarding is a core capability.

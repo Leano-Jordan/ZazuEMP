@@ -8,45 +8,43 @@
 
 ## 1. Owner-confirmed decisions
 
-- The product is operated by Isaac Junior Lehlogonolo Maluleka as a solo operator.
+- The product is operated by the owner as an individual / solo operator.
 - The owner currently handles product operation, support, privacy requests, incidents and customer administration.
-- Initial paid subscription target: **R99 per business/workspace per month**.
-- Free trial: **30 days**, with access to the trial-enabled advanced feature set.
-- At trial end, the workspace moves to the permanent Basic Free tier unless a paid Advanced subscription is active.
-- On subscription expiry or non-payment, the customer is **not locked out**. Basic functionality remains available and paid/advanced features are restricted. Expiry alone does not authorise deletion, withholding or destruction of customer data.
+- The three commercial tiers are **Basic (Free), Intermediate (paid) and Advanced (paid)**. Intermediate pricing and the final tier-by-tier feature matrix are not yet approved.
+- The existing **R99 per business/workspace/month** amount remains a working Advanced price target, not a published offer or finalized billing contract.
+- Free trial: **30 days**, with the Advanced experience available during the trial.
+- At trial end, the workspace moves to Basic Free unless an active paid Intermediate or Advanced entitlement is installed.
+- On subscription expiry or non-payment, the customer is **not locked out**. Basic Free continuity remains available. Expiry alone does not authorise deletion, withholding or destruction of customer data.
+- Trial expiry never silently starts paid billing.
 - Both hosted and local/offline deployment models are intended.
-- Customer content remains the customer's content. Zazu/Rosscore receives only the limited rights needed to host, process, secure, support and provide the contracted service.
+- Customer content remains the customer's content. Zazu receives only the limited rights needed to host, process, secure, support and provide the contracted service.
 - The approved public-facing service-area wording is **Pretoria North, Gauteng, South Africa**. Do not publish the owner's residential street address or imply that this area is a registered office.
 - Direct personal contact details remain outside this public repository until their exact public-facing use is approved.
 
-## 2. Recommended initial commercial tiers — PROPOSAL TO VERIFY
+## 2. Three-tier commercial model — feature matrix pending approval
 
-The following is the recommended product packaging, not a claim that every entitlement is already enforced in the application. The release feature matrix must be checked against routes, permissions, limits and actual hosted behaviour before sale.
+The three experience levels are the three workspace payment tiers. A business-level entitlement sets the maximum selectable experience; each member keeps an individual presentation preference within that ceiling.
 
 ### Basic — Free, ongoing
-- One business/workspace.
-- One owner account.
-- Core customer and event/job records.
-- Basic calendar and event status tracking.
-- Create and view a limited number of active events (recommended initial cap: 5).
-- Basic quote creation and customer-facing document export where already supported.
-- Manual/local data export where supported.
-- No paid automation, advanced reporting, team controls or hosted media allowance beyond a small operational cap.
+The permanent continuity tier. It must remain useful for day-to-day work and preserve access to existing customer-owned records after a trial or paid subscription ends. No active-event, user, storage or other numerical cap is approved for enforcement yet.
 
-### Advanced — R99 per business/workspace/month
-- Everything in Basic.
-- Higher or no artificial active-event cap, subject to fair use.
-- Full operational workflow across quotes, purchasing, inventory/assets, invoices, documents and reporting where those modules are enabled in the release.
-- Additional staff accounts and role-based collaboration (recommended initial allowance: up to 3 users total).
-- Larger hosted storage allowance (recommended initial allowance: 2 GB per workspace).
-- Advanced workflow and productivity features that are implemented, tested and explicitly listed at checkout.
+### Intermediate — paid
+The middle tier for businesses that need more connected operational control across jobs, resources, purchasing, costs, suppliers and finance. The price and exact included features/quotas are **not approved**. Do not publish a price or enforce a module restriction on the basis of this description alone.
 
-### Packaging safeguards
-- Do not remove or restrict access to customer-owned records solely because a trial or paid subscription ends.
-- Basic must remain useful for data access and simple ongoing operations; it must not be a dead-end viewer.
-- Do not advertise a module as included in either tier until its actual entitlement and downgrade behaviour are verified.
-- Keep the R99 tier simple. Add a higher Team tier only after real demand for more users, storage or automation is demonstrated.
-- Revisit the 5-active-event, 3-user and 2-GB suggestions after pilot usage; they are proposed launch limits, not owner-approved final limits.
+### Advanced — paid
+The highest tier for the fullest operational picture, detailed controls, deeper search and guidance. R99 per business/workspace/month remains a working price target, not a published offer. The 30-day Advanced trial uses this same tier ceiling.
+
+### Commercial and engineering safeguards
+
+- A new eligible workspace receives a 30-day Advanced trial from its creation timestamp.
+- At trial expiry, the effective tier becomes Basic Free unless an active signed Intermediate or Advanced entitlement is installed.
+- A valid Intermediate entitlement permits Basic and Intermediate experience levels; a valid Advanced entitlement permits all three.
+- An expired, revoked, not-yet-active or unsupported entitlement resolves to Basic and does not restart a trial.
+- No silent paid conversion, workspace lockout, data deletion or withholding of customer-owned records because of expiry or non-payment.
+- The current implementation enforces the **experience-level ceiling only**. It does not yet enforce a module-by-module paid-feature matrix, quotas, team-size limits or storage caps.
+- Earlier suggestions of five active events, one owner, three users, 250 MB and 2 GB remain unapproved hypotheses. They must not be implemented until the owner approves the full matrix and downgrade behaviour.
+- Do not advertise a module as a paid-tier entitlement until its access boundary and downgrade behaviour are implemented and verified.
+- Keep role-based permissions and business data isolation independent from commercial tier checks.
 
 ## 3. Trial and billing recommendation
 

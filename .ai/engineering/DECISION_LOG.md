@@ -214,3 +214,15 @@ Working commercial hypotheses:
 - **Decision:** Owner-issued implementation requests are execution commands by default. After minimum identity and baseline checks, Jarvis must act immediately, continue through safe bounded cycles without re-authorisation, suppress internal reasoning/play-by-play narration, communicate only on meaningful deltas or genuine blockers, and automatically select the next safe target while the mission remains active.
 - **Acceptance rule:** A response that only announces intention, repeats unchanged observations, or asks the owner to re-authorise already authorised work is an execution failure unless a defined stop condition applies.
 - **Reason:** Maximise engineering progress per owner interaction and prevent the Director from behaving like a planning chatbot instead of an active engineering control plane.
+
+
+## DEC-025 — Three-tier workspace entitlement and experience ceiling
+
+- **Date:** 2026-11-13
+- **Status:** ACTIVE
+- **Owner authority:** Basic Free continuity, trial expiry, Advanced entitlement enforcement and the instruction that the three experience levels are the three payment tiers.
+- **Decision:** The business/workspace entitlement sets the maximum selectable experience level. Each member keeps an individual presentation preference within that ceiling. Basic is the permanent free fallback; Intermediate and Advanced require their respective active signed entitlement, with a 30-day Advanced trial for eligible new workspaces.
+- **Lifecycle:** Trial time is derived from workspace creation. An installed licence supersedes trial state; expired, revoked, not-yet-active or unknown entitlements resolve to Basic and do not restart a trial. The legacy `solo` plan identifier remains an Advanced compatibility alias.
+- **Data/authorization invariant:** Tier expiry or downgrade never locks the workspace, deletes or withholds customer records, or weakens role/permission and business-isolation checks. No blanket plan middleware is applied to customer-data routes.
+- **Matrix boundary:** This change enforces the experience ceiling only. It does not invent or enforce module restrictions, event/user/storage quotas or Intermediate pricing. Those remain pending explicit owner approval.
+- **Reason:** Make the three commercial tiers meaningful in the existing experience preference and licensing architecture without introducing unapproved restrictions or risking customer-data continuity.

@@ -2245,3 +2245,16 @@ Source review found that authenticated sync pull/acknowledgement accepted arbitr
 - The current entrypoint correctly maps `DATABASE_URL` to `DB_URL`; Laravel's PostgreSQL connection uses that URL. The required Render setting is a linked variable named exactly `DATABASE_URL`, sourced from the managed database's **Internal Database URL**. Keep `DB_CONNECTION=pgsql` if present. Do not put the URL/reference into `DB_DATABASE`.
 - Later deploy at 17:40 UTC started successfully and reported `Nothing to migrate`, but this alone does not prove PostgreSQL is now active; the current runtime's selected database remains unverified. The service API connector does not expose environment-variable values, and the database query tool is blocked by the database's empty IP allowlist.
 - No environment variables or database contents were changed. Next operator action: Render Dashboard → ZazuEMP service → Environment; add/link `DATABASE_URL` using the `zazuemp-preview-db` resource's Internal Database URL (Render's linked-variable picker, not a manually typed placeholder). Remove the malformed `DB_DATABASE` placeholder if present; preserve unrelated settings and the stable `APP_KEY`. Save, allow the service to redeploy, then verify startup logs show successful PostgreSQL migrations and no localhost connection attempts before testing registration/login.
+
+
+## Three-tier licensing lifecycle — 2026-11-13
+
+- Main implementation commits: `b67255b88a73421e3d141d96f92463291fc68a8d`, `50fe172a32371f5df4a33375538be0fb36f6bb46`, `49b65c46a9bd3381b5fa3a08292965d646933b6c`, `7612f7bd37795733d670f904cb3f5de48d5c2626`.
+- Business-level `BusinessEntitlement` resolves the maximum tier from a current signed licence or the 30-day creation-date Advanced trial. Any installed expired/revoked/not-yet-active licence suppresses trial restart and falls back to Basic.
+- `ExperienceLevel` clamps each member's saved presentation choice to the workspace entitlement. Onboarding and preference updates reject a choice above the current ceiling. The saved preference is not rewritten by expiry.
+- `OfflineLicenseService` and `BusinessLicense` now use the same three-tier semantics. Legacy `solo` maps to Advanced for compatibility. Licence expiry is exclusive at the expiry timestamp.
+- Experience preference screens show the current workspace tier, trial expiry and available experience levels.
+- Regression coverage added for exact 30-day trial expiry, expired-trial preference preservation, Intermediate ceiling, legacy `solo` compatibility and unlicensed Basic Free continuity after the trial.
+- No module-level feature gates, event/user/storage quotas, customer-data route middleware, data mutation/deletion, deployment or Render configuration changes were made.
+- Commercial matrix: Basic Free; Intermediate paid (price/features unapproved); Advanced paid (R99/workspace/month remains a working target, not a published offer). Proposed 5-event, 3-user, 250 MB and 2 GB restrictions remain unapproved and unenforced.
+- CI/runtime verification must be read against the latest commit before claiming acceptance. Render and deployment configuration remain untouched.
