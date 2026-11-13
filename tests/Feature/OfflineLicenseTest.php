@@ -226,7 +226,17 @@ class OfflineLicenseTest extends TestCase
         $user = $this->signInAsOwner();
         $business = $user->businesses()->firstOrFail();
 
+        $business->forceFill(['created_at' => now()->subDays(31)])->saveQuietly();
+
         $this->assertSame('basic', app(OfflineLicenseService::class)->effectiveTier($business));
+    }
+
+    public function test_new_unlicensed_workspace_uses_the_advanced_trial_ceiling(): void
+    {
+        $user = $this->signInAsOwner();
+        $business = $user->businesses()->firstOrFail();
+
+        $this->assertSame('advanced', app(OfflineLicenseService::class)->effectiveTier($business));
     }
 
     public function test_effective_tier_falls_back_to_basic_when_a_paid_entitlement_expires(): void

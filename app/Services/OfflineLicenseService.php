@@ -4,12 +4,16 @@ namespace App\Services;
 
 use App\Models\Business;
 use App\Models\BusinessLicense;
+use App\Support\BusinessEntitlement;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
 
 class OfflineLicenseService
 {
-    public function __construct(private readonly SignedOfflineLicenseVerifier $verifier)
+    public function __construct(
+        private readonly SignedOfflineLicenseVerifier $verifier,
+        private readonly BusinessEntitlement $entitlements,
+    )
     {
     }
 
@@ -23,7 +27,7 @@ class OfflineLicenseService
      */
     public function effectiveTier(Business $business): string
     {
-        return $this->current($business)?->effectiveTier() ?? 'basic';
+        return $this->entitlements->currentTier($business);
     }
 
     public function isValid(Business $business): bool

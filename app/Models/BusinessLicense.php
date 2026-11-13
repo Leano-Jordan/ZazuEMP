@@ -53,7 +53,7 @@ class BusinessLicense extends Model
             return false;
         }
 
-        return ! $this->expires_at || $at <= $this->expires_at;
+        return ! $this->expires_at || $at < $this->expires_at;
     }
 
     /**
@@ -69,9 +69,12 @@ class BusinessLicense extends Model
             return 'basic';
         }
 
-        return in_array($this->plan, ['basic', 'intermediate', 'advanced'], true)
-            ? $this->plan
-            : 'basic';
+        return match ($this->plan) {
+            'basic' => 'basic',
+            'intermediate' => 'intermediate',
+            'advanced', 'solo' => 'advanced',
+            default => 'basic',
+        };
     }
 
     public function statusLabel(?\DateTimeInterface $at = null): string
