@@ -1,3 +1,15 @@
+## 2026-11-13 — Mobile navigation resilience during host restart
+
+- Found a second mobile continuity gap in `public/sw.js`: when Laravel was reachable but returned an HTTP 5xx (for example, during a restart or temporary overload), navigation returned the server error directly instead of using the authenticated page already cached for that user/business. Network disconnects already fell back correctly; transient HTTP failures did not.
+- Corrected on `main`: 5xx navigation responses now fall back to the active business-scoped cached page. 401/403 and other non-5xx responses are still returned unchanged, preventing stale cached authenticated HTML from masking an authorization/session failure.
+- Advanced the service-worker cache generation to `zazu-static-v37`.
+- Added focused regressions for 503 fallback and 401 non-fallback in `tests/js/service-worker-auth-cache.test.js`. The service-worker suite is now wired into the Laravel GitHub Actions workflow by commit `a8acd2f05f7c2467ed396e4964c1b186b7d8fafd`.
+- Implementation commit: `118ebfa4af26bd909cf0d61f4d6f24039f2f4393`; regression commit: `73734e7d5553eb9bb7b13cc519ac46f0b5266f35`.
+- Source was re-fetched from GitHub and reconciled. Automated execution on the resulting main head remains **PENDING / NOT CLAIMED**. This improves navigation continuity; it does not prove full mobile offline data/workflow parity or physical Android cold-start.
+- No production data, deployment, local database or non-main branch changed.
+
+---
+
 ## 2026-11-13 — Service-worker regression suite connected to CI
 
 - Found a verification gap while tracing the new offline styled-shell regression: `package.json` defined `test:service-worker`, but `.github/workflows/laravel.yml` did not invoke it. The new regression and existing service-worker auth/cache tests would therefore not run in the main Laravel workflow.
