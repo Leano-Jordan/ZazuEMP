@@ -1664,7 +1664,8 @@
 
         const result = await response.json();
         if (Number(result.device?.business_id || 0) !== ACTIVE_BUSINESS_ID) {
-            state.last_sync_error = 'The registered device belongs to a different business workspace.';
+            state.sync_registration_blocked = true;
+            state.last_sync_error = 'The registered device belongs to a different business workspace. The owner must resolve the device registration before these changes can sync.';
             await writeState().catch(() => {});
             window.dispatchEvent(new CustomEvent('zazu:offline-state-updated'));
             return false;
