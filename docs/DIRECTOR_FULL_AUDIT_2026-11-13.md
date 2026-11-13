@@ -3,7 +3,7 @@
 **Audit date:** 2026-11-13  
 **Repository:** `Leano-Jordan/ZazuEMP`  
 **Audited engineering branch:** `main`  
-**Application/test evidence baseline:** `2d7672103ee4b51d28100383f3311111b493deea`  
+**Application/test evidence baseline:** `785b544e3cf49a10f19c510b5e5e7ef8c5e4d9a6`  
 **Deployment branch:** `deploy/render-staging` — preserved; not modified  
 **Disposition:** **V1 NOT YET RELEASE-CERTIFIED**
 
@@ -13,7 +13,7 @@ Zazu has a substantial, integrated business-management foundation. The core conn
 
 The audit does not find a basis for rebuilding the product or expanding the V1 feature set. The remaining engineering objective is a controlled finish: complete the bounded owner acceptance on a real installed device, address only concrete failures, run the final regression against the resulting release candidate and record the release decision.
 
-**Evidence-maturity score: 69/100 (45/65 across 13 domains).** This reaffirms the latest formal 2026-11-09 scorecard; no score uplift is claimed from documentation or test-fixture changes. Latest exact-head automated checks now pass, but the score remains constrained by offline physical-device evidence, recovery maturity and legal/commercial readiness.
+**Evidence-maturity score: 71/100 (46/65 across 13 domains).** The score increased by two points because this audit cycle added and passed focused regression evidence for permission-aware search, business-scoped reporting metrics, and Zazu Helper attention scoping/permissions. No runtime capability uplift is claimed: these are stronger verification of existing V1 behavior. The score remains constrained by offline physical-device evidence, UX/device acceptance, recovery maturity and legal/commercial readiness.
 
 The score is a measure of evidence maturity, not a claim that 69% of the software exists. A high average does not override a critical release gate.
 
@@ -23,20 +23,20 @@ At application/test baseline `2d76721`, the following GitHub Actions runs comple
 
 | Check | Result | Run |
 |---|---:|---|
-| Laravel | **PASS — 462 passed / 3,339 assertions / 1 skipped** | [43374261171](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/43374261171) |
-| Offline browser acceptance | **PASS — 19 passed** | Same Laravel workflow |
-| PostgreSQL migration / registration / recovery | **PASS** | Same Laravel workflow |
-| Full browser regression | **PASS — 83 passed / 40 skipped** | [43374261309](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/43374261309) |
-| Zazu quality + secret scan | **PASS** | [43374261294](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/43374261294) |
-| Psalm security | **PASS** | [43374261346](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/43374261346) |
-| PHPMD | **PASS** | [43374261179](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/43374261179) |
-| Populated database upgrade / rollback | **PASS** | [43374261305](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/43374261305) |
-| Director Contract Lint | **PASS** | [43374261286](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/43374261286) |
-| Director Health | **PASS** | [43374261199](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/43374261199) |
-| Push-on-main / CodeQL | **PASS** | [43374262189](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/43374262189) |
+| Laravel | **PASS — 466 passed / 3,352 assertions / 1 skipped** | [43379813097](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/43379813097) |
+| Offline browser acceptance | **PASS — 19 passed** | [43379813097](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/43379813097) |
+| PostgreSQL migration / registration / recovery | **PASS** | [43379813097](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/43379813097) |
+| Full browser regression | **PENDING on latest test head**; prior exact source head passed 83 / 40 skipped | [43379813143](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/43379813143) |
+| Zazu quality + secret scan | **PASS** | [43379813124](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/43379813124) |
+| Psalm security | **PASS** | [43379813102](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/43379813102) |
+| PHPMD | **PASS** | [43379813257](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/43379813257) |
+| Populated database upgrade / rollback | **PASS** | [43379813316](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/43379813316) |
+| Director Contract Lint | **PASS** | [43379813231](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/43379813231) |
+| Director Health | **PASS** | [43379813231](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/43379813231) |
+| Push-on-main / CodeQL | **PASS** | [43379813117](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/43379813117) |
 | SonarCloud | **SKIPPED — not a pass** | [43374261278](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/43374261278) |
 
-The browser run's 40 skipped tests are not counted as passes. The stateful offline/session/registration journeys are deliberately run once on Chromium; this does not mean those 40 cases passed on every viewport project.
+The latest full browser regression was still running when this report revision was prepared; its result must be reconciled before declaring the test head fully green. The prior exact source head passed 83 tests with 40 skips. Skipped tests are not counted as passes. The stateful offline/session/registration journeys are deliberately run once on Chromium; this does not mean those cases passed on every viewport project.
 
 The PostgreSQL job ran against an actual PostgreSQL 16 service, exercised migrations and registration/workspace creation, and passed the database/private-file backup/restore round-trip. This is automated CI recovery evidence, not a physical-device or selected-production-host recovery drill.
 
@@ -44,8 +44,9 @@ The PostgreSQL job ran against an actual PostgreSQL 16 service, exercised migrat
 
 - Runtime change since the prior verified code baseline: `fb744abb` updated service-worker offline navigation to serve cached application pages immediately when offline.
 - `41006ae` and `282a4eb` corrected/strengthened the browser test fixture/assertions.
-- `afa3da2` and `2d76721` updated release/engineering evidence documentation.
-- No deployment was performed as part of this audit. No service, database, environment setting or customer data was changed.
+- `8476345`, `7c7aaf5`, `7f82f57` and `785b544` add regression tests for Helper operational attention scoping/permissions, report metric business isolation, and search domain permission filtering. A first report fixture exposed the existing active-business write guard; the fixture was corrected to seed foreign-tenant records before authenticating. The final Laravel run passed all 466 tests with 1 skip.
+- `afa3da2`, `2d76721` and the audit commits updated release/engineering evidence documentation.
+- No runtime application source was changed in this overdrive cycle. No deployment was performed as part of this audit. No service, database, environment setting or customer data was changed.
 
 ## 3. V1 specification scorecard
 
@@ -61,13 +62,13 @@ Scoring scale: **0** absent; **1** specified/designed; **2** implemented in sour
 | Security and tenant isolation | **4/5** | Server-side permissions, business scoping, private media, sync-device authorization/revocation and cross-business tests pass. This is not an independent penetration test. |
 | Offline continuity | **3/5** | Device-local IndexedDB, durable queue, pairing, replay protection, conflict handling and several domain handlers exist. The explicitly evidenced offline customer/job journey and reconnect path pass in browser tests. Real installed-device behavior remains unproven; full application parity is not claimed. |
 | Documents and attachments | **4/5** | Private online attachment handling and phone-local queue/download/reconnect safeguards have feature and Playwright coverage. Physical storage survival and the complete new-offline-job-to-attachment journey still need careful owner acceptance. |
-| Search, reporting and Zazu Helper | **3/5** | Business/permission-scoped search, reporting and contextual Helper foundations exist. Current tests establish core behavior/presence, not exhaustive usability of every search/report/Helper scenario. |
+| Search, reporting and Zazu Helper | **4/5** | New exact-head regression tests now verify search domain permission filtering, report metric isolation across businesses, and Helper attention scoping plus work-permission enforcement. Existing commercial reconciliation coverage verifies currency-separated finance totals and event profitability. Natural-language search and autonomous Helper actions remain outside the V1 claim. |
 | UX, mobile, tablet and accessibility | **3/5** | Responsive viewport and accessibility regression coverage passes. Human acceptance on actual phone/tablet hardware is still required. |
 | Recovery and data portability | **3/5** | Installation-level backup/restore, populated recovery, PostgreSQL and private-file CI round-trips pass. A real operator drill on a selected customer installation remains separate. Business self-service restore is not implemented and must not be implied. |
 | Deployment, upgrade and rollback | **4/5** | Populated upgrade/rollback automation passes. This does not mean a production target has been selected or deployed. |
 | Legal, privacy and brand clearance | **1/5** | Technical controls and draft registers exist, but final operating details, contracts/privacy procedures and official Zazu brand clearance remain external decisions. |
 
-**Total: 45/65 = 3.46/5 = 69.2/100, reported as 69/100.**
+**Total: 46/65 = 3.54/5 = 70.8/100, reported as 71/100.**
 
 No domain receives 5/5. The most important restraint is offline maturity: a broad backend handler or a form marked for offline handling is not the same as a complete installed-device workflow being proven.
 
@@ -146,5 +147,5 @@ This audit reconciles the current V1 specification, capability map, scope freeze
 
 ---
 
-**Director audit baseline:** `2d7672103ee4b51d28100383f3311111b493deea`  
+**Director audit baseline:** `785b544e3cf49a10f19c510b5e5e7ef8c5e4d9a6`  
 **Audit report:** this document.
