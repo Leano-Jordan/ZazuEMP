@@ -3,7 +3,7 @@
 **Audit date:** 2026-11-13  
 **Repository:** `Leano-Jordan/ZazuEMP`  
 **Audited engineering branch:** `main`  
-**Application/test evidence baseline:** `785b544e3cf49a10f19c510b5e5e7ef8c5e4d9a6`  
+**Current exact-head CI baseline:** `3dfbeb3d54cf6939e1351b42189807dbda9a4f00` (documentation-only descendant of application/test baseline `785b544e3cf49a10f19c510b5e5e7ef8c5e5e7ef8c5e4d9a6`)  
 **Deployment branch:** `deploy/render-staging` — preserved; not modified  
 **Disposition:** **V1 NOT YET RELEASE-CERTIFIED**
 
@@ -19,24 +19,24 @@ The score is a measure of evidence maturity, not a claim that 69% of the softwar
 
 ## 2. Exact-head automated evidence
 
-At application/test baseline `2d76721`, the following GitHub Actions runs completed:
+At exact repository head `3dfbeb3d54cf6939e1351b42189807dbda9a4f00` (with no runtime changes after application/test baseline `785b544e3cf49a10f19c510b5e5e7ef8c5e4d9a6`), the following GitHub Actions runs completed:
 
 | Check | Result | Run |
 |---|---:|---|
-| Laravel | **PASS — 466 passed / 3,352 assertions / 1 skipped** | [43379813097](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/43379813097) |
-| Offline browser acceptance | **PASS — 19 passed** | [43379813097](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/43379813097) |
-| PostgreSQL migration / registration / recovery | **PASS** | [43379813097](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/43379813097) |
-| Full browser regression | **PENDING on latest test head**; prior exact source head passed 83 / 40 skipped | [43379813143](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/43379813143) |
-| Zazu quality + secret scan | **PASS** | [43379813124](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/43379813124) |
-| Psalm security | **PASS** | [43379813102](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/43379813102) |
-| PHPMD | **PASS** | [43379813257](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/43379813257) |
-| Populated database upgrade / rollback | **PASS** | [43379813316](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/43379813316) |
-| Director Contract Lint | **PASS** | [43379813231](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/43379813231) |
-| Director Health | **PASS** | [43379813231](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/43379813231) |
-| Push-on-main / CodeQL | **PASS** | [43379813117](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/43379813117) |
-| SonarCloud | **SKIPPED — not a pass** | [43374261278](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/43374261278) |
+| Laravel | **PASS — 466 passed / 3,352 assertions / 1 skipped** | [43380229985](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/43380229985) |
+| Offline browser acceptance | **PASS — 19 passed** | [43380229985](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/43380229985) |
+| PostgreSQL migration / registration / recovery | **PASS** | [43380229985](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/43380229985) |
+| Full browser regression | **PASS** | [43380230038](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/43380230038) |
+| Zazu quality + secret scan | **PASS** | [43380230036](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/43380230036) |
+| Psalm security | **PASS** | [43380230087](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/43380230087) |
+| PHPMD | **PASS** | [43380230230](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/43380230230) |
+| Populated database upgrade / rollback | **PASS** | [43380229950](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/43380229950) |
+| Director Contract Lint | **PASS** | [43380229958](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/43380229958) |
+| Director Health | **PASS** | [43381040941](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/43381040941) |
+| Push-on-main / CodeQL | **PASS** | [43380229796](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/43380229796) |
+| SonarCloud | **SKIPPED — not a pass** | [43380230096](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/43380230096) |
 
-The latest full browser regression was still running when this report revision was prepared; its result must be reconciled before declaring the test head fully green. The prior exact source head passed 83 tests with 40 skips. Skipped tests are not counted as passes. The stateful offline/session/registration journeys are deliberately run once on Chromium; this does not mean those cases passed on every viewport project.
+**The full browser regression has now completed successfully on the exact head** (run `43380230038`). The offline browser acceptance suite passed 19 tests. Skipped tests are not counted as passes. The stateful offline/session/registration journeys are deliberately run once on Chromium; this does not mean those cases passed on every viewport project.
 
 The PostgreSQL job ran against an actual PostgreSQL 16 service, exercised migrations and registration/workspace creation, and passed the database/private-file backup/restore round-trip. This is automated CI recovery evidence, not a physical-device or selected-production-host recovery drill.
 
@@ -147,5 +147,5 @@ This audit reconciles the current V1 specification, capability map, scope freeze
 
 ---
 
-**Director audit baseline:** `785b544e3cf49a10f19c510b5e5e7ef8c5e4d9a6`  
+**Director audit baseline:** `3dfbeb3d54cf6939e1351b42189807dbda9a4f00`  
 **Audit report:** this document.
