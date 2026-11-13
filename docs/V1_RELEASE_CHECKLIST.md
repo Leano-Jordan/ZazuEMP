@@ -1,39 +1,22 @@
-## Director reconciliation — 2026-11-13 (supersedes stale archive status below)
+## Director reconciliation — 2026-11-13 (current exact-main evidence)
 
-- Latest observed repository documentation HEAD: `7d95ee61da48d5fcf3ec4ed06ddbab0696df7b8d` on `main`.
-- Business archive restore is now **IMPLEMENTED / EXECUTION UNVERIFIED**, not “not implemented”. The duplicate-FK remapping correction is in `app/Services/BusinessArchiveService.php` commit `51bba91ddfe4f438b4b979c14f5e67e6864ac048`; the focused round-trip regression fixture is in `tests/Feature/BusinessArchiveTest.php` commit `e4daa4d1b12378479b2990360877f964719d0a5a`. The fixture exercises supplier → purchase order → purchase-order item links and the overlapping simple/composite foreign-key case.
-- The correction always resolves foreign-key values from the original archived row, avoiding a second constraint attempting to remap an already-remapped target ID.
-- Acceptance remains **OPEN** until the focused archive round-trip and its safety tests execute and pass on a commit containing both changes. The latest combined-status lookup returned no contexts and the commit-workflow lookup exposed no runs; no pass is claimed.
-- The archive test currently asserts 28 tables, 11 records and 2 files, plus restored tenant-scoped relationships and private/public attachment payloads.
-- Director CI efficiency changes are present on `main`: duplicate PHP verification was removed from Quality, full browser regression is restricted to browser-relevant PRs or manual dispatch, and the unique service-worker regression plus secret scan remain. These workflow edits also require their own Actions evidence.
-- Existing installation-level PostgreSQL/database+private-file CI evidence does not close the controlled installed-environment recovery drill. Physical phone/tablet acceptance, POPIA operations and Zazu name clearance remain open.
-- No customer data, live database, deployment service or `deploy/render-staging` branch was changed.
+**Canonical branch:** `main` · **verified head:** `5888123f1941beb478b31870a6e782e0f8ef8053`.
+
+- Laravel workflow [43491595380](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/43491595380): **PASS** — 486 passed / 1 skipped / 3,475 assertions; PostgreSQL migration, registration, database/private-file recovery and dedicated offline-browser acceptance passed.
+- PHPMD [43491595199](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/43491595199), Psalm [43491595173](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/43491595173), quality/secret scan/CodeQL [43491594809](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/43491594809), and populated upgrade/rollback [43491595120](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/43491595120): **PASS**.
+- The archive restore round-trip and safety tests now execute successfully. Business-level archive restore is **AUTOMATED-VERIFIED**, including related-record remapping, tenant isolation and private/public file payloads. It is not a substitute for the separate installation-level operator recovery drill.
+- Offline session transition and active Work attachment workflows are **AUTOMATED-VERIFIED**. Physical phone/tablet persistence and installed-app acceptance remain owner-verified gates.
+- Quote → payment → profit is **SEEDED AUTOMATED-VERIFIED**; live business-record reconciliation remains a separate operator acceptance.
+- Installation recovery is **CI-VERIFIED / OPERATOR DRILL OPEN**.
+- POPIA operational controls, privacy notice review/publication, retention and incident procedures, and Zazu name/trade-mark clearance remain **OPEN**.
+- **Release disposition: NOT READY.** CI is green; physical-device, installed-target recovery, legal/privacy and brand gates remain. Evidence score is unchanged; no score uplift is claimed.
+- No production deployment, live database, customer data or non-main branch was changed.
 
 ---
 
-# Exact-main gate reconciliation — 2026-11-13
+# Exact-main gate reconciliation — 2026-11-13 (superseded by current exact-head evidence)
 
-**Verified application/test HEAD:** `245aa47f7ef74e6e133fff867670ecafabb603b8`.
-
-| V1 gate | Current disposition | Evidence / remaining proof |
-|---|---|---|
-| Offline account/session security | **AUTOMATED PASS** | Browser run [43473670319](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/43473670319): unreachable logout preservation, owner→manager account hand-off, expired web-session recovery. Business-switch device-ID isolation passed in Laravel run [43473670275](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/43473670275). |
-| Offline Work attachments | **AUTOMATED PASS** | Active Work attachment E2E scenarios passed in [43473670319](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/43473670319). Real phone offline attachment, restart and reconnect remain part of physical acceptance. |
-| Multi-customer offline sync identity | **AUTOMATED PASS** | Laravel + dedicated offline-browser job passed in [43473670275](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/43473670275); two local customer IDs map independently to server IDs and replay is idempotent. The owner's two existing IndexedDB records still require device-side observation; never recreate them. |
-| Business-level export/import | **NOT IMPLEMENTED** | The current 23 tenant-scoped CSV exports and customer-only import are not a restorable business archive. A tenant-scoped, relationship-complete archive including uploaded files is still required. |
-| Installation recovery | **CI PASS / OWNER DRILL OPEN** | PostgreSQL migration, registration, database+private-file backup/restore passed in [43473670275](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/43473670275). Follow `docs/RELEASE_BACKUP_RESTORE_RUNBOOK.md` on an isolated installed target; CI is not the real installation drill. |
-| Quote → payment → profit | **AUTOMATED PASS** | `CommercialReconciliationTest` passed within [43473670275](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/43473670275): accepted R11,500 quote/invoice, R3,450 deposit, R8,050 final payment, R2,800 actual cost, R8,700 profit, 75.65% margin. This is seeded test evidence, not a live customer-record walkthrough. |
-| Physical disconnected-phone acceptance | **OWNER VERIFICATION REQUIRED** | Install on selected secure origin; disconnect; create/update records and attachments; force-close/reopen; reconnect; confirm exactly-once sync and preserved files. |
-| POPIA operational controls and brand clearance | **OPEN** | Operational privacy/retention/incident handling must be verified; Zazu name/trade-mark search and professional clearance remain outstanding. |
-
-## Exact-head automation
-
-- Laravel [43473670275](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/43473670275): **PASS**, including PostgreSQL migration/registration/recovery and dedicated offline-browser acceptance.
-- Full Playwright browser smoke [43473670319](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/43473670319): **PASS**.
-- Zazu quality [43473670378](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/43473670378), Psalm [43473670232](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/43473670232), PHPMD [43473670420](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/43473670420), populated upgrade/rollback [43473670272](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/43473670272), push-on-main [43473671064](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/43473671064), Director Health [43475031359](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/43475031359): **PASS**.
-- SonarCloud [43473670372](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/43473670372): **SKIPPED**, not a pass.
-
-**Release disposition: NOT YET READY.** Automated offline session/attachment and commercial reconciliation coverage is green. Tenant archive/import, real installation recovery drill, physical phone acceptance, POPIA operations and name clearance remain open. Evidence score remains 71/100; no uplift claimed.
+This historical snapshot was recorded against an earlier application head. Its implementation statements and run IDs are retained for audit history only. The current authoritative state is the Director reconciliation immediately above: business archive restore is now automated-verified, and exact-head CI on `5888123f1941beb478b31870a6e782e0f8ef8053` is green. Do not use the old “NOT IMPLEMENTED” archive disposition or old 71/100 score as a current release decision. Physical acceptance, the installed-target recovery drill, POPIA operations and Zazu name clearance remain open.
 
 ---
 
