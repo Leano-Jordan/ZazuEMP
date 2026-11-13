@@ -1,9 +1,21 @@
 name: Zazu browser smoke
 
 on:
-  push:
-    branches: [main]
+  # Full rendered-browser regression is not a per-commit gate. The focused
+  # offline-browser acceptance suite remains in laravel.yml on every main push.
   pull_request:
+    branches: [main]
+    paths:
+      - 'e2e/**'
+      - 'playwright.config.js'
+      - 'resources/**'
+      - 'public/**'
+      - 'routes/**'
+      - 'app/Http/**'
+      - 'app/Livewire/**'
+      - 'vite.config.*'
+      - 'package.json'
+      - 'package-lock.json'
   workflow_dispatch:
 
 permissions:
