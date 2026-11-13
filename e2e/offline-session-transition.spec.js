@@ -147,7 +147,7 @@ test('expired web session requires sign-in without erasing the trusted offline w
     // Remove the authenticated web-session cookie without touching IndexedDB.
     await page.context().clearCookies();
     await page.goto('/dashboard', { waitUntil: 'domcontentloaded' });
-    await expect(page).not.toHaveURL(/\\/dashboard$/);
+    await expect(page).not.toHaveURL(/dashboard$/);
     await expect(page.locator('[data-auth-modal]')).toBeVisible();
 
     await login(page);
