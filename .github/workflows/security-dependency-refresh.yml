@@ -1,11 +1,9 @@
 name: Zazu security dependency refresh
 
 on:
-  push:
-    branches: [main]
-    paths:
-      - '.github/workflows/security-dependency-refresh.yml'
   workflow_dispatch:
+  schedule:
+    - cron: '17 3 * * 1'
 
 permissions:
   contents: write
