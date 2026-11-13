@@ -319,7 +319,7 @@ class InterfaceRegressionTest extends TestCase
         $sweepCss = file_get_contents(resource_path('css/zazu-final-visual-sweep.css'));
         $mobileCss = file_get_contents(resource_path('css/zazu-mobile-refinement.css'));
 
-        $this->assertStringContainsString('--zazu-page: #F5FBFE;', $appCss);
+        $this->assertStringContainsString('--zazu-page: #DCE5ED;', $appCss);
         $this->assertStringContainsString('--zazu-surface: #FFFFFF;', $appCss);
         $this->assertStringContainsString('backdrop-filter: blur(10px) saturate(110%);', $appCss);
         $this->assertStringContainsString('.zazu-btn-cta {', $sweepCss);
