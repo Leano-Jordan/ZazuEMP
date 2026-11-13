@@ -1110,3 +1110,11 @@ Found and corrected a data-recovery blocker in `ZazuBackupCommand::snapshotMysql
 - Added a feature regression in `BusinessContextSecurityTest`; updated the client to stop retrying after 403 and display an owner-approval message.
 - Exact main `fd63ac5717a3afd656da7860530812d6a81a0016`: [Laravel 488 passed / 3,478 assertions / 1 skipped](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/43509943704); PostgreSQL migration/recovery PASS; [Composer/npm audits and secret scan PASS](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/43509943486); [Psalm PASS](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/43509931780); [PHPMD PASS](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/43509937057).
 - Offline browser acceptance was pending at checkpoint; it is not counted. Offline engineering remains paused except for this narrow security correction.
+
+
+## Main-only engineering control and commercial mutation review — 2026-11-13
+
+- **Closed:** the scheduled/manual dependency workflow no longer updates lockfiles, pushes run-specific branches or opens pull requests. It now audits the committed lockfiles, builds the frontend and runs the Laravel suite with read-only repository permission and checkout credentials disabled. This removes the automation path that could create branches without the owner's explicit direction. Main commit: `7375cc198d6ef16930b764260c4a7e5fb0cb7aa2`.
+- **Source review completed:** finance invoice/payment/expense mutations, purchasing order/receipt transitions and inventory movement were re-read on current `main`. Route permissions, business scoping, transaction/row locking, idempotency, financial balance/deposit validation, receipt line ownership, over-receipt and negative-stock controls, and audit records were present in the reviewed paths. No new confirmed defect found; no duplicate regression tests added.
+- **Evidence limit:** workflow file was re-fetched after commit and confirmed read-only. No CI run has yet been observed for `7375cc1`; source review does not count as runtime proof. Do not increase release maturity from this checkpoint.
+- All work stayed on `main`; no branch was created. Offline acceptance remains frozen; V1 remains **NO-GO** pending existing physical, recovery, privacy/legal and brand gates.
