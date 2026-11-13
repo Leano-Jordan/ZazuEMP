@@ -17,7 +17,10 @@ use ZipArchive;
  */
 final class BusinessArchiveService
 {
-    public function __construct(private readonly BusinessArchiveFileService $files)
+    public function __construct(
+        private readonly BusinessArchiveFileService $files,
+        private readonly BusinessArchiveFileCollector $fileCollector
+    )
     {
     }
 
@@ -89,7 +92,7 @@ final class BusinessArchiveService
             }
             }
 
-            $files = $this->files->collectFiles($business, $data);
+            $files = $this->fileCollector->collectFiles($business, $data);
             $zip->addFromString('manifest.json', json_encode([
                 'format' => 'zazu-business-archive',
                 'version' => self::VERSION,
