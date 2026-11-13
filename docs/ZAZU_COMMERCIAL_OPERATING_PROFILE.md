@@ -51,7 +51,7 @@ The highest tier for the fullest operational picture, detailed controls, deeper 
 - Trial duration: **30 days**.
 - Trial should not require a payment method unless the checkout flow clearly explains the billing transition and obtains valid consent.
 - Trial expiry automatically moves the workspace to Basic Free; it must not silently start a paid subscription.
-- Advanced access resumes after successful payment/renewal.
+- Access to the purchased tier resumes after successful payment/renewal.
 - Recommended billing: monthly in advance, cancellable before the next billing date.
 - State whether R99 includes VAT where applicable, payment method, billing date, cancellation process and any payment fees before checkout.
 - No unlimited storage, unlimited media uploads, guaranteed uptime or 24/7 support promise at R99.

@@ -1,6 +1,6 @@
 # Zazu Offline Licensing Specification
 
-**Status:** Active architecture direction; signed-token verification implemented at service level, activation UI/enforcement pending  
+**Status:** Signed-token verification/import and experience-tier ceiling implemented; production issuer and module-level feature enforcement pending  
 **Date:** 2026-10-02
 
 ## Purpose
@@ -95,7 +95,7 @@ The repository contains the local entitlement data foundation, local validity se
 
 The owner Business Settings page now displays the installed entitlement's plan, status, start and expiry dates and provides a signed-token import form. The POST endpoint is inside the authenticated business-context and owner middleware boundary, is rate-limited, rejects oversized/missing tokens, verifies the signed token against the active business, and records a business-scoped audit entry without storing the raw token in the audit log or old form input. A successful import/renewal is available offline once the token has been supplied.
 
-This is an activation/import interface, not a production issuer. There is still no production issuer/key-management workflow, installation identity/reactivation mechanism, or application-wide enforcement boundary. Do not represent the product as commercially license-enforced until those controls are implemented and verified.
+This is an activation/import interface, not a production issuer. The application enforces the workspace entitlement ceiling for experience presentation, but there is not yet a module-level feature-gating matrix. Production issuer/key-management workflow and installation identity/reactivation remain outstanding. Do not represent the full paid-feature matrix as commercially enforced until those controls are implemented and verified.
 
 Licensing is intentionally separate from full offline application operation. A valid license permits entitled local use; it does not by itself provide phone-local data storage, offline mutation queues or synchronization.
 

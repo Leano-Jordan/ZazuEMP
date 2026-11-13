@@ -19,7 +19,7 @@ The product must remain practical for small businesses while supporting increasi
 Zazu hides unnecessary complexity without weakening the underlying system.
 
 ### One product, multiple experience levels
-Zazu provides **Basic, Intermediate and Advanced** experiences. These are experience levels, not separate products. Users select a level during onboarding and can change it later. Changing level must not delete, corrupt or unnecessarily restructure data.
+Zazu provides one product across three commercial tiers: **Basic (Free), Intermediate (paid) and Advanced (paid)**. Each member selects a presentation level during onboarding and can change it later, within the workspace's active entitlement ceiling. Changing level must not delete, corrupt or unnecessarily restructure data.
 
 ### Mobile and desktop are first-class
 Neither platform is secondary. Zazu must provide professional experiences on phones, tablets and desktops. Interfaces adapt to context rather than simply shrinking or expanding another layout.
