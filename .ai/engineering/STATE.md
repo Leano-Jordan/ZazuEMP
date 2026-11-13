@@ -2770,3 +2770,11 @@ Verification boundary: source was re-fetched from `main` and the retry implement
 - **Commercial mutation review:** re-read current-main `FinanceController`, `FinanceTransactionService`, `FinanceIdempotencyMatcher`, `PurchaseOrderController`, `PurchaseOrderReceivingService` and `InventoryController`. Confirmed route permission gates, active-business record scoping, business/event/order locks, idempotency checks, invoice balance/deposit guards, purchase-order line ownership, over-receipt prevention, negative-stock prevention and audit events in the reviewed paths. No new confirmed defect was established; no application mutation code or tests were changed.
 - **Verification boundary:** the workflow change was source-verified after commit. No workflow run or CI pass is claimed for commit `7375cc1`; the combined status endpoint returned no status records at inspection time. The commercial review is source-level only, not runtime certification.
 - Offline acceptance remains frozen. No browser smoke was repeated. No production deployment or customer data was touched.
+
+## 2026-11-14 — Business archive restore complexity correction
+
+- Current archive implementation was revalidated against the exact main head. The archive security test suite had passed on the preceding source checkpoint; the subsequent PHPMD run identified restoreRows() as exceeding cyclomatic and NPath complexity thresholds.
+- Refactored the restore coordinator into focused table, row, foreign-key, file and business-profile helpers. No complexity suppression was added. Existing validation, tenant rebinding, source-row FK remapping, audit-subject detachment, file-write tracking and compensating file cleanup were preserved.
+- Main commit: 41c473784da85e884db7b4978fd0b26c4884c0d5. Changed source re-fetched from GitHub and helper structure reconciled.
+- Exact-head verification started: Laravel run 43520200922, PHPMD 43520200894, Psalm 43520200929, populated upgrade/rollback 43520200961, quality/audit 43520201036. Quality/audit completed successfully; the other runs were still in progress at this checkpoint.
+- No release-readiness uplift until the exact-head Laravel, PHPMD, Psalm, PostgreSQL/offline and populated recovery results are reconciled. The real installation restore drill remains a separate operational acceptance gate.
