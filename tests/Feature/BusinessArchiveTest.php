@@ -2,6 +2,7 @@
 
 namespace Tests\Feature;
 
+use App\Models\AuditLog;
 use App\Models\Business;
 use App\Models\BusinessCapability;
 use App\Models\Customer;
@@ -126,6 +127,46 @@ class BusinessArchiveTest extends TestCase
         $this->assertDatabaseCount('customers', 2);
     }
 
+
+    public function test_restore_detaches_untrusted_polymorphic_audit_subjects_without_loading_classes(): void
+    {
+        Storage::fake('private');
+        $this->signInAsOwner();
+        $source = auth()->user()->businesses()->firstOrFail();
+
+        AuditLog::create([
+            'business_id' => $source->id,
+            'action' => 'archive.security.test',
+            'subject_type' => self::class,
+            'subject_id' => 987654,
+            'metadata' => ['source' => 'archive'],
+            'created_at' => now(),
+        ]);
+
+        $service = app(BusinessArchiveService::class);
+        $archive = $service->download($source);
+        $target = Business::create([
+            'name' => 'Audit Restore Target',
+            'slug' => 'audit-restore-target',
+            'status' => 'active',
+            'currency' => 'ZAR',
+        ]);
+
+        try {
+            $service->restore($archive, $target);
+        } finally {
+            @unlink($archive);
+        }
+
+        $restoredLog = AuditLog::query()
+            ->where('business_id', $target->id)
+            ->where('action', 'archive.security.test')
+            ->firstOrFail();
+
+        $this->assertNull($restoredLog->subject_type);
+        $this->assertNull($restoredLog->subject_id);
+        $this->assertSame(['source' => 'archive'], $restoredLog->metadata);
+    }
 
     public function test_restore_refuses_a_workspace_with_an_already_paired_device(): void
     {
