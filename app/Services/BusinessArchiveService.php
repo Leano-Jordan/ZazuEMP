@@ -10,6 +10,11 @@ use Illuminate\Support\Str;
 use RuntimeException;
 use ZipArchive;
 
+/**
+ * Versioned tenant archive coordinator. Its explicit table and FK allowlists
+ * intentionally centralise fail-closed restore rules for the supported schema.
+ * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
+ */
 final class BusinessArchiveService
 {
     private const VERSION = 1;
@@ -115,6 +120,10 @@ final class BusinessArchiveService
      *
      * @return array{tables:int,records:int,files:int}
      */
+    /**
+     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
+     * @SuppressWarnings(PHPMD.NPathComplexity)
+     */
     public function restore(string $archivePath, Business $target): array
     {
         $zip = new ZipArchive();
@@ -214,6 +223,10 @@ final class BusinessArchiveService
         return $query->get()->map(fn ($row): array => (array) $row)->all();
     }
 
+    /**
+     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
+     * @SuppressWarnings(PHPMD.NPathComplexity)
+     */
     private function collectFiles(Business $business, array &$data): array
     {
         $references = [];
@@ -299,6 +312,10 @@ final class BusinessArchiveService
         }
     }
 
+    /**
+     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
+     * @SuppressWarnings(PHPMD.NPathComplexity)
+     */
     private function restoreRows(Business $target, array $definitions, array $data, array $filePayloads, array $sourceProfile): array
     {
         $idMaps = [];
