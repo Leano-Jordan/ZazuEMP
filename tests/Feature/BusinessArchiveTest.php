@@ -168,6 +168,49 @@ class BusinessArchiveTest extends TestCase
         $this->assertSame(['source' => 'archive'], $restoredLog->metadata);
     }
 
+    public function test_restore_rejects_storage_paths_without_matching_archive_payloads(): void
+    {
+        Storage::fake('private');
+        $this->signInAsOwner();
+        $source = auth()->user()->businesses()->firstOrFail();
+        $customer = Customer::create([
+            'business_id' => $source->id,
+            'name' => 'Path Injection Customer',
+        ]);
+
+        $archive = app(BusinessArchiveService::class)->download($source);
+        $zip = new \ZipArchive();
+        $this->assertTrue($zip->open($archive) === true);
+        $data = json_decode((string) $zip->getFromName('data.json'), true, 512, JSON_THROW_ON_ERROR);
+        $data['customers'][0]['profile_photo_path'] = 'business-archives/another-business/private-secret.jpg';
+        $zip->deleteName('data.json');
+        $zip->addFromString('data.json', json_encode($data, JSON_THROW_ON_ERROR));
+        $zip->close();
+
+        $target = Business::create([
+            'name' => 'Path Injection Target',
+            'slug' => 'path-injection-target',
+            'status' => 'active',
+            'currency' => 'ZAR',
+        ]);
+
+        try {
+            try {
+                app(BusinessArchiveService::class)->restore($archive, $target);
+                $this->fail('A storage path without an archived payload must be rejected.');
+            } catch (\RuntimeException $exception) {
+                $this->assertStringContainsString('without its matching file payload', $exception->getMessage());
+            }
+        } finally {
+            @unlink($archive);
+        }
+
+        $this->assertDatabaseMissing('customers', [
+            'business_id' => $target->id,
+            'name' => 'Path Injection Customer',
+        ]);
+    }
+
     public function test_restore_refuses_a_workspace_with_an_already_paired_device(): void
     {
         Storage::fake('private');
