@@ -2525,3 +2525,12 @@ Verification boundary: source was re-fetched from `main` and the retry implement
 - Audit report: `docs/DIRECTOR_DEEP_AUDIT_2026-11-13.md`.
 - Latest branch checkpoint after audit documentation: `c750279c5ebc069cec15b921473e866ef62e8766`. Fresh exact-head workflows are queued/running; do not promote the prior source-checkpoint results to the new SHA until reruns complete.
 - Remaining V1 acceptance: exact-head browser smoke and real installed phone/tablet acceptance against the release candidate. Scope remains frozen; no speculative gates were added.
+
+
+## 2026-11-13 — Archive restore investigation continuation
+
+- Latest `main` commit: `0eb03bdb206e0a36dffdc6ba8b00c38877f2c773`. This is a test-only strengthening: the archive fixture now explicitly asserts that its event attachment belongs to the source event before export. It does not change restore implementation or close the FK defect.
+- Re-read the current `BusinessArchiveService.php` and the focused archive test. The restore loop remaps declared database foreign keys using ID maps built in definition order; the focused fixture has the expected parent order for customers → customer contacts → events → quotes → quote versions → quote items → attachments. This source inspection alone does not identify the runtime failing FK.
+- Re-read the event/customer-contact/quote/event-requirement/attachment migrations. Confirmed event contact references point to `customer_contacts`; event requirements reference both events and business capabilities; attachment `event_id` references events and `uploaded_by` references users (which restore intentionally nulls).
+- Exact commit combined status returned no status contexts, and the commit workflow-run lookup returned no runs. Focused test execution and exact-HEAD CI remain **UNVERIFIED**. No restore-code change is justified until the actual exception names the unresolved table/column.
+- Next action: obtain the actual focused-test exception from a run or local test output; then fix only the proven missing dependency/remap and add the smallest regression. Keep the empty-target, unpaired-device, tenant-isolation and file-cleanup safeguards intact.
