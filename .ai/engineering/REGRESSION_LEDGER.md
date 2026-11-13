@@ -203,6 +203,6 @@ A service worker keyed authenticated HTML only by user, while the local IndexedD
 **Status:** FIXED ON MAIN — exact-head CI and physical PC/mobile acceptance pending.
 
 
-## REG-023 — Permanent identifier reconciliation
+## Identifier correction note
 
 The offline authenticated-page cache/business-context control was previously assigned duplicate identifier REG-015. REG-015 remains reserved for the resource-register right-edge layout control. The offline cache control is corrected to REG-023, the next unused identifier after REG-022. No application behavior changed.
