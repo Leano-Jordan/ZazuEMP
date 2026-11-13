@@ -87,6 +87,7 @@ final class BusinessArchiveService
                 'version' => self::VERSION,
                 'created_at' => now()->toIso8601String(),
                 'source_business' => [
+                    'id' => (int) $business->id,
                     'name' => $business->name,
                     'currency' => $business->currency,
                     'email' => $business->email,
@@ -169,7 +170,7 @@ final class BusinessArchiveService
                     throw new RuntimeException('The archive contains an unsafe file reference.');
                 }
                 $validIds = $table === 'businesses'
-                    ? [(int) $target->id]
+                    ? [(int) ($manifest['source_business']['id'] ?? 0)]
                     : array_map('intval', array_column($data[$table] ?? [], 'id'));
                 if (! in_array((int) ($file['id'] ?? 0), $validIds, true)) {
                     throw new RuntimeException('The archive contains a file reference outside its business dataset.');
