@@ -1,4 +1,4 @@
-const CACHE_NAME = 'zazu-static-v36';
+const CACHE_NAME = 'zazu-static-v37';
 const OFFLINE_SHELL = '/dashboard';
 let activeUserId = null;
 let activeBusinessId = null;
@@ -481,7 +481,17 @@ self.addEventListener('fetch', (event) => {
 
             try {
                 const response = await fetchWithTimeout(request);
-                if (!response.ok) return response;
+                // A reachable host can still be temporarily unhealthy (for
+                // example, Laravel returning 503 during restart). Keep the
+                // authenticated local workspace usable for transient 5xx
+                // responses, but never mask 401/403 or other client responses
+                // with stale authenticated HTML.
+                if (!response.ok) {
+                    if (response.status >= 500 && response.status <= 599) {
+                        return cachedAppPage(request);
+                    }
+                    return response;
+                }
 
                 // Keep the authenticated page cache operation attached to the
                 // navigation event. Mobile browsers may terminate a worker
