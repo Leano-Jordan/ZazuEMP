@@ -2731,3 +2731,14 @@ Verification boundary: source was re-fetched from `main` and the retry implement
 - Psalm compatibility shim was verified against the upgraded Laravel source revision and its security scan passed.
 - Offline browser acceptance was still running at checkpoint; it is not counted as passed and no offline application code was changed.
 - Security score unchanged pending independent penetration testing and operational/privacy closure. No deployment or customer data was touched.
+
+
+## 2026-11-13 — trusted-device privilege escalation closed
+
+- Source review found `POST /offline/device/register` was available to any authenticated business member. It issued a business-wide sync bearer token; the device mutation handlers support invoices, payments and other financial entities. This bypassed the owner approval boundary and normal staff permission checks.
+- Applied the existing `owner` middleware to primary-device registration. Non-owner staff now receive HTTP 403 and no sync-device row is created. Owner registration remains covered by the existing business-context regression.
+- Added `test_staff_cannot_self_register_a_trusted_sync_device` in `BusinessContextSecurityTest`.
+- Updated `public/zazu-offline.js` so HTTP 403 is treated as an owner-approval requirement, blocks automatic retries, and tells the user to ask the owner to pair the device.
+- This is a bounded security correction. No sync protocol, mutation handler, IndexedDB queue, service worker or offline data model was changed.
+- Exact main: `fd63ac5717a3afd656da7860530812d6a81a0016`. [Laravel run 43509943704](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/43509943704): 488 passed, 3,478 assertions, 1 skipped; PostgreSQL migration/recovery PASS. [Quality + Composer/npm audit + secret scan](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/43509943486), [Psalm PASS](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/43509931780), [PHPMD PASS](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/43509937057).
+- Offline browser acceptance remained in progress and is not counted. Security remains 4/5; independent penetration testing and operational/privacy review remain outstanding.
