@@ -3,7 +3,25 @@ name: Zazu populated upgrade and rollback
 on:
   push:
     branches: [main]
+    paths:
+      - 'app/**'
+      - 'bootstrap/**'
+      - 'config/**'
+      - 'database/**'
+      - 'routes/**'
+      - 'composer.json'
+      - 'composer.lock'
+      - '.github/workflows/zazu-populated-upgrade.yml'
   pull_request:
+    paths:
+      - 'app/**'
+      - 'bootstrap/**'
+      - 'config/**'
+      - 'database/**'
+      - 'routes/**'
+      - 'composer.json'
+      - 'composer.lock'
+      - '.github/workflows/zazu-populated-upgrade.yml'
   workflow_dispatch:
 
 permissions:
