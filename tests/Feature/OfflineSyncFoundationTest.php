@@ -2488,7 +2488,7 @@ class OfflineSyncFoundationTest extends TestCase
         $this->assertSame('resolved', $conflict->fresh()->status);
     }
 
-    public function test_sync_push_returns_server_identity_for_new_offline_record(): void
+    public function test_sync_push_returns_distinct_server_identities_for_multiple_offline_customers(): void
     {
         $business = Business::create([
             'name' => 'Identity Handoff Business',
@@ -2503,42 +2503,62 @@ class OfflineSyncFoundationTest extends TestCase
             'status' => 'active',
         ]);
 
-        $mutationId = (string) Str::uuid();
-        $localId = (string) Str::uuid();
-        $request = Request::create('/api/sync/push', 'POST', [
-            'mutations' => [[
-                'id' => $mutationId,
-                'entity_type' => 'customer',
-                'entity_id' => $localId,
-                'operation' => 'create',
-                'payload' => [
-                    'local_id' => $localId,
-                    'record' => [
-                        'name' => 'Identity Handoff Customer',
-                    ],
-                ],
-            ]],
-        ]);
-        $request->attributes->set('sync_device', $device);
+        $customers = [
+            ['local_id' => (string) Str::uuid(), 'mutation_id' => (string) Str::uuid(), 'name' => 'Identity Handoff Customer One'],
+            ['local_id' => (string) Str::uuid(), 'mutation_id' => (string) Str::uuid(), 'name' => 'Identity Handoff Customer Two'],
+        ];
+        $mutations = array_map(static fn (array $customer): array => [
+            'id' => $customer['mutation_id'],
+            'entity_type' => 'customer',
+            'entity_id' => $customer['local_id'],
+            'operation' => 'create',
+            'payload' => [
+                'local_id' => $customer['local_id'],
+                'record' => ['name' => $customer['name']],
+            ],
+        ], $customers);
 
-        $response = app(SyncController::class)->push(
-            $request,
-            app(SyncMutationRecorder::class),
-            app(SyncMutationApplier::class),
-            app(OfflineDomainMutationHandler::class),
-            app(SyncConflictRecorder::class),
-        );
-        $data = $response->getData(true);
-        $customer = Business::query()->findOrFail($business->id)->customers()->where('name', 'Identity Handoff Customer')->firstOrFail();
+        $push = function (array $items) use ($device): array {
+            $request = Request::create('/api/sync/push', 'POST', ['mutations' => $items]);
+            $request->attributes->set('sync_device', $device);
 
-        $identity = $data['recorded'][0]['identity'];
-        $this->assertSame('customer', $identity['entity_type']);
-        $this->assertSame($localId, $identity['local_id']);
-        $this->assertSame($customer->id, $identity['server_id']);
-        $this->assertSame($customer->id, SyncEntityIdentity::query()
-            ->where('business_id', $business->id)
-            ->where('entity_uuid', $localId)
-            ->value('record_id'));
+            return app(SyncController::class)->push(
+                $request,
+                app(SyncMutationRecorder::class),
+                app(SyncMutationApplier::class),
+                app(OfflineDomainMutationHandler::class),
+                app(SyncConflictRecorder::class),
+            )->getData(true);
+        };
+
+        $data = $push($mutations);
+        $this->assertCount(2, $data['applied']);
+        $this->assertCount(2, $data['recorded']);
+
+        $serverIds = [];
+        foreach ($customers as $customerData) {
+            $customer = Business::query()->findOrFail($business->id)->customers()
+                ->where('name', $customerData['name'])
+                ->firstOrFail();
+            $identity = collect($data['recorded'])->firstWhere('identity.local_id', $customerData['local_id'])['identity'];
+
+            $this->assertSame('customer', $identity['entity_type']);
+            $this->assertSame($customerData['local_id'], $identity['local_id']);
+            $this->assertSame($customer->id, $identity['server_id']);
+            $this->assertSame($customer->id, SyncEntityIdentity::query()
+                ->where('business_id', $business->id)
+                ->where('entity_uuid', $customerData['local_id'])
+                ->value('record_id'));
+            $serverIds[] = $identity['server_id'];
+        }
+
+        $this->assertCount(2, array_unique($serverIds), 'Each offline customer must reconcile to its own server record.');
+
+        // A lost response followed by the same batch must be idempotent.
+        $replay = $push($mutations);
+        $this->assertCount(2, $replay['applied']);
+        $this->assertSame(2, Business::query()->findOrFail($business->id)->customers()->count());
+        $this->assertSame(2, SyncEntityIdentity::query()->where('business_id', $business->id)->where('entity_type', 'customer')->count());
     }
 
     public function test_sync_device_can_revoke_its_bearer_token_and_cannot_reuse_it(): void
