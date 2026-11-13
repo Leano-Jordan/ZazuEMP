@@ -1416,7 +1416,7 @@
 
     function scheduleSyncRetry() {
         if (syncRetryTimer !== null || sessionCleared || !navigator.onLine
-            || state?.sync_authorization_required) return;
+            || state?.sync_authorization_required || state?.sync_registration_blocked) return;
 
         // Retry both halves of the recovery path: obtain a device credential
         // when first registration failed, then drain the durable mutation queue.
@@ -1426,7 +1426,8 @@
         syncRetryAttempt += 1;
         syncRetryTimer = window.setTimeout(async () => {
             syncRetryTimer = null;
-            if (sessionCleared || !navigator.onLine || state?.sync_authorization_required) return;
+            if (sessionCleared || !navigator.onLine || state?.sync_authorization_required
+                || state?.sync_registration_blocked) return;
 
             try {
                 if (!state?.sync?.token) {
@@ -1652,8 +1653,9 @@
             || state?.sync?.token || state?.installation_id !== registrationInstallationId) return false;
 
         if (!response.ok) {
+            state.sync_registration_blocked = response.status === 409;
             state.last_sync_error = response.status === 409
-                ? 'This installation is registered to a different business workspace.'
+                ? 'This installation is registered to a different business workspace. The owner must resolve the device registration before these changes can sync.'
                 : 'Zazu could not register this device (HTTP ' + response.status + '). Your local work remains saved and registration will retry automatically.';
             await writeState().catch(() => {});
             window.dispatchEvent(new CustomEvent('zazu:offline-state-updated'));
@@ -1674,6 +1676,7 @@
         const preserveLocalWorkspace = queued.length > 0 || state.local_dirty === true;
         state.sync = { token: result.token, device: result.device };
         state.sync_authorization_required = false;
+        state.sync_registration_blocked = false;
         state.last_sync_error = null;
         if (!preserveLocalWorkspace) applyBootstrap(result.bootstrap);
         await writeState({ allowSessionChange: true });
