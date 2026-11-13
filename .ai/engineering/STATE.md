@@ -2612,3 +2612,13 @@ Verification boundary: source was re-fetched from `main` and the retry implement
 - Current archive test fixture now explicitly asserts: attachment.event_id belongs to the source business event; the event is present in exported archive data; and the attachment's event ID matches that source event. These are useful preconditions, but they are test assertions, not a test execution result.
 - No dependency-order or missing-ID-map correction is justified by static review alone. Exact focused-test exception and exact-head workflow execution for the archive commits remain **UNVERIFIED**. The business archive restore gate stays **OPEN / NO-GO**.
 - Next action: obtain the focused PHPUnit output from a run that includes the current archive test, then correct only the named relationship. Do not use the older `245aa47` green run as evidence for archive recovery.
+
+## 2026-11-13 — CI execution efficiency
+
+- Reviewed the current `main` workflow triggers after documentation-only pushes repeatedly launched the full Laravel suite, PHPMD, Psalm and populated upgrade/rollback jobs.
+- Added explicit path filters to `.github/workflows/laravel.yml`, `phpmd.yml`, `psalm.yml` and `zazu-populated-upgrade.yml`.
+- Laravel remains triggered by application, migration, route, UI, browser-test, dependency, build/configuration and its own workflow changes. PHPMD and Psalm remain scoped to their relevant PHP/security source and dependency/configuration changes. Populated upgrade/rollback remains triggered by application/schema/dependency changes and its own workflow changes.
+- Manual dispatch remains available for populated upgrade/rollback; PHPMD and Psalm scheduled scans remain unchanged.
+- Documentation-only edits no longer trigger these four expensive workflows. Quality/secret scanning and Director contract lint retain their separate existing triggers.
+- Commits: `c9c0761`, `42a715b`, `7762cd2`, `1433120`.
+- Validation boundary: trigger definitions were re-fetched and the expected path filters verified. GitHub Actions execution for the workflow edits is pending; this is a CI scheduling change, not an application-code change.
