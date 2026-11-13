@@ -1,3 +1,15 @@
+## 2026-11-13 — archive restore source review (follow-up)
+
+- Re-read the complete current `BusinessArchiveService.php`, `BusinessArchiveTest.php`, tenant-parent migration and Laravel workflow from `main`.
+- Structural review: archive allowlist order places suppliers/events before purchase orders and purchase orders before purchase-order items; restore remaps each FK from the original archived row, including columns covered by both simple and composite tenant constraints. File restore writes are tracked for cleanup if the DB transaction fails. Existing target-empty and sync-device guards run both before and inside the locked transaction.
+- Regression fixture covers supplier → purchase order → purchase-order item remapping, purchase-order event relationship, cross-tenant export exclusion, private attachment bytes, public catalogue image bytes, non-empty-target rejection and paired-device rejection.
+- The focused test asserts 28 allowlisted tables, 11 restored records and 2 file payloads.
+- No new source defect was confirmed by this read-only review. This is **not** a runtime pass: the connected GitHub interface exposes no workflow-dispatch or repository-wide workflow-run listing, combined commit status has no contexts, and the commit-workflow wrapper only returns PR-triggered runs. Do not run the permanently loading browser smoke as a substitute.
+- Next meaningful proof is the existing Laravel workflow's `php artisan test` job and PostgreSQL migration/backup recovery job on the current `main` head. The browser acceptance job is a separate relevant gate; routine browser smoke remains excluded unless a browser-facing change warrants it.
+- No application files, databases, deployments, customer data or non-main branches were changed in this review.
+
+---
+
 ## 2026-11-13 — V1 status-document reconciliation
 
 - Reconciled `docs/ZAZU_V1_STATUS.md` and `docs/V1_RELEASE_CHECKLIST.md` with the live archive implementation. Their older sections incorrectly described business archive restore as not implemented; the new leading entries supersede that historical text.
