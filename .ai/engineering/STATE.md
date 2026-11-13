@@ -1,3 +1,13 @@
+## 2026-11-13 — Shared UI token cascade correction
+
+- Owner-reported UI styling/structure failure routed through the UI recovery engine.
+- Root cause confirmed in source: `resources/css/zazu-product-authority.css` contained competing light/dark `:root` token systems loaded after `app.css`. Those late declarations silently replaced the canonical palette, typography/surface relationships and navigation colours. This contradicted the Director CSS authority contract.
+- Corrected on `main`: consolidated the effective product light/dark and semantic tone tokens into the existing canonical `:root` blocks in `resources/css/app.css`; removed all token-root blocks from `zazu-product-authority.css`. The product stylesheet now remains a component extension, not a second token authority.
+- Updated `tests/Feature/UiVisualSystemRegressionTest.php` to assert that shared palette/semantic tokens live in `app.css` and that the product extension contains no light/dark root blocks.
+- Source re-read after writes: `app.css` has exactly one light and one dark root; each contains unique custom-property declarations. `zazu-product-authority.css` has zero root blocks. CSS brace balance passed. Relevant source commits: `c5dc829`, `92056ff`, `4860b3e`, `887e970`, `82e6ce9`, `df2cf7d`, `3f60ae9`.
+- Verification boundary: GitHub combined status returned no status contexts for the latest test commit; PHPUnit/Vite build and rendered desktop/mobile + light/dark acceptance are **UNVERIFIED**. Do not claim visual acceptance until rendered evidence is inspected.
+- No routes, business data, database, deployment settings, Render service or `deploy/render-staging` were changed.
+
 ## 2026-11-13 — Paid entitlement expiry continuity regression added
 
 - Target: verify an expired Advanced paid entitlement resolves the effective presentation tier to Basic while preserving each member's saved Advanced preference.
