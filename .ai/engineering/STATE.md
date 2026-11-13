@@ -2751,3 +2751,13 @@ Verification boundary: source was re-fetched from `main` and the retry implement
 - Confirmed customer profile media requires `customers.view` and business membership; user profile media requires active membership in the current business; business branding media is scoped to the resolved current business and served privately/no-store. Customer-contact endpoints combine route permission middleware with customer/business and contact/customer ownership checks. Customer import endpoints are permission-gated and bind the preview session to its originating business.
 - Workspace switching delegates to `CurrentBusiness::switchTo`; search delegates authorization filtering to `WorkspaceSearchService`. Experience preferences are stored on the individual user/business membership rather than changing another member's preferences.
 - No new confirmed authorization defect was established in this bounded source review. No application code or test was changed, and no runtime/CI pass is claimed. Existing security score remains 4/5 and evidence maturity remains 71/100; independent penetration testing and operational acceptance are still outstanding.
+
+
+## 2026-11-13 — Authentication and privileged-route follow-up
+
+- Reviewed the current login, registration, workspace recovery, logout and password-reset controllers; owner and platform-admin middleware; session configuration; named rate limiters; public signed-quote routes; and current-business switching.
+- Confirmed login regenerates the session; logout invalidates the session and rotates the CSRF token; password reset rotates the remember token, regenerates the authenticated session, removes other database-backed sessions and invokes logout-other-devices; reset responses do not disclose whether an account exists.
+- Confirmed owner routes resolve the active selected business and verify the user's owner membership. Platform administration is separately restricted by the configured platform-admin email allowlist. Business switching verifies active membership in the requested business before writing the session selection.
+- Public quote viewing/acceptance requires valid signed URLs, permits only sent/accepted quote states as appropriate, locks the business/event/quote/version during acceptance, and rechecks the pending state before mutation.
+- Login, registration, password-reset email, password-reset submission, public quote and sync API throttles are configured. No new confirmed defect was established in this source review. No application source or tests changed; no runtime/CI pass is claimed.
+- Security remains 4/5 and evidence maturity 71/100. Independent penetration testing, physical acceptance and legal/privacy obligations remain open.
