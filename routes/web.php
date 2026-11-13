@@ -127,7 +127,7 @@ Route::get('/offline', fn () => redirect()->route('dashboard'))->name('offline.s
 Route::middleware(['auth', 'auth.session', 'business.context'])->group(function () {
     Route::get('/dashboard', DashboardController::class)->middleware('permission:dashboard.view')->name('dashboard');
     Route::get('/offline/bootstrap', [OfflineWorkspaceController::class, 'bootstrap'])->name('offline.bootstrap');
-    Route::post('/offline/device/register', [SyncController::class, 'registerPrimaryDevice'])->middleware('throttle:30,1')->name('offline.device.register');
+    Route::post('/offline/device/register', [SyncController::class, 'registerPrimaryDevice'])->middleware(['owner', 'throttle:30,1'])->name('offline.device.register');
 
     Route::middleware('owner')->group(function () {
         Route::get('/setup', [OnboardingController::class, 'index'])->name('onboarding.index');
