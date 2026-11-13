@@ -291,6 +291,21 @@ final class BusinessArchiveService
 
     private function assertTargetIsEmpty(Business $target, array $definitions): void
     {
+        foreach ([
+            'sync_devices',
+            'sync_mutations',
+            'sync_cursors',
+            'sync_conflicts',
+            'sync_streams',
+            'sync_deliveries',
+            'sync_entity_identities',
+        ] as $syncTable) {
+            if (Schema::hasTable($syncTable)
+                && DB::table($syncTable)->where('business_id', $target->id)->exists()) {
+                throw new RuntimeException('Restore stopped: the target workspace is not empty or still has offline sync state. Restore before pairing devices.');
+            }
+        }
+
         $targetRows = [];
         foreach ($definitions as $table => $definition) {
             $query = DB::table($table);
