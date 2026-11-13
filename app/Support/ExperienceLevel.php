@@ -8,13 +8,14 @@ use DateTimeInterface;
 
 class ExperienceLevel
 {
-    public function __construct(private readonly BusinessEntitlement $entitlements)
-    {
-    }
     public const BASIC = 'basic';
     public const INTERMEDIATE = 'intermediate';
     public const ADVANCED = 'advanced';
     public const DEFAULT = self::INTERMEDIATE;
+
+    public function __construct(private readonly BusinessEntitlement $entitlements)
+    {
+    }
 
     public function selected(?User $user = null, ?Business $business = null): ?string
     {

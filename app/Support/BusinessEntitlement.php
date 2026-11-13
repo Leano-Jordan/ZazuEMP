@@ -22,7 +22,7 @@ class BusinessEntitlement
     public function currentTier(Business $business, ?DateTimeInterface $at = null): string
     {
         $instant = $at ? Carbon::instance($at) : now();
-        $license = $business->license;
+        $license = $business->license()->first();
 
         // An installed licence always supersedes a trial, including when expired or revoked.
         if ($license instanceof BusinessLicense) {
@@ -39,14 +39,16 @@ class BusinessEntitlement
         }
 
         $trialEndsAt = $this->trialEndsAt($business);
-        return $createdAt->lte($instant) && $instant->lt($trialEndsAt)
-            ? self::ADVANCED
-            : self::BASIC;
+        return $trialEndsAt !== null
+            && $createdAt->lte($instant)
+            && $instant->lt($trialEndsAt)
+                ? self::ADVANCED
+                : self::BASIC;
     }
 
     public function trialEndsAt(Business $business): ?Carbon
     {
-        if (! $business->created_at || $business->license) {
+        if (! $business->created_at || $business->license()->exists()) {
             return null;
         }
 
@@ -57,7 +59,7 @@ class BusinessEntitlement
 
     public function isTrial(Business $business, ?DateTimeInterface $at = null): bool
     {
-        if (! $business->created_at || $business->license) {
+        if (! $business->created_at || $business->license()->exists()) {
             return false;
         }
 

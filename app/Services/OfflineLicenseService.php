@@ -13,8 +13,7 @@ class OfflineLicenseService
     public function __construct(
         private readonly SignedOfflineLicenseVerifier $verifier,
         private readonly BusinessEntitlement $entitlements,
-    )
-    {
+    ) {
     }
 
     public function current(Business $business): ?BusinessLicense
