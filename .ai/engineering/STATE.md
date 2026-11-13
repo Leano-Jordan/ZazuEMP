@@ -2418,3 +2418,13 @@ Verification boundary: source was re-fetched from `main` and the retry implement
 - Corrected the file's namespace/import separators and re-fetched the committed source to confirm valid single PHP namespace separators.
 - Fix commit: `44b3aad31dcccfcb34471cbeb5d9d547562b6c78`.
 - Exact-head CI for this correction was queued at inspection time; runtime request/visual acceptance is still pending. Do not claim APP-001 resolved on the user's machine until the local checkout is pulled and the page is retried.
+
+
+## 2026-11-13 — Owner communication contract made persistent
+
+- Owner directive: keep Director responses focused on the actual request; stop introducing unrequested topics, hypothetical alternatives, irrelevant infrastructure, invented scope or generic process narration.
+- Added mandatory owner-facing communication rules to `.ai/engineering/00_DIRECTOR_ENGINE.md`.
+- Added the durable reference `.ai/engineering/OWNER_COMMUNICATION_RULES.md` for all Director and specialist roles.
+- Required reporting is outcome-first and proportional: material result, evidence, changed surface, genuine blocker and next in-scope action only.
+- This instruction applies across future sessions and must not require the owner to repeat it.
+- Commits: Director contract `5251da2c45a91912f805a71c880ca8c89b254d99`; communication reference `e8ed91954946ddcd2b4d86d06cf6a55d95c2fd26`.
