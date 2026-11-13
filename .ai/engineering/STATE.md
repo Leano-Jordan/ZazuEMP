@@ -1,3 +1,14 @@
+## 2026-11-13 — readiness register reconciliation and offline pause
+
+- Owner direction: pause offline engineering. No service-worker, IndexedDB, attachment queue, offline sync or PWA installation changes are authorized in this work cycle.
+- Reconciled `.ai/engineering/READINESS_REGISTER.md` with the current formal scorecard and exact-source CI evidence; its stale Nov 11 snapshot is now explicitly superseded by the Nov 13 reconciliation.
+- The readiness register now records verified application/test source `30e259d445c614df6d1b2495c5a5e505a6d36443`, successful workflow [43504654649](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/43504654649), successful service-worker regression workflow [43504020001](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/43504020001), evidence maturity 71/100, and the remaining owner/operational release obligations.
+- Seeded quote-to-payment-to-profit automation is already verified. Live business-record reconciliation remains an operator acceptance item; no speculative financial-concurrency gate is added.
+- Readiness-register commit: `640b9ea97b70bcfa7d89f474899d85b24a6bacde`.
+- No application source, tests, production data, database, deployment or non-main branch changed.
+
+---
+
 ## 2026-11-13 — V1 scorecard re-score pushed
 
 - Re-scored the 13 V1 domains against verified application/test source `30e259d445c614df6d1b2495c5a5e505a6d36443` and completed Laravel workflow [43504654649](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/43504654649).
