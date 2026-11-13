@@ -116,7 +116,7 @@ class BusinessContextSecurityTest extends TestCase
             'installation_id' => $installationId,
             'device_name' => 'Reused phone',
             'device_type' => 'phone',
-        ])->assertConflict();
+        ])->assertStatus(409);
 
         $firstDevice = SyncDevice::query()->findOrFail($firstDeviceId);
         $this->assertSame($first->id, $firstDevice->business_id);
