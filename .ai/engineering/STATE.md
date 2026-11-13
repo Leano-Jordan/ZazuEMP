@@ -1,3 +1,13 @@
+## 2026-11-13 — Disconnected attachment persistence regression
+
+- Extended `e2e/offline-attachment-sync.spec.js` so the active Work attachment test now reloads the job page while browser connectivity is disabled, then reopens the attachment queue through `window.ZazuOffline` and verifies the original file is still present before reconnect/upload.
+- This closes a test-coverage gap: the prior scenario proved IndexedDB queueing and reconnect within one live document, but did not prove recovery after the document's JavaScript heap is discarded.
+- Test commit: `30e259d445c614df6d1b2495c5a5e505a6d36443`. Exact-head offline-browser CI result is pending; no physical Android force-stop claim is made.
+- The preceding service-worker 5xx fallback and 401/403 non-fallback regressions passed in Laravel workflow [43504020001](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/43504020001) on source commit `73734e7d5553eb9bb7b13cc519ac46f0b5266f35`; the workflow completed Laravel, PostgreSQL and offline-browser jobs successfully.
+- No production data, deployment, local database or non-main branch changed.
+
+---
+
 ## 2026-11-13 — Mobile navigation resilience during host restart
 
 - Found a second mobile continuity gap in `public/sw.js`: when Laravel was reachable but returned an HTTP 5xx (for example, during a restart or temporary overload), navigation returned the server error directly instead of using the authenticated page already cached for that user/business. Network disconnects already fell back correctly; transient HTTP failures did not.
