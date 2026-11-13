@@ -198,3 +198,14 @@ The documentation-only commits after `d1e2a439` do not change application source
 - The offline-browser job remained in progress at this checkpoint and is not counted as a security pass; offline engineering remains frozen by owner direction.
 - Automated dependency refresh is available manually and scheduled weekly. Main remains protected; dependency updates are submitted through PRs, not direct pushes.
 - Remaining security boundary: no independent external penetration test has been performed. Keep V1 security at 4/5 until operational review and privacy/legal controls are closed.
+
+
+## Trusted-device authorization checkpoint — 2026-11-13
+
+- Found a privilege-escalation path: any active business member could call `/offline/device/register`, receive a trusted-device bearer token and use the device-level sync mutation API. That API supports financial entities, while normal staff permissions distinguish read access from payment/financial mutation.
+- Closed the bypass by applying the existing `owner` middleware to primary-device registration. The owner-only pairing/provisioning route remains the supported path for other devices.
+- Added `BusinessContextSecurityTest::test_staff_cannot_self_register_a_trusted_sync_device`; it asserts HTTP 403 and zero device records. Existing owner registration and cross-business device-binding tests remain in the same suite.
+- Updated the offline client to treat HTTP 403 as an owner-approval requirement and stop automatic registration retries; no sync protocol, queue, or offline data model was changed.
+- Exact current main source: `fd63ac5717a3afd656da7860530812d6a81a0016`. [Laravel run 43509943704](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/43509943704): **488 passed / 3,478 assertions / 1 skipped**. PostgreSQL migration and recovery job: PASS. [Quality, Composer/npm audit and secret scan](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/43509943486), [Psalm](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/43509931780), and [PHPMD](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/43509937057): PASS.
+- Offline browser acceptance was still running and is not counted. The security fix is narrow and does not claim offline acceptance.
+- Security score remains **4/5** and evidence maturity **71/100**. No independent penetration test has been performed.
