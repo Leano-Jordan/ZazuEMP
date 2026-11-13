@@ -2444,3 +2444,14 @@ Verification boundary: source was re-fetched from `main` and the retry implement
 - Commits: `37f104a5a57b12e25dc8f8b301474cd4e022e8a6`, `025be00a81eabeb6f4e4a1395813a184f470f385`, `e4cd447a44aee7856bed92fc314b9314491a6b86`, `f72e9447766fbbe2646196f92b68c12db8921a59`, `79c86865c82ead240d09662022937a1e02b76d7b`.
 - Verification boundary: GitHub combined status currently returns no status contexts for the latest commit. PHPUnit, PHPMD and exact-head workflow results are **PENDING / UNVERIFIED**. No application CSS, UI, business data or database was changed.
 - Next active target: inspect the resulting exact-head Laravel and PHPMD output; address only failures still present after this test-contract correction.
+
+
+## 2026-11-13 — V1 test maintainability findings addressed
+
+- Split the three trial-lifecycle tests from `ExperienceLevelTest` into `ExperienceLevelTrialTest`; the original suite now has 8 public methods, below the PHPMD threshold.
+- Split the long authenticated visual-authority regression into focused test methods; no rule suppression was added.
+- Re-fetched both resulting test files and confirmed the new trial suite contains 3 tests and the original experience suite contains 8.
+- Latest source commit: `f0b37a315940766c2f9d3f520493b3e6e7f1e061`.
+- GitHub Actions quality run `43450011964` was created for that exact source commit. At the time of this record, both application and secret-scan jobs were queued; test outcome remains pending.
+- Changed only test organisation. Application behaviour, CSS, UI and stored business data were not changed.
+- Next: inspect the quality run's application result and act on any remaining concrete failures.
