@@ -1,4 +1,11 @@
 
+## 2026-11-13 — LAN Vite asset-origin regression guard
+
+- Added `tests/js/vite-config.test.js` to exercise the actual Vite config callback with a LAN HMR host, derived asset origin, and explicit asset-origin override. The test restores environment variables after execution.
+- Added `npm run test:vite-config` and wired it into the Laravel CI workflow immediately after the frontend build, so the config behaviour is tested rather than merely syntax-checked by `vite build`.
+- Commits: `6996004dc2f3b9c99b4ab8c5f1fd4eaab260e64d` (test), `285e49dde9ba3bc86c89036d5ab22a028df766de` (script), `f45fdde3e6e2aa61d28698fe4e49fe6ebd5339da` (CI).
+- Source re-fetch/reconciliation completed. Combined status currently reports the available contexts; no pass is claimed until the workflow result is confirmed.
+
 ## 2026-11-13 — LAN Vite asset-origin correction
 
 - Owner screenshot showed the authenticated Blade shell rendering without its CSS/JavaScript presentation. The failure is asset delivery, distinct from the shared CSS-token cascade correction above.
