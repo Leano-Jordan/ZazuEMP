@@ -9,7 +9,7 @@
 
 The current `zazu:backup` and `zazu:restore` commands operate on the **entire installation database and private storage**. They are not business-scoped. They must only be run by the installation operator through a controlled command-line session. They must never be exposed as ordinary business-owner settings or self-service routes. A restore replaces data for every business in that installation.
 
-Business-level export/restore is a separate product capability and is not implemented by these commands.
+Business-level export/restore is implemented separately through the owner-only Export business data screen (`/exports`). It uses a tenant-scoped `.zazu` archive with an explicit record allowlist and referenced business files; it excludes credentials, sessions, device-pairing tokens, licence entitlements and sensitive tax credentials. Restore is restricted to an empty, unpaired workspace and remaps record IDs. This does not replace installation-wide operator recovery.
 
 ## Backup
 
@@ -132,9 +132,9 @@ A CI round-trip is supporting evidence, not a substitute for this release-enviro
 The business settings UI no longer exposes the installation-wide backup or restore commands. The previous controls implied that an owner was exporting/restoring only their business, while the commands snapshot or replace the entire installation database and private storage. This was an unsafe scope mismatch. The CLI commands remain available to the installation operator. Separately, tenant-scoped business archive export/restore is implemented through the owner's Export business data screen (`/exports`): the `.zazu` archive contains the explicit allowlisted linked records and referenced business files, excludes credentials, sessions, device pairing tokens, licence entitlements and the SARS TCS PIN, and restores only into an empty, unpaired workspace with record IDs remapped. Its round-trip and tenant-isolation regression is automated-verified in CI. This business archive is not a substitute for the installation-wide operator recovery drill.
 
 
-## PostgreSQL / Render recovery notes — 2026-11-12
+## PostgreSQL recovery notes — 2026-11-12
 
-The CLI backup and restore commands support **SQLite, MySQL and PostgreSQL**. The PostgreSQL path uses the PostgreSQL connection resolved by Laravel, including a configured `DB_URL` (for example, a managed Render PostgreSQL URL with an `sslmode` query parameter). The Render Docker runtime must contain `pg_dump` and `psql`; the current repository Dockerfile installs `postgresql-client`.
+The CLI backup and restore commands support **SQLite, MySQL and PostgreSQL**. The PostgreSQL path uses the PostgreSQL connection resolved by Laravel, including a configured `DB_URL` with its required TLS parameters. The runtime must contain `pg_dump` and `psql`; the repository runtime image installs `postgresql-client`.
 
 The archive contains the installation database snapshot, private storage payload and a SHA-256 checksum manifest (format version 2). Restore validates the archive and checksums before installation mutation. PostgreSQL restore runs with stop-on-error and a single SQL transaction; it also captures a pre-restore database dump so a failed import can attempt to restore the pre-operation database. Private storage has a separate staged rollback path.
 
