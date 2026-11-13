@@ -67,7 +67,7 @@ Codes are permanent once assigned. Never recycle a code.
 | ENG-CONTRACT-006 | CASE-ZAZU-0022 | Stale service-worker cache test assertion | F2/F7 | VERIFIED — Laravel + Zazu quality passed on 3f5d1f1 |
 | ENG-RUNTIME-002 | CASE-ZAZU-0023 | Offline launch relies on insecure PC-hosted LAN origin | F4/F7 | OPEN — delivery architecture and device proof required |
 | ENG-FIXTURE-003 | CASE-ZAZU-0028 | MySQL restore rollback failure fixture emits escaped newlines | F2 | VERIFIED — corrected fixture executed in exact-head Laravel suite |
-| ENG-FIXTURE-004 | CASE-ZAZU-0029 | Offline sync browser tests race boot-time registration and retry scheduling | F2/F3 | OPEN — fixture correction committed; exact-head rerun pending |
+| ENG-FIXTURE-004 | CASE-ZAZU-0029 | Offline sync browser tests race boot-time registration and retry scheduling | F2/F3 | CLOSED — exact-head browser and Laravel verification passed |
 
 
 ## Latest browser failure fingerprints — 2026-10-06 — reconciled
