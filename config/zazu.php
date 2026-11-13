@@ -4,7 +4,8 @@ return [
     'platform_admin_emails' => array_values(array_filter(array_map('trim', explode(',', (string) env('ZAZU_PLATFORM_ADMIN_EMAILS', ''))))),
     'licensing' => [
         // Ed25519 public key only (base64-encoded 32-byte key). Never configure a private key here.
-        'public_key' => env('ZAZU_LICENSE_PUBLIC_KEY', ''),\n        'trial_days' => 30,
+        'public_key' => env('ZAZU_LICENSE_PUBLIC_KEY', ''),
+        'trial_days' => 30,
     ],
     'landing_image_library' => [
         // Bundled landing visuals. Keeping these under public/images/landing avoids
