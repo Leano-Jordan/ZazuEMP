@@ -211,6 +211,36 @@ class ExperienceLevelTest extends TestCase
         $this->assertSame(['basic'], $levels->availableLevels($business));
     }
 
+
+    public function test_setup_centre_displays_effective_level_after_trial_expiry_without_rewriting_preference(): void
+    {
+        $business = Business::create([
+            'name' => 'Expired Setup Business',
+            'slug' => 'expired-setup-'.Str::lower(Str::random(8)),
+            'status' => 'active',
+            'currency' => 'ZAR',
+        ]);
+        $business->forceFill(['created_at' => Carbon::parse('2026-10-01 09:00:00', 'UTC')])->saveQuietly();
+
+        $user = User::factory()->create();
+        $business->users()->attach($user->id, [
+            'role' => 'owner',
+            'experience_level' => 'advanced',
+            'primary_niche' => NicheFocus::DEFAULT,
+        ]);
+
+        $this->actingAs($user)
+            ->get(route('onboarding.index'))
+            ->assertOk()
+            ->assertSee('Basic')
+            ->assertDontSee('Advanced.');
+
+        $this->assertSame(
+            'advanced',
+            $user->businesses()->whereKey($business->id)->first()->pivot->experience_level
+        );
+    }
+
     public function test_intermediate_signed_entitlement_allows_only_basic_and_intermediate_experience(): void
     {
         $business = Business::create([
