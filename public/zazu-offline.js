@@ -1176,6 +1176,11 @@
 
         if (!response.ok) {
             await recordSyncAuthorizationFailure(response);
+            if (![401, 403].includes(response.status) && state && !sessionCleared) {
+                state.last_sync_error = 'The sync server is temporarily unavailable (HTTP ' + response.status + '). Saved changes will retry automatically.';
+                await writeState().catch(() => {});
+                window.dispatchEvent(new CustomEvent('zazu:offline-state-updated'));
+            }
             return;
         }
 
@@ -1471,8 +1476,16 @@
             if (!sessionCleared && navigator.onLine && state?.sync?.token
                 && !state.sync_authorization_required) {
                 try {
-                    if ((await pending()).length) scheduleSyncRetry();
-                    else clearSyncRetry(true);
+                    if ((await pending()).length) {
+                        scheduleSyncRetry();
+                    } else {
+                        clearSyncRetry(true);
+                        if (state.last_sync_error && !state.sync_authorization_required) {
+                            state.last_sync_error = null;
+                            await writeState().catch(() => {});
+                            window.dispatchEvent(new CustomEvent('zazu:offline-state-updated'));
+                        }
+                    }
                 } catch {
                     scheduleSyncRetry();
                 }
