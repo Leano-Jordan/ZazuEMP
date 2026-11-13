@@ -410,6 +410,30 @@ test('operator creates an offline Work job, attaches a file from its directory r
     }]);
     expect(locallySaved.fileText).toBe('captured through the actual Work directory action');
 
+    // Simulate a full page restart while disconnected: the local job and its Blob
+    // must be reconstructed from durable browser storage, not in-memory state.
+    await page.reload({ waitUntil: 'domcontentloaded' });
+    await page.evaluate(async () => window.ZazuOffline.ready);
+    const restartedRow = page.locator('[data-zazu-local-record="job"]').filter({ hasText: 'Attachment journey offline job' });
+    await expect(restartedRow).toBeVisible();
+    await expect(restartedRow.getByRole('button', { name: 'operator-job-brief.txt' })).toBeVisible();
+    const afterRestart = await page.evaluate(async localId => {
+        const records = await window.ZazuOffline.loadAttachments(null, localId);
+        const file = records[0] ? await window.ZazuOffline.getAttachmentFile(records[0].idempotency_key) : null;
+        return {
+            job: window.ZazuOffline.getState().jobs.find(item => item.local_id === localId)?.name || null,
+            status: records[0]?.status || null,
+            name: records[0]?.original_name || null,
+            fileText: file ? await file.text() : null,
+        };
+    }, localJob.local_id);
+    expect(afterRestart).toEqual({
+        job: 'Attachment journey offline job',
+        status: 'pending',
+        name: 'operator-job-brief.txt',
+        fileText: 'captured through the actual Work directory action',
+    });
+
     const deviceToken = 'offline-work-attachment-journey-token';
     await page.evaluate(async token => {
         const state = window.ZazuOffline.getState();
