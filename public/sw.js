@@ -173,7 +173,7 @@ async function primeStaticAsset(url, generation, seenUrls, signal, depth = 0) {
 
         const css = await response.clone().text();
         const references = [];
-        for (const match of css.matchAll(/url\\(\\s*(['"]?)(.*?)\\1\\s*\\)/gi)) {
+        for (const match of css.matchAll(/url\(\s*(['"]?)(.*?)\1\s*\)/gi)) {
             if (match[2]) references.push(match[2]);
         }
         await Promise.all(references.map((reference) => {
