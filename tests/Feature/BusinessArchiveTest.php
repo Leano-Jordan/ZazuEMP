@@ -34,6 +34,7 @@ class BusinessArchiveTest extends TestCase
         $this->signInAsOwner($source);
 
         $this->seedArchiveRecords($source);
+        $sourceEvent = Event::query()->where('business_id', $source->id)->firstOrFail();
 
         $foreign = Business::create([
             'name' => 'Foreign Archive Tenant',
@@ -77,7 +78,7 @@ class BusinessArchiveTest extends TestCase
         $this->assertSame($restoredEvent->id, $restoredQuote->event_id);
         $this->assertSame($restoredVersion->id, $restoredItem->quote_version_id);
         $this->assertSame('Catering service', $restoredItem->description);
-        $this->assertNotSame($event->id, $restoredEvent->id);
+        $this->assertNotSame($sourceEvent->id, $restoredEvent->id);
         $this->assertSame($target->id, $restoredEvent->business_id);
         $this->assertSame('Archive Source', $target->fresh()->name);
         $this->assertSame('Archive Customer', $restoredCustomer->name);
@@ -127,6 +128,4 @@ class BusinessArchiveTest extends TestCase
         ]);
         $this->assertDatabaseCount('customers', 2);
     }
-
-
-
+}
