@@ -1,3 +1,13 @@
+## 2026-11-13 — V1 release checklist exact-evidence correction
+
+- Reconciled the leading current-status section of `docs/V1_RELEASE_CHECKLIST.md`. It incorrectly labelled application/test source `5888123f1941beb478b31870a6e782e0f8ef8053` as current, despite later verified application/test source `30e259d445c614df6d1b2495c5a5e505a6d36443`.
+- Current checklist now distinguishes the verified application/test source from the later documentation/control-plane `main` head `6ca60e37bd71d6eebee0ff9d651c701ef2549ec8`, cites exact passing workflows [43504654649](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/43504654649) and [43504020001](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/43504020001), and preserves the NOT READY disposition and remaining operational obligations.
+- Offline engineering remains paused. No offline application code was changed.
+- Release-checklist commit: `444c423912009932ea0ca53860b18fcbd749db06`.
+- No application source, tests, production data, database, deployment or non-main branch changed.
+
+---
+
 ## 2026-11-13 — readiness register reconciliation and offline pause
 
 - Owner direction: pause offline engineering. No service-worker, IndexedDB, attachment queue, offline sync or PWA installation changes are authorized in this work cycle.
