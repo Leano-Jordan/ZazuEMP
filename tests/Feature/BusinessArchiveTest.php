@@ -177,9 +177,12 @@ class BusinessArchiveTest extends TestCase
         Customer::create(['business_id' => $target->id, 'name' => 'Keep Existing']);
 
         try {
-            $this->expectException(\RuntimeException::class);
-            $this->expectExceptionMessage('workspace is not empty');
-            $service->restore($archive, $target);
+            try {
+                $service->restore($archive, $target);
+                $this->fail('A non-empty workspace must never accept an archive restore.');
+            } catch (\RuntimeException $exception) {
+                $this->assertStringContainsString('workspace is not empty', $exception->getMessage());
+            }
         } finally {
             @unlink($archive);
         }
@@ -188,6 +191,7 @@ class BusinessArchiveTest extends TestCase
             'business_id' => $target->id,
             'name' => 'Keep Existing',
         ]);
+        $this->assertDatabaseCount('customers', 2);
     }
 
     private function signInAsOwner(): void
