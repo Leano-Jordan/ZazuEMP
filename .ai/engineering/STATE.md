@@ -1,3 +1,14 @@
+
+## 2026-11-13 — LAN Vite asset-origin correction
+
+- Owner screenshot showed the authenticated Blade shell rendering without its CSS/JavaScript presentation. The failure is asset delivery, distinct from the shared CSS-token cascade correction above.
+- Source inspection found that `vite.config.js` bound Vite to `0.0.0.0` and allowed `VITE_HMR_HOST` to change only the HMR websocket host. That did not guarantee generated CSS/JS asset URLs used the PC's LAN-reachable address.
+- Corrected `vite.config.js`: `server.origin` now uses `VITE_DEV_SERVER_ORIGIN`, or derives `http://<VITE_HMR_HOST>:5173` when the existing LAN host override is set. HMR and asset origin therefore share the intended host.
+- Documented the optional local `.env` values in `.env.example` and the exact LAN setup / built-asset fallback in `docs/LOCAL_PC_HOST_DEPLOYMENT.md`.
+- Commits: `45969f6cd418f5ca35fd5d0aa185995707ed12f1` (Vite config), `f14631af2c977a087576d260e16442abd5a068cf` (`.env.example`), `8165b821ea01403271b717162c2eafe79758243e` (deployment notes). All writes targeted `main`; each changed file was re-fetched and reconciled.
+- Earlier quality run `43437312175` failed before the namespace correction because `ApplySecurityHeaders.php` contained doubled namespace separators; commit `44b3aad31dcccfcb34471cbeb5d9d547562b6c78` corrected the PHP source and `fe4c21622a16621c1a9e2baae5395b135cf5007f` recorded APP-001. That failed run is not evidence against the later corrected source.
+- Verification boundary: latest Vite config, environment example, deployment notes and middleware were re-fetched from `main`. Exact-head PHPUnit/quality/Vite build and rendered PC/phone acceptance after these changes remain **UNVERIFIED**. Do not claim the screenshot issue is closed until the Vite server is restarted with the LAN origin configured and the rendered page is checked.
+- No customer data, database, Render service or `deploy/render-staging` was changed.
 ## 2026-11-13 — Shared UI token cascade correction
 
 - Owner-reported UI styling/structure failure routed through the UI recovery engine.
