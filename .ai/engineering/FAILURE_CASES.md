@@ -452,3 +452,21 @@ Archive pointer: closed historical cases CASE-ZAZU-0001 through CASE-ZAZU-0009 a
 **Correction:** Generate an executable shell script with actual line breaks, record every invocation, and assert exactly two `mysql` calls plus the deliberate `simulated rollback failure` output. The production restore implementation was not changed.  
 **Verification:** Commit [`7544c11`](https://github.com/Leano-Jordan/ZazuEMP/commit/7544c11edbf3bb47094f2eb30b52825665b42f19); exact-head Laravel [run 43070247812](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/43070247812) passed **454 tests / 3,298 assertions**.  
 **Regression control:** The invocation-count and explicit stderr assertions remain in `tests/Feature/ZazuBackupRecoveryTest.php` so a non-executing fake client cannot satisfy the rollback-failure scenario.
+
+
+### CASE-ZAZU-0029
+
+**Status:** OPEN — browser fixture correction committed; exact-head verification pending.  
+**Engineering diagnostic code:** ENG-FIXTURE-004.  
+**First observed:** 2026-11-13.  
+**Target:** Offline primary-device registration recovery and local sync-status browser acceptance.
+
+**Failure fingerprint:** On commit `55f1211a95b481644c957f798dc605fce6fe38de`, the primary-registration retry test expected at least two intercepted `/offline/device/register` requests but observed zero. A second sync-status test could not observe its expected `Retrying sync` row after a simulated HTTP 503. The Laravel suite passed; the offline browser acceptance job failed 2 tests (20 passed).
+
+**Classification:** F2/F3 — browser test setup/fixture ordering. The dashboard boot path can initiate primary-device registration before the test installs its route interceptor; the status fixture also queued work before installing its network routes, allowing the scheduled retry to race setup. This is a test-harness finding, not proof of an application defect.
+
+**Correction:** Commit `8ecd3894f30cf8c8218ce852aebbf3017d0eef4c` defers automatic boot-time sync/registration in both affected tests. The status test now installs all network routes before queuing the mutation and explicitly triggers sync after setup. Changed only `e2e/pwa-offline.spec.js`.
+
+**Verification:** Changed file re-fetched from `main`; required setup markers and revised ordering confirmed. Exact-head workflow results for the correction are not yet available. Do not claim the fixture correction passed or the customer sync issue is resolved until browser acceptance reruns green.
+
+**Loop prevention:** Do not patch production sync code to satisfy these assertions unless a corrected, deterministic browser test or owner installation evidence demonstrates an application defect.
