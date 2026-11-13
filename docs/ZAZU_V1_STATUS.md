@@ -1,3 +1,16 @@
+## Director reconciliation — 2026-11-13 (supersedes stale archive status below)
+
+- Latest observed repository documentation HEAD: `7d95ee61da48d5fcf3ec4ed06ddbab0696df7b8d` on `main`.
+- Business archive restore is now **IMPLEMENTED / EXECUTION UNVERIFIED**, not “not implemented”. The duplicate-FK remapping correction is in `app/Services/BusinessArchiveService.php` commit `51bba91ddfe4f438b4b979c14f5e67e6864ac048`; the focused round-trip regression fixture is in `tests/Feature/BusinessArchiveTest.php` commit `e4daa4d1b12378479b2990360877f964719d0a5a`. The fixture exercises supplier → purchase order → purchase-order item links and the overlapping simple/composite foreign-key case.
+- The correction always resolves foreign-key values from the original archived row, avoiding a second constraint attempting to remap an already-remapped target ID.
+- Acceptance remains **OPEN** until the focused archive round-trip and its safety tests execute and pass on a commit containing both changes. The latest combined-status lookup returned no contexts and the commit-workflow lookup exposed no runs; no pass is claimed.
+- The archive test currently asserts 28 tables, 11 records and 2 files, plus restored tenant-scoped relationships and private/public attachment payloads.
+- Director CI efficiency changes are present on `main`: duplicate PHP verification was removed from Quality, full browser regression is restricted to browser-relevant PRs or manual dispatch, and the unique service-worker regression plus secret scan remain. These workflow edits also require their own Actions evidence.
+- Existing installation-level PostgreSQL/database+private-file CI evidence does not close the controlled installed-environment recovery drill. Physical phone/tablet acceptance, POPIA operations and Zazu name clearance remain open.
+- No customer data, live database, deployment service or `deploy/render-staging` branch was changed.
+
+---
+
 # Zazu EMP — current V1 gate status (2026-11-13)
 
 **Canonical repository:** `Leano-Jordan/ZazuEMP`  
