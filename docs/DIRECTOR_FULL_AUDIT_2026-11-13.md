@@ -3,7 +3,7 @@
 **Audit date:** 2026-11-13  
 **Repository:** `Leano-Jordan/ZazuEMP`  
 **Audited engineering branch:** `main`  
-**Current exact-head CI baseline:** `3dfbeb3d54cf6939e1351b42189807dbda9a4f00` (documentation-only descendant of application/test baseline `785b544e3cf49a10f19c510b5e5e7ef8c5e5e7ef8c5e4d9a6`)  
+**Current exact-head CI baseline:** `3dfbeb3d54cf6939e1351b42189807dbda9a4f00` (documentation-only descendant of application/test baseline `785b544e3cf49a10f19c510b5e5e7ef8c5e4d9a6`)  
 **Deployment branch:** `deploy/render-staging` — preserved; not modified  
 **Disposition:** **V1 NOT YET RELEASE-CERTIFIED**
 
