@@ -3,7 +3,6 @@
 namespace App\Services;
 
 use App\Models\Business;
-use Illuminate\Database\ConnectionInterface;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Facades\Storage;
@@ -292,6 +291,9 @@ final class BusinessArchiveService
 
         try {
             DB::transaction(function () use ($target, $definitions, $data, $filePayloads, $sourceProfile, &$idMaps, &$createdFiles, &$records): void {
+                DB::table('businesses')->where('id', $target->id)->lockForUpdate()->first();
+                $this->assertTargetIsEmpty($target, $definitions);
+
                 foreach ($definitions as $table => $definition) {
                     $foreignKeys = Schema::getForeignKeys($table);
                     foreach ($data[$table] as $sourceRow) {
@@ -304,6 +306,16 @@ final class BusinessArchiveService
 
                         if (array_key_exists('business_id', $row)) {
                             $row['business_id'] = $target->id;
+                        }
+
+                        if ($table === 'audit_logs' && ! empty($row['subject_id'])) {
+                            $subjectClass = ltrim((string) ($row['subject_type'] ?? ''), '\\');
+                            if (class_exists($subjectClass)) {
+                                $subjectTable = (new $subjectClass())->getTable();
+                                $row['subject_id'] = $idMaps[$subjectTable][(string) $row['subject_id']] ?? null;
+                            } else {
+                                $row['subject_id'] = null;
+                            }
                         }
 
                         foreach ($foreignKeys as $foreignKey) {
