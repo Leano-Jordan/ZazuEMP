@@ -1653,10 +1653,12 @@
             || state?.sync?.token || state?.installation_id !== registrationInstallationId) return false;
 
         if (!response.ok) {
-            state.sync_registration_blocked = response.status === 409;
-            state.last_sync_error = response.status === 409
-                ? 'This installation is registered to a different business workspace. The owner must resolve the device registration before these changes can sync.'
-                : 'Zazu could not register this device (HTTP ' + response.status + '). Your local work remains saved and registration will retry automatically.';
+            state.sync_registration_blocked = [403, 409].includes(response.status);
+            state.last_sync_error = response.status === 403
+                ? 'Only the business owner can register a trusted offline device. Ask the owner to pair this device.'
+                : response.status === 409
+                    ? 'This installation is registered to a different business workspace. The owner must resolve the device registration before these changes can sync.'
+                    : 'Zazu could not register this device (HTTP ' + response.status + '). Your local work remains saved and registration will retry automatically.';
             await writeState().catch(() => {});
             window.dispatchEvent(new CustomEvent('zazu:offline-state-updated'));
             return false;
