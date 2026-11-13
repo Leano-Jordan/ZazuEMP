@@ -1,4 +1,4 @@
-const CACHE_NAME = 'zazu-static-v35';
+const CACHE_NAME = 'zazu-static-v36';
 const OFFLINE_SHELL = '/dashboard';
 let activeUserId = null;
 let activeBusinessId = null;
@@ -140,6 +140,75 @@ async function cacheRenderedPage(request, response, requestGeneration) {
     }
 }
 
+async function primeStaticAsset(url, generation, seenUrls, signal, depth = 0) {
+    if (generation !== activeUserGeneration || seenUrls.size >= 150) return;
+
+    let assetUrl;
+    try {
+        assetUrl = new URL(url, self.location.origin);
+    } catch {
+        return;
+    }
+
+    if (assetUrl.origin !== self.location.origin
+        || !(/^\/build\//.test(assetUrl.pathname) || /^\/images\//.test(assetUrl.pathname))
+        || seenUrls.has(assetUrl.href)) return;
+
+    seenUrls.add(assetUrl.href);
+
+    try {
+        const request = new Request(assetUrl.href, {
+            credentials: 'same-origin',
+            cache: 'no-store',
+        });
+        const response = await fetch(request, { signal });
+        if (!response.ok || generation !== activeUserGeneration) return;
+
+        const cache = await caches.open(CACHE_NAME);
+        if (generation !== activeUserGeneration) return;
+        await cache.put(request, response.clone());
+
+        const contentType = response.headers.get('content-type') || '';
+        if (depth >= 1 || !contentType.toLowerCase().includes('text/css')) return;
+
+        const css = await response.clone().text();
+        const references = [];
+        for (const match of css.matchAll(/url\\(\\s*(['"]?)(.*?)\\1\\s*\\)/gi)) {
+            if (match[2]) references.push(match[2]);
+        }
+        await Promise.all(references.map((reference) => {
+            let child;
+            try {
+                child = new URL(reference, assetUrl);
+            } catch {
+                return Promise.resolve();
+            }
+            return primeStaticAsset(child.href, generation, seenUrls, signal, depth + 1);
+        }));
+    } catch {
+        // An individual build asset must not block the rest of the offline workspace.
+    }
+}
+
+async function primeStaticAssetsFromHtml(html, generation, seenUrls, signal) {
+    if (generation !== activeUserGeneration) return;
+
+    const references = [];
+    for (const match of html.matchAll(/(?:href|src)=["']([^"'#]+)["']/gi)) {
+        if (match[1]) references.push(match[1]);
+    }
+
+    await Promise.all(references.map((reference) => {
+        let assetUrl;
+        try {
+            assetUrl = new URL(reference, self.location.origin);
+        } catch {
+            return Promise.resolve();
+        }
+        return primeStaticAsset(assetUrl.href, generation, seenUrls, signal);
+    }));
+}
+
 async function primePrivateMediaFromHtml(html, generation, userId, businessId, seenUrls, signal) {
     if (generation !== activeUserGeneration
         || activeUserId !== userId || activeBusinessId !== businessId) return;
@@ -276,6 +345,7 @@ async function primePages(routes, primeGeneration = activeUserGeneration, primeU
         .slice(0, MAX_PRIME_ROUTES);
 
     const primedPrivateMediaUrls = new Set();
+    const primedStaticAssetUrls = new Set();
 
     try {
         for (let offset = 0; offset < uniqueRoutes.length; offset += PRIME_CONCURRENCY) {
@@ -308,6 +378,7 @@ async function primePages(routes, primeGeneration = activeUserGeneration, primeU
                         || pageUserId !== activeUserId || pageBusinessId !== activeBusinessId) return;
 
                     await cache.put(new Request(new URL(path, self.location.origin)), response.clone());
+                    await primeStaticAssetsFromHtml(html, primeGeneration, primedStaticAssetUrls, controller.signal);
                     await primePrivateMediaFromHtml(
                         html,
                         primeGeneration,
