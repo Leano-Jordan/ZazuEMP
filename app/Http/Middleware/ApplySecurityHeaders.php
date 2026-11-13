@@ -88,23 +88,23 @@ class ApplySecurityHeaders
 
     private function isAllowedViteUrl(array|false $parts): bool
     {
-        if (! is_array($parts)) {
-            return false;
-        }
+        return is_array($parts)
+            && $this->hasValidViteAuthority($parts)
+            && $this->hasNoUnexpectedViteComponents($parts)
+            && $this->isPrivateNetworkHost(strtolower(trim($parts['host'], '[]')));
+    }
 
-        if (! in_array($parts['scheme'] ?? '', ['http', 'https'], true)
-            || empty($parts['host'])
-            || empty($parts['port'])
-            || isset($parts['user'])
-            || isset($parts['pass'])
-            || isset($parts['query'])
-            || isset($parts['fragment'])
-            || ! in_array($parts['path'] ?? '', ['', '/'], true)
-        ) {
-            return false;
-        }
+    private function hasValidViteAuthority(array $parts): bool
+    {
+        return in_array($parts['scheme'] ?? '', ['http', 'https'], true)
+            && ! empty($parts['host'])
+            && ! empty($parts['port']);
+    }
 
-        return $this->isPrivateNetworkHost(strtolower(trim($parts['host'], '[]')));
+    private function hasNoUnexpectedViteComponents(array $parts): bool
+    {
+        return ! isset($parts['user'], $parts['pass'], $parts['query'], $parts['fragment'])
+            && in_array($parts['path'] ?? '', ['', '/'], true);
     }
 
     private function isPrivateNetworkHost(string $host): bool
