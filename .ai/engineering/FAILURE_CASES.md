@@ -482,3 +482,21 @@ Archive pointer: closed historical cases CASE-ZAZU-0001 through CASE-ZAZU-0009 a
 - Exact-head Laravel [43426697007](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/43426697007): **476 passed / 3,383 assertions / 1 skipped**; dedicated offline browser acceptance **22 passed**.
 - No production code change was needed. The retry chip is visible after the test opens its owning Customer directory; cross-business revocation is now tested with automatic primary registration deferred and an explicit no-token baseline.
 - **Resolution:** CLOSED. Do not reopen unless a new reproducible application failure is observed.
+
+
+### CASE-ZAZU-0030
+
+**Status:** CORRECTED — exact-head rerun pending.  
+**Engineering diagnostic code:** ENG-FIXTURE-005.  
+**First observed:** 2026-11-13.  
+**Target:** Offline browser startup-readiness acceptance.
+
+**Failure fingerprint:** In offline-browser-acceptance run 43469787582, the test `local client becomes ready before an unresponsive initial sync` called `window.ZazuOffline.ready` immediately after the dashboard URL assertion. The dashboard route had completed before the deferred offline runtime script exposed `window.ZazuOffline`; the first attempt failed with `Cannot read properties of undefined (reading 'ready')`, then the retry passed. The job reported 21 passed and 1 flaky.
+
+**Classification:** F2/F3/F8 — test readiness precondition / nondeterministic fixture timing. This is not evidence of a production offline-runtime defect: the failing assertion accessed the runtime before the test had awaited its existing readiness helper.
+
+**Correction:** Commit `b1da7595665a4f2d4b7ec8766d58c67440495f73` adds `await waitForOfflineRuntime(page)` after login and before fixture state mutation. The existing helper polls for the runtime API and awaits its ready promise. No production source changed.
+
+**Verification:** Exact-head browser and offline-browser-acceptance reruns are pending. Do not close this case until both finish without retries/flakes.
+
+**Loop prevention:** Dashboard navigation completion is not the offline runtime readiness contract. Any test that accesses `window.ZazuOffline` must await `waitForOfflineRuntime(page)` first.
