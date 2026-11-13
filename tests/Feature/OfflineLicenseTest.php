@@ -199,8 +199,8 @@ class OfflineLicenseTest extends TestCase
 
         $this->get(route('settings.index'))
             ->assertOk()
-            ->assertSee('SOLO plan · Expired')
-            ->assertDontSee('SOLO plan · Active');
+            ->assertSee('Installed entitlement: Advanced · Expired')
+            ->assertSee('Current workspace tier: Basic');
     }
 
     public function test_non_owner_cannot_install_a_business_license(): void

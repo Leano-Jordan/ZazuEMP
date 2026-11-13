@@ -7,6 +7,7 @@ use App\Models\BusinessTaxProfile;
 use App\Models\SyncDevice;
 use App\Models\TaxRate;
 use App\Support\CurrentBusiness;
+use App\Support\BusinessEntitlement;
 use App\Support\Audit;
 use Carbon\Carbon;
 use Illuminate\Http\RedirectResponse;
@@ -18,7 +19,7 @@ use Illuminate\View\View;
 
 class BusinessSettingsController extends Controller
 {
-    public function edit(Request $request): View
+    public function edit(Request $request, BusinessEntitlement $entitlements): View
     {
         $business = app(CurrentBusiness::class)->model($request->user());
 
@@ -26,6 +27,9 @@ class BusinessSettingsController extends Controller
 
         return view('settings.index', [
             'business' => $business,
+            'currentTier' => $entitlements->currentTier($business),
+            'isTrial' => $entitlements->isTrial($business),
+            'trialEndsAt' => $entitlements->trialEndsAt($business),
             'syncDevices' => SyncDevice::query()->where('business_id', $business->id)->latest('id')->limit(20)->get(),
             'currencies' => config('zazu.currencies'),
             'taxRegimes' => config('zazu.tax.regimes'),

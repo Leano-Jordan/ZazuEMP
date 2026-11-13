@@ -309,7 +309,7 @@
         @if ($license)
             <div class="zazu-list-item mt-4">
                 <div class="min-w-0 flex-1">
-                    <strong class="block">{{ strtoupper($license->plan) }} plan · {{ $license->statusLabel() }}</strong>
+                    <strong class="block">Installed entitlement: {{ $license->plan === 'solo' ? 'Advanced' : ucfirst($license->plan) }} · {{ $license->statusLabel() }}</strong>
                     <p class="zazu-context-copy mt-1">
                         @if ($license->starts_at)
                             Starts {{ $license->starts_at->format('d M Y') }}
@@ -324,8 +324,19 @@
                 </div>
             </div>
         @else
-            <p class="zazu-field-help mt-3">No signed licence is installed for this business.</p>
+            <p class="zazu-field-help mt-3">No signed paid licence is installed for this business.</p>
         @endif
+
+        <div class="zazu-panel mt-4 p-4">
+            <strong>Current workspace tier: {{ ucfirst($currentTier) }}</strong>
+            @if ($isTrial)
+                <p class="zazu-field-help mt-1">Advanced trial ends {{ $trialEndsAt?->format('d M Y H:i') }}. At expiry, the workspace continues on Basic Free unless an active paid entitlement is installed. No payment starts automatically.</p>
+            @elseif ($currentTier === 'basic')
+                <p class="zazu-field-help mt-1">Basic Free keeps the workspace available and preserves access to existing business records.</p>
+            @else
+                <p class="zazu-field-help mt-1">This workspace can use {{ ucfirst($currentTier) }} and all lower experience levels.</p>
+            @endif
+        </div>
 
         <form method="POST" action="{{ route('settings.license.store') }}" class="mt-4">
             @csrf
