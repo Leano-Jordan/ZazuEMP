@@ -209,3 +209,10 @@ The documentation-only commits after `d1e2a439` do not change application source
 - Exact current main source: `fd63ac5717a3afd656da7860530812d6a81a0016`. [Laravel run 43509943704](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/43509943704): **488 passed / 3,478 assertions / 1 skipped**. PostgreSQL migration and recovery job: PASS. [Quality, Composer/npm audit and secret scan](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/43509943486), [Psalm](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/43509931780), and [PHPMD](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/43509937057): PASS.
 - Offline browser acceptance was still running and is not counted. The security fix is narrow and does not claim offline acceptance.
 - Security score remains **4/5** and evidence maturity **71/100**. No independent penetration test has been performed.
+
+
+## Main-only engineering checkpoint — 2026-11-13
+
+- Removed the branch-producing behaviour from the weekly/manual dependency workflow. It now performs read-only Composer/npm lockfile audits, frontend build and Laravel tests; it cannot push commits, create branches or open PRs. [Main commit `7375cc1`](https://github.com/Leano-Jordan/ZazuEMP/commit/7375cc198d6ef16930b764260c4a7e5fb0cb7aa2).
+- Re-reviewed current-main invoice/payment/expense, purchase-order/receiving and inventory mutation paths. Existing route permissions, business scoping, locking, idempotency, financial balance/deposit checks, receipt quantity/line guards, negative-stock prevention and audit events were present. No new confirmed application defect was found in this bounded review.
+- No runtime/CI result is claimed for the workflow commit yet; the file was re-fetched and source-verified only. Scores and V1 disposition are unchanged. Offline acceptance remains frozen; V1 remains **NOT READY**.
