@@ -16,6 +16,7 @@ use App\Models\User;
 use App\Services\BusinessArchiveService;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\DB;
 use Tests\TestCase;
 
 class BusinessArchiveTest extends TestCase
@@ -43,7 +44,12 @@ class BusinessArchiveTest extends TestCase
             'status' => 'active',
             'currency' => 'ZAR',
         ]);
-        Customer::create(['business_id' => $foreign->id, 'name' => 'Must Not Export']);
+        DB::table('customers')->insert([
+            'business_id' => $foreign->id,
+            'name' => 'Must Not Export',
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
 
         $service = app(BusinessArchiveService::class);
         $archive = $service->download($source);
@@ -110,7 +116,12 @@ class BusinessArchiveTest extends TestCase
             'status' => 'active',
             'currency' => 'ZAR',
         ]);
-        Customer::create(['business_id' => $target->id, 'name' => 'Keep Existing']);
+        DB::table('customers')->insert([
+            'business_id' => $target->id,
+            'name' => 'Keep Existing',
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
 
         try {
             try {
