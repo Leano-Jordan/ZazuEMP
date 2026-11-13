@@ -165,6 +165,12 @@ test('Work attachments persist offline, upload on reconnect and cache remote fil
     await attachmentForm.getByRole('button', { name: 'Add to job' }).click();
     await expect(attachmentForm.locator('[data-zazu-offline-attachment-status]')).toContainText('saved on this phone');
 
+    // A page/document restart while disconnected must recover the file from
+    // IndexedDB, not from the previous JavaScript heap or an in-memory queue.
+    await page.reload({ waitUntil: 'domcontentloaded' });
+    await expect(page.locator('[data-zazu-offline-attachment-form]')).toBeVisible();
+    await page.evaluate(async () => window.ZazuOffline.ready);
+
     const pending = await page.evaluate(async id => window.ZazuOffline.loadAttachments(id), eventId);
     expect(pending).toHaveLength(1);
     expect(pending[0].status).toBe('pending');
