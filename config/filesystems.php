@@ -38,6 +38,17 @@ return [
             'report' => false,
         ],
 
+        // Explicit alias for private business attachments and documents.
+        // Keep this separate from the public disk even though both the default
+        // local disk and this alias resolve to the same private storage root.
+        'private' => [
+            'driver' => 'local',
+            'root' => storage_path('app/private'),
+            'serve' => true,
+            'throw' => false,
+            'report' => false,
+        ],
+
         'public' => [
             'driver' => 'local',
             'root' => storage_path('app/public'),
