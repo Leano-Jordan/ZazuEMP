@@ -31,6 +31,67 @@ class SecurityHeadersTest extends TestCase
         $this->assertStringNotContainsString("'unsafe-inline'", $firstCsp);
     }
 
+    public function test_local_vite_origin_is_allowed_by_csp_for_lan_development(): void
+    {
+        $originalEnvironment = $this->app->environment();
+        $hotFile = public_path('hot');
+        $hadHotFile = is_file($hotFile);
+        $originalHotFile = $hadHotFile ? file_get_contents($hotFile) : null;
+
+        try {
+            $this->app->instance('env', 'local');
+            file_put_contents($hotFile, 'http://192.168.137.237:5173');
+
+            $request = Request::create('http://192.168.137.237:8000/', 'GET');
+            $response = (new ApplySecurityHeaders())->handle(
+                $request,
+                fn () => new Response('ok'),
+            );
+            $csp = (string) $response->headers->get('Content-Security-Policy');
+
+            $this->assertStringContainsString("style-src-elem 'self'", $csp);
+            $this->assertStringContainsString('http://192.168.137.237:5173', $csp);
+            $this->assertStringContainsString('ws://192.168.137.237:5173', $csp);
+            $this->assertStringContainsString("script-src 'self'", $csp);
+        } finally {
+            if ($hadHotFile) {
+                file_put_contents($hotFile, (string) $originalHotFile);
+            } else {
+                @unlink($hotFile);
+            }
+            $this->app->instance('env', $originalEnvironment);
+        }
+    }
+
+    public function test_public_vite_origin_is_never_added_to_csp(): void
+    {
+        $originalEnvironment = $this->app->environment();
+        $hotFile = public_path('hot');
+        $hadHotFile = is_file($hotFile);
+        $originalHotFile = $hadHotFile ? file_get_contents($hotFile) : null;
+
+        try {
+            $this->app->instance('env', 'local');
+            file_put_contents($hotFile, 'https://attacker.example:5173');
+
+            $request = Request::create('http://zazu.test/', 'GET');
+            $response = (new ApplySecurityHeaders())->handle(
+                $request,
+                fn () => new Response('ok'),
+            );
+            $csp = (string) $response->headers->get('Content-Security-Policy');
+
+            $this->assertStringNotContainsString('attacker.example', $csp);
+        } finally {
+            if ($hadHotFile) {
+                file_put_contents($hotFile, (string) $originalHotFile);
+            } else {
+                @unlink($hotFile);
+            }
+            $this->app->instance('env', $originalEnvironment);
+        }
+    }
+
     public function test_inline_style_elements_are_nonce_authorized_in_all_standalone_blade_views(): void
     {
         $views = [

@@ -11,6 +11,11 @@ export default defineConfig({
         tailwindcss(),
     ],
     server: {
+        // Allow a phone/tablet on the same LAN to fetch Vite assets during local QA.
+        host: '0.0.0.0',
+        hmr: {
+            host: process.env.VITE_HMR_HOST || undefined,
+        },
         watch: {
             ignored: ['**/storage/framework/views/**'],
         },
