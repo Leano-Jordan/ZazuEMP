@@ -15,7 +15,6 @@ use App\Models\User;
 use App\Services\BusinessArchiveService;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Storage;
-use Illuminate\Support\Str;
 use Tests\TestCase;
 
 class BusinessArchiveTest extends TestCase
@@ -26,8 +25,13 @@ class BusinessArchiveTest extends TestCase
     {
         Storage::fake('private');
         Storage::fake('public');
-        $this->signInAsOwner();
-        $source = auth()->user()->businesses()->firstOrFail();
+        $source = Business::create([
+            'name' => 'Archive Source',
+            'slug' => 'archive-source',
+            'status' => 'active',
+            'currency' => 'ZAR',
+        ]);
+        $this->signInAsOwner($source);
 
         $this->seedArchiveRecords($source);
 
@@ -125,91 +129,4 @@ class BusinessArchiveTest extends TestCase
     }
 
 
-    private function seedArchiveRecords(Business $source): void
-    {
-                $customer = Customer::create([
-                    'business_id' => $source->id,
-                    'name' => 'Archive Customer',
-                    'legal_name' => 'Archive Customer Pty Ltd',
-                ]);
-        
-                $capabilityImage = 'catalogue/archive-service.png';
-                Storage::disk('public')->put($capabilityImage, 'public catalogue image bytes');
-                $capability = BusinessCapability::create([
-                    'business_id' => $source->id,
-                    'name' => 'Catering service',
-                    'capability_type' => 'service',
-                    'pricing_basis' => 'custom',
-                    'default_price' => 1000,
-                    'currency' => 'ZAR',
-                    'image_path' => $capabilityImage,
-                    'is_active' => true,
-                ]);
-                $contact = CustomerContact::create([
-                    'customer_id' => $customer->id,
-                    'name' => 'Archive Contact',
-                    'phone' => '0123456789',
-                    'is_primary' => true,
-                ]);
-                $event = Event::create([
-                    'business_id' => $source->id,
-                    'customer_id' => $customer->id,
-                    'event_day_contact_id' => $contact->id,
-                    'reference' => 'ARCHIVE-EVENT-001',
-                    'name' => 'Archive Test Event',
-                    'customer_name' => $customer->name,
-                    'event_date' => now()->addWeek()->toDateString(),
-                    'status' => 'confirmed',
-                ]);
-                $quote = Quote::create([
-                    'event_id' => $event->id,
-                    'reference' => 'ARCHIVE-QUOTE-001',
-                    'status' => 'accepted',
-                    'currency' => 'ZAR',
-                ]);
-                $version = QuoteVersion::create([
-                    'quote_id' => $quote->id,
-                    'version' => 1,
-                    'status' => 'accepted',
-                    'subtotal' => 1000,
-                    'tax_total' => 150,
-                    'total' => 1150,
-                    'deposit_percent' => 30,
-                    'deposit_amount' => 345,
-                ]);
-                QuoteItem::create([
-                    'quote_version_id' => $version->id,
-                    'description' => 'Catering service',
-                    'quantity' => 1,
-                    'unit_price' => 1000,
-                    'line_total' => 1000,
-                ]);
-        
-                $path = 'jobs/'.$event->id.'/attachments/archive-proof.txt';
-                Storage::disk('private')->put($path, 'private archive attachment bytes');
-                EventAttachment::create([
-                    'event_id' => $event->id,
-                    'business_id' => $source->id,
-                    'uploaded_by' => auth()->id(),
-                    'original_name' => 'archive-proof.txt',
-                    'disk' => 'private',
-                    'path' => $path,
-                    'mime_type' => 'text/plain',
-                    'size' => 31,
-                    'source' => 'upload',
-                ]);
-    }
 
-    private function signInAsOwner(): void
-    {
-        $user = User::factory()->create();
-        $business = Business::create([
-            'name' => 'Archive Source',
-            'slug' => 'archive-source-'.Str::lower(Str::random(6)),
-            'status' => 'active',
-            'currency' => 'ZAR',
-        ]);
-        $business->users()->attach($user->id, ['role' => 'owner']);
-        $this->actingAs($user);
-    }
-}
