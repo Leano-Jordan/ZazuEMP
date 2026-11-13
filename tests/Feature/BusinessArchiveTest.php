@@ -40,6 +40,38 @@ class BusinessArchiveTest extends TestCase
             ->where('business_id', $source->id)->firstOrFail();
         $this->assertSame($sourceEvent->id, $sourceAttachment->event_id);
 
+        // Exercise columns that participate in both simple and composite tenant FKs.
+        $now = now();
+        $supplierId = DB::table('suppliers')->insertGetId([
+            'business_id' => $source->id,
+            'name' => 'Archive Supplier',
+            'created_at' => $now,
+            'updated_at' => $now,
+        ]);
+        $purchaseOrderId = DB::table('purchase_orders')->insertGetId([
+            'business_id' => $source->id,
+            'supplier_id' => $supplierId,
+            'event_id' => $sourceEvent->id,
+            'reference' => 'ARCHIVE-PO-001',
+            'status' => 'draft',
+            'currency' => 'ZAR',
+            'total_amount' => 250,
+            'created_at' => $now,
+            'updated_at' => $now,
+        ]);
+        $purchaseOrderItemId = DB::table('purchase_order_items')->insertGetId([
+            'business_id' => $source->id,
+            'purchase_order_id' => $purchaseOrderId,
+            'capability_id' => null,
+            'description' => 'Archive catering supplies',
+            'quantity' => 1,
+            'unit' => 'lot',
+            'unit_price' => 250,
+            'line_total' => 250,
+            'created_at' => $now,
+            'updated_at' => $now,
+        ]);
+
         $foreign = Business::create([
             'name' => 'Foreign Archive Tenant',
             'slug' => 'foreign-archive-tenant',
@@ -77,11 +109,14 @@ class BusinessArchiveTest extends TestCase
         }
 
         $this->assertSame(28, $result['tables']);
-        $this->assertSame(8, $result['records']);
+        $this->assertSame(11, $result['records']);
         $this->assertSame(2, $result['files']);
 
         $restoredCustomer = Customer::query()->where('business_id', $target->id)->firstOrFail();
         $restoredEvent = Event::query()->where('business_id', $target->id)->firstOrFail();
+        $restoredSupplier = DB::table('suppliers')->where('business_id', $target->id)->first();
+        $restoredPurchaseOrder = DB::table('purchase_orders')->where('business_id', $target->id)->first();
+        $restoredPurchaseOrderItem = DB::table('purchase_order_items')->where('business_id', $target->id)->first();
         $restoredContact = CustomerContact::query()->where('customer_id', $restoredCustomer->id)->firstOrFail();
         $restoredQuote = Quote::query()->where('event_id', $restoredEvent->id)->firstOrFail();
         $restoredVersion = QuoteVersion::query()->where('quote_id', $restoredQuote->id)->firstOrFail();
@@ -92,6 +127,12 @@ class BusinessArchiveTest extends TestCase
         $this->assertSame($restoredCustomer->id, $restoredEvent->customer_id);
         $this->assertSame($restoredContact->id, $restoredEvent->event_day_contact_id);
         $this->assertSame($restoredEvent->id, $restoredQuote->event_id);
+        $this->assertNotNull($restoredSupplier);
+        $this->assertNotNull($restoredPurchaseOrder);
+        $this->assertNotNull($restoredPurchaseOrderItem);
+        $this->assertSame($restoredEvent->id, (int) $restoredPurchaseOrder->event_id);
+        $this->assertSame($restoredSupplier->id, $restoredPurchaseOrder->supplier_id);
+        $this->assertSame($restoredPurchaseOrder->id, $restoredPurchaseOrderItem->purchase_order_id);
         $this->assertSame($restoredVersion->id, $restoredItem->quote_version_id);
         $this->assertSame('Catering service', $restoredItem->description);
         $this->assertNotSame($sourceEvent->id, $restoredEvent->id);
