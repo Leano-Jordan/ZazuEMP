@@ -1,3 +1,16 @@
+## 2026-11-13 — exact-head CI closure and V1 gate reconciliation
+
+- Verified current `main` head: `5888123f1941beb478b31870a6e782e0f8ef8053`.
+- Exact-head Laravel workflow [43491595380](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/43491595380) passed: 486 tests passed, 1 skipped, 3,475 assertions; PostgreSQL migration/registration/backup-restore and dedicated offline-browser acceptance all passed.
+- PHPMD [43491595199](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/43491595199), Psalm [43491595173](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/43491595173), quality/secret scan/CodeQL [43491594809](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/43491594809), and populated upgrade/rollback [43491595120](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/43491595120) passed.
+- PHPMD's 128-line archive round-trip test finding was resolved by extracting fixture setup and restore assertions into private helpers; no suppression or production behavior change.
+- Business archive restore is automated-verified on this exact head. Installation-level recovery is CI-verified but the controlled installed-target operator drill remains open.
+- Automated offline session transition, active Work attachment flow, and seeded commercial reconciliation are green. Real physical-device acceptance remains open.
+- POPIA operational controls/privacy publication, retention and incident procedures, and Zazu name/trade-mark clearance remain open. No legal or brand clearance is claimed.
+- No deployment, live database, customer data, or non-main branch was changed.
+
+---
+
 ## 2026-11-13 — archive restore source review (follow-up)
 
 - Re-read the complete current `BusinessArchiveService.php`, `BusinessArchiveTest.php`, tenant-parent migration and Laravel workflow from `main`.
