@@ -32,8 +32,11 @@ class OnboardingController extends Controller
         );
 
         $taxStatus = $business->taxProfile ? 'in_progress' : 'not_started';
-        $experienceLevel = $levels->selected($request->user(), $business);
-        $experienceStatus = $experienceLevel ? 'completed' : 'not_started';
+        $selectedExperienceLevel = $levels->selected($request->user(), $business);
+        $experienceLevel = $selectedExperienceLevel
+            ? $levels->for($request->user(), $business)
+            : null;
+        $experienceStatus = $selectedExperienceLevel ? 'completed' : 'not_started';
         $nicheFocus = $niches->selected($request->user(), $business);
         $nicheStatus = $nicheFocus ? 'completed' : 'not_started';
         $nicheDefinition = $niches->definition($nicheFocus ?? NicheFocus::DEFAULT);
