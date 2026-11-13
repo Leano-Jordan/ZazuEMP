@@ -11,14 +11,14 @@ class UiProportionFoundationTest extends TestCase
         $css = file_get_contents(resource_path('css/app.css'));
 
         $this->assertIsString($css);
-        $this->assertStringContainsString('--zazu-primary: #159DD2;', $css);
-        $this->assertStringContainsString('--zazu-primary-soft: #DDF4FC;', $css);
-        $this->assertStringContainsString('--zazu-primary-deep: #087FA8;', $css);
-        $this->assertStringContainsString('--zazu-page: #F5FBFE;', $css);
-        $this->assertStringContainsString('--zazu-sidebar: #8ED8F8;', $css);
-        $this->assertStringContainsString('--zazu-primary-light: #35B9E8;', $css);
-        $this->assertStringContainsString('--zazu-accent: #49C7B8;', $css);
-        $this->assertStringContainsString('--zazu-page-deep: #DDF4FC;', $css);
+        $this->assertStringContainsString('--zazu-primary: #426987;', $css);
+        $this->assertStringContainsString('--zazu-primary-soft: #E1E9F0;', $css);
+        $this->assertStringContainsString('--zazu-primary-deep: #304B63;', $css);
+        $this->assertStringContainsString('--zazu-page: #DCE5ED;', $css);
+        $this->assertStringContainsString('--zazu-sidebar: #D5E0E8;', $css);
+        $this->assertStringContainsString('--zazu-primary-light: #6487A2;', $css);
+        $this->assertStringContainsString('--zazu-accent: #6487A2;', $css);
+        $this->assertStringContainsString('--zazu-page-deep: #E8EEF3;', $css);
         $this->assertStringContainsString('--zazu-ui-control-height: 44px;', $css);
         $this->assertStringContainsString('--zazu-content-max: 1320px;', $css);
         $this->assertStringContainsString('--zazu-ui-radius: var(--zazu-radius-lg);', $css);
@@ -174,10 +174,12 @@ class UiProportionFoundationTest extends TestCase
     public function test_product_wide_visual_authority_is_loaded_after_module_styles_and_applies_shared_primitives(): void
     {
         $css = file_get_contents(resource_path('css/zazu-product-authority.css'));
+        $tokens = file_get_contents(resource_path('css/app.css'));
         $layout = file_get_contents(resource_path('views/components/app-layout.blade.php'));
         $vite = file_get_contents(base_path('vite.config.js'));
 
         $this->assertIsString($css);
+        $this->assertIsString($tokens);
         $this->assertIsString($layout);
         $this->assertIsString($vite);
         $this->assertStringContainsString('zazu-product-authority.css', $layout);
@@ -186,8 +188,10 @@ class UiProportionFoundationTest extends TestCase
             strpos($layout, 'zazu-dashboard-authority.css'),
             strpos($layout, 'zazu-product-authority.css')
         );
-        $this->assertStringContainsString('--zazu-border: #C4D0DB;', $css);
-        $this->assertStringContainsString('--zazu-border: #496174;', $css);
+        $this->assertStringContainsString('--zazu-border: #AEBBC7;', $tokens);
+        $this->assertStringContainsString('--zazu-border: #294057;', $tokens);
+        $this->assertStringNotContainsString(':root {', $css);
+        $this->assertStringNotContainsString(':root[data-theme="dark"] {', $css);
         $this->assertStringContainsString('.zazu-card, .zazu-panel', $css);
         $this->assertStringContainsString('.zazu-form-section', $css);
         $this->assertStringContainsString('.zazu-table-wrap', $css);
