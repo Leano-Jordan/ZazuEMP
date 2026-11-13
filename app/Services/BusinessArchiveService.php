@@ -376,6 +376,10 @@ final class BusinessArchiveService
 
                         foreach ($foreignKeys as $foreignKey) {
                             foreach ($foreignKey['columns'] as $column) {
+                                if ($column === 'business_id') {
+                                    continue;
+                                }
+
                                 $oldForeignId = $row[$column] ?? null;
                                 if ($oldForeignId === null) {
                                     continue;
