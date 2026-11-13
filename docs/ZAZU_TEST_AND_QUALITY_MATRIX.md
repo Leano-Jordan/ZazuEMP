@@ -62,3 +62,28 @@ Shared UI: theme, typography, contrast, responsive layout, navigation, form cont
 ## Acceptance
 
 No check is silently ignored. If a check is intentionally non-blocking, record the reason and residual risk in release evidence.
+
+
+## Director verification efficiency policy — 2026-11-13
+
+Verification must be risk-based and must not repeat an already-proven check without a changed dependency or new failure evidence.
+
+- Every application change gets the narrowest relevant automated test first.
+- Run the complete PHPUnit suite once per commit in the Laravel workflow. Do not run it again in a second quality workflow.
+- Keep the focused service-worker race tests as a separate Node test; do not rebuild PHP assets or rerun PHPUnit to execute them.
+- Keep the dedicated offline-browser acceptance test on main because it verifies the PWA runtime contract that PHP tests cannot prove.
+- Run the full rendered-browser suite for browser-relevant pull-request changes or manually at release acceptance. Do not run it automatically on every main push.
+- Do not rerun browser smoke just to confirm static pages, buttons or navigation already covered by established evidence. Trigger it when the changed surface can affect rendered browser behaviour, or when diagnosing a specific browser defect.
+- Do not rerun a green suite after a documentation-only commit. Reuse exact-head evidence only when the application/test inputs are unchanged; record the source SHA and evidence SHA explicitly.
+- A retry is not a pass. Inspect the first failure, classify it (application, test/fixture, environment, CI, tooling, contract or flake), and rerun only the affected test/job after correction.
+- Keep release-level browser checks and real installed-device acceptance separate. Browser automation cannot certify the owner's actual phone installation or physical disconnected workflow.
+
+### Known pipeline duplication removed
+
+- The Zazu quality application job previously repeated the complete PHP install/build/config/migration/PHPUnit pipeline already performed by Laravel. It now runs only the focused service-worker Node regression and secret scan.
+- Zazu browser smoke no longer runs on every push to main. It runs for browser-relevant pull requests or an explicit release/diagnostic dispatch.
+- The Laravel workflow retains the full PHP suite, PostgreSQL migration/recovery checks, and focused offline-browser acceptance on main.
+
+### Deliberate remaining cost
+
+The Laravel and dedicated offline-browser jobs still build separately because they execute in isolated GitHub-hosted jobs and the browser job needs a fully seeded runtime. Removing that build would require artifact handoff or job restructuring; do not add that complexity unless measured CI duration justifies it.
