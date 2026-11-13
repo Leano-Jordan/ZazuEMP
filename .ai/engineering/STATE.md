@@ -2376,3 +2376,13 @@ Verification boundary: source was re-fetched from `main` and the retry implement
 - Re-fetched changed test source from `main`; structural checks confirm both deferral guards and the revised status-test ordering.
 - Exact-head CI for the correction is not yet visible through GitHub Actions. Browser acceptance remains **UNVERIFIED**; no application code, customer data, database, Render service, deployment branch or deployment setting was changed.
 - Next: obtain exact-head offline browser acceptance. If green, reconcile the new registration-retry behaviour against the owner's two queued customer records without recreating or discarding them. If red, inspect the new job logs and follow CASE-ZAZU-0029's attempt budget.
+
+## 2026-11-13 — Mobile UI unstyled / local Vite CSP correction
+
+- Owner screenshot at `192.168.137.237:8000` shows the Blade shell rendering with browser-default typography, links and controls. This is an asset-delivery failure signature, not a confirmed palette/token defect; the earlier token-only diagnosis was insufficient.
+- Re-inspected `app-layout.blade.php`, `vite.config.js`, `public/build/manifest.json` and `ApplySecurityHeaders.php`. The layout uses Laravel Vite. The security middleware's CSP allowed only `'self'` for styles/scripts/connections, which blocks Vite's separate development-server origin (including HMR websocket) even when the phone can reach that server.
+- Corrected `ApplySecurityHeaders` to permit the origin from Laravel's runtime `public/hot` file only in `local` environment, and only when it is an HTTP(S) localhost/private-network origin with an explicit port. Added CSP regression tests for LAN Vite allowance and rejection of public origins.
+- Updated Vite dev server binding to `0.0.0.0` and added optional `VITE_HMR_HOST` override for LAN testing.
+- Commits: `edb02bcc` (CSP), `e95479cc` (tests), `c7d8baa7` (Vite LAN binding).
+- Exact-head GitHub Actions quality workflow `43437312175` was queued at inspection time; test/build result is pending. No PHPUnit/Vite build result is claimed yet.
+- Runtime verification boundary: actual phone access to the hot-file host and generated CSS HTTP responses still require device-side confirmation. If the hot file advertises localhost, set `VITE_HMR_HOST` to the PC's LAN IP and restart Vite; otherwise use a fresh `npm run build` with no stale hot file. Render, deployment, database and customer data remain untouched.
