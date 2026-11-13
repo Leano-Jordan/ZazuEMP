@@ -38,7 +38,29 @@
     </section>
 
     <section class="zazu-panel mt-5">
-        <div class="zazu-panel-title">Export boundary</div>
-        <div class="zazu-panel-copy mt-1">Exports contain structured business records, not original uploaded attachments or a restorable database image. Downloads are private and recorded in the business audit history.</div>
+        <div class="zazu-panel-head">
+            <div>
+                <div class="zazu-panel-title">Complete business archive</div>
+                <div class="zazu-panel-copy mt-1">Package this workspace's linked operational records and private uploaded files into one portable archive. Account passwords, user sessions, device pairing tokens and licence entitlements are never included.</div>
+            </div>
+            <span class="zazu-chip zazu-chip-neutral">ZAZU ARCHIVE V1</span>
+        </div>
+        <div class="flex flex-wrap gap-3 mt-4">
+            <a href="{{ route('exports.archive.download') }}" class="zazu-btn zazu-btn-primary">Download business archive</a>
+        </div>
+        <div class="zazu-detail-row mt-4">
+            <div class="zazu-detail-label">Restore boundary</div>
+            <div class="zazu-detail-value">Restore is allowed only into an empty business workspace. Existing records are never overwritten or merged. Record IDs are remapped and business ownership is re-bound to this workspace.</div>
+        </div>
+        <form method="POST" action="{{ route('exports.archive.restore') }}" enctype="multipart/form-data" class="mt-4 space-y-3">
+            @csrf
+            <label for="business-archive" class="zazu-field-label">Restore a Zazu business archive (.zazu)</label>
+            <input id="business-archive" name="archive" type="file" accept=".zazu,application/zip" required class="zazu-input w-full">
+            @error('archive')
+                <p class="text-sm text-red-600">{{ $message }}</p>
+            @enderror
+            <button type="submit" class="zazu-btn zazu-btn-secondary">Validate and restore archive</button>
+        </form>
+        <p class="zazu-panel-copy mt-3">Restore limit: 100 MB upload / 250 MB expanded archive. Missing files, unsupported versions, unresolved relationships or a non-empty target stop the restore without committing partial database changes.</p>
     </section>
 </x-app-layout>
