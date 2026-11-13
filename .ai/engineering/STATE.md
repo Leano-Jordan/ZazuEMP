@@ -1,3 +1,20 @@
+## Director exact-head verification — 2026-11-13 (PWA offline navigation fixture)
+
+- Canonical repository/branch: `Leano-Jordan/ZazuEMP` / `main`.
+- Exact application/test HEAD: `282a4eb366956dfb49023cd5edc20999f5ead3cb`.
+- Latest source change is test-only: `tests/js/service-worker-auth-cache.test.js` now primes the authenticated dashboard online before disabling the host and asserting offline navigation. No runtime application source or deployment configuration changed.
+- Laravel [43367980312](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/43367980312): **PASS — 462 passed / 3,339 assertions / 1 skipped**.
+- PostgreSQL migration, account/workspace registration, backup/restore/private-file recovery: **PASS** (same workflow).
+- Dedicated offline browser acceptance: **PASS**.
+- Full browser regression [43367980364](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/43367980364): **PASS — 83 passed / 40 skipped / 0 failed**.
+- Zazu quality + secret scan [43367980476](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/43367980476), Psalm [43367980426](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/43367980426), PHPMD [43367980408](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/43367980408), populated upgrade/rollback [43367980313](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/43367980313), push-on-main [43367979917](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/43367979917), and Director Health [43368786394](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/43368786394): **PASS**.
+- SonarCloud [43367980435](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/43367980435): **SKIPPED**, not counted as a pass.
+- The exact-head CI evidence is reconciled in `docs/V1_RELEASE_CHECKLIST.md`. No deployment was performed; `deploy/render-staging` remains untouched.
+- Remaining bounded acceptance: real installed-device offline launch, local persistence across force-close/relaunch, reconnect sync exactly once, and phone/tablet results recorded against the selected secure HTTPS release origin. Browser emulation is not physical-device proof.
+- Scope remains frozen by `.ai/engineering/V1_SCOPE_FREEZE.md`; do not invent new gates or broaden offline scope without a reproducible V1 failure.
+
+---
+
 ## Director exact-head verification — 2026-11-12 (Work completion guards + offline customer-to-Work)
 
 - Exact application/test-source HEAD: `7193038a2b2d14ea71278050a0d7c26ce246bf86` (merge commit; the later `main` descendants `453c80d` and `78fb793` change only these two evidence documents; includes the test-only commits `e3855998`, `b2e548be`, and offline acceptance correction `9bd1cc0d`).
