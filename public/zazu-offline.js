@@ -17,6 +17,8 @@
     let syncing = false;
     let syncRequested = false;
     let activeSyncController = null;
+    let syncRetryTimer = null;
+    let syncRetryAttempt = 0;
     let storageAvailable = true;
     let resolveReady;
     const ready = new Promise((resolve) => { resolveReady = resolve; });
@@ -1395,6 +1397,36 @@
         }
     }
 
+    function clearSyncRetry(resetAttempts = false) {
+        if (syncRetryTimer !== null) {
+            window.clearTimeout(syncRetryTimer);
+            syncRetryTimer = null;
+        }
+        if (resetAttempts) syncRetryAttempt = 0;
+    }
+
+    function scheduleSyncRetry() {
+        if (syncRetryTimer !== null || sessionCleared || !navigator.onLine
+            || !state?.sync?.token || state.sync_authorization_required) return;
+
+        // A reconnect can precede the local host/server becoming ready. Keep
+        // retrying durable pending work with bounded backoff instead of relying
+        // on a second browser "online" event that may never arrive.
+        const delay = Math.min(30000, 1000 * (2 ** Math.min(syncRetryAttempt, 5)));
+        syncRetryAttempt += 1;
+        syncRetryTimer = window.setTimeout(() => {
+            syncRetryTimer = null;
+            if (sessionCleared || !navigator.onLine || !state?.sync?.token
+                || state.sync_authorization_required) return;
+            sync().catch(() => {
+                if (!state || sessionCleared || !state.sync?.token) return;
+                state.last_sync_error = 'Synchronization failed; queued work will retry automatically.';
+                writeState().catch(() => {});
+                window.dispatchEvent(new CustomEvent('zazu:offline-state-updated'));
+            });
+        }, delay);
+    }
+
     async function sync() {
         if (syncing) {
             // A token replacement can request a fresh pass while the previous
@@ -1403,6 +1435,7 @@
             return;
         }
         if (sessionCleared || !navigator.onLine || !state?.sync?.token) return;
+        clearSyncRetry();
         syncing = true;
         const controller = new AbortController();
         activeSyncController = controller;
@@ -1433,6 +1466,18 @@
                     state.last_sync_error = 'Synchronization failed; queued work will retry.';
                     writeState().catch(() => {});
                 });
+            }
+
+            if (!sessionCleared && navigator.onLine && state?.sync?.token
+                && !state.sync_authorization_required) {
+                try {
+                    if ((await pending()).length) scheduleSyncRetry();
+                    else clearSyncRetry(true);
+                } catch {
+                    scheduleSyncRetry();
+                }
+            } else {
+                clearSyncRetry();
             }
         }
     }
