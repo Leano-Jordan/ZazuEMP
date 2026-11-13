@@ -35,8 +35,9 @@ class BusinessArchiveTest extends TestCase
         $this->signInAsOwner($source);
 
         $this->seedArchiveRecords($source);
-        $sourceEvent = Event::query()->where('business_id', $source->id)->firstOrFail();
         $sourceAttachment = EventAttachment::query()->where('business_id', $source->id)->firstOrFail();
+        $sourceEvent = Event::query()->whereKey($sourceAttachment->event_id)
+            ->where('business_id', $source->id)->firstOrFail();
         $this->assertSame($sourceEvent->id, $sourceAttachment->event_id);
 
         $foreign = Business::create([
@@ -232,6 +233,9 @@ class BusinessArchiveTest extends TestCase
             'event_date' => now()->addWeek()->toDateString(),
             'status' => 'confirmed',
         ]);
+        $event = Event::query()->whereKey($event->id)
+            ->where('business_id', $source->id)->firstOrFail();
+
         $quote = Quote::create([
             'event_id' => $event->id,
             'reference' => 'ARCHIVE-QUOTE-001',
