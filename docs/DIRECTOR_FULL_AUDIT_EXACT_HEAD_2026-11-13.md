@@ -1,5 +1,23 @@
 # Zazu EMP — Director Full-Scale Software Audit
 
+> **Superseded exact-head snapshot — reconciliation added 2026-11-13.** The original audit below refers to source head `909d002587358f47a09b069f7fb84bc9449f1076` and its then-red Laravel/PHPMD results. It is retained as historical audit evidence and must not be treated as the current CI state.
+
+## Current authoritative reconciliation — 2026-11-13
+
+- Canonical repository/branch: `Leano-Jordan/ZazuEMP` / `main`.
+- Latest verified application/test head: `5888123f1941beb478b31870a6e782e0f8ef8053`. The subsequent main commits through `b930b3e4aa87a834aebd6bf84203b0f596d7e3fa` are workflow/documentation-only.
+- Laravel run [43491595380](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/43491595380): **PASS — 486 passed, 1 skipped, 3,475 assertions**; PostgreSQL migration/registration/recovery and dedicated offline-browser acceptance passed.
+- PHPMD [43491595199](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/43491595199), Psalm [43491595173](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/43491595173), quality/secret scan/CodeQL [43491594809](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/43491594809), and populated upgrade/rollback [43491595120](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/43491595120): **PASS**.
+- The seven stale visual-system assertions and two PHPMD findings listed in the historical audit were subsequently reconciled. Do not carry those failures forward as current.
+- Business archive restore is automated-verified on the current application/test head, including linked-record ID remapping, tenant exclusion, private attachment payloads and public catalogue media.
+- CI efficiency follow-up: explicit path filters were added to Laravel, PHPMD, Psalm and populated upgrade/rollback workflows. The latest documentation-only commit triggered none of those four expensive workflows. Director lint, quality/secret scan, health report and CodeQL ran separately; the latest observed results passed. PHPMD/Psalm schedules and populated recovery manual dispatch remain available.
+- SonarCloud remains **SKIPPED**, not a pass.
+- Release remains **NOT READY**: physical installed-device acceptance, installed-target operator recovery drill, POPIA operational closure and Zazu name/trade-mark clearance remain open. No legal, physical-device or production acceptance is inferred from CI.
+- No production deployment, live customer database or customer records were changed.
+
+---
+
+
 **Audit date:** 2026-11-13  
 **Repository:** Leano-Jordan/ZazuEMP  
 **Branch audited:** main  
