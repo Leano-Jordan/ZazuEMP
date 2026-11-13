@@ -1,3 +1,15 @@
+## 2026-11-13 — Multi-customer identity reconciliation guard (a6cd9b87)
+
+- Main HEAD: `a6cd9b8776f5917c942a44f55daac7b2db793ada`.
+- Extended the server-side push identity handoff feature test from one customer to two independently queued customer creates. It now asserts each local UUID maps to its own persisted customer/server ID, the IDs are distinct, and replaying the exact same mutation batch creates no duplicate customers or identity rows.
+- This complements the browser registration-retry test added in `b72b28b07fc`, which checks that two local customer records reconcile independently after primary-device registration retry.
+- New exact-HEAD CI is running: Laravel `43471194715`, browser smoke `43471194418`, quality `43471194594`, Psalm `43471194578`, PHPMD `43471194532`, populated upgrade/rollback `43471194613`, Director health `43471194860`, SonarCloud `43471194797` (in progress at last inspection).
+- Earlier exact-HEAD `72dded07` Laravel, offline-browser-acceptance, PostgreSQL migration/recovery, quality, Psalm, PHPMD and Director checks passed. Its browser-smoke run `43470319049` remained in progress for an abnormally long period; this is not counted as a pass. The new HEAD has its own browser-smoke run.
+- No production sync code or customer data was changed in this step; only the server-side regression test was strengthened. No deployment or Render action.
+- Physical phone/PC acceptance and the two real IndexedDB customer reconciliation remain owner-device checks; CI cannot inspect the user's local browser database.
+
+---
+
 ## 2026-11-13 — Exact-main automated verification reconciliation (f0598324)
 
 - Canonical repository/ref: `Leano-Jordan/ZazuEMP` / `main`.
