@@ -31,8 +31,44 @@ name: SonarCloud analysis
 on:
   push:
     branches: [ "main" ]
+    paths:
+      - 'app/**'
+      - 'bootstrap/**'
+      - 'config/**'
+      - 'database/**'
+      - 'e2e/**'
+      - 'public/**'
+      - 'resources/**'
+      - 'routes/**'
+      - 'tests/**'
+      - 'composer.json'
+      - 'composer.lock'
+      - 'package.json'
+      - 'package-lock.json'
+      - 'psalm.xml'
+      - 'phpunit.xml'
+      - 'vite.config.*'
+      - '.github/workflows/sonarcloud.yml'
   pull_request:
     branches: [ "main" ]
+    paths:
+      - 'app/**'
+      - 'bootstrap/**'
+      - 'config/**'
+      - 'database/**'
+      - 'e2e/**'
+      - 'public/**'
+      - 'resources/**'
+      - 'routes/**'
+      - 'tests/**'
+      - 'composer.json'
+      - 'composer.lock'
+      - 'package.json'
+      - 'package-lock.json'
+      - 'psalm.xml'
+      - 'phpunit.xml'
+      - 'vite.config.*'
+      - '.github/workflows/sonarcloud.yml'
   workflow_dispatch:
 
 permissions:
