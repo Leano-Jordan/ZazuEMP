@@ -72,6 +72,8 @@ jobs:
       run: npm ci
     - name: Build frontend assets
       run: npm run build
+    - name: Test service-worker offline cache and session contracts
+      run: npm run test:service-worker
     - name: Verify LAN Vite asset-origin configuration
       run: npm run test:vite-config
     - name: Generate key
