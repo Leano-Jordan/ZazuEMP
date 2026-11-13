@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Customer;
 use App\Models\User;
 use App\Support\CurrentBusiness;
+use App\Support\PermissionService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
@@ -21,6 +22,10 @@ class ProfileMediaController extends Controller
                 ->whereKey($id)
                 ->where('business_id', $business->id)
                 ->firstOrFail();
+            abort_unless(
+                app(PermissionService::class)->allows('customers.view', $request->user(), $business),
+                403
+            );
             $path = $owner->profile_photo_path;
             $prefix = 'profile-photos/customers/';
         } elseif ($type === 'user') {
