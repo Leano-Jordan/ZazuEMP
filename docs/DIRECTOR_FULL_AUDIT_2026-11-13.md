@@ -162,3 +162,13 @@ This addendum supersedes the security/dependency statements above where they con
 - A weekly/manual dependency refresh now creates a PR only after audit, build and test gates pass. Main branch protection remains active and direct pushes are not used.
 - Offline browser acceptance remained pending at this checkpoint and is not counted as a security pass. Offline engineering remains paused.
 - This is source review plus automated regression evidence, not an independent penetration test or proof that attacks are impossible. Security remains 4/5; evidence maturity remains 71/100 until remaining operational/privacy and independent review obligations are addressed.
+
+
+## Trusted-device authorization addendum — 2026-11-13
+
+- A concrete privilege-escalation path was found: the authenticated primary-device registration route did not require owner approval. Any business member could receive a trusted sync bearer token, while the device API supports financial mutations beyond the staff role's normal permissions.
+- Closed by applying the existing owner middleware to `/offline/device/register`. Staff registration now returns 403 without creating a sync device. Existing owner-authorized pairing/provisioning remains unchanged.
+- Added a feature regression proving staff cannot self-register. Updated the client to stop registration retries on 403 and explain that owner pairing is required.
+- Exact main `fd63ac5717a3afd656da7860530812d6a81a0016`: [Laravel 488 passed / 3,478 assertions / 1 skipped](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/43509943704); PostgreSQL migration/recovery PASS; [Composer/npm audit and secret scan PASS](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/43509943486); [Psalm PASS](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/43509931780); [PHPMD PASS](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/43509937057).
+- This change did not alter sync mutation semantics or local queue architecture. Offline browser acceptance remained in progress and is not counted.
+- Security remains 4/5 pending independent penetration testing and operational/privacy review; evidence maturity remains 71/100.
