@@ -2622,3 +2622,11 @@ Verification boundary: source was re-fetched from `main` and the retry implement
 - Documentation-only edits no longer trigger these four expensive workflows. Quality/secret scanning and Director contract lint retain their separate existing triggers.
 - Commits: `c9c0761`, `42a715b`, `7762cd2`, `1433120`.
 - Validation boundary: trigger definitions were re-fetched and the expected path filters verified. GitHub Actions execution for the workflow edits is pending; this is a CI scheduling change, not an application-code change.
+
+## 2026-11-13 — SonarCloud trigger efficiency
+
+- Scoped `.github/workflows/sonarcloud.yml` push and pull-request triggers to application, database, UI, route, test, dependency and analysis-configuration changes.
+- Retained `workflow_dispatch` so a manual analysis can still be run when requested.
+- This avoids queuing SonarCloud on documentation-only commits. SonarCloud remains skipped when its required project/organization variables are not configured; no skipped run is counted as a pass.
+- Workflow commit: `3a22fc71af48a47cae25399b1756c7c57e39c6d6`.
+- Validation boundary: workflow trigger content was re-fetched and the expected filters verified. Runtime application code was not changed.
