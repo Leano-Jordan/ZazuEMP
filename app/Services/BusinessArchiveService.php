@@ -147,6 +147,16 @@ final class BusinessArchiveService
             if (array_keys($data) !== array_keys($definitions)) {
                 throw new RuntimeException('The archive does not contain the complete supported business dataset.');
             }
+            foreach ($definitions as $table => $_definition) {
+                if (! is_array($data[$table])) {
+                    throw new RuntimeException('The archive contains an invalid dataset: '.$table.'.');
+                }
+                foreach ($data[$table] as $row) {
+                    if (! is_array($row)) {
+                        throw new RuntimeException('The archive contains an invalid record in '.$table.'.');
+                    }
+                }
+            }
 
             $this->assertTargetIsEmpty($target, $definitions);
             $filePayloads = [];
@@ -211,7 +221,13 @@ final class BusinessArchiveService
             if (! $path) {
                 return;
             }
+            if (Str::contains($path, ['..', '\\\\'])) {
+                throw new RuntimeException("A referenced business file path is unsafe: {$table}#{$id}.");
+            }
             $diskName = $disk ?: 'private';
+            if ($disk !== null && ! in_array($diskName, ['private', 'local'], true)) {
+                throw new RuntimeException("An attachment uses an unsupported storage disk: {$table}#{$id}.");
+            }
             $candidates = $disk !== null ? [$diskName] : ['private', 'local', 'public'];
             $sourceDisk = null;
             foreach ($candidates as $candidate) {
@@ -348,7 +364,9 @@ final class BusinessArchiveService
                         ? (int) $target->id
                         : (int) $idMaps[$file['table']][(string) $file['id']];
                     $path = 'business-archives/'.$target->id.'/'.Str::uuid().'/'.basename($file['original_name']);
-                    Storage::disk('private')->put($path, $file['bytes']);
+                    if (! Storage::disk('private')->put($path, $file['bytes'])) {
+                        throw new RuntimeException('Restore stopped: a private business file could not be written.');
+                    }
                     $createdFiles[] = $path;
 
                     DB::table($file['table'])->where('id', $newId)->update([
