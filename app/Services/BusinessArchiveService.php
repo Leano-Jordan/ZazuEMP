@@ -30,13 +30,13 @@ final class BusinessArchiveService
             'suppliers' => ['scope' => 'business'],
             'tax_rates' => ['scope' => 'business'],
             'business_tax_profiles' => ['scope' => 'business'],
-            'customer_contacts' => ['scope' => 'parent', 'parent' => 'customers'],
+            'customer_contacts' => ['scope' => 'parent', 'parent' => 'customers', 'parent_key' => 'customer_id'],
             'events' => ['scope' => 'business'],
-            'event_requirements' => ['scope' => 'parent', 'parent' => 'events'],
-            'quotes' => ['scope' => 'parent', 'parent' => 'events'],
-            'quote_versions' => ['scope' => 'parent', 'parent' => 'quotes'],
-            'quote_items' => ['scope' => 'parent', 'parent' => 'quote_versions'],
-            'travel_costs' => ['scope' => 'parent', 'parent' => 'events'],
+            'event_requirements' => ['scope' => 'parent', 'parent' => 'events', 'parent_key' => 'event_id'],
+            'quotes' => ['scope' => 'parent', 'parent' => 'events', 'parent_key' => 'event_id'],
+            'quote_versions' => ['scope' => 'parent', 'parent' => 'quotes', 'parent_key' => 'quote_id'],
+            'quote_items' => ['scope' => 'parent', 'parent' => 'quote_versions', 'parent_key' => 'quote_version_id'],
+            'travel_costs' => ['scope' => 'parent', 'parent' => 'events', 'parent_key' => 'event_id'],
             'event_costs' => ['scope' => 'business'],
             'event_preparation_items' => ['scope' => 'business'],
             'purchase_orders' => ['scope' => 'business'],
@@ -46,7 +46,7 @@ final class BusinessArchiveService
             'assets' => ['scope' => 'business'],
             'asset_allocations' => ['scope' => 'business'],
             'invoices' => ['scope' => 'business'],
-            'invoice_items' => ['scope' => 'parent', 'parent' => 'invoices'],
+            'invoice_items' => ['scope' => 'parent', 'parent' => 'invoices', 'parent_key' => 'invoice_id'],
             'payments' => ['scope' => 'business'],
             'finance_expenses' => ['scope' => 'business'],
             'purchase_order_receipts' => ['scope' => 'business'],
@@ -73,6 +73,12 @@ final class BusinessArchiveService
             $data = [];
             foreach ($this->definitions() as $table => $definition) {
                 $data[$table] = $this->rowsForBusiness($table, $definition, $business->id, $data);
+            if ($table === 'business_tax_profiles') {
+                foreach ($data[$table] as &$profileRow) {
+                    $profileRow['tcs_pin'] = null;
+                }
+                unset($profileRow);
+            }
             }
 
             $files = $this->collectFiles($business, $data);
@@ -83,6 +89,11 @@ final class BusinessArchiveService
                 'source_business' => [
                     'name' => $business->name,
                     'currency' => $business->currency,
+                    'email' => $business->email,
+                    'phone' => $business->phone,
+                    'address' => $business->address,
+                    'website' => $business->website,
+                    'tax_number' => $business->tax_number,
                 ],
                 'tables' => array_map('count', $data),
                 'files' => $files['manifest'],
@@ -151,7 +162,7 @@ final class BusinessArchiveService
                 $filePayloads[] = $file + ['bytes' => $bytes];
             }
 
-            return $this->restoreRows($target, $definitions, $data, $filePayloads);
+            return $this->restoreRows($target, $definitions, $data, $filePayloads, $manifest['source_business'] ?? []);
         } finally {
             $zip->close();
         }
@@ -167,7 +178,7 @@ final class BusinessArchiveService
             if ($parentIds === []) {
                 return [];
             }
-            $foreignKey = Str::singular($definition['parent']).'_id';
+            $foreignKey = $definition['parent_key'];
             $query->whereIn($foreignKey, $parentIds);
         }
 
@@ -223,33 +234,35 @@ final class BusinessArchiveService
 
     private function assertTargetIsEmpty(Business $target, array $definitions): void
     {
-        $loaded = [];
+        $targetRows = [];
         foreach ($definitions as $table => $definition) {
             $query = DB::table($table);
             if ($definition['scope'] === 'business') {
                 $query->where('business_id', $target->id);
             } else {
-                $parentIds = DB::table($definition['parent'])
-                    ->where('business_id', $target->id)->pluck('id')->all();
+                $parentIds = array_column($targetRows[$definition['parent']] ?? [], 'id');
                 if ($parentIds === []) {
+                    $targetRows[$table] = [];
                     continue;
                 }
-                $query->whereIn(Str::singular($definition['parent']).'_id', $parentIds);
+                $query->whereIn($definition['parent_key'], $parentIds);
             }
-            if ($query->exists()) {
+            $rows = $query->get()->map(fn ($row): array => (array) $row)->all();
+            if ($rows !== []) {
                 throw new RuntimeException('Restore stopped: the selected business workspace is not empty.');
             }
+            $targetRows[$table] = $rows;
         }
     }
 
-    private function restoreRows(Business $target, array $definitions, array $data, array $filePayloads): array
+    private function restoreRows(Business $target, array $definitions, array $data, array $filePayloads, array $sourceProfile): array
     {
         $idMaps = [];
         $createdFiles = [];
         $records = 0;
 
         try {
-            DB::transaction(function () use ($target, $definitions, $data, $filePayloads, &$idMaps, &$createdFiles, &$records): void {
+            DB::transaction(function () use ($target, $definitions, $data, $filePayloads, $sourceProfile, &$idMaps, &$createdFiles, &$records): void {
                 foreach ($definitions as $table => $definition) {
                     $foreignKeys = Schema::getForeignKeys($table);
                     foreach ($data[$table] as $sourceRow) {
@@ -300,9 +313,9 @@ final class BusinessArchiveService
                     ]);
                 }
 
-                $sourceProfile = $this->sourceProfile($data);
-                if ($sourceProfile !== []) {
-                    DB::table('businesses')->where('id', $target->id)->update($sourceProfile);
+                $safeProfile = array_intersect_key($sourceProfile, array_flip(['name', 'currency', 'email', 'phone', 'address', 'website', 'tax_number']));
+                if ($safeProfile !== []) {
+                    DB::table('businesses')->where('id', $target->id)->update($safeProfile);
                 }
             });
 
@@ -315,8 +328,4 @@ final class BusinessArchiveService
         }
     }
 
-    private function sourceProfile(array $data): array
-    {
-        return [];
-    }
 }
