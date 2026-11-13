@@ -74,7 +74,7 @@ This is a starting pilot estimate, not a purchase or final production sizing dec
 
 ### Storage and backup
 
-- Recommended initial hosted quota: **2 GB per paid workspace** and **250 MB on Basic Free**, with uploads capped and visible usage indicators.
+- **Storage quotas are not approved for any tier.** Do not enforce a Basic, Intermediate or Advanced quota, upload cap or downgrade restriction until the owner approves the complete three-tier matrix and its data-safe downgrade/export behaviour. Earlier 250 MB / 2 GB figures are proposals only, not product policy.
 - Keep application database and private media storage separated from public web assets.
 - Encrypt backups and restrict access to the owner/operator.
 - Keep at least one backup copy outside the primary server/provider failure domain.
@@ -122,7 +122,7 @@ These are operational defaults for legal/accounting review. They must be impleme
 
 ## 8. Decisions still required before public launch
 
-- Verify the Basic/Advanced matrix, active-event cap, user allowance and storage quotas against the actual release and licence enforcement.
+- Approve the complete Basic/Intermediate/Advanced feature matrix, including any event, team or storage limits, before implementing or publishing those restrictions. Earlier numeric proposals remain unapproved.
 - Confirm VAT treatment, payment channel, billing terms and refund/cancellation flow.
 - Confirm final support hours and approved public contact details.
 - Confirm final hosting provider, region, data-processing terms and independent backup destination.
