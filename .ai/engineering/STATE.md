@@ -1,3 +1,15 @@
+## Director full-scale V1 audit — 2026-11-13
+
+- Audit report: [`docs/DIRECTOR_FULL_AUDIT_2026-11-13.md`](../../docs/DIRECTOR_FULL_AUDIT_2026-11-13.md).
+- Audited application/test evidence baseline: `2d7672103ee4b51d28100383f3311111b493deea`; report-only commit: `10a3a5dace4c4100e5af7e397bb29706f8f5c273`.
+- Evidence-maturity score reaffirmed at **69/100 (45/65 across 13 domains)**. No uplift claimed.
+- Latest exact-head Laravel, offline browser, full browser, PostgreSQL migration/recovery, quality/secret scan, Psalm, PHPMD, populated upgrade/rollback, Director Contract Lint/Health and push checks passed; SonarCloud skipped. Run IDs are in the audit report.
+- V1 remains **NO-GO for release certification** until owner physical installed-device acceptance on the selected trusted HTTPS origin and the final bounded regression/release decision.
+- Commercial subscription launch remains distinct: production issuer/key custody and feature enforcement, final offer/tier matrix, privacy/legal operations and official Zazu brand clearance are not certified.
+- Owner and engineering action split is recorded in the audit report. No runtime source, deployment setting, or `deploy/render-staging` branch changed during this audit.
+
+---
+
 ## Director exact-head verification — 2026-11-13 (PWA offline navigation fixture)
 
 - Canonical repository/branch: `Leano-Jordan/ZazuEMP` / `main`.
