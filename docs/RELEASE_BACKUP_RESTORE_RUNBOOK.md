@@ -155,8 +155,8 @@ Replace the archive path with the exact artifact created by the backup command. 
 - Confirm the runtime has `pg_dump` and `psql` available and can reach the database with the configured TLS mode.
 - Ensure the operator has sufficient PostgreSQL privileges to dump, drop/replace and recreate the objects contained in the backup. A managed database role may not have superuser privileges; test with the actual role on an isolated target.
 - Save the backup archive outside the private-storage tree. Verify its size and preserve its SHA-256 hash and manifest metadata.
-- Copy the completed archive to an independent off-host location. A backup stored only on the same Render persistent disk is not disaster recovery.
+- Copy the completed archive to an independent off-host location. A backup stored only on the same host or storage volume is not disaster recovery.
 - Restore to an isolated PostgreSQL target using a matching database driver and compatible application version. Confirm migration state, representative business records, private uploads, authorization boundaries and audit logging.
 - Record the exact source commit, target database service, archive identifier/hash, operator, timestamps, command outcomes and verification results. Redact credentials and personal data.
 
-**Verification boundary:** the 2026-11-12 GitHub Actions run passed a real PostgreSQL 16 database and private-file round-trip. This is automated CI evidence only. It does not verify the live Render role's privileges, actual `DB_URL` secret, persistent disk, off-host retention, production-sized data, or restore/rollback behaviour on the selected hosting target. Those remain mandatory operator release gates.
+**Verification boundary:** the 2026-11-12 GitHub Actions run passed a real PostgreSQL 16 database and private-file round-trip. This is automated CI evidence only. It does not verify the production database role's privileges, actual database connection secrets, persistent storage, off-host retention, production-sized data, or restore/rollback behaviour on the selected hosting target. Those remain mandatory operator release gates.
