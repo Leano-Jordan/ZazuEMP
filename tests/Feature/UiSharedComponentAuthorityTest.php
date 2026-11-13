@@ -9,7 +9,14 @@ class UiSharedComponentAuthorityTest extends TestCase
         public function test_authenticated_modules_keep_shared_component_authority_and_workspace_primitives(): void
         {
             $css = file_get_contents(resource_path('css/zazu-product-authority.css'));
+            $tokens = file_get_contents(resource_path('css/app.css'));
             $this->assertIsString($css);
+            $this->assertIsString($tokens);
+            $this->assertStringContainsString('--zazu-tone-amber: #FFE4A3;', $tokens);
+            $this->assertStringContainsString('--zazu-tone-teal: #C4F0E6;', $tokens);
+            $this->assertStringContainsString('--zazu-tone-violet: #E2D5FF;', $tokens);
+            $this->assertStringContainsString('--zazu-tone-coral: #FFD5CA;', $tokens);
+
             foreach ([
                 'border-width: 1px !important;',
                 'body[data-zazu-route^="customers."] .zazu-contact-card',
