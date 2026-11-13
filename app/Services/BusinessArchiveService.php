@@ -190,16 +190,25 @@ final class BusinessArchiveService
                 'event_attachments' => ['path'],
             ];
             $seenFileReferences = [];
-            foreach (($manifest['files'] ?? []) as $file) {
+            $seenPayloadEntries = [];
+            foreach ($manifest['files'] as $file) {
+                if (! is_array($file)) {
+                    throw new RuntimeException('The archive contains an invalid business file reference.');
+                }
                 $referenceKey = implode(':', [
                     (string) ($file['table'] ?? ''),
                     (string) ($file['id'] ?? ''),
                     (string) ($file['column'] ?? ''),
                 ]);
+                $entry = (string) ($file['entry'] ?? '');
                 if (isset($seenFileReferences[$referenceKey])) {
                     throw new RuntimeException('The archive contains a duplicate business file reference.');
                 }
+                if ($entry === '' || isset($seenPayloadEntries[$entry])) {
+                    throw new RuntimeException('The archive contains a duplicate or invalid file payload entry.');
+                }
                 $seenFileReferences[$referenceKey] = true;
+                $seenPayloadEntries[$entry] = true;
             }
 
             // Never restore a raw storage path from imported JSON. Every non-empty
@@ -237,6 +246,15 @@ final class BusinessArchiveService
                     : array_map('intval', array_column($data[$table] ?? [], 'id'));
                 if (! in_array((int) ($file['id'] ?? 0), $validIds, true)) {
                     throw new RuntimeException('The archive contains a file reference outside its business dataset.');
+                }
+                $sourcePath = $table === 'businesses'
+                    ? ($manifest['source_business'][$column] ?? null)
+                    : collect($data[$table] ?? [])->firstWhere('id', (int) ($file['id'] ?? 0))[$column] ?? null;
+                if (! is_string($sourcePath) || $sourcePath === '') {
+                    throw new RuntimeException('The archive contains a file payload without a matching record path.');
+                }
+                if (! in_array(($file['source_disk'] ?? null), ['private', 'local', 'public'], true)) {
+                    throw new RuntimeException('The archive contains an unsupported source storage disk.');
                 }
                 $bytes = $zip->getFromName($entry);
                 if ($bytes === false) {
