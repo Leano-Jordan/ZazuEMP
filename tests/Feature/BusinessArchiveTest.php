@@ -11,7 +11,6 @@ use App\Models\EventAttachment;
 use App\Models\Quote;
 use App\Models\QuoteItem;
 use App\Models\QuoteVersion;
-use App\Models\SyncDevice;
 use App\Models\User;
 use App\Services\BusinessArchiveService;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -156,12 +155,14 @@ class BusinessArchiveTest extends TestCase
             'status' => 'active',
             'currency' => 'ZAR',
         ]);
-        SyncDevice::create([
+        DB::table('sync_devices')->insert([
             'business_id' => $target->id,
             'installation_id' => (string) \Illuminate\Support\Str::uuid(),
             'device_name' => 'Existing phone',
             'device_type' => 'mobile',
             'status' => 'active',
+            'created_at' => now(),
+            'updated_at' => now(),
         ]);
 
         try {
