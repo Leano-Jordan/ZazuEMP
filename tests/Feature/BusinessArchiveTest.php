@@ -214,6 +214,52 @@ class BusinessArchiveTest extends TestCase
         ]);
     }
 
+    public function test_restore_rejects_records_claiming_a_different_source_business_before_writing(): void
+    {
+        Storage::fake('private');
+        $this->signInAsOwner();
+        $source = auth()->user()->businesses()->firstOrFail();
+        Customer::create(['business_id' => $source->id, 'name' => 'Source Tenant Customer']);
+        $archive = app(BusinessArchiveService::class)->download($source);
+        $foreign = Business::create([
+            'name' => 'Injected Foreign Tenant',
+            'slug' => 'injected-foreign-tenant',
+            'status' => 'active',
+            'currency' => 'ZAR',
+        ]);
+
+        $zip = new \\ZipArchive();
+        $this->assertTrue($zip->open($archive) === true);
+        $data = json_decode((string) $zip->getFromName('data.json'), true, 512, JSON_THROW_ON_ERROR);
+        $data['customers'][0]['business_id'] = $foreign->id;
+        $zip->deleteName('data.json');
+        $zip->addFromString('data.json', json_encode($data, JSON_THROW_ON_ERROR));
+        $zip->close();
+
+        $target = Business::create([
+            'name' => 'Tenant Validation Target',
+            'slug' => 'tenant-validation-target',
+            'status' => 'active',
+            'currency' => 'ZAR',
+        ]);
+
+        try {
+            try {
+                app(BusinessArchiveService::class)->restore($archive, $target);
+                $this->fail('A record from outside the declared source business must be rejected.');
+            } catch (\\RuntimeException $exception) {
+                $this->assertStringContainsString('outside its declared source business', $exception->getMessage());
+            }
+        } finally {
+            @unlink($archive);
+        }
+
+        $this->assertDatabaseMissing('customers', [
+            'business_id' => $target->id,
+            'name' => 'Source Tenant Customer',
+        ]);
+    }
+
     public function test_restore_rejects_file_payloads_without_matching_record_paths(): void
     {
         Storage::fake('private');
