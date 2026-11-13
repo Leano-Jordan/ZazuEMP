@@ -545,9 +545,14 @@ test('an active user navigation cancels low-priority page priming', async () => 
 
 
 test('an installed app navigation serves the authenticated cached page without any network request when offline is known', async () => {
+    let hostAvailable = true;
     const worker = bootWorker(async () => {
-        throw new Error('Network must not be touched when the browser reports offline.');
-    }, {}, true);
+        if (!hostAvailable) throw new Error('Network must not be touched when the browser reports offline.');
+        return new MockResponse(
+            '<!doctype html><html><body data-zazu-user-id="41" data-zazu-business-id="17"><main>Cached dashboard</main></body></html>',
+            { headers: { 'content-type': 'text/html; charset=utf-8' } },
+        );
+    });
 
     await worker.dispatchMessage({
         type: 'prime-pages',
@@ -556,6 +561,7 @@ test('an installed app navigation serves the authenticated cached page without a
         routes: ['/dashboard'],
     });
 
+    hostAvailable = false;
     worker.setOnline(false);
     const navigation = worker.dispatchFetch(new worker.Request('/dashboard', {
         method: 'GET',
@@ -565,8 +571,9 @@ test('an installed app navigation serves the authenticated cached page without a
 
     const response = await navigation.response;
     assert.equal(response.ok, true);
-    assert.match(await response.text(), /data-zazu-user-id="41"/);
-    assert.match(await response.text(), /data-zazu-business-id="17"/);
+    const html = await response.text();
+    assert.match(html, /data-zazu-user-id="41"/);
+    assert.match(html, /data-zazu-business-id="17"/);
     await navigation.finished();
 
     assert.equal(worker.fetchCalls.length, 1, 'only the initial online page-prime request is allowed');
