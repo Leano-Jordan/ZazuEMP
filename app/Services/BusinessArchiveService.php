@@ -184,6 +184,38 @@ final class BusinessArchiveService
                 'compliance_documents' => ['storage_path'],
                 'event_attachments' => ['path'],
             ];
+            $seenFileReferences = [];
+            foreach (($manifest['files'] ?? []) as $file) {
+                $referenceKey = implode(':', [
+                    (string) ($file['table'] ?? ''),
+                    (string) ($file['id'] ?? ''),
+                    (string) ($file['column'] ?? ''),
+                ]);
+                if (isset($seenFileReferences[$referenceKey])) {
+                    throw new RuntimeException('The archive contains a duplicate business file reference.');
+                }
+                $seenFileReferences[$referenceKey] = true;
+            }
+
+            // Never restore a raw storage path from imported JSON. Every non-empty
+            // file column must have a matching payload entry that will be rewritten
+            // to a fresh target-owned path below. This prevents cross-workspace file
+            // references from being smuggled into an otherwise empty workspace.
+            foreach ($allowedFileColumns as $table => $columns) {
+                $rows = $table === 'businesses'
+                    ? [['id' => (int) ($manifest['source_business']['id'] ?? 0), ...array_intersect_key($manifest['source_business'] ?? [], array_flip($columns))]]
+                    : ($data[$table] ?? []);
+                foreach ($rows as $row) {
+                    foreach ($columns as $column) {
+                        if (! empty($row[$column])) {
+                            $referenceKey = $table.':'.(string) ($row['id'] ?? '').':'.$column;
+                            if (! isset($seenFileReferences[$referenceKey])) {
+                                throw new RuntimeException('The archive contains a file path without its matching file payload.');
+                            }
+                        }
+                    }
+                }
+            }
             foreach (($manifest['files'] ?? []) as $file) {
                 $entry = (string) ($file['entry'] ?? '');
                 $table = (string) ($file['table'] ?? '');
