@@ -164,9 +164,11 @@ test.describe('Zazu installed PWA offline shell', () => {
         await expect.poll(() => registrationAttempts, { timeout: 12_000 }).toBeGreaterThanOrEqual(2);
         await expect.poll(() => pushed, { timeout: 12_000 }).toBe(2);
         await expect.poll(async () => page.evaluate(async () => (await window.ZazuOffline.pending()).length)).toBe(0);
-        const syncedCustomers = await page.evaluate(() => window.ZazuOffline.getState().customers);
-        expect(syncedCustomers.find(customer => customer.local_id === localCustomerIds[0])?.server_id).toBe(880001);
-        expect(syncedCustomers.find(customer => customer.local_id === localCustomerIds[1])?.server_id).toBe(880002);
+        const syncedCustomerIds = await page.evaluate(ids => {
+            const customers = window.ZazuOffline.getState().customers;
+            return ids.map(id => customers.find(customer => customer.local_id === id)?.server_id ?? null);
+        }, localCustomerIds);
+        expect(syncedCustomerIds).toEqual([880001, 880002]);
         expect(await page.evaluate(() => window.ZazuOffline.getState().sync?.token)).toBe('registration-retry-test-token');
     });
 
