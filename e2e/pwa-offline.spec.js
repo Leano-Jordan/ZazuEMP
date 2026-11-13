@@ -116,6 +116,48 @@ test.describe('Zazu installed PWA offline shell', () => {
         await expect.poll(async () => page.evaluate(async () => (await window.ZazuOffline.pending()).length)).toBe(0);
     });
 
+    test('shows a retrying sync state instead of an ambiguous waiting label after a temporary server failure', async ({ page }, testInfo) => {
+        test.setTimeout(20_000);
+        test.skip(testInfo.project.name !== 'chromium', 'Sync status rendering contract runs once.');
+
+        await login(page);
+        await page.evaluate(async () => {
+            await window.ZazuOffline.ready;
+            const state = window.ZazuOffline.getState();
+            state.sync = {
+                token: 'visible-sync-retry-token',
+                device: { id: 999996, business_id: Number(document.body.dataset.zazuBusinessId) },
+            };
+            state.customers = [{
+                local_id: 'local:visible-sync-customer',
+                name: 'Visible sync customer',
+                contact_name: 'Test Contact',
+            }];
+            state.local_dirty = false;
+            await window.ZazuOffline.persist({ allowSessionChange: true });
+            await window.ZazuOffline.queueMutation('customer', 'create', {
+                local_id: 'local:visible-sync-customer',
+                record: { name: 'Visible sync customer' },
+            });
+        });
+
+        await page.route('**/api/sync/push', route => route.fulfill({
+            status: 503,
+            contentType: 'application/json',
+            body: JSON.stringify({ message: 'Local host is still starting.' }),
+        }));
+        await page.route('**/api/sync/pull', route => route.fulfill({
+            status: 200,
+            contentType: 'application/json',
+            body: JSON.stringify({ mutations: [] }),
+        }));
+        await page.evaluate(() => window.ZazuOffline.sync());
+
+        const chip = page.locator('[data-zazu-local-record="customer"] .zazu-chip').filter({ hasText: 'Retrying sync' });
+        await expect(chip).toBeVisible();
+        await expect(chip).toHaveAttribute('title', /HTTP 503/);
+    });
+
     test('automatically retries pending mutations when the host returns after the reconnect event', async ({ page }, testInfo) => {
         test.setTimeout(20_000);
         test.skip(testInfo.project.name !== 'chromium', 'Reconnect retry contract runs once.');
