@@ -364,14 +364,12 @@ final class BusinessArchiveService
                             $row['business_id'] = $target->id;
                         }
 
-                        if ($table === 'audit_logs' && ! empty($row['subject_id'])) {
-                            $subjectClass = ltrim((string) ($row['subject_type'] ?? ''), '\\');
-                            if (class_exists($subjectClass)) {
-                                $subjectTable = (new $subjectClass())->getTable();
-                                $row['subject_id'] = $idMaps[$subjectTable][(string) $row['subject_id']] ?? null;
-                            } else {
-                                $row['subject_id'] = null;
-                            }
+                        if ($table === 'audit_logs') {
+                            // Archives are untrusted input: never autoload or instantiate a
+                            // class named by an archived polymorphic subject_type. Keep the
+                            // historical audit entry, but detach its source-workspace subject.
+                            $row['subject_type'] = null;
+                            $row['subject_id'] = null;
                         }
 
                         foreach ($foreignKeys as $foreignKey) {
