@@ -193,6 +193,52 @@ class SyncAttachmentIdempotencyTest extends TestCase
         ]);
     }
 
+
+    public function test_phone_upload_list_and_download_use_the_real_private_disk_configuration(): void
+    {
+        // Intentionally do not call Storage::fake('private'). This exercises
+        // the same configured disk that the installed phone sync endpoint uses.
+        [, $event, $token] = $this->pairedBusinessAndEvent();
+        $disk = Storage::disk('private');
+        $path = null;
+
+        try {
+            $uploaded = $this->withToken($token)->post('/api/sync/attachments', [
+                'event_id' => $event->id,
+                'idempotency_key' => (string) Str::uuid(),
+                'description' => 'Real private-disk acceptance',
+                'file' => UploadedFile::fake()->createWithContent(
+                    'private-disk-acceptance.txt',
+                    'Attachment stored through the configured private disk.'
+                ),
+            ]);
+
+            $uploaded->assertCreated()
+                ->assertJsonPath('duplicate', false)
+                ->assertJsonPath('attachment.original_name', 'private-disk-acceptance.txt');
+
+            $attachmentId = (int) $uploaded->json('attachment.id');
+            $attachment = EventAttachment::query()->findOrFail($attachmentId);
+            $path = $attachment->path;
+
+            $this->assertSame('private', $attachment->disk);
+            $this->assertTrue($disk->exists($path));
+            $this->assertSame(
+                'Attachment stored through the configured private disk.',
+                $disk->get($path)
+            );
+
+            $this->withToken($token)
+                ->get('/api/sync/attachments/'.$attachmentId)
+                ->assertOk()
+                ->assertDownload('private-disk-acceptance.txt');
+        } finally {
+            if (is_string($path)) {
+                $disk->delete($path);
+            }
+        }
+    }
+
     /**
      * @return array{Business, Event, string}
      */
