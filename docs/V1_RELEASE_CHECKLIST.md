@@ -1,16 +1,18 @@
-## Director reconciliation — 2026-11-13 (current exact-main evidence)
+## Director reconciliation — 2026-11-13 (current application/test evidence)
 
-**Canonical branch:** `main` · **verified head:** `5888123f1941beb478b31870a6e782e0f8ef8053`.
+**Canonical branch:** `main`  
+**Verified application/test source:** `30e259d445c614df6d1b2495c5a5e505a6d36443`  
+**Current main documentation/control head at reconciliation:** `6ca60e37bd71d6eebee0ff9d651c701ef2549ec8`
 
-- Laravel workflow [43491595380](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/43491595380): **PASS** — 486 passed / 1 skipped / 3,475 assertions; PostgreSQL migration, registration, database/private-file recovery and dedicated offline-browser acceptance passed.
-- PHPMD [43491595199](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/43491595199), Psalm [43491595173](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/43491595173), quality/secret scan/CodeQL [43491594809](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/43491594809), and populated upgrade/rollback [43491595120](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/43491595120): **PASS**.
-- The archive restore round-trip and safety tests now execute successfully. Business-level archive restore is **AUTOMATED-VERIFIED**, including related-record remapping, tenant isolation and private/public file payloads. It is not a substitute for the separate installation-level operator recovery drill.
-- Offline session transition and active Work attachment workflows are **AUTOMATED-VERIFIED**. Physical phone/tablet persistence and installed-app acceptance remain owner-verified gates.
-- Quote → payment → profit is **SEEDED AUTOMATED-VERIFIED**; live business-record reconciliation remains a separate operator acceptance.
-- Installation recovery is **CI-VERIFIED / OPERATOR DRILL OPEN**.
-- POPIA operational controls, privacy notice review/publication, retention and incident procedures, and Zazu name/trade-mark clearance remain **OPEN**.
-- **Release disposition: NOT READY.** CI is green; physical-device, installed-target recovery, legal/privacy and brand gates remain. Evidence score is unchanged; no score uplift is claimed.
+- Laravel workflow [43504654649](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/43504654649): **PASS** — Laravel suite, PostgreSQL migration/database/private-file backup-restore, and dedicated offline-browser acceptance all passed on the stated application/test source. The disconnected Work-attachment page-reload persistence assertion is included.
+- Service-worker regression workflow [43504020001](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/43504020001): **PASS** — transient HTTP 503 uses the cached authenticated page; 401/403 are not masked by stale cached HTML.
+- Quote → acceptance → invoice → deposit/payment → event-cost/profit: **SEEDED AUTOMATED-VERIFIED**. Live business-record reconciliation remains an operator acceptance task; no additional financial-code defect is currently evidenced.
+- Business archive export/import and tenant isolation: **AUTOMATED-VERIFIED**. PostgreSQL installation backup/private-file restore: **CI-VERIFIED**. Actual installed-target operator recovery drill remains open.
+- Evidence-maturity score: **71/100**, as recorded in the [formal V1 scorecard](ZAZU_V1_SCORECARD_2026-11-04.md). Offline continuity remains 3/5; physical Android acceptance is not claimed.
+- Owner direction: offline engineering is paused. Do not change service worker, IndexedDB, attachment queue, offline sync or PWA installation paths unless explicitly resumed or a separate critical regression is demonstrated.
+- **Release disposition: NOT READY.** Remaining owner/operational obligations are bounded physical-device acceptance, installed-target operator recovery, live commercial-record reconciliation, and POPIA/privacy/brand closure. Do not turn speculative risks into new V1 gates.
 - No production deployment, live database, customer data or non-main branch was changed.
+
 
 ---
 
