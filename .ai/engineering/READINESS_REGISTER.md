@@ -1101,3 +1101,12 @@ Found and corrected a data-recovery blocker in `ZazuBackupCommand::snapshotMysql
 - **Ongoing:** review direct-route authorization for remaining private/customer/business records and continue authentication/session threat review. Do not duplicate existing cross-business tests.
 - **Ongoing:** independent external penetration testing and operational privacy/incident controls have not been completed. Do not describe Zazu as attack-proof.
 - Offline acceptance remains frozen; no offline implementation work is authorized by this checkpoint.
+
+
+## Trusted-device authorization — 2026-11-13
+
+- **Closed:** authenticated staff could previously self-register a primary sync device and obtain a business-wide sync token. Since the device API supports financial mutations, this bypassed the normal owner approval and staff permission boundary.
+- Primary-device registration now requires the existing owner middleware. Staff registration returns 403 and creates no device. Other devices continue through the existing owner-authorized pairing flow.
+- Added a feature regression in `BusinessContextSecurityTest`; updated the client to stop retrying after 403 and display an owner-approval message.
+- Exact main `fd63ac5717a3afd656da7860530812d6a81a0016`: [Laravel 488 passed / 3,478 assertions / 1 skipped](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/43509943704); PostgreSQL migration/recovery PASS; [Composer/npm audits and secret scan PASS](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/43509943486); [Psalm PASS](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/43509931780); [PHPMD PASS](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/43509937057).
+- Offline browser acceptance was pending at checkpoint; it is not counted. Offline engineering remains paused except for this narrow security correction.
