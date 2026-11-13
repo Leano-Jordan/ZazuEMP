@@ -1,3 +1,14 @@
+## 2026-11-13 — Director source-lineage reconciliation
+
+- Canonical branch: `main`; latest repository documentation commit observed: `193b4584f894bacd3107df926135049197bbcad1`.
+- Latest application/test source checkpoint observed: `0eb03bdb206e0a36dffdc6ba8b00c38877f2c773`. The newer commits through the documentation tip are documentation-only; do not describe the old `35ad012` checkpoint as current source HEAD.
+- Offline startup fixture CASE-ZAZU-0030: the correction from `b1da7595665a4f2d4b7ec8766d58c67440495f73` is present in current `e2e/pwa-offline.spec.js`; the test awaits `waitForOfflineRuntime(page)` before reading `window.ZazuOffline.ready`. This confirms source presence only. The available commit-workflow lookup returned no run for that correction, so exact-head browser/offline acceptance remains **UNVERIFIED** and the case stays open.
+- Offline session transition and active Work attachment acceptance remain supported by the recorded exact-main run at `245aa47f7ef74e6e133fff867670ecafabb603b8`. Later source changes in the observed application/test lineage were archive-focused; do not extend the old run's claim to the new archive implementation.
+- Business archive restore remains **OPEN / NO-GO**. The unresolved FK mapping still needs the exact focused-test exception from a run that includes `BusinessArchiveService.php` and `BusinessArchiveTest.php`. Historical green CI at `245aa47` predates those files and is not archive evidence.
+- No application runtime code, business data, database, deployment setting, or customer record was changed by this reconciliation.
+
+---
+
 ## 2026-11-13 — Current Director checkpoint: business archive restore mapping
 
 - Canonical repository/ref: `Leano-Jordan/ZazuEMP` / `main`.
