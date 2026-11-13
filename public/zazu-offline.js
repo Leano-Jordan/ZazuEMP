@@ -1132,6 +1132,10 @@
             currentState.onerror = () => tx.abort();
             tx.oncomplete = () => {
                 state = stateToPersist;
+                // A local save may happen while the browser still reports
+                // online but the host is unavailable. Start recovery even if
+                // the initial device registration never obtained a token.
+                if (navigator.onLine) scheduleSyncRetry();
                 resolve(mutation);
             };
             tx.onerror = () => {
@@ -1412,23 +1416,38 @@
 
     function scheduleSyncRetry() {
         if (syncRetryTimer !== null || sessionCleared || !navigator.onLine
-            || !state?.sync?.token || state.sync_authorization_required) return;
+            || state?.sync_authorization_required) return;
 
-        // A reconnect can precede the local host/server becoming ready. Keep
-        // retrying durable pending work with bounded backoff instead of relying
-        // on a second browser "online" event that may never arrive.
+        // Retry both halves of the recovery path: obtain a device credential
+        // when first registration failed, then drain the durable mutation queue.
+        // A browser can remain "online" while its local host is still starting,
+        // so this cannot depend on another online event.
         const delay = Math.min(30000, 1000 * (2 ** Math.min(syncRetryAttempt, 5)));
         syncRetryAttempt += 1;
-        syncRetryTimer = window.setTimeout(() => {
+        syncRetryTimer = window.setTimeout(async () => {
             syncRetryTimer = null;
-            if (sessionCleared || !navigator.onLine || !state?.sync?.token
-                || state.sync_authorization_required) return;
-            sync().catch(() => {
-                if (!state || sessionCleared || !state.sync?.token) return;
-                state.last_sync_error = 'Synchronization failed; queued work will retry automatically.';
-                writeState().catch(() => {});
+            if (sessionCleared || !navigator.onLine || state?.sync_authorization_required) return;
+
+            try {
+                if (!state?.sync?.token) {
+                    await registerPrimaryDevice();
+                }
+
+                if (sessionCleared || !navigator.onLine || state?.sync_authorization_required) return;
+                if (state?.sync?.token) {
+                    await sync();
+                    return;
+                }
+
+                const queued = await pending();
+                if (queued.length) scheduleSyncRetry();
+            } catch {
+                if (!state || sessionCleared) return;
+                state.last_sync_error = 'Device registration or synchronization failed. Saved changes remain on this device and will retry automatically.';
+                await writeState().catch(() => {});
                 window.dispatchEvent(new CustomEvent('zazu:offline-state-updated'));
-            });
+                scheduleSyncRetry();
+            }
         }, delay);
     }
 
@@ -1635,13 +1654,17 @@
         if (!response.ok) {
             state.last_sync_error = response.status === 409
                 ? 'This installation is registered to a different business workspace.'
-                : 'Zazu could not register this device. Your local work remains saved.';
+                : 'Zazu could not register this device (HTTP ' + response.status + '). Your local work remains saved and registration will retry automatically.';
+            await writeState().catch(() => {});
+            window.dispatchEvent(new CustomEvent('zazu:offline-state-updated'));
             return false;
         }
 
         const result = await response.json();
         if (Number(result.device?.business_id || 0) !== ACTIVE_BUSINESS_ID) {
             state.last_sync_error = 'The registered device belongs to a different business workspace.';
+            await writeState().catch(() => {});
+            window.dispatchEvent(new CustomEvent('zazu:offline-state-updated'));
             return false;
         }
 
