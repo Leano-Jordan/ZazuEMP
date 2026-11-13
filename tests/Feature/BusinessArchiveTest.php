@@ -176,7 +176,7 @@ class BusinessArchiveTest extends TestCase
         Customer::create(['business_id' => $source->id, 'name' => 'Duplicate ID Customer']);
         $archive = app(BusinessArchiveService::class)->download($source);
 
-        $zip = new \\ZipArchive();
+        $zip = new \ZipArchive();
         $this->assertTrue($zip->open($archive) === true);
         $data = json_decode((string) $zip->getFromName('data.json'), true, 512, JSON_THROW_ON_ERROR);
         $duplicate = $data['customers'][0];
@@ -197,7 +197,7 @@ class BusinessArchiveTest extends TestCase
             try {
                 app(BusinessArchiveService::class)->restore($archive, $target);
                 $this->fail('Duplicate source record identifiers must be rejected.');
-            } catch (\\RuntimeException $exception) {
+            } catch (\RuntimeException $exception) {
                 $this->assertStringContainsString('duplicate record identifier', $exception->getMessage());
             }
         } finally {
@@ -228,7 +228,7 @@ class BusinessArchiveTest extends TestCase
             'currency' => 'ZAR',
         ]);
 
-        $zip = new \\ZipArchive();
+        $zip = new \ZipArchive();
         $this->assertTrue($zip->open($archive) === true);
         $data = json_decode((string) $zip->getFromName('data.json'), true, 512, JSON_THROW_ON_ERROR);
         $data['customers'][0]['business_id'] = $foreign->id;
@@ -247,7 +247,7 @@ class BusinessArchiveTest extends TestCase
             try {
                 app(BusinessArchiveService::class)->restore($archive, $target);
                 $this->fail('A record from outside the declared source business must be rejected.');
-            } catch (\\RuntimeException $exception) {
+            } catch (\RuntimeException $exception) {
                 $this->assertStringContainsString('outside its declared source business', $exception->getMessage());
             }
         } finally {
@@ -271,7 +271,7 @@ class BusinessArchiveTest extends TestCase
         ]);
 
         $archive = app(BusinessArchiveService::class)->download($source);
-        $zip = new \\ZipArchive();
+        $zip = new \ZipArchive();
         $this->assertTrue($zip->open($archive) === true);
         $manifest = json_decode((string) $zip->getFromName('manifest.json'), true, 512, JSON_THROW_ON_ERROR);
         $manifest['files'][] = [
@@ -299,7 +299,7 @@ class BusinessArchiveTest extends TestCase
             try {
                 app(BusinessArchiveService::class)->restore($archive, $target);
                 $this->fail('A file payload without a record path must be rejected.');
-            } catch (\\RuntimeException $exception) {
+            } catch (\RuntimeException $exception) {
                 $this->assertStringContainsString('without a matching record path', $exception->getMessage());
             }
         } finally {
