@@ -168,6 +168,58 @@ class BusinessArchiveTest extends TestCase
         $this->assertSame(['source' => 'archive'], $restoredLog->metadata);
     }
 
+    public function test_restore_rejects_file_payloads_without_matching_record_paths(): void
+    {
+        Storage::fake('private');
+        $this->signInAsOwner();
+        $source = auth()->user()->businesses()->firstOrFail();
+        $customer = Customer::create([
+            'business_id' => $source->id,
+            'name' => 'Orphan Payload Customer',
+        ]);
+
+        $archive = app(BusinessArchiveService::class)->download($source);
+        $zip = new \\ZipArchive();
+        $this->assertTrue($zip->open($archive) === true);
+        $manifest = json_decode((string) $zip->getFromName('manifest.json'), true, 512, JSON_THROW_ON_ERROR);
+        $manifest['files'][] = [
+            'table' => 'customers',
+            'id' => $customer->id,
+            'column' => 'profile_photo_path',
+            'disk_column' => null,
+            'source_disk' => 'private',
+            'entry' => 'payload/files/orphan.bin',
+            'original_name' => 'orphan.bin',
+        ];
+        $zip->deleteName('manifest.json');
+        $zip->addFromString('manifest.json', json_encode($manifest, JSON_THROW_ON_ERROR));
+        $zip->addFromString('payload/files/orphan.bin', 'unreferenced payload bytes');
+        $zip->close();
+
+        $target = Business::create([
+            'name' => 'Orphan Payload Target',
+            'slug' => 'orphan-payload-target',
+            'status' => 'active',
+            'currency' => 'ZAR',
+        ]);
+
+        try {
+            try {
+                app(BusinessArchiveService::class)->restore($archive, $target);
+                $this->fail('A file payload without a record path must be rejected.');
+            } catch (\\RuntimeException $exception) {
+                $this->assertStringContainsString('without a matching record path', $exception->getMessage());
+            }
+        } finally {
+            @unlink($archive);
+        }
+
+        $this->assertDatabaseMissing('customers', [
+            'business_id' => $target->id,
+            'name' => 'Orphan Payload Customer',
+        ]);
+    }
+
     public function test_restore_rejects_storage_paths_without_matching_archive_payloads(): void
     {
         Storage::fake('private');
