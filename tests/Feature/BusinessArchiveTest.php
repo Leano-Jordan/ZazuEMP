@@ -407,7 +407,7 @@ class BusinessArchiveTest extends TestCase
         $source = auth()->user()->businesses()->firstOrFail();
         $archive = app(BusinessArchiveService::class)->download($source);
 
-        $zip = new \\ZipArchive();
+        $zip = new \ZipArchive();
         $this->assertTrue($zip->open($archive) === true);
         $zip->addFromString('payload/files/undeclared.bin', 'unreferenced bytes');
         $zip->close();
@@ -423,7 +423,7 @@ class BusinessArchiveTest extends TestCase
             try {
                 app(BusinessArchiveService::class)->restore($archive, $target);
                 $this->fail('Undeclared ZIP payloads must be rejected.');
-            } catch (\\RuntimeException $exception) {
+            } catch (\RuntimeException $exception) {
                 $this->assertStringContainsString('undeclared file payload', $exception->getMessage());
             }
         } finally {
@@ -441,7 +441,7 @@ class BusinessArchiveTest extends TestCase
         $this->seedArchiveRecords($source);
         $archive = app(BusinessArchiveService::class)->download($source);
 
-        $zip = new \\ZipArchive();
+        $zip = new \ZipArchive();
         $this->assertTrue($zip->open($archive) === true);
         $data = json_decode((string) $zip->getFromName('data.json'), true, 512, JSON_THROW_ON_ERROR);
         $data['events'][0]['customer_id'] = ['unexpected' => 'array'];
@@ -460,7 +460,7 @@ class BusinessArchiveTest extends TestCase
             try {
                 app(BusinessArchiveService::class)->restore($archive, $target);
                 $this->fail('Non-scalar foreign keys must be rejected.');
-            } catch (\\RuntimeException $exception) {
+            } catch (\RuntimeException $exception) {
                 $this->assertStringContainsString('invalid foreign key value', $exception->getMessage());
             }
         } finally {
