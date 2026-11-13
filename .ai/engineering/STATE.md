@@ -1,3 +1,18 @@
+## 2026-11-13 — Exact-main automated verification reconciliation (f0598324)
+
+- Canonical repository/ref: `Leano-Jordan/ZazuEMP` / `main`.
+- Exact current main HEAD: `f05983240ba61cfba4b545c85369e4c4ccc0ad99`.
+- Exact-HEAD Laravel workflow [43452907338](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/43452907338): **PASS**. PostgreSQL migration/registration/backup-restore job and offline-browser-acceptance job also **PASS**. Laravel job explicitly passed frontend build, LAN Vite asset-origin configuration test, Blade compilation, built-manifest validation, configuration validation and PHPUnit/Pest.
+- Full browser smoke [43452907654](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/43452907654): **PASS**.
+- Zazu quality + secret scan [43452907356](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/43452907356), Psalm [43452907402](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/43452907402), PHPMD [43452907248](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/43452907248), populated upgrade/rollback [43452907310](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/43452907310), Director Contract Lint [43452907398](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/43452907398), push-on-main [43452907244](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/43452907244), and Director Health [43454290881](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/43454290881): **PASS**.
+- SonarCloud [43452907264](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/43452907264): **SKIPPED**, not counted as a pass.
+- The LAN Vite origin configuration/build contract is now automated and passed at this exact main HEAD. This does not prove the owner's local PC/phone rendered presentation; the Vite server restart and rendered desktop/mobile check remain **OWNER DEVICE ACCEPTANCE / UNVERIFIED**.
+- Offline browser and sync retry tests passing do not prove the owner's two existing IndexedDB customer records have reached the server. Their local queue and server records remain inaccessible to GitHub CI; do not recreate those customers.
+- V1 evidence score remains **71/100**. Technical V1 remains **NO-GO** pending the bounded physical installed-device acceptance and final release decision. Commercial subscription/legal/brand certification remains separate.
+- No deployment, Render service, database or customer data was changed. `deploy/render-staging` remains untouched.
+
+---
+
 
 ## 2026-11-13 — LAN Vite asset-origin regression guard
 
