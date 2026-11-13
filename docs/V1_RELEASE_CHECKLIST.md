@@ -1,3 +1,17 @@
+## Exact-main release evidence — 2026-11-13 (f0598324)
+
+- Exact current `main` HEAD: `f05983240ba61cfba4b545c85369e4c4ccc0ad99`.
+- Laravel [43452907338](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/43452907338): **PASS**. The run's Laravel job passed frontend asset build, the new LAN Vite asset-origin configuration test, Blade compilation, built asset-manifest validation, configuration validation and PHPUnit/Pest. PostgreSQL migration/registration/backup-restore and dedicated offline-browser-acceptance jobs: **PASS**.
+- Full browser smoke [43452907654](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/43452907654): **PASS**.
+- Zazu quality + secret scan [43452907356](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/43452907356), Psalm [43452907402](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/43452907402), PHPMD [43452907248](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/43452907248), populated upgrade/rollback [43452907310](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/43452907310), Director Contract Lint [43452907398](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/43452907398), push-on-main [43452907244](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/43452907244), and Director Health [43454290881](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/43454290881): **PASS**.
+- SonarCloud [43452907264](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/43452907264): **SKIPPED**, not counted as a pass.
+- This exact-head run verifies the Vite asset-origin config/build contract and the current automated regression suites. It does not establish rendered UI correctness on the owner's PC/phone or prove physical installed-device offline acceptance.
+- Offline sync browser regressions are green, but the owner's two existing locally queued customers have not been observed on the server. Do not recreate them; their local IndexedDB/server reconciliation remains a device-side acceptance item.
+- Evidence maturity remains **71/100**. Technical V1 remains **NO-GO** pending owner physical phone/tablet acceptance on the selected trusted HTTPS origin and final bounded release decision. Commercial subscription certification remains separate.
+- No deployment, Render service, database or customer data was changed; `deploy/render-staging` remains untouched.
+
+---
+
 ## Exact-head V1 regression reconciliation — 2026-11-13 (offline browser fixture closure)
 
 - Verified application/test source SHA: `6303ff59effe95ad95d5df862ff823b01b49d891` on `main`. The only application/test change in this cycle is the Playwright setup correction in `e2e/pwa-offline.spec.js`; no production runtime code changed.
