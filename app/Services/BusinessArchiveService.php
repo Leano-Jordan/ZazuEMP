@@ -221,7 +221,7 @@ final class BusinessArchiveService
             if (! $path) {
                 return;
             }
-            if (Str::contains($path, ['..', '\\\\'])) {
+            if (Str::contains($path, ['..', '\\'])) {
                 throw new RuntimeException("A referenced business file path is unsafe: {$table}#{$id}.");
             }
             $diskName = $disk ?: 'private';
