@@ -205,4 +205,4 @@ jobs:
     - name: Install Chromium for Playwright
       run: npx playwright install --with-deps chromium
     - name: Run offline browser acceptance suite
-      run: npm run test:e2e -- --project=chromium e2e/pwa-offline.spec.js
+      run: npm run test:e2e -- --project=chromium e2e/pwa-offline.spec.js e2e/offline-attachment-sync.spec.js
