@@ -2455,3 +2455,15 @@ Verification boundary: source was re-fetched from `main` and the retry implement
 - GitHub Actions quality run `43450011964` was created for that exact source commit. At the time of this record, both application and secret-scan jobs were queued; test outcome remains pending.
 - Changed only test organisation. Application behaviour, CSS, UI and stored business data were not changed.
 - Next: inspect the quality run's application result and act on any remaining concrete failures.
+
+
+## 2026-11-13 — Deep audit and V1 gate reconciliation
+
+- Audited the current main source and exact-head CI failures. Corrected stale radius/palette test contracts and the PHPMD Vite-origin complexity violation. No application CSS or visual design changes were made.
+- Exact-head source checkpoint `f9eddc341f7bbca3902a5875b6359098dd183b11`: Laravel **480 passed / 1 skipped / 3,398 assertions**; PostgreSQL migration/registration/recovery PASS; PostgreSQL backup/restore round trip PASS; offline browser acceptance **22 passed**; Zazu quality PASS; PHPMD PASS; Psalm PASS; populated upgrade/rollback PASS.
+- Full browser smoke on that checkpoint was cancelled by a subsequent documentation push and is not counted as passed.
+- Reconciled two engineering-record defects: CASE-ZAZU-0029 / ENG-FIXTURE-004 now CLOSED in ERROR_INDEX, matching FAILURE_CASES; duplicate REG-015 was corrected by assigning the offline business-context cache control REG-023.
+- Reviewed active business context, business-owned model writes, signed offline licensing/entitlement, finance transaction integrity and purchase-order receiving. No additional reproducible application defect was confirmed in those inspected paths.
+- Audit report: `docs/DIRECTOR_DEEP_AUDIT_2026-11-13.md`.
+- Latest branch checkpoint after audit documentation: `974bd033b35b863062b291d5454fa86ab40c0d18`. Fresh exact-head workflows are queued/running; do not promote the prior source-checkpoint results to the new SHA until reruns complete.
+- Remaining V1 acceptance: exact-head browser smoke and real installed phone/tablet acceptance against the release candidate. Scope remains frozen; no speculative gates were added.
