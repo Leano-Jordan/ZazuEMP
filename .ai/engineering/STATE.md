@@ -2287,3 +2287,17 @@ Commits:
 - `8adbe3ec90f552264815837ac23f28af6301782a` — transient failure visibility and recovery cleanup.
 
 Verification boundary: source was re-fetched from `main` and the retry implementation and regression test are present. GitHub combined status returned no checks for the latest commit; automated execution is therefore **UNVERIFIED**, not passed. No Render, deployment, database, or feature-scope changes.
+
+
+## 2026-11-13 — Offline record sync-state visibility
+
+- Target: make the existing local Customer and Work sync labels truthful and actionable while reconnect retries are running.
+- Source finding: local directory rows derived sync state only from the presence of a server ID. A queued record therefore continued to display "Waiting to sync" even after a retryable server failure had been recorded in `last_sync_error`; the transient error was not shown in those rows.
+- Changed `resources/js/app.js`: local Customer and Work rows now distinguish Synced, Needs attention, Re-pair required, Retrying sync, Waiting for connection and Waiting to sync. The status message is also exposed through the chip title and accessible label. Existing server identity and conflict handling remain unchanged.
+- Added Playwright regression in `e2e/pwa-offline.spec.js`: simulate a 503 push response and assert the local Customer row changes to "Retrying sync" and exposes the HTTP failure message. Bootstrap and attachment endpoints are stubbed so this test isolates the status contract.
+- Commits on canonical `main`:
+  - `9a1543300d21bf9aeb206db90de716a4bbf73286` — status rendering.
+  - `149cc09f8f49ab712718f027f9db4ef1bd10e8c2` — regression test.
+  - `49e4bc703ce7c9a19d902979eb57f0d2c07dd83d` — isolate all sync endpoints in the test.
+- Re-fetched and inspected the changed source and test from `main`. GitHub combined status returned no status contexts for the latest commit; Playwright execution and exact-head CI are **UNVERIFIED**. No local browser execution was available in this cycle.
+- No Render, deployment branch, database or feature-scope changes.
