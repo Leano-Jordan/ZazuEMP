@@ -32,6 +32,8 @@ jobs:
       run: npm ci
     - name: Build frontend assets
       run: npm run build
+    - name: Verify LAN Vite asset-origin configuration
+      run: npm run test:vite-config
     - name: Generate key
       run: php artisan key:generate
     - name: Compile Blade views
