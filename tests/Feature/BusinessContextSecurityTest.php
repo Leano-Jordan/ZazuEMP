@@ -72,6 +72,29 @@ class BusinessContextSecurityTest extends TestCase
     }
 
 
+
+    public function test_staff_cannot_self_register_a_trusted_sync_device(): void
+    {
+        $business = Business::create([
+            'name' => 'Restricted Device Business',
+            'slug' => 'restricted-device-'.Str::lower(Str::random(8)),
+            'status' => 'active',
+            'currency' => 'ZAR',
+        ]);
+        $staff = User::factory()->create();
+        $business->users()->attach($staff->id, ['role' => 'staff']);
+
+        $this->actingAs($staff)
+            ->postJson(route('offline.device.register'), [
+                'installation_id' => (string) Str::uuid(),
+                'device_name' => 'Unapproved staff device',
+                'device_type' => 'phone',
+            ])
+            ->assertForbidden();
+
+        $this->assertDatabaseCount('sync_devices', 0);
+    }
+
     public function test_switching_business_cannot_rebind_a_trusted_device_to_another_business(): void
     {
         $first = Business::create([
