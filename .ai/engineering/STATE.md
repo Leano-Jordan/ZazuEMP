@@ -1,3 +1,13 @@
+## 2026-11-13 — V1 status-document reconciliation
+
+- Reconciled `docs/ZAZU_V1_STATUS.md` and `docs/V1_RELEASE_CHECKLIST.md` with the live archive implementation. Their older sections incorrectly described business archive restore as not implemented; the new leading entries supersede that historical text.
+- Current archive disposition: **IMPLEMENTED / EXECUTION UNVERIFIED**. Service correction: `51bba91ddfe4f438b4b979c14f5e67e6864ac048`; focused overlap-FK regression fixture: `e4daa4d1b12378479b2990360877f964719d0a5a`.
+- Both documentation writes were made directly to `main`, then re-fetched and verified. Commits: `a9813fc5b4b73216239080e3a899842914dea486` and `79d5c1ba6d8e5345d9de8d06fdad1ae551930d1e`.
+- The archive round-trip and safety tests remain unverified. The latest workflow efficiency changes also require Actions evidence; no CI pass is claimed.
+- No application runtime, customer data, database, deployment configuration or deployment branch was changed.
+
+---
+
 ## 2026-11-13 — Director verification efficiency audit and CI noise reduction
 
 - Audited the live main workflows and test matrix after the owner identified repeated browser smoke as wasted effort.
