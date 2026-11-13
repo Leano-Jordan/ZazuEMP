@@ -212,4 +212,42 @@ class SearchTest extends TestCase
             ->assertViewHas('results', static fn (array $results): bool => $results === []);
     }
 
+
+    public function test_search_results_respect_the_member_domain_permissions(): void
+    {
+        config(['zazu.permissions.roles.staff' => ['customers.view']]);
+
+        $business = Business::create([
+            'name' => 'Search Permission Business',
+            'slug' => 'search-permission-'.Str::lower(Str::random(8)),
+            'status' => 'active',
+            'currency' => 'ZAR',
+        ]);
+        $user = User::factory()->create();
+        $business->users()->attach($user->id, ['role' => 'staff']);
+
+        Customer::create([
+            'business_id' => $business->id,
+            'name' => 'Permitted search customer',
+        ]);
+        Event::create([
+            'business_id' => $business->id,
+            'reference' => 'SEARCH-PERM-'.Str::upper(Str::random(6)),
+            'name' => 'Restricted search job',
+            'status' => 'confirmed',
+        ]);
+
+        $this->actingAs($user);
+
+        $this->get(route('search.index', ['q' => 'Permitted search customer', 'type' => 'customer']))
+            ->assertOk()
+            ->assertSee('Permitted search customer');
+
+        $this->get(route('search.index', ['q' => 'Restricted search job', 'type' => 'event']))
+            ->assertOk()
+            ->assertSee('0 records')
+            ->assertViewHas('results', static fn (array $results): bool => $results === []);
+    }
+
+
 }

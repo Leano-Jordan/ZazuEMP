@@ -1,12 +1,41 @@
-## Director exact-head checkpoint — 2026-11-13
+## Director overdrive verification — 2026-11-13
 
-- Canonical `main` HEAD: `bf7e3ded39ae8ac3e99282d2f93e95678887d16c`.
-- Application runtime source remains `7193038a2b2d14ea71278050a0d7c26ce246bf86`; the 13 commits since that source baseline change engineering evidence, known-limitations/release documentation, the offline browser test readiness wait, and the generated build manifest. No new runtime feature or deployment configuration was introduced.
-- Exact-HEAD GitHub Actions query returned the following required workflows, all **completed successfully** on `bf7e3ded`: Laravel (including offline browser acceptance and PostgreSQL migration/recovery jobs), full browser smoke, Render Docker build, Zazu quality/secret scan, Psalm security, PHPMD, populated database upgrade/rollback, and Director Health. Job-level results were checked; all listed jobs concluded `success`.
-- SonarCloud was **skipped** and is not counted as a pass.
-- Render remains an interim workbench. Service `ZazuEMP` is live at `https://zazuemp.onrender.com`, but its deployment branch `deploy/render-staging` is 48 commits behind canonical `main`. No promotion was performed: the Render PostgreSQL instance is not linked to the service, and its empty external IP allowlist prevents hosted-tool direct inspection. No credentials or environment variables were changed.
-- The agreed physical installed-device acceptance remains **OPEN**. It requires the owner's actual phone and PC on a trusted, stable HTTPS origin; browser emulation is not a substitute.
-- Scope remains frozen by `.ai/engineering/V1_SCOPE_FREEZE.md`. No new code patch is justified by the current automated evidence. Next action is the bounded owner device acceptance, then record the V1 decision. Do not expand scope or promote the stale Render branch as a shortcut.
+- Exact test/application baseline: `785b544e3cf49a10f19c510b5e5e7ef8c5e4d9a6`.
+- Regression additions: Helper attention business isolation, terminal-job filtering and role permission; report metric tenant isolation; search domain-permission filtering.
+- Laravel suite: **PASS — 466 passed / 3,352 assertions / 1 skipped**. Dedicated offline browser acceptance: **PASS — 19 passed**. PostgreSQL migration/registration/recovery: **PASS**.
+- Quality + secret scan, Psalm, PHPMD, populated upgrade/rollback, Director Health/Contract Lint and push-on-main: **PASS**. SonarCloud: **SKIPPED**.
+- Full browser regression was still running when the audit report was revised; do not mark this head fully reconciled until its result is recorded.
+- Evidence score updated from **69/100 to 71/100** (46/65): only the combined Search/Reporting/Helper domain moved from 3/5 to 4/5 after the new regression coverage passed. No runtime code changed in this cycle.
+- Physical installed-device acceptance, recovery/operator drill and commercial/legal/brand tasks remain owner/external gates. No deployment was performed; `deploy/render-staging` remains untouched.
+
+---
+
+## Director full-scale V1 audit — 2026-11-13
+
+- Audit report: [`docs/DIRECTOR_FULL_AUDIT_2026-11-13.md`](../../docs/DIRECTOR_FULL_AUDIT_2026-11-13.md).
+- Audited application/test evidence baseline: `2d7672103ee4b51d28100383f3311111b493deea`; report-only commit: `10a3a5dace4c4100e5af7e397bb29706f8f5c273`.
+- Evidence-maturity score reaffirmed at **69/100 (45/65 across 13 domains)**. No uplift claimed.
+- Latest exact-head Laravel, offline browser, full browser, PostgreSQL migration/recovery, quality/secret scan, Psalm, PHPMD, populated upgrade/rollback, Director Contract Lint/Health and push checks passed; SonarCloud skipped. Run IDs are in the audit report.
+- V1 remains **NO-GO for release certification** until owner physical installed-device acceptance on the selected trusted HTTPS origin and the final bounded regression/release decision.
+- Commercial subscription launch remains distinct: production issuer/key custody and feature enforcement, final offer/tier matrix, privacy/legal operations and official Zazu brand clearance are not certified.
+- Owner and engineering action split is recorded in the audit report. No runtime source, deployment setting, or `deploy/render-staging` branch changed during this audit.
+
+---
+
+## Director exact-head verification — 2026-11-13 (PWA offline navigation fixture)
+
+- Canonical repository/branch: `Leano-Jordan/ZazuEMP` / `main`.
+- Exact application/test HEAD: `282a4eb366956dfb49023cd5edc20999f5ead3cb`.
+- Latest source change is test-only: `tests/js/service-worker-auth-cache.test.js` now primes the authenticated dashboard online before disabling the host and asserting offline navigation. No runtime application source or deployment configuration changed.
+- Laravel [43367980312](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/43367980312): **PASS — 462 passed / 3,339 assertions / 1 skipped**.
+- PostgreSQL migration, account/workspace registration, backup/restore/private-file recovery: **PASS** (same workflow).
+- Dedicated offline browser acceptance: **PASS**.
+- Full browser regression [43367980364](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/43367980364): **PASS — 83 passed / 40 skipped / 0 failed**.
+- Zazu quality + secret scan [43367980476](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/43367980476), Psalm [43367980426](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/43367980426), PHPMD [43367980408](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/43367980408), populated upgrade/rollback [43367980313](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/43367980313), push-on-main [43367979917](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/43367979917), and Director Health [43368786394](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/43368786394): **PASS**.
+- SonarCloud [43367980435](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/43367980435): **SKIPPED**, not counted as a pass.
+- The exact-head CI evidence is reconciled in `docs/V1_RELEASE_CHECKLIST.md`. No deployment was performed; `deploy/render-staging` remains untouched.
+- Remaining bounded acceptance: real installed-device offline launch, local persistence across force-close/relaunch, reconnect sync exactly once, and phone/tablet results recorded against the selected secure HTTPS release origin. Browser emulation is not physical-device proof.
+- Scope remains frozen by `.ai/engineering/V1_SCOPE_FREEZE.md`; do not invent new gates or broaden offline scope without a reproducible V1 failure.
 
 ---
 

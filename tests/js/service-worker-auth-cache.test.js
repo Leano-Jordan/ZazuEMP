@@ -41,7 +41,7 @@ class MockResponse {
 }
 
 
-function bootWorker(fetchImplementation = async () => new MockResponse('online'), cacheHooks = {}) {
+function bootWorker(fetchImplementation = async () => new MockResponse('online'), cacheHooks = {}, initiallyOnline = true) {
     const listeners = new Map();
     const cacheStore = new Map();
     const fetchCalls = [];
@@ -99,6 +99,7 @@ function bootWorker(fetchImplementation = async () => new MockResponse('online')
 
     const self = {
         location: { origin: ORIGIN },
+        navigator: { onLine: initiallyOnline },
         clients: { claim: async () => {} },
         skipWaiting: async () => {},
         addEventListener: (name, handler) => listeners.set(name, handler),
@@ -146,7 +147,7 @@ function bootWorker(fetchImplementation = async () => new MockResponse('online')
         };
     }
 
-    return { caches, dispatchFetch, dispatchMessage, fetchCalls, Request: MockRequest, Response: MockResponse };
+    return { caches, dispatchFetch, dispatchMessage, fetchCalls, Request: MockRequest, Response: MockResponse, setOnline: (online) => { self.navigator.onLine = online; } };
 }
 
 test('authenticated uploaded images are cached only in the active business cache and remain available offline', async () => {
@@ -540,4 +541,41 @@ test('an active user navigation cancels low-priority page priming', async () => 
 
     await Promise.all([priming, navigation.finished()]);
     assert.equal(primeSignal.aborted, true, 'navigation must cancel the in-flight page-prime request');
+});
+
+
+test('an installed app navigation serves the authenticated cached page without any network request when offline is known', async () => {
+    let hostAvailable = true;
+    const worker = bootWorker(async () => {
+        if (!hostAvailable) throw new Error('Network must not be touched when the browser reports offline.');
+        return new MockResponse(
+            '<!doctype html><html><body data-zazu-user-id="41" data-zazu-business-id="17"><main>Cached dashboard</main></body></html>',
+            { headers: { 'content-type': 'text/html; charset=utf-8' } },
+        );
+    });
+
+    await worker.dispatchMessage({
+        type: 'prime-pages',
+        userId: '41',
+        businessId: '17',
+        routes: ['/dashboard'],
+    });
+
+    hostAvailable = false;
+    worker.setOnline(false);
+    const navigation = worker.dispatchFetch(new worker.Request('/dashboard', {
+        method: 'GET',
+        mode: 'navigate',
+        headers: { accept: 'text/html' },
+    }));
+
+    const response = await navigation.response;
+    assert.equal(response.ok, true);
+    const html = await response.text();
+    assert.match(html, /data-zazu-user-id="41"/);
+    assert.match(html, /data-zazu-business-id="17"/);
+    await navigation.finished();
+
+    assert.equal(worker.fetchCalls.length, 1, 'only the initial online page-prime request is allowed');
+    assert.equal(new URL(worker.fetchCalls[0].url).pathname, '/dashboard');
 });

@@ -1,12 +1,20 @@
-## Director exact-head checkpoint — 2026-11-13
+## Exact-head CI reconciliation — 2026-11-13 (PWA offline navigation fixture)
 
-- Canonical `main` HEAD: `bf7e3ded39ae8ac3e99282d2f93e95678887d16c`.
-- Application runtime source remains `7193038a2b2d14ea71278050a0d7c26ce246bf86`; the 13 commits since that source baseline change engineering evidence, known-limitations/release documentation, the offline browser test readiness wait, and the generated build manifest. No new runtime feature or deployment configuration was introduced.
-- Exact-HEAD GitHub Actions query returned the following required workflows, all **completed successfully** on `bf7e3ded`: Laravel (including offline browser acceptance and PostgreSQL migration/recovery jobs), full browser smoke, Render Docker build, Zazu quality/secret scan, Psalm security, PHPMD, populated database upgrade/rollback, and Director Health. Job-level results were checked; all listed jobs concluded `success`.
-- SonarCloud was **skipped** and is not counted as a pass.
-- Render remains an interim workbench. Service `ZazuEMP` is live at `https://zazuemp.onrender.com`, but its deployment branch `deploy/render-staging` is 48 commits behind canonical `main`. No promotion was performed: the Render PostgreSQL instance is not linked to the service, and its empty external IP allowlist prevents hosted-tool direct inspection. No credentials or environment variables were changed.
-- The agreed physical installed-device acceptance remains **OPEN**. It requires the owner's actual phone and PC on a trusted, stable HTTPS origin; browser emulation is not a substitute.
-- Scope remains frozen by `.ai/engineering/V1_SCOPE_FREEZE.md`. No new code patch is justified by the current automated evidence. Next action is the bounded owner device acceptance, then record the V1 decision. Do not expand scope or promote the stale Render branch as a shortcut.
+- Exact current `main` HEAD: `282a4eb366956dfb49023cd5edc20999f5ead3cb`.
+- Change scope: test-only correction in `tests/js/service-worker-auth-cache.test.js`. The offline navigation test now primes the authenticated dashboard while the host is available, then disables the host before requesting the cached page. This matches the real installed-app sequence and prevents a false test setup where the cache was never populated. No application runtime source or deployment configuration changed.
+- Laravel workflow [run 43367980312](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/43367980312): **PASS — 462 passed / 3,339 assertions / 1 skipped**. Inspected job log; PHPUnit/Pest completed successfully.
+- PostgreSQL migration/recovery job: **PASS** — complete migration set, real account/workspace registration, PostgreSQL backup/restore and private-file recovery (same Laravel workflow).
+- Offline browser acceptance: **PASS** — full dedicated job completed successfully (same Laravel workflow).
+- Full browser regression [run 43367980364](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/43367980364): **PASS — 83 passed / 40 skipped / 0 failed**. Inspected job log; no failed tests.
+- Zazu quality + secret scan [run 43367980476](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/43367980476): **PASS**.
+- Psalm security [run 43367980426](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/43367980426): **PASS**.
+- PHPMD [run 43367980408](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/43367980408): **PASS**.
+- Populated upgrade/rollback [run 43367980313](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/43367980313): **PASS**.
+- Push-on-main [run 43367979917](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/43367979917): **PASS**.
+- Director Health [run 43368786394](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/43368786394): **PASS**.
+- SonarCloud [run 43367980435](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/43367980435): **SKIPPED**, not counted as a pass.
+- No deployment was performed; `deploy/render-staging` remains untouched.
+- **Engineering conclusion:** exact-head automated verification is green. The remaining bounded owner acceptance is the real installed-device workflow on the intended secure HTTPS origin. Browser emulation is not physical-device proof. Do not add further offline edge-case scope without a reproducible V1 failure.
 
 ---
 

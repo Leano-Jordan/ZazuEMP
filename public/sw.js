@@ -105,6 +105,13 @@ async function dynamicCache() {
     return name ? caches.open(name) : null;
 }
 
+async function cachedAppPage(request) {
+    const cache = await dynamicCache();
+    const cachedPage = cache ? await cache.match(new Request(request.url)) : null;
+    const offlineShell = cache ? await cache.match(new Request(new URL(OFFLINE_SHELL, self.location.origin))) : null;
+    return cachedPage || offlineShell || Response.error();
+}
+
 async function cacheRenderedPage(request, response, requestGeneration) {
     const html = await response.clone().text();
     if (requestGeneration !== activeUserGeneration) return;
@@ -393,24 +400,27 @@ self.addEventListener('fetch', (event) => {
             activePrimeController?.abort();
         }
 
-        event.respondWith(
-            fetchWithTimeout(request)
-                .then((response) => {
-                    if (!response.ok) return response;
+        event.respondWith((async () => {
+            // When the browser reports no network, do not spend four seconds
+            // attempting the unreachable Laravel host. Resolve the authenticated
+            // page from its user/business cache immediately instead.
+            if (self.navigator?.onLine === false) {
+                return cachedAppPage(request);
+            }
 
-                    // Keep the authenticated page cache operation attached to the
-                    // navigation event. Mobile browsers may terminate a worker
-                    // immediately after returning the response otherwise.
-                    event.waitUntil(cacheRenderedPage(request, response.clone(), requestGeneration));
-                    return response;
-                })
-                .catch(async () => {
-                    const cache = await dynamicCache();
-                    const cachedPage = cache ? await cache.match(new Request(request.url)) : null;
-                    const offlineShell = cache ? await cache.match(new Request(new URL(OFFLINE_SHELL, self.location.origin))) : null;
-                    return cachedPage || offlineShell || Response.error();
-                })
-        );
+            try {
+                const response = await fetchWithTimeout(request);
+                if (!response.ok) return response;
+
+                // Keep the authenticated page cache operation attached to the
+                // navigation event. Mobile browsers may terminate a worker
+                // immediately after returning the response otherwise.
+                event.waitUntil(cacheRenderedPage(request, response.clone(), requestGeneration));
+                return response;
+            } catch {
+                return cachedAppPage(request);
+            }
+        })());
         return;
     }
 
