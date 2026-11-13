@@ -41,7 +41,7 @@
         <div class="zazu-panel-head">
             <div>
                 <div class="zazu-panel-title">Complete business archive</div>
-                <div class="zazu-panel-copy mt-1">Package this workspace's linked operational records and private uploaded files into one portable archive. Account passwords, user sessions, device pairing tokens and licence entitlements are never included.</div>
+                <div class="zazu-panel-copy mt-1">Package this workspace's linked operational records and private uploaded files into one portable archive. Account passwords, user sessions, device pairing tokens, licence entitlements and the SARS TCS PIN are never included. Re-enter the TCS PIN after restoring.</div>
             </div>
             <span class="zazu-chip zazu-chip-neutral">ZAZU ARCHIVE V1</span>
         </div>
@@ -50,7 +50,7 @@
         </div>
         <div class="zazu-detail-row mt-4">
             <div class="zazu-detail-label">Restore boundary</div>
-            <div class="zazu-detail-value">Restore is allowed only into an empty business workspace. Existing records are never overwritten or merged. Record IDs are remapped and business ownership is re-bound to this workspace.</div>
+            <div class="zazu-detail-value">Restore is allowed only into an empty, unpaired business workspace. Existing records and offline sync state are never overwritten or merged. Record IDs are remapped and business ownership is re-bound to this workspace.</div>
         </div>
         <form method="POST" action="{{ route('exports.archive.restore') }}" enctype="multipart/form-data" class="mt-4 space-y-3">
             @csrf
