@@ -107,4 +107,66 @@ test('unreachable logout host preserves the signed-in session and queued busines
         };
     }, mutationId);
     expect(preservedAfterRelogin).toEqual({ paired: true, mutationPresent: true });
+
+test('expired web session requires sign-in without erasing the trusted offline workspace', async ({ page }, testInfo) => {
+    test.setTimeout(45_000);
+    test.skip(testInfo.project.name !== 'chromium', 'Expired-session preservation runs once; responsive navigation is covered separately.');
+
+    await login(page);
+    await waitForOfflineRuntime(page);
+    const businessId = Number(await page.locator('body').getAttribute('data-zazu-business-id'));
+    expect(businessId).toBeGreaterThan(0);
+
+    // A real expired session must not make the already trusted business
+    // workspace or its pending mutations disappear from device storage.
+    await page.route('**/api/sync/**', route => route.fulfill({
+        status: 401,
+        contentType: 'application/json',
+        body: JSON.stringify({ message: 'Authentication required for this test.' }),
+    }));
+
+    const mutationId = await page.evaluate(async () => {
+        await window.ZazuOffline.ready;
+        const state = window.ZazuOffline.getState();
+        state.sync = {
+            token: 'expired-web-session-device-token',
+            device: {
+                id: 987663,
+                business_id: Number(document.body.dataset.zazuBusinessId),
+            },
+        };
+        await window.ZazuOffline.persist({ allowSessionChange: true });
+        const mutation = await window.ZazuOffline.queueMutation('customer', 'create', {
+            local_id: 'local:expired-web-session-customer',
+            name: 'Customer saved before web session expiry',
+        });
+        return mutation.id;
+    });
+
+    // Remove the authenticated web-session cookie without touching IndexedDB.
+    await page.context().clearCookies();
+    await page.goto('/dashboard', { waitUntil: 'domcontentloaded' });
+    await expect(page).not.toHaveURL(/\\/dashboard$/);
+    await expect(page.locator('[data-auth-modal]')).toBeVisible();
+
+    await login(page);
+    await waitForOfflineRuntime(page);
+
+    const recovered = await page.evaluate(async id => {
+        await window.ZazuOffline.ready;
+        const queue = await window.ZazuOffline.pending();
+        return {
+            businessId: Number(document.body.dataset.zazuBusinessId),
+            paired: window.ZazuOffline.isPaired(),
+            mutationPresent: queue.some(item => item.id === id),
+        };
+    }, mutationId);
+
+    expect(recovered).toEqual({
+        businessId,
+        paired: true,
+        mutationPresent: true,
+    });
+});
+
 });
