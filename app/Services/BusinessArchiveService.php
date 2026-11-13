@@ -174,6 +174,11 @@ final class BusinessArchiveService
                     if (! is_array($row)) {
                         throw new RuntimeException('The archive contains an invalid record in '.$table.'.');
                     }
+                    if (array_key_exists('business_id', $row)
+                        && (! is_int($row['business_id']) && !(is_string($row['business_id']) && ctype_digit($row['business_id']))
+                            || (int) $row['business_id'] !== (int) $manifest['source_business']['id'])) {
+                        throw new RuntimeException('The archive contains a record outside its declared source business in '.$table.'.');
+                    }
                     $rawId = $row['id'] ?? null;
                     if (! is_int($rawId) && !(is_string($rawId) && ctype_digit($rawId))) {
                         throw new RuntimeException('The archive contains an invalid record identifier in '.$table.'.');
