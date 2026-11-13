@@ -24,6 +24,7 @@ class BusinessArchiveTest extends TestCase
     public function test_business_archive_restores_linked_records_and_private_attachments_into_an_empty_workspace(): void
     {
         Storage::fake('private');
+        Storage::fake('public');
         $this->signInAsOwner();
         $source = auth()->user()->businesses()->firstOrFail();
 
@@ -31,6 +32,19 @@ class BusinessArchiveTest extends TestCase
             'business_id' => $source->id,
             'name' => 'Archive Customer',
             'legal_name' => 'Archive Customer Pty Ltd',
+        ]);
+
+        $capabilityImage = 'catalogue/archive-service.png';
+        Storage::disk('public')->put($capabilityImage, 'public catalogue image bytes');
+        $capability = BusinessCapability::create([
+            'business_id' => $source->id,
+            'name' => 'Catering service',
+            'capability_type' => 'service',
+            'pricing_basis' => 'custom',
+            'default_price' => 1000,
+            'currency' => 'ZAR',
+            'image_path' => $capabilityImage,
+            'is_active' => true,
         ]);
         $contact = CustomerContact::create([
             'customer_id' => $customer->id,
@@ -111,8 +125,8 @@ class BusinessArchiveTest extends TestCase
         }
 
         $this->assertSame(28, $result['tables']);
-        $this->assertSame(7, $result['records']);
-        $this->assertSame(1, $result['files']);
+        $this->assertSame(8, $result['records']);
+        $this->assertSame(2, $result['files']);
 
         $restoredCustomer = Customer::query()->where('business_id', $target->id)->firstOrFail();
         $restoredEvent = Event::query()->where('business_id', $target->id)->firstOrFail();
@@ -134,6 +148,9 @@ class BusinessArchiveTest extends TestCase
         $this->assertSame('Archive Customer', $restoredCustomer->name);
         $this->assertSame('private', $attachment->disk);
         $this->assertSame('private archive attachment bytes', Storage::disk('private')->get($attachment->path));
+        $restoredCapability = BusinessCapability::query()->where('business_id', $target->id)->firstOrFail();
+        $this->assertTrue(Storage::disk('public')->exists($restoredCapability->image_path));
+        $this->assertSame('public catalogue image bytes', Storage::disk('public')->get($restoredCapability->image_path));
         $this->assertDatabaseMissing('customers', [
             'business_id' => $target->id,
             'name' => 'Must Not Export',
