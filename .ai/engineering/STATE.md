@@ -1,13 +1,20 @@
-## 2026-11-13 — Browser-smoke fixture correction (verification pending)
+## 2026-11-13 — Exact-head V1 regression reconciliation (verified)
 
-- Canonical baseline: Leano-Jordan/ZazuEMP / main at 234dc9d1366e5ac85bf756ff440ebabe3f5541ae.
-- Exact-head browser run 43419239273: 84 passed, 1 failed, 1 flaky, 46 skipped. Failures were isolated to two assertions in e2e/pwa-offline.spec.js.
-- Retry-status test was on /dashboard, but the chip is rendered only in the Customer directory. Cross-business pairing test allowed automatic primary registration to create a valid current-business token, then incorrectly expected that pre-existing token to be absent after a foreign pairing was rejected.
-- Test-only correction: status test now opens /customers; cross-business test defers automatic registration and sets an explicit no-token baseline before pairing. Production runtime source is unchanged.
-- Failure record: CASE-ZAZU-0029 / ENG-FIXTURE-004, including exact-head run and root causes.
-- Verification status: CHANGED, NOT VERIFIED until the post-correction browser workflow completes. No score uplift. No deployment or change to deploy/render-staging.
+- Verified application/test source SHA: `6303ff59effe95ad95d5df862ff823b01b49d891` on `main`.
+- Laravel [run 43426697007](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/43426697007): **PASS — 476 passed / 3,383 assertions / 1 skipped**.
+- Dedicated offline browser acceptance: **PASS — 22 passed** (same Laravel workflow).
+- PostgreSQL 16 migration/registration/recovery: **PASS** — full migrations, registration (**1 test / 13 assertions**) and populated database/private-file backup-restore (**1 test / 5 assertions**) completed.
+- Full browser regression [run 43426696768](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/43426696768): **PASS — 86 passed / 46 skipped / 0 failed / 0 flaky**; 7.1 minutes.
+- Zazu quality + secret scan [run 43426696823](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/43426696823), Psalm [run 43426696750](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/43426696750), PHPMD [run 43426696734](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/43426696734), populated upgrade/rollback [run 43426696904](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/43426696904), Director Contract Lint [run 43426696909](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/43426696909), Director Health [run 43426696562](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/43426696562) and CodeQL analysis [run 43426696578](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/43426696578): **PASS**.
+- SonarCloud [run 43426696691](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/43426696691): **SKIPPED**, not counted as a pass.
+- The only source/test change in this cycle is the two Playwright fixture preconditions in `e2e/pwa-offline.spec.js`; production runtime source and customer data were not changed. CASE-ZAZU-0029 is closed at this exact head.
+- Evidence-maturity score remains **71/100**; no score uplift is awarded for test-fixture corrections.
+- Technical V1 remains **NO-GO only for the bounded real installed-device acceptance and final release decision**: trusted HTTPS origin, physical phone/tablet install, force-close/relaunch offline, local save persistence and reconnect sync exactly once. Browser emulation is not physical-device proof.
+- Commercial subscription certification remains separate: production issuer/key custody and installation identity/reactivation, approved module matrix, legal/privacy operations and brand clearance are not complete.
+- No deployment, database mutation or Render change occurred; `deploy/render-staging` remains untouched.
 
 ---
+
 ## Director overdrive verification — 2026-11-13
 
 - Exact test/application baseline: `785b544e3cf49a10f19c510b5e5e7ef8c5e4d9a6`.

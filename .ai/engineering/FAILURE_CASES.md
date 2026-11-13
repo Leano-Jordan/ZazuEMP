@@ -456,7 +456,7 @@ Archive pointer: closed historical cases CASE-ZAZU-0001 through CASE-ZAZU-0009 a
 
 ### CASE-ZAZU-0029
 
-**Status:** OPEN — browser fixture correction committed; exact-head verification pending.  
+**Status:** CLOSED — corrected fixture preconditions verified on exact application/test SHA `6303ff59effe95ad95d5df862ff823b01b49d891` (2026-11-13).  
 **Engineering diagnostic code:** ENG-FIXTURE-004.  
 **First observed:** 2026-11-13.  
 **Target:** Offline primary-device registration recovery and local sync-status browser acceptance.
@@ -478,4 +478,7 @@ Archive pointer: closed historical cases CASE-ZAZU-0001 through CASE-ZAZU-0009 a
 - The cross-business pairing test allowed boot-time primary-device registration to establish a valid local token, then incorrectly expected that pre-existing token to be absent after a foreign pairing was rejected. The existing credential remained unchanged; this is an F2/F3 fixture precondition defect.
 - Corrected only e2e/pwa-offline.spec.js: open /customers for the status assertion; defer initial registration and establish a no-token baseline for the cross-business pairing test.
 - Production public/zazu-offline.js and resources/js/app.js are unchanged. No customer data, business record, or deployed resource was changed.
-- Exact-head re-run is pending. Keep this case OPEN until the browser workflow confirms both assertions and the full suite is green.
+- Exact-head full browser run [43426696768](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/43426696768): **PASS — 86 passed / 46 skipped / 0 failed / 0 flaky**. Both corrected assertions passed on the first completed run.
+- Exact-head Laravel [43426697007](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/43426697007): **476 passed / 3,383 assertions / 1 skipped**; dedicated offline browser acceptance **22 passed**.
+- No production code change was needed. The retry chip is visible after the test opens its owning Customer directory; cross-business revocation is now tested with automatic primary registration deferred and an explicit no-token baseline.
+- **Resolution:** CLOSED. Do not reopen unless a new reproducible application failure is observed.

@@ -1,3 +1,18 @@
+## Exact-head V1 regression reconciliation — 2026-11-13 (offline browser fixture closure)
+
+- Verified application/test source SHA: `6303ff59effe95ad95d5df862ff823b01b49d891` on `main`. The only application/test change in this cycle is the Playwright setup correction in `e2e/pwa-offline.spec.js`; no production runtime code changed.
+- Laravel [run 43426697007](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/43426697007): **PASS — 476 passed / 3,383 assertions / 1 skipped**.
+- Dedicated offline browser acceptance: **PASS — 22 passed** (same workflow).
+- PostgreSQL 16 migration/registration/recovery: **PASS** — complete migrations, account/workspace registration (**1 test / 13 assertions**) and database/private-file backup/restore (**1 test / 5 assertions**).
+- Full browser regression [run 43426696768](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/43426696768): **PASS — 86 passed / 46 skipped / 0 failed / 0 flaky**.
+- Zazu quality + secret scan [run 43426696823](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/43426696823), Psalm [run 43426696750](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/43426696750), PHPMD [run 43426696734](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/43426696734), populated upgrade/rollback [run 43426696904](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/43426696904), Director Contract Lint [run 43426696909](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/43426696909), Director Health [run 43426696562](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/43426696562) and CodeQL analysis [run 43426696578](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/43426696578): **PASS**.
+- SonarCloud [run 43426696691](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/43426696691): **SKIPPED**, not counted as a pass.
+- CASE-ZAZU-0029 / ENG-FIXTURE-004 is closed. No readiness score uplift; it remains 71/100.
+- **Remaining technical V1 gate:** owner physical phone/tablet installed-app acceptance on the selected trusted HTTPS origin, followed by the final release decision. Browser tests do not substitute for real-device proof.
+- Commercial subscription launch remains separate from technical V1. No deployment or Render changes; `deploy/render-staging` remains untouched.
+
+---
+
 ## Exact-head CI reconciliation — 2026-11-13 (PWA offline navigation fixture)
 
 - Exact current `main` HEAD: `282a4eb366956dfb49023cd5edc20999f5ead3cb`.
