@@ -1,3 +1,15 @@
+## Director exact-head checkpoint — 2026-11-13
+
+- Canonical `main` HEAD: `bf7e3ded39ae8ac3e99282d2f93e95678887d16c`.
+- Application runtime source remains `7193038a2b2d14ea71278050a0d7c26ce246bf86`; the 13 commits since that source baseline change engineering evidence, known-limitations/release documentation, the offline browser test readiness wait, and the generated build manifest. No new runtime feature or deployment configuration was introduced.
+- Exact-HEAD GitHub Actions query returned the following required workflows, all **completed successfully** on `bf7e3ded`: Laravel (including offline browser acceptance and PostgreSQL migration/recovery jobs), full browser smoke, Render Docker build, Zazu quality/secret scan, Psalm security, PHPMD, populated database upgrade/rollback, and Director Health. Job-level results were checked; all listed jobs concluded `success`.
+- SonarCloud was **skipped** and is not counted as a pass.
+- Render remains an interim workbench. Service `ZazuEMP` is live at `https://zazuemp.onrender.com`, but its deployment branch `deploy/render-staging` is 48 commits behind canonical `main`. No promotion was performed: the Render PostgreSQL instance is not linked to the service, and its empty external IP allowlist prevents hosted-tool direct inspection. No credentials or environment variables were changed.
+- The agreed physical installed-device acceptance remains **OPEN**. It requires the owner's actual phone and PC on a trusted, stable HTTPS origin; browser emulation is not a substitute.
+- Scope remains frozen by `.ai/engineering/V1_SCOPE_FREEZE.md`. No new code patch is justified by the current automated evidence. Next action is the bounded owner device acceptance, then record the V1 decision. Do not expand scope or promote the stale Render branch as a shortcut.
+
+---
+
 ## Director exact-head verification — 2026-11-12 (Work completion guards + offline customer-to-Work)
 
 - Exact application/test-source HEAD: `7193038a2b2d14ea71278050a0d7c26ce246bf86` (merge commit; the later `main` descendants `453c80d` and `78fb793` change only these two evidence documents; includes the test-only commits `e3855998`, `b2e548be`, and offline acceptance correction `9bd1cc0d`).
