@@ -9,6 +9,12 @@
 - Earlier quality run `43437312175` failed before the namespace correction because `ApplySecurityHeaders.php` contained doubled namespace separators; commit `44b3aad31dcccfcb34471cbeb5d9d547562b6c78` corrected the PHP source and `fe4c21622a16621c1a9e2baae5395b135cf5007f` recorded APP-001. That failed run is not evidence against the later corrected source.
 - Verification boundary: latest Vite config, environment example, deployment notes and middleware were re-fetched from `main`. Exact-head PHPUnit/quality/Vite build and rendered PC/phone acceptance after these changes remain **UNVERIFIED**. Do not claim the screenshot issue is closed until the Vite server is restarted with the LAN origin configured and the rendered page is checked.
 - No customer data, database, Render service or `deploy/render-staging` was changed.
+
+### Vite environment-loading correction
+
+- Follow-up inspection caught that Vite config evaluation does not automatically populate `process.env` from the project's `.env` file. Updated `vite.config.js` to use Vite `loadEnv(mode, process.cwd(), 'VITE_')`, while retaining process-environment fallback, so the documented LAN origin settings are actually read.
+- Commit: `942bdaab89ae745fd445b7dc7a316e78104c09fb`. Exact-head build and rendered verification remain pending.
+
 ## 2026-11-13 — Shared UI token cascade correction
 
 - Owner-reported UI styling/structure failure routed through the UI recovery engine.
