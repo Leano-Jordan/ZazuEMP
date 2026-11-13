@@ -253,6 +253,7 @@ final class BusinessArchiveService
     {
         $allowedFileColumns = $this->allowedArchiveFileColumns();
         $references = $this->validateArchiveFileManifest($manifest);
+        $this->assertArchivePayloadEntriesAreDeclared($zip, $manifest);
         $this->assertArchivePathsHavePayloads($manifest, $data, $allowedFileColumns, $references);
 
         $filePayloads = [];
@@ -261,6 +262,18 @@ final class BusinessArchiveService
         }
 
         return $filePayloads;
+    }
+
+    private function assertArchivePayloadEntriesAreDeclared(ZipArchive $zip, array $manifest): void
+    {
+        $declaredEntries = array_fill_keys(array_column($manifest['files'], 'entry'), true);
+        for ($index = 0; $index < $zip->numFiles; $index++) {
+            $stat = $zip->statIndex($index);
+            $entry = $stat['name'] ?? '';
+            if (is_string($entry) && Str::startsWith($entry, 'payload/files/') && ! isset($declaredEntries[$entry])) {
+                throw new RuntimeException('The archive contains an undeclared file payload.');
+            }
+        }
     }
 
     private function allowedArchiveFileColumns(): array
@@ -508,6 +521,37 @@ final class BusinessArchiveService
      * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      * @SuppressWarnings(PHPMD.NPathComplexity)
      */
+    private function remapArchiveForeignKey(
+        string $table,
+        string $column,
+        string $foreignTable,
+        mixed $oldForeignId,
+        Business $target,
+        array $idMaps
+    ): mixed {
+        if ($oldForeignId === null) {
+            return null;
+        }
+        if (! is_int($oldForeignId) && !(is_string($oldForeignId) && ctype_digit($oldForeignId))) {
+            throw new RuntimeException("Restore stopped: invalid foreign key value in {$table}.{$column}.");
+        }
+        if ((int) $oldForeignId < 1) {
+            throw new RuntimeException("Restore stopped: invalid foreign key value in {$table}.{$column}.");
+        }
+        if ($foreignTable === 'businesses') {
+            return $target->id;
+        }
+        if ($foreignTable === 'users') {
+            return null;
+        }
+        $mappedId = $idMaps[$foreignTable][(string) $oldForeignId] ?? null;
+        if ($mappedId !== null) {
+            return $mappedId;
+        }
+
+        throw new RuntimeException("Restore stopped: unresolved {$table}.{$column} -> {$foreignTable}#{$oldForeignId}.");
+    }
+
     private function restoreRows(Business $target, array $definitions, array $data, array $filePayloads, array $sourceProfile): array
     {
         $idMaps = [];
@@ -550,20 +594,14 @@ final class BusinessArchiveService
                                 // A column may participate in both a simple FK and a
                                 // composite tenant FK. Always resolve from the archived
                                 // value so processing the second constraint is idempotent.
-                                $oldForeignId = $sourceRow[$column] ?? null;
-                                if ($oldForeignId === null) {
-                                    continue;
-                                }
-                                $foreignTable = $foreignKey['foreign_table'];
-                                if ($foreignTable === 'businesses') {
-                                    $row[$column] = $target->id;
-                                } elseif ($foreignTable === 'users') {
-                                    $row[$column] = null;
-                                } elseif (isset($idMaps[$foreignTable][(string) $oldForeignId])) {
-                                    $row[$column] = $idMaps[$foreignTable][(string) $oldForeignId];
-                                } else {
-                                    throw new RuntimeException("Restore stopped: unresolved {$table}.{$column} -> {$foreignTable}#{$oldForeignId}; available maps: ".implode(',', array_keys($idMaps))."; event IDs: ".implode(',', array_keys($idMaps['events'] ?? [])).".");
-                                }
+                                $row[$column] = $this->remapArchiveForeignKey(
+                                    $table,
+                                    $column,
+                                    $foreignKey['foreign_table'],
+                                    $sourceRow[$column] ?? null,
+                                    $target,
+                                    $idMaps
+                                );
                             }
                         }
 
