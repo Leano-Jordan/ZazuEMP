@@ -144,3 +144,16 @@ The current implementation has advanced beyond the original stage list above. Tr
 5. Build the issuer separately from the customer app; complete installation identity/reactivation and key-custody controls before claiming commercial enforcement.
 
 No V1 readiness uplift is claimed by this documentation reconciliation. Release remains **NO-GO**.
+
+
+## Three-tier lifecycle alignment — 2026-11-13
+
+The owner has confirmed that the three experience levels are also the three commercial tiers. Their canonical identifiers are `basic`, `intermediate` and `advanced`, matching `config/zazu.php`.
+
+- A signed active entitlement may carry one of those three plan identifiers.
+- A 30-day trial uses the Advanced tier and its signed expiry timestamp; when it expires, the effective commercial tier resolves to Basic Free.
+- An expired, not-yet-active, revoked, absent or unrecognised entitlement must resolve to Basic Free. It must never create a workspace lockout.
+- The tier resolver is a commercial-state decision, not permission to invent feature restrictions. Until the owner-approved capability matrix is implemented and tested, it must not disable routes or prevent reading, exporting or retaining customer-owned data.
+- The existing per-membership experience preference remains a presentation choice; it must not mint, upgrade or replace the signed business entitlement. The business entitlement is the commercial source of truth.
+- Intermediate and Advanced capability allocations and public prices remain unapproved. No limits or feature gates are inferred from the labels alone.
+
