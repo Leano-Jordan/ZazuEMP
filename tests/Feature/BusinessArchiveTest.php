@@ -36,6 +36,8 @@ class BusinessArchiveTest extends TestCase
 
         $this->seedArchiveRecords($source);
         $sourceEvent = Event::query()->where('business_id', $source->id)->firstOrFail();
+        $sourceAttachment = EventAttachment::query()->where('business_id', $source->id)->firstOrFail();
+        $this->assertSame($sourceEvent->id, $sourceAttachment->event_id);
 
         $foreign = Business::create([
             'name' => 'Foreign Archive Tenant',
