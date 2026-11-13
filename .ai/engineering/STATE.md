@@ -1,3 +1,13 @@
+## 2026-11-13 — Service-worker regression suite connected to CI
+
+- Found a verification gap while tracing the new offline styled-shell regression: `package.json` defined `test:service-worker`, but `.github/workflows/laravel.yml` did not invoke it. The new regression and existing service-worker auth/cache tests would therefore not run in the main Laravel workflow.
+- Corrected the workflow on `main` by adding a dedicated `Test service-worker offline cache and session contracts` step after frontend build. It runs `npm run test:service-worker` and is triggered by the existing public-source/workflow path filters.
+- Workflow commit: `a8acd2f05f7c2467ed396e4964c1b186b7d8fafd`.
+- This is a CI wiring correction, not a test pass. The workflow must complete on the resulting main head before the service-worker change is called verified.
+- No production data, deployment, local database or non-main branch changed.
+
+---
+
 ## 2026-11-13 — Offline styled-shell asset priming
 
 - Root cause: authenticated page priming cached HTML and private media, but did not guarantee that Vite CSS/JavaScript and CSS-referenced fonts/images were present in the shared static cache. A disconnected dashboard could therefore reopen with missing presentation assets even when its HTML was cached.
