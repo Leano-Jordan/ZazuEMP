@@ -32,9 +32,39 @@ class ExperienceLevel
             : null;
     }
 
-    public function for(?User $user = null, ?Business $business = null): string
+    public function for(?User $user = null, ?Business $business = null, ?DateTimeInterface $at = null): string
     {
-        return $this->selected($user, $business) ?? self::DEFAULT;
+        $selected = $this->selected($user, $business) ?? self::DEFAULT;
+
+        return $business
+            ? $this->entitlements->clamp($selected, $this->entitlements->currentTier($business, $at))
+            : $selected;
+    }
+
+    public function maximumFor(Business $business, ?DateTimeInterface $at = null): string
+    {
+        return $this->entitlements->currentTier($business, $at);
+    }
+
+    public function canSelect(Business $business, string $level, ?DateTimeInterface $at = null): bool
+    {
+        return $this->entitlements->canSelect($business, $level, $at);
+    }
+
+    /** @return list<string> */
+    public function availableLevels(Business $business, ?DateTimeInterface $at = null): array
+    {
+        return $this->entitlements->availableTiers($business, $at);
+    }
+
+    public function isTrial(Business $business, ?DateTimeInterface $at = null): bool
+    {
+        return $this->entitlements->isTrial($business, $at);
+    }
+
+    public function trialEndsAt(Business $business): ?\\Illuminate\\Support\\Carbon
+    {
+        return $this->entitlements->trialEndsAt($business);
     }
 
     public function label(string $level): string

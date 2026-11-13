@@ -17,10 +17,17 @@ class ExperiencePreferenceController extends Controller
     {
         $business = app(CurrentBusiness::class)->model($request->user());
 
+        $maximumLevel = $levels->maximumFor($business);
+
         return view('preferences.experience', [
             'business' => $business,
             'level' => $levels->for($request->user(), $business),
             'options' => $levels->options(),
+            'availableLevels' => $levels->availableLevels($business),
+            'maximumLevel' => $maximumLevel,
+            'maximumLevelLabel' => $levels->label($maximumLevel),
+            'isTrial' => $levels->isTrial($business),
+            'trialEndsAt' => $levels->trialEndsAt($business),
             'primaryNiche' => $niches->for($request->user(), $business),
             'nicheOptions' => $niches->options(),
             'holidayCategories' => SouthAfricaHolidayCalendar::CATEGORIES,
@@ -39,8 +46,16 @@ class ExperiencePreferenceController extends Controller
             'holiday_categories.*' => ['string', 'in:public,muslim,hindu,christian,jewish,cultural'],
         ]);
 
+        if (! $levels->canSelect($business, $validated['experience_level'])) {
+            $maximum = $levels->label($levels->maximumFor($business));
+
+            return back()->withErrors([
+                'experience_level' => "This workspace is on {$maximum}. An active higher-tier entitlement is required for that experience.",
+            ])->withInput();
+        }
+
         $membership = $request->user()->businesses()->whereKey($business->id)->firstOrFail();
-        $previous = $levels->selected($request->user(), $business);
+        $previous = $levels->for($request->user(), $business);
         $previousNiche = $niches->selected($request->user(), $business);
         $primaryNiche = $validated['primary_niche'] ?? $previousNiche ?? NicheFocus::DEFAULT;
         $holidayPreferences = array_fill_keys(array_keys(SouthAfricaHolidayCalendar::CATEGORIES), false);

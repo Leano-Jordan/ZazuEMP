@@ -148,7 +148,8 @@ class OnboardingController extends Controller
     public function experience(Request $request, ExperienceLevel $levels, NicheFocus $niches): View|RedirectResponse
     {
         $business = $this->currentBusiness($request);
-        $experienceLevel = $levels->selected($request->user(), $business);
+        $storedExperienceLevel = $levels->selected($request->user(), $business);
+        $experienceLevel = $storedExperienceLevel ? $levels->for($request->user(), $business) : null;
         $primaryNiche = $niches->selected($request->user(), $business);
 
         if ($experienceLevel && $primaryNiche) {
@@ -158,6 +159,11 @@ class OnboardingController extends Controller
         return view('onboarding.experience', [
             'business' => $business,
             'options' => $levels->options(),
+            'availableLevels' => $levels->availableLevels($business),
+            'maximumLevel' => $levels->maximumFor($business),
+            'maximumLevelLabel' => $levels->label($levels->maximumFor($business)),
+            'isTrial' => $levels->isTrial($business),
+            'trialEndsAt' => $levels->trialEndsAt($business),
             'nicheOptions' => $niches->options(),
             'selectedNiche' => $primaryNiche,
             'selectedLevel' => $experienceLevel,
@@ -171,6 +177,14 @@ class OnboardingController extends Controller
             'experience_level' => ['required', 'in:basic,intermediate,advanced'],
             'primary_niche' => ['nullable', 'string', 'in:'.implode(',', array_keys(config('zazu.niches', [])))],
         ]);
+
+        if (! $levels->canSelect($business, $validated['experience_level'])) {
+            $maximum = $levels->label($levels->maximumFor($business));
+
+            return back()->withErrors([
+                'experience_level' => "This workspace is on {$maximum}. An active higher-tier entitlement is required for that experience.",
+            ])->withInput();
+        }
 
         $primaryNiche = $validated['primary_niche']
             ?? $niches->selected($request->user(), $business)
