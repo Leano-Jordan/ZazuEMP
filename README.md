@@ -30,6 +30,8 @@ The canonical control contract is `.ai/engineering/00_DIRECTOR_ENGINE.md`; `.ai/
 
 The repository-side engineering system is the authoritative control layer for Zazu execution.
 
+For the physical Android PWA install and disconnected-device acceptance route, follow [the Android offline install runbook](docs/ZAZU_ANDROID_OFFLINE_INSTALL_ACCEPTANCE.md). The old plain-HTTP LAN address is not a supported service-worker installation origin.
+
 ## Engineering system
 
 Zazu uses one master control identity and bounded specialist engines:
