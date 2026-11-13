@@ -130,7 +130,7 @@ class BusinessArchiveTest extends TestCase
         $this->assertSame('Catering service', $restoredItem->description);
         $this->assertNotSame($event->id, $restoredEvent->id);
         $this->assertSame($target->id, $restoredEvent->business_id);
-        $this->assertSame('Restore Target', $target->fresh()->name === 'Restore Target' ? $target->name : $target->fresh()->name);
+        $this->assertSame('Archive Source', $target->fresh()->name);
         $this->assertSame('Archive Customer', $restoredCustomer->name);
         $this->assertSame('private', $attachment->disk);
         $this->assertSame('private archive attachment bytes', Storage::disk('private')->get($attachment->path));
