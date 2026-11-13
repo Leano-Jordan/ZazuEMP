@@ -18,23 +18,10 @@ class ReportTest extends TestCase
     {
         $business = $this->makeBusiness('Report Primary');
         $foreignBusiness = $this->makeBusiness('Report Foreign');
-        $user = $this->signInAsOwner($business);
 
-        Customer::create([
-            'business_id' => $business->id,
-            'name' => 'Primary report customer',
-        ]);
         Customer::create([
             'business_id' => $foreignBusiness->id,
             'name' => 'Foreign report customer',
-        ]);
-
-        $primaryJob = Event::create([
-            'business_id' => $business->id,
-            'reference' => 'REPORT-PRIMARY-'.Str::upper(Str::random(5)),
-            'name' => 'Primary report job',
-            'status' => 'confirmed',
-            'event_date' => now()->addDays(7)->toDateString(),
         ]);
         $foreignJob = Event::create([
             'business_id' => $foreignBusiness->id,
@@ -43,19 +30,40 @@ class ReportTest extends TestCase
             'status' => 'confirmed',
             'event_date' => now()->addDays(7)->toDateString(),
         ]);
+        EventPreparationItem::create([
+            'business_id' => $foreignBusiness->id,
+            'event_id' => $foreignJob->id,
+            'title' => 'Foreign open report preparation',
+            'category' => 'Other',
+            'quantity' => '1.00',
+            'unit' => 'item',
+            'status' => 'open',
+            'due_date' => now()->addDays(2)->toDateString(),
+        ]);
 
-        foreach ([$primaryJob, $foreignJob] as $job) {
-            EventPreparationItem::create([
-                'business_id' => $job->business_id,
-                'event_id' => $job->id,
-                'title' => 'Open report preparation',
-                'category' => 'Other',
-                'quantity' => '1.00',
-                'unit' => 'item',
-                'status' => 'open',
-                'due_date' => now()->addDays(2)->toDateString(),
-            ]);
-        }
+        $user = $this->signInAsOwner($business);
+
+        Customer::create([
+            'business_id' => $business->id,
+            'name' => 'Primary report customer',
+        ]);
+        $primaryJob = Event::create([
+            'business_id' => $business->id,
+            'reference' => 'REPORT-PRIMARY-'.Str::upper(Str::random(5)),
+            'name' => 'Primary report job',
+            'status' => 'confirmed',
+            'event_date' => now()->addDays(7)->toDateString(),
+        ]);
+        EventPreparationItem::create([
+            'business_id' => $business->id,
+            'event_id' => $primaryJob->id,
+            'title' => 'Primary open report preparation',
+            'category' => 'Other',
+            'quantity' => '1.00',
+            'unit' => 'item',
+            'status' => 'open',
+            'due_date' => now()->addDays(2)->toDateString(),
+        ]);
 
         $this->actingAs($user)
             ->get(route('reports.index'))
