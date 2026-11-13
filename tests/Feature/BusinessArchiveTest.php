@@ -40,37 +40,7 @@ class BusinessArchiveTest extends TestCase
             ->where('business_id', $source->id)->firstOrFail();
         $this->assertSame($sourceEvent->id, $sourceAttachment->event_id);
 
-        // Exercise columns that participate in both simple and composite tenant FKs.
-        $now = now();
-        $supplierId = DB::table('suppliers')->insertGetId([
-            'business_id' => $source->id,
-            'name' => 'Archive Supplier',
-            'created_at' => $now,
-            'updated_at' => $now,
-        ]);
-        $purchaseOrderId = DB::table('purchase_orders')->insertGetId([
-            'business_id' => $source->id,
-            'supplier_id' => $supplierId,
-            'event_id' => $sourceEvent->id,
-            'reference' => 'ARCHIVE-PO-001',
-            'status' => 'draft',
-            'currency' => 'ZAR',
-            'total_amount' => 250,
-            'created_at' => $now,
-            'updated_at' => $now,
-        ]);
-        $purchaseOrderItemId = DB::table('purchase_order_items')->insertGetId([
-            'business_id' => $source->id,
-            'purchase_order_id' => $purchaseOrderId,
-            'capability_id' => null,
-            'description' => 'Archive catering supplies',
-            'quantity' => 1,
-            'unit' => 'lot',
-            'unit_price' => 250,
-            'line_total' => 250,
-            'created_at' => $now,
-            'updated_at' => $now,
-        ]);
+        $this->seedPurchaseOrderRecords($source, $sourceEvent);
 
         $foreign = Business::create([
             'name' => 'Foreign Archive Tenant',
@@ -112,43 +82,8 @@ class BusinessArchiveTest extends TestCase
         $this->assertSame(11, $result['records']);
         $this->assertSame(2, $result['files']);
 
-        $restoredCustomer = Customer::query()->where('business_id', $target->id)->firstOrFail();
-        $restoredEvent = Event::query()->where('business_id', $target->id)->firstOrFail();
-        $restoredSupplier = DB::table('suppliers')->where('business_id', $target->id)->first();
-        $restoredPurchaseOrder = DB::table('purchase_orders')->where('business_id', $target->id)->first();
-        $restoredPurchaseOrderItem = DB::table('purchase_order_items')->where('business_id', $target->id)->first();
-        $restoredContact = CustomerContact::query()->where('customer_id', $restoredCustomer->id)->firstOrFail();
-        $restoredQuote = Quote::query()->where('event_id', $restoredEvent->id)->firstOrFail();
-        $restoredVersion = QuoteVersion::query()->where('quote_id', $restoredQuote->id)->firstOrFail();
-        $restoredItem = QuoteItem::query()->where('quote_version_id', $restoredVersion->id)->firstOrFail();
-        $attachment = EventAttachment::query()->where('business_id', $target->id)->firstOrFail();
+        $this->assertRestoredArchive($target, $sourceEvent, $result);
 
-        $this->assertSame('Archive Customer', $restoredCustomer->name);
-        $this->assertSame($restoredCustomer->id, $restoredEvent->customer_id);
-        $this->assertSame($restoredContact->id, $restoredEvent->event_day_contact_id);
-        $this->assertSame($restoredEvent->id, $restoredQuote->event_id);
-        $this->assertNotNull($restoredSupplier);
-        $this->assertNotNull($restoredPurchaseOrder);
-        $this->assertNotNull($restoredPurchaseOrderItem);
-        $this->assertSame($restoredEvent->id, (int) $restoredPurchaseOrder->event_id);
-        $this->assertSame($restoredSupplier->id, $restoredPurchaseOrder->supplier_id);
-        $this->assertSame($restoredPurchaseOrder->id, $restoredPurchaseOrderItem->purchase_order_id);
-        $this->assertSame($restoredVersion->id, $restoredItem->quote_version_id);
-        $this->assertSame('Catering service', $restoredItem->description);
-        $this->assertNotSame($sourceEvent->id, $restoredEvent->id);
-        $this->assertSame($target->id, $restoredEvent->business_id);
-        $this->assertSame('Archive Source', $target->fresh()->name);
-        $this->assertSame('Archive Customer', $restoredCustomer->name);
-        $this->assertSame('private', $attachment->disk);
-        $this->assertSame('private archive attachment bytes', Storage::disk('private')->get($attachment->path));
-        $restoredCapability = BusinessCapability::query()->where('business_id', $target->id)->firstOrFail();
-        $this->assertTrue(Storage::disk('public')->exists($restoredCapability->image_path));
-        $this->assertSame('public catalogue image bytes', Storage::disk('public')->get($restoredCapability->image_path));
-        $this->assertDatabaseMissing('customers', [
-            'business_id' => $target->id,
-            'name' => 'Must Not Export',
-        ]);
-        $this->assertNull($attachment->uploaded_by);
     }
 
     public function test_restore_refuses_a_non_empty_business_without_changing_its_records(): void
@@ -314,6 +249,87 @@ class BusinessArchiveTest extends TestCase
             'size' => 31,
             'source' => 'upload',
         ]);
+    }
+
+
+    private function seedPurchaseOrderRecords(Business $source, Event $event): void
+    {
+        // Exercise columns covered by both simple and composite tenant foreign keys.
+        $now = now();
+        $supplierId = DB::table('suppliers')->insertGetId([
+            'business_id' => $source->id,
+            'name' => 'Archive Supplier',
+            'created_at' => $now,
+            'updated_at' => $now,
+        ]);
+        $purchaseOrderId = DB::table('purchase_orders')->insertGetId([
+            'business_id' => $source->id,
+            'supplier_id' => $supplierId,
+            'event_id' => $event->id,
+            'reference' => 'ARCHIVE-PO-001',
+            'status' => 'draft',
+            'currency' => 'ZAR',
+            'total_amount' => 250,
+            'created_at' => $now,
+            'updated_at' => $now,
+        ]);
+        DB::table('purchase_order_items')->insertGetId([
+            'business_id' => $source->id,
+            'purchase_order_id' => $purchaseOrderId,
+            'capability_id' => null,
+            'description' => 'Archive catering supplies',
+            'quantity' => 1,
+            'unit' => 'lot',
+            'unit_price' => 250,
+            'line_total' => 250,
+            'created_at' => $now,
+            'updated_at' => $now,
+        ]);
+    }
+
+    private function assertRestoredArchive(Business $target, Event $sourceEvent, array $result): void
+    {
+        $this->assertSame(28, $result['tables']);
+        $this->assertSame(11, $result['records']);
+        $this->assertSame(2, $result['files']);
+
+        $restoredCustomer = Customer::query()->where('business_id', $target->id)->firstOrFail();
+        $restoredEvent = Event::query()->where('business_id', $target->id)->firstOrFail();
+        $restoredSupplier = DB::table('suppliers')->where('business_id', $target->id)->first();
+        $restoredPurchaseOrder = DB::table('purchase_orders')->where('business_id', $target->id)->first();
+        $restoredPurchaseOrderItem = DB::table('purchase_order_items')->where('business_id', $target->id)->first();
+        $restoredContact = CustomerContact::query()->where('customer_id', $restoredCustomer->id)->firstOrFail();
+        $restoredQuote = Quote::query()->where('event_id', $restoredEvent->id)->firstOrFail();
+        $restoredVersion = QuoteVersion::query()->where('quote_id', $restoredQuote->id)->firstOrFail();
+        $restoredItem = QuoteItem::query()->where('quote_version_id', $restoredVersion->id)->firstOrFail();
+        $attachment = EventAttachment::query()->where('business_id', $target->id)->firstOrFail();
+
+        $this->assertSame('Archive Customer', $restoredCustomer->name);
+        $this->assertSame($restoredCustomer->id, $restoredEvent->customer_id);
+        $this->assertSame($restoredContact->id, $restoredEvent->event_day_contact_id);
+        $this->assertSame($restoredEvent->id, $restoredQuote->event_id);
+        $this->assertNotNull($restoredSupplier);
+        $this->assertNotNull($restoredPurchaseOrder);
+        $this->assertNotNull($restoredPurchaseOrderItem);
+        $this->assertSame($restoredEvent->id, (int) $restoredPurchaseOrder->event_id);
+        $this->assertSame($restoredSupplier->id, $restoredPurchaseOrder->supplier_id);
+        $this->assertSame($restoredPurchaseOrder->id, $restoredPurchaseOrderItem->purchase_order_id);
+        $this->assertSame($restoredVersion->id, $restoredItem->quote_version_id);
+        $this->assertSame('Catering service', $restoredItem->description);
+        $this->assertNotSame($sourceEvent->id, $restoredEvent->id);
+        $this->assertSame($target->id, $restoredEvent->business_id);
+        $this->assertSame('Archive Source', $target->fresh()->name);
+        $this->assertSame('private', $attachment->disk);
+        $this->assertSame('private archive attachment bytes', Storage::disk('private')->get($attachment->path));
+
+        $restoredCapability = BusinessCapability::query()->where('business_id', $target->id)->firstOrFail();
+        $this->assertTrue(Storage::disk('public')->exists($restoredCapability->image_path));
+        $this->assertSame('public catalogue image bytes', Storage::disk('public')->get($restoredCapability->image_path));
+        $this->assertDatabaseMissing('customers', [
+            'business_id' => $target->id,
+            'name' => 'Must Not Export',
+        ]);
+        $this->assertNull($attachment->uploaded_by);
     }
 
 }
