@@ -1,3 +1,14 @@
+## 2026-11-13 — Paid entitlement expiry continuity regression added
+
+- Target: verify an expired Advanced paid entitlement resolves the effective presentation tier to Basic while preserving each member's saved Advanced preference.
+- Change: added `test_expired_paid_entitlement_falls_back_to_basic_without_overwriting_member_preference` in `tests/Feature/ExperienceLevelTest.php`.
+- Invariants covered: expired paid entitlement clamps available presentation to Basic; the saved membership preference remains unchanged; no customer records or permissions are mutated.
+- Commit: `c41ea1cbb16f7eae4cc72459469f07d2e4a076e2`.
+- Verification: source re-fetched and reconciled. Test execution and exact-head CI are **PENDING / UNVERIFIED**; do not count this regression as passed until Actions evidence is inspected.
+- Runtime application code, licence records, customer data and deployment settings were not changed.
+ 
+---
+
 ## 2026-11-13 — Exact-head V1 regression reconciliation (verified)
 
 - Verified application/test source SHA: `6303ff59effe95ad95d5df862ff823b01b49d891` on `main`.
