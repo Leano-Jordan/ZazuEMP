@@ -1,3 +1,24 @@
+## Director reconciliation — 2026-11-13 (exact-head CI and archive gate closure)
+
+**Canonical repository:** `Leano-Jordan/ZazuEMP` · **branch:** `main` · **verified head:** `5888123f1941beb478b31870a6e782e0f8ef8053`.
+
+- Exact-head Laravel workflow [43491595380](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/43491595380): **PASS** — Laravel suite 486 passed / 1 skipped / 3,475 assertions; PostgreSQL migration, registration and database/private-file recovery passed; dedicated offline-browser acceptance passed.
+- Exact-head PHPMD [43491595199](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/43491595199): **PASS**. The archive round-trip regression test was split into focused fixture/assertion helpers after PHPMD identified its 128-line test method; no warning suppression was added.
+- Exact-head Psalm [43491595173](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/43491595173): **PASS**.
+- Exact-head Zazu quality, secret scan and CodeQL push workflow [43491594809](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/43491594809): **PASS**.
+- Populated upgrade/rollback [43491595120](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/43491595120): **PASS**.
+- Business archive restore is now **IMPLEMENTED / AUTOMATED-VERIFIED** on this head. The round-trip test covers linked tenant records, supplier → purchase order → purchase-order item remapping, tenant exclusion, private attachment bytes and public catalogue media. The passing test confirms the earlier overlapping simple/composite FK remapping correction. This does not replace an operator-run restore on the actual installed target.
+- Offline account/session transition and active Work attachment flows are automated-verified by the passing Laravel and dedicated offline-browser jobs. Real phone/tablet persistence and secure-origin installation remain unverified.
+- Quote → payment → profit remains **SEEDED AUTOMATED-VERIFIED**; this does not claim a manual reconciliation of real business records.
+- Installation recovery remains **CI-VERIFIED / OPERATOR DRILL OPEN**. Business archive restore and installation-wide backup/restore are separate capabilities.
+- Physical device acceptance remains open; the owner's current plain-HTTP LAN address does not satisfy the secure-origin installed-PWA precondition.
+- POPIA operational controls, privacy notice publication/review, retention and incident procedures, and Zazu name/trade-mark clearance remain open. Do not claim legal clearance.
+- No production deployment, live customer data, database or non-main branch was changed.
+
+**Release decision: NOT YET READY.** Automated engineering gates are green; owner-controlled physical installation/recovery and legal/brand gates remain. No evidence score uplift is claimed by this reconciliation.
+
+---
+
 ## Director reconciliation — 2026-11-13 (supersedes stale archive status below)
 
 - Latest observed repository documentation HEAD: `7d95ee61da48d5fcf3ec4ed06ddbab0696df7b8d` on `main`.
