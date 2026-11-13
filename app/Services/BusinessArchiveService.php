@@ -364,10 +364,12 @@ final class BusinessArchiveService
                         ? (int) $target->id
                         : (int) $idMaps[$file['table']][(string) $file['id']];
                     $path = 'business-archives/'.$target->id.'/'.Str::uuid().'/'.basename($file['original_name']);
-                    if (! Storage::disk('private')->put($path, $file['bytes'])) {
-                        throw new RuntimeException('Restore stopped: a private business file could not be written.');
+                    $restoreDisk = $file['table'] === 'event_attachments' ? 'private' : ($file['source_disk'] ?? 'private');
+                    if (! in_array($restoreDisk, ['private', 'local', 'public'], true)
+                        || ! Storage::disk($restoreDisk)->put($path, $file['bytes'])) {
+                        throw new RuntimeException('Restore stopped: a business file could not be written to its storage disk.');
                     }
-                    $createdFiles[] = $path;
+                    $createdFiles[] = ['disk' => $restoreDisk, 'path' => $path];
 
                     DB::table($file['table'])->where('id', $newId)->update([
                         $file['column'] => $path,
@@ -383,8 +385,8 @@ final class BusinessArchiveService
 
             return ['tables' => count($definitions), 'records' => $records, 'files' => count($filePayloads)];
         } catch (\Throwable $exception) {
-            foreach ($createdFiles as $path) {
-                Storage::disk('private')->delete($path);
+            foreach ($createdFiles as $file) {
+                Storage::disk($file['disk'])->delete($file['path']);
             }
             throw $exception;
         }
