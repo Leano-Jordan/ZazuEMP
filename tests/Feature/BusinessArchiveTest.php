@@ -400,6 +400,77 @@ class BusinessArchiveTest extends TestCase
         ]);
     }
 
+    public function test_restore_rejects_undeclared_zip_file_payloads(): void
+    {
+        Storage::fake('private');
+        $this->signInAsOwner();
+        $source = auth()->user()->businesses()->firstOrFail();
+        $archive = app(BusinessArchiveService::class)->download($source);
+
+        $zip = new \\ZipArchive();
+        $this->assertTrue($zip->open($archive) === true);
+        $zip->addFromString('payload/files/undeclared.bin', 'unreferenced bytes');
+        $zip->close();
+
+        $target = Business::create([
+            'name' => 'Undeclared Payload Target',
+            'slug' => 'undeclared-payload-target',
+            'status' => 'active',
+            'currency' => 'ZAR',
+        ]);
+
+        try {
+            try {
+                app(BusinessArchiveService::class)->restore($archive, $target);
+                $this->fail('Undeclared ZIP payloads must be rejected.');
+            } catch (\\RuntimeException $exception) {
+                $this->assertStringContainsString('undeclared file payload', $exception->getMessage());
+            }
+        } finally {
+            @unlink($archive);
+        }
+
+        $this->assertDatabaseCount('customers', 0);
+    }
+
+    public function test_restore_rejects_non_scalar_foreign_key_values_without_writing_records(): void
+    {
+        Storage::fake('private');
+        $this->signInAsOwner();
+        $source = auth()->user()->businesses()->firstOrFail();
+        $this->seedArchiveRecords($source);
+        $archive = app(BusinessArchiveService::class)->download($source);
+
+        $zip = new \\ZipArchive();
+        $this->assertTrue($zip->open($archive) === true);
+        $data = json_decode((string) $zip->getFromName('data.json'), true, 512, JSON_THROW_ON_ERROR);
+        $data['events'][0]['customer_id'] = ['unexpected' => 'array'];
+        $zip->deleteName('data.json');
+        $zip->addFromString('data.json', json_encode($data, JSON_THROW_ON_ERROR));
+        $zip->close();
+
+        $target = Business::create([
+            'name' => 'Malformed Foreign Key Target',
+            'slug' => 'malformed-foreign-key-target',
+            'status' => 'active',
+            'currency' => 'ZAR',
+        ]);
+
+        try {
+            try {
+                app(BusinessArchiveService::class)->restore($archive, $target);
+                $this->fail('Non-scalar foreign keys must be rejected.');
+            } catch (\\RuntimeException $exception) {
+                $this->assertStringContainsString('invalid foreign key value', $exception->getMessage());
+            }
+        } finally {
+            @unlink($archive);
+        }
+
+        $this->assertDatabaseMissing('events', ['business_id' => $target->id]);
+        $this->assertDatabaseMissing('customers', ['business_id' => $target->id]);
+    }
+
     private function seedArchiveRecords(Business $source): void
     {
         $customer = Customer::create([
