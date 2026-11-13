@@ -62,6 +62,11 @@ test.describe('Zazu installed PWA offline shell', () => {
         test.setTimeout(25_000);
         test.skip(testInfo.project.name !== 'chromium', 'Primary device registration recovery contract runs once.');
 
+        // Keep boot-time registration out of this test so the retry endpoint
+        // is intercepted before the first registration attempt.
+        await page.addInitScript(() => {
+            window.__ZAZU_OFFLINE_DEFER_INITIAL_SYNC = true;
+        });
         await login(page);
         await page.evaluate(async () => {
             await window.ZazuOffline.ready;
@@ -212,6 +217,11 @@ test.describe('Zazu installed PWA offline shell', () => {
         test.setTimeout(20_000);
         test.skip(testInfo.project.name !== 'chromium', 'Sync status rendering contract runs once.');
 
+        // This test supplies its own token and network responses; prevent the
+        // dashboard's automatic first-device registration from racing setup.
+        await page.addInitScript(() => {
+            window.__ZAZU_OFFLINE_DEFER_INITIAL_SYNC = true;
+        });
         await login(page);
         await page.evaluate(async () => {
             await window.ZazuOffline.ready;
@@ -227,10 +237,6 @@ test.describe('Zazu installed PWA offline shell', () => {
             }];
             state.local_dirty = false;
             await window.ZazuOffline.persist({ allowSessionChange: true });
-            await window.ZazuOffline.queueMutation('customer', 'create', {
-                local_id: 'local:visible-sync-customer',
-                record: { name: 'Visible sync customer' },
-            });
         });
 
         await page.route('**/api/sync/push', route => route.fulfill({
@@ -253,7 +259,13 @@ test.describe('Zazu installed PWA offline shell', () => {
             contentType: 'application/json',
             body: JSON.stringify({ attachments: [] }),
         }));
-        await page.evaluate(() => window.ZazuOffline.sync());
+        await page.evaluate(async () => {
+            await window.ZazuOffline.queueMutation('customer', 'create', {
+                local_id: 'local:visible-sync-customer',
+                record: { name: 'Visible sync customer' },
+            });
+            await window.ZazuOffline.sync();
+        });
 
         const chip = page.locator('[data-zazu-local-record="customer"] .zazu-chip').filter({ hasText: 'Retrying sync' });
         await expect(chip).toBeVisible();
