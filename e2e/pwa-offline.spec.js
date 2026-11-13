@@ -151,6 +151,16 @@ test.describe('Zazu installed PWA offline shell', () => {
             contentType: 'application/json',
             body: JSON.stringify({ mutations: [] }),
         }));
+        await page.route('**/api/sync/bootstrap', route => route.fulfill({
+            status: 200,
+            contentType: 'application/json',
+            body: JSON.stringify({}),
+        }));
+        await page.route('**/api/sync/attachments', route => route.fulfill({
+            status: 200,
+            contentType: 'application/json',
+            body: JSON.stringify({ attachments: [] }),
+        }));
         await page.evaluate(() => window.ZazuOffline.sync());
 
         const chip = page.locator('[data-zazu-local-record="customer"] .zazu-chip').filter({ hasText: 'Retrying sync' });
