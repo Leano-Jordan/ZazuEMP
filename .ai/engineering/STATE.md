@@ -2717,3 +2717,17 @@ Verification boundary: source was re-fetched from `main` and the retry implement
 - This avoids queuing SonarCloud on documentation-only commits. SonarCloud remains skipped when its required project/organization variables are not configured; no skipped run is counted as a pass.
 - Workflow commit: `3a22fc71af48a47cae25399b1756c7c57e39c6d6`.
 - Validation boundary: workflow trigger content was re-fetched and the expected filters verified. Runtime application code was not changed.
+
+
+## 2026-11-13 — security hardening and dependency remediation
+
+- Owner priority: tighten security and reduce attack surface; offline engineering remains paused.
+- Added Composer `composer audit --locked` and npm `npm audit --audit-level=high` to the Zazu quality workflow.
+- The audit exposed vulnerable locked framework components. Updated and merged Laravel `v13.42.0`, Symfony HttpFoundation/HttpKernel/Routing `v8.1.11`, and Symfony Mime `v8.1.10` through [PR #54](https://github.com/Leano-Jordan/ZazuEMP/pull/54), merge commit `637561c53dedbe31d3de0e38e205200e3d5e3301`.
+- Added a weekly/manual dependency-refresh workflow. It runs Composer audit, frontend build and the full Laravel suite before opening a dependency PR. Protected main correctly rejected direct workflow pushes; the process now creates PRs.
+- Source audit found customer profile photos were business-scoped but did not enforce the existing `customers.view` permission. Fixed `ProfileMediaController` and added a regression for a member lacking that permission; expected 403 confirmed.
+- Main regression evidence: [run 43508450343](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/43508450343) — 487 passed, 3,476 assertions, 1 skipped.
+- Dependency-upgrade PR evidence: [Laravel 487 passed](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/43508848942), [Composer/npm audit and secret scan PASS](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/43508848964), [Psalm PASS](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/43508848909), [PHPMD PASS](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/43508848991), [PostgreSQL migration/recovery PASS](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/43508848942), [populated upgrade/rollback PASS](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/43508848911).
+- Psalm compatibility shim was verified against the upgraded Laravel source revision and its security scan passed.
+- Offline browser acceptance was still running at checkpoint; it is not counted as passed and no offline application code was changed.
+- Security score unchanged pending independent penetration testing and operational/privacy closure. No deployment or customer data was touched.
