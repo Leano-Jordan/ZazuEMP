@@ -68,14 +68,22 @@ test.describe('Zazu installed PWA offline shell', () => {
             window.__ZAZU_OFFLINE_DEFER_INITIAL_SYNC = true;
         });
         await login(page);
-        await page.evaluate(async () => {
+        const localCustomerIds = [
+            'local:registration-retry-customer-one',
+            'local:registration-retry-customer-two',
+        ];
+        await page.evaluate(async (ids) => {
             await window.ZazuOffline.ready;
             const state = window.ZazuOffline.getState();
             state.sync = null;
             state.sync_authorization_required = false;
             state.last_sync_error = null;
+            state.customers = ids.map((local_id, index) => ({
+                local_id,
+                name: 'Customer saved before registration recovery ' + (index + 1),
+            }));
             await window.ZazuOffline.persist({ allowSessionChange: true });
-        });
+        }, localCustomerIds);
 
         const businessId = Number(await page.locator('body').getAttribute('data-zazu-business-id'));
         let registrationAttempts = 0;
@@ -120,7 +128,7 @@ test.describe('Zazu installed PWA offline shell', () => {
                             identity: {
                                 entity_type: mutation.entity_type,
                                 local_id: mutation.payload.local_id,
-                                server_id: 880001,
+                                server_id: mutation.payload.local_id === localCustomerIds[0] ? 880001 : 880002,
                             },
                         })),
                     }),
@@ -142,16 +150,23 @@ test.describe('Zazu installed PWA offline shell', () => {
             await route.fulfill({ status: 404, contentType: 'application/json', body: JSON.stringify({ message: 'Unexpected sync request' }) });
         });
 
-        await page.evaluate(async () => {
+        await page.evaluate(async (ids) => {
             await window.ZazuOffline.queueMutation('customer', 'create', {
-                local_id: crypto.randomUUID(),
-                name: 'Customer saved before device registration recovered',
+                local_id: ids[0],
+                record: { name: 'First customer saved before registration recovery' },
             });
-        });
+            await window.ZazuOffline.queueMutation('customer', 'create', {
+                local_id: ids[1],
+                record: { name: 'Second customer saved before registration recovery' },
+            });
+        }, localCustomerIds);
 
         await expect.poll(() => registrationAttempts, { timeout: 12_000 }).toBeGreaterThanOrEqual(2);
-        await expect.poll(() => pushed, { timeout: 12_000 }).toBe(1);
+        await expect.poll(() => pushed, { timeout: 12_000 }).toBe(2);
         await expect.poll(async () => page.evaluate(async () => (await window.ZazuOffline.pending()).length)).toBe(0);
+        const syncedCustomers = await page.evaluate(() => window.ZazuOffline.getState().customers);
+        expect(syncedCustomers.find(customer => customer.local_id === localCustomerIds[0])?.server_id).toBe(880001);
+        expect(syncedCustomers.find(customer => customer.local_id === localCustomerIds[1])?.server_id).toBe(880002);
         expect(await page.evaluate(() => window.ZazuOffline.getState().sync?.token)).toBe('registration-retry-test-token');
     });
 
