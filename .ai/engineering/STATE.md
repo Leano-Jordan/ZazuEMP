@@ -1,3 +1,15 @@
+## Director overdrive verification — 2026-11-13
+
+- Exact test/application baseline: `785b544e3cf49a10f19c510b5e5e7ef8c5e4d9a6`.
+- Regression additions: Helper attention business isolation, terminal-job filtering and role permission; report metric tenant isolation; search domain-permission filtering.
+- Laravel suite: **PASS — 466 passed / 3,352 assertions / 1 skipped**. Dedicated offline browser acceptance: **PASS — 19 passed**. PostgreSQL migration/registration/recovery: **PASS**.
+- Quality + secret scan, Psalm, PHPMD, populated upgrade/rollback, Director Health/Contract Lint and push-on-main: **PASS**. SonarCloud: **SKIPPED**.
+- Full browser regression was still running when the audit report was revised; do not mark this head fully reconciled until its result is recorded.
+- Evidence score updated from **69/100 to 71/100** (46/65): only the combined Search/Reporting/Helper domain moved from 3/5 to 4/5 after the new regression coverage passed. No runtime code changed in this cycle.
+- Physical installed-device acceptance, recovery/operator drill and commercial/legal/brand tasks remain owner/external gates. No deployment was performed; `deploy/render-staging` remains untouched.
+
+---
+
 ## Director full-scale V1 audit — 2026-11-13
 
 - Audit report: [`docs/DIRECTOR_FULL_AUDIT_2026-11-13.md`](../../docs/DIRECTOR_FULL_AUDIT_2026-11-13.md).
