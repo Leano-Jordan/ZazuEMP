@@ -186,3 +186,15 @@ Application source SHA: `d1e2a4397b064d3fbfe7fc2cf1dc59236e00922f`.
 | SonarCloud | SKIPPED — [run 41727830643](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/41727830643); not counted as a pass |
 
 The documentation-only commits after `d1e2a439` do not change application source. Browser smoke remains the only observed pending required check for this source SHA. Do not mark the candidate fully CI-verified until it concludes.
+
+
+## Security hardening checkpoint — 2026-11-13
+
+- **No score inflation:** security remains 4/5 and overall evidence maturity remains 71/100. These changes improve verified controls; they do not constitute an independent penetration test.
+- Found and closed an authorization gap in customer profile media: the endpoint enforced business membership but did not also require the existing `customers.view` permission. `ProfileMediaController` now enforces that permission and `ProfileMediaSecurityTest` proves a business member without it receives 403. The regression passed on main: [Laravel run 43508450343](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/43508450343) — 487 passed, 3,476 assertions, 1 skipped.
+- Added locked dependency auditing to CI: Composer audit and npm audit. The old lockfile exposed vulnerable Laravel/Symfony versions. Updated to Laravel `v13.42.0`, Symfony HttpFoundation/HttpKernel/Routing `v8.1.11`, and Symfony Mime `v8.1.10`.
+- Dependency remediation merged through [PR #54](https://github.com/Leano-Jordan/ZazuEMP/pull/54), merge commit `637561c53dedbe31d3de0e38e205200e3d5e3301`.
+- Post-upgrade evidence on the PR head: [Laravel 487 passed / 3,476 assertions / 1 skipped](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/43508848942), [Composer + npm quality/security audit PASS](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/43508848964), [Psalm security PASS](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/43508848909), [PHPMD PASS](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/43508848991), [PostgreSQL migration and recovery PASS](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/43508848942), and [populated upgrade/rollback PASS](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/43508848911).
+- The offline-browser job remained in progress at this checkpoint and is not counted as a security pass; offline engineering remains frozen by owner direction.
+- Automated dependency refresh is available manually and scheduled weekly. Main remains protected; dependency updates are submitted through PRs, not direct pushes.
+- Remaining security boundary: no independent external penetration test has been performed. Keep V1 security at 4/5 until operational review and privacy/legal controls are closed.
