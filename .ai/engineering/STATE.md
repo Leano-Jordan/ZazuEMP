@@ -2267,3 +2267,23 @@ Source review found that authenticated sync pull/acknowledgement accepted arbitr
 - Commits: `dbddbc9907be76ddf286c2685deea8deb604806d` (controller), `c9cc78850829a6392c2dd4f7323137763f46cdbc` (regression test).
 - Updated the commercial operating profile to state explicitly that the earlier 250 MB / 2 GB storage figures and all tier quotas remain proposals, not approved policy. The complete Basic / Intermediate / Advanced matrix must be approved before restrictions are implemented or published (`9f6f627457009eb003f2aa4839232910d32ec164`).
 - Latest CI for these commits: pending verification. Previous exact-head baseline CI passed Laravel tests, PostgreSQL migration/registration/backup-restore smoke, offline browser acceptance, browser smoke, quality, Psalm, PHPMD, populated upgrade/rollback and Director Contract Lint. No deployment or Render changes were made.
+
+
+## 2026-11-13 — Reconnect sync retry defect
+
+Owner clarified the observed failure: offline changes are saved locally, but remain "Waiting to sync" after the PC/server becomes reachable again. The expected behaviour is to consolidate queued changes with the server once the host is reachable.
+
+Source inspection found a concrete retry gap in `public/zazu-offline.js`: reconnect/resume triggered one sync pass, but a failed HTTP push or a retryable server-side pending mutation could leave the queue unchanged. The sync loop then stopped. It depended on another browser online/focus/visibility event to try again; if the host became ready after the single reconnect attempt, no further event was guaranteed.
+
+Implemented on `main`:
+- Added bounded exponential retry for durable pending mutations (1s up to 30s) while online and paired.
+- Retries stop while offline, after session clearing, or when device authorization requires owner recovery.
+- Non-auth HTTP push failures now record a transient sync error; successful queue drain clears that stale error.
+- Added Playwright regression coverage: first push receives HTTP 503, subsequent automatic retry succeeds and drains the queue.
+
+Commits:
+- `7368710e65eb724a4cdf7978d96c72fd0fee468d` — reconnect retry scheduler.
+- `f913d3b8ab11a6abd42ec7651988c03af7aa6a55` — delayed-host reconnect regression.
+- `8adbe3ec90f552264815837ac23f28af6301782a` — transient failure visibility and recovery cleanup.
+
+Verification boundary: source was re-fetched from `main` and the retry implementation and regression test are present. GitHub combined status returned no checks for the latest commit; automated execution is therefore **UNVERIFIED**, not passed. No Render, deployment, database, or feature-scope changes.
