@@ -56,6 +56,24 @@ class BusinessLicense extends Model
         return ! $this->expires_at || $at <= $this->expires_at;
     }
 
+    /**
+     * Resolve the workspace's effective commercial tier.
+     *
+     * An absent, expired, not-yet-active, revoked or unknown entitlement always
+     * falls back to Basic. This is a tier-resolution boundary only; it does not
+     * block access to existing customer data or enforce unapproved feature limits.
+     */
+    public function effectiveTier(?\DateTimeInterface $at = null): string
+    {
+        if (! $this->isActive($at)) {
+            return 'basic';
+        }
+
+        return in_array($this->plan, ['basic', 'intermediate', 'advanced'], true)
+            ? $this->plan
+            : 'basic';
+    }
+
     public function statusLabel(?\DateTimeInterface $at = null): string
     {
         $at ??= now();
