@@ -568,7 +568,7 @@ final class BusinessArchiveService
             });
 
             return ['tables' => count($definitions), 'records' => $records, 'files' => count($filePayloads)];
-        } catch (\\Throwable $exception) {
+        } catch (\Throwable $exception) {
             foreach ($createdFiles as $file) {
                 Storage::disk($file['disk'])->delete($file['path']);
             }
