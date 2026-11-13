@@ -105,9 +105,9 @@ class UiDashboardResponsiveTest extends TestCase
         $this->assertSame(0, preg_match('/\\.zazu-caption,\\s*\\.zazu-eyebrow,/', $extensionCss));
 
         // Theme values and wallpaper treatment remain token/state driven.
-        $this->assertStringContainsString('--zazu-sidebar: #8ED8F8;', $appCss);
-        $this->assertStringContainsString('--zazu-sidebar: #061826;', $appCss);
-        $this->assertStringContainsString('--zazu-sidebar-ink: #F3F7FB;', $appCss);
+        $this->assertStringContainsString('--zazu-sidebar: #D5E0E8;', $appCss);
+        $this->assertStringContainsString('--zazu-sidebar: #202B35;', $appCss);
+        $this->assertStringContainsString('--zazu-sidebar-ink: #E5EBF0;', $appCss);
         $this->assertStringContainsString('body.zazu-has-wallpaper .zazu-topbar', $appCss);
         $this->assertStringContainsString('.zazu-theme-toggle:hover {', $appCss);
         $this->assertStringContainsString('.zazu-theme-toggle:active {', $appCss);
