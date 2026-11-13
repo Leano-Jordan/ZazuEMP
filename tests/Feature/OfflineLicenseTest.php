@@ -31,6 +31,45 @@ class OfflineLicenseTest extends TestCase
         $this->assertFalse($license->isActive(Carbon::parse('2026-10-01 00:00:00')));
     }
 
+    public function test_expiry_and_revocation_preserve_basic_customer_data_access(): void
+    {
+        $user = $this->signInAsOwner();
+        $business = $user->businesses()->firstOrFail();
+        $customer = Customer::query()->create([
+            'business_id' => $business->id,
+            'name' => 'Commercial continuity customer',
+        ]);
+        $licenses = app(OfflineLicenseService::class);
+
+        $expired = $licenses->importSignedLicense($business, $this->signedToken($business, [
+            'issued_at' => '2026-10-01T00:00:00+00:00',
+            'starts_at' => '2026-10-01T00:00:00+00:00',
+            'expires_at' => '2026-10-31T23:59:59+00:00',
+        ]));
+
+        $this->assertFalse($expired->isActive());
+        $this->get(route('customers.index'))
+            ->assertOk()
+            ->assertSeeText('Commercial continuity customer');
+
+        $revoked = $licenses->importSignedLicense($business, $this->signedToken($business, [
+            'status' => 'revoked',
+            'issued_at' => '2026-11-01T00:00:00+00:00',
+            'starts_at' => '2026-10-01T00:00:00+00:00',
+            'expires_at' => '2027-10-31T23:59:59+00:00',
+        ]));
+
+        $this->assertFalse($revoked->isActive());
+        $this->assertDatabaseHas('customers', [
+            'id' => $customer->id,
+            'business_id' => $business->id,
+            'name' => 'Commercial continuity customer',
+        ]);
+        $this->get(route('customers.index'))
+            ->assertOk()
+            ->assertSeeText('Commercial continuity customer');
+    }
+
     public function test_a_valid_signed_license_can_be_imported_without_network_access(): void
     {
         $user = $this->signInAsOwner();
