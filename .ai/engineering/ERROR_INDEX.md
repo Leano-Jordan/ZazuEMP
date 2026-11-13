@@ -68,6 +68,7 @@ Codes are permanent once assigned. Never recycle a code.
 | ENG-RUNTIME-002 | CASE-ZAZU-0023 | Offline launch relies on insecure PC-hosted LAN origin | F4/F7 | OPEN — delivery architecture and device proof required |
 | ENG-FIXTURE-003 | CASE-ZAZU-0028 | MySQL restore rollback failure fixture emits escaped newlines | F2 | VERIFIED — corrected fixture executed in exact-head Laravel suite |
 | ENG-FIXTURE-004 | CASE-ZAZU-0029 | Offline sync browser tests race boot-time registration and retry scheduling | F2/F3 | CLOSED — exact-head browser and Laravel verification passed |
+| ENG-FIXTURE-005 | CASE-ZAZU-0030 | Offline startup readiness test accesses ZazuOffline before runtime exposure | F2/F3/F8 | CORRECTED — exact-head rerun pending |
 
 
 ## Latest browser failure fingerprints — 2026-10-06 — reconciled
