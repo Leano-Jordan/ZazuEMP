@@ -4,7 +4,7 @@
     <section class="zazu-page-intro">
         <div>
             <span class="zazu-eyebrow">Setup · Workspace tier and preference</span>
-            <h2>Set up Zazu around the way your business works.</h2>
+            <h2>What do you mainly provide?</h2>
             <p>Choose your main business focus and the level of detail you want to see. Your workspace tier controls the maximum experience; roles and permissions still control actions and records.</p>
             @if($isTrial)
                 <p class="zazu-field-help mt-3" role="status">Your 30-day Advanced trial ends {{ $trialEndsAt?->format('j M Y') }}. It moves to Basic Free at expiry unless you actively install a paid entitlement.</p>
@@ -22,7 +22,7 @@
         </fieldset>
         <details class="zazu-disclosure" {{ $selectedLevel ? '' : 'open' }}>
             <summary>
-                <span><strong>Experience level</strong><small>Current: {{ $selectedLevel ? ucfirst($selectedLevel) : 'Not selected' }}</small></span>
+                <span><strong>How much of Zazu should be visible?</strong><small>Current: {{ $selectedLevel ? ucfirst($selectedLevel) : 'Not selected' }}</small></span>
                 <span aria-hidden="true">+</span>
             </summary>
             <div class="zazu-disclosure-body">

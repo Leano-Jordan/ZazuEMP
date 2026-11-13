@@ -176,7 +176,7 @@ class ExperienceLevelTest extends TestCase
             'status' => 'active',
             'currency' => 'ZAR',
         ]);
-        $createdAt = Carbon::parse('2026-11-01T09:00:00+02:00');
+        $createdAt = Carbon::parse('2026-11-01 09:00:00', 'UTC');
         $business->forceFill(['created_at' => $createdAt])->saveQuietly();
 
         $levels = app(ExperienceLevel::class);
@@ -195,7 +195,7 @@ class ExperienceLevelTest extends TestCase
             'status' => 'active',
             'currency' => 'ZAR',
         ]);
-        $business->forceFill(['created_at' => Carbon::parse('2026-10-01T09:00:00+02:00')])->saveQuietly();
+        $business->forceFill(['created_at' => Carbon::parse('2026-10-01 09:00:00', 'UTC')])->saveQuietly();
 
         $user = User::factory()->create();
         $business->users()->attach($user->id, [

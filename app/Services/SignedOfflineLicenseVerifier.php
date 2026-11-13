@@ -121,7 +121,7 @@ class SignedOfflineLicenseVerifier
         return is_string($payload['license_id'] ?? null)
             && Str::isUuid($payload['license_id'])
             && is_string($payload['plan'] ?? null)
-            && in_array($payload['plan'], ['basic', 'intermediate', 'advanced', 'solo'], true);
+            && (bool) preg_match('/^[a-z][a-z0-9_-]{0,39}$/', $payload['plan']);
     }
 
     /**
