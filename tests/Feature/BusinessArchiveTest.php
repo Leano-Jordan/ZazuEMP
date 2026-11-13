@@ -173,7 +173,7 @@ class BusinessArchiveTest extends TestCase
         Storage::fake('private');
         $this->signInAsOwner();
         $source = auth()->user()->businesses()->firstOrFail();
-        $customer = Customer::create([
+        Customer::create([
             'business_id' => $source->id,
             'name' => 'Path Injection Customer',
         ]);
