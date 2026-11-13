@@ -18,8 +18,20 @@ name: PHPMD
 on:
   push:
     branches: [ "main" ]
+    paths:
+      - 'app/**/*.php'
+      - 'tests/**/*.php'
+      - 'composer.json'
+      - 'composer.lock'
+      - '.github/workflows/phpmd.yml'
   pull_request:
     branches: [ "main" ]
+    paths:
+      - 'app/**/*.php'
+      - 'tests/**/*.php'
+      - 'composer.json'
+      - 'composer.lock'
+      - '.github/workflows/phpmd.yml'
   schedule:
     - cron: '38 21 * * 2'
 
