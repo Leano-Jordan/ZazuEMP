@@ -337,7 +337,7 @@ test('reconciles an offline-created Work attachment after its job receives a ser
 
 test('operator creates an offline Work job, attaches a file from its directory row, then syncs it', async ({ page }, testInfo) => {
     test.setTimeout(60_000);
-    test.skip(testInfo.project.name !== 'chromium', 'The full offline attachment journey runs once in Chromium.');
+    test.skip(!['chromium', 'chromium-mobile'].includes(testInfo.project.name), 'The full offline attachment journey runs on desktop and mobile Chromium.');
 
     await login(page);
     await page.goto('/dashboard', { waitUntil: 'domcontentloaded' });
