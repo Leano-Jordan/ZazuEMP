@@ -230,80 +230,49 @@
     function applyBootstrap(bootstrap) {
         if (!bootstrap) return;
 
-        state.business = bootstrap.business || state.business;
-        state.catalogue = (bootstrap.catalogue || []).map(x => ({
-            ...x.record,
-            local_id: x.local_id,
-            id: x.server_id,
-            server_id: x.server_id,
-        }));
+        // The Laravel bootstrap endpoint returns direct records (id/local_id),
+        // while older sync envelopes wrap records as { record, server_id }.
+        // Accept both contracts so a fresh device actually receives its workspace.
+        const normalizeRecord = (item) => {
+            const record = item?.record && typeof item.record === 'object' ? item.record : item;
+            const serverId = item?.server_id ?? record?.server_id ?? record?.id ?? null;
 
-        state.suppliers = (bootstrap.suppliers || []).map(x => ({
-            ...x.record,
-            local_id: x.local_id,
-            id: x.server_id,
-            server_id: x.server_id,
+            return {
+                ...(record || {}),
+                local_id: item?.local_id ?? record?.local_id ?? null,
+                ...(serverId !== null ? { id: serverId, server_id: serverId } : {}),
+            };
+        };
+        const normalizeList = (items) => (items || []).map(normalizeRecord);
+
+        state.business = bootstrap.business || state.business;
+        state.catalogue = normalizeList(bootstrap.catalogue ?? bootstrap.capabilities);
+        state.suppliers = normalizeList(bootstrap.suppliers);
+        state.purchase_orders = (bootstrap.purchase_orders || []).map((item) => ({
+            ...normalizeRecord(item),
+            items: normalizeList(item.items),
         }));
-        state.purchase_orders = (bootstrap.purchase_orders || []).map(x => ({
-            ...x.record,
-            local_id: x.local_id,
-            id: x.server_id,
-            server_id: x.server_id,
-            items: (x.items || []).map(item => ({
-                ...item.record,
-                local_id: item.local_id,
-                id: item.server_id,
-                server_id: item.server_id,
-            })),
+        state.invoices = (bootstrap.invoices || []).map((item) => ({
+            ...normalizeRecord(item),
+            payments: normalizeList(item.payments),
         }));
-        state.invoices = (bootstrap.invoices || []).map(x => ({
-            ...x.record,
-            local_id: x.local_id,
-            id: x.server_id,
-            server_id: x.server_id,
-            payments: (x.payments || []).map(payment => ({
-                ...payment.record,
-                local_id: payment.local_id,
-                id: payment.server_id,
-                server_id: payment.server_id,
-            })),
+        state.expenses = normalizeList(bootstrap.expenses);
+        state.inventory_items = (bootstrap.inventory_items || []).map((item) => ({
+            ...normalizeRecord(item),
+            movements: normalizeList(item.record?.movements ?? item.movements),
         }));
-        state.expenses = (bootstrap.expenses || []).map(x => ({
-            ...x.record,
-            local_id: x.local_id,
-            id: x.server_id,
-            server_id: x.server_id,
+        state.assets = (bootstrap.assets || []).map((item) => ({
+            ...normalizeRecord(item),
+            allocations: normalizeList(item.record?.allocations ?? item.allocations),
         }));
-        state.inventory_items = (bootstrap.inventory_items || []).map(x => ({
-            ...x.record,
-            local_id: x.local_id,
-            id: x.server_id,
-            server_id: x.server_id,
-            movements: (x.record?.movements || []).map(movement => ({
-                ...(movement.record || {}),
-                local_id: movement.local_id,
-                id: movement.server_id,
-                server_id: movement.server_id,
-            })),
-        }));
-        state.assets = (bootstrap.assets || []).map(x => ({
-            ...x.record,
-            local_id: x.local_id,
-            id: x.server_id,
-            server_id: x.server_id,
-            allocations: (x.record?.allocations || []).map(allocation => ({
-                ...(allocation.record || {}),
-                local_id: allocation.local_id,
-                id: allocation.server_id,
-                server_id: allocation.server_id,
-            })),
-        }));
-        state.costs = (bootstrap.costs || []).map(x => ({
-            ...x.record,
-            local_id: x.local_id,
-            id: x.server_id,
-            server_id: x.server_id,
-        }));
+        state.costs = normalizeList(bootstrap.costs);
+
+        // Current Laravel bootstrap uses top-level customers/events/quotes.
+        // The selected envelope remains supported for older and scoped payloads.
+        state.customers = normalizeList(bootstrap.customers);
+        state.jobs = normalizeList(bootstrap.events ?? bootstrap.jobs);
+        state.quotes = normalizeList(bootstrap.quotes);
+        state.preparations = normalizeList(bootstrap.preparations);
 
         const selected = bootstrap.selected || [];
         const targets = {
@@ -317,14 +286,12 @@
             const target = targets[item.type];
             if (!target) continue;
 
-            const record = {
-                ...item.record,
-                local_id: item.local_id,
-                id: item.server_id,
-                server_id: item.server_id,
-            };
+            const record = normalizeRecord(item);
             const list = state[target];
-            const index = list.findIndex(x => x.local_id === item.local_id || Number(x.id) === Number(item.server_id));
+            const index = list.findIndex((entry) =>
+                (record.local_id && entry.local_id === record.local_id)
+                || (record.server_id && Number(entry.id) === Number(record.server_id))
+            );
             if (index >= 0) list[index] = record;
             else list.push(record);
         }
