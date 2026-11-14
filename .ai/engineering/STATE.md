@@ -1,3 +1,18 @@
+## 2026-11-14 — Owner V1 shipping mandate and current operating state (AUTHORITATIVE)
+
+This entry supersedes any lower historical/current-looking note that directs work back into offline engineering or keeps V1 gates open for speculative refinement.
+
+- **Owner objective:** deliver a practical, dependable Zazu V1 that can be put in the hands of the first real businesses. Do not optimise for thousands of customers or theoretical enterprise perfection before first-customer usability.
+- **Definition of done:** agree the acceptance criteria, verify them, award **5/5**, and CLOSE the gate. Distinguish DONE, ACCEPTED LIMITATION and BLOCKED. Reopen only for new reproducible evidence.
+- **Execution discipline:** no repeated investigations, duplicate green tests, speculative hardening, scope creep, or documentation-only activity presented as product progress. Batch related verified defects and move to the next V1 gate.
+- **Offline boundary:** offline engineering is PAUSED by owner direction. Do not modify the service worker, IndexedDB, attachment queue, offline sync or PWA installation path unless the owner explicitly resumes that work or a separate critical regression is demonstrated. The immediately following older entry's instruction to continue offline issues #34/#35 is superseded.
+- **Repository instructions:** the owner mandate is pinned at the top of `memory.md`; `AGENTS.md` instructs every engineering session to read it first. Work directly on `main`; do not create feature/development branches; preserve `deploy/render-staging`.
+- **Application/test source:** `62a551e97e48a2fa0045046f07742dfd9d817f43`. Exact-head Laravel workflow [43575869239](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/43575869239): **PASS** — 496 passed, 1 skipped, 3,502 assertions; PostgreSQL migration/registration/database+private-file backup/restore: **PASS**; dedicated offline-browser acceptance: **29 passed**. These are automated results only, not physical-device proof.
+- **Current documentation/control head at this entry:** `1b3571f2bc3fb1b3579bfa3533f4142a3e2c51f1`. Zazu quality [43577075706](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/43577075706), Director Contract Lint [43577075740](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/43577075740), Director Health [43577075750](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/43577075750), and Push on main [43577075530](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/43577075530): **PASS**. SonarCloud was skipped and is not counted.
+- **No new offline work is authorised.** The remaining V1 items are bounded acceptance/owner decisions: physical device acceptance, installed-target recovery drill, live commercial-record reconciliation, and POPIA/privacy/brand closure. Do not turn these into invented engineering backlogs; complete any source-level work only when a verified V1 defect or explicit requirement exists.
+
+---
+
 ## 2026-11-14 — Offline conflict acceptance deterministic; exact-head CI closure
 
 - Canonical repository: `Leano-Jordan/ZazuEMP`; branch: `main`; application/test source: `aaa47895b334b3bbf3a68f89b66e4ff6a0738032`.
