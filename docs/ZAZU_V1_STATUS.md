@@ -366,3 +366,10 @@ Backup compatibility coverage was extended after the initial integrity note: the
 - **Exact-head CI status:** not confirmed for `51da528`. The recorded Laravel/asset-build PASS remains tied to `d09fdbfbe4bdbb7cfaed9ca1ea125313910fa3e` (run `43593454044`); do not carry that PASS forward.
 - **Release remains NOT READY.** Physical Android installed-device acceptance, controlled installation recovery drill, live business-record quote/payment/profit reconciliation, and POPIA operational sign-off remain open. Zazu name clearance remains deferred by owner.
 - No application runtime, offline engine, database, customer data, deployment, or non-main branch was changed during this review.
+
+### Operational-document readiness detail
+
+- **Recovery runbook exists:** `docs/RELEASE_BACKUP_RESTORE_RUNBOOK.md` contains Windows and PostgreSQL operator procedures, preflight, restore, post-restore checks and a pass/fail evidence list. The missing item is execution against an isolated copy of the intended installed environment, not another written procedure.
+- **POPIA documents exist as drafts:** privacy notice, data-subject request procedure, retention/disposal schedule and incident-response runbook are present. They are not operationally signed off: public request/contact channels, Information Officer appointment/registration status, escalation route, real procedure test and legal/accounting review still need confirmation.
+- **No self-service data-subject request portal is claimed.** Current manual procedure is the documented boundary; ordinary CRUD deletion is not a POPIA rights workflow.
+- **Commercial proof remains operator-side:** seeded quote/invoice/deposit/final-payment/actual-cost/profit automation is already verified in the recorded source lineage. Do not re-run or expand seeded tests without a reproducible defect; the remaining acceptance is reconciliation using the owner's real business records.
