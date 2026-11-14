@@ -266,11 +266,30 @@ $stderr = Join-Path $logDirectory "zazu-dev-$stamp.err.log"
 
 $process = Start-Process -FilePath $php -ArgumentList @('artisan', 'serve', "--host=$BindAddress", "--port=$Port") -WorkingDirectory $ProjectPath -RedirectStandardOutput $stdout -RedirectStandardError $stderr -WindowStyle Hidden -PassThru
 
+function Get-ZazuStartupLogTail {
+    $sections = @()
+    foreach ($log in @(@{ Label = 'STDERR'; Path = $stderr }, @{ Label = 'STDOUT'; Path = $stdout })) {
+        if (Test-Path $log.Path -PathType Leaf) {
+            $tail = Get-Content $log.Path -Tail 40 -ErrorAction SilentlyContinue
+            if ($tail) {
+                $sections += ("--- {0} ({1}) ---" -f $log.Label, $log.Path)
+                $sections += $tail
+            }
+        }
+    }
+    if ($sections.Count -eq 0) {
+        return '(Laravel has not written any startup output yet.)'
+    }
+    return ($sections -join [Environment]::NewLine)
+}
+
 $ready = $false
-for ($attempt = 0; $attempt -lt 15; $attempt++) {
+# Allow a bounded cold boot on the owner's local HDD rather than timing out after 15 seconds.
+for ($attempt = 0; $attempt -lt 45; $attempt++) {
     Start-Sleep -Seconds 1
     if ($process.HasExited) {
-        throw "Zazu server exited during startup. Review $stderr and $stdout."
+        $details = Get-ZazuStartupLogTail
+        throw ("Zazu server exited during startup. Startup output:`n{0}" -f $details)
     }
     if ((Get-ZazuListener).Count -gt 0) {
         $ready = $true
@@ -279,8 +298,9 @@ for ($attempt = 0; $attempt -lt 15; $attempt++) {
 }
 
 if (-not $ready) {
+    $details = Get-ZazuStartupLogTail
     Stop-Process -Id $process.Id -Force -ErrorAction SilentlyContinue
-    throw "Zazu did not open port $Port within 15 seconds. Review $stderr and $stdout."
+    throw ("Zazu did not open port $Port within 45 seconds. Startup output:`n{0}" -f $details)
 }
 
 Write-Host "Zazu development server is running independently of VS Code."
