@@ -14,9 +14,13 @@ class DashboardVisualRefinementTest extends TestCase
         $this->assertIsString($dashboardCss);
         $this->assertIsString($productCss);
         $this->assertStringContainsString('background: var(--zazu-primary) !important;', $dashboardCss);
-        $this->assertStringContainsString('color: #0B253B !important;', $dashboardCss);
-        $this->assertStringContainsString('background: var(--zazu-primary-light) !important;', $dashboardCss);
+        $this->assertStringNotContainsString('color: #0B253B !important;', $dashboardCss);
+        $this->assertStringContainsString('background: var(--zazu-primary-hover) !important;', $dashboardCss);
         $this->assertStringContainsString('color: var(--zazu-primary-ink) !important;', $dashboardCss);
+        $this->assertDoesNotMatchRegularExpression(
+            '/(?:[^{}]*\.zazu-btn-cta[^{}]*)\{[^}]*color:\s*#(?:20374A|23394D)\s*!important;/is',
+            $dashboardCss
+        );
         $this->assertStringContainsString(
             'body.zazu-dashboard-page .zazu-dash-event { background: var(--zazu-surface) !important; }',
             $productCss

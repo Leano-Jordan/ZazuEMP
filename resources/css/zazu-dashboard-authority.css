@@ -245,9 +245,9 @@ body.zazu-dashboard-page .zazu-dash-quick-actions .zazu-btn {
 }
 
 body.zazu-dashboard-page .zazu-dash-quick-actions .zazu-btn-cta {
-    background: #426987 !important;
-    border-color: #6487A2 !important;
-    color: #23394D !important;
+    background: var(--zazu-primary) !important;
+    border-color: var(--zazu-primary) !important;
+    color: var(--zazu-primary-ink) !important;
 }
 
 body.zazu-dashboard-page .zazu-dash-action-copy strong {
@@ -440,7 +440,9 @@ body.zazu-dashboard-page .zazu-dash-quick-actions .zazu-btn:not(.zazu-btn-cta):h
 }
 
 body.zazu-dashboard-page .zazu-dash-quick-actions .zazu-btn-cta:hover {
-    background: #355B79 !important;
+    border-color: var(--zazu-primary-hover) !important;
+    background: var(--zazu-primary-hover) !important;
+    color: var(--zazu-primary-ink) !important;
     box-shadow: 0 5px 12px rgba(35, 61, 84, .18) !important;
     transform: translateY(-1px);
 }
@@ -740,9 +742,9 @@ body.zazu-dashboard-page .zazu-dash-quick-actions .zazu-btn {
 }
 
 body.zazu-dashboard-page .zazu-dash-quick-actions .zazu-btn-cta {
-    border-color: #426987 !important;
-    background: #426987 !important;
-    color: #23394D !important;
+    border-color: var(--zazu-primary) !important;
+    background: var(--zazu-primary) !important;
+    color: var(--zazu-primary-ink) !important;
 }
 
 body.zazu-dashboard-page .zazu-dash-action-copy strong { font-size: 12px; }
@@ -1001,9 +1003,9 @@ html[data-theme="dark"] body.zazu-dashboard-page .zazu-theme-toggle {
 }
 
 html[data-theme="dark"] body.zazu-dashboard-page .zazu-dash-quick-actions .zazu-btn-cta {
-    border-color: #3977BD !important;
-    background: #2865A6 !important;
-    color: #23394D !important;
+    border-color: var(--zazu-primary) !important;
+    background: var(--zazu-primary) !important;
+    color: var(--zazu-primary-ink) !important;
 }
 
 html[data-theme="dark"] body.zazu-dashboard-page .zazu-dash-queue-state {
@@ -1256,9 +1258,9 @@ body.zazu-dashboard-page .zazu-dash-quick-actions .zazu-btn {
 }
 
 body.zazu-dashboard-page .zazu-dash-quick-actions .zazu-btn-cta {
-    border-color: #426987 !important;
-    background: #426987 !important;
-    color: #20374A !important;
+    border-color: var(--zazu-primary) !important;
+    background: var(--zazu-primary) !important;
+    color: var(--zazu-primary-ink) !important;
     box-shadow: 0 3px 8px rgba(42, 82, 113, .13) !important;
 }
 
@@ -1270,8 +1272,9 @@ body.zazu-dashboard-page .zazu-dash-quick-actions .zazu-btn:not(.zazu-btn-cta):h
 }
 
 body.zazu-dashboard-page .zazu-dash-quick-actions .zazu-btn-cta:hover {
-    border-color: #315775 !important;
-    background: #315775 !important;
+    border-color: var(--zazu-primary-hover) !important;
+    background: var(--zazu-primary-hover) !important;
+    color: var(--zazu-primary-ink) !important;
     transform: translateY(-1px);
 }
 
@@ -1286,7 +1289,7 @@ body.zazu-dashboard-page .zazu-dash-action-icon {
 
 body.zazu-dashboard-page .zazu-dash-quick-actions .zazu-btn-cta .zazu-dash-action-icon {
     background: rgba(255, 255, 255, .22) !important;
-    color: #0B253B !important;
+    color: var(--zazu-primary-ink) !important;
 }
 
 body.zazu-dashboard-page .zazu-dash-action-copy strong {
@@ -1320,7 +1323,7 @@ html[data-theme="dark"] body.zazu-dashboard-page .zazu-dash-action-icon {
 
 html[data-theme="dark"] body.zazu-dashboard-page .zazu-dash-quick-actions .zazu-btn-cta .zazu-dash-action-icon {
     background: rgba(255, 255, 255, .22) !important;
-    color: #0B253B !important;
+    color: var(--zazu-primary-ink) !important;
 }
 
 @media (max-width: 900px) {
@@ -1714,7 +1717,7 @@ body.zazu-dashboard-page .zazu-dash-quick-actions .zazu-btn-cta,
 body.zazu-dashboard-page .zazu-dash-overview .zazu-dash-quick-actions .zazu-btn-cta {
     border: 0 !important;
     background: var(--zazu-primary) !important;
-    color: #0B253B !important;
+    color: var(--zazu-primary-ink) !important;
     box-shadow: 0 3px 9px rgba(21, 157, 210, .20) !important;
 }
 
@@ -1724,8 +1727,8 @@ body.zazu-dashboard-page .zazu-dash-quick-actions .zazu-btn:not(.zazu-btn-cta):h
 }
 
 body.zazu-dashboard-page .zazu-dash-quick-actions .zazu-btn-cta:hover {
-    background: var(--zazu-primary-light) !important;
-    color: #0B253B !important;
+    background: var(--zazu-primary-hover) !important;
+    color: var(--zazu-primary-ink) !important;
     box-shadow: 0 4px 10px rgba(21, 157, 210, .22) !important;
 }
 
