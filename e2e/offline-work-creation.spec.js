@@ -43,11 +43,25 @@ test('real Zazu job form can create a job locally while disconnected', async ({ 
             cachedRoutes[1].clone().text(),
             cachedRoutes[3].clone().text(),
         ]);
-        return customerCreateHtml.includes('data-zazu-offline-entity="customer"')
-            && workCreateHtml.includes('data-zazu-offline-entity="job"');
+        const registration = await navigator.serviceWorker.getRegistration('/');
+        const snapshot = {
+            pageCacheName,
+            activeContext: context,
+            cachedRoutes: cachedRoutes.map(Boolean),
+            customerForm: customerCreateHtml.includes('data-zazu-offline-entity="customer"'),
+            workForm: workCreateHtml.includes('data-zazu-offline-entity="job"'),
+            controllerState: navigator.serviceWorker.controller?.state || null,
+            activeState: registration?.active?.state || null,
+            waitingState: registration?.waiting?.state || null,
+            installingState: registration?.installing?.state || null,
+        };
+        if (!snapshot.customerForm || !snapshot.workForm) return false;
+        window.__zazuPrimeCacheSnapshot = snapshot;
+        return true;
     }, null, { timeout: 20_000 });
 
     const primedCacheSnapshot = await page.evaluate(async () => {
+        const captured = window.__zazuPrimeCacheSnapshot || null;
         const names = await caches.keys();
         const staticName = names.find(name => name.startsWith('zazu-static-v') && !name.includes('-user-'));
         const contextResponse = staticName
@@ -65,7 +79,7 @@ test('real Zazu job form can create a job locally while disconnected', async ({ 
                 return { path, cached: Boolean(response) };
             }))
             : [];
-        return { activeContext: context, pageCacheName, cached };
+        return { captured, activeContext: context, pageCacheName, cached };
     });
     console.log('OFFLINE_ROUTE_CACHE_BEFORE_DISCONNECT', JSON.stringify(primedCacheSnapshot));
 
