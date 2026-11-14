@@ -34,7 +34,7 @@ This matrix distinguishes an IndexedDB mutation handler from a complete offline 
 |---|---|---|---|
 | Customers | Customer directory merges pending local customers into the rendered directory; cached customer HTML is still a snapshot | Create and update | Updating an existing server customer requires that customer to already exist in the local workspace. Profile-photo add/remove is online-only. |
 | Work / jobs | Work register merges pending local jobs; cached Work HTML is still a snapshot | Create | A selected customer must exist in the local customer workspace. Local jobs can hold phone-local attachments in the dedicated attachment store. |
-| Quotes | Quote records exist in the local workspace; no general local quote directory renderer is present | Create | The related job must already have a local workspace record with its server identity. At least one quote line is required. |
+| Quotes | Dashboard now renders a device-local quote summary with parent-job context and sync state; no general local quote directory/detail renderer is present | Create | The related job must already have a local workspace record with its server identity. At least one quote line is required. |
 | Quote acceptance | No independent local acceptance directory is present | Accept | The quote must exist locally and have status `sent`. |
 | Suppliers | Records can exist in local workspace; no local supplier directory renderer is present | Create and update | Existing update requires the supplier record in the local workspace. |
 | Services / catalogue | Records can exist in local workspace; no local catalogue directory renderer is present | Create and update | Service images are online-only. |
@@ -61,7 +61,7 @@ This matrix distinguishes an IndexedDB mutation handler from a complete offline 
 **Navigation and read boundary**
 
 - The only routes explicitly primed by the current bounded first-launch flow are `/customers`, `/customers/create`, `/work`, and `/work/create`.
-- The visible local directory renderer currently covers Customers and Work only.
+- The visible local directory renderer currently covers Customers and Work only. The dashboard also provides a read-only summary of locally stored quotes; this is not a quote directory or detail workflow.
 - Other entity collections may be present in IndexedDB and their forms may queue writes, but no generic local list/detail renderer exists for them. Their server-rendered pages remain cache-dependent and may fall back to the cached dashboard shell.
 - Cached Laravel HTML is snapshot presentation, not a local route implementation. The current capability must therefore be described as a bounded device-local mutation queue with customer/Work directory visibility—not full offline business-data read parity.
 
