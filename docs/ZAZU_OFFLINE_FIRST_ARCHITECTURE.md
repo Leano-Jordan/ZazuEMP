@@ -26,12 +26,55 @@ The phone can reopen a cached authenticated HTML page after the PC/server is sto
 
 **This is the confirmed architectural gap to solve.** Do not add another cache layer or keep increasing the number of cached HTML routes as a substitute. Extend the existing IndexedDB workspace and offline UI in a bounded, workflow-first way inside the current Laravel modular monolith. Preserve the existing online screens; provide local rendering and navigation for the V1 workflows explicitly declared offline-capable, and clearly disable/disclose server-only actions.
 
+### V1 offline workflow matrix — source-derived, current `main`
+
+This matrix distinguishes an IndexedDB mutation handler from a complete offline screen. A form being queue-capable does not prove that its directory, detail page, attachments, or every related action can be opened and rendered without Laravel.
+
+| Domain | Local read/render evidence | Local write handler | Required device-local prerequisites / limits |
+|---|---|---|---|
+| Customers | Customer directory merges pending local customers into the rendered directory; cached customer HTML is still a snapshot | Create and update | Updating an existing server customer requires that customer to already exist in the local workspace. Profile-photo add/remove is online-only. |
+| Work / jobs | Work register merges pending local jobs; cached Work HTML is still a snapshot | Create | A selected customer must exist in the local customer workspace. Local jobs can hold phone-local attachments in the dedicated attachment store. |
+| Quotes | Quote records exist in the local workspace; no general local quote directory renderer is present | Create | The related job must already have a local workspace record with its server identity. At least one quote line is required. |
+| Quote acceptance | No independent local acceptance directory is present | Accept | The quote must exist locally and have status `sent`. |
+| Suppliers | Records can exist in local workspace; no local supplier directory renderer is present | Create and update | Existing update requires the supplier record in the local workspace. |
+| Services / catalogue | Records can exist in local workspace; no local catalogue directory renderer is present | Create and update | Service images are online-only. |
+| Inventory items | Records can exist in local workspace; no local inventory directory renderer is present | Create | A selected capability is resolved from the local catalogue when supplied. |
+| Assets | Records can exist in local workspace; no local asset directory renderer is present | Create and update | Existing update requires the asset in the local workspace; capability association requires a locally available capability. |
+| Inventory movements | No local movement directory renderer is present | Create | The inventory item must exist locally; a selected job must also exist locally. |
+| Purchase orders | No local purchase-order directory renderer is present | Create | Supplier is required locally; a selected job and capability references must resolve locally; at least one line is required. |
+| Purchase receipts | No local receiving directory renderer is present | Receive | Purchase order and each received line must exist locally; at least one positive received quantity is required. |
+| Preparation | No local preparation directory renderer is present | Create | Parent job must exist locally. |
+| Event costs | No local cost directory renderer is present | Create | Parent job must exist locally. |
+| Invoices | No local invoice directory renderer is present | Create | Related quote must exist locally and already be accepted. |
+| Payments | No local payment directory renderer is present | Create | Related invoice must exist locally. |
+| Expenses | No local expense directory renderer is present | Create | Any selected supplier, job or purchase order must exist locally. |
+| Asset allocations | No local allocation directory renderer is present | Create and update | Asset must exist locally; any selected job must exist locally; updating requires the allocation to be present locally. |
+
+**Attachment boundary**
+
+- The Work workflow can store selected files in the business-scoped phone attachment store and retain them until a verifiable server attachment identity is returned.
+- Pending local jobs can queue attachments from the local Work row.
+- The active Work detail attachment panel is designed around a server-backed event ID; the local-job row is the separate path for a not-yet-synchronized job.
+- Customer profile-photo changes and service images explicitly require a connection.
+- Do not infer that other documents, receipts, or media are device-local merely because their parent record has an IndexedDB representation.
+
+**Navigation and read boundary**
+
+- The only routes explicitly primed by the current bounded first-launch flow are `/customers`, `/customers/create`, `/work`, and `/work/create`.
+- The visible local directory renderer currently covers Customers and Work only.
+- Other entity collections may be present in IndexedDB and their forms may queue writes, but no generic local list/detail renderer exists for them. Their server-rendered pages remain cache-dependent and may fall back to the cached dashboard shell.
+- Cached Laravel HTML is snapshot presentation, not a local route implementation. The current capability must therefore be described as a bounded device-local mutation queue with customer/Work directory visibility—not full offline business-data read parity.
+
+**Evidence source:** `resources/js/app.js` (`setupZazuOfflineForms`, `setupZazuOfflineDirectoryViews`), `public/zazu-offline.js`, `public/sw.js`, `resources/views/dashboard.blade.php`, and the focused offline Playwright suite on `main`.
+
 ### Next implementation sequence
 
-1. Define the V1 offline workflow matrix from the existing entity handlers and their prerequisites; distinguish locally readable, locally writable, attachment-capable and server-only actions.
-2. Identify the smallest shared local workspace/navigation surface that can render the existing IndexedDB records without requesting Laravel HTML.
-3. Add focused browser acceptance for cold navigation between local workspace views, local create/edit, reload while disconnected, and reconnect reconciliation.
-4. Keep the physical Android PC/server-off acceptance as the final proof; CI is not a substitute.
+1. **Matrix complete.** Use this table as the baseline; do not re-audit or re-list the same handlers.
+2. Implement one shared device-local workspace surface inside the existing dashboard shell. It must render local records from IndexedDB without requesting Laravel HTML and must label unavailable actions rather than implying they work.
+3. Expand that surface one workflow at a time, starting with the existing customer → job → quote chain, then only add dependent commercial/purchasing workflows when their local parent data and sync reconciliation are present.
+4. Add focused browser acceptance for direct offline navigation, local reads, local create/edit, reload while disconnected, and reconnect reconciliation. Do not count a cached page snapshot as a local read.
+5. Keep physical Android PC/server-off acceptance as final proof; CI is not a substitute.
+
 
 No runtime code changed in this audit. The physical Android gate remains OPEN.
 
