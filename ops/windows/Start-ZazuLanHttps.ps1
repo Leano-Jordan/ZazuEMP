@@ -77,6 +77,7 @@ if ($existing.Count -gt 0) {
 $startArguments = @{
     BindAddress = '127.0.0.1'
     Port = $AppPort
+    BuiltAssetsOnly = $true
 }
 if (-not [string]::IsNullOrWhiteSpace($PhpPath)) {
     $startArguments.PhpPath = $PhpPath
