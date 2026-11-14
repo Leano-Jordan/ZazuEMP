@@ -1,16 +1,21 @@
-## Director reconciliation — 2026-11-14 (current V1 source and owner scope)
+## Director reconciliation — 2026-11-14 (owner-resumed V1 acceptance)
 
-This entry supersedes the 2026-11-13 checkpoint below where it conflicts with newer evidence or the owner's latest direction.
+This entry supersedes the 2026-11-14 paused-offline checkpoint below where it conflicts with the owner's explicit resumption and newer exact-head evidence.
 
-- **Current repository/control head:** `6f5838cfe1babb1155f45a78a5f0841e30cd74c8` on `main`.
-- **Latest application/test source:** `62a551e97e48a2fa0045046f07742dfd9d817f43`. A direct GitHub compare confirms the 12 commits from that source baseline to current `main` contain only Director state, instructions, memory, deployment documentation and Windows launcher changes; no application, migration or test source changed.
-- **Exact-source Laravel workflow:** [43575869239](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/43575869239) — **496 passed, 1 skipped, 3,502 assertions**. PostgreSQL 16 migrations/registration/database + private-file backup/restore: **PASS**. Dedicated offline-browser acceptance: **28 passed**. Use the job log count (28); the earlier STATE summary's 29 was a reporting error and has been corrected.
-- **Current-head controls:** Zazu quality, Composer security audit and secret scan [43578628853](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/43578628853); Director Contract Lint [43578628791](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/43578628791); Director Health [43578628815](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/43578628815); Push-on-main / CodeQL [43578628140](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/43578628140): **PASS**.
-- **Windows LAN/HTTPS launcher:** [43578557436](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/43578557436) — **PASS** on launcher source `8fc403f2609f5e8d96300ffd668c907809fa9220`; subsequent current-head changes are non-runtime control/documentation changes.
-- **Evidence maturity remains 71/100**; no score uplift is claimed from launcher/control-plane work. Seeded commercial workflow automation remains passed; live owner business-record reconciliation is still a real-operator acceptance task.
-- **Owner runtime check still open:** pull current `main`, run `Start-Zazu-LAN.cmd`, and confirm the phone's rendered styling. Secure-origin installation/physical offline cold-launch and actual installed-target recovery remain unverified. Offline implementation is paused; do not modify service worker, IndexedDB, attachment queue, sync or PWA install paths.
-- **Branding and trademark clearance are deferred by the owner and are not an active engineering task or a reason to divert V1 work.** Do not perform brand research or artwork work unless explicitly requested later.
-- Keep V1 scope frozen. Do not create speculative new gates or reopen passed seeded commercial tests without a reproducible defect. No production deployment, customer data, database, or non-main branch changed.
+- **Current repository/control head:** `501fdda87843a55d5742947b66f6e8241cabe16d` on `main`.
+- **Application/test source:** `f9307b9dd477cc0cf6dd4f51abf8a818b53bae75`.
+- **Exact-head Laravel:** [43589965430](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/43589965430) — **496 passed, 1 skipped, 3,502 assertions**.
+- **Dedicated offline-browser acceptance:** **30 passed / 0 failed / 0 flaky** in the same run. The acceptance now covers first-launch priming of the supported customer/Work routes, offline customer/job creation, dashboard visibility, directory navigation, persistence and reconnection sync.
+- **PostgreSQL:** migrations, registration, database backup/restore and private-file recovery smoke: **PASS**.
+- **Quality/security:** Zazu quality, Composer security audit and secret scan [43589965437](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/43589965437): **PASS**. Push-on-main CodeQL [43589965413](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/43589965413): **PASS**.
+- **Offline work was explicitly resumed by the owner on 2026-11-14.** The bounded implementation now exposes pending customer/job records on the cached dashboard, links to the cached customer/Work directories and primes only the four currently supported device-local workflow routes. It is not full Laravel-route parity.
+- **Evidence maturity remains 71/100; no score uplift is claimed.** Offline continuity remains below release acceptance because secure-origin installation, physical Android cold-launch with the PC/server unavailable, force-close/reopen persistence and reconnection on the actual installed device are still unverified.
+- **Recovery:** tenant-scoped business `.zazu` export/restore and business CSV export are **IMPLEMENTED / AUTOMATED-VERIFIED**. Installation-wide PostgreSQL/database/private-file recovery is **CI-VERIFIED**. The controlled installed-target operator recovery drill remains **OPEN**.
+- **Commercial:** seeded quote → invoice → deposit → final payment → actual cost → event profit reconciliation is **AUTOMATED-VERIFIED**. Live business-record reconciliation remains an operator acceptance task.
+- **POPIA operational controls:** privacy/retention and incident procedures still require owner sign-off. **Brand/name clearance is deferred by owner and is not a current V1 engineering gate.**
+- **Release disposition:** NOT READY until the bounded physical-device check, installed-target recovery drill, live commercial reconciliation and POPIA operational sign-off are completed. Do not invent further gates or reopen seeded commercial tests without a reproducible defect.
+- No production deployment, customer data, database, or non-main branch was changed.
+
 
 ---
 
