@@ -1,3 +1,26 @@
+## 2026-11-14 — Owner-resumed offline customer/workspace slice
+
+- Owner explicitly resumed bounded offline engineering on 2026-11-14, with the condition that work must not loop or duplicate effort. This supersedes the earlier pause instruction for the current V1 offline target.
+- Current verified application/test head: `f9307b9dd477cc0cf6dd4f51abf8a818b53bae75` on `main`.
+- Implemented on this source line:
+  - Locally pending jobs remain visible under the Work “All” filter.
+  - The cached dashboard exposes a device-local workspace for pending customers and jobs, using the existing IndexedDB directory renderer.
+  - The workspace links to the customer and Work directories.
+  - First authenticated dashboard launch primes the four existing supported local workflow routes: `/customers`, `/customers/create`, `/work`, and `/work/create`.
+  - The offline Work-creation acceptance test now verifies those routes are primed in the active user/business cache by the active service worker, then exercises disconnected customer/job creation, persistence, dashboard visibility, navigation into both directories and reconnection sync.
+  - The Laravel workflow now executes `e2e/offline-work-creation.spec.js`; it was previously omitted from the dedicated offline-browser command.
+- Exact-head verification:
+  - Laravel [43589965430](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/43589965430): **496 passed, 1 skipped, 3,502 assertions**.
+  - Dedicated offline-browser acceptance: **30 passed**.
+  - PostgreSQL migration, registration, database and private-file backup/restore smoke: **PASS**.
+  - Zazu quality, Composer security audit and secret scan [43589965437](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/43589965437): **PASS**.
+  - Push-on-main CodeQL [43589965413](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/43589965413): **PASS**.
+- Scope boundary: this closes a bounded cached customer/Work navigation and mutation slice; it does **not** establish full local rendering for every Laravel route or physical Android offline acceptance.
+- Still open: secure-origin Android installation, cold launch with the host unavailable, force-close/reopen persistence on the actual phone, reconnection on the installed target, controlled installation-wide operator recovery drill, live business-record reconciliation, and POPIA operational/legal sign-off.
+- No production deployment, customer database, or non-main branch was changed.
+
+---
+
 ## 2026-11-14 — Current-head V1 automation reconciliation
 
 - Current repository head: `6f5838cfe1babb1155f45a78a5f0841e30cd74c8` on `main`.
