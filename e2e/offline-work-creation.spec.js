@@ -29,11 +29,11 @@ test('real Zazu job form can create a job locally while disconnected', async ({ 
         const pageCacheName = names.find(name => name.includes('-user-') && name.includes('-business-'));
         if (!pageCacheName) return false;
         const cache = await caches.open(pageCacheName);
-        const [customerCreate, workCreate] = await Promise.all([
-            cache.match(new URL('/customers/create', window.location.origin)),
-            cache.match(new URL('/work/create', window.location.origin)),
-        ]);
-        return Boolean(customerCreate && workCreate);
+        const requiredRoutes = ['/customers', '/customers/create', '/work', '/work/create'];
+        const cachedRoutes = await Promise.all(requiredRoutes.map(path =>
+            cache.match(new URL(path, window.location.origin))
+        ));
+        return cachedRoutes.every(Boolean);
     }, null, { timeout: 20_000 });
 
     // Create the customer through Zazu's real customer form while offline.
@@ -127,6 +127,17 @@ test('real Zazu job form can create a job locally while disconnected', async ({ 
     await expect(page.locator('[data-zazu-offline-workspace]')).toBeVisible();
     await expect(page.locator('[data-zazu-offline-workspace] [data-zazu-local-record="customer"]').filter({ hasText: customerName })).toBeVisible();
     await expect(page.locator('[data-zazu-offline-workspace] [data-zazu-local-record="job"]').filter({ hasText: jobName })).toBeVisible();
+
+    // The device-local workspace must navigate into the cached customer and
+    // Work directories and render the same IndexedDB records there.
+    await page.getByRole('link', { name: 'Open customers' }).click();
+    await expect(page).toHaveURL(/\\/customers$/);
+    await expect(page.locator('[data-zazu-local-record="customer"]').filter({ hasText: customerName })).toBeVisible();
+    await page.goBack({ waitUntil: 'domcontentloaded' });
+    await expect(page.locator('[data-zazu-offline-workspace]')).toBeVisible();
+    await page.getByRole('link', { name: 'Open work' }).click();
+    await expect(page).toHaveURL(/\\/work$/);
+    await expect(page.locator('[data-zazu-local-record="job"]').filter({ hasText: jobName })).toBeVisible();
 
     // Reconnect must provision this signed-in phone automatically. No
     // desktop settings screen or manually generated pairing code is involved.
