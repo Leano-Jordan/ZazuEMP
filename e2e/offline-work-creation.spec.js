@@ -223,3 +223,46 @@ test('real Zazu job form can create a job locally while disconnected', async ({ 
     expect(serverCustomers.ok()).toBe(true);
     expect(await serverCustomers.text()).toContain(customerName);
 });
+
+
+test('an existing customer can be edited locally while disconnected and synced on reconnect', async ({ page }) => {
+    const runId = randomUUID().slice(0, 8);
+    await login(page);
+    await page.goto('/customers', { waitUntil: 'domcontentloaded' });
+
+    const customerLink = page.locator('.zazu-customer-directory a[href^="/customers/"]').first();
+    await expect(customerLink).toBeVisible();
+    await customerLink.click();
+    await page.getByRole('link', { name: 'Edit customer' }).click();
+
+    const form = page.locator('form[data-zazu-offline-entity="customer"]');
+    await expect(form).toBeVisible();
+    const customerId = Number(new URL(page.url()).pathname.split('/').filter(Boolean).at(-2));
+    expect(customerId).toBeGreaterThan(0);
+
+    const nameInput = form.locator('input[name="name"]');
+    const updatedName = (await nameInput.inputValue()) + ' offline edit ' + runId;
+    await nameInput.fill(updatedName);
+    await form.locator('input[name="primary_contact_phone"]').fill('0123456789');
+
+    await page.context().setOffline(true);
+    await form.getByRole('button', { name: 'Save changes' }).click();
+
+    await expect(form.getByText('Saved on this device. It will sync automatically when Zazu reconnects.')).toBeVisible();
+    const queued = await page.evaluate(async () => window.ZazuOffline.pending());
+    const update = queued.find(item => item.entity_type === 'customer' && item.operation === 'update' && item.payload?.record?.name === updatedName);
+    expect(update).toBeTruthy();
+
+    const localCustomer = await page.evaluate((id) => window.ZazuOffline.getState()?.customers?.find(item => Number(item.id ?? item.server_id) === id) || null, customerId);
+    expect(localCustomer?.name).toBe(updatedName);
+
+    await page.context().setOffline(false);
+    await expect.poll(async () => page.evaluate(async () => (await window.ZazuOffline.pending()).length), {
+        timeout: 30_000,
+        message: 'The existing customer update should sync after reconnecting.',
+    }).toBe(0);
+
+    const customerResponse = await page.request.get('/customers/' + customerId);
+    expect(customerResponse.ok()).toBe(true);
+    expect(await customerResponse.text()).toContain(updatedName);
+});

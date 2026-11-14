@@ -1379,10 +1379,22 @@ function setupZazuOfflineForms() {
 
             let payload;
             if (entity === 'customer') {
-                const profilePhoto = formData.get('profile_photo');
-                if (profilePhoto instanceof File && profilePhoto.size > 0) {
+                const offlineState = window.ZazuOffline.getState();
+                const serverId = form.dataset.zazuOfflineServerId;
+                const existing = serverId
+                    ? offlineState?.customers?.find(item => Number(item.id ?? item.server_id) === Number(serverId))
+                    : null;
+
+                if (serverId && !existing?.local_id) {
                     releaseSubmitLock();
-                    window.alert('Customer profile photos need a connection. Save the customer details first, then upload the photo when Zazu is online.');
+                    window.alert('This customer is not available in the local Zazu copy yet. Reconnect and refresh the customer record before editing it offline.');
+                    return;
+                }
+
+                const profilePhoto = formData.get('profile_photo');
+                if ((profilePhoto instanceof File && profilePhoto.size > 0) || get('remove_profile_photo') === '1') {
+                    releaseSubmitLock();
+                    window.alert('Customer profile photo changes need a connection. Save the customer details first, then update the photo when Zazu is online.');
                     return;
                 }
 
@@ -1398,8 +1410,8 @@ function setupZazuOfflineForms() {
                 }
 
                 payload = {
-                    local_id: localId,
-                    server_id: null,
+                    local_id: existing?.local_id || localId,
+                    server_id: existing?.server_id ?? (serverId ? Number(serverId) : null),
                     name: get('name'),
                     contact_name: get('primary_contact_name') || get('name'),
                     legal_name: get('legal_name') || null,
@@ -1417,6 +1429,7 @@ function setupZazuOfflineForms() {
                     night_contact_phone: get('night_contact_phone') || null,
                     night_contact_email: get('night_contact_email') || null,
                 };
+                payload.__operation = existing?.local_id ? 'update' : 'create';
             } else if (entity === 'job') {
                 const customerOption = form.querySelector('[name="customer_id"]')?.selectedOptions?.[0];
                 const customerValue = customerOption?.value || '';

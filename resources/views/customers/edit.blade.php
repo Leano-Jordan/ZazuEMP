@@ -7,7 +7,7 @@
         <div><div class="zazu-eyebrow">Relationship record</div><h2 class="zazu-command-title">{{ $customer->name }}</h2><p class="zazu-command-copy">Update the customer identity, primary contact and profile image without rewriting linked operational history.</p></div>
     </section>
 
-    <form method="POST" action="{{ route('customers.update', $customer) }}" enctype="multipart/form-data">
+    <form method="POST" action="{{ route('customers.update', $customer) }}" enctype="multipart/form-data" data-zazu-offline-entity="customer" data-zazu-offline-server-id="{{ $customer->id }}">
         @csrf @method('PUT')
         <div class="zazu-editor">
             <div class="zazu-form-main">
