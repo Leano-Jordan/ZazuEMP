@@ -736,3 +736,12 @@ The Render preview deployment for this commit is **LIVE**. This is a deployment 
 - Remaining bounded work: owner approval of the three-tier entitlement matrix and final real-device acceptance. No global licence gate is to be added before the entitlement boundaries are defined and tested.
 
 **Automated exact-head verification: GREEN. Commercial entitlement enforcement and physical installed-device acceptance remain OPEN.**
+
+
+## Director reconciliation — 2026-11-14 (post-Codex remote source review)
+
+- Current `main` source/test commit reviewed: `51da528532d6758bb997630e886948fabcf3ef3a`. Dashboard CTA styling now uses the shared light/dark theme tokens; the matching feature test asserts token usage and rejects the replaced hardcoded foreground colours.
+- The manifest's hashed build assets are generated under ignored `public/build/`; their absence as committed files is expected. CI must rebuild assets and validate the manifest.
+- **Do not mark this head CI-verified yet.** The latest recorded exact-source Laravel/asset-build evidence remains `d09fdbfbe4bdbb7cfaed9ca1ea125313910fa3e`, run [43593454044](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/43593454044). The later CSS/test commit has source-level review only in this reconciliation.
+- Release remains **NOT READY** pending physical installed-device acceptance, the intended-installation recovery drill, live commercial-record reconciliation, and POPIA operational sign-off. Branding/name clearance remains deferred by owner.
+- No runtime/offline code, data, deployment, or non-main branch changed.
