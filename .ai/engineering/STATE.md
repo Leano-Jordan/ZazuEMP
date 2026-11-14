@@ -1,3 +1,16 @@
+## 2026-11-14 — Offline conflict acceptance deterministic; exact-head CI closure
+
+- Canonical repository: `Leano-Jordan/ZazuEMP`; branch: `main`; application/test source: `aaa47895b334b3bbf3a68f89b66e4ff6a0738032`.
+- Exact-head Laravel workflow [43567837212](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/43567837212): **PASS**. Laravel suite: 496 passed, 1 skipped, 3,502 assertions. PostgreSQL migration, registration, backup/restore and private-file recovery: **PASS**. Dedicated offline-browser acceptance: **29 passed, 0 failed, 0 flaky**.
+- The browser run includes the corrected rejected-sync/conflict-persistence case. The test now keeps the browser offline while installing mocked routes, reconnects after interception is ready, and polls the durable IndexedDB mutation status rather than assuming a coalesced sync promise represents the final pass. It passed on the first attempt in this run.
+- Regression coverage also includes the single-backslash tenant file-path rejection test committed in parent `60dbfc71c556ce34ed4350560e8eb59b3ae4a4fc`.
+- The run verifies browser automation and PostgreSQL recovery paths only. It does **not** prove physical Android install, force-close/cold-launch with the PC/server off, full local workflow parity, or operator recovery on the installed target.
+- Current offline architectural blocker remains the server-rendered Laravel navigation/workspace dependency: service-worker page caching can preserve a previously rendered screen, but that is not equivalent to a phone-local application runtime. Continue from open Director issues #34 and #35; inspect and extend the existing IndexedDB/offline handlers rather than adding a second offline layer or cache-only workaround.
+- Release remains **NO-GO** pending physical Android acceptance, business-level export/import and installed-target recovery drill, live quote-to-payment-to-profit reconciliation, and POPIA/privacy/retention/incident plus Zazu name clearance.
+- No production deployment, live database, customer records, or non-main branch changed.
+
+---
+
 ## 2026-11-13 — V1 release checklist exact-evidence correction
 
 - Reconciled the leading current-status section of `docs/V1_RELEASE_CHECKLIST.md`. It incorrectly labelled application/test source `5888123f1941beb478b31870a6e782e0f8ef8053` as current, despite later verified application/test source `30e259d445c614df6d1b2495c5a5e505a6d36443`.
