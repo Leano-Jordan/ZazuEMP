@@ -4,6 +4,39 @@
 **Director update:** 2026-10-03  
 **Current source baseline:** main
 
+## Director source audit — 2026-11-14
+
+**Verified application/test baseline:** `aaa47895b334b3bbf3a68f89b66e4ff6a0738032`  
+**Exact-head automated evidence:** [Laravel / PostgreSQL / offline browser workflow 43567837212](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/43567837212) — 496 passed, 1 skipped; PostgreSQL recovery passed; 29 offline browser tests passed.
+
+### Confirmed implementation boundary
+
+The current implementation is a hybrid cache-and-queue client, not a standalone local application runtime:
+
+- `public/sw.js` intercepts authenticated HTML navigations. While disconnected it returns the exact user/business-cached route when available; otherwise it returns the cached `/dashboard` HTML shell. This is a cached Laravel-rendered document, not a client-side route renderer.
+- The offline priming code collects same-origin links from the currently rendered page. It does not guarantee every route, every nested form, or every record view is available offline.
+- `public/zazu-offline.js` restores the business-scoped IndexedDB workspace and durable queue independently of the network. This is the local data foundation.
+- `resources/js/app.js` has offline form handlers for customer, job, quote, quote acceptance, supplier, inventory item, asset, expense, payment, preparation, event cost, service, inventory movement, purchase receipt, invoice, asset allocation and purchase order.
+- The visible local directory renderer currently rebuilds customer and job rows. The existence of local queue handlers for other entities does not mean their full list/detail pages or all related workflows are locally rendered.
+- Several offline form paths explicitly require related records already present in the device workspace; customer photos and service images are explicitly deferred until online.
+
+### Root cause of the phone's “last page” behaviour
+
+The phone can reopen a cached authenticated HTML page after the PC/server is stopped, but the service worker has no general local route/view renderer to replace server-rendered navigation and page data. A cached page can therefore remain visible while the user is effectively looking at a snapshot. The offline queue can save supported mutations, but it cannot manufacture an unvisited Laravel page or a complete local directory/detail view.
+
+**This is the confirmed architectural gap to solve.** Do not add another cache layer or keep increasing the number of cached HTML routes as a substitute. Extend the existing IndexedDB workspace and offline UI in a bounded, workflow-first way inside the current Laravel modular monolith. Preserve the existing online screens; provide local rendering and navigation for the V1 workflows explicitly declared offline-capable, and clearly disable/disclose server-only actions.
+
+### Next implementation sequence
+
+1. Define the V1 offline workflow matrix from the existing entity handlers and their prerequisites; distinguish locally readable, locally writable, attachment-capable and server-only actions.
+2. Identify the smallest shared local workspace/navigation surface that can render the existing IndexedDB records without requesting Laravel HTML.
+3. Add focused browser acceptance for cold navigation between local workspace views, local create/edit, reload while disconnected, and reconnect reconciliation.
+4. Keep the physical Android PC/server-off acceptance as the final proof; CI is not a substitute.
+
+No runtime code changed in this audit. The physical Android gate remains OPEN.
+
+---
+
 ## 1. Non-negotiable product rule
 
 Zazu is **offline-first at the device workflow level**.
