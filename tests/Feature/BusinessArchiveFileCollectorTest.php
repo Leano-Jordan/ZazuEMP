@@ -31,12 +31,10 @@ class BusinessArchiveFileCollectorTest extends TestCase
         ]);
 
         try {
-            try {
-                app(BusinessArchiveService::class)->download($business);
-                $this->fail('A file path containing a backslash must be rejected.');
-            } catch (RuntimeException $exception) {
-                $this->assertStringContainsString('file path is unsafe', $exception->getMessage());
-            }
+            app(BusinessArchiveService::class)->download($business);
+            $this->fail('A file path containing a backslash must be rejected.');
+        } catch (RuntimeException $exception) {
+            $this->assertStringContainsString('file path is unsafe', $exception->getMessage());
         }
     }
 }
