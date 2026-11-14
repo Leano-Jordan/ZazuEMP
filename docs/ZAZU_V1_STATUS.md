@@ -1,3 +1,18 @@
+## Director reconciliation — 2026-11-14 (offline acceptance verification)
+
+**Canonical repository:** `Leano-Jordan/ZazuEMP` · **branch:** `main` · **application/test source:** `aaa47895b334b3bbf3a68f89b66e4ff6a0738032` · **verification workflow:** [43567837212](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/43567837212).
+
+- Laravel: **496 passed / 1 skipped / 3,502 assertions**.
+- PostgreSQL: complete migrations, business registration, backup/restore and private-file recovery smoke **PASS**.
+- Offline browser acceptance: **29 passed / 0 failed / 0 flaky**. The rejected-sync/conflict-persistence test passed on its first attempt after the deterministic fixture correction in `aaa47895`.
+- The backslash tenant-file-path rejection regression is included in the tested source lineage.
+- This is automated evidence. It does not close real Android installation/cold-launch/server-off acceptance or prove all Laravel-rendered workflows run locally.
+- **Offline release gate remains OPEN.** The product still needs a phone-local runtime for supported disconnected navigation and work, not only a cached Laravel-rendered page. Continue against Director issues [#34](https://github.com/Leano-Jordan/ZazuEMP/issues/34) and [#35](https://github.com/Leano-Jordan/ZazuEMP/issues/35).
+- Other open V1 gates: business-level archive export/import plus installed-target recovery drill; live commercial record reconciliation; POPIA operational/privacy/retention/incident controls; Zazu name clearance.
+- No deployment or production data was changed.
+
+---
+
 <!-- Historical assessments below are retained as an audit trail. The newest dated Director reconciliation at the top is authoritative; older snapshots may contain statuses that were true at their assessment date and have since been superseded. -->
 
 ## Director reconciliation — 2026-11-13 (exact-head CI and archive gate closure)
