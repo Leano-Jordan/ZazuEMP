@@ -1,6 +1,6 @@
 [CmdletBinding()]
 param(
-    [string]$ProjectPath = (Resolve-Path (Join-Path $PSScriptRoot '..\\..')).Path,
+    [string]$ProjectPath,
     [string]$BindAddress = '127.0.0.1',
     [string]$PhpPath,
     [switch]$Lan,
@@ -11,6 +11,14 @@ param(
 )
 
 $ErrorActionPreference = 'Stop'
+
+# Script automatic variables are not reliably populated while parameter defaults are evaluated.
+# Resolve the default project root in the script body, where PSCommandPath is available.
+if ([string]::IsNullOrWhiteSpace($ProjectPath)) {
+    $scriptDirectory = Split-Path -Parent $PSCommandPath
+    $ProjectPath = (Resolve-Path (Join-Path $scriptDirectory '..\\..')).Path
+}
+
 $ProjectPath = [System.IO.Path]::GetFullPath($ProjectPath).TrimEnd('\\')
 
 if ($Lan -and -not $Stop) {
