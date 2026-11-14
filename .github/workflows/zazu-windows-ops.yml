@@ -93,6 +93,12 @@ jobs:
           if ($hostLauncher -notmatch '(?s)if \(\[string\]::IsNullOrWhiteSpace\(\$ProjectPath\)\)\s*\{\s*\$scriptDirectory = Split-Path -Parent \$PSCommandPath\s*\$ProjectPath = \(Resolve-Path \(Join-Path \$scriptDirectory') {
             throw 'The host launcher must resolve its default project root from PSCommandPath inside the script body.'
           }
+          if ($hostLauncher -notmatch '\$attempt -lt 45') {
+            throw 'The LAN host launcher must allow a bounded 45-second cold start.'
+          }
+          if ($hostLauncher -notmatch 'function Get-ZazuStartupLogTail' -or $hostLauncher -notmatch 'Startup output:`n\{0\}') {
+            throw 'Startup failures must print the captured Laravel stdout/stderr tail for direct diagnosis.'
+          }
           if ($httpsLauncher -notmatch 'BuiltAssetsOnly = \$true') {
             throw 'The LAN HTTPS launcher must force the compiled-assets path.'
           }
