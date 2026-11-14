@@ -38,14 +38,16 @@ This is HTTP development access. It is sufficient for same-network page/workflow
 
 The Laravel page and Vite asset server are separate HTTP origins during composer run dev. Binding Vite to 0.0.0.0 makes the server listen on the LAN, but it does not automatically make generated CSS/JavaScript URLs point to the PC's Wi-Fi address. VITE_HMR_HOST alone selects the HMR websocket host; it does not set the asset origin.
 
-For same-LAN development with Vite running, set these local .env values to the PC's current private Wi-Fi IPv4 address (do not commit the real address):
+**Normal phone/LAN access uses compiled assets automatically.** `Start-Zazu-LAN.cmd` removes a stale `public/hot` marker, verifies `public/build/manifest.json` and every referenced asset, and builds the bundle locally when it is missing and `node_modules` is already installed. It then serves CSS/JavaScript from the same Laravel origin (port 8000), so a stopped or unreachable Vite server cannot leave the phone with an unstyled page. The HTTPS launcher uses the same compiled-assets path behind Caddy. The local loopback `Start-Zazu-Dev.cmd` remains the normal Vite/development workflow.
+
+For live same-LAN development with Vite running (HMR), set these local .env values to the PC's current private Wi-Fi IPv4 address (do not commit the real address):
 
 ```dotenv
 VITE_HMR_HOST=192.168.1.20
 VITE_DEV_SERVER_ORIGIN=http://192.168.1.20:5173
 ```
 
-Replace the example address with the address printed by the LAN launcher, then restart Vite so Laravel's public/hot file is regenerated. The asset origin and HMR websocket must use the same reachable PC address. If using only built assets, stop Vite, remove a stale runtime public/hot file, run npm run build, and use php artisan serve. Never commit public/hot.
+Replace the example address with the address printed by the LAN launcher, then restart Vite so Laravel's public/hot file is regenerated. The asset origin and HMR websocket must use the same reachable PC address. If starting Laravel manually with built assets instead, stop Vite, remove a stale runtime `public/hot` file, run `npm run build`, and then start Laravel. Never commit `public/hot`.
 
 ### 1B. Private LAN HTTPS (implemented in repository; physical trust still open)
 
