@@ -13,8 +13,8 @@
   - Laravel [43589965430](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/43589965430): **496 passed, 1 skipped, 3,502 assertions**.
   - Dedicated offline-browser acceptance: **30 passed**.
   - PostgreSQL migration, registration, database and private-file backup/restore smoke: **PASS**.
-  - Zazu quality, Composer security audit and secret scan [43590473956](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/43590473956): **PASS**.
-  - Director Contract Lint [43590474028](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/43590474028), Director Health [43590474436](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/43590474436), and Push-on-main CodeQL [43590474076](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/43590474076): **PASS**.
+  - Zazu quality, Composer security audit and secret scan [43591107583](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/43591107583): **PASS**.
+  - Director Contract Lint [43591107537](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/43591107537), Director Health [43591107577](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/43591107577), and Push-on-main CodeQL [43591107054](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/43591107054): **PASS**.
 - Scope boundary: this closes a bounded cached customer/Work navigation and mutation slice; it does **not** establish full local rendering for every Laravel route or physical Android offline acceptance.
 - Still open: secure-origin Android installation, cold launch with the host unavailable, force-close/reopen persistence on the actual phone, reconnection on the installed target, controlled installation-wide operator recovery drill, live business-record reconciliation, and POPIA operational/legal sign-off.
 - No production deployment, customer database, or non-main branch was changed.
