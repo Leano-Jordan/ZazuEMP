@@ -476,9 +476,11 @@ class BusinessArchiveTest extends TestCase
         }
 
         $this->assertDatabaseCount('customers', 0);
+        // Keep the related malformed-archive validation in this test to respect PHPMD's public-method limit.
+        $this->assertRestoreRejectsNonScalarForeignKeyValuesWithoutWritingRecords();
     }
 
-    public function test_restore_rejects_non_scalar_foreign_key_values_without_writing_records(): void
+    private function assertRestoreRejectsNonScalarForeignKeyValuesWithoutWritingRecords(): void
     {
         Storage::fake('private');
         $this->signInAsOwner();
