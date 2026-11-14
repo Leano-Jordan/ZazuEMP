@@ -373,3 +373,17 @@ Backup compatibility coverage was extended after the initial integrity note: the
 - **POPIA documents exist as drafts:** privacy notice, data-subject request procedure, retention/disposal schedule and incident-response runbook are present. They are not operationally signed off: public request/contact channels, Information Officer appointment/registration status, escalation route, real procedure test and legal/accounting review still need confirmation.
 - **No self-service data-subject request portal is claimed.** Current manual procedure is the documented boundary; ordinary CRUD deletion is not a POPIA rights workflow.
 - **Commercial proof remains operator-side:** seeded quote/invoice/deposit/final-payment/actual-cost/profit automation is already verified in the recorded source lineage. Do not re-run or expand seeded tests without a reproducible defect; the remaining acceptance is reconciliation using the owner's real business records.
+
+## Director reconciliation — 2026-11-14 (offline workspace sync-state correction)
+
+- **Current verified source/control head:** `7e2531583090ce2bfab2acea71dbfe0e7f3951f0` on canonical `main`.
+- The offline dashboard workspace previously labelled every locally rendered Work row as `Pending sync`, even when the IndexedDB record already carried a server identity. This was misleading whenever pending work caused the workspace panel to appear alongside previously synchronized jobs.
+- Corrected the row presentation: server-backed local jobs now show their actual job reference (with a safe ID fallback) and `Synced`; only jobs without a server identity show `Local reference / Pending sync`.
+- Added a focused Playwright regression for a synced job coexisting with pending local work. The test verifies the reference label/value, synced state and absence of the false pending label.
+- **Exact-head Laravel run [43634136062](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/43634136062): PASS** — 496 passed, 1 skipped, 3,511 assertions; PostgreSQL migration, real registration, database backup/restore and private-file recovery smoke: PASS.
+- **Offline browser acceptance:** 34 passed; mobile customer/Work acceptance: 3 passed; phone-local attachment journey: 1 passed. All three jobs passed on the exact head.
+- **Quality/security:** application quality, Composer security audit and secret scan passed; Push-on-main / CodeQL passed; Director Health passed. SonarCloud was skipped and is not counted as a pass.
+- The build produced `assets/app-zy7aGQjZ.js`; the committed manifest now references that exact generated asset.
+- The offline workflow matrix is recorded in `docs/ZAZU_OFFLINE_FIRST_ARCHITECTURE.md`. It makes the boundary explicit: only Customers and Work have visible local directory renderers today; other domain mutation handlers do not imply complete local read/navigation parity.
+- **Release remains NOT READY.** Physical Android cold launch/restart/reconnect, installed-target recovery drill, live business-record reconciliation and POPIA operational sign-off remain open. This correction does not resolve the documented cached-dashboard fallback architecture.
+- No production deployment, customer data, live database or non-main branch was changed.
