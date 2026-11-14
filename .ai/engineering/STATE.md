@@ -1,3 +1,15 @@
+## 2026-11-14 — LAN built-asset startup contract final verification
+
+- Latest implementation and workflow source: `8fc403f2609f5e8d96300ffd668c907809fa9220` on `main`.
+- LAN/HTTPS launchers now select same-origin compiled assets, remove stale runtime `public/hot`, build only when the manifest is absent and dependencies are already installed, and validate each manifest `file`, `css`, and `assets` output before starting Laravel.
+- Loopback development launcher remains unchanged and continues to support Vite/HMR.
+- The initial Windows static assertion was corrected to match the actual nested `Join-Path` implementation; a subsequent exact-head run passes. No application code was modified to bypass a test.
+- Exact-head checks: Windows Ops [43578557436](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/43578557436), Zazu Quality [43578557394](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/43578557394), Director Contract Lint [43578557360](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/43578557360), Director Health [43578557375](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/43578557375): **PASS**.
+- Changed source/doc/workflow commits: `8d7dcb82`, `bff43d75`, `7e6a491c`, `50a4695c`, `e86a5db4`, `57753ff0`, `8fc403f2`.
+- **Owner runtime acceptance remains open:** pull latest `main`, run `Start-Zazu-LAN.cmd`, then reload the current phone URL and confirm styling is restored. This cannot be proven by source inspection or Windows CI. Offline engineering remains paused.
+
+---
+
 ## 2026-11-14 — LAN app styling / Vite asset delivery correction
 
 - **Target:** stop the phone/browser LAN entrypoint from rendering the Laravel shell without CSS when `public/hot` points to a stopped or phone-unreachable Vite server.
