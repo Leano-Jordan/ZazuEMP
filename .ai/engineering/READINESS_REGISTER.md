@@ -2,7 +2,7 @@
 
 This entry supersedes the 2026-11-14 paused-offline checkpoint below where it conflicts with the owner's explicit resumption and newer exact-head evidence.
 
-- **Current repository/control head:** `501fdda87843a55d5742947b66f6e8241cabe16d` on `main`.
+- **Current repository/control head:** `aed83a4281daa8555e529db7912ff8969e7ba5a2` on `main`.
 - **Application/test source:** `f9307b9dd477cc0cf6dd4f51abf8a818b53bae75`.
 - **Exact-head Laravel:** [43589965430](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/43589965430) — **496 passed, 1 skipped, 3,502 assertions**.
 - **Dedicated offline-browser acceptance:** **30 passed / 0 failed / 0 flaky** in the same run. The acceptance now covers first-launch priming of the supported customer/Work routes, offline customer/job creation, dashboard visibility, directory navigation, persistence and reconnection sync.
