@@ -1181,3 +1181,11 @@ Found and corrected a data-recovery blocker in `ZazuBackupCommand::snapshotMysql
 - Application quality, Composer security audit, secret scan, Push-on-main/CodeQL, Director Health and build/manifest verification: **PASS**. SonarCloud skipped; not counted.
 - The V1 offline workflow matrix is now documented in `docs/ZAZU_OFFLINE_FIRST_ARCHITECTURE.md`. The bounded local read surface remains Customers and Work; remaining entity handlers are not claimed as full local directories.
 - No readiness score uplift. V1 remains **NOT READY** pending physical Android acceptance, installed-target recovery, live commercial-record reconciliation and POPIA operational sign-off.
+
+## 2026-11-14 — Device-local quote summary
+
+- Added a dashboard summary for locally stored quotes, including parent Work context and sync state. The workspace is now also exposed when pending quote data exists without pending customer/job records.
+- Added Playwright regression coverage for a draft quote linked to a synchronized local Work record.
+- Exact application/test verification at `126efb6b4d1f832cc1e7f67db51e0124a962b5f7`, Laravel run [43634683863](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/43634683863): **496 passed, 1 skipped, 3,511 assertions**; PostgreSQL recovery smoke **PASS**; offline browser **35 passed**; mobile customer/Work **4 passed**; phone attachment **1 passed**.
+- Exact build output is `assets/app-DILCeBlI.js`; manifest aligned in `45d5929e615a480b1983ccd53c9892cd10b5fea2`. Manifest-only commit verification is pending.
+- Customers and Work remain the only full local directory renderers. Quotes are a dashboard summary, not a full local directory/detail route. No readiness score uplift; V1 remains **NOT READY**.
