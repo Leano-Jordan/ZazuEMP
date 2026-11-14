@@ -54,6 +54,26 @@ test('real Zazu job form can create a job locally while disconnected', async ({ 
             title: document.title,
             hasDashboard: Boolean(document.querySelector('[data-zazu-offline-workspace]')),
             bodyText: (document.body?.innerText || '').slice(0, 700),
+            cacheState: await (async () => {
+                const names = await caches.keys();
+                const staticName = names.find(name => /^zazu-static-v/.test(name) && !name.includes('-user-'));
+                let activeContext = null;
+                if (staticName) {
+                    const response = await (await caches.open(staticName)).match('/__zazu-active-context__');
+                    activeContext = response ? await response.json() : null;
+                }
+                const userCaches = await Promise.all(names.filter(name => name.includes('-user-')).map(async name => {
+                    const cache = await caches.open(name);
+                    const response = await cache.match(new URL('/customers/create', window.location.origin));
+                    const html = response ? await response.clone().text() : '';
+                    return {
+                        name,
+                        hasCustomerCreate: Boolean(response),
+                        hasCustomerForm: html.includes('data-zazu-offline-entity="customer"'),
+                    };
+                }));
+                return { activeContext, userCaches };
+            })(),
         }));
         console.log('OFFLINE_CUSTOMER_ROUTE_DIAGNOSTIC', JSON.stringify({
             responseStatus: offlineCustomerResponse?.status() ?? null,
