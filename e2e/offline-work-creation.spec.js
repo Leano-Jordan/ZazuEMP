@@ -24,65 +24,54 @@ test('real Zazu job form can create a job locally while disconnected', async ({ 
     // its first authenticated dashboard launch. Do not visit them online here:
     // doing so would hide a broken automatic-prime path.
     await page.waitForFunction(() => Boolean(navigator.serviceWorker?.controller));
-    await page.waitForFunction(async () => {
-        const names = await caches.keys();
-        const staticName = names.find(name => name.startsWith('zazu-static-v') && !name.includes('-user-'));
-        if (!staticName) return false;
-        const contextResponse = await (await caches.open(staticName)).match('/__zazu-active-context__');
-        if (!contextResponse) return false;
-        const context = await contextResponse.json();
-        const pageCacheName = staticName + '-user-' + context.user_id + '-business-' + context.business_id;
-        if (!names.includes(pageCacheName)) return false;
-        const cache = await caches.open(pageCacheName);
-        const requiredRoutes = ['/customers', '/customers/create', '/work', '/work/create'];
-        const cachedRoutes = await Promise.all(requiredRoutes.map(path =>
-            cache.match(new URL(path, window.location.origin))
-        ));
-        if (!cachedRoutes.every(Boolean)) return false;
-        const [customerCreateHtml, workCreateHtml] = await Promise.all([
-            cachedRoutes[1].clone().text(),
-            cachedRoutes[3].clone().text(),
-        ]);
-        const registration = await navigator.serviceWorker.getRegistration('/');
-        const snapshot = {
-            pageCacheName,
-            activeContext: context,
-            cachedRoutes: cachedRoutes.map(Boolean),
-            customerForm: customerCreateHtml.includes('data-zazu-offline-entity="customer"'),
-            workForm: workCreateHtml.includes('data-zazu-offline-entity="job"'),
-            controllerState: navigator.serviceWorker.controller?.state || null,
-            activeState: registration?.active?.state || null,
-            waitingState: registration?.waiting?.state || null,
-            installingState: registration?.installing?.state || null,
-        };
-        if (!snapshot.customerForm || !snapshot.workForm) return false;
-        document.documentElement.dataset.zazuPrimeCacheSnapshot = JSON.stringify(snapshot);
-        return true;
-    }, null, { timeout: 20_000 });
-
-    const primedCacheSnapshot = await page.evaluate(async () => {
-        const captured = document.documentElement.dataset.zazuPrimeCacheSnapshot
-            ? JSON.parse(document.documentElement.dataset.zazuPrimeCacheSnapshot)
-            : null;
-        const names = await caches.keys();
-        const staticName = names.find(name => name.startsWith('zazu-static-v') && !name.includes('-user-'));
-        const contextResponse = staticName
-            ? await (await caches.open(staticName)).match('/__zazu-active-context__')
-            : null;
-        const context = contextResponse ? await contextResponse.json() : null;
-        const pageCacheName = context && staticName
-            ? staticName + '-user-' + context.user_id + '-business-' + context.business_id
-            : null;
-        const cache = pageCacheName ? await caches.open(pageCacheName) : null;
-        const routes = ['/customers', '/customers/create', '/work', '/work/create'];
-        const cached = cache
-            ? await Promise.all(routes.map(async path => {
-                const response = await cache.match(new URL(path, window.location.origin));
-                return { path, cached: Boolean(response) };
-            }))
-            : [];
-        return { captured, activeContext: context, pageCacheName, cached };
-    });
+    let primedCacheSnapshot = null;
+    await expect.poll(async () => {
+        primedCacheSnapshot = await page.evaluate(async () => {
+            const names = await caches.keys();
+            const staticName = names.find(name => name.startsWith('zazu-static-v') && !name.includes('-user-'));
+            if (!staticName) return { ready: false, reason: 'static-cache-missing' };
+            const contextResponse = await (await caches.open(staticName)).match('/__zazu-active-context__');
+            if (!contextResponse) return { ready: false, reason: 'active-context-missing' };
+            const context = await contextResponse.json();
+            const pageCacheName = staticName + '-user-' + context.user_id + '-business-' + context.business_id;
+            if (!names.includes(pageCacheName)) return { ready: false, reason: 'business-cache-missing', context };
+            const cache = await caches.open(pageCacheName);
+            const requiredRoutes = ['/customers', '/customers/create', '/work', '/work/create'];
+            const cachedRoutes = await Promise.all(requiredRoutes.map(path =>
+                cache.match(new URL(path, window.location.origin))
+            ));
+            if (!cachedRoutes.every(Boolean)) {
+                return {
+                    ready: false,
+                    reason: 'routes-not-cached',
+                    context,
+                    pageCacheName,
+                    cachedRoutes: cachedRoutes.map(Boolean),
+                };
+            }
+            const [customerCreateHtml, workCreateHtml] = await Promise.all([
+                cachedRoutes[1].clone().text(),
+                cachedRoutes[3].clone().text(),
+            ]);
+            const registration = await navigator.serviceWorker.getRegistration('/');
+            return {
+                ready: customerCreateHtml.includes('data-zazu-offline-entity="customer"')
+                    && workCreateHtml.includes('data-zazu-offline-entity="job"'),
+                reason: 'forms-not-present',
+                context,
+                pageCacheName,
+                cachedRoutes: cachedRoutes.map(Boolean),
+                customerForm: customerCreateHtml.includes('data-zazu-offline-entity="customer"'),
+                workForm: workCreateHtml.includes('data-zazu-offline-entity="job"'),
+                controllerState: navigator.serviceWorker.controller?.state || null,
+                controllerMatchesActive: navigator.serviceWorker.controller === registration?.active,
+                activeState: registration?.active?.state || null,
+                waitingState: registration?.waiting?.state || null,
+                installingState: registration?.installing?.state || null,
+            };
+        });
+        return primedCacheSnapshot?.ready === true;
+    }, { timeout: 20_000 }).toBe(true);
     console.log('OFFLINE_ROUTE_CACHE_BEFORE_DISCONNECT', JSON.stringify(primedCacheSnapshot));
 
     // Create the customer through Zazu's real customer form while offline.
