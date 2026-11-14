@@ -1,15 +1,31 @@
-## Director reconciliation — 2026-11-14 (offline acceptance verification)
+## Director reconciliation — 2026-11-14 (V1 source and offline acceptance)
 
-**Canonical repository:** `Leano-Jordan/ZazuEMP` · **branch:** `main` · **application/test source:** `aaa47895b334b3bbf3a68f89b66e4ff6a0738032` · **verification workflow:** [43567837212](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/43567837212).
+**Canonical repository:** `Leano-Jordan/ZazuEMP` · **branch:** `main` · **application/test head:** `f9307b9dd477cc0cf6dd4f51abf8a818b53bae75`.
 
-- Laravel: **496 passed / 1 skipped / 3,502 assertions**.
-- PostgreSQL: complete migrations, business registration, backup/restore and private-file recovery smoke **PASS**.
-- Offline browser acceptance: **29 passed / 0 failed / 0 flaky**. The rejected-sync/conflict-persistence test passed on its first attempt after the deterministic fixture correction in `aaa47895`.
-- The backslash tenant-file-path rejection regression is included in the tested source lineage.
-- This is automated evidence. It does not close real Android installation/cold-launch/server-off acceptance or prove all Laravel-rendered workflows run locally.
-- **Offline release gate remains OPEN.** The product still needs a phone-local runtime for supported disconnected navigation and work, not only a cached Laravel-rendered page. Continue against Director issues [#34](https://github.com/Leano-Jordan/ZazuEMP/issues/34) and [#35](https://github.com/Leano-Jordan/ZazuEMP/issues/35).
-- Other open V1 gates: business-level archive export/import plus installed-target recovery drill; live commercial record reconciliation; POPIA operational/privacy/retention/incident controls; Zazu name clearance.
-- No deployment or production data was changed.
+- Laravel [run 43589965430](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/43589965430): **496 passed / 1 skipped / 3,502 assertions**.
+- Dedicated offline-browser acceptance in the same run: **30 passed / 0 failed / 0 flaky**.
+- PostgreSQL 16 migrations, business registration, database backup/restore and private-file recovery smoke: **PASS**.
+- Zazu quality, Composer security audit and secret scan [run 43589965437](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/43589965437): **PASS**.
+- Push-on-main CodeQL [run 43589965413](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/43589965413): **PASS**.
+
+### Offline customer and Work slice
+
+- The dashboard now shows locally pending customers and jobs from the existing IndexedDB working set.
+- The device-local workspace links to the cached customer and Work directories.
+- First authenticated dashboard launch primes `/customers`, `/customers/create`, `/work` and `/work/create`.
+- The automated browser test verifies that the active service worker primes those routes in the active business cache, then creates customer/job records while disconnected, reloads, confirms local records remain visible, navigates into both directories and verifies reconnection sync.
+- This is a bounded customer/Work offline capability. It does **not** establish complete local rendering for every Laravel route or full offline parity across the application.
+
+### Other V1 gates
+
+- **Business data portability — IMPLEMENTED / AUTOMATED-VERIFIED:** 23 business-scoped CSV datasets and the tenant-scoped `.zazu` archive export/restore are available. Archive restore remaps record IDs, restores linked records and referenced business files, and refuses non-empty or already-paired target workspaces.
+- **Commercial reconciliation — SEEDED AUTOMATED-VERIFIED:** the accepted quote → invoice → deposit → final payment → actual cost → event profit path is covered by populated regression data. Live business-record reconciliation remains an operator acceptance task.
+- **Installation recovery — CI-VERIFIED / OPERATOR DRILL OPEN:** PostgreSQL/database/private-file recovery passes in CI. The controlled backup → restore → data/media/security verification drill on the intended installed target remains open.
+- **Physical offline acceptance — OPEN:** secure-origin installation on the actual Android device, cold launch with the PC/server unavailable, supported disconnected workflows, force-close/reopen persistence and reconnection must still be proven on-device.
+- **POPIA and legal/brand — OPEN:** operational privacy, retention and incident procedures require owner sign-off; Zazu name clearance is not claimed.
+
+**Release decision: NOT YET READY.** The bounded offline browser workflow and automated engineering gates are green. Physical device acceptance, the installed-target recovery drill, live commercial reconciliation and operational privacy/legal sign-off remain. No production deployment or live customer data was changed.
+
 
 ---
 
