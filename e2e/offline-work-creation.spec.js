@@ -78,6 +78,24 @@ test('real Zazu job form can create a job locally while disconnected', async ({ 
     // Create the customer through Zazu's real customer form while offline.
     // This exercises the same form handler and durable queue used by operators.
     await page.context().setOffline(true);
+    const cacheBeforeOfflineNavigation = await page.evaluate(async () => {
+        const names = await caches.keys();
+        const staticName = names.find(name => name.startsWith('zazu-static-v') && !name.includes('-user-'));
+        const contextResponse = staticName ? await (await caches.open(staticName)).match('/__zazu-active-context__') : null;
+        const context = contextResponse ? await contextResponse.json() : null;
+        const cacheName = context && staticName + '-user-' + context.user_id + '-business-' + context.business_id;
+        const cache = cacheName ? await caches.open(cacheName) : null;
+        const keys = cache ? await cache.keys() : [];
+        return {
+            cacheName,
+            keys: keys.map(request => new URL(request.url).pathname),
+            routes: await Promise.all(['/customers', '/customers/create', '/work', '/work/create'].map(async path => ({
+                path,
+                present: Boolean(cache && await cache.match(new URL(path, window.location.origin))),
+            }))),
+        };
+    });
+    console.log('OFFLINE_CACHE_BEFORE_NAVIGATION', JSON.stringify(cacheBeforeOfflineNavigation));
     const offlineCustomerResponse = await page.goto('/customers/create', { waitUntil: 'domcontentloaded' });
     const customerForm = page.locator('form[data-zazu-offline-entity="customer"]');
     if (await customerForm.count() === 0) {
