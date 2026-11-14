@@ -1,3 +1,24 @@
+## 2026-11-14 — Exact-head offline acceptance reconciliation
+
+- Owner resumed bounded offline engineering on 2026-11-14 and explicitly required no looping or duplicate effort. Work remains on canonical `main`; no deployment or non-main branch was used.
+- Exact application/test head: `d09fdbfbe4bdbb7cfaed9ca1ea125313910fa3e0`.
+- Implemented and verified in this slice:
+  - Pending local Work jobs remain visible in the All Work filter.
+  - Cached dashboard exposes pending local customers/jobs and links into the cached Customers and Work directories.
+  - Service-worker priming covers the four supported device-local routes: `/customers`, `/customers/create`, `/work`, `/work/create`.
+  - Service worker now acknowledges when page priming has completed; the disconnected acceptance waits for that acknowledgement instead of treating early cache entries as proof that priming has finished.
+  - Offline session-transition tests are now part of the per-main focused offline CI gate.
+  - Archive validation tests remain covered while the test class stays within PHPMD's public-method limit.
+- Exact-head CI [Laravel run 43593454044](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/43593454044): **PASS** — 496 passed, 1 skipped, 3,510 assertions.
+- Dedicated offline browser acceptance in the same run: **32 passed**. Separate mobile-viewport customer/Work acceptance: **1 passed**. Phone-local attachment journey on mobile viewport: **1 passed**.
+- PostgreSQL migration, business registration, database backup/restore and private-file recovery smoke: **PASS** in run 43593454044.
+- Zazu quality, Composer security audit and secret scan [43593453976](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/43593453976): **PASS**. Push-on-main CodeQL [43593453848](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/43593453848): **PASS**. PHPMD [43593169089](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/43593169089): **PASS** on the same PHP test/source lineage.
+- Acceptance boundary: automated browser tests do not prove physical Android installation, disconnected cold launch, force-close/reopen persistence or reconnect on the owner's actual phone. Those remain open and are not represented as passed.
+- Still open for V1: physical installed-device acceptance; controlled recovery drill on the intended installation; live business-record quote/payment/profit reconciliation; POPIA operational/privacy sign-off. Branding/name clearance remains deferred by owner and is not an active engineering target.
+- No production deployment, customer data or live database was changed.
+
+---
+
 ## 2026-11-14 — Owner-resumed offline customer/workspace slice
 
 - Owner explicitly resumed bounded offline engineering on 2026-11-14, with the condition that work must not loop or duplicate effort. This supersedes the earlier pause instruction for the current V1 offline target.
