@@ -7,9 +7,13 @@
 - Canonical branch: main
 - Only Zazu EMP is an implementation target.
 
+## Owner mission — read first
+
+Read `memory.md` first. Its opening **Owner V1 shipping mandate** is a binding instruction: ship a practical, dependable V1 for first businesses; close acceptance-passed gates at 5/5; avoid perfectionism, speculative blockers, scope creep and repeated engineering loops; offline engineering stays paused unless the owner resumes it or a critical regression is demonstrated. This is the operating objective for every session.
+
 ## Canonical control contract
 
-Read and obey, in order:
+Then read and obey, in order:
 
 1. .ai/REPOSITORY_IDENTITY_LOCK.md
 2. .ai/engineering/00_DIRECTOR_ENGINE.md
@@ -17,7 +21,7 @@ Read and obey, in order:
 4. Relevant skill / specialist contract
 5. Failure / regression / readiness records only when required by the active target
 
-AGENTS.md is an entry pointer. It does not duplicate the Director contract.
+AGENTS.md is an entry pointer. It points to the owner mandate and canonical Director contract; it does not create a competing control system.
 
 ## Operating boundary
 
