@@ -103,6 +103,15 @@ test('real Zazu job form can create a job locally while disconnected', async ({ 
     await page.goto('/work', { waitUntil: 'domcontentloaded' });
     await expect(page.locator('[data-zazu-local-record="job"]').filter({ hasText: jobName })).toHaveCount(1);
     await expect(page.locator('[data-zazu-local-record="job"]').filter({ hasText: jobName })).toBeVisible();
+    // The local directory renderer must retain pending records in the All Work view.
+    await page.evaluate(() => {
+        const url = new URL(window.location.href);
+        url.searchParams.set('filter', 'all');
+        history.replaceState({}, '', url);
+        window.dispatchEvent(new CustomEvent('zazu:offline-state-updated'));
+    });
+    await expect(page.locator('[data-zazu-local-record="job"]').filter({ hasText: jobName })).toHaveCount(1);
+
     await expect(page.locator('[data-zazu-local-record="job"]').filter({ hasText: customerName })).toHaveCount(1);
 
     await page.goto('/customers', { waitUntil: 'domcontentloaded' });
