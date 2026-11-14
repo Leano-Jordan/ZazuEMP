@@ -1149,7 +1149,11 @@ function setupZazuOfflineDirectoryViews() {
                 (() => {
                     const ref = document.createElement('span');
                     ref.className = 'zazu-ops-ref';
-                    ref.append(text('span', 'zazu-ops-ref-label', 'Local reference'), text('strong', '', 'Pending sync'));
+                    const serverId = job.server_id ?? job.id;
+                    ref.append(
+                        text('span', 'zazu-ops-ref-label', serverId ? 'Job reference' : 'Local reference'),
+                        text('strong', '', serverId ? (job.reference || '#' + serverId) : 'Pending sync')
+                    );
                     return ref;
                 })(),
                 (() => {
