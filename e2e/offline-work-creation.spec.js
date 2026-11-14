@@ -55,9 +55,12 @@ test('real Zazu job form can create a job locally while disconnected', async ({ 
             ]);
             const registration = await navigator.serviceWorker.getRegistration('/');
             return {
-                ready: customerCreateHtml.includes('data-zazu-offline-entity="customer"')
-                    && workCreateHtml.includes('data-zazu-offline-entity="job"'),
-                reason: 'forms-not-present',
+                ready: cachedRoutes.every(Boolean)
+                    && customerCreateHtml.includes('data-zazu-offline-entity="customer"')
+                    && workCreateHtml.includes('data-zazu-offline-entity="job"')
+                    && navigator.serviceWorker.controller === registration?.active
+                    && !registration?.waiting
+                    && !registration?.installing,
                 context,
                 pageCacheName,
                 cachedRoutes: cachedRoutes.map(Boolean),
@@ -72,8 +75,6 @@ test('real Zazu job form can create a job locally while disconnected', async ({ 
         });
         return primedCacheSnapshot?.ready === true;
     }, { timeout: 20_000 }).toBe(true);
-    console.log('OFFLINE_ROUTE_CACHE_BEFORE_DISCONNECT', JSON.stringify(primedCacheSnapshot));
-
     // Create the customer through Zazu's real customer form while offline.
     // This exercises the same form handler and durable queue used by operators.
     await page.context().setOffline(true);
