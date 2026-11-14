@@ -733,6 +733,9 @@ test.describe('Zazu installed PWA offline shell', () => {
             await window.ZazuOffline.persist({ allowSessionChange: true });
         }, businessId);
 
+        // Keep the queue offline while installing deterministic server routes.
+        // Otherwise the app's automatic online sync can race this test's mocked response.
+        await page.context().setOffline(true);
         const mutation = await page.evaluate(() => window.ZazuOffline.queueMutation('customer', 'create', {
             local_id: 'atomic-failed-customer',
             record: { name: 'Customer requiring operator review' },
@@ -767,7 +770,27 @@ test.describe('Zazu installed PWA offline shell', () => {
             }),
         }));
 
+        // Reconnect only after every response is intercepted. sync() may coalesce
+        // with an already-running pass, so assert the durable outcome rather than
+        // assuming its returned promise represents the queued follow-up pass.
+        await page.context().setOffline(false);
         await page.evaluate(() => window.ZazuOffline.sync());
+
+        await expect.poll(async () => page.evaluate(async (mutationId) => {
+            const db = await new Promise((resolve, reject) => {
+                const request = indexedDB.open('zazu-client-business-' + document.body.dataset.zazuBusinessId, 1);
+                request.onsuccess = () => resolve(request.result);
+                request.onerror = () => reject(request.error || new Error('Could not open offline workspace'));
+            });
+            const status = await new Promise((resolve, reject) => {
+                const tx = db.transaction('mutations', 'readonly');
+                const request = tx.objectStore('mutations').get(mutationId);
+                tx.oncomplete = () => resolve(request.result?.status || null);
+                tx.onerror = () => reject(tx.error || new Error('Could not inspect mutation acknowledgement'));
+            });
+            db.close();
+            return status;
+        }, mutation.id), { timeout: 10000 }).toBe('failed');
 
         const persisted = await page.evaluate(async () => {
             const db = await new Promise((resolve, reject) => {
