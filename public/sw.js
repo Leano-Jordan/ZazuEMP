@@ -395,6 +395,8 @@ async function primePages(routes, primeGeneration = activeUserGeneration, primeU
     } finally {
         if (activePrimeController === controller) activePrimeController = null;
     }
+
+    return !controller.signal.aborted;
 }
 
 async function clearActiveContext() {
@@ -424,8 +426,12 @@ self.addEventListener('message', (event) => {
         await loadActiveContext(generation);
         if (generation !== activeUserGeneration) return;
         const activeGeneration = await setContext(event.data.userId, event.data.businessId, generation);
-        if (activeGeneration === null) return;
-        await primePages(event.data.routes, activeGeneration, activeUserId, activeBusinessId);
+        if (activeGeneration === null) {
+            event.ports?.[0]?.postMessage({ type: 'prime-pages-complete', success: false });
+            return;
+        }
+        const completed = await primePages(event.data.routes, activeGeneration, activeUserId, activeBusinessId);
+        event.ports?.[0]?.postMessage({ type: 'prime-pages-complete', success: completed });
     })());
 });
 
