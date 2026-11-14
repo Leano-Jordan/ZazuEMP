@@ -118,6 +118,13 @@ test('real Zazu job form can create a job locally while disconnected', async ({ 
     await expect(page.locator('[data-zazu-local-record="customer"]').filter({ hasText: customerName })).toHaveCount(1);
     await expect(page.locator('[data-zazu-local-record="customer"]').filter({ hasText: customerName })).toBeVisible();
 
+    // The cached dashboard is the fallback for unprimed routes. It must expose
+    // the IndexedDB working set instead of leaving the operator on a stale snapshot.
+    await page.goto('/dashboard', { waitUntil: 'domcontentloaded' });
+    await expect(page.locator('[data-zazu-offline-workspace]')).toBeVisible();
+    await expect(page.locator('[data-zazu-offline-workspace] [data-zazu-local-record="customer"]').filter({ hasText: customerName })).toBeVisible();
+    await expect(page.locator('[data-zazu-offline-workspace] [data-zazu-local-record="job"]').filter({ hasText: jobName })).toBeVisible();
+
     // Reconnect must provision this signed-in phone automatically. No
     // desktop settings screen or manually generated pairing code is involved.
     await page.context().setOffline(false);
