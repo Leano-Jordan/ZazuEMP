@@ -312,6 +312,51 @@ class BusinessArchiveTest extends TestCase
         ]);
     }
 
+    public function test_restore_rejects_inline_file_bytes_in_archive_manifest(): void
+    {
+        Storage::fake('private');
+        Storage::fake('public');
+        $source = Business::create([
+            'name' => 'Inline Bytes Source',
+            'slug' => 'inline-bytes-source',
+            'status' => 'active',
+            'currency' => 'ZAR',
+        ]);
+        $this->signInAsOwner($source);
+        $this->seedArchiveRecords($source);
+
+        $archive = app(BusinessArchiveService::class)->download($source);
+        $zip = new \\ZipArchive();
+        $this->assertTrue($zip->open($archive) === true);
+        $manifest = json_decode((string) $zip->getFromName('manifest.json'), true, 512, JSON_THROW_ON_ERROR);
+        $attachmentIndex = array_search('event_attachments', array_column($manifest['files'], 'table'), true);
+        $this->assertNotFalse($attachmentIndex);
+        $manifest['files'][$attachmentIndex]['bytes'] = 'untrusted inline payload';
+        $zip->deleteName('manifest.json');
+        $zip->addFromString('manifest.json', json_encode($manifest, JSON_THROW_ON_ERROR));
+        $zip->close();
+
+        $target = Business::create([
+            'name' => 'Inline Bytes Target',
+            'slug' => 'inline-bytes-target',
+            'status' => 'active',
+            'currency' => 'ZAR',
+        ]);
+
+        try {
+            try {
+                app(BusinessArchiveService::class)->restore($archive, $target);
+                $this->fail('Inline file bytes in the manifest must be rejected.');
+            } catch (\\RuntimeException $exception) {
+                $this->assertStringContainsString('inline payload bytes', $exception->getMessage());
+            }
+        } finally {
+            @unlink($archive);
+        }
+
+        $this->assertDatabaseMissing('event_attachments', ['business_id' => $target->id]);
+    }
+
     public function test_restore_rejects_storage_paths_without_matching_archive_payloads(): void
     {
         Storage::fake('private');
