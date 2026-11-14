@@ -268,6 +268,12 @@
                 <div class="zazu-empty">No pending jobs on this device.</div>
             </div>
         </section>
+        <section class="zazu-dash-surface" aria-label="Quotes saved on this device">
+            <h3 class="zazu-dash-panel-heading">Quotes</h3>
+            <div class="zazu-customer-directory zazu-list" data-zazu-local-quotes>
+                <div class="zazu-empty">No quote records available on this device.</div>
+            </div>
+        </section>
     </div>
 </section>
 
