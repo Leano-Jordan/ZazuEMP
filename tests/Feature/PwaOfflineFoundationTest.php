@@ -45,6 +45,7 @@ class PwaOfflineFoundationTest extends TestCase
         $this->assertStringNotContainsString('zazu-phone-workspace', $html);
 
         $app = File::get(resource_path('js/app.js'));
+        $worker = File::get(public_path('sw.js'));
         $client = File::get(public_path('zazu-offline.js'));
         $workspaceOpen = substr($client, strpos($client, 'function openDb('), strpos($client, 'async function readState()') - strpos($client, 'function openDb('));
         $this->assertStringContainsString('new BroadcastChannel(\'zazu-offline-session-\' + ACTIVE_BUSINESS_ID)', $client);
