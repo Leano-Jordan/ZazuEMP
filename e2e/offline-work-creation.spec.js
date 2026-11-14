@@ -75,62 +75,18 @@ test('real Zazu job form can create a job locally while disconnected', async ({ 
         });
         return primedCacheSnapshot?.ready === true;
     }, { timeout: 20_000 }).toBe(true);
+    // Cache entries can appear before the service worker has finished warming
+    // their dependent assets. Wait for its explicit completion acknowledgement
+    // before simulating a disconnected launch.
+    await page.waitForFunction(
+        () => document.documentElement.dataset.zazuOfflinePagesPrimed === 'true',
+        { timeout: 20_000 },
+    );
     // Create the customer through Zazu's real customer form while offline.
     // This exercises the same form handler and durable queue used by operators.
     await page.context().setOffline(true);
-    const cacheBeforeOfflineNavigation = await page.evaluate(async () => {
-        const names = await caches.keys();
-        const staticName = names.find(name => name.startsWith('zazu-static-v') && !name.includes('-user-'));
-        const contextResponse = staticName ? await (await caches.open(staticName)).match('/__zazu-active-context__') : null;
-        const context = contextResponse ? await contextResponse.json() : null;
-        const cacheName = context && staticName + '-user-' + context.user_id + '-business-' + context.business_id;
-        const cache = cacheName ? await caches.open(cacheName) : null;
-        const keys = cache ? await cache.keys() : [];
-        return {
-            cacheName,
-            keys: keys.map(request => new URL(request.url).pathname),
-            routes: await Promise.all(['/customers', '/customers/create', '/work', '/work/create'].map(async path => ({
-                path,
-                present: Boolean(cache && await cache.match(new URL(path, window.location.origin))),
-            }))),
-        };
-    });
-    console.log('OFFLINE_CACHE_BEFORE_NAVIGATION', JSON.stringify(cacheBeforeOfflineNavigation));
     const offlineCustomerResponse = await page.goto('/customers/create', { waitUntil: 'domcontentloaded' });
     const customerForm = page.locator('form[data-zazu-offline-entity="customer"]');
-    if (await customerForm.count() === 0) {
-        const diagnostic = await page.evaluate(async () => ({
-            url: window.location.href,
-            route: document.body?.dataset.zazuRoute || null,
-            title: document.title,
-            hasDashboard: Boolean(document.querySelector('[data-zazu-offline-workspace]')),
-            bodyText: (document.body?.innerText || '').slice(0, 700),
-            cacheState: await (async () => {
-                const names = await caches.keys();
-                const staticName = names.find(name => /^zazu-static-v/.test(name) && !name.includes('-user-'));
-                let activeContext = null;
-                if (staticName) {
-                    const response = await (await caches.open(staticName)).match('/__zazu-active-context__');
-                    activeContext = response ? await response.json() : null;
-                }
-                const userCaches = await Promise.all(names.filter(name => name.includes('-user-')).map(async name => {
-                    const cache = await caches.open(name);
-                    const response = await cache.match(new URL('/customers/create', window.location.origin));
-                    const html = response ? await response.clone().text() : '';
-                    return {
-                        name,
-                        hasCustomerCreate: Boolean(response),
-                        hasCustomerForm: html.includes('data-zazu-offline-entity="customer"'),
-                    };
-                }));
-                return { activeContext, userCaches };
-            })(),
-        }));
-        console.log('OFFLINE_CUSTOMER_ROUTE_DIAGNOSTIC', JSON.stringify({
-            responseStatus: offlineCustomerResponse?.status() ?? null,
-            ...diagnostic,
-        }));
-    }
     await expect(customerForm).toBeVisible();
     await customerForm.locator('input[name="name"]').fill(customerName);
     await customerForm.locator('input[name="primary_contact_name"]').fill('Offline test contact');
