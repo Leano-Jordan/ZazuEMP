@@ -249,6 +249,10 @@
             <h2>Saved on this device</h2>
             <p class="zazu-card-description">Pending customers and jobs stay available here while the server is disconnected.</p>
         </div>
+        <nav class="zazu-action-group" aria-label="Offline workspace navigation">
+            <a href="{{ route('customers.index') }}" class="zazu-btn zazu-btn-secondary">Open customers</a>
+            <a href="{{ route('work.index') }}" class="zazu-btn zazu-btn-secondary">Open work</a>
+        </nav>
         <span class="zazu-chip zazu-chip-neutral">Device local</span>
     </header>
     <div class="zazu-dash-grid">
