@@ -239,9 +239,8 @@ test('an existing customer can be edited locally while disconnected and synced o
     await createForm.locator('input[name="primary_contact_name"]').fill('Offline edit contact');
     await createForm.locator('input[name="primary_contact_phone"]').fill('0123456789');
     await createForm.getByRole('button', { name: 'Save customer' }).click();
-    await expect(page).toHaveURL(/\/customers\/\d+/);
+    await expect(page).toHaveURL(/\/customers$/);
 
-    await page.goto('/customers', { waitUntil: 'domcontentloaded' });
     const customerLink = page.locator('.zazu-customer-directory a[href^="/customers/"]').filter({ hasText: customerName });
     await expect(customerLink).toBeVisible();
     await customerLink.click();
