@@ -500,3 +500,23 @@ Archive pointer: closed historical cases CASE-ZAZU-0001 through CASE-ZAZU-0009 a
 **Verification:** Exact-head browser and offline-browser-acceptance reruns are pending. Do not close this case until both finish without retries/flakes.
 
 **Loop prevention:** Dashboard navigation completion is not the offline runtime readiness contract. Any test that accesses `window.ZazuOffline` must await `waitForOfflineRuntime(page)` first.
+
+
+### CASE-ZAZU-0031
+
+**Status:** CLOSED — exact-head offline browser acceptance and supporting CI passed.  
+**Engineering diagnostic code:** ENG-FIXTURE-006.  
+**First observed:** 2026-11-14.  
+**Target:** Existing-customer offline edit browser acceptance.
+
+**Failure fingerprint:** The customer edit test initially depended on a seeded directory customer. After moving to a test-created customer, the browser could not reliably discover that new server record through the service-worker-cached `/customers` navigation, even though a direct Laravel request returned the record. The fixture therefore failed before reaching its intended offline-edit assertion.
+
+**Classification:** F2/F3 — browser fixture precondition and cached-page test coupling. This was not evidence that the customer update queue or reconnect mutation handler was broken.
+
+**Correction:** The test now creates its own record through the real customer form and asserts the Laravel POST redirect. It obtains the server ID from a direct directory response, refreshes the paired device bootstrap, asserts the local entity has the expected server identity, and opens that record's unique detail URL before disconnecting. The test then verifies the local update queue, cached directory override while offline, queue drain after reconnect and persisted server value. Form connectivity probes use Laravel's lightweight `HEAD /up` endpoint; the two simulated unreachable-origin tests intercept that endpoint. The broader service-worker navigation preflight experiment was rejected and reverted.
+
+**Verification:** Exact main `5a9516f275ebbefc3a7df88da18c57fb331b3113`. [Laravel run 43624809134](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/43624809134): 496 passed, 3,510 assertions, 1 skipped; Chromium offline browser 33 passed; mobile-viewport customer/Work 2 passed; mobile-viewport phone-local attachment 1 passed; PostgreSQL migration/backup/restore passed. [Zazu quality run 43624809004](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/43624809004): application, Composer security audit and secret scan passed.
+
+**Scope boundary:** This closes the deterministic browser fixture and exact-head automated acceptance. Physical Android force-closed launch, disconnected persistence and reconnect must still be verified on the actual device; no hardware pass is inferred from mobile viewport emulation.
+
+**Loop prevention:** Do not require this offline-edit test to discover its just-created fixture through a cached directory navigation. Use the verified server identity and paired local record. Do not modify global service-worker navigation/cache behaviour for this fixture.
