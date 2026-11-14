@@ -2900,3 +2900,13 @@ Verification boundary: source was re-fetched from `main` and the retry implement
 - **Exact-head evidence:** [Laravel run 43624809134](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/43624809134) — **496 passed / 3,510 assertions / 1 skipped**; offline browser acceptance **33 passed**; mobile-viewport customer/Work **2 passed**; mobile-viewport phone-local attachment **1 passed**; PostgreSQL migration/backup/restore **PASS**. [Zazu quality run 43624809004](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/43624809004) — application, Composer security audit and secret scan **PASS**. Push-on-main workflow passed.
 - **Scope boundary:** This verifies the automated Chromium and mobile-viewport acceptance journeys. It does not claim physical Android cold-start acceptance. The disconnected, force-closed phone drill remains a separate physical acceptance item.
 - **Resolution:** CLOSED for the browser acceptance fixture and exact-head CI. Do not reopen without a new reproducible failing fingerprint.
+
+## 2026-11-14 — Device-local quote summary slice
+
+- Added a Quotes panel to the cached dashboard's device-local workspace. It renders locally available quote reference/status/currency, related Work name where available, and sync state.
+- Workspace visibility now includes pending quote records, not only pending customers/jobs.
+- Added Playwright regression coverage for a locally queued draft quote linked to an already-synchronized Work record.
+- Source/test commit: `126efb6b4d1f832cc1e7f67db51e0124a962b5f7`. Exact Laravel/offline/PostgreSQL run [43634683863](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/43634683863): Laravel **496 passed / 1 skipped / 3,511 assertions**; offline browser **35 passed**; mobile customer/Work **4 passed**; phone attachment **1 passed**; PostgreSQL recovery **PASS**.
+- Build output: `assets/app-DILCeBlI.js`; manifest aligned in `45d5929e615a480b1983ccd53c9892cd10b5fea2`. Manifest-only follow-up verification is pending.
+- Local read boundary: customer and Work directories plus a dashboard quote summary. No full local quote detail/list view or other entity directory is claimed.
+- No deployment or customer data changed. V1 remains **NOT READY** pending physical/operational gates.
