@@ -33,14 +33,33 @@ test('real Zazu job form can create a job locally while disconnected', async ({ 
         const cachedRoutes = await Promise.all(requiredRoutes.map(path =>
             cache.match(new URL(path, window.location.origin))
         ));
-        return cachedRoutes.every(Boolean);
+        if (!cachedRoutes.every(Boolean)) return false;
+        const [customerCreateHtml, workCreateHtml] = await Promise.all([
+            cachedRoutes[1].clone().text(),
+            cachedRoutes[3].clone().text(),
+        ]);
+        return customerCreateHtml.includes('data-zazu-offline-entity="customer"')
+            && workCreateHtml.includes('data-zazu-offline-entity="job"');
     }, null, { timeout: 20_000 });
 
     // Create the customer through Zazu's real customer form while offline.
     // This exercises the same form handler and durable queue used by operators.
     await page.context().setOffline(true);
-    await page.goto('/customers/create', { waitUntil: 'domcontentloaded' });
+    const offlineCustomerResponse = await page.goto('/customers/create', { waitUntil: 'domcontentloaded' });
     const customerForm = page.locator('form[data-zazu-offline-entity="customer"]');
+    if (await customerForm.count() === 0) {
+        const diagnostic = await page.evaluate(() => ({
+            url: window.location.href,
+            route: document.body?.dataset.zazuRoute || null,
+            title: document.title,
+            hasDashboard: Boolean(document.querySelector('[data-zazu-offline-workspace]')),
+            bodyText: (document.body?.innerText || '').slice(0, 700),
+        }));
+        console.log('OFFLINE_CUSTOMER_ROUTE_DIAGNOSTIC', JSON.stringify({
+            responseStatus: offlineCustomerResponse?.status() ?? null,
+            ...diagnostic,
+        }));
+    }
     await expect(customerForm).toBeVisible();
     await customerForm.locator('input[name="name"]').fill(customerName);
     await customerForm.locator('input[name="primary_contact_name"]').fill('Offline test contact');
