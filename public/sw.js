@@ -435,7 +435,7 @@ self.addEventListener('message', (event) => {
     })());
 });
 
-async function fetchWithTimeout(request, timeoutMs = 6000) {
+async function fetchWithTimeout(request, timeoutMs = 4000) {
     const controller = new AbortController();
     const timeout = setTimeout(() => controller.abort(), timeoutMs);
 

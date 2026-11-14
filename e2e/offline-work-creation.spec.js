@@ -263,19 +263,29 @@ test('an existing customer can be edited locally while disconnected and synced o
     expect(createResponse.status(), 'the fixture must be saved by Laravel before the offline edit begins').toBe(302);
     await expect(page).toHaveURL(/\/customers$/);
 
-    // Verify persistence directly against Laravel, then force a fresh directory
-    // navigation. This distinguishes a successful DB write from a stale cached
-    // page response after the POST redirect.
+    // Confirm that Laravel persisted the server-backed fixture independently
+    // of the service-worker-cached directory HTML. The new customer URL is unique
+    // and therefore cannot be mistaken for a previous cached directory snapshot.
     const serverDirectory = await page.request.get('/customers');
     expect(serverDirectory.status()).toBe(200);
-    expect(await serverDirectory.text()).toContain(customerName);
+    const directoryHtml = await serverDirectory.text();
+    const customerPosition = directoryHtml.indexOf(customerName);
+    expect(customerPosition, 'Laravel must return the newly created customer in its directory').toBeGreaterThan(-1);
+    const rowMarkers = [...directoryHtml.slice(0, customerPosition).matchAll(/data-zazu-server-customer-id="(\\d+)"/g)];
+    const customerId = Number(rowMarkers.at(-1)?.[1] || 0);
+    expect(customerId, 'the directory row must expose a server customer ID').toBeGreaterThan(0);
 
-    const refreshedDirectory = await page.goto('/customers', { waitUntil: 'domcontentloaded' });
-    expect(refreshedDirectory?.status()).toBe(200);
+    // Refresh the paired device snapshot after creating the fixture so the edit
+    // path has the server record in IndexedDB before the connection is removed.
+    await page.evaluate(() => window.ZazuOffline.refreshBootstrap());
+    const localFixture = await page.evaluate(name =>
+        window.ZazuOffline.getState().customers.find(customer => customer.name === name) || null,
+        customerName
+    );
+    expect(localFixture?.local_id, 'the customer must be present in the paired local workspace').toBeTruthy();
+    expect(Number(localFixture?.server_id ?? localFixture?.id)).toBe(customerId);
 
-    const customerLink = page.locator('.zazu-customer-directory a[href^="/customers/"]').filter({ hasText: customerName });
-    await expect(customerLink).toBeVisible();
-    await customerLink.click();
+    await page.goto('/customers/' + customerId, { waitUntil: 'domcontentloaded' });
     await page.getByRole('link', { name: 'Edit customer' }).click();
 
     const form = page.locator('form[data-zazu-offline-entity="customer"]');
