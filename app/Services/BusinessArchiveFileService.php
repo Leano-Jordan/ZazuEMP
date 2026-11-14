@@ -61,6 +61,9 @@ final class BusinessArchiveFileService
             if (! is_array($file)) {
                 throw new RuntimeException('The archive contains an invalid business file reference.');
             }
+            if (array_key_exists('bytes', $file)) {
+                throw new RuntimeException('The archive file manifest must not contain inline payload bytes.');
+            }
             $key = implode(':', [(string) ($file['table'] ?? ''), (string) ($file['id'] ?? ''), (string) ($file['column'] ?? '')]);
             $entry = (string) ($file['entry'] ?? '');
             if (isset($references[$key])) {
