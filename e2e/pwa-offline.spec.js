@@ -177,6 +177,7 @@ test.describe('Zazu installed PWA offline shell', () => {
         test.skip(testInfo.project.name !== 'chromium', 'Installed-app resume reconnect contract runs once.');
 
         await login(page);
+        await waitForOfflineRuntime(page);
         await page.evaluate(async () => {
             await window.ZazuOffline.ready;
             const state = window.ZazuOffline.getState();
@@ -242,6 +243,7 @@ test.describe('Zazu installed PWA offline shell', () => {
         await login(page);
         // The status chip is rendered on the Customer directory, not the dashboard.
         await page.goto('/customers', { waitUntil: 'domcontentloaded' });
+        await waitForOfflineRuntime(page);
         await page.evaluate(() => window.ZazuOffline.ready);
         await page.evaluate(async () => {
             const state = window.ZazuOffline.getState();
