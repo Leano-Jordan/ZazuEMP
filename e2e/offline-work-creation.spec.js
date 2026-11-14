@@ -26,7 +26,7 @@ test('real Zazu job form can create a job locally while disconnected', async ({ 
     await page.waitForFunction(() => Boolean(navigator.serviceWorker?.controller));
     await page.waitForFunction(async () => {
         const names = await caches.keys();
-        const pageCacheName = names.find(name => /-user-\\d+-business-\\d+$/.test(name));
+        const pageCacheName = names.find(name => name.includes('-user-') && name.includes('-business-'));
         if (!pageCacheName) return false;
         const cache = await caches.open(pageCacheName);
         const [customerCreate, workCreate] = await Promise.all([
