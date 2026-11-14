@@ -271,7 +271,7 @@ test('an existing customer can be edited locally while disconnected and synced o
     const directoryHtml = await serverDirectory.text();
     const customerPosition = directoryHtml.indexOf(customerName);
     expect(customerPosition, 'Laravel must return the newly created customer in its directory').toBeGreaterThan(-1);
-    const rowMarkers = [...directoryHtml.slice(0, customerPosition).matchAll(/data-zazu-server-customer-id="(\\d+)"/g)];
+    const rowMarkers = [...directoryHtml.slice(0, customerPosition).matchAll(/data-zazu-server-customer-id="(\d+)"/g)];
     const customerId = Number(rowMarkers.at(-1)?.[1] || 0);
     expect(customerId, 'the directory row must expose a server customer ID').toBeGreaterThan(0);
 
@@ -290,8 +290,6 @@ test('an existing customer can be edited locally while disconnected and synced o
 
     const form = page.locator('form[data-zazu-offline-entity="customer"]');
     await expect(form).toBeVisible();
-    const customerId = Number(new URL(page.url()).pathname.split('/').filter(Boolean).at(-2));
-    expect(customerId).toBeGreaterThan(0);
 
     const nameInput = form.locator('input[name="name"]');
     const updatedName = (await nameInput.inputValue()) + ' offline edit ' + runId;
