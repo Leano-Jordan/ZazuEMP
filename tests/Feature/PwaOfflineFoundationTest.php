@@ -100,7 +100,9 @@ class PwaOfflineFoundationTest extends TestCase
         $this->assertStringContainsString("const OFFLINE_SHELL = '/dashboard';", $worker);
         $this->assertStringContainsString('async function fetchWithTimeout(request, timeoutMs = 4000)', $worker);
         $this->assertStringContainsString('const timeout = setTimeout(() => controller.abort(), timeoutMs);', $worker);
-        $this->assertStringContainsString('fetchWithTimeout(request)', $worker);
+        $this->assertStringContainsString('async function canReachAppOrigin(timeoutMs = 2500)', $worker);
+        $this->assertStringContainsString('await canReachAppOrigin()', $worker);
+        $this->assertStringContainsString('fetchWithTimeout(request, 10000)', $worker);
         $this->assertStringContainsString("OFFLINE_SHELL,", $worker);
         $this->assertStringContainsString("'/offline-attachments.js'", $worker);
         $this->assertStringContainsString("'/zazu-offline.js'", $worker);
