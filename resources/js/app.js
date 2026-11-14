@@ -1023,11 +1023,31 @@ function setupZazuOfflineDirectoryViews() {
         if (!directory) return;
 
         directory.querySelectorAll('[data-zazu-local-record="customer"]').forEach(node => node.remove());
-        const customers = (state?.customers || []).filter(customer => {
-            if (!customer?.local_id) return false;
+        const customers = [];
+        for (const customer of state?.customers || []) {
+            if (!customer?.local_id) continue;
+
             const serverId = customer.server_id ?? customer.id;
-            return !serverId || !directory.querySelector('[data-zazu-server-customer-id="' + Number(serverId) + '"]');
-        });
+            const serverRow = serverId
+                ? directory.querySelector('[data-zazu-server-customer-id="' + Number(serverId) + '"]')
+                : null;
+
+            if (serverRow) {
+                // A locally edited server record must override the cached HTML
+                // snapshot while disconnected; otherwise the directory shows
+                // stale identity/contact details until the next server response.
+                const title = serverRow.querySelector('.zazu-list-title');
+                if (title) title.textContent = customer.name || 'Saved customer';
+
+                const meta = serverRow.querySelector('.zazu-list-meta');
+                if (meta) {
+                    meta.textContent = [customer.phone, customer.email].filter(Boolean).join(' · ') || 'No phone';
+                }
+                continue;
+            }
+
+            customers.push(customer);
+        }
         const pendingCustomers = customers.filter(customer => customer.server_id == null && customer.id == null);
         const empty = directory.querySelector('.zazu-empty');
         const header = directory.querySelector('.zazu-record-header');
