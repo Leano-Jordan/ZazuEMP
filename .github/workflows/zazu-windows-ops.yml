@@ -73,6 +73,8 @@ jobs:
             'function Prepare-ZazuBuiltAssets',
             '$hotFile = Join-Path $publicDirectory ''hot''',
             '$manifestFile = Join-Path $buildDirectory ''manifest.json''',
+            '$entry.Value.css',
+            '$entry.Value.assets',
             'Get-Command npm.cmd',
             'run build',
             'ConvertFrom-Json',
