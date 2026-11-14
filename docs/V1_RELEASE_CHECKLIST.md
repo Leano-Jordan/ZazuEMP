@@ -1,3 +1,19 @@
+## Director reconciliation — 2026-11-14 (latest exact-head verification)
+
+**Canonical branch:** `main`  
+**Verified application/test source:** `aaa47895b334b3bbf3a68f89b66e4ff6a0738032`  
+**Exact-head workflow:** [43567837212](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/43567837212)
+
+- Laravel suite: **496 passed / 1 skipped / 3,502 assertions**.
+- PostgreSQL migration, business registration, database backup/restore and private-file recovery: **PASS**.
+- Dedicated offline-browser acceptance: **29 passed / 0 failed / 0 flaky**. The conflict-persistence race correction passed first attempt.
+- This automated run does not prove physical Android installed-app cold launch with the PC/server off. Offline remains **OPEN** until the real-device acceptance in the Android runbook passes.
+- Business archive service/collector refactor and tenant file-path backslash rejection are included in the verified source lineage. PostgreSQL backup/restore is CI evidence, not the installed-target operator recovery drill.
+- V1 remains **NOT READY** pending physical offline acceptance; business archive export/import plus installed-target recovery; live quote/payment/profit reconciliation; and POPIA operational controls and Zazu name clearance.
+- No production deployment or live business data changed.
+
+---
+
 ## Director reconciliation — 2026-11-13 (current application/test evidence)
 
 **Canonical branch:** `main`  
