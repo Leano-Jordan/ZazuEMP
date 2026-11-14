@@ -12,6 +12,7 @@ async function login(page, email = DEMO_EMAIL, password = DEMO_PASSWORD) {
     await page.locator('#auth_password').fill(password);
     await page.locator('[data-auth-submit]').click();
     await expect(page).toHaveURL(/\/dashboard$/);
+    await waitForOfflineRuntime(page);
 }
 
 async function waitForOfflineRuntime(page) {
@@ -28,7 +29,6 @@ test.describe('Zazu installed PWA offline shell', () => {
         test.skip(testInfo.project.name !== 'chromium', 'Network-stall startup contract runs once; responsive viewports are covered separately.');
 
         await login(page);
-        await waitForOfflineRuntime(page);
         await page.evaluate(async () => {
             const state = window.ZazuOffline.getState();
             state.sync = { token: 'startup-readiness-test-token', device: { id: 999999 } };
@@ -177,7 +177,6 @@ test.describe('Zazu installed PWA offline shell', () => {
         test.skip(testInfo.project.name !== 'chromium', 'Installed-app resume reconnect contract runs once.');
 
         await login(page);
-        await waitForOfflineRuntime(page);
         await page.evaluate(async () => {
             await window.ZazuOffline.ready;
             const state = window.ZazuOffline.getState();
