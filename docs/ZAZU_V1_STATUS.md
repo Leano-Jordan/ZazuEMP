@@ -22,7 +22,7 @@
 - **Commercial reconciliation — SEEDED AUTOMATED-VERIFIED:** the accepted quote → invoice → deposit → final payment → actual cost → event profit path is covered by populated regression data. Live business-record reconciliation remains an operator acceptance task.
 - **Installation recovery — CI-VERIFIED / OPERATOR DRILL OPEN:** PostgreSQL/database/private-file recovery passes in CI. The controlled backup → restore → data/media/security verification drill on the intended installed target remains open.
 - **Physical offline acceptance — OPEN:** secure-origin installation on the actual Android device, cold launch with the PC/server unavailable, supported disconnected workflows, force-close/reopen persistence and reconnection must still be proven on-device.
-- **POPIA and legal/brand — OPEN:** operational privacy, retention and incident procedures require owner sign-off; Zazu name clearance is not claimed.
+- **POPIA operational controls — OPEN:** privacy, retention and incident procedures require owner sign-off. **Brand/name clearance is deferred by owner** and is not a current V1 engineering gate.
 
 **Release decision: NOT YET READY.** The bounded offline browser workflow and automated engineering gates are green. Physical device acceptance, the installed-target recovery drill, live commercial reconciliation and operational privacy/legal sign-off remain. No production deployment or live customer data was changed.
 
