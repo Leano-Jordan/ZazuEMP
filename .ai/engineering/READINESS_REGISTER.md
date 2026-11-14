@@ -2,12 +2,12 @@
 
 This entry supersedes the 2026-11-14 paused-offline checkpoint below where it conflicts with the owner's explicit resumption and newer exact-head evidence.
 
-- **Current repository/control head:** `aed83a4281daa8555e529db7912ff8969e7ba5a2` on `main`.
+- **Current repository/control head at this reconciliation:** `6f0ae26abaed0c84a964148962538b46c94841ae` on `main`.
 - **Application/test source:** `f9307b9dd477cc0cf6dd4f51abf8a818b53bae75`.
 - **Exact-head Laravel:** [43589965430](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/43589965430) — **496 passed, 1 skipped, 3,502 assertions**.
-- **Dedicated offline-browser acceptance:** **30 passed / 0 failed / 0 flaky** in the same run. The acceptance now covers first-launch priming of the supported customer/Work routes, offline customer/job creation, dashboard visibility, directory navigation, persistence and reconnection sync.
+- **Dedicated offline-browser acceptance:** **30 passed / 0 failed / 0 flaky** in the same run; separate Pixel 7 mobile-viewport acceptance: **1 passed**. The acceptance covers first-launch priming of the supported customer/Work routes, offline customer/job creation, dashboard visibility, directory navigation, persistence and reconnection sync. Physical Android acceptance remains open.
 - **PostgreSQL:** migrations, registration, database backup/restore and private-file recovery smoke: **PASS**.
-- **Quality/security:** Zazu quality, Composer security audit and secret scan [43589965437](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/43589965437): **PASS**. Push-on-main CodeQL [43589965413](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/43589965413): **PASS**.
+- **Quality/security:** Zazu quality, Composer security audit and secret scan [43590473956](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/43590473956): **PASS**. Push-on-main CodeQL [43590474076](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/43590474076): **PASS**.
 - **Offline work was explicitly resumed by the owner on 2026-11-14.** The bounded implementation now exposes pending customer/job records on the cached dashboard, links to the cached customer/Work directories and primes only the four currently supported device-local workflow routes. It is not full Laravel-route parity.
 - **Evidence maturity remains 71/100; no score uplift is claimed.** Offline continuity remains below release acceptance because secure-origin installation, physical Android cold-launch with the PC/server unavailable, force-close/reopen persistence and reconnection on the actual installed device are still unverified.
 - **Recovery:** tenant-scoped business `.zazu` export/restore and business CSV export are **IMPLEMENTED / AUTOMATED-VERIFIED**. Installation-wide PostgreSQL/database/private-file recovery is **CI-VERIFIED**. The controlled installed-target operator recovery drill remains **OPEN**.
