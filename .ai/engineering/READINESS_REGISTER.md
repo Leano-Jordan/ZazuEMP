@@ -1,3 +1,19 @@
+## Director reconciliation — 2026-11-14 (current V1 source and owner scope)
+
+This entry supersedes the 2026-11-13 checkpoint below where it conflicts with newer evidence or the owner's latest direction.
+
+- **Current repository/control head:** `6f5838cfe1babb1155f45a78a5f0841e30cd74c8` on `main`.
+- **Latest application/test source:** `62a551e97e48a2fa0045046f07742dfd9d817f43`. A direct GitHub compare confirms the 12 commits from that source baseline to current `main` contain only Director state, instructions, memory, deployment documentation and Windows launcher changes; no application, migration or test source changed.
+- **Exact-source Laravel workflow:** [43575869239](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/43575869239) — **496 passed, 1 skipped, 3,502 assertions**. PostgreSQL 16 migrations/registration/database + private-file backup/restore: **PASS**. Dedicated offline-browser acceptance: **28 passed**. Use the job log count (28); the earlier STATE summary's 29 was a reporting error and has been corrected.
+- **Current-head controls:** Zazu quality, Composer security audit and secret scan [43578628853](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/43578628853); Director Contract Lint [43578628791](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/43578628791); Director Health [43578628815](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/43578628815); Push-on-main / CodeQL [43578628140](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/43578628140): **PASS**.
+- **Windows LAN/HTTPS launcher:** [43578557436](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/43578557436) — **PASS** on launcher source `8fc403f2609f5e8d96300ffd668c907809fa9220`; subsequent current-head changes are non-runtime control/documentation changes.
+- **Evidence maturity remains 71/100**; no score uplift is claimed from launcher/control-plane work. Seeded commercial workflow automation remains passed; live owner business-record reconciliation is still a real-operator acceptance task.
+- **Owner runtime check still open:** pull current `main`, run `Start-Zazu-LAN.cmd`, and confirm the phone's rendered styling. Secure-origin installation/physical offline cold-launch and actual installed-target recovery remain unverified. Offline implementation is paused; do not modify service worker, IndexedDB, attachment queue, sync or PWA install paths.
+- **Branding and trademark clearance are deferred by the owner and are not an active engineering task or a reason to divert V1 work.** Do not perform brand research or artwork work unless explicitly requested later.
+- Keep V1 scope frozen. Do not create speculative new gates or reopen passed seeded commercial tests without a reproducible defect. No production deployment, customer data, database, or non-main branch changed.
+
+---
+
 ## Director reconciliation — 2026-11-13 (offline scope frozen)
 
 This entry supersedes the older 2026-11-11 execution snapshot below where it conflicts with newer verified evidence. The owner-directed V1 scope freeze remains binding.
