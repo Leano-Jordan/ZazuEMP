@@ -1094,7 +1094,7 @@ function setupZazuOfflineDirectoryViews() {
         register.querySelectorAll('[data-zazu-local-record="job"]').forEach(node => node.remove());
         const filter = new URLSearchParams(window.location.search).get('filter') || '';
         const jobs = (state?.jobs || []).filter(job => {
-            if (!job?.local_id || (filter && filter !== 'draft')) return false;
+            if (!job?.local_id || (filter && !['all', 'draft'].includes(filter))) return false;
             const serverId = job.server_id ?? job.id;
             return !serverId || !register.querySelector('[data-zazu-server-job-id="' + Number(serverId) + '"]');
         });
