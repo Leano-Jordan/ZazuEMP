@@ -211,4 +211,4 @@ jobs:
     - name: Run offline customer and Work acceptance on mobile viewport
       run: npm run test:e2e -- --project=chromium-mobile e2e/offline-work-creation.spec.js
     - name: Run phone-local attachment journey on mobile viewport
-      run: npm run test:e2e -- --project=chromium-mobile e2e/offline-attachment-sync.spec.js --grep "reconciles an offline-created Work attachment after its job receives a server ID"
+      run: npm run test:e2e -- --project=chromium-mobile e2e/offline-attachment-sync.spec.js --grep "operator creates an offline Work job, attaches a file from its directory row, then syncs it"
