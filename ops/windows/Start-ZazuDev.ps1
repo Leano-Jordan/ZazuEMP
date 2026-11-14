@@ -157,14 +157,26 @@ function Prepare-ZazuBuiltAssets {
     }
 
     foreach ($entry in $entries) {
-        $assetFile = $entry.Value.file
-        if ([string]::IsNullOrWhiteSpace($assetFile)) {
-            continue
+        $assetFiles = @()
+        if (-not [string]::IsNullOrWhiteSpace($entry.Value.file)) {
+            $assetFiles += $entry.Value.file
+        }
+        foreach ($cssFile in @($entry.Value.css)) {
+            if (-not [string]::IsNullOrWhiteSpace($cssFile)) {
+                $assetFiles += $cssFile
+            }
+        }
+        foreach ($importedAsset in @($entry.Value.assets)) {
+            if (-not [string]::IsNullOrWhiteSpace($importedAsset)) {
+                $assetFiles += $importedAsset
+            }
         }
 
-        $assetPath = Join-Path $buildDirectory ($assetFile -replace '/', [System.IO.Path]::DirectorySeparatorChar)
-        if (-not (Test-Path $assetPath -PathType Leaf)) {
-            throw "A compiled frontend asset referenced by the manifest is missing: $assetPath"
+        foreach ($assetFile in ($assetFiles | Select-Object -Unique)) {
+            $assetPath = Join-Path $buildDirectory ($assetFile -replace '/', [System.IO.Path]::DirectorySeparatorChar)
+            if (-not (Test-Path $assetPath -PathType Leaf)) {
+                throw "A compiled frontend asset referenced by the manifest is missing: $assetPath"
+            }
         }
     }
 
