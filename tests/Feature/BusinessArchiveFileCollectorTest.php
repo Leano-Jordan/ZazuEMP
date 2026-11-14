@@ -37,8 +37,6 @@ class BusinessArchiveFileCollectorTest extends TestCase
             } catch (RuntimeException $exception) {
                 $this->assertStringContainsString('file path is unsafe', $exception->getMessage());
             }
-        } finally {
-            // The collector must reject the path before attempting storage access.
         }
     }
 }
