@@ -18,20 +18,23 @@ test('real Zazu job form can create a job locally while disconnected', async ({ 
     const customerName = `Offline test customer ${runId}`;
     const jobName = `Offline catering job ${runId}`;
     await login(page);
-    await page.goto('/dashboard', { waitUntil: 'domcontentloaded' });
     await expect(page.getByRole('heading', { name: 'Dashboard' })).toBeVisible();
 
-    // Prime the authenticated directory routes before disconnecting. The
-    // test then verifies their cached shells can render the IndexedDB records.
-    await page.goto('/customers/create', { waitUntil: 'domcontentloaded' });
-    await expect(page.locator('form[data-zazu-offline-entity="customer"]')).toBeVisible();
-    await page.goto('/customers', { waitUntil: 'domcontentloaded' });
-    await expect(page.getByRole('heading', { name: 'Customers' })).toBeVisible();
-    await page.goto('/work', { waitUntil: 'domcontentloaded' });
-    await expect(page.getByRole('heading', { name: 'Event Operations' })).toBeVisible();
-
-    await page.goto('/work/create', { waitUntil: 'domcontentloaded' });
-    await expect(page.locator('#new-job-form')).toBeVisible();
+    // The installed app must prime the supported local creation routes from
+    // its first authenticated dashboard launch. Do not visit them online here:
+    // doing so would hide a broken automatic-prime path.
+    await page.waitForFunction(() => Boolean(navigator.serviceWorker?.controller));
+    await page.waitForFunction(async () => {
+        const names = await caches.keys();
+        const pageCacheName = names.find(name => /-user-\\d+-business-\\d+$/.test(name));
+        if (!pageCacheName) return false;
+        const cache = await caches.open(pageCacheName);
+        const [customerCreate, workCreate] = await Promise.all([
+            cache.match(new URL('/customers/create', window.location.origin)),
+            cache.match(new URL('/work/create', window.location.origin)),
+        ]);
+        return Boolean(customerCreate && workCreate);
+    }, null, { timeout: 20_000 });
 
     // Create the customer through Zazu's real customer form while offline.
     // This exercises the same form handler and durable queue used by operators.
