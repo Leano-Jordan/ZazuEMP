@@ -1,3 +1,18 @@
+## Director reconciliation — 2026-11-14 (exact-head offline V1)
+
+**Canonical repository:** `Leano-Jordan/ZazuEMP` · **branch:** `main` · **verified application/test head:** `d09fdbfbe4bdbb7cfaed9ca1ea125313910fa3e0`.
+
+- Laravel [43593454044](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/43593454044): **496 passed / 1 skipped / 3,510 assertions**.
+- Dedicated offline browser acceptance: **32 passed**; separate mobile-viewport customer/Work acceptance: **1 passed**; phone-local attachment journey on mobile viewport: **1 passed**.
+- PostgreSQL migration, registration, database backup/restore and private-file recovery: **PASS**.
+- Zazu quality, Composer security audit and secret scan [43593453976](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/43593453976): **PASS**. Push-on-main CodeQL [43593453848](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/43593453848): **PASS**. PHPMD [43593169089](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/43593169089): **PASS**.
+- The focused offline CI now includes PWA shell, offline session transition, Work attachment sync and offline customer/Work creation. Service-worker page priming has an explicit completion acknowledgement; the offline test waits for full priming before disconnecting.
+- Pending local customers/jobs are visible from the cached dashboard, with links to the cached Customers and Work directories. The supported primed routes remain limited to `/customers`, `/customers/create`, `/work` and `/work/create`. This is not full application offline parity.
+- **Release disposition: NOT READY.** Physical Android installed-app cold launch/restart/reconnect, installed-target recovery drill, live commercial-record reconciliation and POPIA operational sign-off remain open. Brand/name clearance is deferred by owner and is not an active engineering target.
+- No production deployment or live customer data was changed.
+
+---
+
 ## Director reconciliation — 2026-11-14 (V1 source and offline acceptance)
 
 **Canonical repository:** `Leano-Jordan/ZazuEMP` · **branch:** `main` · **current control/workflow head:** `652d4d58979ce7016f03e6318ffb5a6944bbe184` · **application/test head:** `f9307b9dd477cc0cf6dd4f51abf8a818b53bae75`.
