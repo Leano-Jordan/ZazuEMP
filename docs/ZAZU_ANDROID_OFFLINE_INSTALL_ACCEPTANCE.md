@@ -59,22 +59,39 @@ If Zazu displays **Offline installation unavailable from this address** or **Zaz
 
 ## Required disconnected acceptance
 
-Keep the phone on the same Wi-Fi network. Stop the PC-hosted app using:
+Run these as two separate checks. The first isolates loss of the PC host; the second proves the installed app can operate without any network.
+
+### A. PC host unavailable, phone still on Wi-Fi
+
+1. Keep the phone connected to the same private Wi-Fi used for installation.
+2. Stop the PC-hosted app and Caddy proxy:
 
 ```text
 Stop-Zazu-LAN-HTTPS.cmd
 ```
 
-Then test from the installed Zazu icon:
+3. Launch Zazu from the installed app icon, not a remembered browser tab.
+4. Verify the cached dashboard opens and the device-local workspace shows pending customer/job records.
+5. Open the cached Customers and Work directories. Confirm locally saved records remain visible.
+6. Create one supported customer or Work record and confirm it is visibly pending on the phone.
 
-- The app opens to the cached dashboard rather than a browser network error.
-- Previously primed navigation pages open from the device cache.
-- The offline workspace loads its locally stored business records.
-- A supported offline Work/job change can be made and is visibly pending.
-- A locally selected attachment remains available after a full browser/app restart.
-- Restart the PC service with `Start-Zazu-LAN-HTTPS.cmd`; queued work synchronizes without duplication when connectivity returns.
+### B. Fully disconnected, including cold launch
 
-Record each result separately. A cached dashboard alone is not a pass for offline workflows or attachments.
+1. Leave the PC host and Caddy proxy stopped.
+2. Turn off Wi-Fi and mobile data on the phone.
+3. Force-close Zazu/Chrome, then launch Zazu again from the installed app icon.
+4. Verify the dashboard, Customers and Work directories open without network access.
+5. Create a supported customer and Work record. Reload, force-close and reopen; confirm the records remain visible and pending.
+6. Attach a small test file to a locally created Work record. Confirm the attachment remains available after reload and force-close/reopen.
+
+### C. Reconnect and reconcile
+
+1. Restore Wi-Fi and mobile data.
+2. Start the PC host and HTTPS proxy with `Start-Zazu-LAN-HTTPS.cmd`.
+3. Open Zazu and verify queued customers, Work records and attachments synchronize exactly once.
+4. Confirm the server-side records and attachment bytes match the phone's local working set.
+
+Record host-loss, fully disconnected, restart and reconnect results separately, including device/browser/OS, build/commit and installation origin. A cached dashboard alone is not a pass for offline workflows or attachments.
 
 ## What this route does not prove
 
