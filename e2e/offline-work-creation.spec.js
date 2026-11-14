@@ -26,8 +26,13 @@ test('real Zazu job form can create a job locally while disconnected', async ({ 
     await page.waitForFunction(() => Boolean(navigator.serviceWorker?.controller));
     await page.waitForFunction(async () => {
         const names = await caches.keys();
-        const pageCacheName = names.find(name => name.includes('-user-') && name.includes('-business-'));
-        if (!pageCacheName) return false;
+        const staticName = names.find(name => /^zazu-static-v\\d+$/.test(name));
+        if (!staticName) return false;
+        const contextResponse = await (await caches.open(staticName)).match('/__zazu-active-context__');
+        if (!contextResponse) return false;
+        const context = await contextResponse.json();
+        const pageCacheName = staticName + '-user-' + context.user_id + '-business-' + context.business_id;
+        if (!names.includes(pageCacheName)) return false;
         const cache = await caches.open(pageCacheName);
         const requiredRoutes = ['/customers', '/customers/create', '/work', '/work/create'];
         const cachedRoutes = await Promise.all(requiredRoutes.map(path =>
@@ -41,6 +46,28 @@ test('real Zazu job form can create a job locally while disconnected', async ({ 
         return customerCreateHtml.includes('data-zazu-offline-entity="customer"')
             && workCreateHtml.includes('data-zazu-offline-entity="job"');
     }, null, { timeout: 20_000 });
+
+    const primedCacheSnapshot = await page.evaluate(async () => {
+        const names = await caches.keys();
+        const staticName = names.find(name => /^zazu-static-v\\d+$/.test(name));
+        const contextResponse = staticName
+            ? await (await caches.open(staticName)).match('/__zazu-active-context__')
+            : null;
+        const context = contextResponse ? await contextResponse.json() : null;
+        const pageCacheName = context && staticName
+            ? staticName + '-user-' + context.user_id + '-business-' + context.business_id
+            : null;
+        const cache = pageCacheName ? await caches.open(pageCacheName) : null;
+        const routes = ['/customers', '/customers/create', '/work', '/work/create'];
+        const cached = cache
+            ? await Promise.all(routes.map(async path => {
+                const response = await cache.match(new URL(path, window.location.origin));
+                return { path, cached: Boolean(response) };
+            }))
+            : [];
+        return { activeContext: context, pageCacheName, cached };
+    });
+    console.log('OFFLINE_ROUTE_CACHE_BEFORE_DISCONNECT', JSON.stringify(primedCacheSnapshot));
 
     // Create the customer through Zazu's real customer form while offline.
     // This exercises the same form handler and durable queue used by operators.
