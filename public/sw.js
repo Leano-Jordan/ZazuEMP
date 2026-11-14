@@ -446,6 +446,22 @@ async function fetchWithTimeout(request, timeoutMs = 4000) {
     }
 }
 
+async function canReachAppOrigin(timeoutMs = 2500) {
+    const healthRequest = new Request(new URL('/up', self.location.origin), {
+        method: 'HEAD',
+        credentials: 'include',
+        cache: 'no-store',
+        headers: { 'X-Zazu-Connectivity-Probe': '1' },
+    });
+
+    try {
+        const response = await fetchWithTimeout(healthRequest, timeoutMs);
+        return response.status < 500;
+    } catch {
+        return false;
+    }
+}
+
 self.addEventListener('fetch', (event) => {
     const request = event.request;
     const url = new URL(request.url);
@@ -478,15 +494,18 @@ self.addEventListener('fetch', (event) => {
         }
 
         event.respondWith((async () => {
-            // When the browser reports no network, do not spend four seconds
-            // attempting the unreachable Laravel host. Resolve the authenticated
-            // page from its user/business cache immediately instead.
-            if (self.navigator?.onLine === false) {
+            // A browser can report online while the Zazu host is unreachable.
+            // Probe the lightweight Laravel health route first so the offline
+            // workspace is selected quickly when the host is genuinely absent.
+            if (self.navigator?.onLine === false || !(await canReachAppOrigin())) {
                 return cachedAppPage(request);
             }
 
             try {
-                const response = await fetchWithTimeout(request);
+                // Health is reachable, so allow the real page enough time to
+                // render. A four-second page timeout could replace fresh content
+                // with a stale cached directory during normal server load.
+                const response = await fetchWithTimeout(request, 10000);
                 // A reachable host can still be temporarily unhealthy (for
                 // example, Laravel returning 503 during restart). Keep the
                 // authenticated local workspace usable for transient 5xx

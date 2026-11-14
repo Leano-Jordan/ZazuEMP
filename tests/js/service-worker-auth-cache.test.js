@@ -418,6 +418,55 @@ test('logout clears a context that was primed immediately before the session end
     );
 });
 
+test('a reachable origin returns fresh page HTML instead of an older cached snapshot', async () => {
+    const requested = [];
+    let directoryVersion = 'Primed customer directory';
+    const worker = bootWorker(async (request) => {
+        const url = new URL(request.url);
+        requested.push({ path: url.pathname, method: request.method });
+
+        if (url.pathname === '/up') {
+            return new MockResponse('healthy');
+        }
+
+        if (url.pathname === '/customers') {
+            const version = directoryVersion;
+            return new MockResponse(
+                '<!doctype html><html><body data-zazu-user-id="41" data-zazu-business-id="17"><main>' +
+                version + '</main></body></html>',
+                { headers: { 'content-type': 'text/html; charset=utf-8' } },
+            );
+        }
+
+        return new MockResponse('online');
+    });
+
+    await worker.dispatchMessage({
+        type: 'prime-pages',
+        userId: '41',
+        businessId: '17',
+        routes: ['/customers'],
+    });
+
+    directoryVersion = 'Fresh customer after save';
+    const navigation = worker.dispatchFetch(new worker.Request('/customers', {
+        method: 'GET',
+        mode: 'navigate',
+        headers: { accept: 'text/html' },
+    }));
+
+    const response = await navigation.response;
+    assert.equal(response.status, 200);
+    assert.match(await response.text(), /Fresh customer after save/);
+    await navigation.finished();
+
+    const navigationRequests = requested.slice(-2);
+    assert.deepEqual(navigationRequests, [
+        { path: '/up', method: 'HEAD' },
+        { path: '/customers', method: 'GET' },
+    ]);
+});
+
 test('a cached authenticated dashboard remains available when the host returns a transient server error', async () => {
     let hostStatus = 200;
     const worker = bootWorker(async () => new MockResponse(

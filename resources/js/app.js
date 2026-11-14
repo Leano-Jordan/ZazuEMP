@@ -953,7 +953,7 @@ window.addEventListener('popstate', restoreZazuAuthRoute);
 
 async function canReachZazuOrigin() {
     const controller = new AbortController();
-    const timeout = window.setTimeout(() => controller.abort(), 1200);
+    const timeout = window.setTimeout(() => controller.abort(), 3000);
     const healthUrl = new URL('/up', window.location.origin);
 
     try {

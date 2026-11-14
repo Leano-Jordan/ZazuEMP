@@ -233,8 +233,19 @@ test('an existing customer can be edited locally while disconnected and synced o
     // Create this test's own server-backed record instead of depending on
     // whichever demo customer happens to be present in the seeded database.
     await page.goto('/customers/create', { waitUntil: 'domcontentloaded' });
+    await page.evaluate(() => window.ZazuOffline.ready);
     const createForm = page.locator('form[data-zazu-offline-entity="customer"]');
     await expect(createForm).toBeVisible();
+    expect(await page.evaluate(() => navigator.onLine)).toBe(true);
+    const reachableStatus = await page.evaluate(async () => {
+        const response = await fetch('/up', {
+            method: 'HEAD',
+            credentials: 'same-origin',
+            cache: 'no-store',
+        });
+        return response.status;
+    });
+    expect(reachableStatus).toBe(200);
     await createForm.locator('input[name="name"]').fill(customerName);
     await createForm.locator('input[name="primary_contact_name"]').fill('Offline edit contact');
     await createForm.locator('input[name="primary_contact_phone"]').fill('0123456789');
@@ -252,9 +263,9 @@ test('an existing customer can be edited locally while disconnected and synced o
     });
 
     await createForm.getByRole('button', { name: 'Save customer' }).click();
+    expect(healthProbeStatuses, 'the form connectivity probe must reach Laravel /up').toContain(200);
+    expect(customerCreateStatuses, 'the customer fixture must be POSTed to Laravel').toContain(302);
     await expect(page).toHaveURL(/\/customers$/);
-    expect(healthProbeStatuses).toContain(200);
-    expect(customerCreateStatuses).toContain(302);
 
     // Verify persistence directly against Laravel, then force a fresh directory
     // navigation. This distinguishes a successful DB write from a stale cached
