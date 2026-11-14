@@ -326,7 +326,7 @@ class BusinessArchiveTest extends TestCase
         $this->seedArchiveRecords($source);
 
         $archive = app(BusinessArchiveService::class)->download($source);
-        $zip = new \\ZipArchive();
+        $zip = new \ZipArchive();
         $this->assertTrue($zip->open($archive) === true);
         $manifest = json_decode((string) $zip->getFromName('manifest.json'), true, 512, JSON_THROW_ON_ERROR);
         $attachmentIndex = array_search('event_attachments', array_column($manifest['files'], 'table'), true);
@@ -347,7 +347,7 @@ class BusinessArchiveTest extends TestCase
             try {
                 app(BusinessArchiveService::class)->restore($archive, $target);
                 $this->fail('Inline file bytes in the manifest must be rejected.');
-            } catch (\\RuntimeException $exception) {
+            } catch (\RuntimeException $exception) {
                 $this->assertStringContainsString('inline payload bytes', $exception->getMessage());
             }
         } finally {
