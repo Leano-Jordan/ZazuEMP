@@ -1,12 +1,12 @@
 ## Director reconciliation — 2026-11-14 (V1 source and offline acceptance)
 
-**Canonical repository:** `Leano-Jordan/ZazuEMP` · **branch:** `main` · **application/test head:** `f9307b9dd477cc0cf6dd4f51abf8a818b53bae75`.
+**Canonical repository:** `Leano-Jordan/ZazuEMP` · **branch:** `main` · **current control/workflow head:** `6f0ae26abaed0c84a964148962538b46c94841ae` · **application/test head:** `f9307b9dd477cc0cf6dd4f51abf8a818b53bae75`.
 
 - Laravel [run 43589965430](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/43589965430): **496 passed / 1 skipped / 3,502 assertions**.
-- Dedicated offline-browser acceptance in the same run: **30 passed / 0 failed / 0 flaky**.
+- Dedicated offline-browser acceptance in the same run: **30 passed / 0 failed / 0 flaky** on desktop Chromium; separate Pixel 7 mobile-viewport acceptance: **1 passed**.
 - PostgreSQL 16 migrations, business registration, database backup/restore and private-file recovery smoke: **PASS**.
-- Zazu quality, Composer security audit and secret scan [run 43589965437](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/43589965437): **PASS**.
-- Push-on-main CodeQL [run 43589965413](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/43589965413): **PASS**.
+- Zazu quality, Composer security audit and secret scan [run 43590473956](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/43590473956): **PASS**.
+- Director Contract Lint [run 43590474028](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/43590474028), Director Health [run 43590474436](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/43590474436) and Push-on-main CodeQL [run 43590474076](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/43590474076): **PASS**.
 
 ### Offline customer and Work slice
 
