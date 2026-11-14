@@ -387,3 +387,14 @@ Backup compatibility coverage was extended after the initial integrity note: the
 - The offline workflow matrix is recorded in `docs/ZAZU_OFFLINE_FIRST_ARCHITECTURE.md`. It makes the boundary explicit: only Customers and Work have visible local directory renderers today; other domain mutation handlers do not imply complete local read/navigation parity.
 - **Release remains NOT READY.** Physical Android cold launch/restart/reconnect, installed-target recovery drill, live business-record reconciliation and POPIA operational sign-off remain open. This correction does not resolve the documented cached-dashboard fallback architecture.
 - No production deployment, customer data, live database or non-main branch was changed.
+
+## Director reconciliation — 2026-11-14 (device-local quote summary)
+
+- Added a Quotes section to the existing dashboard device-local workspace. It renders quote records already present in the business-scoped IndexedDB state, shows the related Work name where available, and displays the quote's sync state. It does not pretend to provide a complete quote directory or detail screen.
+- The offline workspace now becomes visible when there is pending customer, Work **or quote** data. A quote summary therefore remains visible even when no customer/job mutation is currently pending.
+- Added Playwright coverage for a locally stored draft quote linked to an already-synchronized local job. The test checks the draft label, parent Work name, currency and waiting-to-sync state.
+- Application/test evidence: source/test commit `126efb6b4d1f832cc1e7f67db51e0124a962b5f7`, Laravel workflow [43634683863](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/43634683863): **496 passed, 1 skipped, 3,511 assertions**; PostgreSQL migration/registration/backup/private-file recovery: **PASS**; offline browser: **35 passed**; mobile customer/Work: **4 passed**; phone-local attachment: **1 passed**.
+- The same run confirms the new local quote summary and synced/pending job-label regression. Exact compiled app bundle from repeated CI builds: `assets/app-DILCeBlI.js`.
+- Manifest alignment commit: `45d5929e615a480b1983ccd53c9892cd10b5fea2`. The latest application code/test changes are unchanged from the verified source/test commit; manifest-only follow-up is undergoing its own full workflow verification.
+- **Scope boundary:** Customers and Work remain the only device-local directory renderers. Quotes now have a dashboard summary only; all other entity collections remain local data/queued mutation foundations without complete local directory/detail parity.
+- V1 remains **NOT READY** pending physical Android acceptance, installed-target recovery drill, live commercial-record reconciliation and POPIA operational sign-off. No readiness score uplift is claimed.
