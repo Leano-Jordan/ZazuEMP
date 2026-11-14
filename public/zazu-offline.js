@@ -246,33 +246,34 @@
         const normalizeList = (items) => (items || []).map(normalizeRecord);
 
         state.business = bootstrap.business || state.business;
-        state.catalogue = normalizeList(bootstrap.catalogue ?? bootstrap.capabilities);
-        state.suppliers = normalizeList(bootstrap.suppliers);
-        state.purchase_orders = (bootstrap.purchase_orders || []).map((item) => ({
+        const has = (key) => Object.prototype.hasOwnProperty.call(bootstrap, key);
+        if (has('catalogue') || has('capabilities')) state.catalogue = normalizeList(bootstrap.catalogue ?? bootstrap.capabilities);
+        if (has('suppliers')) state.suppliers = normalizeList(bootstrap.suppliers);
+        if (has('purchase_orders')) state.purchase_orders = bootstrap.purchase_orders.map((item) => ({
             ...normalizeRecord(item),
             items: normalizeList(item.items),
         }));
-        state.invoices = (bootstrap.invoices || []).map((item) => ({
+        if (has('invoices')) state.invoices = bootstrap.invoices.map((item) => ({
             ...normalizeRecord(item),
             payments: normalizeList(item.payments),
         }));
-        state.expenses = normalizeList(bootstrap.expenses);
-        state.inventory_items = (bootstrap.inventory_items || []).map((item) => ({
+        if (has('expenses')) state.expenses = normalizeList(bootstrap.expenses);
+        if (has('inventory_items')) state.inventory_items = bootstrap.inventory_items.map((item) => ({
             ...normalizeRecord(item),
             movements: normalizeList(item.record?.movements ?? item.movements),
         }));
-        state.assets = (bootstrap.assets || []).map((item) => ({
+        if (has('assets')) state.assets = bootstrap.assets.map((item) => ({
             ...normalizeRecord(item),
             allocations: normalizeList(item.record?.allocations ?? item.allocations),
         }));
-        state.costs = normalizeList(bootstrap.costs);
+        if (has('costs')) state.costs = normalizeList(bootstrap.costs);
 
         // Current Laravel bootstrap uses top-level customers/events/quotes.
-        // The selected envelope remains supported for older and scoped payloads.
-        state.customers = normalizeList(bootstrap.customers);
-        state.jobs = normalizeList(bootstrap.events ?? bootstrap.jobs);
-        state.quotes = normalizeList(bootstrap.quotes);
-        state.preparations = normalizeList(bootstrap.preparations);
+        // Partial registration responses must not erase existing local data.
+        if (has('customers')) state.customers = normalizeList(bootstrap.customers);
+        if (has('events') || has('jobs')) state.jobs = normalizeList(bootstrap.events ?? bootstrap.jobs);
+        if (has('quotes')) state.quotes = normalizeList(bootstrap.quotes);
+        if (has('preparations')) state.preparations = normalizeList(bootstrap.preparations);
 
         const selected = bootstrap.selected || [];
         const targets = {
