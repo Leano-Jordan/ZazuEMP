@@ -1171,3 +1171,13 @@ Found and corrected a data-recovery blocker in `ZazuBackupCommand::snapshotMysql
 - **Verification boundary:** no workflow run or local build was available/confirmed for `51da528` during this review. The last recorded automated application/test evidence remains the exact source head `d09fdbfbe4bdbb7cfaed9ca1ea125313910fa3e` and run `43593454044`. Do not transfer that PASS status to `51da528`.
 - No runtime PHP, offline engine, database, customer data, deployment, or branch was changed in this reconciliation.
 - Release disposition remains **NOT READY**: physical installed-device acceptance, intended-installation recovery drill, live commercial-record reconciliation, and POPIA operational sign-off remain open. Brand/name clearance remains deferred by owner.
+
+## 2026-11-14 — Offline workspace sync-state correction and exact-head verification
+
+- Current source/control head: `7e2531583090ce2bfab2acea71dbfe0e7f3951f0` on `main`.
+- Fixed a dashboard offline-workspace display defect: synchronized local jobs now show their server reference and `Synced`, instead of being incorrectly presented as `Pending sync`. Added an E2E regression for a synced job coexisting with pending local work.
+- Exact-head Laravel run [43634136062](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/43634136062): **PASS** — 496 passed, 1 skipped, 3,511 assertions. PostgreSQL migration/registration/backup/private-file recovery: **PASS**.
+- Offline browser acceptance: **34 passed**; mobile customer/Work acceptance: **3 passed**; phone-local attachment acceptance: **1 passed**.
+- Application quality, Composer security audit, secret scan, Push-on-main/CodeQL, Director Health and build/manifest verification: **PASS**. SonarCloud skipped; not counted.
+- The V1 offline workflow matrix is now documented in `docs/ZAZU_OFFLINE_FIRST_ARCHITECTURE.md`. The bounded local read surface remains Customers and Work; remaining entity handlers are not claimed as full local directories.
+- No readiness score uplift. V1 remains **NOT READY** pending physical Android acceptance, installed-target recovery, live commercial-record reconciliation and POPIA operational sign-off.
