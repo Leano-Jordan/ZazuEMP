@@ -9,6 +9,27 @@
 **Active development branch:** main
 **Context updated:** 2026-11-11
 
+## Owner V1 shipping mandate — 2026-11-14 (READ FIRST)
+
+**Primary objective: get a working Zazu V1 into the hands of the first real businesses.** V1 is the practical first release, not an enterprise-scale perfection exercise. The owner needs a usable product to demonstrate, generate interest and begin earning revenue; that traction funds stronger equipment and V2 investment.
+
+Mandatory operating rules for Director/Jarvis and every specialist:
+
+- Build and finish the agreed V1 customer workflows. Do not optimise for thousands of customers or hypothetical future scale before first-customer usability.
+- Define acceptance criteria before work. When those criteria are met and evidenced, award **5/5 and CLOSE** the gate. Do not keep it at 4/5 because of optional refinements or imagined edge cases.
+- Distinguish **DONE**, **ACCEPTED LIMITATION**, and **BLOCKED**. Only a reproducible defect in an agreed V1 workflow, a demonstrated security/privacy/data-integrity failure, or an explicit owner-approved requirement may hold release.
+- Do not reopen a closed gate without new, reproducible evidence. Do not repeat an investigation or test unless new evidence or a changed input makes it useful.
+- No engineering loops, perfectionism, scope creep, speculative hardening or cosmetic/documentation-only work presented as product progress.
+- Work in meaningful batches, fix related verified defects together, run the relevant verification once after the batch, and move to the next V1 gate.
+- **Offline work is paused** unless the owner explicitly resumes it or a separate critical regression is demonstrated. Do not return to the offline subsystem as a default task.
+- Work directly on canonical `main`. Never create feature/development branches. Preserve `deploy/render-staging` as the deployment-only branch.
+- Keep updates compact and outcome-based. Execute instead of repeatedly asking for permission or narrating plans. Never claim unverified progress.
+- The finish line is a dependable, demonstrable first release with known limitations recorded—not perfection. V2 hardening belongs after real usage and available resources justify it.
+
+This mandate is the first operating instruction. Repository state remains the source of current facts, but no stale historical note or scorecard loop may override this owner direction.
+
+---
+
 ## Financial communication and currency standard — mandatory
 
 - Primary currency for Zazu EMP and Rosscore Labs financial work is **South African rand (ZAR / R)**.
