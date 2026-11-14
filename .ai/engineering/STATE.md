@@ -1,3 +1,17 @@
+## 2026-11-14 — LAN app styling / Vite asset delivery correction
+
+- **Target:** stop the phone/browser LAN entrypoint from rendering the Laravel shell without CSS when `public/hot` points to a stopped or phone-unreachable Vite server.
+- `ops/windows/Start-ZazuDev.ps1` now has a bounded built-assets preparation step for `-Lan` or `-BuiltAssetsOnly`: remove the runtime `public/hot` marker, require/produce `public/build/manifest.json`, build locally only when `node_modules` is already present, parse the manifest, and verify each referenced output file before Laravel starts.
+- `Start-Zazu-LAN.cmd` reaches this automatically through its existing `-Lan` switch. `Start-ZazuLanHttps.ps1` explicitly passes `BuiltAssetsOnly = $true` so HTTPS uses same-origin compiled assets. `Start-Zazu-Dev.cmd` remains unchanged for normal loopback Vite/HMR work.
+- Updated `docs/LOCAL_PC_HOST_DEPLOYMENT.md` to document automatic compiled-asset behaviour and reserve explicit Vite HMR settings for live LAN development.
+- Added a Windows Actions contract check covering stale-marker removal, manifest/build validation, LAN and HTTPS launcher selection, and preservation of loopback development behaviour.
+- Changed commits: `8d7dcb82e8d6d17f9a70b1df4e91d8eb33f792d1` (host launcher); `bff43d75edc7a2fd711ad3a98dd753312e018d23` (HTTPS launcher); `7e6a491cee69ca5dcc2c36c4f9e4a4db9f2d279a` (deployment guide); `50a4695cba7a2d5f7af0d37b2fcb41b6dfc5c8e3` (Windows validation); `e86a5db4f6e1b82393c07f8c1799268e00e593c5` (corrected validation assertion).
+- Exact-head checks on `e86a5db4f6e1b82393c07f8c1799268e00e593c5`: Windows Ops [43578259181](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/43578259181), Zazu Quality [43578259182](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/43578259182), Director Contract Lint [43578259174](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/43578259174), Director Health [43578259177](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/43578259177), and Push on main [43578258703](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/43578258703): **PASS**.
+- First Windows contract run failed only because the new static assertion expected a literal combined path where the script correctly uses nested `Join-Path` calls. The assertion was corrected; the exact-head Windows Ops run then passed all steps, including PowerShell parsing and existing HTTPS cleanup checks. No product code was changed to appease a failing test.
+- Verification boundary: source and Windows CI pass. The owner PC/phone has not yet run the updated LAN launcher, so rendered CSS on the actual phone remains **OWNER RUNTIME CHECK REQUIRED**. The concrete owner action is to pull latest `main`, run `Start-Zazu-LAN.cmd`, then reload the phone URL. Offline engineering remains paused.
+
+---
+
 ## 2026-11-14 — Owner V1 shipping mandate and current operating state (AUTHORITATIVE)
 
 This entry supersedes any lower historical/current-looking note that directs work back into offline engineering or keeps V1 gates open for speculative refinement.
