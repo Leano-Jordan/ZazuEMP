@@ -1305,10 +1305,64 @@ function setupZazuOfflineDirectoryViews() {
         });
     };
 
+    const renderQuotes = (state) => {
+        const directory = document.querySelector('[data-zazu-local-quotes]');
+        if (!directory) return;
+
+        directory.querySelectorAll('[data-zazu-local-record="quote"]').forEach(node => node.remove());
+        const quotes = state?.quotes || [];
+        const empty = directory.querySelector('.zazu-empty');
+
+        for (const quote of quotes) {
+            if (!quote?.local_id) continue;
+
+            const serverId = quote.server_id ?? quote.id;
+            const job = (state?.jobs || []).find(item =>
+                (quote.event_local_id && item.local_id === quote.event_local_id)
+                || (quote.event_id && Number(item.id ?? item.server_id) === Number(quote.event_id))
+            );
+            const row = document.createElement('div');
+            row.className = 'zazu-list-item';
+            row.dataset.zazuLocalRecord = 'quote';
+
+            const identity = document.createElement('div');
+            identity.className = 'zazu-row-with-avatar min-w-0 flex-1';
+            const marker = text('span', 'zazu-avatar', 'Q');
+            marker.setAttribute('aria-hidden', 'true');
+
+            const main = document.createElement('div');
+            main.className = 'zazu-list-main';
+            main.append(
+                text('div', 'zazu-list-title', quote.reference || (serverId ? 'Quote #' + serverId : 'Draft quote')),
+                text('div', 'zazu-list-meta', [
+                    quote.event_name || job?.name || 'Work not recorded on this device',
+                    String(quote.status || 'draft').replace(/_/g, ' '),
+                    quote.currency || state?.business?.currency || 'ZAR',
+                ].join(' · '))
+            );
+            identity.append(marker, main);
+
+            const sync = document.createElement('div');
+            sync.className = 'zazu-action-group';
+            const syncStatus = localSyncStatus(state, 'quote', quote.local_id, serverId);
+            const chip = text('span', 'zazu-chip zazu-chip-neutral', syncStatus.label);
+            chip.title = syncStatus.title;
+            chip.setAttribute('aria-label', syncStatus.label + '. ' + syncStatus.title);
+            sync.append(chip);
+
+            row.append(identity, sync);
+            if (empty?.parentNode === directory) directory.insertBefore(row, empty);
+            else directory.append(row);
+        }
+
+        if (empty) empty.hidden = quotes.length > 0;
+    };
+
     const render = () => {
         const state = window.ZazuOffline.getState();
         renderCustomers(state);
         renderJobs(state);
+        renderQuotes(state);
         const workspace = document.querySelector('[data-zazu-offline-workspace]');
         if (workspace) {
             const hasPendingCustomers = (state?.customers || []).some(customer =>
@@ -1317,7 +1371,10 @@ function setupZazuOfflineDirectoryViews() {
             const hasPendingJobs = (state?.jobs || []).some(job =>
                 job?.local_id && !(job.server_id ?? job.id)
             );
-            workspace.hidden = !hasPendingCustomers && !hasPendingJobs;
+            const hasPendingQuotes = (state?.quotes || []).some(quote =>
+                quote?.local_id && !(quote.server_id ?? quote.id)
+            );
+            workspace.hidden = !hasPendingCustomers && !hasPendingJobs && !hasPendingQuotes;
         }
         refreshLocalAttachmentLists();
     };
