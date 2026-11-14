@@ -458,7 +458,7 @@ test.describe('Zazu installed PWA offline shell', () => {
         const dialog = page.waitForEvent('dialog');
         await page.getByRole('button', { name: 'Save customer' }).click();
         const alert = await dialog;
-        expect(alert.message()).toContain('Customer profile photos need a connection');
+        expect(alert.message()).toContain('Customer profile photo changes need a connection');
         await alert.accept();
 
         await expect(page.getByRole('button', { name: 'Save customer' })).toBeEnabled();
