@@ -1,3 +1,17 @@
+## Director reconciliation — 2026-11-14 (latest exact-head CI)
+
+**Canonical branch:** `main` · **verified source/test head:** `d09fdbfbe4bdbb7cfaed9ca1ea125313910fa3e0`.
+
+- Laravel [43593454044](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/43593454044): **PASS** — 496 passed / 1 skipped / 3,510 assertions.
+- PostgreSQL migrations, registration, database backup/restore and private-file recovery: **PASS**.
+- Dedicated offline browser acceptance: **32 passed**. Separate mobile-viewport customer/Work acceptance and phone-local attachment journey: **PASS**.
+- Zazu quality/security audit [43593453976](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/43593453976), PHPMD [43593169089](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/43593169089), and Push-on-main CodeQL [43593453848](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/43593453848): **PASS**.
+- The focused offline CI includes session-transition acceptance and waits for the service worker's explicit page-priming completion acknowledgement before disconnecting.
+- Automated checks do not close physical Android cold-launch/restart/reconnect, the intended-installation recovery drill, live commercial-record reconciliation or POPIA operational sign-off.
+- **Release disposition: NOT READY.** Branding/name clearance remains deferred by owner; no production deployment or live business data was changed.
+
+---
+
 ## Director reconciliation — 2026-11-14 (latest exact-head verification)
 
 **Canonical branch:** `main`  
