@@ -58,6 +58,44 @@ jobs:
             Write-Host "PASS: $($script.Name)"
           }
 
+      - name: Verify LAN launchers use compiled frontend assets
+        shell: pwsh
+        run: |
+          $hostLauncher = Get-Content 'ops/windows/Start-ZazuDev.ps1' -Raw
+          $httpsLauncher = Get-Content 'ops/windows/Start-ZazuLanHttps.ps1' -Raw
+          $lanWrapper = Get-Content 'Start-Zazu-LAN.cmd' -Raw
+          $devWrapper = Get-Content 'Start-Zazu-Dev.cmd' -Raw
+
+          if ($hostLauncher -notmatch '\[switch\]\$BuiltAssetsOnly') {
+            throw 'The shared host launcher does not expose its compiled-assets mode.'
+          }
+          foreach ($required in @(
+            'function Prepare-ZazuBuiltAssets',
+            'public\\hot',
+            'public\\build\\manifest.json',
+            'Get-Command npm\.cmd',
+            'run build',
+            'ConvertFrom-Json',
+            'Compiled CSS/JavaScript manifest and referenced assets are ready'
+          )) {
+            if ($hostLauncher -notmatch $required) {
+              throw "Compiled-assets startup contract is missing: $required"
+            }
+          }
+          if ($hostLauncher -notmatch '(?s)if \(\(\$Lan -or \$BuiltAssetsOnly\) -and -not \$Stop\)\s*\{\s*Prepare-ZazuBuiltAssets\s*\}') {
+            throw 'LAN and explicit built-assets startup must validate the compiled bundle before launching Laravel.'
+          }
+          if ($httpsLauncher -notmatch 'BuiltAssetsOnly = \$true') {
+            throw 'The LAN HTTPS launcher must force the compiled-assets path.'
+          }
+          if ($lanWrapper -notmatch 'Start-ZazuDev\.ps1.*-Lan') {
+            throw 'The plain LAN wrapper must use the shared LAN-safe startup path.'
+          }
+          if ($devWrapper -notmatch 'Start-ZazuDev\.ps1' -or $devWrapper -match 'BuiltAssetsOnly') {
+            throw 'Loopback development must retain the normal Vite development workflow.'
+          }
+          Write-Host 'PASS: LAN/HTTPS launchers use verified same-origin compiled assets; loopback development remains unchanged.'
+
       - name: Verify LAN HTTPS command wrappers
         shell: pwsh
         run: |
