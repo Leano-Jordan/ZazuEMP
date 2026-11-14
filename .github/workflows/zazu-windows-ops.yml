@@ -87,6 +87,12 @@ jobs:
           if ($hostLauncher -notmatch '(?s)if \(\(\$Lan -or \$BuiltAssetsOnly\) -and -not \$Stop\)\s*\{\s*Prepare-ZazuBuiltAssets\s*\}') {
             throw 'LAN and explicit built-assets startup must validate the compiled bundle before launching Laravel.'
           }
+          if ($hostLauncher -match '\[string\]\$ProjectPath\s*=.*\$PSScriptRoot') {
+            throw 'Project root must not be resolved in the parameter default expression.'
+          }
+          if ($hostLauncher -notmatch '(?s)if \(\[string\]::IsNullOrWhiteSpace\(\$ProjectPath\)\)\s*\{\s*\$scriptDirectory = Split-Path -Parent \$PSCommandPath\s*\$ProjectPath = \(Resolve-Path \(Join-Path \$scriptDirectory') {
+            throw 'The host launcher must resolve its default project root from PSCommandPath inside the script body.'
+          }
           if ($httpsLauncher -notmatch 'BuiltAssetsOnly = \$true') {
             throw 'The LAN HTTPS launcher must force the compiled-assets path.'
           }
