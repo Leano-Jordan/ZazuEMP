@@ -227,10 +227,22 @@ test('real Zazu job form can create a job locally while disconnected', async ({ 
 
 test('an existing customer can be edited locally while disconnected and synced on reconnect', async ({ page }) => {
     const runId = randomUUID().slice(0, 8);
+    const customerName = 'Offline edit fixture ' + runId;
     await login(page);
-    await page.goto('/customers', { waitUntil: 'domcontentloaded' });
 
-    const customerLink = page.locator('.zazu-customer-directory a[href^="/customers/"]').first();
+    // Create this test's own server-backed record instead of depending on
+    // whichever demo customer happens to be present in the seeded database.
+    await page.goto('/customers/create', { waitUntil: 'domcontentloaded' });
+    const createForm = page.locator('form[data-zazu-offline-entity="customer"]');
+    await expect(createForm).toBeVisible();
+    await createForm.locator('input[name="name"]').fill(customerName);
+    await createForm.locator('input[name="primary_contact_name"]').fill('Offline edit contact');
+    await createForm.locator('input[name="primary_contact_phone"]').fill('0123456789');
+    await createForm.getByRole('button', { name: 'Save customer' }).click();
+    await expect(page).toHaveURL(/\/customers\/\d+/);
+
+    await page.goto('/customers', { waitUntil: 'domcontentloaded' });
+    const customerLink = page.locator('.zazu-customer-directory a[href^="/customers/"]').filter({ hasText: customerName });
     await expect(customerLink).toBeVisible();
     await customerLink.click();
     await page.getByRole('link', { name: 'Edit customer' }).click();
