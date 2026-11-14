@@ -954,9 +954,13 @@ window.addEventListener('popstate', restoreZazuAuthRoute);
 async function canReachZazuOrigin() {
     const controller = new AbortController();
     const timeout = window.setTimeout(() => controller.abort(), 1200);
+    const healthUrl = new URL('/up', window.location.origin);
 
     try {
-        const response = await fetch(window.location.href, {
+        // Probe Laravel's lightweight health route instead of re-rendering the
+        // current page. A slow Blade/database-backed page must not be mistaken
+        // for an unreachable host and cause an online save to queue locally.
+        const response = await fetch(healthUrl.href, {
             method: 'HEAD',
             credentials: 'same-origin',
             cache: 'no-store',

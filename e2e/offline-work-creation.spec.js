@@ -238,8 +238,23 @@ test('an existing customer can be edited locally while disconnected and synced o
     await createForm.locator('input[name="name"]').fill(customerName);
     await createForm.locator('input[name="primary_contact_name"]').fill('Offline edit contact');
     await createForm.locator('input[name="primary_contact_phone"]').fill('0123456789');
+
+    // This test requires a server-backed customer as the starting point for
+    // the subsequent disconnected edit. Record both sides of the online save
+    // contract so a false offline classification cannot look like success.
+    const healthProbeStatuses = [];
+    const customerCreateStatuses = [];
+    page.on('response', response => {
+        const request = response.request();
+        const pathname = new URL(response.url()).pathname;
+        if (request.method() === 'HEAD' && pathname === '/up') healthProbeStatuses.push(response.status());
+        if (request.method() === 'POST' && pathname === '/customers') customerCreateStatuses.push(response.status());
+    });
+
     await createForm.getByRole('button', { name: 'Save customer' }).click();
     await expect(page).toHaveURL(/\/customers$/);
+    expect(healthProbeStatuses).toContain(200);
+    expect(customerCreateStatuses).toContain(302);
 
     const customerLink = page.locator('.zazu-customer-directory a[href^="/customers/"]').filter({ hasText: customerName });
     await expect(customerLink).toBeVisible();
