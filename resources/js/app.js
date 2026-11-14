@@ -2298,8 +2298,15 @@ function registerZazuServiceWorker() {
         const businessId = document.body?.dataset.zazuBusinessId;
         if (!userId || !businessId) return;
 
+        // These are the two device-local creation routes currently supported
+        // by the offline mutation queue. Prime them even when responsive navigation
+        // or role-specific shortcuts do not expose links on the dashboard.
         const routes = [...new Set([
             window.location.pathname,
+            '/customers',
+            '/customers/create',
+            '/work',
+            '/work/create',
             ...[...document.querySelectorAll('a[href]')]
                 .map((link) => {
                     try {
