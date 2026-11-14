@@ -253,18 +253,14 @@ test('an existing customer can be edited locally while disconnected and synced o
     // This test requires a server-backed customer as the starting point for
     // the subsequent disconnected edit. Record both sides of the online save
     // contract so a false offline classification cannot look like success.
-    const healthProbeStatuses = [];
-    const customerCreateStatuses = [];
-    page.on('response', response => {
+    const customerCreateResponse = page.waitForResponse(response => {
         const request = response.request();
-        const pathname = new URL(response.url()).pathname;
-        if (request.method() === 'HEAD' && pathname === '/up') healthProbeStatuses.push(response.status());
-        if (request.method() === 'POST' && pathname === '/customers') customerCreateStatuses.push(response.status());
+        return request.method() === 'POST' && new URL(response.url()).pathname === '/customers';
     });
 
     await createForm.getByRole('button', { name: 'Save customer' }).click();
-    expect(healthProbeStatuses, 'the form connectivity probe must reach Laravel /up').toContain(200);
-    expect(customerCreateStatuses, 'the customer fixture must be POSTed to Laravel').toContain(302);
+    const createResponse = await customerCreateResponse;
+    expect(createResponse.status(), 'the fixture must be saved by Laravel before the offline edit begins').toBe(302);
     await expect(page).toHaveURL(/\/customers$/);
 
     // Verify persistence directly against Laravel, then force a fresh directory

@@ -435,7 +435,7 @@ self.addEventListener('message', (event) => {
     })());
 });
 
-async function fetchWithTimeout(request, timeoutMs = 4000) {
+async function fetchWithTimeout(request, timeoutMs = 6000) {
     const controller = new AbortController();
     const timeout = setTimeout(() => controller.abort(), timeoutMs);
 
@@ -443,22 +443,6 @@ async function fetchWithTimeout(request, timeoutMs = 4000) {
         return await fetch(request, { signal: controller.signal });
     } finally {
         clearTimeout(timeout);
-    }
-}
-
-async function canReachAppOrigin(timeoutMs = 2500) {
-    const healthRequest = new Request(new URL('/up', self.location.origin), {
-        method: 'HEAD',
-        credentials: 'include',
-        cache: 'no-store',
-        headers: { 'X-Zazu-Connectivity-Probe': '1' },
-    });
-
-    try {
-        const response = await fetchWithTimeout(healthRequest, timeoutMs);
-        return response.status < 500;
-    } catch {
-        return false;
     }
 }
 
@@ -494,18 +478,15 @@ self.addEventListener('fetch', (event) => {
         }
 
         event.respondWith((async () => {
-            // A browser can report online while the Zazu host is unreachable.
-            // Probe the lightweight Laravel health route first so the offline
-            // workspace is selected quickly when the host is genuinely absent.
-            if (self.navigator?.onLine === false || !(await canReachAppOrigin())) {
+            // When the browser reports no network, do not spend four seconds
+            // attempting the unreachable Laravel host. Resolve the authenticated
+            // page from its user/business cache immediately instead.
+            if (self.navigator?.onLine === false) {
                 return cachedAppPage(request);
             }
 
             try {
-                // Health is reachable, so allow the real page enough time to
-                // render. A four-second page timeout could replace fresh content
-                // with a stale cached directory during normal server load.
-                const response = await fetchWithTimeout(request, 10000);
+                const response = await fetchWithTimeout(request);
                 // A reachable host can still be temporarily unhealthy (for
                 // example, Laravel returning 503 during restart). Keep the
                 // authenticated local workspace usable for transient 5xx
