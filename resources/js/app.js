@@ -2323,7 +2323,18 @@ function registerZazuServiceWorker() {
         ])];
 
         const target = navigator.serviceWorker.controller || registration.active;
-        target?.postMessage({ type: 'prime-pages', userId, businessId, routes });
+        if (!target) return;
+
+        const channel = new MessageChannel();
+        channel.port1.onmessage = (event) => {
+            if (event.data?.type !== 'prime-pages-complete') return;
+            document.documentElement.dataset.zazuOfflinePagesPrimed = event.data.success ? 'true' : 'false';
+            window.dispatchEvent(new CustomEvent('zazu:offline-pages-primed', {
+                detail: { success: event.data.success === true },
+            }));
+            channel.port1.close();
+        };
+        target.postMessage({ type: 'prime-pages', userId, businessId, routes }, [channel.port2]);
     };
 
     window.addEventListener('load', () => {
