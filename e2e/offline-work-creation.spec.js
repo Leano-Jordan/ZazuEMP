@@ -26,7 +26,7 @@ test('real Zazu job form can create a job locally while disconnected', async ({ 
     await page.waitForFunction(() => Boolean(navigator.serviceWorker?.controller));
     await page.waitForFunction(async () => {
         const names = await caches.keys();
-        const staticName = names.find(name => /^zazu-static-v\\d+$/.test(name));
+        const staticName = names.find(name => name.startsWith('zazu-static-v') && !name.includes('-user-'));
         if (!staticName) return false;
         const contextResponse = await (await caches.open(staticName)).match('/__zazu-active-context__');
         if (!contextResponse) return false;
@@ -49,7 +49,7 @@ test('real Zazu job form can create a job locally while disconnected', async ({ 
 
     const primedCacheSnapshot = await page.evaluate(async () => {
         const names = await caches.keys();
-        const staticName = names.find(name => /^zazu-static-v\\d+$/.test(name));
+        const staticName = names.find(name => name.startsWith('zazu-static-v') && !name.includes('-user-'));
         const contextResponse = staticName
             ? await (await caches.open(staticName)).match('/__zazu-active-context__')
             : null;
