@@ -13,6 +13,46 @@ async function login(page) {
     await expect(page).toHaveURL(/\/dashboard$/);
 }
 
+test('offline workspace distinguishes synced local jobs from pending jobs', async ({ page }) => {
+    const runId = randomUUID().slice(0, 8);
+    const syncedReference = 'ZAZ-SYNC-' + runId;
+    const syncedName = 'Previously synced local job ' + runId;
+    const pendingCustomerName = 'Pending workspace customer ' + runId;
+
+    await login(page);
+    await page.evaluate(async ({ syncedReference, syncedName, pendingCustomerName }) => {
+        await window.ZazuOffline.ready;
+        const state = window.ZazuOffline.getState();
+        state.customers.push({
+            local_id: crypto.randomUUID(),
+            server_id: null,
+            name: pendingCustomerName,
+        });
+        state.jobs.push({
+            local_id: crypto.randomUUID(),
+            server_id: 987654321,
+            id: 987654321,
+            reference: syncedReference,
+            name: syncedName,
+            customer_name: 'Existing customer',
+            event_type: 'Catering',
+            event_date: '2026-11-20',
+            status: 'confirmed',
+        });
+        await window.ZazuOffline.persist();
+        window.dispatchEvent(new CustomEvent('zazu:offline-state-updated'));
+    }, { syncedReference, syncedName, pendingCustomerName });
+
+    const workspace = page.locator('[data-zazu-offline-workspace]');
+    await expect(workspace).toBeVisible();
+    const syncedRow = workspace.locator('[data-zazu-local-record="job"]').filter({ hasText: syncedName });
+    await expect(syncedRow).toBeVisible();
+    await expect(syncedRow.locator('.zazu-ops-ref-label')).toHaveText('Job reference');
+    await expect(syncedRow.locator('.zazu-ops-ref strong')).toHaveText(syncedReference);
+    await expect(syncedRow).toContainText('Synced');
+    await expect(syncedRow).not.toContainText('Pending sync');
+});
+
 test('real Zazu job form can create a job locally while disconnected', async ({ page }) => {
     const runId = randomUUID().slice(0, 8);
     const customerName = `Offline test customer ${runId}`;
