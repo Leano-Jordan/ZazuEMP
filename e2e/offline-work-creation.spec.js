@@ -256,6 +256,13 @@ test('an existing customer can be edited locally while disconnected and synced o
     const localCustomer = await page.evaluate((id) => window.ZazuOffline.getState()?.customers?.find(item => Number(item.id ?? item.server_id) === id) || null, customerId);
     expect(localCustomer?.name).toBe(updatedName);
 
+    // The cached Customers directory must render the local override rather
+    // than showing the older server-rendered snapshot while disconnected.
+    await page.goto('/customers', { waitUntil: 'domcontentloaded' });
+    const cachedCustomerRow = page.locator('[data-zazu-server-customer-id="' + customerId + '"]');
+    await expect(cachedCustomerRow.locator('.zazu-list-title')).toHaveText(updatedName);
+    await expect(cachedCustomerRow.locator('.zazu-list-meta')).toContainText('0123456789');
+
     await page.context().setOffline(false);
     await expect.poll(async () => page.evaluate(async () => (await window.ZazuOffline.pending()).length), {
         timeout: 30_000,
