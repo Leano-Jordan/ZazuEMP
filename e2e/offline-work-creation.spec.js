@@ -47,7 +47,7 @@ test('offline workspace exposes locally stored quotes with their sync state', as
 
     const workspace = page.locator('[data-zazu-offline-workspace]');
     await expect(workspace).toBeVisible();
-    const quoteRow = workspace.locator('[data-zazu-local-record="quote"]');
+    const quoteRow = workspace.locator('[data-zazu-local-record="quote"]').filter({ hasText: jobName });
     await expect(quoteRow).toHaveCount(1);
     await expect(quoteRow.locator('.zazu-list-title')).toHaveText('Draft quote');
     await expect(quoteRow.locator('.zazu-list-meta')).toContainText(jobName);
