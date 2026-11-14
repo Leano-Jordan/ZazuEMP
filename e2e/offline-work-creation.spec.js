@@ -131,12 +131,12 @@ test('real Zazu job form can create a job locally while disconnected', async ({ 
     // The device-local workspace must navigate into the cached customer and
     // Work directories and render the same IndexedDB records there.
     await page.getByRole('link', { name: 'Open customers' }).click();
-    await expect(page).toHaveURL(/\\/customers$/);
+    await expect(page).toHaveURL(/customers$/);
     await expect(page.locator('[data-zazu-local-record="customer"]').filter({ hasText: customerName })).toBeVisible();
     await page.goBack({ waitUntil: 'domcontentloaded' });
     await expect(page.locator('[data-zazu-offline-workspace]')).toBeVisible();
     await page.getByRole('link', { name: 'Open work' }).click();
-    await expect(page).toHaveURL(/\\/work$/);
+    await expect(page).toHaveURL(/work$/);
     await expect(page.locator('[data-zazu-local-record="job"]').filter({ hasText: jobName })).toBeVisible();
 
     // Reconnect must provision this signed-in phone automatically. No
