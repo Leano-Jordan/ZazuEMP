@@ -366,7 +366,7 @@ test.describe('Zazu installed PWA offline shell', () => {
         expect(await page.evaluate(() => navigator.onLine)).toBe(true);
 
         // Keep the browser online while making the application origin unavailable.
-        await page.route('**/customers/create*', async route => {
+        await page.route('**/up', async route => {
             if (route.request().method() === 'HEAD') {
                 await route.abort('failed');
                 return;
@@ -439,7 +439,7 @@ test.describe('Zazu installed PWA offline shell', () => {
         await login(page);
         await page.goto('/customers/create', { waitUntil: 'domcontentloaded' });
         await page.evaluate(() => window.ZazuOffline.ready);
-        await page.route('**/customers/create*', async route => {
+        await page.route('**/up', async route => {
             if (route.request().method() === 'HEAD') {
                 await route.abort('failed');
                 return;

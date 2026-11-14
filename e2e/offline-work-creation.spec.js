@@ -256,6 +256,16 @@ test('an existing customer can be edited locally while disconnected and synced o
     expect(healthProbeStatuses).toContain(200);
     expect(customerCreateStatuses).toContain(302);
 
+    // Verify persistence directly against Laravel, then force a fresh directory
+    // navigation. This distinguishes a successful DB write from a stale cached
+    // page response after the POST redirect.
+    const serverDirectory = await page.request.get('/customers');
+    expect(serverDirectory.status()).toBe(200);
+    expect(await serverDirectory.text()).toContain(customerName);
+
+    const refreshedDirectory = await page.goto('/customers', { waitUntil: 'domcontentloaded' });
+    expect(refreshedDirectory?.status()).toBe(200);
+
     const customerLink = page.locator('.zazu-customer-directory a[href^="/customers/"]').filter({ hasText: customerName });
     await expect(customerLink).toBeVisible();
     await customerLink.click();
