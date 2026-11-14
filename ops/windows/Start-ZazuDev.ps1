@@ -4,6 +4,7 @@ param(
     [string]$BindAddress = '127.0.0.1',
     [string]$PhpPath,
     [switch]$Lan,
+    [switch]$BuiltAssetsOnly,
     [ValidateRange(1024, 65535)]
     [int]$Port = 8000,
     [switch]$Stop
@@ -99,6 +100,79 @@ if (-not (Test-Path $artisan -PathType Leaf) -or -not (Test-Path $autoload -Path
 }
 if (-not (Test-Path $environment -PathType Leaf)) {
     throw "The .env file is missing. Complete the existing local setup before starting Zazu."
+}
+
+function Prepare-ZazuBuiltAssets {
+    $publicDirectory = Join-Path $ProjectPath 'public'
+    $hotFile = Join-Path $publicDirectory 'hot'
+    $buildDirectory = Join-Path $publicDirectory 'build'
+    $manifestFile = Join-Path $buildDirectory 'manifest.json'
+
+    # LAN entrypoints use same-origin compiled assets. A stale Vite hot file
+    # otherwise makes Laravel emit CSS/JS URLs to a dead or unreachable port 5173.
+    if (Test-Path $hotFile -PathType Leaf) {
+        Remove-Item $hotFile -Force
+        Write-Host 'Removed the stale Vite development marker; LAN mode will use compiled assets.'
+    }
+
+    if (-not (Test-Path $manifestFile -PathType Leaf)) {
+        $nodeModules = Join-Path $ProjectPath 'node_modules'
+        if (-not (Test-Path $nodeModules -PathType Container)) {
+            throw 'Compiled Zazu assets are missing and node_modules is not installed. From the project folder, run npm ci once, then start Zazu again.'
+        }
+
+        $npmCommand = Get-Command npm.cmd -ErrorAction SilentlyContinue | Select-Object -First 1
+        if (-not $npmCommand) {
+            $npmCommand = Get-Command npm.exe -ErrorAction SilentlyContinue | Select-Object -First 1
+        }
+        if (-not $npmCommand) {
+            throw 'Compiled Zazu assets are missing and npm was not found. Install Node.js/npm, run npm ci once, then start Zazu again.'
+        }
+
+        Write-Host 'Compiled Zazu assets are missing; building the local frontend bundle.'
+        Push-Location $ProjectPath
+        try {
+            & $npmCommand.Source run build
+            if ($LASTEXITCODE -ne 0) {
+                throw "Zazu frontend build failed with exit code $LASTEXITCODE. Review the build output before starting the app."
+            }
+        } finally {
+            Pop-Location
+        }
+    }
+
+    if (-not (Test-Path $manifestFile -PathType Leaf)) {
+        throw 'The frontend build completed without creating public/build/manifest.json. Zazu was not started.'
+    }
+
+    try {
+        $manifest = Get-Content $manifestFile -Raw | ConvertFrom-Json
+    } catch {
+        throw "The compiled frontend manifest is invalid: $manifestFile"
+    }
+
+    $entries = @($manifest.PSObject.Properties)
+    if ($entries.Count -eq 0) {
+        throw 'The compiled frontend manifest is empty. Zazu was not started.'
+    }
+
+    foreach ($entry in $entries) {
+        $assetFile = $entry.Value.file
+        if ([string]::IsNullOrWhiteSpace($assetFile)) {
+            continue
+        }
+
+        $assetPath = Join-Path $buildDirectory ($assetFile -replace '/', [System.IO.Path]::DirectorySeparatorChar)
+        if (-not (Test-Path $assetPath -PathType Leaf)) {
+            throw "A compiled frontend asset referenced by the manifest is missing: $assetPath"
+        }
+    }
+
+    Write-Host 'Compiled CSS/JavaScript manifest and referenced assets are ready.'
+}
+
+if (($Lan -or $BuiltAssetsOnly) -and -not $Stop) {
+    Prepare-ZazuBuiltAssets
 }
 
 $php = $null
