@@ -13,6 +13,49 @@ async function login(page) {
     await expect(page).toHaveURL(/\/dashboard$/);
 }
 
+test('offline workspace exposes locally stored quotes with their sync state', async ({ page }) => {
+    const runId = randomUUID().slice(0, 8);
+    const jobLocalId = randomUUID();
+    const quoteLocalId = randomUUID();
+    const jobName = 'Offline quote parent ' + runId;
+
+    await login(page);
+    await page.evaluate(async ({ jobLocalId, quoteLocalId, jobName }) => {
+        await window.ZazuOffline.ready;
+        const state = window.ZazuOffline.getState();
+        state.jobs.push({
+            local_id: jobLocalId,
+            server_id: 7654321,
+            id: 7654321,
+            reference: 'ZAZ-JOB-' + jobLocalId.slice(0, 6),
+            name: jobName,
+            event_type: 'Catering',
+            status: 'confirmed',
+        });
+        state.quotes.push({
+            local_id: quoteLocalId,
+            server_id: null,
+            event_local_id: jobLocalId,
+            reference: null,
+            status: 'draft',
+            currency: 'ZAR',
+            items: [{ description: 'Catering package', quantity: 1, unit_price: '2500.00' }],
+        });
+        await window.ZazuOffline.persist();
+        window.dispatchEvent(new CustomEvent('zazu:offline-state-updated'));
+    }, { jobLocalId, quoteLocalId, jobName });
+
+    const workspace = page.locator('[data-zazu-offline-workspace]');
+    await expect(workspace).toBeVisible();
+    const quoteRow = workspace.locator('[data-zazu-local-record="quote"]');
+    await expect(quoteRow).toHaveCount(1);
+    await expect(quoteRow.locator('.zazu-list-title')).toHaveText('Draft quote');
+    await expect(quoteRow.locator('.zazu-list-meta')).toContainText(jobName);
+    await expect(quoteRow.locator('.zazu-list-meta')).toContainText('draft');
+    await expect(quoteRow.locator('.zazu-list-meta')).toContainText('ZAR');
+    await expect(quoteRow).toContainText('Waiting to sync');
+});
+
 test('offline workspace distinguishes synced local jobs from pending jobs', async ({ page }) => {
     const runId = randomUUID().slice(0, 8);
     const syncedReference = 'ZAZ-SYNC-' + runId;
