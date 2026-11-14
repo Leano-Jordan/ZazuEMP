@@ -56,12 +56,14 @@ test('real Zazu job form can create a job locally while disconnected', async ({ 
             installingState: registration?.installing?.state || null,
         };
         if (!snapshot.customerForm || !snapshot.workForm) return false;
-        window.__zazuPrimeCacheSnapshot = snapshot;
+        document.documentElement.dataset.zazuPrimeCacheSnapshot = JSON.stringify(snapshot);
         return true;
     }, null, { timeout: 20_000 });
 
     const primedCacheSnapshot = await page.evaluate(async () => {
-        const captured = window.__zazuPrimeCacheSnapshot || null;
+        const captured = document.documentElement.dataset.zazuPrimeCacheSnapshot
+            ? JSON.parse(document.documentElement.dataset.zazuPrimeCacheSnapshot)
+            : null;
         const names = await caches.keys();
         const staticName = names.find(name => name.startsWith('zazu-static-v') && !name.includes('-user-'));
         const contextResponse = staticName
