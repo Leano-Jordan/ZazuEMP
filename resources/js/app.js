@@ -1281,6 +1281,16 @@ function setupZazuOfflineDirectoryViews() {
         const state = window.ZazuOffline.getState();
         renderCustomers(state);
         renderJobs(state);
+        const workspace = document.querySelector('[data-zazu-offline-workspace]');
+        if (workspace) {
+            const hasPendingCustomers = (state?.customers || []).some(customer =>
+                customer?.local_id && !(customer.server_id ?? customer.id)
+            );
+            const hasPendingJobs = (state?.jobs || []).some(job =>
+                job?.local_id && !(job.server_id ?? job.id)
+            );
+            workspace.hidden = !hasPendingCustomers && !hasPendingJobs;
+        }
         refreshLocalAttachmentLists();
     };
 
