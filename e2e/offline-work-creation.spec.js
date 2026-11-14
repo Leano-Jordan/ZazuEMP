@@ -48,7 +48,7 @@ test('real Zazu job form can create a job locally while disconnected', async ({ 
     const offlineCustomerResponse = await page.goto('/customers/create', { waitUntil: 'domcontentloaded' });
     const customerForm = page.locator('form[data-zazu-offline-entity="customer"]');
     if (await customerForm.count() === 0) {
-        const diagnostic = await page.evaluate(() => ({
+        const diagnostic = await page.evaluate(async () => ({
             url: window.location.href,
             route: document.body?.dataset.zazuRoute || null,
             title: document.title,
