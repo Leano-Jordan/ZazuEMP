@@ -25,6 +25,7 @@ return Application::configure(basePath: dirname(__DIR__))
         // Never trust forwarded scheme/host headers from LAN clients directly.
         $middleware->trustProxies(at: ['127.0.0.1', '::1']);
         $middleware->appendToGroup('web', \App\Http\Middleware\AttachRequestId::class);
+        $middleware->appendToGroup('web', \App\Http\Middleware\PreferCompiledViteAssetsForRemoteClients::class);
         $middleware->appendToGroup('web', \App\Http\Middleware\ApplySecurityHeaders::class);
         $middleware->appendToGroup('api', \App\Http\Middleware\AttachRequestId::class);
         $middleware->appendToGroup('api', \App\Http\Middleware\ApplySecurityHeaders::class);
