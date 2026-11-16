@@ -1,0 +1,134 @@
+name: Zazu Windows V1 Package
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'app/**'
+      - 'bootstrap/**'
+      - 'config/**'
+      - 'database/**'
+      - 'ops/windows/**'
+      - 'public/**'
+      - 'resources/**'
+      - 'routes/**'
+      - 'Start-Zazu-*.cmd'
+      - 'Install-Zazu.cmd'
+      - 'composer.json'
+      - 'composer.lock'
+      - 'package.json'
+      - 'package-lock.json'
+      - 'docs/V1_PACKAGE_INSTALLATION.md'
+      - '.github/workflows/zazu-windows-package.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  package:
+    name: Build Windows installation candidate
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout exact main commit
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          ref: \${{ github.sha }}
+
+      - name: Set up PHP
+        uses: shivammathur/setup-php@f3e473d116dcccaddc5834248c87452386958240
+        with:
+          php-version: '8.4'
+          extensions: curl, dom, fileinfo, mbstring, openssl, pdo_sqlite, tokenizer, xml, zip
+          coverage: none
+
+      - name: Set up Node
+        uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020
+        with:
+          node-version: '22'
+          cache: npm
+
+      - name: Install production PHP dependencies
+        run: composer install --no-dev --prefer-dist --no-interaction --no-progress --optimize-autoloader --no-scripts
+
+      - name: Build production frontend assets
+        run: |
+          npm ci
+          npm run build
+
+      - name: Verify package prerequisites
+        run: |
+          test -f vendor/autoload.php
+          test -s public/build/manifest.json
+          php -r '$manifest = json_decode(file_get_contents("public/build/manifest.json"), true, 512, JSON_THROW_ON_ERROR); foreach ($manifest as $entry) { foreach (array_filter(array_merge([$entry["file"] ?? null], $entry["css"] ?? [], $entry["assets"] ?? [])) as $asset) { if (!is_file("public/build/".$asset)) { throw new RuntimeException("Missing asset: ".$asset); } } } echo "Production dependencies and compiled assets verified.".PHP_EOL;'
+
+      - name: Assemble clean Windows installation
+        env:
+          PACKAGE_SHA: \${{ github.sha }}
+        run: |
+          set -euo pipefail
+          package_root="$RUNNER_TEMP/zazu-package"
+          mkdir -p "$package_root/ZazuEMP"
+          git archive HEAD | tar -x -C "$package_root/ZazuEMP"
+
+          rm -rf \
+            "$package_root/ZazuEMP/.agents" \
+            "$package_root/ZazuEMP/.ai" \
+            "$package_root/ZazuEMP/.github" \
+            "$package_root/ZazuEMP/tests" \
+            "$package_root/ZazuEMP/e2e" \
+            "$package_root/ZazuEMP/prelaunch" \
+            "$package_root/ZazuEMP/reference ui ux images" \
+            "$package_root/ZazuEMP/docker" \
+            "$package_root/ZazuEMP/vendor" \
+            "$package_root/ZazuEMP/node_modules"
+
+          rm -f \
+            "$package_root/ZazuEMP/AGENTS.md" \
+            "$package_root/ZazuEMP/CLAUDE.md" \
+            "$package_root/ZazuEMP/CONTRIBUTING.md" \
+            "$package_root/ZazuEMP/memory.md" \
+            "$package_root/ZazuEMP/Dockerfile" \
+            "$package_root/ZazuEMP/render.yaml" \
+            "$package_root/ZazuEMP/.dockerignore" \
+            "$package_root/ZazuEMP/package.json" \
+            "$package_root/ZazuEMP/package-lock.json" \
+            "$package_root/ZazuEMP/vite.config.js"
+
+          cp -a vendor "$package_root/ZazuEMP/vendor"
+          mkdir -p "$package_root/ZazuEMP/public/build"
+          cp -a public/build/. "$package_root/ZazuEMP/public/build/"
+
+          (
+            cd "$package_root/ZazuEMP"
+            cp .env.example .env
+            php artisan package:discover --ansi
+            rm -f .env
+          )
+
+          cat > "$package_root/ZazuEMP/PACKAGE-MANIFEST.txt" <<EOF
+          Zazu EMP — Windows V1 installation candidate
+          Commit: $PACKAGE_SHA
+          PHP runtime: 8.4+
+          Database: fresh local SQLite
+          Frontend: compiled production assets
+          Composer dependencies: production only
+          Package type: fresh installation; not an in-place updater
+          Build timestamp: $(date -u +'%Y-%m-%dT%H:%M:%SZ')
+          EOF
+
+          mkdir -p "$RUNNER_TEMP/zazu-output"
+          cd "$package_root"
+          zip -qr "$RUNNER_TEMP/zazu-output/ZazuEMP-v1-candidate-\${PACKAGE_SHA:0:7}.zip" ZazuEMP
+          cd "$RUNNER_TEMP/zazu-output"
+          sha256sum *.zip > SHA256SUMS.txt
+
+      - name: Upload Windows installation candidate
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: zazu-emp-windows-v1-candidate-\${{ github.sha }}
+          path: |
+            \${{ runner.temp }}/zazu-output/*.zip
+            \${{ runner.temp }}/zazu-output/SHA256SUMS.txt
+          if-no-files-found: error
+          retention-days: 30
