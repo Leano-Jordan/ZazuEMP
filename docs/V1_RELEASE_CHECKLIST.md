@@ -1,3 +1,16 @@
+## Director reconciliation — 2026-11-16 (current control head)
+
+**Canonical branch:** `main` · **current control head:** `c0f0fdc7ad97d1c60ce9cfe53f5eebc35df827df`.
+
+- The two commits after application/test head `b67720910216ac22c1a961020e44c789f32823a7` change only `.github/workflows/security-dependency-refresh.yml`; no application, migration or test source changed.
+- Current-head dependency audit [43917662550](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/43917662550): **PASS** — Composer audit/install, npm audit (0 vulnerabilities), frontend build, SQLite migration and complete Laravel suite.
+- Current-head Zazu quality [43917662110](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/43917662110), Director Contract Lint [43917662310](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/43917662310), Director Health [43917662413](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/43917662413), and Push on main [43917660267](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/43917660267): **PASS**.
+- The earlier scheduled audit failure was caused by missing Composer dependency installation in the audit workflow. The workflow was corrected and the exact-head rerun passed.
+- This is CI maintenance evidence only; no readiness score uplift. The last recorded application acceptance evidence remains the November 14 Laravel/offline/mobile/attachment results. Physical-device acceptance, installed-target recovery, live commercial-record reconciliation and POPIA operational sign-off remain open. Branding/name clearance remains deferred by owner direction.
+- No production deployment, database or customer data changed.
+
+---
+
 ## Director reconciliation — 2026-11-14 (latest exact-head CI)
 
 **Canonical branch:** `main` · **verified source/test head:** `d09fdbfbe4bdbb7cfaed9ca1ea125313910fa3e0`.
