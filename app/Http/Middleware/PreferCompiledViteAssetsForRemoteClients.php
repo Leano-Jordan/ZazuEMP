@@ -31,32 +31,46 @@ class PreferCompiledViteAssetsForRemoteClients
 
     private function isHotServerReachable(): bool
     {
+        $endpoint = $this->hotServerEndpoint();
+
+        return $endpoint !== null && $this->canConnect($endpoint['host'], $endpoint['port']);
+    }
+
+    /**
+     * @return array{host:string,port:int}|null
+     */
+    private function hotServerEndpoint(): ?array
+    {
         $hotFile = public_path('hot');
 
         if (! is_file($hotFile)) {
-            return false;
+            return null;
         }
 
-        $url = trim((string) file_get_contents($hotFile));
-        $parts = parse_url($url);
+        $parts = parse_url(trim((string) file_get_contents($hotFile)));
 
         if (! is_array($parts)) {
-            return false;
+            return null;
         }
 
         $host = $parts['host'] ?? null;
 
         if (! is_string($host) || $host === '') {
-            return false;
+            return null;
         }
 
         $scheme = $parts['scheme'] ?? 'http';
         $port = $parts['port'] ?? ($scheme === 'https' ? 443 : 80);
 
         if (! is_int($port) || $port < 1 || $port > 65535) {
-            return false;
+            return null;
         }
 
+        return ['host' => $host, 'port' => $port];
+    }
+
+    private function canConnect(string $host, int $port): bool
+    {
         $connection = @fsockopen($host, $port, $errorCode, $errorMessage, 0.2);
 
         if (! is_resource($connection)) {
