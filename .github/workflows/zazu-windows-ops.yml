@@ -6,6 +6,8 @@ on:
     paths:
       - 'ops/windows/*.ps1'
       - 'Start-Zazu-Dev.cmd'
+      - 'Install-Zazu.cmd'
+      - 'Install-Zazu.cmd'
       - 'Start-Zazu-LAN.cmd'
       - 'Stop-Zazu-Dev.cmd'
       - 'Start-Zazu-LAN-HTTPS.cmd'
@@ -109,6 +111,41 @@ jobs:
             throw 'Loopback development must retain the normal Vite development workflow.'
           }
           Write-Host 'PASS: LAN/HTTPS launchers use verified same-origin compiled assets; loopback development remains unchanged.'
+
+
+      - name: Verify the packaged Windows installer contract
+        shell: pwsh
+        run: |
+          $installer = Get-Content 'ops/windows/Install-Zazu.ps1' -Raw
+          $wrapper = Get-Content 'Install-Zazu.cmd' -Raw
+
+          foreach ($required in @(
+            'vendor\autoload.php',
+            'public\build\manifest.json',
+            "APP_ENV = 'production'",
+            "APP_DEBUG = 'false'",
+            "SESSION_SECURE_COOKIE = 'true'",
+            'php.exe',
+            "php -m",
+            'pdo_sqlite',
+            'key:generate',
+            "'migrate', '--force'"
+          )) {
+            if (-not $installer.Contains($required)) {
+              throw "Packaged installer requirement is missing: $required"
+            }
+          }
+
+          if ($installer -notmatch 'if \(-not \(Test-Path \$environmentPath -PathType Leaf\)\)') {
+            throw 'The installer must preserve an existing .env file.'
+          }
+          if ($installer -match 'db:seed|ZAZU_SEED_DEMO') {
+            throw 'The release installer must not seed development demo records.'
+          }
+          if ($wrapper -notmatch 'ops\\windows\\Install-Zazu\.ps1') {
+            throw 'Install-Zazu.cmd does not invoke the PowerShell installer.'
+          }
+          Write-Host 'PASS: Windows package installer validates runtime, creates a first-run environment, preserves existing data/configuration and migrates without demo seeding.'
 
       - name: Verify LAN HTTPS command wrappers
         shell: pwsh
