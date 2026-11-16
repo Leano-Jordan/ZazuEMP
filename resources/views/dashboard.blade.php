@@ -247,7 +247,7 @@
     <header class="zazu-dash-surface-head zazu-dash-panel-head">
         <div class="zazu-dash-panel-heading">
             <h2>Saved on this device</h2>
-            <p class="zazu-card-description">Pending customers and jobs stay available here while the server is disconnected.</p>
+            <p class="zazu-card-description">Customers, jobs and quotes saved on this device remain available here when the server is disconnected.</p>
         </div>
         <nav class="zazu-action-group" aria-label="Offline workspace navigation">
             <a href="{{ route('customers.index') }}" class="zazu-btn zazu-btn-secondary">Open customers</a>
@@ -259,13 +259,13 @@
         <section class="zazu-dash-surface" aria-label="Customers saved on this device">
             <h3 class="zazu-dash-panel-heading">Customers</h3>
             <div class="zazu-customer-directory zazu-list">
-                <div class="zazu-empty">No pending customers on this device.</div>
+                <div class="zazu-empty">No customer records saved on this device.</div>
             </div>
         </section>
         <section class="zazu-dash-surface" aria-label="Jobs saved on this device">
             <h3 class="zazu-dash-panel-heading">Jobs</h3>
             <div class="zazu-ops-register zazu-card">
-                <div class="zazu-empty">No pending jobs on this device.</div>
+                <div class="zazu-empty">No jobs saved on this device.</div>
             </div>
         </section>
         <section class="zazu-dash-surface" aria-label="Quotes saved on this device">
