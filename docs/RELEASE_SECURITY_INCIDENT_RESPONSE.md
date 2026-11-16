@@ -84,13 +84,31 @@ Determine:
 
 Do not edit or delete incident evidence to make the system appear cleaner.
 
-## Notification assessment
+## POPIA section 22 notification decision
 
-Where POPIA or another applicable law requires notification, the responsible party must use the approved legal/regulatory process and act within the applicable timing requirements.
+Where POPIA applies, do not use the S1–S4 severity rating as a notification threshold. Severity helps prioritise containment; it does not decide whether a reportable security compromise is notified.
 
-For operator relationships, the operator must promptly notify the responsible party according to the contract.
+The statutory trigger is reasonable grounds to believe that a data subject's personal information has been accessed or acquired by an unauthorised person. Once that trigger is met:
 
-This document intentionally does not invent statutory deadlines or legal conclusions.
+1. The responsible party must notify the Information Regulator and the affected data subject(s), unless a data subject's identity cannot be established.
+2. Notify as soon as reasonably possible after discovery. Do not wait for the investigation to be complete or for a final impact/risk score. Submit the information available and update the notification as further facts are established.
+3. Notify affected data subjects in writing using an allowed channel and give enough information for them to take protective measures.
+4. A delay in notifying data subjects is permitted only where the Regulator or a public body responsible for preventing, detecting or investigating offences determines that notification will impede a criminal investigation. Record the direction and reason.
+5. An operator that has reasonable grounds to believe personal information was accessed or acquired by an unauthorised person must notify the responsible party immediately. The responsible party retains the regulator/data-subject notification duty.
+
+**No low-risk carve-out:** the Information Regulator's published fact sheet states that POPIA has no risk threshold for reporting security compromises; reportable compromises must be reported irrespective of the assessed level of risk. Do not close an incident as S3/S4 to avoid notification. If the facts are uncertain, escalate promptly to the Information Officer and obtain legal advice without delaying required notification.
+
+**Reporting channel:** from 1 April 2025, the Regulator requires security-compromise reports to be submitted through its eServices portal rather than by email:
+https://eservices.inforegulator.org.za/compromises/default.aspx
+
+The incident record must capture at least: incident identifier; date/time of compromise if known; discovery date/time; affected systems and responsible-party/operator roles; categories of personal information; estimated/confirmed number of affected data subjects; unauthorised access/acquisition facts; potential consequences; containment actions; notification decision and rationale; date/reference of the Regulator submission; data-subject notification method/date; any permitted delay direction; and subsequent updates. Minimise personal information in the incident record and restrict access.
+
+References:
+- POPIA, sections 19–22: https://www.justice.gov.za/legislation/acts/2013-004.pdf
+- Information Regulator, Fact Sheet: Handling of Security Compromises: https://inforegulator.org.za/2025/08/19/fact-sheet-handling-of-security-compromises/
+- Information Regulator, 7 April 2025 statement on mandatory eServices reporting: https://inforegulator.org.za/wp-content/uploads/2025/04/MEDIA-STATEMENT-INVITATION-TO-REPORT-SECURITY-COMPROMISES-THROUGH-THE-eSERVICES-PORTAL-.pdf
+
+This procedure is operational guidance, not a substitute for deployment-specific legal advice or the responsible party's own assessment of whether POPIA applies.
 
 ## Recovery
 
