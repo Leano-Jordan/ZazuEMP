@@ -1,3 +1,27 @@
+## Director reconciliation — 2026-11-17 (V1 correction batch)
+
+**Canonical repository:** `Leano-Jordan/ZazuEMP` · **branch:** `main` · **verified source/control head:** `7cb17334d53312265521769223bcac4f42eda772`
+
+### Verified corrections
+- **D2 — offline purchase-order money integrity:** purchase-order sync now uses the existing integer-cent `Money` utility for quantities, unit prices, line totals and order totals. Values that lose precision (for example quantity `0.004` or unit price `1.005`) are rejected instead of silently rounded. Dedicated regression test added.
+- **D4 — offline bootstrap authorization:** `/offline/bootstrap` now requires the explicit `offline.bootstrap` business permission. The existing staff and manager roles are granted it; a regression verifies denied and permitted access.
+- **D5 — work deletion roles:** `work.delete` is now manager-level rather than staff-level. Owner authority is unchanged; the role boundary is regression-tested.
+- **D7 — generated Vite manifest:** removed the tracked `public/build/manifest.json`. Build output remains ignored/generated; the Windows launcher already rebuilds when the manifest or referenced assets are missing or stale.
+- **PostgreSQL CI correction:** the PostgreSQL registration/recovery job now installs Node dependencies and builds Vite assets before rendering the dashboard. This prevents a missing generated manifest from masquerading as a database failure.
+- Offline V1 engineering was explicitly resumed. `AGENTS.md`, `memory.md`, `.ai/engineering/V1_SCOPE_FREEZE.md` and the release checklist now reflect the current owner direction. Work remains on `main`; no branches were created.
+
+### Exact-head evidence
+- Laravel [run 43973662513](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/43973662513): **PASS — 503 passed / 1 skipped / 3,563 assertions**.
+- Offline browser acceptance in the same run: **37 desktop Chromium passed**, **6 mobile-viewport passed**, and **1 phone-local attachment journey passed**.
+- PostgreSQL migrations, real account/workspace registration, and database/private-file backup/restore: **PASS** in the same run.
+- Zazu quality [run 43973662490](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/43973662490), PHPMD [run 43973662406](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/43973662406), Director Health [run 43973662488](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/43973662488), and Push on main [run 43973661651](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/43973661651): **PASS**. SonarCloud was **SKIPPED**, not counted.
+- Windows fresh-install package build and PowerShell first-install smoke [run 43973129806](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/43973129806): **PASS** on application source `e09b8e7e7005f6be1d8af9eb3712f66b97fbdc6f`; no application source changed between that package build and the current verified head.
+
+### Release decision
+**V1 remains NOT READY. Evidence maturity remains 73/100; no score uplift is claimed.** Remaining owner/operational gates are physical Android installed-app cold launch/restart/reconnect, the installed-target recovery drill including private media, live populated-business quote/payment/cost/profit reconciliation, and POPIA operational/privacy sign-off. No production deployment, live business database or customer data changed.
+
+---
+
 ## Director reconciliation — 2026-11-16 (Windows V1 install candidate verified)
 
 **Canonical branch:** `main`  

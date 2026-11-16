@@ -70,8 +70,8 @@ This matrix distinguishes an IndexedDB mutation handler from a complete offline 
 ### Next implementation sequence
 
 1. **Matrix complete.** Use this table as the baseline; do not re-audit or re-list the same handlers.
-2. Implement one shared device-local workspace surface inside the existing dashboard shell. It must render local records from IndexedDB without requesting Laravel HTML and must label unavailable actions rather than implying they work.
-3. Expand that surface one workflow at a time, starting with the existing customer → job → quote chain, then only add dependent commercial/purchasing workflows when their local parent data and sync reconciliation are present.
+2. **Implemented:** the dashboard device-local workspace renders locally stored customers, jobs and quotes from IndexedDB when the Zazu origin is unavailable; synced records remain visible and sync state is explicit. This is a dashboard workspace, not general local route/detail parity.
+3. **Next:** expand local read/detail/edit coverage one workflow at a time, starting with the existing customer → job → quote chain; add dependent commercial/purchasing workflows only when their local parent data and sync reconciliation are present.
 4. Add focused browser acceptance for direct offline navigation, local reads, local create/edit, reload while disconnected, and reconnect reconciliation. Do not count a cached page snapshot as a local read.
 5. Keep physical Android PC/server-off acceptance as final proof; CI is not a substitute.
 
