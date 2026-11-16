@@ -39,9 +39,14 @@ class PreferCompiledViteAssetsForRemoteClients
 
         $url = trim((string) file_get_contents($hotFile));
         $parts = parse_url($url);
+
+        if (! is_array($parts)) {
+            return false;
+        }
+
         $host = $parts['host'] ?? null;
 
-        if (! is_array($parts) || ! is_string($host) || $host === '') {
+        if (! is_string($host) || $host === '') {
             return false;
         }
 
