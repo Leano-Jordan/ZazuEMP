@@ -191,6 +191,8 @@ Light-mode and dark-mode tokens can be semantically reused in the wrong role, pr
 
 **Control:** use semantic foreground tokens (`--zazu-primary-ink`, `--zazu-danger-ink`, `--zazu-success-ink`, etc.) rather than hard-coded white/dark text on theme-variable fills. Contrast-sensitive shared components require both-theme regression assertions. Standalone surfaces such as Offline must declare a matching `color-scheme` and keep foreground/background relationships internally coherent.
 
+**Additional control — dashboard theme aliases:** dashboard-scoped `--dash-*` aliases must resolve to shared `--zazu-*` tokens in both light and dark modes. Browser assertions must check computed values under the theme-qualified selector, not only source order. Review selector specificity before assuming a later visual declaration wins.
+
 **Status:** CONTROL ACTIVE
 
 
