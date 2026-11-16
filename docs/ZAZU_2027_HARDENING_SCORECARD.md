@@ -47,7 +47,7 @@ Brand/name clearance remains deferred by owner direction. Do not reopen already-
 
 ### Score and release disposition
 
-**Evidence maturity: 73/100 (up from 71/100).** The +2 reflects verified Windows packaging and first-install evidence only; it does not certify actual owner-device use or complete commercial release readiness.
+**Evidence maturity at this prior checkpoint: 71/100.** Package/installer evidence had not yet been recorded.
 
 The remaining release gates are deliberately bounded:
 1. Physical Android installed-app acceptance: secure-origin launch, disconnected cold launch/restart/force-close, local file picker/storage and reconnect on the actual phone.
