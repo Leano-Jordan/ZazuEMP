@@ -1359,7 +1359,7 @@ class OfflineDomainMutationHandler implements SyncMutationHandler
         $unitPriceCents = $this->nonNegativePurchasePrice($line['unit_price'] ?? null);
         try {
             $lineTotalCents = Money::multiplyQuantityByPrice($quantityHundredths, $unitPriceCents);
-        } catch (\\InvalidArgumentException) {
+        } catch (\InvalidArgumentException) {
             throw ValidationException::withMessages(['lines' => 'Offline purchase order line total exceeds the supported calculation range.']);
         }
 
@@ -1532,7 +1532,7 @@ class OfflineDomainMutationHandler implements SyncMutationHandler
     {
         try {
             $quantityHundredths = Money::toHundredths(is_int($value) || is_float($value) || is_string($value) ? $value : '');
-        } catch (\\InvalidArgumentException) {
+        } catch (\InvalidArgumentException) {
             throw ValidationException::withMessages(['quantity' => 'Offline purchase order quantity must be positive and have at most two decimal places.']);
         }
 
@@ -1547,7 +1547,7 @@ class OfflineDomainMutationHandler implements SyncMutationHandler
     {
         try {
             return Money::toCents(is_int($value) || is_float($value) || is_string($value) ? $value : '');
-        } catch (\\InvalidArgumentException) {
+        } catch (\InvalidArgumentException) {
             throw ValidationException::withMessages(['unit_price' => 'Offline purchase order price must be non-negative and have at most two decimal places.']);
         }
     }
