@@ -20,7 +20,7 @@ test('dashboard uses shared Zazu colours while retaining its branded visual dept
     await page.getByLabel('Username or email').fill(DEMO_EMAIL);
     await page.locator('#auth_password').fill(DEMO_PASSWORD);
     await page.locator('[data-auth-submit]').click();
-    await expect(page).toHaveURL(/\\/dashboard$/);
+    await expect(page).toHaveURL(/\/dashboard$/);
     await expect(page.locator('body.zazu-dashboard-page')).toBeVisible();
     await expect(page.locator('.zazu-dash-hero')).toBeVisible();
 
