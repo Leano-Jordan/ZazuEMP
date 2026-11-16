@@ -533,6 +533,8 @@ class FinancePurchasingInventoryTest extends TestCase
         $staff = User::factory()->create(['username' => 'boundarystaff']);
         $business->users()->attach($staff->id, ['role' => 'staff']);
 
+        $this->assertFalse(app(\App\Support\PermissionService::class)->allows('work.delete', $staff, $business));
+
         $this->actingAs($staff)
             ->get(route('finance.index'))
             ->assertOk()
@@ -598,7 +600,7 @@ class FinancePurchasingInventoryTest extends TestCase
 
         $this->assertTrue(app(\App\Support\PermissionService::class)->allows('work.view', $manager, $business));
         $this->assertTrue(app(\App\Support\PermissionService::class)->allows('work.update', $manager, $business));
-        $this->assertFalse(app(\App\Support\PermissionService::class)->allows('work.delete', $manager, $business));
+        $this->assertTrue(app(\App\Support\PermissionService::class)->allows('work.delete', $manager, $business));
         $this->assertTrue(app(\App\Support\PermissionService::class)->allows('purchasing.status', $manager, $business));
         $this->assertTrue(app(\App\Support\PermissionService::class)->allows('inventory.movement', $manager, $business));
         $this->assertTrue(app(\App\Support\PermissionService::class)->allows('assets.allocate', $manager, $business));
