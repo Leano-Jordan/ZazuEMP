@@ -1802,6 +1802,16 @@ body.zazu-dashboard-page .zazu-dash-focus-item:focus-visible { outline-color: va
 
 /* These explicit selectors beat the legacy dark palette without losing the
    hero's layered finish or the business-provided image. */
+html[data-theme="dark"] body.zazu-dashboard-page {
+    --dash-canvas: var(--zazu-page);
+    --dash-surface: var(--zazu-surface);
+    --dash-surface-soft: var(--zazu-surface-2);
+    --dash-border: var(--zazu-border);
+    --dash-ink: var(--zazu-ink);
+    --dash-muted: var(--zazu-muted);
+    --dash-blue: var(--zazu-primary);
+    --dash-sidebar: var(--zazu-sidebar);
+}
 html[data-theme="dark"] body.zazu-dashboard-page,
 html[data-theme="dark"] body.zazu-dashboard-page .zazu-shell,
 html[data-theme="dark"] body.zazu-dashboard-page .zazu-main,
