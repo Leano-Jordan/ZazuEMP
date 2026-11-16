@@ -149,7 +149,7 @@
                         <div class="text-right">
                             <div class="zazu-detail-label">Indicative operating result</div>
                             <div class="zazu-command-meta-value mt-1">{{ $eventResult['currency'] }} {{ \App\Support\Money::formatCents($eventResult['indicative_result_cents']) }}</div>
-                            <div class="zazu-field-help">{{ $eventResult['indicative_margin_percentage'] === null ? 'Margin unavailable' : number_format($eventResult['margin_percentage'], 2) . '%' }}</div>
+                            <div class="zazu-field-help">{{ $eventResult['indicative_margin_percentage'] === null ? 'Margin unavailable' : number_format($eventResult['indicative_margin_percentage'], 2) . '%' }}</div>
                         </div>
                     </div>
                     <div class="mt-3 grid gap-2 sm:grid-cols-2">
