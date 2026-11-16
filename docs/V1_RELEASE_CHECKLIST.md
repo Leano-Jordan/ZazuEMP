@@ -1,6 +1,6 @@
-## Director reconciliation — 2026-11-16 (current control head)
+## Director reconciliation — 2026-11-16 (dependency audit workflow correction)
 
-**Canonical branch:** `main` · **current control head:** `c0f0fdc7ad97d1c60ce9cfe53f5eebc35df827df`.
+**Canonical branch:** `main` · **workflow verification commit:** `c0f0fdc7ad97d1c60ce9cfe53f5eebc35df827df`.
 
 - The two commits after application/test head `b67720910216ac22c1a961020e44c789f32823a7` change only `.github/workflows/security-dependency-refresh.yml`; no application, migration or test source changed.
 - Current-head dependency audit [43917662550](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/43917662550): **PASS** — Composer audit/install, npm audit (0 vulnerabilities), frontend build, SQLite migration and complete Laravel suite.
