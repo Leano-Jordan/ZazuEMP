@@ -1552,6 +1552,24 @@ class OfflineDomainMutationHandler implements SyncMutationHandler
         }
     }
 
+    private function positiveQuantity(mixed $value): float
+    {
+        if (! is_numeric($value) || (float) $value <= 0) {
+            throw ValidationException::withMessages(['quantity' => 'Offline quantity must be greater than zero.']);
+        }
+
+        return round((float) $value, 2);
+    }
+
+    private function nonNegativeMoney(mixed $value): float
+    {
+        if (! is_numeric($value) || (float) $value < 0) {
+            throw ValidationException::withMessages(['unit_price' => 'Offline money value must be zero or greater.']);
+        }
+
+        return round((float) $value, 2);
+    }
+
     private function nullableDate(mixed $value): ?string
     {
         if ($value === null || $value === '') {
