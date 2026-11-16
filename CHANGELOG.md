@@ -1,5 +1,14 @@
 # Changelog
 
+## 2026-11-16 — Windows V1 installation candidate and commercial architecture research
+
+- Added a Windows first-run installer and one-click installation launcher. It verifies PHP 8.4+ and required extensions, creates a private environment only when absent, generates the application key and runs pending migrations without demo seeding.
+- Added a production ZIP build containing production Composer dependencies, compiled Vite assets, Windows startup helpers, customer installation instructions and operator runbooks; the package excludes `.env`, databases, private uploads, internal engineering files and test suites.
+- Added SHA-256 checksum generation and a 30-day GitHub Actions artifact.
+- Kept the loopback Vite development path separate from the LAN/compiled-assets startup path.
+- Added current commercial architecture research covering Tripleseat, Event Temple, Perfect Venue, HoneyBook and CaterZen patterns, mapped to Zazu's event-centred model.
+- Package status is an installable fresh-install candidate, not a hosted SaaS release or an in-place updater. Physical-device acceptance, installed-target recovery, live-business reconciliation and POPIA operational sign-off remain release evidence gates.
+
 ## 2026-09-27 — Development hardening
 - Added business-scoped idempotency protection for invoices, payments, expenses, purchase orders and stock movements.
 - Added operational audit logging and owner Activity Audit view.
