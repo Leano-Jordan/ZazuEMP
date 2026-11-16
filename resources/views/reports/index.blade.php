@@ -134,8 +134,8 @@
     <section class="zazu-panel mt-5">
         <div class="zazu-panel-head">
             <div>
-                <div class="zazu-panel-title">Event profitability</div>
-                <div class="zazu-panel-copy">Invoiced value less recorded actual job costs. Currency totals stay separate; planned costs are excluded.</div>
+                <div class="zazu-panel-title">Event contribution</div>
+                <div class="zazu-panel-copy">Net invoiced value excluding output VAT, less actual costs as recorded. Input-tax recovery and other accounting adjustments are not calculated, so this is an operational estimate rather than an accounting profit figure.</div>
             </div>
         </div>
         <div class="mt-4 grid gap-3">
@@ -147,18 +147,18 @@
                             <div class="zazu-route-card-title mt-1">{{ $eventResult['event_name'] }}</div>
                         </div>
                         <div class="text-right">
-                            <div class="zazu-detail-label">Recorded profit</div>
-                            <div class="zazu-command-meta-value mt-1">{{ $eventResult['currency'] }} {{ \App\Support\Money::formatCents($eventResult['profit_cents']) }}</div>
-                            <div class="zazu-field-help">{{ $eventResult['margin_percentage'] === null ? 'Margin unavailable' : number_format($eventResult['margin_percentage'], 2) . '%' }}</div>
+                            <div class="zazu-detail-label">Indicative operating result</div>
+                            <div class="zazu-command-meta-value mt-1">{{ $eventResult['currency'] }} {{ \App\Support\Money::formatCents($eventResult['indicative_result_cents']) }}</div>
+                            <div class="zazu-field-help">{{ $eventResult['indicative_margin_percentage'] === null ? 'Margin unavailable' : number_format($eventResult['margin_percentage'], 2) . '%' }}</div>
                         </div>
                     </div>
                     <div class="mt-3 grid gap-2 sm:grid-cols-2">
                         <div class="zazu-detail-row">
-                            <div class="zazu-detail-label">Invoiced value</div>
-                            <div class="zazu-detail-value">{{ $eventResult['currency'] }} {{ \App\Support\Money::formatCents($eventResult['invoiced_cents']) }}</div>
+                            <div class="zazu-detail-label">Net invoiced value (excl. output VAT)</div>
+                            <div class="zazu-detail-value">{{ $eventResult['currency'] }} {{ \App\Support\Money::formatCents($eventResult['net_sales_cents']) }}</div>
                         </div>
                         <div class="zazu-detail-row">
-                            <div class="zazu-detail-label">Actual costs</div>
+                            <div class="zazu-detail-label">Actual costs recorded</div>
                             <div class="zazu-detail-value">{{ $eventResult['currency'] }} {{ \App\Support\Money::formatCents($eventResult['actual_cost_cents']) }}</div>
                         </div>
                     </div>
