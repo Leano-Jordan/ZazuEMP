@@ -40,7 +40,7 @@
     @vite(['resources/css/app.css', 'resources/css/zazu-responsive-theme.css', 'resources/css/zazu-mobile-refinement.css', 'resources/css/zazu-final-visual-sweep.css', 'resources/css/zazu-dashboard-authority.css', 'resources/css/zazu-product-authority.css', 'resources/js/app.js'])
     <style nonce="{{ request()->attributes->get('cspNonce') }}">
         :root {
-            --zazu-dashboard-image: url('{{ e($business?->dashboard_image_path ? route('business.media', ['type' => 'dashboard']).'?v='.$brandingVersion : asset('images/Background-ZAZU.jpg')) }}');
+            --zazu-dashboard-image: url('{{ e($business?->dashboard_image_path ? route('business.media', ['type' => 'dashboard']).'?v='.$brandingVersion : asset('images/landing/stock/hero.jpg')) }}');
             @if($business?->wallpaper_path)
                 --zazu-wallpaper: url('{{ e(route('business.media', ['type' => 'wallpaper']).'?v='.$brandingVersion) }}');
             @endif
