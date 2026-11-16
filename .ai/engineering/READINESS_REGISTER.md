@@ -1,3 +1,15 @@
+## Director reconciliation — 2026-11-16 (dashboard shared-theme recovery)
+
+- Source/test correction: `8cdadcd1563bd30c88b15153ca91181a2d5abb23`; current `main` manifest-only descendant: `dfc01749af5718011332a9e86d303b9622fe7ff4`.
+- Dashboard light/dark colours now use shared Zazu theme tokens. The high-specificity dark-mode alias regression is covered by the visual foundation test; the layered hero/business-image treatment remains.
+- Exact-head Laravel source/test run [43952349496](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/43952349496): **500 passed / 1 skipped / 3,549 assertions**; offline browser **37 desktop + 6 mobile-viewport passed**; separate phone-local attachment **1 passed**; PostgreSQL migration and backup/private-file recovery smoke **PASS**.
+- Manifest descendant run [43952861421](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/43952861421): Laravel, offline-browser and PostgreSQL jobs all **PASS**. Zazu Quality [43952861428](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/43952861428), Director Health [43952861384](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/43952861384), and Push on main [43952861462](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/43952861462): **PASS**. SonarCloud skipped.
+- Automated CI/browser verification is green. **Actual owner-PC rendered appearance remains UNVERIFIED**; CI browser success is not a substitute for inspecting the real PC screen.
+- No evidence-maturity or readiness score uplift. V1 remains **NOT READY** pending the existing physical installed-device check, intended-installation recovery drill, live business-record reconciliation and POPIA operational sign-off. Branding/name clearance remains deferred by owner direction.
+- No offline-engine, database, production deployment, customer data or non-main branch changed.
+
+---
+
 ## Director reconciliation — 2026-11-14 (owner-resumed offline V1)
 
 - Owner resumed bounded offline engineering on 2026-11-14 and explicitly required no looping or duplicate effort. Work remains on canonical `main`; no deployment or non-main branch was used.
