@@ -1643,9 +1643,8 @@ html[data-theme="dark"] body.zazu-dashboard-page .zazu-dash-quote-stage {
 
 
 /* ==========================================================================
-   DIRECTOR — dashboard returns to the shared Zazu design system.
-   Keep the dashboard's layout, imagery and interaction hierarchy; remove its
-   isolated blue palette so light/dark surfaces match every other module.
+   DIRECTOR — shared Zazu palette, preserved dashboard visual identity.
+   Colours are token-owned; hero imagery, overlays and depth remain intact.
    ========================================================================== */
 body.zazu-dashboard-page {
     --dash-canvas: var(--zazu-page);
@@ -1661,21 +1660,16 @@ body.zazu-dashboard-page {
 }
 body.zazu-dashboard-page .zazu-shell,
 body.zazu-dashboard-page .zazu-main,
-body.zazu-dashboard-page .zazu-content {
-    background: var(--zazu-page) !important;
-    color: var(--zazu-ink) !important;
-}
+body.zazu-dashboard-page .zazu-content { background: var(--zazu-page) !important; color: var(--zazu-ink) !important; }
 body.zazu-dashboard-page .zazu-sidebar {
     background: var(--zazu-sidebar) !important;
+    background-image: none !important;
     border-right: 1px solid var(--zazu-border) !important;
     color: var(--zazu-sidebar-ink) !important;
     box-shadow: none !important;
 }
 body.zazu-dashboard-page .zazu-brand,
-body.zazu-dashboard-page .zazu-sidebar-footer {
-    background: var(--zazu-sidebar) !important;
-    border-color: var(--zazu-border) !important;
-}
+body.zazu-dashboard-page .zazu-sidebar-footer { background: var(--zazu-sidebar) !important; border-color: var(--zazu-border) !important; }
 body.zazu-dashboard-page .zazu-brand-lockup strong,
 body.zazu-dashboard-page .zazu-brand-lockup span,
 body.zazu-dashboard-page .zazu-sidebar .zazu-nav-area-trigger,
@@ -1684,9 +1678,7 @@ body.zazu-dashboard-page .zazu-footer-workspace-label,
 body.zazu-dashboard-page .zazu-footer-workspace strong,
 body.zazu-dashboard-page .zazu-footer-workspace > span:last-child,
 body.zazu-dashboard-page .zazu-user-identity,
-body.zazu-dashboard-page .zazu-user-identity strong {
-    color: var(--zazu-sidebar-ink) !important;
-}
+body.zazu-dashboard-page .zazu-user-identity strong { color: var(--zazu-sidebar-ink) !important; }
 body.zazu-dashboard-page .zazu-sidebar .zazu-nav-area-trigger:hover,
 body.zazu-dashboard-page .zazu-sidebar .zazu-nav-area-trigger:focus-visible,
 body.zazu-dashboard-page .zazu-sidebar .zazu-nav-area.is-open > .zazu-nav-area-trigger,
@@ -1703,10 +1695,7 @@ body.zazu-dashboard-page .zazu-sidebar .zazu-nav-area.is-active > .zazu-nav-area
     box-shadow: inset 3px 0 0 var(--zazu-primary) !important;
 }
 body.zazu-dashboard-page .zazu-footer-workspace,
-body.zazu-dashboard-page .zazu-user-trigger {
-    border-color: var(--zazu-border) !important;
-    background: var(--zazu-sidebar-surface) !important;
-}
+body.zazu-dashboard-page .zazu-user-trigger { border-color: var(--zazu-border) !important; background: var(--zazu-sidebar-surface) !important; }
 body.zazu-dashboard-page .zazu-topbar {
     border-bottom: 1px solid var(--zazu-border) !important;
     background: color-mix(in srgb, var(--zazu-surface) 96%, var(--zazu-page)) !important;
@@ -1714,28 +1703,29 @@ body.zazu-dashboard-page .zazu-topbar {
 }
 body.zazu-dashboard-page .zazu-dash-hero {
     border-color: var(--zazu-border) !important;
-    background: var(--zazu-surface-2) !important;
-    background-image: none !important;
+    background-color: var(--zazu-surface-2) !important;
+    background-image:
+        radial-gradient(circle at 78% 12%, color-mix(in srgb, var(--zazu-primary) 14%, transparent), transparent 15rem),
+        linear-gradient(112deg, var(--zazu-surface-2), var(--zazu-surface)) !important;
     box-shadow: var(--zazu-shadow) !important;
 }
 body.zazu-dashboard-page .zazu-dash-hero .zazu-dash-greeting,
 body.zazu-dashboard-page .zazu-dash-hero .zazu-dash-hero-lead,
 body.zazu-dashboard-page .zazu-dash-hero .zazu-dash-hero-support,
-body.zazu-dashboard-page .zazu-dash-hero h2 {
-    color: var(--zazu-ink) !important;
-}
-body.zazu-dashboard-page .zazu-dash-hero-side {
-    border-color: var(--zazu-border) !important;
-    background: var(--zazu-surface) !important;
-    background-image: none !important;
-    box-shadow: none !important;
-}
+body.zazu-dashboard-page .zazu-dash-hero h2,
 body.zazu-dashboard-page .zazu-dash-capability-copy .zazu-dash-side-label,
 body.zazu-dashboard-page .zazu-dash-capability-copy strong,
 body.zazu-dashboard-page .zazu-dash-capability-copy > span:not(.zazu-dash-side-label),
-body.zazu-dashboard-page .zazu-dash-capability-copy .zazu-text-action {
-    color: var(--zazu-ink) !important;
+body.zazu-dashboard-page .zazu-dash-capability-copy .zazu-text-action { color: var(--zazu-ink) !important; }
+body.zazu-dashboard-page .zazu-dash-hero-side {
+    border-color: var(--zazu-border) !important;
+    background-color: var(--zazu-surface-2) !important;
+    background-image:
+        linear-gradient(110deg, color-mix(in srgb, var(--zazu-surface) 94%, transparent), color-mix(in srgb, var(--zazu-surface-2) 82%, transparent)),
+        var(--zazu-dashboard-image) !important;
+    box-shadow: var(--zazu-shadow) !important;
 }
+body.zazu-dashboard-page .zazu-dash-hero-image { opacity: .18; }
 body.zazu-dashboard-page .zazu-dash-overview .zazu-dash-metric,
 body.zazu-dashboard-page .zazu-dash-overview .zazu-dash-metric:nth-child(4n + 1),
 body.zazu-dashboard-page .zazu-dash-overview .zazu-dash-metric:nth-child(4n + 2),
@@ -1747,19 +1737,10 @@ body.zazu-dashboard-page .zazu-dash-overview .zazu-dash-metric:nth-child(4n) {
     box-shadow: var(--zazu-shadow) !important;
 }
 body.zazu-dashboard-page .zazu-dash-metric::before,
-body.zazu-dashboard-page .zazu-dash-metric:nth-child(n)::before {
-    background: var(--zazu-primary) !important;
-}
-body.zazu-dashboard-page .zazu-dash-metric > span:not(.zazu-dash-metric-icon) {
-    color: var(--zazu-muted) !important;
-}
-body.zazu-dashboard-page .zazu-dash-metric > strong {
-    color: var(--zazu-ink) !important;
-}
-body.zazu-dashboard-page .zazu-dash-metric-icon {
-    background: var(--zazu-primary-soft) !important;
-    color: var(--zazu-primary) !important;
-}
+body.zazu-dashboard-page .zazu-dash-metric:nth-child(n)::before { background: var(--zazu-primary) !important; }
+body.zazu-dashboard-page .zazu-dash-metric > span:not(.zazu-dash-metric-icon) { color: var(--zazu-muted) !important; }
+body.zazu-dashboard-page .zazu-dash-metric > strong { color: var(--zazu-ink) !important; }
+body.zazu-dashboard-page .zazu-dash-metric-icon { background: var(--zazu-primary-soft) !important; color: var(--zazu-primary) !important; }
 body.zazu-dashboard-page .zazu-dash-quick-actions .zazu-btn,
 body.zazu-dashboard-page .zazu-dash-quick-actions .zazu-btn:not(.zazu-btn-cta) {
     border-color: var(--zazu-border) !important;
@@ -1781,22 +1762,17 @@ body.zazu-dashboard-page .zazu-dash-quick-actions .zazu-btn-cta:hover {
 }
 body.zazu-dashboard-page .zazu-dash-surface {
     border-color: var(--zazu-border) !important;
-    background: var(--zazu-surface) !important;
+    background: linear-gradient(145deg, var(--zazu-surface), color-mix(in srgb, var(--zazu-surface-2) 76%, var(--zazu-surface))) !important;
     box-shadow: var(--zazu-shadow) !important;
 }
-body.zazu-dashboard-page .zazu-dash-surface-head {
-    border-bottom-color: var(--zazu-border) !important;
-    background: var(--zazu-surface-2) !important;
-}
+body.zazu-dashboard-page .zazu-dash-surface-head { border-bottom-color: var(--zazu-border) !important; background: var(--zazu-surface-2) !important; }
 body.zazu-dashboard-page .zazu-dash-surface-head h3,
 body.zazu-dashboard-page .zazu-dash-panel-heading h3,
 body.zazu-dashboard-page .zazu-dash-event-copy strong,
 body.zazu-dashboard-page .zazu-dash-focus-item strong,
 body.zazu-dashboard-page .zazu-dash-health-label strong,
 body.zazu-dashboard-page .zazu-dash-health-value,
-body.zazu-dashboard-page .zazu-dash-quote-stage strong {
-    color: var(--zazu-ink) !important;
-}
+body.zazu-dashboard-page .zazu-dash-quote-stage strong { color: var(--zazu-ink) !important; }
 body.zazu-dashboard-page .zazu-dash-surface-head p,
 body.zazu-dashboard-page .zazu-dash-panel-heading p,
 body.zazu-dashboard-page .zazu-dash-event-copy span,
@@ -1805,9 +1781,7 @@ body.zazu-dashboard-page .zazu-dash-focus-item small,
 body.zazu-dashboard-page .zazu-dash-resource-grid small,
 body.zazu-dashboard-page .zazu-dash-quote-stage span,
 body.zazu-dashboard-page .zazu-dash-quote-stage small,
-body.zazu-dashboard-page .zazu-dash-empty {
-    color: var(--zazu-muted) !important;
-}
+body.zazu-dashboard-page .zazu-dash-empty { color: var(--zazu-muted) !important; }
 body.zazu-dashboard-page .zazu-dash-event,
 body.zazu-dashboard-page .zazu-dash-focus-item,
 body.zazu-dashboard-page .zazu-dash-resource-grid > *,
@@ -1818,61 +1792,56 @@ body.zazu-dashboard-page .zazu-dash-quote-stage {
 }
 body.zazu-dashboard-page .zazu-dash-event:hover,
 body.zazu-dashboard-page .zazu-dash-focus-item:hover,
-body.zazu-dashboard-page .zazu-dash-resource-grid > *:hover {
-    background: var(--zazu-surface-3) !important;
-    border-color: var(--zazu-border-strong) !important;
-}
-body.zazu-dashboard-page .zazu-app-footer {
-    border-color: var(--zazu-border) !important;
-    color: var(--zazu-muted) !important;
-}
-body.zazu-dashboard-page .zazu-dash-metric:hover {
-    border-color: var(--zazu-border-strong) !important;
-    box-shadow: var(--zazu-shadow-strong) !important;
-}
+body.zazu-dashboard-page .zazu-dash-resource-grid > *:hover { background: var(--zazu-surface-3) !important; border-color: var(--zazu-border-strong) !important; }
+body.zazu-dashboard-page .zazu-app-footer { border-color: var(--zazu-border) !important; color: var(--zazu-muted) !important; }
+body.zazu-dashboard-page .zazu-dash-metric:hover { border-color: var(--zazu-border-strong) !important; box-shadow: var(--zazu-shadow-strong) !important; }
 body.zazu-dashboard-page .zazu-dash-metric:focus-visible,
 body.zazu-dashboard-page .zazu-dash-quick-actions .zazu-btn:focus-visible,
 body.zazu-dashboard-page .zazu-dash-event:focus-visible,
-body.zazu-dashboard-page .zazu-dash-focus-item:focus-visible {
-    outline-color: var(--zazu-focus) !important;
-}
+body.zazu-dashboard-page .zazu-dash-focus-item:focus-visible { outline-color: var(--zazu-focus) !important; }
 
-
-/* Dark theme has higher-specificity legacy selectors; explicitly bind it to
-   the same shared tokens so the dashboard cannot drift from other modules. */
-html[data-theme="dark"] body.zazu-dashboard-page {
-    --dash-canvas: var(--zazu-page);
-    --dash-surface: var(--zazu-surface);
-    --dash-surface-soft: var(--zazu-surface-2);
-    --dash-border: var(--zazu-border);
-    --dash-ink: var(--zazu-ink);
-    --dash-muted: var(--zazu-muted);
-    background: var(--zazu-page) !important;
-    color: var(--zazu-ink) !important;
-}
+/* These explicit selectors beat the legacy dark palette without losing the
+   hero's layered finish or the business-provided image. */
+html[data-theme="dark"] body.zazu-dashboard-page,
+html[data-theme="dark"] body.zazu-dashboard-page .zazu-shell,
+html[data-theme="dark"] body.zazu-dashboard-page .zazu-main,
+html[data-theme="dark"] body.zazu-dashboard-page .zazu-content { background: var(--zazu-page) !important; color: var(--zazu-ink) !important; }
 html[data-theme="dark"] body.zazu-dashboard-page .zazu-sidebar,
 html[data-theme="dark"] body.zazu-dashboard-page .zazu-brand,
 html[data-theme="dark"] body.zazu-dashboard-page .zazu-sidebar-footer {
     background: var(--zazu-sidebar) !important;
+    background-image: none !important;
     border-color: var(--zazu-border) !important;
 }
-html[data-theme="dark"] body.zazu-dashboard-page .zazu-topbar {
-    background: var(--zazu-surface) !important;
+html[data-theme="dark"] body.zazu-dashboard-page .zazu-topbar { background: var(--zazu-surface) !important; border-color: var(--zazu-border) !important; }
+html[data-theme="dark"] body.zazu-dashboard-page .zazu-dash-hero {
+    background-color: var(--zazu-surface-2) !important;
+    background-image:
+        radial-gradient(circle at 78% 12%, color-mix(in srgb, var(--zazu-primary) 18%, transparent), transparent 15rem),
+        linear-gradient(112deg, var(--zazu-surface-2), var(--zazu-surface)) !important;
     border-color: var(--zazu-border) !important;
 }
-html[data-theme="dark"] body.zazu-dashboard-page .zazu-dash-hero,
+html[data-theme="dark"] body.zazu-dashboard-page .zazu-dash-hero-side {
+    background-color: var(--zazu-surface-2) !important;
+    background-image:
+        linear-gradient(110deg, color-mix(in srgb, var(--zazu-surface) 94%, transparent), color-mix(in srgb, var(--zazu-surface-2) 82%, transparent)),
+        var(--zazu-dashboard-image) !important;
+    border-color: var(--zazu-border) !important;
+}
 html[data-theme="dark"] body.zazu-dashboard-page .zazu-dash-overview .zazu-dash-metric:nth-child(n),
 html[data-theme="dark"] body.zazu-dashboard-page .zazu-dash-surface {
     background: var(--zazu-surface) !important;
-    background-image: none !important;
     border-color: var(--zazu-border) !important;
     color: var(--zazu-ink) !important;
     box-shadow: var(--zazu-shadow) !important;
 }
-html[data-theme="dark"] body.zazu-dashboard-page .zazu-dash-hero-side,
+html[data-theme="dark"] body.zazu-dashboard-page .zazu-dash-surface-head,
+html[data-theme="dark"] body.zazu-dashboard-page .zazu-dash-event,
+html[data-theme="dark"] body.zazu-dashboard-page .zazu-dash-focus-item,
+html[data-theme="dark"] body.zazu-dashboard-page .zazu-dash-resource-grid > *,
+html[data-theme="dark"] body.zazu-dashboard-page .zazu-dash-quote-stage,
 html[data-theme="dark"] body.zazu-dashboard-page .zazu-dash-quick-actions .zazu-btn:not(.zazu-btn-cta) {
     background: var(--zazu-surface-2) !important;
-    background-image: none !important;
     border-color: var(--zazu-border) !important;
     color: var(--zazu-ink) !important;
 }
@@ -1887,32 +1856,19 @@ html[data-theme="dark"] body.zazu-dashboard-page .zazu-dash-metric > strong,
 html[data-theme="dark"] body.zazu-dashboard-page .zazu-dash-surface-head h3,
 html[data-theme="dark"] body.zazu-dashboard-page .zazu-dash-event-copy strong,
 html[data-theme="dark"] body.zazu-dashboard-page .zazu-dash-focus-item strong,
-html[data-theme="dark"] body.zazu-dashboard-page .zazu-dash-health-value {
-    color: var(--zazu-ink) !important;
-}
+html[data-theme="dark"] body.zazu-dashboard-page .zazu-dash-health-value,
+html[data-theme="dark"] body.zazu-dashboard-page .zazu-dash-quote-stage strong { color: var(--zazu-ink) !important; }
 html[data-theme="dark"] body.zazu-dashboard-page .zazu-dash-metric > span:not(.zazu-dash-metric-icon),
 html[data-theme="dark"] body.zazu-dashboard-page .zazu-dash-surface-head p,
 html[data-theme="dark"] body.zazu-dashboard-page .zazu-dash-event-copy span,
 html[data-theme="dark"] body.zazu-dashboard-page .zazu-dash-event-copy small,
 html[data-theme="dark"] body.zazu-dashboard-page .zazu-dash-focus-item small,
-html[data-theme="dark"] body.zazu-dashboard-page .zazu-dash-resource-grid small {
-    color: var(--zazu-muted) !important;
-}
-html[data-theme="dark"] body.zazu-dashboard-page .zazu-dash-metric-icon {
-    background: var(--zazu-primary-soft) !important;
-    color: var(--zazu-primary) !important;
-}
+html[data-theme="dark"] body.zazu-dashboard-page .zazu-dash-resource-grid small,
+html[data-theme="dark"] body.zazu-dashboard-page .zazu-dash-empty { color: var(--zazu-muted) !important; }
+html[data-theme="dark"] body.zazu-dashboard-page .zazu-dash-metric-icon { background: var(--zazu-primary-soft) !important; color: var(--zazu-primary) !important; }
+html[data-theme="dark"] body.zazu-dashboard-page .zazu-dash-metric::before { background: var(--zazu-primary) !important; }
 html[data-theme="dark"] body.zazu-dashboard-page .zazu-dash-quick-actions .zazu-btn-cta {
     background: var(--zazu-primary) !important;
     border-color: var(--zazu-primary) !important;
     color: var(--zazu-primary-ink) !important;
-}
-html[data-theme="dark"] body.zazu-dashboard-page .zazu-dash-surface-head,
-html[data-theme="dark"] body.zazu-dashboard-page .zazu-dash-event,
-html[data-theme="dark"] body.zazu-dashboard-page .zazu-dash-focus-item,
-html[data-theme="dark"] body.zazu-dashboard-page .zazu-dash-resource-grid > *,
-html[data-theme="dark"] body.zazu-dashboard-page .zazu-dash-quote-stage {
-    background: var(--zazu-surface-2) !important;
-    border-color: var(--zazu-border) !important;
-    color: var(--zazu-ink) !important;
 }
