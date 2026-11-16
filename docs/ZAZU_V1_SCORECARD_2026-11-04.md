@@ -1,6 +1,6 @@
 ## Director evidence snapshot — 2026-11-16 (dashboard correction / current-head reconciliation)
 
-**Canonical repository:** `Leano-Jordan/ZazuEMP` · **branch:** `main` · **assessed source/control head:** `8b20f04ecc8f15734f65a4f465136bbcbb329d96`.
+**Canonical repository:** `Leano-Jordan/ZazuEMP` · **branch:** `main` · **assessed application/UI source head:** `8b20f04ecc8f15734f65a4f465136bbcbb329d96`.
 
 **Formal V1 evidence-maturity score: 71/100 (46/65 across 13 domains; 3.54/5).**  
 **Score action: REAFFIRMED — unchanged from the 2026-11-13 formal re-score.** This is not a new numerical re-score. The existing 13-domain table below remains the authoritative scoring basis.
@@ -11,7 +11,7 @@
 - Zazu Quality [run 43926017208](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/43926017208): **PASS**.
 - Director Health [run 43926017196](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/43926017196): **PASS**.
 - Push on main [run 43926017312](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/43926017312): **PASS**.
-- Laravel [run 43926017197](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/43926017197): Laravel job **PASS — 496 passed / 1 skipped / 3,511 assertions**. PostgreSQL migration/registration/backup-and-private-file-recovery job **PASS**. The dedicated offline-browser job was still running its mobile-viewport customer/Work acceptance step at the time of this snapshot; its result is **PENDING**, not a pass.
+- Laravel [run 43926017197](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/43926017197): Laravel job **PASS — 496 passed / 1 skipped / 3,511 assertions**. PostgreSQL migration/registration/backup-and-private-file-recovery job **PASS**. Dedicated offline-browser acceptance in the same Laravel run: **37 desktop Chromium tests passed**; **6 mobile-viewport tests passed**; the separate mobile phone-local attachment journey: **1 passed**. No failures were reported in these three acceptance commands.
 - The Laravel job also completed frontend dependency installation/build, Blade compilation, asset-manifest validation and LAN asset-origin contract checks. This proves build integrity, not that the owner's rendered screen now looks correct.
 
 ### Score and release boundary
@@ -22,7 +22,7 @@
 - Commercial workflow remains **4/5**. Seeded quote-to-payment-to-profit automation is verified; live business-record reconciliation remains an operator acceptance task.
 - Legal/privacy remains **1/5** pending operational POPIA/privacy sign-off. Zazu name clearance is deferred by owner direction and is not an active V1 engineering target.
 
-**Release disposition: NOT READY.** The remaining bounded V1 acceptance items are physical installed-device acceptance, the intended-installation recovery drill, live commercial-record reconciliation and POPIA operational sign-off. Do not convert the pending browser job or a source-level CSS correction into release approval.
+**Release disposition: NOT READY.** The remaining bounded V1 acceptance items are physical installed-device acceptance, the intended-installation recovery drill, live commercial-record reconciliation and POPIA operational sign-off. Do not convert browser automation or a source-level CSS correction into physical-device or release approval.
 
 ---
 
