@@ -1,3 +1,16 @@
+## Director reconciliation — 2026-11-16 (Windows V1 package and first-install proof)
+
+- **Package verification source:** `9a1fc33004c52d7ee4b5a16d94dc7d94b578e5f0` on canonical `main`.
+- Windows V1 package workflow [43966804827](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/43966804827): **PASS** — production Composer dependencies, Vite build, manifest/reference validation, clean ZIP assembly and artifact upload.
+- Windows PowerShell first-install job in the same run: **PASS** — PHP 8.4, SQLite, private `.env` creation, APP_KEY generation, database migrations, route boot and HTTP `/login` 200 response. The `Set-Cookie` header was checked to ensure the local loopback HTTP session cookie is not marked `Secure`.
+- Zazu Quality [43966805237](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/43966805237), Director Contract Lint [43966804706](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/43966804706), Director Health [43966804574](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/43966804574) and Push on main [43966803035](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/43966803035): **PASS**.
+- Artifact: `ZazuEMP-v1-candidate-9a1fc33.zip`; standalone package SHA-256: `33a60db7fb40a6031634c3d97fc1d3600b46e6994c2276f48fc08ca448c980a7`. The ZIP contains production dependencies, compiled CSS/JavaScript, Windows installer/launchers and customer/operator guides; no `.env`, local database, private customer files, tests or internal Zazu engineering controls.
+- The local first-install profile uses `SESSION_SECURE_COOKIE=false` for its explicit loopback HTTP address. HTTPS-only installations must set `SESSION_SECURE_COOKIE=true` and use the HTTPS origin. The local HTTP server must not be exposed to the public internet.
+- **Package/first-install gate: CLOSED for the defined Windows candidate criteria.** This is a fresh-install local Windows package, not an in-place updater or hosted SaaS deployment.
+- **V1 release remains NOT READY** until the actual owner PC/browser and intended phone/device are accepted, the installed-target database/private-media recovery drill is completed, real-business quote/payment/cost/profit records are reconciled, and POPIA operational/privacy sign-off is recorded. Automated CI is not a substitute for those operator proofs.
+- No production deployment, live customer database or customer records were changed. All work stayed on `main`; no branch was created.
+
+---
 ## Director reconciliation — 2026-11-16 (dashboard shared-theme recovery)
 
 - Source/test correction: `8cdadcd1563bd30c88b15153ca91181a2d5abb23`; current `main` manifest-only descendant: `dfc01749af5718011332a9e86d303b9622fe7ff4`.
