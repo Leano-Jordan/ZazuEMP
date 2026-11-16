@@ -198,7 +198,7 @@ jobs:
             '^APP_ENV=production$',
             '^APP_DEBUG=false$',
             '^APP_URL=http://127\.0\.0\.1:8000$',
-            '^SESSION_SECURE_COOKIE=true$',
+            '^SESSION_SECURE_COOKIE=false$',
             '^DB_CONNECTION=sqlite$',
             '^DB_DATABASE=database/database\.sqlite$'
           )) {
