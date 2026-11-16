@@ -1,5 +1,35 @@
 # Zazu EMP — Hardening & Commercial Readiness Scorecard
 
+## Current Director checkpoint — 2026-11-16
+
+**Canonical repository:** `Leano-Jordan/ZazuEMP`, branch `main`  
+**Current documentation/control head:** `19bc949891d02afd1226cf0843df259b4b35e682`  
+**Application/test head:** `8cdadcd1563bd30c88b15153ca91181a2d5abb23`; generated-asset manifest descendant `dfc01749af5718011332a9e86d303b9622fe7ff4`.
+
+### Verified engineering progress
+
+- Dashboard light/dark palette is now sourced from shared Zazu theme tokens. The dark-mode specificity defect is fixed, and Playwright asserts the computed shared-token relationship while retaining the layered hero/business-image treatment.
+- Exact source/test run [43952349496](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/43952349496): Laravel **500 passed / 1 skipped / 3,549 assertions**; offline browser **37 desktop passed**; mobile-viewport acceptance **6 passed**; phone-local attachment journey **1 passed**; PostgreSQL migration and database/private-file recovery smoke **PASS**.
+- Manifest descendant run [43952861421](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/43952861421): Laravel, offline-browser and PostgreSQL jobs **PASS**. Zazu Quality [43952861428](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/43952861428), Director Health [43952861384](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/43952861384), and Push on main [43952861462](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/43952861462) **PASS**. SonarCloud was skipped.
+- Current documentation-only reconciliation commit [19bc949](https://github.com/Leano-Jordan/ZazuEMP/commit/19bc949891d02afd1226cf0843df259b4b35e682): Zazu Quality **PASS** (application, Composer security audit, secret scan); Director Contract Lint **PASS**. Push-on-main was still running at the time of this checkpoint.
+- Offline session/attachment scope is documented against current automated coverage: unreachable logout, expired web-session recovery, owner/manager account transition, business-scoped queue preservation, stale response/logout races, cross-business pairing rejection, owner revocation and active Work attachment persistence/reconnect/idempotency/private-file checks. These remain automated evidence, not physical-device proof.
+
+### Score and release disposition
+
+**Evidence maturity remains 71/100 — unchanged. Commercial V1 remains NOT READY.** No numerical uplift is awarded for a CSS correction, documentation reconciliation or CI success alone.
+
+The remaining release gates are deliberately bounded:
+1. Physical Android installed-app acceptance: secure-origin launch, disconnected cold launch/restart/force-close, local file picker/storage and reconnect on the actual phone.
+2. Operator recovery drill on the intended installation, including database and private media.
+3. Live populated business-record reconciliation through quote → invoice/payment → costs/profit.
+4. POPIA operational/privacy sign-off.
+
+Brand/name clearance remains deferred by owner direction. Do not reopen already-passing seeded commercial tests without a reproducible defect. Do not claim PC visual acceptance or physical Android acceptance from CI viewport tests.
+
+**Execution control:** stay on `main`; no branches, no unrelated feature expansion, no production deployment or customer-data changes. Next engineering focus remains the highest-risk reproducible defect in V1 security/offline continuity, not future-scale work.
+
+---
+
 ## Purpose
 
 Current working gate for development toward a commercially usable release.
