@@ -1,3 +1,19 @@
+## Director reconciliation — 2026-11-16 (Windows V1 install candidate verified)
+
+**Canonical branch:** `main`  
+**Package verification source:** `9a1fc33004c52d7ee4b5a16d94dc7d94b578e5f0`  
+**Exact package/Windows install workflow:** [43966804827](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/43966804827).
+
+- Production Composer dependencies and Vite assets built successfully; manifest and referenced asset files verified; clean Windows ZIP assembled and uploaded with SHA-256.
+- Windows PowerShell 5.1 fresh-install smoke: **PASS** — PHP 8.4 with SQLite, private `.env` creation, APP_KEY generation, full migrations, login route boot, loopback `/login` HTTP 200 and a session cookie with no `Secure` attribute for the default HTTP profile.
+- Exact-head Zazu Quality [43966805237](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/43966805237), Director Contract Lint [43966804706](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/43966804706), Director Health [43966804574](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/43966804574) and Push-on-main [43966803035](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/43966803035): **PASS**.
+- Artifact: `ZazuEMP-v1-candidate-9a1fc33.zip`; standalone SHA-256: `33a60db7fb40a6031634c3d97fc1d3600b46e6994c2276f48fc08ca448c980a7`. This is a clean fresh-install Windows package, not an in-place updater or hosted SaaS image. The package does not bundle PHP; the host must provide PHP 8.4+ and required extensions.
+- The default loopback HTTP install sets `SESSION_SECURE_COOKIE=false` to preserve login sessions. For HTTPS-only use, change it to `true` and use the HTTPS origin. Do not expose the local HTTP server to the public internet.
+- **Package/first-install gate: CLOSED.** This only closes the Windows candidate package acceptance criteria.
+- **Release disposition: NOT READY** pending actual owner-PC/browser and intended phone acceptance, installed-target recovery including private files, real-business quote/payment/cost/profit reconciliation, and POPIA operational sign-off.
+- No production deployment, live database or customer data changed.
+
+---
 ## Director reconciliation — 2026-11-16 (dashboard visual correction / current-head CI)
 
 **Canonical branch:** `main` · **assessed application/UI source head:** `8b20f04ecc8f15734f65a4f465136bbcbb329d96`.
