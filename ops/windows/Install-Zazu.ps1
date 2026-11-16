@@ -110,7 +110,7 @@ if ($environmentCreated) {
         LOG_LEVEL = 'warning'
         DB_CONNECTION = 'sqlite'
         DB_DATABASE = 'database/database.sqlite'
-        SESSION_SECURE_COOKIE = 'true'
+        SESSION_SECURE_COOKIE = 'false'
         FILESYSTEM_DISK = 'local'
         QUEUE_CONNECTION = 'database'
         CACHE_STORE = 'database'
