@@ -1,3 +1,34 @@
+## Current Director checkpoint — 2026-11-16 (Windows V1 package)
+
+**Canonical repository:** `Leano-Jordan/ZazuEMP`, branch `main`  
+**Verified Windows package source:** `9a1fc33004c52d7ee4b5a16d94dc7d94b578e5f0`  
+**Package run:** [43966804827](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/43966804827) — package assembly and Windows PowerShell first-install smoke **PASS**.
+
+### Verified package and installation evidence
+
+- Production-only Composer dependencies installed; Vite frontend built; manifest and referenced assets verified; clean Windows ZIP assembled with SHA-256.
+- Windows PowerShell 5.1 fresh-install smoke with PHP 8.4/SQLite created the private `.env`, generated APP_KEY, ran migrations, booted Laravel routes, and fetched `/login` over loopback HTTP. The returned session cookie was checked to be browser-usable for the local HTTP profile.
+- Artifact `ZazuEMP-v1-candidate-9a1fc33.zip`; standalone SHA-256: `33a60db7fb40a6031634c3d97fc1d3600b46e6994c2276f48fc08ca448c980a7`.
+- Package includes production PHP dependencies, compiled frontend assets, Windows launchers/installer and customer/operator runbooks. It excludes `.env`, local DB, private business files, tests, Node modules and internal engineering controls.
+- The default package uses `SESSION_SECURE_COOKIE=false` for the local `http://127.0.0.1:8000` address. HTTPS-only installations must set it to `true`; the HTTP server must never be public.
+- The package is a **fresh local install candidate**, not an in-place updater or hosted SaaS deployment.
+- Zazu Quality [43966805237](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/43966805237), Director Contract Lint [43966804706](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/43966804706), Director Health [43966804574](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/43966804574), and Push on main [43966803035](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/43966803035): **PASS**.
+
+### Score and release disposition
+
+**Evidence maturity: 73/100 (up from 71/100).** The +2 reflects verified Windows packaging and first-install evidence only; it does not certify actual owner-device use or complete commercial release readiness.
+
+**Windows package/first-install gate: CLOSED for the defined fresh-install candidate.** The actual owner PC/browser and phone remain separate acceptance targets.
+
+**Commercial V1 remains NOT READY** pending:
+1. Owner-PC/browser rendered acceptance and physical phone acceptance for the intended phone/PWA workflows.
+2. Installed-target operator backup/restore drill, including private media.
+3. Live populated-business reconciliation through quote → invoice/payment → incurred costs → event contribution.
+4. POPIA operational/privacy sign-off.
+
+Brand/name clearance remains deferred by owner direction. Do not reopen already-passing seeded commercial tests without reproducible new evidence. No production deployment or live business-data change occurred.
+
+---
 # Zazu EMP — Hardening & Commercial Readiness Scorecard
 
 ## Current Director checkpoint — 2026-11-16
@@ -16,7 +47,7 @@
 
 ### Score and release disposition
 
-**Evidence maturity remains 71/100 — unchanged. Commercial V1 remains NOT READY.** No numerical uplift is awarded for a CSS correction, documentation reconciliation or CI success alone.
+**Evidence maturity: 73/100 (up from 71/100).** The +2 reflects verified Windows packaging and first-install evidence only; it does not certify actual owner-device use or complete commercial release readiness.
 
 The remaining release gates are deliberately bounded:
 1. Physical Android installed-app acceptance: secure-origin launch, disconnected cold launch/restart/force-close, local file picker/storage and reconnect on the actual phone.
