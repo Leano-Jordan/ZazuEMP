@@ -1,3 +1,16 @@
+## 2026-11-16 — Windows V1 package, local installer and browser session acceptance
+
+- **Canonical repository:** `Leano-Jordan/ZazuEMP`; all changes committed directly to `main`. Package verification source commit: `9a1fc33004c52d7ee4b5a16d94dc7d94b578e5f0`.
+- Added the Windows first-run installer and customer-facing setup guide. The installer checks PHP 8.4+ and required extensions; creates `.env` only on a fresh install; generates an application key; prepares local SQLite/storage paths; and runs migrations without seeding demo data or overwriting an existing `.env`/database.
+- The Windows package workflow builds production-only Composer dependencies, Vite production assets and a clean SHA-256-checksummed ZIP. It excludes local database/customer data, `.env`, tests, Node modules and internal Director files. The package is for a **fresh local installation**, not an updater or hosted SaaS deployment.
+- Exact package run [43966804827](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/43966804827): **PASS** — package build plus Windows PowerShell first-install smoke. The Windows job used PHP 8.4/SQLite, generated APP_KEY, migrated the database, booted the login route table, requested `/login` over loopback HTTP and confirmed a session cookie is issued without the `Secure` attribute.
+- Exact-head control checks: Zazu Quality [43966805237](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/43966805237), Director Contract Lint [43966804706](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/43966804706), Director Health [43966804574](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/43966804574), Push on main [43966803035](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/43966803035): **PASS**.
+- Local HTTP default: `SESSION_SECURE_COOKIE=false` is required for a usable session on `http://127.0.0.1:8000`; use `SESSION_SECURE_COOKIE=true` for HTTPS-only operation. Do not expose the local HTTP server to the internet.
+- Commercial architecture research was recorded in `docs/COMMERCIAL_ARCHITECTURE_RESEARCH_2026-11-16.md`, grounded in Tripleseat, Event Temple, Perfect Venue, HoneyBook and CaterZen workflow/review evidence. The reusable commercial standard remains one event/job source of truth, versioned proposal changes and connected operational/financial handoffs.
+- Remaining operator release evidence: actual owner-PC/browser and physical phone acceptance; installed-target database/private-file recovery; live populated-business financial reconciliation; POPIA operational/privacy sign-off. Brand/name clearance remains deferred by owner direction.
+- No production deployment, live business database or customer data changed. No branch created.
+
+---
 ## 2026-11-16 — Dashboard theme cascade correction and exact-head acceptance
 
 - **Canonical repository/ref:** `Leano-Jordan/ZazuEMP` / `main`. CSS and E2E source/test correction: `8cdadcd1563bd30c88b15153ca91181a2d5abb23`. Current main includes manifest-only descendant `dfc01749af5718011332a9e86d303b9622fe7ff4`.
