@@ -88,7 +88,11 @@ jobs:
             "$package_root/ZazuEMP/AGENTS.md" \
             "$package_root/ZazuEMP/CLAUDE.md" \
             "$package_root/ZazuEMP/CONTRIBUTING.md" \
+            "$package_root/ZazuEMP/README.md" \
+            "$package_root/ZazuEMP/ROSCORE_PROJECT_MANIFEST.md" \
+            "$package_root/ZazuEMP/IP_OWNERSHIP.md" \
             "$package_root/ZazuEMP/memory.md" \
+            "$package_root/ZazuEMP/.npmrc" \
             "$package_root/ZazuEMP/Dockerfile" \
             "$package_root/ZazuEMP/render.yaml" \
             "$package_root/ZazuEMP/.dockerignore" \
@@ -101,6 +105,7 @@ jobs:
           cp -a public/build/. "$package_root/ZazuEMP/public/build/"
           mkdir -p "$package_root/ZazuEMP/docs"
           cp docs/V1_PACKAGE_INSTALLATION.md "$package_root/ZazuEMP/docs/"
+          cp docs/V1_PACKAGE_INSTALLATION.md "$package_root/ZazuEMP/README.md"
           cp docs/LOCAL_PC_HOST_DEPLOYMENT.md "$package_root/ZazuEMP/docs/"
           cp docs/RELEASE_BACKUP_RESTORE_RUNBOOK.md "$package_root/ZazuEMP/docs/"
 
