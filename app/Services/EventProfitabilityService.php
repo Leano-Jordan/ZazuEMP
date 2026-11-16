@@ -18,10 +18,10 @@ final class EventProfitabilityService
      *     event_name: string,
      *     event_date: ?string,
      *     currency: string,
-     *     invoiced_cents: int,
+     *     net_sales_cents: int,
      *     actual_cost_cents: int,
-     *     profit_cents: int,
-     *     margin_percentage: ?float
+     *     indicative_result_cents: int,
+     *     indicative_margin_percentage: ?float
      * }>
      */
     public function forBusiness(Business $business): Collection
@@ -32,7 +32,7 @@ final class EventProfitabilityService
             ->where('business_id', $business->id)
             ->whereNotNull('event_id')
             ->whereIn('status', ['issued', 'paid'])
-            ->selectRaw('event_id, currency, SUM(total) as aggregate_total')
+            ->selectRaw('event_id, currency, SUM(subtotal) as aggregate_total')
             ->groupBy('event_id', 'currency')
             ->get();
 
@@ -41,7 +41,7 @@ final class EventProfitabilityService
             $totals[$key] = [
                 'event_id' => (int) $row->event_id,
                 'currency' => (string) $row->currency,
-                'invoiced_cents' => Money::toCents((string) $row->aggregate_total),
+                'net_sales_cents' => Money::toCents((string) $row->aggregate_total),
                 'actual_cost_cents' => 0,
             ];
         }
@@ -60,7 +60,7 @@ final class EventProfitabilityService
             $totals[$key] ??= [
                 'event_id' => (int) $row->event_id,
                 'currency' => (string) $row->currency,
-                'invoiced_cents' => 0,
+                'net_sales_cents' => 0,
                 'actual_cost_cents' => 0,
             ];
             $totals[$key]['actual_cost_cents'] = Money::toCents((string) $row->aggregate_total);
@@ -84,16 +84,16 @@ final class EventProfitabilityService
                     return null;
                 }
 
-                $profitCents = $amounts['invoiced_cents'] - $amounts['actual_cost_cents'];
+                $indicativeResultCents = $amounts['net_sales_cents'] - $amounts['actual_cost_cents'];
 
                 return [
                     ...$amounts,
                     'event_reference' => (string) $event->reference,
                     'event_name' => (string) $event->name,
                     'event_date' => $event->event_date?->toDateString(),
-                    'profit_cents' => $profitCents,
-                    'margin_percentage' => $amounts['invoiced_cents'] > 0
-                        ? round(($profitCents / $amounts['invoiced_cents']) * 100, 2)
+                    'indicative_result_cents' => $indicativeResultCents,
+                    'indicative_margin_percentage' => $amounts['net_sales_cents'] > 0
+                        ? round(($indicativeResultCents / $amounts['net_sales_cents']) * 100, 2)
                         : null,
                 ];
             })
