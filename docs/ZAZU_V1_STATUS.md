@@ -1,3 +1,19 @@
+## Director reconciliation — 2026-11-16 (Windows V1 package verified)
+
+**Canonical repository:** `Leano-Jordan/ZazuEMP` · **branch:** `main`  
+**Package verification source:** `9a1fc33004c52d7ee4b5a16d94dc7d94b578e5f0` · **workflow:** [43966804827](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/43966804827).
+
+- A clean Windows V1 candidate ZIP builds with production Composer dependencies and compiled Vite assets. Manifest integrity and referenced asset presence are checked before packaging.
+- The Windows PowerShell first-install smoke **PASSED** on PHP 8.4/SQLite: `.env` and APP_KEY creation, database migrations, login route boot, HTTP `/login` 200 and a usable local HTTP session cookie (no `Secure` attribute).
+- Zazu Quality [43966805237](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/43966805237), Director Contract Lint [43966804706](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/43966804706), Director Health [43966804574](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/43966804574), and Push on main [43966803035](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/43966803035): **PASS**.
+- Package: `ZazuEMP-v1-candidate-9a1fc33.zip`; standalone SHA-256: `33a60db7fb40a6031634c3d97fc1d3600b46e6994c2276f48fc08ca448c980a7`. It is a fresh local Windows installation candidate; it is not an updater or a hosted SaaS deployment. PHP 8.4+ remains a host prerequisite.
+- The installer defaults to loopback HTTP and therefore sets `SESSION_SECURE_COOKIE=false`; HTTPS-only operation must set it to `true`. Keep the local HTTP server off the public internet.
+- Commercial architecture research is recorded at `docs/COMMERCIAL_ARCHITECTURE_RESEARCH_2026-11-16.md`. Market pattern: event/job as one source of truth, versioned proposal changes, and connected payments, purchasing, preparation and profitability.
+- **Formal evidence maturity: 73/100** (previously 71/100; +2 for the verified package/installer and Windows first-install evidence).
+- **V1 remains NOT READY** pending owner-PC/browser and intended phone acceptance, installed-target backup/restore with private media, live-business quote/payment/cost/profit reconciliation and POPIA operational/privacy sign-off. Brand/name clearance remains deferred by owner direction.
+- No production deployment, live customer database or customer data changed.
+
+---
 ## Director reconciliation — 2026-11-16 (current V1 evidence)
 
 **Canonical repository:** `Leano-Jordan/ZazuEMP` · **branch:** `main` · **current documentation head:** `ee301b2b5732c849acfc015137f528cbd3604811` · **verified application/test source:** `8cdadcd1563bd30c88b15153ca91181a2d5abb23` · **compiled CSS manifest descendant:** `dfc01749af5718011332a9e86d303b9622fe7ff4`.
