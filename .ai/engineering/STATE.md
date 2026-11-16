@@ -1,3 +1,17 @@
+## 2026-11-16 — Dashboard theme cascade correction and exact-head acceptance
+
+- **Canonical repository/ref:** `Leano-Jordan/ZazuEMP` / `main`. CSS and E2E source/test correction: `8cdadcd1563bd30c88b15153ca91181a2d5abb23`. Current main includes manifest-only descendant `dfc01749af5718011332a9e86d303b9622fe7ff4`.
+- **Failure classification:** `ENG-CSS-004 / CASE-ZAZU-0032`, F1. In dark mode, a legacy high-specificity `html[data-theme="dark"] body.zazu-dashboard-page` declaration retained `--dash-canvas: #0D1D2E` while the shared `--zazu-page` token resolved to `#0B1726`. The dashboard therefore diverged from the application theme despite the lower-specificity token mapping.
+- **Correction:** rebound all dashboard theme aliases at the dark selector's effective specificity. The dashboard now consumes shared Zazu page, surface, sidebar, border, ink, muted and primary tokens in both themes. Its radial/linear hero treatment, business-image overlay, page composition and KPI hierarchy remain. No service-worker, IndexedDB, offline-sync, financial mutation or database code changed.
+- **Regression control:** `e2e/zazu-visual-foundation.spec.js` now compares computed dashboard aliases/surfaces against shared theme tokens in light and dark modes, checks the retained hero/image treatment and typography, and fails on stylesheet load errors.
+- **Exact source/test evidence:** Laravel run [43952349496](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/43952349496) — **500 passed / 1 skipped / 3,549 assertions**; desktop offline-browser acceptance **37 passed**; mobile-viewport acceptance **6 passed**; phone-local attachment journey **1 passed**; PostgreSQL migration/registration and backup/private-file restore smoke **PASS**.
+- **Current main manifest descendant:** `dfc01749` changes only the generated CSS asset reference to `assets/zazu-product-authority-DTNoJ_s9.css`. Laravel run [43952861421](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/43952861421): all three jobs **PASS** (Laravel, offline browser, PostgreSQL). Zazu Quality [43952861428](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/43952861428), Director Health [43952861384](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/43952861384), and Push on main [43952861462](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/43952861462): **PASS**. SonarCloud [43952861463](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/43952861463) was **SKIPPED**, not counted.
+- **Acceptance boundary:** automated CI/browser verification is green. Owner-PC rendered appearance and physical Android installed-device acceptance remain unverified; automated viewport emulation is not hardware proof.
+- **Readiness:** no score uplift. The formal V1 disposition remains **NOT READY** for the existing operational gates: physical installed-device acceptance, intended-installation recovery drill, live business-record reconciliation and POPIA operational sign-off. Brand clearance remains deferred by owner direction.
+- All source/test/documentation work stayed on `main`; no branch was created. No production deployment, live database or customer data was changed.
+
+---
+
 ## 2026-11-16 — Dependency audit workflow bootstrap correction
 
 - Canonical branch: `main`; exact workflow verification commit: `c0f0fdc7ad97d1c60ce9cfe53f5eebc35df827df`.
