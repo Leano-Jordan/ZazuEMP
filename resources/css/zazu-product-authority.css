@@ -1188,3 +1188,417 @@ html[data-theme="dark"] .zazu-sidebar .zazu-user-identity strong {
 html[data-theme="dark"] .zazu-sidebar .zazu-user-identity span {
     color: #B8C7D2 !important;
 }
+
+ 
+/* ==========================================================================
+   ZAZU VISUAL IDENTITY — V1 RESTORATION
+   The previous consolidation flattened all hero surfaces and removed the
+   dashboard's image treatment. Keep the product's blue hospitality identity
+   while retaining the existing responsive structure and semantic states.
+   ========================================================================== */
+
+body.zazu-dashboard-page {
+    --dash-canvas: #E6F0F8;
+    --dash-surface: #F8FBFE;
+    --dash-surface-soft: #EAF3FA;
+    --dash-border: #C7D9E8;
+    --dash-ink: #15395D;
+    --dash-muted: #4E6F91;
+    --dash-blue: #176FCE;
+    --dash-sidebar: #3676AA;
+    background:
+        radial-gradient(ellipse at 78% 0%, rgba(132, 190, 235, .30), transparent 34rem),
+        linear-gradient(135deg, #EDF5FC 0%, #DFECF7 55%, #E8F2FA 100%) !important;
+    color: var(--dash-ink);
+}
+
+body.zazu-dashboard-page .zazu-shell,
+body.zazu-dashboard-page .zazu-main,
+body.zazu-dashboard-page .zazu-content {
+    background: transparent !important;
+}
+
+body.zazu-dashboard-page .zazu-sidebar {
+    background: linear-gradient(180deg, #4382B5 0%, #326F9F 52%, #285D8B 100%) !important;
+    border-right: 1px solid #2D6798 !important;
+    color: #F4F9FF !important;
+    box-shadow: 5px 0 22px rgba(28, 73, 111, .12) !important;
+}
+
+body.zazu-dashboard-page .zazu-brand {
+    background: linear-gradient(135deg, rgba(255,255,255,.10), rgba(255,255,255,.025)) !important;
+    border-color: rgba(255,255,255,.14) !important;
+}
+
+body.zazu-dashboard-page .zazu-brand-lockup strong,
+body.zazu-dashboard-page .zazu-brand-lockup span,
+body.zazu-dashboard-page .zazu-sidebar .zazu-nav-area-trigger,
+body.zazu-dashboard-page .zazu-sidebar .zazu-nav-link,
+body.zazu-dashboard-page .zazu-footer-workspace-label,
+body.zazu-dashboard-page .zazu-footer-workspace strong,
+body.zazu-dashboard-page .zazu-footer-workspace > span:last-child,
+body.zazu-dashboard-page .zazu-user-identity,
+body.zazu-dashboard-page .zazu-user-identity strong {
+    color: #F4F9FF !important;
+}
+
+body.zazu-dashboard-page .zazu-sidebar .zazu-nav-area-trigger {
+    border-radius: 8px !important;
+    background: transparent !important;
+}
+
+body.zazu-dashboard-page .zazu-sidebar .zazu-nav-link {
+    border-radius: 8px !important;
+    background: transparent !important;
+}
+
+body.zazu-dashboard-page .zazu-sidebar .zazu-nav-area-trigger:hover,
+body.zazu-dashboard-page .zazu-sidebar .zazu-nav-area-trigger:focus-visible,
+body.zazu-dashboard-page .zazu-sidebar .zazu-nav-area.is-open > .zazu-nav-area-trigger,
+body.zazu-dashboard-page .zazu-sidebar .zazu-nav-link:hover,
+body.zazu-dashboard-page .zazu-sidebar .zazu-nav-link:focus-visible {
+    background: rgba(255,255,255,.14) !important;
+    color: #FFFFFF !important;
+}
+
+body.zazu-dashboard-page .zazu-sidebar .zazu-nav-link.active,
+body.zazu-dashboard-page .zazu-sidebar .zazu-nav-area.is-active > .zazu-nav-area-trigger {
+    border-color: rgba(255,255,255,.18) !important;
+    background: rgba(255,255,255,.20) !important;
+    color: #FFFFFF !important;
+    box-shadow: inset 3px 0 0 #B9DEFF !important;
+}
+
+body.zazu-dashboard-page .zazu-sidebar-footer {
+    border-color: rgba(255,255,255,.18) !important;
+}
+
+body.zazu-dashboard-page .zazu-footer-workspace,
+body.zazu-dashboard-page .zazu-user-trigger {
+    border-color: rgba(255,255,255,.18) !important;
+    background: rgba(12, 47, 78, .18) !important;
+}
+
+body.zazu-dashboard-page .zazu-topbar {
+    border-bottom: 1px solid #D0E0EE !important;
+    background: rgba(244, 249, 254, .92) !important;
+    box-shadow: 0 3px 16px rgba(43, 82, 116, .055) !important;
+    backdrop-filter: blur(14px);
+    -webkit-backdrop-filter: blur(14px);
+}
+
+body.zazu-dashboard-page .zazu-dash-hero {
+    position: relative;
+    min-height: 190px !important;
+    overflow: hidden;
+    border: 1px solid #C0D8EB !important;
+    border-radius: 16px !important;
+    background-image:
+        radial-gradient(circle at 78% 12%, rgba(255,255,255,.58), transparent 15rem),
+        radial-gradient(circle at 62% 110%, rgba(110,174,224,.18), transparent 18rem),
+        linear-gradient(112deg, #D8EAFB 0%, #E9F4FD 58%, #D5E9FA 100%) !important;
+    box-shadow: 0 10px 28px rgba(44, 91, 132, .11) !important;
+}
+
+body.zazu-dashboard-page .zazu-dash-hero-main {
+    position: relative;
+    z-index: 1;
+    padding: 25px 30px !important;
+}
+
+body.zazu-dashboard-page .zazu-dash-hero .zazu-dash-greeting,
+body.zazu-dashboard-page .zazu-dash-hero .zazu-dash-hero-lead,
+body.zazu-dashboard-page .zazu-dash-hero .zazu-dash-hero-support {
+    color: #315F8B !important;
+}
+
+body.zazu-dashboard-page .zazu-dash-hero h2 {
+    margin: 7px 0 8px !important;
+    color: #123D68 !important;
+    font-family: var(--zazu-font-display);
+    font-size: clamp(27px, 2.8vw, 38px) !important;
+    font-weight: 750;
+    line-height: 1.08 !important;
+    letter-spacing: -.045em;
+}
+
+body.zazu-dashboard-page .zazu-dash-hero .zazu-dash-hero-lead {
+    font-size: 15px !important;
+    line-height: 1.45 !important;
+}
+
+body.zazu-dashboard-page .zazu-dash-hero .zazu-dash-hero-support {
+    display: block !important;
+    margin-top: 4px !important;
+    font-size: 12px !important;
+    line-height: 1.5 !important;
+}
+
+body.zazu-dashboard-page .zazu-dash-hero-side {
+    position: relative;
+    display: flex !important;
+    align-items: center;
+    min-width: 0;
+    margin: 14px !important;
+    padding: 20px 22px !important;
+    overflow: hidden;
+    border: 1px solid rgba(255,255,255,.72) !important;
+    border-radius: 13px !important;
+    background-image:
+        linear-gradient(110deg, rgba(222,239,253,.94), rgba(225,240,252,.78)),
+        var(--zazu-dashboard-image) !important;
+    background-position: center;
+    background-size: cover;
+    box-shadow: 0 5px 18px rgba(46, 91, 132, .09) !important;
+}
+
+body.zazu-dashboard-page .zazu-dash-hero-image {
+    position: absolute !important;
+    inset: 0 !important;
+    display: block !important;
+    width: 100% !important;
+    height: 100% !important;
+    object-fit: cover !important;
+    opacity: .18;
+    pointer-events: none;
+}
+
+body.zazu-dashboard-page .zazu-dash-capability-copy {
+    position: relative;
+    z-index: 1;
+    display: grid !important;
+    grid-template-columns: minmax(0, 1fr) !important;
+    gap: 6px !important;
+}
+
+body.zazu-dashboard-page .zazu-dash-capability-copy .zazu-dash-side-label {
+    color: #315F8B !important;
+    font-size: 11px !important;
+    letter-spacing: .09em;
+}
+
+body.zazu-dashboard-page .zazu-dash-capability-copy strong {
+    color: #153F69 !important;
+    font-size: 18px !important;
+    line-height: 1.3;
+}
+
+body.zazu-dashboard-page .zazu-dash-capability-copy > span:not(.zazu-dash-side-label) {
+    display: block !important;
+    color: #426A91 !important;
+    font-size: 12px !important;
+    line-height: 1.45;
+}
+
+body.zazu-dashboard-page .zazu-dash-capability-copy .zazu-text-action {
+    grid-column: 1;
+    margin-top: 5px;
+    color: #075FC4 !important;
+    font-weight: 750;
+}
+
+body.zazu-dashboard-page .zazu-dash-overview .zazu-dash-metric {
+    position: relative;
+    min-height: 112px !important;
+    overflow: hidden;
+    border: 1px solid #C9DDED !important;
+    border-radius: 13px !important;
+    box-shadow: 0 5px 16px rgba(42, 85, 125, .075) !important;
+    transition: transform .16s ease, box-shadow .16s ease, border-color .16s ease;
+}
+
+body.zazu-dashboard-page .zazu-dash-overview .zazu-dash-metric:nth-child(4n + 1) {
+    background: linear-gradient(145deg, #FFFFFF 0%, #E8F2FF 100%) !important;
+}
+body.zazu-dashboard-page .zazu-dash-overview .zazu-dash-metric:nth-child(4n + 2) {
+    background: linear-gradient(145deg, #FFFFFF 0%, #E8F5EF 100%) !important;
+}
+body.zazu-dashboard-page .zazu-dash-overview .zazu-dash-metric:nth-child(4n + 3) {
+    background: linear-gradient(145deg, #FFFFFF 0%, #F0EDFF 100%) !important;
+}
+body.zazu-dashboard-page .zazu-dash-overview .zazu-dash-metric:nth-child(4n) {
+    background: linear-gradient(145deg, #FFFFFF 0%, #FFF3E3 100%) !important;
+}
+
+body.zazu-dashboard-page .zazu-dash-metric::before {
+    display: block !important;
+    width: 4px !important;
+    background: #438DE0 !important;
+}
+body.zazu-dashboard-page .zazu-dash-metric:nth-child(4n + 2)::before { background: #32A77A !important; }
+body.zazu-dashboard-page .zazu-dash-metric:nth-child(4n + 3)::before { background: #8A70D6 !important; }
+body.zazu-dashboard-page .zazu-dash-metric:nth-child(4n)::before { background: #D99A3E !important; }
+
+body.zazu-dashboard-page .zazu-dash-overview .zazu-dash-metric:hover {
+    transform: translateY(-2px);
+    border-color: #A9CBE7 !important;
+    box-shadow: 0 10px 23px rgba(42, 85, 125, .13) !important;
+}
+
+body.zazu-dashboard-page .zazu-dash-quick-actions .zazu-btn {
+    min-height: 70px !important;
+    border: 1px solid #C7DCEC !important;
+    border-radius: 12px !important;
+    background: linear-gradient(145deg, #FFFFFF, #EAF3FC) !important;
+    color: #174A78 !important;
+    box-shadow: 0 4px 13px rgba(42, 85, 125, .07) !important;
+    transition: transform .16s ease, box-shadow .16s ease, border-color .16s ease;
+}
+
+body.zazu-dashboard-page .zazu-dash-quick-actions .zazu-btn:hover {
+    transform: translateY(-2px);
+    border-color: #A9CBE7 !important;
+    box-shadow: 0 8px 18px rgba(42, 85, 125, .12) !important;
+}
+
+body.zazu-dashboard-page .zazu-dash-quick-actions .zazu-btn-cta {
+    border-color: #176FCE !important;
+    background: linear-gradient(135deg, #2786ED 0%, #1267C8 100%) !important;
+    color: #FFFFFF !important;
+    box-shadow: 0 8px 18px rgba(23, 111, 206, .24) !important;
+}
+
+body.zazu-dashboard-page .zazu-dash-quick-actions .zazu-btn-cta:hover {
+    background: linear-gradient(135deg, #1979DF 0%, #0E5DB8 100%) !important;
+    color: #FFFFFF !important;
+    box-shadow: 0 11px 23px rgba(23, 111, 206, .30) !important;
+}
+
+body.zazu-dashboard-page .zazu-dash-surface {
+    border: 1px solid #C9DDED !important;
+    border-radius: 14px !important;
+    background: linear-gradient(145deg, rgba(255,255,255,.98), rgba(244,249,254,.98)) !important;
+    box-shadow: 0 6px 19px rgba(42, 85, 125, .075) !important;
+}
+
+body.zazu-dashboard-page .zazu-dash-surface-head {
+    border-bottom: 1px solid #D7E6F2 !important;
+    background: linear-gradient(90deg, #EAF4FC, #F8FBFE 78%) !important;
+}
+
+body.zazu-dashboard-page .zazu-dash-event,
+body.zazu-dashboard-page .zazu-dash-focus-item,
+body.zazu-dashboard-page .zazu-dash-resource-grid > *,
+body.zazu-dashboard-page .zazu-dash-quote-stage {
+    border-color: #D4E3EF !important;
+    border-radius: 10px !important;
+    background: linear-gradient(145deg, #FFFFFF, #F0F6FC) !important;
+    box-shadow: 0 2px 8px rgba(42, 85, 125, .045) !important;
+}
+
+@media (max-width: 760px) {
+    body.zazu-dashboard-page .zazu-dash-hero {
+        min-height: 0 !important;
+    }
+    body.zazu-dashboard-page .zazu-dash-hero-main {
+        padding: 21px 19px !important;
+    }
+    body.zazu-dashboard-page .zazu-dash-hero-side {
+        min-height: 112px;
+        margin: 0 12px 12px !important;
+        padding: 16px !important;
+        border-radius: 11px !important;
+    }
+    body.zazu-dashboard-page .zazu-dash-overview .zazu-dash-metric {
+        min-height: 96px !important;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    body.zazu-dashboard-page .zazu-dash-overview .zazu-dash-metric,
+    body.zazu-dashboard-page .zazu-dash-quick-actions .zazu-btn {
+        transition: none !important;
+    }
+}
+
+html[data-theme="dark"] body.zazu-dashboard-page {
+    --dash-canvas: #0D1D2E;
+    --dash-border: #29445F;
+    --dash-ink: #E5EFF9;
+    --dash-muted: #A8BDD2;
+    background:
+        radial-gradient(ellipse at 78% 0%, rgba(42, 103, 154, .20), transparent 34rem),
+        linear-gradient(135deg, #0D1D2E 0%, #11263A 55%, #102236 100%) !important;
+}
+
+html[data-theme="dark"] body.zazu-dashboard-page .zazu-sidebar {
+    background: linear-gradient(180deg, #173B5D 0%, #102E4C 55%, #0B233B 100%) !important;
+    border-right-color: #29445F !important;
+}
+
+html[data-theme="dark"] body.zazu-dashboard-page .zazu-topbar {
+    border-bottom-color: #29445F !important;
+    background: rgba(17, 38, 58, .94) !important;
+}
+
+html[data-theme="dark"] body.zazu-dashboard-page .zazu-dash-hero {
+    border-color: #315472 !important;
+    background-image:
+        radial-gradient(circle at 78% 12%, rgba(72,130,177,.18), transparent 15rem),
+        linear-gradient(112deg, #173A59 0%, #1A4262 58%, #173852 100%) !important;
+    box-shadow: 0 10px 28px rgba(0,0,0,.20) !important;
+}
+
+html[data-theme="dark"] body.zazu-dashboard-page .zazu-dash-hero h2,
+html[data-theme="dark"] body.zazu-dashboard-page .zazu-dash-capability-copy strong {
+    color: #F1F7FD !important;
+}
+html[data-theme="dark"] body.zazu-dashboard-page .zazu-dash-hero .zazu-dash-greeting,
+html[data-theme="dark"] body.zazu-dashboard-page .zazu-dash-hero .zazu-dash-hero-lead,
+html[data-theme="dark"] body.zazu-dashboard-page .zazu-dash-hero .zazu-dash-hero-support,
+html[data-theme="dark"] body.zazu-dashboard-page .zazu-dash-capability-copy .zazu-dash-side-label,
+html[data-theme="dark"] body.zazu-dashboard-page .zazu-dash-capability-copy > span:not(.zazu-dash-side-label) {
+    color: #C1D7EB !important;
+}
+
+html[data-theme="dark"] body.zazu-dashboard-page .zazu-dash-hero-side {
+    border-color: #3B5D7A !important;
+    background-image:
+        linear-gradient(110deg, rgba(18,42,64,.91), rgba(20,48,72,.78)),
+        var(--zazu-dashboard-image) !important;
+}
+
+html[data-theme="dark"] body.zazu-dashboard-page .zazu-dash-overview .zazu-dash-metric:nth-child(n) {
+    border-color: #31506C !important;
+    background: linear-gradient(145deg, #1A344D, #142A40) !important;
+    box-shadow: 0 5px 16px rgba(0,0,0,.16) !important;
+}
+html[data-theme="dark"] body.zazu-dashboard-page .zazu-dash-metric > span:not(.zazu-dash-metric-icon) {
+    color: #B8CDE0 !important;
+}
+html[data-theme="dark"] body.zazu-dashboard-page .zazu-dash-metric > strong {
+    color: #F0F6FC !important;
+}
+html[data-theme="dark"] body.zazu-dashboard-page .zazu-dash-overview .zazu-dash-metric:nth-child(n) .zazu-dash-metric-icon {
+    background: #244968 !important;
+    color: #A9D1F4 !important;
+}
+
+html[data-theme="dark"] body.zazu-dashboard-page .zazu-dash-quick-actions .zazu-btn:not(.zazu-btn-cta) {
+    border-color: #365875 !important;
+    background: linear-gradient(145deg, #1C3853, #162E46) !important;
+    color: #E4EFF9 !important;
+}
+html[data-theme="dark"] body.zazu-dashboard-page .zazu-dash-quick-actions .zazu-btn-cta {
+    border-color: #2C83D7 !important;
+    background: linear-gradient(135deg, #267CCB, #155B9E) !important;
+    color: #FFFFFF !important;
+}
+
+html[data-theme="dark"] body.zazu-dashboard-page .zazu-dash-surface {
+    border-color: #2E4B66 !important;
+    background: linear-gradient(145deg, #172E44, #13283C) !important;
+    box-shadow: 0 6px 19px rgba(0,0,0,.17) !important;
+}
+html[data-theme="dark"] body.zazu-dashboard-page .zazu-dash-surface-head {
+    border-bottom-color: #2E4B66 !important;
+    background: linear-gradient(90deg, #1D3A55, #172E44 78%) !important;
+}
+html[data-theme="dark"] body.zazu-dashboard-page .zazu-dash-event,
+html[data-theme="dark"] body.zazu-dashboard-page .zazu-dash-focus-item,
+html[data-theme="dark"] body.zazu-dashboard-page .zazu-dash-resource-grid > *,
+html[data-theme="dark"] body.zazu-dashboard-page .zazu-dash-quote-stage {
+    border-color: #2D4A64 !important;
+    background: linear-gradient(145deg, #1B354D, #162D43) !important;
+    box-shadow: 0 2px 8px rgba(0,0,0,.12) !important;
+}
