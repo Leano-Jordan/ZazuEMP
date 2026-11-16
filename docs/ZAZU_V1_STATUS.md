@@ -1,13 +1,16 @@
 ## Director reconciliation — 2026-11-16 (current V1 evidence)
 
-**Canonical repository:** `Leano-Jordan/ZazuEMP` · **branch:** `main` · **assessed application/UI source head:** `8b20f04ecc8f15734f65a4f465136bbcbb329d96`.
+**Canonical repository:** `Leano-Jordan/ZazuEMP` · **branch:** `main` · **current documentation head:** `ee301b2b5732c849acfc015137f528cbd3604811` · **verified application/test source:** `8cdadcd1563bd30c88b15153ca91181a2d5abb23` · **compiled CSS manifest descendant:** `dfc01749af5718011332a9e86d303b9622fe7ff4`.
 
-- Dashboard visual hierarchy correction is on main in [`8b20f04`](https://github.com/Leano-Jordan/ZazuEMP/commit/8b20f04ecc8f15734f65a4f465136bbcbb329d96). The CSS bundle builds, its manifest validates, and visual-foundation browser assertions pass; rendered appearance on the owner's PC/phone remains **UNVERIFIED**.
-- Zazu Quality [43926017208](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/43926017208), Director Health [43926017196](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/43926017196), and Push on main [43926017312](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/43926017312): **PASS**.
-- Laravel [43926017197](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/43926017197): **496 passed / 1 skipped / 3,511 assertions**; PostgreSQL migration, registration, backup/restore and private-file recovery: **PASS**. Dedicated offline-browser acceptance: **37 desktop tests passed**, **6 mobile-viewport tests passed**, and **1 mobile phone-local attachment test passed**.
-- Formal evidence score remains **71/100**; no score uplift is awarded for visual CSS restoration or incomplete workflow evidence. See [the 13-domain V1 scorecard](ZAZU_V1_SCORECARD_2026-11-04.md).
-- **Release disposition: NOT READY.** Physical Android installed-device acceptance, installed-target recovery drill, live commercial-record reconciliation and POPIA operational sign-off remain. Brand/name clearance remains deferred by owner direction.
-- No production deployment or live customer data changed.
+- Dashboard theme recovery is complete in source: light and dark dashboard aliases use shared Zazu tokens; the radial/linear hero and business-image overlay remain. The visual foundation test compares computed styles in both themes.
+- Exact application/test run [43952349496](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/43952349496): **500 passed / 1 skipped / 3,549 assertions**; dedicated offline browser **37 desktop passed**; mobile-viewport acceptance **6 passed**; phone-local attachment journey **1 passed**; PostgreSQL migration/registration and database/private-file recovery smoke **PASS**.
+- The manifest-only descendant updates the CSS reference to `assets/zazu-product-authority-DTNoJ_s9.css`. Exact descendant run [43952861421](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/43952861421): all Laravel, offline-browser and PostgreSQL jobs **PASS**. Zazu Quality [43952861428](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/43952861428), Director Health [43952861384](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/43952861384), and Push on main [43952861462](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/43952861462): **PASS**. SonarCloud [43952861463](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/43952861463) was skipped and is not counted.
+- Server-side offline security review found no new defect requiring an architecture change: sync credentials are hash-stored, active/expiry/revocation checks are enforced, device revocation is owner/tenant-scoped, and attachment transfer/read paths enforce business scope and idempotent payload matching. Existing tests cover stale responses, re-pairing, expired/revoked tokens and cross-business pairing rejection.
+- **Formal evidence score remains 71/100**; no readiness uplift is awarded for this visual correction or automated viewport verification.
+- **Release disposition: NOT READY.** Physical Android installed-device acceptance, intended-installation recovery drill, live commercial-record reconciliation and POPIA operational sign-off remain open. Brand/name clearance remains deferred by owner direction.
+- Actual rendered appearance on the owner's PC remains **UNVERIFIED**; CI browser success is not real-PC acceptance.
+- No production deployment or live customer data changed. All engineering changes stayed on `main`; no branch was created.
+
 
 ---
 
