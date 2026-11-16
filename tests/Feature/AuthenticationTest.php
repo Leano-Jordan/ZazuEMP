@@ -51,6 +51,8 @@ class AuthenticationTest extends TestCase
             'role' => 'owner',
         ]);
 
+        // Surface the underlying exception in cross-database acceptance instead of hiding it behind HTTP 500.
+        $this->withoutExceptionHandling();
         $this->get(route('dashboard'))->assertOk();
         $this->post(route('logout'))->assertRedirect(route('landing'));
         $this->post(route('login.store'), [
