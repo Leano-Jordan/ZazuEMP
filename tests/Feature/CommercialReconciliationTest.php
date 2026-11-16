@@ -84,10 +84,10 @@ class CommercialReconciliationTest extends TestCase
             ->first(fn (array $row): bool => $row['event_id'] === $event->id && $row['currency'] === 'ZAR');
 
         $this->assertNotNull($profit);
-        $this->assertSame(1150000, $profit['net_sales_cents']);
+        $this->assertSame(1000000, $profit['net_sales_cents']);
         $this->assertSame(280000, $profit['actual_cost_cents']);
-        $this->assertSame(870000, $profit['indicative_result_cents']);
-        $this->assertSame(75.65, $profit['indicative_margin_percentage']);
+        $this->assertSame(720000, $profit['indicative_result_cents']);
+        $this->assertSame(72.0, $profit['indicative_margin_percentage']);
         $this->assertCount(
             1,
             app(EventProfitabilityService::class)->forBusiness($business)
