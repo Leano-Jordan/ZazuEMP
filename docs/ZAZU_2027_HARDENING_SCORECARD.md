@@ -31,7 +31,7 @@ Brand/name clearance remains deferred by owner direction. Do not reopen already-
 ---
 # Zazu EMP — Hardening & Commercial Readiness Scorecard
 
-## Current Director checkpoint — 2026-11-16
+## Prior Director checkpoint — 2026-11-16 (dashboard/theme stage)
 
 **Canonical repository:** `Leano-Jordan/ZazuEMP`, branch `main`  
 **Current documentation/control head:** `19bc949891d02afd1226cf0843df259b4b35e682`  
