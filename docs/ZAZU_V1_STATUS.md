@@ -14,7 +14,7 @@
 - No production deployment, live customer database or customer data changed.
 
 ---
-## Director reconciliation — 2026-11-16 (current V1 evidence)
+## Prior Director reconciliation — 2026-11-16 (dashboard and automated V1 evidence)
 
 **Canonical repository:** `Leano-Jordan/ZazuEMP` · **branch:** `main` · **current documentation head:** `ee301b2b5732c849acfc015137f528cbd3604811` · **verified application/test source:** `8cdadcd1563bd30c88b15153ca91181a2d5abb23` · **compiled CSS manifest descendant:** `dfc01749af5718011332a9e86d303b9622fe7ff4`.
 
