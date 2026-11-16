@@ -1311,12 +1311,16 @@ class OfflineDomainMutationHandler implements SyncMutationHandler
             'total_amount' => '0.00',
         ]);
 
-        $total = 0.0;
+        $totalCents = 0;
         foreach ($lines as $line) {
-            $total += $this->createOfflinePurchaseOrderLine($order, $mutation, $line);
+            $lineCents = $this->createOfflinePurchaseOrderLine($order, $mutation, $line);
+            if ($lineCents > PHP_INT_MAX - $totalCents) {
+                throw ValidationException::withMessages(['lines' => 'Offline purchase order total exceeds the supported calculation range.']);
+            }
+            $totalCents += $lineCents;
         }
 
-        $order->update(['total_amount' => number_format($total, 2, '.', '')]);
+        $order->update(['total_amount' => Money::fromCents($totalCents)]);
 
         return $order->fresh(['items']);
     }
@@ -1344,16 +1348,20 @@ class OfflineDomainMutationHandler implements SyncMutationHandler
         return $supplier;
     }
 
-    private function createOfflinePurchaseOrderLine(PurchaseOrder $order, SyncMutation $mutation, mixed $line): float
+    private function createOfflinePurchaseOrderLine(PurchaseOrder $order, SyncMutation $mutation, mixed $line): int
     {
         if (! is_array($line)) {
             throw ValidationException::withMessages(['lines' => 'Offline purchase order lines must be objects.']);
         }
 
         $description = $this->requiredString($line['description'] ?? null, 'description', 255);
-        $quantity = $this->positiveQuantity($line['quantity'] ?? null);
-        $unitPrice = $this->nonNegativeMoney($line['unit_price'] ?? null);
-        $lineTotal = round($quantity * $unitPrice, 2);
+        $quantityHundredths = $this->positivePurchaseQuantity($line['quantity'] ?? null);
+        $unitPriceCents = $this->nonNegativePurchasePrice($line['unit_price'] ?? null);
+        try {
+            $lineTotalCents = Money::multiplyQuantityByPrice($quantityHundredths, $unitPriceCents);
+        } catch (\\InvalidArgumentException) {
+            throw ValidationException::withMessages(['lines' => 'Offline purchase order line total exceeds the supported calculation range.']);
+        }
 
         $capabilityId = $line['capability_id'] ?? null;
         if ($capabilityId !== null && (
@@ -1372,15 +1380,15 @@ class OfflineDomainMutationHandler implements SyncMutationHandler
             'business_id' => $mutation->business_id,
             'capability_id' => $capabilityId,
             'description' => $description,
-            'quantity' => number_format($quantity, 2, '.', ''),
+            'quantity' => Money::fromCents($quantityHundredths),
             'received_quantity' => '0.00',
             'unit' => $this->nullableString($line['unit'] ?? null, 50),
-            'unit_price' => number_format($unitPrice, 2, '.', ''),
-            'line_total' => number_format($lineTotal, 2, '.', ''),
+            'unit_price' => Money::fromCents($unitPriceCents),
+            'line_total' => Money::fromCents($lineTotalCents),
         ]);
         $this->identities->register($item, 'purchase_order_item', $lineLocalId);
 
-        return $lineTotal;
+        return $lineTotalCents;
     }
 
     private function purchaseReceipt(SyncMutation $mutation): ?Model
@@ -1520,22 +1528,28 @@ class OfflineDomainMutationHandler implements SyncMutationHandler
         return (float) $value;
     }
 
-    private function positiveQuantity(mixed $value): float
+    private function positivePurchaseQuantity(mixed $value): int
     {
-        if (! is_numeric($value) || (float) $value <= 0) {
+        try {
+            $quantityHundredths = Money::toHundredths(is_int($value) || is_float($value) || is_string($value) ? $value : '');
+        } catch (\\InvalidArgumentException) {
+            throw ValidationException::withMessages(['quantity' => 'Offline purchase order quantity must be positive and have at most two decimal places.']);
+        }
+
+        if ($quantityHundredths <= 0) {
             throw ValidationException::withMessages(['quantity' => 'Offline purchase order quantity must be greater than zero.']);
         }
 
-        return round((float) $value, 2);
+        return $quantityHundredths;
     }
 
-    private function nonNegativeMoney(mixed $value): float
+    private function nonNegativePurchasePrice(mixed $value): int
     {
-        if (! is_numeric($value) || (float) $value < 0) {
-            throw ValidationException::withMessages(['unit_price' => 'Offline purchase order price must be zero or greater.']);
+        try {
+            return Money::toCents(is_int($value) || is_float($value) || is_string($value) ? $value : '');
+        } catch (\\InvalidArgumentException) {
+            throw ValidationException::withMessages(['unit_price' => 'Offline purchase order price must be non-negative and have at most two decimal places.']);
         }
-
-        return round((float) $value, 2);
     }
 
     private function nullableDate(mixed $value): ?string
