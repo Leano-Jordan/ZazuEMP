@@ -1,3 +1,16 @@
+## 2026-11-16 — Dependency audit workflow bootstrap correction
+
+- Canonical branch: `main`; exact current control head: `c0f0fdc7ad97d1c60ce9cfe53f5eebc35df827df`.
+- Investigated scheduled dependency audit failure [run 43854594637](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/43854594637). Composer and npm security audits plus frontend build passed; database preparation failed because the workflow invoked Artisan without first installing Composer dependencies (`vendor/autoload.php` absent).
+- Corrected `.github/workflows/security-dependency-refresh.yml` by adding the same locked, no-script Composer install used by the Laravel CI workflow. Added a push trigger scoped only to changes to this workflow so future bootstrap changes are verified immediately.
+- Re-run on exact head [run 43917662550](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/43917662550): **PASS** — Composer audit, Composer install, npm install/audit (0 vulnerabilities), frontend build, SQLite migration and complete Laravel test suite all completed successfully.
+- Exact-head Zazu quality [43917662110](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/43917662110), Director Contract Lint [43917662310](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/43917662310), Director Health [43917662413](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/43917662413), and Push on main [43917660267](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/43917660267): **PASS**.
+- Compare against application baseline `b67720910216ac22c1a961020e44c789f32823a7` confirms the two commits changed only this workflow file; no application, migration or test source changed. No branch created; `deploy/render-staging` preserved.
+- No readiness score uplift: this closes a CI workflow defect only. V1/beta readiness still requires owner-side deployment-mode decision, physical-device acceptance where claimed, controlled installation recovery, populated commercial-record reconciliation and POPIA operational sign-off. Brand/name clearance remains deferred by owner direction.
+- No deployment, production database or customer data changed.
+
+---
+
 ## 2026-11-14 — Exact-head offline acceptance reconciliation
 
 - Owner resumed bounded offline engineering on 2026-11-14 and explicitly required no looping or duplicate effort. Work remains on canonical `main`; no deployment or non-main branch was used.
