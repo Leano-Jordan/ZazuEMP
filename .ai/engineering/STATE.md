@@ -1,6 +1,6 @@
 ## 2026-11-16 — Dependency audit workflow bootstrap correction
 
-- Canonical branch: `main`; exact current control head: `c0f0fdc7ad97d1c60ce9cfe53f5eebc35df827df`.
+- Canonical branch: `main`; exact workflow verification commit: `c0f0fdc7ad97d1c60ce9cfe53f5eebc35df827df`.
 - Investigated scheduled dependency audit failure [run 43854594637](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/43854594637). Composer and npm security audits plus frontend build passed; database preparation failed because the workflow invoked Artisan without first installing Composer dependencies (`vendor/autoload.php` absent).
 - Corrected `.github/workflows/security-dependency-refresh.yml` by adding the same locked, no-script Composer install used by the Laravel CI workflow. Added a push trigger scoped only to changes to this workflow so future bootstrap changes are verified immediately.
 - Re-run on exact head [run 43917662550](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/43917662550): **PASS** — Composer audit, Composer install, npm install/audit (0 vulnerabilities), frontend build, SQLite migration and complete Laravel test suite all completed successfully.
