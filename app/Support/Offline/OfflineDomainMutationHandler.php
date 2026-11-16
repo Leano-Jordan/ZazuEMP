@@ -1555,7 +1555,7 @@ class OfflineDomainMutationHandler implements SyncMutationHandler
     private function positiveQuantity(mixed $value): float
     {
         if (! is_numeric($value) || (float) $value <= 0) {
-            throw ValidationException::withMessages(['quantity' => 'Offline quantity must be greater than zero.']);
+            throw ValidationException::withMessages(['quantity' => 'Offline purchase order quantity must be greater than zero.']);
         }
 
         return round((float) $value, 2);
@@ -1564,7 +1564,7 @@ class OfflineDomainMutationHandler implements SyncMutationHandler
     private function nonNegativeMoney(mixed $value): float
     {
         if (! is_numeric($value) || (float) $value < 0) {
-            throw ValidationException::withMessages(['unit_price' => 'Offline money value must be zero or greater.']);
+            throw ValidationException::withMessages(['unit_price' => 'Offline purchase order price must be zero or greater.']);
         }
 
         return round((float) $value, 2);
