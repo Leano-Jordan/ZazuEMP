@@ -116,17 +116,66 @@ function Prepare-ZazuBuiltAssets {
     $buildDirectory = Join-Path $publicDirectory 'build'
     $manifestFile = Join-Path $buildDirectory 'manifest.json'
 
-    # LAN entrypoints use same-origin compiled assets. A stale Vite hot file
-    # otherwise makes Laravel emit CSS/JS URLs to a dead or unreachable port 5173.
+    # This launcher serves compiled assets; it never starts Vite. A leftover
+    # hot marker would send phones/other devices to an unreachable port 5173.
     if (Test-Path $hotFile -PathType Leaf) {
         Remove-Item $hotFile -Force
-        Write-Host 'Removed the stale Vite development marker; LAN mode will use compiled assets.'
+        Write-Host 'Removed the stale Vite development marker; Zazu will use same-origin compiled assets.'
     }
 
-    if (-not (Test-Path $manifestFile -PathType Leaf)) {
+    $needsBuild = -not (Test-Path $manifestFile -PathType Leaf)
+    if (-not $needsBuild) {
+        try {
+            $existingManifest = Get-Content $manifestFile -Raw | ConvertFrom-Json
+            $existingEntries = @($existingManifest.PSObject.Properties)
+            if ($existingEntries.Count -eq 0) {
+                $needsBuild = $true
+            } else {
+                foreach ($entry in $existingEntries) {
+                    $assetFiles = @()
+                    if (-not [string]::IsNullOrWhiteSpace($entry.Value.file)) { $assetFiles += $entry.Value.file }
+                    foreach ($cssFile in @($entry.Value.css)) {
+                        if (-not [string]::IsNullOrWhiteSpace($cssFile)) { $assetFiles += $cssFile }
+                    }
+                    foreach ($asset in @($entry.Value.assets)) {
+                        if (-not [string]::IsNullOrWhiteSpace($asset)) { $assetFiles += $asset }
+                    }
+                    foreach ($assetFile in ($assetFiles | Select-Object -Unique)) {
+                        $assetPath = Join-Path $buildDirectory ($assetFile -replace '/', [System.IO.Path]::DirectorySeparatorChar)
+                        if (-not (Test-Path $assetPath -PathType Leaf)) {
+                            $needsBuild = $true
+                            break
+                        }
+                    }
+                    if ($needsBuild) { break }
+                }
+            }
+
+            # A pulled CSS/JS source newer than the tracked manifest means the
+            # ignored local bundle may be stale even when its old files exist.
+            if (-not $needsBuild) {
+                $manifestTime = (Get-Item $manifestFile).LastWriteTimeUtc
+                $sourceFiles = @()
+                $cssDirectory = Join-Path $ProjectPath 'resources\css'
+                $jsEntry = Join-Path $ProjectPath 'resources\js\app.js'
+                if (Test-Path $cssDirectory -PathType Container) {
+                    $sourceFiles += @(Get-ChildItem $cssDirectory -Filter '*.css' -File -Recurse)
+                }
+                if (Test-Path $jsEntry -PathType Leaf) { $sourceFiles += Get-Item $jsEntry }
+                if (@($sourceFiles | Where-Object { $_.LastWriteTimeUtc -gt $manifestTime.AddSeconds(2) }).Count -gt 0) {
+                    $needsBuild = $true
+                }
+            }
+        } catch {
+            Write-Warning "The existing frontend manifest needs rebuilding: $($_.Exception.Message)"
+            $needsBuild = $true
+        }
+    }
+
+    if ($needsBuild) {
         $nodeModules = Join-Path $ProjectPath 'node_modules'
         if (-not (Test-Path $nodeModules -PathType Container)) {
-            throw 'Compiled Zazu assets are missing and node_modules is not installed. From the project folder, run npm ci once, then start Zazu again.'
+            throw 'Zazu frontend assets are missing or stale and node_modules is not installed. From the project folder, run npm ci once, then start Zazu again.'
         }
 
         $npmCommand = Get-Command npm.cmd -ErrorAction SilentlyContinue | Select-Object -First 1
@@ -134,15 +183,15 @@ function Prepare-ZazuBuiltAssets {
             $npmCommand = Get-Command npm.exe -ErrorAction SilentlyContinue | Select-Object -First 1
         }
         if (-not $npmCommand) {
-            throw 'Compiled Zazu assets are missing and npm was not found. Install Node.js/npm, run npm ci once, then start Zazu again.'
+            throw 'Zazu frontend assets are missing or stale and npm was not found. Install Node.js/npm, run npm ci once, then start Zazu again.'
         }
 
-        Write-Host 'Compiled Zazu assets are missing; building the local frontend bundle.'
+        Write-Host 'Building the Zazu frontend bundle because its manifest or compiled assets are missing or stale.'
         Push-Location $ProjectPath
         try {
             & $npmCommand.Source run build
             if ($LASTEXITCODE -ne 0) {
-                throw "Zazu frontend build failed with exit code $LASTEXITCODE. Review the build output before starting the app."
+                throw "Zazu frontend build failed with exit code $LASTEXITCODE. Review the build output before starting Zazu."
             }
         } finally {
             Pop-Location
@@ -156,7 +205,7 @@ function Prepare-ZazuBuiltAssets {
     try {
         $manifest = Get-Content $manifestFile -Raw | ConvertFrom-Json
     } catch {
-        throw "The compiled frontend manifest is invalid: $manifestFile"
+        throw "The compiled frontend manifest is invalid after build: $manifestFile"
     }
 
     $entries = @($manifest.PSObject.Properties)
@@ -166,32 +215,25 @@ function Prepare-ZazuBuiltAssets {
 
     foreach ($entry in $entries) {
         $assetFiles = @()
-        if (-not [string]::IsNullOrWhiteSpace($entry.Value.file)) {
-            $assetFiles += $entry.Value.file
-        }
+        if (-not [string]::IsNullOrWhiteSpace($entry.Value.file)) { $assetFiles += $entry.Value.file }
         foreach ($cssFile in @($entry.Value.css)) {
-            if (-not [string]::IsNullOrWhiteSpace($cssFile)) {
-                $assetFiles += $cssFile
-            }
+            if (-not [string]::IsNullOrWhiteSpace($cssFile)) { $assetFiles += $cssFile }
         }
-        foreach ($importedAsset in @($entry.Value.assets)) {
-            if (-not [string]::IsNullOrWhiteSpace($importedAsset)) {
-                $assetFiles += $importedAsset
-            }
+        foreach ($asset in @($entry.Value.assets)) {
+            if (-not [string]::IsNullOrWhiteSpace($asset)) { $assetFiles += $asset }
         }
-
         foreach ($assetFile in ($assetFiles | Select-Object -Unique)) {
             $assetPath = Join-Path $buildDirectory ($assetFile -replace '/', [System.IO.Path]::DirectorySeparatorChar)
             if (-not (Test-Path $assetPath -PathType Leaf)) {
-                throw "A compiled frontend asset referenced by the manifest is missing: $assetPath"
+                throw "A compiled frontend asset referenced by the manifest is still missing after build: $assetPath"
             }
         }
     }
 
-    Write-Host 'Compiled CSS/JavaScript manifest and referenced assets are ready.'
+    Write-Host 'Compiled Zazu CSS/JavaScript manifest and every referenced asset are ready.'
 }
 
-if (($Lan -or $BuiltAssetsOnly) -and -not $Stop) {
+if (-not $Stop) {
     Prepare-ZazuBuiltAssets
 }
 
