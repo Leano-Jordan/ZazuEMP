@@ -2,6 +2,18 @@
 
 Zazu EMP is a proprietary event-management platform for small businesses operating across catering and event-related services, including catering, tents/chairs, sound/DJ, baking/cookies, decor, rentals, photography, camera hire and combinations of these services.
 
+## Windows installation candidate
+
+A first installable Windows V1 candidate is available as a clean ZIP package. It includes production PHP dependencies, compiled frontend assets, a first-run installer and Windows launchers. It does not require Composer or Node.js on the target PC.
+
+- Read [Windows package installation](docs/V1_PACKAGE_INSTALLATION.md) before installing.
+- Host requirement: 64-bit Windows and PHP 8.4+ with the documented extensions. The package does not bundle PHP.
+- The ZIP is for a **fresh local installation**, not an in-place updater or hosted SaaS deployment.
+- Use the dedicated private-LAN HTTPS procedure for phone/tablet access. Do not expose the local HTTP development port to the internet.
+- Physical-device acceptance, the installed-target recovery drill, live-business reconciliation and POPIA operational sign-off remain separate release gates.
+
+The market and architecture findings informing the product's event-centred workflow are recorded in [Commercial Architecture Research — 2026-11-16](docs/COMMERCIAL_ARCHITECTURE_RESEARCH_2026-11-16.md).
+
 ## Project authority
 
 - **Product:** Zazu – Event Management Platform
