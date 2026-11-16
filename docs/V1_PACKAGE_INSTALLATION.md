@@ -53,8 +53,8 @@ Physical phone/PWA/offline acceptance is not implied by a successful package bui
 
 ## Operational boundary
 
-This package is a local Windows installation candidate, not a hosted multi-customer SaaS deployment. Hosted deployment requires a separately selected persistent database and private-file store, HTTPS domain, secrets management, monitoring, off-host backups and an operator recovery drill. The presence of a Dockerfile or a successful CI build does not certify a customer deployment.
+This package is a local Windows installation candidate, not a hosted multi-customer SaaS deployment. Hosted deployment requires a separately selected persistent database and private-file store, HTTPS domain, secrets management, monitoring, off-host backups and an operator recovery drill. An installation ZIP and a successful CI build do not certify a hosted customer deployment.
 
 ## Evidence required before calling V1 release-ready
 
-The package build must pass on its exact commit. The remaining owner/operator acceptance is recorded in `V1_RELEASE_CHECKLIST.md` and includes the intended installed-device acceptance, installation recovery drill, a live populated-business quote/payment/profit reconciliation, and POPIA operational sign-off. A generated ZIP alone does not close these gates.
+The package build must pass on its exact commit. Before calling the product release-ready, the release owner must also complete the intended Windows installation acceptance, physical-device acceptance for any claimed phone/offline workflows, an operator backup/restore drill on an isolated copy of the intended installation, live populated-business quote/payment/cost/profit reconciliation, and POPIA operational/privacy sign-off. A generated ZIP alone does not close these gates.
