@@ -1,10 +1,10 @@
 <?php
 
-namespace Tests\\Feature;
+namespace Tests\Feature;
 
-use Illuminate\\Foundation\\Vite;
-use Illuminate\\Support\\Facades\\File;
-use Tests\\TestCase;
+use Illuminate\Foundation\Vite;
+use Illuminate\Support\Facades\File;
+use Tests\TestCase;
 
 class ViteAssetDeliveryTest extends TestCase
 {
