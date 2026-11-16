@@ -302,7 +302,7 @@ return [
         'roles' => [
             'staff' => [
                 'dashboard.view', 'calendar.view',
-                'work.view', 'work.create', 'work.update', 'work.delete',
+                'work.view', 'work.create', 'work.update',
                 'customers.view', 'customers.create', 'customers.update', 'customers.contacts.manage',
                 'quotes.view', 'quotes.create', 'quotes.update', 'quotes.status',
                 'finance.view',
@@ -314,7 +314,7 @@ return [
             ],
             'manager' => [
                 'dashboard.view', 'calendar.view',
-                'work.view', 'work.create', 'work.update',
+                'work.view', 'work.create', 'work.update', 'work.delete',
                 'customers.view', 'customers.create', 'customers.update', 'customers.contacts.manage',
                 'quotes.view', 'quotes.create', 'quotes.update', 'quotes.status',
                 'finance.view',
