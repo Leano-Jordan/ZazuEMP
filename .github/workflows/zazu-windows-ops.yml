@@ -126,7 +126,7 @@ jobs:
             "APP_DEBUG = 'false'",
             "SESSION_SECURE_COOKIE = 'true'",
             'php.exe',
-            "php -m",
+            '$script:PhpPath -m',
             'pdo_sqlite',
             'key:generate',
             "'migrate', '--force'"
