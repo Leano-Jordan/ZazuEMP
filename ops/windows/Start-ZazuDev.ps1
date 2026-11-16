@@ -233,7 +233,7 @@ function Prepare-ZazuBuiltAssets {
     Write-Host 'Compiled Zazu CSS/JavaScript manifest and every referenced asset are ready.'
 }
 
-if (-not $Stop) {
+if (($Lan -or $BuiltAssetsOnly) -and -not $Stop) {
     Prepare-ZazuBuiltAssets
 }
 
