@@ -1,10 +1,10 @@
 <?php
 
-namespace Tests\Feature;
+namespace Tests\\Feature;
 
-use Illuminate\Foundation\Vite;
-use Illuminate\Support\Facades\File;
-use Tests\TestCase;
+use Illuminate\\Foundation\\Vite;
+use Illuminate\\Support\\Facades\\File;
+use Tests\\TestCase;
 
 class ViteAssetDeliveryTest extends TestCase
 {
@@ -16,7 +16,7 @@ class ViteAssetDeliveryTest extends TestCase
 
         try {
             File::ensureDirectoryExists(dirname($hotFile));
-            file_put_contents($hotFile, 'http://127.0.0.1:5173');
+            file_put_contents($hotFile, 'http://127.0.0.1:1');
 
             $this->signInAsOwner();
 
@@ -25,7 +25,7 @@ class ViteAssetDeliveryTest extends TestCase
                 ->get('/dashboard');
 
             $response->assertOk();
-            $response->assertDontSee('http://127.0.0.1:5173');
+            $response->assertDontSee('http://127.0.0.1:1');
             $response->assertSee('/build/assets/', false);
             $response->assertSee('app-', false);
             $response->assertSee('zazu-dashboard-authority-', false);
@@ -36,17 +36,11 @@ class ViteAssetDeliveryTest extends TestCase
                 app(Vite::class)->hotFile(),
             );
         } finally {
-            if ($hadHotFile) {
-                file_put_contents($hotFile, (string) $originalHotFile);
-            } else {
-                @unlink($hotFile);
-            }
-
-            app(Vite::class)->useHotFile(public_path('hot'));
+            $this->restoreHotFile($hotFile, $hadHotFile, $originalHotFile);
         }
     }
 
-    public function test_loopback_dashboard_requests_keep_local_vite_hmr_enabled(): void
+    public function test_loopback_dashboard_falls_back_to_compiled_assets_when_vite_is_not_running(): void
     {
         $hotFile = public_path('hot');
         $hadHotFile = is_file($hotFile);
@@ -54,7 +48,39 @@ class ViteAssetDeliveryTest extends TestCase
 
         try {
             File::ensureDirectoryExists(dirname($hotFile));
-            file_put_contents($hotFile, 'http://127.0.0.1:5173');
+            file_put_contents($hotFile, 'http://127.0.0.1:1');
+
+            $response = $this
+                ->withServerVariables(['REMOTE_ADDR' => '127.0.0.1'])
+                ->get('/');
+
+            $response->assertOk();
+            $response->assertDontSee('http://127.0.0.1:1');
+            $response->assertSee('/build/assets/', false);
+            $this->assertFalse(app(Vite::class)->isRunningHot());
+            $this->assertSame(
+                storage_path('framework/zazu/remote-vite-hot-disabled'),
+                app(Vite::class)->hotFile(),
+            );
+        } finally {
+            $this->restoreHotFile($hotFile, $hadHotFile, $originalHotFile);
+        }
+    }
+
+    public function test_loopback_dashboard_keeps_hmr_enabled_when_the_vite_server_is_reachable(): void
+    {
+        $hotFile = public_path('hot');
+        $hadHotFile = is_file($hotFile);
+        $originalHotFile = $hadHotFile ? file_get_contents($hotFile) : null;
+        $server = stream_socket_server('tcp://127.0.0.1:0', $errorCode, $errorMessage);
+
+        $this->assertIsResource($server, 'A local test socket is required to verify Vite HMR reachability.');
+
+        try {
+            $address = stream_socket_get_name($server, false);
+            $port = (int) substr(strrchr((string) $address, ':'), 1);
+            File::ensureDirectoryExists(dirname($hotFile));
+            file_put_contents($hotFile, 'http://127.0.0.1:'.$port);
 
             $this
                 ->withServerVariables(['REMOTE_ADDR' => '127.0.0.1'])
@@ -63,13 +89,8 @@ class ViteAssetDeliveryTest extends TestCase
             $this->assertSame(public_path('hot'), app(Vite::class)->hotFile());
             $this->assertTrue(app(Vite::class)->isRunningHot());
         } finally {
-            if ($hadHotFile) {
-                file_put_contents($hotFile, (string) $originalHotFile);
-            } else {
-                @unlink($hotFile);
-            }
-
-            app(Vite::class)->useHotFile(public_path('hot'));
+            fclose($server);
+            $this->restoreHotFile($hotFile, $hadHotFile, $originalHotFile);
         }
     }
 
@@ -105,5 +126,16 @@ class ViteAssetDeliveryTest extends TestCase
         $appEntry = $manifest['resources/css/app.css'];
         $appCss = (string) file_get_contents(public_path('build/'.$appEntry['file']));
         $this->assertStringContainsString('.zazu-shell', $appCss);
+    }
+
+    private function restoreHotFile(string $hotFile, bool $hadHotFile, string|false|null $originalHotFile): void
+    {
+        if ($hadHotFile) {
+            file_put_contents($hotFile, (string) $originalHotFile);
+        } else {
+            @unlink($hotFile);
+        }
+
+        app(Vite::class)->useHotFile(public_path('hot'));
     }
 }
