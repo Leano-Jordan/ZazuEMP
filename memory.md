@@ -7,7 +7,7 @@
 **Repository:** Leano-Jordan/ZazuEMP
 **Default branch:** main
 **Active development branch:** main
-**Context updated:** 2026-11-11
+**Context updated:** 2026-11-17
 
 ## Owner V1 shipping mandate — 2026-11-14 (READ FIRST)
 
@@ -21,8 +21,8 @@ Mandatory operating rules for Director/Jarvis and every specialist:
 - Do not reopen a closed gate without new, reproducible evidence. Do not repeat an investigation or test unless new evidence or a changed input makes it useful.
 - No engineering loops, perfectionism, scope creep, speculative hardening or cosmetic/documentation-only work presented as product progress.
 - Work in meaningful batches, fix related verified defects together, run the relevant verification once after the batch, and move to the next V1 gate.
-- **Offline work is paused** unless the owner explicitly resumes it or a separate critical regression is demonstrated. Do not return to the offline subsystem as a default task.
-- Work directly on canonical `main`. Never create feature/development branches. Preserve `deploy/render-staging` as the deployment-only branch.
+- **Offline V1 engineering resumed on 2026-11-17.** Work across the service worker, IndexedDB, local attachment workflow, offline sync and PWA installation is authorized where it closes V1 acceptance gaps. Keep the work bounded to reliable first-business workflows; do not use this as permission for unrelated feature expansion.
+- Work directly on canonical `main`. Never create branches. Work directly on `main`; do not introduce Render or AMPPS deployment workflows.
 - Keep updates compact and outcome-based. Execute instead of repeatedly asking for permission or narrating plans. Never claim unverified progress.
 - The finish line is a dependable, demonstrable first release with known limitations recorded—not perfection. V2 hardening belongs after real usage and available resources justify it.
 

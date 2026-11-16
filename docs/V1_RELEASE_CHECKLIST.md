@@ -83,7 +83,7 @@
 - Quote → acceptance → invoice → deposit/payment → event-cost/profit: **SEEDED AUTOMATED-VERIFIED**. Live business-record reconciliation remains an operator acceptance task; no additional financial-code defect is currently evidenced.
 - Business archive export/import and tenant isolation: **AUTOMATED-VERIFIED**. PostgreSQL installation backup/private-file restore: **CI-VERIFIED**. Actual installed-target operator recovery drill remains open.
 - Evidence-maturity score: **71/100**, as recorded in the [formal V1 scorecard](ZAZU_V1_SCORECARD_2026-11-04.md). Offline continuity remains 3/5; physical Android acceptance is not claimed.
-- Owner direction: offline engineering is paused. Do not change service worker, IndexedDB, attachment queue, offline sync or PWA installation paths unless explicitly resumed or a separate critical regression is demonstrated.
+- Owner direction (2026-11-17): offline V1 engineering is resumed. Service worker, IndexedDB, local attachment workflow, offline sync and PWA installation paths are active engineering scope where they close agreed V1 acceptance gaps. Keep work on `main`; do not repeat already-passed tests.
 - **Release disposition: NOT READY.** Remaining owner/operational obligations are bounded physical-device acceptance, installed-target operator recovery, live commercial-record reconciliation, and POPIA/privacy/brand closure. Do not turn speculative risks into new V1 gates.
 - No production deployment, live database, customer data or non-main branch was changed.
 

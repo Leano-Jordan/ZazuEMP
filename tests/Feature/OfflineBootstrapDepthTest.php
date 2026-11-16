@@ -134,4 +134,33 @@ class OfflineBootstrapDepthTest extends TestCase
         $this->assertSame($ownerBusiness->id, $response->json('business.id'));
     }
 
+    public function test_phone_bootstrap_requires_its_explicit_business_permission(): void
+    {
+        $business = Business::create([
+            'name' => 'Bootstrap Permission Business',
+            'slug' => 'bootstrap-permission-'.Str::lower(Str::random(8)),
+            'status' => 'active',
+            'currency' => 'ZAR',
+        ]);
+        $staff = User::factory()->create(['username' => 'bootstrappermission']);
+        $business->users()->attach($staff->id, ['role' => 'staff']);
+
+        $staffPermissions = config('zazu.permissions.roles.staff');
+        config([
+            'zazu.permissions.roles.staff' => array_values(array_diff($staffPermissions, ['offline.bootstrap'])),
+        ]);
+
+        $this->actingAs($staff)
+            ->withSession(['zazu_business_id' => $business->id])
+            ->get(route('offline.bootstrap'))
+            ->assertForbidden();
+
+        config(['zazu.permissions.roles.staff' => $staffPermissions]);
+
+        $this->actingAs($staff)
+            ->withSession(['zazu_business_id' => $business->id])
+            ->get(route('offline.bootstrap'))
+            ->assertOk();
+    }
+
 }

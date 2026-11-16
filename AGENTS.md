@@ -9,7 +9,7 @@
 
 ## Owner mission — read first
 
-Read `memory.md` first. Its opening **Owner V1 shipping mandate** is a binding instruction: ship a practical, dependable V1 for first businesses; close acceptance-passed gates at 5/5; avoid perfectionism, speculative blockers, scope creep and repeated engineering loops; offline engineering stays paused unless the owner resumes it or a critical regression is demonstrated. This is the operating objective for every session.
+Read `memory.md` first. Its opening **Owner V1 shipping mandate** is a binding instruction: ship a practical, dependable V1 for first businesses; close acceptance-passed gates at 5/5; avoid perfectionism, speculative blockers, scope creep and repeated engineering loops; offline V1 engineering is explicitly resumed; work across local persistence, service worker, attachments, sync and PWA installation is authorized where it closes agreed V1 gaps. This is the operating objective for every session.
 
 ## Canonical control contract
 

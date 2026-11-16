@@ -310,7 +310,7 @@ return [
                 'inventory.view', 'inventory.create', 'inventory.movement',
                 'assets.view', 'assets.create', 'assets.update', 'assets.allocate', 'assets.release',
                 'suppliers.view', 'suppliers.create', 'suppliers.update',
-                'reports.view', 'capabilities.view',
+                'reports.view', 'capabilities.view', 'offline.bootstrap',
             ],
             'manager' => [
                 'dashboard.view', 'calendar.view',
@@ -322,7 +322,7 @@ return [
                 'inventory.view', 'inventory.create', 'inventory.movement',
                 'assets.view', 'assets.create', 'assets.update', 'assets.allocate', 'assets.release',
                 'suppliers.view', 'suppliers.create', 'suppliers.update',
-                'reports.view', 'capabilities.view',
+                'reports.view', 'capabilities.view', 'offline.bootstrap',
             ],
         ],
     ],

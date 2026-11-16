@@ -1,6 +1,6 @@
 # Zazu EMP V1 — Scope Freeze and Finish Rule
 
-**Status:** OWNER-DIRECTED / ACTIVE  
+**Status:** OWNER-DIRECTED / ACTIVE — OFFLINE V1 WORK RESUMED 2026-11-17  
 **Effective:** 2026-11-12  
 **Authority:** Owner instruction; this file is binding on Director and all specialist agents.
 
@@ -10,7 +10,7 @@ Finish and release a dependable, usable Zazu V1. Do not pursue theoretical perfe
 
 ## Scope is frozen
 
-Only work required to make the agreed V1 customer workflows reliable is in scope. The current release checklist and verified defects define that scope.
+Only work required to make the agreed V1 customer workflows reliable is in scope. The current release checklist and verified defects define that scope. The owner explicitly resumed offline V1 engineering on 2026-11-17: service worker, IndexedDB, attachment queue/local file workflow, sync, PWA installation and recovery work may proceed where required for V1 acceptance.
 
 A new item may enter V1 only when:
 1. it is a reproducible defect in an agreed V1 workflow;
@@ -36,9 +36,9 @@ Everything else—including speculative edge cases, optional polish, new feature
 - Once the final regression pass is green, stop engineering scope expansion and prepare the release.
 - A missing piece of evidence is only a blocker when that evidence is explicitly required to accept an agreed V1 workflow or release obligation.
 
-## Render boundary
+## Deployment boundary
 
-Render is an interim remote-development workbench so the owner can access Zazu away from the home development PC. It is not the final production destination. Do not treat Render production persistence, production hosting, or production infrastructure as V1 development gates unless the owner explicitly changes this direction. Keep the workbench usable; avoid expensive or destructive infrastructure changes.
+The active product target is Zazu's local-first PC and phone experience. Do not introduce Render, AMPPS or an unapproved hosted deployment path. Validate the actual local installation and phone workflows; the Windows fresh-install package is not proof of full commercial readiness.
 
 ## Decision rule
 
