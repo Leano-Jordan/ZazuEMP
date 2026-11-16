@@ -13,6 +13,60 @@ async function login(page) {
     await expect(page).toHaveURL(/\/dashboard$/);
 }
 
+test('offline workspace remains visible for synced device-local records when the Zazu server is unavailable', async ({ page }) => {
+    const runId = randomUUID().slice(0, 8);
+    const customerName = 'Synced offline customer ' + runId;
+    const jobName = 'Synced offline job ' + runId;
+    const jobLocalId = randomUUID();
+    const quoteLocalId = randomUUID();
+
+    await login(page);
+    await page.context().setOffline(true);
+    await page.evaluate(async ({ customerName, jobName, jobLocalId, quoteLocalId }) => {
+        await window.ZazuOffline.ready;
+        const state = window.ZazuOffline.getState();
+        state.customers.push({
+            local_id: crypto.randomUUID(),
+            server_id: 7654301,
+            id: 7654301,
+            name: customerName,
+            contact_name: 'Offline contact',
+            phone: '0123456789',
+        });
+        state.jobs.push({
+            local_id: jobLocalId,
+            server_id: 7654302,
+            id: 7654302,
+            reference: 'ZAZ-JOB-' + jobLocalId.slice(0, 6),
+            name: jobName,
+            customer_name: customerName,
+            event_type: 'Catering',
+            status: 'confirmed',
+        });
+        state.quotes.push({
+            local_id: quoteLocalId,
+            server_id: 7654303,
+            id: 7654303,
+            event_local_id: jobLocalId,
+            reference: 'ZAZ-QUO-' + quoteLocalId.slice(0, 6),
+            status: 'sent',
+            currency: 'ZAR',
+            items: [{ description: 'Catering package', quantity: 1, unit_price: '2500.00' }],
+        });
+        await window.ZazuOffline.persist();
+        window.dispatchEvent(new CustomEvent('zazu:offline-state-updated'));
+    }, { customerName, jobName, jobLocalId, quoteLocalId });
+
+    const workspace = page.locator('[data-zazu-offline-workspace]');
+    await expect(workspace).toBeVisible();
+    await expect(workspace.locator('[data-zazu-local-record="customer"]').filter({ hasText: customerName })).toBeVisible();
+    await expect(workspace.locator('[data-zazu-local-record="job"]').filter({ hasText: jobName })).toBeVisible();
+    await expect(workspace.locator('[data-zazu-local-record="quote"]').filter({ hasText: jobName })).toBeVisible();
+
+    await page.context().setOffline(false);
+    await expect(workspace).toBeHidden();
+});
+
 test('offline workspace exposes locally stored quotes with their sync state', async ({ page }) => {
     const runId = randomUUID().slice(0, 8);
     const jobLocalId = randomUUID();
