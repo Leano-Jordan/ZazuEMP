@@ -6,6 +6,9 @@ use App\Models\Business;
 use App\Models\Customer;
 use App\Models\Event;
 use App\Models\EventPreparationItem;
+use App\Models\EventCost;
+use App\Models\Invoice;
+use App\Services\EventProfitabilityService;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Str;
 use Tests\TestCase;
@@ -74,6 +77,65 @@ class ReportTest extends TestCase
                 && $metrics['customers'] === 1
                 && $metrics['outstanding_preparation'] === 1
             );
+    }
+
+
+    public function test_event_contribution_excludes_output_vat_and_discloses_unadjusted_cost_tax(): void
+    {
+        $business = $this->makeBusiness('VAT Report Business');
+        $user = $this->signInAsOwner($business);
+
+        $event = Event::create([
+            'business_id' => $business->id,
+            'reference' => 'REPORT-VAT-001',
+            'name' => 'VAT Contribution Event',
+            'status' => 'confirmed',
+            'event_date' => now()->addDays(7)->toDateString(),
+        ]);
+
+        Invoice::create([
+            'business_id' => $business->id,
+            'event_id' => $event->id,
+            'number' => 'INV-REPORT-VAT-001',
+            'idempotency_key' => (string) Str::uuid(),
+            'status' => 'paid',
+            'currency' => 'ZAR',
+            'subtotal' => '10000.00',
+            'tax_total' => '1500.00',
+            'total' => '11500.00',
+            'tax_code' => 'VAT15',
+            'tax_label' => 'VAT',
+            'tax_treatment' => 'standard',
+            'tax_rate' => '15.00',
+        ]);
+
+        EventCost::create([
+            'business_id' => $business->id,
+            'event_id' => $event->id,
+            'category' => 'Supplies',
+            'description' => 'Recorded event supplies',
+            'currency' => 'ZAR',
+            'projected_amount' => '4000.00',
+            'actual_amount' => '4000.00',
+            'status' => 'paid',
+        ]);
+
+        $result = app(EventProfitabilityService::class)
+            ->forBusiness($business)
+            ->firstWhere('event_id', $event->id);
+
+        $this->assertNotNull($result);
+        $this->assertSame(1000000, $result['net_sales_cents']);
+        $this->assertSame(400000, $result['actual_cost_cents']);
+        $this->assertSame(600000, $result['indicative_result_cents']);
+        $this->assertSame(60.0, $result['indicative_margin_percentage']);
+
+        $this->actingAs($user)
+            ->get(route('reports.index'))
+            ->assertOk()
+            ->assertSee('Event contribution')
+            ->assertSee('Net invoiced value excluding output VAT')
+            ->assertSee('operational estimate rather than an accounting profit figure');
     }
 
     private function makeBusiness(string $name): Business
