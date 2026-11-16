@@ -142,3 +142,79 @@ jobs:
             ${{ runner.temp }}/zazu-output/SHA256SUMS.txt
           if-no-files-found: error
           retention-days: 30
+
+
+  windows-fresh-install-smoke:
+    name: Verify fresh install on Windows PowerShell
+    needs: package
+    runs-on: windows-latest
+    steps:
+      - name: Checkout exact main commit
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          ref: \${{ github.sha }}
+
+      - name: Set up PHP 8.4 with SQLite
+        uses: shivammathur/setup-php@f3e473d116dcccaddc5834248c87452386958240
+        with:
+          php-version: '8.4'
+          extensions: curl, dom, fileinfo, mbstring, openssl, pdo_sqlite, tokenizer, xml, zip
+          coverage: none
+
+      - name: Set up Node
+        uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020
+        with:
+          node-version: '22'
+          cache: npm
+
+      - name: Install production dependencies and compiled assets
+        shell: powershell
+        run: |
+          composer install --no-dev --prefer-dist --no-interaction --no-progress --optimize-autoloader --no-scripts
+          if ($LASTEXITCODE -ne 0) { throw 'Composer production dependency install failed.' }
+
+          npm ci
+          if ($LASTEXITCODE -ne 0) { throw 'npm ci failed.' }
+
+          npm run build
+          if ($LASTEXITCODE -ne 0) { throw 'Vite production asset build failed.' }
+
+          php artisan package:discover --ansi
+          if ($LASTEXITCODE -ne 0) { throw 'Laravel package discovery failed.' }
+
+      - name: Run the first-install script using Windows PowerShell
+        shell: powershell
+        run: |
+          $ErrorActionPreference = 'Stop'
+          $project = (Get-Location).Path
+
+          & (Join-Path $project 'ops/windows/Install-Zazu.ps1') -ProjectPath $project
+
+          if (-not (Test-Path '.env' -PathType Leaf)) { throw 'Installer did not create .env.' }
+          if (-not (Test-Path 'database/database.sqlite' -PathType Leaf)) { throw 'Installer did not create the SQLite database.' }
+
+          $envLines = Get-Content '.env'
+          foreach ($required in @(
+            '^APP_ENV=production$',
+            '^APP_DEBUG=false$',
+            '^APP_URL=http://127\.0\.0\.1:8000$',
+            '^SESSION_SECURE_COOKIE=true$',
+            '^DB_CONNECTION=sqlite$',
+            '^DB_DATABASE=database/database\.sqlite$'
+          )) {
+            if (-not ($envLines -match $required)) {
+              throw "First-install environment is missing expected production/local setting: $required"
+            }
+          }
+
+          if (-not ($envLines -match '^APP_KEY=base64:.+')) {
+            throw 'Installer did not generate a Laravel application key.'
+          }
+
+          php artisan migrate:status --no-ansi
+          if ($LASTEXITCODE -ne 0) { throw 'Fresh-install database migration status failed.' }
+
+          php artisan route:list --path=login --no-ansi
+          if ($LASTEXITCODE -ne 0) { throw 'Application route boot failed after installation.' }
+
+          Write-Host 'PASS: Windows PowerShell fresh install generated a private environment and app key, migrated SQLite, and booted the application routes.'
