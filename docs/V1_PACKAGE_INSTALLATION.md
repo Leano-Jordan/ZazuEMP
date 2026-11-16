@@ -28,6 +28,8 @@ PHP must be available as `php.exe` on `PATH`, or at `C:\PHP84\php.exe`. The inst
 5. Open `http://127.0.0.1:8000` on the same PC.
 6. Register the first business account through Zazu. Do not use development demo credentials.
 
+The fresh-install profile uses a non-`Secure` session cookie because its default address is local HTTP (`127.0.0.1`). Keep that HTTP server on the PC or a trusted private network only. For a TLS-only deployment or HTTPS-only operation, set `SESSION_SECURE_COOKIE=true` in `.env` and use the HTTPS origin; do not expose the HTTP port to the internet.
+
 The installer is safe to re-run for a partially completed fresh installation: an existing `.env`, application key and SQLite database are preserved. It runs pending migrations but does not seed sample customers or overwrite business records.
 
 ## Phone/tablet access
