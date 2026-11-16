@@ -1,3 +1,18 @@
+## Director reconciliation — 2026-11-16 (dashboard visual correction / current-head CI)
+
+**Canonical branch:** `main` · **current head:** `8b20f04ecc8f15734f65a4f465136bbcbb329d96`.
+
+- Dashboard visual correction [`8b20f04`](https://github.com/Leano-Jordan/ZazuEMP/commit/8b20f04ecc8f15734f65a4f465136bbcbb329d96) restores the dashboard hierarchy and supporting visual treatments within the existing design direction. The change is source-level; rendered PC/phone acceptance remains **UNVERIFIED**.
+- Zazu Quality [43926017208](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/43926017208), Director Health [43926017196](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/43926017196), and Push on main [43926017312](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/43926017312): **PASS**.
+- Laravel [43926017197](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/43926017197): **496 passed / 1 skipped / 3,511 assertions**. PostgreSQL migrations, account/workspace registration, database backup/restore and private-file recovery: **PASS**.
+- The dedicated offline-browser job in [43926017197](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/43926017197) was still executing its mobile-viewport customer/Work acceptance step at this reconciliation. It is **PENDING**; no browser acceptance pass is claimed yet.
+- Frontend build, Blade compilation, built asset-manifest validation and LAN asset-origin checks completed successfully in the Laravel job. These do not replace rendered visual acceptance or physical Android acceptance.
+- Formal evidence score remains **71/100** with no uplift. See [the current scorecard](ZAZU_V1_SCORECARD_2026-11-04.md). Seeded commercial reconciliation remains automated-verified; live business records remain an operator task. Business archive/installation recovery automation remains verified; installed-target operator drill remains open.
+- **Release disposition: NOT READY.** Remaining V1 acceptance items: physical Android installed-app cold-launch/restart/reconnect; intended-installation recovery drill; live quote/payment/profit reconciliation; POPIA operational sign-off. Brand/name clearance is deferred by owner direction.
+- No production deployment, live database or customer data changed.
+
+---
+
 ## Director reconciliation — 2026-11-16 (dependency audit workflow correction)
 
 **Canonical branch:** `main` · **workflow verification commit:** `c0f0fdc7ad97d1c60ce9cfe53f5eebc35df827df`.

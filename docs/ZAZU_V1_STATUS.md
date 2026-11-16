@@ -1,3 +1,16 @@
+## Director reconciliation — 2026-11-16 (current V1 evidence)
+
+**Canonical repository:** `Leano-Jordan/ZazuEMP` · **branch:** `main` · **current head:** `8b20f04ecc8f15734f65a4f465136bbcbb329d96`.
+
+- Dashboard visual hierarchy correction is on main in [`8b20f04`](https://github.com/Leano-Jordan/ZazuEMP/commit/8b20f04ecc8f15734f65a4f465136bbcbb329d96). The CSS bundle builds and its manifest is validated in CI; rendered appearance on the owner's PC/phone remains **UNVERIFIED**.
+- Zazu Quality [43926017208](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/43926017208), Director Health [43926017196](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/43926017196), and Push on main [43926017312](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/43926017312): **PASS**.
+- Laravel [43926017197](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/43926017197): **496 passed / 1 skipped / 3,511 assertions**; PostgreSQL migration, registration, backup/restore and private-file recovery: **PASS**. Dedicated offline-browser acceptance was still running its mobile-viewport customer/Work step; result is **PENDING**.
+- Formal evidence score remains **71/100**; no score uplift is awarded for visual CSS restoration or incomplete workflow evidence. See [the 13-domain V1 scorecard](ZAZU_V1_SCORECARD_2026-11-04.md).
+- **Release disposition: NOT READY.** Physical Android installed-device acceptance, installed-target recovery drill, live commercial-record reconciliation and POPIA operational sign-off remain. Brand/name clearance remains deferred by owner direction.
+- No production deployment or live customer data changed.
+
+---
+
 ## Director reconciliation — 2026-11-14 (exact-head offline V1)
 
 **Canonical repository:** `Leano-Jordan/ZazuEMP` · **branch:** `main` · **verified application/test head:** `d09fdbfbe4bdbb7cfaed9ca1ea125313910fa3e0`.

@@ -1,3 +1,31 @@
+## Director evidence snapshot — 2026-11-16 (dashboard correction / current-head reconciliation)
+
+**Canonical repository:** `Leano-Jordan/ZazuEMP` · **branch:** `main` · **assessed source/control head:** `8b20f04ecc8f15734f65a4f465136bbcbb329d96`.
+
+**Formal V1 evidence-maturity score: 71/100 (46/65 across 13 domains; 3.54/5).**  
+**Score action: REAFFIRMED — unchanged from the 2026-11-13 formal re-score.** This is not a new numerical re-score. The existing 13-domain table below remains the authoritative scoring basis.
+
+### Current-head evidence
+
+- Dashboard visual-restoration change: [`8b20f04`](https://github.com/Leano-Jordan/ZazuEMP/commit/8b20f04ecc8f15734f65a4f465136bbcbb329d96) restores the existing dashboard's hero hierarchy, supporting copy, capability panel, metric treatment, card depth and light/dark styling. It changes presentation only; it does not close a business-workflow or device-acceptance gate.
+- Zazu Quality [run 43926017208](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/43926017208): **PASS**.
+- Director Health [run 43926017196](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/43926017196): **PASS**.
+- Push on main [run 43926017312](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/43926017312): **PASS**.
+- Laravel [run 43926017197](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/43926017197): Laravel job **PASS — 496 passed / 1 skipped / 3,511 assertions**. PostgreSQL migration/registration/backup-and-private-file-recovery job **PASS**. The dedicated offline-browser job was still running its mobile-viewport customer/Work acceptance step at the time of this snapshot; its result is **PENDING**, not a pass.
+- The Laravel job also completed frontend dependency installation/build, Blade compilation, asset-manifest validation and LAN asset-origin contract checks. This proves build integrity, not that the owner's rendered screen now looks correct.
+
+### Score and release boundary
+
+- No domain score is increased from this CSS-only correction. UX/mobile/accessibility remains **3/5** until the visual result and physical-device/accessibility boundaries have adequate acceptance evidence.
+- Offline continuity remains **3/5**. Automated browser evidence does not prove installed Android cold launch, force-close/reopen persistence or reconnect on the actual phone.
+- Recovery remains **4/5**. Business archive and PostgreSQL backup/private-file recovery have automated evidence; the intended-installation operator recovery drill remains open.
+- Commercial workflow remains **4/5**. Seeded quote-to-payment-to-profit automation is verified; live business-record reconciliation remains an operator acceptance task.
+- Legal/privacy remains **1/5** pending operational POPIA/privacy sign-off. Zazu name clearance is deferred by owner direction and is not an active V1 engineering target.
+
+**Release disposition: NOT READY.** The remaining bounded V1 acceptance items are physical installed-device acceptance, the intended-installation recovery drill, live commercial-record reconciliation and POPIA operational sign-off. Do not convert the pending browser job or a source-level CSS correction into release approval.
+
+---
+
 ## Director formal re-score — 2026-11-13
 
 **Verified application/test source:** `30e259d445c614df6d1b2495c5a5e505a6d36443` on `main`. Documentation-only reconciliation followed; no application/test source changed after this verified source head.
