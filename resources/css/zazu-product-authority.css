@@ -1836,3 +1836,83 @@ body.zazu-dashboard-page .zazu-dash-event:focus-visible,
 body.zazu-dashboard-page .zazu-dash-focus-item:focus-visible {
     outline-color: var(--zazu-focus) !important;
 }
+
+
+/* Dark theme has higher-specificity legacy selectors; explicitly bind it to
+   the same shared tokens so the dashboard cannot drift from other modules. */
+html[data-theme="dark"] body.zazu-dashboard-page {
+    --dash-canvas: var(--zazu-page);
+    --dash-surface: var(--zazu-surface);
+    --dash-surface-soft: var(--zazu-surface-2);
+    --dash-border: var(--zazu-border);
+    --dash-ink: var(--zazu-ink);
+    --dash-muted: var(--zazu-muted);
+    background: var(--zazu-page) !important;
+    color: var(--zazu-ink) !important;
+}
+html[data-theme="dark"] body.zazu-dashboard-page .zazu-sidebar,
+html[data-theme="dark"] body.zazu-dashboard-page .zazu-brand,
+html[data-theme="dark"] body.zazu-dashboard-page .zazu-sidebar-footer {
+    background: var(--zazu-sidebar) !important;
+    border-color: var(--zazu-border) !important;
+}
+html[data-theme="dark"] body.zazu-dashboard-page .zazu-topbar {
+    background: var(--zazu-surface) !important;
+    border-color: var(--zazu-border) !important;
+}
+html[data-theme="dark"] body.zazu-dashboard-page .zazu-dash-hero,
+html[data-theme="dark"] body.zazu-dashboard-page .zazu-dash-overview .zazu-dash-metric:nth-child(n),
+html[data-theme="dark"] body.zazu-dashboard-page .zazu-dash-surface {
+    background: var(--zazu-surface) !important;
+    background-image: none !important;
+    border-color: var(--zazu-border) !important;
+    color: var(--zazu-ink) !important;
+    box-shadow: var(--zazu-shadow) !important;
+}
+html[data-theme="dark"] body.zazu-dashboard-page .zazu-dash-hero-side,
+html[data-theme="dark"] body.zazu-dashboard-page .zazu-dash-quick-actions .zazu-btn:not(.zazu-btn-cta) {
+    background: var(--zazu-surface-2) !important;
+    background-image: none !important;
+    border-color: var(--zazu-border) !important;
+    color: var(--zazu-ink) !important;
+}
+html[data-theme="dark"] body.zazu-dashboard-page .zazu-dash-hero h2,
+html[data-theme="dark"] body.zazu-dashboard-page .zazu-dash-hero .zazu-dash-greeting,
+html[data-theme="dark"] body.zazu-dashboard-page .zazu-dash-hero .zazu-dash-hero-lead,
+html[data-theme="dark"] body.zazu-dashboard-page .zazu-dash-hero .zazu-dash-hero-support,
+html[data-theme="dark"] body.zazu-dashboard-page .zazu-dash-capability-copy strong,
+html[data-theme="dark"] body.zazu-dashboard-page .zazu-dash-capability-copy .zazu-dash-side-label,
+html[data-theme="dark"] body.zazu-dashboard-page .zazu-dash-capability-copy > span:not(.zazu-dash-side-label),
+html[data-theme="dark"] body.zazu-dashboard-page .zazu-dash-metric > strong,
+html[data-theme="dark"] body.zazu-dashboard-page .zazu-dash-surface-head h3,
+html[data-theme="dark"] body.zazu-dashboard-page .zazu-dash-event-copy strong,
+html[data-theme="dark"] body.zazu-dashboard-page .zazu-dash-focus-item strong,
+html[data-theme="dark"] body.zazu-dashboard-page .zazu-dash-health-value {
+    color: var(--zazu-ink) !important;
+}
+html[data-theme="dark"] body.zazu-dashboard-page .zazu-dash-metric > span:not(.zazu-dash-metric-icon),
+html[data-theme="dark"] body.zazu-dashboard-page .zazu-dash-surface-head p,
+html[data-theme="dark"] body.zazu-dashboard-page .zazu-dash-event-copy span,
+html[data-theme="dark"] body.zazu-dashboard-page .zazu-dash-event-copy small,
+html[data-theme="dark"] body.zazu-dashboard-page .zazu-dash-focus-item small,
+html[data-theme="dark"] body.zazu-dashboard-page .zazu-dash-resource-grid small {
+    color: var(--zazu-muted) !important;
+}
+html[data-theme="dark"] body.zazu-dashboard-page .zazu-dash-metric-icon {
+    background: var(--zazu-primary-soft) !important;
+    color: var(--zazu-primary) !important;
+}
+html[data-theme="dark"] body.zazu-dashboard-page .zazu-dash-quick-actions .zazu-btn-cta {
+    background: var(--zazu-primary) !important;
+    border-color: var(--zazu-primary) !important;
+    color: var(--zazu-primary-ink) !important;
+}
+html[data-theme="dark"] body.zazu-dashboard-page .zazu-dash-surface-head,
+html[data-theme="dark"] body.zazu-dashboard-page .zazu-dash-event,
+html[data-theme="dark"] body.zazu-dashboard-page .zazu-dash-focus-item,
+html[data-theme="dark"] body.zazu-dashboard-page .zazu-dash-resource-grid > *,
+html[data-theme="dark"] body.zazu-dashboard-page .zazu-dash-quote-stage {
+    background: var(--zazu-surface-2) !important;
+    border-color: var(--zazu-border) !important;
+    color: var(--zazu-ink) !important;
+}
