@@ -1363,26 +1363,42 @@ function setupZazuOfflineDirectoryViews() {
         renderCustomers(state);
         renderJobs(state);
         renderQuotes(state);
-        const workspace = document.querySelector('[data-zazu-offline-workspace]');
-        if (workspace) {
-            const hasPendingCustomers = (state?.customers || []).some(customer =>
-                customer?.local_id && !(customer.server_id ?? customer.id)
-            );
-            const hasPendingJobs = (state?.jobs || []).some(job =>
-                job?.local_id && !(job.server_id ?? job.id)
-            );
-            const hasPendingQuotes = (state?.quotes || []).some(quote =>
-                quote?.local_id && !(quote.server_id ?? quote.id)
-            );
-            workspace.hidden = !hasPendingCustomers && !hasPendingJobs && !hasPendingQuotes;
-        }
+        refreshOfflineWorkspaceVisibility(state);
         refreshLocalAttachmentLists();
+    };
+
+    let workspaceVisibilityRequest = 0;
+    const refreshOfflineWorkspaceVisibility = async (state) => {
+        const workspace = document.querySelector('[data-zazu-offline-workspace]');
+        if (!workspace) return;
+
+        const hasPendingRecords = ['customers', 'jobs', 'quotes'].some(collection =>
+            (state?.[collection] || []).some(record =>
+                record?.local_id && !(record.server_id ?? record.id)
+            )
+        );
+        const request = ++workspaceVisibilityRequest;
+        let originAvailable = navigator.onLine;
+
+        // navigator.onLine only reports the network interface. The server may
+        // be unavailable while Wi-Fi remains connected, so check Zazu itself
+        // before hiding the device-local workspace.
+        if (originAvailable) originAvailable = await canReachZazuOrigin();
+        if (request !== workspaceVisibilityRequest || !workspace.isConnected) return;
+
+        workspace.hidden = !hasPendingRecords && originAvailable;
     };
 
     window.ZazuOffline.ready.then(render).catch(() => {});
     window.addEventListener('zazu:offline-ready', render);
     window.addEventListener('zazu:offline-state-updated', render);
     window.addEventListener('zazu:offline-attachments-updated', refreshLocalAttachmentLists);
+    window.addEventListener('online', render);
+    window.addEventListener('offline', render);
+    window.addEventListener('focus', render);
+    document.addEventListener('visibilitychange', () => {
+        if (document.visibilityState === 'visible') render();
+    });
 }
 
 function setupZazuOfflineCustomerOptions() {
