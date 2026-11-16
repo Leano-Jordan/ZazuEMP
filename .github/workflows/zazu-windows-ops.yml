@@ -124,7 +124,7 @@ jobs:
             'public\build\manifest.json',
             "APP_ENV = 'production'",
             "APP_DEBUG = 'false'",
-            "SESSION_SECURE_COOKIE = 'true'",
+            "SESSION_SECURE_COOKIE = 'false'",
             'php.exe',
             '$script:PhpPath -m',
             'pdo_sqlite',
