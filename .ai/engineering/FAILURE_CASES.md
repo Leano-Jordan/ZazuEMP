@@ -29,6 +29,7 @@ This is the persistent failure-history register for the Failure Case / Loop-Brea
 | CASE-ZAZU-0012 | PHPUnit 12-failure stale/brittle contract batch | Historical PHPUnit batch exposed stale/brittle source and selector contracts | CORRECTED | Repository corrections exist; synchronized verification pending | Current-head CI/PHPUnit evidence |
 | CASE-ZAZU-0013 | PHPUnit 269-pass/7-fail stale-checkout batch | Historical failures traced to stale checkout against current main | CORRECTED | Repository corrections exist; synchronized verification pending | Current-head CI/PHPUnit evidence |
 | CASE-ZAZU-0014 | Dark-theme browser token assertions | E2E had stale palette literals and sampled active navigation before its theme transition settled | VERIFIED | Exact-head browser smoke passed on `153c4d01bef4b5c3bd01a1db770902b0c7649bb0` | Closed |
+| CASE-ZAZU-0032 | Dashboard shared theme / dark-mode token mapping | Dashboard canvas alias differs from shared page token because a higher-specificity dark selector wins | CLOSED | High-specificity legacy dark rule overrides lower-specificity token alias | Exact-head light/dark Playwright and CI |
 | CASE-ZAZU-0015 | Dark form-control theme timing | Browser test observed a transient light background immediately after switching theme; retry passed | CORRECTED | Test waits for dark theme and settled control backgrounds | Exact-head browser CI |
 
 ### CASE-ZAZU-0014
@@ -520,3 +521,24 @@ Archive pointer: closed historical cases CASE-ZAZU-0001 through CASE-ZAZU-0009 a
 **Scope boundary:** This closes the deterministic browser fixture and exact-head automated acceptance. Physical Android force-closed launch, disconnected persistence and reconnect must still be verified on the actual device; no hardware pass is inferred from mobile viewport emulation.
 
 **Loop prevention:** Do not require this offline-edit test to discover its just-created fixture through a cached directory navigation. Use the verified server identity and paired local record. Do not modify global service-worker navigation/cache behaviour for this fixture.
+
+
+### CASE-ZAZU-0032
+
+**Status:** CLOSED — exact-head light/dark browser acceptance and supporting CI passed.  
+**Engineering diagnostic code:** ENG-CSS-004.  
+**First observed:** 2026-11-16.  
+**Target:** Dashboard shared theme alignment in light and dark modes.
+
+**Failure fingerprint:** After the shared-palette correction, the dashboard's computed `--dash-canvas` remained `#0D1D2E` in dark mode while `--zazu-page` resolved to `#0B1726`. The older `html[data-theme="dark"] body.zazu-dashboard-page` selector had greater specificity than the later `body.zazu-dashboard-page` alias mapping, so the custom dashboard token retained the old isolated palette value.
+
+**Classification:** F1 — application CSS cascade defect. This was not an offline runtime, fixture, database or browser-environment failure.
+
+**Correction:** Rebound the dashboard's full `--dash-*` token aliases inside the high-specificity dark-theme selector. Preserved the dashboard's layered radial/linear hero and business-image overlay while sourcing its colour values from shared theme tokens. Updated the visual foundation test to exercise both theme modes and compare dashboard-computed values with shared tokens.
+
+**Verification:** Source/test commit `8cdadcd1563bd30c88b15153ca91181a2d5abb23`, exact Laravel run [43952349496](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/43952349496): Laravel **500 passed / 1 skipped / 3,549 assertions**; desktop browser **37 passed**; mobile viewport **6 passed**; phone attachment **1 passed**; PostgreSQL migration/recovery smoke **PASS**. Manifest-only descendant `dfc01749af5718011332a9e86d303b9622fe7ff4) reverified by [Laravel run 43952861421](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/43952861421), all three jobs passed. Zazu Quality, Director Health and Push-on-main also passed.
+
+**Scope boundary:** This proves the automated theme and browser contract. It does not claim rendered acceptance on the owner's actual PC or physical Android device. No readiness score uplift.
+
+**Loop prevention:** When a dashboard token alias is defined in both a generic and theme-qualified selector, assert the computed value under both themes. Review specificity before assuming a later source-order rule wins.
+
