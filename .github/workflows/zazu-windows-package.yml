@@ -33,7 +33,7 @@ jobs:
       - name: Checkout exact main commit
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
         with:
-          ref: \${{ github.sha }}
+          ref: ${{ github.sha }}
 
       - name: Set up PHP
         uses: shivammathur/setup-php@f3e473d116dcccaddc5834248c87452386958240
@@ -64,7 +64,7 @@ jobs:
 
       - name: Assemble clean Windows installation
         env:
-          PACKAGE_SHA: \${{ github.sha }}
+          PACKAGE_SHA: ${{ github.sha }}
         run: |
           set -euo pipefail
           package_root="$RUNNER_TEMP/zazu-package"
@@ -80,6 +80,7 @@ jobs:
             "$package_root/ZazuEMP/prelaunch" \
             "$package_root/ZazuEMP/reference ui ux images" \
             "$package_root/ZazuEMP/docker" \
+            "$package_root/ZazuEMP/docs" \
             "$package_root/ZazuEMP/vendor" \
             "$package_root/ZazuEMP/node_modules"
 
@@ -98,6 +99,10 @@ jobs:
           cp -a vendor "$package_root/ZazuEMP/vendor"
           mkdir -p "$package_root/ZazuEMP/public/build"
           cp -a public/build/. "$package_root/ZazuEMP/public/build/"
+          mkdir -p "$package_root/ZazuEMP/docs"
+          cp docs/V1_PACKAGE_INSTALLATION.md "$package_root/ZazuEMP/docs/"
+          cp docs/LOCAL_PC_HOST_DEPLOYMENT.md "$package_root/ZazuEMP/docs/"
+          cp docs/RELEASE_BACKUP_RESTORE_RUNBOOK.md "$package_root/ZazuEMP/docs/"
 
           (
             cd "$package_root/ZazuEMP"
@@ -119,16 +124,16 @@ jobs:
 
           mkdir -p "$RUNNER_TEMP/zazu-output"
           cd "$package_root"
-          zip -qr "$RUNNER_TEMP/zazu-output/ZazuEMP-v1-candidate-\${PACKAGE_SHA:0:7}.zip" ZazuEMP
+          zip -qr "$RUNNER_TEMP/zazu-output/ZazuEMP-v1-candidate-${PACKAGE_SHA:0:7}.zip" ZazuEMP
           cd "$RUNNER_TEMP/zazu-output"
           sha256sum *.zip > SHA256SUMS.txt
 
       - name: Upload Windows installation candidate
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
         with:
-          name: zazu-emp-windows-v1-candidate-\${{ github.sha }}
+          name: zazu-emp-windows-v1-candidate-${{ github.sha }}
           path: |
-            \${{ runner.temp }}/zazu-output/*.zip
-            \${{ runner.temp }}/zazu-output/SHA256SUMS.txt
+            ${{ runner.temp }}/zazu-output/*.zip
+            ${{ runner.temp }}/zazu-output/SHA256SUMS.txt
           if-no-files-found: error
           retention-days: 30
