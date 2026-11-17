@@ -91,3 +91,10 @@ Close the physical Android device, intended-installation recovery, live financia
 - Laravel job `134284080768`: PASS — service-worker/session contracts, LAN asset-origin checks, Blade/manifest/config checks and PHPUnit/Pest.
 - Application code is unchanged after tested source `71c8fc5`; latest `main` HEAD `1bb4936` is a documentation-only release-checklist commit.
 - Scheduling engineering/CI subgate closed. No overall readiness uplift: physical Android, installed-target recovery, live commercial reconciliation, POPIA and dependency advisory remain open.
+
+
+## DB-001 diagnostic contract correction — 2026-11-17
+
+Source inspection confirms the authoritative incident logger is intentionally privacy-minimised. It records request ID, error classification, exception class, route/action, method/path, timestamp and source file/line; it does not record exception messages, SQL, bindings or stack traces. The request middleware also adds the request ID to log context and the response header.
+
+The incident-framework documentation was corrected on `main` (documentation-only commit `f88af665ae09b6f87f3c8d73a52c3cc5e4854dbd`) to match the implementation. This is a documentation correction, not an incident fix. The actual owner-installation log entry matching `aa9080f4-9580-41c9-a643-439b31928ffa` is still required to inspect its exception class, source file/line and route. DB-001 remains OPEN; no readiness uplift.
