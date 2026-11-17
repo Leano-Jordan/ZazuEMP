@@ -32,6 +32,11 @@ class ZazuBackupCommand extends Command
             return self::FAILURE;
         }
 
+        return $this->runBackup($directory);
+    }
+
+    private function runBackup(string $directory): int
+    {
         $stamp = now()->format('Ymd_His').'_' . Str::lower((string) Str::ulid());
         $work = storage_path('app/.zazu-backup-'.$stamp);
         $archive = $directory.DIRECTORY_SEPARATOR.'zazu-backup-'.$stamp.'.zip';
@@ -41,25 +46,7 @@ class ZazuBackupCommand extends Command
 
         try {
             $driver = config('database.default');
-            $manifest = $this->buildManifest($driver, $stamp);
-
-            if (!$this->snapshotDatabase($driver, $work)) {
-                return self::FAILURE;
-            }
-
-            if (!$this->backupPrivateStorage($work)) {
-                return self::FAILURE;
-            }
-
-            $checksums = $this->buildChecksums($work);
-            if ($checksums === null) {
-                return self::FAILURE;
-            }
-
-            $manifest['checksums'] = $checksums;
-            File::put($work.'/manifest.json', json_encode($manifest, JSON_PRETTY_PRINT | JSON_THROW_ON_ERROR));
-
-            if (!$this->createArchive($work, $temporaryArchive)) {
+            if (!$this->buildBackupArchive($driver, $stamp, $work, $temporaryArchive)) {
                 return self::FAILURE;
             }
 
@@ -79,6 +66,25 @@ class ZazuBackupCommand extends Command
             File::delete($temporaryArchive);
             File::deleteDirectory($work);
         }
+    }
+
+    private function buildBackupArchive(string $driver, string $stamp, string $work, string $temporaryArchive): bool
+    {
+        $manifest = $this->buildManifest($driver, $stamp);
+
+        if (!$this->snapshotDatabase($driver, $work) || !$this->backupPrivateStorage($work)) {
+            return false;
+        }
+
+        $checksums = $this->buildChecksums($work);
+        if ($checksums === null) {
+            return false;
+        }
+
+        $manifest['checksums'] = $checksums;
+        File::put($work.'/manifest.json', json_encode($manifest, JSON_PRETTY_PRINT | JSON_THROW_ON_ERROR));
+
+        return $this->createArchive($work, $temporaryArchive);
     }
 
     private function prepareDestination(): ?string
