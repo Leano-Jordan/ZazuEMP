@@ -26,6 +26,10 @@
                 : ['label' => 'Add services', 'route' => route('work.requirements.create', $event), 'copy' => 'Choose what you are providing for this job.']);
     @endphp
 
+    @if (session('schedule_warning'))
+        <div class="zazu-warning-note mb-4" role="status">{{ session('schedule_warning') }}</div>
+    @endif
+
     <section class="zazu-work-hero zazu-work-hero-refined">
         <div>
             <div class="zazu-work-ref">{{ $event->reference }}</div>
