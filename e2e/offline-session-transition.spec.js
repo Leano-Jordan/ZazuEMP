@@ -27,6 +27,77 @@ async function openPublicNavigation(page) {
     if (await toggle.isVisible()) await toggle.click();
 }
 
+test('offline logout retries trusted-device revocation after the next owner login without storing its token', async ({ page }, testInfo) => {
+    test.setTimeout(45_000);
+    test.skip(testInfo.project.name !== 'chromium', 'Offline logout revocation recovery runs once.');
+
+    await login(page);
+    await waitForOfflineRuntime(page);
+    const businessId = Number(await page.locator('body').getAttribute('data-zazu-business-id'));
+    expect(businessId).toBeGreaterThan(0);
+
+    const installationId = '6f96fa7a-7d39-4bc1-a0df-8b9b98d73f61';
+    await page.evaluate(async ({ id, business }) => {
+        await window.ZazuOffline.ready;
+        const state = window.ZazuOffline.getState();
+        state.installation_id = id;
+        state.sync = {
+            token: 'logout-revocation-secret-token',
+            device: { id: 987649, business_id: business },
+        };
+        state.local_dirty = false;
+        await window.ZazuOffline.persist({ allowSessionChange: true });
+    }, { id: installationId, business: businessId });
+
+    await page.route('**/api/sync/revoke', route => route.abort());
+    const logout = await page.evaluate(() => window.ZazuOffline.clearLocalSession());
+    expect(logout).toEqual({
+        ok: false,
+        reason: 'unreachable',
+        queued_for_retry: true,
+    });
+
+    const storedMarker = await page.evaluate(business => {
+        const raw = localStorage.getItem('zazu-pending-device-revocation:' + business);
+        return raw ? JSON.parse(raw) : null;
+    }, businessId);
+    expect(storedMarker.installation_id).toBe(installationId);
+    expect(storedMarker.business_id).toBe(businessId);
+    expect(storedMarker).not.toHaveProperty('token');
+    expect(JSON.stringify(storedMarker)).not.toContain('logout-revocation-secret-token');
+
+    let retryAttempts = 0;
+    await page.route('**/settings/sync/devices/revoke-installation', async route => {
+        retryAttempts++;
+        expect(route.request().method()).toBe('POST');
+        expect(route.request().postDataJSON()).toEqual({ installation_id: installationId });
+        await route.fulfill({
+            status: 200,
+            contentType: 'application/json',
+            body: JSON.stringify({ revoked: true, device_id: 987649 }),
+        });
+    });
+
+    // The server-side web session ends independently of the local offline clear.
+    await page.context().clearCookies();
+    await page.goto('/');
+    await login(page);
+    await expect.poll(() => retryAttempts).toBe(1);
+
+    const recovered = await page.evaluate(business => ({
+        marker: localStorage.getItem('zazu-pending-device-revocation:' + business),
+        installationId: window.ZazuOffline.getState().installation_id,
+        token: window.ZazuOffline.getState().sync?.token || null,
+        consent: window.ZazuOffline.getState().sync_registration_consent,
+    }), businessId);
+    expect(recovered).toEqual({
+        marker: null,
+        installationId,
+        token: null,
+        consent: false,
+    });
+});
+
 test('unreachable logout host preserves the signed-in session and queued business work', async ({ page }, testInfo) => {
     test.setTimeout(45_000);
     test.skip(testInfo.project.name !== 'chromium', 'Session transition acceptance runs once; responsive navigation is covered separately.');
