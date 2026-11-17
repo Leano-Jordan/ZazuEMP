@@ -2062,6 +2062,59 @@ test.describe('Zazu installed PWA offline shell', () => {
         await expect(updatedDetail).toBeHidden();
     });
 
+    test('reassigns a device-local Work record to another customer while disconnected', async ({ page, context }, testInfo) => {
+        test.setTimeout(25_000);
+        test.skip(testInfo.project.name !== 'chromium', 'Offline Work reassignment contract runs once on desktop Chromium.');
+
+        const jobLocalId = 'abababab-abab-4bab-8bab-abababababab';
+        const firstCustomerId = 'acacacac-acac-4cac-8cac-acacacacacac';
+        const nextCustomerId = 'adadadad-adad-4dad-8dad-adadadadadad';
+
+        await page.addInitScript(() => {
+            window.__ZAZU_OFFLINE_DEFER_INITIAL_SYNC = true;
+        });
+        await login(page);
+        await page.goto('/work', { waitUntil: 'domcontentloaded' });
+        await waitForOfflineRuntime(page);
+        await page.evaluate(async ({ jobLocalId, firstCustomerId, nextCustomerId }) => {
+            const state = window.ZazuOffline.getState();
+            state.customers = [
+                { local_id: firstCustomerId, name: 'Original offline customer' },
+                { local_id: nextCustomerId, name: 'Replacement offline customer' },
+            ];
+            state.jobs = [{
+                local_id: jobLocalId,
+                name: 'Offline reassignment job',
+                customer_local_id: firstCustomerId,
+                customer_name: 'Original offline customer',
+                event_type: 'Other',
+                status: 'draft',
+                requirements: [],
+                services: [],
+            }];
+            state.local_dirty = false;
+            await window.ZazuOffline.persist();
+            window.dispatchEvent(new CustomEvent('zazu:offline-state-updated'));
+        }, { jobLocalId, firstCustomerId, nextCustomerId });
+
+        await context.setOffline(true);
+        const row = page.locator('[data-zazu-local-record="job"]').filter({ hasText: 'Offline reassignment job' });
+        await expect(row).toBeVisible();
+        await row.getByRole('button', { name: 'View offline' }).click();
+        const detail = page.getByRole('region', { name: 'Offline job details' });
+        await detail.getByRole('button', { name: 'Edit offline' }).click();
+        const form = detail.locator('[data-zazu-job-offline-edit]');
+        await form.locator('[name="customer_local_id"]').selectOption(nextCustomerId);
+        await form.getByRole('button', { name: 'Save offline changes' }).click();
+
+        const queued = await page.evaluate(async () => window.ZazuOffline.pending());
+        expect(queued).toHaveLength(1);
+        expect(queued[0].payload.record.customer_local_id).toBe(nextCustomerId);
+        const updated = await page.evaluate(id => window.ZazuOffline.getState().jobs.find(job => job.local_id === id), jobLocalId);
+        expect(updated.customer_local_id).toBe(nextCustomerId);
+        expect(updated.customer_name).toBe('Replacement offline customer');
+    });
+
     test('reads and edits a device-local customer relationship while disconnected', async ({ page, context }, testInfo) => {
         test.setTimeout(30_000);
         test.skip(testInfo.project.name !== 'chromium', 'Customer local read/edit contract runs once on desktop Chromium.');
