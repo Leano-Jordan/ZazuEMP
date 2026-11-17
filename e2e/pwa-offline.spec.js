@@ -23,6 +23,15 @@ async function waitForOfflineRuntime(page) {
     await page.evaluate(() => window.ZazuOffline.ready);
 }
 
+async function trustCurrentDevice(page) {
+    await page.goto('/settings', { waitUntil: 'domcontentloaded' });
+    const trustButton = page.getByRole('button', { name: 'Trust this device for offline sync' });
+    await expect(trustButton).toBeVisible();
+    await trustButton.click();
+    await expect(page.getByRole('button', { name: 'This device is trusted' })).toBeVisible();
+    await expect.poll(() => page.evaluate(() => window.ZazuOffline.isPaired())).toBe(true);
+}
+
 test.describe('Zazu installed PWA offline shell', () => {
     test('local client becomes ready before an unresponsive initial sync', async ({ page }, testInfo) => {
         test.setTimeout(20_000);
@@ -609,12 +618,12 @@ test.describe('Zazu installed PWA offline shell', () => {
 
     test('migrates legacy offline data only into its matching business workspace', async ({ page }) => {
         await login(page);
-        await expect.poll(() => page.evaluate(() => window.ZazuOffline.isPaired())).toBe(true);
+        await trustCurrentDevice(page);
         const businessId = await page.evaluate(() => Number(document.body.dataset.zazuBusinessId));
         expect(businessId).toBeGreaterThan(0);
 
-        // The authenticated first load auto-registers this installation. Clear
-        // that current workspace so this test represents a genuine legacy-only upgrade.
+        // Explicitly approve this browser before clearing its current workspace;
+        // legacy migration must preserve the trusted business device identity.
         await page.evaluate(async activeBusinessId => {
             const db = await new Promise((resolve, reject) => {
                 const request = indexedDB.open('zazu-client-business-' + activeBusinessId, 1);
@@ -1224,9 +1233,9 @@ test.describe('Zazu installed PWA offline shell', () => {
 
         await login(page);
         await waitForOfflineRuntime(page);
-        // Wait for the best-effort first-load device registration before replacing
-        // its token with a deterministic fixture for the logout preservation test.
-        await expect.poll(() => page.evaluate(() => window.ZazuOffline.isPaired())).toBe(true);
+        // Owner approval is explicit; then replace the real credential with a
+        // deterministic fixture for the logout preservation test.
+        await trustCurrentDevice(page);
         const databaseName = await page.evaluate(() => {
             const businessId = Number(document.body.dataset.zazuBusinessId);
             if (!Number.isSafeInteger(businessId) || businessId < 1) {
@@ -2022,7 +2031,7 @@ test.describe('Zazu installed PWA offline shell', () => {
             'INV-OFFLINE-001',
             'Balance ZAR 7500.00',
         ]) {
-            await expect(detail.getByText(value)).toBeVisible();
+            await expect(detail.getByText(value).first()).toBeVisible();
         }
         await expect(detail.getByText('Wedding', { exact: true })).toBeVisible();
 
