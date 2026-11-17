@@ -526,3 +526,8 @@ Backup compatibility coverage was extended after the initial integrity note: the
 - Manifest alignment commit: `45d5929e615a480b1983ccd53c9892cd10b5fea2`. The latest application code/test changes are unchanged from the verified source/test commit; manifest-only follow-up is undergoing its own full workflow verification.
 - **Scope boundary:** Customers and Work remain the only device-local directory renderers. Quotes now have a dashboard summary only; all other entity collections remain local data/queued mutation foundations without complete local directory/detail parity.
 - V1 remains **NOT READY** pending physical Android acceptance, installed-target recovery drill, live commercial-record reconciliation and POPIA operational sign-off. No readiness score uplift is claimed.
+
+
+## Commercial document sharing checkpoint — 2026-11-18
+
+COM-01 is PARTIAL on `main`: signed public quote pages now support browser Print / Save as PDF; quote details hand off to the signed customer view through WhatsApp; issued/paid invoices have a seven-day signed, read-only customer view with WhatsApp handoff and browser Print / Save as PDF. This is not direct PDF-file attachment generation. Customer-ready receipts and desktop/Android practical acceptance remain open. DB-001 remains OPEN and the V1 release remains NOT READY.
