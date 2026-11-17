@@ -1,5 +1,9 @@
 # Changelog
 
+## Unreleased — 2026-11-17 (Normalize optional allocation end date)
+- Normalized an omitted allocated_until value before date-order validation, overlap checking, persistence and audit to prevent the open-ended booking path from returning HTTP 500.
+- Exact-head CI pending; regression remains unchanged.
+
 ## Unreleased — 2026-11-17 (Nullable open-ended allocation handling)
 - Persisted and audited the normalized nullable allocation end date when the optional field is omitted, preventing an HTTP 500 on open-ended bookings.
 - The failed online regression remains intact; exact-head CI pending.

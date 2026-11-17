@@ -1,7 +1,7 @@
 # Zazu EMP — V1 Readiness Register
 
 Last fully verified HEAD: Leano-Jordan/ZazuEMP / main / 807db36e6eb9aaded81e6bb45e1e2f0c9c18c5de
-Current follow-up: open-ended rental overlap handling; controller nullable-value fix pending exact-head CI
+Current follow-up: open-ended rental overlap; nullable end-date normalization correction pending exact-head CI
 Release disposition: NOT READY
 Evidence maturity: 73/100 unchanged; no uplift claimed.
 
@@ -19,7 +19,7 @@ Evidence maturity: 73/100 unchanged; no uplift claimed.
 2. Six-digit pairing code, per-IP throttle only, no failed-attempt lockout — DEFER; low-confidence hardening, no demonstrated V1 exploit.
 3. Loopback-only proxy trust and no HTTPS forcing — ACCEPTED LIMITATION for local Windows/LAN V1; hosted reverse-proxy behavior is outside active deployment scope.
 4. CurrentBusiness test-only branch, min-8 password policy, generated manifest drift, offline bootstrap permission filtering — MIXED: generated manifest tracking corrected; bootstrap endpoint permission gate covered; password-policy expansion and per-permission filtering deferred; test-only branch accepted.
-5. Rental asset date allocation — REPRODUCED and CORRECTED for explicit date ranges at 807db36. Follow-up adds symmetric open-ended overlap protection. Offline regression passed at 885d1fb; online regression exposed an HTTP 500 when allocated_until was omitted because the audit record accessed a missing validated key. The controller now uses the normalized nullable value; exact-head CI pending. Manual physical return remains operator-confirmed; no automatic release on event state/date alone. Quantity-based rental stock remains outside the serialized-asset model.
+5. Rental asset date allocation — REPRODUCED and CORRECTED for explicit date ranges at 807db36. Follow-up adds symmetric open-ended overlap protection. Offline open-ended regression passed; online test exposed missing-key handling in the optional allocated_until input (HTTP 500). Two direct accesses were normalized in sequence; the current candidate normalizes the value before validation, overlap checks, persistence and audit. Exact-head CI pending. Manual physical return remains operator-confirmed; no automatic release on event state/date alone. Quantity-based rental stock remains outside the serialized-asset model.
 6. Multi-day events, start/end/setup/collection times, clash detection and staff scheduling — OWNER-DECISION / SCOPE; no implementation without explicit V1 authorization.
 7. Invoice numbering (online month-prefixed random suffix; offline UUID suffix) — OWNER-DECISION pending South African tax-adviser guidance; current format assertion passed, numbering unchanged.
 8. Team invites/role assignment, email/PDF delivery, billing, app-wide licence enforcement, in-app legal terms/privacy, monitoring and scheduled jobs — OWNER-DECISION / SCOPE; no silent V1 expansion.
@@ -32,8 +32,8 @@ Evidence maturity: 73/100 unchanged; no uplift claimed.
 
 ## Exact-head CI evidence
 - 807db36: Laravel 521 passed / 1 skipped / 3,648 assertions; offline browser 45 desktop + 6 mobile + 1 phone-local attachment passed; PostgreSQL recovery passed; Windows package/fresh install passed; populated upgrade/rollback, quality, Psalm, PHPMD, Director Health, Contract Lint and CodeQL passed; SonarCloud skipped.
-- 885d1fb: Laravel 522 passed / 1 skipped / 1 failed (3,652 assertions); online open-ended allocation failed with HTTP 500 due the optional allocated_until audit lookup. Offline open-ended regression passed. PHPMD, quality, Director Health and Contract Lint passed; PostgreSQL passed; SonarCloud skipped; offline-browser acceptance was still running at last observation.
+- 17f3b9c: Laravel 522 passed / 1 skipped / 1 failed (3,652 assertions); online open-ended allocation returned HTTP 500 due an earlier direct read of missing allocated_until. Offline open-ended regression passed. PHPMD, quality, Director Health and Contract Lint passed; PostgreSQL passed; SonarCloud skipped; offline browser and Windows package were still running at last observation.
 - No score uplift. Existing release gates remain open.
 
 ## Next
-Run exact-head CI on the nullable-value correction. Keep invoice numbering and all owner-decision scope items unchanged.
+Run exact-head CI on the normalized nullable-value correction. Keep invoice numbering and all owner-decision scope items unchanged.

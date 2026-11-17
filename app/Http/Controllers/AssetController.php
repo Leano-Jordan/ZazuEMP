@@ -132,10 +132,10 @@ class AssetController extends Controller
                 ->findOrFail($asset->id);
 
             abort_unless(in_array($lockedAsset->status, ['available', 'allocated'], true), 422, 'Only available assets can be allocated.');
-            abort_if($data['allocated_until'] && $data['allocated_from'] > $data['allocated_until'], 422, 'Allocation dates are invalid.');
+            $until = $data['allocated_until'] ?? null;
+            abort_if($until && $data['allocated_from'] > $until, 422, 'Allocation dates are invalid.');
 
             $overlapQuery = $lockedAsset->allocations()->where('status', 'allocated');
-            $until = $data['allocated_until'] ?? null;
             if ($until !== null) {
                 $overlapQuery->whereDate('allocated_from', '<=', $until);
             }

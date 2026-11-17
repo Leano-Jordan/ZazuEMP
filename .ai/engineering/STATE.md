@@ -4,7 +4,7 @@ As of: 2026-11-17
 Repository: Leano-Jordan/ZazuEMP
 Canonical branch: main only; never create branches
 Last fully verified HEAD: 807db36e6eb9aaded81e6bb45e1e2f0c9c18c5de
-Current follow-up: open-ended allocation-overlap protection; controller audit/persistence handling corrected in this update; exact-head CI pending.
+Current follow-up: open-ended allocation overlap; nullable end-date validation is now normalized before validation, overlap checks, persistence and audit; exact-head CI pending.
 
 ## Verified correction
 Rental asset date-allocation was reproduced at c7be735: a second non-overlapping booking returned HTTP 422 before date-overlap evaluation.
@@ -17,7 +17,7 @@ The bounded online/offline correction passed at 807db36:
 - SonarCloud skipped.
 
 ## Open-ended follow-up evidence
-The optional end date is open-ended when omitted. The new tests cover future bounded bookings followed by an earlier open-ended booking. At 885d1fb the offline handler regression passed, but the online route returned HTTP 500 because the audit record read allocated_until directly from the validated input when the optional field was absent. The controller now uses the normalized nullable value for persistence and audit. The failed test remains unchanged; no weakening.
+At 885d1fb, online open-ended booking returned HTTP 500 because the audit read a missing optional validated end-date key. At 17f3b9c, that key was normalized for persistence and audit, but Laravel still returned 500 because the earlier date-order guard accessed the missing key directly. The offline open-ended regression passed. The current patch normalizes the optional value before the date-order guard and reuses it consistently. Exact-head CI pending. Tests remain intact.
 
 ## Commercial numbering
 Online invoice-number format assertion passed: month-prefixed random suffix. Offline source uses an entity-UUID suffix. Numbering remains unchanged pending South African tax-adviser guidance.

@@ -29,7 +29,7 @@ Zazu is a reusable commercial event-management platform for catering, event equi
 
 ## Current verified position
 Last fully verified HEAD: 807db36e6eb9aaded81e6bb45e1e2f0c9c18c5de. Laravel 521 passed, 1 skipped, 3,648 assertions; desktop/mobile offline and phone-local attachment acceptance passed; PostgreSQL recovery, Windows fresh install, populated upgrade/rollback, quality, Psalm, PHPMD and CodeQL passed; SonarCloud skipped.
-The bounded rental date-allocation correction is verified at 807db36. Open-ended overlap protection is being completed; a missing optional end date exposed an audit-record null handling issue, now corrected and awaiting exact-head CI.
+Bounded rental date availability is verified at 807db36. Open-ended overlap handling is being completed; the online optional end-date path still had an HTTP 500 at 17f3b9c, and the current correction normalizes the nullable date before all uses. Exact-head CI pending.
 Invoice numbering remains unchanged pending SA tax-adviser guidance.
 V1 remains NOT READY; evidence maturity remains 73/100 with no uplift.
 Current gates: physical Android offline/reconnect; installed-target recovery including private media; live populated-business financial reconciliation; POPIA operational sign-off.
