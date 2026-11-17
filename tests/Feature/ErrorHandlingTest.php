@@ -121,20 +121,21 @@ class ErrorHandlingTest extends TestCase
             ->withArgs(function (string $level, string $message, array $context) use ($marker): bool {
                 $serialized = json_encode($context);
 
+                $expectedDiagnostics = [
+                    'database_connection' => 'sqlite',
+                    'database_driver' => 'sqlite',
+                    'database_sqlstate' => 'HY000',
+                    'database_driver_code' => 1,
+                    'database_operation' => null,
+                ];
+
                 return $level === 'error'
                     && $message === 'Zazu error incident'
                     && $context['request_id'] === 'redaction-request-id'
                     && $context['exception_class'] === QueryException::class
-                    && ! array_key_exists('technical_message', $context)
-                    && ! array_key_exists('query', $context)
-                    && ! array_key_exists('trace', $context)
+                    && array_intersect_key($context, $expectedDiagnostics) === $expectedDiagnostics
                     && ! str_contains((string) $serialized, $marker)
-                    && ! str_contains((string) $serialized, 'select * from private_customers')
-                    && $context['database_connection'] === 'sqlite'
-                    && $context['database_driver'] === 'sqlite'
-                    && $context['database_sqlstate'] === 'HY000'
-                    && $context['database_driver_code'] === 1
-                    && $context['database_operation'] === null;
+                    && ! str_contains((string) $serialized, 'select * from private_customers');
             });
 
         $pdoException = new \PDOException($marker);
