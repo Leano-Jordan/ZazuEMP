@@ -16,10 +16,22 @@ final class EventScheduleConflictDetector
      */
     public function conflicts(int $businessId, array $schedule, ?int $exceptEventId = null): Collection
     {
-        $startDate = $schedule['setup_date'] ?: $schedule['event_date'];
-        $endDate = $schedule['collection_date'] ?: ($schedule['event_end_date'] ?: $schedule['event_date']);
-        $startTime = $schedule['setup_date'] ? '00:00' : ($schedule['event_start_time'] ?: '00:00');
-        $endTime = $schedule['collection_date'] ? '23:59' : ($schedule['event_end_time'] ?: '23:59');
+        $setupDate = $schedule['setup_date'] ?? null;
+        $collectionDate = $schedule['collection_date'] ?? null;
+        $eventDate = $schedule['event_date'] ?? null;
+        $eventEndDate = $schedule['event_end_date'] ?? null;
+        $eventStartTime = $schedule['event_start_time'] ?? null;
+        $eventEndTime = $schedule['event_end_time'] ?? null;
+        $startDate = $setupDate ?: $eventDate;
+        $endDate = $collectionDate ?: ($eventEndDate ?: $eventDate);
+        $hasCompleteTimeRange = $eventStartTime !== null && $eventStartTime !== ''
+            && $eventEndTime !== null && $eventEndTime !== '';
+        $startTime = $setupDate || ! $hasCompleteTimeRange ? '00:00' : $eventStartTime;
+        $endTime = $collectionDate || ! $hasCompleteTimeRange ? '23:59' : $eventEndTime;
+
+        if (! $startDate || ! $endDate) {
+            return collect();
+        }
 
         $windowStart = CarbonImmutable::parse($startDate.' '.$startTime);
         $windowEnd = CarbonImmutable::parse($endDate.' '.$endTime);
@@ -58,8 +70,9 @@ final class EventScheduleConflictDetector
                     return false;
                 }
 
-                $otherStartTime = $event->setup_date ? '00:00' : ($event->event_start_time ?: '00:00');
-                $otherEndTime = $event->collection_date ? '23:59' : ($event->event_end_time ?: '23:59');
+                $hasOtherTimeRange = $event->event_start_time && $event->event_end_time;
+                $otherStartTime = $event->setup_date || ! $hasOtherTimeRange ? '00:00' : $event->event_start_time;
+                $otherEndTime = $event->collection_date || ! $hasOtherTimeRange ? '23:59' : $event->event_end_time;
                 $otherStart = CarbonImmutable::parse($otherStartDate.' '.$otherStartTime);
                 $otherEnd = CarbonImmutable::parse($otherEndDate.' '.$otherEndTime);
 
