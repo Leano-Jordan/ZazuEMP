@@ -1079,8 +1079,6 @@ function setupZazuOfflineDirectoryViews() {
             editButton.type = 'button';
             editButton.className = 'zazu-btn zazu-btn-secondary';
             editButton.textContent = 'Edit offline';
-            editButton.disabled = ['completed', 'cancelled'].includes(currentJob.status);
-            if (editButton.disabled) editButton.title = 'Closed Work records cannot be edited.';
             editButton.setAttribute('aria-expanded', 'false');
             heading.append(title, editButton, close);
             panel.append(heading);
