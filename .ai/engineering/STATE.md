@@ -112,3 +112,11 @@ V1: NOT READY. Historical state/register/memory, checklist and changelog are pre
 - Corrected `docs/ZAZU_ERROR_INCIDENT_FRAMEWORK.md` on `main` (documentation-only commit `f88af665ae09b6f87f3c8d73a52c3cc5e4854dbd`) because its prior wording incorrectly claimed the routine incident log contained technical exception messages, stack traces and safe query context.
 - This clarifies the diagnostic contract but does not establish the cause of either owner-reported DB-001. The installed log entry matching `aa9080f4-9580-41c9-a643-439b31928ffa` is still required to identify exception class, source file/line and route. If those fields are insufficient, reproduce under controlled local diagnostics without adding raw SQL/bindings to production logs.
 - No application code changed, no database touched, no readiness uplift. DB-001 remains OPEN.
+
+
+## Backup publication integrity hardening — 2026-11-17
+
+- Closed a source-level safety gap found while reviewing the backup-first Windows startup path: the launcher previously accepted a non-empty ZIP based on process exit code and file size, while full manifest/checksum validation happened only during restore.
+- `ZazuBackupCommand` now reopens the completed temporary ZIP with consistency checking, validates the Zazu format/driver/manifest, checks exact payload membership and verifies every payload SHA-256 before publishing the archive. Failed verification prevents publication.
+- Added a focused regression proving the verifier accepts a valid archive and rejects a tampered private-storage payload.
+- Changes are on `main`; exact-head Laravel/Windows CI has not yet been observed. This is a source correction, not proof of the owner's installed backup or migration. DB-001 remains OPEN; no readiness uplift.
