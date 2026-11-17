@@ -4,7 +4,7 @@ As of: 2026-11-17
 Repository: Leano-Jordan/ZazuEMP
 Canonical branch: main only; never create branches
 Last fully verified HEAD: 807db36e6eb9aaded81e6bb45e1e2f0c9c18c5de
-Current follow-up: symmetric open-ended allocation-overlap protection; tests refactored after PHPMD flagged excessive method length; exact-head CI pending.
+Current follow-up: open-ended allocation-overlap protection; controller audit/persistence handling corrected in this update; exact-head CI pending.
 
 ## Verified correction
 Rental asset date-allocation was reproduced at c7be735: a second non-overlapping booking returned HTTP 422 before date-overlap evaluation.
@@ -16,8 +16,8 @@ The bounded online/offline correction passed at 807db36:
 - Populated upgrade/rollback, Zazu quality, Psalm, PHPMD, Director Health, Director Contract Lint and Push-on-main/CodeQL passed.
 - SonarCloud skipped.
 
-## Follow-up edge case
-An allocation without an end date is open-ended. A new open-ended booking starting before an existing future booking must be rejected. Online and offline regression coverage now tests this. The first follow-up test implementation exceeded PHPMD's 100-line method limit; it has been split into focused tests without weakening the rule. Exact-head CI pending.
+## Open-ended follow-up evidence
+The optional end date is open-ended when omitted. The new tests cover future bounded bookings followed by an earlier open-ended booking. At 885d1fb the offline handler regression passed, but the online route returned HTTP 500 because the audit record read allocated_until directly from the validated input when the optional field was absent. The controller now uses the normalized nullable value for persistence and audit. The failed test remains unchanged; no weakening.
 
 ## Commercial numbering
 Online invoice-number format assertion passed: month-prefixed random suffix. Offline source uses an entity-UUID suffix. Numbering remains unchanged pending South African tax-adviser guidance.

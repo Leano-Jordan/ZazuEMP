@@ -1,5 +1,9 @@
 # Changelog
 
+## Unreleased — 2026-11-17 (Nullable open-ended allocation handling)
+- Persisted and audited the normalized nullable allocation end date when the optional field is omitted, preventing an HTTP 500 on open-ended bookings.
+- The failed online regression remains intact; exact-head CI pending.
+
 ## Unreleased — 2026-11-17 (Regression test maintainability)
 - Split online and offline open-ended allocation regression coverage into focused methods after PHPMD flagged the previous test methods over the 100-line limit; no threshold or test was weakened.
 - Exact-head CI pending.

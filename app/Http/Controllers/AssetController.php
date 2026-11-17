@@ -146,14 +146,14 @@ class AssetController extends Controller
 
             abort_if($overlap, 422, 'This asset is already allocated for the selected period.');
 
-            $lockedAsset->allocations()->create([...$data,'business_id'=>$businessId,'status'=>'allocated']);
+            $lockedAsset->allocations()->create([...$data, 'allocated_until' => $until, 'business_id' => $businessId, 'status' => 'allocated']);
             $lockedAsset->update(['status'=>'allocated']);
 
             Audit::record('assets.allocated', $lockedAsset, [
                 'event_id' => $event->id,
                 'allocation_id' => $lockedAsset->allocations()->latest('id')->value('id'),
                 'allocated_from' => $data['allocated_from'],
-                'allocated_until' => $data['allocated_until'],
+                'allocated_until' => $until,
             ], $businessId);
 
             return back()->with('success',$lockedAsset->name.' allocated to '.$event->name.'.');
