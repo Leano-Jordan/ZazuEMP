@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Invoice;
+use Illuminate\Http\Response;
 use Illuminate\View\View;
 
 class PublicInvoiceController extends Controller
@@ -12,12 +13,16 @@ class PublicInvoiceController extends Controller
      * Only the invoice snapshot and line items are exposed; payment records,
      * internal notes and business workspace data remain private.
      */
-    public function show(Invoice $invoice): View
+    public function show(Invoice $invoice): Response
     {
         abort_unless(in_array($invoice->status, ['issued', 'paid'], true), 404);
 
         $invoice->load('items');
 
-        return view('finance.invoice-public', compact('invoice'));
+        return response()
+            ->view('finance.invoice-public', compact('invoice'))
+            ->header('Cache-Control', 'private, no-store, no-cache, must-revalidate')
+            ->header('Pragma', 'no-cache')
+            ->header('Referrer-Policy', 'no-referrer');
     }
 }
