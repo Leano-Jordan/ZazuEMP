@@ -6,8 +6,8 @@ Last verified source baseline: e5dc263aaa1fd509061c12abdb158c5b5765dfee
 Canonical branch: main only; never create branches. Engineering changes are active on main; no branches created.
 Owner mandate: ship a dependable first-business V1; preserve scope; no Render or AMPPS workflow.
 
-## Current unverified delta — 5598800
-The current source head extends server-side validation for queued financial mutations: offline payment type/method and expense status now match the online allowed values; payment/expense/invoice dates reject malformed or impossible calendar dates; offline quote currency must be supported by the configured currency list. Regression coverage includes invalid enums, malformed/impossible expense dates, unsupported quote currency, and float-decoded purchase-order quantity/unit-price precision. Exact-head Laravel, quality and security workflows are queued; no pass is claimed for this delta yet.
+## Current unverified delta — fc83edf
+The current source head extends server-side validation for queued financial mutations: offline payment type/method and expense status now match the online allowed values; payment/expense/invoice dates reject malformed or impossible calendar dates; offline quote currency must be supported by the configured currency list. Focused regression coverage checks invalid enums, malformed/impossible dates, unsupported quote currency, and float-decoded purchase-order quantity/unit-price precision. Exact-head Laravel, quality and security workflows are queued; no pass is claimed for this delta yet.
 
 ## Verified work
 Rental asset date allocation was reproduced at c7be735: a second non-overlapping booking returned HTTP 422 before date-overlap evaluation. The online/offline correction now permits non-overlapping reservations, rejects overlapping and open-ended conflicts, supports per-allocation returns, and keeps asset status allocated until all active bookings are returned. Manual physical return remains operator-confirmed.
