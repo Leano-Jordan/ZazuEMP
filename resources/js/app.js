@@ -1986,6 +1986,7 @@ function setupZazuOfflineDirectoryViews() {
                 (job?.customer_local_id && item.local_id === job.customer_local_id)
                 || (job?.customer_id && Number(item.id ?? item.server_id) === Number(job.customer_id))
             );
+            const currentQuoteServerId = Number(currentQuote.server_id ?? currentQuote.id ?? serverId ?? 0);
             const version = currentQuote.latest_version || currentQuote.latestVersion || {};
             const fields = [
                 ['Status', String(currentQuote.status || version.status || 'draft').replace(/_/g, ' ')],
@@ -2056,7 +2057,7 @@ function setupZazuOfflineDirectoryViews() {
             panel.append(itemSection);
 
             const invoice = (currentState.invoices || []).find(item =>
-                (item.quote_id && serverId > 0 && Number(item.quote_id) === serverId)
+                (item.quote_id && currentQuoteServerId > 0 && Number(item.quote_id) === currentQuoteServerId)
                 || (item.quote_local_id && item.quote_local_id === currentQuote.local_id)
             );
             const invoices = invoice ? [invoice] : [];
