@@ -1658,6 +1658,124 @@ test.describe('Zazu installed PWA offline shell', () => {
         await expect(page.getByRole('heading', { name: 'Dashboard' })).toBeVisible();
         await expect(page.locator('.zazu-error-shell')).toHaveCount(0);
     });
+    test('inspects a device-local quote version, invoice and payments while disconnected', async ({ page, context }, testInfo) => {
+        test.setTimeout(30_000);
+        test.skip(testInfo.project.name !== 'chromium', 'Local quote inspection contract runs once on desktop Chromium.');
+
+        const jobLocalId = 'dddddddd-dddd-4ddd-8ddd-dddddddddddd';
+        const customerLocalId = 'eeeeeeee-eeee-4eee-8eee-eeeeeeeeeeee';
+        const quoteLocalId = 'ffffffff-ffff-4fff-8fff-ffffffffffff';
+        const jobServerId = 88101;
+        const quoteServerId = 88201;
+
+        await page.addInitScript(() => {
+            window.__ZAZU_OFFLINE_DEFER_INITIAL_SYNC = true;
+        });
+        await login(page);
+        await page.goto('/quotes', { waitUntil: 'domcontentloaded' });
+        await waitForOfflineRuntime(page);
+        await page.evaluate(async ({ jobLocalId, customerLocalId, quoteLocalId, jobServerId, quoteServerId }) => {
+            await window.ZazuOffline.ready;
+            const state = window.ZazuOffline.getState();
+            state.customers = [{
+                local_id: customerLocalId,
+                id: 88301,
+                server_id: 88301,
+                name: 'Offline quote customer',
+                contact_name: 'Accounts contact',
+            }];
+            state.jobs = [{
+                local_id: jobLocalId,
+                id: jobServerId,
+                server_id: jobServerId,
+                customer_local_id: customerLocalId,
+                customer_id: 88301,
+                name: 'Offline reception job',
+                reference: 'OFFLINE-JOB-QUOTE-001',
+                event_type: 'Wedding',
+                status: 'confirmed',
+            }];
+            state.quotes = [{
+                local_id: quoteLocalId,
+                id: quoteServerId,
+                server_id: quoteServerId,
+                event_local_id: jobLocalId,
+                event_id: jobServerId,
+                event_name: 'Offline reception job',
+                reference: 'OFFLINE-QUOTE-001',
+                status: 'sent',
+                currency: 'ZAR',
+                latest_version: {
+                    version: 2,
+                    status: 'sent',
+                    subtotal: '10000.00',
+                    tax_total: '0.00',
+                    total: '10000.00',
+                    deposit_percent: '50.00',
+                    deposit_amount: '5000.00',
+                    notes: 'Menu and service scope',
+                    items: [{
+                        description: 'Buffet package',
+                        quantity: '80.00',
+                        unit: 'guests',
+                        unit_price: '125.00',
+                        line_total: '10000.00',
+                    }],
+                },
+            }];
+            state.invoices = [{
+                local_id: 'abababab-abab-4bab-8bab-abababababab',
+                id: 88401,
+                server_id: 88401,
+                quote_id: quoteServerId,
+                event_id: jobServerId,
+                number: 'INV-OFFLINE-001',
+                status: 'partially_paid',
+                currency: 'ZAR',
+                paid_amount: '5000.00',
+                balance: '5000.00',
+                payments: [{
+                    local_id: 'acacacac-acac-4cac-8cac-acacacacacac',
+                    id: 88501,
+                    server_id: 88501,
+                    amount: '5000.00',
+                    method: 'EFT',
+                    paid_at: '2026-11-16',
+                    status: 'received',
+                }],
+            }];
+            await window.ZazuOffline.persist();
+            window.dispatchEvent(new CustomEvent('zazu:offline-state-updated'));
+        }, { jobLocalId, customerLocalId, quoteLocalId, jobServerId, quoteServerId });
+
+        await context.setOffline(true);
+        const quoteRow = page.locator('[data-zazu-local-record="quote"]').filter({ hasText: 'OFFLINE-QUOTE-001' });
+        await expect(quoteRow).toBeVisible();
+        await quoteRow.getByRole('button', { name: 'View offline' }).click();
+
+        const detail = page.getByRole('region', { name: 'Offline quote details' });
+        await expect(detail).toBeVisible();
+        for (const value of [
+            'OFFLINE-QUOTE-001',
+            'Offline reception job',
+            'Offline quote customer',
+            'Menu and service scope',
+            'Buffet package',
+            'INV-OFFLINE-001',
+            'EFT',
+        ]) {
+            await expect(detail.getByText(value, { exact: true })).toBeVisible();
+        }
+        await expect(detail.getByText('sent', { exact: true })).toBeVisible();
+        await expect(detail.getByText('50.00%', { exact: true })).toBeVisible();
+        await expect(detail.getByText('80.00 guests', { exact: true })).toBeVisible();
+        await expect(detail.getByText(/Line total 10000\.00/)).toBeVisible();
+        await expect(detail.getByText(/Balance ZAR 5000\.00/)).toBeVisible();
+
+        await detail.getByRole('button', { name: 'Close' }).click();
+        await expect(detail).toBeHidden();
+    });
+
     test('inspects a device-local Work record and its commercial chain while disconnected', async ({ page, context }, testInfo) => {
         test.setTimeout(30_000);
         test.skip(testInfo.project.name !== 'chromium', 'Local Work inspection contract runs once on desktop Chromium.');
