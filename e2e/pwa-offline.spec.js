@@ -30,6 +30,10 @@ async function trustCurrentDevice(page) {
     await trustButton.click();
     await expect(page.getByRole('button', { name: 'This device is trusted' })).toBeVisible();
     await expect.poll(() => page.evaluate(() => window.ZazuOffline.isPaired())).toBe(true);
+    // Leave the shared helper on the dashboard so callers start from a stable
+    // authenticated route rather than inheriting the Settings page.
+    await page.goto('/dashboard', { waitUntil: 'domcontentloaded' });
+    await expect(page.getByRole('heading', { name: 'Dashboard' })).toBeVisible();
 }
 
 test.describe('Zazu installed PWA offline shell', () => {
@@ -2017,7 +2021,6 @@ test.describe('Zazu installed PWA offline shell', () => {
         for (const value of [
             'Offline wedding reception',
             'OFFLINE-WORK-001',
-            'Offline Work customer',
             'Work day contact',
             '2026-12-12',
             'Pretoria, Gauteng',
@@ -2038,6 +2041,9 @@ test.describe('Zazu installed PWA offline shell', () => {
         await detail.getByRole('button', { name: 'Edit offline' }).click();
         const editForm = detail.locator('[data-zazu-job-offline-edit]');
         await expect(editForm).toBeVisible();
+        // The customer is represented by the selected customer control in the
+        // offline editor; its <option> is intentionally not visible page text.
+        await expect(editForm.locator('select[name="customer_local_id"] option:checked')).toHaveText('Offline Work customer');
         await editForm.locator('[name="name"]').fill('Updated offline wedding reception');
         await editForm.locator('[name="status"]').selectOption('in_progress');
         await editForm.locator('[name="event_date"]').fill('2026-12-13');
