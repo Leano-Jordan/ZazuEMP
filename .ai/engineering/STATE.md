@@ -2,7 +2,7 @@
 
 As of: 2026-11-17
 Repository: Leano-Jordan/ZazuEMP
-Last verified repository HEAD: 1bb4936594add3368dd3f39d9ec969ef5b7b5ca1 (17 Nov 2026)
+Last verified repository HEAD: 8bf76fe034f888138c0542dc308e3d4d752bd304 (17 Nov 2026)
 Last application-code test baseline: 71c8fc5c7aeba392b95e26aee694945b286f2c8e
 Canonical branch: main only; never create branches. Engineering changes are active on main; no branches created.
 Owner mandate: ship a dependable first-business V1; preserve scope; no Render or AMPPS workflow.
@@ -84,5 +84,5 @@ V1: NOT READY. Historical state/register/memory, checklist and changelog are pre
 - Offline-browser job `134284080089`: PASS; browser suite, mobile-viewport Work/customer acceptance and phone-local attachment journey all passed.
 - PostgreSQL job `134284080622`: PASS; full migration set, account/workspace registration and backup/restore/private-file recovery passed.
 - Laravel job `134284080768`: PASS; service-worker/session contracts, LAN asset-origin checks, Blade/manifest/config checks and PHPUnit/Pest passed.
-- Documentation-only follow-up on `main` is `1bb4936594add3368dd3f39d9ec969ef5b7b5ca1`; no application code changed after the tested source baseline.
+- Documentation-only follow-up on `main` is `8bf76fe034f888138c0542dc308e3d4d752bd304`; no application code changed after the tested source baseline.
 - Scheduling engineering/CI subgate is CLOSED. Physical Android and other operator gates remain OPEN. Release remains NOT READY.
