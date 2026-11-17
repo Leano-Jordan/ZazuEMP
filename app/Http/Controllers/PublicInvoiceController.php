@@ -1,9 +1,9 @@
 <?php
 
-namespace App\\Http\\Controllers;
+namespace App\Http\Controllers;
 
-use App\\Models\\Invoice;
-use Illuminate\\View\\View;
+use App\Models\Invoice;
+use Illuminate\View\View;
 
 class PublicInvoiceController extends Controller
 {
