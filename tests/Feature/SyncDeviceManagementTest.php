@@ -81,6 +81,87 @@ class SyncDeviceManagementTest extends TestCase
             ->assertUnauthorized();
     }
 
+    public function test_owner_can_retry_logout_revocation_by_installation_identity(): void
+    {
+        $business = Business::create([
+            'name' => 'Logout Retry Revocation Business',
+            'slug' => 'logout-retry-revocation-'.Str::lower(Str::random(8)),
+            'status' => 'active',
+            'currency' => 'ZAR',
+        ]);
+        $owner = User::factory()->create();
+        $business->users()->attach($owner->id, ['role' => 'owner']);
+        $installationId = (string) Str::uuid();
+        $device = SyncDevice::create([
+            'business_id' => $business->id,
+            'installation_id' => $installationId,
+            'device_name' => 'Offline logout browser',
+            'device_type' => 'desktop',
+            'status' => 'active',
+            'token_expires_at' => now()->addDays(SyncDevice::SYNC_TOKEN_IDLE_EXPIRY_DAYS),
+            'metadata' => ['sync_token_hash' => hash('sha256', 'offline-logout-secret')],
+        ]);
+
+        $route = route('settings.sync.devices.revoke-installation');
+        $this->actingAs($owner)
+            ->postJson($route, ['installation_id' => $installationId])
+            ->assertOk()
+            ->assertJsonPath('revoked', true)
+            ->assertJsonPath('device_id', $device->id);
+
+        $device->refresh();
+        $this->assertSame('revoked', $device->status);
+        $this->assertNotNull($device->revoked_at);
+        $this->assertNull($device->token_expires_at);
+        $this->assertArrayNotHasKey('sync_token_hash', $device->metadata ?? []);
+        $this->assertDatabaseHas('audit_logs', [
+            'business_id' => $business->id,
+            'action' => 'sync.device.revoked',
+        ]);
+
+        $this->actingAs($owner)
+            ->postJson($route, ['installation_id' => $installationId])
+            ->assertOk()
+            ->assertJsonPath('revoked', true)
+            ->assertJsonPath('already_revoked', true);
+
+        $this->assertSame(1, AuditLog::query()
+            ->where('business_id', $business->id)
+            ->where('action', 'sync.device.revoked')
+            ->where('metadata->device_id', $device->id)
+            ->count());
+    }
+
+    public function test_staff_cannot_retry_logout_revocation_for_a_business_device(): void
+    {
+        $business = Business::create([
+            'name' => 'Logout Retry Staff Boundary',
+            'slug' => 'logout-retry-staff-'.Str::lower(Str::random(8)),
+            'status' => 'active',
+            'currency' => 'ZAR',
+        ]);
+        $staff = User::factory()->create();
+        $business->users()->attach($staff->id, ['role' => 'staff']);
+        $installationId = (string) Str::uuid();
+        $device = SyncDevice::create([
+            'business_id' => $business->id,
+            'installation_id' => $installationId,
+            'status' => 'active',
+            'token_expires_at' => now()->addDays(30),
+            'metadata' => ['sync_token_hash' => hash('sha256', 'staff-must-not-revoke')],
+        ]);
+
+        $this->actingAs($staff)
+            ->postJson(route('settings.sync.devices.revoke-installation'), [
+                'installation_id' => $installationId,
+            ])
+            ->assertForbidden();
+
+        $device->refresh();
+        $this->assertSame('active', $device->status);
+        $this->assertArrayHasKey('sync_token_hash', $device->metadata ?? []);
+    }
+
     public function test_expired_sync_device_token_is_rejected_without_extending_its_lifetime(): void
     {
         $business = Business::create([
