@@ -11,7 +11,20 @@ Owner mandate: ship a dependable first-business V1; preserve scope; no Render or
 
 Owner authorised the focused V1 addition: multi-day event dates, start/end times, setup/collection dates, schedule clash warnings and connected rental allocation dates. Staff scheduling, quantity-based rental stock and workforce management remain deferred.
 
-Implementation candidate is on `main` at source HEAD `d4a3293c067972646f47c6eb74f43a62ba504a27` (17 Nov 2026). Added an additive events migration; online Work create/edit persistence and validation; offline mutation payload/server application and workspace bootstrap; calendar multi-day expansion; schedule clash detection; and rental allocation date defaults. Added focused online/offline feature tests, including preservation of new schedule fields when older queued offline mutations arrive. Exact-head Laravel, PHPMD, security and offline-browser CI are pending; rendered/physical acceptance is pending; no pass or readiness uplift is claimed.
+Implementation candidate is on `main` at source HEAD `71c8fc5c7aeba392b95e26aee694945b286f2c8e` (17 Nov 2026). Added an additive events migration; online Work create/edit persistence and validation; offline mutation payload/server application and workspace bootstrap; calendar multi-day expansion; schedule clash detection; and rental allocation date defaults. Added focused online/offline feature tests, including preservation of new schedule fields when older queued offline mutations arrive. At the current baseline, Laravel passes 532 tests / 1 skipped / 3,714 assertions; PHPMD passes; the Windows package and PowerShell first-install + private-media recovery pass on the immediately preceding code baseline 2ef2a0b. PostgreSQL and desktop/mobile offline-browser acceptance are still running for 71c8fc5. Zazu Quality remains red on the unpatched picomatch advisory. Rendered/physical acceptance is pending; no readiness uplift is claimed.
+
+## Event scheduling implementation verification — 71c8fc5 (17 Nov 2026)
+
+- Online event creation/editing persists event date range, start/end times, setup and collection dates; invalid date/time ranges are rejected.
+- Active schedule overlaps produce a warning while preserving operator save; setup and collection logistics are included in the conflict window.
+- Calendar now spans event and logistics dates and labels setup/collection days.
+- Offline job mutations carry the schedule fields; server-side validation protects the fields and older queued mutations cannot erase schedule values they do not know about.
+- Asset allocation defaults follow the event setup/collection window; existing serialized-asset overlap/return protections remain in force.
+- Laravel: PASS — 532 passed / 1 skipped / 3,714 assertions. PHPMD: PASS.
+- Windows V1 package, fresh PowerShell install and Windows SQLite/private-media recovery: PASS at 2ef2a0b (same scheduling implementation; latest commit after that is regression-test-only).
+- PostgreSQL and desktop/mobile offline-browser acceptance are pending at 71c8fc5.
+- Zazu Quality remains RED on the unpatched high-severity picomatch build-tool advisory; no breaking downgrade or suppression applied.
+- No readiness uplift. Physical Android, intended-installation recovery, populated-business financial reconciliation and POPIA remain operator gates.
 
 ## Current repository verification — fd82f6a (17 Nov 2026)
 
