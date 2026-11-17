@@ -1465,6 +1465,10 @@ function setupZazuOfflineDirectoryViews() {
                 (job.local_id && item.local_id === job.local_id)
                 || (serverId > 0 && Number(item.server_id ?? item.id ?? 0) === serverId)
             ) || job;
+            const customer = (currentState.customers || []).find(item =>
+                (currentJob.customer_local_id && item.local_id === currentJob.customer_local_id)
+                || (currentJob.customer_id && Number(item.id ?? item.server_id) === Number(currentJob.customer_id))
+            );
             let panel = row.nextElementSibling;
             if (!panel?.matches('[data-zazu-job-offline-detail]')) {
                 panel = document.createElement('section');
@@ -1667,10 +1671,6 @@ function setupZazuOfflineDirectoryViews() {
                 }
             });
 
-            const customer = (currentState.customers || []).find(item =>
-                (currentJob.customer_local_id && item.local_id === currentJob.customer_local_id)
-                || (currentJob.customer_id && Number(item.id ?? item.server_id) === Number(currentJob.customer_id))
-            );
             const fields = [
                 ['Reference', currentJob.reference || (serverId > 0 ? '#' + serverId : 'Local job')],
                 ['Customer', customer?.name || currentJob.customer_name],
