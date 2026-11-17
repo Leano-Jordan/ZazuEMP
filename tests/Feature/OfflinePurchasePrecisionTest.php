@@ -84,13 +84,13 @@ class OfflinePurchasePrecisionTest extends TestCase
             'business_id' => $business->id,
             'installation_id' => (string) Str::uuid(),
         ]);
-        $event = \\App\\Models\\Event::create([
+        $event = \App\Models\Event::create([
             'business_id' => $business->id,
             'reference' => 'OFF-COST-PRECISION',
             'name' => 'Precision Cost Event',
             'status' => 'draft',
         ]);
-        $eventIdentity = app(\\App\\Support\\Offline\\SyncEntityIdentityRegistry::class)->identify($event, 'job');
+        $eventIdentity = app(\App\Support\Offline\SyncEntityIdentityRegistry::class)->identify($event, 'job');
 
         $invalidRecords = [
             ['status' => 'planned', 'projected_amount' => '1.005', 'actual_amount' => null],
@@ -118,11 +118,11 @@ class OfflinePurchasePrecisionTest extends TestCase
 
             try {
                 app(SyncMutationApplier::class)->apply($mutation, [
-                    'event_cost' => app(\\App\\Support\\Offline\\OfflineDomainMutationHandler::class),
+                    'event_cost' => app(\App\Support\Offline\OfflineDomainMutationHandler::class),
                 ]);
                 $this->fail('Offline event costs must reject values with more than two decimal places.');
-            } catch (\\Illuminate\\Validation\\ValidationException) {
-                $this->assertSame(0, \\App\\Models\\EventCost::query()
+            } catch (\Illuminate\Validation\ValidationException) {
+                $this->assertSame(0, \App\Models\EventCost::query()
                     ->where('business_id', $business->id)
                     ->count());
             }
@@ -160,11 +160,11 @@ class OfflinePurchasePrecisionTest extends TestCase
 
         try {
             app(SyncMutationApplier::class)->apply($mutation, [
-                'asset' => app(\\App\\Support\\Offline\\OfflineDomainMutationHandler::class),
+                'asset' => app(\App\Support\Offline\OfflineDomainMutationHandler::class),
             ]);
             $this->fail('Offline asset costs must reject values with more than two decimal places.');
-        } catch (\\Illuminate\\Validation\\ValidationException) {
-            $this->assertSame(0, \\App\\Models\\Asset::query()
+        } catch (\Illuminate\Validation\ValidationException) {
+            $this->assertSame(0, \App\Models\Asset::query()
                 ->where('business_id', $business->id)
                 ->count());
         }
@@ -182,13 +182,13 @@ class OfflinePurchasePrecisionTest extends TestCase
             'business_id' => $business->id,
             'installation_id' => (string) Str::uuid(),
         ]);
-        $event = \\App\\Models\\Event::create([
+        $event = \App\Models\Event::create([
             'business_id' => $business->id,
             'reference' => 'OFF-QUOTE-PRECISION',
             'name' => 'Precision Quote Event',
             'status' => 'draft',
         ]);
-        $eventIdentity = app(\\App\\Support\\Offline\\SyncEntityIdentityRegistry::class)->identify($event, 'job');
+        $eventIdentity = app(\App\Support\Offline\SyncEntityIdentityRegistry::class)->identify($event, 'job');
         $localId = (string) Str::uuid();
         $mutation = app(SyncMutationRecorder::class)->record(
             $device,
@@ -211,11 +211,11 @@ class OfflinePurchasePrecisionTest extends TestCase
 
         try {
             app(SyncMutationApplier::class)->apply($mutation, [
-                'quote' => app(\\App\\Support\\Offline\\OfflineDomainMutationHandler::class),
+                'quote' => app(\App\Support\Offline\OfflineDomainMutationHandler::class),
             ]);
             $this->fail('Offline quote quantities must reject values with more than two decimal places.');
-        } catch (\\Illuminate\\Validation\\ValidationException) {
-            $this->assertSame(0, \\App\\Models\\Quote::query()->count());
+        } catch (\Illuminate\Validation\ValidationException) {
+            $this->assertSame(0, \App\Models\Quote::query()->count());
         }
     }
 
