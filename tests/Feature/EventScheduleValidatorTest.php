@@ -59,6 +59,8 @@ class EventScheduleValidatorTest extends TestCase
 
     public function test_multi_day_jobs_can_end_earlier_by_clock_time_on_the_last_day(): void
     {
+        $this->expectNotToPerformAssertions();
+
         app(EventScheduleValidator::class)->validate([
             'event_date' => '2026-12-11',
             'event_end_date' => '2026-12-12',
@@ -67,7 +69,19 @@ class EventScheduleValidatorTest extends TestCase
             'setup_date' => '2026-12-10',
             'collection_date' => '2026-12-13',
         ]);
+    }
 
-        $this->assertTrue(true);
+    public function test_one_day_jobs_can_use_the_same_start_and_end_date(): void
+    {
+        $this->expectNotToPerformAssertions();
+
+        app(EventScheduleValidator::class)->validate([
+            'event_date' => '2026-12-11',
+            'event_end_date' => null,
+            'event_start_time' => '09:00',
+            'event_end_time' => '17:00',
+            'setup_date' => '2026-12-11',
+            'collection_date' => '2026-12-11',
+        ]);
     }
 }
