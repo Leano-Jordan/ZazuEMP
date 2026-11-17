@@ -313,7 +313,7 @@ class ZazuBackupCommand extends Command
 
         try {
             $manifest = json_decode($contents, true, 512, JSON_THROW_ON_ERROR);
-        } catch (\\JsonException) {
+        } catch (\JsonException) {
             return null;
         }
 
@@ -355,7 +355,7 @@ class ZazuBackupCommand extends Command
 
     private function isAllowedArchiveEntry(string $name, string $databaseEntry): bool
     {
-        if ($name === '' || str_contains($name, '\\\\') || str_contains($name, "\\0")
+        if ($name === '' || str_contains($name, '\\') || str_contains($name, "\0")
             || str_starts_with($name, '/') || in_array('..', explode('/', $name), true)) {
             return false;
         }
