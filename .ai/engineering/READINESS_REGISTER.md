@@ -122,3 +122,12 @@ The create screen had omitted the required Work / event name field although `Wor
 **Exact-head evidence:** Laravel run `44184183003` passed all three jobs: Laravel tests, PostgreSQL migration/registration/backup/restore/private-file recovery, and offline-browser acceptance (including the mobile customer-to-Work and phone-local attachment journeys). Zazu Quality `44184183085`, Windows V1 Package `44184182900` (including PowerShell fresh install), Director Health `44184182984` and Push-on-main `44184180721` also passed. SonarCloud was skipped, not passed.
 
 This is a closed form/CI regression, not a readiness uplift. DB-001 and all four operator acceptance gates remain open; release remains NOT READY and evidence maturity remains 73/100.
+
+
+## DB-001 recurrence — OPEN (2026-11-18)
+
+New owner-reported reference: `895e2c23-bc6b-4919-a891-1e8e5c1e27e4`. The user reports another failure while opening/saving account/workspace information. The precise action and matching log record are not yet known, so no root cause is claimed.
+
+A safe Windows capture utility is now on `main`: `ops/windows/Get-ZazuIncident.ps1`. Run it from the Zazu project folder with the reference ID; it returns only the correlated request ID, route/action, exception class, source file/line and bounded database diagnostics. It deliberately excludes SQL, bindings, messages and secrets. See `docs/DB001_INCIDENT_CAPTURE.md`.
+
+**Closure still requires:** matching runtime record, a targeted correction, and successful repeat of the affected workflow on the intended installation. Do not alter the database while the cause is unknown. Release remains NOT READY; no score uplift.

@@ -99,3 +99,11 @@ The owner-installation entry matching `aa9080f4-9580-41c9-a643-439b31928ffa` rem
 - [x] Exact-head Laravel run `44184183003`: Laravel, PostgreSQL migration/recovery and offline-browser jobs all PASS, including mobile customer-to-Work and phone-local attachment acceptance.
 - [x] Zazu Quality `44184183085`, Windows package + PowerShell fresh install `44184182900`, Director Health `44184182984` and Push-on-main `44184180721`: PASS. SonarCloud skipped.
 - DB-001 remains open. No readiness score uplift; V1 remains NOT READY.
+
+
+### DB-001 recurrence — 2026-11-18
+
+- [ ] Resolve owner-reported DB-001 reference `895e2c23-bc6b-4919-a891-1e8e5c1e27e4`; cause remains unconfirmed pending the matching runtime record.
+- [x] Add safe, reference-specific Windows log extraction at `ops/windows/Get-ZazuIncident.ps1`; output is restricted to allowlisted incident metadata and database diagnostics.
+- [ ] Apply the targeted correction after inspecting the matching record and verify the affected workflow on the intended installation.
+- Do not reset, reinstall or alter business data as an investigative step. Release remains NOT READY.

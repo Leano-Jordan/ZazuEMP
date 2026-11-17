@@ -138,3 +138,11 @@ V1: NOT READY. Historical state/register/memory, checklist and changelog are pre
 - Exact-head Laravel run `44184183003`: PASS — Laravel tests, PostgreSQL migration/registration/backup/restore/private-file recovery, and offline-browser acceptance including mobile customer-to-Work and phone-local attachment journeys.
 - Supporting exact-head checks: Zazu Quality `44184183085` PASS; Windows V1 Package `44184182900` PASS including PowerShell fresh-install verification; Director Health `44184182984` PASS; Push-on-main `44184180721` PASS. SonarCloud was skipped and is not counted as a pass.
 - This closes the form regression and associated CI failure only. DB-001 remains OPEN; release remains NOT READY; evidence maturity stays 73/100 with no readiness uplift.
+
+
+## DB-001 recurrence — reference 895e2c23-bc6b-4919-a891-1e8e5c1e27e4 (2026-11-18)
+
+- Owner reports another DB-001 while opening/saving account/workspace information. Reference: `895e2c23-bc6b-4919-a891-1e8e5c1e27e4`. The exact triggering action and matching runtime record are not yet available; do not infer a cause from the reference alone.
+- Existing incident recorder now emits bounded database diagnostics (connection, driver, SQLSTATE, numeric driver code and operation) without SQL, bindings, exception messages or credentials.
+- Added `ops/windows/Get-ZazuIncident.ps1` and `docs/DB001_INCIDENT_CAPTURE.md` on `main`. The script finds the exact request ID in Laravel logs and outputs only an allowlist of diagnostic fields. This is a safe evidence-capture path, not a root-cause fix.
+- DB-001 remains OPEN until the matching record is inspected and the failing workflow is repeated successfully on the intended installation. No database changes, reset or restore performed. V1 remains NOT READY; no evidence-score uplift.
