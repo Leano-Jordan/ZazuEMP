@@ -1,9 +1,10 @@
 ## Director update — 2026-11-17 (offline Work editing and lifecycle)
 
-**Current source head:** `70b201fd60fd0ec947bda6cf27288767f8bb69bd` on canonical `main`.
+**Current source head:** `5f0b5046e5d540eae47f83300871519494c72056` on canonical `main`.
 
 ### Implemented in source
 - Existing Work records can now edit their service/requirement list from the device-local Work inspector. The change updates the local IndexedDB record and queues a `job:update` mutation.
+- Existing Work records can be reassigned to another locally cached customer while disconnected. The selected customer identity and name are saved locally and queued; server sync rejects reassignment once any quote exists for that Work record.
 - Server sync reconciles the requirement list only when the mutation explicitly includes `services`. Matching requirements retain quantity, unit, notes, status and capability metadata; removed descriptions are removed; new descriptions receive the configured service category where available.
 - Offline Work edits now include lifecycle status transitions using the same `EventLifecycleService` transition and completion/cancellation guards as connected workflows.
 - Closed Work records cannot be edited from the offline inspector. The server also rejects closed-record mutations and invalid transitions.
@@ -11,6 +12,7 @@
 
 ### Regression coverage added
 - Laravel feature tests cover requirement reconciliation and preservation of existing requirement metadata, valid confirmed → in-progress transition, blocked completion while preparation remains open, and closed-record edit rejection.
+- Laravel and Playwright coverage also exercise offline customer reassignment on Work records without quotes.
 - Playwright coverage now exercises local service-list editing and a status transition while disconnected, including the queued mutation and updated local Work row.
 
 ### Verification boundary
