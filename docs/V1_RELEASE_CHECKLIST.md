@@ -107,3 +107,12 @@ The owner-installation entry matching `aa9080f4-9580-41c9-a643-439b31928ffa` rem
 - [x] Add safe, reference-specific Windows log extraction at `ops/windows/Get-ZazuIncident.ps1`; output is restricted to allowlisted incident metadata and database diagnostics.
 - [ ] Apply the targeted correction after inspecting the matching record and verify the affected workflow on the intended installation.
 - Do not reset, reinstall or alter business data as an investigative step. Release remains NOT READY.
+
+
+### COM-01 customer document handoff — PARTIAL (2026-11-18)
+
+- [x] Signed customer quote view supports browser Print / Save as PDF.
+- [x] Quote detail provides WhatsApp handoff to the signed customer view.
+- [x] Issued/paid invoice detail provides WhatsApp handoff to a seven-day signed read-only invoice view; the view supports browser Print / Save as PDF.
+- [ ] Direct generated PDF-file attachment, receipts, and desktop/Android practical acceptance remain open.
+- DB-001 remains OPEN; this commercial increment does not change the V1 release disposition.
