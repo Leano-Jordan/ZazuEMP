@@ -232,13 +232,13 @@ class OfflinePurchasePrecisionTest extends TestCase
             'business_id' => $business->id,
             'installation_id' => (string) Str::uuid(),
         ]);
-        $event = \\App\\Models\\Event::create([
+        $event = \App\Models\Event::create([
             'business_id' => $business->id,
             'reference' => 'OFF-QUOTE-PRICE-PRECISION',
             'name' => 'Precision Quote Price Event',
             'status' => 'draft',
         ]);
-        $eventIdentity = app(\\App\\Support\\Offline\\SyncEntityIdentityRegistry::class)->identify($event, 'job');
+        $eventIdentity = app(\App\Support\Offline\SyncEntityIdentityRegistry::class)->identify($event, 'job');
         $localId = (string) Str::uuid();
         $mutation = app(SyncMutationRecorder::class)->record(
             $device,
@@ -261,11 +261,11 @@ class OfflinePurchasePrecisionTest extends TestCase
 
         try {
             app(SyncMutationApplier::class)->apply($mutation, [
-                'quote' => app(\\App\\Support\\Offline\\OfflineDomainMutationHandler::class),
+                'quote' => app(\App\Support\Offline\OfflineDomainMutationHandler::class),
             ]);
             $this->fail('Offline quote prices must reject values with more than two decimal places.');
-        } catch (\\Illuminate\\Validation\\ValidationException) {
-            $this->assertSame(0, \\App\\Models\\Quote::query()
+        } catch (\Illuminate\Validation\ValidationException) {
+            $this->assertSame(0, \App\Models\Quote::query()
                 ->whereHas('event', fn ($query) => $query->where('business_id', $business->id))
                 ->count());
         }
@@ -283,13 +283,13 @@ class OfflinePurchasePrecisionTest extends TestCase
             'business_id' => $business->id,
             'installation_id' => (string) Str::uuid(),
         ]);
-        $item = \\App\\Models\\InventoryItem::create([
+        $item = \App\Models\InventoryItem::create([
             'business_id' => $business->id,
             'name' => 'Precision stock item',
             'unit' => 'unit',
             'reorder_level' => '0.00',
         ]);
-        $itemIdentity = app(\\App\\Support\\Offline\\SyncEntityIdentityRegistry::class)->identify($item, 'inventory_item');
+        $itemIdentity = app(\App\Support\Offline\SyncEntityIdentityRegistry::class)->identify($item, 'inventory_item');
         $localId = (string) Str::uuid();
         $mutation = app(SyncMutationRecorder::class)->record(
             $device,
@@ -310,11 +310,11 @@ class OfflinePurchasePrecisionTest extends TestCase
 
         try {
             app(SyncMutationApplier::class)->apply($mutation, [
-                'inventory_movement' => app(\\App\\Support\\Offline\\OfflineDomainMutationHandler::class),
+                'inventory_movement' => app(\App\Support\Offline\OfflineDomainMutationHandler::class),
             ]);
             $this->fail('Offline inventory movement costs must reject values with more than two decimal places.');
-        } catch (\\Illuminate\\Validation\\ValidationException) {
-            $this->assertSame(0, \\App\\Models\\InventoryMovement::query()
+        } catch (\Illuminate\Validation\ValidationException) {
+            $this->assertSame(0, \App\Models\InventoryMovement::query()
                 ->where('business_id', $business->id)
                 ->count());
         }
@@ -351,11 +351,11 @@ class OfflinePurchasePrecisionTest extends TestCase
 
         try {
             app(SyncMutationApplier::class)->apply($mutation, [
-                'expense' => app(\\App\\Support\\Offline\\OfflineDomainMutationHandler::class),
+                'expense' => app(\App\Support\Offline\OfflineDomainMutationHandler::class),
             ]);
             $this->fail('Offline expenses must reject values with more than two decimal places.');
-        } catch (\\Illuminate\\Validation\\ValidationException) {
-            $this->assertSame(0, \\App\\Models\\FinanceExpense::query()
+        } catch (\Illuminate\Validation\ValidationException) {
+            $this->assertSame(0, \App\Models\FinanceExpense::query()
                 ->where('business_id', $business->id)
                 ->count());
         }
@@ -373,16 +373,16 @@ class OfflinePurchasePrecisionTest extends TestCase
             'business_id' => $business->id,
             'installation_id' => (string) Str::uuid(),
         ]);
-        $supplier = \\App\\Models\\Supplier::create([
+        $supplier = \App\Models\Supplier::create([
             'business_id' => $business->id,
             'name' => 'Receipt Precision Supplier',
         ]);
-        $supplierIdentity = app(\\App\\Support\\Offline\\SyncEntityIdentityRegistry::class)->identify($supplier, 'supplier');
+        $supplierIdentity = app(\App\Support\Offline\SyncEntityIdentityRegistry::class)->identify($supplier, 'supplier');
         $orderLocalId = (string) Str::uuid();
         $lineLocalId = (string) Str::uuid();
         $recorder = app(SyncMutationRecorder::class);
         $applier = app(SyncMutationApplier::class);
-        $handler = app(\\App\\Support\\Offline\\OfflineDomainMutationHandler::class);
+        $handler = app(\App\Support\Offline\OfflineDomainMutationHandler::class);
 
         $orderMutation = $recorder->record(
             $device,
@@ -424,11 +424,11 @@ class OfflinePurchasePrecisionTest extends TestCase
         try {
             $applier->apply($receiptMutation, ['purchase_receipt' => $handler]);
             $this->fail('Offline receipt quantities must reject values with more than two decimal places.');
-        } catch (\\Illuminate\\Validation\\ValidationException) {
-            $this->assertSame(0, \\App\\Models\\PurchaseOrderReceipt::query()
+        } catch (\Illuminate\Validation\ValidationException) {
+            $this->assertSame(0, \App\Models\PurchaseOrderReceipt::query()
                 ->where('business_id', $business->id)
                 ->count());
-            $this->assertSame('0.00', \\App\\Models\\PurchaseOrderItem::query()
+            $this->assertSame('0.00', \App\Models\PurchaseOrderItem::query()
                 ->where('business_id', $business->id)
                 ->value('received_quantity'));
         }
