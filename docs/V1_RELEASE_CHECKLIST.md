@@ -9,6 +9,9 @@ Disposition: NOT READY · Evidence maturity: 73/100 unchanged.
 - [ ] Live commercial reconciliation: populated quote → invoice → deposit/final payment → purchasing/costs → completion → profit/margin.
 - [ ] POPIA operational sign-off: privacy notice, retention/deletion, access controls and incident procedure.
 
+## Engineering verification in progress — ff7f0bb
+- [ ] Offline financial push contract: payment/expense enums, configured quote currency, calendar-date validation, all-zero receipt rejection and float-decoded purchase-order precision. Close only on exact-head Laravel and quality/security evidence.
+
 ## Closed acceptance
 - [x] Windows fresh-install candidate package and PowerShell first-install smoke — built and verified at 00af9adda; not an updater or hosted deployment.
 - [x] Seeded commercial workflow automation — verified; reopen only on reproducible defect.
