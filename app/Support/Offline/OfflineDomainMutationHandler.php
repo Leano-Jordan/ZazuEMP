@@ -847,7 +847,7 @@ class OfflineDomainMutationHandler implements SyncMutationHandler
             'sku' => $sku,
             'name' => $this->requiredString($payload['name'] ?? null, 'name', 255),
             'unit' => $this->requiredString($payload['unit'] ?? 'unit', 'unit', 50),
-            'reorder_level' => number_format((float) ($payload['reorder_level'] ?? '0'), 2, '.', ''),
+            'reorder_level' => $this->nullableQuantity($payload['reorder_level'] ?? '0.00'),
         ];
 
         if ($item instanceof InventoryItem) {
