@@ -373,6 +373,15 @@
         </div>
     </section>
 
+    <section class="zazu-context-card mt-4" data-zazu-current-device-trust>
+        <div class="zazu-context-title">Trust this device</div>
+        <p class="zazu-context-copy mt-1">Approving this browser or installed app grants it a long-lived business sync credential and allows saved offline changes to be applied to this business. Only approve a device controlled by the business. Use the phone pairing code for a separate phone.</p>
+        <div class="flex flex-wrap gap-3 mt-4">
+            <button type="button" class="zazu-btn zazu-btn-secondary" data-zazu-trust-current-device>Trust this device for offline sync</button>
+            <span class="zazu-field-help" data-zazu-current-device-trust-result role="status" aria-live="polite"></span>
+        </div>
+    </section>
+
     <section class="zazu-context-card mt-4" aria-labelledby="zazu-trusted-devices-title">
         <div class="zazu-context-title" id="zazu-trusted-devices-title">Trusted phone access</div>
         <p class="zazu-context-copy mt-1">Review phones paired with this business. Revoking a phone blocks its sync token immediately, but does not remotely erase business data already stored on that phone. Changes remaining only on that phone will not upload unless it is paired again.</p>
@@ -424,6 +433,81 @@
     document.addEventListener('DOMContentLoaded', () => {
         const pairingButton = document.querySelector('[data-zazu-generate-pairing]');
         const pairingResult = document.querySelector('[data-zazu-pairing-result]');
+        const trustCurrentDeviceButton = document.querySelector('[data-zazu-trust-current-device]');
+        const trustCurrentDeviceResult = document.querySelector('[data-zazu-current-device-trust-result]');
+
+        const getOfflineClient = async () => {
+            if (window.ZazuOffline) return window.ZazuOffline;
+            return new Promise(resolve => {
+                window.addEventListener('zazu:offline-ready', event => {
+                    resolve(event.detail || window.ZazuOffline || null);
+                }, { once: true });
+            });
+        };
+
+        const renderCurrentDeviceTrust = async () => {
+            if (!trustCurrentDeviceButton || !trustCurrentDeviceResult || !window.ZazuOffline) return;
+            const offline = window.ZazuOffline;
+            await offline.ready;
+            const state = offline.getState() || {};
+
+            if (offline.isPaired() && !state.sync_authorization_required) {
+                trustCurrentDeviceButton.disabled = true;
+                trustCurrentDeviceButton.textContent = 'This device is trusted';
+                trustCurrentDeviceResult.textContent = 'Offline sync is enabled for this device.';
+                return;
+            }
+
+            if (state.sync_registration_blocked) {
+                trustCurrentDeviceButton.disabled = true;
+                trustCurrentDeviceButton.textContent = 'Device registration blocked';
+                trustCurrentDeviceResult.textContent = state.last_sync_error || 'The owner must resolve this device registration before it can sync.';
+                return;
+            }
+
+            trustCurrentDeviceButton.disabled = false;
+            trustCurrentDeviceButton.textContent = state.sync_authorization_required
+                ? 'Re-authorize this device'
+                : state.sync_registration_consent
+                    ? 'Retry device registration'
+                    : 'Trust this device for offline sync';
+            trustCurrentDeviceResult.textContent = state.sync_authorization_required
+                ? 'This device needs fresh owner approval. Its locally saved changes remain in place.'
+                : state.sync_registration_consent
+                    ? (state.last_sync_error || 'Owner approval is saved. Registration will retry when the host is available.')
+                    : 'This browser is not trusted yet. Its local changes will not be sent to the business until you approve it.';
+        };
+
+        trustCurrentDeviceButton?.addEventListener('click', async () => {
+            trustCurrentDeviceButton.disabled = true;
+            trustCurrentDeviceResult.textContent = 'Applying owner approval…';
+            try {
+                const offline = await getOfflineClient();
+                if (!offline) throw new Error('The offline workspace is not available yet.');
+                await offline.ready;
+                const registered = await offline.registerPrimaryDevice({ explicitConsent: true });
+                const state = offline.getState() || {};
+                if (registered || offline.isPaired()) {
+                    trustCurrentDeviceResult.textContent = 'This device is trusted. Its saved offline changes will sync when connected.';
+                } else if (!navigator.onLine) {
+                    trustCurrentDeviceResult.textContent = 'Approval is saved. Connect to Zazu to finish registering this device.';
+                } else {
+                    trustCurrentDeviceResult.textContent = state.last_sync_error || 'Zazu could not register this device. Your local work remains saved.';
+                }
+            } catch (error) {
+                trustCurrentDeviceResult.textContent = error.message || 'Could not approve this device.';
+            } finally {
+                await renderCurrentDeviceTrust();
+            }
+        });
+
+        window.addEventListener('zazu:offline-ready', () => {
+            renderCurrentDeviceTrust().catch(() => {});
+        });
+        window.addEventListener('zazu:offline-state-updated', () => {
+            renderCurrentDeviceTrust().catch(() => {});
+        });
+        renderCurrentDeviceTrust().catch(() => {});
 
         const recoverySection = document.querySelector('[data-zazu-sync-recovery]');
         const recoveryMessage = document.querySelector('[data-zazu-sync-recovery-message]');
