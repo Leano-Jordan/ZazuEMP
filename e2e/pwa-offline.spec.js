@@ -1672,7 +1672,7 @@ test.describe('Zazu installed PWA offline shell', () => {
             window.__ZAZU_OFFLINE_DEFER_INITIAL_SYNC = true;
         });
         await login(page);
-        await page.goto('/quotes', { waitUntil: 'domcontentloaded' });
+        await page.goto('/dashboard', { waitUntil: 'domcontentloaded' });
         await waitForOfflineRuntime(page);
         await page.evaluate(async ({ jobLocalId, customerLocalId, quoteLocalId, jobServerId, quoteServerId }) => {
             await window.ZazuOffline.ready;
