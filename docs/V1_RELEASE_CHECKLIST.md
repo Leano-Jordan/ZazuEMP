@@ -3,6 +3,20 @@
 Last verified application-code baseline: 71c8fc5c7aeba392b95e26aee694945b286f2c8e
 Disposition: NOT READY · Evidence maturity: 73/100 unchanged.
 
+## Open database incident — owner installation
+
+- [ ] Resolve the repeated owner-reported DB-001 errors. References: `2bc77a48-5c6c-4095-afe2-fa079f60e4ba` and `aa9080f4-9580-41c9-a643-439b31928ffa`.
+- [ ] Confirm the cause using the installed application's diagnostic record; local SQLite migration drift is currently only a hypothesis.
+- [ ] Verify backup-first migration on the intended Windows installation, then repeat the affected job workflow successfully.
+- Windows startup source now checks migration status, creates and verifies a full database/private-files backup before pending migrations, and checks the final migration state. Exact-head CI and owner-installation execution remain pending.
+
+## Current code follow-up — 2026-11-17
+
+- Job date/time relationships now use one validator for online creation/editing and offline sync.
+- The job form uses shared labels, plain-English guidance and browser date/time limits.
+- DB-001 and account error copy is simpler; the product-wide language rule is in `docs/ZAZU_PLAIN_LANGUAGE_STANDARD.md`.
+- Source and regression tests are committed on `main`; exact-head CI is pending. No readiness uplift is claimed.
+
 ## Event scheduling and rental logistics — owner-authorised V1 addition (2026-11-17)
 Implementation baseline: `71c8fc5c7aeba392b95e26aee694945b286f2c8e` on `main`.
 - [x] Multi-day event date range, start/end time, setup and collection dates persist and validate online.
