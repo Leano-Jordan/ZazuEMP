@@ -27,3 +27,8 @@ Destructive or irreversible actions require explicit owner authority unless alre
 
 For repeated failures, load the persistent failure case before another correction.
 
+## Current owner handover — 2026-11-17
+
+Before auditing or advising on V1, read `docs/CLAUDE_HANDOVER_2026-11-17.md`. It records the current baseline, recent correction evidence, exact CI runs, audit targets, owner/operator release gates and the required Claude output.
+
+Claude's initial engagement is read-only audit and advice. Do not write code, commit, push, create branches or alter data unless the owner explicitly assigns that work. `main` is the only engineering write target; existing non-main refs are read-only legacy state.
