@@ -1,5 +1,14 @@
 # Changelog
 
+## 2026-11-17 — Job date rules, safer Windows startup and plain English
+
+- Centralised job date/time relationship checks for online saves and offline sync. Invalid date order is rejected; multi-day jobs may end at an earlier clock time on their final day.
+- Reused the same date/time fields on job creation and editing, with clearer labels, short explanations and changing date/time limits in the form.
+- Added regression coverage for online/offline date conflicts and the form's labels and date limits. Exact-head CI is pending.
+- Added a product-wide plain-English writing standard and simplified the DB-001 and account-error screens.
+- Windows startup now checks for pending database migrations. It creates and verifies a full database/private-files backup before applying updates, then verifies the migration status. Startup stops if any safety step fails.
+- Owner-reported DB-001 remains open. Local schema drift is the leading hypothesis; the actual database error has not yet been confirmed from the installed application.
+
 ## 2026-11-17 — Dashboard monthly payments KPI
 
 - Added a live “Payments received (this month)” dashboard KPI for users with finance access. It sums recorded payment rows for the active business, the current calendar month and that business's configured currency; it does not mistake quote totals or unpaid invoices for cash received.
