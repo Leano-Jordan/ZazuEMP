@@ -57,6 +57,17 @@
                     <section class="zazu-form-section">
                         <div class="zazu-form-section-head">
                             <div class="zazu-form-section-title">What kind of job is it?</div>
+                            <div class="zazu-form-section-copy">Give this work a clear name so your team can identify it across the schedule, quote and job workspace.</div>
+                        </div>
+                        <div class="zazu-form-grid">
+                            <label class="zazu-field zazu-field-wide">
+                                <span class="zazu-label">Work / event name <span class="zazu-required">*</span></span>
+                                <input name="name" value="{{ old('name') }}" required maxlength="255" class="zazu-input" placeholder="e.g. Mokoena family wedding">
+                                @error('name')<span class="zazu-field-error">{{ $message }}</span>@enderror
+                            </label>
+                        </div>
+                        <div class="zazu-form-section-head">
+                            <div class="zazu-form-section-title">Choose the job type</div>
                             <div class="zazu-form-section-copy">Pick the closest option. You can choose Other if none of these describes the job.</div>
                         </div>
                         <div class="zazu-choice-grid">
