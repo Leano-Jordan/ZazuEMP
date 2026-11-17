@@ -309,6 +309,27 @@ class OfflineDomainMutationHandler implements SyncMutationHandler
             throw ValidationException::withMessages(['event_type' => 'The offline job type is not supported.']);
         }
 
+        $eventDate = $this->nullableDate($payload['event_date'] ?? null);
+        $eventEndDate = $this->nullableDate($payload['event_end_date'] ?? null);
+        $setupDate = $this->nullableDate($payload['setup_date'] ?? null);
+        $collectionDate = $this->nullableDate($payload['collection_date'] ?? null);
+        $startTime = $this->nullableTime($payload['event_start_time'] ?? null);
+        $endTime = $this->nullableTime($payload['event_end_time'] ?? null);
+
+        if ($eventDate !== null && $eventEndDate !== null && $eventEndDate < $eventDate) {
+            throw ValidationException::withMessages(['event_end_date' => 'The event end date cannot precede its start date.']);
+        }
+        if ($setupDate !== null && $eventDate !== null && $setupDate > $eventDate) {
+            throw ValidationException::withMessages(['setup_date' => 'Setup cannot be scheduled after the event begins.']);
+        }
+        $effectiveEndDate = $eventEndDate ?? $eventDate;
+        if ($collectionDate !== null && $effectiveEndDate !== null && $collectionDate < $effectiveEndDate) {
+            throw ValidationException::withMessages(['collection_date' => 'Collection cannot be scheduled before the event ends.']);
+        }
+        if ($eventDate !== null && $effectiveEndDate === $eventDate && $startTime !== null && $endTime !== null && $endTime <= $startTime) {
+            throw ValidationException::withMessages(['event_end_time' => 'The end time must be later than the start time for a same-day event.']);
+        }
+
         return [
             'business_id' => $mutation->business_id,
             'customer_id' => $customer?->id ?? $event?->customer_id,
@@ -320,7 +341,12 @@ class OfflineDomainMutationHandler implements SyncMutationHandler
             'customer_name' => $customer?->name ?? $this->nullableString($payload['customer_name'] ?? null, 255),
             'customer_phone' => $customer?->primaryContact?->phone ?? $event?->customer_phone,
             'customer_email' => $customer?->primaryContact?->email ?? $event?->customer_email,
-            'event_date' => $this->nullableDate($payload['event_date'] ?? null),
+            'event_date' => $eventDate,
+            'event_end_date' => $eventEndDate,
+            'event_start_time' => $startTime,
+            'event_end_time' => $endTime,
+            'setup_date' => $setupDate,
+            'collection_date' => $collectionDate,
             'event_address' => $this->nullableString($payload['event_address'] ?? null, 255),
             'notes' => $this->nullableString($payload['notes'] ?? null, 5000),
             'status' => $event?->status ?: 'draft',
@@ -1736,6 +1762,19 @@ class OfflineDomainMutationHandler implements SyncMutationHandler
         }
 
         return Money::fromCents($cents);
+    }
+
+    private function nullableTime(mixed $value): ?string
+    {
+        if ($value === null || $value === '') {
+            return null;
+        }
+
+        if (! is_string($value) || ! preg_match('/^(?:[01]\\d|2[0-3]):[0-5]\\d$/D', $value)) {
+            throw ValidationException::withMessages(['time' => 'Offline time must use 24-hour HH:MM format.']);
+        }
+
+        return $value;
     }
 
     private function nullableDate(mixed $value): ?string
