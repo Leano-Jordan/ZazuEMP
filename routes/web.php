@@ -85,6 +85,7 @@ Route::get('/', function (\Illuminate\Http\Request $request) {
 })->name('landing');
 
 Route::middleware('signed')->group(function () {
+    Route::get('/invoices/{invoice}/view', [\App\Http\Controllers\PublicInvoiceController::class, 'show'])->middleware('throttle:quote.public')->name('finance.invoices.public');
     Route::get('/quotes/{quote}/view', [QuoteController::class, 'publicShow'])->middleware('throttle:quote.public')->name('quotes.public');
     Route::post('/quotes/{quote}/accept', [QuoteController::class, 'publicAccept'])->middleware('throttle:quote.public')->name('quotes.public.accept');
 });
