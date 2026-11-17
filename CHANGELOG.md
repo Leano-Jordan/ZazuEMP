@@ -9,6 +9,7 @@
 - Reconciled offline V1 scope resumption and current exact-head acceptance evidence.
 - Added a device-local customer relationship view with offline customer/contact/billing edits, linked Work/quote visibility, durable queued updates and acknowledgement-based sync status; covered by Playwright acceptance.
 - Added device-local Work inspection across customer, services, quotes, preparation, costs, purchase orders and invoices, with desktop/mobile offline acceptance.
+- Added queued offline Work edits for job name, date, venue/address and notes, while preserving lifecycle status and customer identity.
 - Removed the unrelated Render-labelled Docker preview workflow; no Render deployment is part of Zazu.
 
 
