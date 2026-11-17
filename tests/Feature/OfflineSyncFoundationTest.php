@@ -1903,6 +1903,72 @@ class OfflineSyncFoundationTest extends TestCase
         ]);
     }
 
+    public function test_offline_financial_mutations_reject_invalid_payment_and_expense_enums(): void
+    {
+        $business = Business::create([
+            'name' => 'Offline Financial Validation Business',
+            'slug' => 'offline-financial-validation-'.Str::lower(Str::random(8)),
+            'status' => 'active',
+            'currency' => 'ZAR',
+        ]);
+        $device = SyncDevice::create([
+            'business_id' => $business->id,
+            'installation_id' => (string) Str::uuid(),
+        ]);
+
+        $cases = [
+            [
+                'entity' => 'payment',
+                'record' => [
+                    'type' => 'refund',
+                    'amount' => '10.00',
+                    'method' => 'cash',
+                ],
+            ],
+            [
+                'entity' => 'payment',
+                'record' => [
+                    'type' => 'payment',
+                    'amount' => '10.00',
+                    'method' => 'crypto',
+                ],
+            ],
+            [
+                'entity' => 'expense',
+                'record' => [
+                    'description' => 'Invalid offline expense',
+                    'amount' => '10.00',
+                    'status' => 'approved',
+                ],
+            ],
+        ];
+
+        $recorder = app(SyncMutationRecorder::class);
+        $applier = app(SyncMutationApplier::class);
+        $handler = app(OfflineDomainMutationHandler::class);
+
+        foreach ($cases as $case) {
+            $localId = (string) Str::uuid();
+            $mutation = $recorder->record(
+                $device,
+                $case['entity'],
+                $localId,
+                'create',
+                ['local_id' => $localId, 'record' => $case['record']],
+            );
+
+            try {
+                $applier->apply($mutation, [$case['entity'] => $handler]);
+                $this->fail('Offline financial mutations must reject values outside the online validation contract.');
+            } catch (\\Illuminate\\Validation\\ValidationException) {
+                $this->assertSame('pending', $mutation->fresh()->status);
+            }
+        }
+
+        $this->assertSame(0, \\App\\Models\\Payment::query()->where('business_id', $business->id)->count());
+        $this->assertSame(0, \\App\\Models\\FinanceExpense::query()->where('business_id', $business->id)->count());
+    }
+
     public function test_sync_push_keeps_unexpected_server_failures_retryable_without_orphaning_the_mutation(): void
     {
         $business = Business::create([
