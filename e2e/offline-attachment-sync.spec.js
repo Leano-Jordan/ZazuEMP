@@ -229,6 +229,56 @@ test('Work attachments persist offline, upload on reconnect and cache remote fil
 });
 
 
+test('existing synced Work records can queue attachments while disconnected', async ({ page }, testInfo) => {
+    test.setTimeout(25_000);
+    test.skip(testInfo.project.name !== 'chromium', 'Existing-job offline attachment control runs once.');
+
+    await login(page);
+    await page.goto('/work', { waitUntil: 'domcontentloaded' });
+    await expect(page.locator('[data-zazu-job-row]').filter({ hasText: 'Mokoena Family Celebration' }).first()).toBeVisible();
+
+    const jobRow = page.locator('[data-zazu-job-row]').filter({ hasText: 'Mokoena Family Celebration' }).first();
+    const eventId = Number(await jobRow.getAttribute('data-zazu-server-job-id'));
+    expect(eventId).toBeGreaterThan(0);
+
+    await page.evaluate(async id => {
+        await window.ZazuOffline.ready;
+        const state = window.ZazuOffline.getState();
+        state.jobs = [
+            ...(state.jobs || []).filter(job => Number(job.server_id ?? job.id) !== id),
+            { local_id: 'existing-job-attachment-' + id, id, server_id: id, name: 'Mokoena Family Celebration' },
+        ];
+        state.local_dirty = false;
+        await window.ZazuOffline.persist({ allowSessionChange: true });
+        window.dispatchEvent(new Event('zazu:offline-state-updated'));
+    }, eventId);
+
+    const attach = jobRow.getByRole('button', { name: 'Attach files' });
+    await expect(attach).toBeVisible();
+    await page.context().setOffline(true);
+    await jobRow.locator('input[data-zazu-server-job-attachments]').setInputFiles({
+        name: 'existing-job-offline-note.txt',
+        mimeType: 'text/plain',
+        buffer: Buffer.from('saved against an existing Work record while disconnected'),
+    });
+    await expect(jobRow.getByRole('status')).toContainText('Saved offline');
+
+    const saved = await page.evaluate(async id => {
+        const records = await window.ZazuOffline.loadAttachments(id);
+        const file = records.find(record => record.original_name === 'existing-job-offline-note.txt');
+        if (!file) return null;
+        const blob = await window.ZazuOffline.getAttachmentFile(file.idempotency_key);
+        return { status: file.status, text: await blob.text(), business_id: file.business_id };
+    }, eventId);
+
+    expect(saved).toMatchObject({
+        status: 'pending',
+        text: 'saved against an existing Work record while disconnected',
+    });
+    expect(saved.business_id).toBeGreaterThan(0);
+    await page.context().setOffline(false);
+});
+
 test('reconciles an offline-created Work attachment after its job receives a server ID', async ({ page }, testInfo) => {
     test.setTimeout(30_000);
     test.skip(testInfo.project.name !== 'chromium', 'Offline Work identity reconciliation runs once.');
