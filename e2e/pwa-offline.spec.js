@@ -83,6 +83,52 @@ test.describe('Zazu installed PWA offline shell', () => {
         expect(state.sync?.token || null).toBeNull();
     });
 
+    test('owner can explicitly trust the current PC browser for offline sync', async ({ page }, testInfo) => {
+        test.setTimeout(25_000);
+        test.skip(testInfo.project.name !== 'chromium', 'Current-device trust contract runs once.');
+
+        await login(page);
+        const businessId = Number(await page.locator('body').getAttribute('data-zazu-business-id'));
+        expect(businessId).toBeGreaterThan(0);
+
+        let registrationAttempts = 0;
+        await page.route('**/offline/device/register', async route => {
+            registrationAttempts++;
+            const body = route.request().postDataJSON();
+            await route.fulfill({
+                status: 200,
+                contentType: 'application/json',
+                body: JSON.stringify({
+                    device: {
+                        id: 999994,
+                        installation_id: body.installation_id,
+                        business_id: businessId,
+                    },
+                    token: 'explicit-current-device-trust-token',
+                    bootstrap: {},
+                }),
+            });
+        });
+
+        await page.goto('/settings', { waitUntil: 'domcontentloaded' });
+        const trustButton = page.getByRole('button', { name: 'Trust this device for offline sync' });
+        await expect(trustButton).toBeVisible();
+        await trustButton.click();
+
+        await expect(page.getByRole('button', { name: 'This device is trusted' })).toBeVisible();
+        await expect.poll(() => registrationAttempts).toBe(1);
+        const trustedState = await page.evaluate(() => ({
+            consent: window.ZazuOffline.getState().sync_registration_consent,
+            token: window.ZazuOffline.getState().sync?.token,
+            paired: window.ZazuOffline.isPaired(),
+        }));
+        expect(trustedState).toEqual({
+            consent: true,
+            token: 'explicit-current-device-trust-token',
+            paired: true,
+        });
+    });
+
     test('retries primary device registration and drains queued customers after the host returns', async ({ page }, testInfo) => {
         test.setTimeout(25_000);
         test.skip(testInfo.project.name !== 'chromium', 'Primary device registration recovery contract runs once.');
