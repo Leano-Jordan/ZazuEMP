@@ -1960,13 +1960,13 @@ class OfflineSyncFoundationTest extends TestCase
             try {
                 $applier->apply($mutation, [$case['entity'] => $handler]);
                 $this->fail('Offline financial mutations must reject values outside the online validation contract.');
-            } catch (\\Illuminate\\Validation\\ValidationException) {
+            } catch (\Illuminate\Validation\ValidationException) {
                 $this->assertSame('pending', $mutation->fresh()->status);
             }
         }
 
-        $this->assertSame(0, \\App\\Models\\Payment::query()->where('business_id', $business->id)->count());
-        $this->assertSame(0, \\App\\Models\\FinanceExpense::query()->where('business_id', $business->id)->count());
+        $this->assertSame(0, \App\Models\Payment::query()->where('business_id', $business->id)->count());
+        $this->assertSame(0, \App\Models\FinanceExpense::query()->where('business_id', $business->id)->count());
     }
 
     public function test_sync_push_keeps_unexpected_server_failures_retryable_without_orphaning_the_mutation(): void
