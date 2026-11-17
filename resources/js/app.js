@@ -1399,14 +1399,216 @@ function setupZazuOfflineDirectoryViews() {
         }
     };
 
+    const addJobOfflineDetails = (row, job) => {
+        if (row.dataset.zazuJobDetailsBound === '1') return;
+        const actions = row.querySelector('.zazu-ops-actions') || row;
+        const button = document.createElement('button');
+        button.type = 'button';
+        button.className = 'zazu-btn zazu-btn-ghost';
+        button.textContent = 'View offline';
+        button.title = 'Inspect this job using records stored on this device';
+        button.setAttribute('aria-expanded', 'false');
+        button.addEventListener('click', () => {
+            const currentState = window.ZazuOffline?.getState();
+            if (!currentState) return;
+            const serverId = Number(job.server_id ?? job.id ?? 0);
+            const currentJob = (currentState.jobs || []).find(item =>
+                (job.local_id && item.local_id === job.local_id)
+                || (serverId > 0 && Number(item.server_id ?? item.id ?? 0) === serverId)
+            ) || job;
+            let panel = row.nextElementSibling;
+            if (!panel?.matches('[data-zazu-job-offline-detail]')) {
+                panel = document.createElement('section');
+                panel.className = 'zazu-panel mt-3';
+                panel.dataset.zazuJobOfflineDetail = '1';
+                panel.setAttribute('role', 'region');
+                panel.setAttribute('aria-label', 'Offline job details');
+                row.insertAdjacentElement('afterend', panel);
+            }
+            const opening = panel.hidden || panel.childElementCount === 0;
+            panel.hidden = !opening;
+            button.setAttribute('aria-expanded', opening ? 'true' : 'false');
+            if (!opening) return;
+
+            panel.replaceChildren();
+            const heading = document.createElement('div');
+            heading.className = 'zazu-panel-head';
+            const title = document.createElement('div');
+            title.className = 'zazu-panel-title';
+            title.textContent = currentJob.name || 'Job details';
+            const close = document.createElement('button');
+            close.type = 'button';
+            close.className = 'zazu-btn zazu-btn-ghost';
+            close.textContent = 'Close';
+            close.addEventListener('click', () => {
+                panel.hidden = true;
+                button.setAttribute('aria-expanded', 'false');
+                button.focus();
+            });
+            heading.append(title, close);
+            panel.append(heading);
+
+            const customer = (currentState.customers || []).find(item =>
+                (currentJob.customer_local_id && item.local_id === currentJob.customer_local_id)
+                || (currentJob.customer_id && Number(item.id ?? item.server_id) === Number(currentJob.customer_id))
+            );
+            const fields = [
+                ['Reference', currentJob.reference || (serverId > 0 ? '#' + serverId : 'Local job')],
+                ['Customer', customer?.name || currentJob.customer_name],
+                ['Contact', customer?.contact_name || customer?.phone || customer?.email],
+                ['Function type', currentJob.event_type],
+                ['Date', currentJob.event_date],
+                ['Venue', currentJob.event_address],
+                ['Status', String(currentJob.status || 'draft').replace(/_/g, ' ')],
+                ['Notes', currentJob.notes],
+            ].filter(([, value]) => value !== null && value !== undefined && String(value).trim() !== '');
+            const details = document.createElement('div');
+            details.className = 'zazu-detail-rows mt-3';
+            for (const [label, value] of fields) {
+                const item = document.createElement('div');
+                item.className = 'zazu-detail-row';
+                const name = document.createElement('div');
+                name.className = 'zazu-detail-label';
+                name.textContent = label;
+                const detail = document.createElement('div');
+                detail.className = 'zazu-detail-value';
+                detail.textContent = String(value);
+                item.append(name, detail);
+                details.append(item);
+            }
+            if (fields.length) panel.append(details);
+
+            const addListSection = (sectionTitle, records, formatter, emptyLabel) => {
+                const section = document.createElement('section');
+                section.className = 'mt-4';
+                const sectionHeading = document.createElement('div');
+                sectionHeading.className = 'zazu-panel-title';
+                sectionHeading.textContent = sectionTitle + ' (' + records.length + ')';
+                section.append(sectionHeading);
+                const list = document.createElement('div');
+                list.className = 'zazu-list mt-2';
+                if (!records.length) {
+                    const empty = document.createElement('p');
+                    empty.className = 'zazu-panel-copy';
+                    empty.textContent = emptyLabel;
+                    list.append(empty);
+                } else {
+                    for (const record of records) {
+                        const item = document.createElement('div');
+                        item.className = 'zazu-list-item';
+                        const main = document.createElement('div');
+                        main.className = 'zazu-list-main min-w-0 flex-1';
+                        const line = formatter(record);
+                        const recordTitle = document.createElement('div');
+                        recordTitle.className = 'zazu-list-title';
+                        recordTitle.textContent = line.title;
+                        const meta = document.createElement('div');
+                        meta.className = 'zazu-list-meta';
+                        meta.textContent = line.meta || '';
+                        main.append(recordTitle);
+                        if (line.meta) main.append(meta);
+                        item.append(main);
+                        list.append(item);
+                    }
+                }
+                section.append(list);
+                panel.append(section);
+            };
+
+            const requirementRecords = (currentJob.requirements || [])
+                .map(item => item.record || item)
+                .filter(item => item && (item.description || item.name));
+            const serviceRecords = requirementRecords.length
+                ? requirementRecords
+                : (currentJob.services || []).map(description => ({ description }));
+            addListSection('Services', serviceRecords, item => ({
+                title: item.description || item.name || 'Service',
+                meta: [item.quantity ? String(item.quantity) + ' ' + (item.unit || '') : '', item.category, item.status].filter(Boolean).join(' · '),
+            }), 'No services are stored on this device for this job.');
+
+            const relatedQuotes = (currentState.quotes || []).filter(quote =>
+                (quote.event_local_id && quote.event_local_id === currentJob.local_id)
+                || (quote.event_id && serverId > 0 && Number(quote.event_id) === serverId)
+            );
+            addListSection('Quotes', relatedQuotes, quote => ({
+                title: quote.reference || 'Draft quote',
+                meta: [
+                    String(quote.status || 'draft').replace(/_/g, ' '),
+                    quote.latest_version?.status ? 'Version ' + quote.latest_version.status : '',
+                    quote.currency || currentState.business?.currency || 'ZAR',
+                    quote.latest_version?.total ? String(quote.latest_version.total) : '',
+                ].filter(Boolean).join(' · '),
+            }), 'No linked quotes are stored on this device.');
+
+            const relatedPreparation = (currentState.preparations || []).filter(item =>
+                (item.event_local_id && item.event_local_id === currentJob.local_id)
+                || (item.event_id && serverId > 0 && Number(item.event_id) === serverId)
+            );
+            addListSection('Preparation', relatedPreparation, item => ({
+                title: item.title || 'Preparation item',
+                meta: [String(item.status || 'open').replace(/_/g, ' '), item.due_date ? 'Due ' + item.due_date : ''].filter(Boolean).join(' · '),
+            }), 'No preparation items are stored on this device for this job.');
+
+            const relatedCosts = (currentState.costs || []).filter(item =>
+                (item.event_local_id && item.event_local_id === currentJob.local_id)
+                || (item.event_id && serverId > 0 && Number(item.event_id) === serverId)
+            );
+            addListSection('Costs', relatedCosts, item => ({
+                title: item.description || item.name || item.category || 'Recorded cost',
+                meta: [item.amount ? String(item.currency || currentState.business?.currency || 'ZAR') + ' ' + String(item.amount) : '', item.status].filter(Boolean).join(' · '),
+            }), 'No linked costs are stored on this device.');
+
+            const relatedOrders = (currentState.purchase_orders || []).filter(item =>
+                (item.event_local_id && item.event_local_id === currentJob.local_id)
+                || (item.event_id && serverId > 0 && Number(item.event_id) === serverId)
+            );
+            addListSection('Purchasing', relatedOrders, item => ({
+                title: item.reference || 'Purchase order',
+                meta: [String(item.status || 'draft').replace(/_/g, ' '), (item.items || []).length + ' lines'].join(' · '),
+            }), 'No linked purchase orders are stored on this device.');
+
+            const relatedInvoices = (currentState.invoices || []).filter(item =>
+                (item.event_local_id && item.event_local_id === currentJob.local_id)
+                || (item.event_id && serverId > 0 && Number(item.event_id) === serverId)
+            );
+            addListSection('Invoices', relatedInvoices, item => ({
+                title: item.number || 'Invoice',
+                meta: [
+                    String(item.status || 'draft').replace(/_/g, ' '),
+                    item.paid_amount !== undefined ? 'Paid ' + String(item.currency || 'ZAR') + ' ' + String(item.paid_amount) : '',
+                    item.balance !== undefined ? 'Balance ' + String(item.currency || 'ZAR') + ' ' + String(item.balance) : '',
+                ].filter(Boolean).join(' · '),
+            }), 'No linked invoices are stored on this device.');
+
+            const note = document.createElement('p');
+            note.className = 'zazu-panel-copy mt-4';
+            note.textContent = 'This inspection uses the last synchronised and locally saved records on this device. It does not fetch live server data while disconnected.';
+            panel.append(note);
+        });
+        actions.append(button);
+        row.dataset.zazuJobDetailsBound = '1';
+    };
+
     const renderJobs = (state) => {
         const register = document.querySelector('.zazu-ops-register');
         if (!register) return;
 
-        register.querySelectorAll('[data-zazu-local-record="job"]').forEach(node => node.remove());
+        register.querySelectorAll('[data-zazu-local-record="job"]').forEach(node => {
+            const detail = node.nextElementSibling;
+            if (detail?.matches('[data-zazu-job-offline-detail]')) detail.remove();
+            node.remove();
+        });
         const filter = new URLSearchParams(window.location.search).get('filter') || '';
-        const jobs = (state?.jobs || []).filter(job => {
-            if (!job?.local_id || (filter && !['all', 'draft'].includes(filter))) return false;
+        const allJobs = (state?.jobs || []).filter(job => job?.local_id);
+        for (const job of allJobs) {
+            const serverId = job.server_id ?? job.id;
+            const serverRow = serverId
+                ? register.querySelector('[data-zazu-server-job-id="' + Number(serverId) + '"]')
+                : null;
+            if (serverRow) addJobOfflineDetails(serverRow, job);
+        }
+        const jobs = allJobs.filter(job => {
+            if (filter && !['all', 'draft'].includes(filter)) return false;
             const serverId = job.server_id ?? job.id;
             return !serverId || !register.querySelector('[data-zazu-server-job-id="' + Number(serverId) + '"]');
         });
@@ -1524,6 +1726,7 @@ function setupZazuOfflineDirectoryViews() {
             }
 
             row.append(main, actions);
+            addJobOfflineDetails(row, job);
 
             if (empty?.parentNode === register) register.insertBefore(row, empty);
             else register.append(row);
