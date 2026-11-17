@@ -1,0 +1,118 @@
+<?php
+
+namespace Tests\Feature;
+
+use App\Models\Business;
+use App\Models\Event;
+use App\Models\Payment;
+use App\Models\Quote;
+use App\Models\SyncDevice;
+use App\Support\Offline\OfflineDomainMutationHandler;
+use App\Support\Offline\SyncEntityIdentityRegistry;
+use App\Support\Offline\SyncMutationApplier;
+use App\Support\Offline\SyncMutationRecorder;
+use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Str;
+use Illuminate\Validation\ValidationException;
+use Tests\TestCase;
+
+class OfflinePaymentPrecisionTest extends TestCase
+{
+    use RefreshDatabase;
+
+    public function test_offline_payment_rejects_amount_precision_loss_without_posting(): void
+    {
+        $business = Business::create([
+            'name' => 'Offline Payment Precision Business',
+            'slug' => 'offline-payment-precision-'.Str::lower(Str::random(8)),
+            'status' => 'active',
+            'currency' => 'ZAR',
+        ]);
+        $device = SyncDevice::create([
+            'business_id' => $business->id,
+            'installation_id' => (string) Str::uuid(),
+        ]);
+        $event = Event::create([
+            'business_id' => $business->id,
+            'reference' => 'OFF-PAYMENT-PRECISION',
+            'name' => 'Precision Payment Event',
+            'status' => 'draft',
+        ]);
+        $quote = Quote::create([
+            'event_id' => $event->id,
+            'reference' => 'QUO-OFF-PAYMENT-PRECISION',
+            'status' => 'sent',
+            'currency' => 'ZAR',
+        ]);
+        $version = $quote->versions()->create([
+            'version' => 1,
+            'status' => 'sent',
+            'subtotal' => '1000.00',
+            'tax_total' => '0.00',
+            'total' => '1000.00',
+            'deposit_percent' => '25.00',
+            'deposit_amount' => '250.00',
+            'tax_label' => 'No tax',
+            'tax_treatment' => 'out_of_scope',
+            'tax_rate' => '0.00',
+            'tax_snapshot_at' => now(),
+        ]);
+        $version->items()->create([
+            'description' => 'Offline payment precision service',
+            'quantity' => '1.00',
+            'unit' => 'service',
+            'unit_price' => '1000.00',
+            'line_total' => '1000.00',
+            'source_snapshot' => ['offline' => false],
+        ]);
+
+        $registry = app(SyncEntityIdentityRegistry::class);
+        $quoteIdentity = $registry->identify($quote, 'quote');
+        $handler = app(OfflineDomainMutationHandler::class);
+        $applier = app(SyncMutationApplier::class);
+        $recorder = app(SyncMutationRecorder::class);
+
+        $acceptanceId = (string) Str::uuid();
+        $acceptance = $recorder->record($device, 'quote_acceptance', $acceptanceId, 'create', [
+            'local_id' => $acceptanceId,
+            'record' => [
+                'quote_local_id' => $quoteIdentity->entity_uuid,
+                'customer_name' => 'Offline Customer',
+            ],
+        ]);
+        $applier->apply($acceptance, ['quote_acceptance' => $handler]);
+
+        $invoiceId = (string) Str::uuid();
+        $invoiceMutation = $recorder->record($device, 'invoice', $invoiceId, 'create', [
+            'local_id' => $invoiceId,
+            'record' => ['quote_local_id' => $quoteIdentity->entity_uuid],
+        ]);
+        $applier->apply($invoiceMutation, ['invoice' => $handler]);
+
+        $invoice = \App\Models\Invoice::query()
+            ->where('business_id', $business->id)
+            ->firstOrFail();
+        $invoiceIdentity = $registry->identify($invoice, 'invoice');
+
+        $paymentId = (string) Str::uuid();
+        $paymentMutation = $recorder->record($device, 'payment', $paymentId, 'create', [
+            'local_id' => $paymentId,
+            'record' => [
+                'invoice_local_id' => $invoiceIdentity->entity_uuid,
+                'type' => 'deposit',
+                'amount' => '250.005',
+                'method' => 'bank_transfer',
+                'paid_at' => now()->toDateString(),
+            ],
+        ]);
+
+        try {
+            $applier->apply($paymentMutation, ['payment' => $handler]);
+            $this->fail('Offline payments must reject amounts with more than two decimal places.');
+        } catch (ValidationException) {
+            $this->assertSame(0, Payment::query()->where('business_id', $business->id)->count());
+            $this->assertSame('issued', $invoice->fresh()->status);
+            $this->assertSame('0.00', $invoice->fresh()->paid_amount);
+        }
+    }
+}
