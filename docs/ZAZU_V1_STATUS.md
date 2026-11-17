@@ -1,24 +1,23 @@
-## Director reconciliation — 2026-11-17 (device-local customer relationship view)
+## Director reconciliation — 2026-11-17 (device-local customer read/edit workflow)
 
-**Canonical repository:** `Leano-Jordan/ZazuEMP` · **branch:** `main` · **current control head:** `a91f0e44278f9372a23f22aeb729a1a62c92f8d8` · **application/test source:** `2f5407ef6ee9e873b409b6954effab6f31720235`.
+**Canonical repository:** `Leano-Jordan/ZazuEMP` · **branch:** `main` · **verified control head:** `f70947ff0a850d8620bc34726c99f818433beedc` · **application/test source:** `f70947ff0a850d8620bc34726c99f818433beedc`.
 
-### Offline customer relationship slice
-- The Customers directory now opens an in-place device-local relationship panel from the business-scoped IndexedDB workspace.
-- It reads available customer identity/contact/billing/notes fields, linked local Work records and linked local quote summaries without requesting a Laravel customer detail page.
-- The panel is intentionally read-only. Customer edit and full local route/detail parity remain future implementation work; a cached server page is still not counted as a local read.
-- Added Playwright coverage for opening, reading and closing the customer relationship view while disconnected.
-- The existing staff/manager work-delete permission boundary was already covered by the preceding correction batch; no duplicate test was added.
-- Removed the unrelated Render-labelled Docker preview workflow. Zazu's application workflow remains on `main`; no Render service or deployment was introduced.
+### Offline customer relationship workflow
+- The Customers directory opens an in-place relationship panel from the business-scoped IndexedDB workspace. It reads customer/contact/billing/notes fields plus linked local Work and quote summaries without requesting a Laravel customer detail page.
+- Supported customer profile, primary-contact and billing fields can be edited in the same panel while disconnected. The save updates the local working copy and queues a customer update atomically in IndexedDB.
+- The customer row displays **Waiting to sync** while the update is queued. After the server acknowledges the update and returns its identity, the per-record marker clears and the row returns to **Synced**. Conflicts and re-pair requirements take priority over the waiting state.
+- Profile-photo changes remain online-only. The server-rendered customer show/edit routes remain snapshots when offline; this bounded panel is not full route parity.
+- Playwright acceptance covers offline customer read/edit, queued update persistence, reconnect acknowledgement, returned server identity and sync-state clearing. Existing staff/manager work-delete role regression remains in place; no duplicate test was added.
+- Removed the unrelated Render-labelled Docker preview workflow. Zazu has no Render service or deployment.
 
 ### Exact-head acceptance evidence
-- Laravel [run 44025968451](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/44025968451): **PASS — 503 passed / 1 skipped / 3,563 assertions**.
+- Laravel [run 44027207107](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/44027207107): **PASS — 503 passed / 1 skipped / 3,566 assertions**.
 - Offline browser acceptance in the same run: **38 desktop Chromium passed**, **6 mobile-viewport passed**, and **1 phone-local attachment journey passed**.
 - PostgreSQL migrations, real account/workspace registration, and database/private-file backup/restore: **PASS**.
-- Zazu quality [run 44025968403](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/44025968403), Director Health [run 44026027084](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/44026027084), Director Contract Lint [run 44026027054](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/44026027054), and Push on main [run 44026026698](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/44026026698): **PASS**. SonarCloud was **SKIPPED**, not counted.
+- Zazu quality [run 44027207088](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/44027207088) and Push on main [run 44027207014](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/44027207014): **PASS**. Director Health [run 44027142919](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/44027142919) and PHPMD [run 44027142915](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/44027142915): **PASS** on the immediately preceding code/test checkpoint. SonarCloud was **SKIPPED**, not counted.
 
 ### Release decision
 **V1 remains NOT READY. Evidence maturity remains 73/100; no score uplift is claimed.** Physical Android installed-app cold launch/restart/reconnect, the installed-target recovery drill including private media, live populated-business quote/payment/cost/profit reconciliation, and POPIA operational/privacy sign-off remain open. CI browser success does not replace physical-device acceptance. No production deployment, live business database or customer data changed.
-
 ---
 
 ## Director reconciliation — 2026-11-17 (V1 correction batch)
