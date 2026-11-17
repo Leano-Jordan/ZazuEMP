@@ -1178,6 +1178,8 @@ function setupZazuOfflineDirectoryViews() {
                     nextState.customers[customerIndex] = {
                         ...nextState.customers[customerIndex],
                         ...payload,
+                        services: payload.services,
+                        requirements: payload.services.map(description => ({ description, category: 'Other', quantity: 1, unit: 'service', status: 'open' })),
                         pending_sync: true,
                     };
                     await window.ZazuOffline.queueMutation('customer', 'update', payload, nextState);
@@ -1527,6 +1529,13 @@ function setupZazuOfflineDirectoryViews() {
             addEditField('Event date', 'event_date', currentJob.event_date ? String(currentJob.event_date).slice(0, 10) : '', 'date');
             addEditField('Venue / address', 'event_address', currentJob.event_address, 'text', false, 255);
             addEditField('Operational notes', 'notes', currentJob.notes, 'text', true, 5000);
+            const currentRequirements = (currentJob.requirements || [])
+                .map(item => item.record || item)
+                .filter(item => item && (item.description || item.name));
+            const currentServices = currentRequirements.length
+                ? currentRequirements.map(item => item.description || item.name)
+                : (currentJob.services || []);
+            addEditField('Services / requirements (one per line)', 'services', currentServices.join('\n'), 'text', true, 3000);
             const editStatus = document.createElement('p');
             editStatus.className = 'zazu-panel-copy';
             editStatus.setAttribute('role', 'status');
@@ -1567,6 +1576,10 @@ function setupZazuOfflineDirectoryViews() {
                     event_date: String(formData.get('event_date') || '').trim() || null,
                     event_address: String(formData.get('event_address') || '').trim() || null,
                     notes: String(formData.get('notes') || '').trim() || null,
+                    services: [...new Set(String(formData.get('services') || '')
+                        .split(/[\n,]+/)
+                        .map(value => value.trim())
+                        .filter(Boolean))],
                     customer_local_id: currentJob.customer_local_id || customer?.local_id || null,
                     customer_name: customer?.name || currentJob.customer_name || null,
                     event_day_contact_id: currentJob.event_day_contact_id ?? null,
