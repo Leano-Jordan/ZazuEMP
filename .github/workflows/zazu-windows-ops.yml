@@ -120,7 +120,8 @@ jobs:
           $parseErrors = $null
           [System.Management.Automation.Language.Parser]::ParseFile($launcherPath, [ref]$tokens, [ref]$parseErrors) | Out-Null
           if ($parseErrors.Count -gt 0) {
-            throw ("Windows startup script has PowerShell syntax errors: " + ($parseErrors | ForEach-Object { $_.Message } | Join-String -Separator '; '))
+            $parseMessages = @($parseErrors | ForEach-Object { $_.Message })
+            throw ("Windows startup script has PowerShell syntax errors: " + ($parseMessages -join '; '))
           }
           $launcher = Get-Content $launcherPath -Raw
           foreach ($required in @(
