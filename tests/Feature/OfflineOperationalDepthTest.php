@@ -277,6 +277,12 @@ class OfflineOperationalDepthTest extends TestCase
         $this->assertSame(0, $asset->allocations()->where('status', 'allocated')->count());
         $this->assertSame(2, $asset->allocations()->where('status', 'returned')->count());
 
+    }
+
+    public function test_offline_open_ended_allocation_rejects_a_later_booking(): void
+    {
+        $business = $this->business();
+        $device = $this->device($business);
         $futureEvent = Event::create([
             'business_id' => $business->id,
             'reference' => 'OFF-ASSET-003',
@@ -289,12 +295,27 @@ class OfflineOperationalDepthTest extends TestCase
             'name' => 'Open-ended Offline Booking',
             'status' => 'confirmed',
         ]);
+        $asset = Asset::create([
+            'business_id' => $business->id,
+            'asset_tag' => 'OFF-ASSET-002',
+            'name' => 'Open-ended PA',
+            'status' => 'available',
+            'condition' => 'good',
+            'purchase_cost' => '5000.00',
+            'currency' => 'ZAR',
+        ]);
+
+        $registry = app(\App\Support\Offline\SyncEntityIdentityRegistry::class);
+        $assetUuid = $registry->identify($asset, 'asset')->entity_uuid;
         $futureEventUuid = $registry->identify($futureEvent, 'job')->entity_uuid;
         $openEndedEventUuid = $registry->identify($openEndedEvent, 'job')->entity_uuid;
+        $recorder = app(SyncMutationRecorder::class);
+        $applier = app(SyncMutationApplier::class);
+        $handler = app(\App\Support\Offline\OfflineDomainMutationHandler::class);
 
-        $futureAllocationUuid = (string) Str::uuid();
-        $futureAllocation = $recorder->record($device, 'asset_allocation', $futureAllocationUuid, 'create', [
-            'local_id' => $futureAllocationUuid,
+        $futureUuid = (string) Str::uuid();
+        $future = $recorder->record($device, 'asset_allocation', $futureUuid, 'create', [
+            'local_id' => $futureUuid,
             'record' => [
                 'asset_local_id' => $assetUuid,
                 'event_local_id' => $futureEventUuid,
@@ -302,7 +323,7 @@ class OfflineOperationalDepthTest extends TestCase
                 'allocated_until' => '2026-12-26',
             ],
         ]);
-        $applier->apply($futureAllocation, ['asset_allocation' => $handler]);
+        $applier->apply($future, ['asset_allocation' => $handler]);
 
         $openEndedUuid = (string) Str::uuid();
         $openEnded = $recorder->record($device, 'asset_allocation', $openEndedUuid, 'create', [

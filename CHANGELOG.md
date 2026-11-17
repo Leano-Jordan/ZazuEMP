@@ -1,5 +1,9 @@
 # Changelog
 
+## Unreleased — 2026-11-17 (Regression test maintainability)
+- Split online and offline open-ended allocation regression coverage into focused methods after PHPMD flagged the previous test methods over the 100-line limit; no threshold or test was weakened.
+- Exact-head CI pending.
+
 ## Unreleased — 2026-11-17 (Follow-up test correction)
 - Corrected the fully-qualified HttpException namespace in the open-ended allocation regression test; exact-head CI remains pending.
 

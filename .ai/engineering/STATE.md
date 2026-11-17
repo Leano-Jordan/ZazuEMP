@@ -4,7 +4,7 @@ As of: 2026-11-17
 Repository: Leano-Jordan/ZazuEMP
 Canonical branch: main only; never create branches
 Last fully verified HEAD: 807db36e6eb9aaded81e6bb45e1e2f0c9c18c5de
-Current follow-up: symmetric open-ended allocation-overlap protection; test namespace correction included in this update; exact-head CI pending.
+Current follow-up: symmetric open-ended allocation-overlap protection; tests refactored after PHPMD flagged excessive method length; exact-head CI pending.
 
 ## Verified correction
 Rental asset date-allocation was reproduced at c7be735: a second non-overlapping booking returned HTTP 422 before date-overlap evaluation.
@@ -17,7 +17,7 @@ The bounded online/offline correction passed at 807db36:
 - SonarCloud skipped.
 
 ## Follow-up edge case
-An allocation without an end date is open-ended. The overlap query must be symmetric: a new open-ended booking starting before an existing future booking must be rejected. This follow-up adds online/offline regression coverage and awaits exact-head CI.
+An allocation without an end date is open-ended. A new open-ended booking starting before an existing future booking must be rejected. Online and offline regression coverage now tests this. The first follow-up test implementation exceeded PHPMD's 100-line method limit; it has been split into focused tests without weakening the rule. Exact-head CI pending.
 
 ## Commercial numbering
 Online invoice-number format assertion passed: month-prefixed random suffix. Offline source uses an entity-UUID suffix. Numbering remains unchanged pending South African tax-adviser guidance.

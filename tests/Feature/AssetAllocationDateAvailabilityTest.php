@@ -89,6 +89,29 @@ class AssetAllocationDateAvailabilityTest extends TestCase
         $this->assertSame('returned', $allocations[1]->fresh()->status);
         $this->assertSame('available', $asset->fresh()->status);
 
+
+    }
+    public function test_open_ended_asset_booking_blocks_a_later_reservation(): void
+    {
+        $business = Business::create([
+            'name' => 'Open-ended Rental Availability',
+            'slug' => 'open-ended-rental-availability',
+            'status' => 'active',
+            'currency' => 'ZAR',
+        ]);
+        $user = User::factory()->create(['username' => 'openendedowner']);
+        $business->users()->attach($user->id, ['role' => 'owner']);
+        $this->actingAs($user);
+
+        $asset = Asset::create([
+            'business_id' => $business->id,
+            'asset_tag' => 'CHAIR-OPEN-001',
+            'name' => 'Open-ended Chair',
+            'status' => 'available',
+            'condition' => 'good',
+            'purchase_cost' => '100.00',
+            'currency' => 'ZAR',
+        ]);
         $futureEvent = Event::create([
             'business_id' => $business->id,
             'reference' => 'RENTAL-004',
@@ -117,6 +140,7 @@ class AssetAllocationDateAvailabilityTest extends TestCase
             'allocated_from' => '2026-12-20',
         ])->assertStatus(422);
 
-        $this->assertSame(3, $asset->allocations()->count());
+        $this->assertDatabaseCount('asset_allocations', 1);
     }
+
 }
