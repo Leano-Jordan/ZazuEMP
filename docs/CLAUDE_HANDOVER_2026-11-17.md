@@ -18,7 +18,10 @@ Claude is an independent read-only auditor/adviser for V1. The owner remains fin
 - Automated mobile viewport tests are not proof of physical Android installed-app cold launch, host-loss, force-close/reopen or reconnect behaviour.
 - Keep confirmed defects separate from hypotheses, accepted limitations and owner-dependent evidence.
 
-## Audit focus — choose one target at a time
+## Initial Claude assignment — one bounded pass
+Audit **offline session and trusted-device transitions only**. This is the next security-focused V1 target. Trace the real login/logout, web-session expiry, business switch, device revocation/expiry, in-flight sync response and queued financial mutation paths. Confirm what is already protected before reporting gaps. Do not broaden into attachments, recovery, financial workflow or UI unless a directly connected defect requires it.
+
+## Further audit focus — only after Director closes the first pass
 1. **Offline commercial records:** real server bootstrap envelopes, nested payments/items, identity joins, queue reconciliation and business isolation. Recent payment normalization work is already covered; do not reopen without new evidence.
 2. **Phone-local attachments:** durable bytes, business/Work ownership, retry/idempotency and truthful sync status.
 3. **Offline session/device transition:** revoked or expired devices, business switching, stale responses and queued financial mutations.
