@@ -7,6 +7,12 @@ Last application-code test baseline: a5ead696429867bcd57342406bb37662ca1b2f2c
 Canonical branch: main only; never create branches. Engineering changes are active on main; no branches created.
 Owner mandate: ship a dependable first-business V1; preserve scope; no Render or AMPPS workflow.
 
+## Owner-approved event scheduling implementation — 2026-11-17
+
+Owner authorised the focused V1 addition: multi-day event dates, start/end times, setup/collection dates, schedule clash warnings and connected rental allocation dates. Staff scheduling, quantity-based rental stock and workforce management remain deferred.
+
+Implementation candidate is on `main` (source HEAD at time of this note: `24e68b73d3a73bd6a5e5a8103f164bc3146e02fc`; subsequent documentation commits follow). Added an additive events migration; online Work create/edit persistence and validation; offline mutation payload/server application and workspace bootstrap; calendar multi-day expansion; schedule clash detection; and rental allocation date defaults. Added focused online/offline feature tests. Exact-head CI and rendered/physical acceptance are pending; no pass or readiness uplift is claimed.
+
 ## Current repository verification — fd82f6a (17 Nov 2026)
 
 The only repository change between application-code baseline a5ead69 and fd82f6a is `.github/workflows/zazu-windows-package.yml`; application source and tests are unchanged across that range.
