@@ -62,43 +62,75 @@ final class ZazuIncidentRecorder
      */
     private static function databaseDiagnostics(Throwable $exception): array
     {
-        if (! $exception instanceof \Illuminate\Database\QueryException
-            && ! $exception instanceof \PDOException) {
-            return [];
-        }
-
-        $connectionName = $exception instanceof \Illuminate\Database\QueryException
-            ? $exception->getConnectionName()
-            : null;
-        $driver = is_string($connectionName)
-            ? config("database.connections.{$connectionName}.driver")
-            : null;
-        $errorInfo = $exception->errorInfo ?? null;
-        $sqlState = is_array($errorInfo) && isset($errorInfo[0]) && is_string($errorInfo[0])
-            && preg_match('/^[0-9A-Z]{5}$/', $errorInfo[0]) === 1
-                ? $errorInfo[0]
-                : null;
-        $driverCode = is_array($errorInfo) && isset($errorInfo[1])
-            && (is_int($errorInfo[1]) || (is_string($errorInfo[1]) && preg_match('/^[0-9]{1,10}$/', $errorInfo[1]) === 1))
-                ? (int) $errorInfo[1]
-                : null;
-
-        $diagnostics = [
-            'database_connection' => is_string($connectionName) ? $connectionName : null,
-            'database_driver' => is_string($driver) && preg_match('/^[a-z0-9_]{1,32}$/i', $driver) === 1
-                ? $driver
-                : null,
-            'database_sqlstate' => $sqlState,
-            'database_driver_code' => $driverCode,
-        ];
-
         if ($exception instanceof \Illuminate\Database\QueryException) {
-            $diagnostics['database_operation'] = in_array($exception->readWriteType, ['read', 'write', 'direct'], true)
-                ? $exception->readWriteType
-                : null;
+            return self::queryExceptionDiagnostics($exception);
         }
 
-        return $diagnostics;
+        if ($exception instanceof \PDOException) {
+            return self::pdoExceptionDiagnostics($exception);
+        }
+
+        return [];
+    }
+
+    private static function queryExceptionDiagnostics(\Illuminate\Database\QueryException $exception): array
+    {
+        return [
+            'database_connection' => $exception->getConnectionName(),
+            'database_driver' => self::databaseDriver($exception->getConnectionName()),
+            'database_sqlstate' => self::sqlState($exception->errorInfo ?? null),
+            'database_driver_code' => self::driverCode($exception->errorInfo ?? null),
+            'database_operation' => self::databaseOperation($exception->readWriteType),
+        ];
+    }
+
+    private static function pdoExceptionDiagnostics(\PDOException $exception): array
+    {
+        return [
+            'database_connection' => null,
+            'database_driver' => null,
+            'database_sqlstate' => self::sqlState($exception->errorInfo ?? null),
+            'database_driver_code' => self::driverCode($exception->errorInfo ?? null),
+        ];
+    }
+
+    private static function databaseDriver(string $connectionName): ?string
+    {
+        $driver = config("database.connections.{$connectionName}.driver");
+
+        return is_string($driver) && preg_match('/^[a-z0-9_]{1,32}$/i', $driver) === 1
+            ? $driver
+            : null;
+    }
+
+    private static function sqlState(mixed $errorInfo): ?string
+    {
+        if (!is_array($errorInfo) || !isset($errorInfo[0]) || !is_string($errorInfo[0])) {
+            return null;
+        }
+
+        return preg_match('/^[0-9A-Z]{5}$/', $errorInfo[0]) === 1 ? $errorInfo[0] : null;
+    }
+
+    private static function driverCode(mixed $errorInfo): ?int
+    {
+        if (!is_array($errorInfo) || !isset($errorInfo[1])) {
+            return null;
+        }
+
+        $code = $errorInfo[1];
+        if (is_int($code)) {
+            return $code;
+        }
+
+        return is_string($code) && preg_match('/^[0-9]{1,10}$/', $code) === 1
+            ? (int) $code
+            : null;
+    }
+
+    private static function databaseOperation(?string $operation): ?string
+    {
+        return in_array($operation, ['read', 'write', 'direct'], true) ? $operation : null;
     }
 
     private static function requestId(?Request $request): string
