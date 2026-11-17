@@ -101,7 +101,7 @@ class OfflineEventScheduleSyncTest extends TestCase
             'collection_date' => '2026-12-13',
             'status' => 'confirmed',
         ]);
-        $identity = app(\\App\\Support\\Offline\\SyncEntityIdentityRegistry::class)
+        $identity = app(\App\Support\Offline\SyncEntityIdentityRegistry::class)
             ->identify($event, 'job')
             ->entity_uuid;
         $mutation = app(SyncMutationRecorder::class)->record($device, 'job', $identity, 'update', [
@@ -114,7 +114,7 @@ class OfflineEventScheduleSyncTest extends TestCase
         ]);
 
         app(SyncMutationApplier::class)->apply($mutation, [
-            'job' => app(\\App\\Support\\Offline\\OfflineDomainMutationHandler::class),
+            'job' => app(\App\Support\Offline\OfflineDomainMutationHandler::class),
         ]);
 
         $saved = $event->fresh();
