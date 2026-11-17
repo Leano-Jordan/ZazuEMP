@@ -89,7 +89,7 @@
             </section>
 
             <footer class="zazu-public-copy print-hide">
-                This secure customer link expires seven days after it was issued. Contact the business for a refreshed link or help with this invoice.
+                This secure customer link expires seven days after it is generated. Contact the business for a refreshed link or help with this invoice.
             </footer>
         </section>
     </main>
