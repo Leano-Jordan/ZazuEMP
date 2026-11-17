@@ -1034,9 +1034,9 @@ function setupZazuOfflineDirectoryViews() {
         button.addEventListener('click', () => {
             const currentState = window.ZazuOffline?.getState();
             if (!currentState) return;
-            const customerServerId = Number(currentCustomer.server_id ?? currentCustomer.id ?? 0);
+            const customerServerId = Number(customer.server_id ?? customer.id ?? 0);
             const currentCustomer = (currentState.customers || []).find(item =>
-                (currentCustomer.local_id && item.local_id === currentCustomer.local_id)
+                (customer.local_id && item.local_id === customer.local_id)
                 || (customerServerId > 0 && Number(item.server_id ?? item.id ?? 0) === customerServerId)
             ) || customer;
             let panel = row.nextElementSibling;
@@ -1097,7 +1097,6 @@ function setupZazuOfflineDirectoryViews() {
             }
             if (fields.length) panel.append(details);
 
-            const customerServerId = Number(currentCustomer.server_id ?? currentCustomer.id ?? 0);
             const jobs = (currentState.jobs || []).filter(job =>
                 (currentCustomer.local_id && job.customer_local_id === currentCustomer.local_id)
                 || (customerServerId > 0 && Number(job.customer_id || 0) === customerServerId)
