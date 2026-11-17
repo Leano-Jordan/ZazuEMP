@@ -11,6 +11,7 @@
         ? 'zazu-phone-attachments-business-' + ACTIVE_BUSINESS_ID
         : 'zazu-phone-attachments-unscoped';
     const ATTACHMENT_STORE = 'files';
+    const PENDING_DEVICE_REVOCATION_PREFIX = 'zazu-pending-device-revocation:';
     const STATE = 'state';
     const QUEUE = 'mutations';
     let state = null;
@@ -47,6 +48,7 @@
     let sessionGeneration = 0;
     let sessionChannel = null;
     let primaryRegistrationAttempt = null;
+    let pendingDeviceRevocationAttempt = null;
 
     try {
         if ('BroadcastChannel' in window) {
@@ -848,6 +850,99 @@
         }
     }
 
+    function pendingDeviceRevocationKey() {
+        return PENDING_DEVICE_REVOCATION_PREFIX + ACTIVE_BUSINESS_ID;
+    }
+
+    function readPendingDeviceRevocation() {
+        if (ACTIVE_BUSINESS_ID < 1) return null;
+        try {
+            const marker = JSON.parse(localStorage.getItem(pendingDeviceRevocationKey()) || 'null');
+            return marker
+                && Number(marker.business_id) === ACTIVE_BUSINESS_ID
+                && typeof marker.installation_id === 'string'
+                && /^[0-9a-f-]{36}$/i.test(marker.installation_id)
+                ? marker : null;
+        } catch {
+            return null;
+        }
+    }
+
+    function rememberPendingDeviceRevocation(installationId) {
+        if (ACTIVE_BUSINESS_ID < 1 || typeof installationId !== 'string'
+            || !/^[0-9a-f-]{36}$/i.test(installationId)) return false;
+        try {
+            localStorage.setItem(pendingDeviceRevocationKey(), JSON.stringify({
+                business_id: ACTIVE_BUSINESS_ID,
+                installation_id: installationId,
+                requested_at: new Date().toISOString(),
+            }));
+            return true;
+        } catch {
+            return false;
+        }
+    }
+
+    async function retryPendingDeviceRevocation() {
+        const marker = readPendingDeviceRevocation();
+        if (!marker) return { ok: true, reason: 'not_pending' };
+        if (pendingDeviceRevocationAttempt) return pendingDeviceRevocationAttempt;
+        if (!navigator.onLine) return { ok: false, reason: 'offline' };
+
+        const attempt = (async () => {
+            const csrfToken = document.querySelector('meta[name="csrf-token"]')?.content;
+            if (!csrfToken) return { ok: false, reason: 'missing_session' };
+
+            const controller = new AbortController();
+            const timeout = window.setTimeout(() => controller.abort(), 1800);
+            try {
+                const response = await fetch('/settings/sync/devices/revoke-installation', {
+                    method: 'POST',
+                    credentials: 'same-origin',
+                    headers: {
+                        'Accept': 'application/json',
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': csrfToken,
+                    },
+                    body: JSON.stringify({ installation_id: marker.installation_id }),
+                    cache: 'no-store',
+                    signal: controller.signal,
+                });
+
+                if (!response.ok) {
+                    return {
+                        ok: false,
+                        reason: response.status === 403 ? 'owner_required'
+                            : response.status === 404 ? 'business_unavailable' : 'server_rejected',
+                    };
+                }
+
+                const result = await response.json().catch(() => ({}));
+                if (result.revoked !== true) return { ok: false, reason: 'unconfirmed' };
+
+                // Reuse the same non-secret installation identity only after the
+                // owner-authenticated revocation has been confirmed server-side.
+                if (!state?.installation_id) {
+                    state.installation_id = marker.installation_id;
+                    await writeState({ allowSessionChange: true });
+                }
+                localStorage.removeItem(pendingDeviceRevocationKey());
+                return { ok: true, reason: null };
+            } catch {
+                return { ok: false, reason: controller.signal.aborted ? 'timeout' : 'unreachable' };
+            } finally {
+                window.clearTimeout(timeout);
+            }
+        })();
+
+        pendingDeviceRevocationAttempt = attempt;
+        try {
+            return await attempt;
+        } finally {
+            if (pendingDeviceRevocationAttempt === attempt) pendingDeviceRevocationAttempt = null;
+        }
+    }
+
     async function revokeDeviceToken(token) {
         if (!token) return { ok: true, reason: 'not_paired' };
         if (!navigator.onLine) return { ok: false, reason: 'offline' };
@@ -879,11 +974,15 @@
     async function clearLocalSession() {
         await ready;
         const token = state?.sync?.token || null;
+        const installationId = state?.installation_id || null;
         await clearStoredWorkspace(true);
 
-        // Local logout must succeed even without the server. Remote revocation
-        // is bounded and its result is returned so the UI can warn accurately.
-        return revokeDeviceToken(token);
+        // Local logout must succeed even without the server. When immediate
+        // revocation cannot reach the host, retain only the non-secret device
+        // identity so the next owner session can revoke it through its web login.
+        const result = await revokeDeviceToken(token);
+        const queuedForRetry = !result.ok && rememberPendingDeviceRevocation(installationId);
+        return { ...result, queued_for_retry: queuedForRetry };
     }
 
     async function resolveConflict(conflictId, action, note = null) {
@@ -1620,6 +1719,19 @@
             }
         }
 
+        // Finish any previous logout revocation before issuing a fresh token
+        // for this installation. Only the non-secret installation identity is
+        // retained across logout; bearer credentials never enter browser storage.
+        if (readPendingDeviceRevocation()) {
+            const revocation = await retryPendingDeviceRevocation();
+            if (!revocation.ok) {
+                state.last_sync_error = 'The previous device credential still needs revocation. Keep this device online and retry from Settings.';
+                await writeState({ allowSessionChange: true }).catch(() => {});
+                window.dispatchEvent(new CustomEvent('zazu:offline-state-updated'));
+                return false;
+            }
+        }
+
         // A trusted sync credential is granted only after an owner explicitly
         // approves this browser/device in Settings. Previously every fresh web
         // login silently registered another long-lived device token.
@@ -1738,6 +1850,10 @@
         // that is slow or unreachable cannot hold the installed app hostage.
         resolveReady(state);
         window.dispatchEvent(new CustomEvent('zazu:offline-ready', { detail: api }));
+
+        if (storageAvailable && navigator.onLine && readPendingDeviceRevocation()) {
+            retryPendingDeviceRevocation().catch(() => {});
+        }
 
         if (storageAvailable && !state.sync?.token && state.sync_registration_consent === true
             && navigator.onLine && window.__ZAZU_OFFLINE_DEFER_INITIAL_SYNC !== true) {
