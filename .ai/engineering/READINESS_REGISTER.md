@@ -5,6 +5,9 @@ Last application-code test baseline: a5ead696429867bcd57342406bb37662ca1b2f2c
 Release disposition: NOT READY
 Evidence maturity: 73/100 unchanged; no uplift claimed.
 
+## Owner-approved V1 scheduling addition — 2026-11-17
+Event scheduling and connected rental logistics are explicitly authorised for V1: multi-day event dates, start/end times, setup/collection dates, schedule clash warnings, and rental allocation defaults using the event logistics window. Staff scheduling, quantity-based rental stock and wider workforce management remain deferred. Implementation is on `main`; automated acceptance is pending exact-head CI.
+
 ## Existing release gates
 | Gate | Disposition | Closure evidence |
 |---|---|---|
@@ -12,6 +15,7 @@ Evidence maturity: 73/100 unchanged; no uplift claimed.
 | Installation recovery | OPEN — CI supporting proof added | Windows V1 Package run 82 on fd82f6a passes Windows PowerShell first install and Windows-native SQLite + private-media backup/mutate/restore; still requires the controlled drill on the intended installed target, with representative data, media, authorization, audit and migrations |
 | Commercial reconciliation | OPEN | Populated real-business quote, invoice, payment, cost and profit reconciliation |
 | POPIA operations | OPEN | Owner-approved privacy/retention, incident and operational controls |
+| Event scheduling & rental logistics | OPEN — implementation in progress | Multi-day dates/times, setup/collection windows, clash warning and offline schedule sync; close after exact-head Laravel/upgrade/browser verification |
 | Windows package | CLOSED for defined fresh-install candidate | Windows V1 Package run 82 at fd82f6a: production candidate build, PowerShell first-install smoke and Windows-native SQLite/private-media recovery pass; not an updater or hosted deployment |
 
 ## Claude independent audit reconciliation — 2026-11-17
@@ -20,7 +24,7 @@ Evidence maturity: 73/100 unchanged; no uplift claimed.
 3. Loopback-only proxy trust and no HTTPS forcing — ACCEPTED LIMITATION for local Windows/LAN V1; hosted reverse-proxy behavior is outside active deployment scope.
 4. CurrentBusiness test-only branch, min-8 password policy, generated manifest drift, offline bootstrap permission filtering — MIXED: generated manifest tracking corrected; bootstrap endpoint permission gate covered; password-policy expansion and per-permission filtering deferred; test-only branch accepted.
 5. Rental asset date allocation — REPRODUCED and FIXED. Online/offline tests at 00af verify non-overlapping periods can be booked, overlapping periods are rejected, open-ended ranges conflict correctly, and individual returns preserve allocated status until the final active booking is returned. Manual physical return remains operator-confirmed; no automatic release on event state/date alone. Quantity-based rental stock remains outside the serialized-asset model and is an OWNER-DECISION / SCOPE item.
-6. Multi-day events, start/end/setup/collection times, clash detection and staff scheduling — OWNER-DECISION / SCOPE; no implementation without explicit V1 authorization.
+6. Multi-day events, start/end times, setup/collection dates and clash detection — OWNER-AUTHORIZED for focused V1 implementation on 2026-11-17. Staff scheduling and quantity-based rental stock remain deferred.
 7. Invoice numbering (online month-prefixed random suffix; offline UUID suffix) — OWNER-DECISION pending South African tax-adviser guidance; current format assertion passed, numbering unchanged.
 8. Team invites/role assignment, email/PDF delivery, billing, app-wide licence enforcement, in-app legal terms/privacy, monitoring and scheduled jobs — OWNER-DECISION / SCOPE; no silent V1 expansion.
 
