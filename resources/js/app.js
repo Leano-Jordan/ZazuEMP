@@ -1792,7 +1792,8 @@ function setupZazuOfflineDirectoryViews() {
                 (() => {
                     const status = document.createElement('span');
                     const statusValue = String(job.status || 'draft');
-                    const statusLabel = statusValue.replace(/_/g, ' ');
+                    const statusText = statusValue.replace(/_/g, ' ');
+                    const statusLabel = statusText.charAt(0).toUpperCase() + statusText.slice(1);
                     const statusClass = {
                         confirmed: 'zazu-chip-success',
                         in_progress: 'zazu-chip-info',
