@@ -1006,6 +1006,10 @@ function setupZazuOfflineDirectoryViews() {
             label: 'Needs attention',
             title: state.last_sync_error || 'The owner must resolve this device registration before queued changes can sync.',
         };
+        if (pendingSync && state?.last_sync_error) return {
+            label: 'Retrying sync',
+            title: state.last_sync_error,
+        };
         if (pendingSync) return {
             label: 'Waiting to sync',
             title: 'This device has saved changes for this record. They will sync when Zazu reconnects.',
