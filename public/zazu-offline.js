@@ -1286,7 +1286,25 @@
             }
         }
 
-        state.local_dirty = (await pending()).length > 0;
+        const remainingMutations = await pending();
+        for (const mutation of mutations) {
+            const remote = recorded.get(mutation.id);
+            if (remote?.status !== 'applied') continue;
+
+            const target = identityTargets[mutation.entity_type];
+            const localId = mutation.payload?.local_id || mutation.entity_id;
+            if (!target || !localId) continue;
+
+            const sameRecordStillPending = remainingMutations.some(item =>
+                item.entity_type === mutation.entity_type
+                && (item.payload?.local_id || item.entity_id) === localId
+            );
+            if (sameRecordStillPending) continue;
+
+            const record = (state[target] || []).find(item => item.local_id === localId);
+            if (record?.pending_sync === true) record.pending_sync = false;
+        }
+        state.local_dirty = remainingMutations.length > 0;
         if (sessionCleared || !state?.sync?.token) return;
         await writeState();
         window.dispatchEvent(new CustomEvent('zazu:offline-state-updated'));
