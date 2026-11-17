@@ -1658,6 +1658,145 @@ test.describe('Zazu installed PWA offline shell', () => {
         await expect(page.getByRole('heading', { name: 'Dashboard' })).toBeVisible();
         await expect(page.locator('.zazu-error-shell')).toHaveCount(0);
     });
+    test('inspects a device-local Work record and its commercial chain while disconnected', async ({ page, context }, testInfo) => {
+        test.setTimeout(30_000);
+        test.skip(testInfo.project.name !== 'chromium', 'Local Work inspection contract runs once on desktop Chromium.');
+
+        const jobLocalId = '44444444-4444-4444-8444-444444444444';
+        const customerLocalId = '55555555-5555-4555-8555-555555555555';
+        const jobServerId = 77777;
+
+        await page.addInitScript(() => {
+            window.__ZAZU_OFFLINE_DEFER_INITIAL_SYNC = true;
+        });
+        await login(page);
+        await page.goto('/work', { waitUntil: 'domcontentloaded' });
+        await waitForOfflineRuntime(page);
+        await page.evaluate(async ({ jobLocalId, customerLocalId, jobServerId }) => {
+            await window.ZazuOffline.ready;
+            const state = window.ZazuOffline.getState();
+            state.customers = [{
+                local_id: customerLocalId,
+                id: 99999,
+                server_id: 99999,
+                name: 'Offline Work customer',
+                contact_name: 'Work day contact',
+                phone: '0123456789',
+                email: 'work@example.test',
+            }];
+            state.jobs = [{
+                local_id: jobLocalId,
+                id: jobServerId,
+                server_id: jobServerId,
+                customer_local_id: customerLocalId,
+                customer_id: 99999,
+                customer_name: 'Offline Work customer',
+                name: 'Offline wedding reception',
+                reference: 'OFFLINE-WORK-001',
+                event_type: 'Wedding',
+                event_date: '2026-12-12',
+                event_address: 'Pretoria, Gauteng',
+                status: 'confirmed',
+                notes: 'Venue access from 08:00',
+                requirements: [{
+                    local_id: '66666666-6666-4666-8666-666666666666',
+                    server_id: 90001,
+                    record: {
+                        description: 'Full catering service',
+                        category: 'Catering',
+                        quantity: 80,
+                        unit: 'guests',
+                        status: 'open',
+                    },
+                }],
+            }];
+            state.quotes = [{
+                local_id: '88888888-8888-4888-8888-888888888888',
+                id: 80001,
+                server_id: 80001,
+                event_local_id: jobLocalId,
+                event_id: jobServerId,
+                reference: 'OFFLINE-QUOTE-001',
+                status: 'draft',
+                currency: 'ZAR',
+                latest_version: { status: 'draft', total: '12500.00', items: [] },
+            }];
+            state.preparations = [{
+                local_id: '99999999-9999-4999-8999-999999999999',
+                id: 90002,
+                server_id: 90002,
+                event_local_id: jobLocalId,
+                event_id: jobServerId,
+                title: 'Confirm final menu',
+                status: 'open',
+                due_date: '2026-12-01',
+            }];
+            state.costs = [{
+                local_id: 'aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa',
+                id: 91001,
+                server_id: 91001,
+                event_id: jobServerId,
+                description: 'Food supplies',
+                amount: '2500.00',
+                currency: 'ZAR',
+                status: 'actual',
+            }];
+            state.purchase_orders = [{
+                local_id: 'bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbbbb',
+                id: 92001,
+                server_id: 92001,
+                event_id: jobServerId,
+                reference: 'PO-OFFLINE-001',
+                status: 'received',
+                items: [{ id: 1 }],
+            }];
+            state.invoices = [{
+                local_id: 'cccccccc-cccc-4ccc-8ccc-cccccccccccc',
+                id: 93001,
+                server_id: 93001,
+                event_id: jobServerId,
+                number: 'INV-OFFLINE-001',
+                status: 'partially_paid',
+                currency: 'ZAR',
+                paid_amount: '5000.00',
+                balance: '7500.00',
+            }];
+            await window.ZazuOffline.persist();
+            window.dispatchEvent(new CustomEvent('zazu:offline-state-updated'));
+        }, { jobLocalId, customerLocalId, jobServerId });
+
+        await context.setOffline(true);
+        const jobRow = page.locator('[data-zazu-local-record="job"]').filter({ hasText: 'Offline wedding reception' });
+        await expect(jobRow).toBeVisible();
+        await jobRow.getByRole('button', { name: 'View offline' }).click();
+
+        const detail = page.getByRole('region', { name: 'Offline job details' });
+        await expect(detail).toBeVisible();
+        for (const value of [
+            'Offline wedding reception',
+            'OFFLINE-WORK-001',
+            'Offline Work customer',
+            'Work day contact',
+            'Wedding',
+            '2026-12-12',
+            'Pretoria, Gauteng',
+            'Venue access from 08:00',
+            'Full catering service',
+            'OFFLINE-QUOTE-001',
+            '12500.00',
+            'Confirm final menu',
+            'Food supplies',
+            'PO-OFFLINE-001',
+            'INV-OFFLINE-001',
+            'Balance ZAR 7500.00',
+        ]) {
+            await expect(detail.getByText(value)).toBeVisible();
+        }
+
+        await detail.getByRole('button', { name: 'Close' }).click();
+        await expect(detail).toBeHidden();
+    });
+
     test('reads and edits a device-local customer relationship while disconnected', async ({ page, context }, testInfo) => {
         test.setTimeout(30_000);
         test.skip(testInfo.project.name !== 'chromium', 'Customer local read/edit contract runs once on desktop Chromium.');
