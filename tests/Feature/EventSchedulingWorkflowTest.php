@@ -103,7 +103,7 @@ class EventSchedulingWorkflowTest extends TestCase
 
     public function test_job_schedule_fields_use_clear_labels_and_date_limits(): void
     {
-        [$business] = $this->ownerWorkspace();
+        $this->ownerWorkspace();
 
         $response = $this->get(route('work.create'));
 
@@ -116,6 +116,23 @@ class EventSchedulingWorkflowTest extends TestCase
         $response->assertSee('endDate.min = startDate.value ||', false);
         $response->assertSee('setupDate.max = startDate.value ||', false);
         $response->assertSee('collectionDate.min = endDate.value || startDate.value ||', false);
+    }
+
+
+
+    public function test_job_end_date_before_start_date_is_rejected_on_create(): void
+    {
+        [, $customer] = $this->ownerWorkspace();
+
+        $this->from(route('work.create'))->post(route('work.store'), [
+            'customer_id' => $customer->id,
+            'name' => 'Invalid date order',
+            'event_type' => config('zazu.job_types')[0],
+            'event_date' => '2026-12-11',
+            'event_end_date' => '2026-12-10',
+        ])->assertSessionHasErrors('event_end_date');
+
+        $this->assertDatabaseMissing('events', ['name' => 'Invalid date order']);
     }
 
 
