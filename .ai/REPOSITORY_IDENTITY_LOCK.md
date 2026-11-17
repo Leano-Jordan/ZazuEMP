@@ -8,21 +8,17 @@ This repository is **Zazu EMP only**.
 - Product: Zazu – Event Management Platform
 - Local root when locally available: `C:\Projects\ZazuEMP`
 
-## ENGINEERING / DEPLOYMENT BRANCH POLICY — OWNER CLARIFICATION
+## ENGINEERING BRANCH POLICY — CURRENT OWNER DIRECTION
 
-**`main` is the canonical engineering branch.** All application source, tests, documentation, audits and maintenance work must be written directly to `main`.
+**`main` is the canonical source of truth and the only engineering write target.** Application source, tests, documentation, audits and maintenance work must be written directly to `main`.
 
-**`deploy/render-staging` is an intentional deployment-only branch for Render.** The owner clarified on 2026-11-11 that this second branch is required and must be preserved. It is not a development branch.
-
-- Never create feature or development branches.
-- Never use `deploy/render-staging` for ordinary engineering work.
-- Do not delete, rename, merge, rebase or otherwise clean up `deploy/render-staging` as part of routine repository maintenance.
-- Only the designated Render deployment process may update `deploy/render-staging`, and only when deployment is explicitly authorised.
-- All engineering writes target `Leano-Jordan/ZazuEMP` on `main`.
-- Any other non-`main` branch is policy drift; inspect it read-only and seek owner direction before destructive action.
+- Never create feature, development, review or temporary branches.
+- Do not switch engineering work away from `main`.
+- Treat any existing non-`main` ref as read-only legacy state. Do not update, merge, rename or delete it without explicit owner direction.
+- Do not create a separate deployment branch or introduce an unapproved deployment workflow.
 - Before every write, explicitly confirm the repository and `main` target.
 
-This narrow deployment-branch exception supersedes the earlier 2026-11-05 blanket non-main cleanup instruction for `deploy/render-staging` only.
+This policy reflects the owner's current direction and supersedes older branch/deployment notes below or in historical records.
 
 ## WRITE GATE
 
