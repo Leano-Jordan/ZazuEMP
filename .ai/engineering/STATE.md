@@ -85,3 +85,21 @@ V1: NOT READY. Historical state/register/memory, checklist and changelog are pre
 - Laravel job `134284080768`: PASS; service-worker/session contracts, LAN asset-origin checks, Blade/manifest/config checks and PHPUnit/Pest passed.
 - Documentation-only follow-up on `main` is `8bf76fe034f888138c0542dc308e3d4d752bd304`; no application code changed after the tested source baseline.
 - Scheduling engineering/CI subgate is CLOSED. Physical Android and other operator gates remain OPEN. Release remains NOT READY.
+
+
+## Director follow-up — job date integrity, startup migration safety and plain English (2026-11-17)
+
+- Introduced `EventScheduleValidator` as the single relationship check for online job create/edit and offline job sync.
+- The validator rejects an end date before the start date, setup after the start date, equipment collection before the job end date, and an earlier/equal end time for a one-day job. Multi-day jobs may end at an earlier clock time on their final day.
+- Job create/edit screens now share the same clearly labelled schedule fields and explain what each date/time means. The form sets browser date/time limits as values change.
+- Added online and offline regression cases for conflicting dates, shared-validator relationship coverage, and form labels/date limits.
+- Simplified the DB-001 and account-error wording. Added `docs/ZAZU_PLAIN_LANGUAGE_STANDARD.md` as a standing product-wide writing rule.
+- Windows startup now checks migration status before starting Laravel. When updates are pending, it must create and verify a full database + private-files backup before applying them, then confirm no migrations remain pending. Backup or migration failure blocks server startup.
+- **Verification:** Source is committed on `main`. Exact-head CI and PowerShell execution for this follow-up have not yet been observed. No readiness uplift is claimed.
+
+## Open owner-reported database incident — 2026-11-17
+
+- Repeated user-facing `DB-001` incidents were reported. References: `2bc77a48-5c6c-4095-afe2-fa079f60e4ba` and `aa9080f4-9580-41c9-a643-439b31928ffa`.
+- The newer reference was supplied with the Account access error screen; the exact action that triggered that occurrence was not stated.
+- Source inspection found that the Work controller writes the five new scheduling columns, while the previous Windows start path did not check or apply pending migrations. A local SQLite database behind the current code is therefore the leading explanation, **not a confirmed root cause**.
+- Backup-first migration handling has now been added to the shared Windows startup script. It has not yet run against the owner's installed database. The incident remains OPEN until exact runtime evidence confirms the cause and the affected workflow succeeds.
