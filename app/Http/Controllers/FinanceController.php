@@ -20,6 +20,7 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\URL;
 use Illuminate\Support\Str;
 use Illuminate\Validation\Rule;
 use Illuminate\View\View;
@@ -377,8 +378,13 @@ class FinanceController extends Controller
 
         abort_unless((int) $invoice->business_id === $businessId, 404);
 
+        $customerUrl = in_array($invoice->status, ['issued', 'paid'], true)
+            ? URL::temporarySignedRoute('finance.invoices.public', now()->addDays(7), ['invoice' => $invoice])
+            : null;
+
         return view('finance.invoice-show', [
             'invoice' => $invoice,
+            'customerUrl' => $customerUrl,
         ]);
     }
 
