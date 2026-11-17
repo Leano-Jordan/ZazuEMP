@@ -1658,4 +1658,64 @@ test.describe('Zazu installed PWA offline shell', () => {
         await expect(page.getByRole('heading', { name: 'Dashboard' })).toBeVisible();
         await expect(page.locator('.zazu-error-shell')).toHaveCount(0);
     });
+    test('opens a device-local customer relationship view while disconnected', async ({ page, context }, testInfo) => {
+        test.setTimeout(25_000);
+        test.skip(testInfo.project.name !== 'chromium', 'Customer local-detail contract runs once on desktop Chromium.');
+
+        const customerLocalId = 'local:customer-detail-acceptance';
+        const jobLocalId = 'local:customer-detail-job';
+        const customerName = 'Offline relationship customer';
+
+        await login(page);
+        await page.goto('/customers', { waitUntil: 'domcontentloaded' });
+        await waitForOfflineRuntime(page);
+        await page.evaluate(async ({ customerLocalId, jobLocalId, customerName }) => {
+            await window.ZazuOffline.ready;
+            const state = window.ZazuOffline.getState();
+            state.customers = [{
+                local_id: customerLocalId,
+                name: customerName,
+                contact_name: 'Offline primary contact',
+                phone: '0123456789',
+                email: 'offline@example.test',
+                billing_address: 'Pretoria, Gauteng',
+                notes: 'Customer notes stored on this device',
+            }];
+            state.jobs = [{
+                local_id: jobLocalId,
+                customer_local_id: customerLocalId,
+                name: 'Offline wedding job',
+                reference: 'LOCAL-JOB-001',
+                event_date: '2026-12-12',
+                status: 'confirmed',
+            }];
+            state.quotes = [{
+                local_id: 'local:customer-detail-quote',
+                event_local_id: jobLocalId,
+                reference: 'LOCAL-QUOTE-001',
+                status: 'sent',
+            }];
+            await window.ZazuOffline.persist();
+            window.dispatchEvent(new CustomEvent('zazu:offline-state-updated'));
+        }, { customerLocalId, jobLocalId, customerName });
+
+        await context.setOffline(true);
+        const customerRow = page.locator('[data-zazu-local-record="customer"]').filter({ hasText: customerName });
+        await expect(customerRow).toBeVisible();
+        await customerRow.getByRole('button', { name: 'View offline' }).click();
+
+        const detail = page.getByRole('region', { name: 'Offline customer details' });
+        await expect(detail).toBeVisible();
+        await expect(detail.getByText(customerName)).toBeVisible();
+        await expect(detail.getByText('Offline primary contact')).toBeVisible();
+        await expect(detail.getByText('Pretoria, Gauteng')).toBeVisible();
+        await expect(detail.getByText('Customer notes stored on this device')).toBeVisible();
+        await expect(detail.getByText('Offline wedding job')).toBeVisible();
+        await expect(detail.getByText('LOCAL-JOB-001')).toBeVisible();
+        await expect(detail.getByText('LOCAL-QUOTE-001')).toBeVisible();
+
+        await detail.getByRole('button', { name: 'Close' }).click();
+        await expect(detail).toBeHidden();
+    });
+
 });
