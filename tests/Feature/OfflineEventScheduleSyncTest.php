@@ -125,4 +125,58 @@ class OfflineEventScheduleSyncTest extends TestCase
         $this->assertSame('2026-12-13', $saved->collection_date->format('Y-m-d'));
     }
 
+
+    public function test_offline_job_update_rejects_conflicting_schedule_dates(): void
+    {
+        $business = Business::create([
+            'name' => 'Offline Invalid Schedule Business',
+            'slug' => 'offline-invalid-schedule-'.Str::lower(Str::random(8)),
+            'status' => 'active',
+            'currency' => 'ZAR',
+        ]);
+        $device = SyncDevice::create([
+            'business_id' => $business->id,
+            'installation_id' => (string) Str::uuid(),
+            'device_name' => 'Invalid schedule phone',
+            'device_type' => 'phone',
+            'metadata' => ['sync_token_hash' => hash('sha256', 'offline-invalid-schedule-token')],
+            'token_expires_at' => now()->addDays(SyncDevice::SYNC_TOKEN_IDLE_EXPIRY_DAYS),
+        ]);
+        $event = Event::create([
+            'business_id' => $business->id,
+            'reference' => 'OFFLINE-SCHEDULE-INVALID',
+            'name' => 'Existing event',
+            'event_type' => 'Other',
+            'event_date' => '2026-12-11',
+            'status' => 'confirmed',
+        ]);
+        $identity = app(\App\Support\Offline\SyncEntityIdentityRegistry::class)
+            ->identify($event, 'job')
+            ->entity_uuid;
+
+        $mutation = app(SyncMutationRecorder::class)->record($device, 'job', $identity, 'update', [
+            'local_id' => $identity,
+            'record' => [
+                'name' => 'Existing event',
+                'event_type' => 'Other',
+                'status' => 'confirmed',
+                'event_date' => '2026-12-11',
+                'event_end_date' => '2026-12-10',
+            ],
+        ]);
+
+        try {
+            app(SyncMutationApplier::class)->apply($mutation, [
+                'job' => app(\App\Support\Offline\OfflineDomainMutationHandler::class),
+            ]);
+            $this->fail('An offline job update with an end date before its start date must be rejected.');
+        } catch (\Illuminate\Validation\ValidationException $exception) {
+            $this->assertArrayHasKey('event_end_date', $exception->errors());
+        }
+
+        $this->assertSame('2026-12-11', $event->fresh()->event_date->format('Y-m-d'));
+        $this->assertSame('pending', $mutation->fresh()->status);
+    }
+
+
 }
