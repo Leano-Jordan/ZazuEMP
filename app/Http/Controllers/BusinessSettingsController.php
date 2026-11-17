@@ -10,6 +10,7 @@ use App\Support\CurrentBusiness;
 use App\Support\BusinessEntitlement;
 use App\Support\Audit;
 use Carbon\Carbon;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -48,7 +49,38 @@ class BusinessSettingsController extends Controller
         $business = app(CurrentBusiness::class)->model($request->user());
         abort_unless((int) $device->business_id === (int) $business->id, 404);
 
-        DB::transaction(function () use ($device, $business): void {
+        $this->revokeSyncDeviceRecord($device, $business);
+
+        return redirect()->route('settings.index')->with('success', 'Device access revoked. The device must be trusted again before it can sync.');
+    }
+
+    public function revokeSyncDeviceByInstallation(Request $request): JsonResponse
+    {
+        $validated = $request->validate([
+            'installation_id' => ['required', 'uuid'],
+        ]);
+        $business = app(CurrentBusiness::class)->model($request->user());
+
+        $device = SyncDevice::query()
+            ->where('business_id', $business->id)
+            ->where('installation_id', $validated['installation_id'])
+            ->first();
+
+        if (! $device) {
+            return response()->json(['revoked' => true, 'already_revoked' => true]);
+        }
+
+        $this->revokeSyncDeviceRecord($device, $business, 'offline_logout_retry');
+
+        return response()->json([
+            'revoked' => true,
+            'device_id' => (int) $device->id,
+        ]);
+    }
+
+    private function revokeSyncDeviceRecord(SyncDevice $device, Business $business, ?string $reason = null): void
+    {
+        DB::transaction(function () use ($device, $business, $reason): void {
             $lockedDevice = SyncDevice::query()
                 ->whereKey($device->getKey())
                 ->lockForUpdate()
@@ -77,15 +109,18 @@ class BusinessSettingsController extends Controller
             ])->save();
 
             if ($needsAudit) {
-                Audit::record('sync.device.revoked', $business, [
+                $auditContext = [
                     'device_id' => (int) $lockedDevice->id,
                     'device_name' => $lockedDevice->device_name,
                     'device_type' => $lockedDevice->device_type,
-                ], $business->id);
+                ];
+                if ($reason !== null) {
+                    $auditContext['reason'] = $reason;
+                }
+
+                Audit::record('sync.device.revoked', $business, $auditContext, $business->id);
             }
         });
-
-        return redirect()->route('settings.index')->with('success', 'Phone access revoked. The device must be paired again before it can sync.');
     }
 
     /**
