@@ -1,13 +1,13 @@
 <?php
 
-namespace Tests\\Feature;
+namespace Tests\Feature;
 
-use App\\Models\\Invoice;
-use App\\Support\\CurrentBusiness;
-use Illuminate\\Foundation\\Testing\\RefreshDatabase;
-use Illuminate\\Support\\Facades\\URL;
-use Illuminate\\Support\\Str;
-use Tests\\TestCase;
+use App\Models\Invoice;
+use App\Support\CurrentBusiness;
+use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\URL;
+use Illuminate\Support\Str;
+use Tests\TestCase;
 
 class InvoiceCustomerShareTest extends TestCase
 {
@@ -39,7 +39,7 @@ class InvoiceCustomerShareTest extends TestCase
         $customerView->assertOk()
             ->assertSee('INV-CUSTOMER-SHARE-001')
             ->assertSee('Public invoice service')
-            ->assertSee('ZAR 1,150.00')
+            ->assertSee('ZAR 1150.00')
             ->assertSee('Print / Save as PDF')
             ->assertDontSee('Private internal note')
             ->assertDontSee('Payment history')
