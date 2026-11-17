@@ -103,58 +103,7 @@ class PasswordResetController extends Controller
 
         Auth::logoutOtherDevices($validated['password']);
 
-        // Sync devices are business-scoped rather than user-scoped. After an
-        // owner resets their password, revoke every trusted device in each
-        // business they own so old bearer tokens cannot outlive account recovery.
-        $ownedBusinessIds = $user->businesses()
-            ->wherePivot('role', 'owner')
-            ->pluck('businesses.id');
-
-        if ($ownedBusinessIds->isNotEmpty()) {
-            DB::transaction(function () use ($ownedBusinessIds): void {
-                $businesses = Business::query()
-                    ->whereIn('id', $ownedBusinessIds)
-                    ->get()
-                    ->keyBy('id');
-
-                $devices = SyncDevice::query()
-                    ->whereIn('business_id', $ownedBusinessIds)
-                    ->lockForUpdate()
-                    ->get();
-
-                foreach ($devices as $device) {
-                    $metadata = $device->metadata ?? [];
-                    $needsAudit = $device->status !== 'revoked' || $device->revoked_at === null;
-                    $needsCleanup = $device->token_expires_at !== null
-                        || array_key_exists('sync_token_hash', $metadata)
-                        || array_key_exists('pairing_code_hash', $metadata)
-                        || array_key_exists('pairing_expires_at', $metadata);
-
-                    if (! $needsAudit && ! $needsCleanup) {
-                        continue;
-                    }
-
-                    unset($metadata['sync_token_hash'], $metadata['pairing_code_hash'], $metadata['pairing_expires_at']);
-
-                    $device->forceFill([
-                        'status' => 'revoked',
-                        'revoked_at' => $device->revoked_at ?? now(),
-                        'token_expires_at' => null,
-                        'metadata' => $metadata,
-                    ])->save();
-
-                    if ($needsAudit && isset($businesses[$device->business_id])) {
-                        $business = $businesses[$device->business_id];
-                        Audit::record('sync.device.revoked', $business, [
-                            'device_id' => (int) $device->id,
-                            'device_name' => $device->device_name,
-                            'device_type' => $device->device_type,
-                            'reason' => 'owner_password_reset',
-                        ], $business->id);
-                    }
-                }
-            });
-        }
+        $this->revokeOwnedBusinessDevices($user);
 
         $ownedBusiness = $user->businesses()
             ->where('businesses.status', 'active')
@@ -171,5 +120,73 @@ class PasswordResetController extends Controller
         return redirect()
             ->route('dashboard')
             ->with('success', 'Your password has been reset.');
+    }
+}
+
+
+    /**
+     * Trusted sync credentials belong to a business rather than a single user.
+     * Revoking devices across the reset owner's businesses ensures stale bearer
+     * tokens cannot survive account recovery.
+     */
+    private function revokeOwnedBusinessDevices(User $user): void
+    {
+        $businessIds = $user->businesses()
+            ->wherePivot('role', 'owner')
+            ->pluck('businesses.id');
+
+        if ($businessIds->isEmpty()) {
+            return;
+        }
+
+        DB::transaction(function () use ($businessIds): void {
+            $businesses = Business::query()
+                ->whereIn('id', $businessIds)
+                ->get()
+                ->keyBy('id');
+
+            SyncDevice::query()
+                ->whereIn('business_id', $businessIds)
+                ->orderBy('id')
+                ->lockForUpdate()
+                ->get()
+                ->each(fn (SyncDevice $device) => $this->revokeTrustedDevice($device, $businesses));
+        });
+    }
+
+    /**
+     * @param \Illuminate\Support\Collection<int, Business> $businesses
+     */
+    private function revokeTrustedDevice(SyncDevice $device, $businesses): void
+    {
+        $metadata = $device->metadata ?? [];
+        $needsAudit = $device->status !== 'revoked' || $device->revoked_at === null;
+        $needsCleanup = $device->token_expires_at !== null
+            || array_key_exists('sync_token_hash', $metadata)
+            || array_key_exists('pairing_code_hash', $metadata)
+            || array_key_exists('pairing_expires_at', $metadata);
+
+        if (! $needsAudit && ! $needsCleanup) {
+            return;
+        }
+
+        unset($metadata['sync_token_hash'], $metadata['pairing_code_hash'], $metadata['pairing_expires_at']);
+
+        $device->forceFill([
+            'status' => 'revoked',
+            'revoked_at' => $device->revoked_at ?? now(),
+            'token_expires_at' => null,
+            'metadata' => $metadata,
+        ])->save();
+
+        $business = $businesses->get($device->business_id);
+        if ($needsAudit && $business instanceof Business) {
+            Audit::record('sync.device.revoked', $business, [
+                'device_id' => (int) $device->id,
+                'device_name' => $device->device_name,
+                'device_type' => $device->device_type,
+                'reason' => 'owner_password_reset',
+            ], $business->id);
+        }
     }
 }
