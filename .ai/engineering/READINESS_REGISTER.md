@@ -7,6 +7,19 @@ Evidence maturity: 73/100 unchanged; no uplift claimed.
 ## Owner-approved V1 scheduling addition — 2026-11-17
 Event scheduling and connected rental logistics are explicitly authorised for V1: multi-day event dates, start/end times, setup/collection dates, schedule clash warnings, and rental allocation defaults using the event logistics window. Staff scheduling, quantity-based rental stock and wider workforce management remain deferred. Implementation is on `main` at code baseline `71c8fc5c7aeba392b95e26aee694945b286f2c8e`; Laravel 532/1 skipped/3,714 assertions and PHPMD pass. Windows package + PowerShell install/recovery pass on 2ef2a0b; PostgreSQL migration/recovery and offline-browser acceptance PASS at exact application-code baseline 71c8fc5 in run 44152431508.
 
+## Open runtime blocker — repeated DB-001 (2026-11-17)
+
+**Status:** OPEN — cause not yet proven  
+**Owner-reported references:** `2bc77a48-5c6c-4095-afe2-fa079f60e4ba`, `aa9080f4-9580-41c9-a643-439b31928ffa`
+
+The owner reported repeated database errors on the installed Windows application. The latest reference was supplied with the Account access error screen; its exact triggering action is not recorded.
+
+**Source finding:** Work creation/editing now writes five scheduling columns introduced by migration `2026_11_17_000001_add_event_schedule_fields.php`. The previous shared Windows start script did not check or apply pending migrations. This makes local schema drift the leading hypothesis, but the reference number alone does not reveal the SQL exception.
+
+**Correction on main:** Windows startup now checks migration status. If migrations are pending, it creates and verifies a full installation backup containing the database and private files before applying them, then checks that all migrations completed. Startup stops if backup, migration or final status verification fails.
+
+**Closure evidence still required:** Exact-head Windows startup/upgrade CI; successful execution on the owner's intended installation; confirmation that all migrations are current; and successful completion of the job save that previously failed. No root cause or runtime fix is claimed yet.
+
 ## Existing release gates
 | Gate | Disposition | Closure evidence |
 |---|---|---|
