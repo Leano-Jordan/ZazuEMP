@@ -1,6 +1,6 @@
 # Zazu EMP — Commercial Completion Backlog
 
-**Status:** Recorded for later execution  
+**Status:** Active — first customer-document sharing increment in progress  
 **Canonical repository:** `Leano-Jordan/ZazuEMP`  
 **Branch:** `main`  
 **Owner authority:** Founder  
@@ -14,11 +14,15 @@ DB-001 remains the active release blocker: repeated database read/write failures
 
 ## Deferred commercial workstreams
 
-### COM-01 — WhatsApp and PDF document sharing
-- [ ] Generate professional, printable PDFs for supported customer-facing documents, beginning with quotes, invoices and receipts.
-- [ ] Add a WhatsApp share handoff that uses the generated document and appropriate customer context.
-- [ ] Verify behaviour on desktop and Android, including missing WhatsApp, unavailable network, cancelled share and file-generation failure.
-- [ ] Keep private business documents access-controlled; do not expose public permanent file URLs by default.
+### COM-01 — WhatsApp and PDF document sharing — PARTIAL
+- [x] Quote customer view can be printed/saved as PDF through the browser's native print dialog.
+- [x] Invoice customer view can be printed/saved as PDF through the browser's native print dialog.
+- [x] Quote and invoice pages provide WhatsApp message handoff to the corresponding customer view.
+- [x] Invoice customer sharing uses a signed, read-only link with a seven-day expiry; void/draft invoices are not shareable.
+- [ ] Direct PDF-file generation and attachment sharing (rather than a customer link) remains open.
+- [ ] Add customer-ready receipts and extend PDF output to receipts.
+- [ ] Verify desktop/Android handoff, including WhatsApp missing, offline use, cancellation and expiry behaviour.
+- [ ] Keep private business documents access-controlled; do not expose permanent public file URLs.
 
 ### COM-02 — Payment links and payment reconciliation
 - [ ] Select and document a suitable payment-provider approach for the South African launch market.
@@ -67,3 +71,8 @@ DB-001 remains the active release blocker: repeated database read/write failures
 - `docs/V1_RELEASE_CHECKLIST.md`
 
 **Director disposition:** All five commercial workstreams are recorded and deferred for planned execution. DB-001 and the existing V1 release gates retain priority.
+
+
+## COM-01 implementation checkpoint — 2026-11-18
+
+The first customer-document handoff increment adds browser print-to-PDF on the signed public quote page, WhatsApp handoff from the quote detail, and a seven-day signed read-only invoice customer view with WhatsApp handoff. This is not a generated PDF attachment workflow: the browser creates the PDF when the user chooses Print / Save as PDF, while WhatsApp currently sends the expiring customer link. Direct PDF file generation/attachment, receipts and physical desktop/Android acceptance remain open. DB-001 remains a separate release blocker.
