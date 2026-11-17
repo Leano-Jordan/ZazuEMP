@@ -182,6 +182,66 @@ jobs:
           php artisan package:discover --ansi
           if ($LASTEXITCODE -ne 0) { throw 'Laravel package discovery failed.' }
 
+      - name: Verify Windows backup and private-media recovery
+        shell: powershell
+        run: |
+          $ErrorActionPreference = 'Stop'
+          $project = (Get-Location).Path
+
+          # Use a disposable sentinel table and private file so this drill proves
+          # that Windows ZIP/SQLite recovery restores both data classes.
+          $privateDirectory = Join-Path $project 'storage\\app\\private\\windows-recovery-acceptance'
+          $privateProbe = Join-Path $privateDirectory 'media-probe.txt'
+          New-Item -ItemType Directory -Path $privateDirectory -Force | Out-Null
+          [System.IO.File]::WriteAllText($privateProbe, 'private media before restore', [System.Text.UTF8Encoding]::new($false))
+
+          $seedProbe = @'
+          $db = new PDO('sqlite:database/database.sqlite');
+          $db->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+          $db->exec('CREATE TABLE IF NOT EXISTS zazu_windows_recovery_probe (id INTEGER PRIMARY KEY, value TEXT NOT NULL)');
+          $db->exec("DELETE FROM zazu_windows_recovery_probe");
+          $db->exec("INSERT INTO zazu_windows_recovery_probe (id, value) VALUES (1, 'before-restore')");
+          '@
+          php -r $seedProbe
+          if ($LASTEXITCODE -ne 0) { throw 'Could not prepare the Windows recovery database sentinel.' }
+
+          $backupDirectory = Join-Path $env:RUNNER_TEMP 'zazu-windows-recovery-backup'
+          New-Item -ItemType Directory -Path $backupDirectory -Force | Out-Null
+          php artisan zazu:backup "--output=$backupDirectory"
+          if ($LASTEXITCODE -ne 0) { throw 'Windows backup command failed.' }
+
+          $archives = @(Get-ChildItem -Path $backupDirectory -Filter 'zazu-backup-*.zip' -File)
+          if ($archives.Count -ne 1) { throw "Expected exactly one Windows backup archive; found $($archives.Count)." }
+          $archive = $archives[0]
+
+          $mutateProbe = @'
+          $db = new PDO('sqlite:database/database.sqlite');
+          $db->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+          $db->exec("UPDATE zazu_windows_recovery_probe SET value = 'after-mutation' WHERE id = 1");
+          '@
+          php -r $mutateProbe
+          if ($LASTEXITCODE -ne 0) { throw 'Could not mutate the Windows recovery database sentinel.' }
+          [System.IO.File]::WriteAllText($privateProbe, 'private media after mutation', [System.Text.UTF8Encoding]::new($false))
+
+          php artisan zazu:restore $archive.FullName --force
+          if ($LASTEXITCODE -ne 0) { throw 'Windows restore command failed.' }
+
+          $verifyProbe = @'
+          $db = new PDO('sqlite:database/database.sqlite');
+          $db->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+          echo (string) $db->query('SELECT value FROM zazu_windows_recovery_probe WHERE id = 1')->fetchColumn();
+          '@
+          $restoredValue = (& php -r $verifyProbe | Out-String).Trim()
+          if ($LASTEXITCODE -ne 0 -or $restoredValue -ne 'before-restore') {
+            throw "Windows restore did not recover the original database value (received: $restoredValue)."
+          }
+
+          $restoredMedia = [System.IO.File]::ReadAllText($privateProbe)
+          if ($restoredMedia -ne 'private media before restore') {
+            throw 'Windows restore did not recover the original private-media bytes.'
+          }
+
+          Write-Host "PASS: Windows backup/restore recovered the SQLite sentinel and private media from $($archive.Name)."
       - name: Run the first-install script using Windows PowerShell
         shell: powershell
         run: |
