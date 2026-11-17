@@ -20,6 +20,83 @@ class OfflineFinancialMutationValidationTest extends TestCase
 {
     use RefreshDatabase;
 
+    public function test_offline_invoice_rejects_impossible_issue_and_due_dates(): void
+    {
+        $business = Business::create([
+            'name' => 'Offline Invoice Date Validation',
+            'slug' => 'offline-invoice-date-'.Str::lower(Str::random(8)),
+            'status' => 'active',
+            'currency' => 'ZAR',
+        ]);
+        $device = SyncDevice::create([
+            'business_id' => $business->id,
+            'installation_id' => (string) Str::uuid(),
+        ]);
+        $event = Event::create([
+            'business_id' => $business->id,
+            'reference' => 'OFF-INVOICE-DATE',
+            'name' => 'Offline invoice date validation',
+            'status' => 'confirmed',
+        ]);
+        $quote = \\App\\Models\\Quote::create([
+            'event_id' => $event->id,
+            'reference' => 'QUO-OFF-INVOICE-DATE',
+            'status' => 'accepted',
+            'currency' => 'ZAR',
+        ]);
+        $version = $quote->versions()->create([
+            'version' => 1,
+            'status' => 'accepted',
+            'subtotal' => '100.00',
+            'tax_total' => '0.00',
+            'total' => '100.00',
+            'deposit_percent' => '0.00',
+            'deposit_amount' => '0.00',
+            'tax_label' => 'No tax',
+            'tax_treatment' => 'out_of_scope',
+            'tax_rate' => '0.00',
+            'tax_snapshot_at' => now(),
+        ]);
+        $version->items()->create([
+            'description' => 'Invoice date validation item',
+            'quantity' => '1.00',
+            'unit' => 'service',
+            'unit_price' => '100.00',
+            'line_total' => '100.00',
+            'source_snapshot' => ['offline' => true],
+        ]);
+        $quoteIdentity = app(SyncEntityIdentityRegistry::class)->identify($quote, 'quote');
+        $recorder = app(SyncMutationRecorder::class);
+        $applier = app(SyncMutationApplier::class);
+        $handler = app(OfflineDomainMutationHandler::class);
+
+        foreach (['issued_at', 'due_at'] as $dateField) {
+            $localId = (string) Str::uuid();
+            $mutation = $recorder->record(
+                $device,
+                'invoice',
+                $localId,
+                'create',
+                [
+                    'local_id' => $localId,
+                    'record' => [
+                        'quote_local_id' => $quoteIdentity->entity_uuid,
+                        $dateField => '2026-02-31',
+                    ],
+                ],
+            );
+
+            try {
+                $applier->apply($mutation, ['invoice' => $handler]);
+                $this->fail('Offline invoices must reject impossible calendar dates.');
+            } catch (ValidationException) {
+                $this->assertSame('pending', $mutation->fresh()->status);
+            }
+        }
+
+        $this->assertSame(0, \\App\\Models\\Invoice::query()->where('business_id', $business->id)->count());
+    }
+
     public function test_offline_financial_mutations_reject_invalid_enums_and_dates(): void
     {
         $business = Business::create([
