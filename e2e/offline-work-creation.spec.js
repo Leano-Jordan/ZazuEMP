@@ -13,6 +13,15 @@ async function login(page) {
     await expect(page).toHaveURL(/\/dashboard$/);
 }
 
+async function trustCurrentDevice(page) {
+    await page.goto('/settings', { waitUntil: 'domcontentloaded' });
+    const trustButton = page.getByRole('button', { name: 'Trust this device for offline sync' });
+    await expect(trustButton).toBeVisible();
+    await trustButton.click();
+    await expect(page.getByRole('button', { name: 'This device is trusted' })).toBeVisible();
+    await expect.poll(() => page.evaluate(() => window.ZazuOffline.isPaired())).toBe(true);
+}
+
 test('offline workspace remains visible for synced device-local records when the Zazu server is unavailable', async ({ page }) => {
     const runId = randomUUID().slice(0, 8);
     const customerName = 'Synced offline customer ' + runId;
@@ -219,6 +228,10 @@ test('real Zazu job form can create a job locally while disconnected', async ({ 
         () => document.documentElement.dataset.zazuOfflinePagesPrimed === 'true',
         { timeout: 20_000 },
     );
+
+    // The owner must explicitly trust this browser before offline changes can sync.
+    await trustCurrentDevice(page);
+    await page.goto('/dashboard', { waitUntil: 'domcontentloaded' });
     // Create the customer through Zazu's real customer form while offline.
     // This exercises the same form handler and durable queue used by operators.
     await page.context().setOffline(true);
@@ -322,8 +335,7 @@ test('real Zazu job form can create a job locally while disconnected', async ({ 
     await expect(page).toHaveURL(/work$/);
     await expect(page.locator('[data-zazu-local-record="job"]').filter({ hasText: jobName })).toBeVisible();
 
-    // Reconnect must provision this signed-in phone automatically. No
-    // desktop settings screen or manually generated pairing code is involved.
+    // The previously owner-trusted device must resume sync after reconnecting.
     await page.context().setOffline(false);
     await expect.poll(async () => page.evaluate(() => Boolean(window.ZazuOffline?.isPaired())), {
         timeout: 20_000,
@@ -366,6 +378,7 @@ test('an existing customer can be edited locally while disconnected and synced o
     const runId = randomUUID().slice(0, 8);
     const customerName = 'Offline edit fixture ' + runId;
     await login(page);
+    await trustCurrentDevice(page);
 
     // Create this test's own server-backed record instead of depending on
     // whichever demo customer happens to be present in the seeded database.
