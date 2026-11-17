@@ -180,7 +180,7 @@ class WorkController extends Controller
 
         $scheduleConflicts = $conflictDetector->conflicts($business->id, $validated, $event->id);
         $scheduleWarning = $scheduleConflicts->isNotEmpty()
-            ? 'This job overlaps with other scheduled work: '. $scheduleConflicts->pluck('name')->implode(', ').'. Check the calendar before confirming it.'
+            ? 'This job clashes with other scheduled work: '. $scheduleConflicts->pluck('name')->implode(', ').'. Check the calendar before you confirm it.'
             : null;
 
         if ($request->string('start_intent')->toString() === 'quote') {
@@ -295,7 +295,7 @@ class WorkController extends Controller
 
         $scheduleConflicts = $conflictDetector->conflicts($business->id, $validated, $event->id);
         $scheduleWarning = $scheduleConflicts->isNotEmpty()
-            ? 'This job overlaps with other scheduled work: '. $scheduleConflicts->pluck('name')->implode(', ').'. Check the calendar before confirming it.'
+            ? 'This job clashes with other scheduled work: '. $scheduleConflicts->pluck('name')->implode(', ').'. Check the calendar before you confirm it.'
             : null;
 
         return redirect()
