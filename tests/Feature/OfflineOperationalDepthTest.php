@@ -443,6 +443,7 @@ class OfflineOperationalDepthTest extends TestCase
             'business_id' => $business->id,
             'reference' => 'OFF-CLOSED-001',
             'name' => 'Completed Catering Job',
+            'event_type' => 'Other',
             'status' => 'completed',
         ]);
         $identity = app(\App\Support\Offline\SyncEntityIdentityRegistry::class)
