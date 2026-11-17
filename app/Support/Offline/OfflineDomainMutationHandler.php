@@ -355,17 +355,31 @@ class OfflineDomainMutationHandler implements SyncMutationHandler
         $eventDate = $schedule['event_date'];
         $eventEndDate = $schedule['event_end_date'] ?? $eventDate;
 
+        $this->assertOfflineEventDateOrder($eventDate, $eventEndDate);
+        $this->assertOfflineSetupDate($schedule['setup_date'], $eventDate);
+        $this->assertOfflineCollectionDate($schedule['collection_date'], $eventEndDate);
+        $this->assertOfflineTimeRange($schedule, $eventDate, $eventEndDate);
+    }
+
+    private function assertOfflineEventDateOrder(?string $eventDate, ?string $eventEndDate): void
+    {
         if ($eventDate !== null && $eventEndDate !== null && $eventEndDate < $eventDate) {
             throw ValidationException::withMessages(['event_end_date' => 'The event end date cannot precede its start date.']);
         }
-        if ($schedule['setup_date'] !== null && $eventDate !== null && $schedule['setup_date'] > $eventDate) {
+    }
+
+    private function assertOfflineSetupDate(?string $setupDate, ?string $eventDate): void
+    {
+        if ($setupDate !== null && $eventDate !== null && $setupDate > $eventDate) {
             throw ValidationException::withMessages(['setup_date' => 'Setup cannot be scheduled after the event begins.']);
         }
-        if ($schedule['collection_date'] !== null && $eventEndDate !== null && $schedule['collection_date'] < $eventEndDate) {
+    }
+
+    private function assertOfflineCollectionDate(?string $collectionDate, ?string $eventEndDate): void
+    {
+        if ($collectionDate !== null && $eventEndDate !== null && $collectionDate < $eventEndDate) {
             throw ValidationException::withMessages(['collection_date' => 'Collection cannot be scheduled before the event ends.']);
         }
-
-        $this->assertOfflineTimeRange($schedule, $eventDate, $eventEndDate);
     }
 
     /**
