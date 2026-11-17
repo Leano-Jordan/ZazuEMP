@@ -287,7 +287,7 @@ class ZazuBackupCommand extends Command
 
             try {
                 $manifest = json_decode($manifestContents, true, 512, JSON_THROW_ON_ERROR);
-            } catch (\\JsonException) {
+            } catch (\JsonException) {
                 return false;
             }
 
@@ -304,7 +304,7 @@ class ZazuBackupCommand extends Command
             $actualFiles = [];
             for ($index = 0; $index < $zip->numFiles; $index++) {
                 $name = $zip->getNameIndex($index);
-                if (!is_string($name) || $name === '' || str_contains($name, '\\\\') || str_contains($name, "\\0")) {
+                if (!is_string($name) || $name === '' || str_contains($name, '\\') || str_contains($name, "\\0")) {
                     return false;
                 }
 
