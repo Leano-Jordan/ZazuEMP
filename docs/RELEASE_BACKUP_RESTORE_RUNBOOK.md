@@ -160,3 +160,8 @@ Replace the archive path with the exact artifact created by the backup command. 
 - Record the exact source commit, target database service, archive identifier/hash, operator, timestamps, command outcomes and verification results. Redact credentials and personal data.
 
 **Verification boundary:** the 2026-11-12 GitHub Actions run passed a real PostgreSQL 16 database and private-file round-trip. This is automated CI evidence only. It does not verify the production database role's privileges, actual database connection secrets, persistent storage, off-host retention, production-sized data, or restore/rollback behaviour on the selected hosting target. Those remain mandatory operator release gates.
+
+
+## Backup creation integrity check
+
+The backup command does not publish the ZIP immediately after writing it. It reopens the temporary archive with ZIP consistency checking, validates the Zazu format and configured database driver, checks exact payload membership against the manifest, and recomputes every payload SHA-256. A failed check prevents publication. Restore independently repeats its own validation before any installation mutation.
