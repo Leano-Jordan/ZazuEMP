@@ -2,7 +2,9 @@
 
 namespace Tests\Feature;
 
+use App\Models\AuditLog;
 use App\Models\Business;
+use App\Models\SyncDevice;
 use App\Models\User;
 use App\Support\CurrentBusiness;
 use Illuminate\Support\Facades\Auth;
@@ -397,6 +399,88 @@ class AuthenticationTest extends TestCase
         $this->assertDatabaseMissing('sessions', ['id' => 'old-device-session']);
     }
 
+
+    public function test_password_reset_revokes_all_owned_business_devices_but_not_staff_business_devices(): void
+    {
+        $owner = User::factory()->create([
+            'username' => 'device-reset-owner',
+            'email' => 'device-reset-owner@example.com',
+            'password' => 'old-password',
+        ]);
+        $staffBusiness = Business::create([
+            'name' => 'Staff Membership Business',
+            'slug' => 'staff-membership-reset-business',
+            'status' => 'active',
+            'currency' => 'ZAR',
+        ]);
+        $ownedBusiness = Business::create([
+            'name' => 'Owned Reset Business',
+            'slug' => 'owned-reset-business',
+            'status' => 'active',
+            'currency' => 'ZAR',
+        ]);
+        $secondOwnedBusiness = Business::create([
+            'name' => 'Second Owned Reset Business',
+            'slug' => 'second-owned-reset-business',
+            'status' => 'active',
+            'currency' => 'ZAR',
+        ]);
+
+        $staffBusiness->users()->attach($owner->id, ['role' => 'staff']);
+        $ownedBusiness->users()->attach($owner->id, ['role' => 'owner']);
+        $secondOwnedBusiness->users()->attach($owner->id, ['role' => 'owner']);
+
+        $makeDevice = static function (Business $business, string $installationId): SyncDevice {
+            return SyncDevice::create([
+                'business_id' => $business->id,
+                'installation_id' => $installationId,
+                'device_name' => 'Trusted recovery device',
+                'device_type' => 'desktop',
+                'status' => 'active',
+                'token_expires_at' => now()->addDays(30),
+                'metadata' => [
+                    'sync_token_hash' => hash('sha256', 'secret-'.$installationId),
+                    'pairing_code_hash' => hash('sha256', 'pairing-'.$installationId),
+                    'pairing_expires_at' => now()->addMinutes(10)->toISOString(),
+                ],
+            ]);
+        };
+
+        $staffDevice = $makeDevice($staffBusiness, '11111111-1111-4111-8111-111111111111');
+        $ownedDevice = $makeDevice($ownedBusiness, '22222222-2222-4222-8222-222222222222');
+        $secondOwnedDevice = $makeDevice($secondOwnedBusiness, '33333333-3333-4333-8333-333333333333');
+
+        $token = Password::createToken($owner);
+
+        $this->post(route('password.update'), [
+            'token' => $token,
+            'email' => $owner->email,
+            'password' => 'new-password',
+            'password_confirmation' => 'new-password',
+        ])->assertRedirect(route('dashboard'));
+
+        foreach ([$ownedDevice, $secondOwnedDevice] as $device) {
+            $device->refresh();
+            $this->assertSame('revoked', $device->status);
+            $this->assertNotNull($device->revoked_at);
+            $this->assertNull($device->token_expires_at);
+            $this->assertArrayNotHasKey('sync_token_hash', $device->metadata ?? []);
+            $this->assertArrayNotHasKey('pairing_code_hash', $device->metadata ?? []);
+            $this->assertArrayNotHasKey('pairing_expires_at', $device->metadata ?? []);
+            $this->assertDatabaseHas('audit_logs', [
+                'business_id' => $device->business_id,
+                'action' => 'sync.device.revoked',
+            ]);
+        }
+
+        $staffDevice->refresh();
+        $this->assertSame('active', $staffDevice->status);
+        $this->assertArrayHasKey('sync_token_hash', $staffDevice->metadata ?? []);
+        $this->assertSame(2, AuditLog::query()
+            ->whereIn('business_id', [$ownedBusiness->id, $secondOwnedBusiness->id])
+            ->where('action', 'sync.device.revoked')
+            ->count());
+    }
 
     public function test_password_reset_token_cannot_be_reused(): void
     {
