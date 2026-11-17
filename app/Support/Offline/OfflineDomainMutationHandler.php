@@ -418,10 +418,19 @@ class OfflineDomainMutationHandler implements SyncMutationHandler
         $event->requirements()->whereNotIn('description', array_keys($requirements))->delete();
 
         foreach ($requirements as $description => $category) {
-            $event->requirements()->updateOrCreate(
-                ['description' => $description],
-                ['category' => $category, 'quantity' => 1, 'unit' => 'service', 'status' => 'open'],
-            );
+            $requirement = $event->requirements()->where('description', $description)->first();
+            if ($requirement) {
+                $requirement->update(['category' => $category]);
+                continue;
+            }
+
+            $event->requirements()->create([
+                'description' => $description,
+                'category' => $category,
+                'quantity' => 1,
+                'unit' => 'service',
+                'status' => 'open',
+            ]);
         }
     }
 
