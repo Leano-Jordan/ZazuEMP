@@ -1,6 +1,7 @@
 # Zazu EMP — V1 Release Checklist
 
 Baseline: Leano-Jordan/ZazuEMP / main / c7be735021e24b88052511c91652d71607f71383 (17 Nov 2026)
+Current correction candidate: pending exact-head CI
 Disposition: NOT READY · Evidence maturity: 73/100 unchanged.
 
 ## Release acceptance gates
@@ -16,4 +17,4 @@ Disposition: NOT READY · Evidence maturity: 73/100 unchanged.
 - [x] Password reset revokes the owner's trusted devices — independently verified in source.
 
 ## Current audit execution
-Rental date-allocation defect reproduced: run 44075168970, c7be735, 520 passed / 1 skipped / 3,638 assertions plus one targeted failure (non-overlapping booking received HTTP 422). A bounded online/offline correction is included in the current candidate; exact-head CI is pending. Invoice numbering remains unchanged pending SA tax-adviser advice. No score uplift or release gate closure.
+Rental date-allocation defect reproduced: run 44075168970 at c7be735, 520 passed / 1 skipped / 3,638 assertions plus one targeted failure (non-overlapping booking received HTTP 422). The first correction candidate failed Laravel due to a syntax error; corrected candidate awaits exact-head CI. Invoice numbering remains unchanged pending SA tax-adviser advice. No score uplift or release gate closure.
