@@ -1,5 +1,10 @@
 # Changelog
 
+## Unreleased — 2026-11-17 (Open-ended rental overlap hardening)
+- Extended online and offline allocation overlap checks so an allocation without a return date is treated as open-ended and cannot overlap a later booking.
+- Added regression coverage for bounded non-overlapping bookings, overlapping bookings, independent returns and open-ended overlap protection.
+- Exact-head CI for this follow-up is pending.
+
 ## Unreleased — 2026-11-17 (Rental allocation correction candidate)
 - Reproduced the non-overlapping asset booking rejection (HTTP 422) at c7be735; added online and offline regression coverage.
 - Enabled multiple non-overlapping date allocations for serialized assets, added allocation end-date entry, per-allocation return handling and consistent asset status while other bookings remain active.

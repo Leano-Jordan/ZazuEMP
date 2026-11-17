@@ -134,11 +134,15 @@ class AssetController extends Controller
             abort_unless(in_array($lockedAsset->status, ['available', 'allocated'], true), 422, 'Only available assets can be allocated.');
             abort_if($data['allocated_until'] && $data['allocated_from'] > $data['allocated_until'], 422, 'Allocation dates are invalid.');
 
-            $overlap=$lockedAsset->allocations()->where('status','allocated')
-                ->whereDate('allocated_from','<=',$data['allocated_until'] ?: $data['allocated_from'])
-                ->where(function($query) use ($data) {
-                    $query->whereNull('allocated_until')->orWhereDate('allocated_until','>=',$data['allocated_from']);
-                })->exists();
+            $overlapQuery = $lockedAsset->allocations()->where('status', 'allocated');
+            $until = $data['allocated_until'] ?? null;
+            if ($until !== null) {
+                $overlapQuery->whereDate('allocated_from', '<=', $until);
+            }
+            $overlap = $overlapQuery->where(function ($query) use ($data): void {
+                $query->whereNull('allocated_until')
+                    ->orWhereDate('allocated_until', '>=', $data['allocated_from']);
+            })->exists();
 
             abort_if($overlap, 422, 'This asset is already allocated for the selected period.');
 

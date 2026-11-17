@@ -1290,13 +1290,13 @@ class OfflineDomainMutationHandler implements SyncMutationHandler
             $lockedAsset = Asset::query()->where('business_id', $mutation->business_id)->lockForUpdate()->findOrFail($asset->id);
             abort_unless(in_array($lockedAsset->status, ['available', 'allocated'], true), 422, 'Only available assets can be allocated offline.');
 
-            $overlap = $lockedAsset->allocations()
-                ->where('status', 'allocated')
-                ->whereDate('allocated_from', '<=', $until ?: $from)
-                ->where(function ($query) use ($from): void {
-                    $query->whereNull('allocated_until')->orWhereDate('allocated_until', '>=', $from);
-                })
-                ->exists();
+            $overlapQuery = $lockedAsset->allocations()->where('status', 'allocated');
+            if ($until !== null) {
+                $overlapQuery->whereDate('allocated_from', '<=', $until);
+            }
+            $overlap = $overlapQuery->where(function ($query) use ($from): void {
+                $query->whereNull('allocated_until')->orWhereDate('allocated_until', '>=', $from);
+            })->exists();
 
             abort_if($overlap, 422, 'This asset is already allocated for the selected period.');
 

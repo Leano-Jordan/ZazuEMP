@@ -88,5 +88,35 @@ class AssetAllocationDateAvailabilityTest extends TestCase
         $this->post(route('assets.release', $asset), ['allocation_id' => $allocations[1]->id])->assertRedirect();
         $this->assertSame('returned', $allocations[1]->fresh()->status);
         $this->assertSame('available', $asset->fresh()->status);
+
+        $futureEvent = Event::create([
+            'business_id' => $business->id,
+            'reference' => 'RENTAL-004',
+            'name' => 'Later Rental',
+            'event_date' => '2026-12-25',
+            'customer_name' => 'Fourth Customer',
+            'status' => 'draft',
+        ]);
+        $openEndedEvent = Event::create([
+            'business_id' => $business->id,
+            'reference' => 'RENTAL-005',
+            'name' => 'Open-ended Rental',
+            'event_date' => '2026-12-20',
+            'customer_name' => 'Fifth Customer',
+            'status' => 'draft',
+        ]);
+
+        $this->post(route('assets.allocate', $asset), [
+            'event_id' => $futureEvent->id,
+            'allocated_from' => '2026-12-25',
+            'allocated_until' => '2026-12-26',
+        ])->assertRedirect();
+
+        $this->from(route('assets.index'))->post(route('assets.allocate', $asset), [
+            'event_id' => $openEndedEvent->id,
+            'allocated_from' => '2026-12-20',
+        ])->assertStatus(422);
+
+        $this->assertSame(3, $asset->allocations()->count());
     }
 }

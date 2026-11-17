@@ -3,24 +3,26 @@
 As of: 2026-11-17
 Repository: Leano-Jordan/ZazuEMP
 Canonical branch: main only; never create branches
-Last complete baseline: ac79543732f2c3c5345cd095dce6e55eb16ac319
-Reproduction commit: c7be735021e24b88052511c91652d71607f71383
-Previous correction attempt: dbd675448ccf62e344dbda1e0a2bc8898a8178b1 (blocked by an extra closing brace; corrected in the current candidate)
-Current correction candidate: pending commit SHA and exact-head CI
+Last fully verified HEAD: 807db36e6eb9aaded81e6bb45e1e2f0c9c18c5de
+Current follow-up candidate: open-ended allocation-overlap hardening; commit and exact-head CI pending
 Owner mandate: ship a dependable first-business V1; preserve scope; no Render or AMPPS workflow.
 
-## Current mission
-Close reproducible defects in agreed V1 workflows and demonstrated security/privacy/data-integrity failures. Offline V1 work is RESUMED and authorized under AGENTS.md for bounded workflows that close V1 gaps.
+## Verified correction
+The rental asset date-allocation defect was reproduced at c7be735 in Laravel run 44075168970: a second non-overlapping booking returned HTTP 422 before date-overlap evaluation.
+The bounded online/offline correction passed at 807db36:
+- Laravel: 521 passed, 1 skipped, 3,648 assertions.
+- Offline browser: 45 desktop tests, 6 mobile tests and 1 phone-local attachment journey passed.
+- PostgreSQL migration/registration/backup/private-file recovery passed.
+- Windows V1 package built; Windows PowerShell fresh-install smoke passed (private .env, app key, SQLite migration, route boot and loopback HTTP session cookie).
+- Populated upgrade/rollback, Zazu quality, Psalm, PHPMD, Director Health, Director Contract Lint and Push-on-main/CodeQL passed.
+- SonarCloud skipped.
+The first correction attempt dbd6754 had an extra closing brace; this was corrected in 807db36. No tests were weakened.
 
-## Reproduction evidence
-- Rental date allocation reproduced in Laravel run 44075168970 at c7be735.
-- Two non-overlapping periods on one serialized asset: second booking returned HTTP 422 before date-overlap evaluation.
-- Reproduction run: 520 passed, 1 skipped, 3,638 assertions, one intentional new regression failure. PostgreSQL migration/registration/recovery passed. Zazu quality, Director Contract Lint, Director Health and Push-on-main passed; SonarCloud skipped.
-- The first correction candidate had a PHP ParseError from one extra closing brace in AssetController; the new candidate removes it. OfflineOperationalDepthTest passed in that candidate; full Laravel run had 510 passed, 1 skipped and 11 failures caused by that parse error.
-- Online invoice-number format assertion passed: month-prefixed random suffix. Offline source uses an entity-UUID suffix. No numbering change is authorized before South African tax-adviser guidance.
+## Follow-up edge case
+The optional allocation end date means a missing end date is open-ended. The overlap query must be symmetric: a new open-ended booking starting before an existing future booking must be rejected. This follow-up adds online/offline regression coverage and is awaiting exact-head CI.
 
-## Current correction
-Allow additional allocations only when active date ranges do not overlap; expose allocation end dates; return a specific allocation; preserve allocated status while any active booking remains; keep offline sync and optimistic state consistent. Physical return remains operator-confirmed; no automatic release on event completion/cancellation/date passage.
+## Commercial numbering
+The online invoice-number format assertion passed: month-prefixed random suffix. Offline source uses an entity-UUID suffix. Numbering remains unchanged pending South African tax-adviser guidance.
 
 ## Active V1 acceptance gates
 1. Physical Android installed-app cold launch, offline restart and reconnect.
@@ -29,4 +31,4 @@ Allow additional allocations only when active date ranges do not overlap; expose
 4. POPIA operational/privacy sign-off.
 
 ## Release
-V1: NOT READY. Evidence maturity: 73/100 unchanged. Historical state/register/memory, checklist and prior changelog are preserved in docs/archive/engineering/2026-11-17-state-register-memory-history.md.
+V1: NOT READY. Evidence maturity: 73/100 unchanged. Historical state/register/memory, checklist and changelog are preserved in docs/archive/engineering/2026-11-17-state-register-memory-history.md.

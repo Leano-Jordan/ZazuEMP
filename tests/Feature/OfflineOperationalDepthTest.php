@@ -276,6 +276,52 @@ class OfflineOperationalDepthTest extends TestCase
         $this->assertSame('available', $asset->fresh()->status);
         $this->assertSame(0, $asset->allocations()->where('status', 'allocated')->count());
         $this->assertSame(2, $asset->allocations()->where('status', 'returned')->count());
+
+        $futureEvent = Event::create([
+            'business_id' => $business->id,
+            'reference' => 'OFF-ASSET-003',
+            'name' => 'Later Offline Booking',
+            'status' => 'confirmed',
+        ]);
+        $openEndedEvent = Event::create([
+            'business_id' => $business->id,
+            'reference' => 'OFF-ASSET-004',
+            'name' => 'Open-ended Offline Booking',
+            'status' => 'confirmed',
+        ]);
+        $futureEventUuid = $registry->identify($futureEvent, 'job')->entity_uuid;
+        $openEndedEventUuid = $registry->identify($openEndedEvent, 'job')->entity_uuid;
+
+        $futureAllocationUuid = (string) Str::uuid();
+        $futureAllocation = $recorder->record($device, 'asset_allocation', $futureAllocationUuid, 'create', [
+            'local_id' => $futureAllocationUuid,
+            'record' => [
+                'asset_local_id' => $assetUuid,
+                'event_local_id' => $futureEventUuid,
+                'allocated_from' => '2026-12-25',
+                'allocated_until' => '2026-12-26',
+            ],
+        ]);
+        $applier->apply($futureAllocation, ['asset_allocation' => $handler]);
+
+        $openEndedUuid = (string) Str::uuid();
+        $openEnded = $recorder->record($device, 'asset_allocation', $openEndedUuid, 'create', [
+            'local_id' => $openEndedUuid,
+            'record' => [
+                'asset_local_id' => $assetUuid,
+                'event_local_id' => $openEndedEventUuid,
+                'allocated_from' => '2026-12-20',
+            ],
+        ]);
+
+        try {
+            $applier->apply($openEnded, ['asset_allocation' => $handler]);
+            $this->fail('An open-ended earlier allocation must overlap a later booking.');
+        } catch (\\Symfony\\Component\\HttpKernel\\Exception\\HttpException $exception) {
+            $this->assertSame(422, $exception->getStatusCode());
+        }
+
+        $this->assertSame(1, $asset->allocations()->where('status', 'allocated')->count());
     }
 
     public function test_offline_job_update_cannot_mutate_a_closed_work_record(): void
