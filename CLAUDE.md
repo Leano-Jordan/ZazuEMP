@@ -1,34 +1,23 @@
 # Zazu EMP — Agent Entry Contract
 
-Zazu EMP is the only implementation target.
+**Target:** `Leano-Jordan/ZazuEMP` · **write target:** `main` only.
 
-Repository: Leano-Jordan/ZazuEMP
-Canonical branch: main
+## Fast start (every session)
+1. Read the opening **Owner V1 shipping mandate** in `memory.md` only; do not read the full history.
+2. Read the current task/target and the latest relevant entry at the top of `.ai/engineering/STATE.md`. Do not load the full STATE file.
+3. Inspect only the source, tests and specialist contract needed for that target. Read `.ai/REPOSITORY_IDENTITY_LOCK.md`, the full Director contract, failure ledgers or archives only when the task touches those controls or needs that history.
 
-## Required read order
+## Operating rules
+- Finish the agreed V1 workflows; no speculative features, perfectionism or documentation-only progress.
+- Work directly on `main`. Never create branches. Do not introduce Render or AMPPS workflows.
+- Preserve the existing product and architecture; make the smallest evidence-backed correction.
+- Never weaken tests or claim unobserved CI, runtime, browser or release evidence.
+- Do not repeat checks without new evidence or changed inputs.
+- Claude's initial role is read-only audit/advice. No code edits, commits, pushes, branches, data changes or configuration changes unless the owner explicitly authorises implementation.
+- Director/Jarvis owns sequencing, scope, evidence reconciliation and acceptance. The owner has final authority.
 
-1. .ai/REPOSITORY_IDENTITY_LOCK.md
-2. .ai/engineering/00_DIRECTOR_ENGINE.md
-3. .ai/engineering/STATE.md
-4. Relevant skill / specialist contract for the active target
-5. Failure / regression records only when required by the target
+## Documentation discipline
+Documentation is a tool, not a gate. Update a living record only when a decision, verified defect/fix, acceptance result or material handover changes. Do not create session diaries, duplicate summaries, new scorecards or task packets for routine work. Keep one concise current-state entry; retain historical evidence without making agents reread it.
 
-The canonical control contract is .ai/engineering/00_DIRECTOR_ENGINE.md.
-Do not duplicate its rules here.
-
-## Execution
-
-Morpheus / Director is the control-plane authority.
-
-Use current repository state, not historical chat, as engineering truth.
-Do not claim tests, runtime, CI, browser or release evidence that was not actually observed.
-Do not weaken tests/evals to obtain green results.
-Destructive or irreversible actions require explicit owner authority unless already explicitly authorised by the active instruction.
-
-For repeated failures, load the persistent failure case before another correction.
-
-## Current owner handover — 2026-11-17
-
-Before auditing or advising on V1, read `docs/CLAUDE_HANDOVER_2026-11-17.md`. It records the current baseline, recent correction evidence, exact CI runs, audit targets, owner/operator release gates and the required Claude output.
-
-Claude's initial engagement is read-only audit and advice. Do not write code, commit, push, create branches or alter data unless the owner explicitly assigns that work. `main` is the only engineering write target; existing non-main refs are read-only legacy state.
+## Claude handover
+For the current bounded audit, read `docs/CLAUDE_HANDOVER_2026-11-17.md`. It is a brief, not a mandatory full-repository reading list. Start with the single highest-value target agreed with Director; expand only if evidence requires it.
