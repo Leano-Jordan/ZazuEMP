@@ -41,6 +41,8 @@ class InvoiceCustomerShareTest extends TestCase
             ->assertSee('Public invoice service')
             ->assertSee('ZAR 1150.00')
             ->assertSee('Print / Save as PDF')
+            ->assertHeader('Cache-Control', 'private, no-store, no-cache, must-revalidate')
+            ->assertHeader('Referrer-Policy', 'no-referrer')
             ->assertDontSee('Private internal note')
             ->assertDontSee('Payment history')
             ->assertDontSee('Record payment');
