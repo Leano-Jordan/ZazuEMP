@@ -1,5 +1,11 @@
 # Changelog
 
+## Unreleased — 2026-11-17 (Director audit reconciliation)
+- Reconciled Director state, readiness register and V1 release checklist to live main HEAD ac795437 and exact-head CI evidence.
+- Archived prior long-form state, readiness register and memory snapshots without discarding history.
+- Recorded Claude's eight findings in the existing readiness register; no duplicate backlog or scorecard.
+- Confirmed root ROSCORE_PROJECT_MANIFEST.md as canonical; docs/ROSCOR_PROJECT_MANIFEST.md is now a legacy pointer.
+
 ## Unreleased — 2026-11-17
 
 - Corrected offline purchase-order decimal handling to use integer-cent arithmetic and reject precision loss.

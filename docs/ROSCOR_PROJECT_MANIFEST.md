@@ -1,36 +1,5 @@
-# Rosscore Project Manifest — Zazu EMP
+# Legacy project-manifest pointer
 
-## Identity
-- Company: Rosscore Labs
-- Company Director: **Ross**
-- Project: Zazu EMP
-- Repository: Leano-Jordan/ZazuEMP
-- Local root: C:\Projects\ZazuEMP
-- Canonical branch: main
-- Project Director: **Jarvis** (internal engine: Morpheus)
+The canonical Zazu EMP project manifest is the repository-root file ROSCORE_PROJECT_MANIFEST.md.
 
-## Active-project rule
-
-When this repository/workspace is the active target, the implementation target is Zazu EMP only.
-
-Before any write verify:
-- repository is Leano-Jordan/ZazuEMP
-- workspace is C:\Projects\ZazuEMP when local
-- branch is main unless explicitly overridden
-- requested task is within Zazu scope
-
-Do not modify Swift Order or any other repository from a Zazu task.
-
-## Cross-project visibility
-
-Rosscore Labs and other projects may be known at company level. Their product facts, architecture, requirements, release state and historical decisions are not fallback Zazu knowledge.
-
-For missing Zazu facts: mark UNKNOWN and inspect current Zazu evidence.
-
-## Human-professional rule
-
-Challenge owner proposals when evidence supports a material objection. After the Founder decides, execute the decision and record accepted risk where appropriate.
-
-## Parent contract
-
-Company-level rules live in the Rosscore Labs repository. This manifest establishes the local project boundary and never overrides the local Zazu Director control plane.
+This older file is retained only for compatibility with historical links. Do not update it as a second source of truth. Current repository identity and engineering boundaries are controlled by .ai/REPOSITORY_IDENTITY_LOCK.md and .ai/engineering/00_DIRECTOR_ENGINE.md.
