@@ -27,7 +27,7 @@ jobs:
         run: npm ci
 
       - name: Audit locked npm dependencies
-        run: npm audit --audit-level=high
+        run: node scripts/audit-npm.mjs
 
       - name: Test service-worker authentication cache races
         run: npm run test:service-worker
