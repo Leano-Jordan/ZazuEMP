@@ -190,7 +190,7 @@ jobs:
 
           # Use a disposable sentinel table and private file so this drill proves
           # that Windows ZIP/SQLite recovery restores both data classes.
-          $privateDirectory = Join-Path $project 'storage\\app\\private\\windows-recovery-acceptance'
+          $privateDirectory = Join-Path $project 'storage/app/private/windows-recovery-acceptance'
           $privateProbe = Join-Path $privateDirectory 'media-probe.txt'
           New-Item -ItemType Directory -Path $privateDirectory -Force | Out-Null
           [System.IO.File]::WriteAllText($privateProbe, 'private media before restore', [System.Text.UTF8Encoding]::new($false))
