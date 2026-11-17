@@ -35,6 +35,9 @@ class OfflinePurchasePrecisionTest extends TestCase
         $invalidLines = [
             ['quantity' => '0.004', 'unit_price' => '10.00'],
             ['quantity' => '1.00', 'unit_price' => '1.005'],
+            // Exercise decoded JSON numeric values as floats, not only strings.
+            ['quantity' => 1.005, 'unit_price' => 10.00],
+            ['quantity' => 1.00, 'unit_price' => 1.005],
         ];
 
         foreach ($invalidLines as $line) {
