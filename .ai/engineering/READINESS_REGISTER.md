@@ -33,7 +33,7 @@ Evidence maturity: 73/100 unchanged; no uplift claimed.
 - Offline payment, expense and invoice dates now reject malformed and impossible calendar dates.
 - An all-zero offline purchase receipt is rejected before a receipt record or idempotency key is consumed.
 - Focused regression coverage includes these cases and float-decoded purchase-order quantity/price precision.
-- Exact-head Laravel, browser, quality and security evidence is pending. These changes are not marked verified and do not change the 73/100 score or release disposition.
+- Exact code-head Laravel: PASS — 526 passed / 1 skipped / 3,680 assertions. PHPMD, Zazu Quality, Director Health, Composer security audit, secret scan, CodeQL and PostgreSQL migration/recovery: PASS. Offline browser acceptance remains in progress. No score uplift; release remains NOT READY.
 
 ## Documentation and commercial decisions
 - Offline work is ACTIVE/RESUMED; stale pause notes are historical and archived.
