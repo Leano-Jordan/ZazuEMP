@@ -4,9 +4,11 @@ namespace Tests\Feature;
 
 use App\Models\Business;
 use App\Models\Event;
+use App\Models\Invoice;
 use App\Models\Payment;
 use App\Models\Quote;
 use App\Models\SyncDevice;
+use App\Models\SyncEntityIdentity;
 use App\Support\Offline\OfflineDomainMutationHandler;
 use App\Support\Offline\SyncEntityIdentityRegistry;
 use App\Support\Offline\SyncMutationApplier;
@@ -19,6 +21,71 @@ use Tests\TestCase;
 class OfflinePaymentPrecisionTest extends TestCase
 {
     use RefreshDatabase;
+
+    public function test_offline_payment_cannot_target_an_invoice_from_another_business(): void
+    {
+        $business = Business::create([
+            'name' => 'Offline Payment Boundary Business',
+            'slug' => 'offline-payment-boundary-'.Str::lower(Str::random(8)),
+            'status' => 'active',
+            'currency' => 'ZAR',
+        ]);
+        $foreignBusiness = Business::create([
+            'name' => 'Foreign Invoice Business',
+            'slug' => 'foreign-invoice-'.Str::lower(Str::random(8)),
+            'status' => 'active',
+            'currency' => 'ZAR',
+        ]);
+        $device = SyncDevice::create([
+            'business_id' => $business->id,
+            'installation_id' => (string) Str::uuid(),
+        ]);
+        $foreignEvent = Event::create([
+            'business_id' => $foreignBusiness->id,
+            'reference' => 'FOREIGN-OFF-PAYMENT',
+            'name' => 'Foreign Payment Event',
+            'status' => 'draft',
+        ]);
+        $foreignInvoice = Invoice::create([
+            'business_id' => $foreignBusiness->id,
+            'event_id' => $foreignEvent->id,
+            'number' => 'INV-FOREIGN-OFFLINE',
+            'status' => 'issued',
+            'currency' => 'ZAR',
+            'subtotal' => '100.00',
+            'tax_total' => '0.00',
+            'total' => '100.00',
+            'tax_label' => 'No tax',
+            'tax_treatment' => 'out_of_scope',
+            'tax_rate' => '0.00',
+            'issued_at' => now()->toDateString(),
+        ]);
+        $foreignIdentity = app(SyncEntityIdentityRegistry::class)->identify($foreignInvoice, 'invoice');
+
+        $recorder = app(SyncMutationRecorder::class);
+        $applier = app(SyncMutationApplier::class);
+        $handler = app(OfflineDomainMutationHandler::class);
+        $mutationId = (string) Str::uuid();
+        $mutation = $recorder->record($device, 'payment', $mutationId, 'create', [
+            'local_id' => $mutationId,
+            'record' => [
+                'invoice_local_id' => $foreignIdentity->entity_uuid,
+                'type' => 'payment',
+                'amount' => '25.00',
+                'method' => 'bank_transfer',
+                'paid_at' => now()->toDateString(),
+            ],
+        ]);
+
+        try {
+            $applier->apply($mutation, ['payment' => $handler]);
+            $this->fail('A trusted device must not post a payment against another business invoice.');
+        } catch (ValidationException) {
+            $this->assertSame(0, Payment::query()->where('business_id', $business->id)->count());
+            $this->assertSame(0, Payment::query()->where('business_id', $foreignBusiness->id)->count());
+            $this->assertSame('pending', $mutation->fresh()->status);
+        }
+    }
 
     public function test_offline_payment_rejects_amount_precision_loss_without_posting(): void
     {
