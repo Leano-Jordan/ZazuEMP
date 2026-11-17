@@ -70,6 +70,11 @@ class EventSchedulingWorkflowTest extends TestCase
         $this->assertSame('2026-12-10', $event->setup_date->format('Y-m-d'));
         $this->assertSame('2026-12-13', $event->collection_date->format('Y-m-d'));
         $response->assertSessionHas('schedule_warning');
+
+        $calendar = $this->get(route('calendar.index', ['month' => '2026-12', 'view' => 'month']));
+        $calendar->assertOk();
+        $calendar->assertSee('Multi-day wedding');
+        $this->assertGreaterThanOrEqual(2, substr_count($calendar->getContent(), 'Multi-day wedding'));
     }
 
     public function test_same_day_event_end_time_must_follow_start_time(): void
