@@ -132,11 +132,24 @@ class ErrorHandlingTest extends TestCase
                     && ! str_contains((string) $serialized, 'select * from private_customers');
             });
 
+        $pdoException = new \PDOException($marker);
+        $pdoException->errorInfo = ['HY000', 1, $marker];
+
+        Log::shouldReceive('log')
+            ->once()
+            ->withArgs(function (string $level, string $message, array $context): bool {
+                return $context['database_connection'] === 'sqlite'
+                    && $context['database_driver'] === 'sqlite'
+                    && $context['database_sqlstate'] === 'HY000'
+                    && $context['database_driver_code'] === 1
+                    && $context['database_operation'] === null;
+            });
+
         ZazuIncidentRecorder::record(new QueryException(
             'sqlite',
             'select * from private_customers where email = ?',
             [$marker],
-            new \PDOException($marker)
+            $pdoException
         ));
     }
 
