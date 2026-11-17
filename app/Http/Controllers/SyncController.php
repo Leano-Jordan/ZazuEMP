@@ -61,7 +61,7 @@ class SyncController extends Controller
         $selection = $requestedSelection
             ? $this->validateSelection($business, $requestedSelection)
             : app(SyncBootstrapPayloadBuilder::class)->defaultSelection($business);
-        $pairingCode = (string) random_int(100000, 999999);
+        $pairingCode = (string) random_int(10000000, 99999999);
         $installationId = (string) Str::uuid();
         $expiresAt = now()->addMinutes($validated['expires_in_minutes'] ?? 10);
 
@@ -152,7 +152,7 @@ class SyncController extends Controller
     public function provision(Request $request): JsonResponse
     {
         $validated = $request->validate([
-            'pairing_code' => ['required', 'digits:6'],
+            'pairing_code' => ['required', 'digits:8'],
             'device_name' => ['nullable', 'string', 'max:120'],
             'device_type' => ['nullable', 'string', 'max:32'],
         ]);
