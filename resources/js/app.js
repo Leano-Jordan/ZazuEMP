@@ -1445,8 +1445,117 @@ function setupZazuOfflineDirectoryViews() {
                 button.setAttribute('aria-expanded', 'false');
                 button.focus();
             });
-            heading.append(title, close);
+            const editButton = document.createElement('button');
+            editButton.type = 'button';
+            editButton.className = 'zazu-btn zazu-btn-secondary';
+            editButton.textContent = 'Edit offline';
+            editButton.setAttribute('aria-expanded', 'false');
+            heading.append(title, editButton, close);
             panel.append(heading);
+
+            const editForm = document.createElement('form');
+            editForm.className = 'mt-4 grid gap-3';
+            editForm.dataset.zazuJobOfflineEdit = '1';
+            editForm.hidden = true;
+            const editFields = document.createElement('div');
+            editFields.className = 'grid gap-3 sm:grid-cols-2';
+            const addEditField = (labelText, name, value, type = 'text', multiline = false, maxLength = null) => {
+                const label = document.createElement('label');
+                label.className = 'zazu-field';
+                const caption = document.createElement('span');
+                caption.className = 'zazu-label';
+                caption.textContent = labelText;
+                const input = document.createElement(multiline ? 'textarea' : 'input');
+                input.className = multiline ? 'zazu-textarea' : 'zazu-input';
+                input.name = name;
+                input.value = value == null ? '' : String(value);
+                if (multiline) input.rows = 3;
+                else input.type = type;
+                if (name === 'name') input.required = true;
+                if (maxLength) input.maxLength = maxLength;
+                label.append(caption, input);
+                editFields.append(label);
+            };
+            addEditField('Job name', 'name', currentJob.name, 'text', false, 255);
+            addEditField('Event date', 'event_date', currentJob.event_date ? String(currentJob.event_date).slice(0, 10) : '', 'date');
+            addEditField('Venue / address', 'event_address', currentJob.event_address, 'text', false, 255);
+            addEditField('Operational notes', 'notes', currentJob.notes, 'text', true, 5000);
+            const editStatus = document.createElement('p');
+            editStatus.className = 'zazu-panel-copy';
+            editStatus.setAttribute('role', 'status');
+            editStatus.setAttribute('aria-live', 'polite');
+            const editActions = document.createElement('div');
+            editActions.className = 'flex flex-wrap gap-2';
+            const saveEdit = document.createElement('button');
+            saveEdit.type = 'submit';
+            saveEdit.className = 'zazu-btn zazu-btn-primary';
+            saveEdit.textContent = 'Save offline changes';
+            const cancelEdit = document.createElement('button');
+            cancelEdit.type = 'button';
+            cancelEdit.className = 'zazu-btn zazu-btn-ghost';
+            cancelEdit.textContent = 'Cancel';
+            cancelEdit.addEventListener('click', () => {
+                editForm.hidden = true;
+                editButton.setAttribute('aria-expanded', 'false');
+            });
+            editActions.append(saveEdit, cancelEdit);
+            editForm.append(editFields, editStatus, editActions);
+            panel.append(editForm);
+
+            editButton.addEventListener('click', () => {
+                editForm.hidden = !editForm.hidden;
+                editButton.setAttribute('aria-expanded', editForm.hidden ? 'false' : 'true');
+                if (!editForm.hidden) editForm.querySelector('[name="name"]')?.focus();
+            });
+
+            editForm.addEventListener('submit', async event => {
+                event.preventDefault();
+                if (saveEdit.disabled) return;
+                const formData = new FormData(editForm);
+                const payload = {
+                    local_id: currentJob.local_id,
+                    server_id: currentJob.server_id ?? currentJob.id ?? null,
+                    name: String(formData.get('name') || '').trim(),
+                    event_type: currentJob.event_type || 'Other',
+                    event_date: String(formData.get('event_date') || '').trim() || null,
+                    event_address: String(formData.get('event_address') || '').trim() || null,
+                    notes: String(formData.get('notes') || '').trim() || null,
+                    customer_local_id: currentJob.customer_local_id || customer?.local_id || null,
+                    customer_name: customer?.name || currentJob.customer_name || null,
+                    event_day_contact_id: currentJob.event_day_contact_id ?? null,
+                    event_night_contact_id: currentJob.event_night_contact_id ?? null,
+                };
+                if (!payload.local_id || !payload.name) {
+                    editStatus.textContent = 'A job name and local workspace identity are required.';
+                    return;
+                }
+
+                saveEdit.disabled = true;
+                saveEdit.textContent = 'Saving…';
+                editStatus.textContent = '';
+                try {
+                    const nextState = JSON.parse(JSON.stringify(window.ZazuOffline.getState()));
+                    const jobIndex = nextState.jobs.findIndex(item => item.local_id === payload.local_id);
+                    if (jobIndex < 0) throw new Error('This job is no longer available in the local workspace.');
+                    nextState.jobs[jobIndex] = {
+                        ...nextState.jobs[jobIndex],
+                        ...payload,
+                        pending_sync: true,
+                    };
+                    await window.ZazuOffline.queueMutation('job', 'update', payload, nextState);
+                    editStatus.textContent = 'Saved on this device. It will sync when Zazu reconnects.';
+                    editForm.hidden = true;
+                    editButton.setAttribute('aria-expanded', 'false');
+                    panel.hidden = true;
+                    button.setAttribute('aria-expanded', 'false');
+                    window.dispatchEvent(new CustomEvent('zazu:offline-state-updated'));
+                } catch (error) {
+                    editStatus.textContent = error.message || 'The job change could not be saved locally.';
+                } finally {
+                    saveEdit.disabled = false;
+                    saveEdit.textContent = 'Save offline changes';
+                }
+            });
 
             const customer = (currentState.customers || []).find(item =>
                 (currentJob.customer_local_id && item.local_id === currentJob.customer_local_id)
@@ -1605,7 +1714,23 @@ function setupZazuOfflineDirectoryViews() {
             const serverRow = serverId
                 ? register.querySelector('[data-zazu-server-job-id="' + Number(serverId) + '"]')
                 : null;
-            if (serverRow) addJobOfflineDetails(serverRow, job);
+            if (serverRow) {
+                const syncStatus = localSyncStatus(state, 'job', job.local_id, serverId, job.pending_sync === true);
+                const actions = serverRow.querySelector('.zazu-ops-actions');
+                let syncChip = actions?.querySelector('[data-zazu-local-sync-chip]');
+                if (actions && !syncChip) {
+                    syncChip = document.createElement('span');
+                    syncChip.className = 'zazu-chip zazu-chip-neutral';
+                    syncChip.dataset.zazuLocalSyncChip = '1';
+                    actions.prepend(syncChip);
+                }
+                if (syncChip) {
+                    syncChip.textContent = syncStatus.label;
+                    syncChip.title = syncStatus.title;
+                    syncChip.setAttribute('aria-label', syncStatus.label + '. ' + syncStatus.title);
+                }
+                addJobOfflineDetails(serverRow, job);
+            }
         }
         const jobs = allJobs.filter(job => {
             if (filter && !['all', 'draft'].includes(filter)) return false;
@@ -1666,8 +1791,9 @@ function setupZazuOfflineDirectoryViews() {
                 })(),
                 (() => {
                     const status = document.createElement('span');
-                    const syncStatus = localSyncStatus(state, 'job', job.local_id, job.server_id ?? job.id);
+                    const syncStatus = localSyncStatus(state, 'job', job.local_id, job.server_id ?? job.id, job.pending_sync === true);
                     const chip = text('span', 'zazu-chip zazu-chip-neutral', syncStatus.label);
+                    chip.dataset.zazuLocalSyncChip = '1';
                     chip.title = syncStatus.title;
                     chip.setAttribute('aria-label', syncStatus.label + '. ' + syncStatus.title);
                     status.append(chip);
