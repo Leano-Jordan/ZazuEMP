@@ -202,7 +202,9 @@ jobs:
           $db->exec("DELETE FROM zazu_windows_recovery_probe");
           $db->exec("INSERT INTO zazu_windows_recovery_probe (id, value) VALUES (1, 'before-restore')");
           '@
-          php -r $seedProbe
+          $seedScript = Join-Path $env:RUNNER_TEMP 'zazu-recovery-seed.php'
+          [System.IO.File]::WriteAllText($seedScript, "<?php`n" + $seedProbe, [System.Text.UTF8Encoding]::new($false))
+          php $seedScript
           if ($LASTEXITCODE -ne 0) { throw 'Could not prepare the Windows recovery database sentinel.' }
 
           $backupDirectory = Join-Path $env:RUNNER_TEMP 'zazu-windows-recovery-backup'
@@ -219,7 +221,9 @@ jobs:
           $db->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
           $db->exec("UPDATE zazu_windows_recovery_probe SET value = 'after-mutation' WHERE id = 1");
           '@
-          php -r $mutateProbe
+          $mutateScript = Join-Path $env:RUNNER_TEMP 'zazu-recovery-mutate.php'
+          [System.IO.File]::WriteAllText($mutateScript, "<?php`n" + $mutateProbe, [System.Text.UTF8Encoding]::new($false))
+          php $mutateScript
           if ($LASTEXITCODE -ne 0) { throw 'Could not mutate the Windows recovery database sentinel.' }
           [System.IO.File]::WriteAllText($privateProbe, 'private media after mutation', [System.Text.UTF8Encoding]::new($false))
 
@@ -231,7 +235,9 @@ jobs:
           $db->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
           echo (string) $db->query('SELECT value FROM zazu_windows_recovery_probe WHERE id = 1')->fetchColumn();
           '@
-          $restoredValue = (& php -r $verifyProbe | Out-String).Trim()
+          $verifyScript = Join-Path $env:RUNNER_TEMP 'zazu-recovery-verify.php'
+          [System.IO.File]::WriteAllText($verifyScript, "<?php`n" + $verifyProbe, [System.Text.UTF8Encoding]::new($false))
+          $restoredValue = (& php $verifyScript | Out-String).Trim()
           if ($LASTEXITCODE -ne 0 -or $restoredValue -ne 'before-restore') {
             throw "Windows restore did not recover the original database value (received: $restoredValue)."
           }
