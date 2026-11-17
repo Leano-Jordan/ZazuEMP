@@ -121,8 +121,6 @@ class PasswordResetController extends Controller
             ->route('dashboard')
             ->with('success', 'Your password has been reset.');
     }
-}
-
 
     /**
      * Trusted sync credentials belong to a business rather than a single user.
