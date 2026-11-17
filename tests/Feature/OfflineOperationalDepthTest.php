@@ -317,7 +317,7 @@ class OfflineOperationalDepthTest extends TestCase
         try {
             $applier->apply($openEnded, ['asset_allocation' => $handler]);
             $this->fail('An open-ended earlier allocation must overlap a later booking.');
-        } catch (\\Symfony\\Component\\HttpKernel\\Exception\\HttpException $exception) {
+        } catch (\Symfony\Component\HttpKernel\Exception\HttpException $exception) {
             $this->assertSame(422, $exception->getStatusCode());
         }
 

@@ -1,5 +1,8 @@
 # Changelog
 
+## Unreleased — 2026-11-17 (Follow-up test correction)
+- Corrected the fully-qualified HttpException namespace in the open-ended allocation regression test; exact-head CI remains pending.
+
 ## Unreleased — 2026-11-17 (Open-ended rental overlap hardening)
 - Extended online and offline allocation overlap checks so an allocation without a return date is treated as open-ended and cannot overlap a later booking.
 - Added regression coverage for bounded non-overlapping bookings, overlapping bookings, independent returns and open-ended overlap protection.
