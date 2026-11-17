@@ -4,6 +4,8 @@ namespace Tests\Feature;
 
 use App\Models\Business;
 use App\Models\Event;
+use App\Models\Invoice;
+use App\Models\Quote;
 use App\Models\FinanceExpense;
 use App\Models\Payment;
 use App\Models\SyncDevice;
@@ -38,7 +40,7 @@ class OfflineFinancialMutationValidationTest extends TestCase
             'name' => 'Offline invoice date validation',
             'status' => 'confirmed',
         ]);
-        $quote = \\App\\Models\\Quote::create([
+        $quote = Quote::create([
             'event_id' => $event->id,
             'reference' => 'QUO-OFF-INVOICE-DATE',
             'status' => 'accepted',
@@ -94,7 +96,7 @@ class OfflineFinancialMutationValidationTest extends TestCase
             }
         }
 
-        $this->assertSame(0, \\App\\Models\\Invoice::query()->where('business_id', $business->id)->count());
+        $this->assertSame(0, Invoice::query()->where('business_id', $business->id)->count());
     }
 
     public function test_offline_financial_mutations_reject_invalid_enums_and_dates(): void
