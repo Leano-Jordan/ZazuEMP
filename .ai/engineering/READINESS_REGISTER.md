@@ -1,12 +1,13 @@
 # Zazu EMP — V1 Readiness Register
 
-Last verified engineering source baseline: Leano-Jordan/ZazuEMP / main / 71c8fc5c7aeba392b95e26aee694945b286f2c8e / 17 Nov 2026
+Last verified repository HEAD: Leano-Jordan/ZazuEMP / main / 1bb4936594add3368dd3f39d9ec969ef5b7b5ca1 / 17 Nov 2026
+Last application-code test baseline: 71c8fc5c7aeba392b95e26aee694945b286f2c8e
 Last application-code test baseline: a5ead696429867bcd57342406bb37662ca1b2f2c
 Release disposition: NOT READY
 Evidence maturity: 73/100 unchanged; no uplift claimed.
 
 ## Owner-approved V1 scheduling addition — 2026-11-17
-Event scheduling and connected rental logistics are explicitly authorised for V1: multi-day event dates, start/end times, setup/collection dates, schedule clash warnings, and rental allocation defaults using the event logistics window. Staff scheduling, quantity-based rental stock and wider workforce management remain deferred. Implementation is on `main` at code baseline `71c8fc5c7aeba392b95e26aee694945b286f2c8e`; Laravel 532/1 skipped/3,714 assertions and PHPMD pass. Windows package + PowerShell install/recovery pass on 2ef2a0b; PostgreSQL and offline-browser acceptance remain pending exact-head CI.
+Event scheduling and connected rental logistics are explicitly authorised for V1: multi-day event dates, start/end times, setup/collection dates, schedule clash warnings, and rental allocation defaults using the event logistics window. Staff scheduling, quantity-based rental stock and wider workforce management remain deferred. Implementation is on `main` at code baseline `71c8fc5c7aeba392b95e26aee694945b286f2c8e`; Laravel 532/1 skipped/3,714 assertions and PHPMD pass. Windows package + PowerShell install/recovery pass on 2ef2a0b; PostgreSQL migration/recovery and offline-browser acceptance PASS at exact application-code baseline 71c8fc5 in run 44152431508.
 
 ## Existing release gates
 | Gate | Disposition | Closure evidence |
@@ -15,7 +16,7 @@ Event scheduling and connected rental logistics are explicitly authorised for V1
 | Installation recovery | OPEN — CI supporting proof added | Windows V1 Package run 82 on fd82f6a passes Windows PowerShell first install and Windows-native SQLite + private-media backup/mutate/restore; still requires the controlled drill on the intended installed target, with representative data, media, authorization, audit and migrations |
 | Commercial reconciliation | OPEN | Populated real-business quote, invoice, payment, cost and profit reconciliation |
 | POPIA operations | OPEN | Owner-approved privacy/retention, incident and operational controls |
-| Event scheduling & rental logistics | OPEN — implementation in progress | Online/offline fields, setup/collection calendar coverage, clash warnings and rental allocation defaults implemented; Laravel + PHPMD pass; close after exact-head PostgreSQL/offline-browser verification and workflow review |
+| Event scheduling & rental logistics | CLOSED — engineering/CI | Online/offline fields, setup/collection calendar coverage, clash warnings and rental allocation defaults implemented; Laravel, PostgreSQL migration/recovery and desktop/mobile offline-browser acceptance passed at 71c8fc5 in run 44152431508; physical Android remains a separate release gate |
 | Windows package | CLOSED for defined fresh-install candidate | Windows V1 Package run 82 at fd82f6a: production candidate build, PowerShell first-install smoke and Windows-native SQLite/private-media recovery pass; not an updater or hosted deployment |
 
 ## Claude independent audit reconciliation — 2026-11-17
@@ -70,3 +71,12 @@ Event scheduling and connected rental logistics are explicitly authorised for V1
 
 ## Next
 Close the physical Android device, intended-installation recovery, live financial reconciliation and POPIA operational gates. Resolve the unpatched frontend build-tool advisory when a verified upstream fix becomes available. Keep all owner-decision scope items unchanged until approved.
+
+
+## Exact-head scheduling acceptance evidence — 2026-11-17
+- GitHub Actions run `44152431508`: all three jobs completed successfully.
+- Offline browser job `134284080089`: PASS — browser suite, mobile Work/customer acceptance and phone-local attachment journey.
+- PostgreSQL job `134284080622`: PASS — migrations, account/workspace registration and backup/restore/private-file recovery.
+- Laravel job `134284080768`: PASS — service-worker/session contracts, LAN asset-origin checks, Blade/manifest/config checks and PHPUnit/Pest.
+- Application code is unchanged after tested source `71c8fc5`; latest `main` HEAD `1bb4936` is a documentation-only release-checklist commit.
+- Scheduling engineering/CI subgate closed. No overall readiness uplift: physical Android, installed-target recovery, live commercial reconciliation, POPIA and dependency advisory remain open.
