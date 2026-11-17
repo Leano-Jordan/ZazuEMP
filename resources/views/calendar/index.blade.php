@@ -97,7 +97,7 @@
                                 <a href="{{ route('calendar.index',['month'=>$block['month']->format('Y-m'),'view'=>'month']) }}" class="{{ $inMonth ? '' : 'is-adjacent' }} {{ $day->isToday() ? 'is-today' : '' }}" title="{{ $dayHolidays->pluck('name')->implode(', ') ?: ($count.' '.($count===1?'job':'jobs')) }}">{{ $day->format('j') }}@if($count)<i></i>@endif @if($dayHolidays->isNotEmpty())<b class="zazu-calendar-holiday-dot-mini holiday-{{ $dayHolidays->first()['category'] }}" title="{{ $dayHolidays->pluck('name')->implode(', ') }}"></b>@endif</a>
                             @endforeach
                         </div>
-                        <footer>{{ $block['eventsByDate']->flatten(1)->count() }} {{ $block['eventsByDate']->flatten(1)->count()===1?'job':'jobs' }}</footer>
+                        <footer>{{ $block['eventsByDate']->flatten(1)->unique('id')->count() }} {{ $block['eventsByDate']->flatten(1)->unique('id')->count()===1?'job':'jobs' }}</footer>
                         @php $blockHolidays = $block['holidays']->flatten(1); @endphp
                         @if($blockHolidays->isNotEmpty())
                             <div class="zazu-calendar-mini-holidays">
@@ -112,7 +112,7 @@
         @elseif($view === 'year')
             <div class="zazu-calendar-year-grid">
                 @foreach($yearMonths as $yearMonth)
-                    @php $count=$yearMonth['eventsByDate']->flatten(1)->count(); $yearMonthHolidays=$yearMonth['holidays']->flatten(1); @endphp
+                    @php $count=$yearMonth['eventsByDate']->flatten(1)->unique('id')->count(); $yearMonthHolidays=$yearMonth['holidays']->flatten(1); @endphp
                     <a href="{{ route('calendar.index',['month'=>$yearMonth['month']->format('Y-m'),'view'=>'month']) }}" class="zazu-calendar-year-month {{ $yearMonth['month']->isSameMonth(now())?'is-current':'' }}">
                         <header><strong>{{ $yearMonth['month']->format('F') }}</strong><span>{{ $count }} {{ $count===1?'job':'jobs' }}</span></header>
                         <div class="zazu-calendar-mini-weekdays">@foreach(['M','T','W','T','F','S','S'] as $weekday)<span>{{ $weekday }}</span>@endforeach</div>
