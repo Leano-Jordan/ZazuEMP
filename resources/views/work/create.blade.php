@@ -124,6 +124,31 @@
                                 <input type="date" name="event_date" value="{{ old('event_date') }}" required class="zazu-input">
                                 @error('event_date')<span class="zazu-field-error">{{ $message }}</span>@enderror
                             </label>
+                            <label class="zazu-field">
+                                <span class="zazu-label">Event end date</span>
+                                <input type="date" name="event_end_date" value="{{ old('event_end_date') }}" class="zazu-input">
+                                @error('event_end_date')<span class="zazu-field-error">{{ $message }}</span>@enderror
+                            </label>
+                            <label class="zazu-field">
+                                <span class="zazu-label">Start time</span>
+                                <input type="time" name="event_start_time" value="{{ old('event_start_time') }}" class="zazu-input">
+                                @error('event_start_time')<span class="zazu-field-error">{{ $message }}</span>@enderror
+                            </label>
+                            <label class="zazu-field">
+                                <span class="zazu-label">End time</span>
+                                <input type="time" name="event_end_time" value="{{ old('event_end_time') }}" class="zazu-input">
+                                @error('event_end_time')<span class="zazu-field-error">{{ $message }}</span>@enderror
+                            </label>
+                            <label class="zazu-field">
+                                <span class="zazu-label">Setup date</span>
+                                <input type="date" name="setup_date" value="{{ old('setup_date') }}" class="zazu-input">
+                                @error('setup_date')<span class="zazu-field-error">{{ $message }}</span>@enderror
+                            </label>
+                            <label class="zazu-field">
+                                <span class="zazu-label">Collection date</span>
+                                <input type="date" name="collection_date" value="{{ old('collection_date') }}" class="zazu-input">
+                                @error('collection_date')<span class="zazu-field-error">{{ $message }}</span>@enderror
+                            </label>
                             <label class="zazu-field zazu-field-wide">
                                 <span class="zazu-label">Job location</span>
                                 <input name="event_address" value="{{ old('event_address') }}" class="zazu-input">
