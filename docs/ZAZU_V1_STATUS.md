@@ -1,3 +1,28 @@
+## Director update — 2026-11-17 (offline customer detail and archive validation hardening)
+
+**Canonical repository:** \`Leano-Jordan/ZazuEMP\` · **branch:** \`main\`  
+**Verified application/test source:** \`325dc671d1005fd157fdaa64979d818a66961f0c\`.
+
+### Corrections committed
+- Customer offline detail rendering no longer references the Work-only \`currentJob\` variable. The invalid reference could stop the customer panel from rendering.
+- Malformed business archive JSON is now returned as a controlled archive validation error instead of an uncaught JSON exception. A dedicated regression verifies the upload is rejected without changing business records.
+- Offline Work requirement reconciliation was split into focused helpers to remain within PHPMD complexity limits without changing reconciliation behaviour.
+- Offline Work lifecycle and archive malformed-upload tests were separated into focused test classes to keep test classes maintainable.
+- The Work-detail browser assertion now handles the customer name appearing in more than one detail row.
+
+### Exact-head automated evidence
+- Laravel: **520 passed / 1 skipped / 3,635 assertions**.
+- PostgreSQL migration, account/workspace registration, and database/private-file backup/restore: **PASS**.
+- PHPMD: **PASS**.
+- Zazu Quality, Composer security audit and secret scan: **PASS**.
+- Offline browser acceptance was still running when this checkpoint was recorded; no browser pass is claimed here.
+- The populated commercial reconciliation regression is included in the passing Laravel suite. It verifies accepted quote → invoice → deposit → final payment → received purchasing → actual cost → event completion → event profitability, including report output and exclusion of void/planned/cancelled values.
+
+### Release disposition
+**V1 remains NOT READY.** Automated recovery and commercial regression coverage are verified, but they do not replace the installed Windows recovery drill or the owner's live-business reconciliation. Physical Android installed-app cold launch/restart/reconnect and POPIA operational sign-off remain open. Brand/name clearance remains deferred by owner direction. No live business data or production installation was changed.
+
+---
+
 ## Director update — 2026-11-17 (offline Work editing and lifecycle)
 
 **Current source head:** `ac761414a9ec4339812646e25238d5b4ae888c85` on canonical `main`.
