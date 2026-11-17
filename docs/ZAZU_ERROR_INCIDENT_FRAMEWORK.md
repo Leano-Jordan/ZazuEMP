@@ -46,9 +46,9 @@ Please try again. If the problem continues, share this reference number with sup
 
 Reference number: request ID
 
-The authoritative application incident log records the request ID, error classification, exception class, source file/line, route/action, method/path and timestamp. Request middleware also adds the request ID to the log context and response header.
+The authoritative application incident log records the request ID, error classification, exception class, source file/line, route/action, method/path and timestamp. Request middleware also adds the request ID to the log context and response header. For database exceptions, the logger additionally records bounded diagnostic fields when available: configured connection name, database driver, five-character SQLSTATE, numeric driver error code and read/write operation type.
 
-The incident logger intentionally omits exception messages, SQL, bindings and stack traces. The reference ID is therefore used to correlate the event with the bounded metadata available in the log; it does not reveal the underlying SQL failure by itself. If deeper diagnostics are required, obtain them through a controlled local reproduction or a separately approved, access-restricted diagnostic process. Never add raw customer data, credentials, SQL bindings or stack traces to routine production logs.
+The incident logger intentionally omits exception messages, SQL, bindings, stack traces, connection hosts, database names and credentials. The reference ID can now correlate a database incident with the SQLSTATE and driver code when the database supplies them, but it still does not identify the failed query or schema object. If those fields are insufficient, obtain deeper evidence through a controlled local reproduction or a separately approved, access-restricted diagnostic process. Never add raw customer data, credentials, SQL bindings or stack traces to routine production logs.
 
 Never expose technical diagnostics, environment secrets or internal infrastructure details to the user.
 
