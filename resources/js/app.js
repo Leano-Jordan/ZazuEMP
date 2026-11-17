@@ -1791,11 +1791,17 @@ function setupZazuOfflineDirectoryViews() {
                 })(),
                 (() => {
                     const status = document.createElement('span');
-                    const syncStatus = localSyncStatus(state, 'job', job.local_id, job.server_id ?? job.id, job.pending_sync === true);
-                    const chip = text('span', 'zazu-chip zazu-chip-neutral', syncStatus.label);
-                    chip.dataset.zazuLocalSyncChip = '1';
-                    chip.title = syncStatus.title;
-                    chip.setAttribute('aria-label', syncStatus.label + '. ' + syncStatus.title);
+                    const statusValue = String(job.status || 'draft');
+                    const statusLabel = statusValue.replace(/_/g, ' ');
+                    const statusClass = {
+                        confirmed: 'zazu-chip-success',
+                        in_progress: 'zazu-chip-info',
+                        completed: 'zazu-chip-accent',
+                        cancelled: 'zazu-chip-danger',
+                    }[statusValue] || 'zazu-chip-neutral';
+                    const chip = text('span', 'zazu-chip ' + statusClass, statusLabel);
+                    chip.title = 'Current job lifecycle status stored on this device.';
+                    chip.setAttribute('aria-label', 'Job status: ' + statusLabel);
                     status.append(chip);
                     return status;
                 })()
@@ -1803,7 +1809,7 @@ function setupZazuOfflineDirectoryViews() {
 
             const actions = document.createElement('div');
             actions.className = 'zazu-ops-actions';
-            const syncStatus = localSyncStatus(state, 'job', job.local_id, job.server_id ?? job.id);
+            const syncStatus = localSyncStatus(state, 'job', job.local_id, job.server_id ?? job.id, job.pending_sync === true);
             const syncChip = text('span', 'zazu-chip zazu-chip-neutral', syncStatus.label);
             syncChip.title = syncStatus.title;
             syncChip.setAttribute('aria-label', syncStatus.label + '. ' + syncStatus.title);
