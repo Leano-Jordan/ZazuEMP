@@ -131,3 +131,10 @@ New owner-reported reference: `895e2c23-bc6b-4919-a891-1e8e5c1e27e4`. The user r
 A safe Windows capture utility is now on `main`: `ops/windows/Get-ZazuIncident.ps1`. Run it from the Zazu project folder with the reference ID; it returns only the correlated request ID, route/action, exception class, source file/line and bounded database diagnostics. It deliberately excludes SQL, bindings, messages and secrets. See `docs/DB001_INCIDENT_CAPTURE.md`.
 
 **Closure still requires:** matching runtime record, a targeted correction, and successful repeat of the affected workflow on the intended installation. Do not alter the database while the cause is unknown. Release remains NOT READY; no score uplift.
+
+
+## DB-001 read-only local SQLite inspection — OPEN (2026-11-18)
+
+A new Windows diagnostic is committed on `main`: `ops/windows/Test-ZazuDatabaseSchema.ps1`, documented in `docs/DB001_SQLITE_SCHEMA_CHECK.md`. It inspects migration status, the event scheduling migration ledger/columns, the historical `business_user.primary_niche` column and SQLite integrity without changing the database. A Windows Ops workflow contract check now guards its required checks and non-mutating boundary.
+
+**Next evidence required:** run the script against the owner's installed Zazu project and inspect the generated `Zazu-Database-Schema-Check.json`. Then select a targeted correction from the observed schema/migration state and reproduce the failing workflow. This source-side diagnostic does not establish the cause of request `895e2c23-bc6b-4919-a891-1e8e5c1e27e4`; do not claim the incident is resolved.
