@@ -103,3 +103,12 @@ V1: NOT READY. Historical state/register/memory, checklist and changelog are pre
 - The newer reference was supplied with the Account access error screen; the exact action that triggered that occurrence was not stated.
 - Source inspection found that the Work controller writes the five new scheduling columns, while the previous Windows start path did not check or apply pending migrations. A local SQLite database behind the current code is therefore the leading explanation, **not a confirmed root cause**.
 - Backup-first migration handling has now been added to the shared Windows startup script. It has not yet run against the owner's installed database. The incident remains OPEN until exact runtime evidence confirms the cause and the affected workflow succeeds.
+
+
+## DB-001 diagnostic contract correction — 2026-11-17
+
+- Inspected `app/Support/ZazuIncidentRecorder.php`, `bootstrap/app.php`, `AttachRequestId.php`, `ZazuErrorCatalog.php` and `ErrorHandlingTest.php` at the current source baseline.
+- Confirmed that the authoritative incident logger deliberately records bounded metadata only: request ID, classification, exception class, route/action, method/path, timestamp and source file/line. It intentionally omits exception messages, SQL, bindings and stack traces to prevent customer-data/credential leakage. Request middleware adds the same request ID to log context and the response header.
+- Corrected `docs/ZAZU_ERROR_INCIDENT_FRAMEWORK.md` on `main` (documentation-only commit `f88af665ae09b6f87f3c8d73a52c3cc5e4854dbd`) because its prior wording incorrectly claimed the routine incident log contained technical exception messages, stack traces and safe query context.
+- This clarifies the diagnostic contract but does not establish the cause of either owner-reported DB-001. The installed log entry matching `aa9080f4-9580-41c9-a643-439b31928ffa` is still required to identify exception class, source file/line and route. If those fields are insufficient, reproduce under controlled local diagnostics without adding raw SQL/bindings to production logs.
+- No application code changed, no database touched, no readiness uplift. DB-001 remains OPEN.
