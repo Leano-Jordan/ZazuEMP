@@ -4,9 +4,9 @@ namespace Tests\Feature;
 
 use App\Models\Business;
 use App\Models\Event;
+use App\Models\FinanceExpense;
 use App\Models\Invoice;
 use App\Models\Quote;
-use App\Models\FinanceExpense;
 use App\Models\Payment;
 use App\Models\SyncDevice;
 use App\Support\Offline\OfflineDomainMutationHandler;
