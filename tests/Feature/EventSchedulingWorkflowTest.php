@@ -100,4 +100,23 @@ class EventSchedulingWorkflowTest extends TestCase
             $this->assertTrue(Schema::hasColumn('events', $column));
         }
     }
+
+    public function test_job_schedule_fields_use_clear_labels_and_date_limits(): void
+    {
+        [$business] = $this->ownerWorkspace();
+
+        $response = $this->get(route('work.create'));
+
+        $response->assertOk();
+        $response->assertSee('Job start date');
+        $response->assertSee('Job end date');
+        $response->assertSee('The first day of the event.');
+        $response->assertSee('Leave this blank for a one-day job.');
+        $response->assertSee('Equipment collection date');
+        $response->assertSee('endDate.min = startDate.value ||', false);
+        $response->assertSee('setupDate.max = startDate.value ||', false);
+        $response->assertSee('collectionDate.min = endDate.value || startDate.value ||', false);
+    }
+
+
 }
