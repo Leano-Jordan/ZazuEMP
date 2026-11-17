@@ -266,7 +266,9 @@ class PwaOfflineFoundationTest extends TestCase
         $this->assertStringContainsString("'zazu-phone-attachments-business-' + BUSINESS_ID", $attachmentClient);
         $this->assertStringContainsString('business_id: BUSINESS_ID', $attachmentClient);
         $this->assertStringContainsString("fetch('/api/sync/revoke'", $client);
-        $this->assertStringContainsString('return revokeDeviceToken(token);', $client);
+        $this->assertStringContainsString('const result = await revokeDeviceToken(token);', $client);
+        $this->assertStringContainsString('rememberPendingDeviceRevocation(installationId)', $client);
+        $this->assertStringContainsString('retryPendingDeviceRevocation()', $client);
         $this->assertStringContainsString('let activeSyncController = null;', $client);
         $this->assertStringContainsString('activeSyncController?.abort();', $client);
         $this->assertStringContainsString('sessionCleared || !state?.sync?.token', $client);
