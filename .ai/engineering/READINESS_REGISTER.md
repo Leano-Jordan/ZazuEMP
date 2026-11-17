@@ -105,3 +105,11 @@ The incident-framework documentation was corrected on `main` (documentation-only
 The backup command now reopens its completed temporary ZIP, performs ZIP consistency checking, validates the Zazu manifest and database driver, checks that archive payload membership exactly matches the checksum manifest, and verifies every payload SHA-256 before publishing the backup. The Windows startup script's backup command therefore returns success only after this self-verification. A focused regression checks valid and tampered payload behavior.
 
 **Evidence status:** committed on `main`; exact-head Laravel and Windows workflow results are not yet available. Owner-installation migration execution and the affected account workflow remain required. No DB-001 closure or readiness uplift.
+
+
+## Zazu quality workflow — exact-head result — 2026-11-17
+
+- GitHub Actions run `44179163841` passed all jobs on `76be1f234e7726352c2e15b511b37b9084d2ddfa`: application, Composer security audit and secret scan.
+- Application: `npm ci`, scoped npm audit policy and service-worker authentication cache-race tests all passed.
+- The exact GHSA-fc5q-39xc-vjpf / CVE-2026-112366 exception remains temporary because npm has no patched picomatch version. The audit script fails closed for every other high/critical advisory and for any dependency chain not exclusively attributable to this finding.
+- This is a CI gate resolution, not vulnerability remediation. Keep the advisory tracked until upstream publishes a fix or withdraws it. No readiness score uplift; DB-001 and owner acceptance gates remain open.
