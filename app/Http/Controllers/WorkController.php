@@ -10,6 +10,7 @@ use App\Models\EventPreparationItem;
 use App\Models\EventRequirement;
 use App\Support\Audit;
 use App\Services\EventLifecycleService;
+use App\Services\EventScheduleConflictDetector;
 use App\Support\CurrentBusiness;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -113,7 +114,7 @@ class WorkController extends Controller
         ]);
     }
 
-    public function store(Request $request): RedirectResponse
+    public function store(Request $request, EventScheduleConflictDetector $conflictDetector): RedirectResponse
     {
         $business = $this->business($request);
         $validated = $request->validate($this->rules());
@@ -176,15 +177,22 @@ class WorkController extends Controller
             return $event;
         });
 
+        $scheduleConflicts = $conflictDetector->conflicts($business->id, $validated, $event->id);
+        $scheduleWarning = $scheduleConflicts->isNotEmpty()
+            ? 'Schedule overlap: '. $scheduleConflicts->pluck('name')->implode(', ').'. Review the calendar before confirming this job.'
+            : null;
+
         if ($request->string('start_intent')->toString() === 'quote') {
             return redirect()
                 ->route('work.quotes.create', $event)
-                ->with('success', 'Job created. Zazu opened the quote workflow from your starting point.');
+                ->with('success', 'Job created. Zazu opened the quote workflow from your starting point.')
+                ->with('schedule_warning', $scheduleWarning);
         }
 
         return redirect()
             ->route('work.show', $event)
-            ->with('success', 'Job created. Start by checking the services below.');
+            ->with('success', 'Job created. Start by checking the services below.')
+            ->with('schedule_warning', $scheduleWarning);
     }
 
     public function edit(Request $request, Event $event): View
@@ -215,7 +223,7 @@ class WorkController extends Controller
         return view('work.edit', compact('event', 'customers', 'customerOptions', 'hasQuotes'));
     }
 
-    public function update(Request $request, Event $event, EventLifecycleService $lifecycle): RedirectResponse
+    public function update(Request $request, Event $event, EventLifecycleService $lifecycle, EventScheduleConflictDetector $conflictDetector): RedirectResponse
     {
         $business = $this->business($request);
         $validated = $request->validate($this->rules() + [
@@ -284,9 +292,15 @@ class WorkController extends Controller
                 ->withErrors($exception->errors());
         }
 
+        $scheduleConflicts = $conflictDetector->conflicts($business->id, $validated, $event->id);
+        $scheduleWarning = $scheduleConflicts->isNotEmpty()
+            ? 'Schedule overlap: '. $scheduleConflicts->pluck('name')->implode(', ').'. Review the calendar before confirming this job.'
+            : null;
+
         return redirect()
             ->route('work.show', $event)
-            ->with('success', 'Job details updated.');
+            ->with('success', 'Job details updated.')
+            ->with('schedule_warning', $scheduleWarning);
     }
 
     public function destroy(Request $request, Event $event, EventLifecycleService $lifecycle): RedirectResponse
