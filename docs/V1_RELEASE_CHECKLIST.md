@@ -68,3 +68,10 @@ V1 remains NOT READY. Application-code CI at a5ead69 passed: Laravel 526 passed 
 - PostgreSQL job `134284080622`: migrations, account/workspace registration and backup/restore/private-file recovery passed.
 - Laravel job `134284080768`: service-worker/session contracts, LAN asset-origin checks, Blade/manifest/config checks and PHPUnit/Pest passed.
 - Scheduling engineering/CI subgate: CLOSED. Physical Android installation and disconnected cold-launch/reconnect remain a separate owner-operated gate.
+
+
+### DB-001 diagnostic contract clarification — 2026-11-17
+
+The incident logger records privacy-minimised metadata only (request ID, classification, exception class, route/action, method/path, timestamp and source file/line). It intentionally excludes exception messages, SQL, bindings and stack traces. The incident-framework documentation has been corrected to match this implementation.
+
+The owner-installation entry matching `aa9080f4-9580-41c9-a643-439b31928ffa` remains required. Use it to identify the exception class, source file/line and route; if those bounded fields do not isolate the cause, reproduce locally under controlled diagnostics. This documentation correction does not close DB-001 or verify the startup migration against the intended installation.
