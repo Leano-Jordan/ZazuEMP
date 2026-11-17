@@ -1,3 +1,25 @@
+## Director update — 2026-11-17 (offline Work editing and lifecycle)
+
+**Current source head:** `70b201fd60fd0ec947bda6cf27288767f8bb69bd` on canonical `main`.
+
+### Implemented in source
+- Existing Work records can now edit their service/requirement list from the device-local Work inspector. The change updates the local IndexedDB record and queues a `job:update` mutation.
+- Server sync reconciles the requirement list only when the mutation explicitly includes `services`. Matching requirements retain quantity, unit, notes, status and capability metadata; removed descriptions are removed; new descriptions receive the configured service category where available.
+- Offline Work edits now include lifecycle status transitions using the same `EventLifecycleService` transition and completion/cancellation guards as connected workflows.
+- Closed Work records cannot be edited from the offline inspector. The server also rejects closed-record mutations and invalid transitions.
+- Customer reassignment remains guarded when a quote exists. Existing business/event locking order is retained.
+
+### Regression coverage added
+- Laravel feature tests cover requirement reconciliation and preservation of existing requirement metadata, valid confirmed → in-progress transition, blocked completion while preparation remains open, and closed-record edit rejection.
+- Playwright coverage now exercises local service-list editing and a status transition while disconnected, including the queued mutation and updated local Work row.
+
+### Verification boundary
+These source and test changes are committed, but the Laravel and Playwright suites have **not** been executed against this head. GitHub currently reports no combined status entries or workflow runs for this commit. No test pass is claimed.
+
+**Release remains NOT READY.** Physical Android installed-app offline acceptance, installed-target database/private-media recovery, live populated-business commercial reconciliation, and POPIA/privacy/brand closure remain separate acceptance gates. No branches, production deployment, or live business data were changed.
+
+---
+
 ## Director reconciliation — 2026-11-17 (offline customer and Work read/edit workflows)
 
 **Canonical repository:** `Leano-Jordan/ZazuEMP` · **branch:** `main` · **verified head:** `3726f2f0bf08e6a3ae5e7c6dd0169d1aebc97565`.
