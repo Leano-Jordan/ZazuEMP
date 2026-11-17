@@ -42,8 +42,8 @@ class ErrorHandlingTest extends TestCase
         $response = $this->get('/dashboard');
 
         $response->assertForbidden();
-        $response->assertSee("You're signed in, but no workspace is active.");
-        $response->assertSee('Public site');
+        $response->assertSee("You're signed in, but no business is open.");
+        $response->assertSee('Home page');
         $response->assertSee('Sign out');
         $this->assertSame('AUTHZ-002', $response->headers->get('X-Zazu-Error-Code'));
     }
