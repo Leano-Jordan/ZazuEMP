@@ -16,6 +16,7 @@ use App\Models\User;
 use App\Services\BusinessArchiveService;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\DB;
 use Tests\TestCase;
 
@@ -85,6 +86,39 @@ class BusinessArchiveTest extends TestCase
 
         $this->assertRestoredArchive($target, $sourceEvent, $result);
 
+    }
+
+    public function test_malformed_business_archive_is_returned_as_validation_error_without_mutation(): void
+    {
+        $this->signInAsOwner();
+        $business = auth()->user()->businesses()->firstOrFail();
+        $archivePath = tempnam(sys_get_temp_dir(), 'zazu-invalid-archive-');
+        $zip = new \ZipArchive();
+        $this->assertTrue($zip->open($archivePath, \ZipArchive::OVERWRITE) === true);
+        $zip->addFromString('manifest.json', '{invalid json');
+        $zip->addFromString('data.json', '{}');
+        $zip->close();
+
+        try {
+            $upload = UploadedFile::fake()->createWithContent(
+                'damaged.zazu',
+                (string) file_get_contents($archivePath)
+            );
+
+            $response = $this->post(route('exports.archive.restore'), ['archive' => $upload]);
+
+            $response->assertRedirect();
+            $response->assertSessionHasErrors('archive');
+            $this->assertSame(
+                'The uploaded archive is damaged or contains invalid data.',
+                session('errors')->first('archive')
+            );
+        } finally {
+            @unlink($archivePath);
+        }
+
+        $this->assertDatabaseCount('customers', 0);
+        $this->assertSame($business->id, auth()->user()->businesses()->firstOrFail()->id);
     }
 
     public function test_restore_refuses_a_non_empty_business_without_changing_its_records(): void
