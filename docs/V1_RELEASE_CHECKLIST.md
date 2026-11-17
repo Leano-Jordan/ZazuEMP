@@ -1,6 +1,6 @@
 # Zazu EMP — V1 Release Checklist
 
-Current repository HEAD: Leano-Jordan/ZazuEMP / main / fd82f6a5fb59365687fac903f93e944394145427 (17 Nov 2026)
+Last verified engineering source baseline: Leano-Jordan/ZazuEMP / main / fd82f6a5fb59365687fac903f93e944394145427 (17 Nov 2026)
 Last application-code test baseline: a5ead696429867bcd57342406bb37662ca1b2f2c
 Disposition: NOT READY · Evidence maturity: 73/100 unchanged.
 
@@ -16,6 +16,7 @@ Disposition: NOT READY · Evidence maturity: 73/100 unchanged.
 - Repository head fd82f6a changes only the Windows package workflow after that application-code baseline.
 - Windows V1 Package run 82: PASS — candidate package built; Windows PowerShell first install passed; Windows-native backup/restore recovered both a disposable SQLite record and private-media bytes.
 - Director Health, Director Contract Lint and Push-on-main passed.
+- LAN asset delivery regression passed at a5ead69: a remote client with a stale loopback Vite hot marker receives compiled same-origin CSS/JS. The supplied 13 Nov HTTP screenshot predates this correction; physical Android HTTPS launch remains required.
 - Zazu Quality is RED at npm audit because GHSA-fc5q-39xc-vjpf / CVE-2026-112366 flags the locked picomatch build-tool dependency chain. GitHub currently lists no patched version. Composer security audit and secret scan passed. The advisory is not suppressed and no breaking Vite downgrade was applied.
 - The Windows CI recovery test is supporting evidence only; it does not close the controlled recovery drill on the intended installed target.
 ## Closed acceptance

@@ -5,6 +5,7 @@
 - Extended the Windows V1 package workflow to perform a Windows-native SQLite and private-media backup/restore round-trip. The CI drill creates disposable sentinels, backs them up, mutates both, restores the archive and verifies the original database value and file bytes.
 - Windows V1 Package run 82 at fd82f6a passed the package build, PowerShell fresh installation and the new recovery drill. This is supporting CI evidence; the owner-run recovery drill on the intended installation remains open.
 - The quality workflow now fails at npm audit because GitHub advisory GHSA-fc5q-39xc-vjpf / CVE-2026-112366 flags picomatch versions through 4.0.7. The advisory currently lists no patched version. The affected packages are in the development/build toolchain; no advisory suppression or breaking Vite downgrade was applied pending a verified fix.
+- Confirmed that LAN asset delivery fixes already in main post-date the supplied 13 Nov phone screenshot: remote requests bypass stale Vite hot URLs and receive compiled same-origin CSS/JS; Windows LAN startup validates compiled assets. The current HTTPS physical-device check remains open.
 
 
 ## 2026-11-17 — Rental asset date availability verified

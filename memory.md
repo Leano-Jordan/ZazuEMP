@@ -28,9 +28,10 @@ Zazu is a reusable commercial event-management platform for catering, event equi
 - Primary currency is South African rand (ZAR / R); show rand first in commercial analysis.
 
 ## Current verified position
-Current repository HEAD: fd82f6a5fb59365687fac903f93e944394145427. Application-code baseline: a5ead696429867bcd57342406bb37662ca1b2f2c (the only later change is the Windows package workflow).
+Last verified engineering source baseline: fd82f6a5fb59365687fac903f93e944394145427. Application-code test baseline: a5ead696429867bcd57342406bb37662ca1b2f2c (the only later change is the Windows package workflow).
 Application-code CI: Laravel 526 passed, 1 skipped, 3,681 assertions; desktop/mobile offline browser acceptance and phone-local attachment journey passed; PostgreSQL migration and recovery passed.
 Windows V1 Package run 82 at fd82f6a: candidate build, Windows PowerShell fresh install and Windows-native SQLite + private-media backup/restore passed. Director Health, Contract Lint and Push-on-main passed.
+LAN asset delivery is covered by ViteAssetDeliveryTest at application baseline a5ead69: remote clients receive compiled same-origin assets despite stale loopback Vite hot markers. This fix post-dates the supplied 13 Nov HTTP screenshot; physical Android use must still be verified from the documented HTTPS origin.
 Zazu Quality is currently red at npm audit because GHSA-fc5q-39xc-vjpf / CVE-2026-112366 flags the locked picomatch development/build dependency chain; GitHub currently lists no patched version. The finding is not suppressed or force-downgraded.
 V1 remains NOT READY; evidence maturity remains 73/100 with no uplift. Current acceptance gates: physical Android offline/reconnect; intended installed-target recovery; live populated-business financial reconciliation; POPIA operational sign-off.
 Current state: .ai/engineering/STATE.md. Sole readiness register: .ai/engineering/READINESS_REGISTER.md. Release acceptance: docs/V1_RELEASE_CHECKLIST.md.

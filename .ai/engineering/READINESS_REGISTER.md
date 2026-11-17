@@ -1,6 +1,6 @@
 # Zazu EMP — V1 Readiness Register
 
-Current repository HEAD: Leano-Jordan/ZazuEMP / main / fd82f6a5fb59365687fac903f93e944394145427 / 17 Nov 2026
+Last verified engineering source baseline: Leano-Jordan/ZazuEMP / main / fd82f6a5fb59365687fac903f93e944394145427 / 17 Nov 2026
 Last application-code test baseline: a5ead696429867bcd57342406bb37662ca1b2f2c
 Release disposition: NOT READY
 Evidence maturity: 73/100 unchanged; no uplift claimed.
@@ -45,6 +45,7 @@ Evidence maturity: 73/100 unchanged; no uplift claimed.
 - Windows V1 Package run 82: PASS — production candidate, Windows PowerShell fresh install and Windows-native backup/restore of a disposable SQLite record plus private media.
 - Director Health, Director Contract Lint and Push-on-main: PASS.
 - Composer security audit and secret scan: PASS.
+- LAN asset delivery regression: PASS at application-code baseline a5ead69. Remote clients are served compiled same-origin assets even with a stale loopback Vite hot marker; Windows LAN startup removes stale hot state and validates the built manifest. This post-dates the supplied 13 Nov screenshot. Physical Android launch from the HTTPS origin remains part of the open device gate.
 - Zazu Quality: FAIL at `npm audit --audit-level=high` due GHSA-fc5q-39xc-vjpf / CVE-2026-112366 in the locked picomatch build-tool dependency chain. GitHub's advisory currently lists affected versions through 4.0.7 and no patched version. The npm dependencies are development/build tools and are excluded from the Windows runtime candidate, but the quality workflow remains red. No force downgrade or advisory suppression applied.
 - Windows CI recovery is supporting evidence, not a replacement for the owner-run recovery drill on the intended installation.
 - No score uplift; release remains NOT READY.
