@@ -10,7 +10,7 @@ Disposition: NOT READY · Evidence maturity: 73/100 unchanged.
 - [ ] POPIA operational sign-off: privacy notice, retention/deletion, access controls and incident procedure.
 
 ## Engineering verification in progress — ff7f0bb
-- [ ] Offline financial push contract: payment/expense enums, configured quote currency, calendar-date validation, all-zero receipt rejection and float-decoded purchase-order precision. Close only on exact-head Laravel and quality/security evidence.
+- [ ] Offline financial push contract: payment/expense enums, configured quote currency, calendar-date validation, all-zero receipt rejection and float-decoded purchase-order precision. Laravel 526/1 skipped/3,680 assertions, PHPMD, Zazu Quality, Director Health, Composer security audit, secret scan, CodeQL and PostgreSQL migration/recovery pass at code head ff7f0bb; offline browser acceptance remains in progress. Close after browser result.
 
 ## Closed acceptance
 - [x] Windows fresh-install candidate package and PowerShell first-install smoke — built and verified at 00af9adda; not an updater or hosted deployment.
