@@ -16,68 +16,67 @@ final class EventScheduleConflictDetector
      */
     public function conflicts(int $businessId, array $schedule, ?int $exceptEventId = null): Collection
     {
-        $setupDate = $schedule['setup_date'] ?? null;
-        $collectionDate = $schedule['collection_date'] ?? null;
-        $eventDate = $schedule['event_date'] ?? null;
-        $eventEndDate = $schedule['event_end_date'] ?? null;
-        $eventStartTime = $schedule['event_start_time'] ?? null;
-        $eventEndTime = $schedule['event_end_time'] ?? null;
-        $startDate = $setupDate ?: $eventDate;
-        $endDate = $collectionDate ?: ($eventEndDate ?: $eventDate);
-        $hasCompleteTimeRange = $eventStartTime !== null && $eventStartTime !== ''
-            && $eventEndTime !== null && $eventEndTime !== '';
-        $startTime = $setupDate || ! $hasCompleteTimeRange ? '00:00' : $eventStartTime;
-        $endTime = $collectionDate || ! $hasCompleteTimeRange ? '23:59' : $eventEndTime;
-
-        if (! $startDate || ! $endDate) {
+        $window = $this->scheduleWindow($schedule);
+        if ($window === null) {
             return collect();
         }
-
-        $windowStart = CarbonImmutable::parse($startDate.' '.$startTime);
-        $windowEnd = CarbonImmutable::parse($endDate.' '.$endTime);
 
         return Event::query()
             ->where('business_id', $businessId)
             ->whereNotIn('status', Event::TERMINAL_STATUSES)
             ->when($exceptEventId, fn ($query) => $query->where('id', '!=', $exceptEventId))
-            ->where(function ($query) use ($endDate): void {
-                $query->whereDate('setup_date', '<=', $endDate)
-                    ->orWhere(function ($fallback) use ($endDate): void {
-                        $fallback->whereNull('setup_date')->whereDate('event_date', '<=', $endDate);
-                    });
-            })
-            ->where(function ($query) use ($startDate): void {
-                $query->whereDate('collection_date', '>=', $startDate)
-                    ->orWhere(function ($fallback) use ($startDate): void {
-                        $fallback->whereNull('collection_date')
-                            ->where(function ($end) use ($startDate): void {
-                                $end->whereDate('event_end_date', '>=', $startDate)
-                                    ->orWhere(function ($single) use ($startDate): void {
-                                        $single->whereNull('event_end_date')->whereDate('event_date', '>=', $startDate);
-                                    });
-                            });
-                    });
-            })
-            ->orderBy('event_date')
             ->get()
-            ->filter(function (Event $event) use ($windowStart, $windowEnd): bool {
-                $otherStartDate = $event->setup_date?->format('Y-m-d') ?? $event->event_date?->format('Y-m-d');
-                $otherEndDate = $event->collection_date?->format('Y-m-d')
-                    ?? $event->event_end_date?->format('Y-m-d')
-                    ?? $otherStartDate;
-
-                if (! $otherStartDate || ! $otherEndDate) {
-                    return false;
-                }
-
-                $hasOtherTimeRange = $event->event_start_time && $event->event_end_time;
-                $otherStartTime = $event->setup_date || ! $hasOtherTimeRange ? '00:00' : $event->event_start_time;
-                $otherEndTime = $event->collection_date || ! $hasOtherTimeRange ? '23:59' : $event->event_end_time;
-                $otherStart = CarbonImmutable::parse($otherStartDate.' '.$otherStartTime);
-                $otherEnd = CarbonImmutable::parse($otherEndDate.' '.$otherEndTime);
-
-                return $windowStart->lt($otherEnd) && $otherStart->lt($windowEnd);
-            })
+            ->filter(fn (Event $event): bool => $this->eventOverlapsWindow($event, $window))
             ->values();
+    }
+
+    /**
+     * @param array<string, mixed> $schedule
+     * @return array{start: CarbonImmutable, end: CarbonImmutable}|null
+     */
+    private function scheduleWindow(array $schedule): ?array
+    {
+        $eventDate = $schedule['event_date'] ?? null;
+        if (! $eventDate) {
+            return null;
+        }
+
+        $setupDate = $schedule['setup_date'] ?? null;
+        $collectionDate = $schedule['collection_date'] ?? null;
+        $eventEndDate = $schedule['event_end_date'] ?? null;
+        $startTime = $schedule['event_start_time'] ?? null;
+        $endTime = $schedule['event_end_time'] ?? null;
+        $hasTimeRange = $startTime && $endTime;
+
+        $start = $setupDate ?: $eventDate;
+        $end = $collectionDate ?: ($eventEndDate ?: $eventDate);
+
+        return [
+            'start' => CarbonImmutable::parse($start.' '.($setupDate || ! $hasTimeRange ? '00:00' : $startTime)),
+            'end' => CarbonImmutable::parse($end.' '.($collectionDate || ! $hasTimeRange ? '23:59' : $endTime)),
+        ];
+    }
+
+    /**
+     * @param array{start: CarbonImmutable, end: CarbonImmutable} $window
+     */
+    private function eventOverlapsWindow(Event $event, array $window): bool
+    {
+        $eventStartDate = $event->setup_date?->format('Y-m-d') ?? $event->event_date?->format('Y-m-d');
+        if (! $eventStartDate) {
+            return false;
+        }
+
+        $eventEndDate = $event->collection_date?->format('Y-m-d')
+            ?? $event->event_end_date?->format('Y-m-d')
+            ?? $eventStartDate;
+        $hasTimeRange = $event->event_start_time && $event->event_end_time;
+        $startTime = $event->setup_date || ! $hasTimeRange ? '00:00' : $event->event_start_time;
+        $endTime = $event->collection_date || ! $hasTimeRange ? '23:59' : $event->event_end_time;
+
+        $eventStart = CarbonImmutable::parse($eventStartDate.' '.$startTime);
+        $eventEnd = CarbonImmutable::parse($eventEndDate.' '.$endTime);
+
+        return $window['start']->lt($eventEnd) && $eventStart->lt($window['end']);
     }
 }
