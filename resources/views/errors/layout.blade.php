@@ -16,10 +16,10 @@
         $signedIn = auth()->check();
         $isWorkspaceMissing = ($code ?? '') === 'AUTHZ-002';
         $displayHeadline = $isWorkspaceMissing
-            ? "You're signed in, but no workspace is active."
+            ? "You're signed in, but no business is open."
             : ((!$signedIn && ($code ?? '') === 'AUTHZ-001') ? 'Sign in to continue.' : $headline);
         $displayMessage = $isWorkspaceMissing
-            ? 'Your account is recognised, but Zazu cannot open a business workspace for it yet. Return to the public site to check your account state, or sign out and use another account.'
+            ? 'Zazu cannot find a business linked to your account. Go to the Zazu home page to check your account, or sign out and use a different account.'
             : ((!$signedIn && ($code ?? '') === 'AUTHZ-001') ? 'This area is part of a protected Zazu workspace. Sign in to continue.' : $messageText);
     @endphp
     <main class="zazu-error-shell">
@@ -28,16 +28,16 @@
                 <span class="zazu-brand-mark">Z</span>
                 <span class="zazu-brand-name">Zazu</span>
             </div>
-            <div class="zazu-eyebrow">{{ $signedIn ? 'Account access' : 'Workspace access' }}</div>
+            <div class="zazu-eyebrow">{{ 'Account access' }}</div>
             <div class="zazu-error-code">{{ $code ?? 'ERROR' }}</div>
             <h1 class="zazu-error-title">{{ $displayHeadline }}</h1>
             <p class="zazu-error-copy">{{ $displayMessage }}</p>
 
             <div class="zazu-error-actions">
-                <a href="{{ url('/') }}" class="zazu-btn zazu-btn-secondary">Public site</a>
+                <a href="{{ url('/') }}" class="zazu-btn zazu-btn-secondary">Home page</a>
                 @if($signedIn)
                     @if(!$isWorkspaceMissing)
-                        <a href="{{ route('dashboard') }}" class="zazu-btn zazu-btn-primary">Go to workspace</a>
+                        <a href="{{ route('dashboard') }}" class="zazu-btn zazu-btn-primary">Open your business</a>
                     @endif
                     <form method="POST" action="{{ route('logout') }}" class="zazu-error-signout-form">
                         @csrf
@@ -49,7 +49,7 @@
             </div>
 
             <div class="zazu-error-reference">
-                Reference {{ $requestId ?? 'available in the request header' }}
+                Reference number: {{ $requestId ?? 'available in the request header' }}
             </div>
         </div>
     </main>
