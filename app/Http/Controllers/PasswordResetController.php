@@ -170,12 +170,16 @@ class PasswordResetController extends Controller
 
         unset($metadata['sync_token_hash'], $metadata['pairing_code_hash'], $metadata['pairing_expires_at']);
 
+        // Recovery intentionally spans every business this user owns. The
+        // normal BelongsToBusiness saving guard protects the currently selected
+        // workspace; this owner-scoped recovery has already established each
+        // target business through the user's owner pivot, so persist quietly.
         $device->forceFill([
             'status' => 'revoked',
             'revoked_at' => $device->revoked_at ?? now(),
             'token_expires_at' => null,
             'metadata' => $metadata,
-        ])->save();
+        ])->saveQuietly();
 
         $business = $businesses->get($device->business_id);
         if ($needsAudit && $business instanceof Business) {
