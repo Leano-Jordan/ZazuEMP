@@ -271,6 +271,13 @@ class OfflineOperationalDepthTest extends TestCase
             'notes' => 'Keep dietary notes',
             'status' => 'ready',
         ]);
+        $event->requirements()->create([
+            'description' => 'Removed service',
+            'category' => 'Other',
+            'quantity' => 1,
+            'unit' => 'service',
+            'status' => 'open',
+        ]);
         $identity = app(\App\Support\Offline\SyncEntityIdentityRegistry::class)
             ->identify($event, 'job')
             ->entity_uuid;
@@ -300,7 +307,7 @@ class OfflineOperationalDepthTest extends TestCase
         $this->assertDatabaseHas('event_requirements', [
             'event_id' => $event->id,
             'description' => 'Equipment hire',
-            'category' => 'Other',
+            'category' => 'Furniture & equipment',
         ]);
         $this->assertDatabaseMissing('event_requirements', [
             'event_id' => $event->id,
