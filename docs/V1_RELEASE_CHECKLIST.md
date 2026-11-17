@@ -1,23 +1,31 @@
 # Zazu EMP — V1 Release Checklist
 
-Last verified engineering source baseline: Leano-Jordan/ZazuEMP / main / fd82f6a5fb59365687fac903f93e944394145427 (17 Nov 2026)
+Last verified engineering source baseline: Leano-Jordan/ZazuEMP / main / 71c8fc5c7aeba392b95e26aee694945b286f2c8e (17 Nov 2026)
 Last application-code test baseline: a5ead696429867bcd57342406bb37662ca1b2f2c
 Disposition: NOT READY · Evidence maturity: 73/100 unchanged.
 
 ## Event scheduling and rental logistics — owner-authorised V1 addition (2026-11-17)
-Implementation baseline: `d4a3293c067972646f47c6eb74f43a62ba504a27` on `main`; exact-head CI pending.
+Implementation baseline: `71c8fc5c7aeba392b95e26aee694945b286f2c8e` on `main`.
 - [ ] Multi-day event date range, start/end time, setup and collection dates persist and validate online.
 - [ ] Schedule clash warnings identify overlapping active work without blocking an operator save.
 - [ ] Offline-created schedule fields survive sync and are included in the device workspace bootstrap.
-- [ ] Calendar displays multi-day events across each occupied event date.
+- [x] Calendar displays multi-day events and includes setup/collection logistics days.
 - [ ] Asset booking defaults use the event setup/collection window; existing overlap and independent-return protections remain intact.
-- [ ] Exact-head Laravel, migration/upgrade and offline-browser regression pass.
+- [ ] Exact-head PostgreSQL migration/recovery and desktop/mobile offline-browser regression pass (pending).
 
 ## Release acceptance gates
 - [ ] Physical Android acceptance: secure-origin install, disconnected cold launch/restart, local records/attachments and reconnect sync on actual device.
 - [ ] Installed-target recovery: controlled database + private-media backup/restore on intended Windows installation.
 - [ ] Live commercial reconciliation: populated quote → invoice → deposit/final payment → purchasing/costs → completion → profit/margin.
 - [ ] POPIA operational sign-off: privacy notice, retention/deletion, access controls and incident procedure.
+
+## Event scheduling implementation evidence — 71c8fc5
+
+- Laravel: PASS — 532 passed / 1 skipped / 3,714 assertions.
+- PHPMD: PASS.
+- Windows candidate build, fresh PowerShell install and SQLite/private-media recovery: PASS on 2ef2a0b, the same application-code implementation before the final regression-test-only commit.
+- PostgreSQL and desktop/mobile offline-browser acceptance: pending on exact source HEAD 71c8fc5.
+- Zazu Quality: RED on GHSA-fc5q-39xc-vjpf / CVE-2026-112366. No patched version is published; no advisory suppression or breaking Vite downgrade applied.
 
 ## Latest CI verification
 
