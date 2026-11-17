@@ -301,6 +301,7 @@ if ($listeners.Count -gt 0) {
     throw "Port $Port is already in use by another process or an incompatible listener. Nothing was changed."
 }
 
+
 function Prepare-ZazuDatabase([string]$PhpExecutable) {
     Push-Location $ProjectPath
     try {
@@ -314,64 +315,7 @@ function Prepare-ZazuDatabase([string]$PhpExecutable) {
             throw ("Zazu could not check the database update status. The server was not started." + [Environment]::NewLine + $statusText)
         }
 
-        $hasPendingMigrations = $migrationTableMissing -or ($statusText -match '(?im)\bPending\s*
-$stamp = Get-Date -Format 'yyyyMMdd-HHmmss'
-$stdout = Join-Path $logDirectory "zazu-dev-$stamp.out.log"
-$stderr = Join-Path $logDirectory "zazu-dev-$stamp.err.log"
-
-$process = Start-Process -FilePath $php -ArgumentList @('artisan', 'serve', "--host=$BindAddress", "--port=$Port") -WorkingDirectory $ProjectPath -RedirectStandardOutput $stdout -RedirectStandardError $stderr -WindowStyle Hidden -PassThru
-
-function Get-ZazuStartupLogTail {
-    $sections = @()
-    foreach ($log in @(@{ Label = 'STDERR'; Path = $stderr }, @{ Label = 'STDOUT'; Path = $stdout })) {
-        if (Test-Path $log.Path -PathType Leaf) {
-            $tail = Get-Content $log.Path -Tail 40 -ErrorAction SilentlyContinue
-            if ($tail) {
-                $sections += ("--- {0} ({1}) ---" -f $log.Label, $log.Path)
-                $sections += $tail
-            }
-        }
-    }
-    if ($sections.Count -eq 0) {
-        return '(Laravel has not written any startup output yet.)'
-    }
-    return ($sections -join [Environment]::NewLine)
-}
-
-$ready = $false
-# Allow a bounded cold boot on the owner's local HDD rather than timing out after 15 seconds.
-for ($attempt = 0; $attempt -lt 45; $attempt++) {
-    Start-Sleep -Seconds 1
-    if ($process.HasExited) {
-        $details = Get-ZazuStartupLogTail
-        throw ("Zazu server exited during startup. Startup output:`n{0}" -f $details)
-    }
-    if ((Get-ZazuListener).Count -gt 0) {
-        $ready = $true
-        break
-    }
-}
-
-if (-not $ready) {
-    $details = Get-ZazuStartupLogTail
-    Stop-Process -Id $process.Id -Force -ErrorAction SilentlyContinue
-    throw ("Zazu did not open port $Port within 45 seconds. Startup output:`n{0}" -f $details)
-}
-
-Write-Host "Zazu development server is running independently of VS Code."
-Write-Host ("URL: http://{0}:{1}" -f $BindAddress, $Port)
-Write-Host "PHP: $phpVersion ($php)"
-Write-Host "Logs: $logDirectory"
-Write-Host "Stop it by double-clicking Stop-Zazu-Dev.cmd."
-if ($Lan) {
-    Write-Host "LAN mode: bound only to the active private Wi-Fi address."
-    Write-Host "Use this URL only from devices on the same trusted Wi-Fi network."
-    Write-Host "The server is HTTP-only; installed PWA service-worker/offline acceptance requires a secure HTTPS origin."
-    Write-Host "No Windows Firewall or router settings were changed."
-} else {
-    Write-Host "Loopback development only: this HTTP server is not a production host and does not provide a secure PWA origin to other devices."
-}
-)
+        $hasPendingMigrations = $migrationTableMissing -or ($statusText -match '(?im)\bPending\s*$')
         if (-not $hasPendingMigrations) {
             Write-Host 'The Zazu database is up to date.'
             return
@@ -408,64 +352,7 @@ if ($Lan) {
         $verifyOutput = @(& $PhpExecutable $artisan 'migrate:status' '--no-ansi' 2>&1 | ForEach-Object { "$_" })
         $verifyExitCode = $LASTEXITCODE
         $verifyText = $verifyOutput -join [Environment]::NewLine
-        if ($verifyExitCode -ne 0 -or $verifyText -match '(?im)\bPending\s*
-$stamp = Get-Date -Format 'yyyyMMdd-HHmmss'
-$stdout = Join-Path $logDirectory "zazu-dev-$stamp.out.log"
-$stderr = Join-Path $logDirectory "zazu-dev-$stamp.err.log"
-
-$process = Start-Process -FilePath $php -ArgumentList @('artisan', 'serve', "--host=$BindAddress", "--port=$Port") -WorkingDirectory $ProjectPath -RedirectStandardOutput $stdout -RedirectStandardError $stderr -WindowStyle Hidden -PassThru
-
-function Get-ZazuStartupLogTail {
-    $sections = @()
-    foreach ($log in @(@{ Label = 'STDERR'; Path = $stderr }, @{ Label = 'STDOUT'; Path = $stdout })) {
-        if (Test-Path $log.Path -PathType Leaf) {
-            $tail = Get-Content $log.Path -Tail 40 -ErrorAction SilentlyContinue
-            if ($tail) {
-                $sections += ("--- {0} ({1}) ---" -f $log.Label, $log.Path)
-                $sections += $tail
-            }
-        }
-    }
-    if ($sections.Count -eq 0) {
-        return '(Laravel has not written any startup output yet.)'
-    }
-    return ($sections -join [Environment]::NewLine)
-}
-
-$ready = $false
-# Allow a bounded cold boot on the owner's local HDD rather than timing out after 15 seconds.
-for ($attempt = 0; $attempt -lt 45; $attempt++) {
-    Start-Sleep -Seconds 1
-    if ($process.HasExited) {
-        $details = Get-ZazuStartupLogTail
-        throw ("Zazu server exited during startup. Startup output:`n{0}" -f $details)
-    }
-    if ((Get-ZazuListener).Count -gt 0) {
-        $ready = $true
-        break
-    }
-}
-
-if (-not $ready) {
-    $details = Get-ZazuStartupLogTail
-    Stop-Process -Id $process.Id -Force -ErrorAction SilentlyContinue
-    throw ("Zazu did not open port $Port within 45 seconds. Startup output:`n{0}" -f $details)
-}
-
-Write-Host "Zazu development server is running independently of VS Code."
-Write-Host ("URL: http://{0}:{1}" -f $BindAddress, $Port)
-Write-Host "PHP: $phpVersion ($php)"
-Write-Host "Logs: $logDirectory"
-Write-Host "Stop it by double-clicking Stop-Zazu-Dev.cmd."
-if ($Lan) {
-    Write-Host "LAN mode: bound only to the active private Wi-Fi address."
-    Write-Host "Use this URL only from devices on the same trusted Wi-Fi network."
-    Write-Host "The server is HTTP-only; installed PWA service-worker/offline acceptance requires a secure HTTPS origin."
-    Write-Host "No Windows Firewall or router settings were changed."
-} else {
-    Write-Host "Loopback development only: this HTTP server is not a production host and does not provide a secure PWA origin to other devices."
-}
- -or $verifyText -match '(?i)migration table.*not found') {
+        if ($verifyExitCode -ne 0 -or $verifyText -match '(?im)\bPending\s*$' -or $verifyText -match '(?i)migration table.*not found') {
             throw ("Zazu could not confirm that all database updates finished. The server was not started. The backup is available at:" + [Environment]::NewLine + $backupPath + [Environment]::NewLine + "Check output:" + [Environment]::NewLine + $verifyText)
         }
 
