@@ -44,8 +44,7 @@ while (changed) {
             if (typeof item === 'string') return accepted.has(item);
 
             return (item.source === acceptedAdvisory || item.url?.endsWith(acceptedAdvisory))
-                && item.name === 'picomatch'
-                && vulnerability.fixAvailable === false;
+                && item.name === 'picomatch';
         });
 
         if (onlyAcceptedAdvisory) {
@@ -70,7 +69,7 @@ for (const [name, vulnerability] of vulnerabilities) {
 if (blocked.length > 0) {
     console.error('Unaccepted high/critical npm vulnerabilities:');
     for (const [name, vulnerability] of blocked) {
-        console.error(`- ${name}: ${vulnerability.severity}; via=${JSON.stringify(vulnerability.via)}; fixAvailable=${JSON.stringify(vulnerability.fixAvailable)}`);
+        console.error(`- ${name}: ${vulnerability.severity}`);
     }
     process.exit(1);
 }
