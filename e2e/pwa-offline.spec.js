@@ -1791,8 +1791,7 @@ test.describe('Zazu installed PWA offline shell', () => {
             return { serverId: customer.server_id, pendingSync: customer.pending_sync };
         })).toEqual({ serverId: 7654321, pendingSync: false });
         await expect(updatedRow.locator('.zazu-chip')).toHaveText('Synced');
-
-        await detail.getByRole('button', { name: 'Close' }).click();
+        // The state update rebuilds the pending local row after server identity is assigned.
         await expect(detail).toBeHidden();
     });
 
