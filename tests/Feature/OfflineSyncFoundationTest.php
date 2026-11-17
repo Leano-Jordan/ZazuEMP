@@ -1392,6 +1392,24 @@ class OfflineSyncFoundationTest extends TestCase
         ]);
         $applier->apply($create, ['purchase_order' => $handler]);
 
+        $emptyReceiptLocalId = (string) Str::uuid();
+        $emptyReceipt = app(SyncMutationRecorder::class)->record($device, 'purchase_receipt', $emptyReceiptLocalId, 'create', [
+            'local_id' => $emptyReceiptLocalId,
+            'record' => [
+                'purchase_order_local_id' => $orderLocalId,
+                'received_quantities' => [$lineOne => '0.00', $lineTwo => '0.00'],
+            ],
+        ]);
+        try {
+            $applier->apply($emptyReceipt, ['purchase_receipt' => $handler]);
+            $this->fail('An all-zero offline receipt must not consume its idempotency key.');
+        } catch (\Illuminate\Validation\ValidationException) {
+            $this->assertSame('pending', $emptyReceipt->fresh()->status);
+            $this->assertSame(0, \App\Models\PurchaseOrderReceipt::query()
+                ->where('business_id', $business->id)
+                ->count());
+        }
+
         $partial = app(SyncMutationRecorder::class)->record($device, 'purchase_receipt', (string) Str::uuid(), 'create', [
             'local_id' => (string) Str::uuid(),
             'record' => [
