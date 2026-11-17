@@ -78,12 +78,12 @@
                         </label>
                         <label class="zazu-field">
                             <span class="zazu-label">Start time</span>
-                            <input type="time" name="event_start_time" value="{{ old('event_start_time', $event->event_start_time) }}" class="zazu-input">
+                            <input type="time" name="event_start_time" value="{{ old('event_start_time', substr((string) $event->event_start_time, 0, 5)) }}" class="zazu-input">
                             @error('event_start_time')<span class="zazu-field-error">{{ $message }}</span>@enderror
                         </label>
                         <label class="zazu-field">
                             <span class="zazu-label">End time</span>
-                            <input type="time" name="event_end_time" value="{{ old('event_end_time', $event->event_end_time) }}" class="zazu-input">
+                            <input type="time" name="event_end_time" value="{{ old('event_end_time', substr((string) $event->event_end_time, 0, 5)) }}" class="zazu-input">
                             @error('event_end_time')<span class="zazu-field-error">{{ $message }}</span>@enderror
                         </label>
                         <label class="zazu-field">
