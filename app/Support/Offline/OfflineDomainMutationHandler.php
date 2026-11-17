@@ -1258,7 +1258,8 @@ class OfflineDomainMutationHandler implements SyncMutationHandler
                     'notes' => $this->nullableString($payload['notes'] ?? $lockedAllocation->notes, 5000),
                 ]);
 
-                $lockedAsset->update(['status' => $status === 'returned' ? 'available' : 'allocated']);
+                $hasActiveAllocations = $lockedAsset->allocations()->where('status', 'allocated')->exists();
+                $lockedAsset->update(['status' => $hasActiveAllocations ? 'allocated' : 'available']);
 
                 Audit::record(
                     $status === 'returned' ? 'assets.released' : 'assets.allocated',
@@ -1287,7 +1288,7 @@ class OfflineDomainMutationHandler implements SyncMutationHandler
 
         \Illuminate\Support\Facades\DB::transaction(function () use ($mutation, $asset, $event, $payload, $from, $until, &$allocation): void {
             $lockedAsset = Asset::query()->where('business_id', $mutation->business_id)->lockForUpdate()->findOrFail($asset->id);
-            abort_if($lockedAsset->status !== 'available', 422, 'Only available assets can be allocated offline.');
+            abort_unless(in_array($lockedAsset->status, ['available', 'allocated'], true), 422, 'Only available assets can be allocated offline.');
 
             $overlap = $lockedAsset->allocations()
                 ->where('status', 'allocated')

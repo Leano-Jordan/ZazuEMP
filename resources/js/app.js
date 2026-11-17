@@ -3008,7 +3008,9 @@ function setupZazuOfflineForms() {
                     if (operation === 'update') {
                         const allocation = asset.allocations?.find(item => item.local_id === payload.local_id);
                         if (allocation) allocation.status = 'returned';
-                        asset.status = 'available';
+                        asset.status = asset.allocations?.some(item => item.status === 'allocated')
+                            ? 'allocated'
+                            : 'available';
                     } else {
                         const event = state.jobs?.find(item => item.local_id === payload.event_local_id);
                         asset.status = 'allocated';

@@ -131,7 +131,7 @@ class AssetController extends Controller
                 ->lockForUpdate()
                 ->findOrFail($asset->id);
 
-            abort_if($lockedAsset->status!=='available',422,'Only available assets can be allocated.');
+            abort_unless(in_array($lockedAsset->status, ['available', 'allocated'], true), 422, 'Only available assets can be allocated.');
             abort_if($data['allocated_until'] && $data['allocated_from'] > $data['allocated_until'], 422, 'Allocation dates are invalid.');
 
             $overlap=$lockedAsset->allocations()->where('status','allocated')
@@ -158,31 +158,38 @@ class AssetController extends Controller
 
     public function release(Request $request, Asset $asset): RedirectResponse
     {
-        $businessId=app(CurrentBusiness::class)->id($request->user());
-        abort_unless((int)$asset->business_id===$businessId,404);
+        $businessId = app(CurrentBusiness::class)->id($request->user());
+        abort_unless((int) $asset->business_id === $businessId, 404);
 
-        return DB::transaction(function () use ($asset, $businessId): RedirectResponse {
-            $lockedAsset = Asset::query()
-                ->where('business_id', $businessId)
-                ->lockForUpdate()
-                ->findOrFail($asset->id);
+        $data = $request->validate(['allocation_id' => ['nullable', 'integer']]);
 
-            $allocation=$lockedAsset->allocations()->where('status','allocated')->latest()->lockForUpdate()->first();
-            if($allocation){
+        return DB::transaction(function () use ($asset, $businessId, $data): RedirectResponse {
+            $lockedAsset = Asset::query()->where('business_id', $businessId)->lockForUpdate()->findOrFail($asset->id);
+            $allocationQuery = $lockedAsset->allocations()->where('status', 'allocated');
+
+            if (! empty($data['allocation_id'])) {
+                $allocationQuery->whereKey($data['allocation_id']);
+            }
+
+            $allocation = $allocationQuery->latest('id')->lockForUpdate()->first();
+            abort_if(! empty($data['allocation_id']) && ! $allocation, 404);
+
+            if ($allocation) {
                 $allocation->update([
                     'status' => 'returned',
                     'allocated_until' => $allocation->allocated_until ?? now()->toDateString(),
                 ]);
-
                 Audit::record('assets.released', $lockedAsset, [
                     'event_id' => $allocation->event_id,
                     'allocation_id' => $allocation->id,
                 ], $businessId);
             }
 
-            $lockedAsset->update(['status'=>'available']);
+            $hasActiveAllocations = $lockedAsset->allocations()->where('status', 'allocated')->exists();
+            $lockedAsset->update(['status' => $hasActiveAllocations ? 'allocated' : 'available']);
 
-            return back()->with('success','Asset returned to available status.');
+            return back()->with('success', 'Asset allocation returned.');
         });
     }
+}
 }

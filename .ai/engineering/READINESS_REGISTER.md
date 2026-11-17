@@ -1,6 +1,6 @@
 # Zazu EMP — V1 Readiness Register
 
-Baseline: Leano-Jordan/ZazuEMP / main / ac79543732f2c3c5345cd095dce6e55eb16ac319 / 17 Nov 2026
+Baseline: Leano-Jordan/ZazuEMP / main / c7be735021e24b88052511c91652d71607f71383 / 17 Nov 2026
 Release disposition: NOT READY
 Evidence maturity: 73/100 unchanged; no uplift claimed.
 
@@ -14,26 +14,26 @@ Evidence maturity: 73/100 unchanged; no uplift claimed.
 | Windows package | CLOSED for defined fresh-install candidate | Existing source/run evidence; not an updater or hosted deployment |
 
 ## Claude independent audit reconciliation — 2026-11-17
-Baseline: live main HEAD ac79543732f2c3c5345cd095dce6e55eb16ac319; Claude baseline 325dc67 is older. Reconciled here; no second backlog:
-1. Owner web login auto-trusts browsers for 180 days vs 120-minute session; offline logout has no revoke retry — OWNER-DECISION on intended all-browser persistent trust; already covered by session/device work.
-2. Six-digit pairing code, per-IP throttle only, no failed-attempt lockout — DEFER; low-confidence/low-priority hardening, no demonstrated V1 exploit.
-3. Loopback-only proxy trust and no HTTPS forcing — ACCEPTED LIMITATION for current local Windows/LAN V1; hosted reverse-proxy behavior is outside active deployment scope.
-4. CurrentBusiness test-only branch, min-8 password policy, generated manifest drift, offline bootstrap permission filtering — MIXED: generated Vite manifest tracking already corrected; bootstrap endpoint permission gate already covered; password-policy expansion and per-permission filtering deferred absent a demonstrated V1 failure; test-only branch accepted as test isolation.
-5. Rental asset date allocation — NEW / REPRODUCTION REQUIRED. Source shows global status != available rejection before date-overlap evaluation, blocking a later non-overlapping booking while prior allocation remains active. Add a focused regression reproduction before any application fix.
+1. Owner web login auto-trusts browsers for 180 days vs 120-minute session; offline logout has no revoke retry — OWNER-DECISION; covered by existing session/device work.
+2. Six-digit pairing code, per-IP throttle only, no failed-attempt lockout — DEFER; low-confidence hardening, no demonstrated V1 exploit.
+3. Loopback-only proxy trust and no HTTPS forcing — ACCEPTED LIMITATION for local Windows/LAN V1; hosted reverse-proxy behavior is outside active deployment scope.
+4. CurrentBusiness test-only branch, min-8 password policy, generated manifest drift, offline bootstrap permission filtering — MIXED: generated manifest tracking corrected; bootstrap endpoint permission gate covered; password-policy expansion and per-permission filtering deferred; test-only branch accepted.
+5. Rental asset date allocation — REPRODUCED. Run 44075168970 at c7be735: second non-overlapping booking returned HTTP 422 because global status blocked the request before overlap evaluation. Bounded online/offline correction is included in the current candidate; exact-head CI pending. Manual physical return remains operator-confirmed; no automatic release on event state/date alone. Quantity-based rental stock remains outside the serialized-asset model.
 6. Multi-day events, start/end/setup/collection times, clash detection and staff scheduling — OWNER-DECISION / SCOPE; no implementation without explicit V1 authorization.
-7. Invoice numbering (random INV-YYYYMM suffix; offline UUID suffix) vs serial expectation — OWNER-DECISION pending South African tax-adviser guidance; preserve current numbering until confirmed.
+7. Invoice numbering (online month-prefixed random suffix; offline UUID suffix) — OWNER-DECISION pending South African tax-adviser guidance; current format assertion added, numbering unchanged.
 8. Team invites/role assignment, email/PDF delivery, billing, app-wide licence enforcement, in-app legal terms/privacy, monitoring and scheduled jobs — OWNER-DECISION / SCOPE; no silent V1 expansion.
 
-Documentation reconciliation: live HEAD and exact CI recorded; offline work ACTIVE/RESUMED; tier conflict remains OWNER-DECISION; root ROSCORE_PROJECT_MANIFEST.md is canonical and docs/ROSCOR_PROJECT_MANIFEST.md is a legacy pointer.
+## Documentation and commercial decisions
+- Offline work is ACTIVE/RESUMED; stale pause notes are historical and archived.
+- Tier conflict remains OWNER-DECISION: product-specification/operating-profile describe three tiers (Basic Free, Intermediate, Advanced), while commercial requirements specify four paid prices (R299, R499, R799, R1,299). No tier or price decision inferred.
+- Root ROSCORE_PROJECT_MANIFEST.md is canonical; docs/ROSCOR_PROJECT_MANIFEST.md is a legacy pointer.
+- Prior long-form state/register/memory are preserved in docs/archive/engineering/2026-11-17-state-register-memory-history.md.
 
-## Exact-head CI — ac795437
-- Laravel run 44073375399: PASS — 520 passed, 1 skipped, 3,635 assertions; PostgreSQL migration/registration/backup/private-file recovery job passed; dedicated offline-browser job passed.
-- Zazu quality run 44073375388: PASS — secret scan, npm audit/service-worker tests, Composer security audit.
-- Push on main / CodeQL run 44073375925: PASS.
-- SonarCloud run 44073375462: SKIPPED, not counted.
-- No separate combined status contexts were reported. No Windows package workflow was triggered at this head; package evidence remains tied to its recorded source commit.
+## Exact reproduction CI
+- Laravel run 44075168970 at c7be735: 520 passed, 1 skipped, 3,638 assertions; one targeted rental reproduction failed with HTTP 422.
+- PostgreSQL migration/registration/recovery passed.
+- Zazu quality, Director Contract Lint, Director Health and Push-on-main passed. SonarCloud skipped. Offline-browser job was still running at last observation.
+- No score uplift. Existing release gates remain open.
 
-Evidence maturity remains 73/100 with no uplift. Release remains NOT READY pending physical Android offline/reconnect, installed-target recovery including private media, live populated-business financial reconciliation and POPIA operational sign-off.
-
-## Next engineering target
-Reproduce rental date-allocation behavior in a focused regression test. Preserve current behavior until the test proves the failure and correction is safely scoped. Invoice numbering remains unchanged pending tax-adviser advice.
+## Next
+Run exact-head CI on the correction candidate. Close only when the new online and offline rental regressions pass and existing date-overlap protection remains effective.

@@ -13,7 +13,7 @@ class AssetAllocationDateAvailabilityTest extends TestCase
 {
     use RefreshDatabase;
 
-    public function test_same_asset_can_be_allocated_to_two_non_overlapping_event_periods(): void
+    public function test_same_asset_can_be_allocated_for_non_overlapping_periods_and_released_independently(): void
     {
         $business = Business::create([
             'name' => 'Rental Date Availability',
@@ -51,6 +51,14 @@ class AssetAllocationDateAvailabilityTest extends TestCase
             'customer_name' => 'Second Customer',
             'status' => 'draft',
         ]);
+        $overlappingEvent = Event::create([
+            'business_id' => $business->id,
+            'reference' => 'RENTAL-003',
+            'name' => 'Overlapping Rental',
+            'event_date' => '2026-12-02',
+            'customer_name' => 'Third Customer',
+            'status' => 'draft',
+        ]);
 
         $this->post(route('assets.allocate', $asset), [
             'event_id' => $firstEvent->id,
@@ -64,11 +72,21 @@ class AssetAllocationDateAvailabilityTest extends TestCase
             'allocated_until' => '2026-12-11',
         ])->assertRedirect();
 
+        $this->from(route('assets.index'))->post(route('assets.allocate', $asset), [
+            'event_id' => $overlappingEvent->id,
+            'allocated_from' => '2026-12-02',
+            'allocated_until' => '2026-12-10',
+        ])->assertStatus(422);
+
         $this->assertDatabaseCount('asset_allocations', 2);
-        $this->assertDatabaseHas('asset_allocations', [
-            'asset_id' => $asset->id,
-            'event_id' => $secondEvent->id,
-            'status' => 'allocated',
-        ]);
+        $allocations = $asset->allocations()->orderBy('id')->get();
+
+        $this->post(route('assets.release', $asset), ['allocation_id' => $allocations[0]->id])->assertRedirect();
+        $this->assertSame('returned', $allocations[0]->fresh()->status);
+        $this->assertSame('allocated', $asset->fresh()->status);
+
+        $this->post(route('assets.release', $asset), ['allocation_id' => $allocations[1]->id])->assertRedirect();
+        $this->assertSame('returned', $allocations[1]->fresh()->status);
+        $this->assertSame('available', $asset->fresh()->status);
     }
 }

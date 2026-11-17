@@ -28,11 +28,9 @@ Zazu is a reusable commercial event-management platform for catering, event equi
 - Primary currency is South African rand (ZAR / R); show rand first in commercial analysis.
 
 ## Current verified position
-Baseline ac79543732f2c3c5345cd095dce6e55eb16ac319 on main.
-Laravel CI: 520 passed, 1 skipped, 3,635 assertions; PostgreSQL and offline browser jobs passed.
-Zazu quality and Push-on-main/CodeQL passed; SonarCloud skipped.
+Previous baseline ac79543732f2c3c5345cd095dce6e55eb16ac319 on main. Rental date-allocation reproduced in run 44075168970 at c7be735; bounded online/offline correction is committed in the current candidate and awaiting exact-head CI.
+Invoice-number format assertion added without changing numbering; offline generation remains UUID-based pending SA tax-adviser guidance.
 V1 remains NOT READY; evidence maturity remains 73/100 with no uplift.
 Current gates: physical Android offline/reconnect; installed-target recovery including private media; live populated-business financial reconciliation; POPIA operational sign-off.
-Rental date-allocation reproduction test added; exact-head CI pending. Invoice-number format assertion added without changing numbering.
 Current state: .ai/engineering/STATE.md. Sole readiness register: .ai/engineering/READINESS_REGISTER.md. Release acceptance: docs/V1_RELEASE_CHECKLIST.md.
 Historical context is preserved in docs/archive/engineering/2026-11-17-state-register-memory-history.md.

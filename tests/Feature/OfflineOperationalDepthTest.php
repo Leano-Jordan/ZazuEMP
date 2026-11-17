@@ -205,6 +205,12 @@ class OfflineOperationalDepthTest extends TestCase
             'name' => 'Offline Asset Job',
             'status' => 'confirmed',
         ]);
+        $secondEvent = Event::create([
+            'business_id' => $business->id,
+            'reference' => 'OFF-ASSET-002',
+            'name' => 'Second Offline Asset Job',
+            'status' => 'confirmed',
+        ]);
         $asset = Asset::create([
             'business_id' => $business->id,
             'asset_tag' => 'OFF-ASSET-001',
@@ -218,6 +224,7 @@ class OfflineOperationalDepthTest extends TestCase
         $registry = app(\App\Support\Offline\SyncEntityIdentityRegistry::class);
         $assetUuid = $registry->identify($asset, 'asset')->entity_uuid;
         $eventUuid = $registry->identify($event, 'job')->entity_uuid;
+        $secondEventUuid = $registry->identify($secondEvent, 'job')->entity_uuid;
         $recorder = app(SyncMutationRecorder::class);
         $applier = app(SyncMutationApplier::class);
         $handler = app(\App\Support\Offline\OfflineDomainMutationHandler::class);
@@ -228,37 +235,48 @@ class OfflineOperationalDepthTest extends TestCase
             'record' => [
                 'asset_local_id' => $assetUuid,
                 'event_local_id' => $eventUuid,
-                'allocated_from' => now()->toDateString(),
-                'allocated_until' => now()->addDay()->toDateString(),
+                'allocated_from' => '2026-12-01',
+                'allocated_until' => '2026-12-02',
             ],
         ]);
         $applier->apply($create, ['asset_allocation' => $handler]);
 
-        $this->assertSame('allocated', $asset->fresh()->status);
-        $this->assertSame(1, $asset->allocations()->where('status', 'allocated')->count());
-        $allocation = $asset->allocations()->firstOrFail();
-        $allocationIdentity = $registry->identify($allocation, 'asset_allocation')->entity_uuid;
-
-        $release = $recorder->record($device, 'asset_allocation', $allocationIdentity, 'update', [
-            'local_id' => $allocationIdentity,
+        $secondAllocationUuid = (string) Str::uuid();
+        $secondCreate = $recorder->record($device, 'asset_allocation', $secondAllocationUuid, 'create', [
+            'local_id' => $secondAllocationUuid,
             'record' => [
                 'asset_local_id' => $assetUuid,
-                'status' => 'returned',
+                'event_local_id' => $secondEventUuid,
+                'allocated_from' => '2026-12-10',
+                'allocated_until' => '2026-12-11',
             ],
         ]);
-        $applier->apply($release, ['asset_allocation' => $handler]);
+        $applier->apply($secondCreate, ['asset_allocation' => $handler]);
+
+        $this->assertSame('allocated', $asset->fresh()->status);
+        $this->assertSame(2, $asset->allocations()->where('status', 'allocated')->count());
+
+        $allocations = $asset->allocations()->orderBy('id')->get();
+        foreach ($allocations as $index => $allocation) {
+            $allocationIdentity = $registry->identify($allocation, 'asset_allocation')->entity_uuid;
+            $release = $recorder->record($device, 'asset_allocation', $allocationIdentity, 'update', [
+                'local_id' => $allocationIdentity,
+                'record' => [
+                    'asset_local_id' => $assetUuid,
+                    'status' => 'returned',
+                ],
+            ]);
+            $applier->apply($release, ['asset_allocation' => $handler]);
+
+            if ($index === 0) {
+                $this->assertSame('allocated', $asset->fresh()->status);
+            }
+        }
 
         $this->assertSame('available', $asset->fresh()->status);
-        $this->assertSame('returned', $allocation->fresh()->status);
+        $this->assertSame(0, $asset->allocations()->where('status', 'allocated')->count());
+        $this->assertSame(2, $asset->allocations()->where('status', 'returned')->count());
     }
-
-
-
-
-
-
-
-
 
     public function test_offline_job_update_cannot_mutate_a_closed_work_record(): void
     {
