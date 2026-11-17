@@ -5,6 +5,10 @@
         <a href="{{ route('work.show', $event) }}" class="zazu-btn zazu-btn-ghost">Job workspace</a>
     </x-slot:headerAction>
 
+    @if (session('schedule_warning'))
+        <div class="zazu-warning-note mb-4" role="status">{{ session('schedule_warning') }}</div>
+    @endif
+
     <section class="zazu-command-band zazu-quote-editor-command">
         <div>
             <div class="zazu-eyebrow">{{ $event->reference }} · Commercial</div>
