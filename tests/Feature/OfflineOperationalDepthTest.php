@@ -252,6 +252,41 @@ class OfflineOperationalDepthTest extends TestCase
         $this->assertSame('returned', $allocation->fresh()->status);
     }
 
+    public function test_offline_job_update_cannot_mutate_a_closed_work_record(): void
+    {
+        $business = $this->business();
+        $device = $this->device($business);
+        $event = Event::create([
+            'business_id' => $business->id,
+            'reference' => 'OFF-CLOSED-001',
+            'name' => 'Completed Catering Job',
+            'status' => 'completed',
+        ]);
+        $identity = app(\App\Support\Offline\SyncEntityIdentityRegistry::class)
+            ->identify($event, 'job')
+            ->entity_uuid;
+
+        $mutation = app(SyncMutationRecorder::class)->record($device, 'job', $identity, 'update', [
+            'local_id' => $identity,
+            'record' => [
+                'name' => 'Changed while offline',
+                'event_type' => 'Other',
+                'event_date' => now()->toDateString(),
+            ],
+        ]);
+
+        $this->expectException(ValidationException::class);
+        try {
+            app(SyncMutationApplier::class)->apply($mutation, [
+                'job' => app(\App\Support\Offline\OfflineDomainMutationHandler::class),
+            ]);
+        } finally {
+            $this->assertSame('Completed Catering Job', $event->fresh()->name);
+            $this->assertSame('completed', $event->fresh()->status);
+            $this->assertSame('pending', $mutation->fresh()->status);
+        }
+    }
+
     public function test_offline_asset_update_rejects_another_assets_tag_without_database_exception(): void
     {
         $business = $this->business();
