@@ -320,7 +320,7 @@ class OfflineDomainMutationHandler implements SyncMutationHandler
             'customer_name' => $customer?->name ?? $this->nullableString($payload['customer_name'] ?? null, 255),
             'customer_phone' => $customer?->primaryContact?->phone ?? $event?->customer_phone,
             'customer_email' => $customer?->primaryContact?->email ?? $event?->customer_email,
-            ...$this->offlineScheduleAttributes($payload),
+            ...$this->offlineScheduleAttributes($payload, $event),
             'event_address' => $this->nullableString($payload['event_address'] ?? null, 255),
             'notes' => $this->nullableString($payload['notes'] ?? null, 5000),
             'status' => $event?->status ?: 'draft',
@@ -331,15 +331,27 @@ class OfflineDomainMutationHandler implements SyncMutationHandler
      * @param array<string, mixed> $payload
      * @return array<string, string|null>
      */
-    private function offlineScheduleAttributes(array $payload): array
+    private function offlineScheduleAttributes(array $payload, ?Event $event): array
     {
         $schedule = [
-            'event_date' => $this->nullableDate($payload['event_date'] ?? null),
-            'event_end_date' => $this->nullableDate($payload['event_end_date'] ?? null),
-            'event_start_time' => $this->nullableTime($payload['event_start_time'] ?? null),
-            'event_end_time' => $this->nullableTime($payload['event_end_time'] ?? null),
-            'setup_date' => $this->nullableDate($payload['setup_date'] ?? null),
-            'collection_date' => $this->nullableDate($payload['collection_date'] ?? null),
+            'event_date' => array_key_exists('event_date', $payload)
+                ? $this->nullableDate($payload['event_date'])
+                : $event?->event_date?->toDateString(),
+            'event_end_date' => array_key_exists('event_end_date', $payload)
+                ? $this->nullableDate($payload['event_end_date'])
+                : $event?->event_end_date?->toDateString(),
+            'event_start_time' => array_key_exists('event_start_time', $payload)
+                ? $this->nullableTime($payload['event_start_time'])
+                : ($event?->event_start_time ? substr((string) $event->event_start_time, 0, 5) : null),
+            'event_end_time' => array_key_exists('event_end_time', $payload)
+                ? $this->nullableTime($payload['event_end_time'])
+                : ($event?->event_end_time ? substr((string) $event->event_end_time, 0, 5) : null),
+            'setup_date' => array_key_exists('setup_date', $payload)
+                ? $this->nullableDate($payload['setup_date'])
+                : $event?->setup_date?->toDateString(),
+            'collection_date' => array_key_exists('collection_date', $payload)
+                ? $this->nullableDate($payload['collection_date'])
+                : $event?->collection_date?->toDateString(),
         ];
 
         $this->assertOfflineSchedule($schedule);
