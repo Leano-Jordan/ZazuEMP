@@ -2,8 +2,8 @@
 
 As of: 2026-11-17
 Repository: Leano-Jordan/ZazuEMP
-Last verified source baseline: 00af9adda943ee4e232e7eedeaf894a809dcbe88
-Canonical branch: main only; never create branches. Subsequent commits in this reconciliation batch are documentation-only.
+Last verified source baseline: e5dc263aaa1fd509061c12abdb158c5b5765dfee
+Canonical branch: main only; never create branches. Engineering changes are active on main; no branches created.
 Owner mandate: ship a dependable first-business V1; preserve scope; no Render or AMPPS workflow.
 
 ## Verified work
@@ -11,21 +11,21 @@ Rental asset date allocation was reproduced at c7be735: a second non-overlapping
 
 Online and offline regressions pass at current HEAD. The optional end date is normalized once and used consistently for validation, overlap checks, persistence and audit.
 
-## Exact-head CI — 00af9adda
-- Laravel run 44079343772: PASS — 523 passed, 1 skipped, 3,653 assertions.
-- Offline browser acceptance: PASS — 45 desktop, 6 mobile and 1 phone-local attachment journey.
-- PostgreSQL migration/recovery: PASS — migration/registration and real backup/private-file restore.
-- Windows V1 package run 44079343934: PASS — package built and Windows PowerShell fresh-install verification passed (private environment, app key, SQLite migration, route boot and local HTTP session cookie).
-- Populated upgrade/rollback run 44079344032: PASS.
-- Zazu quality run 44079343883: PASS.
-- Psalm run 44079343941: PASS.
-- PHPMD run 44079345552: PASS.
-- Director Health run 44079343910: PASS.
-- Director Contract Lint run 44079343776: PASS.
-- Push-on-main / CodeQL run 44079343748: PASS.
-- SonarCloud run 44079344053: SKIPPED, not counted as a pass.
+Trusted-device security corrections at e5dc263: fresh desktop browsers no longer receive long-lived sync credentials automatically; an owner must explicitly trust the current device in Settings. The installed-phone behaviour remains an accepted owner limitation. If destructive local workspace cleanup cannot reach the host to revoke a device, only its business-scoped installation UUID is retained and the next authenticated owner session retries revocation through an owner-only endpoint. Ordinary web logout remains non-destructive and preserves the trusted workspace by design.
 
-No tests were weakened. Evidence maturity remains 73/100; no score uplift.
+Password recovery now revokes active and pending sync devices across every business where the resetting user has the owner role, clears token and pairing credentials, and records per-business audit events. Staff-only business devices are left untouched. The regression covers an owner whose currently selected business is a staff membership, protecting cross-business recovery from the normal active-workspace save guard.
+
+Offline financial push validation uses integer-cent / hundredths parsing and rejects excess precision before posting. Regression coverage includes quote line quantity and price, event and asset costs, inventory movement, expenses, purchase-order quantity and price, purchase receipts, and payments.
+
+## Exact-head CI — e5dc263
+- Laravel run 44127089629: PASS — 523 passed / 1 skipped / 3,662 assertions.
+- Offline browser acceptance in the same run: PASS — 45 desktop Chromium, 6 mobile-viewport, and 1 phone-local attachment journey.
+- PostgreSQL migration, registration, backup/restore and private-file recovery: PASS.
+- Windows V1 package and PowerShell fresh-install verification: PASS.
+- Populated upgrade/rollback, Zazu quality, Psalm, PHPMD, Director Health and Push-on-main: PASS.
+- SonarCloud: SKIPPED, not counted as a pass.
+
+No tests were weakened. Evidence maturity remains 73/100; no score uplift. Physical Android, intended-installation recovery, live commercial reconciliation and POPIA remain operator gates.
 
 ## Independent audit reconciliation
 All eight Claude findings remain in the sole readiness register. Invoice numbering is unchanged pending South African tax-adviser guidance. Session auto-trust scope, commercial tiers and feature expansions remain owner decisions. Pairing-code hardening is deferred; hosted proxy behavior is an accepted limitation for local Windows/LAN V1.
