@@ -316,6 +316,79 @@ class OfflineOperationalDepthTest extends TestCase
         $this->assertSame('applied', $mutation->fresh()->status);
     }
 
+    public function test_offline_job_update_can_advance_confirmed_work_to_in_progress(): void
+    {
+        $business = $this->business();
+        $device = $this->device($business);
+        $event = Event::create([
+            'business_id' => $business->id,
+            'reference' => 'OFF-STATUS-001',
+            'name' => 'Offline Status Job',
+            'event_type' => 'Other',
+            'status' => 'confirmed',
+        ]);
+        $identity = app(\App\Support\Offline\SyncEntityIdentityRegistry::class)
+            ->identify($event, 'job')
+            ->entity_uuid;
+        $mutation = app(SyncMutationRecorder::class)->record($device, 'job', $identity, 'update', [
+            'local_id' => $identity,
+            'record' => [
+                'name' => 'Offline Status Job',
+                'event_type' => 'Other',
+                'status' => 'in_progress',
+            ],
+        ]);
+
+        app(SyncMutationApplier::class)->apply($mutation, [
+            'job' => app(\App\Support\Offline\OfflineDomainMutationHandler::class),
+        ]);
+
+        $this->assertSame('in_progress', $event->fresh()->status);
+        $this->assertSame('applied', $mutation->fresh()->status);
+    }
+
+    public function test_offline_job_cannot_complete_while_preparation_is_open(): void
+    {
+        $business = $this->business();
+        $device = $this->device($business);
+        $event = Event::create([
+            'business_id' => $business->id,
+            'reference' => 'OFF-COMPLETE-001',
+            'name' => 'Offline Completion Job',
+            'event_type' => 'Other',
+            'status' => 'in_progress',
+        ]);
+        $event->preparationItems()->create([
+            'business_id' => $business->id,
+            'title' => 'Confirm final menu',
+            'category' => 'Operations',
+            'quantity' => 1,
+            'unit' => 'task',
+            'status' => 'open',
+        ]);
+        $identity = app(\App\Support\Offline\SyncEntityIdentityRegistry::class)
+            ->identify($event, 'job')
+            ->entity_uuid;
+        $mutation = app(SyncMutationRecorder::class)->record($device, 'job', $identity, 'update', [
+            'local_id' => $identity,
+            'record' => [
+                'name' => 'Offline Completion Job',
+                'event_type' => 'Other',
+                'status' => 'completed',
+            ],
+        ]);
+
+        $this->expectException(\Symfony\Component\HttpKernel\Exception\HttpException::class);
+        try {
+            app(SyncMutationApplier::class)->apply($mutation, [
+                'job' => app(\App\Support\Offline\OfflineDomainMutationHandler::class),
+            ]);
+        } finally {
+            $this->assertSame('in_progress', $event->fresh()->status);
+            $this->assertSame('pending', $mutation->fresh()->status);
+        }
+    }
+
     public function test_offline_job_update_cannot_mutate_a_closed_work_record(): void
     {
         $business = $this->business();
