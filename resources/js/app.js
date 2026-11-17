@@ -1620,6 +1620,9 @@ function setupZazuOfflineDirectoryViews() {
                 event.preventDefault();
                 if (saveEdit.disabled) return;
                 const formData = new FormData(editForm);
+                const selectedCustomerLocalId = String(formData.get('customer_local_id') || currentCustomerLocalId || '');
+                const selectedCustomer = (window.ZazuOffline.getState().customers || [])
+                    .find(item => item.local_id === selectedCustomerLocalId);
                 const payload = {
                     local_id: currentJob.local_id,
                     server_id: currentJob.server_id ?? currentJob.id ?? null,
