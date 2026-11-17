@@ -249,7 +249,11 @@ class OfflineDomainMutationHandler implements SyncMutationHandler
             }
 
             $event->update($attributes);
-            return $event->fresh();
+            if (array_key_exists('services', $payload)) {
+                $this->syncOfflineJobRequirements($event, $payload);
+            }
+
+            return $event->fresh(['requirements']);
         }
 
         $event = Event::create($attributes);
@@ -372,6 +376,53 @@ class OfflineDomainMutationHandler implements SyncMutationHandler
         }
 
         return $contactId;
+    }
+
+    /**
+     * Replace the operational requirement list only when an offline client
+     * explicitly sends it. Existing matching rows retain quantity, notes,
+     * status and capability links; removed descriptions are deleted.
+     *
+     * @param array<string, mixed> $payload
+     */
+    private function syncOfflineJobRequirements(Event $event, array $payload): void
+    {
+        $services = $payload['services'];
+        if (! is_array($services) || ! array_is_list($services)) {
+            throw ValidationException::withMessages(['services' => 'Offline job services must be a list.']);
+        }
+
+        $categoryByService = [];
+        foreach (config('zazu.service_categories', []) as $category => $availableServices) {
+            foreach ($availableServices as $service) {
+                $categoryByService[$service] = $category;
+            }
+        }
+
+        $requirements = [];
+        foreach ($services as $service) {
+            $description = $this->requiredString($service, 'services', 100);
+            $requirements[$description] = $categoryByService[$description] ?? 'Other';
+        }
+
+        $otherService = $this->nullableString($payload['other_service'] ?? null, 100);
+        if ($otherService !== null) {
+            $requirements[$otherService] = 'Other';
+        }
+
+        if ($requirements === []) {
+            $event->requirements()->delete();
+            return;
+        }
+
+        $event->requirements()->whereNotIn('description', array_keys($requirements))->delete();
+
+        foreach ($requirements as $description => $category) {
+            $event->requirements()->updateOrCreate(
+                ['description' => $description],
+                ['category' => $category, 'quantity' => 1, 'unit' => 'service', 'status' => 'open'],
+            );
+        }
     }
 
     /**
