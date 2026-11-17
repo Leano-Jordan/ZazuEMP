@@ -988,7 +988,11 @@ function setupZazuOfflineDirectoryViews() {
         return node;
     };
 
-    const localSyncStatus = (state, entityType, localId, serverId) => {
+    const localSyncStatus = (state, entityType, localId, serverId, pendingSync = false) => {
+        if (pendingSync) return {
+            label: 'Waiting to sync',
+            title: 'This device has saved changes for this record. They will sync when Zazu reconnects.',
+        };
         if (serverId) return { label: 'Synced', title: 'This record has a server identity.' };
 
         const conflict = (state?.conflicts || []).find(item =>
@@ -1068,8 +1072,125 @@ function setupZazuOfflineDirectoryViews() {
                 button.setAttribute('aria-expanded', 'false');
                 button.focus();
             });
-            heading.append(title, close);
+            const editButton = document.createElement('button');
+            editButton.type = 'button';
+            editButton.className = 'zazu-btn zazu-btn-secondary';
+            editButton.textContent = 'Edit offline';
+            editButton.setAttribute('aria-expanded', 'false');
+            heading.append(title, editButton, close);
             panel.append(heading);
+
+            const editForm = document.createElement('form');
+            editForm.className = 'mt-4 grid gap-3';
+            editForm.dataset.zazuCustomerOfflineEdit = '1';
+            editForm.hidden = true;
+            const editFields = document.createElement('div');
+            editFields.className = 'grid gap-3 sm:grid-cols-2';
+            const addEditField = (labelText, name, value, type = 'text', multiline = false) => {
+                const label = document.createElement('label');
+                label.className = 'zazu-field';
+                const caption = document.createElement('span');
+                caption.className = 'zazu-label';
+                caption.textContent = labelText;
+                const input = document.createElement(multiline ? 'textarea' : 'input');
+                input.className = multiline ? 'zazu-textarea' : 'zazu-input';
+                input.name = name;
+                input.value = value == null ? '' : String(value);
+                if (multiline) input.rows = 3;
+                else input.type = type;
+                if (name === 'name') input.required = true;
+                label.append(caption, input);
+                editFields.append(label);
+            };
+            addEditField('Customer name', 'name', currentCustomer.name);
+            addEditField('Primary contact', 'contact_name', currentCustomer.contact_name);
+            addEditField('Phone', 'phone', currentCustomer.phone, 'tel');
+            addEditField('Email', 'email', currentCustomer.email, 'email');
+            addEditField('Legal / billing name', 'legal_name', currentCustomer.legal_name);
+            addEditField('Registration number', 'registration_number', currentCustomer.registration_number);
+            addEditField('Tax reference', 'tax_number', currentCustomer.tax_number);
+            addEditField('VAT number', 'vat_number', currentCustomer.vat_number);
+            addEditField('Billing address', 'billing_address', currentCustomer.billing_address, 'text', true);
+            addEditField('Notes', 'notes', currentCustomer.notes, 'text', true);
+            const editStatus = document.createElement('p');
+            editStatus.className = 'zazu-panel-copy';
+            editStatus.setAttribute('role', 'status');
+            editStatus.setAttribute('aria-live', 'polite');
+            const editActions = document.createElement('div');
+            editActions.className = 'flex flex-wrap gap-2';
+            const saveEdit = document.createElement('button');
+            saveEdit.type = 'submit';
+            saveEdit.className = 'zazu-btn zazu-btn-primary';
+            saveEdit.textContent = 'Save offline changes';
+            const cancelEdit = document.createElement('button');
+            cancelEdit.type = 'button';
+            cancelEdit.className = 'zazu-btn zazu-btn-ghost';
+            cancelEdit.textContent = 'Cancel';
+            cancelEdit.addEventListener('click', () => {
+                editForm.hidden = true;
+                editButton.setAttribute('aria-expanded', 'false');
+            });
+            editActions.append(saveEdit, cancelEdit);
+            editForm.append(editFields, editStatus, editActions);
+            panel.append(editForm);
+
+            editButton.addEventListener('click', () => {
+                editForm.hidden = !editForm.hidden;
+                editButton.setAttribute('aria-expanded', editForm.hidden ? 'false' : 'true');
+                if (!editForm.hidden) editForm.querySelector('[name="name"]')?.focus();
+            });
+
+            editForm.addEventListener('submit', async event => {
+                event.preventDefault();
+                if (saveEdit.disabled) return;
+                const formData = new FormData(editForm);
+                const payload = {
+                    local_id: currentCustomer.local_id,
+                    server_id: currentCustomer.server_id ?? currentCustomer.id ?? null,
+                    name: String(formData.get('name') || '').trim(),
+                    contact_name: String(formData.get('contact_name') || '').trim() || null,
+                    phone: String(formData.get('phone') || '').trim() || null,
+                    email: String(formData.get('email') || '').trim() || null,
+                    legal_name: String(formData.get('legal_name') || '').trim() || null,
+                    registration_number: String(formData.get('registration_number') || '').trim() || null,
+                    tax_number: String(formData.get('tax_number') || '').trim() || null,
+                    vat_number: String(formData.get('vat_number') || '').trim() || null,
+                    billing_address: String(formData.get('billing_address') || '').trim() || null,
+                    notes: String(formData.get('notes') || '').trim() || null,
+                };
+                if (!payload.local_id || !payload.name) {
+                    editStatus.textContent = 'A customer name and local workspace identity are required.';
+                    return;
+                }
+
+                saveEdit.disabled = true;
+                saveEdit.textContent = 'Saving…';
+                editStatus.textContent = '';
+                try {
+                    const nextState = JSON.parse(JSON.stringify(window.ZazuOffline.getState()));
+                    const customerIndex = nextState.customers.findIndex(item =>
+                        item.local_id === payload.local_id
+                    );
+                    if (customerIndex < 0) throw new Error('This customer is no longer available in the local workspace.');
+                    nextState.customers[customerIndex] = {
+                        ...nextState.customers[customerIndex],
+                        ...payload,
+                        pending_sync: true,
+                    };
+                    await window.ZazuOffline.queueMutation('customer', 'update', payload, nextState);
+                    editStatus.textContent = 'Saved on this device. It will sync when Zazu reconnects.';
+                    editForm.hidden = true;
+                    editButton.setAttribute('aria-expanded', 'false');
+                    panel.hidden = true;
+                    button.setAttribute('aria-expanded', 'false');
+                    window.dispatchEvent(new CustomEvent('zazu:offline-state-updated'));
+                } catch (error) {
+                    editStatus.textContent = error.message || 'The customer change could not be saved locally.';
+                } finally {
+                    saveEdit.disabled = false;
+                    saveEdit.textContent = 'Save offline changes';
+                }
+            });
 
             const fields = [
                 ['Primary contact', currentCustomer.contact_name],
@@ -1202,6 +1323,13 @@ function setupZazuOfflineDirectoryViews() {
                 if (meta) {
                     meta.textContent = [customer.phone, customer.email].filter(Boolean).join(' · ') || 'No phone';
                 }
+                const syncStatus = localSyncStatus(state, 'customer', customer.local_id, serverId, customer.pending_sync === true);
+                const syncChip = serverRow.querySelector('.zazu-chip');
+                if (syncChip) {
+                    syncChip.textContent = syncStatus.label;
+                    syncChip.title = syncStatus.title;
+                    syncChip.setAttribute('aria-label', syncStatus.label + '. ' + syncStatus.title);
+                }
                 addCustomerOfflineDetails(serverRow, customer);
                 continue;
             }
@@ -1247,7 +1375,7 @@ function setupZazuOfflineDirectoryViews() {
 
             const sync = document.createElement('div');
             sync.className = 'zazu-action-group';
-            const syncStatus = localSyncStatus(state, 'customer', customer.local_id, customer.server_id ?? customer.id);
+            const syncStatus = localSyncStatus(state, 'customer', customer.local_id, customer.server_id ?? customer.id, customer.pending_sync === true);
             const syncChip = text('span', 'zazu-chip zazu-chip-neutral', syncStatus.label);
             syncChip.title = syncStatus.title;
             syncChip.setAttribute('aria-label', syncStatus.label + '. ' + syncStatus.title);
