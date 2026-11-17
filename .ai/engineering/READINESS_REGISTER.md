@@ -1,7 +1,6 @@
 # Zazu EMP — V1 Readiness Register
 
-Last verified repository HEAD: Leano-Jordan/ZazuEMP / main / 8bf76fe034f888138c0542dc308e3d4d752bd304 / 17 Nov 2026
-Last application-code test baseline: 71c8fc5c7aeba392b95e26aee694945b286f2c8e
+Last verified application-code baseline: 71c8fc5c7aeba392b95e26aee694945b286f2c8e
 Release disposition: NOT READY
 Evidence maturity: 73/100 unchanged; no uplift claimed.
 
