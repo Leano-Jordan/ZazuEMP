@@ -6,7 +6,7 @@ Release disposition: NOT READY
 Evidence maturity: 73/100 unchanged; no uplift claimed.
 
 ## Owner-approved V1 scheduling addition — 2026-11-17
-Event scheduling and connected rental logistics are explicitly authorised for V1: multi-day event dates, start/end times, setup/collection dates, schedule clash warnings, and rental allocation defaults using the event logistics window. Staff scheduling, quantity-based rental stock and wider workforce management remain deferred. Implementation is on `main`; automated acceptance is pending exact-head CI.
+Event scheduling and connected rental logistics are explicitly authorised for V1: multi-day event dates, start/end times, setup/collection dates, schedule clash warnings, and rental allocation defaults using the event logistics window. Staff scheduling, quantity-based rental stock and wider workforce management remain deferred. Implementation is on `main` at code baseline `d4a3293c067972646f47c6eb74f43a62ba504a27`; automated acceptance is pending exact-head CI.
 
 ## Existing release gates
 | Gate | Disposition | Closure evidence |
