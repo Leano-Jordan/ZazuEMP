@@ -309,27 +309,6 @@ class OfflineDomainMutationHandler implements SyncMutationHandler
             throw ValidationException::withMessages(['event_type' => 'The offline job type is not supported.']);
         }
 
-        $eventDate = $this->nullableDate($payload['event_date'] ?? null);
-        $eventEndDate = $this->nullableDate($payload['event_end_date'] ?? null);
-        $setupDate = $this->nullableDate($payload['setup_date'] ?? null);
-        $collectionDate = $this->nullableDate($payload['collection_date'] ?? null);
-        $startTime = $this->nullableTime($payload['event_start_time'] ?? null);
-        $endTime = $this->nullableTime($payload['event_end_time'] ?? null);
-
-        if ($eventDate !== null && $eventEndDate !== null && $eventEndDate < $eventDate) {
-            throw ValidationException::withMessages(['event_end_date' => 'The event end date cannot precede its start date.']);
-        }
-        if ($setupDate !== null && $eventDate !== null && $setupDate > $eventDate) {
-            throw ValidationException::withMessages(['setup_date' => 'Setup cannot be scheduled after the event begins.']);
-        }
-        $effectiveEndDate = $eventEndDate ?? $eventDate;
-        if ($collectionDate !== null && $effectiveEndDate !== null && $collectionDate < $effectiveEndDate) {
-            throw ValidationException::withMessages(['collection_date' => 'Collection cannot be scheduled before the event ends.']);
-        }
-        if ($eventDate !== null && $effectiveEndDate === $eventDate && $startTime !== null && $endTime !== null && $endTime <= $startTime) {
-            throw ValidationException::withMessages(['event_end_time' => 'The end time must be later than the start time for a same-day event.']);
-        }
-
         return [
             'business_id' => $mutation->business_id,
             'customer_id' => $customer?->id ?? $event?->customer_id,
@@ -341,16 +320,66 @@ class OfflineDomainMutationHandler implements SyncMutationHandler
             'customer_name' => $customer?->name ?? $this->nullableString($payload['customer_name'] ?? null, 255),
             'customer_phone' => $customer?->primaryContact?->phone ?? $event?->customer_phone,
             'customer_email' => $customer?->primaryContact?->email ?? $event?->customer_email,
-            'event_date' => $eventDate,
-            'event_end_date' => $eventEndDate,
-            'event_start_time' => $startTime,
-            'event_end_time' => $endTime,
-            'setup_date' => $setupDate,
-            'collection_date' => $collectionDate,
+            ...$this->offlineScheduleAttributes($payload),
             'event_address' => $this->nullableString($payload['event_address'] ?? null, 255),
             'notes' => $this->nullableString($payload['notes'] ?? null, 5000),
             'status' => $event?->status ?: 'draft',
         ];
+    }
+
+    /**
+     * @param array<string, mixed> $payload
+     * @return array<string, string|null>
+     */
+    private function offlineScheduleAttributes(array $payload): array
+    {
+        $schedule = [
+            'event_date' => $this->nullableDate($payload['event_date'] ?? null),
+            'event_end_date' => $this->nullableDate($payload['event_end_date'] ?? null),
+            'event_start_time' => $this->nullableTime($payload['event_start_time'] ?? null),
+            'event_end_time' => $this->nullableTime($payload['event_end_time'] ?? null),
+            'setup_date' => $this->nullableDate($payload['setup_date'] ?? null),
+            'collection_date' => $this->nullableDate($payload['collection_date'] ?? null),
+        ];
+
+        $this->assertOfflineSchedule($schedule);
+
+        return $schedule;
+    }
+
+    /**
+     * @param array<string, string|null> $schedule
+     */
+    private function assertOfflineSchedule(array $schedule): void
+    {
+        $eventDate = $schedule['event_date'];
+        $eventEndDate = $schedule['event_end_date'] ?? $eventDate;
+
+        if ($eventDate !== null && $eventEndDate !== null && $eventEndDate < $eventDate) {
+            throw ValidationException::withMessages(['event_end_date' => 'The event end date cannot precede its start date.']);
+        }
+        if ($schedule['setup_date'] !== null && $eventDate !== null && $schedule['setup_date'] > $eventDate) {
+            throw ValidationException::withMessages(['setup_date' => 'Setup cannot be scheduled after the event begins.']);
+        }
+        if ($schedule['collection_date'] !== null && $eventEndDate !== null && $schedule['collection_date'] < $eventEndDate) {
+            throw ValidationException::withMessages(['collection_date' => 'Collection cannot be scheduled before the event ends.']);
+        }
+
+        $this->assertOfflineTimeRange($schedule, $eventDate, $eventEndDate);
+    }
+
+    /**
+     * @param array<string, string|null> $schedule
+     */
+    private function assertOfflineTimeRange(array $schedule, ?string $eventDate, ?string $eventEndDate): void
+    {
+        $startTime = $schedule['event_start_time'];
+        $endTime = $schedule['event_end_time'];
+
+        if ($eventDate !== null && $eventEndDate === $eventDate
+            && $startTime !== null && $endTime !== null && $endTime <= $startTime) {
+            throw ValidationException::withMessages(['event_end_time' => 'The end time must be later than the start time for a same-day event.']);
+        }
     }
 
     /**
