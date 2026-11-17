@@ -553,13 +553,13 @@ class OfflineDomainMutationHandler implements SyncMutationHandler
             }
 
             $lineTotalCents = Money::multiplyQuantityByPrice(
-                Money::toHundredths((string) $quantityHundredths),
+                $quantityHundredths,
                 $unitPriceCents
             );
 
             $version->items()->create([
                 'description' => $this->requiredString($item['description'] ?? null, 'description', 500),
-                'quantity' => number_format($quantityHundredths, 2, '.', ''),
+                'quantity' => Money::fromCents($quantityHundredths),
                 'unit' => $this->nullableString($item['unit'] ?? null, 100),
                 'unit_price' => Money::fromCents($unitPriceCents),
                 'line_total' => Money::fromCents($lineTotalCents),
@@ -571,13 +571,21 @@ class OfflineDomainMutationHandler implements SyncMutationHandler
                 ],
             ]);
 
+            if ($lineTotalCents > PHP_INT_MAX - $subtotalCents) {
+                throw ValidationException::withMessages(['items' => 'Offline quote total exceeds the supported calculation range.']);
+            }
             $subtotalCents += $lineTotalCents;
         }
 
         $taxCents = 0;
         $totalCents = $subtotalCents;
         $depositPercent = Money::toCents((string) ($version->deposit_percent ?? '0.00'));
-        $depositCents = intdiv(($totalCents * $depositPercent) + 5000, 10000);
+        $depositWhole = intdiv($totalCents, 10000) * $depositPercent;
+        $depositRemainder = intdiv(((($totalCents % 10000) * $depositPercent) + 5000), 10000);
+        if ($depositWhole > PHP_INT_MAX - $depositRemainder) {
+            throw ValidationException::withMessages(['deposit_percent' => 'Offline quote deposit exceeds the supported calculation range.']);
+        }
+        $depositCents = $depositWhole + $depositRemainder;
 
         $version->update([
             'subtotal' => Money::fromCents($subtotalCents),
@@ -589,11 +597,17 @@ class OfflineDomainMutationHandler implements SyncMutationHandler
 
     private function offlineDepositPercent(mixed $value): string
     {
-        if (! is_numeric($value) || (float) $value < 0 || (float) $value > 100) {
+        try {
+            $basisPoints = Money::toCents(is_int($value) || is_float($value) || is_string($value) ? $value : '');
+        } catch (\InvalidArgumentException) {
+            throw ValidationException::withMessages(['deposit_percent' => 'Offline quote deposit percentage must have at most two decimal places.']);
+        }
+
+        if ($basisPoints > 10000) {
             throw ValidationException::withMessages(['deposit_percent' => 'Offline quote deposit percentage must be between 0 and 100.']);
         }
 
-        return number_format((float) $value, 2, '.', '');
+        return Money::fromCents($basisPoints);
     }
 
     /**
@@ -931,7 +945,7 @@ class OfflineDomainMutationHandler implements SyncMutationHandler
 
             if (in_array($type, ['issue', 'adjustment_out'], true)) {
                 $onHand = $lockedItem->on_hand_hundredths;
-                $requested = Money::toHundredths((string) $quantity);
+                $requested = $quantity;
                 if ($requested > $onHand) {
                     throw ValidationException::withMessages([
                         'quantity' => 'This offline movement would make stock on hand negative.',
@@ -956,8 +970,8 @@ class OfflineDomainMutationHandler implements SyncMutationHandler
                 'purchase_order_id' => $purchaseOrder?->id,
                 'purchase_order_item_id' => $purchaseOrderItem?->id,
                 'type' => $type,
-                'quantity' => number_format($quantity, 2, '.', ''),
-                'unit_cost' => number_format($unitCost, 2, '.', ''),
+                'quantity' => Money::fromCents($quantity),
+                'unit_cost' => $unitCost,
                 'movement_date' => $movementDate,
                 'reference' => $this->nullableString($payload['reference'] ?? null, 255),
                 'notes' => $this->nullableString($payload['notes'] ?? null, 5000),
@@ -1032,8 +1046,8 @@ class OfflineDomainMutationHandler implements SyncMutationHandler
             'category' => $category,
             'description' => $this->requiredString($payload['description'] ?? null, 'description', 255),
             'currency' => $currency,
-            'projected_amount' => number_format($projected, 2, '.', ''),
-            'actual_amount' => $actual === null ? null : number_format($actual, 2, '.', ''),
+            'projected_amount' => $projected,
+            'actual_amount' => $actual,
             'status' => $status,
             'notes' => $this->nullableString($payload['notes'] ?? null, 5000),
         ];
@@ -1083,7 +1097,7 @@ class OfflineDomainMutationHandler implements SyncMutationHandler
             'condition' => $this->requiredEnum($payload['condition'] ?? 'good', ['good', 'fair', 'poor', 'damaged'], 'condition'),
             'location' => $this->nullableString($payload['location'] ?? null, 255),
             'acquired_at' => $this->nullableDate($payload['acquired_at'] ?? null),
-            'purchase_cost' => number_format($this->nonNegativeMoney($payload['purchase_cost'] ?? '0.00'), 2, '.', ''),
+            'purchase_cost' => $this->nonNegativeMoney($payload['purchase_cost'] ?? '0.00'),
             'currency' => $this->businessCurrency($mutation->business_id),
             'notes' => $this->nullableString($payload['notes'] ?? null, 5000),
         ];
@@ -1515,17 +1529,19 @@ class OfflineDomainMutationHandler implements SyncMutationHandler
         return $value;
     }
 
-    private function nullableQuantity(mixed $value): ?float
+    private function nullableQuantity(mixed $value): ?string
     {
         if ($value === null || $value === '') {
             return null;
         }
 
-        if (! is_numeric($value) || (float) $value < 0) {
-            throw ValidationException::withMessages(['quantity' => 'Offline preparation quantity must be zero or greater.']);
+        try {
+            $quantityHundredths = Money::toHundredths(is_int($value) || is_float($value) || is_string($value) ? $value : '');
+        } catch (\InvalidArgumentException) {
+            throw ValidationException::withMessages(['quantity' => 'Offline preparation quantity must be non-negative and have at most two decimal places.']);
         }
 
-        return (float) $value;
+        return Money::fromCents($quantityHundredths);
     }
 
     private function positivePurchaseQuantity(mixed $value): int
@@ -1552,22 +1568,30 @@ class OfflineDomainMutationHandler implements SyncMutationHandler
         }
     }
 
-    private function positiveQuantity(mixed $value): float
+    private function positiveQuantity(mixed $value): int
     {
-        if (! is_numeric($value) || (float) $value <= 0) {
-            throw ValidationException::withMessages(['quantity' => 'Offline purchase order quantity must be greater than zero.']);
+        try {
+            $quantityHundredths = Money::toHundredths(is_int($value) || is_float($value) || is_string($value) ? $value : '');
+        } catch (\InvalidArgumentException) {
+            throw ValidationException::withMessages(['quantity' => 'Offline quantity must be positive and have at most two decimal places.']);
         }
 
-        return round((float) $value, 2);
+        if ($quantityHundredths <= 0) {
+            throw ValidationException::withMessages(['quantity' => 'Offline quantity must be greater than zero.']);
+        }
+
+        return $quantityHundredths;
     }
 
-    private function nonNegativeMoney(mixed $value): float
+    private function nonNegativeMoney(mixed $value): string
     {
-        if (! is_numeric($value) || (float) $value < 0) {
-            throw ValidationException::withMessages(['unit_price' => 'Offline purchase order price must be zero or greater.']);
+        try {
+            $cents = Money::toCents(is_int($value) || is_float($value) || is_string($value) ? $value : '');
+        } catch (\InvalidArgumentException) {
+            throw ValidationException::withMessages(['amount' => 'Offline financial amounts must be non-negative and have at most two decimal places.']);
         }
 
-        return round((float) $value, 2);
+        return Money::fromCents($cents);
     }
 
     private function nullableDate(mixed $value): ?string
@@ -1628,7 +1652,7 @@ class OfflineDomainMutationHandler implements SyncMutationHandler
             'name' => $this->requiredString($payload['name'] ?? null, 'name', 255),
             'capability_type' => $this->requiredEnum($payload['capability_type'] ?? null, ['service', 'rental', 'product', 'package', 'other'], 'capability_type'),
             'pricing_basis' => $this->requiredEnum($payload['pricing_basis'] ?? null, ['custom', 'fixed', 'per_unit', 'per_person', 'per_hour', 'per_day'], 'pricing_basis'),
-            'default_price' => $payload['default_price'] === null || $payload['default_price'] === '' ? null : number_format($this->nonNegativeMoney($payload['default_price']), 2, '.', ''),
+            'default_price' => $payload['default_price'] === null || $payload['default_price'] === '' ? null : $this->nonNegativeMoney($payload['default_price']),
             'currency' => $currency,
             'default_unit' => $this->nullableString($payload['default_unit'] ?? null, 50),
             'description' => $this->nullableString($payload['description'] ?? null, 5000),
