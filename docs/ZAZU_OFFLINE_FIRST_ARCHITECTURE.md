@@ -17,7 +17,7 @@ The current implementation is a hybrid cache-and-queue client, not a standalone 
 - The offline priming code collects same-origin links from the currently rendered page. It does not guarantee every route, every nested form, or every record view is available offline.
 - `public/zazu-offline.js` restores the business-scoped IndexedDB workspace and durable queue independently of the network. This is the local data foundation.
 - `resources/js/app.js` has offline form handlers for customer, job, quote, quote acceptance, supplier, inventory item, asset, expense, payment, preparation, event cost, service, inventory movement, purchase receipt, invoice, asset allocation and purchase order.
-- The visible local directory renderer currently rebuilds customer and job rows. The existence of local queue handlers for other entities does not mean their full list/detail pages or all related workflows are locally rendered.
+- The visible local directory renderer rebuilds customer and job rows. Customers with a local workspace identity can also open an in-place, read-only relationship panel containing the local customer record and linked local jobs/quotes. The existence of local queue handlers for other entities does not mean their full list/detail pages or all related workflows are locally rendered.
 - Several offline form paths explicitly require related records already present in the device workspace; customer photos and service images are explicitly deferred until online.
 
 ### Root cause of the phone's “last page” behaviour
@@ -32,7 +32,7 @@ This matrix distinguishes an IndexedDB mutation handler from a complete offline 
 
 | Domain | Local read/render evidence | Local write handler | Required device-local prerequisites / limits |
 |---|---|---|---|
-| Customers | Customer directory merges pending local customers into the rendered directory; cached customer HTML is still a snapshot | Create and update | Updating an existing server customer requires that customer to already exist in the local workspace. Profile-photo add/remove is online-only. |
+| Customers | Customer directory merges pending local customers; an in-place device-local relationship panel reads available customer/contact/billing fields plus linked local jobs and quotes. The panel is read-only; server-rendered show/edit routes remain snapshots. | Create and update | Updating an existing server customer requires that customer to already exist in the local workspace. Profile-photo add/remove is online-only. |
 | Work / jobs | Work register merges pending local jobs; cached Work HTML is still a snapshot | Create | A selected customer must exist in the local customer workspace. Local jobs can hold phone-local attachments in the dedicated attachment store. |
 | Quotes | Dashboard now renders a device-local quote summary with parent-job context and sync state; no general local quote directory/detail renderer is present | Create | The related job must already have a local workspace record with its server identity. At least one quote line is required. |
 | Quote acceptance | No independent local acceptance directory is present | Accept | The quote must exist locally and have status `sent`. |
@@ -61,7 +61,7 @@ This matrix distinguishes an IndexedDB mutation handler from a complete offline 
 **Navigation and read boundary**
 
 - The only routes explicitly primed by the current bounded first-launch flow are `/customers`, `/customers/create`, `/work`, and `/work/create`.
-- The visible local directory renderer currently covers Customers and Work only. The dashboard also provides a read-only summary of locally stored quotes; this is not a quote directory or detail workflow.
+- The visible local directory renderer covers Customers and Work. Customer relationship details are rendered in place from IndexedDB, including locally available linked Work and quote summaries. The dashboard also provides a read-only summary of locally stored quotes; this is not a quote directory or detail workflow.
 - Other entity collections may be present in IndexedDB and their forms may queue writes, but no generic local list/detail renderer exists for them. Their server-rendered pages remain cache-dependent and may fall back to the cached dashboard shell.
 - Cached Laravel HTML is snapshot presentation, not a local route implementation. The current capability must therefore be described as a bounded device-local mutation queue with customer/Work directory visibility—not full offline business-data read parity.
 
@@ -71,9 +71,10 @@ This matrix distinguishes an IndexedDB mutation handler from a complete offline 
 
 1. **Matrix complete.** Use this table as the baseline; do not re-audit or re-list the same handlers.
 2. **Implemented:** the dashboard device-local workspace renders locally stored customers, jobs and quotes from IndexedDB when the Zazu origin is unavailable; synced records remain visible and sync state is explicit. This is a dashboard workspace, not general local route/detail parity.
-3. **Next:** expand local read/detail/edit coverage one workflow at a time, starting with the existing customer → job → quote chain; add dependent commercial/purchasing workflows only when their local parent data and sync reconciliation are present.
-4. Add focused browser acceptance for direct offline navigation, local reads, local create/edit, reload while disconnected, and reconnect reconciliation. Do not count a cached page snapshot as a local read.
-5. Keep physical Android PC/server-off acceptance as final proof; CI is not a substitute.
+3. **Customer read slice implemented and browser-verified:** an in-place device-local relationship panel reads customer details, linked Work and linked quote summaries from IndexedDB. It is read-only and does not claim full customer route parity.
+4. **Next:** add local customer edit from the same workspace, then local Work detail/read/edit coverage; expand quotes only when parent-job identity and version data are available locally.
+5. Keep focused browser acceptance for direct offline navigation, local reads/writes, reload while disconnected, and reconnect reconciliation. Do not count a cached page snapshot as a local read.
+6. Keep physical Android PC/server-off acceptance as final proof; CI is not a substitute.
 
 
 No runtime code changed in this audit. The physical Android gate remains OPEN.
