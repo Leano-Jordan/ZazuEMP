@@ -1034,6 +1034,11 @@ function setupZazuOfflineDirectoryViews() {
         button.addEventListener('click', () => {
             const currentState = window.ZazuOffline?.getState();
             if (!currentState) return;
+            const customerServerId = Number(currentCustomer.server_id ?? currentCustomer.id ?? 0);
+            const currentCustomer = (currentState.customers || []).find(item =>
+                (currentCustomer.local_id && item.local_id === currentCustomer.local_id)
+                || (customerServerId > 0 && Number(item.server_id ?? item.id ?? 0) === customerServerId)
+            ) || customer;
             let panel = row.nextElementSibling;
             if (!panel?.matches('[data-zazu-customer-offline-detail]')) {
                 panel = document.createElement('section');
@@ -1053,7 +1058,7 @@ function setupZazuOfflineDirectoryViews() {
             heading.className = 'zazu-panel-head';
             const title = document.createElement('div');
             title.className = 'zazu-panel-title';
-            title.textContent = customer.name || 'Customer details';
+            title.textContent = currentCustomer.name || 'Customer details';
             const close = document.createElement('button');
             close.type = 'button';
             close.className = 'zazu-btn zazu-btn-ghost';
@@ -1067,14 +1072,14 @@ function setupZazuOfflineDirectoryViews() {
             panel.append(heading);
 
             const fields = [
-                ['Primary contact', customer.contact_name],
-                ['Phone', customer.phone],
-                ['Email', customer.email],
-                ['Legal / billing name', customer.legal_name],
-                ['Registration number', customer.registration_number],
-                ['VAT number', customer.vat_number],
-                ['Billing address', customer.billing_address],
-                ['Notes', customer.notes],
+                ['Primary contact', currentCustomer.contact_name],
+                ['Phone', currentCustomer.phone],
+                ['Email', currentCustomer.email],
+                ['Legal / billing name', currentCustomer.legal_name],
+                ['Registration number', currentCustomer.registration_number],
+                ['VAT number', currentCustomer.vat_number],
+                ['Billing address', currentCustomer.billing_address],
+                ['Notes', currentCustomer.notes],
             ].filter(([, value]) => value !== null && value !== undefined && String(value).trim() !== '');
             const details = document.createElement('div');
             details.className = 'zazu-detail-rows mt-3';
@@ -1092,9 +1097,9 @@ function setupZazuOfflineDirectoryViews() {
             }
             if (fields.length) panel.append(details);
 
-            const customerServerId = Number(customer.server_id ?? customer.id ?? 0);
+            const customerServerId = Number(currentCustomer.server_id ?? currentCustomer.id ?? 0);
             const jobs = (currentState.jobs || []).filter(job =>
-                (customer.local_id && job.customer_local_id === customer.local_id)
+                (currentCustomer.local_id && job.customer_local_id === currentCustomer.local_id)
                 || (customerServerId > 0 && Number(job.customer_id || 0) === customerServerId)
             );
             const workHeading = document.createElement('div');
@@ -1173,7 +1178,11 @@ function setupZazuOfflineDirectoryViews() {
         const directory = document.querySelector('.zazu-customer-directory');
         if (!directory) return;
 
-        directory.querySelectorAll('[data-zazu-local-record="customer"]').forEach(node => node.remove());
+        directory.querySelectorAll('[data-zazu-local-record="customer"]').forEach(node => {
+            const detail = node.nextElementSibling;
+            if (detail?.matches('[data-zazu-customer-offline-detail]')) detail.remove();
+            node.remove();
+        });
         const customers = [];
         for (const customer of state?.customers || []) {
             if (!customer?.local_id) continue;
