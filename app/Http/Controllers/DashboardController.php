@@ -95,17 +95,9 @@ class DashboardController extends Controller
         $workspaceTools = $this->workspaceToolsFor($request->user(), $business);
 
         if ($workspaceTools['finance']) {
-            $receivedThisMonth = Payment::query()
-                ->where('business_id', $businessId)
-                ->where('currency', $business->currency ?? 'ZAR')
-                ->whereBetween('paid_at', [
-                    $today->copy()->startOfMonth()->toDateString(),
-                    $today->copy()->endOfMonth()->toDateString(),
-                ])
-                ->sum('amount');
-
-            $metrics['payments_received_this_month'] = Money::formatCents(
-                Money::toCents((string) $receivedThisMonth)
+            $metrics['payments_received_this_month'] = $this->paymentsReceivedThisMonth(
+                (int) $businessId,
+                (string) ($business->currency ?? 'ZAR'),
             );
         }
 
@@ -123,6 +115,21 @@ class DashboardController extends Controller
             'nicheDefinition',
             'supportingNiches'
         ));
+    }
+
+    private function paymentsReceivedThisMonth(int $businessId, string $currency): string
+    {
+        $today = now();
+        $amount = Payment::query()
+            ->where('business_id', $businessId)
+            ->where('currency', $currency)
+            ->whereBetween('paid_at', [
+                $today->copy()->startOfMonth()->toDateString(),
+                $today->copy()->endOfMonth()->toDateString(),
+            ])
+            ->sum('amount');
+
+        return Money::formatCents(Money::toCents((string) $amount));
     }
 
     private function workspaceToolsFor(\Illuminate\Contracts\Auth\Authenticatable $user, \App\Models\Business $business): array
