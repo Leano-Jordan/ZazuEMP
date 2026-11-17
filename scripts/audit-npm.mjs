@@ -43,7 +43,7 @@ while (changed) {
         const onlyAcceptedAdvisory = via.every((item) => {
             if (typeof item === 'string') return accepted.has(item);
 
-            return item.source === acceptedAdvisory
+            return (item.source === acceptedAdvisory || item.url?.endsWith(acceptedAdvisory))
                 && item.name === 'picomatch'
                 && vulnerability.fixAvailable === false;
         });
