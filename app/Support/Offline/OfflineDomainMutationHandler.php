@@ -239,6 +239,10 @@ class OfflineDomainMutationHandler implements SyncMutationHandler
             $event = $this->lifecycle->lock($mutation->business_id, $event->id);
             $this->lifecycle->assertOperational($event);
 
+            $nextStatus = $this->requiredString($payload['status'] ?? $event->status, 'status', 30);
+            $this->lifecycle->assertTransitionAllowed($event, $nextStatus);
+            $attributes['status'] = $nextStatus;
+
             if (
                 (int) $event->customer_id !== (int) ($attributes['customer_id'] ?? $event->customer_id)
                 && $event->quotes()->exists()
