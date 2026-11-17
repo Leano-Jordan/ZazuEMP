@@ -1,5 +1,9 @@
 # Changelog
 
+## Unreleased — 2026-11-17 (Rental and invoice-number reproduction)
+- Added a focused regression test for two non-overlapping bookings of one serialized rental asset; exact-head CI is pending before defect confirmation or correction.
+- Added an assertion documenting the existing month-prefixed random online invoice-number format; offline UUID numbering remains unchanged pending SA tax-adviser guidance.
+
 ## Unreleased — 2026-11-17 (Director audit reconciliation)
 - Reconciled Director state, readiness register and V1 release checklist to live main HEAD ac795437 and exact-head CI evidence.
 - Archived prior long-form state, readiness register and memory snapshots without discarding history.

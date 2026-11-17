@@ -192,6 +192,7 @@ class TaxComplianceTest extends TestCase
             ->assertRedirect();
 
         $invoice = Invoice::where('quote_id', $quote->id)->firstOrFail();
+        $this->assertMatchesRegularExpression('/^INV-\\d{6}-[A-Z0-9]{6}$/', $invoice->number);
 
         $this->assertSame('1000.00', (string) $invoice->subtotal);
         $this->assertSame('150.00', (string) $invoice->tax_total);

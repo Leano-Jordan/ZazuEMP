@@ -16,6 +16,6 @@ Disposition: NOT READY · Evidence maturity: 73/100 unchanged.
 - [x] Password reset revokes the owner's trusted devices — independently verified in source.
 
 ## Independent audit reconciliation
-All eight Claude findings are triaged in the existing readiness register; no second backlog or scorecard. Rental date-allocation requires focused reproduction before correction. Invoice numbering remains unchanged pending South African tax-adviser advice. Multi-day scheduling and team/communications/billing expansion require explicit owner approval. Persistent trusted-device scope and product tier count also require owner decisions.
+All eight Claude findings are triaged in the existing readiness register; no second backlog or scorecard. Rental date-allocation has a focused regression reproduction awaiting exact-head CI; no application fix is included. Invoice numbering remains unchanged pending South African tax-adviser advice. Multi-day scheduling and team/communications/billing expansion require explicit owner approval. Persistent trusted-device scope and product tier count also require owner decisions.
 
 Exact-head CI at ac795437: Laravel 520 passed / 1 skipped / 3,635 assertions; PostgreSQL migration/registration/recovery and offline browser acceptance jobs passed; Zazu quality and CodeQL passed; SonarCloud skipped. See the readiness register for run links and exact evidence.
