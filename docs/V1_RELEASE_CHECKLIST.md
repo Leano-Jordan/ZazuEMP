@@ -75,3 +75,11 @@ V1 remains NOT READY. Application-code CI at a5ead69 passed: Laravel 526 passed 
 The incident logger records privacy-minimised metadata only (request ID, classification, exception class, route/action, method/path, timestamp and source file/line). It intentionally excludes exception messages, SQL, bindings and stack traces. The incident-framework documentation has been corrected to match this implementation.
 
 The owner-installation entry matching `aa9080f4-9580-41c9-a643-439b31928ffa` remains required. Use it to identify the exception class, source file/line and route; if those bounded fields do not isolate the cause, reproduce locally under controlled diagnostics. This documentation correction does not close DB-001 or verify the startup migration against the intended installation.
+
+
+### Backup-first verification hardening — 2026-11-17
+
+- [x] Backup creation now reopens the completed ZIP and validates ZIP consistency, manifest/driver, exact payload membership and every SHA-256 checksum before publishing it.
+- [x] Added a regression for valid archive acceptance and tampered private-payload rejection.
+- [ ] Exact-head Laravel and Windows workflow verification.
+- [ ] Run backup-first migration on the intended installation and confirm the previously failing workflow succeeds.
