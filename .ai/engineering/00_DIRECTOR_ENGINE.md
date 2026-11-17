@@ -57,16 +57,16 @@ This narrow exception supersedes the earlier 2026-11-05 blanket non-main cleanup
 
 When sources conflict, preserve the higher authority and surface the conflict.
 
-## Session read order
+## Session read order — lean execution
 
-1. `.ai/REPOSITORY_IDENTITY_LOCK.md`
-2. `.ai/engineering/00_DIRECTOR_ENGINE.md` — this canonical control contract
-3. `.ai/engineering/STATE.md` — current state only
-4. Relevant skill / specialist contract for the active target
-5. Failure case / error index / regression ledger only when the target requires them
-6. Archives only when historical evidence is needed
+Do not make documentation reading a development gate.
 
-CLAUDE.md and AGENTS.md are entry-point pointers. They must not duplicate this contract.
+1. Read only the opening **Owner V1 shipping mandate** in `memory.md`.
+2. Confirm repository/ref and inspect the latest relevant entry at the top of `.ai/engineering/STATE.md`; never preload the full living state/history.
+3. Read the source, tests and one relevant specialist contract for the active target.
+4. Load the identity lock, full control contract, failure ledgers or archives only when the target touches those boundaries or requires that history.
+
+CLAUDE.md and AGENTS.md are short entry pointers. They must not duplicate this contract. A routine task does not require a task packet or a new documentation entry. Record only meaningful decisions, verified defects/fixes, acceptance changes or handovers; prefer updating the existing living record over creating another file. Documentation must reduce uncertainty, not delay implementation.
 
 ## Control loop
 
