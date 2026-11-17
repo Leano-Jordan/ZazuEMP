@@ -2030,6 +2030,7 @@ test.describe('Zazu installed PWA offline shell', () => {
         const editForm = detail.locator('[data-zazu-job-offline-edit]');
         await expect(editForm).toBeVisible();
         await editForm.locator('[name="name"]').fill('Updated offline wedding reception');
+        await editForm.locator('[name="status"]').selectOption('in_progress');
         await editForm.locator('[name="event_date"]').fill('2026-12-13');
         await editForm.locator('[name="event_address"]').fill('Centurion, Gauteng');
         await editForm.locator('[name="notes"]').fill('Updated offline venue instructions');
@@ -2041,6 +2042,7 @@ test.describe('Zazu installed PWA offline shell', () => {
         expect(queued[0].entity_type).toBe('job');
         expect(queued[0].operation).toBe('update');
         expect(queued[0].payload.record.name).toBe('Updated offline wedding reception');
+        expect(queued[0].payload.record.status).toBe('in_progress');
         expect(queued[0].payload.record.event_date).toBe('2026-12-13');
         expect(queued[0].payload.record.event_address).toBe('Centurion, Gauteng');
         expect(queued[0].payload.record.services).toEqual(['Full catering service', 'Equipment hire']);
@@ -2048,7 +2050,7 @@ test.describe('Zazu installed PWA offline shell', () => {
         const updatedRow = page.locator('[data-zazu-local-record="job"]').filter({ hasText: 'Updated offline wedding reception' });
         await expect(updatedRow).toBeVisible();
         await expect(updatedRow.locator('.zazu-ops-actions .zazu-chip')).toHaveText('Waiting to sync');
-        await expect(updatedRow.locator('.zazu-ops-row-main .zazu-chip')).toHaveText('Confirmed');
+        await expect(updatedRow.locator('.zazu-ops-row-main .zazu-chip')).toHaveText('In progress');
         await updatedRow.getByRole('button', { name: 'View offline' }).click();
         const updatedDetail = page.getByRole('region', { name: 'Offline job details' });
         await expect(updatedDetail.getByText('Updated offline wedding reception')).toBeVisible();
