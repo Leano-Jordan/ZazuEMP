@@ -46,11 +46,11 @@ Additional transport/status mappings are defined for session expiry, method-not-
 
 User-facing pages expose a named code and safe explanation, for example:
 
-**Unable to load Customers**  
+**We could not open or save your information.**  
 **DB-001**  
-We could not load the requested data. Please try again.
+Please try again. If the problem continues, share this reference number with support.
 
-Reference: request UUID
+Reference number: request ID
 
 The diagnostic log contains the technical exception, source location, route/component, timestamp, stack trace and request correlation identifier.
 
