@@ -70,10 +70,19 @@ class BusinessSettingsController extends Controller
             return response()->json(['revoked' => true, 'already_revoked' => true]);
         }
 
+        $metadata = $device->metadata ?? [];
+        $alreadyRevoked = $device->status === 'revoked'
+            && $device->revoked_at !== null
+            && $device->token_expires_at === null
+            && ! array_key_exists('sync_token_hash', $metadata)
+            && ! array_key_exists('pairing_code_hash', $metadata)
+            && ! array_key_exists('pairing_expires_at', $metadata);
+
         $this->revokeSyncDeviceRecord($device, $business, 'offline_logout_retry');
 
         return response()->json([
             'revoked' => true,
+            'already_revoked' => $alreadyRevoked,
             'device_id' => (int) $device->id,
         ]);
     }
