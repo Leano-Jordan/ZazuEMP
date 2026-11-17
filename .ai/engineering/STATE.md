@@ -2,8 +2,7 @@
 
 As of: 2026-11-17
 Repository: Leano-Jordan/ZazuEMP
-Last verified repository HEAD: 8bf76fe034f888138c0542dc308e3d4d752bd304 (17 Nov 2026)
-Last application-code test baseline: 71c8fc5c7aeba392b95e26aee694945b286f2c8e
+Last verified application-code baseline: 71c8fc5c7aeba392b95e26aee694945b286f2c8e
 Canonical branch: main only; never create branches. Engineering changes are active on main; no branches created.
 Owner mandate: ship a dependable first-business V1; preserve scope; no Render or AMPPS workflow.
 
