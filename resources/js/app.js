@@ -3116,7 +3116,7 @@ function handleZazuPhonePairing() {
     const params = new URLSearchParams(window.location.search);
     if (params.get('zazu-pair') !== '1') return;
 
-    const code = window.prompt('Enter the 6-digit Zazu phone pairing code from the owner Zazu settings.');
+    const code = window.prompt('Enter the 8-digit Zazu phone pairing code from the owner Zazu settings.');
     if (!code) return;
 
     window.ZazuOffline.pair(code)
