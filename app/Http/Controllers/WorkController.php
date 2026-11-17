@@ -10,6 +10,7 @@ use App\Models\EventPreparationItem;
 use App\Models\EventRequirement;
 use App\Support\Audit;
 use App\Services\EventLifecycleService;
+use App\Services\EventScheduleValidator;
 use App\Services\EventScheduleConflictDetector;
 use App\Support\CurrentBusiness;
 use Illuminate\Http\RedirectResponse;
@@ -114,11 +115,11 @@ class WorkController extends Controller
         ]);
     }
 
-    public function store(Request $request, EventScheduleConflictDetector $conflictDetector): RedirectResponse
+    public function store(Request $request, EventScheduleConflictDetector $conflictDetector, EventScheduleValidator $scheduleValidator): RedirectResponse
     {
         $business = $this->business($request);
         $validated = $request->validate($this->rules());
-        $this->validateSchedule($validated);
+        $scheduleValidator->validate($validated);
 
         $customer = Customer::query()
             ->where('business_id', $business->id)
@@ -223,13 +224,13 @@ class WorkController extends Controller
         return view('work.edit', compact('event', 'customers', 'customerOptions', 'hasQuotes'));
     }
 
-    public function update(Request $request, Event $event, EventLifecycleService $lifecycle, EventScheduleConflictDetector $conflictDetector): RedirectResponse
+    public function update(Request $request, Event $event, EventLifecycleService $lifecycle, EventScheduleConflictDetector $conflictDetector, EventScheduleValidator $scheduleValidator): RedirectResponse
     {
         $business = $this->business($request);
         $validated = $request->validate($this->rules() + [
             'status' => ['required', 'in:draft,confirmed,in_progress,completed,cancelled'],
         ]);
-        $this->validateSchedule($validated);
+        $scheduleValidator->validate($validated);
 
         $customer = Customer::query()
             ->where('business_id', $business->id)
@@ -371,45 +372,6 @@ class WorkController extends Controller
     }
 
 
-    /**
-     * Validate the event's operational schedule while retaining date-only
-     * compatibility for existing records and offline clients.
-     *
-     * @param array<string, mixed> $data
-     */
-    private function validateSchedule(array $data): void
-    {
-        $this->validateSameDayTimeRange($data);
-        $this->validateCollectionDate($data);
-    }
-
-    private function validateSameDayTimeRange(array $data): void
-    {
-        $startDate = $data['event_date'] ?? null;
-        $endDate = $data['event_end_date'] ?? $startDate;
-        $startTime = $data['event_start_time'] ?? null;
-        $endTime = $data['event_end_time'] ?? null;
-
-        if ($startDate && $endDate && $startDate === $endDate
-            && $startTime && $endTime && $endTime <= $startTime) {
-            throw ValidationException::withMessages([
-                'event_end_time' => 'The end time must be later than the start time for a same-day event.',
-            ]);
-        }
-    }
-
-    private function validateCollectionDate(array $data): void
-    {
-        $endDate = $data['event_end_date'] ?? ($data['event_date'] ?? null);
-
-        if (! empty($data['collection_date']) && $endDate
-            && $data['collection_date'] < $endDate) {
-            throw ValidationException::withMessages([
-                'collection_date' => 'Collection cannot be scheduled before the event ends.',
-            ]);
-        }
-    }
-
     private function rules(): array
     {
         return [
@@ -419,11 +381,11 @@ class WorkController extends Controller
             'name' => ['required', 'string', 'max:255'],
             'event_type' => ['required', 'string', 'in:' . implode(',', config('zazu.job_types'))],
             'event_date' => ['required', 'date'],
-            'event_end_date' => ['nullable', 'date', 'after_or_equal:event_date'],
+            'event_end_date' => ['nullable', 'date'],
             'event_start_time' => ['nullable', 'date_format:H:i'],
             'event_end_time' => ['nullable', 'date_format:H:i'],
-            'setup_date' => ['nullable', 'date', 'before_or_equal:event_date'],
-            'collection_date' => ['nullable', 'date', 'after_or_equal:event_end_date'],
+            'setup_date' => ['nullable', 'date'],
+            'collection_date' => ['nullable', 'date'],
             'event_address' => ['nullable', 'string', 'max:255'],
             'notes' => ['nullable', 'string'],
             'services' => ['nullable', 'array'],
