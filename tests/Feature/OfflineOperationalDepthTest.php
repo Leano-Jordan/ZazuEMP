@@ -316,6 +316,52 @@ class OfflineOperationalDepthTest extends TestCase
         $this->assertSame('applied', $mutation->fresh()->status);
     }
 
+    public function test_offline_job_update_can_reassign_customer_without_quotes(): void
+    {
+        $business = $this->business();
+        $device = $this->device($business);
+        $oldCustomer = \App\Models\Customer::create([
+            'business_id' => $business->id,
+            'name' => 'Original Work Customer',
+        ]);
+        $newCustomer = \App\Models\Customer::create([
+            'business_id' => $business->id,
+            'name' => 'Replacement Work Customer',
+        ]);
+        $event = Event::create([
+            'business_id' => $business->id,
+            'customer_id' => $oldCustomer->id,
+            'reference' => 'OFF-REASSIGN-001',
+            'name' => 'Offline Reassignment Job',
+            'event_type' => 'Other',
+            'status' => 'confirmed',
+        ]);
+        $customerIdentity = app(\App\Support\Offline\SyncEntityIdentityRegistry::class)
+            ->identify($newCustomer, 'customer')
+            ->entity_uuid;
+        $jobIdentity = app(\App\Support\Offline\SyncEntityIdentityRegistry::class)
+            ->identify($event, 'job')
+            ->entity_uuid;
+        $mutation = app(SyncMutationRecorder::class)->record($device, 'job', $jobIdentity, 'update', [
+            'local_id' => $jobIdentity,
+            'record' => [
+                'name' => 'Offline Reassignment Job',
+                'event_type' => 'Other',
+                'status' => 'confirmed',
+                'customer_local_id' => $customerIdentity,
+                'customer_name' => 'Replacement Work Customer',
+            ],
+        ]);
+
+        app(SyncMutationApplier::class)->apply($mutation, [
+            'job' => app(\App\Support\Offline\OfflineDomainMutationHandler::class),
+        ]);
+
+        $this->assertSame($newCustomer->id, $event->fresh()->customer_id);
+        $this->assertSame('Replacement Work Customer', $event->fresh()->customer_name);
+        $this->assertSame('applied', $mutation->fresh()->status);
+    }
+
     public function test_offline_job_update_can_advance_confirmed_work_to_in_progress(): void
     {
         $business = $this->business();
