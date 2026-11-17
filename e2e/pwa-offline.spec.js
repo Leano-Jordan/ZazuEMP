@@ -1793,8 +1793,34 @@ test.describe('Zazu installed PWA offline shell', () => {
         }
         await expect(detail.getByText('Wedding', { exact: true })).toBeVisible();
 
-        await detail.getByRole('button', { name: 'Close' }).click();
-        await expect(detail).toBeHidden();
+        await detail.getByRole('button', { name: 'Edit offline' }).click();
+        const editForm = detail.locator('[data-zazu-job-offline-edit]');
+        await expect(editForm).toBeVisible();
+        await editForm.locator('[name="name"]').fill('Updated offline wedding reception');
+        await editForm.locator('[name="event_date"]').fill('2026-12-13');
+        await editForm.locator('[name="event_address"]').fill('Centurion, Gauteng');
+        await editForm.locator('[name="notes"]').fill('Updated offline venue instructions');
+        await editForm.getByRole('button', { name: 'Save offline changes' }).click();
+
+        await expect.poll(async () => page.evaluate(async () => (await window.ZazuOffline.pending()).length)).toBe(1);
+        const queued = await page.evaluate(async () => window.ZazuOffline.pending());
+        expect(queued[0].entity_type).toBe('job');
+        expect(queued[0].operation).toBe('update');
+        expect(queued[0].payload.record.name).toBe('Updated offline wedding reception');
+        expect(queued[0].payload.record.event_date).toBe('2026-12-13');
+        expect(queued[0].payload.record.event_address).toBe('Centurion, Gauteng');
+
+        const updatedRow = page.locator('[data-zazu-local-record="job"]').filter({ hasText: 'Updated offline wedding reception' });
+        await expect(updatedRow).toBeVisible();
+        await expect(updatedRow.locator('.zazu-chip')).toHaveText('Waiting to sync');
+        await updatedRow.getByRole('button', { name: 'View offline' }).click();
+        const updatedDetail = page.getByRole('region', { name: 'Offline job details' });
+        await expect(updatedDetail.getByText('Updated offline wedding reception')).toBeVisible();
+        await expect(updatedDetail.getByText('2026-12-13')).toBeVisible();
+        await expect(updatedDetail.getByText('Centurion, Gauteng')).toBeVisible();
+        await expect(updatedDetail.getByText('Updated offline venue instructions')).toBeVisible();
+        await updatedDetail.getByRole('button', { name: 'Close' }).click();
+        await expect(updatedDetail).toBeHidden();
     });
 
     test('reads and edits a device-local customer relationship while disconnected', async ({ page, context }, testInfo) => {
