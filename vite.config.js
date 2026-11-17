@@ -14,7 +14,7 @@ export default defineConfig(({ mode }) => {
     return {
         plugins: [
             laravel({
-                input: ['resources/css/app.css', 'resources/css/zazu-responsive-theme.css', 'resources/css/zazu-final-visual-sweep.css', 'resources/css/zazu-mobile-refinement.css', 'resources/css/zazu-dashboard-authority.css', 'resources/css/zazu-product-authority.css', 'resources/js/app.js'],
+                input: ['resources/css/app.css', 'resources/css/zazu-responsive-theme.css', 'resources/css/zazu-final-visual-sweep.css', 'resources/css/zazu-mobile-refinement.css', 'resources/css/zazu-dashboard-authority.css', 'resources/css/zazu-product-authority.css', 'resources/js/app.js', 'resources/js/public-document.js'],
                 refresh: true,
             }),
             tailwindcss(),
