@@ -1149,9 +1149,6 @@ function setupZazuOfflineDirectoryViews() {
                 event.preventDefault();
                 if (saveEdit.disabled) return;
                 const formData = new FormData(editForm);
-                const selectedCustomerLocalId = String(formData.get('customer_local_id') || currentCustomerLocalId || '');
-                const selectedCustomer = (window.ZazuOffline.getState().customers || [])
-                    .find(item => item.local_id === selectedCustomerLocalId);
                 const payload = {
                     local_id: currentCustomer.local_id,
                     server_id: currentCustomer.server_id ?? currentCustomer.id ?? null,
@@ -1183,17 +1180,6 @@ function setupZazuOfflineDirectoryViews() {
                     nextState.customers[customerIndex] = {
                         ...nextState.customers[customerIndex],
                         ...payload,
-                        services: payload.services,
-                        status: payload.status,
-                        customer_local_id: payload.customer_local_id,
-                        customer_id: selectedCustomer?.server_id ?? selectedCustomer?.id ?? null,
-                        customer_name: payload.customer_name,
-                        requirements: payload.services.map(description => {
-                            const existing = currentRequirements.find(item => (item.description || item.name) === description);
-                            return existing
-                                ? { ...existing, description }
-                                : { description, category: 'Other', quantity: 1, unit: 'service', status: 'open' };
-                        }),
                         pending_sync: true,
                     };
                     await window.ZazuOffline.queueMutation('customer', 'update', payload, nextState);
@@ -1656,6 +1642,14 @@ function setupZazuOfflineDirectoryViews() {
                     nextState.jobs[jobIndex] = {
                         ...nextState.jobs[jobIndex],
                         ...payload,
+                        customer_id: selectedCustomer?.server_id ?? selectedCustomer?.id
+                            ?? (selectedCustomerLocalId === currentCustomerLocalId ? currentJob.customer_id : null),
+                        requirements: payload.services.map(description => {
+                            const existing = currentRequirements.find(item => (item.description || item.name) === description);
+                            return existing
+                                ? { ...existing, description }
+                                : { description, category: 'Other', quantity: 1, unit: 'service', status: 'open' };
+                        }),
                         pending_sync: true,
                     };
                     await window.ZazuOffline.queueMutation('job', 'update', payload, nextState);
