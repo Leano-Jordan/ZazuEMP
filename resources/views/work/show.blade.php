@@ -38,7 +38,7 @@
                 {{ $event->customer?->name ?? $event->customer_name ?? 'No customer' }}
                 · {{ $event->event_type ?: 'Job' }}
                 @if ($event->event_date) · {{ $event->event_date->format('l, d F Y') }} @endif
-                @if ($event->event_end_date && !$event->event_end_date->isSameDay($event->event_date)) · through {{ $event->event_end_date->format('d F Y') }} @endif
+                @if ($event->event_end_date && $event->event_date && !$event->event_end_date->isSameDay($event->event_date)) · through {{ $event->event_end_date->format('d F Y') }} @endif
                 @if ($event->event_start_time || $event->event_end_time) · {{ substr((string) $event->event_start_time, 0, 5) ?: '—' }}–{{ substr((string) $event->event_end_time, 0, 5) ?: '—' }} @endif
                 @if ($event->setup_date) · Setup {{ $event->setup_date->format('d M') }} @endif
                 @if ($event->collection_date) · Collection {{ $event->collection_date->format('d M') }} @endif
