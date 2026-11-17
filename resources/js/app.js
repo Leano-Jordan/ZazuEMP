@@ -1149,6 +1149,9 @@ function setupZazuOfflineDirectoryViews() {
                 event.preventDefault();
                 if (saveEdit.disabled) return;
                 const formData = new FormData(editForm);
+                const selectedCustomerLocalId = String(formData.get('customer_local_id') || currentCustomerLocalId || '');
+                const selectedCustomer = (window.ZazuOffline.getState().customers || [])
+                    .find(item => item.local_id === selectedCustomerLocalId);
                 const payload = {
                     local_id: currentCustomer.local_id,
                     server_id: currentCustomer.server_id ?? currentCustomer.id ?? null,
@@ -1182,6 +1185,9 @@ function setupZazuOfflineDirectoryViews() {
                         ...payload,
                         services: payload.services,
                         status: payload.status,
+                        customer_local_id: payload.customer_local_id,
+                        customer_id: selectedCustomer?.server_id ?? selectedCustomer?.id ?? null,
+                        customer_name: payload.customer_name,
                         requirements: payload.services.map(description => {
                             const existing = currentRequirements.find(item => (item.description || item.name) === description);
                             return existing
@@ -1561,6 +1567,16 @@ function setupZazuOfflineDirectoryViews() {
             };
             const availableStatuses = statusOptions[currentJob.status || 'draft'] || statusOptions.draft;
             addEditSelect('Work status', 'status', currentJob.status || 'draft', availableStatuses);
+            const currentCustomerLocalId = currentJob.customer_local_id || customer?.local_id || '';
+            const customerOptions = (currentState.customers || [])
+                .filter(item => item && item.local_id)
+                .map(item => ({ value: item.local_id, label: item.name || 'Unnamed customer' }));
+            if (currentCustomerLocalId && !customerOptions.some(item => item.value === currentCustomerLocalId)) {
+                customerOptions.unshift({ value: currentCustomerLocalId, label: customer?.name || currentJob.customer_name || 'Current customer' });
+            }
+            if (customerOptions.length) {
+                addEditSelect('Customer', 'customer_local_id', currentCustomerLocalId, customerOptions);
+            }
             addEditField('Job name', 'name', currentJob.name, 'text', false, 255);
             addEditField('Event date', 'event_date', currentJob.event_date ? String(currentJob.event_date).slice(0, 10) : '', 'date');
             addEditField('Venue / address', 'event_address', currentJob.event_address, 'text', false, 255);
@@ -1617,10 +1633,10 @@ function setupZazuOfflineDirectoryViews() {
                         .split(/[\n,]+/)
                         .map(value => value.trim())
                         .filter(Boolean))],
-                    customer_local_id: currentJob.customer_local_id || customer?.local_id || null,
-                    customer_name: customer?.name || currentJob.customer_name || null,
-                    event_day_contact_id: currentJob.event_day_contact_id ?? null,
-                    event_night_contact_id: currentJob.event_night_contact_id ?? null,
+                    customer_local_id: String(formData.get('customer_local_id') || currentCustomerLocalId || '') || null,
+                    customer_name: selectedCustomer?.name || currentJob.customer_name || null,
+                    event_day_contact_id: selectedCustomerLocalId === currentCustomerLocalId ? (currentJob.event_day_contact_id ?? null) : null,
+                    event_night_contact_id: selectedCustomerLocalId === currentCustomerLocalId ? (currentJob.event_night_contact_id ?? null) : null,
                 };
                 if (!payload.local_id || !payload.name) {
                     editStatus.textContent = 'A job name and local workspace identity are required.';
