@@ -2,8 +2,8 @@
 
 As of: 2026-11-17
 Repository: Leano-Jordan/ZazuEMP
-Last verified engineering source baseline: fd82f6a5fb59365687fac903f93e944394145427 (17 Nov 2026)
-Last application-code test baseline: a5ead696429867bcd57342406bb37662ca1b2f2c
+Last verified repository HEAD: 1bb4936594add3368dd3f39d9ec969ef5b7b5ca1 (17 Nov 2026)
+Last application-code test baseline: 71c8fc5c7aeba392b95e26aee694945b286f2c8e
 Canonical branch: main only; never create branches. Engineering changes are active on main; no branches created.
 Owner mandate: ship a dependable first-business V1; preserve scope; no Render or AMPPS workflow.
 
@@ -11,7 +11,7 @@ Owner mandate: ship a dependable first-business V1; preserve scope; no Render or
 
 Owner authorised the focused V1 addition: multi-day event dates, start/end times, setup/collection dates, schedule clash warnings and connected rental allocation dates. Staff scheduling, quantity-based rental stock and workforce management remain deferred.
 
-Implementation candidate is on `main` at source HEAD `71c8fc5c7aeba392b95e26aee694945b286f2c8e` (17 Nov 2026). Added an additive events migration; online Work create/edit persistence and validation; offline mutation payload/server application and workspace bootstrap; calendar multi-day expansion; schedule clash detection; and rental allocation date defaults. Added focused online/offline feature tests, including preservation of new schedule fields when older queued offline mutations arrive. At the current baseline, Laravel passes 532 tests / 1 skipped / 3,714 assertions; PHPMD passes; the Windows package and PowerShell first-install + private-media recovery pass on the immediately preceding code baseline 2ef2a0b. PostgreSQL and desktop/mobile offline-browser acceptance are still running for 71c8fc5. Zazu Quality remains red on the unpatched picomatch advisory. Rendered/physical acceptance is pending; no readiness uplift is claimed.
+Implementation candidate is on `main` at source HEAD `71c8fc5c7aeba392b95e26aee694945b286f2c8e` (17 Nov 2026). Added an additive events migration; online Work create/edit persistence and validation; offline mutation payload/server application and workspace bootstrap; calendar multi-day expansion; schedule clash detection; and rental allocation date defaults. Added focused online/offline feature tests, including preservation of new schedule fields when older queued offline mutations arrive. At the current baseline, Laravel passes 532 tests / 1 skipped / 3,714 assertions; PHPMD passes; the Windows package and PowerShell first-install + private-media recovery pass on the immediately preceding code baseline 2ef2a0b. PostgreSQL and desktop/mobile offline-browser acceptance completed PASS for 71c8fc5 in run 44152431508. Zazu Quality remains red on the unpatched picomatch advisory. Rendered/physical acceptance is pending; no readiness uplift is claimed.
 
 ## Event scheduling implementation verification — 71c8fc5 (17 Nov 2026)
 
@@ -22,7 +22,7 @@ Implementation candidate is on `main` at source HEAD `71c8fc5c7aeba392b95e26aee6
 - Asset allocation defaults follow the event setup/collection window; existing serialized-asset overlap/return protections remain in force.
 - Laravel: PASS — 532 passed / 1 skipped / 3,714 assertions. PHPMD: PASS.
 - Windows V1 package, fresh PowerShell install and Windows SQLite/private-media recovery: PASS at 2ef2a0b (same scheduling implementation; latest commit after that is regression-test-only).
-- PostgreSQL and desktop/mobile offline-browser acceptance are pending at 71c8fc5.
+- PostgreSQL migration/recovery and desktop/mobile offline-browser acceptance: PASS at 71c8fc5 (run 44152431508; all three jobs succeeded).
 - Zazu Quality remains RED on the unpatched high-severity picomatch build-tool advisory; no breaking downgrade or suppression applied.
 - No readiness uplift. Physical Android, intended-installation recovery, populated-business financial reconciliation and POPIA remain operator gates.
 
@@ -75,3 +75,14 @@ All eight Claude findings remain in the sole readiness register. Invoice numberi
 
 ## Release
 V1: NOT READY. Historical state/register/memory, checklist and changelog are preserved in docs/archive/engineering/2026-11-17-state-register-memory-history.md.
+
+
+## Exact-head scheduling acceptance closure — 2026-11-17
+
+- Source: `71c8fc5c7aeba392b95e26aee694945b286f2c8e`.
+- GitHub Actions run `44152431508`: Laravel tests, PostgreSQL migration/recovery and offline-browser acceptance all completed successfully.
+- Offline-browser job `134284080089`: PASS; browser suite, mobile-viewport Work/customer acceptance and phone-local attachment journey all passed.
+- PostgreSQL job `134284080622`: PASS; full migration set, account/workspace registration and backup/restore/private-file recovery passed.
+- Laravel job `134284080768`: PASS; service-worker/session contracts, LAN asset-origin checks, Blade/manifest/config checks and PHPUnit/Pest passed.
+- Documentation-only follow-up on `main` is `1bb4936594add3368dd3f39d9ec969ef5b7b5ca1`; no application code changed after the tested source baseline.
+- Scheduling engineering/CI subgate is CLOSED. Physical Android and other operator gates remain OPEN. Release remains NOT READY.
