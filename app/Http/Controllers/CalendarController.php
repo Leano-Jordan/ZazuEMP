@@ -44,22 +44,18 @@ class CalendarController extends Controller
         $events = Event::query()
             ->where('business_id', $businessId)
             ->with('customer')
-            ->whereDate('event_date', '<=', $rangeEnd)
-            ->where(function ($query) use ($rangeStart): void {
-                $query->whereDate('event_end_date', '>=', $rangeStart)
-                    ->orWhere(function ($singleDay) use ($rangeStart): void {
-                        $singleDay->whereNull('event_end_date')
-                            ->whereDate('event_date', '>=', $rangeStart);
-                    });
-            })
+            ->whereRaw('COALESCE(setup_date, event_date) <= ?', [$rangeEnd->toDateString()])
+            ->whereRaw('COALESCE(collection_date, event_end_date, event_date) >= ?', [$rangeStart->toDateString()])
             ->orderBy('event_date')
             ->orderBy('name')
             ->get();
 
         $eventsByDate = collect();
         foreach ($events as $event) {
-            $firstDay = $event->event_date->copy()->max($rangeStart);
-            $lastDay = ($event->event_end_date ?? $event->event_date)->copy()->min($rangeEnd);
+            $scheduleStart = $event->setup_date ?? $event->event_date;
+            $scheduleEnd = $event->collection_date ?? $event->event_end_date ?? $event->event_date;
+            $firstDay = $scheduleStart->copy()->max($rangeStart);
+            $lastDay = $scheduleEnd->copy()->min($rangeEnd);
             for ($day = $firstDay->copy(); $day->lte($lastDay); $day->addDay()) {
                 $key = $day->format('Y-m-d');
                 $eventsByDate->put($key, $eventsByDate->get($key, collect())->push($event));
@@ -69,14 +65,15 @@ class CalendarController extends Controller
         $monthStart = $month->copy()->startOfMonth();
         $monthEnd = $month->copy()->endOfMonth();
         $monthEvents = $events->filter(function ($event) use ($monthStart, $monthEnd): bool {
-            $lastDay = $event->event_end_date ?? $event->event_date;
-            return $event->event_date->lte($monthEnd) && $lastDay->gte($monthStart);
+            $firstDay = $event->setup_date ?? $event->event_date;
+            $lastDay = $event->collection_date ?? $event->event_end_date ?? $event->event_date;
+            return $firstDay->lte($monthEnd) && $lastDay->gte($monthStart);
         })->values();
         $statusCounts = $monthEvents->groupBy('status')->map->count();
         $attentionCount = $statusCounts->get('draft', 0);
         $isCurrentMonth = $month->isSameMonth(now());
         $agendaStart = $isCurrentMonth ? now()->startOfDay() : $month->copy()->startOfMonth();
-        $upcomingCount = $monthEvents->filter(fn ($event) => ($event->event_end_date ?? $event->event_date)->gte($agendaStart))->count();
+        $upcomingCount = $monthEvents->filter(fn ($event) => ($event->collection_date ?? $event->event_end_date ?? $event->event_date)->gte($agendaStart))->count();
 
         return view('calendar.index', [
             'month' => $month,
