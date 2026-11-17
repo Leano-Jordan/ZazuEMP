@@ -1571,9 +1571,19 @@ class OfflineDomainMutationHandler implements SyncMutationHandler
     private function resolveOfflineReceiptQuantities(PurchaseOrder $order, int $businessId, array $received): array
     {
         $resolved = [];
+        $hasPositiveQuantity = false;
+
         foreach ($received as $lineIdentityOrId => $quantity) {
             $line = $this->resolveOfflinePurchaseOrderLine($order, $businessId, $lineIdentityOrId);
-            $resolved[$line->id] = $this->nonNegativeQuantity($quantity, 'received_quantities');
+            $normalizedQuantity = $this->nonNegativeQuantity($quantity, 'received_quantities');
+            $hasPositiveQuantity = $hasPositiveQuantity || Money::toHundredths($normalizedQuantity) > 0;
+            $resolved[$line->id] = $normalizedQuantity;
+        }
+
+        if (! $hasPositiveQuantity) {
+            throw ValidationException::withMessages([
+                'received_quantities' => 'At least one received quantity must be greater than zero.',
+            ]);
         }
 
         return $resolved;
