@@ -1289,7 +1289,7 @@
         const remainingMutations = await pending();
         for (const mutation of mutations) {
             const remote = recorded.get(mutation.id);
-            if (remote?.status !== 'applied') continue;
+            if (!['applied', 'discarded'].includes(remote?.status)) continue;
 
             const target = identityTargets[mutation.entity_type];
             const localId = mutation.payload?.local_id || mutation.entity_id;
