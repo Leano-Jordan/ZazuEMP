@@ -1729,8 +1729,12 @@ class OfflineDomainMutationHandler implements SyncMutationHandler
             return null;
         }
 
-        if (! is_string($value) || ! preg_match('/^\d{4}-\d{2}-\d{2}$/', $value) || ! strtotime($value)) {
-            throw ValidationException::withMessages(['date' => 'Offline date must be a valid date.']);
+        if (
+            ! is_string($value)
+            || ! preg_match('/^(\d{4})-(\d{2})-(\d{2})$/D', $value, $parts)
+            || ! checkdate((int) $parts[2], (int) $parts[3], (int) $parts[1])
+        ) {
+            throw ValidationException::withMessages(['date' => 'Offline date must be a valid calendar date in YYYY-MM-DD format.']);
         }
 
         return $value;
