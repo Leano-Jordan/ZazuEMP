@@ -58,6 +58,11 @@ class Event extends Model
         'customer_phone',
         'customer_email',
         'event_date',
+        'event_end_date',
+        'event_start_time',
+        'event_end_time',
+        'setup_date',
+        'collection_date',
         'event_address',
         'notes',
         'status',
@@ -67,6 +72,9 @@ class Event extends Model
     {
         return [
             'event_date' => 'date',
+            'event_end_date' => 'date',
+            'setup_date' => 'date',
+            'collection_date' => 'date',
         ];
     }
 
