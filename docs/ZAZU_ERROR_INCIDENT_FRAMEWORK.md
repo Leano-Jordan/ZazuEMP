@@ -10,19 +10,13 @@ The request UUID is a correlation/reference identifier. It is not the diagnostic
 
 Every classified failure has:
 
-- Error code
-- Category
-- Severity
-- HTTP status
-- User-facing headline
-- User-facing message
-- Technical exception message
-- Originating component / route action
-- Request ID
-- Timestamp
-- Exception class, source file and line
-- Stack trace
-- Safe query context for database exceptions
+- Error code, category, severity and HTTP status;
+- safe user-facing headline and message;
+- exception class and source file/line when a throwable is available;
+- originating route action, route name, HTTP method and path when available;
+- request ID and timestamp.
+
+The production incident logger deliberately does **not** persist raw exception messages, SQL statements, bindings or stack traces. Those values can contain customer data, personal information or credentials. Do not describe the redacted incident log as containing them.
 
 Core code families:
 
@@ -52,9 +46,11 @@ Please try again. If the problem continues, share this reference number with sup
 
 Reference number: request ID
 
-The diagnostic log contains the technical exception, source location, route/component, timestamp, stack trace and request correlation identifier.
+The authoritative application incident log records the request ID, error classification, exception class, source file/line, route/action, method/path and timestamp. Request middleware also adds the request ID to the log context and response header.
 
-Never expose SQL bindings, stack traces, environment secrets or internal infrastructure details to the user.
+The incident logger intentionally omits exception messages, SQL, bindings and stack traces. The reference ID is therefore used to correlate the event with the bounded metadata available in the log; it does not reveal the underlying SQL failure by itself. If deeper diagnostics are required, obtain them through a controlled local reproduction or a separately approved, access-restricted diagnostic process. Never add raw customer data, credentials, SQL bindings or stack traces to routine production logs.
+
+Never expose technical diagnostics, environment secrets or internal infrastructure details to the user.
 
 ## Handling rules
 
@@ -65,9 +61,10 @@ Never expose SQL bindings, stack traces, environment secrets or internal infrast
 - Response-only 5xx failures are classified even when no throwable is available.
 - Error rendering is asset-independent so a broken frontend build does not remove the basic diagnostic surface.
 - Incident logging must never become the reason the original request fails.
+- Keep incident records privacy-minimised; do not weaken redaction to make an individual incident easier to debug.
 
 ## Future extension
 
 This foundation intentionally does not add an incident database table or admin dashboard yet.
 
-The next useful layer, after repeated operational evidence, is a searchable owner/admin incident view filtered by error code, date, route, severity and reference ID.
+The next useful layer, after repeated operational evidence, is a searchable owner/admin incident view filtered by error code, date, route, severity and reference ID, preserving the same redaction boundary.
