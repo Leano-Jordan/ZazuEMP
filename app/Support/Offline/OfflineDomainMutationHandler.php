@@ -594,12 +594,17 @@ class OfflineDomainMutationHandler implements SyncMutationHandler
             throw ValidationException::withMessages(['status' => 'Offline quotes may only be created as draft or sent.']);
         }
 
+        $currency = strtoupper((string) ($payload['currency'] ?? 'ZAR'));
+        if (! array_key_exists($currency, config('zazu.currencies', []))) {
+            throw ValidationException::withMessages(['currency' => 'Offline quotes must use a supported business currency.']);
+        }
+
         $quote = \App\Models\Quote::create([
             'event_id' => $event->id,
             'reference' => $this->nullableString($payload['reference'] ?? null, 100)
                 ?? 'QUO-OFFLINE-'.strtoupper(substr($this->entityUuid($mutation), 0, 8)),
             'status' => $status,
-            'currency' => strtoupper((string) ($payload['currency'] ?? 'ZAR')),
+            'currency' => $currency,
         ]);
 
         $version = $quote->versions()->create([
@@ -812,8 +817,8 @@ class OfflineDomainMutationHandler implements SyncMutationHandler
             'subtotal' => $version->subtotal,
             'tax_total' => $version->tax_total,
             'total' => $version->total,
-            'issued_at' => $payload['issued_at'] ?? now()->toDateString(),
-            'due_at' => $payload['due_at'] ?? now()->addDays(7)->toDateString(),
+            'issued_at' => $this->nullableDate($payload['issued_at'] ?? now()->toDateString()) ?? now()->toDateString(),
+            'due_at' => $this->nullableDate($payload['due_at'] ?? now()->addDays(7)->toDateString()) ?? now()->addDays(7)->toDateString(),
             'notes' => $version->notes,
             'tax_rate_id' => $version->tax_rate_id,
             'tax_code' => $version->tax_code,
