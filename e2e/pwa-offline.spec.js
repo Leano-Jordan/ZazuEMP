@@ -1743,6 +1743,55 @@ test.describe('Zazu installed PWA offline shell', () => {
         await expect(detail.getByText('0115550199')).toBeVisible();
         await expect(detail.getByText('Offline wedding job')).toBeVisible();
         await expect(detail.getByText('LOCAL-QUOTE-001')).toBeVisible();
+
+        await page.route('**/api/sync/**', async route => {
+            const url = new URL(route.request().url());
+            if (url.pathname === '/api/sync/push') {
+                const body = route.request().postDataJSON();
+                await route.fulfill({
+                    status: 200,
+                    contentType: 'application/json',
+                    body: JSON.stringify({
+                        recorded: body.mutations.map(mutation => ({
+                            id: mutation.id,
+                            status: 'applied',
+                            identity: {
+                                entity_type: mutation.entity_type,
+                                local_id: mutation.payload.local_id,
+                                server_id: 7654321,
+                            },
+                        })),
+                    }),
+                });
+                return;
+            }
+            if (url.pathname === '/api/sync/pull') {
+                await route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify({ mutations: [] }) });
+                return;
+            }
+            if (url.pathname === '/api/sync/bootstrap') {
+                await route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify({}) });
+                return;
+            }
+            await route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify({ attachments: [] }) });
+        });
+        await page.evaluate(async () => {
+            const state = window.ZazuOffline.getState();
+            state.sync = {
+                token: 'customer-edit-reconnect-token',
+                device: { id: 999993, business_id: Number(document.body.dataset.zazuBusinessId) },
+            };
+            await window.ZazuOffline.persist({ allowSessionChange: true });
+        });
+        await context.setOffline(false);
+        await page.evaluate(() => window.ZazuOffline.sync());
+        await expect.poll(async () => page.evaluate(async () => (await window.ZazuOffline.pending()).length)).toBe(0);
+        await expect.poll(async () => page.evaluate(() => {
+            const customer = window.ZazuOffline.getState().customers[0];
+            return { serverId: customer.server_id, pendingSync: customer.pending_sync };
+        })).toEqual({ serverId: 7654321, pendingSync: false });
+        await expect(updatedRow.locator('.zazu-chip')).toHaveText('Synced');
+
         await detail.getByRole('button', { name: 'Close' }).click();
         await expect(detail).toBeHidden();
     });
