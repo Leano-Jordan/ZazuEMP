@@ -6,7 +6,7 @@ Product: Zazu EMP — Event & Catering Management Platform
 Repository: Leano-Jordan/ZazuEMP
 Canonical branch: main (only engineering write target)
 Director: Jarvis (owner-facing); Morpheus is the canonical control plane.
-Current main HEAD (2026-11-17): 00af9adda943ee4e232e7eedeaf894a809dcbe88
+Last verified source baseline (2026-11-17): 00af9adda943ee4e232e7eedeaf894a809dcbe88
 
 ## Product purpose
 Zazu EMP supports event and catering operators in managing customers, jobs/events, services, quotes, invoices/payments, suppliers, purchasing/receiving, inventory, assets, costs, attachments, reporting and business administration. It serves catering, event equipment hire, sound/DJ, baking, decor, rentals, photography/camera hire and related operators.

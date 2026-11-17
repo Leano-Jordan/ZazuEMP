@@ -1,6 +1,6 @@
 # Zazu EMP — V1 Readiness Register
 
-Current baseline: Leano-Jordan/ZazuEMP / main / 00af9adda943ee4e232e7eedeaf894a809dcbe88 / 17 Nov 2026
+Last verified source baseline: Leano-Jordan/ZazuEMP / main / 00af9adda943ee4e232e7eedeaf894a809dcbe88 / 17 Nov 2026
 Release disposition: NOT READY
 Evidence maturity: 73/100 unchanged; no uplift claimed.
 

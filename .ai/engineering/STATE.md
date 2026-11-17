@@ -2,8 +2,8 @@
 
 As of: 2026-11-17
 Repository: Leano-Jordan/ZazuEMP
-Current main HEAD: 00af9adda943ee4e232e7eedeaf894a809dcbe88
-Canonical branch: main only; never create branches
+Last verified source baseline: 00af9adda943ee4e232e7eedeaf894a809dcbe88
+Canonical branch: main only; never create branches. Subsequent commits in this reconciliation batch are documentation-only.
 Owner mandate: ship a dependable first-business V1; preserve scope; no Render or AMPPS workflow.
 
 ## Verified work

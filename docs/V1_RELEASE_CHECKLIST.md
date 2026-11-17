@@ -1,6 +1,6 @@
 # Zazu EMP — V1 Release Checklist
 
-Current baseline: Leano-Jordan/ZazuEMP / main / 00af9adda943ee4e232e7eedeaf894a809dcbe88 (17 Nov 2026)
+Last verified source baseline: Leano-Jordan/ZazuEMP / main / 00af9adda943ee4e232e7eedeaf894a809dcbe88 (17 Nov 2026)
 Disposition: NOT READY · Evidence maturity: 73/100 unchanged.
 
 ## Release acceptance gates
