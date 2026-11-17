@@ -386,7 +386,7 @@
         <div class="zazu-context-title" id="zazu-trusted-devices-title">Trusted device access</div>
         <p class="zazu-context-copy mt-1">Review the devices trusted by this business. Revoking a device blocks its sync token immediately, but does not remotely erase business data already stored on that device. Changes remaining only there will not upload unless it is trusted again.</p>
         @if ($syncDevices->isEmpty())
-            <p class="zazu-field-help mt-3">No phones have been paired with this business.</p>
+            <p class="zazu-field-help mt-3">No devices have been trusted by this business.</p>
         @else
             <div class="grid gap-3 mt-4">
                 @foreach ($syncDevices as $device)
@@ -400,7 +400,7 @@
                             </p>
                         </div>
                         @if ($device->status !== 'revoked' && $device->revoked_at === null)
-                            <form method="POST" action="{{ route('settings.sync.devices.revoke', $device) }}" data-zazu-confirm="Revoke this phone's access to business sync?" data-zazu-confirm-title="Revoke trusted phone?" data-zazu-confirm-action="Revoke access">
+                            <form method="POST" action="{{ route('settings.sync.devices.revoke', $device) }}" data-zazu-confirm="Revoke this device's access to business sync?" data-zazu-confirm-title="Revoke trusted device?" data-zazu-confirm-action="Revoke access">
                                 @csrf
                                 <button type="submit" class="zazu-btn zazu-btn-ghost">Revoke access</button>
                             </form>
@@ -412,9 +412,9 @@
     </section>
 
     <section class="zazu-context-card mt-4" data-zazu-sync-recovery hidden role="alert" aria-live="assertive">
-        <div class="zazu-context-title">Phone needs re-pairing</div>
+        <div class="zazu-context-title">Device needs re-authorization</div>
         <p class="zazu-context-copy mt-1" data-zazu-sync-recovery-message></p>
-        <p class="zazu-field-help mt-2">Do not clear this phone's browser data. Its saved offline changes must be preserved and reconciled during re-pairing.</p>
+        <p class="zazu-field-help mt-2">Do not clear this device's browser data. Its saved offline changes must be preserved and reconciled after re-authorization or re-pairing.</p>
     </section>
 
     <section class="zazu-context-card mt-4" data-zazu-offline-conflicts hidden>
