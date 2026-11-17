@@ -67,7 +67,7 @@ class QuoteCommercialHandoffTest extends TestCase
             ->assertSee('Public Quote Customer')
             ->assertSee('Accept quote')
             ->assertSee('Print / Save as PDF')
-            ->assertSee('public-document.js');
+            ->assertSee('data-zazu-print', false);
 
         $acceptUrl = \Illuminate\Support\Facades\URL::temporarySignedRoute(
             'quotes.public.accept',
