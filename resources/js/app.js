@@ -1022,6 +1022,153 @@ function setupZazuOfflineDirectoryViews() {
         };
     };
 
+    const addCustomerOfflineDetails = (row, customer) => {
+        if (row.dataset.zazuCustomerDetailsBound === '1') return;
+        const actions = row.querySelector('.zazu-action-group, .zazu-list-side') || row;
+        const button = document.createElement('button');
+        button.type = 'button';
+        button.className = 'zazu-btn zazu-btn-ghost';
+        button.textContent = 'View offline';
+        button.title = 'Read this customer and linked work from this device';
+        button.setAttribute('aria-expanded', 'false');
+        button.addEventListener('click', () => {
+            const currentState = window.ZazuOffline?.getState();
+            if (!currentState) return;
+            let panel = row.nextElementSibling;
+            if (!panel?.matches('[data-zazu-customer-offline-detail]')) {
+                panel = document.createElement('section');
+                panel.className = 'zazu-panel mt-3';
+                panel.dataset.zazuCustomerOfflineDetail = '1';
+                panel.setAttribute('role', 'region');
+                panel.setAttribute('aria-label', 'Offline customer details');
+                row.insertAdjacentElement('afterend', panel);
+            }
+            const opening = panel.hidden || panel.childElementCount === 0;
+            panel.hidden = !opening;
+            button.setAttribute('aria-expanded', opening ? 'true' : 'false');
+            if (!opening) return;
+
+            panel.replaceChildren();
+            const heading = document.createElement('div');
+            heading.className = 'zazu-panel-head';
+            const title = document.createElement('div');
+            title.className = 'zazu-panel-title';
+            title.textContent = customer.name || 'Customer details';
+            const close = document.createElement('button');
+            close.type = 'button';
+            close.className = 'zazu-btn zazu-btn-ghost';
+            close.textContent = 'Close';
+            close.addEventListener('click', () => {
+                panel.hidden = true;
+                button.setAttribute('aria-expanded', 'false');
+                button.focus();
+            });
+            heading.append(title, close);
+            panel.append(heading);
+
+            const fields = [
+                ['Primary contact', customer.contact_name],
+                ['Phone', customer.phone],
+                ['Email', customer.email],
+                ['Legal / billing name', customer.legal_name],
+                ['Registration number', customer.registration_number],
+                ['VAT number', customer.vat_number],
+                ['Billing address', customer.billing_address],
+                ['Notes', customer.notes],
+            ].filter(([, value]) => value !== null && value !== undefined && String(value).trim() !== '');
+            const details = document.createElement('div');
+            details.className = 'zazu-detail-rows mt-3';
+            for (const [label, value] of fields) {
+                const item = document.createElement('div');
+                item.className = 'zazu-detail-row';
+                const name = document.createElement('div');
+                name.className = 'zazu-detail-label';
+                name.textContent = label;
+                const detail = document.createElement('div');
+                detail.className = 'zazu-detail-value';
+                detail.textContent = String(value);
+                item.append(name, detail);
+                details.append(item);
+            }
+            if (fields.length) panel.append(details);
+
+            const customerServerId = Number(customer.server_id ?? customer.id ?? 0);
+            const jobs = (currentState.jobs || []).filter(job =>
+                (customer.local_id && job.customer_local_id === customer.local_id)
+                || (customerServerId > 0 && Number(job.customer_id || 0) === customerServerId)
+            );
+            const workHeading = document.createElement('div');
+            workHeading.className = 'zazu-panel-title mt-4';
+            workHeading.textContent = 'Work on this device (' + jobs.length + ')';
+            panel.append(workHeading);
+            const workList = document.createElement('div');
+            workList.className = 'zazu-list mt-2';
+            for (const job of jobs) {
+                const item = document.createElement('div');
+                item.className = 'zazu-list-item';
+                const main = document.createElement('div');
+                main.className = 'zazu-list-main min-w-0 flex-1';
+                const jobTitle = document.createElement('div');
+                jobTitle.className = 'zazu-list-title';
+                jobTitle.textContent = job.name || 'Untitled work';
+                const meta = document.createElement('div');
+                meta.className = 'zazu-list-meta';
+                meta.textContent = [job.reference || 'Local job', job.event_date || 'Date not set', String(job.status || 'draft').replace(/_/g, ' ')].join(' · ');
+                main.append(jobTitle, meta);
+                item.append(main);
+                workList.append(item);
+            }
+            if (!jobs.length) {
+                const empty = document.createElement('p');
+                empty.className = 'zazu-panel-copy mt-2';
+                empty.textContent = 'No linked work records are stored on this device.';
+                workList.append(empty);
+            }
+            panel.append(workList);
+
+            const jobLocalIds = new Set(jobs.map(job => job.local_id).filter(Boolean));
+            const jobServerIds = new Set(jobs.map(job => Number(job.server_id ?? job.id)).filter(id => id > 0));
+            const quotes = (currentState.quotes || []).filter(quote =>
+                (quote.event_local_id && jobLocalIds.has(quote.event_local_id))
+                || (quote.event_id && jobServerIds.has(Number(quote.event_id)))
+            );
+            const quoteHeading = document.createElement('div');
+            quoteHeading.className = 'zazu-panel-title mt-4';
+            quoteHeading.textContent = 'Quotes on this device (' + quotes.length + ')';
+            panel.append(quoteHeading);
+            const quoteList = document.createElement('div');
+            quoteList.className = 'zazu-list mt-2';
+            for (const quote of quotes) {
+                const item = document.createElement('div');
+                item.className = 'zazu-list-item';
+                const main = document.createElement('div');
+                main.className = 'zazu-list-main min-w-0 flex-1';
+                const quoteTitle = document.createElement('div');
+                quoteTitle.className = 'zazu-list-title';
+                quoteTitle.textContent = quote.reference || 'Draft quote';
+                const meta = document.createElement('div');
+                meta.className = 'zazu-list-meta';
+                meta.textContent = String(quote.status || 'draft').replace(/_/g, ' ');
+                main.append(quoteTitle, meta);
+                item.append(main);
+                quoteList.append(item);
+            }
+            if (!quotes.length) {
+                const empty = document.createElement('p');
+                empty.className = 'zazu-panel-copy mt-2';
+                empty.textContent = 'No linked quotes are stored on this device.';
+                quoteList.append(empty);
+            }
+            panel.append(quoteList);
+            const note = document.createElement('p');
+            note.className = 'zazu-panel-copy mt-4';
+            note.textContent = 'Offline view uses this device’s last synchronised and locally saved records. Changes made on another device will appear after reconnection.';
+            panel.append(note);
+        });
+        actions.append(button);
+        row.dataset.zazuCustomerDetailsBound = '1';
+    };
+
     const renderCustomers = (state) => {
         const directory = document.querySelector('.zazu-customer-directory');
         if (!directory) return;
@@ -1047,6 +1194,7 @@ function setupZazuOfflineDirectoryViews() {
                 if (meta) {
                     meta.textContent = [customer.phone, customer.email].filter(Boolean).join(' · ') || 'No phone';
                 }
+                addCustomerOfflineDetails(serverRow, customer);
                 continue;
             }
 
@@ -1098,6 +1246,7 @@ function setupZazuOfflineDirectoryViews() {
             sync.append(syncChip);
 
             row.append(identity, work, sync);
+            addCustomerOfflineDetails(row, customer);
             if (empty?.parentNode === directory) directory.insertBefore(row, empty);
             else directory.append(row);
         }
