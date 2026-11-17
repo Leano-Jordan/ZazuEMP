@@ -65,73 +65,7 @@
                             @error('event_type')<span class="zazu-field-error">{{ $message }}</span>@enderror
                         </fieldset>
 
-                        <label class="zazu-field">
-                            <span class="zazu-label">Job date <span class="zazu-required">*</span></span>
-                            <input type="date" name="event_date" value="{{ old('event_date', $event->event_date?->format('Y-m-d')) }}" required class="zazu-input">
-                            @error('event_date')<span class="zazu-field-error">{{ $message }}</span>@enderror
-                        </label>
-
-                        <label class="zazu-field">
-                            <span class="zazu-label">Event end date</span>
-                            <input type="date" name="event_end_date" value="{{ old('event_end_date', $event->event_end_date?->format('Y-m-d')) }}" class="zazu-input">
-                            @error('event_end_date')<span class="zazu-field-error">{{ $message }}</span>@enderror
-                        </label>
-                        <label class="zazu-field">
-                            <span class="zazu-label">Start time</span>
-                            <input type="time" name="event_start_time" value="{{ old('event_start_time', substr((string) $event->event_start_time, 0, 5)) }}" class="zazu-input">
-                            @error('event_start_time')<span class="zazu-field-error">{{ $message }}</span>@enderror
-                        </label>
-                        <label class="zazu-field">
-                            <span class="zazu-label">End time</span>
-                            <input type="time" name="event_end_time" value="{{ old('event_end_time', substr((string) $event->event_end_time, 0, 5)) }}" class="zazu-input">
-                            @error('event_end_time')<span class="zazu-field-error">{{ $message }}</span>@enderror
-                        </label>
-                        <label class="zazu-field">
-                            <span class="zazu-label">Setup date</span>
-                            <input type="date" name="setup_date" value="{{ old('setup_date', $event->setup_date?->format('Y-m-d')) }}" class="zazu-input">
-                            @error('setup_date')<span class="zazu-field-error">{{ $message }}</span>@enderror
-                        </label>
-                        <label class="zazu-field">
-                            <span class="zazu-label">Collection date</span>
-                            <input type="date" name="collection_date" value="{{ old('collection_date', $event->collection_date?->format('Y-m-d')) }}" class="zazu-input">
-                            @error('collection_date')<span class="zazu-field-error">{{ $message }}</span>@enderror
-                        </label>
-
-                        <label class="zazu-field">
-                            <span class="zazu-label">Day contact <span class="font-normal text-[var(--zazu-faint)]">(optional)</span></span>
-                            <select id="event_day_contact_id" name="event_day_contact_id" class="zazu-select">
-                                <option value="">No day contact</option>
-                            </select>
-                            @error('event_day_contact_id')<span class="zazu-field-error">{{ $message }}</span>@enderror
-                        </label>
-
-                        <label class="zazu-field">
-                            <span class="zazu-label">Night contact <span class="font-normal text-[var(--zazu-faint)]">(optional)</span></span>
-                            <select id="event_night_contact_id" name="event_night_contact_id" class="zazu-select">
-                                <option value="">No night contact</option>
-                            </select>
-                            @error('event_night_contact_id')<span class="zazu-field-error">{{ $message }}</span>@enderror
-                        </label>
-
-                        <label class="zazu-field">
-                            <span class="zazu-label">Status</span>
-                            <select name="status" class="zazu-select">
-                                @foreach (['draft' => 'Draft', 'confirmed' => 'Confirmed', 'in_progress' => 'In progress', 'completed' => 'Completed', 'cancelled' => 'Cancelled'] as $value => $label)
-                                    <option value="{{ $value }}" @selected(old('status', $event->status) === $value)>{{ $label }}</option>
-                                @endforeach
-                            </select>
-                            @error('status')<span class="zazu-field-error">{{ $message }}</span>@enderror
-                        </label>
-                    </div>
-                </section>
-
-                <section class="zazu-form-section">
-                    <div class="zazu-form-section-head">
-                        <div class="zazu-form-section-title">Location and notes</div>
-                        <div class="zazu-form-section-copy">Keep the address and notes with the work record.</div>
-                    </div>
-
-                    <div class="zazu-form-grid">
+                                                @include('work._schedule-fields')
                         <label class="zazu-field zazu-field-wide">
                             <span class="zazu-label">Job location</span>
                             <input name="event_address" value="{{ old('event_address', $event->event_address) }}" class="zazu-input">
