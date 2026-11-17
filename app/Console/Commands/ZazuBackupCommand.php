@@ -280,85 +280,142 @@ class ZazuBackupCommand extends Command
                 return false;
             }
 
-            $manifestContents = $zip->getFromName('manifest.json');
-            if ($manifestContents === false) {
-                return false;
-            }
-
-            try {
-                $manifest = json_decode($manifestContents, true, 512, JSON_THROW_ON_ERROR);
-            } catch (\JsonException) {
-                return false;
-            }
-
-            if (
-                ($manifest['application'] ?? null) !== 'Zazu EMP'
-                || ($manifest['format_version'] ?? null) !== self::FORMAT_VERSION
-                || ($manifest['database_driver'] ?? null) !== $driver
-                || !is_array($manifest['checksums'] ?? null)
-            ) {
+            $manifest = $this->readVerifiedManifest($zip, $driver);
+            if ($manifest === null) {
                 return false;
             }
 
             $databaseEntry = $driver === 'sqlite' ? 'database.sqlite' : 'database.sql';
-            $actualFiles = [];
-            for ($index = 0; $index < $zip->numFiles; $index++) {
-                $name = $zip->getNameIndex($index);
-                if (!is_string($name) || $name === '' || str_contains($name, '\\') || str_contains($name, "\\0")) {
-                    return false;
-                }
+            $actualFiles = $this->archivePayloadNames($zip, $databaseEntry);
 
-                if ($name !== 'manifest.json' && $name !== $databaseEntry && !str_starts_with($name, 'storage/private/')) {
-                    return false;
-                }
-
-                if ($name !== 'manifest.json') {
-                    $actualFiles[] = $name;
-                }
-            }
-
-            $checksums = $manifest['checksums'];
-            $checksumFiles = array_keys($checksums);
-            sort($actualFiles, SORT_STRING);
-            sort($checksumFiles, SORT_STRING);
-
-            if (!in_array($databaseEntry, $actualFiles, true) || $actualFiles !== $checksumFiles) {
+            if ($actualFiles === null) {
                 return false;
             }
 
-            foreach ($checksums as $name => $expected) {
-                if (!is_string($name) || !is_string($expected) || !preg_match('/^[a-f0-9]{64}$/i', $expected)) {
-                    return false;
-                }
-
-                $stream = $zip->getStream($name);
-                if ($stream === false) {
-                    return false;
-                }
-
-                $hash = hash_init('sha256');
-                $readFailed = false;
-                while (!feof($stream)) {
-                    $chunk = fread($stream, 1024 * 1024);
-                    if ($chunk === false) {
-                        $readFailed = true;
-                        break;
-                    }
-                    if ($chunk !== '') {
-                        hash_update($hash, $chunk);
-                    }
-                }
-                fclose($stream);
-
-                if ($readFailed || !hash_equals(strtolower($expected), hash_final($hash))) {
-                    return false;
-                }
-            }
-
-            return true;
+            return $this->verifyPayloadManifest($zip, $actualFiles, $manifest['checksums'], $databaseEntry);
         } finally {
             $zip->close();
         }
+    }
+
+    private function readVerifiedManifest(ZipArchive $zip, string $driver): ?array
+    {
+        $contents = $zip->getFromName('manifest.json');
+        if ($contents === false) {
+            return null;
+        }
+
+        try {
+            $manifest = json_decode($contents, true, 512, JSON_THROW_ON_ERROR);
+        } catch (\\JsonException) {
+            return null;
+        }
+
+        if (!is_array($manifest)
+            || ($manifest['application'] ?? null) !== 'Zazu EMP'
+            || ($manifest['format_version'] ?? null) !== self::FORMAT_VERSION
+            || ($manifest['database_driver'] ?? null) !== $driver
+            || !is_array($manifest['checksums'] ?? null)) {
+            return null;
+        }
+
+        return $manifest;
+    }
+
+    private function archivePayloadNames(ZipArchive $zip, string $databaseEntry): ?array
+    {
+        $actualFiles = [];
+        $seen = [];
+
+        for ($index = 0; $index < $zip->numFiles; $index++) {
+            $name = $zip->getNameIndex($index);
+
+            if (!is_string($name) || !$this->isAllowedArchiveEntry($name, $databaseEntry)) {
+                return null;
+            }
+
+            if (isset($seen[$name])) {
+                return null;
+            }
+            $seen[$name] = true;
+
+            if ($name !== 'manifest.json') {
+                $actualFiles[] = $name;
+            }
+        }
+
+        return $actualFiles;
+    }
+
+    private function isAllowedArchiveEntry(string $name, string $databaseEntry): bool
+    {
+        if ($name === '' || str_contains($name, '\\\\') || str_contains($name, "\\0")
+            || str_starts_with($name, '/') || in_array('..', explode('/', $name), true)) {
+            return false;
+        }
+
+        return $name === 'manifest.json'
+            || $name === $databaseEntry
+            || str_starts_with($name, 'storage/private/');
+    }
+
+    private function verifyPayloadManifest(ZipArchive $zip, array $actualFiles, array $checksums, string $databaseEntry): bool
+    {
+        if (!in_array($databaseEntry, $actualFiles, true)) {
+            return false;
+        }
+
+        foreach ($checksums as $name => $expected) {
+            if (!is_string($name) || !is_string($expected)
+                || !preg_match('/^[a-f0-9]{64}$/i', $expected)
+                || !$this->isAllowedArchiveEntry($name, $databaseEntry)
+                || $name === 'manifest.json') {
+                return false;
+            }
+        }
+
+        $checksumFiles = array_keys($checksums);
+        sort($actualFiles, SORT_STRING);
+        sort($checksumFiles, SORT_STRING);
+
+        if ($actualFiles !== $checksumFiles) {
+            return false;
+        }
+
+        foreach ($checksums as $name => $expected) {
+            if (!$this->verifyPayloadChecksum($zip, $name, $expected)) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    private function verifyPayloadChecksum(ZipArchive $zip, string $name, string $expected): bool
+    {
+        $stream = $zip->getStream($name);
+        if ($stream === false) {
+            return false;
+        }
+
+        $hash = hash_init('sha256');
+        $readFailed = false;
+
+        while (!feof($stream)) {
+            $chunk = fread($stream, 1024 * 1024);
+            if ($chunk === false) {
+                $readFailed = true;
+                break;
+            }
+
+            if ($chunk !== '') {
+                hash_update($hash, $chunk);
+            }
+        }
+
+        fclose($stream);
+
+        return !$readFailed && hash_equals(strtolower($expected), hash_final($hash));
     }
 
     private function createArchive(string $work, string $temporaryArchive): bool
