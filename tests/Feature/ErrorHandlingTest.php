@@ -102,7 +102,7 @@ class ErrorHandlingTest extends TestCase
 
         $this->assertSame(500, $response->getStatusCode());
         $this->assertStringContainsString('DB-001', (string) $response->getContent());
-        $this->assertStringContainsString('We could not load or save the requested data.', (string) $response->getContent());
+        $this->assertStringContainsString('We could not open or save your information.', (string) $response->getContent());
         $this->assertStringNotContainsString('select * from customers', (string) $response->getContent());
         $this->assertStringNotContainsString('SQLSTATE[HY000]', (string) $response->getContent());
         $this->assertSame('db-request-id', $response->headers->get('X-Zazu-Request-Id'));
