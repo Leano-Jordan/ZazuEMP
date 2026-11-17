@@ -65,7 +65,9 @@ class QuoteCommercialHandoffTest extends TestCase
             ->assertOk()
             ->assertSee('QUO-PUBLIC-001')
             ->assertSee('Public Quote Customer')
-            ->assertSee('Accept quote');
+            ->assertSee('Accept quote')
+            ->assertSee('Print / Save as PDF')
+            ->assertSee('public-document.js');
 
         $acceptUrl = \Illuminate\Support\Facades\URL::temporarySignedRoute(
             'quotes.public.accept',
@@ -129,6 +131,11 @@ class QuoteCommercialHandoffTest extends TestCase
 
         $this->assertSame('accepted', $quote->fresh()->status);
         $this->assertSame('confirmed', $event->fresh()->status);
+
+        $this->get(route('quotes.show', $quote))
+            ->assertOk()
+            ->assertSee('Share via WhatsApp')
+            ->assertSee('https://wa.me/?text=', false);
     }
 
     public function test_accepted_quote_exposes_invoice_hand_off_and_preserves_existing_invoice_link(): void
