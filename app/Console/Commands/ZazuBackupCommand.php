@@ -371,13 +371,8 @@ class ZazuBackupCommand extends Command
             return false;
         }
 
-        foreach ($checksums as $name => $expected) {
-            if (!is_string($name) || !is_string($expected)
-                || !preg_match('/^[a-f0-9]{64}$/i', $expected)
-                || !$this->isAllowedArchiveEntry($name, $databaseEntry)
-                || $name === 'manifest.json') {
-                return false;
-            }
+        if (!$this->hasValidChecksumEntries($checksums, $databaseEntry)) {
+            return false;
         }
 
         $checksumFiles = array_keys($checksums);
@@ -390,6 +385,23 @@ class ZazuBackupCommand extends Command
 
         foreach ($checksums as $name => $expected) {
             if (!$this->verifyPayloadChecksum($zip, $name, $expected)) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    private function hasValidChecksumEntries(array $checksums, string $databaseEntry): bool
+    {
+        foreach ($checksums as $name => $expected) {
+            if (!is_string($name) || !is_string($expected)) {
+                return false;
+            }
+
+            if (!preg_match('/^[a-f0-9]{64}$/i', $expected)
+                || !$this->isAllowedArchiveEntry($name, $databaseEntry)
+                || $name === 'manifest.json') {
                 return false;
             }
         }
