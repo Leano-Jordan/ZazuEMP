@@ -761,7 +761,7 @@ class OfflineDomainMutationHandler implements SyncMutationHandler
             'invoice_id' => $invoice->id,
             'idempotency_key' => $mutation->mutation_id,
             'type' => $payload['type'] ?? 'payment',
-            'amount' => $payload['amount'] ?? null,
+            'amount' => $this->positiveMoney($payload['amount'] ?? null),
             'method' => $payload['method'] ?? null,
             'reference' => $this->nullableString($payload['reference'] ?? null, 255),
             'paid_at' => $payload['paid_at'] ?? now()->toDateString(),
@@ -797,7 +797,7 @@ class OfflineDomainMutationHandler implements SyncMutationHandler
             'purchase_order_id' => $order?->id,
             'supplier_id' => $supplier?->id,
             'description' => $this->requiredString($payload['description'] ?? null, 'description', 500),
-            'amount' => $payload['amount'] ?? null,
+            'amount' => $this->positiveMoney($payload['amount'] ?? null),
             'status' => $payload['status'] ?? 'unpaid',
             'reference' => $this->nullableString($payload['reference'] ?? null, 255),
             'expense_date' => $payload['expense_date'] ?? now()->toDateString(),
@@ -1453,7 +1453,7 @@ class OfflineDomainMutationHandler implements SyncMutationHandler
         $resolved = [];
         foreach ($received as $lineIdentityOrId => $quantity) {
             $line = $this->resolveOfflinePurchaseOrderLine($order, $businessId, $lineIdentityOrId);
-            $resolved[$line->id] = $quantity;
+            $resolved[$line->id] = $this->nonNegativeQuantity($quantity, 'received_quantities');
         }
 
         return $resolved;
@@ -1533,14 +1533,19 @@ class OfflineDomainMutationHandler implements SyncMutationHandler
 
     private function nullableQuantity(mixed $value): ?string
     {
-        if ($value === null || $value === '') {
-            return null;
-        }
+        return $value === null || $value === ''
+            ? null
+            : $this->nonNegativeQuantity($value);
+    }
 
+    private function nonNegativeQuantity(mixed $value, string $field = 'quantity'): string
+    {
         try {
             $quantityHundredths = Money::toHundredths(is_int($value) || is_float($value) || is_string($value) ? $value : '');
         } catch (\InvalidArgumentException) {
-            throw ValidationException::withMessages(['quantity' => 'Offline preparation quantity must be non-negative and have at most two decimal places.']);
+            throw ValidationException::withMessages([
+                $field => "Offline {$field} must be non-negative and have at most two decimal places.",
+            ]);
         }
 
         return Money::fromCents($quantityHundredths);
@@ -1572,17 +1577,24 @@ class OfflineDomainMutationHandler implements SyncMutationHandler
 
     private function positiveQuantity(mixed $value): int
     {
-        try {
-            $quantityHundredths = Money::toHundredths(is_int($value) || is_float($value) || is_string($value) ? $value : '');
-        } catch (\InvalidArgumentException) {
-            throw ValidationException::withMessages(['quantity' => 'Offline quantity must be positive and have at most two decimal places.']);
-        }
+        $quantity = $this->nonNegativeQuantity($value);
+        $quantityHundredths = Money::toHundredths($quantity);
 
         if ($quantityHundredths <= 0) {
             throw ValidationException::withMessages(['quantity' => 'Offline quantity must be greater than zero.']);
         }
 
         return $quantityHundredths;
+    }
+
+    private function positiveMoney(mixed $value): string
+    {
+        $amount = $this->nonNegativeMoney($value);
+        if (Money::toCents($amount) <= 0) {
+            throw ValidationException::withMessages(['amount' => 'Offline financial amounts must be greater than zero.']);
+        }
+
+        return $amount;
     }
 
     private function nonNegativeMoney(mixed $value): string
