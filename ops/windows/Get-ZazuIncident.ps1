@@ -4,11 +4,11 @@ param(
     [ValidatePattern('^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$')]
     [string]$Reference,
 
-    [string]$ProjectPath = (Resolve-Path (Join-Path $PSScriptRoot '..\\..')).Path
+    [string]$ProjectPath = (Resolve-Path (Join-Path $PSScriptRoot '..\..')).Path
 )
 
 $ErrorActionPreference = 'Stop'
-$logDirectory = Join-Path $ProjectPath 'storage\\logs'
+$logDirectory = Join-Path $ProjectPath 'storage\logs'
 if (-not (Test-Path $logDirectory -PathType Container)) {
     throw "Zazu log directory was not found: $logDirectory"
 }
