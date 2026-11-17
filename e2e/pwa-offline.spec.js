@@ -1658,14 +1658,17 @@ test.describe('Zazu installed PWA offline shell', () => {
         await expect(page.getByRole('heading', { name: 'Dashboard' })).toBeVisible();
         await expect(page.locator('.zazu-error-shell')).toHaveCount(0);
     });
-    test('opens a device-local customer relationship view while disconnected', async ({ page, context }, testInfo) => {
-        test.setTimeout(25_000);
-        test.skip(testInfo.project.name !== 'chromium', 'Customer local-detail contract runs once on desktop Chromium.');
+    test('reads and edits a device-local customer relationship while disconnected', async ({ page, context }, testInfo) => {
+        test.setTimeout(30_000);
+        test.skip(testInfo.project.name !== 'chromium', 'Customer local read/edit contract runs once on desktop Chromium.');
 
-        const customerLocalId = 'local:customer-detail-acceptance';
-        const jobLocalId = 'local:customer-detail-job';
+        const customerLocalId = '11111111-1111-4111-8111-111111111111';
+        const jobLocalId = '22222222-2222-4222-8222-222222222222';
         const customerName = 'Offline relationship customer';
 
+        await page.addInitScript(() => {
+            window.__ZAZU_OFFLINE_DEFER_INITIAL_SYNC = true;
+        });
         await login(page);
         await page.goto('/customers', { waitUntil: 'domcontentloaded' });
         await waitForOfflineRuntime(page);
@@ -1690,7 +1693,7 @@ test.describe('Zazu installed PWA offline shell', () => {
                 status: 'confirmed',
             }];
             state.quotes = [{
-                local_id: 'local:customer-detail-quote',
+                local_id: '33333333-3333-4333-8333-333333333333',
                 event_local_id: jobLocalId,
                 reference: 'LOCAL-QUOTE-001',
                 status: 'sent',
@@ -1704,7 +1707,7 @@ test.describe('Zazu installed PWA offline shell', () => {
         await expect(customerRow).toBeVisible();
         await customerRow.getByRole('button', { name: 'View offline' }).click();
 
-        const detail = page.getByRole('region', { name: 'Offline customer details' });
+        let detail = page.getByRole('region', { name: 'Offline customer details' });
         await expect(detail).toBeVisible();
         await expect(detail.getByText(customerName)).toBeVisible();
         await expect(detail.getByText('Offline primary contact')).toBeVisible();
@@ -1714,6 +1717,32 @@ test.describe('Zazu installed PWA offline shell', () => {
         await expect(detail.getByText('LOCAL-JOB-001')).toBeVisible();
         await expect(detail.getByText('LOCAL-QUOTE-001')).toBeVisible();
 
+        await detail.getByRole('button', { name: 'Edit offline' }).click();
+        const editForm = detail.locator('[data-zazu-customer-offline-edit]');
+        await expect(editForm).toBeVisible();
+        await editForm.locator('[name="name"]').fill('Updated offline relationship customer');
+        await editForm.locator('[name="contact_name"]').fill('Updated offline contact');
+        await editForm.locator('[name="phone"]').fill('0115550199');
+        await editForm.getByRole('button', { name: 'Save offline changes' }).click();
+
+        await expect.poll(async () => page.evaluate(async () => (await window.ZazuOffline.pending()).length)).toBe(1);
+        const queued = await page.evaluate(async () => window.ZazuOffline.pending());
+        expect(queued[0].entity_type).toBe('customer');
+        expect(queued[0].operation).toBe('update');
+        expect(queued[0].payload.record.name).toBe('Updated offline relationship customer');
+        expect(queued[0].payload.record.phone).toBe('0115550199');
+
+        const updatedRow = page.locator('[data-zazu-local-record="customer"]').filter({ hasText: 'Updated offline relationship customer' });
+        await expect(updatedRow).toBeVisible();
+        await expect(updatedRow.locator('.zazu-chip')).toHaveText('Waiting to sync');
+        await updatedRow.getByRole('button', { name: 'View offline' }).click();
+
+        detail = page.getByRole('region', { name: 'Offline customer details' });
+        await expect(detail.getByText('Updated offline relationship customer')).toBeVisible();
+        await expect(detail.getByText('Updated offline contact')).toBeVisible();
+        await expect(detail.getByText('0115550199')).toBeVisible();
+        await expect(detail.getByText('Offline wedding job')).toBeVisible();
+        await expect(detail.getByText('LOCAL-QUOTE-001')).toBeVisible();
         await detail.getByRole('button', { name: 'Close' }).click();
         await expect(detail).toBeHidden();
     });
