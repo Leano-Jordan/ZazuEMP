@@ -1182,7 +1182,12 @@ function setupZazuOfflineDirectoryViews() {
                         ...payload,
                         services: payload.services,
                         status: payload.status,
-                        requirements: payload.services.map(description => ({ description, category: 'Other', quantity: 1, unit: 'service', status: 'open' })),
+                        requirements: payload.services.map(description => {
+                            const existing = currentRequirements.find(item => (item.description || item.name) === description);
+                            return existing
+                                ? { ...existing, description }
+                                : { description, category: 'Other', quantity: 1, unit: 'service', status: 'open' };
+                        }),
                         pending_sync: true,
                     };
                     await window.ZazuOffline.queueMutation('customer', 'update', payload, nextState);
