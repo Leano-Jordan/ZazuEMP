@@ -2121,7 +2121,7 @@ class OfflineSyncFoundationTest extends TestCase
             'status' => 'active',
             'currency' => 'ZAR',
         ]);
-        $code = '482731';
+        $code = '48273195';
 
         $device = SyncDevice::create([
             'business_id' => $business->id,
@@ -2215,6 +2215,7 @@ class OfflineSyncFoundationTest extends TestCase
             app(\App\Support\CurrentBusiness::class),
         );
         $pairing = $pairingResponse->getData(true);
+        $this->assertMatchesRegularExpression('/^\d{8}$/', $pairing['pairing_code']);
         $this->assertSame(4, $pairing['selection_count']);
 
         $device = SyncDevice::query()->where('business_id', $business->id)->latest('id')->firstOrFail();
