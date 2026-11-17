@@ -379,6 +379,12 @@ class WorkController extends Controller
      */
     private function validateSchedule(array $data): void
     {
+        $this->validateSameDayTimeRange($data);
+        $this->validateCollectionDate($data);
+    }
+
+    private function validateSameDayTimeRange(array $data): void
+    {
         $startDate = $data['event_date'] ?? null;
         $endDate = $data['event_end_date'] ?? $startDate;
         $startTime = $data['event_start_time'] ?? null;
@@ -390,6 +396,11 @@ class WorkController extends Controller
                 'event_end_time' => 'The end time must be later than the start time for a same-day event.',
             ]);
         }
+    }
+
+    private function validateCollectionDate(array $data): void
+    {
+        $endDate = $data['event_end_date'] ?? ($data['event_date'] ?? null);
 
         if (! empty($data['collection_date']) && $endDate
             && $data['collection_date'] < $endDate) {
