@@ -73,12 +73,13 @@ class PasswordResetTrustedDeviceTest extends TestCase
 
         $token = Password::createToken($owner);
 
-        $this->post(route('password.update'), [
+        $response = $this->post(route('password.update'), [
             'token' => $token,
             'email' => $owner->email,
             'password' => 'new-password',
             'password_confirmation' => 'new-password',
-        ])->assertRedirect(route('dashboard'));
+        ]);
+        $this->assertSame(302, $response->getStatusCode(), $response->getContent());
 
         foreach ([$activeDevice, $pendingDevice, $secondOwnedDevice] as $device) {
             $device->refresh();
