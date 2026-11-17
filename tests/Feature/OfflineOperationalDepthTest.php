@@ -275,7 +275,7 @@ class OfflineOperationalDepthTest extends TestCase
             ],
         ]);
 
-        $this->expectException(\\Symfony\\Component\\HttpKernel\\Exception\\HttpException::class);
+        $this->expectException(\Symfony\\Component\\HttpKernel\\Exception\\HttpException::class);
         try {
             app(SyncMutationApplier::class)->apply($mutation, [
                 'job' => app(\App\Support\Offline\OfflineDomainMutationHandler::class),
