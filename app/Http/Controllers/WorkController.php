@@ -117,6 +117,7 @@ class WorkController extends Controller
     {
         $business = $this->business($request);
         $validated = $request->validate($this->rules());
+        $this->validateSchedule($validated);
 
         $customer = Customer::query()
             ->where('business_id', $business->id)
@@ -151,6 +152,11 @@ class WorkController extends Controller
                 'customer_phone' => $customer->primaryContact?->phone,
                 'customer_email' => $customer->primaryContact?->email,
                 'event_date' => $validated['event_date'],
+                'event_end_date' => $validated['event_end_date'] ?? null,
+                'event_start_time' => $validated['event_start_time'] ?? null,
+                'event_end_time' => $validated['event_end_time'] ?? null,
+                'setup_date' => $validated['setup_date'] ?? null,
+                'collection_date' => $validated['collection_date'] ?? null,
                 'event_address' => $validated['event_address'] ?? null,
                 'notes' => $validated['notes'] ?? null,
                 'status' => 'draft',
@@ -215,6 +221,7 @@ class WorkController extends Controller
         $validated = $request->validate($this->rules() + [
             'status' => ['required', 'in:draft,confirmed,in_progress,completed,cancelled'],
         ]);
+        $this->validateSchedule($validated);
 
         $customer = Customer::query()
             ->where('business_id', $business->id)
@@ -253,6 +260,11 @@ class WorkController extends Controller
                     'customer_phone' => $customer->primaryContact?->phone,
                     'customer_email' => $customer->primaryContact?->email,
                     'event_date' => $validated['event_date'],
+                    'event_end_date' => $validated['event_end_date'] ?? null,
+                    'event_start_time' => $validated['event_start_time'] ?? null,
+                    'event_end_time' => $validated['event_end_time'] ?? null,
+                    'setup_date' => $validated['setup_date'] ?? null,
+                    'collection_date' => $validated['collection_date'] ?? null,
                     'event_address' => $validated['event_address'] ?? null,
                     'notes' => $validated['notes'] ?? null,
                     'status' => $validated['status'],
@@ -344,6 +356,35 @@ class WorkController extends Controller
         abort_unless($valid, 422, 'The selected contact does not belong to the selected customer.');
     }
 
+
+    /**
+     * Validate the event's operational schedule while retaining date-only
+     * compatibility for existing records and offline clients.
+     *
+     * @param array<string, mixed> $data
+     */
+    private function validateSchedule(array $data): void
+    {
+        $startDate = $data['event_date'] ?? null;
+        $endDate = $data['event_end_date'] ?? $startDate;
+        $startTime = $data['event_start_time'] ?? null;
+        $endTime = $data['event_end_time'] ?? null;
+
+        if ($startDate && $endDate && $startDate === $endDate
+            && $startTime && $endTime && $endTime <= $startTime) {
+            throw ValidationException::withMessages([
+                'event_end_time' => 'The end time must be later than the start time for a same-day event.',
+            ]);
+        }
+
+        if (! empty($data['collection_date']) && $endDate
+            && $data['collection_date'] < $endDate) {
+            throw ValidationException::withMessages([
+                'collection_date' => 'Collection cannot be scheduled before the event ends.',
+            ]);
+        }
+    }
+
     private function rules(): array
     {
         return [
@@ -353,6 +394,11 @@ class WorkController extends Controller
             'name' => ['required', 'string', 'max:255'],
             'event_type' => ['required', 'string', 'in:' . implode(',', config('zazu.job_types'))],
             'event_date' => ['required', 'date'],
+            'event_end_date' => ['nullable', 'date', 'after_or_equal:event_date'],
+            'event_start_time' => ['nullable', 'date_format:H:i'],
+            'event_end_time' => ['nullable', 'date_format:H:i'],
+            'setup_date' => ['nullable', 'date', 'before_or_equal:event_date'],
+            'collection_date' => ['nullable', 'date', 'after_or_equal:event_end_date'],
             'event_address' => ['nullable', 'string', 'max:255'],
             'notes' => ['nullable', 'string'],
             'services' => ['nullable', 'array'],
