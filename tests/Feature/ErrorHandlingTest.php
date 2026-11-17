@@ -62,7 +62,7 @@ class ErrorHandlingTest extends TestCase
         $this->assertSame(500, $response->getStatusCode());
         $this->assertStringContainsString('Zazu could not complete that request.', (string) $response->getContent());
         $this->assertStringContainsString('APP-001', (string) $response->getContent());
-        $this->assertStringContainsString('Reference test-request-id', (string) $response->getContent());
+        $this->assertStringContainsString('Reference number: test-request-id', (string) $response->getContent());
         $this->assertStringNotContainsString('Sensitive database/table details', (string) $response->getContent());
         $this->assertSame('test-request-id', $response->headers->get('X-Zazu-Request-Id'));
     }
