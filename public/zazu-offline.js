@@ -253,10 +253,18 @@
             ...normalizeRecord(item),
             items: normalizeList(item.items),
         }));
-        if (has('invoices')) state.invoices = bootstrap.invoices.map((item) => ({
-            ...normalizeRecord(item),
-            payments: normalizeList(item.payments),
-        }));
+        if (has('invoices')) state.invoices = bootstrap.invoices.map((item) => {
+            const record = normalizeRecord(item);
+
+            // The sync bootstrap wraps invoice fields under "record"; payments
+            // are nested in that record too. Prefer the outer collection when
+            // a direct-response variant supplies it, otherwise preserve and
+            // normalise the nested collection instead of replacing it with [].
+            return {
+                ...record,
+                payments: normalizeList(item.payments ?? record.payments),
+            };
+        });
         if (has('expenses')) state.expenses = normalizeList(bootstrap.expenses);
         if (has('inventory_items')) state.inventory_items = bootstrap.inventory_items.map((item) => ({
             ...normalizeRecord(item),
