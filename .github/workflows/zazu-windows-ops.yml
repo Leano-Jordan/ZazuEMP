@@ -112,6 +112,40 @@ jobs:
           }
           Write-Host 'PASS: LAN/HTTPS launchers use verified same-origin compiled assets; loopback development remains unchanged.'
 
+      - name: Verify database updates are backed up before Windows startup
+        shell: pwsh
+        run: |
+          $launcher = Get-Content 'ops/windows/Start-ZazuDev.ps1' -Raw
+          foreach ($required in @(
+            'function Prepare-ZazuDatabase',
+            'migrate:status',
+            'zazu:backup',
+            'migrate',
+            'migrate:status',
+            'Backup ready:',
+            'Recovery backup:'
+          )) {
+            if (-not $launcher.Contains($required)) {
+              throw "Safe database update startup requirement is missing: $required"
+            }
+          }
+
+          $backupIndex = $launcher.IndexOf("'zazu:backup'")
+          $migrationIndex = $launcher.IndexOf("'migrate' '--force' '--no-interaction'")
+          $prepareIndex = $launcher.IndexOf('Prepare-ZazuDatabase $php')
+          $serverStartIndex = $launcher.IndexOf('$process = Start-Process -FilePath $php')
+
+          if ($backupIndex -lt 0 -or $migrationIndex -lt 0 -or $backupIndex -gt $migrationIndex) {
+            throw 'The complete installation backup must be created before applying database updates.'
+          }
+          if ($prepareIndex -lt 0 -or $serverStartIndex -lt 0 -or $prepareIndex -gt $serverStartIndex) {
+            throw 'Database status and safe updates must be checked before the Laravel server starts.'
+          }
+          if ($launcher -notmatch 'backupArchives\.Count -ne 1' -or $launcher -notmatch 'backupArchives\[0\]\.Length -le 0') {
+            throw 'The startup check must verify that a non-empty backup archive exists before updating the database.'
+          }
+          Write-Host 'PASS: Pending database updates require a verified full backup and are checked before the server starts.'
+
 
       - name: Verify the packaged Windows installer contract
         shell: pwsh
