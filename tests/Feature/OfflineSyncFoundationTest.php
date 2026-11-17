@@ -1950,6 +1950,15 @@ class OfflineSyncFoundationTest extends TestCase
                     'expense_date' => 'not-a-date',
                 ],
             ],
+            [
+                'entity' => 'expense',
+                'record' => [
+                    'description' => 'Impossible offline expense date',
+                    'amount' => '10.00',
+                    'status' => 'unpaid',
+                    'expense_date' => '2026-02-31',
+                ],
+            ],
         ];
 
         $recorder = app(SyncMutationRecorder::class);
