@@ -11,7 +11,7 @@ Owner mandate: ship a dependable first-business V1; preserve scope; no Render or
 
 Owner authorised the focused V1 addition: multi-day event dates, start/end times, setup/collection dates, schedule clash warnings and connected rental allocation dates. Staff scheduling, quantity-based rental stock and workforce management remain deferred.
 
-Implementation candidate is on `main` (source HEAD at time of this note: `24e68b73d3a73bd6a5e5a8103f164bc3146e02fc`; subsequent documentation commits follow). Added an additive events migration; online Work create/edit persistence and validation; offline mutation payload/server application and workspace bootstrap; calendar multi-day expansion; schedule clash detection; and rental allocation date defaults. Added focused online/offline feature tests. Exact-head CI and rendered/physical acceptance are pending; no pass or readiness uplift is claimed.
+Implementation candidate is on `main` at source HEAD `d4a3293c067972646f47c6eb74f43a62ba504a27` (17 Nov 2026). Added an additive events migration; online Work create/edit persistence and validation; offline mutation payload/server application and workspace bootstrap; calendar multi-day expansion; schedule clash detection; and rental allocation date defaults. Added focused online/offline feature tests, including preservation of new schedule fields when older queued offline mutations arrive. Exact-head Laravel, PHPMD, security and offline-browser CI are pending; rendered/physical acceptance is pending; no pass or readiness uplift is claimed.
 
 ## Current repository verification — fd82f6a (17 Nov 2026)
 
