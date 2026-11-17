@@ -77,7 +77,7 @@
                             <div class="zazu-calendar-events">
                                 @foreach($dayEvents->take(3) as $event)
                                     @php $status=$event->status?:'draft'; $statusLabel=str_replace('_',' ',ucfirst($status)); @endphp
-                                    <a href="{{ route('work.show',$event) }}" class="zazu-calendar-event status-{{ $status }}" title="{{ $event->name }}"><span class="zazu-calendar-event-accent"></span><span class="zazu-calendar-event-content"><strong>{{ $event->name }}</strong>@if($event->event_type || $event->customer_name)<small>{{ $event->event_type ?: $event->customer_name }}</small>@endif</span><span class="zazu-calendar-status">{{ $statusLabel }}</span></a>
+                                    <a href="{{ route('work.show',$event) }}" class="zazu-calendar-event status-{{ $status }}" title="{{ $event->name }}"><span class="zazu-calendar-event-accent"></span><span class="zazu-calendar-event-content"><strong>{{ $event->name }}</strong>@if($event->event_type || $event->customer_name)<small>{{ $event->event_type ?: $event->customer_name }}@if($event->event_start_time) · {{ substr((string) $event->event_start_time, 0, 5) }}@endif @if($event->event_end_date && $event->event_date && !$event->event_end_date->isSameDay($event->event_date)) · Multi-day @endif</small>@endif</span><span class="zazu-calendar-status">{{ $statusLabel }}</span></a>
                                 @endforeach
                                 @if($dayEvents->count()>3)<span class="zazu-calendar-more">+ {{ $dayEvents->count()-3 }} more jobs</span>@endif
                             </div>
@@ -157,7 +157,7 @@
 <div class="zazu-calendar-agenda-events">
                             @foreach($dayEvents as $event)
                                 @php $status=$event->status?:'draft'; @endphp
-                                <a href="{{ route('work.show',$event) }}" class="zazu-calendar-agenda-event status-{{ $status }}"><span class="zazu-calendar-event-accent"></span><span class="zazu-calendar-agenda-event-main"><strong>{{ $event->name }}</strong><small>{{ $event->event_type ?: 'Event' }}@if($event->customer_name) · {{ $event->customer_name }}@endif @if($event->event_address) · {{ $event->event_address }}@endif</small></span><span class="zazu-calendar-agenda-status">{{ str_replace('_',' ',ucfirst($status)) }}</span><span class="zazu-calendar-open" aria-hidden="true">→</span></a>
+                                <a href="{{ route('work.show',$event) }}" class="zazu-calendar-agenda-event status-{{ $status }}"><span class="zazu-calendar-event-accent"></span><span class="zazu-calendar-agenda-event-main"><strong>{{ $event->name }}</strong><small>{{ $event->event_type ?: 'Event' }}@if($event->customer_name) · {{ $event->customer_name }}@endif @if($event->event_start_time) · {{ substr((string) $event->event_start_time, 0, 5) }}–{{ substr((string) $event->event_end_time, 0, 5) ?: '—' }}@endif @if($event->event_end_date && $event->event_date && !$event->event_end_date->isSameDay($event->event_date)) · Through {{ $event->event_end_date->format('d M') }}@endif @if($event->event_address) · {{ $event->event_address }}@endif</small></span><span class="zazu-calendar-agenda-status">{{ str_replace('_',' ',ucfirst($status)) }}</span><span class="zazu-calendar-open" aria-hidden="true">→</span></a>
                             @endforeach
                         </div></div>
                     @endif
