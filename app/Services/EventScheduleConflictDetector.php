@@ -46,15 +46,20 @@ final class EventScheduleConflictDetector
         $eventEndDate = $schedule['event_end_date'] ?? null;
         $startTime = $schedule['event_start_time'] ?? null;
         $endTime = $schedule['event_end_time'] ?? null;
-        $hasTimeRange = $startTime && $endTime;
-
+        $hasTimeRange = (bool) ($startTime && $endTime);
         $start = $setupDate ?: $eventDate;
         $end = $collectionDate ?: ($eventEndDate ?: $eventDate);
 
         return [
-            'start' => CarbonImmutable::parse($start.' '.($setupDate || ! $hasTimeRange ? '00:00' : $startTime)),
-            'end' => CarbonImmutable::parse($end.' '.($collectionDate || ! $hasTimeRange ? '23:59' : $endTime)),
+            'start' => CarbonImmutable::parse($start.' '.$this->boundaryTime($setupDate, $startTime, $hasTimeRange, '00:00')),
+            'end' => CarbonImmutable::parse($end.' '.$this->boundaryTime($collectionDate, $endTime, $hasTimeRange, '23:59')),
         ];
+    }
+
+
+    private function boundaryTime(?string $logisticsDate, ?string $time, bool $hasTimeRange, string $fallback): string
+    {
+        return $logisticsDate || ! $hasTimeRange ? $fallback : (string) $time;
     }
 
     /**
