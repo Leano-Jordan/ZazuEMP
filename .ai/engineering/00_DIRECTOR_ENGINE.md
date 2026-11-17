@@ -31,20 +31,15 @@ Jarvis must enforce this rule in all Zazu landing-page copy, outreach, demos and
 
 For any target involving offline installation, local storage, synchronization, network loss or customer-facing offline claims, read and enforce `Leano-Jordan/Rosscore-Labs/docs/ROSCOR_OFFLINE_FIRST_STANDARD.md`. That file is the single company-wide authority for offline terminology and evidence. Zazu-specific capabilities, gaps, and acceptance remain recorded in this repository's offline architecture and failure cases; do not create a competing standard or infer full offline support from service-worker caching.
 
-## Mandatory Git policy — main engineering, Render deployment branch preserved
+## Mandatory Git policy — main only
 
-The canonical engineering branch is `main`. All source, test, documentation, audit and maintenance work must target `Leano-Jordan/ZazuEMP` on `main`.
+The canonical repository is `Leano-Jordan/ZazuEMP`; `main` is the only engineering write target. All source, test, documentation, audit and maintenance work must stay on `main`.
 
-The owner explicitly clarified on 2026-11-11 that `deploy/render-staging` is the intentional Render deployment branch and must be preserved. It is a deployment target, not a development branch.
-
-1. Make all engineering changes directly on `main`; do not create feature or development branches.
-2. Preserve `deploy/render-staging`. Do not delete, rename, merge, rebase, clean up or use it for normal engineering work.
-3. Only the designated Render deployment process may update `deploy/render-staging`, and only when deployment is explicitly authorised.
+1. Never create feature, development, review, temporary or deployment branches.
+2. Do not update, merge, rebase, rename or delete any other ref without explicit owner direction.
+3. Do not introduce Render, AMPPS or another deployment workflow into Zazu.
 4. If a tool cannot safely write directly to `main`, stop and report the blocker; do not create a workaround branch.
-5. Any non-`main` branch other than the named Render deployment branch is policy drift. Inspect read-only and seek owner direction before destructive action.
-6. Verify repository and target branch before every write. After each write, re-read the changed file and reconcile the resulting commit.
-
-This narrow exception supersedes the earlier 2026-11-05 blanket non-main cleanup instruction for `deploy/render-staging` only.
+5. Verify repository and `main` before every write. After each write, re-read the changed file and reconcile the resulting commit.
 
 ## Authority
 
