@@ -5,6 +5,7 @@ Last application-code test baseline: a5ead696429867bcd57342406bb37662ca1b2f2c
 Disposition: NOT READY · Evidence maturity: 73/100 unchanged.
 
 ## Event scheduling and rental logistics — owner-authorised V1 addition (2026-11-17)
+Implementation baseline: `d4a3293c067972646f47c6eb74f43a62ba504a27` on `main`; exact-head CI pending.
 - [ ] Multi-day event date range, start/end time, setup and collection dates persist and validate online.
 - [ ] Schedule clash warnings identify overlapping active work without blocking an operator save.
 - [ ] Offline-created schedule fields survive sync and are included in the device workspace bootstrap.
