@@ -39,6 +39,7 @@
         assets: [],
         costs: [],
         conflicts: [],
+        sync_registration_consent: false,
     });
 
     let dbPromise = null;
@@ -1410,6 +1411,7 @@
 
     function scheduleSyncRetry() {
         if (syncRetryTimer !== null || sessionCleared || !navigator.onLine
+            || (!state?.sync?.token && !state?.sync_registration_consent)
             || state?.sync_authorization_required || state?.sync_registration_blocked) return;
 
         // Retry both halves of the recovery path: obtain a device credential
@@ -1424,7 +1426,7 @@
                 || state?.sync_registration_blocked) return;
 
             try {
-                if (!state?.sync?.token) {
+                if (!state?.sync?.token && state?.sync_registration_consent) {
                     await registerPrimaryDevice();
                 }
 
@@ -1599,13 +1601,41 @@
         return result.device;
     }
 
-    async function registerPrimaryDevice() {
+    async function registerPrimaryDevice({ explicitConsent = false } = {}) {
+        await ready;
+        if (sessionCleared || !storageAvailable || !ACTIVE_BUSINESS_ID) return false;
+
+        if (explicitConsent) {
+            const reauthorizing = state?.sync_authorization_required === true;
+            const firstApproval = state?.sync_registration_consent !== true;
+            state.sync_registration_consent = true;
+            if (reauthorizing) {
+                state.sync = null;
+                state.sync_authorization_required = false;
+                state.sync_registration_blocked = false;
+            }
+            if (firstApproval || reauthorizing) {
+                await writeState({ allowSessionChange: true });
+                window.dispatchEvent(new CustomEvent('zazu:offline-state-updated'));
+            }
+        }
+
+        // A trusted sync credential is granted only after an owner explicitly
+        // approves this browser/device in Settings. Previously every fresh web
+        // login silently registered another long-lived device token.
+        if (state?.sync_registration_consent !== true || state?.sync_registration_blocked) return false;
         if (primaryRegistrationAttempt) return primaryRegistrationAttempt;
 
         const attempt = registerPrimaryDeviceOnce();
         primaryRegistrationAttempt = attempt;
         try {
-            return await attempt;
+            const registered = await attempt;
+            if (!registered && state?.sync_registration_consent === true
+                && !state?.sync_registration_blocked && !state?.sync_authorization_required
+                && navigator.onLine && (await pending()).length > 0) {
+                scheduleSyncRetry();
+            }
+            return registered;
         } finally {
             if (primaryRegistrationAttempt === attempt) primaryRegistrationAttempt = null;
         }
@@ -1709,7 +1739,8 @@
         resolveReady(state);
         window.dispatchEvent(new CustomEvent('zazu:offline-ready', { detail: api }));
 
-        if (storageAvailable && !state.sync?.token && navigator.onLine && window.__ZAZU_OFFLINE_DEFER_INITIAL_SYNC !== true) {
+        if (storageAvailable && !state.sync?.token && state.sync_registration_consent === true
+            && navigator.onLine && window.__ZAZU_OFFLINE_DEFER_INITIAL_SYNC !== true) {
             registerPrimaryDevice().then(registered => {
                 if (registered && state?.sync?.token) sync().catch(() => {});
             }).catch(() => {
@@ -1761,11 +1792,11 @@
             await ready;
             if (sessionCleared || !navigator.onLine) return;
 
-            if (!state?.sync?.token) {
+            if (!state?.sync?.token && state?.sync_registration_consent === true) {
                 try {
                     await registerPrimaryDevice();
                 } catch {
-                    // Keep local work queued; another resume/reconnect can retry.
+                    // Retry only after the owner has explicitly trusted this device.
                 }
             }
 
