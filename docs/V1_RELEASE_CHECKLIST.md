@@ -1,3 +1,20 @@
+## Director reconciliation — 2026-11-17 (offline detail and recovery hardening)
+
+**Canonical repository:** \`Leano-Jordan/ZazuEMP\` · **branch:** \`main\`  
+**Verified application/test source:** \`325dc671d1005fd157fdaa64979d818a66961f0c\`.
+
+- Corrected a customer offline detail-panel runtime reference and added controlled handling for malformed tenant archive JSON.
+- Refactored offline Work requirement reconciliation to pass PHPMD complexity checks; separated focused archive and Work lifecycle regressions into dedicated test classes.
+- Laravel: **520 passed / 1 skipped / 3,635 assertions**.
+- PostgreSQL migration, registration and real database/private-file backup/restore smoke: **PASS**.
+- PHPMD: **PASS**. Zazu Quality, Composer security audit and secret scan: **PASS**.
+- Seeded commercial acceptance is included in the passing Laravel suite: quote acceptance, invoice, deposit, final payment, purchasing receipt, actual cost, event completion and report-level profit/margin reconciliation.
+- Offline browser acceptance was still running at the time of this record and is not counted as passed.
+
+**Release remains NOT READY.** Physical Android installed-app offline cold launch/restart/reconnect, installed-target Windows backup/restore with private media, live-business commercial reconciliation and POPIA operational sign-off remain owner/operational acceptance items. Brand/name clearance remains deferred by owner direction.
+
+---
+
 ## Director reconciliation — 2026-11-17 (V1 correction batch)
 
 **Canonical repository:** `Leano-Jordan/ZazuEMP` · **branch:** `main` · **verified source/control head:** `7cb17334d53312265521769223bcac4f42eda772`
