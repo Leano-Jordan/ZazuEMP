@@ -1,6 +1,6 @@
 # Zazu EMP — V1 Readiness Register
 
-Last verified application-code baseline: 71c8fc5c7aeba392b95e26aee694945b286f2c8e
+Last verified application-code baseline: ba94b39e0460e4e57c560e98541808c762f50e25
 Release disposition: NOT READY
 Evidence maturity: 73/100 unchanged; no uplift claimed.
 
@@ -113,3 +113,12 @@ The backup command now reopens its completed temporary ZIP, performs ZIP consist
 - Application: `npm ci`, scoped npm audit policy and service-worker authentication cache-race tests all passed.
 - The exact GHSA-fc5q-39xc-vjpf / CVE-2026-112366 exception remains temporary because npm has no patched picomatch version. The audit script fails closed for every other high/critical advisory and for any dependency chain not exclusively attributable to this finding.
 - This is a CI gate resolution, not vulnerability remediation. Keep the advisory tracked until upstream publishes a fix or withdraws it. No readiness score uplift; DB-001 and owner acceptance gates remain open.
+
+
+## New-job form regression — CLOSED (2026-11-17)
+
+The create screen had omitted the required Work / event name field although `WorkController` still validates and persists `name`. This caused three offline-browser journeys to time out at the absent form control. The production form was corrected on `main` at `ba94b39e0460e4e57c560e98541808c762f50e25`; the tests remain unchanged.
+
+**Exact-head evidence:** Laravel run `44184183003` passed all three jobs: Laravel tests, PostgreSQL migration/registration/backup/restore/private-file recovery, and offline-browser acceptance (including the mobile customer-to-Work and phone-local attachment journeys). Zazu Quality `44184183085`, Windows V1 Package `44184182900` (including PowerShell fresh install), Director Health `44184182984` and Push-on-main `44184180721` also passed. SonarCloud was skipped, not passed.
+
+This is a closed form/CI regression, not a readiness uplift. DB-001 and all four operator acceptance gates remain open; release remains NOT READY and evidence maturity remains 73/100.

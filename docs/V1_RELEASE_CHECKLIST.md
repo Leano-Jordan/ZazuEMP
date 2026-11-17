@@ -1,6 +1,6 @@
 # Zazu EMP — V1 Release Checklist
 
-Last verified application-code baseline: 71c8fc5c7aeba392b95e26aee694945b286f2c8e
+Last verified application-code baseline: ba94b39e0460e4e57c560e98541808c762f50e25
 Disposition: NOT READY · Evidence maturity: 73/100 unchanged.
 
 ## Open database incident — owner installation
@@ -90,3 +90,12 @@ The owner-installation entry matching `aa9080f4-9580-41c9-a643-439b31928ffa` rem
 - [x] Exact-head quality workflow run `44179163841` passed on `76be1f234e7726352c2e15b511b37b9084d2ddfa`: application, Composer security audit and secret scan.
 - [x] Application job passed dependency installation, the scoped npm audit policy and service-worker authentication cache-race tests.
 - [ ] Replace the temporary GHSA-fc5q-39xc-vjpf exception when a verified picomatch fix is published or the advisory is withdrawn. This exception is not a dependency fix.
+
+
+### New-job form regression closure — 2026-11-17
+
+- [x] Restore required Work / event name input on the new-job form; controller validation and persistence remain unchanged.
+- [x] Keep the offline-browser acceptance tests intact; all three previously blocked journeys now pass.
+- [x] Exact-head Laravel run `44184183003`: Laravel, PostgreSQL migration/recovery and offline-browser jobs all PASS, including mobile customer-to-Work and phone-local attachment acceptance.
+- [x] Zazu Quality `44184183085`, Windows package + PowerShell fresh install `44184182900`, Director Health `44184182984` and Push-on-main `44184180721`: PASS. SonarCloud skipped.
+- DB-001 remains open. No readiness score uplift; V1 remains NOT READY.

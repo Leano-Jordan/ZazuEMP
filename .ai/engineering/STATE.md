@@ -2,7 +2,7 @@
 
 As of: 2026-11-17
 Repository: Leano-Jordan/ZazuEMP
-Last verified application-code baseline: 71c8fc5c7aeba392b95e26aee694945b286f2c8e
+Last verified application-code baseline: ba94b39e0460e4e57c560e98541808c762f50e25
 Canonical branch: main only; never create branches. Engineering changes are active on main; no branches created.
 Owner mandate: ship a dependable first-business V1; preserve scope; no Render or AMPPS workflow.
 
@@ -129,3 +129,12 @@ V1: NOT READY. Historical state/register/memory, checklist and changelog are pre
 - Added `scripts/audit-npm.mjs`: it permits only this exact advisory and only packages whose complete npm audit dependency chain leads to that finding. Every other high/critical finding remains blocking. The exception is temporary and must be removed when the advisory is fixed or withdrawn.
 - This is a CI policy exception, **not a dependency remediation** and not a claim that the advisory is resolved. Zazu's Vite/Laravel build configuration uses repository-defined static glob patterns; no user-supplied glob input was found in the inspected Vite configuration.
 - DB-001 remains OPEN. No release-readiness uplift.
+
+
+## New-job form regression closure — 2026-11-17
+
+- Root cause of the single failing Laravel workflow: `resources/views/work/create.blade.php` omitted the required `name` field while `WorkController` continued to validate and persist it. Three offline-browser journeys consequently stalled on the missing field selector; the tests were exercising the real required workflow correctly.
+- Restored the required **Work / event name** field and validation feedback on `main` in application commit `ba94b39e0460e4e57c560e98541808c762f50e25`. No tests were weakened and no branches were created.
+- Exact-head Laravel run `44184183003`: PASS — Laravel tests, PostgreSQL migration/registration/backup/restore/private-file recovery, and offline-browser acceptance including mobile customer-to-Work and phone-local attachment journeys.
+- Supporting exact-head checks: Zazu Quality `44184183085` PASS; Windows V1 Package `44184182900` PASS including PowerShell fresh-install verification; Director Health `44184182984` PASS; Push-on-main `44184180721` PASS. SonarCloud was skipped and is not counted as a pass.
+- This closes the form regression and associated CI failure only. DB-001 remains OPEN; release remains NOT READY; evidence maturity stays 73/100 with no readiness uplift.
