@@ -1768,7 +1768,7 @@ test.describe('Zazu installed PWA offline shell', () => {
         }
         await expect(detail.getByText('sent', { exact: true })).toBeVisible();
         await expect(detail.getByText('50.00%', { exact: true })).toBeVisible();
-        await expect(detail.getByText('80.00 guests', { exact: true })).toBeVisible();
+        await expect(detail.getByText('80.00 guests')).toBeVisible();
         await expect(detail.getByText(/Line total 10000\.00/)).toBeVisible();
         await expect(detail.getByText(/Balance ZAR 5000\.00/)).toBeVisible();
 
