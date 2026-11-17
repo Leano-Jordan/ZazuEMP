@@ -13,6 +13,15 @@ async function login(page) {
     await expect(page).toHaveURL(/\/dashboard$/);
 }
 
+async function trustCurrentDevice(page) {
+    await page.goto('/settings', { waitUntil: 'domcontentloaded' });
+    const trustButton = page.getByRole('button', { name: 'Trust this device for offline sync' });
+    await expect(trustButton).toBeVisible();
+    await trustButton.click();
+    await expect(page.getByRole('button', { name: 'This device is trusted' })).toBeVisible();
+    await expect.poll(() => page.evaluate(() => window.ZazuOffline.isPaired())).toBe(true);
+}
+
 test('Work attachments persist offline, upload on reconnect and cache remote files', async ({ page }, testInfo) => {
     test.setTimeout(45_000);
     test.skip(testInfo.project.name !== 'chromium', 'Attachment reconnect contract runs once; responsive browser coverage is separate.');
@@ -891,8 +900,8 @@ test('re-pair in one tab replaces the stale device session in other open tabs', 
     test.skip(testInfo.project.name !== 'chromium', 'Cross-tab device session contract runs once in Chromium.');
 
     await login(page);
+    await trustCurrentDevice(page);
     await page.goto('/dashboard', { waitUntil: 'domcontentloaded' });
-    await expect.poll(() => page.evaluate(() => window.ZazuOffline.isPaired())).toBe(true);
     const businessId = await page.evaluate(() => Number(document.body.dataset.zazuBusinessId));
     await page.evaluate(async businessId => {
         await window.ZazuOffline.ready;
