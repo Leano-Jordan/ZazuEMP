@@ -1,5 +1,12 @@
 # Changelog
 
+## 2026-11-17 — Windows recovery proof and frontend dependency advisory
+
+- Extended the Windows V1 package workflow to perform a Windows-native SQLite and private-media backup/restore round-trip. The CI drill creates disposable sentinels, backs them up, mutates both, restores the archive and verifies the original database value and file bytes.
+- Windows V1 Package run 82 at fd82f6a passed the package build, PowerShell fresh installation and the new recovery drill. This is supporting CI evidence; the owner-run recovery drill on the intended installation remains open.
+- The quality workflow now fails at npm audit because GitHub advisory GHSA-fc5q-39xc-vjpf / CVE-2026-112366 flags picomatch versions through 4.0.7. The advisory currently lists no patched version. The affected packages are in the development/build toolchain; no advisory suppression or breaking Vite downgrade was applied pending a verified fix.
+
+
 ## 2026-11-17 — Rental asset date availability verified
 - Closed the serialized-asset booking defect: non-overlapping periods can be booked while the asset has other active allocations; overlapping and open-ended conflicts are rejected.
 - Added per-allocation return handling, end-date entry and consistent asset status across online and offline mutation paths.

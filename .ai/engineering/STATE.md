@@ -2,14 +2,27 @@
 
 As of: 2026-11-17
 Repository: Leano-Jordan/ZazuEMP
-Last verified source baseline: e5dc263aaa1fd509061c12abdb158c5b5765dfee
+Current repository HEAD: fd82f6a5fb59365687fac903f93e944394145427 (17 Nov 2026)
+Last application-code test baseline: a5ead696429867bcd57342406bb37662ca1b2f2c
 Canonical branch: main only; never create branches. Engineering changes are active on main; no branches created.
 Owner mandate: ship a dependable first-business V1; preserve scope; no Render or AMPPS workflow.
 
-## Current engineering delta — ff7f0bb (partial verification)
-Queued financial mutation validation now matches connected-workflow rules for payment type/method, expense status, configured quote currency and calendar dates. All-zero offline purchase receipts are rejected before consuming their idempotency key. Focused regression coverage includes invalid enums/dates/currency, float-decoded purchase-order precision and all-zero receipts.
-Exact code-head Laravel: PASS — 526 passed / 1 skipped / 3,680 assertions. PHPMD, Zazu Quality, Director Health, Composer security audit, secret scan, CodeQL and PostgreSQL migration/recovery: PASS. Offline browser acceptance remains in progress; no browser pass is claimed yet.
+## Current repository verification — fd82f6a (17 Nov 2026)
 
+The only repository change between application-code baseline a5ead69 and fd82f6a is `.github/workflows/zazu-windows-package.yml`; application source and tests are unchanged across that range.
+
+Application-code CI at a5ead69:
+- Laravel: PASS — 526 passed / 1 skipped / 3,681 assertions.
+- Offline browser acceptance: PASS — 45 desktop Chromium, 6 mobile-viewport and 1 phone-local attachment journey.
+- PostgreSQL migration, account/workspace registration, backup/restore and private-file recovery: PASS.
+
+Windows V1 Package run 82 at fd82f6a: PASS. The production candidate built, Windows PowerShell fresh installation passed, and a new Windows-native recovery drill created a disposable SQLite record and private-media file, backed up both, mutated both, restored the archive and verified the original database value and private-file bytes.
+
+Director Health, Director Contract Lint and Push-on-main passed at fd82f6a. Composer security audit and secret scan passed.
+
+Zazu Quality is currently RED at `npm audit --audit-level=high`. The current lockfile contains the development/build-tool dependency chain that resolves to picomatch versions flagged by [GHSA-fc5q-39xc-vjpf](https://github.com/advisories/GHSA-fc5q-39xc-vjpf) / CVE-2026-112366. GitHub's advisory currently lists affected versions through 4.0.7 and no patched version. The finding is in the npm development/build toolchain; the Windows runtime candidate excludes npm manifests and node_modules. This still blocks the quality workflow. Do not suppress the advisory or apply the suggested breaking Vite downgrade without a verified fix.
+
+The Windows CI round-trip is supporting evidence only. It does not close the installed-target operator gate because it is not a recovery drill on the intended owner/customer installation.
 ## Verified work
 Rental asset date allocation was reproduced at c7be735: a second non-overlapping booking returned HTTP 422 before date-overlap evaluation. The online/offline correction now permits non-overlapping reservations, rejects overlapping and open-ended conflicts, supports per-allocation returns, and keeps asset status allocated until all active bookings are returned. Manual physical return remains operator-confirmed.
 
@@ -21,7 +34,7 @@ Password recovery now revokes active and pending sync devices across every busin
 
 Offline financial push validation uses integer-cent / hundredths parsing and rejects excess precision before posting. Regression coverage includes quote line quantity and price, event and asset costs, inventory movement, expenses, purchase-order quantity and price, purchase receipts, and payments.
 
-## Exact-head CI — e5dc263
+## Earlier application-code CI — e5dc263 (historical baseline)
 - Laravel run 44127089629: PASS — 523 passed / 1 skipped / 3,662 assertions.
 - Offline browser acceptance in the same run: PASS — 45 desktop Chromium, 6 mobile-viewport, and 1 phone-local attachment journey.
 - PostgreSQL migration, registration, backup/restore and private-file recovery: PASS.

@@ -28,11 +28,11 @@ Zazu is a reusable commercial event-management platform for catering, event equi
 - Primary currency is South African rand (ZAR / R); show rand first in commercial analysis.
 
 ## Current verified position
-Last verified source baseline: 00af9adda943ee4e232e7eedeaf894a809dcbe88. Later reconciliation commits only synchronize control documents.
-Laravel 523 passed, 1 skipped, 3,653 assertions. Desktop/mobile offline and phone-local attachment acceptance passed (45 + 6 + 1). PostgreSQL recovery, Windows V1 package/fresh install, populated upgrade/rollback, Zazu quality, Psalm, PHPMD, Director Health, Contract Lint and CodeQL passed; SonarCloud skipped.
-Serialized-asset date availability is corrected and verified online/offline, including open-ended overlap and independent returns.
-Invoice numbering remains unchanged pending SA tax-adviser guidance.
-V1 remains NOT READY; evidence maturity remains 73/100 with no uplift.
-Current gates: physical Android offline/reconnect; installed-target recovery including private media; live populated-business financial reconciliation; POPIA operational sign-off.
+Current repository HEAD: fd82f6a5fb59365687fac903f93e944394145427. Application-code baseline: a5ead696429867bcd57342406bb37662ca1b2f2c (the only later change is the Windows package workflow).
+Application-code CI: Laravel 526 passed, 1 skipped, 3,681 assertions; desktop/mobile offline browser acceptance and phone-local attachment journey passed; PostgreSQL migration and recovery passed.
+Windows V1 Package run 82 at fd82f6a: candidate build, Windows PowerShell fresh install and Windows-native SQLite + private-media backup/restore passed. Director Health, Contract Lint and Push-on-main passed.
+Zazu Quality is currently red at npm audit because GHSA-fc5q-39xc-vjpf / CVE-2026-112366 flags the locked picomatch development/build dependency chain; GitHub currently lists no patched version. The finding is not suppressed or force-downgraded.
+V1 remains NOT READY; evidence maturity remains 73/100 with no uplift. Current acceptance gates: physical Android offline/reconnect; intended installed-target recovery; live populated-business financial reconciliation; POPIA operational sign-off.
 Current state: .ai/engineering/STATE.md. Sole readiness register: .ai/engineering/READINESS_REGISTER.md. Release acceptance: docs/V1_RELEASE_CHECKLIST.md.
+Historical context is preserved in docs/archive/engineering/2026-11-17-state-register-memory-history.md.
 Historical context is preserved in docs/archive/engineering/2026-11-17-state-register-memory-history.md.

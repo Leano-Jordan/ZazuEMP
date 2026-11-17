@@ -1,6 +1,7 @@
 # Zazu EMP — V1 Release Checklist
 
-Last verified source baseline: Leano-Jordan/ZazuEMP / main / e5dc263aaa1fd509061c12abdb158c5b5765dfee (17 Nov 2026)
+Current repository HEAD: Leano-Jordan/ZazuEMP / main / fd82f6a5fb59365687fac903f93e944394145427 (17 Nov 2026)
+Last application-code test baseline: a5ead696429867bcd57342406bb37662ca1b2f2c
 Disposition: NOT READY · Evidence maturity: 73/100 unchanged.
 
 ## Release acceptance gates
@@ -9,11 +10,16 @@ Disposition: NOT READY · Evidence maturity: 73/100 unchanged.
 - [ ] Live commercial reconciliation: populated quote → invoice → deposit/final payment → purchasing/costs → completion → profit/margin.
 - [ ] POPIA operational sign-off: privacy notice, retention/deletion, access controls and incident procedure.
 
-## Engineering verification in progress — ff7f0bb
-- [ ] Offline financial push contract: payment/expense enums, configured quote currency, calendar-date validation, all-zero receipt rejection and float-decoded purchase-order precision. Laravel 526/1 skipped/3,680 assertions, PHPMD, Zazu Quality, Director Health, Composer security audit, secret scan, CodeQL and PostgreSQL migration/recovery pass at code head ff7f0bb; offline browser acceptance remains in progress. Close after browser result.
+## Latest CI verification
 
+- Application-code baseline a5ead69: Laravel 526 passed / 1 skipped / 3,681 assertions; offline browser acceptance 45 desktop + 6 mobile-viewport + 1 phone-local attachment; PostgreSQL migration/registration/backup/private-file recovery passed.
+- Repository head fd82f6a changes only the Windows package workflow after that application-code baseline.
+- Windows V1 Package run 82: PASS — candidate package built; Windows PowerShell first install passed; Windows-native backup/restore recovered both a disposable SQLite record and private-media bytes.
+- Director Health, Director Contract Lint and Push-on-main passed.
+- Zazu Quality is RED at npm audit because GHSA-fc5q-39xc-vjpf / CVE-2026-112366 flags the locked picomatch build-tool dependency chain. GitHub currently lists no patched version. Composer security audit and secret scan passed. The advisory is not suppressed and no breaking Vite downgrade was applied.
+- The Windows CI recovery test is supporting evidence only; it does not close the controlled recovery drill on the intended installed target.
 ## Closed acceptance
-- [x] Windows fresh-install candidate package and PowerShell first-install smoke — built and verified at 00af9adda; not an updater or hosted deployment.
+- [x] Windows fresh-install candidate package, PowerShell first-install smoke and Windows-native SQLite/private-media backup/restore — Windows V1 Package run 82 passed at fd82f6a; not an updater or hosted deployment.
 - [x] Seeded commercial workflow automation — verified; reopen only on reproducible defect.
 - [x] Offline financial mutation precision/rejection — quote lines, payments, purchase orders/receipts, event and asset costs, expenses and inventory movement use strict cents/hundredths validation.
 - [x] Desktop trusted-device consent — fresh browsers do not auto-register; owner explicitly trusts the current PC from Settings.
@@ -22,4 +28,4 @@ Disposition: NOT READY · Evidence maturity: 73/100 unchanged.
 - [x] Serialized-asset date availability — online/offline tests pass for non-overlap, overlap, open-ended dates and independent returns at 00af9adda.
 
 ## Current release position
-V1 remains NOT READY. Exact-head CI at e5dc263 passed: Laravel 523 passed / 1 skipped / 3,662 assertions; offline browser 45 desktop + 6 mobile + 1 phone-local attachment; PostgreSQL migration/recovery; Windows package/fresh install; populated upgrade/rollback; Zazu quality, Psalm, PHPMD, Director Health and Push-on-main. SonarCloud skipped. Evidence maturity remains 73/100; no score uplift.
+V1 remains NOT READY. Application-code CI at a5ead69 passed: Laravel 526 passed / 1 skipped / 3,681 assertions; offline browser 45 desktop + 6 mobile + 1 phone-local attachment; PostgreSQL migration/recovery. Windows package run 82 at fd82f6a passed candidate build, Windows fresh install and the new Windows-native backup/private-media restore drill. Director Health, Contract Lint and Push-on-main passed. Zazu Quality is currently red due the unpatched picomatch advisory; Composer audit and secret scan passed. The four operator acceptance gates remain open. Evidence maturity remains 73/100; no score uplift.
