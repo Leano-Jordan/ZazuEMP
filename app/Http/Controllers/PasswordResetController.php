@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\AuditLog;
 use App\Models\Business;
 use App\Models\SyncDevice;
 use App\Models\User;
@@ -183,12 +184,14 @@ class PasswordResetController extends Controller
 
         $business = $businesses->get($device->business_id);
         if ($needsAudit && $business instanceof Business) {
-            Audit::record('sync.device.revoked', $business, [
+            // The audit belongs to the target business, which may not be the
+            // currently selected workspace during multi-business account recovery.
+            AuditLog::withoutEvents(fn () => Audit::record('sync.device.revoked', $business, [
                 'device_id' => (int) $device->id,
                 'device_name' => $device->device_name,
                 'device_type' => $device->device_type,
                 'reason' => 'owner_password_reset',
-            ], $business->id);
+            ], $business->id));
         }
     }
 }
