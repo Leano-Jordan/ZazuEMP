@@ -174,3 +174,6 @@ All notable Zazu EMP project changes will be recorded here.
 - Added regression coverage for quote revision integrity, currency-aware pricing, exact Money arithmetic, private media replacement and route integrity.
 - Added BusinessIsolationTest coverage for cross-business access, workload isolation and lifecycle controls.
 
+
+
+- Backup creation now reopens and validates the completed ZIP, manifest, payload membership and SHA-256 checksums before publishing it; a regression covers tampered private payload rejection.
