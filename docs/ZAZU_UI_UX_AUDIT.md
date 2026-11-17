@@ -450,3 +450,17 @@ Verification boundary: source-level conditional and markup inspection only. Scre
 - Kept the icon treatment CSS-token-driven so the existing light and dark themes inherit their current semantic colours; no raster/generated assets were added.
 - Added a focused regression test for all four icons, desktop/mobile card geometry and continued live metric rendering. The stylesheet is included in the shared app Vite bundle.
 - Source re-fetch confirms the markup, CSS and regression assertion are present on main. PHPUnit, Vite build and rendered desktop/tablet/mobile light/dark acceptance remain UNVERIFIED; do not claim visual acceptance until rendered review is completed.
+
+
+## Owner content direction — plain English for everyday users (2026-11-17)
+
+The product owner has made the language requirement explicit: Zazu must be understandable to people with a basic English foundation. This applies across the whole product, not only onboarding or help text.
+
+The active writing standard is `docs/ZAZU_PLAIN_LANGUAGE_STANDARD.md`. It covers page titles, navigation, field labels, buttons, helper text, validation, warnings, error pages, notifications, reports, exports and offline status.
+
+Changes in this cycle:
+- Job schedule fields now say **Job start date**, **Job end date**, **Event start time**, **Event end time** and **Equipment collection date**, with short explanations of what each date or time means.
+- The account error screen now uses **Home page**, **Open your business** and **Reference number** rather than less familiar or unclear labels.
+- The DB-001 headline and next step no longer use the technical phrase “database operation”.
+
+Verification: source and regression coverage are committed on `main`. Rendered desktop/phone review and exact-head CI remain pending. This is a standing content requirement for future changes, not a claim that every existing screen has already been audited.
