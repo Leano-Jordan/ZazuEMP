@@ -1,12 +1,12 @@
 # Zazu EMP — V1 Readiness Register
 
-Last verified engineering source baseline: Leano-Jordan/ZazuEMP / main / fd82f6a5fb59365687fac903f93e944394145427 / 17 Nov 2026
+Last verified engineering source baseline: Leano-Jordan/ZazuEMP / main / 71c8fc5c7aeba392b95e26aee694945b286f2c8e / 17 Nov 2026
 Last application-code test baseline: a5ead696429867bcd57342406bb37662ca1b2f2c
 Release disposition: NOT READY
 Evidence maturity: 73/100 unchanged; no uplift claimed.
 
 ## Owner-approved V1 scheduling addition — 2026-11-17
-Event scheduling and connected rental logistics are explicitly authorised for V1: multi-day event dates, start/end times, setup/collection dates, schedule clash warnings, and rental allocation defaults using the event logistics window. Staff scheduling, quantity-based rental stock and wider workforce management remain deferred. Implementation is on `main` at code baseline `d4a3293c067972646f47c6eb74f43a62ba504a27`; automated acceptance is pending exact-head CI.
+Event scheduling and connected rental logistics are explicitly authorised for V1: multi-day event dates, start/end times, setup/collection dates, schedule clash warnings, and rental allocation defaults using the event logistics window. Staff scheduling, quantity-based rental stock and wider workforce management remain deferred. Implementation is on `main` at code baseline `71c8fc5c7aeba392b95e26aee694945b286f2c8e`; Laravel 532/1 skipped/3,714 assertions and PHPMD pass. Windows package + PowerShell install/recovery pass on 2ef2a0b; PostgreSQL and offline-browser acceptance remain pending exact-head CI.
 
 ## Existing release gates
 | Gate | Disposition | Closure evidence |
@@ -15,7 +15,7 @@ Event scheduling and connected rental logistics are explicitly authorised for V1
 | Installation recovery | OPEN — CI supporting proof added | Windows V1 Package run 82 on fd82f6a passes Windows PowerShell first install and Windows-native SQLite + private-media backup/mutate/restore; still requires the controlled drill on the intended installed target, with representative data, media, authorization, audit and migrations |
 | Commercial reconciliation | OPEN | Populated real-business quote, invoice, payment, cost and profit reconciliation |
 | POPIA operations | OPEN | Owner-approved privacy/retention, incident and operational controls |
-| Event scheduling & rental logistics | OPEN — implementation in progress | Multi-day dates/times, setup/collection windows, clash warning and offline schedule sync; close after exact-head Laravel/upgrade/browser verification |
+| Event scheduling & rental logistics | OPEN — implementation in progress | Online/offline fields, setup/collection calendar coverage, clash warnings and rental allocation defaults implemented; Laravel + PHPMD pass; close after exact-head PostgreSQL/offline-browser verification and workflow review |
 | Windows package | CLOSED for defined fresh-install candidate | Windows V1 Package run 82 at fd82f6a: production candidate build, PowerShell first-install smoke and Windows-native SQLite/private-media recovery pass; not an updater or hosted deployment |
 
 ## Claude independent audit reconciliation — 2026-11-17
