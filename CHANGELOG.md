@@ -1,5 +1,11 @@
 # Changelog
 
+## 2026-11-17 — Rental asset date availability verified
+- Closed the serialized-asset booking defect: non-overlapping periods can be booked while the asset has other active allocations; overlapping and open-ended conflicts are rejected.
+- Added per-allocation return handling, end-date entry and consistent asset status across online and offline mutation paths.
+- Verified online/offline regression coverage and exact-head CI at 00af9adda: 523 passed, 1 skipped, 3,653 assertions; desktop/mobile offline and phone-local attachment acceptance passed; Windows fresh-install candidate passed.
+- Physical return remains manual; event completion or a passed date alone does not prove equipment has been returned.
+
 ## Unreleased — 2026-11-17 (Normalize optional allocation end date)
 - Normalized an omitted allocated_until value before date-order validation, overlap checking, persistence and audit to prevent the open-ended booking path from returning HTTP 500.
 - Exact-head CI pending; regression remains unchanged.

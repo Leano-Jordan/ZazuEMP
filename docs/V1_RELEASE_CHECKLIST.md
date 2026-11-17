@@ -1,7 +1,6 @@
 # Zazu EMP — V1 Release Checklist
 
-Last fully verified HEAD: Leano-Jordan/ZazuEMP / main / 807db36e6eb9aaded81e6bb45e1e2f0c9c18c5de
-Current follow-up candidate: open-ended rental overlap hardening; exact-head CI pending
+Current baseline: Leano-Jordan/ZazuEMP / main / 00af9adda943ee4e232e7eedeaf894a809dcbe88 (17 Nov 2026)
 Disposition: NOT READY · Evidence maturity: 73/100 unchanged.
 
 ## Release acceptance gates
@@ -11,11 +10,11 @@ Disposition: NOT READY · Evidence maturity: 73/100 unchanged.
 - [ ] POPIA operational sign-off: privacy notice, retention/deletion, access controls and incident procedure.
 
 ## Closed acceptance
-- [x] Windows fresh-install candidate package and PowerShell first-install smoke — built and verified at 807db36; not an updater or hosted deployment.
+- [x] Windows fresh-install candidate package and PowerShell first-install smoke — built and verified at 00af9adda; not an updater or hosted deployment.
 - [x] Seeded commercial workflow automation — verified; reopen only on reproducible defect.
 - [x] Offline purchase-order integer-cent precision/rejection — verified.
 - [x] Password reset revokes the owner's trusted devices — independently verified in source.
-- [x] Bounded asset date availability correction — Laravel and offline tests passed at 807db36; follow-up open-ended overlap case awaits CI.
+- [x] Serialized-asset date availability — online/offline tests pass for non-overlap, overlap, open-ended dates and independent returns at 00af9adda.
 
-## Current audit execution
-Rental date-allocation defect was reproduced at c7be735 and corrected at 807db36. Exact-head CI passed, including Windows install, PostgreSQL recovery and desktop/mobile offline acceptance. A final open-ended interval edge-case test is in the current follow-up candidate. Invoice numbering remains unchanged pending SA tax-adviser advice. No score uplift or release gate closure.
+## Current release position
+V1 remains NOT READY. Exact-head CI passed: Laravel 523 passed / 1 skipped / 3,653 assertions; offline browser 45 desktop + 6 mobile + 1 phone-local attachment; PostgreSQL recovery; Windows package/fresh install; populated upgrade/rollback; quality, Psalm, PHPMD and CodeQL. SonarCloud skipped. No score uplift.

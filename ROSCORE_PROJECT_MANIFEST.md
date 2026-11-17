@@ -6,7 +6,7 @@ Product: Zazu EMP — Event & Catering Management Platform
 Repository: Leano-Jordan/ZazuEMP
 Canonical branch: main (only engineering write target)
 Director: Jarvis (owner-facing); Morpheus is the canonical control plane.
-Last fully verified baseline (2026-11-17): 807db36e6eb9aaded81e6bb45e1e2f0c9c18c5de; open-ended allocation overlap follow-up pending exact-head CI.
+Current main HEAD (2026-11-17): 00af9adda943ee4e232e7eedeaf894a809dcbe88
 
 ## Product purpose
 Zazu EMP supports event and catering operators in managing customers, jobs/events, services, quotes, invoices/payments, suppliers, purchasing/receiving, inventory, assets, costs, attachments, reporting and business administration. It serves catering, event equipment hire, sound/DJ, baking, decor, rentals, photography/camera hire and related operators.
@@ -29,4 +29,4 @@ Zazu is offline-first. Exact supported offline workflows, local persistence, que
 - Release gates: docs/V1_RELEASE_CHECKLIST.md
 
 ## Current release position
-V1: NOT READY. Last complete baseline at 807db36 passed Laravel (521 passed, 1 skipped, 3,648 assertions), PostgreSQL migration/registration/recovery, desktop/mobile offline acceptance, Windows V1 package/fresh-install, populated upgrade/rollback, Zazu quality, Psalm, PHPMD and CodeQL. SonarCloud was skipped. Evidence maturity remains 73/100 without uplift. Remaining operator gates: physical Android offline/reconnect acceptance, installed-target recovery with private media, live populated-business financial reconciliation and POPIA operational sign-off.
+V1: NOT READY. Exact-head CI at 00af9adda passed Laravel (523 passed, 1 skipped, 3,653 assertions), PostgreSQL migration/recovery, desktop/mobile offline acceptance, Windows V1 package/fresh install, populated upgrade/rollback, Zazu quality, Psalm, PHPMD and CodeQL. SonarCloud was skipped. Evidence maturity remains 73/100 without uplift. Remaining operator gates: physical Android offline/reconnect acceptance, installed-target recovery with private media, live populated-business financial reconciliation and POPIA operational sign-off.
