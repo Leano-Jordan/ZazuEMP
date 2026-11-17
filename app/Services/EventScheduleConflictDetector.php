@@ -27,8 +27,13 @@ final class EventScheduleConflictDetector
         return Event::query()
             ->where('business_id', $businessId)
             ->whereNotIn('status', Event::TERMINAL_STATUSES)
-            ->when($exceptEventId, fn ($query) => $query->whereKeyNot($exceptEventId))
-            ->whereDate('event_date', '<=', $endDate)
+            ->when($exceptEventId, fn ($query) => $query->where('id', '!=', $exceptEventId))
+            ->where(function ($query) use ($endDate): void {
+                $query->whereDate('setup_date', '<=', $endDate)
+                    ->orWhere(function ($fallback) use ($endDate): void {
+                        $fallback->whereNull('setup_date')->whereDate('event_date', '<=', $endDate);
+                    });
+            })
             ->where(function ($query) use ($startDate): void {
                 $query->whereDate('collection_date', '>=', $startDate)
                     ->orWhere(function ($fallback) use ($startDate): void {
