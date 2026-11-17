@@ -1813,6 +1813,7 @@ test.describe('Zazu installed PWA offline shell', () => {
         const updatedRow = page.locator('[data-zazu-local-record="job"]').filter({ hasText: 'Updated offline wedding reception' });
         await expect(updatedRow).toBeVisible();
         await expect(updatedRow.locator('.zazu-ops-actions .zazu-chip')).toHaveText('Waiting to sync');
+        await expect(updatedRow.locator('.zazu-ops-row-main .zazu-chip')).toHaveText('Confirmed');
         await updatedRow.getByRole('button', { name: 'View offline' }).click();
         const updatedDetail = page.getByRole('region', { name: 'Offline job details' });
         await expect(updatedDetail.getByText('Updated offline wedding reception')).toBeVisible();
