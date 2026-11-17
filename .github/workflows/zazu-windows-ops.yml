@@ -115,7 +115,14 @@ jobs:
       - name: Verify database updates are backed up before Windows startup
         shell: pwsh
         run: |
-          $launcher = Get-Content 'ops/windows/Start-ZazuDev.ps1' -Raw
+          $launcherPath = (Resolve-Path 'ops/windows/Start-ZazuDev.ps1').Path
+          $tokens = $null
+          $parseErrors = $null
+          [System.Management.Automation.Language.Parser]::ParseFile($launcherPath, [ref]$tokens, [ref]$parseErrors) | Out-Null
+          if ($parseErrors.Count -gt 0) {
+            throw ("Windows startup script has PowerShell syntax errors: " + ($parseErrors | ForEach-Object { $_.Message } | Join-String -Separator '; '))
+          }
+          $launcher = Get-Content $launcherPath -Raw
           foreach ($required in @(
             'function Prepare-ZazuDatabase',
             'migrate:status',
