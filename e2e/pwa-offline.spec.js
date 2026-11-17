@@ -1672,114 +1672,118 @@ test.describe('Zazu installed PWA offline shell', () => {
 
         // Match the real SyncBootstrapPayloadBuilder envelope: selected records
         // and invoice payments are wrapped beneath "record", not flattened.
-        await page.route('**/api/sync/bootstrap', route => route.fulfill({
-            status: 200,
-            contentType: 'application/json',
-            body: JSON.stringify({
-                business: { id: 1, name: 'Offline quote business', currency: 'ZAR' },
-                selected: [
-                    {
-                        type: 'customer',
-                        local_id: customerLocalId,
-                        server_id: 88301,
-                        record: {
-                            id: 88301,
-                            name: 'Offline quote customer',
-                            contact_name: 'Accounts contact',
-                        },
-                    },
-                    {
-                        type: 'job',
-                        local_id: jobLocalId,
-                        server_id: jobServerId,
-                        record: {
-                            id: jobServerId,
-                            customer_local_id: customerLocalId,
-                            customer_id: 88301,
-                            name: 'Offline reception job',
-                            reference: 'OFFLINE-JOB-QUOTE-001',
-                            event_type: 'Wedding',
-                            status: 'confirmed',
-                        },
-                    },
-                    {
-                        type: 'quote',
-                        local_id: quoteLocalId,
-                        server_id: quoteServerId,
-                        record: {
-                            id: quoteServerId,
-                            event_local_id: jobLocalId,
-                            event_id: jobServerId,
-                            event_name: 'Offline reception job',
-                            reference: 'OFFLINE-QUOTE-001',
-                            status: 'sent',
-                            currency: 'ZAR',
-                            latest_version: {
-                                version: 2,
-                                status: 'sent',
-                                subtotal: '10000.00',
-                                tax_total: '0.00',
-                                total: '10000.00',
-                                deposit_percent: '50.00',
-                                deposit_amount: '5000.00',
-                                notes: 'Menu and service scope',
-                                items: [{
-                                    description: 'Buffet package',
-                                    quantity: '80.00',
-                                    unit: 'guests',
-                                    unit_price: '125.00',
-                                    line_total: '10000.00',
-                                }],
-                            },
-                        },
-                    },
-                ],
-                invoices: [{
-                    local_id: invoiceLocalId,
-                    server_id: 88401,
-                    record: {
-                        id: 88401,
-                        quote_id: quoteServerId,
-                        event_id: jobServerId,
-                        number: 'INV-OFFLINE-001',
-                        status: 'partially_paid',
-                        currency: 'ZAR',
-                        paid_amount: '5000.00',
-                        balance: '5000.00',
-                        payments: [{
-                            local_id: paymentLocalId,
-                            server_id: 88501,
-                            record: {
-                                id: 88501,
-                                amount: '5000.00',
-                                method: 'EFT',
-                                paid_at: '2026-11-16',
-                                status: 'received',
-                            },
-                        }],
-                    },
-                }],
-            }),
-        }));
-
         await page.addInitScript(() => {
             window.__ZAZU_OFFLINE_DEFER_INITIAL_SYNC = true;
         });
         await login(page);
         await page.goto('/dashboard', { waitUntil: 'domcontentloaded' });
         await waitForOfflineRuntime(page);
+        const businessId = await page.evaluate(() => Number(document.body.dataset.zazuBusinessId || 0));
+
+        await page.route('**/api/sync/provision', route => route.fulfill({
+            status: 200,
+            contentType: 'application/json',
+            body: JSON.stringify({
+                device: {
+                    id: 99001,
+                    installation_id: 'bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbbbb',
+                    business_id: businessId,
+                },
+                token: 'offline-quote-inspection-token',
+                bootstrap: {
+                    business: { id: businessId, name: 'Offline quote business', currency: 'ZAR' },
+                    selected: [
+                        {
+                            type: 'customer',
+                            local_id: customerLocalId,
+                            server_id: 88301,
+                            record: {
+                                id: 88301,
+                                name: 'Offline quote customer',
+                                contact_name: 'Accounts contact',
+                            },
+                        },
+                        {
+                            type: 'job',
+                            local_id: jobLocalId,
+                            server_id: jobServerId,
+                            record: {
+                                id: jobServerId,
+                                customer_local_id: customerLocalId,
+                                customer_id: 88301,
+                                name: 'Offline reception job',
+                                reference: 'OFFLINE-JOB-QUOTE-001',
+                                event_type: 'Wedding',
+                                status: 'confirmed',
+                            },
+                        },
+                        {
+                            type: 'quote',
+                            local_id: quoteLocalId,
+                            server_id: quoteServerId,
+                            record: {
+                                id: quoteServerId,
+                                event_local_id: jobLocalId,
+                                event_id: jobServerId,
+                                event_name: 'Offline reception job',
+                                reference: 'OFFLINE-QUOTE-001',
+                                status: 'sent',
+                                currency: 'ZAR',
+                                latest_version: {
+                                    version: 2,
+                                    status: 'sent',
+                                    subtotal: '10000.00',
+                                    tax_total: '0.00',
+                                    total: '10000.00',
+                                    deposit_percent: '50.00',
+                                    deposit_amount: '5000.00',
+                                    notes: 'Menu and service scope',
+                                    items: [{
+                                        description: 'Buffet package',
+                                        quantity: '80.00',
+                                        unit: 'guests',
+                                        unit_price: '125.00',
+                                        line_total: '10000.00',
+                                    }],
+                                },
+                            },
+                        },
+                    ],
+                    invoices: [{
+                        local_id: invoiceLocalId,
+                        server_id: 88401,
+                        record: {
+                            id: 88401,
+                            quote_id: quoteServerId,
+                            event_id: jobServerId,
+                            number: 'INV-OFFLINE-001',
+                            status: 'partially_paid',
+                            currency: 'ZAR',
+                            paid_amount: '5000.00',
+                            balance: '5000.00',
+                            payments: [{
+                                local_id: paymentLocalId,
+                                server_id: 88501,
+                                record: {
+                                    id: 88501,
+                                    amount: '5000.00',
+                                    method: 'EFT',
+                                    paid_at: '2026-11-16',
+                                    status: 'received',
+                                },
+                            }],
+                        },
+                    }],
+                },
+            }),
+        }));
+
         await page.evaluate(async () => {
             await window.ZazuOffline.ready;
-            const state = window.ZazuOffline.getState();
-            state.sync = {
-                token: 'offline-quote-inspection-token',
-                device: { business_id: Number(document.body.dataset.zazuBusinessId || 1) },
-            };
-            await window.ZazuOffline.persist();
-            await window.ZazuOffline.refreshBootstrap();
+            await window.ZazuOffline.pair('123456');
             const invoice = window.ZazuOffline.getState().invoices.find(item => item.number === 'INV-OFFLINE-001');
             if (invoice?.payments?.[0]?.method !== 'EFT') {
-                throw new Error('Sync bootstrap did not preserve nested invoice payments.');
+                throw new Error('Pairing bootstrap did not preserve nested invoice payments.');
             }
         });
 
