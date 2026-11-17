@@ -9,6 +9,11 @@
         @if($invoice->status === 'issued')
             <a href="{{ route('finance.payments.create', ['invoice_id' => $invoice->id]) }}" class="zazu-btn zazu-btn-primary print-hide">Record payment</a>
         @endif
+        @if($customerUrl)
+            @php($whatsAppUrl = 'https://wa.me/?text='.rawurlencode('Please review invoice '.$invoice->number.' using this secure customer link: '.$customerUrl))
+            <a href="{{ $customerUrl }}" target="_blank" rel="noopener noreferrer" class="zazu-btn zazu-btn-secondary print-hide">Customer invoice view</a>
+            <a href="{{ $whatsAppUrl }}" target="_blank" rel="noopener noreferrer" class="zazu-btn zazu-btn-secondary print-hide">Share via WhatsApp</a>
+        @endif
         <button type="button" class="zazu-btn zazu-btn-primary print-hide" data-zazu-print>Print / Save as PDF</button>
     </x-slot:headerAction>
 
