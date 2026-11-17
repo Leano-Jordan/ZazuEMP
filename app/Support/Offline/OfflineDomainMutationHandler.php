@@ -391,7 +391,30 @@ class OfflineDomainMutationHandler implements SyncMutationHandler
      */
     private function syncOfflineJobRequirements(Event $event, array $payload): void
     {
-        $services = $payload['services'];
+        $requirements = $this->offlineJobRequirementDefinitions(
+            $payload['services'],
+            $payload['other_service'] ?? null
+        );
+
+        if ($requirements === []) {
+            $event->requirements()->delete();
+
+            return;
+        }
+
+        $event->requirements()->whereNotIn('description', array_keys($requirements))->delete();
+
+        foreach ($requirements as $description => $category) {
+            $this->upsertOfflineJobRequirement($event, $description, $category);
+        }
+    }
+
+    /**
+     * @param mixed $services
+     * @return array<string, string>
+     */
+    private function offlineJobRequirementDefinitions(mixed $services, mixed $otherService): array
+    {
         if (! is_array($services) || ! array_is_list($services)) {
             throw ValidationException::withMessages(['services' => 'Offline job services must be a list.']);
         }
@@ -409,33 +432,30 @@ class OfflineDomainMutationHandler implements SyncMutationHandler
             $requirements[$description] = $categoryByService[$description] ?? 'Other';
         }
 
-        $otherService = $this->nullableString($payload['other_service'] ?? null, 100);
+        $otherService = $this->nullableString($otherService, 100);
         if ($otherService !== null) {
             $requirements[$otherService] = 'Other';
         }
 
-        if ($requirements === []) {
-            $event->requirements()->delete();
+        return $requirements;
+    }
+
+    private function upsertOfflineJobRequirement(Event $event, string $description, string $category): void
+    {
+        $requirement = $event->requirements()->where('description', $description)->first();
+        if ($requirement) {
+            $requirement->update(['category' => $category]);
+
             return;
         }
 
-        $event->requirements()->whereNotIn('description', array_keys($requirements))->delete();
-
-        foreach ($requirements as $description => $category) {
-            $requirement = $event->requirements()->where('description', $description)->first();
-            if ($requirement) {
-                $requirement->update(['category' => $category]);
-                continue;
-            }
-
-            $event->requirements()->create([
-                'description' => $description,
-                'category' => $category,
-                'quantity' => 1,
-                'unit' => 'service',
-                'status' => 'open',
-            ]);
-        }
+        $event->requirements()->create([
+            'description' => $description,
+            'category' => $category,
+            'quantity' => 1,
+            'unit' => 'service',
+            'status' => 'open',
+        ]);
     }
 
     /**
