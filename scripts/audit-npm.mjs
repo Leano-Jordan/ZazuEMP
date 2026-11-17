@@ -70,7 +70,7 @@ for (const [name, vulnerability] of vulnerabilities) {
 if (blocked.length > 0) {
     console.error('Unaccepted high/critical npm vulnerabilities:');
     for (const [name, vulnerability] of blocked) {
-        console.error(`- ${name}: ${vulnerability.severity}`);
+        console.error(`- ${name}: ${vulnerability.severity}; via=${JSON.stringify(vulnerability.via)}; fixAvailable=${JSON.stringify(vulnerability.fixAvailable)}`);
     }
     process.exit(1);
 }
