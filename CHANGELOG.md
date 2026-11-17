@@ -1,5 +1,11 @@
 # Changelog
 
+## 2026-11-17 — Dashboard monthly payments KPI
+
+- Added a live “Payments received (this month)” dashboard KPI for users with finance access. It sums recorded payment rows for the active business, the current calendar month and that business's configured currency; it does not mistake quote totals or unpaid invoices for cash received.
+- Kept “Next 14 days” as the fallback KPI for users without finance access who have calendar access. Added regression coverage for business, currency and month boundaries.
+
+
 ## 2026-11-17 — Windows recovery proof and frontend dependency advisory
 
 - Extended the Windows V1 package workflow to perform a Windows-native SQLite and private-media backup/restore round-trip. The CI drill creates disposable sentinels, backs them up, mutates both, restores the archive and verifies the original database value and file bytes.

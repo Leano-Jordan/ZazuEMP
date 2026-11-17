@@ -9,6 +9,8 @@ use App\Models\Asset;
 use App\Models\InventoryItem;
 use App\Models\Invoice;
 use App\Models\PurchaseOrder;
+use App\Models\Payment;
+use App\Support\Money;
 use App\Support\CurrentBusiness;
 use App\Support\PermissionService;
 use App\Support\ExperienceLevel;
@@ -91,6 +93,21 @@ class DashboardController extends Controller
             ->get();
 
         $workspaceTools = $this->workspaceToolsFor($request->user(), $business);
+
+        if ($workspaceTools['finance']) {
+            $receivedThisMonth = Payment::query()
+                ->where('business_id', $businessId)
+                ->where('currency', $business->currency ?? 'ZAR')
+                ->whereBetween('paid_at', [
+                    $today->copy()->startOfMonth()->toDateString(),
+                    $today->copy()->endOfMonth()->toDateString(),
+                ])
+                ->sum('amount');
+
+            $metrics['payments_received_this_month'] = Money::formatCents(
+                Money::toCents((string) $receivedThisMonth)
+            );
+        }
 
         $isOwner = app(CurrentBusiness::class)->hasRole('owner', $request->user(), $business);
 
