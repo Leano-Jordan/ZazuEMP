@@ -1915,8 +1915,22 @@ class OfflineSyncFoundationTest extends TestCase
             'business_id' => $business->id,
             'installation_id' => (string) Str::uuid(),
         ]);
+        $event = \\App\\Models\\Event::create([
+            'business_id' => $business->id,
+            'reference' => 'OFF-FIN-VALIDATION',
+            'name' => 'Offline finance validation',
+            'status' => 'draft',
+        ]);
+        $eventIdentity = app(\\App\\Support\\Offline\\SyncEntityIdentityRegistry::class)->identify($event, 'job');
 
         $cases = [
+            [
+                'entity' => 'quote',
+                'record' => [
+                    'event_local_id' => $eventIdentity->entity_uuid,
+                    'currency' => 'XXX',
+                ],
+            ],
             [
                 'entity' => 'payment',
                 'record' => [
