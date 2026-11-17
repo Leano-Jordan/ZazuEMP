@@ -30,7 +30,9 @@
             </form>
         @endif
         @if ($customerUrl)
-            <a href="{{ $customerUrl }}" target="_blank" rel="noopener" class="zazu-btn zazu-btn-secondary">Customer view</a>
+            @php($whatsAppUrl = 'https://wa.me/?text='.rawurlencode('Please review quote '.$quote->reference.' using this secure customer link: '.$customerUrl))
+            <a href="{{ $customerUrl }}" target="_blank" rel="noopener noreferrer" class="zazu-btn zazu-btn-secondary print-hide">Customer view</a>
+            <a href="{{ $whatsAppUrl }}" target="_blank" rel="noopener noreferrer" class="zazu-btn zazu-btn-secondary print-hide">Share via WhatsApp</a>
         @endif
         <a href="{{ route('work.show', $quote->event) }}" class="zazu-btn zazu-btn-secondary">Job workspace</a>
         <a href="{{ route('work.quotes.index', $quote->event) }}" class="zazu-btn zazu-btn-ghost">All quotes</a>
