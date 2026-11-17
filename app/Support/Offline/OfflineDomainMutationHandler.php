@@ -233,6 +233,21 @@ class OfflineDomainMutationHandler implements SyncMutationHandler
         $attributes = $this->offlineJobAttributes($mutation, $payload, $event, $customer);
 
         if ($event instanceof Event) {
+            // Offline job edits must obey the same lifecycle boundary as online
+            // Work edits. Lock business → event before checking closure so a
+            // concurrent completion/cancellation cannot race this mutation.
+            $event = $this->lifecycle->lock($mutation->business_id, $event->id);
+            $this->lifecycle->assertOperational($event);
+
+            if (
+                (int) $event->customer_id !== (int) ($attributes['customer_id'] ?? $event->customer_id)
+                && $event->quotes()->exists()
+            ) {
+                throw ValidationException::withMessages([
+                    'customer_local_id' => 'The customer cannot be changed after a quote exists for this job.',
+                ]);
+            }
+
             $event->update($attributes);
             return $event->fresh();
         }
