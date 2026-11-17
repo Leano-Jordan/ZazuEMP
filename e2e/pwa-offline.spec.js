@@ -2033,6 +2033,7 @@ test.describe('Zazu installed PWA offline shell', () => {
         await editForm.locator('[name="event_date"]').fill('2026-12-13');
         await editForm.locator('[name="event_address"]').fill('Centurion, Gauteng');
         await editForm.locator('[name="notes"]').fill('Updated offline venue instructions');
+        await editForm.locator('[name="services"]').fill('Full catering service\nEquipment hire');
         await editForm.getByRole('button', { name: 'Save offline changes' }).click();
 
         await expect.poll(async () => page.evaluate(async () => (await window.ZazuOffline.pending()).length)).toBe(1);
@@ -2042,6 +2043,7 @@ test.describe('Zazu installed PWA offline shell', () => {
         expect(queued[0].payload.record.name).toBe('Updated offline wedding reception');
         expect(queued[0].payload.record.event_date).toBe('2026-12-13');
         expect(queued[0].payload.record.event_address).toBe('Centurion, Gauteng');
+        expect(queued[0].payload.record.services).toEqual(['Full catering service', 'Equipment hire']);
 
         const updatedRow = page.locator('[data-zazu-local-record="job"]').filter({ hasText: 'Updated offline wedding reception' });
         await expect(updatedRow).toBeVisible();
@@ -2053,6 +2055,7 @@ test.describe('Zazu installed PWA offline shell', () => {
         await expect(updatedDetail.getByText('2026-12-13')).toBeVisible();
         await expect(updatedDetail.getByText('Centurion, Gauteng')).toBeVisible();
         await expect(updatedDetail.getByText('Updated offline venue instructions')).toBeVisible();
+        await expect(updatedDetail.getByText('Equipment hire')).toBeVisible();
         await updatedDetail.getByRole('button', { name: 'Close' }).click();
         await expect(updatedDetail).toBeHidden();
     });
