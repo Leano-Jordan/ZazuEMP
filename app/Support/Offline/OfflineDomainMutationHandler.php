@@ -555,7 +555,7 @@ class OfflineDomainMutationHandler implements SyncMutationHandler
                     $quantityHundredths,
                     $unitPriceCents
                 );
-            } catch (\\InvalidArgumentException) {
+            } catch (\InvalidArgumentException) {
                 throw ValidationException::withMessages(['items' => 'Offline quote line total exceeds the supported calculation range.']);
             }
 
