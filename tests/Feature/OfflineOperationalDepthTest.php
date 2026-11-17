@@ -252,6 +252,63 @@ class OfflineOperationalDepthTest extends TestCase
         $this->assertSame('returned', $allocation->fresh()->status);
     }
 
+    public function test_offline_job_update_reconciles_services_without_losing_existing_requirement_metadata(): void
+    {
+        $business = $this->business();
+        $device = $this->device($business);
+        $event = Event::create([
+            'business_id' => $business->id,
+            'reference' => 'OFF-SERVICES-001',
+            'name' => 'Offline Services Job',
+            'event_type' => 'Other',
+            'status' => 'confirmed',
+        ]);
+        $existing = $event->requirements()->create([
+            'description' => 'Catering',
+            'category' => 'Food',
+            'quantity' => 25,
+            'unit' => 'guests',
+            'notes' => 'Keep dietary notes',
+            'status' => 'ready',
+        ]);
+        $identity = app(\App\Support\Offline\SyncEntityIdentityRegistry::class)
+            ->identify($event, 'job')
+            ->entity_uuid;
+
+        $mutation = app(SyncMutationRecorder::class)->record($device, 'job', $identity, 'update', [
+            'local_id' => $identity,
+            'record' => [
+                'name' => 'Offline Services Job',
+                'event_type' => 'Other',
+                'event_date' => now()->toDateString(),
+                'services' => ['Catering', 'Equipment hire'],
+            ],
+        ]);
+
+        app(SyncMutationApplier::class)->apply($mutation, [
+            'job' => app(\App\Support\Offline\OfflineDomainMutationHandler::class),
+        ]);
+
+        $this->assertDatabaseHas('event_requirements', [
+            'id' => $existing->id,
+            'description' => 'Catering',
+            'quantity' => 25,
+            'unit' => 'guests',
+            'notes' => 'Keep dietary notes',
+            'status' => 'ready',
+        ]);
+        $this->assertDatabaseHas('event_requirements', [
+            'event_id' => $event->id,
+            'description' => 'Equipment hire',
+            'category' => 'Other',
+        ]);
+        $this->assertDatabaseMissing('event_requirements', [
+            'event_id' => $event->id,
+            'description' => 'Removed service',
+        ]);
+        $this->assertSame('applied', $mutation->fresh()->status);
+    }
+
     public function test_offline_job_update_cannot_mutate_a_closed_work_record(): void
     {
         $business = $this->business();
