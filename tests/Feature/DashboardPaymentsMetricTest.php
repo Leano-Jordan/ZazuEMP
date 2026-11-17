@@ -24,6 +24,20 @@ class DashboardPaymentsMetricTest extends TestCase
                 'status' => 'active',
                 'currency' => 'ZAR',
             ]);
+            $foreignBusiness = Business::create([
+                'name' => 'Foreign Dashboard Business',
+                'slug' => 'foreign-dashboard-'.Str::lower(Str::random(8)),
+                'status' => 'active',
+                'currency' => 'ZAR',
+            ]);
+            Payment::create([
+                'business_id' => $foreignBusiness->id,
+                'amount' => '7000.00',
+                'currency' => 'ZAR',
+                'method' => 'bank_transfer',
+                'paid_at' => '2026-11-12',
+            ]);
+
             $user = $this->signInAsOwner($business);
 
             Payment::create([
@@ -55,20 +69,6 @@ class DashboardPaymentsMetricTest extends TestCase
                 'currency' => 'ZAR',
                 'method' => 'bank_transfer',
                 'paid_at' => '2026-10-31',
-            ]);
-
-            $foreignBusiness = Business::create([
-                'name' => 'Foreign Dashboard Business',
-                'slug' => 'foreign-dashboard-'.Str::lower(Str::random(8)),
-                'status' => 'active',
-                'currency' => 'ZAR',
-            ]);
-            Payment::create([
-                'business_id' => $foreignBusiness->id,
-                'amount' => '7000.00',
-                'currency' => 'ZAR',
-                'method' => 'bank_transfer',
-                'paid_at' => '2026-11-12',
             ]);
 
             $this->actingAs($user)
