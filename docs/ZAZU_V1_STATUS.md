@@ -1,3 +1,26 @@
+## Director reconciliation — 2026-11-17 (device-local customer relationship view)
+
+**Canonical repository:** `Leano-Jordan/ZazuEMP` · **branch:** `main` · **current control head:** `a91f0e44278f9372a23f22aeb729a1a62c92f8d8` · **application/test source:** `2f5407ef6ee9e873b409b6954effab6f31720235`.
+
+### Offline customer relationship slice
+- The Customers directory now opens an in-place device-local relationship panel from the business-scoped IndexedDB workspace.
+- It reads available customer identity/contact/billing/notes fields, linked local Work records and linked local quote summaries without requesting a Laravel customer detail page.
+- The panel is intentionally read-only. Customer edit and full local route/detail parity remain future implementation work; a cached server page is still not counted as a local read.
+- Added Playwright coverage for opening, reading and closing the customer relationship view while disconnected.
+- The existing staff/manager work-delete permission boundary was already covered by the preceding correction batch; no duplicate test was added.
+- Removed the unrelated Render-labelled Docker preview workflow. Zazu's application workflow remains on `main`; no Render service or deployment was introduced.
+
+### Exact-head acceptance evidence
+- Laravel [run 44025968451](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/44025968451): **PASS — 503 passed / 1 skipped / 3,563 assertions**.
+- Offline browser acceptance in the same run: **38 desktop Chromium passed**, **6 mobile-viewport passed**, and **1 phone-local attachment journey passed**.
+- PostgreSQL migrations, real account/workspace registration, and database/private-file backup/restore: **PASS**.
+- Zazu quality [run 44025968403](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/44025968403), Director Health [run 44026027084](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/44026027084), Director Contract Lint [run 44026027054](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/44026027054), and Push on main [run 44026026698](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/44026026698): **PASS**. SonarCloud was **SKIPPED**, not counted.
+
+### Release decision
+**V1 remains NOT READY. Evidence maturity remains 73/100; no score uplift is claimed.** Physical Android installed-app cold launch/restart/reconnect, the installed-target recovery drill including private media, live populated-business quote/payment/cost/profit reconciliation, and POPIA operational/privacy sign-off remain open. CI browser success does not replace physical-device acceptance. No production deployment, live business database or customer data changed.
+
+---
+
 ## Director reconciliation — 2026-11-17 (V1 correction batch)
 
 **Canonical repository:** `Leano-Jordan/ZazuEMP` · **branch:** `main` · **verified source/control head:** `7cb17334d53312265521769223bcac4f42eda772`
