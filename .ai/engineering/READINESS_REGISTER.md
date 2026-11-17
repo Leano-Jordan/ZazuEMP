@@ -28,6 +28,13 @@ Evidence maturity: 73/100 unchanged; no uplift claimed.
 - Offline financial mutation validation rejects precision beyond two decimal places before posting; quote, payment, purchase-order, receipt, cost, expense and inventory regressions are covered.
 - CI verifies 523 Laravel tests passed / 1 skipped / 3,662 assertions; 45 desktop Chromium, 6 mobile-viewport and 1 phone-local attachment journey passed; PostgreSQL recovery, Windows fresh-install package, populated upgrade/rollback, quality, Psalm, PHPMD, Director Health and Push-on-main passed. SonarCloud skipped.
 
+## Current source changes awaiting exact-head evidence — ff7f0bb
+- Offline push now validates payment type/method and expense status against the same allowed values as connected workflows; quote currency must be configured.
+- Offline payment, expense and invoice dates now reject malformed and impossible calendar dates.
+- An all-zero offline purchase receipt is rejected before a receipt record or idempotency key is consumed.
+- Focused regression coverage includes these cases and float-decoded purchase-order quantity/price precision.
+- Exact-head Laravel, browser, quality and security evidence is pending. These changes are not marked verified and do not change the 73/100 score or release disposition.
+
 ## Documentation and commercial decisions
 - Offline work is ACTIVE/RESUMED; stale pause notes are historical and archived.
 - Tier conflict remains OWNER-DECISION: product-specification/operating-profile describe three tiers (Basic Free, Intermediate, Advanced), while commercial requirements specify four paid prices (R299, R499, R799, R1,299). No tier or price decision inferred.
