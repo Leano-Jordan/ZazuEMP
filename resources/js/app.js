@@ -1402,6 +1402,53 @@ function setupZazuOfflineDirectoryViews() {
     const addJobOfflineDetails = (row, job) => {
         if (row.dataset.zazuJobDetailsBound === '1') return;
         const actions = row.querySelector('.zazu-ops-actions') || row;
+        const serverEventId = Number(job.server_id ?? job.id ?? 0);
+
+        // Synced jobs also need a device-local attachment path. Previously the
+        // attachment control existed only on pending local-job rows, leaving
+        // existing jobs unable to accept files while disconnected.
+        if (serverEventId > 0 && !actions.querySelector('[data-zazu-server-job-attachments]')) {
+            const attachmentInput = document.createElement('input');
+            attachmentInput.type = 'file';
+            attachmentInput.multiple = true;
+            attachmentInput.accept = '.pdf,.doc,.docx,.xls,.xlsx,.csv,.txt,.jpg,.jpeg,.png,.webp';
+            attachmentInput.hidden = true;
+            attachmentInput.dataset.zazuServerJobAttachments = String(serverEventId);
+
+            const attachButton = document.createElement('button');
+            attachButton.type = 'button';
+            attachButton.className = 'zazu-btn zazu-btn-secondary';
+            attachButton.textContent = 'Attach files';
+            attachButton.addEventListener('click', () => attachmentInput.click());
+
+            const attachmentStatus = document.createElement('span');
+            attachmentStatus.className = 'zazu-chip zazu-chip-neutral';
+            attachmentStatus.setAttribute('role', 'status');
+            attachmentStatus.setAttribute('aria-live', 'polite');
+
+            attachmentInput.addEventListener('change', async () => {
+                const files = [...(attachmentInput.files || [])];
+                if (!files.length) return;
+
+                attachButton.disabled = true;
+                attachmentStatus.textContent = 'Saving files…';
+                try {
+                    await window.ZazuOffline.queueAttachments(serverEventId, files);
+                    attachmentInput.value = '';
+                    attachmentStatus.textContent = navigator.onLine
+                        ? 'Files queued'
+                        : 'Saved offline';
+                } catch (error) {
+                    attachmentStatus.textContent = 'Not saved';
+                    attachmentStatus.title = error.message || 'Files could not be saved locally.';
+                } finally {
+                    attachButton.disabled = false;
+                }
+            });
+
+            actions.append(attachmentInput, attachButton, attachmentStatus);
+        }
+
         const button = document.createElement('button');
         button.type = 'button';
         button.className = 'zazu-btn zazu-btn-ghost';
