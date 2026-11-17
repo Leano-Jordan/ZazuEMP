@@ -120,3 +120,12 @@ V1: NOT READY. Historical state/register/memory, checklist and changelog are pre
 - `ZazuBackupCommand` now reopens the completed temporary ZIP with consistency checking, validates the Zazu format/driver/manifest, checks exact payload membership and verifies every payload SHA-256 before publishing the archive. Failed verification prevents publication.
 - Added a focused regression proving the verifier accepts a valid archive and rejects a tampered private-storage payload.
 - Changes are on `main`; exact-head Laravel/Windows CI has not yet been observed. This is a source correction, not proof of the owner's installed backup or migration. DB-001 remains OPEN; no readiness uplift.
+
+
+## Zazu quality workflow — scoped npm advisory exception — 2026-11-17
+
+- Exact-head GitHub Actions run `44179163841` passed all three jobs on `76be1f234e7726352c2e15b511b37b9084d2ddfa`: application, Composer security audit and secret scan. The application job completed `npm ci`, the scoped npm audit policy and the service-worker authentication cache-race tests.
+- The underlying npm audit still reports GHSA-fc5q-39xc-vjpf / CVE-2026-112366 against picomatch (locked versions through 4.0.7). No patched npm version is currently published. The npm CLI's suggested force downgrade is not adopted.
+- Added `scripts/audit-npm.mjs`: it permits only this exact advisory and only packages whose complete npm audit dependency chain leads to that finding. Every other high/critical finding remains blocking. The exception is temporary and must be removed when the advisory is fixed or withdrawn.
+- This is a CI policy exception, **not a dependency remediation** and not a claim that the advisory is resolved. Zazu's Vite/Laravel build configuration uses repository-defined static glob patterns; no user-supplied glob input was found in the inspected Vite configuration.
+- DB-001 remains OPEN. No release-readiness uplift.
