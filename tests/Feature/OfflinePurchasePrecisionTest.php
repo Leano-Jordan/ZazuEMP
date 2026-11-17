@@ -219,4 +219,219 @@ class OfflinePurchasePrecisionTest extends TestCase
         }
     }
 
+
+    public function test_offline_quote_rejects_unit_price_precision_loss(): void
+    {
+        $business = Business::create([
+            'name' => 'Offline Quote Price Precision Business',
+            'slug' => 'offline-quote-price-precision-'.Str::lower(Str::random(8)),
+            'status' => 'active',
+            'currency' => 'ZAR',
+        ]);
+        $device = SyncDevice::create([
+            'business_id' => $business->id,
+            'installation_id' => (string) Str::uuid(),
+        ]);
+        $event = \\App\\Models\\Event::create([
+            'business_id' => $business->id,
+            'reference' => 'OFF-QUOTE-PRICE-PRECISION',
+            'name' => 'Precision Quote Price Event',
+            'status' => 'draft',
+        ]);
+        $eventIdentity = app(\\App\\Support\\Offline\\SyncEntityIdentityRegistry::class)->identify($event, 'job');
+        $localId = (string) Str::uuid();
+        $mutation = app(SyncMutationRecorder::class)->record(
+            $device,
+            'quote',
+            $localId,
+            'create',
+            [
+                'local_id' => $localId,
+                'record' => [
+                    'event_local_id' => $eventIdentity->entity_uuid,
+                    'currency' => 'ZAR',
+                    'items' => [[
+                        'description' => 'Precision validation line',
+                        'quantity' => '1.00',
+                        'unit_price' => '1.005',
+                    ]],
+                ],
+            ],
+        );
+
+        try {
+            app(SyncMutationApplier::class)->apply($mutation, [
+                'quote' => app(\\App\\Support\\Offline\\OfflineDomainMutationHandler::class),
+            ]);
+            $this->fail('Offline quote prices must reject values with more than two decimal places.');
+        } catch (\\Illuminate\\Validation\\ValidationException) {
+            $this->assertSame(0, \\App\\Models\\Quote::query()
+                ->whereHas('event', fn ($query) => $query->where('business_id', $business->id))
+                ->count());
+        }
+    }
+
+    public function test_offline_inventory_movement_rejects_unit_cost_precision_loss(): void
+    {
+        $business = Business::create([
+            'name' => 'Offline Movement Precision Business',
+            'slug' => 'offline-movement-precision-'.Str::lower(Str::random(8)),
+            'status' => 'active',
+            'currency' => 'ZAR',
+        ]);
+        $device = SyncDevice::create([
+            'business_id' => $business->id,
+            'installation_id' => (string) Str::uuid(),
+        ]);
+        $item = \\App\\Models\\InventoryItem::create([
+            'business_id' => $business->id,
+            'name' => 'Precision stock item',
+            'unit' => 'unit',
+            'reorder_level' => '0.00',
+        ]);
+        $itemIdentity = app(\\App\\Support\\Offline\\SyncEntityIdentityRegistry::class)->identify($item, 'inventory_item');
+        $localId = (string) Str::uuid();
+        $mutation = app(SyncMutationRecorder::class)->record(
+            $device,
+            'inventory_movement',
+            $localId,
+            'create',
+            [
+                'local_id' => $localId,
+                'record' => [
+                    'inventory_item_local_id' => $itemIdentity->entity_uuid,
+                    'type' => 'receipt',
+                    'quantity' => '1.00',
+                    'unit_cost' => '1.005',
+                    'movement_date' => now()->toDateString(),
+                ],
+            ],
+        );
+
+        try {
+            app(SyncMutationApplier::class)->apply($mutation, [
+                'inventory_movement' => app(\\App\\Support\\Offline\\OfflineDomainMutationHandler::class),
+            ]);
+            $this->fail('Offline inventory movement costs must reject values with more than two decimal places.');
+        } catch (\\Illuminate\\Validation\\ValidationException) {
+            $this->assertSame(0, \\App\\Models\\InventoryMovement::query()
+                ->where('business_id', $business->id)
+                ->count());
+        }
+    }
+
+    public function test_offline_expense_rejects_money_precision_loss(): void
+    {
+        $business = Business::create([
+            'name' => 'Offline Expense Precision Business',
+            'slug' => 'offline-expense-precision-'.Str::lower(Str::random(8)),
+            'status' => 'active',
+            'currency' => 'ZAR',
+        ]);
+        $device = SyncDevice::create([
+            'business_id' => $business->id,
+            'installation_id' => (string) Str::uuid(),
+        ]);
+        $localId = (string) Str::uuid();
+        $mutation = app(SyncMutationRecorder::class)->record(
+            $device,
+            'expense',
+            $localId,
+            'create',
+            [
+                'local_id' => $localId,
+                'record' => [
+                    'description' => 'Precision validation expense',
+                    'amount' => '1.005',
+                    'status' => 'unpaid',
+                    'expense_date' => now()->toDateString(),
+                ],
+            ],
+        );
+
+        try {
+            app(SyncMutationApplier::class)->apply($mutation, [
+                'expense' => app(\\App\\Support\\Offline\\OfflineDomainMutationHandler::class),
+            ]);
+            $this->fail('Offline expenses must reject values with more than two decimal places.');
+        } catch (\\Illuminate\\Validation\\ValidationException) {
+            $this->assertSame(0, \\App\\Models\\FinanceExpense::query()
+                ->where('business_id', $business->id)
+                ->count());
+        }
+    }
+
+    public function test_offline_purchase_receipt_rejects_quantity_precision_loss(): void
+    {
+        $business = Business::create([
+            'name' => 'Offline Receipt Precision Business',
+            'slug' => 'offline-receipt-precision-'.Str::lower(Str::random(8)),
+            'status' => 'active',
+            'currency' => 'ZAR',
+        ]);
+        $device = SyncDevice::create([
+            'business_id' => $business->id,
+            'installation_id' => (string) Str::uuid(),
+        ]);
+        $supplier = \\App\\Models\\Supplier::create([
+            'business_id' => $business->id,
+            'name' => 'Receipt Precision Supplier',
+        ]);
+        $supplierIdentity = app(\\App\\Support\\Offline\\SyncEntityIdentityRegistry::class)->identify($supplier, 'supplier');
+        $orderLocalId = (string) Str::uuid();
+        $lineLocalId = (string) Str::uuid();
+        $recorder = app(SyncMutationRecorder::class);
+        $applier = app(SyncMutationApplier::class);
+        $handler = app(\\App\\Support\\Offline\\OfflineDomainMutationHandler::class);
+
+        $orderMutation = $recorder->record(
+            $device,
+            'purchase_order',
+            $orderLocalId,
+            'create',
+            [
+                'local_id' => $orderLocalId,
+                'record' => [
+                    'supplier_local_id' => $supplierIdentity->entity_uuid,
+                    'currency' => 'ZAR',
+                    'status' => 'ordered',
+                    'lines' => [[
+                        'local_id' => $lineLocalId,
+                        'description' => 'Receipt validation item',
+                        'quantity' => '2.00',
+                        'unit_price' => '10.00',
+                    ]],
+                ],
+            ],
+        );
+        $applier->apply($orderMutation, ['purchase_order' => $handler]);
+
+        $receiptLocalId = (string) Str::uuid();
+        $receiptMutation = $recorder->record(
+            $device,
+            'purchase_receipt',
+            $receiptLocalId,
+            'create',
+            [
+                'local_id' => $receiptLocalId,
+                'record' => [
+                    'purchase_order_local_id' => $orderLocalId,
+                    'received_quantities' => [$lineLocalId => '0.004'],
+                ],
+            ],
+        );
+
+        try {
+            $applier->apply($receiptMutation, ['purchase_receipt' => $handler]);
+            $this->fail('Offline receipt quantities must reject values with more than two decimal places.');
+        } catch (\\Illuminate\\Validation\\ValidationException) {
+            $this->assertSame(0, \\App\\Models\\PurchaseOrderReceipt::query()
+                ->where('business_id', $business->id)
+                ->count());
+            $this->assertSame('0.00', \\App\\Models\\PurchaseOrderItem::query()
+                ->where('business_id', $business->id)
+                ->value('received_quantity'));
+        }
+    }
+
 }
