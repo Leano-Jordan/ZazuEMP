@@ -47,7 +47,7 @@ Implementation baseline: `71c8fc5c7aeba392b95e26aee694945b286f2c8e` on `main`.
 - Windows V1 Package run 82: PASS — candidate package built; Windows PowerShell first install passed; Windows-native backup/restore recovered both a disposable SQLite record and private-media bytes.
 - Director Health, Director Contract Lint and Push-on-main passed.
 - LAN asset delivery regression passed at a5ead69: a remote client with a stale loopback Vite hot marker receives compiled same-origin CSS/JS. The supplied 13 Nov HTTP screenshot predates this correction; physical Android HTTPS launch remains required.
-- Zazu Quality is RED at npm audit because GHSA-fc5q-39xc-vjpf / CVE-2026-112366 flags the locked picomatch build-tool dependency chain. GitHub currently lists no patched version. Composer security audit and secret scan passed. The advisory is not suppressed and no breaking Vite downgrade was applied.
+- Zazu Quality passes with a temporary, exact-advisory exception for GHSA-fc5q-39xc-vjpf / CVE-2026-112366 in the picomatch build-tool dependency chain. The underlying advisory remains open/unpatched; the audit script allows only this finding and its exclusive dependency chain. Composer security audit and secret scan passed. No breaking Vite downgrade was applied.
 - The Windows CI recovery test is supporting evidence only; it does not close the controlled recovery drill on the intended installed target.
 ## Closed acceptance
 - [x] Windows fresh-install candidate package, PowerShell first-install smoke and Windows-native SQLite/private-media backup/restore — Windows V1 Package run 82 passed at fd82f6a; not an updater or hosted deployment.
@@ -59,7 +59,7 @@ Implementation baseline: `71c8fc5c7aeba392b95e26aee694945b286f2c8e` on `main`.
 - [x] Serialized-asset date availability — online/offline tests pass for non-overlap, overlap, open-ended dates and independent returns at 00af9adda.
 
 ## Current release position
-V1 remains NOT READY. Application-code CI at a5ead69 passed: Laravel 526 passed / 1 skipped / 3,681 assertions; offline browser 45 desktop + 6 mobile + 1 phone-local attachment; PostgreSQL migration/recovery. Windows package run 82 at fd82f6a passed candidate build, Windows fresh install and the new Windows-native backup/private-media restore drill. Director Health, Contract Lint and Push-on-main passed. Zazu Quality is currently red due the unpatched picomatch advisory; Composer audit and secret scan passed. The four operator acceptance gates remain open. Evidence maturity remains 73/100; no score uplift.
+V1 remains NOT READY. Application-code CI at a5ead69 passed: Laravel 526 passed / 1 skipped / 3,681 assertions; offline browser 45 desktop + 6 mobile + 1 phone-local attachment; PostgreSQL migration/recovery. Windows package run 82 at fd82f6a passed candidate build, Windows fresh install and the new Windows-native backup/private-media restore drill. Director Health, Contract Lint and Push-on-main passed. Zazu Quality passes with a temporary exact-advisory exception for the unpatched picomatch finding; Composer audit and secret scan passed. The four operator acceptance gates remain open. Evidence maturity remains 73/100; no score uplift.
 
 
 ## Scheduling exact-head acceptance closure
@@ -83,3 +83,10 @@ The owner-installation entry matching `aa9080f4-9580-41c9-a643-439b31928ffa` rem
 - [x] Added a regression for valid archive acceptance and tampered private-payload rejection.
 - [ ] Exact-head Laravel and Windows workflow verification.
 - [ ] Run backup-first migration on the intended installation and confirm the previously failing workflow succeeds.
+
+
+### Zazu quality gate — 2026-11-17
+
+- [x] Exact-head quality workflow run `44179163841` passed on `76be1f234e7726352c2e15b511b37b9084d2ddfa`: application, Composer security audit and secret scan.
+- [x] Application job passed dependency installation, the scoped npm audit policy and service-worker authentication cache-race tests.
+- [ ] Replace the temporary GHSA-fc5q-39xc-vjpf exception when a verified picomatch fix is published or the advisory is withdrawn. This exception is not a dependency fix.
