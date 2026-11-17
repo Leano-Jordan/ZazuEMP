@@ -547,15 +547,17 @@ class OfflineDomainMutationHandler implements SyncMutationHandler
             }
 
             $quantityHundredths = $this->positiveQuantity($item['quantity'] ?? null);
-            $unitPriceCents = Money::toCents((string) ($item['unit_price'] ?? '0.00'));
-            if ($unitPriceCents < 0) {
-                throw ValidationException::withMessages(['items' => 'Offline quote prices cannot be negative.']);
-            }
+            $unitPrice = $this->nonNegativeMoney($item['unit_price'] ?? '0.00');
+            $unitPriceCents = Money::toCents($unitPrice);
 
-            $lineTotalCents = Money::multiplyQuantityByPrice(
-                $quantityHundredths,
-                $unitPriceCents
-            );
+            try {
+                $lineTotalCents = Money::multiplyQuantityByPrice(
+                    $quantityHundredths,
+                    $unitPriceCents
+                );
+            } catch (\\InvalidArgumentException) {
+                throw ValidationException::withMessages(['items' => 'Offline quote line total exceeds the supported calculation range.']);
+            }
 
             $version->items()->create([
                 'description' => $this->requiredString($item['description'] ?? null, 'description', 500),
