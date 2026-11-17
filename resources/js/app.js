@@ -1179,6 +1179,7 @@ function setupZazuOfflineDirectoryViews() {
                         ...nextState.customers[customerIndex],
                         ...payload,
                         services: payload.services,
+                        status: payload.status,
                         requirements: payload.services.map(description => ({ description, category: 'Other', quantity: 1, unit: 'service', status: 'open' })),
                         pending_sync: true,
                     };
@@ -1525,6 +1526,34 @@ function setupZazuOfflineDirectoryViews() {
                 label.append(caption, input);
                 editFields.append(label);
             };
+            const addEditSelect = (labelText, name, value, options) => {
+                const label = document.createElement('label');
+                label.className = 'zazu-field';
+                const caption = document.createElement('span');
+                caption.className = 'zazu-label';
+                caption.textContent = labelText;
+                const select = document.createElement('select');
+                select.className = 'zazu-input';
+                select.name = name;
+                for (const option of options) {
+                    const item = document.createElement('option');
+                    item.value = option.value;
+                    item.textContent = option.label;
+                    select.append(item);
+                }
+                select.value = value;
+                label.append(caption, select);
+                editFields.append(label);
+            };
+            const statusOptions = {
+                draft: [{ value: 'draft', label: 'Draft' }, { value: 'confirmed', label: 'Confirmed' }, { value: 'cancelled', label: 'Cancelled' }],
+                confirmed: [{ value: 'confirmed', label: 'Confirmed' }, { value: 'in_progress', label: 'In progress' }, { value: 'cancelled', label: 'Cancelled' }],
+                in_progress: [{ value: 'in_progress', label: 'In progress' }, { value: 'completed', label: 'Completed' }, { value: 'cancelled', label: 'Cancelled' }],
+                completed: [{ value: 'completed', label: 'Completed' }],
+                cancelled: [{ value: 'cancelled', label: 'Cancelled' }],
+            };
+            const availableStatuses = statusOptions[currentJob.status || 'draft'] || statusOptions.draft;
+            addEditSelect('Work status', 'status', currentJob.status || 'draft', availableStatuses);
             addEditField('Job name', 'name', currentJob.name, 'text', false, 255);
             addEditField('Event date', 'event_date', currentJob.event_date ? String(currentJob.event_date).slice(0, 10) : '', 'date');
             addEditField('Venue / address', 'event_address', currentJob.event_address, 'text', false, 255);
@@ -1572,6 +1601,7 @@ function setupZazuOfflineDirectoryViews() {
                     local_id: currentJob.local_id,
                     server_id: currentJob.server_id ?? currentJob.id ?? null,
                     name: String(formData.get('name') || '').trim(),
+                    status: String(formData.get('status') || currentJob.status || 'draft'),
                     event_type: currentJob.event_type || 'Other',
                     event_date: String(formData.get('event_date') || '').trim() || null,
                     event_address: String(formData.get('event_address') || '').trim() || null,
