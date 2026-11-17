@@ -4,7 +4,9 @@ param(
     [ValidatePattern('^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$')]
     [string]$Reference,
 
-    [string]$ProjectPath = (Resolve-Path (Join-Path $PSScriptRoot '..\..')).Path
+    [string]$ProjectPath = (Resolve-Path (Join-Path $PSScriptRoot '..\..')).Path,
+
+    [string]$OutputPath = (Join-Path ([Environment]::GetFolderPath('Desktop')) "Zazu-Incident-$Reference.txt")
 )
 
 $ErrorActionPreference = 'Stop'
@@ -61,9 +63,20 @@ foreach ($logFile in $logFiles) {
 }
 
 if ($matches.Count -eq 0) {
-    Write-Output "No matching structured incident record found for $Reference."
-    Write-Output 'Confirm Zazu was restarted on the updated installation after the diagnostic update, then reproduce the issue once.'
+    $report = @(
+        "No matching structured incident record found for $Reference."
+        'The installation may not yet have the diagnostic update, or the incident has not been reproduced since that update.'
+        'Restart the updated Zazu installation and reproduce the issue once before running this capture again.'
+    ) -join [Environment]::NewLine
+    Set-Content -LiteralPath $OutputPath -Value $report -Encoding UTF8
+    Write-Output $report
+    Write-Output "Report saved to: $OutputPath"
+    Start-Process -FilePath 'notepad.exe' -ArgumentList @($OutputPath)
     exit 2
 }
 
-$matches | ConvertTo-Json -Depth 4
+$report = $matches | ConvertTo-Json -Depth 4
+Set-Content -LiteralPath $OutputPath -Value $report -Encoding UTF8
+Write-Output $report
+Write-Output "Safe report saved to: $OutputPath"
+Start-Process -FilePath 'notepad.exe' -ArgumentList @($OutputPath)
