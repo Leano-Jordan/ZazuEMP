@@ -155,6 +155,31 @@ jobs:
           Write-Host 'PASS: Pending database updates require a verified full backup and are checked before the server starts.'
 
 
+      - name: Verify DB-001 read-only SQLite diagnostic
+        shell: pwsh
+        run: |
+          $diagnostic = Get-Content 'ops/windows/Test-ZazuDatabaseSchema.ps1' -Raw
+          foreach ($required in @(
+            'migrate:status',
+            '2026_11_17_000001_add_event_schedule_fields',
+            'event_end_date',
+            'event_start_time',
+            'event_end_time',
+            'setup_date',
+            'collection_date',
+            'business_user_primary_niche_exists',
+            'PRAGMA integrity_check',
+            'No migrations were run and no database records or schema were changed.'
+          )) {
+            if (-not $diagnostic.Contains($required)) {
+              throw "Read-only DB-001 diagnostic contract is missing: $required"
+            }
+          }
+          if ($diagnostic -match "artisan.*'migrate'.*'--force'|artisan.*'zazu:restore'|artisan.*'zazu:backup'") {
+            throw 'The read-only DB-001 diagnostic must not run migrations, backups or restores.'
+          }
+          Write-Host 'PASS: DB-001 schema diagnostic checks migration ledger, required SQLite columns and integrity without mutation.'
+
       - name: Verify the packaged Windows installer contract
         shell: pwsh
         run: |
