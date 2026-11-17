@@ -146,3 +146,13 @@ V1: NOT READY. Historical state/register/memory, checklist and changelog are pre
 - Existing incident recorder now emits bounded database diagnostics (connection, driver, SQLSTATE, numeric driver code and operation) without SQL, bindings, exception messages or credentials.
 - Added `ops/windows/Get-ZazuIncident.ps1` and `docs/DB001_INCIDENT_CAPTURE.md` on `main`. The script finds the exact request ID in Laravel logs and outputs only an allowlist of diagnostic fields. This is a safe evidence-capture path, not a root-cause fix.
 - DB-001 remains OPEN until the matching record is inspected and the failing workflow is repeated successfully on the intended installation. No database changes, reset or restore performed. V1 remains NOT READY; no evidence-score uplift.
+
+
+## DB-001 read-only SQLite inspection added — 2026-11-18
+
+- Added `ops/windows/Test-ZazuDatabaseSchema.ps1` and `docs/DB001_SQLITE_SCHEMA_CHECK.md` on `main`.
+- The Windows diagnostic reads Laravel migration status, checks the event schedule migration ledger entry and all five expected `events` columns, checks the historical `business_user.primary_niche` column, and runs SQLite `PRAGMA integrity_check`.
+- It emits only bounded schema/status metadata to a desktop JSON report. It does not run migrations, create backups, restore archives, or alter database records/schema.
+- Added a Windows Ops workflow contract check for the diagnostic's required checks and non-mutating boundary.
+- This enables evidence-based selection of a repair once the owner's actual installed SQLite database is inspected. The source repository cannot inspect the owner's local database or recover the omitted SQL exception from the request ID alone.
+- DB-001 reference `895e2c23-bc6b-4919-a891-1e8e5c1e27e4` remains OPEN pending the read-only report and successful reproduction on the intended installation. No readiness uplift.
