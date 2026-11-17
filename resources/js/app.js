@@ -1929,11 +1929,211 @@ function setupZazuOfflineDirectoryViews() {
         });
     };
 
+    const addQuoteOfflineDetails = (row, quote) => {
+        if (row.dataset.zazuQuoteDetailsBound === '1') return;
+        const actions = row.querySelector('.zazu-action-group') || row;
+        const button = document.createElement('button');
+        button.type = 'button';
+        button.className = 'zazu-btn zazu-btn-ghost';
+        button.textContent = 'View offline';
+        button.title = 'Inspect this quote and its invoice records from this device';
+        button.setAttribute('aria-expanded', 'false');
+        button.addEventListener('click', () => {
+            const currentState = window.ZazuOffline?.getState();
+            if (!currentState) return;
+            const serverId = Number(quote.server_id ?? quote.id ?? 0);
+            const currentQuote = (currentState.quotes || []).find(item =>
+                (quote.local_id && item.local_id === quote.local_id)
+                || (serverId > 0 && Number(item.server_id ?? item.id ?? 0) === serverId)
+            ) || quote;
+            let panel = row.nextElementSibling;
+            if (!panel?.matches('[data-zazu-quote-offline-detail]')) {
+                panel = document.createElement('section');
+                panel.className = 'zazu-panel mt-3';
+                panel.dataset.zazuQuoteOfflineDetail = '1';
+                panel.setAttribute('role', 'region');
+                panel.setAttribute('aria-label', 'Offline quote details');
+                row.insertAdjacentElement('afterend', panel);
+            }
+            const opening = panel.hidden || panel.childElementCount === 0;
+            panel.hidden = !opening;
+            button.setAttribute('aria-expanded', opening ? 'true' : 'false');
+            if (!opening) return;
+
+            panel.replaceChildren();
+            const heading = document.createElement('div');
+            heading.className = 'zazu-panel-head';
+            const title = document.createElement('div');
+            title.className = 'zazu-panel-title';
+            title.textContent = currentQuote.reference || 'Quote details';
+            const close = document.createElement('button');
+            close.type = 'button';
+            close.className = 'zazu-btn zazu-btn-ghost';
+            close.textContent = 'Close';
+            close.addEventListener('click', () => {
+                panel.hidden = true;
+                button.setAttribute('aria-expanded', 'false');
+                button.focus();
+            });
+            heading.append(title, close);
+            panel.append(heading);
+
+            const job = (currentState.jobs || []).find(item =>
+                (currentQuote.event_local_id && item.local_id === currentQuote.event_local_id)
+                || (currentQuote.event_id && Number(item.id ?? item.server_id) === Number(currentQuote.event_id))
+            );
+            const customer = (currentState.customers || []).find(item =>
+                (job?.customer_local_id && item.local_id === job.customer_local_id)
+                || (job?.customer_id && Number(item.id ?? item.server_id) === Number(job.customer_id))
+            );
+            const version = currentQuote.latest_version || currentQuote.latestVersion || {};
+            const fields = [
+                ['Status', String(currentQuote.status || version.status || 'draft').replace(/_/g, ' ')],
+                ['Version', version.version ? String(version.version) : null],
+                ['Job', currentQuote.event_name || job?.name],
+                ['Customer', customer?.name || job?.customer_name],
+                ['Currency', currentQuote.currency || currentState.business?.currency || 'ZAR'],
+                ['Subtotal', version.subtotal],
+                ['Tax', version.tax_total],
+                ['Total', version.total ?? currentQuote.total],
+                ['Deposit', version.deposit_percent !== undefined ? String(version.deposit_percent) + '%' : null],
+                ['Deposit amount', version.deposit_amount],
+                ['Notes', version.notes ?? currentQuote.notes],
+            ].filter(([, value]) => value !== null && value !== undefined && String(value).trim() !== '');
+            const details = document.createElement('div');
+            details.className = 'zazu-detail-rows mt-3';
+            for (const [label, value] of fields) {
+                const item = document.createElement('div');
+                item.className = 'zazu-detail-row';
+                const name = document.createElement('div');
+                name.className = 'zazu-detail-label';
+                name.textContent = label;
+                const detail = document.createElement('div');
+                detail.className = 'zazu-detail-value';
+                detail.textContent = String(value);
+                item.append(name, detail);
+                details.append(item);
+            }
+            if (fields.length) panel.append(details);
+
+            const items = version.items || currentQuote.items || [];
+            const itemSection = document.createElement('section');
+            itemSection.className = 'mt-4';
+            const itemHeading = document.createElement('div');
+            itemHeading.className = 'zazu-panel-title';
+            itemHeading.textContent = 'Quote lines (' + items.length + ')';
+            itemSection.append(itemHeading);
+            const itemList = document.createElement('div');
+            itemList.className = 'zazu-list mt-2';
+            if (!items.length) {
+                const empty = document.createElement('p');
+                empty.className = 'zazu-panel-copy';
+                empty.textContent = 'No quote lines are stored on this device.';
+                itemList.append(empty);
+            } else {
+                for (const line of items) {
+                    const item = document.createElement('div');
+                    item.className = 'zazu-list-item';
+                    const main = document.createElement('div');
+                    main.className = 'zazu-list-main min-w-0 flex-1';
+                    const lineTitle = document.createElement('div');
+                    lineTitle.className = 'zazu-list-title';
+                    lineTitle.textContent = line.description || 'Quote line';
+                    const meta = document.createElement('div');
+                    meta.className = 'zazu-list-meta';
+                    meta.textContent = [
+                        line.quantity !== undefined ? String(line.quantity) + (line.unit ? ' ' + line.unit : '') : '',
+                        line.unit_price !== undefined ? String(currentQuote.currency || 'ZAR') + ' ' + String(line.unit_price) : '',
+                        line.line_total !== undefined ? 'Line total ' + String(line.line_total) : '',
+                    ].filter(Boolean).join(' · ');
+                    main.append(lineTitle);
+                    if (meta.textContent) main.append(meta);
+                    item.append(main);
+                    itemList.append(item);
+                }
+            }
+            itemSection.append(itemList);
+            panel.append(itemSection);
+
+            const invoice = (currentState.invoices || []).find(item =>
+                (item.quote_id && serverId > 0 && Number(item.quote_id) === serverId)
+                || (item.quote_local_id && item.quote_local_id === currentQuote.local_id)
+            );
+            const invoices = invoice ? [invoice] : [];
+            const invoiceSection = document.createElement('section');
+            invoiceSection.className = 'mt-4';
+            const invoiceHeading = document.createElement('div');
+            invoiceHeading.className = 'zazu-panel-title';
+            invoiceHeading.textContent = 'Invoice and payments (' + invoices.length + ')';
+            invoiceSection.append(invoiceHeading);
+            const invoiceList = document.createElement('div');
+            invoiceList.className = 'zazu-list mt-2';
+            if (!invoice) {
+                const empty = document.createElement('p');
+                empty.className = 'zazu-panel-copy';
+                empty.textContent = 'No linked invoice is stored on this device.';
+                invoiceList.append(empty);
+            } else {
+                const invoiceItem = document.createElement('div');
+                invoiceItem.className = 'zazu-list-item';
+                const invoiceMain = document.createElement('div');
+                invoiceMain.className = 'zazu-list-main min-w-0 flex-1';
+                const invoiceTitle = document.createElement('div');
+                invoiceTitle.className = 'zazu-list-title';
+                invoiceTitle.textContent = invoice.number || 'Invoice';
+                const invoiceMeta = document.createElement('div');
+                invoiceMeta.className = 'zazu-list-meta';
+                invoiceMeta.textContent = [
+                    String(invoice.status || 'draft').replace(/_/g, ' '),
+                    invoice.paid_amount !== undefined ? 'Paid ' + String(invoice.currency || 'ZAR') + ' ' + String(invoice.paid_amount) : '',
+                    invoice.balance !== undefined ? 'Balance ' + String(invoice.currency || 'ZAR') + ' ' + String(invoice.balance) : '',
+                ].filter(Boolean).join(' · ');
+                invoiceMain.append(invoiceTitle, invoiceMeta);
+                invoiceItem.append(invoiceMain);
+                invoiceList.append(invoiceItem);
+
+                for (const payment of invoice.payments || []) {
+                    const paymentItem = document.createElement('div');
+                    paymentItem.className = 'zazu-list-item';
+                    const paymentMain = document.createElement('div');
+                    paymentMain.className = 'zazu-list-main min-w-0 flex-1';
+                    const paymentTitle = document.createElement('div');
+                    paymentTitle.className = 'zazu-list-title';
+                    paymentTitle.textContent = payment.reference || payment.method || 'Payment';
+                    const paymentMeta = document.createElement('div');
+                    paymentMeta.className = 'zazu-list-meta';
+                    paymentMeta.textContent = [
+                        payment.amount !== undefined ? String(invoice.currency || 'ZAR') + ' ' + String(payment.amount) : '',
+                        payment.paid_at || payment.received_at || '',
+                        payment.status || '',
+                    ].filter(Boolean).join(' · ');
+                    paymentMain.append(paymentTitle);
+                    if (paymentMeta.textContent) paymentMain.append(paymentMeta);
+                    paymentItem.append(paymentMain);
+                    invoiceList.append(paymentItem);
+                }
+            }
+            invoiceSection.append(invoiceList);
+            panel.append(invoiceSection);
+
+            const note = document.createElement('p');
+            note.className = 'zazu-panel-copy mt-4';
+            note.textContent = 'This quote view uses the last synchronised and locally saved version. It does not fetch live pricing, tax or acceptance status while disconnected.';
+            panel.append(note);
+        });
+        actions.append(button);
+        row.dataset.zazuQuoteDetailsBound = '1';
+    };
+
     const renderQuotes = (state) => {
         const directory = document.querySelector('[data-zazu-local-quotes]');
         if (!directory) return;
 
-        directory.querySelectorAll('[data-zazu-local-record="quote"]').forEach(node => node.remove());
+        directory.querySelectorAll('[data-zazu-local-record="quote"]').forEach(node => {
+            const detail = node.nextElementSibling;
+            if (detail?.matches('[data-zazu-quote-offline-detail]')) detail.remove();
+            node.remove();
+        });
         const quotes = state?.quotes || [];
         const empty = directory.querySelector('.zazu-empty');
 
@@ -1975,6 +2175,7 @@ function setupZazuOfflineDirectoryViews() {
             sync.append(chip);
 
             row.append(identity, sync);
+            addQuoteOfflineDetails(row, quote);
             if (empty?.parentNode === directory) directory.insertBefore(row, empty);
             else directory.append(row);
         }
