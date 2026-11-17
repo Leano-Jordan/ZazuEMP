@@ -25,7 +25,7 @@ This policy reflects the owner's current direction and supersedes older branch/d
 Before any state-changing operation, establish:
 1. requested target = Zazu EMP;
 2. repository target = `Leano-Jordan/ZazuEMP`;
-3. engineering branch = `main`; `deploy/render-staging` is reserved for the explicitly authorised Render deployment process;
+3. engineering branch = `main`; no other branch is an approved engineering or deployment target;
 4. target path is inside this repository;
 5. the intended change is derived from current Zazu evidence, not from another project's remembered context.
 
