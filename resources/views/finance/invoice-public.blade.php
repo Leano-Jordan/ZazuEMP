@@ -84,7 +84,7 @@
             </section>
 
             <section class="zazu-public-total">
-                <span>Total due</span>
+                <span>Invoice total</span>
                 <strong>{{ $invoice->currency }} {{ $invoice->total }}</strong>
             </section>
 

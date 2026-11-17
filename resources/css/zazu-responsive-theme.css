@@ -597,6 +597,7 @@ textarea {
 /* Customer document output: print only the document, not app controls. */
 @media print {
     .print-hide,
+    .zazu-public-accept,
     .zazu-sidebar,
     .zazu-topbar-actions,
     .zazu-helper,
