@@ -4,7 +4,7 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>{{ $quote->reference }} · Zazu</title>
-    @vite(['resources/css/app.css', 'resources/css/zazu-responsive-theme.css', 'resources/css/zazu-final-visual-sweep.css'])
+    @vite(['resources/css/app.css', 'resources/css/zazu-responsive-theme.css', 'resources/css/zazu-final-visual-sweep.css', 'resources/js/public-document.js'])
 </head>
 <body>
     <main class="zazu-public-shell">
@@ -15,6 +15,7 @@
                     <h1 class="zazu-public-title">{{ $quote->reference }}</h1>
                     <p class="zazu-public-copy">{{ $quote->event?->business?->name ?? 'Event services' }}</p>
                 </div>
+                <button type="button" class="zazu-btn zazu-btn-secondary print-hide" data-zazu-print>Print / Save as PDF</button>
                 <span class="zazu-chip {{ $quote->status === 'accepted' ? 'zazu-chip-success' : 'zazu-chip-info' }}">
                     {{ ucfirst($quote->status) }}
                 </span>
