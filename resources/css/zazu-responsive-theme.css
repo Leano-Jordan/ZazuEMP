@@ -592,3 +592,53 @@ textarea {
         flex-wrap: nowrap;
     }
 }
+
+
+/* Customer document output: print only the document, not app controls. */
+@media print {
+    .print-hide,
+    .zazu-sidebar,
+    .zazu-topbar-actions,
+    .zazu-helper,
+    .zazu-app-footer {
+        display: none !important;
+    }
+
+    html,
+    body {
+        background: #fff !important;
+        color: #111 !important;
+    }
+
+    .zazu-content,
+    .zazu-public-shell {
+        width: 100% !important;
+        max-width: none !important;
+        margin: 0 !important;
+        padding: 0 !important;
+        background: #fff !important;
+    }
+
+    .zazu-document,
+    .zazu-public-card {
+        width: 100% !important;
+        max-width: none !important;
+        margin: 0 !important;
+        border: 0 !important;
+        border-radius: 0 !important;
+        box-shadow: none !important;
+        background: #fff !important;
+        color: #111 !important;
+    }
+
+    .zazu-document-table-wrap,
+    .zazu-document-table,
+    .zazu-public-lines {
+        break-inside: avoid;
+    }
+
+    a {
+        color: inherit !important;
+        text-decoration: none !important;
+    }
+}
