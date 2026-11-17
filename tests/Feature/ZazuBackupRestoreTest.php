@@ -2,6 +2,7 @@
 
 namespace Tests\Feature;
 
+use App\Console\Commands\ZazuBackupCommand;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Artisan;
@@ -105,6 +106,49 @@ class ZazuBackupRestoreTest extends TestCase
                 'database.connections.sqlite.database' => $originalDatabase,
             ]);
             DB::purge('sqlite');
+        }
+    }
+
+    public function test_backup_verifier_rejects_payload_corruption_before_archive_publication(): void
+    {
+        if (!class_exists(ZipArchive::class)) {
+            $this->markTestSkipped('PHP Zip extension is required for backup verification tests.');
+        }
+
+        $archive = storage_path('app/zazu-backup-verifier-test.zip');
+        $databasePayload = 'valid database payload';
+        $privatePayload = 'private media payload';
+        $manifest = [
+            'application' => 'Zazu EMP',
+            'format_version' => 2,
+            'database_driver' => 'sqlite',
+            'checksums' => [
+                'database.sqlite' => hash('sha256', $databasePayload),
+                'storage/private/probe.txt' => hash('sha256', $privatePayload),
+            ],
+        ];
+
+        $writeArchive = function (string $payload) use ($archive, $manifest, $databasePayload): void {
+            $zip = new ZipArchive();
+            $this->assertSame(true, $zip->open($archive, ZipArchive::CREATE | ZipArchive::OVERWRITE));
+            $zip->addFromString('manifest.json', json_encode($manifest, JSON_THROW_ON_ERROR));
+            $zip->addFromString('database.sqlite', $databasePayload);
+            $zip->addFromString('storage/private/probe.txt', $payload);
+            $zip->close();
+        };
+
+        $command = app(ZazuBackupCommand::class);
+        $verifier = new \ReflectionMethod($command, 'verifyArchive');
+        $verifier->setAccessible(true);
+
+        try {
+            $writeArchive($privatePayload);
+            $this->assertTrue($verifier->invoke($command, $archive, 'sqlite'));
+
+            $writeArchive('tampered private media payload');
+            $this->assertFalse($verifier->invoke($command, $archive, 'sqlite'));
+        } finally {
+            File::delete($archive);
         }
     }
 
