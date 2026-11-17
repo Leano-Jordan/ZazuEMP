@@ -72,6 +72,32 @@
                         </label>
 
                         <label class="zazu-field">
+                            <span class="zazu-label">Event end date</span>
+                            <input type="date" name="event_end_date" value="{{ old('event_end_date', $event->event_end_date?->format('Y-m-d')) }}" class="zazu-input">
+                            @error('event_end_date')<span class="zazu-field-error">{{ $message }}</span>@enderror
+                        </label>
+                        <label class="zazu-field">
+                            <span class="zazu-label">Start time</span>
+                            <input type="time" name="event_start_time" value="{{ old('event_start_time', $event->event_start_time) }}" class="zazu-input">
+                            @error('event_start_time')<span class="zazu-field-error">{{ $message }}</span>@enderror
+                        </label>
+                        <label class="zazu-field">
+                            <span class="zazu-label">End time</span>
+                            <input type="time" name="event_end_time" value="{{ old('event_end_time', $event->event_end_time) }}" class="zazu-input">
+                            @error('event_end_time')<span class="zazu-field-error">{{ $message }}</span>@enderror
+                        </label>
+                        <label class="zazu-field">
+                            <span class="zazu-label">Setup date</span>
+                            <input type="date" name="setup_date" value="{{ old('setup_date', $event->setup_date?->format('Y-m-d')) }}" class="zazu-input">
+                            @error('setup_date')<span class="zazu-field-error">{{ $message }}</span>@enderror
+                        </label>
+                        <label class="zazu-field">
+                            <span class="zazu-label">Collection date</span>
+                            <input type="date" name="collection_date" value="{{ old('collection_date', $event->collection_date?->format('Y-m-d')) }}" class="zazu-input">
+                            @error('collection_date')<span class="zazu-field-error">{{ $message }}</span>@enderror
+                        </label>
+
+                        <label class="zazu-field">
                             <span class="zazu-label">Day contact <span class="font-normal text-[var(--zazu-faint)]">(optional)</span></span>
                             <select id="event_day_contact_id" name="event_day_contact_id" class="zazu-select">
                                 <option value="">No day contact</option>
