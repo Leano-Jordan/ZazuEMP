@@ -13,7 +13,7 @@
         @if(in_array($asset->status, ['available', 'allocated'], true))
             <form method="POST" action="{{ route('assets.allocate', $asset) }}" class="flex flex-wrap gap-2" data-zazu-offline-entity="asset_allocation" data-zazu-offline-asset-id="{{ $asset->id }}">
                 @csrf
-                <select name="event_id" required><option value="">Allocate to job</option>@foreach($events as $event)<option value="{{ $event->id }}">{{ $event->name }}</option>@endforeach</select>
+                <select name="event_id" required><option value="">Allocate to job</option>@foreach($events as $event)<option value="{{ $event->id }}" data-allocated-from="{{ $event->setup_date?->toDateString() ?? $event->event_date?->toDateString() }}" data-allocated-until="{{ $event->collection_date?->toDateString() ?? $event->event_end_date?->toDateString() ?? $event->event_date?->toDateString() }}">{{ $event->name }}</option>@endforeach</select>
                 <input type="date" name="allocated_from" value="{{ now()->toDateString() }}" required>
                 <input type="date" name="allocated_until" aria-label="Allocation end date">
                 <button class="zazu-btn zazu-btn-secondary">Book dates</button>
@@ -50,4 +50,17 @@
 </section>
 <section class="zazu-card zazu-list mt-5"><div class="zazu-card-header"><div class="zazu-eyebrow">Planning</div><div class="zazu-card-title mt-1">Rental demand from active jobs</div></div>
 @forelse($demand as $requirement)<div class="zazu-list-item"><div class="zazu-list-main"><div class="zazu-list-title">{{ $requirement->capability?->name ?? $requirement->description }}</div><div class="zazu-list-meta">{{ $requirement->event->name }}</div></div><div class="zazu-list-side"><div class="zazu-side-primary">{{ number_format((float)$requirement->quantity,2) }} {{ $requirement->unit ?: 'units' }}</div></div></div>@empty<div class="zazu-empty">No active rental demand.</div>@endforelse
-</section></x-app-layout>
+</section><script nonce="{{ request()->attributes->get('cspNonce') }}">
+    document.querySelectorAll('form[data-zazu-offline-entity="asset_allocation"] select[name="event_id"]').forEach((select) => {
+        const form = select.closest('form');
+        const from = form.querySelector('[name="allocated_from"]');
+        const until = form.querySelector('[name="allocated_until"]');
+        select.addEventListener('change', () => {
+            const option = select.selectedOptions[0];
+            if (option?.dataset.allocatedFrom) from.value = option.dataset.allocatedFrom;
+            if (option?.dataset.allocatedUntil) until.value = option.dataset.allocatedUntil;
+        });
+    });
+</script>
+
+</x-app-layout>
