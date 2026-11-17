@@ -118,7 +118,7 @@ class WorkController extends Controller
     public function store(Request $request, EventScheduleConflictDetector $conflictDetector, EventScheduleValidator $scheduleValidator): RedirectResponse
     {
         $business = $this->business($request);
-        $validated = $request->validate($this->rules());
+        $validated = $request->validate($this->rules(), $this->validationMessages());
         $scheduleValidator->validate($validated);
 
         $customer = Customer::query()
@@ -229,7 +229,7 @@ class WorkController extends Controller
         $business = $this->business($request);
         $validated = $request->validate($this->rules() + [
             'status' => ['required', 'in:draft,confirmed,in_progress,completed,cancelled'],
-        ]);
+        ], $this->validationMessages());
         $scheduleValidator->validate($validated);
 
         $customer = Customer::query()
@@ -371,6 +371,19 @@ class WorkController extends Controller
         abort_unless($valid, 422, 'The selected contact does not belong to the selected customer.');
     }
 
+
+    private function validationMessages(): array
+    {
+        return [
+            'event_date.required' => 'Enter the first day of the job.',
+            'event_date.date' => 'Enter a valid job start date.',
+            'event_end_date.date' => 'Enter a valid job end date.',
+            'event_start_time.date_format' => 'Enter a valid event start time.',
+            'event_end_time.date_format' => 'Enter a valid event end time.',
+            'setup_date.date' => 'Enter a valid setup date.',
+            'collection_date.date' => 'Enter a valid equipment collection date.',
+        ];
+    }
 
     private function rules(): array
     {
