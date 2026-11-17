@@ -157,7 +157,7 @@ class PasswordResetController extends Controller
     /**
      * @param \Illuminate\Support\Collection<int, Business> $businesses
      */
-    private function revokeTrustedDevice(SyncDevice $device, $businesses): void
+    private function revokeTrustedDevice(SyncDevice $device, Collection $businesses): void
     {
         $metadata = $device->metadata ?? [];
         $needsAudit = $device->status !== 'revoked' || $device->revoked_at === null;
