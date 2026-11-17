@@ -851,6 +851,16 @@ class OfflineDomainMutationHandler implements SyncMutationHandler
         }
 
         $payload = $this->recordPayload($mutation);
+        $type = $payload['type'] ?? 'payment';
+        if (! is_string($type) || ! in_array($type, ['payment', 'deposit'], true)) {
+            throw ValidationException::withMessages(['type' => 'Offline payment type must be payment or deposit.']);
+        }
+
+        $method = $payload['method'] ?? null;
+        if (! is_string($method) || ! in_array($method, ['cash', 'bank_transfer', 'card', 'other'], true)) {
+            throw ValidationException::withMessages(['method' => 'Offline payment method is invalid.']);
+        }
+
         $invoice = $this->resolveIdentityRecord($mutation->business_id, 'invoice', $payload['invoice_local_id'] ?? null, Invoice::class);
         if (! $invoice) {
             throw ValidationException::withMessages(['invoice_local_id' => 'The offline payment references an unknown invoice.']);
@@ -859,11 +869,11 @@ class OfflineDomainMutationHandler implements SyncMutationHandler
         $data = [
             'invoice_id' => $invoice->id,
             'idempotency_key' => $mutation->mutation_id,
-            'type' => $payload['type'] ?? 'payment',
+            'type' => $type,
             'amount' => $this->positiveMoney($payload['amount'] ?? null),
-            'method' => $payload['method'] ?? null,
+            'method' => $method,
             'reference' => $this->nullableString($payload['reference'] ?? null, 255),
-            'paid_at' => $payload['paid_at'] ?? now()->toDateString(),
+            'paid_at' => $this->nullableDate($payload['paid_at'] ?? now()->toDateString()) ?? now()->toDateString(),
             'notes' => $this->nullableString($payload['notes'] ?? null, 5000),
         ];
 
@@ -882,6 +892,11 @@ class OfflineDomainMutationHandler implements SyncMutationHandler
         }
 
         $payload = $this->recordPayload($mutation);
+        $status = $payload['status'] ?? 'unpaid';
+        if (! is_string($status) || ! in_array($status, ['unpaid', 'paid'], true)) {
+            throw ValidationException::withMessages(['status' => 'Offline expense status must be unpaid or paid.']);
+        }
+
         $event = $this->resolveOfflineEvent($mutation->business_id, $payload['event_local_id'] ?? null);
         $order = array_key_exists('purchase_order_local_id', $payload)
             ? $this->resolveIdentityRecord($mutation->business_id, 'purchase_order', $payload['purchase_order_local_id'], PurchaseOrder::class)
@@ -897,9 +912,9 @@ class OfflineDomainMutationHandler implements SyncMutationHandler
             'supplier_id' => $supplier?->id,
             'description' => $this->requiredString($payload['description'] ?? null, 'description', 500),
             'amount' => $this->positiveMoney($payload['amount'] ?? null),
-            'status' => $payload['status'] ?? 'unpaid',
+            'status' => $status,
             'reference' => $this->nullableString($payload['reference'] ?? null, 255),
-            'expense_date' => $payload['expense_date'] ?? now()->toDateString(),
+            'expense_date' => $this->nullableDate($payload['expense_date'] ?? now()->toDateString()) ?? now()->toDateString(),
             'notes' => $this->nullableString($payload['notes'] ?? null, 5000),
         ], $this->lifecycle);
 
