@@ -58,6 +58,31 @@ test.describe('Zazu installed PWA offline shell', () => {
         expect(readiness).toBe('ready');
     });
 
+    test('does not register a fresh browser device without explicit owner approval', async ({ page }, testInfo) => {
+        test.setTimeout(20_000);
+        test.skip(testInfo.project.name !== 'chromium', 'Primary device consent contract runs once.');
+
+        let registrationAttempts = 0;
+        await page.route('**/offline/device/register', async route => {
+            registrationAttempts++;
+            await route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify({}) });
+        });
+
+        await login(page);
+        await expect(page.getByRole('heading', { name: 'Dashboard' })).toBeVisible();
+        await page.evaluate(async () => {
+            await window.ZazuOffline.ready;
+            window.dispatchEvent(new Event('focus'));
+            window.dispatchEvent(new Event('online'));
+        });
+        await page.waitForTimeout(250);
+
+        expect(registrationAttempts).toBe(0);
+        const state = await page.evaluate(() => window.ZazuOffline.getState());
+        expect(state.sync_registration_consent).toBe(false);
+        expect(state.sync?.token || null).toBeNull();
+    });
+
     test('retries primary device registration and drains queued customers after the host returns', async ({ page }, testInfo) => {
         test.setTimeout(25_000);
         test.skip(testInfo.project.name !== 'chromium', 'Primary device registration recovery contract runs once.');
@@ -160,6 +185,11 @@ test.describe('Zazu installed PWA offline shell', () => {
                 record: { name: 'Second customer saved before registration recovery' },
             });
         }, localCustomerIds);
+
+        const firstRegistration = await page.evaluate(() =>
+            window.ZazuOffline.registerPrimaryDevice({ explicitConsent: true })
+        );
+        expect(firstRegistration).toBe(false);
 
         await expect.poll(() => registrationAttempts, { timeout: 12_000 }).toBeGreaterThanOrEqual(2);
         await expect.poll(() => pushed, { timeout: 12_000 }).toBe(2);
