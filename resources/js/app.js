@@ -989,12 +989,6 @@ function setupZazuOfflineDirectoryViews() {
     };
 
     const localSyncStatus = (state, entityType, localId, serverId, pendingSync = false) => {
-        if (pendingSync) return {
-            label: 'Waiting to sync',
-            title: 'This device has saved changes for this record. They will sync when Zazu reconnects.',
-        };
-        if (serverId) return { label: 'Synced', title: 'This record has a server identity.' };
-
         const conflict = (state?.conflicts || []).find(item =>
             item.status === 'open'
             && item.entity_type === entityType
@@ -1012,6 +1006,11 @@ function setupZazuOfflineDirectoryViews() {
             label: 'Needs attention',
             title: state.last_sync_error || 'The owner must resolve this device registration before queued changes can sync.',
         };
+        if (pendingSync) return {
+            label: 'Waiting to sync',
+            title: 'This device has saved changes for this record. They will sync when Zazu reconnects.',
+        };
+        if (serverId) return { label: 'Synced', title: 'This record has a server identity.' };
         if (state?.last_sync_error) return {
             label: 'Retrying sync',
             title: state.last_sync_error,
