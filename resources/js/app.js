@@ -2413,6 +2413,7 @@ function setupZazuOfflineForms() {
             };
 
             let payload;
+            let scheduleConflictNames = [];
             if (entity === 'customer') {
                 const offlineState = window.ZazuOffline.getState();
                 const serverId = form.dataset.zazuOfflineServerId;
@@ -2502,6 +2503,31 @@ function setupZazuOfflineForms() {
                     other_service: get('other_service') || null,
                     notes: get('notes') || null,
                 };
+
+                const scheduleWindow = (record) => {
+                    const startDate = record.setup_date || record.event_date;
+                    const endDate = record.collection_date || record.event_end_date || record.event_date;
+                    if (!startDate || !endDate) return null;
+                    const hasTimeRange = Boolean(record.event_start_time && record.event_end_time);
+                    const startTime = record.setup_date || !hasTimeRange ? '00:00' : String(record.event_start_time).slice(0, 5);
+                    const endTime = record.collection_date || !hasTimeRange ? '23:59' : String(record.event_end_time).slice(0, 5);
+                    const start = new Date(startDate + 'T' + startTime + ':00').getTime();
+                    const end = new Date(endDate + 'T' + endTime + ':00').getTime();
+                    return Number.isFinite(start) && Number.isFinite(end) ? { start, end } : null;
+                };
+                const newWindow = scheduleWindow(payload);
+                if (newWindow) {
+                    scheduleConflictNames = (offlineState?.jobs || [])
+                        .filter(job => !['completed', 'cancelled'].includes(job.status))
+                        .filter(job => {
+                            const existingWindow = scheduleWindow(job);
+                            return existingWindow
+                                && newWindow.start < existingWindow.end
+                                && existingWindow.start < newWindow.end;
+                        })
+                        .map(job => job.name)
+                        .filter(Boolean);
+                }
             } else if (entity === 'quote') {
                 const state = window.ZazuOffline.getState();
                 const serverJobId = form.dataset.zazuOfflineJobId;
@@ -3067,7 +3093,9 @@ function setupZazuOfflineForms() {
             const notice = document.createElement('div');
             notice.className = 'zazu-notice';
             notice.setAttribute('role', 'status');
-            notice.textContent = 'Saved on this device. It will sync automatically when Zazu reconnects.';
+            notice.textContent = scheduleConflictNames.length
+                ? 'Saved on this device. Schedule overlap with: ' + scheduleConflictNames.join(', ') + '. Review the calendar before confirming this job. It will sync when Zazu reconnects.'
+                : 'Saved on this device. It will sync automatically when Zazu reconnects.';
             form.prepend(notice);
             } catch (error) {
                 // IndexedDB quota, blocked upgrades, and transaction failures
