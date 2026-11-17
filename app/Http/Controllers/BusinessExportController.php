@@ -67,6 +67,8 @@ class BusinessExportController extends Controller
             $result = $archives->restore($validated['archive']->getRealPath(), $business);
         } catch (RuntimeException $exception) {
             return back()->withErrors(['archive' => $exception->getMessage()]);
+        } catch (\JsonException) {
+            return back()->withErrors(['archive' => 'The uploaded archive is damaged or contains invalid data.']);
         }
 
         Audit::record('business.archive_restored', null, [
