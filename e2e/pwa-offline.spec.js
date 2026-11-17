@@ -1777,7 +1777,6 @@ test.describe('Zazu installed PWA offline shell', () => {
             'OFFLINE-WORK-001',
             'Offline Work customer',
             'Work day contact',
-            'Wedding',
             '2026-12-12',
             'Pretoria, Gauteng',
             'Venue access from 08:00',
@@ -1792,6 +1791,7 @@ test.describe('Zazu installed PWA offline shell', () => {
         ]) {
             await expect(detail.getByText(value)).toBeVisible();
         }
+        await expect(detail.getByText('Wedding', { exact: true })).toBeVisible();
 
         await detail.getByRole('button', { name: 'Close' }).click();
         await expect(detail).toBeHidden();
