@@ -26,19 +26,19 @@ final class EventScheduleValidator
 
         if ($startDate && $endDate && $endDate < $startDate) {
             throw ValidationException::withMessages([
-                'event_end_date' => 'Choose an end date that is the same as or later than the start date.',
+                'event_end_date' => 'The job end date must be the same as or later than the start date.',
             ]);
         }
 
         if ($setupDate && $startDate && $setupDate > $startDate) {
             throw ValidationException::withMessages([
-                'setup_date' => 'Choose a setup date that is the same as or earlier than the start date.',
+                'setup_date' => 'The setup date must be the same as or earlier than the job start date.',
             ]);
         }
 
         if ($collectionDate && $endDate && $collectionDate < $endDate) {
             throw ValidationException::withMessages([
-                'collection_date' => 'Choose a collection date that is the same as or later than the end date.',
+                'collection_date' => 'The equipment collection date must be the same as or later than the job end date.',
             ]);
         }
 
