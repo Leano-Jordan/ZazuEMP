@@ -6,7 +6,7 @@
 **Public service area:** Pretoria North, Gauteng, South Africa
 **Customer:** The business/customer accepting the final terms
 **Effective date:** [DATE OF FINAL PUBLICATION]
-**Contact:** [APPROVED BUSINESS EMAIL / TELEPHONE TO BE INSERTED AT PUBLICATION]
+**Provisional customer contact:** rosscorelabs@outlook.com (owner-confirmed for current use; replace when a dedicated Zazu channel is established)
 
 > This draft records the intended commercial model. It is not a signed contract or legal opinion. The final terms must match the actual release, checkout flow, payment method and South African legal requirements.
 
