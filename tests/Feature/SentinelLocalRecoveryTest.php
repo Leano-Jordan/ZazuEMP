@@ -51,6 +51,16 @@ class SentinelLocalRecoveryTest extends TestCase
             ->assertForbidden();
     }
 
+    public function test_local_recovery_rejects_content_types_that_only_start_with_form_media_type(): void
+    {
+        $this->withHeaders([
+            'Origin' => 'http://localhost',
+            'Sec-Fetch-Site' => 'same-origin',
+            'Content-Type' => 'application/x-www-form-urlencoded-evil',
+        ])->post('/api/sentinel/recovery', ['code' => str_repeat('a', 64)])
+            ->assertForbidden();
+    }
+
     public function test_local_recovery_rejects_same_host_on_a_different_port(): void
     {
         $this->withHeaders([
