@@ -2,6 +2,8 @@
 
 namespace Tests\Feature;
 
+use App\Models\Business;
+use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
@@ -20,13 +22,13 @@ class SentinelRescueTest extends TestCase
 
     public function test_non_owner_business_member_cannot_open_sentinel_rescue(): void
     {
-        $business = \\App\\Models\\Business::create([
+        $business = Business::create([
             'name' => 'Staff Test Business',
             'slug' => 'staff-test-business',
             'status' => 'active',
             'currency' => 'ZAR',
         ]);
-        $staff = \\App\\Models\\User::factory()->create();
+        $staff = User::factory()->create();
         $business->users()->attach($staff->id, ['role' => 'staff']);
 
         $this->actingAs($staff)
