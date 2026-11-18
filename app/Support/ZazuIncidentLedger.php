@@ -109,7 +109,7 @@ final class ZazuIncidentLedger
                     }
 
                     if (is_array($record) && ($record['request_id'] ?? null) === $requestId) {
-                        return $record;
+                        return self::allowlisted($record);
                     }
                 }
             } catch (Throwable) {
@@ -124,6 +124,8 @@ final class ZazuIncidentLedger
     {
         $fields = [
             'request_id',
+            'failure_fingerprint',
+            'failure_fingerprint_version',
             'error_code',
             'category',
             'severity',
@@ -152,8 +154,10 @@ final class ZazuIncidentLedger
             }
         }
 
-        if (isset($context['file']) && is_string($context['file'])) {
-            $safe['source_file'] = basename($context['file']);
+        $sourceFile = $context['source_file'] ?? $context['file'] ?? null;
+
+        if (is_string($sourceFile)) {
+            $safe['source_file'] = basename($sourceFile);
         }
 
         return $safe;
