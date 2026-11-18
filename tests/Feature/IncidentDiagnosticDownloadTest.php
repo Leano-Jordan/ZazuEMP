@@ -82,6 +82,8 @@ class IncidentDiagnosticDownloadTest extends TestCase
 
     public function test_db001_reference_download_uses_independent_ledger_and_includes_stable_fingerprint(): void
     {
+        config(['cache.default' => 'array']);
+
         $requestId = 'b17e9a51-891c-48b6-9d71-1f24e6ab4c82';
         $directory = storage_path('app/private/zazu-diagnostics');
         File::deleteDirectory($directory);
