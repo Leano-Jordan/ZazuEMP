@@ -302,25 +302,47 @@ jobs:
             'S-1-5-32-544'
           )
           $privateRoot = Join-Path $project 'storage/app/private'
-          $aclTargets = @(
+          $protectedRoots = @(
             $privateRoot,
-            (Join-Path $privateRoot 'zazu-diagnostics'),
-            (Join-Path $privateRoot 'zazu-diagnostics/incidents.lock'),
-            (Join-Path $privateRoot 'zazu-diagnostics/incidents.jsonl')
+            (Join-Path $project 'storage/framework'),
+            (Join-Path $project 'storage/logs'),
+            (Join-Path $project 'database'),
+            (Join-Path $project 'bootstrap/cache'),
+            (Join-Path $project '.env')
           )
-          foreach ($target in $aclTargets) {
-            if (-not (Test-Path -LiteralPath $target)) { throw "Expected private diagnostic path was not created: $target" }
+          foreach ($target in $protectedRoots) {
+            if (-not (Test-Path -LiteralPath $target)) { throw "Expected protected Zazu data path was not found: $target" }
             $acl = Get-Acl -LiteralPath $target
-            if ($target -eq $privateRoot -and -not $acl.AreAccessRulesProtected) {
-              throw 'The private storage root still inherits broad parent permissions.'
+            if (-not $acl.AreAccessRulesProtected) {
+              throw "Protected Zazu data path still inherits broad parent permissions: $target."
             }
             foreach ($rule in $acl.Access) {
               $sid = $rule.IdentityReference.Translate([System.Security.Principal.SecurityIdentifier]).Value
               if ($allowedSids -notcontains $sid -or $rule.AccessControlType -ne [System.Security.AccessControl.AccessControlType]::Allow) {
-                throw "Private storage contains an unexpected Windows access rule for SID $sid at $target."
+                throw "Protected Zazu data path contains an unexpected Windows access rule for SID $sid at $target."
               }
-              if ($target -ne $privateRoot -and -not $rule.IsInherited) {
-                throw "A private diagnostic child has an unexpected explicit access rule: $target."
+              if ($rule.IsInherited) {
+                throw "Protected Zazu root contains an unexpected inherited access rule: $target."
+              }
+            }
+          }
+
+          $inheritedTargets = @(
+            (Join-Path $privateRoot 'zazu-diagnostics'),
+            (Join-Path $privateRoot 'zazu-diagnostics/incidents.lock'),
+            (Join-Path $privateRoot 'zazu-diagnostics/incidents.jsonl'),
+            (Join-Path $project 'database/database.sqlite')
+          )
+          foreach ($target in $inheritedTargets) {
+            if (-not (Test-Path -LiteralPath $target)) { throw "Expected protected child path was not created: $target" }
+            $acl = Get-Acl -LiteralPath $target
+            foreach ($rule in $acl.Access) {
+              $sid = $rule.IdentityReference.Translate([System.Security.Principal.SecurityIdentifier]).Value
+              if ($allowedSids -notcontains $sid -or $rule.AccessControlType -ne [System.Security.AccessControl.AccessControlType]::Allow) {
+                throw "Protected Zazu child contains an unexpected Windows access rule for SID $sid at $target."
+              }
+              if (-not $rule.IsInherited) {
+                throw "Protected Zazu child does not inherit its restricted ACL: $target."
               }
             }
           }
