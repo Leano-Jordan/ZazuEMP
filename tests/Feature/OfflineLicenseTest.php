@@ -180,6 +180,17 @@ class OfflineLicenseTest extends TestCase
         ]);
     }
 
+    public function test_business_owner_can_see_business_id_for_manual_license_issuance(): void
+    {
+        $user = $this->signInAsOwner();
+        $business = $user->businesses()->firstOrFail();
+
+        $this->get(route('settings.index'))
+            ->assertOk()
+            ->assertSeeText('Business ID for licence requests: '.$business->id)
+            ->assertSeeText('It identifies this business record; it is not an access credential.');
+    }
+
     public function test_settings_displays_an_expired_license_as_expired(): void
     {
         $user = $this->signInAsOwner();
