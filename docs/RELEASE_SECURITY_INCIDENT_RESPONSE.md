@@ -2,6 +2,7 @@
 
 **Status:** OPERATIONAL DRAFT — REAL CONTACTS REQUIRED BEFORE RELEASE  
 **Incident owner:** Isaac Junior Lehlogonolo Maluleka  
+**Initial customer incident-reporting channel:** rosscorelabs@outlook.com (provisional; this does not replace the Information Regulator's prescribed reporting process)
 **Operating address:** [Operating address — see private records]
 **Information Officer:** Isaac Junior Lehlogonolo Maluleka — formal registration/appointment status to be confirmed before publication  
 **Deputy / escalation:** Not applicable to the current solo-operator model; external legal/regulatory support to be engaged when required  
