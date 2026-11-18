@@ -3,9 +3,12 @@
 namespace Tests\Feature;
 
 use App\Models\Business;
+use App\Models\BusinessLicense;
+use App\Services\SignedOfflineLicenseVerifier;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Config;
+use Illuminate\Support\Str;
 use Tests\TestCase;
 
 class SentinelLicenseManagementTest extends TestCase
