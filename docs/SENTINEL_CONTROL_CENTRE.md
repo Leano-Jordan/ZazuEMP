@@ -213,3 +213,14 @@ The private incident ledger re-applies restrictive filesystem modes during write
 ### Windows NTFS enforcement
 
 The Windows installer protects `.env`, `database`, `storage/app/private`, `storage/framework`, `storage/logs` and `bootstrap/cache` by removing inherited parent access and applying Full Control only to the installing Windows account, Local System and local Administrators. Existing descendants are normalised; reparse points in protected paths cause installation to stop rather than follow an unexpected target. New files and directories inherit the restricted ACL. The Windows fresh-install acceptance workflow creates a real incident ledger and checks the protected roots plus database, diagnostics, lock and ledger ACLs against the allowed SIDs. This is separate from PHP `chmod`, which is not an effective Windows access-control guarantee.
+
+
+## Founder licensing workspace
+
+The founder-only `/admin/sentinel` console now includes a Licensing & Entitlements section. It searches businesses by name or numeric ID, displays the currently installed entitlement, and provides signed licence issue/renewal and revocation actions. Customer activation remains in the existing owner-only Business Settings workflow.
+
+Issuance reuses the existing `zazu:license:issue` signer from a server-side request. Configure `ZAZU_LICENSE_PRIVATE_KEY_FILE` as an absolute path to the base64 Ed25519 secret-key file outside the Zazu project. `ZAZU_LICENSE_PUBLIC_KEY` must contain the matching public key. The secret-key bytes are never sent to the browser, stored in the database, or written to the application log. The signed token is shown once in the founder's authenticated session for delivery to the matching business owner.
+
+Each issue/renew/revoke action is rate-limited and writes a metadata-only application log entry containing the business, licence reference, plan, action and actor. The signed token and private-key material are excluded. A renewal reuses the installed licence UUID when one is present. Revocation is a signed token and only takes effect on a customer installation after its owner imports that token; this is an offline licensing system, not a remote kill switch.
+
+The UI exposes the existing Basic, Intermediate and Advanced plan identifiers. It does not introduce feature restrictions or claim application-wide paid-tier enforcement. Do not issue customer licences with a production key until key custody, backup and Windows ACLs for the external key file have been deliberately established and the exact-head test workflows pass.
