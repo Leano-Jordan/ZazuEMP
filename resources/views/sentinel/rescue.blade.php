@@ -48,7 +48,7 @@
         <div class="brand"><span class="mark" aria-hidden="true">Z</span><span>ZAZU EMP · SENTINEL</span></div>
         <div class="eyebrow">Private installation access</div>
         <h1>Sentinel Rescue</h1>
-        <p>This is a separate diagnostic entry point. It does not require your normal Zazu sign-in or a database-backed session, and it does not need internet access.</p>
+        <p>This private diagnostic view is available only to an authenticated owner of the active business. It works locally and does not need internet access.</p>
         <div class="meta">
             <span>PHP {{ $phpVersion }}</span>
             <span>Laravel {{ $laravelVersion }}</span>
@@ -121,8 +121,8 @@
 
     <section class="panel">
         <h2>How to use this page</h2>
-        <p class="notice">Bookmark this private link while Zazu is working normally. It can remain available when normal sign-in or the business database is unavailable, provided the local Zazu web process and application bootstrap are still running.</p>
-        <p>The page uses the installation's signed link as a private access key. Anyone who receives that link can view this installation-level health snapshot. Keep it private and renew it from the System menu when it expires.</p>
+        <p class="notice">Open Sentinel Rescue from System while signed in as the owner of this business. Signing out or losing the authenticated session removes access.</p>
+        <p>This view reports local installation health only. It does not expose the founder's platform-wide incident console or another business's records.</p>
         <p>Sentinel does not apply migrations, restore backups, reset the database or modify business records. Pending migrations are evidence to investigate, not an instruction to repair automatically.</p>
         <p>A present service worker or manifest does not prove that a phone's browser cache, local records or sync queue are healthy. Those require separate device-side checks.</p>
     </section>
