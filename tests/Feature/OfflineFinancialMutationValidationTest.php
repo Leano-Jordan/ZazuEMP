@@ -99,6 +99,97 @@ class OfflineFinancialMutationValidationTest extends TestCase
         $this->assertSame(0, Invoice::query()->where('business_id', $business->id)->count());
     }
 
+
+    public function test_offline_invoice_sync_uses_the_shared_business_month_sequence(): void
+    {
+        $business = Business::create([
+            'name' => 'Offline Invoice Sequence Business',
+            'slug' => 'offline-invoice-sequence-'.Str::lower(Str::random(8)),
+            'status' => 'active',
+            'currency' => 'ZAR',
+        ]);
+        $device = SyncDevice::create([
+            'business_id' => $business->id,
+            'installation_id' => (string) Str::uuid(),
+        ]);
+        $event = Event::create([
+            'business_id' => $business->id,
+            'reference' => 'OFF-INVOICE-SEQUENCE',
+            'name' => 'Offline invoice sequence',
+            'status' => 'confirmed',
+        ]);
+        $quote = Quote::create([
+            'event_id' => $event->id,
+            'reference' => 'QUO-OFF-INVOICE-SEQUENCE',
+            'status' => 'accepted',
+            'currency' => 'ZAR',
+        ]);
+        $version = $quote->versions()->create([
+            'version' => 1,
+            'status' => 'accepted',
+            'subtotal' => '100.00',
+            'tax_total' => '0.00',
+            'total' => '100.00',
+            'deposit_percent' => '0.00',
+            'deposit_amount' => '0.00',
+            'tax_label' => 'No tax',
+            'tax_treatment' => 'out_of_scope',
+            'tax_rate' => '0.00',
+            'tax_snapshot_at' => now(),
+        ]);
+        $version->items()->create([
+            'description' => 'Offline invoice sequence item',
+            'quantity' => '1.00',
+            'unit' => 'service',
+            'unit_price' => '100.00',
+            'line_total' => '100.00',
+            'source_snapshot' => ['offline' => true],
+        ]);
+
+        Invoice::create([
+            'business_id' => $business->id,
+            'number' => 'INV-202611-000004',
+            'status' => 'issued',
+            'currency' => 'ZAR',
+            'subtotal' => '100.00',
+            'tax_total' => '0.00',
+            'total' => '100.00',
+        ]);
+
+        $quoteIdentity = app(SyncEntityIdentityRegistry::class)->identify($quote, 'quote');
+        $localId = (string) Str::uuid();
+        $mutation = app(SyncMutationRecorder::class)->record(
+            $device,
+            'invoice',
+            $localId,
+            'create',
+            [
+                'local_id' => $localId,
+                'record' => [
+                    'quote_local_id' => $quoteIdentity->entity_uuid,
+                    'issued_at' => '2026-11-18',
+                    'due_at' => '2026-11-25',
+                ],
+            ],
+        );
+
+        $handler = app(OfflineDomainMutationHandler::class);
+        $applier = app(SyncMutationApplier::class);
+        $applied = $applier->apply($mutation, ['invoice' => $handler]);
+        $invoice = Invoice::query()
+            ->where('business_id', $business->id)
+            ->where('idempotency_key', $mutation->mutation_id)
+            ->firstOrFail();
+
+        $this->assertSame('applied', $applied->status);
+        $this->assertSame('INV-202611-000005', $invoice->number);
+        $this->assertSame('2026-11-18', $invoice->issued_at?->toDateString());
+
+        $replayed = $applier->apply($applied, ['invoice' => $handler]);
+        $this->assertSame($applied->id, $replayed->id);
+        $this->assertSame(2, Invoice::query()->where('business_id', $business->id)->count());
+    }
+
     public function test_offline_financial_mutations_reject_invalid_enums_and_dates(): void
     {
         $business = Business::create([

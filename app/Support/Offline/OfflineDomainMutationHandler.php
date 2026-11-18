@@ -24,10 +24,12 @@ use App\Models\SyncMutation;
 use App\Services\EventLifecycleService;
 use App\Services\EventScheduleValidator;
 use App\Services\FinanceTransactionService;
+use App\Services\InvoiceNumberGenerator;
 use App\Services\PurchaseOrderReceivingService;
 use App\Support\Audit;
 use App\Support\Money;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Str;
 use Illuminate\Validation\ValidationException;
 
@@ -44,6 +46,7 @@ class OfflineDomainMutationHandler implements SyncMutationHandler
         private readonly EventScheduleValidator $scheduleValidator,
         private readonly PurchaseOrderReceivingService $receivingService,
         private readonly FinanceTransactionService $finance,
+        private readonly InvoiceNumberGenerator $invoiceNumbers,
     ) {
     }
 
@@ -828,13 +831,15 @@ class OfflineDomainMutationHandler implements SyncMutationHandler
 
         $business = Business::query()->with('taxProfile')->findOrFail($mutation->business_id);
         $customer = $quote->event?->customer;
+        $issuedAt = $this->nullableDate($payload['issued_at'] ?? now()->toDateString()) ?? now()->toDateString();
+        $dueAt = $this->nullableDate($payload['due_at'] ?? now()->addDays(7)->toDateString()) ?? now()->addDays(7)->toDateString();
         $invoice = Invoice::create([
             'business_id' => $business->id,
             'idempotency_key' => $mutation->mutation_id,
             'event_id' => $quote->event_id,
             'quote_id' => $quote->id,
             'quote_version_id' => $version->id,
-            'number' => 'INV-OFFLINE-'.strtoupper(substr($this->entityUuid($mutation), 0, 8)),
+            'number' => $this->invoiceNumbers->nextForBusiness($business->id, Carbon::parse($issuedAt)),
             'business_legal_name' => $business->taxProfile?->legal_name ?: $business->name,
             'business_trading_name' => $business->taxProfile?->trading_name ?: $business->name,
             'business_address' => $business->address,
@@ -853,8 +858,8 @@ class OfflineDomainMutationHandler implements SyncMutationHandler
             'subtotal' => $version->subtotal,
             'tax_total' => $version->tax_total,
             'total' => $version->total,
-            'issued_at' => $this->nullableDate($payload['issued_at'] ?? now()->toDateString()) ?? now()->toDateString(),
-            'due_at' => $this->nullableDate($payload['due_at'] ?? now()->addDays(7)->toDateString()) ?? now()->addDays(7)->toDateString(),
+            'issued_at' => $issuedAt,
+            'due_at' => $dueAt,
             'notes' => $version->notes,
             'tax_rate_id' => $version->tax_rate_id,
             'tax_code' => $version->tax_code,

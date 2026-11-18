@@ -20,6 +20,7 @@ use App\Services\InvoiceIdempotencyMatcher;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\URL;
 use Illuminate\Support\Str;
@@ -316,7 +317,7 @@ class FinanceController extends Controller
                 'event_id' => $lockedEvent?->id ?? $event?->id,
                 'quote_id' => $data['quote_id'] ?? null,
                 'quote_version_id' => $quoteVersionId,
-                'number' => app(InvoiceNumberGenerator::class)->nextForBusiness($businessId),
+                'number' => app(InvoiceNumberGenerator::class)->nextForBusiness($businessId, Carbon::parse($data['issued_at'] ?? now()->toDateString())),
                 'business_legal_name' => $business->taxProfile?->legal_name ?: $business->name,
                 'business_trading_name' => $business->taxProfile?->trading_name ?: $business->name,
                 'business_address' => $business->address,

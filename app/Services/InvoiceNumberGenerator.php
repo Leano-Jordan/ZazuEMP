@@ -53,7 +53,7 @@ final class InvoiceNumberGenerator
 
     private function nextAfterExistingInvoices(int $businessId, string $prefix): int
     {
-        $pattern = '/^'.preg_quote($prefix, '/').'([0-9]{6,})$/D';
+        $pattern = '/^'.preg_quote($prefix, '/').'([0-9]+)$/D';
         $highest = 0;
 
         $numbers = Invoice::query()

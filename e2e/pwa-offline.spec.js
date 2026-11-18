@@ -2136,6 +2136,7 @@ test.describe('Zazu installed PWA offline shell', () => {
 
         const customerLocalId = '11111111-1111-4111-8111-111111111111';
         const jobLocalId = '22222222-2222-4222-8222-222222222222';
+        const invoiceLocalId = '44444444-4444-4444-8444-444444444444';
         const customerName = 'Offline relationship customer';
 
         await page.addInitScript(() => {
@@ -2144,7 +2145,7 @@ test.describe('Zazu installed PWA offline shell', () => {
         await login(page);
         await page.goto('/customers', { waitUntil: 'domcontentloaded' });
         await waitForOfflineRuntime(page);
-        await page.evaluate(async ({ customerLocalId, jobLocalId, customerName }) => {
+        await page.evaluate(async ({ customerLocalId, jobLocalId, invoiceLocalId, customerName }) => {
             await window.ZazuOffline.ready;
             const state = window.ZazuOffline.getState();
             state.customers = [{
@@ -2170,9 +2171,19 @@ test.describe('Zazu installed PWA offline shell', () => {
                 reference: 'LOCAL-QUOTE-001',
                 status: 'sent',
             }];
+            state.invoices = [{
+                local_id: invoiceLocalId,
+                number: 'INV-OFFLINE-TEMP-LOCAL',
+                status: 'issued',
+                currency: 'ZAR',
+                total: '100.00',
+                paid_amount: '0.00',
+                balance: '100.00',
+                payments: [],
+            }];
             await window.ZazuOffline.persist();
             window.dispatchEvent(new CustomEvent('zazu:offline-state-updated'));
-        }, { customerLocalId, jobLocalId, customerName });
+        }, { customerLocalId, jobLocalId, invoiceLocalId, customerName });
 
         await context.setOffline(true);
         const customerRow = page.locator('[data-zazu-local-record="customer"]').filter({ hasText: customerName });
@@ -2242,7 +2253,25 @@ test.describe('Zazu installed PWA offline shell', () => {
                 return;
             }
             if (url.pathname === '/api/sync/bootstrap') {
-                await route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify({}) });
+                await route.fulfill({
+                    status: 200,
+                    contentType: 'application/json',
+                    body: JSON.stringify({
+                        invoices: [{
+                            local_id: invoiceLocalId,
+                            server_id: 7654322,
+                            record: {
+                                id: 7654322,
+                                number: 'INV-202611-000001',
+                                status: 'issued',
+                                currency: 'ZAR',
+                                total: '100.00',
+                                paid_amount: '0.00',
+                                balance: '100.00',
+                            },
+                        }],
+                    }),
+                });
                 return;
             }
             await route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify({ attachments: [] }) });
@@ -2263,6 +2292,10 @@ test.describe('Zazu installed PWA offline shell', () => {
             return { serverId: customer.server_id, pendingSync: customer.pending_sync };
         })).toEqual({ serverId: 7654321, pendingSync: false });
         await expect(updatedRow.locator('.zazu-chip')).toHaveText('Synced');
+        await expect.poll(async () => page.evaluate(invoiceLocalId =>
+            window.ZazuOffline.getState().invoices.find(invoice => invoice.local_id === invoiceLocalId)?.number,
+            invoiceLocalId,
+        )).toBe('INV-202611-000001');
         // The state update rebuilds the pending local row after server identity is assigned.
         await expect(detail).toBeHidden();
     });

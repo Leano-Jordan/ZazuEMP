@@ -45,6 +45,7 @@ DB-001 remains the active release blocker: repeated database read/write failures
 - [ ] Verify applicable PAIA and other legal-document obligations with qualified South African advice.
 - [x] Implement consecutive, collision-safe invoice numbering using the existing `INV-YYYYMM-` prefix, scoped per business and calendar month.
 - [x] Serialize allocation with the business transaction lock and a durable per-business/month sequence; voided numbers remain consumed and existing numeric numbers seed the first sequence allocation.
+- [x] Online issuance and offline invoice sync use the same allocator. An offline temporary number is replaced by the canonical server number when the synced workspace bootstrap refreshes.
 - [ ] Verify invoice and tax-invoice presentation against the customer's actual VAT/tax status and applicable SARS requirements.
 - [x] Test sequence continuation, tenant/month isolation, legacy-number coexistence, transaction rollback and idempotent invoice retries. Imports/restores retain the sequence table; older imports seed from existing numeric invoice numbers.
 - [ ] Legal review of the numbering scheme and invoice/tax-invoice presentation remains open.
