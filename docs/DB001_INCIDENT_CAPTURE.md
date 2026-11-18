@@ -77,5 +77,14 @@ The reference-scoped download endpoint is unauthenticated but rate-limited and r
 high-entropy UUID reference. It returns only allowlisted diagnostic fields with private,
 no-store caching headers. Treat the reference as sensitive and share the report deliberately.
 
+
+## Owner Sentinel Rescue access
+
+Business owners can open **System → Sentinel Rescue** to get a private signed link that bypasses the normal Zazu login/session path. The link is valid for one year when generated and should be kept private. It opens a standalone page that checks the local Sentinel evidence store without querying the business database or exposing incident contents.
+
+This is deliberately a narrow rescue surface. It proves whether Sentinel's own diagnostic directory and ledger are usable; it does not yet diagnose DB-001 root causes, database schema, storage, private attachments, offline sync or backup integrity. A healthy result is not a whole-system health certification. The rescue path also requires the local Zazu web process and application bootstrap to remain running.
+
+Automated route, owner-navigation and health-check acceptance is subject to exact-head CI; physical packaged-installation acceptance remains separate.
+
 The console, timeline and export action require automated feature-test and production-build
 verification before being treated as release-accepted.
