@@ -161,3 +161,13 @@ V1: NOT READY. Historical state/register/memory, checklist and changelog are pre
 - Added a Windows Ops workflow contract check for the diagnostic's required checks and non-mutating boundary.
 - This enables evidence-based selection of a repair once the owner's actual installed SQLite database is inspected. The source repository cannot inspect the owner's local database or recover the omitted SQL exception from the request ID alone.
 - DB-001 reference `895e2c23-bc6b-4919-a891-1e8e5c1e27e4` remains OPEN pending the read-only report and successful reproduction on the intended installation. No readiness uplift.
+
+
+## Offline cache-priming input hardening — 2026-11-18
+
+- Reviewed the service-worker page-priming message path under issue #35.
+- Found that the route filter accepted any string beginning with /; URL parsing treats protocol-relative and backslash-normalized paths as cross-origin URLs. The priming fetch uses credentials: include, so this was an unnecessary credentialed cross-origin request surface.
+- Updated public/sw.js to parse and normalize each route before fetching; reject cross-origin URLs, embedded URL credentials, /api and /api/*, non-string values, and oversized route strings.
+- Added tests/js/service-worker-auth-cache.test.js regression coverage proving only a same-origin non-API route is fetched.
+- Commits: service-worker correction 51e71414a293b4584d1b304dcbf0d0d2d1b15b97; regression test 6517703a4d2b2263547b603d1b8dc1a9c0c2e0e1.
+- Exact-head CI is queued/running. No test pass is claimed until observed. This is a narrow defense-in-depth correction; it does not close physical Android acceptance or establish full offline workflow parity.
