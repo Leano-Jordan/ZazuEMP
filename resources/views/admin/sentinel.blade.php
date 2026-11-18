@@ -53,7 +53,8 @@
         .sentinel-license-form{display:flex;gap:.5rem;flex-wrap:wrap;align-items:end}
         .sentinel-license-form label{display:grid;gap:.25rem;font-size:.76rem;color:var(--zazu-muted,#687386)}
         .sentinel-license-form input,.sentinel-license-form select{min-width:9rem;border:1px solid var(--zazu-border,#d9dee7);border-radius:8px;padding:.55rem;background:var(--zazu-background,#fff);color:inherit}
-        .sentinel-license-form .sentinel-button{font-size:.82rem}\n        .sentinel-license-form input[type=checkbox]{min-width:auto;padding:0}
+        .sentinel-license-form .sentinel-button{font-size:.82rem}
+        .sentinel-license-form input[type=checkbox]{min-width:auto;padding:0}
         .sentinel-token{width:100%;min-height:6rem;overflow-wrap:anywhere;border:1px solid var(--zazu-border,#d9dee7);border-radius:10px;padding:.7rem;background:var(--zazu-background,#fff);color:inherit}
         .sentinel-alert{padding:.85rem 1rem;border:1px solid var(--zazu-border,#d9dee7);border-radius:12px}
         .sentinel-alert-error{border-color:#c04444}
