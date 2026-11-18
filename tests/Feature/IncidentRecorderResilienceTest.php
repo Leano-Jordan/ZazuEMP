@@ -24,7 +24,7 @@ class IncidentRecorderResilienceTest extends TestCase
         File::deleteDirectory($directory);
 
         try {
-            ZazuIncidentRecorder::record(new \\RuntimeException('permission verification'));
+            ZazuIncidentRecorder::record(new \RuntimeException('permission verification'));
 
             clearstatcache(true, $directory);
             clearstatcache(true, $directory.DIRECTORY_SEPARATOR.'incidents.lock');
