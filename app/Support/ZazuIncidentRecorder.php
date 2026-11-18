@@ -34,10 +34,9 @@ final class ZazuIncidentRecorder
             'originating_component' => is_object($route) ? $route->getActionName() : null,
             'route_name' => is_object($route) ? $route->getName() : null,
             'http_method' => $request instanceof Request ? $request->method() : null,
-            'http_path' => $request instanceof Request ? $request->path() : null,
             'request_id' => self::requestId($request),
             'timestamp' => now()->toIso8601String(),
-            'file' => $exception->getFile(),
+            'file' => basename($exception->getFile()),
             'line' => $exception->getLine(),
             ...self::databaseDiagnostics($exception),
         ];
