@@ -16,7 +16,7 @@
 - Removed the one-year signed bearer URL from `/api/sentinel/rescue`; unauthenticated requests can no longer reach Sentinel Rescue.
 - Moved Rescue to `/sentinel/rescue` behind `auth`, `auth.session`, `business.context` and the active-business `owner` middleware.
 - Added explicit `sentinel.admin` route authorization for `/admin/sentinel`, separate from ordinary business-owner roles.
-- Founder authorization now resolves to one configured email identity (`ZAZU_PLATFORM_ADMIN_EMAIL`). The legacy plural variable is accepted only when it contains exactly one address; multiple legacy addresses grant no founder access.
+- Founder authorization now resolves only to the one explicitly configured email identity (`ZAZU_PLATFORM_ADMIN_EMAIL`). The legacy plural `ZAZU_PLATFORM_ADMIN_EMAILS` variable is ignored completely; business `admin` roles do not grant platform access. Existing installations must set the singular variable for the designated founder.
 - Founder navigation is visible independently of business-owner navigation. Business owners see only their owner Rescue entry; the founder sees the Control Centre only when the configured identity matches.
 - Added regression coverage for unauthenticated denial, removal of the old API route, authenticated owner access and updated founder identity configuration.
 - **Resilience trade-off:** authenticated business-owner Rescue still depends on the normal user/session path. The separate loopback-only one-time-code host recovery path now provides installation health checks without that dependency. Packaged Windows acceptance remains open; this does not diagnose a stopped host or broken PHP/Laravel bootstrap.
