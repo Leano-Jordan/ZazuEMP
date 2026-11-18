@@ -287,3 +287,5 @@ V1: NOT READY. Historical state/register/memory, checklist and changelog are pre
 - No branches created. V1 remains NOT READY pending exact-head CI and physical-device/package acceptance.
 
 - Added a POSIX feature test that verifies the diagnostics directory is `0700` and the incident lock/ledger files are `0600`; the test explicitly skips on Windows because NTFS ACLs, not POSIX mode bits, determine effective access there. Commit `d1923af`; exact-head CI pending.
+
+- PHPMD caught a malformed fully-qualified exception name in the new permission regression test (`\\RuntimeException`); corrected to `\RuntimeException` in `61dbd19`. This was test syntax only, not a production-code finding. Fresh PHPMD/Laravel runs are required before considering the permission test verified.
