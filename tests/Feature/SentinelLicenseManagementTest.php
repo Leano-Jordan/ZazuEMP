@@ -107,6 +107,13 @@ class SentinelLicenseManagementTest extends TestCase
                 'never_expires' => '1',
             ])
             ->assertForbidden();
+
+        $this->actingAs($user)
+            ->post(route('admin.sentinel.licence-customers.store'), [
+                'business_name' => 'Attempted registration',
+                'business_uuid' => (string) Str::uuid(),
+            ])
+            ->assertForbidden();
     }
 
     public function test_founder_can_create_a_signed_revocation_for_a_registered_customer(): void
