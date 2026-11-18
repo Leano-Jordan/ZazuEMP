@@ -8,7 +8,6 @@ use App\Services\InvoiceNumberGenerator;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
-use LogicException;
 use Tests\TestCase;
 
 class InvoiceNumberGeneratorTest extends TestCase
@@ -71,14 +70,31 @@ class InvoiceNumberGeneratorTest extends TestCase
         $this->assertSame('INV-202612-000001', $businessDecember);
     }
 
-    public function test_number_allocation_requires_an_active_database_transaction(): void
+    public function test_rolled_back_number_allocation_does_not_advance_the_sequence(): void
     {
         $user = $this->signInAsOwner();
         $business = $user->businesses()->firstOrFail();
+        $period = Carbon::parse('2026-11-18 12:00:00');
+        $generator = app(InvoiceNumberGenerator::class);
 
-        $this->expectException(LogicException::class);
+        try {
+            DB::transaction(function () use ($business, $period, $generator): void {
+                $this->assertSame(
+                    'INV-202611-000001',
+                    $generator->nextForBusiness($business->id, $period)
+                );
 
-        app(InvoiceNumberGenerator::class)->nextForBusiness($business->id);
+                throw new \\RuntimeException('Force sequence allocation rollback.');
+            });
+        } catch (\\RuntimeException $exception) {
+            $this->assertSame('Force sequence allocation rollback.', $exception->getMessage());
+        }
+
+        $next = DB::transaction(
+            fn (): string => $generator->nextForBusiness($business->id, $period)
+        );
+
+        $this->assertSame('INV-202611-000001', $next);
     }
 
     private function createInvoice(int $businessId, string $number, string $status = 'issued'): Invoice
