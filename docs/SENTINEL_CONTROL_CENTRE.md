@@ -28,18 +28,21 @@ The framework also has a critical resilience question: `SESSION_DRIVER` defaults
 
 ## First implemented control-centre increment — 2026-11-18
 
-The following first step is now in the application source on `main`:
+The current implementation on `main` includes:
 
-- `ZazuSentinelHealth` aggregates Sentinel self-health independently of business database queries.
-- `ZazuSentinelLedgerHealth` checks that the private diagnostics directory is readable, inspects the active and previous JSONL segments, counts valid/malformed records without exposing their contents, and performs a disposable write/read/delete probe.
-- The platform-admin Sentinel console displays these self-health results alongside the existing fingerprint/timeline view.
-- Business owners have a **Sentinel Rescue** entry in the System navigation. It opens a standalone signed URL at `/api/sentinel/rescue`, which uses the API middleware stack rather than the normal authenticated web/session stack.
-- The rescue page does not query the business database, start a database-backed session, read business records or expose incident contents. It is designed to remain reachable during a database/session failure while the local Zazu web process and application bootstrap remain operational.
-- The rescue URL is a bearer capability, valid for one year when issued. Keep it private. Anyone who receives the link can view this installation-level diagnostic health summary.
+- `ZazuSentinelHealth` and `ZazuSentinelLedgerHealth`: verify the private diagnostic directory, inspect active and previous JSONL ledgers, count valid and malformed records without exposing their content, and run a disposable write/read/delete probe.
+- `ZazuDatabaseHealth`: issue a read-only database probe, inspect migration history when the connection works, and report pending migration filenames without running migrations. Connection and migration-query failures are captured through the independent incident ledger.
+- `ZazuLocalEnvironmentHealth`: inspect private-storage read/write permissions and the presence/readability of the service worker, offline client, web manifest and compiled asset manifest. This does not certify phone cache or sync operation.
+- `ZazuSystemHealth`: aggregate the available checks using explicit status states.
+- The platform-admin Sentinel console now displays Sentinel's own evidence-store health and links DB-001 timeline entries directly to their redacted reference-specific report.
+- Business owners have a **System → Sentinel Rescue** entry. It opens a one-year signed route at `/api/sentinel/rescue`, outside the normal authenticated web/session stack. Treat the URL as a private bearer link; anyone holding it can read the installation-level health snapshot.
+- The rescue page displays the database driver and health result, migration state, storage and offline asset checks, and Sentinel ledger integrity. When a database operation throws, it attempts to record the safe DB-001 incident and provides the matching report link.
 
-**Current limitation:** the rescue page checks Sentinel's own evidence store only. It is not yet a complete system-health check and does not currently diagnose database connectivity/schema, storage, attachments, offline queue/sync or backup/recovery. A healthy Sentinel ledger must never be interpreted as proof that all of Zazu is healthy.
+The rescue route is proven by a feature test using an intentionally unavailable SQLite database path while the configured session driver is `database`. The route returned the page, reported DB-001, and retained the Sentinel evidence path. It still requires the local PHP/Laravel process and bootstrap to be running; it cannot diagnose a stopped PC host or a broken application bootstrap.
 
-Automated acceptance for the new owner link, session-independent route and health checks is pending exact-head CI. Do not claim physical device or packaged-installation acceptance from source-level tests.
+**Not implemented yet:** diagnostic ZIP/JSON bundle and manifest, a complete local failure knowledge base, attachment and offline queue/sync probes, session/cache diagnostics, backup integrity/recovery checks, and guided recovery. A healthy database probe is not proof of a healthy schema or business workflow. A present service-worker file is not proof that the physical phone has usable offline caches or can synchronize.
+
+Exact-source verification for application tests, PostgreSQL migration smoke, quality/security and PHPMD is recorded below in the engineering state. Offline-browser acceptance remained in progress at the time of this documentation update. Physical Android and packaged owner-operated rescue acceptance are still separate gates.
 
 ## The five control surfaces
 
