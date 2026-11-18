@@ -53,7 +53,7 @@
             </div>
             @if(($code ?? '') === 'DB-001' && \Illuminate\Support\Str::isUuid($requestId ?? ''))
                 <div class="zazu-error-actions">
-                    <a href="{{ url('/api/support/incidents/'.rawurlencode($requestId)) }}" class="zazu-btn zazu-btn-primary" download>
+                    <a href="{{ URL::temporarySignedRoute('support.incidents.show', now()->addMinutes(15), ['requestId' => $requestId]) }}" class="zazu-btn zazu-btn-primary" download>
                         Download safe diagnostic report
                     </a>
                 </div>
