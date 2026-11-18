@@ -30,7 +30,9 @@
             </form>
         @endif
         @if ($customerUrl)
-            @php($whatsAppUrl = 'https://wa.me/?text='.rawurlencode('Please review quote '.$quote->reference.' using this secure customer link: '.$customerUrl))
+            @php
+                $whatsAppUrl = 'https://wa.me/?text=' . rawurlencode('Please review quote '.$quote->reference.' using this secure customer link: '.$customerUrl);
+            @endphp
             <a href="{{ $customerUrl }}" target="_blank" rel="noopener noreferrer" class="zazu-btn zazu-btn-secondary print-hide">Customer view</a>
             <a href="{{ $whatsAppUrl }}" target="_blank" rel="noopener noreferrer" class="zazu-btn zazu-btn-secondary print-hide">Share via WhatsApp</a>
         @endif

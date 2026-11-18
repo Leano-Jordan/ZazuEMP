@@ -10,7 +10,9 @@
             <a href="{{ route('finance.payments.create', ['invoice_id' => $invoice->id]) }}" class="zazu-btn zazu-btn-primary print-hide">Record payment</a>
         @endif
         @if($customerUrl)
-            @php($whatsAppUrl = 'https://wa.me/?text='.rawurlencode('Please review invoice '.$invoice->number.' using this secure customer link: '.$customerUrl))
+            @php
+                $whatsAppUrl = 'https://wa.me/?text=' . rawurlencode('Please review invoice '.$invoice->number.' using this secure customer link: '.$customerUrl);
+            @endphp
             <a href="{{ $customerUrl }}" target="_blank" rel="noopener noreferrer" class="zazu-btn zazu-btn-secondary print-hide">Customer invoice view</a>
             <a href="{{ $whatsAppUrl }}" target="_blank" rel="noopener noreferrer" class="zazu-btn zazu-btn-secondary print-hide">Share via WhatsApp</a>
         @endif
@@ -117,7 +119,9 @@
                     <div class="zazu-list-side">
                         <div class="zazu-side-primary">{{ $invoice->currency }} {{ $payment->amount }}</div>
                         @if($payment->customer_receipt_url)
-                            @php($receiptShareUrl = 'https://wa.me/?text='.rawurlencode('Your payment receipt for invoice '.$invoice->number.' is ready: '.$payment->customer_receipt_url))
+                            @php
+                                $receiptShareUrl = 'https://wa.me/?text=' . rawurlencode('Your payment receipt for invoice '.$invoice->number.' is ready: '.$payment->customer_receipt_url);
+                            @endphp
                             <div class="zazu-list-meta print-hide">
                                 <a href="{{ $payment->customer_receipt_url }}" target="_blank" rel="noopener noreferrer">View receipt</a>
                                 · <a href="{{ $receiptShareUrl }}" target="_blank" rel="noopener noreferrer">Share receipt</a>
