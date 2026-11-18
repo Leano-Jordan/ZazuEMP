@@ -7,7 +7,9 @@ return [
     'platform_admin_email' => strtolower($platformAdminEmail),
     'licensing' => [
         // Ed25519 public key only (base64-encoded 32-byte key). Never configure a private key here.
-        'public_key' => env('ZAZU_LICENSE_PUBLIC_KEY', ''),\n        // External base64 Ed25519 secret-key file; never store key bytes in config or the project.\n        'private_key_file' => env('ZAZU_LICENSE_PRIVATE_KEY_FILE', ''),
+        'public_key' => env('ZAZU_LICENSE_PUBLIC_KEY', ''),
+        // External base64 Ed25519 secret-key file; never store key bytes in config or the project.
+        'private_key_file' => env('ZAZU_LICENSE_PRIVATE_KEY_FILE', ''),
         'trial_days' => 30,
     ],
     'landing_image_library' => [
