@@ -1,3 +1,16 @@
+## Sentinel local recovery implementation — 2026-11-18
+
+- Added `/api/sentinel/recovery` as a stateless, loopback-only host-operator recovery surface outside Laravel's web/session middleware.
+- The route explicitly excludes Laravel's database-backed `throttle:api` middleware; the recovery path therefore does not rely on the default database cache store.
+- Access requires a loopback peer address and loopback Host header. POST also requires same-origin Origin and rejects cross-site Fetch Metadata.
+- Added `zazu:sentinel-recovery-code`: creates a 256-bit random code, stores only SHA-256 hash plus five-minute expiry, invalidates prior codes, and displays the new code once.
+- The code is consumed atomically under a filesystem lock and cannot be replayed. It is entered in a local form, never placed in a URL.
+- The unlocked report reuses read-only `ZazuSystemHealth` checks. It contains installation health only and no customer records, attachment bytes, global incident ledger or founder console.
+- Added feature coverage for unauthenticated local screen access, LAN denial, cross-origin POST denial and one-use report access.
+- Updated Sentinel, DB-001 and Windows package documentation.
+- **Acceptance remains pending:** GitHub Actions must pass; verify the command, route, file permissions and database/session-outage behaviour on the packaged Windows installation. This path cannot diagnose a stopped host, PHP process or broken Laravel bootstrap.
+- All changes committed directly to `main`; no branches created.
+
 ## Sentinel access isolation correction — 2026-11-18
 
 - Removed the one-year signed bearer URL from `/api/sentinel/rescue`; unauthenticated requests can no longer reach Sentinel Rescue.
