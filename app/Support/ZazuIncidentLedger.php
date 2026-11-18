@@ -63,6 +63,8 @@ final class ZazuIncidentLedger
                 throw new \RuntimeException('Unable to open the incident ledger lock.');
             }
 
+            @chmod($lockPath, 0600);
+
             try {
                 self::appendWhileLocked($lock, $ledger, $safe);
             } finally {
@@ -79,6 +81,10 @@ final class ZazuIncidentLedger
         if (!is_dir($directory) && !mkdir($directory, 0700, true) && !is_dir($directory)) {
             throw new \RuntimeException('Unable to create the private incident ledger directory.');
         }
+
+        // The directory can pre-exist from an older installation with broader
+        // permissions. Re-apply the private mode on every write (best effort on Windows).
+        @chmod($directory, 0700);
     }
 
     /**
@@ -98,6 +104,9 @@ final class ZazuIncidentLedger
             if ($written === false || $written !== strlen($line)) {
                 throw new \RuntimeException('The incident ledger write was incomplete.');
             }
+
+            // Existing ledger files may predate the private-directory hardening.
+            @chmod($ledger, 0600);
         } finally {
             flock($lock, LOCK_UN);
         }
