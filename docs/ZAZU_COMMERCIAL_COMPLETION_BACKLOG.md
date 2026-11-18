@@ -20,7 +20,7 @@ DB-001 remains the active release blocker: repeated database read/write failures
 - [x] Quote and invoice pages provide WhatsApp message handoff to the corresponding customer view.
 - [x] Invoice customer sharing uses a signed, read-only link with a seven-day expiry; void/draft invoices are not shareable.
 - [ ] Direct PDF-file generation and attachment sharing (rather than a customer link) remains open.
-- [ ] Add customer-ready receipts and extend PDF output to receipts.
+- [x] Invoice-linked payments have signed, read-only receipt pages with WhatsApp handoff and browser Print / Save as PDF.
 - [ ] Verify desktop/Android handoff, including WhatsApp missing, offline use, cancellation and expiry behaviour.
 - [ ] Keep private business documents access-controlled; do not expose permanent public file URLs.
 
@@ -75,4 +75,4 @@ DB-001 remains the active release blocker: repeated database read/write failures
 
 ## COM-01 implementation checkpoint — 2026-11-18
 
-The first customer-document handoff increment adds browser print-to-PDF on the signed public quote page, WhatsApp handoff from the quote detail, and a seven-day signed read-only invoice customer view with WhatsApp handoff. This is not a generated PDF attachment workflow: the browser creates the PDF when the user chooses Print / Save as PDF, while WhatsApp currently sends the expiring customer link. Direct PDF file generation/attachment, receipts and physical desktop/Android acceptance remain open. DB-001 remains a separate release blocker.
+The first customer-document handoff increment adds browser print-to-PDF on the signed public quote page, WhatsApp handoff from the quote detail, and a seven-day signed read-only invoice customer view with WhatsApp handoff. This is not a generated PDF attachment workflow: the browser creates the PDF when the user chooses Print / Save as PDF, while WhatsApp sends the expiring customer link. Invoice-linked payment receipts now have the same signed view, print and WhatsApp handoff. Direct PDF file generation/attachment and physical desktop/Android acceptance remain open. DB-001 remains a separate release blocker.

@@ -3,6 +3,7 @@
 namespace Tests\Feature;
 
 use App\Models\Invoice;
+use App\Models\Payment;
 use App\Support\CurrentBusiness;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\URL;
@@ -69,6 +70,50 @@ class InvoiceCustomerShareTest extends TestCase
             ['invoice' => $voidInvoice]
         );
         $this->get($voidUrl)->assertNotFound();
+    }
+
+
+    public function test_invoice_payment_has_a_signed_customer_receipt_and_whatsapp_handoff(): void
+    {
+        $invoice = $this->makeInvoice('issued');
+
+        $payment = Payment::create([
+            'business_id' => $invoice->business_id,
+            'invoice_id' => $invoice->id,
+            'type' => 'deposit',
+            'idempotency_key' => (string) Str::uuid(),
+            'amount' => '250.00',
+            'currency' => 'ZAR',
+            'method' => 'cash',
+            'reference' => 'CASH-REF-001',
+            'paid_at' => now()->toDateString(),
+            'notes' => 'Private payment note',
+        ]);
+
+        $ownerView = $this->get(route('finance.invoices.show', $invoice));
+        $ownerView->assertOk()
+            ->assertSee('View receipt')
+            ->assertSee('Share receipt')
+            ->assertSee('https://wa.me/?text=', false);
+
+        $receiptUrl = URL::temporarySignedRoute(
+            'finance.payments.receipt',
+            now()->addHour(),
+            ['payment' => $payment]
+        );
+
+        $receipt = $this->get($receiptUrl);
+        $receipt->assertOk()
+            ->assertSee('Payment receipt')
+            ->assertSee('INV-CUSTOMER-SHARE-001')
+            ->assertSee('Public Invoice Customer')
+            ->assertSee('Deposit received')
+            ->assertSee('ZAR 250.00')
+            ->assertSee('CASH-REF-001')
+            ->assertSee('Print / Save as PDF')
+            ->assertHeader('Cache-Control', 'private, no-store, no-cache, must-revalidate')
+            ->assertHeader('Referrer-Policy', 'no-referrer')
+            ->assertDontSee('Private payment note');
     }
 
     private function makeInvoice(string $status, string $number = 'INV-CUSTOMER-SHARE-001'): Invoice

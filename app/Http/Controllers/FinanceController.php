@@ -378,6 +378,13 @@ class FinanceController extends Controller
 
         abort_unless((int) $invoice->business_id === $businessId, 404);
 
+        foreach ($invoice->payments as $payment) {
+            $payment->setAttribute(
+                'customer_receipt_url',
+                URL::temporarySignedRoute('finance.payments.receipt', now()->addDays(7), ['payment' => $payment])
+            );
+        }
+
         $customerUrl = in_array($invoice->status, ['issued', 'paid'], true)
             ? URL::temporarySignedRoute('finance.invoices.public', now()->addDays(7), ['invoice' => $invoice])
             : null;

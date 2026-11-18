@@ -114,5 +114,6 @@ The owner-installation entry matching `aa9080f4-9580-41c9-a643-439b31928ffa` rem
 - [x] Signed customer quote view supports browser Print / Save as PDF.
 - [x] Quote detail provides WhatsApp handoff to the signed customer view.
 - [x] Issued/paid invoice detail provides WhatsApp handoff to a seven-day signed read-only invoice view; the view supports browser Print / Save as PDF.
-- [ ] Direct generated PDF-file attachment, receipts, and desktop/Android practical acceptance remain open.
+- [x] Invoice-linked payment receipts have a signed, read-only customer view with WhatsApp handoff and browser Print / Save as PDF.
+- [ ] Direct generated PDF-file attachment and desktop/Android practical acceptance remain open.
 - DB-001 remains OPEN; this commercial increment does not change the V1 release disposition.

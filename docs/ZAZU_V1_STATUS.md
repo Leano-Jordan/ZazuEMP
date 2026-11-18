@@ -530,4 +530,4 @@ Backup compatibility coverage was extended after the initial integrity note: the
 
 ## Commercial document sharing checkpoint — 2026-11-18
 
-COM-01 is PARTIAL on `main`: signed public quote pages now support browser Print / Save as PDF; quote details hand off to the signed customer view through WhatsApp; issued/paid invoices have a seven-day signed, read-only customer view with WhatsApp handoff and browser Print / Save as PDF. This is not direct PDF-file attachment generation. Customer-ready receipts and desktop/Android practical acceptance remain open. DB-001 remains OPEN and the V1 release remains NOT READY.
+COM-01 is PARTIAL on `main`: signed public quote pages now support browser Print / Save as PDF; quote details hand off to the signed customer view through WhatsApp; issued/paid invoices have a seven-day signed, read-only customer view with WhatsApp handoff and browser Print / Save as PDF. This is not direct PDF-file attachment generation. Invoice-linked receipts now have the same signed print/share path. Desktop/Android practical acceptance remains open. DB-001 remains OPEN and the V1 release remains NOT READY.

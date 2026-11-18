@@ -114,7 +114,16 @@
                         <div class="zazu-list-title">{{ ucfirst($payment->type) }} · {{ ucfirst(str_replace('_', ' ', $payment->method)) }}</div>
                         <div class="zazu-list-meta">{{ $payment->paid_at?->format('d M Y') ?: 'Date not set' }} · {{ $payment->reference ?: 'No reference' }}</div>
                     </div>
-                    <div class="zazu-list-side"><div class="zazu-side-primary">{{ $invoice->currency }} {{ $payment->amount }}</div></div>
+                    <div class="zazu-list-side">
+                        <div class="zazu-side-primary">{{ $invoice->currency }} {{ $payment->amount }}</div>
+                        @if($payment->customer_receipt_url)
+                            @php($receiptShareUrl = 'https://wa.me/?text='.rawurlencode('Your payment receipt for invoice '.$invoice->number.' is ready: '.$payment->customer_receipt_url))
+                            <div class="zazu-list-meta print-hide">
+                                <a href="{{ $payment->customer_receipt_url }}" target="_blank" rel="noopener noreferrer">View receipt</a>
+                                · <a href="{{ $receiptShareUrl }}" target="_blank" rel="noopener noreferrer">Share receipt</a>
+                            </div>
+                        @endif
+                    </div>
                 </div>
             @empty
                 <div class="zazu-empty">No payments recorded yet.</div>
