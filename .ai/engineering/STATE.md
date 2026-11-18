@@ -299,3 +299,6 @@ V1: NOT READY. Historical state/register/memory, checklist and changelog are pre
 - Application hardening verification on `61dbd19`: Laravel, PostgreSQL migration smoke, offline-browser acceptance, PHPMD and Zazu quality/security scans **PASS**. The POSIX permission regression test is included in that Laravel run.
 - Documentation updated in `docs/V1_PACKAGE_INSTALLATION.md` and `docs/SENTINEL_CONTROL_CENTRE.md`. Current `main` documentation head is `707dcb0`; its quality and Director Contract Lint checks are running.
 - Do not claim NTFS ACL acceptance until the exact `d39396f` or later Windows package workflow completes successfully. Physical-device acceptance remains separate. No branches created; V1 remains NOT READY.
+
+- Exact Windows package workflow `44380197892` on commit `ceb6c8c`: package build **PASS**; Windows PowerShell fresh install **PASS**, including the new real-ledger NTFS ACL assertions for the private root, diagnostics directory, lock and JSONL file. The ACL test confirmed only the installer account, Local System and local Administrators are allowed, with diagnostic children inheriting the protected ACL.
+- Latest main state/documentation commit `e278d9c`: Zazu quality, Director Contract Lint and Director Health Report **PASS**. No code changes after the Windows ACL-verified package commit; only documentation/state updates.
