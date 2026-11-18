@@ -2,21 +2,22 @@
 
 ## Purpose
 
-Zazu distinguishes expected user-facing failures from unexpected application incidents while keeping technical diagnostics out of the operator interface.
+Zazu distinguishes expected user-facing failures from unexpected application incidents while keeping sensitive technical diagnostics out of ordinary operator messages.
 
 The request UUID is a correlation/reference identifier. It is not the diagnostic explanation.
 
+Sentinel is the local operations and diagnostic control centre built on this incident framework. Its product contract and delivery gates are defined in [Sentinel — Local Operations & Diagnostic Control Centre](SENTINEL_CONTROL_CENTRE.md).
+
 ## Error contract
 
-Every classified failure has:
+Every classified failure should provide:
 
 - Error code, category, severity and HTTP status;
 - safe user-facing headline and message;
 - exception class and source file/line when a throwable is available;
-- originating route action, route name, HTTP method and path when available;
-- request ID and timestamp.
-
-The production incident logger deliberately does **not** persist raw exception messages, SQL statements, bindings or stack traces. Those values can contain customer data, personal information or credentials. Do not describe the redacted incident log as containing them.
+- originating route action, route name and HTTP method when available;
+- request ID and timestamp;
+- bounded diagnostics relevant to the failure domain, where available.
 
 Core code families:
 
@@ -36,35 +37,45 @@ Core code families:
 
 Additional transport/status mappings are defined for session expiry, method-not-allowed and rate limiting.
 
+## Privacy boundary
+
+The production incident ledger deliberately excludes raw exception messages, SQL statements, bindings, stack traces, customer/business records, connection hosts, database names and credentials. These may contain personal information, customer data or secrets.
+
+For database exceptions, current capture includes bounded fields where available: configured connection name, database driver, SQLSTATE, numeric driver code, operation type and classified failure family.
+
+The reference can correlate an incident with this metadata, but it does not necessarily identify the failed query or schema object. Sentinel must report that limitation plainly and collect additional safe evidence through controlled read-only checks. Never weaken redaction merely to make an individual incident easier to debug.
+
 ## User versus diagnostic surface
 
-User-facing pages expose a named code and safe explanation, for example:
+Ordinary error pages should explain the impact in plain language, show the error code and preserve the request reference. They must not expose internal infrastructure details or secrets.
 
-**We could not open or save your information.**  
-**DB-001**  
-Please try again. If the problem continues, share this reference number with support.
+Sentinel translates the safe technical record into:
+- the affected subsystem and current health;
+- recurring fingerprints and an occurrence timeline;
+- evidence-backed likely causes with an explicit confidence level;
+- affected capabilities and safe next actions;
+- a locally generated diagnostic package the owner can inspect and deliberately share.
 
-Reference number: request ID
-
-The authoritative application incident log records the request ID, error classification, exception class, source file/line, route/action, method/path and timestamp. Request middleware also adds the request ID to the log context and response header. For database exceptions, the logger additionally records bounded diagnostic fields when available: configured connection name, database driver, five-character SQLSTATE, numeric driver error code and read/write operation type.
-
-The incident logger intentionally omits exception messages, SQL, bindings, stack traces, connection hosts, database names and credentials. The reference ID can now correlate a database incident with the SQLSTATE and driver code when the database supplies them, but it still does not identify the failed query or schema object. If those fields are insufficient, obtain deeper evidence through a controlled local reproduction or a separately approved, access-restricted diagnostic process. Never add raw customer data, credentials, SQL bindings or stack traces to routine production logs.
-
-Never expose technical diagnostics, environment secrets or internal infrastructure details to the user.
+A fingerprint is a recurrence/correlation aid, not proof of root cause. Missing evidence must be labelled unknown or not checked, never reported as healthy.
 
 ## Handling rules
 
 - Validation remains a normal correction workflow rather than a generic 500.
 - Authentication and authorization failures retain their meaningful HTTP behaviour.
-- Not-found, conflict, API, storage and server failures receive distinct classifications.
+- Not-found, conflict, API, storage, database and server failures receive distinct classifications.
 - Unexpected exceptions fall back to APP-001.
 - Response-only 5xx failures are classified even when no throwable is available.
-- Error rendering is asset-independent so a broken frontend build does not remove the basic diagnostic surface.
+- Error rendering should remain asset-independent so a broken frontend build does not remove the basic diagnostic surface.
 - Incident logging must never become the reason the original request fails.
-- Keep incident records privacy-minimised; do not weaken redaction to make an individual incident easier to debug.
+- Incident capture must remain independent of the business database and primary log channel.
+- Diagnostic health checks are read-only by default. Any repair that changes data or installation state requires explicit owner confirmation and verified recovery safeguards.
+- The diagnostic entry point must not depend invisibly on the same database/session service it is diagnosing.
+- All owner-facing diagnostics must respect business/installation isolation. Platform-wide incident access remains platform-admin-only.
 
-## Future extension
+## Existing implementation
 
-This foundation intentionally does not add an incident database table or admin dashboard yet.
+The repository currently contains an independent private incident ledger, versioned failure fingerprints, recurrence summaries, a platform-admin console at `/admin/sentinel`, a reference-scoped redacted DB-001 report endpoint, and Windows read-only inspection tooling.
 
-The next useful layer, after repeated operational evidence, is a searchable owner/admin incident view filtered by error code, date, route, severity and reference ID, preserving the same redaction boundary.
+The platform-admin console is not yet the owner-facing control centre defined by Sentinel's product contract. The existing global ledger must not be opened to business owners until ownership/installation scoping is implemented and tested. The current default database-backed session configuration must also be addressed in the resilience design before claiming that Sentinel remains accessible during database failure.
+
+See [Sentinel — Local Operations & Diagnostic Control Centre](SENTINEL_CONTROL_CENTRE.md) for the staged build plan and definition of done.
