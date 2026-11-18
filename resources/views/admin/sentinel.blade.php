@@ -131,7 +131,7 @@
                                     <select name="plan" required>
                                         <option value="basic" @selected(($business->license?->plan ?? 'basic') === 'basic')>Basic</option>
                                         <option value="intermediate" @selected(($business->license?->plan ?? '') === 'intermediate')>Intermediate</option>
-                                        <option value="advanced" @selected(in_array($business->license?->plan, ['advanced', 'solo'], true) || !$business->license)>Advanced</option>
+                                        <option value="advanced" @selected(in_array($business->license?->plan, ['advanced', 'solo'], true))>Advanced</option>
                                     </select>
                                 </label>
                                 <label>Expires at
