@@ -181,6 +181,12 @@ class IncidentDiagnosticDownloadTest extends TestCase
             $this->assertSame('895e2c23-bc6b-4919-a891-1e8e5c1e27e4', $summary[0]['latest_reference']);
             $this->assertArrayNotHasKey('sql', $summary[0]);
             $this->assertStringNotContainsString('private SQL', json_encode($summary, JSON_THROW_ON_ERROR));
+
+            $timeline = app(\\App\\Support\\ZazuIncidentSummary::class)->timeline($fingerprint);
+            $this->assertCount(2, $timeline);
+            $this->assertSame('895e2c23-bc6b-4919-a891-1e8e5c1e27e4', $timeline[0]['request_id']);
+            $this->assertArrayNotHasKey('sql', $timeline[0]);
+            $this->assertStringNotContainsString('private SQL', json_encode($timeline, JSON_THROW_ON_ERROR));
         } finally {
             File::deleteDirectory($directory);
         }
