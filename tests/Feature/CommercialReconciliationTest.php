@@ -239,6 +239,7 @@ class CommercialReconciliationTest extends TestCase
 
         $invoice = Invoice::query()->where('quote_id', $quote->id)->firstOrFail();
 
+        $this->assertMatchesRegularExpression('/^INV-'.now()->format('Ym').'-[0-9]{6,}$/', $invoice->number);
         $this->assertSame('10000.00', (string) $invoice->subtotal);
         $this->assertSame('1500.00', (string) $invoice->tax_total);
         $this->assertSame('11500.00', (string) $invoice->total);

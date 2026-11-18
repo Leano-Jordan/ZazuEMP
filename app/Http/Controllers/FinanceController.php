@@ -13,6 +13,7 @@ use App\Models\TaxRate;
 use App\Support\Audit;
 use App\Support\CurrentBusiness;
 use App\Services\EventLifecycleService;
+use App\Services\InvoiceNumberGenerator;
 use App\Support\Money;
 use App\Services\FinanceTransactionService;
 use App\Services\InvoiceIdempotencyMatcher;
@@ -315,7 +316,7 @@ class FinanceController extends Controller
                 'event_id' => $lockedEvent?->id ?? $event?->id,
                 'quote_id' => $data['quote_id'] ?? null,
                 'quote_version_id' => $quoteVersionId,
-                'number' => 'INV-'.now()->format('Ym').'-'.Str::upper(Str::random(6)),
+                'number' => app(InvoiceNumberGenerator::class)->nextForBusiness($businessId),
                 'business_legal_name' => $business->taxProfile?->legal_name ?: $business->name,
                 'business_trading_name' => $business->taxProfile?->trading_name ?: $business->name,
                 'business_address' => $business->address,

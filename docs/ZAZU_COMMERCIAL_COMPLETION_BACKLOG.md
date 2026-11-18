@@ -43,10 +43,11 @@ DB-001 remains the active release blocker: repeated database read/write failures
 - [ ] Publish customer-facing privacy and terms pages after appropriate legal review.
 - [ ] Close operational POPIA requirements: responsible ownership/contact channels, Information Officer status, data-subject request handling, retention/disposal, operator arrangements and incident escalation.
 - [ ] Verify applicable PAIA and other legal-document obligations with qualified South African advice.
-- [ ] Implement consecutive, collision-safe invoice numbering with transaction-safe allocation.
-- [ ] Define numbering scope (at minimum business/issuer and financial document type), uniqueness, concurrency behaviour and treatment of voided documents.
+- [x] Implement consecutive, collision-safe invoice numbering using the existing `INV-YYYYMM-` prefix, scoped per business and calendar month.
+- [x] Serialize allocation with the business transaction lock and a durable per-business/month sequence; voided numbers remain consumed and existing numeric numbers seed the first sequence allocation.
 - [ ] Verify invoice and tax-invoice presentation against the customer's actual VAT/tax status and applicable SARS requirements.
-- [ ] Test concurrent invoice creation, rollback, retries, imports/restores and numbering continuity. Never silently reuse an issued number.
+- [x] Test sequence continuation, tenant/month isolation, legacy-number coexistence, transaction rollback and idempotent invoice retries. Imports/restores retain the sequence table; older imports seed from existing numeric invoice numbers.
+- [ ] Legal review of the numbering scheme and invoice/tax-invoice presentation remains open.
 
 ### COM-05 — Customer support path
 - [ ] Provide a clear in-app support route and published support contact channel.
