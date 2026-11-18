@@ -58,9 +58,12 @@ class InvoiceNumberGeneratorTest extends TestCase
         $businessNovember = DB::transaction(
             fn (): string => $generator->nextForBusiness($business->id, $november)
         );
+        $this->signInAsOwner($otherBusiness);
         $otherBusinessNovember = DB::transaction(
             fn (): string => $generator->nextForBusiness($otherBusiness->id, $november)
         );
+
+        $this->actingAs($user);
         $businessDecember = DB::transaction(
             fn (): string => $generator->nextForBusiness($business->id, $december)
         );
