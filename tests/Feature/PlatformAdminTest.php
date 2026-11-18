@@ -75,7 +75,7 @@ class PlatformAdminTest extends TestCase
     {
         $this->get(route('admin.sentinel'))->assertRedirect(route('login'));
 
-        $user = \\App\\Models\\User::factory()->create(['email' => 'owner@zazu.test']);
+        $user = \App\Models\User::factory()->create(['email' => 'owner@zazu.test']);
         Config::set('zazu.platform_admin_emails', ['admin@zazu.test']);
 
         $this->actingAs($user)
@@ -85,7 +85,7 @@ class PlatformAdminTest extends TestCase
 
     public function test_platform_admin_can_search_sentinel_and_open_safe_timeline(): void
     {
-        $admin = \\App\\Models\\User::factory()->create(['email' => 'admin@zazu.test']);
+        $admin = \App\Models\User::factory()->create(['email' => 'admin@zazu.test']);
         Config::set('zazu.platform_admin_emails', ['admin@zazu.test']);
 
         $directory = storage_path('app/private/zazu-diagnostics');
@@ -99,7 +99,7 @@ class PlatformAdminTest extends TestCase
                 'failure_fingerprint' => $fingerprint,
                 'error_code' => 'DB-001',
                 'database_failure_class' => 'sqlite_missing_column',
-                'exception_class' => 'Illuminate\\\\Database\\\\QueryException',
+                'exception_class' => 'Illuminate\\Database\\QueryException',
                 'source_file' => 'DashboardController.php',
                 'timestamp' => '2026-11-18T10:00:00+02:00',
                 'sql' => 'private SQL must not appear',
@@ -109,7 +109,7 @@ class PlatformAdminTest extends TestCase
                 'failure_fingerprint' => $fingerprint,
                 'error_code' => 'DB-001',
                 'database_failure_class' => 'sqlite_missing_column',
-                'exception_class' => 'Illuminate\\\\Database\\\\QueryException',
+                'exception_class' => 'Illuminate\\Database\\QueryException',
                 'source_file' => 'DashboardController.php',
                 'timestamp' => '2026-11-18T11:00:00+02:00',
             ],
