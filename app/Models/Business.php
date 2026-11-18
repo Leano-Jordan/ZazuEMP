@@ -7,10 +7,20 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
+use Illuminate\Support\Str;
 
 class Business extends Model
 {
     use HasFactory;
+
+    protected static function booted(): void
+    {
+        static::creating(function (Business $business): void {
+            if (! filled($business->licensing_uuid)) {
+                $business->licensing_uuid = (string) Str::uuid();
+            }
+        });
+    }
 
     protected function casts(): array
     {
