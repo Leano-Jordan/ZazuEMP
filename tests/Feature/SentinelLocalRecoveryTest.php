@@ -46,6 +46,16 @@ class SentinelLocalRecoveryTest extends TestCase
             ->assertForbidden();
     }
 
+    public function test_local_recovery_rejects_same_host_on_a_different_port(): void
+    {
+        $this->withHeaders([
+            'Origin' => 'http://localhost:5173',
+            'Sec-Fetch-Site' => 'same-site',
+            'Content-Type' => 'application/x-www-form-urlencoded',
+        ])->post('/api/sentinel/recovery', ['code' => str_repeat('a', 64)])
+            ->assertForbidden();
+    }
+
     public function test_local_recovery_code_runs_health_check_once_without_login(): void
     {
         $recovery = app(ZazuLocalSentinelRecovery::class);
