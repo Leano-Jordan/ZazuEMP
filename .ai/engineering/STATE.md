@@ -238,3 +238,13 @@ V1: NOT READY. Historical state/register/memory, checklist and changelog are pre
 - Controls are progressively enhanced: the filter toolbar remains hidden until its script initialises; without JavaScript the complete diagnostic report remains visible.
 - No new server write endpoints, external requests, business-record access, or telemetry were introduced. Recheck reruns the existing GET health inspection.
 - Automated verification is pending for the current main head; visual acceptance remains with the owner on the installed application.
+
+
+## Sentinel Rescue actionable diagnostics — 2026-11-18
+
+- Failed and attention checks now show a contextual **Recommended next step** panel based on the stable diagnostic key.
+- Guidance covers database connectivity, migration state, private storage, installed-app assets, the private diagnostics directory, incident-ledger integrity and the temporary write/read probe.
+- Existing DB-001 safe incident report remains the only linked diagnostic action. No automatic repair, migration, file deletion or business-data mutation was added.
+- Updated the page copy to distinguish read-only database checks from the existing temporary diagnostics-file write/read probe, which attempts cleanup after each check.
+- Added a focused Blade-render regression test for safe incident-ledger guidance and updated Sentinel documentation.
+- Verification is pending for the new commits. Visual acceptance remains pending on the owner's installation. All commits are directly on `main`; no branches created.
