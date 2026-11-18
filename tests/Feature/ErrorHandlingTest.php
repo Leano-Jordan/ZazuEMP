@@ -210,7 +210,7 @@ class ErrorHandlingTest extends TestCase
             });
 
         try {
-            $exception = new \\PDOException('SQLSTATE[HY000]: database is locked '.$privateMarker);
+            $exception = new \PDOException('SQLSTATE[HY000]: database is locked '.$privateMarker);
             $exception->errorInfo = ['HY000', 5, $privateMarker];
 
             ZazuIncidentRecorder::record($exception);
