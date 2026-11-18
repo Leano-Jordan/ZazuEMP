@@ -35,10 +35,10 @@ The current implementation on `main` includes:
 - `ZazuLocalEnvironmentHealth`: inspect private-storage read/write permissions and the presence/readability of the service worker, offline client, web manifest and compiled asset manifest. This does not certify phone cache or sync operation.
 - `ZazuSystemHealth`: aggregate the available checks using explicit status states.
 - The platform-admin Sentinel console now displays Sentinel's own evidence-store health and links DB-001 timeline entries directly to their redacted reference-specific report.
-- Business owners have a **System → Sentinel Rescue** entry. It opens a one-year signed route at `/api/sentinel/rescue`, outside the normal authenticated web/session stack. Treat the URL as a private bearer link; anyone holding it can read the installation-level health snapshot.
+- Business owners have a **System → Sentinel Rescue** entry at `/sentinel/rescue`. It requires the authenticated session, active business context and owner role on every request. It is not a signed/bearer URL.
 - The rescue page displays the database driver and health result, migration state, storage and offline asset checks, and Sentinel ledger integrity. When a database operation throws, it attempts to record the safe DB-001 incident and provides the matching report link.
 
-The rescue route is proven by a feature test using an intentionally unavailable SQLite database path while the configured session driver is `database`. The route returned the page, reported DB-001, and retained the Sentinel evidence path. It still requires the local PHP/Laravel process and bootstrap to be running; it cannot diagnose a stopped PC host or a broken application bootstrap.
+The earlier bearer-link implementation was removed because possession of a one-year signed URL allowed unauthenticated access. The current owner route is protected by `auth`, `auth.session`, `business.context` and `owner`. This restores the explicit access boundary but means the route relies on the normal user/session authentication path; when the business database or database-backed session store is unavailable, access may fail before health checks run. A separate authenticated local recovery-session design is still required before Sentinel can claim secure diagnosis of database/session outages. The route also requires the local PHP/Laravel process and bootstrap to be running.
 
 **Not implemented yet:** diagnostic ZIP/JSON bundle and manifest, a complete local failure knowledge base, attachment and offline queue/sync probes, session/cache diagnostics, backup integrity/recovery checks, and guided recovery. A healthy database probe is not proof of a healthy schema or business workflow. A present service-worker file is not proof that the physical phone has usable offline caches or can synchronize.
 
@@ -170,7 +170,7 @@ Sentinel is not production-ready until all of the following are proven:
 - It produces a useful, safe diagnostic package without internet or manual commands.
 - Its output excludes secrets and business/customer data and respects business isolation.
 - A failed diagnostic subsystem is itself visible.
-- The local entry point survives the failure modes it claims to diagnose, including the configured session dependency.
+- The authenticated local entry point survives the failure modes it claims to diagnose, including the configured session dependency, without using a transferable bearer URL.
 - Known recovery steps are safe, tested and explicit about when human intervention is required.
 - DB-001 is demonstrated end-to-end on the intended installation: capture, explanation, package, targeted correction and successful repeat.
 
