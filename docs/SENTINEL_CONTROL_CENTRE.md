@@ -198,3 +198,8 @@ Sentinel is not production-ready until all of the following are proven:
 ## Owner dashboard interaction
 
 Sentinel Rescue is a non-destructive owner diagnostic surface. The owner can filter checks by status, search diagnostic labels/messages, expand or collapse available detail sections, and re-run the health inspection with **Recheck**. Failed and attention findings now include key-specific safe next steps. DB-001 findings with a valid reference link to the existing redacted incident report; no new repair or mutation endpoint is exposed. Database probes remain read-only; the existing diagnostics write/read probe creates and removes a uniquely named temporary file. No business records are changed and no external service is contacted.
+
+
+## Local recovery code maintainability
+
+The local recovery middleware separates loopback, same-origin POST and fetch-metadata checks into small private guards. The one-time challenge service separates code format validation, locked challenge reading, expiry/hash validation and invalidation. These are structural refactors only: the local-only boundary, form content-type requirement, origin scheme/host/port match, optional same-origin Fetch Metadata check, 256-bit random code, SHA-256 stored hash, five-minute expiry, lock-protected single use and failure invalidation remain in place. Feature coverage includes cross-origin rejection, port mismatch, one-time use, expiry and malformed challenge data.
