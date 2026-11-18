@@ -105,6 +105,17 @@ class PlatformAdminTest extends TestCase
             ->assertSee('Sentinel Control Centre');
     }
 
+    public function test_legacy_admin_list_does_not_grant_founder_access(): void
+    {
+        $user = \\App\\Models\\User::factory()->create(['email' => 'admin@zazu.test']);
+        Config::set('zazu.platform_admin_email', '');
+        Config::set('zazu.platform_admin_emails', ['admin@zazu.test']);
+
+        $this->actingAs($user)
+            ->get(route('admin.sentinel'))
+            ->assertForbidden();
+    }
+
     public function test_platform_admin_can_search_sentinel_and_open_safe_timeline(): void
     {
         $admin = \App\Models\User::factory()->create(['email' => 'admin@zazu.test']);
