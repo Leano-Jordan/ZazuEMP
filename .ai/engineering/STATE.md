@@ -289,3 +289,13 @@ V1: NOT READY. Historical state/register/memory, checklist and changelog are pre
 - Added a POSIX feature test that verifies the diagnostics directory is `0700` and the incident lock/ledger files are `0600`; the test explicitly skips on Windows because NTFS ACLs, not POSIX mode bits, determine effective access there. Commit `d1923af`; exact-head CI pending.
 
 - PHPMD caught a malformed fully-qualified exception name in the new permission regression test (`\\RuntimeException`); corrected to `\RuntimeException` in `61dbd19`. This was test syntax only, not a production-code finding. Fresh PHPMD/Laravel runs are required before considering the permission test verified.
+
+
+## Windows private-storage ACL hardening — 2026-11-18
+
+- Windows installer `ops/windows/Install-Zazu.ps1` now removes inherited parent permissions from `storage/app/private` and normalises existing descendants to allow Full Control only for the installing Windows account, Local System and local Administrators. It refuses reparse points in this private tree.
+- The Windows package workflow now boots the installed app, writes a real redacted incident-ledger probe, and verifies the private root, diagnostics directory, lock and JSONL file contain only the allowed SIDs; child entries must inherit the restricted ACL.
+- Windows Ops Scripts validation on `409056b`: **PASS**. Windows package build and fresh-install smoke on `409056b`: **PASS** (before the new explicit ACL assertions). The exact workflow with ACL assertions on `d39396f` is still running; a subsequent package workflow on `ceb6c8c` is also running.
+- Application hardening verification on `61dbd19`: Laravel, PostgreSQL migration smoke, offline-browser acceptance, PHPMD and Zazu quality/security scans **PASS**. The POSIX permission regression test is included in that Laravel run.
+- Documentation updated in `docs/V1_PACKAGE_INSTALLATION.md` and `docs/SENTINEL_CONTROL_CENTRE.md`. Current `main` documentation head is `707dcb0`; its quality and Director Contract Lint checks are running.
+- Do not claim NTFS ACL acceptance until the exact `d39396f` or later Windows package workflow completes successfully. Physical-device acceptance remains separate. No branches created; V1 remains NOT READY.
