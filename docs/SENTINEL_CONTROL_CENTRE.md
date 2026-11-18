@@ -50,7 +50,7 @@ To unlock one read-only installation health report, an operator physically using
 php artisan zazu:sentinel-recovery-code
 ```
 
-The command generates a cryptographically random 256-bit code, stores only its SHA-256 hash in a private local framework file, and displays the code once. It expires after five minutes, is consumed atomically on successful use, and cannot be replayed. Generating a replacement invalidates the previous code. The code is entered into the local recovery page; it is never placed in a URL, sent over the network to a third party, or stored in a browser session.
+The command generates a cryptographically random 256-bit code, stores only its SHA-256 hash in a private local framework file, and displays the code once. It expires after five minutes, is consumed atomically on successful use, and cannot be replayed. Generating a replacement invalidates the previous code. The code is entered into the local recovery page; it is never placed in a URL, sent over the network to a third party, or stored in a browser session. The POST guard requires the exact `application/x-www-form-urlencoded` media type (optional parameters such as a charset are allowed), a loopback peer/host, matching origin scheme/host/port and, when supplied, same-origin Fetch Metadata.
 
 The recovery report runs the existing read-only `ZazuSystemHealth` checks. It reports installation health only and does not expose customer/business records, private attachment contents, the global incident ledger, or the founder Control Centre. It is not a remote/mobile rescue path and cannot help if PHP, Laravel bootstrap, the local web process or the host PC itself is unavailable.
 
