@@ -129,6 +129,8 @@ class ErrorHandlingTest extends TestCase
 
         $this->assertSame(500, $response->getStatusCode());
         $this->assertStringContainsString('/api/support/incidents/'.$requestId, (string) $response->getContent());
+        $this->assertStringContainsString('signature=', (string) $response->getContent());
+        $this->assertStringContainsString('expires=', (string) $response->getContent());
         $this->assertStringContainsString('Download safe diagnostic report', (string) $response->getContent());
         $this->assertStringNotContainsString('private database detail', (string) $response->getContent());
     }
