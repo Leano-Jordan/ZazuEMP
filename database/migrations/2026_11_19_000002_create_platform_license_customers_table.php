@@ -13,7 +13,6 @@ return new class extends Migration
             $table->uuid('business_uuid')->unique();
             $table->string('business_name');
             $table->string('contact_email')->nullable();
-            $table->text('notes')->nullable();
             $table->foreignId('created_by')->nullable()->constrained('users')->nullOnDelete();
             $table->uuid('last_license_id')->nullable()->unique();
             $table->string('last_plan', 40)->nullable();
