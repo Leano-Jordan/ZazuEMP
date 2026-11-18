@@ -1,11 +1,6 @@
 <?php
 
-$legacyPlatformAdminEmails = array_values(array_filter(array_map('trim', explode(',', (string) env('ZAZU_PLATFORM_ADMIN_EMAILS', '')))));
 $platformAdminEmail = trim((string) env('ZAZU_PLATFORM_ADMIN_EMAIL', ''));
-
-if ($platformAdminEmail === '' && count($legacyPlatformAdminEmails) === 1) {
-    $platformAdminEmail = $legacyPlatformAdminEmails[0];
-}
 
 return [
     // One explicitly designated founder identity. Legacy configuration is accepted only when it contains exactly one address.
