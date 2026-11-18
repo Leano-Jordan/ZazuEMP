@@ -122,6 +122,6 @@ final class ZazuIncidentSummary
             return 'unknown';
         }
 
-        return mb_substr(preg_replace('/[^a-zA-Z0-9_\\\\.\\\\-@]/', '', $value) ?? '', 0, 120);
+        return mb_substr(preg_replace('/[^A-Za-z0-9_.@-]/', '', $value) ?? '', 0, 120);
     }
 }
