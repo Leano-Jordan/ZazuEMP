@@ -69,8 +69,13 @@ The console provides:
 
 The timeline is limited to 500 matching records and the overview to the 100 most frequent
 fingerprints. Both active and previous ledger segments are read. The console does not
-increase the underlying two-segment retention window. Incident references are displayed
-as identifiers and are not linked to the unauthenticated diagnostic download endpoint.
+increase the underlying two-segment retention window. DB-001 references in the timeline
+include a direct link to download that incident's allowlisted JSON report; other incident
+families do not display the database-only export action.
 
-The console and timeline require automated feature-test and production-build verification
-before being treated as release-accepted.
+The reference-scoped download endpoint is unauthenticated but rate-limited and requires a
+high-entropy UUID reference. It returns only allowlisted diagnostic fields with private,
+no-store caching headers. Treat the reference as sensitive and share the report deliberately.
+
+The console, timeline and export action require automated feature-test and production-build
+verification before being treated as release-accepted.
