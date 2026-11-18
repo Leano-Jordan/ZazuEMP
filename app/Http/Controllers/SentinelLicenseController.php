@@ -49,8 +49,7 @@ final class SentinelLicenseController extends Controller
         if ($neverExpires) {
             $arguments['--never-expires'] = true;
         } else {
-            $arguments['--expires-at'] = now(config('app.timezone'))
-                ->parse($validated['expires_at'])
+            $arguments['--expires-at'] = \Illuminate\Support\Carbon::parse($validated['expires_at'], config('app.timezone'))
                 ->seconds(0)
                 ->toIso8601String();
         }
@@ -85,7 +84,7 @@ final class SentinelLicenseController extends Controller
         try {
             $exitCode = Artisan::call('zazu:license:issue', $arguments);
             $output = Artisan::output();
-        } catch (\\Throwable $exception) {
+        } catch (\Throwable $exception) {
             Log::warning('Sentinel licence issuer failed', [
                 'business_id' => $business->id,
                 'action' => $action,
