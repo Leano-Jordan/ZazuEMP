@@ -3,7 +3,7 @@
 **Status:** OPERATIONAL DRAFT — COMPLETE WITH REAL CONTACTS BEFORE RELEASE  
 **Operational privacy owner:** Isaac Junior Lehlogonolo Maluleka  
 **Operating address:** [Operating address — see private records]
-**Request channel:** `[EMAIL / PUBLISHED PRIVACY CHANNEL TO BE SUPPLIED]`  
+**Request channel:** rosscorelabs@outlook.com (provisional owner-confirmed contact; replace when a dedicated Zazu privacy channel is established)  
 **Information Officer:** Isaac Junior Lehlogonolo Maluleka — formal registration/appointment status to be confirmed before publication
 
 ## Purpose
