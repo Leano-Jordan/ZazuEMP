@@ -203,3 +203,8 @@ Sentinel Rescue is a non-destructive owner diagnostic surface. The owner can fil
 ## Local recovery code maintainability
 
 The local recovery middleware separates loopback, same-origin POST and fetch-metadata checks into small private guards. The one-time challenge service separates code format validation, locked challenge reading, expiry/hash validation and invalidation. These are structural refactors only: the local-only boundary, form content-type requirement, origin scheme/host/port match, optional same-origin Fetch Metadata check, 256-bit random code, SHA-256 stored hash, five-minute expiry, lock-protected single use and failure invalidation remain in place. Feature coverage includes cross-origin rejection, port mismatch, one-time use, expiry and malformed challenge data.
+
+
+## Incident ledger storage permissions
+
+The private incident ledger re-applies restrictive filesystem modes during writes: the diagnostics directory is set to `0700`, and the lock and JSONL ledger files are set to `0600` (best effort on Windows, where effective access control is governed by NTFS ACLs). This also tightens pre-existing directories/files created by older installs. The ledger remains an allowlisted, redacted record store and is independent of the business database and Laravel log channel. Windows package acceptance must continue to verify the actual installed directory ACLs; PHP `chmod` success alone is not proof of NTFS isolation.
