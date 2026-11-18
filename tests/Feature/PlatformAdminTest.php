@@ -89,7 +89,7 @@ class PlatformAdminTest extends TestCase
         $this->get(route('admin.sentinel'))->assertRedirect(route('login'));
 
         $user = \App\Models\User::factory()->create(['email' => 'owner@zazu.test']);
-        Config::set('zazu.platform_admin_emails', ['admin@zazu.test']);
+        Config::set('zazu.platform_admin_email', 'admin@zazu.test');
 
         $this->actingAs($user)
             ->get(route('admin.sentinel'))
@@ -99,7 +99,7 @@ class PlatformAdminTest extends TestCase
     public function test_platform_admin_can_search_sentinel_and_open_safe_timeline(): void
     {
         $admin = \App\Models\User::factory()->create(['email' => 'admin@zazu.test']);
-        Config::set('zazu.platform_admin_emails', ['admin@zazu.test']);
+        Config::set('zazu.platform_admin_email', 'admin@zazu.test');
 
         $directory = storage_path('app/private/zazu-diagnostics');
         File::deleteDirectory($directory);
@@ -143,6 +143,7 @@ class PlatformAdminTest extends TestCase
                     'fingerprint' => $fingerprint,
                 ]))
                 ->assertOk()
+                ->assertSee('Sentinel Control Centre')
                 ->assertSee($fingerprint)
                 ->assertSee('895e2c23-bc6b-4919-a891-1e8e5c1e27e4')
                 ->assertSee('DashboardController.php')
