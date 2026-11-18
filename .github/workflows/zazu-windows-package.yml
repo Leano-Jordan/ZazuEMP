@@ -277,6 +277,54 @@ jobs:
             throw 'Installer did not generate a Laravel application key.'
           }
 
+          $ledgerScript = Join-Path $env:RUNNER_TEMP 'zazu-ledger-acl-probe.php'
+          $ledgerProbe = @'
+          <?php
+          $project = $argv[1];
+          chdir($project);
+          require $project . '/vendor/autoload.php';
+          $app = require $project . '/bootstrap/app.php';
+          $kernel = $app->make(\Illuminate\Contracts\Console\Kernel::class);
+          $kernel->bootstrap();
+          \App\Support\ZazuIncidentLedger::record([
+              'request_id' => 'e48b22d4-81ec-4e14-a5e1-8e7b7a19f214',
+              'error_code' => 'APP-001',
+              'exception_class' => \RuntimeException::class,
+          ]);
+          '@
+          [System.IO.File]::WriteAllText($ledgerScript, $ledgerProbe, [System.Text.UTF8Encoding]::new($false))
+          php $ledgerScript $project
+          if ($LASTEXITCODE -ne 0) { throw 'Could not create the Windows incident-ledger ACL probe.' }
+
+          $allowedSids = @(
+            [System.Security.Principal.WindowsIdentity]::GetCurrent().User.Value,
+            'S-1-5-18',
+            'S-1-5-32-544'
+          )
+          $privateRoot = Join-Path $project 'storage/app/private'
+          $aclTargets = @(
+            $privateRoot,
+            (Join-Path $privateRoot 'zazu-diagnostics'),
+            (Join-Path $privateRoot 'zazu-diagnostics/incidents.lock'),
+            (Join-Path $privateRoot 'zazu-diagnostics/incidents.jsonl')
+          )
+          foreach ($target in $aclTargets) {
+            if (-not (Test-Path -LiteralPath $target)) { throw "Expected private diagnostic path was not created: $target" }
+            $acl = Get-Acl -LiteralPath $target
+            if ($target -eq $privateRoot -and -not $acl.AreAccessRulesProtected) {
+              throw 'The private storage root still inherits broad parent permissions.'
+            }
+            foreach ($rule in $acl.Access) {
+              $sid = $rule.IdentityReference.Translate([System.Security.Principal.SecurityIdentifier]).Value
+              if ($allowedSids -notcontains $sid -or $rule.AccessControlType -ne [System.Security.AccessControl.AccessControlType]::Allow) {
+                throw "Private storage contains an unexpected Windows access rule for SID $sid at $target."
+              }
+              if ($target -ne $privateRoot -and -not $rule.IsInherited) {
+                throw "A private diagnostic child has an unexpected explicit access rule: $target."
+              }
+            }
+          }
+
           php artisan migrate:status --no-ansi
           if ($LASTEXITCODE -ne 0) { throw 'Fresh-install database migration status failed.' }
 
