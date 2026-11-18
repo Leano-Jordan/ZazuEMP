@@ -44,51 +44,80 @@ final class ZazuLocalSentinelRecovery
      */
     public function consume(string $code): bool
     {
-        if (preg_match('/\A[a-f0-9]{64}\z/D', $code) !== 1 || ! is_file($this->path)) {
+        if (! $this->isWellFormedCode($code) || ! is_file($this->path)) {
             return false;
         }
 
-        return $this->withLock(function () use ($code): bool {
-            if (! is_file($this->path) || ! is_readable($this->path)) {
-                return false;
-            }
+        return $this->withLock(fn (): bool => $this->consumeLocked($code));
+    }
 
-            $contents = file_get_contents($this->path);
+    private function isWellFormedCode(string $code): bool
+    {
+        return preg_match('/\A[a-f0-9]{64}\z/D', $code) === 1;
+    }
 
-            if (! is_string($contents)) {
-                return false;
-            }
+    private function consumeLocked(string $code): bool
+    {
+        $challenge = $this->readChallenge();
 
-            try {
-                $challenge = json_decode($contents, true, 8, JSON_THROW_ON_ERROR);
-            } catch (\JsonException) {
-                return false;
-            }
+        if (! $this->matchesChallenge($challenge, $code)) {
+            return false;
+        }
 
-            $expectedHash = $challenge['token_hash'] ?? null;
-            $expiresAt = $challenge['expires_at'] ?? null;
+        return $this->invalidateChallenge($code);
+    }
 
-            if (
-                ! is_string($expectedHash)
-                || ! is_int($expiresAt)
-                || $expiresAt < time()
-                || ! hash_equals($expectedHash, hash('sha256', $code))
-            ) {
-                return false;
-            }
+    /**
+     * @return array{token_hash?: mixed, expires_at?: mixed}|null
+     */
+    private function readChallenge(): ?array
+    {
+        if (! is_file($this->path) || ! is_readable($this->path)) {
+            return null;
+        }
 
-            // Invalidate while holding the lock so concurrent requests cannot replay it.
-            if (@unlink($this->path)) {
-                return true;
-            }
+        $contents = file_get_contents($this->path);
 
-            $invalidated = json_encode([
-                'token_hash' => hash('sha256', random_bytes(32)),
-                'expires_at' => 0,
-            ], JSON_THROW_ON_ERROR);
+        if (! is_string($contents)) {
+            return null;
+        }
 
-            return file_put_contents($this->path, $invalidated, LOCK_EX) !== false;
-        });
+        try {
+            $challenge = json_decode($contents, true, 8, JSON_THROW_ON_ERROR);
+        } catch (\JsonException) {
+            return null;
+        }
+
+        return is_array($challenge) ? $challenge : null;
+    }
+
+    /**
+     * @param array{token_hash?: mixed, expires_at?: mixed}|null $challenge
+     */
+    private function matchesChallenge(?array $challenge, string $code): bool
+    {
+        $expectedHash = $challenge['token_hash'] ?? null;
+        $expiresAt = $challenge['expires_at'] ?? null;
+
+        return is_string($expectedHash)
+            && is_int($expiresAt)
+            && $expiresAt >= time()
+            && hash_equals($expectedHash, hash('sha256', $code));
+    }
+
+    private function invalidateChallenge(string $code): bool
+    {
+        // Invalidate while holding the lock so concurrent requests cannot replay it.
+        if (@unlink($this->path)) {
+            return true;
+        }
+
+        $invalidated = json_encode([
+            'token_hash' => hash('sha256', random_bytes(32)),
+            'expires_at' => 0,
+        ], JSON_THROW_ON_ERROR);
+
+        return file_put_contents($this->path, $invalidated, LOCK_EX) !== false;
     }
 
     private function withLock(callable $callback): mixed
