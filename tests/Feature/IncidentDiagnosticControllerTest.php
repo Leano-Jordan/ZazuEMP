@@ -4,6 +4,7 @@ namespace Tests\Feature;
 
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Str;
+use Illuminate\Support\Facades\URL;
 use Tests\TestCase;
 
 class IncidentDiagnosticControllerTest extends TestCase
@@ -57,7 +58,7 @@ class IncidentDiagnosticControllerTest extends TestCase
             'password' => $secret,
         ]));
 
-        $response = $this->get('/api/support/incidents/'.$requestId);
+        $response = $this->get(URL::temporarySignedRoute('support.incidents.show', now()->addMinutes(15), ['requestId' => $requestId]));
 
         $response->assertOk()
             ->assertHeader('Cache-Control', 'no-store, private')
@@ -92,7 +93,7 @@ class IncidentDiagnosticControllerTest extends TestCase
 
     public function test_reference_download_returns_not_found_when_no_matching_log_exists(): void
     {
-        $this->get('/api/support/incidents/'.Str::uuid())->assertNotFound();
+        $this->get(URL::temporarySignedRoute('support.incidents.show', now()->addMinutes(15), ['requestId' => Str::uuid()]))->assertNotFound();
     }
 
     private function logLine(array $context): string
@@ -101,4 +102,27 @@ class IncidentDiagnosticControllerTest extends TestCase
             .json_encode($context, JSON_THROW_ON_ERROR)
             .PHP_EOL;
     }
+
+    public function test_reference_download_rejects_unsigned_expired_and_tampered_links(): void
+    {
+        $requestId = (string) Str::uuid();
+
+        $this->get('/api/support/incidents/'.$requestId)->assertForbidden();
+
+        $expired = URL::temporarySignedRoute(
+            'support.incidents.show',
+            now()->subMinute(),
+            ['requestId' => $requestId],
+        );
+        $this->get($expired)->assertForbidden();
+
+        $valid = URL::temporarySignedRoute(
+            'support.incidents.show',
+            now()->addMinutes(15),
+            ['requestId' => $requestId],
+        );
+        $tampered = str_replace($requestId, (string) Str::uuid(), $valid);
+        $this->get($tampered)->assertForbidden();
+    }
+
 }
