@@ -22,10 +22,7 @@ class ApplySecurityHeaders
 
         $response->headers->set('X-Content-Type-Options', 'nosniff');
         $response->headers->set('X-Frame-Options', 'SAMEORIGIN');
-        // Preserve a stricter endpoint-specific policy (for example, signed customer documents).
-        if (! $response->headers->has('Referrer-Policy')) {
-            $response->headers->set('Referrer-Policy', 'strict-origin-when-cross-origin');
-        }
+        $this->applyReferrerPolicy($response);
         $response->headers->set('Permissions-Policy', 'geolocation=(), microphone=()');
         $response->headers->set(
             'Content-Security-Policy',
@@ -49,6 +46,16 @@ class ApplySecurityHeaders
         }
 
         return $response;
+    }
+
+    /**
+     * Preserve endpoint-specific policies that are stricter than the application default.
+     */
+    private function applyReferrerPolicy(Response $response): void
+    {
+        if (! $response->headers->has('Referrer-Policy')) {
+            $response->headers->set('Referrer-Policy', 'strict-origin-when-cross-origin');
+        }
     }
 
     /**
