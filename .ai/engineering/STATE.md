@@ -1,3 +1,13 @@
+## Sentinel access isolation correction — 2026-11-18
+
+- Removed the one-year signed bearer URL from `/api/sentinel/rescue`; unauthenticated requests can no longer reach Sentinel Rescue.
+- Moved Rescue to `/sentinel/rescue` behind `auth`, `auth.session`, `business.context` and the active-business `owner` middleware.
+- Added explicit `sentinel.admin` route authorization for `/admin/sentinel`, separate from ordinary business-owner roles.
+- Founder authorization now resolves to one configured email identity (`ZAZU_PLATFORM_ADMIN_EMAIL`). The legacy plural variable is accepted only when it contains exactly one address; multiple legacy addresses grant no founder access.
+- Founder navigation is visible independently of business-owner navigation. Business owners see only their owner Rescue entry; the founder sees the Control Centre only when the configured identity matches.
+- Added regression coverage for unauthenticated denial, removal of the old API route, authenticated owner access and updated founder identity configuration.
+- **Resilience trade-off:** authenticated Rescue now depends on the normal user/session path. A database-backed session or unavailable user database may block access before health checks execute. Do not claim secure database/session-outage diagnosis is solved; a separate authenticated local recovery-session design remains open.
+- Changes were committed directly to `main`; no branches were created. Automated tests and runtime acceptance have not yet been executed in this environment.
 # Zazu EMP — Current Director State
 
 ## DB-001 support capture — 2026-11-18
