@@ -38,7 +38,25 @@ The current implementation on `main` includes:
 - Business owners have a **System → Sentinel Rescue** entry at `/sentinel/rescue`. It requires the authenticated session, active business context and owner role on every request. It is not a signed/bearer URL.
 - The rescue page displays the database driver and health result, migration state, storage and offline asset checks, and Sentinel ledger integrity. When a database operation throws, it attempts to record the safe DB-001 incident and provides the matching report link.
 
-The earlier bearer-link implementation was removed because possession of a one-year signed URL allowed unauthenticated access. The current owner route is protected by `auth`, `auth.session`, `business.context` and `owner`. This restores the explicit access boundary but means the route relies on the normal user/session authentication path; when the business database or database-backed session store is unavailable, access may fail before health checks run. A separate authenticated local recovery-session design is still required before Sentinel can claim secure diagnosis of database/session outages. The route also requires the local PHP/Laravel process and bootstrap to be running.
+### Independent local recovery path — implemented in source, awaiting CI and packaged-host acceptance
+
+A separate local-only recovery screen is available at `http://127.0.0.1:8000/api/sentinel/recovery`. It is deliberately outside the authenticated web/session stack and does not use the database-backed API throttle.
+
+Access is constrained to loopback clients (`127.0.0.1` or `::1`) and loopback hostnames (`localhost`, `127.0.0.1`, or `::1`). It rejects LAN clients, non-loopback host headers and cross-origin form submissions. The screen itself reveals no health data.
+
+To unlock one read-only installation health report, an operator physically using the Windows host runs:
+
+```powershell
+php artisan zazu:sentinel-recovery-code
+```
+
+The command generates a cryptographically random 256-bit code, stores only its SHA-256 hash in a private local framework file, and displays the code once. It expires after five minutes, is consumed atomically on successful use, and cannot be replayed. Generating a replacement invalidates the previous code. The code is entered into the local recovery page; it is never placed in a URL, sent over the network to a third party, or stored in a browser session.
+
+The recovery report runs the existing read-only `ZazuSystemHealth` checks. It reports installation health only and does not expose customer/business records, private attachment contents, the global incident ledger, or the founder Control Centre. It is not a remote/mobile rescue path and cannot help if PHP, Laravel bootstrap, the local web process or the host PC itself is unavailable.
+
+This is a local host-operator recovery mechanism, not an alternative customer login. The normal **System → Sentinel Rescue** remains restricted to the authenticated owner of the active business. The founder Control Centre remains separately founder-gated.
+
+The earlier bearer-link implementation was removed because possession of a one-year signed URL allowed unauthenticated access. The current owner route is protected by `auth`, `auth.session`, `business.context` and `owner`. This restores the explicit access boundary but means the route relies on the normal user/session authentication path; when the business database or database-backed session store is unavailable, access may fail before health checks run. A separate loopback-only, one-time-code recovery path has now been added for host-operator diagnosis when the normal database/session path is unavailable. It still requires the PHP/Laravel bootstrap and local web process to be operational. The route also requires the local PHP/Laravel process and bootstrap to be running.
 
 **Not implemented yet:** diagnostic ZIP/JSON bundle and manifest, a complete local failure knowledge base, attachment and offline queue/sync probes, session/cache diagnostics, backup integrity/recovery checks, and guided recovery. A healthy database probe is not proof of a healthy schema or business workflow. A present service-worker file is not proof that the physical phone has usable offline caches or can synchronize.
 
