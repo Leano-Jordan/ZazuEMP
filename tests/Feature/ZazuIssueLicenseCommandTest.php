@@ -4,6 +4,7 @@ namespace Tests\Feature;
 
 use App\Services\SignedOfflineLicenseVerifier;
 use Illuminate\Support\Facades\Artisan;
+use Illuminate\Support\Str;
 use Tests\TestCase;
 
 class ZazuIssueLicenseCommandTest extends TestCase
@@ -11,6 +12,8 @@ class ZazuIssueLicenseCommandTest extends TestCase
     private string $keyFile;
 
     private string $publicKey;
+
+    private string $businessUuid;
 
     protected function setUp(): void
     {
@@ -20,6 +23,7 @@ class ZazuIssueLicenseCommandTest extends TestCase
             $this->markTestSkipped('PHP Sodium is required for signed licence tests.');
         }
 
+        $this->businessUuid = (string) Str::uuid();
         $keypair = sodium_crypto_sign_keypair();
         $secretKey = sodium_crypto_sign_secretkey($keypair);
         $publicKey = sodium_crypto_sign_publickey($keypair);
@@ -42,7 +46,7 @@ class ZazuIssueLicenseCommandTest extends TestCase
     public function test_command_issues_a_token_accepted_by_the_existing_business_verifier(): void
     {
         $exitCode = Artisan::call('zazu:license:issue', [
-            'business_id' => 42,
+            'business_uuid' => $this->businessUuid,
             'plan' => 'advanced',
             '--private-key-file' => $this->keyFile,
             '--starts-at' => '2026-11-19T00:00:00+02:00',
@@ -56,9 +60,9 @@ class ZazuIssueLicenseCommandTest extends TestCase
         preg_match('/^TOKEN: ([A-Za-z0-9_-]+\.[A-Za-z0-9_-]+)$/m', Artisan::output(), $matches);
         $this->assertArrayHasKey(1, $matches);
 
-        $verified = app(SignedOfflineLicenseVerifier::class)->verifyForBusiness($matches[1], 42);
+        $verified = app(SignedOfflineLicenseVerifier::class)->verifyForBusiness($matches[1], $this->businessUuid);
 
-        $this->assertSame(42, $verified['payload']['business_id']);
+        $this->assertSame($this->businessUuid, $verified['payload']['business_uuid']);
         $this->assertSame('advanced', $verified['payload']['plan']);
         $this->assertSame('active', $verified['payload']['status']);
         $this->assertSame(['offline_core' => true], $verified['payload']['features']);
@@ -68,7 +72,7 @@ class ZazuIssueLicenseCommandTest extends TestCase
     public function test_default_feature_metadata_is_signed_as_a_json_object(): void
     {
         $exitCode = Artisan::call('zazu:license:issue', [
-            'business_id' => 42,
+            'business_uuid' => $this->businessUuid,
             'plan' => 'basic',
             '--private-key-file' => $this->keyFile,
             '--never-expires' => true,
@@ -89,7 +93,7 @@ class ZazuIssueLicenseCommandTest extends TestCase
     public function test_command_requires_an_expiry_or_an_explicit_never_expires_choice(): void
     {
         $exitCode = Artisan::call('zazu:license:issue', [
-            'business_id' => 42,
+            'business_uuid' => $this->businessUuid,
             'plan' => 'basic',
             '--private-key-file' => $this->keyFile,
         ]);
@@ -101,7 +105,7 @@ class ZazuIssueLicenseCommandTest extends TestCase
     public function test_revocation_requires_the_existing_license_id(): void
     {
         $exitCode = Artisan::call('zazu:license:issue', [
-            'business_id' => 42,
+            'business_uuid' => $this->businessUuid,
             'plan' => 'advanced',
             '--private-key-file' => $this->keyFile,
             '--status' => 'revoked',
@@ -119,7 +123,7 @@ class ZazuIssueLicenseCommandTest extends TestCase
 
         try {
             $exitCode = Artisan::call('zazu:license:issue', [
-                'business_id' => 42,
+                'business_uuid' => $this->businessUuid,
                 'plan' => 'advanced',
                 '--private-key-file' => $projectKey,
                 '--expires-at' => '2027-11-18T23:59:59+02:00',
@@ -140,7 +144,7 @@ class ZazuIssueLicenseCommandTest extends TestCase
         config(['zazu.licensing.public_key' => base64_encode(sodium_crypto_sign_publickey($otherKeypair))]);
 
         $exitCode = Artisan::call('zazu:license:issue', [
-            'business_id' => 42,
+            'business_uuid' => $this->businessUuid,
             'plan' => 'advanced',
             '--private-key-file' => $this->keyFile,
             '--expires-at' => '2027-11-18T23:59:59+02:00',
@@ -153,7 +157,7 @@ class ZazuIssueLicenseCommandTest extends TestCase
     public function test_command_rejects_invalid_calendar_dates_and_non_object_feature_metadata(): void
     {
         $invalidDateExit = Artisan::call('zazu:license:issue', [
-            'business_id' => 42,
+            'business_uuid' => $this->businessUuid,
             'plan' => 'advanced',
             '--private-key-file' => $this->keyFile,
             '--expires-at' => '2026-02-30T23:59:59+02:00',
@@ -163,7 +167,7 @@ class ZazuIssueLicenseCommandTest extends TestCase
         $this->assertStringContainsString('not a valid calendar date', Artisan::output());
 
         $invalidFeaturesExit = Artisan::call('zazu:license:issue', [
-            'business_id' => 42,
+            'business_uuid' => $this->businessUuid,
             'plan' => 'advanced',
             '--private-key-file' => $this->keyFile,
             '--expires-at' => '2027-11-18T23:59:59+02:00',
