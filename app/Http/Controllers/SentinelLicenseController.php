@@ -17,7 +17,6 @@ final class SentinelLicenseController extends Controller
             'business_uuid' => ['required', 'uuid', 'unique:platform_license_customers,business_uuid'],
             'business_name' => ['required', 'string', 'max:255'],
             'contact_email' => ['nullable', 'email', 'max:255'],
-            'notes' => ['nullable', 'string', 'max:2000'],
         ]);
 
         PlatformLicenseCustomer::query()->create($validated + [
