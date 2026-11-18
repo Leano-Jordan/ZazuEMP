@@ -81,11 +81,11 @@ The production activation flow should also distinguish:
 
 Do not use a shared secret embedded in the application as the final production licensing mechanism.
 
-## Signed offline token format — version 1
+## Signed offline token format — version 2
 
 The local verifier accepts a two-part token: `base64url(payload JSON).base64url(Ed25519 detached signature)`. The exact UTF-8 payload bytes are signed; the verifier checks the detached signature before parsing or trusting any fields.
 
-Required payload fields: `version=1`, local `business_id`, UUID `license_id`, `plan`, `status` (`active` or `revoked`), `starts_at`, `issued_at`, nullable `expires_at`, and a `features` object. All timestamps must include seconds and an explicit timezone (for example `2026-11-10T14:30:00+02:00` or `2026-11-10T12:30:00Z`); timezone-less and invalid calendar dates are rejected rather than interpreted using the installation's local timezone. Expiry must not precede the start date. A token for another business is rejected. A distinct signed payload must have a strictly newer issue timestamp than the installed entitlement, regardless of whether the issuer reuses the same `license_id`. The exact signed payload's SHA-256 fingerprint is retained so an identical token can be re-imported idempotently, while a different payload cannot reuse the same issue timestamp. Imports are serialized under a per-business database row lock to prevent concurrent older/newer token races. Older active tokens therefore cannot reverse a later signed revocation. Token input is size-bounded. A signed revoked token imports as inactive. Invalid signatures, malformed payloads, missing key configuration and unavailable sodium verification fail closed.
+Required payload fields: `version=2`, globally unique `business_uuid`, UUID `license_id`, `plan`, `status` (`active` or `revoked`), `starts_at`, `issued_at`, nullable `expires_at`, and a `features` object. All timestamps must include seconds and an explicit timezone (for example `2026-11-10T14:30:00+02:00` or `2026-11-10T12:30:00Z`); timezone-less and invalid calendar dates are rejected rather than interpreted using the installation's local timezone. Expiry must not precede the start date. The business UUID is generated once for each business record, persisted in that customer's local installation and displayed in Business Settings. A token for another business UUID is rejected. Version-1 tokens bound only to numeric local IDs are no longer accepted because independent local installations can reuse the same numeric ID. A distinct signed payload must have a strictly newer issue timestamp than the installed entitlement, regardless of whether the issuer reuses the same `license_id`. The exact signed payload's SHA-256 fingerprint is retained so an identical token can be re-imported idempotently, while a different payload cannot reuse the same issue timestamp. Imports are serialized under a per-business database row lock to prevent concurrent older/newer token races. Older active tokens therefore cannot reverse a later signed revocation. Token input is size-bounded. A signed revoked token imports as inactive. Invalid signatures, malformed payloads, missing key configuration and unavailable sodium verification fail closed.
 
 The app is configured with `ZAZU_LICENSE_PUBLIC_KEY` only: base64-encoded Ed25519 public key. The issuer's private signing key must remain outside this repository and outside customer installations. Never commit a real private key or use a development test key in production.
 
@@ -180,16 +180,27 @@ The central `BusinessEntitlement` resolver determines the business-wide ceiling.
 
 ## Manual first-customer issuer — 2026-11-19
 
-The Artisan command **zazu:license:issue** creates a version-1 Ed25519 token compatible with the existing local verifier. It accepts a local business ID, one of the existing **basic**, **intermediate** or **advanced** plan identifiers, an explicit start/expiry, and optional JSON feature metadata. A non-expiring entitlement requires the deliberate **--never-expires** option. Revocation requires the existing licence UUID so the new signed revocation replaces the correct installed entitlement.
+The Artisan command **zazu:license:issue** creates a version-2 Ed25519 token compatible with the local verifier. It accepts the business's stable licensing UUID, one of the existing **basic**, **intermediate** or **advanced** plan identifiers, an explicit start/expiry, and optional JSON feature metadata. A non-expiring entitlement requires the deliberate **--never-expires** option. Revocation requires the existing licence UUID so the new signed revocation replaces the correct installed entitlement.
 
 The command requires **--private-key-file** pointing to a base64-encoded Ed25519 secret-key file outside the Zazu project. It derives the public key from that secret and refuses to issue unless it matches the configured **ZAZU_LICENSE_PUBLIC_KEY**. It does not create keys, change customer data, contact a server, or enforce new feature restrictions. The signed token is printed for manual delivery to the matching business owner.
 
 Example PowerShell invocation (illustrative dates only):
 
-    php artisan zazu:license:issue 42 advanced --private-key-file="C:\ZazuIssuer\zazu-ed25519.key" --starts-at="2026-11-19T00:00:00+02:00" --expires-at="2026-12-19T00:00:00+02:00" --features='{"offline_core":true}'
+    php artisan zazu:license:issue 6b4b2b6a-2d4e-4a5a-9f8e-1c6b3d0f7a21 advanced --private-key-file="C:\ZazuIssuer\zazu-ed25519.key" --starts-at="2026-11-19T00:00:00+02:00" --expires-at="2026-12-19T00:00:00+02:00" --features='{"offline_core":true}'
 
 The command refuses a key stored inside the project, but it does not provision the key or set Windows file permissions. Before production use, the owner must establish the keypair, restrict the private-key file's NTFS ACL to the authorised operator plus required local system administrators, keep a protected recovery copy, and verify that no customer package contains the key. Never put the private key in a customer .env, repository, support ticket or customer communication. Share only the signed token.
 
 **Verification status:** command and regression tests are committed to main; exact-head CI has not yet been observed. Do not use a production key or issue customer licences until the test run passes and key custody is deliberately established.
 
-This is a manual issuer, not a complete commercial licensing operation. Production key custody, installation identity/reactivation, module-level feature enforcement and a fully approved commercial tier matrix remain open.
+Sentinel now includes a founder-only customer registry. A customer reads the stable Business Licensing Reference in Business Settings and supplies it to Roscore; the founder registers that UUID and issues, renews or revokes signed tokens from Sentinel. The registry stores business identity and current licence metadata, never signed token contents or private-key material. Revocation remains an offline import operation, not a remote kill switch. Production key custody, installation identity/reactivation, module-level feature enforcement and a fully approved commercial tier matrix remain open.
+
+
+## Stable identity and founder registry — 2026-11-19
+
+Numeric database primary keys are local to an installation and must never be used as a cross-installation licensing identity. The `businesses.licensing_uuid` column is generated for new businesses and backfilled for existing records. It is displayed to the owner as the Business Licensing Reference; the ordinary numeric Business ID remains a local support reference only.
+
+The founder's Sentinel registry stores a customer name, the UUID supplied by that customer, optional contact email and notes, plus the latest issued licence metadata. The founder can register customers, issue/renew and revoke signed tokens from the protected Sentinel console. The token contains `business_uuid` and version 2; the customer verifier compares it with the UUID in that installation's own Business record. A customer can therefore receive a token without Roscore needing access to the customer's local database or requiring a live cloud licence server.
+
+Version-1 tokens containing only `business_id` are rejected. No production signing key has been provisioned and no production licence has been issued, so this format correction does not invalidate a production customer entitlement. If any test/development token was previously imported, it must be reissued as version 2 after the customer installation has the new migration.
+
+This business identity does not yet enforce per-device or per-installation seat limits. Installation identity, reactivation and key rotation/custody remain separate release gates. Do not infer device limits from a business-level licence.
