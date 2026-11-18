@@ -14,7 +14,7 @@
 3. Complete legal/privacy information, Information Officer registration and operational POPIA responsibilities, plus a working WhatsApp support contact.
 4. Run a two-week pilot with 2–3 friendly operators and ship only pilot-evidenced fixes.
 
-**Operating constraints:** WIP limit one active target; no new branches; main only; no Render or AMPPS in Zazu; Sentinel/diagnostics feature freeze (verified maintenance only); no offline/sync expansion; no new subsystem without explicit Founder approval; avoid repeating unchanged browser smoke tests; cap docs-only work. Pricing remains unresolved because existing tier models conflict and requires Founder decision.
+**Operating constraints:** Focused execution batches, but engineering remains active; Sentinel and diagnostics remain active development targets; no new branches; main only; no Render or AMPPS in Zazu; no unrelated offline/sync expansion or new subsystem without explicit Founder approval; avoid repeating unchanged browser smoke tests; cap docs-only work. Pricing remains unresolved because existing tier models conflict and requires Founder decision.
 
 **Progress labels are separate:** ENGINEERING COMPLETE; TESTS PASSED; VERIFIED ON FOUNDER PC; COMMERCIALLY USABLE; CUSTOMER VALIDATED. Never infer a later state from an earlier one. For installed-workflow acceptance, Founder confirmation on the actual PC is required. Documentation updates do not count as application acceptance.
 
@@ -343,3 +343,12 @@ V1: NOT READY. Historical state/register/memory, checklist and changelog are pre
 - A Windows Ops workflow contract check now verifies this guard and its non-mutating boundary.
 - The normal stopped-server path remains unchanged: verified full database/private-files backup, migration, final migration-status verification, then server start.
 - **Evidence pending:** Windows Ops workflow must pass on exact `main` HEAD. The owner installation has not been modified or tested by this repository change. The one pending invoice-numbering migration is not evidence that the earlier account/workspace DB-001 has recurred; the historical `business_user.primary_niche` column is present in the supplied Sentinel schema report.
+
+
+## Director continuation and DB-001 isolation — 2026-11-18
+
+- Founder explicitly confirmed: do not freeze Jarvis. Engineering, Sentinel and hardening remain active; focused work batches are a delivery discipline, not a development freeze.
+- Repository review confirms the pending `2026_11_18_000001_create_invoice_number_sequences_table` migration is used by invoice issuance only: online `FinanceController::storeInvoice` and offline invoice sync through `OfflineDomainMutationHandler`. It is not called by business/account settings or dashboard account loading. It is therefore not a supported explanation for the earlier account/workspace DB-001 incident.
+- The historical DB-001 fingerprint was `GET /dashboard` querying missing `business_user.primary_niche`; the current supplied Sentinel schema report confirms that column is present. The separate invoice-sequence migration remains pending and still requires backup-first installation handling before invoice issuance is considered ready.
+- Windows Ops workflow initially exposed a PowerShell parse failure in the new existing-server migration guard. The failure was diagnosed and corrected on main. Exact current main HEAD `a7798c41224876aa4a6e2d98963e8cd793680909`: Windows Ops Scripts, Windows V1 Package, Zazu quality and Push on main all completed SUCCESS. This confirms CI only, not the Founder's installed PC.
+- DB-001 remains OPEN pending matching current incident evidence and successful repetition of the affected installed workflow. No database migration or owner-device mutation has been performed by this repository investigation.
