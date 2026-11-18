@@ -114,7 +114,7 @@ final class SentinelLicenseController extends Controller
             'plan' => $plan,
             'action' => $action,
             'actor_user_id' => auth()->id(),
-            'expires_at' => $action === 'revoked' ? null : ($business->license?->expires_at?->toIso8601String()),
+            'expires_at' => $arguments['--expires-at'] ?? null,
         ]);
 
         session()->flash('sentinel_issued_license_token', $tokenMatch[1]);
