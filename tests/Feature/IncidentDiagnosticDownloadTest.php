@@ -132,7 +132,6 @@ class IncidentDiagnosticDownloadTest extends TestCase
         }
     }
 
-
     public function test_sentinel_summary_groups_repeated_fingerprints_without_exposing_private_payloads(): void
     {
         $directory = storage_path('app/private/zazu-diagnostics');
