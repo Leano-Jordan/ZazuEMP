@@ -26,6 +26,17 @@ class SentinelLocalRecoveryTest extends TestCase
             ->assertNotFound();
     }
 
+    public function test_local_recovery_routes_do_not_use_the_api_throttle_cache(): void
+    {
+        $route = app('router')->getRoutes()->getByName('sentinel.local-recovery.verify');
+
+        $this->assertNotNull($route);
+        $this->assertNotContains(
+            \\Illuminate\\Routing\\Middleware\\ThrottleRequests::class,
+            $route->gatherMiddleware()
+        );
+    }
+
     public function test_local_recovery_rejects_cross_origin_code_submission(): void
     {
         $this->withHeaders([
