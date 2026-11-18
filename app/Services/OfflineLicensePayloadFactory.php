@@ -63,7 +63,7 @@ final class OfflineLicensePayloadFactory
     {
         $status = (string) $value;
         if (! in_array($status, ['active', 'revoked'], true)) {
-            throw new \InvalidArgumentException('Status must be basic, active or revoked.');
+            throw new \InvalidArgumentException('Status must be active or revoked.');
         }
 
         return $status;
