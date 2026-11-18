@@ -5,6 +5,7 @@ namespace Tests\Feature;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\File;
 use Tests\TestCase;
 
 class PlatformAdminTest extends TestCase
@@ -69,4 +70,73 @@ class PlatformAdminTest extends TestCase
             ->get(route('admin.landing.settings'))
             ->assertForbidden();
     }
+
+    public function test_sentinel_console_is_restricted_to_platform_administrators(): void
+    {
+        $this->get(route('admin.sentinel'))->assertRedirect(route('login'));
+
+        $user = \\App\\Models\\User::factory()->create(['email' => 'owner@zazu.test']);
+        Config::set('zazu.platform_admin_emails', ['admin@zazu.test']);
+
+        $this->actingAs($user)
+            ->get(route('admin.sentinel'))
+            ->assertForbidden();
+    }
+
+    public function test_platform_admin_can_search_sentinel_and_open_safe_timeline(): void
+    {
+        $admin = \\App\\Models\\User::factory()->create(['email' => 'admin@zazu.test']);
+        Config::set('zazu.platform_admin_emails', ['admin@zazu.test']);
+
+        $directory = storage_path('app/private/zazu-diagnostics');
+        File::deleteDirectory($directory);
+        File::ensureDirectoryExists($directory);
+
+        $fingerprint = 'ZAZU-0123456789ABCDEF';
+        $records = [
+            [
+                'request_id' => 'b17e9a51-891c-48b6-9d71-1f24e6ab4c82',
+                'failure_fingerprint' => $fingerprint,
+                'error_code' => 'DB-001',
+                'database_failure_class' => 'sqlite_missing_column',
+                'exception_class' => 'Illuminate\\\\Database\\\\QueryException',
+                'source_file' => 'DashboardController.php',
+                'timestamp' => '2026-11-18T10:00:00+02:00',
+                'sql' => 'private SQL must not appear',
+            ],
+            [
+                'request_id' => '895e2c23-bc6b-4919-a891-1e8e5c1e27e4',
+                'failure_fingerprint' => $fingerprint,
+                'error_code' => 'DB-001',
+                'database_failure_class' => 'sqlite_missing_column',
+                'exception_class' => 'Illuminate\\\\Database\\\\QueryException',
+                'source_file' => 'DashboardController.php',
+                'timestamp' => '2026-11-18T11:00:00+02:00',
+            ],
+        ];
+
+        File::put(
+            $directory.DIRECTORY_SEPARATOR.'incidents.jsonl',
+            implode(PHP_EOL, array_map(
+                static fn (array $record): string => json_encode($record, JSON_THROW_ON_ERROR),
+                $records,
+            )).PHP_EOL,
+        );
+
+        try {
+            $this->actingAs($admin)
+                ->get(route('admin.sentinel', [
+                    'q' => 'sqlite_missing_column',
+                    'fingerprint' => $fingerprint,
+                ]))
+                ->assertOk()
+                ->assertSee($fingerprint)
+                ->assertSee('895e2c23-bc6b-4919-a891-1e8e5c1e27e4')
+                ->assertSee('DashboardController.php')
+                ->assertDontSee('private SQL');
+        } finally {
+            File::deleteDirectory($directory);
+        }
+    }
+
 }
