@@ -69,7 +69,7 @@ final class ZazuIssueLicenseCommand extends Command
      *   starts_at: string,
      *   issued_at: string,
      *   expires_at: ?string,
-     *   features: array<string, mixed>
+     *   features: object
      * }
      */
     private function buildPayload(): array
@@ -141,7 +141,7 @@ final class ZazuIssueLicenseCommand extends Command
             'starts_at' => $startsAt,
             'issued_at' => now('UTC')->format('Y-m-d\TH:i:s\Z'),
             'expires_at' => $expiresAt,
-            'features' => (array) $featuresObject,
+            'features' => $featuresObject,
         ];
     }
 
