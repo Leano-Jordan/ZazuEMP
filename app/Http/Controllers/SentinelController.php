@@ -17,23 +17,9 @@ final class SentinelController extends Controller
         ]);
 
         $health = $healthService->inspect();
-        $all = $incidents->build(100);
-        $overview = $incidents->overview();
         $query = trim((string) ($filters['q'] ?? ''));
-        $summaries = $all;
-
-        if ($query !== '') {
-            $needle = mb_strtolower($query);
-            $summaries = array_values(array_filter($all, static function (array $item) use ($needle): bool {
-                foreach (['fingerprint', 'error_code', 'failure_class', 'exception', 'source_file'] as $field) {
-                    if (str_contains(mb_strtolower((string) $item[$field]), $needle)) {
-                        return true;
-                    }
-                }
-
-                return false;
-            }));
-        }
+        $summaries = $query === '' ? $incidents->build(100) : $incidents->search($query, 100);
+        $overview = $incidents->overview();
 
         $selected = $filters['fingerprint'] ?? null;
         $timeline = $selected ? $incidents->timeline($selected) : [];
