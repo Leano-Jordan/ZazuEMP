@@ -94,7 +94,7 @@ class SentinelLocalRecoveryTest extends TestCase
         $code = $recovery->issue();
 
         $this->withHeaders([
-            'Origin' => 'http://localhost',
+            'Origin' => 'http://localhost:8000',
             'Sec-Fetch-Site' => 'same-origin',
             'Content-Type' => 'application/x-www-form-urlencoded',
         ])->post('/api/sentinel/recovery', ['code' => $code])
@@ -103,7 +103,7 @@ class SentinelLocalRecoveryTest extends TestCase
             ->assertSee('Overall status:');
 
         $this->withHeaders([
-            'Origin' => 'http://localhost',
+            'Origin' => 'http://localhost:8000',
             'Sec-Fetch-Site' => 'same-origin',
             'Content-Type' => 'application/x-www-form-urlencoded',
         ])->post('/api/sentinel/recovery', ['code' => $code])
