@@ -305,7 +305,8 @@
     <section class="zazu-context-card mt-4" aria-labelledby="zazu-license-title">
         <div class="zazu-context-title" id="zazu-license-title">Zazu licence</div>
         <p class="zazu-context-copy mt-1">Install a signed licence issued for this business. Verification happens locally; activation and renewal do not require an internet connection. Never share your licence token with anyone who is not authorised to manage this business.</p>
-        <p class="zazu-field-help mt-2"><strong>Business ID for licence requests: {{ $business->id }}</strong> · Share this reference when requesting or renewing a signed licence. It identifies this business record; it is not an access credential.</p>
+        <p class="zazu-field-help mt-2"><strong>Business licensing reference: {{ $business->licensing_uuid }}</strong> · Share this UUID with Rosscore when requesting or renewing a signed licence. It is unique to this business and is not an access credential.</p>
+        <p class="zazu-field-help mt-1">Local Business ID: {{ $business->id }} · Used for local support only; it is not the signed licensing identity.</p>
 
         @if ($license)
             <div class="zazu-list-item mt-4">
