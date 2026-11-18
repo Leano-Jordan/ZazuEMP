@@ -12,9 +12,8 @@ final class ZazuIncidentRecorder
     public static function record(Throwable $exception): void
     {
         try {
-            $definition = ZazuErrorCatalog::for($exception);
             $context = self::buildContext($exception);
-            self::writeIncident($context, $definition['status']);
+            self::writeIncident($context, (int) $context['http_status']);
         } catch (Throwable $loggingFailure) {
             // Never reintroduce exception messages that may contain SQL or customer data.
             Log::error('Zazu error incident recorder failed', [
