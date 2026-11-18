@@ -197,9 +197,6 @@
                     <div class="guidance" role="note">
                         <strong>Recommended next step</strong>
                         <p>{{ $safeGuidance }}</p>
-                        @if(!empty($check['reference']) && \Illuminate\Support\Str::isUuid($check['reference']) && ($check['error_code'] ?? null) === 'DB-001')
-                            <a href="{{ route('support.incidents.show', ['requestId' => $check['reference']]) }}">Open safe incident report →</a>
-                        @endif
                     </div>
                 @elseif(!empty($check['next_step']))
                     <p class="notice">{{ $check['next_step'] }}</p>
