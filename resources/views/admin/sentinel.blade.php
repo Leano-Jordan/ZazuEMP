@@ -49,7 +49,7 @@
         <section class="sentinel-stats" aria-label="Sentinel overview">
             <div class="sentinel-stat"><strong>{{ number_format($totalFingerprints) }}</strong><span>Failure fingerprints indexed</span></div>
             <div class="sentinel-stat"><strong>{{ number_format($totalOccurrences) }}</strong><span>Recorded occurrences in retained ledger</span></div>
-            <div class="sentinel-stat"><strong>{{ $latestIncident ? \Illuminate\Support\Carbon::parse($latestIncident)->diffForHumans() : '—' }}</strong><span>Most recent recorded incident</span></div>
+            <div class="sentinel-stat"><strong>{{ $latestIncident ?? '—' }}</strong><span>Most recent recorded incident</span></div>
         </section>
 
         <section class="sentinel-panel">
