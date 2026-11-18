@@ -341,7 +341,28 @@ async function primePages(routes, primeGeneration = activeUserGeneration, primeU
     activePrimeController = controller;
 
     const uniqueRoutes = [...new Set(Array.isArray(routes) ? routes : [])]
-        .filter((path) => typeof path === 'string' && path.startsWith('/') && !path.startsWith('/api/'))
+        .map((path) => {
+            if (typeof path !== 'string' || path.length > 2048) return null;
+
+            let route;
+            try {
+                route = new URL(path, self.location.origin);
+            } catch {
+                return null;
+            }
+
+            // The message channel is same-origin, but route values are still
+            // input. Never let cache priming turn them into credentialed
+            // cross-origin fetches (for example, a //host/path URL).
+            if (route.origin !== self.location.origin
+                || route.username !== ''
+                || route.password !== ''
+                || route.pathname === '/api'
+                || route.pathname.startsWith('/api/')) return null;
+
+            return route.pathname + route.search;
+        })
+        .filter(Boolean)
         .slice(0, MAX_PRIME_ROUTES);
 
     const primedPrivateMediaUrls = new Set();
