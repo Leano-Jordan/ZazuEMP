@@ -5,7 +5,7 @@ use App\Http\Controllers\SyncController;
 use App\Http\Middleware\AuthenticateSyncDevice;
 use Illuminate\Support\Facades\Route;
 
-Route::post('/sync/provision', [SyncController::class, 'provision'])->middleware('throttle:30,1');
+Route::middleware(EnsureLocalSentinelRecovery::class)->prefix('/sentinel/recovery')->group(function () {\n    Route::get('/', [SentinelLocalRecoveryController::class, 'show'])->name('sentinel.local-recovery.show');\n    Route::post('/', [SentinelLocalRecoveryController::class, 'verify'])->name('sentinel.local-recovery.verify');\n});\n\nRoute::post('/sync/provision', [SyncController::class, 'provision'])->middleware('throttle:30,1');
 Route::get('/support/incidents/{requestId}', [IncidentDiagnosticController::class, 'show'])
     ->whereUuid('requestId')
     ->middleware('throttle:20,1')
