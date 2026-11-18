@@ -44,7 +44,7 @@ final class ZazuLocalSentinelRecovery
      */
     public function consume(string $code): bool
     {
-        if (preg_match('/\A[a-f0-9]{64}\z/D', $code) !== 1) {
+        if (preg_match('/\A[a-f0-9]{64}\z/D', $code) !== 1 || ! is_file($this->path)) {
             return false;
         }
 
