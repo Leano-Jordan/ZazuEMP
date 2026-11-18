@@ -46,7 +46,12 @@ final class ZazuIncidentRecorder
 
             // Write the independent ledger first: a broken business database or
             // unavailable Laravel log channel must not erase the diagnostic record.
-            ZazuIncidentLedger::record($context);
+            $ledgerRecord = ZazuIncidentLedger::record($context);
+
+            if (isset($ledgerRecord['failure_fingerprint'])) {
+                $context['failure_fingerprint'] = $ledgerRecord['failure_fingerprint'];
+                $context['failure_fingerprint_version'] = $ledgerRecord['failure_fingerprint_version'];
+            }
 
             $level = $definition['status'] >= 500 ? 'error' : 'warning';
 
