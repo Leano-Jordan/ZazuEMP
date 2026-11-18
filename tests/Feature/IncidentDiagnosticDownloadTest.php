@@ -79,4 +79,55 @@ class IncidentDiagnosticDownloadTest extends TestCase
             File::delete($path);
         }
     }
+
+    public function test_db001_reference_download_uses_independent_ledger_and_includes_stable_fingerprint(): void
+    {
+        $requestId = 'b17e9a51-891c-48b6-9d71-1f24e6ab4c82';
+        $directory = storage_path('app/private/zazu-diagnostics');
+        File::deleteDirectory($directory);
+
+        try {
+            \\App\\Support\\ZazuIncidentLedger::record([
+                'request_id' => $requestId,
+                'error_code' => 'DB-001',
+                'category' => 'Database',
+                'severity' => 'high',
+                'http_status' => 500,
+                'exception_class' => 'Illuminate\\\\Database\\\\QueryException',
+                'originating_component' => 'App\\\\Http\\\\Controllers\\\\DashboardController@index',
+                'route_name' => 'dashboard',
+                'http_method' => 'GET',
+                'timestamp' => '2026-11-18T11:00:00+02:00',
+                'file' => '/srv/zazu/app/Http/Controllers/DashboardController.php',
+                'line' => 81,
+                'database_connection' => 'sqlite',
+                'database_driver' => 'sqlite',
+                'database_sqlstate' => 'HY000',
+                'database_driver_code' => 1,
+                'database_operation' => 'write',
+                'database_failure_class' => 'sqlite_missing_column',
+                'sql' => 'must never be persisted',
+                'bindings' => ['private@example.com'],
+                'exception_message' => 'private customer details',
+            ]);
+
+            $response = $this->get('/api/support/incidents/'.$requestId);
+
+            $response->assertOk()
+                ->assertJsonPath('request_id', $requestId)
+                ->assertJsonPath('source_file', 'DashboardController.php')
+                ->assertJsonPath('database_failure_class', 'sqlite_missing_column')
+                ->assertJsonPath('failure_fingerprint_version', 1);
+
+            $fingerprint = $response->json('failure_fingerprint');
+            $this->assertIsString($fingerprint);
+            $this->assertMatchesRegularExpression('/^ZAZU-[A-F0-9]{16}$/', $fingerprint);
+            $this->assertStringNotContainsString('must never be persisted', $response->getContent());
+            $this->assertStringNotContainsString('private@example.com', $response->getContent());
+            $this->assertStringNotContainsString('private customer details', $response->getContent());
+        } finally {
+            File::deleteDirectory($directory);
+        }
+    }
+
 }
