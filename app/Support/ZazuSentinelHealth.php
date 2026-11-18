@@ -16,134 +16,181 @@ final class ZazuSentinelHealth
     }
 
     /**
-     * Inspect Sentinel's own local evidence path without querying the business database.
+     * Inspect Sentinel's local evidence path without querying the business database.
      *
-     * A short-lived write/read/delete probe verifies that the directory is usable.
-     * The probe contains no business or incident data and is removed immediately.
+     * A disposable write/read/delete probe verifies that the directory is usable.
      */
     public function inspect(): array
     {
         $directory = $this->directory ?? storage_path('app/private/zazu-diagnostics');
-        $checks = [];
-        $directoryExists = is_dir($directory);
-
-        $checks[] = [
-            'key' => 'diagnostic_directory',
-            'label' => 'Private diagnostics folder',
-            'status' => $directoryExists && is_readable($directory) ? 'healthy' : 'failed',
-            'message' => ! $directoryExists
-                ? 'The private diagnostics folder is missing.'
-                : (is_readable($directory)
-                    ? 'The private diagnostics folder is present and readable.'
-                    : 'The private diagnostics folder cannot be read.'),
+        $checks = [
+            $this->directoryCheck($directory),
+            ...$this->directoryChecks($directory),
         ];
 
-        if ($directoryExists) {
-            $checks[] = $this->inspectSegment($directory, self::ACTIVE_LEDGER, 'Current incident ledger');
-            $checks[] = $this->inspectSegment($directory, self::PREVIOUS_LEDGER, 'Previous incident ledger');
-            $checks[] = $this->writeProbe($directory);
-        } else {
-            foreach ([
-                ['key' => 'current_ledger', 'label' => 'Current incident ledger'],
-                ['key' => 'previous_ledger', 'label' => 'Previous incident ledger'],
-                ['key' => 'write_probe', 'label' => 'Diagnostic write/read test'],
-            ] as $check) {
-                $checks[] = [
-                    ...$check,
-                    'status' => 'not_checked',
-                    'message' => 'Not checked because the diagnostics folder is unavailable.',
-                ];
-            }
-        }
-
-        $statuses = array_column($checks, 'status');
-        $overall = in_array('failed', $statuses, true)
-            ? 'failed'
-            : (in_array('attention', $statuses, true)
-                ? 'attention'
-                : (in_array('unknown', $statuses, true) ? 'unknown' : 'healthy'));
-
         return [
-            'status' => $overall,
+            'status' => $this->overallStatus($checks),
             'checked_at' => now()->toIso8601String(),
             'checks' => $checks,
         ];
     }
 
-    private function inspectSegment(string $directory, string $filename, string $label): array
+    private function directoryCheck(string $directory): array
     {
-        $path = $directory.DIRECTORY_SEPARATOR.$filename;
+        $exists = is_dir($directory);
+        $readable = $exists && is_readable($directory);
 
-        if (! file_exists($path)) {
-            return [
-                'key' => $filename === self::ACTIVE_LEDGER ? 'current_ledger' : 'previous_ledger',
-                'label' => $label,
-                'status' => 'healthy',
-                'message' => 'No records have been written to this segment yet.',
-                'records' => 0,
-                'malformed_lines' => 0,
-                'size_bytes' => 0,
-            ];
-        }
+        return [
+            'key' => 'diagnostic_directory',
+            'label' => 'Private diagnostics folder',
+            'status' => $readable ? 'healthy' : 'failed',
+            'message' => ! $exists
+                ? 'The private diagnostics folder is missing.'
+                : ($readable
+                    ? 'The private diagnostics folder is present and readable.'
+                    : 'The private diagnostics folder cannot be read.'),
+        ];
+    }
 
-        if (! is_file($path) || ! is_readable($path)) {
-            return [
-                'key' => $filename === self::ACTIVE_LEDGER ? 'current_ledger' : 'previous_ledger',
-                'label' => $label,
-                'status' => 'failed',
-                'message' => 'The incident segment exists but cannot be read as a normal file.',
-            ];
-        }
-
-        $records = 0;
-        $malformed = 0;
-
-        try {
-            $file = new SplFileObject($path, 'r');
-
-            while (! $file->eof()) {
-                $line = $file->fgets();
-
-                if (! is_string($line) || trim($line) === '') {
-                    continue;
-                }
-
-                try {
-                    $record = json_decode($line, true, 32, JSON_THROW_ON_ERROR);
-                } catch (\JsonException) {
-                    $malformed++;
-
-                    continue;
-                }
-
-                if (! is_array($record) || ! is_string($record['request_id'] ?? null)) {
-                    $malformed++;
-
-                    continue;
-                }
-
-                $records++;
-            }
-        } catch (Throwable) {
-            return [
-                'key' => $filename === self::ACTIVE_LEDGER ? 'current_ledger' : 'previous_ledger',
-                'label' => $label,
-                'status' => 'failed',
-                'message' => 'Sentinel could not complete a read of this incident segment.',
-            ];
+    private function directoryChecks(string $directory): array
+    {
+        if (! is_dir($directory)) {
+            return $this->notCheckedDirectoryItems();
         }
 
         return [
-            'key' => $filename === self::ACTIVE_LEDGER ? 'current_ledger' : 'previous_ledger',
+            $this->inspectSegment($directory, self::ACTIVE_LEDGER, 'Current incident ledger'),
+            $this->inspectSegment($directory, self::PREVIOUS_LEDGER, 'Previous incident ledger'),
+            $this->writeProbe($directory),
+        ];
+    }
+
+    private function notCheckedDirectoryItems(): array
+    {
+        $items = [
+            ['key' => 'current_ledger', 'label' => 'Current incident ledger'],
+            ['key' => 'previous_ledger', 'label' => 'Previous incident ledger'],
+            ['key' => 'write_probe', 'label' => 'Diagnostic write/read test'],
+        ];
+
+        return array_map(static fn (array $item): array => [
+            ...$item,
+            'status' => 'not_checked',
+            'message' => 'Not checked because the diagnostics folder is unavailable.',
+        ], $items);
+    }
+
+    private function overallStatus(array $checks): string
+    {
+        $statuses = array_column($checks, 'status');
+
+        if (in_array('failed', $statuses, true)) {
+            return 'failed';
+        }
+
+        if (in_array('attention', $statuses, true)) {
+            return 'attention';
+        }
+
+        return in_array('unknown', $statuses, true) ? 'unknown' : 'healthy';
+    }
+
+    private function inspectSegment(string $directory, string $filename, string $label): array
+    {
+        $path = $directory.DIRECTORY_SEPARATOR.$filename;
+        $key = $this->segmentKey($filename);
+
+        if (! file_exists($path)) {
+            return $this->emptySegment($key, $label);
+        }
+
+        if (! is_file($path) || ! is_readable($path)) {
+            return $this->unreadableSegment($key, $label);
+        }
+
+        try {
+            $summary = $this->readSegment($path);
+        } catch (Throwable) {
+            return $this->unreadableSegment($key, $label);
+        }
+
+        return [
+            'key' => $key,
             'label' => $label,
-            'status' => $malformed > 0 ? 'attention' : 'healthy',
-            'message' => $malformed > 0
+            'status' => $summary['malformed_lines'] > 0 ? 'attention' : 'healthy',
+            'message' => $summary['malformed_lines'] > 0
                 ? 'Some lines cannot be read as incident records. Valid records remain available.'
                 : 'The incident segment is readable.',
-            'records' => $records,
-            'malformed_lines' => $malformed,
+            ...$summary,
             'size_bytes' => filesize($path) ?: 0,
         ];
+    }
+
+    private function segmentKey(string $filename): string
+    {
+        return $filename === self::ACTIVE_LEDGER ? 'current_ledger' : 'previous_ledger';
+    }
+
+    private function emptySegment(string $key, string $label): array
+    {
+        return [
+            'key' => $key,
+            'label' => $label,
+            'status' => 'healthy',
+            'message' => 'No records have been written to this segment yet.',
+            'records' => 0,
+            'malformed_lines' => 0,
+            'size_bytes' => 0,
+        ];
+    }
+
+    private function unreadableSegment(string $key, string $label): array
+    {
+        return [
+            'key' => $key,
+            'label' => $label,
+            'status' => 'failed',
+            'message' => 'Sentinel could not read this incident segment as a normal file.',
+        ];
+    }
+
+    private function readSegment(string $path): array
+    {
+        $records = 0;
+        $malformed = 0;
+        $file = new SplFileObject($path, 'r');
+
+        while (! $file->eof()) {
+            $lineStatus = $this->classifyLine($file->fgets());
+
+            if ($lineStatus === 'valid') {
+                $records++;
+            } elseif ($lineStatus === 'malformed') {
+                $malformed++;
+            }
+        }
+
+        return [
+            'records' => $records,
+            'malformed_lines' => $malformed,
+        ];
+    }
+
+    private function classifyLine(mixed $line): string
+    {
+        if (! is_string($line) || trim($line) === '') {
+            return 'empty';
+        }
+
+        try {
+            $record = json_decode($line, true, 32, JSON_THROW_ON_ERROR);
+        } catch (\JsonException) {
+            return 'malformed';
+        }
+
+        return is_array($record) && is_string($record['request_id'] ?? null)
+            ? 'valid'
+            : 'malformed';
     }
 
     private function writeProbe(string $directory): array
@@ -153,45 +200,31 @@ final class ZazuSentinelHealth
         $created = false;
         $writeReadPassed = false;
         $cleanupPassed = true;
-        $failureMessage = 'Sentinel could not create and lock a temporary diagnostics file.';
+        $failureMessage = 'Sentinel could not create a temporary diagnostics file.';
 
         try {
             $path = $directory.DIRECTORY_SEPARATOR.'sentinel-health-'.bin2hex(random_bytes(8)).'.tmp';
             $handle = @fopen($path, 'x+b');
+            $created = is_resource($handle);
 
-            if ($handle !== false) {
-                $created = true;
-
-                if (flock($handle, LOCK_EX)) {
-                    $marker = 'zazu-sentinel-health-probe';
-                    $written = fwrite($handle, $marker);
-                    $flushed = fflush($handle);
-                    rewind($handle);
-                    $readBack = stream_get_contents($handle);
-                    $writeReadPassed = $written === strlen($marker) && $flushed && $readBack === $marker;
-                    $failureMessage = 'Sentinel could not verify a temporary write and read.';
-                }
+            if (! $created) {
+                $failureMessage = 'Sentinel could not create a temporary diagnostics file.';
+            } elseif (! flock($handle, LOCK_EX)) {
+                $failureMessage = 'Sentinel could not lock its temporary diagnostics file.';
+            } else {
+                $writeReadPassed = $this->verifyProbe($handle);
+                $failureMessage = 'Sentinel could not verify a temporary write and read.';
             }
         } catch (Throwable) {
             $failureMessage = 'Sentinel could not complete its temporary write/read test.';
         } finally {
-            if (is_resource($handle)) {
-                flock($handle, LOCK_UN);
-                fclose($handle);
-            }
-
-            // Delete only a file this health check successfully created.
-            if ($created && is_string($path) && file_exists($path)) {
-                $cleanupPassed = @unlink($path);
-            }
+            $cleanupPassed = $this->cleanupProbe($handle, $path, $created);
         }
-
-        $passed = $writeReadPassed && $cleanupPassed;
 
         return [
             'key' => 'write_probe',
             'label' => 'Diagnostic write/read test',
-            'status' => $passed ? 'healthy' : 'failed',
+            'status' => $writeReadPassed && $cleanupPassed ? 'healthy' : 'failed',
             'message' => ! $writeReadPassed
                 ? $failureMessage
                 : ($cleanupPassed
@@ -199,5 +232,32 @@ final class ZazuSentinelHealth
                     : 'The probe worked but Sentinel could not remove its temporary file.'),
         ];
     }
-}
+
+    /**
+     * @param resource $handle
+     */
+    private function verifyProbe($handle): bool
+    {
+        $marker = 'zazu-sentinel-health-probe';
+        $written = fwrite($handle, $marker);
+        $flushed = fflush($handle);
+        $rewound = rewind($handle);
+        $readBack = stream_get_contents($handle);
+
+        return $written === strlen($marker) && $flushed && $rewound && $readBack === $marker;
+    }
+
+    private function cleanupProbe(mixed $handle, ?string $path, bool $created): bool
+    {
+        if (is_resource($handle)) {
+            flock($handle, LOCK_UN);
+            fclose($handle);
+        }
+
+        if (! $created || ! is_string($path) || ! file_exists($path)) {
+            return true;
+        }
+
+        return @unlink($path);
+    }
 }
