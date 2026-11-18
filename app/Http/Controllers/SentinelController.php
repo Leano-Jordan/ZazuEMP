@@ -18,6 +18,7 @@ final class SentinelController extends Controller
 
         $health = $healthService->inspect();
         $all = $incidents->build(100);
+        $overview = $incidents->overview();
         $query = trim((string) ($filters['q'] ?? ''));
         $summaries = $all;
 
@@ -43,9 +44,9 @@ final class SentinelController extends Controller
             'timeline' => $timeline,
             'selectedFingerprint' => $selected,
             'searchQuery' => $query,
-            'totalFingerprints' => count($all),
-            'totalOccurrences' => array_sum(array_column($all, 'occurrences')),
-            'latestIncident' => $all[0]['last_seen'] ?? null,
+            'totalFingerprints' => $overview['fingerprints'],
+            'totalOccurrences' => $overview['occurrences'],
+            'latestIncident' => $overview['latest_incident'],
         ]);
     }
 }
