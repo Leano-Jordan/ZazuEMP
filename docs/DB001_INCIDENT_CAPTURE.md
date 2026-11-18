@@ -80,11 +80,11 @@ no-store caching headers. Treat the reference as sensitive and share the report 
 
 ## Owner Sentinel Rescue access
 
-Business owners can open **System → Sentinel Rescue** to get a private signed link that bypasses the normal Zazu login/session path. The link is valid for one year when generated and should be kept private. Anyone who receives it can view this installation-level health snapshot.
+Business owners open **System → Sentinel Rescue** while signed in. The `/sentinel/rescue` route requires authentication, a valid active business context and the owner role on every request. It does not issue transferable signed/bearer links.
 
 The standalone page checks database connectivity and migration history using read-only queries; private storage permissions; required installed-app support files; and Sentinel's own diagnostic directory, active/previous ledger readability, malformed-record counts and temporary write/read/delete probe. When the database probe or a migration query throws, Sentinel attempts to capture a safe incident and shows the reference-specific DB-001 report link.
 
-The route is tested with an unavailable SQLite database path while `SESSION_DRIVER=database`. It returned the rescue page and retained independent diagnostic capture without requiring a normal database-backed session. It still depends on the local Zazu web process and application bootstrap remaining operational.
+The previous unauthenticated bearer route was removed. The authenticated owner route now depends on the configured user/session authentication path; if the business database or database-backed session store is unavailable, the owner may be unable to reach Rescue. Secure database-outage diagnosis therefore remains an open resilience item and must not be claimed as solved. The route still depends on the local Zazu web process and application bootstrap.
 
 This is not full diagnosis yet. No diagnostic ZIP/manifest, attachment health, offline queue/sync verification, backup integrity/recovery check, session/cache check or local knowledge base has been completed. A present service-worker file is not proof of phone offline capability. Physical Android and owner-operated packaged-installation acceptance remain separate.
 
