@@ -98,6 +98,7 @@ class IncidentDiagnosticController extends Controller
             'request_id',
             'failure_fingerprint',
             'failure_fingerprint_version',
+            'source_file',
             'error_code',
             'category',
             'severity',
