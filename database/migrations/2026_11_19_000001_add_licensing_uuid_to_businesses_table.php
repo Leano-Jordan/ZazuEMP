@@ -25,6 +25,10 @@ return new class extends Migration
                         ->update(['licensing_uuid' => (string) Str::uuid()]);
                 }
             });
+
+        Schema::table('businesses', function (Blueprint $table): void {
+            $table->uuid('licensing_uuid')->nullable(false)->change();
+        });
     }
 
     public function down(): void
