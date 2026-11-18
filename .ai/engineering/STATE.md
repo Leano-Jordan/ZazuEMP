@@ -403,3 +403,17 @@ V1: NOT READY. Historical state/register/memory, checklist and changelog are pre
 - The signed token is returned once in the founder's authenticated session for manual delivery. Application logs record metadata only; token and key bytes are not logged. Revocation requires the owner to import the signed revocation token while offline; it is not a remote kill switch.
 - Added focused feature tests for founder issuance, non-founder denial and missing-key fail-closed behavior. Exact-head CI has not yet been observed. Do not mark this workflow accepted until Laravel tests, quality/security checks and relevant Windows package checks pass.
 - No feature matrix or paid-feature enforcement was invented. No branches created; all changes are directly on `main`.
+
+
+## Sentinel founder licensing — UUID-backed offline customer registry — 2026-11-19
+
+- Reworked the Sentinel licensing workspace to fit Zazu's documented first-customer model: independent local installations, no mandatory cloud licensing server. The founder maintains a local registry of customer businesses using the stable licensing UUID supplied by each owner.
+- Added `businesses.licensing_uuid`: migration backfills existing businesses and new Business records generate a UUID. Business Settings now displays this as the Business Licensing Reference; the numeric Business ID is explicitly local/support-only.
+- Signed licence payloads are now version 2 and bind to `business_uuid`. The local verifier compares that UUID with the UUID in the customer's Business record. Version-1 tokens bound only to local numeric IDs are rejected because separate customer installations can reuse those IDs.
+- Added `platform_license_customers` founder registry for business UUID, business name, optional email/notes and latest licence metadata. It does not store signed token contents or private-key material.
+- Sentinel now supports founder-only customer registration/search, signed issue/renewal and revocation. All actions remain inside `auth`, `auth.session`, `sentinel.admin`; issue/revoke/register actions are rate-limited. Customers still import tokens through their existing owner-only Business Settings screen.
+- Issuance uses the external `ZAZU_LICENSE_PRIVATE_KEY_FILE` path and matching `ZAZU_LICENSE_PUBLIC_KEY`. The private key never enters the browser, customer installation, database or logs. No production key was generated or used.
+- Split issuer payload validation and token signing into focused services to keep the command maintainable. Added feature coverage for registry registration, UUID-bound issuance, revocation, founder authorization and missing-key fail-closed behaviour; updated local import and CLI tests to version 2.
+- Exact-head Laravel, PHPMD, Psalm, Quality, populated migration/rollback and Windows package evidence is still pending. Do not claim the founder workflow is accepted until those exact-head runs pass and the Windows local installation has the new migration. No production licence has been issued.
+- Business-level identity is implemented; per-installation seat limits/reactivation, production key custody/rotation, approved tier matrix and module-level feature enforcement remain open. Do not infer any device-count restrictions.
+- All work committed directly to `main`; no branches created.
