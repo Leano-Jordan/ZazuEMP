@@ -219,3 +219,12 @@ V1: NOT READY. Historical state/register/memory, checklist and changelog are pre
 - Windows V1 package run `44318697559` on app-source-equivalent commit `e5bb8c602b7b66403dbda49ca023cb7000856170`: package build and Windows PowerShell fresh-install verification **PASS**. No physical owner installation acceptance is inferred from CI.
 - Remaining Sentinel gaps: package export/manifest, full failure knowledge base, attachment health, offline queue/sync checks, session/cache diagnostics, backup integrity and recovery checks, richer fault injection, and on-device/offline packaged acceptance.
 - DB-001 reference `895e2c23-bc6b-4919-a891-1e8e5c1e27e4` remains OPEN until the actual installation's failing workflow is identified, corrected and repeated successfully. V1 remains NOT READY; no readiness score uplift. No branches created.
+
+
+## Sentinel Rescue owner-dashboard refinement — 2026-11-18
+
+- Owner reported that the standalone Rescue screen consumed too much vertical space and offered no route back into the Zazu workspace.
+- Kept the standalone read-only diagnostic surface so it remains useful when the normal application shell/database path is unhealthy; added a persistent compact workspace link to the owner dashboard.
+- Reworked the large introduction and instructional panels into a compact status summary and responsive health-check grid. Detailed migration names remain collapsed until requested.
+- Founder environment setting confirmed by owner as `Rosscorelabs@outlook.com`. `config/zazu.php` normalizes the configured `ZAZU_PLATFORM_ADMIN_EMAIL` to lowercase. Do not hard-code the founder identity into shared defaults; each installation must set it in its private `.env`.
+- Source/test update is not visually accepted until rendered on the owner's installation. Existing Sentinel security boundaries remain unchanged.
