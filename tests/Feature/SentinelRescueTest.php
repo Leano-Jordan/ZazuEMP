@@ -30,19 +30,32 @@ class SentinelRescueTest extends TestCase
     public function test_signed_rescue_page_loads_without_authentication_or_database_sessions(): void
     {
         config([
-            'database.default' => 'sentinel_database_unavailable',
+            'database.default' => 'sqlite',
+            'database.connections.sqlite.database' => $this->directory,
             'session.driver' => 'database',
         ]);
+        \\Illuminate\\Support\\Facades\\DB::purge('sqlite');
 
-        $url = URL::temporarySignedRoute('sentinel.rescue', now()->addDays(365));
+        $incidentDirectory = storage_path('app/private/zazu-diagnostics');
+        File::deleteDirectory($incidentDirectory);
 
-        $this->get($url)
-            ->assertOk()
-            ->assertSee('Sentinel Rescue')
-            ->assertSee('does not require your normal Zazu sign-in')
-            ->assertSee('Diagnostic write/read test')
-            ->assertHeader('Cache-Control', 'no-store, private')
-            ->assertHeader('Referrer-Policy', 'no-referrer');
+        try {
+            $url = URL::temporarySignedRoute('sentinel.rescue', now()->addDays(365));
+
+            $this->get($url)
+                ->assertOk()
+                ->assertSee('Sentinel Rescue')
+                ->assertSee('does not require your normal Zazu sign-in')
+                ->assertSee('Database connection')
+                ->assertSee('DB-001')
+                ->assertSee('sqlite_open_failed')
+                ->assertSee('Download safe DB report')
+                ->assertSee('Diagnostic write/read test')
+                ->assertHeader('Cache-Control', 'no-store, private')
+                ->assertHeader('Referrer-Policy', 'no-referrer');
+        } finally {
+            File::deleteDirectory($incidentDirectory);
+        }
     }
 
     public function test_rescue_route_rejects_a_missing_signature(): void
