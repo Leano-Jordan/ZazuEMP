@@ -20,8 +20,8 @@ class IncidentDiagnosticDownloadTest extends TestCase
             'category' => 'Database',
             'severity' => 'high',
             'http_status' => 500,
-            'exception_class' => 'Illuminate\\Database\\QueryException',
-            'originating_component' => 'App\\Http\\Controllers\\DashboardController@index',
+            'exception_class' => 'Illuminate\Database\QueryException',
+            'originating_component' => 'App\Http\Controllers\DashboardController@index',
             'route_name' => 'dashboard',
             'http_method' => 'GET',
             'http_path' => 'dashboard/private-customer-123',
@@ -95,8 +95,8 @@ class IncidentDiagnosticDownloadTest extends TestCase
                 'category' => 'Database',
                 'severity' => 'high',
                 'http_status' => 500,
-                'exception_class' => 'Illuminate\\Database\\QueryException',
-                'originating_component' => 'App\\Http\\Controllers\\DashboardController@index',
+                'exception_class' => 'Illuminate\Database\QueryException',
+                'originating_component' => 'App\Http\Controllers\DashboardController@index',
                 'route_name' => 'dashboard',
                 'http_method' => 'GET',
                 'timestamp' => '2026-11-18T11:00:00+02:00',
@@ -146,7 +146,7 @@ class IncidentDiagnosticDownloadTest extends TestCase
                 'failure_fingerprint' => $fingerprint,
                 'error_code' => 'DB-001',
                 'database_failure_class' => 'sqlite_missing_column',
-                'exception_class' => 'Illuminate\\\\Database\\\\QueryException',
+                'exception_class' => 'Illuminate\\Database\\QueryException',
                 'source_file' => 'DashboardController.php',
                 'timestamp' => '2026-11-18T10:00:00+02:00',
                 'sql' => 'private SQL must not appear',
@@ -156,7 +156,7 @@ class IncidentDiagnosticDownloadTest extends TestCase
                 'failure_fingerprint' => $fingerprint,
                 'error_code' => 'DB-001',
                 'database_failure_class' => 'sqlite_missing_column',
-                'exception_class' => 'Illuminate\\\\Database\\\\QueryException',
+                'exception_class' => 'Illuminate\\Database\\QueryException',
                 'source_file' => 'DashboardController.php',
                 'timestamp' => '2026-11-18T11:00:00+02:00',
             ],
@@ -171,7 +171,7 @@ class IncidentDiagnosticDownloadTest extends TestCase
         );
 
         try {
-            $summary = app(\\App\\Support\\ZazuIncidentSummary::class)->build();
+            $summary = app(\App\Support\ZazuIncidentSummary::class)->build();
 
             $this->assertCount(1, $summary);
             $this->assertSame($fingerprint, $summary[0]['fingerprint']);
@@ -182,7 +182,7 @@ class IncidentDiagnosticDownloadTest extends TestCase
             $this->assertArrayNotHasKey('sql', $summary[0]);
             $this->assertStringNotContainsString('private SQL', json_encode($summary, JSON_THROW_ON_ERROR));
 
-            $timeline = app(\\App\\Support\\ZazuIncidentSummary::class)->timeline($fingerprint);
+            $timeline = app(\App\Support\ZazuIncidentSummary::class)->timeline($fingerprint);
             $this->assertCount(2, $timeline);
             $this->assertSame('895e2c23-bc6b-4919-a891-1e8e5c1e27e4', $timeline[0]['request_id']);
             $this->assertArrayNotHasKey('sql', $timeline[0]);
