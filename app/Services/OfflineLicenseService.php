@@ -38,7 +38,7 @@ class OfflineLicenseService
         Business $business,
         string $token,
     ): BusinessLicense {
-        $verified = $this->verifier->verifyForBusiness($token, (int) $business->id);
+        $verified = $this->verifier->verifyForBusiness($token, (string) $business->licensing_uuid);
         $payload = $verified['payload'];
         $dates = $verified['dates'];
         $fingerprint = $verified['fingerprint'];
@@ -60,7 +60,7 @@ class OfflineLicenseService
                     'features' => $payload['features'] ?: null,
                     'metadata' => [
                         'signed' => true,
-                        'format_version' => 1,
+                        'format_version' => 2,
                         'issued_at' => $dates['issued_at']->toIso8601String(),
                         'payload_sha256' => $fingerprint,
                     ],
