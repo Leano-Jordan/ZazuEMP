@@ -285,3 +285,5 @@ V1: NOT READY. Historical state/register/memory, checklist and changelog are pre
 - Windows security remains dependent on effective NTFS ACLs; PHP `chmod` is not treated as proof. Installed-package ACL verification remains an acceptance requirement.
 - Change committed directly to `main` as `396960a`; CI for this exact head is pending. Prior application commit `529bd6f` had Laravel 575 passed / 1 skipped / 3,962 assertions, PostgreSQL smoke PASS, PHPMD PASS and quality scans PASS; offline-browser acceptance was still running at last check.
 - No branches created. V1 remains NOT READY pending exact-head CI and physical-device/package acceptance.
+
+- Added a POSIX feature test that verifies the diagnostics directory is `0700` and the incident lock/ledger files are `0600`; the test explicitly skips on Windows because NTFS ACLs, not POSIX mode bits, determine effective access there. Commit `d1923af`; exact-head CI pending.
