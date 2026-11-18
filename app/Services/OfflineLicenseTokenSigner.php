@@ -28,6 +28,16 @@ final class OfflineLicenseTokenSigner
 
     private function loadSecretKey(string $keyFile): string
     {
+        $realPath = $this->resolveExternalKeyPath($keyFile);
+        $secretKey = $this->decodeSecretKey($realPath);
+        $publicKey = $this->configuredPublicKey();
+        $this->assertKeyMatches($secretKey, $publicKey);
+
+        return $secretKey;
+    }
+
+    private function resolveExternalKeyPath(string $keyFile): string
+    {
         $realPath = realpath(trim($keyFile));
         if ($realPath === false || ! is_file($realPath) || ! is_readable($realPath)) {
             throw new \InvalidArgumentException('A readable external signing-key file is required.');
@@ -40,22 +50,35 @@ final class OfflineLicenseTokenSigner
             throw new \InvalidArgumentException('The signing key must be stored outside the Zazu project.');
         }
 
-        $encodedKey = file_get_contents($realPath);
+        return $realPath;
+    }
+
+    private function decodeSecretKey(string $path): string
+    {
+        $encodedKey = file_get_contents($path);
         $secretKey = is_string($encodedKey) ? base64_decode(trim($encodedKey), true) : false;
         if ($secretKey === false || strlen($secretKey) !== SODIUM_CRYPTO_SIGN_SECRETKEYBYTES) {
             throw new \InvalidArgumentException('The external signing-key file is not a valid base64 Ed25519 secret key.');
         }
 
+        return $secretKey;
+    }
+
+    private function configuredPublicKey(): string
+    {
         $publicKey = base64_decode((string) config('zazu.licensing.public_key', ''), true);
         if ($publicKey === false || strlen($publicKey) !== SODIUM_CRYPTO_SIGN_PUBLICKEYBYTES) {
             throw new \InvalidArgumentException('The matching ZAZU_LICENSE_PUBLIC_KEY is not configured.');
         }
 
+        return $publicKey;
+    }
+
+    private function assertKeyMatches(string $secretKey, string $publicKey): void
+    {
         if (! hash_equals($publicKey, sodium_crypto_sign_publickey_from_secretkey($secretKey))) {
             throw new \InvalidArgumentException('The external signing key does not match the configured Zazu public key.');
         }
-
-        return $secretKey;
     }
 
     private function base64UrlEncode(string $value): string
