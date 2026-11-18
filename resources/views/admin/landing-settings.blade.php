@@ -1,6 +1,9 @@
 <x-app-layout>
     <x-slot:title>Landing page administration</x-slot:title>
     <x-slot:heading>Landing page administration</x-slot:heading>
+    <x-slot:headerAction>
+        <a href="{{ route('admin.sentinel') }}" class="zazu-btn zazu-btn-ghost">Open Sentinel diagnostics</a>
+    </x-slot:headerAction>
 
     <section class="zazu-command-band">
         <div>
