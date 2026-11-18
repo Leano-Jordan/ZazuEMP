@@ -35,7 +35,7 @@
         .status-attention{color:#754b08;background:#fff5dd;border-color:#d9b85f}
         .status-failed{color:#8d2525;background:#fff0f0;border-color:#d99a9a}
         .status-unknown,.status-not_checked{color:#40576e;background:#eef2f6;border-color:#b4c1ce}
-        .toolbar{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;padding:10px 11px;margin-bottom:11px;border:1px solid #aebdcb;border-radius:13px;background:#f9fbfd}
+        .toolbar[hidden]{display:none}.toolbar{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;padding:10px 11px;margin-bottom:11px;border:1px solid #aebdcb;border-radius:13px;background:#f9fbfd}
         .filters{display:flex;align-items:center;gap:6px;flex-wrap:wrap}
         .filter-button,.expand-button{min-height:34px;padding:0 11px;border:1px solid #aab9c8;border-radius:9px;background:#fff;color:#354d64;font:inherit;font-size:.75rem;font-weight:750;cursor:pointer}
         .filter-button:hover,.expand-button:hover{border-color:#6986a1;background:#edf4f9}
