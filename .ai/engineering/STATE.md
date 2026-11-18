@@ -366,3 +366,11 @@ V1: NOT READY. Historical state/register/memory, checklist and changelog are pre
 
 - Follow-on inspection found the same top-100 truncation also affected search: low-frequency fingerprints outside the displayed top 100 were impossible to find. Search now filters the complete retained fingerprint set before applying its 100-row result cap. The regression test also searches for a deliberately low-frequency fingerprint and verifies unrelated top-ranked entries are absent.
 - Follow-on commits: summary search `1ac1cff`, controller `7c3a043`, search regression `fa9308b`. CI for the final combined head remains pending.
+
+## Sentinel diagnostic-link access hardening — 2026-11-18
+
+- Source review found the DB-001 diagnostic endpoint was rate-limited and returned only allowlisted fields, but its reference UUID URL had no signature or expiry. A copied URL could therefore be reused indefinitely.
+- The endpoint now requires Laravel's signed-URL middleware in addition to the existing rate limit. Sentinel Control Centre, Sentinel Rescue and the DB-001 error page generate temporary signed report links that expire after 15 minutes.
+- The report remains reference-scoped and redacted; this does not grant access to the founder console or the full incident ledger.
+- Added feature coverage for unsigned, expired and path-tampered links, and assertions that all three user-facing link surfaces include signature and expiry parameters.
+- Verification is pending on the exact resulting `main` head. This is source-level hardening only; no installed device, database or incident records were changed.
