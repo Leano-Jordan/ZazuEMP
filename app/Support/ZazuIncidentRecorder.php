@@ -99,12 +99,19 @@ final class ZazuIncidentRecorder
 
     private static function pdoExceptionDiagnostics(\PDOException $exception): array
     {
+        $configuredConnection = config('database.default');
+        $connectionName = is_string($configuredConnection)
+            && preg_match('/^[a-z0-9_-]{1,64}$/i', $configuredConnection) === 1
+                ? $configuredConnection
+                : null;
+        $driver = $connectionName !== null ? self::databaseDriver($connectionName) : null;
+
         return [
-            'database_connection' => null,
-            'database_driver' => null,
+            'database_connection' => $connectionName,
+            'database_driver' => $driver,
             'database_sqlstate' => self::sqlState($exception->errorInfo ?? null),
             'database_driver_code' => self::driverCode($exception->errorInfo ?? null),
-            'database_failure_class' => self::databaseFailureClass($exception, null),
+            'database_failure_class' => self::databaseFailureClass($exception, $driver),
         ];
     }
 
