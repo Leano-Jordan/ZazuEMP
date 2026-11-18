@@ -75,3 +75,7 @@ This package is a local Windows installation candidate, not a hosted multi-custo
 ## Evidence required before calling V1 release-ready
 
 The package build must pass on its exact commit. Before calling the product release-ready, the release owner must also complete the intended Windows installation acceptance, physical-device acceptance for any claimed phone/offline workflows, an operator backup/restore drill on an isolated copy of the intended installation, live populated-business quote/payment/cost/profit reconciliation, and POPIA operational/privacy sign-off. A generated ZIP alone does not close these gates.
+
+### Windows private-storage access
+
+The installer applies a protected NTFS ACL to `storage/app/private` and its existing contents. Access is limited to the Windows account running the installer, Local System and the local Administrators group; broad inherited access from the installation parent is removed. New diagnostic and private-media files inherit that restricted access. The installer rejects reparse points inside this private tree rather than applying permissions through an unexpected link. Re-run the installer after changing the Windows account that operates Zazu so the private-storage owner and ACLs are aligned with that account.
