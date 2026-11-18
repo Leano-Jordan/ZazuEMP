@@ -16,6 +16,56 @@ function Stop-ZazuInstall([string]$Message) {
     exit 1
 }
 
+function Set-ZazuPrivateStorageAcl([string]$Path) {
+    $currentUserSid = [System.Security.Principal.WindowsIdentity]::GetCurrent().User
+    if (-not $currentUserSid) {
+        Stop-ZazuInstall 'Could not identify the Windows account that owns this Zazu installation.'
+    }
+
+    $allowedSids = @(
+        $currentUserSid,
+        [System.Security.Principal.SecurityIdentifier]::new('S-1-5-18'),
+        [System.Security.Principal.SecurityIdentifier]::new('S-1-5-32-544')
+    )
+
+    $root = Get-Item -LiteralPath $Path -Force
+    if (($root.Attributes -band [System.IO.FileAttributes]::ReparsePoint) -ne 0) {
+        Stop-ZazuInstall 'The private storage directory cannot be a symbolic link or reparse point.'
+    }
+
+    $items = @($root) + @(Get-ChildItem -LiteralPath $Path -Force -Recurse -ErrorAction Stop)
+    foreach ($item in $items) {
+        if (($item.Attributes -band [System.IO.FileAttributes]::ReparsePoint) -ne 0) {
+            Stop-ZazuInstall "Private storage contains an unsupported link or reparse point: $($item.FullName)"
+        }
+
+        $acl = Get-Acl -LiteralPath $item.FullName
+        $acl.SetAccessRuleProtection($true, $false)
+        foreach ($existingRule in @($acl.Access)) {
+            [void]$acl.RemoveAccessRuleSpecific($existingRule)
+        }
+        $acl.SetOwner($currentUserSid)
+
+        $inheritance = [System.Security.AccessControl.InheritanceFlags]::None
+        if ($item.PSIsContainer) {
+            $inheritance = [System.Security.AccessControl.InheritanceFlags]::ContainerInherit -bor [System.Security.AccessControl.InheritanceFlags]::ObjectInherit
+        }
+
+        foreach ($sid in $allowedSids) {
+            $rule = [System.Security.AccessControl.FileSystemAccessRule]::new(
+                $sid,
+                [System.Security.AccessControl.FileSystemRights]::FullControl,
+                $inheritance,
+                [System.Security.AccessControl.PropagationFlags]::None,
+                [System.Security.AccessControl.AccessControlType]::Allow
+            )
+            [void]$acl.AddAccessRule($rule)
+        }
+
+        Set-Acl -LiteralPath $item.FullName -AclObject $acl
+    }
+}
+
 function Invoke-ZazuPhp([string[]]$Arguments) {
     Push-Location $ProjectPath
     try {
@@ -145,6 +195,9 @@ $requiredDirectories = @(
 foreach ($relativePath in $requiredDirectories) {
     New-Item -ItemType Directory -Path (Join-Path $ProjectPath $relativePath) -Force | Out-Null
 }
+
+# Private attachments and diagnostic artifacts must not inherit broad local-user access.
+Set-ZazuPrivateStorageAcl (Join-Path $ProjectPath 'storage\app\private')
 
 $databasePath = Join-Path $ProjectPath 'database\database.sqlite'
 if (-not (Test-Path $databasePath -PathType Leaf)) {
