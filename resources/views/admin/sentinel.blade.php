@@ -122,9 +122,6 @@
                     <label>Contact email (optional)
                         <input type="email" name="contact_email" value="{{ old('contact_email') }}" maxlength="255">
                     </label>
-                    <label>Internal notes (optional)
-                        <textarea name="notes" rows="2" maxlength="2000">{{ old('notes') }}</textarea>
-                    </label>
                     <button class="sentinel-button" type="submit">Register business</button>
                 </form>
                 @if($errors->any())
@@ -148,17 +145,22 @@
                             @endif
                             <div class="sentinel-license-meta">Business UUID: <code>{{ $customer->business_uuid }}</code></div>
                             @if($customer->last_license_id)
+                                @php
+                                    $licenceStatus = $customer->last_status;
+                                    if ($licenceStatus === 'active' && $customer->last_starts_at?->isFuture()) {
+                                        $licenceStatus = 'not yet active';
+                                    } elseif ($licenceStatus === 'active' && $customer->last_expires_at?->isPast()) {
+                                        $licenceStatus = 'expired';
+                                    }
+                                @endphp
                                 <div class="sentinel-health-facts sentinel-license-facts">
                                     <span class="sentinel-pill">{{ strtoupper($customer->last_plan) }}</span>
-                                    <span class="sentinel-pill">{{ strtoupper($customer->last_status) }}</span>
+                                    <span class="sentinel-pill">{{ strtoupper($licenceStatus) }}</span>
                                     <span>Expires {{ $customer->last_expires_at?->format('d M Y H:i') ?? 'Never' }}</span>
                                 </div>
                                 <div class="sentinel-muted sentinel-license-meta">Licence {{ $customer->last_license_id }}</div>
                             @else
                                 <div class="sentinel-muted">No licence issued yet</div>
-                            @endif
-                            @if($customer->notes)
-                                <p class="sentinel-muted sentinel-license-meta">{{ $customer->notes }}</p>
                             @endif
                         </div>
                         <div class="sentinel-license-actions">
