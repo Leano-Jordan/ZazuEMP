@@ -3,7 +3,7 @@
 $platformAdminEmail = trim((string) env('ZAZU_PLATFORM_ADMIN_EMAIL', ''));
 
 return [
-    // One explicitly designated founder identity. Legacy configuration is accepted only when it contains exactly one address.
+    // One explicitly designated founder identity. No legacy administrator list is accepted.
     'platform_admin_email' => strtolower($platformAdminEmail),
     'licensing' => [
         // Ed25519 public key only (base64-encoded 32-byte key). Never configure a private key here.
