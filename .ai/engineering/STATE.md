@@ -248,3 +248,13 @@ V1: NOT READY. Historical state/register/memory, checklist and changelog are pre
 - Updated the page copy to distinguish read-only database checks from the existing temporary diagnostics-file write/read probe, which attempts cleanup after each check.
 - Added a focused Blade-render regression test for safe incident-ledger guidance and updated Sentinel documentation.
 - Verification is pending for the new commits. Visual acceptance remains pending on the owner's installation. All commits are directly on `main`; no branches created.
+
+
+## Sentinel local recovery complexity cleanup — 2026-11-18
+
+- Refactored `EnsureLocalSentinelRecovery` into focused loopback and same-origin POST guards; retained exact local address/host restrictions, content-type, origin scheme/host/port checks and Fetch Metadata behavior.
+- Refactored `ZazuLocalSentinelRecovery` into code-format, locked-read, challenge-validation and invalidation helpers. The 256-bit code, SHA-256 hash storage, five-minute expiry, lock-protected single-use behavior and invalidation fallback are preserved.
+- Added feature coverage for expired and malformed challenges alongside existing cross-origin, different-port and one-time-use tests.
+- PHPMD had reported complexity violations in the two recovery methods. New PHPMD result is pending; no suppression or threshold change was made.
+- Removed a duplicate incident-report link from the owner guidance panel; the existing reference-scoped DB-001 report action remains in the diagnostic facts row.
+- Changes committed directly to `main`; no branches created. Full Laravel and physical-device acceptance remain pending.
