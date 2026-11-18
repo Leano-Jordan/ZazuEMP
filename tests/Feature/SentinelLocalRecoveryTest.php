@@ -19,6 +19,7 @@ class SentinelLocalRecoveryTest extends TestCase
             ->assertOk()
             ->assertSee('Sentinel Local Recovery')
             ->assertSee('zazu:sentinel-recovery-code')
+            ->assertDontSee('Database connection')
             ->assertHeader('Cache-Control', 'no-store, private');
     }
 
