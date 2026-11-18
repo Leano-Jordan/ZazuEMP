@@ -56,7 +56,11 @@
         .sentinel-license-form .sentinel-button{font-size:.82rem}
         .sentinel-token{width:100%;min-height:6rem;overflow-wrap:anywhere;border:1px solid var(--zazu-border,#d9dee7);border-radius:10px;padding:.7rem;background:var(--zazu-background,#fff);color:inherit}
         .sentinel-alert{padding:.85rem 1rem;border:1px solid var(--zazu-border,#d9dee7);border-radius:12px}
-        .sentinel-alert-error{border-color:#c04444}\n        .sentinel-license-search{margin:.8rem 0}\n        .sentinel-license-facts{margin-top:.45rem}\n        .sentinel-license-meta{font-size:.75rem}\n        .sentinel-license-pagination{margin-top:1rem}
+        .sentinel-alert-error{border-color:#c04444}
+        .sentinel-license-search{margin:.8rem 0}
+        .sentinel-license-facts{margin-top:.45rem}
+        .sentinel-license-meta{font-size:.75rem}
+        .sentinel-license-pagination{margin-top:1rem}
         @media(max-width:800px){.sentinel-license-row{grid-template-columns:1fr}}
         @media(max-width:700px){.sentinel-stats{grid-template-columns:1fr}.sentinel-health-grid{grid-template-columns:1fr}.sentinel-intro{display:block}.sentinel-event{grid-template-columns:1fr}.sentinel-event dl{grid-template-columns:1fr 1fr}}
     </style>
@@ -125,9 +129,9 @@
                                 <input type="hidden" name="business_id" value="{{ $business->id }}">
                                 <label>Plan
                                     <select name="plan" required>
-                                        <option value="basic">Basic</option>
-                                        <option value="intermediate">Intermediate</option>
-                                        <option value="advanced" selected>Advanced</option>
+                                        <option value="basic" @selected(($business->license?->plan ?? 'basic') === 'basic')>Basic</option>
+                                        <option value="intermediate" @selected(($business->license?->plan ?? '') === 'intermediate')>Intermediate</option>
+                                        <option value="advanced" @selected(in_array($business->license?->plan, ['advanced', 'solo'], true) || !$business->license)>Advanced</option>
                                     </select>
                                 </label>
                                 <label>Expires at
