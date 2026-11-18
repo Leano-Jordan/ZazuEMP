@@ -113,6 +113,7 @@ Route::middleware(['auth', 'auth.session', 'owner'])->group(function () {
 });
 
 Route::middleware(['auth', 'auth.session', 'platform.admin'])->prefix('admin')->group(function () {
+    Route::get('/sentinel', [SentinelController::class, 'index'])->name('admin.sentinel');
     Route::get('/landing-settings', [PlatformLandingSettingsController::class, 'edit'])->name('admin.landing.settings');
     Route::put('/landing-settings', [PlatformLandingSettingsController::class, 'update'])->name('admin.landing.settings.update');
 });
