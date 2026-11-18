@@ -25,55 +25,7 @@ final class ZazuIncidentLedger
         $safe = self::allowlisted($context);
         $safe['failure_fingerprint_version'] = 1;
         $safe['failure_fingerprint'] = self::fingerprint($safe);
-
-        $directory = storage_path('app/private/zazu-diagnostics');
-        $ledger = $directory.DIRECTORY_SEPARATOR.'incidents.jsonl';
-        $lockPath = $directory.DIRECTORY_SEPARATOR.'incidents.lock';
-
-        try {
-            if (!is_dir($directory) && !mkdir($directory, 0700, true) && !is_dir($directory)) {
-                throw new \RuntimeException('Unable to create the private incident ledger directory.');
-            }
-
-            $lock = fopen($lockPath, 'c');
-
-            if ($lock === false) {
-                throw new \RuntimeException('Unable to open the incident ledger lock.');
-            }
-
-            try {
-                if (!flock($lock, LOCK_EX)) {
-                    throw new \RuntimeException('Unable to lock the incident ledger.');
-                }
-
-                if (is_file($ledger) && filesize($ledger) >= self::MAX_FILE_BYTES) {
-                    $previous = $ledger.'.1';
-
-                    if (is_file($previous) && !unlink($previous)) {
-                        throw new \RuntimeException('Unable to rotate the previous incident ledger.');
-                    }
-
-                    if (!rename($ledger, $previous)) {
-                        throw new \RuntimeException('Unable to rotate the incident ledger.');
-                    }
-                }
-
-                $encoded = json_encode($safe, JSON_THROW_ON_ERROR | JSON_UNESCAPED_SLASHES);
-                $line = $encoded.PHP_EOL;
-                $written = file_put_contents($ledger, $line, FILE_APPEND | LOCK_EX);
-
-                if ($written === false || $written !== strlen($line)) {
-                    throw new \RuntimeException('The incident ledger write was incomplete.');
-                }
-            } finally {
-                flock($lock, LOCK_UN);
-                fclose($lock);
-            }
-        } catch (Throwable $failure) {
-            // Do not send the original exception or incident payload to another
-            // application logger. The PHP error channel is the last-resort signal.
-            error_log('Zazu incident ledger write failed: '.$failure::class);
-        }
+        self::persist($safe);
 
         return $safe;
     }
@@ -86,40 +38,134 @@ final class ZazuIncidentLedger
 
         $directory = storage_path('app/private/zazu-diagnostics');
 
-        foreach ([
-            $directory.DIRECTORY_SEPARATOR.'incidents.jsonl',
-            $directory.DIRECTORY_SEPARATOR.'incidents.jsonl.1',
-        ] as $path) {
-            if (!is_file($path) || !is_readable($path)) {
-                continue;
-            }
+        foreach (self::ledgerPaths($directory) as $path) {
+            $record = self::findInFile($path, $requestId);
 
-            try {
-                $file = new SplFileObject($path, 'r');
-
-                while (!$file->eof()) {
-                    $line = $file->fgets();
-
-                    if (!is_string($line) || !str_contains($line, $requestId)) {
-                        continue;
-                    }
-
-                    try {
-                        $record = json_decode($line, true, 32, JSON_THROW_ON_ERROR);
-                    } catch (\JsonException) {
-                        continue;
-                    }
-
-                    if (is_array($record) && ($record['request_id'] ?? null) === $requestId) {
-                        return self::allowlisted($record);
-                    }
-                }
-            } catch (Throwable) {
-                continue;
+            if ($record !== null) {
+                return self::allowlisted($record);
             }
         }
 
         return null;
+    }
+
+    private static function persist(array $safe): void
+    {
+        $directory = storage_path('app/private/zazu-diagnostics');
+        $ledger = $directory.DIRECTORY_SEPARATOR.'incidents.jsonl';
+        $lockPath = $directory.DIRECTORY_SEPARATOR.'incidents.lock';
+
+        try {
+            self::ensureDirectory($directory);
+            $lock = fopen($lockPath, 'c');
+
+            if ($lock === false) {
+                throw new \RuntimeException('Unable to open the incident ledger lock.');
+            }
+
+            try {
+                self::appendWhileLocked($lock, $ledger, $safe);
+            } finally {
+                fclose($lock);
+            }
+        } catch (Throwable $failure) {
+            // Never send the original exception or incident payload to another logger.
+            error_log('Zazu incident ledger write failed: '.$failure::class);
+        }
+    }
+
+    private static function ensureDirectory(string $directory): void
+    {
+        if (!is_dir($directory) && !mkdir($directory, 0700, true) && !is_dir($directory)) {
+            throw new \RuntimeException('Unable to create the private incident ledger directory.');
+        }
+    }
+
+    /**
+     * @param resource $lock
+     */
+    private static function appendWhileLocked($lock, string $ledger, array $safe): void
+    {
+        if (!flock($lock, LOCK_EX)) {
+            throw new \RuntimeException('Unable to lock the incident ledger.');
+        }
+
+        try {
+            self::rotateIfNeeded($ledger);
+            $line = json_encode($safe, JSON_THROW_ON_ERROR | JSON_UNESCAPED_SLASHES).PHP_EOL;
+            $written = file_put_contents($ledger, $line, FILE_APPEND | LOCK_EX);
+
+            if ($written === false || $written !== strlen($line)) {
+                throw new \RuntimeException('The incident ledger write was incomplete.');
+            }
+        } finally {
+            flock($lock, LOCK_UN);
+        }
+    }
+
+    private static function rotateIfNeeded(string $ledger): void
+    {
+        if (!is_file($ledger) || filesize($ledger) < self::MAX_FILE_BYTES) {
+            return;
+        }
+
+        $previous = $ledger.'.1';
+
+        if (is_file($previous) && !unlink($previous)) {
+            throw new \RuntimeException('Unable to rotate the previous incident ledger.');
+        }
+
+        if (!rename($ledger, $previous)) {
+            throw new \RuntimeException('Unable to rotate the incident ledger.');
+        }
+    }
+
+    private static function ledgerPaths(string $directory): array
+    {
+        return [
+            $directory.DIRECTORY_SEPARATOR.'incidents.jsonl',
+            $directory.DIRECTORY_SEPARATOR.'incidents.jsonl.1',
+        ];
+    }
+
+    private static function findInFile(string $path, string $requestId): ?array
+    {
+        if (!is_file($path) || !is_readable($path)) {
+            return null;
+        }
+
+        try {
+            $file = new SplFileObject($path, 'r');
+
+            while (!$file->eof()) {
+                $record = self::decodeMatchingLine($file->fgets(), $requestId);
+
+                if ($record !== null) {
+                    return $record;
+                }
+            }
+        } catch (Throwable) {
+            return null;
+        }
+
+        return null;
+    }
+
+    private static function decodeMatchingLine(mixed $line, string $requestId): ?array
+    {
+        if (!is_string($line) || !str_contains($line, $requestId)) {
+            return null;
+        }
+
+        try {
+            $record = json_decode($line, true, 32, JSON_THROW_ON_ERROR);
+        } catch (\JsonException) {
+            return null;
+        }
+
+        return is_array($record) && ($record['request_id'] ?? null) === $requestId
+            ? $record
+            : null;
     }
 
     private static function allowlisted(array $context): array
