@@ -61,6 +61,33 @@ class SentinelLocalRecoveryTest extends TestCase
             ->assertForbidden();
     }
 
+    public function test_local_recovery_rejects_expired_and_malformed_challenges(): void
+    {
+        $directory = sys_get_temp_dir().DIRECTORY_SEPARATOR.'zazu-recovery-test-'.bin2hex(random_bytes(8));
+        mkdir($directory, 0700, true);
+        $path = $directory.DIRECTORY_SEPARATOR.'challenge.json';
+        $recovery = new ZazuLocalSentinelRecovery($path);
+        $code = str_repeat('a', 64);
+
+        try {
+            file_put_contents($path, json_encode([
+                'token_hash' => hash('sha256', $code),
+                'expires_at' => time() - 1,
+            ], JSON_THROW_ON_ERROR));
+
+            $this->assertFalse($recovery->consume($code));
+
+            file_put_contents($path, '{malformed');
+
+            $this->assertFalse($recovery->consume($code));
+            $this->assertFalse($recovery->consume('not-a-recovery-code'));
+        } finally {
+            @unlink($path);
+            @unlink($path.'.lock');
+            @rmdir($directory);
+        }
+    }
+
     public function test_local_recovery_code_runs_health_check_once_without_login(): void
     {
         $recovery = app(ZazuLocalSentinelRecovery::class);
