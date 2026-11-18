@@ -55,7 +55,7 @@ class OfflineLicenseTest extends TestCase
         $existing = $service->importSignedLicense($business, $this->signedToken($business));
         $token = $this->signedToken($business);
         [, $signature] = explode('.', $token, 2);
-        $tampered = $this->base64UrlEncode('{"version":1,"business_id":'.$business->id.',"status":"active"}').'.'.$signature;
+        $tampered = $this->base64UrlEncode('{"version":2,"business_uuid":"'.$business->licensing_uuid.'","status":"active"}').'.'.$signature;
 
         try {
             $service->importSignedLicense($business, $tampered);
@@ -71,14 +71,14 @@ class OfflineLicenseTest extends TestCase
     {
         $user = $this->signInAsOwner();
         $business = $user->businesses()->firstOrFail();
-        $otherBusinessId = $business->id + 1000;
+        $otherBusinessUuid = (string) Str::uuid();
 
         $this->expectException(\InvalidArgumentException::class);
         $this->expectExceptionMessage('The signed licence payload has invalid fields or belongs to another business.');
 
         app(OfflineLicenseService::class)->importSignedLicense(
             $business,
-            $this->signedToken($business, ['business_id' => $otherBusinessId]),
+            $this->signedToken($business, ['business_uuid' => $otherBusinessUuid]),
         );
     }
 
@@ -140,15 +140,16 @@ class OfflineLicenseTest extends TestCase
         ]);
     }
 
-    public function test_business_owner_can_see_business_id_for_manual_license_issuance(): void
+    public function test_business_owner_can_see_stable_licensing_reference(): void
     {
         $user = $this->signInAsOwner();
         $business = $user->businesses()->firstOrFail();
 
         $this->get(route('settings.index'))
             ->assertOk()
-            ->assertSeeText('Business ID for licence requests: '.$business->id)
-            ->assertSeeText('It identifies this business record; it is not an access credential.');
+            ->assertSeeText('Business licensing reference: '.$business->licensing_uuid)
+            ->assertSeeText('Local Business ID: '.$business->id)
+            ->assertSeeText('It is not an access credential.');
     }
 
     public function test_settings_displays_an_expired_license_as_expired(): void
@@ -260,8 +261,8 @@ class OfflineLicenseTest extends TestCase
     {
         [$secretKey] = $this->signingKeys();
         $payload = array_merge([
-            'version' => 1,
-            'business_id' => (int) $business->id,
+            'version' => 2,
+            'business_uuid' => $business->licensing_uuid,
             'license_id' => (string) Str::uuid(),
             'plan' => 'solo',
             'status' => 'active',
