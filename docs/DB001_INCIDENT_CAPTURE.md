@@ -36,3 +36,20 @@ For Windows installations where the endpoint is unavailable, the existing `ops/w
 The ledger is local to an installation and is not a remote monitoring service. It must be included in the installation's protected operational data and considered during backup/recovery design. If the disk is unavailable or full, the application must continue to fail safely; the PHP error channel receives only the ledger writer's exception class, not the incident payload.
 
 Do not reset, reinstall, or alter a business database merely to investigate an incident. Use captured evidence to select a targeted correction.
+
+
+## Sentinel recurrence report
+
+The private incident ledger also powers the local Sentinel recurrence report. It groups incidents by the stable `failure_fingerprint` and reports occurrence count, first seen, last seen, error code, bounded failure class and latest reference.
+
+Run from the application directory:
+
+```powershell
+php artisan zazu:sentinel
+php artisan zazu:sentinel --limit=50
+php artisan zazu:sentinel --json
+```
+
+The report reads only the active and immediately previous private ledger segments. It does not query the business database, expose exception messages, SQL, bindings or customer records, or transmit diagnostics externally. The JSON option is intended for local tooling and automation.
+
+This is a recurrence index, not proof of root cause. Fingerprint groups are only comparable within the same fingerprint version; future fingerprint algorithm changes must increment `failure_fingerprint_version`.
