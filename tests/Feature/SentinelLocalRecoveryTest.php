@@ -93,7 +93,12 @@ class SentinelLocalRecoveryTest extends TestCase
         $recovery = app(ZazuLocalSentinelRecovery::class);
         $code = $recovery->issue();
 
-        $this->withHeaders([
+        $this->withServerVariables([
+            'REMOTE_ADDR' => '127.0.0.1',
+            'SERVER_PORT' => '8000',
+            'HTTP_HOST' => 'localhost:8000',
+            'HTTPS' => 'off',
+        ])->withHeaders([
             'Origin' => 'http://localhost:8000',
             'Sec-Fetch-Site' => 'same-origin',
             'Content-Type' => 'application/x-www-form-urlencoded',
@@ -102,7 +107,12 @@ class SentinelLocalRecoveryTest extends TestCase
             ->assertSee('Installation health')
             ->assertSee('Overall status:');
 
-        $this->withHeaders([
+        $this->withServerVariables([
+            'REMOTE_ADDR' => '127.0.0.1',
+            'SERVER_PORT' => '8000',
+            'HTTP_HOST' => 'localhost:8000',
+            'HTTPS' => 'off',
+        ])->withHeaders([
             'Origin' => 'http://localhost:8000',
             'Sec-Fetch-Site' => 'same-origin',
             'Content-Type' => 'application/x-www-form-urlencoded',
