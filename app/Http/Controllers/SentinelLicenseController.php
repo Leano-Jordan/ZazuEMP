@@ -56,7 +56,7 @@ final class SentinelLicenseController extends Controller
         return $this->runIssuer($arguments, $business, 'issued', $validated['plan']);
     }
 
-    public function revoke(Request $request, Business $business): RedirectResponse
+    public function revoke(Business $business): RedirectResponse
     {
         $business->load('license');
         abort_unless($business->license?->license_id, 404);
