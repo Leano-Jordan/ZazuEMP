@@ -362,3 +362,7 @@ V1: NOT READY. Historical state/register/memory, checklist and changelog are pre
 - Changes committed directly to `main`: summary `0ad2178`, controller `58bcda2`, regression `fcd7345`.
 - Updated the Director contract: Sentinel/diagnostics are active engineering targets, not frozen. Founder-only platform incident access remains unchanged.
 - **Verification pending:** run the application/quality workflows on the resulting exact main head. No owner installation or incident data was changed.
+
+
+- Follow-on inspection found the same top-100 truncation also affected search: low-frequency fingerprints outside the displayed top 100 were impossible to find. Search now filters the complete retained fingerprint set before applying its 100-row result cap. The regression test also searches for a deliberately low-frequency fingerprint and verifies unrelated top-ranked entries are absent.
+- Follow-on commits: summary search `1ac1cff`, controller `7c3a043`, search regression `fa9308b`. CI for the final combined head remains pending.
