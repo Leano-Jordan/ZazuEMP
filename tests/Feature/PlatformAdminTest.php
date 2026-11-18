@@ -180,7 +180,7 @@ class PlatformAdminTest extends TestCase
 
     public function test_sentinel_overview_counts_all_retained_fingerprints_not_only_the_top_hundred(): void
     {
-        $admin = \\App\\Models\\User::factory()->create(['email' => 'admin@zazu.test']);
+        $admin = \App\Models\User::factory()->create(['email' => 'admin@zazu.test']);
         Config::set('zazu.platform_admin_email', 'admin@zazu.test');
 
         $directory = storage_path('app/private/zazu-diagnostics');
