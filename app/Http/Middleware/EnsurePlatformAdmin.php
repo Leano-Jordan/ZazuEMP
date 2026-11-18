@@ -11,12 +11,14 @@ class EnsurePlatformAdmin
     public function handle(Request $request, Closure $next): Response
     {
         $user = $request->user();
-        $allowedEmails = config('zazu.platform_admin_emails', []);
+        $founderEmail = (string) config('zazu.platform_admin_email', '');
 
         abort_unless(
-            $user && in_array(strtolower((string) $user->email), array_map('strtolower', $allowedEmails), true),
+            $user
+                && $founderEmail !== ''
+                && hash_equals($founderEmail, strtolower(trim((string) $user->email))),
             403,
-            'Platform administrator access is required.'
+            'Founder access is required.'
         );
 
         return $next($request);
