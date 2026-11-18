@@ -114,7 +114,11 @@ Route::middleware(['auth', 'auth.session', 'owner'])->group(function () {
     Route::get('/owner', [\App\Http\Controllers\AuthController::class, 'owner'])->name('owner.dashboard');
 });
 
-Route::middleware(['auth', 'auth.session', 'sentinel.admin'])->group(function () {\n    Route::get('/admin/sentinel', [SentinelController::class, 'index'])->name('admin.sentinel');\n    Route::post('/admin/sentinel/licences', [SentinelLicenseController::class, 'issue'])->middleware('throttle:10,1')->name('admin.sentinel.licences.issue');\n    Route::post('/admin/sentinel/businesses/{business}/licence/revoke', [SentinelLicenseController::class, 'revoke'])->middleware('throttle:10,1')->name('admin.sentinel.licences.revoke');\n});
+Route::middleware(['auth', 'auth.session', 'sentinel.admin'])->group(function () {
+    Route::get('/admin/sentinel', [SentinelController::class, 'index'])->name('admin.sentinel');
+    Route::post('/admin/sentinel/licences', [SentinelLicenseController::class, 'issue'])->middleware('throttle:10,1')->name('admin.sentinel.licences.issue');
+    Route::post('/admin/sentinel/businesses/{business}/licence/revoke', [SentinelLicenseController::class, 'revoke'])->middleware('throttle:10,1')->name('admin.sentinel.licences.revoke');
+});
 
 Route::middleware(['auth', 'auth.session', 'platform.admin'])->prefix('admin')->group(function () {
     Route::get('/landing-settings', [PlatformLandingSettingsController::class, 'edit'])->name('admin.landing.settings');
