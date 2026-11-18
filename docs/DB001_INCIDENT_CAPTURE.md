@@ -58,8 +58,7 @@ This is a recurrence index, not proof of root cause. Fingerprint groups are only
 ## Director Sentinel console
 
 Platform administrators can open the searchable diagnostics console at `/admin/sentinel`.
-The route is protected by the existing `auth`, `auth.session`, and `platform.admin`
-middleware chain. It reads the private incident ledger only; it does not query business
+The route is protected by `auth`, `auth.session`, and the explicit `sentinel.admin` founder gate. It reads the private incident ledger only; it does not query business
 records or expose raw exception messages, SQL, bindings, customer data, or stack traces.
 
 The console provides:
