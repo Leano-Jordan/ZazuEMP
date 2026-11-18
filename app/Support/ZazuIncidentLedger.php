@@ -1,8 +1,9 @@
 <?php
 
-namespace App\\Support;
+namespace App\Support;
 
-use Illuminate\\Support\\Str;
+use Illuminate\Support\Str;
+use SplFileObject;
 use Throwable;
 
 final class ZazuIncidentLedger
@@ -31,37 +32,38 @@ final class ZazuIncidentLedger
 
         try {
             if (!is_dir($directory) && !mkdir($directory, 0700, true) && !is_dir($directory)) {
-                throw new \\RuntimeException('Unable to create the private incident ledger directory.');
+                throw new \RuntimeException('Unable to create the private incident ledger directory.');
             }
 
             $lock = fopen($lockPath, 'c');
 
             if ($lock === false) {
-                throw new \\RuntimeException('Unable to open the incident ledger lock.');
+                throw new \RuntimeException('Unable to open the incident ledger lock.');
             }
 
             try {
                 if (!flock($lock, LOCK_EX)) {
-                    throw new \\RuntimeException('Unable to lock the incident ledger.');
+                    throw new \RuntimeException('Unable to lock the incident ledger.');
                 }
 
                 if (is_file($ledger) && filesize($ledger) >= self::MAX_FILE_BYTES) {
                     $previous = $ledger.'.1';
 
                     if (is_file($previous) && !unlink($previous)) {
-                        throw new \\RuntimeException('Unable to rotate the previous incident ledger.');
+                        throw new \RuntimeException('Unable to rotate the previous incident ledger.');
                     }
 
                     if (!rename($ledger, $previous)) {
-                        throw new \\RuntimeException('Unable to rotate the incident ledger.');
+                        throw new \RuntimeException('Unable to rotate the incident ledger.');
                     }
                 }
 
                 $encoded = json_encode($safe, JSON_THROW_ON_ERROR | JSON_UNESCAPED_SLASHES);
-                $written = file_put_contents($ledger, $encoded.PHP_EOL, FILE_APPEND | LOCK_EX);
+                $line = $encoded.PHP_EOL;
+                $written = file_put_contents($ledger, $line, FILE_APPEND | LOCK_EX);
 
-                if ($written === false || $written !== strlen($encoded.PHP_EOL)) {
-                    throw new \\RuntimeException('The incident ledger write was incomplete.');
+                if ($written === false || $written !== strlen($line)) {
+                    throw new \RuntimeException('The incident ledger write was incomplete.');
                 }
             } finally {
                 flock($lock, LOCK_UN);
@@ -82,13 +84,16 @@ final class ZazuIncidentLedger
 
         $directory = storage_path('app/private/zazu-diagnostics');
 
-        foreach ([$directory.DIRECTORY_SEPARATOR.'incidents.jsonl', $directory.DIRECTORY_SEPARATOR.'incidents.jsonl.1'] as $path) {
+        foreach ([
+            $directory.DIRECTORY_SEPARATOR.'incidents.jsonl',
+            $directory.DIRECTORY_SEPARATOR.'incidents.jsonl.1',
+        ] as $path) {
             if (!is_file($path) || !is_readable($path)) {
                 continue;
             }
 
             try {
-                $file = new \\SplFileObject($path, 'r');
+                $file = new SplFileObject($path, 'r');
 
                 while (!$file->eof()) {
                     $line = $file->fgets();
@@ -99,7 +104,7 @@ final class ZazuIncidentLedger
 
                     try {
                         $record = json_decode($line, true, 32, JSON_THROW_ON_ERROR);
-                    } catch (\\JsonException) {
+                    } catch (\JsonException) {
                         continue;
                     }
 
