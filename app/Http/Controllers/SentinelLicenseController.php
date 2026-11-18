@@ -70,14 +70,14 @@ final class SentinelLicenseController extends Controller
 
         return $this->runIssuer([
             'business_id' => (string) $business->id,
-            'plan' => $business->license->plan,
+            'plan' => $business->license->plan === 'solo' ? 'advanced' : $business->license->plan,
             '--private-key-file' => $keyFile,
             '--license-id' => $business->license->license_id,
             '--status' => 'revoked',
             '--starts-at' => now('UTC')->format('Y-m-d\\TH:i:s\\Z'),
             '--never-expires' => true,
             '--features' => '{}',
-        ], $business, 'revoked', $business->license->plan);
+        ], $business, 'revoked', $business->license->plan === 'solo' ? 'advanced' : $business->license->plan);
     }
 
     private function runIssuer(array $arguments, Business $business, string $action, string $plan): RedirectResponse
