@@ -47,6 +47,17 @@
         .sentinel-event dd{margin:0;font-size:.85rem;overflow-wrap:anywhere}
         .sentinel-empty{padding:1.2rem;text-align:center;color:var(--zazu-muted,#687386)}
         .sentinel-retention-note{font-size:.78rem}
+        .sentinel-license-grid{display:grid;gap:.8rem}
+        .sentinel-license-row{display:grid;grid-template-columns:minmax(0,1fr) minmax(18rem,1.2fr);gap:1rem;padding:1rem;border:1px solid var(--zazu-border,#d9dee7);border-radius:12px}
+        .sentinel-license-actions{display:grid;gap:.55rem}
+        .sentinel-license-form{display:flex;gap:.5rem;flex-wrap:wrap;align-items:end}
+        .sentinel-license-form label{display:grid;gap:.25rem;font-size:.76rem;color:var(--zazu-muted,#687386)}
+        .sentinel-license-form input,.sentinel-license-form select{min-width:9rem;border:1px solid var(--zazu-border,#d9dee7);border-radius:8px;padding:.55rem;background:var(--zazu-background,#fff);color:inherit}
+        .sentinel-license-form .sentinel-button{font-size:.82rem}
+        .sentinel-token{width:100%;min-height:6rem;overflow-wrap:anywhere;border:1px solid var(--zazu-border,#d9dee7);border-radius:10px;padding:.7rem;background:var(--zazu-background,#fff);color:inherit}
+        .sentinel-alert{padding:.85rem 1rem;border:1px solid var(--zazu-border,#d9dee7);border-radius:12px}
+        .sentinel-alert-error{border-color:#c04444}
+        @media(max-width:800px){.sentinel-license-row{grid-template-columns:1fr}}
         @media(max-width:700px){.sentinel-stats{grid-template-columns:1fr}.sentinel-health-grid{grid-template-columns:1fr}.sentinel-intro{display:block}.sentinel-event{grid-template-columns:1fr}.sentinel-event dl{grid-template-columns:1fr 1fr}}
     </style>
 
@@ -58,6 +69,88 @@
                 <p class="sentinel-copy">Sentinel reads the independent, privacy-filtered incident ledger. It groups repeat failures, exposes their technical fingerprints and preserves an occurrence timeline without querying business records.</p>
             </div>
             <span class="sentinel-pill">Platform admin only</span>
+        </section>
+
+        <section class="sentinel-panel" id="licensing">
+            <div class="sentinel-health-overall">
+                <div>
+                    <h3>Licensing &amp; entitlements</h3>
+                    <p class="sentinel-muted">Founder-only business lookup, signed licence issue/renewal and revocation. Customer activation remains in Business Settings.</p>
+                </div>
+                <span class="sentinel-pill">{{ $licenceSigningConfigured ? 'Signing configured' : 'Signing not configured' }}</span>
+            </div>
+
+            @if(session('error'))
+                <div class="sentinel-alert sentinel-alert-error" role="alert">{{ session('error') }}</div>
+            @endif
+
+            @if($issuedLicenseToken)
+                <div class="sentinel-alert" role="status">
+                    <strong>Signed licence {{ $issuedLicenseAction }} for {{ $issuedLicenseBusiness }}.</strong>
+                    <p class="sentinel-muted">Copy this token and deliver it only to the matching business owner. It is shown once in this founder session; it is not written to the audit log.</p>
+                    <textarea class="sentinel-token" readonly rows="4" onclick="this.select()" aria-label="Signed licence token">{{ $issuedLicenseToken }}</textarea>
+                </div>
+            @endif
+
+            @if(!$licenceSigningConfigured)
+                <p class="sentinel-muted">To enable issuance, set <code>ZAZU_LICENSE_PRIVATE_KEY_FILE</code> to a base64 Ed25519 secret-key file outside the Zazu project. The browser never receives the key. The configured public key must match it.</p>
+            @endif
+
+            <form method="GET" action="{{ route('admin.sentinel') }}" class="sentinel-search" style="margin:.8rem 0">
+                <input type="search" name="business_q" value="{{ $businessQuery }}" maxlength="120" placeholder="Find business by name or ID" aria-label="Find business">
+                <button class="sentinel-button" type="submit">Find business</button>
+                <a class="sentinel-clear" href="{{ route('admin.sentinel', ['section' => 'licensing']) }}">Clear</a>
+            </form>
+
+            <div class="sentinel-license-grid">
+                @forelse($businesses as $business)
+                    <article class="sentinel-license-row">
+                        <div>
+                            <strong>{{ $business->name }}</strong>
+                            <div class="sentinel-muted">Business ID #{{ $business->id }}</div>
+                            @if($business->license)
+                                <div class="sentinel-health-facts" style="margin-top:.45rem">
+                                    <span class="sentinel-pill">{{ strtoupper($business->license->plan) }}</span>
+                                    <span class="sentinel-pill">{{ $business->license->statusLabel() }}</span>
+                                    <span>Expires {{ $business->license->expires_at?->format('d M Y H:i') ?? 'Never' }}</span>
+                                </div>
+                                <div class="sentinel-muted" style="font-size:.75rem">Licence {{ $business->license->license_id }}</div>
+                            @else
+                                <div class="sentinel-muted">No signed licence installed · Basic Free / trial rules apply</div>
+                            @endif
+                        </div>
+                        <div class="sentinel-license-actions">
+                            <form method="POST" action="{{ route('admin.sentinel.licences.issue') }}" class="sentinel-license-form">
+                                @csrf
+                                <input type="hidden" name="business_id" value="{{ $business->id }}">
+                                <label>Plan
+                                    <select name="plan" required>
+                                        <option value="basic">Basic</option>
+                                        <option value="intermediate">Intermediate</option>
+                                        <option value="advanced" selected>Advanced</option>
+                                    </select>
+                                </label>
+                                <label>Expires at
+                                    <input type="datetime-local" name="expires_at">
+                                </label>
+                                <label><span> </span><span><input type="checkbox" name="never_expires" value="1"> Never expires</span></label>
+                                <button class="sentinel-button" type="submit" {{ !$licenceSigningConfigured ? 'disabled' : '' }}>{{ $business->license ? 'Issue renewal' : 'Issue licence' }}</button>
+                            </form>
+                            @if($business->license && $business->license->status !== 'revoked')
+                                <form method="POST" action="{{ route('admin.sentinel.licences.revoke', $business) }}" class="sentinel-license-form">
+                                    @csrf
+                                    <span class="sentinel-muted">Revoke current licence</span>
+                                    <button class="sentinel-button" type="submit" {{ !$licenceSigningConfigured ? 'disabled' : '' }}>Revoke</button>
+                                </form>
+                            @endif
+                        </div>
+                    </article>
+                @empty
+                    <div class="sentinel-empty">No businesses match this search.</div>
+                @endforelse
+            </div>
+            <div style="margin-top:1rem">{{ $businesses->links() }}</div>
+            <p class="sentinel-muted sentinel-retention-note">Issuance and revocation actions are recorded in the application log without storing signed tokens or private-key material. Issuing a renewal replaces the currently installed business entitlement when the owner imports the newer token; revocation takes effect when the owner imports the revocation token.</p>
         </section>
 
         <section class="sentinel-stats" aria-label="Sentinel overview">
