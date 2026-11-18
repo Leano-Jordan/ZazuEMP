@@ -136,8 +136,8 @@ final class SentinelLicenseController extends Controller
             'last_license_id' => strtolower($idMatch[1]),
             'last_plan' => $plan,
             'last_status' => $action === 'revoked' ? 'revoked' : 'active',
-            'last_starts_at' => \\Illuminate\\Support\\Carbon::parse($arguments['--starts-at'] ?? now('UTC')),
-            'last_expires_at' => isset($arguments['--expires-at']) ? \\Illuminate\\Support\\Carbon::parse($arguments['--expires-at']) : null,
+            'last_starts_at' => \Illuminate\Support\Carbon::parse($arguments['--starts-at'] ?? now('UTC')),
+            'last_expires_at' => isset($arguments['--expires-at']) ? \Illuminate\Support\Carbon::parse($arguments['--expires-at']) : null,
             'last_issued_at' => \Illuminate\Support\Carbon::parse(trim($issuedAtMatch[1])),
         ])->save();
 
