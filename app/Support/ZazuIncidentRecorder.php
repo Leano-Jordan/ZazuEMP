@@ -16,9 +16,14 @@ final class ZazuIncidentRecorder
             self::writeIncident($context, (int) $context['http_status']);
         } catch (Throwable $loggingFailure) {
             // Never reintroduce exception messages that may contain SQL or customer data.
-            Log::error('Zazu error incident recorder failed', [
-                'exception_class' => $loggingFailure::class,
-            ]);
+            // A broken primary log channel must not break the application's exception path.
+            try {
+                Log::error('Zazu error incident recorder failed', [
+                    'exception_class' => $loggingFailure::class,
+                ]);
+            } catch (Throwable) {
+                error_log('Zazu incident recorder failed: '.$loggingFailure::class);
+            }
         }
     }
 
