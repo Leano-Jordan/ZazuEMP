@@ -11,7 +11,7 @@ final class OfflineLicensePayloadFactory
      * @param array<string, mixed> $options
      * @return array{
      *   version: int,
-     *   business_id: int,
+     *   business_uuid: string,
      *   license_id: string,
      *   plan: string,
      *   status: string,
@@ -21,14 +21,14 @@ final class OfflineLicensePayloadFactory
      *   features: object
      * }
      */
-    public function build(mixed $businessIdValue, mixed $planValue, array $options): array
+    public function build(mixed $businessUuidValue, mixed $planValue, array $options): array
     {
         $status = $this->status($options['status'] ?? 'active');
         $startsAt = $this->startsAt($options['starts_at'] ?? null);
 
         return [
-            'version' => 1,
-            'business_id' => $this->businessId($businessIdValue),
+            'version' => 2,
+            'business_uuid' => $this->businessUuid($businessUuidValue),
             'license_id' => $this->licenseId($options['license_id'] ?? null, $status),
             'plan' => $this->plan($planValue),
             'status' => $status,
@@ -39,14 +39,14 @@ final class OfflineLicensePayloadFactory
         ];
     }
 
-    private function businessId(mixed $value): int
+    private function businessUuid(mixed $value): string
     {
-        $businessId = filter_var($value, FILTER_VALIDATE_INT);
-        if (! is_int($businessId) || $businessId < 1) {
-            throw new \InvalidArgumentException('Business ID must be a positive integer.');
+        $businessUuid = strtolower(trim((string) $value));
+        if (! Str::isUuid($businessUuid)) {
+            throw new \InvalidArgumentException('Business licensing reference must be a valid UUID.');
         }
 
-        return $businessId;
+        return $businessUuid;
     }
 
     private function plan(mixed $value): string
