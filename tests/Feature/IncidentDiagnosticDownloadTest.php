@@ -132,4 +132,58 @@ class IncidentDiagnosticDownloadTest extends TestCase
         }
     }
 
+
+    public function test_sentinel_summary_groups_repeated_fingerprints_without_exposing_private_payloads(): void
+    {
+        $directory = storage_path('app/private/zazu-diagnostics');
+        File::deleteDirectory($directory);
+        File::ensureDirectoryExists($directory);
+
+        $fingerprint = 'ZAZU-0123456789ABCDEF';
+        $records = [
+            [
+                'request_id' => 'b17e9a51-891c-48b6-9d71-1f24e6ab4c82',
+                'failure_fingerprint' => $fingerprint,
+                'error_code' => 'DB-001',
+                'database_failure_class' => 'sqlite_missing_column',
+                'exception_class' => 'Illuminate\\\\Database\\\\QueryException',
+                'source_file' => 'DashboardController.php',
+                'timestamp' => '2026-11-18T10:00:00+02:00',
+                'sql' => 'private SQL must not appear',
+            ],
+            [
+                'request_id' => '895e2c23-bc6b-4919-a891-1e8e5c1e27e4',
+                'failure_fingerprint' => $fingerprint,
+                'error_code' => 'DB-001',
+                'database_failure_class' => 'sqlite_missing_column',
+                'exception_class' => 'Illuminate\\\\Database\\\\QueryException',
+                'source_file' => 'DashboardController.php',
+                'timestamp' => '2026-11-18T11:00:00+02:00',
+            ],
+        ];
+
+        File::put(
+            $directory.DIRECTORY_SEPARATOR.'incidents.jsonl',
+            implode(PHP_EOL, array_map(
+                static fn (array $record): string => json_encode($record, JSON_THROW_ON_ERROR),
+                $records,
+            )).PHP_EOL,
+        );
+
+        try {
+            $summary = app(\\App\\Support\\ZazuIncidentSummary::class)->build();
+
+            $this->assertCount(1, $summary);
+            $this->assertSame($fingerprint, $summary[0]['fingerprint']);
+            $this->assertSame(2, $summary[0]['occurrences']);
+            $this->assertSame('2026-11-18T10:00:00+02:00', $summary[0]['first_seen']);
+            $this->assertSame('2026-11-18T11:00:00+02:00', $summary[0]['last_seen']);
+            $this->assertSame('895e2c23-bc6b-4919-a891-1e8e5c1e27e4', $summary[0]['latest_reference']);
+            $this->assertArrayNotHasKey('sql', $summary[0]);
+            $this->assertStringNotContainsString('private SQL', json_encode($summary, JSON_THROW_ON_ERROR));
+        } finally {
+            File::deleteDirectory($directory);
+        }
+    }
+
 }
