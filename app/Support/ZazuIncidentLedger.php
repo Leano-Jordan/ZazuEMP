@@ -14,12 +14,12 @@ final class ZazuIncidentLedger
      * Persist a privacy-filtered incident independently of the business database
      * and the configured Laravel log channel.
      */
-    public static function record(array $context): void
+    public static function record(array $context): array
     {
         $requestId = $context['request_id'] ?? null;
 
         if (!is_string($requestId) || !Str::isUuid($requestId)) {
-            return;
+            return [];
         }
 
         $safe = self::allowlisted($context);
@@ -74,6 +74,8 @@ final class ZazuIncidentLedger
             // application logger. The PHP error channel is the last-resort signal.
             error_log('Zazu incident ledger write failed: '.$failure::class);
         }
+
+        return $safe;
     }
 
     public static function find(string $requestId): ?array
