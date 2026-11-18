@@ -3,6 +3,7 @@
 namespace Tests\Feature;
 
 use Illuminate\Support\Facades\File;
+use Illuminate\Support\Facades\URL;
 use Tests\TestCase;
 
 class IncidentDiagnosticDownloadTest extends TestCase
@@ -39,7 +40,7 @@ class IncidentDiagnosticDownloadTest extends TestCase
         ], JSON_THROW_ON_ERROR).PHP_EOL);
 
         try {
-            $response = $this->get('/api/support/incidents/'.$requestId);
+            $response = $this->get(URL::temporarySignedRoute('support.incidents.show', now()->addMinutes(15), ['requestId' => $requestId]));
 
             $response->assertOk()
                 ->assertHeader('Cache-Control', 'no-store, private')
@@ -74,7 +75,7 @@ class IncidentDiagnosticDownloadTest extends TestCase
 
         try {
             $this->get('/api/support/incidents/'.$requestId)->assertNotFound();
-            $this->get('/api/support/incidents/'.'not-a-uuid')->assertNotFound();
+            $this->get(URL::temporarySignedRoute('support.incidents.show', now()->addMinutes(15), ['requestId' => 'not-a-uuid']))->assertNotFound();
         } finally {
             File::delete($path);
         }
@@ -189,6 +190,29 @@ class IncidentDiagnosticDownloadTest extends TestCase
         } finally {
             File::deleteDirectory($directory);
         }
+    }
+
+
+    public function test_db001_report_download_rejects_unsigned_expired_and_tampered_links(): void
+    {
+        $requestId = '895e2c23-bc6b-4919-a891-1e8e5c1e27e4';
+
+        $this->get('/api/support/incidents/'.$requestId)->assertForbidden();
+
+        $expired = URL::temporarySignedRoute(
+            'support.incidents.show',
+            now()->subMinute(),
+            ['requestId' => $requestId],
+        );
+        $this->get($expired)->assertForbidden();
+
+        $valid = URL::temporarySignedRoute(
+            'support.incidents.show',
+            now()->addMinutes(15),
+            ['requestId' => $requestId],
+        );
+        $tampered = str_replace($requestId, 'b17e9a51-891c-48b6-9d71-1f24e6ab4c82', $valid);
+        $this->get($tampered)->assertForbidden();
     }
 
 }
