@@ -153,6 +153,27 @@ jobs:
             throw 'The startup check must verify that a non-empty backup archive exists before updating the database.'
           }
           Write-Host 'PASS: Pending database updates require a verified full backup and are checked before the server starts.'
+          $alreadyRunningStart = $launcher.IndexOf('if ($alreadyZazu)')
+          $alreadyRunningEnd = $launcher.IndexOf('if ($wrongBinding.Count -gt 0', $alreadyRunningStart)
+          if ($alreadyRunningStart -lt 0 -or $alreadyRunningEnd -lt 0) {
+            throw 'Could not locate the existing-server startup guard.'
+          }
+          $alreadyRunningBlock = $launcher.Substring($alreadyRunningStart, $alreadyRunningEnd - $alreadyRunningStart)
+          foreach ($required in @(
+            "'migrate:status'",
+            '$hasPendingMigrations',
+            'No migration was applied while the server was active',
+            'Stop-Zazu-Dev.cmd',
+            'Start-Zazu-Dev.cmd'
+          )) {
+            if (-not $alreadyRunningBlock.Contains($required)) {
+              throw "Existing-server migration safety check is missing: $required"
+            }
+          }
+          if ($alreadyRunningBlock.Contains("'migrate' '--force'")) {
+            throw 'The existing-server guard must never apply migrations while the server is active.'
+          }
+          Write-Host 'PASS: An already-running Zazu process cannot silently bypass pending migration detection.'
 
 
       - name: Verify DB-001 read-only SQLite diagnostic
