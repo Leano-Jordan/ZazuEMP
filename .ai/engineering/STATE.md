@@ -181,3 +181,18 @@ V1: NOT READY. Historical state/register/memory, checklist and changelog are pre
 - Important resilience gap: `config/session.php` defaults `SESSION_DRIVER` to `database`. The diagnostic interface must not rely invisibly on the business database/session path it is expected to diagnose. Its fallback access path needs an explicit security design and packaged-installation verification.
 - Created `docs/SENTINEL_CONTROL_CENTRE.md` defining the product contract, five control surfaces, access/isolation rules, resilience requirements, delivery sequence and acceptance criteria. Updated `docs/ZAZU_ERROR_INCIDENT_FRAMEWORK.md` to remove its obsolete statement that no dashboard exists.
 - This is a scope/architecture definition only. No runtime capability has been added and no CI or production acceptance is claimed. DB-001 remains OPEN; V1 remains NOT READY; no readiness uplift.
+
+
+## Sentinel control-centre implementation — 2026-11-18
+
+- Current source head at verification: `f608effe6b890f618e2cdd5b93bb7d26e58f502a` on `main`.
+- Added owner-discoverable **System → Sentinel Rescue** with a one-year temporary signed URL. The route is outside the regular authenticated web/session middleware; it was tested while `session.driver=database` and the configured SQLite database path was intentionally unavailable. The request still rendered the rescue page.
+- Sentinel Rescue now performs read-only database connectivity and migration-history checks; private storage permission checks; offline support-file presence/readability checks; and independent Sentinel ledger folder/segment/write-read-delete checks.
+- A failed database connection or migration read is captured through the independent ledger. The page displays a safe error code/failure category/reference and a link to the allowlisted DB-001 report.
+- Raw PDO failures now inherit only the validated configured connection alias and driver, allowing SQLite failures during connection/bootstrap to be classified without storing private exception messages.
+- Sentinel admin timeline DB-001 references now include a direct download action. The owner rescue access is installation-level and signed-link protected; it does not expose the platform-admin timeline or the raw global ledger.
+- Exact-head run `44318909570`: Laravel/Pest/PHPUnit **563 passed, 1 skipped, 3,915 assertions**; PostgreSQL migration smoke **PASS**. The offline-browser acceptance job was still running at the time of this note.
+- Exact-head run `44318909679`: PHPMD **PASS**. Exact-head run `44318909551`: Zazu quality application, Composer security audit and secret scan **PASS**.
+- Windows V1 package run `44318697559` on app-source-equivalent commit `e5bb8c602b7b66403dbda49ca023cb7000856170`: package build and Windows PowerShell fresh-install verification **PASS**. No physical owner installation acceptance is inferred from CI.
+- Remaining Sentinel gaps: package export/manifest, full failure knowledge base, attachment health, offline queue/sync checks, session/cache diagnostics, backup integrity and recovery checks, richer fault injection, and on-device/offline packaged acceptance.
+- DB-001 reference `895e2c23-bc6b-4919-a891-1e8e5c1e27e4` remains OPEN until the actual installation's failing workflow is identified, corrected and repeated successfully. V1 remains NOT READY; no readiness score uplift. No branches created.
