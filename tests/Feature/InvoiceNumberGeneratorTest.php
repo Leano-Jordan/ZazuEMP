@@ -84,9 +84,9 @@ class InvoiceNumberGeneratorTest extends TestCase
                     $generator->nextForBusiness($business->id, $period)
                 );
 
-                throw new \\RuntimeException('Force sequence allocation rollback.');
+                throw new \RuntimeException('Force sequence allocation rollback.');
             });
-        } catch (\\RuntimeException $exception) {
+        } catch (\RuntimeException $exception) {
             $this->assertSame('Force sequence allocation rollback.', $exception->getMessage());
         }
 
