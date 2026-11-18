@@ -11,7 +11,6 @@ class PlatformLicenseCustomer extends Model
         'business_uuid',
         'business_name',
         'contact_email',
-        'notes',
         'created_by',
         'last_license_id',
         'last_plan',
