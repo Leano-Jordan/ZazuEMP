@@ -68,8 +68,8 @@ class OfflineLicenseContinuityTest extends TestCase
     {
         [$secretKey] = $this->signingKeys();
         $payload = array_merge([
-            'version' => 1,
-            'business_id' => (int) $business->id,
+            'version' => 2,
+            'business_uuid' => $business->licensing_uuid,
             'license_id' => (string) Str::uuid(),
             'plan' => 'solo',
             'status' => 'active',
