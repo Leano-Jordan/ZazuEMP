@@ -15,7 +15,7 @@ class PlatformAdminTest extends TestCase
     public function test_platform_admin_can_manage_landing_media(): void
     {
         $admin = \App\Models\User::factory()->create(['email' => 'admin@zazu.test']);
-        Config::set('zazu.platform_admin_emails', ['admin@zazu.test']);
+        Config::set('zazu.platform_admin_email', 'admin@zazu.test');
 
         $this->actingAs($admin)
             ->get(route('admin.landing.settings'))
@@ -64,7 +64,7 @@ class PlatformAdminTest extends TestCase
     public function test_non_platform_admin_cannot_manage_landing_media(): void
     {
         $user = \App\Models\User::factory()->create(['email' => 'owner@zazu.test']);
-        Config::set('zazu.platform_admin_emails', ['admin@zazu.test']);
+        Config::set('zazu.platform_admin_email', 'admin@zazu.test');
 
         $this->actingAs($user)
             ->get(route('admin.landing.settings'))
@@ -80,7 +80,8 @@ class PlatformAdminTest extends TestCase
         $response->assertOk()
             ->assertSee('Sentinel Rescue');
 
-        $this->assertStringContainsString('/api/sentinel/rescue?', $response->getContent());
+        $this->assertStringContainsString('href="'.route('sentinel.rescue').'"', $response->getContent());
+        $this->assertStringNotContainsString('/api/sentinel/rescue?', $response->getContent());
     }
 
     public function test_sentinel_console_is_restricted_to_platform_administrators(): void
