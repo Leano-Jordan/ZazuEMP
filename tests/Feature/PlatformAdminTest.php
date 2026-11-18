@@ -71,6 +71,18 @@ class PlatformAdminTest extends TestCase
             ->assertForbidden();
     }
 
+    public function test_business_owner_sees_a_private_sentinel_rescue_link(): void
+    {
+        $this->signInAsOwner();
+
+        $response = $this->get(route('settings.index'));
+
+        $response->assertOk()
+            ->assertSee('Sentinel Rescue');
+
+        $this->assertStringContainsString('/api/sentinel/rescue?', $response->getContent());
+    }
+
     public function test_sentinel_console_is_restricted_to_platform_administrators(): void
     {
         $this->get(route('admin.sentinel'))->assertRedirect(route('login'));
