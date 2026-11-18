@@ -45,6 +45,17 @@ Do not expose port 8000, enable router port forwarding, use public/guest Wi-Fi, 
 
 Physical phone/PWA/offline acceptance is not implied by a successful package build or automated browser tests.
 
+## Local Sentinel recovery
+
+If the normal Zazu sign-in or database-backed session cannot open **System → Sentinel Rescue**, but the local Zazu web process is still running:
+
+1. Open PowerShell in the extracted Zazu folder.
+2. Run `php artisan zazu:sentinel-recovery-code`.
+3. On the same PC, open `http://127.0.0.1:8000/api/sentinel/recovery`.
+4. Enter the one-use code shown in PowerShell within five minutes.
+
+This screen is loopback-only; phones and other LAN devices cannot open it. The code is single-use and is not a URL. It runs installation health checks only. It does not expose customer records or replace the founder Control Centre. If PHP/Laravel or the local web process cannot start, use the Windows PowerShell diagnostics documented in `DB001_INCIDENT_CAPTURE.md`.
+
 ## Data safety and updates
 
 - Keep the installation folder intact. The SQLite database is in `database/database.sqlite`; private business files are under `storage/app/private`.
