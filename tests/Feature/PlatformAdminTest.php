@@ -102,7 +102,9 @@ class PlatformAdminTest extends TestCase
         $this->actingAs($founder)
             ->get(route('admin.sentinel'))
             ->assertOk()
-            ->assertSee('Sentinel Control Centre');
+            ->assertSee('Sentinel Control Centre')
+            ->assertSee('href="'.route('admin.sentinel').'"', false)
+            ->assertDontSee('href="'.route('dashboard').'"', false);
     }
 
     public function test_legacy_admin_list_does_not_grant_founder_access(): void
