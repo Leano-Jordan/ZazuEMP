@@ -17,6 +17,7 @@ use App\Http\Controllers\EventAttachmentController;
 use App\Http\Controllers\ExperiencePreferenceController;
 use App\Http\Controllers\SearchController;
 use App\Http\Controllers\SentinelController;
+use App\Http\Controllers\SentinelLicenseController;
 use App\Http\Controllers\SentinelRescueController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\FinanceController;
