@@ -64,7 +64,7 @@ final class ZazuLocalSentinelRecovery
             return false;
         }
 
-        return $this->invalidateChallenge($code);
+        return $this->invalidateChallenge();
     }
 
     /**
@@ -105,7 +105,7 @@ final class ZazuLocalSentinelRecovery
             && hash_equals($expectedHash, hash('sha256', $code));
     }
 
-    private function invalidateChallenge(string $code): bool
+    private function invalidateChallenge(): bool
     {
         // Invalidate while holding the lock so concurrent requests cannot replay it.
         if (@unlink($this->path)) {
