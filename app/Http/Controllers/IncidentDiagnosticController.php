@@ -13,7 +13,9 @@ class IncidentDiagnosticController extends Controller
     {
         abort_unless(Str::isUuid($requestId), 404);
 
-        $incident = $this->findDatabaseIncident($requestId);
+        // Prefer the independent ledger; legacy Laravel logs remain a fallback
+        // for incidents captured before the ledger was introduced.
+        $incident = ZazuIncidentLedger::find($requestId) ?? $this->findDatabaseIncident($requestId);
 
         abort_if($incident === null, 404, 'No matching database incident record is available.');
 
@@ -94,6 +96,8 @@ class IncidentDiagnosticController extends Controller
     {
         $fields = [
             'request_id',
+            'failure_fingerprint',
+            'failure_fingerprint_version',
             'error_code',
             'category',
             'severity',
