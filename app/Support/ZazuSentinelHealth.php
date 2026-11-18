@@ -148,41 +148,41 @@ final class ZazuSentinelHealth
 
     private function writeProbe(string $directory): array
     {
-        $path = $directory.DIRECTORY_SEPARATOR.'sentinel-health-'.bin2hex(random_bytes(8)).'.tmp';
+        $path = null;
         $handle = false;
+        $created = false;
         $writeReadPassed = false;
-        $cleanupPassed = false;
+        $cleanupPassed = true;
+        $failureMessage = 'Sentinel could not create and lock a temporary diagnostics file.';
 
         try {
+            $path = $directory.DIRECTORY_SEPARATOR.'sentinel-health-'.bin2hex(random_bytes(8)).'.tmp';
             $handle = @fopen($path, 'x+b');
 
-            if ($handle === false || ! flock($handle, LOCK_EX)) {
-                return [
-                    'key' => 'write_probe',
-                    'label' => 'Diagnostic write/read test',
-                    'status' => 'failed',
-                    'message' => 'Sentinel could not create and lock a temporary diagnostics file.',
-                ];
-            }
+            if ($handle !== false) {
+                $created = true;
 
-            $marker = 'zazu-sentinel-health-probe';
-            $written = fwrite($handle, $marker);
-            $flushed = fflush($handle);
-            rewind($handle);
-            $readBack = stream_get_contents($handle);
-            $writeReadPassed = $written === strlen($marker) && $flushed && $readBack === $marker;
+                if (flock($handle, LOCK_EX)) {
+                    $marker = 'zazu-sentinel-health-probe';
+                    $written = fwrite($handle, $marker);
+                    $flushed = fflush($handle);
+                    rewind($handle);
+                    $readBack = stream_get_contents($handle);
+                    $writeReadPassed = $written === strlen($marker) && $flushed && $readBack === $marker;
+                    $failureMessage = 'Sentinel could not verify a temporary write and read.';
+                }
+            }
         } catch (Throwable) {
-            $writeReadPassed = false;
+            $failureMessage = 'Sentinel could not complete its temporary write/read test.';
         } finally {
             if (is_resource($handle)) {
                 flock($handle, LOCK_UN);
                 fclose($handle);
             }
 
-            if (file_exists($path)) {
+            // Delete only a file this health check successfully created.
+            if ($created && is_string($path) && file_exists($path)) {
                 $cleanupPassed = @unlink($path);
-            } else {
-                $cleanupPassed = true;
             }
         }
 
@@ -193,10 +193,11 @@ final class ZazuSentinelHealth
             'label' => 'Diagnostic write/read test',
             'status' => $passed ? 'healthy' : 'failed',
             'message' => ! $writeReadPassed
-                ? 'Sentinel could not verify a temporary write and read.'
+                ? $failureMessage
                 : ($cleanupPassed
                     ? 'Temporary write and read passed; the probe file was removed.'
                     : 'The probe worked but Sentinel could not remove its temporary file.'),
         ];
     }
+}
 }
