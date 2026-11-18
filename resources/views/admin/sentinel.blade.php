@@ -97,7 +97,7 @@
                             <article class="sentinel-event">
                                 <div>
                                     <time>{{ $event['timestamp'] }}</time>
-                                    <div><a class="sentinel-code" href="{{ url('/api/support/incidents/'.$event['request_id']) }}">{{ $event['request_id'] }}</a></div>
+                                    <div><code class="sentinel-code">{{ $event['request_id'] }}</code></div>
                                 </div>
                                 <dl>
                                     <div><dt>Error</dt><dd>{{ $event['error_code'] }}</dd></div>
