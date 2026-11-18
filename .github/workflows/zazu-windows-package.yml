@@ -327,22 +327,38 @@ jobs:
             }
           }
 
+          $normalisedChildren = @(
+            (Join-Path $project 'database/database.sqlite')
+          )
+          foreach ($target in $normalisedChildren) {
+            if (-not (Test-Path -LiteralPath $target)) { throw "Expected protected data file was not created: $target" }
+            $acl = Get-Acl -LiteralPath $target
+            if (-not $acl.AreAccessRulesProtected) {
+              throw "Pre-existing protected data file was not normalised to an explicit restricted ACL: $target."
+            }
+            foreach ($rule in $acl.Access) {
+              $sid = $rule.IdentityReference.Translate([System.Security.Principal.SecurityIdentifier]).Value
+              if ($allowedSids -notcontains $sid -or $rule.AccessControlType -ne [System.Security.AccessControl.AccessControlType]::Allow -or $rule.IsInherited) {
+                throw "Protected Zazu data file contains an unexpected access rule for SID $sid at $target."
+              }
+            }
+          }
+
           $inheritedTargets = @(
             (Join-Path $privateRoot 'zazu-diagnostics'),
             (Join-Path $privateRoot 'zazu-diagnostics/incidents.lock'),
-            (Join-Path $privateRoot 'zazu-diagnostics/incidents.jsonl'),
-            (Join-Path $project 'database/database.sqlite')
+            (Join-Path $privateRoot 'zazu-diagnostics/incidents.jsonl')
           )
           foreach ($target in $inheritedTargets) {
-            if (-not (Test-Path -LiteralPath $target)) { throw "Expected protected child path was not created: $target" }
+            if (-not (Test-Path -LiteralPath $target)) { throw "Expected protected diagnostic path was not created: $target" }
             $acl = Get-Acl -LiteralPath $target
             foreach ($rule in $acl.Access) {
               $sid = $rule.IdentityReference.Translate([System.Security.Principal.SecurityIdentifier]).Value
               if ($allowedSids -notcontains $sid -or $rule.AccessControlType -ne [System.Security.AccessControl.AccessControlType]::Allow) {
-                throw "Protected Zazu child contains an unexpected Windows access rule for SID $sid at $target."
+                throw "Protected Zazu diagnostic child contains an unexpected Windows access rule for SID $sid at $target."
               }
               if (-not $rule.IsInherited) {
-                throw "Protected Zazu child does not inherit its restricted ACL: $target."
+                throw "New Zazu diagnostic child does not inherit its restricted ACL: $target."
               }
             }
           }
