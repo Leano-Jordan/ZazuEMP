@@ -18,6 +18,7 @@ class InvoiceNumberGeneratorTest extends TestCase
     {
         $user = $this->signInAsOwner();
         $business = $user->businesses()->firstOrFail();
+        $this->withSession(['zazu_business_id' => $business->id]);
         $period = Carbon::parse('2026-11-18 12:00:00');
 
         $this->createInvoice($business->id, 'INV-202611-000007');
@@ -44,6 +45,7 @@ class InvoiceNumberGeneratorTest extends TestCase
     {
         $user = $this->signInAsOwner();
         $business = $user->businesses()->firstOrFail();
+        $this->withSession(['zazu_business_id' => $business->id]);
         $otherBusiness = Business::create([
             'name' => 'Second Test Business',
             'slug' => 'second-test-business',
@@ -59,11 +61,13 @@ class InvoiceNumberGeneratorTest extends TestCase
             fn (): string => $generator->nextForBusiness($business->id, $november)
         );
         $this->signInAsOwner($otherBusiness);
+        $this->withSession(['zazu_business_id' => $otherBusiness->id]);
         $otherBusinessNovember = DB::transaction(
             fn (): string => $generator->nextForBusiness($otherBusiness->id, $november)
         );
 
         $this->actingAs($user);
+        $this->withSession(['zazu_business_id' => $business->id]);
         $businessDecember = DB::transaction(
             fn (): string => $generator->nextForBusiness($business->id, $december)
         );
