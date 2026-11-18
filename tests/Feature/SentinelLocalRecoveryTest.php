@@ -3,6 +3,9 @@
 namespace Tests\Feature;
 
 use App\Support\ZazuLocalSentinelRecovery;
+use Illuminate\Auth\Middleware\Authenticate;
+use Illuminate\Routing\Middleware\ThrottleRequests;
+use Illuminate\Session\Middleware\StartSession;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
@@ -31,10 +34,11 @@ class SentinelLocalRecoveryTest extends TestCase
         $route = app('router')->getRoutes()->getByName('sentinel.local-recovery.verify');
 
         $this->assertNotNull($route);
-        $this->assertNotContains(
-            \Illuminate\Routing\Middleware\ThrottleRequests::class,
-            app('router')->gatherRouteMiddleware($route)
-        );
+        $middleware = app('router')->gatherRouteMiddleware($route);
+
+        foreach ([Authenticate::class, StartSession::class, ThrottleRequests::class] as $blockedMiddleware) {
+            $this->assertNotContains($blockedMiddleware, $middleware);
+        }
     }
 
     public function test_local_recovery_rejects_cross_origin_code_submission(): void
