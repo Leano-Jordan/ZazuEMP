@@ -5,7 +5,7 @@
 **Current operator:** Isaac Junior Lehlogonolo Maluleka, operating as an individual
 **Future business identity:** Rosscore Labs; not an incorporated provider unless and until registration is completed
 **Effective date:** [TO BE PUBLISHED]
-**Privacy contact:** [OWNER-CONFIRMED BUSINESS EMAIL — INSERT AT PUBLICATION]
+**Provisional privacy and customer-support contact:** rosscorelabs@outlook.com (owner-confirmed for current use; replace when a dedicated Zazu channel is established)
 **Telephone:** [OWNER-CONFIRMED BUSINESS NUMBER — INSERT AT PUBLICATION]
 **Service address:** Pretoria North, Gauteng, South Africa (public service area only; not a registered-office claim)
 
