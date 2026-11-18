@@ -26,6 +26,21 @@ The current `/admin/sentinel` route is protected by `auth`, `auth.session` and `
 
 The framework also has a critical resilience question: `SESSION_DRIVER` defaults to `database`. A diagnostic page protected by a database-backed session may fail at exactly the time the database needs diagnosing. The diagnostic access path and the normal application database/session path must be evaluated separately.
 
+## First implemented control-centre increment — 2026-11-18
+
+The following first step is now in the application source on `main`:
+
+- `ZazuSentinelHealth` aggregates Sentinel self-health independently of business database queries.
+- `ZazuSentinelLedgerHealth` checks that the private diagnostics directory is readable, inspects the active and previous JSONL segments, counts valid/malformed records without exposing their contents, and performs a disposable write/read/delete probe.
+- The platform-admin Sentinel console displays these self-health results alongside the existing fingerprint/timeline view.
+- Business owners have a **Sentinel Rescue** entry in the System navigation. It opens a standalone signed URL at `/api/sentinel/rescue`, which uses the API middleware stack rather than the normal authenticated web/session stack.
+- The rescue page does not query the business database, start a database-backed session, read business records or expose incident contents. It is designed to remain reachable during a database/session failure while the local Zazu web process and application bootstrap remain operational.
+- The rescue URL is a bearer capability, valid for one year when issued. Keep it private. Anyone who receives the link can view this installation-level diagnostic health summary.
+
+**Current limitation:** the rescue page checks Sentinel's own evidence store only. It is not yet a complete system-health check and does not currently diagnose database connectivity/schema, storage, attachments, offline queue/sync or backup/recovery. A healthy Sentinel ledger must never be interpreted as proof that all of Zazu is healthy.
+
+Automated acceptance for the new owner link, session-independent route and health checks is pending exact-head CI. Do not claim physical device or packaged-installation acceptance from source-level tests.
+
 ## The five control surfaces
 
 ### 1. System health — the terrain map
