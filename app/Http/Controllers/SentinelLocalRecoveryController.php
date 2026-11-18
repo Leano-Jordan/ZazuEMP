@@ -20,11 +20,9 @@ final class SentinelLocalRecoveryController extends Controller
 
     public function verify(Request $request, ZazuLocalSentinelRecovery $recovery, ZazuSystemHealth $health): Response
     {
-        $validated = $request->validate([
-            'code' => ['required', 'string', 'size:64', 'regex:/\A[a-f0-9]{64}\z/D'],
-        ]);
+        $code = $request->input('code');
 
-        if (! $recovery->consume($validated['code'])) {
+        if (! is_string($code) || preg_match('/\\A[a-f0-9]{64}\\z/D', $code) !== 1 || ! $recovery->consume($code)) {
             return $this->privateResponse([
                 'health' => null,
                 'verified' => false,
