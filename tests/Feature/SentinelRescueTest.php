@@ -36,6 +36,29 @@ class SentinelRescueTest extends TestCase
             ->assertForbidden();
     }
 
+    public function test_failed_diagnostics_render_safe_keyed_recovery_guidance(): void
+    {
+        $html = view('sentinel.rescue', [
+            'health' => [
+                'status' => 'attention',
+                'checked_at' => now()->toIso8601String(),
+                'checks' => [[
+                    'key' => 'current_ledger',
+                    'group' => 'Sentinel',
+                    'label' => 'Current incident ledger',
+                    'status' => 'attention',
+                    'message' => 'Some lines cannot be read as incident records.',
+                ]],
+            ],
+            'phpVersion' => PHP_VERSION,
+            'laravelVersion' => app()->version(),
+        ])->render();
+
+        $this->assertStringContainsString('Recommended next step', $html);
+        $this->assertStringContainsString('Preserve the original diagnostic file.', $html);
+        $this->assertStringContainsString('Do not edit, truncate or delete ledger lines', $html);
+    }
+
     public function test_authenticated_business_owner_can_open_local_rescue_and_return_to_workspace(): void
     {
         $this->signInAsOwner();
@@ -43,7 +66,7 @@ class SentinelRescueTest extends TestCase
         $this->get(route('sentinel.rescue'))
             ->assertOk()
             ->assertSee('Sentinel Rescue')
-            ->assertSee('A read-only health snapshot for this installation.')
+            ->assertSee('A local health snapshot with safe next steps.')
             ->assertSee('Database connection')
             ->assertSee('Diagnostic write/read test')
             ->assertSee('Back to workspace')
