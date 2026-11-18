@@ -176,6 +176,49 @@ class ErrorHandlingTest extends TestCase
         ));
     }
 
+    public function test_direct_pdo_connection_exception_keeps_safe_driver_context(): void
+    {
+        config()->set('database.default', 'sqlite');
+        config()->set('database.connections.sqlite.driver', 'sqlite');
+
+        $requestId = '6d8c6a3a-fbae-4d15-bc0a-9bd9905c2e9c';
+        $request = Request::create('/sentinel/rescue', 'GET');
+        $request->attributes->set('zazu_request_id', $requestId);
+        $this->app->instance('request', $request);
+
+        $directory = storage_path('app/private/zazu-diagnostics');
+        File::deleteDirectory($directory);
+        File::ensureDirectoryExists($directory);
+
+        $privateMarker = 'private-pdo-detail-'.bin2hex(random_bytes(8));
+        Log::shouldReceive('log')
+            ->once()
+            ->withArgs(function (string $level, string $message, array $context) use ($requestId, $privateMarker): bool {
+                $expected = [
+                    'database_connection' => 'sqlite',
+                    'database_driver' => 'sqlite',
+                    'database_sqlstate' => 'HY000',
+                    'database_driver_code' => 5,
+                    'database_failure_class' => 'sqlite_locked',
+                ];
+
+                return $level === 'error'
+                    && $message === 'Zazu error incident'
+                    && $context['request_id'] === $requestId
+                    && array_intersect_key($context, $expected) === $expected
+                    && ! str_contains(json_encode($context, JSON_THROW_ON_ERROR), $privateMarker);
+            });
+
+        try {
+            $exception = new \\PDOException('SQLSTATE[HY000]: database is locked '.$privateMarker);
+            $exception->errorInfo = ['HY000', 5, $privateMarker];
+
+            ZazuIncidentRecorder::record($exception);
+        } finally {
+            File::deleteDirectory($directory);
+        }
+    }
+
     public function test_http_500_exception_gets_an_application_error_code(): void
     {
         Route::get('/__zazu-test-response-500', fn () => abort(500))->middleware('web');
