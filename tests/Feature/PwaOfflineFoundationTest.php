@@ -22,6 +22,8 @@ class PwaOfflineFoundationTest extends TestCase
         $this->assertSame('Zazu', $manifest['short_name']);
         $this->assertSame('/dashboard', $manifest['start_url']);
         $this->assertSame('standalone', $manifest['display']);
+        // Desktop installs must retain the native draggable title bar and keep OS controls clear of Zazu actions.
+        $this->assertSame(['standalone'], $manifest['display_override']);
         $this->assertCount(2, $manifest['icons']);
         $this->assertSame('/icons/zazu-192.svg', $manifest['icons'][0]['src']);
         $this->assertSame('192x192', $manifest['icons'][0]['sizes']);
