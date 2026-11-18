@@ -393,3 +393,13 @@ V1: NOT READY. Historical state/register/memory, checklist and changelog are pre
 - The report remains reference-scoped and redacted; this does not grant access to the founder console or the full incident ledger.
 - Added feature coverage for unsigned, expired and path-tampered links, and assertions that all three user-facing link surfaces include signature and expiry parameters.
 - Verification is pending on the exact resulting `main` head. This is source-level hardening only; no installed device, database or incident records were changed.
+
+
+## Sentinel founder licensing workspace — 2026-11-19
+
+- Added a Licensing & Entitlements section to the existing founder-only Sentinel console on `main`. It searches businesses by name/ID, displays installed licence status and dates, and provides issue/renew/revoke actions.
+- Added `SentinelLicenseController` routes under the existing `auth`, `auth.session` and `sentinel.admin` boundary; issue/revoke POST actions are rate-limited. Business-owner routes and customer activation remain unchanged.
+- The UI invokes the existing Ed25519 issuer server-side. The signing key path is configured through `ZAZU_LICENSE_PRIVATE_KEY_FILE` and must point outside the project; the existing issuer still validates key format, project exclusion and match against `ZAZU_LICENSE_PUBLIC_KEY`. No key was generated or deployed.
+- The signed token is returned once in the founder's authenticated session for manual delivery. Application logs record metadata only; token and key bytes are not logged. Revocation requires the owner to import the signed revocation token while offline; it is not a remote kill switch.
+- Added focused feature tests for founder issuance, non-founder denial and missing-key fail-closed behavior. Exact-head CI has not yet been observed. Do not mark this workflow accepted until Laravel tests, quality/security checks and relevant Windows package checks pass.
+- No feature matrix or paid-feature enforcement was invented. No branches created; all changes are directly on `main`.
