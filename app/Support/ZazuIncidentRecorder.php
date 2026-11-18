@@ -13,56 +13,61 @@ final class ZazuIncidentRecorder
     {
         try {
             $definition = ZazuErrorCatalog::for($exception);
-            $request = app()->bound('request') ? request() : null;
-            $requestId = self::requestId($request);
-
-            $route = $request instanceof Request ? $request->route() : null;
-            $routeName = is_object($route) ? $route->getName() : null;
-            $routeAction = is_object($route) ? $route->getActionName() : null;
-
-            // Keep operational correlation, but never persist exception messages,
-            // SQL text, bindings or stack traces in the application incident log.
-            // Those values can contain customer data or credentials.
-            $databaseDiagnostics = self::databaseDiagnostics($exception);
-
-            $context = [
-                'event_type' => 'application_error',
-                'error_code' => $definition['code'],
-                'category' => $definition['category'],
-                'severity' => $definition['severity'],
-                'http_status' => $definition['status'],
-                'user_message' => $definition['message'],
-                'exception_class' => $exception::class,
-                'originating_component' => $routeAction,
-                'route_name' => $routeName,
-                'http_method' => $request instanceof Request ? $request->method() : null,
-                'http_path' => $request instanceof Request ? $request->path() : null,
-                'request_id' => $requestId,
-                'timestamp' => now()->toIso8601String(),
-                'file' => $exception->getFile(),
-                'line' => $exception->getLine(),
-                ...$databaseDiagnostics,
-            ];
-
-            // Write the independent ledger first: a broken business database or
-            // unavailable Laravel log channel must not erase the diagnostic record.
-            $ledgerRecord = ZazuIncidentLedger::record($context);
-
-            if (isset($ledgerRecord['failure_fingerprint'])) {
-                $context['failure_fingerprint'] = $ledgerRecord['failure_fingerprint'];
-                $context['failure_fingerprint_version'] = $ledgerRecord['failure_fingerprint_version'];
-            }
-
-            $level = $definition['status'] >= 500 ? 'error' : 'warning';
-
-            Log::log($level, 'Zazu error incident', $context);
+            $context = self::buildContext($exception);
+            self::writeIncident($context, $definition['status']);
         } catch (Throwable $loggingFailure) {
-            // The fallback must not reintroduce an exception message that may
-            // contain SQL, customer data or secrets.
+            // Never reintroduce exception messages that may contain SQL or customer data.
             Log::error('Zazu error incident recorder failed', [
                 'exception_class' => $loggingFailure::class,
             ]);
         }
+    }
+
+    private static function buildContext(Throwable $exception): array
+    {
+        $request = app()->bound('request') ? request() : null;
+        $route = $request instanceof Request ? $request->route() : null;
+
+        return [
+            'event_type' => 'application_error',
+            ...self::errorDefinition($exception),
+            'exception_class' => $exception::class,
+            'originating_component' => is_object($route) ? $route->getActionName() : null,
+            'route_name' => is_object($route) ? $route->getName() : null,
+            'http_method' => $request instanceof Request ? $request->method() : null,
+            'http_path' => $request instanceof Request ? $request->path() : null,
+            'request_id' => self::requestId($request),
+            'timestamp' => now()->toIso8601String(),
+            'file' => $exception->getFile(),
+            'line' => $exception->getLine(),
+            ...self::databaseDiagnostics($exception),
+        ];
+    }
+
+    private static function errorDefinition(Throwable $exception): array
+    {
+        $definition = ZazuErrorCatalog::for($exception);
+
+        return [
+            'error_code' => $definition['code'],
+            'category' => $definition['category'],
+            'severity' => $definition['severity'],
+            'http_status' => $definition['status'],
+            'user_message' => $definition['message'],
+        ];
+    }
+
+    private static function writeIncident(array $context, int $status): void
+    {
+        // The independent ledger must survive a broken business DB or Laravel log channel.
+        $ledgerRecord = ZazuIncidentLedger::record($context);
+
+        if (isset($ledgerRecord['failure_fingerprint'])) {
+            $context['failure_fingerprint'] = $ledgerRecord['failure_fingerprint'];
+            $context['failure_fingerprint_version'] = $ledgerRecord['failure_fingerprint_version'];
+        }
+
+        Log::log($status >= 500 ? 'error' : 'warning', 'Zazu error incident', $context);
     }
 
     /**
@@ -104,7 +109,6 @@ final class ZazuIncidentRecorder
             'database_failure_class' => self::databaseFailureClass($exception, null),
         ];
     }
-
 
     /**
      * Convert private driver text into a small, non-sensitive failure category.
@@ -173,6 +177,7 @@ final class ZazuIncidentRecorder
         }
 
         $code = $errorInfo[1];
+
         if (is_int($code)) {
             return $code;
         }
