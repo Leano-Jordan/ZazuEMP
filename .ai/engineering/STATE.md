@@ -228,3 +228,13 @@ V1: NOT READY. Historical state/register/memory, checklist and changelog are pre
 - Reworked the large introduction and instructional panels into a compact status summary and responsive health-check grid. Detailed migration names remain collapsed until requested.
 - Founder environment setting confirmed by owner as `Rosscorelabs@outlook.com`. `config/zazu.php` normalizes the configured `ZAZU_PLATFORM_ADMIN_EMAIL` to lowercase. Do not hard-code the founder identity into shared defaults; each installation must set it in its private `.env`.
 - Source/test update is not visually accepted until rendered on the owner's installation. Existing Sentinel security boundaries remain unchanged.
+
+
+## Sentinel Rescue interaction and visual refinement — 2026-11-18
+
+- Owner requested stronger borders and meaningful interaction rather than a static report.
+- Diagnostic cards and dashboard surfaces now use higher-contrast borders and clearer hover/focus states.
+- Added client-side status filters (all / failed / attention / healthy), live text search, visible-result count, expand/collapse for diagnostic details, and a recheck control that reloads the read-only health inspection.
+- Controls are progressively enhanced: the filter toolbar remains hidden until its script initialises; without JavaScript the complete diagnostic report remains visible.
+- No new server write endpoints, external requests, business-record access, or telemetry were introduced. Recheck reruns the existing GET health inspection.
+- Automated verification is pending for the current main head; visual acceptance remains with the owner on the installed application.
