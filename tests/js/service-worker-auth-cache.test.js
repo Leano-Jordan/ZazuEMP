@@ -192,6 +192,41 @@ test('authenticated uploaded images are cached only in the active business cache
     await offline.finished();
 });
 
+test('page priming rejects cross-origin and API routes before making credentialed requests', async () => {
+    const worker = bootWorker(async (request) => {
+        const url = new URL(request.url);
+        if (url.origin !== ORIGIN) {
+            throw new Error('Page priming must never request another origin.');
+        }
+        if (url.pathname === '/dashboard') {
+            return new MockResponse(
+                '<body data-zazu-user-id="41" data-zazu-business-id="17"><main>Dashboard</main></body>',
+                { headers: { 'content-type': 'text/html; charset=utf-8' } },
+            );
+        }
+        return new MockResponse('unexpected route');
+    });
+
+    await worker.dispatchMessage({
+        type: 'prime-pages',
+        userId: '41',
+        businessId: '17',
+        routes: [
+            '/dashboard',
+            '//attacker.example/collect',
+            '/\\\\attacker.example/collect',
+            '/api/sync/bootstrap',
+            '/api',
+        ],
+    });
+
+    assert.deepEqual(
+        worker.fetchCalls.map((request) => new URL(request.url).pathname),
+        ['/dashboard'],
+        'only the same-origin non-API route should be fetched',
+    );
+});
+
 test('page priming caches referenced private images before disconnected launch', async () => {
     let hostAvailable = true;
     const worker = bootWorker(async (request) => {
