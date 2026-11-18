@@ -177,7 +177,7 @@
                     <div class="facts">
                         <span>Reference: <code>{{ $check['reference'] }}</code></span>
                         @if(($check['error_code'] ?? null) === 'DB-001')
-                            <a href="{{ route('support.incidents.show', ['requestId' => $check['reference']]) }}">Download safe DB report</a>
+                            <a href="{{ URL::temporarySignedRoute('support.incidents.show', now()->addMinutes(15), ['requestId' => $check['reference']]) }}">Download safe DB report</a>
                         @endif
                     </div>
                 @endif
