@@ -65,6 +65,27 @@ class ZazuIssueLicenseCommandTest extends TestCase
         $this->assertSame('2027-11-18T23:59:59+02:00', $verified['payload']['expires_at']);
     }
 
+    public function test_default_feature_metadata_is_signed_as_a_json_object(): void
+    {
+        $exitCode = Artisan::call('zazu:license:issue', [
+            'business_id' => 42,
+            'plan' => 'basic',
+            '--private-key-file' => $this->keyFile,
+            '--never-expires' => true,
+        ]);
+
+        $this->assertSame(0, $exitCode);
+        preg_match('/^TOKEN: ([A-Za-z0-9_-]+\.[A-Za-z0-9_-]+)$/m', Artisan::output(), $matches);
+        $this->assertArrayHasKey(1, $matches);
+
+        [$payloadSegment] = explode('.', $matches[1], 2);
+        $base64 = strtr($payloadSegment, '-_', '+/');
+        $base64 .= str_repeat('=', (4 - strlen($base64) % 4) % 4);
+        $payload = json_decode((string) base64_decode($base64), false, 32, JSON_THROW_ON_ERROR);
+
+        $this->assertIsObject($payload->features);
+    }
+
     public function test_command_requires_an_expiry_or_an_explicit_never_expires_choice(): void
     {
         $exitCode = Artisan::call('zazu:license:issue', [
