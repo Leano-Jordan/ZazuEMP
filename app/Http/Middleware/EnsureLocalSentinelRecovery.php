@@ -43,16 +43,23 @@ final class EnsureLocalSentinelRecovery
         $originPort = is_array($origin)
             ? (int) ($origin['port'] ?? ($originScheme === 'https' ? 443 : 80))
             : null;
-        $contentType = strtolower((string) $request->headers->get('Content-Type', ''));
+        $contentType = (string) $request->headers->get('Content-Type', '');
 
         abort_unless(
-            str_starts_with($contentType, 'application/x-www-form-urlencoded')
+            $this->isFormUrlEncoded($contentType)
                 && $originHost === $this->normaliseHost($request->getHost())
                 && $originScheme === $request->getScheme()
                 && $originPort === $request->getPort()
                 && $this->isSameOriginFetch($request),
             403
         );
+    }
+
+    private function isFormUrlEncoded(string $contentType): bool
+    {
+        $mediaType = strtolower(trim(explode(';', $contentType, 2)[0]));
+
+        return $mediaType === 'application/x-www-form-urlencoded';
     }
 
     private function isSameOriginFetch(Request $request): bool
