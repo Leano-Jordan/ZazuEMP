@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Business;
+use App\Models\PlatformLicenseCustomer;
 use App\Support\ZazuIncidentSummary;
 use App\Support\ZazuSentinelHealth;
 use Illuminate\Http\Request;
@@ -24,15 +24,14 @@ final class SentinelController extends Controller
         $overview = $incidents->overview();
 
         $businessQuery = trim((string) ($filters['business_q'] ?? ''));
-        $businesses = Business::query()
-            ->with('license')
+        $customers = PlatformLicenseCustomer::query()
             ->when($businessQuery !== '', fn ($query) => $query->where(function ($businessesQuery) use ($businessQuery): void {
-                $businessesQuery->where('name', 'like', '%'.$businessQuery.'%');
-                if (ctype_digit($businessQuery)) {
-                    $businessesQuery->orWhere('id', (int) $businessQuery);
-                }
+                $businessesQuery->where('business_name', 'like', '%'.$businessQuery.'%')
+                    ->orWhere('contact_email', 'like', '%'.$businessQuery.'%')
+                    ->orWhere('business_uuid', 'like', '%'.$businessQuery.'%');
+                
             }))
-            ->orderBy('name')
+            ->orderBy('business_name')
             ->paginate(25, ['*'], 'business_page')
             ->withQueryString();
 
@@ -48,7 +47,7 @@ final class SentinelController extends Controller
             'totalFingerprints' => $overview['fingerprints'],
             'totalOccurrences' => $overview['occurrences'],
             'latestIncident' => $overview['latest_incident'],
-            'businesses' => $businesses,
+            'customers' => $customers,
             'businessQuery' => $businessQuery,
             'licenceSigningConfigured' => trim((string) config('zazu.licensing.private_key_file', '')) !== '',
             'issuedLicenseToken' => session('sentinel_issued_license_token'),
