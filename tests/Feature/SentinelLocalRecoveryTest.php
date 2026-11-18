@@ -33,7 +33,7 @@ class SentinelLocalRecoveryTest extends TestCase
         $this->assertNotNull($route);
         $this->assertNotContains(
             \\Illuminate\\Routing\\Middleware\\ThrottleRequests::class,
-            $route->gatherMiddleware()
+            app('router')->gatherRouteMiddleware($route)
         );
     }
 
