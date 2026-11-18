@@ -325,7 +325,7 @@ Priority order:
 Pricing remains an owner decision. Existing documentation contains conflicting tier/pricing models; surface the conflict and do not silently select or rewrite pricing.
 
 ### Explicit freeze and scope control
-- Sentinel and diagnostics are in **feature freeze**. Maintenance is permitted only for a verified defect, security issue or direct dependency of the active target. No more diagnostic consoles, recovery subsystems or observability features without explicit Founder approval.
+- Sentinel and diagnostics remain **active engineering targets** under the Founder's explicit direction. Continue improving the existing control centre, incident capture, health visibility, security and recovery workflows in focused, evidence-backed batches. Do not interpret WIP discipline as a feature freeze. Preserve the founder-only platform incident boundary and existing recovery safety rules; any genuinely new subsystem or material architecture expansion still requires explicit Founder approval.
 - No expansion of offline/synchronisation scope during this commercial-readiness mission. Preserve and repair existing approved behaviour when it is a verified blocker; do not add another offline subsystem.
 - No new subsystem, product feature, architecture programme or broad refactor without explicit Founder approval.
 - Do not repeat known browser smoke tests or unchanged checks. Repeat a check only when a code/configuration change or new evidence makes the result materially different.
