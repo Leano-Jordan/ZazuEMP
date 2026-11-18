@@ -14,11 +14,11 @@ class SignedOfflineLicenseVerifier
      *   fingerprint: string
      * }
      */
-    public function verifyForBusiness(string $token, int $businessId): array
+    public function verifyForBusiness(string $token, string $businessUuid): array
     {
         $payloadBytes = $this->verifiedPayloadBytes($token);
         $payload = $this->decodePayload($payloadBytes);
-        $this->assertPayloadBelongsToBusiness($payload, $businessId);
+        $this->assertPayloadBelongsToBusiness($payload, $businessUuid);
 
         return [
             'payload' => $payload,
@@ -102,11 +102,12 @@ class SignedOfflineLicenseVerifier
     /**
      * @param array<string, mixed> $payload
      */
-    private function assertPayloadBelongsToBusiness(array $payload, int $businessId): void
+    private function assertPayloadBelongsToBusiness(array $payload, string $businessUuid): void
     {
-        if (($payload['version'] ?? null) !== 1
-            || ! is_int($payload['business_id'] ?? null)
-            || $payload['business_id'] !== $businessId
+        if (($payload['version'] ?? null) !== 2
+            || ! is_string($payload['business_uuid'] ?? null)
+            || ! Str::isUuid($payload['business_uuid'])
+            || ! hash_equals(strtolower($businessUuid), strtolower($payload['business_uuid']))
             || ! $this->hasValidLicenseIdentity($payload)
             || ! $this->hasValidEntitlementFields($payload)) {
             throw new \InvalidArgumentException('The signed licence payload has invalid fields or belongs to another business.');
