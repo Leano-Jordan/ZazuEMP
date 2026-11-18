@@ -334,3 +334,12 @@ V1: NOT READY. Historical state/register/memory, checklist and changelog are pre
 - Documentation updated in V1 package and Sentinel runbooks. Do not mark expanded ACL assertions accepted until a Windows package workflow containing the latest assertion set completes successfully.
 
 - Expanded Windows ACL test initially failed because the backup/restore acceptance drill had already created `database/database.sqlite` before installation. The installer correctly normalised that pre-existing file to its own protected explicit ACL; the test incorrectly required it to inherit. The assertion now verifies the database file has an explicit protected ACL with only the allowed SIDs, while newly created diagnostics must inherit. Workflow correction committed as `c628604`; fresh Windows acceptance is queued. This was a test expectation correction; no ACL restriction was loosened.
+
+## Existing-server migration bypass guard — 2026-11-18
+
+- Inspection of `ops/windows/Start-ZazuDev.ps1` found that its already-running-server fast path returned before calling the backup-first database preparation routine.
+- If repository files were updated while the PHP server remained running, launching the wrapper again could report “already running” without detecting newly pending migrations. This is a concrete startup-control gap, not proof of the owner-reported DB-001 cause.
+- The fast path now performs read-only `migrate:status` first. If migrations are pending or the migration ledger is missing, it refuses to claim the launch is current and tells the operator to stop then restart Zazu. It never migrates while the existing server is active.
+- A Windows Ops workflow contract check now verifies this guard and its non-mutating boundary.
+- The normal stopped-server path remains unchanged: verified full database/private-files backup, migration, final migration-status verification, then server start.
+- **Evidence pending:** Windows Ops workflow must pass on exact `main` HEAD. The owner installation has not been modified or tested by this repository change. The one pending invoice-numbering migration is not evidence that the earlier account/workspace DB-001 has recurred; the historical `business_user.primary_niche` column is present in the supplied Sentinel schema report.
