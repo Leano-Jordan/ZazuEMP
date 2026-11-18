@@ -16,7 +16,11 @@ class IncidentDiagnosticController extends Controller
 
         // Prefer the independent ledger; legacy Laravel logs remain a fallback
         // for incidents captured before the ledger was introduced.
-        $incident = ZazuIncidentLedger::find($requestId) ?? $this->findDatabaseIncident($requestId);
+        $incident = ZazuIncidentLedger::find($requestId);
+
+        if (($incident['error_code'] ?? null) !== 'DB-001') {
+            $incident = $this->findDatabaseIncident($requestId);
+        }
 
         abort_if($incident === null, 404, 'No matching database incident record is available.');
 
