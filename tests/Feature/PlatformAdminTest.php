@@ -170,7 +170,9 @@ class PlatformAdminTest extends TestCase
                 ->assertSee($fingerprint)
                 ->assertSee('895e2c23-bc6b-4919-a891-1e8e5c1e27e4')
                 ->assertSee('DashboardController.php')
-                ->assertSee(route('support.incidents.show', ['requestId' => '895e2c23-bc6b-4919-a891-1e8e5c1e27e4']), false)
+                ->assertSee('/api/support/incidents/895e2c23-bc6b-4919-a891-1e8e5c1e27e4', false)
+                ->assertSee('signature=', false)
+                ->assertSee('expires=', false)
                 ->assertSee('Download safe DB report')
                 ->assertDontSee('private SQL');
         } finally {
