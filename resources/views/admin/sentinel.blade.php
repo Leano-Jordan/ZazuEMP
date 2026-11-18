@@ -146,7 +146,7 @@
                             <div class="sentinel-license-meta">Business UUID: <code>{{ $customer->business_uuid }}</code></div>
                             @if($customer->last_license_id)
                                 @php
-                                    $licenceStatus = $customer->last_status;
+                                    $licenceStatus = $customer->last_status === 'active' ? 'issued active' : $customer->last_status;
                                     if ($licenceStatus === 'active' && $customer->last_starts_at?->isFuture()) {
                                         $licenceStatus = 'not yet active';
                                     } elseif ($licenceStatus === 'active' && $customer->last_expires_at?->isPast()) {
@@ -158,7 +158,7 @@
                                     <span class="sentinel-pill">{{ strtoupper($licenceStatus) }}</span>
                                     <span>Expires {{ $customer->last_expires_at?->format('d M Y H:i') ?? 'Never' }}</span>
                                 </div>
-                                <div class="sentinel-muted sentinel-license-meta">Licence {{ $customer->last_license_id }}</div>
+                                <div class="sentinel-muted sentinel-license-meta">Last issued licence {{ $customer->last_license_id }}</div>
                             @else
                                 <div class="sentinel-muted">No licence issued yet</div>
                             @endif
@@ -183,7 +183,7 @@
                             @if($customer->last_license_id && $customer->last_status === 'active')
                                 <form method="POST" action="{{ route('admin.sentinel.licences.revoke', $customer) }}" class="sentinel-license-form">
                                     @csrf
-                                    <span class="sentinel-muted">Revoke current licence</span>
+                                    <span class="sentinel-muted">Revoke latest issued licence</span>
                                     <button class="sentinel-button" type="submit" {{ !$licenceSigningConfigured ? 'disabled' : '' }}>Revoke</button>
                                 </form>
                             @endif
