@@ -3,6 +3,7 @@
 namespace Tests\Feature;
 
 use App\Support\ZazuSentinelHealth;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\URL;
 use Tests\TestCase;
@@ -34,7 +35,7 @@ class SentinelRescueTest extends TestCase
             'database.connections.sqlite.database' => $this->directory,
             'session.driver' => 'database',
         ]);
-        \\Illuminate\\Support\\Facades\\DB::purge('sqlite');
+        DB::purge('sqlite');
 
         $incidentDirectory = storage_path('app/private/zazu-diagnostics');
         File::deleteDirectory($incidentDirectory);
