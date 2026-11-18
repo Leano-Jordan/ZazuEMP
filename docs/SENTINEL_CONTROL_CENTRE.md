@@ -197,4 +197,4 @@ Sentinel is not production-ready until all of the following are proven:
 
 ## Owner dashboard interaction
 
-Sentinel Rescue remains a read-only report. The owner can filter checks by status, search diagnostic labels/messages, expand or collapse available detail sections, and re-run the health inspection with **Recheck**. These controls run in the browser; recheck reloads the existing read-only page and does not write business data or contact an external service.
+Sentinel Rescue is a non-destructive owner diagnostic surface. The owner can filter checks by status, search diagnostic labels/messages, expand or collapse available detail sections, and re-run the health inspection with **Recheck**. Failed and attention findings now include key-specific safe next steps. DB-001 findings with a valid reference link to the existing redacted incident report; no new repair or mutation endpoint is exposed. Database probes remain read-only; the existing diagnostics write/read probe creates and removes a uniquely named temporary file. No business records are changed and no external service is contacted.
