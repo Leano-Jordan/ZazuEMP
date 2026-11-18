@@ -15,7 +15,8 @@
             || in_array($permission, config('zazu.permissions.roles.'.$currentRole, []), true);
         $isOwner = $currentRole === 'owner';
         $sentinelRescueUrl = $isOwner ? \Illuminate\Support\Facades\URL::temporarySignedRoute('sentinel.rescue', now()->addYear()) : null;
-        $isPlatformAdmin = in_array(strtolower((string) auth()->user()->email), array_map('strtolower', config('zazu.platform_admin_emails', [])), true);
+        $founderEmail = (string) config('zazu.platform_admin_email', '');
+        $isPlatformAdmin = $founderEmail !== '' && hash_equals($founderEmail, strtolower(trim((string) auth()->user()->email)));
         $experienceLevel = app(\App\Support\ExperienceLevel::class)->for(auth()->user(), $business);
         $experienceLabel = app(\App\Support\ExperienceLevel::class)->label($experienceLevel);
         $primaryNiche = app(\App\Support\NicheFocus::class)->for(auth()->user(), $business);
@@ -109,14 +110,19 @@
                             @if($can('reports.view'))<a href="{{ route('reports.index') }}" class="zazu-nav-link {{ request()->routeIs('reports.*') ? 'active' : '' }}">Reports</a>@endif
                         </div></div>
                     </div>
-                    @if($isOwner)
-                    <div class="zazu-nav-area {{ request()->routeIs('settings.*','admin.landing.*','onboarding.*') ? 'is-active' : '' }}" data-zazu-nav-area>
+                    @if($isOwner || $isPlatformAdmin)
+                    <div class="zazu-nav-area {{ request()->routeIs('settings.*','admin.*','onboarding.*','sentinel.rescue') ? 'is-active' : '' }}" data-zazu-nav-area>
                         <button type="button" class="zazu-nav-area-trigger" data-zazu-nav-trigger aria-expanded="false" aria-controls="zazu-nav-system"><span class="zazu-nav-area-title">System</span><span class="zazu-nav-area-chevron" aria-hidden="true">›</span></button>
                         <div class="zazu-nav-flyout" id="zazu-nav-system" data-zazu-nav-panel><div class="zazu-nav-flyout-links">
-                            <a href="{{ route('settings.index') }}" class="zazu-nav-link {{ request()->routeIs('settings.*') ? 'active' : '' }}">Settings</a>
-                            <a href="{{ $sentinelRescueUrl }}" class="zazu-nav-link" target="_blank" rel="noreferrer">Sentinel Rescue</a>
-                            <a href="{{ route('onboarding.index') }}" class="zazu-nav-link {{ request()->routeIs('onboarding.*') ? 'active' : '' }}">Setup</a>
-                            @if($isPlatformAdmin)<a href="{{ route('admin.landing.settings') }}" class="zazu-nav-link {{ request()->routeIs('admin.landing.*') ? 'active' : '' }}">Platform</a>@endif
+                            @if($isOwner)
+                                <a href="{{ route('settings.index') }}" class="zazu-nav-link {{ request()->routeIs('settings.*') ? 'active' : '' }}">Settings</a>
+                                <a href="{{ route('sentinel.rescue') }}" class="zazu-nav-link {{ request()->routeIs('sentinel.rescue') ? 'active' : '' }}">Sentinel Rescue</a>
+                                <a href="{{ route('onboarding.index') }}" class="zazu-nav-link {{ request()->routeIs('onboarding.*') ? 'active' : '' }}">Setup</a>
+                            @endif
+                            @if($isPlatformAdmin)
+                                <a href="{{ route('admin.sentinel') }}" class="zazu-nav-link {{ request()->routeIs('admin.sentinel') ? 'active' : '' }}">Sentinel Control Centre</a>
+                                <a href="{{ route('admin.landing.settings') }}" class="zazu-nav-link {{ request()->routeIs('admin.landing.*') ? 'active' : '' }}">Platform</a>
+                            @endif
                         </div></div>
                     </div>
                     @endif
