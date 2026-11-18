@@ -124,4 +124,59 @@ final class ZazuIncidentSummary
 
         return mb_substr(preg_replace('/[^A-Za-z0-9_.@-]/', '', $value) ?? '', 0, 120);
     }
+
+    /**
+     * Return safe occurrence details for one validated fingerprint.
+     */
+    public function timeline(string $fingerprint, int $limit = 100): array
+    {
+        if (preg_match('/^ZAZU-[A-F0-9]{16}$/', $fingerprint) !== 1) {
+            return [];
+        }
+
+        $records = [];
+
+        foreach ($this->ledgerFiles() as $path) {
+            $this->collectTimeline($path, $fingerprint, $records);
+        }
+
+        usort($records, static fn (array $a, array $b): int => strcmp($b['timestamp'], $a['timestamp']));
+
+        return array_slice($records, 0, max(1, min($limit, 500)));
+    }
+
+    private function collectTimeline(string $path, string $fingerprint, array &$records): void
+    {
+        if (!is_file($path) || !is_readable($path)) {
+            return;
+        }
+
+        try {
+            $file = new SplFileObject($path, 'r');
+
+            while (!$file->eof()) {
+                $record = $this->decode($file->fgets());
+
+                if ($record === null || $record['failure_fingerprint'] !== $fingerprint) {
+                    continue;
+                }
+
+                $records[] = [
+                    'request_id' => $record['request_id'],
+                    'timestamp' => is_string($record['timestamp'] ?? null) ? $record['timestamp'] : 'unknown',
+                    'error_code' => $this->safeText($record['error_code'] ?? null),
+                    'exception' => $this->safeText($record['exception_class'] ?? null),
+                    'source_file' => $this->safeText($record['source_file'] ?? null),
+                    'component' => $this->safeText($record['originating_component'] ?? null),
+                    'database_driver' => $this->safeText($record['database_driver'] ?? null),
+                    'database_sqlstate' => $this->safeText($record['database_sqlstate'] ?? null),
+                    'database_operation' => $this->safeText($record['database_operation'] ?? null),
+                    'database_failure_class' => $this->safeText($record['database_failure_class'] ?? null),
+                ];
+            }
+        } catch (Throwable) {
+            // Continue with the other ledger segment if one is damaged.
+        }
+    }
+
 }
