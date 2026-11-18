@@ -14,7 +14,6 @@
         $can = fn (string $permission): bool => $currentRole === 'owner'
             || in_array($permission, config('zazu.permissions.roles.'.$currentRole, []), true);
         $isOwner = $currentRole === 'owner';
-        $sentinelRescueUrl = $isOwner ? \Illuminate\Support\Facades\URL::temporarySignedRoute('sentinel.rescue', now()->addYear()) : null;
         $founderEmail = (string) config('zazu.platform_admin_email', '');
         $isPlatformAdmin = $founderEmail !== '' && hash_equals($founderEmail, strtolower(trim((string) auth()->user()->email)));
         $experienceLevel = app(\App\Support\ExperienceLevel::class)->for(auth()->user(), $business);
