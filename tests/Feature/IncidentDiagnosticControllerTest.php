@@ -49,6 +49,7 @@ class IncidentDiagnosticControllerTest extends TestCase
             'database_sqlstate' => 'HY000',
             'database_driver_code' => 1,
             'database_operation' => 'read',
+            'database_failure_class' => 'sqlite_missing_table',
             'file' => '/private/path/FinanceController.php',
             'message' => $secret,
             'sql' => 'select * from customers where email = ?',
@@ -65,6 +66,7 @@ class IncidentDiagnosticControllerTest extends TestCase
             ->assertJsonPath('error_code', 'DB-001')
             ->assertJsonPath('database_driver_code', 1)
             ->assertJsonPath('database_operation', 'read')
+            ->assertJsonPath('database_failure_class', 'sqlite_missing_table')
             ->assertJsonPath('source_file', 'FinanceController.php')
             ->assertJsonMissingPath('sql')
             ->assertJsonMissingPath('bindings')

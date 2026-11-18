@@ -109,6 +109,7 @@ class IncidentDiagnosticController extends Controller
             'database_sqlstate',
             'database_driver_code',
             'database_operation',
+            'database_failure_class',
         ];
 
         $safe = [];

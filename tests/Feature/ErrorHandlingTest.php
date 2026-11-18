@@ -151,6 +151,7 @@ class ErrorHandlingTest extends TestCase
                     'database_sqlstate' => 'HY000',
                     'database_driver_code' => 1,
                     'database_operation' => null,
+                    'database_failure_class' => 'sqlite_missing_table',
                 ];
 
                 return $level === 'error'
@@ -162,7 +163,7 @@ class ErrorHandlingTest extends TestCase
                     && ! str_contains((string) $serialized, 'select * from private_customers');
             });
 
-        $pdoException = new \PDOException($marker);
+        $pdoException = new \PDOException('SQLSTATE[HY000]: General error: 1 no such table: private_customers');
         $pdoException->errorInfo = ['HY000', 1, $marker];
 
 

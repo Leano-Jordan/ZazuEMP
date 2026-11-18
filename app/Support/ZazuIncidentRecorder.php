@@ -81,6 +81,7 @@ final class ZazuIncidentRecorder
             'database_sqlstate' => self::sqlState($exception->errorInfo ?? null),
             'database_driver_code' => self::driverCode($exception->errorInfo ?? null),
             'database_operation' => self::databaseOperation($exception->readWriteType),
+            'database_failure_class' => self::databaseFailureClass($exception, self::databaseDriver($exception->getConnectionName())),
         ];
     }
 
@@ -91,7 +92,51 @@ final class ZazuIncidentRecorder
             'database_driver' => null,
             'database_sqlstate' => self::sqlState($exception->errorInfo ?? null),
             'database_driver_code' => self::driverCode($exception->errorInfo ?? null),
+            'database_failure_class' => self::databaseFailureClass($exception, null),
         ];
+    }
+
+
+    /**
+     * Convert private driver text into a small, non-sensitive failure category.
+     * Never persist the original driver message.
+     */
+    private static function databaseFailureClass(Throwable $exception, ?string $driver): string
+    {
+        $previous = $exception->getPrevious();
+        $message = strtolower($previous?->getMessage() ?? $exception->getMessage());
+        $sqlState = self::sqlState($exception instanceof \PDOException ? ($exception->errorInfo ?? null) : null);
+
+        if ($driver === 'sqlite' || str_starts_with((string) $sqlState, 'HY')) {
+            return match (true) {
+                str_contains($message, 'no such table') => 'sqlite_missing_table',
+                str_contains($message, 'no such column') => 'sqlite_missing_column',
+                str_contains($message, 'database is locked') => 'sqlite_locked',
+                str_contains($message, 'database table is locked'),
+                str_contains($message, 'database schema is locked') => 'sqlite_schema_locked',
+                str_contains($message, 'readonly database'),
+                str_contains($message, 'read-only database') => 'sqlite_read_only',
+                str_contains($message, 'disk i/o error') => 'sqlite_disk_io',
+                str_contains($message, 'database disk image is malformed') => 'sqlite_malformed',
+                str_contains($message, 'unable to open database file') => 'sqlite_open_failed',
+                str_contains($message, 'database or disk is full') => 'sqlite_disk_full',
+                str_contains($message, 'foreign key constraint failed') => 'sqlite_foreign_key',
+                str_contains($message, 'unique constraint failed') => 'sqlite_unique_constraint',
+                str_contains($message, 'database is busy') => 'sqlite_busy',
+                default => 'sqlite_unclassified',
+            };
+        }
+
+        return match ($sqlState) {
+            '42P01' => 'database_missing_table',
+            '42703' => 'database_missing_column',
+            '23505' => 'database_unique_constraint',
+            '23503' => 'database_foreign_key',
+            '40001' => 'database_serialization_conflict',
+            '40P01' => 'database_deadlock',
+            '08006', '08003' => 'database_connection_failure',
+            default => 'database_unclassified',
+        };
     }
 
     private static function databaseDriver(string $connectionName): ?string
