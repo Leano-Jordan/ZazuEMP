@@ -1,3 +1,21 @@
+## Director update — 2026-11-18 (DB-001 diagnostic classification)
+
+**Canonical repository:** `Leano-Jordan/ZazuEMP` · **branch:** `main`  
+**Commit:** `f63c9080a18389265da094df84cd24b02ecc7fc0`  
+**CI:** [Laravel run 44252182123](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/44252182123) — Laravel tests **PASS**.
+
+### DB-001 diagnostic improvements
+- The existing reference-scoped download now includes a safe database failure category derived from the private driver message; the original message, SQL, bindings, customer data, credentials and full paths remain excluded.
+- SQLite categories distinguish missing table, missing column, database lock/schema lock, read-only access, disk I/O, malformed database, open failure, disk full, foreign-key/unique constraint, busy and unclassified failures.
+- PostgreSQL SQLSTATEs distinguish missing table/column, unique/foreign-key constraints, serialization conflict, deadlock and connection failure.
+- Added feature coverage for the reference download allowlist/redaction and recorder classification.
+- Automated evidence: **552 passed / 1 skipped / 3,844 assertions**. PostgreSQL migration smoke, Windows package build and fresh-install verification, PHPMD, Psalm, Zazu Quality, Director Health, populated upgrade/rollback and Push-on-main: **PASS**. Offline-browser acceptance is still running; SonarCloud is skipped.
+
+### Required owner-side evidence
+The actual Windows installation has not yet produced its reference-scoped diagnostic report in this conversation. The historical DB-001 cause is therefore **not yet proven or repaired**. Obtain the report from the affected installation before choosing a database repair. V1 remains **NOT READY**.
+
+---
+
 ## Director update — 2026-11-18 (commercial sharing and invoice numbering)
 
 **Canonical repository:** `Leano-Jordan/ZazuEMP` · **branch:** `main`  
