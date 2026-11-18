@@ -80,11 +80,13 @@ no-store caching headers. Treat the reference as sensitive and share the report 
 
 ## Owner Sentinel Rescue access
 
-Business owners can open **System → Sentinel Rescue** to get a private signed link that bypasses the normal Zazu login/session path. The link is valid for one year when generated and should be kept private. It opens a standalone page that checks the local Sentinel evidence store without querying the business database or exposing incident contents.
+Business owners can open **System → Sentinel Rescue** to get a private signed link that bypasses the normal Zazu login/session path. The link is valid for one year when generated and should be kept private. Anyone who receives it can view this installation-level health snapshot.
 
-This is deliberately a narrow rescue surface. It proves whether Sentinel's own diagnostic directory and ledger are usable; it does not yet diagnose DB-001 root causes, database schema, storage, private attachments, offline sync or backup integrity. A healthy result is not a whole-system health certification. The rescue path also requires the local Zazu web process and application bootstrap to remain running.
+The standalone page checks database connectivity and migration history using read-only queries; private storage permissions; required installed-app support files; and Sentinel's own diagnostic directory, active/previous ledger readability, malformed-record counts and temporary write/read/delete probe. When the database probe or a migration query throws, Sentinel attempts to capture a safe incident and shows the reference-specific DB-001 report link.
 
-Automated route, owner-navigation and health-check acceptance is subject to exact-head CI; physical packaged-installation acceptance remains separate.
+The route is tested with an unavailable SQLite database path while `SESSION_DRIVER=database`. It returned the rescue page and retained independent diagnostic capture without requiring a normal database-backed session. It still depends on the local Zazu web process and application bootstrap remaining operational.
+
+This is not full diagnosis yet. No diagnostic ZIP/manifest, attachment health, offline queue/sync verification, backup integrity/recovery check, session/cache check or local knowledge base has been completed. A present service-worker file is not proof of phone offline capability. Physical Android and owner-operated packaged-installation acceptance remain separate.
 
 The console, timeline and export action require automated feature-test and production-build
 verification before being treated as release-accepted.
