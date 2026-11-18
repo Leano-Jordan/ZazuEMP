@@ -87,14 +87,14 @@ class IncidentDiagnosticDownloadTest extends TestCase
         File::deleteDirectory($directory);
 
         try {
-            \\App\\Support\\ZazuIncidentLedger::record([
+            \App\Support\ZazuIncidentLedger::record([
                 'request_id' => $requestId,
                 'error_code' => 'DB-001',
                 'category' => 'Database',
                 'severity' => 'high',
                 'http_status' => 500,
-                'exception_class' => 'Illuminate\\\\Database\\\\QueryException',
-                'originating_component' => 'App\\\\Http\\\\Controllers\\\\DashboardController@index',
+                'exception_class' => 'Illuminate\\Database\\QueryException',
+                'originating_component' => 'App\\Http\\Controllers\\DashboardController@index',
                 'route_name' => 'dashboard',
                 'http_method' => 'GET',
                 'timestamp' => '2026-11-18T11:00:00+02:00',
