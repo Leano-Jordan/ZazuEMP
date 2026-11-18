@@ -25,13 +25,18 @@ final class EnsureLocalSentinelRecovery
                 ? strtolower(trim((string) ($origin['host'] ?? ''), '[]'))
                 : '';
             $originScheme = is_array($origin) ? ($origin['scheme'] ?? null) : null;
+            $originPort = is_array($origin)
+                ? (int) ($origin['port'] ?? ($originScheme === 'https' ? 443 : 80))
+                : null;
             $fetchSite = $request->headers->get('Sec-Fetch-Site');
+            $contentType = strtolower((string) $request->headers->get('Content-Type', ''));
 
             abort_unless(
-                $request->isJson() === false
-                    && in_array($request->getMethod(), ['POST'], true)
+                $request->getMethod() === 'POST'
+                    && str_starts_with($contentType, 'application/x-www-form-urlencoded')
                     && $originHost === $host
                     && $originScheme === $request->getScheme()
+                    && $originPort === $request->getPort()
                     && ($fetchSite === null || $fetchSite === 'same-origin'),
                 403
             );
