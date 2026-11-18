@@ -1,12 +1,15 @@
 <?php
 
+$legacyPlatformAdminEmails = array_values(array_filter(array_map('trim', explode(',', (string) env('ZAZU_PLATFORM_ADMIN_EMAILS', '')))));
+$platformAdminEmail = trim((string) env('ZAZU_PLATFORM_ADMIN_EMAIL', ''));
+
+if ($platformAdminEmail === '' && count($legacyPlatformAdminEmails) === 1) {
+    $platformAdminEmail = $legacyPlatformAdminEmails[0];
+}
+
 return [
     // One explicitly designated founder identity. Legacy configuration is accepted only when it contains exactly one address.
-    'platform_admin_email' => strtolower(trim((string) env('ZAZU_PLATFORM_ADMIN_EMAIL', (function (): string {
-        $legacy = array_values(array_filter(array_map('trim', explode(',', (string) env('ZAZU_PLATFORM_ADMIN_EMAILS', '')))));
-
-        return count($legacy) === 1 ? $legacy[0] : '';
-    })()))),
+    'platform_admin_email' => strtolower($platformAdminEmail),
     'licensing' => [
         // Ed25519 public key only (base64-encoded 32-byte key). Never configure a private key here.
         'public_key' => env('ZAZU_LICENSE_PUBLIC_KEY', ''),
