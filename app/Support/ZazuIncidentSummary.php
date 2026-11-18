@@ -9,18 +9,47 @@ final class ZazuIncidentSummary
 {
     public function build(int $limit = 25): array
     {
+        $summaries = array_values($this->aggregateGroups());
+        usort($summaries, static fn (array $a, array $b): int =>
+            ($b['occurrences'] <=> $a['occurrences']) ?: strcmp($b['last_seen'], $a['last_seen'])
+        );
+
+        return array_slice($summaries, 0, max(1, min($limit, 100)));
+    }
+
+    /**
+     * Return installation-wide totals, independent of the display-list limit.
+     */
+    public function overview(): array
+    {
+        $groups = $this->aggregateGroups();
+        $latestIncident = null;
+        $totalOccurrences = 0;
+
+        foreach ($groups as $group) {
+            $totalOccurrences += $group['occurrences'];
+
+            if ($latestIncident === null || $group['last_seen'] > $latestIncident) {
+                $latestIncident = $group['last_seen'];
+            }
+        }
+
+        return [
+            'fingerprints' => count($groups),
+            'occurrences' => $totalOccurrences,
+            'latest_incident' => $latestIncident,
+        ];
+    }
+
+    private function aggregateGroups(): array
+    {
         $groups = [];
 
         foreach ($this->ledgerFiles() as $path) {
             $this->aggregateFile($path, $groups);
         }
 
-        $summaries = array_values($groups);
-        usort($summaries, static fn (array $a, array $b): int =>
-            ($b['occurrences'] <=> $a['occurrences']) ?: strcmp($b['last_seen'], $a['last_seen'])
-        );
-
-        return array_slice($summaries, 0, max(1, min($limit, 100)));
+        return $groups;
     }
 
     private function ledgerFiles(): array
