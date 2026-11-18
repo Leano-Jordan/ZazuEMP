@@ -2,13 +2,13 @@
 
 namespace App\Http\Controllers;
 
-use App\Support\ZazuSentinelHealth;
+use App\Support\ZazuSystemHealth;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\App;
 
 final class SentinelRescueController extends Controller
 {
-    public function show(ZazuSentinelHealth $health): Response
+    public function show(ZazuSystemHealth $health): Response
     {
         return response()
             ->view('sentinel.rescue', [
