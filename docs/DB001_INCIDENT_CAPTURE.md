@@ -53,3 +53,24 @@ php artisan zazu:sentinel --json
 The report reads only the active and immediately previous private ledger segments. It does not query the business database, expose exception messages, SQL, bindings or customer records, or transmit diagnostics externally. The JSON option is intended for local tooling and automation.
 
 This is a recurrence index, not proof of root cause. Fingerprint groups are only comparable within the same fingerprint version; future fingerprint algorithm changes must increment `failure_fingerprint_version`.
+
+
+## Director Sentinel console
+
+Platform administrators can open the searchable diagnostics console at `/admin/sentinel`.
+The route is protected by the existing `auth`, `auth.session`, and `platform.admin`
+middleware chain. It reads the private incident ledger only; it does not query business
+records or expose raw exception messages, SQL, bindings, customer data, or stack traces.
+
+The console provides:
+- retained fingerprint and occurrence totals;
+- search across fingerprint, error code, failure class, exception class, and source file;
+- a fingerprint drill-down with a timestamped occurrence timeline and safe technical fields.
+
+The timeline is limited to 500 matching records and the overview to the 100 most frequent
+fingerprints. Both active and previous ledger segments are read. The console does not
+increase the underlying two-segment retention window. Incident references are displayed
+as identifiers and are not linked to the unauthenticated diagnostic download endpoint.
+
+The console and timeline require automated feature-test and production-build verification
+before being treated as release-accepted.
