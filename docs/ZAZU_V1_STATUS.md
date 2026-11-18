@@ -1,3 +1,27 @@
+## Director update — 2026-11-18 (commercial sharing and invoice numbering)
+
+**Canonical repository:** `Leano-Jordan/ZazuEMP` · **branch:** `main`  
+**Application-code baseline:** `1f72eada34a774089efcb9a65ee84b0b93003269`  
+**Exact-head CI:** [run 44208836341](https://github.com/Leano-Jordan/ZazuEMP/actions/runs/44208836341) — **PASS**.
+
+### Commercial engineering delivered
+- Signed, read-only customer receipt pages for invoice-linked payments, with WhatsApp handoff and browser Print / Save as PDF.
+- Consecutive invoice numbering in the existing `INV-YYYYMM-` format, scoped per business and month, protected by a durable sequence row and business transaction lock.
+- Online issuance and offline invoice sync use the same allocator. Offline records refresh to the canonical server number after sync.
+- Existing numeric invoice numbers seed the counter; voided numbers remain consumed; idempotent retries do not allocate a second number.
+
+### Exact-head automated evidence
+- Laravel: **546 passed / 1 skipped / 3,805 assertions**.
+- Offline browser: **45 desktop Chromium tests passed**, **6 mobile-viewport tests passed**, and **1 phone-local attachment journey passed**.
+- PostgreSQL migrations, account/workspace registration and database/private-file backup/restore: **PASS**.
+- Windows V1 candidate build and Windows PowerShell fresh-install verification: **PASS**.
+- PHPMD, Psalm, Zazu Quality, Director Contract Lint, Director Health, populated upgrade/rollback and Push-on-main: **PASS**. SonarCloud: **SKIPPED**.
+
+### Remaining release gates
+COM-01 remains partial: direct PDF-file attachment and physical desktop/Android sharing acceptance remain open. South African tax-adviser/legal review of invoice numbering and tax-invoice presentation remains open. DB-001, intended-installation recovery, live-business reconciliation, physical Android acceptance and POPIA operational sign-off remain open. **V1 remains NOT READY; no readiness score uplift is claimed.**
+
+---
+
 ## Director update — 2026-11-17 (offline customer detail and archive validation hardening)
 
 **Canonical repository:** \`Leano-Jordan/ZazuEMP\` · **branch:** \`main\`  
