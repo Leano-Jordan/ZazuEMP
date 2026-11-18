@@ -224,6 +224,13 @@ class PlatformAdminTest extends TestCase
                 ->assertSee('101</strong>', false)
                 ->assertSee('201</strong>', false)
                 ->assertSee('2026-11-18T23:00:00+02:00');
+
+            $this->actingAs($admin)
+                ->get(route('admin.sentinel', ['q' => 'APP-002']))
+                ->assertOk()
+                ->assertSee('ZAZU-FFFFFFFFFFFFFFFF')
+                ->assertSee('APP-002')
+                ->assertDontSee('ZAZU-0000000000000001');
         } finally {
             File::deleteDirectory($directory);
         }
