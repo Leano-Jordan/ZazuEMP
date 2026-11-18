@@ -268,3 +268,12 @@ V1: NOT READY. Historical state/register/memory, checklist and changelog are pre
 - PHPMD run 44374538225 and Zazu quality run 44374538448 on 3d809a6: **PASS**. Laravel run 44374538236 on 3d809a6: **573 passed, 1 skipped, 3,956 assertions**. PostgreSQL migration smoke and offline browser acceptance for that exact commit were still running at this note; earlier commit 9d5ae4f had both checks **PASS**.
 - Windows V1 package build and fresh-install PowerShell verification passed on commit 9d5ae4f. Director Contract Lint passed on 21a2f4e.
 - No security checks were relaxed, no branches were created, and no physical-device acceptance is inferred from CI. V1 remains **NOT READY** pending physical installation/offline acceptance and remaining release gates.
+
+## Sentinel request and incident-capture hardening — 2026-11-18
+
+- Tightened the local recovery POST content-type guard to compare the parsed media type exactly with `application/x-www-form-urlencoded`; values that merely share the prefix are rejected. Added a regression test for the malformed suffix case. Existing loopback, origin scheme/host/port, Fetch Metadata and one-time challenge controls are unchanged.
+- Hardened `ZazuIncidentRecorder`: if both the primary Laravel log channel and fallback Laravel error log fail, the recorder emits only the failure class to PHP's local `error_log` and does not allow the secondary logging failure to escape the exception-reporting path.
+- Added `IncidentRecorderResilienceTest` proving the independent redacted incident ledger still receives the record during a simulated primary/fallback log-channel outage and that private exception details are not written to the ledger.
+- Exact-head commit `529bd6fe47e9d7624a47c3237b87e03f508ae872`: Laravel **575 passed, 1 skipped, 3,962 assertions**; PostgreSQL migration/recovery smoke **PASS**; PHPMD **PASS**; Zazu quality application, Composer security audit and secret scan **PASS**. Offline browser acceptance was still running at the time of this note.
+- Earlier CI failures on intermediate commits were traced to a malformed namespace separator in the newly added test and a PHPMD public-method count after adding the test to an already-large test class. The test was moved into its own feature-test class, syntax corrected, and PHPMD plus Laravel now pass on 529bd6f. No production safeguard was weakened.
+- All changes are committed directly to `main`; no branches created. Physical Windows/Android acceptance remains separate from CI, and V1 remains **NOT READY** pending the outstanding operator gates.
