@@ -25,6 +25,13 @@ DB-001 remains the active release blocker: repeated database read/write failures
 - [ ] Keep private business documents access-controlled; do not expose permanent public file URLs.
 
 ### COM-02 — Payment links and payment reconciliation
+
+**Provider research snapshot — 2026-11-18 (recommendation only; provider selection remains with the owner):** Paystack is the leading V1 candidate. Its backend transaction-initialize API returns a hosted checkout URL and unique reference; the transaction-verify endpoint can confirm the final state. Published South African fees are 2.9% + R1 for local card transactions and 2% for EFT, excluding VAT, with no setup or monthly fees. Its webhook notifications require a publicly reachable endpoint, so the local-first V1 should verify outstanding references from the local server when connectivity returns rather than depend on an always-online webhook receiver. [Paystack transaction API](https://paystack.com/docs/api/transaction/) · [Paystack SA pricing](https://paystack.com/za/pricing) · [Paystack webhook requirements](https://paystack.com/docs/payments/webhooks/)
+
+Peach Payments is the strongest alternative if native payment-link management is the priority: its Payment Links API can generate, cancel and query links; it supports signed HMAC-SHA256 webhooks with retries for up to 30 days. Published SA Growth pricing lists 2.95% + R1.50 for local cards and 1.50% + R1.50 for Pay by Bank/Capitec Pay, excluding VAT. [Peach Payment Links API](https://developer.peachpayments.com/docs/payment-links-api) · [Peach webhook security and retries](https://developer.peachpayments.com/docs/payment-links-webhooks) · [Peach SA fees](https://www.peachpayments.com/fees/?country=za)
+
+Yoco's self-service payment links are created in the Yoco app; its Checkout API is a separate integration path. This is convenient for manual collection but less direct for automated invoice-bound link creation in Zazu. [Yoco payment links](https://support.yoco.help/en/articles/418086-payment-links-from-the-yoco-app) · [Yoco online payments](https://www.yoco.com/za/online-payment/)
+
 - [ ] Select and document a suitable payment-provider approach for the South African launch market.
 - [ ] Keep provider integration replaceable; do not hard-wire financial workflow logic to one gateway.
 - [ ] Attach payment links to the relevant invoice/payment request.
