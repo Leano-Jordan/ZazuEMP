@@ -36,7 +36,7 @@ class SentinelRescueTest extends TestCase
             ->assertForbidden();
     }
 
-    public function test_authenticated_business_owner_can_open_local_rescue(): void
+    public function test_authenticated_business_owner_can_open_local_rescue_and_return_to_workspace(): void
     {
         $this->signInAsOwner();
 
@@ -46,6 +46,8 @@ class SentinelRescueTest extends TestCase
             ->assertSee('authenticated owner of the active business')
             ->assertSee('Database connection')
             ->assertSee('Diagnostic write/read test')
+            ->assertSee('Back to workspace')
+            ->assertSee(route('dashboard'))
             ->assertHeader('Cache-Control', 'no-store, private')
             ->assertHeader('Referrer-Policy', 'no-referrer');
     }
