@@ -32,6 +32,10 @@ The fresh-install profile uses a non-`Secure` session cookie because its default
 
 The installer is safe to re-run for a partially completed fresh installation: an existing `.env`, application key and SQLite database are preserved. It runs pending migrations but does not seed sample customers or overwrite business records.
 
+## Founder Control Centre identity
+
+Before using the founder-only Sentinel Control Centre, set `ZAZU_PLATFORM_ADMIN_EMAIL` in the installation's private `.env` file to the exact email address of the designated founder account, then rebuild the configuration cache if the installation uses one. This is a single identity, not a comma-separated administrator list. The former `ZAZU_PLATFORM_ADMIN_EMAILS` variable is deliberately ignored; a business account's `admin` role does not grant platform access.
+
 ## Phone/tablet access
 
 The normal HTTP launcher is loopback-only and is intended for the PC. For a phone/tablet on the same trusted private Wi-Fi network, use the private-LAN HTTPS procedure in `LOCAL_PC_HOST_DEPLOYMENT.md`:
