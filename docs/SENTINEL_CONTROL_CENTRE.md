@@ -193,3 +193,8 @@ Sentinel is not production-ready until all of the following are proven:
 - DB-001 is demonstrated end-to-end on the intended installation: capture, explanation, package, targeted correction and successful repeat.
 
 **No release-readiness uplift is implied by this mandate or by documentation alone.**
+
+
+## Owner dashboard interaction
+
+Sentinel Rescue remains a read-only report. The owner can filter checks by status, search diagnostic labels/messages, expand or collapse available detail sections, and re-run the health inspection with **Recheck**. These controls run in the browser; recheck reloads the existing read-only page and does not write business data or contact an external service.
