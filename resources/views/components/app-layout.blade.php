@@ -16,6 +16,7 @@
         $isOwner = $currentRole === 'owner';
         $founderEmail = (string) config('zazu.platform_admin_email', '');
         $isPlatformAdmin = $founderEmail !== '' && hash_equals($founderEmail, strtolower(trim((string) auth()->user()->email)));
+        $brandHomeUrl = $business ? route('dashboard') : ($isPlatformAdmin ? route('admin.sentinel') : route('dashboard'));
         $experienceLevel = app(\App\Support\ExperienceLevel::class)->for(auth()->user(), $business);
         $experienceLabel = app(\App\Support\ExperienceLevel::class)->label($experienceLevel);
         $primaryNiche = app(\App\Support\NicheFocus::class)->for(auth()->user(), $business);
@@ -54,7 +55,7 @@
         <button type="button" class="zazu-mobile-nav-backdrop" data-mobile-sidebar-close aria-label="Close navigation"></button>
         <aside class="zazu-sidebar" id="zazu-mobile-sidebar" data-mobile-sidebar>
             <div class="zazu-brand">
-                <a href="{{ route('dashboard') }}" class="zazu-brand-link" aria-label="Zazu EMP dashboard">
+                <a href="{{ $brandHomeUrl }}" class="zazu-brand-link" aria-label="Zazu EMP dashboard">
                     @if($business?->logo_path)
                         <img
                             class="zazu-brand-logo"
@@ -76,6 +77,7 @@
 
             <nav class="zazu-nav zazu-nav-hierarchical" aria-label="Primary">
                 <div class="zazu-nav-hierarchy">
+                    @if($business)
                     <div class="zazu-nav-area {{ request()->routeIs('dashboard','work.*','customers.*','calendar.*') ? 'is-active' : '' }}" data-zazu-nav-area>
                         <button type="button" class="zazu-nav-area-trigger" data-zazu-nav-trigger aria-expanded="false" aria-controls="zazu-nav-workspace"><span class="zazu-nav-area-title">Work</span><span class="zazu-nav-area-chevron" aria-hidden="true">›</span></button>
                         <div class="zazu-nav-flyout" id="zazu-nav-workspace" data-zazu-nav-panel><div class="zazu-nav-flyout-links">
@@ -109,6 +111,7 @@
                             @if($can('reports.view'))<a href="{{ route('reports.index') }}" class="zazu-nav-link {{ request()->routeIs('reports.*') ? 'active' : '' }}">Reports</a>@endif
                         </div></div>
                     </div>
+                    @endif
                     @if($isOwner || $isPlatformAdmin)
                     <div class="zazu-nav-area {{ request()->routeIs('settings.*','admin.*','onboarding.*','sentinel.rescue') ? 'is-active' : '' }}" data-zazu-nav-area>
                         <button type="button" class="zazu-nav-area-trigger" data-zazu-nav-trigger aria-expanded="false" aria-controls="zazu-nav-system"><span class="zazu-nav-area-title">System</span><span class="zazu-nav-area-chevron" aria-hidden="true">›</span></button>
