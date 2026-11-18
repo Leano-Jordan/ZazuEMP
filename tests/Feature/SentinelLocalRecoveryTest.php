@@ -96,6 +96,7 @@ class SentinelLocalRecoveryTest extends TestCase
         $this->withHeaders([
             'Origin' => 'http://localhost',
             'Sec-Fetch-Site' => 'same-origin',
+            'Content-Type' => 'application/x-www-form-urlencoded',
         ])->post('/api/sentinel/recovery', ['code' => $code])
             ->assertOk()
             ->assertSee('Installation health')
@@ -104,6 +105,7 @@ class SentinelLocalRecoveryTest extends TestCase
         $this->withHeaders([
             'Origin' => 'http://localhost',
             'Sec-Fetch-Site' => 'same-origin',
+            'Content-Type' => 'application/x-www-form-urlencoded',
         ])->post('/api/sentinel/recovery', ['code' => $code])
             ->assertForbidden()
             ->assertSee('invalid, expired or already used');
