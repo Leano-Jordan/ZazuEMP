@@ -186,7 +186,7 @@ The command requires **--private-key-file** pointing to a base64-encoded Ed25519
 
 Example PowerShell invocation (illustrative dates only):
 
-    php artisan zazu:license:issue 6b4b2b6a-2d4e-4a5a-9f8e-1c6b3d0f7a21 advanced --private-key-file="C:\ZazuIssuer\zazu-ed25519.key" --starts-at="2026-11-19T00:00:00+02:00" --expires-at="2026-12-19T00:00:00+02:00" --features='{"offline_core":true}'
+    php artisan zazu:license:issue BUSINESS-LICENSING-UUID advanced --private-key-file="C:\ZazuIssuer\zazu-ed25519.key" --starts-at="2026-11-19T00:00:00+02:00" --expires-at="2026-12-19T00:00:00+02:00" --features='{"offline_core":true}'
 
 The command refuses a key stored inside the project, but it does not provision the key or set Windows file permissions. Before production use, the owner must establish the keypair, restrict the private-key file's NTFS ACL to the authorised operator plus required local system administrators, keep a protected recovery copy, and verify that no customer package contains the key. Never put the private key in a customer .env, repository, support ticket or customer communication. Share only the signed token.
 
