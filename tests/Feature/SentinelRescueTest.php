@@ -47,6 +47,11 @@ class SentinelRescueTest extends TestCase
             ->assertSee('Database connection')
             ->assertSee('Diagnostic write/read test')
             ->assertSee('Back to workspace')
+            ->assertSee('data-filter="failed"', false)
+            ->assertSee('data-check-search', false)
+            ->assertSee('data-refresh', false)
+            ->assertSee('data-expand-details', false)
+            ->assertSee('data-check-card', false)
             ->assertSee(route('dashboard'))
             ->assertHeader('Cache-Control', 'no-store, private')
             ->assertHeader('Referrer-Policy', 'no-referrer');
