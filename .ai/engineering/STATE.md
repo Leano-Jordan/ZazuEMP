@@ -1,3 +1,25 @@
+
+
+## Operating reset and current V1 mission — 2026-11-18
+
+**Source:** Founder-supplied read-only research report of main at cb7ab270. The report states that Laravel and browser suites were not run. Its test/CI statements are repository-documentation claims; market numbers and adoption scenarios are research estimates, not verified forecasts.
+
+**Current assessment:** Late Alpha; the report estimates V1 completion at approximately 74%. DB-001 remains OPEN. The actual installed workflow has not yet been demonstrated error-free. There are no paying customers or completed customer pilots.
+
+**Active priority:** DB-001 on the Founder's real installation. The first investigation is limited to one focused owner-assisted session: run the existing schema check on the Founder's PC and inspect the matching classified incident record. Establish root cause before changing code. Do not mark closed until the affected installed workflow is repeated successfully.
+
+**Next priorities, in order:**
+1. Prove the populated-record quote → invoice → payment recording → costs/expenses → event profit workflow. Manual/EFT payment recording is enough for the first pilot.
+2. Establish manual EFT-paid signed licence-key issuance and activation for the first ten customers; no subscription automation without approval.
+3. Complete legal/privacy information, Information Officer registration and operational POPIA responsibilities, plus a working WhatsApp support contact.
+4. Run a two-week pilot with 2–3 friendly operators and ship only pilot-evidenced fixes.
+
+**Operating constraints:** WIP limit one active target; no new branches; main only; no Render or AMPPS in Zazu; Sentinel/diagnostics feature freeze (verified maintenance only); no offline/sync expansion; no new subsystem without explicit Founder approval; avoid repeating unchanged browser smoke tests; cap docs-only work. Pricing remains unresolved because existing tier models conflict and requires Founder decision.
+
+**Progress labels are separate:** ENGINEERING COMPLETE; TESTS PASSED; VERIFIED ON FOUNDER PC; COMMERCIALLY USABLE; CUSTOMER VALIDATED. Never infer a later state from an earlier one. For installed-workflow acceptance, Founder confirmation on the actual PC is required. Documentation updates do not count as application acceptance.
+
+**Owner/operator model:** The Founder is the sole human operator and final authority. Jarvis must state the intended scope, repository/ref, planned action and stop boundary before each distinct autonomous work batch. Do not invent staff or teams, and do not claim local-device verification without evidence.
+
 ## Sentinel local recovery implementation — 2026-11-18
 
 - Added `/api/sentinel/recovery` as a stateless, loopback-only host-operator recovery surface outside Laravel's web/session middleware.

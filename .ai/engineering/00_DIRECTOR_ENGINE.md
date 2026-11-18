@@ -300,3 +300,47 @@ This file intentionally stays small. Its job is to control the system, not conta
 ## Owner V1 scope-freeze rule — mandatory
 
 At the start of every engineering cycle, load `.ai/engineering/V1_SCOPE_FREEZE.md`. It is binding on Director and all specialist engines. Finish the agreed customer workflows; do not expand scope through hypothetical edge cases, optional polish, speculative compliance or future infrastructure. Only reproducible V1 workflow defects, demonstrated security/privacy/data-integrity failures, or explicit owner-authorised additions may enter scope. Close the known checklist blockers, verify the core workflows, run one final regression pass, fix only material failures from that pass, record known limitations and issue the release decision. Do not reopen closed gates without new evidence. Render is an interim remote-development workbench, not the final production destination and not a production-hosting gate. If a matter is not necessary for reliable use of the agreed V1 workflows, it does not block V1. See the scope-freeze document for stop conditions and finish sequence.
+
+
+## Founder-led V1 execution reset — 2026-11-18
+
+This section establishes the current V1 mission and supersedes conflicting execution priorities in older notes.
+
+### Founder and operating model
+- The Founder is the sole human operator, product owner and final decision-maker. Do not describe hypothetical departments, hired roles, staff or delegated human teams as if they exist.
+- Jarvis is the AI engineering partner operating under the Founder's authority. Before each distinct autonomous execution batch, state plainly what will be inspected or changed, the exact repository/ref, intended outcome and stop boundary. Do not silently expand scope or take irreversible action.
+- The Founder must be able to understand and monitor founder-only/platform-administration surfaces. Never assume other administrators or staff exist.
+- Do not claim local-PC, installed-app, physical-device or browser results unless that exact environment was exercised and evidence observed.
+
+### Current mission and work-in-progress limit
+The mission is to reach a dependable, sellable first-business V1. **WIP limit: one active blocker/target at a time.** Finish or explicitly block the current target before starting another.
+
+Priority order:
+1. **DB-001 on the real installation.** Timebox the first investigation to one focused owner-assisted session: run the existing schema check on the Founder's PC and inspect the matching classified incident record. Establish root cause before patching. DB-001 stays OPEN until corrected and the failing installed workflow is repeated successfully.
+2. **Commercial transaction proof.** Demonstrate quote → invoice → payment recording → costs/expenses → event profit using populated records. Manual/EFT payment recording is sufficient for the first pilot; do not add a payment gateway merely to claim payment support.
+3. **Manual first-customer licensing.** Support the first ten customers with EFT-paid, manually issued signed licence keys and a controlled activation/renewal process. Do not build subscription automation unless the Founder approves it.
+4. **Legal and support readiness.** Prepare required legal/privacy information, establish Information Officer registration and operational POPIA responsibilities, and establish a real WhatsApp support contact. Do not claim legal compliance from document presence alone.
+5. **Small operator pilot.** Run a two-week pilot with 2–3 friendly operators. Prioritise only defects and changes demonstrated by pilot use.
+
+Pricing remains an owner decision. Existing documentation contains conflicting tier/pricing models; surface the conflict and do not silently select or rewrite pricing.
+
+### Explicit freeze and scope control
+- Sentinel and diagnostics are in **feature freeze**. Maintenance is permitted only for a verified defect, security issue or direct dependency of the active target. No more diagnostic consoles, recovery subsystems or observability features without explicit Founder approval.
+- No expansion of offline/synchronisation scope during this commercial-readiness mission. Preserve and repair existing approved behaviour when it is a verified blocker; do not add another offline subsystem.
+- No new subsystem, product feature, architecture programme or broad refactor without explicit Founder approval.
+- Do not repeat known browser smoke tests or unchanged checks. Repeat a check only when a code/configuration change or new evidence makes the result materially different.
+- Reduce CI syntax-fix churn: use a real local PHP test environment when available, classify failures before editing application code, and never use CI as a substitute for root-cause diagnosis.
+- Documentation is supporting control, not delivery. Cap docs-only work; update existing living records only for a meaningful decision, verified defect/fix, acceptance change or handover. A documentation update is never evidence that the application works.
+
+### Definition of progress and acceptance
+Always distinguish these states; never collapse them into a single “done” claim:
+1. **ENGINEERING COMPLETE** — implementation is present in the repository.
+2. **TESTS PASSED** — named automated checks passed on the stated commit/environment.
+3. **VERIFIED ON FOUNDER PC** — the Founder confirms, or direct authorised access proves, the actual installed workflow works.
+4. **COMMERCIALLY USABLE** — the complete minimum customer workflow and operational support/licensing path work.
+5. **CUSTOMER VALIDATED** — real pilot operators complete the workflow and provide observed feedback.
+
+For installation-specific acceptance, “Owner confirmed on the Founder's PC” is the completion gate. Missing access means report UNVERIFIED and give the Founder the single concrete check needed; do not infer success from CI, source inspection or documentation.
+
+### Current baseline
+The Founder-supplied research report reviewed read-only main at cb7ab270 (2026-11-18 19:31 UTC). It reports DB-001 still OPEN, no real-install error-free acceptance, no billable customer path yet, and no completed customer pilot. Laravel/browser suites were not run for that report; test/CI claims and market estimates in it are source-reported or research assumptions, not fresh runtime verification. Treat the report's V1 completion estimate (~74%) and readiness scores as directional assessments, not acceptance evidence.

@@ -226,3 +226,17 @@ Working commercial hypotheses:
 - **Data/authorization invariant:** Tier expiry or downgrade never locks the workspace, deletes or withholds customer records, or weakens role/permission and business-isolation checks. No blanket plan middleware is applied to customer-data routes.
 - **Matrix boundary:** This change enforces the experience ceiling only. It does not invent or enforce module restrictions, event/user/storage quotas or Intermediate pricing. Those remain pending explicit owner approval.
 - **Reason:** Make the three commercial tiers meaningful in the existing experience preference and licensing architecture without introducing unapproved restrictions or risking customer-data continuity.
+
+
+## DEC-026 — Founder-led commercial V1 convergence and one-target WIP
+
+- **Date:** 2026-11-18
+- **Status:** ACTIVE
+- **Authority:** Explicit Founder direction and the Founder-supplied current-state research report.
+- **Decision:** Zazu execution is now governed by a one-active-target WIP limit and a commercial V1 convergence mission. The first target is DB-001 on the Founder's actual installation, investigated in one focused owner-assisted session using the existing schema check and classified incident record. Root cause must be established before correction; closure requires successful repetition of the affected installed workflow.
+- **Priority sequence:** (1) DB-001 real-install closure; (2) populated-record quote → invoice → manual/EFT payment recording → costs → event profit proof; (3) manual EFT-paid signed licence keys for the first ten customers; (4) legal/privacy and Information Officer/POPIA operational readiness plus a real WhatsApp support contact; (5) a two-week pilot with 2–3 operators, with fixes driven by observed use.
+- **Scope freeze:** Sentinel and diagnostics are feature-frozen except verified maintenance; offline/sync scope does not expand; no new subsystem, broad refactor or subscription automation without explicit Founder approval. Known unchanged browser smoke tests are not repeated. CI syntax churn is reduced through local PHP verification where available and mandatory failure classification.
+- **Commercial decisions:** Manual payment recording is sufficient for initial pilot acceptance. Pricing remains unresolved because existing tier models conflict; Director must surface the conflict for Founder decision rather than silently choose.
+- **Founder/operator model:** The Founder is the sole human operator and final authority. Jarvis must declare the exact repository/ref, intended actions and stop boundary before each distinct autonomous work batch; no fictional staff/team assumptions.
+- **Acceptance vocabulary:** ENGINEERING COMPLETE, TESTS PASSED, VERIFIED ON FOUNDER PC, COMMERCIALLY USABLE and CUSTOMER VALIDATED are separate evidence states. Documentation and CI cannot substitute for actual installed-workflow or customer evidence.
+- **Reason:** Prevent the engineering loop from optimising for internal tooling and documentation instead of a reliable, usable and sellable first release.
