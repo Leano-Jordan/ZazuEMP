@@ -51,6 +51,14 @@
             <div class="zazu-error-reference">
                 Reference number: {{ $requestId ?? 'available in the request header' }}
             </div>
+            @if(($code ?? '') === 'DB-001' && \Illuminate\Support\Str::isUuid($requestId ?? ''))
+                <div class="zazu-error-actions">
+                    <a href="{{ url('/api/support/incidents/'.rawurlencode($requestId)) }}" class="zazu-btn zazu-btn-primary" download>
+                        Download safe diagnostic report
+                    </a>
+                </div>
+                <p class="zazu-error-copy">The report contains only the matching error details needed for support. It excludes SQL, customer records and credentials.</p>
+            @endif
         </div>
     </main>
 </body>

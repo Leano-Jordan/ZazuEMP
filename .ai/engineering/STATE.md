@@ -1,5 +1,10 @@
 # Zazu EMP — Current Director State
 
+## DB-001 support capture — 2026-11-18
+
+The DB-001 error page now offers a reference-scoped download of the matching redacted incident record through the local API. It is rate-limited and exposes only an allowlist of diagnostic fields; SQL, bindings, exception messages, customer data and credentials are excluded. This removes the need to copy diagnostic files between the Windows host and phone. The endpoint is useful only when the running installation contains the updated incident recorder. **DB-001 remains OPEN until the actual installed-workflow failure is identified, corrected and repeated successfully.** No root cause or readiness uplift is claimed.
+
+
 As of: 2026-11-17
 Repository: Leano-Jordan/ZazuEMP
 Last verified application-code baseline: ba94b39e0460e4e57c560e98541808c762f50e25

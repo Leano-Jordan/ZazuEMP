@@ -1,6 +1,8 @@
 # DB-001 incident capture (Windows)
 
-Use this when Zazu shows a DB-001 reference. It extracts the matching structured incident record and prints an allowlist of diagnostic fields only. It does not print exception messages, SQL, bindings, credentials or unrelated log entries.
+When Zazu shows a DB-001 reference, first use **Download safe diagnostic report** directly on the error screen. The reference-scoped link works from the same browser/phone and downloads only the matching structured incident fields; no PC-to-phone file transfer or PowerShell is needed. It excludes exception messages, SQL, bindings, credentials and unrelated log entries.
+
+The PowerShell command below remains the fallback for installations that do not yet show the download link.
 
 From the Zazu project folder, run PowerShell:
 

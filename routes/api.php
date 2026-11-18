@@ -1,10 +1,15 @@
 <?php
 
+use App\Http\Controllers\IncidentDiagnosticController;
 use App\Http\Controllers\SyncController;
 use App\Http\Middleware\AuthenticateSyncDevice;
 use Illuminate\Support\Facades\Route;
 
 Route::post('/sync/provision', [SyncController::class, 'provision'])->middleware('throttle:30,1');
+Route::get('/support/incidents/{requestId}', [IncidentDiagnosticController::class, 'show'])
+    ->whereUuid('requestId')
+    ->middleware('throttle:20,1')
+    ->name('support.incidents.show');
 Route::middleware([AuthenticateSyncDevice::class, 'throttle:sync'])->prefix('sync')->group(function () {
     Route::post('/revoke', [SyncController::class, 'revoke']);
     Route::get('/bootstrap', [SyncController::class, 'bootstrap']);

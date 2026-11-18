@@ -109,6 +109,30 @@ class ErrorHandlingTest extends TestCase
         $this->assertSame('DB-001', $response->headers->get('X-Zazu-Error-Code'));
     }
 
+
+    public function test_db001_error_surface_offers_reference_scoped_diagnostic_download(): void
+    {
+        $requestId = '895e2c23-bc6b-4919-a891-1e8e5c1e27e4';
+        $request = Request::create('/dashboard', 'GET');
+        $request->attributes->set('zazu_request_id', $requestId);
+        $this->app->instance('request', $request);
+
+        $response = app(ExceptionHandler::class)->render(
+            $request,
+            new QueryException(
+                'sqlite',
+                'select * from customers',
+                [],
+                new \PDOException('SQLSTATE[HY000]: private database detail')
+            )
+        );
+
+        $this->assertSame(500, $response->getStatusCode());
+        $this->assertStringContainsString('/api/support/incidents/'.$requestId, (string) $response->getContent());
+        $this->assertStringContainsString('Download safe diagnostic report', (string) $response->getContent());
+        $this->assertStringNotContainsString('private database detail', (string) $response->getContent());
+    }
+
     public function test_incident_log_omits_exception_messages_sql_and_stack_traces(): void
     {
         $marker = 'private-customer-secret-'.bin2hex(random_bytes(8));
