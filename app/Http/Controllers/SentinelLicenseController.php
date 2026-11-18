@@ -12,6 +12,7 @@ final class SentinelLicenseController extends Controller
 {
     public function register(Request $request): RedirectResponse
     {
+        $request->merge(['business_uuid' => strtolower(trim((string) $request->input('business_uuid')))]);
         $validated = $request->validate([
             'business_uuid' => ['required', 'uuid', 'unique:platform_license_customers,business_uuid'],
             'business_name' => ['required', 'string', 'max:255'],
