@@ -19,7 +19,7 @@ The fingerprint groups failures with matching technical characteristics. It is a
 
 Use the reference-scoped endpoint:
 
-`/api/support/incidents/{reference-id}`
+`/api/support/incidents/{reference-id}` with a 15-minute Laravel temporary signature and the existing rate limit
 
 It prefers the independent ledger and falls back to existing Laravel logs for older incidents. The response is an allowlisted JSON attachment with private/no-store caching headers.
 
