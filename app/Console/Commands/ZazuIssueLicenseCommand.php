@@ -11,7 +11,7 @@ use Throwable;
 final class ZazuIssueLicenseCommand extends Command
 {
     protected $signature = 'zazu:license:issue
-        {business_id : Local Zazu business ID}
+        {business_uuid : Stable Zazu business licensing UUID}
         {plan : basic, intermediate or advanced}
         {--private-key-file= : Base64 Ed25519 secret-key file outside the Zazu project}
         {--license-id= : Existing UUID when renewing/revoking; otherwise generated}
@@ -29,7 +29,7 @@ final class ZazuIssueLicenseCommand extends Command
     ): int {
         try {
             $payload = $payloadFactory->build(
-                $this->argument('business_id'),
+                $this->argument('business_uuid'),
                 $this->argument('plan'),
                 [
                     'license_id' => $this->option('license-id'),
@@ -52,7 +52,7 @@ final class ZazuIssueLicenseCommand extends Command
         }
 
         $this->info('Signed Zazu licence created.');
-        $this->line('Business ID: '.$payload['business_id']);
+        $this->line('Business Licensing Reference: '.$payload['business_uuid']);
         $this->line('Licence ID: '.$payload['license_id']);
         $this->line('Plan: '.$payload['plan']);
         $this->line('Status: '.$payload['status']);
