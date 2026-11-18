@@ -171,3 +171,13 @@ V1: NOT READY. Historical state/register/memory, checklist and changelog are pre
 - Added tests/js/service-worker-auth-cache.test.js regression coverage proving only a same-origin non-API route is fetched.
 - Commits: service-worker correction 51e71414a293b4584d1b304dcbf0d0d2d1b15b97; regression test 6517703a4d2b2263547b603d1b8dc1a9c0c2e0e1.
 - Exact-head CI is queued/running. No test pass is claimed until observed. This is a narrow defense-in-depth correction; it does not close physical Android acceptance or establish full offline workflow parity.
+
+
+## Sentinel control-centre mandate — 2026-11-18
+
+- Owner directive: prioritise Sentinel as the next major engineering focus. The target is a local, self-service operations and diagnostic control centre that explains failures and collects the evidence a developer would otherwise request manually. It must remain useful without internet access.
+- Audited the actual implementation at `main` HEAD `68f8729e728fd43e238a5d4ad6376ab07dbb561f`: independent privacy-filtered incident ledger, fingerprint grouping/timeline, platform-admin UI, redacted reference-scoped DB-001 download, Windows incident capture and read-only SQLite schema tooling already exist.
+- Important capability gap: `/admin/sentinel` is protected by `auth`, `auth.session` and `platform.admin`; it is not currently the business-owner control surface. The installation-wide ledger has no tested per-business incident ownership boundary. Do not remove platform-admin access controls or expose the global ledger to business owners as a shortcut.
+- Important resilience gap: `config/session.php` defaults `SESSION_DRIVER` to `database`. The diagnostic interface must not rely invisibly on the business database/session path it is expected to diagnose. Its fallback access path needs an explicit security design and packaged-installation verification.
+- Created `docs/SENTINEL_CONTROL_CENTRE.md` defining the product contract, five control surfaces, access/isolation rules, resilience requirements, delivery sequence and acceptance criteria. Updated `docs/ZAZU_ERROR_INCIDENT_FRAMEWORK.md` to remove its obsolete statement that no dashboard exists.
+- This is a scope/architecture definition only. No runtime capability has been added and no CI or production acceptance is claimed. DB-001 remains OPEN; V1 remains NOT READY; no readiness uplift.
