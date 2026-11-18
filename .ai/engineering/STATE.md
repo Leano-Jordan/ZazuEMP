@@ -1,3 +1,10 @@
+## Provisional customer/privacy contact confirmed — 2026-11-19
+
+- Owner-approved current contact: `rosscorelabs@outlook.com`.
+- Recorded as a provisional Zazu customer-support, privacy/data-subject request and initial customer incident-reporting channel in the privacy notice draft, data-subject request procedure, incident response runbook, customer terms draft, documentation index and commercial/legal register.
+- Replace consistently when a dedicated Zazu address is established. This email is not a substitute for statutory regulator reporting or an approved emergency escalation process.
+- These documents remain pre-launch drafts; publication still requires operational mailbox testing, provider/identity details and appropriate legal review.
+
 ## Manual offline licence issuer implementation — 2026-11-19
 
 - Added the existing-app Artisan command `zazu:license:issue` for manual first-customer signed-token issuance. It supports the approved tier identifiers, explicit expiry or deliberate never-expire choice, signed feature metadata, renewal IDs and revocation IDs.
