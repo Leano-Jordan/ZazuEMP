@@ -78,7 +78,8 @@ class PlatformAdminTest extends TestCase
         $response = $this->get(route('settings.index'));
 
         $response->assertOk()
-            ->assertSee('Sentinel Rescue');
+            ->assertSee('Sentinel Rescue')
+            ->assertDontSee('Sentinel Control Centre');
 
         $this->assertStringContainsString('href="'.route('sentinel.rescue').'"', $response->getContent());
         $this->assertStringNotContainsString('/api/sentinel/rescue?', $response->getContent());
@@ -94,6 +95,14 @@ class PlatformAdminTest extends TestCase
         $this->actingAs($user)
             ->get(route('admin.sentinel'))
             ->assertForbidden();
+
+        $founder = \\App\\Models\\User::factory()->create(['email' => 'admin@zazu.test']);
+        Config::set('zazu.platform_admin_email', 'admin@zazu.test');
+
+        $this->actingAs($founder)
+            ->get(route('admin.sentinel'))
+            ->assertOk()
+            ->assertSee('Sentinel Control Centre');
     }
 
     public function test_platform_admin_can_search_sentinel_and_open_safe_timeline(): void
