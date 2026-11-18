@@ -303,7 +303,18 @@ if ($listeners.Count -gt 0) {
                 throw ("Zazu is already running, but its database update status could not be checked. No changes were made." + [Environment]::NewLine + $statusText)
             }
 
-            $hasPendingMigrations = $migrationTableMissing -or ($statusText -match '(?im)\bPending\s*
+            $pendingStatusRows = @($statusOutput | Where-Object { $_.Trim() -eq 'Pending' })
+            $hasPendingMigrations = $migrationTableMissing -or ($pendingStatusRows.Count -gt 0)
+            if ($hasPendingMigrations) {
+                throw 'Zazu is already running with pending database migrations. No migration was applied while the server was active. Double-click Stop-Zazu-Dev.cmd, then Start-Zazu-Dev.cmd to run the verified backup-first update before reopening Zazu.'
+            }
+        } finally {
+            Pop-Location
+        }
+
+        Write-Host ("Zazu is already listening at http://{0}:{1}; migration status is current." -f $BindAddress, $Port)
+        return
+    }
 
     if ($wrongBinding.Count -gt 0 -and $listeners.Count -eq $wrongBinding.Count) {
         $existingAddresses = ($wrongBinding | Sort-Object -Unique) -join ', '
