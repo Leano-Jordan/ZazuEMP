@@ -24,6 +24,7 @@
         .sentinel-table th{font-size:.72rem;text-transform:uppercase;letter-spacing:.06em;color:var(--zazu-muted,#687386)}
         .sentinel-table code,.sentinel-code{font-size:.8rem;overflow-wrap:anywhere}
         .sentinel-table a{font-weight:700;color:inherit}
+        .sentinel-download{display:inline-block;margin-top:.35rem;font-size:.78rem;font-weight:650;color:var(--zazu-accent,#263d58)!important;text-decoration:underline}
         .sentinel-muted{color:var(--zazu-muted,#687386)}
         .sentinel-pill{display:inline-block;border:1px solid var(--zazu-border,#d9dee7);border-radius:999px;padding:.18rem .55rem;font-size:.75rem}
         .sentinel-timeline{display:grid;gap:.65rem}
@@ -99,6 +100,9 @@
                                 <div>
                                     <time>{{ $event['timestamp'] }}</time>
                                     <div><code class="sentinel-code">{{ $event['request_id'] }}</code></div>
+                                    @if($event['error_code'] === 'DB-001')
+                                        <a class="sentinel-download" href="{{ route('support.incidents.show', ['requestId' => $event['request_id']]) }}">Download safe DB report</a>
+                                    @endif
                                 </div>
                                 <dl>
                                     <div><dt>Error</dt><dd>{{ $event['error_code'] }}</dd></div>
