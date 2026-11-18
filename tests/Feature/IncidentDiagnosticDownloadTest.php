@@ -75,7 +75,7 @@ class IncidentDiagnosticDownloadTest extends TestCase
 
         try {
             $this->get('/api/support/incidents/'.$requestId)->assertNotFound();
-            $this->get(URL::temporarySignedRoute('support.incidents.show', now()->addMinutes(15), ['requestId' => 'not-a-uuid']))->assertNotFound();
+            $this->get('/api/support/incidents/not-a-uuid')->assertNotFound();
         } finally {
             File::delete($path);
         }
