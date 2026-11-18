@@ -44,6 +44,10 @@ final class ZazuIncidentRecorder
                 ...$databaseDiagnostics,
             ];
 
+            // Write the independent ledger first: a broken business database or
+            // unavailable Laravel log channel must not erase the diagnostic record.
+            ZazuIncidentLedger::record($context);
+
             $level = $definition['status'] >= 500 ? 'error' : 'warning';
 
             Log::log($level, 'Zazu error incident', $context);
