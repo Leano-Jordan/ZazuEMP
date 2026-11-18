@@ -59,6 +59,13 @@
         .sentinel-alert{padding:.85rem 1rem;border:1px solid var(--zazu-border,#d9dee7);border-radius:12px}
         .sentinel-alert-error{border-color:#c04444}
         .sentinel-license-search{margin:.8rem 0}
+        .sentinel-license-register{display:grid;gap:.55rem;padding:1rem;margin:.8rem 0;border:1px solid var(--zazu-border,#d9dee7);border-radius:12px}
+        .sentinel-license-register h4{font-weight:700}
+        .sentinel-license-register-form{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:.65rem}
+        .sentinel-license-register-form label{display:grid;gap:.25rem;font-size:.76rem;color:var(--zazu-muted,#687386)}
+        .sentinel-license-register-form input,.sentinel-license-register-form textarea{min-width:0;border:1px solid var(--zazu-border,#d9dee7);border-radius:8px;padding:.55rem;background:var(--zazu-background,#fff);color:inherit}
+        .sentinel-license-register-form button{justify-self:start}
+        @media(max-width:800px){.sentinel-license-register-form{grid-template-columns:1fr}}
         .sentinel-license-facts{margin-top:.45rem}
         .sentinel-license-meta{font-size:.75rem}
         .sentinel-license-pagination{margin-top:1rem}
@@ -80,7 +87,7 @@
             <div class="sentinel-health-overall">
                 <div>
                     <h3>Licensing &amp; entitlements</h3>
-                    <p class="sentinel-muted">Founder-only business lookup, signed licence issue/renewal and revocation. Customer activation remains in Business Settings.</p>
+                    <p class="sentinel-muted">Founder registry for customer installations. Add the business name and unique licensing reference supplied from the customer's Business Settings, then issue, renew or revoke offline tokens.</p>
                 </div>
                 <span class="sentinel-pill">{{ $licenceSigningConfigured ? 'Signing configured' : 'Signing not configured' }}</span>
             </div>
@@ -101,48 +108,78 @@
                 <p class="sentinel-muted">To enable issuance, set <code>ZAZU_LICENSE_PRIVATE_KEY_FILE</code> to a base64 Ed25519 secret-key file outside the Zazu project. The browser never receives the key. The configured public key must match it.</p>
             @endif
 
+            <div class="sentinel-license-register">
+                <h4>Register a customer business</h4>
+                <p class="sentinel-muted">The customer finds this UUID under Settings → Zazu licence. Do not use their numeric local Business ID; it is not globally unique.</p>
+                <form method="POST" action="{{ route('admin.sentinel.licence-customers.store') }}" class="sentinel-license-register-form">
+                    @csrf
+                    <label>Business name
+                        <input name="business_name" value="{{ old('business_name') }}" maxlength="255" required>
+                    </label>
+                    <label>Business licensing reference (UUID)
+                        <input name="business_uuid" value="{{ old('business_uuid') }}" maxlength="36" required>
+                    </label>
+                    <label>Contact email (optional)
+                        <input type="email" name="contact_email" value="{{ old('contact_email') }}" maxlength="255">
+                    </label>
+                    <label>Internal notes (optional)
+                        <textarea name="notes" rows="2" maxlength="2000">{{ old('notes') }}</textarea>
+                    </label>
+                    <button class="sentinel-button" type="submit">Register business</button>
+                </form>
+                @if($errors->any())
+                    <p class="sentinel-muted" role="alert">{{ $errors->first() }}</p>
+                @endif
+            </div>
+
             <form method="GET" action="{{ route('admin.sentinel') }}" class="sentinel-search sentinel-license-search">
-                <input type="search" name="business_q" value="{{ $businessQuery }}" maxlength="120" placeholder="Find business by name or ID" aria-label="Find business">
-                <button class="sentinel-button" type="submit">Find business</button>
+                <input type="search" name="business_q" value="{{ $businessQuery }}" maxlength="120" placeholder="Find customer by name, email or UUID" aria-label="Find licensing customer">
+                <button class="sentinel-button" type="submit">Find customer</button>
                 <a class="sentinel-clear" href="{{ route('admin.sentinel', ['section' => 'licensing']) }}">Clear</a>
             </form>
 
             <div class="sentinel-license-grid">
-                @forelse($businesses as $business)
+                @forelse($customers as $customer)
                     <article class="sentinel-license-row">
                         <div>
-                            <strong>{{ $business->name }}</strong>
-                            <div class="sentinel-muted">Business ID #{{ $business->id }}</div>
-                            @if($business->license)
+                            <strong>{{ $customer->business_name }}</strong>
+                            @if($customer->contact_email)
+                                <div class="sentinel-muted">{{ $customer->contact_email }}</div>
+                            @endif
+                            <div class="sentinel-license-meta">Business UUID: <code>{{ $customer->business_uuid }}</code></div>
+                            @if($customer->last_license_id)
                                 <div class="sentinel-health-facts sentinel-license-facts">
-                                    <span class="sentinel-pill">{{ strtoupper($business->license->plan) }}</span>
-                                    <span class="sentinel-pill">{{ $business->license->statusLabel() }}</span>
-                                    <span>Expires {{ $business->license->expires_at?->format('d M Y H:i') ?? 'Never' }}</span>
+                                    <span class="sentinel-pill">{{ strtoupper($customer->last_plan) }}</span>
+                                    <span class="sentinel-pill">{{ strtoupper($customer->last_status) }}</span>
+                                    <span>Expires {{ $customer->last_expires_at?->format('d M Y H:i') ?? 'Never' }}</span>
                                 </div>
-                                <div class="sentinel-muted sentinel-license-meta">Licence {{ $business->license->license_id }}</div>
+                                <div class="sentinel-muted sentinel-license-meta">Licence {{ $customer->last_license_id }}</div>
                             @else
-                                <div class="sentinel-muted">No signed licence installed · Basic Free / trial rules apply</div>
+                                <div class="sentinel-muted">No licence issued yet</div>
+                            @endif
+                            @if($customer->notes)
+                                <p class="sentinel-muted sentinel-license-meta">{{ $customer->notes }}</p>
                             @endif
                         </div>
                         <div class="sentinel-license-actions">
                             <form method="POST" action="{{ route('admin.sentinel.licences.issue') }}" class="sentinel-license-form">
                                 @csrf
-                                <input type="hidden" name="business_id" value="{{ $business->id }}">
+                                <input type="hidden" name="platform_license_customer_id" value="{{ $customer->id }}">
                                 <label>Plan
                                     <select name="plan" required>
-                                        <option value="basic" @selected(($business->license?->plan ?? 'basic') === 'basic')>Basic</option>
-                                        <option value="intermediate" @selected(($business->license?->plan ?? '') === 'intermediate')>Intermediate</option>
-                                        <option value="advanced" @selected(in_array($business->license?->plan, ['advanced', 'solo'], true))>Advanced</option>
+                                        <option value="basic" @selected(($customer->last_plan ?? 'basic') === 'basic')>Basic</option>
+                                        <option value="intermediate" @selected(($customer->last_plan ?? '') === 'intermediate')>Intermediate</option>
+                                        <option value="advanced" @selected(($customer->last_plan ?? '') === 'advanced')>Advanced</option>
                                     </select>
                                 </label>
                                 <label>Expires at
-                                    <input type="datetime-local" name="expires_at">
+                                    <input type="datetime-local" name="expires_at" value="{{ $customer->last_expires_at?->format('Y-m-d\TH:i') }}">
                                 </label>
-                                <label><span> </span><span><input type="checkbox" name="never_expires" value="1"> Never expires</span></label>
-                                <button class="sentinel-button" type="submit" {{ !$licenceSigningConfigured ? 'disabled' : '' }}>{{ $business->license ? 'Issue renewal' : 'Issue licence' }}</button>
+                                <label><span> </span><span><input type="checkbox" name="never_expires" value="1" @checked($customer->last_license_id && !$customer->last_expires_at)> Never expires</span></label>
+                                <button class="sentinel-button" type="submit" {{ !$licenceSigningConfigured ? 'disabled' : '' }}>{{ $customer->last_license_id ? 'Issue renewal' : 'Issue licence' }}</button>
                             </form>
-                            @if($business->license && $business->license->status !== 'revoked')
-                                <form method="POST" action="{{ route('admin.sentinel.licences.revoke', $business) }}" class="sentinel-license-form">
+                            @if($customer->last_license_id && $customer->last_status === 'active')
+                                <form method="POST" action="{{ route('admin.sentinel.licences.revoke', $customer) }}" class="sentinel-license-form">
                                     @csrf
                                     <span class="sentinel-muted">Revoke current licence</span>
                                     <button class="sentinel-button" type="submit" {{ !$licenceSigningConfigured ? 'disabled' : '' }}>Revoke</button>
@@ -151,11 +188,11 @@
                         </div>
                     </article>
                 @empty
-                    <div class="sentinel-empty">No businesses match this search.</div>
+                    <div class="sentinel-empty">No customer businesses registered yet.</div>
                 @endforelse
             </div>
-            <div class="sentinel-license-pagination">{{ $businesses->links() }}</div>
-            <p class="sentinel-muted sentinel-retention-note">Issuance and revocation actions are recorded in the application log without storing signed tokens or private-key material. Issuing a renewal replaces the currently installed business entitlement when the owner imports the newer token; revocation takes effect when the owner imports the revocation token.</p>
+            <div class="sentinel-license-pagination">{{ $customers->links() }}</div>
+            <p class="sentinel-muted sentinel-retention-note">The registry stores customer identity and current licence metadata, never signed tokens or private-key material. Issuance and revocation are logged without token contents. Revocation takes effect when the owner imports the signed revocation token into their offline installation.</p>
         </section>
 
         <section class="sentinel-stats" aria-label="Sentinel overview">
