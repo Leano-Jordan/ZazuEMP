@@ -18,6 +18,37 @@ final class ZazuIncidentSummary
     }
 
     /**
+     * Search the complete retained fingerprint set before applying the display limit.
+     */
+    public function search(string $query, int $limit = 100): array
+    {
+        $needle = mb_strtolower(trim($query));
+
+        if ($needle === '') {
+            return $this->build($limit);
+        }
+
+        $summaries = array_values(array_filter(
+            $this->aggregateGroups(),
+            static function (array $item) use ($needle): bool {
+                foreach (['fingerprint', 'error_code', 'failure_class', 'exception', 'source_file'] as $field) {
+                    if (str_contains(mb_strtolower((string) $item[$field]), $needle)) {
+                        return true;
+                    }
+                }
+
+                return false;
+            }
+        ));
+
+        usort($summaries, static fn (array $a, array $b): int =>
+            ($b['occurrences'] <=> $a['occurrences']) ?: strcmp($b['last_seen'], $a['last_seen'])
+        );
+
+        return array_slice($summaries, 0, max(1, min($limit, 100)));
+    }
+
+    /**
      * Return installation-wide totals, independent of the display-list limit.
      */
     public function overview(): array
