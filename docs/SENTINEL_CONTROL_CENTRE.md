@@ -22,7 +22,7 @@ The existing foundation on `main` includes:
 
 This is a useful capture and investigation foundation, not a finished owner control centre.
 
-The current `/admin/sentinel` route is protected by `auth`, `auth.session` and `platform.admin`. It is not currently an owner-facing control. The existing incident ledger is installation-wide and does not currently establish safe per-business incident ownership. Do not simply remove platform-admin protection or expose the global ledger to every business owner.
+The current `/admin/sentinel` route is protected by `auth`, `auth.session` and the explicit `sentinel.admin` founder gate (configured through one exact founder email). It is not currently an owner-facing control. The existing incident ledger is installation-wide and does not currently establish safe per-business incident ownership. Do not simply remove platform-admin protection or expose the global ledger to every business owner.
 
 The normal owner Rescue route still depends on the configured authentication/session path (`SESSION_DRIVER` defaults to `database`) and may be unavailable during a database/session outage. A separate loopback-only, one-time-code host recovery route now bypasses that dependency for local installation health checks. It does not help when PHP, Laravel bootstrap, the local web process or the host PC is unavailable; packaged Windows acceptance remains required.
 
