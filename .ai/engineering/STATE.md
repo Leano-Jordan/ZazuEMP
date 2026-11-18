@@ -3,6 +3,7 @@
 - Added the existing-app Artisan command `zazu:license:issue` for manual first-customer signed-token issuance. It supports the approved tier identifiers, explicit expiry or deliberate never-expire choice, signed feature metadata, renewal IDs and revocation IDs.
 - The command reads a base64 Ed25519 secret key only from an external file, rejects key files inside the Zazu project, and verifies that the derived public key matches the configured app verification key. It does not create or store a key, change customer data, add feature restrictions or contact a remote service.
 - Added feature tests for verifier compatibility, default feature-object serialization, expiry choice, revocation identity, project-local key rejection, public/private key mismatch, invalid timestamps and invalid feature metadata.
+- Added the local Business ID to the existing owner-only licence settings section so a customer can provide the exact business reference needed for manual issuance; added a focused settings regression test.
 - Updated the existing offline licensing specification with command usage and the remaining key-custody boundary.
 - Source, tests and specification are on `main`; latest commit: `8f1f1fecb2a5355faed55a16bc1e9d414a0f095f`.
 - Local syntax check: command passes `php -l` on PHP 8.4.24. Timestamp parser spot-check accepts explicit-offset/Z timestamps and rejects an invalid calendar date.
