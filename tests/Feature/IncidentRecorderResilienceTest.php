@@ -1,12 +1,12 @@
 <?php
 
-namespace Tests\\Feature;
+namespace Tests\Feature;
 
-use App\\Support\\ZazuIncidentRecorder;
-use Illuminate\\Http\\Request;
-use Illuminate\\Support\\Facades\\File;
-use Illuminate\\Support\\Facades\\Log;
-use Tests\\TestCase;
+use App\Support\ZazuIncidentRecorder;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\File;
+use Illuminate\Support\Facades\Log;
+use Tests\TestCase;
 
 class IncidentRecorderResilienceTest extends TestCase
 {
