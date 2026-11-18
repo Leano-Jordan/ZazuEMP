@@ -35,7 +35,7 @@ This directory contains the operational documentation set for a commercial Zazu 
 - Owner-confirmed free trial: 30 days, followed by Basic Free unless the customer subscribes.
 - 30-day trial/subscription expiry: downgrade to Basic Free; no lockout or data deletion solely for non-payment.
 - Deployment direction: hosted and local/offline.
-- Support, privacy requests and incidents are initially owner-handled.
+- Support, privacy requests and initial customer incident reports are initially owner-handled through rosscorelabs@outlook.com (provisional contact; owner-confirmed 2026-11-19).
 - Customer content remains customer-owned.
 - Hosted customer data is expected to be processed under an operator arrangement where POPIA applies; local deployments have a different access/responsibility boundary.
 - Recommended hosting shortlist: xneelo Cloud, Johannesburg; not yet provisioned or contracted. Planning budget: R450–R500/month including a provisional backup/overhead allowance.
