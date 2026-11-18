@@ -84,6 +84,40 @@ class SentinelLicenseManagementTest extends TestCase
             ->assertForbidden();
     }
 
+    public function test_founder_can_create_a_signed_revocation_for_an_installed_licence(): void
+    {
+        $founder = User::factory()->create(['email' => 'founder@zazu.test']);
+        $business = Business::query()->create([
+            'name' => 'Revocation customer',
+            'slug' => 'revocation-customer',
+            'status' => 'active',
+        ]);
+        $licenseId = (string) Str::uuid();
+
+        BusinessLicense::query()->create([
+            'business_id' => $business->id,
+            'license_id' => $licenseId,
+            'plan' => 'basic',
+            'status' => 'active',
+            'starts_at' => now()->subDay(),
+            'expires_at' => now()->addMonth(),
+            'features' => ['offline_core' => true],
+            'metadata' => ['signed' => true, 'issued_at' => now()->subDay()->toIso8601String()],
+            'activated_at' => now(),
+        ]);
+
+        $response = $this->actingAs($founder)
+            ->post(route('admin.sentinel.licences.revoke', $business));
+
+        $response->assertRedirect(route('admin.sentinel', ['section' => 'licensing']));
+        $response->assertSessionHas('sentinel_issued_license_token', function (string $token) use ($business, $licenseId): bool {
+            $verified = app(SignedOfflineLicenseVerifier::class)->verifyForBusiness($token, (int) $business->id);
+
+            return $verified['payload']['status'] === 'revoked'
+                && $verified['payload']['license_id'] === $licenseId;
+        });
+    }
+
     public function test_licence_issuance_fails_closed_when_external_signing_file_is_not_configured(): void
     {
         Config::set('zazu.licensing.private_key_file', '');
