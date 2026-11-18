@@ -17,6 +17,7 @@ use App\Http\Controllers\EventAttachmentController;
 use App\Http\Controllers\ExperiencePreferenceController;
 use App\Http\Controllers\SearchController;
 use App\Http\Controllers\SentinelController;
+use App\Http\Controllers\SentinelRescueController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\FinanceController;
 use App\Http\Controllers\InventoryController;
@@ -113,8 +114,9 @@ Route::middleware(['auth', 'auth.session', 'owner'])->group(function () {
     Route::get('/owner', [\App\Http\Controllers\AuthController::class, 'owner'])->name('owner.dashboard');
 });
 
+Route::middleware(['auth', 'auth.session', 'sentinel.admin'])->get('/admin/sentinel', [SentinelController::class, 'index'])->name('admin.sentinel');
+
 Route::middleware(['auth', 'auth.session', 'platform.admin'])->prefix('admin')->group(function () {
-    Route::get('/sentinel', [SentinelController::class, 'index'])->name('admin.sentinel');
     Route::get('/landing-settings', [PlatformLandingSettingsController::class, 'edit'])->name('admin.landing.settings');
     Route::put('/landing-settings', [PlatformLandingSettingsController::class, 'update'])->name('admin.landing.settings.update');
 });
@@ -134,6 +136,7 @@ Route::middleware(['auth', 'auth.session', 'business.context'])->group(function 
     Route::post('/offline/device/register', [SyncController::class, 'registerPrimaryDevice'])->middleware(['owner', 'throttle:30,1'])->name('offline.device.register');
 
     Route::middleware('owner')->group(function () {
+        Route::get('/sentinel/rescue', [SentinelRescueController::class, 'show'])->name('sentinel.rescue');
         Route::get('/setup', [OnboardingController::class, 'index'])->name('onboarding.index');
         Route::get('/setup/catalogue', [OnboardingController::class, 'catalogue'])->name('onboarding.catalogue');
         Route::post('/setup/catalogue', [OnboardingController::class, 'storeCatalogue'])->name('onboarding.catalogue.store');
