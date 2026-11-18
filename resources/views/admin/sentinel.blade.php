@@ -56,7 +56,7 @@
         .sentinel-license-form .sentinel-button{font-size:.82rem}
         .sentinel-token{width:100%;min-height:6rem;overflow-wrap:anywhere;border:1px solid var(--zazu-border,#d9dee7);border-radius:10px;padding:.7rem;background:var(--zazu-background,#fff);color:inherit}
         .sentinel-alert{padding:.85rem 1rem;border:1px solid var(--zazu-border,#d9dee7);border-radius:12px}
-        .sentinel-alert-error{border-color:#c04444}
+        .sentinel-alert-error{border-color:#c04444}\n        .sentinel-license-search{margin:.8rem 0}\n        .sentinel-license-facts{margin-top:.45rem}\n        .sentinel-license-meta{font-size:.75rem}\n        .sentinel-license-pagination{margin-top:1rem}
         @media(max-width:800px){.sentinel-license-row{grid-template-columns:1fr}}
         @media(max-width:700px){.sentinel-stats{grid-template-columns:1fr}.sentinel-health-grid{grid-template-columns:1fr}.sentinel-intro{display:block}.sentinel-event{grid-template-columns:1fr}.sentinel-event dl{grid-template-columns:1fr 1fr}}
     </style>
@@ -88,7 +88,7 @@
                 <div class="sentinel-alert" role="status">
                     <strong>Signed licence {{ $issuedLicenseAction }} for {{ $issuedLicenseBusiness }}.</strong>
                     <p class="sentinel-muted">Copy this token and deliver it only to the matching business owner. It is shown once in this founder session; it is not written to the audit log.</p>
-                    <textarea class="sentinel-token" readonly rows="4" onclick="this.select()" aria-label="Signed licence token">{{ $issuedLicenseToken }}</textarea>
+                    <textarea class="sentinel-token" readonly rows="4" aria-label="Signed licence token">{{ $issuedLicenseToken }}</textarea>
                 </div>
             @endif
 
@@ -96,7 +96,7 @@
                 <p class="sentinel-muted">To enable issuance, set <code>ZAZU_LICENSE_PRIVATE_KEY_FILE</code> to a base64 Ed25519 secret-key file outside the Zazu project. The browser never receives the key. The configured public key must match it.</p>
             @endif
 
-            <form method="GET" action="{{ route('admin.sentinel') }}" class="sentinel-search" style="margin:.8rem 0">
+            <form method="GET" action="{{ route('admin.sentinel') }}" class="sentinel-search sentinel-license-search">
                 <input type="search" name="business_q" value="{{ $businessQuery }}" maxlength="120" placeholder="Find business by name or ID" aria-label="Find business">
                 <button class="sentinel-button" type="submit">Find business</button>
                 <a class="sentinel-clear" href="{{ route('admin.sentinel', ['section' => 'licensing']) }}">Clear</a>
@@ -109,12 +109,12 @@
                             <strong>{{ $business->name }}</strong>
                             <div class="sentinel-muted">Business ID #{{ $business->id }}</div>
                             @if($business->license)
-                                <div class="sentinel-health-facts" style="margin-top:.45rem">
+                                <div class="sentinel-health-facts sentinel-license-facts">
                                     <span class="sentinel-pill">{{ strtoupper($business->license->plan) }}</span>
                                     <span class="sentinel-pill">{{ $business->license->statusLabel() }}</span>
                                     <span>Expires {{ $business->license->expires_at?->format('d M Y H:i') ?? 'Never' }}</span>
                                 </div>
-                                <div class="sentinel-muted" style="font-size:.75rem">Licence {{ $business->license->license_id }}</div>
+                                <div class="sentinel-muted sentinel-license-meta">Licence {{ $business->license->license_id }}</div>
                             @else
                                 <div class="sentinel-muted">No signed licence installed · Basic Free / trial rules apply</div>
                             @endif
@@ -149,7 +149,7 @@
                     <div class="sentinel-empty">No businesses match this search.</div>
                 @endforelse
             </div>
-            <div style="margin-top:1rem">{{ $businesses->links() }}</div>
+            <div class="sentinel-license-pagination">{{ $businesses->links() }}</div>
             <p class="sentinel-muted sentinel-retention-note">Issuance and revocation actions are recorded in the application log without storing signed tokens or private-key material. Issuing a renewal replaces the currently installed business entitlement when the owner imports the newer token; revocation takes effect when the owner imports the revocation token.</p>
         </section>
 
