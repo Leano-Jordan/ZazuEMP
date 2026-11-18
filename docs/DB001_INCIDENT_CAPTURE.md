@@ -86,6 +86,19 @@ The standalone page checks database connectivity and migration history using rea
 
 The previous unauthenticated bearer route was removed. The authenticated owner route now depends on the configured user/session authentication path; if the business database or database-backed session store is unavailable, the owner may be unable to reach Rescue. Secure database-outage diagnosis therefore remains an open resilience item and must not be claimed as solved. The route still depends on the local Zazu web process and application bootstrap.
 
+### Local recovery when the database-backed session is unavailable
+
+The owner Rescue route above still requires the normal authenticated session. For a database/session outage on the Windows host, use the separate loopback-only recovery screen:
+
+1. On the host PC, open PowerShell in the Zazu installation folder.
+2. Run `php artisan zazu:sentinel-recovery-code`.
+3. Open `http://127.0.0.1:8000/api/sentinel/recovery` on that same PC.
+4. Enter the one-use code shown in PowerShell within five minutes.
+
+The code is random, 256-bit, stored only as a SHA-256 hash, consumed once and never included in a URL. The endpoint accepts loopback connections only, rejects LAN access and cross-origin form submissions, and does not use Laravel's database-backed session or API rate-limit cache. It runs the existing read-only installation health checks and does not display business records or the founder incident console.
+
+This recovery path requires the local PHP/Laravel process and application bootstrap to be running. If those are unavailable, use the documented Windows PowerShell incident/schema utilities from the host filesystem. This code is not a customer account credential and must not be sent to support or another person.
+
 This is not full diagnosis yet. No diagnostic ZIP/manifest, attachment health, offline queue/sync verification, backup integrity/recovery check, session/cache check or local knowledge base has been completed. A present service-worker file is not proof of phone offline capability. Physical Android and owner-operated packaged-installation acceptance remain separate.
 
 The console, timeline and export action require automated feature-test and production-build
