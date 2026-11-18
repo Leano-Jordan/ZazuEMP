@@ -302,3 +302,11 @@ V1: NOT READY. Historical state/register/memory, checklist and changelog are pre
 
 - Exact Windows package workflow `44380197892` on commit `ceb6c8c`: package build **PASS**; Windows PowerShell fresh install **PASS**, including the new real-ledger NTFS ACL assertions for the private root, diagnostics directory, lock and JSONL file. The ACL test confirmed only the installer account, Local System and local Administrators are allowed, with diagnostic children inheriting the protected ACL.
 - Latest main state/documentation commit `e278d9c`: Zazu quality, Director Contract Lint and Director Health Report **PASS**. No code changes after the Windows ACL-verified package commit; only documentation/state updates.
+
+
+## Expanded Windows local-data ACL boundary — 2026-11-18
+
+- Expanded installer ACL enforcement beyond private attachments to `.env`, `database`, `storage/framework`, `storage/logs` and `bootstrap/cache`. This protects the SQLite business database, application secrets, sessions/cache, logs and cached configuration from broad inherited access in shared Windows folders.
+- The generic ACL routine normalises existing descendants, gives Full Control only to the installing account, Local System and local Administrators, and refuses reparse points in protected paths. New database and runtime files inherit the protected parent ACL.
+- Windows Ops Scripts validation passed for the installer change on `eded442`; its Windows package build and fresh-install smoke also passed. The expanded workflow assertions now inspect all protected roots plus inherited database/diagnostic child ACLs; exact runs on `ffae4d3` and `cc90359` are still in progress.
+- Documentation updated in V1 package and Sentinel runbooks. Do not mark expanded ACL assertions accepted until a Windows package workflow containing the latest assertion set completes successfully.
