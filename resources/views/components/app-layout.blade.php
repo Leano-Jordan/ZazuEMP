@@ -369,6 +369,7 @@
                         <p>One operational workspace for jobs, resources, purchasing and finance.</p>
                     </div>
 
+                    @if($business)
                     <nav class="zazu-app-footer-nav" aria-label="Operations navigation">
                         <h2 class="zazu-app-footer-heading">Operate</h2>
                         <a href="{{ route('dashboard') }}" @if(request()->routeIs('dashboard')) aria-current="page" @endif>Dashboard</a>
@@ -397,6 +398,8 @@
                             <a href="{{ route('onboarding.index') }}" @if(request()->routeIs('onboarding.*')) aria-current="page" @endif>Setup centre</a>
                         @endif
                     </nav>
+
+                    @endif
 
                     <div class="zazu-app-footer-meta">
                         <span class="zazu-app-footer-heading">Workspace</span>
