@@ -315,3 +315,8 @@ The October 4 numeric npm inventory above is historical. The lockfile was reconc
 - Final legal/commercial approval, applicable notice obligations and trademark clearance remain open release gates.
 
 Status: **engineering metadata refreshed; legal clearance still open.**
+
+
+## 15. Provisional public customer/privacy contact — 2026-11-19
+
+The owner has approved **rosscorelabs@outlook.com** for current Zazu customer support, privacy/data-subject requests and initial customer incident reports. This is a provisional channel, not a dedicated Zazu mailbox. Replace it consistently when a dedicated address is established. Do not treat this email as a substitute for the Information Regulator's eServices security-compromise reporting channel or other statutory notification requirements. Before publication, test mailbox access, monitoring, identity verification and response handling.
