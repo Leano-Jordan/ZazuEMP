@@ -208,3 +208,8 @@ The local recovery middleware separates loopback, same-origin POST and fetch-met
 ## Incident ledger storage permissions
 
 The private incident ledger re-applies restrictive filesystem modes during writes: the diagnostics directory is set to `0700`, and the lock and JSONL ledger files are set to `0600` (best effort on Windows, where effective access control is governed by NTFS ACLs). This also tightens pre-existing directories/files created by older installs. The ledger remains an allowlisted, redacted record store and is independent of the business database and Laravel log channel. Windows package acceptance must continue to verify the actual installed directory ACLs; PHP `chmod` success alone is not proof of NTFS isolation.
+
+
+### Windows NTFS enforcement
+
+The Windows installer protects `storage/app/private` by removing inherited parent access and applying Full Control only to the installing Windows account, Local System and local Administrators. Existing descendants are normalised; reparse points in the private tree cause installation to stop rather than follow an unexpected target. New files and directories inherit the restricted ACL. The Windows fresh-install acceptance workflow creates a real incident ledger and checks the root, diagnostics directory, lock and ledger ACLs against the allowed SIDs. This is separate from PHP `chmod`, which is not an effective Windows access-control guarantee.
