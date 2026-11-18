@@ -53,7 +53,10 @@ jobs:
 
             if ($errors.Count -gt 0) {
               Write-Host "PowerShell parse errors in $($script.Name):"
-              $errors | Format-List * | Out-String | Write-Host
+              foreach ($parseError in $errors) {
+                Write-Host ("Line {0}, column {1}: {2} [{3}]" -f $parseError.Extent.StartLineNumber, $parseError.Extent.StartColumnNumber, $parseError.Message, $parseError.ErrorId)
+                Write-Host ("Source: {0}" -f $parseError.Extent.Text)
+              }
               throw "PowerShell syntax validation failed for $($script.Name)."
             }
 
