@@ -33,6 +33,7 @@
         .sentinel-event dt{font-size:.7rem;text-transform:uppercase;color:var(--zazu-muted,#687386)}
         .sentinel-event dd{margin:0;font-size:.85rem;overflow-wrap:anywhere}
         .sentinel-empty{padding:1.2rem;text-align:center;color:var(--zazu-muted,#687386)}
+        .sentinel-retention-note{font-size:.78rem}
         @media(max-width:700px){.sentinel-stats{grid-template-columns:1fr}.sentinel-intro{display:block}.sentinel-event{grid-template-columns:1fr}.sentinel-event dl{grid-template-columns:1fr 1fr}}
     </style>
 
@@ -116,6 +117,6 @@
             </section>
         @endif
 
-        <p class="sentinel-muted" style="font-size:.78rem">Retention is limited to the active and previous ledger segments. Incident messages, SQL statements, bindings, customer data and stack traces are intentionally excluded.</p>
+        <p class="sentinel-muted sentinel-retention-note">Retention is limited to the active and previous ledger segments. Incident messages, SQL statements, bindings, customer data and stack traces are intentionally excluded.</p>
     </div>
 </x-app-layout>
