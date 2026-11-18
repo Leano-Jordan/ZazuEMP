@@ -58,6 +58,10 @@
         .details summary{cursor:pointer;font-weight:750}
         .details ul{padding-left:17px;max-height:120px;overflow:auto}
         .notice{padding:8px 10px;border:1px solid #b1c3d2;border-left:3px solid #527b9e;border-radius:7px;background:#eef4f8;color:#294761!important;font-size:.74rem!important}
+        .guidance{display:grid;gap:4px;padding:10px 11px;border:1px solid #c2ced9;border-left:3px solid #557b9c;border-radius:8px;background:#f5f8fb}
+        .guidance strong{color:#294761;font-size:.72rem;letter-spacing:.025em}
+        .guidance p{color:#405970;font-size:.75rem}
+        .guidance a{width:max-content;color:#1d527a;font-size:.74rem;font-weight:800;text-decoration:underline;text-underline-offset:2px}
         .empty-state{display:none;padding:22px;border:1px dashed #8298ac;border-radius:13px;background:#f8fafc;color:#52677c;text-align:center;font-size:.84rem}
         .empty-state.is-visible{display:block}
         .foot{display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;padding:12px 3px 2px;color:#596f84;font-size:.69rem}
@@ -96,7 +100,7 @@
         <div>
             <div class="eyebrow">Owner diagnostics</div>
             <h1>Sentinel Rescue</h1>
-            <p class="page-copy">A read-only health snapshot for this installation. Available locally without an internet connection.</p>
+            <p class="page-copy">A local health snapshot with safe next steps. Business records are not changed by these checks.</p>
         </div>
     </header>
 
@@ -177,7 +181,27 @@
                         @endif
                     </div>
                 @endif
-                @if(!empty($check['next_step']))
+                @if(in_array($check['status'], ['failed', 'attention'], true))
+                    @php
+                        $safeGuidance = $check['next_step'] ?? match ($check['key'] ?? '') {
+                            'database_connection' => 'Check that the configured local database service is running and that the installation connection settings are correct. Do not change credentials or replace the database from this screen.',
+                            'migration_history' => 'Stop normal data entry until the schema is reviewed. Verify a complete database and private-files backup, then use the documented Zazu upgrade procedure. Do not run migrations from this screen.',
+                            'private_storage' => 'Check that the private storage folder exists and that the Windows account running Zazu can read and write it. Do not move, rename or delete existing attachment files.',
+                            'offline_assets' => 'Repair the installation using the matching Zazu release package, then recheck. Do not mix files from different releases or clear phone data as a first response.',
+                            'diagnostic_directory' => 'Check that the private diagnostics folder exists and that the Zazu process can read it. Preserve any existing diagnostic files while correcting folder access.',
+                            'current_ledger', 'previous_ledger' => 'Preserve the original diagnostic file. Do not edit, truncate or delete ledger lines; use the available reference-specific report when an incident reference is shown.',
+                            'write_probe' => 'Check available disk space and the diagnostics folder permissions. Sentinel uses a temporary file for this probe and attempts to remove it automatically; do not delete unrelated files.',
+                            default => 'Keep the installation data intact. Record the check name and reference, if present, before attempting a repair.',
+                        };
+                    @endphp
+                    <div class="guidance" role="note">
+                        <strong>Recommended next step</strong>
+                        <p>{{ $safeGuidance }}</p>
+                        @if(!empty($check['reference']) && \Illuminate\Support\Str::isUuid($check['reference']) && ($check['error_code'] ?? null) === 'DB-001')
+                            <a href="{{ route('support.incidents.show', ['requestId' => $check['reference']]) }}">Open safe incident report →</a>
+                        @endif
+                    </div>
+                @elseif(!empty($check['next_step']))
                     <p class="notice">{{ $check['next_step'] }}</p>
                 @endif
             </article>
@@ -186,8 +210,8 @@
     <div class="empty-state" data-empty-state>No checks match that filter. Try a different status or search term.</div>
 
     <footer class="foot">
-        <span>Owner access · active business only · read-only checks</span>
-        <span>Sentinel Rescue · No external services contacted</span>
+        <span>Owner access · active business only · non-destructive diagnostics</span>
+        <span>Database checks are read-only · temporary diagnostic probe is removed after use</span>
     </footer>
 </main>
 <script nonce="{{ request()->attributes->get('cspNonce') }}">
