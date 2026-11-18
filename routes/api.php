@@ -19,7 +19,7 @@ Route::post('/sentinel/recovery', [SentinelLocalRecoveryController::class, 'veri
 Route::post('/sync/provision', [SyncController::class, 'provision'])->middleware('throttle:30,1');
 Route::get('/support/incidents/{requestId}', [IncidentDiagnosticController::class, 'show'])
     ->whereUuid('requestId')
-    ->middleware('throttle:20,1')
+    ->middleware(['signed', 'throttle:20,1'])
     ->name('support.incidents.show');
 Route::middleware([AuthenticateSyncDevice::class, 'throttle:sync'])->prefix('sync')->group(function () {
     Route::post('/revoke', [SyncController::class, 'revoke']);
