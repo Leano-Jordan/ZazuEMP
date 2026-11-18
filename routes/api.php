@@ -8,8 +8,12 @@ use App\Http\Middleware\AuthenticateSyncDevice;
 use Illuminate\Support\Facades\Route;
 
 Route::middleware(EnsureLocalSentinelRecovery::class)->prefix('/sentinel/recovery')->group(function () {
-    Route::get('/', [SentinelLocalRecoveryController::class, 'show'])->name('sentinel.local-recovery.show');
-    Route::post('/', [SentinelLocalRecoveryController::class, 'verify'])->name('sentinel.local-recovery.verify');
+    Route::get('/', [SentinelLocalRecoveryController::class, 'show'])
+        ->withoutMiddleware(\Illuminate\Routing\Middleware\ThrottleRequests::class)
+        ->name('sentinel.local-recovery.show');
+    Route::post('/', [SentinelLocalRecoveryController::class, 'verify'])
+        ->withoutMiddleware(\Illuminate\Routing\Middleware\ThrottleRequests::class)
+        ->name('sentinel.local-recovery.verify');
 });
 
 Route::post('/sync/provision', [SyncController::class, 'provision'])->middleware('throttle:30,1');
