@@ -140,7 +140,7 @@
                                     <time>{{ $event['timestamp'] }}</time>
                                     <div><code class="sentinel-code">{{ $event['request_id'] }}</code></div>
                                     @if($event['error_code'] === 'DB-001')
-                                        <a class="sentinel-download" href="{{ route('support.incidents.show', ['requestId' => $event['request_id']]) }}">Download safe DB report</a>
+                                        <a class="sentinel-download" href="{{ URL::temporarySignedRoute('support.incidents.show', now()->addMinutes(15), ['requestId' => $event['request_id']]) }}">Download safe DB report</a>
                                     @endif
                                 </div>
                                 <dl>
