@@ -230,11 +230,11 @@ class ErrorHandlingTest extends TestCase
         File::deleteDirectory($directory);
         File::ensureDirectoryExists($directory);
 
-        Log::shouldReceive('log')->once()->andThrow(new \\RuntimeException('primary log unavailable'));
-        Log::shouldReceive('error')->once()->andThrow(new \\RuntimeException('fallback log unavailable'));
+        Log::shouldReceive('log')->once()->andThrow(new \RuntimeException('primary log unavailable'));
+        Log::shouldReceive('error')->once()->andThrow(new \RuntimeException('fallback log unavailable'));
 
         try {
-            ZazuIncidentRecorder::record(new \\RuntimeException('private exception details'));
+            ZazuIncidentRecorder::record(new \RuntimeException('private exception details'));
 
             $ledger = File::get($directory.DIRECTORY_SEPARATOR.'incidents.jsonl');
             $this->assertStringContainsString($requestId, $ledger);
