@@ -27,53 +27,67 @@ class IncidentDiagnosticController extends Controller
 
     private function findDatabaseIncident(string $requestId): ?array
     {
-        $paths = glob(storage_path('logs/laravel*.log')) ?: [];
+        foreach (glob(storage_path('logs/laravel*.log')) ?: [] as $path) {
+            $incident = $this->findIncidentInFile($path, $requestId);
 
-        foreach ($paths as $path) {
-            if (!is_file($path) || !is_readable($path)) {
-                continue;
+            if ($incident !== null) {
+                return $incident;
             }
+        }
 
-            try {
-                $file = new SplFileObject($path, 'r');
-            } catch (Throwable) {
-                continue;
-            }
+        return null;
+    }
 
-            while (!$file->eof()) {
-                $line = $file->fgets();
+    private function findIncidentInFile(string $path, string $requestId): ?array
+    {
+        if (!is_file($path) || !is_readable($path)) {
+            return null;
+        }
 
-                if (!is_string($line) || !str_contains($line, $requestId)) {
-                    continue;
-                }
+        try {
+            $file = new SplFileObject($path, 'r');
+        } catch (Throwable) {
+            return null;
+        }
 
-                $jsonStart = strpos($line, '{');
+        while (!$file->eof()) {
+            $context = $this->matchingIncidentContext($file->fgets(), $requestId);
 
-                if ($jsonStart === false) {
-                    continue;
-                }
-
-                try {
-                    $decoded = json_decode(substr($line, $jsonStart), true, 512, JSON_THROW_ON_ERROR);
-                } catch (\JsonException) {
-                    continue;
-                }
-
-                if (!is_array($decoded)) {
-                    continue;
-                }
-
-                $context = is_array($decoded['context'] ?? null) ? $decoded['context'] : $decoded;
-
-                if (($context['request_id'] ?? null) !== $requestId || ($context['error_code'] ?? null) !== 'DB-001') {
-                    continue;
-                }
-
+            if ($context !== null) {
                 return $this->allowlistedFields($context);
             }
         }
 
         return null;
+    }
+
+    private function matchingIncidentContext(mixed $line, string $requestId): ?array
+    {
+        if (!is_string($line) || !str_contains($line, $requestId)) {
+            return null;
+        }
+
+        $jsonStart = strpos($line, '{');
+
+        if ($jsonStart === false) {
+            return null;
+        }
+
+        try {
+            $decoded = json_decode(substr($line, $jsonStart), true, 512, JSON_THROW_ON_ERROR);
+        } catch (\JsonException) {
+            return null;
+        }
+
+        if (!is_array($decoded)) {
+            return null;
+        }
+
+        $context = is_array($decoded['context'] ?? null) ? $decoded['context'] : $decoded;
+
+        return ($context['request_id'] ?? null) === $requestId && ($context['error_code'] ?? null) === 'DB-001'
+            ? $context
+            : null;
     }
 
     private function allowlistedFields(array $context): array
