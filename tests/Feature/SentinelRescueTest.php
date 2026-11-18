@@ -18,6 +18,22 @@ class SentinelRescueTest extends TestCase
             ->assertNotFound();
     }
 
+    public function test_non_owner_business_member_cannot_open_sentinel_rescue(): void
+    {
+        $business = \\App\\Models\\Business::create([
+            'name' => 'Staff Test Business',
+            'slug' => 'staff-test-business',
+            'status' => 'active',
+            'currency' => 'ZAR',
+        ]);
+        $staff = \\App\\Models\\User::factory()->create();
+        $business->users()->attach($staff->id, ['role' => 'staff']);
+
+        $this->actingAs($staff)
+            ->get(route('sentinel.rescue'))
+            ->assertForbidden();
+    }
+
     public function test_authenticated_business_owner_can_open_local_rescue(): void
     {
         $this->signInAsOwner();
