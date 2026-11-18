@@ -258,3 +258,13 @@ V1: NOT READY. Historical state/register/memory, checklist and changelog are pre
 - PHPMD had reported complexity violations in the two recovery methods. Refactor verified by PHPMD run `44372419579` on commit `a3dc514`; scan completed successfully with no suppression or threshold change.
 - Removed a duplicate incident-report link from the owner guidance panel; the existing reference-scoped DB-001 report action remains in the diagnostic facts row.
 - Changes committed directly to `main`; no branches created. Full Laravel and physical-device acceptance remain pending.
+
+
+## Sentinel CI regression closure — 2026-11-18
+
+- Corrected the founder layout so workspace footer destinations are rendered only when an active business workspace exists; founders with a business retain normal workspace navigation. This resolves the founder-console navigation assertion without exposing the console to business users.
+- Local recovery feature requests now explicitly model the local host request context (loopback address, HTTP scheme, host and configured port) and submit the required form content type. The recovery middleware remains unchanged and continues to enforce loopback-only access plus exact same-origin scheme/host/port and Fetch Metadata checks.
+- Laravel run 44374252678 on commit a9ab1f2: **573 passed, 1 skipped, 3,956 assertions**. PostgreSQL migration smoke and offline browser acceptance were still running when this note was prepared; the preceding run 44373939367 had PostgreSQL and offline browser acceptance **PASS**.
+- PHPMD run 44374252745 and Zazu quality run 44374252557 on a9ab1f2: **PASS**. The latest main commit 3d809a6 makes the test server variables explicit and has fresh CI running; do not treat that exact head as fully verified until its runs finish.
+- Windows V1 package build and fresh-install PowerShell verification passed on commit 9d5ae4f. Director Contract Lint passed on 21a2f4e.
+- No security checks were relaxed, no branches were created, and no physical-device acceptance is inferred from CI. V1 remains **NOT READY** pending physical installation/offline acceptance and remaining release gates.
