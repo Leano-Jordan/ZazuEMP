@@ -9,6 +9,18 @@
         .sentinel-title{font-size:1.45rem;font-weight:750;margin:.3rem 0}
         .sentinel-copy{color:var(--zazu-muted,#687386);max-width:58rem}
         .sentinel-stats{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:.8rem}
+        .sentinel-health-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:.7rem}
+        .sentinel-health-card{display:grid;gap:.35rem;padding:.85rem;border:1px solid var(--zazu-border,#d9dee7);border-radius:12px;min-width:0}
+        .sentinel-health-card strong{font-size:.9rem}
+        .sentinel-health-card p{margin:0;color:var(--zazu-muted,#687386);font-size:.82rem}
+        .sentinel-health-card small{color:var(--zazu-muted,#687386);font-size:.72rem}
+        .sentinel-health-healthy{border-left:4px solid #23865b}
+        .sentinel-health-attention{border-left:4px solid #b7791f}
+        .sentinel-health-failed{border-left:4px solid #c04444}
+        .sentinel-health-unknown,.sentinel-health-not_checked{border-left:4px solid var(--zazu-border,#d9dee7)}
+        .sentinel-health-overall{display:flex;justify-content:space-between;gap:1rem;align-items:center;margin-bottom:.9rem}
+        .sentinel-health-overall strong{font-size:1rem}
+        .sentinel-health-facts{display:flex;gap:.8rem;flex-wrap:wrap;font-size:.75rem;color:var(--zazu-muted,#687386)}
         .sentinel-stat{padding:1rem;border:1px solid var(--zazu-border,#d9dee7);border-radius:14px;background:var(--zazu-surface,#fff)}
         .sentinel-stat strong{display:block;font-size:1.55rem;font-variant-numeric:tabular-nums}
         .sentinel-stat span{font-size:.8rem;color:var(--zazu-muted,#687386)}
@@ -35,7 +47,7 @@
         .sentinel-event dd{margin:0;font-size:.85rem;overflow-wrap:anywhere}
         .sentinel-empty{padding:1.2rem;text-align:center;color:var(--zazu-muted,#687386)}
         .sentinel-retention-note{font-size:.78rem}
-        @media(max-width:700px){.sentinel-stats{grid-template-columns:1fr}.sentinel-intro{display:block}.sentinel-event{grid-template-columns:1fr}.sentinel-event dl{grid-template-columns:1fr 1fr}}
+        @media(max-width:700px){.sentinel-stats{grid-template-columns:1fr}.sentinel-health-grid{grid-template-columns:1fr}.sentinel-intro{display:block}.sentinel-event{grid-template-columns:1fr}.sentinel-event dl{grid-template-columns:1fr 1fr}}
     </style>
 
     <div class="sentinel-wrap">
@@ -52,6 +64,33 @@
             <div class="sentinel-stat"><strong>{{ number_format($totalFingerprints) }}</strong><span>Failure fingerprints indexed</span></div>
             <div class="sentinel-stat"><strong>{{ number_format($totalOccurrences) }}</strong><span>Recorded occurrences in retained ledger</span></div>
             <div class="sentinel-stat"><strong>{{ $latestIncident ?? '—' }}</strong><span>Most recent recorded incident</span></div>
+        </section>
+
+        <section class="sentinel-panel" aria-label="Sentinel diagnostic health">
+            <div class="sentinel-health-overall">
+                <div>
+                    <h3>Sentinel's own health</h3>
+                    <p class="sentinel-muted">Checks the local incident evidence store, not the health of every Zazu subsystem.</p>
+                </div>
+                <span class="sentinel-pill">{{ strtoupper(str_replace('_', ' ', $health['status'])) }}</span>
+            </div>
+            <div class="sentinel-muted sentinel-retention-note">Checked {{ $health['checked_at'] }}. This check does not query or modify business records.</div>
+            <div class="sentinel-health-grid">
+                @foreach($health['checks'] as $check)
+                    <article class="sentinel-health-card sentinel-health-{{ $check['status'] }}">
+                        <strong>{{ $check['label'] }}</strong>
+                        <span class="sentinel-pill">{{ strtoupper(str_replace('_', ' ', $check['status'])) }}</span>
+                        <p>{{ $check['message'] }}</p>
+                        @if(isset($check['records']))
+                            <div class="sentinel-health-facts">
+                                <span>{{ number_format($check['records']) }} valid records</span>
+                                <span>{{ number_format($check['malformed_lines']) }} unreadable lines</span>
+                                <span>{{ number_format($check['size_bytes']) }} bytes</span>
+                            </div>
+                        @endif
+                    </article>
+                @endforeach
+            </div>
         </section>
 
         <section class="sentinel-panel">
