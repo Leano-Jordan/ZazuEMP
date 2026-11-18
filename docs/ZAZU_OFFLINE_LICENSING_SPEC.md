@@ -1,6 +1,6 @@
 # Zazu Offline Licensing Specification
 
-**Status:** Signed-token verification/import and experience-tier ceiling implemented; production issuer and module-level feature enforcement pending  
+**Status:** Signed-token verification/import and manual local issuer command implemented in source; exact-head CI pending. Production key provisioning/custody, installation identity/reactivation and module-level feature enforcement remain open.
 **Date:** 2026-10-02
 
 ## Purpose
@@ -95,7 +95,7 @@ The repository contains the local entitlement data foundation, local validity se
 
 The owner Business Settings page now displays the installed entitlement's plan, status, start and expiry dates and provides a signed-token import form. The POST endpoint is inside the authenticated business-context and owner middleware boundary, is rate-limited, rejects oversized/missing tokens, verifies the signed token against the active business, and records a business-scoped audit entry without storing the raw token in the audit log or old form input. A successful import/renewal is available offline once the token has been supplied.
 
-This is an activation/import interface, not a production issuer. The application enforces the workspace entitlement ceiling for experience presentation, but there is not yet a module-level feature-gating matrix. Production issuer/key-management workflow and installation identity/reactivation remain outstanding. Do not represent the full paid-feature matrix as commercially enforced until those controls are implemented and verified.
+The activation/import interface is implemented. A manual local issuer command is now present in source, but exact-head CI and production key custody remain unverified. The application enforces the workspace entitlement ceiling for experience presentation; there is not yet a module-level feature-gating matrix. Do not represent the full paid-feature matrix as commercially enforced until those controls are implemented and verified.
 
 Licensing is intentionally separate from full offline application operation. A valid license permits entitled local use; it does not by itself provide phone-local data storage, offline mutation queues or synchronization.
 
@@ -176,3 +176,20 @@ The owner has confirmed that Basic, Intermediate and Advanced are the three comm
 - Production issuer/private-key custody, installation identity/reactivation and final module-level entitlement matrix remain outstanding. Do not claim a complete paid subscription system until those controls are implemented and verified.
 
 The central `BusinessEntitlement` resolver determines the business-wide ceiling. `ExperienceLevel` applies that ceiling to each member's saved presentation choice. `OfflineLicenseService` uses the same resolver so the trial, installed licence and preference UI cannot report conflicting effective tiers.
+
+
+## Manual first-customer issuer — 2026-11-19
+
+The Artisan command **zazu:license:issue** creates a version-1 Ed25519 token compatible with the existing local verifier. It accepts a local business ID, one of the existing **basic**, **intermediate** or **advanced** plan identifiers, an explicit start/expiry, and optional JSON feature metadata. A non-expiring entitlement requires the deliberate **--never-expires** option. Revocation requires the existing licence UUID so the new signed revocation replaces the correct installed entitlement.
+
+The command requires **--private-key-file** pointing to a base64-encoded Ed25519 secret-key file outside the Zazu project. It derives the public key from that secret and refuses to issue unless it matches the configured **ZAZU_LICENSE_PUBLIC_KEY**. It does not create keys, change customer data, contact a server, or enforce new feature restrictions. The signed token is printed for manual delivery to the matching business owner.
+
+Example PowerShell invocation (illustrative dates only):
+
+    php artisan zazu:license:issue 42 advanced --private-key-file="C:\ZazuIssuer\zazu-ed25519.key" --starts-at="2026-11-19T00:00:00+02:00" --expires-at="2026-12-19T00:00:00+02:00" --features='{"offline_core":true}'
+
+The command refuses a key stored inside the project, but it does not provision the key or set Windows file permissions. Before production use, the owner must establish the keypair, restrict the private-key file's NTFS ACL to the authorised operator plus required local system administrators, keep a protected recovery copy, and verify that no customer package contains the key. Never put the private key in a customer .env, repository, support ticket or customer communication. Share only the signed token.
+
+**Verification status:** command and regression tests are committed to main; exact-head CI has not yet been observed. Do not use a production key or issue customer licences until the test run passes and key custody is deliberately established.
+
+This is a manual issuer, not a complete commercial licensing operation. Production key custody, installation identity/reactivation, module-level feature enforcement and a fully approved commercial tier matrix remain open.
