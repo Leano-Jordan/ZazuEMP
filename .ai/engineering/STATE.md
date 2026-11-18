@@ -352,3 +352,13 @@ V1: NOT READY. Historical state/register/memory, checklist and changelog are pre
 - The historical DB-001 fingerprint was `GET /dashboard` querying missing `business_user.primary_niche`; the current supplied Sentinel schema report confirms that column is present. The separate invoice-sequence migration remains pending and still requires backup-first installation handling before invoice issuance is considered ready.
 - Windows Ops workflow initially exposed a PowerShell parse failure in the new existing-server migration guard. The failure was diagnosed and corrected on main. Exact current main HEAD `a7798c41224876aa4a6e2d98963e8cd793680909`: Windows Ops Scripts, Windows V1 Package, Zazu quality and Push on main all completed SUCCESS. This confirms CI only, not the Founder's installed PC.
 - DB-001 remains OPEN pending matching current incident evidence and successful repetition of the affected installed workflow. No database migration or owner-device mutation has been performed by this repository investigation.
+
+
+## Sentinel overview accuracy correction — 2026-11-18
+
+- Source review found that the control-centre overview derived fingerprint count, occurrence total and latest-incident timestamp from the display list capped at 100 fingerprints. This made the headline figures incomplete once the retained ledger contained more than 100 distinct failure patterns; the "latest incident" could also be stale because the list is ranked by recurrence.
+- Added a separate full-retained-ledger overview aggregation. The visible recurring-pattern table remains intentionally capped at 100 rows and ranked by occurrence count; headline totals and latest timestamp now use all valid records in both retained ledger segments.
+- Added a feature regression test with 101 fingerprints / 201 occurrences, where the newest low-frequency fingerprint falls outside the visible top 100.
+- Changes committed directly to `main`: summary `0ad2178`, controller `58bcda2`, regression `fcd7345`.
+- Updated the Director contract: Sentinel/diagnostics are active engineering targets, not frozen. Founder-only platform incident access remains unchanged.
+- **Verification pending:** run the application/quality workflows on the resulting exact main head. No owner installation or incident data was changed.
