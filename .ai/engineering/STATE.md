@@ -277,3 +277,11 @@ V1: NOT READY. Historical state/register/memory, checklist and changelog are pre
 - Exact-head commit `529bd6fe47e9d7624a47c3237b87e03f508ae872`: Laravel **575 passed, 1 skipped, 3,962 assertions**; PostgreSQL migration/recovery smoke **PASS**; PHPMD **PASS**; Zazu quality application, Composer security audit and secret scan **PASS**. Offline browser acceptance was still running at the time of this note.
 - Earlier CI failures on intermediate commits were traced to a malformed namespace separator in the newly added test and a PHPMD public-method count after adding the test to an already-large test class. The test was moved into its own feature-test class, syntax corrected, and PHPMD plus Laravel now pass on 529bd6f. No production safeguard was weakened.
 - All changes are committed directly to `main`; no branches created. Physical Windows/Android acceptance remains separate from CI, and V1 remains **NOT READY** pending the outstanding operator gates.
+
+## Incident ledger filesystem hardening — 2026-11-18
+
+- `ZazuIncidentLedger` now reapplies private filesystem modes when writing: diagnostics directory `0700`, lock file `0600`, JSONL ledger `0600` (best effort on Windows).
+- This tightens pre-existing paths from older installations as well as newly created paths. No incident fields or retention policy changed.
+- Windows security remains dependent on effective NTFS ACLs; PHP `chmod` is not treated as proof. Installed-package ACL verification remains an acceptance requirement.
+- Change committed directly to `main` as `396960a`; CI for this exact head is pending. Prior application commit `529bd6f` had Laravel 575 passed / 1 skipped / 3,962 assertions, PostgreSQL smoke PASS, PHPMD PASS and quality scans PASS; offline-browser acceptance was still running at last check.
+- No branches created. V1 remains NOT READY pending exact-head CI and physical-device/package acceptance.
