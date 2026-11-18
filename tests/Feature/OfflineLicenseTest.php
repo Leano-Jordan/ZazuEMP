@@ -149,7 +149,7 @@ class OfflineLicenseTest extends TestCase
             ->assertOk()
             ->assertSeeText('Business licensing reference: '.$business->licensing_uuid)
             ->assertSeeText('Local Business ID: '.$business->id)
-            ->assertSeeText('It is not an access credential.');
+            ->assertSeeText('is not an access credential.');
     }
 
     public function test_settings_displays_an_expired_license_as_expired(): void
