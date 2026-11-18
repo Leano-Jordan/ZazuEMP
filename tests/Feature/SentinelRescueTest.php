@@ -43,7 +43,7 @@ class SentinelRescueTest extends TestCase
         $this->get(route('sentinel.rescue'))
             ->assertOk()
             ->assertSee('Sentinel Rescue')
-            ->assertSee('authenticated owner of the active business')
+            ->assertSee('A read-only health snapshot for this installation.')
             ->assertSee('Database connection')
             ->assertSee('Diagnostic write/read test')
             ->assertSee('Back to workspace')
