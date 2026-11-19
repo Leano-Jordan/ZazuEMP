@@ -21,11 +21,21 @@ The detail page deliberately does not expose customer records, event details, fi
 
 ## Current access boundary
 
-The live directory and account detail page are read-only. They do not change the active business session, impersonate a user, or bypass `EnsureActiveBusinessContext`.
+The live directory and account detail page do not change the active business session, impersonate a user, or bypass `EnsureActiveBusinessContext`. A separate, explicitly started support session provides a tightly limited read-only view of up to 20 customer names and 20 recent event summaries.
 
 A founder identity is not automatically a member of every business. Do not add the founder to customer `business_user` memberships as a shortcut to support access.
 
-## Requirements before enabling support actions
+## Temporary read-only support sessions
+
+- Founder starts access from a specific business detail page and supplies a reason (10–500 characters).
+- Each session expires automatically after 15 minutes and can be ended explicitly.
+- Session identity is bound to the authenticated founder and the session ID stored in that founder's server-side session.
+- The support route requires the active, unexpired session and never adds the founder to `business_user`.
+- The support view exposes customer names and recent event reference/name/date/status only. It does not expose customer contact details, attachments, quotes, payments, expenses, credentials or mutation controls.
+- Session start and each support-view access are recorded in `platform_audit_logs`, separate from business audit logs.
+- Write actions remain disabled.
+
+## Requirements before enabling write support actions
 
 Any future account mutation or temporary support workspace must be implemented as a separate, explicit founder capability. At minimum:
 
@@ -51,4 +61,5 @@ Any future account mutation or temporary support workspace must be implemented a
 - Live directory and search: implemented.
 - Founder-only business detail and membership view: implemented.
 - Directory and detail access-control tests: added; run them in the local Zazu environment before operational acceptance.
-- Audited temporary support access and account mutations: not yet implemented.
+- Audited temporary read-only support access: implemented; local migration and feature-test verification still required.
+- Founder write access, impersonation, account suspension and other mutations: intentionally disabled.
