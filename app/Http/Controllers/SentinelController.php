@@ -1,12 +1,13 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\\Http\\Controllers;
 
-use App\Models\PlatformLicenseCustomer;
-use App\Support\ZazuIncidentSummary;
-use App\Support\ZazuSentinelHealth;
-use Illuminate\Http\Request;
-use Illuminate\View\View;
+use App\\Models\\Business;
+use App\\Models\\PlatformLicenseCustomer;
+use App\\Support\\ZazuIncidentSummary;
+use App\\Support\\ZazuSentinelHealth;
+use Illuminate\\Http\\Request;
+use Illuminate\\View\\View;
 
 final class SentinelController extends Controller
 {
@@ -16,6 +17,7 @@ final class SentinelController extends Controller
             'q' => ['nullable', 'string', 'max:120'],
             'fingerprint' => ['nullable', 'regex:/^ZAZU-[A-F0-9]{16}$/'],
             'business_q' => ['nullable', 'string', 'max:120'],
+            'account_q' => ['nullable', 'string', 'max:120'],
         ]);
 
         $health = $healthService->inspect();
@@ -29,10 +31,24 @@ final class SentinelController extends Controller
                 $businessesQuery->where('business_name', 'like', '%'.$businessQuery.'%')
                     ->orWhere('contact_email', 'like', '%'.$businessQuery.'%')
                     ->orWhere('business_uuid', 'like', '%'.$businessQuery.'%');
-                
             }))
             ->orderBy('business_name')
             ->paginate(25, ['*'], 'business_page')
+            ->withQueryString();
+
+        $accountQuery = trim((string) ($filters['account_q'] ?? ''));
+        $platformBusinesses = Business::query()
+            ->with(['users' => fn ($users) => $users->orderBy('name')])
+            ->withCount(['users', 'customers', 'events'])
+            ->when($accountQuery !== '', fn ($businesses) => $businesses->where(function ($builder) use ($accountQuery): void {
+                $builder->where('name', 'like', '%'.$accountQuery.'%')
+                    ->orWhere('email', 'like', '%'.$accountQuery.'%')
+                    ->orWhereHas('users', fn ($users) => $users
+                        ->where('name', 'like', '%'.$accountQuery.'%')
+                        ->orWhere('email', 'like', '%'.$accountQuery.'%'));
+            }))
+            ->orderBy('name')
+            ->paginate(20, ['*'], 'account_page')
             ->withQueryString();
 
         $selected = $filters['fingerprint'] ?? null;
@@ -49,10 +65,22 @@ final class SentinelController extends Controller
             'latestIncident' => $overview['latest_incident'],
             'customers' => $customers,
             'businessQuery' => $businessQuery,
+            'platformBusinesses' => $platformBusinesses,
+            'accountQuery' => $accountQuery,
             'licenceSigningConfigured' => trim((string) config('zazu.licensing.private_key_file', '')) !== '',
             'issuedLicenseToken' => session('sentinel_issued_license_token'),
             'issuedLicenseBusiness' => session('sentinel_issued_license_business'),
             'issuedLicenseAction' => session('sentinel_issued_license_action'),
+        ]);
+    }
+
+    public function showBusiness(Business $business): View
+    {
+        $business->load(['users' => fn ($users) => $users->orderBy('name')]);
+        $business->loadCount(['users', 'customers', 'events']);
+
+        return view('admin.sentinel-business', [
+            'business' => $business,
         ]);
     }
 }
