@@ -107,6 +107,29 @@ jobs:
           if ($httpsLauncher -notmatch 'BuiltAssetsOnly = \$true') {
             throw 'The LAN HTTPS launcher must force the compiled-assets path.'
           }
+          if (-not $hostLauncher.Contains('[switch]$SecureCookies') -or -not $httpsLauncher.Contains('SecureCookies = $true')) {
+            throw 'The HTTPS host process must opt into Secure session cookies.'
+          }
+          if (-not $hostLauncher.Contains('config:clear') -or -not $hostLauncher.Contains('$env:SESSION_SECURE_COOKIE = ''true''') -or -not $hostLauncher.Contains('[Environment]::SetEnvironmentVariable')) {
+            throw 'Secure-cookie mode must clear stale Laravel config, set the environment override and restore the launcher environment.'
+          }
+          $httpStopIndex = $httpsLauncher.IndexOf('& $startServer -Stop -Port $AppPort')
+          $httpsStartIndex = $httpsLauncher.IndexOf('& $startServer @startArguments')
+          if ($httpStopIndex -lt 0 -or $httpsStartIndex -lt 0 -or $httpStopIndex -gt $httpsStartIndex) {
+            throw 'HTTPS mode must replace a previously running HTTP-mode app process before starting with Secure cookies.'
+          }
+          foreach ($rangeCheck in @(
+            '$_.IPAddress -match ''^10\.''',
+            '$_.IPAddress -match ''^192\.168\.''',
+            '$_.IPAddress -match ''^172\.(1[6-9]|2[0-9]|3[01])\.'''
+          )) {
+            if (-not $httpsLauncher.Contains($rangeCheck)) {
+              throw "The LAN HTTPS host is missing a private IPv4 range check: $rangeCheck"
+            }
+          }
+          if (-not (Get-Content '.gitignore' -Raw).Contains('/tools/caddy.exe')) {
+            throw 'The downloaded Caddy executable must be ignored by Git.'
+          }
           if ($lanWrapper -notmatch 'Start-ZazuDev\.ps1.*-Lan') {
             throw 'The plain LAN wrapper must use the shared LAN-safe startup path.'
           }
