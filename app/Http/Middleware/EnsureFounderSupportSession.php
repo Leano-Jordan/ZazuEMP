@@ -18,11 +18,16 @@ class EnsureFounderSupportSession
             $supportSession instanceof FounderSupportSession
                 && $sessionId !== null
                 && (int) $sessionId === (int) $supportSession->id
-                && (int) $supportSession->actor_user_id === (int) $request->user()->getAuthIdentifier()
-                && $supportSession->isActive(),
+                && (int) $supportSession->actor_user_id === (int) $request->user()->getAuthIdentifier(),
             403,
             'An active founder support session is required.'
         );
+
+        if (! $supportSession->isActive()) {
+            $request->session()->forget('zazu_founder_support_session_id');
+
+            abort(403, 'This founder support session has expired or ended.');
+        }
 
         return $next($request);
     }
