@@ -462,7 +462,7 @@ The Laravel web session cookie is server-managed. The client submits the actual 
 
 The client confirms logout only after Laravel returns a successful redirect. If the request fails or the server cannot be reached, it tells the user that the web session remains active, keeps the business-scoped offline workspace, queued mutations, attachments and trusted-device credential untouched, and allows a retry. It does not pretend that clearing browser state is equivalent to invalidating the server session.
 
-Only after the server confirms logout does the client ask the service worker to clear authenticated page cache. This cache cleanup is best-effort; the server-side session invalidation remains authoritative. Regression coverage must exercise a failed logout POST, successful logout/re-login, and preservation of queued business work.
+The service worker also guards this boundary: it clears authenticated page cache only after its own `POST /logout` fetch receives the same successful redirect. The page client sends an idempotent cleanup message after receiving that confirmed response, covering clients that were not yet controlled by the worker. Cache cleanup remains best-effort; server-side session invalidation is authoritative. Regression coverage exercises failed logout, confirmed logout, late-response cache races and preservation of queued business work.
 
 
 ## Authenticated page-cache generation boundary
