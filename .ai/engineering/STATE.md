@@ -1,3 +1,14 @@
+## Rosscore Labs Founder Control Centre and Sentinel direction — 2026-11-19
+
+- The user is the sole Founder, owner and final authority for Rosscore Labs and Zazu EMP. Address him directly; never frame the Founder as hypothetical, replaceable or a role that may pass to someone else. Company identity: **Rosscore Labs**.
+- `/admin/sentinel` is the Founder's installation-wide oversight dashboard. Its purpose is to monitor every Zazu instance and platform health. It should provide fleet/instance status and operational visibility without exposing unnecessary customer or business-sensitive records.
+- Sentinel Rescue (`/sentinel/rescue`) is to merge into the existing business Owner Admin experience as its health, diagnostics and safe-recovery capability. Avoid a separate owner-facing Rescue page/destination and duplicated owner dashboard information.
+- Maintain strict scopes: Founder Control Centre = cross-instance/platform oversight; Owner Admin with integrated Sentinel Rescue = diagnostics for the active authorised business only. Never expose the global incident ledger or another business's data to a business owner.
+- Use one coherent Sentinel capability with server-enforced data scopes. Both surfaces must be discoverable through persistent navigation; no manual URL entry as the intended workflow. Keep a clear return path to the business workspace. Link visibility is not a security boundary.
+- This records the agreed direction only. No application code, routes, permissions or UI have been changed by this documentation update. Implementation requires an authorised execution batch and source-level inspection first.
+
+---
+
 ## Provisional customer/privacy contact confirmed — 2026-11-19
 
 - Owner-approved current contact: `rosscorelabs@outlook.com`.
