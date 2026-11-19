@@ -613,8 +613,6 @@ const setupZazuHierarchicalNavigation = () => {
     };
 
     const syncActiveAreaForViewport = () => {
-        if (!window.matchMedia('(max-width: 850px)').matches) return;
-
         const activeArea = areas.find((area) => area.classList.contains('is-active'));
         if (!activeArea) return;
 
@@ -3518,8 +3516,20 @@ function registerZazuServiceWorker() {
     };
 
     window.addEventListener('load', () => {
-        navigator.serviceWorker.register('/sw.js', { scope: '/' })
-            .then(() => navigator.serviceWorker.ready)
+        navigator.serviceWorker.register('/sw.js', {
+            scope: '/',
+            updateViaCache: 'none',
+        })
+            .then(async (registration) => {
+                // Check the origin for a newer worker on every launch, including installed PWA launches.
+                try {
+                    await registration.update();
+                } catch {
+                    // A temporary network failure must not block the cached app shell.
+                }
+
+                return navigator.serviceWorker.ready;
+            })
             .then((ready) => {
                 // Prime once only: prime-pages aborts any earlier priming run, so
                 // sending the same route set twice can cancel the dashboard cache fill.
