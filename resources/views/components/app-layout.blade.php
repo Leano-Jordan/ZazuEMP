@@ -122,7 +122,7 @@
                                 <a href="{{ route('onboarding.index') }}" class="zazu-nav-link {{ request()->routeIs('onboarding.*') ? 'active' : '' }}">Setup</a>
                             @endif
                             @if($isPlatformAdmin)
-                                <a href="{{ route('admin.sentinel') }}" class="zazu-nav-link {{ request()->routeIs('admin.sentinel') ? 'active' : '' }}">Sentinel Control Centre</a>
+                                <a href="{{ route('admin.sentinel') }}" class="zazu-nav-link {{ request()->routeIs('admin.sentinel') ? 'active' : '' }}">Founder Control Centre</a>
                                 <a href="{{ route('admin.landing.settings') }}" class="zazu-nav-link {{ request()->routeIs('admin.landing.*') ? 'active' : '' }}">Platform</a>
                             @endif
                         </div></div>
