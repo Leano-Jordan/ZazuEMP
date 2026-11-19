@@ -73,7 +73,7 @@
         @media(max-width:800px){.sentinel-license-register-form{grid-template-columns:1fr}}
         .sentinel-license-facts{margin-top:.45rem}
         .sentinel-license-meta{font-size:.75rem}
-        .sentinel-license-pagination{margin-top:1rem}
+        .sentinel-license-pagination{margin-top:1rem}\n        .sentinel-account-list{display:grid;gap:.7rem;margin-top:.8rem}\n        .sentinel-account{display:grid;grid-template-columns:minmax(0,1.3fr) minmax(12rem,1fr) auto;gap:1rem;align-items:center;padding:.9rem;border:1px solid var(--zazu-border,#d9dee7);border-radius:12px}\n        .sentinel-account-meta{display:flex;gap:.45rem;flex-wrap:wrap;font-size:.78rem;color:var(--zazu-muted,#687386)}\n        .sentinel-account-users{font-size:.8rem;color:var(--zazu-muted,#687386)}\n        @media(max-width:800px){.sentinel-account{grid-template-columns:1fr}}
         @media(max-width:800px){.sentinel-license-row{grid-template-columns:1fr}}
         @media(max-width:700px){.sentinel-stats{grid-template-columns:1fr}.sentinel-health-grid{grid-template-columns:1fr}.sentinel-intro{display:block}.sentinel-event{grid-template-columns:1fr}.sentinel-event dl{grid-template-columns:1fr 1fr}}
     </style>
@@ -86,6 +86,51 @@
                 <p class="sentinel-copy">Review this installation's diagnostic evidence, investigate recurring failures and manage registered customer licences. Customer business records are not displayed here.</p>
             </div>
             <span class="sentinel-pill">Founder only</span>
+        </section>
+
+        <section class="sentinel-panel" id="platform-accounts">
+            <div class="sentinel-health-overall">
+                <div>
+                    <h3>Platform business accounts</h3>
+                    <p class="sentinel-muted">Live records from Zazu's business database — separate from the manually maintained licensing registry. Founder visibility is cross-business; business workspaces remain isolated.</p>
+                </div>
+                <span class="sentinel-pill">{{ number_format($platformBusinesses->total()) }} matching accounts</span>
+            </div>
+            <form method="GET" action="{{ route('admin.sentinel') }}" class="sentinel-search">
+                <input type="search" name="account_q" value="{{ $accountQuery }}" maxlength="120" placeholder="Search business, owner or member name/email" aria-label="Search platform business accounts">
+                <button class="sentinel-button" type="submit">Find account</button>
+                <a class="sentinel-clear" href="{{ route('admin.sentinel', ['section' => 'accounts']) }}">Clear</a>
+            </form>
+            <div class="sentinel-account-list">
+                @forelse($platformBusinesses as $platformBusiness)
+                    <article class="sentinel-account">
+                        <div>
+                            <strong>{{ $platformBusiness->name }}</strong>
+                            <div class="sentinel-account-meta">
+                                <span class="sentinel-pill">{{ strtoupper($platformBusiness->status ?: 'unknown') }}</span>
+                                <span>{{ $platformBusiness->users_count }} user(s)</span>
+                                <span>{{ $platformBusiness->customers_count }} customer(s)</span>
+                                <span>{{ $platformBusiness->events_count }} event(s)</span>
+                            </div>
+                        </div>
+                        <div class="sentinel-account-users">
+                            @forelse($platformBusiness->users->take(3) as $member)
+                                <div>{{ $member->name }} · {{ ucfirst($member->pivot->role ?? 'member') }}</div>
+                            @empty
+                                <div>No linked users</div>
+                            @endforelse
+                            @if($platformBusiness->users_count > 3)
+                                <div>+ {{ $platformBusiness->users_count - 3 }} more</div>
+                            @endif
+                        </div>
+                        <a class="sentinel-button" href="{{ route('admin.sentinel.businesses.show', $platformBusiness) }}">Inspect account</a>
+                    </article>
+                @empty
+                    <div class="sentinel-empty">No platform business accounts match this search.</div>
+                @endforelse
+            </div>
+            <div class="sentinel-license-pagination">{{ $platformBusinesses->links() }}</div>
+            <p class="sentinel-muted sentinel-retention-note">This directory is read-only in this release. It does not expose customer records, financial data, passwords, authentication tokens or offline device secrets.</p>
         </section>
 
         <section class="sentinel-panel" aria-labelledby="sentinel-installation-visibility">
