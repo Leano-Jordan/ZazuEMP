@@ -1093,12 +1093,12 @@ test.describe('Zazu installed PWA offline shell', () => {
         expect(localState.pendingCount).toBe(1);
     });
 
-    test('late authenticated HTML cannot repopulate the private cache after logout starts', async ({ page }, testInfo) => {
+    test('logout preserves the private cache on network failure and blocks late HTML after server confirmation', async ({ page }, testInfo) => {
         test.setTimeout(20_000);
         test.skip(testInfo.project.name !== 'chromium', 'Service-worker cache race contract runs once.');
 
         await login(page);
-        const userCaches = await page.evaluate(async () => {
+        const logoutCacheResult = await page.evaluate(async () => {
             const workerSource = await fetch('/sw.js', { cache: 'no-store' }).then(response => response.text());
             const handlers = {};
             const cacheStores = new Map();
@@ -1167,11 +1167,22 @@ test.describe('Zazu installed PWA offline shell', () => {
             let markNetworkStarted;
             const networkStarted = new Promise(resolve => { markNetworkStarted = resolve; });
             const stalledHtml = new Promise(resolve => { resolveHtml = resolve; });
+            const cachePrefix = workerSource.match(/const CACHE_NAME = '([^']+)'/)?.[1];
+            if (!cachePrefix) throw new Error('Service-worker cache version was not found');
+            const userCacheName = cachePrefix + '-user-123-business-456';
+            await cachesApi.open(userCacheName);
+
+            let logoutFails = true;
             const mockFetch = input => {
                 const url = new URL(typeof input === 'string' ? input : input.url, window.location.origin);
                 if (url.pathname === '/dashboard') {
                     markNetworkStarted();
                     return stalledHtml;
+                }
+                if (url.pathname === '/logout') {
+                    return logoutFails
+                        ? Promise.reject(new Error('Server is unreachable'))
+                        : Promise.resolve({ ok: true, redirected: true });
                 }
                 return Promise.reject(new Error('Unexpected network request in cache-race test: ' + url.pathname));
             };
@@ -1212,12 +1223,26 @@ test.describe('Zazu installed PWA offline shell', () => {
 
             await networkStarted;
 
-            const logoutWaits = [];
+            let failedLogoutResponse;
             handlers.fetch({
                 request: new WorkerRequest(new URL('/logout', window.location.origin).href, { method: 'POST' }),
-                waitUntil(promise) { logoutWaits.push(promise); },
+                respondWith(promise) { failedLogoutResponse = Promise.resolve(promise); },
             });
-            await Promise.all(logoutWaits);
+            let failedLogoutRejected = false;
+            try {
+                await failedLogoutResponse;
+            } catch {
+                failedLogoutRejected = true;
+            }
+            const cachePreservedAfterFailure = (await cachesApi.keys()).includes(userCacheName);
+
+            logoutFails = false;
+            let successfulLogoutResponse;
+            handlers.fetch({
+                request: new WorkerRequest(new URL('/logout', window.location.origin).href, { method: 'POST' }),
+                respondWith(promise) { successfulLogoutResponse = Promise.resolve(promise); },
+            });
+            await successfulLogoutResponse;
 
             resolveHtml(new window.Response(
                 '<!doctype html><html><body data-zazu-user-id="123">stale authenticated page</body></html>',
@@ -1226,10 +1251,16 @@ test.describe('Zazu installed PWA offline shell', () => {
             await navigationResponse;
             await Promise.all(cacheWaits);
 
-            return (await cachesApi.keys()).filter(name => name.includes('-user-'));
+            return {
+                failedLogoutRejected,
+                cachePreservedAfterFailure,
+                userCaches: (await cachesApi.keys()).filter(name => name.includes('-user-')),
+            };
         });
 
-        expect(userCaches).toEqual([]);
+        expect(logoutCacheResult.failedLogoutRejected).toBe(true);
+        expect(logoutCacheResult.cachePreservedAfterFailure).toBe(true);
+        expect(logoutCacheResult.userCaches).toEqual([]);
     });
 
     test('logout preserves the business offline workspace and paired device across account sessions', async ({ page }) => {
