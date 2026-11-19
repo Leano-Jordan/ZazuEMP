@@ -1,10 +1,10 @@
 <?php
 
-namespace App\\Support;
+namespace App\Support;
 
-use App\\Models\\Business;
-use App\\Models\\User;
-use Illuminate\\Support\\Facades\\DB;
+use App\Models\Business;
+use App\Models\User;
+use Illuminate\Support\Facades\DB;
 use Throwable;
 
 final class ZazuBusinessHealth
