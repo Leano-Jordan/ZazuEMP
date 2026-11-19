@@ -81,7 +81,8 @@ final class SentinelController extends Controller
                         ->where('name', 'like', '%'.$accountQuery.'%')
                         ->orWhere('email', 'like', '%'.$accountQuery.'%'));
             }))
-            ->orderBy('name')
+            ->orderByDesc('created_at')
+            ->orderByDesc('id')
             ->paginate(20, ['*'], 'account_page')
             ->withQueryString();
     }
