@@ -26,30 +26,10 @@ final class SentinelController extends Controller
         $overview = $incidents->overview();
 
         $businessQuery = trim((string) ($filters['business_q'] ?? ''));
-        $customers = PlatformLicenseCustomer::query()
-            ->when($businessQuery !== '', fn ($query) => $query->where(function ($businessesQuery) use ($businessQuery): void {
-                $businessesQuery->where('business_name', 'like', '%'.$businessQuery.'%')
-                    ->orWhere('contact_email', 'like', '%'.$businessQuery.'%')
-                    ->orWhere('business_uuid', 'like', '%'.$businessQuery.'%');
-            }))
-            ->orderBy('business_name')
-            ->paginate(25, ['*'], 'business_page')
-            ->withQueryString();
+        $customers = $this->licenseCustomers($businessQuery);
 
         $accountQuery = trim((string) ($filters['account_q'] ?? ''));
-        $platformBusinesses = Business::query()
-            ->with(['users' => fn ($users) => $users->orderBy('name')])
-            ->withCount(['users', 'customers', 'events'])
-            ->when($accountQuery !== '', fn ($businesses) => $businesses->where(function ($builder) use ($accountQuery): void {
-                $builder->where('name', 'like', '%'.$accountQuery.'%')
-                    ->orWhere('email', 'like', '%'.$accountQuery.'%')
-                    ->orWhereHas('users', fn ($users) => $users
-                        ->where('name', 'like', '%'.$accountQuery.'%')
-                        ->orWhere('email', 'like', '%'.$accountQuery.'%'));
-            }))
-            ->orderBy('name')
-            ->paginate(20, ['*'], 'account_page')
-            ->withQueryString();
+        $platformBusinesses = $this->platformBusinesses($accountQuery);
 
         $selected = $filters['fingerprint'] ?? null;
         $timeline = $selected ? $incidents->timeline($selected) : [];
@@ -72,6 +52,37 @@ final class SentinelController extends Controller
             'issuedLicenseBusiness' => session('sentinel_issued_license_business'),
             'issuedLicenseAction' => session('sentinel_issued_license_action'),
         ]);
+    }
+
+
+    private function licenseCustomers(string $businessQuery)
+    {
+        return PlatformLicenseCustomer::query()
+            ->when($businessQuery !== '', fn ($query) => $query->where(function ($businessesQuery) use ($businessQuery): void {
+                $businessesQuery->where('business_name', 'like', '%'.$businessQuery.'%')
+                    ->orWhere('contact_email', 'like', '%'.$businessQuery.'%')
+                    ->orWhere('business_uuid', 'like', '%'.$businessQuery.'%');
+            }))
+            ->orderBy('business_name')
+            ->paginate(25, ['*'], 'business_page')
+            ->withQueryString();
+    }
+
+    private function platformBusinesses(string $accountQuery)
+    {
+        return Business::query()
+            ->with(['users' => fn ($users) => $users->orderBy('name')])
+            ->withCount(['users', 'customers', 'events'])
+            ->when($accountQuery !== '', fn ($businesses) => $businesses->where(function ($builder) use ($accountQuery): void {
+                $builder->where('name', 'like', '%'.$accountQuery.'%')
+                    ->orWhere('email', 'like', '%'.$accountQuery.'%')
+                    ->orWhereHas('users', fn ($users) => $users
+                        ->where('name', 'like', '%'.$accountQuery.'%')
+                        ->orWhere('email', 'like', '%'.$accountQuery.'%'));
+            }))
+            ->orderBy('name')
+            ->paginate(20, ['*'], 'account_page')
+            ->withQueryString();
     }
 
     public function showBusiness(Business $business): View
