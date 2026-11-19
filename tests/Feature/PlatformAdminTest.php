@@ -111,8 +111,8 @@ class PlatformAdminTest extends TestCase
 
     public function test_founder_control_centre_has_a_return_path_when_the_founder_has_a_business_workspace(): void
     {
-        $founder = \\App\\Models\\User::factory()->create(['email' => 'admin@zazu.test']);
-        $business = \\App\\Models\\Business::create([
+        $founder = \App\Models\User::factory()->create(['email' => 'admin@zazu.test']);
+        $business = \App\Models\Business::create([
             'name' => 'Founder Workspace',
             'slug' => 'founder-workspace',
             'status' => 'active',
