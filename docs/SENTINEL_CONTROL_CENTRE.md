@@ -7,7 +7,9 @@ This section is the current product authority and supersedes older surface namin
 - **Scope boundary:** Founder Control Centre provides cross-instance/platform operational oversight. Owner Admin and its integrated Sentinel capability are restricted to the active authorised business. Do not expose the installation-wide incident ledger, another business's incident metadata or customer records through Owner Admin.
 - **Shared capability, separate scopes:** reuse one Sentinel health/diagnostics engine where practical, with explicit server-enforced scope filtering. Do not weaken `sentinel.admin`, `business.context`, `owner` or other route authorization to make navigation work.
 - **Navigation:** each authorised surface must be discoverable through persistent in-app navigation without manual URL entry. Preserve a clear return path from Founder Control Centre to the business workspace. Hiding a link is not authorization; direct-route access must remain protected.
-- **Implementation status:** this is the agreed direction, not an implementation claim. Existing routes/views and navigation predicates must be inspected before changes. No source, route, permission or UI change is implied by this documentation entry.
+- **Implementation status — 2026-11-19:** Owner Admin now contains the business-scoped Sentinel health panel. The legacy `/sentinel/rescue` route redirects to `/owner#business-health`; its standalone controller and view have been removed. Owner navigation exposes Owner Admin, and Founder Control Centre navigation is named explicitly. The business health service checks database response, active owner membership and only that business's customer, event and service data paths. It does not call the installation-wide incident recorder or expose the global ledger.
+- **Founder visibility limit:** the Founder Control Centre currently shows the local installation's diagnostic evidence and the registered customer licensing registry. Remote customer installations do not yet send health or connectivity telemetry. A licence record or licence status is not a live health signal. Do not imply fleet-wide live monitoring until a separate privacy-conscious reporting design is approved and implemented.
+- **Verification:** focused feature tests have been updated/added for the owner surface, legacy redirect, navigation and business scope. Runtime/CI execution is not yet verified.
 
 ---
 
@@ -48,7 +50,7 @@ The current implementation on `main` includes:
 - `ZazuLocalEnvironmentHealth`: inspect private-storage read/write permissions and the presence/readability of the service worker, offline client, web manifest and compiled asset manifest. This does not certify phone cache or sync operation.
 - `ZazuSystemHealth`: aggregate the available checks using explicit status states.
 - The platform-admin Sentinel console now displays Sentinel's own evidence-store health and links DB-001 timeline entries directly to their redacted reference-specific report.
-- Business owners have a **System → Sentinel Rescue** entry at `/sentinel/rescue`. It requires the authenticated session, active business context and owner role on every request. It is not a signed/bearer URL.
+- Business owners access business-scoped Sentinel diagnostics inside **System → Owner Admin**. The legacy `/sentinel/rescue` URL redirects to the Owner Admin health section and remains behind authenticated owner middleware.
 - The rescue page displays the database driver and health result, migration state, storage and offline asset checks, and Sentinel ledger integrity. When a database operation throws, it attempts to record the safe DB-001 incident and provides the matching report link.
 
 ### Independent local recovery path — implemented in source, awaiting CI and packaged-host acceptance
