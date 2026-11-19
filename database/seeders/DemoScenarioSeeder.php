@@ -57,21 +57,23 @@ class DemoScenarioSeeder extends Seeder
             ]
         );
 
-        $business = Business::updateOrCreate(
-            ['slug' => 'zazu-demo-catering'],
-            [
-                'name' => 'Zazu Demo Catering',
-                'status' => 'active',
-                'currency' => 'ZAR',
-                'email' => $email,
-                'phone' => '010 000 0000',
-                'address' => '18 Freedom Avenue, Soshanguve, Pretoria, Gauteng, 0152',
-                'website' => 'https://demo.zazu.local',
-                'tax_number' => '9012345678',
-                'business_setup_completed_at' => now(),
-                'catalogue_setup_completed_at' => now(),
-            ]
-        );
+        $business = Business::firstOrNew(['slug' => 'zazu-demo-catering']);
+        $business->fill([
+            'name' => 'Zazu Demo Catering',
+            'status' => 'active',
+            'currency' => 'ZAR',
+            'email' => $email,
+            'phone' => '010 000 0000',
+            'address' => '18 Freedom Avenue, Soshanguve, Pretoria, Gauteng, 0152',
+            'website' => 'https://demo.zazu.local',
+            'tax_number' => '9012345678',
+            'business_setup_completed_at' => now(),
+            'catalogue_setup_completed_at' => now(),
+        ]);
+        if (! filled($business->licensing_uuid)) {
+            $business->licensing_uuid = (string) Str::uuid();
+        }
+        $business->save();
 
         foreach ([
             ['name' => 'Zazu Operations Manager', 'username' => 'zazu_operations', 'email' => 'operations@zazu.local', 'role' => 'manager', 'experience_level' => 'advanced'],
