@@ -119,7 +119,9 @@
                             @if($isOwner)
                                 <a href="{{ route('owner.dashboard') }}" class="zazu-nav-link {{ request()->routeIs('owner.dashboard') ? 'active' : '' }}" @if(request()->routeIs('owner.dashboard')) aria-current="page" @endif>Owner Admin</a>
                                 <a href="{{ route('exports.index') }}" class="zazu-nav-link {{ request()->routeIs('exports.*') ? 'active' : '' }}" @if(request()->routeIs('exports.*')) aria-current="page" @endif>Data export &amp; recovery</a>
-                                <a href="{{ route('settings.index') }}" class="zazu-nav-link {{ request()->routeIs('settings.*') ? 'active' : '' }}">Settings</a>
+                                <a href="{{ route('settings.index') }}" class="zazu-nav-link {{ request()->routeIs('settings.index') ? 'active' : '' }}">Settings</a>
+                                <a href="{{ route('settings.compliance') }}" class="zazu-nav-link {{ request()->routeIs('settings.compliance*') ? 'active' : '' }}">Compliance</a>
+                                <a href="{{ route('settings.audit') }}" class="zazu-nav-link {{ request()->routeIs('settings.audit') ? 'active' : '' }}">Activity audit</a>
                                 <a href="{{ route('onboarding.index') }}" class="zazu-nav-link {{ request()->routeIs('onboarding.*') ? 'active' : '' }}">Setup</a>
                             @endif
                             @if($isPlatformAdmin)
