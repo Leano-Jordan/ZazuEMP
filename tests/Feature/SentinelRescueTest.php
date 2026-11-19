@@ -4,6 +4,7 @@ namespace Tests\Feature;
 
 use App\Models\Business;
 use App\Models\User;
+use App\Support\ZazuBusinessHealth;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
