@@ -43,7 +43,7 @@ final class PurgeNonFounderWorkspaces extends Command
         }
 
         $businesses = Business::query()
-            ->whereKeyNot($keepBusinessId)
+            ->where('id', '!=', $keepBusinessId)
             ->with(['users:id,name,email'])
             ->withCount(['customers', 'events'])
             ->orderBy('id')
@@ -89,7 +89,7 @@ final class PurgeNonFounderWorkspaces extends Command
         $orphanedUsers = User::query()
             ->whereIn('id', $candidateUserIds)
             ->whereDoesntHave('businesses')
-            ->whereKeyNot($keepUserId)
+            ->where('id', '!=', $keepUserId)
             ->get(['id', 'name', 'email']);
 
         $this->newLine();
