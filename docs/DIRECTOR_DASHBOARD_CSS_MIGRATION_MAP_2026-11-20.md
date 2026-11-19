@@ -112,3 +112,32 @@ Line numbers are source locations at the blob SHAs above; they must be refreshed
 No CSS declaration was moved or deleted in this pass. There is not yet a proven zero-difference subset of the hero/supporting-panel rules that can be safely consolidated without changing the current cascade. The apparent repetition is partly historical design evolution and partly a cross-file authority overlap.
 
 The first code migration should therefore be a coordinated relocation of a fully mapped dashboard-only token/theme group, not a partial hero rule cleanup. Before that change, map the exact start/end of the product authority's dashboard palette section and all responsive/theme blocks it owns; then update the source-ownership tests in the same commit. Do not move only the light-theme declarations.
+
+
+## Full product-file dashboard selector inventory — 2026-11-20
+
+A full-file selector scan of `zazu-product-authority.css` (blob `6173878b926561eba9f644c621d8a3ae63ce7b6c`, 1,885 lines) found **260 lines containing dashboard-scoped selectors**. They are not confined to the final Director token section.
+
+The first dashboard-scoped selector occurs at line 496. Further groups appear around lines 536-545, 786-789, 882-894, 1,038-1,110, 1,300 onward, and the final palette block at 1,680-1,885. The file therefore contains multiple generations of dashboard-specific rules interleaved with cross-module product rules.
+
+### Corrected migration boundary
+
+The final Director palette block is not a safe standalone move. Earlier product-file dashboard rules occur before it and include shell, hero, surface, responsive, and dark-theme declarations. Moving only the final block into the dashboard file would place it before those earlier product-file rules in the actual load order and could reverse existing winners.
+
+**Decision: do not relocate the final block alone.** The earlier recommendation to map that block as a self-contained migration unit is superseded by this full-file inventory.
+
+### Next required analysis
+
+1. Extract complete CSS rule blocks (not just selector lines) for all 260 dashboard-scoped selector lines.
+2. Preserve their original source order and record mixed-selector groups that also target non-dashboard pages.
+3. Separate pure dashboard-only blocks from mixed shared-shell blocks.
+4. For each pure dashboard block, determine whether it can be moved to dashboard authority while preserving its order relative to every other dashboard rule.
+5. For mixed selector lists, split selectors only when declarations and media/theme context remain identical; otherwise leave the shared rule in product authority.
+6. Update tests only alongside a verified move. In particular, preserve the product-level shared shell assertions and move dashboard-specific ownership assertions to dashboard CSS.
+
+### Status correction
+
+- Confirmed: dashboard-specific rules are distributed throughout product authority, not only in the tail section.
+- Confirmed: a tail-only relocation would risk changing cascade order.
+- No CSS or test source changed in this pass.
+- The migration boundary is now the complete ordered set of dashboard-scoped rules, not a single contiguous block.
