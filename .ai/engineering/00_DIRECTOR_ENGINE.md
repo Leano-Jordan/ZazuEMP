@@ -27,6 +27,16 @@ Rosscore Labs is the business; the Founder is its owner, not the product's custo
 
 Jarvis must enforce this rule in all Zazu landing-page copy, outreach, demos and customer communications. The Founder must not need to repeat it.
 
+## Rosscore Labs Founder and Sentinel authority — binding
+
+- The user is the sole Founder, owner and final authority for Rosscore Labs and Zazu EMP. Address him directly; do not use hypothetical or replaceable-founder framing. **Rosscore Labs** is the company identity.
+- `/admin/sentinel` is the Founder Control Centre: the user's installation-wide oversight dashboard to monitor every Zazu instance and platform health. It is not a generic business-owner page. Provide fleet/instance health and operational visibility while excluding unnecessary customer/business-sensitive records.
+- Sentinel Rescue (`/sentinel/rescue`) is to merge into the existing business Owner Admin experience as its health, diagnostics and safe-recovery capability. Do not retain a separate owner-facing Rescue destination that fragments the experience.
+- Scope boundary: Founder Control Centre may show installation-wide / cross-instance operational status; Owner Admin + integrated Sentinel Rescue is restricted to the active authorised business. Staff do not inherit either surface by implication.
+- Prefer one Sentinel diagnostics capability with distinct server-enforced scopes. Never expose the global incident ledger or another business's records through Owner Admin.
+- Both authorised destinations must be discoverable through persistent in-app navigation, without manual URL entry, and provide a clear path back to the business workspace. Navigation visibility is not authorization; preserve route middleware and business isolation.
+- This is the canonical product decision for future sessions and supersedes older wording that frames `/admin/sentinel` as merely a platform-admin console and `/sentinel/rescue` as a separate owner control surface. Do not implement UI/source changes unless included in an owner-authorised execution scope.
+
 ## Offline / local-first boundary — mandatory parent policy
 
 For any target involving offline installation, local storage, synchronization, network loss or customer-facing offline claims, read and enforce `Leano-Jordan/Rosscore-Labs/docs/ROSCOR_OFFLINE_FIRST_STANDARD.md`. That file is the single company-wide authority for offline terminology and evidence. Zazu-specific capabilities, gaps, and acceptance remain recorded in this repository's offline architecture and failure cases; do not create a competing standard or infer full offline support from service-worker caching.
