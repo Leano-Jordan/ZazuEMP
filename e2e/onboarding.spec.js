@@ -89,7 +89,7 @@ test('registration flows through onboarding into the dashboard', async ({ page }
     const logoutNavigation = page.waitForNavigation({ waitUntil: 'domcontentloaded' });
     await signOutButton.click();
     await expect.poll(() => logoutDialogs.length, {
-        message: 'logout should display its confirmation after the server reachability probe',
+        message: 'logout should display its confirmation before submitting the server-side session-ending request',
     }).toBe(1);
 
     const confirmation = logoutDialogs[0];
