@@ -1,3 +1,17 @@
+## Commercial direction adopted — 2026-11-19
+
+- Added the Founder-approved commercial positioning and execution direction to `docs/COMMERCIAL_ARCHITECTURE_RESEARCH_2026-11-16.md`.
+- Positioning: **Run your business. Manage every job. Know what you actually earn. Even offline.** Keep Zazu broad across event/catering and related service businesses; do not narrow to one trade without customer evidence.
+- Commercial proof remains the existing event/job → quote → acceptance → invoice → payment → purchasing/receiving → incurred costs → event contribution → export chain. Do not describe indicative event contribution as audited accounting profit.
+- WhatsApp quote handoff is an evaluation of the existing signed-link workflow, not approval for a new messaging subsystem. Inspect existing behavior before deciding whether a gap exists.
+- Trust requirements are clarified: POPIA operational sign-off remains open; invoice numbering does not establish SARS tax compliance; claims about privacy, export/recovery and offline capability must match demonstrated behavior.
+- First-impression priorities are the landing page, dashboard, quote workflow, signed public quote page and customer PDF. Improve the existing visual system; require rendered desktop/phone evidence for UI acceptance.
+- A fictional, ZAR-valued demo business is a commercial preparation task. Do not seed demo data into real customer installations.
+- This direction does not amend the V1 scope freeze or create new release gates. Engineering remains focused on existing V1 blockers and observed workflow defects.
+- No new branch created. Documentation committed directly to `main`.
+
+---
+
 ## Sentinel Owner Admin consolidation — 2026-11-19
 
 - Integrated business-scoped Sentinel checks into the existing `/owner` Owner Admin page. The checks are limited to read-only database response, active owner membership and this business's customer/event/service data paths; they do not call the installation-wide incident recorder or return global incident metadata.
