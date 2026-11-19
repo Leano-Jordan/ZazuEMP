@@ -8,8 +8,8 @@
     </x-slot:headerAction>
 
     <style nonce="{{ request()->attributes->get('cspNonce') }}">
-        .sentinel-wrap{display:grid;gap:1.25rem}
-        .sentinel-intro{display:flex;justify-content:space-between;gap:1rem;align-items:flex-start;padding:1.25rem;border:1px solid var(--zazu-border,#d9dee7);border-radius:18px;background:var(--zazu-surface,#fff)}
+        .sentinel-wrap{display:grid;gap:1rem;max-width:1440px;margin-inline:auto;padding-bottom:1.5rem}
+        .sentinel-intro{display:flex;justify-content:space-between;gap:1.25rem;align-items:center;padding:1.35rem;border:1px solid var(--zazu-border,#d9dee7);border-radius:18px;background:var(--zazu-surface,#fff)}
         .sentinel-kicker{font-size:.72rem;letter-spacing:.12em;text-transform:uppercase;font-weight:700;color:var(--zazu-muted,#687386)}
         .sentinel-title{font-size:1.45rem;font-weight:750;margin:.3rem 0}
         .sentinel-copy{color:var(--zazu-muted,#687386);max-width:58rem}
@@ -29,7 +29,7 @@
         .sentinel-stat{padding:1rem;border:1px solid var(--zazu-border,#d9dee7);border-radius:14px;background:var(--zazu-surface,#fff)}
         .sentinel-stat strong{display:block;font-size:1.55rem;font-variant-numeric:tabular-nums}
         .sentinel-stat span{font-size:.8rem;color:var(--zazu-muted,#687386)}
-        .sentinel-panel{padding:1rem;border:1px solid var(--zazu-border,#d9dee7);border-radius:16px;background:var(--zazu-surface,#fff);min-width:0}
+        .sentinel-panel{padding:1.2rem;border:1px solid var(--zazu-border,#d9dee7);border-radius:16px;background:var(--zazu-surface,#fff);min-width:0}
         .sentinel-panel h3{font-size:1rem;font-weight:700;margin:0 0 .8rem}
         .sentinel-search{display:flex;gap:.6rem;flex-wrap:wrap}
         .sentinel-search input{flex:1 1 16rem;min-width:0;border:1px solid var(--zazu-border,#d9dee7);border-radius:10px;padding:.7rem .85rem;background:var(--zazu-background,#fff);color:inherit}
@@ -73,7 +73,23 @@
         @media(max-width:800px){.sentinel-license-register-form{grid-template-columns:1fr}}
         .sentinel-license-facts{margin-top:.45rem}
         .sentinel-license-meta{font-size:.75rem}
-        .sentinel-license-pagination{margin-top:1rem}\n        .sentinel-account-list{display:grid;gap:.7rem;margin-top:.8rem}\n        .sentinel-account{display:grid;grid-template-columns:minmax(0,1.3fr) minmax(12rem,1fr) auto;gap:1rem;align-items:center;padding:.9rem;border:1px solid var(--zazu-border,#d9dee7);border-radius:12px}\n        .sentinel-account-meta{display:flex;gap:.45rem;flex-wrap:wrap;font-size:.78rem;color:var(--zazu-muted,#687386)}\n        .sentinel-account-users{font-size:.8rem;color:var(--zazu-muted,#687386)}\n        @media(max-width:800px){.sentinel-account{grid-template-columns:1fr}}
+        .sentinel-license-pagination{margin-top:1rem}
+        .sentinel-section-nav{display:flex;gap:.5rem;flex-wrap:wrap;padding:.25rem 0 .45rem;border-bottom:1px solid var(--zazu-border,#d9dee7)}
+        .sentinel-section-nav a{display:inline-flex;align-items:center;min-height:40px;padding:.5rem .8rem;border:1px solid var(--zazu-border,#d9dee7);border-radius:999px;text-decoration:none;font-size:.84rem;font-weight:650;color:inherit;background:var(--zazu-surface,#fff)}
+        .sentinel-account-list{display:grid;gap:.65rem;margin-top:1rem}
+        .sentinel-account{display:grid;grid-template-columns:minmax(0,1.25fr) minmax(13rem,1fr) auto;gap:1.1rem;align-items:center;padding:1rem;border:1px solid var(--zazu-border,#d9dee7);border-radius:12px}
+        .sentinel-account-meta{display:flex;gap:.45rem;flex-wrap:wrap;font-size:.78rem;color:var(--zazu-muted,#687386)}
+        .sentinel-account-users{font-size:.82rem;color:var(--zazu-muted,#687386);line-height:1.55;overflow-wrap:anywhere}
+        .sentinel-account-users strong{color:var(--zazu-text,#263445)}
+        .sentinel-account-created{font-size:.76rem;color:var(--zazu-muted,#687386);margin-top:.45rem}
+        .sentinel-account .sentinel-button{white-space:nowrap;text-align:center;min-width:9.5rem}
+        .sentinel-search{align-items:center;margin-top:.9rem}
+        .sentinel-search .sentinel-button{min-height:42px}
+        .sentinel-license-form .sentinel-button{min-height:40px}
+        .sentinel-stats{gap:.7rem}
+        .sentinel-stat{padding:1rem 1.1rem}
+        @media(max-width:900px){.sentinel-account{grid-template-columns:minmax(0,1fr) minmax(0,1fr)}.sentinel-account .sentinel-button{grid-column:1/-1;justify-self:start}}
+        @media(max-width:560px){.sentinel-panel{padding:.9rem}.sentinel-account{grid-template-columns:minmax(0,1fr);gap:.7rem}.sentinel-account .sentinel-button{grid-column:auto;width:100%}.sentinel-intro{padding:1rem}.sentinel-search input{flex-basis:100%}.sentinel-search .sentinel-button{flex:1}.sentinel-section-nav{gap:.4rem}.sentinel-section-nav a{flex:1;justify-content:center}.sentinel-license-row{padding:.85rem}.sentinel-license-form{align-items:stretch}.sentinel-license-form label{flex:1 1 9rem}.sentinel-license-form .sentinel-button{width:100%}}
         @media(max-width:800px){.sentinel-license-row{grid-template-columns:1fr}}
         @media(max-width:700px){.sentinel-stats{grid-template-columns:1fr}.sentinel-health-grid{grid-template-columns:1fr}.sentinel-intro{display:block}.sentinel-event{grid-template-columns:1fr}.sentinel-event dl{grid-template-columns:1fr 1fr}}
     </style>
@@ -82,17 +98,24 @@
         <section class="sentinel-intro">
             <div>
                 <div class="sentinel-kicker">Rosscore Labs · Founder control</div>
-                <h2 class="sentinel-title">Platform operations and licence control.</h2>
-                <p class="sentinel-copy">Review this installation's diagnostic evidence, investigate recurring failures and manage registered customer licences. Customer business records are not displayed here.</p>
+                <h2 class="sentinel-title">Founder operations and account oversight.</h2>
+                <p class="sentinel-copy">Manage customer business accounts, inspect ownership and membership, administer licences, and review this installation's platform diagnostics. Cross-business visibility does not grant access to customer workspaces.</p>
             </div>
             <span class="sentinel-pill">Founder only</span>
         </section>
 
+        <nav class="sentinel-section-nav" aria-label="Founder Control Centre sections">
+            <a href="#platform-accounts">Business accounts</a>
+            <a href="#licensing">Licensing</a>
+            <a href="#platform-health">Platform health</a>
+            <a href="#incident-patterns">Failure patterns</a>
+        </nav>
+
         <section class="sentinel-panel" id="platform-accounts">
             <div class="sentinel-health-overall">
                 <div>
-                    <h3>Platform business accounts</h3>
-                    <p class="sentinel-muted">Live records from Zazu's business database — separate from the manually maintained licensing registry. Founder visibility is cross-business; business workspaces remain isolated.</p>
+                    <h3>Business account directory</h3>
+                    <p class="sentinel-muted">Live business records, ordered by newest registration. Check the creation date and linked owner before treating an unfamiliar account as a real customer.</p>
                 </div>
                 <span class="sentinel-pill">{{ number_format($platformBusinesses->total()) }} matching accounts</span>
             </div>
@@ -106,6 +129,7 @@
                     <article class="sentinel-account">
                         <div>
                             <strong>{{ $platformBusiness->name }}</strong>
+                            <div class="sentinel-account-created">Created {{ $platformBusiness->created_at?->format('d M Y · H:i') ?? 'Date unavailable' }}</div>
                             <div class="sentinel-account-meta">
                                 <span class="sentinel-pill">{{ strtoupper($platformBusiness->status ?: 'unknown') }}</span>
                                 <span>{{ $platformBusiness->users_count }} user(s)</span>
@@ -114,8 +138,15 @@
                             </div>
                         </div>
                         <div class="sentinel-account-users">
-                            @forelse($platformBusiness->users->take(3) as $member)
-                                <div>{{ $member->name }} · {{ ucfirst($member->pivot->role ?? 'member') }}</div>
+                            @php($accountOwner = $platformBusiness->users->first(fn ($member) => ($member->pivot->role ?? null) === 'owner'))
+                            @if($accountOwner)
+                                <div><strong>Owner:</strong> {{ $accountOwner->name }}</div>
+                                <div>{{ $accountOwner->email }}</div>
+                            @else
+                                <div><strong>Owner:</strong> Not identified</div>
+                            @endif
+                            @forelse($platformBusiness->users->where('id', '!=', $accountOwner?->id)->take(2) as $member)
+                                <div>{{ $member->name }} · {{ ucfirst($member->pivot->role ?? 'member') }} · {{ $member->email }}</div>
                             @empty
                                 <div>No linked users</div>
                             @endforelse
@@ -133,12 +164,7 @@
             <p class="sentinel-muted sentinel-retention-note">This directory is read-only in this release. It does not expose customer records, financial data, passwords, authentication tokens or offline device secrets.</p>
         </section>
 
-        <section class="sentinel-panel" aria-labelledby="sentinel-installation-visibility">
-            <h3 id="sentinel-installation-visibility">Customer installation visibility</h3>
-            <p class="sentinel-muted">{{ number_format($customers->total()) }} registered installation record(s) match the current filter. This is the licensing registry, not a live fleet-health feed. Customer installations do not currently send remote health or connectivity reports, so licence status must not be read as proof that an installation is online or healthy.</p>
-        </section>
-
-        <section class="sentinel-panel" id="licensing">
+                <section class="sentinel-panel" id="licensing">
             <div class="sentinel-health-overall">
                 <div>
                     <h3>Registered installations · licensing &amp; entitlements</h3>
@@ -258,7 +284,7 @@
             <div class="sentinel-stat"><strong>{{ $latestIncident ?? '—' }}</strong><span>Most recent recorded incident</span></div>
         </section>
 
-        <section class="sentinel-panel" aria-label="Sentinel diagnostic health">
+        <section class="sentinel-panel" id="platform-health" aria-label="Sentinel diagnostic health">
             <div class="sentinel-health-overall">
                 <div>
                     <h3>This installation's Sentinel health</h3>
@@ -285,7 +311,7 @@
             </div>
         </section>
 
-        <section class="sentinel-panel">
+        <section class="sentinel-panel" id="incident-patterns">
             <h3>Search failure patterns</h3>
             <form method="GET" action="{{ route('admin.sentinel') }}" class="sentinel-search">
                 <input type="search" name="q" value="{{ $searchQuery }}" maxlength="120" placeholder="Fingerprint, error code, exception, failure class or source file" aria-label="Search incidents">
