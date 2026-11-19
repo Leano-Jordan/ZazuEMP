@@ -107,9 +107,19 @@ https://$($lanIp):$HttpsPort {
 "@
 Set-Content -Path $configPath -Value $config -Encoding ASCII
 
-$validation = & $caddy validate --config $configPath --adapter caddyfile 2>&1
-if ($LASTEXITCODE -ne 0) {
-    throw "Caddy rejected the generated LAN configuration: $($validation | Out-String)"
+# PowerShell 5.1 can promote native stderr output to a terminating
+# NativeCommandError when ErrorActionPreference is Stop. Caddy writes normal
+# informational diagnostics to stderr, so judge validation by its exit code.
+$previousErrorActionPreference = $ErrorActionPreference
+try {
+    $ErrorActionPreference = 'Continue'
+    $validation = & $caddy validate --config $configPath --adapter caddyfile 2>&1
+    $validationExitCode = $LASTEXITCODE
+} finally {
+    $ErrorActionPreference = $previousErrorActionPreference
+}
+if ($validationExitCode -ne 0) {
+    throw "Caddy rejected the generated LAN configuration (exit code $validationExitCode): $($validation | Out-String)"
 }
 
 # Validate the proxy before starting Laravel so a bad Caddy configuration
