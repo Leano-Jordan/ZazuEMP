@@ -53,7 +53,7 @@ class FounderBusinessDirectoryTest extends TestCase
             ->assertSee('North Catering')
             ->assertSee('north.owner@example.test')
             ->assertSee('Owner')
-            ->assertSee('Founder actions');
+            ->assertSee('Founder support access');
     }
 
     public function test_non_founder_cannot_view_platform_business_directory_or_details(): void
