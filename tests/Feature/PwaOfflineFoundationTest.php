@@ -6,6 +6,7 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\File;
 use Tests\TestCase;
 
+/** @SuppressWarnings(PHPMD.TooManyPublicMethods) */
 class PwaOfflineFoundationTest extends TestCase
 {
     use RefreshDatabase;
