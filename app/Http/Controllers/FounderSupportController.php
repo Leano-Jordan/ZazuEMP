@@ -22,6 +22,28 @@ final class FounderSupportController extends Controller
 
         $supportSession = DB::transaction(function () use ($request, $business, $validated): FounderSupportSession {
             $now = now();
+            $previousSessionId = $request->session()->get('zazu_founder_support_session_id');
+
+            if ($previousSessionId !== null) {
+                $previousSession = FounderSupportSession::query()
+                    ->whereKey($previousSessionId)
+                    ->where('actor_user_id', $request->user()->getAuthIdentifier())
+                    ->lockForUpdate()
+                    ->first();
+
+                if ($previousSession && $previousSession->isActive()) {
+                    $previousSession->forceFill([
+                        'ended_at' => $now,
+                        'ended_by_user_id' => $request->user()->getAuthIdentifier(),
+                    ])->save();
+
+                    $this->audit($request, $previousSession, 'founder.support.superseded', [
+                        'access_mode' => 'read_only',
+                        'replacement_business_id' => $business->id,
+                    ]);
+                }
+            }
+
             $session = FounderSupportSession::query()->create([
                 'actor_user_id' => $request->user()->getAuthIdentifier(),
                 'business_id' => $business->id,
@@ -96,7 +118,9 @@ final class FounderSupportController extends Controller
             $request->session()->forget('zazu_founder_support_session_id');
         }
 
-        return redirect()->route('admin.sentinel.businesses.show', $supportSession->business_id);
+        return $supportSession->business_id
+            ? redirect()->route('admin.sentinel.businesses.show', $supportSession->business_id)
+            : redirect()->route('admin.sentinel');
     }
 
     private function audit(Request $request, FounderSupportSession $supportSession, string $action, array $metadata = []): void
