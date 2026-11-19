@@ -116,6 +116,7 @@ Route::middleware(['auth', 'auth.session', 'owner'])->group(function () {
 
 Route::middleware(['auth', 'auth.session', 'sentinel.admin'])->group(function () {
     Route::get('/admin/sentinel', [SentinelController::class, 'index'])->name('admin.sentinel');
+    Route::get('/admin/sentinel/businesses/{business}', [SentinelController::class, 'showBusiness'])->whereNumber('business')->name('admin.sentinel.businesses.show');
     Route::post('/admin/sentinel/licence-customers', [SentinelLicenseController::class, 'register'])->middleware('throttle:10,1')->name('admin.sentinel.licence-customers.store');
     Route::post('/admin/sentinel/licences', [SentinelLicenseController::class, 'issue'])->middleware('throttle:10,1')->name('admin.sentinel.licences.issue');
     Route::post('/admin/sentinel/licence-customers/{customer}/revoke', [SentinelLicenseController::class, 'revoke'])->middleware('throttle:10,1')->name('admin.sentinel.licences.revoke');
