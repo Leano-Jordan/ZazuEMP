@@ -55,9 +55,10 @@ class ZazuIssueLicenseCommandTest extends TestCase
         ]);
 
         $this->assertSame(0, $exitCode);
-        $this->assertMatchesRegularExpression('/^TOKEN: [A-Za-z0-9_-]+\.[A-Za-z0-9_-]+$/m', Artisan::output());
+        $output = Artisan::output();
+        $this->assertMatchesRegularExpression('/^TOKEN: [A-Za-z0-9_-]+\.[A-Za-z0-9_-]+$/m', $output);
 
-        preg_match('/^TOKEN: ([A-Za-z0-9_-]+\.[A-Za-z0-9_-]+)$/m', Artisan::output(), $matches);
+        preg_match('/^TOKEN: ([A-Za-z0-9_-]+\.[A-Za-z0-9_-]+)$/m', $output, $matches);
         $this->assertArrayHasKey(1, $matches);
 
         $verified = app(SignedOfflineLicenseVerifier::class)->verifyForBusiness($matches[1], $this->businessUuid);
