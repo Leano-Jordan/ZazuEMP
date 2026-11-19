@@ -113,12 +113,12 @@
                     </div>
                     @endif
                     @if($isOwner || $isPlatformAdmin)
-                    <div class="zazu-nav-area {{ request()->routeIs('settings.*','admin.*','onboarding.*','sentinel.rescue') ? 'is-active' : '' }}" data-zazu-nav-area>
+                    <div class="zazu-nav-area {{ request()->routeIs('owner.dashboard','settings.*','admin.*','onboarding.*') ? 'is-active' : '' }}" data-zazu-nav-area>
                         <button type="button" class="zazu-nav-area-trigger" data-zazu-nav-trigger aria-expanded="false" aria-controls="zazu-nav-system"><span class="zazu-nav-area-title">System</span><span class="zazu-nav-area-chevron" aria-hidden="true">›</span></button>
                         <div class="zazu-nav-flyout" id="zazu-nav-system" data-zazu-nav-panel><div class="zazu-nav-flyout-links">
                             @if($isOwner)
+                                <a href="{{ route('owner.dashboard') }}" class="zazu-nav-link {{ request()->routeIs('owner.dashboard') ? 'active' : '' }}" @if(request()->routeIs('owner.dashboard')) aria-current="page" @endif>Owner Admin</a>
                                 <a href="{{ route('settings.index') }}" class="zazu-nav-link {{ request()->routeIs('settings.*') ? 'active' : '' }}">Settings</a>
-                                <a href="{{ route('sentinel.rescue') }}" class="zazu-nav-link {{ request()->routeIs('sentinel.rescue') ? 'active' : '' }}">Sentinel Rescue</a>
                                 <a href="{{ route('onboarding.index') }}" class="zazu-nav-link {{ request()->routeIs('onboarding.*') ? 'active' : '' }}">Setup</a>
                             @endif
                             @if($isPlatformAdmin)
