@@ -463,11 +463,13 @@ The service worker serves `/zazu-offline.js` and `/offline-attachments.js` cache
 
 
 
-## Logout requires a reachable authentication host
+## Logout request and offline boundary
 
-The Laravel web session cookie is server-managed. A disconnected browser cannot reliably complete the `POST /logout` action. The active client probes the same-origin health endpoint with a bounded, uncached `GET /up` request before submitting logout. If the host cannot be reached, it keeps the local workspace, queue and device token intact and asks the user to reconnect before trying again.
+The Laravel web session cookie is server-managed. The client submits the actual CSRF-protected `POST /logout` request directly; a separate `GET /up` preflight is deliberately avoided because it adds a network race and can block a valid logout request.
 
-A successful probe does not guarantee that the subsequent logout POST cannot fail; this remains a normal network race. The actual installed-device and disconnected-server acceptance remains required.
+The client confirms logout only after Laravel returns a successful redirect. If the request fails or the server cannot be reached, it tells the user that the web session remains active, keeps the business-scoped offline workspace, queued mutations, attachments and trusted-device credential untouched, and allows a retry. It does not pretend that clearing browser state is equivalent to invalidating the server session.
+
+Only after the server confirms logout does the client ask the service worker to clear authenticated page cache. This cache cleanup is best-effort; the server-side session invalidation remains authoritative. Regression coverage must exercise a failed logout POST, successful logout/re-login, and preservation of queued business work.
 
 
 ## Authenticated page-cache generation boundary
