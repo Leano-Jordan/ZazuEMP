@@ -17,6 +17,7 @@ use App\Http\Controllers\EventAttachmentController;
 use App\Http\Controllers\ExperiencePreferenceController;
 use App\Http\Controllers\SearchController;
 use App\Http\Controllers\SentinelController;
+use App\Http\Controllers\FounderSupportController;
 use App\Http\Controllers\SentinelLicenseController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\FinanceController;
@@ -117,6 +118,9 @@ Route::middleware(['auth', 'auth.session', 'owner'])->group(function () {
 Route::middleware(['auth', 'auth.session', 'sentinel.admin'])->group(function () {
     Route::get('/admin/sentinel', [SentinelController::class, 'index'])->name('admin.sentinel');
     Route::get('/admin/sentinel/businesses/{business}', [SentinelController::class, 'showBusiness'])->whereNumber('business')->name('admin.sentinel.businesses.show');
+    Route::post('/admin/sentinel/businesses/{business}/support', [FounderSupportController::class, 'start'])->whereNumber('business')->middleware('throttle:5,1')->name('admin.sentinel.support.start');
+    Route::get('/admin/sentinel/support/{supportSession}', [FounderSupportController::class, 'show'])->middleware(\App\Http\Middleware\EnsureFounderSupportSession::class)->name('admin.sentinel.support.show');
+    Route::post('/admin/sentinel/support/{supportSession}/end', [FounderSupportController::class, 'end'])->name('admin.sentinel.support.end');
     Route::post('/admin/sentinel/licence-customers', [SentinelLicenseController::class, 'register'])->middleware('throttle:10,1')->name('admin.sentinel.licence-customers.store');
     Route::post('/admin/sentinel/licences', [SentinelLicenseController::class, 'issue'])->middleware('throttle:10,1')->name('admin.sentinel.licences.issue');
     Route::post('/admin/sentinel/licence-customers/{customer}/revoke', [SentinelLicenseController::class, 'revoke'])->middleware('throttle:10,1')->name('admin.sentinel.licences.revoke');
