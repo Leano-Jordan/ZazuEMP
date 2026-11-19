@@ -135,17 +135,17 @@ test('unreachable logout host preserves the signed-in session and queued busines
         else await dialog.accept();
     });
 
-    await page.route('**/up', route => route.abort());
+    await page.route('**/logout', route => route.abort());
     await openPublicNavigation(page);
     await page.locator('nav[aria-label="Public navigation"]').getByRole('button', { name: 'Sign out', exact: true }).click();
 
     await expect.poll(() => dialogs.length).toBe(1);
     expect(dialogs[0].type).toBe('alert');
-    expect(dialogs[0].message).toContain('Your business offline workspace, pending changes and device token were left untouched');
+    expect(dialogs[0].message).toContain('could not reach the server to end your session');
     await expect(page).toHaveURL(/\/$/);
     await expect(page.locator('nav[aria-label="Public navigation"]').getByText("You’re signed in", { exact: true })).toBeVisible();
 
-    await page.unroute('**/up');
+    await page.unroute('**/logout');
     await page.goto('/dashboard', { waitUntil: 'domcontentloaded' });
     await expect(page.getByRole('heading', { name: 'Dashboard' })).toBeVisible();
     await waitForOfflineRuntime(page);
