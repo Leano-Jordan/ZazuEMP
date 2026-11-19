@@ -1,3 +1,16 @@
+## Authority and product-surface decision — 2026-11-19
+
+This section is the current product authority and supersedes older surface naming/placement language below where it conflicts.
+
+- **Rosscore Labs Founder Control Centre — `/admin/sentinel`:** the sole Founder’s installation-wide oversight dashboard for monitoring every Zazu instance and platform health. It should show fleet/instance health, operational state and actionable platform signals without exposing unnecessary customer/business-sensitive records. It is not a generic business-owner dashboard.
+- **Business Owner Admin with integrated Sentinel Rescue:** Sentinel Rescue (`/sentinel/rescue`) is to be merged into the existing Owner Admin experience as the business's health, diagnostics and safe-recovery capability. It should not remain a separate owner-facing page or navigation destination. Remove duplicated owner dashboard information when implementing this consolidation, based on actual source inspection.
+- **Scope boundary:** Founder Control Centre provides cross-instance/platform operational oversight. Owner Admin and its integrated Sentinel capability are restricted to the active authorised business. Do not expose the installation-wide incident ledger, another business's incident metadata or customer records through Owner Admin.
+- **Shared capability, separate scopes:** reuse one Sentinel health/diagnostics engine where practical, with explicit server-enforced scope filtering. Do not weaken `sentinel.admin`, `business.context`, `owner` or other route authorization to make navigation work.
+- **Navigation:** each authorised surface must be discoverable through persistent in-app navigation without manual URL entry. Preserve a clear return path from Founder Control Centre to the business workspace. Hiding a link is not authorization; direct-route access must remain protected.
+- **Implementation status:** this is the agreed direction, not an implementation claim. Existing routes/views and navigation predicates must be inspected before changes. No source, route, permission or UI change is implied by this documentation entry.
+
+---
+
 # Sentinel — Local Operations & Diagnostic Control Centre
 
 **Status:** Engineering mandate, active V1 support work  
