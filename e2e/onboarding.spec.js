@@ -14,8 +14,9 @@ test('registration flows through onboarding into the dashboard', async ({ page }
     // Playwright. Never run it against a developer's normal Zazu database.
     // Opt in only after explicitly pointing the server at a disposable E2E DB.
     test.skip(
-        process.env.ZAZU_E2E_ALLOW_REGISTRATION !== '1',
-        'Registration mutates the server database; enable only for an isolated disposable E2E database.',
+        process.env.ZAZU_E2E_ALLOW_REGISTRATION !== '1'
+            || process.env.ZAZU_E2E_ISOLATED_DATABASE !== '1',
+        'Registration mutates the server database; both explicit opt-ins are required, and the server must use a disposable E2E database.',
     );
     test.skip(testInfo.project.name !== 'chromium', 'The complete registration flow runs once to avoid shared-IP registration throttling; responsive entry surfaces are covered separately.');
     const unique = globalThis.crypto.randomUUID()
