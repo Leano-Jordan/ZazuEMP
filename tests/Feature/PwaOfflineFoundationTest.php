@@ -322,7 +322,8 @@ class PwaOfflineFoundationTest extends TestCase
         $client = File::get(public_path('zazu-offline.js'));
         $worker = File::get(public_path('sw.js'));
 
-        $this->assertStringContainsString("slice(0, 8)", $client);
+        $this->assertStringContainsString("if (!/^\\d{8}$/.test(normalizedCode))", $client);
+        $this->assertStringContainsString("pairing_code: normalizedCode", $client);
         $this->assertStringNotContainsString("slice(0, 6)", $client);
         $this->assertStringContainsString("data-zazu-phone-pairing-submit", $app);
         $this->assertStringNotContainsString("window.prompt('Enter the 8-digit Zazu phone pairing code", $app);
