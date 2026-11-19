@@ -1634,7 +1634,7 @@
                 'Accept': 'application/json',
             },
             body: JSON.stringify({
-                pairing_code: String(pairingCode).replace(/\D/g, '').slice(0, 6),
+                pairing_code: String(pairingCode).replace(/\D/g, '').slice(0, 8),
                 device_name: 'Zazu phone',
                 device_type: 'phone',
             }),
