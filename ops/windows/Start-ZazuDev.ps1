@@ -5,6 +5,7 @@ param(
     [string]$PhpPath,
     [switch]$Lan,
     [switch]$BuiltAssetsOnly,
+    [switch]$SecureCookies,
     [ValidateRange(1024, 65535)]
     [int]$Port = 8000,
     [switch]$Stop
@@ -270,6 +271,22 @@ if ($parsedVersion -lt [version]'8.4') {
     throw "Zazu requires PHP 8.4+. Found $phpVersion at $php."
 }
 
+if ($SecureCookies) {
+    # A cached Laravel config would otherwise retain the HTTP installer setting.
+    $configCache = Join-Path $ProjectPath 'bootstrap\cache\config.php'
+    if (Test-Path $configCache -PathType Leaf) {
+        Push-Location $ProjectPath
+        try {
+            & $php $artisan 'config:clear' '--no-interaction'
+            if ($LASTEXITCODE -ne 0) {
+                throw 'Could not clear Laravel configuration cache before enabling HTTPS-only session cookies.'
+            }
+        } finally {
+            Pop-Location
+        }
+    }
+}
+
 $listeners = Get-ZazuListener
 if ($listeners.Count -gt 0) {
     $alreadyZazu = $true
@@ -393,7 +410,19 @@ $stamp = Get-Date -Format 'yyyyMMdd-HHmmss'
 $stdout = Join-Path $logDirectory "zazu-dev-$stamp.out.log"
 $stderr = Join-Path $logDirectory "zazu-dev-$stamp.err.log"
 
-$process = Start-Process -FilePath $php -ArgumentList @('artisan', 'serve', "--host=$BindAddress", "--port=$Port") -WorkingDirectory $ProjectPath -RedirectStandardOutput $stdout -RedirectStandardError $stderr -WindowStyle Hidden -PassThru
+$previousSecureCookieValue = [Environment]::GetEnvironmentVariable('SESSION_SECURE_COOKIE', 'Process')
+try {
+    if ($SecureCookies) {
+        # Override the installer’s localhost-HTTP default only for this HTTPS-hosted PHP process.
+        $env:SESSION_SECURE_COOKIE = 'true'
+    }
+
+    $process = Start-Process -FilePath $php -ArgumentList @('artisan', 'serve', "--host=$BindAddress", "--port=$Port") -WorkingDirectory $ProjectPath -RedirectStandardOutput $stdout -RedirectStandardError $stderr -WindowStyle Hidden -PassThru
+} finally {
+    if ($SecureCookies) {
+        [Environment]::SetEnvironmentVariable('SESSION_SECURE_COOKIE', $previousSecureCookieValue, 'Process')
+    }
+}
 
 function Get-ZazuStartupLogTail {
     $sections = @()
