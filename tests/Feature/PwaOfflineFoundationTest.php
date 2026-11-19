@@ -68,9 +68,13 @@ class PwaOfflineFoundationTest extends TestCase
         $this->assertStringNotContainsString('primeInstalledPages(registration)', $app);
         $this->assertStringContainsString('window.ZazuOffline.pair(code)', $app);
         $this->assertStringContainsString("document.querySelectorAll('a[href]')", $app);
-        $this->assertStringContainsString('async function loadZazuOfflineClient()', $app);
-        $this->assertStringContainsString("script.src = '/zazu-offline.js';", $app);
-        $this->assertStringContainsString('window.__ZAZU_OFFLINE_DEFER_INITIAL_SYNC = true;', $app);
+        $layout = File::get(resource_path('views/components/app-layout.blade.php'));
+        $offlineScriptPosition = strpos($layout, '<script src="/zazu-offline.js" defer></script>');
+        $viteScriptPosition = strpos($layout, "@vite(['resources/css/app.css'");
+        $this->assertNotFalse($offlineScriptPosition);
+        $this->assertNotFalse($viteScriptPosition);
+        $this->assertLessThan($viteScriptPosition, $offlineScriptPosition);
+        $this->assertStringContainsString('<script src="/zazu-offline.js" defer></script>', $html);
         $this->assertStringContainsString('window.__ZAZU_OFFLINE_DEFER_INITIAL_SYNC !== true', $client);
         $boot = substr($client, strpos($client, 'async function boot()'));
         $readyPosition = strpos($boot, 'resolveReady(state);');
