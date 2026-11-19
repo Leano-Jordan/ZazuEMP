@@ -1,3 +1,13 @@
+## Sentinel Owner Admin consolidation — 2026-11-19
+
+- Integrated business-scoped Sentinel checks into the existing `/owner` Owner Admin page. The checks are limited to read-only database response, active owner membership and this business's customer/event/service data paths; they do not call the installation-wide incident recorder or return global incident metadata.
+- Removed the standalone Sentinel Rescue controller/view. The authenticated owner-only legacy `/sentinel/rescue` route redirects to `/owner#business-health`. Persistent System navigation now exposes Owner Admin; the Founder destination is labelled Founder Control Centre and provides a direct return to the business workspace when one is active.
+- Removed the Owner Admin metric tiles that repeated dashboard metrics. The page now focuses on business health and owner actions (settings, audit, business export/recovery, compliance and services).
+- Founder Control Centre now states that the registered customer licensing registry is not live fleet telemetry. Remote customer installations do not currently report health/connectivity; no heartbeat or remote telemetry was introduced.
+- Focused feature coverage was updated/added. **Tests and rendered UI are not yet verified on the runtime or exact CI head.** No branch was created; all changes were committed directly to `main`.
+
+---
+
 ## Rosscore Labs Founder Control Centre and Sentinel direction — 2026-11-19
 
 - The user is the sole Founder, owner and final authority for Rosscore Labs and Zazu EMP. Address him directly; never frame the Founder as hypothetical, replaceable or a role that may pass to someone else. Company identity: **Rosscore Labs**.
