@@ -76,7 +76,7 @@ Code inspection found that the attachment IndexedDB open handler treated the Ind
 
 The 4 November open acceptance matrix has been advanced with current-main regressions:
 
-- `e2e/offline-session-transition.spec.js` seeds a paired business-scoped device workspace and a pending customer mutation, makes the same-origin `/up` probe unreachable, and verifies logout is blocked with the safety alert while the authenticated session and pending mutation remain intact. It then restores reachability, completes account logout, signs into the same account again and verifies the business device pairing and pending mutation remain available.
+- `e2e/offline-session-transition.spec.js` seeds a paired business-scoped device workspace and a pending customer mutation, aborts the actual `POST /logout`, and verifies the failure is reported while the authenticated session, device pairing and pending mutation remain intact. It then restores the route, completes account logout, signs into the same business account again and verifies the business device pairing and pending mutation remain available. The client no longer performs a separate `/up` preflight.
 - `SyncDeviceManagementTest` now verifies owner revocation rejects the previously valid bearer token across bootstrap, pull, push and attachment-list endpoints, not only bootstrap.
 - Existing cross-business owner-revocation denial remains covered.
 
