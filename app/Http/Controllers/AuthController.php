@@ -6,6 +6,7 @@ use App\Models\Business;
 use App\Models\User;
 use App\Services\RegisterBusiness;
 use App\Support\CurrentBusiness;
+use App\Support\ZazuBusinessHealth;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -189,23 +190,12 @@ class AuthController extends Controller
         return redirect()->route('onboarding.catalogue');
     }
 
-    public function owner(): View
+    public function owner(ZazuBusinessHealth $healthService): View
     {
         $business = app(CurrentBusiness::class)->model(request()->user());
-        $ownerCount = $business->users()->wherePivot('role', 'owner')->count();
-        $staffCount = $business->users()->wherePivot('role', 'staff')->count();
-        $customerCount = $business->customers()->count();
-        $jobCount = $business->events()->whereNotIn('status', ['completed', 'cancelled'])->count();
-        $capabilityCount = $business->capabilities()->where('is_active', true)->count();
+        $health = $healthService->inspect($business, request()->user());
 
-        return view('owner.index', compact(
-            'business',
-            'ownerCount',
-            'staffCount',
-            'customerCount',
-            'jobCount',
-            'capabilityCount'
-        ));
+        return view('owner.index', compact('business', 'health'));
     }
 
     public function destroy(Request $request): RedirectResponse
