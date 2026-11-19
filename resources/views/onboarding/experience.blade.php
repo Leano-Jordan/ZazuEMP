@@ -6,7 +6,9 @@
             <span class="zazu-eyebrow">Setup · Workspace tier and preference</span>
             <h2>What do you mainly provide?</h2>
             <p>Choose your main business focus and the level of detail you want to see. Your workspace tier controls the maximum experience; roles and permissions still control actions and records.</p>
-            @if($isTrial)
+            @if($isFounder)
+                <p class="zazu-field-help mt-3" role="status">Founder access: all experience levels are available to this configured account. This does not change the business licence or customer entitlements.</p>
+            @elseif($isTrial)
                 <p class="zazu-field-help mt-3" role="status">Your 30-day Advanced trial ends {{ $trialEndsAt?->format('j M Y') }}. It moves to Basic Free at expiry unless you actively install a paid entitlement.</p>
             @else
                 <p class="zazu-field-help mt-3" role="status">Workspace tier: <strong>{{ $maximumLevelLabel }}</strong>. You can select this tier or a lower experience.</p>
