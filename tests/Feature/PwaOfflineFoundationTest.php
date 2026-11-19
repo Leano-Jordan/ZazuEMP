@@ -126,6 +126,11 @@ class PwaOfflineFoundationTest extends TestCase
         $this->assertStringContainsString('let activeUserGeneration = 0;', $worker);
         $this->assertStringContainsString('requestGeneration !== activeUserGeneration', $worker);
         $this->assertStringContainsString("url.pathname === '/logout'", $worker);
+        $logoutBoundary = substr($worker, strpos($worker, "url.pathname === '/logout'"), strpos($worker, "url.pathname === '/business/switch'") - strpos($worker, "url.pathname === '/logout'"));
+        $this->assertStringContainsString('event.respondWith((async () => {', $logoutBoundary);
+        $this->assertStringContainsString('const response = await fetch(request);', $logoutBoundary);
+        $this->assertStringContainsString('if (response.ok && response.redirected) await clearActiveContext();', $logoutBoundary);
+        $this->assertStringNotContainsString('event.waitUntil(clearActiveContext())', $logoutBoundary);
         $this->assertStringContainsString("url.pathname === '/business/switch'", $worker);
         $this->assertStringContainsString('data-zazu-business-id', $worker);
         $this->assertStringContainsString('cacheRenderedPage(request, response.clone(), requestGeneration)', $worker);
