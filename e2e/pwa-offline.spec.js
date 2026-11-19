@@ -1931,7 +1931,26 @@ test.describe('Zazu installed PWA offline shell', () => {
         await expect(detail.getByText(/Line total 10000\.00/)).toBeVisible();
         await expect(detail.getByText(/Balance ZAR 5000\.00/)).toBeVisible();
 
-        await detail.getByRole('button', { name: 'Close' }).click();
+        await detail.getByRole('button', { name: 'Accept quote offline' }).click();
+        await expect.poll(() => page.evaluate(localId =>
+            window.ZazuOffline.getState().quotes.find(item => item.local_id === localId)?.status,
+        quoteLocalId)).toBe('accepted');
+
+        const acceptanceMutation = await page.evaluate(async localId => {
+            const queued = await window.ZazuOffline.pending();
+            const mutation = queued.find(item => item.entity_type === 'quote_acceptance');
+            return mutation ? {
+                quote_local_id: mutation.payload.record.quote_local_id,
+                customer_name: mutation.payload.record.customer_name,
+                status: mutation.status,
+            } : null;
+        }, quoteLocalId);
+        expect(acceptanceMutation).toEqual({
+            quote_local_id: quoteLocalId,
+            customer_name: 'Offline quote customer',
+            status: 'pending',
+        });
+
         await expect(detail).toBeHidden();
     });
 
