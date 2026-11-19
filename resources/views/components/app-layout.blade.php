@@ -120,7 +120,7 @@
                         <a href="{{ route('admin.sentinel') }}" class="zazu-nav-link {{ request()->routeIs('admin.sentinel') ? 'active' : '' }}" @if(request()->routeIs('admin.sentinel')) aria-current="page" @endif>Founder Control Centre</a>
                     @endif
                     @if($isOwner || $isPlatformAdmin)
-                    <div class="zazu-nav-area {{ request()->routeIs('settings.*','admin.*','onboarding.*') ? 'is-active' : '' }}" data-zazu-nav-area>
+                    <div class="zazu-nav-area {{ request()->routeIs('owner.dashboard','settings.*','admin.*','onboarding.*','exports.*') ? 'is-active' : '' }}" data-zazu-nav-area>
                         <button type="button" class="zazu-nav-area-trigger" data-zazu-nav-trigger aria-expanded="false" aria-controls="zazu-nav-system"><span class="zazu-nav-area-title">System</span><span class="zazu-nav-area-chevron" aria-hidden="true">›</span></button>
                         <div class="zazu-nav-flyout" id="zazu-nav-system" data-zazu-nav-panel><div class="zazu-nav-flyout-links">
                             @if($isOwner)
