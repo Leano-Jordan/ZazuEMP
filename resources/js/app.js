@@ -2096,6 +2096,58 @@ function setupZazuOfflineDirectoryViews() {
             );
             const currentQuoteServerId = Number(currentQuote.server_id ?? currentQuote.id ?? serverId ?? 0);
             const version = currentQuote.latest_version || currentQuote.latestVersion || {};
+
+            // Expose the existing quote-acceptance queue from the local quote
+            // view, so acceptance does not depend on a cached Laravel detail page.
+            if (currentQuote.status === 'sent' && version.status === 'sent') {
+                const acceptance = document.createElement('div');
+                acceptance.className = 'zazu-work-actions mt-3';
+                const acceptButton = document.createElement('button');
+                acceptButton.type = 'button';
+                acceptButton.className = 'zazu-btn zazu-btn-primary';
+                acceptButton.textContent = 'Accept quote offline';
+                const acceptanceStatus = document.createElement('p');
+                acceptanceStatus.className = 'zazu-panel-copy';
+                acceptanceStatus.setAttribute('role', 'status');
+                acceptButton.addEventListener('click', async () => {
+                    const latestState = window.ZazuOffline?.getState();
+                    const latestQuote = latestState?.quotes?.find(item =>
+                        item.local_id === currentQuote.local_id
+                    );
+                    const latestVersion = latestQuote?.latest_version || latestQuote?.latestVersion;
+                    if (!latestQuote?.local_id || latestQuote.status !== 'sent' || latestVersion?.status !== 'sent') {
+                        acceptanceStatus.textContent = 'This quote is no longer awaiting acceptance in the local workspace. Refresh after reconnecting.';
+                        acceptButton.disabled = true;
+                        return;
+                    }
+
+                    const nextState = JSON.parse(JSON.stringify(latestState));
+                    const nextQuote = nextState.quotes.find(item => item.local_id === latestQuote.local_id);
+                    nextQuote.status = 'accepted';
+                    if (nextQuote.latest_version) nextQuote.latest_version.status = 'accepted';
+                    if (nextQuote.latestVersion) nextQuote.latestVersion.status = 'accepted';
+
+                    acceptButton.disabled = true;
+                    acceptButton.textContent = 'Saving acceptance…';
+                    try {
+                        await window.ZazuOffline.queueMutation('quote_acceptance', 'create', {
+                            local_id: crypto.randomUUID(),
+                            server_id: null,
+                            quote_local_id: nextQuote.local_id,
+                            customer_name: customer?.name || job?.customer_name || 'Customer',
+                        }, nextState);
+                        acceptanceStatus.textContent = 'Acceptance saved on this device and queued for server validation.';
+                        window.dispatchEvent(new CustomEvent('zazu:offline-state-updated'));
+                    } catch (error) {
+                        acceptButton.disabled = false;
+                        acceptButton.textContent = 'Accept quote offline';
+                        acceptanceStatus.textContent = error?.message || 'Acceptance could not be saved on this device.';
+                    }
+                });
+                acceptance.append(acceptButton, acceptanceStatus);
+                panel.append(acceptance);
+            }
+
             const fields = [
                 ['Status', String(currentQuote.status || version.status || 'draft').replace(/_/g, ' ')],
                 ['Version', version.version ? String(version.version) : null],
