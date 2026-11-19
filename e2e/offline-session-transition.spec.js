@@ -138,11 +138,17 @@ test('unreachable logout host preserves the signed-in session and queued busines
     // Simulate a genuinely disconnected installed client. A page-level route
     // abort can miss the POST when the service worker owns the fetch event.
     await page.context().setOffline(true);
-    await openPublicNavigation(page);
-    await page.locator('nav[aria-label="Public navigation"]').getByRole('button', { name: 'Sign out', exact: true }).click();
+    // Exercise the actual logout form directly; the menu's responsive visibility
+    // is covered elsewhere and must not make this session-safety assertion flaky.
+    await page.evaluate(() => {
+        const form = document.querySelector('form[action$="/logout"]');
+        if (!form) throw new Error('Logout form was not found');
+        form.requestSubmit();
+    });
 
     await expect.poll(() => dialogs.length).toBe(2);
     expect(dialogs[0].type).toBe('confirm');
+    expect(dialogs[0].message).toContain('Signing out ends this web session');
     expect(dialogs[1].type).toBe('alert');
     expect(dialogs[1].message).toContain('could not reach the server to end your session');
     await expect(page).toHaveURL(/\/$/);
