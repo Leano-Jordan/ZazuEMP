@@ -89,9 +89,16 @@ final class SentinelController extends Controller
     {
         $business->load(['users' => fn ($users) => $users->orderBy('name')]);
         $business->loadCount(['users', 'customers', 'events']);
+        $supportSessions = FounderSupportSession::query()
+            ->with('actor:id,name,email')
+            ->where('business_id', $business->id)
+            ->latest('started_at')
+            ->limit(10)
+            ->get();
 
         return view('admin.sentinel-business', [
             'business' => $business,
+            'supportSessions' => $supportSessions,
         ]);
     }
 }
