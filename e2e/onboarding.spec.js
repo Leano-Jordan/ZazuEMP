@@ -9,6 +9,14 @@ async function openPublicNavigation(page) {
 
 test('registration flows through onboarding into the dashboard', async ({ page }, testInfo) => {
     test.setTimeout(60_000);
+
+    // This flow creates a permanent user + business in the database served by
+    // Playwright. Never run it against a developer's normal Zazu database.
+    // Opt in only after explicitly pointing the server at a disposable E2E DB.
+    test.skip(
+        process.env.ZAZU_E2E_ALLOW_REGISTRATION !== '1',
+        'Registration mutates the server database; enable only for an isolated disposable E2E database.',
+    );
     test.skip(testInfo.project.name !== 'chromium', 'The complete registration flow runs once to avoid shared-IP registration throttling; responsive entry surfaces are covered separately.');
     const unique = globalThis.crypto.randomUUID()
         .replace(/[^a-zA-Z0-9]/g, '')
