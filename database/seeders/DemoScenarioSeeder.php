@@ -32,6 +32,7 @@ use App\Models\TaxRate;
 use App\Models\User;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Str;
 
 class DemoScenarioSeeder extends Seeder
 {
