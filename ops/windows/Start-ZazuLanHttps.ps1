@@ -36,12 +36,14 @@ if (-not $wifiProfile) {
 $wifiAddress = Get-NetIPAddress -InterfaceIndex $wifiProfile.InterfaceIndex -AddressFamily IPv4 -ErrorAction Stop |
     Where-Object {
         $_.AddressState -eq 'Preferred' -and
-        $_.IPAddress -notmatch '^(127\.|169\.254\.)'
+        ($_.IPAddress -match '^10\.' -or
+            $_.IPAddress -match '^192\.168\.' -or
+            $_.IPAddress -match '^172\.(1[6-9]|2[0-9]|3[01])\.')
     } |
     Select-Object -First 1
 
 if (-not $wifiAddress) {
-    throw "No usable IPv4 address was found on '$($wifiProfile.InterfaceAlias)'."
+    throw "No RFC1918 private IPv4 address was found on '$($wifiProfile.InterfaceAlias)'."
 }
 
 $lanIp = $wifiAddress.IPAddress
@@ -82,6 +84,7 @@ $startArguments = @{
     BindAddress = '127.0.0.1'
     Port = $AppPort
     BuiltAssetsOnly = $true
+    SecureCookies = $true
 }
 if (-not [string]::IsNullOrWhiteSpace($PhpPath)) {
     $startArguments.PhpPath = $PhpPath
@@ -107,6 +110,9 @@ if ($LASTEXITCODE -ne 0) {
 
 # Validate the proxy before starting Laravel so a bad Caddy configuration
 # cannot leave an otherwise-unreachable application process running.
+# Replace an earlier localhost-HTTP process so it cannot keep issuing non-Secure
+# session cookies after the browser moves to this HTTPS origin.
+& $startServer -Stop -Port $AppPort
 & $startServer @startArguments
 
 Remove-Item $pidPath -Force -ErrorAction SilentlyContinue
