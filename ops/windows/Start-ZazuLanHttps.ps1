@@ -11,7 +11,7 @@ param(
 $ErrorActionPreference = 'Stop'
 $ProjectPath = [System.IO.Path]::GetFullPath($ProjectPath).TrimEnd('\')
 
-$localCaddy = Join-Path $ProjectPath 'tools\\caddy.exe'
+$localCaddy = Join-Path $ProjectPath 'tools\caddy.exe'
 $caddyCommand = Get-Command caddy.exe -ErrorAction SilentlyContinue | Select-Object -First 1
 if (Test-Path $localCaddy -PathType Leaf) {
     $caddy = $localCaddy
