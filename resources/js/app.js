@@ -3439,61 +3439,7 @@ registerZazuServiceWorker();
 
 let zazuLogoutInProgress = false;
 
-async function canReachZazuLogoutServer() {
-    if (!navigator.onLine) return false;
-
-    const controller = new AbortController();
-    const timeout = window.setTimeout(() => controller.abort(), 2500);
-
-    try {
-        const response = await fetch('/up', {
-            method: 'GET',
-            credentials: 'same-origin',
-            cache: 'no-store',
-            signal: controller.signal,
-        });
-        return response.ok;
-    } catch {
-        return false;
-    } finally {
-        window.clearTimeout(timeout);
-    }
-}
-
-async function loadZazuOfflineClient() {
-    if (window.ZazuOffline) {
-        await window.ZazuOffline.ready;
-        return window.ZazuOffline;
-    }
-
-    // Do not let a best-effort network sync hold a public-page logout hostage.
-    // The caller decides whether to keep the queue or explicitly discard it first.
-    window.__ZAZU_OFFLINE_DEFER_INITIAL_SYNC = true;
-
-    await new Promise((resolve, reject) => {
-        const script = document.createElement('script');
-        script.src = '/zazu-offline.js';
-        script.async = true;
-        script.onload = resolve;
-        script.onerror = () => reject(new Error('The local offline client could not be loaded.'));
-        document.head.appendChild(script);
-    });
-
-    if (!window.ZazuOffline) {
-        throw new Error('The local offline client did not initialize.');
-    }
-
-    await window.ZazuOffline.ready;
-    return window.ZazuOffline;
-}
-
 async function handleZazuLogout(form) {
-    const logoutServerReachable = await canReachZazuLogoutServer();
-    if (!logoutServerReachable) {
-        window.alert('Zazu cannot reach the authentication server, so it cannot securely end this web session. Your business offline workspace, pending changes and device token were left untouched. Reconnect to the server and retry signing out.');
-        return;
-    }
-
     const businessId = Number(document.body?.dataset.zazuBusinessId || 0);
     const message = businessId > 0
         ? 'Signing out ends this web session. This browser’s business-scoped offline workspace and any queued changes or attachments will remain on this device. To remove this device from the business, an owner must revoke it in Business Settings. Continue?'
@@ -3501,17 +3447,55 @@ async function handleZazuLogout(form) {
 
     if (!window.confirm(message)) return;
 
-    if ('serviceWorker' in navigator) {
-        try {
-            const registration = await navigator.serviceWorker.getRegistration();
-            const target = navigator.serviceWorker.controller || registration?.active;
-            target?.postMessage({ type: 'clear-user' });
-        } catch {
-            // User-scoped page-cache cleanup is best-effort; business offline data is preserved.
-        }
+    const submit = form.querySelector('button[type="submit"]');
+    if (submit) {
+        submit.disabled = true;
+        submit.setAttribute('aria-busy', 'true');
     }
 
-    HTMLFormElement.prototype.submit.call(form);
+    try {
+        // Submit the real Laravel logout action directly. A separate /up probe
+        // creates a needless race and can block logout even when POST /logout works.
+        const response = await fetch(form.action || '/logout', {
+            method: 'POST',
+            credentials: 'same-origin',
+            cache: 'no-store',
+            redirect: 'follow',
+            headers: { 'Accept': 'text/html' },
+            body: new FormData(form),
+        });
+
+        if (!response.ok || !response.redirected) {
+            const message = response.status === 419
+                ? 'Your security token has expired. Refresh Zazu, then try signing out again.'
+                : 'Zazu could not confirm that your session ended (HTTP ' + response.status + '). You are still signed in; please retry.';
+            throw new Error(message);
+        }
+
+        // Clear only the authenticated page cache after the server confirms
+        // that the session-ending POST succeeded. Business data and its queue
+        // remain intact for the next authorized sign-in.
+        if ('serviceWorker' in navigator) {
+            try {
+                const registration = await navigator.serviceWorker.getRegistration();
+                const target = navigator.serviceWorker.controller || registration?.active;
+                target?.postMessage({ type: 'clear-user' });
+            } catch {
+                // Cache cleanup is best-effort; the server session is already ended.
+            }
+        }
+
+        window.location.assign(response.url || '/');
+    } catch (error) {
+        window.alert(error instanceof TypeError
+            ? 'Zazu could not reach the server to end your session. You are still signed in. Your offline workspace and queued work are safe; reconnect and try again.'
+            : (error.message || 'Zazu could not complete sign out. Your session and offline work have been left unchanged; please retry.'));
+    } finally {
+        if (submit) {
+            submit.disabled = false;
+            submit.removeAttribute('aria-busy');
+        }
+    }
 }
 
 document.addEventListener('submit', async (event) => {
