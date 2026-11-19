@@ -437,10 +437,20 @@ final class BusinessArchiveService
             $newId = $file['table'] === 'businesses'
                 ? (int) $target->id
                 : (int) $idMaps[$file['table']][(string) $file['id']];
-            $path = 'business-archives/'.$target->id.'/'.Str::uuid().'.bin';
-            $restoreDisk = $file['table'] === 'event_attachments' ? 'private' : ($file['source_disk'] ?? 'private');
-            if (! in_array($restoreDisk, ['private', 'local', 'public'], true)
-                || ! Storage::disk($restoreDisk)->put($path, $file['bytes'])) {
+            $filename = Str::uuid().'.bin';
+            $path = match ($file['table']) {
+                'businesses' => 'business-branding/'.$target->id.'/'.$filename,
+                'business_capabilities' => 'catalogue/'.$filename,
+                'customers' => 'profile-photos/customers/'.$newId.'/'.$filename,
+                'compliance_documents' => 'business-compliance/'.$target->id.'/'.$filename,
+                default => 'business-archives/'.$target->id.'/'.$filename,
+            };
+
+            // Archive metadata is untrusted. Only catalogue images are intended
+            // for the public disk; branding, customer photos, compliance files
+            // and attachments must be private regardless of the source archive.
+            $restoreDisk = $file['table'] === 'business_capabilities' ? 'public' : 'private';
+            if (! Storage::disk($restoreDisk)->put($path, $file['bytes'])) {
                 throw new RuntimeException('Restore stopped: a business file could not be written to its storage disk.');
             }
             $createdFiles[] = ['disk' => $restoreDisk, 'path' => $path];
