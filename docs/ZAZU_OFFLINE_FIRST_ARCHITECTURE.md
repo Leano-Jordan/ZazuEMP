@@ -444,18 +444,11 @@ Source assertions and cloud CI are necessary but are not physical-device proof. 
 
 
 
-## Device-local logout and queued-change safety — current contract
+## Device-local logout and queued-change safety
 
-A web-account logout and trusted-device revocation are deliberately separate operations. The local business workspace is device-scoped, not tied to the currently signed-in web account.
+Ordinary web-account logout and trusted-device revocation are separate operations. The current direct `POST /logout` behavior and its offline failure boundary are defined in **Logout request and offline boundary** below. The former `GET /up` preflight description is obsolete and must not be used as implementation guidance.
 
-- Before logout, the client probes the same-origin health endpoint with a bounded `GET /up` request. If the host cannot be reached, logout is cancelled and the workspace, queue and paired-device token remain untouched; a disconnected browser cannot reliably end the Laravel web session.
-- When the host is reachable, the user receives an explicit confirmation that signing out ends only the web session. The business-scoped IndexedDB workspace, pending/failed mutations, attachments and sync token remain on that device.
-- On confirmation, the client asks the service worker to clear the user-scoped authenticated HTML cache, then submits the normal Laravel logout form.
-- The offline workspace is not erased and the device is not automatically unpaired. This allows the same trusted device to resume its business workspace after a later authorized sign-in.
-- To remove a device from the business, an owner must revoke it through Business Settings. Revocation invalidates its sync credential; local data cleanup on a lost/unavailable device is a separate device-management concern.
-- The offline client's `clearLocalSession()` API is a distinct destructive cleanup operation: it clears the attachment workspace, IndexedDB state and mutation queue, then attempts bounded remote token revocation. If the host is unreachable, it retains only the business-scoped installation UUID (never the bearer token) and retries through an owner-authenticated, owner-only endpoint on the next online owner session. It is not called by ordinary web-account logout, which intentionally preserves the trusted workspace and queue.
-- Regression coverage must verify unreachable-host preservation, confirmation cancellation, ordinary logout with workspace/token/queue preserved, same-business reauthentication, and explicit device revocation/cleanup separately. Installed-device acceptance remains a separate verification layer.
-
+The offline client's destructive `clearLocalSession()` operation remains separate from ordinary logout: it clears the attachment workspace, IndexedDB state and mutation queue, then attempts remote device-token revocation. If the host is unreachable, it retains only the business-scoped installation UUID and retries through the owner-authenticated endpoint on the next online owner session. It is not called by ordinary web-account logout.
 
 ## Offline asset cache versioning
 
