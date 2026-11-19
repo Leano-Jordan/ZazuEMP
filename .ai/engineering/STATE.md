@@ -438,3 +438,13 @@ V1: NOT READY. Historical state/register/memory, checklist and changelog are pre
 - Exact-head Laravel, PHPMD, Psalm, Quality, populated migration/rollback and Windows package evidence is still pending. Do not claim the founder workflow is accepted until those exact-head runs pass and the Windows local installation has the new migration. No production licence has been issued.
 - Business-level identity is implemented; per-installation seat limits/reactivation, production key custody/rotation, approved tier matrix and module-level feature enforcement remain open. Do not infer any device-count restrictions.
 - All work committed directly to `main`; no branches created.
+
+
+## Navigation discoverability audit — 2026-11-19
+
+- Founder review identified the owner-only Data Export & Recovery page as effectively hidden: it was reachable from Owner Admin and Reports, but absent from the persistent sidebar and command palette. Its route was already protected by the owner middleware; this was a discoverability defect, not an authorization defect.
+- Added Data Export & Recovery to the owner System navigation, command palette and footer Control navigation. Export routes now activate the System navigation group and show a contextual section tab.
+- The same audit found Compliance and Activity Audit were available through settings sub-navigation, command palette and footer, but not the persistent owner System navigation. Added direct owner-only System links for both.
+- Added a focused regression test for owner discovery and active navigation on the export page. Existing route middleware and export authorization were not changed.
+- Customer spreadsheet import is already discoverable from the Customers page action; event costs, preparation, requirements, travel and attachments are contextual job-level tools, not standalone workspace destinations. No duplicate top-level links added for those contextual workflows.
+- Changes committed directly to main; automated test execution and rendered desktop/mobile verification remain pending. Do not claim UI acceptance until verified.
