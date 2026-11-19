@@ -14,6 +14,7 @@ class PlatformAuditLog extends Model
         'business_id',
         'founder_support_session_id',
         'action',
+        'outcome',
         'reason',
         'metadata',
         'request_id',
