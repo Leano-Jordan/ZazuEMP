@@ -175,6 +175,50 @@ class ExperienceLevelTest extends TestCase
 
 
 
+    public function test_designated_founder_can_use_advanced_experience_after_business_trial_expires(): void
+    {
+        $business = Business::create([
+            'name' => 'Founder Experience Business',
+            'slug' => 'founder-experience-'.Str::lower(Str::random(8)),
+            'status' => 'active',
+            'currency' => 'ZAR',
+        ]);
+        $business->forceFill(['created_at' => now()->subDays(60)])->saveQuietly();
+
+        $founder = User::factory()->create();
+        $business->users()->attach($founder->id, [
+            'role' => 'owner',
+            'experience_level' => 'basic',
+            'primary_niche' => NicheFocus::DEFAULT,
+        ]);
+        $otherOwner = User::factory()->create();
+        $business->users()->attach($otherOwner->id, ['role' => 'owner']);
+
+        config(['zazu.platform_admin_email' => strtolower($founder->email)]);
+
+        $levels = app(ExperienceLevel::class);
+        $this->assertSame(['basic', 'intermediate', 'advanced'], $levels->availableLevels($business, null, $founder));
+        $this->assertSame('advanced', $levels->maximumFor($business, null, $founder));
+        $this->assertTrue($levels->canSelect($business, 'advanced', null, $founder));
+        $this->assertSame(['basic'], $levels->availableLevels($business, null, $otherOwner));
+        $this->assertFalse($levels->canSelect($business, 'advanced', null, $otherOwner));
+
+        $this->actingAs($founder)
+            ->get(route('preferences.experience'))
+            ->assertOk()
+            ->assertSee('Founder access: all experience levels are available to this configured account.')
+            ->assertDontSee('value="advanced" disabled', false);
+
+        $this->put(route('preferences.experience.update'), [
+            'experience_level' => 'advanced',
+            'primary_niche' => NicheFocus::DEFAULT,
+        ])->assertRedirect(route('preferences.experience'));
+
+        $membership = $founder->businesses()->whereKey($business->id)->first()->pivot;
+        $this->assertSame('advanced', $membership->experience_level);
+        $this->assertSame('advanced', $levels->for($founder, $business));
+    }
+
     public function test_intermediate_signed_entitlement_allows_only_basic_and_intermediate_experience(): void
     {
         $business = Business::create([
