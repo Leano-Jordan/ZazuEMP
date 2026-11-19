@@ -1910,6 +1910,13 @@ test.describe('Zazu installed PWA offline shell', () => {
             }
         });
 
+        // Cache the real invoice form while connected. After the quote is
+        // accepted locally, the same form must discover that local acceptance.
+        await page.goto('/finance/invoices/create', { waitUntil: 'domcontentloaded' });
+        await expect(page.locator('form[data-zazu-offline-entity="invoice"]')).toBeVisible();
+        await page.goto('/dashboard', { waitUntil: 'domcontentloaded' });
+        await waitForOfflineRuntime(page);
+
         await context.setOffline(true);
         const quoteRow = page.locator('[data-zazu-local-record="quote"]').filter({ hasText: 'OFFLINE-QUOTE-001' });
         await expect(quoteRow).toBeVisible();
@@ -1955,6 +1962,40 @@ test.describe('Zazu installed PWA offline shell', () => {
         });
 
         await expect(detail).toBeHidden();
+
+        // Convert that newly accepted local quote through the existing invoice
+        // form, without relying on the server-rendered quote list being current.
+        await page.goto('/finance/invoices/create', { waitUntil: 'domcontentloaded' });
+        const invoiceForm = page.locator('form[data-zazu-offline-entity="invoice"]');
+        await expect(invoiceForm).toBeVisible();
+        const localQuoteOption = invoiceForm.locator(`select[name="quote_id"] option[value="${quoteServerId}"]`);
+        await expect(localQuoteOption).toHaveCount(1);
+        await expect(localQuoteOption).toContainText('OFFLINE-QUOTE-001');
+        await invoiceForm.locator('select[name="quote_id"]').selectOption(String(quoteServerId));
+        await expect(invoiceForm.locator('[data-invoice-source-summary]')).toContainText('OFFLINE-QUOTE-001');
+        await invoiceForm.getByRole('button', { name: 'Create invoice' }).click();
+        await expect(invoiceForm.getByRole('status')).toContainText('Saved on this device');
+
+        const queuedInvoice = await page.evaluate(async quoteId => {
+            const state = window.ZazuOffline.getState();
+            const queued = await window.ZazuOffline.pending();
+            const mutation = queued.find(item =>
+                item.entity_type === 'invoice'
+                && item.payload?.record?.quote_local_id === quoteId
+            );
+            return {
+                quote_local_id: mutation?.payload?.record?.quote_local_id || null,
+                status: mutation?.status || null,
+                local_invoice: state.invoices?.find(item =>
+                    item.local_id === mutation?.payload?.record?.local_id
+                )?.quote_local_id || null,
+            };
+        }, quoteLocalId);
+        expect(queuedInvoice).toEqual({
+            quote_local_id: quoteLocalId,
+            status: 'pending',
+            local_invoice: quoteLocalId,
+        });
     });
 
     test('inspects a device-local Work record and its commercial chain while disconnected', async ({ page, context }, testInfo) => {
