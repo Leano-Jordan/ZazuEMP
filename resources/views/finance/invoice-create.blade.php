@@ -162,7 +162,52 @@
                 eventSelect.addEventListener('change', () => {
                     if (!quoteSelect.value) manualEventId = eventSelect.value;
                 });
+                const addLocalAcceptedQuotes = () => {
+                    const offlineState = window.ZazuOffline?.getState();
+                    if (!offlineState) return;
+
+                    const existingValues = new Set([...quoteSelect.options].map(option => option.value));
+                    for (const quote of offlineState.quotes || []) {
+                        const quoteId = Number(quote.id ?? quote.server_id ?? 0);
+                        const version = quote.latest_version || quote.latestVersion || {};
+                        if (
+                            quoteId <= 0
+                            || quote.status !== 'accepted'
+                            || version.status !== 'accepted'
+                            || existingValues.has(String(quoteId))
+                        ) continue;
+
+                        const eventId = Number(quote.event_id ?? quote.event?.id ?? 0);
+                        const customerName = quote.customer_name || quote.event?.customer?.name || 'Customer';
+                        const currency = quote.currency || offlineState.business?.currency || 'ZAR';
+                        const total = version.total ?? quote.total ?? '0.00';
+                        const option = document.createElement('option');
+                        option.value = String(quoteId);
+                        option.dataset.eventId = eventId > 0 ? String(eventId) : '';
+                        option.dataset.eventName = quote.event_name || quote.event?.name || '';
+                        option.dataset.customerName = customerName;
+                        option.dataset.currency = currency;
+                        option.dataset.total = String(total);
+                        option.dataset.zazuLocalQuote = '1';
+                        option.textContent = [
+                            quote.reference || 'Accepted quote',
+                            'accepted',
+                            customerName,
+                            currency + ' ' + total,
+                        ].join(' · ');
+                        quoteSelect.append(option);
+                        existingValues.add(String(quoteId));
+                    }
+
+                    syncInvoiceSource();
+                };
+
                 quoteSelect.addEventListener('change', syncInvoiceSource);
+                window.addEventListener('zazu:offline-state-updated', addLocalAcceptedQuotes);
+                if (window.ZazuOffline?.ready) {
+                    window.ZazuOffline.ready.then(addLocalAcceptedQuotes).catch(() => {});
+                }
+                addLocalAcceptedQuotes();
                 syncInvoiceSource();
             }
 
