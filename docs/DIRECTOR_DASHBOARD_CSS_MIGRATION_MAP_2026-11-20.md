@@ -184,3 +184,38 @@ No CSS relocation is approved by the evidence gathered so far. This is deliberat
 - Used repository search to locate the corresponding dashboard-authority rules and source-level test coupling.
 - No CSS or test source changed.
 - PHPUnit, Vite and browser visual tests were not run in this environment; no pass is claimed.
+
+
+## Brace-aware rule inventory and cascade correction — 2026-11-20
+
+A second pass parsed complete rule blocks from the exact current product stylesheet (blob `6173878b926561eba9f644c621d8a3ae63ce7b6c`), tracking comments, quoted strings, braces, and enclosing at-rule context. This is a source-order inventory, not a browser CSSOM/computed-style test.
+
+- **154 rule blocks** contain dashboard-related selectors or dashboard component names.
+- **7 selector-list blocks** mix dashboard-scoped selectors with selectors also used outside the dashboard. These are the shared shell and shared heading/reset groups at lines 495, 502, 508, 1035, 1045, 1107 and 1144.
+- The 154 count is lower than the earlier 161-rule exploratory scan because the earlier pass did not handle all selector-list and at-rule boundaries consistently. The earlier 260 figure counted matching source lines, not rules; it must not be interpreted as 260 independent CSS rules.
+
+### Quote-pipeline declaration trace
+
+The product quote block around lines 778–797 has the following trace:
+
+- The desktop `.zazu-dash-commercial .zazu-dash-quote-stages` rule sets padding and gap; its gap is later affected by the more-specific dashboard rule in dashboard authority. The padding needs to be evaluated against the subsequent product layout passes.
+- The stage rule sets min-height and padding, with a later mobile override at max-width 620px. It is not safe to remove based on selector overlap alone.
+- The adjacent dashboard panel-head and hero-side border rules at 786 and 789 are separate overrides; they are not part of the same quote-stage ownership unit.
+- Existing source assertions in `UiVisualSystemRegressionTest` and `DashboardVisualRefinementTest` encode current product-file locations/values and must be deliberately rewritten if ownership changes.
+
+### Mixed selector groups — confirmed boundary
+
+The seven mixed blocks are:
+1. Sidebar shell (495)
+2. Topbar shell (502)
+3. Dark topbar shell (508)
+4. Shared card/panel/form/dashboard heading surface (1035)
+5. Shared heading typography (1045)
+6. Shared solid-surface background-image reset (1107)
+7. Dark shared heading surface (1144)
+
+These should remain in product authority unless split into selector-equivalent rules with identical declarations and identical theme context. The pure dashboard blocks are candidates for further cascade mapping, not automatic migration candidates.
+
+### Current engineering decision
+
+No CSS source change is made in this pass. The parser provides a more reliable ordered inventory, but it does not prove unchanged computed styles. The next code change must be based on a property-by-property comparison of one pure dashboard block against all earlier/later declarations in both stylesheets, then paired test changes. Browser computed-style validation is still required before calling the migration visually safe.
