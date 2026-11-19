@@ -54,6 +54,7 @@ class FounderSupportAccessTest extends TestCase
         $this->assertDatabaseHas('platform_audit_logs', [
             'founder_support_session_id' => $supportSession->id,
             'action' => 'founder.support.started',
+            'outcome' => 'success',
         ]);
 
         $this->get(route('admin.sentinel.support.show', $supportSession))
@@ -66,6 +67,7 @@ class FounderSupportAccessTest extends TestCase
         $this->assertDatabaseHas('platform_audit_logs', [
             'founder_support_session_id' => $supportSession->id,
             'action' => 'founder.support.viewed',
+            'outcome' => 'success',
         ]);
 
         $this->post(route('admin.sentinel.support.end', $supportSession))
@@ -75,6 +77,7 @@ class FounderSupportAccessTest extends TestCase
         $this->assertDatabaseHas('platform_audit_logs', [
             'founder_support_session_id' => $supportSession->id,
             'action' => 'founder.support.ended',
+            'outcome' => 'success',
         ]);
 
         $this->get(route('admin.sentinel.support.show', $supportSession))
