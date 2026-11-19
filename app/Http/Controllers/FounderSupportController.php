@@ -19,21 +19,25 @@ final class FounderSupportController extends Controller
 
         abort_unless($business->exists, 404);
 
-        $now = now();
-        $supportSession = FounderSupportSession::query()->create([
-            'actor_user_id' => $request->user()->getAuthIdentifier(),
-            'business_id' => $business->id,
-            'reason' => trim($validated['reason']),
-            'started_at' => $now,
-            'expires_at' => $now->copy()->addMinutes(15),
-        ]);
+        $supportSession = DB::transaction(function () use ($request, $business, $validated): FounderSupportSession {
+            $now = now();
+            $session = FounderSupportSession::query()->create([
+                'actor_user_id' => $request->user()->getAuthIdentifier(),
+                'business_id' => $business->id,
+                'reason' => trim($validated['reason']),
+                'started_at' => $now,
+                'expires_at' => $now->copy()->addMinutes(15),
+            ]);
+
+            $this->audit($request, $session, 'founder.support.started', [
+                'expires_at' => $session->expires_at->toIso8601String(),
+                'access_mode' => 'read_only',
+            ]);
+
+            return $session;
+        });
 
         $request->session()->put('zazu_founder_support_session_id', $supportSession->id);
-
-        $this->audit($request, $supportSession, 'founder.support.started', [
-            'expires_at' => $supportSession->expires_at->toIso8601String(),
-            'access_mode' => 'read_only',
-        ]);
 
         return redirect()->route('admin.sentinel.support.show', $supportSession);
     }
@@ -43,6 +47,10 @@ final class FounderSupportController extends Controller
         abort_unless($supportSession->business, 404);
 
         $business = $supportSession->business;
+        $this->audit($request, $supportSession, 'founder.support.viewed', [
+            'access_mode' => 'read_only',
+        ]);
+
         $customers = $business->customers()->orderBy('name')->limit(20)->get(['id', 'name', 'created_at']);
         $events = $business->events()->latest('event_date')->limit(20)->get([
             'id',
@@ -50,12 +58,6 @@ final class FounderSupportController extends Controller
             'name',
             'event_date',
             'status',
-        ]);
-
-        $this->audit($request, $supportSession, 'founder.support.viewed', [
-            'customer_rows_returned' => $customers->count(),
-            'event_rows_returned' => $events->count(),
-            'access_mode' => 'read_only',
         ]);
 
         return view('admin.sentinel-support', [
@@ -70,16 +72,22 @@ final class FounderSupportController extends Controller
     {
         abort_unless((int) $supportSession->actor_user_id === (int) $request->user()->getAuthIdentifier(), 403);
 
-        if ($supportSession->ended_at === null) {
-            $supportSession->forceFill([
+        DB::transaction(function () use ($request, $supportSession): void {
+            $lockedSession = FounderSupportSession::query()->lockForUpdate()->findOrFail($supportSession->id);
+
+            if ($lockedSession->ended_at !== null) {
+                return;
+            }
+
+            $lockedSession->forceFill([
                 'ended_at' => now(),
                 'ended_by_user_id' => $request->user()->getAuthIdentifier(),
             ])->save();
 
-            $this->audit($request, $supportSession, 'founder.support.ended', [
+            $this->audit($request, $lockedSession, 'founder.support.ended', [
                 'access_mode' => 'read_only',
             ]);
-        }
+        });
 
         if ((int) $request->session()->get('zazu_founder_support_session_id') === (int) $supportSession->id) {
             $request->session()->forget('zazu_founder_support_session_id');
@@ -95,6 +103,7 @@ final class FounderSupportController extends Controller
             'business_id' => $supportSession->business_id,
             'founder_support_session_id' => $supportSession->id,
             'action' => $action,
+            'outcome' => 'success',
             'reason' => $supportSession->reason,
             'metadata' => $metadata,
             'request_id' => $request->attributes->get('zazu_request_id'),
