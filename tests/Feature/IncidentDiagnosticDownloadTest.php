@@ -114,7 +114,8 @@ class IncidentDiagnosticDownloadTest extends TestCase
                 'exception_message' => 'private customer details',
             ]);
 
-            $response = $this->get('/api/support/incidents/'.$requestId);
+            $signedUrl = URL::temporarySignedRoute('support.incidents.show', now()->addMinutes(15), ['requestId' => $requestId]);
+            $response = $this->get($signedUrl);
 
             $response->assertOk()
                 ->assertJsonPath('request_id', $requestId)
