@@ -60,8 +60,16 @@
         </section>
 
         <section class="founder-account-panel">
-            <h3 class="font-semibold mb-2">Founder actions</h3>
-            <p class="founder-muted">Account inspection is read-only at this stage. Temporary workspace access, account suspension and other consequential actions will only be enabled after dedicated founder audit logging, expiry controls and isolation tests are in place.</p>
+            <h3 class="font-semibold mb-2">Founder support access</h3>
+            <p class="founder-muted mb-3">Start a separate, time-limited, read-only support session. The business owner is not impersonated and your own active workspace is not changed. Access is limited to customer names and recent event summaries.</p>
+            <form method="POST" action="{{ route('admin.sentinel.support.start', $business) }}" class="grid gap-3">
+                @csrf
+                <label for="support-reason" class="font-medium text-sm">Reason for access</label>
+                <textarea id="support-reason" name="reason" rows="3" minlength="10" maxlength="500" required class="w-full rounded-xl border border-[var(--zazu-border)] bg-[var(--zazu-surface)] p-3" placeholder="Describe the support request and why account visibility is needed.">{{ old('reason') }}</textarea>
+                @error('reason')<p class="text-sm text-red-600">{{ $message }}</p>@enderror
+                <div><button type="submit" class="zazu-btn zazu-btn-primary">Start 15-minute read-only session</button></div>
+            </form>
+            <p class="founder-muted mt-3">Every start and view is written to the separate platform audit log. No edits, exports, payment access, credential access or account mutations are enabled.</p>
         </section>
     </div>
 </x-app-layout>
