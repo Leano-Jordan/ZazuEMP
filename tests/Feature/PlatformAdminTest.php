@@ -84,6 +84,7 @@ class PlatformAdminTest extends TestCase
             ->assertDontSee('Sentinel Rescue');
 
         $this->assertStringContainsString('href="'.route('owner.dashboard').'"', $response->getContent());
+        $this->assertStringContainsString('href="'.route('exports.index').'"', $response->getContent());
         $this->assertStringNotContainsString('href="'.route('sentinel.rescue').'"', $response->getContent());
     }
 
@@ -126,6 +127,9 @@ class PlatformAdminTest extends TestCase
             ->assertOk()
             ->assertSee('Founder Control Centre')
             ->assertSee('Business workspace')
+            ->assertSee('href="'.route('admin.sentinel').'"', false)
+            ->assertSee('href="'.route('owner.dashboard').'"', false)
+            ->assertSee('href="'.route('exports.index').'"', false)
             ->assertSee('href="'.route('dashboard').'"', false);
     }
 
