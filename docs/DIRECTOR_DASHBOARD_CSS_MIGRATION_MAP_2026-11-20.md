@@ -159,3 +159,28 @@ A source-order pass over the complete product stylesheet identified eight mixed 
 The first seven are genuine shared/mixed ownership cases and must remain in product authority unless split into selector-equivalent rules with identical declarations and unchanged media/theme context. The final item is a parser-boundary artifact and requires manual source parsing, not an assumption that the rule itself is mixed.
 
 The scan confirms that a bulk move by line range is not safe. The migration must be performed rule-by-rule, preserving source order and splitting only demonstrably equivalent selector lists.
+
+
+## Rule-level follow-up — dashboard quote pipeline candidate
+
+The quote-pipeline group around product-authority lines 775–795 was inspected against dashboard-authority source and repository search results.
+
+| Product rule | Ownership | Result |
+|---|---|---|
+| `.zazu-dash-commercial .zazu-dash-quote-stages` | Dashboard-only | Dashboard authority already has a more specific `body.zazu-dashboard-page .zazu-dash-commercial .zazu-dash-quote-stages` rule. The product rule's `gap` does not win against that more-specific important declaration. Its padding remains a distinct declaration and needs full downstream property tracing. |
+| `.zazu-dash-commercial .zazu-dash-quote-stage` | Dashboard-only | Dashboard authority already contains a more-specific stage rule. The product block's minimum-height and padding cannot be treated as an independent ownership move without checking the dashboard rule's declarations and later product overrides. |
+| `body.zazu-dashboard-page .zazu-dash-panel-head` | Dashboard-only | Separate rule, but panel-head structure is also styled in dashboard authority and in the final visual sweep stylesheet. Not part of the safe candidate. |
+| `body.zazu-dashboard-page .zazu-dash-hero-side` | Dashboard-only | Separate rule, with multiple earlier/later hero-side declarations in both authority files. Not part of the safe candidate. |
+
+The product quote-pipeline block is not a clean first migration unit: its declarations are interleaved with unrelated product rules, overlap more-specific dashboard rules, and have test assertions tied to the current product-file location (`UiVisualSystemRegressionTest`). The dashboard interaction test also asserts the dashboard-owned quote-pipeline selector. A blind move would either leave dead declarations behind or alter the cascade while giving misleading ownership signals.
+
+### Current decision
+
+No CSS relocation is approved by the evidence gathered so far. This is deliberate: the candidate inspected is not a safe atomic group. The next useful pass is a complete rule/declaration matrix for the dashboard-only blocks in product authority, including their selector specificity and all later declarations in both authority files. Only a block with a proven unchanged computed winner and paired test update should be moved.
+
+### Verification boundary
+
+- Re-fetched current `main` product authority, dashboard authority, shared-component test and migration document before this analysis.
+- Used repository search to locate the corresponding dashboard-authority rules and source-level test coupling.
+- No CSS or test source changed.
+- PHPUnit, Vite and browser visual tests were not run in this environment; no pass is claimed.
